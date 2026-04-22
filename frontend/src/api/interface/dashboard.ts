@@ -52,6 +52,7 @@ export namespace Dashboard {
         platform: string;
         platformFamily: string;
         platformVersion: string;
+        prettyDistro: string;
         kernelArch: string;
         kernelVersion: string;
         virtualizationSystem: string;
@@ -61,6 +62,7 @@ export namespace Dashboard {
         cpuCores: number;
         cpuLogicalCores: number;
         cpuModelName: string;
+        cpuMhz: number;
 
         currentInfo: CurrentInfo;
         quickJump: Array<QuickJump>;
@@ -79,6 +81,7 @@ export namespace Dashboard {
         cpuUsedPercent: number;
         cpuUsed: number;
         cpuTotal: number;
+        cpuDetailedPercent: Array<number>; // [user, system, nice, idle, iowait, irq, softirq, steal]
 
         memoryTotal: number;
         memoryAvailable: number;

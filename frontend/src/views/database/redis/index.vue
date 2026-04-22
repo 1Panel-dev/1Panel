@@ -200,7 +200,7 @@ const getAppDetail = (key: string) => {
 };
 const goRemoteDB = async () => {
     if (currentDB.value) {
-        globalStore.setCurrentRedisDB(currentDBName.value);
+        globalStore.currentRedisDB = currentDBName.value;
     }
     routerToName('Redis-Remote');
 };
@@ -226,6 +226,7 @@ const changeDatabase = async () => {
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
+            globalStore.currentRedisDB = currentDB.value.database;
             appKey.value = item.type;
             appName.value = item.database;
             appStatusRef.value?.onCheck(appKey.value, appName.value);
@@ -236,6 +237,7 @@ const changeDatabase = async () => {
     for (const item of dbOptionsRemote.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
+            globalStore.currentRedisDB = currentDB.value.database;
             break;
         }
     }
@@ -248,7 +250,7 @@ const loadDBOptions = async () => {
         let datas = res.data || [];
         dbOptionsLocal.value = [];
         dbOptionsRemote.value = [];
-        currentDBName.value = globalStore.currentDB;
+        currentDBName.value = globalStore.currentRedisDB;
         for (const item of datas) {
             if (currentDBName.value && item.database === currentDBName.value) {
                 currentDB.value = item;

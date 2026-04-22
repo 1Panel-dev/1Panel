@@ -148,10 +148,8 @@ func (i *Iptables) Port(port FireInfo, operation string) error {
 	if port.Chain == iptables.Chain1PanelBasicBefore {
 		name = iptables.BasicBeforeFileName
 	}
-	if port.Chain == iptables.Chain1PanelBasic {
-		if err := iptables.SaveRulesToFile(iptables.FilterTab, port.Chain, name); err != nil {
-			global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
-		}
+	if err := iptables.SaveRulesToFile(iptables.FilterTab, port.Chain, name); err != nil {
+		global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
 	}
 	return nil
 }
@@ -215,10 +213,8 @@ func (i *Iptables) RichRules(rule FireInfo, operation string) error {
 	if rule.Chain == iptables.Chain1PanelBasicBefore {
 		name = iptables.BasicBeforeFileName
 	}
-	if rule.Chain == iptables.Chain1PanelBasic {
-		if err := iptables.SaveRulesToFile(iptables.FilterTab, rule.Chain, name); err != nil {
-			global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
-		}
+	if err := iptables.SaveRulesToFile(iptables.FilterTab, rule.Chain, name); err != nil {
+		global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
 	}
 	return nil
 }

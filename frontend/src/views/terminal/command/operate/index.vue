@@ -14,7 +14,10 @@
             :model="dialogData.rowData"
             :rules="rules"
         >
-            <el-form-item :label="$t('commons.table.name')" prop="name">
+            <el-form-item v-if="dialogData.title === 'create'" :label="$t('terminal.batchInput')">
+                <el-switch v-model="batchMode" />
+            </el-form-item>
+            <el-form-item v-if="!batchMode" :label="$t('commons.table.name')" prop="name">
                 <el-input clearable v-model="dialogData.rowData!.name" />
             </el-form-item>
             <el-form-item :label="$t('commons.table.group')" prop="groupID">
@@ -29,8 +32,19 @@
                     </div>
                 </el-select>
             </el-form-item>
-            <el-form-item :label="$t('terminal.command')" prop="command">
+            <el-form-item v-if="!batchMode" :label="$t('terminal.command')" prop="command">
                 <el-input type="textarea" clearable v-model="dialogData.rowData!.command" />
+            </el-form-item>
+            <el-form-item v-else :label="$t('terminal.command')">
+                <el-input
+                    v-model="batchCommandText"
+                    type="textarea"
+                    clearable
+                    :autosize="{ minRows: 8, maxRows: 16 }"
+                />
+                <div class="input-help mt-1 text-[var(--el-text-color-secondary)] text-xs leading-5">
+                    {{ $t('terminal.quickCommandBatchHelper') }}
+                </div>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -49,14 +63,16 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { Command } from '@/api/interface/command';
-import { addCommand, editCommand } from '@/api/modules/command';
+import { addCommand, editCommand, importCommands } from '@/api/modules/command';
 import { getGroupList } from '@/api/modules/group';
 
 const loading = ref();
 const open = ref();
 const groupList = ref();
+const batchMode = ref(false);
+const batchCommandText = ref('');
 
 const rules = reactive({
     name: [Rules.requiredInput],
@@ -79,6 +95,8 @@ const dialogData = ref<DialogProps>({
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title) + i18n.global.t('terminal.quickCommand');
+    batchMode.value = false;
+    batchCommandText.value = '';
     loadGroups();
     open.value = true;
 };
@@ -88,8 +106,48 @@ const handleClose = () => {
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
+const buildBatchCommands = (): Array<Command.CommandOperate> => {
+    const lines = batchCommandText.value
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean);
+    return lines.map((line) => {
+        const tripleDashSeparator = '---';
+        const tripleDashIndex = line.indexOf(tripleDashSeparator);
+        const separator = tripleDashIndex > 0 ? tripleDashSeparator : '';
+        const separatorIndex = separator ? line.indexOf(separator) : -1;
+        const hasCustomName = separatorIndex > 0;
+        const name = hasCustomName ? line.slice(0, separatorIndex).trim() : line;
+        const command = hasCustomName ? line.slice(separatorIndex + separator.length).trim() : line;
+        return {
+            id: 0,
+            type: 'command',
+            groupID: dialogData.value.rowData!.groupID,
+            name,
+            command,
+        };
+    });
+};
+
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
+    if (batchMode.value) {
+        if (!dialogData.value.rowData?.groupID) {
+            MsgError(i18n.global.t('commons.rule.requiredSelect'));
+            return;
+        }
+        const items = buildBatchCommands().filter((item) => item.name && item.command);
+        if (items.length === 0) {
+            MsgError(i18n.global.t('commons.rule.requiredInput'));
+            return;
+        }
+        loading.value = true;
+        await importCommands(items);
+        open.value = false;
+        emit('search');
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        return;
+    }
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;

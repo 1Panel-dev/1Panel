@@ -17,9 +17,12 @@ export namespace Setting {
         ntpSite: string;
 
         panelName: string;
+        edition: string;
         theme: string;
         menuTabs: string;
         language: string;
+        docSource: string;
+        defaultIO: string;
         defaultNetwork: string;
         lastCleanTime: string;
         lastCleanSize: string;
@@ -32,7 +35,10 @@ export namespace Setting {
         sslType: string;
         allowIPs: string;
         bindDomain: string;
+        passkeyTrustedProxies: string;
         securityEntrance: string;
+        dashboardMemoVisible: string;
+        dashboardSimpleNodeVisible: string;
         expirationDays: number;
         expirationTime: string;
         complexityVerification: string;
@@ -68,10 +74,31 @@ export namespace Setting {
         lineHeight: string;
         letterSpacing: string;
         fontSize: string;
+        fontFamily: string;
+        backgroundColor: string;
+        foregroundColor: string;
         cursorBlink: string;
         cursorStyle: string;
         scrollback: string;
         scrollSensitivity: string;
+    }
+    export interface TerminalAIInfo {
+        aiStatus: string;
+        aiAccountId: string;
+        aiPrefix: string;
+        aiRiskCommands: string;
+        aiRiskCommandsDefault?: string;
+    }
+
+    export interface FileManageAIInfo {
+        aiStatus: string;
+        aiAccountId: string;
+    }
+
+    export interface FileHistoryInfo {
+        enable: string;
+        maxPerPath: number;
+        diskQuotaMB: number;
     }
     export interface SettingUpdate {
         key: string;
@@ -127,6 +154,19 @@ export namespace Setting {
         secret: string;
         code: string;
         interval: string;
+    }
+    export interface PasskeyRegisterRequest {
+        name: string;
+    }
+    export interface PasskeyBeginResponse {
+        sessionId: string;
+        publicKey: Record<string, any>;
+    }
+    export interface PasskeyInfo {
+        id: string;
+        name: string;
+        createdAt: string;
+        lastUsedAt: string;
     }
     export interface CommonDescription {
         id: string;
@@ -286,5 +326,10 @@ export namespace Setting {
         licenseName: string;
         smsUsed: number;
         smsTotal: number;
+    }
+
+    export interface NodeAppItem {
+        name: string;
+        updateCount: number;
     }
 }

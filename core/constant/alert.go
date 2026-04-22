@@ -7,4 +7,5 @@ const (
 	WeCom    = "weCom"
 	DingTalk = "dingTalk"
 	FeiShu   = "feiShu"
+	Custom   = "custom"
 )

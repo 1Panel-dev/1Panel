@@ -8,12 +8,12 @@ import (
 
 func LoadErrCode() int {
 	settingRepo := repo.NewISettingRepo()
-	codeVal, err := settingRepo.Get(repo.WithByKey("NoAuthSetting"))
+	codeVal, err := settingRepo.GetValueByKey("NoAuthSetting")
 	if err != nil {
 		return 500
 	}
 
-	switch codeVal.Value {
+	switch codeVal {
 	case "400":
 		return http.StatusBadRequest
 	case "401":

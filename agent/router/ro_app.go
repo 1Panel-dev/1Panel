@@ -19,10 +19,11 @@ func (a *AppRouter) InitRouter(Router *gin.RouterGroup) {
 		appRouter.POST("/search", baseApi.SearchApp)
 		appRouter.GET("/:key", baseApi.GetApp)
 		appRouter.GET("/detail/:appId/:version/:type", baseApi.GetAppDetail)
+		appRouter.GET("/detail/node/:appKey/:version", baseApi.GetAppDetailForNode)
 		appRouter.GET("/details/:id", baseApi.GetAppDetailByID)
 		appRouter.POST("/install", baseApi.InstallApp)
 		appRouter.GET("/tags", baseApi.GetAppTags)
-		appRouter.GET("/icon/:appID", baseApi.GetAppIcon)
+		appRouter.GET("/icon/:key", baseApi.GetAppIcon)
 
 		appRouter.POST("/installed/check", baseApi.CheckAppInstalled)
 		appRouter.POST("/installed/loadport", baseApi.LoadPort)
@@ -39,6 +40,7 @@ func (a *AppRouter) InitRouter(Router *gin.RouterGroup) {
 		appRouter.POST("/installed/params/update", baseApi.UpdateInstalled)
 		appRouter.POST("/installed/update/versions", baseApi.GetUpdateVersions)
 		appRouter.POST("/installed/config/update", baseApi.UpdateAppConfig)
+		appRouter.POST("/installed/sort/update", baseApi.UpdateAppInstallSort)
 		appRouter.GET("/installed/info/:appInstallId", baseApi.GetAppInstallInfo)
 
 		appRouter.POST("/installed/ignore", baseApi.IgnoreAppUpgrade)

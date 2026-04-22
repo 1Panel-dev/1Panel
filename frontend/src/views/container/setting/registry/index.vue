@@ -35,8 +35,7 @@ import { MsgSuccess } from '@/utils/message';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateDaemonJson } from '@/api/modules/container';
 import { FormInstance } from 'element-plus';
-import { emptyLineFilter } from '@/utils/util';
-
+import { emptyLineFilter } from '@/utils/validate';
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const confirmDialogRef = ref();
@@ -79,7 +78,7 @@ const acceptParams = (params: DialogProps): void => {
 const onSave = async () => {
     let params = {
         header: i18n.global.t('database.confChange'),
-        operationInfo: i18n.global.t('database.restartNowHelper'),
+        operationInfo: i18n.global.t('container.restartHelper'),
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRef.value!.acceptParams(params);

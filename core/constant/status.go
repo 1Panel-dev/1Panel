@@ -21,6 +21,7 @@ const (
 
 	StatusEnable  = "Enable"
 	StatusDisable = "Disable"
+	StatusMux     = "Mux"
 
 	StatusInstalling = "Installing"
 	StatusNormal     = "Normal"

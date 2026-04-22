@@ -20,6 +20,7 @@ type IAppRepo interface {
 	WithResource(resource string) DBOption
 	WithNotLocal() DBOption
 	WithByLikeName(name string) DBOption
+	WithKeyIn(keys []string) DBOption
 	WithArch(arch string) DBOption
 	WithPanelVersion(panelVersion string) DBOption
 
@@ -33,7 +34,7 @@ type IAppRepo interface {
 	DeleteByIDs(ctx context.Context, ids []uint) error
 	DeleteBy(opts ...DBOption) error
 
-	GetTopRecomment() ([]string, error)
+	GetTopRecommend() ([]string, error)
 }
 
 func NewIAppRepo() IAppRepo {
@@ -52,6 +53,12 @@ func (a AppRepo) WithByLikeName(name string) DBOption {
 func (a AppRepo) WithKey(key string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("key = ?", key)
+	}
+}
+
+func (a AppRepo) WithKeyIn(keys []string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("`key` in (?)", keys)
 	}
 }
 
@@ -124,7 +131,7 @@ func (a AppRepo) GetBy(opts ...DBOption) ([]model.App, error) {
 	return apps, nil
 }
 
-func (a AppRepo) GetTopRecomment() ([]string, error) {
+func (a AppRepo) GetTopRecommend() ([]string, error) {
 	var (
 		apps  []model.App
 		names []string

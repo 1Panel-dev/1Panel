@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
@@ -11,6 +12,11 @@ import (
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
+)
+
+var (
+	expiredLoc     *time.Location
+	expiredLocOnce sync.Once
 )
 
 func PasswordExpired() gin.HandlerFunc {
@@ -22,24 +28,23 @@ func PasswordExpired() gin.HandlerFunc {
 			return
 		}
 		settingRepo := repo.NewISettingRepo()
-		setting, err := settingRepo.Get(repo.WithByKey("ExpirationDays"))
+		expirationDays, err := settingRepo.GetValueByKey("ExpirationDays")
 		if err != nil {
 			helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPasswordExpired", err)
 			return
 		}
-		expiredDays, _ := strconv.Atoi(setting.Value)
+		expiredDays, _ := strconv.Atoi(expirationDays)
 		if expiredDays == 0 {
 			c.Next()
 			return
 		}
 
-		extime, err := settingRepo.Get(repo.WithByKey("ExpirationTime"))
+		expirationTime, err := settingRepo.GetValueByKey("ExpirationTime")
 		if err != nil {
 			helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPasswordExpired", err)
 			return
 		}
-		loc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
-		expiredTime, err := time.ParseInLocation(constant.DateTimeLayout, extime.Value, loc)
+		expiredTime, err := time.ParseInLocation(constant.DateTimeLayout, expirationTime, loadExpiredLocation())
 		if err != nil {
 			helper.ErrorWithDetail(c, 313, "ErrPasswordExpired", err)
 			return
@@ -50,4 +55,19 @@ func PasswordExpired() gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+
+func loadExpiredLocation() *time.Location {
+	expiredLocOnce.Do(func() {
+		loc, err := time.LoadLocation(common.LoadTimeZoneByCmd())
+		if err != nil {
+			expiredLoc = time.Local
+			return
+		}
+		expiredLoc = loc
+	})
+	if expiredLoc == nil {
+		return time.Local
+	}
+	return expiredLoc
 }

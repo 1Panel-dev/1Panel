@@ -53,7 +53,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { updateIpv6Option } from '@/api/modules/container';
-import { checkIpV6 } from '@/utils/util';
+import { checkIpV6 } from '@/utils/validate';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -111,7 +111,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         let params = {
             header: i18n.global.t('database.confChange'),
-            operationInfo: i18n.global.t('database.restartNowHelper'),
+            operationInfo: i18n.global.t('container.restartHelper'),
             submitInputInfo: i18n.global.t('database.restartNow'),
         };
         confirmDialogRef.value!.acceptParams(params);

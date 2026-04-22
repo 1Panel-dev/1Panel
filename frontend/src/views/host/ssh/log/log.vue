@@ -89,7 +89,8 @@
 </template>
 
 <script setup lang="ts">
-import { dateFormat, downloadFile } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { downloadFile } from '@/utils/file';
 import { onMounted, reactive, ref } from 'vue';
 import { exportSSHLogs, loadSSHLogs } from '@/api/modules/host';
 import { GlobalStore } from '@/store';

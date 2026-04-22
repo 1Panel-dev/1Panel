@@ -65,13 +65,18 @@ const handleChange = (tab: any) => {
 
 const loadTerminalSetting = async () => {
     await getTerminalInfo().then((res) => {
-        terminalStore.setLineHeight(Number(res.data.lineHeight));
-        terminalStore.setLetterSpacing(Number(res.data.letterSpacing));
-        terminalStore.setFontSize(Number(res.data.fontSize));
-        terminalStore.setCursorBlink(res.data.cursorBlink);
-        terminalStore.setCursorStyle(res.data.cursorStyle);
-        terminalStore.setScrollback(Number(res.data.scrollback));
-        terminalStore.setScrollSensitivity(Number(res.data.scrollSensitivity));
+        terminalStore.$patch({
+            lineHeight: Number(res.data.lineHeight),
+            letterSpacing: Number(res.data.letterSpacing),
+            fontSize: Number(res.data.fontSize),
+            fontFamily: res.data.fontFamily || "Monaco, Menlo, Consolas, 'Courier New', monospace",
+            backgroundColor: res.data.backgroundColor || '#000000',
+            foregroundColor: res.data.foregroundColor || '#f5f5f5',
+            cursorBlink: res.data.cursorBlink,
+            cursorStyle: res.data.cursorStyle,
+            scrollback: Number(res.data.scrollback),
+            scrollSensitivity: Number(res.data.scrollSensitivity),
+        });
     });
 };
 
@@ -84,13 +89,13 @@ onUnmounted(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .router_card {
     --el-card-padding: 0;
 }
 
 .router_card_button {
-    .el-radio-button__inner {
+    :deep(.el-radio-button__inner) {
         min-width: 100px;
         height: 100%;
         background-color: var(--panel-button-active) !important;
@@ -98,7 +103,7 @@ onUnmounted(() => {
         border: 2px solid transparent !important;
     }
 
-    .el-radio-button__original-radio:checked + .el-radio-button__inner {
+    :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
         color: $primary-color;
         border-color: $primary-color !important;
         border-radius: 4px;

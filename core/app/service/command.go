@@ -33,7 +33,7 @@ func NewICommandService() ICommandService {
 }
 
 func (u *CommandService) List(req dto.OperateByType) ([]dto.CommandInfo, error) {
-	commands, err := commandRepo.List(repo.WithOrderBy("name"), repo.WithByType(req.Type))
+	commands, err := commandRepo.List(repo.WithOrderAsc("name"), repo.WithByType(req.Type))
 	if err != nil {
 		return nil, buserr.New("ErrRecordNotFound")
 	}
@@ -49,7 +49,7 @@ func (u *CommandService) List(req dto.OperateByType) ([]dto.CommandInfo, error) 
 }
 
 func (u *CommandService) SearchForTree(req dto.OperateByType) ([]dto.CommandTree, error) {
-	cmdList, err := commandRepo.List(repo.WithOrderBy("name"), repo.WithByType(req.Type))
+	cmdList, err := commandRepo.List(repo.WithOrderAsc("name"), repo.WithByType(req.Type))
 	if err != nil {
 		return nil, err
 	}

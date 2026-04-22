@@ -5,7 +5,7 @@
         <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="openCreate">
-                    {{ $t('runtime.create') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
             </template>
             <template #rightToolBar>
@@ -99,7 +99,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { RuntimeDeleteCheck, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import Operate from '@/views/website/runtime/go/operate/index.vue';
 import Delete from '@/views/website/runtime/delete/index.vue';
 import i18n from '@/lang';

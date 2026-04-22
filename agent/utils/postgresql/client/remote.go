@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/docker/docker/api/types/image"
 	"github.com/pkg/errors"
 
@@ -94,6 +95,13 @@ func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
 
 func (r *Remote) Delete(info DeleteInfo) error {
 	if len(info.Name) != 0 {
+		inUse, err := r.isDatabaseInUse(info.Name, info.Timeout)
+		if err != nil && !info.ForceDelete {
+			return fmt.Errorf("check database connections failed, err: %v", err)
+		}
+		if inUse && !info.ForceDelete {
+			return buserr.WithDetail("ErrInUsed", info.Name, nil)
+		}
 		dropSql := fmt.Sprintf("DROP DATABASE \"%s\"", info.Name)
 		if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
 			return fmt.Errorf("drop database failed, err: %v", err)
@@ -104,6 +112,24 @@ func (r *Remote) Delete(info DeleteInfo) error {
 		return fmt.Errorf("drop user failed, err: %v", err)
 	}
 	return nil
+}
+
+func (r *Remote) isDatabaseInUse(name string, timeout uint) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	defer cancel()
+
+	var count int
+	if err := r.Client.QueryRowContext(
+		ctx,
+		"SELECT COUNT(*) FROM pg_stat_activity WHERE datname = $1 AND pid <> pg_backend_pid()",
+		name,
+	).Scan(&count); err != nil {
+		return false, err
+	}
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		return false, buserr.New("ErrExecTimeOut")
+	}
+	return count > 0, nil
 }
 
 func (r *Remote) ChangePrivileges(info Privileges) error {
@@ -119,6 +145,9 @@ func (r *Remote) ChangePassword(info PasswordChangeInfo) error {
 }
 
 func (r *Remote) Backup(info BackupInfo) error {
+	if cmd.CheckIllegal(r.Password, r.Address, r.User, info.Name) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	imageTag, err := loadImageTag(info.Database)
 	if err != nil {
 		return err
@@ -132,7 +161,7 @@ func (r *Remote) Backup(info BackupInfo) error {
 	}
 	fileNameItem := info.TargetDir + "/" + strings.TrimSuffix(info.FileName, ".gz")
 	backupCommand := exec.Command("bash", "-c",
-		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD=\"%s\" pg_dump  -h %s -p %d --no-owner -Fc -U %s %s' > %s",
+		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD='\\''%s'\\'' pg_dump  -h %s -p %d --no-owner -Fc -U %s %s' > %s",
 			imageTag, r.Password, r.Address, r.Port, r.User, info.Name, fileNameItem))
 	_ = backupCommand.Run()
 	b := make([]byte, 5)
@@ -157,6 +186,9 @@ func (r *Remote) Backup(info BackupInfo) error {
 }
 
 func (r *Remote) Recover(info RecoverInfo) error {
+	if cmd.CheckIllegal(r.Password, r.Address, r.User, info.Name, info.Username) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	imageTag, err := loadImageTag(info.Database)
 	if err != nil {
 		return err
@@ -176,7 +208,7 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		}()
 	}
 	recoverCommand := exec.Command("bash", "-c",
-		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD=\"%s\" pg_restore -h %s -p %d --verbose --clean --no-privileges --no-owner -Fc -c  --if-exists --no-owner -U %s -d %s --role=%s' < %s",
+		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD='\\''%s'\\'' pg_restore -h %s -p %d --verbose --clean --no-privileges --no-owner -Fc -c  --if-exists --no-owner -U %s -d %s --role=%s' < %s",
 			imageTag, r.Password, r.Address, r.Port, r.User, info.Name, info.Username, fileName))
 	pipe, _ := recoverCommand.StdoutPipe()
 	stderrPipe, _ := recoverCommand.StderrPipe()

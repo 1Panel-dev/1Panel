@@ -27,10 +27,7 @@
                     <el-table-column :label="$t('logs.loginAgent')" show-overflow-tooltip prop="agent" />
                     <el-table-column :label="$t('logs.loginStatus')" prop="status">
                         <template #default="{ row }">
-                            <Status
-                                :status="row.status"
-                                :msg="row.message === 'ErrAuth' ? $t('commons.login.errorAuthInfo') : row.message"
-                            />
+                            <Status :status="row.status" :msg="loadMsg(row.message)" />
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -49,7 +46,7 @@
 <script setup lang="ts">
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import LogRouter from '@/views/log/router/index.vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { cleanLogs, getLoginLogs } from '@/api/modules/log';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
@@ -93,6 +90,16 @@ const onClean = async () => {
         submitInputInfo: i18n.global.t('logs.deleteLogs'),
     };
     confirmDialogRef.value!.acceptParams(params);
+};
+
+const loadMsg = (msg: string) => {
+    if (msg === 'ErrAuth') {
+        return i18n.global.t('commons.login.errorAuthInfo');
+    }
+    if (msg === 'ErrMFA') {
+        return i18n.global.t('commons.login.errorMfaInfo');
+    }
+    return msg;
 };
 
 const onSubmitClean = async () => {

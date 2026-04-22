@@ -127,6 +127,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
                         rotate: form.rotate,
                         gap: form.gap,
                     };
+                    globalStore.watermarkShow = true;
                     handleClose();
                     return;
                 })

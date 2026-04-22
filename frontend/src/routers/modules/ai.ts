@@ -1,23 +1,44 @@
 import { Layout } from '@/routers/constant';
 
-const databaseRouter = {
+const aiRouter = {
     sort: 4,
     path: '/ai',
     name: 'AI-Menu',
     component: Layout,
-    redirect: '/ai/model',
+    redirect: '/ai/model/account',
     meta: {
         icon: 'p-jiqiren2',
         title: 'menu.aiTools',
     },
     children: [
         {
-            path: '/ai/model/ollama',
-            name: 'OllamaModel',
-            component: () => import('@/views/ai/model/ollama/index.vue'),
+            path: '/ai/agents/agent',
+            name: 'Agents',
+            component: () => import('@/views/ai/agents/agent/index.vue'),
+            meta: {
+                icon: 'p-jiqiren2',
+                title: 'aiTools.agents.agent',
+                requiresAuth: true,
+            },
+        },
+        {
+            path: '/ai/model/account',
+            name: 'AIModel',
+            component: () => import('@/views/ai/model/index.vue'),
             meta: {
                 icon: 'p-moxing-menu',
                 title: 'aiTools.model.model',
+                requiresAuth: true,
+            },
+        },
+        {
+            path: '/ai/model/local',
+            hidden: true,
+            name: 'LocalModel',
+            component: () => import('@/views/ai/model/index.vue'),
+            meta: {
+                title: 'aiTools.model.localModel',
+                activeMenu: '/ai/model/account',
                 requiresAuth: true,
             },
         },
@@ -32,27 +53,27 @@ const databaseRouter = {
             },
         },
         {
-            path: '/ai/gpu',
+            path: '/ai/gpu/current',
             name: 'GPU',
-            component: () => import('@/views/ai/gpu/index.vue'),
+            component: () => import('@/views/ai/gpu/current/index.vue'),
             meta: {
                 icon: 'p-gpu-menu',
                 title: 'aiTools.gpu.gpu',
+                activeMenu: '/ai/gpu/current',
                 requiresAuth: true,
             },
         },
         {
-            path: '/ai/model/tensorrt',
-            hidden: true,
-            name: 'TensorRTLLm',
-            component: () => import('@/views/ai/model/tensorrt/index.vue'),
+            path: '/ai/gpu/history',
+            name: 'GPUHistory',
+            component: () => import('@/views/ai/gpu/history/index.vue'),
             meta: {
-                title: 'aiTools.tensorRT.llm',
-                activeMenu: '/ai/model/ollama',
+                title: 'aiTools.gpu.history',
+                activeMenu: '/ai/gpu/current',
                 requiresAuth: true,
             },
         },
     ],
 };
 
-export default databaseRouter;
+export default aiRouter;

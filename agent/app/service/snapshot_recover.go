@@ -101,15 +101,15 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		}()
 
 		if req.IsNew || snap.InterruptStep == "RecoverDownload" || req.ReDownload {
-			taskItem.AddSubTaskWithAlias(
+			taskItem.AddSubTaskWithAliasAndOps(
 				"RecoverDownload",
 				func(t *task.Task) error { return handleDownloadSnapshot(&itemHelper, snap, rootDir) },
-				nil,
+				nil, 0, 90*time.Minute,
 			)
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "RecoverDecompress" {
-			taskItem.AddSubTaskWithAlias(
+			taskItem.AddSubTaskWithAliasAndOps(
 				"RecoverDecompress",
 				func(t *task.Task) error {
 					itemHelper.Task.Log("---------------------- 2 / 11 ----------------------")
@@ -118,54 +118,46 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 					itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Decompress"), err)
 					return err
 				},
-				nil,
+				nil, 0, 90*time.Minute,
 			)
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "BackupBeforeRecover" {
-			taskItem.AddSubTaskWithAlias(
+			taskItem.AddSubTaskWithAliasAndOps(
 				"BackupBeforeRecover",
 				func(t *task.Task) error { return backupBeforeRecover(snap.Name, &itemHelper) },
-				nil,
+				nil, 0, 90*time.Minute,
 			)
 			req.IsNew = true
 		}
 
 		var snapJson SnapshotJson
-		taskItem.AddSubTaskWithAlias(
-			"Readjson",
+		taskItem.AddSubTaskWithAliasAndOps(
+			"ReadJson",
 			func(t *task.Task) error {
 				snapJson, err = readFromJson(path.Join(rootDir, snap.Name), &itemHelper)
 				return err
 			},
-			nil,
+			nil, 0, 90*time.Minute,
 		)
 		if req.IsNew || snap.InterruptStep == "RecoverApp" {
-			taskItem.AddSubTaskWithAlias(
+			taskItem.AddSubTaskWithAliasAndOps(
 				"RecoverApp",
 				func(t *task.Task) error { return recoverAppData(path.Join(rootDir, snap.Name), &itemHelper) },
-				nil,
+				nil, 0, 90*time.Minute,
 			)
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "RecoverBaseData" {
-			taskItem.AddSubTaskWithAlias(
+			taskItem.AddSubTaskWithAliasAndOps(
 				"RecoverBaseData",
 				func(t *task.Task) error { return recoverBaseData(path.Join(rootDir, snap.Name, "base"), &itemHelper) },
-				nil,
-			)
-			req.IsNew = true
-		}
-		if req.IsNew || snap.InterruptStep == "RecoverDBData" {
-			taskItem.AddSubTaskWithAlias(
-				"RecoverDBData",
-				func(t *task.Task) error { return recoverDBData(path.Join(rootDir, snap.Name, "db"), &itemHelper) },
-				nil,
+				nil, 0, 90*time.Minute,
 			)
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "RecoverBackups" {
-			taskItem.AddSubTaskWithAlias(
+			taskItem.AddSubTaskWithAliasAndOps(
 				"RecoverBackups",
 				func(t *task.Task) error {
 					itemHelper.Task.Log("---------------------- 8 / 11 ----------------------")
@@ -174,12 +166,12 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 					itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Decompress"), err)
 					return err
 				},
-				nil,
+				nil, 0, 90*time.Minute,
 			)
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "RecoverWebsite" {
-			taskItem.AddSubTaskWithAlias(
+			taskItem.AddSubTaskWithAliasAndOps(
 				"RecoverWebsite",
 				func(t *task.Task) error {
 					itemHelper.Task.Log("---------------------- 9 / 11 ----------------------")
@@ -193,12 +185,12 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 					itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Decompress"), err)
 					return err
 				},
-				nil,
+				nil, 0, 90*time.Minute,
 			)
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "RecoverPanelData" {
-			taskItem.AddSubTaskWithAlias(
+			taskItem.AddSubTaskWithAliasAndOps(
 				"RecoverPanelData",
 				func(t *task.Task) error {
 					itemHelper.Task.Log("---------------------- 10 / 11 ----------------------")
@@ -218,17 +210,28 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 					}
 					return err
 				},
-				nil,
+				nil, 0, 90*time.Minute,
 			)
 			req.IsNew = true
 		}
-		taskItem.AddSubTaskWithAlias(
-			"RecoverDBData",
-			func(t *task.Task) error {
-				return restartCompose(path.Join(snapJson.BaseDir, "1panel/docker/compose"), &itemHelper)
-			},
-			nil,
-		)
+		if req.IsNew || snap.InterruptStep == "RecoverCompose" {
+			taskItem.AddSubTaskWithAliasAndOps(
+				"RecoverCompose",
+				func(t *task.Task) error {
+					return restartCompose(path.Join(snapJson.BaseDir, "1panel/docker/compose"), &itemHelper)
+				},
+				nil, 0, 90*time.Minute,
+			)
+			req.IsNew = true
+		}
+		if req.IsNew || snap.InterruptStep == "RecoverDBData" {
+			taskItem.AddSubTaskWithAliasAndOps(
+				"RecoverDBData",
+				func(t *task.Task) error { return recoverDBData(path.Join(rootDir, snap.Name, "db"), &itemHelper) },
+				nil, 0, 90*time.Minute,
+			)
+			req.IsNew = true
+		}
 
 		if err := taskItem.Execute(); err != nil {
 			_ = settingRepo.Update("SystemStatus", "Free")
@@ -277,14 +280,15 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 			return err
 		}
 	}
-	err := itemHelper.FileOp.CopyDirWithExclude(global.Dir.DataDir, rootDir, []string{"cache", "tmp"})
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", global.Dir.DataDir), err)
+	dataDir := global.Dir.DataDir
+	err := itemHelper.FileOp.CopyDirWithExclude(dataDir, rootDir, []string{"cache", "tmp", "backup"})
+	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", dataDir), err)
 	if err != nil {
 		return err
 	}
 
 	openrestyDir, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
-	if len(openrestyDir) != 0 && !strings.Contains(openrestyDir, global.Dir.DataDir) {
+	if len(openrestyDir) != 0 && !strings.Contains(openrestyDir, dataDir) {
 		err := itemHelper.FileOp.CopyDirWithExclude(openrestyDir, rootDir, nil)
 		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", openrestyDir), err)
 		if err != nil {
@@ -292,9 +296,10 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 		}
 	}
 
-	if len(global.Dir.LocalBackupDir) != 0 && !strings.Contains(global.Dir.LocalBackupDir, global.Dir.DataDir) {
-		err = itemHelper.FileOp.CopyDirWithExclude(global.Dir.LocalBackupDir, rootDir, []string{"system_snapshot"})
-		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", global.Dir.LocalBackupDir), err)
+	backupDir := global.Dir.LocalBackupDir
+	if len(backupDir) != 0 && (backupDir == dataDir+"/backup" || !strings.HasPrefix(backupDir, dataDir)) {
+		err = itemHelper.FileOp.CopyDirWithExclude(backupDir, rootDir, []string{"system_snapshot", "tmp"})
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", backupDir), err)
 		if err != nil {
 			return err
 		}
@@ -341,22 +346,22 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 
 func readFromJson(rootDir string, itemHelper *snapRecoverHelper) (SnapshotJson, error) {
 	itemHelper.Task.Log("---------------------- 4 / 11 ----------------------")
-	itemHelper.Task.LogStart(i18n.GetMsgByKey("Readjson"))
+	itemHelper.Task.LogStart(i18n.GetMsgByKey("ReadJson"))
 
 	snapJsonPath := path.Join(rootDir, "base/snapshot.json")
 	var snap SnapshotJson
 	_, err := os.Stat(snapJsonPath)
-	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("ReadjsonPath"), err)
+	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("ReadJsonPath"), err)
 	if err != nil {
 		return snap, err
 	}
 	fileByte, err := os.ReadFile(snapJsonPath)
-	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("ReadjsonContent"), err)
+	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("ReadJsonContent"), err)
 	if err != nil {
 		return snap, err
 	}
 	err = json.Unmarshal(fileByte, &snap)
-	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("ReadjsonMarshal"), err)
+	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("ReadJsonMarshal"), err)
 	if err != nil {
 		return snap, err
 	}
@@ -437,17 +442,8 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 	return nil
 }
 
-func recoverDBData(src string, itemHelper *snapRecoverHelper) error {
-	itemHelper.Task.Log("---------------------- 7 / 11 ----------------------")
-	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverDBData"))
-	err := itemHelper.FileOp.CopyDirWithExclude(src, global.Dir.DataDir, nil)
-
-	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), err)
-	return err
-}
-
 func restartCompose(composePath string, itemHelper *snapRecoverHelper) error {
-	itemHelper.Task.Log("---------------------- 11 / 11 ----------------------")
+	itemHelper.Task.Log("---------------------- 7 / 11 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverCompose"))
 
 	composes, err := composeRepo.ListRecord()
@@ -468,5 +464,66 @@ func restartCompose(composePath string, itemHelper *snapRecoverHelper) error {
 		}
 		itemHelper.Task.LogSuccess(i18n.GetWithName("RecoverComposeItem", pathItem))
 	}
+	return nil
+}
+
+func recoverDBData(src string, itemHelper *snapRecoverHelper) error {
+	itemHelper.Task.Log("---------------------- 11 / 11 ----------------------")
+	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverDBData"))
+	dbDir := path.Join(global.Dir.DataDir, "db")
+	if err := os.RemoveAll(dbDir); err != nil {
+		itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), err)
+		return err
+	}
+
+	err := itemHelper.FileOp.CopyDirWithExclude(src, global.Dir.DataDir, nil)
+	if err != nil {
+		itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), err)
+		return err
+	}
+	if cleanErr := cleanOrphanSQLiteSidecars(dbDir); cleanErr != nil {
+		itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), cleanErr)
+		return cleanErr
+	}
+
+	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), nil)
+	return nil
+}
+
+func cleanOrphanSQLiteSidecars(dbDir string) error {
+	entries, err := os.ReadDir(dbDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+
+		name := entry.Name()
+		var mainDB string
+		switch {
+		case strings.HasSuffix(name, ".db-wal"):
+			mainDB = strings.TrimSuffix(name, "-wal")
+		case strings.HasSuffix(name, ".db-shm"):
+			mainDB = strings.TrimSuffix(name, "-shm")
+		default:
+			continue
+		}
+
+		if _, statErr := os.Stat(path.Join(dbDir, mainDB)); statErr != nil {
+			if !os.IsNotExist(statErr) {
+				return statErr
+			}
+			if removeErr := os.Remove(path.Join(dbDir, name)); removeErr != nil && !os.IsNotExist(removeErr) {
+				return removeErr
+			}
+		}
+	}
+
 	return nil
 }

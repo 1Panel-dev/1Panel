@@ -38,7 +38,22 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
-                    <div v-if="account.type == 'google' || account.type == 'freessl'">
+                    <div v-if="account.type == 'custom'">
+                        <el-form-item :label="$t('ssl.customAcmeURL')" prop="caDirURL">
+                            <el-input v-model.trim="account.caDirURL"></el-input>
+                        </el-form-item>
+                        <el-form-item :label="$t('ssl.useEAB')" prop="useEAB">
+                            <el-switch v-model="account.useEAB"></el-switch>
+                        </el-form-item>
+                    </div>
+
+                    <div
+                        v-if="
+                            account.type == 'google' ||
+                            account.type == 'freessl' ||
+                            (account.type === 'custom' && account.useEAB)
+                        "
+                    >
                         <el-form-item label="EAB kid" prop="eabKid">
                             <el-input v-model.trim="account.eabKid"></el-input>
                         </el-form-item>
@@ -55,9 +70,6 @@
                             {{ $t('ssl.googleHelper') }}
                         </el-link>
                     </div>
-                    <el-form-item v-if="account.type == 'custom'" :label="$t('ssl.customAcmeURL')" prop="caDirURL">
-                        <el-input v-model.trim="account.caDirURL"></el-input>
-                    </el-form-item>
                 </el-form>
             </el-col>
         </el-row>
@@ -102,6 +114,7 @@ const initData = () => ({
     keyType: 'P256',
     useProxy: false,
     caDirURL: '',
+    useEAB: false,
 });
 
 const account = ref(initData());

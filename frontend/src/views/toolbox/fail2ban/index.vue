@@ -166,7 +166,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { getFail2banConf, getFail2banBase, operateFail2ban, updateFail2banByFile } from '@/api/modules/toolbox';
 import { ElMessageBox } from 'element-plus';
-import { transTimeUnit } from '@/utils/util';
+import { transTimeUnit } from '@/utils/validate';
 import { GlobalStore } from '@/store';
 
 const globalStore = GlobalStore();

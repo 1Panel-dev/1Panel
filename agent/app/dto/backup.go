@@ -33,6 +33,12 @@ type BackupInfo struct {
 	RememberAuth bool `json:"rememberAuth"`
 }
 
+type BackupCheckRes struct {
+	IsOk  bool   `json:"isOk"`
+	Msg   string `json:"msg"`
+	Token string `json:"token"`
+}
+
 type ForBuckets struct {
 	Type       string `json:"type" validate:"required"`
 	AccessKey  string `json:"accessKey"`
@@ -59,24 +65,28 @@ type UploadForRecover struct {
 }
 
 type CommonBackup struct {
-	Type       string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mysql-cluster postgresql-cluster redis-cluster"`
-	Name       string `json:"name"`
-	DetailName string `json:"detailName"`
-	Secret     string `json:"secret"`
-	TaskID     string `json:"taskID"`
-	FileName   string `json:"fileName"`
+	Type       string   `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mongodb mysql-cluster postgresql-cluster redis-cluster container compose"`
+	Name       string   `json:"name"`
+	DetailName string   `json:"detailName"`
+	Secret     string   `json:"secret"`
+	StopBefore bool     `json:"stopBefore"`
+	TaskID     string   `json:"taskID"`
+	FileName   string   `json:"fileName"`
+	Args       []string `json:"args"`
 
 	Description string `json:"description"`
 }
 type CommonRecover struct {
-	DownloadAccountID uint   `json:"downloadAccountID" validate:"required"`
-	Type              string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mysql-cluster postgresql-cluster redis-cluster"`
-	Name              string `json:"name"`
-	DetailName        string `json:"detailName"`
-	File              string `json:"file"`
-	Secret            string `json:"secret"`
-	TaskID            string `json:"taskID"`
-	BackupRecordID    uint   `json:"backupRecordID"`
+	DownloadAccountID  uint   `json:"downloadAccountID" validate:"required"`
+	Type               string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql mongodb mysql-cluster postgresql-cluster redis-cluster container compose"`
+	Name               string `json:"name"`
+	DetailName         string `json:"detailName"`
+	File               string `json:"file"`
+	Secret             string `json:"secret"`
+	DropAllCollections bool   `json:"dropAllCollections"`
+	TaskID             string `json:"taskID"`
+	BackupRecordID     uint   `json:"backupRecordID"`
+	Timeout            int    `json:"timeout"`
 }
 
 type RecordSearch struct {

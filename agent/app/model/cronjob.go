@@ -37,6 +37,7 @@ type Cronjob struct {
 	Timeout           uint   `json:"timeout"`
 	IgnoreErr         bool   `json:"ignoreErr"`
 	RetainCopies      uint64 `json:"retainCopies"`
+	Args              string `json:"args"`
 
 	IsExecuting bool         `json:"isExecuting"`
 	Status      string       `json:"status"`

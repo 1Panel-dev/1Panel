@@ -25,7 +25,7 @@ func NewIWebsiteAcmeAccountService() IWebsiteAcmeAccountService {
 }
 
 func (w WebsiteAcmeAccountService) Page(search dto.PageInfo) (int64, []response.WebsiteAcmeAccountDTO, error) {
-	total, accounts, err := websiteAcmeRepo.Page(search.Page, search.PageSize, repo.WithOrderBy("created_at desc"))
+	total, accounts, err := websiteAcmeRepo.Page(search.Page, search.PageSize, repo.WithOrderDesc("created_at"))
 	var accountDTOs []response.WebsiteAcmeAccountDTO
 	for _, account := range accounts {
 		accountDTOs = append(accountDTOs, response.WebsiteAcmeAccountDTO{
@@ -45,9 +45,10 @@ func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreat
 		Type:     create.Type,
 		KeyType:  create.KeyType,
 		UseProxy: create.UseProxy,
+		UseEAB:   create.UseEAB,
 	}
 
-	if create.Type == "google" || create.Type == "freessl" {
+	if create.Type == "google" || create.Type == "freessl" || (create.Type == "custom" && create.UseEAB) {
 		if create.EabKid == "" || create.EabHmacKey == "" {
 			return nil, buserr.New("ErrEabKidOrEabHmacKeyCannotBlank")
 		}

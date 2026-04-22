@@ -1,6 +1,12 @@
 <template>
     <div :style="{ '--main-height': mainHeight + 'px' }">
-        <el-tabs tab-position="left" v-model="tabIndex" v-if="id > 0" class="custom-tabs" ref="tabsRef">
+        <el-tabs
+            tab-position="left"
+            v-model="tabIndex"
+            v-if="id > 0 && website.type != 'stream'"
+            class="custom-tabs"
+            ref="tabsRef"
+        >
             <el-tab-pane :label="$t('website.domainConfig')" name="0">
                 <Domain :key="id" :id="id" v-if="tabIndex == '0'"></Domain>
             </el-tab-pane>
@@ -59,10 +65,24 @@
                 <Other :id="id" v-if="tabIndex == '12'"></Other>
             </el-tab-pane>
         </el-tabs>
+        <el-tabs
+            tab-position="left"
+            v-model="tabIndex"
+            v-if="id > 0 && website.type == 'stream'"
+            class="custom-tabs"
+            ref="tabsRef"
+        >
+            <el-tab-pane :label="$t('website.other')" name="12">
+                <Other :id="id" v-if="tabIndex == '12'"></Other>
+            </el-tab-pane>
+            <el-tab-pane :label="$t('website.stream')" name="13">
+                <Stream :id="id" v-if="tabIndex == '13'"></Stream>
+            </el-tab-pane>
+        </el-tabs>
     </div>
 </template>
 
-<script lang="ts" setup name="Basic">
+<script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue';
 
 import Domain from './domain/index.vue';
@@ -81,6 +101,8 @@ import PHP from './php/index.vue';
 import RealIP from './real-ip/index.vue';
 import Resource from './resource/index.vue';
 import Cors from './cors/index.vue';
+import Stream from './stream/index.vue';
+defineOptions({ name: 'Basic' });
 
 const props = defineProps({
     website: {
@@ -98,9 +120,10 @@ const id = computed(() => {
     return props.website.id;
 });
 const tabIndex = ref('0');
+const menuKey = ref('site-tabIndex-');
 
 watch(tabIndex, (newVal) => {
-    localStorage.setItem('site-tabIndex', newVal);
+    localStorage.setItem(menuKey.value, newVal);
 });
 
 const handleResize = () => {
@@ -113,6 +136,11 @@ const handleScroll = (event: WheelEvent) => {
     const tabContainer = tabsRef.value.$el.querySelector('.el-tabs__nav-scroll');
     if (!tabContainer) return;
 
+    const currentScrollTop = tabContainer.scrollTop;
+    if (currentScrollTop == 0) {
+        return;
+    }
+
     const target = event.target as HTMLElement;
     if (!target.classList.contains('el-tabs__item')) {
         return;
@@ -123,9 +151,15 @@ const handleScroll = (event: WheelEvent) => {
 };
 
 onMounted(() => {
-    const storedTabIndex = localStorage.getItem('site-tabIndex');
+    menuKey.value = 'site-tabIndex-' + props.website.id;
+    const storedTabIndex = localStorage.getItem(menuKey.value);
     if (storedTabIndex !== null) {
         tabIndex.value = storedTabIndex;
+    } else {
+        tabIndex.value = '0';
+        if (props.website.type == 'stream') {
+            tabIndex.value = '12';
+        }
     }
     window.addEventListener('resize', handleResize);
     document.addEventListener('wheel', handleScroll, { passive: false });

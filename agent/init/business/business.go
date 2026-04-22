@@ -23,7 +23,10 @@ func syncApp() {
 	if global.CONF.Base.IsOffLine {
 		return
 	}
-	_ = service.NewISettingService().Update("AppStoreSyncStatus", constant.StatusSyncSuccess)
+	setting, err := service.NewISettingService().GetSettingInfo()
+	if err == nil && setting.AppStoreSyncStatus == constant.StatusSyncing {
+		_ = service.NewISettingService().Update("AppStoreSyncStatus", constant.StatusSyncSuccess)
+	}
 	if err := service.NewIAppService().SyncAppListFromRemote(""); err != nil {
 		global.LOG.Errorf("App Store synchronization failed")
 		return
@@ -78,13 +81,13 @@ func initAcmeAccount() {
 }
 
 func checkDockerCompose() {
-	dockerComposCmd := common.GetDockerComposeCommand()
-	if dockerComposCmd == "" {
+	dockerComposeCmd := common.GetDockerComposeCommand()
+	if dockerComposeCmd == "" {
 		global.LOG.Errorf("Docker Compose command not found, please install Docker Compose Plugin")
 		return
 	}
-	global.CONF.DockerConfig.Command = dockerComposCmd
-	if err := service.NewISettingService().Update("DockerComposeCommand", dockerComposCmd); err != nil {
+	global.CONF.DockerConfig.Command = dockerComposeCmd
+	if err := service.NewISettingService().Update("DockerComposeCommand", dockerComposeCmd); err != nil {
 		global.LOG.Errorf("update docker compose command error: %s", err.Error())
 		return
 	}

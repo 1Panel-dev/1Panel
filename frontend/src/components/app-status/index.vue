@@ -180,6 +180,8 @@ onMounted(() => {
 
 defineExpose({
     onCheck,
+    getHttpPort: () => httpPort.value,
+    getHttpsPort: () => httpsPort.value,
 });
 </script>
 <style scoped lang="scss">

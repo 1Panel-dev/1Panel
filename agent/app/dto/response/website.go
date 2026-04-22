@@ -3,6 +3,7 @@ package response
 import (
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 )
 
@@ -16,6 +17,10 @@ type WebsiteDTO struct {
 	RuntimeType   string `json:"runtimeType"`
 	SiteDir       string `json:"siteDir"`
 	OpenBaseDir   bool   `json:"openBaseDir"`
+	Algorithm     string `json:"algorithm"`
+	UDP           bool   `json:"udp"`
+
+	Servers []dto.NginxUpstreamServer `json:"servers"`
 }
 
 type WebsiteRes struct {
@@ -35,6 +40,7 @@ type WebsiteRes struct {
 	SSLStatus     string    `json:"sslStatus"`
 	AppInstallID  uint      `json:"appInstallId"`
 	ChildSites    []string  `json:"childSites"`
+	ParentSite    string    `json:"parentSite"`
 	RuntimeType   string    `json:"runtimeType"`
 	Favorite      bool      `json:"favorite"`
 	IPV6          bool      `json:"IPV6"`

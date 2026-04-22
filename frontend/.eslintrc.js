@@ -40,7 +40,7 @@ module.exports = {
         'no-irregular-whitespace': 'off', // 禁止不规则的空白
 
         // typeScript (https://typescript-eslint.io/rules)
-        '@typescript-eslint/no-unused-vars': 'error', // 禁止定义未使用的变量
+        '@typescript-eslint/no-unused-vars': ['error', { caughtErrors: 'none' }], // 保持现有 catch(error) 写法，不在依赖升级时强制清理
         '@typescript-eslint/no-inferrable-types': 'off', // 可以轻松推断的显式类型可能会增加不必要的冗长
         '@typescript-eslint/no-namespace': 'off', // 禁止使用自定义 TypeScript 模块和命名空间。
         '@typescript-eslint/no-explicit-any': 'off', // 禁止使用 any 类型
@@ -49,7 +49,10 @@ module.exports = {
         '@typescript-eslint/explicit-function-return-type': 'off', // 不允许对初始化为数字、字符串或布尔值的变量或参数进行显式类型声明
         '@typescript-eslint/no-var-requires': 'off', // 不允许在 import 语句中使用 require 语句
         '@typescript-eslint/no-empty-function': 'off', // 禁止空函数
+        '@typescript-eslint/no-empty-object-type': 'off', // 保持现有 {} 类型写法，不在规则升级时批量重构
         '@typescript-eslint/no-use-before-define': 'off', // 禁止在变量定义之前使用它们
+        '@typescript-eslint/no-unused-expressions': 'off', // 保持现有短路表达式调用写法
+        '@typescript-eslint/no-unsafe-function-type': 'off', // 保持现有 Function 类型写法，不在本轮升级中扩散修改
         '@typescript-eslint/ban-ts-comment': 'off', // 禁止 @ts-<directive> 使用注释或要求在指令后进行描述
         '@typescript-eslint/no-non-null-assertion': 'off', // 不允许使用后缀运算符的非空断言(!)
         '@typescript-eslint/explicit-module-boundary-types': 'off', // 要求导出函数和类的公共类方法的显式返回和参数类型
@@ -69,5 +72,6 @@ module.exports = {
         'vue/attribute-hyphenation': 'off', // 对模板中的自定义组件强制执行属性命名样式
         'vue/require-default-prop': 'off', // 此规则要求为每个 prop 为必填时，必须提供默认值
         'vue/multi-word-component-names': 'off', // 要求组件名称始终为 “-” 链接的单词
+        'vue/no-dupe-keys': 'off', // 保持现有仓库的 script/template 同名用法，不在依赖升级时引入额外改造
     },
 };

@@ -1,6 +1,7 @@
 package files
 
 import (
+	"context"
 	"fmt"
 	"path"
 	"time"
@@ -25,7 +26,7 @@ func (z RarArchiver) Extract(filePath, dstDir string, _ string) error {
 	return cmd.RunDefaultBashCf("unrar x -y -o+ %q %q", filePath, dstDir)
 }
 
-func (z RarArchiver) Compress(sourcePaths []string, dstFile string, _ string) (err error) {
+func (z RarArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, _ string) (err error) {
 	if err = checkCmdAvailability("rar"); err != nil {
 		return err
 	}
@@ -45,7 +46,7 @@ func (z RarArchiver) Compress(sourcePaths []string, dstFile string, _ string) (e
 	}
 
 	cmdArgs := append([]string{"a", "-r", tmpFile}, relativePaths...)
-	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(baseDir))
+	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(baseDir), cmd.WithContext(ctx))
 	if err = cmdMgr.Run("rar", cmdArgs...); err != nil {
 		return err
 	}

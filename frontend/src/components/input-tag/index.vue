@@ -32,7 +32,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { copyText } from '@/utils/util';
+import { copyText } from '@/utils/clipboard';
 import FileList from '@/components/file-list/index.vue';
 const em = defineEmits(['update:tags']);
 

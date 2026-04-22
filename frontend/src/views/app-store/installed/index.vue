@@ -4,8 +4,22 @@
             <Tags @change="changeTag" hideKey="Runtime" />
         </template>
         <template #leftToolBar>
-            <el-button @click="sync" type="primary" plain v-if="mode === 'installed' && data != null">
+            <el-button @click="sync" type="primary" plain v-if="mode === 'installed' && !sortMode && data != null">
                 {{ $t('commons.button.refresh') }}
+            </el-button>
+            <el-button
+                @click="enterSortMode"
+                type="primary"
+                plain
+                v-if="mode === 'installed' && !sortMode && data != null"
+            >
+                {{ $t('app.sortMode') }}
+            </el-button>
+            <el-button @click="saveSortOrder" type="primary" v-if="sortMode">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+            <el-button @click="exitSortMode" plain v-if="sortMode">
+                {{ $t('commons.button.cancel') }}
             </el-button>
             <el-button @click="openIgnore" type="primary" plain v-if="mode === 'upgrade'">
                 {{ $t('app.showIgnore') }}
@@ -17,7 +31,7 @@
         <template #main>
             <div>
                 <MainDiv :heightDiff="mode === 'upgrade' ? 280 : 300">
-                    <el-alert type="info" :closable="false" v-if="mode === 'installed'">
+                    <el-alert type="info" :closable="false" v-if="mode === 'installed' && !isIntl">
                         <template #title>
                             <span class="flx-align-center">
                                 {{ $t('app.installHelper') }}
@@ -29,7 +43,6 @@
                                 >
                                     {{ $t('firewall.quickJump') }}
                                 </el-link>
-                                　
                             </span>
                         </template>
                     </el-alert>
@@ -39,358 +52,61 @@
                             <img src="@/assets/images/no_update_app.svg" />
                         </div>
                     </div>
-                    <el-row :gutter="5">
+                    <el-row :gutter="5" ref="sortContainer">
                         <el-col
                             v-for="(installed, index) in data"
-                            :key="index"
+                            :key="installed.id"
+                            :data-sort-index="index"
                             :xs="24"
                             :sm="24"
                             :md="24"
                             :lg="12"
                             :xl="12"
                         >
-                            <div class="install-card">
-                                <el-card class="e-card">
-                                    <el-row :gutter="10">
-                                        <el-col :xs="3" :sm="3" :md="3" :lg="4" :xl="4">
-                                            <div class="icon">
-                                                <el-avatar
-                                                    @click="openDetail(installed.appKey)"
-                                                    shape="square"
-                                                    :size="66"
-                                                    :src="getAppIconUrl(installed.appID, currentNode)"
-                                                />
-                                            </div>
-                                        </el-col>
-                                        <el-col :xs="24" :sm="21" :md="21" :lg="20" :xl="20">
-                                            <div class="a-detail">
-                                                <div class="d-name">
-                                                    <div class="flex items-center justify-between">
-                                                        <div class="min-w-50 flex items-center justify-start gap-1">
-                                                            <el-button link type="info">
-                                                                <el-tooltip :content="installed.name" placement="top">
-                                                                    <span class="name">{{ installed.name }}</span>
-                                                                </el-tooltip>
-                                                            </el-button>
-                                                            <span class="status">
-                                                                <Status
-                                                                    :key="installed.status"
-                                                                    :status="installed.status"
-                                                                ></Status>
-                                                            </span>
-                                                            <span class="msg">
-                                                                <el-popover
-                                                                    v-if="isAppErr(installed)"
-                                                                    placement="bottom"
-                                                                    :width="400"
-                                                                    trigger="hover"
-                                                                    :content="installed.message"
-                                                                    :popper-options="options"
-                                                                >
-                                                                    <template #reference>
-                                                                        <el-button link type="danger">
-                                                                            <el-icon><Warning /></el-icon>
-                                                                        </el-button>
-                                                                    </template>
-                                                                    <div class="app-error">
-                                                                        {{ installed.message }}
-                                                                    </div>
-                                                                </el-popover>
-                                                            </span>
-                                                            <span class="ml-1">
-                                                                <el-tooltip
-                                                                    effect="dark"
-                                                                    :content="$t('app.toFolder')"
-                                                                    placement="top"
-                                                                >
-                                                                    <el-button
-                                                                        type="primary"
-                                                                        link
-                                                                        @click="routerToFileWithPath(installed.path)"
-                                                                        icon="FolderOpened"
-                                                                    ></el-button>
-                                                                </el-tooltip>
-                                                            </span>
-                                                            <span class="ml-1">
-                                                                <el-tooltip
-                                                                    v-if="mode !== 'upgrade'"
-                                                                    effect="dark"
-                                                                    :content="$t('commons.button.log')"
-                                                                    placement="top"
-                                                                >
-                                                                    <el-button
-                                                                        type="primary"
-                                                                        link
-                                                                        @click="openLog(installed)"
-                                                                        :disabled="installed.status === 'DownloadErr'"
-                                                                    >
-                                                                        <el-icon><Tickets /></el-icon>
-                                                                    </el-button>
-                                                                </el-tooltip>
-                                                            </span>
-                                                            <span class="ml-1">
-                                                                <el-tooltip
-                                                                    v-if="mode !== 'upgrade'"
-                                                                    effect="dark"
-                                                                    :content="$t('menu.terminal')"
-                                                                    placement="top"
-                                                                >
-                                                                    <el-button
-                                                                        type="primary"
-                                                                        link
-                                                                        @click="openTerminal(installed)"
-                                                                        :disabled="installed.status !== 'Running'"
-                                                                    >
-                                                                        <el-icon>
-                                                                            <SvgIcon iconName="p-terminal2" />
-                                                                        </el-icon>
-                                                                    </el-button>
-                                                                </el-tooltip>
-                                                            </span>
-                                                            <span class="ml-1">
-                                                                <el-tooltip
-                                                                    v-if="mode !== 'upgrade'"
-                                                                    effect="dark"
-                                                                    :content="$t('menu.container')"
-                                                                    placement="top"
-                                                                >
-                                                                    <el-button
-                                                                        type="primary"
-                                                                        link
-                                                                        @click="toContainer(installed)"
-                                                                    >
-                                                                        <el-icon>
-                                                                            <SvgIcon iconName="p-docker" />
-                                                                        </el-icon>
-                                                                    </el-button>
-                                                                </el-tooltip>
-                                                            </span>
-                                                            <span class="ml-1" v-if="mode === 'installed'">
-                                                                <el-tooltip
-                                                                    effect="dark"
-                                                                    :content="$t('website.cancelFavorite')"
-                                                                    placement="top-start"
-                                                                    v-if="installed.favorite"
-                                                                >
-                                                                    <el-button
-                                                                        link
-                                                                        size="large"
-                                                                        icon="StarFilled"
-                                                                        type="warning"
-                                                                        @click="favoriteInstall(installed)"
-                                                                    ></el-button>
-                                                                </el-tooltip>
-                                                                <el-tooltip
-                                                                    effect="dark"
-                                                                    :content="$t('website.favorite')"
-                                                                    placement="top-start"
-                                                                    v-else
-                                                                >
-                                                                    <el-button
-                                                                        link
-                                                                        icon="Star"
-                                                                        type="info"
-                                                                        @click="favoriteInstall(installed)"
-                                                                    ></el-button>
-                                                                </el-tooltip>
-                                                            </span>
-                                                        </div>
-                                                        <div class="flex flex-wrap items-center justify-end gap-1">
-                                                            <el-button
-                                                                class="h-button"
-                                                                plain
-                                                                round
-                                                                size="small"
-                                                                @click="openUploads(installed.appKey, installed.name)"
-                                                                v-if="mode === 'installed'"
-                                                            >
-                                                                {{ $t('database.loadBackup') }}
-                                                            </el-button>
-                                                            <el-button
-                                                                class="h-button"
-                                                                plain
-                                                                round
-                                                                size="small"
-                                                                @click="openBackups(installed)"
-                                                                v-if="mode === 'installed'"
-                                                            >
-                                                                {{ $t('commons.button.backup') }}
-                                                            </el-button>
-                                                            <el-button
-                                                                class="h-button"
-                                                                plain
-                                                                round
-                                                                size="small"
-                                                                :disabled="installed.status === 'Upgrading'"
-                                                                @click="ignoreApp(installed)"
-                                                                v-if="mode === 'upgrade'"
-                                                            >
-                                                                {{ $t('commons.button.ignore') }}
-                                                            </el-button>
-                                                            <el-button
-                                                                class="h-button"
-                                                                plain
-                                                                round
-                                                                size="small"
-                                                                :disabled="
-                                                                    (installed.status !== 'Running' &&
-                                                                        installed.status !== 'UpgradeErr') ||
-                                                                    installed.appStatus === 'TakeDown'
-                                                                "
-                                                                @click="openOperate(installed, 'upgrade')"
-                                                                v-if="mode === 'upgrade'"
-                                                            >
-                                                                {{ $t('commons.button.upgrade') }}
-                                                            </el-button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    class="d-description flex flex-wrap items-center justify-start gap-1.5"
-                                                >
-                                                    <el-button class="mr-1" plain size="small">
-                                                        {{ $t('app.version') }}{{ $t('commons.colon')
-                                                        }}{{ installed.version }}
-                                                    </el-button>
-                                                    <el-button
-                                                        v-if="installed.httpPort > 0"
-                                                        class="mr-1"
-                                                        plain
-                                                        size="small"
-                                                    >
-                                                        {{ $t('commons.table.port') }}{{ $t('commons.colon')
-                                                        }}{{ installed.httpPort }}
-                                                    </el-button>
-                                                    <el-button v-if="installed.httpsPort > 0" plain size="small">
-                                                        {{ $t('commons.table.port') }}：{{ installed.httpsPort }}
-                                                    </el-button>
-
-                                                    <el-popover
-                                                        placement="top-start"
-                                                        trigger="hover"
-                                                        v-if="hasLinkButton(installed)"
-                                                        :width="400"
-                                                    >
-                                                        <template #reference>
-                                                            <el-button
-                                                                plain
-                                                                icon="Promotion"
-                                                                size="small"
-                                                                @click="openLink(defaultLink, installed)"
-                                                            >
-                                                                {{ $t('app.toLink') }}
-                                                            </el-button>
-                                                        </template>
-                                                        <table>
-                                                            <tbody>
-                                                                <tr v-if="defaultLink != ''">
-                                                                    <td v-if="installed.httpPort > 0">
-                                                                        <el-button
-                                                                            type="primary"
-                                                                            link
-                                                                            @click="
-                                                                                toLink(
-                                                                                    'http://' +
-                                                                                        defaultLink +
-                                                                                        ':' +
-                                                                                        installed.httpPort,
-                                                                                )
-                                                                            "
-                                                                        >
-                                                                            {{
-                                                                                'http://' +
-                                                                                defaultLink +
-                                                                                ':' +
-                                                                                installed.httpPort
-                                                                            }}
-                                                                        </el-button>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr v-if="defaultLink != ''">
-                                                                    <td v-if="installed.httpsPort > 0">
-                                                                        <el-button
-                                                                            type="primary"
-                                                                            link
-                                                                            @click="
-                                                                                toLink(
-                                                                                    'https://' +
-                                                                                        defaultLink +
-                                                                                        ':' +
-                                                                                        installed.httpsPort,
-                                                                                )
-                                                                            "
-                                                                        >
-                                                                            {{
-                                                                                'https://' +
-                                                                                defaultLink +
-                                                                                ':' +
-                                                                                installed.httpsPort
-                                                                            }}
-                                                                        </el-button>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr v-if="installed.webUI != ''">
-                                                                    <td>
-                                                                        <el-button
-                                                                            type="primary"
-                                                                            link
-                                                                            @click="toLink(installed.webUI)"
-                                                                        >
-                                                                            {{ installed.webUI }}
-                                                                        </el-button>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                        <span v-if="defaultLink == '' && installed.webUI == ''">
-                                                            {{ $t('app.webUIConfig') }}
-                                                            <el-link
-                                                                icon="Position"
-                                                                @click="jumpToPath(router, '/settings/panel')"
-                                                                type="primary"
-                                                            >
-                                                                {{ $t('firewall.quickJump') }}
-                                                            </el-link>
-                                                        </span>
-                                                    </el-popover>
-                                                </div>
-                                                <div class="description">
-                                                    <span>
-                                                        {{ $t('app.alreadyRun') }}{{ $t('commons.colon') }}
-                                                        {{ getAge(installed.createdAt) }}
-                                                    </span>
-                                                </div>
-                                                <div class="app-divider" />
-                                                <div
-                                                    class="d-button flex flex-wrap items-center justify-start gap-1.5"
-                                                    v-if="mode === 'installed' && installed.status != 'Installing'"
-                                                >
-                                                    <el-button
-                                                        class="app-button"
-                                                        v-for="(button, key) in buttons"
-                                                        :key="key"
-                                                        :type="
-                                                            button.disabled && button.disabled(installed) ? 'info' : ''
-                                                        "
-                                                        plain
-                                                        round
-                                                        size="small"
-                                                        @click="button.click(installed)"
-                                                        :disabled="button.disabled && button.disabled(installed)"
-                                                    >
-                                                        {{ button.label }}
-                                                    </el-button>
-                                                </div>
-                                            </div>
-                                        </el-col>
-                                    </el-row>
-                                </el-card>
-                            </div>
+                            <AppCard
+                                :installed="installed"
+                                :mode="mode"
+                                :defaultLink="defaultLink"
+                                :currentNode="currentNode"
+                                :sortMode="sortMode"
+                                @open-detail="openDetail(installed.appKey)"
+                                @open-backups="openBackups(installed)"
+                                @open-log="openLog(installed)"
+                                @open-terminal="openTerminal(installed)"
+                                @open-operate="openOperate(installed, 'upgrade')"
+                                @favorite-install="favoriteInstall(installed)"
+                                @to-folder="routerToFileWithPath(installed.path)"
+                                @open-uploads="openUploads(installed.appKey, installed.name)"
+                                @jump-to-path="jumpToPath(router, '/settings/panel')"
+                                @to-container="toContainer(installed)"
+                                @ignore-app="ignoreApp(installed)"
+                            >
+                                <template #buttons>
+                                    <div
+                                        class="d-button flex flex-wrap items-center justify-start gap-1.5"
+                                        v-if="mode === 'installed' && installed.status != 'Installing'"
+                                    >
+                                        <el-button
+                                            class="app-button"
+                                            v-for="(button, key) in buttons"
+                                            :key="key"
+                                            :type="button.disabled && button.disabled(installed) ? 'info' : ''"
+                                            plain
+                                            round
+                                            size="small"
+                                            @click="button.click(installed)"
+                                            :disabled="button.disabled && button.disabled(installed)"
+                                        >
+                                            {{ button.label }}
+                                        </el-button>
+                                    </div>
+                                </template>
+                            </AppCard>
                         </el-col>
                     </el-row>
                 </MainDiv>
             </div>
-            <div class="page-button" v-if="mode === 'installed'">
+            <div class="page-button" v-if="mode === 'installed' && !sortMode">
                 <fu-table-pagination
                     v-model:current-page="paginationConfig.currentPage"
                     v-model:page-size="paginationConfig.pageSize"
@@ -407,7 +123,6 @@
     <AppDelete ref="deleteRef" @close="search" />
     <AppParams ref="appParamRef" @close="search" />
     <AppUpgrade ref="upgradeRef" @close="search" />
-    <PortJumpDialog ref="dialogPortJumpRef" />
     <AppIgnore ref="ignoreRef" @close="search" />
     <ComposeLogs ref="composeLogRef" />
     <TerminalDialog ref="dialogTerminalRef" />
@@ -417,40 +132,42 @@
 </template>
 
 <script lang="ts" setup>
+import AppCard from '@/views/app-store/installed/app/card.vue';
 import Backups from '@/components/backup/index.vue';
 import Uploads from '@/components/upload/index.vue';
-import PortJumpDialog from '@/components/port-jump/index.vue';
 import AppResources from './check/index.vue';
 import AppDelete from './delete/index.vue';
 import AppParams from './detail/index.vue';
 import AppUpgrade from './upgrade/index.vue';
 import AppIgnore from './ignore/index.vue';
-import Status from '@/components/status/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import Detail from '@/views/app-store/detail/index.vue';
 import Tags from '@/views/app-store/components/tag.vue';
-import SvgIcon from '@/components/svg-icon/svg-icon.vue';
 import MainDiv from '@/components/main-div/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 
-import { searchAppInstalled, installedOp, appInstalledDeleteCheck, getAppIconUrl } from '@/api/modules/app';
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import { searchAppInstalled, installedOp, appInstalledDeleteCheck, updateAppInstallSort } from '@/api/modules/app';
+import { onMounted, onUnmounted, reactive, ref, nextTick } from 'vue';
+import Sortable from 'sortablejs';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { App } from '@/api/interface/app';
-import { getAge, jumpToPath, toLink } from '@/utils/util';
+import { jumpToPath } from '@/utils/router';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
 import { getAgentSettingByKey } from '@/api/modules/setting';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { currentNode, isMaster, currentNodeAddr } = useGlobalStore();
+const { currentNode, isMaster, currentNodeAddr, isIntl } = useGlobalStore();
 
 const data = ref<any>();
 const loading = ref(false);
 const syncLoading = ref(false);
+const sortMode = ref(false);
+const sortContainer = ref();
+let sortableInstance: Sortable | null = null;
 let timer: NodeJS.Timer | null = null;
 const paginationConfig = reactive({
     cacheSizeKey: 'app-installed-page-size',
@@ -472,7 +189,6 @@ const deleteRef = ref();
 const appParamRef = ref();
 const upgradeRef = ref();
 const ignoreRef = ref();
-const dialogPortJumpRef = ref();
 const composeLogRef = ref();
 const dialogTerminalRef = ref();
 const taskLogRef = ref();
@@ -491,18 +207,6 @@ const defaultLink = ref('');
 const detailRef = ref();
 const ignoreAppRef = ref();
 
-const options = {
-    modifiers: [
-        {
-            name: 'flip',
-            options: {
-                padding: 5,
-                fallbackPlacements: ['bottom-start', 'top-start', 'right', 'left'],
-            },
-        },
-    ],
-};
-
 const openDetail = (key: string) => {
     detailRef.value.acceptParams(key, 'install');
 };
@@ -513,13 +217,6 @@ const changeTag = (key: string) => {
         searchReq.tags = [key];
     }
     search();
-};
-
-const hasLinkButton = (installed: any) => {
-    return (
-        (installed.appType == 'website' || installed.appKey?.startsWith('local')) &&
-        (installed.httpPort > 0 || installed.httpsPort > 0 || installed.webUI != '')
-    );
 };
 
 const search = async () => {
@@ -577,10 +274,6 @@ const favoriteInstall = (row: App.AppInstalled) => {
 
 const openIgnore = () => {
     ignoreRef.value.acceptParams();
-};
-
-const ignoreApp = (row: App.AppInstalled) => {
-    ignoreAppRef.value.acceptParams(row);
 };
 
 const operate = async () => {
@@ -702,6 +395,10 @@ const buttons = [
     },
 ];
 
+const ignoreApp = (row: App.AppInstalled) => {
+    ignoreAppRef.value.acceptParams(row);
+};
+
 const toContainer = async (row: App.AppInstalled) => {
     routerToNameWithQuery('ContainerItem', {
         filters: 'com.docker.compose.project=' + row.serviceName,
@@ -733,10 +430,6 @@ const openParam = (row: any) => {
     appParamRef.value.acceptParams({ id: row.id });
 };
 
-const isAppErr = (row: any) => {
-    return row.status.includes('Err') || row.status.includes('Error') || row.status.includes('UnHealthy');
-};
-
 const openLog = (row: any) => {
     switch (row.status) {
         case 'Installing':
@@ -756,6 +449,65 @@ const openTerminal = (row: any) => {
     dialogTerminalRef.value!.acceptParams({ containerID: row.container, title: title });
 };
 
+const enterSortMode = async () => {
+    sortMode.value = true;
+    clearInterval(Number(timer));
+    timer = null;
+    const res = await searchAppInstalled({ page: 1, pageSize: 10000, name: '', tags: [], update: false, sync: false });
+    data.value = res.data.items;
+    await nextTick();
+    const el = sortContainer.value?.$el;
+    if (el) {
+        const favCount = data.value.filter((i: any) => i.favorite).length;
+        sortableInstance = Sortable.create(el, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onMove: (evt: any) => {
+                const from = evt.dragged.dataset.sortIndex;
+                const to = evt.related.dataset.sortIndex;
+                const fromFav = Number(from) < favCount;
+                const toFav = Number(to) < favCount;
+                return fromFav === toFav;
+            },
+            onEnd: (evt: any) => {
+                const el = evt.from;
+                el.removeChild(evt.item);
+                el.insertBefore(evt.item, el.children[evt.oldIndex] || null);
+
+                const list = [...data.value];
+                const [moved] = list.splice(evt.oldIndex, 1);
+                list.splice(evt.newIndex, 0, moved);
+                data.value = list;
+            },
+        });
+    }
+};
+
+const saveSortOrder = async () => {
+    if (!data.value) return;
+    let favIdx = 0;
+    let normalIdx = 0;
+    const items = data.value.map((item: any) => ({
+        installID: item.id,
+        sortOrder: item.favorite ? favIdx++ : normalIdx++,
+    }));
+    await updateAppInstallSort(items);
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    exitSortMode();
+};
+
+const exitSortMode = () => {
+    if (sortableInstance) {
+        sortableInstance.destroy();
+        sortableInstance = null;
+    }
+    sortMode.value = false;
+    search();
+    timer = setInterval(() => {
+        search();
+    }, 1000 * 30);
+};
+
 const getConfig = async () => {
     try {
         const res = await getAgentSettingByKey('SystemIP');
@@ -767,27 +519,6 @@ const getConfig = async () => {
             defaultLink.value = currentNodeAddr.value;
         }
     } catch (error) {}
-};
-
-const openLink = (defaultLink: string, installed: App.AppInstalled) => {
-    if (defaultLink != '' && installed.webUI != '') {
-        return;
-    }
-    if (defaultLink == '' && installed.webUI == '') {
-        return;
-    }
-    if (installed.webUI != '') {
-        toLink(installed.webUI);
-        return;
-    }
-    if (installed.httpsPort > 0) {
-        toLink('https://' + defaultLink + ':' + installed.httpsPort);
-        return;
-    }
-    if (installed.httpPort > 0) {
-        toLink('http://' + defaultLink + ':' + installed.httpPort);
-        return;
-    }
 };
 
 onMounted(() => {
@@ -819,28 +550,9 @@ onUnmounted(() => {
 <style scoped lang="scss">
 @use '../index';
 
-.app-error {
-    max-height: 500px;
-    overflow-y: auto;
-}
-.d-name {
-    .el-button + .el-button {
-        margin-left: 0;
-    }
-}
 .d-button {
     .el-button + .el-button {
         margin-left: 0;
     }
-}
-.d-description {
-    .el-button + .el-button {
-        margin-left: 0;
-    }
-}
-.svg-icon {
-    width: 100%;
-    height: 100%;
-    padding: 0;
 }
 </style>

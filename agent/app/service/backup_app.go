@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/subosito/gotenv"
 
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
@@ -179,6 +180,9 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 			return err
 		}
 		tmpPath := strings.ReplaceAll(recoverFile, ".tar.gz", "")
+		if err := fileOp.TarGzExtractPro(tmpPath+"/app.tar.gz", tmpPath, ""); err != nil {
+			return err
+		}
 		defer func() {
 			_, _ = compose.Up(install.GetComposePath())
 			_ = os.RemoveAll(strings.ReplaceAll(recoverFile, ".tar.gz", ""))
@@ -187,19 +191,26 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		if !fileOp.Stat(tmpPath+"/app.json") || !fileOp.Stat(tmpPath+"/app.tar.gz") {
 			return errors.New(i18n.GetMsgByKey("AppBackupFileIncomplete"))
 		}
-		var oldInstall model.AppInstall
+		var backupInstall model.AppInstall
 		appJson, err := os.ReadFile(tmpPath + "/app.json")
 		if err != nil {
 			return err
 		}
-		if err := json.Unmarshal(appJson, &oldInstall); err != nil {
+		if err := json.Unmarshal(appJson, &backupInstall); err != nil {
 			return fmt.Errorf("unmarshal app.json failed, err: %v", err)
 		}
-		if oldInstall.App.Key != install.App.Key || oldInstall.Name != install.Name {
+		if backupInstall.App.Key != install.App.Key || backupInstall.Name != install.Name {
 			return errors.New(i18n.GetMsgByKey("AppAttributesNotMatch"))
 		}
-
-		newEnvFile := ""
+		backupEnvMap, err := getEnvMapByPath(path.Join(tmpPath, install.Name, ".env"))
+		if err != nil {
+			return err
+		}
+		installedEnvMap, err := getEnvMapByPath(install.GetEnvPath())
+		if err != nil {
+			return err
+		}
+		var mergedEnvContent string
 		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 		for _, resource := range resources {
 			var database model.Database
@@ -225,11 +236,20 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 				if err != nil {
 					return err
 				}
+				newDB, err := reCreatePostgresqlDB(db.ID, database, backupEnvMap)
+				if err != nil {
+					return err
+				}
+				backupInstall.Env, mergedEnvContent, err = buildRecoverEnv(backupInstall.Env, backupEnvMap, installedEnvMap)
+				if err != nil {
+					return err
+				}
+				_ = appInstallResourceRepo.BatchUpdateBy(map[string]interface{}{"resource_id": newDB.ID}, repo.WithByID(resource.ID))
 				taskName := task.GetTaskName(db.Name, task.TaskRecover, task.TaskScopeDatabase)
 				t.LogStart(taskName)
 				if err := handlePostgresqlRecover(dto.CommonRecover{
-					Name:       database.Name,
-					DetailName: db.Name,
+					Name:       newDB.PostgresqlName,
+					DetailName: newDB.Name,
 					File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, install.Name),
 				}, parentTask, true); err != nil {
 					t.LogFailedWithErr(taskName, err)
@@ -241,15 +261,11 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 				if err != nil {
 					return err
 				}
-				newDB, envMap, err := reCreateDB(db.ID, database, oldInstall.Env)
+				newDB, err := reCreateDB(db.ID, database, backupEnvMap)
 				if err != nil {
 					return err
 				}
-				oldHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", envMap["PANEL_DB_HOST"].(string))
-				newHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", database.Address)
-				oldInstall.Env = strings.ReplaceAll(oldInstall.Env, oldHost, newHost)
-				envMap["PANEL_DB_HOST"] = database.Address
-				newEnvFile, err = coverEnvJsonToStr(oldInstall.Env)
+				backupInstall.Env, mergedEnvContent, err = buildRecoverEnv(backupInstall.Env, backupEnvMap, installedEnvMap)
 				if err != nil {
 					return err
 				}
@@ -284,22 +300,22 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		t.LogSuccess(deCompressName)
 		_ = fileOp.DeleteDir(backPath)
 
-		if len(newEnvFile) != 0 {
+		if len(mergedEnvContent) != 0 {
 			envPath := fmt.Sprintf("%s/%s/.env", install.GetAppPath(), install.Name)
 			file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_TRUNC, 0640)
 			if err != nil {
 				return err
 			}
 			defer file.Close()
-			_, _ = file.WriteString(newEnvFile)
+			_, _ = file.WriteString(mergedEnvContent)
 		}
 
-		oldInstall.ID = install.ID
-		oldInstall.Status = constant.StatusRunning
-		oldInstall.AppId = install.AppId
-		oldInstall.AppDetailId = install.AppDetailId
-		oldInstall.App.ID = install.AppId
-		if err := appInstallRepo.Save(context.Background(), &oldInstall); err != nil {
+		backupInstall.ID = install.ID
+		backupInstall.Status = constant.StatusRunning
+		backupInstall.AppId = install.AppId
+		backupInstall.AppDetailId = install.AppDetailId
+		backupInstall.App.ID = install.AppId
+		if err := appInstallRepo.Save(context.Background(), &backupInstall); err != nil {
 			global.LOG.Errorf("save db app install failed, err: %v", err)
 			return err
 		}
@@ -373,33 +389,131 @@ func doAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir, fi
 	return nil
 }
 
-func reCreateDB(dbID uint, database model.Database, oldEnv string) (*model.DatabaseMysql, map[string]interface{}, error) {
+func reCreateDB(dbID uint, database model.Database, envMap map[string]interface{}) (*model.DatabaseMysql, error) {
 	mysqlService := NewIMysqlService()
 	ctx := context.Background()
 	_ = mysqlService.Delete(ctx, dto.MysqlDBDelete{ID: dbID, Database: database.Name, Type: database.Type, DeleteBackup: false, ForceDelete: true})
 
-	envMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(oldEnv), &envMap); err != nil {
-		return nil, envMap, err
-	}
-	oldName, _ := envMap["PANEL_DB_NAME"].(string)
-	oldUser, _ := envMap["PANEL_DB_USER"].(string)
-	oldPassword, _ := envMap["PANEL_DB_USER_PASSWORD"].(string)
+	dbInfo := getDBCreateInfoFromEnv(envMap, "utf8mb4")
 	createDB, err := mysqlService.Create(context.Background(), dto.MysqlDBCreate{
-		Name:       oldName,
+		Name:       dbInfo.Name,
 		From:       database.From,
 		Database:   database.Name,
-		Format:     "utf8mb4",
-		Username:   oldUser,
-		Password:   oldPassword,
+		Format:     dbInfo.Format,
+		Username:   dbInfo.User,
+		Password:   dbInfo.Password,
 		Permission: "%",
 	})
-	cronjobs, _ := cronjobRepo.List(cronjobRepo.WithByDbName(fmt.Sprintf("%v", dbID)))
-	for _, job := range cronjobs {
-		_ = cronjobRepo.Update(job.ID, map[string]interface{}{"db_name": fmt.Sprintf("%v", createDB.ID)})
-	}
 	if err != nil {
-		return nil, envMap, err
+		return nil, err
 	}
-	return createDB, envMap, nil
+	updateCronjobsDBRef(dbID, createDB.ID)
+	return createDB, nil
+}
+
+func reCreatePostgresqlDB(dbID uint, database model.Database, envMap map[string]interface{}) (*model.DatabasePostgresql, error) {
+	postgresqlService := NewIPostgresqlService()
+	_ = postgresqlService.Delete(context.Background(), dto.PostgresqlDBDelete{
+		ID:           dbID,
+		Type:         database.Type,
+		Database:     database.Name,
+		DeleteBackup: false,
+		ForceDelete:  true,
+	})
+
+	dbInfo := getDBCreateInfoFromEnv(envMap, "UTF8")
+	createDB, err := postgresqlService.Create(context.Background(), dto.PostgresqlDBCreate{
+		Name:      dbInfo.Name,
+		From:      database.From,
+		Database:  database.Name,
+		Format:    dbInfo.Format,
+		Username:  dbInfo.User,
+		Password:  dbInfo.Password,
+		SuperUser: true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	updateCronjobsDBRef(dbID, createDB.ID)
+	return createDB, nil
+}
+
+type dbRecreateInfo struct {
+	Name     string
+	User     string
+	Password string
+	Format   string
+}
+
+func getDBCreateInfoFromEnv(envMap map[string]interface{}, defaultFormat string) dbRecreateInfo {
+	name, _ := envMap["PANEL_DB_NAME"].(string)
+	user, _ := envMap["PANEL_DB_USER"].(string)
+	password, _ := envMap["PANEL_DB_USER_PASSWORD"].(string)
+	format, _ := envMap["format"].(string)
+	if len(format) == 0 {
+		format = defaultFormat
+	}
+	return dbRecreateInfo{
+		Name:     name,
+		User:     user,
+		Password: password,
+		Format:   format,
+	}
+}
+
+func updateCronjobsDBRef(oldDBID, newDBID uint) {
+	cronjobs, _ := cronjobRepo.List(cronjobRepo.WithByDbName(fmt.Sprintf("%v", oldDBID)))
+	for _, job := range cronjobs {
+		_ = cronjobRepo.Update(job.ID, map[string]interface{}{"db_name": fmt.Sprintf("%v", newDBID)})
+	}
+}
+
+func buildRecoverEnv(appEnv string, backupEnvMap, installedEnvMap map[string]interface{}) (string, string, error) {
+	currentHostVal, hasCurrentHost := installedEnvMap["PANEL_DB_HOST"]
+	if hasCurrentHost && fmt.Sprintf("%v", currentHostVal) != "" {
+		backupHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", backupEnvMap["PANEL_DB_HOST"])
+		currentHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", currentHostVal)
+		appEnv = strings.ReplaceAll(appEnv, backupHost, currentHost)
+		if _, ok := backupEnvMap["CASDOOR_DATASOURCE_NAME"]; ok {
+			backupEnvMap["CASDOOR_DATASOURCE_NAME"] = strings.ReplaceAll(
+				fmt.Sprintf("%v", backupEnvMap["CASDOOR_DATASOURCE_NAME"]),
+				fmt.Sprintf("%v", backupEnvMap["PANEL_DB_HOST"]),
+				fmt.Sprintf("%v", currentHostVal),
+			)
+		}
+		backupEnvMap["PANEL_DB_HOST"] = currentHostVal
+	}
+	newEnvMap := make(map[string]string, len(backupEnvMap))
+	handleMap(backupEnvMap, newEnvMap)
+	mergedEnvContent, err := gotenv.Marshal(newEnvMap)
+	if err != nil {
+		return appEnv, "", err
+	}
+	return appEnv, mergedEnvContent, nil
+}
+
+func getEnvMapByPath(envPath string) (map[string]interface{}, error) {
+	envMap := make(map[string]interface{})
+	envFile, err := os.ReadFile(envPath)
+	if err != nil {
+		return envMap, err
+	}
+	lines := strings.Split(string(envFile), "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 {
+			value := strings.TrimSpace(parts[1])
+			if len(value) >= 2 {
+				if (value[0] == '"' && value[len(value)-1] == '"') || (value[0] == '\'' && value[len(value)-1] == '\'') {
+					value = value[1 : len(value)-1]
+				}
+			}
+			envMap[parts[0]] = value
+		}
+	}
+	return envMap, nil
 }

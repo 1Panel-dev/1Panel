@@ -1,7 +1,7 @@
 <template>
     <DrawerPro
         v-model="open"
-        :header="$t('runtime.' + mode)"
+        :header="$t('commons.button.' + mode)"
         size="large"
         :resource="mode === 'edit' ? runtime.name : ''"
         @close="handleClose"
@@ -119,31 +119,6 @@
                     <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                         <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('website.remark')" prop="remark">
-                        <el-input type="textarea" :rows="1" clearable v-model="runtime.remark" />
-                    </el-form-item>
-                    <el-form-item>
-                        <el-alert :title="$t('php.containerConfigHelper')" type="info" :closable="false" />
-                    </el-form-item>
-                    <el-form-item>
-                        <el-alert type="warning" :closable="false">
-                            <template #default>
-                                <div>
-                                    <div>{{ $t('runtime.buildHelper') }}</div>
-                                    <span>
-                                        {{ $t('runtime.extendHelper') }}
-                                    </span>
-                                    <span
-                                        v-if="!globalStore.isFxplay"
-                                        class="custom-link"
-                                        @click="openLink(globalStore.docsUrl + '/user_manual/websites/php/#php_1')"
-                                    >
-                                        {{ $t('php.toExtensionsList') }}
-                                    </span>
-                                </div>
-                            </template>
-                        </el-alert>
-                    </el-form-item>
                     <el-form-item :label="$t('php.extensions')">
                         <el-select v-model="extensions" @change="changePHPExtension()" clearable>
                             <el-option
@@ -163,6 +138,34 @@
                                 :label="service.label"
                             ></el-option>
                         </el-select>
+                    </el-form-item>
+
+                    <el-form-item>
+                        <el-alert type="warning" :closable="false">
+                            <template #default>
+                                <div>
+                                    <div>{{ $t('runtime.buildHelper') }}</div>
+                                    <span>
+                                        {{ $t('runtime.extendHelper') }}
+                                    </span>
+                                    <div>
+                                        <span
+                                            v-if="!globalStore.isFxplay"
+                                            class="custom-link"
+                                            @click="openLink(globalStore.docsUrl + '/user_manual/websites/php/#php_1')"
+                                        >
+                                            {{ $t('php.toExtensionsList') }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                        </el-alert>
+                    </el-form-item>
+                    <el-form-item :label="$t('website.remark')" prop="remark">
+                        <el-input type="textarea" :rows="1" clearable v-model="runtime.remark" />
+                    </el-form-item>
+                    <el-form-item>
+                        <el-alert :title="$t('php.containerConfigHelper')" type="info" :closable="false" />
                     </el-form-item>
                 </div>
             </div>
@@ -210,7 +213,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
-import { getLabel } from '@/utils/util';
+import { getLabel } from '@/utils/app-store';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { globalStore } = useGlobalStore();
 

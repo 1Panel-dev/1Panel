@@ -39,7 +39,7 @@
                             ></el-date-picker>
                         </div>
                     </template>
-                    <div class="chart">
+                    <div class="chart" v-loading="loadingMap.load">
                         <v-charts
                             height="400px"
                             id="loadLoadChart"
@@ -71,7 +71,7 @@
                             ></el-date-picker>
                         </div>
                     </template>
-                    <div class="chart">
+                    <div class="chart" v-loading="loadingMap.cpu">
                         <v-charts
                             height="400px"
                             id="loadCPUChart"
@@ -101,7 +101,7 @@
                             ></el-date-picker>
                         </div>
                     </template>
-                    <div class="chart">
+                    <div class="chart" v-loading="loadingMap.memory">
                         <v-charts
                             height="400px"
                             id="loadMemoryChart"
@@ -152,7 +152,7 @@
                             ></el-date-picker>
                         </div>
                     </template>
-                    <div class="chart">
+                    <div class="chart" v-loading="loadingMap.io">
                         <v-charts
                             height="400px"
                             id="loadIOChart"
@@ -201,7 +201,7 @@
                             ></el-date-picker>
                         </div>
                     </template>
-                    <div class="chart">
+                    <div class="chart" v-loading="loadingMap.network">
                         <v-charts
                             height="400px"
                             id="loadNetworkChart"
@@ -220,7 +220,8 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
 import { loadMonitor, getNetworkOptions, getIOOptions } from '@/api/modules/host';
-import { computeSize, computeSizeFromKBs, dateFormatWithoutYear } from '@/utils/util';
+import { computeSize, computeSizeFromKBs } from '@/utils/size';
+import { dateFormatWithoutYear } from '@/utils/date';
 import i18n from '@/lang';
 import MonitorRouter from '@/views/host/monitor/index.vue';
 import { GlobalStore } from '@/store';
@@ -245,6 +246,13 @@ const netOptions = ref();
 const ioChoose = ref();
 const ioOptions = ref();
 const chartsOption = ref({ loadLoadChart: null, loadCPUChart: null, loadMemoryChart: null, loadNetworkChart: null });
+const loadingMap = reactive({
+    load: false,
+    cpu: false,
+    memory: false,
+    io: false,
+    network: false,
+});
 
 const searchTime = ref();
 const searchInfo = reactive<Host.MonitorSearch>({
@@ -298,36 +306,41 @@ const search = async (param: string) => {
         searchInfo.startTime = searchTime.value[0];
         searchInfo.endTime = searchTime.value[1];
     }
-    const res = await loadMonitor(searchInfo);
-    monitorBase.value = res.data;
-    for (const item of monitorBase.value) {
-        if (!item.value) {
-            item.value = [];
-            item.date = [];
+    setChartLoading(param, true);
+    try {
+        const res = await loadMonitor(searchInfo);
+        monitorBase.value = res.data;
+        for (const item of monitorBase.value) {
+            if (!item.value) {
+                item.value = [];
+                item.date = [];
+            }
+            switch (item.param) {
+                case 'base':
+                    let baseDate = item.date.length === 0 ? loadEmptyDate(timeRangeCpu.value) : item.date;
+                    baseDate = baseDate.map(function (item: any) {
+                        return dateFormatWithoutYear(item);
+                    });
+                    if (param === 'cpu' || param === 'all') {
+                        initCPUCharts(baseDate, item);
+                    }
+                    if (param === 'memory' || param === 'all') {
+                        initMemCharts(baseDate, item);
+                    }
+                    if (param === 'load' || param === 'all') {
+                        initLoadCharts(item);
+                    }
+                    break;
+                case 'io':
+                    initIOCharts(item);
+                    break;
+                case 'network':
+                    initNetCharts(item);
+                    break;
+            }
         }
-        switch (item.param) {
-            case 'base':
-                let baseDate = item.date.length === 0 ? loadEmptyDate(timeRangeCpu.value) : item.date;
-                baseDate = baseDate.map(function (item: any) {
-                    return dateFormatWithoutYear(item);
-                });
-                if (param === 'cpu' || param === 'all') {
-                    initCPUCharts(baseDate, item);
-                }
-                if (param === 'memory' || param === 'all') {
-                    initMemCharts(baseDate, item);
-                }
-                if (param === 'load' || param === 'all') {
-                    initLoadCharts(item);
-                }
-                break;
-            case 'io':
-                initIOCharts(item);
-                break;
-            case 'network':
-                initNetCharts(item);
-                break;
-        }
+    } finally {
+        setChartLoading(param, false);
     }
 };
 
@@ -353,6 +366,34 @@ const loadOptions = async () => {
     ioChoose.value = searchInfo.io;
 
     search('all');
+};
+
+const setChartLoading = (param: string, value: boolean) => {
+    if (param === 'all') {
+        loadingMap.load = value;
+        loadingMap.cpu = value;
+        loadingMap.memory = value;
+        loadingMap.io = value;
+        loadingMap.network = value;
+        return;
+    }
+    switch (param) {
+        case 'load':
+            loadingMap.load = value;
+            break;
+        case 'cpu':
+            loadingMap.cpu = value;
+            break;
+        case 'memory':
+            loadingMap.memory = value;
+            break;
+        case 'io':
+            loadingMap.io = value;
+            break;
+        case 'network':
+            loadingMap.network = value;
+            break;
+    }
 };
 
 function initLoadCharts(item: Host.MonitorData) {
@@ -740,5 +781,8 @@ onMounted(() => {
 .chart {
     width: 100%;
     height: 400px;
+}
+.el-dropdown {
+    vertical-align: baseline;
 }
 </style>

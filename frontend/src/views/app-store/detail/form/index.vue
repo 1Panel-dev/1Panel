@@ -122,6 +122,15 @@
                     <span class="input-help">{{ $t('app.pullImageHelper') }}</span>
                 </el-form-item>
 
+                <PushtoNode
+                    v-if="isMaster && isMasterProductPro && batchInstallSupport"
+                    :push-node="formData.pushNode"
+                    :nodes="formData.nodes"
+                    type="app"
+                    @update:push-node="formData.pushNode = $event"
+                    @update:nodes="formData.nodes = $event"
+                />
+
                 <el-form-item prop="editCompose">
                     <el-checkbox v-model="formData.editCompose" :label="$t('app.editCompose')" size="large" />
                     <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
@@ -135,19 +144,24 @@
     </div>
 </template>
 
-<script lang="ts" setup name="AppInstallForm">
+<script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { getAppByKey, getAppDetail, getAppInstalledByID } from '@/api/modules/app';
+import { getAppStoreConfig } from '@/api/modules/setting';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
 import { ref, watch } from 'vue';
 import Params from '../params/index.vue';
 import { Container } from '@/api/interface/container';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
-import { computeSizeFromMB } from '@/utils/util';
+import { computeSizeFromMB } from '@/utils/size';
 import { loadResourceLimit } from '@/api/modules/container';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isOffLine } = useGlobalStore();
+import { loadOptionalComponent } from '@/extensions/optional';
+defineOptions({ name: 'AppInstallForm' });
+const { isOffLine, isMasterProductPro, isMaster } = useGlobalStore();
+
+const PushtoNode = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/ssl/index.vue'));
 
 interface ClusterProps {
     key: string;
@@ -161,6 +175,7 @@ interface ClusterProps {
 interface Props {
     loading?: boolean;
     modelValue?: any;
+    batchInstallSupport?: boolean;
 }
 
 const limits = ref<Container.ResourceLimit>({
@@ -170,6 +185,7 @@ const limits = ref<Container.ResourceLimit>({
 
 const props = withDefaults(defineProps<Props>(), {
     loading: false,
+    batchInstallSupport: false,
 });
 
 interface Emits {
@@ -202,6 +218,7 @@ const formRules = ref<FormRules>({
     specifyIP: [Rules.ipv4orV6],
     restartPolicy: [Rules.requiredSelect],
     format: [Rules.requiredInput],
+    nodes: [Rules.requiredSelect],
 });
 
 const initFormData = () => ({
@@ -223,6 +240,8 @@ const initFormData = () => ({
     gpuConfig: false,
     specifyIP: '',
     restartPolicy: 'always',
+    pushNode: false,
+    nodes: [],
 });
 
 const formData = ref(props.modelValue || initFormData());
@@ -275,8 +294,21 @@ const getVersionDetail = async (version: string) => {
     } catch (error) {}
 };
 
+const loadInstallDefaultConfig = async () => {
+    try {
+        const res = await getAppStoreConfig(operateNode.value);
+        formData.value.allowPort = res.data.installAllowPort === 'Enable';
+    } catch (error) {
+        formData.value.allowPort = false;
+    }
+};
+
 const initForm = async (appKey: string) => {
+    operateNode.value = undefined;
+    env.value = undefined;
+    masterNodeAddr.value = undefined;
     formData.value.name = appKey.replace(/^local/, '');
+    await loadInstallDefaultConfig();
     const res = await getAppByKey(appKey);
     currentApp.value = res.data;
     appVersions.value = currentApp.value.versions;
@@ -330,6 +362,7 @@ const initClusterForm = async (props: ClusterProps) => {
     }
     masterNodeAddr.value = props.masterNodeAddr;
     operateNode.value = props.node;
+    await loadInstallDefaultConfig();
     const res = await getAppByKey(props.key, props.node);
     currentApp.value = res.data;
     appVersions.value = currentApp.value.versions;

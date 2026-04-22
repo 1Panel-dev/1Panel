@@ -6,6 +6,55 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "14679640",
+      "name": "qrcode",
+      "font_class": "qrcode",
+      "unicode": "e72a",
+      "unicode_decimal": 59178
+    },
+    {
+      "icon_id": "39643896",
+      "name": "qrcode",
+      "font_class": "qrcode-line",
+      "unicode": "e669",
+      "unicode_decimal": 58985
+    },
+    {
+      "icon_id": "9783460",
+      "name": "概览",
+      "font_class": "gailan1",
+      "unicode": "e62e",
+      "unicode_decimal": 58926
+    },
+    {
+      "icon_id": "26213819",
+      "name": "退出登陆",
+      "font_class": "tuichudenglu3",
+      "unicode": "e62d",
+      "unicode_decimal": 58925
+    },
+    {
+      "icon_id": "32303204",
+      "name": "任务中心",
+      "font_class": "renwuzhongxin1",
+      "unicode": "e807",
+      "unicode_decimal": 59399
+    },
+    {
+      "icon_id": "3453887",
+      "name": "主机",
+      "font_class": "zhuji",
+      "unicode": "e629",
+      "unicode_decimal": 58921
+    },
+    {
+      "icon_id": "39180612",
+      "name": "pcm",
+      "font_class": "pcm",
+      "unicode": "e7b2",
+      "unicode_decimal": 59314
+    },
+    {
       "icon_id": "5041257",
       "name": "运行环境",
       "font_class": "run-menu",

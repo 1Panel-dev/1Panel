@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/docker/docker/api/types/image"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -404,7 +405,7 @@ func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) err
 	if len(imageList) != 0 {
 		snap.Task.Log(strings.Join(imageList, " "))
 		snap.Task.Logf("docker save %s | gzip -c > %s", strings.Join(imageList, " "), path.Join(targetDir, "images.tar.gz"))
-		if err := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute)).RunBashCf("docker save %s | gzip -c > %s", strings.Join(imageList, " "), path.Join(targetDir, "images.tar.gz")); err != nil {
+		if err := cmd.RunDefaultBashCf("docker save %s | gzip -c > %s", strings.Join(imageList, " "), path.Join(targetDir, "images.tar.gz")); err != nil {
 			snap.Task.LogFailedWithErr(i18n.GetMsgByKey("SnapDockerSave"), err)
 			return err
 		}
@@ -561,5 +562,8 @@ func snapUpload(snap snapHelper, accounts string, downloadID, retry uint, file s
 	src := path.Join(global.Dir.LocalBackupDir, "tmp/system", path.Base(file))
 	dst := path.Join("system_snapshot", path.Base(file))
 	accountMap := NewBackupClientMap(strings.Split(accounts, ","))
+	if !accountMap[fmt.Sprintf("%d", downloadID)].isOk {
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", downloadID)].message))
+	}
 	return uploadWithMap(snap.Task, accountMap, src, dst, accounts, downloadID, retry)
 }

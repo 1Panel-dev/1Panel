@@ -50,8 +50,8 @@ import { ElForm } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operateIPRule, updateAddrRule } from '@/api/modules/host';
-import { checkCidr, checkCidrV6, checkIpV4V6, deepCopy } from '@/utils/util';
-
+import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
+import { deepCopy } from '@/utils/misc';
 const loading = ref();
 const oldRule = ref<Host.RuleIP>();
 

@@ -2,6 +2,13 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
+	"math"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -17,11 +24,6 @@ import (
 	"github.com/shirou/gopsutil/v4/load"
 	"github.com/shirou/gopsutil/v4/mem"
 	"github.com/shirou/gopsutil/v4/net"
-	"math"
-	"sort"
-	"strconv"
-	"strings"
-	"time"
 )
 
 const (
@@ -110,7 +112,7 @@ func (m *AlertTaskHelper) getClassifiedAlerts() (baseAlerts, resourceAlerts []dt
 
 func handleBaseAlerts(baseAlerts []dto.AlertDTO) {
 	if len(baseAlerts) == 0 {
-		stopResourceJob()
+		stopBaseJob()
 		return
 	}
 	if global.AlertBaseJobID == 0 {
@@ -227,11 +229,30 @@ func loadSSLInfo(alert dto.AlertDTO) {
 		return
 	}
 	sender := NewAlertSender(alert, projectJSON)
+	minDays := math.MaxInt
+	maxDays := 0
+	allDomains := make([]string, 0)
 	for daysDiff, domains := range daysDiffMap {
-		domainStr := strings.Join(domains, ",")
-		params := createAlertBaseParams(strconv.Itoa(len(domains)), strconv.Itoa(daysDiff))
-		sender.Send(domainStr, params)
+		allDomains = append(allDomains, domains...)
+		if daysDiff < minDays {
+			minDays = daysDiff
+		}
+		if daysDiff > maxDays {
+			maxDays = daysDiff
+		}
 	}
+	if len(allDomains) == 0 {
+		return
+	}
+	var daysStr string
+	if len(allDomains) == 1 {
+		daysStr = strconv.Itoa(minDays)
+	} else {
+		daysStr = strconv.Itoa(minDays) + "-" + strconv.Itoa(maxDays)
+	}
+	domainStr := strings.Join(allDomains, ",")
+	params := createAlertBaseParams(strconv.Itoa(len(daysDiffMap)), daysStr)
+	sender.Send(domainStr, params)
 }
 
 func loadWebsiteInfo(alert dto.AlertDTO) {
@@ -247,11 +268,30 @@ func loadWebsiteInfo(alert dto.AlertDTO) {
 		return
 	}
 	sender := NewAlertSender(alert, projectJSON)
+	minDays := math.MaxInt
+	maxDays := 0
+	allDomains := make([]string, 0)
 	for daysDiff, domains := range daysDiffMap {
-		domainStr := strings.Join(domains, ",")
-		params := createAlertBaseParams(strconv.Itoa(len(domains)), strconv.Itoa(daysDiff))
-		sender.Send(domainStr, params)
+		allDomains = append(allDomains, domains...)
+		if daysDiff < minDays {
+			minDays = daysDiff
+		}
+		if daysDiff > maxDays {
+			maxDays = daysDiff
+		}
 	}
+	if len(allDomains) == 0 {
+		return
+	}
+	var daysStr string
+	if len(allDomains) == 1 {
+		daysStr = strconv.Itoa(minDays)
+	} else {
+		daysStr = strconv.Itoa(minDays) + "-" + strconv.Itoa(maxDays)
+	}
+	domainStr := strings.Join(allDomains, ",")
+	params := createAlertBaseParams(strconv.Itoa(len(daysDiffMap)), daysStr)
+	sender.Send(domainStr, params)
 }
 
 func loadPanelPwd(alert dto.AlertDTO) {
@@ -384,25 +424,19 @@ func loadDiskUsage(alert dto.AlertDTO) {
 	}
 	if isAlertDue(newDate) {
 		if strings.Contains(alert.Project, "all") {
-			err = processAllDisks(alert)
+			_ = processAllDisks(alert)
 		} else {
-			err = processSingleDisk(alert)
+			_ = processSingleDisk(alert)
 		}
 	}
 }
 
 func loadPanelLogin(alert dto.AlertDTO) {
 	count, isAlert, err := alertUtil.CountRecentFailedLoginLogs(alert.Cycle, alert.Count)
-	alertType := alert.Type
-	quota := strconv.Itoa(count)
-	quotaType := strconv.Itoa(int(alert.Cycle))
 	if err != nil {
 		global.LOG.Errorf("Failed to count recent failed login logs: %v", err)
 	}
 	if isAlert {
-		alertType = "panelLogin"
-		quota = strconv.Itoa(count)
-		quotaType = "panelLogin"
 		params := []dto.Param{
 			{
 				Index: "1",
@@ -415,7 +449,7 @@ func loadPanelLogin(alert dto.AlertDTO) {
 				Value: "",
 			},
 		}
-		sendAlerts(alert, alertType, quota, quotaType, params)
+		sendAlerts(alert, "panelLogin", strconv.Itoa(count), "panelLogin", params)
 	}
 
 	whitelist := strings.Split(strings.TrimSpace(alert.AdvancedParams), "\n")
@@ -424,15 +458,13 @@ func loadPanelLogin(alert dto.AlertDTO) {
 		global.LOG.Errorf("Failed to check recent failed ip login logs: %v", err)
 	}
 	if len(records) > 0 {
-		quota = strings.Join(func() []string {
+		quota := strings.Join(func() []string {
 			var ips []string
 			for _, r := range records {
 				ips = append(ips, r.IP)
 			}
 			return ips
 		}(), "\n")
-		alertType = "panelIpLogin"
-		quotaType = "panelIpLogin"
 		params := []dto.Param{
 			{
 				Index: "1",
@@ -445,22 +477,16 @@ func loadPanelLogin(alert dto.AlertDTO) {
 				Value: " IP ",
 			},
 		}
-		sendAlerts(alert, alertType, quota, quotaType, params)
+		sendAlerts(alert, "panelIpLogin", quota, "panelIpLogin", params)
 	}
 }
 
 func loadSSHLogin(alert dto.AlertDTO) {
 	count, isAlert, err := alertUtil.CountRecentFailedSSHLog(alert.Cycle, alert.Count)
-	alertType := alert.Type
-	quota := strconv.Itoa(count)
-	quotaType := strconv.Itoa(int(alert.Cycle))
 	if err != nil {
 		global.LOG.Errorf("Failed to count recent failed ssh login logs: %v", err)
 	}
 	if isAlert {
-		alertType = "sshLogin"
-		quota = strconv.Itoa(count)
-		quotaType = "sshLogin"
 		params := []dto.Param{
 			{
 				Index: "1",
@@ -473,7 +499,7 @@ func loadSSHLogin(alert dto.AlertDTO) {
 				Value: "",
 			},
 		}
-		sendAlerts(alert, alertType, quota, quotaType, params)
+		sendAlerts(alert, "sshLogin", strconv.Itoa(count), "sshLogin", params)
 	}
 	whitelist := strings.Split(strings.TrimSpace(alert.AdvancedParams), "\n")
 	records, err := alertUtil.FindRecentSuccessLoginNotInWhitelist(30, whitelist)
@@ -481,9 +507,7 @@ func loadSSHLogin(alert dto.AlertDTO) {
 		global.LOG.Errorf("Failed to check recent failed ip ssh login logs: %v", err)
 	}
 	if len(records) > 0 {
-		quota = strings.Join(records, "\n")
-		alertType = "sshIpLogin"
-		quotaType = "sshIpLogin"
+		quota := strings.Join(records, "\n")
 		params := []dto.Param{
 			{
 				Index: "1",
@@ -496,7 +520,7 @@ func loadSSHLogin(alert dto.AlertDTO) {
 				Value: " IP ",
 			},
 		}
-		sendAlerts(alert, alertType, quota, quotaType, params)
+		sendAlerts(alert, "sshIpLogin", quota, "sshIpLogin", params)
 	}
 }
 
@@ -580,10 +604,12 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 					AlertId: alert.ID,
 					Count:   todayCount + 1,
 				}
-				_ = xpack.CreateSMSAlertLog(alertType, alert, create, quotaType, params, constant.SMS)
+				alertErr := xpack.CreateSMSAlertLog(alertType, alert, create, quotaType, params, constant.SMS)
+				if alertErr != nil {
+					global.LOG.Infof("%s alert sms push faild, err: %v", alertType, alertErr.Error())
+					continue
+				}
 				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, constant.SMS)
-				global.LOG.Infof("%s alert sms push successful", alertType)
-
 			case constant.Email:
 				todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, constant.Email)
 				if !isValid {
@@ -599,9 +625,54 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 				create.AlertRule = alertUtil.ProcessAlertRule(alert)
 				create.AlertDetail = alertUtil.ProcessAlertDetail(alertInfo, quotaType, params, constant.Email)
 				transport := xpack.LoadRequestTransport()
-				_ = alertUtil.CreateEmailAlertLog(create, alertInfo, params, transport)
+				agentInfo, _ := xpack.GetAgentInfo()
+				alertErr := alertUtil.CreateEmailAlertLog(create, alertInfo, params, transport, agentInfo)
+				if alertErr != nil {
+					global.LOG.Infof("%s alert email push faild, err: %v", alertType, alertErr.Error())
+					continue
+				}
 				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, constant.Email)
-				global.LOG.Infof("%s alert email push successful", alertType)
+			case constant.WeCom, constant.DingTalk, constant.FeiShu:
+				todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, m)
+				if !isValid {
+					continue
+				}
+				var create = dto.AlertLogCreate{
+					Type:    alertUtil.GetCronJobType(alert.Type),
+					AlertId: alert.ID,
+					Count:   todayCount + 1,
+				}
+				transport := xpack.LoadRequestTransport()
+				agentInfo, _ := xpack.GetAgentInfo()
+				err := xpack.CreateWebhookAlertLog(alertType, alert, create, quotaType, params, m, transport, agentInfo)
+				if err != nil {
+					global.LOG.Infof("%s alert webhook %s push faild, err: %v", alertType, m, err)
+					continue
+				}
+				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, m)
+			case constant.Bark:
+				todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, m)
+				if !isValid {
+					continue
+				}
+				var create = dto.AlertLogCreate{
+					Type:    alertUtil.GetCronJobType(alert.Type),
+					AlertId: alert.ID,
+					Count:   todayCount + 1,
+				}
+				alertInfo := alert
+				alertInfo.Type = alertType
+				create.AlertRule = alertUtil.ProcessAlertRule(alert)
+				create.AlertDetail = alertUtil.ProcessAlertDetail(alertInfo, quotaType, params, m)
+				transport := xpack.LoadRequestTransport()
+				agentInfo, _ := xpack.GetAgentInfo()
+				alertErr := alertUtil.CreateBarkAlertLog(create, alertInfo, params, transport, agentInfo)
+				if alertErr != nil {
+					global.LOG.Infof("%s alert %s push failed, err: %v", alertType, m, alertErr.Error())
+					continue
+				}
+				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, m)
+			default:
 			}
 		}
 	}
@@ -641,7 +712,9 @@ func calculateSSLExpiryDays(sslList []model.WebsiteSSL, cycle uint) (map[int][]s
 	projectMap := make(map[uint][]time.Time)
 
 	for _, ssl := range sslList {
-		daysDiff := int(ssl.ExpireDate.Sub(currentDate).Hours() / 24)
+		daysDiff := int(math.Ceil(
+			ssl.ExpireDate.Sub(currentDate).Hours() / 24,
+		))
 		if daysDiff > 0 && int(cycle) >= daysDiff {
 			daysDiffMap[daysDiff] = append(daysDiffMap[daysDiff], ssl.PrimaryDomain)
 			projectMap[ssl.ID] = append(projectMap[ssl.ID], ssl.ExpireDate)
@@ -656,7 +729,9 @@ func calculateWebsiteExpiryDays(websites []model.Website, cycle uint) (map[int][
 	projectMap := make(map[uint][]time.Time)
 
 	for _, website := range websites {
-		daysDiff := int(website.ExpireDate.Sub(currentDate).Hours() / 24)
+		daysDiff := int(math.Ceil(
+			website.ExpireDate.Sub(currentDate).Hours() / 24,
+		))
 		if daysDiff > 0 && int(cycle) >= daysDiff {
 			daysDiffMap[daysDiff] = append(daysDiffMap[daysDiff], website.PrimaryDomain)
 			projectMap[website.ID] = append(projectMap[website.ID], website.ExpireDate)
@@ -820,30 +895,36 @@ func processAllDisks(alert dto.AlertDTO) error {
 		global.LOG.Errorf("error getting disk list, err: %v", err)
 		return err
 	}
+	var errMsgs []string
 	for _, item := range diskList {
-		if success, err := checkAndCreateDiskAlert(alert, item.Path); err == nil && success {
-			global.LOG.Infof("disk alert pushed successfully for %s", item.Path)
+		err := checkAndCreateDiskAlert(alert, item.Path)
+		if err != nil {
+			errMsg := fmt.Sprintf("disk path %s process failed: %v", item.Path, err)
+			errMsgs = append(errMsgs, errMsg)
+			global.LOG.Errorf("%s", errMsg)
+			continue
 		}
+	}
+	if len(errMsgs) > 0 {
+		return fmt.Errorf("batch process disks failed, error count: %d, details: %s", len(errMsgs), strings.Join(errMsgs, "; "))
 	}
 	return nil
 }
 
 func processSingleDisk(alert dto.AlertDTO) error {
-	success, err := checkAndCreateDiskAlert(alert, alert.Project)
+	err := checkAndCreateDiskAlert(alert, alert.Project)
 	if err != nil {
+		global.LOG.Errorf("%s", err.Error())
 		return err
-	}
-	if success {
-		global.LOG.Infof("disk alert pushed successfully for %s", alert.Project)
 	}
 	return nil
 }
 
-func checkAndCreateDiskAlert(alert dto.AlertDTO, path string) (bool, error) {
+func checkAndCreateDiskAlert(alert dto.AlertDTO, path string) error {
 	usageStat, err := psutil.DISK.GetUsage(path, false)
 	if err != nil {
 		global.LOG.Errorf("error getting disk usage for %s, err: %v", path, err)
-		return false, err
+		return err
 	}
 
 	usedTotal, usedStr := calculateUsedTotal(alert.Cycle, usageStat)
@@ -852,13 +933,12 @@ func checkAndCreateDiskAlert(alert dto.AlertDTO, path string) (bool, error) {
 		commonTotal *= 1024 * 1024 * 1024
 	}
 	if usedTotal < commonTotal {
-		return false, nil
+		return nil
 	}
-	global.LOG.Infof("disk「 %s 」usage: %s", path, usedStr)
 	params := createAlertDiskParams(path, usedStr)
 	sender := NewAlertSender(alert, alert.Project)
 	sender.ResourceSend(path, params)
-	return true, nil
+	return nil
 }
 
 func calculateUsedTotal(cycle uint, usageStat *disk.UsageStat) (float64, string) {

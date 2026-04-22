@@ -13,6 +13,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -21,7 +22,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	"github.com/pkg/errors"
 )
 
 func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
@@ -32,7 +32,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 	}
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	for _, app := range apps {
 		retry := 0
@@ -90,7 +90,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 	}
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	for _, web := range webs {
 		retry := 0
@@ -149,7 +149,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 	}
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	for _, dbInfo := range dbs {
 		retry := 0
@@ -165,7 +165,20 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 			record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
 
 			backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("tmp/database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
-			record.FileName = simplifiedFileName(fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5)))
+			switch dbInfo.DBType {
+			case constant.AppMongodb:
+				record.FileName = simplifiedFileName(fmt.Sprintf(
+					"db_%s_%s.gz",
+					dbInfo.Name,
+					startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5),
+				))
+			default:
+				record.FileName = simplifiedFileName(fmt.Sprintf(
+					"db_%s_%s.sql.gz",
+					dbInfo.Name,
+					startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5),
+				))
+			}
 			if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" || cronjob.DBType == "mysql-cluster" {
 				if err := doMysqlBackup(dbInfo, backupDir, record.FileName, cronjob.Secret); err != nil {
 					if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
@@ -177,8 +190,19 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 						return nil
 					}
 				}
+			} else if cronjob.DBType == constant.AppMongodb {
+				if err := doMongodbBackup(dbInfo.Database, dbInfo.DBType, dbInfo.Name, backupDir, record.FileName, cronjob.Secret, task); err != nil {
+					if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
+						retry++
+						return err
+					} else {
+						task.Log(i18n.GetMsgWithDetail("IgnoreBackupErr", err.Error()))
+						cleanAccountMap(accountMap)
+						return nil
+					}
+				}
 			} else {
-				if err := doPostgresqlgBackup(dbInfo, backupDir, record.FileName, cronjob.Secret, taskItem); err != nil {
+				if err := doPostgresqlBackup(dbInfo, backupDir, record.FileName, cronjob.Secret, taskItem); err != nil {
 					if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
 						retry++
 						return err
@@ -217,7 +241,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	taskItem.AddSubTaskWithOps(task.GetTaskName(cronjob.SourceDir, task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
 		fileName := fmt.Sprintf("%s.tar.gz", startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(2))
@@ -267,7 +291,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	taskItem.AddSubTaskWithOps(task.GetTaskName(i18n.GetMsgByKey("SystemLog"), task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
 		nameItem := startTime.Format(constant.DateTimeSlimLayout) + common.RandStrAndNum(5)
@@ -303,7 +327,7 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.JobRecords, taskItem *task.Task) error {
 	accountMap := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if !accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].isOk {
-		return errors.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	var record model.BackupRecord
 	record.Status = constant.StatusSuccess
@@ -379,6 +403,7 @@ type DatabaseHelper struct {
 	DBType   string
 	Database string
 	Name     string
+	Args     []string
 }
 
 func addSkipTask(source string, taskItem *task.Task) {
@@ -400,6 +425,19 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 					DBType:   cronjob.DBType,
 					Database: mysql.Database,
 					Name:     mysql.Name,
+					Args:     strings.Split(cronjob.Args, ","),
+				})
+			}
+		} else if cronjob.DBType == constant.AppMongodb {
+			databaseService := NewIDatabaseService()
+			mongodbItems, _ := databaseService.LoadItems(cronjob.DBType)
+			for _, mongodb := range mongodbItems {
+				dbs = append(dbs, DatabaseHelper{
+					ID:       mongodb.ID,
+					DBType:   cronjob.DBType,
+					Database: mongodb.Database,
+					Name:     mongodb.Name,
+					Args:     strings.Split(cronjob.Args, ","),
 				})
 			}
 		} else {
@@ -410,6 +448,7 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 					DBType:   cronjob.DBType,
 					Database: pg.PostgresqlName,
 					Name:     pg.Name,
+					Args:     strings.Split(cronjob.Args, ","),
 				})
 			}
 		}
@@ -425,6 +464,16 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 				DBType:   cronjob.DBType,
 				Database: mysqlItem.MysqlName,
 				Name:     mysqlItem.Name,
+				Args:     strings.Split(cronjob.Args, ","),
+			})
+		} else if cronjob.DBType == constant.AppMongodb {
+			mongodbItem, _ := mongodbRepo.Get(repo.WithByID(uint(itemID)))
+			dbs = append(dbs, DatabaseHelper{
+				ID:       mongodbItem.ID,
+				DBType:   cronjob.DBType,
+				Database: mongodbItem.MongodbName,
+				Name:     mongodbItem.Name,
+				Args:     strings.Split(cronjob.Args, ","),
 			})
 		} else {
 			pgItem, _ := postgresqlRepo.Get(repo.WithByID(uint(itemID)))
@@ -433,6 +482,7 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 				DBType:   cronjob.DBType,
 				Database: pgItem.PostgresqlName,
 				Name:     pgItem.Name,
+				Args:     strings.Split(cronjob.Args, ","),
 			})
 		}
 	}
@@ -440,10 +490,10 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 }
 
 func loadWebsForJob(cronjob model.Cronjob) []model.Website {
-	var weblist []model.Website
+	var list []model.Website
 	if cronjob.Website == "all" {
-		weblist, _ = websiteRepo.List()
-		return weblist
+		list, _ = websiteRepo.List()
+		return list
 	}
 	websites := strings.Split(cronjob.Website, ",")
 	var idItems []uint
@@ -451,8 +501,8 @@ func loadWebsForJob(cronjob model.Cronjob) []model.Website {
 		itemID, _ := strconv.Atoi(websites[i])
 		idItems = append(idItems, uint(itemID))
 	}
-	weblist, _ = websiteRepo.GetBy(repo.WithByIDs(idItems))
-	return weblist
+	list, _ = websiteRepo.GetBy(repo.WithByIDs(idItems))
+	return list
 }
 
 func handleBackupLogs(taskItem *task.Task, targetDir, fileName string, secret string) error {

@@ -2,15 +2,19 @@ package service
 
 import (
 	"bufio"
+	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/websocket"
-	"github.com/shirou/gopsutil/v4/process"
 	"os"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/websocket"
+	"github.com/shirou/gopsutil/v4/net"
+	"github.com/shirou/gopsutil/v4/process"
 )
 
 type ProcessService struct{}
@@ -18,6 +22,7 @@ type ProcessService struct{}
 type IProcessService interface {
 	StopProcess(req request.ProcessReq) error
 	GetProcessInfoByPID(pid int32) (*websocket.PsProcessData, error)
+	GetListeningProcess(c context.Context) ([]ListeningProcess, error)
 }
 
 func NewIProcessService() IProcessService {
@@ -33,6 +38,61 @@ func (ps *ProcessService) StopProcess(req request.ProcessReq) error {
 		return err
 	}
 	return nil
+}
+
+type ListeningProcess struct {
+	PID      int32
+	Port     map[uint32]struct{}
+	Protocol uint32
+	Name     string
+}
+
+func (ps *ProcessService) GetListeningProcess(c context.Context) ([]ListeningProcess, error) {
+	conn, err := net.ConnectionsMaxWithContext(c, "inet", 32768)
+	if err != nil {
+		return nil, err
+	}
+	// One cache entry per (PID, socket type) so TCP and UDP sockets are not merged under one Protocol.
+	type procKey struct {
+		pid      int32
+		protocol uint32
+	}
+	procCache := make(map[procKey]ListeningProcess, 64)
+
+	for _, conn := range conn {
+		if conn.Pid == 0 {
+			continue
+		}
+
+		if (conn.Status == "LISTEN" && conn.Type == syscall.SOCK_STREAM) || (conn.Type == syscall.SOCK_DGRAM && conn.Raddr.Port == 0) {
+			key := procKey{pid: conn.Pid, protocol: conn.Type}
+			if _, exists := procCache[key]; !exists {
+				proc, err := process.NewProcess(conn.Pid)
+				if err != nil {
+					continue
+				}
+				procData := ListeningProcess{
+					PID: conn.Pid,
+				}
+				procData.Name, _ = proc.Name()
+				procData.Port = make(map[uint32]struct{})
+				procData.Port[conn.Laddr.Port] = struct{}{}
+				procData.Protocol = conn.Type
+				procCache[key] = procData
+			} else {
+				p := procCache[key]
+				p.Port[conn.Laddr.Port] = struct{}{}
+				procCache[key] = p
+			}
+		}
+	}
+
+	procs := make([]ListeningProcess, 0, len(procCache))
+	for _, proc := range procCache {
+		procs = append(procs, proc)
+	}
+
+	return procs, nil
 }
 
 func (ps *ProcessService) GetProcessInfoByPID(pid int32) (*websocket.PsProcessData, error) {

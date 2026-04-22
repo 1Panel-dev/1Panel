@@ -37,6 +37,7 @@ type SyncTime struct {
 
 type CleanData struct {
 	SystemClean    []CleanTree `json:"systemClean"`
+	BackupClean    []CleanTree `json:"backupClean"`
 	UploadClean    []CleanTree `json:"uploadClean"`
 	DownloadClean  []CleanTree `json:"downloadClean"`
 	SystemLogClean []CleanTree `json:"systemLogClean"`
@@ -54,6 +55,7 @@ type CleanTree struct {
 	Size        uint64 `json:"size"`
 	IsCheck     bool   `json:"isCheck"`
 	IsRecommend bool   `json:"isRecommend"`
+	CanDelete   bool   `json:"canDelete"`
 }
 
 type Clean struct {
@@ -62,6 +64,10 @@ type Clean struct {
 	Size     uint64 `json:"size"`
 }
 
+type SSHDefaultConn struct {
+	WithReset   bool   `json:"withReset"`
+	DefaultConn string `json:"defaultConn"`
+}
 type SSHConnData struct {
 	Addr       string `json:"addr" validate:"required"`
 	Port       uint   `json:"port" validate:"required,number,max=65535,min=1"`
@@ -80,6 +86,19 @@ type SystemProxy struct {
 	Port     string `json:"port"`
 	User     string `json:"user"`
 	Password string `json:"password"`
+}
+
+type TerminalAIInfo struct {
+	AIStatus              string `json:"aiStatus"`
+	AIAccountID           string `json:"aiAccountId"`
+	AIPrefix              string `json:"aiPrefix" validate:"required,oneof=@ai #ai /ai"`
+	AIRiskCommands        string `json:"aiRiskCommands"`
+	AIRiskCommandsDefault string `json:"aiRiskCommandsDefault"`
+}
+
+type FileManageAIInfo struct {
+	AIStatus    string `json:"aiStatus"`
+	AIAccountID string `json:"aiAccountId"`
 }
 
 type CommonDescription struct {

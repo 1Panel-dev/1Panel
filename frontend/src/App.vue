@@ -32,7 +32,7 @@ const i18nLocale = computed(() => {
     if (globalStore.language === 'ja') return ja;
     if (globalStore.language === 'ms') return ms;
     if (globalStore.language === 'ru') return ru;
-    if (globalStore.language === 'pt-br') return ptBR;
+    if (globalStore.language === 'pt-BR') return ptBR;
     if (globalStore.language === 'ko') return ko;
     if (globalStore.language === 'tr') return tr;
     if (globalStore.language === 'es-ES') return esES;

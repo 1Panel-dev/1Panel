@@ -40,7 +40,8 @@ import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import Create from './create/index.vue';
 import Detail from './detail/index.vue';
-import { getKeyName, dateFormat } from '@/utils/util';
+import { getKeyName } from '@/utils/ssl';
+import { dateFormat } from '@/utils/date';
 import Obtain from './obtain/index.vue';
 
 const open = ref(false);

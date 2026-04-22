@@ -14,6 +14,7 @@
                     <template #prefix>{{ $t('logs.resource') }}</template>
                     <el-option :label="$t('commons.table.all')" value="" />
                     <el-option :label="$t('logs.detail.apps')" value="apps" />
+                    <el-option :label="$t('logs.detail.openresty')" value="openresty" />
                     <el-option :label="$t('logs.detail.websites')" value="websites" />
                     <el-option :label="$t('logs.detail.runtimes')" value="runtimes" />
                     <el-option :label="$t('logs.detail.ai')" value="ai" />
@@ -95,7 +96,7 @@
 <script setup lang="ts">
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import LogRouter from '@/views/log/router/index.vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { cleanLogs, getOperationLogs } from '@/api/modules/log';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
@@ -156,12 +157,13 @@ const onClean = async () => {
 };
 
 const loadDetail = (log: string) => {
-    for (const [key, value] of Object.entries(replacements)) {
-        if (log.indexOf(key) !== -1) {
-            log = log.replace(key, '[' + i18n.global.t(value) + ']');
+    return log.replace(/\[([^\]]+)\]/g, (matched, token: string) => {
+        const transKey = resolveReplacementKey(token);
+        if (!transKey) {
+            return matched;
         }
-    }
-    return log;
+        return '[' + i18n.global.t(transKey) + ']';
+    });
 };
 
 const loadNodes = async () => {
@@ -178,29 +180,105 @@ const loadNodes = async () => {
         });
 };
 
-const replacements = {
-    '[enable]': 'commons.button.enable',
-    '[Enable]': 'commons.button.enable',
-    '[disable]': 'commons.button.disable',
-    '[Disable]': 'commons.button.disable',
-    '[light]': 'setting.light',
-    '[dark]': 'setting.dark',
-    '[delete]': 'commons.button.delete',
-    '[get]': 'commons.button.get',
-    '[operate]': 'commons.table.operate',
-    '[UserName]': 'commons.login.username',
-    '[PanelName]': 'setting.title',
-    '[Language]': 'setting.language',
-    '[Theme]': 'setting.theme',
-    '[MenuTabs]': 'setting.menuTabs',
-    '[SessionTimeout]': 'setting.sessionTimeout',
-    '[SecurityEntrance]': 'setting.entrance',
-    '[ExpirationDays]': 'setting.expirationTime',
-    '[ComplexityVerification]': 'setting.complexity',
-    '[MFAStatus]': 'setting.mfa',
-    '[MonitorStatus]': 'setting.enableMonitor',
-    '[MonitorStoreDays]': 'setting.monitor',
-    '[ApiInterfaceStatus]': 'setting.apiInterface',
+const normalizedReplacements: Record<string, string> = {
+    enable: 'commons.button.enable',
+    disable: 'commons.button.disable',
+    start: 'commons.button.start',
+    stop: 'commons.button.stop',
+    restart: 'commons.button.restart',
+    reload: 'commons.operate.reload',
+    sync: 'commons.button.sync',
+    update: 'commons.button.update',
+    upgrade: 'commons.button.upgrade',
+    open: 'commons.button.open',
+    close: 'commons.button.close',
+    up: 'commons.button.up',
+    down: 'commons.button.down',
+    login: 'commons.button.login',
+    delete: 'commons.button.delete',
+    create: 'commons.button.create',
+    add: 'commons.button.add',
+    edit: 'commons.button.edit',
+    save: 'commons.button.save',
+    clean: 'commons.button.clean',
+    clear: 'commons.button.clean',
+    get: 'commons.button.get',
+    install: 'commons.button.install',
+    uninstall: 'commons.button.uninstall',
+    backup: 'commons.button.backup',
+    recover: 'commons.button.recover',
+    upload: 'commons.button.upload',
+    download: 'commons.button.download',
+    bind: 'commons.button.bind',
+    unbind: 'commons.button.unbind',
+    verify: 'commons.button.verify',
+    rebuild: 'commons.operate.rebuild',
+    remove: 'commons.msg.remove',
+    kill: 'container.kill',
+    pause: 'container.pause',
+    unpause: 'container.unpause',
+    allow: 'firewall.allow',
+    deny: 'firewall.deny',
+    accept: 'firewall.accept',
+    drop: 'firewall.drop',
+    reject: 'firewall.stop',
+    running: 'commons.status.running',
+    stopped: 'commons.status.stopped',
+    success: 'commons.status.success',
+    failed: 'commons.status.failed',
+    created: 'commons.status.created',
+    restarting: 'commons.status.restarting',
+    paused: 'commons.status.paused',
+    exited: 'commons.status.exited',
+    dead: 'commons.status.dead',
+    light: 'setting.light',
+    dark: 'setting.dark',
+    darkgold: 'setting.darkGold',
+    auto: 'setting.auto',
+    cn: 'setting.cn',
+    intl: 'setting.intl',
+    status: 'commons.table.status',
+    all: 'commons.table.all',
+    operate: 'commons.table.operate',
+    true: 'commons.true',
+    false: 'commons.false',
+};
+
+const exactReplacements: Record<string, string> = {
+    disableBanPing: 'firewall.disableBanPing',
+    enableBanPing: 'firewall.enableBanPing',
+    UserName: 'commons.login.username',
+    PanelName: 'setting.title',
+    Language: 'setting.language',
+    Theme: 'setting.theme',
+    MenuTabs: 'setting.menuTabs',
+    SessionTimeout: 'setting.sessionTimeout',
+    SecurityEntrance: 'setting.entrance',
+    ExpirationDays: 'setting.expirationTime',
+    ComplexityVerification: 'setting.complexity',
+    MFAStatus: 'setting.mfa',
+    MonitorStatus: 'setting.enableMonitor',
+    MonitorStoreDays: 'setting.monitor',
+    ApiInterfaceStatus: 'setting.apiInterface',
+    ComponentSize: 'setting.componentSize',
+    Region: 'setting.region',
+    SystemIP: 'setting.systemIP',
+    ProxyType: 'setting.proxyType',
+    ProxyUrl: 'setting.proxyUrl',
+    ProxyPort: 'setting.proxyPort',
+    ProxyPasswdKeep: 'setting.proxyPasswdKeep',
+    ProxyDocker: 'setting.proxyDocker',
+    SyncToNode: 'setting.syncToNode',
+    IPWhiteList: 'setting.ipWhiteList',
+    ApiKeyValidityTime: 'setting.apiKeyValidityTime',
+    DeveloperMode: 'setting.developerMode',
+};
+
+const resolveReplacementKey = (token: string): string | undefined => {
+    if (exactReplacements[token]) {
+        return exactReplacements[token];
+    }
+    return normalizedReplacements[token.toLowerCase()];
 };
 
 const onSubmitClean = async () => {

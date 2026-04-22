@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -99,6 +100,9 @@ func (f *Ftp) Operate(operate string) error {
 }
 
 func (f *Ftp) UserAdd(username, passwd, path string) error {
+	if cmd.CheckIllegal(username, path) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	entry, err := generatePureFtpEntrySimple(username, passwd, path)
 	if err != nil {
 		return fmt.Errorf("generate pure-ftpd entry failed, err: %v", err)
@@ -121,6 +125,9 @@ func (f *Ftp) UserAdd(username, passwd, path string) error {
 }
 
 func (f *Ftp) UserDel(username string) error {
+	if cmd.CheckIllegal(username) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	if err := cmd.RunDefaultBashCf("pure-pw userdel %s", username); err != nil {
 		return err
 	}
@@ -179,6 +186,9 @@ func (f *Ftp) SetPasswd(username, passwd string) error {
 }
 
 func (f *Ftp) SetPath(username, path string) error {
+	if cmd.CheckIllegal(username, path) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	if err := cmd.RunDefaultBashCf("pure-pw usermod %s -d %s", username, path); err != nil {
 		return err
 	}
@@ -189,6 +199,9 @@ func (f *Ftp) SetPath(username, path string) error {
 }
 
 func (f *Ftp) SetStatus(username, status string) error {
+	if cmd.CheckIllegal(username, status) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	statusItem := "''"
 	if status == constant.StatusDisable {
 		statusItem = "1"

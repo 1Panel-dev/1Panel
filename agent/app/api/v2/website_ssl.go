@@ -1,13 +1,13 @@
 package v2
 
 import (
-	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"net/url"
-	"reflect"
 	"strconv"
+
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -25,27 +25,39 @@ import (
 // @Router /websites/ssl/search [post]
 func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 	var req request.WebsiteSSLSearch
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	total, accounts, err := websiteSSLService.Page(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithDataGzipped(c, dto.PageResult{
+		Total: total,
+		Items: accounts,
+	})
+}
+
+// @Tags Website SSL
+// @Summary List website ssl
+// @Accept json
+// @Param request body request.WebsiteSSLListReq true "request"
+// @Success 200 {array} response.WebsiteSSLDTO
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/ssl/list [post]
+func (b *BaseApi) ListWebsiteSSL(c *gin.Context) {
+	var req request.WebsiteSSLListReq
 	if err := helper.CheckBind(&req, c); err != nil {
 		return
 	}
-	if !reflect.DeepEqual(req.PageInfo, dto.PageInfo{}) {
-		total, accounts, err := websiteSSLService.Page(req)
-		if err != nil {
-			helper.InternalServer(c, err)
-			return
-		}
-		helper.SuccessWithData(c, dto.PageResult{
-			Total: total,
-			Items: accounts,
-		})
-	} else {
-		list, err := websiteSSLService.Search(req)
-		if err != nil {
-			helper.InternalServer(c, err)
-			return
-		}
-		helper.SuccessWithData(c, list)
+	list, err := websiteSSLService.Search(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
 	}
+	helper.SuccessWithDataGzipped(c, list)
 }
 
 // @Tags Website SSL

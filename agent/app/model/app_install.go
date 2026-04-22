@@ -26,6 +26,7 @@ type AppInstall struct {
 	HttpsPort     int    `json:"httpsPort"`
 	WebUI         string `json:"webUI"`
 	Favorite      bool   `json:"favorite"`
+	SortOrder     int    `json:"sortOrder" gorm:"default:0"`
 
 	App App `json:"app" gorm:"-:migration"`
 }

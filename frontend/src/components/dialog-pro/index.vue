@@ -3,9 +3,10 @@
         :title="title"
         v-model="dialogVisible"
         :destroy-on-close="true"
-        :close-on-click-modal="false"
+        :close-on-click-modal="closeOnClickModal"
         :show-close="showClose"
         :width="size"
+        draggable
         :open="open"
         @opened="opened"
         :before-close="handleBeforeClose"
@@ -37,6 +38,10 @@ const props = defineProps({
     showClose: {
         type: Boolean,
         default: true,
+    },
+    closeOnClickModal: {
+        type: Boolean,
+        default: false,
     },
     size: {
         type: String,

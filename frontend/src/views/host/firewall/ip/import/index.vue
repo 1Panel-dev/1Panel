@@ -103,7 +103,6 @@ const acceptParams = async (): Promise<void> => {
 const loadCurrentData = async () => {
     const res = await searchFireRule({
         type: 'address',
-        status: '',
         strategy: '',
         info: '',
         page: 1,

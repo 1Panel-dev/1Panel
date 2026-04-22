@@ -118,7 +118,7 @@
                         </div>
                     </el-form-item>
                     <div v-if="globalStore.isIntl">
-                        <el-form-item v-if="(dialogData.rowData!.hasSpec) && !isProductPro">
+                        <el-form-item v-if="dialogData.rowData!.hasSpec && !isProductPro">
                             <span class="input-help logText">
                                 {{ $t('toolbox.clam.alertHelper') }}
                                 <el-link class="link" type="primary" @click="toUpload">
@@ -154,6 +154,26 @@
                                 cleanable
                             >
                                 <el-option value="mail" :label="$t('xpack.alert.mail')" />
+                                <el-option v-if="!isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
+                                <el-option
+                                    value="weCom"
+                                    v-if="!globalStore.isIntl"
+                                    :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
+                                    :label="$t('xpack.alert.weCom')"
+                                />
+                                <el-option
+                                    value="dingTalk"
+                                    v-if="!globalStore.isIntl"
+                                    :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
+                                    :label="$t('xpack.alert.dingTalk')"
+                                />
+                                <el-option
+                                    value="feiShu"
+                                    v-if="!globalStore.isIntl"
+                                    :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
+                                    :label="$t('xpack.alert.feiShu')"
+                                />
+                                <el-option v-if="isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                                 <el-option
                                     value="sms"
                                     v-if="!globalStore.isIntl"
@@ -221,8 +241,7 @@ import { createClam, updateClam } from '@/api/modules/toolbox';
 import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
 import { specOptions, transObjToSpec, transSpecToObj, weekOptions } from '@/views/cronjob/cronjob/helper';
-import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/util';
-
+import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/validate';
 const globalStore = GlobalStore();
 const licenseRef = ref();
 const scanDirRef = ref();

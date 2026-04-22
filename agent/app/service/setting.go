@@ -3,14 +3,20 @@ package service
 import (
 	"encoding/base64"
 	"encoding/json"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
+	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 	"github.com/jinzhu/copier"
 )
 
@@ -18,10 +24,17 @@ type SettingService struct{}
 
 type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
+	GetTerminalAIInfo() (*dto.TerminalAIInfo, error)
+	GetFileManageAIInfo() (*dto.FileManageAIInfo, error)
+	GetFileHistorySettingInfo() (*response.FileHistorySettingInfo, error)
 	Update(key, value string) error
+	UpdateTerminalAI(req dto.TerminalAIInfo) error
+	UpdateFileManageAI(req dto.FileManageAIInfo) error
+	UpdateFileHistorySetting(req request.FileHistorySettingUpdate) error
 
 	TestConnByInfo(req dto.SSHConnData) bool
 	SaveConnInfo(req dto.SSHConnData) error
+	SetDefaultIsConn(req dto.SSHDefaultConn) error
 	GetSystemProxy() (*dto.SystemProxy, error)
 	GetLocalConn() dto.SSHConnData
 	GetSettingByKey(key string) string
@@ -55,8 +68,117 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	return &info, err
 }
 
+func (u *SettingService) GetTerminalAIInfo() (*dto.TerminalAIInfo, error) {
+	info := &dto.TerminalAIInfo{
+		AIStatus:              constant.StatusDisable,
+		AIAccountID:           "",
+		AIPrefix:              constant.DefaultTerminalAIPrefix,
+		AIRiskCommands:        "[]",
+		AIRiskCommandsDefault: constant.DefaultTerminalAIRiskCommands,
+	}
+
+	if value, err := settingRepo.GetValueByKey("AIStatus"); err == nil && value != "" {
+		info.AIStatus = value
+	}
+	if value, err := settingRepo.GetValueByKey("AIAccountID"); err == nil {
+		info.AIAccountID = value
+	}
+	if value, err := settingRepo.GetValueByKey("AIPrefix"); err == nil {
+		info.AIPrefix = value
+	}
+	if value, err := settingRepo.GetValueByKey("AIRiskCommands"); err == nil && value != "" {
+		info.AIRiskCommands = value
+	}
+
+	return info, nil
+}
+
+func (u *SettingService) GetFileManageAIInfo() (*dto.FileManageAIInfo, error) {
+	info := &dto.FileManageAIInfo{
+		AIStatus:    constant.StatusDisable,
+		AIAccountID: "",
+	}
+	if value, err := settingRepo.GetValueByKey("FileAIStatus"); err == nil && value != "" {
+		info.AIStatus = value
+	}
+	if value, err := settingRepo.GetValueByKey("FileAIAccountID"); err == nil {
+		info.AIAccountID = value
+	}
+	return info, nil
+}
+
+func (u *SettingService) GetFileHistorySettingInfo() (*response.FileHistorySettingInfo, error) {
+	return historyService.GetSettingInfo()
+}
+
 func (u *SettingService) Update(key, value string) error {
 	return settingRepo.UpdateOrCreate(key, value)
+}
+
+func (u *SettingService) UpdateTerminalAI(req dto.TerminalAIInfo) error {
+	if strings.EqualFold(strings.TrimSpace(req.AIStatus), constant.StatusEnable) {
+		accountID, err := strconv.ParseUint(strings.TrimSpace(req.AIAccountID), 10, 64)
+		if err != nil || accountID == 0 {
+			return buserr.New("ErrAgentAccountIDRequired")
+		}
+		currentStatus, _ := settingRepo.GetValueByKey("AIStatus")
+		currentAccountID, _ := settingRepo.GetValueByKey("AIAccountID")
+		needValidate := !strings.EqualFold(strings.TrimSpace(currentStatus), constant.StatusEnable) ||
+			strings.TrimSpace(currentAccountID) != strings.TrimSpace(req.AIAccountID)
+		if needValidate {
+			if err := terminalai.ValidateTerminalAccount(uint(accountID)); err != nil {
+				return buserr.WithErr("ErrAgentAccountUnavailable", err)
+			}
+		}
+	}
+	if err := settingRepo.UpdateOrCreate("AIStatus", req.AIStatus); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("AIAccountID", req.AIAccountID); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("AIPrefix", req.AIPrefix); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("AIRiskCommands", req.AIRiskCommands); err != nil {
+		return err
+	}
+	terminalai.InvalidateTerminalRuntimeCache()
+	return nil
+}
+
+func (u *SettingService) UpdateFileManageAI(req dto.FileManageAIInfo) error {
+	if strings.EqualFold(strings.TrimSpace(req.AIStatus), constant.StatusEnable) {
+		accountID, err := strconv.ParseUint(strings.TrimSpace(req.AIAccountID), 10, 64)
+		if err != nil || accountID == 0 {
+			return buserr.New("ErrAgentAccountIDRequired")
+		}
+		currentStatus, _ := settingRepo.GetValueByKey("FileAIStatus")
+		currentAccountID, _ := settingRepo.GetValueByKey("FileAIAccountID")
+		needValidate := !strings.EqualFold(strings.TrimSpace(currentStatus), constant.StatusEnable) ||
+			strings.TrimSpace(currentAccountID) != strings.TrimSpace(req.AIAccountID)
+		if needValidate {
+			if err := terminalai.ValidateTerminalAccount(uint(accountID)); err != nil {
+				return buserr.WithErr("ErrAgentAccountUnavailable", err)
+			}
+		}
+	}
+	accountVal := strings.TrimSpace(req.AIAccountID)
+	if !strings.EqualFold(strings.TrimSpace(req.AIStatus), constant.StatusEnable) {
+		accountVal = ""
+	}
+	if err := settingRepo.UpdateOrCreate("FileAIStatus", req.AIStatus); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("FileAIAccountID", accountVal); err != nil {
+		return err
+	}
+	terminalai.InvalidateFileAIRuntimeCache()
+	return nil
+}
+
+func (u *SettingService) UpdateFileHistorySetting(req request.FileHistorySettingUpdate) error {
+	return historyService.UpdateSetting(req)
 }
 
 func (u *SettingService) TestConnByInfo(req dto.SSHConnData) bool {
@@ -125,6 +247,15 @@ func (u *SettingService) SaveConnInfo(req dto.SSHConnData) error {
 	return nil
 }
 
+func (u *SettingService) SetDefaultIsConn(req dto.SSHDefaultConn) error {
+	if req.DefaultConn == constant.StatusDisable && req.WithReset {
+		if err := settingRepo.Update("LocalSSHConn", ""); err != nil {
+			return err
+		}
+	}
+	return settingRepo.Update("LocalSSHConnShow", req.DefaultConn)
+}
+
 func (u *SettingService) GetSystemProxy() (*dto.SystemProxy, error) {
 	systemProxy := dto.SystemProxy{}
 	systemProxy.Type, _ = settingRepo.GetValueByKey("ProxyType")
@@ -138,6 +269,7 @@ func (u *SettingService) GetSystemProxy() (*dto.SystemProxy, error) {
 
 func (u *SettingService) GetLocalConn() dto.SSHConnData {
 	var data dto.SSHConnData
+	data.LocalSSHConnShow, _ = settingRepo.GetValueByKey("LocalSSHConnShow")
 	connItem, _ := settingRepo.GetValueByKey("LocalSSHConn")
 	if len(connItem) == 0 {
 		return data

@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -14,7 +13,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
@@ -22,9 +20,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client/iptables"
 	"github.com/jinzhu/copier"
 )
-
-const confPath = "/etc/sysctl.conf"
-const panelSysctlPath = "/etc/sysctl.d/98-onepanel.conf"
 
 type FirewallService struct{}
 
@@ -62,7 +57,7 @@ func (u *FirewallService) LoadBaseInfo(tab string) (dto.FirewallBaseInfo, error)
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		baseInfo.PingStatus = u.pingStatus()
+		baseInfo.PingStatus = firewall.LoadPingStatus()
 		baseInfo.Version, _ = client.Version()
 	}()
 	go func() {
@@ -117,29 +112,15 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 		}
 	}
 
-	var datasFilterStatus []fireClient.FireInfo
-	if len(req.Status) != 0 {
-		for _, data := range datas {
-			if req.Status == "free" && len(data.UsedStatus) == 0 {
-				datasFilterStatus = append(datasFilterStatus, data)
-			}
-			if req.Status == "used" && len(data.UsedStatus) != 0 {
-				datasFilterStatus = append(datasFilterStatus, data)
-			}
-		}
-	} else {
-		datasFilterStatus = datas
-	}
-
 	var datasFilterStrategy []fireClient.FireInfo
 	if len(req.Strategy) != 0 {
-		for _, data := range datasFilterStatus {
+		for _, data := range datas {
 			if req.Strategy == data.Strategy {
 				datasFilterStrategy = append(datasFilterStrategy, data)
 			}
 		}
 	} else {
-		datasFilterStrategy = datasFilterStatus
+		datasFilterStrategy = datas
 	}
 
 	total, start, end := len(datasFilterStrategy), (req.Page-1)*req.PageSize, req.Page*req.PageSize
@@ -206,10 +187,18 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 			return err
 		}
 		needRestartDocker = true
-	case "disablePing":
-		return u.updatePingStatus("0")
-	case "enablePing":
-		return u.updatePingStatus("1")
+	case "disableBanPing":
+		if err := firewall.UpdatePingStatus("0"); err != nil {
+			return err
+		}
+		_ = settingRepo.Update("BanPing", constant.StatusDisable)
+		return nil
+	case "enableBanPing":
+		if err := firewall.UpdatePingStatus("1"); err != nil {
+			return err
+		}
+		_ = settingRepo.Update("BanPing", constant.StatusEnable)
+		return nil
 	default:
 		return fmt.Errorf("not supported operation: %s", req.Operation)
 	}
@@ -589,105 +578,6 @@ func (u *FirewallService) cleanUnUsedData(client firewall.FirewallClient) {
 	}
 }
 
-func (u *FirewallService) pingStatus() string {
-	data, err := os.ReadFile("/proc/sys/net/ipv4/icmp_echo_ignore_all")
-	if err != nil {
-		return constant.StatusNone
-	}
-	v6Data, v6err := os.ReadFile("/proc/sys/net/ipv6/icmp/echo_ignore_all")
-	if v6err != nil {
-		if strings.TrimSpace(string(data)) == "1" {
-			return constant.StatusEnable
-		}
-		return constant.StatusDisable
-	} else {
-		if strings.TrimSpace(string(data)) == "1" && strings.TrimSpace(string(v6Data)) == "1" {
-			return constant.StatusEnable
-		}
-		return constant.StatusDisable
-	}
-
-}
-
-func (u *FirewallService) updatePingStatus(enable string) error {
-	var targetPath string
-	var applyCmd string
-
-	if _, err := os.Stat(confPath); os.IsNotExist(err) {
-		// Debian 13
-		targetPath = panelSysctlPath
-		applyCmd = fmt.Sprintf("%s sysctl --system", cmd.SudoHandleCmd())
-		if err := cmd.RunDefaultBashCf("%s mkdir -p /etc/sysctl.d", cmd.SudoHandleCmd()); err != nil {
-			return fmt.Errorf("failed to create directory /etc/sysctl.d: %v", err)
-		}
-	} else {
-		targetPath = confPath
-		applyCmd = fmt.Sprintf("%s sysctl -p", cmd.SudoHandleCmd())
-	}
-
-	lineBytes, err := os.ReadFile(targetPath)
-	if err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("failed to read %s: %v", targetPath, err)
-	}
-
-	if err := cmd.RunDefaultBashCf("echo %s | %s tee /proc/sys/net/ipv4/icmp_echo_ignore_all > /dev/null", enable, cmd.SudoHandleCmd()); err != nil {
-		return fmt.Errorf("failed to apply ipv4 ping status temporarily: %v", err)
-	}
-
-	var hasIpv6 bool
-	if _, err := os.Stat("/proc/sys/net/ipv6/icmp/echo_ignore_all"); err == nil {
-		hasIpv6 = true
-		if err := cmd.RunDefaultBashCf("echo %s | %s tee /proc/sys/net/ipv6/icmp/echo_ignore_all > /dev/null", enable, cmd.SudoHandleCmd()); err != nil {
-			global.LOG.Warnf("failed to apply ipv6 ping status temporarily: %v", err)
-		}
-	}
-
-	var files []string
-	if err == nil {
-		files = strings.Split(string(lineBytes), "\n")
-	}
-
-	var newFiles []string
-	hasIPv4Line, hasIPv6Line := false, false
-
-	for _, line := range files {
-		if strings.HasPrefix(strings.TrimSpace(line), "net.ipv4.icmp_echo_ignore_all") {
-			newFiles = append(newFiles, "net.ipv4.icmp_echo_ignore_all="+enable)
-			hasIPv4Line = true
-			continue
-		}
-		if strings.HasPrefix(strings.TrimSpace(line), "net.ipv6.icmp.echo_ignore_all") {
-			newFiles = append(newFiles, "net.ipv6.icmp.echo_ignore_all="+enable)
-			hasIPv6Line = true
-			continue
-		}
-		newFiles = append(newFiles, line)
-	}
-
-	if !hasIPv4Line {
-		newFiles = append(newFiles, "net.ipv4.icmp_echo_ignore_all="+enable)
-	}
-	if hasIpv6 && !hasIPv6Line {
-		newFiles = append(newFiles, "net.ipv6.icmp.echo_ignore_all="+enable)
-	}
-
-	file, err := os.OpenFile(targetPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
-	if err != nil {
-		return fmt.Errorf("failed to open %s: %v", targetPath, err)
-	}
-	defer file.Close()
-
-	if _, err = file.WriteString(strings.Join(newFiles, "\n")); err != nil {
-		return fmt.Errorf("failed to write to %s: %v", targetPath, err)
-	}
-
-	if err := cmd.RunDefaultBashC(applyCmd); err != nil {
-		global.LOG.Warnf("failed to apply persistent config with '%s': %v", applyCmd, err)
-	}
-
-	return nil
-}
-
 func (u *FirewallService) addPortsBeforeStart(client firewall.FirewallClient) error {
 	if !global.IsMaster {
 		if err := client.Port(fireClient.FireInfo{Port: global.CONF.Base.Port, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
@@ -709,6 +599,9 @@ func (u *FirewallService) addPortsBeforeStart(client firewall.FirewallClient) er
 		return err
 	}
 	if err := client.Port(fireClient.FireInfo{Port: "443", Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
+		return err
+	}
+	if err := client.Port(fireClient.FireInfo{Port: "443", Protocol: "udp", Strategy: "accept"}, "add"); err != nil {
 		return err
 	}
 
@@ -813,16 +706,9 @@ func checkPortUsed(ports, proto string, apps []portOfApp) string {
 
 	for _, app := range apps {
 		if app.HttpPort == ports || app.HttpsPort == ports {
-			return fmt.Sprintf("(%s)", app.AppName)
+			return app.AppName
 		}
 	}
-	port, err := strconv.Atoi(ports)
-	if err != nil {
-		global.LOG.Errorf(" convert string %v to int failed, err: %v", port, err)
-		return ""
-	}
-	if common.ScanPortWithProto(port, proto) {
-		return "inUsed"
-	}
+
 	return ""
 }

@@ -43,8 +43,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { updateSSH } from '@/api/modules/host';
-import { checkIp, checkIpV6 } from '@/utils/util';
-
+import { checkIp, checkIpV6 } from '@/utils/validate';
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 interface DialogProps {
@@ -131,7 +130,6 @@ const onSave = async (formEl: FormInstance | undefined) => {
             .then(async () => {
                 let params = {
                     key: 'ListenAddress',
-                    oldValue: '',
                     newValue: itemAddr.join(','),
                 };
                 loading.value = true;

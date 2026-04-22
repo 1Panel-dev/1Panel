@@ -3,17 +3,20 @@ package v2
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"path"
 	"regexp"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/app/service"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/gin-gonic/gin"
 )
@@ -93,9 +96,17 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	}
 	if req.Key == "SecurityEntrance" {
 		if !checkEntrancePattern(req.Value) {
-			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", fmt.Errorf("the format of the security entrance %s is incorrect.", req.Value))
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", buserr.WithName("ErrEntranceFormat", req.Value))
 			return
 		}
+	}
+	if req.Key == "PasskeyTrustedProxies" {
+		value, err := normalizePasskeyTrustedProxies(req.Value)
+		if err != nil {
+			helper.BadRequest(c, err)
+			return
+		}
+		req.Value = value
 	}
 
 	if err := settingService.Update(req.Key, req.Value); err != nil {
@@ -103,8 +114,7 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 		return
 	}
 	if req.Key == "SecurityEntrance" {
-		entranceValue := base64.StdEncoding.EncodeToString([]byte(req.Value))
-		c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
+		service.SetSecurityEntranceCookie(c, req.Value)
 	}
 	helper.Success(c)
 }
@@ -419,6 +429,86 @@ func (b *BaseApi) MFABind(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags System Setting
+// @Summary Begin passkey registration
+// @Accept json
+// @Param request body dto.PasskeyRegisterRequest true "request"
+// @Success 200 {object} dto.PasskeyBeginResponse
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/passkey/register/begin [post]
+func (b *BaseApi) PasskeyRegisterBegin(c *gin.Context) {
+	var req dto.PasskeyRegisterRequest
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, msgKey, err := authService.PasskeyBeginRegister(c, req.Name)
+	if msgKey != "" {
+		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
+		return
+	}
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags System Setting
+// @Summary Finish passkey registration
+// @Accept json
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/passkey/register/finish [post]
+func (b *BaseApi) PasskeyRegisterFinish(c *gin.Context) {
+	sessionID := c.GetHeader("Passkey-Session")
+	msgKey, err := authService.PasskeyFinishRegister(c, sessionID)
+	if msgKey != "" {
+		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
+		return
+	}
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags System Setting
+// @Summary List passkeys
+// @Success 200 {array} dto.PasskeyInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/passkey/list [get]
+func (b *BaseApi) PasskeyList(c *gin.Context) {
+	list, err := authService.PasskeyList()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags System Setting
+// @Summary Delete passkey
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/passkey/{id} [delete]
+func (b *BaseApi) PasskeyDelete(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		helper.BadRequest(c, errors.New("passkey id is required"))
+		return
+	}
+	if err := authService.PasskeyDelete(id); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
 func (b *BaseApi) ReloadSSL(c *gin.Context) {
 	clientIP := c.ClientIP()
 	if clientIP != "127.0.0.1" {
@@ -517,10 +607,94 @@ func (b *BaseApi) GetAppstoreConfig(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
+// @Tags System Setting
+// @Summary Load dashboard memo
+// @Success 200 {string} memo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/memo [get]
+func (b *BaseApi) GetMemo(c *gin.Context) {
+	memo, err := settingService.GetMemo()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, memo)
+}
+
+// @Tags System Setting
+// @Summary Update dashboard memo
+// @Accept json
+// @Param request body dto.MemoUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/settings/memo [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新仪表盘备忘录","formatEN":"update dashboard memo"}
+func (b *BaseApi) UpdateMemo(c *gin.Context) {
+	var req dto.MemoUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := settingService.UpdateMemo(req.Content); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
 func checkEntrancePattern(val string) bool {
 	if len(val) == 0 {
 		return true
 	}
 	result, _ := regexp.MatchString("^[a-zA-Z0-9]{5,116}$", val)
-	return result
+	if !result {
+		return false
+	}
+	lowerVal := strings.ToLower(val)
+	for key := range constant.WebUrlMap {
+		if key == "/" || !strings.HasPrefix(key, "/") {
+			continue
+		}
+		if strings.Count(key, "/") != 1 {
+			continue
+		}
+		segment := strings.ToLower(strings.TrimPrefix(key, "/"))
+		if len(segment) < 5 {
+			continue
+		}
+		if lowerVal == segment {
+			return false
+		}
+	}
+	assetsList := [2]string{"public", "assets"}
+	for _, item := range assetsList {
+		if lowerVal == item {
+			return false
+		}
+	}
+	return true
+}
+
+func normalizePasskeyTrustedProxies(value string) (string, error) {
+	if strings.TrimSpace(value) == "" {
+		return "", nil
+	}
+	lines := strings.Split(value, "\n")
+	validLines := make([]string, 0, len(lines))
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		validLines = append(validLines, line)
+	}
+	if len(validLines) == 0 {
+		return "", nil
+	}
+	normalized := strings.Join(validLines, "\n")
+	if _, err := common.HandleIPList(normalized); err != nil {
+		return "", err
+	}
+	return normalized, nil
 }

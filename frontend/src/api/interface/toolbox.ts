@@ -36,6 +36,7 @@ export namespace Toolbox {
 
     export interface CleanData {
         systemClean: Array<CleanTree>;
+        backupClean: Array<CleanTree>;
         uploadClean: Array<CleanTree>;
         downloadClean: Array<CleanTree>;
         systemLogClean: Array<CleanTree>;
@@ -50,6 +51,7 @@ export namespace Toolbox {
         size: number;
         isCheck: boolean;
         isRecommend: boolean;
+        canDelete: boolean;
     }
 
     export interface Fail2banBaseInfo {

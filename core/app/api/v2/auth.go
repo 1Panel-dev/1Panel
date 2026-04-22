@@ -2,16 +2,19 @@ package v2
 
 import (
 	"encoding/base64"
-	"github.com/1Panel-dev/1Panel/core/utils/common"
+	"net/http"
 	"os"
 	"path"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	initauth "github.com/1Panel-dev/1Panel/core/init/auth"
 	"github.com/1Panel-dev/1Panel/core/utils/captcha"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,6 +34,10 @@ func (b *BaseApi) Login(c *gin.Context) {
 	}
 
 	ip := common.GetRealClientIP(c)
+	if global.IPTracker.IsLocked(ip) {
+		helper.BadAuth(c, "ErrLoginLocked", nil)
+		return
+	}
 	needCaptcha := global.IPTracker.NeedCaptcha(ip)
 	if needCaptcha {
 		if errMsg := captcha.VerifyCode(req.CaptchaID, req.Captcha); errMsg != "" {
@@ -52,20 +59,26 @@ func (b *BaseApi) Login(c *gin.Context) {
 	}
 
 	user, msgKey, err := authService.Login(c, req, string(entrance))
-	go saveLoginLogs(c, err)
+	if user == nil || user.MfaStatus != constant.StatusEnable {
+		go saveLoginLogs(c, wrapLoginErr(msgKey, err))
+	}
 	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
 		if msgKey == "ErrAuth" {
+			global.IPTracker.RecordFailure(ip)
 			global.IPTracker.SetNeedCaptcha(ip)
 		}
 		helper.BadAuth(c, msgKey, err)
 		return
 	}
 	if err != nil {
+		global.IPTracker.RecordFailure(ip)
 		global.IPTracker.SetNeedCaptcha(ip)
 		helper.InternalServer(c, err)
 		return
 	}
-	global.IPTracker.Clear(ip)
+	if user == nil || user.MfaStatus != constant.StatusEnable {
+		global.IPTracker.Clear(ip)
+	}
 	helper.SuccessWithData(c, user)
 }
 
@@ -81,6 +94,11 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	ip := common.GetRealClientIP(c)
+	if global.IPTracker.IsLocked(ip) {
+		helper.BadAuth(c, "ErrLoginLocked", nil)
+		return
+	}
 
 	entranceItem := c.Request.Header.Get("EntranceCode")
 	var entrance []byte
@@ -89,14 +107,79 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 	}
 
 	user, msgKey, err := authService.MFALogin(c, req, string(entrance))
-	if msgKey == "ErrAuth" {
+	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
+	if msgKey == "ErrMFA" {
+		global.IPTracker.RecordFailure(ip)
+		failures := initauth.GetMFASessionStore().RecordFailure(req.SessionID)
+		if failures >= initauth.MFASessionMaxFailures {
+			global.IPTracker.SetNeedCaptcha(ip)
+			helper.BadAuth(c, "ErrCaptchaCode", nil)
+			return
+		}
 		helper.BadAuth(c, msgKey, err)
+		return
+	}
+	if err != nil {
+		global.IPTracker.RecordFailure(ip)
+		helper.InternalServer(c, err)
+		return
+	}
+	global.IPTracker.Clear(ip)
+	helper.SuccessWithData(c, user)
+}
+
+// @Tags Auth
+// @Summary User login with passkey
+// @Success 200 {object} dto.PasskeyBeginResponse
+// @Router /core/auth/passkey/begin [post]
+func (b *BaseApi) PasskeyBeginLogin(c *gin.Context) {
+	entrance := loadEntranceFromRequest(c)
+	res, msgKey, err := authService.PasskeyBeginLogin(c, entrance)
+	if msgKey != "" {
+		if msgKey == "ErrEntrance" {
+			helper.BadAuth(c, msgKey, err)
+			return
+		}
+		if msgKey == "ErrPasskeyNotConfigured" {
+			helper.ErrorWithDetail(c, http.StatusNotFound, msgKey, err)
+			return
+		}
+		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
 		return
 	}
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Auth
+// @Summary User login with passkey
+// @Success 200 {object} dto.UserLoginInfo
+// @Router /core/auth/passkey/finish [post]
+func (b *BaseApi) PasskeyFinishLogin(c *gin.Context) {
+	sessionID := c.GetHeader("Passkey-Session")
+	entrance := loadEntranceFromRequest(c)
+	user, msgKey, err := authService.PasskeyFinishLogin(c, sessionID, entrance)
+	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
+	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
+		if msgKey == "ErrAuth" {
+			global.IPTracker.SetNeedCaptcha(common.GetRealClientIP(c))
+		}
+		helper.BadAuth(c, msgKey, err)
+		return
+	}
+	if msgKey != "" {
+		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
+		return
+	}
+	if err != nil {
+		global.IPTracker.SetNeedCaptcha(common.GetRealClientIP(c))
+		helper.InternalServer(c, err)
+		return
+	}
+	global.IPTracker.Clear(common.GetRealClientIP(c))
 	helper.SuccessWithData(c, user)
 }
 
@@ -155,7 +238,7 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 	needCaptcha := global.IPTracker.NeedCaptcha(ip)
 	res := &dto.LoginSetting{
 		IsDemo:      global.CONF.Base.IsDemo,
-		IsIntl:      global.CONF.Base.IsIntl,
+		IsIntl:      global.CONF.Base.Edition == "intl",
 		IsFxplay:    global.CONF.Base.IsFxplay,
 		IsOffLine:   global.CONF.Base.IsOffLine,
 		Language:    settingInfo.Language,
@@ -164,6 +247,7 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 		Theme:       settingInfo.Theme,
 		NeedCaptcha: needCaptcha,
 	}
+	res.PasskeySetting = authService.PasskeyStatus(c)
 	helper.SuccessWithData(c, res)
 }
 
@@ -178,4 +262,29 @@ func saveLoginLogs(c *gin.Context, err error) {
 	logs.IP = c.ClientIP()
 	logs.Agent = c.GetHeader("User-Agent")
 	_ = logService.CreateLoginLog(logs)
+}
+
+func wrapLoginErr(msgKey string, err error) error {
+	if err != nil {
+		return err
+	}
+	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
+		return buserr.New(msgKey)
+	}
+	return nil
+}
+
+func loadEntranceFromRequest(c *gin.Context) string {
+	entranceItem := c.Request.Header.Get("EntranceCode")
+	var entrance []byte
+	if len(entranceItem) != 0 {
+		entrance, _ = base64.StdEncoding.DecodeString(entranceItem)
+	}
+	if len(entrance) == 0 {
+		cookieValue, err := c.Cookie("SecurityEntrance")
+		if err == nil {
+			entrance, _ = base64.StdEncoding.DecodeString(cookieValue)
+		}
+	}
+	return string(entrance)
 }

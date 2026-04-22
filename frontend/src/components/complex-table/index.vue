@@ -15,6 +15,9 @@
                 :max-height="tableHeight"
                 @row-contextmenu="handleRightClick"
                 @row-click="handleRowClick"
+                :tooltip-options="{
+                    placement: 'bottom-start',
+                }"
             >
                 <slot></slot>
                 <template #empty>
@@ -31,6 +34,7 @@
             </div>
 
             <div
+                ref="paginationRef"
                 class="complex-table__pagination flex items-center w-full sm:flex-row flex-col text-xs sm:text-sm"
                 v-if="props.paginationConfig"
                 :class="{ '!justify-between': slots.paginationLeft, '!justify-end': !slots.paginationLeft }"
@@ -44,12 +48,9 @@
                         :page-sizes="[5, 10, 20, 50, 100, 200, 500]"
                         @size-change="sizeChange"
                         @current-change="currentChange"
+                        :pager-count="responsivePagerCount"
                         :size="mobile || paginationConfig.small ? 'small' : 'default'"
-                        :layout="
-                            mobile || paginationConfig.small
-                                ? 'total, prev, pager, next'
-                                : 'total, sizes, prev, pager, next, jumper'
-                        "
+                        :layout="responsivePaginationLayout"
                     />
                 </slot>
             </div>
@@ -62,7 +63,7 @@
             @click.stop
         >
             <li
-                v-for="(btn, index) in rightButtons"
+                v-for="(btn, index) in visibleRightButtons"
                 :key="index"
                 :class="[{ disabled: disabled(btn) }, { divided: btn.divided }]"
                 @click="!disabled(btn) && rightButtonClick(btn)"
@@ -109,9 +110,12 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 const tableRef = ref();
-const tableHeight = ref(0);
+const tableHeight = ref<number | string>('');
 const menuRef = ref<HTMLElement | null>(null);
+const paginationRef = ref<HTMLElement | null>(null);
 const leftSelect = ref(false);
+const paginationWidth = ref(0);
+let paginationResizeObserver: ResizeObserver | null = null;
 
 const rightClick = ref({
     visible: false,
@@ -143,6 +147,20 @@ const disabled = computed(() => {
     return function (btn: any) {
         return typeof btn.disabled === 'function' ? btn.disabled(rightClick.value.currentRow) : btn.disabled;
     };
+});
+const visibleRightButtons = computed(() => {
+    if (!props.rightButtons) {
+        return [];
+    }
+    return props.rightButtons.filter((btn: any) => {
+        if (typeof btn.show === 'function') {
+            return btn.show(rightClick.value.currentRow);
+        }
+        if (typeof btn.show === 'boolean') {
+            return btn.show;
+        }
+        return true;
+    });
 });
 function rightButtonClick(btn: any) {
     closeRightClick();
@@ -179,6 +197,27 @@ function clearSelects() {
 function clearSort() {
     tableRef.value.refElTable.clearSort();
 }
+
+const updatePaginationWidth = () => {
+    paginationWidth.value = paginationRef.value?.clientWidth || 0;
+};
+
+const responsivePaginationLayout = computed(() => {
+    if (mobile.value || props.paginationConfig?.small) {
+        return 'total, prev, pager, next';
+    }
+    if (paginationWidth.value < 520) {
+        return 'total, prev, pager, next';
+    }
+    return 'total, sizes, prev, pager, next, jumper';
+});
+
+const responsivePagerCount = computed(() => {
+    if (mobile.value || props.paginationConfig?.small || paginationWidth.value < 720) {
+        return 5;
+    }
+    return 7;
+});
 
 const adjustedX = ref(rightClick.value.left);
 const adjustedY = ref(rightClick.value.top);
@@ -256,6 +295,13 @@ const toggleSelection = () => {
 
 onMounted(() => {
     calcHeight();
+    nextTick(() => {
+        updatePaginationWidth();
+        if (paginationRef.value) {
+            paginationResizeObserver = new ResizeObserver(updatePaginationWidth);
+            paginationResizeObserver.observe(paginationRef.value);
+        }
+    });
     window.addEventListener('resize', calcHeight);
     watch(
         () => props.height,
@@ -267,6 +313,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     window.removeEventListener('resize', calcHeight);
+    paginationResizeObserver?.disconnect();
+    paginationResizeObserver = null;
 });
 </script>
 
@@ -345,5 +393,15 @@ onBeforeUnmount(() => {
 .complex-table__pagination {
     flex: 1;
     @include flex-row(flex-end);
+
+    :deep(.el-pagination__sizes .el-select) {
+        width: 128px;
+        min-width: 128px;
+    }
+
+    :deep(.el-pagination--small .el-pagination__sizes .el-select) {
+        width: 100px;
+        min-width: 100px;
+    }
 }
 </style>

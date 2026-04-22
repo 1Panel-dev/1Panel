@@ -42,6 +42,19 @@
                         ></el-option>
                     </el-select>
                 </el-form-item>
+                <el-alert
+                    v-if="showOpenclawHttpRollbackNotice"
+                    type="warning"
+                    :closable="false"
+                    show-icon
+                    class="upgrade-notice"
+                >
+                    <template #title>{{ $t('app.openclawHttpsUpgradeNoticeTitle') }}</template>
+                    <div class="upgrade-notice-content">
+                        <div>1. {{ $t('app.openclawHttpsUpgradeNoticeItem1') }}</div>
+                        <div>2. {{ $t('app.openclawHttpsUpgradeNoticeItem2') }}</div>
+                    </div>
+                </el-alert>
                 <el-form-item prop="backup" v-if="operateReq.operate === 'upgrade'">
                     <el-checkbox v-model="operateReq.backup" :label="$t('app.backupApp')" />
                     <span class="input-help">
@@ -86,13 +99,16 @@ import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { App } from '@/api/interface/app';
 import { getAppUpdateVersions, ignoreUpgrade, installedOp } from '@/api/modules/app';
 import { getAppStoreConfig } from '@/api/modules/setting';
+import { isOpenclawCurrentHTTPVersion, isOpenclawHTTPSWindowVersion } from '@/utils/agent';
 import i18n from '@/lang';
 import { ElMessageBox, FormInstance } from 'element-plus';
-import { reactive, ref, onBeforeUnmount } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 import bus from '@/global/bus';
 import { v4 as uuidv4 } from 'uuid';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { currentNode } = useGlobalStore();
 
 const composeDiffRef = ref();
 const updateRef = ref<FormInstance>();
@@ -119,7 +135,7 @@ const newContent = ref('');
 const em = defineEmits(['close']);
 const handleClose = () => {
     open.value = false;
-    em('close', open);
+    em('close', open.value);
 };
 
 const newCompose = ref('');
@@ -132,6 +148,18 @@ const ignoreAppReq = reactive({
     scope: 'app',
 });
 const isEdit = ref(false);
+const node = ref('');
+const currentVersion = ref('');
+const currentAppKey = ref('');
+
+const showOpenclawHttpRollbackNotice = computed(() => {
+    return (
+        operateReq.operate === 'upgrade' &&
+        currentAppKey.value === 'openclaw' &&
+        isOpenclawHTTPSWindowVersion(currentVersion.value) &&
+        isOpenclawCurrentHTTPVersion(operateReq.version)
+    );
+});
 
 const toLink = (link: string) => {
     window.open(link, '_blank');
@@ -155,7 +183,7 @@ const getNewCompose = (compose: string) => {
 };
 
 const initData = async () => {
-    const config = await getAppStoreConfig();
+    const config = await getAppStoreConfig(node.value);
     newCompose.value = '';
     useNewCompose.value = false;
     operateReq.backup = config.data.upgradeBackup == 'Enable';
@@ -163,9 +191,16 @@ const initData = async () => {
     operateReq.dockerCompose = '';
 };
 
-const acceptParams = (appInstall: App.AppInstallDto, op: string) => {
+const acceptParams = (appInstall: App.AppInstallDto, op: string, opNode?: string) => {
     initData();
+    if (opNode) {
+        node.value = opNode;
+    } else {
+        node.value = currentNode.value;
+    }
     isEdit.value = appInstall.isEdit;
+    currentVersion.value = appInstall.version;
+    currentAppKey.value = appInstall.appKey;
     operateReq.installId = appInstall.id;
     operateReq.operate = op;
     resourceName.value = appInstall.name;
@@ -188,7 +223,7 @@ const getVersions = async (version: string) => {
         req['updateVersion'] = version;
     }
     try {
-        const res = await getAppUpdateVersions(req);
+        const res = await getAppUpdateVersions(req, node.value);
         versions.value = res.data || [];
         if (res.data != null && res.data.length > 0) {
             let item = res.data[0];
@@ -205,7 +240,7 @@ const getVersions = async (version: string) => {
 };
 
 const openTaskLog = (taskID: string) => {
-    taskLogRef.value.openWithTaskID(taskID);
+    taskLogRef.value.openWithTaskID(taskID, true, node.value);
 };
 
 const operate = async () => {
@@ -216,7 +251,7 @@ const operate = async () => {
         }
         const taskID = uuidv4();
         operateReq.taskID = taskID;
-        await installedOp(operateReq)
+        await installedOp(operateReq, node.value)
             .then(() => {
                 bus.emit('upgrade', true);
                 handleClose();
@@ -260,3 +295,13 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss" scoped>
+.upgrade-notice {
+    margin-bottom: 16px;
+}
+
+.upgrade-notice-content {
+    line-height: 1.8;
+}
+</style>

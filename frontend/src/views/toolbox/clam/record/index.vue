@@ -185,7 +185,7 @@ import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { shortcuts } from '@/utils/shortcuts';
-import { dateFormat, dateFormatForName } from '@/utils/util';
+import { dateFormat, dateFormatForName } from '@/utils/date';
 import { Toolbox } from '@/api/interface/toolbox';
 import LogFile from '@/components/log/file/index.vue';
 import { cleanClamRecord, handleClamScan, searchClamRecord } from '@/api/modules/toolbox';

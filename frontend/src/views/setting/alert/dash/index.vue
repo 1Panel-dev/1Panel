@@ -324,7 +324,7 @@ onMounted(() => {
     flex-wrap: wrap;
     gap: 10px;
     flex: 1 1 auto;
-    justify-content: start;
+    justify-content: flex-start;
 }
 
 .search-fields {

@@ -104,7 +104,7 @@ func loadRestorePath(upgradeDir string) (string, error) {
 }
 
 func downloadLangFromRemote() {
-	path := fmt.Sprintf("%s/language/lang.tar.gz", global.CONF.RemoteURL.RepoUrl)
+	path := fmt.Sprintf("%s/language/lang.tar.gz", global.RepoURL())
 	if err := fileUtils.DownloadFile(path, "/usr/local/bin/lang.tar.gz"); err != nil {
 		global.LOG.Errorf("download lang.tar.gz failed, err: %v", err)
 		return
@@ -122,7 +122,7 @@ func downloadLangFromRemote() {
 }
 func downloadGeoFromRemote(targetPath string) {
 	_ = os.MkdirAll(path.Dir(targetPath), os.ModePerm)
-	pathItem := fmt.Sprintf("%s/geo/GeoIP.mmdb", global.CONF.RemoteURL.RepoUrl)
+	pathItem := fmt.Sprintf("%s/geo/GeoIP.mmdb", global.RepoURL())
 	if err := fileUtils.DownloadFile(pathItem, targetPath); err != nil {
 		global.LOG.Errorf("download geo ip failed, err: %v", err)
 		return

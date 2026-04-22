@@ -12,6 +12,8 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -25,12 +27,18 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/appicon"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"gopkg.in/yaml.v3"
+)
+
+var (
+	appStoreSyncMu  sync.Mutex
+	appStoreSyncing bool
 )
 
 type AppService struct {
@@ -41,12 +49,17 @@ type IAppService interface {
 	GetAppTags(ctx *gin.Context) ([]response.TagDTO, error)
 	GetApp(ctx *gin.Context, key string) (*response.AppDTO, error)
 	GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error)
-	Install(req request.AppInstallCreate) (*model.AppInstall, error)
+	Install(req request.AppInstallCreate, executeScript bool) (*model.AppInstall, error)
 	SyncAppListFromRemote(taskID string) error
 	GetAppUpdate() (*response.AppUpdateRes, error)
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
 	SyncAppListFromLocal(taskID string)
-	GetAppIcon(appID uint) ([]byte, error)
+	GetAppIcon(key string) ([]byte, string, string, error)
+	GetAppDetailByKey(appKey, version string) (response.AppDetailSimpleDTO, error)
+}
+
+type appInstallHooks struct {
+	AfterCopyData func(appInstall *model.AppInstall) error
 }
 
 func NewIAppService() IAppService {
@@ -118,13 +131,15 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (*response.
 			}
 		}
 		appDTO := &response.AppItem{
-			ID:          ap.ID,
-			Name:        ap.Name,
-			Key:         ap.Key,
-			Limit:       ap.Limit,
-			GpuSupport:  ap.GpuSupport,
-			Recommend:   ap.Recommend,
-			Description: ap.GetDescription(ctx),
+			ID:                  ap.ID,
+			Name:                ap.Name,
+			Key:                 ap.Key,
+			Limit:               ap.Limit,
+			GpuSupport:          ap.GpuSupport,
+			Recommend:           ap.Recommend,
+			Description:         ap.GetDescription(ctx),
+			Type:                ap.Type,
+			BatchInstallSupport: ap.BatchInstallSupport,
 		}
 		appDTOs = append(appDTOs, appDTO)
 		tags, err := getAppTags(ap.ID, lang)
@@ -193,30 +208,27 @@ func (a AppService) GetApp(ctx *gin.Context, key string) (*response.AppDTO, erro
 	if err != nil {
 		return nil, err
 	}
-	var versionsRaw []string
-	hasLatest := false
-	latestVersion := ""
-	for _, detail := range details {
-		if strings.Contains(detail.Version, "latest") {
-			hasLatest = true
-			latestVersion = detail.Version
-			continue
-		}
-		if key == "openresty" && !common.CompareAppVersion(detail.Version, "1.27") {
-			continue
-		}
-		versionsRaw = append(versionsRaw, detail.Version)
-	}
-	appDTO.Versions = common.GetSortedVersions(versionsRaw)
-	if hasLatest {
-		appDTO.Versions = append([]string{latestVersion}, appDTO.Versions...)
-	}
+	appDTO.Versions = getAppVersions(key, details)
 	tags, err := getAppTags(app.ID, strings.ToLower(common.GetLang(ctx)))
 	if err != nil {
 		return nil, err
 	}
 	appDTO.Tags = tags
 	return &appDTO, nil
+}
+
+func (a AppService) GetAppDetailByKey(appKey, version string) (response.AppDetailSimpleDTO, error) {
+	var appDetailDTO response.AppDetailSimpleDTO
+	app, err := appRepo.GetFirst(appRepo.WithKey(appKey))
+	if err != nil {
+		return appDetailDTO, err
+	}
+	appDetail, err := appDetailRepo.GetFirst(appDetailRepo.WithAppId(app.ID), appDetailRepo.WithVersion(version))
+	if err != nil {
+		return appDetailDTO, err
+	}
+	appDetailDTO.ID = appDetail.ID
+	return appDetailDTO, nil
 }
 
 func (a AppService) GetAppDetail(appID uint, version, appType string) (response.AppDetailDTO, error) {
@@ -332,7 +344,11 @@ func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
 	return res, nil
 }
 
-func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.AppInstall, err error) {
+func (a AppService) Install(req request.AppInstallCreate, executeScript bool) (appInstall *model.AppInstall, err error) {
+	return a.installWithHooks(req, executeScript, nil)
+}
+
+func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript bool, hooks *appInstallHooks) (appInstall *model.AppInstall, err error) {
 	if err = docker.CreateDefaultDockerNetwork(); err != nil {
 		err = buserr.WithDetail("Err1PanelNetworkFailed", err.Error(), nil)
 		return
@@ -402,11 +418,21 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		App:         app,
 	}
 	composeMap := make(map[string]interface{})
+	var composeRes []byte
 	if req.EditCompose {
 		if err = yaml.Unmarshal([]byte(req.DockerCompose), &composeMap); err != nil {
 			return
 		}
 	} else {
+		if appDetail.DockerCompose == "" {
+			dockerComposeUrl := fmt.Sprintf("%s/%s/1panel/%s/%s/docker-compose.yml", global.AppRepoURL(), global.CONF.Base.Mode, app.Key, appDetail.Version)
+			_, composeRes, err = req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
+			if err != nil {
+				return
+			}
+			appDetail.DockerCompose = string(composeRes)
+			_ = appDetailRepo.Update(context.Background(), appDetail)
+		}
 		if err = yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
 			return
 		}
@@ -499,6 +525,10 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 	}
 	appInstall.Env = string(paramByte)
 
+	var maxSort int
+	global.DB.Model(&model.AppInstall{}).Where("favorite = ?", false).Select("COALESCE(MAX(sort_order),0)").Scan(&maxSort)
+	appInstall.SortOrder = maxSort + 1
+
 	if err = appInstallRepo.Create(context.Background(), appInstall); err != nil {
 		return
 	}
@@ -516,8 +546,15 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		if err = copyData(t, app, appDetail, appInstall, req); err != nil {
 			return err
 		}
-		if err = runScript(t, appInstall, "init"); err != nil {
-			return err
+		if hooks != nil && hooks.AfterCopyData != nil {
+			if err = hooks.AfterCopyData(appInstall); err != nil {
+				return err
+			}
+		}
+		if executeScript {
+			if err = runScript(t, appInstall, "init"); err != nil {
+				return err
+			}
 		}
 		if app.Key == "openresty" {
 			if err = handleSiteDir(app, appDetail, req, t); err != nil {
@@ -540,7 +577,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		_ = appInstallRepo.Save(context.Background(), appInstall)
 	}
 
-	installTask.AddSubTask(task.GetTaskName(appInstall.Name, task.TaskInstall, task.TaskScopeApp), installApp, handleAppStatus)
+	installTask.AddSubTaskWithOps(task.GetTaskName(appInstall.Name, task.TaskInstall, task.TaskScopeApp), installApp, handleAppStatus, 0, time.Hour)
 
 	go func() {
 		if taskErr := installTask.Execute(); taskErr != nil {
@@ -792,8 +829,13 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	res := &response.AppUpdateRes{
 		CanUpdate: false,
 	}
+	mysql, _ := appRepo.GetFirst(appRepo.WithKey("mysql"))
+	if !mysql.BatchInstallSupport {
+		res.CanUpdate = true
+		return res, nil
+	}
 
-	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.CONF.RemoteURL.AppRepo, global.CONF.Base.Mode)
+	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.AppRepoURL(), global.CONF.Base.Mode)
 	_, versionRes, err := req_helper.HandleRequest(versionUrl, http.MethodGet, constant.TimeOut20s)
 	if err != nil {
 		return nil, err
@@ -823,6 +865,13 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		if app.Icon == "" {
 			res.CanUpdate = true
 			return res, err
+		}
+		if appicon.IsIconFile(app.Icon) {
+			fileName, _ := appicon.ParseIconField(app.Icon)
+			if fileName == "" || !appicon.IconFileExists(fileName) {
+				res.CanUpdate = true
+				return res, err
+			}
 		}
 	}
 
@@ -858,7 +907,7 @@ func getAppFromRepo(downloadPath string) error {
 
 func getAppList() (*dto.AppList, error) {
 	list := &dto.AppList{}
-	if err := getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.CONF.RemoteURL.AppRepo, global.CONF.Base.Mode)); err != nil {
+	if err := getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.AppRepoURL(), global.CONF.Base.Mode)); err != nil {
 		return nil, err
 	}
 	listFile := filepath.Join(global.Dir.ResourceDir, "1panel.json")
@@ -881,295 +930,116 @@ var InitTypes = map[string]struct{}{
 }
 
 func deleteCustomApp() {
+	installs, err := appInstallRepo.ListBy(context.Background())
+	if err != nil {
+		global.LOG.Errorf("[AppStore] deleteCustomApp: failed to list installs, skipping: %v", err)
+		return
+	}
 	var appIDS []uint
-	installs, _ := appInstallRepo.ListBy(context.Background())
 	for _, install := range installs {
 		appIDS = append(appIDS, install.AppId)
 	}
 	var ops []repo.DBOption
-	ops = append(ops, repo.WithByIDNotIn(appIDS))
 	if len(appIDS) > 0 {
 		ops = append(ops, repo.WithByIDNotIn(appIDS))
 	}
-	apps, _ := appRepo.GetBy(ops...)
+	apps, err := appRepo.GetBy(ops...)
+	if err != nil {
+		global.LOG.Errorf("[AppStore] deleteCustomApp: failed to get apps, skipping: %v", err)
+		return
+	}
 	var deleteIDS []uint
 	for _, app := range apps {
 		if app.Resource == constant.AppResourceCustom {
 			deleteIDS = append(deleteIDS, app.ID)
 		}
 	}
-	_ = appRepo.DeleteByIDs(context.Background(), deleteIDS)
-	_ = appDetailRepo.DeleteByAppIds(context.Background(), deleteIDS)
+	if len(deleteIDS) == 0 {
+		return
+	}
+	if err = appRepo.DeleteByIDs(context.Background(), deleteIDS); err != nil {
+		global.LOG.Errorf("[AppStore] deleteCustomApp: failed to delete apps: %v", err)
+	}
+	if err = appDetailRepo.DeleteByAppIds(context.Background(), deleteIDS); err != nil {
+		global.LOG.Errorf("[AppStore] deleteCustomApp: failed to delete app details: %v", err)
+	}
 }
 
 func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	if xpack.IsUseCustomApp() {
 		return nil
 	}
+
+	appStoreSyncMu.Lock()
+	global.LOG.Info("[AppStore] sync app from remote task create start")
+	if appStoreSyncing {
+		appStoreSyncMu.Unlock()
+		global.LOG.Info("[AppStore] sync already in progress, skipping")
+		return nil
+	}
+	appStoreSyncing = true
+	appStoreSyncMu.Unlock()
+
 	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("App"), task.TaskSync, task.TaskScopeAppStore, taskID, 0)
 	if err != nil {
+		appStoreSyncMu.Lock()
+		appStoreSyncing = false
+		appStoreSyncMu.Unlock()
 		return err
 	}
-	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("App"), task.TaskSync, task.TaskScopeAppStore), func(t *task.Task) (err error) {
-		updateRes, err := a.GetAppUpdate()
-		if err != nil {
-			return err
-		}
-		if !updateRes.CanUpdate {
-			if updateRes.IsSyncing {
-				t.Log(i18n.GetMsgByKey("AppStoreIsSyncing"))
-				return nil
-			}
-			t.Log(i18n.GetMsgByKey("AppStoreIsUpToDate"))
-			return nil
-		}
-		list := &dto.AppList{}
-		if updateRes.AppList == nil {
-			list, err = getAppList()
-			if err != nil {
-				return err
-			}
-		} else {
-			list = updateRes.AppList
-		}
-		settingService := NewISettingService()
-		_ = settingService.Update("AppStoreSyncStatus", constant.StatusSyncing)
 
-		setting, err := settingService.GetSettingInfo()
-		if err != nil {
-			return err
-		}
-		var (
-			appTags   []*model.AppTag
-			oldAppIds []uint
-		)
-		if err = SyncTags(list.Extra); err != nil {
-			return err
-		}
-		deleteCustomApp()
-		oldApps, err := appRepo.GetBy(appRepo.WithNotLocal())
-		if err != nil {
-			return err
-		}
-		for _, old := range oldApps {
-			oldAppIds = append(oldAppIds, old.ID)
-		}
+	var sharedCtx *appSyncContext
 
-		baseRemoteUrl := fmt.Sprintf("%s/%s/1panel", global.CONF.RemoteURL.AppRepo, global.CONF.Base.Mode)
-
-		appsMap := getApps(oldApps, list.Apps, setting.SystemVersion, t)
-
-		t.LogStart(i18n.GetMsgByKey("SyncAppDetail"))
-		for _, l := range list.Apps {
-			app, ok := appsMap[l.AppProperty.Key]
-			if !ok {
-				continue
-			}
-			iconStr := ""
-			_, iconRes, err := req_helper.HandleRequest(l.Icon, http.MethodGet, constant.TimeOut20s)
-			if err == nil {
-				if !strings.Contains(string(iconRes), "<xml>") {
-					iconStr = base64.StdEncoding.EncodeToString(iconRes)
-				}
-			}
-			app.Icon = iconStr
-			app.TagsKey = l.AppProperty.Tags
-			if l.AppProperty.Recommend > 0 {
-				app.Recommend = l.AppProperty.Recommend
-			} else {
-				app.Recommend = 9999
-			}
-			app.ReadMe = l.ReadMe
-			app.LastModified = l.LastModified
-			versions := l.Versions
-			detailsMap := getAppDetails(app.Details, versions)
-			for _, v := range versions {
-				version := v.Name
-				detail := detailsMap[version]
-				versionUrl := fmt.Sprintf("%s/%s/%s", baseRemoteUrl, app.Key, version)
-				paramByte, _ := json.Marshal(v.AppForm)
-				var appForm dto.AppForm
-				_ = json.Unmarshal(paramByte, &appForm)
-				if appForm.SupportVersion > 0 && common.CompareVersion(strconv.FormatFloat(appForm.SupportVersion, 'f', -1, 64), setting.SystemVersion) {
-					delete(detailsMap, version)
-					continue
-				}
-				if _, ok := InitTypes[app.Type]; ok {
-					dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
-					_, composeRes, err := req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
-					if err == nil {
-						detail.DockerCompose = string(composeRes)
-					}
-				} else {
-					detail.DockerCompose = ""
-				}
-
-				detail.Params = string(paramByte)
-				detail.DownloadUrl = fmt.Sprintf("%s/%s", versionUrl, app.Key+"-"+version+".tar.gz")
-				detail.DownloadCallBackUrl = v.DownloadCallBackUrl
-				detail.Update = true
-				detail.LastModified = v.LastModified
-				detailsMap[version] = detail
-			}
-			var newDetails []model.AppDetail
-			for _, detail := range detailsMap {
-				newDetails = append(newDetails, detail)
-			}
-			app.Details = newDetails
-			appsMap[l.AppProperty.Key] = app
-		}
-		t.LogSuccess(i18n.GetMsgByKey("SyncAppDetail"))
-
-		tags, _ := tagRepo.All()
-		var (
-			addAppArray    []model.App
-			updateAppArray []model.App
-			deleteAppArray []model.App
-			deleteIds      []uint
-			tagMap         = make(map[string]uint, len(tags))
-		)
-
-		for _, v := range appsMap {
-			if v.ID == 0 {
-				addAppArray = append(addAppArray, v)
-			} else {
-				if v.Status == constant.AppTakeDown {
-					installs, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(v.ID))
-					if len(installs) > 0 {
-						updateAppArray = append(updateAppArray, v)
-						continue
-					}
-					deleteAppArray = append(deleteAppArray, v)
-					deleteIds = append(deleteIds, v.ID)
-				} else {
-					updateAppArray = append(updateAppArray, v)
-				}
-			}
-		}
-
-		tx, ctx := getTxAndContext()
-		defer func() {
-			if err != nil {
-				tx.Rollback()
-				return
-			}
-		}()
-		if len(addAppArray) > 0 {
-			if err = appRepo.BatchCreate(ctx, addAppArray); err != nil {
-				return
-			}
-		}
-		if len(deleteAppArray) > 0 {
-			if err = appRepo.BatchDelete(ctx, deleteAppArray); err != nil {
-				return
-			}
-			if err = appDetailRepo.DeleteByAppIds(ctx, deleteIds); err != nil {
-				return
-			}
-		}
-		for _, tag := range tags {
-			tagMap[tag.Key] = tag.ID
-		}
-		for _, update := range updateAppArray {
-			if err = appRepo.Save(ctx, &update); err != nil {
-				return
-			}
-		}
-		apps := append(addAppArray, updateAppArray...)
-
-		var (
-			addDetails    []model.AppDetail
-			updateDetails []model.AppDetail
-			deleteDetails []model.AppDetail
-		)
-		for _, app := range apps {
-			for _, tag := range app.TagsKey {
-				tagId, ok := tagMap[tag]
-				if ok {
-					exist, _ := appTagRepo.GetFirst(ctx, appTagRepo.WithByTagID(tagId), appTagRepo.WithByAppID(app.ID))
-					if exist == nil {
-						appTags = append(appTags, &model.AppTag{
-							AppId: app.ID,
-							TagId: tagId,
-						})
-					}
-				}
-			}
-			for _, d := range app.Details {
-				d.AppId = app.ID
-				if d.ID == 0 {
-					addDetails = append(addDetails, d)
-				} else {
-					if d.Status == constant.AppTakeDown {
-						runtime, _ := runtimeRepo.GetFirst(ctx, runtimeRepo.WithDetailId(d.ID))
-						if runtime != nil {
-							updateDetails = append(updateDetails, d)
-							continue
-						}
-						installs, _ := appInstallRepo.ListBy(ctx, appInstallRepo.WithDetailIdsIn([]uint{d.ID}))
-						if len(installs) > 0 {
-							updateDetails = append(updateDetails, d)
-							continue
-						}
-						deleteDetails = append(deleteDetails, d)
-					} else {
-						updateDetails = append(updateDetails, d)
-					}
-				}
-			}
-		}
-		if len(addDetails) > 0 {
-			if err = appDetailRepo.BatchCreate(ctx, addDetails); err != nil {
-				return
-			}
-		}
-		if len(deleteDetails) > 0 {
-			if err = appDetailRepo.BatchDelete(ctx, deleteDetails); err != nil {
-				return
-			}
-		}
-		for _, u := range updateDetails {
-			if err = appDetailRepo.Update(ctx, u); err != nil {
-				return
-			}
-		}
-
-		if len(oldAppIds) > 0 {
-			if err = appTagRepo.DeleteByAppIds(ctx, deleteIds); err != nil {
-				return
-			}
-		}
-
-		if len(appTags) > 0 {
-			if err = appTagRepo.BatchCreate(ctx, appTags); err != nil {
-				return
-			}
-		}
-		tx.Commit()
-
-		_ = settingService.Update("AppStoreSyncStatus", constant.StatusSyncSuccess)
-		_ = settingService.Update("AppStoreLastModified", strconv.Itoa(list.LastModified))
-		return nil
-	}, nil)
+	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("App"), task.TaskSync, task.TaskScopeAppStore), a.createSyncAppStoreTask(&sharedCtx), nil)
+	syncTask.AddSubTask(i18n.GetMsgByKey("SyncAppDetail"), a.createSyncAppStoreMetaTask(&sharedCtx), nil)
 
 	go func() {
-		if err = syncTask.Execute(); err != nil {
-			_ = NewISettingService().Update("AppStoreLastModified", "0")
-			_ = NewISettingService().Update("AppStoreSyncStatus", constant.StatusError)
+		defer func() {
+			if r := recover(); r != nil {
+				global.LOG.Errorf("[AppStore] sync goroutine recovered from panic: %v", r)
+				if updateErr := NewISettingService().Update("AppStoreSyncStatus", constant.StatusError); updateErr != nil {
+					global.LOG.Warnf("[AppStore] failed to update sync status after panic: %v", updateErr)
+				}
+			}
+			appStoreSyncMu.Lock()
+			appStoreSyncing = false
+			appStoreSyncMu.Unlock()
+		}()
+		if err := syncTask.Execute(); err != nil {
+			if updateErr := NewISettingService().Update("AppStoreLastModified", "0"); updateErr != nil {
+				global.LOG.Warnf("[AppStore] failed to reset last modified: %v", updateErr)
+			}
+			if updateErr := NewISettingService().Update("AppStoreSyncStatus", constant.StatusError); updateErr != nil {
+				global.LOG.Warnf("[AppStore] failed to update sync status to error: %v", updateErr)
+			}
+			return
 		}
 	}()
 
+	global.LOG.Info("[AppStore] sync app from remote task create ok")
 	return nil
 }
 
-func (a AppService) GetAppIcon(appID uint) ([]byte, error) {
-	app, err := appRepo.GetFirst(repo.WithByID(appID))
+func (a AppService) GetAppIcon(key string) ([]byte, string, string, error) {
+	app, err := appRepo.GetFirst(appRepo.WithKey(key))
 	if err != nil {
-		return nil, err
+		return nil, "", "", err
 	}
+
+	if appicon.IsIconFile(app.Icon) {
+		fileName, etag := appicon.ParseIconField(app.Icon)
+		iconBytes, err := appicon.ReadIconFile(fileName)
+		if err != nil {
+			global.LOG.Warnf("[AppIcon] read icon file failed key=%s, file=%s, err=%v", key, fileName, err)
+			return nil, "", "", nil
+		}
+		return iconBytes, fileName, etag, nil
+	}
+
 	iconBytes, err := base64.StdEncoding.DecodeString(app.Icon)
 	if err != nil {
-		return nil, err
+		global.LOG.Warnf("[AppIcon] decode base64 icon failed key=%s, err=%v", key, err)
+		return nil, "", "", nil
 	}
-	return iconBytes, nil
+	return iconBytes, "", "", nil
 }

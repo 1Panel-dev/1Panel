@@ -57,3 +57,18 @@ func (b *BaseApi) GetProcessInfoByPID(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, data)
 }
+
+// @Tags Process
+// @Summary Get Listening Process
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /process/listening [post]
+func (b *BaseApi) GetListeningProcess(c *gin.Context) {
+	procs, err := processService.GetListeningProcess(c)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, procs)
+}

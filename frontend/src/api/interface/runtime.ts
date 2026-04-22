@@ -51,7 +51,7 @@ export namespace Runtime {
         name: string;
         appDetailID: number;
         image: string;
-        params: Object;
+        params: object;
         type: string;
         resource: string;
         appID?: number;
@@ -211,7 +211,7 @@ export namespace Runtime {
         id: number;
     }
 
-    export interface SupersivorProcess {
+    export interface SupervisorProcess {
         operate: string;
         name: string;
         command: string;

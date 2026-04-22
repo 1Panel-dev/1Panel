@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
-	mathRand "math/rand"
+	"math/big"
 	"net"
 	"os/exec"
 	"reflect"
@@ -135,13 +135,6 @@ func isDigit(r rune) bool {
 	return r >= '0' && r <= '9'
 }
 
-func max(x, y int) int {
-	if x > y {
-		return x
-	}
-	return y
-}
-
 func GetSortedVersions(versions []string) []string {
 	sort.Slice(versions, func(i, j int) bool {
 		return CompareVersion(versions[i], versions[j])
@@ -169,21 +162,29 @@ var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456
 
 func RandStr(n int) string {
 	b := make([]rune, n)
+	max := big.NewInt(int64(len(letters)))
 	for i := range b {
-		b[i] = letters[mathRand.Intn(len(letters))]
+		num, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			return ""
+		}
+		b[i] = letters[num.Int64()]
 	}
 	return string(b)
 }
 
 func RandStrAndNum(n int) string {
-	source := mathRand.NewSource(time.Now().UnixNano())
-	randGen := mathRand.New(source)
 	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
 	b := make([]byte, n)
+	max := big.NewInt(int64(len(charset)))
 	for i := range b {
-		b[i] = charset[randGen.Intn(len(charset)-1)]
+		num, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			return ""
+		}
+		b[i] = charset[num.Int64()]
 	}
-	return (string(b))
+	return string(b)
 }
 
 func ScanPort(port int) bool {
@@ -191,7 +192,7 @@ func ScanPort(port int) bool {
 	if err != nil {
 		return true
 	}
-	defer ln.Close()
+	defer func() { _ = ln.Close() }()
 	return false
 }
 
@@ -200,7 +201,7 @@ func ScanUDPPort(port int) bool {
 	if err != nil {
 		return true
 	}
-	defer ln.Close()
+	defer func() { _ = ln.Close() }()
 	return false
 }
 
@@ -225,7 +226,7 @@ func ScanPortWithIP(ip string, port int) bool {
 		}
 		return false
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	return true
 }
 
@@ -304,6 +305,10 @@ func LoadTimeZoneByCmd() string {
 
 func IsValidDomain(domain string) bool {
 	return re.GetRegex(re.DomainPattern).MatchString(domain)
+}
+
+func IsValidNginxServerName(serverName string) bool {
+	return re.GetRegex(re.NginxServerNamePattern).MatchString(serverName)
 }
 
 func ContainsChinese(text string) bool {
@@ -414,4 +419,23 @@ func GetDockerComposeCommand() string {
 		return "docker-compose"
 	}
 	return ""
+}
+
+func LoadParams(param string) string {
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
+	if err != nil {
+		panic(err)
+	}
+	info := strings.ReplaceAll(stdout, "\n", "")
+	if len(info) == 0 || info == `""` {
+		panic(fmt.Sprintf("error `%s` find in /usr/local/bin/1pctl", param))
+	}
+	return info
+}
+func LoadParamsWithoutPanic(param string) string {
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
+	if err != nil {
+		return ""
+	}
+	return strings.ReplaceAll(stdout, "\n", "")
 }

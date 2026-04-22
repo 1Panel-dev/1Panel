@@ -46,6 +46,7 @@ const (
 	SyncAlertSetting                 = "SyncAlertSetting"
 	SyncCustomApp                    = "SyncCustomApp"
 	SyncLanguage                     = "SyncLanguage"
+	SyncEdition                      = "SyncEdition"
 	SyncSystemProxyWithRestartDocker = "SyncSystemProxyWithRestartDocker"
 )
 
@@ -56,12 +57,14 @@ var WebUrlMap = map[string]struct{}{
 	"/apps/upgrade":   {},
 	"/apps/setting":   {},
 
-	"/ai":                {},
-	"/ai/model":          {},
-	"/ai/gpu":            {},
-	"/ai/mcp":            {},
-	"/ai/model/tensorrt": {},
-	"/ai/model/ollama":   {},
+	"/ai":               {},
+	"/ai/model/account": {},
+	"/ai/model/local":   {},
+	"/ai/gpu":           {},
+	"/ai/gpu/current":   {},
+	"/ai/gpu/history":   {},
+	"/ai/mcp":           {},
+	"/ai/agents/agent":  {},
 
 	"/containers":                   {},
 	"/containers/container/operate": {},
@@ -83,6 +86,8 @@ var WebUrlMap = map[string]struct{}{
 	"/databases":                   {},
 	"/databases/mysql":             {},
 	"/databases/mysql/remote":      {},
+	"/databases/mongodb":           {},
+	"/databases/mongodb/remote":    {},
 	"/databases/postgresql":        {},
 	"/databases/postgresql/remote": {},
 	"/databases/redis":             {},
@@ -165,10 +170,12 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/alert/log":       {},
 	"/xpack/alert/setting":   {},
 	"/xpack/setting":         {},
+	"/xpack/node/dashboard":  {},
 	"/xpack/node":            {},
 	"/xpack/simple-node":     {},
 	"/xpack/exchange/file":   {},
 	"/xpack/app":             {},
+	"/xpack/app-upgrade":     {},
 
 	"/xpack/cluster/mysql":    {},
 	"/xpack/cluster/postgres": {},
@@ -180,6 +187,7 @@ var DynamicRoutes = []string{
 	`^/databases/mysql/setting/[^/]+/[^/]+$`,
 	`^/databases/postgresql/setting/[^/]+/[^/]+$`,
 	`^/websites/[^/]+/config/[^/]+$`,
+	`^/s/[A-Za-z0-9]{10,16}$`,
 }
 
 var CertStore atomic.Value

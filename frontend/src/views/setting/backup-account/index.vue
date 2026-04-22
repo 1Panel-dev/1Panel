@@ -20,7 +20,7 @@
                                 class="ml-1 text-xs"
                                 type="primary"
                                 target="_blank"
-                                :href="globalStore.docsUrl + '/user_manual/settings/#3'"
+                                :href="globalStore.docsUrl + '/user_manual/settings/#4'"
                             >
                                 {{ $t('commons.button.helpDoc') }}
                             </el-link>
@@ -118,7 +118,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { onMounted, ref } from 'vue';
 import { searchBackup, deleteBackup, refreshToken } from '@/api/modules/backup';
 import Operate from '@/views/setting/backup-account/operate/index.vue';

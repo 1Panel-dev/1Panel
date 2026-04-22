@@ -4,6 +4,7 @@ import "time"
 
 type DashboardBase struct {
 	WebsiteNumber      int `json:"websiteNumber"`
+	AgentNumber        int `json:"agentNumber"`
 	DatabaseNumber     int `json:"databaseNumber"`
 	CronjobNumber      int `json:"cronjobNumber"`
 	AppInstalledNumber int `json:"appInstalledNumber"`
@@ -13,15 +14,17 @@ type DashboardBase struct {
 	Platform             string `json:"platform"`
 	PlatformFamily       string `json:"platformFamily"`
 	PlatformVersion      string `json:"platformVersion"`
+	PrettyDistro         string `json:"prettyDistro"`
 	KernelArch           string `json:"kernelArch"`
 	KernelVersion        string `json:"kernelVersion"`
 	VirtualizationSystem string `json:"virtualizationSystem"`
 	IpV4Addr             string `json:"ipV4Addr"`
 	SystemProxy          string `json:"systemProxy"`
 
-	CPUCores        int    `json:"cpuCores"`
-	CPULogicalCores int    `json:"cpuLogicalCores"`
-	CPUModelName    string `json:"cpuModelName"`
+	CPUCores        int     `json:"cpuCores"`
+	CPULogicalCores int     `json:"cpuLogicalCores"`
+	CPUModelName    string  `json:"cpuModelName"`
+	CPUMhz          float64 `json:"cpuMhz"`
 
 	QuickJumps  []QuickJump      `json:"quickJump"`
 	CurrentInfo DashboardCurrent `json:"currentInfo"`
@@ -48,6 +51,7 @@ type OsInfo struct {
 	PlatformFamily string `json:"platformFamily"`
 	KernelArch     string `json:"kernelArch"`
 	KernelVersion  string `json:"kernelVersion"`
+	PrettyDistro   string `json:"prettyDistro"`
 
 	DiskSize int64 `json:"diskSize"`
 }
@@ -58,9 +62,10 @@ type NodeCurrent struct {
 	Load15           float64 `json:"load15"`
 	LoadUsagePercent float64 `json:"loadUsagePercent"`
 
-	CPUUsedPercent float64 `json:"cpuUsedPercent"`
-	CPUUsed        float64 `json:"cpuUsed"`
-	CPUTotal       int     `json:"cpuTotal"`
+	CPUUsedPercent     float64   `json:"cpuUsedPercent"`
+	CPUUsed            float64   `json:"cpuUsed"`
+	CPUTotal           int       `json:"cpuTotal"`
+	CPUDetailedPercent []float64 `json:"cpuDetailedPercent"`
 
 	MemoryTotal       uint64  `json:"memoryTotal"`
 	MemoryAvailable   uint64  `json:"memoryAvailable"`
@@ -84,10 +89,11 @@ type DashboardCurrent struct {
 	Load15           float64 `json:"load15"`
 	LoadUsagePercent float64 `json:"loadUsagePercent"`
 
-	CPUPercent     []float64 `json:"cpuPercent"`
-	CPUUsedPercent float64   `json:"cpuUsedPercent"`
-	CPUUsed        float64   `json:"cpuUsed"`
-	CPUTotal       int       `json:"cpuTotal"`
+	CPUPercent         []float64 `json:"cpuPercent"`
+	CPUUsedPercent     float64   `json:"cpuUsedPercent"`
+	CPUUsed            float64   `json:"cpuUsed"`
+	CPUTotal           int       `json:"cpuTotal"`
+	CPUDetailedPercent []float64 `json:"cpuDetailedPercent"`
 
 	MemoryTotal       uint64  `json:"memoryTotal"`
 	MemoryUsed        uint64  `json:"memoryUsed"`

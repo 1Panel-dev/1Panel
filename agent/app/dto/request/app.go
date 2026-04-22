@@ -22,7 +22,16 @@ type AppInstallCreate struct {
 	Name        string                 `json:"name" validate:"required"`
 	Services    map[string]string      `json:"services"`
 	TaskID      string                 `json:"taskID"`
+
 	AppContainerConfig
+	NodePushConfig
+}
+
+type NodePushConfig struct {
+	Nodes    []string `json:"nodes"`
+	PushNode bool     `json:"pushNode"`
+	AppKey   string   `json:"appKey"`
+	Version  string   `json:"version"`
 }
 
 type AppContainerConfig struct {
@@ -45,13 +54,14 @@ type AppContainerConfig struct {
 
 type AppInstalledSearch struct {
 	dto.PageInfo
-	Type   string   `json:"type"`
-	Name   string   `json:"name"`
-	Tags   []string `json:"tags"`
-	Update bool     `json:"update"`
-	Unused bool     `json:"unused"`
-	All    bool     `json:"all"`
-	Sync   bool     `json:"sync"`
+	Type        string   `json:"type"`
+	Name        string   `json:"name"`
+	Tags        []string `json:"tags"`
+	Update      bool     `json:"update"`
+	Unused      bool     `json:"unused"`
+	All         bool     `json:"all"`
+	Sync        bool     `json:"sync"`
+	CheckUpdate bool     `json:"checkUpdate"`
 }
 
 type AppInstalledInfo struct {
@@ -127,4 +137,13 @@ type PortUpdate struct {
 type AppUpdateVersion struct {
 	AppInstallID  uint   `json:"appInstallID" validate:"required"`
 	UpdateVersion string `json:"updateVersion"`
+}
+
+type AppInstallSortItem struct {
+	InstallID uint `json:"installID"`
+	SortOrder int  `json:"sortOrder"`
+}
+
+type AppInstallSort struct {
+	Items []AppInstallSortItem `json:"items" validate:"required"`
 }

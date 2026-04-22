@@ -1,6 +1,7 @@
 package files
 
 import (
+	"context"
 	"fmt"
 	"path"
 	"time"
@@ -25,7 +26,7 @@ func (z X7zArchiver) Extract(filePath, dstDir string, _ string) error {
 	return cmd.RunDefaultBashCf("7z x -y -o%q %q", dstDir, filePath)
 }
 
-func (z X7zArchiver) Compress(sourcePaths []string, dstFile string, _ string) (err error) {
+func (z X7zArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, _ string) (err error) {
 	if err = checkCmdAvailability("7z"); err != nil {
 		return err
 	}
@@ -45,7 +46,7 @@ func (z X7zArchiver) Compress(sourcePaths []string, dstFile string, _ string) (e
 	}
 
 	cmdArgs := append([]string{"a", "-r", tmpFile}, relativePaths...)
-	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(baseDir))
+	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(baseDir), cmd.WithContext(ctx))
 	if err = cmdMgr.Run("7z", cmdArgs...); err != nil {
 		return err
 	}

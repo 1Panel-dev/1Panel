@@ -10,8 +10,8 @@ func SetPasswordPublicKey() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cookieKey, _ := c.Cookie("panel_public_key")
 		settingRepo := repo.NewISettingRepo()
-		key, _ := settingRepo.Get(repo.WithByKey("PASSWORD_PUBLIC_KEY"))
-		base64Key := base64.StdEncoding.EncodeToString([]byte(key.Value))
+		key, _ := settingRepo.GetValueByKey("PASSWORD_PUBLIC_KEY")
+		base64Key := base64.StdEncoding.EncodeToString([]byte(key))
 		if base64Key == cookieKey {
 			c.Next()
 			return

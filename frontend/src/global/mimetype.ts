@@ -48,6 +48,10 @@ export const Languages = [
         value: ['md'],
     },
     {
+        label: 'dockerfile',
+        value: ['dockerfile'],
+    },
+    {
         label: 'yaml',
         value: ['yml', 'yaml'],
     },
@@ -177,6 +181,14 @@ export const DNSTypes = [
         value: 'AliYun',
     },
     {
+        label: i18n.global.t('website.aliEsa'),
+        value: 'AliESA',
+    },
+    {
+        label: i18n.global.t('website.awsRoute53'),
+        value: 'AWSRoute53',
+    },
+    {
         label: i18n.global.t('website.tencentCloud'),
         value: 'TencentCloud',
     },
@@ -257,8 +269,16 @@ export const DNSTypes = [
         value: 'Volcengine',
     },
     {
+        label: 'PorkBun',
+        value: 'PorkBun',
+    },
+    {
         label: 'DNSPod (' + i18n.global.t('ssl.deprecated') + ')',
         value: 'DnsPod',
+    },
+    {
+        label: 'Technitium',
+        value: 'Technitium',
     },
 ];
 
@@ -404,23 +424,31 @@ export const Actions = [
     },
 ];
 
-export const getAlgorithms = () => [
-    {
-        label: i18n.global.t('commons.table.default'),
-        value: 'default',
-        placeHolder: i18n.global.t('website.defaultHelper'),
-    },
-    {
-        label: i18n.global.t('website.ipHash'),
-        value: 'ip_hash',
-        placeHolder: i18n.global.t('website.ipHashHelper'),
-    },
-    {
-        label: i18n.global.t('website.leastConn'),
-        value: 'least_conn',
-        placeHolder: i18n.global.t('website.leastConnHelper'),
-    },
-];
+export const getAlgorithms = (type: string) => {
+    const baseAlgorithms = [
+        {
+            label: i18n.global.t('commons.table.default'),
+            value: 'default',
+            placeHolder: i18n.global.t('website.defaultHelper'),
+        },
+        {
+            label: i18n.global.t('website.ipHash'),
+            value: 'ip_hash',
+            placeHolder: i18n.global.t('website.ipHashHelper'),
+        },
+        {
+            label: i18n.global.t('website.leastConn'),
+            value: 'least_conn',
+            placeHolder: i18n.global.t('website.leastConnHelper'),
+        },
+    ];
+
+    if (type === 'stream') {
+        return baseAlgorithms.filter((algo) => algo.value !== 'ip_hash');
+    }
+
+    return baseAlgorithms;
+};
 
 export const getStatusStrategy = () => [
     {
@@ -443,15 +471,19 @@ export const getWebsiteTypes = () => [
         value: 'runtime',
     },
     {
-        label: i18n.global.t('website.proxy'),
-        value: 'proxy',
-    },
-    {
         label: i18n.global.t('website.static'),
         value: 'static',
     },
     {
+        label: i18n.global.t('website.proxy'),
+        value: 'proxy',
+    },
+    {
         label: i18n.global.t('website.subsite'),
         value: 'subsite',
+    },
+    {
+        label: i18n.global.t('website.stream'),
+        value: 'stream',
     },
 ];

@@ -15,7 +15,6 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 		baRouter.GET("/stats/:id", baseApi.ContainerStats)
 
 		baRouter.POST("", baseApi.ContainerCreate)
-		baRouter.POST("command", baseApi.ContainerCreateByCommand)
 		baRouter.POST("/update", baseApi.ContainerUpdate)
 		baRouter.POST("/upgrade", baseApi.ContainerUpgrade)
 		baRouter.POST("/info", baseApi.ContainerInfo)
@@ -24,6 +23,7 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/list/byimage", baseApi.ListContainerByImage)
 		baRouter.GET("/status", baseApi.LoadContainerStatus)
 		baRouter.GET("/list/stats", baseApi.ContainerListStats)
+		baRouter.POST("/item/stats", baseApi.ContainerItemStats)
 		baRouter.GET("/search/log", baseApi.ContainerStreamLogs)
 		baRouter.POST("/download/log", baseApi.DownloadContainerLogs)
 		baRouter.GET("/limit", baseApi.LoadResourceLimit)
@@ -35,6 +35,12 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/prune", baseApi.ContainerPrune)
 
 		baRouter.POST("/users", baseApi.LoadContainerUsers)
+		baRouter.POST("/files/search", baseApi.ListContainerFiles)
+		baRouter.POST("/files/upload", baseApi.UploadContainerFile)
+		baRouter.POST("/files/content", baseApi.GetContainerFileContent)
+		baRouter.POST("/files/size", baseApi.GetContainerFileSize)
+		baRouter.POST("/files/del", baseApi.DeleteContainerFile)
+		baRouter.POST("/files/download", baseApi.DownloadContainerFile)
 
 		baRouter.GET("/repo", baseApi.ListRepo)
 		baRouter.POST("/repo/status", baseApi.CheckRepoStatus)
@@ -45,8 +51,10 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 
 		baRouter.POST("/compose/search", baseApi.SearchCompose)
 		baRouter.POST("/compose", baseApi.CreateCompose)
+		baRouter.POST("/compose/env", baseApi.LoadComposeEnv)
 		baRouter.POST("/compose/test", baseApi.TestCompose)
 		baRouter.POST("/compose/operate", baseApi.OperatorCompose)
+		baRouter.POST("/compose/clean/log", baseApi.CleanComposeLog)
 		baRouter.POST("/compose/update", baseApi.ComposeUpdate)
 
 		baRouter.GET("/template", baseApi.ListComposeTemplate)

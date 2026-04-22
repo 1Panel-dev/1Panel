@@ -110,6 +110,7 @@ const openEdit = (rowData: any): void => {
     if (tensorRTLLM.value.exposedPorts == null) {
         tensorRTLLM.value.exposedPorts = [];
     }
+    tensorRTLLM.value.command = rowData.command.slice(1, -1).replace(/^'|'$/g, '').replace(/\\"/g, '"');
     if (tensorRTLLM.value.extraHosts == null) {
         tensorRTLLM.value.extraHosts = [];
     }

@@ -3,15 +3,16 @@ package middleware
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"net"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
-	"net"
-	"strconv"
-	"strings"
-	"time"
 )
 
 func ApiAuth() gin.HandlerFunc {

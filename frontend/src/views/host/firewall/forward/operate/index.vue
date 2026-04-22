@@ -14,6 +14,7 @@
 
             <el-form-item :label="$t('firewall.sourcePort')" prop="port">
                 <el-input clearable v-model.trim="dialogData.rowData!.port" />
+                <span class="input-help">{{ $t('firewall.forwardPortHelper') }}</span>
             </el-form-item>
 
             <el-form-item :label="$t('firewall.targetIP')" prop="targetIP">
@@ -24,9 +25,14 @@
 
             <el-form-item :label="$t('firewall.targetPort')" prop="targetPort">
                 <el-input clearable v-model.trim="dialogData.rowData!.targetPort" />
+                <span class="input-help">{{ $t('firewall.forwardPortHelper') }}</span>
             </el-form-item>
 
-            <el-form-item :label="$t('firewall.forwardInboundInterface')" prop="interface">
+            <el-form-item
+                v-if="dialogData.fireName !== 'firewalld'"
+                :label="$t('firewall.forwardInboundInterface')"
+                prop="interface"
+            >
                 <el-select class="w-full" v-model="dialogData.rowData!.interface">
                     <el-option
                         v-for="item in interfaceOptions"
@@ -56,8 +62,8 @@ import { ElForm } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operateForwardRule, getNetworkOptions } from '@/api/modules/host';
-import { checkCidr, checkCidrV6, checkIp, checkPort, deepCopy } from '@/utils/util';
-
+import { checkCidr, checkCidrV6, checkIp, checkPort } from '@/utils/validate';
+import { deepCopy } from '@/utils/misc';
 const loading = ref();
 const oldRule = ref<Host.RuleForward>();
 
@@ -103,8 +109,21 @@ function checkPortRule(rule: any, value: string, callback: any) {
     if (!value) {
         return callback(new Error(i18n.global.t('firewall.portFormatError')));
     }
-    if (checkPort(value)) {
-        return callback(new Error(i18n.global.t('firewall.portFormatError')));
+    if (value.indexOf('-') !== -1) {
+        const ports = value.split('-');
+        if (ports.length !== 2) {
+            return callback(new Error(i18n.global.t('firewall.portFormatError')));
+        }
+        if (checkPort(ports[0]) || checkPort(ports[1])) {
+            return callback(new Error(i18n.global.t('firewall.portFormatError')));
+        }
+        if (Number(ports[0]) > Number(ports[1])) {
+            return callback(new Error(i18n.global.t('firewall.portFormatError')));
+        }
+    } else {
+        if (checkPort(value)) {
+            return callback(new Error(i18n.global.t('firewall.portFormatError')));
+        }
     }
     callback();
 }

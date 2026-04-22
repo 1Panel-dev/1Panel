@@ -27,7 +27,11 @@
                 style="width: 100%"
             >
                 <template #toolbar>
-                    <el-button type="primary" :disabled="status && status != 'Running'" @click="onBackup()">
+                    <el-button
+                        type="primary"
+                        :disabled="status && status.toLowerCase() != 'running'"
+                        @click="onBackup()"
+                    >
                         {{ $t('commons.button.backup') }}
                     </el-button>
                     <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
@@ -100,15 +104,57 @@
     <DialogPro
         v-model="open"
         :title="isBackup ? $t('commons.button.backup') : $t('commons.button.recover') + ' - ' + name"
-        size="small"
         @close="handleBackupClose"
     >
         <el-alert :closable="false">
             {{ $t('commons.msg.' + (isBackup ? 'backupHelper' : 'recoverHelper'), [name + '( ' + detailName + ' )']) }}
         </el-alert>
         <el-form class="mt-5" ref="backupForm" @submit.prevent label-position="top" v-loading="loading">
+            <el-form-item v-if="isBackup && (type === 'container' || type === 'compose')">
+                <el-checkbox v-model="stopBefore">
+                    {{
+                        type === 'container'
+                            ? $t('container.stopContainerBeforeBackup')
+                            : $t('container.stopComposeBeforeBackup')
+                    }}
+                </el-checkbox>
+                <span class="input-help">{{ $t('container.stopBeforeBackupHelper') }}</span>
+            </el-form-item>
             <el-form-item :label="$t('setting.compressPassword')">
                 <el-input v-model="secret" :placeholder="$t('setting.backupRecoverMessage')" />
+            </el-form-item>
+            <el-form-item v-if="!isBackup && type === 'mongodb'">
+                <el-checkbox v-model="dropAllCollections">
+                    {{ $t('database.mongodbRecoverDropAllCollections') }}
+                </el-checkbox>
+                <span class="input-help">{{ $t('database.mongodbRecoverDropAllCollectionsHelper') }}</span>
+            </el-form-item>
+            <el-form-item v-if="type === 'mysql' || type === 'mysql-cluster'" :label="$t('cronjob.backupArgs')">
+                <el-select v-model="args" filterable allow-create multiple>
+                    <el-option v-for="item in mysqlArgs" :key="item.arg" :value="item.arg" :label="item.arg">
+                        {{ item.arg }}
+                        <span class="ml-2">{{ item.description }}</span>
+                    </el-option>
+                </el-select>
+                <span class="input-help">
+                    {{ $t('cronjob.backupArgsHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item
+                v-if="!isBackup && type !== 'app' && type !== 'website'"
+                :label="$t('cronjob.timeout')"
+                prop="timeoutItem"
+            >
+                <el-input type="number" class="selectClass" v-model.number="timeoutItem">
+                    <template #append>
+                        <el-select v-model="timeoutUnit" style="width: 80px">
+                            <el-option :label="$t('commons.units.second')" value="s" />
+                            <el-option :label="$t('commons.units.minute')" value="m" />
+                            <el-option :label="$t('commons.units.hour')" value="h" />
+                        </el-select>
+                    </template>
+                </el-input>
+                <span class="input-help">{{ $t('database.recoverTimeoutHelper') }}</span>
             </el-form-item>
             <el-form-item v-if="isBackup" :label="$t('commons.table.description')">
                 <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" v-model="description" />
@@ -133,7 +179,11 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { computeSize, dateFormat, downloadFile, newUUID } from '@/utils/util';
+import { computeSize } from '@/utils/size';
+import { dateFormat } from '@/utils/date';
+import { downloadFile } from '@/utils/file';
+import { newUUID } from '@/utils/id';
+import { transferTimeToSecond } from '@/utils/validate';
 import {
     getLocalBackupDir,
     handleBackup,
@@ -150,18 +200,16 @@ import { MsgSuccess } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
 import { routerToFileWithPath } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { mysqlArgs } from '@/views/cronjob/cronjob/helper';
+import { loadOptionalComponent } from '@/extensions/optional';
 const { currentNode } = useGlobalStore();
 
-const PushApp = defineAsyncComponent(async () => {
-    const modules = import.meta.glob('@/xpack/views/appstore/push-app/index.vue');
-    const loader = modules['/src/xpack/views/appstore/push-app/index.vue'];
-    if (loader) {
-        return ((await loader()) as any).default;
-    }
-    return { template: '<div></div>' };
-});
+const emit = defineEmits(['close']);
+
+const PushApp = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/appstore/push-app/index.vue'));
 
 const selects = ref<any>([]);
+const args = ref([]);
 const loading = ref();
 const opRef = ref();
 const taskLogRef = ref();
@@ -182,6 +230,11 @@ const backupPath = ref();
 const status = ref();
 const secret = ref();
 const description = ref();
+const timeoutItem = ref(30);
+const timeoutUnit = ref('m');
+const node = ref();
+const stopBefore = ref(false);
+const dropAllCollections = ref(false);
 
 const open = ref();
 const isBackup = ref();
@@ -194,9 +247,11 @@ interface DialogProps {
     detailName: string;
     status: string;
     appInstallID?: number;
+    node?: string;
 }
 const acceptParams = (params: DialogProps): void => {
     type.value = params.type;
+    node.value = params.node || currentNode.value;
     if (type.value === 'app') {
         appInstallID.value = params.appInstallID || 0;
         loadBackupDir();
@@ -210,6 +265,7 @@ const acceptParams = (params: DialogProps): void => {
 };
 const handleClose = () => {
     backupVisible.value = false;
+    emit('close');
 };
 const handleBackupClose = () => {
     open.value = false;
@@ -217,7 +273,7 @@ const handleBackupClose = () => {
 };
 
 const loadBackupDir = async () => {
-    const res = await getLocalBackupDir();
+    const res = await getLocalBackupDir(node.value);
     backupPath.value = res.data;
 };
 
@@ -226,7 +282,7 @@ const goFile = async () => {
 };
 
 const onChange = async (info: any) => {
-    await updateRecordDescription(info.id, info.description);
+    await updateRecordDescription(info.id, info.description, node.value);
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
@@ -239,7 +295,7 @@ const search = async () => {
         detailName: detailName.value,
     };
     loading.value = true;
-    await searchBackupRecords(params)
+    await searchBackupRecords(params, node.value)
         .then((res) => {
             loading.value = false;
             loadSize(params);
@@ -252,7 +308,7 @@ const search = async () => {
 };
 
 const loadSize = async (params: any) => {
-    await loadRecordSize(params)
+    await loadRecordSize(params, node.value)
         .then((res) => {
             let stats = res.data || [];
             if (stats.length === 0) {
@@ -274,7 +330,7 @@ const loadSize = async (params: any) => {
 };
 
 const openTaskLog = (taskID: string) => {
-    taskLogRef.value.openWithTaskID(taskID);
+    taskLogRef.value.openWithTaskID(taskID, true, node.value);
 };
 
 function selectable(row) {
@@ -290,9 +346,11 @@ const backup = async () => {
         secret: secret.value,
         taskID: taskID,
         description: description.value,
+        args: args.value,
+        stopBefore: stopBefore.value,
     };
     loading.value = true;
-    await handleBackup(params)
+    await handleBackup(params, node.value)
         .then(() => {
             loading.value = false;
             openTaskLog(taskID);
@@ -314,9 +372,11 @@ const recover = async (row?: any) => {
         secret: secret.value,
         taskID: taskID,
         backupRecordID: row.id,
+        timeout: timeoutItem.value === -1 ? -1 : transferTimeToSecond(timeoutItem.value + timeoutUnit.value),
+        dropAllCollections: type.value === 'mongodb' ? dropAllCollections.value : false,
     };
     loading.value = true;
-    await handleRecover(params)
+    await handleRecover(params, node.value)
         .then(() => {
             loading.value = false;
             openTaskLog(taskID);
@@ -330,12 +390,15 @@ const recover = async (row?: any) => {
 const onBackup = async () => {
     description.value = '';
     secret.value = '';
+    args.value = [];
+    stopBefore.value = false;
     isBackup.value = true;
     open.value = true;
 };
 
 const onRecover = async (row: Backup.RecordInfo) => {
     secret.value = '';
+    dropAllCollections.value = false;
     isBackup.value = false;
     recordInfo.value = row;
     open.value = true;
@@ -355,8 +418,8 @@ const onDownload = async (row: Backup.RecordInfo) => {
         fileDir: row.fileDir,
         fileName: row.fileName,
     };
-    await downloadBackupRecord(params).then(async (res) => {
-        downloadFile(res.data, currentNode.value);
+    await downloadBackupRecord(params, node.value).then(async (res) => {
+        downloadFile(res.data, node.value);
     });
 };
 
@@ -380,7 +443,7 @@ const onBatchDelete = async (row: Backup.RecordInfo | null) => {
             i18n.global.t('commons.button.backup'),
             i18n.global.t('commons.button.delete'),
         ]),
-        params: { ids: ids },
+        params: { ids: ids, node: node.value },
     });
 };
 

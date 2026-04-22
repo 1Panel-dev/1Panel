@@ -11,7 +11,8 @@ router.beforeEach((to, from, next) => {
     NProgress.start();
     axiosCanceler.removeAllPending();
     const globalStore = GlobalStore();
-    if (to.name !== 'entrance' && !globalStore.isLogin) {
+    const isPublicRoute = to.name === 'entrance' || to.matched.some((record) => record.meta.requiresAuth === false);
+    if (!isPublicRoute && !globalStore.isLogin) {
         next({
             name: 'entrance',
             params: to.params,
@@ -63,7 +64,7 @@ router.beforeEach((to, from, next) => {
 });
 
 router.afterEach((to) => {
-    if (to.meta.activeMenu && !isRedirecting) {
+    if (to.meta.activeMenu && !to.meta.ignoreTab && !isRedirecting) {
         let notMathParam = true;
         if (to.matched.some((record) => record.path.includes(':'))) {
             notMathParam = false;

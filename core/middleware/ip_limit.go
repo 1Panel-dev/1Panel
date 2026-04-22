@@ -24,17 +24,17 @@ func WhiteAllow() gin.HandlerFunc {
 		}
 
 		settingRepo := repo.NewISettingRepo()
-		status, err := settingRepo.Get(repo.WithByKey("AllowIPs"))
+		allowIPs, err := settingRepo.GetValueByKey("AllowIPs")
 		if err != nil {
 			helper.InternalServer(c, err)
 			return
 		}
 
-		if len(status.Value) == 0 {
+		if len(allowIPs) == 0 {
 			c.Next()
 			return
 		}
-		for _, ip := range strings.Split(status.Value, ",") {
+		for _, ip := range strings.Split(allowIPs, ",") {
 			if len(ip) == 0 {
 				continue
 			}

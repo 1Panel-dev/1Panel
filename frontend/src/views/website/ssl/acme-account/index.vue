@@ -51,7 +51,7 @@ import { deleteAcmeAccount, searchAcmeAccount, updateAcmeAccount } from '@/api/m
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import Create from './create/index.vue';
-import { getAccountName, getKeyName } from '@/utils/util';
+import { getAccountName, getKeyName } from '@/utils/ssl';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();

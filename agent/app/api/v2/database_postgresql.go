@@ -167,6 +167,7 @@ func (b *BaseApi) SearchPostgresql(c *gin.Context) {
 // @Summary Load postgresql database from remote
 // @Accept json
 // @Param request body dto.PostgresqlLoadDB true "request"
+// @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /databases/pg/:database/load [post]

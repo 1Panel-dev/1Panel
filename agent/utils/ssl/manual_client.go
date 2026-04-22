@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/go-acme/lego/v4/certificate"
+	"github.com/miekg/dns"
 	"golang.org/x/crypto/acme"
 	"log"
 	"net"
@@ -70,12 +71,39 @@ type Resolve struct {
 }
 
 func (c *ManualClient) GetDNSResolve(ctx context.Context, websiteSSL *model.WebsiteSSL) (map[string]Resolve, error) {
-	order, err := c.client.AuthorizeOrder(ctx, acme.DomainIDs(getWebsiteSSLDomains(websiteSSL)...))
+	var order *acme.Order
+	var err error
+
+	// Check if we have an existing valid order for this SSL
+	existingOrder, exists := Orders[websiteSSL.ID]
+	if exists && existingOrder != nil {
+		// Verify the order is still valid (not expired and still pending)
+		// If Expires is zero, order is still valid (ACME doesn't always set expiry immediately)
+		isNotExpired := existingOrder.Expires.IsZero() || existingOrder.Expires.After(time.Now())
+		if isNotExpired && (existingOrder.Status == acme.StatusPending || existingOrder.Status == acme.StatusReady) {
+			// Try to reuse the existing order
+			records, err := c.extractDNSChallenges(ctx, existingOrder)
+			if err == nil && len(records) > 0 {
+				return records, nil
+			}
+			// If extraction failed, fall through to create a new order
+		}
+		// Existing order is expired or invalid, remove it
+		delete(Orders, websiteSSL.ID)
+	}
+
+	// Create a new order
+	order, err = c.client.AuthorizeOrder(ctx, acme.DomainIDs(getWebsiteSSLDomains(websiteSSL)...))
 	if err != nil {
 		return nil, err
 	}
 	Orders[websiteSSL.ID] = order
 
+	return c.extractDNSChallenges(ctx, order)
+}
+
+// extractDNSChallenges extracts DNS-01 challenge values from an ACME order
+func (c *ManualClient) extractDNSChallenges(ctx context.Context, order *acme.Order) (map[string]Resolve, error) {
 	records := make(map[string]Resolve)
 
 	for _, authzURL := range order.AuthzURLs {
@@ -102,7 +130,14 @@ func (c *ManualClient) GetDNSResolve(ctx context.Context, websiteSSL *model.Webs
 			return nil, err
 		}
 
-		records[domain] = Resolve{
+		// Use different map key for wildcard vs non-wildcard to avoid overwriting
+		// Both use the same DNS record name (_acme-challenge.domain) but different values
+		mapKey := domain
+		if authz.Wildcard {
+			mapKey = "*." + domain
+		}
+
+		records[mapKey] = Resolve{
 			Key:   fmt.Sprintf("_acme-challenge.%s", domain),
 			Value: txtValue,
 		}
@@ -110,20 +145,20 @@ func (c *ManualClient) GetDNSResolve(ctx context.Context, websiteSSL *model.Webs
 	return records, nil
 }
 
-func queryDNSRecords(domain string) (map[string]string, error) {
+func queryDNSRecords(domain string) (map[string][]string, error) {
 	recordName := fmt.Sprintf("_acme-challenge.%s", domain)
 	txts, err := net.LookupTXT(recordName)
 	if err != nil {
 		return nil, err
 	}
-	records := make(map[string]string)
+	records := make(map[string][]string)
 	if len(txts) > 0 {
-		records[recordName] = txts[0]
+		records[recordName] = txts
 	}
 	return records, nil
 }
 
-func (c *ManualClient) handleAuthorization(ctx context.Context, authzURL string) error {
+func (c *ManualClient) handleAuthorization(ctx context.Context, authzURL string, nameservers []string) error {
 	authz, err := c.client.GetAuthorization(ctx, authzURL)
 	if err != nil {
 		return fmt.Errorf("failed to get authorization: %v", err)
@@ -158,21 +193,44 @@ func (c *ManualClient) handleAuthorization(ctx context.Context, authzURL string)
 
 	for {
 		c.logger.Printf("[INFO] [%s] acme: Checking DNS record propagation.", domain)
-		currentRecords, err := queryDNSRecords(domain)
-		if err != nil {
-			return fmt.Errorf("failed to query DNS records: %v", err)
+		var currentRecords map[string][]string
+		var queryErr error
+		if len(nameservers) == 0 {
+			currentRecords, queryErr = queryDNSRecords(domain)
+		} else {
+			var errs []string
+			for _, nameserver := range nameservers {
+				currentRecords, queryErr = queryDNSRecordsWithResolver(ctx, c.logger, domain, nameserver)
+				errs = append(errs, fmt.Sprintf("%s: %v", nameserver, queryErr))
+			}
+			if queryErr != nil && len(errs) > 0 {
+				queryErr = fmt.Errorf("all nameservers failed: %s", strings.Join(errs, "; "))
+			}
+		}
+		if currentRecords == nil && queryErr != nil {
+			return fmt.Errorf("failed to query DNS records: %v", queryErr)
 		}
 		recordName := fmt.Sprintf("_acme-challenge.%s", domain)
-		providedRecord, exists := currentRecords[recordName]
-		if exists && providedRecord == expectedRecord {
+		providedRecords, exists := currentRecords[recordName]
+		// Check if expected record is in any of the TXT values
+		found := false
+		if exists {
+			for _, record := range providedRecords {
+				if record == expectedRecord {
+					found = true
+					break
+				}
+			}
+		}
+		if found {
 			break
 		}
 		if time.Now().After(deadline) {
-			if !exists {
+			if !exists || len(providedRecords) == 0 {
 				return fmt.Errorf("TXT record not provided for domain %s after retrying", domain)
 			}
-			c.logger.Printf("[INFO] [%s] TXT record mismatch for %s: expected %s, got %s\"", domain, domain, expectedRecord, providedRecord)
-			return fmt.Errorf("TXT record mismatch for %s: expected %s, got %s", domain, expectedRecord, providedRecord)
+			c.logger.Printf("[INFO] [%s] TXT record mismatch for %s: expected %s, got %v", domain, domain, expectedRecord, providedRecords)
+			return fmt.Errorf("TXT record mismatch for %s: expected %s, got %v", domain, expectedRecord, providedRecords)
 		}
 		time.Sleep(pollingInterval)
 	}
@@ -262,7 +320,7 @@ func (c *ManualClient) RequestCertificate(ctx context.Context, websiteSSL *model
 	defer delete(Orders, websiteSSL.ID)
 
 	for _, authzURL := range order.AuthzURLs {
-		if err := c.handleAuthorization(ctx, authzURL); err != nil {
+		if err := c.handleAuthorization(ctx, authzURL, getNameservers(*websiteSSL)); err != nil {
 			return res, err
 		}
 	}
@@ -305,4 +363,77 @@ func (c *ManualClient) RequestCertificate(ctx context.Context, websiteSSL *model
 		CSR:           csr,
 	}
 	return resource, nil
+}
+
+func getNameservers(websiteSSL model.WebsiteSSL) []string {
+	var nameservers []string
+	if websiteSSL.Nameserver1 != "" {
+		nameservers = append(nameservers, handleNameserver(websiteSSL.Nameserver1))
+	}
+	if websiteSSL.Nameserver2 != "" {
+		nameservers = append(nameservers, handleNameserver(websiteSSL.Nameserver2))
+	}
+	return nameservers
+}
+
+func handleNameserver(nameserver string) string {
+	if strings.Contains(nameserver, ":") {
+		return nameserver
+	}
+	return fmt.Sprintf("%s:53", nameserver)
+}
+
+func queryDNSRecordsWithResolver(ctx context.Context, logger *log.Logger, domain string, dnsServer string) (map[string][]string, error) {
+	recordName := fmt.Sprintf("_acme-challenge.%s", domain)
+	c := new(dns.Client)
+	c.Timeout = 10 * time.Second
+	c.Net = "udp"
+
+	m := new(dns.Msg)
+	m.SetQuestion(dns.Fqdn(recordName), dns.TypeTXT)
+	m.RecursionDesired = true
+
+	r, _, err := c.ExchangeContext(ctx, m, dnsServer)
+	if isNetworkError(err) {
+		logger.Printf("[WARN] Network error occurred while querying DNS: %v", err)
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("DNS query failed: %w", err)
+	}
+
+	if r.Rcode == dns.RcodeNameError {
+		logger.Printf("[INFO] DNS record does not exist yet (NXDOMAIN)")
+		return nil, nil
+	}
+
+	if r.Rcode != dns.RcodeSuccess {
+		return nil, fmt.Errorf("DNS query failed with code: %s", dns.RcodeToString[r.Rcode])
+	}
+
+	records := make(map[string][]string)
+	var txtValues []string
+
+	for _, answer := range r.Answer {
+		if txt, ok := answer.(*dns.TXT); ok {
+			if len(txt.Txt) > 0 {
+				txtValues = append(txtValues, txt.Txt[0])
+			}
+		}
+	}
+	if len(txtValues) > 0 {
+		records[recordName] = txtValues
+	}
+
+	return records, nil
+}
+
+func isNetworkError(err error) bool {
+	if err == nil {
+		return false
+	}
+	return strings.Contains(err.Error(), "i/o timeout") ||
+		strings.Contains(err.Error(), "connection refused") ||
+		strings.Contains(err.Error(), "network is unreachable") ||
+		strings.Contains(err.Error(), "no route to host")
 }

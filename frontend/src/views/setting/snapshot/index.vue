@@ -3,10 +3,10 @@
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('setting.snapshot', 2)">
             <template #leftToolBar>
                 <el-button type="primary" @click="onCreate()">
-                    {{ $t('setting.createSnapshot') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button type="primary" plain @click="onImport()">
-                    {{ $t('setting.importSnapshot') }}
+                    {{ $t('commons.button.sync') }}
                 </el-button>
                 <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
@@ -231,7 +231,9 @@ import {
     updateSnapshotDescription,
 } from '@/api/modules/setting';
 import { onMounted, reactive, ref } from 'vue';
-import { computeSize, dateFormat, newUUID } from '@/utils/util';
+import { computeSize } from '@/utils/size';
+import { dateFormat } from '@/utils/date';
+import { newUUID } from '@/utils/id';
 import { ElForm } from 'element-plus';
 import i18n from '@/lang';
 import { Setting } from '@/api/interface/setting';

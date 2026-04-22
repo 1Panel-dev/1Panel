@@ -37,6 +37,10 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/password/update", baseApi.UpdatePassword)
 		settingRouter.POST("/mfa", baseApi.LoadMFA)
 		settingRouter.POST("/mfa/bind", baseApi.MFABind)
+		settingRouter.POST("/passkey/register/begin", baseApi.PasskeyRegisterBegin)
+		settingRouter.POST("/passkey/register/finish", baseApi.PasskeyRegisterFinish)
+		settingRouter.GET("/passkey/list", baseApi.PasskeyList)
+		settingRouter.DELETE("/passkey/:id", baseApi.PasskeyDelete)
 
 		settingRouter.POST("/upgrade", baseApi.Upgrade)
 		settingRouter.POST("/upgrade/notes", baseApi.GetNotesByVersion)
@@ -49,5 +53,8 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 
 		settingRouter.POST("/apps/store/update", baseApi.UpdateAppstoreConfig)
 		settingRouter.GET("/apps/store/config", baseApi.GetAppstoreConfig)
+
+		settingRouter.GET("/memo", baseApi.GetMemo)
+		settingRouter.POST("/memo", baseApi.UpdateMemo)
 	}
 }

@@ -2,21 +2,28 @@
     <DrawerPro v-model="drawerVisible" :header="$t('setting.release')" @close="handleClose" size="large">
         <div class="note" v-loading="loading">
             <el-form ref="formRef" :model="form" :rules="rules">
-                <el-form-item :label="$t('setting.versionItem')" prop="version">
-                    <el-input class="p-w-200" disabled v-model="form.version">
-                        <template #append>
-                            <CopyButton class="w-16" :isIcon="false" :content="form.version" type="primary" />
-                        </template>
-                    </el-input>
-                </el-form-item>
-                <el-form-item :label="$t('setting.backupCopies')" prop="backupCopies">
-                    <el-input class="p-w-200" type="number" v-model.number="form.backupCopies">
-                        <template #append>
-                            <el-button @click="onSave(formRef)" class="w-16">{{ $t('commons.button.save') }}</el-button>
-                        </template>
-                    </el-input>
-                    <span class="input-help">{{ $t('setting.backupCopiesHelper') }}</span>
-                </el-form-item>
+                <div class="release-settings">
+                    <el-form-item :label="$t('setting.versionItem')" prop="version" class="compact-form-item">
+                        <div class="setting-control">
+                            <el-input disabled v-model="form.version" />
+                            <CopyButton
+                                class="setting-action-btn"
+                                :isIcon="false"
+                                :content="form.version"
+                                type="primary"
+                            />
+                        </div>
+                    </el-form-item>
+                    <el-form-item :label="$t('setting.backupCopies')" prop="backupCopies" class="compact-form-item">
+                        <div class="setting-control">
+                            <el-input-number v-model="form.backupCopies" :min="0" controls-position="right" />
+                            <el-button @click="onSave(formRef)" class="setting-action-btn" type="primary">
+                                {{ $t('commons.button.save') }}
+                            </el-button>
+                        </div>
+                        <span class="input-help">{{ $t('setting.backupCopiesHelper') }}</span>
+                    </el-form-item>
+                </div>
             </el-form>
             <el-collapse v-if="notes && notes.length !== 0" v-model="currentVersion" :accordion="true">
                 <div v-for="(item, index) in notes" :key="index">
@@ -32,7 +39,7 @@
                             <span class="icon-span">{{ item.fixCount }}</span>
                         </template>
                         <div class="panel-MdEditor">
-                            <MdEditor v-model="item.content" previewOnly :theme="isDarkTheme ? 'dark' : 'light'" />
+                            <MarkDownEditor :content="item.content" />
                         </div>
                     </el-collapse-item>
                 </div>
@@ -57,12 +64,11 @@
 </template>
 
 <script setup lang="ts">
+import MarkDownEditor from '@/components/mkdown-editor/index.vue';
+
 import { getSettingInfo, listReleases, updateSetting } from '@/api/modules/setting';
-import MdEditor from 'md-editor-v3';
-import 'md-editor-v3/lib/style.css';
 import { ref } from 'vue';
 import { GlobalStore } from '@/store';
-import { storeToRefs } from 'pinia';
 import { FormInstance } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
@@ -72,8 +78,6 @@ const globalStore = GlobalStore();
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
-
-const { isDarkTheme } = storeToRefs(globalStore);
 
 const drawerVisible = ref(false);
 const currentVersion = ref(0);
@@ -185,5 +189,32 @@ defineExpose({
     font-size: 12px;
     margin-left: 5px;
     margin-top: -4px;
+}
+.release-settings {
+    margin-bottom: 16px;
+    padding: 14px 14px 10px;
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 10px;
+}
+.compact-form-item {
+    margin-bottom: 12px;
+}
+.compact-form-item :deep(.el-form-item__label) {
+    padding-bottom: 6px;
+}
+.setting-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 340px;
+    width: 100%;
+}
+.setting-control :deep(.el-input),
+.setting-control :deep(.el-input-number) {
+    flex: 1;
+    width: 100%;
+}
+.setting-action-btn {
+    min-width: 64px;
 }
 </style>

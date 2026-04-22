@@ -1,7 +1,9 @@
 package service
 
 import (
+	"archive/tar"
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -11,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -19,12 +22,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/gin-gonic/gin"
-
-	"github.com/pkg/errors"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -44,7 +43,9 @@ import (
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
+	"github.com/gin-gonic/gin"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/mem"
@@ -61,32 +62,43 @@ type IContainerService interface {
 	ListNetwork() ([]dto.Options, error)
 	PageVolume(req dto.SearchWithPage) (int64, interface{}, error)
 	ListVolume() ([]dto.Options, error)
+
 	PageCompose(req dto.SearchWithPage) (int64, interface{}, error)
+	LoadComposeEnv(name string) (string, error)
 	CreateCompose(req dto.ComposeCreate) error
 	ComposeOperation(req dto.ComposeOperation) error
+	TestCompose(req dto.ComposeCreate) (bool, error)
+	ComposeUpdate(req dto.ComposeUpdate) error
+	ComposeLogClean(req dto.ComposeLogClean) error
+
 	ContainerCreate(req dto.ContainerOperate, inThread bool) error
-	ContainerCreateByCommand(req dto.ContainerCreateByCommand) error
 	ContainerUpdate(req dto.ContainerOperate) error
 	ContainerUpgrade(req dto.ContainerUpgrade) error
 	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
 	ContainerListStats() ([]dto.ContainerListStats, error)
+	ContainerItemStats(req dto.OperationWithName) (dto.ContainerItemStats, error)
 	LoadResourceLimit() (*dto.ResourceLimit, error)
 	ContainerRename(req dto.ContainerRename) error
 	ContainerCommit(req dto.ContainerCommit) error
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
-	DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error
+	DownloadContainerLogs(containerType, container, since, tail string, timestamp bool, c *gin.Context) error
 	ContainerStats(id string) (*dto.ContainerStats, error)
+
 	Inspect(req dto.InspectReq) (string, error)
 	DeleteNetwork(req dto.BatchDelete) error
 	CreateNetwork(req dto.NetworkCreate) error
 	DeleteVolume(req dto.BatchDelete) error
 	CreateVolume(req dto.VolumeCreate) error
-	TestCompose(req dto.ComposeCreate) (bool, error)
-	ComposeUpdate(req dto.ComposeUpdate) error
 	Prune(req dto.ContainerPrune) error
 
 	LoadUsers(req dto.OperationWithName) []string
+	ListContainerFiles(req dto.ContainerFileReq) ([]dto.ContainerFileInfo, error)
+	UploadContainerFile(req dto.ContainerFileReq, fileName string, fileSize int64, file io.Reader) error
+	GetContainerFileContent(req dto.ContainerFileReq) (*dto.ContainerFileContent, error)
+	GetContainerFileSize(req dto.ContainerFileReq) (int64, error)
+	DeleteContainerFile(req dto.ContainerFileBatchDeleteReq) error
+	DownloadContainerFile(req dto.ContainerFileReq) (io.ReadCloser, string, string, error)
 
 	StreamLogs(ctx *gin.Context, params dto.StreamLog)
 }
@@ -100,11 +112,8 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	if err != nil {
 		return 0, nil, err
 	}
-	defer client.Close()
-	options := container.ListOptions{
-		All:  true,
-		Size: true,
-	}
+	defer func() { _ = client.Close() }()
+	options := container.ListOptions{All: true}
 	if len(req.Filters) != 0 {
 		options.Filters = filters.NewArgs()
 		options.Filters.Add("label", req.Filters)
@@ -201,13 +210,60 @@ func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
 	defer client.Close()
 	c := context.Background()
 
-	usage, err := client.DiskUsage(c, types.DiskUsageOptions{})
+	images, _ := client.ImageList(c, image.ListOptions{All: true})
+	data.ImageCount = len(images)
+	repo, _ := imageRepoRepo.List()
+	data.RepoCount = len(repo)
+	templates, _ := composeRepo.List()
+	data.ComposeTemplateCount = len(templates)
+	networks, _ := client.NetworkList(c, network.ListOptions{})
+	data.NetworkCount = len(networks)
+	volumes, _ := client.VolumeList(c, volume.ListOptions{})
+	data.VolumeCount = len(volumes.Volumes)
+	data.ComposeCount = loadComposeCount(client)
+	containers, _ := client.ContainerList(c, container.ListOptions{All: true})
+	data.ContainerCount = len(containers)
+	for _, item := range containers {
+		switch item.State {
+		case "created":
+			data.Created++
+		case "running":
+			data.Running++
+		case "paused":
+			data.Paused++
+		case "restarting":
+			data.Restarting++
+		case "dead":
+			data.Dead++
+		case "exited":
+			data.Exited++
+		case "removing":
+			data.Removing++
+		}
+	}
+	return data, nil
+}
+func (u *ContainerService) ContainerItemStats(req dto.OperationWithName) (dto.ContainerItemStats, error) {
+	var data dto.ContainerItemStats
+	client, err := docker.NewDockerClient()
 	if err != nil {
 		return data, err
 	}
+	if req.Name != "system" {
+		defer client.Close()
+		containerInfo, _, err := client.ContainerInspectWithRaw(context.Background(), req.Name, true)
+		if err != nil {
+			return data, err
+		}
+		data.SizeRw = *containerInfo.SizeRw
+		data.SizeRootFs = *containerInfo.SizeRootFs
+		return data, nil
+	}
 
-	data.ImageCount = len(usage.Images)
-	data.VolumeCount = len(usage.Volumes)
+	usage, err := client.DiskUsage(context.Background(), types.DiskUsageOptions{})
+	if err != nil {
+		return data, err
+	}
 	for _, item := range usage.Images {
 		data.ImageUsage += item.Size
 		if item.Containers < 1 {
@@ -228,34 +284,6 @@ func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
 	}
 	for _, item := range usage.BuildCache {
 		data.BuildCacheUsage += item.Size
-	}
-	repo, _ := imageRepoRepo.List()
-	data.RepoCount = len(repo)
-	templates, _ := composeRepo.List()
-	data.ComposeTemplateCount = len(templates)
-	networks, _ := client.NetworkList(c, network.ListOptions{})
-	data.NetworkCount = len(networks)
-	volumes, _ := client.VolumeList(c, volume.ListOptions{})
-	data.VolumeCount = len(volumes.Volumes)
-	data.ComposeCount = loadComposeCount(client)
-	data.ContainerCount = len(usage.Containers)
-	for _, item := range usage.Containers {
-		switch item.State {
-		case "created":
-			data.Created++
-		case "running":
-			data.Running++
-		case "paused":
-			data.Paused++
-		case "restarting":
-			data.Restarting++
-		case "dead":
-			data.Dead++
-		case "exited":
-			data.Exited++
-		case "removing":
-			data.Removing++
-		}
 	}
 	return data, nil
 }
@@ -280,42 +308,6 @@ func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error
 	}
 	wg.Wait()
 	return datas, nil
-}
-
-func (u *ContainerService) ContainerCreateByCommand(req dto.ContainerCreateByCommand) error {
-	if cmd.CheckIllegal(req.Command) {
-		return buserr.New("ErrCmdIllegal")
-	}
-	if !strings.HasPrefix(strings.TrimSpace(req.Command), "docker run ") {
-		return errors.New("error command format")
-	}
-	containerName := ""
-	commands := strings.Split(req.Command, " ")
-	for index, val := range commands {
-		if val == "--name" && len(commands) > index+1 {
-			containerName = commands[index+1]
-		}
-	}
-	if !strings.Contains(req.Command, " -d ") {
-		req.Command = strings.ReplaceAll(req.Command, "docker run", "docker run -d")
-	}
-	if len(containerName) == 0 {
-		containerName = fmt.Sprintf("1Panel-%s-%s", common.RandStr(5), common.RandStrAndNum(4))
-		req.Command += fmt.Sprintf(" --name %s", containerName)
-	}
-	taskItem, err := task.NewTaskWithOps(containerName, task.TaskCreate, task.TaskScopeContainer, req.TaskID, 1)
-	if err != nil {
-		global.LOG.Errorf("new task for create container failed, err: %v", err)
-		return err
-	}
-	go func() {
-		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", containerName), func(t *task.Task) error {
-			cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem), cmd.WithTimeout(5*time.Minute))
-			return cmdMgr.RunBashC(req.Command)
-		}, nil)
-		_ = taskItem.Execute()
-	}()
-	return nil
 }
 
 func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
@@ -344,6 +336,9 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 		}
 		for _, container := range containers {
 			config := container.Labels[composeConfigLabel]
+			if len(req.Detail) != 0 && strings.Contains(config, req.Detail) {
+				config = req.Detail
+			}
 			workdir := container.Labels[composeWorkdirLabel]
 			if len(config) != 0 && len(workdir) != 0 && strings.Contains(config, workdir) {
 				filePath = config
@@ -416,7 +411,6 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 			}
 		}
 		taskItem.Log(i18n.GetMsgByKey("PruneStart"))
-		DeletedNumber := 0
 		SpaceReclaimed := 0
 		switch req.PruneType {
 		case "container":
@@ -424,21 +418,18 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 			if err != nil {
 				return err
 			}
-			DeletedNumber = len(rep.ContainersDeleted)
 			SpaceReclaimed = int(rep.SpaceReclaimed)
 		case "image":
 			rep, err := client.ImagesPrune(context.Background(), pruneFilters)
 			if err != nil {
 				return err
 			}
-			DeletedNumber = len(rep.ImagesDeleted)
 			SpaceReclaimed = int(rep.SpaceReclaimed)
 		case "network":
-			rep, err := client.NetworksPrune(context.Background(), pruneFilters)
+			_, err := client.NetworksPrune(context.Background(), pruneFilters)
 			if err != nil {
 				return err
 			}
-			DeletedNumber = len(rep.NetworksDeleted)
 		case "volume":
 			versions, err := client.ServerVersion(context.Background())
 			if err != nil {
@@ -451,7 +442,6 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 			if err != nil {
 				return err
 			}
-			DeletedNumber = len(rep.VolumesDeleted)
 			SpaceReclaimed = int(rep.SpaceReclaimed)
 		case "buildcache":
 			opts := build.CachePruneOptions{}
@@ -460,10 +450,9 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 			if err != nil {
 				return err
 			}
-			DeletedNumber = len(rep.CachesDeleted)
 			SpaceReclaimed = int(rep.SpaceReclaimed)
 		}
-		taskItem.Log(i18n.GetMsgWithMap("PruneHelper", map[string]interface{}{"name": i18n.GetMsgByKey(name), "count": DeletedNumber, "size": common.LoadSizeUnit2F(float64(SpaceReclaimed))}))
+		taskItem.Log(i18n.GetMsgWithMap("PruneHelper", map[string]interface{}{"name": i18n.GetMsgByKey(name), "size": common.LoadSizeUnit2F(float64(SpaceReclaimed))}))
 		return nil
 	}, nil)
 	go func() {
@@ -604,6 +593,16 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	data.ExposedPorts = loadContainerPortForInfo(exposePorts)
 	data.Hostname = oldContainer.Config.Hostname
 	data.DNS = oldContainer.HostConfig.DNS
+	for _, item := range oldContainer.HostConfig.ExtraHosts {
+		parts := strings.SplitN(item, ":", 2)
+		if len(parts) != 2 || len(parts[0]) == 0 || len(parts[1]) == 0 {
+			continue
+		}
+		data.ExtraHosts = append(data.ExtraHosts, dto.ExtraHost{
+			Hostname: parts[0],
+			IP:       parts[1],
+		})
+	}
 	data.DomainName = oldContainer.Config.Domainname
 
 	data.Cmd = oldContainer.Config.Cmd
@@ -939,6 +938,9 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 	if params.Follow {
 		cmdArgs = append(cmdArgs, "-f")
 	}
+	if params.Timestamp {
+		cmdArgs = append(cmdArgs, "-t")
+	}
 	if params.Tail != "0" {
 		cmdArgs = append(cmdArgs, "--tail", params.Tail)
 	}
@@ -951,12 +953,18 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 
 	var dockerCmd *exec.Cmd
 	if params.Type == "compose" {
-		dockerComposCmd := common.GetDockerComposeCommand()
-		if dockerComposCmd == "docker-compose" {
-			newCmdArgs := append([]string{"-f", params.Compose}, cmdArgs...)
-			dockerCmd = exec.Command(dockerComposCmd, newCmdArgs...)
+		dockerComposeCmd := common.GetDockerComposeCommand()
+		var yamlFiles []string
+		for _, item := range strings.Split(params.Compose, ",") {
+			if len(item) != 0 {
+				yamlFiles = append(yamlFiles, "-f", item)
+			}
+		}
+		if dockerComposeCmd == "docker-compose" {
+			newCmdArgs := append(yamlFiles, cmdArgs...)
+			dockerCmd = exec.Command(dockerComposeCmd, newCmdArgs...)
 		} else {
-			newCmdArgs := append([]string{"compose", "-f", params.Compose}, cmdArgs...)
+			newCmdArgs := append(append([]string{"compose"}, yamlFiles...), cmdArgs...)
 			dockerCmd = exec.Command("docker", newCmdArgs...)
 		}
 	} else {
@@ -1029,17 +1037,23 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 	_ = dockerCmd.Wait()
 }
 
-func (u *ContainerService) DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error {
+func (u *ContainerService) DownloadContainerLogs(containerType, container, since, tail string, timestamp bool, c *gin.Context) error {
 	if cmd.CheckIllegal(container, since, tail) {
 		return buserr.New("ErrCmdIllegal")
 	}
 	commandArg := []string{"logs", container}
 	dockerCommand := global.CONF.DockerConfig.Command
 	if containerType == "compose" {
+		var yamlFiles []string
+		for _, item := range strings.Split(container, ",") {
+			if len(item) != 0 {
+				yamlFiles = append(yamlFiles, "-f", item)
+			}
+		}
 		if dockerCommand == "docker-compose" {
-			commandArg = []string{"-f", container, "logs"}
+			commandArg = append(yamlFiles, "logs")
 		} else {
-			commandArg = []string{"compose", "-f", container, "logs"}
+			commandArg = append(append([]string{"compose"}, yamlFiles...), "logs")
 		}
 	}
 
@@ -1050,6 +1064,9 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 	if since != "all" {
 		commandArg = append(commandArg, "--since")
 		commandArg = append(commandArg, since)
+	}
+	if timestamp {
+		commandArg = append(commandArg, "-t")
 	}
 	var dockerCmd *exec.Cmd
 	if containerType == "compose" && dockerCommand == "docker-compose" {
@@ -1126,10 +1143,8 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		res.Body.Close()
 		return nil, err
 	}
-	res.Body.Close()
 	var stats *container.StatsResponse
 	if err := json.Unmarshal(body, &stats); err != nil {
 		return nil, err
@@ -1148,7 +1163,7 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 
 func (u *ContainerService) LoadUsers(req dto.OperationWithName) []string {
 	var users []string
-	std, err := cmd.RunDefaultWithStdoutBashCf("docker exec %s cat /etc/passwd", req.Name)
+	std, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("docker", "exec", req.Name, "cat", "/etc/passwd")
 	if err != nil {
 		return users
 	}
@@ -1159,6 +1174,455 @@ func (u *ContainerService) LoadUsers(req dto.OperationWithName) []string {
 		}
 	}
 	return users
+}
+
+func (u *ContainerService) ListContainerFiles(req dto.ContainerFileReq) ([]dto.ContainerFileInfo, error) {
+	if len(req.Path) == 0 {
+		req.Path = "/"
+	}
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, err
+	}
+	defer cli.Close()
+
+	ctx := context.Background()
+	stat, err := cli.ContainerStatPath(ctx, req.ContainerID, req.Path)
+	if err != nil {
+		return nil, normalizeContainerFileError(err)
+	}
+	isDir := stat.Mode.IsDir()
+	isLink := stat.Mode&os.ModeSymlink != 0
+	if isLink && !isDir {
+		linkDir, linkErr := isContainerDir(cli, req.ContainerID, req.Path)
+		if linkErr == nil {
+			isDir = linkDir
+		}
+	}
+	if !isDir {
+		return []dto.ContainerFileInfo{toContainerFileInfo(req.Path, stat, isDir)}, nil
+	}
+
+	output, err := runContainerCommand(cli, req.ContainerID, []string{"ls", "-1A", "--", req.Path})
+	if err != nil {
+		return nil, normalizeContainerFileError(err)
+	}
+	lines := strings.Split(strings.TrimSpace(output), "\n")
+	files := make([]dto.ContainerFileInfo, 0, len(lines))
+	for _, line := range lines {
+		name := strings.TrimSpace(line)
+		if len(name) == 0 || name == "." || name == ".." {
+			continue
+		}
+		childPath := req.Path
+		if childPath == "/" {
+			childPath = "/" + name
+		} else {
+			childPath = strings.TrimSuffix(childPath, "/") + "/" + name
+		}
+		childStat, statErr := cli.ContainerStatPath(ctx, req.ContainerID, childPath)
+		if statErr != nil {
+			continue
+		}
+		childIsDir := childStat.Mode.IsDir()
+		if childStat.Mode&os.ModeSymlink != 0 && !childIsDir {
+			linkDir, linkErr := isContainerDir(cli, req.ContainerID, childPath)
+			if linkErr == nil {
+				childIsDir = linkDir
+			}
+		}
+		files = append(files, toContainerFileInfo(childPath, childStat, childIsDir))
+	}
+	sort.Slice(files, func(i, j int) bool {
+		if files[i].IsDir != files[j].IsDir {
+			return files[i].IsDir
+		}
+		return strings.ToLower(files[i].Name) < strings.ToLower(files[j].Name)
+	})
+	return files, nil
+}
+
+func (u *ContainerService) DeleteContainerFile(req dto.ContainerFileBatchDeleteReq) error {
+	for _, item := range req.Paths {
+		if strings.TrimSpace(item) == "/" {
+			return buserr.New("ErrPathNotDelete")
+		}
+	}
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	command := []string{"rm", "-rf", "--"}
+	command = append(command, req.Paths...)
+	_, err = runContainerCommand(cli, req.ContainerID, command)
+	return err
+}
+
+func (u *ContainerService) UploadContainerFile(req dto.ContainerFileReq, fileName string, fileSize int64, file io.Reader) error {
+	if len(req.Path) == 0 {
+		req.Path = "/"
+	}
+	safeName := path.Base(fileName)
+	if safeName == "." || safeName == "/" || len(safeName) == 0 {
+		return buserr.New("ErrInvalidChar")
+	}
+
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	ctx := context.Background()
+	stat, err := cli.ContainerStatPath(ctx, req.ContainerID, req.Path)
+	if err != nil {
+		if _, mkErr := runContainerCommand(cli, req.ContainerID, []string{"mkdir", "-p", "--", req.Path}); mkErr != nil {
+			return mkErr
+		}
+		stat, err = cli.ContainerStatPath(ctx, req.ContainerID, req.Path)
+		if err != nil {
+			return err
+		}
+	}
+	if !stat.Mode.IsDir() {
+		return fmt.Errorf("path %s is not directory", req.Path)
+	}
+
+	pipeReader, pipeWriter := io.Pipe()
+	writeErr := make(chan error, 1)
+	go func() {
+		tw := tar.NewWriter(pipeWriter)
+		header := &tar.Header{
+			Name:    safeName,
+			Mode:    0644,
+			Size:    fileSize,
+			ModTime: time.Now(),
+		}
+		if err := tw.WriteHeader(header); err != nil {
+			_ = tw.Close()
+			_ = pipeWriter.CloseWithError(err)
+			writeErr <- err
+			return
+		}
+		if _, err := io.Copy(tw, file); err != nil {
+			_ = tw.Close()
+			_ = pipeWriter.CloseWithError(err)
+			writeErr <- err
+			return
+		}
+		if err := tw.Close(); err != nil {
+			_ = pipeWriter.CloseWithError(err)
+			writeErr <- err
+			return
+		}
+		_ = pipeWriter.Close()
+		writeErr <- nil
+	}()
+
+	err = cli.CopyToContainer(ctx, req.ContainerID, req.Path, pipeReader, container.CopyToContainerOptions{
+		CopyUIDGID: true,
+	})
+	if err != nil {
+		_ = pipeReader.CloseWithError(err)
+		_ = pipeWriter.CloseWithError(err)
+		<-writeErr
+		return err
+	}
+	if err := <-writeErr; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *ContainerService) GetContainerFileContent(req dto.ContainerFileReq) (*dto.ContainerFileContent, error) {
+	if len(req.Path) == 0 {
+		return nil, buserr.New("ErrInvalidChar")
+	}
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, err
+	}
+	defer cli.Close()
+
+	stat, err := cli.ContainerStatPath(context.Background(), req.ContainerID, req.Path)
+	if err != nil {
+		return nil, normalizeContainerFileError(err)
+	}
+	if stat.Mode.IsDir() {
+		return nil, fmt.Errorf("path %s is directory", req.Path)
+	}
+
+	content := &dto.ContainerFileContent{Size: stat.Size}
+	headBytes, err := runContainerCommandRaw(cli, req.ContainerID, []string{"head", "-c", "4096", "--", req.Path})
+	if err != nil {
+		return nil, err
+	}
+	if bytes.IndexByte(headBytes, 0) >= 0 {
+		content.IsBinary = true
+		return content, nil
+	}
+
+	const inlinePreviewMax = 512 * 1024
+	if stat.Size <= inlinePreviewMax {
+		raw, err := runContainerCommandRaw(cli, req.ContainerID, []string{"cat", "--", req.Path})
+		if err != nil {
+			return nil, err
+		}
+		content.Content = string(raw)
+		return content, nil
+	}
+
+	raw, err := runContainerCommandRaw(cli, req.ContainerID, []string{"tail", "-n", "300", "--", req.Path})
+	if err != nil {
+		return nil, err
+	}
+	content.Content = string(raw)
+	content.Truncated = true
+	return content, nil
+}
+
+func (u *ContainerService) GetContainerFileSize(req dto.ContainerFileReq) (int64, error) {
+	if len(req.Path) == 0 {
+		return 0, buserr.New("ErrInvalidChar")
+	}
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return 0, err
+	}
+	defer cli.Close()
+
+	stat, err := cli.ContainerStatPath(context.Background(), req.ContainerID, req.Path)
+	if err != nil {
+		return 0, normalizeContainerFileError(err)
+	}
+	if !stat.Mode.IsDir() {
+		return stat.Size, nil
+	}
+	output, err := runContainerCommand(cli, req.ContainerID, []string{"du", "-sb", "--", req.Path})
+	if err != nil {
+		return 0, err
+	}
+	parts := strings.Fields(output)
+	if len(parts) == 0 {
+		return 0, fmt.Errorf("invalid du output")
+	}
+	size, err := strconv.ParseInt(parts[0], 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return size, nil
+}
+
+func (u *ContainerService) DownloadContainerFile(req dto.ContainerFileReq) (io.ReadCloser, string, string, error) {
+	if len(req.Path) == 0 {
+		req.Path = "/"
+	}
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	ctx := context.Background()
+	stat, err := cli.ContainerStatPath(ctx, req.ContainerID, req.Path)
+	if err != nil {
+		_ = cli.Close()
+		return nil, "", "", normalizeContainerFileError(err)
+	}
+
+	fileName := stat.Name
+	if len(fileName) == 0 {
+		fileName = "container-file"
+	}
+	if stat.Mode.IsDir() {
+		if _, err := runContainerCommand(cli, req.ContainerID, []string{"sh", "-c", "command -v tar >/dev/null 2>&1"}); err != nil {
+			_ = cli.Close()
+			return nil, "", "", fmt.Errorf("tar command not found in container")
+		}
+
+		targetPath := path.Clean(req.Path)
+		parentPath := path.Dir(targetPath)
+		targetName := path.Base(targetPath)
+		if parentPath == "." || parentPath == "" {
+			parentPath = "/"
+		}
+		tarStream, err := runContainerCommandStream(cli, req.ContainerID, []string{
+			"tar", "-czf", "-", "-C", parentPath, "--", targetName,
+		})
+		if err != nil {
+			_ = cli.Close()
+			return nil, "", "", err
+		}
+		if !strings.HasSuffix(fileName, ".tar.gz") {
+			fileName += ".tar.gz"
+		}
+		return &closeHookReader{
+			ReadCloser: tarStream,
+			onClose:    cli.Close,
+		}, fileName, "application/gzip", nil
+	}
+
+	fileStream, err := runContainerCommandStream(cli, req.ContainerID, []string{"cat", "--", req.Path})
+	if err != nil {
+		_ = cli.Close()
+		return nil, "", "", err
+	}
+	return &closeHookReader{
+		ReadCloser: fileStream,
+		onClose:    cli.Close,
+	}, fileName, "application/octet-stream", nil
+}
+
+func normalizeContainerFileError(err error) error {
+	if err == nil {
+		return nil
+	}
+	message := strings.ToLower(err.Error())
+	if strings.Contains(message, "no such file or directory") || strings.Contains(message, "not found") {
+		return buserr.New("ErrPathNotFound")
+	}
+	return err
+}
+
+func runContainerCommand(cli *client.Client, containerID string, command []string) (string, error) {
+	raw, err := runContainerCommandRaw(cli, containerID, command)
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(string(raw)), nil
+}
+
+type closeHookReader struct {
+	io.ReadCloser
+	onClose func() error
+}
+
+func (r *closeHookReader) Close() error {
+	var closeErr error
+	if r.ReadCloser != nil {
+		closeErr = r.ReadCloser.Close()
+	}
+	if r.onClose != nil {
+		if err := r.onClose(); err != nil && closeErr == nil {
+			closeErr = err
+		}
+	}
+	return closeErr
+}
+
+func runContainerCommandRaw(cli *client.Client, containerID string, command []string) ([]byte, error) {
+	ctx := context.Background()
+	resp, err := cli.ContainerExecCreate(ctx, containerID, container.ExecOptions{
+		Cmd:          command,
+		AttachStdout: true,
+		AttachStderr: true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	hijack, err := cli.ContainerExecAttach(ctx, resp.ID, container.ExecAttachOptions{})
+	if err != nil {
+		return nil, err
+	}
+	defer hijack.Close()
+
+	raw, err := io.ReadAll(hijack.Reader)
+	if err != nil {
+		return nil, err
+	}
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	if _, err := stdcopy.StdCopy(&stdout, &stderr, bytes.NewReader(raw)); err != nil {
+		return nil, err
+	}
+	output := strings.TrimSpace(stdout.String())
+	errorOutput := strings.TrimSpace(stderr.String())
+	info, err := cli.ContainerExecInspect(ctx, resp.ID)
+	if err != nil {
+		return nil, err
+	}
+	if info.ExitCode != 0 {
+		if len(errorOutput) != 0 {
+			return nil, fmt.Errorf("%s", errorOutput)
+		}
+		if len(output) == 0 {
+			return nil, fmt.Errorf("container command failed with exit code %d", info.ExitCode)
+		}
+		return nil, fmt.Errorf("%s", output)
+	}
+	return stdout.Bytes(), nil
+}
+
+func runContainerCommandStream(cli *client.Client, containerID string, command []string) (io.ReadCloser, error) {
+	ctx := context.Background()
+	resp, err := cli.ContainerExecCreate(ctx, containerID, container.ExecOptions{
+		Cmd:          command,
+		AttachStdout: true,
+		AttachStderr: true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	hijack, err := cli.ContainerExecAttach(ctx, resp.ID, container.ExecAttachOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	pipeReader, pipeWriter := io.Pipe()
+	go func() {
+		defer hijack.Close()
+		var stderr bytes.Buffer
+		_, copyErr := stdcopy.StdCopy(pipeWriter, &stderr, hijack.Reader)
+		if copyErr != nil {
+			_ = pipeWriter.CloseWithError(copyErr)
+			return
+		}
+		info, inspectErr := cli.ContainerExecInspect(ctx, resp.ID)
+		if inspectErr != nil {
+			_ = pipeWriter.CloseWithError(inspectErr)
+			return
+		}
+		if info.ExitCode != 0 {
+			msg := strings.TrimSpace(stderr.String())
+			if len(msg) == 0 {
+				msg = fmt.Sprintf("container command failed with exit code %d", info.ExitCode)
+			}
+			_ = pipeWriter.CloseWithError(fmt.Errorf("%s", msg))
+			return
+		}
+		_ = pipeWriter.Close()
+	}()
+	return pipeReader, nil
+}
+
+func toContainerFileInfo(filePath string, stat container.PathStat, isDir bool) dto.ContainerFileInfo {
+	name := stat.Name
+	if len(name) == 0 {
+		items := strings.Split(strings.TrimSuffix(filePath, "/"), "/")
+		name = items[len(items)-1]
+	}
+	isLink := stat.Mode&os.ModeSymlink != 0
+	return dto.ContainerFileInfo{
+		Name:    name,
+		Path:    filePath,
+		IsDir:   isDir,
+		IsLink:  isLink,
+		LinkTo:  stat.LinkTarget,
+		Size:    stat.Size,
+		Mode:    stat.Mode.String(),
+		ModTime: stat.Mtime.Format(constant.DateTimeLayout),
+	}
+}
+
+func isContainerDir(cli *client.Client, containerID, targetPath string) (bool, error) {
+	_, err := runContainerCommand(cli, containerID, []string{
+		"sh", "-c", "[ -d \"$1\" ]", "sh", targetPath,
+	})
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func stringsToMap(list []string) map[string]string {
@@ -1455,6 +1919,13 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *conta
 	hostConf.Binds = []string{}
 	hostConf.Mounts = []mount.Mount{}
 	hostConf.DNS = req.DNS
+	hostConf.ExtraHosts = []string{}
+	for _, item := range req.ExtraHosts {
+		if len(item.Hostname) == 0 || len(item.IP) == 0 {
+			continue
+		}
+		hostConf.ExtraHosts = append(hostConf.ExtraHosts, fmt.Sprintf("%s:%s", item.Hostname, item.IP))
+	}
 	config.Volumes = make(map[string]struct{})
 	for _, volume := range req.Volumes {
 		item := mount.Mount{
@@ -1760,8 +2231,6 @@ func searchWithFilter(req dto.PageContainer, containers []container.Summary) []d
 			ImageName:     item.Image,
 			State:         item.State,
 			RunTime:       item.Status,
-			SizeRw:        item.SizeRw,
-			SizeRootFs:    item.SizeRootFs,
 			IsFromApp:     IsFromApp,
 			IsFromCompose: IsFromCompose,
 		}
@@ -1775,9 +2244,9 @@ func searchWithFilter(req dto.PageContainer, containers []container.Summary) []d
 		}
 		records = append(records, info)
 	}
-	dscriptions, _ := settingRepo.GetDescriptionList(repo.WithByType("container"))
+	descriptions, _ := settingRepo.GetDescriptionList(repo.WithByType("container"))
 	for i := 0; i < len(records); i++ {
-		for _, desc := range dscriptions {
+		for _, desc := range descriptions {
 			if desc.ID == records[i].ContainerID {
 				records[i].Description = desc.Description
 				records[i].IsPinned = desc.IsPinned

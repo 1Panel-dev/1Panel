@@ -41,12 +41,13 @@ export const changePort = (params: App.ChangePort) => {
     return http.post<any>('apps/installed/port/change', params);
 };
 
-export const searchAppInstalled = (search: App.AppInstallSearch) => {
-    return http.post<ResPage<App.AppInstallDto>>('apps/installed/search', search);
+export const searchAppInstalled = (search: App.AppInstallSearch, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.post<ResPage<App.AppInstallDto>>(`apps/installed/search${params}`, search);
 };
 
 export const listAppInstalled = () => {
-    return http.get<Array<App.AppInstalledInfo>>('apps/installed/list');
+    return http.get<Array<App.AppInstalledOption>>('apps/installed/list');
 };
 
 export const getAppPort = (type: string, name: string) => {
@@ -89,8 +90,9 @@ export const getAppService = (key: string | undefined, node?: string) => {
     return http.get<App.AppService[]>(`apps/services/${key}${params}`);
 };
 
-export const getAppUpdateVersions = (req: App.AppUpdateVersionReq) => {
-    return http.post<any>(`apps/installed/update/versions`, req);
+export const getAppUpdateVersions = (req: App.AppUpdateVersionReq, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.post<any>(`apps/installed/update/versions${params}`, req);
 };
 
 export const getAppDefaultConfig = (key: string, name: string) => {
@@ -121,6 +123,10 @@ export const updateInstallConfig = (req: App.AppConfigUpdate) => {
     return http.post(`apps/installed/config/update`, req);
 };
 
+export const updateAppInstallSort = (items: Array<{ installID: number; sortOrder: number }>) => {
+    return http.post(`apps/installed/sort/update`, { items });
+};
+
 export const syncCutomAppStore = (req: App.AppStoreSync) => {
     return http.post(`/custom/app/sync`, req);
 };
@@ -129,8 +135,12 @@ export const getCurrentNodeCustomAppConfig = () => {
     return http.get<App.CustomAppStoreConfig>(`/custom/app/config`);
 };
 
-export function getAppIconUrl(appId: number, node?: string): string {
+export function getAppIconUrl(appKey: string, node?: string): string {
     const baseURL = import.meta.env.VITE_API_URL as string;
     const params = node ? `?operateNode=${node}` : '';
-    return `${baseURL}/apps/icon/${appId}${params}`;
+    return `${baseURL}/apps/icon/${appKey}${params}`;
 }
+
+export const installAppToNodes = (param: App.InstallAppToNodes) => {
+    return http.post(`/core/xpack/sync/app/install`, param);
+};

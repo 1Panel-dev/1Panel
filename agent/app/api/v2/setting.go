@@ -5,6 +5,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
@@ -20,6 +21,15 @@ import (
 // @Router /settings/search [post]
 func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 	setting, err := settingService.GetSettingInfo()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, setting)
+}
+
+func (b *BaseApi) GetTerminalAISettingInfo(c *gin.Context) {
+	setting, err := settingService.GetTerminalAIInfo()
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -59,6 +69,75 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	helper.Success(c)
 }
 
+func (b *BaseApi) UpdateTerminalAISetting(c *gin.Context) {
+	var req dto.TerminalAIInfo
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := settingService.UpdateTerminalAI(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+func (b *BaseApi) GetFileManageAISettingInfo(c *gin.Context) {
+	setting, err := settingService.GetFileManageAIInfo()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, setting)
+}
+
+func (b *BaseApi) UpdateFileManageAISetting(c *gin.Context) {
+	var req dto.FileManageAIInfo
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := settingService.UpdateFileManageAI(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags System Setting
+// @Summary Load file history setting info
+// @Success 200 {object} response.FileHistorySettingInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/file-history/search [post]
+func (b *BaseApi) GetFileHistorySettingInfo(c *gin.Context) {
+	setting, err := settingService.GetFileHistorySettingInfo()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, setting)
+}
+
+// @Tags System Setting
+// @Summary Update file history setting
+// @Accept json
+// @Param request body request.FileHistorySettingUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/file-history/update [post]
+func (b *BaseApi) UpdateFileHistorySetting(c *gin.Context) {
+	var req request.FileHistorySettingUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := settingService.UpdateFileHistorySetting(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
 // @Tags System Setting
 // @Summary Load local backup dir
 // @Success 200 {string} path
@@ -80,13 +159,38 @@ func (b *BaseApi) LoadLocalConn(c *gin.Context) {
 }
 
 func (b *BaseApi) CheckLocalConn(c *gin.Context) {
-	_, err := loadLocalConn()
+	client, err := loadLocalConn()
+	if err == nil && client != nil {
+		client.Close()
+	}
 	helper.SuccessWithData(c, err == nil)
 }
 
 // @Tags System Setting
+// @Summary Update local is conn
+// @Accept json
+// @Param request body dto.SSHDefaultConn true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/ssh/conn/default [post]
+// @x-panel-log {"bodyKeys":["defaultConn"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"本地终端默认连接 [defaultConn]","formatEN":"update system default conn [defaultConn]"}
+func (b *BaseApi) SetDefaultIsConn(c *gin.Context) {
+	var req dto.SSHDefaultConn
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := settingService.SetDefaultIsConn(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags System Setting
 // @Summary Check local conn info
-// @Success 200 {bool} isOk
+// @Success 200 {boolean} isOk
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /settings/ssh/check/info [post]

@@ -27,6 +27,8 @@ export namespace Website {
         dbID: number;
         dbType: string;
         favorite: boolean;
+        streamPorts: string;
+        udp: boolean;
     }
 
     export interface WebsiteDTO extends Website {
@@ -37,7 +39,17 @@ export namespace Website {
         runtimeName: string;
         runtimeType: string;
         openBaseDir: boolean;
+        algorithm: string;
+        servers: NginxUpstreamServer[];
     }
+
+    export interface WebsiteStreamUpdate {
+        websiteID: number;
+        algorithm: string;
+        streamPorts?: string;
+        servers: NginxUpstreamServer[];
+    }
+
     export interface WebsiteRes extends CommonModel {
         protocol: string;
         primaryDomain: string;
@@ -93,6 +105,10 @@ export namespace Website {
         dbUser?: string;
         dbHost?: string;
         domains: SubDomain[];
+        streamPorts?: string;
+        name: string;
+        algorithm: string;
+        servers: NginxUpstreamServer[];
     }
 
     export interface WebSiteUpdateReq {
@@ -120,6 +136,12 @@ export namespace Website {
 
     export interface OptionReq {
         types?: string[];
+    }
+
+    export interface WebsiteOption {
+        id: number;
+        primaryDomain: string;
+        alias: string;
     }
 
     export interface WebSiteLog {
@@ -182,20 +204,20 @@ export namespace Website {
     export interface DnsAccount extends CommonModel {
         name: string;
         type: string;
-        authorization: Object;
+        authorization: object;
     }
 
     export interface DnsAccountCreate {
         name: string;
         type: string;
-        authorization: Object;
+        authorization: object;
     }
 
     export interface DnsAccountUpdate {
         id: number;
         name: string;
         type: string;
-        authorization: Object;
+        authorization: object;
     }
 
     export interface SSL extends CommonModel {
@@ -229,6 +251,7 @@ export namespace Website {
         nodes: string;
         privateKeyPath: string;
         certPath: string;
+        isIP: boolean;
     }
 
     export interface SSLDTO extends SSL {
@@ -243,6 +266,7 @@ export namespace Website {
         dnsAccountId: number;
         id?: number;
         description: string;
+        isIP: boolean;
     }
 
     export interface SSLApply {
@@ -327,6 +351,20 @@ export namespace Website {
         http3: boolean;
     }
 
+    export interface BatchSetHttps {
+        ids: number[];
+        taskID: string;
+        enable: boolean;
+        websiteSSLId?: number;
+        type: string;
+        certificate?: string;
+        privateKey?: string;
+        httpConfig: string;
+        SSLProtocol: string[];
+        algorithm: string;
+        http3: boolean;
+    }
+
     export interface CheckReq {
         installIds?: number[];
     }
@@ -365,7 +403,7 @@ export namespace Website {
         content: string;
     }
 
-    export interface CustomRewirte {
+    export interface CustomRewrite {
         operate: string;
         name: string;
         content: string;
@@ -407,13 +445,25 @@ export namespace Website {
         proxyProtocol?: string;
         sni?: boolean;
         proxySSLName: string;
+        sslVerify?: boolean;
         cors: boolean;
         allowOrigins: string;
         allowMethods: string;
         allowHeaders: string;
         allowCredentials: boolean;
         preflight: boolean;
-        browserCache?: boolean;
+        browserCache?: 'enable' | 'disable' | 'noModify';
+    }
+
+    export interface ProxyDel {
+        id: number;
+        name: string;
+    }
+
+    export interface ProxyStatusUpdate {
+        id: number;
+        name: string;
+        status: string;
     }
 
     export interface ProxReplace {
@@ -581,6 +631,7 @@ export namespace Website {
     export interface WebsiteHtmlUpdate {
         type: string;
         content: string;
+        sync: boolean;
     }
 
     export interface NginxUpstream {

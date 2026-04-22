@@ -3,11 +3,12 @@ import { ReqPage, ResPage } from '../interface';
 import { Website } from '../interface/website';
 import { File } from '../interface/file';
 import { TimeoutEnum } from '@/enums/http-enum';
-import { deepCopy } from '@/utils/util';
-import { Base64 } from 'js-base64';
+import { deepCopy } from '@/utils/misc';
+import { encodeBase64Fields } from '@/utils/base64';
 
-export const searchWebsites = (req: Website.WebSiteSearch) => {
-    return http.post<ResPage<Website.WebsiteRes>>(`/websites/search`, req);
+export const searchWebsites = (req: Website.WebSiteSearch, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.post<ResPage<Website.WebsiteRes>>(`/websites/search${params}`, req);
 };
 
 export const listWebsites = () => {
@@ -16,14 +17,13 @@ export const listWebsites = () => {
 
 export const createWebsite = (req: Website.WebSiteCreateReq) => {
     let request = deepCopy(req) as Website.WebSiteCreateReq;
-    if (request.ftpPassword) {
-        request.ftpPassword = Base64.encode(request.ftpPassword);
-    }
+    encodeBase64Fields(request, ['ftpPassword']);
     return http.post<any>(`/websites`, request, TimeoutEnum.T_10M);
 };
 
-export const opWebsite = (req: Website.WebSiteOp) => {
-    return http.post<any>(`/websites/operate`, req);
+export const opWebsite = (req: Website.WebSiteOp, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post<any>(`/websites/operate${query}`, req);
 };
 
 export const opWebsiteLog = (req: Website.WebSiteOpLog) => {
@@ -39,7 +39,7 @@ export const getWebsite = (id: number) => {
 };
 
 export const getWebsiteOptions = (req: Website.OptionReq) => {
-    return http.post<any>(`/websites/options`, req);
+    return http.post<Website.WebsiteOption[]>(`/websites/options`, req);
 };
 
 export const getWebsiteConfig = (id: number, type: string) => {
@@ -111,11 +111,11 @@ export const searchSSL = (req: ReqPage) => {
 };
 
 export const listSSL = (req: Website.SSLReq) => {
-    return http.post<Website.SSLDTO[]>(`/websites/ssl/search`, req);
+    return http.post<Website.SSLDTO[]>(`/websites/ssl/list`, req);
 };
 
 export const listLocalNodeSSL = (req: Website.SSLReq) => {
-    return http.postLocalNode<Website.SSLDTO[]>(`/websites/ssl/search`, req);
+    return http.postLocalNode<Website.SSLDTO[]>(`/websites/ssl/list`, req);
 };
 
 export const createSSL = (req: Website.SSLCreate) => {
@@ -155,7 +155,7 @@ export const preCheck = (req: Website.CheckReq) => {
 };
 
 export const updateNginxFile = (req: Website.NginxUpdate) => {
-    return http.post<any>(`/websites/nginx/update`, req);
+    return http.post<any>(`/websites/nginx/update`, req, TimeoutEnum.T_3M);
 };
 
 export const changeDefaultServer = (req: Website.DefaultServerUpdate) => {
@@ -184,6 +184,14 @@ export const getProxyConfig = (req: Website.ProxyReq) => {
 
 export const operateProxyConfig = (req: Website.ProxyReq) => {
     return http.post<any>(`/websites/proxies/update`, req);
+};
+
+export const deleteProxyConfig = (req: Website.ProxyDel) => {
+    return http.post<any>(`/websites/proxies/delete`, req);
+};
+
+export const updateProxyConfigStatus = (req: Website.ProxyStatusUpdate) => {
+    return http.post<any>(`/websites/proxies/status`, req);
 };
 
 export const updateProxyConfigFile = (req: Website.ProxyFileUpdate) => {
@@ -340,7 +348,7 @@ export const changeDatabase = (req: Website.ChangeDatabase) => {
     return http.post(`/websites/databases`, req);
 };
 
-export const operateCustomRewrite = (req: Website.CustomRewirte) => {
+export const operateCustomRewrite = (req: Website.CustomRewrite) => {
     return http.post(`/websites/rewrite/custom`, req);
 };
 
@@ -356,7 +364,7 @@ export const execComposer = (req: Website.ExecComposer) => {
     return http.post(`/websites/exec/composer`, req);
 };
 
-export const batchOpreate = (req: Website.BatchOperate) => {
+export const batchOperate = (req: Website.BatchOperate) => {
     return http.post(`/websites/batch/operate`, req);
 };
 
@@ -370,4 +378,12 @@ export const updateCorsConfig = (req: Website.CorsConfigReq) => {
 
 export const batchSetGroup = (req: Website.BatchSetGroup) => {
     return http.post(`/websites/batch/group`, req);
+};
+
+export const updateWebsiteStream = (req: Website.WebsiteStreamUpdate) => {
+    return http.post(`/websites/stream/update`, req);
+};
+
+export const batchSetHttps = (req: Website.BatchSetHttps) => {
+    return http.post(`/websites/batch/ssl`, req);
 };

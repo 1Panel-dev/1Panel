@@ -143,6 +143,7 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 			Timeout:        cronjob.Timeout,
 			IgnoreErr:      cronjob.IgnoreErr,
 			Secret:         cronjob.Secret,
+			Args:           cronjob.Args,
 		}
 		switch cronjob.Type {
 		case "app":
@@ -237,6 +238,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 			Timeout:        item.Timeout,
 			IgnoreErr:      item.IgnoreErr,
 			Secret:         item.Secret,
+			Args:           item.Args,
 		}
 		hasNotFound := false
 		switch item.Type {
@@ -279,6 +281,15 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 			if strings.Contains(cronjob.DBType, "postgresql") {
 				for _, db := range item.DBNames {
 					dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(db.Name), repo.WithByName(db.DetailName))
+					if err != nil {
+						hasNotFound = true
+						continue
+					}
+					dbIDs = append(dbIDs, fmt.Sprintf("%v", dbItem.ID))
+				}
+			} else if cronjob.DBType == constant.AppMongodb {
+				for _, db := range item.DBNames {
+					dbItem, err := mongodbRepo.Get(mongodbRepo.WithByMongodbName(db.Name), repo.WithByName(db.DetailName))
 					if err != nil {
 						hasNotFound = true
 						continue
@@ -447,7 +458,7 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 func (u *CronjobService) LoadNextHandle(specStr string) ([]string, error) {
 	spec := cron.NewParser(cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow)
 	now := time.Now()
-	var nexts [5]string
+	var next [5]string
 	if strings.HasPrefix(specStr, "@every ") {
 		duration := time.Minute
 		if strings.HasSuffix(specStr, "s") {
@@ -462,10 +473,10 @@ func (u *CronjobService) LoadNextHandle(specStr string) ([]string, error) {
 		}
 		for i := 0; i < 5; i++ {
 			nextTime := now.Add(time.Duration(durationItem) * duration)
-			nexts[i] = nextTime.Format(constant.DateTimeLayout)
+			next[i] = nextTime.Format(constant.DateTimeLayout)
 			now = nextTime
 		}
-		return nexts[:], nil
+		return next[:], nil
 	}
 	sched, err := spec.Parse(specStr)
 	if err != nil {
@@ -473,10 +484,10 @@ func (u *CronjobService) LoadNextHandle(specStr string) ([]string, error) {
 	}
 	for i := 0; i < 5; i++ {
 		nextTime := sched.Next(now)
-		nexts[i] = nextTime.Format(constant.DateTimeLayout)
+		next[i] = nextTime.Format(constant.DateTimeLayout)
 		now = nextTime
 	}
-	return nexts[:], nil
+	return next[:], nil
 }
 
 func (u *CronjobService) LoadRecordLog(req dto.OperateByID) string {
@@ -633,8 +644,8 @@ func (u *CronjobService) HandleStop(id uint) error {
 	if len(record.TaskID) == 0 {
 		return nil
 	}
-	if cancle, ok := global.TaskCtxMap[record.TaskID]; ok {
-		cancle()
+	if cancel, ok := global.TaskCtxMap[record.TaskID]; ok {
+		cancel()
 	}
 	return nil
 }
@@ -733,6 +744,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate) error {
 	upMap["timeout"] = req.Timeout
 	upMap["ignore_err"] = req.IgnoreErr
 	upMap["secret"] = req.Secret
+	upMap["args"] = req.Args
 	err = cronjobRepo.Update(id, upMap)
 	if err != nil {
 		return err
@@ -762,7 +774,7 @@ func (u *CronjobService) UpdateStatus(id uint, status string) error {
 	)
 
 	if status == constant.StatusEnable {
-		entryIDs, err = u.StartJob(&cronjob, false)
+		entryIDs, err = u.StartJob(&cronjob, true)
 		if err != nil {
 			return err
 		}

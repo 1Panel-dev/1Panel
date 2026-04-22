@@ -3,11 +3,7 @@ base:
   mode: dev
   is_demo: false
   is_offline: false
-
-remote_url:
-  app_repo: https://apps-assets.fit2cloud.com
-  repo_url: https://resource.fit2cloud.com/1panel/package/v2
-  resource_url: https://resource.fit2cloud.com/1panel/resource/v2
+  is_fxplay: false
 
 log:
   level: debug

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('container.createNetwork')" @close="handleClose" size="large">
+    <DrawerPro v-model="drawerVisible" :header="$t('commons.button.create')" @close="handleClose" size="large">
         <el-form ref="formRef" label-position="top" v-loading="loading" :model="form" :rules="rules" label-width="80px">
             <el-form-item :label="$t('container.networkName')" prop="name">
                 <el-input clearable v-model.trim="form.name" />
@@ -143,7 +143,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { createNetwork } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
-import { checkIp, checkIpV6 } from '@/utils/util';
+import { checkIp, checkIpV6 } from '@/utils/validate';
 import { getNetworkOptions } from '@/api/modules/host';
 
 const loading = ref(false);

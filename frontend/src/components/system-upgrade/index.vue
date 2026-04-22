@@ -101,12 +101,13 @@ const toLxware = () => {
     if (!globalStore.isIntl) {
         window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
     } else {
-        window.open('https://1panel.hk/pricing' + '', '_blank', 'noopener,noreferrer');
+        window.open('https://1panel.pro/pricing' + '', '_blank', 'noopener,noreferrer');
     }
 };
 
 const to1Panel = () => {
-    window.open('https://1panel.cn', '_blank', 'noopener,noreferrer');
+    let url = globalStore.isIntl ? 'https://1panel.pro' : 'https://1panel.cn';
+    window.open(url, '_blank', 'noopener,noreferrer');
 };
 
 const toDoc = () => {
@@ -117,7 +118,7 @@ const toForum = () => {
     let url = globalStore.isIntl
         ? 'https://github.com/1Panel-dev/1Panel/discussions'
         : 'https://bbs.fit2cloud.com/c/1p/7';
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
 };
 
 const toGithub = () => {

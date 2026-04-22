@@ -45,82 +45,44 @@
                 </template>
                 <Terminal
                     :style="{
-                        height: cmdPanelVisible
-                            ? `calc(100vh - ${loadHeightWithPanel()})`
-                            : `calc(100vh - ${loadHeight()})`,
+                        height: `calc(100vh - ${loadHeight()})`,
                         'background-color': `var(--panel-logs-bg-color)`,
                     }"
                     :ref="'t-' + item.index"
                     :key="item.Refresh"
                 ></Terminal>
 
-                <transition name="el-fade-in">
-                    <div
-                        v-show="cmdPanelVisible"
-                        class="mb-2 border-b border-[var(--el-border-color)] pb-2 w-full bg-[var(--el-bg-color)]"
+                <div class="flex items-center gap-2 w-full py-2 flex-wrap">
+                    <AiSetting v-if="!mobile" class="shrink-0" />
+                    <el-cascader
+                        v-model="quickCmd"
+                        :options="commandTree"
+                        :props="quickCommandProps"
+                        :show-all-levels="false"
+                        filterable
+                        clearable
+                        class="quick-command-cascader min-w-[180px] max-w-[260px] shrink-0"
+                        :placeholder="$t('terminal.quickCommand')"
+                        @change="handleQuickCommandChange"
                     >
-                        <el-tabs v-model="activeGroupTab" type="card" class="command-tabs">
-                            <el-tab-pane
-                                v-for="group in commandTree"
-                                :key="group.value"
-                                :label="''"
-                                :name="group.value"
+                        <template #default="{ data }">
+                            <el-tooltip
+                                v-if="!data.children?.length"
+                                placement="right"
+                                popper-class="command-detail-tooltip"
                             >
-                                <template #label>
-                                    <span class="group-tab-label">
-                                        <span v-if="group.label.length <= 6">{{ group.label }}</span>
-                                        <el-tooltip v-else :content="group.label" placement="top">
-                                            <span>{{ group.label.substring(0, 6) }}...</span>
-                                        </el-tooltip>
-                                    </span>
+                                <template #content>
+                                    <div class="command-detail-content">{{ data.value }}</div>
                                 </template>
-                                <div class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-2 p-0">
-                                    <el-tag
-                                        v-for="cmd in group.children"
-                                        :key="cmd.value"
-                                        class="command-tag"
-                                        @click="executeCommand(cmd.value)"
-                                        type="info"
-                                        effect="plain"
-                                    >
-                                        <div class="flex items-center justify-between w-full gap-1.5">
-                                            <span class="command-tag-name" :title="cmd.label">
-                                                {{
-                                                    cmd.label.length > 8 ? cmd.label.substring(0, 8) + '...' : cmd.label
-                                                }}
-                                            </span>
-                                            <el-popover placement="top" :width="320" trigger="hover">
-                                                <template #reference>
-                                                    <el-icon class="command-preview-icon">
-                                                        <InfoFilled />
-                                                    </el-icon>
-                                                </template>
-                                                <div class="command-preview">
-                                                    <div class="command-preview-name">
-                                                        <strong>{{ cmd.label }}</strong>
-                                                    </div>
-                                                    <div class="command-preview-value">{{ cmd.value }}</div>
-                                                </div>
-                                            </el-popover>
-                                        </div>
-                                    </el-tag>
+                                <div class="cascader-option">
+                                    <span class="cascader-option-label">{{ data.label }}</span>
                                 </div>
-                            </el-tab-pane>
-                        </el-tabs>
-                    </div>
-                </transition>
-
-                <div class="flex items-center gap-3 w-full py-2 flex-wrap">
-                    <el-button
-                        @click="cmdPanelVisible = !cmdPanelVisible"
-                        type="primary"
-                        class="min-w-[120px] max-w-[150px] shrink-0"
-                    >
-                        {{ $t('terminal.quickCommand') }}
-                        <el-icon class="ml-1">
-                            <component :is="cmdPanelVisible ? 'ArrowUp' : 'ArrowDown'" />
-                        </el-icon>
-                    </el-button>
+                            </el-tooltip>
+                            <div v-else class="cascader-option">
+                                <span class="cascader-option-label">{{ data.label }}</span>
+                            </div>
+                        </template>
+                    </el-cascader>
                     <el-input
                         v-model="batchVal"
                         @keydown.enter.exact.prevent="batchInput"
@@ -206,8 +168,7 @@
                                 :props="defaultProps"
                                 :filter-node-method="filterHost"
                                 :empty-text="$t('terminal.noHost')"
-                                class="host-tree compact"
-                                :style="{ 'max-height': '200px' }"
+                                class="host-tree"
                             >
                                 <template #default="{ node, data }">
                                     <span class="custom-tree-node w-full">
@@ -284,6 +245,7 @@ import { GlobalStore } from '@/store';
 import router from '@/routers';
 import { getCommandTree } from '@/api/modules/command';
 import { getAgentSettingByKey } from '@/api/modules/setting';
+import AiSetting from '@/views/terminal/setting/ai/index.vue';
 
 const dialogRef = ref();
 const ctx = getCurrentInstance() as any;
@@ -307,8 +269,9 @@ const terminalTabs = ref([]) as any;
 let tabIndex = 0;
 
 const commandTree = ref();
-const cmdPanelVisible = ref(false);
-const activeGroupTab = ref('');
+const quickCommandProps = {
+    expandTrigger: 'hover' as const,
+};
 let quickCmd = ref();
 let batchVal = ref();
 let isBatch = ref<boolean>(false);
@@ -361,10 +324,7 @@ const cleanTimer = () => {
 };
 
 const loadHeight = () => {
-    return globalStore.openMenuTabs ? '230px' : '190px';
-};
-const loadHeightWithPanel = () => {
-    return globalStore.openMenuTabs ? '470px' : '430px';
+    return globalStore.openMenuTabs ? '250px' : '210px';
 };
 const loadEmptyHeight = () => {
     return globalStore.openMenuTabs ? '201px' : '156px';
@@ -415,9 +375,6 @@ const loadCommandTree = async () => {
             item.label = i18n.global.t('commons.table.default');
         }
     }
-    if (commandTree.value.length > 0) {
-        activeGroupTab.value = commandTree.value[0].value;
-    }
 };
 
 const executeCommand = (command: string) => {
@@ -431,6 +388,14 @@ const executeCommand = (command: string) => {
     } else {
         ctx.refs[`t-${terminalValue.value}`] && ctx.refs[`t-${terminalValue.value}`][0].sendMsg(command + '\n');
     }
+};
+
+const handleQuickCommandChange = (val: Array<string>) => {
+    if (!val?.length) {
+        return;
+    }
+    executeCommand(val[val.length - 1]);
+    quickCmd.value = '';
 };
 
 function batchInput() {
@@ -514,7 +479,7 @@ const onReconnect = async (item: any) => {
     nextTick(() => {
         ctx.refs[`t-${item.index}`] &&
             ctx.refs[`t-${item.index}`][0].acceptParams({
-                endpoint: '/api/v2/core/hosts/terminal',
+                endpoint: '/api/v2/hosts/terminal',
                 args: `id=${item.wsID}`,
                 initCmd: initCmd.value,
                 error: res.data ? '' : 'Failed to set up the connection. Please check the host information',
@@ -537,7 +502,7 @@ const onConnTerminal = async (title: string, wsID: number) => {
     nextTick(() => {
         ctx.refs[`t-${terminalValue.value}`] &&
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
-                endpoint: '/api/v2/core/hosts/terminal',
+                endpoint: '/api/v2/hosts/terminal',
                 args: `id=${wsID}`,
                 initCmd: initCmd.value,
                 error: res.data ? '' : 'Authentication failed. Please check the host information!',
@@ -613,59 +578,8 @@ onMounted(() => {
 }
 
 .host-tree {
-    :deep(.el-tree-node) {
-        .el-tree-node__content {
-            height: 36px;
-            padding: 0 12px;
-
-            &:hover {
-                background-color: var(--el-fill-color-light);
-            }
-        }
-
-        .el-tree-node__label {
-            flex: 1;
-            padding-left: 8px;
-        }
-
-        .el-tree-node__expand-icon {
-            margin-right: 8px;
-        }
-    }
-
-    :deep(.el-tree__empty-block) {
-        padding: 24px 0;
-        min-height: auto;
-    }
-
-    :deep(.el-tree__empty-text) {
-        color: var(--el-text-color-secondary);
-        font-size: 13px;
-    }
-
-    &.compact {
-        :deep(.el-tree-node) {
-            .el-tree-node__content {
-                height: 28px;
-                padding: 0 8px;
-            }
-
-            .el-tree-node__label {
-                padding-left: 4px;
-            }
-
-            .el-tree-node__expand-icon {
-                margin-right: 4px;
-                font-size: 12px;
-            }
-        }
-
-        :deep(.el-tree-node__children) {
-            .el-tree-node__content {
-                padding-left: 20px;
-            }
-        }
-    }
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .search-container {
@@ -703,97 +617,32 @@ onMounted(() => {
     transition: height 0.2s ease;
 }
 
-.command-tabs {
-    :deep(.el-tabs__header) {
-        margin-bottom: 0;
-        background-color: var(--el-bg-color);
-    }
-    :deep(.el-tabs__content) {
-        height: 180px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        background-color: var(--el-bg-color);
-    }
-    :deep(.el-tabs__item) {
-        min-width: 80px;
-        max-width: 110px;
-        text-align: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        padding: 0 8px;
-    }
-}
-.group-tab-label {
-    width: 90px;
-    display: inline-block;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 14px;
-}
-
-.command-tag {
-    cursor: pointer;
-    height: auto;
-    padding: 8px 12px;
-    transition: all 0.3s;
-    border-radius: 4px;
-    white-space: nowrap;
-    border: 1px solid transparent;
-
-    &:hover {
-        border-color: var(--el-color-primary);
+.quick-command-cascader {
+    :deep(.el-input__wrapper) {
+        border-radius: 6px;
     }
 }
 
-.command-tag-name {
-    font-weight: 500;
-    font-size: 13px;
-    flex: 1;
-    text-align: left;
-}
-
-.command-preview-icon {
-    font-size: 14px;
-    opacity: 0.6;
-    transition: opacity 0.3s;
-    cursor: help;
-    flex-shrink: 0;
+.cascader-option {
+    width: 100%;
     display: flex;
     align-items: center;
-
-    &:hover {
-        opacity: 1;
-    }
+    min-width: 0;
 }
 
-.command-preview {
-    .command-preview-name {
-        font-size: 13px;
-        margin-bottom: 6px;
-        color: var(--el-text-color-primary);
-        word-break: break-word;
-    }
-
-    .command-preview-value {
-        font-size: 12px;
-        font-family: monospace;
-        padding: 8px;
-        background-color: var(--el-fill-color-light);
-        border-radius: 4px;
-        color: var(--el-text-color-regular);
-        word-break: break-all;
-        white-space: pre-wrap;
-    }
-}
-
-.command-tag-name {
+.cascader-option-label {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    display: inline-block;
+}
+
+:deep(.command-detail-tooltip) {
+    max-width: 420px;
+}
+
+.command-detail-content {
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.5;
 }
 </style>

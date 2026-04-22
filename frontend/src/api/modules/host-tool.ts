@@ -10,19 +10,19 @@ export const operateSupervisor = (operate: string) => {
     return http.post<any>(`/hosts/tool/operate`, { type: 'supervisord', operate: operate });
 };
 
-export const operateSupervisorConfig = (req: HostTool.SupersivorConfig) => {
-    return http.post<HostTool.SupersivorConfigRes>(`/hosts/tool/config`, req);
+export const operateSupervisorConfig = (req: HostTool.SupervisorConfig) => {
+    return http.post<HostTool.SupervisorConfigRes>(`/hosts/tool/config`, req);
 };
 
 export const getSupervisorLog = () => {
     return http.post<any>(`/hosts/tool/log`, { type: 'supervisord' });
 };
 
-export const initSupervisor = (req: HostTool.SupersivorInit) => {
+export const initSupervisor = (req: HostTool.SupervisorInit) => {
     return http.post<any>(`/hosts/tool/init`, req);
 };
 
-export const createSupervisorProcess = (req: HostTool.SupersivorProcess) => {
+export const createSupervisorProcess = (req: HostTool.SupervisorProcess) => {
     return http.post<any>(`/hosts/tool/supervisor/process`, req);
 };
 
@@ -31,7 +31,7 @@ export const operateSupervisorProcess = (req: HostTool.ProcessReq) => {
 };
 
 export const getSupervisorProcess = () => {
-    return http.get<HostTool.SupersivorProcess[]>(`/hosts/tool/supervisor/process`, {}, { timeout: TimeoutEnum.T_3M });
+    return http.get<HostTool.SupervisorProcess[]>(`/hosts/tool/supervisor/process`, {}, { timeout: TimeoutEnum.T_3M });
 };
 
 export const operateSupervisorProcessFile = (req: HostTool.ProcessFileReq) => {

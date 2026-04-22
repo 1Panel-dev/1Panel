@@ -68,7 +68,7 @@ const handleClose = () => {
         fileForm.value.resetFields();
     }
     open.value = false;
-    em('close', open);
+    em('close', open.value);
 };
 
 const getLinkPath = (path: string) => {

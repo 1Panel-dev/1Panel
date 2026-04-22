@@ -40,4 +40,6 @@ const (
 
 	OrderDesc = "descending"
 	OrderAsc  = "ascending"
+	Desc      = "desc"
+	Asc       = "asc"
 )

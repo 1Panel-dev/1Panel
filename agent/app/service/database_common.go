@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -43,6 +44,10 @@ func (u *DBCommonService) LoadBaseInfo(req dto.OperationWithNameAndType) (*dto.D
 
 func (u *DBCommonService) LoadDatabaseFile(req dto.OperationWithNameAndType) (string, error) {
 	filePath := ""
+	safeName := filepath.Base(req.Name)
+	if safeName != req.Name || strings.Contains(safeName, "..") {
+		return "", buserr.New("ErrInvalidParams")
+	}
 	switch req.Type {
 	case "mysql-cluster-conf":
 		filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mysql-cluster/%s/conf/my.cnf", req.Name))

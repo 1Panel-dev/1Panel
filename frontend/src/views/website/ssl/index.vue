@@ -59,7 +59,7 @@
                         prop="domains"
                         min-width="90px"
                     ></el-table-column>
-                    <el-table-column :label="$t('ssl.applyType')" show-overflow-tooltip prop="provider" width="120px">
+                    <el-table-column :label="$t('ssl.applyType')" show-overflow-tooltip prop="provider" width="200px">
                         <template #default="{ row }">{{ getProvider(row.provider) }}</template>
                     </el-table-column>
                     <el-table-column
@@ -72,7 +72,7 @@
                         :label="$t('commons.table.status')"
                         show-overflow-tooltip
                         prop="status"
-                        width="100px"
+                        width="110px"
                     >
                         <template #default="{ row }">
                             <el-popover
@@ -97,7 +97,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.button.log')" width="80px">
+                    <el-table-column :label="$t('commons.button.log')" prop="log" width="80px">
                         <template #default="{ row }">
                             <el-button
                                 @click="openSSLLog(row)"
@@ -127,7 +127,7 @@
                             </fu-read-write-switch>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('ssl.autoRenew')" width="100px">
+                    <el-table-column :label="$t('ssl.autoRenew')" prop="autoRenew" width="200px">
                         <template #default="{ row }">
                             <el-switch
                                 :disabled="
@@ -153,7 +153,7 @@
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         :fixed="mobile ? false : 'right'"
-                        width="300px"
+                        width="320px"
                         fix
                     />
                 </ComplexTable>
@@ -180,7 +180,8 @@ import AcmeAccount from './acme-account/index.vue';
 import CA from './ca/index.vue';
 import Create from './create/index.vue';
 import Detail from './detail/index.vue';
-import { dateFormat, getProvider } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { getProvider } from '@/utils/ssl';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -309,7 +310,7 @@ const mobile = computed(() => {
 
 const changeSort = ({ order }) => {
     req.orderBy = 'expire_date';
-    req.order = order;
+    req.order = order || 'descending';
     search();
 };
 
@@ -319,7 +320,7 @@ const search = () => {
         pageSize: paginationConfig.pageSize,
         domain: req.domain,
         orderBy: req.orderBy,
-        order: req.order,
+        order: req.order || 'descending',
     };
     loading.value = true;
     searchSSL(request)

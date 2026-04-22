@@ -30,6 +30,10 @@ func (s *AlertSender) Send(quota string, params []dto.Param) {
 			s.sendSMS(quota, params)
 		case constant.Email:
 			s.sendEmail(quota, params)
+		case constant.Bark:
+			s.sendBark(quota, params)
+		case constant.WeCom, constant.DingTalk, constant.FeiShu:
+			s.sendWebhook(quota, params, method)
 		}
 	}
 }
@@ -43,6 +47,10 @@ func (s *AlertSender) ResourceSend(quota string, params []dto.Param) {
 			s.sendResourceSMS(quota, params)
 		case constant.Email:
 			s.sendResourceEmail(quota, params)
+		case constant.Bark:
+			s.sendResourceBark(quota, params)
+		case constant.WeCom, constant.DingTalk, constant.FeiShu:
+			s.sendResourceWebhook(quota, params, method)
 		}
 	}
 }
@@ -64,9 +72,12 @@ func (s *AlertSender) sendSMS(quota string, params []dto.Param) {
 		Type:    s.alert.Type,
 	}
 
-	_ = xpack.CreateSMSAlertLog(s.alert.Type, s.alert, create, quota, params, constant.SMS)
+	err := xpack.CreateSMSAlertLog(s.alert.Type, s.alert, create, quota, params, constant.SMS)
+	if err != nil {
+		global.LOG.Errorf("%s alert sms push failed: %v", s.alert.Type, err)
+		return
+	}
 	alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, constant.SMS)
-	global.LOG.Infof("%s alert sms push successful", s.alert.Type)
 }
 
 func (s *AlertSender) sendEmail(quota string, params []dto.Param) {
@@ -85,9 +96,60 @@ func (s *AlertSender) sendEmail(quota string, params []dto.Param) {
 	}
 
 	transport := xpack.LoadRequestTransport()
-	_ = alertUtil.CreateEmailAlertLog(create, s.alert, params, transport)
+	agentInfo, _ := xpack.GetAgentInfo()
+	err := alertUtil.CreateEmailAlertLog(create, s.alert, params, transport, agentInfo)
+	if err != nil {
+		global.LOG.Errorf("%s alert email push failed: %v", s.alert.Type, err)
+		return
+	}
 	alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, constant.Email)
-	global.LOG.Infof("%s alert email push successful", s.alert.Type)
+}
+
+func (s *AlertSender) sendBark(quota string, params []dto.Param) {
+	totalCount, isValid := s.canSendAlert(constant.Bark)
+	if !isValid {
+		return
+	}
+
+	create := dto.AlertLogCreate{
+		Status:      constant.AlertSuccess,
+		Count:       totalCount + 1,
+		AlertId:     s.alert.ID,
+		Type:        s.alert.Type,
+		AlertRule:   alertUtil.ProcessAlertRule(s.alert),
+		AlertDetail: alertUtil.ProcessAlertDetail(s.alert, quota, params, constant.Bark),
+	}
+
+	transport := xpack.LoadRequestTransport()
+	agentInfo, _ := xpack.GetAgentInfo()
+	err := alertUtil.CreateBarkAlertLog(create, s.alert, params, transport, agentInfo)
+	if err != nil {
+		global.LOG.Errorf("%s alert bark push failed: %v", s.alert.Type, err)
+		return
+	}
+	alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, constant.Bark)
+}
+
+func (s *AlertSender) sendWebhook(quota string, params []dto.Param, method string) {
+	totalCount, isValid := s.canSendAlert(method)
+	if !isValid {
+		return
+	}
+
+	create := dto.AlertLogCreate{
+		Status:  constant.AlertSuccess,
+		Count:   totalCount + 1,
+		AlertId: s.alert.ID,
+		Type:    s.alert.Type,
+	}
+	transport := xpack.LoadRequestTransport()
+	agentInfo, _ := xpack.GetAgentInfo()
+	err := xpack.CreateWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, method, transport, agentInfo)
+	if err != nil {
+		global.LOG.Errorf("%s alert %s webhook push failed: %v", s.alert.Type, method, err)
+		return
+	}
+	alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, method)
 }
 
 func (s *AlertSender) sendResourceSMS(quota string, params []dto.Param) {
@@ -112,7 +174,6 @@ func (s *AlertSender) sendResourceSMS(quota string, params []dto.Param) {
 		return
 	}
 	alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, constant.SMS)
-	global.LOG.Infof("%s alert sms push successful", s.alert.Type)
 }
 
 func (s *AlertSender) sendResourceEmail(quota string, params []dto.Param) {
@@ -131,12 +192,57 @@ func (s *AlertSender) sendResourceEmail(quota string, params []dto.Param) {
 	}
 
 	transport := xpack.LoadRequestTransport()
-	if err := alertUtil.CreateEmailAlertLog(create, s.alert, params, transport); err != nil {
+	agentInfo, _ := xpack.GetAgentInfo()
+	if err := alertUtil.CreateEmailAlertLog(create, s.alert, params, transport, agentInfo); err != nil {
 		global.LOG.Errorf("failed to send Email alert: %v", err)
 		return
 	}
 	alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, constant.Email)
-	global.LOG.Infof("%s alert email push successful", s.alert.Type)
+}
+
+func (s *AlertSender) sendResourceBark(quota string, params []dto.Param) {
+	todayCount, isValid := s.canResourceSendAlert(constant.Bark)
+	if !isValid {
+		return
+	}
+
+	create := dto.AlertLogCreate{
+		Status:      constant.AlertSuccess,
+		Count:       todayCount + 1,
+		AlertId:     s.alert.ID,
+		Type:        s.alert.Type,
+		AlertRule:   alertUtil.ProcessAlertRule(s.alert),
+		AlertDetail: alertUtil.ProcessAlertDetail(s.alert, quota, params, constant.Bark),
+	}
+
+	transport := xpack.LoadRequestTransport()
+	agentInfo, _ := xpack.GetAgentInfo()
+	if err := alertUtil.CreateBarkAlertLog(create, s.alert, params, transport, agentInfo); err != nil {
+		global.LOG.Errorf("failed to send Bark alert: %v", err)
+		return
+	}
+	alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, constant.Bark)
+}
+
+func (s *AlertSender) sendResourceWebhook(quota string, params []dto.Param, method string) {
+	todayCount, isValid := s.canResourceSendAlert(method)
+	if !isValid {
+		return
+	}
+
+	create := dto.AlertLogCreate{
+		Status:  constant.AlertSuccess,
+		Count:   todayCount + 1,
+		AlertId: s.alert.ID,
+		Type:    s.alert.Type,
+	}
+	transport := xpack.LoadRequestTransport()
+	agentInfo, _ := xpack.GetAgentInfo()
+	if err := xpack.CreateWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, method, transport, agentInfo); err != nil {
+		global.LOG.Errorf("%s alert %s webhook push failed: %v", s.alert.Type, method, err)
+		return
+	}
+	alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, method)
 }
 
 func (s *AlertSender) canSendAlert(method string) (uint, bool) {

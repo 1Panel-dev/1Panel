@@ -1,5 +1,5 @@
 <template>
-    <div class="h-full" @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
+    <div class="h-full" ref="fileTableRef" @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
         <el-tabs
             type="card"
             class="file-tabs"
@@ -279,7 +279,7 @@
                                                             class="box-item"
                                                             effect="dark"
                                                             :content="row.path"
-                                                            placement="top"
+                                                            placement="left"
                                                         >
                                                             <span
                                                                 class="table-link text-ellipsis"
@@ -312,6 +312,29 @@
                                         </el-table>
                                     </div>
                                 </el-popover>
+
+                                <el-button class="file-tool">
+                                    <el-dropdown>
+                                        <template #default>
+                                            <el-button
+                                                link
+                                                class="!w-full !h-full p-2 focus-visible:!outline-none cursor-pointer transition-colors"
+                                            >
+                                                {{ $t('file.fileTools') }}
+                                            </el-button>
+                                        </template>
+                                        <template #dropdown>
+                                            <el-dropdown-menu>
+                                                <el-dropdown-item @click="openShareList">
+                                                    {{ $t('file.shareList') }}
+                                                </el-dropdown-item>
+                                                <el-dropdown-item @click="openFileHistoryCenter">
+                                                    {{ $t('file.history') }}
+                                                </el-dropdown-item>
+                                            </el-dropdown-menu>
+                                        </template>
+                                    </el-dropdown>
+                                </el-button>
                                 <el-button class="btn" @click="calculateSize(req.path)" :loading="disableBtn">
                                     {{ $t('file.calculate') }}
                                 </el-button>
@@ -424,23 +447,35 @@
                                     <el-button plain class="close" icon="Close" @click="closeMove"></el-button>
                                 </el-tooltip>
                             </el-button-group>
-                            <div class="w-80">
-                                <el-input
-                                    v-model="req.search"
-                                    clearable
-                                    @clear="search()"
-                                    @keydown.enter="search()"
-                                    :placeholder="$t('file.search')"
-                                >
-                                    <template #prepend>
-                                        <el-checkbox v-model="req.containSub">
-                                            {{ $t('file.sub') }}
-                                        </el-checkbox>
-                                    </template>
-                                    <template #append>
-                                        <el-button icon="Search" @click="search" round />
-                                    </template>
-                                </el-input>
+                            <div class="flex items-center gap-2">
+                                <fu-table-column-select
+                                    :columns="columns"
+                                    trigger="hover"
+                                    :title="$t('commons.table.selectColumn')"
+                                    popper-class="popper-class"
+                                    :only-icon="true"
+                                />
+                                <div class="w-80">
+                                    <el-input
+                                        v-model="req.search"
+                                        clearable
+                                        @clear="search()"
+                                        @keydown.enter="search()"
+                                        :placeholder="$t('file.search')"
+                                    >
+                                        <template #prepend>
+                                            <el-checkbox v-model="req.containSub">
+                                                {{ $t('file.sub') }}
+                                            </el-checkbox>
+                                        </template>
+                                        <template #append>
+                                            <el-button icon="Search" @click="search" round />
+                                        </template>
+                                    </el-input>
+                                </div>
+                                <el-button plain type="primary" @click="openAiSearchDrawer">
+                                    {{ $t('file.aiSearch') }}
+                                </el-button>
                             </div>
                         </div>
                     </template>
@@ -456,6 +491,8 @@
                             @cell-mouse-leave="hideFavorite"
                             :heightDiff="heightDiff"
                             :right-buttons="rightButtons"
+                            :columns="columns"
+                            localKey="fileManagementColumn"
                         >
                             <el-table-column type="selection" width="30" />
                             <el-table-column
@@ -465,6 +502,9 @@
                                 show-overflow-tooltip
                                 :sortable="'custom'"
                                 prop="name"
+                                :tooltip-options="{
+                                    placement: 'bottom-start',
+                                }"
                             >
                                 <template #default="{ row }">
                                     <div class="file-row">
@@ -477,7 +517,7 @@
                                             <svg-icon
                                                 v-else
                                                 className="table-icon"
-                                                :iconName="getIconName(row.extension)"
+                                                :iconName="getIconName(row.name, row.extension)"
                                             ></svg-icon>
                                         </div>
                                         <div class="file-name">
@@ -495,6 +535,16 @@
                                                 {{ row.name }}
                                             </span>
                                             <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
+                                        </div>
+                                        <div>
+                                            <el-button
+                                                v-if="row.shareCode"
+                                                link
+                                                type="primary"
+                                                size="large"
+                                                icon="Share"
+                                                @click="openShareFile(row)"
+                                            ></el-button>
                                         </div>
                                         <div>
                                             <el-button
@@ -517,31 +567,25 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column :label="$t('file.mode')" prop="mode" min-width="110">
+                            <el-table-column :label="$t('file.mode')" prop="mode" width="80">
                                 <template #default="{ row }">
                                     <el-link underline="never" @click="openMode(row)">{{ row.mode }}</el-link>
                                 </template>
                             </el-table-column>
                             <el-table-column
-                                :label="$t('commons.table.user')"
+                                :label="`${$t('commons.table.user')} / ${$t('file.group')}`"
                                 prop="user"
                                 show-overflow-tooltip
-                                min-width="90"
+                                width="200"
                             >
                                 <template #default="{ row }">
                                     <el-link underline="never" @click="openChown(row)">
-                                        {{ row.user ? row.user : '-' }} ({{ row.uid }})
-                                    </el-link>
-                                </template>
-                            </el-table-column>
-                            <el-table-column :label="$t('file.group')" prop="group" show-overflow-tooltip>
-                                <template #default="{ row }">
-                                    <el-link underline="never" @click="openChown(row)">
+                                        {{ row.user ? row.user : '-' }} ({{ row.uid }}) /
                                         {{ row.group ? row.group : '-' }} ({{ row.gid }})
                                     </el-link>
                                 </template>
                             </el-table-column>
-                            <el-table-column :label="$t('file.size')" prop="size" min-width="100" :sortable="'custom'">
+                            <el-table-column :label="$t('file.size')" prop="size" width="120" :sortable="'custom'">
                                 <template #default="{ row }">
                                     <el-button
                                         type="primary"
@@ -570,13 +614,19 @@
                                 show-overflow-tooltip
                                 :sortable="'custom'"
                             ></el-table-column>
+                            <el-table-column :label="$t('file.remark')" prop="remark" width="180" show-overflow-tooltip>
+                                <template #default="{ row }">
+                                    <span>{{ row.remark ? row.remark : '-' }}</span>
+                                </template>
+                            </el-table-column>
                             <fu-table-operations
+                                :max-height="dropdownMaxHeight"
                                 :ellipsis="mobile ? 0 : 2"
                                 :buttons="tableMoreButtons"
                                 :label="$t('commons.table.operate')"
                                 :min-width="mobile ? 'auto' : 200"
                                 :fixed="mobile ? false : 'right'"
-                                width="270"
+                                width="200"
                                 fix
                             />
                             <template #paginationLeft>
@@ -610,7 +660,7 @@
 
         <CreateFile ref="createRef" @close="search" />
         <ChangeRole ref="roleRef" @close="search" />
-        <Compress ref="compressRef" @close="search" />
+        <Compress ref="compressRef" @close="search" @task-change="onCompressTaskChange" />
         <Decompress ref="deCompressRef" @close="search" />
         <CodeEditor ref="codeEditorRef" @close="search" />
         <FileRename ref="renameRef" @close="search" />
@@ -624,40 +674,52 @@
         <DeleteFile ref="deleteRef" @close="search" />
         <RecycleBin ref="recycleBinRef" @close="search" />
         <Favorite ref="favoriteRef" @close="search" @jump="jump" @to-favorite="toFavorite" />
+        <ShareList ref="shareListRef" @close="search" @detail="openShareDetail" />
+        <FileHistoryDrawer ref="historyDrawerRef" @restored="search" />
         <BatchRole ref="batchRoleRef" @close="search" />
         <VscodeOpenDialog ref="dialogVscodeOpenRef" />
         <Preview ref="previewRef" />
+        <TextPreview ref="textPreviewRef" />
         <TerminalDialog ref="dialogTerminalRef" />
         <Convert ref="convertRef" @close="search" />
+
+        <FileAiSearchDrawer
+            ref="aiSearchDrawerRef"
+            v-model="aiSearchDrawerVisible"
+            :list-path="req.path"
+            @pick-directory="openAiSearchPathPicker"
+            @open-editor="onAiSearchOpenEditor"
+        />
+        <FileList ref="fileRef" @choose="getSearchPath" />
+        <FileShare ref="fileShareRef" @close="search" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, reactive, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import {
     addFavorite,
+    batchGetFileRemarks,
     computeDepthDirSize,
     computeDirSize,
     fileWgetKeys,
     getFileContent,
+    removeFileShare,
     getFilesList,
+    setFileRemark,
     removeFavorite,
     renameRile,
     searchFavorite,
     searchHostMount,
 } from '@/api/modules/files';
-import {
-    computeSize,
-    copyText,
-    dateFormat,
-    downloadFile,
-    getFileType,
-    getIcon,
-    getRandomStr,
-    isConvertible,
-} from '@/utils/util';
+import { computeSize } from '@/utils/size';
+import { copyText } from '@/utils/clipboard';
+import { dateFormat } from '@/utils/date';
+import { downloadFile, getFileType, getIcon, isConvertible } from '@/utils/file';
+import { getRandomStr } from '@/utils/id';
 import { File } from '@/api/interface/file';
-import { Languages, Mimetypes } from '@/global/mimetype';
+import { Mimetypes } from '@/global/mimetype';
+import { resolveEditorLanguage } from '@/utils/file';
 import { useRouter } from 'vue-router';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useMultipleSearchable } from './hooks/searchable';
@@ -682,18 +744,24 @@ import Process from './process/index.vue';
 import Detail from './detail/index.vue';
 import RecycleBin from './recycle-bin/index.vue';
 import Favorite from './favorite/index.vue';
+import ShareList from './share-list/index.vue';
+import FileHistoryDrawer from './code-editor/history/index.vue';
 import BatchRole from './batch-role/index.vue';
 import Preview from './preview/index.vue';
+import TextPreview from './text-preview/index.vue';
 import VscodeOpenDialog from '@/components/vscode-open/index.vue';
 import Convert from './convert/index.vue';
+import FileAiSearchDrawer from './ai-search/file-ai-search-drawer.vue';
+import FileShare from './share/index.vue';
 import { debounce } from 'lodash-es';
 import TerminalDialog from './terminal/index.vue';
 import { Dashboard } from '@/api/interface/dashboard';
-import { CompressExtension, CompressType } from '@/enums/files';
+import { CompressExtension, MimetypeByExtensionObject } from '@/enums/files';
 import type { TabPaneName } from 'element-plus';
 import { getComponentInfo } from '@/api/modules/host';
 import { routerToNameWithQuery } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
+import FileList from '@/components/file-list/index.vue';
 
 const globalStore = GlobalStore();
 
@@ -702,10 +770,21 @@ interface FilePaths {
     name: string;
 }
 
+const fileRef = ref();
 const router = useRouter();
 const data = ref();
 const tableRefs = ref<Record<string, any>>({});
 const heightDiff = ref(365);
+const fileTableRef = ref<HTMLElement | null>(null);
+const dropdownMaxHeight = ref(450);
+const baseDir = ref();
+const remarkRequestId = ref(0);
+const remarkLoadTimer = ref<number | null>(null);
+const editableTabsKey = ref('');
+const editableTabs = ref([
+    { id: '1', name: getLastPath(baseDir.value), path: baseDir.value },
+    { id: '2', name: 'home', path: '/home' },
+]);
 
 const setTableRef = (key: string, el: any) => {
     if (el) {
@@ -729,7 +808,6 @@ const initData = () => ({
 });
 let req = reactive(initData());
 let loading = ref(false);
-const baseDir = ref();
 const paths = ref<FilePaths[]>([]);
 const hidePaths = ref<FilePaths[]>([]);
 let pathWidth = ref(0);
@@ -739,7 +817,14 @@ let pointer = -1;
 const fileCreate = reactive({ path: '/', isDir: false, mode: 0o755 });
 const fileCompress = reactive({ files: [''], name: '', dst: '', operate: 'compress' });
 const fileDeCompress = reactive({ path: '', name: '', dst: '', type: '' });
-const fileEdit = reactive({ content: '', path: '', name: '', language: 'plaintext', extension: '' });
+const fileEdit = reactive<{
+    content: string;
+    path: string;
+    name: string;
+    language: string;
+    extension: string;
+    initialLine?: number;
+}>({ content: '', path: '', name: '', language: 'plaintext', extension: '' });
 const filePreview = reactive({ path: '', name: '', extension: '', fileType: '', imageFiles: [], currentNode: '' });
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100, isDetail: false });
 const fileUpload = reactive({ path: '' });
@@ -763,6 +848,21 @@ const fileConvert = reactive<{
 });
 const ffmpegExist = ref(false);
 
+const aiSearchDrawerVisible = ref(false);
+const aiSearchDrawerRef = ref<InstanceType<typeof FileAiSearchDrawer> | null>(null);
+
+const openAiSearchDrawer = () => {
+    aiSearchDrawerVisible.value = true;
+};
+
+const getSearchPath = (path: string | string[]) => {
+    aiSearchDrawerRef.value?.applyPathFromPicker(path);
+};
+
+const openAiSearchPathPicker = (path?: string) => {
+    fileRef.value.acceptParams({ path: path || req.path, dir: true, multiple: false });
+};
+
 const createRef = ref();
 const roleRef = ref();
 const detailRef = ref();
@@ -781,12 +881,21 @@ const moveOpen = ref(false);
 const deleteRef = ref();
 const recycleBinRef = ref();
 const favoriteRef = ref();
+const shareListRef = ref();
+const historyDrawerRef = ref<InstanceType<typeof FileHistoryDrawer> | null>(null);
+const compressTaskState = ref<{
+    taskID: string;
+    status: string;
+} | null>(null);
 const hoveredRowPath = ref(null);
 const favorites = ref([]);
 const batchRoleRef = ref();
 const dialogVscodeOpenRef = ref();
 const previewRef = ref();
+const textPreviewRef = ref();
 const processRef = ref();
+
+const MAX_OPEN_SIZE = 10 * 1024 * 1024;
 const hostMount = ref<Dashboard.DiskInfo[]>([]);
 let resizeObserver: ResizeObserver;
 const dirTotalSize = ref(-1);
@@ -808,6 +917,7 @@ const setRenameRef = (key: string, el: any) => {
 const getCurrentRename = () => renameRefs.value[editableTabsKey.value];
 
 const pathRefs = ref<Record<string, any>>({});
+const columns = ref([]);
 
 const setPathRef = (key: string, el: any) => {
     if (el) {
@@ -815,6 +925,14 @@ const setPathRef = (key: string, el: any) => {
     }
 };
 const getCurrentPath = () => pathRefs.value[editableTabsKey.value];
+
+const onCompressTaskChange = (task: { taskID: string; status: string }) => {
+    if (!task.taskID) {
+        compressTaskState.value = null;
+        return;
+    }
+    compressTaskState.value = task;
+};
 
 const { searchableStatus, searchablePath, setSearchableInputRef, searchableInputBlur } = useMultipleSearchable(paths);
 
@@ -865,6 +983,7 @@ const handleSearchResult = (res: ResultData<File.File>) => {
     dirNum.value = data.value.filter((item) => item.isDir).length;
     fileNum.value = data.value.filter((item) => !item.isDir).length;
     req.path = res.data.path;
+    scheduleRemarkLoad();
 };
 
 const viewHideFile = async () => {
@@ -989,6 +1108,7 @@ const observeResize = () => {
 
         if (isElChanged) resizeHandler();
         if (isEleChanged) btnResizeHandler();
+        updateHeight();
     });
 
     observe.observe(el);
@@ -1004,10 +1124,6 @@ function watchTitleHeight() {
         heightDiff.value = 325 + titleHeight;
     }
 }
-
-watchTitleHeight();
-
-window.addEventListener('resize', watchTitleHeight);
 
 const resetPaths = () => {
     paths.value = [...hidePaths.value, ...paths.value];
@@ -1051,12 +1167,12 @@ const jump = async (url: string) => {
     let searchResult = await searchFile();
     if (!searchResult.data.path) {
         req.path = oldUrl;
-        globalStore.setLastFilePath(req.path);
+        globalStore.lastFilePath = req.path;
         MsgWarning(i18n.global.t('commons.res.notFound'));
         return;
     }
     req.path = searchResult.data.path;
-    globalStore.setLastFilePath(req.path);
+    globalStore.lastFilePath = req.path;
     handleSearchResult(searchResult);
     getPaths(req.path);
     updateTab(req.path);
@@ -1081,24 +1197,23 @@ const backForwardJump = async (url: string) => {
     });
 };
 
-const getPaths = (reqPath: string) => {
-    const pathArray = reqPath.split('/');
-    paths.value = [];
-    hidePaths.value = [];
-    let base = '/';
+const getPaths = (reqPath: string | undefined | null) => {
+    const pathString = reqPath || '';
+    const pathArray = pathString.split('/').filter((p) => p !== '');
+
+    const breadcrumbs = [];
+    let base = '';
+
     for (const p of pathArray) {
-        if (p != '') {
-            if (base.endsWith('/')) {
-                base = base + p;
-            } else {
-                base = base + '/' + p;
-            }
-            paths.value.push({
-                url: base,
-                name: p,
-            });
-        }
+        base = `${base}/${p}`;
+        breadcrumbs.push({
+            url: base,
+            name: p,
+        });
     }
+
+    paths.value = breadcrumbs;
+    hidePaths.value = [];
 };
 
 const handleCreate = (command: string) => {
@@ -1179,8 +1294,8 @@ const calculateSize = (path: string) => {
     }, 0);
 };
 
-const getIconName = (extension: string) => {
-    return getIcon(extension);
+const getIconName = (name: string, extension: string) => {
+    return getIcon(getFileExtension(name, extension));
 };
 
 const openMode = (item: File.File) => {
@@ -1208,16 +1323,18 @@ const openCompress = (items: File.File[]) => {
 };
 
 const openDeCompress = (item: File.File) => {
-    if (Mimetypes.get(item.mimeType) == undefined) {
+    const extension = getFileExtension(item.name, item.extension);
+    const mimeType = item.mimeType || MimetypeByExtensionObject[extension];
+    const typeByMime = mimeType ? Mimetypes.get(mimeType) : undefined;
+    const typeByExtension = getEnumKeyByValue(extension);
+
+    if (typeByMime && (!typeByExtension || CompressExtension[typeByMime] === extension)) {
+        fileDeCompress.type = typeByMime;
+    } else if (typeByExtension) {
+        fileDeCompress.type = typeByExtension;
+    } else {
         MsgWarning(i18n.global.t('file.canNotDeCompress'));
         return;
-    }
-    fileDeCompress.type = Mimetypes.get(item.mimeType);
-    if (CompressExtension[Mimetypes.get(item.mimeType)] != item.extension) {
-        fileDeCompress.type = getEnumKeyByValue(item.extension);
-    }
-    if (item.name.endsWith('.tar.gz') || item.name.endsWith('.tgz')) {
-        fileDeCompress.type = CompressType.TarGz;
     }
 
     fileDeCompress.name = item.name;
@@ -1228,10 +1345,32 @@ const openDeCompress = (item: File.File) => {
 };
 
 function getEnumKeyByValue(value: string): keyof typeof CompressExtension | undefined {
+    const normalizedValue = value.toLowerCase();
     return (Object.keys(CompressExtension) as Array<keyof typeof CompressExtension>).find(
-        (k) => CompressExtension[k] === value,
+        (k) => CompressExtension[k] === normalizedValue,
     );
 }
+
+const sortedCompressExtensions = Object.values(CompressExtension).sort((a, b) => b.length - a.length);
+
+const getFileExtension = (name: string, extension?: string): string => {
+    const lowerName = name?.toLowerCase().split('?')[0] ?? '';
+    if (lowerName.startsWith('.') && lowerName.indexOf('.', 1) === -1) {
+        return extension.toLowerCase();
+    }
+    const compoundMatch = sortedCompressExtensions.find((compressExtension) => lowerName.endsWith(compressExtension));
+    if (compoundMatch) {
+        return compoundMatch;
+    }
+
+    if (extension) {
+        const lowerExt = extension.toLowerCase();
+        return lowerExt.startsWith('.') ? lowerExt : `.${lowerExt}`;
+    }
+
+    const extensionIndex = lowerName.lastIndexOf('.');
+    return extensionIndex === -1 ? '' : lowerName.slice(extensionIndex);
+};
 
 const openView = (item: File.File) => {
     const fileType = getFileType(item.extension);
@@ -1247,13 +1386,20 @@ const openView = (item: File.File) => {
         return openPreview(item, fileType);
     }
 
-    const actionMap = {
-        compress: openDeCompress,
-        text: () => openCodeEditor(item.path, item.extension),
-    };
+    if (fileType === 'compress') {
+        return openDeCompress(item);
+    }
 
     const path = item.isSymlink ? item.linkPath : item.path;
-    return actionMap[fileType] ? actionMap[fileType](item) : openCodeEditor(path, item.extension);
+    if (item.size > MAX_OPEN_SIZE) {
+        return openTextPreview(path, item.name);
+    }
+
+    const actionMap = {
+        text: () => openCodeEditor(path),
+    };
+
+    return actionMap[fileType] ? actionMap[fileType](item) : openCodeEditor(path);
 };
 
 const openPreview = (item: File.File, fileType: string) => {
@@ -1271,18 +1417,19 @@ const openPreview = (item: File.File, fileType: string) => {
     previewRef.value.acceptParams(filePreview);
 };
 
-const openCodeEditor = (path: string, extension: string) => {
+const openPathInCodeEditor = (
+    path: string,
+    opts?: {
+        initialLine?: number;
+    },
+) => {
+    if (!path) {
+        return;
+    }
     codeReq.path = path;
     codeReq.expand = true;
 
-    if (extension != '') {
-        Languages.forEach((language) => {
-            const ext = extension.substring(1);
-            if (language.value.indexOf(ext) > -1) {
-                fileEdit.language = language.label;
-            }
-        });
-    }
+    const line = opts?.initialLine && opts.initialLine > 0 ? Math.floor(opts.initialLine) : undefined;
 
     getFileContent(codeReq)
         .then((res) => {
@@ -1290,10 +1437,24 @@ const openCodeEditor = (path: string, extension: string) => {
             fileEdit.path = res.data.path;
             fileEdit.name = res.data.name;
             fileEdit.extension = res.data.extension;
-
+            fileEdit.language = resolveEditorLanguage(res.data.path, res.data.extension, res.data.name);
+            fileEdit.initialLine = line;
             codeEditorRef.value.acceptParams(fileEdit);
+            fileEdit.initialLine = undefined;
         })
         .catch(() => {});
+};
+
+const onAiSearchOpenEditor = (payload: { path: string; initialLine?: number }) => {
+    openPathInCodeEditor(payload.path, { initialLine: payload.initialLine });
+};
+
+const openCodeEditor = (path: string) => {
+    openPathInCodeEditor(path);
+};
+
+const openTextPreview = (path: string, name: string) => {
+    textPreviewRef.value.acceptParams({ path, name });
 };
 
 const openUpload = () => {
@@ -1310,14 +1471,14 @@ const openBatchRole = (items: File.File[]) => {
     batchRoleRef.value.acceptParams({ files: items });
 };
 
-const closeWget = (submit: Boolean) => {
+const closeWget = (submit: boolean) => {
     search();
     if (submit) {
         openProcess();
     }
 };
 
-const closeMovePage = (submit: Boolean) => {
+const closeMovePage = (submit: boolean) => {
     if (submit) {
         search();
         closeMove();
@@ -1347,7 +1508,7 @@ const getWgetProcess = async () => {
     } catch (error) {}
 };
 
-const openRename = (item: File.File, source: String) => {
+const openRename = (item: File.File, source: string) => {
     fileRename.path = req.path;
     fileRename.oldName = item.name;
     if (source === 'right') {
@@ -1464,6 +1625,14 @@ const openDownload = (file: File.File) => {
     downloadFile(file.path, globalStore.currentNode);
 };
 
+const fileShareRef = ref<InstanceType<typeof FileShare> | null>(null);
+const openShareFile = (row: File.File) => {
+    fileShareRef.value?.acceptParams({ path: row.path });
+};
+const openShareDetail = (path: string) => {
+    fileShareRef.value?.acceptParams({ path });
+};
+
 const openDetail = (row: File.File) => {
     detailRef.value.acceptParams({ path: row.path });
 };
@@ -1474,6 +1643,21 @@ const openRecycleBin = () => {
 
 const openFavorite = () => {
     favoriteRef.value.acceptParams();
+};
+
+const openShareList = () => {
+    shareListRef.value.acceptParams();
+};
+
+const openFileHistoryCenter = () => {
+    historyDrawerRef.value?.acceptParams({
+        path: '',
+        content: '',
+        language: 'plaintext',
+        extension: '',
+        dirty: false,
+        scope: 'all',
+    });
 };
 
 const changeSort = ({ prop, order }) => {
@@ -1520,13 +1704,28 @@ const getFavorites = async () => {
     } catch (error) {}
 };
 
+const removeShareByPath = async (path: string) => {
+    ElMessageBox.confirm(i18n.global.t('file.shareCancelConfirm'), i18n.global.t('commons.msg.remove'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        try {
+            await removeFileShare(path);
+            await search();
+        } catch (error) {}
+    });
+};
+
 const toFavorite = (row: File.Favorite) => {
     if (row.isDir) {
         jump(row.path);
     } else {
         let file = {} as File.File;
+        const extension = getFileExtension(row.name);
         file.path = row.path;
-        file.extension = '.' + row.name.split('.').pop();
+        file.name = row.name;
+        file.extension = extension;
+        file.mimeType = MimetypeByExtensionObject[extension] || '';
         openView(file);
     }
 };
@@ -1540,10 +1739,40 @@ const openWithVSCode = (row: File.File) => {
     dialogVscodeOpenRef.value.acceptParams({ path: row.path + (row.isDir ? '' : ':1:1') });
 };
 
+const openRemark = async (row: File.File) => {
+    try {
+        const res = await ElMessageBox.prompt(i18n.global.t('file.remarkPrompt'), i18n.global.t('file.setRemark'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            inputValue: row.remark ?? '',
+            inputPlaceholder: i18n.global.t('file.remarkPlaceholder'),
+        });
+        const remark = res.value ?? '';
+        await setFileRemark({ path: row.path, remark: remark });
+        row.remark = remark;
+        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+    } catch (error) {
+        return;
+    }
+};
+
 const beforeButtons = [
     {
         label: i18n.global.t('commons.button.open'),
         click: open,
+        show: (row: File.File) => {
+            return row?.isDir || row?.size <= MAX_OPEN_SIZE || isDecompressFile(row);
+        },
+    },
+    {
+        label: i18n.global.t('file.previewLargeFile'),
+        click: (row: File.File) => {
+            const path = row.isSymlink ? row.linkPath : row.path;
+            openTextPreview(path, row.name);
+        },
+        show: (row: File.File) => {
+            return !row?.isDir && row?.size > MAX_OPEN_SIZE && !isDecompressFile(row);
+        },
     },
     {
         label: i18n.global.t('commons.button.download'),
@@ -1588,6 +1817,13 @@ const beforeButtons = [
             openBatchRole([row]);
         },
     },
+    {
+        label: i18n.global.t('file.setRemark'),
+        hideOnRemarkBlackList: true,
+        click: (row: File.File) => {
+            openRemark(row);
+        },
+    },
 ];
 const afterButtons = [
     {
@@ -1603,13 +1839,33 @@ const afterButtons = [
         click: copyDir,
     },
     {
-        label: i18n.global.t('file.addFavorite'),
+        label: i18n.global.t('file.addFavoriteAction'),
         click: (row: File.File) => {
-            if (row?.favoriteID > 0) {
-                remove(row?.favoriteID);
-            } else {
-                addToFavorite(row);
-            }
+            addToFavorite(row);
+        },
+        show: (row: File.File) => row?.favoriteID === 0,
+    },
+    {
+        label: i18n.global.t('file.removeFavoriteAction'),
+        click: (row: File.File) => {
+            remove(row?.favoriteID);
+        },
+        show: (row: File.File) => row?.favoriteID > 0,
+    },
+    {
+        label: i18n.global.t('file.shareFile'),
+        click: openShareFile,
+        show: (row: File.File) => {
+            return !row?.isDir && !row?.shareCode;
+        },
+    },
+    {
+        label: i18n.global.t('file.shareCancel'),
+        click: (row: File.File) => {
+            removeShareByPath(row.path);
+        },
+        show: (row: File.File) => {
+            return !row?.isDir && !!row?.shareCode;
         },
     },
     {
@@ -1649,8 +1905,15 @@ const moreBtnRename = [
     },
 ];
 
-const rightButtons = [...beforeButtons, ...rightBtnRename, ...afterButtons];
-const tableMoreButtons = [...beforeButtons, ...moreBtnRename, ...afterButtons];
+const filterRemarkButtons = (buttons: any[]) => {
+    if (!isInRemarkBlackList(req.path)) {
+        return buttons;
+    }
+    return buttons.filter((btn) => !btn.hideOnRemarkBlackList);
+};
+
+const rightButtons = computed(() => filterRemarkButtons([...beforeButtons, ...rightBtnRename, ...afterButtons]));
+const tableMoreButtons = computed(() => filterRemarkButtons([...beforeButtons, ...moreBtnRename, ...afterButtons]));
 const openConvert = (item: File.File) => {
     if (!ffmpegExist.value) {
         ElMessageBox.confirm(i18n.global.t('cronjob.library.noSuchApp', ['FFmpeg']), i18n.global.t('file.convert'), {
@@ -1685,14 +1948,19 @@ const isDecompressFile = (row: File.File) => {
     if (row.isDir) {
         return false;
     }
-    if (getFileType(row.extension) === 'compress') {
+
+    const extension = getFileExtension(row.name, row.extension);
+    const mimeType = row.mimeType || MimetypeByExtensionObject[extension];
+
+    if (getFileType(extension) === 'compress') {
         return true;
     }
-    if (row.mimeType == 'application/octet-stream') {
+
+    if (!mimeType || mimeType === 'application/octet-stream') {
         return false;
-    } else {
-        return Mimetypes.get(row.mimeType) != undefined;
     }
+
+    return Mimetypes.get(mimeType) != undefined;
 };
 
 const getHostMount = async () => {
@@ -1735,6 +2003,44 @@ function initShowHidden() {
     }
 }
 
+const remarkBlackList = ['/proc', '/sys', '/dev', '/run'];
+
+const scheduleRemarkLoad = () => {
+    if (remarkLoadTimer.value) {
+        window.clearTimeout(remarkLoadTimer.value);
+    }
+    if (isInRemarkBlackList(req.path)) {
+        return;
+    }
+    remarkLoadTimer.value = window.setTimeout(() => {
+        void loadRemarksForCurrentPage();
+    }, 1000);
+};
+
+const isInRemarkBlackList = (path: string) => {
+    return remarkBlackList.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+};
+
+const loadRemarksForCurrentPage = async () => {
+    if (!Array.isArray(data.value) || data.value.length === 0) return;
+    const paths = data.value.map((item) => item.path).filter(Boolean);
+    if (paths.length === 0) return;
+    const currentId = ++remarkRequestId.value;
+    try {
+        const res = await batchGetFileRemarks(paths);
+        if (currentId !== remarkRequestId.value) return;
+        const remarks = res.data?.remarks || {};
+        data.value.forEach((item) => {
+            const remark = remarks[item.path];
+            if (remark !== undefined && remark !== '') {
+                item.remark = remark;
+            }
+        });
+    } catch (error) {
+        if (currentId !== remarkRequestId.value) return;
+    }
+};
+
 function initTabsAndPaths() {
     initTabs();
     let path = getInitialPath();
@@ -1746,12 +2052,19 @@ function initTabsAndPaths() {
 }
 
 function buildPaths(path: string) {
-    const segments = path.split('/').filter(Boolean);
-    let url = '';
-    return segments.map((segment) => {
-        url += '/' + segment;
-        return { url, name: segment };
-    });
+    return path
+        .split('/')
+        .filter(Boolean)
+        .reduce((accumulator, segment) => {
+            const lastPath = accumulator[accumulator.length - 1];
+            const currentUrl = lastPath ? `${lastPath.url}/${segment}` : `/${segment}`;
+            accumulator.push({
+                url: currentUrl,
+                name: segment,
+            });
+
+            return accumulator;
+        }, []);
 }
 
 function initHistory() {
@@ -1762,30 +2075,25 @@ function initHistory() {
 
 function getInitialPath(): string {
     const routePath = router.currentRoute.value.query.path;
-    if (routePath != undefined) {
-        const p = String(routePath);
-        globalStore.setLastFilePath(p);
-        return p;
-    } else if (
-        typeof globalStore.lastFilePath === 'string' &&
-        globalStore.lastFilePath.trim() !== '' &&
-        globalStore.lastFilePath !== 'undefined'
-    ) {
-        return globalStore.lastFilePath;
+    if (routePath && typeof routePath === 'string') {
+        const p = routePath.trim();
+        if (p !== '') {
+            globalStore.lastFilePath = p;
+            return p;
+        }
     }
     const tab = editableTabs.value.find((t) => t.id === editableTabsKey.value);
-    if (tab) {
-        globalStore.setLastFilePath(tab.path);
-        return tab.path;
+    if (tab && typeof tab.path === 'string' && tab.path.trim() !== '') {
+        const p = tab.path.trim();
+        globalStore.lastFilePath = p;
+        return p;
     }
+    if (typeof globalStore.lastFilePath === 'string' && globalStore.lastFilePath.trim() !== '') {
+        return globalStore.lastFilePath;
+    }
+
     return '/';
 }
-
-const editableTabsKey = ref('');
-const editableTabs = ref([
-    { id: '1', name: getLastPath(baseDir.value), path: baseDir.value },
-    { id: '2', name: 'home', path: '/home' },
-]);
 
 function initTabs() {
     const savedTabs = localStorage.getItem('editableTabs');
@@ -1872,7 +2180,7 @@ const changeTab = (targetPath: TabPaneName) => {
     saveStorageTabs();
     saveStorageTabsKey();
     req.path = current ? current.path : '';
-    globalStore.setLastFilePath(req.path);
+    globalStore.lastFilePath = req.path;
     getPaths(req.path);
     search();
 };
@@ -1902,14 +2210,27 @@ const checkFFmpeg = () => {
     });
 };
 
-onMounted(() => {
-    loadPath();
+const updateHeight = () => {
+    const el = fileTableRef.value;
+    if (!el) return;
+    let tabHeight = globalStore.openMenuTabs ? 40 : -4;
+    const half = (el.offsetHeight + tabHeight) / 2;
+    dropdownMaxHeight.value = Math.max(half, 300);
+};
+
+onMounted(async () => {
+    await loadPath();
+    await nextTick();
+    watchTitleHeight();
+    window.addEventListener('resize', watchTitleHeight);
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
     initShowHidden();
     initTabsAndPaths();
-    getHostMount();
+    await getHostMount();
     initHistory();
     checkFFmpeg();
-    nextTick(function () {
+    await nextTick(function () {
         handlePath();
         observeResize();
     });
@@ -1918,6 +2239,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
     if (resizeObserver) resizeObserver.disconnect();
     window.removeEventListener('resize', watchTitleHeight);
+    window.removeEventListener('resize', updateHeight);
+    if (remarkLoadTimer.value) {
+        window.clearTimeout(remarkLoadTimer.value);
+    }
 });
 </script>
 
@@ -2006,5 +2331,17 @@ onBeforeUnmount(() => {
 }
 :deep(.file-tabs .el-tabs--card .el-tabs__header .el-tabs__nav) {
     border-bottom: none !important;
+}
+:deep(.file-tool) {
+    padding: 0 !important;
+    .el-button.is-link {
+        padding: 8px 15px !important;
+    }
+}
+.file-tool:hover {
+    color: var(--el-color-primary) !important;
+    .el-button {
+        color: var(--el-color-primary) !important;
+    }
 }
 </style>

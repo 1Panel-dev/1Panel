@@ -77,7 +77,7 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref, computed } from 'vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
@@ -214,7 +214,26 @@ const formatMessage = (row: Alert.AlertInfo) => {
 };
 
 const formatMethod = (row: Alert.AlertLog) => {
-    return row.method === 'mail' ? t('xpack.alert.mail') : t('xpack.alert.sms');
+    switch (row.method) {
+        case 'mail':
+            return t('xpack.alert.mail');
+        case 'dingTalk':
+            return t('xpack.alert.dingTalk');
+        case 'weCom':
+            return t('xpack.alert.weCom');
+        case 'feiShu':
+            return t('xpack.alert.feiShu');
+        case 'wechat':
+            return t('xpack.alert.wechat');
+        case 'sms':
+            return t('xpack.alert.sms');
+        case 'webhook':
+            return t('xpack.alert.webhook');
+        case 'bark':
+            return t('xpack.alert.bark');
+        default:
+            return t('xpack.alert.unknown');
+    }
 };
 
 const formatCount = (row: Alert.AlertInfo) => {

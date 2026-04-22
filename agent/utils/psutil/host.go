@@ -1,6 +1,9 @@
 package psutil
 
 import (
+	"fmt"
+	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -13,7 +16,8 @@ type HostInfoState struct {
 	mu             sync.RWMutex
 	lastSampleTime time.Time
 
-	cachedInfo *host.InfoStat
+	cachedInfo   *host.InfoStat
+	cachedDistro string
 }
 
 func (h *HostInfoState) GetHostInfo(forceRefresh bool) (*host.InfoStat, error) {
@@ -35,4 +39,53 @@ func (h *HostInfoState) GetHostInfo(forceRefresh bool) (*host.InfoStat, error) {
 	h.mu.Unlock()
 
 	return hostInfo, nil
+}
+
+func (h *HostInfoState) GetDistro() string {
+	if h.cachedDistro == "" {
+		h.cachedDistro = detectLinuxDistro()
+	}
+	return h.cachedDistro
+}
+
+func detectLinuxDistro() string {
+	distroFiles := []string{
+		"/etc/os-release",
+		"/usr/lib/os-release",
+	}
+
+	var targetFile string
+	for _, f := range distroFiles {
+		if _, err := os.Stat(f); err == nil {
+			targetFile = f
+			break
+		}
+	}
+
+	if targetFile != "" {
+		data, err := os.ReadFile(targetFile)
+		if err == nil {
+			content := string(data)
+			for _, line := range strings.Split(content, "\n") {
+				idx := strings.Index(line, "=")
+				if idx == -1 {
+					continue
+				}
+				key := line[:idx]
+				if key == "PRETTY_NAME" {
+					d := strings.Trim(line[idx+1:], "\"")
+					if strings.Contains(d, "(") && strings.Contains(d, ")") {
+						d = d[:strings.LastIndex(d, "(")]
+					}
+					return strings.TrimSpace(d)
+				}
+			}
+		}
+	}
+
+	if osInfo, err := host.Info(); err == nil {
+		return fmt.Sprintf("%s %s", osInfo.Platform, osInfo.PlatformVersion)
+	}
+
+	return "Linux"
 }

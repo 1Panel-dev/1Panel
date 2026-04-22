@@ -1,14 +1,18 @@
 import i18n from '@/lang';
 import { FormItemRule } from 'element-plus';
 
-const checkNoSpace = (rule: any, value: any, callback: any) => {
+type ValidatorValue = string;
+type ValidatorCallback = (error?: Error) => void;
+type RuleValidator = (rule: FormItemRule, value: ValidatorValue, callback: ValidatorCallback) => void;
+
+const checkNoSpace: RuleValidator = (_rule, value, callback) => {
     if (value.indexOf(' ') !== -1) {
         return callback(new Error(i18n.global.t('setting.noSpace')));
     }
     callback();
 };
 
-const checkIp = (rule: any, value: any, callback: any) => {
+const checkIp: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.requiredInput')));
     } else {
@@ -22,7 +26,7 @@ const checkIp = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkIpv4 = (rule: any, value: any, callback: any) => {
+const checkIpv4: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback();
     } else {
@@ -36,7 +40,7 @@ const checkIpv4 = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkIpV6 = (rule: any, value: any, callback: any) => {
+const checkIpV6: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.requiredInput')));
     } else {
@@ -63,7 +67,7 @@ const checkIpV6 = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkIpV4V6OrDomain = (rule: any, value: any, callback: any) => {
+const checkIpV4V6OrDomain: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.requiredInput')));
     } else {
@@ -92,14 +96,14 @@ const checkIpV4V6OrDomain = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkDomainOrIP = (rule: any, value: any, callback: any) => {
+const checkDomainOrIP: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback();
     } else {
         const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
         const ipv6Regex =
             /^(?:(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(?::[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(?:ffff(?::0{1,4}){0,1}:){0,1}(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
-        const domainRegex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$/i;
+        const domainRegex = /^(?:\*\.)?(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$/i;
 
         if (ipv4Regex.test(value) || ipv6Regex.test(value) || domainRegex.test(value)) {
             callback();
@@ -109,7 +113,7 @@ const checkDomainOrIP = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkHost = (rule: any, value: any, callback: any) => {
+const checkHost: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.requiredInput')));
     } else {
@@ -124,7 +128,7 @@ const checkHost = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkIllegal = (rule: any, value: any, callback: any) => {
+const checkIllegal: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.requiredInput')));
         return;
@@ -147,7 +151,7 @@ const checkIllegal = (rule: any, value: any, callback: any) => {
     }
 };
 
-const complexityPassword = (rule: any, value: any, callback: any) => {
+const complexityPassword: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.complexityPassword')));
     } else {
@@ -160,7 +164,7 @@ const complexityPassword = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkName = (rule: any, value: any, callback: any) => {
+const checkName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.commonName')));
     } else {
@@ -173,7 +177,7 @@ const checkName = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkUserName = (rule: any, value: any, callback: any) => {
+const checkUserName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.userName')));
     } else {
@@ -186,7 +190,7 @@ const checkUserName = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkSimpleName = (rule: any, value: any, callback: any) => {
+const checkSimpleName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.simpleName')));
     } else {
@@ -199,7 +203,7 @@ const checkSimpleName = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkSimplePassword = (rule: any, value: any, callback: any) => {
+const checkSimplePassword: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.simplePassword')));
     } else {
@@ -212,7 +216,7 @@ const checkSimplePassword = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkAuthBasicPassword = (rule: any, value: any, callback: any) => {
+const checkAuthBasicPassword: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.authBasicPassword')));
     } else {
@@ -225,7 +229,7 @@ const checkAuthBasicPassword = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkDBName = (rule: any, value: any, callback: any) => {
+const checkDBName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.dbName')));
     } else {
@@ -238,7 +242,7 @@ const checkDBName = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkComposeName = (rule: any, value: any, callback: any) => {
+const checkComposeName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.composeName')));
     } else {
@@ -251,7 +255,7 @@ const checkComposeName = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkImageName = (rule: any, value: any, callback: any) => {
+const checkImageName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.imageName')));
     } else {
@@ -264,7 +268,7 @@ const checkImageName = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkVolumeName = (rule: any, value: any, callback: any) => {
+const checkVolumeName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.volumeName')));
     } else {
@@ -277,7 +281,7 @@ const checkVolumeName = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkLinuxName = (rule: any, value: any, callback: any) => {
+const checkLinuxName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?\'"()<>|'])));
     } else {
@@ -290,7 +294,7 @@ const checkLinuxName = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkSupervisorName = (rule: any, value: any, callback: any) => {
+const checkSupervisorName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.supervisorName')));
     } else {
@@ -303,7 +307,7 @@ const checkSupervisorName = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkDatabaseName = (rule: any, value: any, callback: any) => {
+const checkDatabaseName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.databaseName')));
     } else {
@@ -316,7 +320,7 @@ const checkDatabaseName = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkAppName = (rule: any, value: any, callback: any) => {
+const checkAppName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.appName')));
     } else {
@@ -329,7 +333,7 @@ const checkAppName = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkAlias = (rule: any, value: any, callback: any) => {
+const checkAlias: RuleValidator = (_rule, value, callback) => {
     if (!value) {
         callback(new Error(i18n.global.t('commons.rule.alias')));
         return;
@@ -342,7 +346,7 @@ const checkAlias = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkDomain = (rule: any, value: any, callback: any) => {
+const checkDomain: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.domain')));
     } else {
@@ -356,7 +360,7 @@ const checkDomain = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkDomainWithPort = (rule: any, value: any, callback: any) => {
+const checkDomainWithPort: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.domain')));
     } else {
@@ -370,7 +374,7 @@ const checkDomainWithPort = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkIntegerNumber = (rule: any, value: any, callback: any) => {
+const checkIntegerNumber: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.integer')));
     } else {
@@ -383,7 +387,7 @@ const checkIntegerNumber = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkIntegerNumberWith0 = (rule: any, value: any, callback: any) => {
+const checkIntegerNumberWith0: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.integer')));
     } else {
@@ -396,7 +400,7 @@ const checkIntegerNumberWith0 = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkFloatNumber = (rule: any, value: any, callback: any) => {
+const checkFloatNumber: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.integer')));
     } else {
@@ -409,7 +413,7 @@ const checkFloatNumber = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkParamCommon = (rule: any, value: any, callback: any) => {
+const checkParamCommon: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.paramName')));
     } else {
@@ -422,7 +426,7 @@ const checkParamCommon = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkParamComplexity = (rule: any, value: any, callback: any) => {
+const checkParamComplexity: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.paramComplexity', ['.%@!~_-'])));
     } else {
@@ -435,7 +439,7 @@ const checkParamComplexity = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkParamUrlAndPort = (rule: any, value: any, callback: any) => {
+const checkParamUrlAndPort: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.paramUrlAndPort')));
     } else {
@@ -449,7 +453,7 @@ const checkParamUrlAndPort = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkPort = (rule: any, value: any, callback: any) => {
+const checkPort: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.port')));
     } else {
@@ -462,7 +466,7 @@ const checkPort = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkDoc = (rule: any, value: any, callback: any) => {
+const checkDoc: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.nginxDoc')));
     } else {
@@ -487,7 +491,7 @@ export function checkNumberRange(min: number, max: number): FormItemRule {
 }
 
 export function checkFloatNumberRange(min: number, max: number): FormItemRule {
-    let validatorFunc = function (rule: any, value: any, callback: any) {
+    const validatorFunc: RuleValidator = (_rule, value, callback) => {
         if (value === '' || typeof value === 'undefined' || value == null) {
             callback(new Error(i18n.global.t('commons.rule.disableFunction')));
         } else {
@@ -506,7 +510,7 @@ export function checkFloatNumberRange(min: number, max: number): FormItemRule {
     };
 }
 
-const checkContainerName = (rule: any, value: any, callback: any) => {
+const checkContainerName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback();
     } else {
@@ -519,7 +523,7 @@ const checkContainerName = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkDisableFunctions = (rule: any, value: any, callback: any) => {
+const checkDisableFunctions: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.disableFunction')));
     } else {
@@ -532,7 +536,7 @@ const checkDisableFunctions = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkLeechExts = (rule: any, value: any, callback: any) => {
+const checkLeechExts: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.leechExts')));
     } else {
@@ -545,7 +549,7 @@ const checkLeechExts = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkParamSimple = (rule: any, value: any, callback: any) => {
+const checkParamSimple: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback();
     } else {
@@ -558,7 +562,7 @@ const checkParamSimple = (rule: any, value: any, callback: any) => {
     }
 };
 
-const checkFilePermission = (rule, value, callback) => {
+const checkFilePermission: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.filePermission')));
     } else {
@@ -571,7 +575,7 @@ const checkFilePermission = (rule, value, callback) => {
     }
 };
 
-const checkPHPExtensions = (rule, value, callback) => {
+const checkPHPExtensions: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.phpExtension')));
     } else {
@@ -584,7 +588,7 @@ const checkPHPExtensions = (rule, value, callback) => {
     }
 };
 
-const checkHttpOrHttps = (rule, value, callback) => {
+const checkHttpOrHttps: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.paramHttp')));
     } else {
@@ -597,7 +601,7 @@ const checkHttpOrHttps = (rule, value, callback) => {
     }
 };
 
-const checkPhone = (rule: any, value: any, callback: any) => {
+const checkPhone: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback();
     } else {
@@ -615,7 +619,7 @@ export function checkMaxLength(maxLength: number): FormItemRule {
         required: false,
         trigger: 'blur',
         type: 'string',
-        validator: (rule: any, value: any, callback: any) => {
+        validator: (_rule: FormItemRule, value: ValidatorValue, callback: ValidatorCallback) => {
             if (value === '' || typeof value === 'undefined' || value == null) {
                 callback();
             } else {
@@ -629,7 +633,7 @@ export function checkMaxLength(maxLength: number): FormItemRule {
     };
 }
 
-const checkIpv4orV6 = (rule: any, value: any, callback: any) => {
+const checkIpv4orV6: RuleValidator = (_rule, value, callback) => {
     if (value === '' || value == null) {
         return callback();
     }

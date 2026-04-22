@@ -15,22 +15,26 @@ type SettingInfo struct {
 	Ipv6           string `json:"ipv6"`
 	BindAddress    string `json:"bindAddress"`
 	PanelName      string `json:"panelName"`
+	Edition        string `json:"edition"`
 	Theme          string `json:"theme"`
 	MenuTabs       string `json:"menuTabs"`
 	Language       string `json:"language"`
+	DocSource      string `json:"docSource"`
 
-	ServerPort             string `json:"serverPort"`
-	SSL                    string `json:"ssl"`
-	SSLType                string `json:"sslType"`
-	BindDomain             string `json:"bindDomain"`
-	AllowIPs               string `json:"allowIPs"`
-	SecurityEntrance       string `json:"securityEntrance"`
-	ExpirationDays         string `json:"expirationDays"`
-	ExpirationTime         string `json:"expirationTime"`
-	ComplexityVerification string `json:"complexityVerification"`
-	MFAStatus              string `json:"mfaStatus"`
-	MFASecret              string `json:"mfaSecret"`
-	MFAInterval            string `json:"mfaInterval"`
+	ServerPort                 string `json:"serverPort"`
+	SSL                        string `json:"ssl"`
+	SSLType                    string `json:"sslType"`
+	BindDomain                 string `json:"bindDomain"`
+	PasskeyTrustedProxies      string `json:"passkeyTrustedProxies"`
+	AllowIPs                   string `json:"allowIPs"`
+	SecurityEntrance           string `json:"securityEntrance"`
+	DashboardMemoVisible       string `json:"dashboardMemoVisible"`
+	DashboardSimpleNodeVisible string `json:"dashboardSimpleNodeVisible"`
+	ExpirationDays             string `json:"expirationDays"`
+	ExpirationTime             string `json:"expirationTime"`
+	ComplexityVerification     string `json:"complexityVerification"`
+	MFAStatus                  string `json:"mfaStatus"`
+	MFAInterval                string `json:"mfaInterval"`
 
 	AppStoreVersion      string `json:"appStoreVersion"`
 	AppStoreLastModified string `json:"appStoreLastModified"`
@@ -64,7 +68,7 @@ type SettingUpdate struct {
 type SSLUpdate struct {
 	SSLType string `json:"sslType" validate:"required,oneof=self select import import-paste import-local"`
 	Domain  string `json:"domain"`
-	SSL     string `json:"ssl" validate:"required,oneof=Enable Disable"`
+	SSL     string `json:"ssl" validate:"required,oneof=Enable Disable Mux"`
 	Cert    string `json:"cert"`
 	Key     string `json:"key"`
 	SSLID   uint   `json:"sslID"`
@@ -224,6 +228,9 @@ type TerminalInfo struct {
 	LineHeight        string `json:"lineHeight"`
 	LetterSpacing     string `json:"letterSpacing"`
 	FontSize          string `json:"fontSize"`
+	FontFamily        string `json:"fontFamily"`
+	BackgroundColor   string `json:"backgroundColor"`
+	ForegroundColor   string `json:"foregroundColor"`
 	CursorBlink       string `json:"cursorBlink"`
 	CursorStyle       string `json:"cursorStyle"`
 	Scrollback        string `json:"scrollback"`
@@ -231,23 +238,40 @@ type TerminalInfo struct {
 }
 
 type AppstoreUpdate struct {
-	Scope  string `json:"scope" validate:"required,oneof=UninstallDeleteImage UpgradeBackup UninstallDeleteBackup"`
+	Scope  string `json:"scope" validate:"required,oneof=UninstallDeleteImage UpgradeBackup UninstallDeleteBackup InstallAllowPort"`
 	Status string `json:"status"  validate:"required,oneof=Disable Enable"`
 }
 type AppstoreConfig struct {
 	UninstallDeleteImage  string `json:"uninstallDeleteImage"`
 	UpgradeBackup         string `json:"upgradeBackup"`
 	UninstallDeleteBackup string `json:"uninstallDeleteBackup"`
+	InstallAllowPort      string `json:"installAllowPort"`
 }
 
 type LoginSetting struct {
-	IsDemo      bool   `json:"isDemo"`
-	IsIntl      bool   `json:"isIntl"`
-	IsOffLine   bool   `json:"isOffLine"`
-	IsFxplay    bool   `json:"isFxplay"`
-	Language    string `json:"language"`
-	MenuTabs    string `json:"menuTabs"`
-	PanelName   string `json:"panelName"`
-	Theme       string `json:"theme"`
-	NeedCaptcha bool   `json:"needCaptcha"`
+	IsDemo         bool   `json:"isDemo"`
+	IsIntl         bool   `json:"isIntl"`
+	IsOffLine      bool   `json:"isOffLine"`
+	IsFxplay       bool   `json:"isFxplay"`
+	Language       string `json:"language"`
+	MenuTabs       string `json:"menuTabs"`
+	PanelName      string `json:"panelName"`
+	Theme          string `json:"theme"`
+	NeedCaptcha    bool   `json:"needCaptcha"`
+	PasskeySetting bool   `json:"passkeySetting"`
+}
+
+type PasskeyRegisterRequest struct {
+	Name string `json:"name" validate:"required"`
+}
+
+type PasskeyInfo struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	CreatedAt  string `json:"createdAt"`
+	LastUsedAt string `json:"lastUsedAt"`
+}
+
+type MemoUpdate struct {
+	Content string `json:"content" validate:"max=500"`
 }

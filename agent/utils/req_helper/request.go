@@ -4,12 +4,13 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"io"
 	"net"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -46,6 +47,12 @@ func HandleGet(url string) (*http.Response, error) {
 }
 
 func HandleRequest(url, method string, timeout int) (int, []byte, error) {
+	transport := xpack.LoadRequestTransport()
+	client := http.Client{Timeout: time.Duration(timeout) * time.Second, Transport: transport}
+	return HandleRequestWithClient(&client, url, method, timeout)
+}
+
+func HandleRequestWithClient(client *http.Client, url, method string, timeout int) (int, []byte, error) {
 	defer func() {
 		if r := recover(); r != nil {
 			global.LOG.Errorf("handle request failed, error message: %v", r)
@@ -53,8 +60,6 @@ func HandleRequest(url, method string, timeout int) (int, []byte, error) {
 		}
 	}()
 
-	transport := xpack.LoadRequestTransport()
-	client := http.Client{Timeout: time.Duration(timeout) * time.Second, Transport: transport}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 	defer cancel()
 	request, err := http.NewRequestWithContext(ctx, method, url, nil)
@@ -76,6 +81,46 @@ func HandleRequest(url, method string, timeout int) (int, []byte, error) {
 	defer resp.Body.Close()
 
 	return resp.StatusCode, body, nil
+}
+
+type RequestResponse struct {
+	StatusCode int
+	Body       []byte
+	Header     http.Header
+}
+
+func HandleRequestWithHeaders(client *http.Client, url, method string, timeout int, reqHeaders map[string]string) (*RequestResponse, error) {
+	defer func() {
+		if r := recover(); r != nil {
+			global.LOG.Errorf("handle request failed, error message: %v", r)
+		}
+	}()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	defer cancel()
+	request, err := http.NewRequestWithContext(ctx, method, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range reqHeaders {
+		request.Header.Set(k, v)
+	}
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return &RequestResponse{
+		StatusCode: resp.StatusCode,
+		Body:       body,
+		Header:     resp.Header,
+	}, nil
 }
 
 func RequestFile(url, method string, timeout int) (io.ReadCloser, context.CancelFunc, error) {

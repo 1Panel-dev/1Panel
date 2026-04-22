@@ -10,7 +10,7 @@
         <LayoutContent v-if="isExist" :title="$t('container.volume', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onCreate()">
-                    {{ $t('container.createVolume') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button type="primary" plain @click="onClean()">
                     {{ $t('container.volumePrune') }}
@@ -125,7 +125,8 @@ import CreateDialog from '@/views/container/volume/create/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { reactive, ref, computed } from 'vue';
-import { dateFormat, newUUID } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { newUUID } from '@/utils/id';
 import { deleteVolume, searchVolume, inspect, containerPrune } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import TaskLog from '@/components/log/task/index.vue';
@@ -190,7 +191,7 @@ const search = async () => {
 };
 
 const onInspect = async (id: string) => {
-    const res = await inspect({ id: id, type: 'volume' });
+    const res = await inspect({ id: id, type: 'volume', detail: '' });
     let detailInfo = JSON.stringify(JSON.parse(res.data), null, 2);
     let param = {
         header: i18n.global.t('commons.button.view'),

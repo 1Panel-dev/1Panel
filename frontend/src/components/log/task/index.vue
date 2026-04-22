@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" :show-close="showClose" @close="handleClose" :width="width">
+    <el-dialog v-model="open" :show-close="showClose" @closed="handleClose" :width="width">
         <div v-if="open">
             <LogFile :config="config" :showTail="showTail"></LogFile>
         </div>
@@ -44,7 +44,7 @@ const config = reactive({
 const open = ref(false);
 const showTail = ref(true);
 
-const openWithTaskID = (id: string, tail: boolean, operateNode?: string) => {
+const openWithTaskID = (id: string, tail?: boolean, operateNode?: string) => {
     config.taskID = id;
     if (tail === undefined) {
         config.tail = true;
@@ -67,7 +67,6 @@ const openWithResourceID = (taskType: string, taskOperate: string, resourceID: n
 const em = defineEmits(['close']);
 const handleClose = () => {
     em('close', true);
-    open.value = false;
     bus.emit('refreshTask', true);
     bus.emit('refreshApp', true);
 };

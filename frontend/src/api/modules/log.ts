@@ -10,16 +10,18 @@ export const getLoginLogs = (info: Log.SearchLgLog) => {
     return http.post<ResPage<Log.OperationLog>>(`/core/logs/login`, info);
 };
 
-export const getSystemFiles = () => {
-    return http.get<Array<string>>(`/logs/system/files`);
+export const getSystemFiles = (node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.get<Array<string>>(`/logs/system/files${params}`);
 };
 
 export const cleanLogs = (param: Log.CleanLog) => {
     return http.post(`/core/logs/clean`, param);
 };
 
-export const searchTasks = (req: Log.SearchTaskReq) => {
-    return http.post<ResPage<Log.Task>>(`/logs/tasks/search`, req);
+export const searchTasks = (req: Log.SearchTaskReq, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.post<ResPage<Log.Task>>(`/logs/tasks/search${params}`, req);
 };
 
 export const countExecutingTask = () => {

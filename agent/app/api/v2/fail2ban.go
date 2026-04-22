@@ -28,7 +28,7 @@ func (b *BaseApi) LoadFail2BanBaseInfo(c *gin.Context) {
 // @Summary Page fail2ban ip list
 // @Accept json
 // @Param request body dto.Fail2BanSearch true "request"
-// @Success 200 {Array} string
+// @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /toolbox/fail2ban/search [post]
@@ -51,6 +51,7 @@ func (b *BaseApi) SearchFail2Ban(c *gin.Context) {
 // @Summary Operate fail2ban
 // @Accept json
 // @Param request body dto.Operate true "request"
+// @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /toolbox/fail2ban/operate [post]
@@ -72,7 +73,8 @@ func (b *BaseApi) OperateFail2Ban(c *gin.Context) {
 // @Tags Fail2ban
 // @Summary Operate sshd of fail2ban
 // @Accept json
-// @Param request body dto.Operate true "request"
+// @Param request body dto.Fail2BanSet true "request"
+// @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /toolbox/fail2ban/operate/sshd [post]

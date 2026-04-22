@@ -106,12 +106,12 @@
                             <el-form-item :label="$t('setting.panelSSL')" prop="ssl">
                                 <el-switch
                                     @change="handleSSL"
-                                    v-model="form.ssl"
+                                    v-model="form.sslItem"
                                     active-value="Enable"
                                     inactive-value="Disable"
                                 />
                                 <span class="input-help">{{ $t('setting.https') }}</span>
-                                <div v-if="form.ssl === 'Enable' && sslInfo">
+                                <div v-if="form.ssl !== 'Disable' && sslInfo">
                                     <el-tag>{{ $t('setting.domainOrIP') }} {{ sslInfo.domain }}</el-tag>
                                     <el-tag style="margin-left: 5px">
                                         {{ $t('setting.timeOut') }} {{ sslInfo.timeout }}
@@ -164,6 +164,15 @@
                                     {{ $t('setting.mfaHelper') }}
                                 </span>
                             </el-form-item>
+
+                            <el-form-item :label="$t('setting.passkey')">
+                                <el-button @click="openPasskeyDialog">
+                                    {{ $t('setting.passkeyManage') }}
+                                </el-button>
+                                <span class="input-help">
+                                    {{ $t('setting.passkeyHelper') }}
+                                </span>
+                            </el-form-item>
                         </el-col>
                     </el-row>
                 </el-form>
@@ -179,6 +188,7 @@
         <DomainSetting ref="domainRef" @search="search" />
         <AllowIPsSetting ref="allowIPsRef" @search="search" />
         <ResponseSetting ref="responseRef" @search="search()" />
+        <PasskeySetting ref="passkeyRef" @go-configure-domain="onChangeBindDomain" />
     </div>
 </template>
 
@@ -194,6 +204,7 @@ import TimeoutSetting from '@/views/setting/safe/timeout/index.vue';
 import EntranceSetting from '@/views/setting/safe/entrance/index.vue';
 import DomainSetting from '@/views/setting/safe/domain/index.vue';
 import AllowIPsSetting from '@/views/setting/safe/allowips/index.vue';
+import PasskeySetting from '@/views/setting/safe/passkey/index.vue';
 import { updateSetting, getSettingInfo, getSystemAvailable, updateSSL, loadSSLInfo } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -210,9 +221,11 @@ const mfaRef = ref();
 const responseRef = ref();
 
 const sslRef = ref();
+const lastSSL = ref('Disable');
 const sslInfo = ref<Setting.SSLInfo>();
 const domainRef = ref();
 const allowIPsRef = ref();
+const passkeyRef = ref();
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
@@ -222,6 +235,7 @@ const form = reactive({
     ipv6: 'Disable',
     bindAddress: '',
     ssl: 'Disable',
+    sslItem: 'Disable',
     sslType: 'self',
     securityEntrance: '',
     expirationDays: 0,
@@ -243,8 +257,10 @@ const search = async () => {
     form.ipv6 = res.data.ipv6;
     form.bindAddress = res.data.bindAddress;
     form.ssl = res.data.ssl;
+    form.sslItem = res.data.ssl === 'Disable' ? 'Disable' : 'Enable';
+    lastSSL.value = form.ssl;
     form.sslType = res.data.sslType;
-    if (form.ssl === 'Enable') {
+    if (form.ssl !== 'Disable') {
         loadInfo();
     }
     form.securityEntrance = res.data.securityEntrance;
@@ -307,6 +323,10 @@ const handleMFA = async () => {
         });
 };
 
+const openPasskeyDialog = async () => {
+    passkeyRef.value.acceptParams({ bindDomain: form.bindDomain });
+};
+
 const onChangeEntrance = () => {
     entranceRef.value.acceptParams({ securityEntrance: form.securityEntrance });
 };
@@ -326,7 +346,7 @@ const onChangeAllowIPs = () => {
     allowIPsRef.value.acceptParams({ allowIPs: form.allowIPs });
 };
 const handleSSL = async () => {
-    if (form.ssl === 'Enable') {
+    if (form.sslItem !== 'Disable') {
         let params = {
             ssl: form.ssl,
             sslType: form.sslType,
@@ -343,6 +363,7 @@ const handleSSL = async () => {
         .then(async () => {
             await updateSSL({ ssl: 'Disable', domain: '', sslType: form.sslType, key: '', cert: '', sslID: 0 });
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            lastSSL.value = 'Disable';
             let href = window.location.href;
             globalStore.isLogin = false;
             let address = href.split('://')[1];
@@ -356,7 +377,8 @@ const handleSSL = async () => {
             }, 1000);
         })
         .catch(() => {
-            form.ssl = 'Enable';
+            form.ssl = lastSSL.value;
+            form.sslItem = lastSSL.value === 'Disable' ? 'Disable' : 'Enable';
         });
 };
 

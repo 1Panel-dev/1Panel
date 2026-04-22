@@ -13,6 +13,7 @@ type DiskMountRequest struct {
 	MountPoint string `json:"mountPoint" validate:"required"`
 	Filesystem string `json:"filesystem" validate:"required,oneof=ext4 xfs"`
 	AutoMount  bool   `json:"autoMount"`
+	NoFail     bool   `json:"noFail"`
 }
 
 type DiskUnmountRequest struct {

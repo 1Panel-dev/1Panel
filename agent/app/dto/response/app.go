@@ -29,16 +29,18 @@ type AppDTO struct {
 }
 
 type AppItem struct {
-	Name        string   `json:"name"`
-	Key         string   `json:"key"`
-	ID          uint     `json:"id"`
-	Description string   `json:"description"`
-	Status      string   `json:"status"`
-	Installed   bool     `json:"installed"`
-	Limit       int      `json:"limit"`
-	Tags        []string `json:"tags"`
-	GpuSupport  bool     `json:"gpuSupport"`
-	Recommend   int      `json:"recommend"`
+	Name                string   `json:"name"`
+	Key                 string   `json:"key"`
+	ID                  uint     `json:"id"`
+	Description         string   `json:"description"`
+	Status              string   `json:"status"`
+	Installed           bool     `json:"installed"`
+	Limit               int      `json:"limit"`
+	Tags                []string `json:"tags"`
+	GpuSupport          bool     `json:"gpuSupport"`
+	Recommend           int      `json:"recommend"`
+	Type                string   `json:"type"`
+	BatchInstallSupport bool     `json:"batchInstallSupport"`
 }
 
 type TagDTO struct {
@@ -72,6 +74,10 @@ type AppDetailDTO struct {
 	Architectures  string      `json:"architectures"`
 	MemoryRequired int         `json:"memoryRequired"`
 	GpuSupport     bool        `json:"gpuSupport"`
+}
+
+type AppDetailSimpleDTO struct {
+	ID uint `json:"id"`
 }
 
 type IgnoredApp struct {
@@ -120,6 +126,7 @@ type AppInstallDTO struct {
 	WebUI         string    `json:"webUI"`
 	CreatedAt     time.Time `json:"createdAt"`
 	Favorite      bool      `json:"favorite"`
+	SortOrder     int       `json:"sortOrder"`
 	App           AppDetail `json:"app"`
 	Container     string    `json:"container"`
 	IsEdit        bool      `json:"isEdit"`

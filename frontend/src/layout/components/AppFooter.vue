@@ -5,7 +5,7 @@
                 <a v-if="!globalStore.isIntl && !globalStore.isFxplay" href="https://fit2cloud.com/" target="_blank">
                     Copyright © 2014-{{ year }} {{ $t('commons.fit2cloud') }}
                 </a>
-                <a v-if="globalStore.isIntl && !globalStore.isFxplay" href="https://1panel.hk/" target="_blank">
+                <a v-else href="https://1panel.pro/" target="_blank">
                     Copyright © {{ year }} {{ $t('commons.lingxia') }}
                 </a>
             </div>

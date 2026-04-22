@@ -1,7 +1,7 @@
 <template>
     <LayoutContent
         back-name="CronjobItem"
-        :title="isCreate ? $t('cronjob.create') : $t('commons.button.edit') + ' - ' + form.name"
+        :title="isCreate ? $t('commons.button.create') : $t('commons.button.edit') + ' - ' + form.name"
     >
         <template #main>
             <el-form ref="formRef" label-position="top" :model="form" :rules="rules">
@@ -255,10 +255,20 @@
                                                 :value="item.id + ''"
                                                 :label="item.primaryDomain"
                                             >
-                                                <span>{{ item.primaryDomain }}</span>
-                                                <el-tag class="tagClass">
-                                                    {{ item.alias }}
-                                                </el-tag>
+                                                <div class="option-content">
+                                                    <el-tooltip
+                                                        :content="item.primaryDomain"
+                                                        placement="top"
+                                                        :open-delay="500"
+                                                        effect="dark"
+                                                    >
+                                                        <span class="domain-text">{{ item.primaryDomain }}</span>
+                                                    </el-tooltip>
+
+                                                    <el-tag class="tagClass">
+                                                        {{ item.alias }}
+                                                    </el-tag>
+                                                </div>
                                             </el-option>
                                         </el-select>
                                         <span class="input-help" v-if="form.type === 'cutWebsiteLog'">
@@ -298,6 +308,7 @@
                                             <el-option label="Mariadb" value="mariadb" />
                                             <el-option label="PostgreSQL" value="postgresql" />
                                             <el-option label="PostgreSQL-Cluster" value="postgresql-cluster" />
+                                            <el-option label="MongoDB" value="mongodb" />
                                         </el-select>
                                     </el-form-item>
                                 </LayoutCol>
@@ -333,6 +344,30 @@
                                                 </el-tag>
                                             </el-option>
                                         </el-select>
+                                    </el-form-item>
+                                </LayoutCol>
+                                <LayoutCol
+                                    :span="20"
+                                    v-if="
+                                        form.type === 'database' &&
+                                        (form.dbType === 'mysql' || form.dbType === 'mysql-cluster')
+                                    "
+                                >
+                                    <el-form-item :label="$t('cronjob.backupArgs')">
+                                        <el-select v-model="form.argItems" filterable allow-create multiple>
+                                            <el-option
+                                                v-for="item in mysqlArgs"
+                                                :key="item.arg"
+                                                :value="item.arg"
+                                                :label="item.arg"
+                                            >
+                                                {{ item.arg }}
+                                                <span class="ml-2">{{ item.description }}</span>
+                                            </el-option>
+                                        </el-select>
+                                        <span class="input-help">
+                                            {{ $t('cronjob.backupArgsHelper') }}
+                                        </span>
                                     </el-form-item>
                                 </LayoutCol>
                                 <LayoutCol v-if="form.type === 'directory'">
@@ -617,7 +652,7 @@
                             <el-row :gutter="20">
                                 <LayoutCol v-if="isBackup() && !isDatabase()">
                                     <el-form-item :label="$t('setting.compressPassword')" prop="secret">
-                                        <el-input v-model="form.secret" />
+                                        <el-input type="password" show-password v-model="form.secret" />
                                     </el-form-item>
                                 </LayoutCol>
                                 <LayoutCol>
@@ -682,6 +717,34 @@
                                             cleanable
                                         >
                                             <el-option value="mail" :label="$t('xpack.alert.mail')" />
+                                            <el-option
+                                                v-if="!isProductPro"
+                                                value="bark"
+                                                :label="$t('xpack.alert.bark')"
+                                            />
+                                            <el-option
+                                                value="weCom"
+                                                v-if="!globalStore.isIntl"
+                                                :disabled="!form.hasAlert || !isProductPro"
+                                                :label="$t('xpack.alert.weCom')"
+                                            />
+                                            <el-option
+                                                value="dingTalk"
+                                                v-if="!globalStore.isIntl"
+                                                :disabled="!form.hasAlert || !isProductPro"
+                                                :label="$t('xpack.alert.dingTalk')"
+                                            />
+                                            <el-option
+                                                value="feiShu"
+                                                v-if="!globalStore.isIntl"
+                                                :disabled="!form.hasAlert || !isProductPro"
+                                                :label="$t('xpack.alert.feiShu')"
+                                            />
+                                            <el-option
+                                                v-if="isProductPro"
+                                                value="bark"
+                                                :label="$t('xpack.alert.bark')"
+                                            />
                                             <el-option
                                                 value="sms"
                                                 v-if="!globalStore.isIntl"
@@ -774,7 +837,6 @@ import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import InputTag from '@/components/input-tag/index.vue';
 import LayoutCol from '@/components/layout-col/form.vue';
 import CleanLogConfig from '@/views/cronjob/cronjob/config/clean-log.vue';
-
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import { listBackupOptions } from '@/api/modules/backup';
@@ -797,13 +859,14 @@ import {
     transSpecToObj,
     weekOptions,
     cronjobTypes,
+    mysqlArgs,
 } from '../helper';
 import { loadUsers } from '@/api/modules/toolbox';
 import { loadContainerUsers } from '@/api/modules/container';
 import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
 import LicenseImport from '@/components/license-import/index.vue';
-import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/util';
+import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/validate';
 import { getGroupList } from '@/api/modules/group';
 import { routerToName, routerToPath } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
@@ -883,6 +946,8 @@ const form = reactive<Cronjob.CronjobInfo>({
     alertMethodItems: [],
 
     scopes: [],
+    args: '',
+    argItems: [],
 });
 
 const search = async () => {
@@ -982,6 +1047,7 @@ const search = async () => {
                     form.alertMethodItems = [];
                 }
                 form.scopes = res.data.scopes;
+                form.argItems = res.data.args ? res.data.args.split(',') : [];
             })
             .catch(() => {
                 loading.value = false;
@@ -1481,6 +1547,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     form.url = form.urlItems.join(',');
     form.sourceAccountIDs = form.sourceAccountItems.join(',');
     form.spec = specs.join('&&');
+    form.args = form.argItems.join(',');
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
@@ -1539,7 +1606,8 @@ onMounted(() => {
     width: 17% !important;
     margin-left: 20px;
     .append {
-        width: 20px;
+        margin-left: -10px;
+        width: 30px;
     }
 }
 @media only screen and (max-width: 1000px) {
@@ -1595,5 +1663,23 @@ onMounted(() => {
     width: 100%;
     margin: 3px 0;
     border-top: 1px var(--el-border-color) var(--el-border-style);
+}
+
+.option-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.domain-text {
+    max-width: 200px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    display: inline-block;
+    vertical-align: middle;
 }
 </style>

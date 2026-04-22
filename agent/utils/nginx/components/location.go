@@ -73,6 +73,12 @@ func NewLocation(directive IDirective) *Location {
 						location.CacheUint = unit
 						location.CacheTime = cacheTime
 					}
+					if di.GetName() == "add_header" && len(di.GetParameters()) >= 2 {
+						if di.GetParameters()[0] == "Cache-Control" && di.GetParameters()[1] == "no-cache" {
+							location.CacheTime = -1
+							location.CacheUint = ""
+						}
+					}
 				}
 			}
 			if params[0] == "(" && params[1] == "$request_method" && params[2] == `=` && params[3] == `'OPTIONS'` && params[4] == ")" {
@@ -274,6 +280,28 @@ func (l *Location) AddBrowserCache(cacheTime int, cacheUint string) {
 	l.CacheUint = cacheUint
 }
 
+func (l *Location) AddBroswerNoCache() {
+	l.RemoveDirective("add_header", []string{"Cache-Control", "no-cache"})
+	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
+	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
+	directives := l.GetDirectives()
+	newDir := &Directive{
+		Name:       "if",
+		Parameters: []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "add_header",
+		Parameters: []string{"Cache-Control", "no-cache"},
+	})
+	newDir.Block = block
+	directives = append(directives, newDir)
+	l.Directives = directives
+	l.CacheTime = -1
+	l.CacheUint = "s"
+}
+
 func (l *Location) AddServerCache(cacheKey string, serverCacheTime int, serverCacheUint string) {
 	l.UpdateDirective("proxy_ignore_headers", []string{"Set-Cookie", "Cache-Control", "expires"})
 	l.UpdateDirective("proxy_cache", []string{cacheKey})
@@ -287,7 +315,7 @@ func (l *Location) AddServerCache(cacheKey string, serverCacheTime int, serverCa
 func (l *Location) RemoveBrowserCache() {
 	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
 	l.RemoveDirectiveByFullParams("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2|jpeg|svg|webp|avif)$"`, ")"})
-	l.UpdateDirective("add_header", []string{"Cache-Control", "no-cache"})
+	l.RemoveDirective("add_header", []string{"Cache-Control", "no-cache"})
 	l.CacheTime = 0
 	l.CacheUint = ""
 }

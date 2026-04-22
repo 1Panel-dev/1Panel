@@ -38,16 +38,16 @@ func TestGenerateXlog(t *testing.T) {
 						logContent := ""
 						for _, comment := range d.Doc.List {
 							if strings.HasPrefix(comment.Text, "// @Router") {
-								routerContent = replaceStr(comment.Text, "// @Router", "[post]", "[get]", " ")
+								routerContent = replaceStr(comment.Text, "// @Router", "[post]", "[get]")
 							}
 							if strings.HasPrefix(comment.Text, "// @x-panel-log") {
-								logContent = replaceStr(comment.Text, "// @x-panel-log", " ")
+								logContent = replaceStr(comment.Text, "// @x-panel-log")
 							}
 						}
 						if len(routerContent) != 0 && len(logContent) != 0 {
 							var item operationJson
 							if err := json.Unmarshal([]byte(logContent), &item); err != nil {
-								panic(fmt.Sprintf("json unamrshal failed, err: %v", err))
+								panic(fmt.Sprintf("json unmarshal failed, err: %v", err))
 							}
 							xlogMap[routerContent] = item
 						}
@@ -62,7 +62,10 @@ func TestGenerateXlog(t *testing.T) {
 		panic(fmt.Sprintf("json marshal for new file failed, err: %v", err))
 	}
 	if err := os.WriteFile("x-log.json", newJson, 0640); err != nil {
-		panic(fmt.Sprintf("write new swagger.json failed, err: %v", err))
+		panic(fmt.Sprintf("write core x-log.json failed, err: %v", err))
+	}
+	if err := os.WriteFile(workDir+"/agent/cmd/server/docs/x-log.json", newJson, 0640); err != nil {
+		panic(fmt.Sprintf("write agent x-log.json failed, err: %v", err))
 	}
 }
 
@@ -186,6 +189,7 @@ func replaceStr(val string, rep ...string) string {
 	for _, item := range rep {
 		val = strings.ReplaceAll(val, item, "")
 	}
+	val = strings.TrimSpace(val)
 	return val
 }
 

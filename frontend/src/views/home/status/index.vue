@@ -58,12 +58,15 @@
                 v-if="chartsOption['cpu']"
                 @hide="onCpuPopoverHide"
             >
-                <el-descriptions :title="baseInfo.cpuModelName" :column="2" size="small">
+                <el-descriptions :title="baseInfo.cpuModelName" class="ml-1" :column="3" size="small">
                     <el-descriptions-item :label="$t('home.core')">
                         {{ baseInfo.cpuCores }}
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('home.logicCore')">
                         {{ baseInfo.cpuLogicalCores }}
+                    </el-descriptions-item>
+                    <el-descriptions-item v-if="baseInfo.cpuMhz > 0" :label="$t('home.cpuFrequency')">
+                        {{ formatNumber(baseInfo.cpuMhz) }} MHz
                     </el-descriptions-item>
                 </el-descriptions>
 
@@ -81,7 +84,42 @@
                     <el-button v-if="!cpuShowAll" @click="cpuShowAll = true" icon="More" link size="small" />
                     <el-button v-if="cpuShowAll" @click="cpuShowAll = false" icon="ArrowUp" link size="small" />
                 </div>
-                <br />
+
+                <div v-if="currentInfo.cpuDetailedPercent?.length >= 8" class="mt-2">
+                    <el-button
+                        link
+                        size="small"
+                        type="primary"
+                        class="mb-2"
+                        @click="showCpuDetailedPercent = !showCpuDetailedPercent"
+                    >
+                        {{ $t('home.cpuDetailedPercent') }}
+                        <el-icon v-if="!showCpuDetailedPercent"><ArrowRight /></el-icon>
+                        <el-icon v-if="showCpuDetailedPercent"><ArrowDown /></el-icon>
+                    </el-button>
+                    <el-space wrap :size="5" class="ml-1 mb-2" v-if="showCpuDetailedPercent">
+                        <div class="cpu-detail">
+                            {{ $t('home.cpuUser') }}: {{ formatNumber(currentInfo.cpuDetailedPercent[0]) }}%
+                        </div>
+                        <div class="cpu-detail">
+                            {{ $t('home.cpuSystem') }}: {{ formatNumber(currentInfo.cpuDetailedPercent[1]) }}%
+                        </div>
+                        <div class="cpu-detail">Nice: {{ formatNumber(currentInfo.cpuDetailedPercent[2]) }}%</div>
+                        <div class="cpu-detail">
+                            {{ $t('home.cpuIdle') }}: {{ formatNumber(currentInfo.cpuDetailedPercent[3]) }}%
+                        </div>
+                        <div class="cpu-detail">I/O: {{ formatNumber(currentInfo.cpuDetailedPercent[4]) }}%</div>
+                        <div class="cpu-detail">
+                            {{ $t('home.cpuIrq') }}: {{ formatNumber(currentInfo.cpuDetailedPercent[5]) }}%
+                        </div>
+                        <div class="cpu-detail">
+                            {{ $t('home.cpuSoftirq') }}: {{ formatNumber(currentInfo.cpuDetailedPercent[6]) }}%
+                        </div>
+                        <div class="cpu-detail">
+                            {{ $t('home.cpuSteal') }}: {{ formatNumber(currentInfo.cpuDetailedPercent[7]) }}%
+                        </div>
+                    </el-space>
+                </div>
 
                 <el-button link size="small" type="primary" class="mt-2 mb-2" @click="toggleCpuTop">
                     {{ $t('home.cpuTop') }}
@@ -264,22 +302,22 @@
             <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center" v-if="isShow('gpu', index)">
                 <el-popover :hide-after="20" :teleported="false" :width="450" v-if="chartsOption[`gpu${index}`]">
                     <el-descriptions :title="item.productName" direction="vertical" :column="3" size="small">
-                        <el-descriptions-item :label="$t('monitor.gpuUtil')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.gpuUtil')">
                             {{ item.gpuUtil }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.temperature')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.temperature')">
                             {{ item.temperature.replaceAll('C', '°C') }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.performanceState')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.performanceState')">
                             {{ item.performanceState }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.powerUsage')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.powerUsage')">
                             {{ item.powerUsage }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.memoryUsage')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.memoryUsage')">
                             {{ item.memoryUsage }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.fanSpeed')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.fanSpeed')">
                             {{ item.fanSpeed }}
                         </el-descriptions-item>
                     </el-descriptions>
@@ -303,17 +341,14 @@
         <template v-for="(item, index) of currentInfo.xpuData" :key="index">
             <el-col :xs="6" :sm="6" :md="3" :lg="3" :xl="3" align="center" v-if="isShow('xpu', index)">
                 <el-popover :hide-after="20" :teleported="false" :width="400" v-if="chartsOption[`xpu${index}`]">
-                    <el-descriptions :title="item.deviceName" direction="vertical" :column="4" size="small">
-                        <el-descriptions-item :label="$t('monitor.gpuUtil')">
-                            {{ item.memoryUtil }}
-                        </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.temperature')">
+                    <el-descriptions :title="item.deviceName" direction="vertical" :column="3" size="small">
+                        <el-descriptions-item :label="$t('aiTools.gpu.temperature')">
                             {{ item.temperature }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.powerUsage')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.powerUsage')">
                             {{ item.power }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('monitor.memoryUsage')">
+                        <el-descriptions-item :label="$t('aiTools.gpu.memoryUsage')">
                             {{ item.memoryUsed }}/{{ item.memory }}
                         </el-descriptions-item>
                     </el-descriptions>
@@ -350,7 +385,7 @@
 
 <script setup lang="ts">
 import { Dashboard } from '@/api/interface/dashboard';
-import { computeSize } from '@/utils/util';
+import { computeSize } from '@/utils/size';
 import i18n from '@/lang';
 import { nextTick, onBeforeUnmount, ref } from 'vue';
 import { routerToFileWithPath, routerToName } from '@/utils/router';
@@ -380,7 +415,9 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     cpuCores: 0,
     cpuLogicalCores: 0,
     cpuModelName: '',
+    cpuMhz: 0,
     currentInfo: null,
+    prettyDistro: '',
     quickJump: [],
 });
 const currentInfo = ref<Dashboard.CurrentInfo>({
@@ -397,6 +434,7 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     cpuUsedPercent: 0,
     cpuUsed: 0,
     cpuTotal: 0,
+    cpuDetailedPercent: [] as Array<number>,
 
     memoryTotal: 0,
     memoryAvailable: 0,
@@ -429,6 +467,7 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
 });
 
 const cpuShowAll = ref();
+const showCpuDetailedPercent = ref(false);
 const showCpuTop = ref(false);
 const showMemTop = ref(false);
 const killProcessID = ref();

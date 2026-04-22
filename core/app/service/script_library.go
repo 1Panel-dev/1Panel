@@ -1,9 +1,10 @@
 package service
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
-	mathRand "math/rand"
+	"math/big"
 	"net/http"
 	"os"
 	"path"
@@ -43,7 +44,7 @@ func NewIScriptService() IScriptService {
 }
 
 func (u *ScriptService) Search(ctx *gin.Context, req dto.SearchPageWithGroup) (int64, interface{}, error) {
-	options := []global.DBOption{repo.WithOrderBy("created_at desc")}
+	options := []global.DBOption{repo.WithOrderDesc("created_at")}
 	if len(req.Info) != 0 {
 		options = append(options, scriptRepo.WithByInfo(req.Info))
 	}
@@ -172,7 +173,17 @@ func StartSync() {
 	service := NewIScriptService()
 	scriptSync, _ := repo.NewISettingRepo().GetValueByKey("ScriptSync")
 	if !global.CONF.Base.IsOffLine && scriptSync == constant.StatusEnable {
-		id, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", mathRand.Intn(60), mathRand.Intn(3)), service)
+		minuteRand, err := rand.Int(rand.Reader, big.NewInt(60))
+		if err != nil {
+			global.LOG.Errorf("generate random minute failed: %v", err)
+			minuteRand = big.NewInt(0)
+		}
+		hourRand, err := rand.Int(rand.Reader, big.NewInt(3))
+		if err != nil {
+			global.LOG.Errorf("generate random hour failed: %v", err)
+			hourRand = big.NewInt(0)
+		}
+		id, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", minuteRand.Int64(), hourRand.Int64()), service)
 		if err != nil {
 			global.LOG.Errorf("[core] can not add script sync corn job: %s", err.Error())
 		}
@@ -194,14 +205,14 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 	if global.CONF.Base.IsOffLine {
 		return nil
 	}
-	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("ScriptLibrary"), task.TaskSync, task.TaskScopeScript, req.TaskID, 0)
+	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("RemoteScriptLibrary"), task.TaskSync, task.TaskScopeScript, req.TaskID, 0)
 	if err != nil {
 		global.LOG.Errorf("create sync task failed %v", err)
 		return err
 	}
 
-	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("ScriptLibrary"), task.TaskSync, task.TaskScopeScript), func(t *task.Task) (err error) {
-		versionUrl := fmt.Sprintf("%s/scripts/version.txt", global.CONF.RemoteURL.ResourceURL)
+	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("RemoteScriptLibrary"), task.TaskSync, task.TaskScopeScript), func(t *task.Task) (err error) {
+		versionUrl := fmt.Sprintf("%s/scripts/version.txt", global.ResourceURL())
 		_, versionRes, err := req_helper.HandleRequestWithProxy(versionUrl, http.MethodGet, constant.TimeOut20s)
 		if err != nil {
 			return fmt.Errorf("load scripts version from remote failed, err: %v", err)
@@ -216,7 +227,7 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 			return nil
 		}
 
-		dataUrl := fmt.Sprintf("%s/scripts/data.yaml", global.CONF.RemoteURL.ResourceURL)
+		dataUrl := fmt.Sprintf("%s/scripts/data.yaml", global.ResourceURL())
 		_, dataRes, err := req_helper.HandleRequestWithProxy(dataUrl, http.MethodGet, constant.TimeOut20s)
 		syncTask.LogWithStatus(i18n.GetMsgByKey("DownloadData"), err)
 		if err != nil {
@@ -232,8 +243,8 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 		if _, err := os.Stat(tmpDir); err != nil {
 			_ = os.MkdirAll(tmpDir, 0755)
 		}
-		scriptsUrl := fmt.Sprintf("%s/scripts/scripts.tar.gz", global.CONF.RemoteURL.ResourceURL)
-		err = files.DownloadFileWithProxy(scriptsUrl, tmpDir+"/scripts.tar.gz")
+		scriptsUrl := fmt.Sprintf("%s/scripts/scripts.tar.gz", global.ResourceURL())
+		err = files.DownloadFileWithProxyStream(scriptsUrl, tmpDir+"/scripts.tar.gz")
 		syncTask.LogWithStatus(i18n.GetMsgByKey("DownloadPackage"), err)
 		if err != nil {
 			return fmt.Errorf("download scripts.tar.gz failed, err: %v", err)

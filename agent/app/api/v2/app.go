@@ -1,13 +1,14 @@
 package v2
 
 import (
+	"net/http"
+
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/appicon"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"time"
 )
 
 // @Tags App
@@ -28,7 +29,7 @@ func (b *BaseApi) SearchApp(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, list)
+	helper.SuccessWithDataGzipped(c, list)
 }
 
 // @Tags App
@@ -163,7 +164,7 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	install, err := appService.Install(req)
+	install, err := appService.Install(req, true)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -202,20 +203,53 @@ func (b *BaseApi) GetAppListUpdate(c *gin.Context) {
 // @Success 200 {file} file "app icon"
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /apps/icon/:appId [get]
+// @Router /apps/icon/:key [get]
 func (b *BaseApi) GetAppIcon(c *gin.Context) {
-	appID, err := helper.GetIntParamByKey(c, "appID")
+	appKey, err := helper.GetStrParamByKey(c, "key")
 	if err != nil {
 		helper.BadRequest(c, err)
 		return
 	}
-	iconBytes, err := appService.GetAppIcon(appID)
+	iconBytes, filename, etag, err := appService.GetAppIcon(appKey)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	c.Header("Content-Type", "image/png")
-	c.Header("Cache-Control", "public, max-age=31536000, immutable")
-	c.Header("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
-	c.Data(http.StatusOK, "image/png", iconBytes)
+
+	if len(iconBytes) == 0 {
+		c.Status(http.StatusNoContent)
+		return
+	}
+
+	c.Header("Cache-Control", "public, max-age=2592000")
+
+	if etag != "" && filename != "" {
+		c.Header("ETag", etag)
+		if c.GetHeader("If-None-Match") == etag {
+			c.Status(http.StatusNotModified)
+			return
+		}
+	}
+
+	c.Data(http.StatusOK, appicon.ContentTypePNG, iconBytes)
+}
+
+// @Tags App
+// @Summary Search app detail by appkey and version
+// @Accept json
+// @Param appId path integer true "app key"
+// @Param version path string true "app version"
+// @Success 200 {object} response.AppDetailSimpleDTO
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /apps/detail/node/:appKey/:version [get]
+func (b *BaseApi) GetAppDetailForNode(c *gin.Context) {
+	appKey := c.Param("appKey")
+	version := c.Param("version")
+	appDetailDTO, err := appService.GetAppDetailByKey(appKey, version)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, appDetailDTO)
 }

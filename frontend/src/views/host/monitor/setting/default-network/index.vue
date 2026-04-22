@@ -64,7 +64,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         await updateMonitorSetting('DefaultNetwork', form.defaultNetwork)
             .then(async () => {
-                globalStore.setDefaultNetwork(form.defaultNetwork);
+                globalStore.defaultNetwork = form.defaultNetwork;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loading.value = false;
                 drawerVisible.value = false;

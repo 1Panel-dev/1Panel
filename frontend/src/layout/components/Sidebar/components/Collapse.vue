@@ -1,6 +1,8 @@
 <template>
     <div>
         <el-popover
+            ref="nodeChangeRef"
+            v-model:visible="popoverVisible"
             placement="right-end"
             :show-arrow="false"
             :offset="0"
@@ -13,35 +15,44 @@
                 <div class="el-dropdown-link" v-if="!menuStore.isCollapse">
                     <el-badge is-dot :value="taskCount" :show-zero="false" :offset="[5, 5]">
                         <el-button link @click="openChangeNode" @mouseenter="openChangeNode">
-                            <SvgIcon class="icon" iconName="p-gerenzhongxin1" />
+                            <SvgIcon class="icon" iconName="p-pcm" />
                             <span class="ellipsis-text">{{ loadCurrentName() }}</span>
                         </el-button>
                     </el-badge>
                 </div>
                 <div v-else class="el-dropdown-link">
                     <el-badge is-dot :value="taskCount" :show-zero="false" :offset="[-5, 5]">
-                        <SvgIcon class="icon" iconName="p-gerenzhongxin1" />
+                        <SvgIcon class="icon" iconName="p-pcm" />
                     </el-badge>
                 </div>
             </template>
             <div class="dropdown-menu" v-loading="loading">
-                <div class="dropdown-item mb-2" @click="openTask">
+                <div class="dropdown-item" @click="openTask">
+                    <SvgIcon class="icon" iconName="p-renwuzhongxin1" />
                     {{ $t('menu.msgCenter') }}
                     <el-tag class="msg-tag" v-if="taskCount !== 0" size="small" round>{{ taskCount }}</el-tag>
                 </div>
                 <el-divider v-if="showNodes()" class="divider" />
+                <div class="dropdown-item" @click="openNodeDashboard" v-if="isMasterPro">
+                    <SvgIcon class="icon" iconName="p-gailan1" />
+                    {{ $t('xpack.node.multiOverview') }}
+                </div>
+                <el-divider v-if="isMasterPro" class="divider" />
 
-                <div v-if="showNodes()" class="mb-2">
-                    <el-scrollbar max-height="168px" :noresize="true">
+                <div v-if="showNodes()">
+                    <el-scrollbar :max-height="isMasterPro ? '257px' : '218px'" :noresize="true">
                         <div
-                            class="dropdown-item mt-1"
+                            class="dropdown-item"
                             @click="changeNode(item.name)"
                             :disabled="item.status !== 'Healthy'"
                             v-for="item in nodeOptions"
                             :key="item.name"
                         >
-                            <div class="node" v-if="item.name !== 'local'">
-                                {{ item.name }}
+                            <div class="node">
+                                <SvgIcon class="icon" iconName="p-zhuji" />
+                                <span class="node-name">
+                                    {{ item.name === 'local' ? globalStore.getMasterAlias() : item.name }}
+                                </span>
                                 <el-tooltip
                                     v-if="item.status !== 'Healthy' || !item.isBound"
                                     :content="
@@ -56,9 +67,6 @@
                             </div>
                         </div>
                     </el-scrollbar>
-                    <div class="dropdown-item -mb-1" @click="changeNode('local')">
-                        <div class="node">{{ globalStore.getMasterAlias() }}</div>
-                    </div>
                 </div>
                 <el-input
                     v-if="showNodes() && nodes?.length > 5"
@@ -70,7 +78,10 @@
                     clearable
                 />
                 <el-divider class="divider" />
-                <div class="dropdown-item mt-2" @click="logout">{{ $t('commons.login.logout') }}</div>
+                <div class="dropdown-item" @click="logout">
+                    <SvgIcon class="icon" iconName="p-tuichudenglu3" />
+                    {{ $t('commons.login.logout') }}
+                </div>
             </div>
         </el-popover>
     </div>
@@ -78,7 +89,7 @@
 
 <script setup lang="ts">
 import { GlobalStore, MenuStore } from '@/store';
-import { DropdownInstance } from 'element-plus';
+import type { PopoverInstance } from 'element-plus';
 import { countExecutingTask } from '@/api/modules/log';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
@@ -97,7 +108,8 @@ const menuStore = MenuStore();
 const nodes = ref([]);
 const nodeOptions = ref([]);
 const loading = ref();
-const nodeChangeRef = ref<DropdownInstance>();
+const popoverVisible = ref(false);
+const nodeChangeRef = ref<PopoverInstance>();
 const props = defineProps({
     version: String,
 });
@@ -117,7 +129,7 @@ bus.on('refreshTask', () => {
 });
 
 const openChangeNode = () => {
-    nodeChangeRef.value?.handleOpen();
+    popoverVisible.value = true;
 };
 
 const loadCurrentName = () => {
@@ -165,6 +177,11 @@ const loadNodes = async () => {
             if (nodes.value.length === 0) {
                 setDefaultNodeInfo();
             }
+            nodes.value.sort((a, b) => {
+                if (a.name === 'local') return -1;
+                if (b.name === 'local') return 1;
+                return 0;
+            });
             nodeOptions.value = nodes.value || [];
             loading.value = false;
         })
@@ -183,6 +200,8 @@ const changeNode = (command: string) => {
                 globalStore.currentNode = 'local';
                 globalStore.currentNodeAddr = item.addr;
                 loadGlobalSetting();
+                localStorage.removeItem('dashboardCache');
+                localStorage.removeItem('upgradeChecked');
                 loadProductProFromDB();
                 routerToNameWithQuery('home', { t: Date.now() });
                 return;
@@ -200,6 +219,8 @@ const changeNode = (command: string) => {
                 return;
             }
             loadGlobalSetting();
+            localStorage.removeItem('dashboardCache');
+            localStorage.removeItem('upgradeChecked');
             globalStore.currentNode = command || 'local';
             globalStore.currentNodeAddr = item.addr;
             loadProductProFromDB();
@@ -230,6 +251,10 @@ const openTask = () => {
     emit('openTask');
 };
 
+const openNodeDashboard = () => {
+    routerToNameWithQuery('NodeDashboard', { uncached: 'true' });
+};
+
 const logout = () => {
     ElMessageBox.confirm(i18n.global.t('commons.msg.sureLogOut'), i18n.global.t('commons.msg.infoTitle'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -238,12 +263,8 @@ const logout = () => {
     })
         .then(async () => {
             await logOutApi();
-            sessionStorage.removeItem('dashboardCache');
-            localStorage.removeItem('dashboardCache');
-            sessionStorage.removeItem('upgradeChecked');
-            localStorage.removeItem('upgradeChecked');
             router.push({ name: 'entrance', params: { code: globalStore.entrance } });
-            globalStore.setLogStatus(false);
+            globalStore.isLogin = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {});
@@ -298,21 +319,35 @@ onMounted(() => {
 }
 
 .dropdown-item {
+    display: flex;
+    align-items: center;
     padding: 2px 8px;
     cursor: pointer;
+    min-height: 32px;
     transition: background 0.3s;
     .icon {
-        font-size: 6px;
+        font-size: 8px;
     }
     .icon-status {
-        float: right;
-        font-size: 18px;
+        font-size: 16px;
+        margin-left: auto;
     }
     .node {
+        display: flex;
+        align-items: center;
+        gap: 6px;
         padding: 3px 0;
+        width: 100%;
+    }
+    .node-name {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
     .msg-tag {
-        float: right;
+        margin-left: auto;
         background-color: transparent;
         color: var(--panel-main-bg-color-1);
     }

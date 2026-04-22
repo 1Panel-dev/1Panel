@@ -23,6 +23,8 @@ export namespace File {
         extension: string;
         itemTotal: number;
         favoriteID: number;
+        shareCode: string;
+        remark?: string;
     }
 
     export interface ReqFile extends ReqPage {
@@ -37,8 +39,56 @@ export namespace File {
         isDetail?: boolean;
     }
 
+    export interface FileAISearchReq {
+        path: string;
+        query: string;
+        responseLanguage?: string;
+        containSub?: boolean;
+        maxItems?: number;
+        matchCase?: boolean;
+        wholeWord?: boolean;
+        useRegex?: boolean;
+        extensions?: string[];
+        minSize?: number;
+        maxSize?: number;
+        modifiedAfter?: string;
+        modifiedBefore?: string;
+        maxScanFiles?: number;
+        maxFileBytes?: number;
+        maxHitsPerFile?: number;
+        maxTotalHits?: number;
+        contentHitsPromptMaxBytes?: number;
+        llmMaxOutputTokens?: number;
+    }
+
+    export interface FileAIContentHit {
+        path: string;
+        line: number;
+        text: string;
+    }
+
+    export interface FileAISearchResult {
+        mode?: 'ai' | 'grep';
+        summary: string;
+        hits: FileAIContentHit[];
+        contentScannedFiles: number;
+        contentHitsTruncated: boolean;
+        truncated: boolean;
+        preFiltered: boolean;
+        itemCount: number;
+        promptTokens: number;
+        completionTokens: number;
+        totalTokens: number;
+        duration: string;
+    }
+
     export interface ReqNodeFile extends ReqFile {
         node: string;
+    }
+
+    export interface PreviewContentReq {
+        path: string;
+        isDetail?: boolean;
     }
 
     export interface SearchUploadInfo extends ReqPage {
@@ -87,6 +137,11 @@ export namespace File {
         name: string;
         replace: boolean;
         secret: string;
+        taskID?: string;
+    }
+
+    export interface FileCompressStopReq {
+        taskID: string;
     }
 
     export interface FileDeCompress {
@@ -99,6 +154,40 @@ export namespace File {
     export interface FileEdit {
         path: string;
         content: string;
+    }
+
+    export interface FileHistorySearchReq {
+        page: number;
+        pageSize: number;
+        path: string;
+        scope: 'current' | 'all';
+        operation?: string;
+    }
+
+    export interface FileHistoryInfo {
+        id: number;
+        fileId?: string;
+        path: string;
+        currentPath?: string;
+        previousId?: number;
+        sourcePath?: string;
+        targetPath?: string;
+        fileName: string;
+        extension: string;
+        fileMode?: string;
+        operation: string;
+        deleted?: boolean;
+        contentSize: number;
+        contentSHA: string;
+        storagePath?: string;
+        content?: string;
+        currentContent?: string;
+        createdAt: string;
+        updatedAt: string;
+    }
+
+    export interface FileHistoryDeleteReq {
+        ids: number[];
     }
 
     export interface FileRename {
@@ -214,6 +303,15 @@ export namespace File {
         sub: boolean;
     }
 
+    export interface FileRemarkUpdate {
+        path: string;
+        remark: string;
+    }
+
+    export interface FileRemarksRes {
+        remarks: Record<string, string>;
+    }
+
     export interface UserGroupResponse {
         users: UserInfo[];
         groups: string[];
@@ -244,5 +342,34 @@ export namespace File {
         log: string;
         status: string;
         message: string;
+    }
+
+    export interface FileShareCreate {
+        path: string;
+        expireMinutes: number;
+        password?: string;
+    }
+
+    export interface FileShareCheck {
+        code: string;
+        password?: string;
+        operateNode: string;
+    }
+
+    export interface FileShareInfo {
+        code: string;
+        path: string;
+        fileName: string;
+        expiresAt: number;
+        permanent: boolean;
+        hasPassword: boolean;
+        password?: string;
+    }
+
+    export interface FileSharePublicInfo {
+        fileName: string;
+        expiresAt: number;
+        permanent: boolean;
+        hasPassword: boolean;
     }
 }

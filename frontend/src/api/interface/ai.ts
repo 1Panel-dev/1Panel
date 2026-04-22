@@ -1,6 +1,8 @@
 import { ReqPage } from '.';
 
 export namespace AI {
+    export type AgentType = 'openclaw' | 'copaw' | 'hermes-agent';
+
     export interface OllamaModelInfo {
         id: number;
         name: string;
@@ -234,5 +236,673 @@ export namespace AI {
     export interface TensorRTLLMOperate {
         id: number;
         operate: string;
+    }
+
+    export interface AgentCreateReq {
+        name: string;
+        remark: string;
+        appVersion: string;
+        webUIPort: number;
+        bridgePort?: number;
+        allowedOrigins?: string[];
+        agentType: AgentType;
+        model?: string;
+        accountId?: number;
+        token?: string;
+        taskID: string;
+        advanced: boolean;
+        containerName: string;
+        allowPort: boolean;
+        specifyIP: string;
+        restartPolicy: string;
+        cpuQuota: number;
+        memoryLimit: number;
+        memoryUnit: string;
+        pullImage: boolean;
+        editCompose: boolean;
+        dockerCompose: string;
+    }
+
+    export interface AgentItem {
+        id: number;
+        name: string;
+        remark: string;
+        agentType: AgentType;
+        provider: string;
+        providerName: string;
+        model: string;
+        apiType: string;
+        maxTokens: number;
+        contextWindow: number;
+        baseUrl: string;
+        apiKey: string;
+        token: string;
+        status: string;
+        message: string;
+        appInstallId: number;
+        websiteId: number;
+        websitePrimaryDomain: string;
+        websiteType: string;
+        websiteProtocol: string;
+        accountId: number;
+        appVersion: string;
+        containerName: string;
+        webUIPort: number;
+        bridgePort: number;
+        path: string;
+        configPath: string;
+        upgradable: boolean;
+        createdAt: string;
+    }
+
+    export interface AgentDeleteReq {
+        id: number;
+        taskID: string;
+        forceDelete: boolean;
+    }
+
+    export interface AgentTokenResetReq {
+        id: number;
+    }
+
+    export interface AgentRemarkUpdateReq {
+        id: number;
+        remark: string;
+    }
+
+    export interface AgentWebsiteBindReq {
+        agentId: number;
+        websiteId: number;
+    }
+
+    export interface AgentModelConfigUpdateReq {
+        agentId: number;
+        accountId: number;
+        model: string;
+        fallbacks: string[];
+    }
+
+    export interface AgentModelConfig {
+        accountId: number;
+        model: string;
+        fallbacks: string[];
+    }
+
+    export interface AgentHermesChatSessionItem {
+        id: string;
+        title: string;
+        model: string;
+        messageCount: number;
+        startedAt: string;
+        lastActive: string;
+    }
+
+    export interface AgentHermesChatSessionRenameReq {
+        agentId: number;
+        id: string;
+        title: string;
+    }
+
+    export interface AgentHermesChatSessionDeleteReq {
+        agentId: number;
+        id: string;
+    }
+
+    export interface AgentOverviewReq {
+        agentId: number;
+    }
+
+    export interface AgentIDReq {
+        agentId: number;
+    }
+
+    export interface AgentRoleCreateReq {
+        agentId: number;
+        name: string;
+        model: string;
+        bindings: AgentRoleBinding[];
+    }
+
+    export interface AgentRoleBinding {
+        channel: string;
+        accountId: string;
+    }
+
+    export interface AgentRoleCreateResp {
+        output: string;
+    }
+
+    export interface AgentRoleDeleteReq {
+        agentId: number;
+        id: string;
+    }
+
+    export interface AgentRoleBindReq {
+        agentId: number;
+        id: string;
+        channel: string;
+        accountId: string;
+    }
+
+    export interface AgentConfiguredAgentsReq {
+        agentId: number;
+    }
+
+    export interface AgentRoleChannelsReq {
+        agentId: number;
+    }
+
+    export interface AgentRoleChannelItem {
+        name: string;
+        bound: boolean;
+        accountIds: string[];
+    }
+
+    export interface AgentRoleMarkdownFilesReq {
+        agentId: number;
+        workspace: string;
+    }
+
+    export interface AgentConfiguredAgentItem {
+        id: string;
+        name: string;
+        workspace: string;
+        model: string;
+        agentDir: string;
+        bindings: AgentRoleBinding[];
+    }
+
+    export interface AgentRoleMarkdownFileItem {
+        name: string;
+        content: string;
+    }
+
+    export interface AgentRoleMarkdownFileUpdateItem {
+        name: string;
+        content: string;
+    }
+
+    export interface AgentRoleMarkdownFilesUpdateReq {
+        agentId: number;
+        workspace: string;
+        restart: boolean;
+        files: AgentRoleMarkdownFileUpdateItem[];
+    }
+
+    export interface AgentOverviewSnapshot {
+        containerStatus: string;
+        appVersion: string;
+        defaultModel: string;
+        channelCount: number;
+        skillCount: number;
+        jobCount: number;
+        sessionCount: number;
+    }
+
+    export interface AgentOverview {
+        snapshot: AgentOverviewSnapshot;
+    }
+
+    export interface AgentAccountModel {
+        recordId: number;
+        id: string;
+        name: string;
+        contextWindow: number;
+        maxTokens: number;
+        reasoning: boolean;
+        input: string[];
+    }
+
+    export interface AgentAccountModelReq {
+        accountId: number;
+    }
+
+    export interface AgentAccountModelCreateReq {
+        accountId: number;
+        model: AgentAccountModel;
+    }
+
+    export interface AgentAccountModelUpdateReq {
+        accountId: number;
+        model: AgentAccountModel;
+    }
+
+    export interface AgentAccountModelDeleteReq {
+        accountId: number;
+        recordId: number;
+    }
+
+    export interface ProviderModelInfo {
+        id: string;
+        name: string;
+        contextWindow: number;
+        maxTokens: number;
+        reasoning: boolean;
+        input: string[];
+    }
+
+    export interface ProviderInfo {
+        provider: string;
+        displayName: string;
+        baseUrl: string;
+        models: ProviderModelInfo[];
+    }
+
+    export interface AgentAccountCreateReq {
+        provider: string;
+        name: string;
+        apiKey: string;
+        rememberApiKey: boolean;
+        baseURL: string;
+        apiType: string;
+        models?: AgentAccountModel[];
+        remark: string;
+    }
+
+    export interface AgentAccountUpdateReq {
+        id: number;
+        name: string;
+        apiKey: string;
+        rememberApiKey: boolean;
+        baseURL: string;
+        apiType: string;
+        remark: string;
+        syncAgents: boolean;
+    }
+
+    export interface AgentAccountSearch {
+        page: number;
+        pageSize: number;
+        provider: string;
+        name: string;
+    }
+
+    export interface AgentAccountItem {
+        id: number;
+        provider: string;
+        providerName: string;
+        name: string;
+        apiKey: string;
+        rememberApiKey: boolean;
+        baseUrl: string;
+        models: AgentAccountModel[];
+        apiType: string;
+        verified: boolean;
+        remark: string;
+        createdAt: string;
+    }
+
+    export interface AgentAccountVerifyReq {
+        provider: string;
+        apiKey: string;
+        baseURL: string;
+    }
+
+    export interface AgentAccountDeleteReq {
+        id: number;
+    }
+
+    export interface AgentFeishuConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentChannelBotBase {
+        accountId: string;
+        name: string;
+        enabled: boolean;
+        isDefault: boolean;
+    }
+
+    export interface AgentFeishuBot extends AgentChannelBotBase {
+        appId: string;
+        appSecret: string;
+        dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        allowFrom: string[];
+    }
+
+    export interface AgentFeishuConfig {
+        enabled: boolean;
+        threadSession: boolean;
+        replyMode: string;
+        streaming: boolean;
+        requireMention: 'true' | 'false' | 'open';
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
+        domain?: string;
+        connectionMode?: 'websocket' | 'webhook';
+        bots: AgentFeishuBot[];
+        installed: boolean;
+    }
+
+    export interface AgentFeishuConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        threadSession: boolean;
+        replyMode: string;
+        streaming: boolean;
+        requireMention: 'true' | 'false' | 'open';
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
+        domain?: string;
+        connectionMode?: 'websocket' | 'webhook';
+        bots: AgentFeishuBot[];
+    }
+
+    export interface AgentFeishuPairingApproveReq {
+        agentId: number;
+        pairingCode: string;
+    }
+
+    export interface AgentTelegramConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentTelegramConfig {
+        enabled: boolean;
+        dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        allowFrom: string[];
+        requireMention: boolean;
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
+        proxy: string;
+        streaming: 'off' | 'partial' | 'block' | 'progress';
+        defaultAccount: string;
+        bots: AgentTelegramBot[];
+    }
+
+    export interface AgentTelegramConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        allowFrom: string[];
+        requireMention: boolean;
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
+        proxy: string;
+        streaming: 'off' | 'partial' | 'block' | 'progress';
+        defaultAccount: string;
+        bots: AgentTelegramBot[];
+    }
+
+    export interface AgentChannelPairingApproveReq {
+        agentId: number;
+        type: 'feishu' | 'telegram' | 'discord' | 'wecom' | 'qqbot' | 'dingtalk';
+        pairingCode: string;
+        accountId?: string;
+    }
+
+    export interface AgentTelegramBot extends AgentChannelBotBase {
+        botToken: string;
+        dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        streaming: 'off' | 'partial' | 'block' | 'progress';
+    }
+
+    export interface AgentWecomConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentWecomConfig {
+        enabled: boolean;
+        dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        allowFrom: string[];
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
+        botId: string;
+        secret: string;
+        installed: boolean;
+    }
+
+    export interface AgentWecomConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        dmPolicy: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        allowFrom: string[];
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
+        botId: string;
+        secret: string;
+    }
+
+    export interface AgentDingTalkConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentDingTalkConfig {
+        enabled: boolean;
+        dmPolicy: 'pairing' | 'allowlist' | 'open' | 'disabled';
+        allowFrom: string[];
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
+        separateSessionByConversation: boolean;
+        groupSessionScope: 'group' | 'group_sender';
+        sharedMemoryAcrossConversations: boolean;
+        asyncMode: boolean;
+        ackText: string;
+        bots: AgentDingTalkBot[];
+        installed: boolean;
+    }
+
+    export interface AgentDingTalkConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        dmPolicy: 'pairing' | 'allowlist' | 'open' | 'disabled';
+        allowFrom: string[];
+        groupPolicy: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom: string[];
+        separateSessionByConversation: boolean;
+        groupSessionScope: 'group' | 'group_sender';
+        sharedMemoryAcrossConversations: boolean;
+        asyncMode: boolean;
+        ackText: string;
+        bots: AgentDingTalkBot[];
+    }
+
+    export interface AgentWeixinLoginReq {
+        agentId: number;
+        taskID: string;
+    }
+
+    export interface AgentWeixinConfig {
+        enabled: boolean;
+    }
+
+    export interface AgentChannelDeleteReq {
+        agentId: number;
+        type: 'feishu' | 'telegram' | 'discord' | 'wecom' | 'qqbot' | 'dingtalk' | 'weixin';
+    }
+
+    export interface AgentQQBotConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentQQBotConfig {
+        enabled: boolean;
+        dmPolicy?: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        allowFrom?: string[];
+        groupPolicy?: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom?: string[];
+        bots: AgentQQBotBot[];
+        installed: boolean;
+    }
+
+    export interface AgentQQBotConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        dmPolicy?: 'pairing' | 'open' | 'allowlist' | 'disabled';
+        allowFrom?: string[];
+        groupPolicy?: 'open' | 'allowlist' | 'disabled';
+        groupAllowFrom?: string[];
+        bots: AgentQQBotBot[];
+    }
+
+    export interface AgentPluginInstallReq {
+        agentId: number;
+        type: 'feishu' | 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
+        taskID: string;
+    }
+
+    export interface AgentPluginUpgradeReq {
+        agentId: number;
+        type: 'feishu' | 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
+        taskID: string;
+    }
+
+    export interface AgentPluginUninstallReq {
+        agentId: number;
+        type: 'feishu' | 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
+        taskID: string;
+    }
+
+    export interface AgentPluginCheckReq {
+        agentId: number;
+        type: 'feishu' | 'qqbot' | 'wecom' | 'dingtalk' | 'weixin';
+        checkLatest?: boolean;
+    }
+
+    export interface AgentPluginStatus {
+        installed: boolean;
+        currentVersion: string;
+        latestVersion: string;
+        upgradable: boolean;
+    }
+
+    export interface AgentDiscordConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentDiscordConfig {
+        enabled: boolean;
+        dmPolicy: string;
+        allowFrom: string[];
+        requireMention: boolean;
+        groupPolicy: string;
+        proxy: string;
+        defaultAccount: string;
+        bots: AgentDiscordBot[];
+    }
+
+    export interface AgentDiscordConfigUpdateReq {
+        agentId: number;
+        enabled: boolean;
+        dmPolicy: string;
+        allowFrom: string[];
+        requireMention: boolean;
+        groupPolicy: string;
+        proxy: string;
+        defaultAccount: string;
+        bots: AgentDiscordBot[];
+    }
+
+    export interface AgentDiscordBot extends AgentChannelBotBase {
+        token: string;
+    }
+
+    export interface AgentQQBotBot extends AgentChannelBotBase {
+        appId: string;
+        clientSecret: string;
+        allowFrom: string[];
+        systemPrompt: string;
+    }
+
+    export interface AgentDingTalkBot extends AgentChannelBotBase {
+        clientId: string;
+        clientSecret: string;
+    }
+
+    export interface AgentSecurityConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentSecurityConfig {
+        allowedOrigins: string[];
+    }
+
+    export interface AgentSecurityConfigUpdateReq {
+        agentId: number;
+        allowedOrigins: string[];
+    }
+
+    export interface AgentOtherConfigReq {
+        agentId: number;
+    }
+
+    export interface AgentOtherConfig {
+        userTimezone: string;
+        browserEnabled: boolean;
+        npmRegistry: string;
+    }
+
+    export interface AgentOtherConfigUpdateReq {
+        agentId: number;
+        userTimezone: string;
+        browserEnabled: boolean;
+        npmRegistry: string;
+    }
+
+    export interface AgentConfigFileReq {
+        agentId: number;
+    }
+
+    export interface AgentConfigFile {
+        content: string;
+    }
+
+    export interface AgentConfigFileUpdateReq {
+        agentId: number;
+        content: string;
+    }
+
+    export interface AgentSkillsReq {
+        agentId: number;
+    }
+
+    export interface AgentSkillSearchReq {
+        agentId: number;
+        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub' | 'official' | 'skills-sh';
+        keyword: string;
+    }
+
+    export interface AgentSkillItem {
+        name: string;
+        description: string;
+        category: string;
+        tags: string[];
+        source: string;
+        trust: string;
+        identifier: string;
+        bundled: boolean;
+        disabled: boolean;
+        uninstallable: boolean;
+    }
+
+    export interface AgentSkillSearchItem {
+        slug: string;
+        identifier: string;
+        name: string;
+        description: string;
+        summary: string;
+        version: string;
+        source: string;
+        trust: string;
+        score: string;
+    }
+
+    export interface AgentSkillUpdateReq {
+        agentId: number;
+        name: string;
+        enabled: boolean;
+    }
+
+    export interface AgentSkillInstallReq {
+        agentId: number;
+        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub' | 'official' | 'skills-sh';
+        slug: string;
+        taskID: string;
+    }
+
+    export interface AgentSkillUninstallReq {
+        agentId: number;
+        name: string;
     }
 }

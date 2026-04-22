@@ -109,7 +109,7 @@ func (b *BaseApi) LoadPort(c *gin.Context) {
 // @Success 200 {object} response.DatabaseConn
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /apps/installed/conninfo [POST]
+// @Router /apps/installed/conninfo [post]
 func (b *BaseApi) LoadConnInfo(c *gin.Context) {
 	var req dto.OperationWithNameAndType
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -294,7 +294,7 @@ func (b *BaseApi) GetParams(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /apps/installed/params/update [post]
-// @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用参数修改 [installId]","formatEN":"Application param update [installId]"}
+// @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"name","output_value":"name"}],"formatZH":"应用参数修改 [name]","formatEN":"Application param update [name]"}
 func (b *BaseApi) UpdateInstalled(c *gin.Context) {
 	var req request.AppInstalledUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -348,4 +348,16 @@ func (b *BaseApi) GetAppInstallInfo(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, info)
+}
+
+func (b *BaseApi) UpdateAppInstallSort(c *gin.Context) {
+	var req request.AppInstallSort
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := appInstallService.UpdateSort(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
 }

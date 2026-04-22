@@ -30,7 +30,7 @@
             </template>
             <template #main>
                 <MainDiv :heightDiff="260">
-                    <Basic :website="website" v-if="index === 'basic'" :heightDiff="320"></Basic>
+                    <Basic :website="website" v-if="index === 'basic' && website.id" :heightDiff="320"></Basic>
                     <Log :id="id" v-if="index === 'log'"></Log>
                     <Resource :id="id" v-if="index === 'resource'"></Resource>
                 </MainDiv>
@@ -77,22 +77,18 @@ const changeTab = (index: string) => {
     routerToNameWithParams('WebsiteConfig', { id: id.value, tab: index });
 };
 
-onMounted(() => {
+onMounted(async () => {
     index.value = props.tab;
     id.value = Number(props.id);
     loading.value = true;
-    getWebsite(id.value)
-        .then(async (res) => {
-            website.value = res.data;
-            if (res.data.type === 'runtime') {
-                const runRes = await GetRuntime(res.data.runtimeID);
-                if (runRes.data.type == 'php' && runRes.data.resource === 'appstore') {
-                    configPHP.value = true;
-                }
-            }
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+    const res = await getWebsite(id.value);
+    website.value = res.data;
+    if (res.data.type === 'runtime') {
+        const runRes = await GetRuntime(res.data.runtimeID);
+        if (runRes.data.type == 'php' && runRes.data.resource === 'appstore') {
+            configPHP.value = true;
+        }
+    }
+    loading.value = false;
 });
 </script>

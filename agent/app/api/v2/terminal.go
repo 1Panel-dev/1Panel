@@ -9,8 +9,10 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/1Panel-dev/1Panel/agent/utils/terminal"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -40,9 +42,33 @@ func (b *BaseApi) WsSSH(c *gin.Context) {
 		return
 	}
 
-	client, err := loadLocalConn()
-	if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
-		return
+	hostID, _ := strconv.Atoi(c.DefaultQuery("id", "0"))
+	var client *ssh.SSHClient
+	if hostID > 0 {
+		host, err := service.GetHostInfo(uint(hostID))
+		if wshandleError(wsConn, errors.WithMessage(err, "load host info by id failed")) {
+			return
+		}
+		connInfo := ssh.ConnInfo{
+			Addr:       host.Addr,
+			Port:       int(host.Port),
+			User:       host.User,
+			AuthMode:   host.AuthMode,
+			Password:   host.Password,
+			PrivateKey: []byte(host.PrivateKey),
+		}
+		if len(host.PassPhrase) != 0 {
+			connInfo.PassPhrase = []byte(host.PassPhrase)
+		}
+		client, err = ssh.NewClient(connInfo)
+		if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
+			return
+		}
+	} else {
+		client, err = loadLocalConn()
+		if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
+			return
+		}
 	}
 	defer client.Close()
 	command := c.DefaultQuery("command", "")
@@ -187,12 +213,15 @@ func loadContainerInitCmd(c *gin.Context) ([]string, error) {
 func loadDatabaseInitCmd(c *gin.Context) ([]string, error) {
 	database := c.Query("database")
 	databaseType := c.Query("databaseType")
-	if len(database) == 0 || len(databaseType) == 0 {
+	if len(databaseType) == 0 {
 		return nil, fmt.Errorf("error param of database: %s or database type: %s", database, databaseType)
 	}
 	databaseConn, err := appInstallService.LoadConnInfo(dto.OperationWithNameAndType{Type: databaseType, Name: database})
 	if err != nil {
 		return nil, fmt.Errorf("no such database in db, err: %v", err)
+	}
+	if len(databaseConn.ContainerName) == 0 {
+		return nil, fmt.Errorf("no such database container for database: %s or database type: %s", database, databaseType)
 	}
 	commands := []string{"exec", "-it", databaseConn.ContainerName}
 	switch databaseType {
@@ -200,6 +229,13 @@ func loadDatabaseInitCmd(c *gin.Context) ([]string, error) {
 		commands = append(commands, []string{"mysql", "-uroot", "-p" + databaseConn.Password}...)
 	case "mariadb":
 		commands = append(commands, []string{"mariadb", "-uroot", "-p" + databaseConn.Password}...)
+	case "mongodb":
+		commands = append(commands, []string{
+			"mongosh",
+			"--username", databaseConn.Username,
+			"--password", databaseConn.Password,
+			"--authenticationDatabase", "admin",
+		}...)
 	case "postgresql", "postgresql-cluster":
 		commands = []string{"exec", "-e", fmt.Sprintf("PGPASSWORD=%s", databaseConn.Password), "-it", databaseConn.ContainerName, "psql", "-t", "-U", databaseConn.Username}
 	}

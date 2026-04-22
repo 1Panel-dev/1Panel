@@ -1,24 +1,6 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('website.create')" size="60%" @close="handleClose">
-        <template #buttons>
-            <span class="drawer-header-button">
-                <template v-for="item in WebsiteTypes" :key="item.value">
-                    <el-button
-                        :class="website.type === item.value ? 'active-button' : ''"
-                        @click="changeType(item.value)"
-                        :type="website.type === item.value ? '' : 'info'"
-                        :plain="website.type === item.value"
-                        :text="website.type !== item.value"
-                        :bg="website.type !== item.value"
-                    >
-                        {{ item.label }}
-                    </el-button>
-                </template>
-            </span>
-        </template>
+    <DrawerPro v-model="open" :header="$t('commons.button.create')" size="60%" @close="handleClose">
         <div v-loading="loading" :class="{ mask: !versionExist }">
-            <SSLAlert :websiteType="website.type" />
-            <br />
             <el-form
                 ref="websiteForm"
                 label-position="top"
@@ -28,6 +10,15 @@
                 :validate-on-rule-change="false"
                 v-loading="loading"
             >
+                <el-form-item>
+                    <el-radio-group v-model="website.type" @change="changeType">
+                        <el-radio-button v-for="item in WebsiteTypes" :key="item.value" :value="item.value">
+                            {{ item.label }}
+                        </el-radio-button>
+                    </el-radio-group>
+                </el-form-item>
+                <SSLAlert :websiteType="website.type" class="mb-2" :versionNotMatch="versionNotMatch" />
+
                 <GroupSelect
                     v-model="website.webSiteGroupId"
                     :prop="'webSiteGroupId'"
@@ -77,6 +68,7 @@
                                     :key="index"
                                     :label="app.name"
                                     :value="app.id"
+                                    :disabled="isRestrictedDeploymentApp(app.key)"
                                 ></el-option>
                             </el-select>
                         </el-form-item>
@@ -185,11 +177,32 @@
                         {{ $t('website.runtimePortWarn') }}
                     </el-text>
                 </div>
-                <DomainCreate v-model:form="website" @gengerate="websiteForm.clearValidate()"></DomainCreate>
-                <el-form-item prop="IPV6">
-                    <el-checkbox v-model="website.IPV6" :label="$t('website.ipv6')" size="large" />
-                </el-form-item>
-                <el-form-item :label="$t('website.alias')" prop="alias">
+
+                <el-divider content-position="left" v-if="website.type !== 'stream'">
+                    <el-text type="info" size="small">{{ $t('website.domain') }}</el-text>
+                </el-divider>
+                <div v-if="website.type === 'stream'">
+                    <el-form-item :label="$t('website.streamPorts')" prop="streamPorts">
+                        <el-input
+                            v-model="website.streamPorts"
+                            :placeholder="$t('website.streamPortsHelper')"
+                        ></el-input>
+                    </el-form-item>
+                    <el-form-item prop="udp">
+                        <el-checkbox v-model="website.udp" :label="$t('website.udp')" size="large" />
+                    </el-form-item>
+                </div>
+                <div v-else>
+                    <DomainCreate
+                        v-model:form="website"
+                        @gengerate="websiteForm.clearValidate()"
+                        @domain-blur="handleFirstDomainBlur"
+                    ></DomainCreate>
+                </div>
+                <el-divider content-position="left">
+                    <el-text type="info" size="small">{{ $t('website.advancedSettings') }}</el-text>
+                </el-divider>
+                <el-form-item :label="$t('website.alias')" prop="alias" class="mt-2">
                     <el-input v-model.trim="website.alias" :placeholder="$t('website.aliasHelper')"></el-input>
                     <div>
                         <span class="input-help">
@@ -198,12 +211,71 @@
                         </span>
                     </div>
                 </el-form-item>
-
+                <el-form-item prop="IPV6">
+                    <el-checkbox v-model="website.IPV6" :label="$t('website.ipv6')" size="large" />
+                </el-form-item>
+                <div v-if="website.type == 'stream'">
+                    <LoadBalanceForm ref="lbFormRef" v-model="steamConfig" :disabled="true" type="stream" />
+                </div>
+                <div v-else>
+                    <el-form-item prop="enableSSL">
+                        <el-checkbox v-model="website.enableSSL" :label="$t('website.enableHTTPS')" size="large" />
+                        <span class="input-help">{{ $t('website.enableSSLHelper') }}</span>
+                    </el-form-item>
+                    <div v-if="website.enableSSL">
+                        <el-form-item :label="$t('website.acmeAccountManage')" prop="acmeAccountID">
+                            <el-select
+                                v-model="website.acmeAccountID"
+                                :placeholder="$t('website.selectAcme')"
+                                @change="listSSLs"
+                            >
+                                <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
+                                <el-option
+                                    v-for="(acme, index) in acmeAccounts"
+                                    :key="index"
+                                    :label="acme.email"
+                                    :value="acme.id"
+                                >
+                                    <span>
+                                        {{ acme.email }}
+                                        <el-tag class="ml-5">{{ getAccountName(acme.type) }}</el-tag>
+                                    </span>
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item :label="$t('website.ssl')" prop="websiteSSLID" :hide-required-asterisk="true">
+                            <el-select
+                                v-model="website.websiteSSLID"
+                                :placeholder="$t('website.selectSSL')"
+                                @change="handleSSLSelectChange"
+                            >
+                                <el-option
+                                    v-for="(ssl, index) in ssls"
+                                    :key="index"
+                                    :label="ssl.primaryDomain"
+                                    :value="ssl.id"
+                                    :disabled="ssl.pem == ''"
+                                >
+                                    <span>{{ ssl.primaryDomain }}</span>
+                                    <el-tag class="tagClass" v-if="ssl.expireDate">
+                                        {{ dateFormatSimple(ssl.expireDate) }}
+                                    </el-tag>
+                                    <el-tag class="tagClass" v-if="ssl.organization">
+                                        {{ ssl.organization }}
+                                    </el-tag>
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
+                            <WebsiteSSL :websiteSSL="websiteSSL" />
+                        </el-form-item>
+                    </div>
+                </div>
                 <el-form-item prop="enableFtp" v-if="website.type === 'static' || website.type === 'runtime'">
                     <el-checkbox
                         @change="random"
                         v-model="website.enableFtp"
-                        :label="$t('commons.button.create') + ' FTP'"
+                        :label="$t('commons.button.create')"
                         size="large"
                     />
                     <span class="input-help">{{ $t('website.ftpHelper') }}</span>
@@ -324,76 +396,9 @@
                     </el-col>
                 </el-row>
 
-                <el-form-item prop="enableSSL">
-                    <el-checkbox v-model="website.enableSSL" :label="$t('website.enableHTTPS')" size="large" />
-                    <span class="input-help">{{ $t('website.enableSSLHelper') }}</span>
-                </el-form-item>
-
-                <div v-if="website.enableSSL">
-                    <el-form-item :label="$t('website.acmeAccountManage')" prop="acmeAccountID">
-                        <el-select
-                            v-model="website.acmeAccountID"
-                            :placeholder="$t('website.selectAcme')"
-                            @change="listSSLs"
-                        >
-                            <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
-                            <el-option
-                                v-for="(acme, index) in acmeAccounts"
-                                :key="index"
-                                :label="acme.email"
-                                :value="acme.id"
-                            >
-                                <span>
-                                    {{ acme.email }}
-                                    <el-tag class="ml-5">{{ getAccountName(acme.type) }}</el-tag>
-                                </span>
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.ssl')" prop="websiteSSLID" :hide-required-asterisk="true">
-                        <el-select
-                            v-model="website.websiteSSLID"
-                            :placeholder="$t('website.selectSSL')"
-                            @change="handleSSLSelectChange"
-                        >
-                            <el-option
-                                v-for="(ssl, index) in ssls"
-                                :key="index"
-                                :label="ssl.primaryDomain"
-                                :value="ssl.id"
-                                :disabled="ssl.pem == ''"
-                            ></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
-                        <el-descriptions :column="7" border direction="vertical">
-                            <el-descriptions-item :label="$t('website.primaryDomain')">
-                                {{ websiteSSL.primaryDomain }}
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('website.otherDomains')">
-                                {{ websiteSSL.domains }}
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('website.brand')">
-                                {{ websiteSSL.organization }}
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('ssl.provider')">
-                                {{ getProvider(websiteSSL.provider) }}
-                            </el-descriptions-item>
-                            <el-descriptions-item
-                                :label="$t('ssl.acmeAccount')"
-                                v-if="websiteSSL.acmeAccount && websiteSSL.provider !== 'manual'"
-                            >
-                                {{ websiteSSL.acmeAccount.email }}
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('website.expireDate')">
-                                {{ dateFormatSimple(websiteSSL.expireDate) }}
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('website.remark')">
-                                {{ websiteSSL.description }}
-                            </el-descriptions-item>
-                        </el-descriptions>
-                    </el-form-item>
-                </div>
+                <el-divider content-position="left">
+                    <el-text type="info" size="small">{{ $t('commons.table.description') }}</el-text>
+                </el-divider>
                 <el-form-item :label="$t('website.remark')" prop="remark">
                     <el-input type="textarea" :rows="3" clearable v-model="website.remark" />
                 </el-form-item>
@@ -401,7 +406,11 @@
         </div>
         <template #footer>
             <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button type="primary" @click="submit(websiteForm)" :disabled="loading">
+            <el-button
+                type="primary"
+                @click="submit(websiteForm)"
+                :disabled="loading || (website.type == 'stream' && versionNotMatch)"
+            >
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -415,13 +424,15 @@
     </DrawerPro>
 </template>
 
-<script lang="ts" setup name="CreateWebSite">
+<script lang="ts" setup>
 import AppInstallForm from '@/views/app-store/detail/form/index.vue';
 import SSLAlert from '@/views/website/website/create/site-alert/index.vue';
 import DomainCreate from '@/views/website/website/domain-create/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import Check from '../check/index.vue';
 import GroupSelect from '@/views/website/website/components/group/index.vue';
+import WebsiteSSL from '@/views/website/website/components/website-ssl/index.vue';
+import LoadBalanceForm from '@/views/website/website/config/basic/load-balance/form/index.vue';
 
 import { App } from '@/api/interface/app';
 import { searchApp, getAppInstalled } from '@/api/modules/app';
@@ -440,13 +451,17 @@ import { reactive, ref, watch } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { SearchRuntimes } from '@/api/modules/runtime';
 import { Runtime } from '@/api/interface/runtime';
-import { getRandomStr, getRuntimeLabel } from '@/utils/util';
+import { getRandomStr } from '@/utils/id';
+import { getRuntimeLabel } from '@/utils/app-store';
+import { dateFormatSimple } from '@/utils/date';
 import { getAppService } from '@/api/modules/app';
 import { v4 as uuidv4 } from 'uuid';
-import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
+import { getAccountName } from '@/utils/ssl';
 import { Website } from '@/api/interface/website';
 import { getPathByType } from '@/api/modules/files';
 import { getWebsiteTypes } from '@/global/mimetype';
+import { compareVersion } from '@/utils/version';
+defineOptions({ name: 'CreateWebSite' });
 
 type SSLItem = Website.SSLDTO & {
     organization?: string;
@@ -482,6 +497,9 @@ const initData = () => ({
         memoryUnit: 'MB',
         containerName: '',
         allowPort: false,
+
+        format: 'utf8mb4',
+        collation: '',
     },
     IPV6: false,
     enableFtp: false,
@@ -506,10 +524,15 @@ const initData = () => ({
     domains: [],
     parentWebsiteID: undefined,
     siteDir: '',
+
+    streamPorts: '',
+    udp: false,
+    name: '',
+    algorithm: '',
+    servers: [],
 });
 const website = ref(initData());
 const rules = ref<any>({
-    primaryDomain: [Rules.domainWithPort],
     alias: [Rules.alias],
     type: [Rules.requiredInput],
     webSiteGroupId: [Rules.requiredSelectBusiness],
@@ -537,6 +560,7 @@ const rules = ref<any>({
     websiteSSLID: [Rules.requiredSelect],
     parentWebsiteID: [Rules.requiredSelect],
     siteDir: [Rules.requiredSelect],
+    streamPorts: [Rules.requiredInput],
 });
 
 const open = ref(false);
@@ -572,6 +596,25 @@ const dirs = ref([]);
 const runtimePorts = ref([]);
 const WebsiteTypes = getWebsiteTypes();
 const installFormRef = ref();
+const lbFormRef = ref();
+const versionNotMatch = ref();
+const initLbForm = () => ({
+    name: '',
+    type: 'stream',
+    algorithm: 'default',
+    servers: [
+        {
+            server: '',
+            weight: undefined,
+            maxFails: undefined,
+            maxConns: undefined,
+            failTimeout: undefined,
+            failTimeoutUnit: 's',
+            flag: '',
+        },
+    ],
+});
+const steamConfig = ref(initLbForm());
 
 const handleClose = () => {
     open.value = false;
@@ -632,11 +675,35 @@ const getAppByService = async (key: string) => {
     dbServices.value = res.data;
 };
 
+const getProxyTargetFromApp = (app: Pick<App.AppInstalled, 'httpPort' | 'httpsPort'>) => {
+    if ((app.httpPort ?? 0) > 0) {
+        return {
+            protocol: 'http://',
+            address: `127.0.0.1:${app.httpPort}`,
+        };
+    }
+    if ((app.httpsPort ?? 0) > 0) {
+        return {
+            protocol: 'https://',
+            address: `127.0.0.1:${app.httpsPort}`,
+        };
+    }
+    return {
+        protocol: 'http://',
+        address: '',
+    };
+};
+
+const isRestrictedDeploymentApp = (appKey?: string) => {
+    return appKey === 'openclaw' || appKey === 'copaw' || appKey === 'hermes-agent';
+};
+
 const changeInstall = () => {
     appInstalls.value.forEach((app) => {
         if (app.id === website.value.appInstallId) {
-            website.value.proxyProtocol = 'http://';
-            website.value.proxyAddress = '127.0.0.1:' + app.httpPort;
+            const target = getProxyTargetFromApp(app);
+            website.value.proxyProtocol = target.protocol;
+            website.value.proxyAddress = target.address;
         }
     });
 };
@@ -644,9 +711,11 @@ const changeInstall = () => {
 const searchAppList = () => {
     searchApp(appReq).then((res) => {
         apps.value = res.data.items;
-        if (res.data.items.length > 0) {
-            website.value.appinstall.appId = res.data.items[0].id;
-            website.value.appinstall.appkey = res.data.items[0].key;
+
+        const selectableApp = res.data.items.find((item) => !isRestrictedDeploymentApp(item.key));
+        if (selectableApp) {
+            website.value.appinstall.appId = selectableApp.id;
+            website.value.appinstall.appkey = selectableApp.key;
             changeApp();
         }
     });
@@ -704,7 +773,11 @@ const getRuntimes = async () => {
     } catch (error) {}
 };
 
-const acceptParams = async () => {
+const acceptParams = async (openrestyVersion: string) => {
+    versionNotMatch.value = false;
+    if (!compareVersion(openrestyVersion, '1.27.1.2-3-3-focal')) {
+        versionNotMatch.value = true;
+    }
     website.value = initData();
     if (websiteForm.value) {
         websiteForm.value.resetFields();
@@ -718,6 +791,8 @@ const acceptParams = async () => {
     runtimeResource.value = 'appstore';
     runtimeReq.value = initRuntimeReq();
     listAcmeAccount();
+
+    steamConfig.value = initLbForm();
 
     open.value = true;
 };
@@ -932,6 +1007,10 @@ const submit = async (formEl: FormInstance | undefined) => {
             MsgError(i18n.global.t('website.runtimePortWarn'));
             return;
         }
+        if (website.value.type == 'stream') {
+            const isValid = await lbFormRef.value?.validate();
+            if (!isValid) return;
+        }
         loading.value = true;
         try {
             const res = await preCheck({});
@@ -944,6 +1023,11 @@ const submit = async (formEl: FormInstance | undefined) => {
                 if (!website.value.enableFtp) {
                     website.value.ftpUser = '';
                     website.value.ftpPassword = '';
+                }
+                if (website.value.type == 'stream') {
+                    website.value.name = steamConfig.value.name;
+                    website.value.algorithm = steamConfig.value.algorithm;
+                    website.value.servers = steamConfig.value.servers;
                 }
                 const taskID = uuidv4();
                 website.value.taskID = taskID;
@@ -961,11 +1045,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 watch(
     () => website.value.domains,
-    (value) => {
-        if (value && value.length > 0) {
-            const firstDomain = value[0].domain;
-            changeAlias(firstDomain);
-        }
+    () => {
         tryAutoSelectSSL();
     },
     { deep: true },
@@ -990,8 +1070,32 @@ watch(
     },
 );
 
-const changeAlias = (value: string) => {
-    const domain = value.split(':')[0];
+watch(
+    () => website.value.alias,
+    (value) => {
+        if (website.value.type === 'stream') {
+            steamConfig.value.name = value;
+        }
+    },
+    { deep: true },
+);
+
+const handleFirstDomainBlur = (index: number) => {
+    if (index !== 0) {
+        return;
+    }
+    const firstDomain = website.value.domains?.[0]?.domain || '';
+    fillAliasFromDomainIfEmpty(firstDomain);
+};
+
+const fillAliasFromDomainIfEmpty = (value: string) => {
+    if (!value || website.value.alias.trim() !== '') {
+        return;
+    }
+    const domain = value.split(':')[0].trim();
+    if (!domain) {
+        return;
+    }
     website.value.alias = domain;
 };
 
@@ -1028,5 +1132,11 @@ defineExpose({
     text-overflow: ellipsis;
     white-space: nowrap;
     display: inline-block;
+}
+.tagClass {
+    float: right;
+    margin-right: 10px;
+    font-size: 12px;
+    margin-top: 5px;
 }
 </style>

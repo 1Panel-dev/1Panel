@@ -20,7 +20,7 @@
                 <LayoutContent :title="$t('firewall.forwardRule', 2)" :class="{ mask: !isActive }">
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('firewall.createForwardRule') }}
+                            {{ $t('commons.button.create') }}
                         </el-button>
                         <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                             {{ $t('commons.button.delete') }}
@@ -105,13 +105,12 @@ import { operateForwardRule, searchFireRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { downloadWithContent, getCurrentDateFormatted } from '@/utils/util';
-
+import { downloadWithContent } from '@/utils/file';
+import { getCurrentDateFormatted } from '@/utils/date';
 const loading = ref();
 const activeTag = ref('forward');
 const selects = ref<any>([]);
 const searchName = ref();
-const searchStatus = ref('');
 const searchStrategy = ref('');
 
 const maskShow = ref(true);
@@ -141,7 +140,6 @@ const search = async () => {
     }
     let params = {
         type: activeTag.value,
-        status: searchStatus.value,
         strategy: searchStrategy.value,
         info: searchName.value,
         page: paginationConfig.currentPage,

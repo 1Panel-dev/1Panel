@@ -9,7 +9,7 @@ import (
 // @Tags Host
 // @Summary Check if a system component exists
 // @Accept json
-// @Param name query string true "Component name to check (e.g., rsync, docker)"
+// @Param name path string true "Component name to check (e.g., rsync, docker)"
 // @Success 200 {object} response.ComponentInfo
 // @Security ApiKeyAuth
 // @Security Timestamp

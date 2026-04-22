@@ -106,7 +106,6 @@ const acceptParams = async (): Promise<void> => {
 const loadCurrentData = async () => {
     const res = await searchFireRule({
         type: 'port',
-        status: '',
         strategy: '',
         info: '',
         page: 1,

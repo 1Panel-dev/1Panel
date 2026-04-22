@@ -3,27 +3,29 @@ package helper
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"gorm.io/gorm"
-	"strings"
 )
 
 func LoadMenus() string {
 	item := []dto.ShowMenu{
 		{ID: "1", Disabled: true, Title: "menu.home", IsShow: true, Label: "Home-Menu", Path: "/", Sort: 100},
 		{ID: "2", Disabled: true, Title: "menu.apps", IsShow: true, Label: "App-Menu", Path: "/apps/all", Sort: 200},
-		{ID: "3", Disabled: false, Title: "menu.website", IsShow: true, Label: "Website-Menu", Path: "/websites", Sort: 300,
+		{ID: "3", Disabled: false, Title: "menu.aiTools", IsShow: true, Label: "AI-Menu", Path: "/ai/model/account", Sort: 300,
+			Children: []dto.ShowMenu{
+				{ID: "44", Disabled: false, Title: "aiTools.agents.agent", IsShow: true, Label: "Agents", Path: "/ai/agents/agent", Sort: 50},
+				{ID: "41", Disabled: false, Title: "aiTools.model.model", IsShow: true, Label: "AIModel", Path: "/ai/model/account", Sort: 100},
+				{ID: "42", Disabled: false, Title: "menu.mcp", IsShow: true, Label: "MCPServer", Path: "/ai/mcp", Sort: 200},
+				{ID: "43", Disabled: false, Title: "aiTools.gpu.gpu", IsShow: true, Label: "GPU", Path: "/ai/gpu", Sort: 300},
+			}},
+		{ID: "4", Disabled: false, Title: "menu.website", IsShow: true, Label: "Website-Menu", Path: "/websites", Sort: 400,
 			Children: []dto.ShowMenu{
 				{ID: "31", Disabled: false, Title: "menu.website", IsShow: true, Label: "Website", Path: "/websites", Sort: 100},
 				{ID: "32", Disabled: false, Title: "menu.ssl", IsShow: true, Label: "SSL", Path: "/websites/ssl", Sort: 200},
 				{ID: "33", Disabled: false, Title: "menu.runtime", IsShow: true, Label: "PHP", Path: "/websites/runtimes/php", Sort: 300},
-			}},
-		{ID: "4", Disabled: false, Title: "menu.aiTools", IsShow: true, Label: "AI-Menu", Path: "/ai/model", Sort: 400,
-			Children: []dto.ShowMenu{
-				{ID: "41", Disabled: false, Title: "aiTools.model.model", IsShow: true, Label: "OllamaModel", Path: "/ai/model", Sort: 100},
-				{ID: "42", Disabled: false, Title: "menu.mcp", IsShow: true, Label: "MCPServer", Path: "/ai/mcp", Sort: 200},
-				{ID: "43", Disabled: false, Title: "aiTools.gpu.gpu", IsShow: true, Label: "GPU", Path: "/ai/gpu", Sort: 300},
 			}},
 		{ID: "5", Disabled: false, Title: "menu.database", IsShow: true, Label: "Database-Menu", Path: "/databases", Sort: 500},
 		{ID: "6", Disabled: false, Title: "menu.container", IsShow: true, Label: "Container-Menu", Path: "/containers", Sort: 600},
@@ -43,7 +45,7 @@ func LoadMenus() string {
 			Children: []dto.ShowMenu{
 				{ID: "118", Disabled: false, Title: "xpack.app.app", IsShow: true, Label: "XApp", Path: "/xpack/app", Sort: 100},
 				{ID: "112", Disabled: false, Title: "xpack.waf.name", IsShow: true, Label: "Dashboard", Path: "/xpack/waf/dashboard", Sort: 200},
-				{ID: "111", Disabled: false, Title: "xpack.node.nodeManagement", IsShow: true, Label: "Node", Path: "/xpack/node", Sort: 300},
+				{ID: "111", Disabled: false, Title: "xpack.node.nodeManagement", IsShow: true, Label: "NodeDashboard", Path: "/xpack/node/dashboard", Sort: 300},
 				{ID: "119", Disabled: false, Title: "xpack.upage", IsShow: true, Label: "Upage", Path: "/xpack/upage", Sort: 400},
 				{ID: "113", Disabled: false, Title: "xpack.monitor.name", IsShow: true, Label: "MonitorDashboard", Path: "/xpack/monitor/dashboard", Sort: 500},
 				{ID: "114", Disabled: false, Title: "xpack.tamper.tamper", IsShow: true, Label: "Tamper", Path: "/xpack/tamper", Sort: 600},
@@ -62,14 +64,15 @@ func MenuSort() []dto.MenuLabelSort {
 	var MenuLabelsWithSort = []dto.MenuLabelSort{
 		{Label: "Home-Menu", Sort: 100},
 		{Label: "App-Menu", Sort: 200},
-		{Label: "Website-Menu", Sort: 300},
+		{Label: "AI-Menu", Sort: 300},
+		{Label: "Agents", Sort: 50},
+		{Label: "AIModel", Sort: 100},
+		{Label: "MCPServer", Sort: 200},
+		{Label: "GPU", Sort: 300},
+		{Label: "Website-Menu", Sort: 400},
 		{Label: "Website", Sort: 100},
 		{Label: "SSL", Sort: 200},
 		{Label: "PHP", Sort: 300},
-		{Label: "AI-Menu", Sort: 400},
-		{Label: "OllamaModel", Sort: 100},
-		{Label: "MCPServer", Sort: 200},
-		{Label: "GPU", Sort: 300},
 		{Label: "Database-Menu", Sort: 500},
 		{Label: "Container-Menu", Sort: 600},
 		{Label: "System-Menu", Sort: 700},

@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { getXpackRoutes } from '@/extensions/routes';
 import { Layout } from '@/routers/constant';
 
 let modules: Record<string, RouteRecordRaw> = import.meta.glob('./modules/*.ts', { eager: true });
-const xpackModules: Record<string, RouteRecordRaw> = import.meta.glob('../xpack/routers/*.ts', { eager: true });
+const xpackModules: Record<string, RouteRecordRaw> = getXpackRoutes();
 modules = { ...modules, ...xpackModules };
 
 const homeRouter: RouteRecordRaw = {
@@ -11,7 +12,6 @@ const homeRouter: RouteRecordRaw = {
     component: Layout,
     redirect: '/',
     meta: {
-        keepAlive: true,
         title: 'menu.home',
         icon: 'p-home',
     },
@@ -22,6 +22,7 @@ const homeRouter: RouteRecordRaw = {
             component: () => import('@/views/home/index.vue'),
             meta: {
                 requiresAuth: true,
+                keepAlive: true,
             },
         },
     ],
@@ -71,6 +72,14 @@ export const routes: RouteRecordRaw[] = [
         meta: {
             requiresAuth: false,
             key: 'login',
+        },
+    },
+    {
+        path: '/s/:code',
+        name: 'file-share',
+        component: () => import('@/views/share/index.vue'),
+        meta: {
+            requiresAuth: false,
         },
     },
     {

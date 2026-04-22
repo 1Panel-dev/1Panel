@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"maps"
 	"math"
 	"net/http"
@@ -34,7 +33,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
-	composeV2 "github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/env"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
@@ -45,6 +43,7 @@ import (
 	"github.com/compose-spec/compose-go/v2/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
 )
@@ -363,7 +362,7 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 				if err != nil {
 					return err
 				}
-				images, err := composeV2.GetImagesFromDockerCompose(content, []byte(install.DockerCompose))
+				images, err := docker.GetImagesFromDockerCompose(content, []byte(install.DockerCompose))
 				if err != nil {
 					return err
 				}
@@ -391,6 +390,10 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		defer tx.Rollback()
 		if err = appInstallRepo.Delete(ctx, install); err != nil {
 			return err
+		}
+		appKey := install.App.Key
+		if isAgentAppKey(appKey) {
+			_ = agentRepo.DeleteByAppInstallIDWithCtx(ctx, install.ID)
 		}
 
 		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
@@ -422,6 +425,8 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		switch install.App.Key {
 		case constant.AppMysql, constant.AppMariaDB, constant.AppMysqlCluster:
 			_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
+		case constant.AppMongodb:
+			_ = mongodbRepo.Delete(ctx, mongodbRepo.WithByMongodbName(install.Name))
 		case constant.AppPostgresql, constant.AppPostgresqlCluster:
 			_ = postgresqlRepo.Delete(ctx, postgresqlRepo.WithByPostgresqlName(install.Name))
 		}
@@ -672,6 +677,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	if err != nil {
 		return err
 	}
+	oldVersion := install.Version
 	detail, err := appDetailRepo.GetFirst(repo.WithByID(req.DetailID))
 	if err != nil {
 		return err
@@ -748,7 +754,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			if req.DockerCompose != "" {
 				composeContent = []byte(req.DockerCompose)
 			}
-			images, err := composeV2.GetImagesFromDockerCompose(content, composeContent)
+			images, err := docker.GetImagesFromDockerCompose(content, composeContent)
 			if err != nil {
 				return err
 			}
@@ -764,6 +770,30 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 
 		command := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rn %s/* %s || true", detailDir, install.GetPath()))
 		_, _ = command.CombinedOutput()
+		if install.App.Key == constant.AppOpenresty {
+			installBuildDir := path.Join(install.GetPath(), "build")
+			detailBuildDir := path.Join(detailDir, "build")
+			if !fileOp.Stat(installBuildDir) {
+				if err := fileOp.CreateDir(installBuildDir, constant.DirPerm); err != nil {
+					return err
+				}
+			}
+			if err := fileOp.DeleteDir(path.Join(installBuildDir, "tmp")); err != nil {
+				return err
+			}
+			if err := fileOp.CopyDir(path.Join(detailBuildDir, "tmp"), installBuildDir); err != nil {
+				return err
+			}
+			if err := fileOp.CopyFile(path.Join(detailBuildDir, "Dockerfile"), installBuildDir); err != nil {
+				return err
+			}
+			if err := fileOp.CopyFile(path.Join(detailBuildDir, "nginx.conf"), installBuildDir); err != nil {
+				return err
+			}
+			if err := fileOp.CopyFile(path.Join(detailBuildDir, "nginx.vh.default.conf"), installBuildDir); err != nil {
+				return err
+			}
+		}
 		sourceScripts := path.Join(detailDir, "scripts")
 		if fileOp.Stat(sourceScripts) {
 			dstScripts := path.Join(install.GetPath(), "scripts")
@@ -774,6 +804,9 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 
 		var newCompose string
+		if err = migrateOpenclawProtocolUpgrade(&install, oldVersion, detail.Version); err != nil {
+			return err
+		}
 		if req.DockerCompose == "" {
 			newCompose, err = getUpgradeCompose(install, detail)
 			if err != nil {
@@ -883,7 +916,7 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr), true)
+	project, err := docker.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr), true)
 	if err != nil {
 		return nil, err
 	}
@@ -959,7 +992,7 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 	}
 }
 
-func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.AppInstall, logger *log.Logger) (err error) {
+func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.AppInstall, logger *logrus.Logger) (err error) {
 	if app.IsLocalApp() || app.IsCustomApp() {
 		return nil
 	}
@@ -1105,7 +1138,7 @@ func runScript(task *task.Task, appInstall *model.AppInstall, operate string) er
 }
 
 func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
-	client, err := composeV2.NewDockerClient()
+	client, err := docker.NewDockerClient()
 	if err != nil {
 		return false, err
 	}
@@ -1141,7 +1174,7 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 			if err != nil {
 				return err
 			}
-			images, err := composeV2.GetImagesFromDockerCompose(envByte, []byte(appInstall.DockerCompose))
+			images, err := docker.GetImagesFromDockerCompose(envByte, []byte(appInstall.DockerCompose))
 			if err != nil {
 				return err
 			}
@@ -1271,8 +1304,9 @@ func getAppDetails(details []model.AppDetail, versions []dto.AppConfigVersion) m
 	return appDetails
 }
 
-func getApps(oldApps []model.App, items []dto.AppDefine, systemVersion string, task *task.Task) map[string]model.App {
+func getApps(oldApps []model.App, items []dto.AppDefine, systemVersion string, task *task.Task) (map[string]model.App, map[string]string) {
 	apps := make(map[string]model.App, len(oldApps))
+	pendingIcons := make(map[string]string, len(items))
 	for _, old := range oldApps {
 		old.Status = constant.AppTakeDown
 		apps[old.Key] = old
@@ -1312,9 +1346,13 @@ func getApps(oldApps []model.App, items []dto.AppDefine, systemVersion string, t
 		app.MemoryRequired = config.MemoryRequired
 		app.Architectures = strings.Join(config.Architectures, ",")
 		app.GpuSupport = config.GpuSupport
+		app.BatchInstallSupport = config.BatchInstallSupport
+		if item.Icon != "" {
+			pendingIcons[key] = item.Icon
+		}
 		apps[key] = app
 	}
-	return apps
+	return apps, pendingIcons
 }
 
 func handleLocalAppDetail(versionDir string, appDetail *model.AppDetail) error {
@@ -1530,7 +1568,7 @@ func synAppInstall(containers map[string]container.Summary, appInstall *model.Ap
 	_ = appInstallRepo.Save(context.Background(), appInstall)
 }
 
-func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool) ([]response.AppInstallDTO, error) {
+func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpdate bool) ([]response.AppInstallDTO, error) {
 	var (
 		res           []response.AppInstallDTO
 		containersMap map[string]container.Summary
@@ -1553,6 +1591,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 		if updated && ignoreUpdate(installed) {
 			continue
 		}
+
 		if sync && !doNotNeedSync(installed) {
 			synAppInstall(containersMap, &installed, false)
 		}
@@ -1579,23 +1618,34 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 				Document: installed.App.Document,
 			},
 			Favorite:    installed.Favorite,
+			SortOrder:   installed.SortOrder,
 			Container:   installed.ContainerName,
 			ServiceName: strings.ToLower(installed.ServiceName),
 		}
-		if !updated {
+
+		if !updated && !checkUpdate {
 			installDTO.LinkDB = hasLinkDB(installed.ID)
 			res = append(res, installDTO)
 			continue
 		}
+
 		if installed.Version == "latest" {
+			if checkUpdate {
+				installDTO.CanUpdate = false
+				installDTO.LinkDB = hasLinkDB(installed.ID)
+				res = append(res, installDTO)
+			}
 			continue
 		}
+
 		installDTO.DockerCompose = installed.DockerCompose
 		installDTO.IsEdit = isEditCompose(installed)
+
 		details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(installed.App.ID))
 		if err != nil {
 			return nil, err
 		}
+
 		var versions []string
 		for _, appDetail := range details {
 			ignores, _ := appIgnoreUpgradeRepo.List(runtimeRepo.WithDetailId(appDetail.ID), appIgnoreUpgradeRepo.WithScope("version"))
@@ -1607,11 +1657,19 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			}
 			versions = append(versions, appDetail.Version)
 		}
+
 		if len(versions) == 0 {
+			if checkUpdate {
+				installDTO.CanUpdate = false
+				installDTO.LinkDB = hasLinkDB(installed.ID)
+				res = append(res, installDTO)
+			}
 			continue
 		}
+
 		versions = common.GetSortedVersions(versions)
 		lastVersion := versions[0]
+
 		if installed.App.Key == constant.AppMysql || installed.App.Key == constant.AppMysqlCluster {
 			for _, version := range versions {
 				majorVersion := getMajorVersion(installed.Version)
@@ -1623,15 +1681,23 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 				}
 			}
 		}
+
 		if common.IsCrossVersion(installed.Version, lastVersion) {
 			installDTO.CanUpdate = installed.App.CrossVersionUpdate
 		} else {
 			installDTO.CanUpdate = common.CompareVersion(lastVersion, installed.Version)
 		}
-		if installDTO.CanUpdate {
+
+		if updated {
+			if installDTO.CanUpdate {
+				res = append(res, installDTO)
+			}
+		} else if checkUpdate {
+			installDTO.LinkDB = hasLinkDB(installed.ID)
 			res = append(res, installDTO)
 		}
 	}
+
 	return res, nil
 }
 
@@ -1960,23 +2026,26 @@ func handleSiteDir(app model.App, appDetail model.AppDetail, req request.AppInst
 			req.Params["WEBSITE_DIR"] = siteDir
 			oldWebStePath, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
 			fileOp := files.NewFileOp()
+			movePath := func(src, dst string) error {
+				return cmd.NewCommandMgr().Run("mv", src, dst)
+			}
 			if oldWebStePath != "" && oldWebStePath != siteDir && fileOp.Stat(oldWebStePath) {
 				t.Log(i18n.GetWithName("MoveSiteDir", siteDir))
 				if fileOp.Stat(siteDir) {
 					if fileOp.Stat(path.Join(siteDir, "conf.d")) {
-						_ = fileOp.Rename(path.Join(siteDir, "conf.d"), path.Join(siteDir, "conf.d.bak"))
+						_ = movePath(path.Join(siteDir, "conf.d"), path.Join(siteDir, "conf.d.bak"))
 					}
 					if fileOp.Stat(path.Join(siteDir, "sites")) {
-						_ = fileOp.Rename(path.Join(siteDir, "sites"), path.Join(siteDir, "sites.bak"))
+						_ = movePath(path.Join(siteDir, "sites"), path.Join(siteDir, "sites.bak"))
 					}
-					if err := fileOp.Rename(path.Join(oldWebStePath, "sites"), path.Join(siteDir, "sites")); err != nil {
+					if err := movePath(path.Join(oldWebStePath, "sites"), path.Join(siteDir, "sites")); err != nil {
 						return err
 					}
-					if err := fileOp.Rename(path.Join(oldWebStePath, "conf.d"), path.Join(siteDir, "conf.d")); err != nil {
+					if err := movePath(path.Join(oldWebStePath, "conf.d"), path.Join(siteDir, "conf.d")); err != nil {
 						return err
 					}
 				} else {
-					err := fileOp.Rename(oldWebStePath, siteDir)
+					err := movePath(oldWebStePath, siteDir)
 					if err != nil {
 						return err
 					}
@@ -2091,15 +2160,21 @@ func handleSSLConfig(appInstall *model.AppInstall, hasDefaultWebsite bool, sslRe
 	return nil
 }
 
-func SyncTags(remoteProperties dto.ExtraProperties) error {
+func SyncTags(remoteProperties dto.ExtraProperties) (err error) {
 	tx, ctx := getTxAndContext()
-	defer tx.Rollback()
-	localTags, _ := tagRepo.All()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+	localTags, err := tagRepo.All()
+	if err != nil {
+		return err
+	}
 	localTagsMap := make(map[string]*model.Tag)
 	for i := range localTags {
 		localTagsMap[localTags[i].Key] = &localTags[i]
 	}
-	var err error
 	remoteTagsMap := make(map[string]*dto.Tag)
 	for i := range remoteProperties.Tags {
 		remoteTagsMap[remoteProperties.Tags[i].Key] = &remoteProperties.Tags[i]
@@ -2107,7 +2182,9 @@ func SyncTags(remoteProperties dto.ExtraProperties) error {
 
 	for key, localTag := range localTagsMap {
 		if _, exists := remoteTagsMap[key]; !exists {
-			_ = tagRepo.DeleteByID(ctx, localTag.ID)
+			if err = tagRepo.DeleteByID(ctx, localTag.ID); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -2137,7 +2214,9 @@ func SyncTags(remoteProperties dto.ExtraProperties) error {
 		}
 	}
 
-	tx.Commit()
+	if err = tx.Commit().Error; err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -2169,8 +2248,62 @@ func isEditCompose(installed model.AppInstall) bool {
 	if rawCompose == "" || err != nil {
 		return false
 	}
-	if rawCompose != installed.DockerCompose {
-		return true
+	equal, err := composeEqualExceptImage(rawCompose, installed.DockerCompose)
+	if err != nil {
+		return false
 	}
-	return false
+	return !equal
+}
+
+func composeEqualExceptImage(expected, current string) (bool, error) {
+	expectedCompose := make(map[string]interface{})
+	if err := yaml.Unmarshal([]byte(expected), &expectedCompose); err != nil {
+		return false, err
+	}
+	currentCompose := make(map[string]interface{})
+	if err := yaml.Unmarshal([]byte(current), &currentCompose); err != nil {
+		return false, err
+	}
+	removeComposeServiceImages(expectedCompose)
+	removeComposeServiceImages(currentCompose)
+	return reflect.DeepEqual(expectedCompose, currentCompose), nil
+}
+
+func removeComposeServiceImages(composeMap map[string]interface{}) {
+	services, ok := composeMap["services"].(map[string]interface{})
+	if !ok {
+		return
+	}
+	for _, service := range services {
+		serviceMap, ok := service.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		delete(serviceMap, "image")
+	}
+}
+
+func getAppVersions(key string, details []model.AppDetail) []string {
+	var (
+		versionsRaw []string
+		versions    []string
+	)
+	hasLatest := false
+	latestVersion := ""
+	for _, detail := range details {
+		if key != "mssql" && strings.Contains(detail.Version, "latest") {
+			hasLatest = true
+			latestVersion = detail.Version
+			continue
+		}
+		if key == "openresty" && !common.CompareAppVersion(detail.Version, "1.27") {
+			continue
+		}
+		versionsRaw = append(versionsRaw, detail.Version)
+	}
+	versions = common.GetSortedVersions(versionsRaw)
+	if hasLatest {
+		versions = append([]string{latestVersion}, versions...)
+	}
+	return versions
 }

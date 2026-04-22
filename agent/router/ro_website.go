@@ -25,8 +25,10 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 		websiteRouter.POST("/del", baseApi.DeleteWebsite)
 		websiteRouter.POST("/default/server", baseApi.ChangeDefaultServer)
 		websiteRouter.POST("/group/change", baseApi.ChangeWebsiteGroup)
+
 		websiteRouter.POST("/batch/operate", baseApi.BatchOpWebsites)
 		websiteRouter.POST("/batch/group", baseApi.BatchSetWebsiteGroup)
+		websiteRouter.POST("/batch/ssl", baseApi.BatchSetHttps)
 
 		websiteRouter.GET("/domains/:websiteId", baseApi.GetWebDomains)
 		websiteRouter.POST("/domains/del", baseApi.DeleteWebDomain)
@@ -52,6 +54,8 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 
 		websiteRouter.POST("/proxies", baseApi.GetProxyConfig)
 		websiteRouter.POST("/proxies/update", baseApi.UpdateProxyConfig)
+		websiteRouter.POST("/proxies/delete", baseApi.DeleteProxyConfig)
+		websiteRouter.POST("/proxies/status", baseApi.UpdateProxyConfigStatus)
 		websiteRouter.POST("/proxies/file", baseApi.UpdateProxyConfigFile)
 		websiteRouter.POST("/proxy/config", baseApi.UpdateProxyCache)
 		websiteRouter.GET("/proxy/config/:id", baseApi.GetProxyCache)
@@ -93,5 +97,6 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 		websiteRouter.POST("/crosssite", baseApi.OperateCrossSiteAccess)
 
 		websiteRouter.POST("/exec/composer", baseApi.ExecComposer)
+		websiteRouter.POST("/stream/update", baseApi.UpdateStreamConfig)
 	}
 }

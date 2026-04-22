@@ -1,18 +1,18 @@
 package task
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/sirupsen/logrus"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -29,8 +29,7 @@ type Task struct {
 
 	Name      string
 	TaskID    string
-	Logger    *log.Logger
-	Writer    *bufio.Writer
+	Logger    *logrus.Logger
 	SubTasks  []*SubTask
 	Rollbacks []RollbackFunc
 	logFile   *os.File
@@ -98,6 +97,7 @@ const (
 	TaskScopeCustomAppstore   = "CustomAppstore"
 	TaskScopeTamper           = "Tamper"
 	TaskScopeFileConvert      = "Convert"
+	TaskScopeTask             = "Task"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {
@@ -127,6 +127,19 @@ func CheckResourceTaskIsExecuting(operate, scope string, resourceID uint) bool {
 	return task.ID != ""
 }
 
+func CheckScopeTaskIsExecuting(scope string, resourceID uint) error {
+	taskRepo := repo.NewITaskRepo()
+	task, _ := taskRepo.GetFirst(
+		taskRepo.WithByStatus(constant.StatusExecuting),
+		taskRepo.WithResourceID(resourceID),
+		repo.WithByType(scope),
+	)
+	if task.ID != "" {
+		return buserr.New("TaskIsExecuting")
+	}
+	return nil
+}
+
 func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, error) {
 	if taskID == "" {
 		taskID = uuid.New().String()
@@ -138,12 +151,13 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 		}
 	}
 	logPath := path.Join(global.Dir.TaskDir, taskScope, taskID+".log")
-	file, err := os.OpenFile(logPath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
+	logger := logrus.New()
+	logger.SetFormatter(&SimpleFormatter{})
+	logFile, err := os.OpenFile(logPath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}
-	writer := bufio.NewWriter(file)
-	logger := log.New(file, "", log.LstdFlags)
+	logger.SetOutput(logFile)
 	taskModel := &model.Task{
 		ID:         taskID,
 		Name:       name,
@@ -154,9 +168,9 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 		Operate:    operate,
 	}
 	taskRepo := repo.NewITaskRepo()
-	ctx, cancle := context.WithCancel(context.Background())
-	global.TaskCtxMap[taskID] = cancle
-	task := &Task{TaskCtx: ctx, Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: taskModel, Writer: writer}
+	ctx, cancel := context.WithCancel(context.Background())
+	global.TaskCtxMap[taskID] = cancel
+	task := &Task{TaskCtx: ctx, Name: name, logFile: logFile, Logger: logger, taskRepo: taskRepo, Task: taskModel}
 	return task, nil
 }
 
@@ -175,16 +189,18 @@ func ReNewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task,
 			return nil, fmt.Errorf("failed to create log directory: %w", err)
 		}
 	}
+
 	logPath := path.Join(global.Dir.TaskDir, taskScope, taskID+".log")
-	file, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
+	logger := logrus.New()
+	logger.SetFormatter(&SimpleFormatter{})
+	logFile, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}
-	writer := bufio.NewWriter(file)
-	logger := log.New(file, "", log.LstdFlags)
+	logger.SetOutput(logFile)
 	logger.Print("\n --------------------------------------------------- \n")
 	taskItem.Status = constant.StatusExecuting
-	task := &Task{Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: &taskItem, Writer: writer}
+	task := &Task{Name: name, logFile: logFile, Logger: logger, taskRepo: taskRepo, Task: &taskItem}
 	task.updateTask(&taskItem)
 	return task, nil
 }
@@ -226,6 +242,9 @@ func (s *SubTask) Execute() error {
 			s.RootTask.Log(i18n.GetWithName("TaskRetry", strconv.Itoa(i)))
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), s.Timeout)
+		if s.Timeout == 0 {
+			ctx, cancel = context.WithCancel(context.Background())
+		}
 		defer cancel()
 
 		done := make(chan error)
@@ -269,7 +288,8 @@ func (t *Task) Execute() error {
 	}
 	var err error
 	t.Log(i18n.GetWithName("TaskStart", t.Name))
-	for _, subTask := range t.SubTasks {
+	for i := 0; i < len(t.SubTasks); i++ {
+		subTask := t.SubTasks[i]
 		t.Task.CurrentStep = subTask.StepAlias
 		t.updateTask(t.Task)
 		if err = subTask.Execute(); err == nil {
@@ -325,7 +345,7 @@ func (t *Task) LogFailed(msg string) {
 }
 
 func (t *Task) LogFailedWithErr(msg string, err error) {
-	t.Logger.Printf("%s %s : %s\n", msg, i18n.GetMsgByKey("Failed"), err.Error())
+	t.Logger.Printf("%s %s : %s", msg, i18n.GetMsgByKey("Failed"), err.Error())
 }
 
 func (t *Task) LogSuccess(msg string) {
@@ -336,7 +356,7 @@ func (t *Task) LogSuccessF(format string, v ...any) {
 }
 
 func (t *Task) LogStart(msg string) {
-	t.Logger.Printf("%s%s\n", i18n.GetMsgByKey("Start"), msg)
+	t.Logger.Printf("%s%s", i18n.GetMsgByKey("Start"), msg)
 }
 
 func (t *Task) LogWithOps(operate, msg string) {
@@ -348,5 +368,26 @@ func (t *Task) LogSuccessWithOps(operate, msg string) {
 }
 
 func (t *Task) LogFailedWithOps(operate, msg string, err error) {
-	t.Logger.Printf("%s%s%s : %s ", i18n.GetMsgByKey(operate), msg, i18n.GetMsgByKey("Failed"), err.Error())
+	t.Logger.Printf("%s%s : %s ", msg, i18n.GetMsgByKey("Failed"), err.Error())
+}
+
+func (t *Task) LogWithProgress(msg string, current int, total int) {
+	const barWidth = 10
+	filled := int(float64(current) / float64(total) * 100 / 10)
+	if filled > barWidth {
+		filled = barWidth
+	}
+	if filled < 0 {
+		filled = 0
+	}
+	bar := strings.Repeat("=", filled) + strings.Repeat("-", barWidth-filled)
+	t.Logger.Printf("%s [%s] %.2f%%", msg, bar, float64(current)/float64(total)*100)
+}
+
+type SimpleFormatter struct{}
+
+func (f *SimpleFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	timestamp := entry.Time.Format("2006/01/02 15:04:05")
+	message := fmt.Sprintf("%s %s\n", timestamp, entry.Message)
+	return []byte(message), nil
 }

@@ -20,7 +20,10 @@
                     </el-form-item>
                 </el-col>
             </el-row>
-            <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
+            <el-form-item :label="''" prop="autoRenew">
+                <el-checkbox v-model="ssl.isIP" :label="$t('ssl.isIP')" @change="changeIP" />
+            </el-form-item>
+            <el-form-item :label="$t('website.otherDomains')" prop="otherDomains" v-if="!ssl.isIP">
                 <el-input type="textarea" :rows="3" v-model="ssl.otherDomains"></el-input>
             </el-form-item>
             <el-form-item :label="$t('website.remark')" prop="description">
@@ -33,6 +36,7 @@
                         :key="index"
                         :label="acme.email + ' [' + getAccountName(acme.type) + '] '"
                         :value="acme.id"
+                        :disabled="ssl.isIP && acme.type !== 'letsencrypt'"
                     >
                         <el-row>
                             <el-col :span="20">
@@ -59,8 +63,8 @@
             </el-form-item>
             <el-form-item :label="$t('website.provider')" prop="provider" v-if="ssl.provider != 'selfSigned'">
                 <el-radio-group v-model="ssl.provider" @change="changeProvider()">
-                    <el-radio value="dnsAccount">{{ $t('website.dnsAccount') }}</el-radio>
-                    <el-radio value="dnsManual">{{ $t('website.dnsManual') }}</el-radio>
+                    <el-radio value="dnsAccount" :disabled="ssl.isIP">{{ $t('website.dnsAccount') }}</el-radio>
+                    <el-radio value="dnsManual" :disabled="ssl.isIP">{{ $t('website.dnsManual') }}</el-radio>
                     <el-radio value="http">HTTP</el-radio>
                 </el-radio-group>
                 <span class="input-help" v-if="ssl.provider === 'dnsManual'">
@@ -145,6 +149,7 @@
                     v-if="isMaster && isMasterProductPro"
                     :push-node="ssl.pushNode"
                     :nodes="ssl.pushNodes"
+                    type="ssl"
                     @update:push-node="ssl.pushNode = $event"
                     @update:nodes="ssl.pushNodes = $event"
                 />
@@ -172,19 +177,13 @@ import { FormInstance } from 'element-plus';
 import { computed, reactive, ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { KeyTypes } from '@/global/mimetype';
-import { getDNSName, getAccountName } from '@/utils/util';
+import { getDNSName, getAccountName } from '@/utils/ssl';
 import { defineAsyncComponent } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { loadOptionalComponent } from '@/extensions/optional';
 const { isMasterProductPro, isMaster } = useGlobalStore();
 
-const PushtoNode = defineAsyncComponent(async () => {
-    const modules = import.meta.glob('@/xpack/views/ssl/index.vue');
-    const loader = modules['/src/xpack/views/ssl/index.vue'];
-    if (loader) {
-        return ((await loader()) as any).default;
-    }
-    return { template: '<div></div>' };
-});
+const PushtoNode = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/ssl/index.vue'));
 
 const props = defineProps({
     id: {
@@ -213,7 +212,7 @@ const acmeAccounts = ref<Website.AcmeAccount[]>();
 const sslForm = ref<FormInstance>();
 const websites = ref();
 const rules = ref({
-    primaryDomain: [Rules.requiredInput, Rules.domain],
+    primaryDomain: [Rules.requiredInput, Rules.domainOrIP],
     acmeAccountId: [Rules.requiredSelectBusiness],
     dnsAccountId: [Rules.requiredSelectBusiness],
     provider: [Rules.requiredInput],
@@ -250,6 +249,7 @@ const initData = () => ({
     pushNode: false,
     pushNodes: [],
     nodes: '',
+    isIP: false,
 });
 
 const ssl = ref(initData());
@@ -267,6 +267,20 @@ const resetForm = () => {
     dnsResolve.value = [];
     ssl.value = initData();
     websiteID.value = undefined;
+};
+
+const changeIP = () => {
+    if (ssl.value.isIP) {
+        ssl.value.provider = 'http';
+        for (const acmeAccount of acmeAccounts.value!) {
+            if (acmeAccount.type == 'letsencrypt') {
+                ssl.value.acmeAccountId = acmeAccount.id;
+                break;
+            }
+        }
+    } else {
+        ssl.value.provider = 'dnsAccount';
+    }
 };
 
 const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
@@ -304,6 +318,7 @@ const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
                 .map((item) => item.trim())
                 .filter((item) => item !== '');
         }
+        ssl.value.isIP = websiteSSL.isIP;
     }
     ssl.value.websiteId = Number(id.value);
     getAcmeAccounts();
@@ -404,6 +419,7 @@ const submit = async (formEl: FormInstance | undefined) => {
                 shell: ssl.value.shell,
                 pushNode: ssl.value.pushNode,
                 nodes: nodes,
+                isIP: ssl.value.isIP,
             };
             updateSSL(sslUpdate)
                 .then(() => {

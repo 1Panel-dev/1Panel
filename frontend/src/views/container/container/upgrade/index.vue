@@ -69,7 +69,7 @@ import { Rules } from '@/global/form-rules';
 import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { newUUID } from '@/utils/util';
+import { newUUID } from '@/utils/id';
 import { CheckboxValueType, ElForm } from 'element-plus';
 import { reactive, ref } from 'vue';
 

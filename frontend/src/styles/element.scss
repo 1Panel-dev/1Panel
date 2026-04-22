@@ -59,6 +59,8 @@ html {
 
     --el-fill-color-light: #ffffff;
     --el-disabled-bg-color: var(--panel-main-bg-color-9) !important;
+
+    --panel-node-card-bg-color: #e3e6f3;
 }
 
 .el-notification {
@@ -230,10 +232,6 @@ html {
     box-shadow: 0px 0px 2px 1px rgba(186, 186, 186, 0.22);
     border-radius: 8px !important;
     padding: 5px;
-}
-
-.el-card {
-    border: none !important;
 }
 
 .el-input-group__append {

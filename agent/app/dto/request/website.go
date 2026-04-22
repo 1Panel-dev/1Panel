@@ -38,6 +38,22 @@ type WebsiteCreate struct {
 	FtpConfig
 	DataBaseConfig
 	SSLConfig
+	StreamConfig
+}
+
+type StreamConfig struct {
+	StreamPorts string `json:"streamPorts"`
+	Name        string `json:"name"`
+	Algorithm   string `json:"algorithm"`
+	UDP         bool   `json:"udp"`
+
+	Servers []dto.NginxUpstreamServer `json:"servers"`
+}
+
+type StreamUpdate struct {
+	WebsiteID uint `json:"websiteID" validate:"required"`
+
+	StreamConfig
 }
 
 type WebsiteOptionReq struct {
@@ -112,6 +128,25 @@ type BatchWebsiteOp struct {
 type BatchWebsiteGroup struct {
 	IDs     []uint `json:"ids" validate:"required"`
 	GroupID uint   `json:"groupID" validate:"required"`
+}
+
+type BatchWebsiteHttps struct {
+	IDs                   []uint   `json:"ids" validate:"required"`
+	TaskID                string   `json:"taskID" validate:"required"`
+	WebsiteSSLID          uint     `json:"websiteSSLId"`
+	Type                  string   `json:"type"  validate:"oneof=existed auto manual"`
+	PrivateKey            string   `json:"privateKey"`
+	Certificate           string   `json:"certificate"`
+	PrivateKeyPath        string   `json:"privateKeyPath"`
+	CertificatePath       string   `json:"certificatePath"`
+	ImportType            string   `json:"importType"`
+	HttpConfig            string   `json:"httpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
+	SSLProtocol           []string `json:"SSLProtocol"`
+	Algorithm             string   `json:"algorithm"`
+	Hsts                  bool     `json:"hsts"`
+	HstsIncludeSubDomains bool     `json:"hstsIncludeSubDomains"`
+	HttpsPorts            []int    `json:"httpsPorts"`
+	Http3                 bool     `json:"http3"`
 }
 
 type WebsiteRedirectUpdate struct {
@@ -234,7 +269,19 @@ type WebsiteProxyConfig struct {
 	Replaces        map[string]string `json:"replaces"`
 	SNI             bool              `json:"sni"`
 	ProxySSLName    string            `json:"proxySSLName"`
+	SSLVerify       bool              `json:"sslVerify"`
 	CorsConfig
+}
+
+type WebsiteProxyDelete struct {
+	ID   uint   `json:"id" validate:"required"`
+	Name string `json:"name" validate:"required"`
+}
+
+type WebsiteProxyStatusUpdate struct {
+	ID     uint   `json:"id" validate:"required"`
+	Name   string `json:"name" validate:"required"`
+	Status string `json:"status" validate:"required"`
 }
 
 type CorsConfig struct {
@@ -276,6 +323,7 @@ type WebsiteHtmlReq struct {
 type WebsiteHtmlUpdate struct {
 	Type    string `json:"type" validate:"required"`
 	Content string `json:"content" validate:"required"`
+	Sync    bool   `json:"sync"`
 }
 
 type WebsiteLBCreate struct {

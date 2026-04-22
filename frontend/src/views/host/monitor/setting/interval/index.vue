@@ -30,8 +30,7 @@ import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { updateMonitorSetting } from '@/api/modules/host';
-import { transferTimeToSecond } from '@/utils/util';
-
+import { transferTimeToSecond } from '@/utils/validate';
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 interface DialogProps {

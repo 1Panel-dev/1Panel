@@ -6,8 +6,12 @@ type WebsiteSSLSearch struct {
 	dto.PageInfo
 	AcmeAccountID string `json:"acmeAccountID"`
 	Domain        string `json:"domain"`
-	OrderBy       string `json:"orderBy" validate:"required,oneof=expire_date"`
-	Order         string `json:"order" validate:"required,oneof=null ascending descending"`
+	OrderBy       string `json:"orderBy" validate:"omitempty,oneof=created_at expire_date"`
+	Order         string `json:"order" validate:"omitempty,oneof=null ascending descending"`
+}
+
+type WebsiteSSLListReq struct {
+	AcmeAccountID string `json:"acmeAccountID"`
 }
 
 type WebsiteSSLCreate struct {
@@ -31,6 +35,7 @@ type WebsiteSSLCreate struct {
 	Shell         string `json:"shell"`
 	PushNode      bool   `json:"pushNode"`
 	Nodes         string `json:"nodes"`
+	IsIp          bool   `json:"isIp"`
 }
 
 type WebsiteDNSReq struct {
@@ -46,7 +51,6 @@ type WebsiteSSLApply struct {
 	ID           uint     `json:"ID" validate:"required"`
 	SkipDNSCheck bool     `json:"skipDNSCheck"`
 	Nameservers  []string `json:"nameservers"`
-	DisableLog   bool     `json:"disableLog"`
 }
 
 type WebsiteSSLObtain struct {
@@ -62,6 +66,7 @@ type WebsiteAcmeAccountCreate struct {
 	EabHmacKey string `json:"eabHmacKey"`
 	UseProxy   bool   `json:"useProxy"`
 	CaDirURL   string `json:"caDirURL"`
+	UseEAB     bool   `json:"useEAB"`
 }
 
 type WebsiteAcmeAccountUpdate struct {

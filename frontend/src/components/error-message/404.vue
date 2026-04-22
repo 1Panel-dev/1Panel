@@ -8,7 +8,9 @@
     </div>
 </template>
 
-<script setup lang="ts" name="404"></script>
+<script setup lang="ts">
+defineOptions({ name: '404' });
+</script>
 
 <style scoped lang="scss">
 .not-container {

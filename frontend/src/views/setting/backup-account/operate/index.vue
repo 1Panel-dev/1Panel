@@ -167,22 +167,7 @@
                 prop="varsJson.region"
                 :rules="Rules.requiredInput"
             >
-                <el-select
-                    v-model="dialogData.rowData!.varsJson['region']"
-                    clearable
-                    filterable
-                    allow-create
-                    default-first-option
-                    placeholder="Amazon S3 Region"
-                    @change="handleS3RegionChange"
-                >
-                    <el-option v-for="item in s3Regions" :key="item.value" :label="item.label" :value="item.value">
-                        <span class="float-left">{{ item.label }}</span>
-                        <span class="option-help">
-                            {{ item.value }}
-                        </span>
-                    </el-option>
-                </el-select>
+                <el-input v-model.trim="dialogData.rowData!.varsJson['region']" />
             </el-form-item>
             <el-form-item
                 v-if="hasAccessKey()"
@@ -233,7 +218,10 @@
                     <el-option value="Deep_Archive" :label="$t('setting.scDeep_Archive')" />
                 </el-select>
                 <el-alert
-                    v-if="dialogData.rowData!.varsJson['scType'] === 'Archive' || dialogData.rowData!.varsJson['scType'] === 'Deep_Archive'"
+                    v-if="
+                        dialogData.rowData!.varsJson['scType'] === 'Archive' ||
+                        dialogData.rowData!.varsJson['scType'] === 'Deep_Archive'
+                    "
                     class="mt-2.5"
                     :closable="false"
                     type="warning"
@@ -253,7 +241,10 @@
                     <el-option value="ColdArchive" :label="$t('setting.scDeep_Archive')" />
                 </el-select>
                 <el-alert
-                    v-if="dialogData.rowData!.varsJson['scType'] === 'Archive' || dialogData.rowData!.varsJson['scType'] === 'ColdArchive'"
+                    v-if="
+                        dialogData.rowData!.varsJson['scType'] === 'Archive' ||
+                        dialogData.rowData!.varsJson['scType'] === 'ColdArchive'
+                    "
                     class="mt-2.5"
                     :closable="false"
                     type="warning"
@@ -273,7 +264,10 @@
                     <el-option value="DEEP_ARCHIVE" :label="$t('setting.scDeep_Archive')" />
                 </el-select>
                 <el-alert
-                    v-if="dialogData.rowData!.varsJson['scType'] === 'GLACIER' || dialogData.rowData!.varsJson['scType'] === 'DEEP_ARCHIVE'"
+                    v-if="
+                        dialogData.rowData!.varsJson['scType'] === 'GLACIER' ||
+                        dialogData.rowData!.varsJson['scType'] === 'DEEP_ARCHIVE'
+                    "
                     class="mt-2.5"
                     :closable="false"
                     type="warning"
@@ -362,7 +356,7 @@
                 >
                     <el-input v-model.trim="dialogData.rowData!.varsJson['redirect_uri']" />
                 </el-form-item>
-                <el-form-item :label="$t('setting.code')" prop="varsJson.code" :rules="rules.driveCode">
+                <el-form-item :label="$t('setting.code')" prop="varsJson.code">
                     <div class="!w-full">
                         <el-input
                             style="width: calc(100% - 80px)"
@@ -405,7 +399,10 @@
             <el-button :disabled="loading" @click="handleClose">
                 {{ $t('commons.button.cancel') }}
             </el-button>
-            <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+            <el-button :disabled="loading" @click="onCheck(formRef)">
+                {{ $t('terminal.testConn') }}
+            </el-button>
+            <el-button type="primary" :disabled="!isOK || loading" @click="onSubmit()">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -414,16 +411,18 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { ref, watch, computed, onUnmounted } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
 import FileList from '@/components/file-list/index.vue';
-import { addBackup, editBackup, getClientInfo, listBucket } from '@/api/modules/backup';
+import { addBackup, checkBackup, editBackup, getClientInfo, listBucket } from '@/api/modules/backup';
 import { cities } from './../helper';
-import { deepCopy, spliceHttp, splitHttp } from '@/utils/util';
-import { MsgSuccess } from '@/utils/message';
+import { dateFormat } from '@/utils/date';
+import { deepCopy } from '@/utils/misc';
+import { spliceHttp, splitHttp } from '@/utils/validate';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { Base64 } from 'js-base64';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
@@ -435,62 +434,13 @@ const buckets = ref();
 const clientInfo = ref();
 const fileRef = ref();
 
-const regionInput = ref();
+const isOK = ref();
+const stopWatch = ref();
 
-const s3Regions: Array<{ label: string; value: string }> = [
-    { label: 'US East (Ohio)', value: 'us-east-2' },
-    { label: 'US East (N. Virginia)', value: 'us-east-1' },
-    { label: 'US West (N. California)', value: 'us-west-1' },
-    { label: 'US West (Oregon)', value: 'us-west-2' },
-    { label: 'Africa (Cape Town)', value: 'af-south-1' },
-    { label: 'Asia Pacific (Hong Kong)', value: 'ap-east-1' },
-    { label: 'Asia Pacific (Hyderabad)', value: 'ap-south-2' },
-    { label: 'Asia Pacific (Jakarta)', value: 'ap-southeast-3' },
-    { label: 'Asia Pacific (Malaysia)', value: 'ap-southeast-5' },
-    { label: 'Asia Pacific (Melbourne)', value: 'ap-southeast-4' },
-    { label: 'Asia Pacific (Mumbai)', value: 'ap-south-1' },
-    { label: 'Asia Pacific (New Zealand)', value: 'ap-southeast-6' },
-    { label: 'Asia Pacific (Osaka)', value: 'ap-northeast-3' },
-    { label: 'Asia Pacific (Seoul)', value: 'ap-northeast-2' },
-    { label: 'Asia Pacific (Singapore)', value: 'ap-southeast-1' },
-    { label: 'Asia Pacific (Sydney)', value: 'ap-southeast-2' },
-    { label: 'Asia Pacific (Taipei)', value: 'ap-east-2' },
-    { label: 'Asia Pacific (Thailand)', value: 'ap-southeast-7' },
-    { label: 'Asia Pacific (Tokyo)', value: 'ap-northeast-1' },
-    { label: 'Canada (Central)', value: 'ca-central-1' },
-    { label: 'Canada West (Calgary)', value: 'ca-west-1' },
-    { label: 'Europe (Frankfurt)', value: 'eu-central-1' },
-    { label: 'Europe (Ireland)', value: 'eu-west-1' },
-    { label: 'Europe (London)', value: 'eu-west-2' },
-    { label: 'Europe (Milan)', value: 'eu-south-1' },
-    { label: 'Europe (Paris)', value: 'eu-west-3' },
-    { label: 'Europe (Spain)', value: 'eu-south-2' },
-    { label: 'Europe (Stockholm)', value: 'eu-north-1' },
-    { label: 'Europe (Zurich)', value: 'eu-central-2' },
-    { label: 'Israel (Tel Aviv)', value: 'il-central-1' },
-    { label: 'Mexico (Central)', value: 'mx-central-1' },
-    { label: 'Middle East (Bahrain)', value: 'me-south-1' },
-    { label: 'Middle East (UAE)', value: 'me-central-1' },
-    { label: 'South America (São Paulo)', value: 'sa-east-1' },
-    { label: 'AWS GovCloud (US-East)', value: 'us-gov-east-1' },
-    { label: 'AWS GovCloud (US-West)', value: 'us-gov-west-1' },
-];
+const regionInput = ref();
 
 const domainProto = ref('http');
 const emit = defineEmits(['search']);
-const rules = reactive({
-    driveCode: [{ validator: checkDriveCode, required: true, trigger: 'blur' }],
-});
-function checkDriveCode(rule: any, value: any, callback: any) {
-    if (!value) {
-        return callback(new Error(i18n.global.t('setting.codeWarning')));
-    }
-    const reg = /^[A-Za-z0-9/_.-]+$/;
-    if (!reg.test(value)) {
-        return callback(new Error(i18n.global.t('setting.codeWarning')));
-    }
-    callback();
-}
 
 interface DialogProps {
     title: string;
@@ -501,6 +451,32 @@ const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
+
+const formWatcher = computed(() => {
+    const { type, isPublic, accessKey, bucket, credential, backupPath, bucketInput, varsJson } =
+        dialogData.value.rowData || {};
+    return { type, isPublic, accessKey, bucket, credential, backupPath, bucketInput, varsJson };
+});
+const startWatcher = () => {
+    if (stopWatch.value) {
+        stopWatcher();
+    }
+    stopWatch.value = watch(
+        () => formWatcher.value,
+        () => {
+            stopWatcher();
+            isOK.value = false;
+        },
+        { deep: true },
+    );
+};
+const stopWatcher = () => {
+    if (stopWatch.value) {
+        stopWatch.value();
+        stopWatch.value = null;
+    }
+};
+
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     dialogData.value.rowData.varsJson = dialogData.value.rowData!.vars
@@ -536,19 +512,19 @@ const toDoc = (type: string) => {
     let uri = '';
     switch (type) {
         case 'onedrive':
-            uri = '#32-onedrive';
+            uri = '#42-onedrive';
             break;
         case 'onedrive-bind':
-            uri = '#33-onedrive';
+            uri = '#43-onedrive';
             break;
         case 'ali-pan':
-            uri = '#34';
+            uri = '#44';
             break;
         case 'google-drive':
-            uri = '#35';
+            uri = '#45';
             break;
         case 'webdav':
-            uri = '#36-webdav-alist';
+            uri = '#46-webdav-alist';
             break;
     }
     window.open(globalStore.docsUrl + '/user_manual/settings/' + uri, '_blank', 'noopener,noreferrer');
@@ -633,20 +609,6 @@ const loadDir = async (path: string) => {
     dialogData.value.rowData!.backupPath = path;
 };
 
-const handleS3RegionChange = (region?: string) => {
-    if (!region || !dialogData.value.rowData || dialogData.value.rowData!.type !== 'S3') {
-        return;
-    }
-    // 检查是否是 AWS S3 标准区域
-    const isStandardRegion = s3Regions.some((item) => item.value === region);
-    if (isStandardRegion) {
-        // 自动设置 endpoint 为 AWS S3 标准 endpoint
-        dialogData.value.rowData!.varsJson['endpointItem'] = `s3.${region}.amazonaws.com`;
-        domainProto.value = 'https';
-    }
-    // 如果是自定义区域，endpoint 保持用户设置的值
-};
-
 const changeType = async () => {
     buckets.value = [];
     dialogData.value.rowData!.varsJson = {};
@@ -716,10 +678,11 @@ const getBuckets = async (formEl: FormInstance | undefined) => {
     }
     loading.value = true;
     let item = deepCopy(dialogData.value.rowData!.varsJson);
+    let itemEndpoint = loadEndpoint();
     if (dialogData.value.rowData!.type === 'KODO') {
-        item['domain'] = spliceHttp(domainProto.value, dialogData.value.rowData!.varsJson['endpointItem']);
+        item['domain'] = itemEndpoint;
     } else {
-        item['endpoint'] = spliceHttp(domainProto.value, dialogData.value.rowData!.varsJson['endpointItem']);
+        item['endpoint'] = itemEndpoint;
     }
     item['endpointItem'] = undefined;
     listBucket({
@@ -739,38 +702,71 @@ const getBuckets = async (formEl: FormInstance | undefined) => {
         });
 };
 
-const onSubmit = async (formEl: FormInstance | undefined) => {
+const loadEndpoint = () => {
+    let item = splitHttp(dialogData.value.rowData!.varsJson['endpointItem']);
+    if (item.proto) {
+        domainProto.value = item.proto;
+        dialogData.value.rowData!.varsJson['endpointItem'] = item.url;
+    }
+    return spliceHttp(domainProto.value, dialogData.value.rowData!.varsJson['endpointItem']);
+};
+
+const onCheck = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
         if (!dialogData.value.rowData) return;
         if (hasAccessKey()) {
-            let itemEndpoint = spliceHttp(domainProto.value, dialogData.value.rowData!.varsJson['endpointItem']);
+            let itemEndpoint = loadEndpoint();
             if (dialogData.value.rowData!.type === 'KODO') {
                 dialogData.value.rowData!.varsJson['domain'] = itemEndpoint;
             } else {
                 dialogData.value.rowData!.varsJson['endpoint'] = itemEndpoint;
             }
-            dialogData.value.rowData!.varsJson['endpointItem'] = itemEndpoint;
+        }
+        if (isOneDrive()) {
+            dialogData.value.rowData!.varsJson['code'] = decodeURIComponent(
+                dialogData.value.rowData!.varsJson['code'] || '',
+            );
         }
         if (isALIYUNYUN()) {
             dialogData.value.rowData!.varsJson['token'] = undefined;
         }
         dialogData.value.rowData.vars = JSON.stringify(dialogData.value.rowData!.varsJson);
         loading.value = true;
-        if (dialogData.value.title === 'create') {
-            await addBackup(dialogData.value.rowData)
-                .then(() => {
-                    loading.value = false;
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    drawerVisible.value = false;
-                })
-                .catch(() => {
-                    loading.value = false;
-                });
-            return;
-        }
-        await editBackup(dialogData.value.rowData)
+        await checkBackup(dialogData.value.rowData)
+            .then((res) => {
+                loading.value = false;
+                if (res.data.isOk) {
+                    isOK.value = true;
+                    MsgSuccess(i18n.global.t('terminal.connTestOk'));
+                    if (hasClient()) {
+                        dialogData.value.rowData!.varsJson['refresh_token'] = Base64.decode(res.data.token);
+                        dialogData.value.rowData!.varsJson['refresh_status'] = 'Success';
+                        dialogData.value.rowData!.varsJson['refresh_time'] = dateFormat(null, null, new Date());
+                    }
+                    if (isALIYUNYUN()) {
+                        dialogData.value.rowData!.varsJson['refresh_status'] = 'Success';
+                        dialogData.value.rowData!.varsJson['refresh_time'] = dateFormat(null, null, new Date());
+                    }
+                    startWatcher();
+                    return;
+                }
+                isOK.value = false;
+                MsgError(i18n.global.t('terminal.connTestFailed') + ':' + res.data.msg);
+            })
+            .catch(() => {
+                loading.value = false;
+                isOK.value = false;
+            });
+    });
+};
+
+const onSubmit = async () => {
+    dialogData.value.rowData.vars = JSON.stringify(dialogData.value.rowData!.varsJson);
+    loading.value = true;
+    if (dialogData.value.title === 'create') {
+        await addBackup(dialogData.value.rowData)
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -779,8 +775,22 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             .catch(() => {
                 loading.value = false;
             });
-    });
+        return;
+    }
+    await editBackup(dialogData.value.rowData)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            drawerVisible.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
+
+onUnmounted(() => {
+    if (stopWatch.value) stopWatcher();
+});
 
 defineExpose({
     acceptParams,

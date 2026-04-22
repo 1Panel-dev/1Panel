@@ -39,8 +39,18 @@ type MonitorSettingUpdate struct {
 }
 
 type MonitorGPUOptions struct {
-	GPUType string   `json:"gpuType"`
-	Options []string `json:"options"`
+	GPUType   string         `json:"gpuType"`
+	ChartHide []GPUChartHide `json:"chartHide"`
+	Options   []string       `json:"options"`
+}
+type GPUChartHide struct {
+	ProductName string `json:"productName"`
+	Process     bool   `json:"process"`
+	GPU         bool   `json:"gpu"`
+	Memory      bool   `json:"memory"`
+	Power       bool   `json:"power"`
+	Temperature bool   `json:"temperature"`
+	Speed       bool   `json:"speed"`
 }
 type MonitorGPUSearch struct {
 	ProductName string    `json:"productName"`
@@ -48,25 +58,21 @@ type MonitorGPUSearch struct {
 	EndTime     time.Time `json:"endTime"`
 }
 type MonitorGPUData struct {
-	Date             []time.Time            `json:"date"`
-	GPUValue         []float64              `json:"gpuValue"`
-	TemperatureValue []float64              `json:"temperatureValue"`
-	PowerValue       []GPUPowerUsageHelper  `json:"powerValue"`
-	MemoryValue      []GPUMemoryUsageHelper `json:"memoryValue"`
-	SpeedValue       []int                  `json:"speedValue"`
-}
-type GPUPowerUsageHelper struct {
-	Total   float64 `json:"total"`
-	Used    float64 `json:"used"`
-	Percent float64 `json:"percent"`
-}
-type GPUMemoryUsageHelper struct {
-	Total   float64 `json:"total"`
-	Used    float64 `json:"used"`
-	Percent float64 `json:"percent"`
+	Date             []time.Time `json:"date"`
+	GPUValue         []float64   `json:"gpuValue"`
+	TemperatureValue []float64   `json:"temperatureValue"`
+	PowerTotal       []float64   `json:"powerTotal"`
+	PowerUsed        []float64   `json:"powerUsed"`
+	PowerPercent     []float64   `json:"powerPercent"`
+	MemoryTotal      []float64   `json:"memoryTotal"`
+	MemoryUsed       []float64   `json:"memoryUsed"`
+	MemoryPercent    []float64   `json:"memoryPercent"`
+	SpeedValue       []int       `json:"speedValue"`
 
-	GPUProcesses []GPUProcess `json:"gpuProcesses"`
+	ProcessCount []int          `json:"processCount"`
+	GPUProcesses [][]GPUProcess `json:"gpuProcesses"`
 }
+
 type GPUProcess struct {
 	Pid         string `json:"pid"`
 	Type        string `json:"type"`

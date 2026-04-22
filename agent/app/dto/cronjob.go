@@ -49,6 +49,7 @@ type CronjobOperate struct {
 	Timeout           uint   `json:"timeout" validate:"number,min=1"`
 	IgnoreErr         bool   `json:"ignoreErr"`
 	Secret            string `json:"secret"`
+	Args              string `json:"args"`
 
 	AlertCount  uint   `json:"alertCount"`
 	AlertTitle  string `json:"alertTitle"`
@@ -123,6 +124,7 @@ type CronjobInfo struct {
 	LastRecordTime   string `json:"lastRecordTime"`
 	Status           string `json:"status"`
 	Secret           string `json:"secret"`
+	Args             string `json:"args"`
 
 	AlertCount uint `json:"alertCount"`
 }
@@ -162,6 +164,7 @@ type CronjobTrans struct {
 	IgnoreErr    bool                `json:"ignoreErr"`
 	SnapshotRule SnapshotTransHelper `json:"snapshotRule"`
 	Secret       string              `json:"secret"`
+	Args         string              `json:"args"`
 
 	SourceAccounts  []string `json:"sourceAccounts"`
 	DownloadAccount string   `json:"downloadAccount"`

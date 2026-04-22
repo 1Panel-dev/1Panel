@@ -7,6 +7,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"gorm.io/gorm"
 )
 
@@ -15,6 +16,12 @@ type DBOption func(*gorm.DB) *gorm.DB
 func WithByID(id uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("id = ?", id)
+	}
+}
+
+func WithByGroupID(id uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("group_id = ?", id)
 	}
 }
 
@@ -39,6 +46,12 @@ func WithByIDNotIn(ids []uint) DBOption {
 func WithByName(name string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("name = ?", name)
+	}
+}
+
+func WithByAddr(addr string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("addr = ?", addr)
 	}
 }
 
@@ -69,6 +82,51 @@ func WithByDetailName(detailName string) DBOption {
 			return g
 		}
 		return g.Where("detail_name = ?", detailName)
+	}
+}
+
+func WithByProvider(provider string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(provider) == 0 {
+			return g
+		}
+		return g.Where("provider = ?", provider)
+	}
+}
+
+func WithByModel(model string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(model) == 0 {
+			return g
+		}
+		return g.Where("model = ?", model)
+	}
+}
+
+func WithByAccountID(accountID uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if accountID == 0 {
+			return g
+		}
+		return g.Where("account_id = ?", accountID)
+	}
+}
+
+func WithByWebsiteID(websiteID uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if websiteID == 0 {
+			return g
+		}
+		return g.Where("website_id = ?", websiteID)
+	}
+}
+
+func WithByAppInstallID(appInstallID uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if appInstallID == 0 {
+			return g
+		}
+		return g.Where("app_install_id = ?", appInstallID)
 	}
 }
 
@@ -124,22 +182,29 @@ func WithByCreatedAt(startTime, endTime time.Time) DBOption {
 	}
 }
 
-func WithOrderBy(orderStr string) DBOption {
-	if orderStr == "createdAt" {
-		orderStr = "created_at"
-	}
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Order(orderStr)
-	}
+func WithOrderDesc(orderBy string) DBOption {
+	return WithOrderRuleBy(orderBy, constant.Desc)
 }
+
+func WithOrderAsc(orderBy string) DBOption {
+	return WithOrderRuleBy(orderBy, constant.Asc)
+}
+
 func WithOrderRuleBy(orderBy, order string) DBOption {
 	if orderBy == "createdAt" {
+		orderBy = "created_at"
+	}
+	if !re.GetRegex(re.OrderByValidationPattern).MatchString(orderBy) {
 		orderBy = "created_at"
 	}
 	switch order {
 	case constant.OrderDesc:
 		order = "desc"
 	case constant.OrderAsc:
+		order = "asc"
+	case constant.Desc:
+		order = "desc"
+	case constant.Asc:
 		order = "asc"
 	default:
 		orderBy = "created_at"

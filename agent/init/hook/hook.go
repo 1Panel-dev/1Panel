@@ -27,11 +27,12 @@ func Init() {
 
 	initDockerConf()
 	initAlertTask()
+	initMonitorDB()
 }
 
 func initGlobalData() {
 	settingRepo := repo.NewISettingRepo()
-	if _, err := settingRepo.Get(settingRepo.WithByKey("SystemStatus")); err != nil {
+	if _, err := settingRepo.GetValueByKey("SystemStatus"); err != nil {
 		_ = settingRepo.Create("SystemStatus", "Free")
 	}
 	if err := settingRepo.Update("SystemStatus", "Free"); err != nil {
@@ -41,6 +42,8 @@ func initGlobalData() {
 	if len(node.Version) != 0 {
 		_ = settingRepo.Update("SystemVersion", node.Version)
 	}
+	global.CONF.Base.Version = node.Version
+	global.CONF.Base.Edition, _ = settingRepo.GetValueByKey("Edition")
 	global.CONF.Base.EncryptKey, _ = settingRepo.GetValueByKey("EncryptKey")
 }
 
@@ -149,4 +152,9 @@ func initDockerConf() {
 
 func initAlertTask() {
 	service.NewIAlertTaskHelper().ResetTask()
+}
+
+func initMonitorDB() {
+	_ = global.MonitorDB.AutoMigrate(&model.MonitorBase{}, &model.MonitorNetwork{}, &model.MonitorGPU{}, &model.MonitorIO{})
+	_ = global.TaskDB.AutoMigrate(&model.Task{})
 }

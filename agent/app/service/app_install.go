@@ -57,6 +57,7 @@ type IAppInstallService interface {
 	UpdateAppConfig(req request.AppConfigUpdate) error
 	GetInstallList() ([]dto.AppInstallInfo, error)
 	GetAppInstallInfo(appInstallID uint) (*response.AppInstallInfo, error)
+	UpdateSort(req request.AppInstallSort) error
 }
 
 func NewIAppInstalledService() IAppInstallService {
@@ -83,6 +84,7 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 		err      error
 	)
 	opts = append(opts, repo.WithOrderRuleBy("favorite", "descending"))
+	opts = append(opts, repo.WithOrderRuleBy("sort_order", "ascending"))
 
 	if req.Name != "" {
 		opts = append(opts, repo.WithByLikeName(req.Name))
@@ -121,7 +123,7 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 		}
 	}
 
-	installDTOs, _ := handleInstalled(installs, req.Update, req.Sync)
+	installDTOs, _ := handleInstalled(installs, req.Update, req.Sync, req.CheckUpdate)
 	if req.Update {
 		total = int64(len(installDTOs))
 	}
@@ -238,7 +240,7 @@ func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]
 		}
 	}
 
-	return handleInstalled(installs, false, true)
+	return handleInstalled(installs, false, true, false)
 }
 
 func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
@@ -300,6 +302,9 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		return opNginx(install.ContainerName, constant.NginxReload)
 	case constant.Favorite:
 		install.Favorite = req.Favorite
+		var maxSort int
+		global.DB.Model(&model.AppInstall{}).Where("favorite = ?", req.Favorite).Select("COALESCE(MAX(sort_order),0)").Scan(&maxSort)
+		install.SortOrder = maxSort + 1
 		return appInstallRepo.Save(context.Background(), &install)
 	default:
 		return errors.New("operate not support")
@@ -318,17 +323,25 @@ func (a *AppInstallService) UpdateAppConfig(req request.AppConfigUpdate) error {
 	return appInstallRepo.Save(context.Background(), &installed)
 }
 
+func (a *AppInstallService) UpdateSort(req request.AppInstallSort) error {
+	for _, item := range req.Items {
+		if err := appInstallRepo.BatchUpdateBy(map[string]interface{}{"sort_order": item.SortOrder}, repo.WithByID(item.InstallID)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	installed, err := appInstallRepo.GetFirst(repo.WithByID(req.InstallId))
 	if err != nil {
 		return err
 	}
-	changePort := false
+	oldInstalled := installed
 	port, ok := req.Params["PANEL_APP_PORT_HTTP"]
 	if ok {
 		portN := int(math.Ceil(port.(float64)))
 		if portN != installed.HttpPort {
-			changePort = true
 			httpPort, err := checkPort("PANEL_APP_PORT_HTTP", req.Params)
 			if err != nil {
 				return err
@@ -414,9 +427,17 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	installed.Status = constant.StatusRunning
 	_ = appInstallRepo.Save(context.Background(), &installed)
 
+	proxyChanged := hasAppInstallProxyPassChanged(&oldInstalled, &installed)
+	currentProxy, currentProxyErr := getAppInstallProxyPass(&installed)
 	website, _ := websiteRepo.GetFirst(websiteRepo.WithAppInstallId(installed.ID))
-	if changePort && website.ID != 0 && website.Status == constant.StatusRunning {
-		go func() {
+	if proxyChanged && website.ID != 0 && currentProxyErr == nil {
+		website.Proxy = currentProxy
+		if err := websiteRepo.SaveWithoutCtx(&website); err != nil {
+			global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", err).Error())
+		}
+	}
+	if proxyChanged && website.ID != 0 && website.Status == constant.StatusRunning && currentProxyErr == nil {
+		go func(website model.Website, proxy string) {
 			nginxInstall, err := getNginxFull(&website)
 			if err != nil {
 				global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", err).Error())
@@ -429,7 +450,6 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 				return
 			}
 			server := servers[0]
-			proxy := fmt.Sprintf("http://127.0.0.1:%d", installed.HttpPort)
 			server.UpdateRootProxy([]string{proxy})
 
 			if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
@@ -440,7 +460,10 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 				global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", err).Error())
 				return
 			}
-		}()
+		}(website, currentProxy)
+	}
+	if proxyChanged && website.ID != 0 && currentProxyErr != nil {
+		global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", currentProxyErr).Error())
 	}
 	return nil
 }
@@ -515,6 +538,7 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 			} else {
 				service.From = constant.AppResourceRemote
 				service.Status = constant.StatusRunning
+				service.Config = map[string]string{"PANEL_DB_ROOT_PASSWORD": db.Password, "PANEL_DB_ROOT_USER": db.Username}
 			}
 			res = append(res, service)
 		}
@@ -829,6 +853,10 @@ func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
 	return nil
 }
 
+func SyncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
+	return syncAppInstallStatus(appInstall, force)
+}
+
 func updateInstallInfoInDB(appKey, appName, param string, value interface{}) error {
 	if param != "password" && param != "port" && param != "user-password" {
 		return nil
@@ -846,7 +874,7 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 	envKey := ""
 	switch param {
 	case "password":
-		if appKey == "mysql" || appKey == "mariadb" || appKey == "postgresql" {
+		if appKey == "mysql" || appKey == "mariadb" || appKey == "postgresql" || appKey == "mongodb" {
 			envKey = "PANEL_DB_ROOT_PASSWORD="
 		} else {
 			envKey = "PANEL_REDIS_ROOT_PASSWORD="
@@ -887,7 +915,7 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 			"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
 			"env":   strings.ReplaceAll(appInstall.Env, oldVal, newVal),
 		}, repo.WithByID(appInstall.ID))
-		if appKey == "mysql" || appKey == "postgresql" {
+		if appKey == "mysql" || appKey == "postgresql" || appKey == "mongodb" {
 			return nil
 		}
 	}

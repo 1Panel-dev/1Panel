@@ -7,7 +7,7 @@
 <script lang="ts" setup>
 import { CSSProperties } from 'vue';
 import { basicSetup, EditorView } from 'codemirror';
-import { EditorState } from '@codemirror/state';
+import { EditorState, Extension } from '@codemirror/state';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { StreamLanguage } from '@codemirror/language';
 import { nginx } from './nginx';
@@ -24,6 +24,10 @@ defineOptions({ name: 'CodemirrorPro' });
 
 const props = defineProps({
     disabled: {
+        type: Boolean,
+        default: false,
+    },
+    readonly: {
         type: Boolean,
         default: false,
     },
@@ -119,7 +123,7 @@ const initCodeMirror = () => {
         },
     });
 
-    const extensions = [
+    const extensions: Extension[] = [
         defaultTheme,
         oneDark,
         basicSetup,
@@ -131,6 +135,7 @@ const initCodeMirror = () => {
         }),
         placeholder(props.placeholder),
         EditorView.editable.of(!props.disabled),
+        EditorState.readOnly.of(props.readonly),
     ];
 
     if (props.lineWrapping) {

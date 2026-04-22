@@ -9,7 +9,6 @@ type ApiGroup struct {
 var ApiGroupApp = new(ApiGroup)
 
 var (
-	hostService    = service.NewIHostService()
 	authService    = service.NewIAuthService()
 	backupService  = service.NewIBackupService()
 	settingService = service.NewISettingService()

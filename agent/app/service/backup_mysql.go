@@ -44,7 +44,7 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 		return err
 	}
 
-	databaseHelper := DatabaseHelper{Database: req.Name, DBType: req.Type, Name: req.DetailName}
+	databaseHelper := DatabaseHelper{Database: req.Name, DBType: req.Type, Name: req.DetailName, Args: req.Args}
 	if err := handleMysqlBackup(databaseHelper, nil, record.ID, targetDir, fileName, req.TaskID, req.Secret); err != nil {
 		backupRepo.UpdateRecordByMap(record.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
 		return err
@@ -57,11 +57,11 @@ func (u *BackupService) MysqlRecover(req dto.CommonRecover) error {
 }
 
 func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
-	recoveFile, err := loadSqlFile(req.File)
+	recoverFile, err := loadSqlFile(req.File)
 	if err != nil {
 		return err
 	}
-	req.File = recoveFile
+	req.File = recoverFile
 
 	if err := handleMysqlRecover(req, nil, false); err != nil {
 		return err
@@ -87,7 +87,12 @@ func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, recordID uint, 
 		}
 	}
 
-	itemHandler := func() error { return doMysqlBackup(db, targetDir, fileName, secret) }
+	itemHandler := func() error {
+		if len(db.Args) != 0 {
+			backupTask.Logf("%s: %v", i18n.GetMsgByKey("Arg"), db.Args)
+		}
+		return doMysqlBackup(db, targetDir, fileName, secret)
+	}
 	if parentTask != nil {
 		return itemHandler()
 	}
@@ -193,7 +198,16 @@ func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback
 		return recoverDatabase(parentTask)
 	}
 
-	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil, 0, 3*time.Hour)
+	var timeout time.Duration
+	switch req.Timeout {
+	case -1:
+		timeout = 0
+	case 0:
+		timeout = 3 * time.Hour
+	default:
+		timeout = time.Duration(req.Timeout) * time.Second
+	}
+	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil, 0, timeout)
 	go func() {
 		_ = itemTask.Execute()
 	}()
@@ -216,6 +230,7 @@ func doMysqlBackup(db DatabaseHelper, targetDir, fileName, secret string) error 
 		Format:    dbInfo.Format,
 		TargetDir: targetDir,
 		FileName:  fileName,
+		Args:      db.Args,
 	}
 	if err := cli.Backup(backupInfo); err != nil {
 		return err

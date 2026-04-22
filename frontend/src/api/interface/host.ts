@@ -74,7 +74,6 @@ export namespace Host {
         pingStatus: string;
     }
     export interface RuleSearch extends ReqPage {
-        status: string;
         strategy: string;
         info: string;
         type: string;
@@ -169,25 +168,29 @@ export namespace Host {
     export interface MonitorGPUOptions {
         gpuType: string;
         options: Array<string>;
+        chartHide: Array<ChartHide>;
+    }
+    export interface ChartHide {
+        productName: string;
+        process: boolean;
+        gpu: boolean;
+        memory: boolean;
+        power: boolean;
+        temperature: boolean;
+        speed: boolean;
     }
     export interface MonitorGPUData {
         date: Array<Date>;
         gpuValue: Array<number>;
         temperatureValue: Array<number>;
-        powerValue: Array<GPUPowerUsageHelper>;
-        memoryValue: Array<GPUMemoryUsageHelper>;
+        powerTotal: Array<number>;
+        powerUsed: Array<number>;
+        powerPercent: Array<number>;
+        memoryTotal: Array<number>;
+        memoryUsed: Array<number>;
+        memoryPercent: Array<number>;
         speedValue: Array<number>;
-    }
-    export interface GPUPowerUsageHelper {
-        total: number;
-        used: number;
-        percent: number;
-    }
-    export interface GPUMemoryUsageHelper {
-        total: number;
-        used: number;
-        percent: number;
-        gpuProcesses: Array<GPUProcess>;
+        gpuProcesses: Array<Array<GPUProcess>>;
     }
     export interface GPUProcess {
         pid: string;
@@ -212,7 +215,6 @@ export namespace Host {
     }
     export interface SSHUpdate {
         key: string;
-        oldValue: string;
         newValue: string;
     }
     export interface RootCert {
@@ -287,6 +289,7 @@ export namespace Host {
         label: string;
         autoMount: boolean;
         mountPoint: string;
+        noFail: boolean;
     }
 
     export interface DiskMount {

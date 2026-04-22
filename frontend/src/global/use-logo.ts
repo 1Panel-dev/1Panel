@@ -14,6 +14,7 @@ export const useLogo = async () => {
         globalStore.themeConfig.loginBackground = res.data?.loginBackground;
         globalStore.themeConfig.loginBtnLinkColor = res.data?.loginBtnLinkColor;
         globalStore.themeConfig.favicon = res.data.favicon;
+        globalStore.watermarkShow = res.data.watermarkShow === 'Enable';
         try {
             globalStore.watermark = JSON.parse(res.data.watermark);
         } catch {

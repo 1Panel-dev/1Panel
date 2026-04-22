@@ -62,12 +62,15 @@
                         :placeholder="$t('website.selectSSL')"
                         @change="changeSSl(req.sslID)"
                     >
-                        <el-option
-                            v-for="(ssl, index) in ssls"
-                            :key="index"
-                            :label="ssl.primaryDomain"
-                            :value="ssl.id"
-                        ></el-option>
+                        <el-option v-for="(ssl, index) in ssls" :key="index" :label="ssl.primaryDomain" :value="ssl.id">
+                            <span>{{ ssl.primaryDomain }}</span>
+                            <el-tag class="tagClass" v-if="ssl.expireDate">
+                                {{ dateFormatSimple(ssl.expireDate) }}
+                            </el-tag>
+                            <el-tag class="tagClass" v-if="ssl.organization">
+                                {{ ssl.organization }}
+                            </el-tag>
+                        </el-option>
                     </el-select>
                 </el-form-item>
                 <el-alert :closable="false">
@@ -95,15 +98,18 @@ import { listSSL, searchAcmeAccount } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
-import { getAccountName } from '@/utils/util';
+import { getAccountName } from '@/utils/ssl';
+import { dateFormatSimple } from '@/utils/date';
 import { bindDomain, getBindDomain, updateBindDomain } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 
+type SSLItem = Website.SSL & { organization?: string };
+
 const open = ref(false);
 const operate = ref('create');
 const loading = ref(false);
-const ssls = ref([]);
+const ssls = ref<SSLItem[]>([]);
 const websiteSSL = ref<Website.SSL>();
 const acmeAccounts = ref();
 const formRef = ref();
@@ -238,5 +244,11 @@ defineExpose({
 .pageRoute {
     font-size: 12px;
     margin-left: 5px;
+}
+.tagClass {
+    float: right;
+    margin-right: 10px;
+    font-size: 12px;
+    margin-top: 5px;
 }
 </style>

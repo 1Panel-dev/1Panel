@@ -16,6 +16,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -31,6 +32,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/controller"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/firewall"
+	"github.com/1Panel-dev/1Panel/core/utils/passkey"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
@@ -60,11 +62,12 @@ type ISettingService interface {
 	UpdateSystemSSL() error
 	GenerateRSAKey() error
 
-	GetLoginSetting() (*dto.SystemSetting, error)
-
 	UpdateAppstoreConfig(req dto.AppstoreUpdate) error
 	GetAppstoreConfig() (*dto.AppstoreConfig, error)
 	DefaultMenu() error
+
+	GetMemo() (string, error)
+	UpdateMemo(content string) error
 }
 
 func NewISettingService() ISettingService {
@@ -80,6 +83,15 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	for _, set := range setting {
 		settingMap[set.Key] = set.Value
 	}
+	if hideMenu, ok := settingMap["HideMenu"]; ok && len(hideMenu) > 0 {
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(hideMenu), &menus); err == nil {
+			sortShowMenus(menus)
+			if sortedBytes, err := json.Marshal(menus); err == nil {
+				settingMap["HideMenu"] = string(sortedBytes)
+			}
+		}
+	}
 	var info dto.SettingInfo
 	arr, err := json.Marshal(settingMap)
 	if err != nil {
@@ -88,6 +100,10 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	if err := json.Unmarshal(arr, &info); err != nil {
 		return nil, err
 	}
+	if info.Edition == "" {
+		info.Edition = "cn"
+		_ = settingRepo.UpdateOrCreate("Edition", info.Edition)
+	}
 	if info.ProxyPasswdKeep != constant.StatusEnable {
 		info.ProxyPasswd = ""
 	} else {
@@ -95,6 +111,20 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	}
 
 	return &info, err
+}
+
+func sortShowMenus(menus []dto.ShowMenu) {
+	for i := range menus {
+		if len(menus[i].Children) > 0 {
+			sortShowMenus(menus[i].Children)
+		}
+	}
+	sort.SliceStable(menus, func(i, j int) bool {
+		if menus[i].Sort == menus[j].Sort {
+			return menus[i].ID < menus[j].ID
+		}
+		return menus[i].Sort < menus[j].Sort
+	})
 }
 
 func (u *SettingService) Update(key, value string) error {
@@ -146,6 +176,9 @@ func (u *SettingService) Update(key, value string) error {
 		if len(value) != 0 {
 			_ = global.SESSION.Clean()
 		}
+		if err := u.clearPasskeySettings(); err != nil {
+			return err
+		}
 	case "UserName", "Password":
 		_ = global.SESSION.Clean()
 	case "Language":
@@ -160,6 +193,11 @@ func (u *SettingService) Update(key, value string) error {
 			StartSync()
 		} else {
 			global.Cron.Remove(global.ScriptSyncJobID)
+		}
+	case "Edition":
+		global.CONF.Base.Edition = value
+		if err := xpack.Sync(constant.SyncEdition); err != nil {
+			global.LOG.Errorf("sync edition to node failed, err: %v", err)
 		}
 	}
 
@@ -256,6 +294,9 @@ func (u *SettingService) UpdatePort(port uint) error {
 	if err := settingRepo.Update("ServerPort", strconv.Itoa(int(port))); err != nil {
 		return err
 	}
+	if err := u.clearPasskeySettings(); err != nil {
+		return err
+	}
 	go func() {
 		time.Sleep(1 * time.Second)
 		controller.RestartPanel(true, false, false)
@@ -267,6 +308,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	secretDir := path.Join(global.CONF.Base.InstallDir, "1panel/secret")
 	if req.SSL == constant.StatusDisable {
 		c.SetCookie(constant.SessionName, "", -1, "/", "", false, true)
+		c.SetCookie(constant.CSRFTokenName, "", -1, "/", "", false, false)
 		if err := settingRepo.Update("SSL", constant.StatusDisable); err != nil {
 			return err
 		}
@@ -484,25 +526,37 @@ func (u *SettingService) GetTerminalInfo() (*dto.TerminalInfo, error) {
 	return &info, err
 }
 func (u *SettingService) UpdateTerminal(req dto.TerminalInfo) error {
-	if err := settingRepo.Update("LineHeight", req.LineHeight); err != nil {
+	if err := settingRepo.UpdateOrCreate("LineHeight", req.LineHeight); err != nil {
 		return err
 	}
-	if err := settingRepo.Update("LetterSpacing", req.LetterSpacing); err != nil {
+	if err := settingRepo.UpdateOrCreate("LetterSpacing", req.LetterSpacing); err != nil {
 		return err
 	}
-	if err := settingRepo.Update("FontSize", req.FontSize); err != nil {
+	if err := settingRepo.UpdateOrCreate("FontSize", req.FontSize); err != nil {
 		return err
 	}
-	if err := settingRepo.Update("CursorBlink", req.CursorBlink); err != nil {
+	if err := settingRepo.UpdateOrCreate("FontFamily", req.FontFamily); err != nil {
 		return err
 	}
-	if err := settingRepo.Update("CursorStyle", req.CursorStyle); err != nil {
+	if err := settingRepo.UpdateOrCreate("CursorBlink", req.CursorBlink); err != nil {
 		return err
 	}
-	if err := settingRepo.Update("Scrollback", req.Scrollback); err != nil {
+	if err := settingRepo.UpdateOrCreate("BackgroundColor", req.BackgroundColor); err != nil {
 		return err
 	}
-	if err := settingRepo.Update("ScrollSensitivity", req.ScrollSensitivity); err != nil {
+	if err := settingRepo.UpdateOrCreate("ForegroundColor", req.ForegroundColor); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("CursorBlink", req.CursorBlink); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("CursorStyle", req.CursorStyle); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("Scrollback", req.Scrollback); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("ScrollSensitivity", req.ScrollSensitivity); err != nil {
 		return err
 	}
 	return nil
@@ -513,6 +567,16 @@ func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
 		return err
 	}
 	_ = global.SESSION.Clean()
+	return nil
+}
+
+func (u *SettingService) clearPasskeySettings() error {
+	if err := settingRepo.Update(passkey.PasskeyUserIDSettingKey, ""); err != nil {
+		return err
+	}
+	if err := settingRepo.Update(passkey.PasskeyCredentialSettingKey, ""); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -647,19 +711,6 @@ func (u *SettingService) GenerateRSAKey() error {
 	return nil
 }
 
-func (u *SettingService) GetLoginSetting() (*dto.SystemSetting, error) {
-	settingInfo, err := u.GetSettingInfo()
-	if err != nil {
-		return nil, err
-	}
-	res := &dto.SystemSetting{
-		Language: settingInfo.Language,
-		IsDemo:   global.CONF.Base.IsDemo,
-		IsIntl:   global.CONF.Base.IsIntl,
-	}
-	return res, nil
-}
-
 func (u *SettingService) UpdateAppstoreConfig(req dto.AppstoreUpdate) error {
 	return settingRepo.UpdateOrCreate(req.Scope, req.Status)
 }
@@ -668,15 +719,19 @@ func (u *SettingService) GetAppstoreConfig() (*dto.AppstoreConfig, error) {
 	res := &dto.AppstoreConfig{}
 	res.UninstallDeleteImage, _ = settingRepo.GetValueByKey("UninstallDeleteImage")
 	if res.UninstallDeleteImage == "" {
-		res.UninstallDeleteImage = "False"
+		res.UninstallDeleteImage = constant.StatusDisable
 	}
 	res.UpgradeBackup, _ = settingRepo.GetValueByKey("UpgradeBackup")
 	if res.UpgradeBackup == "" {
-		res.UpgradeBackup = "False"
+		res.UpgradeBackup = constant.StatusDisable
 	}
 	res.UninstallDeleteBackup, _ = settingRepo.GetValueByKey("UninstallDeleteBackup")
 	if res.UninstallDeleteBackup == "" {
-		res.UninstallDeleteBackup = "False"
+		res.UninstallDeleteBackup = constant.StatusDisable
+	}
+	res.InstallAllowPort, _ = settingRepo.GetValueByKey("InstallAllowPort")
+	if res.InstallAllowPort == "" {
+		res.InstallAllowPort = constant.StatusDisable
 	}
 	return res, nil
 }
@@ -694,7 +749,7 @@ func loadDockerProxy(req dto.ProxyUpdate) string {
 		account += "@"
 	}
 
-	return fmt.Sprintf("%s://%s%s:%s", req.ProxyType, account, req.ProxyUrl, req.ProxyPort)
+	return fmt.Sprintf("%s://%s%s:%s", req.ProxyType, account, strings.ReplaceAll(req.ProxyUrl, req.ProxyType+"://", ""), req.ProxyPort)
 }
 
 func checkProxy(req dto.ProxyUpdate) error {
@@ -709,7 +764,7 @@ func checkProxy(req dto.ProxyUpdate) error {
 		if len(req.ProxyUser) != 0 {
 			proxyURL.User = url.UserPassword(req.ProxyUser, req.ProxyPasswd)
 		}
-		transport = http.Transport{Proxy: http.ProxyURL(proxyURL)}
+		transport = http.Transport{Proxy: http.ProxyURL(proxyURL), TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	case "socks5":
 		var auth *proxy.Auth
 		if len(req.ProxyUser) == 0 {
@@ -726,6 +781,7 @@ func checkProxy(req dto.ProxyUpdate) error {
 		}
 		transport = http.Transport{DialContext: dialContext}
 	case "", "close":
+		return nil
 	default:
 		return buserr.WithDetail("ErrNotSupportType", req.ProxyType, nil)
 	}
@@ -757,4 +813,16 @@ func checkProxy(req dto.ProxyUpdate) error {
 
 func (u *SettingService) DefaultMenu() error {
 	return settingRepo.DefaultMenu()
+}
+
+func (u *SettingService) GetMemo() (string, error) {
+	memo, err := settingRepo.GetValueByKey("DashboardMemo")
+	if err != nil {
+		return "", nil
+	}
+	return memo, nil
+}
+
+func (u *SettingService) UpdateMemo(content string) error {
+	return settingRepo.UpdateOrCreate("DashboardMemo", content)
 }

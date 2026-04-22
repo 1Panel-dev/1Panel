@@ -4,7 +4,7 @@
             <el-form-item :label="$t('container.path')" :rules="Rules.requiredInput" prop="path">
                 <el-input v-model="form.path">
                     <template #prepend>
-                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: false })" />
+                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: false, multiple: true })" />
                     </template>
                 </el-input>
             </el-form-item>
@@ -33,8 +33,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { imageLoad } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
-import { newUUID } from '@/utils/util';
-
+import { newUUID } from '@/utils/id';
 const loading = ref(false);
 const fileRef = ref();
 const taskLogRef = ref();
@@ -42,12 +41,14 @@ const taskLogRef = ref();
 const loadVisible = ref(false);
 const form = reactive({
     path: '',
+    paths: [] as string[],
     taskID: '',
 });
 
 const acceptParams = () => {
     loadVisible.value = true;
     form.path = '';
+    form.paths = [];
 };
 const handleClose = () => {
     loadVisible.value = false;
@@ -64,7 +65,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         loading.value = true;
         form.taskID = newUUID();
-        await imageLoad(form)
+        await imageLoad({ paths: form.paths, taskID: form.taskID })
             .then(() => {
                 loading.value = false;
                 loadVisible.value = false;
@@ -82,8 +83,10 @@ const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
 };
 
-const loadLoadDir = async (path: string) => {
-    form.path = path;
+const loadLoadDir = async (paths: string | string[]) => {
+    const newPaths = Array.isArray(paths) ? paths : [paths];
+    form.paths = [...new Set([...form.paths, ...newPaths])];
+    form.path = form.paths.join('; ');
 };
 
 defineExpose({

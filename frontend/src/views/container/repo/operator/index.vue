@@ -1,7 +1,7 @@
 <template>
     <DrawerPro
         v-model="drawerVisible"
-        :header="title + $t('container.repo').toLowerCase()"
+        :header="title"
         :resource="dialogData.rowData?.name"
         @close="handleClose"
         size="small"

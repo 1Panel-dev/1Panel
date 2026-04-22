@@ -27,7 +27,7 @@ func (b *BaseApi) LoadDeviceBaseInfo(c *gin.Context) {
 // @Tags Device
 // @Summary list time zone options
 // @Accept json
-// @Success 200 {Array} string
+// @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /toolbox/device/zone/options [get]

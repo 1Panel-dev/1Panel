@@ -30,7 +30,7 @@
                     </template>
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('firewall.createIpRule') }}
+                            {{ $t('commons.button.create') }}
                         </el-button>
                         <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                             {{ $t('commons.button.delete') }}
@@ -129,8 +129,8 @@ import { Host } from '@/api/interface/host';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { downloadWithContent, getCurrentDateFormatted } from '@/utils/util';
-
+import { downloadWithContent } from '@/utils/file';
+import { getCurrentDateFormatted } from '@/utils/date';
 const loading = ref();
 const activeTag = ref('address');
 const selects = ref<any>([]);
@@ -163,7 +163,6 @@ const search = async () => {
     }
     let params = {
         type: activeTag.value,
-        status: '',
         strategy: searchStrategy.value,
         info: searchName.value,
         page: paginationConfig.currentPage,

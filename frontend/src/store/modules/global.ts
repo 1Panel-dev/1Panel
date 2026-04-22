@@ -1,8 +1,11 @@
 import { defineStore } from 'pinia';
 import piniaPersistConfig from '@/config/pinia-persist';
-import { GlobalState, ThemeConfigProp } from '../interface';
+import { GlobalState } from '../interface';
 import { DeviceType } from '@/enums/app';
 import i18n, { setActiveLocale } from '@/lang';
+
+const CN_DOCS_URL = 'https://1panel.cn/docs/v2';
+const INTL_DOCS_URL = 'https://docs.1panel.pro/v2';
 
 const GlobalStore = defineStore({
     id: 'GlobalState',
@@ -10,8 +13,9 @@ const GlobalStore = defineStore({
         isLoading: false,
         loadingText: '',
         isLogin: false,
+        csrfToken: '',
         entrance: '',
-        language: '',
+        language: i18n.global.locale.value,
         themeConfig: {
             panelName: '',
             primary: '#005eeb',
@@ -28,6 +32,7 @@ const GlobalStore = defineStore({
             loginBtnLinkColor: '',
         },
         watermark: null,
+        watermarkShow: false,
         openMenuTabs: false,
         isFullScreen: false,
         isOnRestart: false,
@@ -37,7 +42,9 @@ const GlobalStore = defineStore({
         device: DeviceType.Desktop,
         lastFilePath: '',
         currentDB: '',
+        currentPgDB: '',
         currentRedisDB: '',
+        currentMongodbDB: '',
         showEntranceWarn: true,
         defaultNetwork: 'all',
         defaultIO: 'all',
@@ -45,6 +52,7 @@ const GlobalStore = defineStore({
 
         isProductPro: false,
         isIntl: false,
+        docWithRegion: true,
         productProExpires: 0,
         isMasterProductPro: false,
         isOffLine: false,
@@ -58,38 +66,24 @@ const GlobalStore = defineStore({
             state.themeConfig.theme === 'dark' ||
             (state.themeConfig.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches),
         isDarkGoldTheme: (state) => state.themeConfig.primary === '#F0BE96' && state.isProductPro,
-        docsUrl: (state) => (state.isIntl ? 'https://docs.1panel.hk' : 'https://1panel.cn/docs/v2'),
+        docsUrl: (state) => {
+            if (state.docWithRegion) {
+                return state.isIntl ? INTL_DOCS_URL : CN_DOCS_URL;
+            }
+            const lang = state.language.toLowerCase();
+            const isChinese = lang === 'zh';
+            return isChinese ? CN_DOCS_URL : INTL_DOCS_URL;
+        },
         isMaster: (state) => state.currentNode === 'local',
     },
     actions: {
-        setOpenMenuTabs(openMenuTabs: boolean) {
-            this.openMenuTabs = openMenuTabs;
-        },
         setScreenFull() {
             this.isFullScreen = !this.isFullScreen;
-        },
-        setLogStatus(login: boolean) {
-            this.isLogin = login;
-        },
-        setGlobalLoading(loading: boolean) {
-            this.isLoading = loading;
-        },
-        setLoadingText(text: string) {
-            this.loadingText = i18n.global.t('commons.loadingText.' + text);
-        },
-        setCsrfToken(token: string) {
-            this.csrfToken = token;
         },
         async updateLanguage(language: string) {
             const activeLocale = await setActiveLocale(language);
             this.language = activeLocale;
             return activeLocale;
-        },
-        setThemeConfig(themeConfig: ThemeConfigProp) {
-            this.themeConfig = themeConfig;
-        },
-        setAgreeLicense(agree: boolean) {
-            this.agreeLicense = agree;
         },
         toggleDevice(value: DeviceType) {
             this.device = value;
@@ -102,24 +96,6 @@ const GlobalStore = defineStore({
         },
         isMasterPro() {
             return this.isMasterProductPro;
-        },
-        setLastFilePath(path: string) {
-            this.lastFilePath = path;
-        },
-        setCurrentDB(name: string) {
-            this.currentDB = name;
-        },
-        setCurrentRedisDB(name: string) {
-            this.currentRedisDB = name;
-        },
-        setShowEntranceWarn(show: boolean) {
-            this.showEntranceWarn = show;
-        },
-        setDefaultNetwork(net: string) {
-            this.defaultNetwork = net;
-        },
-        setDefaultIO(net: string) {
-            this.defaultIO = net;
         },
     },
     persist: piniaPersistConfig('GlobalState'),

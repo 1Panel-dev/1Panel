@@ -17,6 +17,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
@@ -233,6 +235,9 @@ func (r *Remote) ChangeAccess(info AccessChangeInfo) error {
 }
 
 func (r *Remote) Backup(info BackupInfo) error {
+	if cmd.CheckIllegal(r.Password, r.Address, r.User, info.Name, info.Format) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(info.TargetDir) {
 		if err := os.MkdirAll(info.TargetDir, os.ModePerm); err != nil {
@@ -243,7 +248,7 @@ func (r *Remote) Backup(info BackupInfo) error {
 	if err != nil {
 		return fmt.Errorf("open file %s failed, err: %v", path.Join(info.TargetDir, info.FileName), err)
 	}
-	defer outfile.Close()
+	defer func() { _ = outfile.Close() }()
 	dumpCmd := "mysqldump"
 	if r.Type == constant.AppMariaDB {
 		dumpCmd = "mariadb-dump"
@@ -253,8 +258,18 @@ func (r *Remote) Backup(info BackupInfo) error {
 	if err != nil {
 		return err
 	}
-	backupCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c '%s --routines -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
-		image, dumpCmd, r.Address, r.Port, r.User, r.Password, sslSkip(info.Version, r.Type), info.Format, info.Name)
+	info.Args = append(info.Args, "--routines")
+	itemArgs := common.RemoveRepeatStr(info.Args)
+	var args []string
+	for _, arg := range itemArgs {
+		if len(arg) == 0 {
+			continue
+		}
+		args = append(args, arg)
+	}
+
+	backupCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c '%s %s -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
+		image, dumpCmd, strings.Join(args, " "), r.Address, r.Port, r.User, r.Password, sslSkip(info.Version, r.Type), info.Format, info.Name)
 
 	global.LOG.Debug(strings.ReplaceAll(backupCmd, r.Password, "******"))
 	cmd := exec.Command("bash", "-c", backupCmd)
@@ -274,8 +289,11 @@ func (r *Remote) Backup(info BackupInfo) error {
 }
 
 func (r *Remote) Recover(info RecoverInfo) error {
+	if cmd.CheckIllegal(r.Password, r.Address, r.User, info.Name, info.Format) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	fi, _ := os.Open(info.SourceFile)
-	defer fi.Close()
+	defer func() { _ = fi.Close() }()
 
 	image, err := loadImage(info.Type, info.Version)
 	if err != nil {
@@ -293,12 +311,12 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		if err != nil {
 			return err
 		}
-		defer gzipFile.Close()
+		defer func() { _ = gzipFile.Close() }()
 		gzipReader, err := gzip.NewReader(gzipFile)
 		if err != nil {
 			return err
 		}
-		defer gzipReader.Close()
+		defer func() { _ = gzipReader.Close() }()
 		cmd.Stdin = gzipReader
 	} else {
 		cmd.Stdin = fi
@@ -318,7 +336,7 @@ func (r *Remote) SyncDB(version string) ([]SyncDBInfo, error) {
 	if err != nil {
 		return datas, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	for rows.Next() {
 		var dbName, charsetName, collation string
@@ -413,7 +431,7 @@ func (r *Remote) LoadFormatCollation(timeout uint) ([]dto.MysqlFormatCollationOp
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	formatMap := make(map[string][]string)
 	for rows.Next() {
@@ -453,6 +471,7 @@ func (r *Remote) ExecSQLForHosts(timeout uint) ([]string, error) {
 		return nil, buserr.New("ErrExecTimeOut")
 	}
 	var rows []string
+	defer func() { _ = results.Close() }()
 	for results.Next() {
 		var host string
 		if err := results.Scan(&host); err != nil {

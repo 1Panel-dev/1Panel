@@ -137,15 +137,44 @@ func (m *MonitorService) LoadGPUOptions() dto.MonitorGPUOptions {
 			return gpuInfo.GPUs[i].Index < gpuInfo.GPUs[j].Index
 		})
 		for _, item := range gpuInfo.GPUs {
+			var chartHide dto.GPUChartHide
+			chartHide.ProductName = fmt.Sprintf("%d - %s", item.Index, item.ProductName)
+			chartHide.GPU = item.GPUUtil == "" || item.GPUUtil == "N/A"
+			if (item.MemTotal == "" || item.MemTotal == "N/A") && (item.MemUsed == "" || item.MemUsed == "N/A") {
+				chartHide.Memory = true
+			}
+			if (item.MaxPowerLimit == "" || item.MaxPowerLimit == "N/A") && (item.PowerDraw == "" || item.PowerDraw == "N/A") {
+				chartHide.Power = true
+			}
+			chartHide.Temperature = item.Temperature == "" || item.Temperature == "N/A"
+			chartHide.Speed = item.FanSpeed == "" || item.FanSpeed == "N/A"
+			data.ChartHide = append(data.ChartHide, chartHide)
 			data.Options = append(data.Options, fmt.Sprintf("%d - %s", item.Index, item.ProductName))
 		}
 		return data
 	} else {
 		data.GPUType = "xpu"
-		var err error
-		data.Options, err = xpuClient.LoadDeviceList()
-		if err != nil || len(data.Options) == 0 {
+		xpu, err := xpuClient.LoadGpuInfo()
+		if err != nil || len(xpu.Xpu) == 0 {
 			global.LOG.Error("Load XPU info failed or no XPU found, err: ", err)
+		}
+		sort.Slice(xpu.Xpu, func(i, j int) bool {
+			return xpu.Xpu[i].Basic.DeviceID < xpu.Xpu[j].Basic.DeviceID
+		})
+		for _, item := range xpu.Xpu {
+			var chartHide dto.GPUChartHide
+			chartHide.GPU = true
+			chartHide.Speed = true
+			chartHide.ProductName = fmt.Sprintf("%d - %s", item.Basic.DeviceID, item.Basic.DeviceName)
+			if (item.Stats.MemoryUsed == "" || item.Stats.MemoryUsed == "N/A") && (item.Basic.Memory == "" || item.Basic.FreeMemory == "N/A") {
+				chartHide.Memory = true
+			}
+			if item.Stats.Power == "" || item.Stats.Power == "N/A" {
+				chartHide.Power = true
+			}
+			chartHide.Temperature = item.Stats.Temperature == "" || item.Stats.Temperature == "N/A"
+			data.ChartHide = append(data.ChartHide, chartHide)
+			data.Options = append(data.Options, fmt.Sprintf("%d - %s", item.Basic.DeviceID, item.Basic.DeviceName))
 		}
 		return data
 	}
@@ -165,24 +194,29 @@ func (m *MonitorService) LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.Monit
 		data.Date = append(data.Date, gpu.CreatedAt)
 		data.GPUValue = append(data.GPUValue, gpu.GPUUtil)
 		data.TemperatureValue = append(data.TemperatureValue, gpu.Temperature)
-		powerItem := dto.GPUPowerUsageHelper{
-			Total: gpu.MaxPowerLimit,
-			Used:  gpu.PowerDraw,
+		data.PowerUsed = append(data.PowerUsed, gpu.PowerDraw)
+		data.PowerTotal = append(data.PowerTotal, gpu.MaxPowerLimit)
+		if gpu.MaxPowerLimit != 0 {
+			data.PowerPercent = append(data.PowerPercent, gpu.PowerDraw/gpu.MaxPowerLimit*100)
+		} else {
+			data.PowerPercent = append(data.PowerPercent, float64(0))
 		}
-		if powerItem.Total != 0 {
-			powerItem.Percent = powerItem.Used / powerItem.Total
-		}
-		data.PowerValue = append(data.PowerValue, powerItem)
-		memItem := dto.GPUMemoryUsageHelper{
-			Total:   gpu.MemTotal,
-			Used:    gpu.MemUsed,
-			Percent: gpu.MemUsed / gpu.MemTotal * 100,
+
+		data.MemoryTotal = append(data.MemoryTotal, gpu.MemTotal)
+		data.MemoryUsed = append(data.MemoryUsed, gpu.MemUsed)
+		if gpu.MemTotal != 0 {
+			data.MemoryPercent = append(data.MemoryPercent, gpu.MemUsed/gpu.MemTotal*100)
+		} else {
+			data.MemoryPercent = append(data.MemoryPercent, float64(0))
 		}
 		var process []dto.GPUProcess
 		if err := json.Unmarshal([]byte(gpu.Processes), &process); err == nil {
-			memItem.GPUProcesses = process
+			data.ProcessCount = append(data.ProcessCount, len(process))
+			data.GPUProcesses = append(data.GPUProcesses, process)
+		} else {
+			data.ProcessCount = append(data.ProcessCount, 0)
+			data.GPUProcesses = append(data.GPUProcesses, []dto.GPUProcess{})
 		}
-		data.MemoryValue = append(data.MemoryValue, memItem)
 		data.SpeedValue = append(data.SpeedValue, gpu.FanSpeed)
 	}
 	return data, nil
@@ -380,9 +414,7 @@ func (m *MonitorService) saveIODataToDB(ctx context.Context, interval float64) {
 						}
 					}
 				}
-				if err := monitorRepo.BatchCreateMonitorIO(ioList); err != nil {
-					global.LOG.Errorf("Insert io monitoring data failed, err: %v", err)
-				}
+				_ = monitorRepo.BatchCreateMonitorIO(ioList)
 				m.DiskIO <- ioStat2
 			}
 		}
@@ -419,9 +451,7 @@ func (m *MonitorService) saveNetDataToDB(ctx context.Context, interval float64) 
 					}
 				}
 
-				if err := monitorRepo.BatchCreateMonitorNet(netList); err != nil {
-					global.LOG.Errorf("Insert network monitoring data failed, err: %v", err)
-				}
+				_ = monitorRepo.BatchCreateMonitorNet(netList)
 				m.NetIO <- netStat2
 			}
 		}
@@ -455,15 +485,15 @@ func loadTopCPU() []dto.Process {
 		}
 		name, err := p.Name()
 		if err != nil {
-			name = "undifine"
+			name = "undefined"
 		}
 		cmd, err := p.Cmdline()
 		if err != nil {
-			cmd = "undifine"
+			cmd = "undefined"
 		}
 		user, err := p.Username()
 		if err != nil {
-			user = "undifine"
+			user = "undefined"
 		}
 		if len(top5) == 5 {
 			top5[minIndex] = dto.Process{Percent: percent, Pid: p.Pid, User: user, Name: name, Cmd: cmd}
@@ -506,15 +536,15 @@ func loadTopMem() []dto.Process {
 		}
 		name, err := p.Name()
 		if err != nil {
-			name = "undifine"
+			name = "undefined"
 		}
 		cmd, err := p.Cmdline()
 		if err != nil {
-			cmd = "undifine"
+			cmd = "undefined"
 		}
 		user, err := p.Username()
 		if err != nil {
-			user = "undifine"
+			user = "undefined"
 		}
 		percent, _ := p.MemoryPercent()
 		if len(top5) == 5 {
@@ -606,7 +636,6 @@ func saveXPUDataToDB() {
 	for _, xpuItem := range xpuInfo.Xpu {
 		item := model.MonitorGPU{
 			ProductName: fmt.Sprintf("%d - %s", xpuItem.Basic.DeviceID, xpuItem.Basic.DeviceName),
-			GPUUtil:     loadGPUInfoFloat(xpuItem.Stats.MemoryUtil),
 			Temperature: loadGPUInfoFloat(xpuItem.Stats.Temperature),
 			PowerDraw:   loadGPUInfoFloat(xpuItem.Stats.Power),
 			MemUsed:     loadGPUInfoFloat(xpuItem.Stats.MemoryUsed),

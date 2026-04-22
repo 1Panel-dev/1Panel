@@ -5,14 +5,17 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
-	"github.com/go-acme/lego/v4/certificate"
+	"io"
 	"log"
 	"os"
 	"path"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-acme/lego/v4/certificate"
+	legoLogger "github.com/go-acme/lego/v4/log"
+	"github.com/jinzhu/gorm"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -27,8 +30,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssl"
-	legoLogger "github.com/go-acme/lego/v4/log"
-	"github.com/jinzhu/gorm"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
 
 type WebsiteSSLService struct {
@@ -37,7 +39,7 @@ type WebsiteSSLService struct {
 type IWebsiteSSLService interface {
 	Page(search request.WebsiteSSLSearch) (int64, []response.WebsiteSSLDTO, error)
 	GetSSL(id uint) (*response.WebsiteSSLDTO, error)
-	Search(req request.WebsiteSSLSearch) ([]response.WebsiteSSLDTO, error)
+	Search(req request.WebsiteSSLListReq) ([]response.WebsiteSSLDTO, error)
 	Create(create request.WebsiteSSLCreate) (request.WebsiteSSLCreate, error)
 	GetDNSResolve(req request.WebsiteDNSReq) ([]response.WebsiteDNSRes, error)
 	GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO, error)
@@ -45,6 +47,7 @@ type IWebsiteSSLService interface {
 	Update(update request.WebsiteSSLUpdate) error
 	Upload(req request.WebsiteSSLUpload) error
 	ObtainSSL(apply request.WebsiteSSLApply) error
+	AutoRenewSSL(id uint) error
 	SyncForRestart() error
 	DownloadFile(id uint) (*os.File, error)
 	ImportMasterSSL(create model.WebsiteSSL) error
@@ -62,7 +65,7 @@ func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []respo
 	if search.OrderBy != "" && search.Order != "null" {
 		opts = append(opts, repo.WithOrderRuleBy(search.OrderBy, search.Order))
 	} else {
-		opts = append(opts, repo.WithOrderBy("created_at desc"))
+		opts = append(opts, repo.WithOrderDesc("created_at"))
 	}
 	if search.Domain != "" {
 		opts = append(opts, websiteSSLRepo.WithByDomain(search.Domain))
@@ -90,12 +93,12 @@ func (w WebsiteSSLService) GetSSL(id uint) (*response.WebsiteSSLDTO, error) {
 	return &res, nil
 }
 
-func (w WebsiteSSLService) Search(search request.WebsiteSSLSearch) ([]response.WebsiteSSLDTO, error) {
+func (w WebsiteSSLService) Search(search request.WebsiteSSLListReq) ([]response.WebsiteSSLDTO, error) {
 	var (
 		opts   []repo.DBOption
 		result []response.WebsiteSSLDTO
 	)
-	opts = append(opts, repo.WithOrderBy("created_at desc"))
+	opts = append(opts, repo.WithOrderDesc("created_at"))
 	if search.AcmeAccountID != "" {
 		acmeAccountID, err := strconv.ParseUint(search.AcmeAccountID, 10, 64)
 		if err != nil {
@@ -141,6 +144,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		SkipDNS:       create.SkipDNS,
 		DisableCNAME:  create.DisableCNAME,
 		ExecShell:     create.ExecShell,
+		IsIp:          create.IsIp,
 	}
 	if create.ExecShell {
 		websiteSSL.Shell = create.Shell
@@ -209,11 +213,33 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	return create, nil
 }
 
-func printSSLLog(logger *log.Logger, msgKey string, params map[string]interface{}, disableLog bool) {
-	if disableLog {
+func printSSLLog(logger *log.Logger, msgKey string, params map[string]interface{}) {
+	if logger == nil {
 		return
 	}
 	logger.Println(i18n.GetMsgWithMap(msgKey, params))
+}
+
+func newWebsiteSSLLogger(websiteSSL *model.WebsiteSSL, autoRenew bool) (*os.File, *log.Logger) {
+	flags := os.O_CREATE | os.O_WRONLY | os.O_TRUNC
+	if autoRenew {
+		flags = os.O_CREATE | os.O_WRONLY | os.O_APPEND
+	}
+
+	logFile, err := os.OpenFile(websiteSSL.GetLogPath(), flags, constant.FilePerm)
+	if err != nil {
+		global.LOG.Errorf("open ssl log file failed, domain: %s, err: %v", websiteSSL.PrimaryDomain, err)
+		return nil, log.New(io.Discard, "", log.LstdFlags)
+	}
+
+	if autoRenew {
+		if info, statErr := logFile.Stat(); statErr == nil && info.Size() > 0 {
+			_, _ = logFile.WriteString("\n")
+		}
+		_, _ = logFile.WriteString(fmt.Sprintf("========== [%s] auto renew attempt ==========\n", time.Now().Format(constant.DateTimeLayout)))
+	}
+
+	return logFile, log.New(logFile, "", log.LstdFlags)
 }
 
 func reloadSystemSSL(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
@@ -225,7 +251,7 @@ func reloadSystemSSL(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 		fileOp := files.NewFileOp()
 		certPath := path.Join(global.Dir.DataDir, "secret/server.crt")
 		keyPath := path.Join(global.Dir.DataDir, "secret/server.key")
-		printSSLLog(logger, "StartUpdateSystemSSL", nil, logger == nil)
+		printSSLLog(logger, "StartUpdateSystemSSL", nil)
 		if err := fileOp.WriteFile(certPath, strings.NewReader(websiteSSL.Pem), 0600); err != nil {
 			logger.Printf("Failed to update the SSL certificate File for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
 			return
@@ -238,11 +264,19 @@ func reloadSystemSSL(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 			logger.Printf("Failed to update the SSL certificate for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
 			return
 		}
-		printSSLLog(logger, "UpdateSystemSSLSuccess", nil, logger == nil)
+		printSSLLog(logger, "UpdateSystemSSLSuccess", nil)
 	}
 }
 
 func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
+	return w.obtainSSL(apply.ID, false)
+}
+
+func (w WebsiteSSLService) AutoRenewSSL(id uint) error {
+	return w.obtainSSL(id, true)
+}
+
+func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 	var (
 		err          error
 		websiteSSL   *model.WebsiteSSL
@@ -253,7 +287,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		resource     certificate.Resource
 	)
 
-	websiteSSL, err = websiteSSLRepo.GetFirst(repo.WithByID(apply.ID))
+	websiteSSL, err = websiteSSLRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return err
 	}
@@ -305,24 +339,27 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	}
 
 	go func() {
-		logFile, _ := os.OpenFile(path.Join(global.Dir.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
-		defer logFile.Close()
-		logger := log.New(logFile, "", log.LstdFlags)
-		legoLogger.Logger = logger
-		if !apply.DisableLog {
-			startMsg := i18n.GetMsgWithMap("ApplySSLStart", map[string]interface{}{"domain": strings.Join(domains, ","), "type": i18n.GetMsgByKey(websiteSSL.Provider)})
-			if websiteSSL.Provider == constant.DNSAccount {
-				startMsg = startMsg + i18n.GetMsgWithMap("DNSAccountName", map[string]interface{}{"name": dnsAccount.Name, "type": dnsAccount.Type})
-			}
-			logger.Println(startMsg)
+		logFile, logger := newWebsiteSSLLogger(websiteSSL, autoRenew)
+		if logFile != nil {
+			defer logFile.Close()
 		}
+		legoLogger.Logger = logger
+		startMsg := i18n.GetMsgWithMap("ApplySSLStart", map[string]interface{}{"domain": strings.Join(domains, ","), "type": i18n.GetMsgByKey(websiteSSL.Provider)})
+		if websiteSSL.Provider == constant.DNSAccount {
+			startMsg = startMsg + i18n.GetMsgWithMap("DNSAccountName", map[string]interface{}{"name": dnsAccount.Name, "type": dnsAccount.Type})
+		}
+		logger.Println(startMsg)
 		if websiteSSL.Provider != constant.DnsManual {
 			privateKey, err := ssl.GetPrivateKeyByType(websiteSSL.KeyType, websiteSSL.PrivateKey)
 			if err != nil {
 				handleError(websiteSSL, err)
 				return
 			}
-			resource, err = client.ObtainSSL(domains, privateKey)
+			if websiteSSL.IsIp {
+				resource, err = client.ObtainIPSSL(domains[0], privateKey)
+			} else {
+				resource, err = client.ObtainSSL(domains, privateKey)
+			}
 			if err != nil {
 				handleError(websiteSSL, err)
 				return
@@ -356,7 +393,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 			websiteSSL.Organization = cert.Issuer.Organization[0]
 		}
 		websiteSSL.Status = constant.SSLReady
-		printSSLLog(logger, "ApplySSLSuccess", map[string]interface{}{"domain": strings.Join(domains, ",")}, apply.DisableLog)
+		printSSLLog(logger, "ApplySSLSuccess", map[string]interface{}{"domain": strings.Join(domains, ",")})
 		saveCertificateFile(websiteSSL, logger)
 
 		if websiteSSL.ExecShell {
@@ -364,12 +401,12 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 			if websiteSSL.PushDir {
 				workDir = websiteSSL.Dir
 			}
-			printSSLLog(logger, "ExecShellStart", nil, apply.DisableLog)
+			printSSLLog(logger, "ExecShellStart", nil)
 			cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(30*time.Minute), cmd.WithLogger(logger), cmd.WithWorkDir(workDir))
 			if err = cmdMgr.RunBashC(websiteSSL.Shell); err != nil {
-				printSSLLog(logger, "ErrExecShell", map[string]interface{}{"err": err.Error()}, apply.DisableLog)
+				printSSLLog(logger, "ErrExecShell", map[string]interface{}{"err": err.Error()})
 			} else {
-				printSSLLog(logger, "ExecShellSuccess", nil, apply.DisableLog)
+				printSSLLog(logger, "ExecShellSuccess", nil)
 			}
 		}
 
@@ -381,9 +418,9 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(websiteSSL.ID))
 		if len(websites) > 0 {
 			for _, website := range websites {
-				printSSLLog(logger, "ApplyWebSiteSSLLog", map[string]interface{}{"name": website.PrimaryDomain}, apply.DisableLog)
+				printSSLLog(logger, "ApplyWebSiteSSLLog", map[string]interface{}{"name": website.PrimaryDomain})
 				if err := createPemFile(website, *websiteSSL); err != nil {
-					printSSLLog(logger, "ErrUpdateWebsiteSSL", map[string]interface{}{"name": website.PrimaryDomain, "err": err.Error()}, apply.DisableLog)
+					printSSLLog(logger, "ErrUpdateWebsiteSSL", map[string]interface{}{"name": website.PrimaryDomain, "err": err.Error()})
 				}
 			}
 			nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
@@ -391,19 +428,19 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 				return
 			}
 			if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
-				printSSLLog(logger, "ErrSSLApply", nil, apply.DisableLog)
+				printSSLLog(logger, "ErrSSLApply", nil)
 				return
 			}
-			printSSLLog(logger, "ApplyWebSiteSSLSuccess", nil, apply.DisableLog)
+			printSSLLog(logger, "ApplyWebSiteSSLSuccess", nil)
 		}
 		reloadSystemSSL(websiteSSL, logger)
 		if websiteSSL.PushNode {
-			printSSLLog(logger, "StartPushSSLToNode", nil, apply.DisableLog)
+			printSSLLog(logger, "StartPushSSLToNode", nil)
 			if err = xpack.PushSSLToNode(websiteSSL); err != nil {
-				printSSLLog(logger, "PushSSLToNodeFailed", map[string]interface{}{"err": err.Error()}, apply.DisableLog)
+				printSSLLog(logger, "PushSSLToNodeFailed", map[string]interface{}{"err": err.Error()})
 				return
 			}
-			printSSLLog(logger, "PushSSLToNodeSuccess", nil, apply.DisableLog)
+			printSSLLog(logger, "PushSSLToNodeSuccess", nil)
 		}
 	}()
 
@@ -721,7 +758,7 @@ func (w WebsiteSSLService) DownloadFile(id uint) (*os.File, error) {
 		return nil, err
 	}
 	fileName := websiteSSL.PrimaryDomain + ".zip"
-	if err = fileOp.Compress([]string{path.Join(dir, "fullchain.pem"), path.Join(dir, "privkey.pem")}, dir, fileName, files.SdkZip, ""); err != nil {
+	if err = fileOp.Compress(context.Background(), []string{path.Join(dir, "fullchain.pem"), path.Join(dir, "privkey.pem")}, dir, fileName, files.SdkZip, "", nil); err != nil {
 		return nil, err
 	}
 	return os.Open(path.Join(dir, fileName))

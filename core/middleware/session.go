@@ -1,13 +1,15 @@
 package middleware
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/gin-gonic/gin"
-	"strconv"
-	"strings"
 )
 
 func SessionAuth() gin.HandlerFunc {
@@ -20,22 +22,36 @@ func SessionAuth() gin.HandlerFunc {
 
 		psession, err := global.SESSION.Get(c)
 		if err != nil {
+			errItem := err.Error()
+			if errItem == "ErrSessionDataFormat" || errItem == "ErrSessionDataNotFound" {
+				helper.BadAuth(c, "ErrNotLogin", buserr.New(errItem))
+				return
+			}
 			helper.BadAuth(c, "ErrNotLogin", err)
 			return
 		}
 		settingRepo := repo.NewISettingRepo()
-		setting, err := settingRepo.Get(repo.WithByKey("SessionTimeout"))
+		sessionTimeout, err := settingRepo.GetValueByKey("SessionTimeout")
 		if err != nil {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
 			return
 		}
-		lifeTime, _ := strconv.Atoi(setting.Value)
-		httpsSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
+		lifeTime, _ := strconv.Atoi(sessionTimeout)
+		ssl, err := settingRepo.GetValueByKey("SSL")
 		if err != nil {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
 			return
 		}
-		_ = global.SESSION.Set(c, psession, httpsSetting.Value == constant.StatusEnable, lifeTime)
+		if _, err := global.SESSION.RefreshIfNeeded(c, psession, ssl == constant.StatusEnable, lifeTime); err != nil {
+			errItem := err.Error()
+			if errItem == "ErrSessionDataFormat" || errItem == "ErrSessionDataNotFound" {
+				helper.BadAuth(c, "ErrNotLogin", buserr.New(errItem))
+				return
+			}
+			global.LOG.Warnf("refresh session failed, path=%s, err=%v", c.Request.URL.Path, err)
+			helper.BadAuth(c, "ErrNotLogin", err)
+			return
+		}
 		c.Next()
 	}
 }

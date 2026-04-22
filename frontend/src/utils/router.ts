@@ -26,6 +26,10 @@ export const routerToPathWithQuery = async (path: string, query: any) => {
     tabStoreMiddleWare();
 };
 
+export const jumpToPath = (router: any, path: string) => {
+    routerToPathWithQuery(path, { uncached: 'true' });
+};
+
 export const routerToNameWithParams = async (name: string, params: any) => {
     await router.push({ name: name, params: params });
     tabStoreMiddleWare();

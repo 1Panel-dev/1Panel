@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/email"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/shirou/gopsutil/v4/disk"
+	"mime"
 	"sort"
 	"strings"
 	"sync"
@@ -60,7 +61,7 @@ func (a AlertService) PageAlert(search dto.AlertSearch) (int64, []dto.AlertDTO, 
 	if search.Type != "" {
 		opts = append(opts, alertRepo.WithByType(search.Type))
 	}
-	opts = append(opts, repo.WithOrderBy("created_at desc"))
+	opts = append(opts, repo.WithOrderDesc("created_at"))
 
 	total, alerts, err := alertRepo.Page(search.Page, search.PageSize, opts...)
 	if err != nil {
@@ -343,7 +344,7 @@ func (a AlertService) PageAlertLogs(search dto.AlertLogSearch) (int64, []dto.Ale
 	if search.Count != 0 {
 		opts = append(opts, alertRepo.WithByCount(search.Count))
 	}
-	opts = append(opts, repo.WithOrderBy("created_at desc"))
+	opts = append(opts, repo.WithOrderDesc("created_at"))
 
 	total, alerts, err := alertRepo.PageLog(search.Page, search.PageSize, opts...)
 	if err != nil {
@@ -483,13 +484,14 @@ func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {
 	if username == "" {
 		username = req.Sender
 	}
+	encodedDisplayName := mime.BEncoding.Encode("UTF-8", req.DisplayName)
 	cfg := email.SMTPConfig{
 		Host:       req.Host,
 		Port:       req.Port,
 		Sender:     req.Sender,
 		Username:   username,
 		Password:   req.Password,
-		From:       fmt.Sprintf(`"%s" <%s>`, req.DisplayName, req.Sender),
+		From:       fmt.Sprintf(`"%s" <%s>`, encodedDisplayName, req.Sender),
 		Encryption: req.Encryption,
 		Recipient:  req.Recipient,
 	}

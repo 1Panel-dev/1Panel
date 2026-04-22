@@ -6,9 +6,15 @@ type CaptchaResponse struct {
 }
 
 type UserLoginInfo struct {
-	Name      string `json:"name"`
-	Token     string `json:"token"`
-	MfaStatus string `json:"mfaStatus"`
+	Name       string `json:"name"`
+	Token      string `json:"token"`
+	MfaStatus  string `json:"mfaStatus"`
+	MfaSession string `json:"mfaSession"`
+}
+
+type PasskeyBeginResponse struct {
+	SessionID string      `json:"sessionId"`
+	PublicKey interface{} `json:"publicKey"`
 }
 
 type MfaRequest struct {
@@ -31,9 +37,8 @@ type Login struct {
 }
 
 type MFALogin struct {
-	Name     string `json:"name" validate:"required"`
-	Password string `json:"password" validate:"required"`
-	Code     string `json:"code" validate:"required"`
+	SessionID string `json:"sessionId" validate:"required"`
+	Code      string `json:"code" validate:"required"`
 }
 
 type SystemSetting struct {

@@ -159,9 +159,57 @@ export namespace Alert {
         recipient: string;
     }
 
+    export interface CommonAlertConfig {
+        id?: number;
+        type: string;
+        title: string;
+        status: string;
+        config: CommonConfig;
+    }
+
     export interface CommonConfig {
         isOffline?: string;
         alertDailyNum?: number;
         alertSendTimeRange?: string;
+    }
+
+    export interface EmailConfig {
+        id?: number;
+        type: string;
+        title: string;
+        status: string;
+        config: {
+            status?: string;
+            sender?: string;
+            userName?: string;
+            password?: string;
+            displayName?: string;
+            host?: string;
+            port?: number;
+            encryption?: string;
+            recipient?: string;
+        };
+    }
+
+    export interface SmsConfig {
+        id?: number;
+        type: string;
+        title: string;
+        status: string;
+        config: {
+            phone?: string;
+            alertDailyNum?: number;
+        };
+    }
+
+    export interface WebhookConfig {
+        id?: number;
+        type: string;
+        title: string;
+        status: string;
+        config: {
+            displayName?: string;
+            url?: string;
+        };
     }
 }

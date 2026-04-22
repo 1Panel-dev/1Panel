@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -167,7 +168,8 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 		return buserr.New("ErrCmdIllegal")
 	}
 
-	ruleStr := fmt.Sprintf("%s insert 1 %s ", f.CmdStr, rule.Strategy)
+	insertNum := f.loadInsertNum(rule, operation)
+	ruleStr := fmt.Sprintf("%s insert %d %s ", f.CmdStr, insertNum, rule.Strategy)
 	if operation == "remove" {
 		ruleStr = fmt.Sprintf("%s delete %s ", f.CmdStr, rule.Strategy)
 	}
@@ -251,4 +253,27 @@ func (f *Ufw) loadInfo(line string, fireType string) FireInfo {
 	itemInfo.Address = fields[3]
 
 	return itemInfo
+}
+
+func (f *Ufw) loadInsertNum(rule FireInfo, operation string) int {
+	if !strings.Contains(rule.Address, ":") || operation == "remove" {
+		return 1
+	}
+	rules, err := cmd.RunDefaultWithStdoutBashCf("%s status numbered", f.CmdStr)
+	if err != nil {
+		global.LOG.Errorf("load ufw rules failed, err: %v", err)
+		return 1
+	}
+	lines := strings.Split(rules, "\n")
+	i := 1
+	for _, item := range lines {
+		fields := strings.Fields(item)
+		if len(fields) < 4 {
+			continue
+		}
+		if !strings.Contains(item, "(v6)") {
+			i++
+		}
+	}
+	return i
 }

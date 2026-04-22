@@ -10,7 +10,7 @@
         <LayoutContent v-if="isExist" :title="$t('container.composeTemplate', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('create')">
-                    {{ $t('container.createComposeTemplate') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                     {{ $t('commons.button.delete') }}
@@ -74,7 +74,8 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { dateFormat, downloadWithContent, getCurrentDateFormatted } from '@/utils/util';
+import { dateFormat, getCurrentDateFormatted } from '@/utils/date';
+import { downloadWithContent } from '@/utils/file';
 import { Container } from '@/api/interface/container';
 import DetailDialog from '@/views/container/template/detail/index.vue';
 import ImportDialog from '@/views/container/template/import/index.vue';

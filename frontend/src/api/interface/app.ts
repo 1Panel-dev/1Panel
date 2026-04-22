@@ -17,6 +17,7 @@ export namespace App {
         website?: string;
         github?: string;
         readme: string;
+        batchInstallSupport: boolean;
     }
 
     interface Locale {
@@ -55,6 +56,7 @@ export namespace App {
         tags: string[];
         gpuSupport: boolean;
         recommend: number;
+        batchInstallSupport: boolean;
     }
 
     export interface AppResPage {
@@ -132,6 +134,7 @@ export namespace App {
         appDetailId: number;
         params: any;
         taskID: string;
+        name: string;
     }
 
     export interface AppInstallSearch extends ReqPage {
@@ -165,6 +168,9 @@ export namespace App {
         webUI: string;
         appKey?: string;
         serviceName: string;
+        appStatus?: string;
+        appType?: string;
+        version?: string;
     }
 
     export interface AppInstalledInfo {
@@ -204,7 +210,7 @@ export namespace App {
         linkDB: boolean;
     }
 
-    export interface AppInstalledInfo {
+    export interface AppInstalledOption {
         id: number;
         key: string;
         name: string;
@@ -261,7 +267,7 @@ export namespace App {
     export interface AppService {
         label: string;
         value: string;
-        config?: Object;
+        config?: object;
         from?: string;
         status: string;
     }
@@ -284,6 +290,7 @@ export namespace App {
         required?: boolean;
         multiple?: boolean;
         label: Locale;
+        showPassword: boolean;
     }
 
     export interface AppConfig {
@@ -337,6 +344,7 @@ export namespace App {
         uninstallDeleteImage: string;
         uninstallDeleteBackup: string;
         upgradeBackup: string;
+        installAllowPort: string;
     }
 
     export interface AppStoreConfigUpdate {
@@ -347,5 +355,11 @@ export namespace App {
     export interface CustomAppStoreConfig {
         status: string;
         imagePrefix: string;
+    }
+
+    export interface InstallAppToNodes extends AppInstall {
+        nodes: string[];
+        appKey: string;
+        version: string;
     }
 }

@@ -37,7 +37,7 @@ func NewIImageRepoService() IImageRepoService {
 }
 
 func (u *ImageRepoService) Page(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, ops, err := imageRepoRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info), repo.WithOrderBy("created_at desc"))
+	total, ops, err := imageRepoRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info), repo.WithOrderDesc("created_at"))
 	var dtoOps []dto.ImageRepoInfo
 	for _, op := range ops {
 		var item dto.ImageRepoInfo
@@ -65,7 +65,7 @@ func (u *ImageRepoService) Login(req dto.OperateByID) error {
 }
 
 func (u *ImageRepoService) List() ([]dto.ImageRepoOption, error) {
-	ops, err := imageRepoRepo.List(repo.WithOrderBy("created_at desc"))
+	ops, err := imageRepoRepo.List(repo.WithOrderDesc("created_at"))
 	var dtoOps []dto.ImageRepoOption
 	for _, op := range ops {
 		if op.Status == constant.StatusSuccess {
@@ -263,7 +263,15 @@ func stopBeforeUpdateRepo() error {
 	if err := validateDockerConfig(); err != nil {
 		return err
 	}
-	if err := controller.HandleRestart("docker"); err != nil {
+	dockerService, _ := controller.LoadServiceName("docker")
+	if len(dockerService) == 0 {
+		return errors.New("docker service not found")
+	}
+	client, err := controller.New()
+	if err != nil {
+		return err
+	}
+	if err := client.Operate("restart", dockerService); err != nil {
 		return fmt.Errorf("failed to restart Docker: %v", err)
 	}
 	ticker := time.NewTicker(3 * time.Second)
@@ -276,8 +284,8 @@ func stopBeforeUpdateRepo() error {
 				cancel()
 				return errors.New("the docker service cannot be restarted")
 			default:
-				active, err := controller.CheckActive("docker")
-				if active && err != nil {
+				active, _ := client.IsActive(dockerService)
+				if active {
 					global.LOG.Info("docker restart with new conf successful!")
 					return nil
 				}

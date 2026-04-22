@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 defineOptions({ name: 'TableSearch' });
 
 const emit = defineEmits(['search', 'update:searchName']);
@@ -26,7 +26,21 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    searchName: {
+        type: [String, Number],
+        default: undefined,
+    },
 });
+
+watch(
+    () => props.searchName,
+    (newVal) => {
+        if (searchInfo.value !== newVal) {
+            searchInfo.value = newVal;
+        }
+    },
+    { immediate: true },
+);
 
 const search = () => {
     emit('update:searchName', searchInfo.value);

@@ -2,6 +2,8 @@ package components
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 )
 
 type Server struct {
@@ -351,6 +353,7 @@ func (s *Server) UpdateRootLocation() {
 }
 
 func (s *Server) UpdateRootProxy(proxy []string) {
+	httpsProxy := len(proxy) > 0 && strings.HasPrefix(strings.ToLower(strings.TrimSpace(proxy[0])), "https://")
 	newDir := Directive{
 		Name:       "location",
 		Parameters: []string{"/"},
@@ -392,6 +395,14 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 			Parameters: []string{"1.1"},
 		},
 		&Directive{
+			Name:       "proxy_ssl_server_name",
+			Parameters: []string{map[bool]string{true: "on", false: "off"}[httpsProxy]},
+		},
+		&Directive{
+			Name:       "proxy_ssl_name",
+			Parameters: []string{"$proxy_host"},
+		},
+		&Directive{
 			Name:       "proxy_pass",
 			Parameters: proxy,
 		},
@@ -423,12 +434,41 @@ func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
 		},
 	)
 	if localPath == "" {
+		block.AppendDirectives(&Directive{
+			Name:       "set",
+			Parameters: []string{"$real_script_name", "$fastcgi_script_name"},
+		})
+		ifDir := &Directive{
+			Name:       "if",
+			Parameters: []string{"($fastcgi_script_name ~ \"^(.+?\\.php)(/.+)$\")"},
+		}
+		ifDir.Block = &Block{
+			Directives: []IDirective{
+				&Directive{
+					Name:       "set",
+					Parameters: []string{"$real_script_name", "$1"},
+				},
+				&Directive{
+					Name:       "set",
+					Parameters: []string{"$path_info", "$2"},
+				},
+			},
+		}
 		block.AppendDirectives(
+			ifDir,
 			&Directive{
 				Name:       "fastcgi_param",
-				Parameters: []string{"SCRIPT_FILENAME", "$document_root$fastcgi_script_name"},
+				Parameters: []string{"SCRIPT_FILENAME", "$document_root$real_script_name"},
 			},
-		)
+			&Directive{
+				Name:       "fastcgi_param",
+				Parameters: []string{"SCRIPT_NAME", "$real_script_name"},
+			},
+			&Directive{
+				Name:       "fastcgi_param",
+				Parameters: []string{"PATH_INFO", "$path_info"},
+			})
+
 	} else {
 		block.AppendDirectives(&Directive{
 			Name:       "fastcgi_param",
@@ -466,17 +506,25 @@ func (s *Server) RemoveListenByBind(bind string) {
 	s.Listens = listens
 }
 
-func (s *Server) AddHTTP2HTTPS() {
+func (s *Server) AddHTTP2HTTPS(httpsPort int) {
 	newDir := Directive{
 		Name:       "if",
 		Parameters: []string{"($scheme = http)"},
 		Block:      &Block{},
 	}
 	block := &Block{}
-	block.AppendDirectives(&Directive{
-		Name:       "return",
-		Parameters: []string{"301", "https://$host$request_uri"},
-	})
+	if httpsPort == 443 {
+		block.AppendDirectives(&Directive{
+			Name:       "return",
+			Parameters: []string{"301", "https://$host$request_uri"},
+		})
+	} else {
+		block.AppendDirectives(&Directive{
+			Name:       "return",
+			Parameters: []string{"301", fmt.Sprintf("https://$host:%d$request_uri", httpsPort)},
+		})
+	}
+
 	newDir.Block = block
 	s.UpdateDirectiveBySecondKey("if", "($scheme", newDir)
 }

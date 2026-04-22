@@ -96,7 +96,7 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 			}
 		}
 	} else {
-		_ = clam.StopAllClamJob(false, clamRepo)
+		_ = clam.CheckWithStopAll(false, clamRepo)
 	}
 	if baseInfo.FreshIsActive {
 		version, err := cmd.RunDefaultWithStdoutBashC("freshclam --version")
@@ -313,7 +313,7 @@ func (c *ClamService) Delete(req dto.ClamDelete) error {
 }
 
 func (c *ClamService) HandleOnce(id uint) error {
-	if active := clam.StopAllClamJob(true, clamRepo); !active {
+	if active := clam.CheckWithStopAll(true, clamRepo); !active {
 		return buserr.New("ErrClamdscanNotFound")
 	}
 	clamItem, _ := clamRepo.Get(repo.WithByID(id))
@@ -337,9 +337,9 @@ func (c *ClamService) HandleOnce(id uint) error {
 			clamRepo.EndRecords(record, constant.StatusFailed, err.Error())
 			return
 		}
-		handleAlert(record.InfectedFiles, clamItem.Name, clamItem.ID)
 		clam.AnalysisFromLog(taskItem.LogFile, &record)
 		clamRepo.EndRecords(record, constant.StatusDone, "")
+		handleAlert(record.InfectedFiles, clamItem.Name, clamItem.ID)
 	}()
 	return nil
 }

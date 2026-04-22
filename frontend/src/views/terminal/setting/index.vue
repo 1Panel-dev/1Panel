@@ -38,6 +38,32 @@
                                     @change="changeItem()"
                                 />
                             </el-form-item>
+                            <el-form-item :label="$t('terminal.fontFamily')">
+                                <el-select
+                                    class="formInput"
+                                    clearable
+                                    v-model="selectedFontFamilies"
+                                    multiple
+                                    filterable
+                                    allow-create
+                                    default-first-option
+                                    :reserve-keyword="false"
+                                >
+                                    <el-option
+                                        v-for="item in fontFamilyOptions"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value"
+                                    />
+                                </el-select>
+                                <span class="input-help">{{ $t('terminal.fontFamilySupportHelper') }}</span>
+                            </el-form-item>
+                            <el-form-item :label="$t('terminal.backgroundColor')">
+                                <el-color-picker v-model="form.backgroundColor" @change="changeItem()" />
+                            </el-form-item>
+                            <el-form-item :label="$t('terminal.foregroundColor')">
+                                <el-color-picker v-model="form.foregroundColor" @change="changeItem()" />
+                            </el-form-item>
 
                             <el-form-item>
                                 <div class="terminal" ref="terminalElement"></div>
@@ -85,7 +111,9 @@
                                 <el-button @click="search(true)" plain>{{ $t('commons.button.reset') }}</el-button>
                                 <el-button @click="onSave" type="primary">{{ $t('commons.button.save') }}</el-button>
                             </el-form-item>
+
                             <el-divider border-style="dashed" />
+
                             <el-form-item :label="$t('terminal.defaultConn')">
                                 <el-switch v-model="form.showDefaultConn" @change="changeShow" />
                             </el-form-item>
@@ -104,21 +132,30 @@
             </template>
         </LayoutContent>
         <OperateDialog @search="loadConnShow" ref="dialogRef" />
+
+        <OpDialog ref="opRef" @search="search" @cancel="loadConnShow" @submit="submitChangeShow">
+            <template #content>
+                <el-form class="mt-4 mb-1" ref="deleteForm" v-if="!form.showDefaultConn" label-position="left">
+                    <el-form-item>
+                        <el-checkbox v-model="resetConn" :label="$t('terminal.withReset')" />
+                    </el-form-item>
+                </el-form>
+            </template>
+        </OpDialog>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
-import { ElForm } from 'element-plus';
-import { getTerminalInfo, updateAgentSetting, UpdateTerminalInfo } from '@/api/modules/setting';
+import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue';
+import { getTerminalInfo, UpdateTerminalInfo } from '@/api/modules/setting';
 import { Terminal } from '@xterm/xterm';
-import OperateDialog from '@/views/terminal/setting/default_conn/index.vue';
+import OperateDialog from '@/views/terminal/setting/default-conn/index.vue';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { TerminalStore } from '@/store';
-import { loadLocalConn } from '@/api/modules/terminal';
+import { loadLocalConn, updateLocalConn } from '@/api/modules/terminal';
 
 const loading = ref(false);
 const terminalStore = TerminalStore();
@@ -127,25 +164,90 @@ const dialogRef = ref();
 const terminalElement = ref<HTMLDivElement | null>(null);
 const fitAddon = new FitAddon();
 const term = ref();
+const previewResizeObserver = ref<ResizeObserver>();
+const DEFAULT_FONT_FAMILY = "Monaco, Menlo, Consolas, 'Courier New', monospace";
+const selectedFontFamilies = ref<string[]>([]);
+const fontFamilyOptions = [
+    { label: 'Monaco', value: 'Monaco' },
+    { label: 'Menlo', value: 'Menlo' },
+    { label: 'Consolas', value: 'Consolas' },
+    { label: 'JetBrains Mono', value: "'JetBrains Mono'" },
+    { label: 'Fira Code', value: "'Fira Code'" },
+    { label: 'Cascadia Code', value: "'Cascadia Code'" },
+    { label: 'Source Code Pro', value: "'Source Code Pro'" },
+    { label: 'Ubuntu Mono', value: "'Ubuntu Mono'" },
+    { label: 'DejaVu Sans Mono', value: "'DejaVu Sans Mono'" },
+    { label: 'Courier New', value: "'Courier New'" },
+    { label: 'monospace', value: 'monospace' },
+];
 
 const form = reactive({
     lineHeight: 1.2,
     letterSpacing: 1.2,
     fontSize: 12,
+    fontFamily: DEFAULT_FONT_FAMILY,
+    backgroundColor: '#000000',
+    foregroundColor: '#f5f5f5',
     cursorBlink: 'Enable',
     cursorStyle: 'underline',
     scrollback: 1000,
-    scrollSensitivity: 10,
-
+    scrollSensitivity: 6,
     showDefaultConn: false,
     defaultConn: '',
 });
+const resetConn = ref(false);
+const opRef = ref();
+
+const splitFontFamily = (value: string): string[] => {
+    return value
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0);
+};
+
+const syncFontFamilyFromSelected = () => {
+    const values = selectedFontFamilies.value.map((item) => item.trim()).filter((item) => item.length > 0);
+    form.fontFamily = values.join(', ');
+};
+
+const ensureFontFamily = () => {
+    if (selectedFontFamilies.value.length > 0) return;
+    selectedFontFamilies.value = splitFontFamily(DEFAULT_FONT_FAMILY);
+    form.fontFamily = DEFAULT_FONT_FAMILY;
+    if (term.value) {
+        changeItem();
+    }
+};
+
+watch(
+    selectedFontFamilies,
+    () => {
+        syncFontFamilyFromSelected();
+        if (!term.value) return;
+        changeItem();
+    },
+    { deep: true },
+);
 
 const acceptParams = () => {
     search(true);
     loadConnShow();
     iniTerm();
 };
+
+onMounted(() => {
+    previewResizeObserver.value = new ResizeObserver(() => {
+        if (!term.value) return;
+        fitAddon.fit();
+    });
+    if (terminalElement.value) {
+        previewResizeObserver.value.observe(terminalElement.value);
+    }
+});
+
+onBeforeUnmount(() => {
+    previewResizeObserver.value?.disconnect();
+});
 
 const search = async (withReset?: boolean) => {
     loading.value = true;
@@ -155,10 +257,15 @@ const search = async (withReset?: boolean) => {
             form.lineHeight = Number(res.data.lineHeight);
             form.letterSpacing = Number(res.data.letterSpacing);
             form.fontSize = Number(res.data.fontSize);
+            form.fontFamily = res.data.fontFamily || DEFAULT_FONT_FAMILY;
+            selectedFontFamilies.value = splitFontFamily(form.fontFamily);
+            form.backgroundColor = res.data.backgroundColor || '#000000';
+            form.foregroundColor = res.data.foregroundColor || '#f5f5f5';
             form.cursorBlink = res.data.cursorBlink;
             form.cursorStyle = res.data.cursorStyle;
             form.scrollback = Number(res.data.scrollback);
             form.scrollSensitivity = Number(res.data.scrollSensitivity);
+            terminalStore.fontFamily = res.data.fontFamily || '';
 
             if (withReset) {
                 changeItem();
@@ -177,51 +284,88 @@ const loadConnShow = async () => {
         } else {
             form.defaultConn = '-';
         }
+        resetConn.value = false;
     });
 };
 
 const changeShow = async () => {
     let op = form.showDefaultConn ? i18n.global.t('xpack.waf.allow') : i18n.global.t('xpack.waf.deny');
-    ElMessageBox.confirm(i18n.global.t('terminal.defaultConnHelper', [op]), i18n.global.t('terminal.defaultConn'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        await updateAgentSetting({ key: 'LocalSSHConnShow', value: form.showDefaultConn ? 'Enable' : 'Disable' }).then(
-            () => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            },
-        );
+    opRef.value.acceptParams({
+        title: i18n.global.t('terminal.defaultConn'),
+        names: [],
+        msg: i18n.global.t('terminal.defaultConnHelper', [op]),
+        api: null,
+        params: {},
     });
+};
+const submitChangeShow = async () => {
+    loading.value = true;
+    await updateLocalConn({
+        withReset: resetConn.value,
+        defaultConn: form.showDefaultConn ? 'Enable' : 'Disable',
+    })
+        .then(() => {
+            loading.value = false;
+            loadConnShow();
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const iniTerm = () => {
+    const defaultFontFamily = "Monaco, Menlo, Consolas, 'Courier New', monospace";
+    const fontFamily = form.fontFamily || defaultFontFamily;
+
     term.value = new Terminal({
         lineHeight: 1.2,
         fontSize: 12,
-        fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
+        fontFamily: fontFamily,
         theme: {
             background: '#000000',
+            foreground: '#f5f5f5',
         },
         cursorBlink: true,
         cursorStyle: 'block',
         scrollback: 1000,
-        scrollSensitivity: 15,
+        scrollSensitivity: 6,
     });
     term.value.open(terminalElement.value);
+    applyPreviewBackground();
     term.value.loadAddon(fitAddon);
     term.value.write('the first line \r\nthe second line');
     fitAddon.fit();
 };
 
+const applyPreviewBackground = () => {
+    if (!terminalElement.value) return;
+    terminalElement.value.style.backgroundColor = form.backgroundColor || '#000000';
+    terminalElement.value.style.backgroundImage = '';
+    terminalElement.value.style.backgroundSize = '';
+    terminalElement.value.style.backgroundPosition = '';
+    terminalElement.value.style.backgroundRepeat = '';
+    terminalElement.value.style.imageRendering = '';
+};
+
 const changeItem = () => {
+    const defaultFontFamily = "Monaco, Menlo, Consolas, 'Courier New', monospace";
+    const fontFamily = form.fontFamily || defaultFontFamily;
+
     term.value.options.lineHeight = form.lineHeight;
     term.value.options.letterSpacing = form.letterSpacing;
     term.value.options.fontSize = form.fontSize;
+    term.value.options.fontFamily = fontFamily;
+    term.value.options.theme = {
+        ...(term.value.options.theme || {}),
+        background: form.backgroundColor,
+        foreground: form.foregroundColor,
+    };
     term.value.options.cursorBlink = form.cursorBlink === 'Enable';
     term.value.options.cursorStyle = form.cursorStyle;
     term.value.options.scrollback = form.scrollback;
     term.value.options.scrollSensitivity = form.scrollSensitivity;
+    applyPreviewBackground();
 
     fitAddon.fit();
 };
@@ -230,6 +374,10 @@ const onSetDefault = () => {
     form.lineHeight = 1.2;
     form.letterSpacing = 0;
     form.fontSize = 12;
+    form.fontFamily = DEFAULT_FONT_FAMILY;
+    selectedFontFamilies.value = splitFontFamily(DEFAULT_FONT_FAMILY);
+    form.backgroundColor = '#000000';
+    form.foregroundColor = '#f5f5f5';
     form.cursorBlink = 'Enable';
     form.cursorStyle = 'block';
     form.scrollback = 1000;
@@ -239,36 +387,43 @@ const onSetDefault = () => {
 };
 
 const onSave = () => {
+    ensureFontFamily();
     ElMessageBox.confirm(i18n.global.t('terminal.saveHelper'), i18n.global.t('container.setting'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        let param = {
-            lineHeight: form.lineHeight + '',
-            letterSpacing: form.letterSpacing + '',
-            fontSize: form.fontSize + '',
-            cursorBlink: form.cursorBlink,
-            cursorStyle: form.cursorStyle,
-            scrollback: form.scrollback + '',
-            scrollSensitivity: form.scrollSensitivity + '',
-        };
-        await UpdateTerminalInfo(param)
-            .then(() => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                loading.value = false;
-                terminalStore.setLineHeight(form.lineHeight);
-                terminalStore.setLetterSpacing(form.letterSpacing);
-                terminalStore.setFontSize(form.fontSize);
-                terminalStore.setCursorBlink(form.cursorBlink);
-                terminalStore.setCursorStyle(form.cursorStyle);
-                terminalStore.setScrollback(form.scrollback);
-                terminalStore.setScrollSensitivity(form.scrollSensitivity);
-            })
-            .catch(() => {
-                loading.value = false;
+        try {
+            let param = {
+                lineHeight: form.lineHeight + '',
+                letterSpacing: form.letterSpacing + '',
+                fontSize: form.fontSize + '',
+                fontFamily: form.fontFamily,
+                backgroundColor: form.backgroundColor,
+                foregroundColor: form.foregroundColor,
+                cursorBlink: form.cursorBlink,
+                cursorStyle: form.cursorStyle,
+                scrollback: form.scrollback + '',
+                scrollSensitivity: form.scrollSensitivity + '',
+            };
+            await UpdateTerminalInfo(param);
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            terminalStore.$patch({
+                lineHeight: form.lineHeight,
+                letterSpacing: form.letterSpacing,
+                fontSize: form.fontSize,
+                fontFamily: form.fontFamily,
+                backgroundColor: form.backgroundColor,
+                foregroundColor: form.foregroundColor,
+                cursorBlink: form.cursorBlink,
+                cursorStyle: form.cursorStyle,
+                scrollback: form.scrollback,
+                scrollSensitivity: form.scrollSensitivity,
             });
+        } finally {
+            loading.value = false;
+        }
     });
 };
 

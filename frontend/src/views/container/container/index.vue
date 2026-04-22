@@ -23,7 +23,10 @@
 
             <template #leftToolBar>
                 <el-button type="primary" @click="onContainerOperate('')">
-                    {{ $t('container.create') }}
+                    {{ $t('commons.button.create') }}
+                </el-button>
+                <el-button type="primary" plain @click="onImportCreate()">
+                    {{ $t('commons.button.import') }}
                 </el-button>
                 <el-button type="primary" plain @click="onClean()">
                     {{ $t('container.containerPrune') }}
@@ -78,6 +81,7 @@
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
+                    row-key="containerID"
                     @sort-change="search"
                     @search="search"
                     @cell-mouse-enter="showFavorite"
@@ -127,10 +131,15 @@
                     />
                     <el-table-column :label="$t('commons.table.status')" min-width="150" prop="state">
                         <template #default="{ row }">
-                            <el-dropdown placement="bottom">
-                                <Status :key="row.state" :status="row.state" :operate="true"></Status>
+                            <el-dropdown
+                                placement="bottom"
+                                @visible-change="
+                                    (visible) => handleStatusDropdownVisibleChange(row.containerID, visible)
+                                "
+                            >
+                                <Status :status="row.state" :operate="true"></Status>
                                 <template #dropdown>
-                                    <el-dropdown-menu>
+                                    <el-dropdown-menu v-if="activeDropdownContainerId === row.containerID">
                                         <el-dropdown-item
                                             :disabled="checkStatus('start', row)"
                                             @click="onOperate('start', row)"
@@ -209,8 +218,7 @@
                                             <el-descriptions-item :label="$t('container.memTotal')">
                                                 {{ computeSizeForDocker(row.memoryLimit) }}
                                             </el-descriptions-item>
-
-                                            <el-descriptions-item>
+                                            <el-descriptions-item v-if="row.hasLoadSize">
                                                 <template #label>
                                                     {{ $t('container.sizeRw') }}
                                                     <el-tooltip :content="$t('container.sizeRwHelper')">
@@ -219,7 +227,10 @@
                                                 </template>
                                                 {{ computeSize2(row.sizeRw) }}
                                             </el-descriptions-item>
-                                            <el-descriptions-item :label="$t('container.sizeRootFs')">
+                                            <el-descriptions-item
+                                                :label="$t('container.sizeRootFs')"
+                                                v-if="row.hasLoadSize"
+                                            >
                                                 <template #label>
                                                     {{ $t('container.sizeRootFs') }}
                                                     <el-tooltip :content="$t('container.sizeRootFsHelper')">
@@ -229,6 +240,17 @@
                                                 {{ computeSize2(row.sizeRootFs) }}
                                             </el-descriptions-item>
                                         </el-descriptions>
+
+                                        <el-button
+                                            class="mt-2"
+                                            v-if="!row.hasLoadSize"
+                                            size="small"
+                                            link
+                                            type="primary"
+                                            @click="loadSize(row)"
+                                        >
+                                            {{ $t('container.loadSize') }}
+                                        </el-button>
                                     </template>
                                 </el-popover>
                             </div>
@@ -249,34 +271,33 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.related')" min-width="210" prop="appName">
+                    <el-table-column
+                        :label="$t('container.related')"
+                        show-overflow-tooltip
+                        min-width="210"
+                        prop="appName"
+                    >
                         <template #default="{ row }">
-                            <div>
-                                <el-tooltip
-                                    v-if="row.appName != ''"
-                                    :hide-after="20"
-                                    :content="$t('app.app') + ': ' + row.appName + '[' + row.appInstallName + ']'"
-                                    placement="top"
-                                >
-                                    <el-button icon="Position" plain size="small" @click="routerToName('AppInstalled')">
-                                        {{ $t('app.app') }}: {{ row.appName }} [{{ row.appInstallName }}]
-                                    </el-button>
-                                </el-tooltip>
-                            </div>
-                            <div>
-                                <el-tooltip
-                                    v-if="row.websites != null"
-                                    :hide-after="20"
-                                    :content="row.websites.join(',')"
-                                    placement="top"
-                                    class="mt-1"
-                                >
-                                    <el-button icon="Position" plain size="small" @click="routerToName('Website')">
-                                        {{ $t('menu.website') }}:
-                                        {{ row.websites.join(',') }}
-                                    </el-button>
-                                </el-tooltip>
-                            </div>
+                            <el-button v-if="row.appName != '' || row.websites != null" link icon="Position" />
+                            <el-text
+                                v-if="row.appName != ''"
+                                link
+                                class="cursor-pointer"
+                                size="small"
+                                @click="routerToName('AppInstalled')"
+                            >
+                                {{ $t('app.app') }}: {{ row.appName }} [{{ row.appInstallName }}]
+                            </el-text>
+                            <el-text
+                                v-if="row.websites != null"
+                                link
+                                class="cursor-pointer"
+                                size="small"
+                                @click="routerToName('Website')"
+                            >
+                                {{ $t('menu.website') }}:
+                                {{ row.websites.join(',') }}
+                            </el-text>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -341,7 +362,7 @@
                     />
                     <fu-table-operations
                         fix
-                        width="200px"
+                        width="220px"
                         :ellipsis="2"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
@@ -363,8 +384,11 @@
         <CommitDialog @search="search" ref="dialogCommitRef" />
         <MonitorDialog ref="dialogMonitorRef" />
         <TerminalDialog ref="dialogTerminalRef" />
+        <ContainerFileDrawer ref="dialogFileBrowserRef" />
 
         <PortJumpDialog ref="dialogPortJumpRef" />
+        <Backups ref="dialogBackupRef" />
+        <Uploads ref="uploadRef" @close="search" />
         <TaskLog ref="taskLogRef" width="70%" @close="search" />
     </div>
 </template>
@@ -376,14 +400,18 @@ import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
 import CommitDialog from '@/views/container/container/commit/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
+import ContainerFileDrawer from '@/views/container/container/file-browser/index.vue';
 import ContainerInspectDialog from '@/views/container/container/inspect/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
+import Backups from '@/components/backup/index.vue';
+import Uploads from '@/components/upload/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref, computed } from 'vue';
 import {
+    containerItemStats,
     containerListStats,
     containerOperator,
     inspect,
@@ -396,7 +424,8 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import router from '@/routers';
-import { computeSize2, computeSizeForDocker, computeCPU, newUUID } from '@/utils/util';
+import { computeSize2, computeSizeForDocker, computeCPU } from '@/utils/size';
+import { newUUID } from '@/utils/id';
 import { updateCommonDescription } from '@/api/modules/setting';
 const globalStore = GlobalStore();
 
@@ -407,7 +436,7 @@ const isActive = ref(false);
 const isExist = ref(false);
 
 const loading = ref(false);
-const data = ref();
+const data = ref<any[]>([]);
 const selects = ref<any>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'container-page-size',
@@ -422,6 +451,7 @@ const searchName = ref();
 const dialogUpgradeRef = ref();
 const dialogCommitRef = ref();
 const dialogPortJumpRef = ref();
+const dialogBackupRef = ref();
 const opRef = ref();
 const includeAppStore = ref(true);
 const columns = ref([]);
@@ -434,6 +464,101 @@ const tags = ref([]);
 const activeTag = ref('all');
 
 const hoveredRowIndex = ref(-1);
+const activeDropdownContainerId = ref('');
+const statFields = [
+    'cpuTotalUsage',
+    'systemUsage',
+    'cpuPercent',
+    'percpuUsage',
+    'memoryCache',
+    'memoryUsage',
+    'memoryLimit',
+    'memoryPercent',
+] as const;
+
+const assignFields = (target: Record<string, any>, source: Record<string, any>, skipKeys: string[] = []) => {
+    const skipSet = new Set(skipKeys);
+    for (const [key, value] of Object.entries(source)) {
+        if (skipSet.has(key)) {
+            continue;
+        }
+        if (target[key] !== value) {
+            target[key] = value;
+        }
+    }
+};
+
+const syncContainerRows = (containers: Record<string, any>[]) => {
+    const currentMap = new Map(data.value.map((item) => [item.containerID, item]));
+    data.value = containers.map((container) => {
+        const current = currentMap.get(container.containerID);
+        if (!current) {
+            return container;
+        }
+        assignFields(current, container);
+        return current;
+    });
+};
+
+const applyStatsToRows = (stats: Record<string, any>[]) => {
+    if (stats.length === 0 || data.value.length === 0) {
+        return;
+    }
+    const statsMap = new Map(stats.map((item) => [item.containerID, item]));
+    for (const container of data.value) {
+        const stat = statsMap.get(container.containerID);
+        if (!stat) {
+            continue;
+        }
+        if (!container.hasLoad) {
+            container.hasLoad = true;
+        }
+        for (const field of statFields) {
+            if (container[field] !== stat[field]) {
+                container[field] = stat[field];
+            }
+        }
+    }
+};
+
+const updateTags = (status: Record<string, number>) => {
+    const nextTags = [];
+    if (status.containerCount) {
+        nextTags.push({ key: 'all', count: status.containerCount });
+    }
+    if (status.running) {
+        nextTags.push({ key: 'running', count: status.running });
+    }
+    if (status.paused) {
+        nextTags.push({ key: 'paused', count: status.paused });
+    }
+    if (status.restarting) {
+        nextTags.push({ key: 'restarting', count: status.restarting });
+    }
+    if (status.removing) {
+        nextTags.push({ key: 'removing', count: status.removing });
+    }
+    if (status.created) {
+        nextTags.push({ key: 'created', count: status.created });
+    }
+    if (status.dead) {
+        nextTags.push({ key: 'dead', count: status.dead });
+    }
+    if (status.exited) {
+        nextTags.push({ key: 'exited', count: status.exited });
+    }
+    tags.value = nextTags;
+};
+
+const handleStatusDropdownVisibleChange = (containerID: string, visible: boolean) => {
+    if (visible) {
+        activeDropdownContainerId.value = containerID;
+        return;
+    }
+    if (activeDropdownContainerId.value === containerID) {
+        activeDropdownContainerId.value = '';
+    }
+};
 
 const goDashboard = async (port: any) => {
     if (port.indexOf('127.0.0.1') !== -1) {
@@ -483,17 +608,26 @@ const search = async (column?: any) => {
         excludeAppStore: !includeAppStore.value,
     };
     loading.value = true;
-    loadStats();
-    loadContainerCount();
-    await searchContainer(params)
-        .then((res) => {
-            loading.value = false;
-            data.value = res.data.items || [];
-            paginationConfig.total = res.data.total;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    const [containerResult, statsResult, statusResult] = await Promise.allSettled([
+        searchContainer(params),
+        containerListStats(),
+        loadContainerStatus(),
+    ]);
+    loading.value = false;
+
+    if (containerResult.status === 'fulfilled') {
+        const containers = containerResult.value.data.items || [];
+        syncContainerRows(containers);
+        paginationConfig.total = containerResult.value.data.total;
+    }
+
+    if (statsResult.status === 'fulfilled') {
+        applyStatsToRows(statsResult.value.data || []);
+    }
+
+    if (statusResult.status === 'fulfilled') {
+        updateTags(statusResult.value.data || {});
+    }
 };
 
 const searchWithStatus = (item: string) => {
@@ -530,36 +664,6 @@ const changePinned = (row: any, isPinned: boolean) => {
     });
 };
 
-const loadContainerCount = async () => {
-    await loadContainerStatus().then((res) => {
-        tags.value = [];
-        if (res.data.containerCount) {
-            tags.value.push({ key: 'all', count: res.data.containerCount });
-        }
-        if (res.data.running) {
-            tags.value.push({ key: 'running', count: res.data.running });
-        }
-        if (res.data.paused) {
-            tags.value.push({ key: 'paused', count: res.data.paused });
-        }
-        if (res.data.restarting) {
-            tags.value.push({ key: 'restarting', count: res.data.restarting });
-        }
-        if (res.data.removing) {
-            tags.value.push({ key: 'removing', count: res.data.removing });
-        }
-        if (res.data.created) {
-            tags.value.push({ key: 'created', count: res.data.created });
-        }
-        if (res.data.dead) {
-            tags.value.push({ key: 'dead', count: res.data.dead });
-        }
-        if (res.data.exited) {
-            tags.value.push({ key: 'exited', count: res.data.exited });
-        }
-    });
-};
-
 const refresh = async () => {
     let filterItem = props.filters ? props.filters : '';
     let params = {
@@ -571,49 +675,40 @@ const refresh = async () => {
         orderBy: paginationConfig.orderBy,
         order: paginationConfig.order,
     };
-    loadStats();
-    const res = await searchContainer(params);
-    let containers = res.data.items || [];
-    for (const container of containers) {
-        for (const c of data.value) {
-            c.hasLoad = true;
-            if (container.containerID == c.containerID) {
-                for (let key in container) {
-                    if (key !== 'cpuPercent' && key !== 'memoryPercent') {
-                        c[key] = container[key];
-                    }
-                }
-            }
-        }
-    }
+    const [containerResult, statsResult] = await Promise.all([searchContainer(params), containerListStats()]);
+    syncContainerRows(containerResult.data.items || []);
+    applyStatsToRows(statsResult.data || []);
 };
 
-const loadStats = async () => {
-    const res = await containerListStats();
-    let stats = res.data || [];
-    if (stats.length === 0) {
-        return;
-    }
-    for (const container of data.value) {
-        for (const item of stats) {
-            if (container.containerID === item.containerID) {
-                container.hasLoad = true;
-                container.cpuTotalUsage = item.cpuTotalUsage;
-                container.systemUsage = item.systemUsage;
-                container.cpuPercent = item.cpuPercent;
-                container.percpuUsage = item.percpuUsage;
-                container.memoryCache = item.memoryCache;
-                container.memoryUsage = item.memoryUsage;
-                container.memoryLimit = item.memoryLimit;
-                container.memoryPercent = item.memoryPercent;
-                break;
-            }
-        }
-    }
+const loadSize = async (row: any) => {
+    containerItemStats(row.containerID).then((res) => {
+        row.sizeRw = res.data.sizeRw || 0;
+        row.sizeRootFs = res.data.sizeRootFs || 0;
+        row.hasLoadSize = true;
+    });
 };
 
 const onContainerOperate = async (container: string) => {
     routerToNameWithQuery('ContainerCreate', { name: container });
+};
+
+const onBackup = (row: Container.ContainerInfo) => {
+    dialogBackupRef.value!.acceptParams({
+        type: 'container',
+        name: row.name,
+        detailName: '',
+    });
+};
+
+const uploadRef = ref();
+const onImportCreate = () => {
+    uploadRef.value!.acceptParams({
+        type: 'container',
+        name: '',
+        detailName: '',
+        remark: '.tar.gz',
+        node: globalStore.currentNode,
+    });
 };
 
 const dialogMonitorRef = ref();
@@ -626,9 +721,24 @@ const onTerminal = (row: any) => {
     const title = i18n.global.t('menu.container') + ' ' + row.name;
     dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, title: title });
 };
+const dialogFileBrowserRef = ref();
+const onOpenFileBrowser = async (row: any) => {
+    const title = i18n.global.t('menu.container') + ' ' + row.name;
+    let workingDir = '/';
+    try {
+        const res = await inspect({ id: row.containerID, type: 'container', detail: '' });
+        const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+        if (data?.Config?.WorkingDir) {
+            workingDir = data.Config.WorkingDir;
+        }
+    } catch (e) {
+        /* fallback to root */
+    }
+    dialogFileBrowserRef.value!.acceptParams({ containerID: row.containerID, title: title, workingDir: workingDir });
+};
 
 const onInspect = async (row: any) => {
-    const res = await inspect({ id: row.containerID, type: 'container' });
+    const res = await inspect({ id: row.containerID, type: 'container', detail: '' });
     containerInspectRef.value!.acceptParams({ data: res.data, ports: row.ports });
 };
 
@@ -681,7 +791,10 @@ const onOperate = async (op: string, row: Container.ContainerInfo | null) => {
     for (const item of opList) {
         batchNames.value.push(item.name);
         if (item.isFromApp) {
-            msg = i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + op)]);
+            msg =
+                op == 'remove'
+                    ? i18n.global.t('container.containerDeleteHelper', [i18n.global.t('container.' + op)])
+                    : i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + op)]);
         }
     }
     const successMsg = `${i18n.global.t('container.' + op)}${i18n.global.t('commons.status.success')}`;
@@ -731,6 +844,15 @@ const buttons = [
         },
     },
     {
+        label: i18n.global.t('home.dir'),
+        disabled: (row: Container.ContainerInfo) => {
+            return row.state !== 'running';
+        },
+        click: (row: Container.ContainerInfo) => {
+            onOpenFileBrowser(row);
+        },
+    },
+    {
         label: i18n.global.t('commons.button.edit'),
         click: (row: Container.ContainerInfo) => {
             onContainerOperate(row.name);
@@ -740,6 +862,12 @@ const buttons = [
         label: i18n.global.t('commons.button.upgrade'),
         click: (row: Container.ContainerInfo) => {
             dialogUpgradeRef.value!.acceptParams({ container: row.name, image: row.imageName, fromApp: row.isFromApp });
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.backup'),
+        click: (row: Container.ContainerInfo) => {
+            onBackup(row);
         },
     },
     {
@@ -810,5 +938,12 @@ onMounted(() => {
         background: none;
         border: none;
     }
+}
+.button-cell {
+    width: 100%;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>

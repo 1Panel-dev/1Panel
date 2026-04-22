@@ -7,153 +7,90 @@
                 </el-button>
             </template>
             <template #main>
-                <el-row class="mt-5 mb-5">
-                    <el-col :xs="22" :sm="20" :md="20" :lg="10" :xl="10" :offset="1">
-                        <div v-if="scanStatus !== 'scanned'">
-                            <div v-if="scanStatus === 'beforeScan'">
-                                <div v-if="form.lastCleanTime">
-                                    <el-text class="clean_title">
-                                        {{ $t('clean.lastCleanTime', [form.lastCleanTime || '-']) }}
-                                    </el-text>
-                                    <div class="mt-4">
-                                        <el-text>
-                                            {{
-                                                $t('clean.lastCleanHelper', [
-                                                    form.lastCleanData || '-',
-                                                    form.lastCleanSize ? computeSize(Number(form.lastCleanSize)) : '-',
-                                                ])
-                                            }}
-                                        </el-text>
-                                    </div>
-                                </div>
-                                <div v-else>
-                                    <el-text class="clean_title">
-                                        <el-icon>
-                                            <MagicStick />
-                                        </el-icon>
-                                        {{ $t('clean.scanHelper') }}
-                                    </el-text>
-                                </div>
-                                <div class="app-card">
-                                    <el-card class="e-card">
-                                        <el-row>
-                                            <el-col :span="4">
-                                                <el-button icon="Setting" link class="card_icon" />
-                                            </el-col>
-                                            <el-col :span="20">
-                                                <div>
-                                                    <el-text class="mx-1 card_title" type="primary">
-                                                        {{ $t('clean.system') }}
-                                                    </el-text>
-                                                </div>
-                                                <span class="input-help">{{ $t('clean.systemHelper') }}</span>
-                                            </el-col>
-                                        </el-row>
-                                    </el-card>
-                                    <el-card class="e-card">
-                                        <el-row>
-                                            <el-col :span="4">
-                                                <svg-icon iconName="p-docker1" class="svg-icon"></svg-icon>
-                                                <el-button link class="card_icon" />
-                                            </el-col>
-                                            <el-col :span="20">
-                                                <div>
-                                                    <el-text class="mx-1 card_title" type="primary">
-                                                        {{ $t('clean.containerTrash') }}
-                                                    </el-text>
-                                                </div>
-                                                <span class="input-help">
-                                                    {{ $t('container.cleanDockerDiskZone') }}
-                                                </span>
-                                            </el-col>
-                                        </el-row>
-                                    </el-card>
-                                    <el-card class="e-card">
-                                        <el-row>
-                                            <el-col :span="4">
-                                                <el-button icon="Upload" link class="card_icon" />
-                                            </el-col>
-                                            <el-col :span="20">
-                                                <div>
-                                                    <el-text class="mx-1 card_title" type="primary">
-                                                        {{ $t('clean.upload') }}
-                                                    </el-text>
-                                                </div>
-                                                <span class="input-help">{{ $t('clean.uploadHelper') }}</span>
-                                            </el-col>
-                                        </el-row>
-                                    </el-card>
-                                    <el-card class="e-card">
-                                        <el-row>
-                                            <el-col :span="4">
-                                                <el-button icon="Download" link class="card_icon" />
-                                            </el-col>
-                                            <el-col :span="20">
-                                                <div>
-                                                    <el-text class="mx-1 card_title" type="primary">
-                                                        {{ $t('clean.download') }}
-                                                    </el-text>
-                                                </div>
-                                                <span class="input-help">{{ $t('clean.downloadHelper') }}</span>
-                                            </el-col>
-                                        </el-row>
-                                    </el-card>
-                                    <el-card class="e-card">
-                                        <el-row>
-                                            <el-col :span="4">
-                                                <el-button icon="Document" link class="card_icon" />
-                                            </el-col>
-                                            <el-col :span="20">
-                                                <div>
-                                                    <el-text class="mx-1 card_title" type="primary">
-                                                        {{ $t('clean.systemLog') }}
-                                                    </el-text>
-                                                </div>
-                                                <span class="input-help">
-                                                    {{ $t('clean.systemLogHelper') }}
-                                                </span>
-                                            </el-col>
-                                        </el-row>
-                                    </el-card>
-                                </div>
-                            </div>
-                            <div v-if="scanStatus === 'afterScan'">
-                                <el-text class="clean_title">{{ $t('clean.cleanSuccessful') }}</el-text>
-                                <div class="mt-4">
-                                    <el-text>
-                                        {{
-                                            $t('clean.currentCleanHelper', [
-                                                form.lastCleanData,
-                                                computeSize(Number(form.lastCleanSize)),
-                                            ])
-                                        }}
-                                    </el-text>
-                                </div>
-                            </div>
+                <div v-if="scanStatus === 'beforeScan'" class="ml-5">
+                    <div v-if="form.lastCleanTime">
+                        <el-text class="clean_title">
+                            {{ $t('clean.lastCleanTime', [form.lastCleanTime || '-']) }}
+                        </el-text>
+                        <div class="mt-4">
+                            <el-text>
+                                {{
+                                    $t('clean.lastCleanHelper', [
+                                        form.lastCleanData || '-',
+                                        form.lastCleanSize ? computeSize(Number(form.lastCleanSize)) : '-',
+                                    ])
+                                }}
+                            </el-text>
                         </div>
-                        <div v-if="scanStatus === 'scanned'">
-                            <div class="flex flex-row justify-between items-center gap-2">
-                                <div>
-                                    <el-text class="clean_title">
-                                        {{ $t('clean.totalScan') }} {{ computeSize(totalSize) }}
-                                    </el-text>
-                                    <div class="mt-4">
-                                        <el-text type="info">
-                                            {{ $t('clean.selectScan') }} {{ computeSize(selectSize) }}
-                                        </el-text>
-                                    </div>
-                                </div>
-                                <div class="large_button">
-                                    <el-button
-                                        type="primary"
-                                        size="large"
-                                        :disabled="selectSize <= 0"
-                                        @click="onSubmitClean"
-                                    >
-                                        {{ $t('clean.clean') }}
-                                    </el-button>
-                                </div>
-                            </div>
+                    </div>
+                    <div v-else>
+                        <el-text class="clean_title">
+                            <el-icon>
+                                <MagicStick />
+                            </el-icon>
+                            {{ $t('clean.scanHelper') }}
+                        </el-text>
+                    </div>
+                    <el-row type="flex" justify="center" :gutter="20" class="mb-10">
+                        <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12" v-for="item in cleanTag" :key="item.title">
+                            <el-card class="clean-card">
+                                <el-row>
+                                    <el-col :span="4">
+                                        <el-button
+                                            v-if="item.icon.indexOf('p-') === -1"
+                                            :icon="item.icon"
+                                            link
+                                            class="card_icon"
+                                        />
+                                        <template v-else>
+                                            <el-button link class="svg-icon">
+                                                <svg-icon :iconName="item.icon"></svg-icon>
+                                            </el-button>
+                                        </template>
+                                    </el-col>
+                                    <el-col :span="20">
+                                        <div>
+                                            <el-text class="mx-1 card_title" type="primary">
+                                                {{ $t(item.title) }}
+                                            </el-text>
+                                        </div>
+                                        <span class="input-help">{{ $t(item.description) }}</span>
+                                    </el-col>
+                                </el-row>
+                            </el-card>
+                        </el-col>
+                    </el-row>
+                </div>
+                <div v-if="scanStatus === 'afterScan'" class="ml-5">
+                    <el-text class="clean_title">{{ $t('clean.cleanSuccessful') }}</el-text>
+                    <div class="mt-4">
+                        <el-text>
+                            {{
+                                $t('clean.currentCleanHelper', [
+                                    form.lastCleanData,
+                                    computeSize(Number(form.lastCleanSize)),
+                                ])
+                            }}
+                        </el-text>
+                    </div>
+                </div>
+                <div v-if="scanStatus === 'scanned'" class="ml-5">
+                    <div>
+                        <el-text class="clean_title">{{ $t('clean.totalScan') }} {{ computeSize(totalSize) }}</el-text>
+                        <el-button
+                            type="primary"
+                            class="-mt-2 ml-20"
+                            :disabled="selectSize <= 0"
+                            @click="onSubmitClean"
+                        >
+                            {{ $t('clean.clean') }}
+                        </el-button>
+                        <div class="mt-4">
+                            <el-text type="info">{{ $t('clean.selectScan') }} {{ computeSize(selectSize) }}</el-text>
+                        </div>
+                    </div>
+                    <el-row type="flex" :gutter="20" class="mb-10">
+                        <el-col :xs="24" :sm="24" :md="24" :lg="16" :xl="16">
                             <div class="tree-container">
                                 <el-collapse v-model="activeNames" class="tree-collapse">
                                     <el-collapse-item :title="$t('clean.system')" name="system">
@@ -164,37 +101,51 @@
                                             :default-checked-keys="systemDefaultCheck"
                                             show-checkbox
                                             :props="defaultProps"
-                                            @check-change="onChange"
+                                            @check="onChange"
                                             class="responsive-tree"
                                             :empty-text="$t('clean.statusEmpty')"
                                         >
                                             <template #default="{ node, data }">
-                                                <div class="tree-node">
-                                                    <el-tooltip
-                                                        effect="dark"
-                                                        :content="load18n(data.label)"
-                                                        placement="top"
-                                                    >
-                                                        <span class="tree-node-label">{{ load18n(data.label) }}</span>
-                                                    </el-tooltip>
-                                                    <span class="tree-node-size" v-if="data.size">
-                                                        {{ computeSize(data.size) }}
-                                                    </span>
-                                                    <el-tooltip
-                                                        effect="dark"
-                                                        :content="loadTag(node, data)"
-                                                        placement="top"
-                                                    >
-                                                        <span class="tree-node-tooltip">
-                                                            {{ loadTag(node, data) }}
-                                                        </span>
-                                                    </el-tooltip>
-                                                </div>
+                                                <el-text>
+                                                    {{
+                                                        load18n(data.label) +
+                                                        '     ' +
+                                                        computeSize(data.size) +
+                                                        '     ' +
+                                                        loadTag(node, data)
+                                                    }}
+                                                </el-text>
                                             </template>
                                         </el-tree>
                                     </el-collapse-item>
 
-                                    <el-collapse-item :title="$t('clean.containerTrash')" name="container_trash">
+                                    <el-collapse-item :title="$t('clean.unknownBackup')" name="backup">
+                                        <el-tree
+                                            ref="backupRef"
+                                            :data="cleanData.backupClean"
+                                            node-key="id"
+                                            :default-checked-keys="backupDefaultCheck"
+                                            show-checkbox
+                                            :props="defaultProps"
+                                            @check="onChange"
+                                            class="responsive-tree"
+                                            :empty-text="$t('clean.statusEmpty')"
+                                        >
+                                            <template #default="{ node, data }">
+                                                <el-text>
+                                                    {{
+                                                        load18n(data.label) +
+                                                        '     ' +
+                                                        computeSize(data.size) +
+                                                        '     ' +
+                                                        loadTag(node, data)
+                                                    }}
+                                                </el-text>
+                                            </template>
+                                        </el-tree>
+                                    </el-collapse-item>
+
+                                    <el-collapse-item :title="$t('clean.docker')" name="docker">
                                         <el-tree
                                             ref="containerRef"
                                             :data="cleanData.containerClean"
@@ -202,32 +153,20 @@
                                             :default-checked-keys="containerDefaultCheck"
                                             show-checkbox
                                             :props="defaultProps"
-                                            @check-change="onChange"
+                                            @check="onChange"
                                             class="responsive-tree"
                                             :empty-text="$t('clean.statusEmpty')"
                                         >
                                             <template #default="{ node, data }">
-                                                <div class="tree-node">
-                                                    <el-tooltip
-                                                        effect="dark"
-                                                        :content="load18n(data.label)"
-                                                        placement="top"
-                                                    >
-                                                        <span class="tree-node-label">{{ load18n(data.label) }}</span>
-                                                    </el-tooltip>
-                                                    <span class="tree-node-size" v-if="data.size">
-                                                        {{ computeSize(data.size) }}
-                                                    </span>
-                                                    <el-tooltip
-                                                        effect="dark"
-                                                        :content="loadTag(node, data)"
-                                                        placement="top"
-                                                    >
-                                                        <span class="tree-node-tooltip">
-                                                            {{ loadTag(node, data) }}
-                                                        </span>
-                                                    </el-tooltip>
-                                                </div>
+                                                <el-text>
+                                                    {{
+                                                        load18n(data.label) +
+                                                        '     ' +
+                                                        computeSize(data.size) +
+                                                        '     ' +
+                                                        loadTag(node, data)
+                                                    }}
+                                                </el-text>
                                             </template>
                                         </el-tree>
                                     </el-collapse-item>
@@ -239,32 +178,20 @@
                                             :default-checked-keys="uploadDefaultCheck"
                                             show-checkbox
                                             :props="defaultProps"
-                                            @check-change="onChange"
+                                            @check="onChange"
                                             class="responsive-tree"
                                             :empty-text="$t('clean.statusEmpty')"
                                         >
                                             <template #default="{ node, data }">
-                                                <div class="tree-node">
-                                                    <el-tooltip
-                                                        effect="dark"
-                                                        :content="load18n(data.label)"
-                                                        placement="top"
-                                                    >
-                                                        <span class="tree-node-label">{{ load18n(data.label) }}</span>
-                                                    </el-tooltip>
-                                                    <span class="tree-node-size" v-if="data.size">
-                                                        {{ computeSize(data.size) }}
-                                                    </span>
-                                                    <el-tooltip
-                                                        effect="dark"
-                                                        :content="loadTag(node, data)"
-                                                        placement="top"
-                                                    >
-                                                        <span class="tree-node-tooltip">
-                                                            {{ loadTag(node, data) }}
-                                                        </span>
-                                                    </el-tooltip>
-                                                </div>
+                                                <el-text>
+                                                    {{
+                                                        load18n(data.label) +
+                                                        '     ' +
+                                                        computeSize(data.size) +
+                                                        '     ' +
+                                                        loadTag(node, data)
+                                                    }}
+                                                </el-text>
                                             </template>
                                         </el-tree>
                                     </el-collapse-item>
@@ -276,32 +203,20 @@
                                             :default-checked-keys="downloadDefaultCheck"
                                             show-checkbox
                                             :props="defaultProps"
-                                            @check-change="onChange"
+                                            @check="onChange"
                                             class="responsive-tree"
                                             :empty-text="$t('clean.statusEmpty')"
                                         >
                                             <template #default="{ node, data }">
-                                                <div class="tree-node">
-                                                    <el-tooltip
-                                                        effect="dark"
-                                                        :content="load18n(data.label)"
-                                                        placement="top"
-                                                    >
-                                                        <span class="tree-node-label">{{ load18n(data.label) }}</span>
-                                                    </el-tooltip>
-                                                    <span class="tree-node-size" v-if="data.size">
-                                                        {{ computeSize(data.size) }}
-                                                    </span>
-                                                    <el-tooltip
-                                                        effect="dark"
-                                                        :content="loadTag(node, data)"
-                                                        placement="top"
-                                                    >
-                                                        <span class="tree-node-tooltip">
-                                                            {{ loadTag(node, data) }}
-                                                        </span>
-                                                    </el-tooltip>
-                                                </div>
+                                                <el-text>
+                                                    {{
+                                                        load18n(data.label) +
+                                                        '     ' +
+                                                        computeSize(data.size) +
+                                                        '     ' +
+                                                        loadTag(node, data)
+                                                    }}
+                                                </el-text>
                                             </template>
                                         </el-tree>
                                     </el-collapse-item>
@@ -313,54 +228,39 @@
                                             :default-checked-keys="systemLogDefaultCheck"
                                             show-checkbox
                                             :props="defaultProps"
-                                            @check-change="onChange"
+                                            @check="onChange"
                                             class="responsive-tree"
                                             :empty-text="$t('clean.statusEmpty')"
                                         >
                                             <template #default="{ node, data }">
-                                                <div class="tree-node">
-                                                    <el-tooltip
-                                                        effect="dark"
-                                                        :content="load18n(data.label)"
-                                                        placement="top"
-                                                    >
-                                                        <span class="tree-node-label">{{ load18n(data.label) }}</span>
-                                                    </el-tooltip>
-                                                    <span class="tree-node-size" v-if="data.size">
-                                                        {{ computeSize(data.size) }}
-                                                    </span>
-                                                    <el-tooltip
-                                                        effect="dark"
-                                                        :content="loadTag(node, data)"
-                                                        placement="top"
-                                                    >
-                                                        <span class="tree-node-tooltip">
-                                                            {{ loadTag(node, data) }}
-                                                        </span>
-                                                    </el-tooltip>
-                                                </div>
+                                                <el-text>
+                                                    {{
+                                                        load18n(data.label) +
+                                                        '     ' +
+                                                        computeSize(data.size) +
+                                                        '     ' +
+                                                        loadTag(node, data)
+                                                    }}
+                                                </el-text>
                                             </template>
                                         </el-tree>
                                     </el-collapse-item>
                                 </el-collapse>
                             </div>
-                        </div>
-                    </el-col>
-                </el-row>
+                        </el-col>
+                    </el-row>
+                </div>
             </template>
         </LayoutContent>
     </div>
 </template>
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
-import { computeSize } from '@/utils/util';
+import { computeSize } from '@/utils/size';
 import { getSettingInfo } from '@/api/modules/setting';
 import { clean, scan } from '@/api/modules/toolbox';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-
-const globalStore = GlobalStore();
 
 const loading = ref();
 const totalSize = ref<number>(0);
@@ -374,6 +274,7 @@ const defaultProps = {
 };
 const cleanData = reactive({
     systemClean: [],
+    backupClean: [],
     uploadClean: [],
     downloadClean: [],
     systemLogClean: [],
@@ -381,6 +282,8 @@ const cleanData = reactive({
 });
 const systemRef = ref();
 const systemDefaultCheck = ref([]);
+const backupRef = ref();
+const backupDefaultCheck = ref([]);
 const uploadRef = ref();
 const uploadDefaultCheck = ref([]);
 const downloadRef = ref();
@@ -389,7 +292,20 @@ const systemLogRef = ref();
 const systemLogDefaultCheck = ref([]);
 const containerRef = ref();
 const containerDefaultCheck = ref([]);
-const activeNames = ref(['system', 'upload', 'download', 'system_log', 'container_trash']);
+const activeNames = ref(['system', 'backup', 'upload', 'download', 'system_log', 'docker']);
+
+const cleanTag = [
+    { icon: 'Setting', title: i18n.global.t('clean.system'), description: i18n.global.t('clean.systemHelper') },
+    { icon: 'Upload', title: i18n.global.t('clean.upload'), description: i18n.global.t('clean.uploadHelper') },
+    { icon: 'Files', title: i18n.global.t('clean.backup'), description: i18n.global.t('clean.backupHelper') },
+    { icon: 'Download', title: i18n.global.t('clean.download'), description: i18n.global.t('clean.downloadHelper') },
+    {
+        icon: 'p-docker1',
+        title: i18n.global.t('clean.docker'),
+        description: i18n.global.t('clean.dockerHelper'),
+    },
+    { icon: 'Document', title: i18n.global.t('clean.systemLog'), description: i18n.global.t('clean.systemLogHelper') },
+];
 
 const submitCleans = ref();
 
@@ -398,6 +314,10 @@ const form = reactive({
     lastCleanSize: '',
     lastCleanData: '',
 });
+
+const hasChildren = (node: any) => Array.isArray(node?.children) && node.children.length > 0;
+
+const canDeleteNode = (node: any) => !!node?.canDelete;
 
 const scanData = async () => {
     loading.value = true;
@@ -408,6 +328,10 @@ const scanData = async () => {
             totalSize.value = 0;
             cleanData.systemClean = res.data.systemClean || [];
             for (const item of cleanData.systemClean) {
+                totalSize.value += item.size;
+            }
+            cleanData.backupClean = res.data.backupClean || [];
+            for (const item of cleanData.backupClean) {
                 totalSize.value += item.size;
             }
             cleanData.uploadClean = res.data.uploadClean || [];
@@ -427,6 +351,7 @@ const scanData = async () => {
                 totalSize.value += item.size;
             }
             loadCheck(cleanData.systemClean, systemDefaultCheck.value);
+            loadCheck(cleanData.backupClean, backupDefaultCheck.value);
             loadCheck(cleanData.uploadClean, uploadDefaultCheck.value);
             loadCheck(cleanData.downloadClean, downloadDefaultCheck.value);
             loadCheck(cleanData.systemLogClean, systemLogDefaultCheck.value);
@@ -446,18 +371,12 @@ const onSubmitClean = async () => {
     }).then(async () => {
         loading.value = true;
         submitCleans.value = [];
-        let restart = false;
         loadSubmitCheck(cleanData.systemClean);
+        loadSubmitCheck(cleanData.backupClean);
         loadSubmitCheck(cleanData.uploadClean);
         loadSubmitCheck(cleanData.downloadClean);
         loadSubmitCheck(cleanData.systemLogClean);
         loadSubmitCheck(cleanData.containerClean);
-        for (const item of submitCleans.value) {
-            if (item.treeType === 'cache') {
-                restart = true;
-                break;
-            }
-        }
         await clean(submitCleans.value)
             .then(() => {
                 form.lastCleanSize = selectSize.value + '';
@@ -465,17 +384,6 @@ const onSubmitClean = async () => {
                 scanStatus.value = 'afterScan';
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loading.value = false;
-                if (restart) {
-                    let href = window.location.href;
-                    globalStore.isLogin = false;
-                    let address = href.split('://')[1];
-                    if (globalStore.entrance) {
-                        address = address.replaceAll('settings/panel', globalStore.entrance);
-                    } else {
-                        address = address.replaceAll('settings/panel', 'login');
-                    }
-                    window.open(`http://${address}`, '_self');
-                }
             })
             .catch(() => {
                 loading.value = false;
@@ -491,81 +399,76 @@ const search = async () => {
 };
 
 const loadSubmitCheck = (data: any) => {
-    if (data.children === null) {
-        if (data.isCheck) {
-            submitCleans.value.push({ treeType: data.type, name: data.name, size: data.size });
-        }
-        return;
-    }
-    for (const item of data) {
-        if (item.isCheck) {
+    const nodes = Array.isArray(data) ? data : [data];
+    for (const item of nodes) {
+        if (canDeleteNode(item) && item.isCheck) {
             submitCleans.value.push({ treeType: item.type, name: item.name, size: item.size });
-            continue;
         }
-        if (item.children) {
+        if (hasChildren(item)) {
             loadSubmitCheck(item.children);
         }
     }
 };
 
-const changeCheckStatus = (data: any, isCheck: boolean) => {
-    data.isCheck = isCheck;
+const changeCheckStatus = (data: any, checked: Array<string>) => {
+    data.isCheck = checked.indexOf(data.id) !== -1;
     if (data.children) {
         for (const item of data.children) {
-            changeCheckStatus(item, isCheck);
+            changeCheckStatus(item, checked);
         }
     }
 };
 
-function onChange(data: any, isCheck: boolean) {
-    changeCheckStatus(data, isCheck);
+function onChange(data: any, checked: any) {
+    let keys = checked.checkedKeys || [];
+    changeCheckStatus(data, keys);
     selectSize.value = 0;
     let systemSelects = systemRef.value.getCheckedNodes(false, true);
     for (const item of systemSelects) {
-        if (item.children === null) {
+        if (canDeleteNode(item)) {
+            selectSize.value = selectSize.value + Number(item.size);
+        }
+    }
+    let backupSelects = backupRef.value.getCheckedNodes(false, true);
+    for (const item of backupSelects) {
+        if (canDeleteNode(item)) {
             selectSize.value = selectSize.value + Number(item.size);
         }
     }
     let uploadSelects = uploadRef.value.getCheckedNodes(false, true);
     for (const item of uploadSelects) {
-        if (item.children === null) {
+        if (canDeleteNode(item)) {
             selectSize.value = selectSize.value + Number(item.size);
         }
     }
     let downloadSelects = downloadRef.value.getCheckedNodes(false, true);
     for (const item of downloadSelects) {
-        if (item.children === null) {
+        if (canDeleteNode(item)) {
             selectSize.value = selectSize.value + Number(item.size);
         }
     }
     let systemLogSelects = systemLogRef.value.getCheckedNodes(false, true);
     for (const item of systemLogSelects) {
-        if (item.children === null) {
+        if (canDeleteNode(item)) {
             selectSize.value = selectSize.value + Number(item.size);
         }
     }
     let containerSelects = containerRef.value.getCheckedNodes(false, true);
     for (const item of containerSelects) {
-        if (item.children === null) {
+        if (canDeleteNode(item)) {
             selectSize.value = selectSize.value + Number(item.size);
         }
     }
 }
 
 function loadCheck(data: any, checkList: any) {
-    if (data.children === null) {
-        if (data.isCheck) {
-            checkList.push(data.id);
-        }
-        return;
-    }
-    for (const item of data) {
-        if (item.isCheck) {
+    const nodes = Array.isArray(data) ? data : [data];
+    for (const item of nodes) {
+        if (canDeleteNode(item) && item.isCheck) {
             selectSize.value = selectSize.value + Number(item.size);
             checkList.push(item.id);
-            continue;
         }
-        if (item.children) {
+        if (hasChildren(item)) {
             loadCheck(item.children, checkList);
         }
     }
@@ -590,9 +493,6 @@ function loadTag(node: any, data: any) {
     if (data.label === 'upgrade') {
         return i18n.global.t('clean.upgradeHelper');
     }
-    if (data.label === 'cache') {
-        return i18n.global.t('clean.cacheHelper');
-    }
     return data.isRecommend ? i18n.global.t('clean.statusSuggest') : i18n.global.t('clean.statusWarning');
 }
 
@@ -600,16 +500,24 @@ function load18n(label: string) {
     switch (label) {
         case '1panel_original':
             return i18n.global.t('clean.panelOriginal');
-        case 'backup':
-            return i18n.global.t('clean.backup');
         case 'upgrade':
             return i18n.global.t('clean.upgrade');
-        case 'cache':
-            return i18n.global.t('clean.cache');
+        case 'agent_packages':
+            return i18n.global.t('clean.agentPackages');
         case 'snapshot':
             return i18n.global.t('clean.snapshot');
         case 'rollback':
             return i18n.global.t('clean.rollback');
+        case 'tmp_backup':
+            return i18n.global.t('clean.tmpBackup');
+        case 'unknown_app':
+            return i18n.global.t('clean.unknownApp');
+        case 'unknown_database':
+            return i18n.global.t('clean.unknownDatabase');
+        case 'unknown_website':
+            return i18n.global.t('clean.unknownWebsite');
+        case 'unknown_snapshot':
+            return i18n.global.t('clean.unknownSnapshot');
         case 'upload':
         case 'upload_tmp':
             return i18n.global.t('clean.upload');
@@ -635,6 +543,7 @@ function load18n(label: string) {
         case 'download_directory':
             return i18n.global.t('clean.directory');
         case 'system_log':
+            return i18n.global.t('logs.system');
         case 'tmp_backup_log':
             return i18n.global.t('clean.systemLog');
         case 'script':
@@ -650,8 +559,16 @@ function load18n(label: string) {
         case 'System':
         case 'Website':
             return i18n.global.t('menu.' + label.toLowerCase());
+        case 'Backup':
+            return i18n.global.t('logs.detail.backups');
+        case 'Tamper':
+            return i18n.global.t('xpack.tamper.tamper');
+        case 'TaskRollback':
+            return i18n.global.t('setting.rollback');
         case 'Script':
             return i18n.global.t('cronjob.library.library');
+        case 'ScriptLibrary':
+            return i18n.global.t('cronjob.library.remoteLibrary');
         case 'Compose':
             return i18n.global.t('container.compose');
         case 'CustomAppstore':
@@ -683,6 +600,12 @@ function load18n(label: string) {
             return i18n.global.t('clean.volumes');
         case 'build_cache':
             return i18n.global.t('clean.buildCache');
+        case 'website_log':
+            return i18n.global.t('logs.websiteLog');
+        case 'app_tmp_download':
+            return i18n.global.t('clean.appTmpDownload');
+        case 'unknown_website_log':
+            return i18n.global.t('clean.unknownWebsiteLog');
         default:
             return label;
     }
@@ -695,23 +618,14 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.app-card {
+.clean-card {
+    margin-top: 20px;
     cursor: pointer;
-    width: 100%;
+    border: var(--panel-border) !important;
 
-    &:hover .app-icon {
-        transform: scale(1.2);
-    }
-
-    .e-card {
-        margin-top: 20px;
+    &:hover {
         cursor: pointer;
-        border: var(--panel-border) !important;
-
-        &:hover {
-            cursor: pointer;
-            border: 1px solid var(--el-color-primary) !important;
-        }
+        border: 1px solid var(--el-color-primary) !important;
     }
 }
 
@@ -737,7 +651,7 @@ onMounted(() => {
 .svg-icon {
     font-size: 14px;
     float: right;
-    margin-right: 15px;
+    margin-right: 5px;
 }
 
 .tree-container {
@@ -755,31 +669,11 @@ onMounted(() => {
     width: 100%;
     max-height: 100%;
     overflow: auto;
-}
-.tree-node {
-    display: flex;
-    align-items: center;
-    justify-content: start;
-    gap: 1rem;
-    width: 100%;
-    overflow: hidden;
-}
-.tree-node-label {
-    flex-shrink: 0;
-    max-width: 60%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.tree-node-size {
-    flex-shrink: 0;
-    max-width: 25%;
-    white-space: nowrap;
-}
-.tree-node-tooltip {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline-block;
+
+    :deep(.el-tree-node .el-tree-node__content) {
+        width: fit-content;
+        overflow: auto;
+        min-width: 300px;
+    }
 }
 </style>

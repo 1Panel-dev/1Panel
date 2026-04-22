@@ -2,10 +2,12 @@ package service
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -23,7 +25,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
-	"golang.org/x/net/context"
 )
 
 const composeProjectLabel = "com.docker.compose.project"
@@ -73,6 +74,7 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 				Name:        container.Names[0][1:],
 				State:       container.State,
 				CreateTime:  time.Unix(container.Created, 0).Format(constant.DateTimeLayout),
+				Ports:       transPortToStr(container.Ports),
 			}
 			if compose, has := composeMap[name]; has {
 				compose.ContainerCount++
@@ -133,6 +135,7 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 
 	for key, value := range mergedMap {
 		value.Name = key
+		value.ComposeFileExists = composeFileExists(value.Workdir, value.ConfigFile)
 		records = append(records, value)
 	}
 	if len(req.Info) != 0 {
@@ -162,6 +165,29 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	return int64(total), listItem, nil
 }
 
+func composeFileExists(workdir, configFile string) bool {
+	workdir = strings.TrimSpace(workdir)
+	configFile = strings.TrimSpace(configFile)
+	if configFile == "" {
+		return false
+	}
+	for _, item := range strings.Split(configFile, ",") {
+		file := strings.TrimSpace(item)
+		if file == "" {
+			continue
+		}
+		if !filepath.IsAbs(file) && workdir != "" {
+			file = filepath.Join(workdir, file)
+		}
+		file = filepath.Clean(file)
+		info, err := os.Stat(file)
+		if err == nil && !info.IsDir() {
+			return true
+		}
+	}
+	return false
+}
+
 func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 	if cmd.CheckIllegal(req.Path) {
 		return false, buserr.New("ErrCmdIllegal")
@@ -179,7 +205,7 @@ func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 	cmd := getComposeCmd(req.Path, "config")
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
-		return false, errors.New(string(stdout))
+		return false, fmt.Errorf("docker-compose config failed, std: %s, err: %v", string(stdout), err)
 	}
 	return true, nil
 }
@@ -203,7 +229,7 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 	}
 	go func() {
 		taskItem.AddSubTask(i18n.GetMsgByKey("ComposeCreate"), func(t *task.Task) error {
-			err := compose.UpWithTask(req.Path, t)
+			err := compose.UpWithTask(req.Path, t, req.ForcePull)
 			t.LogWithStatus(i18n.GetMsgByKey("ComposeCreate"), err)
 			if err != nil {
 				_, _ = compose.Down(req.Path)
@@ -231,24 +257,24 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 			return err
 		}
 		if req.WithFile {
-			_ = os.RemoveAll(path.Dir(req.Path))
+			for _, item := range strings.Split(req.Path, ",") {
+				if len(item) != 0 {
+					_ = os.RemoveAll(path.Dir(item))
+				}
+			}
 		}
 		_ = composeRepo.DeleteRecord(repo.WithByName(req.Name))
 		return nil
 	}
-	if _, err := os.Stat(req.Path); err != nil {
-		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
-	}
 	if req.Operation == "up" {
 		if stdout, err := compose.Up(req.Path); err != nil {
-			return errors.New(string(stdout))
+			return fmt.Errorf("docker-compose up failed, std: %s, err: %v", stdout, err)
 		}
 	} else {
 		if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
-			return errors.New(string(stdout))
+			return fmt.Errorf("docker-compose %s failed, std: %s, err: %v", req.Operation, stdout, err)
 		}
 	}
-	global.LOG.Infof("docker-compose %s %s successful", req.Operation, req.Name)
 	return nil
 }
 
@@ -256,32 +282,105 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	if cmd.CheckIllegal(req.Name, req.Path) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	oldFile, err := os.ReadFile(req.Path)
+	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskUpdate, task.TaskScopeCompose, req.TaskID, 1)
 	if err != nil {
-		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
-	}
-	file, err := os.OpenFile(req.Path, os.O_WRONLY|os.O_TRUNC, 0640)
-	if err != nil {
+		global.LOG.Errorf("new task for update compose failed, err: %v", err)
 		return err
 	}
-	defer file.Close()
-	write := bufio.NewWriter(file)
-	_, _ = write.WriteString(req.Content)
-	write.Flush()
+	go func() {
+		taskItem.AddSubTask(i18n.GetMsgByKey("TaskUpdate"), func(t *task.Task) error {
+			oldFile, err := os.ReadFile(req.DetailPath)
+			if err != nil {
+				return fmt.Errorf("load file with path %s failed, %v", req.DetailPath, err)
+			}
+			file, err := os.OpenFile(req.DetailPath, os.O_WRONLY|os.O_TRUNC, 0640)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+			write := bufio.NewWriter(file)
+			_, _ = write.WriteString(req.Content)
+			write.Flush()
 
-	global.LOG.Infof("docker-compose.yml %s has been replaced, now start to docker-compose restart", req.Path)
-	if err := newComposeEnv(req.Path, req.Env); err != nil {
-		return err
-	}
+			global.LOG.Infof("docker-compose.yml %s has been replaced, now start to docker-compose restart", req.DetailPath)
+			if err := newComposeEnv(req.DetailPath, req.Env); err != nil {
+				return err
+			}
 
-	if stdout, err := compose.Up(req.Path); err != nil {
-		if err := recreateCompose(string(oldFile), req.Path); err != nil {
-			return fmt.Errorf("update failed when handle compose up, err: %s, recreate failed: %v", string(stdout), err)
-		}
-		return fmt.Errorf("update failed when handle compose up, err: %s", string(stdout))
-	}
+			if err := compose.UpWithTask(req.Path, t, req.ForcePull); err != nil {
+				global.LOG.Errorf("update failed when handle compose up, err: %s, now try to recreate the old compose file", err)
+				if err := recreateCompose(string(oldFile), req.Path); err != nil {
+					return fmt.Errorf("update failed and recreate old compose file also failed, err: %v", err)
+				}
+				return fmt.Errorf("update failed when handle compose up, err: %s", err)
+			}
+
+			return nil
+		}, nil)
+		_ = taskItem.Execute()
+	}()
 
 	return nil
+}
+
+func (u *ContainerService) ComposeLogClean(req dto.ComposeLogClean) error {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	options := container.ListOptions{All: true}
+	options.Filters = filters.NewArgs()
+	options.Filters.Add("label", composeProjectLabel)
+
+	list, err := client.ContainerList(context.Background(), options)
+	if err != nil {
+		return err
+	}
+	ctx := context.Background()
+	for _, item := range list {
+		if name, ok := item.Labels[composeProjectLabel]; ok {
+			if name != req.Name {
+				continue
+			}
+			containerItem, err := client.ContainerInspect(ctx, item.ID)
+			if err != nil {
+				return err
+			}
+			if err := client.ContainerStop(ctx, containerItem.ID, container.StopOptions{}); err != nil {
+				return err
+			}
+			file, err := os.OpenFile(containerItem.LogPath, os.O_RDWR|os.O_CREATE, constant.FilePerm)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+			if err = file.Truncate(0); err != nil {
+				return err
+			}
+			_, _ = file.Seek(0, 0)
+
+			files, _ := filepath.Glob(fmt.Sprintf("%s.*", containerItem.LogPath))
+			for _, file := range files {
+				_ = os.Remove(file)
+			}
+		}
+	}
+	return u.ComposeOperation(dto.ComposeOperation{
+		Name:      req.Name,
+		Path:      req.Path,
+		Operation: "restart",
+	})
+}
+
+func (u *ContainerService) LoadComposeEnv(name string) (string, error) {
+	envFilePath := path.Join(path.Dir(name), ".env")
+	file, err := os.ReadFile(envFilePath)
+	if err != nil {
+		return "", err
+	}
+	return string(file), nil
 }
 
 func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
@@ -352,40 +451,31 @@ func recreateCompose(content, path string) error {
 
 func loadEnv(list []dto.ComposeInfo) []dto.ComposeInfo {
 	for i := 0; i < len(list); i++ {
-		envFilePath := path.Join(path.Dir(list[i].Path), "1panel.env")
+		tmpPath := list[i].Path
+		if strings.Contains(list[i].Path, ",") {
+			tmpPath = strings.Split(list[i].Path, ",")[0]
+		}
+		envFilePath := path.Join(path.Dir(tmpPath), ".env")
 		file, err := os.ReadFile(envFilePath)
 		if err != nil {
 			continue
 		}
-		lines := strings.Split(string(file), "\n")
-		for _, line := range lines {
-			lineItem := strings.TrimSpace(line)
-			if len(lineItem) != 0 && !strings.HasPrefix(lineItem, "#") {
-				list[i].Env = append(list[i].Env, lineItem)
-			}
-		}
+		list[i].Env = string(file)
 	}
 	return list
 }
 
-func newComposeEnv(pathItem string, env []string) error {
-	if len(env) == 0 {
-		return nil
-	}
-	envFilePath := path.Join(path.Dir(pathItem), "1panel.env")
+func newComposeEnv(pathItem string, env string) error {
+	envFilePath := path.Join(path.Dir(pathItem), ".env")
 	file, err := os.OpenFile(envFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
 		global.LOG.Errorf("failed to create env file: %v", err)
 		return err
 	}
 	defer file.Close()
-	for _, env := range env {
-		envItem := strings.TrimSpace(env)
-		if _, err := file.WriteString(fmt.Sprintf("%s\n", envItem)); err != nil {
-			global.LOG.Errorf("failed to write env to file: %v", err)
-			return err
-		}
+	if _, err := file.WriteString(env); err != nil {
+		global.LOG.Errorf("failed to write env to file: %v", err)
+		return err
 	}
-	global.LOG.Infof("1panel.env file successfully created or updated with env variables in %s", envFilePath)
 	return nil
 }

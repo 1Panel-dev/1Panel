@@ -278,6 +278,10 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 }
 
 func handleProcess(supervisordDir string, req request.SupervisorProcessConfig, containerName string) error {
+	safeName := path.Base(req.Name)
+	if safeName != req.Name || strings.Contains(safeName, "..") {
+		return buserr.New("ErrInvalidParams")
+	}
 	var (
 		fileOp     = files.NewFileOp()
 		logDir     = path.Join(supervisordDir, "log")

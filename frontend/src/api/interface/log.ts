@@ -44,6 +44,7 @@ export namespace Log {
     export interface SearchTaskReq extends ReqPage {
         type: string;
         status: string;
+        taskID?: string;
     }
 
     export interface Task {
@@ -56,6 +57,10 @@ export namespace Log {
         operationLogID: number;
         resourceID: number;
         currentStep: string;
+        progressCurrent: number;
+        progressTotal: number;
+        progressPercent: number;
+        progressMessage: string;
         endAt: Date;
         createdAt: Date;
     }

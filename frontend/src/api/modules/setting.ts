@@ -1,6 +1,6 @@
 import http from '@/api';
-import { deepCopy } from '@/utils/util';
-import { Base64 } from 'js-base64';
+import { deepCopy } from '@/utils/misc';
+import { encodeBase64Fields } from '@/utils/base64';
 import { ResPage, SearchWithPage, DescriptionUpdate, ReqPage } from '../interface';
 import { Setting } from '../interface/setting';
 import { TimeoutEnum } from '@/enums/http-enum';
@@ -55,9 +55,14 @@ export const getLicenseSmsInfo = () => {
     return http.get<Setting.SmsInfo>(`/core/licenses/sms/info`);
 };
 
+export const listAppNodes = () => {
+    return http.get<Array<Setting.NodeAppItem>>(`/core/xpack/nodes/apps/update`, {}, { timeout: TimeoutEnum.T_60S });
+};
+
 // agent
-export const loadBaseDir = () => {
-    return http.get<string>(`/settings/basedir`);
+export const loadBaseDir = (node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.get<string>(`/settings/basedir${query}`);
 };
 export const loadDaemonJsonPath = () => {
     return http.get<string>(`/settings/daemonjson`, {});
@@ -67,6 +72,24 @@ export const updateAgentSetting = (param: Setting.SettingUpdate) => {
 };
 export const getAgentSettingInfo = () => {
     return http.post<Setting.SettingInfo>(`/settings/search`);
+};
+export const getAgentTerminalAIInfo = () => {
+    return http.post<Setting.TerminalAIInfo>(`/settings/terminal/ai/search`);
+};
+export const updateAgentTerminalAIInfo = (param: Setting.TerminalAIInfo) => {
+    return http.post(`/settings/terminal/ai/update`, param);
+};
+export const getAgentFileManageAIInfo = () => {
+    return http.post<Setting.FileManageAIInfo>(`/settings/files/ai/search`);
+};
+export const updateAgentFileManageAIInfo = (param: Setting.FileManageAIInfo) => {
+    return http.post(`/settings/files/ai/update`, param);
+};
+export const getAgentFileHistoryInfo = () => {
+    return http.post<Setting.FileHistoryInfo>(`/settings/file-history/search`);
+};
+export const updateAgentFileHistoryInfo = (param: Setting.FileHistoryInfo) => {
+    return http.post(`/settings/file-history/update`, param);
 };
 export const getAgentSettingByKey = (key: string) => {
     return http.get<string>(`/settings/get/${key}`);
@@ -102,9 +125,7 @@ export const defaultMenu = () => {
 };
 export const updateProxy = (params: Setting.ProxyUpdate) => {
     let request = deepCopy(params) as Setting.ProxyUpdate;
-    if (request.proxyPasswd) {
-        request.proxyPasswd = Base64.encode(request.proxyPasswd);
-    }
+    encodeBase64Fields(request, ['proxyPasswd']);
     request.proxyType = request.proxyType === 'close' ? '' : request.proxyType;
     return http.post(`/core/settings/proxy/update`, request);
 };
@@ -137,6 +158,18 @@ export const loadMFA = (param: Setting.MFARequest) => {
 };
 export const bindMFA = (param: Setting.MFABind) => {
     return http.post(`/core/settings/mfa/bind`, param);
+};
+export const passkeyRegisterBegin = (param: Setting.PasskeyRegisterRequest) => {
+    return http.post<Setting.PasskeyBeginResponse>(`/core/settings/passkey/register/begin`, param);
+};
+export const passkeyRegisterFinish = (param: Record<string, any>, sessionId: string) => {
+    return http.post(`/core/settings/passkey/register/finish`, param, undefined, { 'Passkey-Session': sessionId });
+};
+export const passkeyList = () => {
+    return http.get<Array<Setting.PasskeyInfo>>(`/core/settings/passkey/list`);
+};
+export const passkeyDelete = (id: string) => {
+    return http.delete(`/core/settings/passkey/${id}`);
 };
 export const getAppStoreConfig = (node?: string) => {
     const params = node ? `?operateNode=${node}` : '';
@@ -195,4 +228,12 @@ export const generateApiKey = () => {
 };
 export const updateApiConfig = (param: Setting.ApiConfig) => {
     return http.post(`/core/settings/api/config/update`, param);
+};
+
+// memo
+export const getMemo = () => {
+    return http.get<string>(`/core/settings/memo`);
+};
+export const updateMemo = (content: string) => {
+    return http.post(`/core/settings/memo`, { content });
 };

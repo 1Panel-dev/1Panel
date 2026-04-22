@@ -26,6 +26,23 @@ func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
 }
 
 // @Tags Backup Account
+// @Summary Check backup account
+// @Accept json
+// @Param request body dto.BackupOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /backups/check [post]
+func (b *BaseApi) CheckBackup(c *gin.Context) {
+	var req dto.BackupOperate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	helper.SuccessWithData(c, backupService.CheckConn(req))
+}
+
+// @Tags Backup Account
 // @Summary Create backup account
 // @Accept json
 // @Param request body dto.BackupOperate true "request"
@@ -398,6 +415,11 @@ func (b *BaseApi) Backup(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
+	case "mongodb":
+		if err := backupService.MongodbBackup(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
 	case constant.AppPostgresql, constant.AppPostgresqlCluster:
 		if err := backupService.PostgresqlBackup(req); err != nil {
 			helper.InternalServer(c, err)
@@ -410,6 +432,16 @@ func (b *BaseApi) Backup(c *gin.Context) {
 		}
 	case "redis", constant.AppRedisCluster:
 		if err := backupService.RedisBackup(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+	case "container":
+		if err := backupService.ContainerBackup(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+	case "compose":
+		if err := backupService.ComposeBackup(req); err != nil {
 			helper.InternalServer(c, err)
 			return
 		}
@@ -448,6 +480,11 @@ func (b *BaseApi) Recover(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
+	case "mongodb":
+		if err := backupService.MongodbRecover(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
 	case constant.AppPostgresql, constant.AppPostgresqlCluster:
 		if err := backupService.PostgresqlRecover(req); err != nil {
 			helper.InternalServer(c, err)
@@ -465,6 +502,16 @@ func (b *BaseApi) Recover(c *gin.Context) {
 		}
 	case "app":
 		if err := backupService.AppRecover(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+	case "container":
+		if err := backupService.ContainerRecover(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+	case "compose":
+		if err := backupService.ComposeRecover(req); err != nil {
 			helper.InternalServer(c, err)
 			return
 		}
@@ -493,6 +540,11 @@ func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
+	case "mongodb":
+		if err := backupService.MongodbRecoverByUpload(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
 	case constant.AppPostgresql, constant.AppPostgresqlCluster:
 		if err := backupService.PostgresqlRecoverByUpload(req); err != nil {
 			helper.InternalServer(c, err)
@@ -505,6 +557,16 @@ func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 		}
 	case "website":
 		if err := backupService.WebsiteRecover(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+	case "container":
+		if err := backupService.ContainerRecover(req); err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+	case "compose":
+		if err := backupService.ComposeRecover(req); err != nil {
 			helper.InternalServer(c, err)
 			return
 		}

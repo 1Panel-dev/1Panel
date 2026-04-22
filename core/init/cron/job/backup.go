@@ -7,7 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
-	"github.com/1Panel-dev/1Panel/core/utils/cloud_storage/client"
+	"github.com/1Panel-dev/1Panel/core/utils/cloud_storage"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 )
 
@@ -39,9 +39,9 @@ func (b *backup) Run() {
 		)
 		switch backupItem.Type {
 		case constant.OneDrive:
-			refreshToken, err = client.RefreshToken("refresh_token", "refreshToken", varMap)
+			refreshToken, err = cloud_storage.RefreshToken("refresh_token", "refreshToken", varMap)
 		case constant.ALIYUN:
-			refreshToken, err = client.RefreshALIToken(varMap)
+			refreshToken, err = cloud_storage.RefreshALIToken(varMap)
 		}
 		if err != nil {
 			varMap["refresh_status"] = constant.StatusFailed

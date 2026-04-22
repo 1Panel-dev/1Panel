@@ -45,7 +45,7 @@
 import { containerPrune, imageRemove, listAllImage } from '@/api/modules/container';
 import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
-import { newUUID } from '@/utils/util';
+import { newUUID } from '@/utils/id';
 import { ref } from 'vue';
 
 const dialogVisible = ref(false);
@@ -78,6 +78,9 @@ const acceptParams = async (): Promise<void> => {
             unUsedList.value.push(item);
         }
     }
+    checkedLists.value = [];
+    checkAll.value = false;
+    isIndeterminate.value = false;
     dialogVisible.value = true;
     scope.value = 'untag';
     changeScope();
@@ -89,14 +92,14 @@ const changeScope = () => {
     if (scope.value === 'untag') {
         data.value = unTagList.value || [];
         showMsg.value =
-            data.value.length === 0
+            data.value.length !== 0
                 ? i18n.global.t('container.imagePruneSomeHelper')
                 : i18n.global.t('container.imagePruneSomeEmpty');
         return;
     }
     data.value = unUsedList.value || [];
     showMsg.value =
-        data.value.length === 0
+        data.value.length !== 0
             ? i18n.global.t('container.imagePruneAllHelper')
             : i18n.global.t('container.imagePruneAllEmpty');
     return;

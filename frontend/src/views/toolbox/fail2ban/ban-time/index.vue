@@ -31,8 +31,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { updateFail2ban } from '@/api/modules/toolbox';
-import { splitTime, transTimeUnit } from '@/utils/util';
-
+import { splitTime, transTimeUnit } from '@/utils/validate';
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 interface DialogProps {

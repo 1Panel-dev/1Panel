@@ -4,8 +4,9 @@ const (
 	WebRunning = "Running"
 	WebStopped = "Stopped"
 
-	ProtocolHTTP  = "HTTP"
-	ProtocolHTTPS = "HTTPS"
+	ProtocolHTTP   = "HTTP"
+	ProtocolHTTPS  = "HTTPS"
+	ProtocolStream = "TCP/UDP"
 
 	NewApp       = "new"
 	InstalledApp = "installed"
@@ -15,6 +16,7 @@ const (
 	Proxy      = "proxy"
 	Runtime    = "runtime"
 	Subsite    = "subsite"
+	Stream     = "stream"
 
 	SSLExisted = "existed"
 	SSLAuto    = "auto"
@@ -29,6 +31,7 @@ const (
 
 	StartWeb = "start"
 	StopWeb  = "stop"
+	SetHttps = "setHttps"
 
 	HTTPSOnly   = "HTTPSOnly"
 	HTTPAlso    = "HTTPAlso"

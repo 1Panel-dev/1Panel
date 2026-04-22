@@ -51,28 +51,6 @@ func (b *BaseApi) RefreshToken(c *gin.Context) {
 }
 
 // @Tags Backup Account
-// @Summary List buckets
-// @Accept json
-// @Param request body dto.ForBuckets true "request"
-// @Success 200 {array} string
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/backups/buckets [post]
-func (b *BaseApi) ListBuckets(c *gin.Context) {
-	var req dto.ForBuckets
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	buckets, err := backupService.GetBuckets(req)
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, buckets)
-}
-
-// @Tags Backup Account
 // @Summary Load backup account base info
 // @Accept json
 // @Success 200 {object} dto.BackupClientInfo

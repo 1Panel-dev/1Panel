@@ -44,8 +44,7 @@ import { imagePush } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgSuccess } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
-import { newUUID } from '@/utils/util';
-
+import { newUUID } from '@/utils/id';
 const drawerVisible = ref(false);
 const taskLogRef = ref();
 const form = reactive({
@@ -80,7 +79,7 @@ const formRef = ref<FormInstance>();
 
 const handleChange = () => {
     let repoURL = loadDetailInfo(form.repoID);
-    form.name = form.tagName.indexOf(repoURL) !== -1 ? form.tagName.replaceAll(repoURL, '') : form.tagName;
+    form.name = form.tagName.indexOf(repoURL) !== -1 ? form.tagName.replaceAll(repoURL + '/', '') : form.tagName;
 };
 
 const onSubmit = async (formEl: FormInstance | undefined) => {

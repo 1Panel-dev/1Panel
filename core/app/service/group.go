@@ -32,8 +32,8 @@ func NewIGroupService() IGroupService {
 
 func (u *GroupService) List(req dto.OperateByType) ([]dto.GroupInfo, error) {
 	options := []global.DBOption{
-		repo.WithOrderBy("is_default desc"),
-		repo.WithOrderBy("created_at desc"),
+		repo.WithOrderDesc("is_default"),
+		repo.WithOrderDesc("created_at"),
 	}
 	if len(req.Type) != 0 {
 		options = append(options, repo.WithByType(req.Type))
@@ -100,10 +100,8 @@ func (u *GroupService) Delete(id uint) error {
 		return err
 	}
 	switch group.Type {
-	case "host":
-		err = hostRepo.UpdateGroup(id, defaultGroup.ID)
 	case "script":
-		err = hostRepo.UpdateGroup(id, defaultGroup.ID)
+		err = scriptRepo.UpdateGroup(id, defaultGroup.ID)
 	case "command":
 		err = commandRepo.UpdateGroup(id, defaultGroup.ID)
 	case "node":

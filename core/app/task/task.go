@@ -3,7 +3,6 @@ package task
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"strconv"
@@ -11,55 +10,62 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 type ActionFunc func(*Task) error
 type RollbackFunc func(*Task)
 
 type Task struct {
-	Name      string
-	TaskID    string
-	Logger    *log.Logger
-	SubTasks  []*SubTask
-	Rollbacks []RollbackFunc
-	logFile   *os.File
-	taskRepo  repo.ITaskRepo
-	Task      *model.Task
-	ParentID  string
+	Name              string
+	TaskID            string
+	Logger            *logrus.Logger
+	SubTasks          []*SubTask
+	Rollbacks         []RollbackFunc
+	logFile           *os.File
+	taskRepo          repo.ITaskRepo
+	Task              *model.Task
+	ParentID          string
+	CancelWhenTimeout bool
 }
 
 type SubTask struct {
-	RootTask  *Task
-	Name      string
-	StepAlias string
-	Retry     int
-	Timeout   time.Duration
-	Action    ActionFunc
-	Rollback  RollbackFunc
-	Error     error
-	IgnoreErr bool
+	RootTask          *Task
+	Name              string
+	StepAlias         string
+	Retry             int
+	Timeout           time.Duration
+	Action            ActionFunc
+	Rollback          RollbackFunc
+	Error             error
+	IgnoreErr         bool
+	CancelWhenTimeout bool
 }
 
 const (
 	TaskUpgrade        = "TaskUpgrade"
 	TaskAddNode        = "TaskAddNode"
 	TaskSync           = "TaskSync"
+	TaskSyncForNode    = "TaskSyncForNode"
 	TaskRsync          = "TaskRsync"
 	TaskInstallCluster = "TaskInstallCluster"
 	TaskCreateCluster  = "TaskCreateCluster"
 	TaskBackup         = "TaskBackup"
+	TaskPush           = "TaskPush"
 )
 
 const (
-	TaskScopeSystem    = "System"
-	TaskScopeScript    = "Script"
-	TaskScopeNodeFile  = "NodeFile"
-	TaskScopeAppBackup = "AppBackup"
-	TaskScopeCluster   = "Cluster"
+	TaskScopeSystem     = "System"
+	TaskScopeScript     = "ScriptLibrary"
+	TaskScopeNodeFile   = "NodeFile"
+	TaskScopeAppBackup  = "AppBackup"
+	TaskScopeCluster    = "Cluster"
+	TaskScopeAppInstall = "AppInstallTask"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {
@@ -82,11 +88,13 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 		}
 	}
 	logPath := path.Join(logItem, taskScope, taskID+".log")
-	file, err := os.OpenFile(logPath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
+	logger := logrus.New()
+	logger.SetFormatter(&SimpleFormatter{})
+	logFile, err := os.OpenFile(logPath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}
-	logger := log.New(file, "", log.LstdFlags)
+	logger.SetOutput(logFile)
 	taskModel := &model.Task{
 		ID:         taskID,
 		Name:       name,
@@ -97,7 +105,7 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 		Operate:    operate,
 	}
 	taskRepo := repo.NewITaskRepo()
-	task := &Task{Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: taskModel}
+	task := &Task{Name: name, logFile: logFile, Logger: logger, taskRepo: taskRepo, Task: taskModel}
 	return task, nil
 }
 
@@ -143,6 +151,9 @@ func (s *SubTask) Execute() error {
 		select {
 		case <-ctx.Done():
 			s.RootTask.Log(i18n.GetWithName("TaskTimeout", subTaskName))
+			if s.CancelWhenTimeout {
+				return buserr.New(i18n.GetWithName("TaskTimeout", subTaskName))
+			}
 		case err = <-done:
 			if err != nil {
 				s.RootTask.Log(i18n.GetWithNameAndErr("SubTaskFailed", subTaskName, err))
@@ -173,6 +184,7 @@ func (t *Task) Execute() error {
 	var err error
 	t.Log(i18n.GetWithName("TaskStart", t.Name))
 	for _, subTask := range t.SubTasks {
+		subTask.CancelWhenTimeout = t.CancelWhenTimeout
 		t.Task.CurrentStep = subTask.StepAlias
 		t.updateTask(t.Task)
 		if err = subTask.Execute(); err == nil {
@@ -255,4 +267,12 @@ func (t *Task) LogSuccessWithOps(operate, msg string) {
 
 func (t *Task) LogFailedWithOps(operate, msg string, err error) {
 	t.Logger.Printf("%s%s%s : %s ", i18n.GetMsgByKey(operate), msg, i18n.GetMsgByKey("Failed"), err.Error())
+}
+
+type SimpleFormatter struct{}
+
+func (f *SimpleFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	timestamp := entry.Time.Format("2006/01/02 15:04:05")
+	message := fmt.Sprintf("%s %s\n", timestamp, entry.Message)
+	return []byte(message), nil
 }

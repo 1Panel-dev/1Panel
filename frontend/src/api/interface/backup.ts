@@ -25,6 +25,11 @@ export namespace Backup {
         varsJson: object;
         createdAt: Date;
     }
+    export interface CheckResult {
+        isOk: boolean;
+        msg: string;
+        token: string;
+    }
     export interface ClientInfo {
         client_id: string;
         client_secret: string;
@@ -88,6 +93,7 @@ export namespace Backup {
         detailName: string;
         secret: string;
         taskID: string;
+        stopBefore?: boolean;
     }
     export interface Recover {
         downloadAccountID: number;
@@ -97,5 +103,6 @@ export namespace Backup {
         file: string;
         secret: string;
         taskID: string;
+        dropAllCollections?: boolean;
     }
 }

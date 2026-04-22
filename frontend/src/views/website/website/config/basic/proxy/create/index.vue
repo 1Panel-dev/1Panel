@@ -57,7 +57,7 @@
                                 <span class="font-medium">{{ $t('website.sni') }}</span>
                                 <span class="input-help">{{ $t('website.sniHelper') }}</span>
                             </div>
-                            <el-switch v-model="proxy.sni" size="large" />
+                            <el-switch v-model="proxy.sni" size="large" @change="handleSNIChange" />
                         </div>
 
                         <el-form-item
@@ -68,6 +68,14 @@
                         >
                             <el-input v-model.trim="proxy.proxySSLName" />
                         </el-form-item>
+
+                        <div class="flex justify-between items-center py-3">
+                            <div class="flex flex-col gap-1">
+                                <span class="font-medium">{{ $t('website.proxySslVerify') }}</span>
+                                <span class="input-help">{{ $t('website.proxySslVerifyHelper') }}</span>
+                            </div>
+                            <el-switch v-model="proxy.sslVerify" size="large" />
+                        </div>
                     </template>
                 </el-tab-pane>
 
@@ -124,24 +132,31 @@
                         </div>
                         <el-button-group>
                             <el-button
-                                :type="proxy.browserCache ? 'primary' : 'default'"
-                                @click="changeBrowserCache(true)"
+                                :type="proxy.browserCache === 'enable' ? 'primary' : 'default'"
+                                @click="changeBrowserCache('enable')"
                                 size="small"
                             >
                                 {{ $t('commons.button.enable') }}
                             </el-button>
                             <el-button
-                                :type="!proxy.browserCache ? 'primary' : 'default'"
-                                @click="changeBrowserCache(false)"
+                                :type="proxy.browserCache === 'disable' ? 'primary' : 'default'"
+                                @click="changeBrowserCache('disable')"
                                 size="small"
                             >
                                 {{ $t('commons.button.disable') }}
+                            </el-button>
+                            <el-button
+                                :type="proxy.browserCache === 'noModify' ? 'primary' : 'default'"
+                                @click="changeBrowserCache('noModify')"
+                                size="small"
+                            >
+                                {{ $t('website.noModify') }}
                             </el-button>
                         </el-button-group>
                     </div>
 
                     <el-collapse-transition>
-                        <div v-if="proxy.browserCache" class="mt-4 mb-6">
+                        <div v-if="proxy.browserCache === 'enable'" class="mt-4 mb-6">
                             <el-form-item :label="$t('website.browserCacheTime')" prop="cacheTime">
                                 <el-input v-model.number="proxy.cacheTime" maxlength="15" class="!w-64">
                                     <template #append>
@@ -230,11 +245,11 @@ import { operateProxyConfig } from '@/api/modules/website';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Website } from '@/api/interface/website';
 import { Units } from '@/global/mimetype';
-import { isDomain } from '@/utils/util';
+import { isDomain } from '@/utils/validate';
 import { Delete, Plus } from '@element-plus/icons-vue';
 import CorsSetting from '@/views/website/website/cors/index.vue';
 
@@ -251,14 +266,16 @@ const rules = ref({
 const open = ref(false);
 const loading = ref(false);
 const activeTab = ref('basic');
+const shouldAutoEnableSNI = ref(false);
+const sniTouched = ref(false);
 
 const initData = (): Website.ProxyConfig => ({
     id: 0,
     operate: 'create',
     enable: true,
     cache: false,
-    cacheTime: 4,
-    cacheUnit: 'h',
+    cacheTime: 0,
+    cacheUnit: '',
     name: '',
     modifier: '',
     match: '/',
@@ -270,9 +287,10 @@ const initData = (): Website.ProxyConfig => ({
     proxyProtocol: 'http://',
     sni: false,
     proxySSLName: '',
+    sslVerify: false,
     serverCacheTime: 10,
     serverCacheUnit: 'm',
-    browserCache: false,
+    browserCache: 'noModify',
     cors: false,
     allowOrigins: '*',
     allowMethods: 'GET,POST,OPTIONS,PUT,DELETE',
@@ -293,10 +311,16 @@ const acceptParams = (proxyParam: Website.ProxyConfig) => {
     replaces.value = [];
     proxy.value = proxyParam;
     activeTab.value = 'basic';
+    shouldAutoEnableSNI.value = proxy.value.operate === 'create';
+    sniTouched.value = false;
 
     // Initialize browserCache based on cacheTime value
-    if (proxy.value.browserCache === undefined) {
-        proxy.value.browserCache = proxy.value.cacheTime > 0;
+    if (proxy.value.cacheTime > 0) {
+        proxy.value.browserCache = 'enable';
+    } else if (proxy.value.cacheTime === 0) {
+        proxy.value.browserCache = 'noModify';
+    } else {
+        proxy.value.browserCache = 'disable';
     }
 
     const res = getProtocolAndHost(proxyParam.proxyPass);
@@ -326,11 +350,14 @@ const changeServerCache = (cache: boolean) => {
     }
 };
 
-const changeBrowserCache = (cache: boolean) => {
-    proxy.value.browserCache = cache;
-    if (cache) {
+const changeBrowserCache = (mode: 'enable' | 'disable' | 'noModify') => {
+    proxy.value.browserCache = mode;
+    if (mode === 'enable') {
         proxy.value.cacheTime = 4;
         proxy.value.cacheUnit = 'h';
+    } else if (mode === 'disable') {
+        proxy.value.cacheTime = -1;
+        proxy.value.cacheUnit = '';
     } else {
         proxy.value.cacheTime = 0;
         proxy.value.cacheUnit = '';
@@ -343,6 +370,10 @@ const addReplaces = () => {
 
 const removeReplace = (index: number) => {
     replaces.value.splice(index, 1);
+};
+
+const handleSNIChange = () => {
+    sniTouched.value = true;
 };
 
 const getProxyHost = () => {
@@ -410,6 +441,16 @@ const getProtocolAndHost = (url: string): { protocol: string; host: string } | n
     }
     return { protocol: '', host: url };
 };
+
+watch(
+    () => proxy.value.proxyProtocol,
+    (protocol) => {
+        if (proxy.value.operate !== 'create' || sniTouched.value || !shouldAutoEnableSNI.value) {
+            return;
+        }
+        proxy.value.sni = protocol === 'https://';
+    },
+);
 
 defineExpose({
     acceptParams,

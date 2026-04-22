@@ -5,7 +5,7 @@
                 <div class="detail flex">
                     <div class="w-12 h-12 rounded p-1 shadow-md icon">
                         <img
-                            :src="getAppIconUrl(app.id, currentNode)"
+                            :src="getAppIconUrl(app.key, currentNode)"
                             alt="App Icon"
                             class="w-full h-full rounded"
                             style="object-fit: contain"
@@ -66,22 +66,22 @@
                     </el-descriptions>
                 </div>
             </div>
-            <MdEditor previewOnly v-model="app.readMe" :theme="isDarkTheme ? 'dark' : 'light'" />
+            <MarkDownEditor :content="app.readMe" />
         </template>
     </DrawerPro>
     <Install ref="installRef" />
 </template>
 
 <script lang="ts" setup>
+import MarkDownEditor from '@/components/mkdown-editor/index.vue';
+
 import { getAppByKey, getAppDetail, getAppIconUrl } from '@/api/modules/app';
-import MdEditor from 'md-editor-v3';
 import { ref } from 'vue';
 import Install from './install/index.vue';
-import { computeSizeFromMB } from '@/utils/util';
+import { computeSizeFromMB } from '@/utils/size';
 import { jumpToInstall } from '@/utils/app';
-
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { currentNode, isDarkTheme } = useGlobalStore();
+const { currentNode } = useGlobalStore();
 
 const app = ref<any>({});
 const appDetail = ref<any>({});
@@ -110,7 +110,6 @@ const getApp = async () => {
     try {
         const res = await getAppByKey(appKey.value);
         app.value = res.data;
-        app.value.icon = 'data:image/png;base64,' + res.data.icon;
         version.value = app.value.versions[0];
         getDetail(app.value.id, version.value);
     } finally {
@@ -169,6 +168,7 @@ defineExpose({
     }
 
     .icon {
+        flex-shrink: 0;
         width: 180px;
         height: 180px;
         background-color: #ffffff;

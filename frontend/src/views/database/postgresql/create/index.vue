@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="createVisible" :header="$t('database.create')" @close="handleClose" size="small">
+    <DrawerPro v-model="createVisible" :header="$t('commons.button.create')" @close="handleClose" size="small">
         <div v-loading="loading">
             <el-form ref="formRef" label-position="top" :model="form" :rules="rules">
                 <el-form-item :label="$t('commons.table.name')" prop="name">
@@ -49,8 +49,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { addPostgresqlDB } from '@/api/modules/database';
 import { MsgSuccess } from '@/utils/message';
-import { getRandomStr } from '@/utils/util';
-
+import { getRandomStr } from '@/utils/id';
 const loading = ref();
 const createVisible = ref(false);
 const form = reactive({

@@ -30,12 +30,14 @@ export interface GlobalState {
     isLoading: boolean;
     loadingText: string;
     isLogin: boolean;
+    csrfToken: string;
     entrance: string;
     language: string; // zh | en | tw
     themeConfig: ThemeConfigProp;
     isFullScreen: boolean;
     openMenuTabs: boolean;
-    watermark: Watermark;
+    watermark: Watermark | null;
+    watermarkShow: boolean;
     isOnRestart: boolean;
     agreeLicense: boolean;
     hasNewVersion: boolean;
@@ -43,7 +45,9 @@ export interface GlobalState {
     device: DeviceType;
     lastFilePath: string;
     currentDB: string;
+    currentPgDB: string;
     currentRedisDB: string;
+    currentMongodbDB: string;
     showEntranceWarn: boolean;
     defaultNetwork: string;
     defaultIO: string;
@@ -51,6 +55,7 @@ export interface GlobalState {
 
     isProductPro: boolean;
     isIntl: boolean;
+    docWithRegion: boolean;
     productProExpires: number;
     isMasterProductPro: boolean;
     isOffLine: boolean;
@@ -70,6 +75,9 @@ export interface TerminalState {
     lineHeight: number;
     letterSpacing: number;
     fontSize: number;
+    fontFamily: string;
+    backgroundColor: string;
+    foregroundColor: string;
     cursorBlink: string;
     cursorStyle: string;
     scrollback: number;

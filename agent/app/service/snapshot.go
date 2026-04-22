@@ -224,12 +224,16 @@ func loadApps(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 	appTreeMap := make(map[string]dto.DataTree)
 	for _, app := range apps {
 		itemApp := dto.DataTree{
-			ID:    uuid.NewString(),
-			Label: fmt.Sprintf("%s - %s", app.App.Name, app.Name),
-			Key:   app.App.Key,
-			Name:  app.Name,
+			ID:      uuid.NewString(),
+			Label:   fmt.Sprintf("%s - %s", app.App.Name, app.Name),
+			Key:     app.App.Key,
+			Name:    app.Name,
+			IsLocal: app.App.Resource == "local",
 		}
 		appPath := path.Join(global.Dir.DataDir, "apps", app.App.Key, app.Name)
+		if itemApp.IsLocal {
+			appPath = path.Join(global.Dir.AppDir, "local", strings.TrimPrefix(app.App.Key, "local"), app.Name)
+		}
 		itemAppData := dto.DataTree{ID: uuid.NewString(), Label: "appData", Key: app.App.Key, Name: app.Name, IsCheck: true, Path: appPath}
 		if app.App.Key == constant.AppOpenresty && len(websites) != 0 {
 			itemAppData.IsDisable = true
@@ -295,7 +299,11 @@ func loadAppImage(list []dto.DataTree) []dto.DataTree {
 
 	for i := 0; i < len(list); i++ {
 		itemAppImage := dto.DataTree{ID: uuid.NewString(), Label: "appImage"}
-		stdout, err := cmd.RunDefaultWithStdoutBashCf("cat %s | grep image: ", path.Join(global.Dir.AppDir, list[i].Key, list[i].Name, "docker-compose.yml"))
+		appPath := path.Join(global.Dir.DataDir, "apps", list[i].Key, list[i].Name)
+		if list[i].IsLocal {
+			appPath = path.Join(global.Dir.AppDir, "local", strings.TrimPrefix(list[i].Key, "local"), list[i].Name)
+		}
+		stdout, err := cmd.RunDefaultWithStdoutBashCf("cat %s | grep image: ", path.Join(appPath, "docker-compose.yml"))
 		if err != nil {
 			list[i].Children = append(list[i].Children, itemAppImage)
 			continue
@@ -328,11 +336,26 @@ func loadPanelFile(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 			Path:    path.Join(global.Dir.DataDir, fileItem.Name()),
 		}
 		switch itemData.Label {
-		case "agent", "runtime", "docker", "task", "geo", "secret", "uploads":
+		case "runtime", "docker", "task", "geo", "secret", "uploads":
 			itemData.IsDisable = true
 		case "clamav", "download":
 			panelPath := path.Join(global.Dir.DataDir, itemData.Label)
 			itemData.Children, _ = loadFile(panelPath, 3, fileOp)
+		case "agent":
+			panelPath := path.Join(global.Dir.DataDir, itemData.Label)
+			itemData.Children, _ = loadFile(panelPath, 2, fileOp)
+			itemData.IsCheck = false
+			for i := 0; i < len(itemData.Children); i++ {
+				if itemData.Children[i].Label != "package" {
+					itemData.Children[i].IsDisable = true
+				} else {
+					itemData.Size = -itemData.Children[i].Size
+					itemData.Children[i].IsCheck = false
+					for j := 0; j < len(itemData.Children[i].Children); j++ {
+						itemData.Children[i].Children[j].IsCheck = false
+					}
+				}
+			}
 		case "apps", "backup", "log", "db", "tmp":
 			continue
 		}
@@ -341,7 +364,7 @@ func loadPanelFile(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 			if err != nil {
 				continue
 			}
-			itemData.Size = uint64(sizeItem)
+			itemData.Size = uint64(int64(sizeItem) + int64(itemData.Size))
 		} else {
 			fileInfo, err := fileItem.Info()
 			if err != nil {

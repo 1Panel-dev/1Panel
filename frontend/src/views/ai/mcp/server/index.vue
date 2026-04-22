@@ -5,7 +5,7 @@
             <template #leftToolBar>
                 <div class="flex flex-wrap gap-3">
                     <el-button type="primary" @click="openCreate">
-                        {{ $t('aiTools.mcp.create') }}
+                        {{ $t('commons.button.create') }}
                     </el-button>
                     <el-button type="primary" plain @click="openDomain">
                         {{ $t('aiTools.mcp.bindDomain') }}
@@ -101,7 +101,7 @@ import { AI } from '@/api/interface/ai';
 import { deleteMcpServer, operateMcpServer, pageMcpServer } from '@/api/modules/ai';
 import RouterMenu from '@/views/ai/mcp/index.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import McpServerOperate from './operate/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import { GlobalStore } from '@/store';

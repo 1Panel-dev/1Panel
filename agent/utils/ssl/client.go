@@ -2,14 +2,21 @@ package ssl
 
 import (
 	"crypto"
+	"crypto/rand"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"net"
+	"os"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/go-acme/lego/v4/certificate"
 	"github.com/go-acme/lego/v4/challenge/dns01"
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/providers/http/webroot"
 	"github.com/pkg/errors"
-	"os"
 )
 
 type AcmeClientOption func(*AcmeClientOptions)
@@ -84,12 +91,75 @@ func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.PrivateKey) (
 		PrivateKey: privateKey,
 	}
 
-	certificates, err := c.Client.Certificate.Obtain(request)
-	if err != nil {
+	var certificates *certificate.Resource
+	var err error
+
+	for attempt := 1; attempt <= maxRetryAttempts; attempt++ {
+		certificates, err = c.Client.Certificate.Obtain(request)
+		if err == nil {
+			return *certificates, nil
+		}
+
+		if isHTTP503Error(err) && attempt < maxRetryAttempts {
+			global.LOG.Warnf("ACME server returned 503, retrying in %v (attempt %d/%d)",
+				retryDelayOn503, attempt, maxRetryAttempts)
+			time.Sleep(retryDelayOn503)
+			continue
+		}
+
+		// Non-503 error or final attempt, return error
 		return certificate.Resource{}, err
 	}
 
-	return *certificates, nil
+	return certificate.Resource{}, err
+}
+
+func (c *AcmeClient) ObtainIPSSL(ipAddress string, privKey crypto.PrivateKey) (certificate.Resource, error) {
+	csrTemplate := &x509.CertificateRequest{
+		Subject: pkix.Name{
+			CommonName: "",
+		},
+		IPAddresses: []net.IP{
+			net.ParseIP(ipAddress),
+		},
+	}
+	csrDER, err := x509.CreateCertificateRequest(
+		rand.Reader,
+		csrTemplate,
+		privKey,
+	)
+	if err != nil {
+		return certificate.Resource{}, err
+	}
+	csr, err := x509.ParseCertificateRequest(csrDER)
+	if err != nil {
+		return certificate.Resource{}, err
+	}
+	req := certificate.ObtainForCSRRequest{
+		CSR:        csr,
+		PrivateKey: privKey,
+		Profile:    "shortlived",
+		Bundle:     true,
+	}
+
+	var certificates *certificate.Resource
+	for attempt := 1; attempt <= maxRetryAttempts; attempt++ {
+		certificates, err = c.Client.Certificate.ObtainForCSR(req)
+		if err == nil {
+			return *certificates, nil
+		}
+
+		if isHTTP503Error(err) && attempt < maxRetryAttempts {
+			global.LOG.Warnf("ACME server returned 503 for IP SSL, retrying in %v (attempt %d/%d)",
+				retryDelayOn503, attempt, maxRetryAttempts)
+			time.Sleep(retryDelayOn503)
+			continue
+		}
+
+		return certificate.Resource{}, err
+	}
+
+	return certificate.Resource{}, err
 }
 
 func (c *AcmeClient) RevokeSSL(pemSSL []byte) error {

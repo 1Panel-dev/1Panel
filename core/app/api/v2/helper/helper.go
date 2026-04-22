@@ -18,7 +18,7 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 		Code:    code,
 		Message: "",
 	}
-	if msgKey == "ErrCaptchaCode" || msgKey == "ErrAuth" {
+	if msgKey == "ErrCaptchaCode" || msgKey == "ErrAuth" || msgKey == "ErrLoginLocked" {
 		res.Code = 401
 		res.Message = msgKey
 	}

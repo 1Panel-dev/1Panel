@@ -12,11 +12,13 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/docker/cli/cli/config"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
 )
 
@@ -212,7 +214,7 @@ func (c Client) PullImageWithProcessAndOptions(task *task.Task, imageName string
 		}
 		if status == "Pull complete" || status == "Download complete" {
 			id, _ := progress["id"].(string)
-			progressStr := fmt.Sprintf("%s [%s] --- %.2f%%", status, id, 100.0)
+			progressStr := fmt.Sprintf("%s %s", status, id)
 			_ = setLog(id, progressStr, task)
 		}
 	}
@@ -243,21 +245,10 @@ func (c Client) PushImageWithProcessAndOptions(task *task.Task, imageName string
 		status, _ := progress["status"].(string)
 		switch status {
 		case "Pushing":
-			id, _ := progress["id"].(string)
-			progressDetail, _ := progress["progressDetail"].(map[string]interface{})
-			current, _ := progressDetail["current"].(float64)
-			progressStr := ""
-			total, ok := progressDetail["total"].(float64)
-			if ok {
-				progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, (current/total)*100)
-			} else {
-				progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, current)
-			}
-
-			_ = setLog(id, progressStr, task)
+			logProcess(progress, task)
 		case "Pushed":
 			id, _ := progress["id"].(string)
-			progressStr := fmt.Sprintf("%s [%s] --- %.2f%%", status, id, 100.0)
+			progressStr := fmt.Sprintf("%s %s", status, id)
 			_ = setLog(id, progressStr, task)
 		default:
 			progressStr, _ := json.Marshal(progress)
@@ -298,20 +289,10 @@ func (c Client) BuildImageWithProcessAndOptions(task *task.Task, tar io.ReadClos
 		}
 		switch status {
 		case "Downloading", "Extracting":
-			id, _ := progress["id"].(string)
-			progressDetail, _ := progress["progressDetail"].(map[string]interface{})
-			current, _ := progressDetail["current"].(float64)
-			progressStr := ""
-			total, ok := progressDetail["total"].(float64)
-			if ok {
-				progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, (current/total)*100)
-			} else {
-				progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, current)
-			}
-			_ = setLog(id, progressStr, task)
+			logProcess(progress, task)
 		case "Pull complete", "Download complete", "Verifying Checksum":
 			id, _ := progress["id"].(string)
-			progressStr := fmt.Sprintf("%s [%s] --- %.2f%%", status, id, 100.0)
+			progressStr := fmt.Sprintf("%s %s", status, id)
 			_ = setLog(id, progressStr, task)
 		default:
 			progressStr, _ := json.Marshal(progress)
@@ -322,41 +303,19 @@ func (c Client) BuildImageWithProcessAndOptions(task *task.Task, tar io.ReadClos
 }
 
 func (c Client) PullImageWithProcess(task *task.Task, imageName string) error {
-	return c.PullImageWithProcessAndOptions(task, imageName, image.PullOptions{})
-}
-
-func formatBytes(bytes uint64) string {
-	const (
-		KB = 1024
-		MB = 1024 * KB
-		GB = 1024 * MB
-		TB = 1024 * GB
-	)
-
-	switch {
-	case bytes < MB:
-		return fmt.Sprintf("%.0fKB", float64(bytes)/KB)
-	case bytes < GB:
-		return fmt.Sprintf("%.1fMB", float64(bytes)/MB)
-	case bytes < TB:
-		return fmt.Sprintf("%.1fGB", float64(bytes)/GB)
-	default:
-		return fmt.Sprintf("%.2fTB", float64(bytes)/TB)
+	options := image.PullOptions{}
+	if authStr, ok := loadRegistryAuthFromDockerConfig(imageName); ok {
+		options.RegistryAuth = authStr
 	}
+	return c.PullImageWithProcessAndOptions(task, imageName, options)
 }
 
 func logProcess(progress map[string]interface{}, task *task.Task) {
 	status, _ := progress["status"].(string)
 	id, _ := progress["id"].(string)
-	progressDetail, _ := progress["progressDetail"].(map[string]interface{})
-	current, _ := progressDetail["current"].(float64)
+	progressItem, _ := progress["progress"].(string)
 	progressStr := ""
-	total, ok := progressDetail["total"].(float64)
-	if ok {
-		progressStr = fmt.Sprintf("%s [%s] --- %.2f%%", status, id, (current/total)*100)
-	} else {
-		progressStr = fmt.Sprintf("%s [%s] --- %s ", status, id, formatBytes(uint64(current)))
-	}
+	progressStr = fmt.Sprintf("%s %s %s", status, id, progressItem)
 	_ = setLog(id, progressStr, task)
 }
 
@@ -366,8 +325,98 @@ func PullImage(imageName string) error {
 		return err
 	}
 	defer cli.Close()
-	if _, err := cli.ImagePull(context.Background(), imageName, image.PullOptions{}); err != nil {
+	options := image.PullOptions{}
+	if authStr, ok := loadRegistryAuthFromDockerConfig(imageName); ok {
+		options.RegistryAuth = authStr
+	}
+	if _, err := cli.ImagePull(context.Background(), imageName, options); err != nil {
 		return err
 	}
 	return nil
+}
+
+func loadRegistryAuthFromDockerConfig(imageName string) (string, bool) {
+	registryHost, hasRegistry := extractRegistryHost(imageName)
+	cfg := config.LoadDefaultConfigFile(io.Discard)
+	if cfg == nil {
+		return "", false
+	}
+	candidates := make([]string, 0)
+	if hasRegistry {
+		candidates = append(candidates, registryHost, "https://"+registryHost, "http://"+registryHost)
+	}
+	if !hasRegistry || isDockerHubRegistry(registryHost) {
+		candidates = append(candidates,
+			"https://index.docker.io/v1/",
+			"index.docker.io",
+			"docker.io",
+			"registry-1.docker.io",
+			"https://registry-1.docker.io",
+		)
+	}
+	seen := make(map[string]struct{})
+	for _, key := range candidates {
+		if key == "" {
+			continue
+		}
+		if _, ok := seen[key]; ok {
+			continue
+		}
+		seen[key] = struct{}{}
+		auth, err := cfg.GetAuthConfig(key)
+		if err != nil {
+			continue
+		}
+		if auth.Username == "" && auth.Password == "" && auth.Auth == "" && auth.IdentityToken == "" && auth.RegistryToken == "" {
+			continue
+		}
+		authStr, err := registry.EncodeAuthConfig(registry.AuthConfig{
+			Username:      auth.Username,
+			Password:      auth.Password,
+			Auth:          auth.Auth,
+			ServerAddress: auth.ServerAddress,
+			IdentityToken: auth.IdentityToken,
+			RegistryToken: auth.RegistryToken,
+		})
+		if err != nil {
+			return "", false
+		}
+		return authStr, true
+	}
+	return "", false
+}
+
+func isDockerHubRegistry(host string) bool {
+	switch normalizeRegistryHost(host) {
+	case "docker.io", "index.docker.io", "registry-1.docker.io":
+		return true
+	default:
+		return false
+	}
+}
+
+func extractRegistryHost(imageName string) (string, bool) {
+	parts := strings.Split(imageName, "/")
+	if len(parts) < 2 {
+		return "", false
+	}
+	first := parts[0]
+	if strings.Contains(first, ".") || strings.Contains(first, ":") || first == "localhost" {
+		return normalizeRegistryHost(first), true
+	}
+	return "", false
+}
+
+func normalizeRegistryHost(registryKey string) string {
+	key := strings.TrimSpace(registryKey)
+	if key == "" {
+		return ""
+	}
+	key = strings.TrimPrefix(key, "http://")
+	key = strings.TrimPrefix(key, "https://")
+	key = strings.Trim(key, "/")
+	if strings.Contains(key, "/") {
+		key = strings.SplitN(key, "/", 2)[0]
+	}
+	return strings.ToLower(key)
 }

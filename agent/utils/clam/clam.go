@@ -63,15 +63,15 @@ func AnalysisFromLog(pathItem string, record *model.ClamRecord) {
 	}
 }
 
-func StopAllClamJob(withCheck bool, clamRepo repo.IClamRepo) bool {
+func CheckWithStopAll(withCheck bool, clamRepo repo.IClamRepo) bool {
 	if withCheck {
-		isActive := false
-		isexist, _ := controller.CheckExist("clam")
-		if isexist {
-			isActive, _ = controller.CheckActive("clam")
-		}
-		if isActive {
+		isExist, _ := controller.CheckExist("clam")
+		if !isExist {
 			return false
+		}
+		isActive, _ := controller.CheckActive("clam")
+		if isActive {
+			return true
 		}
 	}
 	clams, _ := clamRepo.List(repo.WithByStatus(constant.StatusEnable))
@@ -79,5 +79,5 @@ func StopAllClamJob(withCheck bool, clamRepo repo.IClamRepo) bool {
 		global.Cron.Remove(cron.EntryID(clams[i].EntryID))
 		_ = clamRepo.Update(clams[i].ID, map[string]interface{}{"status": constant.StatusDisable, "entry_id": 0})
 	}
-	return true
+	return false
 }

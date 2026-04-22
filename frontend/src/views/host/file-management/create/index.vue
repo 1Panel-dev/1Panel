@@ -60,7 +60,7 @@ let setRole = ref(false);
 const fileRef = ref();
 
 interface CreateProps {
-    file: Object;
+    file: object;
 }
 const propData = ref<CreateProps>({
     file: {},
@@ -74,7 +74,7 @@ const handleClose = () => {
     if (fileForm.value) {
         fileForm.value.resetFields();
     }
-    em('close', open);
+    em('close', open.value);
 };
 
 const rules = reactive<FormRules>({
@@ -107,7 +107,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         if (getPath.value.indexOf('.1panel_clash') > -1) {
-            MsgWarning(i18n.global.t('file.clashDitNotSupport'));
+            MsgWarning(i18n.global.t('file.clashDidNotSupport'));
             return;
         }
 

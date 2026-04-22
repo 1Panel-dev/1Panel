@@ -88,6 +88,7 @@ func (u *DashboardService) LoadOsInfo() (*dto.OsInfo, error) {
 	baseInfo.PlatformFamily = hostInfo.PlatformFamily
 	baseInfo.KernelArch = hostInfo.KernelArch
 	baseInfo.KernelVersion = hostInfo.KernelVersion
+	baseInfo.PrettyDistro = psutil.HOST.GetDistro()
 
 	diskInfo, err := psutil.DISK.GetUsage(global.Dir.BaseDir, false)
 	if err == nil {
@@ -108,7 +109,7 @@ func (u *DashboardService) LoadCurrentInfoForNode() *dto.NodeCurrent {
 
 	currentInfo.CPUTotal, _ = psutil.CPUInfo.GetLogicalCores(false)
 
-	cpuUsedPercent, perCore := psutil.CPU.GetCPUUsage()
+	cpuUsedPercent, perCore, cpuDetailedPercent := psutil.CPU.GetCPUUsage()
 	if len(perCore) == 0 {
 		currentInfo.CPUTotal = psutil.CPU.NumCPU()
 	} else {
@@ -116,6 +117,7 @@ func (u *DashboardService) LoadCurrentInfoForNode() *dto.NodeCurrent {
 	}
 	currentInfo.CPUUsedPercent = cpuUsedPercent
 	currentInfo.CPUUsed = cpuUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
+	currentInfo.CPUDetailedPercent = cpuDetailedPercent
 
 	loadInfo, _ := load.Avg()
 	currentInfo.Load1 = loadInfo.Load1
@@ -140,7 +142,7 @@ func (u *DashboardService) LoadCurrentInfoForNode() *dto.NodeCurrent {
 
 func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error) {
 	var baseInfo dto.DashboardBase
-	hostInfo, err := psutil.HOST.GetHostInfo(false)
+	hostInfo, err := psutil.HOST.GetHostInfo(true)
 	if err != nil {
 		return nil, err
 	}
@@ -151,6 +153,7 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 		Platform:             hostInfo.Platform,
 		PlatformFamily:       hostInfo.PlatformFamily,
 		PlatformVersion:      hostInfo.PlatformVersion,
+		PrettyDistro:         psutil.HOST.GetDistro(),
 		KernelArch:           hostInfo.KernelArch,
 		KernelVersion:        hostInfo.KernelVersion,
 		VirtualizationSystem: string(ss),
@@ -171,6 +174,7 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 
 	baseInfo.CPUCores, _ = psutil.CPUInfo.GetPhysicalCores(false)
 	baseInfo.CPULogicalCores, _ = psutil.CPUInfo.GetLogicalCores(false)
+	baseInfo.CPUMhz = cpuInfo[0].Mhz
 
 	baseInfo.CurrentInfo = *u.LoadCurrentInfo(ioOption, netOption)
 	return &baseInfo, nil
@@ -184,7 +188,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.Procs = hostInfo.Procs
 	currentInfo.CPUTotal, _ = psutil.CPUInfo.GetLogicalCores(false)
 
-	cpuUsedPercent, perCore := psutil.CPU.GetCPUUsage()
+	cpuUsedPercent, perCore, cpuDetailedPercent := psutil.CPU.GetCPUUsage()
 	if len(perCore) == 0 {
 		currentInfo.CPUTotal = psutil.CPU.NumCPU()
 	} else {
@@ -193,6 +197,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.CPUPercent = perCore
 	currentInfo.CPUUsedPercent = cpuUsedPercent
 	currentInfo.CPUUsed = cpuUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
+	currentInfo.CPUDetailedPercent = cpuDetailedPercent
 
 	loadInfo, _ := load.Avg()
 	currentInfo.Load1 = loadInfo.Load1
@@ -279,8 +284,8 @@ func (u *DashboardService) LoadAppLauncher(ctx *gin.Context) ([]dto.AppLauncher,
 		return data, err
 	}
 
-	showList, err := launcherRepo.ListName()
-	defaultList, err := appRepo.GetTopRecomment()
+	showList, _ := launcherRepo.ListName()
+	defaultList, err := appRepo.GetTopRecommend()
 	if err != nil {
 		return data, nil
 	}
@@ -356,6 +361,9 @@ func (u *DashboardService) LoadQuickOptions() []dto.QuickJump {
 		_ = copier.Copy(&item, &quick)
 		list = append(list, item)
 	}
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].Recommend < list[j].Recommend
+	})
 	return list
 }
 func (u *DashboardService) ChangeQuick(req dto.ChangeQuicks) error {
@@ -607,6 +615,9 @@ func loadQuickJump(base *dto.DashboardBase) {
 	website, _ := websiteRepo.GetBy()
 	base.WebsiteNumber = len(website)
 
+	agents, _ := agentRepo.List()
+	base.AgentNumber = len(agents)
+
 	postgresqlDbs, _ := postgresqlRepo.List()
 	mysqlDbs, _ := mysqlRepo.List()
 	base.DatabaseNumber = len(mysqlDbs) + len(postgresqlDbs)
@@ -620,6 +631,8 @@ func loadQuickJump(base *dto.DashboardBase) {
 	quicks := launcherRepo.ListQuickJump(false)
 	for i := 0; i < len(quicks); i++ {
 		switch quicks[i].Name {
+		case "Agent":
+			quicks[i].Detail = fmt.Sprintf("%d", base.AgentNumber)
 		case "Website":
 			quicks[i].Detail = fmt.Sprintf("%d", base.WebsiteNumber)
 		case "Database":
@@ -633,7 +646,7 @@ func loadQuickJump(base *dto.DashboardBase) {
 		_ = copier.Copy(&item, quicks[i])
 		base.QuickJumps = append(base.QuickJumps, item)
 	}
-	sort.Slice(quicks, func(i, j int) bool {
-		return quicks[i].Recommend < quicks[j].Recommend
+	sort.Slice(base.QuickJumps, func(i, j int) bool {
+		return base.QuickJumps[i].Recommend < base.QuickJumps[j].Recommend
 	})
 }

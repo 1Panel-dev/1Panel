@@ -15,8 +15,9 @@ type PageContainer struct {
 }
 
 type InspectReq struct {
-	ID   string `json:"id" validate:"required"`
-	Type string `json:"type" validate:"required"`
+	ID     string `json:"id" validate:"required"`
+	Type   string `json:"type" validate:"required"`
+	Detail string `json:"detail"`
 }
 
 type ContainerInfo struct {
@@ -30,9 +31,6 @@ type ContainerInfo struct {
 
 	Network []string `json:"network"`
 	Ports   []string `json:"ports"`
-
-	SizeRw     int64 `json:"sizeRw"`
-	SizeRootFs int64 `json:"sizeRootFs"`
 
 	IsFromApp     bool `json:"isFromApp"`
 	IsFromCompose bool `json:"isFromCompose"`
@@ -48,6 +46,34 @@ type ContainerInfo struct {
 type ContainerOptions struct {
 	Name  string `json:"name"`
 	State string `json:"state"`
+}
+
+type ContainerFileReq struct {
+	ContainerID string `json:"containerID" validate:"required"`
+	Path        string `json:"path" validate:"required"`
+}
+
+type ContainerFileBatchDeleteReq struct {
+	ContainerID string   `json:"containerID" validate:"required"`
+	Paths       []string `json:"paths" validate:"required,min=1,dive,required"`
+}
+
+type ContainerFileInfo struct {
+	Name    string `json:"name"`
+	Path    string `json:"path"`
+	IsDir   bool   `json:"isDir"`
+	IsLink  bool   `json:"isLink"`
+	LinkTo  string `json:"linkTo"`
+	Size    int64  `json:"size"`
+	Mode    string `json:"mode"`
+	ModTime string `json:"modTime"`
+}
+
+type ContainerFileContent struct {
+	Content   string `json:"content"`
+	Size      int64  `json:"size"`
+	Truncated bool   `json:"truncated"`
+	IsBinary  bool   `json:"isBinary"`
 }
 
 type ContainerStatus struct {
@@ -66,15 +92,6 @@ type ContainerStatus struct {
 	NetworkCount         int `json:"networkCount"`
 	VolumeCount          int `json:"volumeCount"`
 	RepoCount            int `json:"repoCount"`
-
-	ContainerUsage        int64 `json:"containerUsage"`
-	ContainerReclaimable  int64 `json:"containerReclaimable"`
-	ImageUsage            int64 `json:"imageUsage"`
-	ImageReclaimable      int64 `json:"imageReclaimable"`
-	VolumeUsage           int64 `json:"volumeUsage"`
-	VolumeReclaimable     int64 `json:"volumeReclaimable"`
-	BuildCacheUsage       int64 `json:"buildCacheUsage"`
-	BuildCacheReclaimable int64 `json:"buildCacheReclaimable"`
 }
 type ResourceLimit struct {
 	CPU    int    `json:"cpu"`
@@ -106,9 +123,15 @@ type ContainerOperate struct {
 	Privileged      bool           `json:"privileged"`
 	AutoRemove      bool           `json:"autoRemove"`
 	Volumes         []VolumeHelper `json:"volumes"`
+	ExtraHosts      []ExtraHost    `json:"extraHosts"`
 	Labels          []string       `json:"labels"`
 	Env             []string       `json:"env"`
 	RestartPolicy   string         `json:"restartPolicy"`
+}
+
+type ExtraHost struct {
+	Hostname string `json:"hostname"`
+	IP       string `json:"ip"`
 }
 type ContainerNetwork struct {
 	Network string `json:"network"`
@@ -129,6 +152,19 @@ type ContainerUpgrade struct {
 	ForcePull bool     `json:"forcePull"`
 }
 
+type ContainerItemStats struct {
+	SizeRw     int64 `json:"sizeRw"`
+	SizeRootFs int64 `json:"sizeRootFs"`
+
+	ContainerUsage        int64 `json:"containerUsage"`
+	ContainerReclaimable  int64 `json:"containerReclaimable"`
+	ImageUsage            int64 `json:"imageUsage"`
+	ImageReclaimable      int64 `json:"imageReclaimable"`
+	VolumeUsage           int64 `json:"volumeUsage"`
+	VolumeReclaimable     int64 `json:"volumeReclaimable"`
+	BuildCacheUsage       int64 `json:"buildCacheUsage"`
+	BuildCacheReclaimable int64 `json:"buildCacheReclaimable"`
+}
 type ContainerListStats struct {
 	ContainerID string `json:"containerID"`
 
@@ -251,50 +287,62 @@ type BatchDelete struct {
 }
 
 type ComposeInfo struct {
-	Name           string             `json:"name"`
-	CreatedAt      string             `json:"createdAt"`
-	CreatedBy      string             `json:"createdBy"`
-	ContainerCount int                `json:"containerCount"`
-	RunningCount   int                `json:"runningCount"`
-	ConfigFile     string             `json:"configFile"`
-	Workdir        string             `json:"workdir"`
-	Path           string             `json:"path"`
-	Containers     []ComposeContainer `json:"containers"`
-	Env            []string           `json:"env"`
+	Name              string             `json:"name"`
+	CreatedAt         string             `json:"createdAt"`
+	CreatedBy         string             `json:"createdBy"`
+	ContainerCount    int                `json:"containerCount"`
+	RunningCount      int                `json:"runningCount"`
+	ConfigFile        string             `json:"configFile"`
+	Workdir           string             `json:"workdir"`
+	ComposeFileExists bool               `json:"composeFileExists"`
+	Path              string             `json:"path"`
+	Containers        []ComposeContainer `json:"containers"`
+	Env               string             `json:"env"`
 }
 type ComposeContainer struct {
-	ContainerID string `json:"containerID"`
-	Name        string `json:"name"`
-	CreateTime  string `json:"createTime"`
-	State       string `json:"state"`
+	ContainerID string   `json:"containerID"`
+	Name        string   `json:"name"`
+	CreateTime  string   `json:"createTime"`
+	State       string   `json:"state"`
+	Ports       []string `json:"ports"`
 }
 type ComposeCreate struct {
-	TaskID   string   `json:"taskID"`
-	Name     string   `json:"name"`
-	From     string   `json:"from" validate:"required,oneof=edit path template"`
-	File     string   `json:"file"`
-	Path     string   `json:"path"`
-	Template uint     `json:"template"`
-	Env      []string `json:"env"`
+	TaskID    string `json:"taskID"`
+	Name      string `json:"name"`
+	From      string `json:"from" validate:"required,oneof=edit path template"`
+	File      string `json:"file"`
+	Path      string `json:"path"`
+	Template  uint   `json:"template"`
+	Env       string `json:"env"`
+	ForcePull bool   `json:"forcePull"`
 }
 type ComposeOperation struct {
 	Name      string `json:"name" validate:"required"`
 	Path      string `json:"path"`
 	Operation string `json:"operation" validate:"required,oneof=up start restart stop down delete"`
 	WithFile  bool   `json:"withFile"`
-	Force     bool   `josn:"force"`
+	Force     bool   `json:"force"`
 }
 type ComposeUpdate struct {
-	Name    string   `json:"name" validate:"required"`
-	Path    string   `json:"path" validate:"required"`
-	Content string   `json:"content" validate:"required"`
-	Env     []string `json:"env"`
+	TaskID     string `json:"taskID"`
+	Name       string `json:"name" validate:"required"`
+	Path       string `json:"path" validate:"required"`
+	DetailPath string `json:"detailPath"`
+	Content    string `json:"content" validate:"required"`
+	Env        string `json:"env"`
+	ForcePull  bool   `json:"forcePull"`
+}
+type ComposeLogClean struct {
+	Name       string `json:"name" validate:"required"`
+	Path       string `json:"path" validate:"required"`
+	DetailPath string `json:"detailPath"`
 }
 
 type ContainerLog struct {
 	Container     string `json:"container" validate:"required"`
 	Since         string `json:"since"`
 	Tail          uint   `json:"tail"`
+	Timestamp     bool   `json:"timestamp"`
 	ContainerType string `json:"containerType"`
 }
 
@@ -304,5 +352,6 @@ type StreamLog struct {
 	Since     string
 	Follow    bool
 	Tail      string
+	Timestamp bool
 	Type      string
 }

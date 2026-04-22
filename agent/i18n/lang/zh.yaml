@@ -1,30 +1,34 @@
-ErrInvalidParams: "请求参数错误: {{ .detail }}"
-ErrTokenParse: "Token 生成错误: {{ .detail }}"
+ErrInvalidParams: "参数错误: {{ .detail }}"
+ErrTokenParse: "Token 错误: {{ .detail }}"
 ErrInitialPassword: "原密码错误"
-ErrInternalServer: "服务内部错误: {{ .detail }}"
+ErrInternalServer: "服务错误: {{ .detail }}"
+ErrFileAINotEnabled: "生成 AI 总结需在文件管理中启用并保存文件 AI 账号。关闭 AI 时仍可使用纯内容检索。"
+ErrFileAISearchBadPattern: "搜索条件无效（正则或全词匹配）: {{ .detail }}"
+ErrWgetRemoteFailed: "远程下载地址无效或无法访问：{{ .detail }}"
+ErrWgetInvalidContentType: "远程地址返回的不是文件内容（可能是错误页），{{ .detail }}"
 ErrRecordExist: "记录已存在"
-ErrRecordNotFound: "记录未能找到"
+ErrRecordNotFound: "记录不存在"
 ErrStructTransform: "类型转换失败: {{ .err }}"
 ErrNotLogin: "用户未登录: {{ .detail }}"
 ErrPasswordExpired: "当前密码已过期: {{ .detail }}"
-ErrNotSupportType: "系统暂不支持当前类型: {{ .name }}"
-ErrProxy: "请求错误，请检查该节点状态: {{ .detail }}"
-ErrApiConfigStatusInvalid: "API 接口禁止访问: {{ .detail }}"
+ErrNotSupportType: "不支持当前类型: {{ .name }}"
+ErrProxy: "请求失败，请检查节点状态: {{ .detail }}"
+ErrApiConfigStatusInvalid: "API 禁止访问: {{ .detail }}"
 ErrApiConfigKeyInvalid: "API 接口密钥错误: {{ .detail }}"
 ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
-ErrApiConfigDisable: "此接口禁止使用 API 接口调用: {{ .detail }}"
-ErrApiConfigKeyTimeInvalid: "API 接口时间戳错误: {{ .detail }}"
-ErrShutDown: "命令被手动结束！"
+ErrApiConfigDisable: "此接口禁止 API 调用: {{ .detail }}"
+ErrApiConfigKeyTimeInvalid: "API 时间戳错误: {{ .detail }}"
+ErrShutDown: "命令已手动终止"
 
-ErrMinQuickJump: "请至少设置一个快速跳转入口！"
-ErrMaxQuickJump: "最多可设置四个快速跳转入口！"
+ErrMinQuickJump: "至少设置 1 个快速跳转入口"
+ErrMaxQuickJump: "最多设置 4 个快速跳转入口"
 
 #common
 ErrUsernameIsExist: "用户名已存在"
 ErrNameIsExist: "名称已存在"
-ErrDemoEnvironment: "演示服务器，禁止此操作!"
-ErrCmdTimeout: "命令执行超时！"
-ErrCmdIllegal: "执行命令中存在不合法字符，请修改后重试！"
+ErrDemoEnvironment: "演示环境，禁止操作"
+ErrCmdTimeout: "命令超时"
+ErrCmdIllegal: "命令含非法字符，请修改后重试"
 ErrPortExist: '{{ .port }} 端口已被 {{ .type }} [{{ .name }}] 占用'
 TYPE_APP: "应用"
 TYPE_RUNTIME: "运行环境"
@@ -33,10 +37,36 @@ ErrTypePort: '端口 {{ .name }} 格式错误'
 ErrTypePortRange: '端口范围需要在 1-65535 之间'
 Success: "成功"
 Failed: "失败"
-SystemRestart: "系统重启导致任务中断"
-ErrGroupIsDefault: "默认分组，无法删除"
+SystemRestart: "系统重启，任务中断"
+ErrGroupIsDefault: "默认分组不可删除"
 ErrGroupIsInWebsiteUse: "分组正在被其他网站使用，无法删除"
 Decrypt: "解密"
+
+#agent
+ErrAgentAccountBound: "该账号已绑定智能体，无法删除"
+ErrTerminalAIAccountInUse: "该模型账号正被终端 AI 使用，请在终端 AI 设置中更换账号或关闭终端 AI 后重试"
+ErrAgentAccountUnavailable: "账号连接信息不可用: {{ .err }}"
+ErrAgentProviderNotSupported: "不支持该智能体提供商"
+ErrAgentAccountRequired: "请选择智能体账号后重试"
+ErrAgentAccountNotVerified: "账号未通过验证"
+ErrAgentAccountModelsRequired: "请至少配置一个模型"
+ErrAgentAccountSingleInitialModel: "创建账号时只能配置一个初始模型"
+ErrAgentModelNotInAccount: "所选模型未配置在当前账号中"
+ErrAgentFallbackModelDuplicate: "备用模型不能重复"
+ErrAgentFallbackModelPrimary: "备用模型不能与主模型相同"
+ErrAgentModelInUse: "仍有智能体正在使用该模型: {{ .name }}"
+ErrAgentBaseURLRequired: "Base URL 不能为空"
+ErrAgentApiKeyRequired: "API Key 不能为空"
+ErrAgentComposeRequired: "自定义编排内容不能为空"
+ErrAgentIDRequired: "智能体 ID 不能为空"
+ErrAgentAccountIDRequired: "账号 ID 不能为空"
+ErrAgentLimitReached: "社区版最多支持创建 {{ .max }} 个智能体，升级至专业版无数量限制"
+ErrAgentWebsiteBound: "该智能体已关联网站"
+ErrAgentWebsiteTypeUnsupported: "只能关联反向代理或静态网站"
+ErrAgentWebsiteInUse: "该网站已被其他智能体关联"
+ErrAgentWebsiteUnbindUnsupported: "一键部署网站不支持手动解绑"
+ErrHermesPairingCodeUnavailable: "配对码在 hermes 中暂时不存在，可能是由于网络原因，请稍后尝试"
+ErrHermesFeishuGroupAllowlistRequiresAllowlist: "飞书群组策略为白名单时，私聊策略不能为配对码"
 
 #backup
 Localhost: '本机'
@@ -47,15 +77,15 @@ ErrBackupLocalCreate: "暂不支持创建本地服务器备份账号"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被占用！"
-ErrAppLimit: "应用超出安装数量限制"
+ErrAppLimit: "应用安装数量超限"
 ErrNotInstall: "应用未安装"
 ErrPortInOtherApp: "{{ .port }} 端口已被应用 {{ .apps }} 占用！"
-ErrDbUserNotValid: "存量数据库，用户名密码不匹配！"
-ErrUpdateBuWebsite: '应用更新成功，但是网站配置文件修改失败，请检查配置！'
+ErrDbUserNotValid: "存量数据库用户名或密码不匹配"
+ErrUpdateBuWebsite: '应用更新成功，但网站配置文件修改失败，请检查配置'
 Err1PanelNetworkFailed: '默认容器网络创建失败！{{ .detail }}'
-ErrFileParse: '应用 docker-compose 文件解析失败!'
-ErrInstallDirNotFound: '安装目录不存在，如需卸载，请选择强制卸载'
-AppStoreIsUpToDate: '应用商店已经是最新版本'
+ErrFileParse: '应用 docker-compose 解析失败'
+ErrInstallDirNotFound: '安装目录不存在，如需卸载请选强制卸载'
+AppStoreIsUpToDate: '应用商店已是最新版本'
 LocalAppVersionNull: '{{ .name }} 应用未同步到版本！无法添加到应用列表'
 LocalAppVersionErr: '{{ .name }} 同步版本 {{ .version }} 失败！{{ .err }}'
 ErrFileNotFound: '{{ .name }} 文件不存在'
@@ -73,29 +103,29 @@ ErrContainerMsg: '{{ .name }} 容器异常，具体请在容器页面查看日�
 ErrAppBackup: '{{ .name }} 应用备份失败 {{ .err }}'
 ErrVersionTooLow: '当前 1Panel 版本过低，无法更新应用商店，请升级版本之后操作'
 ErrAppNameExist: '应用名称已存在'
-AppStoreIsSyncing: '应用商店正在同步中，请稍后再试'
+AppStoreIsSyncing: '应用商店同步中，请稍后重试'
 ErrGetCompose: "docker-compose.yml 文件获取失败！{{ .detail }}"
 ErrAppWarn: "状态异常，请查看日志"
 ErrAppParamKey: "参数 {{ .name }} 字段异常"
 ErrAppUpgrade: "应用 {{ .name }} 升级失败 {{ .err }}"
-AppRecover: "应用  {{ .name }} 回滚 "
+AppRecover: "应用 {{ .name }} 回滚"
 PullImageStart: "开始拉取镜像 [{{ .name }}]"
 PullImageSuccess: "镜像拉取成功"
 AppStoreSyncSuccess: "应用商店同步成功"
 SyncAppDetail: "同步应用配置"
 AppVersionNotMatch: "{{ .name }} 应用需要更高的 1Panel 版本，跳过"
-MoveSiteDir: "检测到网站目录变更 需要迁移 OpenResty 网站目录到 {{ .name }}"
+MoveSiteDir: "检测到网站目录变更，需迁移 OpenResty 网站目录到 {{ .name }}"
 MoveSiteDirSuccess: "迁移网站目录成功"
 DeleteRuntimePHP: "删除 PHP 运行环境"
 CustomAppStoreFileValid: "应用商店包需要 .tar.gz 格式"
-PullImageTimeout: "拉取镜像超时,请尝试增加镜像加速或者更换其他镜像加速"
+PullImageTimeout: "拉取镜像超时，请调整镜像加速配置"
 ErrAppIsDown: "{{ .name }} 应用状态异常，请检查"
-ErrCustomApps: "存在已经安装的应用，请先卸载"
-ErrCustomRuntimes: "存在已经安装的运行环境，请先删除"
-ErrAppVersionDeprecated: " {{ .name }} 应用不适配当前 1Panel 版本，跳过"
+ErrCustomApps: "存在已安装应用，请先卸载"
+ErrCustomRuntimes: "存在已安装运行环境，请先删除"
+ErrAppVersionDeprecated: "{{ .name }} 应用不适配当前 1Panel 版本，跳过"
 ErrDockerFailed: "Docker 状态异常，请检查服务状态"
-ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，请先在宿主机安装此命令"
-UseExistImage: "拉取镜像失败，使用存量镜像"
+ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，请先在宿主机安装"
+UseExistImage: "镜像已存在，使用存量镜像"
 ErrDatabaseNotFound: "数据库 {{ .name }} 不存在"
 
 #ssh
@@ -109,30 +139,37 @@ ExportDate: "时间"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
-ErrFileToLarge: "文件超过10M，无法打开"
+ErrFileToLarge: "文件超过 10M，无法打开"
 ErrPathNotFound: "目录不存在"
 ErrMovePathFailed: "目标路径不能包含原路径！"
-ErrLinkPathNotFound: "目标路径不存在!"
+ErrLinkPathNotFound: "目标路径不存在！"
 ErrFileIsExist: "文件或文件夹已存在！"
 ErrFileUpload: "{{ .name }} 上传文件失败 {{ .detail }}"
-ErrFileDownloadDir: "不支持下载文件夹"
-ErrCmdNotFound: "{{ .name}} 命令不存在，请先在宿主机安装此命令"
+ErrFileDownloadDir: "不支持下载目录"
+ErrFileSharePath: "无效的分享路径或目标不是文件"
+ErrFileShareInvalid: "分享链接无效或已失效"
+ErrFileShareExpired: "分享链接已过期"
+ErrFileSharePassword: "访问密码错误"
+ErrFileShareExhausted: "该分享链接的下载次数已用尽"
+ErrFileSharePasswordPolicy: "访问密码至少 4 位"
+ErrFileShareRateLimit: "访问过于频繁，请稍后再试"
+ErrCmdNotFound: "{{ .name }} 命令不存在，请先在宿主机安装此命令"
 ErrSourcePathNotFound:  "源目录不存在"
 ErrFavoriteExist: "已收藏此路径"
 ErrInvalidChar: "禁止使用非法字符"
 ErrPathNotDelete: "所选目录不可删除"
 ErrLogFileToLarge: "日志文件超过 500M，无法打开"
 FileDropFailed: "清理文件 {{ .name }} 失败 {{ .err }}"
-FileDropSuccess: "清理文件 {{ .name }} 成功，清理文件 {{ .count }}，释放磁盘空间 {{ .size }}"
-FileDropSum: "文件清理成功，清理文件共计 {{ .count }}，释放磁盘空间共计 {{ .size }}"
-ErrBadDecrypt: "压缩包解压密码错误，解压失败，请检查后重试！"
+FileDropSuccess: "清理 {{ .name }} 成功，文件 {{ .count }}，释放 {{ .size }}"
+FileDropSum: "文件清理完成，共 {{ .count }}，释放 {{ .size }}"
+ErrBadDecrypt: "压缩包密码错误，解压失败，请检查后重试"
 
 #website
-ErrAliasIsExist: "代号已存在"
+ErrAliasIsExist: "标识已存在"
 ErrBackupMatch: '该备份文件与当前网站部分数据不匹配 {{ .detail }}'
 ErrBackupExist: '该备份文件对应部分源数据不存在 {{ .detail }}'
 ErrPHPResource: '本地运行环境不支持切换！'
-ErrPathPermission: 'index 目录下检测到非 1000:1000 权限文件夹，可能导致网站访问 Access denied 错误，请点击上方保存按钮'
+ErrPathPermission: 'index 目录存在非 1000:1000 权限目录，可能导致 Access denied，请点击上方保存'
 ErrDomainIsUsed: "域名已被网站【{{ .name }}】使用"
 ErrDomainFormat: "{{ .name }} 域名格式不正确"
 ErrDefaultAlias: "default 为保留代号，请使用其他代号"
@@ -153,12 +190,14 @@ pause: '暂停'
 unpause: '恢复'
 remove: '删除'
 delete: '删除'
-ErrDefaultWebsite: "已经设置默认网站，请取消后再设置！"
+ErrDefaultWebsite: "已设置默认网站，请先取消再设置"
+SSL: '证书'
+Set: '设置'
 
 #ssl
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"
 ErrAccountCannotDelete: "账号关联证书，无法删除"
-ErrSSLApply: "证书续签成功，openresty reload失败，请检查配置！"
+ErrSSLApply: "证书续签成功，但 OpenResty reload 失败，请检查配置"
 ErrEmailIsExist: '邮箱已存在'
 ErrSSLKeyNotFound: '私钥文件不存在'
 ErrSSLCertificateNotFound: '证书文件不存在'
@@ -166,18 +205,18 @@ ErrSSLKeyFormat: '私钥文件校验失败'
 ErrSSLCertificateFormat: '证书文件格式错误，请使用 pem 格式'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid 或 EabHmacKey 不能为空'
 ErrOpenrestyNotFound: 'Http 模式需要首先安装 Openresty'
-ApplySSLStart: '开始申请证书，域名 [{{ .domain }}] 申请方式 [{{ .type }}] '
+ApplySSLStart: '开始申请证书，域名 [{{ .domain }}]，方式 [{{ .type }}]'
 dnsAccount: "DNS 自动"
 dnsManual: "DNS 手动"
 http: "HTTP"
-ApplySSLFailed: '申请  [{{ .domain }}] 证书失败， {{ .detail }} '
-ApplySSLSuccess: '申请 [{{ .domain }}] 证书成功！！'
+ApplySSLFailed: '申请 [{{ .domain }}] 证书失败，{{ .detail }}'
+ApplySSLSuccess: '申请 [{{ .domain }}] 证书成功'
 DNSAccountName: 'DNS 账号 [{{ .name }}] 厂商 [{{ .type }}]'
 PushDirLog: '证书推送到目录 [{{ .path }}] {{ .status }}'
 ErrDeleteCAWithSSL: "当前机构下存在已签发证书，无法删除"
 ErrDeleteWithPanelSSL: "面板 SSL 配置使用此证书，无法删除"
 ErrDefaultCA: "默认机构不能删除"
-ApplyWebSiteSSLLog: "开始更新 {{ .name }} 网站证书"
+ApplyWebSiteSSLLog: "开始更新网站证书 {{ .name }}"
 ErrUpdateWebsiteSSL: "{{ .name }} 网站更新证书失败: {{ .err }}"
 ApplyWebSiteSSLSuccess: "更新网站证书成功"
 ErrExecShell: "执行脚本失败 {{ .err }}"
@@ -186,35 +225,66 @@ ExecShellSuccess: "脚本执行成功"
 StartUpdateSystemSSL: "开始更新系统证书"
 UpdateSystemSSLSuccess: "更新系统证书成功"
 ErrWildcardDomain: "HTTP 模式无法申请泛域名证书"
-ErrApplySSLCanNotDelete: "正在申请的证书{{.name}}无法删除，请稍后再试"
+ErrApplySSLCanNotDelete: "正在申请的证书{{ .name }}无法删除，请稍后重试"
 StartPushSSLToNode: "开始推送证书到节点"
 PushSSLToNodeFailed: "推送证书到节点失败: {{ .err }}"
 PushSSLToNodeSuccess: "推送证书到节点成功"
 
 #mysql
-ErrUserIsExist: "当前用户已存在，请重新输入"
-ErrDatabaseIsExist: "当前数据库已存在，请重新输入"
+ErrUserIsExist: "用户已存在，请重新输入"
+ErrDatabaseIsExist: "数据库已存在，请重新输入"
 ErrExecTimeOut: "SQL 执行超时，请检查数据库"
 ErrRemoteExist: "远程数据库已存在该名称，请修改后重试"
 ErrLocalExist: "本地数据库已存在该名称，请修改后重试"
-RemoteBackup: "备份远程数据库需要先使用镜像 {{ .name }} 启动本地容器数据库服务，请稍候..."
-RemoteRecover: "恢复远程数据库需要先使用镜像 {{ .name }} 启动本地容器数据库服务，请稍候..."
+RemoteBackup: "备份远程数据库前需先用镜像 {{ .name }} 启动本地容器数据库服务，请稍候"
+RemoteRecover: "恢复远程数据库前需先用镜像 {{ .name }} 启动本地容器数据库服务，请稍候"
+Arg: "参数"
 
 #redis
 ErrTypeOfRedis: "恢复文件类型与当前持久化方式不符，请修改后重试"
 
 #container
-ErrInUsed: "{{ .detail }} 正被使用，无法删除"
-ErrObjectInUsed: "该对象正被使用，无法删除"
-ErrObjectBeDependent: "该镜像依赖于其他镜像，无法删除"
+ErrInUsed: "{{ .detail }} 正被使用，无法删除！"
+ErrObjectInUsed: "该对象正被使用，无法删除！"
+ErrObjectBeDependent: "该镜像正被其他镜像所依赖，无法删除！"
 ErrPortRules: "端口数目不匹配，请重新输入！"
-ErrPgImagePull: "镜像拉取超时，请配置镜像加速或手动拉取 {{ .name }} 镜像后重试"
-PruneHelper: "本次清理 {{ .name }} {{ .count }} 个，释放磁盘空间 {{ .size }}"
+ErrPgImagePull: "镜像拉取超时，请配置镜像加速或手动拉取 {{ .name }} 后重试"
+PruneHelper: "本次清理 {{ .name }} 释放磁盘空间 {{ .size }}"
 ImageRemoveHelper: "删除镜像 {{ .name }} ，释放磁盘空间 {{ .size }}"
 BuildCache: "构建缓存"
 Volume: "存储卷"
 Network: "网络"
 PruneStart: "清理中，请稍候..."
+ContainerBackupPrepare: "准备容器备份工作目录"
+ContainerBackupStop: "备份前停止容器"
+ContainerBackupInspect: "备份容器 Inspect 与网络信息"
+ContainerBackupMounts: "备份容器挂载数据"
+ContainerBackupMeta: "写入容器备份元信息"
+ContainerBackupStart: "备份后启动容器"
+ContainerRecoverPrepare: "准备容器恢复工作目录"
+ContainerRecoverExtract: "解压容器备份文件"
+ContainerRecoverParse: "加载容器备份元信息"
+ContainerRecoverCreate: "重建容器"
+ContainerRecoverMounts: "恢复容器挂载数据"
+ContainerRecoverStart: "启动已恢复容器"
+ContainerRecoverCleanup: "清理容器恢复工作目录"
+ComposeBackupPrepare: "准备编排备份工作目录"
+ComposeBackupStop: "备份前停止编排"
+ComposeBackupFiles: "备份编排文件"
+ComposeBackupContainers: "备份编排容器"
+ComposeBackupMeta: "写入编排备份元信息"
+ComposeBackupStart: "备份后启动编排"
+ComposeBackupCleanup: "清理编排备份工作目录"
+ComposeRecoverPrepare: "准备编排恢复工作目录"
+ComposeRecoverExtract: "解压编排备份文件"
+ComposeRecoverMeta: "加载编排备份元信息"
+ComposeRecoverMetaLogName: "编排恢复元信息：名称={{ .name }}"
+ComposeRecoverMetaLogPath: "编排恢复元信息：备份路径={{ .backupPath }} 目标路径={{ .targetDir }}"
+ComposeRecoverMetaLogCount: "编排恢复元信息：文件数={{ .files }} 容器数={{ .containers }}"
+ComposeRecoverFiles: "恢复编排文件"
+ComposeRecoverContainers: "恢复编排容器"
+ComposeRecoverRecord: "保存编排记录"
+ComposeRecoverCleanup: "清理编排恢复工作目录"
 
 #runtime
 ErrFileNotExist: "{{ .detail }} 文件不存在！请检查源文件完整性！"
@@ -225,7 +295,7 @@ ErrRuntimeStart: "启动失败"
 ErrPackageJsonNotFound: "package.json 文件不存在"
 ErrScriptsNotFound: "没有在 package.json 中找到 scripts 配置项"
 ErrContainerNameNotFound: "无法获取容器名称，请检查 .env 文件"
-ErrNodeModulesNotFound: "node_modules 文件夹不存在！请编辑运行环境或者等待运行环境启动成功"
+ErrNodeModulesNotFound: "node_modules 文件夹不存在！请编辑运行环境或等待运行环境启动成功"
 ErrContainerNameIsNull: "容器名称不存在"
 ErrPHPPortIsDefault: "9000 端口为默认端口，请修改后重试"
 ErrPHPRuntimePortFailed: "{{ .name }} 端口已被当前运行环境使用，请修改后重试"
@@ -252,15 +322,16 @@ Upload: "上传"
 IgnoreBackupErr: "备份失败，错误：{{ .detail }}，忽略本次错误..."
 IgnoreUploadErr: "上传失败，错误：{{ .detail }}，忽略本次错误..."
 LoadBackupFailed: "获取备份账号连接失败，错误：{{ .detail }}"
-InExecuting: "当前任务正在执行中，请勿重复执行！"
-NoSuchResource: "数据库中未能查询到备份内容，跳过..."
+InExecuting: "任务执行中，请勿重复执行"
+NoSuchResource: "数据库未查询到备份内容，跳过"
 CleanLog: "清理日志"
-CleanLogByName: "清理 {{.name}} 日志"
+CleanLogByName: "清理 {{ .name }} 日志"
+WafIpGroupNotFound: "WAF IP组未找到，请先到【高级功能-WAF-黑白名单-IP组】添加远程下载方式的IP组"
 
 #toolbox
 ErrNotExistUser: "当前用户不存在，请修改后重试！"
-ErrBanAction: "设置失败，当前 {{ .name }} 服务不可用，请检查后重试！"
-ErrClamdscanNotFound: "未检测到 clamdscan 命令，请参考文档安装！"
+ErrBanAction: "设置失败，{{ .name }} 服务不可用，请检查后重试"
+ErrClamdscanNotFound: "未检测到 clamdscan 命令，请按文档安装"
 TaskSwapSet: "设置 Swap"
 SetSwap: "设置 Swap {{ .path }} - {{ .size }}"
 CreateSwap: "创建 Swap 文件"
@@ -293,10 +364,10 @@ xss: 'XSS'
 phpExec: 'PHP 脚本执行'
 oneWordTrojan: '一句话木马'
 appFilter: '应用危险目录过滤'
-webshell: 'Webshell'
+webShell: 'WebShell'
 args: '参数规则'
 protocolFilter: '协议过滤'
-javaFileter: 'Java 危险文件过滤'
+javaFilter: 'Java 危险文件过滤'
 scannerFilter: '扫描器过滤'
 escapeFilter: '转义过滤'
 customRule: '自定义规则'
@@ -327,8 +398,8 @@ allow: "允许"
 deny: "禁止"
 OpenrestyNotFound: "Openresty 未安装"
 remoteIpIsNull: "IP 列表为空"
-OpenrestyVersionErr: "Openresty 版本过低，请升级 Openresty 至 1.27.1.2-2-2-focal"
-ErrFileTooLarge: "文件超过 1MB 无法上传"
+OpenrestyVersionErr: "OpenResty 版本过低，请升级到 1.27.1.2-2-2-focal"
+ErrFileTooLarge: "文件超过 1MB，无法上传"
 
 #task
 TaskStart: "{{ .name }} 任务开始 [START]"
@@ -386,7 +457,7 @@ TaskSync: "同步"
 LocalApp: "本地应用"
 SubTask: "子任务"
 RuntimeExtension: "运行环境扩展"
-TaskIsExecuting: "任务正在运行"
+TaskIsExecuting: "任务运行中"
 CustomAppstore: "自定义应用仓库"
 TaskExec: "执行"
 TaskBatch: "批量操作"
@@ -397,14 +468,14 @@ Clamscan: "扫描 {{ .name }}"
 TaskScan: "扫描"
 
 # task - ai
-OllamaModelPull: "拉取 Ollama 模型  {{ .name }} "
-OllamaModelSize: "获取 Ollama 模型  {{ .name }} 大小 "
+OllamaModelPull: "拉取 Ollama 模型 {{ .name }}"
+OllamaModelSize: "获取 Ollama 模型 {{ .name }} 大小"
 
 # task - snapshot
 Snapshot: "快照"
 SnapDBInfo: "写入 1Panel 数据库信息"
-SnapCopy: "复制文件&目录 {{ .name }} "
-SnapNewDB: "初始化数据库 {{ .name }} 连接 "
+SnapCopy: "复制文件/目录 {{ .name }}"
+SnapNewDB: "初始化数据库 {{ .name }} 连接"
 SnapDeleteOperationLog: "删除操作日志"
 SnapDeleteLoginLog: "删除访问日志"
 SnapDeleteMonitor: "删除监控数据"
@@ -434,10 +505,10 @@ RecoverDownloadAccount: "获取快照下载备份账号 {{ .name }}"
 RecoverDecompress: "解压快照压缩文件"
 Decompress: "解压"
 BackupBeforeRecover: "快照前备份系统相关数据"
-Readjson: "读取快照内 Json 文件"
-ReadjsonPath: "获取快照内 Json 文件路径"
-ReadjsonContent: "读取 Json 文件"
-ReadjsonMarshal: "Json 转义处理"
+ReadJson: "读取快照内 Json 文件"
+ReadJsonPath: "获取快照内 Json 文件路径"
+ReadJsonContent: "读取 Json 文件"
+ReadJsonMarshal: "Json 转义处理"
 RecoverApp: "恢复已安装应用"
 RecoverWebsite: "恢复网站目录"
 RecoverAppImage: "恢复快照镜像备份"
@@ -453,7 +524,6 @@ RecoverBackups: "恢复本地备份目录"
 RecoverPanelData: "恢复数据目录"
 
 # task - container
-ContainerNewCliet: "初始化 Docker Client"
 ContainerImagePull: "拉取容器镜像 {{ .name }}"
 ContainerRemoveOld: "删除原容器 {{ .name }}"
 ContainerImageCheck: "检查镜像是否正常拉取"
@@ -465,17 +535,12 @@ ContainerStartCheck: "检查容器是否已启动"
 
 # task - image
 ImageBuild: "镜像构建"
-ImageBuildStdoutCheck: "解析镜像输出内容"
-ImageBuildRes: "镜像构建输出：{{ .name }}"
 ImagePull: "拉取镜像"
 ImageRepoAuthFromDB: "从数据库获取仓库认证信息"
-ImaegPullRes: "镜像拉取输出：{{ .name }}"
 ImagePush: "推送镜像"
 ImageRenameTag: "修改镜像 Tag"
 ImageNewTag: "新镜像 Tag {{ .name }}"
-ImaegPushRes: "镜像推送输出：{{ .name }}"
 ComposeCreate: "创建编排"
-ComposeCreateRes: "编排创建输出：{{ .name }}"
 
 # task - website
 BackupNginxConfig: "备份网站 OpenResty 配置文件"
@@ -486,15 +551,11 @@ ErrCheckValid: "校验备份文件失败，{{ .name }}"
 Rollback: "回滚"
 websiteDir: "网站目录"
 RecoverFailedStartRollBack: "恢复失败，开始回滚"
-AppBackupFileIncomplete: "备份文件不完整 缺少  app.json 或者 app.tar.gz  文件"
-AppAttributesNotMatch: "应用类型或者名称不一致"
+AppBackupFileIncomplete: "备份文件不完整，缺少 app.json 或 app.tar.gz 文件"
+AppAttributesNotMatch: "应用类型或名称不一致"
 
 #alert
-ErrAlert: "告警信息格式错误，请检查后重试！"
-ErrAlertPush: "告警信息推送错误，请检查后重试！"
-ErrAlertSave: "告警信息保存错误，请检查后重试！"
-ErrAlertSync: "告警信息同步错误，请检查后重试！"
-ErrAlertRemote: "告警信息远端错误，请检查后重试！"
+ErrAlertSync: "告警信息同步错误，请检查后重试"
 
 #task - runtime
 ErrInstallExtension: "已有安装任务正在进行，请等待任务结束"
@@ -502,20 +563,20 @@ ErrInstallExtension: "已有安装任务正在进行，请等待任务结束"
 # alert mail template
 PanelAlertTitle: "面板告警通知"
 TestAlertTitle: "测试邮件 - 验证邮箱连通性"
-TestAlert: "这是一封测试邮件，旨在验证您的邮箱发件配置是否正确。"
-LicenseExpirationAlert: "您的 1Panel 面板，许可证将在 {{ .day }} 天后到期，详情请登录面板查看。"
-CronJobFailedAlert: "您的 1Panel 面板，计划任务-{{ .name }}执行失败，详情请登录面板查看。"
-ClamAlert: "您的 1Panel 面板，病毒扫描任务发现 {{ .num }} 个感染文件，详情请登录面板查看。"
-WebSiteAlert: "您的 1Panel 面板，有 {{ .num }} 个网站将在 {{ .day }} 天后到期，详情请登录面板查看。"
-SSLAlert: "您的 1Panel 面板，有 {{ .num }} 张SSL证书将在 {{ .day }} 天后到期，详情请登录面板查看。"
-DiskUsedAlert: "您的 1Panel 面板，磁盘 {{ .name }} 已使用 {{ .used }}，详情请登录面板查看。"
-ResourceAlert: "您的 1Panel 面板，平均 {{ .time }} 分钟内的 {{ .name }} 使用率为 {{ .used }}，详情请登录面板查看。"
-PanelVersionAlert: "您的 1Panel 面板，有最新面板版本可供升级，详情请登录面板查看。"
-PanelPwdExpirationAlert: "您的 1Panel 面板，面板密码将在 {{ .day }} 天后到期，详情请登录面板查看。"
-CommonAlert: "您的 1Panel 面板，{{ .msg }}，详情请登录面板查看。"
-NodeExceptionAlert: "您的 1Panel 面板，{{ .num }} 个节点存在异常，详情请登录面板查看。"
-LicenseExceptionAlert: "您的 1Panel 面板，{{ .num }} 个许可证存在异常，详情请登录面板查看。"
-SSHAndPanelLoginAlert: "您的 1Panel 面板，面板{{ .name }}登录{{ .ip }}异常，详情请登录面板查看。"
+TestAlert: "这是一封测试邮件，用于验证邮箱发件配置。"
+LicenseExpirationAlert: "您的 {{ .node }}{{ .ip }} 面板，许可证将在 {{ .day }} 天后到期，请登录面板查看详情。"
+CronJobFailedAlert: "您的 {{ .node }}{{ .ip }} 面板，计划任务-{{ .name }}执行失败，请登录面板查看详情。"
+ClamAlert: "您的 {{ .node }}{{ .ip }} 面板，病毒扫描任务发现 {{ .num }} 个感染文件，请登录面板查看详情。"
+WebSiteAlert: "您的 {{ .node }}{{ .ip }} 面板，有 {{ .num }} 个网站将在 {{ .day }} 天后到期，请登录面板查看详情。"
+SSLAlert: "您的 {{ .node }}{{ .ip }} 面板，有 {{ .num }} 张SSL证书将在 {{ .day }} 天后到期，请登录面板查看详情。"
+DiskUsedAlert: "您的 {{ .node }}{{ .ip }} 面板，磁盘 {{ .name }} 已使用 {{ .used }}，请登录面板查看详情。"
+ResourceAlert: "您的 {{ .node }}{{ .ip }} 面板，平均 {{ .time }} 分钟内的 {{ .name }} 使用率为 {{ .used }}，请登录面板查看详情。"
+PanelVersionAlert: "您的 {{ .node }}{{ .ip }} 面板，有最新面板版本可供升级，请登录面板查看详情。"
+PanelPwdExpirationAlert: "您的 {{ .node }}{{ .ip }} 面板，面板密码将在 {{ .day }} 天后到期，请登录面板查看详情。"
+CommonAlert: "您的 {{ .node }}{{ .ip }} 面板，{{ .msg }}，请登录面板查看详情。"
+NodeExceptionAlert: "您的 {{ .node }}{{ .ip }} 面板，{{ .num }} 个节点存在异常，请登录面板查看详情。"
+LicenseExceptionAlert: "您的 {{ .node }}{{ .ip }} 面板，{{ .num }} 个许可证存在异常，请登录面板查看详情。"
+SSHAndPanelLoginAlert: "您的 {{ .node }}{{ .ip }} 面板，面板 {{ .name }} 登录 {{ .loginIp }} 异常，请登录面板查看详情。"
 
 #disk
 DeviceNotFound: "设备 {{ .name }} 未找到"
@@ -523,5 +584,11 @@ DeviceIsMounted: "设备 {{ .name }} 已挂载，请先卸载"
 PartitionDiskErr: "分区失败，{{ .err }}"
 FormatDiskErr: "格式化磁盘失败，{{ .err }}"
 MountDiskErr: "挂载磁盘失败，{{ .err }}"
-UnMountDiskErr: "卸载磁盘失败，{{ .err }}"
 XfsNotFound: "未检测到 xfs 文件系统，请先安装 xfsprogs"
+
+# terminal
+TerminalAIBlockedRiskyCommand: "已拦截风险命令：{{ .command }}"
+TerminalAIThinking: "AI 正在思考..."
+TerminalAIReadyToExecute: "思考完成，请回车执行（耗时 {{ .duration }}，token：{{ .tokens }}）"
+TerminalAIRequestFailed: "AI 请求失败：{{ .err }}"
+FileAISearchEmptyDir: "当前目录下没有可列出的文件或文件夹（或均被过滤）。"

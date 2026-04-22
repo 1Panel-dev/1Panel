@@ -16,6 +16,7 @@
                                 size="large"
                                 :placeholder="$t('commons.login.mfaCode')"
                                 v-model.trim="mfaLoginForm.code"
+                                autocomplete="one-time-code"
                                 @input="mfaLogin(true)"
                             ></el-input>
                             <div class="h-1">
@@ -38,39 +39,93 @@
                     </div>
                 </el-form>
             </div>
-            <div v-else>
-                <el-form ref="loginFormRef" :model="loginForm" size="default" :rules="loginRules">
-                    <div class="flex justify-between items-center mb-6">
-                        <div class="text-2xl font-medium text-gray-900">{{ $t('commons.button.login') }}</div>
-                        <div class="cursor-pointer">
-                            <el-dropdown @command="handleCommand">
-                                <span class="flex items-center space-x-1">
-                                    {{ dropdownText }}
-                                    <el-icon>
-                                        <arrow-down />
-                                    </el-icon>
-                                </span>
-                                <template #dropdown>
-                                    <el-dropdown-menu>
-                                        <el-dropdown-item v-if="globalStore.isIntl" command="en">
-                                            English
-                                        </el-dropdown-item>
-                                        <el-dropdown-item command="zh">中文(简体)</el-dropdown-item>
-                                        <el-dropdown-item command="zh-Hant">中文(繁體)</el-dropdown-item>
-                                        <el-dropdown-item v-if="!globalStore.isIntl" command="en">
-                                            English
-                                        </el-dropdown-item>
-                                        <el-dropdown-item command="ja">日本語</el-dropdown-item>
-                                        <el-dropdown-item command="pt-BR">Português (Brasil)</el-dropdown-item>
-                                        <el-dropdown-item command="ko">한국어</el-dropdown-item>
-                                        <el-dropdown-item command="ru">Русский</el-dropdown-item>
-                                        <el-dropdown-item command="ms">Bahasa Melayu</el-dropdown-item>
-                                        <el-dropdown-item command="tr">Turkish</el-dropdown-item>
-                                    </el-dropdown-menu>
-                                </template>
-                            </el-dropdown>
-                        </div>
+            <div v-else-if="showPasskeyOnly">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="text-2xl font-medium text-gray-900">{{ $t('commons.button.login') }}</div>
+                    <div class="cursor-pointer">
+                        <el-dropdown @command="handleCommand">
+                            <span class="flex items-center space-x-1">
+                                {{ dropdownText }}
+                                <el-icon>
+                                    <arrow-down />
+                                </el-icon>
+                            </span>
+                            <template #dropdown>
+                                <el-dropdown-menu>
+                                    <el-dropdown-item v-if="globalStore.isIntl" command="en">English</el-dropdown-item>
+                                    <el-dropdown-item command="zh">中文(简体)</el-dropdown-item>
+                                    <el-dropdown-item command="zh-Hant">中文(繁體)</el-dropdown-item>
+                                    <el-dropdown-item v-if="!globalStore.isIntl" command="en">English</el-dropdown-item>
+                                    <el-dropdown-item command="ja">日本語</el-dropdown-item>
+                                    <el-dropdown-item command="pt-BR">Português (Brasil)</el-dropdown-item>
+                                    <el-dropdown-item command="ko">한국어</el-dropdown-item>
+                                    <el-dropdown-item command="ru">Русский</el-dropdown-item>
+                                    <el-dropdown-item command="ms">Bahasa Melayu</el-dropdown-item>
+                                    <el-dropdown-item command="tr">Turkish</el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
                     </div>
+                </div>
+                <div class="space-y-6">
+                    <el-form-item>
+                        <el-button class="w-full login-button" type="primary" size="default" @click="passkeyLogin">
+                            <el-icon class="mr-2"><Key /></el-icon>
+                            {{ $t('commons.login.passkey') }}
+                        </el-button>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-link type="primary" :underline="false" @click="switchToPasswordLogin">
+                            {{ $t('commons.login.passkeyToPassword') }}
+                        </el-link>
+                    </el-form-item>
+                    <el-form-item v-if="!isIntl && !isFxplay">
+                        <el-checkbox v-model="loginForm.agreeLicense">
+                            <template #default>
+                                <span class="agree-title">
+                                    {{ $t('commons.button.agree') }}
+                                    <a
+                                        class="agree"
+                                        href="https://www.fit2cloud.com/legal/licenses.html"
+                                        target="_blank"
+                                    >
+                                        {{ $t('commons.login.licenseHelper') }}
+                                    </a>
+                                </span>
+                            </template>
+                        </el-checkbox>
+                    </el-form-item>
+                </div>
+            </div>
+            <div v-else>
+                <div class="flex justify-between items-center mb-6">
+                    <div class="text-2xl font-medium text-gray-900">{{ $t('commons.button.login') }}</div>
+                    <div class="cursor-pointer">
+                        <el-dropdown @command="handleCommand">
+                            <span class="flex items-center space-x-1">
+                                {{ dropdownText }}
+                                <el-icon>
+                                    <arrow-down />
+                                </el-icon>
+                            </span>
+                            <template #dropdown>
+                                <el-dropdown-menu>
+                                    <el-dropdown-item v-if="globalStore.isIntl" command="en">English</el-dropdown-item>
+                                    <el-dropdown-item command="zh">中文(简体)</el-dropdown-item>
+                                    <el-dropdown-item command="zh-Hant">中文(繁體)</el-dropdown-item>
+                                    <el-dropdown-item v-if="!globalStore.isIntl" command="en">English</el-dropdown-item>
+                                    <el-dropdown-item command="ja">日本語</el-dropdown-item>
+                                    <el-dropdown-item command="pt-BR">Português (Brasil)</el-dropdown-item>
+                                    <el-dropdown-item command="ko">한국어</el-dropdown-item>
+                                    <el-dropdown-item command="ru">Русский</el-dropdown-item>
+                                    <el-dropdown-item command="ms">Bahasa Melayu</el-dropdown-item>
+                                    <el-dropdown-item command="tr">Turkish</el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
+                    </div>
+                </div>
+                <el-form ref="loginFormRef" :model="loginForm" size="default" :rules="loginRules">
                     <div class="space-y-6 flex-grow">
                         <el-form-item prop="name" class="w-full">
                             <el-input
@@ -185,14 +240,22 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed, nextTick } from 'vue';
 import type { ElForm } from 'element-plus';
-import { loginApi, getCaptcha, mfaLoginApi, getLoginSetting } from '@/api/modules/auth';
+import {
+    loginApi,
+    getCaptcha,
+    mfaLoginApi,
+    getLoginSetting,
+    passkeyBeginApi,
+    passkeyFinishApi,
+} from '@/api/modules/auth';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { encryptPassword } from '@/utils/util';
+import { encryptPassword, base64UrlToBuffer, bufferToBase64Url } from '@/utils/auth';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 import { routerToName } from '@/utils/router';
-import { changeToLocal } from '@/utils/node';
+import { changeToLocal, setDefaultNodeInfo } from '@/utils/node';
+import { Key } from '@element-plus/icons-vue';
 
 const i18n = useI18n();
 const themeConfig = computed(() => globalStore.themeConfig);
@@ -203,6 +266,10 @@ const tabsStore = TabsStore();
 const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
+const passkeySetting = ref(false);
+const passkeySupported = ref(false);
+const autoPasskeyEnabledKey = '1panel-passkey-auto-enabled';
+const showPasswordLogin = ref(false);
 const isDemo = ref(false);
 const isIntl = ref(true);
 const isFxplay = ref(false);
@@ -256,9 +323,9 @@ let isLoggingIn = false;
 const userNameRef = ref();
 const mfaLoginRef = ref();
 const mfaButtonFocused = ref();
+const pendingLoginMethod = ref<'password' | 'passkey'>('password');
 const mfaLoginForm = reactive({
-    name: '',
-    password: '',
+    sessionId: '',
     secret: '',
     code: '',
     authMethod: 'session',
@@ -273,6 +340,24 @@ const captcha = reactive({
 const loading = ref<boolean>(false);
 const mfaShow = ref<boolean>(false);
 const dropdownText = ref('中文(简体)');
+
+const isAutoPasskeyEnabled = () => {
+    try {
+        return localStorage.getItem(autoPasskeyEnabledKey) === '1';
+    } catch (error) {
+        return false;
+    }
+};
+const enableAutoPasskey = () => {
+    try {
+        localStorage.setItem(autoPasskeyEnabledKey, '1');
+    } catch (error) {}
+};
+const disableAutoPasskey = () => {
+    try {
+        localStorage.removeItem(autoPasskeyEnabledKey);
+    } catch (error) {}
+};
 
 const languageLabelMap: Record<string, string> = {
     zh: '中文(简体)',
@@ -296,7 +381,22 @@ const handleCommand = async (command: string) => {
 const agreeWithLogin = () => {
     open.value = false;
     loginForm.agreeLicense = true;
+    if (pendingLoginMethod.value === 'passkey') {
+        passkeyLogin();
+        return;
+    }
     login(loginFormRef.value);
+};
+
+const showPasskeyOnly = computed(() => {
+    return passkeySetting.value && passkeySupported.value && !showPasswordLogin.value;
+});
+
+const switchToPasswordLogin = () => {
+    showPasswordLogin.value = true;
+    nextTick(() => {
+        userNameRef.value?.focus();
+    });
 };
 
 const login = (formEl: FormInstance | undefined) => {
@@ -310,6 +410,7 @@ const login = (formEl: FormInstance | undefined) => {
         }
         if (!loginForm.agreeLicense) {
             if (_isMobile()) {
+                pendingLoginMethod.value = 'password';
                 open.value = true;
             }
             return;
@@ -332,24 +433,31 @@ const login = (formEl: FormInstance | undefined) => {
             const res = await loginApi(requestLoginForm);
             globalStore.ignoreCaptcha = true;
             if (res.data.mfaStatus === 'Enable') {
+                mfaLoginForm.sessionId = res.data.mfaSession || '';
+                mfaLoginForm.code = '';
                 mfaShow.value = true;
                 errMfaInfo.value = false;
+                errCaptcha.value = false;
                 nextTick(() => {
                     mfaLoginRef.value?.focus();
                 });
                 return;
             }
-            globalStore.setLogStatus(true);
-            globalStore.setAgreeLicense(true);
+            globalStore.isLogin = true;
+            globalStore.agreeLicense = true;
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             changeToLocal();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
+            setDefaultNodeInfo();
+            localStorage.removeItem('dashboardCache');
+            localStorage.removeItem('upgradeChecked');
             routerToName('home');
             document.onkeydown = null;
         } catch (res) {
             if (res.code === 401) {
                 if (res.message === 'ErrCaptchaCode') {
+                    globalStore.ignoreCaptcha = false;
                     loginForm.captcha = '';
                     errCaptcha.value = true;
                     errAuthInfo.value = false;
@@ -377,28 +485,128 @@ const mfaLogin = async (auto: boolean) => {
     if (isLoggingIn) return;
     if ((!auto && mfaLoginForm.code) || (auto && mfaLoginForm.code.length === 6)) {
         isLoggingIn = true;
-        mfaLoginForm.name = loginForm.name;
-        mfaLoginForm.password = encryptPassword(loginForm.password);
         try {
+            errMfaInfo.value = false;
             await mfaLoginApi(mfaLoginForm);
-            globalStore.setLogStatus(true);
+            globalStore.isLogin = true;
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             changeToLocal();
+            setDefaultNodeInfo();
+            localStorage.removeItem('dashboardCache');
+            localStorage.removeItem('upgradeChecked');
             routerToName('home');
             document.onkeydown = null;
         } catch (res) {
             if (res.code === 401) {
-                errMfaInfo.value = true;
+                if (res.message === 'ErrCaptchaCode') {
+                    globalStore.ignoreCaptcha = false;
+                    mfaLoginForm.code = '';
+                    mfaShow.value = false;
+                    loginVerify();
+                    nextTick(() => {
+                        userNameRef.value?.focus();
+                    });
+                } else if (res.message === 'ErrMFA') {
+                    errMfaInfo.value = true;
+                } else if (res.message) {
+                    MsgError(res.message);
+                }
                 isLoggingIn = false;
                 return;
             }
+            loginVerify();
         } finally {
             isLoggingIn = false;
         }
     }
 };
+
+const passkeyLogin = async () => {
+    if (isLoggingIn || !passkeySetting.value) return;
+    if (!passkeySupported.value) {
+        disableAutoPasskey();
+        MsgError(i18n.t('commons.login.passkeyNotSupported'));
+        return;
+    }
+    if (!isIntl.value && !isFxplay.value && !loginForm.agreeLicense) {
+        if (_isMobile() || showPasskeyOnly.value) {
+            pendingLoginMethod.value = 'passkey';
+            open.value = true;
+        } else {
+            MsgError(i18n.t('commons.login.errorAgree'));
+        }
+        return;
+    }
+    try {
+        isLoggingIn = true;
+        loading.value = true;
+        const res = await passkeyBeginApi();
+        const publicKey = normalizePasskeyRequest(res.data.publicKey);
+        const credential = (await navigator.credentials.get({ publicKey })) as PublicKeyCredential | null;
+        if (!credential) {
+            disableAutoPasskey();
+            MsgError(i18n.t('commons.login.passkeyFailed'));
+            return;
+        }
+        const payload = buildPasskeyAssertion(credential);
+        await passkeyFinishApi(payload, res.data.sessionId);
+        enableAutoPasskey();
+        globalStore.ignoreCaptcha = true;
+        globalStore.isLogin = true;
+        globalStore.agreeLicense = true;
+        menuStore.setMenuList([]);
+        tabsStore.removeAllTabs();
+        changeToLocal();
+        MsgSuccess(i18n.t('commons.msg.loginSuccess'));
+        setDefaultNodeInfo();
+        localStorage.removeItem('dashboardCache');
+        localStorage.removeItem('upgradeChecked');
+        routerToName('home');
+        document.onkeydown = null;
+    } catch (res: any) {
+        disableAutoPasskey();
+        if (res?.message) {
+            MsgError(i18n.t('commons.login.passkeyFailed'));
+        }
+    } finally {
+        isLoggingIn = false;
+        loading.value = false;
+    }
+};
+
+const normalizePasskeyRequest = (publicKey: Record<string, any>): PublicKeyCredentialRequestOptions => {
+    const request = { ...publicKey };
+    request.challenge = base64UrlToBuffer(request.challenge);
+    if (request.allowCredentials && Array.isArray(request.allowCredentials)) {
+        request.allowCredentials = request.allowCredentials.map((item) => {
+            return { ...item, id: base64UrlToBuffer(item.id) };
+        });
+    }
+    return request as PublicKeyCredentialRequestOptions;
+};
+
+const buildPasskeyAssertion = (credential: PublicKeyCredential) => {
+    const response = credential.response as AuthenticatorAssertionResponse;
+    const payload: Record<string, any> = {
+        id: credential.id,
+        rawId: bufferToBase64Url(credential.rawId),
+        type: credential.type,
+        response: {
+            clientDataJSON: bufferToBase64Url(response.clientDataJSON),
+            authenticatorData: bufferToBase64Url(response.authenticatorData),
+            signature: bufferToBase64Url(response.signature),
+        },
+        clientExtensionResults: credential.getClientExtensionResults(),
+        authenticatorAttachment: credential.authenticatorAttachment,
+    };
+    if (response.userHandle) {
+        payload.response.userHandle = bufferToBase64Url(response.userHandle);
+    }
+    return payload;
+};
+
 const loginVerify = async () => {
     const res = await getCaptcha();
     captcha.imagePath = res.data.imagePath ? res.data.imagePath : '';
@@ -417,11 +625,22 @@ const getSetting = async () => {
         globalStore.isFxplay = isFxplay.value;
         globalStore.isOffLine = res.data.isOffLine;
         globalStore.ignoreCaptcha = !res.data.needCaptcha;
+        passkeySetting.value = res.data.passkeySetting;
+        if (!globalStore.ignoreCaptcha) {
+            loginVerify();
+        }
 
         document.title = res.data.panelName;
         i18n.warnHtmlMessage = false;
-        globalStore.setOpenMenuTabs(res.data.menuTabs === 'Enable');
-        globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName });
+        globalStore.openMenuTabs = res.data.menuTabs === 'Enable';
+        globalStore.themeConfig = { ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName };
+
+        if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {
+            loginForm.agreeLicense = true;
+        }
+        if (passkeySetting.value && passkeySupported.value && isAutoPasskeyEnabled()) {
+            passkeyLogin();
+        }
     } catch (error) {}
 };
 
@@ -468,6 +687,7 @@ function adjustColorToRGBA(color: string, percent: number, opacity: number): str
 
 onMounted(() => {
     globalStore.isOnRestart = false;
+    passkeySupported.value = !!window.PublicKeyCredential && window.isSecureContext;
     getSetting();
     getXpackSettingForTheme();
     if (!globalStore.ignoreCaptcha) {
@@ -507,6 +727,7 @@ onMounted(() => {
 .agree {
     text-decoration: none;
 }
+
 .agree:hover {
     text-decoration: underline;
 }
@@ -529,6 +750,7 @@ onMounted(() => {
         background-color: var(--login-btn-link-color);
         border-color: var(--login-btn-link-color);
         color: #ffffff;
+
         &:hover {
             background-color: var(--login-btn-link-hover-color) !important;
             border-color: var(--login-btn-link-hover-color) !important;
@@ -544,12 +766,14 @@ onMounted(() => {
     :deep(.el-input__wrapper) {
         background: none !important;
     }
+
     :deep(.el-input__wrapper.is-focus) {
         box-shadow: 0 0 0 1px var(--login-btn-link-color) inset !important;
     }
 
     .demo {
         text-align: center;
+
         span {
             color: red;
         }
@@ -566,6 +790,7 @@ onMounted(() => {
 
     :deep(a) {
         color: var(--login-btn-link-color);
+
         &:hover {
             opacity: 75%;
         }
@@ -589,6 +814,7 @@ onMounted(() => {
         color: #000 !important;
     }
 }
+
 .cursor-pointer {
     outline: none;
 }
@@ -605,6 +831,7 @@ onMounted(() => {
     background-color: var(--login-btn-link-color) !important;
     color: #fff !important;
 }
+
 :deep(.el-dropdown-menu__item:not(.is-disabled):focus) {
     background-color: var(--login-btn-link-color) !important;
     color: #fff !important;
@@ -612,6 +839,7 @@ onMounted(() => {
 
 :deep(.el-loading-mask) {
     background-color: var(--login-loading-mask-color) !important;
+
     .el-loading-spinner .path {
         stroke: var(--login-btn-link-color);
     }

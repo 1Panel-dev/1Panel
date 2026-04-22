@@ -11,6 +11,16 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 	hostRouter := Router.Group("hosts")
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
+		hostRouter.POST("", baseApi.CreateHost)
+		hostRouter.POST("/info", baseApi.GetHostByID)
+		hostRouter.POST("/del", baseApi.DeleteHost)
+		hostRouter.POST("/update", baseApi.UpdateHost)
+		hostRouter.POST("/update/group", baseApi.UpdateHostGroup)
+		hostRouter.POST("/search", baseApi.SearchHost)
+		hostRouter.POST("/tree", baseApi.HostTree)
+		hostRouter.POST("/test/byinfo", baseApi.TestByInfo)
+		hostRouter.POST("/test/byid", baseApi.TestByID)
+
 		hostRouter.POST("/firewall/base", baseApi.LoadFirewallBaseInfo)
 		hostRouter.POST("/firewall/search", baseApi.SearchFirewallRule)
 		hostRouter.POST("/firewall/operate", baseApi.OperateFirewall)

@@ -78,6 +78,7 @@ const getType = (status: string) => {
         case 'removing':
         case 'deleted':
         case 'conflict':
+        case 'partial':
             return 'warning';
         case 'duplicate':
         case 'unexecuted':

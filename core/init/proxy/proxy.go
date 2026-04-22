@@ -8,15 +8,18 @@ import (
 	"time"
 )
 
-var (
-	sockPath = "/etc/1panel/agent.sock"
+const SockPath = "/etc/1panel/agent.sock"
 
+var (
 	LocalAgentProxy *httputil.ReverseProxy
 )
 
 func Init() {
+	dialer := &net.Dialer{
+		Timeout: 5 * time.Second,
+	}
 	dialUnix := func(ctx context.Context, network, addr string) (net.Conn, error) {
-		return net.Dial("unix", sockPath)
+		return dialer.DialContext(ctx, "unix", SockPath)
 	}
 	transport := &http.Transport{
 		DialContext:         dialUnix,
@@ -27,13 +30,23 @@ func Init() {
 	}
 	LocalAgentProxy = &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
+			if req.Header.Get("X-Forwarded-Proto") == "" {
+				if req.TLS != nil {
+					req.Header.Set("X-Forwarded-Proto", "https")
+				} else {
+					req.Header.Set("X-Forwarded-Proto", "http")
+				}
+			}
+			if req.Header.Get("X-Forwarded-Host") == "" && req.Host != "" {
+				req.Header.Set("X-Forwarded-Host", req.Host)
+			}
 			req.URL.Scheme = "http"
 			req.URL.Host = "unix"
 		},
 		Transport: transport,
 		ErrorHandler: func(rw http.ResponseWriter, req *http.Request, err error) {
 			rw.WriteHeader(http.StatusBadGateway)
-			rw.Write([]byte("Bad Gateway"))
+			_, _ = rw.Write([]byte("Bad Gateway: " + err.Error()))
 		},
 	}
 }

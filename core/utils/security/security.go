@@ -3,6 +3,11 @@ package security
 import (
 	"encoding/base64"
 	"fmt"
+	"net/http"
+	"regexp"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
@@ -11,11 +16,9 @@ import (
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"regexp"
-	"strconv"
-	"strings"
 )
+
+var publicSharePagePattern = regexp.MustCompile(`^/s/[A-Za-z0-9]{10,16}$`)
 
 func HandleNotRoute(c *gin.Context) bool {
 	if !checkBindDomain(c) {
@@ -98,7 +101,7 @@ func HandleNotSecurity(c *gin.Context, resType string) {
 		return
 	}
 	if resPage == "444" {
-		c.String(444, "")
+		CloseDirectly(c)
 		return
 	}
 
@@ -136,11 +139,19 @@ func checkFrontendPath(c *gin.Context) bool {
 	if !isFrontendPath(c) {
 		return false
 	}
+	if isPublicFileSharePagePath(c.Request.URL.Path) {
+		return true
+	}
 	authService := service.NewIAuthService()
 	if authService.GetSecurityEntrance() != "" {
 		return authService.IsLogin(c)
 	}
 	return true
+}
+
+func isPublicFileSharePagePath(path string) bool {
+	reqUri := strings.TrimSuffix(path, "/")
+	return publicSharePagePattern.MatchString(reqUri)
 }
 
 func checkBindDomain(c *gin.Context) bool {
@@ -182,4 +193,20 @@ func checkIPLimit(c *gin.Context) bool {
 func checkSession(c *gin.Context) bool {
 	_, err := global.SESSION.Get(c)
 	return err == nil
+}
+
+func CloseDirectly(c *gin.Context) {
+	hijacker, ok := c.Writer.(http.Hijacker)
+	if !ok {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+	conn, _, err := hijacker.Hijack()
+	if err != nil {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
+	conn.Close()
+	c.Abort()
 }

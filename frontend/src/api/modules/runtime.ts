@@ -118,7 +118,7 @@ export const operateSupervisorProcessFile = (req: Runtime.ProcessFileReq) => {
     return http.post<string>(`/runtimes/supervisor/process/file`, req, TimeoutEnum.T_60S);
 };
 
-export const createSupervisorProcess = (req: Runtime.SupersivorProcess) => {
+export const createSupervisorProcess = (req: Runtime.SupervisorProcess) => {
     return http.post(`/runtimes/supervisor/process`, req);
 };
 

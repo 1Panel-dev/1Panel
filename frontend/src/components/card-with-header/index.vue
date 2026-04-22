@@ -2,11 +2,11 @@
     <div>
         <el-card :style="{ height: height }" class="home-card">
             <div class="header">
-                <div class="header-left">
+                <div class="header-left flex flex-wrap gap-3">
                     <span class="header-span">{{ header }}</span>
                     <slot name="header-l" />
                 </div>
-                <div class="header-right">
+                <div class="header-right flex flex-wrap gap-3">
                     <slot name="header-r" />
                 </div>
             </div>

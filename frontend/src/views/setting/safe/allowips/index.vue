@@ -20,8 +20,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { updateSetting } from '@/api/modules/setting';
 import { ElMessageBox, FormInstance } from 'element-plus';
-import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/util';
-
+import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const form = reactive({

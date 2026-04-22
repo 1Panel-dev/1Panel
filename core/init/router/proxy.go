@@ -3,7 +3,6 @@ package router
 import (
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 
@@ -44,7 +43,7 @@ func Proxy() gin.HandlerFunc {
 
 		apiReq := c.GetBool("API_AUTH")
 
-		if !apiReq && strings.HasPrefix(c.Request.URL.Path, "/api/v2/") && !isLocalAPI(c.Request.URL.Path) && !checkSession(c) {
+		if !apiReq && strings.HasPrefix(c.Request.URL.Path, "/api/v2/") && !isLocalAPI(c.Request.URL.Path) && !isPublicFileShareAPI(c.Request.URL.Path) && !checkSession(c) {
 			data, _ := res.ErrorMsg.ReadFile("html/401.html")
 			c.Data(401, "text/html; charset=utf-8", data)
 			c.Abort()
@@ -52,11 +51,6 @@ func Proxy() gin.HandlerFunc {
 		}
 
 		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0) {
-			sockPath := "/etc/1panel/agent.sock"
-			if _, err := os.Stat(sockPath); err != nil {
-				helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrProxy", err)
-				return
-			}
 			defer func() {
 				if err := recover(); err != nil && err != http.ErrAbortHandler {
 					global.LOG.Debug(err)
@@ -77,19 +71,26 @@ func checkSession(c *gin.Context) bool {
 		return false
 	}
 	settingRepo := repo.NewISettingRepo()
-	setting, err := settingRepo.Get(repo.WithByKey("SessionTimeout"))
+	sessionTimeout, err := settingRepo.GetValueByKey("SessionTimeout")
 	if err != nil {
 		return false
 	}
-	lifeTime, _ := strconv.Atoi(setting.Value)
-	httpsSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
+	lifeTime, _ := strconv.Atoi(sessionTimeout)
+	ssl, err := settingRepo.GetValueByKey("SSL")
 	if err != nil {
 		return false
 	}
-	_ = global.SESSION.Set(c, psession, httpsSetting.Value == constant.StatusEnable, lifeTime)
+	if _, err := global.SESSION.RefreshIfNeeded(c, psession, ssl == constant.StatusEnable, lifeTime); err != nil {
+		global.LOG.Warnf("proxy refresh session failed, path=%s, err=%v", c.Request.URL.Path, err)
+		return false
+	}
 	return true
 }
 
 func isLocalAPI(urlPath string) bool {
 	return urlPath == "/api/v2/core/xpack/sync/ssl"
+}
+
+func isPublicFileShareAPI(urlPath string) bool {
+	return urlPath == "/api/v2/files/share/download" || urlPath == "/api/v2/files/share/check" || urlPath == "/api/v2/files/share/info"
 }

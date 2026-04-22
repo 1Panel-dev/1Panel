@@ -1,20 +1,16 @@
 package psession
 
 import (
-	"encoding/json"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
-	"log"
-	"os"
+	"net/http"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/gin-gonic/gin"
-	"github.com/glebarez/sqlite"
-	"github.com/gorilla/securecookie"
-	"github.com/gorilla/sessions"
-	"github.com/wader/gormstore/v2"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type SessionUser struct {
@@ -22,93 +18,277 @@ type SessionUser struct {
 	Name string `json:"name"`
 }
 
-type PSession struct {
-	Store *gormstore.Store
-	db    *gorm.DB
+type sessionItem struct {
+	CreatedAt time.Time
+	CSRFToken string
+	User      SessionUser
+	ExpiredAt time.Time
 }
 
-func NewPSession(dbPath string) *PSession {
-	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags),
-		logger.Config{
-			SlowThreshold:             time.Second,
-			LogLevel:                  logger.Silent,
-			IgnoreRecordNotFoundError: true,
-			Colorful:                  false,
-		},
-	)
-	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{
-		DisableForeignKeyConstraintWhenMigrating: true,
-		Logger:                                   newLogger,
-	})
-	if err != nil {
-		panic(err)
-	}
-	sqlDB, dbError := db.DB()
-	if dbError != nil {
-		panic(err)
-	}
-	sqlDB.SetMaxOpenConns(4)
-	sqlDB.SetMaxIdleConns(1)
-	sqlDB.SetConnMaxIdleTime(15 * time.Minute)
-	sqlDB.SetConnMaxLifetime(time.Hour)
+type PSession struct {
+	mu              sync.RWMutex
+	sessions        map[string]sessionItem
+	cleanupCursor   atomic.Uint64
+	lastFullCleanup time.Time
+}
 
-	store := gormstore.New(db, securecookie.GenerateRandomKey(32))
+const maxSessionEntries = 64
+
+func NewPSession(_ string) *PSession {
 	return &PSession{
-		Store: store,
-		db:    db,
+		sessions: make(map[string]sessionItem),
 	}
 }
 
 func (p *PSession) Get(c *gin.Context) (SessionUser, error) {
 	var result SessionUser
-	session, err := p.Store.Get(c.Request, constant.SessionName)
-	if err != nil {
-		return result, err
+
+	sessionID, err := c.Cookie(constant.SessionName)
+	if err != nil || sessionID == "" {
+		return result, errors.New("ErrSessionDataNotFound")
 	}
-	data, ok := session.Values["user"]
+
+	p.mu.RLock()
+	item, ok := p.sessions[sessionID]
+	p.mu.RUnlock()
 	if !ok {
-		return result, errors.New("session data not found")
+		return result, errors.New("ErrSessionDataNotFound")
 	}
-	bytes, ok := data.([]byte)
-	if !ok {
-		return result, errors.New("invalid session data format")
+	if !item.ExpiredAt.IsZero() && time.Now().After(item.ExpiredAt) {
+		p.mu.Lock()
+		delete(p.sessions, sessionID)
+		p.mu.Unlock()
+		return result, errors.New("ErrSessionDataNotFound")
 	}
-	err = json.Unmarshal(bytes, &result)
-	return result, err
+	return item.User, nil
 }
 
 func (p *PSession) Set(c *gin.Context, user SessionUser, secure bool, ttlSeconds int) error {
-	session, err := p.Store.Get(c.Request, constant.SessionName)
-	if err != nil {
-		return err
+	return p.set(c, user, secure, ttlSeconds, false)
+}
+
+func (p *PSession) SetFresh(c *gin.Context, user SessionUser, secure bool, ttlSeconds int) error {
+	return p.set(c, user, secure, ttlSeconds, true)
+}
+
+func (p *PSession) set(c *gin.Context, user SessionUser, secure bool, ttlSeconds int, forceNew bool) error {
+	sessionID, err := c.Cookie(constant.SessionName)
+	if forceNew {
+		if err == nil && sessionID != "" {
+			p.mu.Lock()
+			delete(p.sessions, sessionID)
+			p.mu.Unlock()
+		}
+		sessionID = ""
 	}
-	data, err := json.Marshal(user)
-	if err != nil {
-		return err
+	if err != nil || sessionID == "" {
+		sessionID, err = generateSessionID()
+		if err != nil {
+			return err
+		}
 	}
-	session.Values["user"] = data
-	session.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   ttlSeconds,
-		HttpOnly: true,
-		Secure:   secure,
+
+	expiredAt := time.Now().Add(time.Duration(ttlSeconds) * time.Second)
+	createdAt := time.Now()
+	csrfToken := ""
+
+	p.mu.Lock()
+	if existing, ok := p.sessions[sessionID]; ok {
+		if !existing.CreatedAt.IsZero() {
+			createdAt = existing.CreatedAt
+		}
+		csrfToken = existing.CSRFToken
 	}
-	return p.Store.Save(c.Request, c.Writer, session)
+	if csrfToken == "" {
+		csrfToken, err = generateSessionID()
+		if err != nil {
+			p.mu.Unlock()
+			return err
+		}
+	}
+	p.sessions[sessionID] = sessionItem{
+		CreatedAt: createdAt,
+		CSRFToken: csrfToken,
+		User:      user,
+		ExpiredAt: expiredAt,
+	}
+	p.evictOverflowLocked(sessionID)
+	p.mu.Unlock()
+	p.cleanupExpiredOnWrite()
+
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie(constant.SessionName, sessionID, ttlSeconds, "/", "", secure, true)
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie(constant.CSRFTokenName, csrfToken, ttlSeconds, "/", "", secure, false)
+	return nil
+}
+
+func (p *PSession) evictOverflowLocked(currentSessionID string) {
+	if maxSessionEntries <= 0 || len(p.sessions) <= maxSessionEntries {
+		return
+	}
+
+	for len(p.sessions) > maxSessionEntries {
+		oldestID := ""
+		var oldestItem sessionItem
+		for sessionID, item := range p.sessions {
+			if sessionID == currentSessionID {
+				continue
+			}
+			if oldestID == "" || item.CreatedAt.Before(oldestItem.CreatedAt) {
+				oldestID = sessionID
+				oldestItem = item
+			}
+		}
+		if oldestID == "" {
+			return
+		}
+		delete(p.sessions, oldestID)
+	}
+}
+
+func (p *PSession) RefreshIfNeeded(c *gin.Context, user SessionUser, secure bool, ttlSeconds int) (bool, error) {
+	sessionID, err := c.Cookie(constant.SessionName)
+	if err != nil || sessionID == "" {
+		return false, p.Set(c, user, secure, ttlSeconds)
+	}
+
+	p.mu.RLock()
+	item, ok := p.sessions[sessionID]
+	p.mu.RUnlock()
+	if !ok {
+		return false, p.Set(c, user, secure, ttlSeconds)
+	}
+	if !item.ExpiredAt.IsZero() && time.Now().After(item.ExpiredAt) {
+		p.mu.Lock()
+		delete(p.sessions, sessionID)
+		p.mu.Unlock()
+		return false, errors.New("ErrSessionDataNotFound")
+	}
+	return true, p.Set(c, user, secure, ttlSeconds)
 }
 
 func (p *PSession) Delete(c *gin.Context) error {
-	session, err := p.Store.Get(c.Request, constant.SessionName)
-	if err != nil {
-		return err
+	sessionID, err := c.Cookie(constant.SessionName)
+	if err == nil && sessionID != "" {
+		p.mu.Lock()
+		delete(p.sessions, sessionID)
+		p.mu.Unlock()
+	}
+	return nil
+}
+
+func (p *PSession) CheckCSRFToken(c *gin.Context, token string) bool {
+	sessionID, err := c.Cookie(constant.SessionName)
+	if err != nil || sessionID == "" || token == "" {
+		return false
 	}
 
-	session.Values = make(map[interface{}]interface{})
-	session.Options.MaxAge = -1
-	return p.Store.Save(c.Request, c.Writer, session)
+	p.mu.RLock()
+	item, ok := p.sessions[sessionID]
+	p.mu.RUnlock()
+	if !ok {
+		return false
+	}
+	if !item.ExpiredAt.IsZero() && time.Now().After(item.ExpiredAt) {
+		p.mu.Lock()
+		delete(p.sessions, sessionID)
+		p.mu.Unlock()
+		return false
+	}
+	return item.CSRFToken == token
 }
 
 func (p *PSession) Clean() error {
-	p.db.Table("sessions").Where("1=1").Delete(nil)
+	p.mu.Lock()
+	p.sessions = make(map[string]sessionItem)
+	p.lastFullCleanup = time.Time{}
+	p.mu.Unlock()
 	return nil
+}
+
+func generateSessionID() (string, error) {
+	buf := make([]byte, 32)
+	if _, err := rand.Read(buf); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(buf), nil
+}
+
+func (p *PSession) cleanupExpiredOnWrite() {
+	const (
+		sampleSize             = 32
+		fullCleanupThreshold   = 1024
+		fullCleanupMinInterval = time.Minute
+	)
+
+	now := time.Now()
+
+	p.mu.RLock()
+	size := len(p.sessions)
+	lastFullCleanup := p.lastFullCleanup
+	p.mu.RUnlock()
+
+	if size == 0 {
+		return
+	}
+	if size >= fullCleanupThreshold && now.Sub(lastFullCleanup) >= fullCleanupMinInterval {
+		p.cleanupExpiredAll(now)
+		return
+	}
+	p.cleanupExpiredSample(now, sampleSize)
+}
+
+func (p *PSession) cleanupExpiredSample(now time.Time, limit int) {
+	if limit <= 0 {
+		return
+	}
+
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	total := len(p.sessions)
+	if total == 0 {
+		return
+	}
+	start := int(p.cleanupCursor.Add(uint64(limit)) % uint64(total))
+	checked := 0
+
+	idx := 0
+	for key, item := range p.sessions {
+		if idx < start {
+			idx++
+			continue
+		}
+		if !item.ExpiredAt.IsZero() && now.After(item.ExpiredAt) {
+			delete(p.sessions, key)
+		}
+		checked++
+		idx++
+		if checked >= limit {
+			break
+		}
+	}
+	if checked < limit {
+		for key, item := range p.sessions {
+			if checked >= limit {
+				break
+			}
+			if !item.ExpiredAt.IsZero() && now.After(item.ExpiredAt) {
+				delete(p.sessions, key)
+			}
+			checked++
+		}
+	}
+}
+
+func (p *PSession) cleanupExpiredAll(now time.Time) {
+	p.mu.Lock()
+	for key, item := range p.sessions {
+		if !item.ExpiredAt.IsZero() && now.After(item.ExpiredAt) {
+			delete(p.sessions, key)
+		}
+	}
+	p.lastFullCleanup = now
+	p.mu.Unlock()
 }

@@ -32,7 +32,7 @@ func (b *BaseApi) PageTasks(c *gin.Context) {
 
 // @Tags TaskLog
 // @Summary Get the number of executing tasks
-// @Success 200 {object} int64
+// @Success 200 {integer} int64
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /logs/tasks/executing/count [get]

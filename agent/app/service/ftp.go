@@ -76,7 +76,7 @@ func (u *FtpService) Operate(operation string) error {
 }
 
 func (f *FtpService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, lists, err := ftpRepo.Page(req.Page, req.PageSize, ftpRepo.WithLikeUser(req.Info), repo.WithOrderBy("created_at desc"))
+	total, lists, err := ftpRepo.Page(req.Page, req.PageSize, ftpRepo.WithLikeUser(req.Info), repo.WithOrderDesc("created_at"))
 	if err != nil {
 		return 0, nil, err
 	}

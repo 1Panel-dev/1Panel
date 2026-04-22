@@ -79,7 +79,7 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.watermark')" v-if="isMasterProductPro" prop="watermark">
-                                <el-radio-group class="w-full" @change="onChangeWatermark" v-model="form.watermarkItem">
+                                <el-radio-group class="w-full" @change="onChangeWatermark" v-model="form.watermarkShow">
                                     <el-radio-button value="Enable">
                                         <span>{{ $t('commons.button.enable') }}</span>
                                     </el-radio-button>
@@ -87,7 +87,7 @@
                                         <span>{{ $t('commons.button.disable') }}</span>
                                     </el-radio-button>
                                 </el-radio-group>
-                                <div v-if="form.watermarkItem === 'Enable'">
+                                <div v-if="form.watermarkShow === 'Enable'">
                                     <div>
                                         <el-button link type="primary" @click="onChangeWatermark">
                                             {{ $t('commons.button.view') }}
@@ -201,6 +201,12 @@
                                     {{ $t('commons.button.set') }}
                                 </el-button>
                             </el-form-item>
+
+                            <el-form-item :label="$t('setting.runtimeEnv')" prop="edition">
+                                <el-button icon="Setting" @click="onChangeRegion">
+                                    {{ runtimeEnvLabel() }}
+                                </el-button>
+                            </el-form-item>
                         </el-col>
                     </el-row>
                 </el-form>
@@ -217,6 +223,7 @@
         <HideMenu ref="hideMenuRef" @search="search()" />
         <ThemeColor ref="themeColorRef" />
         <Watermark ref="watermarkRef" @search="search()" />
+        <Edition ref="editionRef" @search="search()" />
     </div>
 </template>
 
@@ -243,6 +250,7 @@ import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import Proxy from '@/views/setting/panel/proxy/index.vue';
 import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
+import Edition from '@/views/setting/panel/edition/index.vue';
 import { storeToRefs } from 'pinia';
 import { getXpackSetting, updateXpackSettingByKey } from '@/utils/xpack';
 import { setPrimaryColor } from '@/utils/theme';
@@ -274,10 +282,12 @@ const form = reactive({
     panelName: '',
     theme: '',
     watermark: '',
-    watermarkItem: '',
+    watermarkShow: '',
     themeColor: {} as ThemeColor,
     menuTabs: '',
     language: '',
+    docSource: 'withByRegion',
+    edition: '',
     complexityVerification: '',
     developerMode: '',
     systemIP: '',
@@ -311,6 +321,7 @@ const hideMenuRef = ref();
 const watermarkRef = ref();
 const themeColorRef = ref();
 const apiInterfaceRef = ref();
+const editionRef = ref();
 const unset = ref(i18n.global.t('setting.unSetting'));
 
 const languageOptions = ref([
@@ -341,6 +352,8 @@ const search = async () => {
     form.menuTabs = res.data.menuTabs;
     form.panelName = res.data.panelName;
     form.language = res.data.language;
+    form.docSource = res.data.docSource || 'withByRegion';
+    form.edition = res.data.edition;
     form.sessionTimeout = Number(res.data.sessionTimeout);
 
     form.proxyUrl = res.data.proxyUrl;
@@ -372,12 +385,12 @@ const search = async () => {
             globalStore.themeConfig.theme = form.theme;
             form.proxyDocker = xpackRes.data.proxyDocker;
             form.watermark = xpackRes.data.watermark;
+            form.watermarkShow = xpackRes.data.watermarkShow;
             try {
                 globalStore.watermark = JSON.parse(xpackRes.data.watermark);
             } catch {
                 globalStore.watermark = null;
             }
-            form.watermarkItem = xpackRes.data.watermark ? 'Enable' : 'Disable';
         }
     } else {
         globalStore.themeConfig.theme = form.theme;
@@ -415,13 +428,23 @@ const onChangeHideMenus = () => {
     hideMenuRef.value.acceptParams({ hideMenu: form.hideMenu });
 };
 
+const onChangeRegion = () => {
+    editionRef.value.acceptParams({ edition: form.edition, docSource: form.docSource });
+};
+
+const runtimeEnvLabel = () => {
+    const editionLabel = form.edition === 'cn' ? i18n.global.t('setting.cn') : i18n.global.t('setting.intl');
+    const docSourceLabel = i18n.global.t(`setting.${form.docSource || 'withByRegion'}`);
+    return `${editionLabel} / ${docSourceLabel}`;
+};
+
 const onChangeThemeColor = () => {
     const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);
     themeColorRef.value.acceptParams({ themeColor: themeColor, theme: globalStore.themeConfig.theme });
 };
 
 const onChangeWatermark = async () => {
-    if (form.watermarkItem === 'Enable') {
+    if (form.watermarkShow === 'Enable') {
         watermarkRef.value.acceptParams(form.watermark);
         return;
     }
@@ -431,10 +454,11 @@ const onChangeWatermark = async () => {
     })
         .then(async () => {
             loading.value = true;
-            await updateXpackSettingByKey('Watermark', '')
+            await updateXpackSettingByKey('WatermarkShow', 'Disable')
                 .then(() => {
                     loading.value = false;
                     globalStore.watermark = null;
+                    globalStore.watermarkShow = false;
                     search();
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
@@ -443,7 +467,7 @@ const onChangeWatermark = async () => {
                 });
         })
         .catch(() => {
-            form.watermarkItem = 'Enable';
+            form.watermarkShow = 'Enable';
         });
 };
 
@@ -510,15 +534,17 @@ const onSave = async (key: string, val: any) => {
     };
     try {
         await updateSetting(param);
-        if (key === 'Language') {
-            await globalStore.updateLanguage(val);
-            location.reload();
-        }
-        if (key === 'Theme') {
-            handleThemeChange(val);
-        }
-        if (key === 'MenuTabs') {
-            globalStore.setOpenMenuTabs(val === 'Enable');
+        switch (key) {
+            case 'Theme':
+                handleThemeChange(val);
+                break;
+            case 'MenuTabs':
+                globalStore.openMenuTabs = val === 'Enable';
+                break;
+            case 'Language':
+                await globalStore.updateLanguage(val);
+                location.reload();
+                break;
         }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();

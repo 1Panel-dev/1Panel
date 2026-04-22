@@ -166,22 +166,72 @@
             <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
                 <el-carousel
                     class="my-carousel"
-                    :key="simpleNodes.length"
+                    :class="{ 'no-indicator': carouselItemCount <= 1 }"
+                    :key="simpleNodes.length + carouselItemCount"
                     height="368px"
-                    :indicator-position="showSimpleNode() ? '' : 'none'"
+                    indicator-position=""
                     arrow="never"
                 >
                     <el-carousel-item key="systemInfo">
                         <CardWithHeader :header="$t('home.systemInfo')">
                             <template #header-r>
-                                <el-button class="h-button-setting" @click="refreshDashboard" link icon="Refresh" />
-                                <el-button
-                                    class="h-button-setting"
-                                    @click="toggleSensitiveInfo"
-                                    link
-                                    :icon="showSensitiveInfo ? 'View' : 'Hide'"
-                                />
-                                <el-button class="h-button-setting" @click="handleCopy" link icon="CopyDocument" />
+                                <el-popover
+                                    popper-class="dashboard-carousel-popover"
+                                    placement="bottom"
+                                    :title="$t('home.carouselSetting')"
+                                    width="220"
+                                    trigger="click"
+                                >
+                                    <div class="dashboard-carousel-setting">
+                                        <div class="setting-item mt-2">
+                                            <span>{{ $t('home.systemInfo') }}</span>
+                                            <div class="mr-4">-</div>
+                                        </div>
+                                        <div class="setting-item mt-2">
+                                            <span>{{ $t('home.memo') }}</span>
+                                            <el-switch
+                                                v-model="memoCarouselSetting"
+                                                active-value="Enable"
+                                                inactive-value="Disable"
+                                                @change="
+                                                    (val) => updateDashboardCarouselSetting('DashboardMemoVisible', val)
+                                                "
+                                            />
+                                        </div>
+                                        <div class="setting-item">
+                                            <span>{{ $t('setting.panel') }}</span>
+                                            <el-switch
+                                                v-model="simpleNodeCarouselSetting"
+                                                active-value="Enable"
+                                                inactive-value="Disable"
+                                                @change="
+                                                    (val) =>
+                                                        updateDashboardCarouselSetting(
+                                                            'DashboardSimpleNodeVisible',
+                                                            val,
+                                                        )
+                                                "
+                                            />
+                                        </div>
+                                    </div>
+                                    <template #reference>
+                                        <el-button class="h-button-setting" link icon="Setting" />
+                                    </template>
+                                </el-popover>
+                                <el-tooltip :content="$t('commons.button.refresh')" placement="top">
+                                    <el-button class="h-button-setting" @click="refreshDashboard" link icon="Refresh" />
+                                </el-tooltip>
+                                <el-tooltip :content="$t('home.tooltipSensitiveInfo')" placement="top">
+                                    <el-button
+                                        class="h-button-setting"
+                                        @click="toggleSensitiveInfo"
+                                        link
+                                        :icon="showSensitiveInfo ? 'View' : 'Hide'"
+                                    />
+                                </el-tooltip>
+                                <el-tooltip :content="$t('commons.button.copy')" placement="top">
+                                    <el-button class="h-button-setting" @click="handleCopy" link icon="CopyDocument" />
+                                </el-tooltip>
                             </template>
                             <template #body>
                                 <el-scrollbar>
@@ -203,9 +253,11 @@
                                                 <span class="system-label">{{ $t('home.platformVersion') }}</span>
                                             </template>
                                             {{
-                                                baseInfo.platformVersion
-                                                    ? baseInfo.platform + '-' + baseInfo.platformVersion
-                                                    : baseInfo.platform
+                                                baseInfo.prettyDistro
+                                                    ? baseInfo.prettyDistro
+                                                    : baseInfo.platformVersion
+                                                      ? baseInfo.platform + '-' + baseInfo.platformVersion
+                                                      : baseInfo.platform
                                             }}
                                         </el-descriptions-item>
                                         <el-descriptions-item
@@ -268,8 +320,60 @@
                             </template>
                         </CardWithHeader>
                     </el-carousel-item>
+                    <el-carousel-item key="memoInfo" v-if="showMemoCarousel">
+                        <CardWithHeader :header="$t('home.memo')" class="memo-card">
+                            <template #header-r>
+                                <el-tooltip v-if="!memoEditing" :content="$t('commons.button.edit')" placement="top">
+                                    <el-button class="h-button-setting" @click="startMemoEdit" link icon="Edit" />
+                                </el-tooltip>
+                                <el-tooltip v-if="memoEditing" :content="$t('commons.button.save')" placement="top">
+                                    <el-button
+                                        class="h-button-setting"
+                                        @click="saveMemo"
+                                        link
+                                        icon="Check"
+                                        :loading="memoSaving"
+                                    />
+                                </el-tooltip>
+                                <el-tooltip v-if="memoEditing" :content="$t('commons.button.cancel')" placement="top">
+                                    <el-button class="h-button-setting" @click="cancelMemoEdit" link icon="Close" />
+                                </el-tooltip>
+                            </template>
+                            <template #body>
+                                <el-scrollbar height="286px">
+                                    <div class="memo-container ml-5 mr-5">
+                                        <el-input
+                                            v-if="memoEditing"
+                                            v-model="memoEditContent"
+                                            type="textarea"
+                                            :rows="10"
+                                            :maxlength="500"
+                                            :placeholder="$t('home.memoPlaceholder')"
+                                            show-word-limit
+                                        />
+                                        <div v-else class="memo-content">
+                                            <MarkDownEditor v-if="memoContent" :content="memoContent" />
+                                            <span v-else class="memo-placeholder">
+                                                {{ $t('home.memoPlaceholder') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </el-scrollbar>
+                            </template>
+                        </CardWithHeader>
+                    </el-carousel-item>
                     <el-carousel-item key="simpleNode" v-if="showSimpleNode()">
                         <CardWithHeader :header="$t('setting.panel')">
+                            <template #header-r>
+                                <el-tooltip :content="$t('xpack.node.panelItem')" placement="top">
+                                    <el-button
+                                        class="h-button-setting"
+                                        @click="routerToNameWithQuery('SimpleNode', { uncached: 'true' })"
+                                        link
+                                        icon="Setting"
+                                    />
+                                </el-tooltip>
+                            </template>
                             <template #body>
                                 <el-scrollbar height="286px">
                                     <div class="simple-node cursor-pointer" v-for="row in simpleNodes" :key="row.id">
@@ -277,6 +381,7 @@
                                             <el-col :span="21">
                                                 <div class="name">
                                                     {{ row.name }}
+                                                    <Status :status="row.status" :msg="row.message" />
                                                 </div>
                                                 <div class="detail">
                                                     {{ loadSource(row) }}
@@ -287,6 +392,7 @@
                                                 <el-button
                                                     @click="jumpPanel(row)"
                                                     size="small"
+                                                    :disabled="row.status !== 'Healthy'"
                                                     class="visit"
                                                     round
                                                     plain
@@ -318,25 +424,43 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onBeforeUnmount, ref, reactive } from 'vue';
+import { onMounted, onBeforeUnmount, ref, reactive, computed, nextTick } from 'vue';
 import SystemStatus from '@/views/home/status/index.vue';
 import AppLauncher from '@/views/home/app/index.vue';
 import VCharts from '@/components/v-charts/index.vue';
 import LicenseImport from '@/components/license-import/index.vue';
 import QuickJump from '@/views/home/quick/index.vue';
 import CardWithHeader from '@/components/card-with-header/index.vue';
+import MarkDownEditor from '@/components/mkdown-editor/index.vue';
 import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
-import { dateFormatForSecond, computeSize, computeSizeFromKBs, loadUpTime, jumpToPath, copyText } from '@/utils/util';
+import { dateFormatForSecond, loadUpTime } from '@/utils/date';
+import { computeSize, computeSizeFromKBs } from '@/utils/size';
+import { jumpToPath } from '@/utils/router';
+import { copyText } from '@/utils/clipboard';
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
-import { getSettingInfo, listAllSimpleNodes, loadUpgradeInfo } from '@/api/modules/setting';
+import {
+    getSettingInfo,
+    getAgentSettingInfo,
+    listAllSimpleNodes,
+    loadUpgradeInfo,
+    getMemo,
+    updateMemo,
+    updateSetting,
+} from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
-import { routerToFileWithPath, routerToPath } from '@/utils/router';
+import { routerToFileWithPath, routerToNameWithQuery, routerToPath } from '@/utils/router';
 import { getWelcomePage } from '@/api/modules/auth';
-import { clearDashboardCache, getDashboardCache, setDashboardCache } from '@/utils/dashboardCache';
+import {
+    clearDashboardCache,
+    clearDashboardCacheByPrefix,
+    getDashboardCache,
+    setDashboardCache,
+} from '@/utils/dashboardCache';
+import { MsgSuccess } from '@/utils/message';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -345,8 +469,6 @@ const DASHBOARD_CACHE_TTL = {
     netOptions: 60 * 60 * 1000,
     ioOptions: 60 * 60 * 1000,
 };
-const UPGRADE_CHECK_KEY = 'upgradeChecked';
-const UPGRADE_CHECK_EXPIRE = 24 * 60 * 60 * 1000;
 
 const statusRef = ref();
 const appRef = ref();
@@ -388,12 +510,29 @@ const searchInfo = reactive({
     netOption: 'all',
 });
 
+const memoContent = ref('');
+const memoEditContent = ref('');
+const memoEditing = ref(false);
+const memoSaving = ref(false);
+const memoCarouselSetting = ref();
+const simpleNodeCarouselSetting = ref();
+const carouselSettingReady = ref(false);
+
+const showMemoCarousel = computed(() => memoCarouselSetting.value === 'Enable');
+const carouselItemCount = computed(() => {
+    let count = 1;
+    if (showMemoCarousel.value) count += 1;
+    if (showSimpleNode()) count += 1;
+    return count;
+});
+
 const baseInfo = ref<Dashboard.BaseInfo>({
     hostname: '',
     os: '',
     platform: '',
     platformFamily: '',
     platformVersion: '',
+    prettyDistro: '',
     kernelArch: '',
     kernelVersion: '',
     virtualizationSystem: '',
@@ -403,6 +542,7 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     cpuCores: 0,
     cpuLogicalCores: 0,
     cpuModelName: '',
+    cpuMhz: 0,
     currentInfo: null,
 
     quickJump: [],
@@ -421,6 +561,7 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     cpuUsedPercent: 0,
     cpuUsed: 0,
     cpuTotal: 0,
+    cpuDetailedPercent: [] as Array<number>,
 
     memoryTotal: 0,
     memoryAvailable: 0,
@@ -461,6 +602,7 @@ const currentChartInfo = reactive({
     netBytesSent: 0,
     netBytesRecv: 0,
 });
+const skipNextCurrentInfoDelta = ref(false);
 
 const chartsOption = ref({ ioChart1: null, networkChart: null });
 
@@ -482,10 +624,14 @@ const applyDefaultNetOption = () => {
     const defaultNet = globalStore.defaultNetwork || netOptions.value[0];
     if (defaultNet && searchInfo.netOption !== defaultNet) {
         searchInfo.netOption = defaultNet;
-        if (!isStatusInit.value) {
-            onLoadBaseInfo(false, 'network');
-        }
     }
+};
+
+const onLoadAgentSettingInfo = async () => {
+    await getAgentSettingInfo().then((res) => {
+        globalStore.defaultIO = res.data.defaultIO;
+        globalStore.defaultNetwork = res.data.defaultNetwork;
+    });
 };
 
 const onLoadNetworkOptions = async (force?: boolean) => {
@@ -508,14 +654,11 @@ const onLoadSimpleNode = async () => {
     simpleNodes.value = res.data || [];
 };
 
-const applyDefaultIOOption = () => {
+const applyDefaultIOOption = async () => {
     if (!ioOptions.value || ioOptions.value.length === 0) return;
     const defaultIO = globalStore.defaultIO || ioOptions.value[0];
     if (defaultIO && searchInfo.ioOption !== defaultIO) {
         searchInfo.ioOption = defaultIO;
-        if (!isStatusInit.value) {
-            onLoadBaseInfo(false, 'io');
-        }
     }
 };
 
@@ -547,6 +690,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
     baseInfo.value = res.data;
     updateCurrentInfo(baseInfo.value.currentInfo);
+    skipNextCurrentInfoDelta.value = true;
     onLoadCurrentInfo();
     isStatusInit.value = false;
     statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
@@ -577,7 +721,11 @@ const quickJump = (item: any) => {
 };
 
 const showSimpleNode = () => {
-    return globalStore.isMasterProductPro && simpleNodes.value?.length !== 0;
+    return (
+        simpleNodeCarouselSetting.value === 'Enable' &&
+        globalStore.isMasterProductPro &&
+        simpleNodes.value?.length !== 0
+    );
 };
 
 const toggleSensitiveInfo = () => {
@@ -586,11 +734,10 @@ const toggleSensitiveInfo = () => {
 
 const refreshDashboard = async () => {
     clearDashboardCache();
-    localStorage.removeItem(UPGRADE_CHECK_KEY);
+    onLoadBaseInfo(false, '');
     hasRefreshedOptionsOnHover.value = false;
-    await onLoadBaseInfo(false, 'all');
-    await Promise.allSettled([onLoadSimpleNode(), onLoadNetworkOptions(true), onLoadIOOptions(true), loadSafeStatus()]);
-    await loadUpgradeStatus();
+    await Promise.allSettled([onLoadNetworkOptions(true), onLoadIOOptions(true), loadSettingInfo()]);
+    MsgSuccess(i18n.global.t('commons.msg.refreshSuccess'));
 };
 
 const jumpPanel = (row: any) => {
@@ -602,6 +749,19 @@ const jumpPanel = (row: any) => {
 
 const onLoadCurrentInfo = async () => {
     const res = await loadCurrentInfo(searchInfo.ioOption, searchInfo.netOption);
+    if (skipNextCurrentInfoDelta.value) {
+        skipNextCurrentInfoDelta.value = false;
+        currentChartInfo.netBytesSent = 0;
+        currentChartInfo.netBytesRecv = 0;
+        currentChartInfo.ioReadBytes = 0;
+        currentChartInfo.ioWriteBytes = 0;
+        currentChartInfo.ioCount = 0;
+        currentChartInfo.ioTime = 0;
+        updateCurrentInfo(res.data);
+        statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
+        return;
+    }
+
     currentInfo.value.timeSinceUptime = res.data.timeSinceUptime;
 
     let timeInterval = Number(res.data.uptime - currentInfo.value.uptime) || 3;
@@ -667,15 +827,17 @@ const handleCopy = () => {
         '\n' +
         i18n.global.t('home.platformVersion') +
         ': ' +
-        (baseInfo.value.platformVersion
-            ? baseInfo.value.platform + '-' + baseInfo.value.platformVersion
-            : baseInfo.value.platform) +
+        (baseInfo.value.prettyDistro
+            ? baseInfo.value.prettyDistro
+            : baseInfo.value.platformVersion
+              ? baseInfo.value.platform + '-' + baseInfo.value.platformVersion
+              : baseInfo.value.platform) +
         '\n' +
         i18n.global.t('home.kernelVersion') +
         ': ' +
         baseInfo.value.kernelVersion +
         '\n' +
-        i18n.global.t('home.kernelVersion') +
+        i18n.global.t('home.kernelArch') +
         ': ' +
         baseInfo.value.kernelArch +
         '\n' +
@@ -692,6 +854,58 @@ const handleCopy = () => {
         loadUpTime(currentInfo.value.timeSinceUptime) +
         '\n';
     copyText(content);
+};
+
+const loadMemo = async () => {
+    try {
+        const res = await getMemo();
+        memoContent.value = res.data || '';
+    } catch (error) {
+        memoContent.value = '';
+    }
+};
+
+const updateDashboardCarouselSetting = async (key: string, value: 'Enable' | 'Disable') => {
+    if (!carouselSettingReady.value) {
+        return;
+    }
+    let target;
+    if (key === 'DashboardMemoVisible') {
+        target = memoCarouselSetting.value;
+        clearDashboardCacheByPrefix(['memoCarouselSetting']);
+    } else {
+        target = simpleNodeCarouselSetting.value;
+        clearDashboardCacheByPrefix(['simpleNodeCarouselSetting']);
+    }
+    const previous = value === 'Enable' ? 'Disable' : 'Enable';
+    try {
+        await updateSetting({ key, value });
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    } catch (error) {
+        target.value = previous;
+    }
+};
+
+const startMemoEdit = () => {
+    memoEditContent.value = memoContent.value;
+    memoEditing.value = true;
+};
+
+const cancelMemoEdit = () => {
+    memoEditing.value = false;
+    memoEditContent.value = '';
+};
+
+const saveMemo = async () => {
+    memoSaving.value = true;
+    try {
+        await updateMemo(memoEditContent.value);
+        memoContent.value = memoEditContent.value;
+        memoEditing.value = false;
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    } finally {
+        memoSaving.value = false;
+    }
 };
 
 const loadData = async () => {
@@ -729,35 +943,48 @@ const loadData = async () => {
 };
 
 const hideEntrance = () => {
-    globalStore.setShowEntranceWarn(false);
+    globalStore.showEntranceWarn = false;
 };
 
 const loadUpgradeStatus = async () => {
-    const checkedAt = Number(localStorage.getItem(UPGRADE_CHECK_KEY));
-    if (checkedAt && Date.now() - checkedAt < UPGRADE_CHECK_EXPIRE) return;
     const res = await loadUpgradeInfo();
     if (res && (res.data.testVersion || res.data.newVersion || res.data.latestVersion)) {
         globalStore.hasNewVersion = true;
     } else {
         globalStore.hasNewVersion = false;
     }
-    localStorage.setItem(UPGRADE_CHECK_KEY, Date.now().toString());
 };
 
-const loadSafeStatus = async () => {
-    const cache = getDashboardCache('safeStatus');
-    if (cache !== null) {
-        isSafety.value = cache;
+const loadSettingInfo = async () => {
+    const safeCache = getDashboardCache('safeStatus');
+    const memoCache = getDashboardCache('memoCarouselSetting');
+    const simpleNodeCache = getDashboardCache('simpleNodeCarouselSetting');
+    if (safeCache === null || memoCache === null || simpleNodeCache === null) {
+        const res = await getSettingInfo();
+        isSafety.value = res.data.securityEntrance;
+        memoCarouselSetting.value = res.data.dashboardMemoVisible;
+        simpleNodeCarouselSetting.value = res.data.dashboardSimpleNodeVisible;
+        setDashboardCache('safeStatus', isSafety.value, DASHBOARD_CACHE_TTL.safeStatus);
+        setDashboardCache('memoCarouselSetting', memoCarouselSetting.value, DASHBOARD_CACHE_TTL.safeStatus);
+        setDashboardCache('simpleNodeCarouselSetting', simpleNodeCarouselSetting.value, DASHBOARD_CACHE_TTL.safeStatus);
+        if (!carouselSettingReady.value) {
+            await nextTick();
+            carouselSettingReady.value = true;
+        }
         return;
     }
-    const res = await getSettingInfo();
-    isSafety.value = res.data.securityEntrance;
-    setDashboardCache('safeStatus', isSafety.value, DASHBOARD_CACHE_TTL.safeStatus);
+    isSafety.value = safeCache;
+    memoCarouselSetting.value = memoCache;
+    simpleNodeCarouselSetting.value = simpleNodeCache;
+    if (!carouselSettingReady.value) {
+        await nextTick();
+        carouselSettingReady.value = true;
+    }
 };
 
 const loadSource = (row: any) => {
     if (row.status !== 'Healthy') {
-        return '-';
+        return `- ${i18n.global.t('commons.units.core')} (-%) / - GB (-%)`;
     }
     return (
         row.cpuTotal +
@@ -775,6 +1002,7 @@ const loadSource = (row: any) => {
 
 const onFocus = () => {
     isActive.value = true;
+    skipNextCurrentInfoDelta.value = true;
 };
 const onBlur = () => {
     isActive.value = false;
@@ -799,25 +1027,22 @@ const refreshOptionsOnHover = async () => {
 const scheduleDeferredFetch = () => {
     setTimeout(() => {
         onLoadSimpleNode();
-    }, 200);
-    setTimeout(() => {
         onLoadNetworkOptions();
-    }, 400);
-    setTimeout(() => {
         onLoadIOOptions();
     }, 600);
-    setTimeout(() => {
-        loadUpgradeStatus();
-    }, 800);
 };
 
 const fetchData = async () => {
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
     hasRefreshedOptionsOnHover.value = false;
-    await loadSafeStatus();
-    await onLoadBaseInfo(true, 'all');
+    loadSettingInfo();
+    onLoadAgentSettingInfo();
+    onLoadBaseInfo(true, 'all');
     scheduleDeferredFetch();
+    setTimeout(() => {
+        loadUpgradeStatus();
+    }, 2000);
 };
 
 const loadWelcome = async () => {
@@ -850,6 +1075,7 @@ const clearTimer = () => {
 
 onMounted(() => {
     fetchData();
+    loadMemo();
     if (localStorage.getItem('welcomeShow') !== 'false') {
         loadWelcome();
     }
@@ -863,7 +1089,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .h-overview {
     text-align: center;
 
@@ -881,6 +1107,7 @@ onBeforeUnmount(() => {
 
     .count {
         margin-top: 10px;
+
         span {
             font-size: 18px;
             color: $primary-color;
@@ -894,56 +1121,69 @@ onBeforeUnmount(() => {
     margin-left: 18px;
     height: 306px;
 }
+
 @-moz-document url-prefix() {
     .h-systemInfo {
         height: auto;
     }
 }
 
-.system-label {
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    color: var(--panel-text-color);
-    border: none !important;
-    background: none !important;
-    width: fit-content !important;
-    white-space: nowrap !important;
-}
-
-.system-content {
-    font-size: 13px !important;
-    border: none !important;
-    width: 100% !important;
-}
-
 .my-carousel {
-    .el-carousel__button {
+    &.no-indicator {
+        :deep(.el-carousel__indicators) {
+            display: none;
+        }
+    }
+
+    :deep(.el-carousel__button) {
         margin-bottom: -4px;
         background-color: var(--el-text-color-regular);
     }
-    .el-carousel__indicator.is-active .el-carousel__button {
+
+    :deep(.el-carousel__indicator.is-active .el-carousel__button) {
         background-color: var(--panel-color-primary);
     }
-    .el-descriptions .el-descriptions__body .el-descriptions__table {
-        border-spacing: 0 5px !important; /* 垂直间距15px */
+
+    :deep(.el-descriptions .el-descriptions__body .el-descriptions__table) {
+        border-spacing: 0 5px !important;
+    }
+
+    :deep(.h-systemInfo .system-label) {
+        font-weight: 400 !important;
+        font-size: 14px !important;
+        color: var(--panel-text-color);
+        border: none !important;
+        background: none !important;
+        width: fit-content !important;
+        white-space: nowrap !important;
+    }
+
+    :deep(.h-systemInfo .system-content) {
+        font-size: 13px !important;
+        border: none !important;
+        width: 100% !important;
     }
 }
 
 .simple-node {
     padding: 10px 15px 10px 0px;
     margin: -8px 10px 3px 20px;
+
     &:hover {
         background-color: rgba(0, 94, 235, 0.03);
     }
+
     .name {
         font-weight: 500 !important;
-        font-size: 16px !important;
+        font-size: 18px !important;
         line-height: 30px;
         color: var(--panel-text-color);
     }
+
     .detail {
         font-size: 12px !important;
     }
+
     .visit {
         margin-bottom: -25px;
     }
@@ -960,7 +1200,7 @@ onBeforeUnmount(() => {
     top: -10px;
     left: 20px;
 
-    .el-tag {
+    :deep(.el-tag) {
         margin-right: 10px;
         margin-bottom: 10px;
     }
@@ -979,6 +1219,7 @@ onBeforeUnmount(() => {
     .svg-icon {
         font-size: 7px;
     }
+
     span {
         line-height: 20px;
     }
@@ -986,5 +1227,56 @@ onBeforeUnmount(() => {
 
 .chart-card {
     min-height: 383px;
+}
+
+.memo-container {
+    height: 270px;
+}
+
+.memo-card {
+    height: 368px;
+}
+
+.memo-content {
+    min-height: 218px;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-top: -15px;
+    margin-left: -10px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+
+    :deep(.md-editor) {
+        background-color: transparent;
+    }
+
+    :deep(.md-editor-content .md-editor-preview) {
+        font-size: 13px;
+    }
+}
+
+.memo-placeholder {
+    color: var(--el-text-color-placeholder);
+    display: inline-block;
+    font-size: 13px;
+}
+
+.dashboard-carousel-setting {
+    display: flex;
+    flex-direction: column;
+
+    .setting-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.dashboard-carousel-popover {
+    .el-popover__title {
+        padding-bottom: 10px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid var(--el-border-color);
+    }
 }
 </style>

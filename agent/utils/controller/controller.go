@@ -150,7 +150,7 @@ func LoadServiceName(keyword string) (string, error) {
 	}
 
 	processedName := loadProcessedName(client.Name(), keyword)
-	exist, err := client.IsExist(processedName)
+	exist, _ := client.IsExist(processedName)
 	if exist {
 		return processedName, nil
 	}

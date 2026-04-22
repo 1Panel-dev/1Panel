@@ -55,4 +55,11 @@ export namespace Process {
         path: string;
         fd: number;
     }
+
+    export interface ListeningProcess {
+        PID: number;
+        Port: { [key: string]: {} };
+        Protocol: number;
+        Name: string;
+    }
 }

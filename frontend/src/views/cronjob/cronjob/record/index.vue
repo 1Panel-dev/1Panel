@@ -252,7 +252,7 @@
 import { reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { searchRecords, handleOnce, updateStatus, cleanRecords, stopCronjob } from '@/api/modules/cronjob';
-import { dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
 import LogFile from '@/components/log/file/index.vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
@@ -287,7 +287,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     recordShow.value = true;
     dialogData.value = params;
     if (dialogData.value.rowData.type === 'database') {
-        const data = await listDbItems('mysql,mariadb,postgresql');
+        const data = await listDbItems('mysql,mariadb,mysql-cluster,postgresql,postgresql-cluster,mongodb');
         let itemDBs = data.data || [];
         for (const item of itemDBs) {
             if (item.id == dialogData.value.rowData.dbName) {

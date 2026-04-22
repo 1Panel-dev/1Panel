@@ -40,3 +40,31 @@ var (
 
 	TaskCtxMap = make(map[string]context.CancelFunc)
 )
+
+func RepoURL() string {
+	if CONF.Base.IsFxplay {
+		return "https://resource.fit2cloud.com/1panel/package/fusionxplay"
+	}
+	if CONF.Base.Edition != "intl" {
+		return "https://resource.fit2cloud.com/1panel/package/v2"
+	}
+	return "https://resource.1panel.pro/v2"
+}
+func ResourceURL() string {
+	if CONF.Base.IsFxplay {
+		return "https://resource.fit2cloud.com/1panel/resource/fusionxplay"
+	}
+	if CONF.Base.Edition != "intl" {
+		return "https://resource.fit2cloud.com/1panel/resource/v2"
+	}
+	return "https://resource.1panel.pro/v2/resource"
+}
+func AppRepoURL() string {
+	if CONF.Base.IsFxplay {
+		return "https://apps-assets.fit2cloud.com"
+	}
+	if CONF.Base.Edition != "intl" {
+		return "https://apps-assets.fit2cloud.com"
+	}
+	return "https://apps.1panel.pro"
+}

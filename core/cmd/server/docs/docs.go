@@ -18,6 +18,2007 @@ const docTemplate = `{
 	"host": "",
 	"basePath": "/api/v2",
 	"paths": {
+		"/ai/agents": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentCreateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentItem"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create Agent",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/accounts": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountCreateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create Agent account",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/accounts/delete": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountDeleteReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete Agent account",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/accounts/models": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountModelReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentAccountModel"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List Agent account models",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/accounts/models/create": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountModelCreateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create Agent account model",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/accounts/models/delete": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountModelDeleteReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete Agent account model",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/accounts/models/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountModelUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent account model",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/accounts/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountSearch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.PageResult"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page Agent accounts",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/accounts/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent account",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/accounts/verify": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountVerifyReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Verify Agent account",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/bind": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleBindReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Bind Agent role channel",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/channels": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleChannelsReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentRoleChannelItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent role channels from config file",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/create": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleCreateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleCreateResp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create Agent role",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/delete": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleDeleteReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete Agent role",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentConfiguredAgentsReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentConfiguredAgentItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get configured Agent roles from config file",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/md/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleMarkdownFilesReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentRoleMarkdownFileItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent role markdown files",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/md/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleMarkdownFilesUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent role markdown file",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/agent/unbind": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRoleBindReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Unbind Agent role channel",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/dingtalk/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentDingTalkConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent DingTalk channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/dingtalk/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentDingTalkConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent DingTalk channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/discord/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentDiscordConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent Discord channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/discord/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentDiscordConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent Discord channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/feishu/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentFeishuConfigReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentFeishuConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent Feishu channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/feishu/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentFeishuConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent Feishu channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/pairing/approve": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentChannelPairingApproveReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Approve Agent channel pairing code",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/qqbot/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentQQBotConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent QQ Bot channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/qqbot/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentQQBotConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent QQ Bot channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/telegram/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentTelegramConfigReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentTelegramConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent Telegram channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/telegram/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentTelegramConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent Telegram channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/wecom/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentWecomConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent QQ Bot channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/wecom/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentWecomConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent WeCom channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/channel/weixin/login": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentWeixinLoginReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Login Agent Weixin channel",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/config-file/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentConfigFileReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentConfigFile"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent config file",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/config-file/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentConfigFileUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent config file",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/delete": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentDeleteReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete Agent",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/model/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentModelConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent model config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/model/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentModelConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent model config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/other/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentOtherConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent Other config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/other/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentOtherConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent Other config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/overview": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentOverviewReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentOverview"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent overview",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/plugin/check": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginCheckReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginStatus"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check Agent plugin installation status",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/plugin/install": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginInstallReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Install Agent plugin",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/plugin/uninstall": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginUninstallReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Uninstall Agent plugin",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/plugin/upgrade": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginUpgradeReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Upgrade Agent plugin",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/providers": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.ProviderInfo"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Providers",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/remark": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentRemarkUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent remark",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.SearchWithPage"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.PageResult"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page Agents",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/security/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentSecurityConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent Security config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/security/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentSecurityConfigUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent Security config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/skills/install": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentSkillInstallReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Install Agent skill",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/skills/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentSkillItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List Agent skills",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/skills/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentSkillSearchReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentSkillSearchItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Search Agent skills",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/skills/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentSkillUpdateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Agent skill status",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/token/reset": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentTokenResetReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Reset Agent token",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/website/bind": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentWebsiteBindReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Bind Agent website",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/domain/bind": {
 			"post": {
 				"consumes": [
@@ -795,6 +2796,49 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/apps/detail/node/:appKey/:version": {
+			"get": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "app key",
+						"in": "path",
+						"name": "appId",
+						"required": true,
+						"type": "integer"
+					},
+					{
+						"description": "app version",
+						"in": "path",
+						"name": "version",
+						"required": true,
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.AppDetailSimpleDTO"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Search app detail by appkey and version",
+				"tags": [
+					"App"
+				]
+			}
+		},
 		"/apps/details/:id": {
 			"get": {
 				"consumes": [
@@ -826,6 +2870,42 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Get app detail by id",
+				"tags": [
+					"App"
+				]
+			}
+		},
+		"/apps/icon/:key": {
+			"get": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "app id",
+						"in": "path",
+						"name": "appId",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "app icon",
+						"schema": {
+							"type": "file"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get app icon by app_id",
 				"tags": [
 					"App"
 				]
@@ -1434,12 +3514,21 @@ const docTemplate = `{
 					"App"
 				],
 				"x-panel-log": {
-					"BeforeFunctions": [],
+					"BeforeFunctions": [
+						{
+							"db": "app_installs",
+							"input_column": "id",
+							"input_value": "installId",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						}
+					],
 					"bodyKeys": [
 						"installId"
 					],
-					"formatEN": "Application param update [installId]",
-					"formatZH": "应用参数修改 [installId]",
+					"formatEN": "Application param update [name]",
+					"formatZH": "应用参数修改 [name]",
 					"paramKeys": []
 				}
 			}
@@ -1854,6 +3943,41 @@ const docTemplate = `{
 					}
 				],
 				"summary": "List buckets",
+				"tags": [
+					"Backup Account"
+				]
+			}
+		},
+		"/backups/check": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.BackupOperate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check backup account",
 				"tags": [
 					"Backup Account"
 				]
@@ -2601,41 +4725,6 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/containers/command": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.ContainerCreateByCommand"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Create container by command",
-				"tags": [
-					"Container"
-				]
-			}
-		},
 		"/containers/commit": {
 			"post": {
 				"consumes": [
@@ -2713,6 +4802,91 @@ const docTemplate = `{
 					"formatZH": "创建 compose [name]",
 					"paramKeys": []
 				}
+			}
+		},
+		"/containers/compose/clean/log": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ComposeLogClean"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Clean compose log",
+				"tags": [
+					"Container"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name"
+					],
+					"formatEN": "clean compose [name] logs",
+					"formatZH": "清理容器编排 [name] 日志",
+					"paramKeys": []
+				}
+			}
+		},
+		"/containers/compose/env": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.FilePath"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load compose environment variables",
+				"tags": [
+					"Container Compose"
+				]
 			}
 		},
 		"/containers/compose/operate": {
@@ -3083,7 +5257,7 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "string"
+							"$ref": "#/definitions/dto.DockerStatus"
 						}
 					}
 				},
@@ -3101,9 +5275,264 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/containers/download/log": {
+		"/containers/files/content": {
 			"post": {
-				"responses": {}
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerFileReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerFileContent"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get container file content",
+				"tags": [
+					"Container"
+				]
+			}
+		},
+		"/containers/files/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerFileBatchDeleteReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete container file",
+				"tags": [
+					"Container"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"containerID",
+						"paths"
+					],
+					"formatEN": "Delete files [paths] in container [containerID]",
+					"formatZH": "删除容器 [containerID] 文件 [paths]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/containers/files/download": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerFileReq"
+						}
+					}
+				],
+				"responses": {},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Download container file",
+				"tags": [
+					"Container"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"containerID",
+						"path"
+					],
+					"formatEN": "Download file [path] from container [containerID]",
+					"formatZH": "下载容器 [containerID] 文件 [path]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/containers/files/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerFileReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.ContainerFileInfo"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List container files",
+				"tags": [
+					"Container"
+				]
+			}
+		},
+		"/containers/files/size": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerFileReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "int"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get container file size",
+				"tags": [
+					"Container"
+				]
+			}
+		},
+		"/containers/files/upload": {
+			"post": {
+				"consumes": [
+					"multipart/form-data"
+				],
+				"parameters": [
+					{
+						"description": "containerID",
+						"in": "formData",
+						"name": "containerID",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"description": "path",
+						"in": "formData",
+						"name": "path",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"description": "file",
+						"in": "formData",
+						"name": "file",
+						"required": true,
+						"type": "file"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Upload container file",
+				"tags": [
+					"Container"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"containerID",
+						"path"
+					],
+					"formatEN": "Upload file to [path] in container [containerID]",
+					"formatZH": "容器 [containerID] 上传文件到 [path]",
+					"paramKeys": []
+				}
 			}
 		},
 		"/containers/image": {
@@ -3667,6 +6096,41 @@ const docTemplate = `{
 					"formatZH": "更新 ipv6 配置",
 					"paramKeys": []
 				}
+			}
+		},
+		"/containers/item/stats": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperationWithName"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerItemStats"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load container stats size"
 			}
 		},
 		"/containers/limit": {
@@ -4449,9 +6913,19 @@ const docTemplate = `{
 						"in": "query",
 						"name": "tail",
 						"type": "string"
+					},
+					{
+						"description": "是否显示时间",
+						"in": "query",
+						"name": "timestamp",
+						"type": "string"
 					}
 				],
-				"responses": {},
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -5194,6 +7668,38 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/core/auth/passkey/begin": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.PasskeyBeginResponse"
+						}
+					}
+				},
+				"summary": "User login with passkey",
+				"tags": [
+					"Auth"
+				]
+			}
+		},
+		"/core/auth/passkey/finish": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.UserLoginInfo"
+						}
+					}
+				},
+				"summary": "User login with passkey",
+				"tags": [
+					"Auth"
+				]
+			}
+		},
 		"/core/auth/setting": {
 			"get": {
 				"responses": {
@@ -5252,47 +7758,6 @@ const docTemplate = `{
 					"formatZH": "创建备份账号 [type]",
 					"paramKeys": []
 				}
-			}
-		},
-		"/core/backups/buckets": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.ForBuckets"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"type": "string"
-							},
-							"type": "array"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "List buckets",
-				"tags": [
-					"Backup Account"
-				]
 			}
 		},
 		"/core/backups/client/:clientType": {
@@ -5701,7 +8166,10 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "Array"
+							"items": {
+								"$ref": "#/definitions/dto.CommandTree"
+							},
+							"type": "array"
 						}
 					}
 				},
@@ -5951,400 +8419,6 @@ const docTemplate = `{
 					],
 					"formatEN": "update group [name][type]",
 					"formatZH": "更新组 [name][type]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/core/hosts": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.HostOperate"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.HostInfo"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Create host",
-				"tags": [
-					"Host"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"name",
-						"addr"
-					],
-					"formatEN": "create host [name][addr]",
-					"formatZH": "创建主机 [name][addr]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/core/hosts/del": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.OperateByIDs"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Delete host",
-				"tags": [
-					"Host"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [
-						{
-							"db": "hosts",
-							"input_column": "id",
-							"input_value": "ids",
-							"isList": true,
-							"output_column": "addr",
-							"output_value": "addrs"
-						}
-					],
-					"bodyKeys": [
-						"ids"
-					],
-					"formatEN": "delete host [addrs]",
-					"formatZH": "删除主机 [addrs]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/core/hosts/info": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.OperateByID"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.HostInfo"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Get host info",
-				"tags": [
-					"Host"
-				]
-			}
-		},
-		"/core/hosts/search": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.SearchPageWithGroup"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.PageResult"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Page host",
-				"tags": [
-					"Host"
-				]
-			}
-		},
-		"/core/hosts/test/byid/:id": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"type": "integer"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "boolean"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Test host conn by host id",
-				"tags": [
-					"Host"
-				]
-			}
-		},
-		"/core/hosts/test/byinfo": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.HostConnTest"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "boolean"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Test host conn by info",
-				"tags": [
-					"Host"
-				]
-			}
-		},
-		"/core/hosts/tree": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.SearchForTree"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"$ref": "#/definitions/dto.HostTree"
-							},
-							"type": "array"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Load host tree",
-				"tags": [
-					"Host"
-				]
-			}
-		},
-		"/core/hosts/update": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.HostOperate"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.HostInfo"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Update host",
-				"tags": [
-					"Host"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"name",
-						"addr"
-					],
-					"formatEN": "update host [name][addr]",
-					"formatZH": "更新主机信息 [name][addr]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/core/hosts/update/group": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.ChangeHostGroup"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Update host group",
-				"tags": [
-					"Host"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [
-						{
-							"db": "hosts",
-							"input_column": "id",
-							"input_value": "id",
-							"isList": false,
-							"output_column": "addr",
-							"output_value": "addr"
-						}
-					],
-					"bodyKeys": [
-						"id",
-						"group"
-					],
-					"formatEN": "change host [addr] group =\u003e [group]",
-					"formatZH": "切换主机[addr]分组 =\u003e [group]",
 					"paramKeys": []
 				}
 			}
@@ -6980,6 +9054,70 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/core/settings/memo": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load dashboard memo",
+				"tags": [
+					"System Setting"
+				]
+			},
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MemoUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update dashboard memo",
+				"tags": [
+					"System Setting"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "update dashboard memo",
+					"formatZH": "更新仪表盘备忘录",
+					"paramKeys": []
+				}
+			}
+		},
 		"/core/settings/menu/default": {
 			"post": {
 				"consumes": [
@@ -7133,6 +9271,116 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/core/settings/passkey/list": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.PasskeyInfo"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List passkeys",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
+		"/core/settings/passkey/register/begin": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.PasskeyRegisterRequest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.PasskeyBeginResponse"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Begin passkey registration",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
+		"/core/settings/passkey/register/finish": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Finish passkey registration",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
+		"/core/settings/passkey/{id}": {
+			"delete": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete passkey",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
 		"/core/settings/password/update": {
 			"post": {
 				"consumes": [
@@ -7260,59 +9508,6 @@ const docTemplate = `{
 					],
 					"formatEN": "set proxy [proxyPort]:[proxyPort].",
 					"formatZH": "服务器代理配置 [proxyPort]:[proxyPort]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/core/settings/rollback": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.OperateByID"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Upgrade",
-				"tags": [
-					"System Setting"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [
-						{
-							"db": "upgrade_logs",
-							"input_column": "id",
-							"input_value": "id",
-							"isList": false,
-							"output_column": "old_version",
-							"output_value": "version"
-						}
-					],
-					"bodyKeys": [
-						"id"
-					],
-					"formatEN": "rollback system =\u003e [version]",
-					"formatZH": "回滚系统 =\u003e [version]",
 					"paramKeys": []
 				}
 			}
@@ -8382,7 +10577,10 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "Array"
+							"items": {
+								"$ref": "#/definitions/dto.AppLauncher"
+							},
+							"type": "array"
 						}
 					}
 				},
@@ -8420,7 +10618,10 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "Array"
+							"items": {
+								"$ref": "#/definitions/dto.LauncherOption"
+							},
+							"type": "array"
 						}
 					}
 				},
@@ -8620,6 +10821,60 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/dashboard/current/top/cpu": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.Process"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load top cpu processes",
+				"tags": [
+					"Dashboard"
+				]
+			}
+		},
+		"/dashboard/current/top/mem": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.Process"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load top memory processes",
+				"tags": [
+					"Dashboard"
+				]
+			}
+		},
 		"/dashboard/quick/change": {
 			"post": {
 				"consumes": [
@@ -8668,7 +10923,10 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "Array"
+							"items": {
+								"$ref": "#/definitions/dto.QuickJump"
+							},
+							"type": "array"
 						}
 					}
 				},
@@ -9530,6 +11788,47 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/databases/format/options": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperationWithName"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.MysqlFormatCollationOption"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List mysql database format collation options",
+				"tags": [
+					"Database Mysql"
+				]
+			}
+		},
 		"/databases/load": {
 			"post": {
 				"consumes": [
@@ -9546,46 +11845,9 @@ const docTemplate = `{
 						}
 					}
 				],
-				"responses": {},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Load mysql database from remote",
-				"tags": [
-					"Database Mysql"
-				]
-			}
-		},
-		"/databases/options": {
-			"get": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.PageInfo"
-						}
-					}
-				],
 				"responses": {
 					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"$ref": "#/definitions/dto.MysqlOption"
-							},
-							"type": "array"
-						}
+						"description": "OK"
 					}
 				},
 				"security": [
@@ -9596,7 +11858,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "List mysql database names",
+				"summary": "Load mysql database from remote",
 				"tags": [
 					"Database Mysql"
 				]
@@ -9662,7 +11924,11 @@ const docTemplate = `{
 						}
 					}
 				],
-				"responses": {},
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -11373,6 +13639,53 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/files/preview": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileContentReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.FileInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Preview file content",
+				"tags": [
+					"File"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"path"
+					],
+					"formatEN": "Preview file content [path]",
+					"formatZH": "预览文件内容 [path]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/files/read": {
 			"post": {
 				"parameters": [
@@ -11543,6 +13856,79 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Get RecycleBin status",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/remark": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileRemarkUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Set file remark",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/remarks": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileRemarkBatch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.FileRemarksRes"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch get file remarks",
 				"tags": [
 					"File"
 				]
@@ -11917,6 +14303,50 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/files/wget/stop": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileProcessReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Stop wget file download",
+				"tags": [
+					"File"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"key"
+					],
+					"formatEN": "Stop wget task [key]",
+					"formatZH": "停止下载任务 [key]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/groups": {
 			"post": {
 				"consumes": [
@@ -12117,7 +14547,7 @@ const docTemplate = `{
 				"parameters": [
 					{
 						"description": "Component name to check (e.g., rsync, docker)",
-						"in": "query",
+						"in": "path",
 						"name": "name",
 						"required": true,
 						"type": "string"
@@ -12938,6 +15368,41 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/hosts/monitor/gpu/search": {
+			"post": {
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MonitorGPUSearch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.MonitorGPUData"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load monitor data",
+				"tags": [
+					"Monitor"
+				]
+			}
+		},
 		"/hosts/monitor/search": {
 			"post": {
 				"parameters": [
@@ -13284,7 +15749,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.SSHConf"
+							"$ref": "#/definitions/dto.SSHConfUpdate"
 						}
 					}
 				],
@@ -14231,6 +16696,27 @@ const docTemplate = `{
 					"formatZH": "更新 nginx 配置 [domain]",
 					"paramKeys": []
 				}
+			}
+		},
+		"/process/listening": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Listening Process",
+				"tags": [
+					"Process"
+				]
 			}
 		},
 		"/process/stop": {
@@ -15504,6 +17990,41 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/settings/description/save": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.CommonDescription"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Save common description",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
 		"/settings/get/{key}": {
 			"get": {
 				"parameters": [
@@ -16027,7 +18548,7 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "bool"
+							"type": "boolean"
 						}
 					}
 				},
@@ -16067,6 +18588,50 @@ const docTemplate = `{
 				"tags": [
 					"System Setting"
 				]
+			}
+		},
+		"/settings/ssh/conn/default": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.SSHDefaultConn"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update local is conn",
+				"tags": [
+					"System Setting"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"defaultConn"
+					],
+					"formatEN": "update system default conn [defaultConn]",
+					"formatZH": "本地终端默认连接 [defaultConn]",
+					"paramKeys": []
+				}
 			}
 		},
 		"/settings/update": {
@@ -17006,7 +19571,10 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "Array"
+							"items": {
+								"type": "string"
+							},
+							"type": "array"
 						}
 					}
 				},
@@ -17091,7 +19659,11 @@ const docTemplate = `{
 						}
 					}
 				],
-				"responses": {},
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -17127,11 +19699,15 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.Operate"
+							"$ref": "#/definitions/dto.Fail2BanSet"
 						}
 					}
 				],
-				"responses": {},
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -17166,7 +19742,10 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "Array"
+							"items": {
+								"type": "string"
+							},
+							"type": "array"
 						}
 					}
 				},
@@ -17440,7 +20019,11 @@ const docTemplate = `{
 						}
 					}
 				],
-				"responses": {},
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -17656,10 +20239,10 @@ const docTemplate = `{
 				"x-panel-log": {
 					"BeforeFunctions": [],
 					"bodyKeys": [
-						"primaryDomain"
+						"alias"
 					],
-					"formatEN": "Create website [primaryDomain]",
-					"formatZH": "创建网站 [primaryDomain]",
+					"formatEN": "Create website [alias]",
+					"formatZH": "创建网站 [alias]",
 					"paramKeys": []
 				}
 			}
@@ -18196,6 +20779,41 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Batch set website group",
+				"tags": [
+					"Website"
+				]
+			}
+		},
+		"/websites/batch/https": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.BatchWebsiteHttps"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch set HTTPS for websites",
 				"tags": [
 					"Website"
 				]
@@ -20161,6 +22779,60 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/websites/proxies/delete": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.WebsiteProxyDel"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete proxy config",
+				"tags": [
+					"Website"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "websites",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "primary_domain",
+							"output_value": "domain"
+						}
+					],
+					"bodyKeys": [
+						"id",
+						"name"
+					],
+					"formatEN": "Delete domain [domain] proxy config [name]",
+					"formatZH": "删除网站 [domain] 反向代理配置 [name] ",
+					"paramKeys": []
+				}
+			}
+		},
 		"/websites/proxies/file": {
 			"post": {
 				"consumes": [
@@ -20206,10 +22878,66 @@ const docTemplate = `{
 						}
 					],
 					"bodyKeys": [
-						"websiteID"
+						"websiteID",
+						"name"
 					],
-					"formatEN": "Nginx conf proxy file update [domain]",
-					"formatZH": "更新反向代理文件 [domain]",
+					"formatEN": "Update domain [domain] proxy config file [name]",
+					"formatZH": "修改网站 [domain] 反向代理配置文件 [name] ",
+					"paramKeys": []
+				}
+			}
+		},
+		"/websites/proxies/status": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.WebsiteProxyStatusUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update proxy config status",
+				"tags": [
+					"Website"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "websites",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "primary_domain",
+							"output_value": "domain"
+						}
+					],
+					"bodyKeys": [
+						"id",
+						"name",
+						"status"
+					],
+					"formatEN": "Update domain [domain] proxy config [name] status [status]",
+					"formatZH": "修改网站 [domain] 反向代理配置 [name] 状态 [status] ",
 					"paramKeys": []
 				}
 			}
@@ -20259,10 +22987,12 @@ const docTemplate = `{
 						}
 					],
 					"bodyKeys": [
-						"id"
+						"id",
+						"name",
+						"operate"
 					],
-					"formatEN": "Update domain [domain] proxy config",
-					"formatZH": "修改网站 [domain] 反向代理配置 ",
+					"formatEN": "Update [operate] domain [domain] proxy config [name]",
+					"formatZH": "修改 [operate] 网站 [domain] 反向代理配置 [name] ",
 					"paramKeys": []
 				}
 			}
@@ -21016,6 +23746,47 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/websites/ssl/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.WebsiteSSLListReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/response.WebsiteSSLDTO"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List website ssl",
+				"tags": [
+					"Website SSL"
+				]
+			}
+		},
 		"/websites/ssl/obtain": {
 			"post": {
 				"consumes": [
@@ -21352,6 +24123,41 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/websites/stream/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.StreamUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update Stream Config",
+				"tags": [
+					"Website"
+				]
+			}
+		},
 		"/websites/update": {
 			"post": {
 				"consumes": [
@@ -21442,6 +24248,1822 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.AgentAccountCreateReq": {
+			"properties": {
+				"apiKey": {
+					"type": "string"
+				},
+				"apiType": {
+					"type": "string"
+				},
+				"baseURL": {
+					"type": "string"
+				},
+				"models": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentAccountModel"
+					},
+					"type": "array"
+				},
+				"name": {
+					"type": "string"
+				},
+				"provider": {
+					"type": "string"
+				},
+				"remark": {
+					"type": "string"
+				},
+				"rememberApiKey": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"apiKey",
+				"apiType",
+				"name",
+				"provider"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountDeleteReq": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountModel": {
+			"properties": {
+				"contextWindow": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "string"
+				},
+				"input": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"maxTokens": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"reasoning": {
+					"type": "boolean"
+				},
+				"recordId": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentAccountModelCreateReq": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				},
+				"model": {
+					"$ref": "#/definitions/dto.AgentAccountModel"
+				}
+			},
+			"required": [
+				"accountId",
+				"model"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountModelDeleteReq": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				},
+				"recordId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"accountId",
+				"recordId"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountModelReq": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"accountId"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountModelUpdateReq": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				},
+				"model": {
+					"$ref": "#/definitions/dto.AgentAccountModel"
+				}
+			},
+			"required": [
+				"accountId",
+				"model"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountSearch": {
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				},
+				"provider": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"page",
+				"pageSize"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountUpdateReq": {
+			"properties": {
+				"apiKey": {
+					"type": "string"
+				},
+				"apiType": {
+					"type": "string"
+				},
+				"baseURL": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"remark": {
+					"type": "string"
+				},
+				"rememberApiKey": {
+					"type": "boolean"
+				},
+				"syncAgents": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"apiKey",
+				"apiType",
+				"id",
+				"name"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountVerifyReq": {
+			"properties": {
+				"apiKey": {
+					"type": "string"
+				},
+				"baseURL": {
+					"type": "string"
+				},
+				"provider": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"apiKey",
+				"provider"
+			],
+			"type": "object"
+		},
+		"dto.AgentChannelPairingApproveReq": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"agentId": {
+					"type": "integer"
+				},
+				"pairingCode": {
+					"type": "string"
+				},
+				"type": {
+					"enum": [
+						"feishu",
+						"telegram",
+						"discord",
+						"wecom"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"pairingCode",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.AgentConfigFile": {
+			"properties": {
+				"content": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentConfigFileReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId"
+			],
+			"type": "object"
+		},
+		"dto.AgentConfigFileUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"content": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"content"
+			],
+			"type": "object"
+		},
+		"dto.AgentConfiguredAgentItem": {
+			"properties": {
+				"agentDir": {
+					"type": "string"
+				},
+				"bindings": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentRoleBinding"
+					},
+					"type": "array"
+				},
+				"id": {
+					"type": "string"
+				},
+				"model": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"workspace": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentConfiguredAgentsReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId"
+			],
+			"type": "object"
+		},
+		"dto.AgentCreateReq": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				},
+				"advanced": {
+					"type": "boolean"
+				},
+				"agentType": {
+					"enum": [
+						"openclaw",
+						"copaw"
+					],
+					"type": "string"
+				},
+				"allowPort": {
+					"type": "boolean"
+				},
+				"allowedOrigins": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"appVersion": {
+					"type": "string"
+				},
+				"bridgePort": {
+					"type": "integer"
+				},
+				"containerName": {
+					"type": "string"
+				},
+				"cpuQuota": {
+					"type": "number"
+				},
+				"dockerCompose": {
+					"type": "string"
+				},
+				"editCompose": {
+					"type": "boolean"
+				},
+				"memoryLimit": {
+					"type": "number"
+				},
+				"memoryUnit": {
+					"type": "string"
+				},
+				"model": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"pullImage": {
+					"type": "boolean"
+				},
+				"remark": {
+					"type": "string"
+				},
+				"restartPolicy": {
+					"type": "string"
+				},
+				"specifyIP": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"token": {
+					"type": "string"
+				},
+				"webUIPort": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentType",
+				"appVersion",
+				"name",
+				"webUIPort"
+			],
+			"type": "object"
+		},
+		"dto.AgentDeleteReq": {
+			"properties": {
+				"forceDelete": {
+					"type": "boolean"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.AgentDingTalkBot": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"clientId": {
+					"type": "string"
+				},
+				"clientSecret": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"isDefault": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentDingTalkConfig": {
+			"properties": {
+				"ackText": {
+					"type": "string"
+				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"asyncMode": {
+					"type": "boolean"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentDingTalkBot"
+					},
+					"type": "array"
+				},
+				"dmPolicy": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"type": "string"
+				},
+				"groupSessionScope": {
+					"type": "string"
+				},
+				"installed": {
+					"type": "boolean"
+				},
+				"separateSessionByConversation": {
+					"type": "boolean"
+				},
+				"sharedMemoryAcrossConversations": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentDingTalkConfigUpdateReq": {
+			"properties": {
+				"ackText": {
+					"type": "string"
+				},
+				"agentId": {
+					"type": "integer"
+				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"asyncMode": {
+					"type": "boolean"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentDingTalkBot"
+					},
+					"minItems": 1,
+					"type": "array"
+				},
+				"dmPolicy": {
+					"enum": [
+						"allowlist",
+						"open",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"enum": [
+						"open",
+						"allowlist",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"groupSessionScope": {
+					"enum": [
+						"group",
+						"group_sender"
+					],
+					"type": "string"
+				},
+				"separateSessionByConversation": {
+					"type": "boolean"
+				},
+				"sharedMemoryAcrossConversations": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"agentId",
+				"bots",
+				"dmPolicy",
+				"groupPolicy",
+				"groupSessionScope"
+			],
+			"type": "object"
+		},
+		"dto.AgentDiscordBot": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"isDefault": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				},
+				"token": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentDiscordConfig": {
+			"properties": {
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentDiscordBot"
+					},
+					"type": "array"
+				},
+				"defaultAccount": {
+					"type": "string"
+				},
+				"dmPolicy": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupPolicy": {
+					"type": "string"
+				},
+				"proxy": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentDiscordConfigUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentDiscordBot"
+					},
+					"minItems": 1,
+					"type": "array"
+				},
+				"defaultAccount": {
+					"type": "string"
+				},
+				"dmPolicy": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupPolicy": {
+					"enum": [
+						"open",
+						"allowlist",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"proxy": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"bots",
+				"defaultAccount",
+				"dmPolicy",
+				"groupPolicy"
+			],
+			"type": "object"
+		},
+		"dto.AgentFeishuBot": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"appId": {
+					"type": "string"
+				},
+				"appSecret": {
+					"type": "string"
+				},
+				"dmPolicy": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"isDefault": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentFeishuConfig": {
+			"properties": {
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentFeishuBot"
+					},
+					"type": "array"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"type": "string"
+				},
+				"installed": {
+					"type": "boolean"
+				},
+				"replyMode": {
+					"type": "string"
+				},
+				"requireMention": {
+					"type": "string"
+				},
+				"streaming": {
+					"type": "boolean"
+				},
+				"threadSession": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentFeishuConfigReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId"
+			],
+			"type": "object"
+		},
+		"dto.AgentFeishuConfigUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentFeishuBot"
+					},
+					"minItems": 1,
+					"type": "array"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"enum": [
+						"open",
+						"allowlist",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"replyMode": {
+					"type": "string"
+				},
+				"requireMention": {
+					"enum": [
+						"true",
+						"false",
+						"open"
+					],
+					"type": "string"
+				},
+				"streaming": {
+					"type": "boolean"
+				},
+				"threadSession": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"agentId",
+				"bots",
+				"groupPolicy",
+				"replyMode",
+				"requireMention"
+			],
+			"type": "object"
+		},
+		"dto.AgentIDReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId"
+			],
+			"type": "object"
+		},
+		"dto.AgentItem": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				},
+				"agentType": {
+					"type": "string"
+				},
+				"apiKey": {
+					"type": "string"
+				},
+				"apiType": {
+					"type": "string"
+				},
+				"appInstallId": {
+					"type": "integer"
+				},
+				"appVersion": {
+					"type": "string"
+				},
+				"baseUrl": {
+					"type": "string"
+				},
+				"bridgePort": {
+					"type": "integer"
+				},
+				"configPath": {
+					"type": "string"
+				},
+				"containerName": {
+					"type": "string"
+				},
+				"contextWindow": {
+					"type": "integer"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"maxTokens": {
+					"type": "integer"
+				},
+				"message": {
+					"type": "string"
+				},
+				"model": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"provider": {
+					"type": "string"
+				},
+				"providerName": {
+					"type": "string"
+				},
+				"remark": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"token": {
+					"type": "string"
+				},
+				"upgradable": {
+					"type": "boolean"
+				},
+				"webUIPort": {
+					"type": "integer"
+				},
+				"websiteId": {
+					"type": "integer"
+				},
+				"websitePrimaryDomain": {
+					"type": "string"
+				},
+				"websiteProtocol": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentModelConfig": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				},
+				"fallbacks": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"model": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentModelConfigUpdateReq": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				},
+				"agentId": {
+					"type": "integer"
+				},
+				"fallbacks": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"model": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"accountId",
+				"agentId",
+				"model"
+			],
+			"type": "object"
+		},
+		"dto.AgentOtherConfig": {
+			"properties": {
+				"browserEnabled": {
+					"type": "boolean"
+				},
+				"npmRegistry": {
+					"type": "string"
+				},
+				"userTimezone": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentOtherConfigUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"browserEnabled": {
+					"type": "boolean"
+				},
+				"npmRegistry": {
+					"type": "string"
+				},
+				"userTimezone": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"npmRegistry",
+				"userTimezone"
+			],
+			"type": "object"
+		},
+		"dto.AgentOverview": {
+			"properties": {
+				"snapshot": {
+					"$ref": "#/definitions/dto.AgentOverviewSnapshot"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentOverviewReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId"
+			],
+			"type": "object"
+		},
+		"dto.AgentOverviewSnapshot": {
+			"properties": {
+				"appVersion": {
+					"type": "string"
+				},
+				"channelCount": {
+					"type": "integer"
+				},
+				"containerStatus": {
+					"type": "string"
+				},
+				"defaultModel": {
+					"type": "string"
+				},
+				"jobCount": {
+					"type": "integer"
+				},
+				"sessionCount": {
+					"type": "integer"
+				},
+				"skillCount": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentPluginCheckReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"checkLatest": {
+					"type": "boolean"
+				},
+				"type": {
+					"enum": [
+						"feishu",
+						"qqbot",
+						"wecom",
+						"dingtalk",
+						"weixin"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.AgentPluginInstallReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"type": {
+					"enum": [
+						"feishu",
+						"qqbot",
+						"wecom",
+						"dingtalk",
+						"weixin"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"taskID",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.AgentPluginStatus": {
+			"properties": {
+				"currentVersion": {
+					"type": "string"
+				},
+				"installed": {
+					"type": "boolean"
+				},
+				"latestVersion": {
+					"type": "string"
+				},
+				"upgradable": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentPluginUninstallReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"type": {
+					"enum": [
+						"feishu",
+						"qqbot",
+						"wecom",
+						"dingtalk",
+						"weixin"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"taskID",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.AgentPluginUpgradeReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"type": {
+					"enum": [
+						"feishu",
+						"qqbot",
+						"wecom",
+						"dingtalk",
+						"weixin"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"taskID",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.AgentQQBotBot": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"appId": {
+					"type": "string"
+				},
+				"clientSecret": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"isDefault": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				},
+				"systemPrompt": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentQQBotConfig": {
+			"properties": {
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentQQBotBot"
+					},
+					"type": "array"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"installed": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentQQBotConfigUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentQQBotBot"
+					},
+					"minItems": 1,
+					"type": "array"
+				},
+				"enabled": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"agentId",
+				"bots"
+			],
+			"type": "object"
+		},
+		"dto.AgentRemarkUpdateReq": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"remark": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleBindReq": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"agentId": {
+					"type": "integer"
+				},
+				"channel": {
+					"type": "string"
+				},
+				"id": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"channel",
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleBinding": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"channel": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"channel"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleChannelItem": {
+			"properties": {
+				"accountIds": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"bound": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentRoleChannelsReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleCreateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"bindings": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentRoleBinding"
+					},
+					"type": "array"
+				},
+				"model": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"name"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleCreateResp": {
+			"properties": {
+				"output": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentRoleDeleteReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleMarkdownFileItem": {
+			"properties": {
+				"content": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentRoleMarkdownFileUpdateItem": {
+			"properties": {
+				"content": {
+					"type": "string"
+				},
+				"name": {
+					"enum": [
+						"AGENTS.md",
+						"SOUL.md",
+						"USER.md",
+						"IDENTITY.md",
+						"TOOLS.md",
+						"HEARTBEAT.md",
+						"BOOT.md",
+						"BOOTSTRAP.md"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"name"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleMarkdownFilesReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"workspace": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"workspace"
+			],
+			"type": "object"
+		},
+		"dto.AgentRoleMarkdownFilesUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"files": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentRoleMarkdownFileUpdateItem"
+					},
+					"type": "array"
+				},
+				"restart": {
+					"type": "boolean"
+				},
+				"workspace": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"files",
+				"workspace"
+			],
+			"type": "object"
+		},
+		"dto.AgentSecurityConfig": {
+			"properties": {
+				"allowedOrigins": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentSecurityConfigUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"allowedOrigins": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				}
+			},
+			"required": [
+				"agentId"
+			],
+			"type": "object"
+		},
+		"dto.AgentSkillInstallReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"slug": {
+					"type": "string"
+				},
+				"source": {
+					"enum": [
+						"clawhub-global",
+						"clawhub-cn",
+						"skillhub"
+					],
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"slug",
+				"source",
+				"taskID"
+			],
+			"type": "object"
+		},
+		"dto.AgentSkillItem": {
+			"properties": {
+				"bundled": {
+					"type": "boolean"
+				},
+				"description": {
+					"type": "string"
+				},
+				"disabled": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentSkillSearchItem": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"score": {
+					"type": "string"
+				},
+				"slug": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				},
+				"summary": {
+					"type": "string"
+				},
+				"version": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentSkillSearchReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"keyword": {
+					"type": "string"
+				},
+				"source": {
+					"enum": [
+						"clawhub-global",
+						"clawhub-cn",
+						"skillhub"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"keyword",
+				"source"
+			],
+			"type": "object"
+		},
+		"dto.AgentSkillUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"name"
+			],
+			"type": "object"
+		},
+		"dto.AgentTelegramBot": {
+			"properties": {
+				"accountId": {
+					"type": "string"
+				},
+				"botToken": {
+					"type": "string"
+				},
+				"dmPolicy": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupPolicy": {
+					"type": "string"
+				},
+				"isDefault": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				},
+				"streaming": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentTelegramConfig": {
+			"properties": {
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentTelegramBot"
+					},
+					"type": "array"
+				},
+				"defaultAccount": {
+					"type": "string"
+				},
+				"dmPolicy": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"type": "string"
+				},
+				"proxy": {
+					"type": "string"
+				},
+				"streaming": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentTelegramConfigReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId"
+			],
+			"type": "object"
+		},
+		"dto.AgentTelegramConfigUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"bots": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentTelegramBot"
+					},
+					"minItems": 1,
+					"type": "array"
+				},
+				"defaultAccount": {
+					"type": "string"
+				},
+				"dmPolicy": {
+					"enum": [
+						"pairing",
+						"open",
+						"allowlist",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"enum": [
+						"open",
+						"allowlist",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"proxy": {
+					"type": "string"
+				},
+				"streaming": {
+					"enum": [
+						"off",
+						"partial",
+						"block",
+						"progress"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"bots",
+				"defaultAccount",
+				"dmPolicy",
+				"groupPolicy",
+				"streaming"
+			],
+			"type": "object"
+		},
+		"dto.AgentTokenResetReq": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.AgentWebsiteBindReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"websiteId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId",
+				"websiteId"
+			],
+			"type": "object"
+		},
+		"dto.AgentWecomConfig": {
+			"properties": {
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"botId": {
+					"type": "string"
+				},
+				"dmPolicy": {
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"type": "string"
+				},
+				"installed": {
+					"type": "boolean"
+				},
+				"secret": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentWecomConfigUpdateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"botId": {
+					"type": "string"
+				},
+				"dmPolicy": {
+					"enum": [
+						"pairing",
+						"open",
+						"allowlist",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"enum": [
+						"open",
+						"allowlist",
+						"disabled"
+					],
+					"type": "string"
+				},
+				"secret": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"botId",
+				"dmPolicy",
+				"groupPolicy",
+				"secret"
+			],
+			"type": "object"
+		},
+		"dto.AgentWeixinLoginReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"taskID"
+			],
+			"type": "object"
+		},
 		"dto.ApiInterfaceConfig": {
 			"properties": {
 				"apiInterfaceStatus": {
@@ -21517,6 +26139,44 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.AppLauncher": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"detail": {
+					"items": {
+						"$ref": "#/definitions/dto.InstallDetail"
+					},
+					"type": "array"
+				},
+				"icon": {
+					"type": "string"
+				},
+				"isInstall": {
+					"type": "boolean"
+				},
+				"isRecommend": {
+					"type": "boolean"
+				},
+				"key": {
+					"type": "string"
+				},
+				"limit": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"recommend": {
+					"type": "integer"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.AppList": {
 			"properties": {
 				"additionalProperties": {
@@ -21556,6 +26216,9 @@ const docTemplate = `{
 						"type": "string"
 					},
 					"type": "array"
+				},
+				"batchInstallSupport": {
+					"type": "boolean"
 				},
 				"crossVersionUpdate": {
 					"type": "boolean"
@@ -21641,6 +26304,9 @@ const docTemplate = `{
 		},
 		"dto.AppstoreConfig": {
 			"properties": {
+				"installAllowPort": {
+					"type": "string"
+				},
 				"uninstallDeleteBackup": {
 					"type": "string"
 				},
@@ -21659,7 +26325,8 @@ const docTemplate = `{
 					"enum": [
 						"UninstallDeleteImage",
 						"UpgradeBackup",
-						"UninstallDeleteBackup"
+						"UninstallDeleteBackup",
+						"InstallAllowPort"
 					],
 					"type": "string"
 				},
@@ -21909,21 +26576,6 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.ChangeHostGroup": {
-			"properties": {
-				"groupID": {
-					"type": "integer"
-				},
-				"id": {
-					"type": "integer"
-				}
-			},
-			"required": [
-				"groupID",
-				"id"
-			],
-			"type": "object"
-		},
 		"dto.ChangePasswd": {
 			"properties": {
 				"passwd": {
@@ -22144,6 +26796,12 @@ const docTemplate = `{
 		},
 		"dto.CleanData": {
 			"properties": {
+				"backupClean": {
+					"items": {
+						"$ref": "#/definitions/dto.CleanTree"
+					},
+					"type": "array"
+				},
 				"containerClean": {
 					"items": {
 						"$ref": "#/definitions/dto.CleanTree"
@@ -22194,6 +26852,9 @@ const docTemplate = `{
 		},
 		"dto.CleanTree": {
 			"properties": {
+				"canDelete": {
+					"type": "boolean"
+				},
 				"children": {
 					"items": {
 						"$ref": "#/definitions/dto.CleanTree"
@@ -22274,8 +26935,31 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.CommandTree": {
+			"properties": {
+				"children": {
+					"items": {
+						"$ref": "#/definitions/dto.CommandTree"
+					},
+					"type": "array"
+				},
+				"label": {
+					"type": "string"
+				},
+				"value": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.CommonBackup": {
 			"properties": {
+				"args": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"description": {
 					"type": "string"
 				},
@@ -22291,6 +26975,9 @@ const docTemplate = `{
 				"secret": {
 					"type": "string"
 				},
+				"stopBefore": {
+					"type": "boolean"
+				},
 				"taskID": {
 					"type": "string"
 				},
@@ -22304,12 +26991,38 @@ const docTemplate = `{
 						"postgresql",
 						"mysql-cluster",
 						"postgresql-cluster",
-						"redis-cluster"
+						"redis-cluster",
+						"container",
+						"compose"
 					],
 					"type": "string"
 				}
 			},
 			"required": [
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.CommonDescription": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"detailType": {
+					"type": "string"
+				},
+				"id": {
+					"type": "string"
+				},
+				"isPinned": {
+					"type": "boolean"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
 				"type"
 			],
 			"type": "object"
@@ -22337,6 +27050,9 @@ const docTemplate = `{
 				"taskID": {
 					"type": "string"
 				},
+				"timeout": {
+					"type": "integer"
+				},
 				"type": {
 					"enum": [
 						"app",
@@ -22347,7 +27063,9 @@ const docTemplate = `{
 						"postgresql",
 						"mysql-cluster",
 						"postgresql-cluster",
-						"redis-cluster"
+						"redis-cluster",
+						"container",
+						"compose"
 					],
 					"type": "string"
 				}
@@ -22361,13 +27079,13 @@ const docTemplate = `{
 		"dto.ComposeCreate": {
 			"properties": {
 				"env": {
-					"items": {
-						"type": "string"
-					},
-					"type": "array"
+					"type": "string"
 				},
 				"file": {
 					"type": "string"
+				},
+				"forcePull": {
+					"type": "boolean"
 				},
 				"from": {
 					"enum": [
@@ -22392,6 +27110,24 @@ const docTemplate = `{
 			},
 			"required": [
 				"from"
+			],
+			"type": "object"
+		},
+		"dto.ComposeLogClean": {
+			"properties": {
+				"detailPath": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"path"
 			],
 			"type": "object"
 		},
@@ -22497,16 +27233,22 @@ const docTemplate = `{
 				"content": {
 					"type": "string"
 				},
+				"detailPath": {
+					"type": "string"
+				},
 				"env": {
-					"items": {
-						"type": "string"
-					},
-					"type": "array"
+					"type": "string"
+				},
+				"forcePull": {
+					"type": "boolean"
 				},
 				"name": {
 					"type": "string"
 				},
 				"path": {
+					"type": "string"
+				},
+				"taskID": {
 					"type": "string"
 				}
 			},
@@ -22546,13 +27288,117 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.ContainerCreateByCommand": {
+		"dto.ContainerFileBatchDeleteReq": {
 			"properties": {
-				"command": {
+				"containerID": {
 					"type": "string"
 				},
-				"taskID": {
+				"paths": {
+					"items": {
+						"type": "string"
+					},
+					"minItems": 1,
+					"type": "array"
+				}
+			},
+			"required": [
+				"containerID",
+				"paths"
+			],
+			"type": "object"
+		},
+		"dto.ContainerFileContent": {
+			"properties": {
+				"content": {
 					"type": "string"
+				},
+				"isBinary": {
+					"type": "boolean"
+				},
+				"size": {
+					"type": "integer"
+				},
+				"truncated": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.ContainerFileInfo": {
+			"properties": {
+				"isDir": {
+					"type": "boolean"
+				},
+				"isLink": {
+					"type": "boolean"
+				},
+				"linkTo": {
+					"type": "string"
+				},
+				"modTime": {
+					"type": "string"
+				},
+				"mode": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"size": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.ContainerFileReq": {
+			"properties": {
+				"containerID": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"containerID",
+				"path"
+			],
+			"type": "object"
+		},
+		"dto.ContainerItemStats": {
+			"properties": {
+				"buildCacheReclaimable": {
+					"type": "integer"
+				},
+				"buildCacheUsage": {
+					"type": "integer"
+				},
+				"containerReclaimable": {
+					"type": "integer"
+				},
+				"containerUsage": {
+					"type": "integer"
+				},
+				"imageReclaimable": {
+					"type": "integer"
+				},
+				"imageUsage": {
+					"type": "integer"
+				},
+				"sizeRootFs": {
+					"type": "integer"
+				},
+				"sizeRw": {
+					"type": "integer"
+				},
+				"volumeReclaimable": {
+					"type": "integer"
+				},
+				"volumeUsage": {
+					"type": "integer"
 				}
 			},
 			"type": "object"
@@ -22585,6 +27431,23 @@ const docTemplate = `{
 				},
 				"systemUsage": {
 					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.ContainerNetwork": {
+			"properties": {
+				"ipv4": {
+					"type": "string"
+				},
+				"ipv6": {
+					"type": "string"
+				},
+				"macAddr": {
+					"type": "string"
+				},
+				"network": {
+					"type": "string"
 				}
 			},
 			"type": "object"
@@ -22630,6 +27493,12 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
+				"extraHosts": {
+					"items": {
+						"$ref": "#/definitions/dto.ExtraHost"
+					},
+					"type": "array"
+				},
 				"forcePull": {
 					"type": "boolean"
 				},
@@ -22639,20 +27508,11 @@ const docTemplate = `{
 				"image": {
 					"type": "string"
 				},
-				"ipv4": {
-					"type": "string"
-				},
-				"ipv6": {
-					"type": "string"
-				},
 				"labels": {
 					"items": {
 						"type": "string"
 					},
 					"type": "array"
-				},
-				"macAddr": {
-					"type": "string"
 				},
 				"memory": {
 					"type": "number"
@@ -22663,8 +27523,11 @@ const docTemplate = `{
 				"nanoCPUs": {
 					"type": "number"
 				},
-				"network": {
-					"type": "string"
+				"networks": {
+					"items": {
+						"$ref": "#/definitions/dto.ContainerNetwork"
+					},
+					"type": "array"
 				},
 				"openStdin": {
 					"type": "boolean"
@@ -22815,12 +27678,6 @@ const docTemplate = `{
 		},
 		"dto.ContainerStatus": {
 			"properties": {
-				"buildCacheReclaimable": {
-					"type": "integer"
-				},
-				"buildCacheUsage": {
-					"type": "integer"
-				},
 				"composeCount": {
 					"type": "integer"
 				},
@@ -22828,12 +27685,6 @@ const docTemplate = `{
 					"type": "integer"
 				},
 				"containerCount": {
-					"type": "integer"
-				},
-				"containerReclaimable": {
-					"type": "integer"
-				},
-				"containerUsage": {
 					"type": "integer"
 				},
 				"created": {
@@ -22846,12 +27697,6 @@ const docTemplate = `{
 					"type": "integer"
 				},
 				"imageCount": {
-					"type": "integer"
-				},
-				"imageReclaimable": {
-					"type": "integer"
-				},
-				"imageUsage": {
 					"type": "integer"
 				},
 				"networkCount": {
@@ -22873,12 +27718,6 @@ const docTemplate = `{
 					"type": "integer"
 				},
 				"volumeCount": {
-					"type": "integer"
-				},
-				"volumeReclaimable": {
-					"type": "integer"
-				},
-				"volumeUsage": {
 					"type": "integer"
 				}
 			},
@@ -22971,6 +27810,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"appID": {
+					"type": "string"
+				},
+				"args": {
 					"type": "string"
 				},
 				"command": {
@@ -23101,6 +27943,9 @@ const docTemplate = `{
 						"$ref": "#/definitions/dto.TransHelper"
 					},
 					"type": "array"
+				},
+				"args": {
+					"type": "string"
 				},
 				"command": {
 					"type": "string"
@@ -23311,6 +28156,9 @@ const docTemplate = `{
 		},
 		"dto.DashboardBase": {
 			"properties": {
+				"agentNumber": {
+					"type": "integer"
+				},
 				"appInstalledNumber": {
 					"type": "integer"
 				},
@@ -23319,6 +28167,9 @@ const docTemplate = `{
 				},
 				"cpuLogicalCores": {
 					"type": "integer"
+				},
+				"cpuMhz": {
+					"type": "number"
 				},
 				"cpuModelName": {
 					"type": "string"
@@ -23356,6 +28207,9 @@ const docTemplate = `{
 				"platformVersion": {
 					"type": "string"
 				},
+				"prettyDistro": {
+					"type": "string"
+				},
 				"quickJump": {
 					"items": {
 						"$ref": "#/definitions/dto.QuickJump"
@@ -23376,6 +28230,12 @@ const docTemplate = `{
 		},
 		"dto.DashboardCurrent": {
 			"properties": {
+				"cpuDetailedPercent": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
 				"cpuPercent": {
 					"items": {
 						"type": "number"
@@ -23519,6 +28379,9 @@ const docTemplate = `{
 				"isDisable": {
 					"type": "boolean"
 				},
+				"isLocal": {
+					"type": "boolean"
+				},
 				"key": {
 					"type": "string"
 				},
@@ -23559,6 +28422,9 @@ const docTemplate = `{
 						"local",
 						"remote"
 					],
+					"type": "string"
+				},
+				"initialDB": {
 					"type": "string"
 				},
 				"name": {
@@ -23641,6 +28507,9 @@ const docTemplate = `{
 				},
 				"id": {
 					"type": "integer"
+				},
+				"initialDB": {
+					"type": "string"
 				},
 				"name": {
 					"maxLength": 256,
@@ -23770,6 +28639,9 @@ const docTemplate = `{
 				},
 				"id": {
 					"type": "integer"
+				},
+				"initialDB": {
+					"type": "string"
 				},
 				"password": {
 					"type": "string"
@@ -23910,6 +28782,17 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.DockerStatus": {
+			"properties": {
+				"isActive": {
+					"type": "boolean"
+				},
+				"isExist": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
 		"dto.DownloadRecord": {
 			"properties": {
 				"downloadAccountID": {
@@ -23927,6 +28810,17 @@ const docTemplate = `{
 				"fileDir",
 				"fileName"
 			],
+			"type": "object"
+		},
+		"dto.ExtraHost": {
+			"properties": {
+				"hostname": {
+					"type": "string"
+				},
+				"ip": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.ExtraProperties": {
@@ -23993,6 +28887,27 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.Fail2BanSet": {
+			"properties": {
+				"ips": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"operate": {
+					"enum": [
+						"banned",
+						"ignore"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"operate"
+			],
+			"type": "object"
+		},
 		"dto.Fail2BanUpdate": {
 			"properties": {
 				"key": {
@@ -24013,6 +28928,17 @@ const docTemplate = `{
 			},
 			"required": [
 				"key"
+			],
+			"type": "object"
+		},
+		"dto.FilePath": {
+			"properties": {
+				"path": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"path"
 			],
 			"type": "object"
 		},
@@ -24049,8 +28975,8 @@ const docTemplate = `{
 						"start",
 						"stop",
 						"restart",
-						"disablePing",
-						"enablePing"
+						"disableBanPing",
+						"enableBanPing"
 					],
 					"type": "string"
 				},
@@ -24270,6 +29196,23 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.GPUProcess": {
+			"properties": {
+				"pid": {
+					"type": "string"
+				},
+				"processName": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				},
+				"usedMemory": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.GroupCreate": {
 			"properties": {
 				"id": {
@@ -24319,43 +29262,6 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.HostConnTest": {
-			"properties": {
-				"addr": {
-					"type": "string"
-				},
-				"authMode": {
-					"enum": [
-						"password",
-						"key"
-					],
-					"type": "string"
-				},
-				"passPhrase": {
-					"type": "string"
-				},
-				"password": {
-					"type": "string"
-				},
-				"port": {
-					"maximum": 65535,
-					"minimum": 1,
-					"type": "integer"
-				},
-				"privateKey": {
-					"type": "string"
-				},
-				"user": {
-					"type": "string"
-				}
-			},
-			"required": [
-				"addr",
-				"port",
-				"user"
-			],
-			"type": "object"
-		},
 		"dto.HostHelper": {
 			"properties": {
 				"host": {
@@ -24367,124 +29273,14 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
-		"dto.HostInfo": {
+		"dto.ImageBuild": {
 			"properties": {
-				"addr": {
-					"type": "string"
-				},
-				"authMode": {
-					"type": "string"
-				},
-				"createdAt": {
-					"type": "string"
-				},
-				"description": {
-					"type": "string"
-				},
-				"groupBelong": {
-					"type": "string"
-				},
-				"groupID": {
-					"type": "integer"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"name": {
-					"type": "string"
-				},
-				"passPhrase": {
-					"type": "string"
-				},
-				"password": {
-					"type": "string"
-				},
-				"port": {
-					"type": "integer"
-				},
-				"privateKey": {
-					"type": "string"
-				},
-				"rememberPassword": {
-					"type": "boolean"
-				},
-				"user": {
-					"type": "string"
-				}
-			},
-			"type": "object"
-		},
-		"dto.HostOperate": {
-			"properties": {
-				"addr": {
-					"type": "string"
-				},
-				"authMode": {
-					"enum": [
-						"password",
-						"key"
-					],
-					"type": "string"
-				},
-				"description": {
-					"type": "string"
-				},
-				"groupID": {
-					"type": "integer"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"name": {
-					"type": "string"
-				},
-				"passPhrase": {
-					"type": "string"
-				},
-				"password": {
-					"type": "string"
-				},
-				"port": {
-					"maximum": 65535,
-					"minimum": 1,
-					"type": "integer"
-				},
-				"privateKey": {
-					"type": "string"
-				},
-				"rememberPassword": {
-					"type": "boolean"
-				},
-				"user": {
-					"type": "string"
-				}
-			},
-			"required": [
-				"addr",
-				"port",
-				"user"
-			],
-			"type": "object"
-		},
-		"dto.HostTree": {
-			"properties": {
-				"children": {
+				"args": {
 					"items": {
-						"$ref": "#/definitions/dto.TreeChild"
+						"type": "string"
 					},
 					"type": "array"
 				},
-				"id": {
-					"type": "integer"
-				},
-				"label": {
-					"type": "string"
-				}
-			},
-			"type": "object"
-		},
-		"dto.ImageBuild": {
-			"properties": {
 				"dockerfile": {
 					"type": "string"
 				},
@@ -24516,8 +29312,14 @@ const docTemplate = `{
 				"createdAt": {
 					"type": "string"
 				},
+				"description": {
+					"type": "string"
+				},
 				"id": {
 					"type": "string"
+				},
+				"isPinned": {
+					"type": "boolean"
 				},
 				"isUsed": {
 					"type": "boolean"
@@ -24536,15 +29338,18 @@ const docTemplate = `{
 		},
 		"dto.ImageLoad": {
 			"properties": {
-				"path": {
-					"type": "string"
+				"paths": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
 				},
 				"taskID": {
 					"type": "string"
 				}
 			},
 			"required": [
-				"path"
+				"paths"
 			],
 			"type": "object"
 		},
@@ -24683,6 +29488,9 @@ const docTemplate = `{
 		},
 		"dto.InspectReq": {
 			"properties": {
+				"detail": {
+					"type": "string"
+				},
 				"id": {
 					"type": "string"
 				},
@@ -24694,6 +29502,38 @@ const docTemplate = `{
 				"id",
 				"type"
 			],
+			"type": "object"
+		},
+		"dto.InstallDetail": {
+			"properties": {
+				"detailID": {
+					"type": "integer"
+				},
+				"httpPort": {
+					"type": "integer"
+				},
+				"httpsPort": {
+					"type": "integer"
+				},
+				"installID": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"version": {
+					"type": "string"
+				},
+				"webUI": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.IptablesBatchOperate": {
@@ -24740,6 +29580,8 @@ const docTemplate = `{
 			"properties": {
 				"chain": {
 					"enum": [
+						"1PANEL_BASIC",
+						"1PANEL_BASIC_BEFORE",
 						"1PANEL_INPUT",
 						"1PANEL_OUTPUT"
 					],
@@ -24775,9 +29617,9 @@ const docTemplate = `{
 				},
 				"strategy": {
 					"enum": [
-						"ACCEPT",
-						"DROP",
-						"REJECT"
+						"accept",
+						"drop",
+						"reject"
 					],
 					"type": "string"
 				}
@@ -24787,6 +29629,17 @@ const docTemplate = `{
 				"operation",
 				"strategy"
 			],
+			"type": "object"
+		},
+		"dto.LauncherOption": {
+			"properties": {
+				"isShow": {
+					"type": "boolean"
+				},
+				"key": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.LoadRedisStatus": {
@@ -24858,9 +29711,6 @@ const docTemplate = `{
 				"captchaID": {
 					"type": "string"
 				},
-				"ignoreCaptcha": {
-					"type": "boolean"
-				},
 				"language": {
 					"enum": [
 						"zh",
@@ -24895,18 +29745,23 @@ const docTemplate = `{
 				"code": {
 					"type": "string"
 				},
-				"name": {
-					"type": "string"
-				},
-				"password": {
+				"sessionId": {
 					"type": "string"
 				}
 			},
 			"required": [
 				"code",
-				"name",
-				"password"
+				"sessionId"
 			],
+			"type": "object"
+		},
+		"dto.MemoUpdate": {
+			"properties": {
+				"content": {
+					"maxLength": 500,
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.MfaCredential": {
@@ -24937,13 +29792,6 @@ const docTemplate = `{
 					"type": "array"
 				},
 				"param": {
-					"enum": [
-						"cpu",
-						"memory",
-						"load",
-						"io",
-						"network"
-					],
 					"type": "string"
 				},
 				"value": {
@@ -24951,9 +29799,100 @@ const docTemplate = `{
 					"type": "array"
 				}
 			},
-			"required": [
-				"param"
-			],
+			"type": "object"
+		},
+		"dto.MonitorGPUData": {
+			"properties": {
+				"date": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"gpuProcesses": {
+					"items": {
+						"items": {
+							"$ref": "#/definitions/dto.GPUProcess"
+						},
+						"type": "array"
+					},
+					"type": "array"
+				},
+				"gpuValue": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
+				"memoryPercent": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
+				"memoryTotal": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
+				"memoryUsed": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
+				"powerPercent": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
+				"powerTotal": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
+				"powerUsed": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
+				"processCount": {
+					"items": {
+						"type": "integer"
+					},
+					"type": "array"
+				},
+				"speedValue": {
+					"items": {
+						"type": "integer"
+					},
+					"type": "array"
+				},
+				"temperatureValue": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
+		"dto.MonitorGPUSearch": {
+			"properties": {
+				"endTime": {
+					"type": "string"
+				},
+				"productName": {
+					"type": "string"
+				},
+				"startTime": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.MonitorSearch": {
@@ -25030,6 +29969,9 @@ const docTemplate = `{
 		},
 		"dto.MysqlDBCreate": {
 			"properties": {
+				"collation": {
+					"type": "string"
+				},
 				"database": {
 					"type": "string"
 				},
@@ -25037,12 +29979,6 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"format": {
-					"enum": [
-						"utf8mb4",
-						"utf8",
-						"gbk",
-						"big5"
-					],
 					"type": "string"
 				},
 				"from": {
@@ -25169,6 +30105,20 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.MysqlFormatCollationOption": {
+			"properties": {
+				"collations": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"format": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.MysqlLoadDB": {
 			"properties": {
 				"database": {
@@ -25195,26 +30145,6 @@ const docTemplate = `{
 				"from",
 				"type"
 			],
-			"type": "object"
-		},
-		"dto.MysqlOption": {
-			"properties": {
-				"database": {
-					"type": "string"
-				},
-				"from": {
-					"type": "string"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"name": {
-					"type": "string"
-				},
-				"type": {
-					"type": "string"
-				}
-			},
 			"type": "object"
 		},
 		"dto.MysqlStatus": {
@@ -25562,6 +30492,12 @@ const docTemplate = `{
 		},
 		"dto.NodeCurrent": {
 			"properties": {
+				"cpuDetailedPercent": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				},
 				"cpuTotal": {
 					"type": "integer"
 				},
@@ -25802,6 +30738,9 @@ const docTemplate = `{
 				},
 				"platformFamily": {
 					"type": "string"
+				},
+				"prettyDistro": {
+					"type": "string"
 				}
 			},
 			"type": "object"
@@ -26000,6 +30939,43 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.PasskeyBeginResponse": {
+			"properties": {
+				"publicKey": {},
+				"sessionId": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.PasskeyInfo": {
+			"properties": {
+				"createdAt": {
+					"type": "string"
+				},
+				"id": {
+					"type": "string"
+				},
+				"lastUsedAt": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.PasskeyRegisterRequest": {
+			"properties": {
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name"
+			],
+			"type": "object"
+		},
 		"dto.PasswordUpdate": {
 			"properties": {
 				"newPassword": {
@@ -26035,6 +31011,9 @@ const docTemplate = `{
 		"dto.PortRuleOperate": {
 			"properties": {
 				"address": {
+					"type": "string"
+				},
+				"chain": {
 					"type": "string"
 				},
 				"description": {
@@ -26304,6 +31283,52 @@ const docTemplate = `{
 				},
 				"user": {
 					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.ProviderInfo": {
+			"properties": {
+				"baseUrl": {
+					"type": "string"
+				},
+				"displayName": {
+					"type": "string"
+				},
+				"models": {
+					"items": {
+						"$ref": "#/definitions/dto.ProviderModelInfo"
+					},
+					"type": "array"
+				},
+				"provider": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.ProviderModelInfo": {
+			"properties": {
+				"contextWindow": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "string"
+				},
+				"input": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"maxTokens": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"reasoning": {
+					"type": "boolean"
 				}
 			},
 			"type": "object"
@@ -26690,12 +31715,21 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.SSHConf": {
+		"dto.SSHConfUpdate": {
 			"properties": {
-				"file": {
+				"key": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"value": {
 					"type": "string"
 				}
 			},
+			"required": [
+				"key"
+			],
 			"type": "object"
 		},
 		"dto.SSHConnData": {
@@ -26736,6 +31770,17 @@ const docTemplate = `{
 				"port",
 				"user"
 			],
+			"type": "object"
+		},
+		"dto.SSHDefaultConn": {
+			"properties": {
+				"defaultConn": {
+					"type": "string"
+				},
+				"withReset": {
+					"type": "boolean"
+				}
+			},
 			"type": "object"
 		},
 		"dto.SSHInfo": {
@@ -26783,9 +31828,6 @@ const docTemplate = `{
 				},
 				"newValue": {
 					"type": "string"
-				},
-				"oldValue": {
-					"type": "string"
 				}
 			},
 			"required": [
@@ -26830,7 +31872,8 @@ const docTemplate = `{
 				"ssl": {
 					"enum": [
 						"Enable",
-						"Disable"
+						"Disable",
+						"Mux"
 					],
 					"type": "string"
 				},
@@ -26967,14 +32010,6 @@ const docTemplate = `{
 				"pageSize",
 				"type"
 			],
-			"type": "object"
-		},
-		"dto.SearchForTree": {
-			"properties": {
-				"info": {
-					"type": "string"
-				}
-			},
 			"type": "object"
 		},
 		"dto.SearchLgLogWithPage": {
@@ -27501,13 +32536,22 @@ const docTemplate = `{
 		},
 		"dto.TerminalInfo": {
 			"properties": {
+				"backgroundColor": {
+					"type": "string"
+				},
 				"cursorBlink": {
 					"type": "string"
 				},
 				"cursorStyle": {
 					"type": "string"
 				},
+				"fontFamily": {
+					"type": "string"
+				},
 				"fontSize": {
+					"type": "string"
+				},
+				"foregroundColor": {
 					"type": "string"
 				},
 				"letterSpacing": {
@@ -27531,17 +32575,6 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"name": {
-					"type": "string"
-				}
-			},
-			"type": "object"
-		},
-		"dto.TreeChild": {
-			"properties": {
-				"id": {
-					"type": "integer"
-				},
-				"label": {
 					"type": "string"
 				}
 			},
@@ -27583,16 +32616,25 @@ const docTemplate = `{
 		},
 		"dto.UpdateFirewallDescription": {
 			"properties": {
-				"address": {
+				"chain": {
 					"type": "string"
 				},
 				"description": {
 					"type": "string"
 				},
-				"port": {
+				"dstIP": {
+					"type": "string"
+				},
+				"dstPort": {
 					"type": "string"
 				},
 				"protocol": {
+					"type": "string"
+				},
+				"srcIP": {
+					"type": "string"
+				},
+				"srcPort": {
 					"type": "string"
 				},
 				"strategy": {
@@ -27652,6 +32694,9 @@ const docTemplate = `{
 		},
 		"dto.UserLoginInfo": {
 			"properties": {
+				"mfaSession": {
+					"type": "string"
+				},
 				"mfaStatus": {
 					"type": "string"
 				},
@@ -27827,6 +32872,9 @@ const docTemplate = `{
 				"architectures": {
 					"type": "string"
 				},
+				"batchInstallSupport": {
+					"type": "boolean"
+				},
 				"createdAt": {
 					"type": "string"
 				},
@@ -27980,6 +33028,9 @@ const docTemplate = `{
 				},
 				"serviceName": {
 					"type": "string"
+				},
+				"sortOrder": {
+					"type": "integer"
 				},
 				"status": {
 					"type": "string"
@@ -28170,6 +33221,9 @@ const docTemplate = `{
 				"status": {
 					"type": "string"
 				},
+				"streamPorts": {
+					"type": "string"
+				},
 				"type": {
 					"type": "string"
 				},
@@ -28222,6 +33276,9 @@ const docTemplate = `{
 				},
 				"url": {
 					"type": "string"
+				},
+				"useEAB": {
+					"type": "boolean"
 				},
 				"useProxy": {
 					"type": "boolean"
@@ -28324,6 +33381,9 @@ const docTemplate = `{
 				},
 				"id": {
 					"type": "integer"
+				},
+				"isIP": {
+					"type": "boolean"
 				},
 				"keyType": {
 					"type": "string"
@@ -28441,6 +33501,9 @@ const docTemplate = `{
 				"appDetailId": {
 					"type": "integer"
 				},
+				"appKey": {
+					"type": "string"
+				},
 				"containerName": {
 					"type": "string"
 				},
@@ -28468,11 +33531,20 @@ const docTemplate = `{
 				"name": {
 					"type": "string"
 				},
+				"nodes": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"params": {
 					"additionalProperties": true,
 					"type": "object"
 				},
 				"pullImage": {
+					"type": "boolean"
+				},
+				"pushNode": {
 					"type": "boolean"
 				},
 				"restartPolicy": {
@@ -28497,6 +33569,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"type": {
+					"type": "string"
+				},
+				"version": {
 					"type": "string"
 				},
 				"webUI": {
@@ -28574,6 +33649,9 @@ const docTemplate = `{
 		"request.AppInstalledSearch": {
 			"properties": {
 				"all": {
+					"type": "boolean"
+				},
+				"checkUpdate": {
 					"type": "boolean"
 				},
 				"name": {
@@ -28728,6 +33806,82 @@ const docTemplate = `{
 			"required": [
 				"groupID",
 				"ids"
+			],
+			"type": "object"
+		},
+		"request.BatchWebsiteHttps": {
+			"properties": {
+				"SSLProtocol": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"algorithm": {
+					"type": "string"
+				},
+				"certificate": {
+					"type": "string"
+				},
+				"certificatePath": {
+					"type": "string"
+				},
+				"hsts": {
+					"type": "boolean"
+				},
+				"hstsIncludeSubDomains": {
+					"type": "boolean"
+				},
+				"http3": {
+					"type": "boolean"
+				},
+				"httpConfig": {
+					"enum": [
+						"HTTPSOnly",
+						"HTTPAlso",
+						"HTTPToHTTPS"
+					],
+					"type": "string"
+				},
+				"httpsPorts": {
+					"items": {
+						"type": "integer"
+					},
+					"type": "array"
+				},
+				"ids": {
+					"items": {
+						"type": "integer"
+					},
+					"type": "array"
+				},
+				"importType": {
+					"type": "string"
+				},
+				"privateKey": {
+					"type": "string"
+				},
+				"privateKeyPath": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"type": {
+					"enum": [
+						"existed",
+						"auto",
+						"manual"
+					],
+					"type": "string"
+				},
+				"websiteSSLId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"ids",
+				"taskID"
 			],
 			"type": "object"
 		},
@@ -28890,6 +34044,9 @@ const docTemplate = `{
 				},
 				"mountPoint": {
 					"type": "string"
+				},
+				"noFail": {
+					"type": "boolean"
 				}
 			},
 			"required": [
@@ -29350,6 +34507,14 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"request.FileProcessReq": {
+			"properties": {
+				"key": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"request.FileReadByLineReq": {
 			"properties": {
 				"ID": {
@@ -29387,6 +34552,34 @@ const docTemplate = `{
 				"page",
 				"pageSize",
 				"type"
+			],
+			"type": "object"
+		},
+		"request.FileRemarkBatch": {
+			"properties": {
+				"paths": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				}
+			},
+			"required": [
+				"paths"
+			],
+			"type": "object"
+		},
+		"request.FileRemarkUpdate": {
+			"properties": {
+				"path": {
+					"type": "string"
+				},
+				"remark": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"path"
 			],
 			"type": "object"
 		},
@@ -30732,6 +35925,35 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"request.StreamUpdate": {
+			"properties": {
+				"algorithm": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"servers": {
+					"items": {
+						"$ref": "#/definitions/dto.NginxUpstreamServer"
+					},
+					"type": "array"
+				},
+				"streamPorts": {
+					"type": "string"
+				},
+				"udp": {
+					"type": "boolean"
+				},
+				"websiteID": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"websiteID"
+			],
+			"type": "object"
+		},
 		"request.SupervisorProcessConfig": {
 			"properties": {
 				"autoRestart": {
@@ -30841,6 +36063,9 @@ const docTemplate = `{
 						"custom"
 					],
 					"type": "string"
+				},
+				"useEAB": {
+					"type": "boolean"
 				},
 				"useProxy": {
 					"type": "boolean"
@@ -31015,6 +36240,9 @@ const docTemplate = `{
 				"IPV6": {
 					"type": "boolean"
 				},
+				"algorithm": {
+					"type": "string"
+				},
 				"alias": {
 					"type": "string"
 				},
@@ -31067,6 +36295,9 @@ const docTemplate = `{
 				"ftpUser": {
 					"type": "string"
 				},
+				"name": {
+					"type": "string"
+				},
 				"parentWebsiteID": {
 					"type": "integer"
 				},
@@ -31085,7 +36316,16 @@ const docTemplate = `{
 				"runtimeID": {
 					"type": "integer"
 				},
+				"servers": {
+					"items": {
+						"$ref": "#/definitions/dto.NginxUpstreamServer"
+					},
+					"type": "array"
+				},
 				"siteDir": {
+					"type": "string"
+				},
+				"streamPorts": {
 					"type": "string"
 				},
 				"taskID": {
@@ -31093,6 +36333,9 @@ const docTemplate = `{
 				},
 				"type": {
 					"type": "string"
+				},
+				"udp": {
+					"type": "boolean"
 				},
 				"webSiteGroupID": {
 					"type": "integer"
@@ -31338,6 +36581,9 @@ const docTemplate = `{
 			"properties": {
 				"content": {
 					"type": "string"
+				},
+				"sync": {
+					"type": "boolean"
 				},
 				"type": {
 					"type": "string"
@@ -31586,6 +36832,9 @@ const docTemplate = `{
 				},
 				"sni": {
 					"type": "boolean"
+				},
+				"sslVerify": {
+					"type": "boolean"
 				}
 			},
 			"required": [
@@ -31598,6 +36847,21 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"request.WebsiteProxyDel": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
+				"name"
+			],
+			"type": "object"
+		},
 		"request.WebsiteProxyReq": {
 			"properties": {
 				"id": {
@@ -31606,6 +36870,25 @@ const docTemplate = `{
 			},
 			"required": [
 				"id"
+			],
+			"type": "object"
+		},
+		"request.WebsiteProxyStatusUpdate": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
+				"name",
+				"status"
 			],
 			"type": "object"
 		},
@@ -31695,6 +36978,9 @@ const docTemplate = `{
 				"id": {
 					"type": "integer"
 				},
+				"isIp": {
+					"type": "boolean"
+				},
 				"keyType": {
 					"type": "string"
 				},
@@ -31736,6 +37022,14 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"request.WebsiteSSLListReq": {
+			"properties": {
+				"acmeAccountID": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"request.WebsiteSSLSearch": {
 			"properties": {
 				"acmeAccountID": {
@@ -31754,6 +37048,7 @@ const docTemplate = `{
 				},
 				"orderBy": {
 					"enum": [
+						"created_at",
 						"expire_date"
 					],
 					"type": "string"
@@ -31766,8 +37061,6 @@ const docTemplate = `{
 				}
 			},
 			"required": [
-				"order",
-				"orderBy",
 				"page",
 				"pageSize"
 			],
@@ -32056,6 +37349,9 @@ const docTemplate = `{
 				"architectures": {
 					"type": "string"
 				},
+				"batchInstallSupport": {
+					"type": "boolean"
+				},
 				"createdAt": {
 					"type": "string"
 				},
@@ -32206,6 +37502,14 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"response.AppDetailSimpleDTO": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
 		"response.AppInstalledCheck": {
 			"properties": {
 				"app": {
@@ -32252,17 +37556,14 @@ const docTemplate = `{
 		},
 		"response.AppItem": {
 			"properties": {
-				"description": {
-					"type": "string"
+				"batchInstallSupport": {
+					"type": "boolean"
 				},
-				"github": {
+				"description": {
 					"type": "string"
 				},
 				"gpuSupport": {
 					"type": "boolean"
-				},
-				"icon": {
-					"type": "string"
 				},
 				"id": {
 					"type": "integer"
@@ -32282,28 +37583,16 @@ const docTemplate = `{
 				"recommend": {
 					"type": "integer"
 				},
-				"resource": {
-					"type": "string"
-				},
 				"status": {
 					"type": "string"
 				},
 				"tags": {
 					"items": {
-						"$ref": "#/definitions/response.TagDTO"
-					},
-					"type": "array"
-				},
-				"type": {
-					"type": "string"
-				},
-				"versions": {
-					"items": {
 						"type": "string"
 					},
 					"type": "array"
 				},
-				"website": {
+				"type": {
 					"type": "string"
 				}
 			},
@@ -32403,8 +37692,11 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
-				"systemDisk": {
-					"$ref": "#/definitions/response.DiskInfo"
+				"systemDisks": {
+					"items": {
+						"$ref": "#/definitions/response.DiskInfo"
+					},
+					"type": "array"
 				},
 				"totalCapacity": {
 					"type": "integer"
@@ -32716,6 +38008,17 @@ const docTemplate = `{
 				},
 				"totalLines": {
 					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"response.FileRemarksRes": {
+			"properties": {
+				"remarks": {
+					"additionalProperties": {
+						"type": "string"
+					},
+					"type": "object"
 				}
 			},
 			"type": "object"
@@ -33459,6 +38762,9 @@ const docTemplate = `{
 				"url": {
 					"type": "string"
 				},
+				"useEAB": {
+					"type": "boolean"
+				},
 				"useProxy": {
 					"type": "boolean"
 				}
@@ -33535,6 +38841,9 @@ const docTemplate = `{
 					"type": "boolean"
 				},
 				"accessLogPath": {
+					"type": "string"
+				},
+				"algorithm": {
 					"type": "string"
 				},
 				"alias": {
@@ -33621,6 +38930,12 @@ const docTemplate = `{
 				"runtimeType": {
 					"type": "string"
 				},
+				"servers": {
+					"items": {
+						"$ref": "#/definitions/dto.NginxUpstreamServer"
+					},
+					"type": "array"
+				},
 				"siteDir": {
 					"type": "string"
 				},
@@ -33630,8 +38945,14 @@ const docTemplate = `{
 				"status": {
 					"type": "string"
 				},
+				"streamPorts": {
+					"type": "string"
+				},
 				"type": {
 					"type": "string"
+				},
+				"udp": {
+					"type": "boolean"
 				},
 				"updatedAt": {
 					"type": "string"
@@ -33854,6 +39175,9 @@ const docTemplate = `{
 				},
 				"id": {
 					"type": "integer"
+				},
+				"isIP": {
+					"type": "boolean"
 				},
 				"keyType": {
 					"type": "string"

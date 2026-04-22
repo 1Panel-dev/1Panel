@@ -92,13 +92,21 @@ var restoreCmd = &cobra.Command{
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep4"))
 		if _, err := os.Stat(path.Join(tmpPath, "db")); err == nil {
 			dbPath := path.Join(baseDir, "1panel")
+			targetDBDir := path.Join(dbPath, "db")
+			if err := os.RemoveAll(targetDBDir); err != nil {
+				global.LOG.Errorf("rollback 1panel db cleanup failed, err: %v", err)
+			}
 			if err := files.CopyItem(true, true, path.Join(tmpPath, "db"), dbPath); err != nil {
 				global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
+			}
+			if err := cleanOrphanSQLiteSidecars(targetDBDir); err != nil {
+				global.LOG.Errorf("rollback 1panel db sidecar cleanup failed, err: %v", err)
 			}
 		}
 
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep5"))
-		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreSuccessful"))
+		version := loadRollbackVersion(tmpPath)
+		fmt.Println(i18n.GetMsgWithMapForCmd("RestoreSuccessful", map[string]interface{}{"version": version}))
 
 		controller.RestartPanel(true, true, true)
 		return nil
@@ -126,4 +134,54 @@ func loadRestorePath(upgradeDir string) (string, error) {
 		return common.ComparePanelVersion(folders[i], folders[j])
 	})
 	return folders[0], nil
+}
+
+func loadRollbackVersion(upgradeDir string) string {
+	stdout, err := cmdUtils.RunDefaultWithStdoutBashCf("grep '^ORIGINAL_VERSION=' %s/1pctl | cut -d'=' -f2", upgradeDir)
+	if err != nil {
+		return "-"
+	}
+	info := strings.ReplaceAll(stdout, "\n", "")
+	if len(info) == 0 || info == `""` {
+		return "-"
+	}
+	return info
+}
+
+func cleanOrphanSQLiteSidecars(dbDir string) error {
+	entries, err := os.ReadDir(dbDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+
+		name := entry.Name()
+		var mainDB string
+		switch {
+		case strings.HasSuffix(name, ".db-wal"):
+			mainDB = strings.TrimSuffix(name, "-wal")
+		case strings.HasSuffix(name, ".db-shm"):
+			mainDB = strings.TrimSuffix(name, "-shm")
+		default:
+			continue
+		}
+
+		if _, statErr := os.Stat(path.Join(dbDir, mainDB)); statErr != nil {
+			if !os.IsNotExist(statErr) {
+				return statErr
+			}
+			if removeErr := os.Remove(path.Join(dbDir, name)); removeErr != nil && !os.IsNotExist(removeErr) {
+				return removeErr
+			}
+		}
+	}
+
+	return nil
 }

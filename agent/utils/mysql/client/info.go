@@ -72,12 +72,13 @@ type AccessChangeInfo struct {
 }
 
 type BackupInfo struct {
-	Name      string `json:"name"`
-	Type      string `json:"type"`
-	Version   string `json:"version"`
-	Format    string `json:"format"`
-	TargetDir string `json:"targetDir"`
-	FileName  string `json:"fileName"`
+	Name      string   `json:"name"`
+	Type      string   `json:"type"`
+	Version   string   `json:"version"`
+	Format    string   `json:"format"`
+	TargetDir string   `json:"targetDir"`
+	FileName  string   `json:"fileName"`
+	Args      []string `json:"args"`
 
 	Timeout uint `json:"timeout"` // second
 }

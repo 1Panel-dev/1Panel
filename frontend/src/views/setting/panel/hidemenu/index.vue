@@ -17,7 +17,13 @@
                         {{ i18n.global.t(data.title) }}
                     </span>
                     <span class="flex justify-center w-[60px]">
-                        <el-switch v-if="!data.disabled" v-model="data.isShow" @change="onChangeShow(data)" />
+                        <el-switch
+                            v-if="!data.disabled"
+                            v-model="data.isShow"
+                            @change="onChangeShow(data)"
+                            @click.stop
+                            @mousedown.stop
+                        />
                         <span v-else>-</span>
                     </span>
                     <span
@@ -49,7 +55,7 @@ import { defaultMenu, updateMenu } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { ArrowRight } from '@element-plus/icons-vue';
-import { sortMenu } from '@/utils/util';
+import { sortMenu } from '@/utils/misc';
 const globalStore = GlobalStore();
 
 const drawerVisible = ref();
@@ -64,7 +70,7 @@ const acceptParams = (params: DialogProps): void => {
     sortMenu(hideMenu);
     treeData.hideMenu = hideMenu;
     if (globalStore.isIntl) {
-        treeData.hideMenu = removeXAlertDashboard(treeData.hideMenu);
+        treeData.hideMenu = removeUpage(treeData.hideMenu);
     }
 };
 type Node = RenderContentContext['node'];
@@ -135,12 +141,12 @@ const treeData = reactive({
     checkedData: [],
 });
 
-const removeXAlertDashboard = (data: any): any => {
+const removeUpage = (data: any): any => {
     return data
-        .filter((item: { label: string }) => item.label !== 'XAlertDashboard')
+        .filter((item: { label: string }) => item.label !== 'Upage')
         .map((item: { children: any }) => {
             if (Array.isArray(item.children)) {
-                item.children = removeXAlertDashboard(item.children);
+                item.children = removeUpage(item.children);
             }
             return item;
         });

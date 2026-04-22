@@ -2,18 +2,12 @@ base:
   install_dir: /opt
   mode: dev
   is_demo: false
-  is_intl: false
   is_offline: false
   is_fxplay: false
   port: 9999
   username: admin
   password: admin123
   version: v2.0.0
-
-remote_url:
-  app_repo: https://apps-assets.fit2cloud.com
-  repo_url: https://resource.fit2cloud.com/1panel/package/v2
-  resource_url: https://resource.fit2cloud.com/1panel/resource/v2
 
 log:
   level: debug

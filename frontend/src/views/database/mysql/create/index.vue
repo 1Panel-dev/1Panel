@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="createVisible" :header="$t('database.create')" @close="handleClose" size="normal">
+    <DrawerPro v-model="createVisible" :header="$t('commons.button.create')" @close="handleClose" size="normal">
         <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input clearable v-model.trim="form.name" @input="form.username = form.name" />
@@ -76,8 +76,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { addMysqlDB, loadFormatCollations } from '@/api/modules/database';
 import { MsgSuccess } from '@/utils/message';
-import { getRandomStr } from '@/utils/util';
-
+import { getRandomStr } from '@/utils/id';
 const loading = ref();
 const createVisible = ref(false);
 const formatOptions = ref();

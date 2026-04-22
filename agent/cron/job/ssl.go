@@ -31,7 +31,7 @@ func (ssl *ssl) Run() {
 		}
 		expireDate := s.ExpireDate.In(nyc)
 		sub := expireDate.Sub(now)
-		if sub.Hours() < 720 {
+		if s.IsIp && sub.Hours() < 72 || !s.IsIp && sub.Hours() < 720 {
 			global.LOG.Infof("Update the SSL certificate for the [%s] domain", s.PrimaryDomain)
 			if s.Provider == constant.SelfSigned {
 				caService := service.NewIWebsiteCAService()
@@ -46,10 +46,7 @@ func (ssl *ssl) Run() {
 					continue
 				}
 			} else {
-				if err := sslService.ObtainSSL(request.WebsiteSSLApply{
-					ID:         s.ID,
-					DisableLog: true,
-				}); err != nil {
+				if err := sslService.AutoRenewSSL(s.ID); err != nil {
 					global.LOG.Errorf("Failed to update the SSL certificate for the [%s] domain , err:%s", s.PrimaryDomain, err.Error())
 					continue
 				}

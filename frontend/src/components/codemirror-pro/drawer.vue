@@ -1,6 +1,6 @@
 <template>
     <DrawerPro v-model="codeVisible" :header="header" size="large" @close="handleClose">
-        <CodemirrorPro v-model="detailInfo" :height-diff="160" :disabled="true" :mode="mode"></CodemirrorPro>
+        <CodemirrorPro v-model="detailInfo" :height-diff="160" :readonly="true" :mode="mode"></CodemirrorPro>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="codeVisible = false">{{ $t('commons.button.cancel') }}</el-button>

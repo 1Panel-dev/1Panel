@@ -90,7 +90,13 @@
 
             <CardWithHeader :header="$t('container.diskUsage')" class="card-interval">
                 <template #body>
-                    <el-descriptions direction="vertical" align="center" :column="4" class="mt-2">
+                    <el-descriptions
+                        direction="vertical"
+                        align="center"
+                        v-loading="usageLoading"
+                        :column="4"
+                        class="mt-2"
+                    >
                         <el-descriptions-item label-width="25%" align="center" :label="$t('container.image')">
                             {{
                                 $t('container.usage', [
@@ -183,15 +189,16 @@
                 </template>
             </CardWithHeader>
         </div>
-        <TaskLog ref="taskLogRef" width="70%" />
+        <TaskLog ref="taskLogRef" width="70%" @close="loadUsage" />
     </div>
 </template>
 
 <script lang="ts" setup>
-import { containerPrune, loadContainerStatus, loadDaemonJson } from '@/api/modules/container';
+import { containerItemStats, containerPrune, loadContainerStatus, loadDaemonJson } from '@/api/modules/container';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { getSettingInfo } from '@/api/modules/setting';
-import { computeSize2, newUUID } from '@/utils/util';
+import { computeSize2 } from '@/utils/size';
+import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
 import { routerToName } from '@/utils/router';
 import { onMounted, reactive, ref } from 'vue';
@@ -200,6 +207,7 @@ import i18n from '@/lang';
 const taskLogRef = ref();
 
 const loading = ref();
+const usageLoading = ref(false);
 const isActive = ref(false);
 const isExist = ref(false);
 const countItem = reactive({
@@ -237,6 +245,7 @@ const search = () => {
         return;
     }
     loadContainerCount();
+    loadUsage();
     loadContainerSetting();
 };
 
@@ -257,16 +266,25 @@ const loadContainerCount = async () => {
         countItem.networkCount = res.data.networkCount;
         countItem.volumeCount = res.data.volumeCount;
         countItem.repoCount = res.data.repoCount;
-
-        countItem.containerUsage = res.data.containerUsage;
-        countItem.containerReclaimable = res.data.containerReclaimable;
-        countItem.imageUsage = res.data.imageUsage;
-        countItem.imageReclaimable = res.data.imageReclaimable;
-        countItem.volumeUsage = res.data.volumeUsage;
-        countItem.volumeReclaimable = res.data.volumeReclaimable;
-        countItem.buildCacheUsage = res.data.buildCacheUsage;
-        countItem.buildCacheReclaimable = res.data.buildCacheReclaimable;
     });
+};
+
+const loadUsage = async () => {
+    usageLoading.value = true;
+    await containerItemStats('system')
+        .then((res) => {
+            countItem.containerUsage = res.data.containerUsage;
+            countItem.containerReclaimable = res.data.containerReclaimable;
+            countItem.imageUsage = res.data.imageUsage;
+            countItem.imageReclaimable = res.data.imageReclaimable;
+            countItem.volumeUsage = res.data.volumeUsage;
+            countItem.volumeReclaimable = res.data.volumeReclaimable;
+            countItem.buildCacheUsage = res.data.buildCacheUsage;
+            countItem.buildCacheReclaimable = res.data.buildCacheReclaimable;
+        })
+        .finally(() => {
+            usageLoading.value = false;
+        });
 };
 
 const loadContainerSetting = async () => {

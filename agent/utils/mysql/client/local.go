@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
 
@@ -232,14 +233,24 @@ func (r *Local) Backup(info BackupInfo) error {
 	if err != nil {
 		return fmt.Errorf("open file %s failed, err: %v", path.Join(info.TargetDir, info.FileName), err)
 	}
-	defer outfile.Close()
+	defer func() { _ = outfile.Close() }()
 	dumpCmd := "mysqldump"
 	if r.Type == constant.AppMariaDB {
 		dumpCmd = "mariadb-dump"
 	}
-	global.LOG.Infof("start to %s | gzip > %s.gzip", dumpCmd, info.TargetDir+"/"+info.FileName)
+	global.LOG.Infof("start to %s | gzip > %s.gzip, args: %v", dumpCmd, info.TargetDir+"/"+info.FileName, info.Args)
 
-	cmd := exec.Command("docker", "exec", r.ContainerName, dumpCmd, "--routines", "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
+	info.Args = append(info.Args, "--routines")
+	itemArgs := common.RemoveRepeatStr(info.Args)
+	args := []string{"exec", r.ContainerName, dumpCmd, "-uroot", "-p" + r.Password, "--default-character-set=" + info.Format}
+	for _, arg := range itemArgs {
+		if len(arg) == 0 {
+			continue
+		}
+		args = append(args, arg)
+	}
+	args = append(args, info.Name)
+	cmd := exec.Command("docker", args...)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 
@@ -257,7 +268,7 @@ func (r *Local) Backup(info BackupInfo) error {
 
 func (r *Local) Recover(info RecoverInfo) error {
 	fi, _ := os.Open(info.SourceFile)
-	defer fi.Close()
+	defer func() { _ = fi.Close() }()
 	mysqlCli := r.Type
 	if mysqlCli == "mysql-cluster" {
 		mysqlCli = "mysql"
@@ -269,12 +280,12 @@ func (r *Local) Recover(info RecoverInfo) error {
 		if err != nil {
 			return err
 		}
-		defer gzipFile.Close()
+		defer func() { _ = gzipFile.Close() }()
 		gzipReader, err := gzip.NewReader(gzipFile)
 		if err != nil {
 			return err
 		}
-		defer gzipReader.Close()
+		defer func() { _ = gzipReader.Close() }()
 		cmd.Stdin = gzipReader
 	} else {
 		cmd.Stdin = fi

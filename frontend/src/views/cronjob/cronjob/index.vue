@@ -3,7 +3,7 @@
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('menu.cronjob')">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('')">
-                    {{ $t('commons.button.create') }}{{ $t('menu.cronjob') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button @click="onOpenGroupDialog()">
                     {{ $t('commons.table.group') }}
@@ -236,7 +236,7 @@ import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { hasBackup, transSpecToStr } from './helper';
 import { GlobalStore } from '@/store';
-import { getCurrentDateFormatted } from '@/utils/util';
+import { getCurrentDateFormatted } from '@/utils/date';
 import { getGroupList } from '@/api/modules/group';
 import { routerToNameWithQuery } from '@/utils/router';
 

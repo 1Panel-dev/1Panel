@@ -28,11 +28,33 @@
                         </el-button>
                     </span>
                 </el-descriptions-item>
-                <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
-                    <span class="break-all whitespace-normal">
+                <el-descriptions-item
+                    label-class-name="system-label"
+                    v-for="(param, key) in params"
+                    :label="getLabel(param)"
+                    :key="key"
+                >
+                    <span v-if="param.type === 'password' && !param.showPassword">********</span>
+                    <span v-else class="break-all whitespace-normal">
                         {{ param.showValue && param.showValue != '' ? param.showValue : param.value }}
                     </span>
-                    <CopyButton v-if="showCopyButton(param.key)" :content="param.value" />
+                    <template v-if="param.type === 'password'">
+                        <el-button
+                            v-if="!param.showPassword"
+                            link
+                            @click="param.showPassword = true"
+                            icon="View"
+                            class="-mt-1 ml-3"
+                        ></el-button>
+                        <el-button
+                            v-if="param.showPassword"
+                            link
+                            @click="param.showPassword = false"
+                            icon="Hide"
+                            class="-mt-1 ml-3"
+                        ></el-button>
+                    </template>
+                    <CopyButton class="-mt-1" v-if="showCopyButton(param.key)" :content="param.value" />
                 </el-descriptions-item>
             </el-descriptions>
         </div>
@@ -47,6 +69,19 @@
                             v-model.number="paramModel.params[p.key]"
                             :disabled="!p.edit"
                         ></el-input>
+                        <el-input
+                            v-else-if="p.type == 'password'"
+                            :type="p.showPassword ? 'text' : 'password'"
+                            v-model="paramModel.params[p.key]"
+                            :disabled="!p.edit"
+                        >
+                            <template #append>
+                                <el-button
+                                    :icon="p.showPassword ? 'Hide' : 'View'"
+                                    @click="p.showPassword = !p.showPassword"
+                                />
+                            </template>
+                        </el-input>
                         <el-select
                             v-model="paramModel.params[p.key]"
                             v-else-if="p.type == 'select'"
@@ -152,13 +187,14 @@ import { reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { getLabel, splitHttp, checkIpV4V6, checkDomain } from '@/utils/util';
+import { getLabel } from '@/utils/app-store';
+import { splitHttp, checkIpV4V6, checkDomain } from '@/utils/validate';
 import i18n from '@/lang';
 import { loadResourceLimit } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 
 interface ParamProps {
-    id: Number;
+    id: number;
     app: any;
 }
 const paramData = ref<ParamProps>({
@@ -304,6 +340,7 @@ const get = async () => {
                     multiple: d.multiple,
                     label: d.label,
                     required: d.required,
+                    showPassword: false,
                 });
                 if (d.required) {
                     rules.params[d.key] = [Rules.requiredInput];
@@ -433,8 +470,12 @@ const changeUnit = () => {
 defineExpose({ acceptParams });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .change-button {
     margin-top: 5px;
+}
+:deep(.system-label) {
+    width: 40% !important;
+    white-space: nowrap !important;
 }
 </style>

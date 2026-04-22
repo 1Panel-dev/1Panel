@@ -38,6 +38,32 @@
             {{ $t('file.top') }}
         </el-button>
         <div class="mt-4 float-right">
+            <el-popover placement="bottom-end" :width="300" trigger="click" @show="loadFavorites">
+                <template #reference>
+                    <el-button link type="primary" size="small">
+                        {{ $t('file.favorite') }}
+                    </el-button>
+                </template>
+                <div v-if="favorites.length === 0" class="text-center py-3 text-gray-400 text-sm">
+                    {{ $t('commons.msg.noneData') }}
+                </div>
+                <div v-else class="favorite-list max-h-52 overflow-y-auto">
+                    <div
+                        v-for="item in favorites"
+                        :key="item.id"
+                        class="favorite-item flex items-center cursor-pointer px-2 py-1.5 rounded"
+                        @click="jumpToFavorite(item)"
+                    >
+                        <svg-icon
+                            :iconName="item.isDir ? 'p-file-folder' : 'p-file-normal'"
+                            class="mr-2 flex-shrink-0"
+                        ></svg-icon>
+                        <el-tooltip :content="item.path" placement="top">
+                            <span class="truncate text-sm">{{ item.name }}</span>
+                        </el-tooltip>
+                    </div>
+                </div>
+            </el-popover>
             <el-button link @click="onAddItem(true)" type="primary" size="small">
                 {{ $t('commons.button.createNewFolder') }}
             </el-button>
@@ -105,7 +131,7 @@
             </el-table>
         </div>
         <div class="file-list-bottom">
-            <div v-if="selectRow?.path">
+            <div v-if="!isMultiple && selectRow?.path">
                 {{ $t('file.currentSelect') }}
                 <el-tooltip :content="selectRow.path" placement="top">
                     <el-tag type="success">
@@ -114,6 +140,23 @@
                         </div>
                     </el-tag>
                 </el-tooltip>
+            </div>
+            <div v-if="isMultiple && selectRows.length > 0">
+                {{ $t('file.currentSelect') }}
+                <el-tag
+                    v-for="(item, index) in selectRows"
+                    :key="item.path"
+                    type="success"
+                    closable
+                    class="mr-1 mb-1"
+                    @close="removeSelected(index)"
+                >
+                    <el-tooltip :content="item.path" placement="top">
+                        <div class="path">
+                            <span>{{ item.path }}</span>
+                        </div>
+                    </el-tooltip>
+                </el-tag>
             </div>
         </div>
 
@@ -130,22 +173,25 @@
 
 <script lang="ts" setup>
 import { File } from '@/api/interface/file';
-import { computeDirSize, createFile, getFileContent, getFilesList } from '@/api/modules/files';
-import { onUpdated, reactive, ref } from 'vue';
+import { computeDirSize, createFile, getFileContent, getFilesList, searchFavorite } from '@/api/modules/files';
+import { nextTick, onUpdated, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useSearchableForSelect } from '@/views/host/file-management/hooks/searchable';
-import { computeSize, debounce } from '@/utils/util';
-
+import { computeSize } from '@/utils/size';
+import { debounce } from '@/utils/misc';
 const data = ref([]);
 const loading = ref(false);
 const paths = ref<string[]>([]);
 const req = reactive({ path: '/', expand: true, page: 1, pageSize: 300, showHidden: true });
 const selectRow = ref({ path: '', name: '' });
+const selectRows = ref<Array<{ path: string; name: string }>>([]);
+const isMultiple = ref(false);
 const rowRefs = ref();
 const open = ref(false);
 const newFolder = ref();
 const disBtn = ref(false);
+const favorites = ref<File.Favorite[]>([]);
 
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchableForSelect(paths);
 const oldUrl = ref<string>('');
@@ -160,16 +206,20 @@ const form = reactive({
 });
 
 interface DialogProps {
-    path: string;
+    path?: string;
     dir: boolean;
-    isAll: boolean;
-    disabled: boolean;
+    isAll?: boolean;
+    disabled?: boolean;
+    multiple?: boolean;
 }
 const acceptParams = (props: DialogProps): void => {
     form.path = props.path || '/';
     form.dir = props.dir;
-    form.isAll = props.isAll;
-    form.disabled = props.disabled;
+    form.isAll = props.isAll || false;
+    form.disabled = props.disabled || false;
+    isMultiple.value = props.multiple || false;
+    selectRows.value = [];
+    selectRow.value = { path: '', name: '' };
     openPage();
     req.path = form.path;
     oldUrl.value = form.path;
@@ -178,8 +228,15 @@ const acceptParams = (props: DialogProps): void => {
 };
 
 const selectFile = () => {
-    if (selectRow.value) {
-        em('choose', selectRow.value.path);
+    if (isMultiple.value) {
+        em(
+            'choose',
+            selectRows.value.map((r) => r.path),
+        );
+    } else {
+        if (selectRow.value) {
+            em('choose', selectRow.value.path);
+        }
     }
     handleClose();
 };
@@ -187,6 +244,7 @@ const selectFile = () => {
 const handleClose = () => {
     open.value = false;
     selectRow.value = { path: '', name: '' };
+    selectRows.value = [];
 };
 
 const openPage = () => {
@@ -221,13 +279,29 @@ const openDir = async (row: File.File, column: any, event: any) => {
             });
         return;
     }
+    // Handle file click
+    const fullPath = (req.path === '/' ? req.path : req.path + '/') + row.name;
+    if (isMultiple.value) {
+        // Multiple mode: toggle selection
+        const index = selectRows.value.findIndex((r) => r.path === fullPath);
+        if (index > -1) {
+            selectRows.value.splice(index, 1);
+        } else {
+            selectRows.value.push({ path: fullPath, name: row.name });
+        }
+        return;
+    }
+    // Single mode: original behavior
     if (form.isAll || !form.dir) {
-        selectRow.value.path = (req.path === '/' ? req.path : req.path + '/') + row.name;
+        selectRow.value.path = fullPath;
         return;
     }
     selectRow.value.path = '';
 };
-const handleRowClick = (row: File.File, column: any, event: any) => {
+const handleRowClick = (row: any, column: any, event: any) => {
+    if (row.isCreate) {
+        return;
+    }
     debouncedOpenDir(row, column, event);
 };
 const debouncedOpenDir = debounce(openDir, 300);
@@ -390,7 +464,7 @@ const createFolder = async (row: any) => {
     const basePath = req.path === '/' ? req.path : `${req.path}/`;
     addForm.path = `${basePath}${newFolder.value}`;
     if (addForm.path.indexOf('.1panel_clash') > -1) {
-        MsgWarning(i18n.global.t('file.clashDitNotSupport'));
+        MsgWarning(i18n.global.t('file.clashDidNotSupport'));
         return;
     }
     addForm.isDir = row.isDir;
@@ -415,6 +489,29 @@ onUpdated(() => {
     }
     search(req);
 });
+
+const removeSelected = (index: number) => {
+    selectRows.value.splice(index, 1);
+};
+
+const loadFavorites = async () => {
+    try {
+        const res = await searchFavorite({ page: 1, pageSize: 100 });
+        favorites.value = res.data.items || [];
+    } catch {}
+};
+
+const jumpToFavorite = async (item: File.Favorite) => {
+    const targetPath = item.isDir ? item.path : item.path.substring(0, item.path.lastIndexOf('/')) || '/';
+    oldUrl.value = req.path;
+    req.path = targetPath;
+    getPaths(targetPath);
+    selectRow.value.path = form.dir ? targetPath : '';
+    await search(req);
+    if (!item.isDir && (form.isAll || !form.dir)) {
+        selectRow.value.path = item.path;
+    }
+};
 
 defineExpose({
     acceptParams,
@@ -444,5 +541,12 @@ defineExpose({
 }
 :deep(.dialog-file-list .el-table__body tr.current-row > td.el-table__cell) {
     background-color: var(--panel-main-bg-color-4);
+}
+
+.favorite-item {
+    transition: background-color 0.15s;
+    &:hover {
+        background-color: var(--panel-main-bg-color-4);
+    }
 }
 </style>

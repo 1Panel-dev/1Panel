@@ -73,7 +73,7 @@ func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites [post]
-// @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建网站 [primaryDomain]","formatEN":"Create website [primaryDomain]"}
+// @x-panel-log {"bodyKeys":["alias"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建网站 [alias]","formatEN":"Create website [alias]"}
 func (b *BaseApi) CreateWebsite(c *gin.Context) {
 	var req request.WebsiteCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -506,13 +506,57 @@ func (b *BaseApi) GetProxyConfig(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/proxies/update [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 反向代理配置 ","formatEN":"Update domain [domain] proxy config"}
+// @x-panel-log {"bodyKeys":["id","name","operate"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改 [operate] 网站 [domain] 反向代理配置 [name] ","formatEN":"Update [operate] domain [domain] proxy config [name]"}
 func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 	var req request.WebsiteProxyConfig
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 	err := websiteService.OperateProxy(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Website
+// @Summary Delete proxy config
+// @Accept json
+// @Param request body request.WebsiteProxyDel true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/proxies/delete [post]
+// @x-panel-log {"bodyKeys":["id","name"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"删除网站 [domain] 反向代理配置 [name] ","formatEN":"Delete domain [domain] proxy config [name]"}
+func (b *BaseApi) DeleteProxyConfig(c *gin.Context) {
+	var req request.WebsiteProxyDel
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	err := websiteService.DeleteProxy(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Website
+// @Summary Update proxy config status
+// @Accept json
+// @Param request body request.WebsiteProxyStatusUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/proxies/status [post]
+// @x-panel-log {"bodyKeys":["id","name","status"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 反向代理配置 [name] 状态 [status] ","formatEN":"Update domain [domain] proxy config [name] status [status]"}
+func (b *BaseApi) UpdateProxyConfigStatus(c *gin.Context) {
+	var req request.WebsiteProxyStatusUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	err := websiteService.UpdateProxyStatus(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -528,7 +572,7 @@ func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/proxies/file [post]
-// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新反向代理文件 [domain]","formatEN":"Nginx conf proxy file update [domain]"}
+// @x-panel-log {"bodyKeys":["websiteID","name"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 反向代理配置文件 [name] ","formatEN":"Update domain [domain] proxy config file [name]"}
 func (b *BaseApi) UpdateProxyConfigFile(c *gin.Context) {
 	var req request.NginxProxyUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -1218,6 +1262,46 @@ func (b *BaseApi) UpdateCORSConfig(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateCors(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Website
+// @Summary Update Stream Config
+// @Accept json
+// @Param request body request.StreamUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/stream/update [post]
+func (b *BaseApi) UpdateStreamConfig(c *gin.Context) {
+	var req request.StreamUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.UpdateStream(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Website
+// @Summary Batch set HTTPS for websites
+// @Accept json
+// @Param request body request.BatchWebsiteHttps true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/batch/https [post]
+func (b *BaseApi) BatchSetHttps(c *gin.Context) {
+	var req request.BatchWebsiteHttps
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.BatchSetHttps(c, req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

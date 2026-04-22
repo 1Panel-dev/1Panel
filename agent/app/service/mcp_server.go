@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -23,9 +27,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
-	"path"
-	"strconv"
-	"strings"
 )
 
 type McpServerService struct{}

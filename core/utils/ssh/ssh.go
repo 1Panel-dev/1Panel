@@ -8,18 +8,23 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	gossh "golang.org/x/crypto/ssh"
+	"golang.org/x/net/proxy"
 )
 
 type ConnInfo struct {
-	User        string        `json:"user"`
-	Addr        string        `json:"addr"`
-	Port        int           `json:"port"`
-	AuthMode    string        `json:"authMode"`
-	Password    string        `json:"password"`
-	PrivateKey  []byte        `json:"privateKey"`
-	PassPhrase  []byte        `json:"passPhrase"`
+	User       string `json:"user"`
+	Addr       string `json:"addr"`
+	Port       int    `json:"port"`
+	AuthMode   string `json:"authMode"`
+	Password   string `json:"password"`
+	PrivateKey []byte `json:"privateKey"`
+	PassPhrase []byte `json:"passPhrase"`
+
+	UseProxy    bool          `json:"useProxy"`
 	DialTimeOut time.Duration `json:"dialTimeOut"`
 }
 
@@ -52,7 +57,7 @@ func NewClient(c ConnInfo) (*SSHClient, error) {
 	if strings.Contains(c.Addr, ":") {
 		proto = "tcp6"
 	}
-	client, err := DialWithTimeout(proto, addr, config)
+	client, err := DialWithTimeout(proto, addr, c.UseProxy, config)
 	if nil != err {
 		return nil, err
 	}
@@ -240,8 +245,14 @@ func (c *SSHClient) RunWithStreamOutput(command string, outputCallback func(stri
 	return err
 }
 
-func DialWithTimeout(network, addr string, config *gossh.ClientConfig) (*gossh.Client, error) {
-	conn, err := net.DialTimeout(network, addr, config.Timeout)
+func DialWithTimeout(network, addr string, useProxy bool, config *gossh.ClientConfig) (*gossh.Client, error) {
+	var conn net.Conn
+	var err error
+	if useProxy {
+		conn, err = loadSSHConnByProxy(network, addr, config.Timeout)
+	} else {
+		conn, err = net.DialTimeout(network, addr, config.Timeout)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -255,4 +266,56 @@ func DialWithTimeout(network, addr string, config *gossh.ClientConfig) (*gossh.C
 		return nil, fmt.Errorf("clear deadline failed: %v", err)
 	}
 	return gossh.NewClient(c, chans, reqs), nil
+}
+
+func loadSSHConnByProxy(network, addr string, timeout time.Duration) (net.Conn, error) {
+	settingRepo := repo.NewISettingRepo()
+	proxyType, err := settingRepo.Get(repo.WithByKey("ProxyType"))
+	if err != nil {
+		return nil, fmt.Errorf("get proxy type from db failed, err: %v", err)
+	}
+	if len(proxyType.Value) == 0 {
+		return nil, fmt.Errorf("get proxy type from db failed, err: %v", err)
+	}
+	proxyUrl, _ := settingRepo.Get(repo.WithByKey("ProxyUrl"))
+	port, _ := settingRepo.Get(repo.WithByKey("ProxyPort"))
+	user, _ := settingRepo.Get(repo.WithByKey("ProxyUser"))
+	passwd, _ := settingRepo.Get(repo.WithByKey("ProxyPasswd"))
+
+	pass, _ := encrypt.StringDecrypt(passwd.Value)
+	proxyItem := fmt.Sprintf("%s:%s", proxyUrl.Value, port.Value)
+	switch proxyType.Value {
+	case "http", "https":
+		item := HTTPProxyDialer{
+			Type:     proxyType.Value,
+			URL:      proxyItem,
+			User:     user.Value,
+			Password: pass,
+		}
+		return HTTPDial(item, network, addr)
+	case "socks5":
+		var auth *proxy.Auth
+		if len(user.Value) == 0 {
+			auth = nil
+		} else {
+			auth = &proxy.Auth{
+				User:     user.Value,
+				Password: pass,
+			}
+		}
+		dialer, err := proxy.SOCKS5("tcp", proxyItem, auth, &net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("new socks5 proxy failed, err: %v", err)
+		}
+		return dialer.Dial(network, addr)
+	default:
+		conn, err := net.DialTimeout(network, addr, timeout)
+		if err != nil {
+			return nil, err
+		}
+		return conn, nil
+	}
 }

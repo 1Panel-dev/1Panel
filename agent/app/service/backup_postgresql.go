@@ -17,7 +17,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
-	pgclient "github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
 )
 
 func (u *BackupService) PostgresqlBackup(req dto.CommonBackup) error {
@@ -56,11 +55,11 @@ func (u *BackupService) PostgresqlRecover(req dto.CommonRecover) error {
 }
 
 func (u *BackupService) PostgresqlRecoverByUpload(req dto.CommonRecover) error {
-	recoveFile, err := loadSqlFile(req.File)
+	recoverFile, err := loadSqlFile(req.File)
 	if err != nil {
 		return err
 	}
-	req.File = recoveFile
+	req.File = recoverFile
 	if err := handlePostgresqlRecover(req, nil, false); err != nil {
 		return err
 	}
@@ -82,7 +81,7 @@ func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, recordID u
 		}
 	}
 
-	itemHandler := func() error { return doPostgresqlgBackup(db, targetDir, fileName, secret, backupTask) }
+	itemHandler := func() error { return doPostgresqlBackup(db, targetDir, fileName, secret, backupTask) }
 	if parentTask != nil {
 		return itemHandler()
 	}
@@ -188,20 +187,29 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 		return recoverDatabase(parentTask)
 	}
 
-	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil, 0, 3*time.Hour)
+	var timeout time.Duration
+	switch req.Timeout {
+	case -1:
+		timeout = 0
+	case 0:
+		timeout = 3 * time.Hour
+	default:
+		timeout = time.Duration(req.Timeout) * time.Second
+	}
+	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil, 0, timeout)
 	go func() {
 		_ = itemTask.Execute()
 	}()
 	return nil
 }
 
-func doPostgresqlgBackup(db DatabaseHelper, targetDir, fileName, secret string, task *task.Task) error {
+func doPostgresqlBackup(db DatabaseHelper, targetDir, fileName, secret string, task *task.Task) error {
 	cli, err := LoadPostgresqlClientByFrom(db.Database)
 	if err != nil {
 		return err
 	}
 	defer cli.Close()
-	backupInfo := pgclient.BackupInfo{
+	backupInfo := client.BackupInfo{
 		Database:  db.Database,
 		Name:      db.Name,
 		TargetDir: targetDir,

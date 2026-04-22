@@ -20,6 +20,7 @@ var (
 	aiToolService      = service.NewIAIToolService()
 	mcpServerService   = service.NewIMcpServerService()
 	tensorrtLLMService = service.NewITensorRTLLMService()
+	agentService       = service.NewIAgentService()
 
 	containerService       = service.NewIContainerService()
 	composeTemplateService = service.NewIComposeTemplateService()
@@ -30,17 +31,20 @@ var (
 	dbCommonService   = service.NewIDBCommonService()
 	mysqlService      = service.NewIMysqlService()
 	postgresqlService = service.NewIPostgresqlService()
+	mongodbService    = service.NewIMongodbService()
 	databaseService   = service.NewIDatabaseService()
 	redisService      = service.NewIRedisService()
 
 	cronjobService = service.NewICronjobService()
 
-	fileService     = service.NewIFileService()
-	sshService      = service.NewISSHService()
-	firewallService = service.NewIFirewallService()
-	iptablesService = service.NewIIptablesService()
-	monitorService  = service.NewIMonitorService()
-	systemService   = service.NewISystemService()
+	fileService        = service.NewIFileService()
+	fileHistoryService = service.NewIFileHistoryService()
+	fileShareService   = service.NewIFileShareService()
+	sshService         = service.NewISSHService()
+	firewallService    = service.NewIFirewallService()
+	iptablesService    = service.NewIIptablesService()
+	monitorService     = service.NewIMonitorService()
+	systemService      = service.NewISystemService()
 
 	deviceService   = service.NewIDeviceService()
 	fail2banService = service.NewIFail2BanService()
@@ -69,6 +73,7 @@ var (
 
 	recycleBinService = service.NewIRecycleBinService()
 	favoriteService   = service.NewIFavoriteService()
+	hostService       = service.NewIHostService()
 
 	websiteCAService = service.NewIWebsiteCAService()
 	taskService      = service.NewITaskService()

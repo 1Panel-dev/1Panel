@@ -90,8 +90,18 @@ func (u *DatabaseService) LoadItems(dbType string) ([]dto.DatabaseItem, error) {
 	dbs, err := databaseRepo.GetList(databaseRepo.WithTypeList(dbType))
 	var datas []dto.DatabaseItem
 	for _, db := range dbs {
-		if dbType == constant.AppPostgresql || dbType == constant.AppPostgresqlCluster {
+		if db.Type == constant.AppPostgresql || db.Type == constant.AppPostgresqlCluster {
 			items, _ := postgresqlRepo.List(postgresqlRepo.WithByPostgresqlName(db.Name))
+			for _, item := range items {
+				var dItem dto.DatabaseItem
+				if err := copier.Copy(&dItem, &item); err != nil {
+					continue
+				}
+				dItem.Database = db.Name
+				datas = append(datas, dItem)
+			}
+		} else if db.Type == constant.AppMongodb {
+			items, _ := mongodbRepo.List(mongodbRepo.WithByMongodbName(db.Name))
 			for _, item := range items {
 				var dItem dto.DatabaseItem
 				if err := copier.Copy(&dItem, &item); err != nil {
@@ -119,9 +129,10 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 	if req.Timeout == 0 {
 		req.Timeout = 30
 	}
+	var err error
 	switch req.Type {
 	case constant.AppPostgresql:
-		_, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
+		_, err = postgresql.NewPostgresqlClient(pgclient.DBInfo{
 			From:      "remote",
 			Address:   req.Address,
 			Port:      req.Port,
@@ -130,17 +141,22 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 			Password:  req.Password,
 			Timeout:   req.Timeout,
 		})
-		return err == nil
 	case constant.AppRedis:
-		_, err := redisclient.NewRedisClient(redisclient.DBInfo{
+		_, err = redisclient.NewRedisClient(redisclient.DBInfo{
 			Address:  req.Address,
 			Port:     req.Port,
 			Password: req.Password,
 			Timeout:  req.Timeout,
 		})
-		return err == nil
+	case constant.AppMongodb:
+		client, ctx, cancel, connectErr := newRemoteMongodbClient(mongodbConnectionInfoFromCreate(req))
+		if connectErr == nil {
+			defer cancel()
+			defer client.Disconnect(ctx)
+		}
+		err = connectErr
 	case "mysql", "mariadb":
-		_, err := mysql.NewMysqlClient(client.DBInfo{
+		_, err = mysql.NewMysqlClient(client.DBInfo{
 			From:     "remote",
 			Address:  req.Address,
 			Port:     req.Port,
@@ -154,10 +170,13 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 			SkipVerify: req.SkipVerify,
 			Timeout:    req.Timeout,
 		})
-		return err == nil
+	}
+	if err != nil {
+		global.LOG.Errorf("check database connection failed, err: %v", err)
+		return false
 	}
 
-	return false
+	return true
 }
 
 func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
@@ -174,12 +193,13 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 	switch req.Type {
 	case constant.AppPostgresql:
 		if _, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
-			From:     "remote",
-			Address:  req.Address,
-			Port:     req.Port,
-			Username: req.Username,
-			Password: req.Password,
-			Timeout:  req.Timeout,
+			From:      "remote",
+			Address:   req.Address,
+			Port:      req.Port,
+			InitialDB: req.InitialDB,
+			Username:  req.Username,
+			Password:  req.Password,
+			Timeout:   req.Timeout,
 		}); err != nil {
 			return err
 		}
@@ -192,6 +212,13 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 		}); err != nil {
 			return err
 		}
+	case constant.AppMongodb:
+		client, ctx, cancel, err := newRemoteMongodbClient(mongodbConnectionInfoFromCreate(req))
+		if err != nil {
+			return err
+		}
+		defer cancel()
+		defer client.Disconnect(ctx)
 	case "mysql", "mariadb":
 		if _, err := mysql.NewMysqlClient(client.DBInfo{
 			From:     "remote",
@@ -262,6 +289,10 @@ func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
 			if err := mysqlRepo.Delete(context.Background(), mysqlRepo.WithByMysqlName(db.Name)); err != nil && !req.ForceDelete {
 				return err
 			}
+		} else if db.Type == constant.AppMongodb {
+			if err := mongodbRepo.Delete(context.Background(), mongodbRepo.WithByMongodbName(db.Name)); err != nil && !req.ForceDelete {
+				return err
+			}
 		} else {
 			if err := postgresqlRepo.Delete(context.Background(), postgresqlRepo.WithByPostgresqlName(db.Name)); err != nil && !req.ForceDelete {
 				return err
@@ -275,12 +306,13 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 	switch req.Type {
 	case constant.AppPostgresql:
 		if _, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
-			From:     "remote",
-			Address:  req.Address,
-			Port:     req.Port,
-			Username: req.Username,
-			Password: req.Password,
-			Timeout:  req.Timeout,
+			From:      "remote",
+			Address:   req.Address,
+			Port:      req.Port,
+			InitialDB: req.InitialDB,
+			Username:  req.Username,
+			Password:  req.Password,
+			Timeout:   req.Timeout,
 		}); err != nil {
 			return err
 		}
@@ -293,6 +325,24 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 		}); err != nil {
 			return err
 		}
+	case constant.AppMongodb:
+		client, ctx, cancel, err := newRemoteMongodbClient(mongodbConnectionInfoFromCreate(dto.DatabaseCreate{
+			Address:    req.Address,
+			Port:       req.Port,
+			Username:   req.Username,
+			Password:   req.Password,
+			Timeout:    req.Timeout,
+			SSL:        req.SSL,
+			RootCert:   req.RootCert,
+			ClientKey:  req.ClientKey,
+			ClientCert: req.ClientCert,
+			SkipVerify: req.SkipVerify,
+		}))
+		if err != nil {
+			return err
+		}
+		defer cancel()
+		defer client.Disconnect(ctx)
 	case "mysql", "mariadb":
 		if _, err := mysql.NewMysqlClient(client.DBInfo{
 			From:     "remote",
@@ -326,6 +376,7 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 	upMap["port"] = req.Port
 	upMap["username"] = req.Username
 	upMap["password"] = pass
+	upMap["initial_db"] = req.InitialDB
 	upMap["timeout"] = req.Timeout
 	upMap["description"] = req.Description
 	upMap["ssl"] = req.SSL

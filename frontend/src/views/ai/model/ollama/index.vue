@@ -1,6 +1,5 @@
 <template>
     <div v-loading="loading">
-        <RouterMenu />
         <LayoutContent title="Ollama">
             <template #app>
                 <AppStatus
@@ -22,7 +21,7 @@
             </template>
             <template #leftToolBar>
                 <el-button :disabled="modelInfo.status !== 'Running'" type="primary" @click="onCreate()">
-                    {{ $t('aiTools.model.create') }}
+                    {{ $t('commons.button.add') }}
                 </el-button>
                 <el-button plain type="primary" :disabled="modelInfo.status !== 'Running'" @click="bindDomain">
                     {{ $t('aiTools.proxy.proxy') }}
@@ -181,7 +180,6 @@ import Terminal from '@/views/ai/model/ollama/terminal/index.vue';
 import Del from '@/views/ai/model/ollama/del/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
-import RouterMenu from '@/views/ai/model/index.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { App } from '@/api/interface/app';
@@ -195,7 +193,8 @@ import {
 } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import { getAppPort } from '@/api/modules/app';
-import { dateFormat, newUUID } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { newUUID } from '@/utils/id';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
 import BindDomain from '@/views/ai/model/ollama/domain/index.vue';
 import { routerToNameWithQuery } from '@/utils/router';

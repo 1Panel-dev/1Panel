@@ -24,7 +24,7 @@
         </div>
 
         <el-watermark
-            v-if="globalStore.isMasterProductPro && globalStore.watermark"
+            v-if="globalStore.isMasterProductPro && globalStore.watermarkShow && globalStore.watermark"
             :content="loadContent()"
             :font="{
                 fontSize: globalStore.watermark.fontSize,
@@ -62,6 +62,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { loadMasterProductProFromDB, loadProductProFromDB } from '@/utils/xpack';
 import { useTheme } from '@/global/use-theme';
 import TaskList from '@/components/task-list/index.vue';
+import i18n from '@/lang';
 const { switchTheme } = useTheme();
 
 useResize();
@@ -80,7 +81,9 @@ const globalStore = GlobalStore();
 const tabsStore = TabsStore();
 
 const loading = ref(false);
-const loadingText = ref();
+const loadingText = computed(() =>
+    globalStore.loadingText ? i18n.global.t(`commons.loadingText.${globalStore.loadingText}`) : '',
+);
 
 let timer: NodeJS.Timer | null = null;
 
@@ -103,7 +106,12 @@ const handleCollapse = () => {
 };
 
 const loadContent = () => {
-    let itemName = globalStore.watermark.content.replaceAll(
+    const watermark = globalStore.watermark;
+    if (!watermark) {
+        return '';
+    }
+
+    let itemName = watermark.content.replaceAll(
         '${nodeName}',
         globalStore.currentNode === 'local' ? globalStore.getMasterAlias() : globalStore.currentNode,
     );
@@ -140,7 +148,6 @@ const toLogin = () => {
 
 const loadStatus = async () => {
     loading.value = globalStore.isLoading;
-    loadingText.value = globalStore.loadingText;
     if (loading.value) {
         timer = setInterval(async () => {
             await getSystemAvailable()

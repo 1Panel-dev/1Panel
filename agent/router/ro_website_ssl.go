@@ -14,6 +14,7 @@ func (a *WebsiteSSLRouter) InitRouter(Router *gin.RouterGroup) {
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
 		groupRouter.POST("/search", baseApi.PageWebsiteSSL)
+		groupRouter.POST("/list", baseApi.ListWebsiteSSL)
 		groupRouter.POST("", baseApi.CreateWebsiteSSL)
 		groupRouter.POST("/resolve", baseApi.GetDNSResolve)
 		groupRouter.POST("/del", baseApi.DeleteWebsiteSSL)

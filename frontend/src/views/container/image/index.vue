@@ -13,7 +13,7 @@
                 <el-button type="primary" plain @click="onOpenPull">
                     {{ $t('container.imagePull') }}
                 </el-button>
-                <el-button type="primary" plain @click="onOpenload">
+                <el-button type="primary" plain @click="onOpenLoad">
                     {{ $t('container.importImage') }}
                 </el-button>
                 <el-button type="primary" plain @click="onOpenBuild">
@@ -102,7 +102,7 @@
                     />
                     <fu-table-operations
                         width="250px"
-                        :ellipsis="10"
+                        :ellipsis="2"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                     />
@@ -111,6 +111,36 @@
         </LayoutContent>
 
         <CodemirrorDrawer ref="myDetail" />
+        <DialogPro v-model="updateDialogVisible" :title="$t('commons.button.update')" @close="handleUpdateDialogClose">
+            <el-form label-position="top">
+                <el-form-item :label="$t('container.tag')">
+                    <el-checkbox
+                        class="w-full"
+                        :model-value="updateCheckAll"
+                        :indeterminate="updateIndeterminate"
+                        @change="onUpdateCheckAllChange"
+                    >
+                        {{ $t('commons.table.all') }}
+                    </el-checkbox>
+                    <el-checkbox-group v-model="updateSelectedTags">
+                        <el-checkbox v-for="tag in updateTagOptions" :key="tag" :label="tag">
+                            {{ tag }}
+                        </el-checkbox>
+                    </el-checkbox-group>
+                    <span class="input-help">{{ $t('container.imageUpdateHelper') }}</span>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="handleUpdateDialogClose">
+                        {{ $t('commons.button.cancel') }}
+                    </el-button>
+                    <el-button type="primary" @click="submitUpdateSelection">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </DialogPro>
 
         <OpDialog ref="opRef" @search="search" />
         <Pull ref="dialogPullRef" @search="search" />
@@ -127,7 +157,9 @@
 
 <script lang="ts" setup>
 import { reactive, ref, computed } from 'vue';
-import { dateFormat, newUUID, computeSize2 } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { newUUID } from '@/utils/id';
+import { computeSize2 } from '@/utils/size';
 import { Container } from '@/api/interface/container';
 import Pull from '@/views/container/image/pull/index.vue';
 import Tag from '@/views/container/image/tag/index.vue';
@@ -140,12 +172,12 @@ import Prune from '@/views/container/image/prune/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import TaskLog from '@/components/log/task/index.vue';
-import { searchImage, listImageRepo, imageRemove, inspect, containerPrune } from '@/api/modules/container';
+import { searchImage, listImageRepo, imageRemove, inspect, containerPrune, imagePull } from '@/api/modules/container';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
 import { updateCommonDescription } from '@/api/modules/setting';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 const globalStore = GlobalStore();
 
 const taskLogRef = ref();
@@ -184,6 +216,15 @@ const dialogSaveRef = ref();
 const dialogBuildRef = ref();
 const dialogDeleteRef = ref();
 const dialogPruneRef = ref();
+const updateDialogVisible = ref(false);
+const updateTagOptions = ref<Array<string>>([]);
+const updateSelectedTags = ref<Array<string>>([]);
+const updateCheckAll = computed(
+    () => updateTagOptions.value.length > 0 && updateSelectedTags.value.length === updateTagOptions.value.length,
+);
+const updateIndeterminate = computed(
+    () => updateSelectedTags.value.length > 0 && updateSelectedTags.value.length < updateTagOptions.value.length,
+);
 
 const search = async (column?: any) => {
     if (!isActive.value || !isExist.value) {
@@ -252,7 +293,7 @@ const changePinned = (row: any, isPinned: boolean) => {
 };
 
 const onInspect = async (id: string) => {
-    const res = await inspect({ id: id, type: 'image' });
+    const res = await inspect({ id: id, type: 'image', detail: '' });
     let detailInfo = JSON.stringify(JSON.parse(res.data), null, 2);
     let param = {
         header: i18n.global.t('commons.button.view'),
@@ -304,22 +345,82 @@ const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
 };
 
-const onOpenload = () => {
+const onOpenLoad = () => {
     dialogLoadRef.value!.acceptParams();
 };
 
+const normalizeImageTags = (tags: string[]) => {
+    return (tags || []).filter((tag) => tag && !tag.includes('<none>'));
+};
+
+const pullImageTags = async (tags: string[]) => {
+    const taskID = newUUID();
+    await imagePull({
+        taskID: taskID,
+        repoID: 0,
+        imageName: tags,
+    });
+    openTaskLog(taskID);
+};
+
+const runUpdate = async (tags: string[]) => {
+    const validTags = normalizeImageTags(tags);
+    if (validTags.length === 0) {
+        MsgError(i18n.global.t('container.imageUpdateTagEmpty'));
+        return;
+    }
+    try {
+        await ElMessageBox.confirm(
+            i18n.global.t('container.imageUpdateHelper'),
+            i18n.global.t('commons.button.update'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'info',
+            },
+        );
+    } catch {
+        return;
+    }
+    await pullImageTags(validTags);
+};
+
+const onUpdate = async (row: Container.ImageInfo) => {
+    const tags = normalizeImageTags(row.tags || []);
+    if (tags.length === 0) {
+        MsgError(i18n.global.t('container.imageUpdateTagEmpty'));
+        return;
+    }
+    if (tags.length === 1) {
+        await runUpdate(tags);
+        return;
+    }
+    updateTagOptions.value = tags;
+    updateSelectedTags.value = [...tags];
+    updateDialogVisible.value = true;
+};
+
+const onUpdateCheckAllChange = (checked: boolean) => {
+    updateSelectedTags.value = checked ? [...updateTagOptions.value] : [];
+};
+
+const handleUpdateDialogClose = () => {
+    updateDialogVisible.value = false;
+    updateTagOptions.value = [];
+    updateSelectedTags.value = [];
+};
+
+const submitUpdateSelection = async () => {
+    if (updateSelectedTags.value.length === 0) {
+        MsgError(i18n.global.t('commons.msg.confirmNoNull', [i18n.global.t('container.tag')]));
+        return;
+    }
+    const selected = [...updateSelectedTags.value];
+    handleUpdateDialogClose();
+    await runUpdate(selected);
+};
+
 const buttons = [
-    {
-        label: i18n.global.t('container.tag'),
-        click: (row: Container.ImageInfo) => {
-            let params = {
-                repos: repos.value,
-                imageID: row.id,
-                tags: row.tags,
-            };
-            dialogTagRef.value!.acceptParams(params);
-        },
-    },
     {
         label: i18n.global.t('container.push'),
         click: (row: Container.ImageInfo) => {
@@ -338,6 +439,23 @@ const buttons = [
                 tags: row.tags,
             };
             dialogSaveRef.value!.acceptParams(params);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.update'),
+        click: (row: Container.ImageInfo) => {
+            onUpdate(row);
+        },
+    },
+    {
+        label: i18n.global.t('container.tag'),
+        click: (row: Container.ImageInfo) => {
+            let params = {
+                repos: repos.value,
+                imageID: row.id,
+                tags: row.tags,
+            };
+            dialogTagRef.value!.acceptParams(params);
         },
     },
     {

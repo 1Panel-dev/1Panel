@@ -61,7 +61,8 @@
 <script lang="ts" setup>
 import { getRecycleStatus, clearRecycle, getRecycleList, reduceFile } from '@/api/modules/files';
 import { reactive, ref } from 'vue';
-import { dateFormat, computeSize } from '@/utils/util';
+import { dateFormat } from '@/utils/date';
+import { computeSize } from '@/utils/size';
 import i18n from '@/lang';
 import Delete from './delete/index.vue';
 import Reduce from './reduce/index.vue';

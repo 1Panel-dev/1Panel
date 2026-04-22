@@ -51,7 +51,7 @@ func NewIWebsiteCAService() IWebsiteCAService {
 }
 
 func (w WebsiteCAService) Page(search request.WebsiteCASearch) (int64, []response.WebsiteCADTO, error) {
-	total, cas, err := websiteCARepo.Page(search.Page, search.PageSize, repo.WithOrderBy("created_at desc"))
+	total, cas, err := websiteCARepo.Page(search.Page, search.PageSize, repo.WithOrderDesc("created_at"))
 	if err != nil {
 		return 0, nil, err
 	}
@@ -443,7 +443,7 @@ func (w WebsiteCAService) DownloadFile(id uint) (*os.File, error) {
 		return nil, err
 	}
 	fileName := ca.Name + ".zip"
-	if err = fileOp.Compress([]string{path.Join(dir, "ca.crt"), path.Join(dir, "ca.key")}, dir, fileName, files.SdkZip, ""); err != nil {
+	if err = fileOp.Compress(context.Background(), []string{path.Join(dir, "ca.crt"), path.Join(dir, "ca.key")}, dir, fileName, files.SdkZip, "", nil); err != nil {
 		return nil, err
 	}
 	return os.Open(path.Join(dir, fileName))

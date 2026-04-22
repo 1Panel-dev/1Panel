@@ -34,6 +34,7 @@ type IBackupService interface {
 	LoadBackupOptions() ([]dto.BackupOption, error)
 	SearchWithPage(search dto.SearchPageWithType) (int64, interface{}, error)
 	Create(backupDto dto.BackupOperate) error
+	CheckConn(req dto.BackupOperate) dto.BackupCheckRes
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
 	Update(req dto.BackupOperate) error
 	Delete(id uint) error
@@ -43,10 +44,13 @@ type IBackupService interface {
 
 	MysqlBackup(db dto.CommonBackup) error
 	PostgresqlBackup(db dto.CommonBackup) error
+	MongodbBackup(db dto.CommonBackup) error
 	MysqlRecover(db dto.CommonRecover) error
 	PostgresqlRecover(db dto.CommonRecover) error
+	MongodbRecover(db dto.CommonRecover) error
 	MysqlRecoverByUpload(req dto.CommonRecover) error
 	PostgresqlRecoverByUpload(req dto.CommonRecover) error
+	MongodbRecoverByUpload(req dto.CommonRecover) error
 
 	RedisBackup(db dto.CommonBackup) error
 	RedisRecover(db dto.CommonRecover) error
@@ -56,6 +60,11 @@ type IBackupService interface {
 
 	AppBackup(db dto.CommonBackup) (*model.BackupRecord, error)
 	AppRecover(req dto.CommonRecover) error
+
+	ContainerBackup(req dto.CommonBackup) error
+	ContainerRecover(req dto.CommonRecover) error
+	ComposeBackup(req dto.CommonBackup) error
+	ComposeRecover(req dto.CommonRecover) error
 }
 
 func NewIBackupService() IBackupService {
@@ -71,7 +80,7 @@ func (u *BackupService) GetLocalDir() (string, error) {
 }
 
 func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, interface{}, error) {
-	options := []repo.DBOption{repo.WithOrderBy("created_at desc")}
+	options := []repo.DBOption{repo.WithOrderDesc("created_at")}
 	if len(req.Type) != 0 {
 		options = append(options, repo.WithByType(req.Type))
 	}
@@ -123,6 +132,43 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 	return count, data, nil
 }
 
+func (u *BackupService) CheckConn(req dto.BackupOperate) dto.BackupCheckRes {
+	var res dto.BackupCheckRes
+	var backup model.BackupAccount
+	if err := copier.Copy(&backup, &req); err != nil {
+		res.Msg = i18n.GetMsgWithDetail("ErrStructTransform", err.Error())
+		return res
+	}
+	itemAccessKey, err := base64.StdEncoding.DecodeString(backup.AccessKey)
+	if err != nil {
+		res.Msg = err.Error()
+		return res
+	}
+	backup.AccessKey = string(itemAccessKey)
+	itemCredential, err := base64.StdEncoding.DecodeString(backup.Credential)
+	if err != nil {
+		res.Msg = err.Error()
+		return res
+	}
+	backup.Credential = string(itemCredential)
+
+	if req.Type == constant.OneDrive || req.Type == constant.GoogleDrive {
+		refreshToken, err := loadRefreshTokenByCode(&backup)
+		if err != nil {
+			res.Msg = err.Error()
+			return res
+		}
+		res.Token = base64.StdEncoding.EncodeToString([]byte(refreshToken))
+	}
+	isOk, err := u.checkBackupConn(&backup)
+	if err != nil {
+		res.Msg = err.Error()
+		return res
+	}
+	res.IsOk = isOk
+	return res
+}
+
 func (u *BackupService) Create(req dto.BackupOperate) error {
 	if req.Type == constant.Local {
 		return buserr.New("ErrBackupLocalCreate")
@@ -147,19 +193,6 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 		return err
 	}
 	backup.Credential = string(itemCredential)
-
-	if req.Type == constant.OneDrive || req.Type == constant.GoogleDrive || req.Type == constant.ALIYUN {
-		if err := loadRefreshTokenByCode(&backup); err != nil {
-			return err
-		}
-	}
-	if req.Type != constant.Local {
-		isOk, err := u.checkBackupConn(&backup)
-		if err != nil || !isOk {
-			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
-		}
-	}
-
 	backup.AccessKey, err = encrypt.StringEncrypt(backup.AccessKey)
 	if err != nil {
 		return err
@@ -248,16 +281,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 		global.Dir.LocalBackupDir = newBackup.BackupPath
 	}
 
-	if newBackup.Type == constant.OneDrive || newBackup.Type == constant.GoogleDrive || newBackup.Type == constant.ALIYUN {
-		if err := loadRefreshTokenByCode(&newBackup); err != nil {
-			return err
-		}
-	}
 	if backup.Type != constant.Local {
-		isOk, err := u.checkBackupConn(&newBackup)
-		if err != nil || !isOk {
-			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
-		}
 		newBackup.AccessKey, err = encrypt.StringEncrypt(newBackup.AccessKey)
 		if err != nil {
 			return err
@@ -356,7 +380,7 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 }
 
 func (u *BackupService) LoadBackupOptions() ([]dto.BackupOption, error) {
-	accounts, err := backupRepo.List(repo.WithOrderBy("created_at desc"))
+	accounts, err := backupRepo.List(repo.WithOrderDesc("created_at"))
 	if err != nil {
 		return nil, err
 	}
@@ -514,37 +538,34 @@ func newClient(account *model.BackupAccount, isEncrypt bool) (cloud_storage.Clou
 	return client, nil
 }
 
-func loadRefreshTokenByCode(backup *model.BackupAccount) error {
+func loadRefreshTokenByCode(backup *model.BackupAccount) (string, error) {
 	varMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
-		return fmt.Errorf("unmarshal backup vars failed, err: %v", err)
+		return "", fmt.Errorf("unmarshal backup vars failed, err: %v", err)
+	}
+	if token, ok := varMap["refresh_token"]; ok && len(token.(string)) != 0 {
+		return "", nil
 	}
 	refreshToken := ""
 	var err error
-	if backup.Type == constant.GoogleDrive {
+	switch backup.Type {
+	case constant.GoogleDrive:
 		refreshToken, err = client.RefreshGoogleToken("authorization_code", "refreshToken", varMap)
 		if err != nil {
-			return err
+			return "", err
 		}
-	}
-	if backup.Type == constant.OneDrive {
+	case constant.OneDrive:
 		refreshToken, err = client.RefreshToken("authorization_code", "refreshToken", varMap)
 		if err != nil {
-			return err
+			return "", err
 		}
 	}
 	if backup.Type != constant.ALIYUN {
-		delete(varMap, "code")
 		varMap["refresh_token"] = refreshToken
 	}
-	varMap["refresh_status"] = constant.StatusSuccess
-	varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
-	itemVars, err := json.Marshal(varMap)
-	if err != nil {
-		return fmt.Errorf("json marshal var map failed, err: %v", err)
-	}
+	itemVars, _ := json.Marshal(varMap)
 	backup.Vars = string(itemVars)
-	return nil
+	return refreshToken, nil
 }
 
 func loadBackupNamesByID(accountIDs string, downloadID uint) ([]string, string, error) {
