@@ -159,15 +159,19 @@ func readHermesTelegramChannelConfig(confDir string) (*dto.AgentTelegramConfig, 
 
 	allowFrom := splitHermesEnvList(envMap["TELEGRAM_ALLOWED_USERS"])
 	requireMention := extractBoolValue(childMap(cfg, "telegram")["require_mention"], false)
-	dmPolicy := "pairing"
+	dmPolicy := ""
 	if extractHermesEnvBool(envMap, "TELEGRAM_ALLOW_ALL_USERS", false) {
 		dmPolicy = "open"
 	} else if len(allowFrom) > 0 {
 		dmPolicy = "allowlist"
+	} else if envMap["TELEGRAM_BOT_TOKEN"] != "" {
+		dmPolicy = "pairing"
 	}
-	groupPolicy := "open"
+	groupPolicy := ""
 	if requireMention {
 		groupPolicy = "allowlist"
+	} else if envMap["TELEGRAM_BOT_TOKEN"] != "" {
+		groupPolicy = "open"
 	}
 	token := envMap["TELEGRAM_BOT_TOKEN"]
 	result := &dto.AgentTelegramConfig{
@@ -177,8 +181,8 @@ func readHermesTelegramChannelConfig(confDir string) (*dto.AgentTelegramConfig, 
 		RequireMention: requireMention,
 		GroupPolicy:    groupPolicy,
 		GroupAllowFrom: []string{},
-		Streaming:      "partial",
-		DefaultAccount: "default",
+		Streaming:      "",
+		DefaultAccount: "",
 	}
 	if token != "" {
 		result.Bots = []dto.AgentTelegramBot{
@@ -192,7 +196,7 @@ func readHermesTelegramChannelConfig(confDir string) (*dto.AgentTelegramConfig, 
 				BotToken:    token,
 				DmPolicy:    dmPolicy,
 				GroupPolicy: groupPolicy,
-				Streaming:   "partial",
+				Streaming:   "",
 			},
 		}
 	}
@@ -250,16 +254,20 @@ func readHermesDiscordChannelConfig(confDir string) (*dto.AgentDiscordConfig, er
 	}
 
 	allowFrom := splitHermesEnvList(envMap["DISCORD_ALLOWED_USERS"])
-	requireMention := extractBoolValue(childMap(cfg, "discord")["require_mention"], true)
-	dmPolicy := "pairing"
+	requireMention := extractBoolValue(childMap(cfg, "discord")["require_mention"], false)
+	dmPolicy := ""
 	if extractHermesEnvBool(envMap, "DISCORD_ALLOW_ALL_USERS", false) {
 		dmPolicy = "open"
 	} else if len(allowFrom) > 0 {
 		dmPolicy = "allowlist"
+	} else if envMap["DISCORD_BOT_TOKEN"] != "" {
+		dmPolicy = "pairing"
 	}
-	groupPolicy := "open"
+	groupPolicy := ""
 	if requireMention {
 		groupPolicy = "allowlist"
+	} else if envMap["DISCORD_BOT_TOKEN"] != "" {
+		groupPolicy = "open"
 	}
 	token := envMap["DISCORD_BOT_TOKEN"]
 	result := &dto.AgentDiscordConfig{
@@ -268,7 +276,7 @@ func readHermesDiscordChannelConfig(confDir string) (*dto.AgentDiscordConfig, er
 		AllowFrom:      allowFrom,
 		RequireMention: requireMention,
 		GroupPolicy:    groupPolicy,
-		DefaultAccount: "default",
+		DefaultAccount: "",
 	}
 	if token != "" {
 		result.Bots = []dto.AgentDiscordBot{

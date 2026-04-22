@@ -13,33 +13,15 @@
         </el-form-item>
         <el-form-item :label="t('aiTools.agents.dmPolicy')" prop="dmPolicy">
             <el-select v-model="form.dmPolicy">
-                <el-option
-                    :label="t('aiTools.agents.pairingCode')"
-                    value="pairing"
-                    :disabled="form.groupPolicy === 'allowlist'"
-                />
+                <el-option :label="t('aiTools.agents.pairingCode')" value="pairing" />
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-                <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
             </el-select>
         </el-form-item>
         <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
             <el-select v-model="form.groupPolicy">
                 <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
-                <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
                 <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
             </el-select>
-        </el-form-item>
-        <el-form-item
-            v-if="form.dmPolicy === 'allowlist' || form.groupPolicy === 'allowlist'"
-            :label="t('aiTools.agents.policyAllowlist')"
-            prop="allowFromText"
-        >
-            <el-input
-                v-model="form.allowFromText"
-                type="textarea"
-                :rows="3"
-                :placeholder="t('aiTools.agents.allowFromPlaceholder')"
-            />
         </el-form-item>
         <el-form-item>
             <el-button type="primary" :loading="saving" @click="save">
@@ -61,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref } from 'vue';
 import { ElMessageBox, type FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import {
@@ -76,9 +58,8 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 interface FeishuForm {
     appId: string;
     appSecret: string;
-    dmPolicy: 'pairing' | 'open' | 'allowlist';
-    allowFromText: string;
-    groupPolicy: 'open' | 'allowlist' | 'disabled';
+    dmPolicy: 'pairing' | 'open';
+    groupPolicy: 'open' | 'disabled';
 }
 
 const { t } = useI18n();
@@ -92,51 +73,15 @@ const configured = ref(false);
 const form = reactive<FeishuForm>({
     appId: '',
     appSecret: '',
-    dmPolicy: 'pairing',
-    allowFromText: '',
-    groupPolicy: 'allowlist',
+    dmPolicy: 'open',
+    groupPolicy: 'open',
 });
-
-watch(
-    () => form.groupPolicy,
-    (value) => {
-        if (value === 'allowlist' && form.dmPolicy === 'pairing') {
-            form.dmPolicy = 'allowlist';
-        }
-    },
-);
-
-const parseTextList = (value: string): string[] => {
-    return Array.from(
-        new Set(
-            String(value || '')
-                .split(/\r?\n/)
-                .map((item) => item.trim())
-                .filter(Boolean),
-        ),
-    );
-};
 
 const rules = reactive({
     appId: [Rules.requiredInput],
     appSecret: [Rules.requiredInput],
     dmPolicy: [Rules.requiredSelect],
     groupPolicy: [Rules.requiredSelect],
-    allowFromText: [
-        {
-            validator: (_rule, value, callback) => {
-                if (
-                    (form.dmPolicy === 'allowlist' || form.groupPolicy === 'allowlist') &&
-                    parseTextList(String(value || '')).length === 0
-                ) {
-                    callback(new Error(t('aiTools.agents.allowFromRequired')));
-                    return;
-                }
-                callback();
-            },
-            trigger: 'blur',
-        },
-    ],
 });
 
 const load = async (id: number) => {
@@ -144,11 +89,17 @@ const load = async (id: number) => {
     pairingCode.value = '';
     const res = await getAgentFeishuConfig({ agentId: id });
     configured.value = !!res.data?.enabled;
+    if (!configured.value) {
+        form.appId = '';
+        form.appSecret = '';
+        form.dmPolicy = 'open';
+        form.groupPolicy = 'open';
+        return;
+    }
     form.appId = res.data?.bots?.[0]?.appId || '';
     form.appSecret = res.data?.bots?.[0]?.appSecret || '';
-    form.dmPolicy = (res.data?.bots?.[0]?.dmPolicy as FeishuForm['dmPolicy']) || 'pairing';
-    form.allowFromText = (res.data?.bots?.[0]?.allowFrom || []).join('\n');
-    form.groupPolicy = (res.data?.groupPolicy as FeishuForm['groupPolicy']) || 'allowlist';
+    form.dmPolicy = res.data?.bots?.[0]?.dmPolicy === 'pairing' ? 'pairing' : 'open';
+    form.groupPolicy = res.data?.groupPolicy === 'disabled' ? 'disabled' : 'open';
 };
 
 const save = async () => {
@@ -158,7 +109,6 @@ const save = async () => {
     await formRef.value.validate();
     saving.value = true;
     try {
-        const allowFrom = parseTextList(form.allowFromText);
         await updateAgentFeishuConfig({
             agentId: agentId.value,
             enabled: true,
@@ -177,7 +127,7 @@ const save = async () => {
                     appId: form.appId,
                     appSecret: form.appSecret,
                     dmPolicy: form.dmPolicy,
-                    allowFrom: form.dmPolicy === 'allowlist' || form.groupPolicy === 'allowlist' ? allowFrom : [],
+                    allowFrom: [],
                 },
             ],
         });

@@ -48,14 +48,8 @@ func readHermesQQBotChannelConfig(confDir string) (*dto.AgentQQBotConfig, error)
 	appID := envMap["QQ_APP_ID"]
 	clientSecret := envMap["QQ_CLIENT_SECRET"]
 	dmPolicy := extractStringValue(extra["dm_policy"])
-	if dmPolicy == "" {
-		dmPolicy = "open"
-	}
 	allowFrom := splitHermesEnvList(envMap["QQ_ALLOWED_USERS"])
 	groupPolicy := extractStringValue(extra["group_policy"])
-	if groupPolicy == "" {
-		groupPolicy = "open"
-	}
 	groupAllowFrom := splitHermesEnvList(envMap["QQ_GROUP_ALLOWED_USERS"])
 
 	result := &dto.AgentQQBotConfig{
@@ -181,18 +175,8 @@ func readHermesWecomChannelConfig(confDir string) (*dto.AgentWecomConfig, error)
 	platform := childMap(childMap(cfg, "platforms"), "wecom")
 	allowFrom := splitHermesEnvList(envMap["WECOM_ALLOWED_USERS"])
 	groupAllowFrom := splitHermesEnvList(envMap["WECOM_GROUP_ALLOWED_USERS"])
-	dmPolicy := "pairing"
-	if envMap["WECOM_DM_POLICY"] == "open" {
-		dmPolicy = "open"
-	} else if len(allowFrom) > 0 {
-		dmPolicy = "allowlist"
-	} else if policy := envMap["WECOM_DM_POLICY"]; policy != "" {
-		dmPolicy = policy
-	}
+	dmPolicy := envMap["WECOM_DM_POLICY"]
 	groupPolicy := envMap["WECOM_GROUP_POLICY"]
-	if groupPolicy == "" {
-		groupPolicy = "open"
-	}
 
 	botID := envMap["WECOM_BOT_ID"]
 	secret := envMap["WECOM_SECRET"]
@@ -309,22 +293,24 @@ func readHermesDingTalkChannelConfig(confDir string) (*dto.AgentDingTalkConfig, 
 
 	platform := childMap(childMap(cfg, "platforms"), "dingtalk")
 	extra := childMap(platform, "extra")
+	clientID := envMap["DINGTALK_CLIENT_ID"]
+	clientSecret := envMap["DINGTALK_CLIENT_SECRET"]
 	allowFrom := splitHermesEnvList(envMap["DINGTALK_ALLOWED_USERS"])
-	dmPolicy := "pairing"
+	dmPolicy := ""
 	if extractHermesEnvBool(envMap, "DINGTALK_ALLOW_ALL_USERS", false) {
 		dmPolicy = "open"
 	} else if len(allowFrom) > 0 {
 		dmPolicy = "allowlist"
 	} else if extractStringValue(extra["unauthorized_dm_behavior"]) == "ignore" {
 		dmPolicy = "disabled"
+	} else if clientID != "" || clientSecret != "" {
+		dmPolicy = "pairing"
 	}
-	clientID := envMap["DINGTALK_CLIENT_ID"]
-	clientSecret := envMap["DINGTALK_CLIENT_SECRET"]
 	result := &dto.AgentDingTalkConfig{
 		Enabled:        extractBoolValue(platform["enabled"], clientID != "" && clientSecret != ""),
 		DmPolicy:       dmPolicy,
 		AllowFrom:      allowFrom,
-		GroupPolicy:    "open",
+		GroupPolicy:    "",
 		GroupAllowFrom: []string{},
 	}
 	if clientID != "" || clientSecret != "" {
@@ -422,29 +408,28 @@ func readHermesFeishuChannelConfig(confDir string) (*dto.AgentFeishuConfig, erro
 	}
 
 	platform := childMap(childMap(cfg, "platforms"), "feishu")
+	appID := envMap["FEISHU_APP_ID"]
+	appSecret := envMap["FEISHU_APP_SECRET"]
 	allowFrom := splitHermesEnvList(envMap["FEISHU_ALLOWED_USERS"])
-	dmPolicy := "pairing"
+	dmPolicy := ""
 	if extractHermesEnvBool(envMap, "FEISHU_ALLOW_ALL_USERS", false) {
 		dmPolicy = "open"
 	} else if len(allowFrom) > 0 {
 		dmPolicy = "allowlist"
+	} else if appID != "" || appSecret != "" {
+		dmPolicy = "pairing"
 	}
 	groupPolicy := envMap["FEISHU_GROUP_POLICY"]
-	if groupPolicy == "" {
-		groupPolicy = "allowlist"
-	}
-	appID := envMap["FEISHU_APP_ID"]
-	appSecret := envMap["FEISHU_APP_SECRET"]
 	result := &dto.AgentFeishuConfig{
 		Enabled:        extractBoolValue(platform["enabled"], appID != "" && appSecret != ""),
-		ThreadSession:  true,
-		ReplyMode:      "auto",
+		ThreadSession:  false,
+		ReplyMode:      "",
 		Streaming:      false,
-		RequireMention: "true",
+		RequireMention: "",
 		GroupPolicy:    groupPolicy,
 		GroupAllowFrom: []string{},
-		Domain:         firstHermesEnvValue(envMap, "FEISHU_DOMAIN", "feishu"),
-		ConnectionMode: firstHermesEnvValue(envMap, "FEISHU_CONNECTION_MODE", "websocket"),
+		Domain:         envMap["FEISHU_DOMAIN"],
+		ConnectionMode: envMap["FEISHU_CONNECTION_MODE"],
 	}
 	if appID != "" || appSecret != "" {
 		result.Bots = []dto.AgentFeishuBot{
@@ -593,13 +578,6 @@ func firstHermesFeishuBot(bots []dto.AgentFeishuBot) dto.AgentFeishuBot {
 		return dto.AgentFeishuBot{}
 	}
 	return bots[0]
-}
-
-func firstHermesEnvValue(envMap map[string]string, key string, defaultValue string) string {
-	if envMap[key] != "" {
-		return envMap[key]
-	}
-	return defaultValue
 }
 
 func buildHermesWeixinLoginArgs(containerName string) []string {
