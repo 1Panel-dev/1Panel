@@ -680,8 +680,8 @@ const message = {
             allowedOriginsRequired: '접속 주소를 하나 이상 입력하세요',
             allowedOriginsInvalid: 'http(s)://host-or-ip[:port] 형식으로 입력하세요',
             provider: '모델 제공자',
-            accountModelsHelper: 'Configure the models this account exposes to OpenClaw for switching and settings',
-            accountModelsRequired: 'Configure at least one model',
+            accountModelsHelper: '이 계정이 OpenClaw에 제공할 모델을 설정합니다. 모델 전환 및 설정에 사용됩니다.',
+            accountModelsRequired: '모델을 하나 이상 설정하세요.',
             accountModelsDuplicate: '카탈로그에 중복된 모델이 있습니다',
             modelPool: '모델 풀',
             fallbackModels: '폴백 모델',
@@ -1249,7 +1249,7 @@ const message = {
         resource: '리소스',
         macAddr: 'MAC 주소',
         exportHelper: '선택한 이미지를 하나의 tar 파일로 내보냅니다.',
-        goSetting: '편집으로 이동',
+        goSetting: '설정으로 이동',
     },
     cronjob: {
         importHelper:
@@ -2614,10 +2614,10 @@ const message = {
         noService: '{0} 없음',
         toInstall: '설치하러 가기',
         param: '파라미터',
-        alreadyRun: '나이',
+        alreadyRun: '설치됨',
         syncAppList: '동기화',
         less1Minute: '1분 미만',
-        appOfficeWebsite: '오피스 웹사이트',
+        appOfficeWebsite: '공식 웹사이트',
         github: 'GitHub',
         document: '문서',
         updatePrompt: '업데이트가 없습니다.',
@@ -2639,7 +2639,7 @@ const message = {
         editCompose: 'Compose 파일 편집',
         editComposeHelper: 'Compose 파일을 편집하면 소프트웨어 설치가 실패할 수 있습니다.',
         composeNullErr: 'Compose는 비어 있을 수 없습니다.',
-        takeDown: '내리기',
+        takeDown: '지원 종료',
         allReadyInstalled: '설치됨',
         installHelper: '이미지 풀 문제 시 이미지 가속을 구성하세요.',
         sortMode: '정렬',
@@ -2663,11 +2663,11 @@ const message = {
         upgradeWarn:
             '애플리케이션 업그레이드는 docker-compose.yml 파일을 교체합니다. 변경 사항이 있으면 파일 비교를 클릭하여 확인할 수 있습니다.',
         openclawHttpsUpgradeNoticeTitle:
-            'Note: The following instructions only apply to users upgrading OpenClaw from versions 2026.3.13 through 2026.3.22 to 2026.3.23 or later:',
+            '참고: 다음 안내는 OpenClaw를 2026.3.13~2026.3.22 버전에서 2026.3.23 이상으로 업그레이드하는 경우에만 적용됩니다.',
         openclawHttpsUpgradeNoticeItem1:
-            'After the upgrade, agent access switches back to HTTP. Go to Configuration -> Settings -> Security and check the access address.',
+            '업그레이드 후 에이전트 접속이 다시 HTTP로 전환됩니다. 설정 -> 보안에서 접속 주소를 확인하세요.',
         openclawHttpsUpgradeNoticeItem2:
-            'If you previously used a reverse proxy website, change the proxy target to http://IP:Port.',
+            '이전에 리버스 프록시 웹사이트를 사용했다면 프록시 대상 주소를 http://IP:Port 로 변경하세요.',
         newVersion: '새 버전',
         oldVersion: '현재 버전',
         composeDiff: '파일 비교',
@@ -2711,7 +2711,7 @@ const message = {
         upgradeBackup: '앱 업그레이드 전 앱 백업',
         installAllowPort: '앱 설치 시 기본으로 외부 포트 접근 허용',
         noAppHelper: '애플리케이션이 감지되지 않았습니다. 작업 센터에서 앱 스토어 동기화 로그를 확인해 주세요',
-        isEdirWarn: 'docker-compose.yml 파일이 수정된 것을 감지했습니다. 비교를 확인해 주세요',
+        isEdirWarn: 'docker-compose.yml 파일 변경이 감지되었습니다. 차이점을 확인해 주세요.',
     },
     website: {
         primaryDomain: '기본 도메인',
