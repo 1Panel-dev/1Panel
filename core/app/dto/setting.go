@@ -9,16 +9,15 @@ type SettingInfo struct {
 	DeveloperMode       string `json:"developerMode"`
 	UpgradeBackupCopies string `json:"upgradeBackupCopies"`
 
-	SessionTimeout string `json:"sessionTimeout"`
-	Port           string `json:"port"`
-	Ipv6           string `json:"ipv6"`
-	BindAddress    string `json:"bindAddress"`
-	PanelName      string `json:"panelName"`
-	Edition        string `json:"edition"`
-	Theme          string `json:"theme"`
-	MenuTabs       string `json:"menuTabs"`
-	Language       string `json:"language"`
-	DocSource      string `json:"docSource"`
+	Port        string `json:"port"`
+	Ipv6        string `json:"ipv6"`
+	BindAddress string `json:"bindAddress"`
+	PanelName   string `json:"panelName"`
+	Edition     string `json:"edition"`
+	Theme       string `json:"theme"`
+	MenuTabs    string `json:"menuTabs"`
+	Language    string `json:"language"`
+	DocSource   string `json:"docSource"`
 
 	ServerPort                 string `json:"serverPort"`
 	SSL                        string `json:"ssl"`
@@ -32,8 +31,6 @@ type SettingInfo struct {
 	ExpirationDays             string `json:"expirationDays"`
 	ExpirationTime             string `json:"expirationTime"`
 	ComplexityVerification     string `json:"complexityVerification"`
-	MFAStatus                  string `json:"mfaStatus"`
-	MFAInterval                string `json:"mfaInterval"`
 
 	AppStoreVersion      string `json:"appStoreVersion"`
 	AppStoreLastModified string `json:"appStoreLastModified"`
@@ -48,11 +45,55 @@ type SettingInfo struct {
 	ProxyUser       string `json:"proxyUser"`
 	ProxyPasswd     string `json:"proxyPasswd"`
 	ProxyPasswdKeep string `json:"proxyPasswdKeep"`
+}
+
+type SettingBaseInfo struct {
+	SystemVersion       string `json:"systemVersion"`
+	DeveloperMode       string `json:"developerMode"`
+	UpgradeBackupCopies string `json:"upgradeBackupCopies"`
+
+	Port        string `json:"port"`
+	Ipv6        string `json:"ipv6"`
+	BindAddress string `json:"bindAddress"`
+	PanelName   string `json:"panelName"`
+	Edition     string `json:"edition"`
+	Theme       string `json:"theme"`
+	MenuTabs    string `json:"menuTabs"`
+	Language    string `json:"language"`
+	HideMenu    string `json:"hideMenu"`
+	DocSource   string `json:"docSource"`
+
+	ServerPort             string `json:"serverPort"`
+	SecurityEntrance       string `json:"securityEntrance"`
+	ComplexityVerification string `json:"complexityVerification"`
+	NoAuthSetting          string `json:"noAuthSetting"`
+	ProxyType              string `json:"proxyType"`
+
+	DashboardMemoVisible       string `json:"dashboardMemoVisible"`
+	DashboardSimpleNodeVisible string `json:"dashboardSimpleNodeVisible"`
+}
+
+type CurrentUserInfo struct {
+	Name              string `json:"name"`
+	SessionTimeout    int    `json:"sessionTimeout"`
+	MFAStatus         string `json:"mfaStatus"`
+	MFAInterval       string `json:"mfaInterval"`
+	ExpirationDays    int    `json:"expirationDays"`
+	ExpirationTime    string `json:"expirationTime"`
+	ComplexitySetting string `json:"complexitySetting"`
 
 	ApiInterfaceStatus string `json:"apiInterfaceStatus"`
 	ApiKey             string `json:"apiKey"`
 	IpWhiteList        string `json:"ipWhiteList"`
 	ApiKeyValidityTime string `json:"apiKeyValidityTime"`
+}
+type CurrentUserUpdate struct {
+	Name           string `json:"name" validate:"required"`
+	Password       string `json:"password"`
+	OldPassword    string `json:"oldPassword"`
+	SessionTimeout int    `json:"sessionTimeout" validate:"required,min=300,max=864000"`
+	ExpirationDays int    `json:"expirationDays" validate:"min=0,max=60"`
+	ExpirationTime string `json:"expirationTime"`
 }
 
 type SettingKey struct {

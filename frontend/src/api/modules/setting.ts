@@ -81,8 +81,13 @@ export const loadDaemonJsonPath = () => {
 export const updateAgentSetting = (param: Setting.SettingUpdate) => {
     return http.post(`/settings/update`, param);
 };
-export const getAgentSettingInfo = () => {
-    return http.post<Setting.SettingInfo>(`/settings/search`);
+export const getAgentSettingInfo = (currentNode?: string) => {
+    return http.post<Setting.AgentSettingInfo>(
+        `/settings/search`,
+        {},
+        undefined,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 export const getAgentTerminalAIInfo = () => {
     return http.post<Setting.TerminalAIInfo>(`/settings/terminal/ai/search`);
@@ -112,6 +117,9 @@ export const updateCommonDescription = (param: Setting.CommonDescription) => {
 // core
 export const getSettingInfo = () => {
     return http.post<Setting.SettingInfo>(`/core/settings/search`);
+};
+export const getSettingBaseInfo = () => {
+    return http.post<Setting.SettingBaseInfo>(`/core/settings/search/base`);
 };
 export const getSettingBy = (key: string) => {
     return http.post<string>(`/core/settings/by`, { key: key });
@@ -164,24 +172,6 @@ export const downloadSSL = () => {
 export const handleExpired = (param: Setting.PasswordUpdate) => {
     return http.post(`/core/settings/expired/handle`, param);
 };
-export const loadMFA = (param: Setting.MFARequest) => {
-    return http.post<Setting.MFAInfo>(`/core/settings/mfa`, param);
-};
-export const bindMFA = (param: Setting.MFABind) => {
-    return http.post(`/core/settings/mfa/bind`, param);
-};
-export const passkeyRegisterBegin = (param: Setting.PasskeyRegisterRequest) => {
-    return http.post<Setting.PasskeyBeginResponse>(`/core/settings/passkey/register/begin`, param);
-};
-export const passkeyRegisterFinish = (param: Record<string, any>, sessionId: string) => {
-    return http.post(`/core/settings/passkey/register/finish`, param, undefined, { 'Passkey-Session': sessionId });
-};
-export const passkeyList = () => {
-    return http.get<Array<Setting.PasskeyInfo>>(`/core/settings/passkey/list`);
-};
-export const passkeyDelete = (id: string) => {
-    return http.delete(`/core/settings/passkey/${id}`);
-};
 export const getAppStoreConfig = (node?: string) => {
     const params = node ? `?operateNode=${node}` : '';
     return http.get<App.AppStoreConfig>(`/core/settings/apps/store/config${params}`);
@@ -231,14 +221,6 @@ export const listReleases = () => {
 };
 export const upgrade = (version: string) => {
     return http.post(`/core/settings/upgrade`, { version: version });
-};
-
-// api config
-export const generateApiKey = () => {
-    return http.post<string>(`/core/settings/api/config/generate/key`);
-};
-export const updateApiConfig = (param: Setting.ApiConfig) => {
-    return http.post(`/core/settings/api/config/update`, param);
 };
 
 // memo

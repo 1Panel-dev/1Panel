@@ -25,10 +25,7 @@
                                 />
                             </template>
                         </el-select>
-                        <span
-                            class="input-help"
-                            v-if="dialogData.rowData!.type === 'panelPwdEndTime' && expirationDays === 0"
-                        >
+                        <span class="input-help" v-if="dialogData.rowData!.type === 'panelPwdEndTime'">
                             {{ $t('xpack.alert.panelPwdEndTimeRulesHelper') }}
                             <el-link
                                 style="font-size: 12px; margin-left: 5px"
@@ -368,7 +365,7 @@
                 <el-button
                     type="primary"
                     @click="onSubmit(formRef)"
-                    :disabled="dialogData.rowData?.type === 'panelPwdEndTime' && expirationDays === 0 && loading"
+                    :disabled="dialogData.rowData?.type === 'panelPwdEndTime' && loading"
                 >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
@@ -386,7 +383,6 @@ import { CreateAlert, ListDisks, UpdateAlert, ListClams, ListCronJob } from '@/a
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { getSettingInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { routerToName } from '@/utils/router';
@@ -405,7 +401,6 @@ const { t } = i18n.global;
 const loading = ref(false);
 const visible = ref(false);
 const websiteOptions = ref();
-const expirationDays = ref(0);
 const sslOptions = ref([]);
 const diskOptions = ref([]);
 const clamsOptions = ref([]);
@@ -718,11 +713,6 @@ const loadCronJob = async (jobType: string) => {
     });
     cronJobOptions.value = res.data || [];
     dialogData.value.rowData.project = dialogData.value.rowData.project || String(cronJobOptions.value[0].id);
-};
-
-const loadSettings = async () => {
-    const res = await getSettingInfo();
-    expirationDays.value = Number(res.data.expirationDays);
 };
 
 const formatTitle = (row: Alert.AlertInfo) => {

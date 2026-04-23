@@ -160,45 +160,6 @@ export namespace Host {
         endTime: Date;
     }
 
-    export interface MonitorGPUSearch {
-        productName: string;
-        startTime: Date;
-        endTime: Date;
-    }
-    export interface MonitorGPUOptions {
-        gpuType: string;
-        options: Array<string>;
-        chartHide: Array<ChartHide>;
-    }
-    export interface ChartHide {
-        productName: string;
-        process: boolean;
-        gpu: boolean;
-        memory: boolean;
-        power: boolean;
-        temperature: boolean;
-        speed: boolean;
-    }
-    export interface MonitorGPUData {
-        date: Array<Date>;
-        gpuValue: Array<number>;
-        temperatureValue: Array<number>;
-        powerTotal: Array<number>;
-        powerUsed: Array<number>;
-        powerPercent: Array<number>;
-        memoryTotal: Array<number>;
-        memoryUsed: Array<number>;
-        memoryPercent: Array<number>;
-        speedValue: Array<number>;
-        gpuProcesses: Array<Array<GPUProcess>>;
-    }
-    export interface GPUProcess {
-        pid: string;
-        type: string;
-        processName: string;
-        usedMemory: string;
-    }
-
     export interface SSHInfo {
         autoStart: boolean;
         isActive: boolean;

@@ -30,7 +30,7 @@ func HandleRequest(url, method string, timeout int) (int, []byte, error) {
 }
 
 func HandleRequestWithProxy(url, method string, timeout int) (int, []byte, error) {
-	transport := xpack.LoadRequestTransport()
+	transport := xpack.MultiNodeProvider.LoadRequestTransport()
 	return handleRequestWithTransport(url, method, transport, timeout)
 }
 
@@ -78,7 +78,7 @@ func HandleGet(url string) (*http.Response, error) {
 }
 
 func HandleGetWithProxy(url string) (*http.Response, error) {
-	transport := xpack.LoadRequestTransport()
+	transport := xpack.MultiNodeProvider.LoadRequestTransport()
 	return handleGetWithTransport(url, transport)
 }
 

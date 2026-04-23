@@ -41,17 +41,19 @@ var InitSetting = &gormigrate.Migration{
 	ID: "20200908-add-table-setting",
 	Migrate: func(tx *gorm.DB) error {
 		encryptKey := common.RandStr(16)
-		if err := tx.Create(&model.Setting{Key: "UserName", Value: global.CONF.Base.Username}).Error; err != nil {
-			return err
-		}
 		global.CONF.Base.EncryptKey = encryptKey
-		pass, _ := encrypt.StringEncrypt(global.CONF.Base.Password)
 		language := "en"
 		if global.CONF.Base.Language == "zh" {
 			language = "zh"
 		}
-		if err := tx.Create(&model.Setting{Key: "Password", Value: pass}).Error; err != nil {
-			return err
+		if !global.CONF.Base.IsXpackEE {
+			if err := tx.Create(&model.Setting{Key: "UserName", Value: global.CONF.Base.Username}).Error; err != nil {
+				return err
+			}
+			pass, _ := encrypt.StringEncrypt(global.CONF.Base.Password)
+			if err := tx.Create(&model.Setting{Key: "Password", Value: pass}).Error; err != nil {
+				return err
+			}
 		}
 		_, _ = cmd.RunDefaultWithStdoutBashCf("%s sed -i -e 's#ORIGINAL_PASSWORD=.*#ORIGINAL_PASSWORD=**********#g' /usr/local/bin/1pctl", cmd.SudoHandleCmd())
 		if err := tx.Create(&model.Setting{Key: "Theme", Value: "light"}).Error; err != nil {
@@ -989,4 +991,53 @@ func normalizeAiMenuChild(children []dto.ShowMenu, fallback dto.ShowMenu, labels
 		}
 	}
 	return fallback
+}
+
+var AddUserManagementMenu = &gormigrate.Migration{
+	ID: "20260414-add-user-management-menu",
+	Migrate: func(tx *gorm.DB) error {
+		if !global.CONF.Base.IsXpackEE {
+			return nil
+		}
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+		if menuJSON == "" {
+			menuJSON = helper.LoadMenus()
+		}
+
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		newItem := dto.ShowMenu{
+			ID:       "121",
+			Disabled: false,
+			Title:    "xpack.user.userManage",
+			IsShow:   true,
+			Label:    "UserManagement",
+			Path:     "/xpack-ee/users",
+			Sort:     350,
+		}
+
+		for i := range menus {
+			if menus[i].Label != "Xpack-Menu" {
+				continue
+			}
+			menus[i].Children = helper.UpsertMenuByLabel(menus[i].Children, newItem, "NodeDashboard")
+			break
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
 }

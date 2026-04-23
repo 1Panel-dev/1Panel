@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getSettingInfo } from '@/api/modules/setting';
+import { getSettingBaseInfo } from '@/api/modules/setting';
 import { searchXpackSetting } from '@/extensions/xpack';
 
 const showOption = ref(false);
@@ -26,7 +26,7 @@ const loadStatus = async () => {
         em('update:withDockerRestart', false);
         return;
     }
-    await getSettingInfo()
+    await getSettingBaseInfo()
         .then((res) => {
             if (res.data.proxyType === '' || res.data.proxyType === 'close') {
                 em('update:withDockerRestart', false);

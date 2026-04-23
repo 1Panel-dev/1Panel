@@ -3,8 +3,9 @@ package auth
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"sync"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/core/utils/ttlstore"
 )
 
 const (
@@ -28,98 +29,42 @@ type mfaSession struct {
 }
 
 type mfaSessionStore struct {
-	mu    sync.Mutex
-	items map[string]mfaSession
+	store *ttlstore.Store[mfaSession]
 }
 
 func newMFASessionStore() *mfaSessionStore {
-	return &mfaSessionStore{items: make(map[string]mfaSession)}
+	return &mfaSessionStore{
+		store: ttlstore.New[mfaSession](MFASessionTTL, MFASessionStoreMaxEntries, generateMFASessionID),
+	}
 }
 
 func (s *mfaSessionStore) Set(name, entrance, ip string) string {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.cleanupExpiredLocked()
-	if len(s.items) >= MFASessionStoreMaxEntries {
-		s.removeOldestLocked()
-	}
-
-	sessionID := generateMFASessionID()
-	s.items[sessionID] = mfaSession{
-		Name:      name,
-		Entrance:  entrance,
-		IP:        ip,
-		ExpiresAt: time.Now().Add(MFASessionTTL),
-	}
-	return sessionID
+	return s.store.Set(mfaSession{
+		Name:     name,
+		Entrance: entrance,
+		IP:       ip,
+	})
 }
 
 func (s *mfaSessionStore) Get(sessionID string) (mfaSession, bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	item, ok := s.items[sessionID]
-	if !ok {
-		return mfaSession{}, false
-	}
-	if time.Now().After(item.ExpiresAt) {
-		delete(s.items, sessionID)
-		return mfaSession{}, false
-	}
-	return item, true
+	return s.store.Get(sessionID)
 }
 
 func (s *mfaSessionStore) Delete(sessionID string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	delete(s.items, sessionID)
+	s.store.Delete(sessionID)
 }
 
 func (s *mfaSessionStore) RecordFailure(sessionID string) int {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	item, ok := s.items[sessionID]
+	failures := 0
+	ok := s.store.Update(sessionID, func(item *mfaSession) bool {
+		item.Failures++
+		failures = item.Failures
+		return item.Failures < MFASessionMaxFailures
+	})
 	if !ok {
 		return 0
 	}
-	if time.Now().After(item.ExpiresAt) {
-		delete(s.items, sessionID)
-		return 0
-	}
-
-	item.Failures++
-	if item.Failures >= MFASessionMaxFailures {
-		delete(s.items, sessionID)
-		return item.Failures
-	}
-
-	s.items[sessionID] = item
-	return item.Failures
-}
-
-func (s *mfaSessionStore) cleanupExpiredLocked() {
-	now := time.Now()
-	for id, item := range s.items {
-		if now.After(item.ExpiresAt) {
-			delete(s.items, id)
-		}
-	}
-}
-
-func (s *mfaSessionStore) removeOldestLocked() {
-	var oldestID string
-	var oldestTime time.Time
-	for id, item := range s.items {
-		if oldestID == "" || item.ExpiresAt.Before(oldestTime) {
-			oldestID = id
-			oldestTime = item.ExpiresAt
-		}
-	}
-	if oldestID != "" {
-		delete(s.items, oldestID)
-	}
+	return failures
 }
 
 func generateMFASessionID() string {
