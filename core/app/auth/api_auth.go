@@ -1,4 +1,4 @@
-package middleware
+package auth
 
 import (
 	"crypto/md5"
@@ -9,13 +9,24 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
 )
 
-func ApiAuth() gin.HandlerFunc {
+type APIAuthConfig struct {
+	ApiInterfaceStatus string
+	ApiKey             string
+	IpWhiteList        string
+	ApiKeyValidityTime string
+}
+
+type APIAuthConfigLoader func(c *gin.Context) (APIAuthConfig, error)
+type APIAuthSuccessHandler func(c *gin.Context, config APIAuthConfig)
+
+func APIAuthMiddleware(loadConfig APIAuthConfigLoader, onSuccess APIAuthSuccessHandler) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core/auth") {
 			c.Next()
@@ -24,35 +35,61 @@ func ApiAuth() gin.HandlerFunc {
 
 		panelToken := c.GetHeader("1Panel-Token")
 		panelTimestamp := c.GetHeader("1Panel-Timestamp")
-		if panelToken != "" || panelTimestamp != "" {
-			if global.Api.ApiInterfaceStatus == constant.StatusEnable {
-				clientIP := c.ClientIP()
-				if !isValid1PanelTimestamp(panelTimestamp) {
-					helper.BadAuth(c, "ErrApiConfigKeyTimeInvalid", nil)
-					return
-				}
-				if !isValid1PanelToken(panelToken, panelTimestamp) {
-					helper.BadAuth(c, "ErrApiConfigKeyInvalid", nil)
-					return
-				}
-
-				if !isIPInWhiteList(clientIP) {
-					helper.BadAuth(c, "ErrApiConfigIPInvalid", nil)
-					return
-				}
-				c.Set("API_AUTH", true)
-				c.Next()
-				return
-			} else {
-				helper.BadAuth(c, "ErrApiConfigStatusInvalid", nil)
-				return
-			}
+		if panelToken == "" && panelTimestamp == "" {
+			c.Next()
+			return
 		}
+
+		config, err := loadConfig(c)
+		if err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+		if config.ApiInterfaceStatus != constant.StatusEnable {
+			helper.BadAuth(c, "ErrApiConfigStatusInvalid", nil)
+			return
+		}
+		if !isValid1PanelTimestamp(panelTimestamp, config.ApiKeyValidityTime) {
+			helper.BadAuth(c, "ErrApiConfigKeyTimeInvalid", nil)
+			return
+		}
+		if !isValid1PanelToken(panelToken, panelTimestamp, config.ApiKey) {
+			helper.BadAuth(c, "ErrApiConfigKeyInvalid", nil)
+			return
+		}
+		if !isIPInWhiteList(c.ClientIP(), config.IpWhiteList) {
+			helper.BadAuth(c, "ErrApiConfigIPInvalid", nil)
+			return
+		}
+
+		c.Set("API_AUTH", true)
+		if onSuccess != nil {
+			onSuccess(c, config)
+		}
+		c.Next()
 	}
 }
 
-func isValid1PanelTimestamp(panelTimestamp string) bool {
-	apiKeyValidityTime := global.Api.ApiKeyValidityTime
+func LoadAPIAuthConfig(_ *gin.Context) (APIAuthConfig, error) {
+	settingRepo := repo.NewISettingRepo()
+	config := APIAuthConfig{}
+	var err error
+	if config.ApiInterfaceStatus, err = settingRepo.GetValueByKey("ApiInterfaceStatus"); err != nil {
+		return config, err
+	}
+	if config.ApiKey, err = settingRepo.GetValueByKey("ApiKey"); err != nil {
+		return config, err
+	}
+	if config.IpWhiteList, err = settingRepo.GetValueByKey("IpWhiteList"); err != nil {
+		return config, err
+	}
+	if config.ApiKeyValidityTime, err = settingRepo.GetValueByKey("ApiKeyValidityTime"); err != nil {
+		return config, err
+	}
+	return config, nil
+}
+
+func isValid1PanelTimestamp(panelTimestamp string, apiKeyValidityTime string) bool {
 	apiTime, err := strconv.Atoi(apiKeyValidityTime)
 	if err != nil || apiTime < 0 {
 		global.LOG.Errorf("apiTime %d, err: %v", apiTime, err)
@@ -75,13 +112,11 @@ func isValid1PanelTimestamp(panelTimestamp string) bool {
 	return nowTime-panelTime <= int64(apiTime)*60+tolerance
 }
 
-func isValid1PanelToken(panelToken string, panelTimestamp string) bool {
-	system1PanelToken := global.Api.ApiKey
-	return panelToken == GenerateMD5("1panel"+system1PanelToken+panelTimestamp)
+func isValid1PanelToken(panelToken string, panelTimestamp string, apiKey string) bool {
+	return panelToken == GenerateMD5("1panel"+apiKey+panelTimestamp)
 }
 
-func isIPInWhiteList(clientIP string) bool {
-	ipWhiteString := global.Api.IpWhiteList
+func isIPInWhiteList(clientIP string, ipWhiteString string) bool {
 	if len(ipWhiteString) == 0 {
 		global.LOG.Error("IP whitelist is empty")
 		return false

@@ -105,13 +105,13 @@ func (u *GroupService) Delete(id uint) error {
 	case "command":
 		err = commandRepo.UpdateGroup(id, defaultGroup.ID)
 	case "node":
-		err = xpack.UpdateGroup("node", id, defaultGroup.ID)
+		err = xpack.MultiNodeProvider.UpdateGroup("node", id, defaultGroup.ID)
 	case "website":
 		bodyItem := []byte(fmt.Sprintf(`{"Group":%v, "NewGroup":%v}`, id, defaultGroup.ID))
 		if _, err := proxy_local.NewLocalClient("/api/v2/websites/group/change", http.MethodPost, bytes.NewReader(bodyItem), nil); err != nil {
 			return err
 		}
-		if err := xpack.UpdateGroup("node", id, defaultGroup.ID); err != nil {
+		if err := xpack.MultiNodeProvider.UpdateGroup("node", id, defaultGroup.ID); err != nil {
 			return err
 		}
 	}

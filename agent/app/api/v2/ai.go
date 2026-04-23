@@ -3,9 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
-	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/xpu"
 	"github.com/gin-gonic/gin"
 )
 
@@ -161,37 +158,6 @@ func (b *BaseApi) DeleteOllamaModel(c *gin.Context) {
 	}
 
 	helper.Success(c)
-}
-
-// @Tags AI
-// @Summary Load gpu / xpu info
-// @Accept json
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /ai/gpu/load [get]
-func (b *BaseApi) LoadGpuInfo(c *gin.Context) {
-	ok, client := gpu.New()
-	if ok {
-		info, err := client.LoadGpuInfo()
-		if err != nil {
-			helper.BadRequest(c, err)
-			return
-		}
-		helper.SuccessWithData(c, info)
-		return
-	}
-	xpuOK, xpuClient := xpu.New()
-	if xpuOK {
-		info, err := xpuClient.LoadGpuInfo()
-		if err != nil {
-			helper.BadRequest(c, err)
-			return
-		}
-		helper.SuccessWithData(c, info)
-		return
-	}
-	helper.SuccessWithData(c, &common.GpuInfo{})
 }
 
 // @Tags AI

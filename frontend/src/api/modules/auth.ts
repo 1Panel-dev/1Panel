@@ -35,17 +35,44 @@ export const getWelcomePage = () => {
     return http.get<string>('/core/auth/welcome');
 };
 
-export const getAuthInfo = () => {
-    return http.get<Login.AuthInfo>('/core/xpackee/users/info');
+export const getUserInfo = () => {
+    return http.get<Login.AuthInfo>('/core/auth/current');
 };
-export const updateAuthInfo = (params: Login.AuthInfoUpdate) => {
+export const loadMFA = (params: Login.MFARequest) => {
+    return http.post<Login.MFAInfo>(`/core/auth/mfa`, params);
+};
+export const bindMFA = (params: Login.MFABind) => {
+    return http.post(`/core/auth/mfa/bind`, params);
+};
+export const generateApiKey = () => {
+    return http.post<string>(`/core/auth/api/generate`);
+};
+export const updateApiConfig = (param: Login.ApiConfig) => {
+    return http.post(`/core/auth/api/update`, param);
+};
+
+export const passkeyRegisterBegin = (param: { name: string }) => {
+    return http.post<Login.PasskeyBeginResponse>(`/core/auth/passkey/register/begin`, param);
+};
+export const passkeyRegisterFinish = (param: Record<string, any>, sessionId: string) => {
+    return http.post(`/core/auth/passkey/register/finish`, param, undefined, { 'Passkey-Session': sessionId });
+};
+export const passkeyList = () => {
+    return http.get<Array<{ id: string; name: string; createdAt: string; lastUsedAt: string }>>(
+        `/core/auth/passkey/list`,
+    );
+};
+export const passkeyDelete = (id: string) => {
+    return http.post(`/core/auth/passkey/del`, { id });
+};
+
+export const updateUserInfo = (params: Login.AuthInfoUpdate) => {
     let request = deepCopy(params) as Login.AuthInfoUpdate;
     if (request.oldPassword) {
         request.oldPassword = Base64.encode(request.oldPassword);
     }
-    if (request.newPassword) {
-        request.newPassword = Base64.encode(request.newPassword);
+    if (request.password) {
+        request.password = Base64.encode(request.password);
     }
-    request.retryPassword = '';
-    return http.post<any>('/core/xpackee/users/info/update', request);
+    return http.post<any>('/core/auth/current/update', request);
 };

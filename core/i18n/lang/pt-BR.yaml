@@ -49,8 +49,6 @@ AppInstallCheck: 'Verificar ambiente de instalação da aplicação'
 
 # backup
 ErrBackupInUsed: 'Conta de backup em uso por tarefa'
-ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
-ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
 ErrBackupCheck: 'Teste de conexão falhou: {{ .err }}'
 ErrBackupLocal: "A conta de backup do servidor local não suporta essa operação"
 ErrBackupPublic: "A conta de backup detectada não é pública, por favor verifique e tente novamente"
@@ -69,6 +67,7 @@ ErrLicenseExist: "Este registro de licença já existe. Você pode ir diretament
 ErrXpackNotFound: "Este recurso requer a edição Pro. Importe uma licença em Configurações do Painel > Licença."
 ErrXpackExceptional: "Este recurso requer a edição Pro. Sincronize o status da licença em Configurações do Painel > Licença."
 ErrXpackLost: "A licença atingiu o limite de tentativas. Acesse Configurações do Painel > Licença e execute uma sincronização manual."
+ErrXpackEELicenseRequired: "A licença da edição Enterprise não foi importada. Importe uma licença primeiro."
 ErrDeviceLost: "Arquivos necessários para a verificação da licença estão faltando, por favor verifique e tente novamente"
 ErrDeviceErr: "O ambiente atual não corresponde ao ambiente de importação da licença. Por favor, edite a licença e reimporte"
 ErrXpackTimeout: "Requisição expirou, a conexão de rede pode estar instável, por favor tente novamente mais tarde"
@@ -84,6 +83,19 @@ ErrNodeUnbind: "Nó fora do escopo da licença detectado, por favor verifique e 
 ErrNodeBind: "Este nó já está vinculado a uma licença, por favor verifique e tente novamente"
 ErrNodeLocalRollback: "O nó principal não suporta rollback direto. Por favor, execute manualmente o comando '1pctl restore' para fazer o rollback"
 ErrIntlLicense: "A versão atual ainda não oferece suporte à importação de licença da edição internacional. Em breve"
+
+# user
+ErrNoSuchUser: "Informações do usuário não encontradas. Verifique e tente novamente."
+ErrToMaster: "Este usuário não tem permissão para executar esta operação no nó principal. Verifique e tente novamente."
+ErrToNode: "Este usuário não tem permissão para executar esta operação neste nó. Verifique e tente novamente."
+ErrRBAC: "Permissões de usuário insuficientes. Não é possível executar esta operação. Verifique e tente novamente."
+ErrNoneNode: "Este usuário não tem permissões de nenhum nó. Contate o administrador ou verifique e tente novamente."
+ErrOnlySuperAdmin: "Somente superadministradores podem usar este recurso."
+ErrRolePresetCannotDelete: "Funções predefinidas do sistema não podem ser excluídas"
+ErrRolePresetCannotUpdate: "Funções predefinidas do sistema não podem ser atualizadas"
+ErrRoleBoundToUser: "Esta função já está vinculada a usuários e não pode ser excluída"
+ErrRolePresetCannotBind: "Funções predefinidas do sistema não podem ser atribuídas a usuários"
+ErrSuperAdminCannotDelete: "Usuários superadministradores não podem ser excluídos"
 
 InvalidRequestBodyType: "Formato do corpo da requisição inválido. Verifique se o conteúdo está no formato correto e tente novamente"
 InvalidLicenseCodeType: "Formato do código de licença inválido. Verifique e tente novamente"

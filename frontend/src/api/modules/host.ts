@@ -65,12 +65,6 @@ export const operateFilterChain = (name: string, op: string) => {
 export const loadMonitor = (param: Host.MonitorSearch) => {
     return http.post<Array<Host.MonitorData>>(`/hosts/monitor/search`, param);
 };
-export const getGPUOptions = () => {
-    return http.get<Host.MonitorGPUOptions>(`/hosts/monitor/gpuoptions`);
-};
-export const loadGPUMonitor = (param: Host.MonitorGPUSearch) => {
-    return http.post<Host.MonitorGPUData>(`/hosts/monitor/gpu/search`, param);
-};
 export const getNetworkOptions = () => {
     return http.get<Array<string>>(`/hosts/monitor/netoptions`);
 };

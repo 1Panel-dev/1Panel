@@ -3,6 +3,10 @@ type XpackSettingModule = {
     updateXSettingByKey?: (key: string, value: string) => Promise<any>;
 };
 
+type XpackeeUserModule = {
+    getUserInfo?: (currentNode: string) => Promise<any>;
+};
+
 function findModule<T>(modules: Record<string, T>, suffix: string): T | null {
     for (const path in modules) {
         if (path.endsWith(suffix)) {
@@ -17,15 +21,7 @@ function getXpackSettingModule(): XpackSettingModule | null {
         string,
         XpackSettingModule
     >;
-    const xpackModule = findModule(xpackModules, '/api/modules/setting.ts');
-    if (xpackModule) {
-        return xpackModule;
-    }
-    const xpackEEModules = import.meta.glob('@/xpack-ee/api/modules/setting.ts', { eager: true }) as Record<
-        string,
-        XpackSettingModule
-    >;
-    return findModule(xpackEEModules, '/api/modules/setting.ts');
+    return findModule(xpackModules, '/api/modules/setting.ts');
 }
 
 export async function searchXpackSetting() {
@@ -42,6 +38,22 @@ export async function updateXpackSettingByKey(key: string, value: string) {
         return null;
     }
     return module.updateXSettingByKey(key, value);
+}
+
+function getXpackeeUserModule(): XpackeeUserModule | null {
+    const xpackModules = import.meta.glob('@/xpack-ee/api/modules/user.ts', { eager: true }) as Record<
+        string,
+        XpackeeUserModule
+    >;
+    return findModule(xpackModules, '/api/modules/user.ts');
+}
+
+export async function getXpackeeUserInfo(currentNode: string) {
+    const module = getXpackeeUserModule();
+    if (!module?.getUserInfo) {
+        return null;
+    }
+    return module.getUserInfo(currentNode);
 }
 
 export const searchExtensionSetting = searchXpackSetting;

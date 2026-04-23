@@ -38,7 +38,7 @@ func initGlobalData() {
 	if err := settingRepo.Update("SystemStatus", "Free"); err != nil {
 		global.LOG.Fatalf("init service before start failed, err: %v", err)
 	}
-	node, _ := xpack.LoadNodeInfo(false)
+	node, _ := xpack.MultiNodeProvider.LoadNodeInfo(false)
 	if len(node.Version) != 0 {
 		_ = settingRepo.Update("SystemVersion", node.Version)
 	}

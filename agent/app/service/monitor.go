@@ -39,11 +39,12 @@ var monitorCancel context.CancelFunc
 type IMonitorService interface {
 	Run()
 	LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorData, error)
-	LoadGPUOptions() dto.MonitorGPUOptions
-	LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.MonitorGPUData, error)
 	LoadSetting() (*dto.MonitorSetting, error)
 	UpdateSetting(key, value string) error
 	CleanData() error
+
+	LoadGPUOptions() dto.MonitorGPUOptions
+	LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.MonitorGPUData, error)
 
 	saveIODataToDB(ctx context.Context, interval float64)
 	saveNetDataToDB(ctx context.Context, interval float64)

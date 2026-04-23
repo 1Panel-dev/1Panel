@@ -56,7 +56,7 @@ func Init() {
 }
 
 func initBaseInfo() {
-	nodeInfo, err := xpack.LoadNodeInfo(true)
+	nodeInfo, err := xpack.MultiNodeProvider.LoadNodeInfo(true)
 	if err != nil {
 		panic(err)
 	}

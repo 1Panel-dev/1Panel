@@ -9,6 +9,7 @@ const terminalRouter = {
     meta: {
         title: 'menu.terminal',
         icon: 'p-terminal2',
+        protectedRoleOnly: true,
     },
     children: [
         {
@@ -18,7 +19,7 @@ const terminalRouter = {
             component: () => import('@/views/terminal/index.vue'),
             meta: {
                 keepAlive: true,
-                requiresAuth: false,
+                protectedRoleOnly: true,
             },
         },
     ],

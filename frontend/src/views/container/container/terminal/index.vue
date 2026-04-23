@@ -113,7 +113,7 @@ const initTerm = (formEl: FormInstance | undefined) => {
             args += `&operateNode=${form.node}`;
         }
         terminalRef.value!.acceptParams({
-            endpoint: '/api/v2/containers/exec',
+            endpoint: '/api/v2/hosts/terminal/container',
             args: args,
             error: '',
             initCmd: '',

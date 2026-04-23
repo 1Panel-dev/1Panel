@@ -167,14 +167,14 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
-import { loadGPUMonitor, getGPUOptions } from '@/api/modules/host';
+import { loadGPUMonitor, getGPUOptions } from '@/api/modules/ai';
 import { dateFormatWithoutYear } from '@/utils/date';
 import RouterMenu from '@/views/ai/gpu/index.vue';
 import { GlobalStore } from '@/store';
 import { shortcuts } from '@/utils/shortcuts';
-import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { routerToName } from '@/utils/router';
+import { AI } from '@/api/interface/ai';
 
 const globalStore = GlobalStore();
 
@@ -196,7 +196,7 @@ const chartsOption = ref({
 const chartHide = ref([]);
 const currentHide = ref();
 
-const searchInfo = reactive<Host.MonitorGPUSearch>({
+const searchInfo = reactive<AI.MonitorGPUSearch>({
     productName: '',
     startTime: new Date(new Date().setHours(0, 0, 0, 0)),
     endTime: new Date(),

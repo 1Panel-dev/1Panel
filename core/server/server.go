@@ -83,7 +83,8 @@ func Start() {
 	type tcpKeepAliveListener struct {
 		*net.TCPListener
 	}
-	if global.CONF.Conn.SSL == constant.StatusEnable {
+	switch global.CONF.Conn.SSL {
+	case constant.StatusEnable:
 		constant.CertStore.Store(loadCert())
 
 		server.TLSConfig = &tls.Config{
@@ -96,8 +97,7 @@ func Start() {
 		if err := server.ServeTLS(tcpKeepAliveListener{ln.(*net.TCPListener)}, "", ""); err != nil {
 			panic(err)
 		}
-		return
-	} else if global.CONF.Conn.SSL == constant.StatusMux {
+	case constant.StatusMux:
 		constant.CertStore.Store(loadCert())
 
 		server.TLSConfig = &tls.Config{
@@ -144,13 +144,11 @@ func Start() {
 		if err := m.Serve(); err != nil {
 			panic(err)
 		}
-		return
-	} else {
+	default:
 		global.LOG.Infof("listen at http://%s:%s [%s]", global.CONF.Conn.BindAddress, global.CONF.Conn.Port, tcpItem)
 		if err := server.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)}); err != nil {
 			panic(err)
 		}
-		return
 	}
 }
 
@@ -216,5 +214,4 @@ func handleMuxHttpConn(conn net.Conn) {
 	resp.Header.Set("Connection", "close")
 
 	_ = resp.Write(conn)
-	return
 }

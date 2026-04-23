@@ -47,3 +47,7 @@ type SystemSetting struct {
 	Language string `json:"language"`
 	IsIntl   bool   `json:"isIntl"`
 }
+
+type PasskeyID struct {
+	ID string `json:"id" validate:"required"`
+}

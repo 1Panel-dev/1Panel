@@ -82,7 +82,7 @@ func (a AppService) createSyncAppStoreTask(sharedCtx **appSyncContext) func(t *t
 
 		ctx := &appSyncContext{
 			task:           t,
-			httpClient:     http.Client{Timeout: time.Duration(constant.TimeOut20s) * time.Second, Transport: xpack.LoadRequestTransport()},
+			httpClient:     http.Client{Timeout: time.Duration(constant.TimeOut20s) * time.Second, Transport: xpack.MultiNodeProvider.LoadRequestTransport()},
 			baseRemoteUrl:  fmt.Sprintf("%s/%s/1panel", global.AppRepoURL(), global.CONF.Base.Mode),
 			systemVersion:  setting.SystemVersion,
 			settingService: settingService,
@@ -279,9 +279,9 @@ func (c *appSyncContext) syncAppIconsAndDetails() error {
 	}()
 
 	var (
-		completed    int
-		icon200Count int
-		icon304Count int
+		completed     int
+		icon200Count  int
+		icon304Count  int
 		iconFailCount int
 	)
 	milestones := [4]int{totalWork / 4, totalWork / 2, totalWork * 3 / 4, totalWork}

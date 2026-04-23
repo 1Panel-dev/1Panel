@@ -43,16 +43,13 @@ type SettingService struct{}
 
 type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
+	GetSettingBaseInfo() (*dto.SettingBaseInfo, error)
 	LoadInterfaceAddr() ([]string, error)
 	Update(c *gin.Context, key, value string) error
-	UpdatePassword(c *gin.Context, old, new string) error
 	UpdatePort(port uint) error
 	UpdateBindInfo(req dto.BindInfo) error
 	UpdateSSL(c *gin.Context, req dto.SSLUpdate) error
 	LoadFromCert() (*dto.SSLInfo, error)
-	HandlePasswordExpired(c *gin.Context, old, new string) error
-	GenerateApiKey() (string, error)
-	UpdateApiConfig(req dto.ApiInterfaceConfig) error
 
 	UpdateProxy(req dto.ProxyUpdate) error
 
@@ -113,6 +110,40 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	return &info, err
 }
 
+func (u *SettingService) GetSettingBaseInfo() (*dto.SettingBaseInfo, error) {
+	setting, err := settingRepo.List()
+	if err != nil {
+		return nil, buserr.New("ErrRecordNotFound")
+	}
+	settingMap := make(map[string]string)
+	for _, set := range setting {
+		settingMap[set.Key] = set.Value
+	}
+	if hideMenu, ok := settingMap["HideMenu"]; ok && len(hideMenu) > 0 {
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(hideMenu), &menus); err == nil {
+			sortShowMenus(menus)
+			if sortedBytes, err := json.Marshal(menus); err == nil {
+				settingMap["HideMenu"] = string(sortedBytes)
+			}
+		}
+	}
+	var info dto.SettingBaseInfo
+	arr, err := json.Marshal(settingMap)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(arr, &info); err != nil {
+		return nil, err
+	}
+	if info.Edition == "" {
+		info.Edition = "cn"
+		_ = settingRepo.UpdateOrCreate("Edition", info.Edition)
+	}
+
+	return &info, err
+}
+
 func sortShowMenus(menus []dto.ShowMenu) {
 	for i := range menus {
 		if len(menus[i].Children) > 0 {
@@ -164,14 +195,6 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 	}
 
 	switch key {
-	case "ExpirationDays":
-		timeout, err := strconv.Atoi(value)
-		if err != nil {
-			return err
-		}
-		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format(constant.DateTimeLayout)); err != nil {
-			return err
-		}
 	case "BindDomain":
 		if len(value) != 0 {
 			_ = global.SESSION.Clean()
@@ -179,11 +202,9 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 		if err := u.clearPasskeySettings(); err != nil {
 			return err
 		}
-	case "UserName", "Password":
-		u.deleteCurrentSession(c)
 	case "Language":
 		i18n.SetCachedDBLanguage(value)
-		if err := xpack.Sync(constant.SyncLanguage); err != nil {
+		if err := xpack.MultiNodeProvider.Sync(constant.SyncLanguage); err != nil {
 			global.LOG.Errorf("sync language to node failed, err: %v", err)
 		}
 	case "UpgradeBackupCopies":
@@ -196,7 +217,7 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 		}
 	case "Edition":
 		global.CONF.Base.Edition = value
-		if err := xpack.Sync(constant.SyncEdition); err != nil {
+		if err := xpack.MultiNodeProvider.Sync(constant.SyncEdition); err != nil {
 			global.LOG.Errorf("sync edition to node failed, err: %v", err)
 		}
 	}
@@ -263,14 +284,14 @@ func (u *SettingService) UpdateProxy(req dto.ProxyUpdate) error {
 	if err := settingRepo.Update("ProxyPasswdKeep", req.ProxyPasswdKeep); err != nil {
 		return err
 	}
-	if err := xpack.ProxyDocker(loadDockerProxy(req)); err != nil {
+	if err := xpack.MultiNodeProvider.ProxyDocker(loadDockerProxy(req)); err != nil {
 		return err
 	}
 	syncScope := constant.SyncSystemProxy
 	if req.WithDockerRestart {
 		syncScope = constant.SyncSystemProxyWithRestartDocker
 	}
-	if err := xpack.Sync(syncScope); err != nil {
+	if err := xpack.MultiNodeProvider.Sync(syncScope); err != nil {
 		global.LOG.Errorf("sync proxy to node failed, err: %v", err)
 	}
 	return nil
@@ -410,7 +431,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	if err := os.Rename(path.Join(secretDir, "server.key.tmp"), path.Join(secretDir, "server.key")); err != nil {
 		return err
 	}
-	status, _ := settingRepo.GetValueByKey("SSL")
+	status := global.CONF.Conn.SSL
 	if req.SSL != status {
 		go func() {
 			time.Sleep(1 * time.Second)
@@ -420,6 +441,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {
 		return err
 	}
+	global.CONF.Conn.SSL = req.SSL
 	return u.UpdateSystemSSL()
 }
 
@@ -562,14 +584,6 @@ func (u *SettingService) UpdateTerminal(req dto.TerminalInfo) error {
 	return nil
 }
 
-func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
-	if err := u.HandlePasswordExpired(c, old, new); err != nil {
-		return err
-	}
-	u.deleteCurrentSession(c)
-	return nil
-}
-
 func (u *SettingService) deleteCurrentSession(c *gin.Context) {
 	if c == nil {
 		return
@@ -588,7 +602,7 @@ func (u *SettingService) clearPasskeySettings() error {
 	if err := settingRepo.Update(passkey.PasskeyCredentialSettingKey, ""); err != nil {
 		return err
 	}
-	return nil
+	return xpack.AuthProvider.ClearPasskeys()
 }
 
 func (u *SettingService) UpdateSystemSSL() error {
@@ -607,35 +621,6 @@ func (u *SettingService) UpdateSystemSSL() error {
 		return err
 	}
 	constant.CertStore.Store(&cert)
-	return nil
-}
-
-func (u *SettingService) GenerateApiKey() (string, error) {
-	apiKey := common.RandStr(32)
-	if err := settingRepo.Update("ApiKey", apiKey); err != nil {
-		return global.Api.ApiKey, err
-	}
-	global.Api.ApiKey = apiKey
-	return apiKey, nil
-}
-
-func (u *SettingService) UpdateApiConfig(req dto.ApiInterfaceConfig) error {
-	if err := settingRepo.UpdateOrCreate("ApiInterfaceStatus", req.ApiInterfaceStatus); err != nil {
-		return err
-	}
-	global.Api.ApiInterfaceStatus = req.ApiInterfaceStatus
-	if err := settingRepo.UpdateOrCreate("ApiKey", req.ApiKey); err != nil {
-		return err
-	}
-	global.Api.ApiKey = req.ApiKey
-	if err := settingRepo.UpdateOrCreate("IpWhiteList", req.IpWhiteList); err != nil {
-		return err
-	}
-	global.Api.IpWhiteList = req.IpWhiteList
-	if err := settingRepo.UpdateOrCreate("ApiKeyValidityTime", req.ApiKeyValidityTime); err != nil {
-		return err
-	}
-	global.Api.ApiKeyValidityTime = req.ApiKeyValidityTime
 	return nil
 }
 
