@@ -76,7 +76,6 @@
                 <CardWithHeader
                     :header="$t('menu.monitor')"
                     class="card-interval chart-card"
-                    v-loading="!chartsOption['networkChart']"
                     @mouseenter="refreshOptionsOnHover"
                 >
                     <template #header-r>
@@ -145,7 +144,6 @@
                                     id="ioChart"
                                     type="line"
                                     :option="chartsOption['ioChart']"
-                                    v-if="chartsOption['ioChart']"
                                     :dataZoom="true"
                                 />
                             </div>
@@ -155,7 +153,6 @@
                                     id="networkChart"
                                     type="line"
                                     :option="chartsOption['networkChart']"
-                                    v-if="chartsOption['networkChart']"
                                     :dataZoom="true"
                                 />
                             </div>
@@ -604,7 +601,18 @@ const currentChartInfo = reactive({
 });
 const skipNextCurrentInfoDelta = ref(false);
 
-const chartsOption = ref({ ioChart1: null, networkChart: null });
+const chartsOption = ref({
+    ioChart: {
+        xData: [],
+        yData: [],
+        formatStr: 'MB',
+    },
+    networkChart: {
+        xData: [],
+        yData: [],
+        formatStr: 'KB/s',
+    },
+});
 
 const updateCurrentInfo = (data: Dashboard.CurrentInfo) => {
     currentInfo.value = {
