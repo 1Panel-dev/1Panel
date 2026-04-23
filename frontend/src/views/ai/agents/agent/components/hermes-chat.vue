@@ -154,7 +154,7 @@ const connectTerminal = async (initCmd: string) => {
         args += `&operateNode=${node.value}`;
     }
     terminalRef.value?.acceptParams({
-        endpoint: '/api/v2/containers/exec',
+        endpoint: '/api/v2/hosts/terminal/container',
         args,
         error: '',
         initCmd,

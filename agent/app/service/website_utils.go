@@ -576,7 +576,7 @@ func delNginxConfig(website model.Website, force bool) error {
 	}
 	sitePath := GetSiteDir(website.Alias)
 	if fileOp.Stat(sitePath) {
-		xpack.RemoveTamper(website.Alias)
+		xpack.MultiNodeProvider.RemoveTamper(website.Alias)
 		_ = fileOp.DeleteDir(sitePath)
 	}
 

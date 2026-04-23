@@ -11,12 +11,11 @@
 import { computed } from 'vue';
 import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { hasPermission } from '@/utils/rbac';
 const { isOffLine, isFxplay, isAdmin, isXpackEE } = useGlobalStore();
 
 const buttons = computed(() => {
     const items = [
-        ...(isAdmin.value || hasPermission('setting_view')
+        ...(isAdmin.value
             ? [
                   {
                       label: i18n.global.t('setting.panel'),
@@ -40,7 +39,7 @@ const buttons = computed(() => {
                   },
               ]
             : []),
-        ...(isOffLine.value || !(isAdmin.value || hasPermission('setting_view'))
+        ...(isOffLine.value || !isAdmin.value
             ? []
             : [
                   {

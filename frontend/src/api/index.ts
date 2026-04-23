@@ -92,6 +92,11 @@ class RequestHttp {
                     window.location.reload();
                     return Promise.reject(data);
                 }
+                if (data.code == ResultEnum.ERRXPACKEE) {
+                    globalStore.isXpackEELicensed = false;
+                    router.push({ name: 'XpackEELicenseRequired' });
+                    return Promise.reject(data);
+                }
                 if (data.code == ResultEnum.NodeUnBind) {
                     changeToLocal();
                     window.location.reload();

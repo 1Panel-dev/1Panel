@@ -1,7 +1,7 @@
 import {
     getLicenseStatus,
     getMasterLicenseStatus,
-    getSettingInfo,
+    getSettingBaseInfo,
     getXpackEELicenseStatus,
 } from '@/api/modules/setting';
 import { useTheme } from '@/global/use-theme';
@@ -75,7 +75,7 @@ export async function getXpackSetting() {
 
 const loadDataFromDB = async () => {
     const globalStore = getGlobalStore();
-    const res = await getSettingInfo();
+    const res = await getSettingBaseInfo();
     document.title = res.data.panelName;
     globalStore.entrance = res.data.securityEntrance;
     globalStore.openMenuTabs = res.data.menuTabs === 'Enable';
@@ -95,7 +95,7 @@ export async function loadProductProFromDB() {
         }
         return;
     }
-    const res = await getLicenseStatus();
+    const res = await getXpackEELicenseStatus();
     if (!res || !res.data) {
         globalStore.isXpackEELicensed = false;
     } else {
@@ -118,6 +118,7 @@ export async function loadMasterProductProFromDB() {
             globalStore.isXpackEELicensed = false;
         } else {
             globalStore.isXpackEELicensed = res.data.status === 'Bound';
+            globalStore.isMasterProductPro = res.data.status === 'Bound';
         }
     }
     switchTheme();

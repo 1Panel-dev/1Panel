@@ -59,7 +59,7 @@ const initTerm = async () => {
         ? `source=container&containerid=${containerID.value}&user=${user.value}&command=${command.value}`
         : `source=database&databaseType=${databaseType.value}&database=${database.value}`;
     terminalRef.value!.acceptParams({
-        endpoint: '/api/v2/containers/exec',
+        endpoint: '/api/v2/hosts/terminal/container',
         args,
         error: '',
         initCmd: initCmd.value,

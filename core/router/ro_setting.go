@@ -19,7 +19,8 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
 		router.POST("/search", baseApi.GetSettingInfo)
-		router.POST("/expired/handle", baseApi.HandlePasswordExpired)
+		router.POST("/search/base", baseApi.GetSettingBaseInfo)
+
 		settingRouter.POST("/by", baseApi.GetSettingByKey)
 		settingRouter.POST("/terminal/search", baseApi.GetTerminalSettingInfo)
 		settingRouter.GET("/search/available", baseApi.GetSystemAvailable)
@@ -34,20 +35,10 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/ssl/update", baseApi.UpdateSSL)
 		settingRouter.GET("/ssl/info", baseApi.LoadFromCert)
 		settingRouter.POST("/ssl/download", baseApi.DownloadSSL)
-		settingRouter.POST("/password/update", baseApi.UpdatePassword)
-		settingRouter.POST("/mfa", baseApi.LoadMFA)
-		settingRouter.POST("/mfa/bind", baseApi.MFABind)
-		settingRouter.POST("/passkey/register/begin", baseApi.PasskeyRegisterBegin)
-		settingRouter.POST("/passkey/register/finish", baseApi.PasskeyRegisterFinish)
-		settingRouter.GET("/passkey/list", baseApi.PasskeyList)
-		settingRouter.DELETE("/passkey/:id", baseApi.PasskeyDelete)
-
 		settingRouter.POST("/upgrade", baseApi.Upgrade)
 		settingRouter.POST("/upgrade/notes", baseApi.GetNotesByVersion)
 		settingRouter.GET("/upgrade/releases", baseApi.LoadRelease)
 		settingRouter.GET("/upgrade", baseApi.GetUpgradeInfo)
-		settingRouter.POST("/api/config/generate/key", baseApi.GenerateApiKey)
-		settingRouter.POST("/api/config/update", baseApi.UpdateApiConfig)
 
 		noAuthRouter.POST("/ssl/reload", baseApi.ReloadSSL)
 

@@ -20,10 +20,13 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/ollama/model/sync", baseApi.SyncOllamaModel)
 		aiToolsRouter.POST("/ollama/model/load", baseApi.LoadOllamaModelDetail)
 		aiToolsRouter.POST("/ollama/model/del", baseApi.DeleteOllamaModel)
-		aiToolsRouter.GET("/gpu/load", baseApi.LoadGpuInfo)
 		aiToolsRouter.POST("/domain/bind", baseApi.BindDomain)
 		aiToolsRouter.POST("/domain/get", baseApi.GetBindDomain)
 		aiToolsRouter.POST("/domain/update", baseApi.UpdateBindDomain)
+
+		aiToolsRouter.GET("/gpu/load", baseApi.LoadGpuInfo)
+		aiToolsRouter.POST("/gpu/search", baseApi.LoadGPUMonitor)
+		aiToolsRouter.GET("/gpu/options", baseApi.GetCPUOptions)
 
 		aiToolsRouter.POST("/mcp/search", baseApi.PageMcpServers)
 		aiToolsRouter.POST("/mcp/server", baseApi.CreateMcpServer)

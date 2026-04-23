@@ -170,16 +170,20 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
         }
         if (ops === 'testconn') {
             loading.value = true;
-            await testByInfo(dialogData.value.rowData).then((res) => {
-                loading.value = false;
-                if (res.data) {
-                    isOK.value = true;
-                    MsgSuccess(i18n.global.t('terminal.connTestOk'));
-                } else {
-                    isOK.value = false;
-                    MsgError(i18n.global.t('terminal.connTestFailed'));
-                }
-            });
+            await testByInfo(dialogData.value.rowData)
+                .then((res) => {
+                    loading.value = false;
+                    if (res.data) {
+                        isOK.value = true;
+                        MsgSuccess(i18n.global.t('terminal.connTestOk'));
+                    } else {
+                        isOK.value = false;
+                        MsgError(i18n.global.t('terminal.connTestFailed'));
+                    }
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
         }
     });
 };

@@ -24,7 +24,7 @@
                     </el-badge>
                 </div>
             </template>
-            <div class="dropdown-menu" v-loading="loading">
+            <div class="dropdown-menu" v-loading="loading || switchingNode">
                 <div class="dropdown-item" v-if="currentUser" @click="changeUserInfo">
                     <SvgIcon class="icon" iconName="p-gerenzhongxin1" />
                     {{ currentUser.name }}
@@ -88,30 +88,7 @@
                 </div>
             </div>
         </el-popover>
-        <DrawerPro v-model="open" :title="$t('xpack.user.userInfo')">
-            <el-form ref="userRef" label-position="top" :model="userForm" :rules="userRules" v-loading="loading">
-                <el-form-item :label="$t('commons.login.username')" prop="name">
-                    <el-tag type="primary">{{ userForm.name }}</el-tag>
-                </el-form-item>
-                <el-form-item :label="$t('setting.oldPassword')" prop="oldPassword">
-                    <el-input type="password" show-password clearable v-model.trim="userForm.oldPassword" />
-                </el-form-item>
-                <el-form-item :label="$t('setting.newPassword')" prop="newPassword">
-                    <el-input type="password" show-password clearable v-model.trim="userForm.newPassword" />
-                </el-form-item>
-                <el-form-item :label="$t('setting.retryPassword')" prop="retryPassword">
-                    <el-input type="password" show-password clearable v-model.trim="userForm.retryPassword" />
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <el-button :disabled="loading" @click="open = false">
-                    {{ $t('commons.button.cancel') }}
-                </el-button>
-                <el-button :disabled="loading" type="primary" @click="onSubmit(userRef)">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </template>
-        </DrawerPro>
+        <UserInfo ref="userInfoRef" :currentUser="currentUser" @search="loadCurrentUser()" />
     </div>
 </template>
 
@@ -121,15 +98,16 @@ import { countExecutingTask } from '@/api/modules/log';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { getAgentSettingInfo } from '@/api/modules/setting';
-import { ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import bus from '@/global/bus';
-import { getAuthInfo, logOutApi, updateAuthInfo } from '@/api/modules/auth';
+import { logOutApi } from '@/api/modules/auth';
 import router from '@/routers';
 import { loadProductProFromDB } from '@/utils/xpack';
 import { routerToNameWithQuery } from '@/utils/router';
 import { changeToLocal, listNodes, setDefaultNodeInfo } from '@/utils/node';
 import { Login } from '@/api/interface/auth';
-import { Rules } from '@/global/form-rules';
+import { syncAuthInfo } from '@/utils/rbac';
+import UserInfo from './user-info/index.vue';
 
 const filter = ref();
 const currentUser = ref<Login.AuthInfo>();
@@ -138,6 +116,8 @@ const menuStore = MenuStore();
 const nodes = ref([]);
 const nodeOptions = ref([]);
 const loading = ref();
+const switchingNode = ref(false);
+const userInfoRef = ref();
 const props = defineProps({
     version: String,
 });
@@ -145,29 +125,7 @@ const isXpackOrEE = computed(() => {
     return globalStore.isXpackOrEE();
 });
 
-const open = ref(false);
-const userRef = ref();
-const userForm = reactive({
-    id: 0,
-    name: '',
-    oldPassword: '',
-    newPassword: '',
-    retryPassword: '',
-});
-const userRules = reactive({
-    oldPassword: [Rules.requiredInput, Rules.noSpace],
-    newPassword: [Rules.requiredInput, Rules.noSpace],
-    retryPassword: [Rules.requiredInput, Rules.noSpace, { validator: checkPassword, trigger: 'blur' }],
-});
-function checkPassword(rule: any, value: any, callback: any) {
-    let password = userForm.newPassword;
-    if (password !== userForm.retryPassword) {
-        return callback(new Error(i18n.global.t('commons.rule.rePassword')));
-    }
-    callback();
-}
-
-const emit = defineEmits(['openTask']);
+const emit = defineEmits(['openTask', 'refresh']);
 bus.on('refreshTask', () => {
     checkTask();
 });
@@ -182,9 +140,9 @@ const loadCurrentName = () => {
     return globalStore.getMasterAlias();
 };
 
-const showPopover = () => {
+const showPopover = async () => {
     filter.value = '';
-    loadNodes();
+    await loadNodes();
     changeFilter();
 };
 
@@ -225,52 +183,62 @@ const loadNodes = async () => {
         });
 };
 const changeNode = async (command: string) => {
-    if (globalStore.currentNode === command) {
+    if (globalStore.currentNode === command || switchingNode.value) {
         return;
     }
-    for (const item of nodes.value) {
-        if (item.name == command) {
-            if (command == 'local') {
-                globalStore.currentNode = 'local';
-                globalStore.currentNodeAddr = item.addr;
-                if (globalStore.isXpackEE) {
-                    await loadCurrentUser();
+    switchingNode.value = true;
+    try {
+        for (const item of nodes.value) {
+            if (item.name == command) {
+                if (command == 'local') {
+                    if (globalStore.isXpackEE) {
+                        await loadCurrentUser('local');
+                    }
+                    await loadGlobalSetting('local');
+                    globalStore.currentNode = 'local';
+                    globalStore.currentNodeAddr = item.addr;
+                    localStorage.removeItem('dashboardCache');
+                    localStorage.removeItem('upgradeChecked');
+                    menuStore.setMenuList([]);
+                    emit('refresh');
+                    loadProductProFromDB();
+                    routerToNameWithQuery('home', { t: Date.now() });
+                    return;
                 }
-                loadGlobalSetting();
+                if (!item.isBound) {
+                    MsgError(i18n.global.t('xpack.node.nodeUnbindHelper'));
+                    return;
+                }
+                if (item.status !== 'Healthy') {
+                    MsgError(i18n.global.t('xpack.node.nodeUnhealthyHelper'));
+                    return;
+                }
+                if (props.version != item.version) {
+                    MsgError(i18n.global.t('setting.versionNotSame'));
+                    return;
+                }
+                await loadGlobalSetting(command);
                 localStorage.removeItem('dashboardCache');
                 localStorage.removeItem('upgradeChecked');
+                globalStore.currentNode = command;
+                globalStore.currentNodeAddr = item.addr;
+                if (globalStore.isXpackEE) {
+                    await loadCurrentUser(command);
+                }
+                menuStore.setMenuList([]);
+                emit('refresh');
                 loadProductProFromDB();
                 routerToNameWithQuery('home', { t: Date.now() });
                 return;
             }
-            if (!item.isBound) {
-                MsgError(i18n.global.t('xpack.node.nodeUnbindHelper'));
-                return;
-            }
-            if (item.status !== 'Healthy') {
-                MsgError(i18n.global.t('xpack.node.nodeUnhealthyHelper'));
-                return;
-            }
-            if (props.version != item.version) {
-                MsgError(i18n.global.t('setting.versionNotSame'));
-                return;
-            }
-            loadGlobalSetting();
-            localStorage.removeItem('dashboardCache');
-            localStorage.removeItem('upgradeChecked');
-            globalStore.currentNode = command || 'local';
-            globalStore.currentNodeAddr = item.addr;
-            if (globalStore.isXpackEE) {
-                await loadCurrentUser();
-            }
-            loadProductProFromDB();
-            routerToNameWithQuery('home', { t: Date.now() });
         }
+    } finally {
+        switchingNode.value = false;
     }
 };
 
-const loadGlobalSetting = async () => {
-    await getAgentSettingInfo().then((res) => {
+const loadGlobalSetting = async (currentNode?: string) => {
+    await getAgentSettingInfo(currentNode).then((res) => {
         globalStore.defaultNetwork = res.data.defaultNetwork;
     });
 };
@@ -311,56 +279,20 @@ const logout = () => {
         .catch(() => {});
 };
 
-const loadCurrentUser = async () => {
-    await getAuthInfo().then((res) => {
-        currentUser.value = res.data;
-        globalStore.setAuthInfo({
-            isAdmin: res.data.role === 'ADMIN',
-            permissions: res.data.permissions || [],
-            nodeScopes: res.data.nodeScopes || [],
-            nodeRoles: res.data.nodeRoles || [],
-        });
-    });
+const loadCurrentUser = async (currentNode?: string) => {
+    const authInfo = await syncAuthInfo(currentNode);
+    if (authInfo) {
+        currentUser.value = authInfo;
+    }
 };
 const changeUserInfo = () => {
-    if (currentUser.value.role === 'ADMIN') {
-        return;
-    }
-    userForm.id = currentUser.value?.id || 0;
-    userForm.name = currentUser.value?.name || '';
-    open.value = true;
-};
-const onSubmit = async (formEl: any) => {
-    if (!formEl) return;
-    formEl.validate(async (valid: boolean) => {
-        if (!valid) return;
-        if (userForm.newPassword === userForm.oldPassword) {
-            MsgError(i18n.global.t('setting.duplicatePassword'));
-            return;
-        }
-        loading.value = true;
-        await updateAuthInfo(userForm)
-            .then(async () => {
-                loading.value = false;
-                open.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                await logOutApi();
-                router.push({ name: 'entrance', params: { code: globalStore.entrance } });
-                globalStore.setLogStatus(false);
-                globalStore.clearAuthInfo();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
+    userInfoRef.value?.openDrawer();
 };
 
 onMounted(() => {
     loadNodes();
     checkTask();
-    if (globalStore.isXpackEE) {
-        loadCurrentUser();
-    }
+    loadCurrentUser();
 });
 </script>
 

@@ -556,7 +556,9 @@ onBeforeUnmount(() => {
 
 .ai-notice-fade-enter-active,
 .ai-notice-fade-leave-active {
-    transition: opacity 180ms ease, transform 180ms ease;
+    transition:
+        opacity 180ms ease,
+        transform 180ms ease;
 }
 
 .ai-mask-fade-enter-active,

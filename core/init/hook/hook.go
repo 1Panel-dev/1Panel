@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 )
 
 func Init() {
@@ -17,12 +18,6 @@ func Init() {
 	global.CONF.Conn.Port, _ = settingRepo.GetValueByKey("ServerPort")
 	global.CONF.Conn.Ipv6, _ = settingRepo.GetValueByKey("Ipv6")
 	global.CONF.Base.Edition, _ = settingRepo.GetValueByKey("Edition")
-	global.Api.ApiInterfaceStatus, _ = settingRepo.GetValueByKey("ApiInterfaceStatus")
-	if global.Api.ApiInterfaceStatus == constant.StatusEnable {
-		global.Api.ApiKey, _ = settingRepo.GetValueByKey("ApiKey")
-		global.Api.IpWhiteList, _ = settingRepo.GetValueByKey("IpWhiteList")
-		global.Api.ApiKeyValidityTime, _ = settingRepo.GetValueByKey("ApiKeyValidityTime")
-	}
 	global.CONF.Conn.BindAddress, _ = settingRepo.GetValueByKey("BindAddress")
 	global.CONF.Conn.SSL, _ = settingRepo.GetValueByKey("SSL")
 	global.CONF.Base.Version, _ = settingRepo.GetValueByKey("SystemVersion")
@@ -65,15 +60,24 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 	if strings.Contains(global.CONF.Base.ChangeUserInfo, "entrance") {
 		settingMap["SecurityEntrance"] = common.RandStrAndNum(10)
 	}
-	for key, val := range settingMap {
-		if len(val) == 0 {
-			continue
+	if global.CONF.Base.IsXpackEE {
+		if len(settingMap["UserName"]) != 0 || len(settingMap["Password"]) != 0 {
+			if err := xpack.AuthProvider.ResetSuperAdminUser(settingMap["UserName"], settingMap["Password"]); err != nil {
+				global.LOG.Fatalf("reset xpackee super admin failed, err: %v", err)
+				return
+			}
 		}
-		if key == "Password" {
-			val, _ = encrypt.StringEncrypt(val)
-		}
-		if err := settingRepo.Update(key, val); err != nil {
-			global.LOG.Errorf("update %s before start failed, err: %v", key, err)
+	} else {
+		for key, val := range settingMap {
+			if len(val) == 0 {
+				continue
+			}
+			if key == "Password" {
+				val, _ = encrypt.StringEncrypt(val)
+			}
+			if err := settingRepo.Update(key, val); err != nil {
+				global.LOG.Errorf("update %s before start failed, err: %v", key, err)
+			}
 		}
 	}
 

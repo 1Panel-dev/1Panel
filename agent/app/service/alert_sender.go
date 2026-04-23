@@ -72,7 +72,7 @@ func (s *AlertSender) sendSMS(quota string, params []dto.Param) {
 		Type:    s.alert.Type,
 	}
 
-	err := xpack.CreateSMSAlertLog(s.alert.Type, s.alert, create, quota, params, constant.SMS)
+	err := xpack.AlertProvider.CreateSMSAlertLog(s.alert.Type, s.alert, create, quota, params, constant.SMS)
 	if err != nil {
 		global.LOG.Errorf("%s alert sms push failed: %v", s.alert.Type, err)
 		return
@@ -95,8 +95,8 @@ func (s *AlertSender) sendEmail(quota string, params []dto.Param) {
 		AlertDetail: alertUtil.ProcessAlertDetail(s.alert, quota, params, constant.Email),
 	}
 
-	transport := xpack.LoadRequestTransport()
-	agentInfo, _ := xpack.GetAgentInfo()
+	transport := xpack.MultiNodeProvider.LoadRequestTransport()
+	agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
 	err := alertUtil.CreateEmailAlertLog(create, s.alert, params, transport, agentInfo)
 	if err != nil {
 		global.LOG.Errorf("%s alert email push failed: %v", s.alert.Type, err)
@@ -120,8 +120,8 @@ func (s *AlertSender) sendBark(quota string, params []dto.Param) {
 		AlertDetail: alertUtil.ProcessAlertDetail(s.alert, quota, params, constant.Bark),
 	}
 
-	transport := xpack.LoadRequestTransport()
-	agentInfo, _ := xpack.GetAgentInfo()
+	transport := xpack.MultiNodeProvider.LoadRequestTransport()
+	agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
 	err := alertUtil.CreateBarkAlertLog(create, s.alert, params, transport, agentInfo)
 	if err != nil {
 		global.LOG.Errorf("%s alert bark push failed: %v", s.alert.Type, err)
@@ -142,9 +142,9 @@ func (s *AlertSender) sendWebhook(quota string, params []dto.Param, method strin
 		AlertId: s.alert.ID,
 		Type:    s.alert.Type,
 	}
-	transport := xpack.LoadRequestTransport()
-	agentInfo, _ := xpack.GetAgentInfo()
-	err := xpack.CreateWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, method, transport, agentInfo)
+	transport := xpack.MultiNodeProvider.LoadRequestTransport()
+	agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
+	err := xpack.AlertProvider.CreateWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, method, transport, agentInfo)
 	if err != nil {
 		global.LOG.Errorf("%s alert %s webhook push failed: %v", s.alert.Type, method, err)
 		return
@@ -169,7 +169,7 @@ func (s *AlertSender) sendResourceSMS(quota string, params []dto.Param) {
 		Type:    s.alert.Type,
 	}
 
-	if err := xpack.CreateSMSAlertLog(s.alert.Type, s.alert, create, quota, params, constant.SMS); err != nil {
+	if err := xpack.AlertProvider.CreateSMSAlertLog(s.alert.Type, s.alert, create, quota, params, constant.SMS); err != nil {
 		global.LOG.Errorf("failed to send SMS alert: %v", err)
 		return
 	}
@@ -191,8 +191,8 @@ func (s *AlertSender) sendResourceEmail(quota string, params []dto.Param) {
 		AlertDetail: alertUtil.ProcessAlertDetail(s.alert, quota, params, constant.Email),
 	}
 
-	transport := xpack.LoadRequestTransport()
-	agentInfo, _ := xpack.GetAgentInfo()
+	transport := xpack.MultiNodeProvider.LoadRequestTransport()
+	agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
 	if err := alertUtil.CreateEmailAlertLog(create, s.alert, params, transport, agentInfo); err != nil {
 		global.LOG.Errorf("failed to send Email alert: %v", err)
 		return
@@ -215,8 +215,8 @@ func (s *AlertSender) sendResourceBark(quota string, params []dto.Param) {
 		AlertDetail: alertUtil.ProcessAlertDetail(s.alert, quota, params, constant.Bark),
 	}
 
-	transport := xpack.LoadRequestTransport()
-	agentInfo, _ := xpack.GetAgentInfo()
+	transport := xpack.MultiNodeProvider.LoadRequestTransport()
+	agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
 	if err := alertUtil.CreateBarkAlertLog(create, s.alert, params, transport, agentInfo); err != nil {
 		global.LOG.Errorf("failed to send Bark alert: %v", err)
 		return
@@ -236,9 +236,9 @@ func (s *AlertSender) sendResourceWebhook(quota string, params []dto.Param, meth
 		AlertId: s.alert.ID,
 		Type:    s.alert.Type,
 	}
-	transport := xpack.LoadRequestTransport()
-	agentInfo, _ := xpack.GetAgentInfo()
-	if err := xpack.CreateWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, method, transport, agentInfo); err != nil {
+	transport := xpack.MultiNodeProvider.LoadRequestTransport()
+	agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
+	if err := xpack.AlertProvider.CreateWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, method, transport, agentInfo); err != nil {
 		global.LOG.Errorf("%s alert %s webhook push failed: %v", s.alert.Type, method, err)
 		return
 	}

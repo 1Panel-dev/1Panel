@@ -49,8 +49,6 @@ AppInstallCheck: 'Uygulama kurulum ortamını kontrol et'
 
 # backup
 ErrBackupInUsed: 'Yedek hesabı görevde kullanılıyor'
-ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
-ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
 ErrBackupCheck: 'Bağlantı testi başarısız: {{ .err }}'
 ErrBackupLocal: "Yerel sunucu yedekleme hesabı bu işlemi desteklemiyor"
 ErrBackupPublic: "Bu yedekleme hesabının herkese açık olmadığı tespit edildi, lütfen kontrol edip tekrar deneyin"
@@ -69,6 +67,7 @@ ErrLicenseExist: "Bu lisans kaydı zaten mevcut. Düğüm bağlama için doğrud
 ErrXpackNotFound: "Bu bölüm Pro Sürüm gerektirir. Lisansı Panel Ayarları > Lisans bölümünden içe aktarın"
 ErrXpackExceptional: "Bu bölüm Pro Sürüm gerektirir. Lisans durumunu Panel Ayarları > Lisans bölümünden senkronize edin"
 ErrXpackLost: "Lisans yeniden deneme sınırına ulaştı. Panel Ayarları > Lisans bölümüne gidip manuel senkronizasyon çalıştırın"
+ErrXpackEELicenseRequired: "Enterprise Edition lisansı içe aktarılmamış. Önce bir lisans içe aktarın."
 ErrDeviceLost: "Lisans doğrulama için gerekli dosyalar eksik, lütfen kontrol edip tekrar deneyin"
 ErrXpackTimeout: "İstek zaman aşımı, ağ bağlantısı kararsız olabilir, lütfen daha sonra tekrar deneyin"
 ErrUnbindMaster: "Düğüm yönetiminde düğümler tespit edildi, mevcut lisansın bağı çözülemiyor, lütfen önce düğümleri kaldırın ve tekrar deneyin"
@@ -83,6 +82,19 @@ ErrNodeUnbind: "Bu düğüm lisans bağlama aralığında değil, lütfen kontro
 ErrNodeBind: "Bu düğüm zaten bir lisansa bağlı, lütfen kontrol edip tekrar deneyin"
 ErrNodeLocalRollback: "Ana düğüm doğrudan rollback'i desteklemez. Rollback için '1pctl restore' komutunu manuel çalıştırın"
 ErrIntlLicense: "Mevcut sürüm uluslararası sürüm lisansının içe aktarılmasını henüz desteklemiyor. Yakında"
+
+# user
+ErrNoSuchUser: "Kullanıcı bilgisi bulunamadı, lütfen kontrol edip tekrar deneyin"
+ErrToMaster: "Bu kullanıcının ana düğümde bu işlemi yapma izni yok, lütfen kontrol edip tekrar deneyin"
+ErrToNode: "Bu kullanıcının bu düğümde bu işlemi yapma izni yok, lütfen kontrol edip tekrar deneyin"
+ErrRBAC: "Kullanıcı izinleri yetersiz, bu işlem yapılamaz. Lütfen kontrol edip tekrar deneyin"
+ErrNoneNode: "Bu kullanıcının hiçbir düğüm izni yok. Lütfen yöneticiyle iletişime geçin veya kontrol edip tekrar deneyin"
+ErrOnlySuperAdmin: "Bu özellik yalnızca süper yöneticiler tarafından kullanılabilir"
+ErrRolePresetCannotDelete: "Sistem ön tanımlı rolleri silinemez"
+ErrRolePresetCannotUpdate: "Sistem ön tanımlı rolleri güncellenemez"
+ErrRoleBoundToUser: "Bu rol zaten kullanıcılara bağlı ve silinemez"
+ErrRolePresetCannotBind: "Sistem ön tanımlı rolleri kullanıcılara atanamaz"
+ErrSuperAdminCannotDelete: "Süper yönetici kullanıcılar silinemez"
 
 InvalidRequestBodyType: "Geçersiz istek gövdesi formatı, lütfen içeriğin format gereksinimlerine uygun olduğunu kontrol edip tekrar deneyin"
 InvalidLicenseCodeType: "Sağlanan lisans kodu formatı geçersiz, lütfen kontrol edip tekrar deneyin"

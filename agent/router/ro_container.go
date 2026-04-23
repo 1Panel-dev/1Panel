@@ -11,7 +11,6 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 	baRouter := Router.Group("containers")
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
-		baRouter.GET("/exec", baseApi.ContainerWsSSH)
 		baRouter.GET("/stats/:id", baseApi.ContainerStats)
 
 		baRouter.POST("", baseApi.ContainerCreate)

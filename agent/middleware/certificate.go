@@ -19,7 +19,7 @@ func Certificate() gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		if !xpack.ValidateCertificate(c) {
+		if !xpack.MultiNodeProvider.ValidateCertificate(c) {
 			CloseDirectly(c)
 			return
 		}

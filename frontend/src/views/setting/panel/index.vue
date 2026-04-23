@@ -6,26 +6,6 @@
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
-                            <el-form-item :label="$t('setting.user')" prop="userName">
-                                <el-input type="password" disabled v-model="form.userName">
-                                    <template #append>
-                                        <el-button @click="onChangeUserName()" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.passwd')" prop="password">
-                                <el-input type="password" disabled v-model="form.password">
-                                    <template #append>
-                                        <el-button icon="Setting" @click="onChangePassword">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
                             <el-form-item :label="$t('setting.theme')" prop="theme">
                                 <div class="flex justify-center items-center sm:gap-6 gap-2">
                                     <div class="sm:contents hidden">
@@ -127,19 +107,6 @@
                                 </el-select>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
-                                <el-input disabled v-model.number="form.sessionTimeout">
-                                    <template #append>
-                                        <el-button @click="onChangeTimeout" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <span class="input-help">
-                                    {{ $t('setting.sessionTimeoutHelper', [form.sessionTimeout]) }}
-                                </span>
-                            </el-form-item>
-
                             <el-form-item :label="$t('setting.systemIP')" prop="systemIP">
                                 <el-input disabled v-if="form.systemIP" v-model="form.systemIP">
                                     <template #append>
@@ -158,7 +125,7 @@
                                 <span class="input-help">{{ $t('setting.systemIPHelper') }}</span>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.proxy')" prop="proxyShow" v-if="globalStore.isMaster">
+                            <el-form-item :label="$t('setting.proxy')" prop="proxyShow">
                                 <el-input disabled v-model="form.proxyShow">
                                     <template #append>
                                         <el-button @click="onChangeProxy" icon="Setting">
@@ -166,27 +133,6 @@
                                         </el-button>
                                     </template>
                                 </el-input>
-                            </el-form-item>
-
-                            <el-form-item
-                                :label="$t('setting.apiInterface')"
-                                prop="apiInterface"
-                                v-if="globalStore.isMaster"
-                            >
-                                <el-switch
-                                    @change="onChangeApiInterfaceStatus"
-                                    v-model="form.apiInterfaceStatus"
-                                    active-value="Enable"
-                                    inactive-value="Disable"
-                                />
-                                <span class="input-help">{{ $t('setting.apiInterfaceHelper') }}</span>
-                                <div v-if="form.apiInterfaceStatus === 'Enable'">
-                                    <div>
-                                        <el-button link type="primary" @click="onChangeApiInterfaceStatus">
-                                            {{ $t('commons.button.view') }}
-                                        </el-button>
-                                    </div>
-                                </div>
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.developerMode')" prop="developerMode">
@@ -221,13 +167,9 @@
             </template>
         </LayoutContent>
 
-        <Password ref="passwordRef" />
-        <UserName ref="userNameRef" />
         <PanelName ref="panelNameRef" @search="search()" />
         <SystemIP ref="systemIPRef" @search="search()" />
         <Proxy ref="proxyRef" @search="search()" />
-        <ApiInterface ref="apiInterfaceRef" @search="search()" />
-        <Timeout ref="timeoutRef" @search="search()" />
         <HideMenu ref="hideMenuRef" @search="search()" />
         <ThemeColor ref="themeColorRef" />
         <Watermark ref="watermarkRef" @search="search()" />
@@ -238,23 +180,13 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
-import {
-    getSettingInfo,
-    updateSetting,
-    getSystemAvailable,
-    updateApiConfig,
-    getAgentSettingInfo,
-} from '@/api/modules/setting';
+import { getSettingInfo, updateSetting, getSystemAvailable, getAgentSettingInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { useTheme } from '@/global/use-theme';
 import { MsgSuccess } from '@/utils/message';
 import ThemeColor from '@/views/setting/panel/theme-color/index.vue';
-import ApiInterface from '@/views/setting/panel/api-interface/index.vue';
-import Password from '@/views/setting/panel/password/index.vue';
 import Watermark from '@/views/setting/panel/watermark/index.vue';
 import Edition from '@/views/setting/panel/edition/index.vue';
-import UserName from '@/views/setting/panel/username/index.vue';
-import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import Proxy from '@/views/setting/panel/proxy/index.vue';
@@ -281,9 +213,6 @@ interface ThemeColor {
 }
 
 const form = reactive({
-    userName: '',
-    password: '',
-    sessionTimeout: 0,
     panelName: '',
     theme: '',
     watermark: '',
@@ -293,7 +222,6 @@ const form = reactive({
     language: '',
     docSource: 'withByRegion',
     edition: '',
-    complexityVerification: '',
     developerMode: '',
     systemIP: '',
 
@@ -306,26 +234,17 @@ const form = reactive({
     proxyPasswdKeep: '',
     proxyDocker: '',
 
-    apiInterfaceStatus: 'Disable',
-    apiKey: '',
-    ipWhiteList: '',
-    apiKeyValidityTime: 120,
-
     hideMenu: '',
 });
 
 const show = ref();
 
-const userNameRef = ref();
-const passwordRef = ref();
 const panelNameRef = ref();
 const systemIPRef = ref();
 const proxyRef = ref();
-const timeoutRef = ref();
 const hideMenuRef = ref();
 const watermarkRef = ref();
 const themeColorRef = ref();
-const apiInterfaceRef = ref();
 const editionRef = ref();
 const unset = ref(i18n.global.t('setting.unSetting'));
 
@@ -351,15 +270,12 @@ const search = async () => {
     form.systemIP = agentRes.data.systemIP;
 
     const res = await getSettingInfo();
-    form.userName = '******';
-    form.password = '******';
     form.theme = res.data.theme;
     form.menuTabs = res.data.menuTabs;
     form.panelName = res.data.panelName;
     form.language = res.data.language;
     form.docSource = res.data.docSource || 'withByRegion';
     form.edition = res.data.edition;
-    form.sessionTimeout = Number(res.data.sessionTimeout);
 
     form.proxyUrl = res.data.proxyUrl;
     form.proxyType = res.data.proxyType;
@@ -369,15 +285,8 @@ const search = async () => {
     form.proxyPasswd = res.data.proxyPasswd;
     form.proxyPasswdKeep = res.data.proxyPasswdKeep;
 
-    form.apiInterfaceStatus = res.data.apiInterfaceStatus;
-    form.apiKey = res.data.apiKey;
-    form.ipWhiteList = res.data.ipWhiteList;
-    form.apiKeyValidityTime = res.data.apiKeyValidityTime;
-
     form.developerMode = res.data.developerMode;
     form.hideMenu = res.data.hideMenu;
-
-    form.complexityVerification = res.data.complexityVerification;
 
     if (globalStore.isXpackOrEE()) {
         const xpackRes = await getXpackSetting();
@@ -402,17 +311,8 @@ const search = async () => {
     }
 };
 
-const onChangePassword = () => {
-    passwordRef.value.acceptParams({ complexityVerification: form.complexityVerification });
-};
-const onChangeUserName = () => {
-    userNameRef.value.acceptParams();
-};
 const onChangeTitle = () => {
     panelNameRef.value.acceptParams({ panelName: form.panelName });
-};
-const onChangeTimeout = () => {
-    timeoutRef.value.acceptParams({ sessionTimeout: form.sessionTimeout });
 };
 const onChangeSystemIP = () => {
     systemIPRef.value.acceptParams({ systemIP: form.systemIP });
@@ -473,44 +373,6 @@ const onChangeWatermark = async () => {
         })
         .catch(() => {
             form.watermarkShow = 'Enable';
-        });
-};
-
-const onChangeApiInterfaceStatus = async () => {
-    if (form.apiInterfaceStatus === 'Enable') {
-        apiInterfaceRef.value.acceptParams({
-            apiInterfaceStatus: form.apiInterfaceStatus,
-            apiKey: form.apiKey,
-            ipWhiteList: form.ipWhiteList,
-            apiKeyValidityTime: form.apiKeyValidityTime,
-        });
-        return;
-    }
-    ElMessageBox.confirm(i18n.global.t('setting.apiInterfaceClose'), i18n.global.t('setting.apiInterface'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    })
-        .then(async () => {
-            loading.value = true;
-            form.apiInterfaceStatus = 'Disable';
-            let param = {
-                apiKey: form.apiKey,
-                ipWhiteList: form.ipWhiteList,
-                apiInterfaceStatus: form.apiInterfaceStatus,
-                apiKeyValidityTime: form.apiKeyValidityTime,
-            };
-            await updateApiConfig(param)
-                .then(() => {
-                    loading.value = false;
-                    search();
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                })
-                .catch(() => {
-                    loading.value = false;
-                });
-        })
-        .catch(() => {
-            form.apiInterfaceStatus = 'Enable';
         });
 };
 

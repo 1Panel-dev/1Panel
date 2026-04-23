@@ -2,24 +2,38 @@ import router from '@/routers/router';
 import NProgress from '@/config/nprogress';
 import { GlobalStore } from '@/store';
 import { AxiosCanceler } from '@/api/helper/axios-cancel';
-import { hasPermission } from '@/utils/rbac';
+import { hasRouteAccess } from '@/utils/rbac';
 import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
 
 const axiosCanceler = new AxiosCanceler();
 
 let isRedirecting = false;
+let licenseStatusLoading: Promise<boolean> | null = null;
 
-router.beforeEach((to, from, next) => {
+const loadXpackEELicenseStatus = async () => {
+    if (!licenseStatusLoading) {
+        licenseStatusLoading = fetch('/api/v2/core/xpackee/licenses/status', {
+            credentials: 'include',
+            headers: {
+                CurrentNode: encodeURIComponent(GlobalStore().currentNode),
+            },
+        })
+            .then((res) => res.json())
+            .then((res) => res?.data?.status === 'Bound')
+            .catch(() => false)
+            .finally(() => {
+                licenseStatusLoading = null;
+            });
+    }
+    return licenseStatusLoading;
+};
+
+router.beforeEach(async (to, from, next) => {
     NProgress.start();
     axiosCanceler.removeAllPending();
     const globalStore = GlobalStore();
-    if (globalStore.isXpackEE && !globalStore.isAdmin) {
-        if (xpackEEJumper(to, next)) {
-            return;
-        }
-    }
-    if (to.name !== 'entrance' && !globalStore.isLogin) {
+    if (to.name !== 'entrance' && to.name !== 'XpackEELicenseRequired' && !globalStore.isLogin) {
         next({
             name: 'entrance',
             params: to.params,
@@ -38,6 +52,37 @@ router.beforeEach((to, from, next) => {
         next({ name: '404' });
         NProgress.done();
         return;
+    }
+    if (
+        globalStore.isLogin &&
+        globalStore.isXpackEE &&
+        to.name !== 'XpackEELicenseRequired' &&
+        to.name !== 'entrance' &&
+        to.name !== 'login'
+    ) {
+        const licensed = globalStore.isXpackEELicensed || (await loadXpackEELicenseStatus());
+        globalStore.isXpackEELicensed = licensed;
+        if (!licensed) {
+            next({ name: 'XpackEELicenseRequired', query: { code: String(to.params.code || '') } });
+            NProgress.done();
+            return;
+        }
+    }
+    if (to.name === 'XpackEELicenseRequired') {
+        if (!globalStore.isLogin) {
+            next({
+                name: 'entrance',
+                params: to.params,
+            });
+            NProgress.done();
+            return;
+        }
+        if (globalStore.isXpackEELicensed) {
+            next({ name: 'home' });
+            NProgress.done();
+            return;
+        }
+        return next();
     }
 
     if (to.path === '/apps/all' && to.query.install != undefined) {
@@ -65,18 +110,12 @@ router.beforeEach((to, from, next) => {
         return;
     }
 
-    const requiredPermission = [...to.matched].reverse().find((record) => record.meta?.permission)?.meta?.permission as
-        | string
-        | undefined;
-    if (requiredPermission && !hasPermission(requiredPermission)) {
+    if (!hasRouteAccess(to)) {
         MsgError(i18n.global.t('commons.res.forbidden'));
         next(false);
         NProgress.done();
         return;
     }
-
-    if (!to.matched.some((record) => record.meta.requiresAuth)) return next();
-
     return next();
 });
 
@@ -104,52 +143,3 @@ router.afterEach((to) => {
 });
 
 export default router;
-
-const xpackEEJumper = (to: any, next: any) => {
-    switch (to.name) {
-        case 'Panel':
-        case 'Safe':
-        case 'Alert':
-            if (hasPermission('setting_view')) {
-                return false;
-            }
-            MsgError(i18n.global.t('commons.res.forbidden'));
-            next(false);
-            NProgress.done();
-            return true;
-        case 'License':
-            if (hasPermission('setting_view')) {
-                return false;
-            }
-            MsgError(i18n.global.t('commons.res.forbidden'));
-            next(false);
-            NProgress.done();
-            return true;
-        case 'Node':
-        case 'SimpleNode':
-        case 'NodeAppUpgrade':
-            if (hasPermission('node_view')) {
-                return false;
-            }
-            MsgError(i18n.global.t('commons.res.forbidden'));
-            next(false);
-            NProgress.done();
-            return true;
-        case 'UserXpackEEUser':
-            if (hasPermission('setting_view')) {
-                return false;
-            }
-            MsgError(i18n.global.t('commons.res.forbidden'));
-            next(false);
-            NProgress.done();
-            return true;
-        case 'XpackEERole':
-            if (hasPermission('setting_view')) {
-                return false;
-            }
-            MsgError(i18n.global.t('commons.res.forbidden'));
-            next(false);
-            NProgress.done();
-            return true;
-    }
-};

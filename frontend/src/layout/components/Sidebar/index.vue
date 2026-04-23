@@ -23,7 +23,7 @@
                 <SubItem :menuList="routerMenus" :level="0" />
             </el-menu>
         </el-scrollbar>
-        <Collapse :version="version" @open-task="openTask" />
+        <Collapse :version="version" @open-task="openTask" @refresh="search" />
     </div>
 </template>
 
@@ -36,9 +36,9 @@ import Collapse from './components/Collapse.vue';
 import SubItem from './components/SubItem.vue';
 import { menuList } from '@/routers/router';
 import { GlobalStore, MenuStore } from '@/store';
-import { getSettingInfo } from '@/api/modules/setting';
+import { getSettingBaseInfo } from '@/api/modules/setting';
 import PrimaryMenu from '@/assets/images/menu-bg.svg?component';
-import { hasPermission } from '@/utils/rbac';
+import { hasPermission, hasRouteRoleAccess } from '@/utils/rbac';
 
 const route = useRoute();
 const menuStore = MenuStore();
@@ -87,10 +87,21 @@ const openTask = () => {
 };
 
 const search = async () => {
+    let settingInfo: { systemVersion: string; hideMenu?: string } | null = null;
     try {
-        const res = await getSettingInfo();
+        const res = await getSettingBaseInfo();
+        settingInfo = res.data;
         version.value = res.data.systemVersion;
-        let hideMenu = JSON.parse(res.data.hideMenu);
+    } catch (error) {
+        version.value = '';
+    }
+
+    if (!globalStore.isAdmin) {
+        menuStore.setMenuList(buildAuthVisibleMenuList(menuList));
+        return;
+    }
+    try {
+        const hideMenu = JSON.parse(settingInfo?.hideMenu || '[]');
         const showSet = new Set<string>();
         getCheckedLabels(hideMenu, showSet);
         const rstMenuList: RouteRecordRaw[] = [];
@@ -106,7 +117,7 @@ const search = async () => {
         }
     } catch (error) {
         if (!menuStore.menuList || menuStore.menuList.length === 0) {
-            menuStore.setMenuList(menuList);
+            menuStore.setMenuList(buildAuthVisibleMenuList(menuList));
         }
     }
 };
@@ -116,12 +127,50 @@ function isSameMenuList(source: RouteRecordRaw[], target: RouteRecordRaw[]) {
 }
 
 function allowMenuItem(item: RouteRecordRaw) {
+    if (globalStore.isAdmin) {
+        return true;
+    }
+    if (!hasRouteRoleAccess(item.meta)) {
+        return false;
+    }
     const permission = item.meta?.permission as string | undefined;
     if (!permission) {
         return true;
     }
     const allowed = hasPermission(permission);
     return allowed;
+}
+
+function buildAuthVisibleMenuList(source: RouteRecordRaw[]) {
+    return source
+        .map((item) => {
+            if (!allowMenuItem(item)) {
+                return null;
+            }
+            const menuItem = JSON.parse(JSON.stringify(item));
+            const children = Array.isArray(menuItem.children) ? menuItem.children : [];
+            if (children.length === 0) {
+                return menuItem;
+            }
+            menuItem.children = buildAuthVisibleMenuList(children).filter(Boolean);
+            if (menuItem.children.length === 0) {
+                return null;
+            }
+            if (menuItem.children.length === 1) {
+                const onlyChild = menuItem.children[0];
+                if (onlyChild.meta?.icon) {
+                    menuItem.meta.icon = onlyChild.meta.icon;
+                }
+                if (onlyChild.meta?.title) {
+                    menuItem.meta.title = onlyChild.meta.title;
+                }
+            }
+            if (menuItem.name === 'Xpack-Menu') {
+                menuItem.meta.hideInSidebar = false;
+            }
+            return menuItem;
+        })
+        .filter(Boolean) as RouteRecordRaw[];
 }
 
 function buildVisibleMenu(menu: RouteRecordRaw, showSet: Set<string>): RouteRecordRaw | null {
@@ -153,8 +202,13 @@ function buildVisibleMenu(menu: RouteRecordRaw, showSet: Set<string>): RouteReco
     }
 
     if (menuItem.children.length === 1) {
-        menuItem.meta.icon = menuItem.children[0].meta.icon;
-        menuItem.meta.title = menuItem.children[0].meta.title;
+        const onlyChild = menuItem.children[0];
+        if (onlyChild.meta?.icon) {
+            menuItem.meta.icon = onlyChild.meta.icon;
+        }
+        if (onlyChild.meta?.title) {
+            menuItem.meta.title = onlyChild.meta.title;
+        }
     }
     if (menuItem.name === 'Xpack-Menu') {
         menuItem.meta.hideInSidebar = false;
@@ -198,8 +252,13 @@ function adjustAndCleanMenu(menuItem, list) {
     const newMenu = buildTree(menuItem);
     for (const menu of newMenu) {
         if (menu.children?.length === 1) {
-            menu.meta.icon = menu.children[0].meta.icon;
-            menu.meta.title = menu.children[0].meta.title;
+            const onlyChild = menu.children[0];
+            if (onlyChild.meta?.icon) {
+                menu.meta.icon = onlyChild.meta.icon;
+            }
+            if (onlyChild.meta?.title) {
+                menu.meta.title = onlyChild.meta.title;
+            }
         }
     }
 
@@ -208,7 +267,7 @@ function adjustAndCleanMenu(menuItem, list) {
 
 onMounted(() => {
     if (!menuStore.menuList || menuStore.menuList.length === 0) {
-        menuStore.setMenuList(menuList);
+        menuStore.setMenuList(globalStore.isAdmin ? menuList : buildAuthVisibleMenuList(menuList));
     }
     search();
 });

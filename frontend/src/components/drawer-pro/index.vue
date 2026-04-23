@@ -4,6 +4,7 @@
         @close="handleClose"
         :destroy-on-close="true"
         :before-close="beforeClose"
+        append-to-body
         :size="isFull ? '100%' : size"
         :close-on-press-escape="autoClose"
         :close-on-click-modal="autoClose"
