@@ -83,7 +83,7 @@ func writeHermesConfig(confDir string, account *model.AgentAccount, modelName st
 		"base_url": account.BaseURL,
 	}
 	if provider == "custom" && account.APIKey != "" {
-		model["api_key"] = account.APIKey
+		model["api_key"] = "${CUSTOM_API_KEY}"
 	}
 	cfg["model"] = model
 	cfg["terminal"] = map[string]interface{}{
@@ -463,7 +463,12 @@ func resolveHermesEnvEntries(account *model.AgentAccount) []hermesEnvEntry {
 		return nil
 	}
 	if resolveHermesProvider(account.Provider) == "custom" {
-		return nil
+		if account.APIKey == "" {
+			return nil
+		}
+		return []hermesEnvEntry{
+			{Key: "CUSTOM_API_KEY", Value: account.APIKey},
+		}
 	}
 	apiKey := account.APIKey
 	baseURL := account.BaseURL
