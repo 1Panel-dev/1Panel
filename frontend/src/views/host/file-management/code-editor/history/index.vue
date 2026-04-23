@@ -100,13 +100,14 @@
                         </div>
                     </template>
 
-                    <div class="table-box history-table-box">
+                    <div class="history-table-box">
                         <div class="history-table-wrap">
                             <ComplexTable
                                 :pagination-config="paginationConfig"
                                 :data="historyItems"
                                 v-loading="historyLoading"
                                 class="history-table"
+                                @search="loadHistoryList()"
                                 @row-click="openHistoryRecord"
                                 @selection-change="handleSelectionChange"
                             >
@@ -247,7 +248,7 @@ const activeCollapse = ref([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'file-history-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('page-size')) || 20,
+    pageSize: Number(localStorage.getItem('file-history-page-size')) || 20,
     total: 0,
     small: false,
 });
@@ -354,12 +355,6 @@ const syncCurrentFileContext = (history?: File.FileHistoryInfo | null) => {
         scope: 'current',
     };
 };
-
-const pagination = ref({
-    currentPage: 1,
-    pageSize: 10,
-    total: 0,
-});
 
 const diffContainer = ref<HTMLElement | null>(null);
 const emit = defineEmits(['restored']);
@@ -485,7 +480,7 @@ const saveHistorySetting = async () => {
 
 const loadHistoryList = async (resetPage = false) => {
     if (resetPage) {
-        pagination.value.currentPage = 1;
+        paginationConfig.currentPage = 1;
     }
     historyLoading.value = true;
     try {
@@ -497,14 +492,14 @@ const loadHistoryList = async (resetPage = false) => {
             historyItems.value[0]?.path ||
             '';
         const res = await searchFileHistory({
-            page: pagination.value.currentPage,
-            pageSize: pagination.value.pageSize,
+            page: paginationConfig.currentPage,
+            pageSize: paginationConfig.pageSize,
             path: scope.value === 'current' ? currentScopePath : '',
             scope: scope.value,
             operation: operationFilter.value,
         });
         historyItems.value = res.data.items || [];
-        pagination.value.total = res.data.total || 0;
+        paginationConfig.total = res.data.total || 0;
         if (historyItems.value.length > 0) {
             const existSelected = selectedHistory.value
                 ? historyItems.value.find((item) => item.id === selectedHistory.value?.id)
@@ -715,6 +710,7 @@ onBeforeUnmount(() => {
         display: flex;
         flex-direction: column;
         min-height: 0;
+        padding-top: 2px;
     }
 }
 </style>

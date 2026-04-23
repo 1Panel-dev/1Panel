@@ -40,6 +40,7 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
@@ -59,6 +60,7 @@ type IFileService interface {
 	Compress(c request.FileCompress) error
 	StopCompress(taskID string) error
 	DeCompress(c request.FileDeCompress) error
+	StopDeCompress(taskID string) error
 	GetContent(op request.FileContentReq) (response.FileInfo, error)
 	GetPreviewContent(op request.FileContentReq) (response.FileInfo, error)
 	SaveContent(edit request.FileEdit) error
@@ -89,7 +91,7 @@ const (
 	fileRemarkEncodedMaxLen = 256
 )
 
-func NewIFileService() IFileService {
+func NewIFileService() FileService {
 	return &FileService{}
 }
 
@@ -472,7 +474,25 @@ func preflightCompressTool(compressType files.CompressType) error {
 	}
 }
 
+func preflightDecompressTool(decompressType files.CompressType) error {
+	switch decompressType {
+	case files.Tar, files.Zip, files.TarGz, files.Rar, files.X7z:
+		_, err := files.NewExtractShellArchiver(decompressType)
+		return err
+	default:
+		return nil
+	}
+}
+
 func (f *FileService) StopCompress(taskID string) error {
+	if cancel, ok := global.TaskCtxMap[taskID]; ok {
+		cancel()
+		return nil
+	}
+	return buserr.New("TaskNotFound")
+}
+
+func (f *FileService) StopDeCompress(taskID string) error {
 	if cancel, ok := global.TaskCtxMap[taskID]; ok {
 		cancel()
 		return nil
@@ -485,7 +505,49 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 	if c.Type == "tar" && len(c.Secret) != 0 {
 		c.Type = "tar.gz"
 	}
-	return fo.Decompress(c.Path, c.Dst, files.CompressType(c.Type), c.Secret)
+	if err := preflightDecompressTool(files.CompressType(c.Type)); err != nil {
+		return err
+	}
+	taskItem, err := task.NewTask(c.Path, task.TaskExec, task.TaskScopeTask, c.TaskID, 1)
+	if err != nil {
+		return err
+	}
+	go func() {
+		taskItem.AddSubTask(c.Path, func(t *task.Task) error {
+			t.LogStart(c.Path)
+			dstExisted := fo.Stat(c.Dst)
+			parentDir := filepath.Dir(c.Dst)
+			if !fo.Stat(parentDir) {
+				if err := fo.CreateDir(parentDir, constant.DirPerm); err != nil {
+					return err
+				}
+			}
+			tempDst, err := os.MkdirTemp(parentDir, ".decompress-*")
+			if err != nil {
+				return err
+			}
+			success := false
+			defer func() {
+				_ = os.RemoveAll(tempDst)
+				if !success && !dstExisted {
+					_ = os.RemoveAll(c.Dst)
+				}
+			}()
+			if err := fo.Decompress(t.TaskCtx, c.Path, tempDst, files.CompressType(c.Type), c.Secret); err != nil {
+				return err
+			}
+			if err := fo.CreateDir(c.Dst, constant.DirPerm); err != nil {
+				return err
+			}
+			if err := cmd.NewCommandMgr(cmd.WithContext(t.TaskCtx)).RunBashCf("cp -rfp '%s'/. '%s'", tempDst, c.Dst); err != nil {
+				return err
+			}
+			success = true
+			return nil
+		}, nil)
+		_ = taskItem.Execute()
+	}()
+	return nil
 }
 
 func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, error) {

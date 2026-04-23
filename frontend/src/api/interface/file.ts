@@ -149,6 +149,11 @@ export namespace File {
         dst: string;
         type: string;
         secret: string;
+        taskID?: string;
+    }
+
+    export interface FileDeCompressStopReq {
+        taskID: string;
     }
 
     export interface FileEdit {

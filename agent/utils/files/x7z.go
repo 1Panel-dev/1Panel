@@ -19,11 +19,11 @@ func NewX7zArchiver() ShellArchiver {
 	return &X7zArchiver{}
 }
 
-func (z X7zArchiver) Extract(filePath, dstDir string, _ string) error {
+func (z X7zArchiver) Extract(ctx context.Context, filePath, dstDir string, _ string) error {
 	if err := checkCmdAvailability("7z"); err != nil {
 		return err
 	}
-	return cmd.RunDefaultBashCf("7z x -y -o%q %q", dstDir, filePath)
+	return cmd.NewCommandMgr(cmd.WithContext(ctx)).RunBashCf("7z x -y -o%q %q", dstDir, filePath)
 }
 
 func (z X7zArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, _ string) (err error) {

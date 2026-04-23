@@ -896,7 +896,7 @@ func getAppFromRepo(downloadPath string) error {
 		return err
 	}
 
-	if err := fileOp.Decompress(packagePath, global.Dir.ResourceDir, files.SdkZip, ""); err != nil {
+	if err := fileOp.Decompress(context.Background(), packagePath, global.Dir.ResourceDir, files.SdkZip, ""); err != nil {
 		return err
 	}
 	defer func() {
