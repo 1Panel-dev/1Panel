@@ -1,20 +1,37 @@
 import { DateTimeFormats } from '@intlify/core-base';
 
 export namespace Setting {
-    export interface SettingInfo {
-        userName: string;
-        password: string;
-        email: string;
-        systemIP: string;
-        systemVersion: string;
-        upgradeBackupCopies: string;
+    export interface AgentSettingInfo {
         dockerSockPath: string;
-        developerMode: string;
+        systemVersion: string;
+        systemIP: string;
 
-        sessionTimeout: number;
         localTime: string;
         timeZone: string;
         ntpSite: string;
+
+        defaultNetwork: string;
+        defaultIO: string;
+        lastCleanTime: string;
+        lastCleanSize: string;
+        lastCleanData: string;
+
+        monitorStatus: string;
+        monitorInterval: string;
+        monitorStoreDays: string;
+
+        appStoreVersion: string;
+        appStoreLastModified: string;
+        appStoreSyncStatus: string;
+
+        fileRecycleBin: string;
+    }
+    export interface SettingInfo {
+        systemVersion: string;
+        upgradeBackupCopies: string;
+        developerMode: string;
+
+        sessionTimeout: number;
 
         panelName: string;
         edition: string;
@@ -22,11 +39,6 @@ export namespace Setting {
         menuTabs: string;
         language: string;
         docSource: string;
-        defaultIO: string;
-        defaultNetwork: string;
-        lastCleanTime: string;
-        lastCleanSize: string;
-        lastCleanData: string;
 
         serverPort: number;
         ipv6: string;
@@ -39,16 +51,7 @@ export namespace Setting {
         securityEntrance: string;
         dashboardMemoVisible: string;
         dashboardSimpleNodeVisible: string;
-        expirationDays: number;
-        expirationTime: string;
         complexityVerification: string;
-        mfaStatus: string;
-        mfaSecret: string;
-        mfaInterval: string;
-
-        monitorStatus: string;
-        monitorInterval: number;
-        monitorStoreDays: number;
 
         messageType: string;
         emailVars: string;
@@ -64,11 +67,31 @@ export namespace Setting {
         proxyUser: string;
         proxyPasswd: string;
         proxyPasswdKeep: string;
+    }
+    export interface SettingBaseInfo {
+        systemVersion: string;
+        developerMode: string;
+        upgradeBackupCopies: string;
 
-        apiInterfaceStatus: string;
-        apiKey: string;
-        ipWhiteList: string;
-        apiKeyValidityTime: number;
+        port: string;
+        ipv6: string;
+        bindAddress: string;
+        panelName: string;
+        edition: string;
+        theme: string;
+        menuTabs: string;
+        language: string;
+        hideMenu: string;
+        docSource: string;
+
+        serverPort: string;
+        securityEntrance: string;
+        complexityVerification: string;
+        noAuthSetting: string;
+        proxyType: string;
+
+        dashboardMemoVisible: string;
+        dashboardSimpleNodeVisible: string;
     }
     export interface TerminalInfo {
         lineHeight: string;
@@ -113,12 +136,6 @@ export namespace Setting {
         proxyPasswdKeep: string;
         withDockerRestart: boolean;
     }
-    export interface ApiConfig {
-        apiInterfaceStatus: string;
-        apiKey: string;
-        ipWhiteList: string;
-        apiKeyValidityTime: number;
-    }
     export interface SSLUpdate {
         ssl: string;
         domain: string;
@@ -141,19 +158,6 @@ export namespace Setting {
     }
     export interface PortUpdate {
         serverPort: number;
-    }
-    export interface MFARequest {
-        title: string;
-        interval: number;
-    }
-    export interface MFAInfo {
-        secret: string;
-        qrImage: string;
-    }
-    export interface MFABind {
-        secret: string;
-        code: string;
-        interval: string;
     }
     export interface PasskeyRegisterRequest {
         name: string;

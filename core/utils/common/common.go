@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -52,25 +53,6 @@ func Md5(val string) string {
 	hash := md5.New()
 	hash.Write([]byte(val))
 	return hex.EncodeToString(hash.Sum(nil))
-}
-
-func LoadTimeZoneByCmd() string {
-	loc := time.Now().Location().String()
-	if _, err := time.LoadLocation(loc); err != nil {
-		loc = "Asia/Shanghai"
-	}
-	std, err := cmd.RunDefaultWithStdoutBashC("timedatectl | grep 'Time zone'")
-	if err != nil {
-		return loc
-	}
-	fields := strings.Fields(string(std))
-	if len(fields) != 5 {
-		return loc
-	}
-	if _, err := time.LoadLocation(fields[2]); err != nil {
-		return loc
-	}
-	return fields[2]
 }
 
 func ScanPort(port int) bool {
@@ -143,6 +125,25 @@ func SplitStr(str string, spi ...string) []string {
 		lists = results
 	}
 	return results
+}
+
+func UniqueUints(items []uint) []uint {
+	result := make([]uint, 0, len(items))
+	seen := make(map[uint]struct{}, len(items))
+	for _, item := range items {
+		if item == 0 {
+			continue
+		}
+		if _, ok := seen[item]; ok {
+			continue
+		}
+		seen[item] = struct{}{}
+		result = append(result, item)
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i] < result[j]
+	})
+	return result
 }
 
 func LoadArch() (string, error) {

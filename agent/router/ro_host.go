@@ -39,9 +39,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/firewall/filter/chain/status", baseApi.LoadChainStatus)
 
 		hostRouter.POST("/monitor/search", baseApi.LoadMonitor)
-		hostRouter.POST("/monitor/gpu/search", baseApi.LoadGPUMonitor)
 		hostRouter.POST("/monitor/clean", baseApi.CleanMonitor)
-		hostRouter.GET("/monitor/gpuoptions", baseApi.GetCPUOptions)
 		hostRouter.GET("/monitor/netoptions", baseApi.GetNetworkOptions)
 		hostRouter.GET("/monitor/iooptions", baseApi.GetIOOptions)
 		hostRouter.GET("/monitor/setting", baseApi.LoadMonitorSetting)
@@ -69,7 +67,9 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.GET("/tool/supervisor/process", baseApi.GetProcess)
 		hostRouter.POST("/tool/supervisor/process/file", baseApi.GetProcessFile)
 
-		hostRouter.GET("/terminal", baseApi.WsSSH)
+		hostRouter.GET("/terminal/local", baseApi.WsLocalTerminal)
+		hostRouter.GET("/terminal/ssh", baseApi.WsHostSSH)
+		hostRouter.GET("/terminal/container", baseApi.WsContainerTerminal)
 
 		hostRouter.GET("/disks", baseApi.GetCompleteDiskInfo)
 		hostRouter.POST("/disks/partition", baseApi.PartitionDisk)

@@ -1,29 +1,38 @@
 import router from '@/routers';
 import { TabsStore } from '@/store';
+import { hasRouteAccess } from '@/utils/rbac';
+import i18n from '@/lang';
+import { MsgError } from '@/utils/message';
+import type { RouteLocationRaw } from 'vue-router';
+
+const pushWithAccessCheck = async (to: RouteLocationRaw) => {
+    const resolvedRoute = router.resolve(to);
+    if (!hasRouteAccess(resolvedRoute)) {
+        MsgError(i18n.global.t('commons.res.forbidden'));
+        return;
+    }
+    await router.push(to);
+    tabStoreMiddleWare();
+};
 
 export const routerToName = async (name: string) => {
-    await router.push({ name: name });
-    tabStoreMiddleWare();
+    await pushWithAccessCheck({ name: name });
 };
 
 export const routerToPath = async (path: string) => {
-    await router.push({ path: path });
-    tabStoreMiddleWare();
+    await pushWithAccessCheck({ path: path });
 };
 
 export const routerToFileWithPath = async (pathItem: string) => {
-    await router.push({ name: 'File', query: { path: pathItem, uncached: 'true' } });
-    tabStoreMiddleWare();
+    await pushWithAccessCheck({ name: 'File', query: { path: pathItem, uncached: 'true' } });
 };
 
 export const routerToNameWithQuery = async (name: string, query: any) => {
-    await router.push({ name: name, query: query });
-    tabStoreMiddleWare();
+    await pushWithAccessCheck({ name: name, query: query });
 };
 
 export const routerToPathWithQuery = async (path: string, query: any) => {
-    await router.push({ path: path, query: query });
-    tabStoreMiddleWare();
+    await pushWithAccessCheck({ path: path, query: query });
 };
 
 export const jumpToPath = (router: any, path: string) => {
@@ -31,8 +40,7 @@ export const jumpToPath = (router: any, path: string) => {
 };
 
 export const routerToNameWithParams = async (name: string, params: any) => {
-    await router.push({ name: name, params: params });
-    tabStoreMiddleWare();
+    await pushWithAccessCheck({ name: name, params: params });
 };
 
 const tabStoreMiddleWare = () => {

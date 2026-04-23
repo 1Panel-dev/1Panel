@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getSettingInfo } from '@/api/modules/setting';
+import { getSettingBaseInfo } from '@/api/modules/setting';
 import { searchXpackSetting } from '@/extensions/xpack';
 
 const open = ref(false);
@@ -49,7 +49,7 @@ const acceptParams = async (props: DialogProps): Promise<void> => {
         return;
     }
     try {
-        const res = await getSettingInfo();
+        const res = await getSettingBaseInfo();
         if (res.data.proxyType === '' || res.data.proxyType === 'close') {
             emit();
             return;

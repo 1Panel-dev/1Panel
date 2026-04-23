@@ -21,7 +21,6 @@ const homeRouter: RouteRecordRaw = {
             name: 'home',
             component: () => import('@/views/home/index.vue'),
             meta: {
-                requiresAuth: true,
                 keepAlive: true,
             },
         },
@@ -70,17 +69,22 @@ export const routes: RouteRecordRaw[] = [
         props: true,
         component: () => import('@/views/login/index.vue'),
         meta: {
-            requiresAuth: false,
             key: 'login',
+        },
+    },
+    {
+        path: '/xpack-ee/license-required',
+        name: 'XpackEELicenseRequired',
+        component: () => import('@/views/setting/license-required/index.vue'),
+        meta: {
+            key: 'xpack-ee-license-required',
         },
     },
     {
         path: '/s/:code',
         name: 'file-share',
         component: () => import('@/views/share/index.vue'),
-        meta: {
-            requiresAuth: false,
-        },
+        meta: {},
     },
     {
         path: '/:code?',

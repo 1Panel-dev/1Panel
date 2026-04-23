@@ -68,7 +68,7 @@ const initTerm = async () => {
     terminalOpen.value = true;
     await nextTick();
     terminalRef.value!.acceptParams({
-        endpoint: '/api/v2/containers/exec',
+        endpoint: '/api/v2/hosts/terminal/container',
         args: `source=container&containerid=${form.containerID}&user=${form.user}&command=${form.command}`,
         error: '',
         initCmd: '',

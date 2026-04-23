@@ -7,8 +7,36 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/global"
 	"gorm.io/gorm"
 )
+
+func UpsertMenuByLabel(children []dto.ShowMenu, newMenu dto.ShowMenu, afterLabel string) []dto.ShowMenu {
+	for i := range children {
+		if children[i].Label != newMenu.Label {
+			continue
+		}
+		children[i].Disabled = newMenu.Disabled
+		children[i].Title = newMenu.Title
+		children[i].Path = newMenu.Path
+		children[i].Sort = newMenu.Sort
+		children[i].IsShow = newMenu.IsShow
+		return children
+	}
+
+	insertIndex := len(children)
+	for i := range children {
+		if children[i].Label == afterLabel {
+			insertIndex = i + 1
+			break
+		}
+	}
+
+	children = append(children, dto.ShowMenu{})
+	copy(children[insertIndex+1:], children[insertIndex:])
+	children[insertIndex] = newMenu
+	return children
+}
 
 func LoadMenus() string {
 	item := []dto.ShowMenu{
@@ -56,6 +84,23 @@ func LoadMenus() string {
 		{ID: "12", Disabled: false, Title: "menu.logs", IsShow: true, Label: "Log-Menu", Path: "/logs", Sort: 1200},
 		{ID: "13", Disabled: true, Title: "menu.settings", IsShow: true, Label: "Setting-Menu", Path: "/settings", Sort: 1300},
 	}
+	if global.CONF.Base.IsXpackEE {
+		for i := range item {
+			if item[i].Label != "Xpack-Menu" {
+				continue
+			}
+			item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
+				ID:       "121",
+				Disabled: false,
+				Title:    "xpack.user.userManage",
+				IsShow:   true,
+				Label:    "UserManagement",
+				Path:     "/xpack-ee/users",
+				Sort:     350,
+			}, "NodeDashboard")
+			break
+		}
+	}
 	menu, _ := json.Marshal(item)
 	return string(menu)
 }
@@ -89,6 +134,8 @@ func MenuSort() []dto.MenuLabelSort {
 		{Label: "XApp", Sort: 100},
 		{Label: "Dashboard", Sort: 200},
 		{Label: "Node", Sort: 300},
+		{Label: "NodeDashboard", Sort: 300},
+		{Label: "UserManagement", Sort: 350},
 		{Label: "Upage", Sort: 400},
 		{Label: "MonitorDashboard", Sort: 500},
 		{Label: "Tamper", Sort: 600},

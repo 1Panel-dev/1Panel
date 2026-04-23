@@ -32,27 +32,6 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 }
 
 // @Tags Monitor
-// @Summary Load monitor data
-// @Param request body dto.MonitorGPUSearch true "request"
-// @Success 200 {object} dto.MonitorGPUData
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /hosts/monitor/gpu/search [post]
-func (b *BaseApi) LoadGPUMonitor(c *gin.Context) {
-	var req dto.MonitorGPUSearch
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	data, err := monitorService.LoadGPUMonitorData(req)
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, data)
-}
-
-// @Tags Monitor
 // @Summary Clean monitor data
 // @Success 200
 // @Security ApiKeyAuth
@@ -125,8 +104,4 @@ func (b *BaseApi) GetIOOptions(c *gin.Context) {
 	}
 	sort.Strings(options)
 	helper.SuccessWithData(c, options)
-}
-
-func (b *BaseApi) GetCPUOptions(c *gin.Context) {
-	helper.SuccessWithData(c, monitorService.LoadGPUOptions())
 }

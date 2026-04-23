@@ -98,7 +98,7 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 	if err := backupRepo.Create(&backup); err != nil {
 		return err
 	}
-	if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+	if err := xpack.MultiNodeProvider.Sync(constant.SyncBackupAccounts); err != nil {
 		global.LOG.Errorf("sync backup account to node failed, err: %v", err)
 	}
 	return nil
@@ -119,7 +119,7 @@ func (u *BackupService) Delete(name string) error {
 		global.LOG.Errorf("check used of local cronjob failed, err: %v", err)
 		return buserr.New("ErrBackupInUsed")
 	}
-	if err := xpack.CheckBackupUsed(name); err != nil {
+	if err := xpack.MultiNodeProvider.CheckBackupUsed(name); err != nil {
 		global.LOG.Errorf("check used of node cronjob failed, err: %v", err)
 		return buserr.New("ErrBackupInUsed")
 	}
@@ -127,7 +127,7 @@ func (u *BackupService) Delete(name string) error {
 	if err := backupRepo.Delete(repo.WithByName(name)); err != nil {
 		return err
 	}
-	if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+	if err := xpack.MultiNodeProvider.Sync(constant.SyncBackupAccounts); err != nil {
 		global.LOG.Errorf("sync backup account to node failed, err: %v", err)
 	}
 	return nil
@@ -176,7 +176,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	if err := backupRepo.Save(&newBackup); err != nil {
 		return err
 	}
-	if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+	if err := xpack.MultiNodeProvider.Sync(constant.SyncBackupAccounts); err != nil {
 		global.LOG.Errorf("sync backup account to node failed, err: %v", err)
 	}
 	return nil
@@ -218,7 +218,7 @@ func (u *BackupService) RefreshToken(req dto.OperateByName) error {
 	if err := backupRepo.Save(&backup); err != nil {
 		return err
 	}
-	if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+	if err := xpack.MultiNodeProvider.Sync(constant.SyncBackupAccounts); err != nil {
 		global.LOG.Errorf("sync backup account to node failed, err: %v", err)
 	}
 	return nil

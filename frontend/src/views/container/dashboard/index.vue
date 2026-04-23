@@ -196,7 +196,7 @@
 <script lang="ts" setup>
 import { containerItemStats, containerPrune, loadContainerStatus, loadDaemonJson } from '@/api/modules/container';
 import DockerStatus from '@/views/container/docker-status/index.vue';
-import { getSettingInfo } from '@/api/modules/setting';
+import { getAgentSettingInfo } from '@/api/modules/setting';
 import { computeSize2 } from '@/utils/size';
 import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
@@ -291,7 +291,7 @@ const loadContainerSetting = async () => {
     const res = await loadDaemonJson();
     countItem.mirrors = res.data.registryMirrors || [];
 
-    const settingRes = await getSettingInfo();
+    const settingRes = await getAgentSettingInfo();
     countItem.sockPath = settingRes.data.dockerSockPath || 'unix:///var/run/docker.sock';
 };
 

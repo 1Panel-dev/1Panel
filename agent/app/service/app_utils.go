@@ -1178,7 +1178,7 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 			if err != nil {
 				return err
 			}
-			imagePrefix := xpack.GetImagePrefix()
+			imagePrefix := xpack.MultiNodeProvider.GetImagePrefix()
 			dockerCLi, err := docker.NewClient()
 			if err != nil {
 				return err
@@ -1778,7 +1778,7 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 	if !serviceValid {
 		return buserr.New("ErrFileParse")
 	}
-	imagePreFix := xpack.GetImagePrefix()
+	imagePreFix := xpack.MultiNodeProvider.GetImagePrefix()
 	if imagePreFix != "" {
 		for _, service := range services {
 			serviceValue := service.(map[string]interface{})

@@ -15,6 +15,7 @@ import (
 	initauth "github.com/1Panel-dev/1Panel/core/init/auth"
 	"github.com/1Panel-dev/1Panel/core/utils/captcha"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
 
@@ -58,7 +59,7 @@ func (b *BaseApi) Login(c *gin.Context) {
 		}
 	}
 
-	user, msgKey, err := authService.Login(c, req, string(entrance))
+	user, msgKey, err := xpack.AuthProvider.Login(c, req, string(entrance))
 	if user == nil || user.MfaStatus != constant.StatusEnable {
 		go saveLoginLogs(c, wrapLoginErr(msgKey, err))
 	}
@@ -106,7 +107,7 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 		entrance, _ = base64.StdEncoding.DecodeString(entranceItem)
 	}
 
-	user, msgKey, err := authService.MFALogin(c, req, string(entrance))
+	user, msgKey, err := xpack.AuthProvider.MFALogin(c, req, string(entrance))
 	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
 	if msgKey == "ErrMFA" {
 		global.IPTracker.RecordFailure(ip)
@@ -134,7 +135,7 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 // @Router /core/auth/passkey/begin [post]
 func (b *BaseApi) PasskeyBeginLogin(c *gin.Context) {
 	entrance := loadEntranceFromRequest(c)
-	res, msgKey, err := authService.PasskeyBeginLogin(c, entrance)
+	res, msgKey, err := xpack.AuthProvider.PasskeyBeginLogin(c, entrance)
 	if msgKey != "" {
 		if msgKey == "ErrEntrance" {
 			helper.BadAuth(c, msgKey, err)
@@ -161,7 +162,7 @@ func (b *BaseApi) PasskeyBeginLogin(c *gin.Context) {
 func (b *BaseApi) PasskeyFinishLogin(c *gin.Context) {
 	sessionID := c.GetHeader("Passkey-Session")
 	entrance := loadEntranceFromRequest(c)
-	user, msgKey, err := authService.PasskeyFinishLogin(c, sessionID, entrance)
+	user, msgKey, err := xpack.AuthProvider.PasskeyFinishLogin(c, sessionID, entrance)
 	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
 	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
 		if msgKey == "ErrAuth" {
@@ -248,8 +249,216 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 		Theme:       settingInfo.Theme,
 		NeedCaptcha: needCaptcha,
 	}
-	res.PasskeySetting = authService.PasskeyStatus(c)
+	res.PasskeySetting = xpack.AuthProvider.PasskeyStatus(c)
 	helper.SuccessWithData(c, res)
+}
+
+// @Tags Auth
+// @Summary Begin passkey registration
+// @Accept json
+// @Param request body dto.PasskeyRegisterRequest true "request"
+// @Success 200 {object} dto.PasskeyBeginResponse
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/passkey/register/begin [post]
+func (b *BaseApi) PasskeyRegisterBegin(c *gin.Context) {
+	var req dto.PasskeyRegisterRequest
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, msgKey, err := xpack.AuthProvider.PasskeyBeginRegister(c, req.Name)
+	if msgKey != "" {
+		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
+		return
+	}
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Auth
+// @Summary Finish passkey registration
+// @Accept json
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/passkey/register/finish [post]
+func (b *BaseApi) PasskeyRegisterFinish(c *gin.Context) {
+	sessionID := c.GetHeader("Passkey-Session")
+	msgKey, err := xpack.AuthProvider.PasskeyFinishRegister(c, sessionID)
+	if msgKey != "" {
+		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
+		return
+	}
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Auth
+// @Summary List passkeys
+// @Success 200 {array} dto.PasskeyInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/passkey/list [get]
+func (b *BaseApi) PasskeyList(c *gin.Context) {
+	list, err := xpack.AuthProvider.PasskeyList(c)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags Auth
+// @Summary Delete passkey
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/passkey/del [post]
+func (b *BaseApi) PasskeyDelete(c *gin.Context) {
+	var req dto.PasskeyID
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := xpack.AuthProvider.PasskeyDelete(c, req.ID); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags System Setting
+// @Summary Load mfa info
+// @Accept json
+// @Param request body dto.MfaCredential true "request"
+// @Success 200 {object} mfa.Otp
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/mfa [post]
+func (b *BaseApi) LoadMFA(c *gin.Context) {
+	var req dto.MfaRequest
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	otp, err := xpack.AuthProvider.LoadMFA(c, req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	helper.SuccessWithData(c, otp)
+}
+
+// @Tags System Setting
+// @Summary Bind mfa
+// @Accept json
+// @Param request body dto.MfaCredential true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/mfa/bind [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"mfa 绑定","formatEN":"bind mfa"}
+func (b *BaseApi) MFABind(c *gin.Context) {
+	var req dto.MfaCredential
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := xpack.AuthProvider.MFABind(c, req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	helper.Success(c)
+}
+
+// @Tags Auth
+// @Summary generate api key
+// @Accept json
+// @Success 200 {string} key
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/api/generate [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"生成 API 接口密钥","formatEN":"generate api key"}
+func (b *BaseApi) GenerateApiKey(c *gin.Context) {
+	panelToken := c.GetHeader("1Panel-Token")
+	if panelToken != "" {
+		helper.BadAuth(c, "ErrApiConfigDisable", nil)
+		return
+	}
+	apiKey, err := xpack.AuthProvider.GenerateApiKey(c)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, apiKey)
+}
+
+// @Tags Auth
+// @Summary Update api config
+// @Accept json
+// @Param request body dto.ApiInterfaceConfig true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/api/update [post]
+// @x-panel-log {"bodyKeys":["ipWhiteList"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 API 接口配置 => IP 白名单: [ipWhiteList]","formatEN":"update api config => IP White List: [ipWhiteList]"}
+func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
+	panelToken := c.GetHeader("1Panel-Token")
+	if panelToken != "" {
+		helper.BadAuth(c, "ErrApiConfigDisable", nil)
+		return
+	}
+	var req dto.ApiInterfaceConfig
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := xpack.AuthProvider.UpdateApiConfig(c, req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Auth
+// @Summary Load current user info
+// @Success 200 {object} dto.CurrentUserInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/current [get]
+func (b *BaseApi) GetCurrentUser(c *gin.Context) {
+	userInfo, err := xpack.AuthProvider.GetCurrentUserInfo(c)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, userInfo)
+}
+
+// @Tags Auth
+// @Summary Update current user info
+// @Accept json
+// @Param request body dto.CurrentUserUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/current/update [post]
+func (b *BaseApi) UpdateCurrentUser(c *gin.Context) {
+	var req dto.CurrentUserUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := xpack.AuthProvider.UpdateCurrentUserInfo(c, req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
 }
 
 func saveLoginLogs(c *gin.Context, err error) {

@@ -501,7 +501,7 @@ func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {
 		Body:    i18n.GetMsgByKey("TestAlert"),
 		IsHTML:  false,
 	}
-	transport := xpack.LoadRequestTransport()
+	transport := xpack.MultiNodeProvider.LoadRequestTransport()
 	if err := email.SendMail(cfg, msg, transport); err != nil {
 		return false, err
 	}

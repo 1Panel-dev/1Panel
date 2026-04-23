@@ -3,14 +3,13 @@ package router
 import (
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
-	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	psessionUtils "github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
@@ -48,7 +47,7 @@ func Proxy() gin.HandlerFunc {
 			return
 		}
 
-		xpack.Proxy(c, currentNode)
+		xpack.MultiNodeProvider.Proxy(c, currentNode)
 		c.Abort()
 	}
 }
@@ -58,18 +57,13 @@ func checkSession(c *gin.Context) bool {
 	if err != nil {
 		return false
 	}
-	settingRepo := repo.NewISettingRepo()
-	sessionTimeout, err := settingRepo.GetValueByKey("SessionTimeout")
+	c.Set(psessionUtils.GinContextSessionUserKey, psession)
+	lifeTime, err := xpack.AuthProvider.LoadSessionTimeout(c, psession)
 	if err != nil {
+		global.LOG.Errorf("get session timeout failed, err: %v", err)
 		return false
 	}
-	lifeTime, _ := strconv.Atoi(sessionTimeout)
-	lifeTime = xpack.LoadSessionTimeout(psession, lifeTime)
-	ssl, err := settingRepo.GetValueByKey("SSL")
-	if err != nil {
-		return false
-	}
-	if _, err := global.SESSION.RefreshIfNeeded(c, psession, ssl == constant.StatusEnable, lifeTime); err != nil {
+	if _, err := global.SESSION.RefreshIfNeeded(c, psession, global.CONF.Conn.SSL == constant.StatusEnable, lifeTime); err != nil {
 		global.LOG.Warnf("proxy refresh session failed, path=%s, err=%v", c.Request.URL.Path, err)
 		return false
 	}

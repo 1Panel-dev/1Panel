@@ -256,8 +256,8 @@
                                                 baseInfo.prettyDistro
                                                     ? baseInfo.prettyDistro
                                                     : baseInfo.platformVersion
-                                                    ? baseInfo.platform + '-' + baseInfo.platformVersion
-                                                    : baseInfo.platform
+                                                      ? baseInfo.platform + '-' + baseInfo.platformVersion
+                                                      : baseInfo.platform
                                             }}
                                         </el-descriptions-item>
                                         <el-descriptions-item
@@ -442,7 +442,7 @@ import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
 import {
-    getSettingInfo,
+    getSettingBaseInfo,
     getAgentSettingInfo,
     listAllSimpleNodes,
     loadUpgradeInfo,
@@ -830,8 +830,8 @@ const handleCopy = () => {
         (baseInfo.value.prettyDistro
             ? baseInfo.value.prettyDistro
             : baseInfo.value.platformVersion
-            ? baseInfo.value.platform + '-' + baseInfo.value.platformVersion
-            : baseInfo.value.platform) +
+              ? baseInfo.value.platform + '-' + baseInfo.value.platformVersion
+              : baseInfo.value.platform) +
         '\n' +
         i18n.global.t('home.kernelVersion') +
         ': ' +
@@ -963,7 +963,7 @@ const loadSettingInfo = async () => {
     const memoCache = getDashboardCache('memoCarouselSetting');
     const simpleNodeCache = getDashboardCache('simpleNodeCarouselSetting');
     if (safeCache === null || memoCache === null || simpleNodeCache === null) {
-        const res = await getSettingInfo();
+        const res = await getSettingBaseInfo();
         isSafety.value = res.data.securityEntrance;
         memoCarouselSetting.value = res.data.dashboardMemoVisible;
         simpleNodeCarouselSetting.value = res.data.dashboardSimpleNodeVisible;

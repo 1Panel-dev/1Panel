@@ -66,7 +66,7 @@
 <script setup lang="ts">
 import MarkDownEditor from '@/components/mkdown-editor/index.vue';
 
-import { getSettingInfo, listReleases, updateSetting } from '@/api/modules/setting';
+import { getSettingBaseInfo, listReleases, updateSetting } from '@/api/modules/setting';
 import { ref } from 'vue';
 import { GlobalStore } from '@/store';
 import { FormInstance } from 'element-plus';
@@ -101,7 +101,7 @@ const acceptParams = (): void => {
 };
 
 const loadInfo = async () => {
-    const res = await getSettingInfo();
+    const res = await getSettingBaseInfo();
     form.version = res.data.systemVersion;
     form.backupCopies = Number(res.data.upgradeBackupCopies) || 0;
 };

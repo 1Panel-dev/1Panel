@@ -54,8 +54,6 @@ AppInstallCheck: 'Verificar entorno de instalación de aplicación'
 
 # backup
 ErrBackupInUsed: 'Cuenta de respaldo en uso por tarea programada'
-ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
-ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
 ErrBackupCheck: 'Conexión de respaldo falló: {{ .err }}'
 ErrBackupLocal: "La cuenta de respaldo del servidor local no admite esta operación"
 ErrBackupPublic: "Se detectó que esta cuenta de respaldo no es pública, verifique e intente de nuevo"
@@ -75,6 +73,7 @@ ErrXpackNotFound: "Esta sección requiere la edición Pro. Importa una licencia 
 ErrXpackExceptional: "Esta sección requiere la edición Pro. Sincroniza el estado de la licencia en Configuración del panel > Licencia."
 ErrXpackOutOfDate: "La licencia actual ha expirado, importe nuevamente la licencia en Panel > Ajustes > Licencia"
 ErrXpackLost: "La licencia alcanzó el límite de reintentos. Ve a Configuración del panel > Licencia y ejecuta una sincronización manual."
+ErrXpackEELicenseRequired: "La licencia de la edición Enterprise no se ha importado. Importa primero una licencia."
 ErrDeviceLost: "Faltan archivos necesarios para la verificación de licencia, verifique e intente de nuevo"
 ErrDeviceErr: "El entorno actual no coincide con el entorno de importación de la licencia. Edite la licencia e impórtela de nuevo"
 ErrXpackTimeout: "Tiempo de espera de la solicitud, puede que la conexión de red sea inestable, intente más tarde"
@@ -90,6 +89,20 @@ ErrNodeUnbind: "Este nodo no está dentro del rango de vinculación de la licenc
 ErrNodeBind: "Este nodo ya está vinculado a una licencia, verifique e intente de nuevo"
 ErrNodeLocalRollback: "El nodo principal no admite la reversión directa. Ejecuta manualmente '1pctl restore' para revertir."
 ErrIntlLicense: "La versión actual aún no admite importar licencias de la edición internacional. Próximamente"
+
+# user
+ErrNoSuchUser: "No se encontró la información del usuario. Verifique e intente de nuevo."
+ErrToMaster: "Este usuario no tiene permiso para realizar esta operación en el nodo principal. Verifique e intente de nuevo."
+ErrToNode: "Este usuario no tiene permiso para realizar esta operación en este nodo. Verifique e intente de nuevo."
+ErrRBAC: "Permisos de usuario insuficientes. No se puede realizar esta operación. Verifique e intente de nuevo."
+ErrNoneNode: "Este usuario no tiene permisos sobre ningún nodo. Contacte al administrador o verifique e intente de nuevo."
+ErrOnlySuperAdmin: "Solo los superadministradores pueden usar esta función."
+ErrRolePresetCannotDelete: "No se pueden eliminar los roles predefinidos del sistema"
+ErrRolePresetCannotUpdate: "No se pueden actualizar los roles predefinidos del sistema"
+ErrRoleBoundToUser: "Este rol ya está vinculado a usuarios y no se puede eliminar"
+ErrRolePresetCannotBind: "Los roles predefinidos del sistema no se pueden asignar a usuarios"
+ErrSuperAdminCannotDelete: "No se pueden eliminar usuarios superadministradores"
+
 InvalidRequestBodyType: "Formato del cuerpo de la solicitud no válido, por favor revisa y asegúrate de que el contenido cumpla con el formato requerido antes de reintentar."
 InvalidLicenseCodeType: "Formato de código de licencia no válido, por favor revisa e inténtalo de nuevo."
 LicenseNotFoundType: "Licencia no encontrada, no existe ningún registro coincidente en el sistema para la licencia proporcionada. Por favor revisa e inténtalo de nuevo."

@@ -42,8 +42,17 @@ frontend/components.d.ts
 frontend/src/xpack
 frontend/src/xpack-ee
 agent/xpack
+agent/router/entry_xpack.go
+agent/server/init_xpack.go
+agent/utils/xpack/xpack.go
 core/xpack
 core/xpack-ee
+core/router/entry_xpack.go
+core/router/entry_xpackee.go
+core/server/init_xpack.go
+core/server/init_xpackee.go
+core/utils/xpack/xpack.go
+core/utils/xpack/xpackee.go
 
 .history/
 dist/
