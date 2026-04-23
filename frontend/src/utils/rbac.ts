@@ -1,20 +1,68 @@
-import { getAuthInfo } from '@/api/modules/auth';
+import { getUserInfo } from '@/api/modules/auth';
+import { getXpackeeUserInfo } from '@/extensions/xpack';
 import { GlobalStore } from '@/store';
+import type { RouteMeta } from 'vue-router';
 
-export const syncAuthInfo = async () => {
+type RouteAccessMeta = {
+    adminOnly?: boolean;
+    protectedRoleOnly?: boolean;
+};
+
+type RouteAccessTarget = {
+    matched: Array<{
+        meta?: RouteMeta & {
+            permission?: string;
+        };
+    }>;
+};
+
+export const syncAuthInfo = async (currentNode?: string) => {
     const globalStore = GlobalStore();
     if (!globalStore.isXpackEE) {
-        return;
+        const res = await getUserInfo();
+        return res.data;
     }
-    const res = await getAuthInfo();
+    const res = await getXpackeeUserInfo(currentNode ?? globalStore.currentNode);
     globalStore.setAuthInfo({
         isAdmin: res.data.role === 'ADMIN',
         permissions: res.data.permissions || [],
-        nodeScopes: res.data.nodeScopes || [],
         nodeRoles: res.data.nodeRoles || [],
     });
+    return res.data;
 };
 
 export const hasPermission = (permission: string) => {
     return GlobalStore().hasPermission(permission);
+};
+
+export const hasRouteRoleAccess = (meta?: RouteMeta & RouteAccessMeta) => {
+    const globalStore = GlobalStore();
+    if (!meta) {
+        return true;
+    }
+    if (globalStore.isAdmin) {
+        return true;
+    }
+    if (meta.adminOnly && !globalStore.isAdmin) {
+        return false;
+    }
+    if (meta.protectedRoleOnly) {
+        return globalStore.isNodeAdmin;
+    }
+    return true;
+};
+
+export const hasRoutePermissionAccess = (route: RouteAccessTarget) => {
+    const requiredPermissions = [
+        ...new Set(
+            route.matched
+                .map((record) => record.meta?.permission)
+                .filter((permission): permission is string => !!permission),
+        ),
+    ];
+    return requiredPermissions.every((permission) => hasPermission(permission));
+};
+
+export const hasRouteAccess = (route: RouteAccessTarget) => {
+    return route.matched.every((record) => hasRouteRoleAccess(record.meta)) && hasRoutePermissionAccess(route);
 };

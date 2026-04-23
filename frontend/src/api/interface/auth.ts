@@ -48,15 +48,46 @@ export namespace Login {
     export interface AuthInfo {
         id: number;
         name: string;
+        sessionTimeout: number;
+        expirationDays: number;
+        expirationTime: string;
+        mfaStatus: string;
+        mfaInterval: number;
         role: string;
         permissions: string[];
-        nodeScopes: number[];
         nodeRoles: Array<{ nodeId: number; nodeName: string; roleId: number; roleName: string }>;
+
+        apiInterfaceStatus: string;
+        apiKey: string;
+        ipWhiteList: string;
+        apiKeyValidityTime: number;
     }
     export interface AuthInfoUpdate {
         id: number;
+        name: string;
+        password: string;
         oldPassword: string;
-        newPassword: string;
-        retryPassword: string;
+        sessionTimeout: number;
+        expirationDays: number;
+        expirationTime: string;
+    }
+    export interface MFARequest {
+        title: string;
+        interval: number;
+    }
+    export interface MFAInfo {
+        secret: string;
+        qrImage: string;
+    }
+    export interface MFABind {
+        secret: string;
+        code: string;
+        interval: string;
+    }
+    export interface ApiConfig {
+        apiInterfaceStatus: string;
+        apiKey: string;
+        ipWhiteList: string;
+        apiKeyValidityTime: number;
     }
 }

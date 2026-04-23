@@ -8,22 +8,18 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"strconv"
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/core/app/auth"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
-	initauth "github.com/1Panel-dev/1Panel/core/init/auth"
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
-	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
-	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/1Panel-dev/1Panel/core/utils/passkey"
-	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -35,9 +31,7 @@ type AuthService struct{}
 type IAuthService interface {
 	GetResponsePage() (string, error)
 	VerifyCode(code string) (bool, error)
-	Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, string, error)
 	LogOut(c *gin.Context) error
-	MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, string, error)
 	PasskeyBeginLogin(c *gin.Context, entrance string) (*dto.PasskeyBeginResponse, string, error)
 	PasskeyFinishLogin(c *gin.Context, sessionID, entrance string) (*dto.UserLoginInfo, string, error)
 	PasskeyBeginRegister(c *gin.Context, name string) (*dto.PasskeyBeginResponse, string, error)
@@ -51,104 +45,6 @@ type IAuthService interface {
 
 func NewIAuthService() IAuthService {
 	return &AuthService{}
-}
-
-func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, string, error) {
-	nameSetting, err := settingRepo.Get(repo.WithByKey("UserName"))
-	if err != nil {
-		return nil, "", buserr.New("ErrRecordNotFound")
-	}
-	if nameSetting.Value != info.Name {
-		return xpack.Login(c, info, entrance)
-	}
-	if err = checkPassword(info.Password); err != nil {
-		return nil, "ErrAuth", err
-	}
-	entranceSetting, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
-	if err != nil {
-		return nil, "", err
-	}
-	if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
-		return nil, "ErrEntrance", buserr.New("ErrEntrance")
-	}
-	mfa, err := settingRepo.Get(repo.WithByKey("MFAStatus"))
-	if err != nil {
-		return nil, "", err
-	}
-	if err = settingRepo.Update("Language", info.Language); err != nil {
-		return nil, "", err
-	}
-	if mfa.Value == constant.StatusEnable {
-		ip := common.GetRealClientIP(c)
-		mfaSession := initauth.GetMFASessionStore().Set(nameSetting.Value, entrance, ip)
-		return &dto.UserLoginInfo{Name: nameSetting.Value, MfaStatus: mfa.Value, MfaSession: mfaSession}, "", nil
-	}
-	res, err := u.generateSession(c, info.Name)
-	if err != nil {
-		return nil, "", err
-	}
-	if entrance != "" {
-		SetSecurityEntranceCookie(c, entrance)
-	}
-	return res, "", nil
-}
-
-func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, string, error) {
-	mfaSessions := initauth.GetMFASessionStore()
-	session, ok := mfaSessions.Get(info.SessionID)
-	if !ok {
-		return nil, "ErrMFA", nil
-	}
-	if session.IP != common.GetRealClientIP(c) {
-		return nil, "ErrMFA", nil
-	}
-	if session.Entrance != entrance {
-		return nil, "", buserr.New("ErrEntrance")
-	}
-	mfaSecret, err := settingRepo.Get(repo.WithByKey("MFASecret"))
-	if err != nil {
-		return nil, "", err
-	}
-	mfaInterval, err := settingRepo.Get(repo.WithByKey("MFAInterval"))
-	if err != nil {
-		return nil, "", err
-	}
-	success := mfa.ValidCode(info.Code, mfaInterval.Value, mfaSecret.Value)
-	if !success {
-		return nil, "ErrMFA", nil
-	}
-	res, err := u.generateSession(c, session.Name)
-	if err != nil {
-		return nil, "", err
-	}
-	mfaSessions.Delete(info.SessionID)
-	if entrance != "" {
-		SetSecurityEntranceCookie(c, entrance)
-	}
-	return res, "", nil
-}
-
-func (u *AuthService) generateSession(c *gin.Context, name string) (*dto.UserLoginInfo, error) {
-	setting, err := settingRepo.Get(repo.WithByKey("SessionTimeout"))
-	if err != nil {
-		return nil, err
-	}
-	httpsSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
-	if err != nil {
-		return nil, err
-	}
-	lifeTime, err := strconv.Atoi(setting.Value)
-	if err != nil {
-		return nil, err
-	}
-
-	sessionUser := psession.SessionUser{ID: psession.SuperAdminSessionUserID, Name: name, Role: "ADMIN"}
-	lifeTime = xpack.LoadSessionTimeout(sessionUser, lifeTime)
-	if err := global.SESSION.SetFresh(c, sessionUser, httpsSetting.Value == constant.StatusEnable, lifeTime); err != nil {
-		return nil, err
-	}
-
-	return &dto.UserLoginInfo{Name: name, Role: "ADMIN"}, nil
 }
 
 func (u *AuthService) LogOut(c *gin.Context) error {
@@ -304,7 +200,8 @@ func (u *AuthService) PasskeyFinishLogin(c *gin.Context, sessionID, entrance str
 	if err != nil {
 		return nil, "", err
 	}
-	res, err := u.generateSession(c, userSetting.Value)
+	sessionUser := psession.SessionUser{ID: psession.SuperAdminSessionUserID, Name: userSetting.Value, Role: "ADMIN"}
+	res, err := auth.GenerateSession(c, sessionUser)
 	if err != nil {
 		return nil, "", err
 	}
@@ -793,28 +690,4 @@ func stripHostPort(hostport string) string {
 		return strings.Trim(host, "[]")
 	}
 	return strings.Trim(hostport, "[]")
-}
-func checkPassword(password string) error {
-	priKey, _ := settingRepo.Get(repo.WithByKey("PASSWORD_PRIVATE_KEY"))
-
-	privateKey, err := encrypt.ParseRSAPrivateKey(priKey.Value)
-	if err != nil {
-		return err
-	}
-	loginPassword, err := encrypt.DecryptPassword(password, privateKey)
-	if err != nil {
-		return err
-	}
-	passwordSetting, err := settingRepo.Get(repo.WithByKey("Password"))
-	if err != nil {
-		return err
-	}
-	existPassword, err := encrypt.StringDecrypt(passwordSetting.Value)
-	if err != nil {
-		return err
-	}
-	if !hmac.Equal([]byte(loginPassword), []byte(existPassword)) {
-		return buserr.New("ErrAuth")
-	}
-	return nil
 }

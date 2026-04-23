@@ -966,7 +966,7 @@ func deleteCustomApp() {
 }
 
 func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
-	if xpack.IsUseCustomApp() {
+	if xpack.MultiNodeProvider.IsUseCustomApp() {
 		return nil
 	}
 

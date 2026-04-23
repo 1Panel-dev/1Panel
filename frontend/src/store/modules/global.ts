@@ -54,7 +54,6 @@ const GlobalStore = defineStore({
         // tags
         isAdmin: false,
         permissions: [],
-        nodeScopes: [],
         nodeRoles: [],
         isXpackEE: false,
         isIntl: false,
@@ -76,6 +75,8 @@ const GlobalStore = defineStore({
             state.themeConfig.theme === 'dark' ||
             (state.themeConfig.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches),
         isDarkGoldTheme: (state) => state.themeConfig.primary === '#F0BE96' && state.isProductPro,
+        isNodeAdmin: (state) =>
+            state.nodeRoles.some((item) => item.nodeName === state.currentNode && item.roleName === 'Node Admin'),
         docsUrl: (state) => {
             if (state.docWithRegion) {
                 return state.isIntl ? INTL_DOCS_URL : CN_DOCS_URL;
@@ -96,22 +97,30 @@ const GlobalStore = defineStore({
         setAuthInfo(payload: {
             isAdmin: boolean;
             permissions: string[];
-            nodeScopes: number[];
             nodeRoles?: Array<{ nodeId: number; nodeName: string; roleId: number; roleName: string }>;
         }) {
             this.isAdmin = !!payload.isAdmin;
             this.permissions = payload.permissions || [];
-            this.nodeScopes = payload.nodeScopes || [];
             this.nodeRoles = payload.nodeRoles || [];
         },
         clearAuthInfo() {
             this.permissions = [];
-            this.nodeScopes = [];
             this.nodeRoles = [];
             this.isAdmin = false;
         },
         hasPermission(permission: string) {
-            return this.isAdmin || this.permissions.includes(permission);
+            if (this.isAdmin) {
+                return true;
+            }
+            const normalizedPermission = permission.trim();
+            if (!normalizedPermission) {
+                return false;
+            }
+            if (this.permissions.includes(normalizedPermission)) {
+                return true;
+            }
+            const managePermission = getManagePermission(normalizedPermission);
+            return managePermission ? this.permissions.includes(managePermission) : false;
         },
         setGlobalLoading(loading: boolean) {
             this.isLoading = loading;
@@ -153,3 +162,10 @@ const GlobalStore = defineStore({
 });
 
 export default GlobalStore;
+
+function getManagePermission(permission: string) {
+    if (permission.endsWith('_view')) {
+        return permission.replace(/_view$/, '_manage');
+    }
+    return '';
+}

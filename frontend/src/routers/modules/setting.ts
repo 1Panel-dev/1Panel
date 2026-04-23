@@ -9,6 +9,7 @@ const settingRouter = {
     meta: {
         title: 'menu.settings',
         icon: 'p-config',
+        adminOnly: true,
     },
     children: [
         {
@@ -26,9 +27,8 @@ const settingRouter = {
                     meta: {
                         parent: 'menu.settings',
                         title: 'setting.panel',
-                        requiresAuth: true,
                         activeMenu: '/settings',
-                        permission: 'setting_view',
+                        adminOnly: true,
                     },
                 },
                 {
@@ -39,9 +39,8 @@ const settingRouter = {
                     meta: {
                         parent: 'menu.settings',
                         title: 'xpack.alert.alertNotice',
-                        requiresAuth: true,
                         activeMenu: '/settings',
-                        permission: 'setting_view',
+                        adminOnly: true,
                     },
                 },
                 {
@@ -52,9 +51,8 @@ const settingRouter = {
                     meta: {
                         parent: 'menu.settings',
                         title: 'setting.backupAccount',
-                        requiresAuth: true,
                         activeMenu: '/settings',
-                        permission: 'setting_view',
+                        adminOnly: true,
                     },
                 },
                 {
@@ -65,9 +63,8 @@ const settingRouter = {
                     meta: {
                         parent: 'menu.settings',
                         title: 'setting.license',
-                        requiresAuth: true,
                         activeMenu: '/settings',
-                        permission: 'setting_view',
+                        adminOnly: true,
                     },
                 },
                 {
@@ -78,9 +75,8 @@ const settingRouter = {
                     meta: {
                         parent: 'menu.settings',
                         title: 'setting.about',
-                        requiresAuth: true,
                         activeMenu: '/settings',
-                        permission: 'setting_view',
+                        adminOnly: true,
                     },
                 },
                 {
@@ -91,9 +87,8 @@ const settingRouter = {
                     meta: {
                         parent: 'menu.settings',
                         title: 'setting.safe',
-                        requiresAuth: true,
                         activeMenu: '/settings',
-                        permission: 'setting_view',
+                        adminOnly: true,
                     },
                 },
                 {
@@ -104,9 +99,8 @@ const settingRouter = {
                     meta: {
                         parent: 'menu.settings',
                         title: 'setting.snapshot',
-                        requiresAuth: true,
                         activeMenu: '/settings',
-                        permission: 'setting_view',
+                        adminOnly: true,
                     },
                 },
                 {
@@ -115,7 +109,6 @@ const settingRouter = {
                     hidden: true,
                     component: () => import('@/views/setting/expired.vue'),
                     meta: {
-                        requiresAuth: true,
                         activeMenu: '/settings',
                         ignoreTab: true,
                     },

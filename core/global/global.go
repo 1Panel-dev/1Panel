@@ -18,7 +18,6 @@ var (
 	AgentDB *gorm.DB
 	LOG     *logrus.Logger
 	CONF    ServerConfig
-	Api     ApiInterface
 	VALID   *validator.Validate
 	SESSION *psession.PSession
 	Viper   *viper.Viper

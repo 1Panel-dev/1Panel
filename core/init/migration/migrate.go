@@ -38,6 +38,7 @@ func Init() {
 		migrations.UpdateAiModelMenuStructure,
 		migrations.AddDocSourceSetting,
 		migrations.AddAppStoreInstallAllowPortSetting,
+		migrations.AddUserManagementMenu,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

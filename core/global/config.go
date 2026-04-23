@@ -30,13 +30,6 @@ type Conn struct {
 	Entrance    string `mapstructure:"entrance"`
 }
 
-type ApiInterface struct {
-	ApiKey             string `mapstructure:"api_key"`
-	ApiInterfaceStatus string `mapstructure:"api_interface_status"`
-	IpWhiteList        string `mapstructure:"ip_white_list"`
-	ApiKeyValidityTime string `mapstructure:"api_key_validity_time"`
-}
-
 type LogConfig struct {
 	Level     string `mapstructure:"level"`
 	TimeZone  string `mapstructure:"timeZone"`

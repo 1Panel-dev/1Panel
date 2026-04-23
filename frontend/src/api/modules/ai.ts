@@ -26,10 +26,6 @@ export const closeOllamaModel = (name: string) => {
     return http.post(`/ai/ollama/close`, { name: name });
 };
 
-export const loadGPUInfo = () => {
-    return http.get<any>(`/ai/gpu/load`);
-};
-
 export const bindDomain = (req: AI.BindDomain) => {
     return http.post(`/ai/domain/bind`, req);
 };
@@ -40,6 +36,16 @@ export const getBindDomain = (req: AI.BindDomainReq) => {
 
 export const updateBindDomain = (req: AI.BindDomain) => {
     return http.post(`/ai/domain/update`, req);
+};
+
+export const loadGPUInfo = () => {
+    return http.get<any>(`/ai/gpu/load`);
+};
+export const getGPUOptions = () => {
+    return http.get<AI.MonitorGPUOptions>(`/ai/gpu/options`);
+};
+export const loadGPUMonitor = (param: AI.MonitorGPUSearch) => {
+    return http.post<AI.MonitorGPUData>(`/ai/gpu/monitor/search`, param);
 };
 
 export const pageMcpServer = (req: AI.McpServerSearch) => {

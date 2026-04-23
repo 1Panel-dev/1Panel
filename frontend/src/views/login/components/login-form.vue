@@ -449,8 +449,8 @@ const login = (formEl: FormInstance | undefined) => {
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             globalStore.isAdmin = res.data.role === 'ADMIN';
-            await syncAuthInfo();
             await changeToLocal();
+            await syncAuthInfo(globalStore.currentNode);
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             localStorage.removeItem('dashboardCache');
             localStorage.removeItem('upgradeChecked');
@@ -495,8 +495,8 @@ const mfaLogin = async (auto: boolean) => {
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             globalStore.isAdmin = res.data.role === 'ADMIN';
-            await syncAuthInfo();
             await changeToLocal();
+            await syncAuthInfo(globalStore.currentNode);
             localStorage.removeItem('dashboardCache');
             localStorage.removeItem('upgradeChecked');
             routerToName('home');
@@ -562,8 +562,8 @@ const passkeyLogin = async () => {
         menuStore.setMenuList([]);
         tabsStore.removeAllTabs();
         globalStore.isAdmin = loginRes.data.role === 'ADMIN';
-        await syncAuthInfo();
         await changeToLocal();
+        await syncAuthInfo(globalStore.currentNode);
         MsgSuccess(i18n.t('commons.msg.loginSuccess'));
         localStorage.removeItem('dashboardCache');
         localStorage.removeItem('upgradeChecked');

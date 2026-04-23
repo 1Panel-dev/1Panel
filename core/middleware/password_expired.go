@@ -2,72 +2,64 @@ package middleware
 
 import (
 	"net/http"
-	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
-	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/constant"
-	"github.com/1Panel-dev/1Panel/core/utils/common"
+	"github.com/1Panel-dev/1Panel/core/buserr"
+	"github.com/1Panel-dev/1Panel/core/global"
+	psessionUtils "github.com/1Panel-dev/1Panel/core/init/session/psession"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
-)
-
-var (
-	expiredLoc     *time.Location
-	expiredLocOnce sync.Once
 )
 
 func PasswordExpired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core/auth") ||
 			c.Request.URL.Path == "/api/v2/core/settings/expired/handle" ||
-			c.Request.URL.Path == "/api/v2/core/settings/search" {
+			c.Request.URL.Path == "/api/v2/core/settings/search" ||
+			c.Request.URL.Path == "/api/v2/core/settings/search/base" {
 			c.Next()
 			return
 		}
-		settingRepo := repo.NewISettingRepo()
-		expirationDays, err := settingRepo.GetValueByKey("ExpirationDays")
+		if c.GetBool("API_AUTH") {
+			c.Next()
+			return
+		}
+		var err error
+		sessionUser, ok := c.Get(psessionUtils.GinContextSessionUserKey)
+		psession, typeOK := sessionUser.(psessionUtils.SessionUser)
+		if !ok || !typeOK {
+			psession, err = global.SESSION.Get(c)
+		}
+		if err != nil {
+			errItem := err.Error()
+			if errItem == "ErrSessionDataFormat" || errItem == "ErrSessionDataNotFound" {
+				helper.BadAuth(c, "ErrNotLogin", buserr.New(errItem))
+				return
+			}
+			helper.BadAuth(c, "ErrNotLogin", err)
+			return
+		}
+		c.Set(psessionUtils.GinContextSessionUserKey, psession)
+		if len(psession.Name) == 0 {
+			helper.BadAuth(c, "ErrNotLogin", err)
+			return
+		}
+		needCheck, expiredTime, err := xpack.AuthProvider.LoadExpired(c, psession)
 		if err != nil {
 			helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPasswordExpired", err)
 			return
 		}
-		expiredDays, _ := strconv.Atoi(expirationDays)
-		if expiredDays == 0 {
+		if !needCheck {
 			c.Next()
 			return
 		}
 
-		expirationTime, err := settingRepo.GetValueByKey("ExpirationTime")
-		if err != nil {
-			helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPasswordExpired", err)
-			return
-		}
-		expiredTime, err := time.ParseInLocation(constant.DateTimeLayout, expirationTime, loadExpiredLocation())
-		if err != nil {
-			helper.ErrorWithDetail(c, 313, "ErrPasswordExpired", err)
-			return
-		}
 		if time.Now().After(expiredTime) {
 			helper.ErrorWithDetail(c, 313, "ErrPasswordExpired", err)
 			return
 		}
 		c.Next()
 	}
-}
-
-func loadExpiredLocation() *time.Location {
-	expiredLocOnce.Do(func() {
-		loc, err := time.LoadLocation(common.LoadTimeZoneByCmd())
-		if err != nil {
-			expiredLoc = time.Local
-			return
-		}
-		expiredLoc = loc
-	})
-	if expiredLoc == nil {
-		return time.Local
-	}
-	return expiredLoc
 }

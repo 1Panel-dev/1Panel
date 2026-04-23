@@ -54,7 +54,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 const initTerm = async (cwd: string) => {
     await nextTick();
     terminalRef.value!.acceptParams({
-        endpoint: '/api/v2/hosts/terminal',
+        endpoint: '/api/v2/hosts/terminal/local',
         args: `command=${encodeURIComponent(`clear && cd "${cwd}"`)}`,
         error: '',
         initCmd: '',

@@ -49,8 +49,6 @@ AppInstallCheck: 'アプリケーションインストール環境を確認'
 
 # backup
 ErrBackupInUsed: 'バックアップアカウントがスケジュールで使用中'
-ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
-ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
 ErrBackupCheck: '接続テストに失敗しました: {{ .err }}'
 ErrBackupLocal: "ローカルサーバーバックアップアカウントはこの操作をサポートしていません！"
 ErrBackupPublic: "このバックアップアカウントが公開されていないと検出されました。再確認してください！"
@@ -70,6 +68,7 @@ ErrLicenseExist: "このライセンス記録は既に存在します。ライ�
 ErrXpackNotFound: "この機能は Business Edition で利用できます。パネル設定 > ライセンス でライセンスをインポートしてください"
 ErrXpackExceptional: "この機能は Business Edition で利用できます。パネル設定 > ライセンス でライセンス状態を同期してください"
 ErrXpackLost: "ライセンスの再試行回数が上限に達しました。パネル設定 > ライセンス で手動同期を実行してください"
+ErrXpackEELicenseRequired: "Enterprise Edition のライセンスがインポートされていません。先にライセンスをインポートしてください"
 ErrDeviceLost: "ライセンス検証に必要なファイルが失われました。確認して再試行してください！"
 ErrDeviceErr: "現在の環境とライセンスのインポート環境が一致しません。ライセンスを編集して再度インポートしてください！"
 ErrXpackTimeout: "リクエストタイムアウト、ネットワーク接続が不安定な可能性があります。後で再試行してください"
@@ -86,6 +85,19 @@ ErrNodeUnbind: "そのノードはライセンスのバインド範囲内では�
 ErrNodeBind: "そのノードはライセンスにバインドされています、確認して再試行してください"
 ErrNodeLocalRollback: "マスターノードでは直接ロールバックできません。'1pctl restore' を手動で実行してロールバックしてください"
 ErrIntlLicense: "現在のバージョンでは国際版ライセンスのインポートはまだサポートされていません。しばらくお待ちください！"
+
+# user
+ErrNoSuchUser: "ユーザー情報が見つかりません。確認して再試行してください！"
+ErrToMaster: "このユーザーにはマスターノードでこの操作を実行する権限がありません。確認して再試行してください！"
+ErrToNode: "このユーザーにはこのノードでこの操作を実行する権限がありません。確認して再試行してください！"
+ErrRBAC: "ユーザー権限が不足しているため、この操作を実行できません。確認して再試行してください！"
+ErrNoneNode: "このユーザーにはノード権限がありません。管理者に連絡するか、確認して再試行してください！"
+ErrOnlySuperAdmin: "この機能はスーパー管理者のみ使用できます！"
+ErrRolePresetCannotDelete: "システム既定ロールは削除できません"
+ErrRolePresetCannotUpdate: "システム既定ロールは更新できません"
+ErrRoleBoundToUser: "このロールはすでにユーザーに紐付いているため削除できません"
+ErrRolePresetCannotBind: "システム既定ロールはユーザーに割り当てできません"
+ErrSuperAdminCannotDelete: "スーパー管理者ユーザーは削除できません"
 
 InvalidRequestBodyType: "リクエストボディの形式が無効です。内容が要求された形式に準拠しているか確認してから再試行してください！"
 InvalidLicenseCodeType: "提供されたライセンスコードの形式が無効です。確認してから再試行してください！"

@@ -20,6 +20,7 @@ type SessionUser struct {
 }
 
 const SuperAdminSessionUserID = "__super_admin__"
+const GinContextSessionUserKey = "session_user"
 
 type sessionItem struct {
 	CreatedAt time.Time
@@ -35,7 +36,7 @@ type PSession struct {
 	lastFullCleanup time.Time
 }
 
-const maxSessionEntries = 64
+const maxSessionEntries = 1024
 
 func NewPSession(_ string) *PSession {
 	return &PSession{

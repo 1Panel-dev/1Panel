@@ -436,7 +436,7 @@ func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 		reloadSystemSSL(websiteSSL, logger)
 		if websiteSSL.PushNode {
 			printSSLLog(logger, "StartPushSSLToNode", nil)
-			if err = xpack.PushSSLToNode(websiteSSL); err != nil {
+			if err = xpack.MultiNodeProvider.PushSSLToNode(websiteSSL); err != nil {
 				printSSLLog(logger, "PushSSLToNodeFailed", map[string]interface{}{"err": err.Error()})
 				return
 			}

@@ -179,7 +179,7 @@ func (c *ClamService) Create(req dto.ClamCreate) error {
 		clam.InfectedDir = ""
 	}
 	if len(req.Spec) != 0 {
-		entryID, err := xpack.StartClam(&clam, false)
+		entryID, err := xpack.MultiNodeProvider.StartClam(&clam, false)
 		if err != nil {
 			return err
 		}
@@ -232,7 +232,7 @@ func (c *ClamService) Update(req dto.ClamUpdate) error {
 		upMap["entry_id"] = 0
 	}
 	if len(req.Spec) != 0 && clam.Status != constant.StatusDisable {
-		newEntryID, err := xpack.StartClam(&clamItem, true)
+		newEntryID, err := xpack.MultiNodeProvider.StartClam(&clamItem, true)
 		if err != nil {
 			return err
 		}
@@ -276,7 +276,7 @@ func (c *ClamService) UpdateStatus(id uint, status string) error {
 		err     error
 	)
 	if status == constant.StatusEnable {
-		entryID, err = xpack.StartClam(&clam, true)
+		entryID, err = xpack.MultiNodeProvider.StartClam(&clam, true)
 		if err != nil {
 			return err
 		}

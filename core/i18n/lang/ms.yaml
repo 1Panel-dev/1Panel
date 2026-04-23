@@ -44,8 +44,6 @@ ErrFileNotFound: "Fail {{ .name }} tidak wujud"
 
 # backup
 ErrBackupInUsed: 'Akaun sandaran sedang digunakan oleh tugas'
-ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
-ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
 ErrBackupCheck: 'Ujian sambungan gagal: {{ .err }}'
 ErrBackupLocal: "Akaun sandaran pelayan tempatan tidak menyokong operasi ini"
 ErrBackupPublic: "Akaun sandaran ini dikesan tidak awam, sila semak semula dan cuba lagi"
@@ -68,6 +66,7 @@ ErrDeviceLost: "Fail yang diperlukan untuk pengesahan lesen hilang, sila semak d
 ErrDeviceErr: "Persekitaran semasa tidak sepadan dengan persekitaran import lesen. Sila edit lesen dan import semula"
 ErrXpackTimeout: "Permintaan tamat masa, sambungan rangkaian mungkin tidak stabil, sila cuba lagi kemudian"
 ErrUnbindMaster: "Terdapat nod dalam pengurusan nod, sila keluarkan dahulu dan cuba lagi"
+ErrXpackEELicenseRequired: "Lesen Edisi Enterprise belum diimport. Sila import lesen terlebih dahulu"
 ErrFreeNodeLimit: "Had nod Edisi Community telah dicapai. Pergi ke www.lxware.cn/1panel untuk naik taraf dan cuba lagi"
 ErrNodeBound: "Lesen ini telah diikat dengan nod lain, sila semak dan cuba lagi"
 ErrNodeBoundDelete: "Lisensi ini telah diikat dan tidak menyokong operasi penghapusan. Sila semak dan cuba lagi"
@@ -80,6 +79,19 @@ ErrNodeUnbind: "Nod di luar skop lesen dikesan, sila semak dan cuba lagi"
 ErrNodeBind: "Nod ini telah diikat dengan lesen, sila semak dan cuba lagi"
 ErrNodeLocalRollback: "Nod utama tidak menyokong rollback secara langsung. Jalankan '1pctl restore' secara manual untuk rollback"
 ErrIntlLicense: "Versi semasa belum menyokong import lesen edisi antarabangsa. Nantikan"
+
+# user
+ErrNoSuchUser: "Maklumat pengguna tidak ditemui, sila semak dan cuba lagi"
+ErrToMaster: "Pengguna ini tiada kebenaran untuk melakukan operasi ini pada nod utama, sila semak dan cuba lagi"
+ErrToNode: "Pengguna ini tiada kebenaran untuk melakukan operasi ini pada nod ini, sila semak dan cuba lagi"
+ErrRBAC: "Kebenaran pengguna tidak mencukupi, operasi ini tidak boleh dilakukan. Sila semak dan cuba lagi"
+ErrNoneNode: "Pengguna ini tidak mempunyai sebarang kebenaran nod. Sila hubungi pentadbir atau semak dan cuba lagi"
+ErrOnlySuperAdmin: "Hanya super admin boleh menggunakan fungsi ini"
+ErrRolePresetCannotDelete: "Peranan pratetap sistem tidak boleh dipadam"
+ErrRolePresetCannotUpdate: "Peranan pratetap sistem tidak boleh dikemas kini"
+ErrRoleBoundToUser: "Peranan ini sudah terikat kepada pengguna dan tidak boleh dipadam"
+ErrRolePresetCannotBind: "Peranan pratetap sistem tidak boleh diberikan kepada pengguna"
+ErrSuperAdminCannotDelete: "Pengguna super admin tidak boleh dipadam"
 
 InvalidRequestBodyType: "Format badan permintaan tidak sah, sila periksa dan pastikan kandungan memenuhi format yang diperlukan sebelum mencuba semula"
 InvalidLicenseCodeType: "Format kod lesen yang diberikan tidak sah, sila periksa dan cuba lagi"

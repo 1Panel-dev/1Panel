@@ -526,7 +526,7 @@ func loadSSHLogin(alert dto.AlertDTO) {
 
 func loadNodeException(alert dto.AlertDTO) {
 	// only master alert
-	failCount, err := xpack.GetNodeErrorAlert()
+	failCount, err := xpack.AlertProvider.GetNodeErrorAlert()
 	if err != nil {
 		global.LOG.Errorf("error getting node, err: %s", err)
 		return
@@ -555,7 +555,7 @@ func loadNodeException(alert dto.AlertDTO) {
 
 func loadLicenseException(alert dto.AlertDTO) {
 	// only master alert
-	failCount, err := xpack.GetLicenseErrorAlert()
+	failCount, err := xpack.AlertProvider.GetLicenseErrorAlert()
 	if err != nil {
 		global.LOG.Errorf("error getting license, err: %s", err)
 		return
@@ -604,7 +604,7 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 					AlertId: alert.ID,
 					Count:   todayCount + 1,
 				}
-				alertErr := xpack.CreateSMSAlertLog(alertType, alert, create, quotaType, params, constant.SMS)
+				alertErr := xpack.AlertProvider.CreateSMSAlertLog(alertType, alert, create, quotaType, params, constant.SMS)
 				if alertErr != nil {
 					global.LOG.Infof("%s alert sms push faild, err: %v", alertType, alertErr.Error())
 					continue
@@ -624,8 +624,8 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 				alertInfo.Type = alertType
 				create.AlertRule = alertUtil.ProcessAlertRule(alert)
 				create.AlertDetail = alertUtil.ProcessAlertDetail(alertInfo, quotaType, params, constant.Email)
-				transport := xpack.LoadRequestTransport()
-				agentInfo, _ := xpack.GetAgentInfo()
+				transport := xpack.MultiNodeProvider.LoadRequestTransport()
+				agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
 				alertErr := alertUtil.CreateEmailAlertLog(create, alertInfo, params, transport, agentInfo)
 				if alertErr != nil {
 					global.LOG.Infof("%s alert email push faild, err: %v", alertType, alertErr.Error())
@@ -642,9 +642,9 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 					AlertId: alert.ID,
 					Count:   todayCount + 1,
 				}
-				transport := xpack.LoadRequestTransport()
-				agentInfo, _ := xpack.GetAgentInfo()
-				err := xpack.CreateWebhookAlertLog(alertType, alert, create, quotaType, params, m, transport, agentInfo)
+				transport := xpack.MultiNodeProvider.LoadRequestTransport()
+				agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
+				err := xpack.AlertProvider.CreateWebhookAlertLog(alertType, alert, create, quotaType, params, m, transport, agentInfo)
 				if err != nil {
 					global.LOG.Infof("%s alert webhook %s push faild, err: %v", alertType, m, err)
 					continue
@@ -664,8 +664,8 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 				alertInfo.Type = alertType
 				create.AlertRule = alertUtil.ProcessAlertRule(alert)
 				create.AlertDetail = alertUtil.ProcessAlertDetail(alertInfo, quotaType, params, m)
-				transport := xpack.LoadRequestTransport()
-				agentInfo, _ := xpack.GetAgentInfo()
+				transport := xpack.MultiNodeProvider.LoadRequestTransport()
+				agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
 				alertErr := alertUtil.CreateBarkAlertLog(create, alertInfo, params, transport, agentInfo)
 				if alertErr != nil {
 					global.LOG.Infof("%s alert %s push failed, err: %v", alertType, m, alertErr.Error())

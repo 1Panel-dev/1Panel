@@ -123,24 +123,6 @@
                                     </div>
                                 </div>
                             </el-form-item>
-
-                            <el-form-item :label="$t('setting.expirationTime')" prop="expirationTime">
-                                <el-input disabled v-model="form.expirationTime">
-                                    <template #append>
-                                        <el-button @click="onChangeExpirationTime" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <div>
-                                    <span class="input-help" v-if="form.expirationTime !== $t('setting.unSetting')">
-                                        {{ $t('setting.timeoutHelper', [loadTimeOut()]) }}
-                                    </span>
-                                    <span class="input-help" v-else>
-                                        {{ $t('setting.noneSetting') }}
-                                    </span>
-                                </div>
-                            </el-form-item>
                             <el-form-item :label="$t('setting.complexity')" prop="complexityVerification">
                                 <el-switch
                                     @change="onSaveComplexity"
@@ -152,27 +134,6 @@
                                     {{ $t('setting.complexityHelper') }}
                                 </span>
                             </el-form-item>
-
-                            <el-form-item :label="$t('setting.mfa')">
-                                <el-switch
-                                    @change="handleMFA"
-                                    v-model="form.mfaStatus"
-                                    active-value="Enable"
-                                    inactive-value="Disable"
-                                />
-                                <span class="input-help">
-                                    {{ $t('setting.mfaHelper') }}
-                                </span>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.passkey')">
-                                <el-button @click="openPasskeyDialog">
-                                    {{ $t('setting.passkeyManage') }}
-                                </el-button>
-                                <span class="input-help">
-                                    {{ $t('setting.passkeyHelper') }}
-                                </span>
-                            </el-form-item>
                         </el-col>
                     </el-row>
                 </el-form>
@@ -181,14 +142,11 @@
 
         <PortSetting ref="portRef" />
         <BindSetting ref="bindRef" />
-        <MfaSetting ref="mfaRef" @search="search" />
         <SSLSetting ref="sslRef" @search="search" />
         <EntranceSetting ref="entranceRef" @search="search" />
-        <TimeoutSetting ref="timeoutRef" @search="search" />
         <DomainSetting ref="domainRef" @search="search" />
         <AllowIPsSetting ref="allowIPsRef" @search="search" />
         <ResponseSetting ref="responseRef" @search="search()" />
-        <PasskeySetting ref="passkeyRef" @go-configure-domain="onChangeBindDomain" />
     </div>
 </template>
 
@@ -199,12 +157,9 @@ import PortSetting from '@/views/setting/safe/port/index.vue';
 import BindSetting from '@/views/setting/safe/bind/index.vue';
 import ResponseSetting from '@/views/setting/safe/response/index.vue';
 import SSLSetting from '@/views/setting/safe/ssl/index.vue';
-import MfaSetting from '@/views/setting/safe/mfa/index.vue';
-import TimeoutSetting from '@/views/setting/safe/timeout/index.vue';
 import EntranceSetting from '@/views/setting/safe/entrance/index.vue';
 import DomainSetting from '@/views/setting/safe/domain/index.vue';
 import AllowIPsSetting from '@/views/setting/safe/allowips/index.vue';
-import PasskeySetting from '@/views/setting/safe/passkey/index.vue';
 import { updateSetting, getSettingInfo, getSystemAvailable, updateSSL, loadSSLInfo } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -216,8 +171,6 @@ const loading = ref(false);
 const entranceRef = ref();
 const portRef = ref();
 const bindRef = ref();
-const timeoutRef = ref();
-const mfaRef = ref();
 const responseRef = ref();
 
 const sslRef = ref();
@@ -225,7 +178,6 @@ const lastSSL = ref('Disable');
 const sslInfo = ref<Setting.SSLInfo>();
 const domainRef = ref();
 const allowIPsRef = ref();
-const passkeyRef = ref();
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
@@ -238,11 +190,7 @@ const form = reactive({
     sslItem: 'Disable',
     sslType: 'self',
     securityEntrance: '',
-    expirationDays: 0,
-    expirationTime: '',
     complexityVerification: 'Disable',
-    mfaStatus: 'Disable',
-    mfaInterval: 30,
     allowIPs: '',
     bindDomain: '',
     noAuthSetting: '200 - ' + i18n.global.t('setting.help200'),
@@ -264,11 +212,7 @@ const search = async () => {
         loadInfo();
     }
     form.securityEntrance = res.data.securityEntrance;
-    form.expirationDays = Number(res.data.expirationDays);
-    form.expirationTime = res.data.expirationTime;
     form.complexityVerification = res.data.complexityVerification;
-    form.mfaStatus = res.data.mfaStatus;
-    form.mfaInterval = Number(res.data.mfaInterval);
     form.allowIPs = res.data.allowIPs.replaceAll(',', '\n');
     form.bindDomain = res.data.bindDomain;
     form.noAuthSettingValue = res.data.noAuthSetting;
@@ -294,37 +238,6 @@ const onSaveComplexity = async () => {
         .catch(() => {
             loading.value = false;
         });
-};
-
-const handleMFA = async () => {
-    if (form.mfaStatus === 'Enable') {
-        mfaRef.value.acceptParams({ interval: form.mfaInterval });
-        return;
-    }
-    ElMessageBox.confirm(i18n.global.t('setting.mfaClose'), i18n.global.t('setting.mfa'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    })
-        .then(async () => {
-            loading.value = true;
-            await updateSetting({ key: 'MFAStatus', value: 'Disable' })
-                .then(() => {
-                    loading.value = false;
-                    search();
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                })
-                .catch(() => {
-                    loading.value = false;
-                    search();
-                });
-        })
-        .catch(() => {
-            search();
-        });
-};
-
-const openPasskeyDialog = async () => {
-    passkeyRef.value.acceptParams({ bindDomain: form.bindDomain });
 };
 
 const onChangeEntrance = () => {
@@ -387,23 +300,6 @@ const loadInfo = async () => {
         sslInfo.value = res.data;
     });
 };
-
-const onChangeExpirationTime = async () => {
-    timeoutRef.value.acceptParams({ expirationDays: form.expirationDays });
-};
-
-function loadTimeOut() {
-    if (form.expirationDays === 0) {
-        form.expirationTime = i18n.global.t('setting.unSetting');
-        return i18n.global.t('setting.unSetting');
-    }
-    let staytimeGap = new Date(form.expirationTime).getTime() - new Date().getTime();
-    if (staytimeGap < 0) {
-        form.expirationTime = i18n.global.t('setting.unSetting');
-        return i18n.global.t('setting.unSetting');
-    }
-    return Math.floor(staytimeGap / (3600 * 1000 * 24));
-}
 
 onMounted(() => {
     search();

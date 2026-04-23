@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
+import { getSettingBaseInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import Upgrade from '@/components/system-upgrade/upgrade/index.vue';
 import Releases from '@/components/system-upgrade/releases/index.vue';
 import i18n from '@/lang';
@@ -95,7 +95,7 @@ const props = defineProps({
 });
 
 const search = async () => {
-    const res = await getSettingInfo();
+    const res = await getSettingBaseInfo();
     version.value = res.data.systemVersion;
 };
 
