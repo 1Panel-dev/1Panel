@@ -2649,7 +2649,10 @@ const message = {
         unbindHelper: 'Bağlantı kaldırıldığında tüm Pro ile ilgili ayarlar temizlenecek. Devam etmek istiyor musunuz? ',
         importLicense: 'Lisansı içe aktar',
         importHelper: 'Lütfen lisans dosyasını buraya tıklayın veya sürükleyin',
-        licenseRequiredTip: 'Lisans henüz içe aktarılmadı. Cihaz kimliğini kopyalayıp lisansı alın ve giriş yapmadan önce içe aktarın.',
+        licenseRequiredTip:
+            'Lisans henüz içe aktarılmadı. Cihaz kimliğini kopyalayıp lisansı alın ve giriş yapmadan önce içe aktarın.',
+        licenseRequiredUserTip:
+            'Enterprise Edition lisansı bağlı değil. Lisansı içe aktarması için süper yöneticiyle iletişime geçin.',
         levelUpPro: 'Pro Sürüme Yükselt',
         licenseSync: 'Lisans Senkronizasyonu',
         knowMorePro: 'Daha Fazla Bilgi Edinin',

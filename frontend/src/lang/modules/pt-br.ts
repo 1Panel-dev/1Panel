@@ -2782,7 +2782,10 @@ const message = {
             'Todas as configurações relacionadas ao Pro serão limpas após a desvinculação. Você deseja continuar?',
         importLicense: 'Licença',
         importHelper: 'Clique ou arraste o arquivo de licença aqui',
-        licenseRequiredTip: 'A licença ainda não foi importada. Copie o ID do dispositivo, obtenha a licença e importe-a antes de fazer login.',
+        licenseRequiredTip:
+            'A licença ainda não foi importada. Copie o ID do dispositivo, obtenha a licença e importe-a antes de fazer login.',
+        licenseRequiredUserTip:
+            'A licença Enterprise Edition não está vinculada. Entre em contato com o superadministrador para importar a licença.',
         technicalAdvice: 'Consultoria técnica',
         advice: 'Consultoria',
         levelUpPro: 'Fazer upgrade para a edição Pro',
