@@ -9,7 +9,27 @@ import { MsgError } from '@/utils/message';
 const axiosCanceler = new AxiosCanceler();
 
 let isRedirecting = false;
+let xpackEELoading: Promise<boolean> | null = null;
 let licenseStatusLoading: Promise<boolean> | null = null;
+
+const loadXpackEEStatus = async () => {
+    if (!xpackEELoading) {
+        xpackEELoading = fetch('/api/v2/core/auth/setting', {
+            credentials: 'include',
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                const globalStore = GlobalStore();
+                globalStore.isXpackEE = !!res?.data?.isXpackEE;
+                return globalStore.isXpackEE;
+            })
+            .catch(() => GlobalStore().isXpackEE)
+            .finally(() => {
+                xpackEELoading = null;
+            });
+    }
+    return xpackEELoading;
+};
 
 const loadXpackEELicenseStatus = async () => {
     if (!licenseStatusLoading) {
@@ -52,6 +72,9 @@ router.beforeEach(async (to, from, next) => {
         next({ name: '404' });
         NProgress.done();
         return;
+    }
+    if (globalStore.isLogin && to.name !== 'login') {
+        await loadXpackEEStatus();
     }
     if (
         globalStore.isLogin &&

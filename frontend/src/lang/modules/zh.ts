@@ -2397,6 +2397,7 @@ const message = {
         importLicense: '导入许可证',
         importHelper: '请点击或拖动许可文件到此处',
         licenseRequiredTip: '当前尚未导入许可证，复制设备 ID 后获取许可证并导入后才能登录使用。',
+        licenseRequiredUserTip: '企业版许可证未绑定，请联系超级管理员导入许可证。',
         levelUpPro: '升级专业版',
         licenseSync: '许可证同步',
         knowMorePro: '了解更多',
