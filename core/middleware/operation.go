@@ -21,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	psessionUtils "github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
@@ -107,6 +108,8 @@ func OperationLog() gin.HandlerFunc {
 
 		c.Next()
 
+		record.User = loadOperationUser(c)
+
 		if len(operationDic.BeforeFunctions) != 0 {
 			if needAgentResolve {
 				mergeResolvedData(writer.resolvedHeader, formatMap)
@@ -171,6 +174,18 @@ func OperationLog() gin.HandlerFunc {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
 		}
 	}
+}
+
+func loadOperationUser(c *gin.Context) string {
+	sessionUser, ok := c.Get(psessionUtils.GinContextSessionUserKey)
+	if !ok {
+		return ""
+	}
+	psession, ok := sessionUser.(psessionUtils.SessionUser)
+	if !ok {
+		return ""
+	}
+	return psession.Name
 }
 
 func fillOperationDetail(operationDic *operationJson, formatMap map[string]interface{}) {
