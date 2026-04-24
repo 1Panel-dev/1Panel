@@ -3731,6 +3731,7 @@ const message = {
             host_process_view: 'Просмотр процессов',
             host_ssh_view: 'Просмотр SSH',
             host_disk_view: 'Просмотр диска',
+            xpack_app_view: 'Просмотр APP',
             xpack_waf_view: 'Просмотр WAF',
             xpack_waf_manage: 'Управление WAF',
             xpack_node_view: 'Просмотр узлов',
