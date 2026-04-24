@@ -7,6 +7,7 @@ import (
 type OperationLog struct {
 	ID        uint   `json:"id"`
 	Source    string `json:"source"`
+	User      string `json:"user"`
 	Node      string `json:"node"`
 	IP        string `json:"ip"`
 	Path      string `json:"path"`

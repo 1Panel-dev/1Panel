@@ -1041,3 +1041,10 @@ var AddUserManagementMenu = &gormigrate.Migration{
 		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
 	},
 }
+
+var AddOperationLogUser = &gormigrate.Migration{
+	ID: "20260424-add-operation-log-user",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.OperationLog{})
+	},
+}

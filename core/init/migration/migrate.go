@@ -39,6 +39,7 @@ func Init() {
 		migrations.AddDocSourceSetting,
 		migrations.AddAppStoreInstallAllowPortSetting,
 		migrations.AddUserManagementMenu,
+		migrations.AddOperationLogUser,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

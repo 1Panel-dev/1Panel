@@ -7,6 +7,7 @@ import (
 type OperationLog struct {
 	BaseModel
 	Source    string `json:"source"`
+	User      string `json:"user"`
 	IP        string `json:"ip"`
 	Node      string `json:"node"`
 	Path      string `json:"path"`
