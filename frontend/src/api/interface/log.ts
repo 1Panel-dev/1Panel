@@ -5,6 +5,7 @@ export namespace Log {
     export interface OperationLog {
         id: number;
         source: string;
+        user: string;
         action: string;
         ip: string;
         path: string;
