@@ -3923,6 +3923,7 @@ const message = {
             host_process_view: 'Visualização de Processos',
             host_ssh_view: 'Visualização do SSH',
             host_disk_view: 'Visualização de Disco',
+            xpack_app_view: 'Visualização do APP',
             xpack_waf_view: 'Visualização do WAF',
             xpack_waf_manage: 'Gerenciamento do WAF',
             xpack_node_view: 'Visualização de Nó',

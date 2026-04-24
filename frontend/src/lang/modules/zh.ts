@@ -4013,6 +4013,7 @@ const message = {
             host_process_view: '进程查看',
             host_ssh_view: 'SSH 查看',
             host_disk_view: '磁盘查看',
+            xpack_app_view: 'APP 查看',
             xpack_waf_view: 'WAF 查看',
             xpack_waf_manage: 'WAF 管理',
             xpack_node_view: '节点查看',

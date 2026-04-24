@@ -3730,6 +3730,7 @@ const message = {
             host_process_view: 'プロセス表示',
             host_ssh_view: 'SSH 表示',
             host_disk_view: 'ディスク表示',
+            xpack_app_view: 'APP 表示',
             xpack_waf_view: 'WAF 表示',
             xpack_waf_manage: 'WAF 管理',
             xpack_node_view: 'ノード表示',

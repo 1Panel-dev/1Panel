@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('xpack.user.userInfo')" v-loading="loading">
+    <DrawerPro v-model="open" :header="$t('xpack.user.userInfo')">
         <div v-loading="loading">
             <el-form ref="userRef" label-position="top" :model="form" :rules="userRules">
                 <input

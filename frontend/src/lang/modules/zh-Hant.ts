@@ -3430,6 +3430,7 @@ const message = {
             host_process_view: '程序檢視',
             host_ssh_view: 'SSH 檢視',
             host_disk_view: '磁碟檢視',
+            xpack_app_view: 'APP 檢視',
             xpack_waf_view: 'WAF 檢視',
             xpack_waf_manage: 'WAF 管理',
             xpack_node_view: '節點檢視',

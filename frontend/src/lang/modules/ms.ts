@@ -3783,6 +3783,7 @@ const message = {
             host_process_view: 'Paparan Proses',
             host_ssh_view: 'Paparan SSH',
             host_disk_view: 'Paparan Cakera',
+            xpack_app_view: 'Paparan APP',
             xpack_waf_view: 'Paparan WAF',
             xpack_waf_manage: 'Pengurusan WAF',
             xpack_node_view: 'Paparan Nod',

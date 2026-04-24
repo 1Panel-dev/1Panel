@@ -15,7 +15,9 @@
                     {{ upgradeInfo.testVersion }}
                 </el-radio>
             </el-radio-group>
-            <MarkDownEditor v-loading="loading" :content="upgradeInfo.releaseNote" />
+            <div v-loading="loading">
+                <MarkDownEditor :content="upgradeInfo.releaseNote" />
+            </div>
         </div>
         <template #footer>
             <span class="dialog-footer">
