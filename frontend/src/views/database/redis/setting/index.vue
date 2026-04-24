@@ -62,7 +62,9 @@
                         </el-col>
                     </el-row>
                 </div>
-                <Status v-show="activeName === 'status'" ref="statusRef" />
+                <div v-show="activeName === 'status'">
+                    <Status ref="statusRef" />
+                </div>
                 <div v-if="activeName === 'tuning'">
                     <el-form :model="form" ref="formRef" :rules="rules" label-position="top">
                         <el-row class="mt-10">
@@ -110,7 +112,9 @@
                         </el-row>
                     </el-form>
                 </div>
-                <Persistence @loading="changeLoading" v-show="activeName === 'persistence'" ref="persistenceRef" />
+                <div v-show="activeName === 'persistence'">
+                    <Persistence @loading="changeLoading" ref="persistenceRef" />
+                </div>
             </template>
         </LayoutContent>
 

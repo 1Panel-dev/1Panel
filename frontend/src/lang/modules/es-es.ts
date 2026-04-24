@@ -3752,6 +3752,7 @@ const message = {
             host_process_view: 'Vista de procesos',
             host_ssh_view: 'Vista de SSH',
             host_disk_view: 'Vista de disco',
+            xpack_app_view: 'Vista de APP',
             xpack_waf_view: 'Vista de WAF',
             xpack_waf_manage: 'Gestión de WAF',
             xpack_node_view: 'Vista de nodos',
