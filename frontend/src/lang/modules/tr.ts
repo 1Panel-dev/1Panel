@@ -3733,6 +3733,7 @@ const message = {
             host_process_view: 'İşlem Görünümü',
             host_ssh_view: 'SSH Görünümü',
             host_disk_view: 'Disk Görünümü',
+            xpack_app_view: 'APP Görünümü',
             xpack_waf_view: 'WAF Görünümü',
             xpack_waf_manage: 'WAF Yönetimi',
             xpack_node_view: 'Düğüm Görünümü',

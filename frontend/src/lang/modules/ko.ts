@@ -3603,6 +3603,7 @@ const message = {
             host_process_view: '프로세스 보기',
             host_ssh_view: 'SSH 보기',
             host_disk_view: '디스크 보기',
+            xpack_app_view: 'APP 보기',
             xpack_waf_view: 'WAF 보기',
             xpack_waf_manage: 'WAF 관리',
             xpack_node_view: '노드 보기',

@@ -3658,6 +3658,7 @@ const message = {
             host_process_view: 'Process View',
             host_ssh_view: 'SSH View',
             host_disk_view: 'Disk View',
+            xpack_app_view: 'APP View',
             xpack_waf_view: 'WAF View',
             xpack_waf_manage: 'WAF Manage',
             xpack_node_view: 'Node View',
