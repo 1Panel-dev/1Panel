@@ -6,6 +6,7 @@
         :close-on-click-modal="closeOnClickModal"
         :show-close="showClose"
         :width="size"
+        append-to-body
         draggable
         :open="open"
         @opened="opened"
