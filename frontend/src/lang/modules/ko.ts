@@ -2501,7 +2501,10 @@ const message = {
         unbindHelper: '연결 해제 후 모든 Pro 관련 설정이 초기화됩니다. 계속하시겠습니까?',
         importLicense: '라이센스',
         importHelper: '라이센스 파일을 여기에 클릭하거나 드래그하세요',
-        licenseRequiredTip: '아직 라이선스를 가져오지 않았습니다. 장치 ID를 복사해 라이선스를 받은 뒤 가져와야 로그인할 수 있습니다.',
+        licenseRequiredTip:
+            '아직 라이선스를 가져오지 않았습니다. 장치 ID를 복사해 라이선스를 받은 뒤 가져와야 로그인할 수 있습니다.',
+        licenseRequiredUserTip:
+            'Enterprise Edition 라이선스가 바인딩되지 않았습니다. 슈퍼 관리자에게 라이선스 가져오기를 요청하세요.',
         technicalAdvice: '기술 상담',
         advice: '상담',
         levelUpPro: 'Pro Edition으로 업그레이드',

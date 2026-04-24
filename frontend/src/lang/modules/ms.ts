@@ -2610,7 +2610,10 @@ const message = {
         unbindHelper: 'Semua Tetapan berkaitan Pro akan dibersihkan selepas nyahikat. Adakah anda mahu meneruskan?',
         importLicense: 'Lesen',
         importHelper: 'Sila klik atau seret fail lesen ke sini',
-        licenseRequiredTip: 'Lesen belum diimport. Salin ID peranti, dapatkan lesen dan importkannya sebelum anda boleh log masuk.',
+        licenseRequiredTip:
+            'Lesen belum diimport. Salin ID peranti, dapatkan lesen dan importkannya sebelum anda boleh log masuk.',
+        licenseRequiredUserTip:
+            'Lesen Enterprise Edition belum diikat. Hubungi pentadbir super untuk mengimport lesen.',
         technicalAdvice: 'Konsultasi Teknikal',
         advice: 'Konsultasi',
         levelUpPro: 'Naik taraf ke Edisi Pro',

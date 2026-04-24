@@ -2548,7 +2548,10 @@ const message = {
         unbindHelper: 'All Pro related Settings will be cleaned after unbinding. Continue? ',
         importLicense: 'Import license',
         importHelper: 'Click or drag the license file here',
-        licenseRequiredTip: 'The license has not been imported yet. Copy the device ID, obtain the license, and import it before logging in.',
+        licenseRequiredTip:
+            'The license has not been imported yet. Copy the device ID, obtain the license, and import it before logging in.',
+        licenseRequiredUserTip:
+            'The Enterprise Edition license is not bound. Contact a super administrator to import the license.',
         levelUpPro: 'Upgrade to Pro Edition',
         licenseSync: 'License Sync',
         knowMorePro: 'Learn More',

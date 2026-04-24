@@ -7,7 +7,7 @@
             id="login-container"
         >
             <div v-loading="loading" class="w-full h-full flex items-center justify-center px-8">
-                <div class="w-full flex-grow flex flex-col license-form">
+                <div class="w-full flex-grow flex flex-col login-form">
                     <div>
                         <div class="text-2xl font-medium text-gray-900">
                             {{ $t('license.importLicense') }}
@@ -65,12 +65,14 @@ import { getLoginSetting } from '@/api/modules/auth';
 import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { preloadImage } from '@/utils/browser';
+import { adjustColorToRGBA } from '@/utils/color';
 import i18n from '@/lang';
 
 const router = useRouter();
 const globalStore = GlobalStore();
 const loading = ref(false);
 const backgroundOpacity = ref(1);
+const loginBtnLinkColor = ref('#005eeb');
 const uploadRef = ref<UploadInstance>();
 const uploaderFiles = ref<UploadFiles>([]);
 const licenseInfo = reactive({
@@ -112,6 +114,16 @@ const loadLoginTheme = async () => {
         panelName: res.data.panelName,
     };
     document.title = res.data.panelName;
+    loginBtnLinkColor.value = globalStore.themeConfig.loginBtnLinkColor || '#005eeb';
+    document.documentElement.style.setProperty('--login-btn-link-color', loginBtnLinkColor.value);
+    document.documentElement.style.setProperty(
+        '--login-btn-link-hover-color',
+        adjustColorToRGBA(loginBtnLinkColor.value, -10, 80),
+    );
+    document.documentElement.style.setProperty(
+        '--login-loading-mask-color',
+        adjustColorToRGBA(loginBtnLinkColor.value, 30, 15),
+    );
     if (!globalStore.isXpackEE) {
         router.replace({ name: 'entrance', params: { code: globalStore.entrance } });
     }
@@ -203,15 +215,27 @@ onMounted(async () => {
     border-radius: 0;
 }
 
-.license-form {
+.login-form {
     max-width: 640px;
     gap: 18px;
-}
 
-.license-helper {
-    margin-top: 8px;
-    color: var(--el-text-color-secondary);
-    line-height: 22px;
+    .login-button {
+        background-color: var(--login-btn-link-color, #005eeb);
+        border-color: var(--login-btn-link-color, #005eeb);
+        color: #ffffff;
+
+        &:hover {
+            background-color: var(--login-btn-link-hover-color, #0054d3) !important;
+            border-color: var(--login-btn-link-hover-color, #0054d3) !important;
+            outline: none !important;
+        }
+    }
+
+    .license-helper {
+        margin-top: 8px;
+        color: var(--el-text-color-secondary);
+        line-height: 22px;
+    }
 }
 
 .device-id {
@@ -224,5 +248,13 @@ onMounted(async () => {
 
 :deep(.el-upload-dragger) {
     padding: 22px 16px;
+}
+
+:deep(.el-loading-mask) {
+    background-color: var(--login-loading-mask-color) !important;
+
+    .el-loading-spinner .path {
+        stroke: var(--login-btn-link-color);
+    }
 }
 </style>

@@ -1,162 +1,163 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('xpack.user.userInfo')">
-        <el-form ref="userRef" label-position="top" :model="form" :rules="userRules" v-loading="loading">
-            <input class="hidden-autofill-field" type="text" name="username" autocomplete="username" tabindex="-1" />
-            <input
-                class="hidden-autofill-field"
-                type="password"
-                name="password"
-                autocomplete="current-password"
-                tabindex="-1"
-            />
-            <el-form-item :label="$t('commons.login.username')" prop="name">
-                <el-input type="primary" v-model="form.name" name="profile-name" autocomplete="off" />
-            </el-form-item>
-            <el-form-item :label="$t('commons.login.password')" prop="password">
-                <el-input
-                    type="password"
-                    show-password
-                    clearable
-                    v-model.trim="form.password"
-                    name="profile-new-password"
-                    autocomplete="new-password"
+    <DrawerPro v-model="open" :header="$t('xpack.user.userInfo')" v-loading="loading">
+        <div v-loading="loading">
+            <el-form ref="userRef" label-position="top" :model="form" :rules="userRules">
+                <input
+                    class="hidden-autofill-field"
+                    type="text"
+                    name="username"
+                    autocomplete="username"
+                    tabindex="-1"
                 />
-                <span class="input-help">{{ $t('setting.passwordEmptyTip') }}</span>
-            </el-form-item>
-            <el-form-item v-if="form.password" :label="$t('setting.oldPassword')" prop="oldPassword">
-                <el-input
+                <input
+                    class="hidden-autofill-field"
                     type="password"
-                    show-password
-                    clearable
-                    v-model.trim="form.oldPassword"
-                    name="profile-old-password"
+                    name="password"
                     autocomplete="current-password"
+                    tabindex="-1"
                 />
-            </el-form-item>
-            <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
-                <el-input v-model.number="form.sessionTimeout" name="profile-session-timeout" autocomplete="off" />
-                <span class="input-help">
-                    {{ $t('setting.sessionTimeoutHelper', [form.sessionTimeout]) }}
-                </span>
-            </el-form-item>
-
-            <el-form-item :label="$t('setting.days')" prop="expirationDays">
-                <el-input
-                    clearable
-                    v-model.number="form.expirationDays"
-                    name="profile-expiration-days"
-                    autocomplete="off"
-                />
-                <div>
-                    <span class="input-help" v-if="form.expirationDays !== 0">
-                        {{ $t('setting.timeoutHelper', [loadTimeOut()]) }}
+                <el-form-item :label="$t('commons.login.username')" prop="name">
+                    <el-input type="primary" v-model="form.name" name="profile-name" autocomplete="off" />
+                </el-form-item>
+                <el-form-item :label="$t('commons.login.password')" prop="password">
+                    <el-input
+                        type="password"
+                        show-password
+                        clearable
+                        v-model.trim="form.password"
+                        name="profile-new-password"
+                        autocomplete="new-password"
+                    />
+                    <span class="input-help">{{ $t('setting.passwordEmptyTip') }}</span>
+                </el-form-item>
+                <el-form-item v-if="form.password" :label="$t('setting.oldPassword')" prop="oldPassword">
+                    <el-input
+                        type="password"
+                        show-password
+                        clearable
+                        v-model.trim="form.oldPassword"
+                        name="profile-old-password"
+                        autocomplete="current-password"
+                    />
+                </el-form-item>
+                <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
+                    <el-input v-model.number="form.sessionTimeout" name="profile-session-timeout" autocomplete="off" />
+                    <span class="input-help">
+                        {{ $t('setting.sessionTimeoutHelper', [form.sessionTimeout]) }}
                     </span>
-                    <span class="input-help" v-else>
-                        {{ $t('setting.noneSetting') }}
-                    </span>
-                </div>
-                <span class="input-help">{{ $t('setting.expirationHelper') }}</span>
-            </el-form-item>
-        </el-form>
+                </el-form-item>
 
-        <el-form label-position="top" :model="form" v-loading="loading" class="setting-section">
-            <el-form-item>
-                <template #label>
-                    <span class="label-with-help">
-                        {{ $t('setting.mfa') }}
-                        <el-tooltip placement="top">
-                            <template #content>
-                                <div class="tooltip-help-block">{{ $t('setting.mfaAlert') }}</div>
-                                <div>{{ $t('setting.mfaHelper1') }}</div>
-                                <ul class="tooltip-help-list">
-                                    <li>Google Authenticator</li>
-                                    <li>Microsoft Authenticator</li>
-                                    <li>1Password</li>
-                                    <li>LastPass</li>
-                                    <li>Authenticator</li>
-                                </ul>
-                            </template>
-                            <el-icon class="help-icon"><QuestionFilled /></el-icon>
-                        </el-tooltip>
-                    </span>
-                </template>
-                <el-switch
-                    v-if="form.mfaStatus !== null"
-                    @change="handleMFA"
-                    v-model="form.mfaStatus"
-                    active-value="Enable"
-                    inactive-value="Disable"
-                />
-                <span class="input-help">{{ $t('setting.mfaHelper') }}</span>
-            </el-form-item>
-        </el-form>
+                <el-form-item :label="$t('setting.days')" prop="expirationDays">
+                    <el-input
+                        clearable
+                        v-model.number="form.expirationDays"
+                        name="profile-expiration-days"
+                        autocomplete="off"
+                    />
+                    <div>
+                        <span class="input-help" v-if="form.expirationDays !== 0">
+                            {{ $t('setting.timeoutHelper', [loadTimeOut()]) }}
+                        </span>
+                        <span class="input-help" v-else>
+                            {{ $t('setting.noneSetting') }}
+                        </span>
+                    </div>
+                    <span class="input-help">{{ $t('setting.expirationHelper') }}</span>
+                </el-form-item>
+            </el-form>
 
-        <el-form label-position="top" :model="form" v-loading="loading" class="setting-section">
-            <el-form-item>
-                <template #label>
-                    <span class="label-with-help">
-                        {{ $t('setting.passkey') }}
-                        <el-tooltip placement="top">
-                            <template #content>
-                                <div>{{ $t('setting.passkeyRequireSSL') }}</div>
-                            </template>
-                            <el-icon class="help-icon"><QuestionFilled /></el-icon>
-                        </el-tooltip>
-                    </span>
-                </template>
-                <el-button @click="openPasskeyDrawer">
-                    {{ $t('setting.passkeyManage') }}
-                </el-button>
-                <span class="input-help">{{ $t('setting.passkeyHelper') }}</span>
-            </el-form-item>
-        </el-form>
+            <el-form label-position="top" :model="form" class="setting-section">
+                <el-form-item>
+                    <template #label>
+                        <span class="label-with-help">
+                            {{ $t('setting.mfa') }}
+                            <el-tooltip placement="top">
+                                <template #content>
+                                    <div class="tooltip-help-block">{{ $t('setting.mfaAlert') }}</div>
+                                    <div>{{ $t('setting.mfaHelper1') }}</div>
+                                    <ul class="tooltip-help-list">
+                                        <li>Google Authenticator</li>
+                                        <li>Microsoft Authenticator</li>
+                                        <li>1Password</li>
+                                        <li>LastPass</li>
+                                        <li>Authenticator</li>
+                                    </ul>
+                                </template>
+                                <el-icon class="help-icon"><QuestionFilled /></el-icon>
+                            </el-tooltip>
+                        </span>
+                    </template>
+                    <el-switch
+                        v-if="form.mfaStatus !== null"
+                        @change="handleMFA"
+                        v-model="form.mfaStatus"
+                        active-value="Enable"
+                        inactive-value="Disable"
+                    />
+                    <span class="input-help">{{ $t('setting.mfaHelper') }}</span>
+                </el-form-item>
+            </el-form>
 
-        <el-form
-            v-if="globalStore.isAdmin"
-            label-position="top"
-            :model="form"
-            v-loading="loading"
-            class="setting-section"
-        >
-            <el-form-item v-if="globalStore.isAdmin">
-                <template #label>
-                    <span class="label-with-help">
-                        {{ $t('setting.apiInterface') }}
-                        <el-tooltip placement="top">
-                            <template #content>
-                                <ul class="tooltip-help-list">
-                                    <li>
-                                        {{ $t('setting.apiInterfaceAlert1') }}
-                                    </li>
-                                    <li>
-                                        {{ $t('setting.apiInterfaceAlert2') }}
-                                    </li>
-                                    <li>
-                                        <el-link :href="apiURL" target="_blank" class="tooltip-help-link">
-                                            {{ $t('setting.apiInterfaceAlert3') }}
-                                        </el-link>
-                                    </li>
-                                    <li v-if="!globalStore.isFxplay">
-                                        <el-link :href="panelURL" target="_blank" class="tooltip-help-link">
-                                            {{ $t('setting.apiInterfaceAlert4') }}
-                                        </el-link>
-                                    </li>
-                                </ul>
-                            </template>
-                            <el-icon class="help-icon"><QuestionFilled /></el-icon>
-                        </el-tooltip>
-                    </span>
-                </template>
-                <el-switch
-                    @change="handleApi"
-                    v-model="form.apiInterfaceStatus"
-                    active-value="Enable"
-                    inactive-value="Disable"
-                />
-                <span class="input-help">{{ $t('setting.apiInterfaceHelper') }}</span>
-            </el-form-item>
-        </el-form>
+            <el-form label-position="top" :model="form" class="setting-section">
+                <el-form-item>
+                    <template #label>
+                        <span class="label-with-help">
+                            {{ $t('setting.passkey') }}
+                            <el-tooltip placement="top">
+                                <template #content>
+                                    <div>{{ $t('setting.passkeyRequireSSL') }}</div>
+                                </template>
+                                <el-icon class="help-icon"><QuestionFilled /></el-icon>
+                            </el-tooltip>
+                        </span>
+                    </template>
+                    <el-button @click="openPasskeyDrawer">
+                        {{ $t('setting.passkeyManage') }}
+                    </el-button>
+                    <span class="input-help">{{ $t('setting.passkeyHelper') }}</span>
+                </el-form-item>
+            </el-form>
 
+            <el-form v-if="globalStore.isAdmin" label-position="top" :model="form" class="setting-section">
+                <el-form-item v-if="globalStore.isAdmin">
+                    <template #label>
+                        <span class="label-with-help">
+                            {{ $t('setting.apiInterface') }}
+                            <el-tooltip placement="top">
+                                <template #content>
+                                    <ul class="tooltip-help-list">
+                                        <li>
+                                            {{ $t('setting.apiInterfaceAlert1') }}
+                                        </li>
+                                        <li>
+                                            {{ $t('setting.apiInterfaceAlert2') }}
+                                        </li>
+                                        <li>
+                                            <el-link :href="apiURL" target="_blank" class="tooltip-help-link">
+                                                {{ $t('setting.apiInterfaceAlert3') }}
+                                            </el-link>
+                                        </li>
+                                        <li v-if="!globalStore.isFxplay">
+                                            <el-link :href="panelURL" target="_blank" class="tooltip-help-link">
+                                                {{ $t('setting.apiInterfaceAlert4') }}
+                                            </el-link>
+                                        </li>
+                                    </ul>
+                                </template>
+                                <el-icon class="help-icon"><QuestionFilled /></el-icon>
+                            </el-tooltip>
+                        </span>
+                    </template>
+                    <el-switch
+                        @change="handleApi"
+                        v-model="form.apiInterfaceStatus"
+                        active-value="Enable"
+                        inactive-value="Disable"
+                    />
+                    <span class="input-help">{{ $t('setting.apiInterfaceHelper') }}</span>
+                </el-form-item>
+            </el-form>
+        </div>
         <template #footer>
             <el-button :disabled="loading" @click="open = false">
                 {{ $t('commons.button.cancel') }}
@@ -895,7 +896,7 @@ const onSaveApi = async (formEl: FormInstance | undefined) => {
         apiKey: form.apiKey,
         ipWhiteList: form.ipWhiteList,
         apiInterfaceStatus: form.apiInterfaceStatus,
-        apiKeyValidityTime: form.apiKeyValidityTime,
+        apiKeyValidityTime: form.apiKeyValidityTime + '',
     };
     loading.value = true;
     await updateApiConfig(param)
@@ -989,7 +990,7 @@ const handleApi = async () => {
                 apiKey: form.apiKey,
                 ipWhiteList: form.ipWhiteList,
                 apiInterfaceStatus: form.apiInterfaceStatus,
-                apiKeyValidityTime: form.apiKeyValidityTime,
+                apiKeyValidityTime: form.apiKeyValidityTime + '',
             };
             await updateApiConfig(param)
                 .then(() => {
