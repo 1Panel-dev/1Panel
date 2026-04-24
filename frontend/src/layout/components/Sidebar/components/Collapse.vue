@@ -286,6 +286,7 @@ const loadCurrentUser = async (currentNode?: string) => {
     }
 };
 const changeUserInfo = () => {
+    loadCurrentUser();
     userInfoRef.value?.openDrawer();
 };
 

@@ -88,6 +88,6 @@ export namespace Login {
         apiInterfaceStatus: string;
         apiKey: string;
         ipWhiteList: string;
-        apiKeyValidityTime: number;
+        apiKeyValidityTime: string;
     }
 }

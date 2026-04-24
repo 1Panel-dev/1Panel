@@ -2564,7 +2564,10 @@ const message = {
         unbindHelper: 'すべてのPro関連設定は、バインディングを解除した後にクリーニングされます。続けたいですか？',
         importLicense: 'ライセンス',
         importHelper: 'ここでライセンスファイルをクリックまたはドラッグしてください',
-        licenseRequiredTip: 'まだライセンスがインポートされていません。デバイス ID をコピーしてライセンスを取得し、インポートしてからログインしてください。',
+        licenseRequiredTip:
+            'まだライセンスがインポートされていません。デバイス ID をコピーしてライセンスを取得し、インポートしてからログインしてください。',
+        licenseRequiredUserTip:
+            'Enterprise Edition のライセンスがバインドされていません。スーパー管理者に連絡してライセンスをインポートしてください。',
         technicalAdvice: '技術的な相談',
         advice: '相談',
         levelUpPro: 'Pro Edition にアップグレード',

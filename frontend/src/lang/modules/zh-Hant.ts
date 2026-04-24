@@ -2365,6 +2365,7 @@ const message = {
         importLicense: '匯入許可證',
         importHelper: '請點選或拖動許可檔案到此處',
         licenseRequiredTip: '目前尚未匯入許可證，複製裝置 ID 後取得許可證並匯入後才能登入使用。',
+        licenseRequiredUserTip: '企業版許可證未綁定，請聯絡超級管理員匯入許可證。',
         levelUpPro: '升級至 Pro 版',
         licenseSync: '許可證同步',
         knowMorePro: '了解更多',

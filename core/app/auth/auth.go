@@ -266,7 +266,12 @@ func UpdateCurrentUserInfo(c *gin.Context, req dto.CurrentUserUpdate) error {
 	if err := settingRepo.Update("ExpirationDays", strconv.Itoa(req.ExpirationDays)); err != nil {
 		return err
 	}
-	if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, req.ExpirationDays).Format(constant.DateTimeLayout)); err != nil {
+
+	expirationTime := ""
+	if req.ExpirationDays != 0 {
+		expirationTime = time.Now().AddDate(0, 0, req.ExpirationDays).Format(constant.DateTimeLayout)
+	}
+	if err := settingRepo.Update("ExpirationTime", expirationTime); err != nil {
 		return err
 	}
 	deleteCurrentSession(c)
