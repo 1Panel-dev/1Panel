@@ -1960,7 +1960,26 @@ const message = {
         up: '戻って行きます',
         openWithVscode: 'VSコードで開く',
         vscodeHelper:
-            'VSコードがローカルにインストールされ、SSHリモートプラグインが構成されていることを確認してください',
+            '認証方式、ホスト、ポート、ユーザー名を確認してください。鍵認証を使用する場合は、事前に VS Code を実行するローカルコンピューターで SSH 設定を完了してください。',
+        vscodeCopyConfig: 'セットアップスクリプトをコピー',
+        vscodeKeyHelper:
+            '秘密鍵のダウンロード名は設定したパスから生成されます。そのパスに保存してください。設定スクリプトがファイルを確認し、権限を設定します。',
+        vscodeKeyPath: 'SSH 秘密鍵のパス',
+        vscodeKeyPathPlaceholder: '例: ~/.ssh/id_ed25519',
+        vscodeSelectKey: 'SSH 秘密鍵',
+        vscodeScriptPreview: 'SSH 設定スクリプト',
+        vscodePasswordHelper:
+            'パスワード認証はローカル SSH 設定に書き込まれません。リモートホストへ接続する際は、VS Code でパスワードを入力してください。',
+        vscodePasswordHint:
+            'パスワード認証は、設定したホスト、ポート、ユーザー名で接続します。設定スクリプトや秘密鍵ファイルは不要です。',
+        vscodeScriptPreviewHint:
+            'VS Code を実行するローカルコンピューターで設定スクリプトを実行すると、リモート接続用の SSH エイリアスが登録されます。ホスト、ポート、ユーザー名、秘密鍵、または鍵パスを変更した場合は再実行してください。',
+        vscodePasswordModeTitle: 'パスワード認証',
+        vscodePasswordModeHint:
+            'パスワード認証は、設定したホスト、ポート、ユーザー名で接続します。設定スクリプトや秘密鍵ファイルは不要です。',
+        vscodePasswordStep1: 'ホスト、ポート、ユーザー名を確認します。',
+        vscodePasswordStep2: 'VS Code を開き、接続時にパスワードを入力します。',
+        vscodePasswordStep3: '秘密鍵のダウンロードは不要です。',
         saveContentAndClose: 'ファイルが変更されましたが、保存して閉じたいですか？',
         saveAndOpenNewFile: 'ファイルが変更されましたが、新しいファイルを保存して開きますか？',
         noEdit: 'ファイルは変更されておらず、これを行う必要はありません！',

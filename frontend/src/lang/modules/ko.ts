@@ -1919,7 +1919,27 @@ const message = {
         top: '처음으로 돌아가기',
         up: '뒤로가기',
         openWithVscode: 'VS Code 로 열기',
-        vscodeHelper: '로컬에 VS Code 가 설치되어 있고 SSH Remote 플러그인이 구성되어 있는지 확인하세요.',
+        vscodeHelper:
+            '인증 방식, 호스트, 포트, 사용자명을 확인하세요. 키 인증을 사용하려면 먼저 VS Code를 실행하는 로컬 컴퓨터에서 SSH 설정을 완료해야 합니다.',
+        vscodeCopyConfig: '설정 스크립트 복사',
+        vscodeKeyHelper:
+            '개인 키 다운로드 파일명은 설정된 경로를 기준으로 생성됩니다. 파일을 해당 경로에 저장하면 설정 스크립트가 파일을 확인하고 권한을 적용합니다.',
+        vscodeKeyPath: 'SSH 개인 키 경로',
+        vscodeKeyPathPlaceholder: '예: ~/.ssh/id_ed25519',
+        vscodeSelectKey: 'SSH 개인 키',
+        vscodeScriptPreview: 'SSH 설정 스크립트',
+        vscodePasswordHelper:
+            '비밀번호 인증은 로컬 SSH 설정에 기록되지 않습니다. 원격 호스트에 연결할 때 VS Code에서 비밀번호를 입력해야 합니다.',
+        vscodePasswordHint:
+            '비밀번호 인증은 설정된 호스트, 포트, 사용자명으로 연결합니다. 설정 스크립트나 개인 키 파일은 필요하지 않습니다.',
+        vscodeScriptPreviewHint:
+            'VS Code를 실행하는 로컬 컴퓨터에서 설정 스크립트를 실행하면 원격 연결용 SSH 별칭이 등록됩니다. 호스트, 포트, 사용자명, 개인 키 또는 키 경로가 변경되면 다시 실행하세요.',
+        vscodePasswordModeTitle: '비밀번호 인증',
+        vscodePasswordModeHint:
+            '비밀번호 인증은 설정된 호스트, 포트, 사용자명으로 연결합니다. 설정 스크립트나 개인 키 파일은 필요하지 않습니다.',
+        vscodePasswordStep1: '호스트, 포트, 사용자명을 확인하세요.',
+        vscodePasswordStep2: 'VS Code를 열고 연결 시 비밀번호를 입력하세요.',
+        vscodePasswordStep3: '개인 키 다운로드는 필요하지 않습니다.',
         saveContentAndClose: '파일이 수정되었습니다. 저장 후 닫으시겠습니까?',
         saveAndOpenNewFile: '파일이 수정되었습니다. 저장 후 새 파일을 열겠습니까?',
         noEdit: '파일이 수정되지 않았습니다. 이 작업은 필요하지 않습니다!',

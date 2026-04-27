@@ -2108,7 +2108,26 @@ const message = {
         up: 'Voltar',
         openWithVscode: 'Abrir com VS Code',
         vscodeHelper:
-            'Por favor, certifique-se de que o VS Code está instalado localmente e o plugin SSH Remote está configurado',
+            'Confirme o modo de autenticação, host, porta e usuário. A autenticação por chave exige configurar o SSH no computador que executa o VS Code antes do uso.',
+        vscodeCopyConfig: 'Copiar script de configuração',
+        vscodeKeyHelper:
+            'O nome do download da chave privada é derivado do caminho configurado. Salve o arquivo nesse caminho; o script de configuração verificará o arquivo e aplicará permissões.',
+        vscodeKeyPath: 'Caminho da chave privada SSH',
+        vscodeKeyPathPlaceholder: 'Por exemplo: ~/.ssh/id_ed25519',
+        vscodeSelectKey: 'Chave privada SSH',
+        vscodeScriptPreview: 'Script de configuração SSH',
+        vscodePasswordHelper:
+            'A autenticação por senha não grava na configuração SSH local. Informe a senha no VS Code ao conectar ao host remoto.',
+        vscodePasswordHint:
+            'A autenticação por senha conecta usando host, porta e usuário configurados. Não exige script de configuração nem arquivo de chave privada.',
+        vscodeScriptPreviewHint:
+            'Execute o script de configuração no computador que executa o VS Code para registrar o alias SSH de conexão remota. Execute-o novamente se alterar host, porta, usuário, chave privada ou caminho da chave.',
+        vscodePasswordModeTitle: 'Autenticação por senha',
+        vscodePasswordModeHint:
+            'A autenticação por senha conecta usando host, porta e usuário configurados. Não exige script de configuração nem arquivo de chave privada.',
+        vscodePasswordStep1: 'Confirme host, porta e usuário.',
+        vscodePasswordStep2: 'Abra o VS Code e informe a senha quando solicitado.',
+        vscodePasswordStep3: 'Não é necessário baixar a chave privada.',
         saveContentAndClose: 'O arquivo foi modificado, deseja salvar e fechar?',
         saveAndOpenNewFile: 'O arquivo foi modificado, deseja salvar e abrir o novo arquivo?',
         noEdit: 'O arquivo não foi modificado, não é necessário fazer isso!',

@@ -1986,7 +1986,26 @@ const message = {
         up: 'Geri dön',
         openWithVscode: 'VS Code ile aç',
         vscodeHelper:
-            'Lütfen VS Code’un yerel olarak yüklü olduğundan ve SSH Remote eklentisinin yapılandırıldığından emin olun',
+            'Kimlik doğrulama modu, host, port ve kullanıcı adını doğrulayın. Anahtar kimlik doğrulaması için kullanmadan önce VS Code’un çalıştığı yerel bilgisayarda SSH yapılandırması tamamlanmalıdır.',
+        vscodeCopyConfig: 'Kurulum betiğini kopyala',
+        vscodeKeyHelper:
+            'Özel anahtar indirme adı yapılandırılan yoldan türetilir. Dosyayı bu yola kaydedin; kurulum betiği dosyayı doğrular ve izinleri uygular.',
+        vscodeKeyPath: 'SSH özel anahtar yolu',
+        vscodeKeyPathPlaceholder: 'Örneğin: ~/.ssh/id_ed25519',
+        vscodeSelectKey: 'SSH özel anahtarı',
+        vscodeScriptPreview: 'SSH kurulum betiği',
+        vscodePasswordHelper:
+            'Parola kimlik doğrulaması yerel SSH yapılandırmasına yazılmaz. Uzak host’a bağlanırken parolayı VS Code içinde girin.',
+        vscodePasswordHint:
+            'Parola kimlik doğrulaması yapılandırılan host, port ve kullanıcı adıyla bağlanır. Kurulum betiği veya özel anahtar dosyası gerekmez.',
+        vscodeScriptPreviewHint:
+            'Uzak bağlantı SSH alias’ını kaydetmek için kurulum betiğini VS Code’un çalıştığı yerel bilgisayarda çalıştırın. Host, port, kullanıcı adı, özel anahtar veya anahtar yolu değişirse yeniden çalıştırın.',
+        vscodePasswordModeTitle: 'Parola kimlik doğrulaması',
+        vscodePasswordModeHint:
+            'Parola kimlik doğrulaması yapılandırılan host, port ve kullanıcı adıyla bağlanır. Kurulum betiği veya özel anahtar dosyası gerekmez.',
+        vscodePasswordStep1: 'Host, port ve kullanıcı adını doğrulayın.',
+        vscodePasswordStep2: 'VS Code’u açın ve istendiğinde parolayı girin.',
+        vscodePasswordStep3: 'Özel anahtar indirme gerekmez.',
         saveContentAndClose: 'Dosya değiştirildi, kaydedip kapatmak istiyor musunuz?',
         saveAndOpenNewFile: 'Dosya değiştirildi, kaydedip yeni dosyayı açmak istiyor musunuz?',
         noEdit: 'Dosya değiştirilmedi, buna gerek yok!',
