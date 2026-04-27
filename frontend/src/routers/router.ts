@@ -2,8 +2,11 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { getXpackRoutes } from '@/extensions/routes';
 import { Layout } from '@/routers/constant';
 
-let modules: Record<string, RouteRecordRaw> = import.meta.glob('./modules/*.ts', { eager: true });
-const xpackModules: Record<string, RouteRecordRaw> = getXpackRoutes();
+type AppRouteRecord = RouteRecordRaw & { sort?: number };
+type RouteModuleMap = Record<string, { default?: AppRouteRecord }>;
+
+let modules = import.meta.glob('./modules/*.ts', { eager: true }) as RouteModuleMap;
+const xpackModules = getXpackRoutes(modules);
 modules = { ...modules, ...xpackModules };
 
 const homeRouter: RouteRecordRaw = {
@@ -30,13 +33,15 @@ const homeRouter: RouteRecordRaw = {
 export const routerArray: RouteRecordRaw[] = [];
 
 export const rolesRoutes = [
-    ...Object.keys(modules)
-        .map((key) => modules[key]['default'])
-        .sort((r1, r2) => {
-            r1.sort ??= Number.MAX_VALUE;
-            r2.sort ??= Number.MAX_VALUE;
-            return r1.sort - r2.sort;
-        }),
+    ...(
+        Object.keys(modules)
+            .map((key) => modules[key]['default'])
+            .filter(Boolean) as AppRouteRecord[]
+    ).sort((r1, r2) => {
+        r1.sort ??= Number.MAX_VALUE;
+        r2.sort ??= Number.MAX_VALUE;
+        return r1.sort - r2.sort;
+    }),
 ];
 
 rolesRoutes.forEach((item) => {
