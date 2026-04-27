@@ -42,9 +42,13 @@ frontend/components.d.ts
 frontend/src/xpack
 frontend/src/xpack-ee
 agent/xpack
+agent/xpack-ee
 agent/router/entry_xpack.go
+agent/router/entry_xpackee.go
 agent/server/init_xpack.go
+agent/server/init_xpackee.go
 agent/utils/xpack/xpack.go
+agent/utils/xpack/xpackee.go
 core/xpack
 core/xpack-ee
 core/router/entry_xpack.go

@@ -593,3 +593,13 @@ TerminalAIThinking: 'AI is thinking...'
 TerminalAIReadyToExecute: 'Thinking complete, press Enter to execute (duration: {{ .duration }}, tokens: {{ .tokens }})'
 TerminalAIRequestFailed: 'AI request failed: {{ .err }}'
 FileAISearchEmptyDir: 'No files or directories found under this path (or all entries were filtered).'
+
+# ai proxy
+ErrAIProxyServiceNotInstalled: '{{ .name }} service is not installed'
+ErrAIProxyModelAccountNotFound: 'Model account {{ .id }} not found'
+ErrAIProxyModelMapRequired: 'This field is required.'
+ErrAIProxyModelMapInvalid: 'Model mapping must be a valid JSON object: {{ .err }}'
+ErrAIProxyModelMapEmpty: 'Model mapping cannot be empty'
+ErrAIProxyModelMapEmptyExternalModel: 'Model mapping contains an empty request model'
+ErrAIProxyModelMapEmptyUpstreamModel: 'Upstream model for {{ .model }} cannot be empty'
+AIProxyUserFallback: 'User {{ .id }}'
