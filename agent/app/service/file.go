@@ -1079,6 +1079,12 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		logFilePath, _ = ini_conf.GetIniValue(configPath, "supervisord", "logfile")
 	case constant.Supervisor:
 		logFilePath = path.Join(global.Dir.DataDir, "tools", "supervisord", "log", req.Name)
+	case "ai-proxy":
+		safeName := path.Base(req.Name)
+		if safeName != req.Name || strings.Contains(safeName, "..") {
+			return nil, buserr.New("ErrInvalidParams")
+		}
+		logFilePath = path.Join(global.Dir.LogDir, "ai", safeName)
 	}
 
 	file, err := os.Open(logFilePath)

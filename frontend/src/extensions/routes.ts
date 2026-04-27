@@ -1,25 +1,30 @@
 import type { RouteRecordRaw } from 'vue-router';
 
-export function getXpackRoutes(): Record<string, RouteRecordRaw> {
-    const xpackRoutes = import.meta.glob('@/xpack/routers/*.ts', { eager: true }) as Record<string, RouteRecordRaw>;
-    const xpackEERoutes = import.meta.glob('@/xpack-ee/routers/*.ts', { eager: true }) as Record<
-        string,
-        RouteRecordRaw
-    >;
+type ExtensionRouteRecord = RouteRecordRaw & { sort?: number };
+type RouteModuleMap = Record<string, { default?: ExtensionRouteRecord }>;
+
+export function getXpackRoutes(baseModules: RouteModuleMap = {}): RouteModuleMap {
+    const xpackRoutes = import.meta.glob('@/xpack/routers/*.ts', { eager: true }) as RouteModuleMap;
+    const xpackEERoutes = import.meta.glob('@/xpack-ee/routers/*.ts', { eager: true }) as RouteModuleMap;
     const routes = {
         ...xpackRoutes,
         ...xpackEERoutes,
     };
-    const rawRoutes: RouteRecordRaw[] = Object.keys(routes)
-        .map((key) => routes[key]['default'])
-        .sort((r1, r2) => {
-            r1.sort ??= Number.MAX_VALUE;
-            r2.sort ??= Number.MAX_VALUE;
-            return r1.sort - r2.sort;
-        });
+    const rawRoutes = (
+        Object.keys(routes)
+            .map((key) => routes[key]['default'])
+            .filter(Boolean) as ExtensionRouteRecord[]
+    ).sort((r1, r2) => {
+        r1.sort ??= Number.MAX_VALUE;
+        r2.sort ??= Number.MAX_VALUE;
+        return r1.sort - r2.sort;
+    });
 
-    const routeMap = new Map<string, RouteRecordRaw>();
-    rawRoutes.forEach((route) => {
+    const routeMap = new Map<string, ExtensionRouteRecord>();
+    const baseRoutes: ExtensionRouteRecord[] = Object.keys(baseModules)
+        .map((key) => baseModules[key]?.default)
+        .filter(Boolean) as ExtensionRouteRecord[];
+    [...baseRoutes, ...rawRoutes].forEach((route) => {
         if (route?.name) {
             routeMap.set(route.name as string, route);
         }
@@ -47,7 +52,7 @@ export function getXpackRoutes(): Record<string, RouteRecordRaw> {
         mergedRouteNames.add(route.name as string);
     });
 
-    const mergedRoutes: Record<string, RouteRecordRaw> = {};
+    const mergedRoutes: RouteModuleMap = {};
     Object.keys(routes).forEach((key) => {
         const route = routes[key]['default'];
         if (!mergedRouteNames.has(route?.name as string)) {

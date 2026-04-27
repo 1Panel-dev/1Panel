@@ -592,3 +592,13 @@ TerminalAIThinking: "AI 正在思考..."
 TerminalAIReadyToExecute: "思考完成，请回车执行（耗时 {{ .duration }}，token：{{ .tokens }}）"
 TerminalAIRequestFailed: "AI 请求失败：{{ .err }}"
 FileAISearchEmptyDir: "当前目录下没有可列出的文件或文件夹（或均被过滤）。"
+
+# ai proxy
+ErrAIProxyServiceNotInstalled: "{{ .name }} 服务未安装"
+ErrAIProxyModelAccountNotFound: "模型账号 {{ .id }} 不存在"
+ErrAIProxyModelMapRequired: "请填写必填项"
+ErrAIProxyModelMapInvalid: "模型映射必须是合法的 JSON 对象：{{ .err }}"
+ErrAIProxyModelMapEmpty: "模型映射不能为空"
+ErrAIProxyModelMapEmptyExternalModel: "模型映射中存在空的请求模型"
+ErrAIProxyModelMapEmptyUpstreamModel: "模型 {{ .model }} 的上游模型不能为空"
+AIProxyUserFallback: "用户 {{ .id }}"
