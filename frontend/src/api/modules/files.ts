@@ -57,8 +57,15 @@ export const stopCompressFile = (taskID: string) => {
     return http.post('files/compress/stop', { taskID } as File.FileCompressStopReq);
 };
 
-export const deCompressFile = (form: File.FileDeCompress) => {
-    return http.post<File.File>('files/decompress', form, TimeoutEnum.T_10M);
+export const deCompressFile = (form: File.FileDeCompress, config?: AxiosRequestConfig) => {
+    return http.service.post<File.File>('files/decompress', form, {
+        timeout: TimeoutEnum.T_10M,
+        ...config,
+    });
+};
+
+export const stopDeCompressFile = (taskID: string) => {
+    return http.post('files/decompress/stop', { taskID } as File.FileDeCompressStopReq);
 };
 
 export const getFileContent = (params: File.ReqFile) => {

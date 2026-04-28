@@ -910,13 +910,13 @@ func decodeGBK(input string) (string, error) {
 	return decoded, nil
 }
 
-func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType) error {
+func (f FileOp) decompressWithSDK(ctx context.Context, srcFile string, dst string, cType CompressType) error {
 	format := getFormat(cType)
 	if cType == Gz {
-		if err := f.tryDecompressTarGz(srcFile, dst, format); err == nil {
+		if err := f.tryDecompressTarGz(ctx, srcFile, dst, format); err == nil {
 			return nil
 		}
-		return f.DecompressGzFile(srcFile, dst)
+		return f.DecompressGzFile(ctx, srcFile, dst)
 	}
 
 	type dirEntry struct {
@@ -976,7 +976,7 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 		return err
 	}
 	defer input.Close()
-	if err := format.Extract(context.Background(), input, nil, handler); err != nil {
+	if err := format.Extract(ctx, input, nil, handler); err != nil {
 		return err
 	}
 	for i := len(dirs) - 1; i >= 0; i-- {
@@ -985,21 +985,21 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 	return nil
 }
 
-func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secret string) error {
+func (f FileOp) Decompress(ctx context.Context, srcFile string, dst string, cType CompressType, secret string) error {
 	if cType == Tar || cType == Zip || cType == TarGz || cType == Rar || cType == X7z {
 		shellArchiver, err := NewExtractShellArchiver(cType)
 		if !f.Stat(dst) {
 			_ = f.CreateDir(dst, 0755)
 		}
 		if err == nil {
-			if err = shellArchiver.Extract(srcFile, dst, secret); err == nil {
+			if err = shellArchiver.Extract(ctx, srcFile, dst, secret); err == nil {
 				return nil
 			}
 			if cType == TarGz {
 				if strings.Contains(err.Error(), "bad decrypt") {
 					return buserr.New("ErrBadDecrypt")
 				}
-				if err := shellArchiver.Extract(srcFile, dst, "-"); strings.Contains(err.Error(), "bad decrypt") {
+				if err := shellArchiver.Extract(ctx, srcFile, dst, "-"); strings.Contains(err.Error(), "bad decrypt") {
 					return buserr.New("ErrBadDecrypt")
 				}
 			}
@@ -1009,7 +1009,7 @@ func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secre
 			}
 		}
 	}
-	return f.decompressWithSDK(srcFile, dst, cType)
+	return f.decompressWithSDK(ctx, srcFile, dst, cType)
 }
 
 func ZipFile(ctx context.Context, files []archiver.File, dst afero.File, progress func(current, total int, message string)) error {
@@ -1088,7 +1088,7 @@ func (r *contextReader) Read(p []byte) (int, error) {
 	}
 }
 
-func (f FileOp) tryDecompressTarGz(srcFile string, dst string, format archiver.CompressedArchive) error {
+func (f FileOp) tryDecompressTarGz(ctx context.Context, srcFile string, dst string, format archiver.CompressedArchive) error {
 	input, err := f.Fs.Open(srcFile)
 	if err != nil {
 		return err
@@ -1139,7 +1139,7 @@ func (f FileOp) tryDecompressTarGz(srcFile string, dst string, format archiver.C
 		return nil
 	}
 
-	if err := format.Extract(context.Background(), input, nil, handler); err != nil {
+	if err := format.Extract(ctx, input, nil, handler); err != nil {
 		return err
 	}
 	if !extracted {
@@ -1151,7 +1151,7 @@ func (f FileOp) tryDecompressTarGz(srcFile string, dst string, format archiver.C
 	return nil
 }
 
-func (f FileOp) DecompressGzFile(srcFile, dst string) error {
+func (f FileOp) DecompressGzFile(ctx context.Context, srcFile, dst string) error {
 	var archiveModTime time.Time
 	if st, err := f.Fs.Stat(srcFile); err == nil {
 		archiveModTime = st.ModTime()
@@ -1163,7 +1163,7 @@ func (f FileOp) DecompressGzFile(srcFile, dst string) error {
 	}
 	defer in.Close()
 
-	gr, err := gzip.NewReader(in)
+	gr, err := gzip.NewReader(&contextReader{ctx: ctx, r: in})
 	if err != nil {
 		return fmt.Errorf("gzip reader creation failed: %w", err)
 	}
