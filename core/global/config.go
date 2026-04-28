@@ -15,7 +15,7 @@ type Base struct {
 	IsOffLine      bool   `mapstructure:"is_offline"`
 	IsFxplay       bool   `mapstructure:"is_fxplay"`
 	Edition        string `mapstructure:"edition"`
-	IsXpackEE      bool   `mapstructure:"is_xpackee"`
+	IsEnterprise   bool   `mapstructure:"is_enterprise"`
 	Version        string `mapstructure:"version"`
 	InstallDir     string `mapstructure:"install_dir"`
 	ChangeUserInfo string `mapstructure:"change_user_info"`

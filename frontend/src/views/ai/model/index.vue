@@ -13,7 +13,7 @@ import AccountView from '@/views/ai/agents/model/index.vue';
 import LocalView from '@/views/ai/model/local/index.vue';
 import { loadOptionalComponent } from '@/extensions/optional';
 
-const AIProxyView = defineAsyncComponent(() => loadOptionalComponent('/src/xpack-ee/views/ai-proxy/index.vue'));
+const AIProxyView = defineAsyncComponent(() => loadOptionalComponent('/src/enterprise/views/ai-proxy/index.vue'));
 
 const route = useRoute();
 const router = useRouter();

@@ -3,7 +3,7 @@ type VueComponent = { template?: string } | Record<string, any>;
 const EmptyComponent: VueComponent = { template: '<div></div>' };
 const extensionViewModules = {
     ...import.meta.glob('@/xpack/views/**/*.vue'),
-    ...import.meta.glob('@/xpack-ee/views/**/*.vue'),
+    ...import.meta.glob('@/enterprise/views/**/*.vue'),
 };
 
 function findLoader(suffix: string) {

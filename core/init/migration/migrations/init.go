@@ -46,7 +46,7 @@ var InitSetting = &gormigrate.Migration{
 		if global.CONF.Base.Language == "zh" {
 			language = "zh"
 		}
-		if !global.CONF.Base.IsXpackEE {
+		if !global.CONF.Base.IsEnterprise {
 			if err := tx.Create(&model.Setting{Key: "UserName", Value: global.CONF.Base.Username}).Error; err != nil {
 				return err
 			}
@@ -994,9 +994,9 @@ func normalizeAiMenuChild(children []dto.ShowMenu, fallback dto.ShowMenu, labels
 }
 
 var AddUserManagementMenu = &gormigrate.Migration{
-	ID: "20260414-add-user-management-menu",
+	ID: "20260415-add-user-management-menu",
 	Migrate: func(tx *gorm.DB) error {
-		if !global.CONF.Base.IsXpackEE {
+		if !global.CONF.Base.IsEnterprise {
 			return nil
 		}
 		var menuJSON string
@@ -1020,7 +1020,7 @@ var AddUserManagementMenu = &gormigrate.Migration{
 			Title:    "xpack.user.userManage",
 			IsShow:   true,
 			Label:    "UserManagement",
-			Path:     "/xpack-ee/users",
+			Path:     "/enterprise/users",
 			Sort:     350,
 		}
 
