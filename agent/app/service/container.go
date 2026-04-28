@@ -1076,14 +1076,18 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 	}
 	stdout, err := dockerCmd.StdoutPipe()
 	if err != nil {
-		_ = dockerCmd.Process.Signal(syscall.SIGTERM)
 		return err
 	}
 	dockerCmd.Stderr = dockerCmd.Stdout
 	if err := dockerCmd.Start(); err != nil {
-		_ = dockerCmd.Process.Signal(syscall.SIGTERM)
 		return err
 	}
+	defer func() {
+		if dockerCmd.Process != nil {
+			_ = dockerCmd.Process.Kill()
+			_ = dockerCmd.Wait()
+		}
+	}()
 
 	tempFile, err := os.CreateTemp("", "cmd_output_*.txt")
 	if err != nil {
