@@ -19,7 +19,7 @@ func NewTarArchiver(compressType CompressType) ShellArchiver {
 }
 
 func (t TarArchiver) Extract(FilePath string, dstDir string, secret string) error {
-	return cmd.RunDefaultBashCf("%s %s \"%s\" -C \"%s\"", t.Cmd, t.getOptionStr("extract"), FilePath, dstDir)
+	return cmd.NewCommandMgr().Run(t.Cmd, t.getOptionStr("extract"), FilePath, "-C", dstDir)
 }
 
 func (t TarArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, secret string) error {

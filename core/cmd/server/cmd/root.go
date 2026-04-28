@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/server"
-	cmdUtils "github.com/1Panel-dev/1Panel/core/utils/cmd"
+	"github.com/1Panel-dev/1Panel/core/utils/ctl_conf"
 	"github.com/glebarez/sqlite"
 	"github.com/spf13/cobra"
 	"gorm.io/gorm"
@@ -38,11 +38,10 @@ type setting struct {
 }
 
 func loadDBConn(dbName string) (*gorm.DB, error) {
-	stdout, err := cmdUtils.RunDefaultWithStdoutBashC("grep '^BASE_DIR=' /usr/local/bin/1pctl | cut -d'=' -f2")
+	baseDir, err := ctl_conf.LoadFromFile("/usr/local/bin/1pctl", "BASE_DIR")
 	if err != nil {
 		return nil, fmt.Errorf("handle load `BASE_DIR` failed, err: %v", err)
 	}
-	baseDir := strings.ReplaceAll(stdout, "\n", "")
 	if len(baseDir) == 0 {
 		return nil, fmt.Errorf("error `BASE_DIR` find in /usr/local/bin/1pctl \n")
 	}

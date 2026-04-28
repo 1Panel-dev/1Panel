@@ -630,11 +630,14 @@ func (r *RuntimeService) OperateNodeModules(req request.NodeModuleOperateReq) er
 		return err
 	}
 	operation := getOperation(req.Operate, req.PkgManager)
-	execScript := fmt.Sprintf("%s %s %s", req.PkgManager, operation, req.Module)
+	execArgs := []string{"exec", "-i", containerName, req.PkgManager, operation}
+	if strings.TrimSpace(req.Module) != "" {
+		execArgs = append(execArgs, req.Module)
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Minute)
 	defer cancel()
-	installCmd := exec.CommandContext(ctx, "docker", "exec", "-i", containerName, "bash", "-c", execScript)
+	installCmd := exec.CommandContext(ctx, "docker", execArgs...)
 	output, err := installCmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("failed to execute command: %s, error: %w", string(output), err)

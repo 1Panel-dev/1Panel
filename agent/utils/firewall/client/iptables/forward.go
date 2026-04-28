@@ -1,7 +1,6 @@
 package iptables
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -9,33 +8,33 @@ func AddForward(protocol, srcPort, dest, destPort, iface string, save bool) erro
 	srcPort = strings.ReplaceAll(srcPort, "-", ":")
 	itemDstPort := strings.ReplaceAll(destPort, "-", ":")
 	if dest != "" && dest != "127.0.0.1" && dest != "localhost" {
-		iptablesArg := fmt.Sprintf("-A %s", Chain1PanelPreRouting)
+		args := []string{"-A", Chain1PanelPreRouting}
 		if iface != "" {
-			iptablesArg += fmt.Sprintf(" -i %s", iface)
+			args = append(args, "-i", iface)
 		}
-		iptablesArg += fmt.Sprintf(" -p %s --dport %s -j DNAT --to-destination %s:%s", protocol, srcPort, dest, destPort)
-		if err := Run(NatTab, iptablesArg); err != nil {
+		args = append(args, "-p", protocol, "--dport", srcPort, "-j", "DNAT", "--to-destination", dest+":"+destPort)
+		if err := Run(NatTab, args...); err != nil {
 			return err
 		}
 
-		if err := Run(NatTab, fmt.Sprintf("-A %s -d %s -p %s --dport %s -j MASQUERADE", Chain1PanelPostRouting, dest, protocol, itemDstPort)); err != nil {
+		if err := Run(NatTab, "-A", Chain1PanelPostRouting, "-d", dest, "-p", protocol, "--dport", itemDstPort, "-j", "MASQUERADE"); err != nil {
 			return err
 		}
 
-		if err := Run(FilterTab, fmt.Sprintf("-A %s -d %s -p %s --dport %s -j ACCEPT", Chain1PanelForward, dest, protocol, itemDstPort)); err != nil {
+		if err := Run(FilterTab, "-A", Chain1PanelForward, "-d", dest, "-p", protocol, "--dport", itemDstPort, "-j", "ACCEPT"); err != nil {
 			return err
 		}
 
-		if err := Run(FilterTab, fmt.Sprintf("-A %s -s %s -p %s --sport %s -j ACCEPT", Chain1PanelForward, dest, protocol, itemDstPort)); err != nil {
+		if err := Run(FilterTab, "-A", Chain1PanelForward, "-s", dest, "-p", protocol, "--sport", itemDstPort, "-j", "ACCEPT"); err != nil {
 			return err
 		}
 	} else {
-		iptablesArg := fmt.Sprintf("-A %s", Chain1PanelPreRouting)
+		args := []string{"-A", Chain1PanelPreRouting}
 		if iface != "" {
-			iptablesArg += fmt.Sprintf(" -i %s", iface)
+			args = append(args, "-i", iface)
 		}
-		iptablesArg += fmt.Sprintf(" -p %s --dport %s -j REDIRECT --to-port %s", protocol, srcPort, destPort)
-		if err := Run(NatTab, iptablesArg); err != nil {
+		args = append(args, "-p", protocol, "--dport", srcPort, "-j", "REDIRECT", "--to-port", destPort)
+		if err := Run(NatTab, args...); err != nil {
 			return err
 		}
 	}
@@ -44,20 +43,20 @@ func AddForward(protocol, srcPort, dest, destPort, iface string, save bool) erro
 
 func DeleteForward(num string, protocol, srcPort, dest, destPort, iface string) error {
 	itemDstPort := strings.ReplaceAll(destPort, "-", ":")
-	if err := Run(NatTab, fmt.Sprintf("-D %s %s", Chain1PanelPreRouting, num)); err != nil {
+	if err := Run(NatTab, "-D", Chain1PanelPreRouting, num); err != nil {
 		return err
 	}
 
 	if dest != "" && dest != "127.0.0.1" && dest != "localhost" {
-		if err := Run(NatTab, fmt.Sprintf("-D %s -d %s -p %s --dport %s -j MASQUERADE", Chain1PanelPostRouting, dest, protocol, itemDstPort)); err != nil {
+		if err := Run(NatTab, "-D", Chain1PanelPostRouting, "-d", dest, "-p", protocol, "--dport", itemDstPort, "-j", "MASQUERADE"); err != nil {
 			return err
 		}
 
-		if err := Run(FilterTab, fmt.Sprintf("-D %s -d %s -p %s --dport %s -j ACCEPT", Chain1PanelForward, dest, protocol, itemDstPort)); err != nil {
+		if err := Run(FilterTab, "-D", Chain1PanelForward, "-d", dest, "-p", protocol, "--dport", itemDstPort, "-j", "ACCEPT"); err != nil {
 			return err
 		}
 
-		if err := Run(FilterTab, fmt.Sprintf("-D %s -s %s -p %s --sport %s -j ACCEPT", Chain1PanelForward, dest, protocol, itemDstPort)); err != nil {
+		if err := Run(FilterTab, "-D", Chain1PanelForward, "-s", dest, "-p", protocol, "--sport", itemDstPort, "-j", "ACCEPT"); err != nil {
 			return err
 		}
 	}
@@ -68,7 +67,7 @@ func ListForward(chain ...string) ([]IptablesNatInfo, error) {
 	if len(chain) == 0 {
 		chain = append(chain, Chain1PanelPreRouting)
 	}
-	stdout, err := RunWithStd(NatTab, fmt.Sprintf("-nvL %s --line-numbers", chain[0]))
+	stdout, err := RunWithStd(NatTab, "-nvL", chain[0], "--line-numbers")
 	if err != nil {
 		return nil, err
 	}

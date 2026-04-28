@@ -1,7 +1,6 @@
 package client
 
 import (
-	"bytes"
 	"compress/gzip"
 	"context"
 	"errors"
@@ -16,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
@@ -229,11 +229,6 @@ func (r *Local) Backup(info BackupInfo) error {
 			return fmt.Errorf("mkdir %s failed, err: %v", info.TargetDir, err)
 		}
 	}
-	outfile, err := os.OpenFile(path.Join(info.TargetDir, info.FileName), os.O_RDWR|os.O_CREATE, constant.DirPerm)
-	if err != nil {
-		return fmt.Errorf("open file %s failed, err: %v", path.Join(info.TargetDir, info.FileName), err)
-	}
-	defer func() { _ = outfile.Close() }()
 	dumpCmd := "mysqldump"
 	if r.Type == constant.AppMariaDB {
 		dumpCmd = "mariadb-dump"
@@ -250,19 +245,13 @@ func (r *Local) Backup(info BackupInfo) error {
 		args = append(args, arg)
 	}
 	args = append(args, info.Name)
-	cmd := exec.Command("docker", args...)
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-
-	gzipCmd := exec.Command("gzip", "-cf")
-	gzipCmd.Stdin, _ = cmd.StdoutPipe()
-	gzipCmd.Stdout = outfile
-	_ = gzipCmd.Start()
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("handle backup database failed, err: %v", stderr.String())
+	cmdMgr := cmd.NewCommandMgr(cmd.WithOutputFile(path.Join(info.TargetDir, info.FileName)))
+	if _, err := cmdMgr.RunPipe(
+		cmd.PipeCommand{Name: "docker", Args: args},
+		cmd.PipeCommand{Name: "gzip", Args: []string{"-cf"}},
+	); err != nil {
+		return fmt.Errorf("handle backup database failed, err: %v", err)
 	}
-	_ = gzipCmd.Wait()
 	return nil
 }
 

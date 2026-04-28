@@ -990,7 +990,7 @@ func validateAgentConfigFileContent(agentType, content string) error {
 }
 
 func getOpenclawNPMRegistry(containerName string) (string, error) {
-	registry, err := runDockerExecWithStdout(20*time.Second, containerName, "npm", "get", "registry")
+	registry, err := cmd.RunDockerExecWithStdout(20*time.Second, containerName, "npm", "get", "registry")
 	if err != nil {
 		return "", err
 	}
@@ -1002,7 +1002,7 @@ func getOpenclawNPMRegistry(containerName string) (string, error) {
 }
 
 func setOpenclawNPMRegistry(containerName, registry string) error {
-	return cmd.RunDefaultBashCf("docker exec %s npm set registry %q", containerName, registry)
+	return cmd.NewCommandMgr().Run("docker", "exec", containerName, "npm", "set", "registry", registry)
 }
 
 func (a AgentService) loadAgentAndInstall(agentID uint) (*model.Agent, *model.AppInstall, error) {

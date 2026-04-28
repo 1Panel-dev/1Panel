@@ -18,18 +18,11 @@ func (s *Sysvinit) Name() string {
 	return "sysvinit"
 }
 func (s *Sysvinit) IsActive(serviceName string) (bool, error) {
-	out, err := cmd.RunDefaultWithStdoutBashCf("if service %s status >/dev/null 2>&1; then echo 'active'; else echo 'inactive'; fi", serviceName)
-	if err != nil {
-		return false, err
-	}
-	return out == "active\n", nil
+	_, err := cmd.NewCommandMgr().RunWithStdout("service", serviceName, "status")
+	return err == nil, nil
 }
 func (s *Sysvinit) IsEnable(serviceName string) (bool, error) {
-	out, err := cmd.RunDefaultWithStdoutBashCf("if ls /etc/rc*.d/S*%s >/dev/null 2>&1; then echo 'enabled'; else echo 'disabled'; fi", serviceName)
-	if err != nil {
-		return false, err
-	}
-	return out == "enabled\n", nil
+	return isSysvServiceEnabled(serviceName)
 }
 func (s *Sysvinit) IsExist(serviceName string) (bool, error) {
 	_, err := os.Stat(filepath.Join("/etc/init.d", serviceName))
