@@ -4,11 +4,13 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -386,9 +388,13 @@ func getParentDevice(device string) string {
 }
 
 func getDiskUsageInfo(device string) (size, used, avail string, usePercent int, err error) {
-	output, err := cmd.RunDefaultWithStdoutBashC(fmt.Sprintf("df -h %s | tail -1", device))
+	output, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("df", "-h", device)
 	if err != nil {
 		return "", "", "", 0, nil
+	}
+	lines := strings.Split(strings.TrimSpace(output), "\n")
+	if len(lines) > 1 {
+		output = lines[len(lines)-1]
 	}
 
 	fields := strings.Fields(output)
@@ -515,7 +521,7 @@ func removeFromFstab(mountPoint string) error {
 }
 
 func getFilesystemType(device string) (string, error) {
-	output, err := cmd.RunDefaultWithStdoutBashC(fmt.Sprintf("blkid -o value -s TYPE %s", device))
+	output, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("blkid", "-o", "value", "-s", "TYPE", device)
 	if err != nil {
 		return "", err
 	}
@@ -575,7 +581,7 @@ func parseSizeToBytes(sizeStr string) int64 {
 }
 
 func getDeviceUUID(device string) (string, error) {
-	output, err := cmd.RunDefaultWithStdoutBashC(fmt.Sprintf("blkid -s UUID -o value %s", device))
+	output, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("blkid", "-s", "UUID", "-o", "value", device)
 	if err != nil {
 		return "", err
 	}

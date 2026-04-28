@@ -2,8 +2,10 @@ package client
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -22,11 +24,12 @@ func (i *Iptables) Name() string {
 }
 
 func (i *Iptables) Status() (bool, error) {
-	stdout, err := cmd.RunDefaultWithStdoutBashC("iptables -L -n | head -1")
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("iptables", "-L", "-n")
 	if err != nil {
 		return false, err
 	}
-	return strings.Contains(stdout, "Chain"), nil
+	firstLine := strings.Split(strings.TrimSpace(stdout), "\n")[0]
+	return strings.Contains(firstLine, "Chain"), nil
 }
 
 func (i *Iptables) Start() error {
@@ -46,7 +49,7 @@ func (i *Iptables) Reload() error {
 }
 
 func (i *Iptables) Version() (string, error) {
-	stdout, err := cmd.RunDefaultWithStdoutBashC("iptables --version")
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("iptables", "--version")
 	if err != nil {
 		return "", fmt.Errorf("failed to get iptables version: %w", err)
 	}
@@ -131,15 +134,13 @@ func (i *Iptables) Port(port FireInfo, operation string) error {
 		action = "DROP"
 	}
 
-	ruleArgs := []string{fmt.Sprintf("-p %s", protocol)}
-	ruleArgs = append(ruleArgs, fmt.Sprintf("--dport %s", portSpec), fmt.Sprintf("-j %s", action))
-	ruleSpec := strings.Join(ruleArgs, " ")
+	ruleArgs := []string{"-p", protocol, "--dport", portSpec, "-j", action}
 	if operation == "add" {
-		if err := iptables.AddRule(iptables.FilterTab, port.Chain, ruleSpec); err != nil {
+		if err := iptables.AddRule(iptables.FilterTab, port.Chain, ruleArgs...); err != nil {
 			return err
 		}
 	} else {
-		if err := iptables.DeleteRule(iptables.FilterTab, port.Chain, ruleSpec); err != nil {
+		if err := iptables.DeleteRule(iptables.FilterTab, port.Chain, ruleArgs...); err != nil {
 			return err
 		}
 	}
@@ -174,7 +175,7 @@ func (i *Iptables) RichRules(rule FireInfo, operation string) error {
 
 	var ruleArgs []string
 	if address != "" {
-		ruleArgs = append(ruleArgs, fmt.Sprintf("-s %s", address))
+		ruleArgs = append(ruleArgs, "-s", address)
 	}
 
 	protocol := strings.TrimSpace(rule.Protocol)
@@ -183,7 +184,7 @@ func (i *Iptables) RichRules(rule FireInfo, operation string) error {
 	}
 
 	if protocol != "" {
-		ruleArgs = append(ruleArgs, fmt.Sprintf("-p %s", protocol))
+		ruleArgs = append(ruleArgs, "-p", protocol)
 	}
 
 	if rule.Port != "" {
@@ -194,17 +195,16 @@ func (i *Iptables) RichRules(rule FireInfo, operation string) error {
 		if protocol == "" {
 			return fmt.Errorf("protocol is required when specifying a port")
 		}
-		ruleArgs = append(ruleArgs, fmt.Sprintf("--dport %s", portSegment))
+		ruleArgs = append(ruleArgs, "--dport", portSegment)
 	}
 
-	ruleArgs = append(ruleArgs, fmt.Sprintf("-j %s", action))
-	ruleSpec := strings.Join(ruleArgs, " ")
+	ruleArgs = append(ruleArgs, "-j", action)
 	if operation == "add" {
-		if err := iptables.AddRule(iptables.FilterTab, rule.Chain, ruleSpec); err != nil {
+		if err := iptables.AddRule(iptables.FilterTab, rule.Chain, ruleArgs...); err != nil {
 			return err
 		}
 	} else {
-		if err := iptables.DeleteRule(iptables.FilterTab, rule.Chain, ruleSpec); err != nil {
+		if err := iptables.DeleteRule(iptables.FilterTab, rule.Chain, ruleArgs...); err != nil {
 			return err
 		}
 	}
@@ -232,11 +232,16 @@ func (i *Iptables) ListForward() ([]FireInfo, error) {
 }
 
 func EnableIptablesForward() error {
-	if err := cmd.RunDefaultBashC("echo 1 > /proc/sys/net/ipv4/ip_forward"); err != nil {
+	if err := cmd.WriteFileWithOptionalSudo("/proc/sys/net/ipv4/ip_forward", []byte("1"), 0644); err != nil {
 		return fmt.Errorf("failed to enable IP forwarding: %w", err)
 	}
-	_ = cmd.RunDefaultBashC("grep -q '^net.ipv4.ip_forward' /etc/sysctl.conf || echo 'net.ipv4.ip_forward = 1' >> /etc/sysctl.conf")
-	_ = cmd.RunDefaultBashC("sysctl -p")
+	if data, err := os.ReadFile("/etc/sysctl.conf"); err == nil {
+		if !strings.Contains(string(data), "net.ipv4.ip_forward") {
+			content := strings.TrimRight(string(data), "\n") + "\nnet.ipv4.ip_forward = 1\n"
+			_ = cmd.WriteFileWithOptionalSudo("/etc/sysctl.conf", []byte(content), 0644)
+		}
+	}
+	_ = cmd.NewCommandMgr().RunWithOptionalSudo("sysctl", "-p")
 
 	if err := iptables.AddChainWithAppend(iptables.NatTab, "PREROUTING", iptables.Chain1PanelPreRouting); err != nil {
 		return err

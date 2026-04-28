@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 	"time"
@@ -376,7 +377,15 @@ func recoverAppData(src string, itemHelper *snapRecoverHelper) error {
 		itemHelper.Task.Log(i18n.GetMsgByKey("RecoverAppEmpty"))
 		return nil
 	}
-	if err := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute)).RunBashCf("docker load < %s", path.Join(src, "images.tar.gz")); err != nil {
+	imageFile, err := os.Open(path.Join(src, "images.tar.gz"))
+	if err != nil {
+		itemHelper.Task.LogFailedWithErr(i18n.GetMsgByKey("RecoverAppImage"), err)
+		return fmt.Errorf("docker load images failed, %v", err)
+	}
+	defer func() { _ = imageFile.Close() }()
+	loadCmd := exec.Command("docker", "load")
+	loadCmd.Stdin = imageFile
+	if err := loadCmd.Run(); err != nil {
 		itemHelper.Task.LogFailedWithErr(i18n.GetMsgByKey("RecoverAppImage"), err)
 		return fmt.Errorf("docker load images failed, %v", err)
 	}
@@ -457,8 +466,7 @@ func restartCompose(composePath string, itemHelper *snapRecoverHelper) error {
 		if _, err := os.Stat(pathItem); err != nil {
 			continue
 		}
-		upCmd := fmt.Sprintf("docker compose -f %s up -d", pathItem)
-		if err := cmd.RunDefaultBashC(upCmd); err != nil {
+		if err := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute)).Run("docker", "compose", "-f", pathItem, "up", "-d"); err != nil {
 			itemHelper.Task.LogFailedWithErr(i18n.GetMsgByKey("RecoverCompose"), err)
 			continue
 		}

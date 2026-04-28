@@ -86,8 +86,9 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 		baseInfo.IsActive = false
 	}
 
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
 	if baseInfo.IsActive {
-		version, err := cmd.RunDefaultWithStdoutBashC("clamdscan --version")
+		version, err := cmdMgr.RunWithStdout("clamdscan", "--version")
 		if err == nil {
 			if strings.Contains(version, "/") {
 				baseInfo.Version = strings.TrimPrefix(strings.Split(version, "/")[0], "ClamAV ")
@@ -99,7 +100,7 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 		_ = clam.CheckWithStopAll(false, clamRepo)
 	}
 	if baseInfo.FreshIsActive {
-		version, err := cmd.RunDefaultWithStdoutBashC("freshclam --version")
+		version, err := cmdMgr.RunWithStdout("freshclam", "--version")
 		if err == nil {
 			if strings.Contains(version, "/") {
 				baseInfo.FreshVersion = strings.TrimPrefix(strings.Split(version, "/")[0], "ClamAV ")

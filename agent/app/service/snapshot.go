@@ -15,7 +15,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	fileUtils "github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/docker/docker/api/types/image"
@@ -303,12 +302,20 @@ func loadAppImage(list []dto.DataTree) []dto.DataTree {
 		if list[i].IsLocal {
 			appPath = path.Join(global.Dir.AppDir, "local", strings.TrimPrefix(list[i].Key, "local"), list[i].Name)
 		}
-		stdout, err := cmd.RunDefaultWithStdoutBashCf("cat %s | grep image: ", path.Join(appPath, "docker-compose.yml"))
+		composePath := path.Join(appPath, "docker-compose.yml")
+		content, err := os.ReadFile(composePath)
 		if err != nil {
 			list[i].Children = append(list[i].Children, itemAppImage)
 			continue
 		}
-		itemAppImage.Name = strings.ReplaceAll(strings.ReplaceAll(strings.TrimSpace(stdout), "\n", ""), "image: ", "")
+		for _, line := range strings.Split(string(content), "\n") {
+			trimmed := strings.TrimSpace(line)
+			if !strings.HasPrefix(trimmed, "image:") {
+				continue
+			}
+			itemAppImage.Name = strings.TrimSpace(strings.TrimPrefix(trimmed, "image:"))
+			break
+		}
 		for _, imageItem := range imageList {
 			for _, tag := range imageItem.RepoTags {
 				if tag == itemAppImage.Name {

@@ -60,7 +60,9 @@ func (u *DashboardService) Restart(operation string) error {
 	case "system":
 		{
 			go func() {
-				if err := cmd.RunDefaultBashCf("%s reboot", cmd.SudoHandleCmd()); err != nil {
+				cmdMgr := cmd.NewCommandMgr()
+				err := cmdMgr.RunWithOptionalSudo("reboot")
+				if err != nil {
 					global.LOG.Errorf("handle reboot failed, %v", err)
 				}
 			}()
@@ -429,11 +431,17 @@ type diskInfo struct {
 func loadDiskInfo() []dto.DiskInfo {
 	var datas []dto.DiskInfo
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Second))
-	format := `awk 'NR>1 && !/tmpfs|snap\/core|udev/ {printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n", $1, $2, $3, $4, $5, $6, $7}'`
-	stdout, err := cmdMgr.RunWithStdout("bash", "-c", `timeout 2 df -hT -P | `+format)
+	format := `NR>1 && !/tmpfs|snap\/core|udev/ {printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n", $1, $2, $3, $4, $5, $6, $7}`
+	stdout, err := cmdMgr.RunPipe(
+		cmd.PipeCommand{Name: "df", Args: []string{"-hT", "-P"}},
+		cmd.PipeCommand{Name: "awk", Args: []string{format}},
+	)
 	if err != nil {
 		cmdMgr2 := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
-		stdout, err = cmdMgr2.RunWithStdout("bash", "-c", `timeout 1 df -lhT -P | `+format)
+		stdout, err = cmdMgr2.RunPipe(
+			cmd.PipeCommand{Name: "df", Args: []string{"-lhT", "-P"}},
+			cmd.PipeCommand{Name: "awk", Args: []string{format}},
+		)
 		if err != nil {
 			return datas
 		}

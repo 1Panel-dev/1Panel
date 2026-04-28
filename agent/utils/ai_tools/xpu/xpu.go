@@ -34,12 +34,12 @@ func (x XpuSMI) loadDeviceData(device Device, wg *sync.WaitGroup, res *[]XPUSimp
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
 	go func() {
 		defer wgCmd.Done()
-		xpuData, xpuErr = cmdMgr.RunWithStdoutBashCf("xpu-smi discovery -d %d -j", device.DeviceID)
+		xpuData, xpuErr = cmdMgr.RunWithStdout("xpu-smi", "discovery", "-d", strconv.Itoa(device.DeviceID), "-j")
 	}()
 
 	go func() {
 		defer wgCmd.Done()
-		statsData, statsErr = cmdMgr.RunWithStdoutBashCf("xpu-smi stats -d %d -j", device.DeviceID)
+		statsData, statsErr = cmdMgr.RunWithStdout("xpu-smi", "stats", "-d", strconv.Itoa(device.DeviceID), "-j")
 	}()
 
 	wgCmd.Wait()
@@ -93,7 +93,7 @@ func (x XpuSMI) loadDeviceData(device Device, wg *sync.WaitGroup, res *[]XPUSimp
 
 func (x XpuSMI) LoadDashData() ([]XPUSimpleInfo, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
-	data, err := cmdMgr.RunWithStdoutBashC("xpu-smi discovery -j")
+	data, err := cmdMgr.RunWithStdout("xpu-smi", "discovery", "-j")
 	if err != nil {
 		return nil, fmt.Errorf("calling xpu-smi failed, %v", err)
 	}
@@ -122,7 +122,7 @@ func (x XpuSMI) LoadDashData() ([]XPUSimpleInfo, error) {
 
 func (x XpuSMI) LoadGpuInfo() (*XpuInfo, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
-	data, err := cmdMgr.RunWithStdoutBashC("xpu-smi discovery -j")
+	data, err := cmdMgr.RunWithStdout("xpu-smi", "discovery", "-j")
 	if err != nil {
 		return nil, fmt.Errorf("calling xpu-smi  failed, %v", err)
 	}
@@ -144,7 +144,7 @@ func (x XpuSMI) LoadGpuInfo() (*XpuInfo, error) {
 
 	wg.Wait()
 
-	processData, err := cmdMgr.RunWithStdoutBashC("xpu-smi ps -j")
+	processData, err := cmdMgr.RunWithStdout("xpu-smi", "ps", "-j")
 	if err != nil {
 		return nil, fmt.Errorf("calling xpu-smi ps failed, %s", err)
 	}
@@ -194,12 +194,12 @@ func (x XpuSMI) loadDeviceInfo(device Device, wg *sync.WaitGroup, res *XpuInfo, 
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
 	go func() {
 		defer wgCmd.Done()
-		xpuData, xpuErr = cmdMgr.RunWithStdoutBashCf("xpu-smi discovery -d %d -j", device.DeviceID)
+		xpuData, xpuErr = cmdMgr.RunWithStdout("xpu-smi", "discovery", "-d", strconv.Itoa(device.DeviceID), "-j")
 	}()
 
 	go func() {
 		defer wgCmd.Done()
-		statsData, statsErr = cmdMgr.RunWithStdoutBashCf("xpu-smi stats -d %d -j", device.DeviceID)
+		statsData, statsErr = cmdMgr.RunWithStdout("xpu-smi", "stats", "-d", strconv.Itoa(device.DeviceID), "-j")
 	}()
 
 	wgCmd.Wait()

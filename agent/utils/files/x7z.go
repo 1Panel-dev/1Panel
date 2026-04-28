@@ -23,7 +23,7 @@ func (z X7zArchiver) Extract(ctx context.Context, filePath, dstDir string, _ str
 	if err := checkCmdAvailability("7z"); err != nil {
 		return err
 	}
-	return cmd.NewCommandMgr(cmd.WithContext(ctx)).RunBashCf("7z x -y -o%q %q", dstDir, filePath)
+	return cmd.NewCommandMgr(cmd.WithContext(ctx)).Run("7z", "x", "-y", "-o"+dstDir, filePath)
 }
 
 func (z X7zArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, _ string) (err error) {
