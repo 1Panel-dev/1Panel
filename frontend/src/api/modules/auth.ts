@@ -38,6 +38,17 @@ export const getWelcomePage = () => {
 export const getUserInfo = () => {
     return http.get<Login.AuthInfo>('/core/auth/current');
 };
+export const updateUserInfo = (params: Login.AuthInfoUpdate) => {
+    let request = deepCopy(params) as Login.AuthInfoUpdate;
+    if (request.oldPassword) {
+        request.oldPassword = Base64.encode(request.oldPassword);
+    }
+    if (request.password) {
+        request.password = Base64.encode(request.password);
+    }
+    return http.post<any>('/core/auth/current/update', request);
+};
+
 export const loadMFA = (params: Login.MFARequest) => {
     return http.post<Login.MFAInfo>(`/core/auth/mfa`, params);
 };
@@ -66,13 +77,6 @@ export const passkeyDelete = (id: string) => {
     return http.post(`/core/auth/passkey/del`, { id });
 };
 
-export const updateUserInfo = (params: Login.AuthInfoUpdate) => {
-    let request = deepCopy(params) as Login.AuthInfoUpdate;
-    if (request.oldPassword) {
-        request.oldPassword = Base64.encode(request.oldPassword);
-    }
-    if (request.password) {
-        request.password = Base64.encode(request.password);
-    }
-    return http.post<any>('/core/auth/current/update', request);
+export const handleExpired = (param: Login.PasswordUpdate) => {
+    return http.post(`/core/auth/expired/reset`, param);
 };

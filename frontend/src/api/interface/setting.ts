@@ -152,10 +152,6 @@ export namespace Setting {
         key: string;
         sslID: number;
     }
-    export interface PasswordUpdate {
-        oldPassword: string;
-        newPassword: string;
-    }
     export interface PortUpdate {
         serverPort: number;
     }

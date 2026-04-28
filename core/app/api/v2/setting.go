@@ -17,7 +17,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
-	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
 
@@ -332,28 +331,6 @@ func (b *BaseApi) UpdatePort(c *gin.Context) {
 	}
 
 	if err := settingService.UpdatePort(req.ServerPort); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags System Setting
-// @Summary Reset system password expired
-// @Accept json
-// @Param request body dto.PasswordUpdate true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/expired/handle [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"重置过期密码","formatEN":"reset an expired Password"}
-func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
-	var req dto.PasswordUpdate
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	if err := xpack.AuthProvider.HandlePasswordExpired(c, req.OldPassword, req.NewPassword); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

@@ -90,4 +90,8 @@ export namespace Login {
         ipWhiteList: string;
         apiKeyValidityTime: string;
     }
+    export interface PasswordUpdate {
+        oldPassword: string;
+        newPassword: string;
+    }
 }

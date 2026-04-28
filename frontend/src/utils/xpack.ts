@@ -84,6 +84,7 @@ const loadDataFromDB = async () => {
 export async function loadProductProFromDB() {
     const globalStore = getGlobalStore();
     if (!globalStore.isXpackEE) {
+        globalStore.isXpackEELicenseLoaded = true;
         const res = await getLicenseStatus();
         if (!res || !res.data) {
             globalStore.isProductPro = false;
@@ -96,6 +97,7 @@ export async function loadProductProFromDB() {
         return;
     }
     const res = await getXpackEELicenseStatus();
+    globalStore.isXpackEELicenseLoaded = true;
     if (!res || !res.data) {
         globalStore.isXpackEELicensed = false;
     } else {
@@ -106,6 +108,7 @@ export async function loadProductProFromDB() {
 export async function loadMasterProductProFromDB() {
     const globalStore = getGlobalStore();
     if (!globalStore.isXpackEE) {
+        globalStore.isXpackEELicenseLoaded = true;
         const res = await getMasterLicenseStatus();
         if (!res || !res.data) {
             globalStore.isMasterProductPro = false;
@@ -114,6 +117,7 @@ export async function loadMasterProductProFromDB() {
         }
     } else {
         const res = await getXpackEELicenseStatus();
+        globalStore.isXpackEELicenseLoaded = true;
         if (!res || !res.data) {
             globalStore.isXpackEELicensed = false;
         } else {
