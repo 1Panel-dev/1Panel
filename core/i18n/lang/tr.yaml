@@ -67,7 +67,7 @@ ErrLicenseExist: "Bu lisans kaydı zaten mevcut. Düğüm bağlama için doğrud
 ErrXpackNotFound: "Bu bölüm Pro Sürüm gerektirir. Lisansı Panel Ayarları > Lisans bölümünden içe aktarın"
 ErrXpackExceptional: "Bu bölüm Pro Sürüm gerektirir. Lisans durumunu Panel Ayarları > Lisans bölümünden senkronize edin"
 ErrXpackLost: "Lisans yeniden deneme sınırına ulaştı. Panel Ayarları > Lisans bölümüne gidip manuel senkronizasyon çalıştırın"
-ErrXpackEELicenseRequired: "Enterprise Edition lisansı içe aktarılmamış. Önce bir lisans içe aktarın."
+ErrEnterpriseLicenseRequired: "Enterprise Edition lisansı içe aktarılmamış. Önce bir lisans içe aktarın."
 ErrDeviceLost: "Lisans doğrulama için gerekli dosyalar eksik, lütfen kontrol edip tekrar deneyin"
 ErrXpackTimeout: "İstek zaman aşımı, ağ bağlantısı kararsız olabilir, lütfen daha sonra tekrar deneyin"
 ErrUnbindMaster: "Düğüm yönetiminde düğümler tespit edildi, mevcut lisansın bağı çözülemiyor, lütfen önce düğümleri kaldırın ve tekrar deneyin"

@@ -55,7 +55,7 @@ const GlobalStore = defineStore({
         isAdmin: false,
         permissions: [],
         nodeRoles: [],
-        isXpackEE: false,
+        isEnterprise: false,
         isIntl: false,
         docWithRegion: true,
         isFxplay: false,
@@ -64,8 +64,8 @@ const GlobalStore = defineStore({
         isProductPro: false,
         productProExpires: 0,
         isMasterProductPro: false,
-        isXpackEELicensed: false,
-        isXpackEELicenseLoaded: false,
+        isEnterpriseLicensed: false,
+        isEnterpriseLicenseLoaded: false,
         // multi-node
         masterAlias: '',
         currentNode: 'local',
@@ -147,13 +147,13 @@ const GlobalStore = defineStore({
             return this.masterAlias || i18n.global.t('xpack.node.master');
         },
         isEE() {
-            return this.isXpackEE && this.isXpackEELicensed;
+            return this.isEnterprise && this.isEnterpriseLicensed;
         },
         isXpackOrEE() {
-            return (this.isXpackEE && this.isXpackEELicensed) || this.isMasterProductPro;
+            return (this.isEnterprise && this.isEnterpriseLicensed) || this.isMasterProductPro;
         },
         isXpackNodeOrEE() {
-            return (this.isXpackEE && this.isXpackEELicensed) || this.isProductPro;
+            return (this.isEnterprise && this.isEnterpriseLicensed) || this.isProductPro;
         },
         isMasterPro() {
             return this.isMasterProductPro;

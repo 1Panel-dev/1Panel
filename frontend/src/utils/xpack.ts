@@ -2,7 +2,7 @@ import {
     getLicenseStatus,
     getMasterLicenseStatus,
     getSettingBaseInfo,
-    getXpackEELicenseStatus,
+    getEnterpriseLicenseStatus,
 } from '@/api/modules/setting';
 import { useTheme } from '@/global/use-theme';
 import {
@@ -83,8 +83,8 @@ const loadDataFromDB = async () => {
 
 export async function loadProductProFromDB() {
     const globalStore = getGlobalStore();
-    if (!globalStore.isXpackEE) {
-        globalStore.isXpackEELicenseLoaded = true;
+    if (!globalStore.isEnterprise) {
+        globalStore.isEnterpriseLicenseLoaded = true;
         const res = await getLicenseStatus();
         if (!res || !res.data) {
             globalStore.isProductPro = false;
@@ -96,19 +96,19 @@ export async function loadProductProFromDB() {
         }
         return;
     }
-    const res = await getXpackEELicenseStatus();
-    globalStore.isXpackEELicenseLoaded = true;
+    const res = await getEnterpriseLicenseStatus();
+    globalStore.isEnterpriseLicenseLoaded = true;
     if (!res || !res.data) {
-        globalStore.isXpackEELicensed = false;
+        globalStore.isEnterpriseLicensed = false;
     } else {
-        globalStore.isXpackEELicensed = res.data.status === 'Bound';
+        globalStore.isEnterpriseLicensed = res.data.status === 'Bound';
     }
 }
 
 export async function loadMasterProductProFromDB() {
     const globalStore = getGlobalStore();
-    if (!globalStore.isXpackEE) {
-        globalStore.isXpackEELicenseLoaded = true;
+    if (!globalStore.isEnterprise) {
+        globalStore.isEnterpriseLicenseLoaded = true;
         const res = await getMasterLicenseStatus();
         if (!res || !res.data) {
             globalStore.isMasterProductPro = false;
@@ -116,12 +116,12 @@ export async function loadMasterProductProFromDB() {
             globalStore.isMasterProductPro = res.data.status === 'Bound';
         }
     } else {
-        const res = await getXpackEELicenseStatus();
-        globalStore.isXpackEELicenseLoaded = true;
+        const res = await getEnterpriseLicenseStatus();
+        globalStore.isEnterpriseLicenseLoaded = true;
         if (!res || !res.data) {
-            globalStore.isXpackEELicensed = false;
+            globalStore.isEnterpriseLicensed = false;
         } else {
-            globalStore.isXpackEELicensed = res.data.status === 'Bound';
+            globalStore.isEnterpriseLicensed = res.data.status === 'Bound';
             globalStore.isMasterProductPro = res.data.status === 'Bound';
         }
     }

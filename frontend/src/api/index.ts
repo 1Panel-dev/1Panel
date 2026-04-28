@@ -79,7 +79,7 @@ class RequestHttp {
                     });
                     return Promise.reject(data);
                 }
-                if (data.code == ResultEnum.ERRRBAC) {
+                if (data.code == ResultEnum.ERR_RBAC) {
                     MsgError(data.message || i18n.global.t('commons.res.forbidden'));
                     return Promise.reject(data);
                 }
@@ -87,30 +87,30 @@ class RequestHttp {
                     router.push({ name: 'Expired' });
                     return;
                 }
-                if (data.code == ResultEnum.ERRXPACK) {
+                if (data.code == ResultEnum.ERR_XPACK) {
                     globalStore.isProductPro = false;
                     window.location.reload();
                     return Promise.reject(data);
                 }
-                if (data.code == ResultEnum.ERRXPACKEE) {
-                    globalStore.isXpackEELicensed = false;
+                if (data.code == ResultEnum.ERR_ENTERPRISE) {
+                    globalStore.isEnterpriseLicensed = false;
                     const routeName = router.currentRoute.value.name;
                     if (
                         globalStore.isLogin &&
                         routeName !== 'entrance' &&
                         routeName !== 'login' &&
-                        routeName !== 'XpackEELicenseRequired'
+                        routeName !== 'EnterpriseLicenseRequired'
                     ) {
-                        router.push({ name: 'XpackEELicenseRequired' });
+                        router.push({ name: 'EnterpriseLicenseRequired' });
                     }
                     return Promise.reject(data);
                 }
-                if (data.code == ResultEnum.NodeUnBind) {
+                if (data.code == ResultEnum.NODE_UNBIND) {
                     changeToLocal();
                     window.location.reload();
                     return;
                 }
-                if (data.code == ResultEnum.ERRGLOBALLOADING) {
+                if (data.code == ResultEnum.ERR_GLOBAL_LOADING) {
                     globalStore.$patch({
                         isLoading: true,
                         loadingText: data.message,
@@ -121,7 +121,7 @@ class RequestHttp {
                         globalStore.isLoading = false;
                     }
                 }
-                if (data.code == ResultEnum.ERRAUTH) {
+                if (data.code == ResultEnum.ERR_AUTH) {
                     return data;
                 }
                 if (data.code && data.code !== ResultEnum.SUCCESS) {

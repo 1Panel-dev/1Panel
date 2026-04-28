@@ -40,7 +40,7 @@ export namespace Login {
         panelName: string;
         theme: string;
         isOffLine: boolean;
-        isXpackEE: boolean;
+        isEnterprise: boolean;
         needCaptcha: boolean;
         passkeySetting: boolean;
     }

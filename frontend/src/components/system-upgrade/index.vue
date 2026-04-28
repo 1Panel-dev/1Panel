@@ -18,7 +18,7 @@
                 </span>
                 <div class="flex flex-wrap items-center">
                     <el-link underline="never" type="primary" @click="toLxware">
-                        <span v-if="isXpackEE">
+                        <span v-if="isEnterprise">
                             {{ $t('license.ee') }}
                         </span>
                         <span v-else-if="isMasterPro">
@@ -71,7 +71,7 @@ const releasesRef = ref();
 const isMasterPro = computed(() => {
     return globalStore.isMasterPro();
 });
-const isXpackEE = computed(() => {
+const isEnterprise = computed(() => {
     return globalStore.isEE();
 });
 

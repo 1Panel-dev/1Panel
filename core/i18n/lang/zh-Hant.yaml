@@ -67,7 +67,7 @@ ErrLicenseExist: "該許可證記錄已存在，您可直接前往許可證頁�
 ErrXpackNotFound: "此功能需要 Pro 版。請在 面板設定 > 許可證 匯入許可證"
 ErrXpackExceptional: "此功能需要 Pro 版。請在 面板設定 > 許可證 同步許可證狀態"
 ErrXpackLost: "許可證已達重試上限，請前往 面板設定 > 許可證 手動同步"
-ErrXpackEELicenseRequired: "企業版許可證未匯入，請先匯入許可證"
+ErrEnterpriseLicenseRequired: "企業版許可證未匯入，請先匯入許可證"
 ErrDeviceLost: "許可證驗證必要檔案遺失，請檢查後重試。"
 ErrDeviceErr: "目前環境與許可證匯入環境不一致，請編輯許可證重新匯入！"
 ErrXpackTimeout: "請求逾時，網路連接可能不穩定，請稍後再試。"
