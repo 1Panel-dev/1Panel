@@ -67,7 +67,7 @@ ErrLicenseExist: "Este registro de licença já existe. Você pode ir diretament
 ErrXpackNotFound: "Este recurso requer a edição Business. Importe uma licença em Configurações do Painel > Licença."
 ErrXpackExceptional: "Este recurso requer a edição Business. Sincronize o status da licença em Configurações do Painel > Licença."
 ErrXpackLost: "A licença atingiu o limite de tentativas. Acesse Configurações do Painel > Licença e execute uma sincronização manual."
-ErrXpackEELicenseRequired: "A licença da edição Enterprise não foi importada. Importe uma licença primeiro."
+ErrEnterpriseLicenseRequired: "A licença da edição Enterprise não foi importada. Importe uma licença primeiro."
 ErrDeviceLost: "Arquivos necessários para a verificação da licença estão faltando, por favor verifique e tente novamente"
 ErrDeviceErr: "O ambiente atual não corresponde ao ambiente de importação da licença. Por favor, edite a licença e reimporte"
 ErrXpackTimeout: "Requisição expirou, a conexão de rede pode estar instável, por favor tente novamente mais tarde"

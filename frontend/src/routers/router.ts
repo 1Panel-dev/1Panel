@@ -78,11 +78,11 @@ export const routes: RouteRecordRaw[] = [
         },
     },
     {
-        path: '/xpack-ee/license-required',
-        name: 'XpackEELicenseRequired',
+        path: '/enterprise/license-required',
+        name: 'EnterpriseLicenseRequired',
         component: () => import('@/views/setting/license-required/index.vue'),
         meta: {
-            key: 'xpack-ee-license-required',
+            key: 'enterprise-license-required',
         },
     },
     {

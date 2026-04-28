@@ -58,7 +58,7 @@ export interface GlobalState {
     isAdmin: boolean;
     permissions: string[];
     nodeRoles: Array<{ nodeId: number; nodeName: string; roleId: number; roleName: string }>;
-    isXpackEE: boolean;
+    isEnterprise: boolean;
     isIntl: boolean;
     docWithRegion: boolean;
     isFxplay: boolean;
@@ -67,8 +67,8 @@ export interface GlobalState {
     isProductPro: boolean;
     productProExpires: number;
     isMasterProductPro: boolean;
-    isXpackEELicensed: boolean;
-    isXpackEELicenseLoaded: boolean;
+    isEnterpriseLicensed: boolean;
+    isEnterpriseLicenseLoaded: boolean;
     // multi-node
     masterAlias: string;
     currentNode: string;

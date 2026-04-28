@@ -3,7 +3,7 @@ type XpackSettingModule = {
     updateXSettingByKey?: (key: string, value: string) => Promise<any>;
 };
 
-type XpackeeUserModule = {
+type EnterpriseUserModule = {
     getUserInfo?: (currentNode: string) => Promise<any>;
 };
 
@@ -40,16 +40,16 @@ export async function updateXpackSettingByKey(key: string, value: string) {
     return module.updateXSettingByKey(key, value);
 }
 
-function getXpackeeUserModule(): XpackeeUserModule | null {
-    const xpackModules = import.meta.glob('@/xpack-ee/api/modules/user.ts', { eager: true }) as Record<
+function getEnterpriseUserModule(): EnterpriseUserModule | null {
+    const enterpriseModules = import.meta.glob('@/enterprise/api/modules/user.ts', { eager: true }) as Record<
         string,
-        XpackeeUserModule
+        EnterpriseUserModule
     >;
-    return findModule(xpackModules, '/api/modules/user.ts');
+    return findModule(enterpriseModules, '/api/modules/user.ts');
 }
 
-export async function getXpackeeUserInfo(currentNode: string) {
-    const module = getXpackeeUserModule();
+export async function getEnterpriseUserInfo(currentNode: string) {
+    const module = getEnterpriseUserModule();
     if (!module?.getUserInfo) {
         return null;
     }

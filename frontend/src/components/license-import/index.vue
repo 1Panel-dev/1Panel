@@ -59,7 +59,7 @@
 import i18n from '@/lang';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
-import { uploadLicense, uploadXpackEELicense } from '@/api/modules/setting';
+import { uploadLicense, uploadEnterpriseLicense } from '@/api/modules/setting';
 import DockerProxy from '@/components/docker-proxy/index.vue';
 import { GlobalStore } from '@/store';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
@@ -126,9 +126,9 @@ const submit = async () => {
     const file = uploaderFiles.value[0];
     const formData = new FormData();
     formData.append('file', file.raw);
-    if (globalStore.isXpackEE) {
+    if (globalStore.isEnterprise) {
         loading.value = true;
-        await uploadXpackEELicense(formData)
+        await uploadEnterpriseLicense(formData)
             .then(async () => {
                 handleAfterSubmit();
             })
@@ -166,10 +166,10 @@ const handleAfterSubmit = () => {
     open.value = false;
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     if (!isImport.value) {
-        if (!globalStore.isXpackEE) globalStore.isProductPro = true;
+        if (!globalStore.isEnterprise) globalStore.isProductPro = true;
         globalStore.isMasterProductPro = true;
     } else {
-        globalStore.isXpackEELicensed = true;
+        globalStore.isEnterpriseLicensed = true;
     }
     if (!withoutReload.value) {
         loadMasterProductProFromDB();

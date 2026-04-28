@@ -73,7 +73,7 @@ ErrLicenseExist: "This license record already exists. You can directly go to the
 ErrXpackNotFound: "This section requires Business Edition. Import a license in Panel Settings > License."
 ErrXpackExceptional: "This section requires Business Edition. Sync the license status in Panel Settings > License."
 ErrXpackLost: "The license retry limit has been reached. Go to Panel Settings > License and run a manual sync."
-ErrXpackEELicenseRequired: "Enterprise Edition license is not imported. Import a license first."
+ErrEnterpriseLicenseRequired: "Enterprise Edition license is not imported. Import a license first."
 ErrDeviceLost: "Required files for license verification are missing, check and try again!"
 ErrDeviceErr: "Current environment does not match the license import environment. Edit the license and re-import."
 ErrXpackTimeout: "Request timeout, network connection might be unstable, try again later!"

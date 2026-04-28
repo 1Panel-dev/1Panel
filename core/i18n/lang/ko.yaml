@@ -67,7 +67,7 @@ ErrLicenseExist: "해당 라이선스 기록이 이미 존재합니다. 라이�
 ErrXpackNotFound: "이 기능은 Business Edition에서 사용할 수 있습니다. 패널 설정 > 라이선스에서 라이선스를 가져오세요"
 ErrXpackExceptional: "이 기능은 Business Edition에서 사용할 수 있습니다. 패널 설정 > 라이선스에서 라이선스 상태를 동기화하세요"
 ErrXpackLost: "라이선스 재시도 한도에 도달했습니다. 패널 설정 > 라이선스에서 수동 동기화를 실행하세요"
-ErrXpackEELicenseRequired: "Enterprise Edition 라이선스를 가져오지 않았습니다. 먼저 라이선스를 가져오세요"
+ErrEnterpriseLicenseRequired: "Enterprise Edition 라이선스를 가져오지 않았습니다. 먼저 라이선스를 가져오세요"
 ErrDeviceLost: "라이센스 검증에 필요한 파일이 누락되었습니다. 확인 후 다시 시도해 주세요"
 ErrDeviceErr: "현재 환경이 라이선스 가져오기 환경과 일치하지 않습니다. 라이선스를 편집하고 다시 가져오십시오"
 ErrXpackTimeout: "요청 시간 초과, 네트워크 연결이 불안정할 수 있습니다. 나중에 다시 시도해 주세요"

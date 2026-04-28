@@ -293,7 +293,7 @@ type LoginSetting struct {
 	IsIntl         bool   `json:"isIntl"`
 	IsOffLine      bool   `json:"isOffLine"`
 	IsFxplay       bool   `json:"isFxplay"`
-	IsXPackEE      bool   `json:"isXpackEE"`
+	IsEnterprise   bool   `json:"isEnterprise"`
 	Language       string `json:"language"`
 	MenuTabs       string `json:"menuTabs"`
 	PanelName      string `json:"panelName"`

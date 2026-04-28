@@ -61,10 +61,10 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 	if strings.Contains(global.CONF.Base.ChangeUserInfo, "entrance") {
 		settingMap["SecurityEntrance"] = common.RandStrAndNum(10)
 	}
-	if global.CONF.Base.IsXpackEE {
+	if global.CONF.Base.IsEnterprise {
 		if len(settingMap["UserName"]) != 0 || len(settingMap["Password"]) != 0 {
 			if err := xpack.AuthProvider.ResetSuperAdminUser(settingMap["UserName"], settingMap["Password"]); err != nil {
-				global.LOG.Fatalf("reset xpackee super admin failed, err: %v", err)
+				global.LOG.Fatalf("reset enterprise super admin failed, err: %v", err)
 				return
 			}
 		}

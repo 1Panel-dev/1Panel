@@ -10,12 +10,12 @@ import { MsgError } from '@/utils/message';
 const axiosCanceler = new AxiosCanceler();
 
 let isRedirecting = false;
-const xpackEELicenseCheckWhiteList = ['XpackEELicenseRequired', 'entrance', 'login', 'Expired'];
+const enterpriseLicenseCheckWhiteList = ['EnterpriseLicenseRequired', 'entrance', 'login', 'Expired'];
 
 const clearLicenseStatus = () => {
     const globalStore = GlobalStore();
-    globalStore.isXpackEELicensed = false;
-    globalStore.isXpackEELicenseLoaded = false;
+    globalStore.isEnterpriseLicensed = false;
+    globalStore.isEnterpriseLicenseLoaded = false;
 };
 
 const clearLoginStatus = () => {
@@ -52,17 +52,17 @@ router.beforeEach(async (to, from, next) => {
         NProgress.done();
         return;
     }
-    if (globalStore.isLogin && globalStore.isXpackEE && !xpackEELicenseCheckWhiteList.includes(String(to.name))) {
-        if (!globalStore.isXpackEELicenseLoaded) {
+    if (globalStore.isLogin && globalStore.isEnterprise && !enterpriseLicenseCheckWhiteList.includes(String(to.name))) {
+        if (!globalStore.isEnterpriseLicenseLoaded) {
             await loadProductProFromDB();
         }
-        if (!globalStore.isXpackEELicensed) {
-            next({ name: 'XpackEELicenseRequired', query: { code: String(to.params.code || '') } });
+        if (!globalStore.isEnterpriseLicensed) {
+            next({ name: 'EnterpriseLicenseRequired', query: { code: String(to.params.code || '') } });
             NProgress.done();
             return;
         }
     }
-    if (to.name === 'XpackEELicenseRequired') {
+    if (to.name === 'EnterpriseLicenseRequired') {
         if (!globalStore.isLogin) {
             next({
                 name: 'entrance',
@@ -71,7 +71,7 @@ router.beforeEach(async (to, from, next) => {
             NProgress.done();
             return;
         }
-        if (!globalStore.isXpackEE || globalStore.isXpackEELicensed) {
+        if (!globalStore.isEnterprise || globalStore.isEnterpriseLicensed) {
             next({ name: 'home' });
             NProgress.done();
             return;
