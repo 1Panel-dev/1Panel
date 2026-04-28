@@ -5,10 +5,10 @@ type RouteModuleMap = Record<string, { default?: ExtensionRouteRecord }>;
 
 export function getXpackRoutes(baseModules: RouteModuleMap = {}): RouteModuleMap {
     const xpackRoutes = import.meta.glob('@/xpack/routers/*.ts', { eager: true }) as RouteModuleMap;
-    const xpackEERoutes = import.meta.glob('@/xpack-ee/routers/*.ts', { eager: true }) as RouteModuleMap;
+    const enterpriseRoutes = import.meta.glob('@/enterprise/routers/*.ts', { eager: true }) as RouteModuleMap;
     const routes = {
         ...xpackRoutes,
-        ...xpackEERoutes,
+        ...enterpriseRoutes,
     };
     const rawRoutes = (
         Object.keys(routes)

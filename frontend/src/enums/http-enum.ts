@@ -1,7 +1,7 @@
 export enum ResultEnum {
     SUCCESS = 200,
-    ERRIP = 310,
-    ERRDOMAIN = 311,
+    ERR_IP = 310,
+    ERR_DOMAIN = 311,
     UNSAFETY = 312,
     EXPIRED = 313,
 
@@ -9,12 +9,12 @@ export enum ResultEnum {
     OVERDUE = 401,
     FORBIDDEN = 403,
     NOTFOUND = 404,
-    ERRAUTH = 406,
-    ERRGLOBALLOADING = 407,
-    ERRXPACK = 410,
-    NodeUnBind = 411,
-    ERRRBAC = 412,
-    ERRXPACKEE = 413,
+    ERR_AUTH = 406,
+    ERR_GLOBAL_LOADING = 407,
+    ERR_XPACK = 410,
+    NODE_UNBIND = 411,
+    ERR_RBAC = 412,
+    ERR_ENTERPRISE = 413,
     TIMEOUT = 20000,
     TYPE = 'success',
 }

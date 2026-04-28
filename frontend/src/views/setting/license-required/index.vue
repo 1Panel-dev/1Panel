@@ -60,7 +60,7 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 import { genFileId } from 'element-plus';
-import { getXpackEELicense, uploadXpackEELicense } from '@/api/modules/setting';
+import { getEnterpriseLicense, uploadEnterpriseLicense } from '@/api/modules/setting';
 import { getLoginSetting } from '@/api/modules/auth';
 import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
@@ -103,8 +103,8 @@ const loadImage = (name: string) => {
 
 const loadLoginTheme = async () => {
     const res = await getLoginSetting();
-    globalStore.isXpackEE = res.data.isXpackEE;
-    globalStore.isXpackEELicenseLoaded = !res.data.isXpackEE;
+    globalStore.isEnterprise = res.data.isEnterprise;
+    globalStore.isEnterpriseLicenseLoaded = !res.data.isEnterprise;
     globalStore.isIntl = res.data.isIntl;
     globalStore.isFxplay = res.data.isFxplay;
     globalStore.isOffLine = res.data.isOffLine;
@@ -125,7 +125,7 @@ const loadLoginTheme = async () => {
         '--login-loading-mask-color',
         adjustColorToRGBA(loginBtnLinkColor.value, 30, 15),
     );
-    if (!globalStore.isXpackEE) {
+    if (!globalStore.isEnterprise) {
         router.replace(
             globalStore.isLogin ? { name: 'home' } : { name: 'entrance', params: { code: globalStore.entrance } },
         );
@@ -157,11 +157,11 @@ const loadBackground = async () => {
 };
 
 const loadLicenseInfo = async () => {
-    const res = await getXpackEELicense();
-    globalStore.isXpackEELicenseLoaded = true;
+    const res = await getEnterpriseLicense();
+    globalStore.isEnterpriseLicenseLoaded = true;
     licenseInfo.deviceID = res.data.deviceID;
     if (res.data.status === 'Bound') {
-        globalStore.isXpackEELicensed = true;
+        globalStore.isEnterpriseLicensed = true;
         router.replace({ name: 'home' });
     }
 };
@@ -188,9 +188,9 @@ const submit = async () => {
     const formData = new FormData();
     formData.append('file', file.raw);
     loading.value = true;
-    await uploadXpackEELicense(formData)
+    await uploadEnterpriseLicense(formData)
         .then(() => {
-            globalStore.isXpackEELicensed = true;
+            globalStore.isEnterpriseLicensed = true;
             globalStore.isMasterProductPro = true;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             router.replace({ name: 'home' });

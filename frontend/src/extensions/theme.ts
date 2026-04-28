@@ -16,9 +16,9 @@ export function loadXpackStyles() {
     const xpackLoader = findModule(xpackModules, '/styles/index.scss');
     xpackLoader?.();
 
-    const xpackEEModules = import.meta.glob('@/xpack-ee/styles/index.scss');
-    const xpackEELoader = findModule(xpackEEModules, '/styles/index.scss');
-    xpackEELoader?.();
+    const enterpriseModules = import.meta.glob('@/enterprise/styles/index.scss');
+    const enterpriseLoader = findModule(enterpriseModules, '/styles/index.scss');
+    enterpriseLoader?.();
 }
 
 export function setXpackPrimaryColor(color: string) {
@@ -29,12 +29,12 @@ export function setXpackPrimaryColor(color: string) {
     const xpackModule = findModule(xpackModules, '/utils/theme/tool.ts');
     xpackModule?.setPrimaryColor?.(color);
 
-    const xpackEEModules = import.meta.glob('@/xpack-ee/utils/theme/tool.ts', { eager: true }) as Record<
+    const enterpriseModules = import.meta.glob('@/enterprise/utils/theme/tool.ts', { eager: true }) as Record<
         string,
         XpackThemeModule
     >;
-    const xpackEEModule = findModule(xpackEEModules, '/utils/theme/tool.ts');
-    xpackEEModule?.setPrimaryColor?.(color);
+    const enterpriseModule = findModule(enterpriseModules, '/utils/theme/tool.ts');
+    enterpriseModule?.setPrimaryColor?.(color);
 }
 
 export const loadExtensionStyles = loadXpackStyles;

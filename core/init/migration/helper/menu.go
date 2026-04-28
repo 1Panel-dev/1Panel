@@ -84,7 +84,7 @@ func LoadMenus() string {
 		{ID: "12", Disabled: false, Title: "menu.logs", IsShow: true, Label: "Log-Menu", Path: "/logs", Sort: 1200},
 		{ID: "13", Disabled: true, Title: "menu.settings", IsShow: true, Label: "Setting-Menu", Path: "/settings", Sort: 1300},
 	}
-	if global.CONF.Base.IsXpackEE {
+	if global.CONF.Base.IsEnterprise {
 		for i := range item {
 			if item[i].Label != "Xpack-Menu" {
 				continue
@@ -95,7 +95,7 @@ func LoadMenus() string {
 				Title:    "xpack.user.userManage",
 				IsShow:   true,
 				Label:    "UserManagement",
-				Path:     "/xpack-ee/users",
+				Path:     "/enterprise/users",
 				Sort:     350,
 			}, "NodeDashboard")
 			break

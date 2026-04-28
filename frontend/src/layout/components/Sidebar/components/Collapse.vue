@@ -191,7 +191,7 @@ const changeNode = async (command: string) => {
         for (const item of nodes.value) {
             if (item.name == command) {
                 if (command == 'local') {
-                    if (globalStore.isXpackEE) {
+                    if (globalStore.isEnterprise) {
                         await loadCurrentUser('local');
                     }
                     await loadGlobalSetting('local');
@@ -222,7 +222,7 @@ const changeNode = async (command: string) => {
                 localStorage.removeItem('upgradeChecked');
                 globalStore.currentNode = command;
                 globalStore.currentNodeAddr = item.addr;
-                if (globalStore.isXpackEE) {
+                if (globalStore.isEnterprise) {
                     await loadCurrentUser(command);
                 }
                 menuStore.setMenuList([]);
