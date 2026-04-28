@@ -83,8 +83,8 @@ var catalog = map[string]Meta{
 			Input:         []string{"text"},
 		},
 		Models: []Model{
-			{ID: "deepseek/deepseek-chat", Name: "DeepSeek Chat"},
-			{ID: "deepseek/deepseek-reasoner", Name: "DeepSeek Reasoner", MaxTokens: 65536, ContextWindow: 131072, Reasoning: true},
+			{ID: "deepseek/deepseek-v4-flash", Name: "deepseek-v4-flash"},
+			{ID: "deepseek/deepseek-v4-pro", Name: "deepseek-v4-pro"},
 		},
 	},
 	"bailian-coding-plan": {
