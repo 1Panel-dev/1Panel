@@ -9,10 +9,63 @@ import { MsgError } from '@/utils/message';
 const axiosCanceler = new AxiosCanceler();
 
 let isRedirecting = false;
+let loginStatusLoading: Promise<boolean> | null = null;
 let xpackEELoading: Promise<boolean> | null = null;
 let licenseStatusLoading: Promise<boolean> | null = null;
+let loginStatusLoaded = false;
+let xpackEEStatusLoaded = false;
+let licenseStatusLoaded = false;
+const xpackEELicenseCheckWhiteList = ['XpackEELicenseRequired', 'entrance', 'login', 'Expired'];
+
+const clearLoginStatus = () => {
+    const globalStore = GlobalStore();
+    globalStore.setLogStatus(false);
+    globalStore.clearAuthInfo();
+    globalStore.isXpackEELicensed = false;
+    loginStatusLoaded = false;
+    licenseStatusLoaded = false;
+};
+
+const loadLoginStatus = async () => {
+    const globalStore = GlobalStore();
+    if (!globalStore.isLogin) {
+        return false;
+    }
+    if (loginStatusLoaded) {
+        return true;
+    }
+    if (!loginStatusLoading) {
+        loginStatusLoading = fetch('/api/v2/core/auth/current', {
+            credentials: 'include',
+            headers: {
+                CurrentNode: encodeURIComponent(globalStore.currentNode),
+            },
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                const loggedIn = res?.code === 200;
+                if (!loggedIn) {
+                    clearLoginStatus();
+                    return false;
+                }
+                loginStatusLoaded = true;
+                return true;
+            })
+            .catch(() => {
+                clearLoginStatus();
+                return false;
+            })
+            .finally(() => {
+                loginStatusLoading = null;
+            });
+    }
+    return loginStatusLoading;
+};
 
 const loadXpackEEStatus = async () => {
+    if (xpackEEStatusLoaded) {
+        return GlobalStore().isXpackEE;
+    }
     if (!xpackEELoading) {
         xpackEELoading = fetch('/api/v2/core/auth/setting', {
             credentials: 'include',
@@ -21,6 +74,7 @@ const loadXpackEEStatus = async () => {
             .then((res) => {
                 const globalStore = GlobalStore();
                 globalStore.isXpackEE = !!res?.data?.isXpackEE;
+                xpackEEStatusLoaded = true;
                 return globalStore.isXpackEE;
             })
             .catch(() => GlobalStore().isXpackEE)
@@ -32,6 +86,9 @@ const loadXpackEEStatus = async () => {
 };
 
 const loadXpackEELicenseStatus = async () => {
+    if (licenseStatusLoaded) {
+        return GlobalStore().isXpackEELicensed;
+    }
     if (!licenseStatusLoading) {
         licenseStatusLoading = fetch('/api/v2/core/xpackee/licenses/status', {
             credentials: 'include',
@@ -40,7 +97,13 @@ const loadXpackEELicenseStatus = async () => {
             },
         })
             .then((res) => res.json())
-            .then((res) => res?.data?.status === 'Bound')
+            .then((res) => {
+                const globalStore = GlobalStore();
+                const licensed = res?.data?.status === 'Bound';
+                globalStore.isXpackEELicensed = licensed;
+                licenseStatusLoaded = true;
+                return licensed;
+            })
             .catch(() => false)
             .finally(() => {
                 licenseStatusLoading = null;
@@ -53,7 +116,21 @@ router.beforeEach(async (to, from, next) => {
     NProgress.start();
     axiosCanceler.removeAllPending();
     const globalStore = GlobalStore();
-    if (to.name !== 'entrance' && to.name !== 'XpackEELicenseRequired' && !globalStore.isLogin) {
+    if (globalStore.isLogin) {
+        const loggedIn = await loadLoginStatus();
+        if (!loggedIn) {
+            if (to.name !== 'entrance') {
+                next({
+                    name: 'entrance',
+                    params: to.params,
+                });
+                NProgress.done();
+                return;
+            }
+            return next();
+        }
+    }
+    if (to.name !== 'entrance' && !globalStore.isLogin) {
         next({
             name: 'entrance',
             params: to.params,
@@ -76,15 +153,8 @@ router.beforeEach(async (to, from, next) => {
     if (globalStore.isLogin && to.name !== 'login') {
         await loadXpackEEStatus();
     }
-    if (
-        globalStore.isLogin &&
-        globalStore.isXpackEE &&
-        to.name !== 'XpackEELicenseRequired' &&
-        to.name !== 'entrance' &&
-        to.name !== 'login'
-    ) {
-        const licensed = globalStore.isXpackEELicensed || (await loadXpackEELicenseStatus());
-        globalStore.isXpackEELicensed = licensed;
+    if (globalStore.isLogin && globalStore.isXpackEE && !xpackEELicenseCheckWhiteList.includes(String(to.name))) {
+        const licensed = await loadXpackEELicenseStatus();
         if (!licensed) {
             next({ name: 'XpackEELicenseRequired', query: { code: String(to.params.code || '') } });
             NProgress.done();
@@ -100,7 +170,8 @@ router.beforeEach(async (to, from, next) => {
             NProgress.done();
             return;
         }
-        if (globalStore.isXpackEELicensed) {
+        const licensed = await loadXpackEELicenseStatus();
+        if (licensed) {
             next({ name: 'home' });
             NProgress.done();
             return;

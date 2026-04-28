@@ -94,7 +94,10 @@ class RequestHttp {
                 }
                 if (data.code == ResultEnum.ERRXPACKEE) {
                     globalStore.isXpackEELicensed = false;
-                    router.push({ name: 'XpackEELicenseRequired' });
+                    const routeName = router.currentRoute.value.name;
+                    if (globalStore.isLogin && routeName !== 'entrance' && routeName !== 'login') {
+                        router.push({ name: 'XpackEELicenseRequired' });
+                    }
                     return Promise.reject(data);
                 }
                 if (data.code == ResultEnum.NodeUnBind) {
