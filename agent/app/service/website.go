@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"syscall"
@@ -44,6 +45,28 @@ import (
 )
 
 type WebsiteService struct {
+}
+
+func buildRedirectHostPattern(domain string) string {
+	labels := strings.Split(domain, ".")
+	patternLabels := make([]string, 0, len(labels))
+	for _, label := range labels {
+		if label == "*" {
+			patternLabels = append(patternLabels, `[^.]+`)
+			continue
+		}
+		patternLabels = append(patternLabels, regexp.QuoteMeta(label))
+	}
+	return fmt.Sprintf("^%s$", strings.Join(patternLabels, `\.`))
+}
+
+func parseRedirectHostPattern(pattern string) string {
+	pattern = strings.Trim(pattern, "'")
+	pattern = strings.TrimPrefix(pattern, "^")
+	pattern = strings.TrimSuffix(pattern, "$")
+	pattern = strings.ReplaceAll(pattern, `[^.]+`, "*")
+	pattern = strings.ReplaceAll(pattern, `\.`, ".")
+	return pattern
 }
 
 type IWebsiteService interface {
@@ -1728,7 +1751,7 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 		for _, domain := range req.Domains {
 			block.Directives = append(block.Directives, &components.Directive{
 				Name:       "if",
-				Parameters: []string{"($host", "~", fmt.Sprintf("'^%s')", domain)},
+				Parameters: []string{"($host", "~", fmt.Sprintf("'%s')", buildRedirectHostPattern(domain))},
 				Block:      returnBlock,
 			})
 		}
@@ -1834,7 +1857,7 @@ func (w WebsiteService) GetRedirect(id uint) (res []response.NginxRedirectConfig
 				for _, ifDir := range dirs {
 					params := ifDir.GetParameters()
 					if len(params) > 2 && params[0] == "($host" {
-						domain := strings.Trim(strings.Trim(params[2], "'"), "^")
+						domain := parseRedirectHostPattern(params[2])
 						redirectConfig.Domains = append(redirectConfig.Domains, domain)
 						if len(redirectConfig.Domains) > 1 {
 							continue
