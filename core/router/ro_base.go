@@ -26,14 +26,17 @@ func (s *BaseRouter) InitRouter(Router *gin.RouterGroup) {
 
 		authRouter.POST("/mfa", baseApi.LoadMFA)
 		authRouter.POST("/mfa/bind", baseApi.MFABind)
+
 		authRouter.POST("/passkey/register/begin", baseApi.PasskeyRegisterBegin)
 		authRouter.POST("/passkey/register/finish", baseApi.PasskeyRegisterFinish)
 		authRouter.GET("/passkey/list", baseApi.PasskeyList)
 		authRouter.POST("/passkey/del", baseApi.PasskeyDelete)
+
 		authRouter.POST("/api/generate", baseApi.GenerateApiKey)
 		authRouter.POST("/api/update", baseApi.UpdateApiConfig)
 
 		authRouter.GET("/current", baseApi.GetCurrentUser)
 		authRouter.POST("/current/update", baseApi.UpdateCurrentUser)
+		authRouter.POST("/expired/reset", baseApi.ResetPassword)
 	}
 }

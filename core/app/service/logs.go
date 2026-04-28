@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
@@ -126,7 +127,7 @@ func runRemoteShellScript(url string, args ...string) error {
 	if statusCode < http.StatusOK || statusCode >= http.StatusMultipleChoices {
 		return fmt.Errorf("download script failed, status code: %d", statusCode)
 	}
-	_, err = cmd.NewCommandMgr().RunPipe(cmd.PipeCommand{
+	_, err = cmd.NewCommandMgr(cmd.WithOutputFile(os.DevNull)).RunPipe(cmd.PipeCommand{
 		Name:  "sh",
 		Args:  append([]string{"-s"}, args...),
 		Stdin: bytes.NewReader(script),

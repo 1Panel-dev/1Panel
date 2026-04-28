@@ -148,9 +148,6 @@ export const updateProxy = (params: Setting.ProxyUpdate) => {
     request.proxyType = request.proxyType === 'close' ? '' : request.proxyType;
     return http.post(`/core/settings/proxy/update`, request);
 };
-export const updatePassword = (param: Setting.PasswordUpdate) => {
-    return http.post(`/core/settings/password/update`, param);
-};
 export const loadInterfaceAddr = () => {
     return http.get(`/core/settings/interface`);
 };
@@ -168,9 +165,6 @@ export const loadSSLInfo = () => {
 };
 export const downloadSSL = () => {
     return http.download<any>(`/core/settings/ssl/download`);
-};
-export const handleExpired = (param: Setting.PasswordUpdate) => {
-    return http.post(`/core/settings/expired/handle`, param);
 };
 export const getAppStoreConfig = (node?: string) => {
     const params = node ? `?operateNode=${node}` : '';
