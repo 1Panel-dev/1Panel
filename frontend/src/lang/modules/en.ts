@@ -1951,7 +1951,27 @@ const message = {
         top: 'Go Back',
         up: 'Go back',
         openWithVscode: 'Open with VS Code',
-        vscodeHelper: 'Please make sure that VS Code is installed locally and the SSH Remote plugin is configured',
+        vscodeHelper:
+            'Confirm the authentication mode, host, port, and username. Key authentication requires SSH configuration on the computer running VS Code before use.',
+        vscodeCopyConfig: 'Copy setup script',
+        vscodeKeyHelper:
+            'The private key download name is derived from the configured path. Save the file to that path; the setup script will verify it and apply permissions.',
+        vscodeKeyPath: 'SSH private key path',
+        vscodeKeyPathPlaceholder: 'For example: ~/.ssh/id_ed25519',
+        vscodeSelectKey: 'SSH private key',
+        vscodeScriptPreview: 'SSH setup script',
+        vscodePasswordHelper:
+            'Password authentication does not write to the local SSH config. Enter the password in VS Code when connecting to the remote host.',
+        vscodePasswordHint:
+            'Password authentication connects with the configured host, port, and username. No setup script or private key file is required.',
+        vscodeScriptPreviewHint:
+            'Run the setup script on the computer running VS Code to register the SSH alias for remote connections. Rerun it after changing the host, port, username, private key, or key path.',
+        vscodePasswordModeTitle: 'Password authentication',
+        vscodePasswordModeHint:
+            'Password authentication connects with the configured host, port, and username. No setup script or private key file is required.',
+        vscodePasswordStep1: 'Confirm the host, port, and username.',
+        vscodePasswordStep2: 'Open VS Code and enter the password when prompted.',
+        vscodePasswordStep3: 'No private key download is required for this mode.',
         saveContentAndClose: 'The file has been modified, do you want to save and close it?',
         saveAndOpenNewFile: 'The file has been modified, do you want to save and open the new file?',
         noEdit: 'The file has not been modified, no need to do this!',

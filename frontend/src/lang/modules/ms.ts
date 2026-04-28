@@ -1994,7 +1994,27 @@ const message = {
         top: 'Pergi ke atas',
         up: 'Kembali',
         openWithVscode: 'Buka dengan VS Code',
-        vscodeHelper: 'Pastikan VS Code dipasang secara tempatan dan pemalam SSH Remote dikonfigurasikan',
+        vscodeHelper:
+            'Sahkan mod pengesahan, hos, port dan nama pengguna. Pengesahan kunci memerlukan konfigurasi SSH pada komputer yang menjalankan VS Code sebelum digunakan.',
+        vscodeCopyConfig: 'Salin skrip persediaan',
+        vscodeKeyHelper:
+            'Nama muat turun kunci peribadi dijana daripada laluan yang dikonfigurasi. Simpan fail ke laluan tersebut; skrip persediaan akan menyemak fail dan menetapkan kebenaran.',
+        vscodeKeyPath: 'Laluan kunci peribadi SSH',
+        vscodeKeyPathPlaceholder: 'Contohnya: ~/.ssh/id_ed25519',
+        vscodeSelectKey: 'Kunci peribadi SSH',
+        vscodeScriptPreview: 'Skrip persediaan SSH',
+        vscodePasswordHelper:
+            'Pengesahan kata laluan tidak ditulis ke konfigurasi SSH tempatan. Masukkan kata laluan dalam VS Code semasa menyambung ke hos jauh.',
+        vscodePasswordHint:
+            'Pengesahan kata laluan menyambung menggunakan hos, port dan nama pengguna yang dikonfigurasi. Tiada skrip persediaan atau fail kunci peribadi diperlukan.',
+        vscodeScriptPreviewHint:
+            'Jalankan skrip persediaan pada komputer yang menjalankan VS Code untuk mendaftar alias SSH sambungan jauh. Jalankan semula selepas hos, port, nama pengguna, kunci peribadi atau laluan kunci berubah.',
+        vscodePasswordModeTitle: 'Pengesahan kata laluan',
+        vscodePasswordModeHint:
+            'Pengesahan kata laluan menyambung menggunakan hos, port dan nama pengguna yang dikonfigurasi. Tiada skrip persediaan atau fail kunci peribadi diperlukan.',
+        vscodePasswordStep1: 'Sahkan hos, port, dan nama pengguna.',
+        vscodePasswordStep2: 'Buka VS Code dan masukkan kata laluan apabila diminta.',
+        vscodePasswordStep3: 'Tiada muat turun kunci peribadi diperlukan.',
         saveContentAndClose: 'Fail telah diubah suai, adakah anda mahu menyimpan dan menutupnya?',
         saveAndOpenNewFile: 'Fail telah diubah suai, adakah anda mahu menyimpan dan membuka fail baru?',
         noEdit: 'Fail tidak diubah suai, tiada keperluan untuk tindakan ini!',

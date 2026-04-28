@@ -1990,7 +1990,27 @@ const message = {
         top: 'Volver arriba',
         up: 'Subir',
         openWithVscode: 'Abrir con VS Code',
-        vscodeHelper: 'Asegúrese de tener instalado VS Code y configurado el plugin SSH Remote',
+        vscodeHelper:
+            'Confirme el modo de autenticación, el host, el puerto y el usuario. La autenticación con clave requiere configurar SSH en el equipo donde se ejecuta VS Code antes de usarla.',
+        vscodeCopyConfig: 'Copiar script de configuración',
+        vscodeKeyHelper:
+            'El nombre de descarga de la clave privada se deriva de la ruta configurada. Guarde el archivo en esa ruta; el script de configuración lo verificará y aplicará permisos.',
+        vscodeKeyPath: 'Ruta de la clave privada SSH',
+        vscodeKeyPathPlaceholder: 'Por ejemplo: ~/.ssh/id_ed25519',
+        vscodeSelectKey: 'Clave privada SSH',
+        vscodeScriptPreview: 'Script de configuración SSH',
+        vscodePasswordHelper:
+            'La autenticación por contraseña no escribe en la configuración SSH local. Introduzca la contraseña en VS Code al conectarse al host remoto.',
+        vscodePasswordHint:
+            'La autenticación por contraseña conecta con el host, puerto y usuario configurados. No requiere script de configuración ni archivo de clave privada.',
+        vscodeScriptPreviewHint:
+            'Ejecute el script de configuración en el equipo donde se ejecuta VS Code para registrar el alias SSH de conexión remota. Vuelva a ejecutarlo si cambia el host, puerto, usuario, clave privada o ruta de la clave.',
+        vscodePasswordModeTitle: 'Autenticación por contraseña',
+        vscodePasswordModeHint:
+            'La autenticación por contraseña conecta con el host, puerto y usuario configurados. No requiere script de configuración ni archivo de clave privada.',
+        vscodePasswordStep1: 'Confirme el host, el puerto y el usuario.',
+        vscodePasswordStep2: 'Abra VS Code e introduzca la contraseña cuando se le solicite.',
+        vscodePasswordStep3: 'No es necesario descargar la clave privada.',
         saveContentAndClose: 'El archivo se ha modificado, ¿desea guardar y cerrar?',
         saveAndOpenNewFile: 'El archivo se ha modificado, ¿desea guardar y abrir el nuevo archivo?',
         noEdit: 'El archivo no ha sido modificado, ¡no es necesario hacer esto!',
