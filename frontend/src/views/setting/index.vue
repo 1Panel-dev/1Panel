@@ -11,7 +11,7 @@
 import { computed } from 'vue';
 import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isOffLine, isFxplay, isAdmin, isXpackEE } = useGlobalStore();
+const { isOffLine, isFxplay, isAdmin, isEnterprise } = useGlobalStore();
 
 const buttons = computed(() => {
     const items = [
@@ -44,7 +44,7 @@ const buttons = computed(() => {
             : [
                   {
                       label: i18n.global.t('setting.license'),
-                      path: isXpackEE.value ? '/xpack-ee/license' : '/settings/license',
+                      path: isEnterprise.value ? '/enterprise/license' : '/settings/license',
                   },
               ]),
         ...(isFxplay.value

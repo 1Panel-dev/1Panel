@@ -1,4 +1,4 @@
-//go:build !xpack && !xpackee
+//go:build !xpack && !enterprise
 
 package router
 

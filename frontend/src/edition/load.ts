@@ -1,7 +1,7 @@
 import communityProvider from './community';
 import type { EditionFrontendProvider } from './provider';
 import proProvider from '@xpack-pro/edition';
-import eeProvider from '@xpack-ee/edition';
+import eeProvider from '@enterprise/edition';
 
 const edition = (import.meta.env.VITE_FRONTEND_EDITION || 'community').toLowerCase();
 

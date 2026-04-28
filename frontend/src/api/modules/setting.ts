@@ -56,18 +56,18 @@ export const listAppNodes = () => {
     return http.get<Array<Setting.NodeAppItem>>(`/core/xpack/nodes/apps/update`, {}, { timeout: TimeoutEnum.T_60S });
 };
 
-// xpackee
+// enterprise
 export const loadNodeByUser = () => {
-    return http.get<Array<Setting.NodeItem>>(`/core/xpackee/users/nodes`);
+    return http.get<Array<Setting.NodeItem>>(`/core/enterprise/users/nodes`);
 };
-export const uploadXpackEELicense = (params: FormData) => {
-    return http.upload('/core/xpackee/licenses/upload', params);
+export const uploadEnterpriseLicense = (params: FormData) => {
+    return http.upload('/core/enterprise/licenses/upload', params);
 };
-export const getXpackEELicense = () => {
-    return http.get<Setting.LicenseEE>(`/core/xpackee/licenses/info`);
+export const getEnterpriseLicense = () => {
+    return http.get<Setting.LicenseEE>(`/core/enterprise/licenses/info`);
 };
-export const getXpackEELicenseStatus = () => {
-    return http.get<Setting.LicenseStatus>(`/core/xpackee/licenses/status`);
+export const getEnterpriseLicenseStatus = () => {
+    return http.get<Setting.LicenseStatus>(`/core/enterprise/licenses/status`);
 };
 
 // agent

@@ -772,10 +772,6 @@ const registerPasskey = async () => {
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         passkeyForm.name = '';
         await loadPasskeys();
-    } catch (res: any) {
-        if (res?.message) {
-            console.log(res.message);
-        }
     } finally {
         passkeyLoading.value = false;
     }

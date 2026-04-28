@@ -1,5 +1,5 @@
 import { getUserInfo } from '@/api/modules/auth';
-import { getXpackeeUserInfo } from '@/extensions/xpack';
+import { getEnterpriseUserInfo } from '@/extensions/xpack';
 import { GlobalStore } from '@/store';
 import type { RouteMeta } from 'vue-router';
 
@@ -18,11 +18,11 @@ type RouteAccessTarget = {
 
 export const syncAuthInfo = async (currentNode?: string) => {
     const globalStore = GlobalStore();
-    if (!globalStore.isXpackEE) {
+    if (!globalStore.isEnterprise) {
         const res = await getUserInfo();
         return res.data;
     }
-    const res = await getXpackeeUserInfo(currentNode ?? globalStore.currentNode);
+    const res = await getEnterpriseUserInfo(currentNode ?? globalStore.currentNode);
     globalStore.setAuthInfo({
         isAdmin: res.data.role === 'ADMIN',
         permissions: res.data.permissions || [],

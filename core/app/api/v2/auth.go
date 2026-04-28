@@ -238,16 +238,16 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 	ip := common.GetRealClientIP(c)
 	needCaptcha := global.IPTracker.NeedCaptcha(ip)
 	res := &dto.LoginSetting{
-		IsDemo:      global.CONF.Base.IsDemo,
-		IsIntl:      global.CONF.Base.Edition == "intl",
-		IsFxplay:    global.CONF.Base.IsFxplay,
-		IsOffLine:   global.CONF.Base.IsOffLine,
-		IsXPackEE:   global.CONF.Base.IsXpackEE,
-		Language:    settingInfo.Language,
-		MenuTabs:    settingInfo.MenuTabs,
-		PanelName:   settingInfo.PanelName,
-		Theme:       settingInfo.Theme,
-		NeedCaptcha: needCaptcha,
+		IsDemo:       global.CONF.Base.IsDemo,
+		IsIntl:       global.CONF.Base.Edition == "intl",
+		IsFxplay:     global.CONF.Base.IsFxplay,
+		IsOffLine:    global.CONF.Base.IsOffLine,
+		IsEnterprise: global.CONF.Base.IsEnterprise,
+		Language:     settingInfo.Language,
+		MenuTabs:     settingInfo.MenuTabs,
+		PanelName:    settingInfo.PanelName,
+		Theme:        settingInfo.Theme,
+		NeedCaptcha:  needCaptcha,
 	}
 	res.PasskeySetting = xpack.AuthProvider.PasskeyStatus(c)
 	helper.SuccessWithData(c, res)
