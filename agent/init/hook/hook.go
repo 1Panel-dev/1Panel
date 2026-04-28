@@ -2,6 +2,7 @@ package hook
 
 import (
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -11,7 +12,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
 
@@ -140,11 +140,10 @@ func loadLocalDir() {
 }
 
 func initDockerConf() {
-	stdout, err := cmd.RunDefaultWithStdoutBashC("which docker")
+	dockerPath, err := exec.LookPath("docker")
 	if err != nil {
 		return
 	}
-	dockerPath := stdout
 	if strings.Contains(dockerPath, "snap") {
 		constant.DaemonJsonPath = "/var/snap/docker/current/config/daemon.json"
 	}

@@ -147,7 +147,7 @@ func UniqueUints(items []uint) []uint {
 }
 
 func LoadArch() (string, error) {
-	std, err := cmd.RunDefaultWithStdoutBashC("uname -a")
+	std, err := cmd.NewCommandMgr().RunWithStdout("uname", "-a")
 	if err != nil {
 		return "", fmt.Errorf("std: %s, err: %s", std, err.Error())
 	}
@@ -243,25 +243,6 @@ func HandleIPList(content string) ([]string, error) {
 		res = append(res, ip)
 	}
 	return res, nil
-}
-
-func LoadParams(param string) string {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
-	if err != nil {
-		panic(err)
-	}
-	info := strings.ReplaceAll(stdout, "\n", "")
-	if len(info) == 0 || info == `""` {
-		panic(fmt.Sprintf("error `%s` find in /usr/local/bin/1pctl", param))
-	}
-	return info
-}
-func LoadParamsWithoutPanic(param string) string {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
-	if err != nil {
-		return ""
-	}
-	return strings.ReplaceAll(stdout, "\n", "")
 }
 
 func GetRealClientIP(c *gin.Context) string {

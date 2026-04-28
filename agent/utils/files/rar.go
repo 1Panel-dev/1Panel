@@ -23,7 +23,7 @@ func (z RarArchiver) Extract(ctx context.Context, filePath, dstDir string, _ str
 	if err := checkCmdAvailability("unrar"); err != nil {
 		return err
 	}
-	return cmd.NewCommandMgr(cmd.WithContext(ctx)).RunBashCf("unrar x -y -o+ %q %q", filePath, dstDir)
+	return cmd.NewCommandMgr().Run("unrar", "x", "-y", "-o+", filePath, dstDir)
 }
 
 func (z RarArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, _ string) (err error) {

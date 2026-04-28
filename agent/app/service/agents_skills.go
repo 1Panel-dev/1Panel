@@ -55,7 +55,7 @@ func (a AgentService) ListSkills(req dto.AgentIDReq) ([]dto.AgentSkillItem, erro
 	if agent.AgentType != constant.AppOpenclaw {
 		return nil, fmt.Errorf("%s does not support", agent.AgentType)
 	}
-	output, err := runDockerExecWithStdout(5*time.Minute, install.ContainerName, "sh", "-c", "openclaw skills list --json 2>&1")
+	output, err := cmd.RunDockerExecWithStdout(5*time.Minute, install.ContainerName, "openclaw", "skills", "list", "--json")
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (a AgentService) InstallSkill(req dto.AgentSkillInstallReq) error {
 	}
 	installTask.AddSubTask("Install OpenClaw skill", func(t *task.Task) error {
 		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(20*time.Minute))
-		return mgr.Run("docker", "exec", install.ContainerName, "sh", "-c", buildOpenclawSkillInstallCommand(req.Source, req.Slug))
+		return installOpenclawSkill(mgr, install.ContainerName, req.Source, req.Slug)
 	}, nil)
 	go func() {
 		if err := installTask.Execute(); err != nil {
@@ -205,9 +205,9 @@ func parseOpenclawSkillsList(output string) ([]dto.AgentSkillItem, error) {
 func loadOpenclawSkillSearchOutput(containerName, source, keyword string) (string, error) {
 	switch source {
 	case "skillhub":
-		return runDockerExecWithStdout(2*time.Minute, containerName, "skillhub", "search", keyword, "--json")
+		return cmd.RunDockerExecWithStdout(2*time.Minute, containerName, "skillhub", "search", keyword, "--json")
 	default:
-		return runDockerExecWithStdout(
+		return cmd.RunDockerExecWithStdout(
 			2*time.Minute,
 			containerName,
 			"sh",
@@ -261,22 +261,28 @@ func parseClawhubSearchResult(output, source string) []dto.AgentSkillSearchItem 
 	return items
 }
 
-func buildOpenclawSkillInstallCommand(source, slug string) string {
+func installOpenclawSkill(mgr *cmd.CommandHelper, containerName, source, slug string) error {
+	if err := mgr.Run("docker", "exec", containerName, "mkdir", "-p", openclawManagedSkillsDir); err != nil {
+		return err
+	}
 	switch source {
 	case "clawhub-global", "clawhub-cn":
-		return fmt.Sprintf(
-			"mkdir -p %s && CLAWHUB_REGISTRY=%q clawhub --workdir /home/node/.openclaw --dir skills install %q",
-			openclawManagedSkillsDir,
-			resolveClawhubRegistry(source),
+		return mgr.Run(
+			"docker",
+			"exec",
+			"-e",
+			"CLAWHUB_REGISTRY="+resolveClawhubRegistry(source),
+			containerName,
+			"clawhub",
+			"--workdir",
+			"/home/node/.openclaw",
+			"--dir",
+			"skills",
+			"install",
 			slug,
 		)
 	default:
-		return fmt.Sprintf(
-			"mkdir -p %s && skillhub --dir %s install %q",
-			openclawManagedSkillsDir,
-			openclawManagedSkillsDir,
-			slug,
-		)
+		return mgr.Run("docker", "exec", containerName, "skillhub", "--dir", openclawManagedSkillsDir, "install", slug)
 	}
 }
 
@@ -290,7 +296,7 @@ func resolveClawhubRegistry(source string) string {
 }
 
 func getOpenclawSkillKey(containerName, name string) (string, error) {
-	output, err := runDockerExecWithStdout(2*time.Minute, containerName, "sh", "-c", fmt.Sprintf("openclaw skills info %q --json 2>&1", name))
+	output, err := cmd.RunDockerExecWithStdout(2*time.Minute, containerName, "openclaw", "skills", "info", name, "--json")
 	if err != nil {
 		return "", err
 	}

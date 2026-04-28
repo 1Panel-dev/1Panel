@@ -28,7 +28,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssl"
 	"github.com/go-acme/lego/v4/certcrypto"
@@ -378,8 +377,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 			workDir = websiteSSL.Dir
 		}
 		logger.Println(i18n.GetMsgByKey("ExecShellStart"))
-		cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(30*time.Minute), cmd.WithLogger(logger), cmd.WithWorkDir(workDir))
-		if err = cmdMgr.RunBashC(websiteSSL.Shell); err != nil {
+		if err = runShellScriptFile(workDir, websiteSSL.Shell, logger); err != nil {
 			logger.Println(i18n.GetMsgWithMap("ErrExecShell", map[string]interface{}{"err": err.Error()}))
 		} else {
 			logger.Println(i18n.GetMsgByKey("ExecShellSuccess"))

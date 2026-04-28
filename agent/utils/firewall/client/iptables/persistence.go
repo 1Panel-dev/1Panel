@@ -2,12 +2,14 @@ package iptables
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"path"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
 const (
@@ -24,7 +26,7 @@ const (
 func SaveRulesToFile(tab, chain, fileName string) error {
 	rulesFile := path.Join(global.Dir.FirewallDir, fileName)
 
-	stdout, err := RunWithStd(tab, fmt.Sprintf("-S %s", chain))
+	stdout, err := RunWithStd(tab, "-S", chain)
 	if err != nil {
 		return fmt.Errorf("failed to list %s rules: %w", chain, err)
 	}
@@ -80,11 +82,22 @@ func LoadRulesFromFile(tab, chain, fileName string) error {
 
 	for _, rule := range rules {
 		if strings.HasPrefix(rule, fmt.Sprintf("-A %s", chain)) {
-			if err := Run(tab, rule); err != nil {
+			if err := restoreRule(tab, rule); err != nil {
 				global.LOG.Errorf("apply rule '%s' failed, err: %v", rule, err)
 			}
 		}
 	}
 
 	return nil
+}
+
+func restoreRule(tab, rule string) error {
+	restoreInput := fmt.Sprintf("*%s\n%s\nCOMMIT\n", tab, rule)
+	commandName, commandArgs := cmd.WrapWithOptionalSudo("iptables-restore", "-n")
+	_, err := cmd.NewCommandMgr().RunPipe(cmd.PipeCommand{
+		Name:  commandName,
+		Args:  commandArgs,
+		Stdin: bytes.NewReader([]byte(restoreInput)),
+	})
+	return err
 }
