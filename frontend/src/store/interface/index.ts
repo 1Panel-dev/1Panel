@@ -68,6 +68,7 @@ export interface GlobalState {
     productProExpires: number;
     isMasterProductPro: boolean;
     isXpackEELicensed: boolean;
+    isXpackEELicenseLoaded: boolean;
     // multi-node
     masterAlias: string;
     currentNode: string;

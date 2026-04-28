@@ -104,6 +104,7 @@ const loadImage = (name: string) => {
 const loadLoginTheme = async () => {
     const res = await getLoginSetting();
     globalStore.isXpackEE = res.data.isXpackEE;
+    globalStore.isXpackEELicenseLoaded = !res.data.isXpackEE;
     globalStore.isIntl = res.data.isIntl;
     globalStore.isFxplay = res.data.isFxplay;
     globalStore.isOffLine = res.data.isOffLine;
@@ -125,7 +126,9 @@ const loadLoginTheme = async () => {
         adjustColorToRGBA(loginBtnLinkColor.value, 30, 15),
     );
     if (!globalStore.isXpackEE) {
-        router.replace({ name: 'entrance', params: { code: globalStore.entrance } });
+        router.replace(
+            globalStore.isLogin ? { name: 'home' } : { name: 'entrance', params: { code: globalStore.entrance } },
+        );
     }
 };
 
@@ -155,6 +158,7 @@ const loadBackground = async () => {
 
 const loadLicenseInfo = async () => {
     const res = await getXpackEELicense();
+    globalStore.isXpackEELicenseLoaded = true;
     licenseInfo.deviceID = res.data.deviceID;
     if (res.data.status === 'Bound') {
         globalStore.isXpackEELicensed = true;

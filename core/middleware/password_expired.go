@@ -16,9 +16,11 @@ import (
 func PasswordExpired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core/auth") ||
-			c.Request.URL.Path == "/api/v2/core/settings/expired/handle" ||
 			c.Request.URL.Path == "/api/v2/core/settings/search" ||
-			c.Request.URL.Path == "/api/v2/core/settings/search/base" {
+			c.Request.URL.Path == "/api/v2/core/settings/search/base" ||
+			c.Request.URL.Path == "/api/v2/core/xpackee/licenses/info" ||
+			c.Request.URL.Path == "/api/v2/core/xpackee/licenses/status" ||
+			c.Request.URL.Path == "/api/v2/core/xpackee/licenses/upload" {
 			c.Next()
 			return
 		}
