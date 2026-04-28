@@ -65,6 +65,7 @@ const GlobalStore = defineStore({
         productProExpires: 0,
         isMasterProductPro: false,
         isXpackEELicensed: false,
+        isXpackEELicenseLoaded: false,
         // multi-node
         masterAlias: '',
         currentNode: 'local',

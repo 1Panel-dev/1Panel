@@ -461,6 +461,28 @@ func (b *BaseApi) UpdateCurrentUser(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Auth
+// @Summary Reset system password expired
+// @Accept json
+// @Param request body dto.PasswordUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/expired/reset [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"重置过期密码","formatEN":"reset an expired Password"}
+func (b *BaseApi) ResetPassword(c *gin.Context) {
+	var req dto.PasswordUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := xpack.AuthProvider.HandlePasswordExpired(c, req.OldPassword, req.NewPassword); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
 func saveLoginLogs(c *gin.Context, err error) {
 	var logs model.LoginLog
 	if err != nil {

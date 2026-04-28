@@ -18,10 +18,10 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 	noAuthRouter := Router.Group("settings")
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
-		router.POST("/search", baseApi.GetSettingInfo)
 		router.POST("/search/base", baseApi.GetSettingBaseInfo)
 
 		settingRouter.POST("/by", baseApi.GetSettingByKey)
+		settingRouter.POST("/search", baseApi.GetSettingInfo)
 		settingRouter.POST("/terminal/search", baseApi.GetTerminalSettingInfo)
 		settingRouter.GET("/search/available", baseApi.GetSystemAvailable)
 		settingRouter.POST("/update", baseApi.UpdateSetting)
