@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -24,35 +25,34 @@ func (f *Ufw) Name() string {
 }
 
 func (f *Ufw) Status() (bool, error) {
-	stdout, _ := cmd.RunDefaultWithStdoutBashCf("%s status | grep Status", f.CmdStr)
-	if stdout == "Status: active\n" {
+	stdout, _ := f.runWithStdout("status")
+	if strings.Contains(stdout, "Status: active") {
 		return true, nil
 	}
-	stdout1, _ := cmd.RunDefaultWithStdoutBashCf("%s status | grep 状态", f.CmdStr)
-	if stdout1 == "状态： 激活\n" {
+	if strings.Contains(stdout, "状态： 激活") {
 		return true, nil
 	}
 	return false, nil
 }
 
 func (f *Ufw) Version() (string, error) {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s version | grep ufw", f.CmdStr)
+	stdout, err := f.runWithStdout("version")
 	if err != nil {
 		return "", fmt.Errorf("load the firewall status failed, %v", err)
 	}
-	info := strings.ReplaceAll(stdout, "\n", "")
+	info := strings.Split(strings.TrimSpace(stdout), "\n")[0]
 	return strings.ReplaceAll(info, "ufw ", ""), nil
 }
 
 func (f *Ufw) Start() error {
-	if err := cmd.RunDefaultBashCf("echo y | %s enable", f.CmdStr); err != nil {
+	if err := f.run("--force", "enable"); err != nil {
 		return fmt.Errorf("enable the firewall failed, %v", err)
 	}
 	return nil
 }
 
 func (f *Ufw) Stop() error {
-	if err := cmd.RunDefaultBashCf("%s disable", f.CmdStr); err != nil {
+	if err := f.run("disable"); err != nil {
 		return fmt.Errorf("stop the firewall failed, %v", err)
 	}
 	return nil
@@ -73,7 +73,7 @@ func (f *Ufw) Reload() error {
 }
 
 func (f *Ufw) ListPort() ([]FireInfo, error) {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s status verbose", f.CmdStr)
+	stdout, err := f.runWithStdout("status", "verbose")
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 }
 
 func (f *Ufw) ListAddress() ([]FireInfo, error) {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s status verbose", f.CmdStr)
+	stdout, err := f.runWithStdout("status", "verbose")
 	if err != nil {
 		return nil, err
 	}
@@ -141,15 +141,15 @@ func (f *Ufw) Port(port FireInfo, operation string) error {
 		return buserr.New("ErrCmdIllegal")
 	}
 
-	command := fmt.Sprintf("%s %s %s", f.CmdStr, port.Strategy, port.Port)
+	args := []string{port.Strategy, port.Port}
 	if operation == "remove" {
-		command = fmt.Sprintf("%s delete %s %s", f.CmdStr, port.Strategy, port.Port)
+		args = []string{"delete", port.Strategy, port.Port}
 	}
 	if len(port.Protocol) != 0 {
-		command += fmt.Sprintf("/%s", port.Protocol)
+		args[len(args)-1] += "/" + port.Protocol
 	}
-	if err := cmd.RunDefaultBashC(command); err != nil {
-		return fmt.Errorf("%s (%s) failed, %v", operation, command, err)
+	if err := f.run(args...); err != nil {
+		return fmt.Errorf("%s (%s) failed, %v", operation, strings.Join(args, " "), err)
 	}
 	return nil
 }
@@ -169,31 +169,36 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 	}
 
 	insertNum := f.loadInsertNum(rule, operation)
-	ruleStr := fmt.Sprintf("%s insert %d %s ", f.CmdStr, insertNum, rule.Strategy)
+	args := []string{"insert", strconv.Itoa(insertNum), rule.Strategy}
 	if operation == "remove" {
-		ruleStr = fmt.Sprintf("%s delete %s ", f.CmdStr, rule.Strategy)
+		args = []string{"delete", rule.Strategy}
 	}
 	if len(rule.Protocol) != 0 {
-		ruleStr += fmt.Sprintf("proto %s ", rule.Protocol)
+		args = append(args, "proto", rule.Protocol)
 	}
 	if strings.Contains(rule.Address, "-") {
-		ruleStr += fmt.Sprintf("from %s to %s ", strings.Split(rule.Address, "-")[0], strings.Split(rule.Address, "-")[1])
+		parts := strings.Split(rule.Address, "-")
+		args = append(args, "from", parts[0], "to", parts[1])
 	} else {
-		ruleStr += fmt.Sprintf("from %s ", rule.Address)
+		args = append(args, "from", rule.Address)
 	}
 	if len(rule.Port) != 0 {
-		ruleStr += fmt.Sprintf("to any port %s ", rule.Port)
+		args = append(args, "to", "any", "port", rule.Port)
 	}
 
-	stdout, err := cmd.RunDefaultWithStdoutBashC(ruleStr)
+	stdout, err := f.runWithStdout(args...)
 	if err != nil {
 		if strings.Contains(stdout, "ERROR: Invalid position") || strings.Contains(stdout, "ERROR: 无效位置") {
-			if err := cmd.RunDefaultBashC(strings.ReplaceAll(ruleStr, "insert 1 ", "")); err != nil {
-				return fmt.Errorf("%s rich rules (%s), failed, %v", operation, ruleStr, err)
+			fallbackArgs := args
+			if len(args) >= 2 && args[0] == "insert" {
+				fallbackArgs = append([]string{}, args[2:]...)
+			}
+			if err := f.run(fallbackArgs...); err != nil {
+				return fmt.Errorf("%s rich rules (%s), failed, %v", operation, strings.Join(args, " "), err)
 			}
 			return nil
 		}
-		return fmt.Errorf("%s rich rules (%s), failed, %v", operation, ruleStr, err)
+		return fmt.Errorf("%s rich rules (%s), failed, %v", operation, strings.Join(args, " "), err)
 	}
 	return nil
 }
@@ -259,7 +264,7 @@ func (f *Ufw) loadInsertNum(rule FireInfo, operation string) int {
 	if !strings.Contains(rule.Address, ":") || operation == "remove" {
 		return 1
 	}
-	rules, err := cmd.RunDefaultWithStdoutBashCf("%s status numbered", f.CmdStr)
+	rules, err := f.runWithStdout("status", "numbered")
 	if err != nil {
 		global.LOG.Errorf("load ufw rules failed, err: %v", err)
 		return 1
@@ -276,4 +281,14 @@ func (f *Ufw) loadInsertNum(rule FireInfo, operation string) int {
 		}
 	}
 	return i
+}
+
+func (f *Ufw) run(args ...string) error {
+	_, err := f.runWithStdout(args...)
+	return err
+}
+
+func (f *Ufw) runWithStdout(args ...string) (string, error) {
+	cmdMgr := cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en"))
+	return cmdMgr.RunWithOptionalSudoAndStdout("ufw", args...)
 }

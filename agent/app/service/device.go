@@ -82,7 +82,7 @@ func (u *DeviceService) LoadBaseInfo() (dto.DeviceBaseInfo, error) {
 }
 
 func (u *DeviceService) LoadTimeZone() ([]string, error) {
-	std, err := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Minute)).RunWithStdoutBashC("timedatectl list-timezones")
+	std, err := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute)).RunWithStdout("timedatectl", "list-timezones")
 	if err != nil {
 		return []string{}, err
 	}
@@ -223,7 +223,9 @@ func (u *DeviceService) UpdatePasswd(req dto.ChangePasswd) error {
 	if cmd.CheckIllegal(req.User, req.Passwd) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	if err := cmd.RunDefaultBashCf("%s echo '%s:%s' | %s chpasswd", cmd.SudoHandleCmd(), req.User, req.Passwd, cmd.SudoHandleCmd()); err != nil {
+	cmdItem := cmd.ExecCommandWithOptionalSudo("chpasswd")
+	cmdItem.Stdin = strings.NewReader(req.User + ":" + req.Passwd)
+	if err := cmdItem.Run(); err != nil {
 		if strings.Contains(err.Error(), "does not exist") {
 			return buserr.New("ErrNotExistUser")
 		}
@@ -393,7 +395,7 @@ func loadHosts() []dto.HostHelper {
 }
 
 func loadHostname() string {
-	std, err := cmd.RunDefaultWithStdoutBashC("hostname")
+	std, err := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second)).RunWithStdout("hostname")
 	if err != nil {
 		return ""
 	}
@@ -401,7 +403,7 @@ func loadHostname() string {
 }
 
 func loadUser() string {
-	std, err := cmd.RunDefaultWithStdoutBashC("whoami")
+	std, err := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second)).RunWithStdout("whoami")
 	if err != nil {
 		return ""
 	}
@@ -410,7 +412,8 @@ func loadUser() string {
 
 func loadSwap() []dto.SwapHelper {
 	var data []dto.SwapHelper
-	std, err := cmd.RunDefaultWithStdoutBashCf("%s swapon --summary", cmd.SudoHandleCmd())
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
+	std, err := cmdMgr.RunWithOptionalSudoAndStdout("swapon", "--summary")
 	if err != nil {
 		return data
 	}

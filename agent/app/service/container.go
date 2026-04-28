@@ -1163,7 +1163,7 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 
 func (u *ContainerService) LoadUsers(req dto.OperationWithName) []string {
 	var users []string
-	std, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("docker", "exec", req.Name, "cat", "/etc/passwd")
+	std, err := cmd.RunDockerExecWithStdout(20*time.Second, req.Name, "cat", "/etc/passwd")
 	if err != nil {
 		return users
 	}
@@ -1436,7 +1436,7 @@ func (u *ContainerService) DownloadContainerFile(req dto.ContainerFileReq) (io.R
 		fileName = "container-file"
 	}
 	if stat.Mode.IsDir() {
-		if _, err := runContainerCommand(cli, req.ContainerID, []string{"sh", "-c", "command -v tar >/dev/null 2>&1"}); err != nil {
+		if _, err := runContainerCommand(cli, req.ContainerID, []string{"tar", "--help"}); err != nil {
 			_ = cli.Close()
 			return nil, "", "", fmt.Errorf("tar command not found in container")
 		}
@@ -1616,9 +1616,8 @@ func toContainerFileInfo(filePath string, stat container.PathStat, isDir bool) d
 }
 
 func isContainerDir(cli *client.Client, containerID, targetPath string) (bool, error) {
-	_, err := runContainerCommand(cli, containerID, []string{
-		"sh", "-c", "[ -d \"$1\" ]", "sh", targetPath,
-	})
+	checkPath := strings.TrimSuffix(targetPath, "/") + "/."
+	_, err := runContainerCommand(cli, containerID, []string{"ls", "-d", "--", checkPath})
 	if err != nil {
 		return false, err
 	}

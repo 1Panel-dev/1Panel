@@ -24,7 +24,7 @@ func (z ZipArchiver) Extract(filePath, dstDir string, secret string) error {
 	if err := checkCmdAvailability("unzip"); err != nil {
 		return err
 	}
-	return cmd.RunDefaultBashCf("unzip -qo %s -d %s", filePath, dstDir)
+	return cmd.NewCommandMgr().Run("unzip", "-qo", filePath, "-d", dstDir)
 }
 
 func (z ZipArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, _ string) error {

@@ -20,6 +20,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/controller"
+	"github.com/1Panel-dev/1Panel/core/utils/ctl_conf"
 	"github.com/1Panel-dev/1Panel/core/utils/files"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
@@ -166,7 +167,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	fileName := fmt.Sprintf("1panel-%s-%s-%s.tar.gz", req.Version, "linux", itemArch)
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
-		oldLang := common.LoadParams("LANGUAGE")
+		oldLang := ctl_conf.Load("LANGUAGE")
 		if err := files.DownloadFileWithProxyStream(downloadPath+"/"+fileName, downloadDir+"/"+fileName); err != nil {
 			global.LOG.Errorf("download service file failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
@@ -212,12 +213,12 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			u.handleRollback(originalDir, 2, svcInfo)
 			return
 		}
-		if _, err := cmd.RunDefaultWithStdoutBashCf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin/1pctl", global.CONF.Base.InstallDir); err != nil {
+		if err := ctl_conf.UpdateInFile("/usr/local/bin/1pctl", "BASE_DIR", global.CONF.Base.InstallDir); err != nil {
 			global.LOG.Errorf("upgrade basedir in 1pctl failed, err: %v", err)
 			u.handleRollback(originalDir, 2, svcInfo)
 			return
 		}
-		if _, err := cmd.RunDefaultWithStdoutBashCf("sed -i -e 's#LANGUAGE=.*#LANGUAGE=%s#g' /usr/local/bin/1pctl", oldLang); err != nil {
+		if err := ctl_conf.UpdateInFile("/usr/local/bin/1pctl", "LANGUAGE", oldLang); err != nil {
 			global.LOG.Errorf("upgrade basedir in 1pctl failed, err: %v", err)
 			u.handleRollback(originalDir, 2, svcInfo)
 			return
@@ -524,7 +525,7 @@ func (u *UpgradeService) loadReleaseNotes(path string) (string, error) {
 }
 
 func loadArch() (string, error) {
-	std, err := cmd.RunDefaultWithStdoutBashC("uname -a")
+	std, err := cmd.NewCommandMgr().RunWithStdout("uname", "-a")
 	if err != nil {
 		return "", fmt.Errorf("std: %s, err: %s", std, err.Error())
 	}

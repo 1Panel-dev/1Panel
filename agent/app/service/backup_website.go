@@ -178,7 +178,7 @@ func handleWebsiteRecover(website *model.Website, parentTask *task.Task, recover
 		if err = fileOp.TarGzExtractPro(fmt.Sprintf("%s/%s.web.tar.gz", tmpPath, website.Alias), GetOpenrestyDir(SitesRootDir), ""); err != nil {
 			return err
 		}
-		if err := cmd.RunDefaultBashCf("docker exec -i %s nginx -s reload", nginxInfo.ContainerName); err != nil {
+		if err := cmd.NewCommandMgr().Run("docker", "exec", "-i", nginxInfo.ContainerName, "nginx", "-s", "reload"); err != nil {
 			return err
 		}
 		oldWebsite.ID = website.ID

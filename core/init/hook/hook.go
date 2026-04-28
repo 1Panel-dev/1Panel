@@ -1,14 +1,15 @@
 package hook
 
 import (
+	"os/exec"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
-	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
+	"github.com/1Panel-dev/1Panel/core/utils/ctl_conf"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 )
@@ -37,12 +38,12 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 	}
 	settingMap := make(map[string]string)
 	if tags == "use_existing" {
-		settingMap["ServerPort"] = common.LoadParams("ORIGINAL_PORT")
+		settingMap["ServerPort"] = ctl_conf.Load("ORIGINAL_PORT")
 		global.CONF.Conn.Port = settingMap["ServerPort"]
 		settingMap["UserName"] = global.CONF.Base.Username
 		settingMap["Password"] = global.CONF.Base.Password
 		settingMap["SecurityEntrance"] = global.CONF.Conn.Entrance
-		settingMap["SystemVersion"] = common.LoadParams("ORIGINAL_VERSION")
+		settingMap["SystemVersion"] = ctl_conf.Load("ORIGINAL_VERSION")
 		global.CONF.Base.Version = settingMap["SystemVersion"]
 		settingMap["Language"] = global.CONF.Base.Language
 	}
@@ -81,8 +82,8 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 		}
 	}
 
-	_, _ = cmd.RunDefaultWithStdoutBashCf("%s sed -i '/CHANGE_USER_INFO=%v/d' /usr/local/bin/1pctl", cmd.SudoHandleCmd(), global.CONF.Base.ChangeUserInfo)
-	_, _ = cmd.RunDefaultWithStdoutBashCf("%s sed -i -e 's#ORIGINAL_PASSWORD=.*#ORIGINAL_PASSWORD=**********#g' /usr/local/bin/1pctl", cmd.SudoHandleCmd())
+	_ = ctl_conf.RemoveValueFromFile("/usr/local/bin/1pctl", "CHANGE_USER_INFO", global.CONF.Base.ChangeUserInfo)
+	_ = ctl_conf.UpdateInFile("/usr/local/bin/1pctl", "ORIGINAL_PASSWORD", "**********")
 }
 
 func generateKey() {
@@ -92,11 +93,10 @@ func generateKey() {
 }
 
 func initDockerConf() {
-	stdout, err := cmd.RunDefaultWithStdoutBashC("which docker")
+	dockerPath, err := exec.LookPath("docker")
 	if err != nil {
 		return
 	}
-	dockerPath := stdout
 	if strings.Contains(dockerPath, "snap") {
 		constant.DaemonJsonPath = "/var/snap/docker/current/config/daemon.json"
 	}
