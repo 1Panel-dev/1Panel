@@ -271,9 +271,9 @@ const logout = () => {
     })
         .then(async () => {
             await logOutApi();
-            router.push({ name: 'entrance', params: { code: globalStore.entrance } });
             globalStore.setLogStatus(false);
             globalStore.clearAuthInfo();
+            router.push({ name: 'entrance', params: { code: globalStore.entrance } });
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {});

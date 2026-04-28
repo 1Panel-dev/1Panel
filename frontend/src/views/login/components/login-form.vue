@@ -630,6 +630,7 @@ const getSetting = async () => {
         globalStore.isFxplay = isFxplay.value;
         globalStore.isOffLine = res.data.isOffLine;
         globalStore.isXpackEE = res.data.isXpackEE;
+        globalStore.isXpackEELicenseLoaded = !res.data.isXpackEE;
         globalStore.ignoreCaptcha = !res.data.needCaptcha;
         passkeySetting.value = res.data.passkeySetting;
         if (!globalStore.ignoreCaptcha) {
