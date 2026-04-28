@@ -30,7 +30,8 @@ func NewIDiskService() IDiskService {
 
 func (s *DiskService) GetCompleteDiskInfo() (*response.CompleteDiskInfo, error) {
 	var diskInfos []response.DiskBasicInfo
-	output, err := cmd.RunDefaultWithStdoutBashC("lsblk -J -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE,MODEL,SERIAL,TRAN,ROTA")
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
+	output, err := cmdMgr.RunWithStdout("lsblk", "-J", "-o", "NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE,MODEL,SERIAL,TRAN,ROTA")
 	if err == nil {
 		diskInfos, err = parseLsblkJsonOutput(output)
 		if err == nil {
@@ -38,7 +39,7 @@ func (s *DiskService) GetCompleteDiskInfo() (*response.CompleteDiskInfo, error) 
 			return &result, nil
 		}
 	}
-	output, err = cmd.RunDefaultWithStdoutBashC("lsblk -P -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE,MODEL,SERIAL,TRAN,ROTA")
+	output, err = cmdMgr.RunWithStdout("lsblk", "-P", "-o", "NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE,MODEL,SERIAL,TRAN,ROTA")
 	if err != nil {
 		return nil, fmt.Errorf("failed to run lsblk command: %v", err)
 	}

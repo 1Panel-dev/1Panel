@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -89,8 +90,8 @@ func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
 		data.Version = itemVersion.Version
 	}
 	data.IsSwarm = false
-	stdout2, _ := cmd.RunDefaultWithStdoutBashC("docker info  | grep Swarm")
-	if string(stdout2) == " Swarm: active\n" {
+	stdout2, _ := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("docker", "info")
+	if strings.Contains(stdout2, "Swarm: active") {
 		data.IsSwarm = true
 	}
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil {
@@ -423,7 +424,7 @@ func validateDockerConfig() error {
 	if !cmd.Which("dockerd") {
 		return nil
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashC("dockerd --validate")
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("dockerd", "--validate")
 	if strings.Contains(stdout, "unknown flag: --validate") {
 		return nil
 	}

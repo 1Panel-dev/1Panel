@@ -2,6 +2,7 @@ package firewall
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 )
@@ -9,7 +10,7 @@ import (
 func UpdatePort(oldPort, newPort string) error {
 	firewalld := cmd.Which("firewalld")
 	if firewalld {
-		status, _ := cmd.RunDefaultWithStdoutBashC("LANGUAGE=en_US:en firewall-cmd --state")
+		status, _ := cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en")).RunWithStdout("firewall-cmd", "--state")
 		isRunning := status == "running\n"
 		if isRunning {
 			return firewallUpdatePort(oldPort, newPort)
@@ -20,8 +21,8 @@ func UpdatePort(oldPort, newPort string) error {
 	if !ufw {
 		return nil
 	}
-	status, _ := cmd.RunDefaultWithStdoutBashC("LANGUAGE=en_US:en ufw status | grep Status")
-	isRuning := status == "Status: active\n"
+	status, _ := cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en")).RunWithStdout("ufw", "status")
+	isRuning := strings.Contains(status, "Status: active")
 	if isRuning {
 		return ufwUpdatePort(oldPort, newPort)
 	}
@@ -29,22 +30,22 @@ func UpdatePort(oldPort, newPort string) error {
 }
 
 func firewallUpdatePort(oldPort, newPort string) error {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("firewall-cmd --zone=public --add-port=%s/tcp --permanent", newPort)
+	stdout, err := cmd.NewCommandMgr().RunWithStdout("firewall-cmd", "--zone=public", "--add-port="+newPort+"/tcp", "--permanent")
 	if err != nil {
 		return fmt.Errorf("add (port: %s/tcp) failed, err: %s", newPort, stdout)
 	}
 
-	_, _ = cmd.RunDefaultWithStdoutBashCf("firewall-cmd --zone=public --remove-port=%s/tcp --permanent", oldPort)
-	_, _ = cmd.RunDefaultWithStdoutBashC("firewall-cmd --reload")
+	_, _ = cmd.NewCommandMgr().RunWithStdout("firewall-cmd", "--zone=public", "--remove-port="+oldPort+"/tcp", "--permanent")
+	_, _ = cmd.NewCommandMgr().RunWithStdout("firewall-cmd", "--reload")
 	return nil
 }
 
 func ufwUpdatePort(oldPort, newPort string) error {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("ufw allow %s", newPort)
+	stdout, err := cmd.NewCommandMgr().RunWithStdout("ufw", "allow", newPort)
 	if err != nil {
 		return fmt.Errorf("add (port: %s/tcp) failed, err: %s", newPort, stdout)
 	}
 
-	_, _ = cmd.RunDefaultWithStdoutBashCf("ufw delete allow %s", oldPort)
+	_, _ = cmd.NewCommandMgr().RunWithStdout("ufw", "delete", "allow", oldPort)
 	return nil
 }

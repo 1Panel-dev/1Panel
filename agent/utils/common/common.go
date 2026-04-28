@@ -18,6 +18,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/ctl_conf"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"golang.org/x/net/idna"
 )
@@ -289,18 +290,21 @@ func LoadTimeZoneByCmd() string {
 	if _, err := time.LoadLocation(loc); err != nil {
 		loc = "Asia/Shanghai"
 	}
-	std, err := cmd.RunDefaultWithStdoutBashC("timedatectl | grep 'Time zone'")
+	std, err := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second)).RunWithStdout("timedatectl")
 	if err != nil {
 		return loc
 	}
-	fields := strings.Fields(string(std))
-	if len(fields) != 5 {
-		return loc
+	for _, line := range strings.Split(std, "\n") {
+		fields := strings.Fields(line)
+		if len(fields) != 5 || fields[0] != "Time" || fields[1] != "zone:" {
+			continue
+		}
+		if _, err := time.LoadLocation(fields[2]); err != nil {
+			return loc
+		}
+		return fields[2]
 	}
-	if _, err := time.LoadLocation(fields[2]); err != nil {
-		return loc
-	}
-	return fields[2]
+	return loc
 }
 
 func IsValidDomain(domain string) bool {
@@ -442,20 +446,8 @@ func GetDockerComposeCommand() string {
 }
 
 func LoadParams(param string) string {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
-	if err != nil {
-		panic(err)
-	}
-	info := strings.ReplaceAll(stdout, "\n", "")
-	if len(info) == 0 || info == `""` {
-		panic(fmt.Sprintf("error `%s` find in /usr/local/bin/1pctl", param))
-	}
-	return info
+	return ctl_conf.Load(param)
 }
 func LoadParamsWithoutPanic(param string) string {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
-	if err != nil {
-		return ""
-	}
-	return strings.ReplaceAll(stdout, "\n", "")
+	return ctl_conf.LoadWithoutPanic(param)
 }

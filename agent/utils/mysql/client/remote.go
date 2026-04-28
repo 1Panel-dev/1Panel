@@ -1,7 +1,6 @@
 package client
 
 import (
-	"bytes"
 	"compress/gzip"
 	"context"
 	"database/sql"
@@ -244,11 +243,6 @@ func (r *Remote) Backup(info BackupInfo) error {
 			return fmt.Errorf("mkdir %s failed, err: %v", info.TargetDir, err)
 		}
 	}
-	outfile, err := os.OpenFile(path.Join(info.TargetDir, info.FileName), os.O_RDWR|os.O_CREATE, constant.DirPerm)
-	if err != nil {
-		return fmt.Errorf("open file %s failed, err: %v", path.Join(info.TargetDir, info.FileName), err)
-	}
-	defer func() { _ = outfile.Close() }()
 	dumpCmd := "mysqldump"
 	if r.Type == constant.AppMariaDB {
 		dumpCmd = "mariadb-dump"
@@ -268,23 +262,32 @@ func (r *Remote) Backup(info BackupInfo) error {
 		args = append(args, arg)
 	}
 
-	backupCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c '%s %s -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
-		image, dumpCmd, strings.Join(args, " "), r.Address, r.Port, r.User, r.Password, sslSkip(info.Version, r.Type), info.Format, info.Name)
-
-	global.LOG.Debug(strings.ReplaceAll(backupCmd, r.Password, "******"))
-	cmd := exec.Command("bash", "-c", backupCmd)
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-
-	gzipCmd := exec.Command("gzip", "-cf")
-	gzipCmd.Stdin, _ = cmd.StdoutPipe()
-	gzipCmd.Stdout = outfile
-
-	_ = gzipCmd.Start()
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("handle backup database failed, err: %v", stderr.String())
+	backupArgs := []string{"run", "--rm", "--net=host", "-i", image, dumpCmd}
+	backupArgs = append(backupArgs, args...)
+	backupArgs = append(
+		backupArgs,
+		"-h", r.Address,
+		"-P", fmt.Sprintf("%d", r.Port),
+		"-u"+r.User,
+		"-p"+r.Password,
+		sslSkip(info.Version, r.Type),
+		"--default-character-set="+info.Format,
+		info.Name,
+	)
+	debugArgs := append([]string{}, backupArgs...)
+	for i, arg := range debugArgs {
+		if strings.Contains(arg, r.Password) {
+			debugArgs[i] = strings.ReplaceAll(arg, r.Password, "******")
+		}
 	}
-	_ = gzipCmd.Wait()
+	global.LOG.Debug("docker " + strings.Join(debugArgs, " "))
+	cmdMgr := cmd.NewCommandMgr(cmd.WithOutputFile(path.Join(info.TargetDir, info.FileName)))
+	if _, err := cmdMgr.RunPipe(
+		cmd.PipeCommand{Name: "docker", Args: backupArgs},
+		cmd.PipeCommand{Name: "gzip", Args: []string{"-cf"}},
+	); err != nil {
+		return fmt.Errorf("handle backup database failed, err: %v", err)
+	}
 	return nil
 }
 
@@ -300,11 +303,24 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		return err
 	}
 
-	recoverCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c '%s -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
-		image, r.Type, r.Address, r.Port, r.User, r.Password, sslSkip(info.Version, r.Type), info.Format, info.Name)
-
-	global.LOG.Debug(strings.ReplaceAll(recoverCmd, r.Password, "******"))
-	cmd := exec.Command("bash", "-c", recoverCmd)
+	recoverArgs := []string{
+		"run", "--rm", "--net=host", "-i", image, r.Type,
+		"-h", r.Address,
+		"-P", fmt.Sprintf("%d", r.Port),
+		"-u" + r.User,
+		"-p" + r.Password,
+		sslSkip(info.Version, r.Type),
+		"--default-character-set=" + info.Format,
+		info.Name,
+	}
+	debugArgs := append([]string{}, recoverArgs...)
+	for i, arg := range debugArgs {
+		if strings.Contains(arg, r.Password) {
+			debugArgs[i] = strings.ReplaceAll(arg, r.Password, "******")
+		}
+	}
+	global.LOG.Debug("docker " + strings.Join(debugArgs, " "))
+	cmd := exec.Command("docker", recoverArgs...)
 
 	if strings.HasSuffix(info.SourceFile, ".gz") {
 		gzipFile, err := os.Open(info.SourceFile)

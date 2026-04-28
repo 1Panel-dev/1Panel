@@ -77,17 +77,16 @@ func UpdatePingStatus(enable string) error {
 	const panelSysctlPath = "/etc/sysctl.d/98-onepanel.conf"
 
 	var targetPath string
-	var applyCmd string
+	applyArgs := []string{"-p"}
 
 	if _, err := os.Stat(confPath); os.IsNotExist(err) {
 		targetPath = panelSysctlPath
-		applyCmd = fmt.Sprintf("%s sysctl --system", cmd.SudoHandleCmd())
-		if err := cmd.RunDefaultBashCf("%s mkdir -p /etc/sysctl.d", cmd.SudoHandleCmd()); err != nil {
+		applyArgs = []string{"--system"}
+		if err := cmd.NewCommandMgr().RunWithOptionalSudo("mkdir", "-p", "/etc/sysctl.d"); err != nil {
 			return fmt.Errorf("failed to create directory /etc/sysctl.d: %v", err)
 		}
 	} else {
 		targetPath = confPath
-		applyCmd = fmt.Sprintf("%s sysctl -p", cmd.SudoHandleCmd())
 	}
 
 	lineBytes, err := os.ReadFile(targetPath)
@@ -95,14 +94,14 @@ func UpdatePingStatus(enable string) error {
 		return fmt.Errorf("failed to read %s: %v", targetPath, err)
 	}
 
-	if err := cmd.RunDefaultBashCf("echo %s | %s tee /proc/sys/net/ipv4/icmp_echo_ignore_all > /dev/null", enable, cmd.SudoHandleCmd()); err != nil {
+	if err := cmd.WriteFileWithOptionalSudo("/proc/sys/net/ipv4/icmp_echo_ignore_all", []byte(enable), constant.FilePerm); err != nil {
 		return fmt.Errorf("failed to apply ipv4 ping status temporarily: %v", err)
 	}
 
 	var hasIpv6 bool
 	if _, err := os.Stat("/proc/sys/net/ipv6/icmp/echo_ignore_all"); err == nil {
 		hasIpv6 = true
-		if err := cmd.RunDefaultBashCf("echo %s | %s tee /proc/sys/net/ipv6/icmp/echo_ignore_all > /dev/null", enable, cmd.SudoHandleCmd()); err != nil {
+		if err := cmd.WriteFileWithOptionalSudo("/proc/sys/net/ipv6/icmp/echo_ignore_all", []byte(enable), constant.FilePerm); err != nil {
 			global.LOG.Warnf("failed to apply ipv6 ping status temporarily: %v", err)
 		}
 	}
@@ -136,18 +135,12 @@ func UpdatePingStatus(enable string) error {
 		newFiles = append(newFiles, "net.ipv6.icmp.echo_ignore_all="+enable)
 	}
 
-	file, err := os.OpenFile(targetPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
-	if err != nil {
-		return fmt.Errorf("failed to open %s: %v", targetPath, err)
-	}
-	defer file.Close()
-
-	if _, err = file.WriteString(strings.Join(newFiles, "\n")); err != nil {
+	if err = cmd.WriteFileWithOptionalSudo(targetPath, []byte(strings.Join(newFiles, "\n")), constant.FilePerm); err != nil {
 		return fmt.Errorf("failed to write to %s: %v", targetPath, err)
 	}
 
-	if err := cmd.RunDefaultBashC(applyCmd); err != nil {
-		global.LOG.Warnf("failed to apply persistent config with '%s': %v", applyCmd, err)
+	if err := cmd.NewCommandMgr().RunWithOptionalSudo("sysctl", applyArgs...); err != nil {
+		global.LOG.Warnf("failed to apply persistent config: %v", err)
 	}
 
 	return nil

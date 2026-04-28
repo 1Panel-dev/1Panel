@@ -63,7 +63,7 @@ func NewFtpClient() (*Ftp, error) {
 
 	groupItem, err := user.LookupGroupId("1000")
 	if err == nil {
-		if err := cmd.RunDefaultBashCf("useradd -u 1000 -g %s %s", groupItem.Name, "1panel"); err != nil {
+		if err := cmd.NewCommandMgr().Run("useradd", "-u", "1000", "-g", groupItem.Name, "1panel"); err != nil {
 			return nil, err
 		}
 		return &Ftp{DefaultUser: "1panel", DefaultGroup: groupItem.Name}, nil
@@ -71,10 +71,10 @@ func NewFtpClient() (*Ftp, error) {
 	if err.Error() != user.UnknownGroupIdError("1000").Error() {
 		return nil, err
 	}
-	if err := cmd.RunDefaultBashC("groupadd -g 1000 1panel"); err != nil {
+	if err := cmd.NewCommandMgr().Run("groupadd", "-g", "1000", "1panel"); err != nil {
 		return nil, err
 	}
-	if err := cmd.RunDefaultBashC("useradd -u 1000 -g 1panel 1panel"); err != nil {
+	if err := cmd.NewCommandMgr().Run("useradd", "-u", "1000", "-g", "1panel", "1panel"); err != nil {
 		return nil, err
 	}
 	return &Ftp{DefaultUser: "1panel", DefaultGroup: "1panel"}, nil
@@ -118,7 +118,7 @@ func (f *Ftp) UserAdd(username, passwd, path string) error {
 		return err
 	}
 	_ = f.Reload()
-	if err := cmd.RunDefaultBashCf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path); err != nil {
+	if err := cmd.NewCommandMgr().Run("chown", "-R", f.DefaultUser+":"+f.DefaultGroup, path); err != nil {
 		return err
 	}
 	return nil
@@ -128,7 +128,7 @@ func (f *Ftp) UserDel(username string) error {
 	if cmd.CheckIllegal(username) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	if err := cmd.RunDefaultBashCf("pure-pw userdel %s", username); err != nil {
+	if err := cmd.NewCommandMgr().Run("pure-pw", "userdel", username); err != nil {
 		return err
 	}
 	_ = f.Reload()
@@ -189,10 +189,10 @@ func (f *Ftp) SetPath(username, path string) error {
 	if cmd.CheckIllegal(username, path) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	if err := cmd.RunDefaultBashCf("pure-pw usermod %s -d %s", username, path); err != nil {
+	if err := cmd.NewCommandMgr().Run("pure-pw", "usermod", username, "-d", path); err != nil {
 		return err
 	}
-	if err := cmd.RunDefaultBashCf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path); err != nil {
+	if err := cmd.NewCommandMgr().Run("chown", "-R", f.DefaultUser+":"+f.DefaultGroup, path); err != nil {
 		return err
 	}
 	return nil
@@ -202,18 +202,18 @@ func (f *Ftp) SetStatus(username, status string) error {
 	if cmd.CheckIllegal(username, status) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	statusItem := "''"
+	statusItem := ""
 	if status == constant.StatusDisable {
 		statusItem = "1"
 	}
-	if err := cmd.RunDefaultBashCf("pure-pw usermod %s -r %s", username, statusItem); err != nil {
+	if err := cmd.NewCommandMgr().Run("pure-pw", "usermod", username, "-r", statusItem); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (f *Ftp) LoadList() ([]FtpList, error) {
-	std, err := cmd.RunDefaultWithStdoutBashC("pure-pw list")
+	std, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("pure-pw", "list")
 	if err != nil {
 		return nil, err
 	}
@@ -224,14 +224,20 @@ func (f *Ftp) LoadList() ([]FtpList, error) {
 		if len(parts) < 2 {
 			continue
 		}
-		std2, err := cmd.RunDefaultWithStdoutBashCf("pure-pw  show %s | grep 'Allowed client IPs :'", parts[0])
+		std2, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("pure-pw", "show", parts[0])
 		if err != nil {
 			global.LOG.Errorf("handle pure-pw show %s failed, %v", parts[0], err)
 			continue
 		}
 		status := constant.StatusDisable
-		itemStd := strings.ReplaceAll(std2, "\n", "")
-		if len(strings.TrimSpace(strings.ReplaceAll(itemStd, "Allowed client IPs :", ""))) == 0 {
+		allowedLine := ""
+		for _, line := range strings.Split(std2, "\n") {
+			if strings.Contains(line, "Allowed client IPs :") {
+				allowedLine = line
+				break
+			}
+		}
+		if len(strings.TrimSpace(strings.ReplaceAll(allowedLine, "Allowed client IPs :", ""))) == 0 {
 			status = constant.StatusEnable
 		}
 		lists = append(lists, FtpList{User: parts[0], Path: strings.ReplaceAll(parts[1], "/./", ""), Status: status})
@@ -240,7 +246,7 @@ func (f *Ftp) LoadList() ([]FtpList, error) {
 }
 
 func (f *Ftp) Reload() error {
-	if err := cmd.RunDefaultBashC("pure-pw mkdb"); err != nil {
+	if err := cmd.NewCommandMgr().Run("pure-pw", "mkdb"); err != nil {
 		return err
 	}
 	return nil
@@ -250,19 +256,28 @@ func (f *Ftp) LoadLogs(user, operation string) ([]FtpLog, error) {
 	var logs []FtpLog
 	logItem := ""
 	if _, err := os.Stat("/etc/pure-ftpd/conf"); err != nil && os.IsNotExist(err) {
-		std, err := cmd.RunDefaultWithStdoutBashC("cat /etc/pure-ftpd/pure-ftpd.conf | grep AltLog | grep clf:")
 		logItem = "/var/log/pureftpd.log"
-		if err == nil && !strings.HasPrefix(std, "#") {
-			logItem = std
+		data, readErr := os.ReadFile("/etc/pure-ftpd/pure-ftpd.conf")
+		if readErr == nil {
+			for _, line := range strings.Split(string(data), "\n") {
+				if strings.HasPrefix(strings.TrimSpace(line), "#") || !strings.Contains(line, "AltLog") || !strings.Contains(line, "clf:") {
+					continue
+				}
+				logItem = line
+				break
+			}
 		}
 	} else {
 		if err != nil {
 			return logs, err
 		}
-		std, err := cmd.RunDefaultWithStdoutBashC("cat /etc/pure-ftpd/conf/AltLog")
 		logItem = "/var/log/pure-ftpd/transfer.log"
-		if err != nil && !strings.HasPrefix(std, "#") {
-			logItem = std
+		data, readErr := os.ReadFile("/etc/pure-ftpd/conf/AltLog")
+		if readErr == nil {
+			std := string(data)
+			if !strings.HasPrefix(strings.TrimSpace(std), "#") {
+				logItem = std
+			}
 		}
 	}
 
@@ -298,7 +313,7 @@ func (f *Ftp) LoadLogs(user, operation string) ([]FtpLog, error) {
 }
 
 func handleGunzip(path string) error {
-	if err := cmd.RunDefaultBashCf("gunzip %s", path); err != nil {
+	if err := cmd.NewCommandMgr().Run("gunzip", path); err != nil {
 		return err
 	}
 	return nil

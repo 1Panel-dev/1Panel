@@ -71,7 +71,7 @@ func Init() {
 		global.LOG.Errorf("find 1panel service port failed")
 		return
 	}
-	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicBefore, fmt.Sprintf("-p tcp -m tcp --dport %v -j ACCEPT", panelPort)); err != nil {
+	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicBefore, "-p", "tcp", "-m", "tcp", "--dport", panelPort, "-j", "ACCEPT"); err != nil {
 		global.LOG.Errorf("add port accept rule %v failed, err: %v", panelPort, err)
 		return
 	}

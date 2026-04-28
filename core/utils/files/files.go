@@ -61,13 +61,15 @@ func CopyItem(isDir, withName bool, src, dst string) error {
 			_ = os.MkdirAll(dst, srcInfo.Mode())
 		}
 	}
-	cmdStr := fmt.Sprintf(`cp -rf %s %s`, src, dst+"/")
+	cmdArgs := []string{"-rf", "--", src, dst + "/"}
+	cmdText := fmt.Sprintf("cp -rf -- %s %s", src, dst+"/")
 	if !isDir {
-		cmdStr = fmt.Sprintf(`cp -f %s %s`, src, dst+"/")
+		cmdArgs = []string{"-f", "--", src, dst + "/"}
+		cmdText = fmt.Sprintf("cp -f -- %s %s", src, dst+"/")
 	}
-	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(60 * time.Second)).RunWithStdoutBashC(cmdStr)
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithStdout("cp", cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("handle %s failed, stdout: %s, err: %v", cmdStr, stdout, err)
+		return fmt.Errorf("handle %s failed, stdout: %s, err: %v", cmdText, stdout, err)
 	}
 	return nil
 }
@@ -82,10 +84,11 @@ func CopyFileWithRename(src, dst string) error {
 			_ = os.MkdirAll(path.Dir(dst), srcInfo.Mode())
 		}
 	}
-	if err := cmd.RunDefaultBashCf("cp -f %s %s.tmp", src, dst); err != nil {
+	cmdMgr := cmd.NewCommandMgr()
+	if err := cmdMgr.Run("cp", "-f", "--", src, dst+".tmp"); err != nil {
 		return fmt.Errorf("handle cp file failed, err: %v", err)
 	}
-	if err = cmd.RunDefaultBashCf("mv %s.tmp %s", dst, dst); err != nil {
+	if err = cmdMgr.Run("mv", "--", dst+".tmp", dst); err != nil {
 		return err
 	}
 	return nil
@@ -98,9 +101,33 @@ func HandleTar(sourceDir, targetDir, name, exclusionRules string, secret string)
 		}
 	}
 
+	targetFile := path.Join(targetDir, name)
+	excludeText, excludeArgs := buildTarExcludeArgs(exclusionRules)
+	tarPathText, tarPathArgs := buildTarPathArgs(sourceDir)
+	if len(secret) != 0 {
+		logTarEncryptCommand(targetFile, excludeText, tarPathText, secret)
+		stdout, err := runTarEncrypt(targetFile, excludeArgs, tarPathArgs, secret)
+		if err != nil && len(stdout) != 0 {
+			global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
+			return fmt.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
+		}
+		return nil
+	}
+
+	global.LOG.Debug(fmt.Sprintf("tar -zcf %s %s %s", targetFile, excludeText, tarPathText))
+	stdout, err := runTar(targetFile, excludeArgs, tarPathArgs)
+	if err != nil && len(stdout) != 0 {
+		global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
+		return fmt.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
+	}
+	return nil
+}
+
+func buildTarExcludeArgs(exclusionRules string) (string, []string) {
 	exMap := make(map[string]struct{})
 	excludes := strings.Split(exclusionRules, ",")
 	excludeRules := ""
+	excludeArgs := []string{}
 	for _, exclude := range excludes {
 		if len(exclude) == 0 {
 			continue
@@ -109,39 +136,40 @@ func HandleTar(sourceDir, targetDir, name, exclusionRules string, secret string)
 			continue
 		}
 		excludeRules += fmt.Sprintf(" --exclude '%s'", exclude)
+		excludeArgs = append(excludeArgs, "--exclude", exclude)
 		exMap[exclude] = struct{}{}
 	}
-	path := ""
+	return excludeRules, excludeArgs
+}
+
+func buildTarPathArgs(sourceDir string) (string, []string) {
+	tarPath := ""
+	tarPathArgs := []string{}
 	if strings.Contains(sourceDir, "/") {
 		itemDir := strings.ReplaceAll(sourceDir[strings.LastIndex(sourceDir, "/"):], "/", "")
 		aheadDir := sourceDir[:strings.LastIndex(sourceDir, "/")]
 		if len(aheadDir) == 0 {
 			aheadDir = "/"
 		}
-		path += fmt.Sprintf("-C %s %s", aheadDir, itemDir)
+		tarPath += fmt.Sprintf("-C %s %s", aheadDir, itemDir)
+		tarPathArgs = append(tarPathArgs, "-C", aheadDir, itemDir)
 	} else {
-		path = sourceDir
+		tarPath = sourceDir
+		tarPathArgs = append(tarPathArgs, sourceDir)
 	}
+	return tarPath, tarPathArgs
+}
 
-	commands := ""
+func logTarEncryptCommand(targetFile, excludeRules, tarPath, secret string) {
+	extraCmd := "| openssl enc -aes-256-cbc -salt -k '" + secret + "' -out"
+	command := fmt.Sprintf("tar -zcf %s %s %s %s", " -"+excludeRules, tarPath, extraCmd, targetFile)
+	global.LOG.Debug(strings.ReplaceAll(command, fmt.Sprintf(" '%s' ", secret), " ****** "))
+}
 
-	if len(secret) != 0 {
-		extraCmd := "| openssl enc -aes-256-cbc -salt -k '" + secret + "' -out"
-		commands = fmt.Sprintf("tar -zcf %s %s %s %s", " -"+excludeRules, path, extraCmd, targetDir+"/"+name)
-		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" '%s' ", secret), " ****** "))
-	} else {
-		commands = fmt.Sprintf("tar -zcf %s %s %s", targetDir+"/"+name, excludeRules, path)
-		global.LOG.Debug(commands)
-	}
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(24*time.Hour), cmd.WithIgnoreExist1())
-	stdout, err := cmdMgr.RunWithStdoutBashC(commands)
-	if err != nil {
-		if len(stdout) != 0 {
-			global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
-			return fmt.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
-		}
-	}
-	return nil
+func runTar(targetFile string, excludeArgs, tarPathArgs []string) (string, error) {
+	tarArgs := append([]string{"-zcf", targetFile}, excludeArgs...)
+	tarArgs = append(tarArgs, tarPathArgs...)
+	return cmd.NewCommandMgr(cmd.WithTimeout(24*time.Hour), cmd.WithIgnoreExist1()).RunWithStdout("tar", tarArgs...)
 }
 
 func HandleUnTar(sourceFile, targetDir string, secret string) error {
@@ -150,23 +178,49 @@ func HandleUnTar(sourceFile, targetDir string, secret string) error {
 			return err
 		}
 	}
-	commands := ""
 	if len(secret) != 0 {
-		extraCmd := "openssl enc -d -aes-256-cbc -k '" + secret + "' -in " + sourceFile + " | "
-		commands = fmt.Sprintf("%s tar -zxvf - -C %s", extraCmd, targetDir+" > /dev/null 2>&1")
-		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" '%s' ", secret), " ****** "))
-	} else {
-		commands = fmt.Sprintf("tar zxvf '%s' -C '%s'", sourceFile, targetDir)
-		global.LOG.Debug(commands)
+		logTarDecryptCommand(sourceFile, targetDir, secret)
+		stdout, err := runTarDecrypt(sourceFile, targetDir, secret)
+		if err != nil {
+			global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
+			return errors.New(stdout)
+		}
+		return nil
 	}
 
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(24 * time.Hour))
-	stdout, err := cmdMgr.RunWithStdoutBashC(commands)
+	global.LOG.Debug(fmt.Sprintf("tar zxvf '%s' -C '%s'", sourceFile, targetDir))
+	stdout, err := runUnTar(sourceFile, targetDir)
 	if err != nil {
 		global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(stdout)
 	}
 	return nil
+}
+
+func logTarDecryptCommand(sourceFile, targetDir, secret string) {
+	extraCmd := "openssl enc -d -aes-256-cbc -k '" + secret + "' -in " + sourceFile + " | "
+	command := fmt.Sprintf("%s tar -zxvf - -C %s", extraCmd, targetDir+" > /dev/null 2>&1")
+	global.LOG.Debug(strings.ReplaceAll(command, fmt.Sprintf(" '%s' ", secret), " ****** "))
+}
+
+func runUnTar(sourceFile, targetDir string) (string, error) {
+	return cmd.NewCommandMgr(cmd.WithTimeout(24*time.Hour)).RunWithStdout("tar", "zxf", sourceFile, "-C", targetDir)
+}
+
+func runTarEncrypt(targetFile string, excludeArgs, tarPathArgs []string, secret string) (string, error) {
+	tarArgs := append([]string{"-zcf", "-"}, excludeArgs...)
+	tarArgs = append(tarArgs, tarPathArgs...)
+	return cmd.NewCommandMgr(cmd.WithTimeout(24*time.Hour)).RunPipe(
+		cmd.PipeCommand{Name: "tar", Args: tarArgs},
+		cmd.PipeCommand{Name: "openssl", Args: []string{"enc", "-aes-256-cbc", "-salt", "-pass", "env:BACKUP_SECRET", "-out", targetFile}, Env: []string{"BACKUP_SECRET=" + secret}},
+	)
+}
+
+func runTarDecrypt(sourceFile, targetDir, secret string) (string, error) {
+	return cmd.NewCommandMgr(cmd.WithTimeout(24*time.Hour)).RunPipe(
+		cmd.PipeCommand{Name: "openssl", Args: []string{"enc", "-d", "-aes-256-cbc", "-pass", "env:BACKUP_SECRET", "-in", sourceFile}, Env: []string{"BACKUP_SECRET=" + secret}},
+		cmd.PipeCommand{Name: "tar", Args: []string{"-zxf", "-", "-C", targetDir}},
+	)
 }
 
 func DownloadFile(url, dst string) error {

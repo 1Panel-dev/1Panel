@@ -47,7 +47,7 @@ func (f *Fail2ban) Status() (bool, bool, bool) {
 }
 
 func (f *Fail2ban) Version() string {
-	stdout, err := cmd.RunDefaultWithStdoutBashC("fail2ban-client version")
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second)).RunWithStdout("fail2ban-client", "version")
 	if err != nil {
 		global.LOG.Errorf("load the fail2ban version failed, %v", err)
 		return "-"
@@ -63,7 +63,7 @@ func (f *Fail2ban) Operate(operate string) error {
 		}
 		return nil
 	case "reload":
-		if err := cmd.RunDefaultBashC("fail2ban-client reload"); err != nil {
+		if err := cmd.NewCommandMgr().Run("fail2ban-client", "reload"); err != nil {
 			return fmt.Errorf("fail2ban-client reload, %v", err)
 		}
 		return nil
@@ -91,27 +91,30 @@ func (f *Fail2ban) ReBanIPs(ips []string) error {
 
 func (f *Fail2ban) ListBanned() ([]string, error) {
 	var lists []string
-	stdout, err := cmd.RunDefaultWithStdoutBashC("fail2ban-client status sshd | grep 'Banned IP list:'")
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second)).RunWithStdout("fail2ban-client", "status", "sshd")
 	if err != nil {
 		return lists, err
 	}
-	itemList := strings.Split(strings.Trim(stdout, "\n"), "Banned IP list:")
-	if len(itemList) != 2 {
-		return lists, nil
-	}
-
-	ips := strings.Fields(itemList[1])
-	for _, item := range ips {
-		if len(item) != 0 {
-			lists = append(lists, item)
+	for _, line := range strings.Split(strings.Trim(stdout, "\n"), "\n") {
+		itemList := strings.Split(line, "Banned IP list:")
+		if len(itemList) != 2 {
+			continue
 		}
+
+		ips := strings.Fields(itemList[1])
+		for _, item := range ips {
+			if len(item) != 0 {
+				lists = append(lists, item)
+			}
+		}
+		break
 	}
 	return lists, nil
 }
 
 func (f *Fail2ban) ListIgnore() ([]string, error) {
 	var lists []string
-	stdout, err := cmd.RunDefaultWithStdoutBashC("fail2ban-client get sshd ignoreip")
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second)).RunWithStdout("fail2ban-client", "get", "sshd", "ignoreip")
 	if err != nil {
 		return lists, err
 	}

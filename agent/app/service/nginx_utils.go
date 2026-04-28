@@ -240,16 +240,10 @@ func getNginxParamsFromStaticFile(scope dto.NginxKey, newParams []dto.NginxParam
 
 func opNginx(containerName, operate string) error {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
-	cmdStr := fmt.Sprintf("docker exec -i %s nginx ", containerName)
 	if operate == constant.NginxCheck {
-		cmdStr = cmdStr + "-t"
-	} else {
-		cmdStr = cmdStr + "-s reload"
+		return cmdMgr.Run("docker", "exec", "-i", containerName, "nginx", "-t")
 	}
-	if err := cmdMgr.RunBashC(cmdStr); err != nil {
-		return err
-	}
-	return nil
+	return cmdMgr.Run("docker", "exec", "-i", containerName, "nginx", "-s", "reload")
 }
 
 func nginxCheckAndReload(oldContent string, filePath string, containerName string) error {

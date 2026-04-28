@@ -372,14 +372,14 @@ func (a AgentService) InstallPlugin(req dto.AgentPluginInstallReq) error {
 		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
 		if req.Type == "qqbot" {
 			legacyPluginPath := path.Join(openclawPluginBaseDir, "qqbot")
-			if err := mgr.RunBashCf("docker exec %s test -d %s", install.ContainerName, legacyPluginPath); err == nil {
-				if _, err := mgr.RunWithStdout("docker", "exec", "-i", install.ContainerName, "sh", "-c", buildOpenclawPluginUninstallScript("qqbot")); err != nil {
+			if err := mgr.Run("docker", "exec", install.ContainerName, "test", "-d", legacyPluginPath); err == nil {
+				if err := uninstallOpenclawPlugin(mgr, install.ContainerName, "qqbot"); err != nil {
 					return err
 				}
 				time.Sleep(2 * time.Second)
 			}
 		}
-		if _, err := mgr.RunWithStdout("docker", "exec", install.ContainerName, "sh", "-c", buildOpenclawPluginInstallScript(spec, pluginID)); err != nil {
+		if err := installOpenclawPlugin(mgr, install.ContainerName, spec, pluginID); err != nil {
 			return err
 		}
 		conf, err := readOpenclawConfig(agent.ConfigPath)
@@ -415,11 +415,11 @@ func (a AgentService) UpgradePlugin(req dto.AgentPluginUpgradeReq) error {
 	}
 	upgradeTask.AddSubTask("Upgrade OpenClaw plugin", func(t *task.Task) error {
 		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
-		if _, err := mgr.RunWithStdout("docker", "exec", "-i", install.ContainerName, "sh", "-c", buildOpenclawPluginUninstallScript(pluginID)); err != nil {
+		if err := uninstallOpenclawPlugin(mgr, install.ContainerName, pluginID); err != nil {
 			return err
 		}
 		time.Sleep(2 * time.Second)
-		if _, err := mgr.RunWithStdout("docker", "exec", install.ContainerName, "sh", "-c", buildOpenclawPluginInstallScript(spec, pluginID)); err != nil {
+		if err := installOpenclawPlugin(mgr, install.ContainerName, spec, pluginID); err != nil {
 			return err
 		}
 		conf, err := readOpenclawConfig(agent.ConfigPath)
@@ -455,7 +455,7 @@ func (a AgentService) UninstallPlugin(req dto.AgentPluginUninstallReq) error {
 	}
 	uninstallTask.AddSubTask("Uninstall OpenClaw plugin", func(t *task.Task) error {
 		mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(10*time.Minute))
-		if _, err := mgr.RunWithStdout("docker", "exec", "-i", install.ContainerName, "sh", "-c", buildOpenclawPluginUninstallScript(pluginID)); err != nil {
+		if err := uninstallOpenclawPlugin(mgr, install.ContainerName, pluginID); err != nil {
 			return err
 		}
 		conf, err := readOpenclawConfig(agent.ConfigPath)
@@ -487,7 +487,7 @@ func (a AgentService) LoginWeixinChannel(req dto.AgentWeixinLoginReq) error {
 		if agent.AgentType == constant.AppHermesAgent {
 			return mgr.Run("docker", buildHermesWeixinLoginArgs(install.ContainerName)...)
 		}
-		return mgr.RunBashCf("docker exec %s openclaw channels login --channel openclaw-weixin", install.ContainerName)
+		return mgr.Run("docker", "exec", install.ContainerName, "openclaw", "channels", "login", "--channel", "openclaw-weixin")
 	}, nil)
 	if agent.AgentType == constant.AppHermesAgent {
 		loginTask.AddSubTask("Restart Hermes-Agent container", func(t *task.Task) error {
@@ -584,17 +584,26 @@ func (a AgentService) ApproveChannelPairing(req dto.AgentChannelPairingApproveRe
 		return validateHermesPairingApproveResult(output, err)
 	}
 	if req.AccountID != "" {
-		return cmd.RunDefaultBashCf(
-			"docker exec %s openclaw pairing approve %s %q --account %q",
+		return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).Run(
+			"docker",
+			"exec",
 			install.ContainerName,
+			"openclaw",
+			"pairing",
+			"approve",
 			req.Type,
 			req.PairingCode,
+			"--account",
 			req.AccountID,
 		)
 	}
-	return cmd.RunDefaultBashCf(
-		"docker exec %s openclaw pairing approve %s %q",
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).Run(
+		"docker",
+		"exec",
 		install.ContainerName,
+		"openclaw",
+		"pairing",
+		"approve",
 		req.Type,
 		req.PairingCode,
 	)
@@ -1289,20 +1298,40 @@ func appendPluginAllow(conf map[string]interface{}, pluginID string) {
 	plugins["allow"] = append(allow, pluginID)
 }
 
-func buildOpenclawPluginInstallScript(spec, pluginID string) string {
-	return fmt.Sprintf(
-		"set -e; workdir=%s/%s; rm -rf \"$workdir\"; mkdir -p \"$workdir\"; cd \"$workdir\"; npm pack --silent %q >/dev/null 2>&1; pkg=$(find \"$workdir\" -maxdepth 1 -type f -name '*.tgz' | head -n 1); printf '%%s\\n' \"$pkg\"; openclaw plugins install \"$pkg\" --dangerously-force-unsafe-install; rm -rf \"$workdir\"",
-		openclawPluginPackageTmpDir,
-		pluginID,
-		spec,
-	)
+func installOpenclawPlugin(mgr *cmd.CommandHelper, containerName, spec, pluginID string) error {
+	workdir := path.Join(openclawPluginPackageTmpDir, pluginID)
+	defer func() {
+		_ = mgr.Run("docker", "exec", containerName, "rm", "-rf", workdir)
+	}()
+	if err := mgr.Run("docker", "exec", containerName, "rm", "-rf", workdir); err != nil {
+		return err
+	}
+	if err := mgr.Run("docker", "exec", containerName, "mkdir", "-p", workdir); err != nil {
+		return err
+	}
+	if err := mgr.Run("docker", "exec", "-w", workdir, containerName, "npm", "pack", "--silent", spec); err != nil {
+		return err
+	}
+	pkgPath, err := mgr.RunWithStdout("docker", "exec", containerName, "find", workdir, "-maxdepth", "1", "-type", "f", "-name", "*.tgz", "-print", "-quit")
+	if err != nil {
+		return err
+	}
+	pkgPath = strings.TrimSpace(pkgPath)
+	if pkgPath == "" {
+		return fmt.Errorf("openclaw plugin package not found")
+	}
+	return mgr.Run("docker", "exec", containerName, "openclaw", "plugins", "install", pkgPath, "--dangerously-force-unsafe-install")
 }
 
-func buildOpenclawPluginUninstallScript(pluginID string) string {
-	return fmt.Sprintf(
-		"set +e; printf 'yes\\n' | openclaw plugins uninstall %s; code=$?; if [ \"$code\" -eq 137 ]; then exit 0; fi; exit \"$code\"",
-		pluginID,
+func uninstallOpenclawPlugin(mgr *cmd.CommandHelper, containerName, pluginID string) error {
+	_, err := mgr.RunPipe(
+		cmd.PipeCommand{Name: "printf", Args: []string{"yes\n"}},
+		cmd.PipeCommand{Name: "docker", Args: []string{"exec", "-i", containerName, "openclaw", "plugins", "uninstall", pluginID}},
 	)
+	if err != nil && strings.Contains(err.Error(), "exit status 137") {
+		return nil
+	}
+	return err
 }
 
 func resolvePluginMeta(pluginType string) (string, string, error) {
@@ -1357,7 +1386,7 @@ func loadOpenclawPluginLatestVersion(containerName, pluginType string) (string, 
 	if err != nil {
 		return "", err
 	}
-	output, err := runDockerExecWithStdout(20*time.Second, containerName, "npm", "view", spec, "version", "--json")
+	output, err := cmd.RunDockerExecWithStdout(20*time.Second, containerName, "npm", "view", spec, "version", "--json")
 	if err != nil {
 		return "", err
 	}

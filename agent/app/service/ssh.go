@@ -586,12 +586,12 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []d
 	}
 	fileList = sortFileList(fileList)
 
-	command := ""
+	filter := ""
 	if len(req.Info) != 0 {
 		if cmd.CheckIllegal(req.Info) {
 			return 0, data, buserr.New("ErrCmdIllegal")
 		}
-		command = fmt.Sprintf(" | grep '%s'", req.Info)
+		filter = req.Info
 	}
 
 	showCountFrom := (req.Page - 1) * req.PageSize
@@ -599,28 +599,7 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []d
 	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	itemFailed, itemTotal := 0, 0
 	for _, file := range fileList {
-		commandItem := ""
-		if strings.HasPrefix(path.Base(file.Name), "secure") {
-			switch req.Status {
-			case constant.StatusSuccess:
-				commandItem = fmt.Sprintf("cat %s | grep -a Accepted %s", file.Name, command)
-			case constant.StatusFailed:
-				commandItem = fmt.Sprintf("cat %s | grep -a 'Failed password for' %s", file.Name, command)
-			default:
-				commandItem = fmt.Sprintf("cat %s | grep -aE '(Failed password for|Accepted)' %s", file.Name, command)
-			}
-		}
-		if strings.HasPrefix(path.Base(file.Name), "auth.log") {
-			switch req.Status {
-			case constant.StatusSuccess:
-				commandItem = fmt.Sprintf("cat %s | grep -a Accepted %s", file.Name, command)
-			case constant.StatusFailed:
-				commandItem = fmt.Sprintf("cat %s | grep -aE 'Failed password for|Connection closed by authenticating user' %s", file.Name, command)
-			default:
-				commandItem = fmt.Sprintf("cat %s | grep -aE \"(Failed password for|Connection closed by authenticating user|Accepted)\" %s", file.Name, command)
-			}
-		}
-		dataItem, successCount, failedCount := loadSSHData(ctx, commandItem, showCountFrom, showCountTo, file.Year, nyc)
+		dataItem, successCount, failedCount := loadSSHData(ctx, file.Name, path.Base(file.Name), req.Status, filter, showCountFrom, showCountTo, file.Year, nyc)
 		itemFailed += failedCount
 		itemTotal += successCount + failedCount
 		showCountFrom = showCountFrom - (successCount + failedCount)
@@ -1124,7 +1103,7 @@ func isSSHConfigPathAllowed(fileName string) bool {
 	return false
 }
 
-func loadSSHData(ctx *gin.Context, command string, showCountFrom, showCountTo, currentYear int, nyc *time.Location) ([]dto.SSHHistory, int, int) {
+func loadSSHData(ctx *gin.Context, filePath, fileName, status, filter string, showCountFrom, showCountTo, currentYear int, nyc *time.Location) ([]dto.SSHHistory, int, int) {
 	var (
 		datas        []dto.SSHHistory
 		successCount int
@@ -1134,12 +1113,15 @@ func loadSSHData(ctx *gin.Context, command string, showCountFrom, showCountTo, c
 	if err != nil {
 		return datas, 0, 0
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashC(command)
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return datas, 0, 0
 	}
-	lines := strings.Split(stdout, "\n")
+	lines := strings.Split(string(content), "\n")
 	for i := len(lines) - 1; i >= 0; i-- {
+		if !matchSSHLogLine(fileName, status, filter, lines[i]) {
+			continue
+		}
 		var itemData dto.SSHHistory
 		switch {
 		case strings.Contains(lines[i], "Failed password for"):
@@ -1175,6 +1157,44 @@ func loadSSHData(ctx *gin.Context, command string, showCountFrom, showCountTo, c
 		}
 	}
 	return datas, successCount, failedCount
+}
+
+func matchSSHLogLine(fileName, status, filter, line string) bool {
+	if filter != "" && !strings.Contains(line, filter) {
+		return false
+	}
+	containsFailed := strings.Contains(line, "Failed password for")
+	containsClosed := strings.Contains(line, "Connection closed by authenticating user")
+	containsAccepted := strings.Contains(line, "Accepted ")
+	switch {
+	case strings.HasPrefix(fileName, "secure"):
+		switch status {
+		case constant.StatusSuccess:
+			return containsAccepted
+		case constant.StatusFailed:
+			return containsFailed
+		default:
+			return containsFailed || containsAccepted
+		}
+	case strings.HasPrefix(fileName, "auth.log"):
+		switch status {
+		case constant.StatusSuccess:
+			return containsAccepted
+		case constant.StatusFailed:
+			return containsFailed || containsClosed
+		default:
+			return containsFailed || containsClosed || containsAccepted
+		}
+	default:
+		switch status {
+		case constant.StatusSuccess:
+			return containsAccepted
+		case constant.StatusFailed:
+			return containsFailed || containsClosed
+		default:
+			return containsFailed || containsClosed || containsAccepted
+		}
+	}
 }
 
 func loadSuccessDatas(line string) dto.SSHHistory {
