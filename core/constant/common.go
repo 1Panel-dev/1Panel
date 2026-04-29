@@ -180,6 +180,9 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/cluster/mysql":    {},
 	"/xpack/cluster/postgres": {},
 	"/xpack/cluster/redis":    {},
+
+	"/enterprise/users/list":  {},
+	"/enterprise/users/roles": {},
 }
 
 var DynamicRoutes = []string{

@@ -189,7 +189,7 @@ function buildVisibleMenu(menu: RouteRecordRaw, showSet: Set<string>): RouteReco
 
     const visibleChildren = children
         .map((item) => {
-            if (item.name === 'Upage' && globalStore.isIntl) {
+            if (item.name === 'Upage' && (globalStore.isIntl || globalStore.isEE())) {
                 return null;
             }
             return buildVisibleMenu(item, showSet);
