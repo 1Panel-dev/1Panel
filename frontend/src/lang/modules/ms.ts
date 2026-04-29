@@ -2694,6 +2694,8 @@ const message = {
         importHelper: 'Sila klik atau seret fail lesen ke sini',
         licenseRequiredTip:
             'Lesen belum diimport. Salin ID peranti, dapatkan lesen dan importkannya sebelum anda boleh log masuk.',
+        licenseRequiredShortTip:
+            'Sila salin ID peranti terlebih dahulu untuk mendapatkan lesen. Anda boleh log masuk selepas mengimport lesen.',
         licenseRequiredUserTip:
             'Lesen Enterprise Edition belum diikat. Hubungi pentadbir super untuk mengimport lesen.',
         technicalAdvice: 'Konsultasi Teknikal',

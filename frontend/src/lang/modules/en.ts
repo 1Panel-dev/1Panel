@@ -2632,6 +2632,8 @@ const message = {
         importHelper: 'Click or drag the license file here',
         licenseRequiredTip:
             'The license has not been imported yet. Copy the device ID, obtain the license, and import it before logging in.',
+        licenseRequiredShortTip:
+            'Please copy the device ID first to obtain a license. You can log in after importing the license.',
         licenseRequiredUserTip:
             'The Enterprise Edition license is not bound. Contact a super administrator to import the license.',
         levelUpPro: 'Upgrade to Pro Edition',
