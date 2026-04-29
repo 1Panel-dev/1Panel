@@ -2733,6 +2733,8 @@ const message = {
         importHelper: 'Lütfen lisans dosyasını buraya tıklayın veya sürükleyin',
         licenseRequiredTip:
             'Lisans henüz içe aktarılmadı. Cihaz kimliğini kopyalayıp lisansı alın ve giriş yapmadan önce içe aktarın.',
+        licenseRequiredShortTip:
+            'Lütfen önce cihaz kimliğini kopyalayarak lisansı alın. Lisansı içe aktardıktan sonra giriş yapabilirsiniz.',
         licenseRequiredUserTip:
             'Enterprise Edition lisansı bağlı değil. Lisansı içe aktarması için süper yöneticiyle iletişime geçin.',
         levelUpPro: 'Pro Sürüme Yükselt',

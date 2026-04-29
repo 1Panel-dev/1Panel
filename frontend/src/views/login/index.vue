@@ -34,11 +34,15 @@ defineOptions({ name: 'Login' });
 const globalStore = GlobalStore();
 const backgroundOpacity = ref(1);
 const defaultLoginImage = new URL('@/assets/images/1panel-login.jpg', import.meta.url).href;
+const defaultEnterpriseLoginImage = new URL('@/assets/images/1panel-login-enterprise.png', import.meta.url).href;
 const defaultLoginBgImage = new URL('@/assets/images/1panel-login-bg.jpg', import.meta.url).href;
 const loadedLoginImage = ref<string | null>(null);
 const loadedBackgroundImage = ref<string | null>(null);
 const backgroundStyle = ref<{ backgroundImage?: string; backgroundColor?: string }>({});
 const imgLoaded = ref(false);
+const currentDefaultLoginImage = computed(() =>
+    globalStore.isEnterprise ? defaultEnterpriseLoginImage : defaultLoginImage,
+);
 
 function onImgLoad() {
     imgLoaded.value = true;
@@ -60,7 +64,7 @@ const getStatus = async () => {
 const loadImage = (name: string) => {
     const { loginImage, loginBackground, loginBgType } = globalStore.themeConfig;
     if (name === 'loginImage') {
-        return loginImage === 'loginImage' ? loadedLoginImage.value : defaultLoginImage;
+        return loginImage === 'loginImage' ? loadedLoginImage.value : currentDefaultLoginImage.value;
     }
     if (name === 'loginBackground') {
         if (loginBgType === 'image') {
@@ -75,7 +79,7 @@ const loadImage = (name: string) => {
 };
 
 const onImgError = (event: any) => {
-    event.target.src = defaultLoginImage;
+    event.target.src = currentDefaultLoginImage.value;
     imgLoaded.value = true;
 };
 
