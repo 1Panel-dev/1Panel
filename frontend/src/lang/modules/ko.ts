@@ -2585,6 +2585,8 @@ const message = {
         importHelper: '라이센스 파일을 여기에 클릭하거나 드래그하세요',
         licenseRequiredTip:
             '아직 라이선스를 가져오지 않았습니다. 장치 ID를 복사해 라이선스를 받은 뒤 가져와야 로그인할 수 있습니다.',
+        licenseRequiredShortTip:
+            '먼저 장치 ID를 복사해 라이선스를 받은 뒤, 라이선스를 가져오면 로그인할 수 있습니다.',
         licenseRequiredUserTip:
             'Enterprise Edition 라이선스가 바인딩되지 않았습니다. 슈퍼 관리자에게 라이선스 가져오기를 요청하세요.',
         technicalAdvice: '기술 상담',

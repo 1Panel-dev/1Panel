@@ -95,12 +95,7 @@ class RequestHttp {
                 if (data.code == ResultEnum.ERR_ENTERPRISE) {
                     globalStore.isEnterpriseLicensed = false;
                     const routeName = router.currentRoute.value.name;
-                    if (
-                        globalStore.isLogin &&
-                        routeName !== 'entrance' &&
-                        routeName !== 'login' &&
-                        routeName !== 'EnterpriseLicenseRequired'
-                    ) {
+                    if (globalStore.isLogin && routeName !== 'EnterpriseLicenseRequired') {
                         router.push({ name: 'EnterpriseLicenseRequired' });
                     }
                     return Promise.reject(data);

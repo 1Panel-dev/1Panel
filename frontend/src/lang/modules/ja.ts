@@ -2648,6 +2648,8 @@ const message = {
         importHelper: 'ここでライセンスファイルをクリックまたはドラッグしてください',
         licenseRequiredTip:
             'まだライセンスがインポートされていません。デバイス ID をコピーしてライセンスを取得し、インポートしてからログインしてください。',
+        licenseRequiredShortTip:
+            'まずデバイス ID をコピーしてライセンスを取得し、ライセンスをインポートするとログインできます。',
         licenseRequiredUserTip:
             'Enterprise Edition のライセンスがバインドされていません。スーパー管理者に連絡してライセンスをインポートしてください。',
         technicalAdvice: '技術的な相談',
