@@ -558,9 +558,6 @@ const initOptions = (type: string, subType: string) => {
     if (type === 'siteEndTime') {
         loadWebsites();
     }
-    if (type === 'panelPwdEndTime') {
-        loadSettings();
-    }
     if (diskTypes.includes(type)) {
         loadDisks();
     }

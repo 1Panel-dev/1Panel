@@ -1017,7 +1017,7 @@ var AddUserManagementMenu = &gormigrate.Migration{
 		newItem := dto.ShowMenu{
 			ID:       "121",
 			Disabled: false,
-			Title:    "xpack.user.userManage",
+			Title:    "xpack.user.accessControl",
 			IsShow:   true,
 			Label:    "UserManagement",
 			Path:     "/enterprise/users",

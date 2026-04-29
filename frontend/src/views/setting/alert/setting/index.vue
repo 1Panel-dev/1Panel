@@ -388,7 +388,7 @@
                     </el-card>
                     <el-card
                         class="rounded-2xl shadow hover:shadow-md transition-all"
-                        v-if="globalStore.isXpackNodeOrEE() && !globalStore.isIntl"
+                        v-if="globalStore.isMasterPro() && !globalStore.isIntl && !globalStore.isEE()"
                     >
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">
