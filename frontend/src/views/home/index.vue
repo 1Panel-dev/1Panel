@@ -350,9 +350,11 @@
                                         />
                                         <div v-else class="memo-content">
                                             <MarkDownEditor v-if="memoContent" :content="memoContent" />
-                                            <span v-else class="memo-placeholder">
-                                                {{ $t('home.memoPlaceholder') }}
-                                            </span>
+                                            <div v-else class="memo-empty">
+                                                <span class="memo-placeholder">
+                                                    {{ $t('home.memoPlaceholder') }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </el-scrollbar>
@@ -1261,6 +1263,11 @@ onBeforeUnmount(() => {
     :deep(.md-editor-content .md-editor-preview) {
         font-size: 13px;
     }
+}
+
+.memo-empty {
+    min-height: 275px;
+    padding-top: 15px;
 }
 
 .memo-placeholder {
