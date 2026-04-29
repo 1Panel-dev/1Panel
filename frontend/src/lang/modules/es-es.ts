@@ -2742,6 +2742,8 @@ const message = {
         importHelper: 'Haga clic o arrastre el archivo de licencia aquí',
         licenseRequiredTip:
             'La licencia aún no se ha importado. Copie el ID del dispositivo, obtenga la licencia e impórtela antes de iniciar sesión.',
+        licenseRequiredShortTip:
+            'Primero copie el ID del dispositivo para obtener una licencia. Podrá iniciar sesión después de importarla.',
         licenseRequiredUserTip:
             'La licencia Enterprise Edition no está vinculada. Contacte con un superadministrador para importar la licencia.',
         levelUpPro: 'Actualizar a la edición Pro',
