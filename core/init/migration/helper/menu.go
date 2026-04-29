@@ -92,7 +92,7 @@ func LoadMenus() string {
 			item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
 				ID:       "121",
 				Disabled: false,
-				Title:    "xpack.user.userManage",
+				Title:    "xpack.user.accessControl",
 				IsShow:   true,
 				Label:    "UserManagement",
 				Path:     "/enterprise/users",
