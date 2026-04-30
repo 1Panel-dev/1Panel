@@ -39,6 +39,7 @@ func Init() {
 		migrations.AddDocSourceSetting,
 		migrations.AddAppStoreInstallAllowPortSetting,
 		migrations.AddUserManagementMenu,
+		migrations.AddAIBenchmarkMenu,
 		migrations.AddOperationLogUser,
 		migrations.AddIsOfflineSetting,
 	})
