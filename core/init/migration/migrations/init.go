@@ -954,6 +954,15 @@ func buildAiMenuChildren(children []dto.ShowMenu) []dto.ShowMenu {
 			Sort:     100,
 		}, "AIModel", "OllamaModel"),
 		normalizeAiMenuChild(children, dto.ShowMenu{
+			ID:       "45",
+			Label:    "AIBenchmark",
+			Disabled: false,
+			IsShow:   true,
+			Title:    "aiTools.benchmark.title",
+			Path:     "/ai/benchmark",
+			Sort:     150,
+		}, "AIBenchmark"),
+		normalizeAiMenuChild(children, dto.ShowMenu{
 			ID:       "42",
 			Label:    "MCPServer",
 			Disabled: false,
@@ -991,6 +1000,55 @@ func normalizeAiMenuChild(children []dto.ShowMenu, fallback dto.ShowMenu, labels
 		}
 	}
 	return fallback
+}
+
+var AddAIBenchmarkMenu = &gormigrate.Migration{
+	ID: "20260429-add-ai-benchmark-menu",
+	Migrate: func(tx *gorm.DB) error {
+		if !global.CONF.Base.IsEnterprise {
+			return nil
+		}
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+		if menuJSON == "" {
+			menuJSON = helper.LoadMenus()
+		}
+
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		newItem := dto.ShowMenu{
+			ID:       "45",
+			Disabled: false,
+			Title:    "aiTools.benchmark.title",
+			IsShow:   true,
+			Label:    "AIBenchmark",
+			Path:     "/ai/benchmark",
+			Sort:     150,
+		}
+
+		for i := range menus {
+			if menus[i].Label != "AI-Menu" {
+				continue
+			}
+			menus[i].Children = helper.UpsertMenuByLabel(menus[i].Children, newItem, "AIModel")
+			break
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
 }
 
 var AddUserManagementMenu = &gormigrate.Migration{

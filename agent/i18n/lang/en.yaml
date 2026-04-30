@@ -471,6 +471,7 @@ TaskScan: "Scan"
 # task - ai
 OllamaModelPull: 'Pull Ollama model {{ .name }}'
 OllamaModelSize: 'Get Ollama model size: {{ .name }}'
+AIBenchmarkRun: 'Run AI benchmark'
 
 # task-snapshot
 Snapshot: 'Snapshot'
