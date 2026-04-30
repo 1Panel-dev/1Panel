@@ -28,6 +28,7 @@
                         <span v-else-if="isMasterPro">
                             {{ $t('license.pro') }}
                         </span>
+                        <span v-else-if="isOffline">
                     </el-link>
                     <el-link v-else-if="isOffLine" underline="never" type="primary" @click="to1Panel">
                         <span v-if="isOffLine">
@@ -44,7 +45,7 @@
                     </el-link>
                     <el-badge
                         is-dot
-                        v-if="globalStore.isAdmin && !globalStore.isOffLine"
+                        v-if="globalStore.isAdmin && !globalStore.isOffline"
                         class="-mt-0.5"
                         :hidden="version === 'Waiting' || !globalStore.hasNewVersion"
                     >
@@ -73,7 +74,7 @@ import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
-const { docsUrl, isOffLine, isFxplay } = storeToRefs(globalStore);
+const { docsUrl, isOffline, isFxplay } = storeToRefs(globalStore);
 const upgradeRef = ref();
 const releasesRef = ref();
 const isMasterPro = computed(() => {
@@ -107,6 +108,10 @@ const getVersionLog = () => {
 };
 
 const toLxware = () => {
+    if (isOffline.value) {
+        to1Panel();
+        return;
+    }
     if (!globalStore.isIntl) {
         window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
     } else {

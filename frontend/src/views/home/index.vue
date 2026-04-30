@@ -7,7 +7,17 @@
                     path: '/',
                 },
             ]"
-        />
+        >
+            <template #route-button>
+                <div class="router-button" v-if="!isOffline">
+                    <template v-if="!isProductPro">
+                        <el-button link type="primary" @click="toUpload">
+                            {{ $t('license.levelUpPro') }}
+                        </el-button>
+                    </template>
+                </div>
+            </template>
+        </RouterButton>
 
         <el-alert
             v-if="!isSafety && globalStore.showEntranceWarn"
@@ -529,6 +539,7 @@ const ioOptionsFromCache = ref(false);
 const hasRefreshedOptionsOnHover = ref(false);
 
 const quickJumpRef = ref();
+const { isProductPro, isOffline } = storeToRefs(globalStore);
 
 const searchInfo = reactive({
     ioOption: 'all',

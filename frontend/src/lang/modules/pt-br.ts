@@ -2387,6 +2387,7 @@ const message = {
         auto: 'Seguir o sistema',
         language: 'Idioma',
         runtimeEnv: 'Ambiente de execução',
+        offlineEnv: 'Ambiente offline',
         docSource: 'Fonte da documentação',
         withByRegion: 'Seguir região de operação (Padrão)',
         withByLang: 'Seguir idioma do sistema',

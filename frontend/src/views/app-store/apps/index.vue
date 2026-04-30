@@ -7,7 +7,7 @@
             </template>
             <template #leftToolBar>
                 <el-button @click="sync" type="primary" plain :disabled="syncing">
-                    <span>{{ syncCustomAppstore || isOffLine ? $t('app.syncCustomApp') : $t('app.syncAppList') }}</span>
+                    <span>{{ syncCustomAppstore || isOffline ? $t('app.syncCustomApp') : $t('app.syncAppList') }}</span>
                 </el-button>
                 <el-button @click="syncLocal" type="primary" plain :disabled="syncing" class="ml-2">
                     {{ $t('app.syncLocalApp') }}
@@ -85,7 +85,7 @@ import AppCard from '@/views/app-store/apps/app/index.vue';
 import MainDiv from '@/components/main-div/index.vue';
 import { jumpToInstall } from '@/utils/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { globalStore, isProductPro, isOffLine } = useGlobalStore();
+const { globalStore, isProductPro, isOffline } = useGlobalStore();
 
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -180,7 +180,7 @@ const sync = async () => {
     };
     try {
         let res;
-        if (isOffLine.value || (isProductPro.value && syncCustomAppstore.value)) {
+        if (isOffline.value || (isProductPro.value && syncCustomAppstore.value)) {
             res = await syncCutomAppStore(syncReq);
         } else {
             res = await syncApp(syncReq);
@@ -246,7 +246,7 @@ onMounted(async () => {
             syncCustomAppstore.value = res.data.status === 'Enable';
         }
     }
-    if (isOffLine.value) {
+    if (isOffline.value) {
         syncCustomAppstore.value = true;
     }
     mainHeight.value = window.innerHeight - 380;

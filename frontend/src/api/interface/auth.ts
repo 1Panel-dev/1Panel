@@ -39,7 +39,7 @@ export namespace Login {
         menuTabs: string;
         panelName: string;
         theme: string;
-        isOffLine: boolean;
+        isOffline: boolean;
         isEnterprise: boolean;
         needCaptcha: boolean;
         passkeySetting: boolean;

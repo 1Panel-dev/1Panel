@@ -156,6 +156,19 @@
                                 </el-button>
                             </el-form-item>
 
+                            <el-form-item
+                                :label="$t('setting.offlineEnv')"
+                                v-if="globalStore.isEnterprise"
+                                prop="isOffline"
+                            >
+                                <el-switch
+                                    v-model="form.isOffline"
+                                    active-value="Enable"
+                                    inactive-value="Disable"
+                                    @change="onSave('IsOffline', form.isOffline)"
+                                />
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.runtimeEnv')" prop="edition">
                                 <el-button icon="Setting" @click="onChangeRegion">
                                     {{ runtimeEnvLabel() }}
@@ -222,6 +235,7 @@ const form = reactive({
     language: '',
     docSource: 'withByRegion',
     edition: '',
+    isOffline: 'Disable',
     developerMode: '',
     systemIP: '',
 
@@ -276,6 +290,7 @@ const search = async () => {
     form.language = res.data.language;
     form.docSource = res.data.docSource || 'withByRegion';
     form.edition = res.data.edition;
+    form.isOffline = res.data.isOffline || 'Disable';
 
     form.proxyUrl = res.data.proxyUrl;
     form.proxyType = res.data.proxyType;
@@ -411,6 +426,9 @@ const onSave = async (key: string, val: any) => {
             case 'Language':
                 await globalStore.updateLanguage(val);
                 location.reload();
+                break;
+            case 'IsOffline':
+                globalStore.isOffline = val === 'Enable';
                 break;
         }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

@@ -628,7 +628,7 @@ const getSetting = async () => {
         isIntl.value = res.data.isIntl;
         isFxplay.value = res.data.isFxplay;
         globalStore.isFxplay = isFxplay.value;
-        globalStore.isOffLine = res.data.isOffLine;
+        globalStore.isOffline = res.data.isOffline;
         globalStore.isEnterprise = res.data.isEnterprise;
         globalStore.isEnterpriseLicenseLoaded = !res.data.isEnterprise;
         globalStore.ignoreCaptcha = !res.data.needCaptcha;
