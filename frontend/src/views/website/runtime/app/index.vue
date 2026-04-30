@@ -35,7 +35,7 @@ import { App } from '@/api/interface/app';
 import { getAppByKey, getAppDetail, searchApp } from '@/api/modules/app';
 import { useVModel } from '@vueuse/core';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isOffLine } = useGlobalStore();
+const { isOffline } = useGlobalStore();
 
 const props = defineProps({
     mode: {
@@ -93,7 +93,7 @@ const getApp = async (appkey: string, mode: string) => {
 
 const searchAppList = async (appID: number) => {
     try {
-        if (isOffLine.value) {
+        if (isOffline.value) {
             appReq.resource = 'custom';
         }
         const res = await searchApp(appReq);

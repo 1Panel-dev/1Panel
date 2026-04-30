@@ -10,7 +10,7 @@ import (
 
 func Init() {
 	scriptSync, _ := repo.NewISettingRepo().GetValueByKey("ScriptSync")
-	if !global.CONF.Base.IsOffLine && scriptSync == constant.StatusEnable {
+	if !global.CONF.Base.IsOffline && scriptSync == constant.StatusEnable {
 		if err := service.NewIScriptService().Sync(dto.OperateByTaskID{}); err != nil {
 			global.LOG.Errorf("sync scripts from remote failed, err: %v", err)
 		}

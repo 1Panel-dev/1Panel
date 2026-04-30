@@ -51,3 +51,26 @@ type SystemSetting struct {
 type PasskeyID struct {
 	ID string `json:"id" validate:"required"`
 }
+
+type CurrentUserInfo struct {
+	Name              string `json:"name"`
+	SessionTimeout    int    `json:"sessionTimeout"`
+	MFAStatus         string `json:"mfaStatus"`
+	MFAInterval       string `json:"mfaInterval"`
+	ExpirationDays    int    `json:"expirationDays"`
+	ExpirationTime    string `json:"expirationTime"`
+	ComplexitySetting string `json:"complexitySetting"`
+
+	ApiInterfaceStatus string `json:"apiInterfaceStatus"`
+	ApiKey             string `json:"apiKey"`
+	IpWhiteList        string `json:"ipWhiteList"`
+	ApiKeyValidityTime string `json:"apiKeyValidityTime"`
+}
+type CurrentUserUpdate struct {
+	Name           string `json:"name" validate:"required"`
+	Password       string `json:"password"`
+	OldPassword    string `json:"oldPassword"`
+	SessionTimeout int    `json:"sessionTimeout" validate:"required,min=300,max=864000"`
+	ExpirationDays int    `json:"expirationDays" validate:"min=0,max=60"`
+	ExpirationTime string `json:"expirationTime"`
+}

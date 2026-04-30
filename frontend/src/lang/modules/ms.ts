@@ -2275,6 +2275,7 @@ const message = {
         auto: 'Ikut Sistem',
         language: 'Bahasa',
         runtimeEnv: 'Persekitaran operasi',
+        offlineEnv: 'Persekitaran luar talian',
         docSource: 'Sumber dokumentasi',
         withByRegion: 'Ikut wilayah operasi (Lalai)',
         withByLang: 'Ikut bahasa sistem',

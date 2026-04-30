@@ -59,7 +59,7 @@ const GlobalStore = defineStore({
         isIntl: false,
         docWithRegion: true,
         isFxplay: false,
-        isOffLine: false,
+        isOffline: false,
         // license
         isProductPro: false,
         productProExpires: 0,

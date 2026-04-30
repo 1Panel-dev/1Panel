@@ -2230,6 +2230,7 @@ const message = {
         auto: 'Follow System',
         language: 'Language',
         runtimeEnv: 'Runtime environment',
+        offlineEnv: 'Offline environment',
         docSource: 'Documentation Source',
         withByRegion: 'Match Region Setting (Default)',
         withByLang: 'Match System Language',

@@ -88,7 +88,6 @@
                         </span>
                     </template>
                     <el-switch
-                        v-if="form.mfaStatus !== null"
                         @change="handleMFA"
                         v-model="form.mfaStatus"
                         active-value="Enable"
@@ -377,7 +376,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Check, Close, QuestionFilled } from '@element-plus/icons-vue';
@@ -415,7 +414,6 @@ const loading = ref(false);
 const userRef = ref<FormInstance>();
 const mfaFormRef = ref<FormInstance>();
 const apiRef = ref<FormInstance>();
-const switchReady = ref(false);
 const mfaDialogOpen = ref(false);
 const passkeyPrereqDialogOpen = ref(false);
 const passkeyDialogOpen = ref(false);
@@ -442,7 +440,7 @@ const form = reactive({
     password: '',
     oldPassword: '',
     sessionTimeout: 0,
-    mfaStatus: null as string | null,
+    mfaStatus: 'Disable',
     mfaInterval: 30,
     expirationDays: 0,
     expirationTime: '',
@@ -533,20 +531,17 @@ const openDrawer = async () => {
     if (!props.currentUser) {
         return;
     }
-    switchReady.value = false;
     loadComplexitySetting();
     syncCurrentUser(props.currentUser);
     open.value = true;
-    await nextTick();
-    switchReady.value = true;
 };
 
 const syncApiConfig = (currentUser: Login.AuthInfo) => {
-    form.apiInterfaceStatus = currentUser.apiInterfaceStatus;
+    form.apiInterfaceStatus = currentUser.apiInterfaceStatus || 'Disable';
     form.apiKey = currentUser.apiKey;
     form.ipWhiteList = currentUser.ipWhiteList;
     form.apiKeyValidityTime = currentUser.apiKeyValidityTime;
-    savedApiStatus.value = currentUser.apiInterfaceStatus;
+    savedApiStatus.value = form.apiInterfaceStatus;
 };
 
 const syncCurrentUser = (currentUser: Login.AuthInfo) => {
@@ -557,9 +552,9 @@ const syncCurrentUser = (currentUser: Login.AuthInfo) => {
     form.sessionTimeout = currentUser.sessionTimeout;
     form.expirationTime = currentUser.expirationTime;
     form.expirationDays = currentUser.expirationDays;
-    form.mfaStatus = currentUser.mfaStatus;
+    form.mfaStatus = currentUser.mfaStatus || 'Disable';
     form.mfaInterval = currentUser.mfaInterval;
-    savedMfaStatus.value = currentUser.mfaStatus;
+    savedMfaStatus.value = form.mfaStatus;
     mfaDialogOpen.value = false;
     apiDialogOpen.value = false;
     form.expirationDays = form.expirationDays ? form.expirationDays : 0;
@@ -929,7 +924,7 @@ function loadTimeOut() {
 }
 
 const handleMFA = async () => {
-    if (!switchReady.value || !form.mfaStatus) {
+    if (!form.mfaStatus) {
         return;
     }
     if (form.mfaStatus === 'Enable') {
@@ -967,7 +962,7 @@ const handleMFA = async () => {
 };
 
 const handleApi = async () => {
-    if (!switchReady.value || !form.apiInterfaceStatus) {
+    if (!form.apiInterfaceStatus) {
         return;
     }
     if (form.apiInterfaceStatus === 'Enable') {
