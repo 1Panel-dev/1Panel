@@ -181,8 +181,9 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/cluster/postgres": {},
 	"/xpack/cluster/redis":    {},
 
-	"/enterprise/users/list":  {},
-	"/enterprise/users/roles": {},
+	"/enterprise/users/list":       {},
+	"/enterprise/users/roles":      {},
+	"/enterprise/license-required": {},
 }
 
 var DynamicRoutes = []string{

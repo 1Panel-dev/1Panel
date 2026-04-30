@@ -82,13 +82,13 @@ export namespace Login {
     export interface MFABind {
         secret: string;
         code: string;
-        interval: string;
+        interval: number;
     }
     export interface ApiConfig {
         apiInterfaceStatus: string;
         apiKey: string;
         ipWhiteList: string;
-        apiKeyValidityTime: string;
+        apiKeyValidityTime: number;
     }
     export interface PasswordUpdate {
         oldPassword: string;

@@ -18,28 +18,12 @@ type PasskeyBeginResponse struct {
 	PublicKey interface{} `json:"publicKey"`
 }
 
-type MfaRequest struct {
-	Title    string `json:"title" validate:"required"`
-	Interval int    `json:"interval" validate:"required"`
-}
-
-type MfaCredential struct {
-	Secret   string `json:"secret" validate:"required"`
-	Code     string `json:"code" validate:"required"`
-	Interval string `json:"interval" validate:"required"`
-}
-
 type Login struct {
 	Name      string `json:"name" validate:"required"`
 	Password  string `json:"password" validate:"required"`
 	Captcha   string `json:"captcha"`
 	CaptchaID string `json:"captchaID"`
 	Language  string `json:"language" validate:"required,oneof=zh en 'zh-Hant' ko ja ru ms 'pt-BR' tr 'es-ES'"`
-}
-
-type MFALogin struct {
-	SessionID string `json:"sessionId" validate:"required"`
-	Code      string `json:"code" validate:"required"`
 }
 
 type SystemSetting struct {
@@ -52,11 +36,35 @@ type PasskeyID struct {
 	ID string `json:"id" validate:"required"`
 }
 
+// mfa
+type MFALogin struct {
+	SessionID string `json:"sessionId" validate:"required"`
+	Code      string `json:"code" validate:"required"`
+}
+
+type MfaRequest struct {
+	Title    string `json:"title" validate:"required"`
+	Interval int    `json:"interval" validate:"required"`
+}
+
+type MfaCredential struct {
+	Secret   string `json:"secret" validate:"required"`
+	Code     string `json:"code" validate:"required"`
+	Interval int    `json:"interval" validate:"required"`
+}
+
+type ApiInterfaceConfig struct {
+	ApiInterfaceStatus string `json:"apiInterfaceStatus"`
+	ApiKey             string `json:"apiKey"`
+	IpWhiteList        string `json:"ipWhiteList"`
+	ApiKeyValidityTime int    `json:"apiKeyValidityTime"`
+}
+
 type CurrentUserInfo struct {
 	Name              string `json:"name"`
 	SessionTimeout    int    `json:"sessionTimeout"`
 	MFAStatus         string `json:"mfaStatus"`
-	MFAInterval       string `json:"mfaInterval"`
+	MFAInterval       int    `json:"mfaInterval"`
 	ExpirationDays    int    `json:"expirationDays"`
 	ExpirationTime    string `json:"expirationTime"`
 	ComplexitySetting string `json:"complexitySetting"`
@@ -64,7 +72,7 @@ type CurrentUserInfo struct {
 	ApiInterfaceStatus string `json:"apiInterfaceStatus"`
 	ApiKey             string `json:"apiKey"`
 	IpWhiteList        string `json:"ipWhiteList"`
-	ApiKeyValidityTime string `json:"apiKeyValidityTime"`
+	ApiKeyValidityTime int    `json:"apiKeyValidityTime"`
 }
 type CurrentUserUpdate struct {
 	Name           string `json:"name" validate:"required"`
