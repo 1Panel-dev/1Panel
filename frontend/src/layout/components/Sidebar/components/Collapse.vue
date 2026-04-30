@@ -1,7 +1,6 @@
 <template>
     <div>
         <el-popover
-            ref="nodeChangeRef"
             placement="right-end"
             :show-arrow="false"
             :offset="0"
@@ -117,7 +116,6 @@ const nodeOptions = ref([]);
 const loading = ref();
 const switchingNode = ref(false);
 const userInfoRef = ref();
-const nodeChangeRef = ref();
 const props = defineProps({
     version: String,
 });

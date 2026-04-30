@@ -20,7 +20,7 @@ type APIAuthConfig struct {
 	ApiInterfaceStatus string
 	ApiKey             string
 	IpWhiteList        string
-	ApiKeyValidityTime string
+	ApiKeyValidityTime int
 }
 
 type APIAuthConfigLoader func(c *gin.Context) (APIAuthConfig, error)
@@ -83,16 +83,19 @@ func LoadAPIAuthConfig(_ *gin.Context) (APIAuthConfig, error) {
 	if config.IpWhiteList, err = settingRepo.GetValueByKey("IpWhiteList"); err != nil {
 		return config, err
 	}
-	if config.ApiKeyValidityTime, err = settingRepo.GetValueByKey("ApiKeyValidityTime"); err != nil {
+	apiValidity, err := settingRepo.GetValueByKey("ApiKeyValidityTime")
+	if err != nil {
+		return config, err
+	}
+	if config.ApiKeyValidityTime, err = strconv.Atoi(apiValidity); err != nil {
 		return config, err
 	}
 	return config, nil
 }
 
-func isValid1PanelTimestamp(panelTimestamp string, apiKeyValidityTime string) bool {
-	apiTime, err := strconv.Atoi(apiKeyValidityTime)
-	if err != nil || apiTime < 0 {
-		global.LOG.Errorf("apiTime %d, err: %v", apiTime, err)
+func isValid1PanelTimestamp(panelTimestamp string, apiKeyValidityTime int) bool {
+	apiTime := apiKeyValidityTime
+	if apiTime < 0 {
 		return false
 	}
 	if apiTime == 0 {
