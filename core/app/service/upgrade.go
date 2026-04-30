@@ -84,7 +84,7 @@ func NewIUpgradeService() IUpgradeService {
 }
 
 func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
-	if global.CONF.Base.IsOffLine {
+	if global.CONF.Base.IsOffline {
 		return &dto.UpgradeInfo{}, nil
 	}
 	var upgrade dto.UpgradeInfo

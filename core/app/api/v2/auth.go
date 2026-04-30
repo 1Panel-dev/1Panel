@@ -241,7 +241,7 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 		IsDemo:       global.CONF.Base.IsDemo,
 		IsIntl:       global.CONF.Base.Edition == "intl",
 		IsFxplay:     global.CONF.Base.IsFxplay,
-		IsOffLine:    global.CONF.Base.IsOffLine,
+		IsOffline:    global.CONF.Base.IsOffline || settingInfo.IsOffline == constant.StatusEnable,
 		IsEnterprise: global.CONF.Base.IsEnterprise,
 		Language:     settingInfo.Language,
 		MenuTabs:     settingInfo.MenuTabs,

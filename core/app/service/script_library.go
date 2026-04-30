@@ -172,7 +172,7 @@ func StartSync() {
 	}
 	service := NewIScriptService()
 	scriptSync, _ := repo.NewISettingRepo().GetValueByKey("ScriptSync")
-	if !global.CONF.Base.IsOffLine && scriptSync == constant.StatusEnable {
+	if !global.CONF.Base.IsOffline && scriptSync == constant.StatusEnable {
 		minuteRand, err := rand.Int(rand.Reader, big.NewInt(60))
 		if err != nil {
 			global.LOG.Errorf("generate random minute failed: %v", err)
@@ -202,7 +202,7 @@ func LoadScriptInfo(id uint) (model.ScriptLibrary, error) {
 }
 
 func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
-	if global.CONF.Base.IsOffLine {
+	if global.CONF.Base.IsOffline {
 		return nil
 	}
 	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("RemoteScriptLibrary"), task.TaskSync, task.TaskScopeScript, req.TaskID, 0)

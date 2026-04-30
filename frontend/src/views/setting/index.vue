@@ -11,7 +11,7 @@
 import { computed } from 'vue';
 import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isOffLine, isFxplay, isAdmin, isEnterprise } = useGlobalStore();
+const { isOffline, isFxplay, isAdmin, isEnterprise } = useGlobalStore();
 
 const buttons = computed(() => {
     const items = [
@@ -39,7 +39,7 @@ const buttons = computed(() => {
                   },
               ]
             : []),
-        ...(isOffLine.value || !isAdmin.value
+        ...(isOffline.value || !isAdmin.value
             ? []
             : [
                   {

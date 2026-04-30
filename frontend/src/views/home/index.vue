@@ -9,7 +9,7 @@
             ]"
         >
             <template #route-button>
-                <div class="router-button" v-if="!isOffLine">
+                <div class="router-button" v-if="!isOffline">
                     <template v-if="!isProductPro">
                         <el-button link type="primary" @click="toUpload">
                             {{ $t('license.levelUpPro') }}
@@ -543,7 +543,7 @@ const hasRefreshedOptionsOnHover = ref(false);
 
 const licenseRef = ref();
 const quickJumpRef = ref();
-const { isProductPro, isOffLine } = storeToRefs(globalStore);
+const { isProductPro, isOffline } = storeToRefs(globalStore);
 
 const searchInfo = reactive({
     ioOption: 'all',

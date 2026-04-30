@@ -2088,6 +2088,7 @@ const message = {
         auto: '跟隨系統',
         language: '系統語言',
         runtimeEnv: '運行環境',
+        offlineEnv: '離線環境',
         docSource: '文件來源',
         withByRegion: '跟隨運行區域（預設）',
         withByLang: '跟隨系統語言',

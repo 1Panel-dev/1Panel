@@ -2088,6 +2088,7 @@ const message = {
         withByRegion: '跟随运行区域（默认）',
         withByLang: '跟随系统语言',
         runtimeEnv: '运行环境',
+        offlineEnv: '离线环境',
         region: '运行区域',
         cn: '中国大陆',
         intl: '全球',

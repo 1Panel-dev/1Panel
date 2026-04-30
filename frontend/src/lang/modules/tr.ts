@@ -2261,6 +2261,7 @@ const message = {
         auto: 'Sistemi takip et',
         language: 'Dil',
         runtimeEnv: 'Çalışma ortamı',
+        offlineEnv: 'Çevrimdışı ortam',
         docSource: 'Dokümantasyon kaynağı',
         withByRegion: 'Çalışma bölgesini takip et (Varsayılan)',
         withByLang: 'Sistem dilini takip et',
