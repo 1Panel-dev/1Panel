@@ -3,10 +3,8 @@ package mfa
 import (
 	"bytes"
 	"encoding/base64"
-	"strconv"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/skip2/go-qrcode"
 	"github.com/xlzd/gotp"
 )
@@ -32,12 +30,7 @@ func GetOtp(username, title string, interval int) (otp Otp, err error) {
 	return
 }
 
-func ValidCode(code, intervalStr, secret string) bool {
-	interval, err := strconv.Atoi(intervalStr)
-	if err != nil {
-		global.LOG.Errorf("type conversion failed, err: %v", err)
-		return false
-	}
+func ValidCode(interval int, code, secret string) bool {
 	totp := gotp.NewTOTP(secret, 6, interval, nil)
 	now := time.Now().Unix()
 	prevTime := now - int64(interval)

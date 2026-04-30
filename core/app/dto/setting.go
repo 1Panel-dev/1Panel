@@ -235,13 +235,6 @@ type MenuLabelSort struct {
 	Sort  int    `json:"sort"`
 }
 
-type ApiInterfaceConfig struct {
-	ApiInterfaceStatus string `json:"apiInterfaceStatus"`
-	ApiKey             string `json:"apiKey"`
-	IpWhiteList        string `json:"ipWhiteList"`
-	ApiKeyValidityTime string `json:"apiKeyValidityTime"`
-}
-
 type TerminalInfo struct {
 	LineHeight        string `json:"lineHeight"`
 	LetterSpacing     string `json:"letterSpacing"`
