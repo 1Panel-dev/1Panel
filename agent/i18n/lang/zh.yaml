@@ -470,6 +470,7 @@ TaskScan: "扫描"
 # task - ai
 OllamaModelPull: "拉取 Ollama 模型 {{ .name }}"
 OllamaModelSize: "获取 Ollama 模型 {{ .name }} 大小"
+AIBenchmarkRun: "执行 AI 基准测试"
 
 # task - snapshot
 Snapshot: "快照"

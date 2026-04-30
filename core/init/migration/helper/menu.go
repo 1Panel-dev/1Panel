@@ -86,6 +86,18 @@ func LoadMenus() string {
 	}
 	if global.CONF.Base.IsEnterprise {
 		for i := range item {
+			if item[i].Label == "AI-Menu" {
+				item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
+					ID:       "45",
+					Disabled: false,
+					Title:    "aiTools.benchmark.title",
+					IsShow:   true,
+					Label:    "AIBenchmark",
+					Path:     "/ai/benchmark",
+					Sort:     150,
+				}, "AIModel")
+				continue
+			}
 			if item[i].Label != "Xpack-Menu" {
 				continue
 			}
@@ -112,6 +124,7 @@ func MenuSort() []dto.MenuLabelSort {
 		{Label: "AI-Menu", Sort: 300},
 		{Label: "Agents", Sort: 50},
 		{Label: "AIModel", Sort: 100},
+		{Label: "AIBenchmark", Sort: 150},
 		{Label: "MCPServer", Sort: 200},
 		{Label: "GPU", Sort: 300},
 		{Label: "Website-Menu", Sort: 400},

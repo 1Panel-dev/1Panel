@@ -130,6 +130,7 @@ TaskUpgrade: "Upgrade"
 TaskSync: 'Sync'
 TaskSyncForNode: "Sync node data"
 TaskBackup: "Backup"
+AIBenchmarkRun: "Run AI benchmark"
 SuccessStatus: "{{ .name }} succeeded"
 FailedStatus: "{{ .name }} failed {{ .err }}"
 Start: "Start"
