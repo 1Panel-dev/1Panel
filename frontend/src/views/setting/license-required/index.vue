@@ -152,7 +152,7 @@ const loadLoginTheme = async () => {
     globalStore.isEnterpriseLicenseLoaded = !res.data.isEnterprise;
     globalStore.isIntl = res.data.isIntl;
     globalStore.isFxplay = res.data.isFxplay;
-    globalStore.isOffLine = res.data.isOffLine;
+    globalStore.isOffline = res.data.isOffline;
     globalStore.openMenuTabs = res.data.menuTabs === 'Enable';
     globalStore.themeConfig = {
         ...globalStore.themeConfig,

@@ -681,7 +681,7 @@ func GetWebsiteID() uint {
 }
 
 func pullImage(imageType string) {
-	if global.CONF.Base.IsOffLine {
+	if global.CONF.Base.IsOffline {
 		return
 	}
 	if imageType == "npx" {

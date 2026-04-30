@@ -2202,6 +2202,7 @@ const message = {
         auto: 'Как в системе',
         language: 'Язык',
         runtimeEnv: 'Среда выполнения',
+        offlineEnv: 'Офлайн-среда',
         docSource: 'Источник документации',
         withByRegion: 'Следовать региону работы (по умолчанию)',
         withByLang: 'Следовать языку системы',

@@ -322,7 +322,7 @@ const initForm = async (appKey: string) => {
         formData.value.version = defaultVersion;
         getVersionDetail(defaultVersion);
     }
-    if (globalStore.isOffLine) {
+    if (globalStore.isOffline) {
         formData.value.pullImage = false;
     }
 };
