@@ -103,15 +103,19 @@ func VerifyMFALogin(c *gin.Context, sessionID, code, entrance string) (string, s
 	if session.Entrance != entrance {
 		return "", "", buserr.New("ErrEntrance")
 	}
-	mfaSecret, err := settingRepo.Get(repo.WithByKey("MFASecret"))
+	mfaSecret, err := settingRepo.GetValueByKey("MFASecret")
 	if err != nil {
 		return "", "", err
 	}
-	mfaInterval, err := settingRepo.Get(repo.WithByKey("MFAInterval"))
+	mfaInterval, err := settingRepo.GetValueByKey("MFAInterval")
 	if err != nil {
 		return "", "", err
 	}
-	if !mfa.ValidCode(code, mfaInterval.Value, mfaSecret.Value) {
+	interval, err := strconv.Atoi(mfaInterval)
+	if err != nil {
+		return "", "", err
+	}
+	if !mfa.ValidCode(interval, code, mfaSecret) {
 		return "", "ErrMFA", nil
 	}
 	mfaSessions.Delete(sessionID)
@@ -194,13 +198,13 @@ func LoadMFA(req dto.MfaRequest) (mfa.Otp, error) {
 	return otp, nil
 }
 func MFABind(req dto.MfaCredential) error {
-	success := mfa.ValidCode(req.Code, req.Interval, req.Secret)
+	success := mfa.ValidCode(req.Interval, req.Code, req.Secret)
 	if !success {
 		return errors.New("code is not valid")
 	}
 
 	settingRepo := repo.NewISettingRepo()
-	if err := settingRepo.Update("MFAInterval", req.Interval); err != nil {
+	if err := settingRepo.Update("MFAInterval", strconv.Itoa(req.Interval)); err != nil {
 		return err
 	}
 	if err := settingRepo.Update("MFAStatus", constant.StatusEnable); err != nil {
@@ -227,6 +231,8 @@ func GetCurrentUserInfo() (*dto.CurrentUserInfo, error) {
 	}
 	delete(stringSettingMap, "SessionTimeout")
 	delete(stringSettingMap, "ExpirationDays")
+	delete(stringSettingMap, "MFAInterval")
+	delete(stringSettingMap, "ApiKeyValidityTime")
 	arr, err := json.Marshal(stringSettingMap)
 	if err != nil {
 		return nil, err
@@ -236,6 +242,8 @@ func GetCurrentUserInfo() (*dto.CurrentUserInfo, error) {
 	}
 	info.SessionTimeout, _ = strconv.Atoi(settingMap["SessionTimeout"])
 	info.ExpirationDays, _ = strconv.Atoi(settingMap["ExpirationDays"])
+	info.MFAInterval, _ = strconv.Atoi(settingMap["MFAInterval"])
+	info.ApiKeyValidityTime, _ = strconv.Atoi(settingMap["ApiKeyValidityTime"])
 	info.Name = settingMap["UserName"]
 	return &info, nil
 }
@@ -296,7 +304,7 @@ func UpdateApiConfig(req dto.ApiInterfaceConfig) error {
 	if err := settingRepo.UpdateOrCreate("IpWhiteList", req.IpWhiteList); err != nil {
 		return err
 	}
-	if err := settingRepo.UpdateOrCreate("ApiKeyValidityTime", req.ApiKeyValidityTime); err != nil {
+	if err := settingRepo.UpdateOrCreate("ApiKeyValidityTime", strconv.Itoa(req.ApiKeyValidityTime)); err != nil {
 		return err
 	}
 	return nil

@@ -147,12 +147,22 @@
                             </el-tooltip>
                         </span>
                     </template>
-                    <el-switch
-                        @change="handleApi"
-                        v-model="form.apiInterfaceStatus"
-                        active-value="Enable"
-                        inactive-value="Disable"
-                    />
+                    <div class="setting-action-row">
+                        <el-switch
+                            @change="handleApi"
+                            v-model="form.apiInterfaceStatus"
+                            active-value="Enable"
+                            inactive-value="Disable"
+                        />
+                        <el-button
+                            v-if="form.apiInterfaceStatus === 'Enable'"
+                            link
+                            type="primary"
+                            @click="openApiDetail"
+                        >
+                            {{ $t('commons.button.view') }}
+                        </el-button>
+                    </div>
                     <span class="input-help">{{ $t('setting.apiInterfaceHelper') }}</span>
                 </el-form-item>
             </el-form>
@@ -356,7 +366,7 @@
                 <span class="input-help">{{ $t('setting.ipWhiteListHelper') }}</span>
             </el-form-item>
             <el-form-item :label="$t('setting.apiKeyValidityTime')" prop="apiKeyValidityTime">
-                <el-input :placeholder="$t('setting.apiKeyValidityTimeEgs')" v-model="form.apiKeyValidityTime">
+                <el-input :placeholder="$t('setting.apiKeyValidityTimeEgs')" v-model.number="form.apiKeyValidityTime">
                     <template #append>{{ $t('commons.units.minute') }}</template>
                 </el-input>
                 <span class="input-help">
@@ -667,6 +677,11 @@ const handleApiDialogClose = () => {
     form.apiInterfaceStatus = savedApiStatus.value;
 };
 
+const openApiDetail = async () => {
+    await ensureApiKey();
+    apiDialogOpen.value = true;
+};
+
 const openPasskeyDrawer = async () => {
     const settingRes = await loadPasskeySettingInfo();
     hasBindDomain.value = !!settingRes?.data.bindDomain?.trim().length;
@@ -862,7 +877,7 @@ const onBindMFA = async (formEl: FormInstance | undefined) => {
     const param = {
         code: mfaForm.code,
         secret: mfaForm.secret,
-        interval: mfaForm.interval + '',
+        interval: mfaForm.interval,
     };
     loading.value = true;
     await bindMFA(param)
@@ -887,7 +902,7 @@ const onSaveApi = async (formEl: FormInstance | undefined) => {
         apiKey: form.apiKey,
         ipWhiteList: form.ipWhiteList,
         apiInterfaceStatus: form.apiInterfaceStatus,
-        apiKeyValidityTime: form.apiKeyValidityTime + '',
+        apiKeyValidityTime: form.apiKeyValidityTime,
     };
     loading.value = true;
     await updateApiConfig(param)
@@ -981,7 +996,7 @@ const handleApi = async () => {
                 apiKey: form.apiKey,
                 ipWhiteList: form.ipWhiteList,
                 apiInterfaceStatus: form.apiInterfaceStatus,
-                apiKeyValidityTime: form.apiKeyValidityTime + '',
+                apiKeyValidityTime: form.apiKeyValidityTime,
             };
             await updateApiConfig(param)
                 .then(() => {
@@ -1022,6 +1037,12 @@ defineExpose({
 .setting-section {
     padding-top: 6px;
     border-top: 1px solid var(--el-border-color-lighter);
+}
+
+.setting-action-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .api-key-input {
