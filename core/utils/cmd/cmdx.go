@@ -22,6 +22,7 @@ import (
 const maxStreamOutputCapture = 64 * 1024
 
 type CommandHelper struct {
+	context      context.Context
 	workDir      string
 	outputFile   string
 	env          []string
@@ -167,7 +168,10 @@ func (c *CommandHelper) RunPipe(commands ...PipeCommand) (string, error) {
 }
 
 func (c *CommandHelper) pipeContext() (context.Context, context.CancelFunc) {
-	ctx := context.Background()
+	ctx := c.context
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	if c.timeout == 0 {
 		return ctx, nil
 	}
@@ -243,8 +247,15 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 	var cancel context.CancelFunc
 
 	if c.timeout != 0 {
-		ctx, cancel = context.WithTimeout(context.Background(), c.timeout)
+		if c.context == nil {
+			ctx, cancel = context.WithTimeout(context.Background(), c.timeout)
+		} else {
+			ctx, cancel = context.WithTimeout(c.context, c.timeout)
+		}
 		defer cancel()
+		cmd = exec.CommandContext(ctx, name, arg...)
+	} else if c.context != nil {
+		ctx = c.context
 		cmd = exec.CommandContext(ctx, name, arg...)
 	} else {
 		cmd = exec.Command(name, arg...)
@@ -335,6 +346,11 @@ func killProcessGroups(cmds []*exec.Cmd) {
 func WithOutputFile(outputFile string) Option {
 	return func(s *CommandHelper) {
 		s.outputFile = outputFile
+	}
+}
+func WithContext(ctx context.Context) Option {
+	return func(s *CommandHelper) {
+		s.context = ctx
 	}
 }
 func WithTimeout(timeout time.Duration) Option {
