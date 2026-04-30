@@ -1048,3 +1048,13 @@ var AddOperationLogUser = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.OperationLog{})
 	},
 }
+
+var AddIsOfflineSetting = &gormigrate.Migration{
+	ID: "20260429-add-is-offline-setting",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "IsOffline", Value: constant.StatusDisable}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

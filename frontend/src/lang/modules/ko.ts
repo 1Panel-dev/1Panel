@@ -2145,6 +2145,7 @@ const message = {
         auto: '시스템 따라가기',
         language: '언어',
         runtimeEnv: '실행 환경',
+        offlineEnv: '오프라인 환경',
         docSource: '문서 출처',
         withByRegion: '운영 지역 따름(기본값)',
         withByLang: '시스템 언어 따름',

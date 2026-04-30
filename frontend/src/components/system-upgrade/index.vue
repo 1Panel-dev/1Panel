@@ -24,7 +24,7 @@
                         <span v-else-if="isMasterPro">
                             {{ $t('license.pro') }}
                         </span>
-                        <span v-else-if="isOffLine">
+                        <span v-else-if="isOffline">
                             {{ $t('license.offLine') }}
                         </span>
                         <span v-else>
@@ -36,7 +36,7 @@
                     </el-link>
                     <el-badge
                         is-dot
-                        v-if="globalStore.isAdmin && !globalStore.isOffLine"
+                        v-if="globalStore.isAdmin && !globalStore.isOffline"
                         class="-mt-0.5"
                         :hidden="version === 'Waiting' || !globalStore.hasNewVersion"
                     >
@@ -65,7 +65,7 @@ import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
-const { docsUrl, isOffLine, isFxplay } = storeToRefs(globalStore);
+const { docsUrl, isOffline, isFxplay } = storeToRefs(globalStore);
 const upgradeRef = ref();
 const releasesRef = ref();
 const isMasterPro = computed(() => {
@@ -92,14 +92,14 @@ const search = async () => {
 };
 
 const getVersionLog = () => {
-    if (isOffLine.value) {
+    if (isOffline.value) {
         return;
     }
     releasesRef.value.acceptParams();
 };
 
 const toLxware = () => {
-    if (isOffLine.value) {
+    if (isOffline.value) {
         to1Panel();
         return;
     }

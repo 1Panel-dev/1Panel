@@ -24,7 +24,7 @@
                     v-model="runtime.resource"
                     @change="changeResource(runtime.resource)"
                 >
-                    <el-radio :value="'appstore'" v-if="!globalStore.isOffLine">
+                    <el-radio :value="'appstore'" v-if="!globalStore.isOffline">
                         {{ $t('menu.apps') }}
                     </el-radio>
                     <el-radio :value="'local'">
@@ -491,7 +491,7 @@ const acceptParams = async (props: OperateRrops) => {
     initParam.value = false;
     if (props.mode === 'create') {
         Object.assign(runtime, initData(props.type));
-        if (globalStore.isOffLine) {
+        if (globalStore.isOffline) {
             runtime.resource = 'local';
         } else {
             searchAppList(null);

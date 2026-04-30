@@ -40,6 +40,7 @@ func Init() {
 		migrations.AddAppStoreInstallAllowPortSetting,
 		migrations.AddUserManagementMenu,
 		migrations.AddOperationLogUser,
+		migrations.AddIsOfflineSetting,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

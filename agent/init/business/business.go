@@ -20,7 +20,7 @@ func Init() {
 }
 
 func syncApp() {
-	if global.CONF.Base.IsOffLine {
+	if global.CONF.Base.IsOffline {
 		return
 	}
 	setting, err := service.NewISettingService().GetSettingInfo()
