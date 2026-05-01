@@ -91,7 +91,7 @@ const (
 	fileRemarkEncodedMaxLen = 256
 )
 
-func NewIFileService() FileService {
+func NewIFileService() IFileService {
 	return &FileService{}
 }
 
