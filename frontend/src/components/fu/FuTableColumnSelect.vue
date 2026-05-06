@@ -5,7 +5,7 @@
             :trigger="trigger"
             :popper-class="resolvedPopperClass"
             placement="bottom-end"
-            :width="260"
+            :width="popoverWidth"
         >
             <template #reference>
                 <el-button class="fu-search-bar-button" :icon="iconComponent" @click.stop>
@@ -14,14 +14,8 @@
             </template>
             <div class="fu-table-column-select__panel" @click.stop>
                 <div class="fu-table-column-select__title">{{ resolvedTitle }}</div>
-                <div ref="listRef" class="fu-table-column-select__list">
-                    <div
-                        v-for="column in columns"
-                        :key="column.key"
-                        class="fu-table-column-select__item"
-                        :data-key="column.key"
-                    >
-                        <el-icon class="fu-table-column-select__drag"><Rank /></el-icon>
+                <div class="fu-table-column-select__list">
+                    <div v-for="column in columns" :key="column.key" class="fu-table-column-select__item">
                         <el-checkbox v-model="column.show" :disabled="isFixedColumn(column)">
                             {{ column.label }}
                         </el-checkbox>
@@ -33,9 +27,8 @@
 </template>
 
 <script setup lang="ts">
-import Sortable from 'sortablejs';
-import { Rank, Setting } from '@element-plus/icons-vue';
-import { computed, nextTick, onBeforeUnmount, ref, watch, type PropType } from 'vue';
+import { Setting } from '@element-plus/icons-vue';
+import { computed, ref, type PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import type { FuTableColumnConfig } from './shared';
@@ -72,54 +65,22 @@ const props = defineProps({
 });
 
 const visible = ref(false);
-const listRef = ref<HTMLElement | null>(null);
-let sortable: Sortable | undefined;
-
 const resolvedTitle = computed(() => props.title || t('fu.table.custom_table_rows'));
 const resolvedPopperClass = computed(() =>
     ['fu-table-column-select__popover', props.popperClass].filter(Boolean).join(' '),
 );
 const iconComponent = computed(() => props.icon || Setting);
-
-const initSortable = async () => {
-    await nextTick();
-    sortable?.destroy();
-    if (!listRef.value) {
-        return;
-    }
-    sortable = Sortable.create(listRef.value, {
-        animation: 150,
-        handle: '.fu-table-column-select__drag',
-        onEnd: ({ oldIndex, newIndex }) => {
-            if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) {
-                return;
-            }
-            const nextColumns = [...props.columns];
-            const [movedColumn] = nextColumns.splice(oldIndex, 1);
-            if (!movedColumn) {
-                return;
-            }
-            nextColumns.splice(newIndex, 0, movedColumn);
-            props.columns.splice(0, props.columns.length, ...nextColumns);
-        },
-    });
+const estimateTextWidth = (text: string) => {
+    return Array.from(text).reduce((total, char) => total + (char.charCodeAt(0) > 255 ? 14 : 8), 0);
 };
+
+const popoverWidth = computed(() => {
+    const texts = [resolvedTitle.value, ...props.columns.map((column) => String(column.label || ''))];
+    const contentWidth = texts.reduce((maxWidth, text) => Math.max(maxWidth, estimateTextWidth(text)), 0);
+    return Math.min(Math.max(contentWidth + 72, 180), 320);
+});
 
 const isFixedColumn = (column: FuTableColumnConfig) => {
     return Boolean(column.fixed);
 };
-
-watch(visible, (value) => {
-    if (value) {
-        initSortable();
-        return;
-    }
-    sortable?.destroy();
-    sortable = undefined;
-});
-
-onBeforeUnmount(() => {
-    sortable?.destroy();
-    sortable = undefined;
-});
 </script>
