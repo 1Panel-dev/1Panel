@@ -165,8 +165,9 @@
                                     v-model="form.isOffline"
                                     active-value="Enable"
                                     inactive-value="Disable"
-                                    @change="onSave('IsOffline', form.isOffline)"
+                                    @change="onChangeOfflineEnv"
                                 />
+                                <span class="input-help">{{ $t('setting.offlineEnvHelper') }}</span>
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.runtimeEnv')" prop="edition">
@@ -391,6 +392,27 @@ const onChangeWatermark = async () => {
         });
 };
 
+const onChangeOfflineEnv = async (val: string | number | boolean) => {
+    const value = val + '';
+    const oldValue = value === 'Enable' ? 'Disable' : 'Enable';
+    const message =
+        value === 'Enable'
+            ? i18n.global.t('setting.offlineEnvOpenHelper')
+            : i18n.global.t('setting.offlineEnvCloseHelper');
+    try {
+        await ElMessageBox.confirm(message, i18n.global.t('setting.offlineEnv'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        });
+        const success = await onSave('IsOffline', value);
+        if (!success) {
+            form.isOffline = oldValue;
+        }
+    } catch {
+        form.isOffline = oldValue;
+    }
+};
+
 const handleThemeChange = async (val: string) => {
     globalStore.themeConfig.theme = val;
     switchTheme();
@@ -435,9 +457,10 @@ const onSave = async (key: string, val: any) => {
         search();
     } catch (error) {
         loading.value = false;
-        return;
+        return false;
     }
     loading.value = false;
+    return true;
 };
 
 onMounted(() => {

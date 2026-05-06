@@ -20,6 +20,7 @@ type AuthProvider interface {
 
 	LoadMFA(c *gin.Context, req dto.MfaRequest) (mfa.Otp, error)
 	MFABind(c *gin.Context, req dto.MfaCredential) error
+	MFAClose(c *gin.Context) error
 
 	GenerateApiKey(c *gin.Context) (string, error)
 	UpdateApiConfig(c *gin.Context, req dto.ApiInterfaceConfig) error

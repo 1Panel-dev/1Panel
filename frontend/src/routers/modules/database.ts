@@ -127,6 +127,7 @@ const databaseRouter = {
                         requiresAuth: false,
                         parent: 'menu.database',
                         title: 'MongoDB',
+                        permission: 'database_view',
                     },
                 },
                 {
@@ -140,6 +141,7 @@ const databaseRouter = {
                         parent: 'menu.database',
                         title: 'MongoDB',
                         detail: 'database.remote',
+                        permission: 'database_view',
                     },
                 },
             ],
