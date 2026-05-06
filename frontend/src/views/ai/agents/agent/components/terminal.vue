@@ -108,6 +108,6 @@ defineExpose({
 
 <style lang="scss" scoped>
 .terminal {
-    height: calc(100vh - 237px);
+    height: calc(100vh - 240px);
 }
 </style>
