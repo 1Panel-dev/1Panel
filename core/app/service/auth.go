@@ -53,16 +53,64 @@ func NewIAuthService() IAuthService {
 }
 
 func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, string, error) {
-	nameSetting, err := settingRepo.Get(repo.WithByKey("UserName"))
-	if err != nil {
-		return nil, "", buserr.New("ErrRecordNotFound")
+	// First, try to authenticate from the User table (new multi-user system)
+	userRepo := repo.NewIUserRepo()
+	user, userErr := userRepo.GetUserByUsername(info.Name)
+	
+	// Fallback to settings-based authentication for backward compatibility
+	if userErr != nil {
+		nameSetting, err := settingRepo.Get(repo.WithByKey("UserName"))
+		if err != nil {
+			return nil, "", buserr.New("ErrRecordNotFound")
+		}
+		if nameSetting.Value != info.Name {
+			return nil, "ErrAuth", buserr.New("ErrAuth")
+		}
+		if err = checkPassword(info.Password); err != nil {
+			return nil, "ErrAuth", err
+		}
+		// Continue with old-style login for compatibility
+		entranceSetting, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
+		if err != nil {
+			return nil, "", err
+		}
+		if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
+			return nil, "ErrEntrance", buserr.New("ErrEntrance")
+		}
+		mfa, err := settingRepo.Get(repo.WithByKey("MFAStatus"))
+		if err != nil {
+			return nil, "", err
+		}
+		if err = settingRepo.Update("Language", info.Language); err != nil {
+			return nil, "", err
+		}
+		if mfa.Value == constant.StatusEnable {
+			ip := common.GetRealClientIP(c)
+			mfaSession := initauth.GetMFASessionStore().Set(nameSetting.Value, entrance, ip)
+			return &dto.UserLoginInfo{Name: nameSetting.Value, MfaStatus: mfa.Value, MfaSession: mfaSession}, "", nil
+		}
+		res, err := u.generateSession(c, info.Name)
+		if err != nil {
+			return nil, "", err
+		}
+		if entrance != "" {
+			SetSecurityEntranceCookie(c, entrance)
+		}
+		return res, "", nil
 	}
-	if nameSetting.Value != info.Name {
+
+	// New multi-user authentication
+	// Check user status
+	if user.Status != constant.UserStatusActive {
+		return nil, "ErrAuth", buserr.New("ErrUserInactive")
+	}
+
+	// Verify password
+	if err := encrypt.StringDecrypt(info.Password, user.Password); err != nil {
 		return nil, "ErrAuth", buserr.New("ErrAuth")
 	}
-	if err = checkPassword(info.Password); err != nil {
-		return nil, "ErrAuth", err
-	}
+
+	// Check security entrance
 	entranceSetting, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
 	if err != nil {
 		return nil, "", err
@@ -70,18 +118,24 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 	if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
 		return nil, "ErrEntrance", buserr.New("ErrEntrance")
 	}
+
+	// Update language setting
+	if err = settingRepo.Update("Language", info.Language); err != nil {
+		return nil, "", err
+	}
+
+	// Check if MFA is enabled
 	mfa, err := settingRepo.Get(repo.WithByKey("MFAStatus"))
 	if err != nil {
 		return nil, "", err
 	}
-	if err = settingRepo.Update("Language", info.Language); err != nil {
-		return nil, "", err
-	}
+
 	if mfa.Value == constant.StatusEnable {
 		ip := common.GetRealClientIP(c)
-		mfaSession := initauth.GetMFASessionStore().Set(nameSetting.Value, entrance, ip)
-		return &dto.UserLoginInfo{Name: nameSetting.Value, MfaStatus: mfa.Value, MfaSession: mfaSession}, "", nil
+		mfaSession := initauth.GetMFASessionStore().Set(info.Name, entrance, ip)
+		return &dto.UserLoginInfo{Name: info.Name, MfaStatus: mfa.Value, MfaSession: mfaSession, Role: user.Role}, "", nil
 	}
+
 	res, err := u.generateSession(c, info.Name)
 	if err != nil {
 		return nil, "", err
@@ -89,6 +143,12 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 	if entrance != "" {
 		SetSecurityEntranceCookie(c, entrance)
 	}
+	
+	// If we got here, add role to response
+	if res != nil {
+		res.Role = user.Role
+	}
+	
 	return res, "", nil
 }
 
@@ -120,6 +180,13 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance strin
 	if err != nil {
 		return nil, "", err
 	}
+
+	// Get user role
+	userRepo := repo.NewIUserRepo()
+	if user, err := userRepo.GetUserByUsername(session.Name); err == nil {
+		res.Role = user.Role
+	}
+
 	mfaSessions.Delete(info.SessionID)
 	if entrance != "" {
 		SetSecurityEntranceCookie(c, entrance)

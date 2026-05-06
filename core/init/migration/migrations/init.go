@@ -990,3 +990,49 @@ func normalizeAiMenuChild(children []dto.ShowMenu, fallback dto.ShowMenu, labels
 	}
 	return fallback
 }
+
+var AddUserTables = &gormigrate.Migration{
+	ID: "20260506-add-user-tables",
+	Migrate: func(tx *gorm.DB) error {
+		// Create users table
+		if err := tx.AutoMigrate(&model.User{}); err != nil {
+			return err
+		}
+		// Create user permissions table
+		if err := tx.AutoMigrate(&model.UserPermission{}); err != nil {
+			return err
+		}
+		// Create user login history table
+		if err := tx.AutoMigrate(&model.UserLoginHistory{}); err != nil {
+			return err
+		}
+
+		// Check if admin user exists, if not, migrate the old single user to admin
+		var adminCount int64
+		if err := tx.Model(&model.User{}).Where("role = ?", constant.RoleAdminMain).Count(&adminCount).Error; err != nil {
+			return err
+		}
+
+		if adminCount == 0 {
+			// Get the old credentials from settings
+			var usernameSetting, passwordSetting model.Setting
+			if err := tx.Where("key = ?", "UserName").First(&usernameSetting).Error; err == nil {
+				if err := tx.Where("key = ?", "Password").First(&passwordSetting).Error; err == nil {
+					// Create initial admin user from old settings
+					adminUser := &model.User{
+						Username: usernameSetting.Value,
+						Password: passwordSetting.Value,
+						Email:    "",
+						Role:     constant.RoleAdminMain,
+						Status:   constant.UserStatusActive,
+						RealName: "Admin",
+					}
+					if err := tx.Create(adminUser).Error; err != nil {
+						return err
+					}
+				}
+			}
+		}
+		return nil
+	},
+}

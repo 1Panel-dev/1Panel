@@ -10,6 +10,7 @@ type UserLoginInfo struct {
 	Token      string `json:"token"`
 	MfaStatus  string `json:"mfaStatus"`
 	MfaSession string `json:"mfaSession"`
+	Role       string `json:"role"`
 }
 
 type PasskeyBeginResponse struct {

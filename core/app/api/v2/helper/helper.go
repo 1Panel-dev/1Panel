@@ -100,3 +100,53 @@ func GetParamID(c *gin.Context) (uint, error) {
 	intNum, _ := strconv.Atoi(idParam)
 	return uint(intNum), nil
 }
+
+func SuccessWithMsg(ctx *gin.Context, msgKey string) {
+	res := dto.Response{
+		Code:    http.StatusOK,
+		Message: i18n.GetMsgWithMap(msgKey, nil),
+	}
+	ctx.JSON(http.StatusOK, res)
+	ctx.Abort()
+}
+
+func GetCurrentUserID(c *gin.Context) (uint, error) {
+	// Get user ID from session or JWT token
+	// This assumes it's stored in context with key "UserID"
+	if userID, exists := c.Get("UserID"); exists {
+		if id, ok := userID.(uint); ok {
+			return id, nil
+		}
+	}
+	return 0, errors.New("user not authenticated")
+}
+
+func CheckUserRole(c *gin.Context, allowedRoles ...string) error {
+	// Get user role from session or JWT token
+	// This assumes it's stored in context with key "UserRole"
+	if userRole, exists := c.Get("UserRole"); exists {
+		if role, ok := userRole.(string); ok {
+			for _, allowedRole := range allowedRoles {
+				if role == allowedRole {
+					return nil
+				}
+			}
+		}
+	}
+	return errors.New("user does not have required role")
+}
+
+func HasPermission(c *gin.Context, permission string) bool {
+	// Get permissions from session or JWT token
+	// This assumes it's stored in context with key "Permissions"
+	if perms, exists := c.Get("Permissions"); exists {
+		if permissions, ok := perms.([]string); ok {
+			for _, perm := range permissions {
+				if perm == permission {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
