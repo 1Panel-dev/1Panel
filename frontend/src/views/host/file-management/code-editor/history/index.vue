@@ -439,8 +439,11 @@ const renderDiff = async () => {
         readOnly: true,
         automaticLayout: true,
         folding: true,
+        glyphMargin: true,
         roundedSelection: false,
         overviewRulerBorder: false,
+        renderMarginRevertIcon: true,
+        renderGutterMenu: false,
     });
     diffEditor.setModel({
         original: originalModel,
