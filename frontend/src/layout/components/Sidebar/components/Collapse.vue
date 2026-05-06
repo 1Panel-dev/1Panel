@@ -1,8 +1,6 @@
 <template>
     <div>
         <el-popover
-            ref="nodeChangeRef"
-            v-model:visible="popoverVisible"
             placement="right-end"
             :show-arrow="false"
             :offset="0"
@@ -14,7 +12,7 @@
             <template #reference>
                 <div class="el-dropdown-link" v-if="!menuStore.isCollapse">
                     <el-badge is-dot :value="taskCount" :show-zero="false" :offset="[5, 5]">
-                        <el-button link @click="openChangeNode" @mouseenter="openChangeNode">
+                        <el-button link>
                             <SvgIcon class="icon" iconName="p-pcm" />
                             <span class="ellipsis-text">{{ loadCurrentName() }}</span>
                         </el-button>
@@ -28,14 +26,18 @@
             </template>
             <div class="dropdown-menu" v-loading="loading">
                 <div class="dropdown-item" @click="openTask">
-                    <SvgIcon class="icon" iconName="p-renwuzhongxin1" />
-                    {{ $t('menu.msgCenter') }}
+                    <div class="node">
+                        <SvgIcon class="icon" iconName="p-renwuzhongxin1" />
+                        {{ $t('menu.msgCenter') }}
+                    </div>
                     <el-tag class="msg-tag" v-if="taskCount !== 0" size="small" round>{{ taskCount }}</el-tag>
                 </div>
                 <el-divider v-if="showNodes()" class="divider" />
                 <div class="dropdown-item" @click="openNodeDashboard" v-if="isMasterPro">
-                    <SvgIcon class="icon" iconName="p-gailan1" />
-                    {{ $t('xpack.node.multiOverview') }}
+                    <div class="node">
+                        <SvgIcon class="icon" iconName="p-gailan1" />
+                        {{ $t('xpack.node.multiOverview') }}
+                    </div>
                 </div>
                 <el-divider v-if="isMasterPro" class="divider" />
 
@@ -89,7 +91,6 @@
 
 <script setup lang="ts">
 import { GlobalStore, MenuStore } from '@/store';
-import type { PopoverInstance } from 'element-plus';
 import { countExecutingTask } from '@/api/modules/log';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
@@ -108,8 +109,6 @@ const menuStore = MenuStore();
 const nodes = ref([]);
 const nodeOptions = ref([]);
 const loading = ref();
-const popoverVisible = ref(false);
-const nodeChangeRef = ref<PopoverInstance>();
 const props = defineProps({
     version: String,
 });
@@ -127,10 +126,6 @@ const emit = defineEmits(['openTask']);
 bus.on('refreshTask', () => {
     checkTask();
 });
-
-const openChangeNode = () => {
-    popoverVisible.value = true;
-};
 
 const loadCurrentName = () => {
     if (globalStore.currentNode) {
