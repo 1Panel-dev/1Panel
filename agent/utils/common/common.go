@@ -346,6 +346,26 @@ func IsValidIP(ip string) bool {
 	return net.ParseIP(ip) != nil
 }
 
+// ParseIPLoose parses an IP address, accepting bracketed IPv6 forms
+// such as "[::1]" or "[fe80::1%eth0]" in addition to the bare forms
+// that net.ParseIP supports natively. It also trims surrounding
+// whitespace. Returns nil for non-IP input, matching net.ParseIP.
+//
+// This is required because some flows pass the host portion of a URL
+// (e.g. "[::1]") rather than a bare IP address. Rejecting that form
+// caused 1Panel-dev/1Panel#12646 — the panel SSL self-sign workflow
+// reported “domain format invalid” for IPv6 hosts.
+func ParseIPLoose(s string) net.IP {
+	trimmed := strings.TrimSpace(s)
+	if trimmed == "" {
+		return nil
+	}
+	if len(trimmed) >= 2 && trimmed[0] == '[' && trimmed[len(trimmed)-1] == ']' {
+		trimmed = trimmed[1 : len(trimmed)-1]
+	}
+	return net.ParseIP(trimmed)
+}
+
 const (
 	b  = uint64(1)
 	kb = 1024 * b
