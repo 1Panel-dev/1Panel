@@ -3,7 +3,7 @@
         v-model="open"
         :header="resource"
         @close="handleClose"
-        :size="globalStore.isFullScreen ? 'full' : 'large'"
+        :size="globalStore.isFullScreen ? 'full' : '60%'"
         :resource="container"
     >
         <template #extra v-if="!mobile">
