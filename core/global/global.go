@@ -35,6 +35,9 @@ var (
 type DBOption func(*gorm.DB) *gorm.DB
 
 func RepoURL() string {
+	if CONF.Base.IsEnterprise {
+		return "https://resource.fit2cloud.com/1panel/package/enterprise"
+	}
 	if CONF.Base.IsFxplay {
 		return "https://resource.fit2cloud.com/1panel/package/fusionxplay"
 	}
@@ -44,6 +47,9 @@ func RepoURL() string {
 	return "https://resource.1panel.pro/v2"
 }
 func ResourceURL() string {
+	if CONF.Base.IsEnterprise {
+		return "https://resource.fit2cloud.com/1panel/resource/enterprise"
+	}
 	if CONF.Base.IsFxplay {
 		return "https://resource.fit2cloud.com/1panel/resource/fusionxplay"
 	}
@@ -53,6 +59,9 @@ func ResourceURL() string {
 	return "https://resource.1panel.pro/v2/resource"
 }
 func AppRepoURL() string {
+	if CONF.Base.IsEnterprise {
+		return "https://apps-assets.fit2cloud.com"
+	}
 	if CONF.Base.IsFxplay {
 		return "https://apps-assets.fit2cloud.com"
 	}
