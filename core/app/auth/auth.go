@@ -215,6 +215,11 @@ func MFABind(req dto.MfaCredential) error {
 	}
 	return nil
 }
+
+func MFAClose() error {
+	return repo.NewISettingRepo().Update("MFAStatus", constant.StatusDisable)
+}
+
 func GetCurrentUserInfo() (*dto.CurrentUserInfo, error) {
 	setting, err := repo.NewISettingRepo().List()
 	if err != nil {
@@ -249,6 +254,11 @@ func GetCurrentUserInfo() (*dto.CurrentUserInfo, error) {
 }
 func UpdateCurrentUserInfo(c *gin.Context, req dto.CurrentUserUpdate) error {
 	settingRepo := repo.NewISettingRepo()
+	currentName, err := settingRepo.GetValueByKey("UserName")
+	if err != nil {
+		return err
+	}
+	shouldDeleteSession := len(req.Password) != 0 || req.Name != currentName
 	if len(req.Password) != 0 {
 		if len(req.OldPassword) == 0 {
 			return buserr.New("ErrInitialPassword")
@@ -282,7 +292,9 @@ func UpdateCurrentUserInfo(c *gin.Context, req dto.CurrentUserUpdate) error {
 	if err := settingRepo.Update("ExpirationTime", expirationTime); err != nil {
 		return err
 	}
-	deleteCurrentSession(c)
+	if shouldDeleteSession {
+		deleteCurrentSession(c)
+	}
 	return nil
 }
 

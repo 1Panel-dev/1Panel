@@ -69,7 +69,7 @@ const acceptParams = (params: DialogProps): void => {
     let hideMenu = JSON.parse(params.hideMenu);
     sortMenu(hideMenu);
     treeData.hideMenu = hideMenu;
-    if (globalStore.isIntl) {
+    if (globalStore.isIntl || globalStore.isEE()) {
         treeData.hideMenu = removeUpage(treeData.hideMenu);
     }
 };

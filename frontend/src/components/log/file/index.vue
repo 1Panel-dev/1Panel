@@ -52,6 +52,7 @@
 import { nextTick, onMounted, onUnmounted, reactive, ref, computed } from 'vue';
 import { downloadFile } from '@/utils/file';
 import { readByLine } from '@/api/modules/files';
+import { readTaskLogByLine } from '@/api/modules/log';
 import { GlobalStore } from '@/store';
 import bus from '@/global/bus';
 import Highlight from '@/components/log/custom-highlight/index.vue';
@@ -268,7 +269,12 @@ const getContent = async (pre: boolean) => {
 
     let res;
     try {
-        res = await readByLine(readReq, props.config.operateNode || globalStore.currentNode);
+        const operateNode = props.config.operateNode || globalStore.currentNode;
+        if (readReq.type === 'task') {
+            res = await readTaskLogByLine(readReq, operateNode);
+        } else {
+            res = await readByLine(readReq, operateNode);
+        }
     } catch (error) {
         isLoading.value = false;
         firstLoading.value = false;

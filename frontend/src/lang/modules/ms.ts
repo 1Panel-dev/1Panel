@@ -26,6 +26,7 @@ const message = {
             conn: 'Sambung',
             disConn: 'Putus sambungan',
             clean: 'Kosongkan',
+            selectAll: 'Pilih semua',
             login: 'Log masuk',
             close: 'Tutup',
             off: 'Tutup',
@@ -244,7 +245,7 @@ const message = {
             supervisorName:
                 'Ruangan ini mesti bermula dengan aksara bukan khas dan mesti terdiri daripada aksara rumi, nombor, "-", dan "_" dengan panjang 1-128 aksara.',
             complexityPassword:
-                'Ruangan ini mesti terdiri daripada aksara rumi, nombor dengan panjang 8-30 aksara dan mengandungi sekurang-kurangnya dua aksara khas.',
+                'Menyokong gabungan kata laluan dengan panjang 8-30 aksara yang mengandungi sekurang-kurangnya dua daripada huruf, nombor, dan aksara khas.',
             commonPassword: 'Panjang ruangan ini mesti melebihi 6 aksara.',
             linuxName:
                 'Panjang ruangan ini mesti antara 1 hingga 128 aksara. Ruangan ini tidak boleh mengandungi aksara khas berikut: "{0}".',
@@ -2226,6 +2227,10 @@ const message = {
         language: 'Bahasa',
         runtimeEnv: 'Persekitaran operasi',
         offlineEnv: 'Persekitaran luar talian',
+        offlineEnvHelper:
+            'Selepas diaktifkan, sumber seperti App Store akan dibaca secara lalai daripada direktori setempat pelayan.\nNaik taraf sistem dan naik taraf ejen memerlukan pakej luar talian yang dimuat turun secara manual.',
+        offlineEnvOpenHelper: 'Adakah anda pasti mahu mengaktifkan persekitaran luar talian?',
+        offlineEnvCloseHelper: 'Adakah anda pasti mahu menyahaktifkan persekitaran luar talian?',
         docSource: 'Sumber dokumentasi',
         withByRegion: 'Ikut wilayah operasi (Lalai)',
         withByLang: 'Ikut bahasa sistem',
@@ -2449,14 +2454,14 @@ const message = {
         noneSetting:
             'Tetapkan masa tamat tempoh untuk kata laluan panel. Selepas tamat tempoh, anda perlu menetapkan semula kata laluan',
         expirationHelper:
-            'Jika masa tamat tempoh kata laluan ialah [0] hari, fungsi tamat tempoh kata laluan dilumpuhkan',
-        days: 'Hari Tamat Tempoh',
+            'Jika masa tamat tempoh kata laluan ialah 0 hari, fungsi tamat tempoh kata laluan dilumpuhkan',
+        days: 'Hari tamat tempoh kata laluan',
         expiredHelper: 'Kata laluan semasa telah tamat tempoh. Sila tukar kata laluan lagi.',
         timeoutHelper:
-            '[ {0} hari ] Kata laluan panel akan tamat tempoh. Selepas tamat tempoh, anda perlu menetapkan semula kata laluan',
+            'Kata laluan panel akan tamat tempoh dalam {0} hari. Selepas tamat tempoh, anda perlu menetapkan semula kata laluan',
         complexity: 'Pengesahan kerumitan',
         complexityHelper:
-            'Selepas anda mengaktifkannya, peraturan pengesahan kata laluan akan menjadi: 8-30 aksara, termasuk bahasa Inggeris, nombor, dan sekurang-kurangnya dua aksara khas.',
+            'Selepas diaktifkan, kata laluan mestilah 8-30 aksara dan mengandungi sekurang-kurangnya dua daripada huruf, nombor, dan aksara khas.',
         bindDomain: 'Ikatan domain',
         unBindDomain: 'Buka ikatan domain',
         panelSSL: 'Panel SSL',
@@ -3775,15 +3780,17 @@ const message = {
         upage: 'Pembina Laman Web AI',
         proAlert: 'Tingkatkan ke Pro untuk menggunakan ciri ini',
         user: {
-            accessControl: 'Pengurusan Kebenaran',
             user: 'Pengguna',
             userInfo: 'Maklumat Pengguna',
             userManage: 'Pengurusan Pengguna',
             superAdmin: 'Pentadbir Super',
+            superAdminDesc:
+                'Mempunyai kebenaran pengurusan sistem penuh dan boleh mengurus semua sumber serta konfigurasi.',
             nodeAdmin: 'Pentadbir Nod',
+            nodeAdminDesc:
+                'Mempunyai kebenaran pengurusan untuk nod yang ditentukan dan boleh mengurus sumber serta konfigurasi dalam nod tersebut.',
             bindNode: 'Ikat Nod',
             role: 'Peranan',
-            roleManage: 'Pengurusan Peranan',
             roleName: 'Nama',
             permission: 'Kebenaran',
             permissionDuplicate: 'Setiap nod hanya boleh diberikan satu peranan',

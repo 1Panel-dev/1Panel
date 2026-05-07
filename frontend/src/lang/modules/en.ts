@@ -29,6 +29,7 @@ const message = {
             conn: 'Connect',
             disConn: 'Disconnect',
             clean: 'Clear',
+            selectAll: 'Select all',
             login: 'Sign in',
             close: 'Close',
             stop: 'Stop',
@@ -243,7 +244,7 @@ const message = {
             composeName:
                 'Supports non-special characters at the beginning, lowercase letters, numbers, - and _, length 1-256',
             complexityPassword:
-                'This field must consist of English, numbers with a length of 8-30 and contain at least two special characters.',
+                'Supports password combinations with a length of 8-30 that contain at least two of letters, numbers, and special characters.',
             commonPassword: 'This field length must be more than 6.',
             linuxName:
                 'This field length must be between 1 and 128. The field mustn\'t contain these special characters: "{0}".',
@@ -2223,6 +2224,10 @@ const message = {
         language: 'Language',
         runtimeEnv: 'Runtime environment',
         offlineEnv: 'Offline environment',
+        offlineEnvHelper:
+            'After it is enabled, resources such as the App Store are read from the local server directory by default.\nSystem upgrades and agent upgrades require manually downloaded offline packages.',
+        offlineEnvOpenHelper: 'Are you sure you want to enable the offline environment?',
+        offlineEnvCloseHelper: 'Are you sure you want to disable the offline environment?',
         docSource: 'Documentation Source',
         withByRegion: 'Match Region Setting (Default)',
         withByLang: 'Match System Language',
@@ -2454,14 +2459,13 @@ const message = {
         unSetting: 'Not set',
         noneSetting:
             'Set the expiration time for the panel password. After the expiration, you need to reset the password',
-        expirationHelper: 'If the password expiration time is [0] days, the password expiration function is disabled',
-        days: 'Expiration Days',
+        expirationHelper: 'If the password expiration time is 0 days, the password expiration function is disabled',
+        days: 'Password expiration days',
         expiredHelper: 'The current password has expired. Please change the password again.',
-        timeoutHelper:
-            '[ {0} days ] The panel password is about to expire. After the expiration, you need to reset the password',
+        timeoutHelper: 'The panel password will expire in {0} days. After it expires, you need to reset the password',
         complexity: 'Complexity validation',
         complexityHelper:
-            'After you enable it, the password validation rule will be: 8-30 characters, including English, numbers, and at least two special characters.',
+            'After it is enabled, the password must be 8-30 characters long and contain at least two of letters, numbers, and special characters.',
         bindDomain: 'Bind domain',
         unBindDomain: 'Unbind domain',
         panelSSL: 'Panel SSL',
@@ -3737,15 +3741,16 @@ const message = {
         upage: 'AI Website Builder',
         proAlert: 'Upgrade to Pro to use this feature',
         user: {
-            accessControl: 'Permission Management',
             user: 'User',
             userInfo: 'User Info',
             userManage: 'User Management',
             superAdmin: 'Super Admin',
+            superAdminDesc: 'Has full system management permissions and can manage all resources and configurations.',
             nodeAdmin: 'Node Admin',
+            nodeAdminDesc:
+                'Has management permissions for specified nodes and can manage resources and configurations within those nodes.',
             bindNode: 'Bind Node',
             role: 'Role',
-            roleManage: 'Role Management',
             roleName: 'Name',
             permission: 'Permissions',
             permissionDuplicate: 'Only one role can be assigned to each node',
