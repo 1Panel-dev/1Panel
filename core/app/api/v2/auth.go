@@ -377,6 +377,23 @@ func (b *BaseApi) MFABind(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags System Setting
+// @Summary Close mfa
+// @Accept json
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/mfa/close [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"mfa 关闭","formatEN":"close mfa"}
+func (b *BaseApi) MFAClose(c *gin.Context) {
+	if err := xpack.AuthProvider.MFAClose(c); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	helper.Success(c)
+}
+
 // @Tags Auth
 // @Summary generate api key
 // @Accept json

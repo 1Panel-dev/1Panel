@@ -41,7 +41,6 @@ var baseSettingKeys = map[string]struct{}{
 	"NoAuthSetting":              {},
 	"DashboardMemoVisible":       {},
 	"DashboardSimpleNodeVisible": {},
-	"MFAStatus":                  {},
 	"Edition":                    {},
 	"DocSource":                  {},
 	"IsOffline":                  {},

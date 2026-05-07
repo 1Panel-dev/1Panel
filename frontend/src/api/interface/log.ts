@@ -48,6 +48,16 @@ export namespace Log {
         taskID?: string;
     }
 
+    export interface TaskLogReadReq {
+        page: number;
+        pageSize: number;
+        latest?: boolean;
+        taskID?: string;
+        taskType?: string;
+        taskOperate?: string;
+        resourceID?: number;
+    }
+
     export interface Task {
         id: string;
         name: string;
