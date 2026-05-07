@@ -118,7 +118,7 @@
                     </template>
                     <template #body>
                         <div style="position: relative; margin-top: 60px">
-                            <div class="monitor-tags" v-if="chartOption === 'network'">
+                            <div class="monitor-tags" :style="monitorTagsStyle" v-if="chartOption === 'network'">
                                 <el-tag>
                                     {{ $t('monitor.up') }}: {{ computeSizeFromKBs(currentChartInfo.netBytesSent) }}
                                 </el-tag>
@@ -128,7 +128,7 @@
                                 <el-tag>{{ $t('home.totalSend') }}: {{ computeSize(currentInfo.netBytesSent) }}</el-tag>
                                 <el-tag>{{ $t('home.totalRecv') }}: {{ computeSize(currentInfo.netBytesRecv) }}</el-tag>
                             </div>
-                            <div class="monitor-tags" v-if="chartOption === 'io'">
+                            <div class="monitor-tags" :style="monitorTagsStyle" v-if="chartOption === 'io'">
                                 <el-tag>{{ $t('monitor.read') }}: {{ currentChartInfo.ioReadBytes }} MB</el-tag>
                                 <el-tag>{{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB</el-tag>
                                 <el-tag>
@@ -468,6 +468,46 @@ const DASHBOARD_CACHE_TTL = {
     netOptions: 60 * 60 * 1000,
     ioOptions: 60 * 60 * 1000,
 };
+const monitorChartGrid = { left: 65, right: 65, bottom: '20%' };
+const monitorTagsStyle = {
+    left: `${monitorChartGrid.left}px`,
+    right: `${monitorChartGrid.right}px`,
+};
+const monitorChartEmptyLength = 20;
+const loadMonitorEmptyData = () => Array.from({ length: monitorChartEmptyLength }, () => null);
+const loadMonitorEmptyTime = () => Array.from({ length: monitorChartEmptyLength }, () => '');
+const loadMonitorChartData = (data: Array<number>) => (data.length === 0 ? loadMonitorEmptyData() : data);
+const loadMonitorChartTime = (data: Array<string>) => (data.length === 0 ? loadMonitorEmptyTime() : data);
+const loadIOChartOption = () => ({
+    xData: loadMonitorChartTime(timeIODatas.value),
+    yData: [
+        {
+            name: i18n.global.t('monitor.read'),
+            data: loadMonitorChartData(ioReadBytes.value),
+        },
+        {
+            name: i18n.global.t('monitor.write'),
+            data: loadMonitorChartData(ioWriteBytes.value),
+        },
+    ],
+    grid: monitorChartGrid,
+    formatStr: 'MB',
+});
+const loadNetworkChartOption = () => ({
+    xData: loadMonitorChartTime(timeNetDatas.value),
+    yData: [
+        {
+            name: i18n.global.t('monitor.up'),
+            data: loadMonitorChartData(netBytesSents.value),
+        },
+        {
+            name: i18n.global.t('monitor.down'),
+            data: loadMonitorChartData(netBytesRecvs.value),
+        },
+    ],
+    grid: monitorChartGrid,
+    formatStr: 'KB/s',
+});
 
 const statusRef = ref();
 const appRef = ref();
@@ -604,16 +644,8 @@ const currentChartInfo = reactive({
 const skipNextCurrentInfoDelta = ref(false);
 
 const chartsOption = ref({
-    ioChart: {
-        xData: [],
-        yData: [],
-        formatStr: 'MB',
-    },
-    networkChart: {
-        xData: [],
-        yData: [],
-        formatStr: 'KB/s',
-    },
+    ioChart: loadIOChartOption(),
+    networkChart: loadNetworkChartOption(),
 });
 
 const updateCurrentInfo = (data: Dashboard.CurrentInfo) => {
@@ -688,14 +720,21 @@ const onLoadIOOptions = async (force?: boolean) => {
 };
 
 const onLoadBaseInfo = async (isInit: boolean, range: string) => {
+    let resetChartData = false;
     if (range === 'all' || range === 'io') {
         ioReadBytes.value = [];
         ioWriteBytes.value = [];
         timeIODatas.value = [];
-    } else if (range === 'all' || range === 'network') {
+        resetChartData = true;
+    }
+    if (range === 'all' || range === 'network') {
         netBytesSents.value = [];
         netBytesRecvs.value = [];
         timeNetDatas.value = [];
+        resetChartData = true;
+    }
+    if (resetChartData) {
+        loadData();
     }
     const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
     baseInfo.value = res.data;
@@ -920,35 +959,9 @@ const saveMemo = async () => {
 
 const loadData = async () => {
     if (chartOption.value === 'io') {
-        chartsOption.value['ioChart'] = {
-            xData: timeIODatas.value,
-            yData: [
-                {
-                    name: i18n.global.t('monitor.read'),
-                    data: ioReadBytes.value,
-                },
-                {
-                    name: i18n.global.t('monitor.write'),
-                    data: ioWriteBytes.value,
-                },
-            ],
-            formatStr: 'MB',
-        };
+        chartsOption.value['ioChart'] = loadIOChartOption();
     } else {
-        chartsOption.value['networkChart'] = {
-            xData: timeNetDatas.value,
-            yData: [
-                {
-                    name: i18n.global.t('monitor.up'),
-                    data: netBytesSents.value,
-                },
-                {
-                    name: i18n.global.t('monitor.down'),
-                    data: netBytesRecvs.value,
-                },
-            ],
-            formatStr: 'KB/s',
-        };
+        chartsOption.value['networkChart'] = loadNetworkChartOption();
     }
 };
 
@@ -1208,12 +1221,9 @@ onBeforeUnmount(() => {
 .monitor-tags {
     position: absolute;
     top: -10px;
-    left: 20px;
-
-    :deep(.el-tag) {
-        margin-right: 10px;
-        margin-bottom: 10px;
-    }
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .version {
