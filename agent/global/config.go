@@ -7,15 +7,16 @@ type ServerConfig struct {
 }
 
 type Base struct {
-	Port       string `mapstructure:"port"`
-	IsFxplay   bool   `mapstructure:"is_fxplay"`
-	Edition    string `mapstructure:"edition"` // [ cn / intl]
-	Version    string `mapstructure:"version"`
-	EncryptKey string `mapstructure:"encrypt_key"`
-	Mode       string `mapstructure:"mode"` // xpack [ Enable / Disable ]
-	IsDemo     bool   `mapstructure:"is_demo"`
-	InstallDir string `mapstructure:"install_dir"`
-	IsOffline  bool   `mapstructure:"is_offline"`
+	Port         string `mapstructure:"port"`
+	IsFxplay     bool   `mapstructure:"is_fxplay"`
+	IsEnterprise bool   `mapstructure:"is_enterprise"`
+	Edition      string `mapstructure:"edition"` // [ cn / intl]
+	Version      string `mapstructure:"version"`
+	EncryptKey   string `mapstructure:"encrypt_key"`
+	Mode         string `mapstructure:"mode"` // xpack [ Enable / Disable ]
+	IsDemo       bool   `mapstructure:"is_demo"`
+	InstallDir   string `mapstructure:"install_dir"`
+	IsOffline    bool   `mapstructure:"is_offline"`
 }
 
 type SystemDir struct {
