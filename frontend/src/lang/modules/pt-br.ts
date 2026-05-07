@@ -26,6 +26,7 @@ const message = {
             conn: 'Conectar',
             disConn: 'Desconectar',
             clean: 'Limpar',
+            selectAll: 'Selecionar tudo',
             login: 'Entrar',
             close: 'Fechar',
             off: 'Fechar',
@@ -240,7 +241,7 @@ const message = {
             supervisorName:
                 'Este campo deve começar com caracteres não especiais e conter letras, números, "-" e "_" com comprimento de 1-128.',
             complexityPassword:
-                'Este campo deve conter letras, números com comprimento de 8-30 e pelo menos dois caracteres especiais.',
+                'Suporta combinações de senha com comprimento de 8 a 30 que contenham pelo menos dois destes tipos: letras, números e caracteres especiais.',
             commonPassword: 'O comprimento deste campo deve ser maior que 6.',
             linuxName:
                 'O comprimento deste campo deve estar entre 1 e 128. Não pode conter os seguintes caracteres especiais: "{0}".',
@@ -2383,6 +2384,10 @@ const message = {
         language: 'Idioma',
         runtimeEnv: 'Ambiente de execução',
         offlineEnv: 'Ambiente offline',
+        offlineEnvHelper:
+            'Após ativar, recursos como a Loja de Aplicativos serão lidos por padrão do diretório local do servidor.\nAtualizações do sistema e de agentes exigem pacotes offline baixados manualmente.',
+        offlineEnvOpenHelper: 'Tem certeza de que deseja ativar o ambiente offline?',
+        offlineEnvCloseHelper: 'Tem certeza de que deseja desativar o ambiente offline?',
         docSource: 'Fonte da documentação',
         withByRegion: 'Seguir região de operação (Padrão)',
         withByLang: 'Seguir idioma do sistema',
@@ -2606,14 +2611,14 @@ const message = {
         noneSetting:
             'Defina o tempo de expiração da senha do painel. Após a expiração, será necessário redefinir a senha.',
         expirationHelper:
-            'Se o tempo de expiração da senha for [0] dias, a função de expiração da senha estará desativada.',
-        days: 'Dias de Expiração',
+            'Se o tempo de expiração da senha for 0 dias, a função de expiração da senha estará desativada.',
+        days: 'Dias de expiração da senha',
         expiredHelper: 'A senha atual expirou. Por favor, altere a senha novamente.',
         timeoutHelper:
-            '[ {0} dias ] A senha do painel está prestes a expirar. Após a expiração, será necessário redefinir a senha.',
+            'A senha do painel expirará em {0} dias. Após a expiração, será necessário redefinir a senha.',
         complexity: 'Validação de Complexidade',
         complexityHelper:
-            'Após ativar, a regra de validação de senha será: 8-30 caracteres, incluindo letras, números e pelo menos dois caracteres especiais.',
+            'Após ativar, a senha deve ter de 8 a 30 caracteres e conter pelo menos dois destes tipos: letras, números e caracteres especiais.',
         bindDomain: 'Vincular domínio',
         unBindDomain: 'Desvincular domínio',
         panelSSL: 'SSL do Painel',
@@ -3960,15 +3965,17 @@ const message = {
         upage: 'Construtor de Sites com IA',
         proAlert: 'Atualize para Pro para usar este recurso',
         user: {
-            accessControl: 'Gerenciamento de permissões',
             user: 'Usuário',
             userInfo: 'Informações do Usuário',
             userManage: 'Gerenciamento de Usuários',
             superAdmin: 'Super Administrador',
+            superAdminDesc:
+                'Possui permissões completas de gerenciamento do sistema e pode gerenciar todos os recursos e configurações.',
             nodeAdmin: 'Administrador de Nó',
+            nodeAdminDesc:
+                'Possui permissões de gerenciamento para nós especificados e pode gerenciar recursos e configurações dentro desses nós.',
             bindNode: 'Vincular Nó',
             role: 'Função',
-            roleManage: 'Gerenciamento de funções',
             roleName: 'Nome',
             permission: 'Permissões',
             permissionDuplicate: 'Apenas uma função pode ser atribuída a cada nó',

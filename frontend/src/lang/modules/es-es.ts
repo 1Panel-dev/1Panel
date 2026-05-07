@@ -29,6 +29,7 @@ const message = {
             conn: 'Conectar',
             disconn: 'Desconectar',
             clean: 'Limpiar',
+            selectAll: 'Seleccionar todo',
             login: 'Iniciar sesión',
             close: 'Cerrar',
             stop: 'Detener',
@@ -245,7 +246,7 @@ const message = {
             composeName:
                 'Debe comenzar con un carácter no especial, permite minúsculas, números, - y _, longitud de 1 a 256',
             complexityPassword:
-                'Este campo debe estar compuesto por letras, números, con una longitud de 8 a 30 y contener al menos dos caracteres especiales.',
+                'Admite combinaciones de contraseña de 8 a 30 caracteres que contengan al menos dos de estos tipos: letras, números y caracteres especiales.',
             commonPassword: 'La longitud de este campo debe ser mayor a 6.',
             linuxName:
                 'La longitud de este campo debe estar entre 1 y 128. El campo no debe contener los siguientes caracteres especiales: "{0}".',
@@ -2266,6 +2267,10 @@ const message = {
         language: 'Idioma',
         runtimeEnv: 'Entorno de ejecución',
         offlineEnv: 'Entorno sin conexión',
+        offlineEnvHelper:
+            'Después de habilitarlo, recursos como la Tienda de aplicaciones se leerán de forma predeterminada desde el directorio local del servidor.\nLas actualizaciones del sistema y de agentes requieren paquetes sin conexión descargados manualmente.',
+        offlineEnvOpenHelper: '¿Seguro que quieres habilitar el entorno sin conexión?',
+        offlineEnvCloseHelper: '¿Seguro que quieres deshabilitar el entorno sin conexión?',
         docSource: 'Fuente de documentación',
         withByRegion: 'Seguir región de operación (Predeterminado)',
         withByLang: 'Seguir idioma del sistema',
@@ -2510,14 +2515,14 @@ const message = {
         noneSetting:
             'Establece el tiempo de expiración para la contraseña del panel. Tras expirar, deberás restablecer la contraseña',
         expirationHelper:
-            'Si el tiempo de expiración de la contraseña es [0] días, la función de expiración estará desactivada',
-        days: 'Días de expiración',
+            'Si el tiempo de expiración de la contraseña es 0 días, la función de expiración estará desactivada',
+        days: 'Días de expiración de contraseña',
         expiredHelper: 'La contraseña actual ha expirado. Por favor cámbiala de nuevo.',
         timeoutHelper:
-            '[ {0} días ] La contraseña del panel está a punto de expirar. Tras expirar, deberás restablecerla',
+            'La contraseña del panel expirará en {0} días. Tras expirar, deberás restablecerla',
         complexity: 'Validación de complejidad',
         complexityHelper:
-            'Tras habilitarlo, la regla de validación de contraseña será: 8-30 caracteres, incluyendo letras, números y al menos dos caracteres especiales.',
+            'Tras habilitarlo, la contraseña debe tener entre 8 y 30 caracteres y contener al menos dos de estos tipos: letras, números y caracteres especiales.',
         bindDomain: 'Vincular dominio',
         unBindDomain: 'Desvincular dominio',
         panelSSL: 'SSL del panel',
@@ -3782,15 +3787,17 @@ const message = {
         upage: 'Constructor Web con IA',
         proAlert: 'Actualiza a Pro para usar esta función',
         user: {
-            accessControl: 'Gestión de permisos',
             user: 'Usuario',
             userInfo: 'Información de usuario',
             userManage: 'Gestión de usuarios',
             superAdmin: 'Superadministrador',
+            superAdminDesc:
+                'Tiene permisos completos de administración del sistema y puede gestionar todos los recursos y configuraciones.',
             nodeAdmin: 'Administrador de nodo',
+            nodeAdminDesc:
+                'Tiene permisos de administración para nodos especificados y puede gestionar recursos y configuraciones dentro de esos nodos.',
             bindNode: 'Vincular nodo',
             role: 'Rol',
-            roleManage: 'Gestión de roles',
             roleName: 'Nombre',
             permission: 'Permisos',
             permissionDuplicate: 'Solo se puede asignar un rol a cada nodo',

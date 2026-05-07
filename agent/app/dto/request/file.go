@@ -169,6 +169,13 @@ type FileReadByLineReq struct {
 	TaskReq
 }
 
+type TaskLogReadReq struct {
+	Page     int  `json:"page" validate:"required,min=1"`
+	PageSize int  `json:"pageSize" validate:"required,min=1"`
+	Latest   bool `json:"latest"`
+	TaskReq
+}
+
 type TaskReq struct {
 	TaskID      string `json:"taskID"`
 	TaskType    string `json:"taskType"`

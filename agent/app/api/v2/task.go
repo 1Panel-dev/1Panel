@@ -3,6 +3,8 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,6 +30,31 @@ func (b *BaseApi) PageTasks(c *gin.Context) {
 		Items: list,
 		Total: total,
 	})
+}
+
+// @Tags TaskLog
+// @Summary Read task log by Line
+// @Param request body request.TaskLogReadReq true "request"
+// @Success 200 {object} response.FileLineContent
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /logs/tasks/read [post]
+func (b *BaseApi) ReadTaskLogByLine(c *gin.Context) {
+	var req request.TaskLogReadReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	var res *response.FileLineContent
+	res, err := taskService.ReadByLine(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	if res.TotalLines > 100 {
+		helper.SuccessWithDataGzipped(c, res)
+	} else {
+		helper.SuccessWithData(c, res)
+	}
 }
 
 // @Tags TaskLog

@@ -55,6 +55,9 @@ export const loadMFA = (params: Login.MFARequest) => {
 export const bindMFA = (params: Login.MFABind) => {
     return http.post(`/core/auth/mfa/bind`, params);
 };
+export const closeMFA = () => {
+    return http.post(`/core/auth/mfa/close`);
+};
 export const generateApiKey = () => {
     return http.post<string>(`/core/auth/api/generate`);
 };

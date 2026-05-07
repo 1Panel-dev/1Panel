@@ -29,6 +29,7 @@ const message = {
             conn: 'Bağlan',
             disconn: 'Bağlantıyı Kes',
             clean: 'Temizle',
+            selectAll: 'Tümünü seç',
             login: 'Oturum Aç',
             close: 'Kapat',
             stop: 'Durdur',
@@ -245,7 +246,7 @@ const message = {
             composeName:
                 'Başlangıçta özel olmayan karakterleri, küçük harfleri, rakamları, - ve _ destekler, uzunluk 1-256',
             complexityPassword:
-                'Bu alan İngilizce, rakamlardan oluşmalı, uzunluk 8-30 olmalı ve en az iki özel karakter içermelidir.',
+                '8-30 uzunluğunda, harf, rakam ve özel karakterlerden en az iki tür içeren parola kombinasyonlarını destekler.',
             commonPassword: 'Bu alanın uzunluğu 6dan fazla olmalıdır.',
             linuxName:
                 'Bu alanın uzunluğu 1 ile 128 arasında olmalıdır. Alan şu özel karakterleri içermemelidir: "{0}".',
@@ -2262,6 +2263,10 @@ const message = {
         language: 'Dil',
         runtimeEnv: 'Çalışma ortamı',
         offlineEnv: 'Çevrimdışı ortam',
+        offlineEnvHelper:
+            'Etkinleştirildikten sonra App Store gibi kaynaklar varsayılan olarak sunucunun yerel dizininden okunur.\nSistem yükseltmeleri ve aracı yükseltmeleri için çevrimdışı paketlerin manuel olarak indirilmesi gerekir.',
+        offlineEnvOpenHelper: 'Çevrimdışı ortamı etkinleştirmek istediğinizden emin misiniz?',
+        offlineEnvCloseHelper: 'Çevrimdışı ortamı devre dışı bırakmak istediğinizden emin misiniz?',
         docSource: 'Dokümantasyon kaynağı',
         withByRegion: 'Çalışma bölgesini takip et (Varsayılan)',
         withByLang: 'Sistem dilini takip et',
@@ -2499,14 +2504,14 @@ const message = {
         unSetting: 'Ayarlanmadı',
         noneSetting:
             'Panel parolasının son kullanma tarihini ayarlayın. Son kullanma tarihinden sonra parolayı sıfırlamanız gerekir',
-        expirationHelper: 'Parola son kullanma süresi [0] gün ise, parola son kullanma işlevi devre dışı bırakılır',
-        days: 'Son Kullanım Günleri',
+        expirationHelper: 'Parola son kullanma süresi 0 gün ise, parola son kullanma işlevi devre dışı bırakılır',
+        days: 'Parola son kullanma günleri',
         expiredHelper: 'Geçerli parola süresi doldu. Lütfen parolayı tekrar değiştirin.',
         timeoutHelper:
-            '[ {0} gün ] Panel parolası süresi dolmak üzere. Süre dolduktan sonra parolayı sıfırlamanız gerekir',
+            'Panel parolasının süresi {0} gün sonra dolacak. Süre dolduktan sonra parolayı sıfırlamanız gerekir',
         complexity: 'Karmaşıklık doğrulaması',
         complexityHelper:
-            'Etkinleştirildiğinde, parola doğrulama kuralı şu olacaktır: 8-30 karakter, İngilizce, sayılar ve en az iki özel karakter içerir.',
+            'Etkinleştirildiğinde parola 8-30 karakter uzunluğunda olmalı ve harf, rakam ve özel karakterlerden en az iki tür içermelidir.',
         bindDomain: 'Alan adı bağla',
         unBindDomain: 'Alan adı bağlamasını kaldır',
         panelSSL: 'Panel SSL',
@@ -3814,15 +3819,16 @@ const message = {
         upage: 'AI Web Sitesi Oluşturucu',
         proAlert: 'Bu özelliği kullanmak için Proya yükseltin',
         user: {
-            accessControl: 'İzin Yönetimi',
             user: 'Kullanıcı',
             userInfo: 'Kullanıcı Bilgileri',
             userManage: 'Kullanıcı Yönetimi',
             superAdmin: 'Süper Yönetici',
+            superAdminDesc: 'Tam sistem yönetim izinlerine sahiptir ve tüm kaynakları ve yapılandırmaları yönetebilir.',
             nodeAdmin: 'Düğüm Yöneticisi',
+            nodeAdminDesc:
+                'Belirtilen düğümler için yönetim izinlerine sahiptir ve bu düğümlerdeki kaynakları ve yapılandırmaları yönetebilir.',
             bindNode: 'Düğüm Bağla',
             role: 'Rol',
-            roleManage: 'Rol Yönetimi',
             roleName: 'Ad',
             permission: 'İzinler',
             permissionDuplicate: 'Her düğüme yalnızca bir rol atanabilir',

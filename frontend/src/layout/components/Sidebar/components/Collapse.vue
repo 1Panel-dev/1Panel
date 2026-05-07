@@ -54,21 +54,17 @@
                             v-for="item in nodeOptions"
                             :key="item.name"
                         >
-                            <div class="node">
-                                <SvgIcon class="icon" iconName="p-zhuji" />
-                                {{ item.name === 'local' ? globalStore.getMasterAlias() : item.name }}
-                                <el-tooltip
-                                    v-if="item.status !== 'Healthy' || !item.isBound"
-                                    :content="
-                                        item.isBound ? $t('xpack.node.nodeUnhealthy') : $t('xpack.node.nodeUnbind')
-                                    "
-                                    placement="right"
-                                >
-                                    <el-icon class="icon-status" type="danger">
-                                        <Warning />
-                                    </el-icon>
-                                </el-tooltip>
-                            </div>
+                            <SvgIcon class="icon" iconName="p-zhuji" />
+                            {{ item.name === 'local' ? globalStore.getMasterAlias() : item.name }}
+                            <el-tooltip
+                                v-if="item.status !== 'Healthy' || !item.isBound"
+                                :content="item.isBound ? $t('xpack.node.nodeUnhealthy') : $t('xpack.node.nodeUnbind')"
+                                placement="right"
+                            >
+                                <el-icon class="icon-status" type="danger">
+                                    <Warning />
+                                </el-icon>
+                            </el-tooltip>
                         </div>
                     </el-scrollbar>
                 </div>
@@ -342,7 +338,8 @@ onMounted(() => {
 .dropdown-item {
     display: flex;
     align-items: center;
-    padding: 2px 8px;
+    gap: 6px;
+    padding: 5px 8px;
     cursor: pointer;
     line-height: 26px;
     transition: background 0.3s;
@@ -351,21 +348,6 @@ onMounted(() => {
     }
     .icon-status {
         font-size: 16px;
-        margin-left: auto;
-    }
-    .node {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 3px 0;
-        width: 100%;
-    }
-    .node-name {
-        flex: 1;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
     }
     .msg-tag {
         margin-top: 3px;
