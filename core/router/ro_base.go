@@ -26,6 +26,7 @@ func (s *BaseRouter) InitRouter(Router *gin.RouterGroup) {
 
 		authRouter.POST("/mfa", baseApi.LoadMFA)
 		authRouter.POST("/mfa/bind", baseApi.MFABind)
+		authRouter.POST("/mfa/close", baseApi.MFAClose)
 
 		authRouter.POST("/passkey/register/begin", baseApi.PasskeyRegisterBegin)
 		authRouter.POST("/passkey/register/finish", baseApi.PasskeyRegisterFinish)

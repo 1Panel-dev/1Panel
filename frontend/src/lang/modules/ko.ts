@@ -26,6 +26,7 @@ const message = {
             conn: '연결',
             disConn: '연결 해제',
             clean: '지우기',
+            selectAll: '전체 선택',
             login: '로그인',
             close: '닫기',
             off: '꺼짐',
@@ -238,7 +239,7 @@ const message = {
             supervisorName:
                 '이 필드는 특수 문자로 시작할 수 없으며, 영어, 숫자, "-", "_" 문자로 구성되어야 하며 길이는 1-128 자여야 합니다.',
             complexityPassword:
-                '이 필드는 영어와 숫자로 구성되어야 하며 길이는 8-30 자이고 최소 두 개의 특수 문자가 포함되어야 합니다.',
+                '길이 8-30 자이며 영문, 숫자, 특수 문자 중 최소 두 가지를 포함하는 비밀번호 조합을 지원합니다.',
             commonPassword: '이 필드 길이는 6 자 이상이어야 합니다.',
             linuxName: '이 필드 길이는 1-128 자 사이여야 하며, 다음 특수 문자를 포함할 수 없습니다: "{0}".',
             email: '이 필드는 유효한 이메일 주소여야 합니다.',
@@ -2196,6 +2197,10 @@ const message = {
         language: '언어',
         runtimeEnv: '실행 환경',
         offlineEnv: '오프라인 환경',
+        offlineEnvHelper:
+            '활성화하면 앱 스토어 등의 리소스를 기본적으로 서버 로컬 디렉터리에서 읽습니다.\n시스템 업그레이드와 에이전트 업그레이드는 오프라인 패키지를 수동으로 다운로드해야 합니다.',
+        offlineEnvOpenHelper: '오프라인 환경을 활성화하시겠습니까?',
+        offlineEnvCloseHelper: '오프라인 환경을 비활성화하시겠습니까?',
         docSource: '문서 출처',
         withByRegion: '운영 지역 따름(기본값)',
         withByLang: '시스템 언어 따름',
@@ -2401,13 +2406,13 @@ const message = {
         expirationTime: '만료 날짜',
         unSetting: '미설정',
         noneSetting: '패널 비밀번호의 만료 시간을 설정합니다. 만료 후 비밀번호를 재설정해야 합니다.',
-        expirationHelper: '비밀번호 만료 시간이 [0]일인 경우 비밀번호 만료 기능이 비활성화됩니다.',
-        days: '만료 일수',
+        expirationHelper: '비밀번호 만료 시간이 0일인 경우 비밀번호 만료 기능이 비활성화됩니다.',
+        days: '비밀번호 만료 일수',
         expiredHelper: '현재 비밀번호가 만료되었습니다. 비밀번호를 다시 변경하십시오.',
-        timeoutHelper: '[ {0}일 ] 패널 비밀번호가 곧 만료됩니다. 만료 후 비밀번호를 재설정해야 합니다.',
+        timeoutHelper: '패널 비밀번호가 {0}일 후 만료됩니다. 만료 후 비밀번호를 재설정해야 합니다.',
         complexity: '복잡성 검증',
         complexityHelper:
-            '활성화하면 비밀번호 검증 규칙이 8-30 자, 영어, 숫자 및 최소 두 개의 특수 문자 포함으로 설정됩니다.',
+            '활성화하면 비밀번호는 8-30 자이며 영문, 숫자, 특수 문자 중 최소 두 가지를 포함해야 합니다.',
         bindDomain: '도메인 바인딩',
         unBindDomain: '도메인 바인딩 해제',
         panelSSL: '패널 SSL',
@@ -2636,8 +2641,7 @@ const message = {
         importHelper: '라이센스 파일을 여기에 클릭하거나 드래그하세요',
         licenseRequiredTip:
             '아직 라이선스를 가져오지 않았습니다. 장치 ID를 복사해 라이선스를 받은 뒤 가져와야 로그인할 수 있습니다.',
-        licenseRequiredShortTip:
-            '먼저 장치 ID를 복사해 라이선스를 받은 뒤, 라이선스를 가져오면 로그인할 수 있습니다.',
+        licenseRequiredShortTip: '먼저 장치 ID를 복사해 라이선스를 받은 뒤, 라이선스를 가져오면 로그인할 수 있습니다.',
         licenseRequiredUserTip:
             'Enterprise Edition 라이선스가 바인딩되지 않았습니다. 슈퍼 관리자에게 라이선스 가져오기를 요청하세요.',
         technicalAdvice: '기술 상담',
@@ -3692,15 +3696,15 @@ const message = {
         upage: 'AI 웹사이트 빌더',
         proAlert: '이 기능을 사용하려면 Pro로 업그레이드하세요',
         user: {
-            accessControl: '권한 관리',
             user: '사용자',
             userInfo: '사용자 정보',
             userManage: '사용자 관리',
             superAdmin: '최고 관리자',
+            superAdminDesc: '시스템 전체 관리 권한을 보유하며 모든 리소스와 설정을 관리할 수 있습니다.',
             nodeAdmin: '노드 관리자',
+            nodeAdminDesc: '지정된 노드의 관리 권한을 보유하며 노드 내 리소스와 설정을 관리할 수 있습니다.',
             bindNode: '노드 연결',
             role: '역할',
-            roleManage: '역할 관리',
             roleName: '이름',
             permission: '권한',
             permissionDuplicate: '각 노드에는 하나의 역할만 지정할 수 있습니다',

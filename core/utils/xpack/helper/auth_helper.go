@@ -73,6 +73,9 @@ func (a *authHelper) LoadMFA(_ *gin.Context, req baseDto.MfaRequest) (mfa.Otp, e
 func (a *authHelper) MFABind(_ *gin.Context, req baseDto.MfaCredential) error {
 	return auth.MFABind(req)
 }
+func (a *authHelper) MFAClose(_ *gin.Context) error {
+	return auth.MFAClose()
+}
 func (a *authHelper) GenerateApiKey(_ *gin.Context) (string, error) {
 	return auth.GenerateApiKey()
 }

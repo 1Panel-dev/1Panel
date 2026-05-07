@@ -40,13 +40,6 @@
                         autocomplete="current-password"
                     />
                 </el-form-item>
-                <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
-                    <el-input v-model.number="form.sessionTimeout" name="profile-session-timeout" autocomplete="off" />
-                    <span class="input-help">
-                        {{ $t('setting.sessionTimeoutHelper', [form.sessionTimeout]) }}
-                    </span>
-                </el-form-item>
-
                 <el-form-item :label="$t('setting.days')" prop="expirationDays">
                     <el-input
                         clearable
@@ -63,6 +56,12 @@
                         </span>
                     </div>
                     <span class="input-help">{{ $t('setting.expirationHelper') }}</span>
+                </el-form-item>
+                <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
+                    <el-input v-model.number="form.sessionTimeout" name="profile-session-timeout" autocomplete="off" />
+                    <span class="input-help">
+                        {{ $t('setting.sessionTimeoutHelper', [form.sessionTimeout]) }}
+                    </span>
                 </el-form-item>
             </el-form>
 
@@ -395,6 +394,7 @@ import DialogPro from '@/components/dialog-pro/index.vue';
 import { Login } from '@/api/interface/auth';
 import {
     bindMFA,
+    closeMFA,
     generateApiKey,
     loadMFA,
     passkeyDelete,
@@ -846,6 +846,17 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     const valid = await formEl.validateField(getUserFormFields(), () => {});
     if (!valid) return;
+    const needReLogin = form.name !== props.currentUser?.name || !!form.password;
+    if (needReLogin) {
+        try {
+            await ElMessageBox.confirm(i18n.global.t('setting.userChangeHelper'), i18n.global.t('setting.userChange'), {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            });
+        } catch {
+            return;
+        }
+    }
     const param: Login.AuthInfoUpdate = {
         id: form.id,
         name: form.name,
@@ -861,9 +872,13 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             loading.value = false;
             open.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            globalStore.setLogStatus(false);
-            globalStore.clearAuthInfo();
-            router.push({ name: 'entrance', params: { code: globalStore.entrance } });
+            if (needReLogin) {
+                globalStore.setLogStatus(false);
+                globalStore.clearAuthInfo();
+                router.push({ name: 'entrance', params: { code: globalStore.entrance } });
+                return;
+            }
+            emit('search');
         })
         .catch(() => {
             loading.value = false;
@@ -959,7 +974,7 @@ const handleMFA = async () => {
     })
         .then(async () => {
             loading.value = true;
-            await updateSetting({ key: 'MFAStatus', value: 'Disable' })
+            await closeMFA()
                 .then(async () => {
                     loading.value = false;
                     mfaDialogOpen.value = false;
