@@ -50,7 +50,7 @@ func Proxy() gin.HandlerFunc {
 			return
 		}
 
-		if c.Request.URL.Path == "/api/v2/hosts/terminal" {
+		if c.Request.URL.Path == "/api/v2/hosts/terminal" && (currentNode == "local" || len(currentNode) == 0) {
 			proxyLocalAgent(c)
 			return
 		}
