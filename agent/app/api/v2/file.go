@@ -411,7 +411,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 		helper.BadRequest(c, errors.New("error paths in request"))
 		return
 	}
-	dir := path.Dir(paths[0])
+	dir := path.Clean(paths[0])
 
 	_, err = os.Stat(dir)
 	if err != nil && os.IsNotExist(err) {
@@ -452,8 +452,14 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 			}
 			_ = os.Chown(dstDir, uid, gid)
 		}
+		dstDirMode := mode
+		dstFileMode := mode.Perm()
+		if dstDirInfo, err := os.Stat(dstDir); err == nil {
+			dstDirMode = dstDirInfo.Mode()
+			dstFileMode = dstDirInfo.Mode().Perm()
+		}
 		tmpFilename := dstFilename + ".tmp"
-		if err := c.SaveUploadedFile(file, tmpFilename); err != nil {
+		if err := c.SaveUploadedFile(file, tmpFilename, dstDirMode); err != nil {
 			_ = os.Remove(tmpFilename)
 			e := fmt.Errorf("upload [%s] file failed, err: %v", file.Filename, err)
 			failures[file.Filename] = e
@@ -476,7 +482,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 		if statErr == nil {
 			_ = os.Chmod(dstFilename, dstInfo.Mode())
 		} else {
-			_ = os.Chmod(dstFilename, mode)
+			_ = os.Chmod(dstFilename, dstFileMode)
 		}
 		if uid != -1 && gid != -1 {
 			_ = os.Chown(dstFilename, uid, gid)
@@ -787,12 +793,13 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int,
 			return err
 		}
 	}
+	if dstDirInfo, err := os.Stat(dstDir); err == nil {
+		mode = dstDirInfo.Mode().Perm()
+	}
 	dstFileName := filepath.Join(dstDir, fileName)
 	dstInfo, statErr := os.Stat(dstFileName)
 	if statErr == nil {
 		mode = dstInfo.Mode()
-	} else {
-		mode = 0644
 	}
 	if overwrite {
 		_ = os.Remove(dstFileName)
@@ -814,6 +821,7 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int,
 		}
 		_ = os.Remove(chunkPath)
 	}
+	_ = os.Chmod(dstFileName, mode)
 
 	return nil
 }
