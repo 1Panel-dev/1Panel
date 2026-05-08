@@ -168,7 +168,7 @@
                     height="368px"
                     indicator-position=""
                     arrow="never"
-                    :autoplay="!memoEditing"
+                    :autoplay="!showMemoCarousel || !memoEditing"
                 >
                     <el-carousel-item key="systemInfo">
                         <CardWithHeader :header="$t('home.systemInfo')">
