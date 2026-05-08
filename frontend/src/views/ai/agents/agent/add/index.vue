@@ -109,7 +109,7 @@ import { checkNumberRange, Rules } from '@/global/form-rules';
 import { createAgent, getAgentProviders, pageAgentAccounts } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import { getAppByKey, getAppDetail } from '@/api/modules/app';
-import { getAgentSettingByKey } from '@/api/modules/setting';
+import { getAgentSettingInfo } from '@/api/modules/setting';
 import { getRandomStr, newUUID } from '@/utils/id';
 import {
     buildDefaultAllowedOrigin,
@@ -228,8 +228,8 @@ const syncAllowedOriginsWithDefault = (force = false) => {
 
 const loadSystemIP = async () => {
     try {
-        const res = await getAgentSettingByKey('SystemIP');
-        systemIP.value = String(res.data || '').trim();
+        const res = await getAgentSettingInfo();
+        systemIP.value = String(res.data?.systemIP || '').trim();
     } catch (error) {
         systemIP.value = '';
     }

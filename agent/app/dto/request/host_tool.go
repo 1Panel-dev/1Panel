@@ -1,8 +1,12 @@
 package request
 
-type HostToolReq struct {
+type HostToolTypeReq struct {
+	Type string `json:"type" validate:"required,oneof=supervisord"`
+}
+
+type HostToolOperateReq struct {
 	Type    string `json:"type" validate:"required,oneof=supervisord"`
-	Operate string `json:"operate" validate:"oneof=status restart start stop"`
+	Operate string `json:"operate" validate:"required,oneof=restart start stop"`
 }
 
 type HostToolCreate struct {
@@ -15,13 +19,8 @@ type SupervisorConfig struct {
 	ServiceName string `json:"serviceName"`
 }
 
-type HostToolLogReq struct {
-	Type string `json:"type" validate:"required,oneof=supervisord"`
-}
-
-type HostToolConfig struct {
+type HostToolConfigUpdate struct {
 	Type    string `json:"type" validate:"required,oneof=supervisord"`
-	Operate string `json:"operate" validate:"oneof=get set"`
 	Content string `json:"content"`
 }
 
@@ -40,6 +39,18 @@ type SupervisorProcessConfig struct {
 type SupervisorProcessFileReq struct {
 	Name    string `json:"name" validate:"required"`
 	Operate string `json:"operate" validate:"required,oneof=get clear update" `
+	Content string `json:"content"`
+	File    string `json:"file" validate:"required,oneof=out.log err.log config"`
+}
+
+type HostSupervisorProcessFileGetReq struct {
+	Name string `json:"name" validate:"required"`
+	File string `json:"file" validate:"required,oneof=out.log err.log config"`
+}
+
+type HostSupervisorProcessFileOperateReq struct {
+	Name    string `json:"name" validate:"required"`
+	Operate string `json:"operate" validate:"required,oneof=clear update"`
 	Content string `json:"content"`
 	File    string `json:"file" validate:"required,oneof=out.log err.log config"`
 }
