@@ -43,9 +43,6 @@ export const loadLicenseOptions = () => {
 export const listNodeOptions = (type: string) => {
     return http.post<Array<Setting.NodeItem>>(`/core/nodes/list`, { type: type });
 };
-export const listAllNodes = () => {
-    return http.get<Array<Setting.NodeItem>>(`/core/nodes/all`);
-};
 export const listAllSimpleNodes = () => {
     return http.get<Array<Setting.SimpleNodeItem>>(`/core/nodes/simple/all`);
 };
@@ -106,9 +103,6 @@ export const getAgentFileHistoryInfo = () => {
 };
 export const updateAgentFileHistoryInfo = (param: Setting.FileHistoryInfo) => {
     return http.post(`/settings/file-history/update`, param);
-};
-export const getAgentSettingByKey = (key: string) => {
-    return http.get<string>(`/settings/get/${key}`);
 };
 export const updateCommonDescription = (param: Setting.CommonDescription) => {
     return http.post(`/settings/description/save`, param);

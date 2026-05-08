@@ -20,7 +20,6 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/terminal/ai/update", baseApi.UpdateTerminalAISetting)
 		settingRouter.POST("/files/ai/update", baseApi.UpdateFileManageAISetting)
 		settingRouter.POST("/file-history/update", baseApi.UpdateFileHistorySetting)
-		settingRouter.GET("/get/:key", baseApi.GetSettingByKey)
 
 		settingRouter.POST("/description/save", baseApi.SaveDescription)
 

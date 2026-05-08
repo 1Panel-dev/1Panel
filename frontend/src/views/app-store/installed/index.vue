@@ -157,7 +157,7 @@ import { App } from '@/api/interface/app';
 import { jumpToPath } from '@/utils/router';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
-import { getAgentSettingByKey } from '@/api/modules/setting';
+import { getAgentSettingInfo } from '@/api/modules/setting';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { currentNode, isMaster, currentNodeAddr, isIntl } = useGlobalStore();
@@ -510,9 +510,9 @@ const exitSortMode = () => {
 
 const getConfig = async () => {
     try {
-        const res = await getAgentSettingByKey('SystemIP');
-        if (res.data != '') {
-            defaultLink.value = res.data;
+        const res = await getAgentSettingInfo();
+        if (res.data?.systemIP) {
+            defaultLink.value = res.data.systemIP;
             return;
         }
         if (!isMaster.value || currentNodeAddr.value != '127.0.0.1') {

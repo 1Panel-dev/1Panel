@@ -681,6 +681,41 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/agents/channel/delete": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentChannelDeleteReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete Agent channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/agents/channel/dingtalk/get": {
 			"post": {
 				"consumes": [
@@ -1154,6 +1189,44 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/agents/channel/weixin/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentWeixinConfig"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Agent Weixin channel config",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/agents/channel/weixin/login": {
 			"post": {
 				"consumes": [
@@ -1292,6 +1365,158 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Delete Agent",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/delete/check": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AppResource"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete check Agent",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/hermes/chat/sessions": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentHermesChatSessionItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Hermes chat sessions",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/hermes/chat/sessions/delete": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentHermesChatSessionDeleteReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete Hermes chat session",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/hermes/chat/sessions/rename": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentHermesChatSessionRenameReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Rename Hermes chat session",
 				"tags": [
 					"AI"
 				]
@@ -1914,6 +2139,41 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/agents/skills/uninstall": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentSkillUninstallReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Uninstall Agent skill",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/agents/skills/update": {
 			"post": {
 				"consumes": [
@@ -2019,6 +2279,41 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/agents/website/unbind": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentIDReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Unbind Agent website",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/domain/bind": {
 			"post": {
 				"consumes": [
@@ -2113,6 +2408,41 @@ const docTemplate = `{
 				"summary": "Load gpu / xpu info",
 				"tags": [
 					"AI"
+				]
+			}
+		},
+		"/ai/gpu/search": {
+			"post": {
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MonitorGPUSearch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.MonitorGPUData"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load monitor data",
+				"tags": [
+					"Monitor"
 				]
 			}
 		},
@@ -7558,6 +7888,84 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/core/auth/api/generate": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "generate api key",
+				"tags": [
+					"Auth"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "generate api key",
+					"formatZH": "生成 API 接口密钥",
+					"paramKeys": []
+				}
+			}
+		},
+		"/core/auth/api/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ApiInterfaceConfig"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update api config",
+				"tags": [
+					"Auth"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"ipWhiteList"
+					],
+					"formatEN": "update api config =\u003e IP White List: [ipWhiteList]",
+					"formatZH": "更新 API 接口配置 =\u003e IP 白名单: [ipWhiteList]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/core/auth/captcha": {
 			"get": {
 				"responses": {
@@ -7572,6 +7980,107 @@ const docTemplate = `{
 				"tags": [
 					"Auth"
 				]
+			}
+		},
+		"/core/auth/current": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.CurrentUserInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load current user info",
+				"tags": [
+					"Auth"
+				]
+			}
+		},
+		"/core/auth/current/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.CurrentUserUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update current user info",
+				"tags": [
+					"Auth"
+				]
+			}
+		},
+		"/core/auth/expired/reset": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.PasswordUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Reset system password expired",
+				"tags": [
+					"Auth"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "reset an expired Password",
+					"formatZH": "重置过期密码",
+					"paramKeys": []
+				}
 			}
 		},
 		"/core/auth/login": {
@@ -7632,6 +8141,117 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/core/auth/mfa": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MfaCredential"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/mfa.Otp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load mfa info",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
+		"/core/auth/mfa/bind": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MfaCredential"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Bind mfa",
+				"tags": [
+					"System Setting"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "bind mfa",
+					"formatZH": "mfa 绑定",
+					"paramKeys": []
+				}
+			}
+		},
+		"/core/auth/mfa/close": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Close mfa",
+				"tags": [
+					"System Setting"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "close mfa",
+					"formatZH": "mfa 关闭",
+					"paramKeys": []
+				}
+			}
+		},
 		"/core/auth/mfalogin": {
 			"post": {
 				"consumes": [
@@ -7684,6 +8304,27 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/core/auth/passkey/del": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete passkey",
+				"tags": [
+					"Auth"
+				]
+			}
+		},
 		"/core/auth/passkey/finish": {
 			"post": {
 				"responses": {
@@ -7700,13 +8341,102 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/core/auth/passkey/list": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.PasskeyInfo"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List passkeys",
+				"tags": [
+					"Auth"
+				]
+			}
+		},
+		"/core/auth/passkey/register/begin": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.PasskeyRegisterRequest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.PasskeyBeginResponse"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Begin passkey registration",
+				"tags": [
+					"Auth"
+				]
+			}
+		},
+		"/core/auth/passkey/register/finish": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Finish passkey registration",
+				"tags": [
+					"Auth"
+				]
+			}
+		},
 		"/core/auth/setting": {
 			"get": {
 				"responses": {
 					"200": {
 						"description": "OK",
 						"schema": {
-							"$ref": "#/definitions/dto.SystemSetting"
+							"$ref": "#/definitions/dto.LoginSetting"
 						}
 					}
 				},
@@ -8776,84 +9506,6 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/core/settings/api/config/generate/key": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "generate api key",
-				"tags": [
-					"System Setting"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [],
-					"formatEN": "generate api key",
-					"formatZH": "生成 API 接口密钥",
-					"paramKeys": []
-				}
-			}
-		},
-		"/core/settings/api/config/update": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.ApiInterfaceConfig"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Update api config",
-				"tags": [
-					"System Setting"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"ipWhiteList"
-					],
-					"formatEN": "update api config =\u003e IP White List: [ipWhiteList]",
-					"formatZH": "更新 API 接口配置 =\u003e IP 白名单: [ipWhiteList]",
-					"paramKeys": []
-				}
-			}
-		},
 		"/core/settings/apps/store/config": {
 			"get": {
 				"responses": {
@@ -8980,48 +9632,6 @@ const docTemplate = `{
 				"tags": [
 					"System Setting"
 				]
-			}
-		},
-		"/core/settings/expired/handle": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.PasswordUpdate"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Reset system password expired",
-				"tags": [
-					"System Setting"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [],
-					"formatEN": "reset an expired Password",
-					"formatZH": "重置过期密码",
-					"paramKeys": []
-				}
 			}
 		},
 		"/core/settings/interface": {
@@ -9191,238 +9801,6 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/core/settings/mfa": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.MfaCredential"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/mfa.Otp"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Load mfa info",
-				"tags": [
-					"System Setting"
-				]
-			}
-		},
-		"/core/settings/mfa/bind": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.MfaCredential"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Bind mfa",
-				"tags": [
-					"System Setting"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [],
-					"formatEN": "bind mfa",
-					"formatZH": "mfa 绑定",
-					"paramKeys": []
-				}
-			}
-		},
-		"/core/settings/passkey/list": {
-			"get": {
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"$ref": "#/definitions/dto.PasskeyInfo"
-							},
-							"type": "array"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "List passkeys",
-				"tags": [
-					"System Setting"
-				]
-			}
-		},
-		"/core/settings/passkey/register/begin": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.PasskeyRegisterRequest"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.PasskeyBeginResponse"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Begin passkey registration",
-				"tags": [
-					"System Setting"
-				]
-			}
-		},
-		"/core/settings/passkey/register/finish": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Finish passkey registration",
-				"tags": [
-					"System Setting"
-				]
-			}
-		},
-		"/core/settings/passkey/{id}": {
-			"delete": {
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Delete passkey",
-				"tags": [
-					"System Setting"
-				]
-			}
-		},
-		"/core/settings/password/update": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.PasswordUpdate"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Update system password",
-				"tags": [
-					"System Setting"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [],
-					"formatEN": "update system password",
-					"formatZH": "修改系统密码",
-					"paramKeys": []
-				}
-			}
-		},
 		"/core/settings/port/update": {
 			"post": {
 				"consumes": [
@@ -9552,6 +9930,30 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Load system available status",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
+		"/core/settings/search/base": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.SettingBaseInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load base system setting info",
 				"tags": [
 					"System Setting"
 				]
@@ -11864,6 +12266,489 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/databases/mongodb": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MongodbDBCreate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create mongodb database",
+				"tags": [
+					"Database Mongodb"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name"
+					],
+					"formatEN": "create mongodb database [name]",
+					"formatZH": "创建 mongodb 数据库 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/databases/mongodb/bind": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MongodbBind"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Bind mongodb database user info",
+				"tags": [
+					"Database Mongodb"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"database",
+						"name",
+						"username"
+					],
+					"formatEN": "bind mongodb database [database] [name] user [username]",
+					"formatZH": "绑定 mongodb 数据库 [database] [name] 用户 [username]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/databases/mongodb/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MongodbDBDelete"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete mongodb database",
+				"tags": [
+					"Database Mongodb"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "database_mongodbs",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "delete mongodb database [name]",
+					"formatZH": "删除 mongodb 数据库 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/databases/mongodb/del/check": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MongodbDBDeleteCheck"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check before delete mongodb database",
+				"tags": [
+					"Database Mongodb"
+				]
+			}
+		},
+		"/databases/mongodb/description": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.UpdateDescription"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update mongodb database description",
+				"tags": [
+					"Database Mongodb"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "database_mongodbs",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						}
+					],
+					"bodyKeys": [
+						"id",
+						"description"
+					],
+					"formatEN": "The description of the mongodb database [name] is modified =\u003e [description]",
+					"formatZH": "mongodb 数据库 [name] 描述信息修改 [description]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/databases/mongodb/load": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MongodbLoadDB"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load mongodb database from remote",
+				"tags": [
+					"Database Mongodb"
+				]
+			}
+		},
+		"/databases/mongodb/password": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MongodbPassword"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Change mongodb database password",
+				"tags": [
+					"Database Mongodb"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"database",
+						"name"
+					],
+					"formatEN": "update mongodb database [database] [name] password",
+					"formatZH": "更新 mongodb 数据库 [database] [name] 密码",
+					"paramKeys": []
+				}
+			}
+		},
+		"/databases/mongodb/privileges": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MongodbPrivilegesLoad"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load mongodb privileges",
+				"tags": [
+					"Database Mongodb"
+				]
+			}
+		},
+		"/databases/mongodb/privileges/change": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MongodbPrivileges"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Change mongodb privileges",
+				"tags": [
+					"Database Mongodb"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"database",
+						"username"
+					],
+					"formatEN": "update mongodb database [database] user [username] privileges",
+					"formatZH": "更新 mongodb 数据库 [database] 用户 [username] 权限",
+					"paramKeys": []
+				}
+			}
+		},
+		"/databases/mongodb/root/password": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ChangeDBInfo"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Change mongodb root password",
+				"tags": [
+					"Database Mongodb"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"database"
+					],
+					"formatEN": "update mongodb database [database] root password",
+					"formatZH": "更新 mongodb 数据库 [database] root 密码",
+					"paramKeys": []
+				}
+			}
+		},
+		"/databases/mongodb/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MongodbDBSearch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.PageResult"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page mongodb databases",
+				"tags": [
+					"Database Mongodb"
+				]
+			}
+		},
 		"/databases/pg": {
 			"post": {
 				"consumes": [
@@ -12771,6 +13656,45 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/files/ai-search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "When file-management AI is enabled, returns mode=ai with summary and hits. When disabled, returns mode=grep with hits only. Scans file contents only. Supports match options, extension/size/time filters, and scan limits.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileAISearch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.FileAISearchResult"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "File search: content grep + optional AI summary",
+				"tags": [
+					"File"
+				]
+			}
+		},
 		"/files/batch/check": {
 			"post": {
 				"consumes": [
@@ -13057,6 +13981,41 @@ const docTemplate = `{
 					"formatZH": "压缩文件 [name]",
 					"paramKeys": []
 				}
+			}
+		},
+		"/files/compress/stop": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileCompressStopReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Stop compress task",
+				"tags": [
+					"File"
+				]
 			}
 		},
 		"/files/content": {
@@ -13471,6 +14430,155 @@ const docTemplate = `{
 					}
 				],
 				"summary": "List favorites",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/history/content": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileHistoryContentReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.FileHistoryInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load file history content",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/history/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileHistoryDeleteReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete file history record",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/history/restore": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileHistoryRestoreReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.FileInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Restore file history record",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/history/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileHistorySearchReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.PageResult"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load file history list",
 				"tags": [
 					"File"
 				]
@@ -14056,6 +15164,306 @@ const docTemplate = `{
 					}
 				],
 				"summary": "List files",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/share/check": {
+			"get": {
+				"parameters": [
+					{
+						"description": "share code",
+						"in": "query",
+						"name": "code",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"description": "optional password",
+						"in": "query",
+						"name": "password",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.Response"
+						}
+					}
+				},
+				"summary": "Check file share code (no login)",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/share/create": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileShareCreate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.FileShareInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create temporary file share link",
+				"tags": [
+					"File"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"path",
+						"expireMinutes"
+					],
+					"formatEN": "Create file share [path]",
+					"formatZH": "创建文件分享 [path]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/files/share/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.FilePath"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete file share by path",
+				"tags": [
+					"File"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"path"
+					],
+					"formatEN": "Close file share [path]",
+					"formatZH": "关闭文件分享 [path]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/files/share/detail": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.FilePath"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.FileShareInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get file share detail by path",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/share/download": {
+			"get": {
+				"parameters": [
+					{
+						"description": "share code",
+						"in": "query",
+						"name": "code",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"description": "optional password",
+						"in": "query",
+						"name": "password",
+						"type": "string"
+					}
+				],
+				"produces": [
+					"application/octet-stream"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "file"
+						}
+					}
+				},
+				"summary": "Download file by share code (no login)",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/share/info": {
+			"get": {
+				"parameters": [
+					{
+						"description": "share code",
+						"in": "query",
+						"name": "code",
+						"required": true,
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.FileSharePublicInfo"
+						}
+					}
+				},
+				"summary": "Get file share detail by code (no login)",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/share/qrcode": {
+			"get": {
+				"parameters": [
+					{
+						"description": "share code",
+						"in": "query",
+						"name": "code",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"description": "operate node",
+						"in": "query",
+						"name": "operateNode",
+						"type": "string"
+					}
+				],
+				"produces": [
+					"image/png"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "file"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get file share QR code image",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/share/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.PageInfo"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.PageResult"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List file shares",
 				"tags": [
 					"File"
 				]
@@ -15368,41 +16776,6 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/hosts/monitor/gpu/search": {
-			"post": {
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.MonitorGPUSearch"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.MonitorGPUData"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Load monitor data",
-				"tags": [
-					"Monitor"
-				]
-			}
-		},
 		"/hosts/monitor/search": {
 			"post": {
 				"parameters": [
@@ -15970,7 +17343,7 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/hosts/tool": {
+		"/hosts/tool/config/get": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -15982,45 +17355,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/request.HostToolReq"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/response.HostToolRes"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Get tool status",
-				"tags": [
-					"Host tool"
-				]
-			}
-		},
-		"/hosts/tool/config": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.HostToolConfig"
+							"$ref": "#/definitions/request.HostToolTypeReq"
 						}
 					}
 				],
@@ -16043,14 +17378,49 @@ const docTemplate = `{
 				"summary": "Get tool config",
 				"tags": [
 					"Host tool"
+				]
+			}
+		},
+		"/hosts/tool/config/set": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.HostToolConfigUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update tool config",
+				"tags": [
+					"Host tool"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
 					"bodyKeys": [
-						"operate"
+						"type"
 					],
-					"formatEN": "[operate] tool config",
-					"formatZH": "[operate] 主机工具配置文件 ",
+					"formatEN": "update [type] tool config",
+					"formatZH": "更新 [type] 主机工具配置文件 ",
 					"paramKeys": []
 				}
 			}
@@ -16111,7 +17481,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/request.HostToolReq"
+							"$ref": "#/definitions/request.HostToolOperateReq"
 						}
 					}
 				],
@@ -16142,6 +17512,44 @@ const docTemplate = `{
 					"formatZH": "[operate] [type] ",
 					"paramKeys": []
 				}
+			}
+		},
+		"/hosts/tool/status": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.HostToolTypeReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.HostToolRes"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get tool status",
+				"tags": [
+					"Host tool"
+				]
 			}
 		},
 		"/hosts/tool/supervisor/process": {
@@ -16225,7 +17633,54 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/request.SupervisorProcessFileReq"
+							"$ref": "#/definitions/request.HostSupervisorProcessFileOperateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Operate Supervisor process config file",
+				"tags": [
+					"Host tool"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"operate"
+					],
+					"formatEN": "[operate] Supervisor Process Config file",
+					"formatZH": "[operate] Supervisor 进程文件 ",
+					"paramKeys": []
+				}
+			}
+		},
+		"/hosts/tool/supervisor/process/file/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.HostSupervisorProcessFileGetReq"
 						}
 					}
 				],
@@ -16248,16 +17703,7 @@ const docTemplate = `{
 				"summary": "Get Supervisor process config file",
 				"tags": [
 					"Host tool"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"operate"
-					],
-					"formatEN": "[operate] Supervisor Process Config file",
-					"formatZH": "[operate] Supervisor 进程文件 ",
-					"paramKeys": []
-				}
+				]
 			}
 		},
 		"/logs/system/files": {
@@ -16306,6 +17752,41 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Get the number of executing tasks",
+				"tags": [
+					"TaskLog"
+				]
+			}
+		},
+		"/logs/tasks/read": {
+			"post": {
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.TaskLogReadReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.FileLineContent"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Read task log by Line",
 				"tags": [
 					"TaskLog"
 				]
@@ -18025,22 +19506,13 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/settings/get/{key}": {
-			"get": {
-				"parameters": [
-					{
-						"description": "key",
-						"in": "path",
-						"name": "key",
-						"required": true,
-						"type": "string"
-					}
-				],
+		"/settings/file-history/search": {
+			"post": {
 				"responses": {
 					"200": {
 						"description": "OK",
 						"schema": {
-							"$ref": "#/definitions/dto.SettingInfo"
+							"$ref": "#/definitions/response.FileHistorySettingInfo"
 						}
 					}
 				},
@@ -18052,7 +19524,42 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Load system setting by key",
+				"summary": "Load file history setting info",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
+		"/settings/file-history/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileHistorySettingUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update file history setting",
 				"tags": [
 					"System Setting"
 				]
@@ -18646,7 +20153,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.SettingUpdate"
+							"$ref": "#/definitions/dto.AgentSettingUpdate"
 						}
 					}
 				],
@@ -24456,6 +25963,30 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.AgentChannelDeleteReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"type": {
+					"enum": [
+						"feishu",
+						"telegram",
+						"discord",
+						"wecom",
+						"qqbot",
+						"dingtalk",
+						"weixin"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"type"
+			],
+			"type": "object"
+		},
 		"dto.AgentChannelPairingApproveReq": {
 			"properties": {
 				"accountId": {
@@ -24472,7 +26003,9 @@ const docTemplate = `{
 						"feishu",
 						"telegram",
 						"discord",
-						"wecom"
+						"wecom",
+						"qqbot",
+						"dingtalk"
 					],
 					"type": "string"
 				}
@@ -24566,7 +26099,8 @@ const docTemplate = `{
 				"agentType": {
 					"enum": [
 						"openclaw",
-						"copaw"
+						"copaw",
+						"hermes-agent"
 					],
 					"type": "string"
 				},
@@ -24628,6 +26162,8 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"webUIPort": {
+					"maximum": 65535,
+					"minimum": 1,
 					"type": "integer"
 				}
 			},
@@ -24755,6 +26291,7 @@ const docTemplate = `{
 				},
 				"dmPolicy": {
 					"enum": [
+						"pairing",
 						"allowlist",
 						"open",
 						"disabled"
@@ -24823,6 +26360,12 @@ const docTemplate = `{
 		},
 		"dto.AgentDiscordConfig": {
 			"properties": {
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"bots": {
 					"items": {
 						"$ref": "#/definitions/dto.AgentDiscordBot"
@@ -24843,6 +26386,9 @@ const docTemplate = `{
 				},
 				"proxy": {
 					"type": "string"
+				},
+				"requireMention": {
+					"type": "boolean"
 				}
 			},
 			"type": "object"
@@ -24851,6 +26397,12 @@ const docTemplate = `{
 			"properties": {
 				"agentId": {
 					"type": "integer"
+				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
 				},
 				"bots": {
 					"items": {
@@ -24878,6 +26430,9 @@ const docTemplate = `{
 				},
 				"proxy": {
 					"type": "string"
+				},
+				"requireMention": {
+					"type": "boolean"
 				}
 			},
 			"required": [
@@ -24928,6 +26483,12 @@ const docTemplate = `{
 						"$ref": "#/definitions/dto.AgentFeishuBot"
 					},
 					"type": "array"
+				},
+				"connectionMode": {
+					"type": "string"
+				},
+				"domain": {
+					"type": "string"
 				},
 				"enabled": {
 					"type": "boolean"
@@ -24982,6 +26543,12 @@ const docTemplate = `{
 					"minItems": 1,
 					"type": "array"
 				},
+				"connectionMode": {
+					"type": "string"
+				},
+				"domain": {
+					"type": "string"
+				},
 				"enabled": {
 					"type": "boolean"
 				},
@@ -25023,6 +26590,63 @@ const docTemplate = `{
 				"groupPolicy",
 				"replyMode",
 				"requireMention"
+			],
+			"type": "object"
+		},
+		"dto.AgentHermesChatSessionDeleteReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.AgentHermesChatSessionItem": {
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"lastActive": {
+					"type": "string"
+				},
+				"messageCount": {
+					"type": "integer"
+				},
+				"model": {
+					"type": "string"
+				},
+				"startedAt": {
+					"type": "string"
+				},
+				"title": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentHermesChatSessionRenameReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "string"
+				},
+				"title": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"id",
+				"title"
 			],
 			"type": "object"
 		},
@@ -25121,6 +26745,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"websiteProtocol": {
+					"type": "string"
+				},
+				"websiteType": {
 					"type": "string"
 				}
 			},
@@ -25403,14 +27030,32 @@ const docTemplate = `{
 		},
 		"dto.AgentQQBotConfig": {
 			"properties": {
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"bots": {
 					"items": {
 						"$ref": "#/definitions/dto.AgentQQBotBot"
 					},
 					"type": "array"
 				},
+				"dmPolicy": {
+					"type": "string"
+				},
 				"enabled": {
 					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"type": "string"
 				},
 				"installed": {
 					"type": "boolean"
@@ -25423,6 +27068,12 @@ const docTemplate = `{
 				"agentId": {
 					"type": "integer"
 				},
+				"allowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"bots": {
 					"items": {
 						"$ref": "#/definitions/dto.AgentQQBotBot"
@@ -25430,8 +27081,20 @@ const docTemplate = `{
 					"minItems": 1,
 					"type": "array"
 				},
+				"dmPolicy": {
+					"type": "string"
+				},
 				"enabled": {
 					"type": "boolean"
+				},
+				"groupAllowFrom": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"groupPolicy": {
+					"type": "string"
 				}
 			},
 			"required": [
@@ -25668,6 +27331,25 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.AgentSettingUpdate": {
+			"properties": {
+				"key": {
+					"enum": [
+						"SystemIP",
+						"DockerSockPath",
+						"FileRecycleBin"
+					],
+					"type": "string"
+				},
+				"value": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"key"
+			],
+			"type": "object"
+		},
 		"dto.AgentSkillInstallReq": {
 			"properties": {
 				"agentId": {
@@ -25680,7 +27362,9 @@ const docTemplate = `{
 					"enum": [
 						"clawhub-global",
 						"clawhub-cn",
-						"skillhub"
+						"skillhub",
+						"official",
+						"skills-sh"
 					],
 					"type": "string"
 				},
@@ -25701,17 +27385,35 @@ const docTemplate = `{
 				"bundled": {
 					"type": "boolean"
 				},
+				"category": {
+					"type": "string"
+				},
 				"description": {
 					"type": "string"
 				},
 				"disabled": {
 					"type": "boolean"
 				},
+				"identifier": {
+					"type": "string"
+				},
 				"name": {
 					"type": "string"
 				},
 				"source": {
 					"type": "string"
+				},
+				"tags": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"trust": {
+					"type": "string"
+				},
+				"uninstallable": {
+					"type": "boolean"
 				}
 			},
 			"type": "object"
@@ -25719,6 +27421,9 @@ const docTemplate = `{
 		"dto.AgentSkillSearchItem": {
 			"properties": {
 				"description": {
+					"type": "string"
+				},
+				"identifier": {
 					"type": "string"
 				},
 				"name": {
@@ -25734,6 +27439,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"summary": {
+					"type": "string"
+				},
+				"trust": {
 					"type": "string"
 				},
 				"version": {
@@ -25754,7 +27462,9 @@ const docTemplate = `{
 					"enum": [
 						"clawhub-global",
 						"clawhub-cn",
-						"skillhub"
+						"skillhub",
+						"official",
+						"skills-sh"
 					],
 					"type": "string"
 				}
@@ -25763,6 +27473,21 @@ const docTemplate = `{
 				"agentId",
 				"keyword",
 				"source"
+			],
+			"type": "object"
+		},
+		"dto.AgentSkillUninstallReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"name"
 			],
 			"type": "object"
 		},
@@ -25848,6 +27573,9 @@ const docTemplate = `{
 				"proxy": {
 					"type": "string"
 				},
+				"requireMention": {
+					"type": "boolean"
+				},
 				"streaming": {
 					"type": "string"
 				}
@@ -25914,6 +27642,9 @@ const docTemplate = `{
 				},
 				"proxy": {
 					"type": "string"
+				},
+				"requireMention": {
+					"type": "boolean"
 				},
 				"streaming": {
 					"enum": [
@@ -26049,6 +27780,14 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.AgentWeixinConfig": {
+			"properties": {
+				"enabled": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
 		"dto.AgentWeixinLoginReq": {
 			"properties": {
 				"agentId": {
@@ -26073,7 +27812,7 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"apiKeyValidityTime": {
-					"type": "string"
+					"type": "integer"
 				},
 				"ipWhiteList": {
 					"type": "string"
@@ -26543,6 +28282,7 @@ const docTemplate = `{
 						"mariadb",
 						"postgresql",
 						"redis",
+						"mongodb",
 						"mysql-cluster",
 						"postgresql-cluster",
 						"redis-cluster"
@@ -26989,6 +28729,7 @@ const docTemplate = `{
 						"redis",
 						"website",
 						"postgresql",
+						"mongodb",
 						"mysql-cluster",
 						"postgresql-cluster",
 						"redis-cluster",
@@ -27038,6 +28779,9 @@ const docTemplate = `{
 				"downloadAccountID": {
 					"type": "integer"
 				},
+				"dropAllCollections": {
+					"type": "boolean"
+				},
 				"file": {
 					"type": "string"
 				},
@@ -27061,6 +28805,7 @@ const docTemplate = `{
 						"redis",
 						"website",
 						"postgresql",
+						"mongodb",
 						"mysql-cluster",
 						"postgresql-cluster",
 						"redis-cluster",
@@ -28052,6 +29797,75 @@ const docTemplate = `{
 			"required": [
 				"id",
 				"status"
+			],
+			"type": "object"
+		},
+		"dto.CurrentUserInfo": {
+			"properties": {
+				"apiInterfaceStatus": {
+					"type": "string"
+				},
+				"apiKey": {
+					"type": "string"
+				},
+				"apiKeyValidityTime": {
+					"type": "integer"
+				},
+				"complexitySetting": {
+					"type": "string"
+				},
+				"expirationDays": {
+					"type": "integer"
+				},
+				"expirationTime": {
+					"type": "string"
+				},
+				"ipWhiteList": {
+					"type": "string"
+				},
+				"mfaInterval": {
+					"type": "integer"
+				},
+				"mfaStatus": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"sessionTimeout": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.CurrentUserUpdate": {
+			"properties": {
+				"expirationDays": {
+					"maximum": 60,
+					"minimum": 0,
+					"type": "integer"
+				},
+				"expirationTime": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"oldPassword": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				},
+				"sessionTimeout": {
+					"maximum": 864000,
+					"minimum": 300,
+					"type": "integer"
+				}
+			},
+			"required": [
+				"name",
+				"sessionTimeout"
 			],
 			"type": "object"
 		},
@@ -29740,6 +31554,44 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.LoginSetting": {
+			"properties": {
+				"isDemo": {
+					"type": "boolean"
+				},
+				"isEnterprise": {
+					"type": "boolean"
+				},
+				"isFxplay": {
+					"type": "boolean"
+				},
+				"isIntl": {
+					"type": "boolean"
+				},
+				"isOffline": {
+					"type": "boolean"
+				},
+				"language": {
+					"type": "string"
+				},
+				"menuTabs": {
+					"type": "string"
+				},
+				"needCaptcha": {
+					"type": "boolean"
+				},
+				"panelName": {
+					"type": "string"
+				},
+				"passkeySetting": {
+					"type": "boolean"
+				},
+				"theme": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.MFALogin": {
 			"properties": {
 				"code": {
@@ -29770,7 +31622,7 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"interval": {
-					"type": "string"
+					"type": "integer"
 				},
 				"secret": {
 					"type": "string"
@@ -29780,6 +31632,255 @@ const docTemplate = `{
 				"code",
 				"interval",
 				"secret"
+			],
+			"type": "object"
+		},
+		"dto.MongodbBind": {
+			"properties": {
+				"database": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				},
+				"username": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"database",
+				"name",
+				"password",
+				"username"
+			],
+			"type": "object"
+		},
+		"dto.MongodbDBCreate": {
+			"properties": {
+				"database": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"from": {
+					"enum": [
+						"local",
+						"remote"
+					],
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				},
+				"permission": {
+					"enum": [
+						"dbOwner",
+						"read",
+						"readWrite",
+						"userAdmin"
+					],
+					"type": "string"
+				},
+				"username": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"database",
+				"from",
+				"name",
+				"password",
+				"permission",
+				"username"
+			],
+			"type": "object"
+		},
+		"dto.MongodbDBDelete": {
+			"properties": {
+				"database": {
+					"type": "string"
+				},
+				"deleteBackup": {
+					"type": "boolean"
+				},
+				"forceDelete": {
+					"type": "boolean"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"type": {
+					"enum": [
+						"mongodb"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"database",
+				"id",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.MongodbDBDeleteCheck": {
+			"properties": {
+				"database": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"type": {
+					"enum": [
+						"mongodb"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"database",
+				"id",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.MongodbDBSearch": {
+			"properties": {
+				"database": {
+					"type": "string"
+				},
+				"info": {
+					"type": "string"
+				},
+				"order": {
+					"enum": [
+						"null",
+						"ascending",
+						"descending"
+					],
+					"type": "string"
+				},
+				"orderBy": {
+					"enum": [
+						"name",
+						"createdAt"
+					],
+					"type": "string"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"database",
+				"order",
+				"orderBy",
+				"page",
+				"pageSize"
+			],
+			"type": "object"
+		},
+		"dto.MongodbLoadDB": {
+			"properties": {
+				"database": {
+					"type": "string"
+				},
+				"from": {
+					"enum": [
+						"local",
+						"remote"
+					],
+					"type": "string"
+				},
+				"type": {
+					"enum": [
+						"mongodb"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"database",
+				"from",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.MongodbPassword": {
+			"properties": {
+				"database": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"database",
+				"name",
+				"password"
+			],
+			"type": "object"
+		},
+		"dto.MongodbPrivileges": {
+			"properties": {
+				"database": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"permission": {
+					"enum": [
+						"dbOwner",
+						"read",
+						"readWrite",
+						"userAdmin"
+					],
+					"type": "string"
+				},
+				"username": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"database",
+				"name",
+				"permission",
+				"username"
+			],
+			"type": "object"
+		},
+		"dto.MongodbPrivilegesLoad": {
+			"properties": {
+				"database": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"username": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"database",
+				"name",
+				"username"
 			],
 			"type": "object"
 		},
@@ -31649,6 +33750,18 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.Response": {
+			"properties": {
+				"code": {
+					"type": "integer"
+				},
+				"data": {},
+				"message": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.RootCertOperate": {
 			"properties": {
 				"description": {
@@ -32167,6 +34280,9 @@ const docTemplate = `{
 				"status": {
 					"type": "string"
 				},
+				"taskID": {
+					"type": "string"
+				},
 				"type": {
 					"type": "string"
 				}
@@ -32193,6 +34309,71 @@ const docTemplate = `{
 				"page",
 				"pageSize"
 			],
+			"type": "object"
+		},
+		"dto.SettingBaseInfo": {
+			"properties": {
+				"bindAddress": {
+					"type": "string"
+				},
+				"complexityVerification": {
+					"type": "string"
+				},
+				"dashboardMemoVisible": {
+					"type": "string"
+				},
+				"dashboardSimpleNodeVisible": {
+					"type": "string"
+				},
+				"developerMode": {
+					"type": "string"
+				},
+				"docSource": {
+					"type": "string"
+				},
+				"edition": {
+					"type": "string"
+				},
+				"hideMenu": {
+					"type": "string"
+				},
+				"ipv6": {
+					"type": "string"
+				},
+				"language": {
+					"type": "string"
+				},
+				"menuTabs": {
+					"type": "string"
+				},
+				"noAuthSetting": {
+					"type": "string"
+				},
+				"panelName": {
+					"type": "string"
+				},
+				"port": {
+					"type": "string"
+				},
+				"proxyType": {
+					"type": "string"
+				},
+				"securityEntrance": {
+					"type": "string"
+				},
+				"serverPort": {
+					"type": "string"
+				},
+				"systemVersion": {
+					"type": "string"
+				},
+				"theme": {
+					"type": "string"
+				},
+				"upgradeBackupCopies": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.SettingInfo": {
@@ -32225,6 +34406,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"lastCleanTime": {
+					"type": "string"
+				},
+				"localSSHConnShow": {
 					"type": "string"
 				},
 				"localTime": {
@@ -32503,20 +34687,6 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.SystemSetting": {
-			"properties": {
-				"isDemo": {
-					"type": "boolean"
-				},
-				"isIntl": {
-					"type": "boolean"
-				},
-				"language": {
-					"type": "string"
-				}
-			},
-			"type": "object"
-		},
 		"dto.Tag": {
 			"properties": {
 				"key": {
@@ -32703,6 +34873,9 @@ const docTemplate = `{
 				"name": {
 					"type": "string"
 				},
+				"role": {
+					"type": "string"
+				},
 				"token": {
 					"type": "string"
 				}
@@ -32836,6 +35009,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"path": {
+					"type": "string"
+				},
+				"shareCode": {
 					"type": "string"
 				},
 				"size": {
@@ -34204,6 +36380,77 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"request.FileAISearch": {
+			"properties": {
+				"containSub": {
+					"type": "boolean"
+				},
+				"contentHitsPromptMaxBytes": {
+					"type": "integer"
+				},
+				"extensions": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"llmMaxOutputTokens": {
+					"type": "integer"
+				},
+				"matchCase": {
+					"type": "boolean"
+				},
+				"maxFileBytes": {
+					"type": "integer"
+				},
+				"maxHitsPerFile": {
+					"type": "integer"
+				},
+				"maxItems": {
+					"maximum": 2000,
+					"minimum": 1,
+					"type": "integer"
+				},
+				"maxScanFiles": {
+					"type": "integer"
+				},
+				"maxSize": {
+					"type": "integer"
+				},
+				"maxTotalHits": {
+					"type": "integer"
+				},
+				"minSize": {
+					"type": "integer"
+				},
+				"modifiedAfter": {
+					"type": "string"
+				},
+				"modifiedBefore": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"query": {
+					"type": "string"
+				},
+				"responseLanguage": {
+					"type": "string"
+				},
+				"useRegex": {
+					"type": "boolean"
+				},
+				"wholeWord": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"path",
+				"query"
+			],
+			"type": "object"
+		},
 		"request.FileBatchDelete": {
 			"properties": {
 				"isDir": {
@@ -34241,6 +36488,9 @@ const docTemplate = `{
 				"secret": {
 					"type": "string"
 				},
+				"taskID": {
+					"type": "string"
+				},
 				"type": {
 					"type": "string"
 				}
@@ -34250,6 +36500,17 @@ const docTemplate = `{
 				"files",
 				"name",
 				"type"
+			],
+			"type": "object"
+		},
+		"request.FileCompressStopReq": {
+			"properties": {
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"taskID"
 			],
 			"type": "object"
 		},
@@ -34404,6 +36665,96 @@ const docTemplate = `{
 			},
 			"required": [
 				"path"
+			],
+			"type": "object"
+		},
+		"request.FileHistoryContentReq": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"request.FileHistoryDeleteReq": {
+			"properties": {
+				"ids": {
+					"items": {
+						"type": "integer"
+					},
+					"type": "array"
+				}
+			},
+			"required": [
+				"ids"
+			],
+			"type": "object"
+		},
+		"request.FileHistoryRestoreReq": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"request.FileHistorySearchReq": {
+			"properties": {
+				"operation": {
+					"type": "string"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				},
+				"path": {
+					"type": "string"
+				},
+				"scope": {
+					"enum": [
+						"current",
+						"all"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"page",
+				"pageSize",
+				"scope"
+			],
+			"type": "object"
+		},
+		"request.FileHistorySettingUpdate": {
+			"properties": {
+				"diskQuotaMB": {
+					"maximum": 1048576,
+					"minimum": 0,
+					"type": "integer"
+				},
+				"enable": {
+					"enum": [
+						"Enable",
+						"Disable"
+					],
+					"type": "string"
+				},
+				"maxPerPath": {
+					"maximum": 1000,
+					"minimum": 0,
+					"type": "integer"
+				}
+			},
+			"required": [
+				"enable"
 			],
 			"type": "object"
 		},
@@ -34649,6 +37000,25 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"request.FileShareCreate": {
+			"properties": {
+				"expireMinutes": {
+					"maximum": 10080,
+					"minimum": 0,
+					"type": "integer"
+				},
+				"password": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"path"
+			],
+			"type": "object"
+		},
 		"request.FileWget": {
 			"properties": {
 				"ignoreCertificate": {
@@ -34671,16 +37041,60 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"request.HostToolConfig": {
+		"request.HostSupervisorProcessFileGetReq": {
+			"properties": {
+				"file": {
+					"enum": [
+						"out.log",
+						"err.log",
+						"config"
+					],
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"file",
+				"name"
+			],
+			"type": "object"
+		},
+		"request.HostSupervisorProcessFileOperateReq": {
 			"properties": {
 				"content": {
 					"type": "string"
 				},
+				"file": {
+					"enum": [
+						"out.log",
+						"err.log",
+						"config"
+					],
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
 				"operate": {
 					"enum": [
-						"get",
-						"set"
+						"clear",
+						"update"
 					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"file",
+				"name",
+				"operate"
+			],
+			"type": "object"
+		},
+		"request.HostToolConfigUpdate": {
+			"properties": {
+				"content": {
 					"type": "string"
 				},
 				"type": {
@@ -34712,17 +37126,31 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"request.HostToolReq": {
+		"request.HostToolOperateReq": {
 			"properties": {
 				"operate": {
 					"enum": [
-						"status",
 						"restart",
 						"start",
 						"stop"
 					],
 					"type": "string"
 				},
+				"type": {
+					"enum": [
+						"supervisord"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"operate",
+				"type"
+			],
+			"type": "object"
+		},
+		"request.HostToolTypeReq": {
+			"properties": {
 				"type": {
 					"enum": [
 						"supervisord"
@@ -35986,35 +38414,35 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
-		"request.SupervisorProcessFileReq": {
+		"request.TaskLogReadReq": {
 			"properties": {
-				"content": {
+				"latest": {
+					"type": "boolean"
+				},
+				"page": {
+					"minimum": 1,
+					"type": "integer"
+				},
+				"pageSize": {
+					"minimum": 1,
+					"type": "integer"
+				},
+				"resourceID": {
+					"type": "integer"
+				},
+				"taskID": {
 					"type": "string"
 				},
-				"file": {
-					"enum": [
-						"out.log",
-						"err.log",
-						"config"
-					],
+				"taskOperate": {
 					"type": "string"
 				},
-				"name": {
-					"type": "string"
-				},
-				"operate": {
-					"enum": [
-						"get",
-						"clear",
-						"update"
-					],
+				"taskType": {
 					"type": "string"
 				}
 			},
 			"required": [
-				"file",
-				"name",
-				"operate"
+				"page",
+				"pageSize"
 			],
 			"type": "object"
 		},
@@ -36930,9 +39358,6 @@ const docTemplate = `{
 			"properties": {
 				"ID": {
 					"type": "integer"
-				},
-				"disableLog": {
-					"type": "boolean"
 				},
 				"nameservers": {
 					"items": {
@@ -37909,6 +40334,140 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"response.FileAIContentHit": {
+			"properties": {
+				"line": {
+					"type": "integer"
+				},
+				"path": {
+					"type": "string"
+				},
+				"text": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"response.FileAISearchResult": {
+			"properties": {
+				"completionTokens": {
+					"type": "integer"
+				},
+				"contentHitsTruncated": {
+					"type": "boolean"
+				},
+				"contentScannedFiles": {
+					"type": "integer"
+				},
+				"duration": {
+					"type": "string"
+				},
+				"hits": {
+					"items": {
+						"$ref": "#/definitions/response.FileAIContentHit"
+					},
+					"type": "array"
+				},
+				"itemCount": {
+					"type": "integer"
+				},
+				"mode": {
+					"type": "string"
+				},
+				"preFiltered": {
+					"type": "boolean"
+				},
+				"promptTokens": {
+					"type": "integer"
+				},
+				"summary": {
+					"type": "string"
+				},
+				"totalTokens": {
+					"type": "integer"
+				},
+				"truncated": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"response.FileHistoryInfo": {
+			"properties": {
+				"content": {
+					"type": "string"
+				},
+				"contentSHA": {
+					"type": "string"
+				},
+				"contentSize": {
+					"type": "integer"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"currentContent": {
+					"type": "string"
+				},
+				"currentPath": {
+					"type": "string"
+				},
+				"deleted": {
+					"type": "boolean"
+				},
+				"extension": {
+					"type": "string"
+				},
+				"fileId": {
+					"type": "string"
+				},
+				"fileMode": {
+					"type": "string"
+				},
+				"fileName": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"operation": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"previousId": {
+					"type": "integer"
+				},
+				"sourcePath": {
+					"type": "string"
+				},
+				"storagePath": {
+					"type": "string"
+				},
+				"targetPath": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"response.FileHistorySettingInfo": {
+			"properties": {
+				"diskQuotaMB": {
+					"type": "integer"
+				},
+				"enable": {
+					"type": "string"
+				},
+				"maxPerPath": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
 		"response.FileInfo": {
 			"properties": {
 				"content": {
@@ -37965,6 +40524,9 @@ const docTemplate = `{
 				"path": {
 					"type": "string"
 				},
+				"shareCode": {
+					"type": "string"
+				},
 				"size": {
 					"type": "integer"
 				},
@@ -38019,6 +40581,49 @@ const docTemplate = `{
 						"type": "string"
 					},
 					"type": "object"
+				}
+			},
+			"type": "object"
+		},
+		"response.FileShareInfo": {
+			"properties": {
+				"code": {
+					"type": "string"
+				},
+				"expiresAt": {
+					"type": "integer"
+				},
+				"fileName": {
+					"type": "string"
+				},
+				"hasPassword": {
+					"type": "boolean"
+				},
+				"password": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"permanent": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"response.FileSharePublicInfo": {
+			"properties": {
+				"expiresAt": {
+					"type": "integer"
+				},
+				"fileName": {
+					"type": "string"
+				},
+				"hasPassword": {
+					"type": "boolean"
+				},
+				"permanent": {
+					"type": "boolean"
 				}
 			},
 			"type": "object"

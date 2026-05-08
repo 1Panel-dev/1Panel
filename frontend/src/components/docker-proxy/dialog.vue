@@ -25,7 +25,7 @@
 
 <script lang="ts" setup>
 import { getSettingBaseInfo } from '@/api/modules/setting';
-import { searchXpackSetting } from '@/extensions/xpack';
+import { getXpackProxyDocker } from '@/extensions/xpack';
 
 const open = ref(false);
 const restart = ref(true);
@@ -59,12 +59,12 @@ const acceptParams = async (props: DialogProps): Promise<void> => {
         return;
     }
 
-    const res = await searchXpackSetting();
+    const res = await getXpackProxyDocker();
     if (!res) {
         emit();
         return;
     }
-    if (res.data.proxyDocker === '') {
+    if (res.data.proxyDocker !== 'Enable') {
         emit();
         return;
     }

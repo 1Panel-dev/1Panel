@@ -246,7 +246,7 @@ import { getHostTree, testByID, testLocalConn } from '@/api/modules/terminal';
 import { GlobalStore } from '@/store';
 import router from '@/routers';
 import { getCommandTree } from '@/api/modules/command';
-import { getAgentSettingByKey } from '@/api/modules/setting';
+import { getAgentSettingInfo } from '@/api/modules/setting';
 import AiSetting from '@/views/terminal/setting/ai/index.vue';
 import { MsgWarning } from '@/utils/message';
 
@@ -308,8 +308,8 @@ const acceptParams = async () => {
         if (isNodeAdmin.value) {
             onNewLocal();
         } else {
-            await getAgentSettingByKey('LocalSSHConnShow').then((res) => {
-                if (res.data === 'Enable') {
+            await getAgentSettingInfo().then((res) => {
+                if (res.data?.localSSHConnShow === 'Enable') {
                     onNewLocal();
                 }
             });
