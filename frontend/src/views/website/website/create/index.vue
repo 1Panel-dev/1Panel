@@ -458,7 +458,7 @@ import { getAppService } from '@/api/modules/app';
 import { v4 as uuidv4 } from 'uuid';
 import { getAccountName } from '@/utils/ssl';
 import { Website } from '@/api/interface/website';
-import { getPathByType } from '@/api/modules/files';
+import { loadWebsiteDir } from '@/api/modules/setting';
 import { getWebsiteTypes } from '@/global/mimetype';
 import { compareVersion } from '@/utils/version';
 defineOptions({ name: 'CreateWebSite' });
@@ -784,7 +784,7 @@ const acceptParams = async (openrestyVersion: string) => {
     }
     const websiteType = localStorage.getItem('website-type') || 'deployment';
     website.value.type = websiteType;
-    const dirRes = await getPathByType('websiteDir');
+    const dirRes = await loadWebsiteDir();
     staticPath.value = dirRes.data + '/sites/';
     changeType(websiteType);
 
