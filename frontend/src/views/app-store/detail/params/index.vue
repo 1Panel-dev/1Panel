@@ -144,7 +144,7 @@ import { getAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
 import { getDBName, getLabel, getDescription } from '@/utils/app-store';
-import { getPathByType } from '@/api/modules/files';
+import { loadWebsiteDir } from '@/api/modules/setting';
 import { loadFormatCollations } from '@/api/modules/database';
 
 interface ParamObj extends App.FromField {
@@ -226,7 +226,7 @@ const handleParams = () => {
                 form[p.envKey] = p.default;
             }
             if (p.type == 'text' && p.envKey == 'WEBSITE_DIR') {
-                getPathByType('websiteDir').then((res) => {
+                loadWebsiteDir().then((res) => {
                     form[p.envKey] = res.data;
                 });
             }
