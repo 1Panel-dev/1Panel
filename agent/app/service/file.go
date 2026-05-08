@@ -40,7 +40,6 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
@@ -478,7 +477,7 @@ func preflightCompressTool(compressType files.CompressType) error {
 
 func preflightDecompressTool(decompressType files.CompressType) error {
 	switch decompressType {
-	case files.Tar, files.Zip, files.TarGz, files.Rar, files.X7z:
+	case files.Rar, files.X7z:
 		_, err := files.NewExtractShellArchiver(decompressType)
 		return err
 	default:
@@ -541,7 +540,7 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 			if err := fo.CreateDir(c.Dst, constant.DirPerm); err != nil {
 				return err
 			}
-			if err := cmd.NewCommandMgr(cmd.WithContext(t.TaskCtx)).RunBashCf("cp -rfp '%s'/. '%s'", tempDst, c.Dst); err != nil {
+			if err := copyDecompressTree(t.TaskCtx, tempDst, c.Dst); err != nil {
 				return err
 			}
 			success = true
@@ -550,6 +549,124 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 		_ = taskItem.Execute()
 	}()
 	return nil
+}
+
+func copyDecompressTree(ctx context.Context, srcDir, dstDir string) error {
+	entries, err := os.ReadDir(srcDir)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		if err := copyDecompressEntry(ctx, filepath.Join(srcDir, entry.Name()), filepath.Join(dstDir, entry.Name())); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) (retErr error) {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	info, err := os.Lstat(srcPath)
+	if err != nil {
+		return err
+	}
+
+	if info.Mode()&os.ModeSymlink != 0 {
+		if err := os.RemoveAll(dstPath); err != nil {
+			return err
+		}
+		if err := os.MkdirAll(filepath.Dir(dstPath), constant.DirPerm); err != nil {
+			return err
+		}
+		target, err := os.Readlink(srcPath)
+		if err != nil {
+			return err
+		}
+		if err := os.Symlink(target, dstPath); err != nil {
+			return err
+		}
+		return applyDecompressOwnership(srcPath, dstPath)
+	}
+
+	if info.IsDir() {
+		dstInfo, err := os.Lstat(dstPath)
+		keepExistingDir := err == nil && dstInfo.IsDir() && dstInfo.Mode()&os.ModeSymlink == 0
+		if err != nil && !os.IsNotExist(err) {
+			return err
+		}
+		if !keepExistingDir {
+			if err := os.RemoveAll(dstPath); err != nil {
+				return err
+			}
+			if err := os.MkdirAll(dstPath, info.Mode().Perm()); err != nil {
+				return err
+			}
+			if err := applyDecompressOwnership(srcPath, dstPath); err != nil {
+				return err
+			}
+		}
+		entries, err := os.ReadDir(srcPath)
+		if err != nil {
+			return err
+		}
+		for _, entry := range entries {
+			if err := copyDecompressEntry(ctx, filepath.Join(srcPath, entry.Name()), filepath.Join(dstPath, entry.Name())); err != nil {
+				return err
+			}
+		}
+		if keepExistingDir {
+			return nil
+		}
+		return os.Chtimes(dstPath, info.ModTime(), info.ModTime())
+	}
+
+	if err := os.RemoveAll(dstPath); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(dstPath), constant.DirPerm); err != nil {
+		return err
+	}
+
+	srcFile, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+
+	dstFile, err := os.OpenFile(dstPath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, info.Mode().Perm())
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if cerr := dstFile.Close(); cerr != nil && retErr == nil {
+			retErr = cerr
+		}
+	}()
+
+	if _, err := io.Copy(dstFile, srcFile); err != nil {
+		return err
+	}
+	if err := applyDecompressOwnership(srcPath, dstPath); err != nil {
+		return err
+	}
+	return os.Chtimes(dstPath, info.ModTime(), info.ModTime())
+}
+
+func applyDecompressOwnership(srcPath, dstPath string) error {
+	info, err := os.Lstat(srcPath)
+	if err != nil {
+		return err
+	}
+	stat, ok := info.Sys().(*unix.Stat_t)
+	if !ok {
+		return nil
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		return os.Lchown(dstPath, int(stat.Uid), int(stat.Gid))
+	}
+	return os.Chown(dstPath, int(stat.Uid), int(stat.Gid))
 }
 
 func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, error) {
