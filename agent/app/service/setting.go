@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
@@ -28,6 +30,7 @@ type ISettingService interface {
 	GetTerminalAIInfo() (*dto.TerminalAIInfo, error)
 	GetFileManageAIInfo() (*dto.FileManageAIInfo, error)
 	GetFileHistorySettingInfo() (*response.FileHistorySettingInfo, error)
+	GetWebsiteDir() string
 	Update(key, value string) error
 	UpdateTerminalAI(req dto.TerminalAIInfo) error
 	UpdateFileManageAI(req dto.FileManageAIInfo) error
@@ -110,6 +113,14 @@ func (u *SettingService) GetFileManageAIInfo() (*dto.FileManageAIInfo, error) {
 
 func (u *SettingService) GetFileHistorySettingInfo() (*response.FileHistorySettingInfo, error) {
 	return historyService.GetSettingInfo()
+}
+
+func (u *SettingService) GetWebsiteDir() string {
+	value, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
+	if value == "" {
+		return path.Join(global.Dir.BaseDir, "1panel", "www")
+	}
+	return value
 }
 
 func (u *SettingService) Update(key, value string) error {

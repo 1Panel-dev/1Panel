@@ -221,10 +221,6 @@ export const getRecycleStatusByNode = (node: string) => {
     return http.get<string>('files/recycle/status?operateNode=' + node);
 };
 
-export const getPathByType = (pathType: string) => {
-    return http.get<string>(`files/path/${pathType}`);
-};
-
 export const searchHostMount = () => {
     return http.post<Dashboard.DiskInfo[]>(`/files/mount`);
 };
