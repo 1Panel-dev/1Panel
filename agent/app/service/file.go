@@ -562,7 +562,7 @@ func copyDecompressTree(ctx context.Context, srcDir, dstDir string) error {
 	return nil
 }
 
-func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) error {
+func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) (retErr error) {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
@@ -637,7 +637,11 @@ func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) error {
 	if err != nil {
 		return err
 	}
-	defer dstFile.Close()
+	defer func() {
+		if cerr := dstFile.Close(); cerr != nil && retErr == nil {
+			retErr = cerr
+		}
+	}()
 
 	if _, err := io.Copy(dstFile, srcFile); err != nil {
 		return err
