@@ -131,8 +131,8 @@ const acceptParams = (params: DialogProps): void => {
     form.proxyPortItem = params.port ? Number(params.port) : 7890;
     form.proxyUser = params.user;
     form.proxyPasswd = params.passwd;
-    form.proxyDocker = params.proxyDocker !== '';
-    proxyDockerVisible.value = params.proxyDocker !== '';
+    form.proxyDocker = params.proxyDocker === 'Enable';
+    proxyDockerVisible.value = params.proxyDocker === 'Enable';
     proxyVisible.value = true;
     form.proxyPasswdKeepItem = params.passwdKeep === 'Enable';
     loadDocker();

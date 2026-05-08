@@ -1,5 +1,6 @@
 type XpackSettingModule = {
     searchXSetting?: () => Promise<any>;
+    getXProxyDocker?: () => Promise<any>;
     updateXSettingByKey?: (key: string, value: string) => Promise<any>;
 };
 
@@ -32,6 +33,14 @@ export async function searchXpackSetting() {
     return module.searchXSetting();
 }
 
+export async function getXpackProxyDocker() {
+    const module = getXpackSettingModule();
+    if (!module?.getXProxyDocker) {
+        return null;
+    }
+    return module.getXProxyDocker();
+}
+
 export async function updateXpackSettingByKey(key: string, value: string) {
     const module = getXpackSettingModule();
     if (!module?.updateXSettingByKey) {
@@ -57,4 +66,5 @@ export async function getEnterpriseUserInfo(currentNode: string) {
 }
 
 export const searchExtensionSetting = searchXpackSetting;
+export const getExtensionProxyDocker = getXpackProxyDocker;
 export const updateExtensionSettingByKey = updateXpackSettingByKey;

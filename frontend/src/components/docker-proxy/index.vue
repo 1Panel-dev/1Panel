@@ -11,7 +11,7 @@
 
 <script lang="ts" setup>
 import { getSettingBaseInfo } from '@/api/modules/setting';
-import { searchXpackSetting } from '@/extensions/xpack';
+import { getXpackProxyDocker } from '@/extensions/xpack';
 
 const showOption = ref(false);
 const restart = ref(false);
@@ -37,12 +37,12 @@ const loadStatus = async () => {
             em('update:withDockerRestart', false);
             return;
         });
-    const res = await searchXpackSetting();
+    const res = await getXpackProxyDocker();
     if (!res) {
         em('update:withDockerRestart', false);
         return;
     }
-    if (res.data.proxyDocker === '') {
+    if (res.data.proxyDocker !== 'Enable') {
         em('update:withDockerRestart', false);
         return;
     }

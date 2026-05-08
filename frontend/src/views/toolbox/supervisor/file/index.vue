@@ -24,7 +24,7 @@
 </template>
 <script lang="ts" setup>
 import { onUnmounted, reactive, ref } from 'vue';
-import { operateSupervisorProcessFile } from '@/api/modules/host-tool';
+import { getSupervisorProcessFile, operateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
@@ -45,7 +45,7 @@ const em = defineEmits(['search']);
 
 const getContent = () => {
     loading.value = true;
-    operateSupervisorProcessFile(req)
+    getSupervisorProcessFile({ name: req.name, file: req.file })
         .then((res) => {
             content.value = res.data;
         })
