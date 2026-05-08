@@ -45,7 +45,7 @@ export const getGPUOptions = () => {
     return http.get<AI.MonitorGPUOptions>(`/ai/gpu/options`);
 };
 export const loadGPUMonitor = (param: AI.MonitorGPUSearch) => {
-    return http.post<AI.MonitorGPUData>(`/ai/gpu/monitor/search`, param);
+    return http.post<AI.MonitorGPUData>(`/ai/gpu/search`, param);
 };
 
 export const pageMcpServer = (req: AI.McpServerSearch) => {

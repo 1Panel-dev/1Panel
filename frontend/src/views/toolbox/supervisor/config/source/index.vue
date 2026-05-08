@@ -12,7 +12,7 @@
 import { onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { operateSupervisorConfig } from '@/api/modules/host-tool';
+import { getSupervisorConfig, updateSupervisorConfig } from '@/api/modules/host-tool';
 
 let data = ref();
 let content = ref('');
@@ -20,7 +20,7 @@ let loading = ref(false);
 
 const submit = () => {
     loading.value = true;
-    operateSupervisorConfig({ type: 'supervisord', operate: 'set', content: content.value })
+    updateSupervisorConfig({ content: content.value })
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             getConfig();
@@ -31,7 +31,7 @@ const submit = () => {
 };
 
 const getConfig = async () => {
-    const res = await operateSupervisorConfig({ type: 'supervisord', operate: 'get' });
+    const res = await getSupervisorConfig();
     data.value = res.data;
     content.value = data.value.content;
 };

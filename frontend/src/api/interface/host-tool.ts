@@ -17,9 +17,7 @@ export namespace HostTool {
         serviceName: string;
     }
 
-    export interface SupervisorConfig {
-        type: string;
-        operate: string;
+    export interface SupervisorConfigUpdate {
         content?: string;
     }
 
@@ -57,6 +55,11 @@ export namespace HostTool {
     export interface ProcessReq {
         operate: string;
         name: string;
+    }
+
+    export interface ProcessFileGetReq {
+        name: string;
+        file: string;
     }
 
     export interface ProcessFileReq {

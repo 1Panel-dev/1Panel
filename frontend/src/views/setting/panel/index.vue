@@ -205,6 +205,7 @@ import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import Proxy from '@/views/setting/panel/proxy/index.vue';
 import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
+import { getXpackProxyDocker } from '@/extensions/xpack';
 import { getXpackSetting, updateXpackSettingByKey } from '@/utils/xpack';
 import { setPrimaryColor } from '@/utils/theme';
 import i18n from '@/lang';
@@ -305,7 +306,10 @@ const search = async () => {
     form.hideMenu = res.data.hideMenu;
 
     if (globalStore.isXpackOrEE()) {
-        const xpackRes = await getXpackSetting();
+        const [xpackRes, proxyDockerRes] = await Promise.all([
+            getXpackSetting(),
+            getXpackProxyDocker().catch(() => null),
+        ]);
         if (xpackRes) {
             form.theme = xpackRes.data.theme || globalStore.themeConfig.theme || 'light';
             form.themeColor = JSON.parse(xpackRes.data.themeColor || '{"light":"#005eeb","dark":"#F0BE96"}');
@@ -313,7 +317,6 @@ const search = async () => {
                 ? xpackRes.data.themeColor
                 : '{"light":"#005eeb","dark":"#F0BE96"}';
             globalStore.themeConfig.theme = form.theme;
-            form.proxyDocker = xpackRes.data.proxyDocker;
             form.watermark = xpackRes.data.watermark;
             form.watermarkShow = xpackRes.data.watermarkShow;
             try {
@@ -322,6 +325,7 @@ const search = async () => {
                 globalStore.watermark = null;
             }
         }
+        form.proxyDocker = proxyDockerRes?.data?.proxyDocker || '';
     } else {
         globalStore.themeConfig.theme = form.theme;
     }
