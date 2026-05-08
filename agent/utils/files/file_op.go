@@ -950,7 +950,7 @@ func (f FileOp) decompressWithSDK(ctx context.Context, srcFile string, dst strin
 		} else {
 			parentDir := path.Dir(filePath)
 			if !f.Stat(parentDir) {
-				if err := f.Fs.MkdirAll(parentDir, info.Mode()); err != nil {
+				if err := f.Fs.MkdirAll(parentDir, constant.DirPerm); err != nil {
 					return err
 				}
 			}
@@ -1116,7 +1116,7 @@ func (f FileOp) tryDecompressTarGz(ctx context.Context, srcFile string, dst stri
 		} else {
 			parentDir := filepath.Dir(filePath)
 			if !f.Stat(parentDir) {
-				if err := f.Fs.MkdirAll(parentDir, info.Mode()); err != nil {
+				if err := f.Fs.MkdirAll(parentDir, constant.DirPerm); err != nil {
 					return err
 				}
 			}

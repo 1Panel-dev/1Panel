@@ -205,15 +205,13 @@ const loadTaskInfo = async () => {
         emitTaskChange();
         if (!taskInfo.value || taskInfo.value.status !== 'Executing') {
             stopTaskPolling();
-            currentTaskID.value = '';
-            taskInfo.value = null;
-            emitTaskChange();
+            resetDrawerState();
+            em('close', false);
         }
     } catch (error) {
         stopTaskPolling();
-        currentTaskID.value = '';
-        taskInfo.value = null;
-        emitTaskChange();
+        resetDrawerState();
+        em('close', false);
     }
 };
 
