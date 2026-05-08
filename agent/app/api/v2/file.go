@@ -969,16 +969,6 @@ func (b *BaseApi) BatchChangeModeAndOwner(c *gin.Context) {
 	helper.Success(c)
 }
 
-func (b *BaseApi) GetPathByType(c *gin.Context) {
-	pathType, ok := c.Params.Get("type")
-	if !ok {
-		helper.BadRequest(c, errors.New("error pathType id in path"))
-		return
-	}
-	resPath := fileService.GetPathByType(pathType)
-	helper.SuccessWithData(c, resPath)
-}
-
 // @Tags File
 // @Summary system mount
 // @Accept json
