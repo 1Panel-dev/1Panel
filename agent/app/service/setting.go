@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"strconv"
 	"strings"
 	"time"
@@ -37,7 +38,7 @@ type ISettingService interface {
 	SetDefaultIsConn(req dto.SSHDefaultConn) error
 	GetSystemProxy() (*dto.SystemProxy, error)
 	GetLocalConn() dto.SSHConnData
-	GetSettingByKey(key string) string
+	GetLocalConnForSSH() (dto.SSHConnData, error)
 
 	SaveDescription(req dto.CommonDescription) error
 }
@@ -267,7 +268,7 @@ func (u *SettingService) GetSystemProxy() (*dto.SystemProxy, error) {
 	return &systemProxy, nil
 }
 
-func (u *SettingService) GetLocalConn() dto.SSHConnData {
+func (u *SettingService) loadLocalConn() dto.SSHConnData {
 	var data dto.SSHConnData
 	data.LocalSSHConnShow, _ = settingRepo.GetValueByKey("LocalSSHConnShow")
 	connItem, _ := settingRepo.GetValueByKey("LocalSSHConn")
@@ -275,10 +276,14 @@ func (u *SettingService) GetLocalConn() dto.SSHConnData {
 		return data
 	}
 	connInfoInDB, _ := encrypt.StringDecrypt(connItem)
-	data.LocalSSHConnShow, _ = settingRepo.GetValueByKey("LocalSSHConnShow")
 	if err := json.Unmarshal([]byte(connInfoInDB), &data); err != nil {
 		return data
 	}
+	return data
+}
+
+func (u *SettingService) GetLocalConn() dto.SSHConnData {
+	data := u.loadLocalConn()
 	if len(data.Password) != 0 {
 		data.Password = base64.StdEncoding.EncodeToString([]byte(data.Password))
 	}
@@ -291,19 +296,12 @@ func (u *SettingService) GetLocalConn() dto.SSHConnData {
 	return data
 }
 
-func (u *SettingService) GetSettingByKey(key string) string {
-	switch key {
-	case "LocalSSHConn":
-		value, _ := settingRepo.GetValueByKey(key)
-		if len(value) == 0 {
-			return ""
-		}
-		itemStr, _ := encrypt.StringDecrypt(value)
-		return itemStr
-	default:
-		value, _ := settingRepo.GetValueByKey(key)
-		return value
+func (u *SettingService) GetLocalConnForSSH() (dto.SSHConnData, error) {
+	data := u.loadLocalConn()
+	if len(data.Addr) == 0 {
+		return data, errors.New("no such ssh conn info in db")
 	}
+	return data, nil
 }
 
 func (u *SettingService) SaveDescription(req dto.CommonDescription) error {

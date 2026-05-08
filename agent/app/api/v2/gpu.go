@@ -50,7 +50,7 @@ func (b *BaseApi) GetCPUOptions(c *gin.Context) {
 // @Success 200 {object} dto.MonitorGPUData
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/monitor/gpu/search [post]
+// @Router /ai/gpu/search [post]
 func (b *BaseApi) LoadGPUMonitor(c *gin.Context) {
 	var req dto.MonitorGPUSearch
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

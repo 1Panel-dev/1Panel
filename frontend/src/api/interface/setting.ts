@@ -25,6 +25,7 @@ export namespace Setting {
         appStoreSyncStatus: string;
 
         fileRecycleBin: string;
+        localSSHConnShow: string;
     }
     export interface SettingInfo {
         systemVersion: string;
