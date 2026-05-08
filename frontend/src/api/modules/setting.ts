@@ -72,6 +72,9 @@ export const loadBaseDir = (node?: string) => {
     const query = node ? `?operateNode=${node}` : '';
     return http.get<string>(`/settings/basedir${query}`);
 };
+export const loadWebsiteDir = () => {
+    return http.get<string>(`/settings/website/dir`);
+};
 export const loadDaemonJsonPath = () => {
     return http.get<string>(`/settings/daemonjson`, {});
 };

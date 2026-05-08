@@ -135,6 +135,16 @@ func (b *BaseApi) UpdateFileHistorySetting(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Load website dir
+// @Success 200 {string} path
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/website/dir [get]
+func (b *BaseApi) LoadWebsiteDir(c *gin.Context) {
+	helper.SuccessWithData(c, settingService.GetWebsiteDir())
+}
+
+// @Tags System Setting
 // @Summary Load local backup dir
 // @Success 200 {string} path
 // @Security ApiKeyAuth

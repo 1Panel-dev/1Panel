@@ -73,7 +73,6 @@ type IFileService interface {
 	BatchChangeModeAndOwner(op request.FileRoleReq) error
 	ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error)
 
-	GetPathByType(pathType string) string
 	BatchCheckFiles(req request.FilePathsCheck) []response.ExistFileInfo
 	GetHostMount() []dto.DiskInfo
 	GetUsersAndGroups() (*response.UserGroupResponse, error)
@@ -919,17 +918,6 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		res.End = logFileRes.IsEndOfFile
 	}
 	return res, nil
-}
-
-func (f *FileService) GetPathByType(pathType string) string {
-	if pathType == "websiteDir" {
-		value, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
-		if value == "" {
-			return path.Join(global.Dir.BaseDir, "1panel", "www")
-		}
-		return value
-	}
-	return ""
 }
 
 func (f *FileService) BatchCheckFiles(req request.FilePathsCheck) []response.ExistFileInfo {
