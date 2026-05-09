@@ -32,10 +32,8 @@
                 <el-divider class="divider" />
 
                 <div class="dropdown-item" @click="openTask">
-                    <div class="node">
-                        <SvgIcon class="icon" iconName="p-renwuzhongxin1" />
-                        {{ $t('menu.msgCenter') }}
-                    </div>
+                    <SvgIcon class="icon" iconName="p-renwuzhongxin1" />
+                    {{ $t('menu.msgCenter') }}
                     <el-tag class="msg-tag" v-if="taskCount !== 0" size="small" round>{{ taskCount }}</el-tag>
                 </div>
                 <el-divider v-if="showNodes()" class="divider" />
