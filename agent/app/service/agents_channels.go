@@ -1312,7 +1312,7 @@ func installOpenclawPlugin(mgr *cmd.CommandHelper, containerName, spec, pluginID
 	if err := mgr.Run("docker", "exec", "-w", workdir, containerName, "npm", "pack", "--silent", spec); err != nil {
 		return err
 	}
-	pkgPath, err := mgr.RunWithStdout("docker", "exec", containerName, "find", workdir, "-maxdepth", "1", "-type", "f", "-name", "*.tgz", "-print", "-quit")
+	pkgPath, err := cmd.RunDockerExecWithStdout(10*time.Minute, containerName, "find", workdir, "-maxdepth", "1", "-type", "f", "-name", "*.tgz", "-print", "-quit")
 	if err != nil {
 		return err
 	}
