@@ -1084,6 +1084,8 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 			return nil, buserr.New("ErrInvalidParams")
 		}
 		logFilePath = path.Join(global.Dir.LogDir, "ai", safeName)
+	default:
+		return nil, buserr.New("ErrNotSupportType")
 	}
 
 	file, err := os.Open(logFilePath)

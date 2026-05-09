@@ -9610,30 +9610,6 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/core/settings/by": {
-			"post": {
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Load system setting by key",
-				"tags": [
-					"System Setting"
-				]
-			}
-		},
 		"/core/settings/interface": {
 			"get": {
 				"consumes": [

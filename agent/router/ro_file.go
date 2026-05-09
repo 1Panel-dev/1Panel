@@ -54,7 +54,7 @@ func (f *FileRouter) InitRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/depth/size", baseApi.DepthDirSize)
 		fileRouter.GET("/wget/process", baseApi.WgetProcess)
 		fileRouter.GET("/wget/process/keys", baseApi.ProcessKeys)
-		fileRouter.POST("/read", baseApi.ReadFileByLine)
+		fileRouter.POST("/read/:type", baseApi.ReadFileByLine)
 		fileRouter.POST("/batch/role", baseApi.BatchChangeModeAndOwner)
 
 		fileRouter.POST("/recycle/search", baseApi.SearchRecycleBinFile)

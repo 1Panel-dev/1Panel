@@ -135,6 +135,10 @@ func (b *BaseApi) UpdateScript(c *gin.Context) {
 }
 
 func (b *BaseApi) RunScript(c *gin.Context) {
+	if !websocket.IsWebSocketUpgrade(c.Request) {
+		helper.Success(c)
+		return
+	}
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		global.LOG.Errorf("gin context http handler failed, err: %v", err)

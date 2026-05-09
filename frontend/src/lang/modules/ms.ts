@@ -3906,8 +3906,6 @@ const message = {
             ai_mcp_view: 'Paparan MCP',
             ai_mcp_manage: 'Pengurusan MCP',
             ai_gpu_view: 'Paparan GPU',
-            ai_benchmark_view: 'Paparan Penanda Aras AI',
-            ai_benchmark_manage: 'Pengurusan Penanda Aras AI',
             website_view: 'Paparan Laman Web',
             website_manage: 'Pengurusan Laman Web',
             website_cert_view: 'Paparan Sijil',

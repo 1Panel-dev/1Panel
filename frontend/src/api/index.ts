@@ -9,6 +9,7 @@ import { encodeBase64 } from '@/utils/base64';
 import i18n from '@/lang';
 import { changeToLocal } from '@/utils/node';
 import { getCookie } from '@/utils/auth';
+import { handleAuthResponseCode } from '@/utils/auth-response';
 
 const getGlobalStore = () => GlobalStore();
 
@@ -71,21 +72,12 @@ class RequestHttp {
             (response: AxiosResponse) => {
                 const globalStore = getGlobalStore();
                 const { data } = response;
-                if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
-                    globalStore.isLogin = false;
-                    router.push({
-                        name: 'entrance',
-                        params: { code: globalStore.entrance },
-                    });
+                const authResult = handleAuthResponseCode(data, { showRBACMessage: true });
+                if (authResult.handled) {
+                    if (authResult.action === 'return') {
+                        return;
+                    }
                     return Promise.reject(data);
-                }
-                if (data.code == ResultEnum.ERR_RBAC) {
-                    MsgError(data.message || i18n.global.t('commons.res.forbidden'));
-                    return Promise.reject(data);
-                }
-                if (data.code == ResultEnum.EXPIRED) {
-                    router.push({ name: 'Expired' });
-                    return;
                 }
                 if (data.code == ResultEnum.ERR_XPACK) {
                     globalStore.isProductPro = false;

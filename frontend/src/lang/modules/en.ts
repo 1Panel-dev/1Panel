@@ -3813,8 +3813,6 @@ const message = {
             ai_mcp_view: 'MCP View',
             ai_mcp_manage: 'MCP Manage',
             ai_gpu_view: 'GPU View',
-            ai_benchmark_view: 'AI Benchmark View',
-            ai_benchmark_manage: 'AI Benchmark Manage',
             website_view: 'Website View',
             website_manage: 'Website Manage',
             website_cert_view: 'Certificate View',

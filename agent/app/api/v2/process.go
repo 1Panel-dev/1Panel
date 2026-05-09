@@ -5,9 +5,14 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	websocket2 "github.com/1Panel-dev/1Panel/agent/utils/websocket"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 func (b *BaseApi) ProcessWs(c *gin.Context) {
+	if !websocket.IsWebSocketUpgrade(c.Request) {
+		helper.Success(c)
+		return
+	}
 	ws, err := wsUpgrade.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		return

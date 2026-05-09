@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -901,6 +902,10 @@ func (b *BaseApi) LoadComposeEnv(c *gin.Context) {
 // @Security Timestamp
 // @Router /containers/search/log [get]
 func (b *BaseApi) ContainerStreamLogs(c *gin.Context) {
+	if !strings.Contains(strings.ToLower(c.GetHeader("Accept")), "text/event-stream") {
+		helper.Success(c)
+		return
+	}
 	c.Header("Content-Type", "text/event-stream")
 	c.Header("Cache-Control", "no-cache")
 	c.Header("Connection", "keep-alive")

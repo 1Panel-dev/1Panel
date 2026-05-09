@@ -3900,8 +3900,6 @@ const message = {
             ai_mcp_view: 'Просмотр MCP',
             ai_mcp_manage: 'Управление MCP',
             ai_gpu_view: 'Просмотр GPU',
-            ai_benchmark_view: 'Просмотр AI-бенчмарка',
-            ai_benchmark_manage: 'Управление AI-бенчмарком',
             website_view: 'Просмотр сайта',
             website_manage: 'Управление сайтом',
             website_cert_view: 'Просмотр сертификата',
