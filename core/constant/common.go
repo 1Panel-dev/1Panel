@@ -58,6 +58,8 @@ var WebUrlMap = map[string]struct{}{
 	"/apps/setting":   {},
 
 	"/ai":               {},
+	"/ai/ai-proxy":      {},
+	"/ai/benchmark":     {},
 	"/ai/model/account": {},
 	"/ai/model/local":   {},
 	"/ai/gpu":           {},
