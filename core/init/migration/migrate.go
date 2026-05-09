@@ -40,6 +40,7 @@ func Init() {
 		migrations.AddAppStoreInstallAllowPortSetting,
 		migrations.AddUserManagementMenu,
 		migrations.AddAIBenchmarkMenu,
+		migrations.AddAIProxyMenu,
 		migrations.AddOperationLogUser,
 		migrations.AddIsOfflineSetting,
 	})

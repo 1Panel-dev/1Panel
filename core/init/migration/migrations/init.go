@@ -934,7 +934,7 @@ var UpdateAiModelMenuStructure = &gormigrate.Migration{
 }
 
 func buildAiMenuChildren(children []dto.ShowMenu) []dto.ShowMenu {
-	return []dto.ShowMenu{
+	result := []dto.ShowMenu{
 		normalizeAiMenuChild(children, dto.ShowMenu{
 			ID:       "44",
 			Label:    "Agents",
@@ -953,15 +953,30 @@ func buildAiMenuChildren(children []dto.ShowMenu) []dto.ShowMenu {
 			Path:     "/ai/model/account",
 			Sort:     100,
 		}, "AIModel", "OllamaModel"),
-		normalizeAiMenuChild(children, dto.ShowMenu{
+	}
+
+	if global.CONF.Base.IsEnterprise {
+		result = append(result, normalizeAiMenuChild(children, dto.ShowMenu{
+			ID:       "46",
+			Label:    "AIProxyManagement",
+			Disabled: false,
+			IsShow:   true,
+			Title:    "aiTools.aiProxy.title",
+			Path:     "/ai/ai-proxy",
+			Sort:     150,
+		}, "AIProxyManagement"))
+		result = append(result, normalizeAiMenuChild(children, dto.ShowMenu{
 			ID:       "45",
 			Label:    "AIBenchmark",
 			Disabled: false,
 			IsShow:   true,
 			Title:    "aiTools.benchmark.title",
 			Path:     "/ai/benchmark",
-			Sort:     150,
-		}, "AIBenchmark"),
+			Sort:     160,
+		}, "AIBenchmark"))
+	}
+
+	result = append(result,
 		normalizeAiMenuChild(children, dto.ShowMenu{
 			ID:       "42",
 			Label:    "MCPServer",
@@ -980,7 +995,8 @@ func buildAiMenuChildren(children []dto.ShowMenu) []dto.ShowMenu {
 			Path:     "/ai/gpu",
 			Sort:     300,
 		}, "GPU"),
-	}
+	)
+	return result
 }
 
 func normalizeAiMenuChild(children []dto.ShowMenu, fallback dto.ShowMenu, labels ...string) dto.ShowMenu {
@@ -1030,14 +1046,53 @@ var AddAIBenchmarkMenu = &gormigrate.Migration{
 			IsShow:   true,
 			Label:    "AIBenchmark",
 			Path:     "/ai/benchmark",
-			Sort:     150,
+			Sort:     160,
 		}
 
 		for i := range menus {
 			if menus[i].Label != "AI-Menu" {
 				continue
 			}
-			menus[i].Children = helper.UpsertMenuByLabel(menus[i].Children, newItem, "AIModel")
+			menus[i].Children = helper.UpsertMenuByLabel(menus[i].Children, newItem, "AIProxyManagement")
+			break
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
+}
+
+var AddAIProxyMenu = &gormigrate.Migration{
+	ID: "20260509-add-ai-proxy-menu",
+	Migrate: func(tx *gorm.DB) error {
+		if !global.CONF.Base.IsEnterprise {
+			return nil
+		}
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+		if menuJSON == "" {
+			menuJSON = helper.LoadMenus()
+		}
+
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		for i := range menus {
+			if menus[i].Label != "AI-Menu" {
+				continue
+			}
+			menus[i].Children = buildAiMenuChildren(menus[i].Children)
 			break
 		}
 
