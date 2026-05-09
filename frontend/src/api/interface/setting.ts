@@ -92,6 +92,7 @@ export namespace Setting {
         noAuthSetting: string;
         proxyType: string;
 
+        scriptSync: string;
         dashboardMemoVisible: string;
         dashboardSimpleNodeVisible: string;
     }

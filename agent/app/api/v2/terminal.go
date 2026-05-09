@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
@@ -21,19 +22,18 @@ import (
 )
 
 func (b *BaseApi) WsLocalTerminal(c *gin.Context) {
-	client, err := loadLocalConn()
-	b.runSSHSession(c, client, err, c.DefaultQuery("command", ""))
+	b.runSSHSession(c, loadLocalConn, c.DefaultQuery("command", ""))
 }
 
 func (b *BaseApi) WsHostSSH(c *gin.Context) {
-	hostID, _ := strconv.Atoi(c.DefaultQuery("id", "0"))
-	if hostID <= 0 {
-		b.runSSHSession(c, nil, errors.New("missing host id"), c.DefaultQuery("command", ""))
-		return
-	}
-	host, err := service.GetHostInfo(uint(hostID))
-	client, err := newHostSSHClient(host, err)
-	b.runSSHSession(c, client, err, c.DefaultQuery("command", ""))
+	b.runSSHSession(c, func() (*ssh.SSHClient, error) {
+		hostID, _ := strconv.Atoi(c.DefaultQuery("id", "0"))
+		if hostID <= 0 {
+			return nil, errors.New("missing host id")
+		}
+		host, err := service.GetHostInfo(uint(hostID))
+		return newHostSSHClient(host, err)
+	}, c.DefaultQuery("command", ""))
 }
 
 func (b *BaseApi) WsContainerTerminal(c *gin.Context) {
@@ -65,6 +65,10 @@ func (b *BaseApi) WsContainerTerminal(c *gin.Context) {
 }
 
 func prepareTerminalSession(c *gin.Context) (*websocket.Conn, int, int, bool) {
+	if !websocket.IsWebSocketUpgrade(c.Request) {
+		helper.Success(c)
+		return nil, 0, 0, false
+	}
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		global.LOG.Errorf("gin context http handler failed, err: %v", err)
@@ -88,13 +92,14 @@ func prepareTerminalSession(c *gin.Context) (*websocket.Conn, int, int, bool) {
 	return wsConn, cols, rows, true
 }
 
-func (b *BaseApi) runSSHSession(c *gin.Context, client *ssh.SSHClient, clientErr error, command string) {
+func (b *BaseApi) runSSHSession(c *gin.Context, connect func() (*ssh.SSHClient, error), command string) {
 	wsConn, cols, rows, ok := prepareTerminalSession(c)
 	if !ok {
 		return
 	}
 	defer wsConn.Close()
 
+	client, clientErr := connect()
 	if wshandleError(wsConn, errors.WithMessage(clientErr, "failed to set up the connection. Please check the host information")) {
 		return
 	}

@@ -80,6 +80,7 @@ import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import { checkStreamAuth } from '@/utils/stream-auth';
 const globalStore = GlobalStore();
 
 const em = defineEmits(['update:loading']);
@@ -196,6 +197,11 @@ const bindXTermEvents = () => {
     });
 };
 
+const showEventSourceAuthError = (message: string) => {
+    MsgError(message);
+    writeLogLine(message);
+};
+
 const initTerminal = () => {
     if (!terminalElement.value || term) return;
     term = new Terminal({
@@ -243,6 +249,11 @@ const searchLogs = async () => {
         url = `/api/v2/containers/search/log?compose=${logSearch.compose}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&timestamp=${logSearch.isShowTimestamp}&operateNode=${currentNode}`;
     }
 
+    const authError = await checkStreamAuth(url, currentNode);
+    if (authError) {
+        showEventSourceAuthError(authError);
+        return;
+    }
     eventSource = new EventSource(url);
     eventSource.onmessage = (event: MessageEvent) => {
         writeLogLine(event.data);

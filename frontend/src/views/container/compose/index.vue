@@ -43,7 +43,7 @@
                                                     v-if="!row.composeFileExists"
                                                     :content="$t('container.composeFileMissing')"
                                                 >
-                                                    <el-button link icon="WarningFilled">
+                                                    <el-button link icon="WarningFilled" @click.stop>
                                                         <WarningFilled />
                                                     </el-button>
                                                 </el-tooltip>
@@ -78,7 +78,7 @@
                                                     }}
                                                 </el-text>
                                             </div>
-                                            <div class="compose-actions">
+                                            <div class="compose-actions" @click.stop>
                                                 <el-dropdown placement="bottom">
                                                     <Status :status="getComposeStatus(row)" :operate="true" />
                                                     <template #dropdown>

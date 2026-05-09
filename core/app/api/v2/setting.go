@@ -12,7 +12,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	appauth "github.com/1Panel-dev/1Panel/core/app/auth"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
-	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -43,25 +42,6 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 // @Router /core/settings/search/base [post]
 func (b *BaseApi) GetSettingBaseInfo(c *gin.Context) {
 	setting, err := settingService.GetSettingBaseInfo()
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, setting)
-}
-
-// @Tags System Setting
-// @Summary Load system setting by key
-// @Success 200 {string} info
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/by [post]
-func (b *BaseApi) GetSettingByKey(c *gin.Context) {
-	var req dto.SettingKey
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-	setting, err := repo.NewISettingRepo().GetValueByKey(req.Key)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
