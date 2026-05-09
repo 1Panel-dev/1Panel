@@ -899,6 +899,10 @@ var wsUpgrade = websocket.Upgrader{
 }
 
 func (b *BaseApi) WgetProcess(c *gin.Context) {
+	if !websocket.IsWebSocketUpgrade(c.Request) {
+		helper.Success(c)
+		return
+	}
 	ws, err := wsUpgrade.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		return
@@ -936,6 +940,9 @@ func (b *BaseApi) ReadFileByLine(c *gin.Context) {
 	var req request.FileReadByLineReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
+	}
+	if readType := strings.TrimSpace(c.Param("type")); readType != "" {
+		req.Type = readType
 	}
 	res, err := fileService.ReadLogByLine(req)
 	if err != nil {

@@ -195,7 +195,7 @@ export const addFavorite = (path: string) => {
 
 export const readByLine = (req: File.FileReadByLine, operateNode?: string) => {
     const params = operateNode ? `?operateNode=${operateNode}` : '';
-    return http.post<any>(`files/read${params}`, req, TimeoutEnum.T_40S);
+    return http.post<any>(`files/read/${encodeURIComponent(req.type)}${params}`, req, TimeoutEnum.T_40S);
 };
 
 export const removeFavorite = (id: number) => {

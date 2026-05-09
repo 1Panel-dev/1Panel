@@ -4001,8 +4001,6 @@ const message = {
             ai_mcp_view: 'Visualização do MCP',
             ai_mcp_manage: 'Gerenciamento do MCP',
             ai_gpu_view: 'Visualização da GPU',
-            ai_benchmark_view: 'Visualização do Benchmark de IA',
-            ai_benchmark_manage: 'Gerenciamento do Benchmark de IA',
             website_view: 'Visualização do Site',
             website_manage: 'Gerenciamento do Site',
             website_cert_view: 'Visualização do Certificado',

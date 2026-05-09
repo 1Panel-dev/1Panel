@@ -3506,8 +3506,6 @@ const message = {
             ai_mcp_view: 'MCP 檢視',
             ai_mcp_manage: 'MCP 管理',
             ai_gpu_view: 'GPU 檢視',
-            ai_benchmark_view: 'AI 基準測試檢視',
-            ai_benchmark_manage: 'AI 基準測試管理',
             website_view: '網站檢視',
             website_manage: '網站管理',
             website_cert_view: '憑證檢視',

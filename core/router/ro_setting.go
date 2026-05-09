@@ -20,7 +20,6 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 	{
 		router.POST("/search/base", baseApi.GetSettingBaseInfo)
 
-		settingRouter.POST("/by", baseApi.GetSettingByKey)
 		settingRouter.POST("/search", baseApi.GetSettingInfo)
 		settingRouter.POST("/terminal/search", baseApi.GetTerminalSettingInfo)
 		settingRouter.GET("/search/available", baseApi.GetSystemAvailable)

@@ -118,9 +118,6 @@ export const getSettingInfo = () => {
 export const getSettingBaseInfo = () => {
     return http.post<Setting.SettingBaseInfo>(`/core/settings/search/base`);
 };
-export const getSettingBy = (key: string) => {
-    return http.post<string>(`/core/settings/by`, { key: key });
-};
 export const getTerminalInfo = () => {
     return http.post<Setting.TerminalInfo>(`/core/settings/terminal/search`);
 };
