@@ -30,6 +30,7 @@ import i18n from '@/lang';
 import { stopProcess } from '@/api/modules/process';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import { checkStreamAuth } from '@/utils/stream-auth';
 const globalStore = GlobalStore();
 
 const sshSearch = reactive({
@@ -46,19 +47,28 @@ const buttons = [
     },
 ];
 
-let processSocket = ref(null) as unknown as WebSocket;
+let processSocket: WebSocket | null = null;
+let sendTimer: ReturnType<typeof setInterval> | null = null;
+let initProcessToken = 0;
 const data = ref([]);
 const loading = ref(false);
 const tableRef = ref();
 
 const isWsOpen = () => {
-    const readyState = processSocket && processSocket.readyState;
-    return readyState === 1;
+    return processSocket?.readyState === WebSocket.OPEN;
+};
+const clearSendTimer = () => {
+    if (sendTimer) {
+        clearInterval(sendTimer);
+        sendTimer = null;
+    }
 };
 const closeSocket = () => {
+    clearSendTimer();
     if (isWsOpen()) {
-        processSocket && processSocket.close();
+        processSocket.close();
     }
+    processSocket = null;
 };
 
 const onOpenProcess = () => {};
@@ -73,12 +83,24 @@ const onClose = () => {
     closeSocket();
 };
 
-const initProcess = () => {
+const initProcess = async () => {
+    const token = ++initProcessToken;
     let href = window.location.href;
     let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     let ipLocal = href.split('//')[1].split('/')[0];
     let currentNode = globalStore.currentNode;
-    processSocket = new WebSocket(`${protocol}://${ipLocal}/api/v2/process/ws?operateNode=${currentNode}`);
+    const url = `${protocol}://${ipLocal}/api/v2/process/ws?operateNode=${currentNode}`;
+    const authError = await checkStreamAuth(url, currentNode);
+    if (token !== initProcessToken) {
+        return;
+    }
+    if (authError) {
+        loading.value = false;
+        MsgError(authError);
+        return;
+    }
+    closeSocket();
+    processSocket = new WebSocket(url);
     processSocket.onopen = onOpenProcess;
     processSocket.onmessage = onMessage;
     processSocket.onerror = onerror;
@@ -89,7 +111,8 @@ const initProcess = () => {
 
 const sendMsg = () => {
     loading.value = true;
-    setInterval(() => {
+    clearSendTimer();
+    sendTimer = setInterval(() => {
         search();
     }, 3000);
 };
@@ -122,6 +145,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+    initProcessToken++;
     closeSocket();
 });
 </script>

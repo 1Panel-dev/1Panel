@@ -135,7 +135,7 @@ import { GlobalStore } from '@/store';
 import { getGroupList } from '@/api/modules/group';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import { MsgSuccess } from '@/utils/message';
-import { getSettingBy, updateSetting } from '@/api/modules/setting';
+import { getSettingBaseInfo, updateSetting } from '@/api/modules/setting';
 
 const globalStore = GlobalStore();
 const mobile = computed(() => {
@@ -239,8 +239,8 @@ const openTaskLog = (taskID: string) => {
 };
 
 const loadSyncStatus = async () => {
-    const res = await getSettingBy('ScriptSync');
-    scriptSync.value = res.data;
+    const res = await getSettingBaseInfo();
+    scriptSync.value = res.data.scriptSync;
 };
 const handleSyncOp = async (command: string) => {
     let val = 'Enable';

@@ -3906,8 +3906,6 @@ const message = {
             ai_mcp_view: 'MCP Görünümü',
             ai_mcp_manage: 'MCP Yönetimi',
             ai_gpu_view: 'GPU Görünümü',
-            ai_benchmark_view: 'AI Benchmark Görünümü',
-            ai_benchmark_manage: 'AI Benchmark Yönetimi',
             website_view: 'Web Sitesi Görünümü',
             website_manage: 'Web Sitesi Yönetimi',
             website_cert_view: 'Sertifika Görünümü',

@@ -70,12 +70,10 @@ type SettingBaseInfo struct {
 	NoAuthSetting          string `json:"noAuthSetting"`
 	ProxyType              string `json:"proxyType"`
 
+	ScriptSync string `json:"scriptSync"`
+
 	DashboardMemoVisible       string `json:"dashboardMemoVisible"`
 	DashboardSimpleNodeVisible string `json:"dashboardSimpleNodeVisible"`
-}
-
-type SettingKey struct {
-	Key string `json:"key" validate:"required,oneof=ScriptSync"`
 }
 
 type SettingUpdate struct {
