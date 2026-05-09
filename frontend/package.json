@@ -38,7 +38,7 @@
         "crypto-js": "^4.2.0",
         "dompurify": "^3.4.2",
         "echarts": "^5.5.0",
-        "element-plus": "2.11.9",
+        "element-plus": "2.14.0",
         "js-base64": "^3.7.7",
         "jsencrypt": "^3.3.2",
         "md-editor-v3": "^2.11.3",
