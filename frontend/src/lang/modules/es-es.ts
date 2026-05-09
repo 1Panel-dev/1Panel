@@ -3824,8 +3824,6 @@ const message = {
             ai_mcp_view: 'Vista de MCP',
             ai_mcp_manage: 'Gestión de MCP',
             ai_gpu_view: 'Vista de GPU',
-            ai_benchmark_view: 'Vista de benchmark de IA',
-            ai_benchmark_manage: 'Gestión de benchmark de IA',
             website_view: 'Vista del sitio web',
             website_manage: 'Gestión del sitio web',
             website_cert_view: 'Vista de certificados',

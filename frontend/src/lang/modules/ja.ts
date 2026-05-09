@@ -3807,8 +3807,6 @@ const message = {
             ai_mcp_view: 'MCP 表示',
             ai_mcp_manage: 'MCP 管理',
             ai_gpu_view: 'GPU 表示',
-            ai_benchmark_view: 'AI ベンチマーク表示',
-            ai_benchmark_manage: 'AI ベンチマーク管理',
             website_view: 'サイト表示',
             website_manage: 'サイト管理',
             website_cert_view: '証明書表示',

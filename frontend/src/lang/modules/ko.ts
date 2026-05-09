@@ -3722,8 +3722,6 @@ const message = {
             ai_mcp_view: 'MCP 보기',
             ai_mcp_manage: 'MCP 관리',
             ai_gpu_view: 'GPU 보기',
-            ai_benchmark_view: 'AI 벤치마크 보기',
-            ai_benchmark_manage: 'AI 벤치마크 관리',
             website_view: '웹사이트 보기',
             website_manage: '웹사이트 관리',
             website_cert_view: '인증서 보기',

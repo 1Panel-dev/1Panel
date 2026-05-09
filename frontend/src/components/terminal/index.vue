@@ -23,6 +23,8 @@ import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
 import { decodeBase64, encodeBase64 } from '@/utils/base64';
 import { GlobalStore, TerminalStore } from '@/store';
+import { MsgError } from '@/utils/message';
+import { checkStreamAuth } from '@/utils/stream-auth';
 const globalStore = GlobalStore();
 
 const terminalElement = ref<HTMLDivElement | null>(null);
@@ -32,6 +34,7 @@ const webSocketReady = ref(false);
 const term = ref();
 const terminalSocket = ref<WebSocket>();
 const heartbeatTimer = ref<NodeJS.Timer>();
+let initWebSocketToken = 0;
 const latency = ref(0);
 const initCmd = ref('');
 const hideInitCmdEcho = ref(false);
@@ -181,11 +184,18 @@ const initError = (errorInfo: string) => {
 };
 
 function onClose(isKeepShow: boolean = false) {
+    initWebSocketToken++;
     window.removeEventListener('resize', changeTerminalSize);
     clearAINotice();
+    webSocketReady.value = false;
     try {
         terminalSocket.value?.close();
     } catch {}
+    if (heartbeatTimer.value) {
+        clearInterval(Number(heartbeatTimer.value));
+        heartbeatTimer.value = undefined;
+    }
+    terminalSocket.value = undefined;
     if (!isKeepShow) {
         try {
             term.value.dispose();
@@ -236,7 +246,8 @@ function changeTerminalSize() {
 
 // websocket 相关代码 start
 
-const initWebSocket = (endpoint_: string, args: string = '') => {
+const initWebSocket = async (endpoint_: string, args: string = '') => {
+    const token = ++initWebSocketToken;
     const href = window.location.href;
     const protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     const host = href.split('//')[1].split('/')[0];
@@ -244,6 +255,17 @@ const initWebSocket = (endpoint_: string, args: string = '') => {
     let conn = `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}&operateNode=${globalStore.currentNode}`;
     if (args.indexOf('&operateNode=') !== -1) {
         conn = `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}`;
+    }
+    const authError = await checkStreamAuth(conn);
+    if (token !== initWebSocketToken || !termReady.value) {
+        return;
+    }
+    if (authError) {
+        showWebSocketAuthError(authError);
+        return;
+    }
+    if (heartbeatTimer.value) {
+        clearInterval(Number(heartbeatTimer.value));
     }
     terminalSocket.value = new WebSocket(conn);
     terminalSocket.value.onopen = runRealTerminal;
@@ -260,6 +282,12 @@ const initWebSocket = (endpoint_: string, args: string = '') => {
             );
         }
     }, 1000 * 10);
+};
+
+const showWebSocketAuthError = (message: string) => {
+    clearAINotice();
+    MsgError(message);
+    term.value?.write(`\x1b[31m${message}\x1b[m\r\n`);
 };
 
 const runRealTerminal = () => {
@@ -349,9 +377,12 @@ const errorRealTerminal = (ex: any) => {
 
 const closeRealTerminal = (ev: CloseEvent) => {
     clearAINotice();
+    webSocketReady.value = false;
     if (heartbeatTimer.value) {
         clearInterval(Number(heartbeatTimer.value));
+        heartbeatTimer.value = undefined;
     }
+    terminalSocket.value = undefined;
     term.value?.write('The connection has been disconnected.');
     term.value?.write(ev.reason);
 };

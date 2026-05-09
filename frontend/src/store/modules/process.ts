@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, reactive } from 'vue';
+import { MsgError } from '@/utils/message';
+import { checkStreamAuth } from '@/utils/stream-auth';
 
 export interface PsSearch {
     type: 'ps';
@@ -19,6 +21,7 @@ export const ProcessStore = defineStore('ProcessStore', () => {
     let websocket: WebSocket | null = null;
     let pollingTimer: ReturnType<typeof setInterval> | null = null;
     let disconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let initWebSocketToken = 0;
 
     let connectionRefCount = 0;
 
@@ -130,18 +133,32 @@ export const ProcessStore = defineStore('ProcessStore', () => {
         websocket = null;
     };
 
-    const initWebSocket = (currentNode: string) => {
+    const initWebSocket = async (currentNode: string) => {
         if (websocket || isConnecting.value) {
             return;
         }
 
+        const token = ++initWebSocketToken;
         isConnecting.value = true;
 
         const href = window.location.href;
         const protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
         const ipLocal = href.split('//')[1].split('/')[0];
 
-        websocket = new WebSocket(`${protocol}://${ipLocal}/api/v2/process/ws?operateNode=${currentNode}`);
+        const url = `${protocol}://${ipLocal}/api/v2/process/ws?operateNode=${currentNode}`;
+        const authError = await checkStreamAuth(url, currentNode);
+        if (token !== initWebSocketToken || connectionRefCount === 0) {
+            if (token === initWebSocketToken) {
+                isConnecting.value = false;
+            }
+            return;
+        }
+        if (authError) {
+            MsgError(authError);
+            isConnecting.value = false;
+            return;
+        }
+        websocket = new WebSocket(url);
         websocket.onopen = onOpen;
         websocket.onmessage = onMessage;
         websocket.onerror = onError;
@@ -149,6 +166,7 @@ export const ProcessStore = defineStore('ProcessStore', () => {
     };
 
     const closeWebSocket = () => {
+        initWebSocketToken++;
         stopPolling();
 
         if (websocket) {
