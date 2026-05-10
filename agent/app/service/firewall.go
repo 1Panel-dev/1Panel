@@ -34,6 +34,7 @@ type IFirewallService interface {
 	UpdateAddrRule(req dto.AddrRuleUpdate) error
 	UpdateDescription(req dto.UpdateFirewallDescription) error
 	BatchOperateRule(req dto.BatchRuleOperate) error
+	GetPortSecurityOverview(req dto.PortSecuritySearch) (*dto.PortSecurityOverview, error)
 }
 
 func NewIFirewallService() IFirewallService {

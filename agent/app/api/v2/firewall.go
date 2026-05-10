@@ -337,3 +337,26 @@ func (b *BaseApi) LoadChainStatus(c *gin.Context) {
 
 	helper.SuccessWithData(c, iptablesService.LoadChainStatus(req))
 }
+
+// @Tags Firewall
+// @Summary Get port security overview
+// @Accept json
+// @Param request body dto.PortSecuritySearch true "request"
+// @Success 200 {object} dto.PortSecurityOverview
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/port/security [post]
+func (b *BaseApi) GetPortSecurity(c *gin.Context) {
+	var req dto.PortSecuritySearch
+	if err := helper.CheckBind(&req, c); err != nil {
+		return
+	}
+
+	data, err := firewallService.GetPortSecurityOverview(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	helper.SuccessWithData(c, data)
+}

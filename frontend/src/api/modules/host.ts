@@ -43,6 +43,9 @@ export const updateFirewallDescription = (params: Host.UpdateDescription) => {
 export const batchOperateRule = (params: Host.BatchRule) => {
     return http.post(`/hosts/firewall/batch`, params, TimeoutEnum.T_60S);
 };
+export const getPortSecurity = (params: Host.PortSecuritySearch) => {
+    return http.post<Host.PortSecurityOverview>(`/hosts/firewall/port/security`, params, TimeoutEnum.T_40S);
+};
 
 // Iptables Filter
 export const searchFilterRules = (params: Host.IptablesFilterRuleSearch) => {

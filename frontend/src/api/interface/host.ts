@@ -140,6 +140,37 @@ export namespace Host {
         rules: Array<RulePort>;
     }
 
+    export interface PortSecuritySearch {
+        info: string;
+        status: string;
+    }
+    export interface PortSecurityItem {
+        port: number;
+        protocol: string;
+        bindAddress: string;
+        processName: string;
+        pid: number;
+        sourceType: string;
+        containerName: string;
+        appName: string;
+        status: string;
+        hasRule: boolean;
+        ruleStrategy: string;
+    }
+    export interface PortSecuritySummary {
+        total: number;
+        protected: number;
+        unprotected: number;
+        dockerBypassed: number;
+        localOnly: number;
+    }
+    export interface PortSecurityOverview {
+        items: Array<PortSecurityItem>;
+        summary: PortSecuritySummary;
+        fireActive: boolean;
+        dockerExist: boolean;
+    }
+
     export interface MonitorSetting {
         defaultNetwork: string;
         defaultIO: string;

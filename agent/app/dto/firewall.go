@@ -111,3 +111,37 @@ type IptablesChainStatus struct {
 	IsBind          bool   `json:"isBind"`
 	DefaultStrategy string `json:"defaultStrategy"`
 }
+
+type PortSecuritySearch struct {
+	Info   string `json:"info"`
+	Status string `json:"status"`
+}
+
+type PortSecurityOverview struct {
+	Items       []PortSecurityItem  `json:"items"`
+	Summary     PortSecuritySummary `json:"summary"`
+	FireActive  bool                `json:"fireActive"`
+	DockerExist bool                `json:"dockerExist"`
+}
+
+type PortSecuritySummary struct {
+	Total          int `json:"total"`
+	Protected      int `json:"protected"`
+	Unprotected    int `json:"unprotected"`
+	DockerBypassed int `json:"dockerBypassed"`
+	LocalOnly      int `json:"localOnly"`
+}
+
+type PortSecurityItem struct {
+	Port          uint32 `json:"port"`
+	Protocol      string `json:"protocol"`
+	BindAddress   string `json:"bindAddress"`
+	ProcessName   string `json:"processName"`
+	PID           int32  `json:"pid"`
+	SourceType    string `json:"sourceType"`
+	ContainerName string `json:"containerName"`
+	AppName       string `json:"appName"`
+	Status        string `json:"status"`
+	HasRule       bool   `json:"hasRule"`
+	RuleStrategy  string `json:"ruleStrategy"`
+}

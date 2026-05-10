@@ -21,6 +21,12 @@
                     <span>{{ $t('firewall.basicStatus', ['1PANEL_BASIC']) }}</span>
                 </el-card>
 
+                <PortAwareness
+                    v-if="isActive && isBind"
+                    style="margin-top: 7px; margin-bottom: 7px;"
+                    @create-rule="onCreateRuleFromAwareness"
+                />
+
                 <LayoutContent :title="$t('firewall.portRule', 2)" :class="{ mask: !isActive || !isBind }">
                     <template #prompt>
                         <div class="mb-2" v-if="fireName !== 'iptables'">
@@ -159,6 +165,7 @@ import OperateDialog from '@/views/host/firewall/port/operate/index.vue';
 import ImportDialog from '@/views/host/firewall/port/import/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import ProcessDetail from '@/views/host/process/process/detail/index.vue';
+import PortAwareness from '@/views/host/firewall/port/awareness/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { batchOperateRule, searchFireRule, updateFirewallDescription, updatePortRule } from '@/api/modules/host';
 import { getListeningProcess } from '@/api/modules/process';
@@ -285,6 +292,10 @@ const onOpenDialog = async (
 
 const quickJump = () => {
     routerToName('AppInstalled');
+};
+
+const onCreateRuleFromAwareness = (info: { port: string; protocol: string }) => {
+    onOpenDialog('create', { port: info.port, protocol: info.protocol, strategy: 'accept', operation: 'add', source: 'anyWhere' });
 };
 
 const onChangeStatus = async (row: Host.RuleInfo, status: string) => {

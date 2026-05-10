@@ -3361,6 +3361,27 @@ const message = {
         cookieBlockList: 'Cookie blocklist',
         dockerHelper:
             'The current firewall cannot disable container port mapping. Installed applications can go to the [Installed] page to edit application parameters and configure port release rules.',
+        portSecurity: 'Port Security Scan',
+        portSecurityAllSafe: 'All listening ports are protected',
+        dockerBypass: 'Docker Bypass',
+        dockerBypassTip:
+            'This port is exposed via Docker container mapping, bypassing firewall INPUT chain rules. Adding port rules cannot block external access.',
+        dockerBypassSuggest:
+            'Suggest changing port mapping to 127.0.0.1:{0}:{0} in docker-compose.yml and restart the container.',
+        dockerBypassHasRule: 'Firewall rule exists ({0} {1}/{2}), but it is not effective.',
+        noRule: 'No Rule',
+        localOnly: 'Local Only',
+        protected: 'Protected',
+        firewallInactive: 'Firewall Inactive',
+        goToApp: 'Go to App Settings',
+        dockerBypassDetail: 'How to fix',
+        createRuleQuick: 'Create Rule',
+        portSecurityRiskLabel: 'risk(s)',
+        portSecurityPendingLabel: 'pending',
+        portSecuritySafeLabel: 'safe',
+        portSecuritySource: 'Process / Container',
+        portSecurityBindAddr: 'Bind Address',
+        dockerLabel: 'Container',
         iptablesHelper:
             'Detected that the system is using {0} firewall. To switch to iptables, please uninstall it manually first!',
         quickJump: 'Quick access',

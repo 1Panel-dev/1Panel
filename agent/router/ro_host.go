@@ -37,6 +37,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/firewall/filter/rule/batch", baseApi.BatchOperateFilterRule)
 		hostRouter.POST("/firewall/filter/operate", baseApi.OperateFilterChain)
 		hostRouter.POST("/firewall/filter/chain/status", baseApi.LoadChainStatus)
+		hostRouter.POST("/firewall/port/security", baseApi.GetPortSecurity)
 
 		hostRouter.POST("/monitor/search", baseApi.LoadMonitor)
 		hostRouter.POST("/monitor/gpu/search", baseApi.LoadGPUMonitor)
