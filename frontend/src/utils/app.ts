@@ -41,7 +41,7 @@ export const jumpToInstall = (type: string, key: string) => {
             });
             return true;
         case 'vllm':
-            if (globalStore.isProductPro) {
+            if (globalStore.isXpackNodeOrEE()) {
                 router.push({
                     path: '/ai/model/local',
                     query: {
