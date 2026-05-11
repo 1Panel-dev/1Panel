@@ -70,16 +70,16 @@ func (w WebsiteService) GetRewriteConfig(req request.NginxRewriteReq) (*response
 			}
 		}
 	} else {
-		rewriteFile := fmt.Sprintf("rewrite/%s.conf", strings.ToLower(req.Name))
-		contentByte, _ = nginx_conf.Rewrites.ReadFile(rewriteFile)
-		if contentByte == nil {
-			customRewriteDir := GetOpenrestyDir(DefaultRewriteDir)
-			safeName := path.Base(req.Name)
-			if safeName != req.Name || strings.Contains(safeName, "..") {
-				return nil, buserr.New("ErrInvalidParams")
-			}
-			customRewriteFile := path.Join(customRewriteDir, fmt.Sprintf("%s.conf", strings.ToLower(req.Name)))
+		safeName, err := getSafeRewriteName(req.Name)
+		if err != nil {
+			return nil, err
+		}
+		customRewriteFile := path.Join(GetOpenrestyDir(DefaultRewriteDir), fmt.Sprintf("%s.conf", safeName))
+		if files.NewFileOp().Stat(customRewriteFile) {
 			contentByte, err = files.NewFileOp().GetContent(customRewriteFile)
+		} else {
+			rewriteFile := fmt.Sprintf("rewrite/%s.conf", strings.ToLower(safeName))
+			contentByte, _ = nginx_conf.Rewrites.ReadFile(rewriteFile)
 		}
 	}
 	return &response.NginxRewriteRes{
@@ -95,14 +95,18 @@ func (w WebsiteService) OperateCustomRewrite(req request.CustomRewriteOperate) e
 			return err
 		}
 	}
-	safeName := path.Base(req.Name)
-	if safeName != req.Name || strings.Contains(safeName, "..") {
-		return buserr.New("ErrInvalidParams")
+	safeName, err := getSafeRewriteName(req.Name)
+	if err != nil {
+		return err
 	}
-	rewriteFile := path.Join(rewriteDir, fmt.Sprintf("%s.conf", req.Name))
+	rewriteFile := path.Join(rewriteDir, fmt.Sprintf("%s.conf", safeName))
 	switch req.Operate {
 	case "create":
-		if fileOp.Stat(rewriteFile) {
+		exist, err := customRewriteNameExist(rewriteDir, safeName)
+		if err != nil {
+			return err
+		}
+		if exist || builtinRewriteNameExist(safeName) {
 			return buserr.New("ErrNameIsExist")
 		}
 		return fileOp.WriteFile(rewriteFile, strings.NewReader(req.Content), constant.DirPerm)
@@ -110,6 +114,37 @@ func (w WebsiteService) OperateCustomRewrite(req request.CustomRewriteOperate) e
 		return fileOp.DeleteFile(rewriteFile)
 	}
 	return nil
+}
+
+func getSafeRewriteName(name string) (string, error) {
+	safeName := path.Base(name)
+	if safeName != name || strings.Contains(safeName, "..") {
+		return "", buserr.New("ErrInvalidParams")
+	}
+	return safeName, nil
+}
+
+func builtinRewriteNameExist(name string) bool {
+	rewriteFile := fmt.Sprintf("rewrite/%s.conf", strings.ToLower(name))
+	contentByte, _ := nginx_conf.Rewrites.ReadFile(rewriteFile)
+	return contentByte != nil
+}
+
+func customRewriteNameExist(rewriteDir, name string) (bool, error) {
+	entries, err := os.ReadDir(rewriteDir)
+	if err != nil {
+		return false, err
+	}
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		entryName := strings.TrimSuffix(entry.Name(), ".conf")
+		if strings.EqualFold(entryName, name) {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func (w WebsiteService) ListCustomRewrite() ([]string, error) {
