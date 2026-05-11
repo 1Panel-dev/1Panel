@@ -48,7 +48,7 @@
                                 @change="updateConfig('InstallAllowPort', config.installAllowPort)"
                             />
                         </el-form-item>
-                        <CustomSetting v-if="globalStore.isMasterProductPro" />
+                        <CustomSetting v-if="globalStore.isXpackOrEE()" />
                         <span class="input-help logText" v-else>
                             {{ $t('xpack.customApp.licenseHelper') }}
                             <el-link class="link" @click="toUpload" type="primary">
