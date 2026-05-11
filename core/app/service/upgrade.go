@@ -34,7 +34,7 @@ type serviceInfo struct {
 	selAgentName string
 }
 
-const minUpgradeFreeSpace = 1 << 30 // 1GB
+const minUpgradeFreeSpace = 500 << 20 // 500MB
 
 func loadServiceInfo() (serviceInfo, error) {
 	basePath, err := controller.GetServicePath("")
@@ -150,7 +150,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	if err != nil {
 		return err
 	}
-	if err := checkUpgradeSpace(svcInfo); err != nil {
+	if err := checkUpgradeSpace(); err != nil {
 		return err
 	}
 
@@ -358,16 +358,15 @@ func analyzeDoc(version, content string) dto.ReleasesNotes {
 	return item
 }
 
-func checkUpgradeSpace(svcInfo serviceInfo) error {
-	for _, dir := range []string{global.CONF.Base.InstallDir, "/usr/local/bin", svcInfo.basePath} {
-		var stat syscall.Statfs_t
-		if err := syscall.Statfs(dir, &stat); err != nil {
-			return err
-		}
-		avail := stat.Bavail * uint64(stat.Bsize)
-		if avail < minUpgradeFreeSpace {
-			return fmt.Errorf("available space of %s is %d MB, less than required 1GB", dir, avail>>20)
-		}
+func checkUpgradeSpace() error {
+	dir := global.CONF.Base.InstallDir
+	var stat syscall.Statfs_t
+	if err := syscall.Statfs(dir, &stat); err != nil {
+		return err
+	}
+	avail := stat.Bavail * uint64(stat.Bsize)
+	if avail < minUpgradeFreeSpace {
+		return fmt.Errorf("available space of %s is %d MB, less than required 500MB", dir, avail>>20)
 	}
 	return nil
 }
