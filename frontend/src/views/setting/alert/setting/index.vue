@@ -44,7 +44,7 @@
                     <template #title>
                         <div class="flex items-center justify-start">
                             {{ $t('xpack.alert.alertConfigHelper') }}
-                            <span v-if="!globalStore.isProductPro">
+                            <span v-if="!globalStore.isXpackNodeOrEE">
                                 {{ $t('commons.units.semicolon') }}{{ $t('xpack.alert.alertConfigProHelper') }}
                             </span>
                             <el-link
@@ -123,7 +123,7 @@
                     </el-card>
                     <el-card
                         class="rounded-2xl shadow hover:shadow-md transition-all"
-                        v-if="globalStore.isProductPro && !globalStore.isIntl"
+                        v-if="globalStore.isXpackNodeOrEE && !globalStore.isIntl"
                     >
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.weCom') }}</div>
@@ -188,7 +188,7 @@
                     </el-card>
                     <el-card
                         class="rounded-2xl shadow hover:shadow-md transition-all"
-                        v-if="globalStore.isProductPro && !globalStore.isIntl"
+                        v-if="globalStore.isXpackNodeOrEE && !globalStore.isIntl"
                     >
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.dingTalk') }}</div>
@@ -257,7 +257,7 @@
                     </el-card>
                     <el-card
                         class="rounded-2xl shadow hover:shadow-md transition-all"
-                        v-if="globalStore.isProductPro && !globalStore.isIntl"
+                        v-if="globalStore.isXpackNodeOrEE && !globalStore.isIntl"
                     >
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.feiShu') }}</div>

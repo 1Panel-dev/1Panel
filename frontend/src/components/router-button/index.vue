@@ -85,6 +85,7 @@ onMounted(() => {
         height: 100%;
         background-color: var(--panel-button-active) !important;
         box-shadow: none !important;
+        outline: none !important;
         border: 2px solid transparent !important;
         color: var(--el-text-color-regular) !important;
     }

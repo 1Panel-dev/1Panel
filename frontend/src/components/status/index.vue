@@ -82,6 +82,7 @@ const getType = (status: string) => {
             return 'warning';
         case 'duplicate':
         case 'unexecuted':
+        case 'canceled':
             return 'info';
         default:
             return 'primary';
