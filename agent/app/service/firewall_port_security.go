@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	stdnet "net"
 	"sort"
 	"strconv"
 	"strings"
@@ -87,7 +88,7 @@ func (u *FirewallService) GetPortSecurityOverview(req dto.PortSecuritySearch) (*
 
 	dockerPortMap := buildDockerPortMap(containers, dockerErr)
 	ruleIndex := buildFirewallRuleIndex(firewallRules, firewallErr)
-	appPortMap := buildAppPortMap(ctx)
+	appPortMap, systemPort := buildAppPortMaps(ctx)
 
 	seenIndex := make(map[portKey]int)
 	items := make([]dto.PortSecurityItem, 0)
@@ -138,11 +139,17 @@ func (u *FirewallService) GetPortSecurityOverview(req dto.PortSecuritySearch) (*
 			}
 		}
 
-		if appName, ok := appPortMap[conn.Laddr.Port]; ok {
-			item.AppName = appName
-			if item.SourceType == "docker" {
+		// Only tag with App Store appName when the port is actually owned by a Docker
+		// container — prevents mis-labelling a host process that happens to listen on
+		// a port matching a stopped app's record.
+		if item.SourceType == "docker" {
+			if appName, ok := appPortMap[conn.Laddr.Port]; ok {
+				item.AppName = appName
 				item.SourceType = "appStore"
 			}
+		}
+		if systemPort != 0 && conn.Laddr.Port == systemPort {
+			item.AppName = "1panel"
 		}
 
 		ruleStrategy, hasRule := matchFirewallRule(ruleIndex, conn.Laddr.Port, proto)
@@ -152,8 +159,38 @@ func (u *FirewallService) GetPortSecurityOverview(req dto.PortSecuritySearch) (*
 		items = append(items, item)
 	}
 
+	// Add synthetic entries for Docker container ports that have no host-side LISTEN
+	// socket — happens when Docker daemon runs with `userland-proxy: false`, where
+	// traffic is forwarded purely via iptables DNAT and no docker-proxy process binds
+	// the host port. Without this, those ports silently disappear from the overview.
+	for key, dInfo := range dockerPortMap {
+		if _, exists := seenIndex[key]; exists {
+			continue
+		}
+		bindAddr := dInfo.hostIP
+		if bindAddr == "" {
+			bindAddr = "0.0.0.0"
+		}
+		item := dto.PortSecurityItem{
+			Port:          key.port,
+			Protocol:      key.protocol,
+			BindAddress:   bindAddr,
+			ContainerName: dInfo.containerName,
+			SourceType:    "docker",
+		}
+		if appName, ok := appPortMap[key.port]; ok {
+			item.AppName = appName
+			item.SourceType = "appStore"
+		}
+		ruleStrategy, hasRule := matchFirewallRule(ruleIndex, key.port, key.protocol)
+		item.HasRule = hasRule
+		item.RuleStrategy = ruleStrategy
+		seenIndex[key] = len(items)
+		items = append(items, item)
+	}
+
 	for i := range items {
-		items[i].Status = determineStatus(items[i].BindAddress, items[i].SourceType, firewallActive, items[i].HasRule)
+		items[i].Status = determineStatus(items[i].BindAddress, items[i].SourceType, firewallActive, items[i].HasRule, items[i].RuleStrategy)
 	}
 
 	// Sort by status priority > protocol > port number
@@ -172,7 +209,7 @@ func (u *FirewallService) GetPortSecurityOverview(req dto.PortSecuritySearch) (*
 	summary := dto.PortSecuritySummary{Total: len(items)}
 	for _, item := range items {
 		switch item.Status {
-		case "protected":
+		case "protected", "blocked":
 			summary.Protected++
 		case "noRule":
 			summary.Unprotected++
@@ -197,7 +234,8 @@ func (u *FirewallService) GetPortSecurityOverview(req dto.PortSecuritySearch) (*
 				portStr := strconv.FormatUint(uint64(item.Port), 10)
 				if !strings.Contains(portStr, keyword) &&
 					!strings.Contains(strings.ToLower(item.ProcessName), keyword) &&
-					!strings.Contains(strings.ToLower(item.ContainerName), keyword) {
+					!strings.Contains(strings.ToLower(item.ContainerName), keyword) &&
+					!strings.Contains(strings.ToLower(item.AppName), keyword) {
 					continue
 				}
 			}
@@ -255,42 +293,58 @@ func buildFirewallRuleIndex(rules []fireClient.FireInfo, err error) []firewallRu
 	return entries
 }
 
-// buildAppPortMap creates a lookup map from port number to app name.
-func buildAppPortMap(ctx context.Context) map[uint32]string {
-	result := make(map[uint32]string)
+// buildAppPortMaps returns two lookup tables: ports owned by App Store installed
+// apps (keyed by host port → app key), and the 1Panel system port. The system
+// port is returned separately because it's served by a host process (1panel-core),
+// not a Docker container, so it must not go through the docker→appStore promotion.
+func buildAppPortMaps(ctx context.Context) (map[uint32]string, uint32) {
+	appPorts := make(map[uint32]string)
 	apps, err := appInstallRepo.ListBy(ctx)
-	if err != nil {
-		return result
-	}
-	for _, app := range apps {
-		if app.HttpPort > 0 {
-			result[uint32(app.HttpPort)] = app.App.Key
-		}
-		if app.HttpsPort > 0 {
-			result[uint32(app.HttpsPort)] = app.App.Key
-		}
-	}
-	systemPort, err := settingRepo.Get(settingRepo.WithByKey("ServerPort"))
-	if err == nil && systemPort.Value != "" {
-		if port, e := strconv.ParseUint(systemPort.Value, 10, 32); e == nil {
-			result[uint32(port)] = "1panel"
+	if err == nil {
+		for _, app := range apps {
+			if app.HttpPort > 0 {
+				appPorts[uint32(app.HttpPort)] = app.App.Key
+			}
+			if app.HttpsPort > 0 {
+				appPorts[uint32(app.HttpsPort)] = app.App.Key
+			}
 		}
 	}
-	return result
+	var systemPort uint32
+	if setting, err := settingRepo.Get(settingRepo.WithByKey("ServerPort")); err == nil && setting.Value != "" {
+		if port, e := strconv.ParseUint(setting.Value, 10, 32); e == nil {
+			systemPort = uint32(port)
+		}
+	}
+	return appPorts, systemPort
 }
 
 // matchFirewallRule checks if a port has a matching firewall rule, respecting protocol.
+// When multiple rules match (e.g. an accept and a drop on the same port), drop/reject
+// takes precedence over accept. This is security-conservative — if any deny rule applies,
+// the port is reported as denied. It also keeps the result deterministic regardless of
+// the underlying backend's listing order (firewalld lists --list-ports accepts before
+// rich-rule drops, iptables lists by line number, ufw by rule index).
 func matchFirewallRule(rules []firewallRuleEntry, port uint32, proto string) (string, bool) {
 	portStr := strconv.FormatUint(uint64(port), 10)
+	acceptStrategy := ""
+	foundAccept := false
 	for _, r := range rules {
 		if r.protocol != "" && r.protocol != "tcp/udp" && r.protocol != proto {
 			continue
 		}
-		if portMatchesRule(portStr, port, r.portStr) {
+		if !portMatchesRule(portStr, port, r.portStr) {
+			continue
+		}
+		if r.strategy == "drop" || r.strategy == "reject" {
 			return r.strategy, true
 		}
+		if !foundAccept {
+			acceptStrategy = r.strategy
+			foundAccept = true
+		}
 	}
-	return "", false
+	return acceptStrategy, foundAccept
 }
 
 func portMatchesRule(portStr string, portNum uint32, rulePort string) bool {
@@ -318,13 +372,19 @@ func portMatchesRule(portStr string, portNum uint32, rulePort string) bool {
 
 // determineStatus assigns a security status to a port based on its bind address,
 // source type, firewall state, and rule coverage. Priority order:
-// 1. Non-wildcard bind address → localOnly
-// 2. Docker/appStore source → dockerBypass
+// 1. Loopback or link-local bind (127.0.0.0/8, ::1, fe80::/10) → localOnly (unreachable from outside)
+// 2. Docker/appStore source with wildcard bind → dockerBypass (rule applies to INPUT
+//    chain but Docker traffic goes through FORWARD, so the rule is silently ineffective)
 // 3. Firewall inactive → firewallInactive
-// 4. Has matching rule → protected
-// 5. Otherwise → noRule
-func determineStatus(bindAddr, sourceType string, firewallActive, hasRule bool) string {
-	if !isWildcardAddress(bindAddr) {
+// 4. Matching rule with drop/reject strategy → blocked
+// 5. Matching rule with accept strategy → protected
+// 6. Otherwise → noRule
+//
+// Note: a port bound to a specific non-loopback host IP (e.g. the server's public NIC IP
+// or the docker bridge gateway 172.17.0.1) is reachable on that interface and therefore
+// goes through the firewall-rule check rather than being labelled localOnly.
+func determineStatus(bindAddr, sourceType string, firewallActive, hasRule bool, ruleStrategy string) string {
+	if isLoopbackOrLinkLocal(bindAddr) {
 		return "localOnly"
 	}
 	if sourceType == "docker" || sourceType == "appStore" {
@@ -334,6 +394,9 @@ func determineStatus(bindAddr, sourceType string, firewallActive, hasRule bool) 
 		return "firewallInactive"
 	}
 	if hasRule {
+		if ruleStrategy == "drop" || ruleStrategy == "reject" {
+			return "blocked"
+		}
 		return "protected"
 	}
 	return "noRule"
@@ -349,16 +412,35 @@ func statusSortPriority(status string) int {
 		return 2
 	case "protected":
 		return 3
-	case "localOnly":
+	case "blocked":
 		return 4
-	default:
+	case "localOnly":
 		return 5
+	default:
+		return 6
 	}
 }
 
 // isWildcardAddress returns true if the address binds to all interfaces.
 func isWildcardAddress(addr string) bool {
 	return addr == "0.0.0.0" || addr == "::" || addr == ""
+}
+
+// isLoopbackOrLinkLocal returns true if the address is provably unreachable from
+// outside the host: loopback (127.0.0.0/8, ::1) or link-local (169.254.0.0/16,
+// fe80::/10). Wildcard addresses (0.0.0.0, ::) are NOT loopback — they bind every
+// interface including public ones. A specific non-loopback IP (a public NIC IP, a
+// docker bridge gateway like 172.17.0.1, etc.) is reachable on that interface and
+// must go through firewall-rule evaluation, not be labelled localOnly outright.
+func isLoopbackOrLinkLocal(addr string) bool {
+	if addr == "" {
+		return false
+	}
+	ip := stdnet.ParseIP(addr)
+	if ip == nil {
+		return false
+	}
+	return ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast()
 }
 
 func getProcessNameByPID(pid int32) string {

@@ -14,7 +14,7 @@
                 current-tab="base"
             />
             <div v-if="fireName !== '-'">
-                <el-card v-if="!isActive && maskShow" class="mask-prompt">
+                <el-card v-if="!isActive && maskShow && !isBind" class="mask-prompt">
                     <span>{{ $t('firewall.firewallNotStart') }}</span>
                 </el-card>
                 <el-card v-if="!isBind && maskShow" class="mask-prompt">
@@ -22,7 +22,7 @@
                 </el-card>
 
                 <PortAwareness
-                    v-if="isActive && isBind"
+                    v-if="isBind"
                     style="margin-top: 7px; margin-bottom: 7px;"
                     @create-rule="onCreateRuleFromAwareness"
                 />

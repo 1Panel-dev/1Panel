@@ -3,10 +3,20 @@
         <template #leftToolBar>
             <span style="font-weight: 500; font-size: 14px;">{{ $t('firewall.portSecurity') }}</span>
             <template v-if="!loading && overview">
-                <el-tag v-if="overview.summary.dockerBypassed > 0" type="danger">
+                <el-tag
+                    v-if="overview.summary.dockerBypassed > 0"
+                    type="danger"
+                    class="summary-chip"
+                    @click="onChipFilter('dockerBypass')"
+                >
                     {{ overview.summary.dockerBypassed }} {{ $t('firewall.portSecurityRiskLabel') }}
                 </el-tag>
-                <el-tag v-if="overview.summary.unprotected > 0" type="warning">
+                <el-tag
+                    v-if="overview.summary.unprotected > 0"
+                    type="warning"
+                    class="summary-chip"
+                    @click="onChipFilter(overview.fireActive ? 'noRule' : 'firewallInactive')"
+                >
                     {{ overview.summary.unprotected }} {{ $t('firewall.portSecurityPendingLabel') }}
                 </el-tag>
                 <el-tag type="success">
@@ -20,8 +30,10 @@
                 <template #prefix>{{ $t('commons.table.status') }}</template>
                 <el-option :label="$t('commons.table.all')" value=""></el-option>
                 <el-option :label="$t('firewall.dockerBypass')" value="dockerBypass"></el-option>
+                <el-option :label="$t('firewall.firewallInactive')" value="firewallInactive"></el-option>
                 <el-option :label="$t('firewall.noRule')" value="noRule"></el-option>
                 <el-option :label="$t('firewall.protected')" value="protected"></el-option>
+                <el-option :label="$t('firewall.blocked')" value="blocked"></el-option>
                 <el-option :label="$t('firewall.localOnly')" value="localOnly"></el-option>
             </el-select>
             <TableSearch @search="search()" v-model:searchName="searchName" />
@@ -29,9 +41,21 @@
             <TableSetting title="firewall-port-security-refresh" @search="search()" />
         </template>
         <template #main>
-            <div v-if="allData.length === 0 && !loading && !hasError && !searchName && !searchStatus" class="all-safe">
+            <el-alert
+                v-if="hasError && !loading"
+                :title="$t('firewall.portSecurityScanFailed')"
+                type="warning"
+                show-icon
+                :closable="false"
+                style="margin-bottom: 12px;"
+            />
+            <div
+                v-else-if="allData.length === 0 && !loading && !searchName && !searchStatus"
+                class="scan-clear"
+            >
                 <el-icon color="var(--el-color-success)"><CircleCheckFilled /></el-icon>
                 <span>{{ $t('firewall.portSecurityAllSafe') }}</span>
+                <span class="scan-clear__note">{{ $t('firewall.portSecurityScanLimit') }}</span>
             </div>
             <ComplexTable
                 v-else
@@ -43,42 +67,42 @@
                 <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
                 <el-table-column :label="$t('firewall.portSecuritySource')" :min-width="120">
                     <template #default="{ row }">
-                        <span>{{ row.containerName || row.processName || '-' }}</span>
-                        <el-tag
-                            v-if="row.sourceType === 'docker' || row.sourceType === 'appStore'"
-                            class="source-tag--container"
-                            effect="plain"
-                            style="margin-left: 4px;"
-                        >
-                            <svg-icon iconName="p-docker" style="width: 12px; height: 12px; margin-right: 2px; vertical-align: middle;" />
-                            {{ $t('firewall.dockerLabel') }}
-                        </el-tag>
-                        <el-tag v-if="row.appName" type="info" effect="plain" style="margin-left: 4px;">
-                            {{ row.appName }}
-                        </el-tag>
+                        <div class="cell-inline">
+                            <span>{{ row.containerName || row.processName || '-' }}</span>
+                            <el-tag
+                                v-if="row.sourceType === 'docker' || row.sourceType === 'appStore'"
+                                class="source-tag--container"
+                                effect="plain"
+                            >
+                                <svg-icon iconName="p-docker" style="width: 12px; height: 12px; margin-right: 2px; vertical-align: middle;" />
+                                {{ $t('firewall.dockerLabel') }}
+                            </el-tag>
+                        </div>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('firewall.portSecurityBindAddr')" :min-width="80" prop="bindAddress" show-overflow-tooltip />
                 <el-table-column :label="$t('commons.table.status')" :min-width="120">
                     <template #default="{ row }">
-                        <el-tag :type="statusTagType(row.status)">
-                            {{ $t('firewall.' + row.status) }}
-                        </el-tag>
-                        <el-tooltip
-                            v-if="row.status === 'dockerBypass' && row.hasRule"
-                            :content="$t('firewall.dockerBypassHasRule', [row.ruleStrategy, row.port, row.protocol])"
-                            placement="top"
-                        >
-                            <el-icon color="var(--el-color-warning)" style="margin-left: 4px; cursor: pointer;">
-                                <WarningFilled />
-                            </el-icon>
-                        </el-tooltip>
+                        <div class="cell-inline">
+                            <el-tag :type="statusTagType(row.status)">
+                                {{ $t('firewall.' + row.status) }}
+                            </el-tag>
+                            <el-tooltip
+                                v-if="row.status === 'dockerBypass' && row.hasRule"
+                                :content="$t('firewall.dockerBypassHasRule', [row.ruleStrategy, row.port, row.protocol])"
+                                placement="top"
+                            >
+                                <el-icon color="var(--el-color-warning)" style="cursor: pointer;">
+                                    <WarningFilled />
+                                </el-icon>
+                            </el-tooltip>
+                        </div>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('commons.table.operate')" width="200px" fixed="right">
+                <el-table-column :label="$t('commons.table.operate')" width="200px" fixed="right" align="center" header-align="center">
                     <template #default="{ row }">
                         <el-button
-                            v-if="row.status === 'noRule' || row.status === 'firewallInactive'"
+                            v-if="row.status === 'noRule'"
                             link
                             type="primary"
                             @click="onCreateRule(row)"
@@ -154,11 +178,22 @@ const statusTagType = (status: string) => {
             return 'warning';
         case 'protected':
             return 'success';
+        case 'blocked':
         case 'localOnly':
             return 'info';
         default:
             return 'info';
     }
+};
+
+const onChipFilter = (status: string) => {
+    if (searchStatus.value === status) {
+        // toggle off when clicking the active chip
+        searchStatus.value = '';
+    } else {
+        searchStatus.value = status;
+    }
+    search();
 };
 
 const search = async () => {
@@ -197,13 +232,40 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.all-safe {
+.scan-clear {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
     padding: 16px 0;
-    color: var(--el-color-success);
+    color: var(--el-text-color-regular);
     font-size: 14px;
+}
+
+.scan-clear__note {
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.summary-chip {
+    cursor: pointer;
+    transition: filter 0.15s ease-in-out, transform 0.05s ease-in-out;
+
+    &:hover {
+        filter: brightness(0.95);
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+}
+
+.cell-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    vertical-align: middle;
 }
 
 .source-tag--container {
