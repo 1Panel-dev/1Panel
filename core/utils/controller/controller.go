@@ -285,7 +285,7 @@ func SelectInitScript(keyword string) (string, error) {
 		keyword = strings.TrimSuffix(keyword, ".service") + ".openrc"
 	case "sysvinit":
 		if _, err := os.Stat("/etc/rc.common"); err == nil {
-			keyword = strings.TrimSuffix(keyword, ".service") + ".prod"
+			keyword = strings.TrimSuffix(keyword, ".service") + ".procd"
 		} else {
 			keyword = strings.TrimSuffix(keyword, ".service") + ".init"
 		}

@@ -49,6 +49,8 @@ import (
 type FileService struct {
 }
 
+const fileHistorySnapshotMaxSize = 10 * 1024 * 1024
+
 type IFileService interface {
 	GetFileList(op request.FileOption) (response.FileInfo, error)
 	SearchUploadWithPage(req request.SearchUploadWithPage) (int64, interface{}, error)
@@ -59,6 +61,7 @@ type IFileService interface {
 	Compress(c request.FileCompress) error
 	StopCompress(taskID string) error
 	DeCompress(c request.FileDeCompress) error
+	StopDeCompress(taskID string) error
 	GetContent(op request.FileContentReq) (response.FileInfo, error)
 	GetPreviewContent(op request.FileContentReq) (response.FileInfo, error)
 	SaveContent(edit request.FileEdit) error
@@ -472,7 +475,25 @@ func preflightCompressTool(compressType files.CompressType) error {
 	}
 }
 
+func preflightDecompressTool(decompressType files.CompressType) error {
+	switch decompressType {
+	case files.Rar, files.X7z:
+		_, err := files.NewExtractShellArchiver(decompressType)
+		return err
+	default:
+		return nil
+	}
+}
+
 func (f *FileService) StopCompress(taskID string) error {
+	if cancel, ok := global.TaskCtxMap[taskID]; ok {
+		cancel()
+		return nil
+	}
+	return buserr.New("TaskNotFound")
+}
+
+func (f *FileService) StopDeCompress(taskID string) error {
 	if cancel, ok := global.TaskCtxMap[taskID]; ok {
 		cancel()
 		return nil
@@ -485,7 +506,167 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 	if c.Type == "tar" && len(c.Secret) != 0 {
 		c.Type = "tar.gz"
 	}
-	return fo.Decompress(c.Path, c.Dst, files.CompressType(c.Type), c.Secret)
+	if err := preflightDecompressTool(files.CompressType(c.Type)); err != nil {
+		return err
+	}
+	taskItem, err := task.NewTask(c.Path, task.TaskExec, task.TaskScopeTask, c.TaskID, 1)
+	if err != nil {
+		return err
+	}
+	go func() {
+		taskItem.AddSubTask(c.Path, func(t *task.Task) error {
+			t.LogStart(c.Path)
+			dstExisted := fo.Stat(c.Dst)
+			parentDir := filepath.Dir(c.Dst)
+			if !fo.Stat(parentDir) {
+				if err := fo.CreateDir(parentDir, constant.DirPerm); err != nil {
+					return err
+				}
+			}
+			tempDst, err := os.MkdirTemp(parentDir, ".decompress-*")
+			if err != nil {
+				return err
+			}
+			success := false
+			defer func() {
+				_ = os.RemoveAll(tempDst)
+				if !success && !dstExisted {
+					_ = os.RemoveAll(c.Dst)
+				}
+			}()
+			if err := fo.Decompress(t.TaskCtx, c.Path, tempDst, files.CompressType(c.Type), c.Secret); err != nil {
+				return err
+			}
+			if err := fo.CreateDir(c.Dst, constant.DirPerm); err != nil {
+				return err
+			}
+			if err := copyDecompressTree(t.TaskCtx, tempDst, c.Dst); err != nil {
+				return err
+			}
+			success = true
+			return nil
+		}, nil)
+		_ = taskItem.Execute()
+	}()
+	return nil
+}
+
+func copyDecompressTree(ctx context.Context, srcDir, dstDir string) error {
+	entries, err := os.ReadDir(srcDir)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		if err := copyDecompressEntry(ctx, filepath.Join(srcDir, entry.Name()), filepath.Join(dstDir, entry.Name())); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) (retErr error) {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	info, err := os.Lstat(srcPath)
+	if err != nil {
+		return err
+	}
+
+	if info.Mode()&os.ModeSymlink != 0 {
+		if err := os.RemoveAll(dstPath); err != nil {
+			return err
+		}
+		if err := os.MkdirAll(filepath.Dir(dstPath), constant.DirPerm); err != nil {
+			return err
+		}
+		target, err := os.Readlink(srcPath)
+		if err != nil {
+			return err
+		}
+		if err := os.Symlink(target, dstPath); err != nil {
+			return err
+		}
+		return applyDecompressOwnership(srcPath, dstPath)
+	}
+
+	if info.IsDir() {
+		dstInfo, err := os.Lstat(dstPath)
+		keepExistingDir := err == nil && dstInfo.IsDir() && dstInfo.Mode()&os.ModeSymlink == 0
+		if err != nil && !os.IsNotExist(err) {
+			return err
+		}
+		if !keepExistingDir {
+			if err := os.RemoveAll(dstPath); err != nil {
+				return err
+			}
+			if err := os.MkdirAll(dstPath, info.Mode().Perm()); err != nil {
+				return err
+			}
+			if err := applyDecompressOwnership(srcPath, dstPath); err != nil {
+				return err
+			}
+		}
+		entries, err := os.ReadDir(srcPath)
+		if err != nil {
+			return err
+		}
+		for _, entry := range entries {
+			if err := copyDecompressEntry(ctx, filepath.Join(srcPath, entry.Name()), filepath.Join(dstPath, entry.Name())); err != nil {
+				return err
+			}
+		}
+		if keepExistingDir {
+			return nil
+		}
+		return os.Chtimes(dstPath, info.ModTime(), info.ModTime())
+	}
+
+	if err := os.RemoveAll(dstPath); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(dstPath), constant.DirPerm); err != nil {
+		return err
+	}
+
+	srcFile, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+
+	dstFile, err := os.OpenFile(dstPath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, info.Mode().Perm())
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if cerr := dstFile.Close(); cerr != nil && retErr == nil {
+			retErr = cerr
+		}
+	}()
+
+	if _, err := io.Copy(dstFile, srcFile); err != nil {
+		return err
+	}
+	if err := applyDecompressOwnership(srcPath, dstPath); err != nil {
+		return err
+	}
+	return os.Chtimes(dstPath, info.ModTime(), info.ModTime())
+}
+
+func applyDecompressOwnership(srcPath, dstPath string) error {
+	info, err := os.Lstat(srcPath)
+	if err != nil {
+		return err
+	}
+	stat, ok := info.Sys().(*unix.Stat_t)
+	if !ok {
+		return nil
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		return os.Lchown(dstPath, int(stat.Uid), int(stat.Gid))
+	}
+	return os.Chown(dstPath, int(stat.Uid), int(stat.Gid))
 }
 
 func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, error) {
@@ -630,11 +811,11 @@ func (f *FileService) ChangeName(req request.FileRename) error {
 	}
 	fo := files.NewFileOp()
 	info, _ := files.NewFileInfo(files.FileOption{Path: req.OldName, Expand: false})
-	content, _ := os.ReadFile(req.OldName)
+	content, shouldRecordHistory := readEditableFileHistoryContent(req.OldName, info)
 	if err := fo.Rename(req.OldName, req.NewName); err != nil {
 		return err
 	}
-	if info != nil && !info.IsDir {
+	if shouldRecordHistory {
 		if histErr := historyService.RecordOperation(fileHistoryOpRename, req.OldName, content, info.FileMode, req.OldName, req.NewName); histErr != nil {
 			global.LOG.Warnf("record file rename history failed for %s: %v", req.OldName, histErr)
 		}
@@ -665,18 +846,18 @@ func (f *FileService) MvFile(m request.FileMove) error {
 		path    string
 		content []byte
 		mode    os.FileMode
-		isDir   bool
+		record  bool
 	}
 	snapshots := make([]moveSnapshot, 0, len(m.OldPaths))
 	for _, oldPath := range m.OldPaths {
-		content, _ := os.ReadFile(oldPath)
 		mode := os.FileMode(0640)
-		isDir := false
+		record := false
+		var content []byte
 		if info, err := files.NewFileInfo(files.FileOption{Path: oldPath, Expand: false}); err == nil {
 			mode = info.FileMode
-			isDir = info.IsDir
+			content, record = readEditableFileHistoryContent(oldPath, info)
 		}
-		snapshots = append(snapshots, moveSnapshot{path: oldPath, content: content, mode: mode, isDir: isDir})
+		snapshots = append(snapshots, moveSnapshot{path: oldPath, content: content, mode: mode, record: record})
 	}
 	var errs []error
 	if m.Type == "cut" {
@@ -692,7 +873,7 @@ func (f *FileService) MvFile(m request.FileMove) error {
 			return err
 		}
 		for _, snapshot := range snapshots {
-			if !snapshot.isDir {
+			if snapshot.record {
 				targetPath := buildHistoryMoveTargetPath(m.NewPath, m.Name, snapshot.path, len(m.OldPaths))
 				if histErr := historyService.RecordOperation(fileHistoryOpMove, snapshot.path, snapshot.content, snapshot.mode, snapshot.path, targetPath); histErr != nil {
 					global.LOG.Warnf("record file move history failed for %s: %v", snapshot.path, histErr)
@@ -726,6 +907,34 @@ func (f *FileService) MvFile(m request.FileMove) error {
 		return errors.New(errString)
 	}
 	return nil
+}
+
+func readEditableFileHistoryContent(filePath string, info *files.FileInfo) ([]byte, bool) {
+	if info == nil || info.IsDir || files.IsBlockDevice(info.FileMode) || info.Size > fileHistorySnapshotMaxSize {
+		return nil, false
+	}
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, false
+	}
+	defer file.Close()
+
+	headBuf := make([]byte, 1024)
+	n, err := file.Read(headBuf)
+	if err != nil && err != io.EOF {
+		return nil, false
+	}
+	if n > 0 && files.DetectBinary(headBuf[:n]) {
+		return nil, false
+	}
+	if _, err := file.Seek(0, 0); err != nil {
+		return nil, false
+	}
+	content, err := io.ReadAll(io.LimitReader(file, fileHistorySnapshotMaxSize+1))
+	if err != nil || int64(len(content)) > fileHistorySnapshotMaxSize {
+		return nil, false
+	}
+	return content, true
 }
 
 func buildHistoryMoveTargetPath(dst, name, sourcePath string, sourceCount int) string {

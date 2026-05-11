@@ -100,75 +100,61 @@
                         </div>
                     </template>
 
-                    <div class="history-table-wrap">
-                        <el-table
-                            :pagination-config="paginationConfig"
-                            :data="historyItems"
-                            v-loading="historyLoading"
-                            class="history-table"
-                            @row-click="openHistoryRecord"
-                            @selection-change="handleSelectionChange"
-                        >
-                            <el-table-column type="selection" width="46" />
-                            <el-table-column :label="$t('commons.table.date')" min-width="180">
-                                <template #default="{ row }">
-                                    {{ dateFormatSimpleWithSecond(row.createdAt) }}
-                                </template>
-                            </el-table-column>
-                            <el-table-column
-                                :label="$t('file.fileName')"
-                                prop="fileName"
-                                min-width="160"
-                                show-overflow-tooltip
-                            />
-                            <el-table-column
-                                :label="$t('file.path')"
-                                prop="path"
-                                min-width="260"
-                                show-overflow-tooltip
-                            />
-                            <el-table-column :label="$t('commons.table.type')" min-width="110">
-                                <template #default="{ row }">
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        <el-tag size="small" effect="plain">
-                                            {{ getOperationLabel(row.operation) }}
-                                        </el-tag>
-                                    </div>
-                                </template>
-                            </el-table-column>
-                            <el-table-column :label="$t('file.size')" min-width="110">
-                                <template #default="{ row }">
-                                    {{ computeSize(row.contentSize) }}
-                                </template>
-                            </el-table-column>
-                            <el-table-column :label="$t('commons.table.operate')" min-width="110" fixed="right">
-                                <template #default="{ row }">
-                                    <el-button link type="primary" @click.stop="openHistoryRecord(row)">
-                                        {{ $t('commons.button.view') }}
-                                    </el-button>
-                                    <el-button link type="danger" @click.stop="deleteSelected(row)">
-                                        {{ $t('commons.button.delete') }}
-                                    </el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                    </div>
-
-                    <div class="flex justify-end pt-4">
-                        <el-pagination
-                            v-model:current-page="pagination.currentPage"
-                            v-model:page-size="pagination.pageSize"
-                            :page-sizes="[5, 10, 20, 50, 100, 200, 500]"
-                            :size="mobile || paginationConfig.small ? 'small' : 'default'"
-                            :layout="
-                                mobile || paginationConfig.small
-                                    ? 'total, prev, pager, next'
-                                    : 'total, sizes, prev, pager, next, jumper'
-                            "
-                            :total="pagination.total"
-                            @current-change="handlePageChange"
-                            @size-change="handleSizeChange"
-                        />
+                    <div class="history-table-box">
+                        <div class="history-table-wrap">
+                            <ComplexTable
+                                :pagination-config="paginationConfig"
+                                :data="historyItems"
+                                v-loading="historyLoading"
+                                class="history-table"
+                                @search="loadHistoryList()"
+                                @row-click="openHistoryRecord"
+                                @selection-change="handleSelectionChange"
+                            >
+                                <el-table-column type="selection" width="46" />
+                                <el-table-column :label="$t('commons.table.date')" min-width="180">
+                                    <template #default="{ row }">
+                                        {{ dateFormatSimpleWithSecond(row.createdAt) }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column
+                                    :label="$t('file.fileName')"
+                                    prop="fileName"
+                                    min-width="160"
+                                    show-overflow-tooltip
+                                />
+                                <el-table-column
+                                    :label="$t('file.path')"
+                                    prop="path"
+                                    min-width="260"
+                                    show-overflow-tooltip
+                                />
+                                <el-table-column :label="$t('commons.table.type')" min-width="110">
+                                    <template #default="{ row }">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <el-tag size="small" effect="plain">
+                                                {{ getOperationLabel(row.operation) }}
+                                            </el-tag>
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column :label="$t('file.size')" min-width="110">
+                                    <template #default="{ row }">
+                                        {{ computeSize(row.contentSize) }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column :label="$t('commons.table.operate')" min-width="150" fixed="right">
+                                    <template #default="{ row }">
+                                        <el-button link type="primary" @click.stop="openHistoryRecord(row)">
+                                            {{ $t('commons.button.view') }}
+                                        </el-button>
+                                        <el-button link type="danger" @click.stop="deleteSelected(row)">
+                                            {{ $t('commons.button.delete') }}
+                                        </el-button>
+                                    </template>
+                                </el-table-column>
+                            </ComplexTable>
+                        </div>
                     </div>
                 </el-card>
 
@@ -235,8 +221,8 @@ import { Setting } from '@/api/interface/setting';
 import { loadMonacoLanguageSupport, setupMonacoEnvironment } from '@/utils/monaco';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import { Languages } from '@/global/mimetype';
-import { GlobalStore } from '@/store';
 import i18n from '@/lang';
+import ComplexTable from '@/components/complex-table/index.vue';
 
 type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
 
@@ -258,14 +244,11 @@ const historySettingFormRef = ref<FormInstance>();
 const scope = ref<'current' | 'all'>('current');
 const operationFilter = ref('');
 const activeCollapse = ref([]);
-const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+
 const paginationConfig = reactive({
     cacheSizeKey: 'file-history-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('page-size')) || 20,
+    pageSize: Number(localStorage.getItem('file-history-page-size')) || 20,
     total: 0,
     small: false,
 });
@@ -373,12 +356,6 @@ const syncCurrentFileContext = (history?: File.FileHistoryInfo | null) => {
     };
 };
 
-const pagination = ref({
-    currentPage: 1,
-    pageSize: 10,
-    total: 0,
-});
-
 const diffContainer = ref<HTMLElement | null>(null);
 const emit = defineEmits(['restored']);
 let monacoApi: MonacoEditorApi | null = null;
@@ -462,8 +439,11 @@ const renderDiff = async () => {
         readOnly: true,
         automaticLayout: true,
         folding: true,
+        glyphMargin: true,
         roundedSelection: false,
         overviewRulerBorder: false,
+        renderMarginRevertIcon: true,
+        renderGutterMenu: false,
     });
     diffEditor.setModel({
         original: originalModel,
@@ -503,7 +483,7 @@ const saveHistorySetting = async () => {
 
 const loadHistoryList = async (resetPage = false) => {
     if (resetPage) {
-        pagination.value.currentPage = 1;
+        paginationConfig.currentPage = 1;
     }
     historyLoading.value = true;
     try {
@@ -515,14 +495,14 @@ const loadHistoryList = async (resetPage = false) => {
             historyItems.value[0]?.path ||
             '';
         const res = await searchFileHistory({
-            page: pagination.value.currentPage,
-            pageSize: pagination.value.pageSize,
+            page: paginationConfig.currentPage,
+            pageSize: paginationConfig.pageSize,
             path: scope.value === 'current' ? currentScopePath : '',
             scope: scope.value,
             operation: operationFilter.value,
         });
         historyItems.value = res.data.items || [];
-        pagination.value.total = res.data.total || 0;
+        paginationConfig.total = res.data.total || 0;
         if (historyItems.value.length > 0) {
             const existSelected = selectedHistory.value
                 ? historyItems.value.find((item) => item.id === selectedHistory.value?.id)
@@ -599,15 +579,6 @@ const handleScopeChange = async () => {
     if (scope.value === 'current') {
         syncCurrentFileContext();
     }
-    await loadHistoryList(true);
-};
-
-const handlePageChange = async (page: number) => {
-    pagination.value.currentPage = page;
-    await loadHistoryList();
-};
-
-const handleSizeChange = async () => {
     await loadHistoryList(true);
 };
 
@@ -692,7 +663,12 @@ onBeforeUnmount(() => {
     min-width: 0;
 }
 
+.history-table-box {
+    min-height: 0;
+}
+
 .history-table-wrap {
+    flex: 1;
     min-width: 0;
     overflow-x: auto;
     max-height: clamp(240px, 36vh, 420px);
@@ -729,6 +705,15 @@ onBeforeUnmount(() => {
     :deep(.el-card__body) {
         padding-top: 2px;
         padding-bottom: 2px;
+    }
+}
+
+.history-list-card {
+    :deep(.el-card__body) {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        padding-top: 2px;
     }
 }
 </style>

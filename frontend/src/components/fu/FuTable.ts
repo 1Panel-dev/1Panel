@@ -1,5 +1,5 @@
 import { ElTable } from 'element-plus';
-import { computed, defineComponent, h, onMounted, ref, watch, type PropType, type VNode } from 'vue';
+import { cloneVNode, computed, defineComponent, h, onMounted, ref, watch, type PropType, type VNode } from 'vue';
 
 import {
     FU_TABLE_STORAGE_PREFIX,
@@ -145,7 +145,15 @@ export default defineComponent({
             );
             return resolvedColumns.value
                 .filter((column) => column.show !== false)
-                .map((column) => columnNodeMap.get(column.key))
+                .map((column) => {
+                    const vnode = columnNodeMap.get(column.key);
+                    if (!vnode) {
+                        return null;
+                    }
+                    return cloneVNode(vnode, {
+                        key: column.key,
+                    });
+                })
                 .filter((column): column is VNode => Boolean(column));
         });
 

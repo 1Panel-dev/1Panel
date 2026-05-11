@@ -21,7 +21,7 @@ func NewTarGzArchiver() ShellArchiver {
 	return &TarGzArchiver{}
 }
 
-func (t TarGzArchiver) Extract(filePath, dstDir string, secret string) error {
+func (t TarGzArchiver) Extract(ctx context.Context, filePath, dstDir string, secret string) error {
 	if err := os.MkdirAll(dstDir, 0755); err != nil {
 		return fmt.Errorf("failed to create destination dir: %w", err)
 	}
@@ -35,7 +35,7 @@ func (t TarGzArchiver) Extract(filePath, dstDir string, secret string) error {
 		commands = fmt.Sprintf("tar -zxvf '%s' -C '%s' > /dev/null 2>&1", filePath, dstDir)
 		global.LOG.Debug(commands)
 	}
-	if err = cmd.RunDefaultBashC(commands); err != nil {
+	if err = cmd.NewCommandMgr(cmd.WithContext(ctx)).RunBashC(commands); err != nil {
 		return err
 	}
 	return nil

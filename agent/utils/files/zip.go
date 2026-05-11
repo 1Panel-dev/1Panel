@@ -20,11 +20,11 @@ func NewZipArchiver() ShellArchiver {
 	return &ZipArchiver{}
 }
 
-func (z ZipArchiver) Extract(filePath, dstDir string, secret string) error {
+func (z ZipArchiver) Extract(ctx context.Context, filePath, dstDir string, secret string) error {
 	if err := checkCmdAvailability("unzip"); err != nil {
 		return err
 	}
-	return cmd.RunDefaultBashCf("unzip -qo %s -d %s", filePath, dstDir)
+	return cmd.NewCommandMgr(cmd.WithContext(ctx)).RunBashCf("unzip -qo %s -d %s", filePath, dstDir)
 }
 
 func (z ZipArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, _ string) error {

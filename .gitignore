@@ -42,6 +42,7 @@ frontend/components.d.ts
 frontend/src/xpack
 frontend/src/xpack-ee
 agent/xpack
+agent/xpack-ee
 core/xpack
 core/xpack-ee
 

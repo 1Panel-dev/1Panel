@@ -50,19 +50,28 @@ func Proxy() gin.HandlerFunc {
 			return
 		}
 
+		if c.Request.URL.Path == "/api/v2/hosts/terminal" && (currentNode == "local" || len(currentNode) == 0) {
+			proxyLocalAgent(c)
+			return
+		}
+
 		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0) {
-			defer func() {
-				if err := recover(); err != nil && err != http.ErrAbortHandler {
-					global.LOG.Debug(err)
-				}
-			}()
-			proxy.LocalAgentProxy.ServeHTTP(c.Writer, c.Request)
-			c.Abort()
+			proxyLocalAgent(c)
 			return
 		}
 		xpack.Proxy(c, currentNode)
 		c.Abort()
 	}
+}
+
+func proxyLocalAgent(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil && err != http.ErrAbortHandler {
+			global.LOG.Debug(err)
+		}
+	}()
+	proxy.LocalAgentProxy.ServeHTTP(c.Writer, c.Request)
+	c.Abort()
 }
 
 func checkSession(c *gin.Context) bool {

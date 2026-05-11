@@ -97,7 +97,7 @@ export const inspect = (params: Container.ContainerInspect) => {
 export const DownloadFile = (params: Container.ContainerLogInfo) => {
     return http.download<BlobPart>('/containers/download/log', params, {
         responseType: 'blob',
-        timeout: TimeoutEnum.T_40S,
+        timeout: TimeoutEnum.T_60S,
     });
 };
 

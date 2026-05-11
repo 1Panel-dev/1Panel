@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path"
@@ -263,7 +264,7 @@ func loadSqlFile(file string) (string, error) {
 			_ = os.RemoveAll(dstDir)
 			return "", err
 		}
-		if err := archiver.Extract(file, dstDir, ""); err != nil {
+		if err := archiver.Extract(context.Background(), file, dstDir, ""); err != nil {
 			_ = os.RemoveAll(dstDir)
 			return "", err
 		}

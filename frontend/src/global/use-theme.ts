@@ -1,4 +1,4 @@
-import { onUnmounted } from 'vue';
+import { getCurrentScope, onScopeDispose } from 'vue';
 import { GlobalStore } from '@/store';
 import { setPrimaryColor } from '@/utils/theme';
 
@@ -27,7 +27,6 @@ export const useTheme = () => {
         }
     };
 
-    // Listen for OS theme changes when theme is set to "auto"
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const onSystemThemeChange = () => {
         const globalStore = GlobalStore();
@@ -36,9 +35,11 @@ export const useTheme = () => {
         }
     };
     mediaQuery.addEventListener('change', onSystemThemeChange);
-    onUnmounted(() => {
-        mediaQuery.removeEventListener('change', onSystemThemeChange);
-    });
+    if (getCurrentScope()) {
+        onScopeDispose(() => {
+            mediaQuery.removeEventListener('change', onSystemThemeChange);
+        });
+    }
 
     return {
         switchTheme,

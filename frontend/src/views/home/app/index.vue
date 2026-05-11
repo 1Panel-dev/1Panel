@@ -109,7 +109,7 @@
                                     </div>
                                 </div>
                             </el-col>
-                            <el-col :span="1" class="h-app-side-col">
+                            <el-col :span="3" class="h-app-side-col">
                                 <el-button
                                     class="h-app-button"
                                     type="primary"
@@ -293,8 +293,7 @@ defineExpose({
 .h-app-side-col {
     align-items: center;
     min-height: 58px;
-    justify-content: flex-start;
-    margin-left: -2px;
+    justify-content: flex-end;
 }
 
 .h-app-main-col {

@@ -77,11 +77,15 @@ func writeHermesConfig(confDir string, account *model.AgentAccount, modelName st
 	if err != nil {
 		return err
 	}
-	cfg["model"] = map[string]interface{}{
+	model := map[string]interface{}{
 		"default":  resolveHermesModel(account.Provider, provider, modelName),
 		"provider": provider,
 		"base_url": account.BaseURL,
 	}
+	if provider == "custom" && account.APIKey != "" {
+		model["api_key"] = "${CUSTOM_API_KEY}"
+	}
+	cfg["model"] = model
 	cfg["terminal"] = map[string]interface{}{
 		"backend": "local",
 		"cwd":     hermesWorkspaceDir,
@@ -94,7 +98,7 @@ func writeHermesConfig(confDir string, account *model.AgentAccount, modelName st
 	if err := writeHermesConfigMap(configPath, cfg); err != nil {
 		return err
 	}
-	return writeHermesEnv(path.Join(confDir, ".env"), resolveHermesEnvEntries(account))
+	return writeHermesModelEnv(path.Join(confDir, ".env"), account)
 }
 
 func prepareHermesInstallFiles(appInstall *model.AppInstall, account *model.AgentAccount, modelName string) error {
@@ -159,15 +163,19 @@ func readHermesTelegramChannelConfig(confDir string) (*dto.AgentTelegramConfig, 
 
 	allowFrom := splitHermesEnvList(envMap["TELEGRAM_ALLOWED_USERS"])
 	requireMention := extractBoolValue(childMap(cfg, "telegram")["require_mention"], false)
-	dmPolicy := "pairing"
+	dmPolicy := ""
 	if extractHermesEnvBool(envMap, "TELEGRAM_ALLOW_ALL_USERS", false) {
 		dmPolicy = "open"
 	} else if len(allowFrom) > 0 {
 		dmPolicy = "allowlist"
+	} else if envMap["TELEGRAM_BOT_TOKEN"] != "" {
+		dmPolicy = "pairing"
 	}
-	groupPolicy := "open"
+	groupPolicy := ""
 	if requireMention {
 		groupPolicy = "allowlist"
+	} else if envMap["TELEGRAM_BOT_TOKEN"] != "" {
+		groupPolicy = "open"
 	}
 	token := envMap["TELEGRAM_BOT_TOKEN"]
 	result := &dto.AgentTelegramConfig{
@@ -177,8 +185,8 @@ func readHermesTelegramChannelConfig(confDir string) (*dto.AgentTelegramConfig, 
 		RequireMention: requireMention,
 		GroupPolicy:    groupPolicy,
 		GroupAllowFrom: []string{},
-		Streaming:      "partial",
-		DefaultAccount: "default",
+		Streaming:      "",
+		DefaultAccount: "",
 	}
 	if token != "" {
 		result.Bots = []dto.AgentTelegramBot{
@@ -192,7 +200,7 @@ func readHermesTelegramChannelConfig(confDir string) (*dto.AgentTelegramConfig, 
 				BotToken:    token,
 				DmPolicy:    dmPolicy,
 				GroupPolicy: groupPolicy,
-				Streaming:   "partial",
+				Streaming:   "",
 			},
 		}
 	}
@@ -250,16 +258,20 @@ func readHermesDiscordChannelConfig(confDir string) (*dto.AgentDiscordConfig, er
 	}
 
 	allowFrom := splitHermesEnvList(envMap["DISCORD_ALLOWED_USERS"])
-	requireMention := extractBoolValue(childMap(cfg, "discord")["require_mention"], true)
-	dmPolicy := "pairing"
+	requireMention := extractBoolValue(childMap(cfg, "discord")["require_mention"], false)
+	dmPolicy := ""
 	if extractHermesEnvBool(envMap, "DISCORD_ALLOW_ALL_USERS", false) {
 		dmPolicy = "open"
 	} else if len(allowFrom) > 0 {
 		dmPolicy = "allowlist"
+	} else if envMap["DISCORD_BOT_TOKEN"] != "" {
+		dmPolicy = "pairing"
 	}
-	groupPolicy := "open"
+	groupPolicy := ""
 	if requireMention {
 		groupPolicy = "allowlist"
+	} else if envMap["DISCORD_BOT_TOKEN"] != "" {
+		groupPolicy = "open"
 	}
 	token := envMap["DISCORD_BOT_TOKEN"]
 	result := &dto.AgentDiscordConfig{
@@ -268,7 +280,7 @@ func readHermesDiscordChannelConfig(confDir string) (*dto.AgentDiscordConfig, er
 		AllowFrom:      allowFrom,
 		RequireMention: requireMention,
 		GroupPolicy:    groupPolicy,
-		DefaultAccount: "default",
+		DefaultAccount: "",
 	}
 	if token != "" {
 		result.Bots = []dto.AgentDiscordBot{
@@ -450,6 +462,14 @@ func resolveHermesEnvEntries(account *model.AgentAccount) []hermesEnvEntry {
 	if account == nil {
 		return nil
 	}
+	if resolveHermesProvider(account.Provider) == "custom" {
+		if account.APIKey == "" {
+			return nil
+		}
+		return []hermesEnvEntry{
+			{Key: "CUSTOM_API_KEY", Value: account.APIKey},
+		}
+	}
 	apiKey := account.APIKey
 	baseURL := account.BaseURL
 	entries := make([]hermesEnvEntry, 0, 4)
@@ -509,6 +529,73 @@ func resolveHermesEnvEntries(account *model.AgentAccount) []hermesEnvEntry {
 	}
 
 	return entries
+}
+
+func writeHermesModelEnv(envPath string, account *model.AgentAccount) error {
+	envMap, err := readHermesEnvMap(envPath)
+	if err != nil {
+		return err
+	}
+	for _, key := range hermesManagedModelEnvKeys() {
+		delete(envMap, key)
+	}
+	entries := resolveHermesEnvEntries(account)
+	order := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		if entry.Key == "" || entry.Value == "" {
+			continue
+		}
+		envMap[entry.Key] = entry.Value
+		order = append(order, entry.Key)
+	}
+	return writeHermesEnvMap(envPath, envMap, order)
+}
+
+func hermesManagedModelEnvKeys() []string {
+	keys := []string{
+		"OPENROUTER_API_KEY",
+		"OPENROUTER_BASE_URL",
+		"ANTHROPIC_API_KEY",
+		"GOOGLE_API_KEY",
+		"GEMINI_API_KEY",
+		"GEMINI_BASE_URL",
+		"GLM_API_KEY",
+		"ZAI_API_KEY",
+		"Z_AI_API_KEY",
+		"GLM_BASE_URL",
+		"KIMI_API_KEY",
+		"KIMI_CN_API_KEY",
+		"KIMI_BASE_URL",
+		"MINIMAX_CN_API_KEY",
+		"MINIMAX_CN_BASE_URL",
+		"XIAOMI_API_KEY",
+		"XIAOMI_BASE_URL",
+		"DEEPSEEK_API_KEY",
+		"DEEPSEEK_BASE_URL",
+		"DASHSCOPE_API_KEY",
+		"DASHSCOPE_BASE_URL",
+		"OPENAI_API_KEY",
+		"OPENAI_BASE_URL",
+	}
+	seen := make(map[string]struct{}, len(keys))
+	result := make([]string, 0, len(keys))
+	appendKey := func(key string) {
+		if key == "" {
+			return
+		}
+		if _, ok := seen[key]; ok {
+			return
+		}
+		seen[key] = struct{}{}
+		result = append(result, key)
+	}
+	for _, key := range keys {
+		appendKey(key)
+	}
+	for _, meta := range providercatalog.All() {
+		appendKey(meta.EnvKey)
+	}
+	return result
 }
 
 func writeHermesEnv(envPath string, entries []hermesEnvEntry) error {

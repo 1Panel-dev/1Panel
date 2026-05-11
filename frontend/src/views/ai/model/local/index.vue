@@ -28,10 +28,14 @@ import { useRoute, useRouter } from 'vue-router';
 import OllamaView from '@/views/ai/model/ollama/index.vue';
 import TensorRTView from '@/views/ai/model/tensorrt/index.vue';
 import { loadOptionalComponent } from '@/extensions/optional';
+import i18n from '@/lang';
 
 const VllmView = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/vllm/index.vue'));
+const ModelDownloaderView = defineAsyncComponent(() =>
+    loadOptionalComponent('/src/xpack/views/model-downloader/index.vue'),
+);
 
-type LocalTab = 'ollama' | 'vllm' | 'tensorrt';
+type LocalTab = 'ollama' | 'vllm' | 'tensorrt' | 'downloader';
 
 const route = useRoute();
 const router = useRouter();
@@ -40,17 +44,19 @@ const tabLabels: Record<LocalTab, string> = {
     ollama: 'Ollama',
     vllm: 'vLLM',
     tensorrt: 'TensorRT LLM',
+    downloader: i18n.global.t('aiTools.model.downloader'),
 };
 
-const buttons = [
+const buttons: Array<{ label: string; value: LocalTab }> = [
     { label: tabLabels.ollama, value: 'ollama' },
     { label: tabLabels.vllm, value: 'vllm' },
     { label: tabLabels.tensorrt, value: 'tensorrt' },
+    { label: tabLabels.downloader, value: 'downloader' },
 ];
 
 const currentTab = computed<LocalTab>(() => {
     const tab = route.query.tab;
-    if (tab === 'vllm' || tab === 'tensorrt') {
+    if (tab === 'vllm' || tab === 'tensorrt' || tab === 'downloader') {
         return tab;
     }
     return 'ollama';
@@ -62,6 +68,8 @@ const currentComponent = computed(() => {
             return VllmView;
         case 'tensorrt':
             return TensorRTView;
+        case 'downloader':
+            return ModelDownloaderView;
         default:
             return OllamaView;
     }

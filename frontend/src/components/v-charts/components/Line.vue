@@ -141,6 +141,7 @@ function initChart() {
         });
     }
 
+    const grid = props.option.grid || { left: '7%', right: '7%', bottom: '20%' };
     const option = {
         title: [
             {
@@ -205,9 +206,9 @@ function initChart() {
                 return res;
             },
         },
-        grid: props.option.grid || { left: '7%', right: '7%', bottom: '20%' },
+        grid,
         legend: itemSelect || {
-            right: 10,
+            right: grid.right || 10,
             itemWidth: 8,
             textStyle: {
                 color: '#646A73',
@@ -228,7 +229,14 @@ function initChart() {
                   },
               },
         series: series,
-        dataZoom: [{ startValue: props?.option.xData[0], show: props.dataZoom }],
+        dataZoom: [
+            {
+                ...(props.option.xData?.[0] ? { startValue: props.option.xData[0] } : {}),
+                left: grid.left,
+                right: grid.right,
+                show: props.dataZoom,
+            },
+        ],
     };
     // 渲染数据
     itemChart.setOption(option, true);

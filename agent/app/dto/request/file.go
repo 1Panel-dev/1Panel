@@ -90,6 +90,11 @@ type FileDeCompress struct {
 	Type   string `json:"type"  validate:"required"`
 	Path   string `json:"path" validate:"required"`
 	Secret string `json:"secret"`
+	TaskID string `json:"taskID"`
+}
+
+type FileDeCompressStopReq struct {
+	TaskID string `json:"taskID" validate:"required"`
 }
 
 type FileEdit struct {

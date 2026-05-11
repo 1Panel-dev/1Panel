@@ -1034,7 +1034,7 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 		}
 		return
 	}
-	if err = fileOp.Decompress(filePath, appResourceDir, files.SdkTarGz, ""); err != nil {
+	if err = fileOp.Decompress(context.Background(), filePath, appResourceDir, files.SdkTarGz, ""); err != nil {
 		if logger == nil {
 			global.LOG.Errorf("decompress app[%s] error %v", app.Name, err)
 		} else {

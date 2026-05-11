@@ -4,7 +4,7 @@
         :header="$t('commons.button.log')"
         @close="handleClose"
         :resource="logSearch.container"
-        :size="globalStore.isFullScreen ? 'full' : 'large'"
+        :size="globalStore.isFullScreen ? 'full' : '60%'"
     >
         <template #extra v-if="!mobile">
             <el-tooltip :content="loadTooltip()" placement="top">

@@ -188,7 +188,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 			existDomains = append(existDomains, strings.Split(websiteSSL.Domains, ",")...)
 		}
 		for _, domain := range existDomains {
-			if ipAddress := net.ParseIP(domain); ipAddress == nil {
+			if ipAddress := common.ParseIPLoose(domain); ipAddress == nil {
 				domains = append(domains, domain)
 			} else {
 				ips = append(ips, ipAddress)
@@ -220,7 +220,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		if req.Domains != "" {
 			domainArray := strings.Split(req.Domains, "\n")
 			for _, domain := range domainArray {
-				if ipAddress := net.ParseIP(domain); ipAddress == nil {
+				if ipAddress := common.ParseIPLoose(domain); ipAddress == nil {
 					if domain != "localhost" && !common.IsValidDomain(domain) {
 						err = buserr.WithName("ErrDomainFormat", domain)
 						return nil, err
