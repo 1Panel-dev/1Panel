@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
@@ -32,6 +33,8 @@ type serviceInfo struct {
 	selCoreName  string
 	selAgentName string
 }
+
+const minUpgradeFreeSpace = 1 << 30 // 1GB
 
 func loadServiceInfo() (serviceInfo, error) {
 	basePath, err := controller.GetServicePath("")
@@ -139,6 +142,18 @@ func (u *UpgradeService) LoadNotes(req dto.Upgrade) (string, error) {
 
 func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	global.LOG.Info("start to upgrade now...")
+	itemArch, err := loadArch()
+	if err != nil {
+		return err
+	}
+	svcInfo, err := loadServiceInfo()
+	if err != nil {
+		return err
+	}
+	if err := checkUpgradeSpace(svcInfo); err != nil {
+		return err
+	}
+
 	baseDir := path.Join(global.CONF.Base.InstallDir, fmt.Sprintf("1panel/tmp/upgrade/%s", req.Version))
 	downloadDir := path.Join(baseDir, "downloads")
 	_ = os.RemoveAll(baseDir)
@@ -147,14 +162,6 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		return err
 	}
 	if err := os.MkdirAll(originalDir, os.ModePerm); err != nil {
-		return err
-	}
-	itemArch, err := loadArch()
-	if err != nil {
-		return err
-	}
-	svcInfo, err := loadServiceInfo()
-	if err != nil {
 		return err
 	}
 
@@ -206,7 +213,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			return
 		}
 
-		if err := files.CopyItem(false, true, path.Join(tmpDir, "1pctl"), "/usr/local/bin"); err != nil {
+		if err := files.CopyFileWithRename(path.Join(tmpDir, "1pctl"), "/usr/local/bin/1pctl"); err != nil {
 			global.LOG.Errorf("upgrade 1pctl failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			u.handleRollback(originalDir, 2, svcInfo)
@@ -241,11 +248,13 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			global.LOG.Errorf("Update language files failed: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			u.handleRollback(originalDir, 4, svcInfo)
+			return
 		}
-		if err := files.CopyItem(false, true, path.Join(tmpDir, "GeoIP.mmdb"), path.Join(global.CONF.Base.InstallDir, "1panel/geo")); err != nil {
+		if err := files.CopyFileWithRename(path.Join(tmpDir, "GeoIP.mmdb"), path.Join(global.CONF.Base.InstallDir, "1panel/geo/GeoIP.mmdb")); err != nil {
 			global.LOG.Warnf("Update GeoIP database failed: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			u.handleRollback(originalDir, 4, svcInfo)
+			return
 		}
 
 		global.LOG.Info("upgrade successful!")
@@ -349,6 +358,20 @@ func analyzeDoc(version, content string) dto.ReleasesNotes {
 	return item
 }
 
+func checkUpgradeSpace(svcInfo serviceInfo) error {
+	for _, dir := range []string{global.CONF.Base.InstallDir, "/usr/local/bin", svcInfo.basePath} {
+		var stat syscall.Statfs_t
+		if err := syscall.Statfs(dir, &stat); err != nil {
+			return err
+		}
+		avail := stat.Bavail * uint64(stat.Bsize)
+		if avail < minUpgradeFreeSpace {
+			return fmt.Errorf("available space of %s is %d MB, less than required 1GB", dir, avail>>20)
+		}
+	}
+	return nil
+}
+
 func (u *UpgradeService) handleBackup(originalDir string, svcInfo serviceInfo) error {
 	if err := files.CopyItem(false, true, "/usr/local/bin/1panel-core", originalDir); err != nil {
 		return err
@@ -385,25 +408,25 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int, svcInfo
 			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
 		}
 	}
-	if err := files.CopyItem(false, true, path.Join(originalDir, "1panel-core"), "/usr/local/bin"); err != nil {
+	if err := files.CopyFileWithRename(path.Join(originalDir, "1panel-core"), "/usr/local/bin/1panel-core"); err != nil {
 		global.LOG.Errorf("rollback 1panel-core failed, err: %v", err)
 	}
-	if err := files.CopyItem(false, true, path.Join(originalDir, "1panel-agent"), "/usr/local/bin"); err != nil {
+	if err := files.CopyFileWithRename(path.Join(originalDir, "1panel-agent"), "/usr/local/bin/1panel-agent"); err != nil {
 		global.LOG.Errorf("rollback 1panel-agent failed, err: %v", err)
 	}
 	if errStep == 1 {
 		return
 	}
-	if err := files.CopyItem(false, true, path.Join(originalDir, "1pctl"), "/usr/local/bin"); err != nil {
+	if err := files.CopyFileWithRename(path.Join(originalDir, "1pctl"), "/usr/local/bin/1pctl"); err != nil {
 		global.LOG.Errorf("rollback 1pctl failed, err: %v", err)
 	}
 	if errStep == 2 {
 		return
 	}
-	if err := files.CopyItem(false, true, path.Join(originalDir, svcInfo.coreName), svcInfo.basePath); err != nil {
+	if err := files.CopyFileWithRename(path.Join(originalDir, svcInfo.coreName), path.Join(svcInfo.basePath, svcInfo.coreName)); err != nil {
 		global.LOG.Errorf("rollback %s failed, err: %v", svcInfo.coreName, err)
 	}
-	if err := files.CopyItem(false, true, path.Join(originalDir, svcInfo.agentName), svcInfo.basePath); err != nil {
+	if err := files.CopyFileWithRename(path.Join(originalDir, svcInfo.agentName), path.Join(svcInfo.basePath, svcInfo.agentName)); err != nil {
 		global.LOG.Errorf("rollback %s failed, err: %v", svcInfo.agentName, err)
 	}
 	if errStep == 3 {
@@ -412,7 +435,7 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int, svcInfo
 	if err := files.CopyItem(true, true, path.Join(originalDir, "lang"), "/usr/local/bin"); err != nil {
 		global.LOG.Errorf("rollback language files failed, err: %v", err)
 	}
-	if err := files.CopyItem(false, true, path.Join(originalDir, "GeoIP.mmdb"), path.Join(global.CONF.Base.InstallDir, "1panel/geo")); err != nil {
+	if err := files.CopyFileWithRename(path.Join(originalDir, "GeoIP.mmdb"), path.Join(global.CONF.Base.InstallDir, "1panel/geo/GeoIP.mmdb")); err != nil {
 		global.LOG.Errorf("rollback GeoIP database failed, err: %v", err)
 	}
 }
