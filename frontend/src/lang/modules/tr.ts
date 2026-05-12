@@ -963,6 +963,7 @@ const message = {
             addMapping: 'Eşleme ekle',
             usageTrend: 'Kullanım eğilimi',
             providerDistribution: 'Sağlayıcı dağılımı',
+            unmatched: 'Eşleşmedi',
             modelDistribution: 'Model dağılımı',
             serviceProvider: 'Sağlayıcı',
             tokenUsage: 'Token kullanımı',

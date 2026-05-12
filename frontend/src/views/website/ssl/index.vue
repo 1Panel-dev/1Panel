@@ -152,7 +152,7 @@
                         :ellipsis="3"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        :fixed="mobile ? false : 'right'"
+                        :fixed="isMobile ? false : 'right'"
                         width="320px"
                         fix
                     />
@@ -173,7 +173,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref, computed } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { deleteSSL, downloadFile, searchSSL, updateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
@@ -185,14 +185,14 @@ import { getProvider } from '@/utils/ssl';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
 import SSLUpload from './upload/index.vue';
 import Apply from './apply/index.vue';
 import Log from '@/components/log/file-drawer/index.vue';
 import Obtain from './obtain/index.vue';
 import MsgInfo from '@/components/msg-info/index.vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { isMobile } = useGlobalStore();
 const paginationConfig = reactive({
     cacheSizeKey: 'ssl-page-size',
     currentPage: 1,
@@ -303,10 +303,6 @@ const onDownload = (ssl: Website.SSLDTO) => {
             loading.value = false;
         });
 };
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const changeSort = ({ order }) => {
     req.orderBy = 'expire_date';

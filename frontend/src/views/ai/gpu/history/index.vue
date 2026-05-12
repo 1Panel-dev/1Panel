@@ -14,7 +14,7 @@
                         :end-placeholder="$t('commons.search.timeEnd')"
                         :shortcuts="shortcuts"
                         style="max-width: 360px; width: 100%"
-                        :size="mobile ? 'small' : 'default'"
+                        :size="isMobile ? 'small' : 'default'"
                     ></el-date-picker>
                     <el-select class="p-w-300 ml-2" v-model="searchInfo.productName" @change="search()">
                         <el-option v-for="item in options" :key="item" :label="item" :value="item" />
@@ -28,7 +28,7 @@
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
-                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">{{ $t('aiTools.gpu.memoryUsage') }}</span>
                         </div>
                     </template>
@@ -48,7 +48,7 @@
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
-                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">{{ $t('aiTools.gpu.gpuUtil') }}</span>
                         </div>
                     </template>
@@ -68,7 +68,7 @@
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
-                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">{{ $t('aiTools.gpu.process') }}</span>
                         </div>
                     </template>
@@ -88,7 +88,7 @@
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
-                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">{{ $t('aiTools.gpu.powerUsage') }}</span>
                         </div>
                     </template>
@@ -131,7 +131,7 @@
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card class="card-interval" style="overflow: inherit">
                     <template #header>
-                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">{{ $t('aiTools.gpu.fanSpeed') }}</span>
                         </div>
                     </template>
@@ -166,21 +166,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { loadGPUMonitor, getGPUOptions } from '@/api/modules/ai';
 import { dateFormatWithoutYear } from '@/utils/date';
 import RouterMenu from '@/views/ai/gpu/index.vue';
-import { GlobalStore } from '@/store';
 import { shortcuts } from '@/utils/shortcuts';
 import i18n from '@/lang';
 import { routerToName } from '@/utils/router';
 import { AI } from '@/api/interface/ai';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+const { isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const options = ref([]);
@@ -311,7 +307,7 @@ function initMemoryCharts(baseDate: any, data: any) {
                 alignTicks: true,
             },
         ],
-        grid: mobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
+        grid: isMobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
         tooltip: {
             trigger: 'axis',
             formatter: function (list: any) {
@@ -349,7 +345,7 @@ function initPowerCharts(baseDate: any, data: any) {
                 alignTicks: true,
             },
         ],
-        grid: mobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
+        grid: isMobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
         tooltip: {
             trigger: 'axis',
             formatter: function (list: any) {

@@ -621,11 +621,11 @@
                             </el-table-column>
                             <fu-table-operations
                                 :max-height="dropdownMaxHeight"
-                                :ellipsis="mobile ? 0 : 2"
+                                :ellipsis="isMobile ? 0 : 2"
                                 :buttons="tableMoreButtons"
                                 :label="$t('commons.table.operate')"
-                                :min-width="mobile ? 'auto' : 200"
-                                :fixed="mobile ? false : 'right'"
+                                :min-width="isMobile ? 'auto' : 200"
+                                :fixed="isMobile ? false : 'right'"
                                 width="200"
                                 fix
                             />
@@ -762,6 +762,9 @@ import { getComponentInfo } from '@/api/modules/host';
 import { routerToNameWithQuery } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
 import FileList from '@/components/file-list/index.vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 
 const globalStore = GlobalStore();
 
@@ -929,10 +932,6 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: Number(localStorage.getItem('file-page-size')) || 100,
     total: 0,
-});
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
 });
 
 const search = async () => {

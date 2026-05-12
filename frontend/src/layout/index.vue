@@ -56,13 +56,15 @@ import { onMounted, computed, ref, watch, onBeforeUnmount } from 'vue';
 import { Sidebar, Footer, AppMain, MobileHeader, Tabs } from './components';
 import useResize from './hooks/useResize';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
-import { DeviceType } from '@/enums/app';
 import { getSystemAvailable } from '@/api/modules/setting';
 import { useRoute, useRouter } from 'vue-router';
 import { loadMasterProductProFromDB, loadProductProFromDB } from '@/utils/xpack';
 import { useTheme } from '@/global/use-theme';
 import TaskList from '@/components/task-list/index.vue';
 import i18n from '@/lang';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 const { switchTheme } = useTheme();
 
 useResize();
@@ -70,7 +72,7 @@ useResize();
 const taskListRef = ref();
 const openTask = () => {
     taskListRef.value.acceptParams();
-    if (globalStore.isMobile()) {
+    if (isMobile.value) {
         menuStore.setCollapse();
     }
 };
@@ -92,7 +94,7 @@ const classObj = computed(() => {
         fullScreen: globalStore.isFullScreen,
         hideSidebar: menuStore.isCollapse,
         openSidebar: !menuStore.isCollapse,
-        mobile: globalStore.device === DeviceType.Mobile,
+        mobile: isMobile.value,
         openMenuTabs: globalStore.openMenuTabs,
         withoutAnimation: menuStore.withoutAnimation,
     };

@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <LayoutContent :title="$t('setting.panel')" :divider="true">
             <template #main>
-                <el-form :model="form" :label-position="mobile ? 'top' : 'left'" label-width="150px">
+                <el-form :model="form" :label-position="isMobile ? 'top' : 'left'" label-width="150px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
@@ -192,7 +192,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
 import { getSettingInfo, updateSetting, getSystemAvailable, getAgentSettingInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
@@ -209,14 +209,14 @@ import { getXpackProxyDocker } from '@/extensions/xpack';
 import { getXpackSetting, updateXpackSettingByKey } from '@/utils/xpack';
 import { setPrimaryColor } from '@/utils/theme';
 import i18n from '@/lang';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const globalStore = GlobalStore();
 
 const { switchTheme } = useTheme();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 interface ThemeColor {
     light: string;

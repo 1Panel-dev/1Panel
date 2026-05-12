@@ -1,11 +1,10 @@
 import { jumpToPath } from './router';
 import router from '@/routers';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const getGlobalStore = () => GlobalStore();
+const { isProductPro } = useGlobalStore();
 
 export const jumpToInstall = (type: string, key: string) => {
-    const globalStore = getGlobalStore();
     switch (type) {
         case 'php':
         case 'node':
@@ -41,7 +40,7 @@ export const jumpToInstall = (type: string, key: string) => {
             });
             return true;
         case 'vllm':
-            if (globalStore.isXpackNodeOrEE()) {
+            if (isProductPro.value) {
                 router.push({
                     path: '/ai/model/local',
                     query: {

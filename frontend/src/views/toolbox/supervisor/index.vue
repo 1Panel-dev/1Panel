@@ -147,7 +147,7 @@
                         :ellipsis="6"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        :fixed="mobile ? false : 'right'"
+                        :fixed="isMobile ? false : 'right'"
                         width="280px"
                         fix
                     />
@@ -178,6 +178,9 @@ import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
 import { routerToFileWithPath } from '@/utils/router';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 const globalStore = GlobalStore();
 
 const loading = ref(false);
@@ -278,10 +281,6 @@ const loadStatus = async () => {
         }
     } catch (error) {}
 };
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const checkStatus = (status: HostTool.ProcessStatus[]): string => {
     if (!status || status.length === 0) return 'STOPPED';

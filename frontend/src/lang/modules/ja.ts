@@ -956,6 +956,7 @@ const message = {
             addMapping: 'マッピングを追加',
             usageTrend: '使用傾向',
             providerDistribution: 'プロバイダー別分布',
+            unmatched: '未一致',
             modelDistribution: 'モデル別分布',
             serviceProvider: 'プロバイダー',
             tokenUsage: 'Token 使用量',

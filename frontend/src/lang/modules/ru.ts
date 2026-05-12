@@ -955,6 +955,7 @@ const message = {
             addMapping: 'Добавить сопоставление',
             usageTrend: 'Тренд использования',
             providerDistribution: 'Распределение по провайдерам',
+            unmatched: 'Не сопоставлено',
             modelDistribution: 'Распределение по моделям',
             serviceProvider: 'Провайдер',
             tokenUsage: 'Использование Token',

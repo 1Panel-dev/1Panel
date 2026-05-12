@@ -5,7 +5,7 @@
                 <el-form
                     :model="form"
                     v-loading="loading"
-                    :label-position="mobile ? 'top' : 'left'"
+                    :label-position="isMobile ? 'top' : 'left'"
                     label-width="150px"
                 >
                     <el-row>
@@ -151,7 +151,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
 import PortSetting from '@/views/setting/safe/port/index.vue';
 import BindSetting from '@/views/setting/safe/bind/index.vue';
@@ -165,6 +165,9 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { Setting } from '@/api/interface/setting';
 import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 const globalStore = GlobalStore();
 
 const loading = ref(false);
@@ -178,9 +181,6 @@ const lastSSL = ref('Disable');
 const sslInfo = ref<Setting.SSLInfo>();
 const domainRef = ref();
 const allowIPsRef = ref();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const form = reactive({
     serverPort: 9999,
