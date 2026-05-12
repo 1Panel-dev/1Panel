@@ -23,7 +23,7 @@
                 />
             </template>
             <template v-if="showTable" #leftToolBar>
-                <el-button type="primary" @click="openCreate" :disabled="showStopped">
+                <el-button type="primary" @click="openCreate" :disabled="showStopped || !hasManagePermission">
                     {{ $t('commons.button.create') }}
                 </el-button>
             </template>
@@ -76,14 +76,21 @@
                                 <Status
                                     v-if="checkStatus(row.status) === 'RUNNING'"
                                     status="running"
+                                    :disabled="!hasManagePermission"
                                     @click="operate('stop', row.name)"
                                 />
                                 <Status
                                     v-else-if="checkStatus(row.status) === 'WARNING'"
                                     status="unhealthy"
+                                    :disabled="!hasManagePermission"
                                     @click="operate('restart', row.name)"
                                 />
-                                <Status v-else status="stopped" @click="operate('start', row.name)" />
+                                <Status
+                                    v-else
+                                    status="stopped"
+                                    :disabled="!hasManagePermission"
+                                    @click="operate('start', row.name)"
+                                />
                             </div>
                             <div v-if="!row.hasLoad">
                                 <el-button link loading></el-button>
@@ -178,7 +185,9 @@ import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
 import { routerToFileWithPath } from '@/utils/router';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref(false);
 const setSuperVisor = ref(false);
@@ -342,12 +351,14 @@ const edit = (row: HostTool.SupervisorProcess) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: !hasManagePermission.value,
         click: function (row: HostTool.SupervisorProcess) {
             edit(row);
         },
     },
     {
         label: i18n.global.t('website.sourceFile'),
+        disabled: !hasManagePermission.value,
         click: function (row: HostTool.SupervisorProcess) {
             getFile(row.name, 'config');
         },
@@ -360,12 +371,14 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
+        disabled: !hasManagePermission.value,
         click: function (row: HostTool.SupervisorProcess) {
             operate('restart', row.name);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: !hasManagePermission.value,
         click: function (row: HostTool.SupervisorProcess) {
             operate('delete', row.name);
         },

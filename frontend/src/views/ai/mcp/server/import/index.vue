@@ -27,7 +27,7 @@
                 <el-button @click="onCancel">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" @click="onConfirm">
+                <el-button type="primary" :disabled="!hasManagePermission" @click="onConfirm">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -38,8 +38,10 @@
 <script lang="ts" setup>
 import i18n from '@/lang';
 import { ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const submitVisible = ref(false);
+const { hasManagePermission } = useMenuManagePermission();
 const mcpServerJson = ref();
 const mcpServerConfig = ref();
 

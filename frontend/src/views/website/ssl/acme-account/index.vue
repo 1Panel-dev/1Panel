@@ -6,7 +6,9 @@
             </div>
             <ComplexTable :data="data" :pagination-config="paginationConfig" v-loading="loading">
                 <template #toolbar>
-                    <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                    <el-button type="primary" :disabled="!hasManagePermission" @click="openCreate">
+                        {{ $t('commons.button.create') }}
+                    </el-button>
                 </template>
                 <el-table-column
                     :label="$t('website.email')"
@@ -50,11 +52,13 @@ import { Website } from '@/api/interface/website';
 import { deleteAcmeAccount, searchAcmeAccount, updateAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import Create from './create/index.vue';
 import { getAccountName, getKeyName } from '@/utils/ssl';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const open = ref(false);
 const loading = ref(false);

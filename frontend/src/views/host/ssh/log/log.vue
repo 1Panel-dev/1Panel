@@ -6,7 +6,7 @@
                 <div class="mt-2"><el-alert type="info" :title="$t('ssh.sshAlert')" :closable="false" /></div>
             </template>
             <template #leftToolBar>
-                <el-button type="primary" @click="onExport">
+                <el-button type="primary" :disabled="!hasManagePermission" @click="onExport">
                     {{ $t('commons.button.export') }}
                 </el-button>
             </template>
@@ -79,7 +79,7 @@
                     <el-button @click="open = false" :disabled="loading">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
-                    <el-button type="primary" @click="onSubmitExport" :disabled="loading">
+                    <el-button type="primary" @click="onSubmitExport" :disabled="loading || !hasManagePermission">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -94,7 +94,9 @@ import { downloadFile } from '@/utils/file';
 import { onMounted, reactive, ref } from 'vue';
 import { exportSSHLogs, loadSSHLogs } from '@/api/modules/host';
 import { GlobalStore } from '@/store';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref();
 const data = ref();

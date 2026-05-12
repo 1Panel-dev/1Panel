@@ -6,10 +6,16 @@
                 <Tags @change="changeTag" />
             </template>
             <template #leftToolBar>
-                <el-button @click="sync" type="primary" plain :disabled="syncing">
+                <el-button @click="sync" type="primary" plain :disabled="syncing || !hasManagePermission">
                     <span>{{ syncCustomAppstore || isOffline ? $t('app.syncCustomApp') : $t('app.syncAppList') }}</span>
                 </el-button>
-                <el-button @click="syncLocal" type="primary" plain :disabled="syncing" class="ml-2">
+                <el-button
+                    @click="syncLocal"
+                    type="primary"
+                    plain
+                    :disabled="syncing || !hasManagePermission"
+                    class="ml-2"
+                >
                     {{ $t('app.syncLocalApp') }}
                 </el-button>
             </template>
@@ -85,7 +91,9 @@ import AppCard from '@/views/app-store/apps/app/index.vue';
 import MainDiv from '@/components/main-div/index.vue';
 import { jumpToInstall } from '@/utils/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const { globalStore, isProductPro, isOffline } = useGlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const mobile = computed(() => {
     return globalStore.isMobile();

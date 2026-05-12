@@ -28,7 +28,12 @@
                 <el-button :loading="loading" :disabled="saving || !agentId || !workspace" @click="reloadFiles">
                     {{ $t('commons.button.refresh') }}
                 </el-button>
-                <el-button type="primary" :loading="saving" :disabled="!currentFile" @click="saveAllFiles">
+                <el-button
+                    type="primary"
+                    :loading="saving"
+                    :disabled="!currentFile || !hasManagePermission"
+                    @click="saveAllFiles"
+                >
                     {{ $t('aiTools.agents.saveAllMd') }}
                 </el-button>
             </span>
@@ -39,10 +44,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { AI } from '@/api/interface/ai';
 import { getAgentRoleMarkdownFiles, updateAgentRoleMarkdownFile } from '@/api/modules/ai';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+const { hasManagePermission } = useMenuManagePermission();
 
 interface DialogParams {
     name: string;

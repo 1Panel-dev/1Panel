@@ -1,9 +1,11 @@
 <template>
     <ComplexTable :data="data" @search="search" v-loading="loading">
         <template #toolbar>
-            <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
-            <el-button @click="openCache">{{ $t('website.proxyCache') }}</el-button>
-            <el-button type="primary" @click="clear" link>
+            <el-button type="primary" plain :disabled="!hasManagePermission" @click="openCreate">
+                {{ $t('commons.button.create') }}
+            </el-button>
+            <el-button :disabled="!hasManagePermission" @click="openCache">{{ $t('website.proxyCache') }}</el-button>
+            <el-button type="primary" :disabled="!hasManagePermission" @click="clear" link>
                 {{ $t('nginx.clearProxyCache') }}
             </el-button>
         </template>
@@ -24,7 +26,12 @@
         </el-table-column>
         <el-table-column :label="$t('commons.table.status')" prop="enable" width="100">
             <template #default="{ row }">
-                <Status :status="row.enable ? 'enable' : 'disable'" @click="opProxy(row)" :operate="true" />
+                <Status
+                    :status="row.enable ? 'enable' : 'disable'"
+                    :disabled="!hasManagePermission"
+                    @click="opProxy(row)"
+                    :operate="true"
+                />
             </template>
         </el-table-column>
         <fu-table-operations
@@ -47,6 +54,7 @@
 import { Website } from '@/api/interface/website';
 import { getProxyConfig, deleteProxyConfig, updateProxyConfigStatus, clearProxyCache } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
@@ -56,6 +64,7 @@ import File from './file/index.vue';
 import Cache from './cache/index.vue';
 defineOptions({ name: 'Proxy' });
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const props = defineProps({
     id: {
@@ -90,15 +99,16 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: (row: Website.ProxyConfig) => {
+            return !row.enable || !hasManagePermission.value;
+        },
         click: function (row: Website.ProxyConfig) {
             openEdit(row);
-        },
-        disabled: (row: Website.ProxyConfig) => {
-            return !row.enable;
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => !hasManagePermission.value,
         click: function (row: Website.ProxyConfig) {
             deleteProxy(row);
         },

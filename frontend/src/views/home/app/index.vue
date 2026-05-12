@@ -18,7 +18,12 @@
                         </el-table-column>
                     </el-table>
                     <template #reference>
-                        <el-button class="h-button-setting" link icon="Setting"></el-button>
+                        <el-button
+                            class="h-button-setting"
+                            :disabled="!globalStore.isAdminOrNodeAdmin"
+                            link
+                            icon="Setting"
+                        ></el-button>
                     </template>
                 </el-popover>
             </template>
@@ -74,6 +79,7 @@
                                             type="primary"
                                             link
                                             v-if="app.currentRow.status !== 'Running'"
+                                            :disabled="!hasManagePermission"
                                             @click="onOperate('start', app.currentRow)"
                                         >
                                             {{ $t('commons.button.start') }}
@@ -84,6 +90,7 @@
                                             type="primary"
                                             link
                                             v-else
+                                            :disabled="!hasManagePermission"
                                             @click="onOperate('stop', app.currentRow)"
                                         >
                                             {{ $t('commons.button.stop') }}
@@ -93,6 +100,7 @@
                                             size="small"
                                             type="primary"
                                             link
+                                            :disabled="!hasManagePermission"
                                             @click="onOperate('restart', app.currentRow)"
                                         >
                                             {{ $t('commons.button.restart') }}
@@ -102,6 +110,7 @@
                                             size="small"
                                             type="primary"
                                             link
+                                            :disabled="!hasManagePermission"
                                             @click="routerToName('AppInstalled')"
                                         >
                                             {{ $t('tabs.more') }}
@@ -116,7 +125,10 @@
                                     plain
                                     round
                                     size="small"
-                                    :disabled="app.limit == 1 && app.detail && app.detail.length !== 0"
+                                    :disabled="
+                                        (app.limit == 1 && app.detail && app.detail.length !== 0) ||
+                                        !hasManagePermission
+                                    "
                                     @click="goInstall(app.key, app.appType)"
                                 >
                                     {{ $t('commons.button.install') }}
@@ -139,6 +151,8 @@ import { MsgSuccess } from '@/utils/message';
 import { computed, ref } from 'vue';
 import { jumpToInstall } from '@/utils/app';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
+const { hasManagePermission } = useMenuManagePermission('app_manage');
 
 const globalStore = GlobalStore();
 

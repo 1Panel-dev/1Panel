@@ -26,6 +26,7 @@
             <template #leftToolBar>
                 <el-button
                     v-if="currentDB && (currentDB.from !== 'local' || mongodbStatus === 'Running')"
+                    :disabled="!hasManagePermission"
                     type="primary"
                     @click="openCreateDrawer"
                 >
@@ -38,6 +39,7 @@
                     v-if="currentDB && (currentDB.from !== 'local' || mongodbStatus === 'Running')"
                     type="primary"
                     plain
+                    :disabled="!hasManagePermission"
                     @click="onLoadFromRemote"
                 >
                     {{ $t('database.loadFromRemote') }}
@@ -48,7 +50,12 @@
                 <el-button
                     type="primary"
                     plain
-                    :disabled="!currentDB || currentDB.from !== 'local' || mongodbStatus !== 'Running'"
+                    :disabled="
+                        !currentDB ||
+                        currentDB.from !== 'local' ||
+                        mongodbStatus !== 'Running' ||
+                        !globalStore.isAdminOrNodeAdmin
+                    "
                     @click="goTerminal"
                 >
                     {{ $t('menu.terminal') }}
@@ -196,6 +203,8 @@
                         <template #default="{ row }">
                             <fu-input-rw-switch
                                 v-model="row.description"
+                                :write-trigger="hasManagePermission ? 'onClick' : 'disabled'"
+                                :disabled="!hasManagePermission"
                                 @enter="onChange(row)"
                                 @blur="onChange(row)"
                             />
@@ -319,6 +328,7 @@
 
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, reactive, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { dateFormat } from '@/utils/date';
 import { getRandomStr } from '@/utils/id';
 import { Position } from '@element-plus/icons-vue';
@@ -353,6 +363,7 @@ import { GlobalStore } from '@/store';
 import Tooltip from '@/components/tooltip/index.vue';
 
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
@@ -536,7 +547,7 @@ const buttons = [
     {
         label: i18n.global.t('database.changePassword'),
         disabled: (row: Database.MongodbDBInfo) => {
-            return !row.username || row.isDelete;
+            return !row.username || row.isDelete || !hasManagePermission.value;
         },
         click: (row: Database.MongodbDBInfo) => {
             onChangePassword(row);
@@ -545,7 +556,7 @@ const buttons = [
     {
         label: i18n.global.t('database.permission'),
         disabled: (row: Database.MongodbDBInfo) => {
-            return !row.username || row.isDelete;
+            return !row.username || row.isDelete || !hasManagePermission.value;
         },
         click: (row: Database.MongodbDBInfo) => {
             let param = {
@@ -559,7 +570,7 @@ const buttons = [
     {
         label: i18n.global.t('database.backupList'),
         disabled: (row: Database.MongodbDBInfo) => {
-            return row.isDelete;
+            return row.isDelete || !hasManagePermission.value;
         },
         click: (row: Database.MongodbDBInfo) => {
             openBackupList(row);
@@ -568,7 +579,7 @@ const buttons = [
     {
         label: i18n.global.t('database.loadBackup'),
         disabled: (row: Database.MongodbDBInfo) => {
-            return row.isDelete;
+            return row.isDelete || !hasManagePermission.value;
         },
         click: (row: Database.MongodbDBInfo) => {
             openUploadDialog(row);
@@ -576,6 +587,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => {
+            return !hasManagePermission.value;
+        },
         click: (row: Database.MongodbDBInfo) => {
             onDelete(row);
         },

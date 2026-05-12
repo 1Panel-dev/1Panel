@@ -81,7 +81,12 @@
                         :style="{ height: `calc(100vh - ${loadHeight()})`, 'background-color': '#000' }"
                         :description="loadErrMsg()"
                     >
-                        <el-button v-if="currentDB.from === 'remote'" type="primary" @click="installCli">
+                        <el-button
+                            v-if="currentDB.from === 'remote'"
+                            :disabled="!hasManagePermission"
+                            type="primary"
+                            @click="installCli"
+                        >
                             {{ $t('commons.button.enable') }}
                         </el-button>
                     </el-empty>
@@ -95,7 +100,12 @@
                                 :value="cmd.command"
                             />
                         </el-select>
-                        <el-button @click="onSetQuickCmd" icon="Setting" style="width: 10%">
+                        <el-button
+                            :disabled="!hasManagePermission"
+                            @click="onSetQuickCmd"
+                            icon="Setting"
+                            style="width: 10%"
+                        >
                             {{ $t('commons.button.set') }}
                         </el-button>
                     </div>
@@ -144,6 +154,7 @@ import Terminal from '@/components/terminal/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import QuickCmd from '@/views/database/redis/command/index.vue';
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { checkAppInstalled } from '@/api/modules/app';
 import { GlobalStore } from '@/store';
 import { listDatabases, checkRedisCli, installRedisCli } from '@/api/modules/database';
@@ -153,6 +164,7 @@ import i18n from '@/lang';
 import { getCommandList } from '@/api/modules/command';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref(false);
 

@@ -80,7 +80,7 @@
             <el-button @click="handleClose">
                 {{ $t('commons.button.cancel') }}
             </el-button>
-            <el-button type="primary" @click="onSubmit(formRef)">
+            <el-button type="primary" :disabled="!hasManagePermission" @click="onSubmit(formRef)">
                 {{ $t('commons.button.add') }}
             </el-button>
         </template>
@@ -90,6 +90,7 @@
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
 import { listSSL, searchAcmeAccount } from '@/api/modules/website';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { Rules } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
@@ -98,6 +99,7 @@ import { dateFormatSimple } from '@/utils/date';
 import { bindMcpDomain, getMcpDomain, updateMcpDomain } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
+const { hasManagePermission } = useMenuManagePermission();
 
 type SSLItem = Website.SSL & { organization?: string };
 

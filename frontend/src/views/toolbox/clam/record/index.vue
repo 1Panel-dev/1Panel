@@ -30,11 +30,21 @@
                         </el-tag>
 
                         <span class="mt-0.5">
-                            <el-button type="primary" @click="onHandle(dialogData.rowData)" link>
+                            <el-button
+                                type="primary"
+                                :disabled="!hasManagePermission"
+                                @click="onHandle(dialogData.rowData)"
+                                link
+                            >
                                 {{ $t('commons.button.handle') }}
                             </el-button>
                             <el-divider direction="vertical" />
-                            <el-button :disabled="!hasRecords" type="primary" @click="onClean" link>
+                            <el-button
+                                :disabled="!hasRecords || !hasManagePermission"
+                                type="primary"
+                                @click="onClean"
+                                link
+                            >
                                 {{ $t('commons.button.clean') }}
                             </el-button>
                         </span>
@@ -190,10 +200,12 @@ import { Toolbox } from '@/api/interface/toolbox';
 import LogFile from '@/components/log/file/index.vue';
 import { cleanClamRecord, handleClamScan, searchClamRecord } from '@/api/modules/toolbox';
 import { routerToFileWithPath } from '@/utils/router';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const loading = ref();
 const refresh = ref(false);
 const hasRecords = ref();
+const { hasManagePermission } = useMenuManagePermission();
 
 const recordShow = ref(false);
 interface DialogProps {

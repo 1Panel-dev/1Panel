@@ -70,7 +70,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="open = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading" type="primary" @click="submit">
+                <el-button :disabled="loading || !hasManagePermission" type="primary" @click="submit">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -81,6 +81,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { AI } from '@/api/interface/ai';
 import { Rules } from '@/global/form-rules';
 import { createAgentAccount, getAgentProviders, updateAgentAccount } from '@/api/modules/ai';
@@ -90,6 +91,7 @@ import { MsgError } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const emit = defineEmits(['search']);
+const { hasManagePermission } = useMenuManagePermission();
 
 const open = ref(false);
 const formRef = ref<FormInstance>();

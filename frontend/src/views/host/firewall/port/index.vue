@@ -43,17 +43,21 @@
                         </el-alert>
                     </template>
                     <template #leftToolBar>
-                        <el-button type="primary" @click="onOpenDialog('create')">
+                        <el-button type="primary" :disabled="!hasManagePermission" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}
                         </el-button>
-                        <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
+                        <el-button
+                            @click="onDelete(null)"
+                            plain
+                            :disabled="selects.length === 0 || !hasManagePermission"
+                        >
                             {{ $t('commons.button.delete') }}
                         </el-button>
                         <el-button-group>
-                            <el-button @click="onImport">
+                            <el-button :disabled="!hasManagePermission" @click="onImport">
                                 {{ $t('commons.button.import') }}
                             </el-button>
-                            <el-button :disabled="selects.length === 0" @click="onExport">
+                            <el-button :disabled="selects.length === 0 || !hasManagePermission" @click="onExport">
                                 {{ $t('commons.button.export') }}
                             </el-button>
                         </el-button-group>
@@ -102,13 +106,20 @@
                                 <template #default="{ row }">
                                     <el-button
                                         v-if="row.strategy === 'accept'"
+                                        :disabled="!hasManagePermission"
                                         @click="onChangeStatus(row, 'drop')"
                                         link
                                         type="success"
                                     >
                                         {{ $t('firewall.accept') }}
                                     </el-button>
-                                    <el-button v-else link type="danger" @click="onChangeStatus(row, 'accept')">
+                                    <el-button
+                                        v-else
+                                        link
+                                        type="danger"
+                                        :disabled="!hasManagePermission"
+                                        @click="onChangeStatus(row, 'accept')"
+                                    >
                                         {{ $t('firewall.drop') }}
                                     </el-button>
                                 </template>
@@ -128,6 +139,7 @@
                                 <template #default="{ row }">
                                     <fu-input-rw-switch
                                         v-model="row.description"
+                                        :write-trigger="hasManagePermission ? 'onClick' : 'disabled'"
                                         @enter="onChange(row)"
                                         @blur="onChange(row)"
                                     />
@@ -164,6 +176,7 @@ import { batchOperateRule, searchFireRule, updateFirewallDescription, updatePort
 import { getListeningProcess } from '@/api/modules/process';
 import { Host } from '@/api/interface/host';
 import { Process } from '@/api/interface/process';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
@@ -172,6 +185,7 @@ import { routerToName } from '@/utils/router';
 import { downloadWithContent } from '@/utils/file';
 import { getCurrentDateFormatted } from '@/utils/date';
 const loading = ref();
+const { hasManagePermission } = useMenuManagePermission();
 const activeTag = ref('port');
 const selects = ref<any>([]);
 const searchName = ref();
@@ -420,12 +434,14 @@ const showProcessDetail = (pid: number) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: () => !hasManagePermission.value,
         click: (row: Host.RulePort) => {
             onOpenDialog('edit', row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => !hasManagePermission.value,
         click: (row: Host.RuleInfo) => {
             onDelete(row);
         },

@@ -3,7 +3,7 @@
         <template #content>
             <ComplexTable :data="data" v-loading="loading" v-model:selects="selects">
                 <template #toolbar>
-                    <el-button type="primary" @click="openCreate">
+                    <el-button type="primary" :disabled="!hasManagePermission" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
                     <el-button
@@ -128,6 +128,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { computed } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import Create from './create/index.vue';
 import File from './file/index.vue';
 import { GetSupervisorProcess, operateSupervisorProcess } from '@/api/modules/runtime';
@@ -136,6 +137,7 @@ import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref(false);
 const fileRef = ref();

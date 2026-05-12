@@ -31,6 +31,7 @@
                     <el-link
                         style="font-size: 12px; margin-left: 5px"
                         icon="Position"
+                        v-if="globalStore.isAdmin"
                         @click="jumpToPath(router, '/settings/safe')"
                         type="primary"
                     >
@@ -44,7 +45,13 @@
             <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
                 <CardWithHeader :header="$t('menu.home')" height="166px">
                     <template #header-r>
-                        <el-button class="h-button-setting" @click="quickJumpRef.acceptParams()" link icon="Setting" />
+                        <el-button
+                            class="h-button-setting"
+                            :disabled="!globalStore.isAdminOrNodeAdmin"
+                            @click="quickJumpRef.acceptParams()"
+                            link
+                            icon="Setting"
+                        />
                     </template>
                     <template #body>
                         <div class="h-overview">
@@ -57,11 +64,24 @@
                                             :content="item.detail"
                                             placement="bottom"
                                         >
-                                            <span @click="quickJump(item)">
+                                            <el-button
+                                                link
+                                                :disabled="!checkPermission('File')"
+                                                type="primary"
+                                                @click="quickJump(item)"
+                                            >
                                                 {{ item.alias || item.detail.substring(0, 18) + '...' }}
-                                            </span>
+                                            </el-button>
                                         </el-tooltip>
-                                        <span @click="quickJump(item)" v-else>{{ item.detail }}</span>
+                                        <el-button
+                                            link
+                                            :disabled="!checkPermission(item.name)"
+                                            type="primary"
+                                            @click="quickJump(item)"
+                                            v-else
+                                        >
+                                            {{ item.detail }}
+                                        </el-button>
                                     </div>
                                 </el-col>
                             </el-row>
@@ -213,7 +233,12 @@
                                         </div>
                                     </div>
                                     <template #reference>
-                                        <el-button class="h-button-setting" link icon="Setting" />
+                                        <el-button
+                                            class="h-button-setting"
+                                            :disabled="!globalStore.isAdminOrNodeAdmin"
+                                            link
+                                            icon="Setting"
+                                        />
                                     </template>
                                 </el-popover>
                                 <el-tooltip :content="$t('commons.button.refresh')" placement="top">
@@ -322,7 +347,13 @@
                         <CardWithHeader :header="$t('home.memo')" class="memo-card">
                             <template #header-r>
                                 <el-tooltip v-if="!memoEditing" :content="$t('commons.button.edit')" placement="top">
-                                    <el-button class="h-button-setting" @click="startMemoEdit" link icon="Edit" />
+                                    <el-button
+                                        class="h-button-setting"
+                                        :disabled="!globalStore.isAdminOrNodeAdmin"
+                                        @click="startMemoEdit"
+                                        link
+                                        icon="Edit"
+                                    />
                                 </el-tooltip>
                                 <el-tooltip v-if="memoEditing" :content="$t('commons.button.save')" placement="top">
                                     <el-button
@@ -461,6 +492,7 @@ import {
     setDashboardCache,
 } from '@/utils/dashboardCache';
 import { MsgSuccess } from '@/utils/message';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -544,6 +576,18 @@ const hasRefreshedOptionsOnHover = ref(false);
 const licenseRef = ref();
 const quickJumpRef = ref();
 const { isProductPro, isEnterprise, isOffline } = storeToRefs(globalStore);
+const quickJumpPermissionMap = {
+    Agent: useMenuManagePermission('ai_agent_view').hasPermission,
+    Website: useMenuManagePermission('website_view').hasPermission,
+    Database: useMenuManagePermission('database_view').hasPermission,
+    Cronjob: useMenuManagePermission('cronjob_view').hasPermission,
+    AppInstalled: useMenuManagePermission('app_view').hasPermission,
+    File: useMenuManagePermission('host_file_view').hasPermission,
+} as const;
+
+const checkPermission = (item: string) => {
+    return quickJumpPermissionMap[item as keyof typeof quickJumpPermissionMap]?.value ?? true;
+};
 
 const searchInfo = reactive({
     ioOption: 'all',
@@ -1135,11 +1179,9 @@ onBeforeUnmount(() => {
     .count {
         margin-top: 10px;
 
-        span {
+        :deep(.el-button) {
             font-size: 18px;
-            color: $primary-color;
             line-height: 32px;
-            cursor: pointer;
         }
     }
 }

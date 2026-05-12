@@ -18,7 +18,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
+                <el-button :disabled="loading || !hasManagePermission" type="primary" @click="onSave(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -32,7 +32,9 @@ import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { updateFail2ban } from '@/api/modules/toolbox';
 import { splitTime, transTimeUnit } from '@/utils/validate';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const emit = defineEmits<{ (e: 'search'): void }>();
+const { hasManagePermission } = useMenuManagePermission();
 
 interface DialogProps {
     banTime: string;

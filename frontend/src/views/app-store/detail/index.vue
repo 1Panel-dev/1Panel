@@ -33,6 +33,7 @@
                         <el-button
                             round
                             v-if="appDetail.enable && operate === 'install'"
+                            :disabled="!hasManagePermission"
                             @click="openInstall"
                             type="primary"
                             class="brief-button"
@@ -81,7 +82,9 @@ import Install from './install/index.vue';
 import { computeSizeFromMB } from '@/utils/size';
 import { jumpToInstall } from '@/utils/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const { currentNode } = useGlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const app = ref<any>({});
 const appDetail = ref<any>({});

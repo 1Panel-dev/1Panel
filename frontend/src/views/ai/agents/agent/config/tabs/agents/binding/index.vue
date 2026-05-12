@@ -35,7 +35,7 @@
                 </el-table-column>
                 <el-table-column :label="$t('commons.table.operate')" width="100" align="right">
                     <template #default="{ $index }">
-                        <el-button link @click="removeBinding($index)">
+                        <el-button link :disabled="!hasManagePermission" @click="removeBinding($index)">
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </template>
@@ -45,7 +45,12 @@
                 <el-empty :description="$t('commons.msg.noneData')" :image-size="60" />
             </div>
             <div class="binding-dialog__actions">
-                <el-button type="primary" link :disabled="loading || submitting" @click="addBinding">
+                <el-button
+                    type="primary"
+                    link
+                    :disabled="loading || submitting || !hasManagePermission"
+                    @click="addBinding"
+                >
                     {{ $t('commons.button.add') }}
                 </el-button>
             </div>
@@ -57,7 +62,7 @@
             <el-button
                 type="primary"
                 :loading="submitting"
-                :disabled="loading || !form.bindings.length"
+                :disabled="loading || !form.bindings.length || !hasManagePermission"
                 @click="submitBind"
             >
                 {{ $t('commons.button.bind') }}
@@ -68,10 +73,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { bindAgentRole, getAgentRoleChannels } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
+const { hasManagePermission } = useMenuManagePermission();
 
 interface SelectOption {
     label: string;

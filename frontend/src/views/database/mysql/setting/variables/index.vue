@@ -63,7 +63,11 @@
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button @click="onSaveStart(variableFormRef)" type="primary">
+                        <el-button
+                            :disabled="!hasManagePermission"
+                            @click="onSaveStart(variableFormRef)"
+                            type="primary"
+                        >
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-form-item>
@@ -123,6 +127,8 @@ import { updateMysqlVariables } from '@/api/modules/database';
 import i18n from '@/lang';
 import { planOptions } from './../helper';
 import { MsgSuccess } from '@/utils/message';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
+const { hasManagePermission } = useMenuManagePermission();
 
 const plan = ref();
 const confirmDialogRef = ref();

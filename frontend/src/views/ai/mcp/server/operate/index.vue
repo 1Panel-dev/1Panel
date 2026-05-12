@@ -15,7 +15,7 @@
             v-loading="loading"
         >
             <el-form-item>
-                <el-button @click="importRef.acceptParams()" type="primary" plain>
+                <el-button :disabled="!hasManagePermission" @click="importRef.acceptParams()" type="primary" plain>
                     {{ $t('aiTools.mcp.importMcpJson') }}
                 </el-button>
             </el-form-item>
@@ -60,7 +60,13 @@
                         </el-col>
                         <el-col :span="4">
                             <el-form-item>
-                                <el-button type="primary" @click="removeEnv(index)" link class="mt-1">
+                                <el-button
+                                    type="primary"
+                                    :disabled="!hasManagePermission"
+                                    @click="removeEnv(index)"
+                                    link
+                                    class="mt-1"
+                                >
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </el-form-item>
@@ -68,7 +74,9 @@
                     </el-row>
                     <el-row :gutter="20">
                         <el-col :span="4">
-                            <el-button class="mb-2" @click="addEnv">{{ $t('commons.button.add') }}</el-button>
+                            <el-button class="mb-2" :disabled="!hasManagePermission" @click="addEnv">
+                                {{ $t('commons.button.add') }}
+                            </el-button>
                         </el-col>
                     </el-row>
                 </div>
@@ -128,7 +136,7 @@
         <template #footer>
             <span>
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(mcpServerForm)" :disabled="loading">
+                <el-button type="primary" @click="submit(mcpServerForm)" :disabled="loading || !hasManagePermission">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -140,6 +148,7 @@
 <script lang="ts" setup>
 import { AI } from '@/api/interface/ai';
 import { createMcpServer, getMcpDomain, updateMcpServer } from '@/api/modules/ai';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -147,6 +156,7 @@ import { FormInstance } from 'element-plus';
 import { ref, watch } from 'vue';
 import Volumes from '../volume/index.vue';
 import Import from '../import/index.vue';
+const { hasManagePermission } = useMenuManagePermission();
 
 const open = ref(false);
 const mode = ref('create');

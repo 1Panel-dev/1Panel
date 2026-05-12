@@ -1,7 +1,7 @@
 <template>
     <el-form ref="formRef" v-loading="deleting" :model="form" :rules="rules" label-position="top">
         <el-form-item v-if="configured">
-            <el-button type="danger" plain :loading="deleting" @click="deleteChannel">
+            <el-button type="danger" plain :loading="deleting" :disabled="!hasManagePermission" @click="deleteChannel">
                 {{ t('commons.button.delete') }}
             </el-button>
         </el-form-item>
@@ -18,7 +18,7 @@
             <el-switch v-model="form.requireMention" />
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="saving" @click="save">
+            <el-button type="primary" :loading="saving" :disabled="!hasManagePermission" @click="save">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
@@ -28,7 +28,13 @@
                 <el-input v-model="pairingCode" :placeholder="t('aiTools.agents.pairingCodePlaceholder')" />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" plain :loading="approving" @click="approvePairing">
+                <el-button
+                    type="primary"
+                    plain
+                    :loading="approving"
+                    :disabled="!hasManagePermission"
+                    @click="approvePairing"
+                >
                     {{ t('aiTools.agents.approvePairing') }}
                 </el-button>
             </el-form-item>
@@ -39,6 +45,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { ElMessageBox, type FormInstance } from 'element-plus';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import {
     approveAgentChannelPairing,
@@ -56,6 +63,7 @@ interface TelegramForm {
 }
 
 const { t } = useI18n();
+const { hasManagePermission } = useMenuManagePermission();
 const formRef = ref<FormInstance>();
 const saving = ref(false);
 const approving = ref(false);

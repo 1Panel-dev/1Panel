@@ -4,7 +4,7 @@
         <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
         <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="openCreate" :disabled="noApp">
+                <el-button type="primary" @click="openCreate" :disabled="noApp || !hasManagePermission">
                     {{ $t('commons.button.create') }}
                 </el-button>
             </template>
@@ -36,23 +36,23 @@
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="120">
                         <template #default="{ row }">
                             <el-dropdown placement="bottom">
-                                <Status :status="row.status" :operate="true" />
+                                <Status :status="row.status" :disabled="!hasManagePermission" :operate="true" />
                                 <template #dropdown>
                                     <el-dropdown-menu>
                                         <el-dropdown-item
-                                            :disabled="checkStatus('start', row)"
+                                            :disabled="checkStatus('start', row) || !hasManagePermission"
                                             @click="onOperate(row, 'start')"
                                         >
                                             {{ $t('commons.operate.start') }}
                                         </el-dropdown-item>
                                         <el-dropdown-item
-                                            :disabled="checkStatus('stop', row)"
+                                            :disabled="checkStatus('stop', row) || !hasManagePermission"
                                             @click="onOperate(row, 'stop')"
                                         >
                                             {{ $t('commons.operate.stop') }}
                                         </el-dropdown-item>
                                         <el-dropdown-item
-                                            :disabled="checkStatus('restart', row)"
+                                            :disabled="checkStatus('restart', row) || !hasManagePermission"
                                             @click="onOperate(row, 'restart')"
                                         >
                                             {{ $t('commons.button.restart') }}
@@ -66,7 +66,13 @@
                         <template #default="{ row }">
                             <div class="version-cell">
                                 <span>{{ row.appVersion }}</span>
-                                <el-button v-if="row.upgradable" link type="primary" @click="openUpgrade(row)">
+                                <el-button
+                                    :disabled="!hasManagePermission"
+                                    v-if="row.upgradable"
+                                    link
+                                    type="primary"
+                                    @click="openUpgrade(row)"
+                                >
                                     {{ $t('commons.button.upgrade') }}
                                 </el-button>
                             </div>
@@ -134,31 +140,42 @@
                                     link
                                     type="primary"
                                     class="website-link-cell__unbind"
+                                    :disabled="!hasManagePermission"
                                     @click="onUnbindWebsite(row)"
                                 >
                                     {{ $t('commons.button.unbind') }}
                                 </el-button>
                             </div>
-                            <el-button v-else link type="primary" @click="openBindWebsite(row)">
+                            <el-button
+                                v-else
+                                link
+                                type="primary"
+                                :disabled="!hasManagePermission"
+                                @click="openBindWebsite(row)"
+                            >
                                 {{ $t('commons.button.bind') }}
                             </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('website.remark')" prop="remark" min-width="150">
                         <template #default="{ row }">
-                            <fu-read-write-switch>
+                            <fu-read-write-switch :write-trigger="hasManagePermission ? 'onClick' : 'disabled'">
                                 <template #read>
                                     <MsgInfo :info="row.remark" :width="'150'" />
                                 </template>
                                 <template #default="{ read }">
-                                    <el-input v-model="row.remark" @blur="handleUpdateRemark(row, read)" />
+                                    <el-input
+                                        v-model="row.remark"
+                                        :disabled="!hasManagePermission"
+                                        @blur="handleUpdateRemark(row, read)"
+                                    />
                                 </template>
                             </fu-read-write-switch>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('runtime.workDir')" min-width="90">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="openWorkDir(row)">
+                            <el-button :disabled="!hasFilePermission" type="primary" link @click="openWorkDir(row)">
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>
@@ -169,7 +186,12 @@
                         <template #default="{ row }">
                             <el-space v-if="supportsAgentToken(row.agentType)">
                                 <CopyButton :content="row.token" />
-                                <el-button link type="primary" @click="onResetToken(row)">
+                                <el-button
+                                    :disabled="!hasManagePermission"
+                                    link
+                                    type="primary"
+                                    @click="onResetToken(row)"
+                                >
                                     {{ $t('commons.button.reset') }}
                                 </el-button>
                             </el-space>
@@ -211,6 +233,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { deleteAgentCheck, pageAgents, resetAgentToken, unbindAgentWebsite, updateAgentRemark } from '@/api/modules/ai';
 import { checkAppInstalled, installedOp, searchApp, searchAppInstalled } from '@/api/modules/app';
 import { AI } from '@/api/interface/ai';
@@ -247,6 +270,7 @@ import NoApp from '@/views/app-store/apps/no-app/index.vue';
 import openclawIcon from '@/assets/images/ai-agent-openclaw.svg';
 import copawIcon from '@/assets/images/ai-agent-copaw.svg';
 import hermesIcon from '@/assets/images/ai-agent-hermes-agent.svg';
+import { GlobalStore } from '@/store';
 
 const items = ref<AI.AgentItem[]>([]);
 const loading = ref(false);
@@ -264,6 +288,8 @@ const hermesChatRef = ref();
 const dialogPortJumpRef = ref();
 const route = useRoute();
 const router = useRouter();
+const { hasManagePermission } = useMenuManagePermission();
+const { hasPermission: hasFilePermission } = useMenuManagePermission('host_file_view');
 const isActive = ref(false);
 const isExist = ref(false);
 const noApp = ref(false);
@@ -271,6 +297,7 @@ const searchName = ref('');
 const defaultHttpsPort = ref(443);
 const openrestyPortLoaded = ref(false);
 const websiteDomainsMap = ref<Record<number, Website.Domain[]>>({});
+const globalStore = GlobalStore();
 
 const headerButtons = [
     {
@@ -289,6 +316,7 @@ const buttons = [
     {
         label: i18n.global.t('aiTools.agents.hermesChatAction'),
         click: (row: AI.AgentItem) => openHermesChat(row),
+        disabled: () => !globalStore.isAdminOrNodeAdmin,
         show: (row: AI.AgentItem) => row.agentType === 'hermes-agent' && row.status === 'Running',
     },
     {
@@ -298,6 +326,7 @@ const buttons = [
     {
         label: i18n.global.t('menu.terminal'),
         click: (row: AI.AgentItem) => openTerminal(row),
+        disabled: () => !globalStore.isAdminOrNodeAdmin,
     },
     {
         label: i18n.global.t('menu.home'),
@@ -307,25 +336,27 @@ const buttons = [
     {
         label: i18n.global.t('commons.operate.start'),
         click: (row: AI.AgentItem) => onOperate(row, 'start'),
-        disabled: (row: AI.AgentItem) => row.status === 'Running',
+        disabled: (row: AI.AgentItem) => row.status === 'Running' || !hasManagePermission.value,
     },
     {
         label: i18n.global.t('commons.operate.stop'),
         click: (row: AI.AgentItem) => onOperate(row, 'stop'),
-        disabled: (row: AI.AgentItem) => row.status !== 'Running',
+        disabled: (row: AI.AgentItem) => row.status !== 'Running' || !hasManagePermission.value,
     },
     {
         label: i18n.global.t('commons.operate.restart'),
         click: (row: AI.AgentItem) => onOperate(row, 'restart'),
+        disabled: () => !hasManagePermission.value,
     },
     {
         label: i18n.global.t('commons.button.upgrade'),
         click: (row: AI.AgentItem) => openUpgrade(row),
-        disabled: (row: AI.AgentItem) => !row.upgradable,
+        disabled: (row: AI.AgentItem) => !row.upgradable || !hasManagePermission.value,
     },
     {
         label: i18n.global.t('commons.button.delete'),
         click: (row: AI.AgentItem) => onDelete(row),
+        disabled: () => !hasManagePermission.value,
     },
 ];
 

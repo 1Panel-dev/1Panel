@@ -10,14 +10,26 @@
                         <Status class="mt-0.5" :status="form.isActive ? 'enable' : 'disable'" :msg="form.message" />
                     </div>
                     <div class="mt-0.5">
-                        <el-button v-if="form.isActive" type="primary" @click="onOperate('stop')" link>
+                        <el-button
+                            v-if="form.isActive"
+                            type="primary"
+                            :disabled="!hasManagePermission"
+                            @click="onOperate('stop')"
+                            link
+                        >
                             {{ $t('commons.button.stop') }}
                         </el-button>
-                        <el-button v-if="!form.isActive" type="primary" @click="onOperate('start')" link>
+                        <el-button
+                            v-if="!form.isActive"
+                            type="primary"
+                            :disabled="!hasManagePermission"
+                            @click="onOperate('start')"
+                            link
+                        >
                             {{ $t('commons.button.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" @click="onOperate('restart')" link>
+                        <el-button type="primary" :disabled="!hasManagePermission" @click="onOperate('restart')" link>
                             {{ $t('commons.button.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
@@ -29,6 +41,7 @@
                             class="ml-2"
                             inactive-value="disable"
                             active-value="enable"
+                            :disabled="!hasManagePermission"
                             @change="onOperate(autoStart)"
                             v-model="autoStart"
                         />
@@ -44,8 +57,8 @@
                     <el-radio-button value="all">{{ $t('database.allConf') }}</el-radio-button>
                 </el-radio-group>
 
-                <el-button @click="onOpenDrawer">{{ $t('ssh.pubkey') }}</el-button>
-                <el-button @click="onOpenAuthKeys">{{ $t('ssh.authKeys') }}</el-button>
+                <el-button :disabled="!hasManagePermission" @click="onOpenDrawer">{{ $t('ssh.pubkey') }}</el-button>
+                <el-button :disabled="!hasManagePermission" @click="onOpenAuthKeys">{{ $t('ssh.authKeys') }}</el-button>
             </template>
             <template #main>
                 <el-row class="mt-10" v-if="confShowType === 'base'">
@@ -54,7 +67,11 @@
                             <el-form-item :label="$t('ssh.port')" prop="port">
                                 <el-input disabled v-model="form.port">
                                     <template #append>
-                                        <el-button @click="onChangePort" icon="Setting">
+                                        <el-button
+                                            :disabled="!hasManagePermission"
+                                            @click="onChangePort"
+                                            icon="Setting"
+                                        >
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -64,7 +81,11 @@
                             <el-form-item :label="$t('ssh.listenAddress')" prop="listenAddress">
                                 <el-input disabled v-model="form.listenAddressItem">
                                     <template #append>
-                                        <el-button @click="onChangeAddress" icon="Setting">
+                                        <el-button
+                                            :disabled="!hasManagePermission"
+                                            @click="onChangeAddress"
+                                            icon="Setting"
+                                        >
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -74,7 +95,11 @@
                             <el-form-item :label="$t('ssh.permitRootLogin')" prop="permitRootLoginItem">
                                 <el-input disabled v-model="form.permitRootLoginItem">
                                     <template #append>
-                                        <el-button @click="onChangeRoot" icon="Setting">
+                                        <el-button
+                                            :disabled="!hasManagePermission"
+                                            @click="onChangeRoot"
+                                            icon="Setting"
+                                        >
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -85,6 +110,7 @@
                                 <el-switch
                                     active-value="yes"
                                     inactive-value="no"
+                                    :disabled="!hasManagePermission"
                                     @change="onSave(formRef, 'PasswordAuthentication', form.passwordAuthentication)"
                                     v-model="form.passwordAuthentication"
                                 ></el-switch>
@@ -94,6 +120,7 @@
                                 <el-switch
                                     active-value="yes"
                                     inactive-value="no"
+                                    :disabled="!hasManagePermission"
                                     @change="onSave(formRef, 'PubkeyAuthentication', form.pubkeyAuthentication)"
                                     v-model="form.pubkeyAuthentication"
                                 ></el-switch>
@@ -103,6 +130,7 @@
                                 <el-switch
                                     active-value="yes"
                                     inactive-value="no"
+                                    :disabled="!hasManagePermission"
                                     @change="onSave(formRef, 'UseDNS', form.useDNS)"
                                     v-model="form.useDNS"
                                 ></el-switch>
@@ -130,7 +158,12 @@
                         mode="nginx"
                         placeholder="# The SSH configuration file does not exist or is empty (/etc/ssh/sshd_config)"
                     ></CodemirrorPro>
-                    <el-button :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
+                    <el-button
+                        :disabled="loading || !hasManagePermission"
+                        type="primary"
+                        @click="onSaveFile"
+                        class="mt-2.5"
+                    >
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>
@@ -158,8 +191,10 @@ import { MsgSuccess } from '@/utils/message';
 import { loadSSHFile, getSSHInfo, operateSSH, updateSSH, updateSSHByFile } from '@/api/modules/host';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const loading = ref(false);
+const { hasManagePermission } = useMenuManagePermission();
 const formRef = ref();
 const confShowType = ref('base');
 const pubKeyRef = ref();

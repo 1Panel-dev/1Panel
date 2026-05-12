@@ -10,7 +10,7 @@
                     <span class="input-help">{{ $t('tool.supervisor.serviceNameHelper') }}</span>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="submit(initForm)" :disabled="loading">
+                    <el-button type="primary" @click="submit(initForm)" :disabled="loading || !hasManagePermission">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </el-form-item>
@@ -27,7 +27,9 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { onMounted, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const loading = ref(false);
+const { hasManagePermission } = useMenuManagePermission();
 const initForm = ref<FormInstance>();
 const rules = ref({
     configPath: [Rules.requiredInput],

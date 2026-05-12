@@ -9,13 +9,13 @@
 
         <LayoutContent v-if="isExist" :title="$t('container.volume', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="onCreate()">
+                <el-button type="primary" :disabled="!hasManagePermission" @click="onCreate()">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="onClean()">
+                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onClean()">
                     {{ $t('container.volumePrune') }}
                 </el-button>
-                <el-button :disabled="selects.length === 0" @click="batchDelete(null)">
+                <el-button :disabled="selects.length === 0 || !hasManagePermission" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -90,6 +90,7 @@
                                     type="primary"
                                     icon="FolderOpened"
                                     link
+                                    :disabled="!hasFilePermission"
                                     @click="routerToFileWithPath(row.mountpoint)"
                                 />
                             </el-tooltip>
@@ -125,6 +126,7 @@ import CreateDialog from '@/views/container/volume/create/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { reactive, ref, computed } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
 import { deleteVolume, searchVolume, inspect, containerPrune } from '@/api/modules/container';
@@ -137,6 +139,8 @@ import { routerToFileWithPath } from '@/utils/router';
 import { checkFile } from '@/api/modules/files';
 import { MsgError } from '@/utils/message';
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
+const { hasPermission: hasFilePermission } = useMenuManagePermission('host_file_view');
 
 const taskLogRef = ref();
 const mobile = computed(() => {
@@ -261,6 +265,7 @@ const batchDelete = async (row: Container.VolumeInfo | null) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => !hasManagePermission.value,
         click: (row: Container.VolumeInfo) => {
             batchDelete(row);
         },

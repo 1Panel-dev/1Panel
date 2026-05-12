@@ -35,7 +35,9 @@
                             size="small"
                             plain
                             round
-                            :disabled="(app.installed && app.limit == 1) || app.status === 'TakeDown'"
+                            :disabled="
+                                (app.installed && app.limit == 1) || app.status === 'TakeDown' || !hasManagePermission
+                            "
                             @click.stop="openInstall(app)"
                         >
                             {{ $t('commons.button.install') }}
@@ -50,6 +52,7 @@
 <script lang="ts" setup>
 import { getAppIconUrl } from '@/api/modules/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const { currentNode } = useGlobalStore();
 
 defineProps({
@@ -58,6 +61,8 @@ defineProps({
         default: () => ({}),
     },
 });
+
+const { hasManagePermission } = useMenuManagePermission();
 
 const em = defineEmits(['openDetail', 'openInstall']);
 

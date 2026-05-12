@@ -3,7 +3,7 @@
         <el-tab-pane :label="$t('website.global')">
             <ComplexTable :data="data" @search="search" v-loading="loading" :heightDiff="420">
                 <template #toolbar>
-                    <el-button type="primary" plain @click="openCreate('root')">
+                    <el-button type="primary" plain :disabled="!hasManagePermission" @click="openCreate('root')">
                         {{ $t('commons.button.create') }}
                     </el-button>
                     <el-switch
@@ -28,7 +28,7 @@
         <el-tab-pane :label="$t('website.path')" v-if="showPath">
             <ComplexTable :data="pathData" @search="searchPath" v-loading="loading" :heightDiff="420">
                 <template #toolbar>
-                    <el-button type="primary" plain @click="openCreate('path')">
+                    <el-button type="primary" plain :disabled="!hasManagePermission" @click="openCreate('path')">
                         {{ $t('commons.button.create') }}
                     </el-button>
                 </template>
@@ -62,12 +62,14 @@ import {
     getWebsite,
 } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import i18n from '@/lang';
 import Create from './create/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 defineOptions({ name: 'Proxy' });
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const props = defineProps({
     id: {
@@ -92,6 +94,7 @@ const showPath = ref(false);
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: () => !hasManagePermission.value,
         click: function (row: Website.NginxAuthConfig) {
             row.scope = 'root';
             openEdit(row);
@@ -108,6 +111,7 @@ const buttons = [
 const pathButtons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: () => !hasManagePermission.value,
         click: function (row: Website.NginxAuthConfig) {
             row.scope = 'path';
             openEdit(row);

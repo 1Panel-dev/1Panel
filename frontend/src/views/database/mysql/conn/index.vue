@@ -73,7 +73,11 @@
 
             <div v-if="form.from === 'local'">
                 <el-form-item :label="$t('database.remoteAccess')" prop="privilege">
-                    <el-switch v-model="form.privilege" :disabled="form.status !== 'Running'" @change="onSaveAccess" />
+                    <el-switch
+                        v-model="form.privilege"
+                        :disabled="form.status !== 'Running' || !hasManagePermission"
+                        @change="onSaveAccess"
+                    />
                     <span class="input-help">{{ $t('database.remoteConnHelper') }}</span>
                 </el-form-item>
                 <el-form-item :label="$t('database.rootPassword')" prop="password">
@@ -109,7 +113,11 @@
                 <el-button :disabled="loading" @click="dialogVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabled="loading || form.status !== 'Running'" type="primary" @click="onSave(formRef)">
+                <el-button
+                    :disabled="loading || form.status !== 'Running' || !hasManagePermission"
+                    type="primary"
+                    @click="onSave(formRef)"
+                >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -129,7 +137,9 @@ import { getRandomStr } from '@/utils/id';
 import { copyText } from '@/utils/clipboard';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref(false);
 

@@ -21,7 +21,7 @@
                 </el-icon>
             </span>
         </el-tag>
-        <el-button size="small" v-else :type="getType(statusItem)" plain round>
+        <el-button size="small" v-else :type="getType(statusItem)" plain round :disabled="props.disabled">
             <span v-if="statusItem != ''">{{ $t('commons.status.' + statusItem) }}</span>
             <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
                 <Loading />
@@ -39,6 +39,7 @@ const props = defineProps({
     status: String,
     msg: String,
     hasIcon: Boolean,
+    disabled: Boolean,
     operate: {
         type: Boolean,
         default: false,

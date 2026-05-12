@@ -2,7 +2,7 @@
     <div>
         <ComplexTable :data="data" @search="search" v-loading="loading" :heightDiff="420">
             <template #toolbar>
-                <el-button type="primary" plain @click="create()">
+                <el-button type="primary" plain :disabled="!hasManagePermission" @click="create()">
                     {{ $t('commons.button.create') }}
                 </el-button>
                 <el-alert :closable="false" class="!mt-2">
@@ -72,11 +72,13 @@
 <script setup lang="ts">
 import { deleteLoadBalance, getLoadBalances } from '@/api/modules/website';
 import { onMounted, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import Operate from './operate/index.vue';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
 import { getAlgorithms } from '@/global/mimetype';
 import File from './file/index.vue';
+const { hasManagePermission } = useMenuManagePermission();
 
 const props = defineProps({
     id: {
@@ -101,6 +103,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: () => !hasManagePermission.value,
         click: (row: any) => {
             update(row);
         },

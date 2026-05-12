@@ -1,12 +1,12 @@
 <template>
     <el-form v-loading="deleting" label-position="top">
         <el-form-item v-if="configured">
-            <el-button type="danger" plain :loading="deleting" @click="deleteChannel">
+            <el-button type="danger" plain :loading="deleting" :disabled="!hasManagePermission" @click="deleteChannel">
                 {{ t('commons.button.delete') }}
             </el-button>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="loggingIn" @click="loginChannel">
+            <el-button type="primary" :loading="loggingIn" :disabled="!hasManagePermission" @click="loginChannel">
                 {{ t('aiTools.agents.scanConnect') }}
             </el-button>
         </el-form-item>
@@ -18,6 +18,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import { deleteAgentChannelConfig, getAgentWeixinConfig, loginAgentWeixinChannel } from '@/api/modules/ai';
 import TaskLog from '@/components/log/task/index.vue';
@@ -28,6 +29,7 @@ const props = defineProps<{
     agentId: number;
 }>();
 const { t } = useI18n();
+const { hasManagePermission } = useMenuManagePermission();
 const loggingIn = ref(false);
 const deleting = ref(false);
 const loginTaskLogRef = ref();

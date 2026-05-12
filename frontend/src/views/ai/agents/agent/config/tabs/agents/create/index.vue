@@ -51,7 +51,7 @@
                         </el-table-column>
                         <el-table-column :label="$t('commons.table.operate')" width="90" align="center">
                             <template #default="{ $index }">
-                                <el-button link @click="removeBinding($index)">
+                                <el-button link :disabled="!hasManagePermission" @click="removeBinding($index)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </template>
@@ -59,7 +59,7 @@
                     </el-table>
                     <el-empty v-else :description="$t('commons.msg.noneData')" :image-size="60" />
                     <div class="bindings-footer">
-                        <el-button type="primary" link @click="addBinding">
+                        <el-button type="primary" link :disabled="!hasManagePermission" @click="addBinding">
                             {{ $t('commons.button.add') }}
                         </el-button>
                     </div>
@@ -68,7 +68,7 @@
         </div>
         <template #footer>
             <el-button :disabled="loading" @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button type="primary" :loading="loading" @click="submit">
+            <el-button type="primary" :loading="loading" :disabled="!hasManagePermission" @click="submit">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -78,12 +78,15 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { createAgentRole, getAgentRoleChannels, pageAgentAccounts } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { hasManagePermission } = useMenuManagePermission();
 
 interface SelectOption {
     label: string;

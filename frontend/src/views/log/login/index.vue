@@ -5,7 +5,7 @@
                 <LogRouter current="LoginLog" />
             </template>
             <template #leftToolBar>
-                <el-button type="primary" plain @click="onClean()">
+                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onClean()">
                     {{ $t('logs.deleteLogs') }}
                 </el-button>
             </template>
@@ -51,8 +51,10 @@ import { cleanLogs, getLoginLogs } from '@/api/modules/log';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const loading = ref();
+const { hasManagePermission } = useMenuManagePermission();
 const data = ref();
 const confirmDialogRef = ref();
 const paginationConfig = reactive({

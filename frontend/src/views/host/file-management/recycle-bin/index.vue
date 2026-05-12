@@ -2,17 +2,27 @@
     <DrawerPro v-model="open" :header="$t('file.recycleBin')" @close="handleClose" size="large">
         <template #content>
             <div class="flex space-x-4">
-                <el-button @click="clear" type="primary" :disabled="data == null || data.length == 0">
+                <el-button
+                    @click="clear"
+                    type="primary"
+                    :disabled="data == null || data.length == 0 || !hasManagePermission"
+                >
                     {{ $t('file.clearRecycleBin') }}
                 </el-button>
-                <el-button @click="patchDelete" :disabled="data == null || selects.length == 0">
+                <el-button @click="patchDelete" :disabled="data == null || selects.length == 0 || !hasManagePermission">
                     {{ $t('commons.button.delete') }}
                 </el-button>
-                <el-button @click="patchReduce" :disabled="data == null || selects.length == 0">
+                <el-button @click="patchReduce" :disabled="data == null || selects.length == 0 || !hasManagePermission">
                     {{ $t('file.reduce') }}
                 </el-button>
                 <el-form-item :label="$t('file.fileRecycleBin')">
-                    <el-switch v-model="status" active-value="Enable" inactive-value="Disable" @change="changeStatus" />
+                    <el-switch
+                        v-model="status"
+                        active-value="Enable"
+                        inactive-value="Disable"
+                        :disabled="!hasManagePermission"
+                        @change="changeStatus"
+                    />
                 </el-form-item>
             </div>
             <ComplexTable
@@ -68,6 +78,9 @@ import Delete from './delete/index.vue';
 import Reduce from './reduce/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { updateAgentSetting } from '@/api/modules/setting';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
+
+const { hasManagePermission } = useMenuManagePermission();
 
 const open = ref(false);
 const req = reactive({
@@ -181,10 +194,12 @@ const clear = async () => {
 const buttons = [
     {
         label: i18n.global.t('file.reduce'),
+        disabled: () => !hasManagePermission.value,
         click: rdFile,
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => !hasManagePermission.value,
         click: singleDel,
     },
 ];

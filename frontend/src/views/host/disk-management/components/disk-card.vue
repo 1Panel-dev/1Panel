@@ -48,7 +48,12 @@
                                 diskInfo.mountPoint == ''
                             "
                         >
-                            <el-button type="primary" size="small" @click="handlePartition(diskInfo)">
+                            <el-button
+                                type="primary"
+                                size="small"
+                                :disabled="!hasManagePermission"
+                                @click="handlePartition(diskInfo)"
+                            >
                                 {{ $t('disk.handlePartition') }}
                             </el-button>
                         </div>
@@ -92,10 +97,18 @@
                 <el-table-column :label="$t('commons.table.operate')" width="150">
                     <template #default="{ row }">
                         <el-text type="info" v-if="scope === 'system'">{{ $t('disk.cannotOperate') }}</el-text>
-                        <el-button type="primary" link v-else-if="row.mountPoint != ''" @click="unmount(row)">
+                        <el-button
+                            type="primary"
+                            link
+                            v-else-if="row.mountPoint != ''"
+                            :disabled="!hasManagePermission"
+                            @click="unmount(row)"
+                        >
                             {{ $t('disk.unmount') }}
                         </el-button>
-                        <el-button type="primary" link v-else @click="mount(row)">{{ $t('disk.mount') }}</el-button>
+                        <el-button type="primary" link v-else :disabled="!hasManagePermission" @click="mount(row)">
+                            {{ $t('disk.mount') }}
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -137,10 +150,18 @@
                 <el-table-column :label="$t('commons.table.operate')" width="150">
                     <template #default="{ row }">
                         <el-text type="info" v-if="scope === 'system'">{{ $t('disk.cannotOperate') }}</el-text>
-                        <el-button type="primary" link v-else-if="row.mountPoint != ''" @click="unmount(row)">
+                        <el-button
+                            type="primary"
+                            link
+                            v-else-if="row.mountPoint != ''"
+                            :disabled="!hasManagePermission"
+                            @click="unmount(row)"
+                        >
                             {{ $t('disk.unmount') }}
                         </el-button>
-                        <el-button type="primary" link v-else @click="mount(row)">{{ $t('disk.mount') }}</el-button>
+                        <el-button type="primary" link v-else :disabled="!hasManagePermission" @click="mount(row)">
+                            {{ $t('disk.mount') }}
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -164,6 +185,10 @@ defineProps({
     scope: {
         type: String,
         required: false,
+    },
+    hasManagePermission: {
+        type: Boolean,
+        default: true,
     },
 });
 

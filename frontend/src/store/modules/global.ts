@@ -78,6 +78,9 @@ const GlobalStore = defineStore({
         isDarkGoldTheme: (state) => state.themeConfig.primary === '#F0BE96' && state.isProductPro,
         isNodeAdmin: (state) =>
             state.nodeRoles.some((item) => item.nodeName === state.currentNode && item.roleName === 'Node Admin'),
+        isAdminOrNodeAdmin: (state) =>
+            state.isAdmin ||
+            state.nodeRoles.some((item) => item.nodeName === state.currentNode && item.roleName === 'Node Admin'),
         docsUrl: (state) => {
             if (state.docWithRegion) {
                 return state.isIntl ? INTL_DOCS_URL : CN_DOCS_URL;

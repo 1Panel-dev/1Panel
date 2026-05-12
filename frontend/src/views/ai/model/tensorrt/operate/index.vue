@@ -46,7 +46,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading" type="primary" @click="onSubmit">
+                <el-button :disabled="loading || !hasManagePermission" type="primary" @click="onSubmit">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -61,6 +61,7 @@ import DrawerPro from '@/components/drawer-pro/index.vue';
 import FileList from '@/components/file-list/index.vue';
 
 import { reactive, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
@@ -68,6 +69,7 @@ import { createTensorRTLLM, updateTensorRTLLM } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { isFxplay } = useGlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref(false);
 const mode = ref('create');

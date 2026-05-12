@@ -24,6 +24,9 @@ import { searchFavorite, removeFavorite } from '@/api/modules/files';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import { File } from '@/api/interface/file';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
+
+const { hasManagePermission } = useMenuManagePermission();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'favorite-page-size',
@@ -89,6 +92,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => !hasManagePermission.value,
         click: (row: any) => {
             singleDel(row.id);
         },
