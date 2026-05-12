@@ -10,19 +10,19 @@
 
         <LayoutContent v-if="isExist" :title="$t('container.image', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" plain @click="onOpenPull">
+                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onOpenPull">
                     {{ $t('container.imagePull') }}
                 </el-button>
-                <el-button type="primary" plain @click="onOpenLoad">
+                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onOpenLoad">
                     {{ $t('container.importImage') }}
                 </el-button>
-                <el-button type="primary" plain @click="onOpenBuild">
+                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onOpenBuild">
                     {{ $t('container.imageBuild') }}
                 </el-button>
-                <el-button type="primary" plain @click="onOpenBuildCache()">
+                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onOpenBuildCache()">
                     {{ $t('container.cleanBuildCache') }}
                 </el-button>
-                <el-button type="primary" plain @click="onOpenPrune()">
+                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onOpenPrune()">
                     {{ $t('container.imagePrune') }}
                 </el-button>
             </template>
@@ -57,6 +57,7 @@
                                         size="large"
                                         :icon="row.isPinned ? 'StarFilled' : 'Star'"
                                         type="warning"
+                                        :disabled="!hasManagePermission"
                                         @click="changePinned(row, true)"
                                     />
                                 </el-tooltip>
@@ -135,7 +136,7 @@
                     <el-button @click="handleUpdateDialogClose">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
-                    <el-button type="primary" @click="submitUpdateSelection">
+                    <el-button type="primary" :disabled="!hasManagePermission" @click="submitUpdateSelection">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -420,6 +421,7 @@ const submitUpdateSelection = async () => {
 const buttons = [
     {
         label: i18n.global.t('container.push'),
+        disabled: () => !hasManagePermission.value,
         click: (row: Container.ImageInfo) => {
             let params = {
                 repos: repos.value,
@@ -430,6 +432,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('container.export'),
+        disabled: () => !hasManagePermission.value,
         click: (row: Container.ImageInfo) => {
             let params = {
                 repos: repos.value,
@@ -440,12 +443,14 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.update'),
+        disabled: () => !hasManagePermission.value,
         click: (row: Container.ImageInfo) => {
             onUpdate(row);
         },
     },
     {
         label: i18n.global.t('container.tag'),
+        disabled: () => !hasManagePermission.value,
         click: (row: Container.ImageInfo) => {
             let params = {
                 repos: repos.value,
@@ -457,6 +462,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => !hasManagePermission.value,
         click: async (row: Container.ImageInfo) => {
             if (row.tags && row.tags.length > 1) {
                 let params = {

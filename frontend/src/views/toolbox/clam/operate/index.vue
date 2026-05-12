@@ -19,7 +19,11 @@
                     <el-form-item :label="$t('toolbox.clam.scanDir')" prop="path">
                         <el-input v-model="dialogData.rowData!.path">
                             <template #prepend>
-                                <el-button icon="Folder" @click="scanDirRef.acceptParams({ dir: true })" />
+                                <el-button
+                                    icon="Folder"
+                                    :disabled="!hasManagePermission"
+                                    @click="scanDirRef.acceptParams({ dir: true })"
+                                />
                             </template>
                         </el-input>
                     </el-form-item>
@@ -38,7 +42,11 @@
                     <el-form-item v-if="hasInfectedDir()" :label="$t('toolbox.clam.infectedDir')" prop="infectedDir">
                         <el-input v-model="dialogData.rowData!.infectedDir">
                             <template #prepend>
-                                <el-button icon="Folder" @click="infectedDirRef.acceptParams({ dir: true })" />
+                                <el-button
+                                    icon="Folder"
+                                    :disabled="!hasManagePermission"
+                                    @click="infectedDirRef.acceptParams({ dir: true })"
+                                />
                             </template>
                         </el-input>
                     </el-form-item>
@@ -217,7 +225,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="loading || !hasManagePermission" type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -242,7 +250,9 @@ import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
 import { specOptions, transObjToSpec, transSpecToObj, weekOptions } from '@/views/cronjob/cronjob/helper';
 import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/validate';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 const licenseRef = ref();
 const scanDirRef = ref();
 const infectedDirRef = ref();

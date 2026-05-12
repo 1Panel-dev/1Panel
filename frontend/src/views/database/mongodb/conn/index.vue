@@ -117,7 +117,11 @@
                 <el-button :disabled="loading" @click="dialogVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabled="loading || form.status !== 'Running'" type="primary" @click="onSave(formRef)">
+                <el-button
+                    :disabled="loading || form.status !== 'Running' || !hasManagePermission"
+                    type="primary"
+                    @click="onSave(formRef)"
+                >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -127,6 +131,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { Rules } from '@/global/form-rules';
 import { ElForm } from 'element-plus';
 import { getDatabase, updateMongodbRootPassword } from '@/api/modules/database';
@@ -139,6 +144,7 @@ import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 const loading = ref(false);
 const dialogVisible = ref(false);
 

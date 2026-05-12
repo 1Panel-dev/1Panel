@@ -2,15 +2,19 @@
     <div>
         <ComplexTable :data="data" @search="search()" :heightDiff="350" v-loading="loading">
             <template #toolbar>
-                <el-button type="primary" @click="openOperate">{{ $t('commons.button.create') }}</el-button>
-                <el-button type="primary" plain @click="buildNginx">{{ $t('nginx.build') }}</el-button>
+                <el-button type="primary" :disabled="!hasManagePermission" @click="openOperate">
+                    {{ $t('commons.button.create') }}
+                </el-button>
+                <el-button type="primary" plain :disabled="!hasManagePermission" @click="buildNginx">
+                    {{ $t('nginx.build') }}
+                </el-button>
                 <el-text type="warning" class="!ml-2">{{ $t('nginx.buildHelper') }}</el-text>
             </template>
             <el-table-column prop="name" :label="$t('commons.table.name')" />
             <el-table-column prop="params" :label="$t('nginx.params')" />
             <el-table-column :label="$t('commons.table.status')" fix>
                 <template #default="{ row }">
-                    <el-switch v-model="row.enable" @click="updateModule(row)" />
+                    <el-switch v-model="row.enable" :disabled="!hasManagePermission" @click="updateModule(row)" />
                 </template>
             </el-table-column>
             <fu-table-operations
@@ -29,23 +33,27 @@
 </template>
 <script lang="ts" setup>
 import { getNginxModules, updateNginxModule } from '@/api/modules/nginx';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import i18n from '@/lang';
 import { Nginx } from '@/api/interface/nginx';
 import { MsgSuccess } from '@/utils/message';
 import Operate from './operate/index.vue';
 import Build from './build/index.vue';
+const { hasManagePermission } = useMenuManagePermission();
 
 const data = ref([]);
 const loading = ref(false);
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: () => !hasManagePermission.value,
         click: function (row: Nginx.NginxModule) {
             openEdit(row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => !hasManagePermission.value,
         click: function (row: Nginx.NginxModule) {
             deleteModule(row);
         },

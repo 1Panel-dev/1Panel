@@ -27,6 +27,7 @@
             <template #leftToolBar>
                 <el-button
                     v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
+                    :disabled="!hasManagePermission"
                     type="primary"
                     @click="onOpenDialog()"
                 >
@@ -37,6 +38,7 @@
                 </el-button>
                 <el-button
                     v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
+                    :disabled="!hasManagePermission"
                     @click="loadDB"
                     type="primary"
                     plain
@@ -46,7 +48,12 @@
                 <el-button @click="goRemoteDB()" type="primary" plain>
                     {{ $t('database.remoteDB') }}
                 </el-button>
-                <el-button @click="goTerminal()" :disabled="currentDB?.from !== 'local'" type="primary" plain>
+                <el-button
+                    @click="goTerminal()"
+                    :disabled="currentDB?.from !== 'local' || !globalStore.isAdminOrNodeAdmin"
+                    type="primary"
+                    plain
+                >
                     {{ $t('menu.terminal') }}
                 </el-button>
                 <el-dropdown>
@@ -194,6 +201,8 @@
                         <template #default="{ row }">
                             <fu-input-rw-switch
                                 v-model="row.description"
+                                :write-trigger="hasManagePermission ? 'onClick' : 'disabled'"
+                                :disabled="!hasManagePermission"
                                 @enter="onChange(row)"
                                 @blur="onChange(row)"
                             />
@@ -602,7 +611,7 @@ const buttons = [
     {
         label: i18n.global.t('database.changePassword'),
         disabled: (row: Database.MysqlDBInfo) => {
-            return !row.username || row.isDelete;
+            return !row.username || row.isDelete || !hasManagePermission.value;
         },
         click: (row: Database.MysqlDBInfo) => {
             onChangePassword(row);
@@ -611,7 +620,7 @@ const buttons = [
     {
         label: i18n.global.t('database.permission'),
         disabled: (row: Database.MysqlDBInfo) => {
-            return !row.password || row.isDelete;
+            return !row.password || row.isDelete || !hasManagePermission.value;
         },
         click: (row: Database.MysqlDBInfo) => {
             let param = {
@@ -637,7 +646,7 @@ const buttons = [
     {
         label: i18n.global.t('database.backupList'),
         disabled: (row: Database.MysqlDBInfo) => {
-            return row.isDelete;
+            return row.isDelete || !hasManagePermission.value;
         },
         click: (row: Database.MysqlDBInfo) => {
             let params = {
@@ -651,7 +660,7 @@ const buttons = [
     {
         label: i18n.global.t('database.loadBackup'),
         disabled: (row: Database.MysqlDBInfo) => {
-            return row.isDelete;
+            return row.isDelete || !hasManagePermission.value;
         },
         click: (row: Database.MysqlDBInfo) => {
             let params = {
@@ -665,6 +674,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => {
+            return !hasManagePermission.value;
+        },
         click: (row: Database.MysqlDBInfo) => {
             onDelete(row);
         },

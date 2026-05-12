@@ -70,9 +70,11 @@ import i18n from '@/lang';
 import { stopProcess } from '@/api/modules/process';
 import { GlobalStore, ProcessStore } from '@/store';
 import { SortBy, TableV2SortOrder, ElButton } from 'element-plus';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const globalStore = GlobalStore();
 const processStore = ProcessStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const statusOptions = computed(() => [
     { text: i18n.global.t('process.running'), value: 'running' },
@@ -199,6 +201,7 @@ const columns = ref([
                     ElButton,
                     {
                         type: 'text',
+                        disabled: !hasManagePermission.value,
                         onClick: () => stop(rowData),
                     },
                     () => i18n.global.t('process.stopProcess'),

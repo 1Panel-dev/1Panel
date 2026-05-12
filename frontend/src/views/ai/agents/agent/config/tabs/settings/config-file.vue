@@ -9,7 +9,7 @@
             :placeholder="t('commons.msg.noneData')"
         />
         <div class="mt-4">
-            <el-button type="primary" :loading="saving" @click="confirmSave">
+            <el-button type="primary" :loading="saving" :disabled="!hasManagePermission" @click="confirmSave">
                 {{ t('commons.button.save') }}
             </el-button>
         </div>
@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
@@ -27,6 +28,7 @@ import { getAgentConfigFile, updateAgentConfigFile } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 
 const { t } = useI18n();
+const { hasManagePermission } = useMenuManagePermission();
 const loading = ref(false);
 const saving = ref(false);
 const agentId = ref(0);

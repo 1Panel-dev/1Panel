@@ -27,7 +27,7 @@
                 <el-button @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">
+                <el-button type="primary" :disabled="!hasManagePermission" @click="onSubmit(formRef)">
                     {{ $t('commons.button.add') }}
                 </el-button>
             </span>
@@ -37,6 +37,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
@@ -44,6 +45,7 @@ import { MsgSuccess } from '@/utils/message';
 import { createOllamaModel } from '@/api/modules/ai';
 import { newUUID } from '@/utils/id';
 const drawerVisible = ref(false);
+const { hasManagePermission } = useMenuManagePermission();
 const form = reactive({
     name: '',
 });

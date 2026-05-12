@@ -16,7 +16,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit" :loading="loading">
+                <el-button type="primary" @click="submit" :loading="loading" :disabled="!hasManagePermission">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -28,12 +28,14 @@
 <script setup lang="ts">
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { deleteAgent } from '@/api/modules/ai';
 import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
 
 const open = ref(false);
 const loading = ref(false);
+const { hasManagePermission } = useMenuManagePermission();
 const taskLogRef = ref();
 const agentName = ref('');
 const deleteForm = ref<FormInstance>();

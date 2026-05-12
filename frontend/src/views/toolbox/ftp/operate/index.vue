@@ -13,14 +13,20 @@
             <el-form-item :label="$t('commons.login.password')" prop="password">
                 <el-input type="password" clearable v-model="dialogData.rowData!.password" show-password>
                     <template #append>
-                        <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
+                        <el-button :disabled="!hasManagePermission" @click="random">
+                            {{ $t('commons.button.random') }}
+                        </el-button>
                     </template>
                 </el-input>
             </el-form-item>
             <el-form-item :label="$t('file.root')" prop="path">
                 <el-input v-model="dialogData.rowData!.path">
                     <template #prepend>
-                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
+                        <el-button
+                            icon="Folder"
+                            :disabled="!hasManagePermission"
+                            @click="fileRef.acceptParams({ dir: true })"
+                        />
                     </template>
                 </el-input>
                 <span class="input-help">{{ $t('toolbox.ftp.dirHelper') }}</span>
@@ -32,7 +38,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="loading || !hasManagePermission" type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -52,12 +58,14 @@ import { Toolbox } from '@/api/interface/toolbox';
 import { createFtp, updateFtp } from '@/api/modules/toolbox';
 import { getRandomStr } from '@/utils/id';
 import { isSensitiveLinuxPath } from '@/utils/file';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 interface DialogProps {
     title: string;
     rowData?: Toolbox.FtpInfo;
     getTableList?: () => Promise<any>;
 }
 const loading = ref();
+const { hasManagePermission } = useMenuManagePermission();
 const title = ref<string>('');
 const drawerVisible = ref(false);
 const fileRef = ref();

@@ -24,7 +24,7 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <el-button class="ml-3 mt-2" @click="handleHostsAdd()">
+            <el-button class="ml-3 mt-2" :disabled="!hasManagePermission" @click="handleHostsAdd()">
                 {{ $t('commons.button.add') }}
             </el-button>
         </div>
@@ -39,7 +39,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading" type="primary" @click="onSave()">
+                <el-button :disabled="loading || !hasManagePermission" type="primary" @click="onSave()">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -52,8 +52,10 @@ import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { loadDeviceConf, updateDeviceByConf, updateDeviceHost } from '@/api/modules/toolbox';
 import { Toolbox } from '@/api/interface/toolbox';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
+const { hasManagePermission } = useMenuManagePermission();
 
 const confShowType = ref('base');
 const hostsConf = ref();

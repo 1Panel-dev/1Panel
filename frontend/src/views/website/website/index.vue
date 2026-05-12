@@ -20,16 +20,21 @@
                 ></AppStatus>
             </template>
             <template v-if="!openNginxConfig && nginxIsExist" #leftToolBar>
-                <el-button type="primary" @click="openCreate" :disabled="disabledConfig">
+                <el-button type="primary" @click="openCreate" :disabled="disabledConfig || !hasManagePermission">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="openGroup" :disabled="disabledConfig">
+                <el-button type="primary" plain @click="openGroup" :disabled="disabledConfig || !hasManagePermission">
                     {{ $t('commons.table.group') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDefault" :disabled="disabledConfig">
+                <el-button type="primary" plain @click="openDefault" :disabled="disabledConfig || !hasManagePermission">
                     {{ $t('website.defaultServer') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDefaultHtml" :disabled="disabledConfig">
+                <el-button
+                    type="primary"
+                    plain
+                    @click="openDefaultHtml"
+                    :disabled="disabledConfig || !hasManagePermission"
+                >
                     {{ $t('website.defaultHtml') }}
                 </el-button>
             </template>
@@ -121,7 +126,12 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.sitePath')" prop="sitePath" width="90px">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="routerToFileWithPath(row.sitePath + '/index')">
+                            <el-button
+                                type="primary"
+                                :disabled="!hasFilePermission"
+                                link
+                                @click="routerToFileWithPath(row.sitePath + '/index')"
+                            >
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>
@@ -144,6 +154,7 @@
                             <span v-else>
                                 <Status
                                     v-if="row.status === 'Running'"
+                                    :disabled="!hasManagePermission"
                                     :operate="true"
                                     :status="row.status"
                                     @click="operateWebsite('stop', row)"
@@ -151,6 +162,7 @@
                                 <Status
                                     v-else
                                     :status="row.status"
+                                    :disabled="!hasManagePermission"
                                     :operate="true"
                                     @click="operateWebsite('start', row)"
                                 />
@@ -208,12 +220,16 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.remark')" prop="remark" min-width="150px">
                         <template #default="{ row }">
-                            <fu-read-write-switch>
+                            <fu-read-write-switch :write-trigger="hasManagePermission ? 'onClick' : 'disabled'">
                                 <template #read>
                                     <MsgInfo :info="row.remark" :width="'150'" />
                                 </template>
                                 <template #default="{ read }">
-                                    <el-input v-model="row.remark" @blur="updateRemark(row, read)" />
+                                    <el-input
+                                        v-model="row.remark"
+                                        :disabled="!hasManagePermission"
+                                        @blur="updateRemark(row, read)"
+                                    />
                                 </template>
                             </fu-read-write-switch>
                         </template>
@@ -253,7 +269,7 @@
                             <el-button
                                 class="ml-2"
                                 type="primary"
-                                :disabled="selects.length == 0 || batchReq.operate == ''"
+                                :disabled="selects.length == 0 || batchReq.operate == '' || !hasManagePermission"
                                 @click="batchOp"
                             >
                                 {{ $t('website.batchOperate') }}

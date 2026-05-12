@@ -33,7 +33,7 @@
             @approve="approvePairing"
         />
         <el-form-item class="mt-4">
-            <el-button type="primary" :loading="saving" @click="saveChannel">
+            <el-button type="primary" :loading="saving" :disabled="!hasManagePermission" @click="saveChannel">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
@@ -44,6 +44,7 @@
 import { reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
 import { ElMessageBox } from 'element-plus';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { approveAgentChannelPairing, getAgentDiscordConfig, updateAgentDiscordConfig } from '@/api/modules/ai';
@@ -52,6 +53,7 @@ import { Rules } from '@/global/form-rules';
 import ChannelBots from '../components/channel-bots.vue';
 
 const { t } = useI18n();
+const { hasManagePermission } = useMenuManagePermission();
 type BotField = {
     prop: string;
     label: string;

@@ -8,7 +8,7 @@
         />
         <template v-else>
             <div class="role-toolbar">
-                <el-button type="primary" @click="openCreateDialog">
+                <el-button type="primary" :disabled="!hasManagePermission" @click="openCreateDialog">
                     {{ $t('commons.button.add') }}
                 </el-button>
             </div>
@@ -49,7 +49,13 @@
                                     {{ $t('aiTools.agents.agentDir') }}
                                 </el-button>
                             </el-tooltip>
-                            <el-button plain size="small" round @click="handleDelete(row)">
+                            <el-button
+                                plain
+                                size="small"
+                                round
+                                :disabled="!hasManagePermission"
+                                @click="handleDelete(row)"
+                            >
                                 {{ $t('commons.button.delete') }}
                             </el-button>
                         </div>
@@ -64,17 +70,25 @@
                                 <el-tag
                                     v-for="item in row.bindings"
                                     :key="`${item.channel}-${item.accountId || 'default'}`"
-                                    closable
+                                    :closable="hasManagePermission"
                                     @close="handleUnbind(row, item)"
                                 >
                                     {{ item.accountId ? `${item.channel}:${item.accountId}` : item.channel }}
                                 </el-tag>
-                                <el-button size="small" @click="openBindingDialog(row)">
+                                <el-button
+                                    size="small"
+                                    :disabled="!hasManagePermission"
+                                    @click="openBindingDialog(row)"
+                                >
                                     + {{ $t('commons.button.add') }}
                                 </el-button>
                             </div>
                             <div v-else class="role-card__tags">
-                                <el-button size="small" @click="openBindingDialog(row)">
+                                <el-button
+                                    size="small"
+                                    :disabled="!hasManagePermission"
+                                    @click="openBindingDialog(row)"
+                                >
                                     + {{ $t('commons.button.add') }}
                                 </el-button>
                             </div>
@@ -93,6 +107,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { deleteAgentRole, getConfiguredAgentRoles, unbindAgentRole } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import i18n from '@/lang';
@@ -101,6 +116,7 @@ import { MsgSuccess } from '@/utils/message';
 import CreateDialog from './create/index.vue';
 import BindingDialog from './binding/index.vue';
 import DetailDrawer from './detail/index.vue';
+const { hasManagePermission } = useMenuManagePermission();
 
 interface AgentRoleLoadParams {
     agentId: number;

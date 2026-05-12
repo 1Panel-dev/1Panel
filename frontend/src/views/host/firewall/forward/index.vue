@@ -19,17 +19,21 @@
 
                 <LayoutContent :title="$t('firewall.forwardRule', 2)" :class="{ mask: !isActive }">
                     <template #leftToolBar>
-                        <el-button type="primary" @click="onOpenDialog('create')">
+                        <el-button type="primary" :disabled="!hasManagePermission" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}
                         </el-button>
-                        <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
+                        <el-button
+                            @click="onDelete(null)"
+                            plain
+                            :disabled="selects.length === 0 || !hasManagePermission"
+                        >
                             {{ $t('commons.button.delete') }}
                         </el-button>
                         <el-button-group>
-                            <el-button @click="onImport">
+                            <el-button :disabled="!hasManagePermission" @click="onImport">
                                 {{ $t('commons.button.import') }}
                             </el-button>
-                            <el-button :disabled="selects.length === 0" @click="onExport">
+                            <el-button :disabled="selects.length === 0 || !hasManagePermission" @click="onExport">
                                 {{ $t('commons.button.export') }}
                             </el-button>
                         </el-button-group>
@@ -103,11 +107,13 @@ import FireStatus from '@/views/host/firewall/status/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { operateForwardRule, searchFireRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { downloadWithContent } from '@/utils/file';
 import { getCurrentDateFormatted } from '@/utils/date';
 const loading = ref();
+const { hasManagePermission } = useMenuManagePermission();
 const activeTag = ref('forward');
 const selects = ref<any>([]);
 const searchName = ref();
@@ -254,12 +260,14 @@ const onExport = () => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: () => !hasManagePermission.value,
         click: (row: Host.RuleForward) => {
             onOpenDialog('edit', row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => !hasManagePermission.value,
         click: (row: Host.RuleForward) => {
             onDelete(row);
         },

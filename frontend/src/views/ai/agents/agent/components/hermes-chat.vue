@@ -46,7 +46,7 @@
                                         <el-button
                                             link
                                             type="primary"
-                                            :disabled="!canSaveSessionTitle"
+                                            :disabled="!canSaveSessionTitle || !hasManagePermission"
                                             @click.stop="saveSessionTitle(item)"
                                         >
                                             {{ $t('commons.button.save') }}
@@ -60,6 +60,7 @@
                                         link
                                         icon="Edit"
                                         class="hermes-chat-dialog__edit-button"
+                                        :disabled="!hasManagePermission"
                                         @mousedown.stop
                                         @click.stop="startEditSessionTitle(item)"
                                     />
@@ -68,7 +69,7 @@
                                         link
                                         type="danger"
                                         icon="Delete"
-                                        :disabled="isDeleteDisabled(item)"
+                                        :disabled="isDeleteDisabled(item) || !hasManagePermission"
                                         :loading="deletingSessionId === item.id"
                                         @mousedown.stop
                                         @click.stop="deleteSession(item)"
@@ -97,6 +98,7 @@
 <script setup lang="ts">
 import { ElMessageBox } from 'element-plus';
 import { computed, nextTick, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import DialogPro from '@/components/dialog-pro/index.vue';
 import Terminal from '@/components/terminal/index.vue';
@@ -112,6 +114,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 
 const { currentNode } = useGlobalStore();
 const { t } = useI18n();
+const { hasManagePermission } = useMenuManagePermission();
 
 interface HermesChatDialogParams {
     agentId: number;

@@ -4,7 +4,7 @@
         <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
         <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="openCreate">
+                <el-button type="primary" :disabled="!hasManagePermission" @click="openCreate">
                     {{ $t('commons.button.create') }}
                 </el-button>
             </template>
@@ -57,12 +57,16 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.remark')" prop="remark" min-width="150px">
                         <template #default="{ row }">
-                            <fu-read-write-switch>
+                            <fu-read-write-switch :write-trigger="hasManagePermission ? 'onClick' : 'disabled'">
                                 <template #read>
                                     <MsgInfo :info="row.remark" :width="'150'" />
                                 </template>
                                 <template #default="{ read }">
-                                    <el-input v-model="row.remark" @blur="updateRuntimeRemark(row, read)" />
+                                    <el-input
+                                        v-model="row.remark"
+                                        :disabled="!hasManagePermission"
+                                        @blur="updateRuntimeRemark(row, read)"
+                                    />
                                 </template>
                             </fu-read-write-switch>
                         </template>
@@ -97,6 +101,7 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { Runtime } from '@/api/interface/runtime';
 import { RuntimeDeleteCheck, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
 import { dateFormat } from '@/utils/date';

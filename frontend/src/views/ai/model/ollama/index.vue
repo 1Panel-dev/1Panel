@@ -20,16 +20,30 @@
                 </el-alert>
             </template>
             <template #leftToolBar>
-                <el-button :disabled="modelInfo.status !== 'Running'" type="primary" @click="onCreate()">
+                <el-button
+                    :disabled="!hasManagePermission || modelInfo.status !== 'Running'"
+                    type="primary"
+                    @click="onCreate()"
+                >
                     {{ $t('commons.button.add') }}
                 </el-button>
-                <el-button plain type="primary" :disabled="modelInfo.status !== 'Running'" @click="bindDomain">
+                <el-button
+                    plain
+                    type="primary"
+                    :disabled="modelInfo.status !== 'Running' || !hasManagePermission"
+                    @click="bindDomain"
+                >
                     {{ $t('aiTools.proxy.proxy') }}
                 </el-button>
                 <el-button :disabled="modelInfo.status !== 'Running'" @click="onLoadConn" type="primary" plain>
                     {{ $t('database.databaseConnInfo') }}
                 </el-button>
-                <el-button :disabled="modelInfo.status !== 'Running'" type="primary" plain @click="onSync()">
+                <el-button
+                    :disabled="modelInfo.status !== 'Running' || !hasManagePermission"
+                    type="primary"
+                    plain
+                    @click="onSync()"
+                >
                     {{ $t('database.loadFromRemote') }}
                 </el-button>
                 <el-button
@@ -42,7 +56,12 @@
                     OpenWebUI
                 </el-button>
 
-                <el-button plain :disabled="selects.length === 0" type="primary" @click="onDelete(null)">
+                <el-button
+                    plain
+                    :disabled="selects.length === 0 || !hasManagePermission"
+                    type="primary"
+                    @click="onDelete(null)"
+                >
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -418,7 +437,7 @@ const buttons = [
             onReCreate(row.name);
         },
         disabled: (row: any) => {
-            return row.status === 'Success' || row.status === 'Waiting';
+            return row.status === 'Success' || row.status === 'Waiting' || !hasManagePermission.value;
         },
     },
     {
@@ -427,7 +446,7 @@ const buttons = [
             onDelete(row);
         },
         disabled: (row: any) => {
-            return row.status === 'Waiting';
+            return row.status === 'Waiting' || !hasManagePermission.value;
         },
     },
 ];

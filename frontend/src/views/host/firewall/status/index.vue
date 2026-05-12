@@ -10,29 +10,58 @@
                     </div>
                     <div class="mt-0.5">
                         <template v-if="baseInfo.name !== 'iptables'">
-                            <el-button type="primary" v-if="baseInfo.isActive" @click="onOperate('stop')" link>
+                            <el-button
+                                type="primary"
+                                v-if="baseInfo.isActive"
+                                :disabled="!hasManagePermission"
+                                @click="onOperate('stop')"
+                                link
+                            >
                                 {{ $t('commons.button.stop') }}
                             </el-button>
-                            <el-button type="primary" v-if="!baseInfo.isActive" @click="onOperate('start')" link>
+                            <el-button
+                                type="primary"
+                                v-if="!baseInfo.isActive"
+                                :disabled="!hasManagePermission"
+                                @click="onOperate('start')"
+                                link
+                            >
                                 {{ $t('commons.button.start') }}
                             </el-button>
                             <el-divider direction="vertical" />
-                            <el-button type="primary" @click="onOperate('restart')" link>
+                            <el-button
+                                type="primary"
+                                :disabled="!hasManagePermission"
+                                @click="onOperate('restart')"
+                                link
+                            >
                                 {{ $t('commons.button.restart') }}
                             </el-button>
                         </template>
                         <template v-if="!baseInfo.isInit || (props.currentTab === 'forward' && !baseInfo.isBind)">
                             <el-divider direction="vertical" />
-                            <el-button type="primary" link @click="onInit">
+                            <el-button type="primary" link :disabled="!hasManagePermission" @click="onInit">
                                 {{ $t('commons.button.init') }}
                             </el-button>
                         </template>
                         <template v-if="baseInfo.name === 'iptables' && baseInfo.isInit && props.currentTab == 'base'">
                             <el-divider direction="vertical" />
-                            <el-button v-if="baseInfo.isBind" type="primary" link @click="onUnBind">
+                            <el-button
+                                v-if="baseInfo.isBind"
+                                type="primary"
+                                link
+                                :disabled="!hasManagePermission"
+                                @click="onUnBind"
+                            >
                                 {{ $t('commons.button.unbind') }}
                             </el-button>
-                            <el-button v-if="!baseInfo.isBind" type="primary" link @click="onBind">
+                            <el-button
+                                v-if="!baseInfo.isBind"
+                                type="primary"
+                                link
+                                :disabled="!hasManagePermission"
+                                @click="onBind"
+                            >
                                 {{ $t('commons.button.bind') }}
                             </el-button>
                         </template>
@@ -44,6 +73,7 @@
                                 class="ml-2"
                                 inactive-value="Disable"
                                 active-value="Enable"
+                                :disabled="!hasManagePermission"
                                 @change="onPingOperate"
                                 v-model="onPing"
                             />
@@ -90,6 +120,9 @@ import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { ref } from 'vue';
 import { loadDockerStatus } from '@/api/modules/container';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
+
+const { hasManagePermission } = useMenuManagePermission();
 
 const props = defineProps({
     currentTab: String,

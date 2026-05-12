@@ -4,13 +4,13 @@
             <div class="mb-4">
                 <el-alert :closable="false">{{ $t('ssh.pubKeyHelper', [currentUser]) }}</el-alert>
             </div>
-            <el-button type="primary" plain @click="onOpenDialog('create')">
+            <el-button type="primary" plain :disabled="!hasManagePermission" @click="onOpenDialog('create')">
                 {{ $t('commons.button.create') }}
             </el-button>
-            <el-button plain @click="onSync()">
+            <el-button plain :disabled="!hasManagePermission" @click="onSync()">
                 {{ $t('commons.button.sync') }}
             </el-button>
-            <el-button plain :disabled="selects.length === 0" @click="onDelete(null)">
+            <el-button plain :disabled="selects.length === 0 || !hasManagePermission" @click="onDelete(null)">
                 {{ $t('commons.button.delete') }}
             </el-button>
             <ComplexTable
@@ -101,8 +101,10 @@ import Operate from '@/views/host/ssh/ssh/certification/operate/index.vue';
 import { copyText } from '@/utils/clipboard';
 import { Base64 } from 'js-base64';
 import { reactive, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const loading = ref();
+const { hasManagePermission } = useMenuManagePermission();
 const drawerVisible = ref();
 const data = ref();
 const selects = ref<any>([]);
@@ -261,6 +263,7 @@ const handleClose = () => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: () => !hasManagePermission.value,
         click: (row: Host.RootCertInfo) => {
             onOpenDialog('edit', row);
         },
@@ -274,6 +277,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => !hasManagePermission.value,
         click: (row: Host.RootCertInfo) => {
             onDelete(row);
         },

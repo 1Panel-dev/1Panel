@@ -15,6 +15,7 @@
                         <el-form-item :label="$t('app.uninstallDeleteBackup')" prop="uninstallDeleteBackup">
                             <el-switch
                                 v-model="config.uninstallDeleteBackup"
+                                :disabled="!hasManagePermission"
                                 active-value="Enable"
                                 inactive-value="Disable"
                                 :loading="loading"
@@ -24,6 +25,7 @@
                         <el-form-item :label="$t('app.uninstallDeleteImage')" prop="uninstallDeleteImage">
                             <el-switch
                                 v-model="config.uninstallDeleteImage"
+                                :disabled="!hasManagePermission"
                                 active-value="Enable"
                                 inactive-value="Disable"
                                 :loading="loading"
@@ -33,6 +35,7 @@
                         <el-form-item :label="$t('app.upgradeBackup')" prop="upgradeBackup">
                             <el-switch
                                 v-model="config.upgradeBackup"
+                                :disabled="!hasManagePermission"
                                 active-value="Enable"
                                 inactive-value="Disable"
                                 :loading="loading"
@@ -42,6 +45,7 @@
                         <el-form-item :label="$t('app.installAllowPort')" prop="installAllowPort">
                             <el-switch
                                 v-model="config.installAllowPort"
+                                :disabled="!hasManagePermission"
                                 active-value="Enable"
                                 inactive-value="Disable"
                                 :loading="loading"
@@ -72,6 +76,8 @@ import i18n from '@/lang';
 import { defineAsyncComponent } from 'vue';
 import { loadOptionalComponent } from '@/extensions/optional';
 import { GlobalStore } from '@/store';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
+const { hasManagePermission } = useMenuManagePermission();
 const globalStore = GlobalStore();
 
 const CustomSetting = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/appstore/index.vue'));

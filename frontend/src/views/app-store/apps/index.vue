@@ -6,10 +6,16 @@
                 <Tags @change="changeTag" />
             </template>
             <template #leftToolBar>
-                <el-button @click="sync" type="primary" plain :disabled="syncing">
+                <el-button @click="sync" type="primary" plain :disabled="syncing || !hasManagePermission">
                     <span>{{ syncCustomAppstore || isOffline ? $t('app.syncCustomApp') : $t('app.syncAppList') }}</span>
                 </el-button>
-                <el-button @click="syncLocal" type="primary" plain :disabled="syncing" class="ml-2">
+                <el-button
+                    @click="syncLocal"
+                    type="primary"
+                    plain
+                    :disabled="syncing || !hasManagePermission"
+                    class="ml-2"
+                >
                     {{ $t('app.syncLocalApp') }}
                 </el-button>
             </template>

@@ -29,7 +29,7 @@
             <template #main>
                 <div v-if="activeName === 'conf'">
                     <CodemirrorPro :heightDiff="320" v-model="postgresqlConf"></CodemirrorPro>
-                    <el-button type="primary" class="mt-5" @click="onSaveConf">
+                    <el-button :disabled="!hasManagePermission" type="primary" class="mt-5" @click="onSaveConf">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>
@@ -42,7 +42,12 @@
                                     <el-input clearable type="number" v-model.number="baseInfo.port" />
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button type="primary" @click="onSavePort(panelFormRef)" icon="Collection">
+                                    <el-button
+                                        type="primary"
+                                        :disabled="!hasManagePermission"
+                                        @click="onSavePort(panelFormRef)"
+                                        icon="Collection"
+                                    >
                                         {{ $t('commons.button.save') }}
                                     </el-button>
                                 </el-form-item>
@@ -77,6 +82,7 @@ import { FormInstance } from 'element-plus';
 import ContainerLog from '@/components/log/container/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { onMounted, reactive, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { loadDBFile, loadDBBaseInfo, updateDBFile } from '@/api/modules/database';
 import { changePort, checkAppInstalled } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
@@ -86,6 +92,7 @@ import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { routerToName } from '@/utils/router';
 
 const loading = ref(false);
+const { hasManagePermission } = useMenuManagePermission();
 
 const activeName = ref('conf');
 

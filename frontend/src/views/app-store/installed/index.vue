@@ -160,7 +160,9 @@ import { MsgSuccess } from '@/utils/message';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const { currentNode, isMaster, currentNodeAddr, isIntl } = useGlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 
 const data = ref<any>();
 const loading = ref(false);
@@ -324,7 +326,8 @@ const buttons = [
                 row.status === 'DownloadErr' ||
                 row.status === 'Upgrading' ||
                 row.status === 'Rebuilding' ||
-                row.status === 'Uninstalling'
+                row.status === 'Uninstalling' ||
+                !hasManagePermission.value
             );
         },
     },
@@ -338,7 +341,8 @@ const buttons = [
                 row.status === 'DownloadErr' ||
                 row.status === 'Upgrading' ||
                 row.status === 'Rebuilding' ||
-                row.status === 'Uninstalling'
+                row.status === 'Uninstalling' ||
+                !hasManagePermission.value
             );
         },
     },
@@ -354,7 +358,8 @@ const buttons = [
                 row.status === 'DownloadErr' ||
                 row.status === 'Upgrading' ||
                 row.status === 'Rebuilding' ||
-                row.status === 'Uninstalling'
+                row.status === 'Uninstalling' ||
+                !hasManagePermission.value
             );
         },
     },
@@ -369,7 +374,8 @@ const buttons = [
                 row.status === 'DownloadErr' ||
                 row.status === 'Upgrading' ||
                 row.status === 'Rebuilding' ||
-                row.status === 'Uninstalling'
+                row.status === 'Uninstalling' ||
+                !hasManagePermission.value
             );
         },
     },
@@ -377,6 +383,9 @@ const buttons = [
         label: i18n.global.t('commons.button.uninstall'),
         click: (row: any) => {
             openOperate(row, 'delete');
+        },
+        disabled: () => {
+            return !hasManagePermission.value;
         },
     },
     {

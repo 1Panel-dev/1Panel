@@ -63,13 +63,13 @@
                 <el-button :disabled="loading" @click="handleClose">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button v-if="shareInfo" :disabled="loading" @click="cancelShare">
+                <el-button v-if="shareInfo" :disabled="loading || !hasManagePermission" @click="cancelShare">
                     {{ $t('file.shareClose') }}
                 </el-button>
                 <el-button v-if="shareInfo" :disabled="loading" @click="copyLink">
                     {{ $t('file.shareCopyLink') }}
                 </el-button>
-                <el-button type="primary" :disabled="loading" @click="generate">
+                <el-button type="primary" :disabled="loading || !hasManagePermission" @click="generate">
                     {{ shareInfo ? $t('file.shareRegenerate') : $t('file.shareGenerate') }}
                 </el-button>
             </span>
@@ -105,12 +105,14 @@ import { copyText } from '@/utils/clipboard';
 import { dateFormat as formatDateTime } from '@/utils/date';
 import type { FormInstance, FormRules } from 'element-plus';
 import { computed, reactive, ref, watch } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 interface ShareProps {
     path: string;
 }
 
 const globalStore = GlobalStore();
+const { hasManagePermission } = useMenuManagePermission();
 const open = ref(false);
 const loading = ref(false);
 const changed = ref(false);

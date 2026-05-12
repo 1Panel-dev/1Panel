@@ -9,7 +9,7 @@
             />
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="saving" @click="saveConfig">
+            <el-button type="primary" :loading="saving" :disabled="!hasManagePermission" @click="saveConfig">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
@@ -19,12 +19,14 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import { getAgentSecurityConfig, updateAgentSecurityConfig } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 import { buildDefaultAllowedOrigin, parseAllowedOriginsInput, validateAllowedOriginsInput } from '@/utils/agent';
 
 const { t } = useI18n();
+const { hasManagePermission } = useMenuManagePermission();
 const loading = ref(false);
 const saving = ref(false);
 const agentId = ref(0);

@@ -3,7 +3,7 @@
         <template #content>
             <div v-loading="loading">
                 <div class="toolbar">
-                    <el-button type="primary" @click="openCreate">
+                    <el-button type="primary" :disabled="!hasManagePermission" @click="openCreate">
                         {{ $t('commons.button.add') }}
                     </el-button>
                 </div>
@@ -62,7 +62,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button :disabled="saving" @click="editorOpen = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="saving" type="primary" @click="submit">
+                <el-button :disabled="saving || !hasManagePermission" type="primary" @click="submit">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -74,6 +74,7 @@
 import { computed, reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
 import { ElMessageBox } from 'element-plus';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import {
     createAgentAccountModel,
     deleteAgentAccountModel,
@@ -85,6 +86,7 @@ import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
 import { getAgentProviderDisplayName } from '@/utils/agent';
 import { Rules } from '@/global/form-rules';
+const { hasManagePermission } = useMenuManagePermission();
 
 const emit = defineEmits(['updated']);
 
@@ -131,10 +133,12 @@ const rules = reactive({
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: () => !hasManagePermission.value,
         click: (row: AI.AgentAccountModel) => openEdit(row),
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => !hasManagePermission.value,
         click: (row: AI.AgentAccountModel) => onDelete(row),
     },
 ];

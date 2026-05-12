@@ -9,13 +9,13 @@
 
         <LayoutContent v-if="isExist" :title="$t('container.network', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="onCreate()">
+                <el-button type="primary" :disabled="!hasManagePermission" @click="onCreate()">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="onClean()">
+                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onClean()">
                     {{ $t('container.networkPrune') }}
                 </el-button>
-                <el-button :disabled="selects.length === 0" @click="batchDelete(null)">
+                <el-button :disabled="selects.length === 0 || !hasManagePermission" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -96,6 +96,7 @@
 import CreateDialog from '@/views/container/network/create/index.vue';
 import DetailDrawer from '@/views/container/network/detail/index.vue';
 import { reactive, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
 import { deleteNetwork, searchNetwork, inspect, containerPrune } from '@/api/modules/container';
@@ -118,6 +119,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
+const { hasManagePermission } = useMenuManagePermission();
 
 const opRef = ref();
 const isActive = ref(false);
@@ -232,7 +234,7 @@ const buttons = [
             batchDelete(row);
         },
         disabled: (row: any) => {
-            return row.isSystem;
+            return row.isSystem || !hasManagePermission.value;
         },
     },
 ];

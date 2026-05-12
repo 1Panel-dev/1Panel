@@ -96,22 +96,8 @@ const search = async () => {
         version.value = '';
     }
 
-    if (!globalStore.isAdmin) {
-        menuStore.setMenuList(buildAuthVisibleMenuList(menuList));
-        return;
-    }
     try {
-        const hideMenu = JSON.parse(settingInfo?.hideMenu || '[]');
-        const showSet = new Set<string>();
-        getCheckedLabels(hideMenu, showSet);
-        const rstMenuList: RouteRecordRaw[] = [];
-        const resMenuList = adjustAndCleanMenu(hideMenu, menuList);
-        for (const menu of resMenuList) {
-            const menuItem = buildVisibleMenu(menu, showSet);
-            if (menuItem) {
-                rstMenuList.push(menuItem);
-            }
-        }
+        const rstMenuList = buildMenuListFromSettings(settingInfo?.hideMenu);
         if (!isSameMenuList(menuStore.menuList as RouteRecordRaw[], rstMenuList)) {
             menuStore.setMenuList(rstMenuList);
         }
@@ -139,6 +125,21 @@ function allowMenuItem(item: RouteRecordRaw) {
     }
     const allowed = hasPermission(permission);
     return allowed;
+}
+
+function buildMenuListFromSettings(hideMenuValue?: string) {
+    const hideMenu = JSON.parse(hideMenuValue || '[]');
+    const showSet = new Set<string>();
+    getCheckedLabels(hideMenu, showSet);
+    const rstMenuList: RouteRecordRaw[] = [];
+    const resMenuList = adjustAndCleanMenu(hideMenu, menuList);
+    for (const menu of resMenuList) {
+        const menuItem = buildVisibleMenu(menu, showSet);
+        if (menuItem) {
+            rstMenuList.push(menuItem);
+        }
+    }
+    return rstMenuList;
 }
 
 function buildAuthVisibleMenuList(source: RouteRecordRaw[]) {

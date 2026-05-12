@@ -20,10 +20,18 @@
                 />
             </template>
             <template #leftToolBar v-if="clamStatus.isExist">
-                <el-button type="primary" :disabled="!clamStatus.isRunning" @click="onOpenDialog('add')">
+                <el-button
+                    type="primary"
+                    :disabled="!clamStatus.isRunning || !hasManagePermission"
+                    @click="onOpenDialog('add')"
+                >
                     {{ $t('toolbox.clam.clamCreate') }}
                 </el-button>
-                <el-button plain :disabled="selects.length === 0 || !clamStatus.isRunning" @click="onDelete(null)">
+                <el-button
+                    plain
+                    :disabled="selects.length === 0 || !clamStatus.isRunning || !hasManagePermission"
+                    @click="onDelete(null)"
+                >
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -139,6 +147,7 @@
                         <template #default="{ row }">
                             <fu-input-rw-switch
                                 v-model="row.description"
+                                :write-trigger="hasManagePermission ? 'onClick' : 'disabled'"
                                 @enter="onChange(row)"
                                 @blur="onChange(row)"
                             />
@@ -185,9 +194,11 @@ import { transSpecToStr } from '@/views/cronjob/cronjob/helper';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import { routerToFileWithPath, routerToName } from '@/utils/router';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const loading = ref();
 const selects = ref<any>([]);
+const { hasManagePermission } = useMenuManagePermission();
 
 const globalStore = GlobalStore();
 const { isProductPro } = storeToRefs(globalStore);
@@ -339,6 +350,7 @@ const onChangeStatus = async (id: number, status: string) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.handle'),
+        disabled: !hasManagePermission.value,
         click: async (row: Toolbox.ClamInfo) => {
             loading.value = true;
             await handleClamScan(row.id)
@@ -354,6 +366,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: !hasManagePermission.value,
         click: (row: Toolbox.ClamInfo) => {
             onOpenDialog('edit', row);
         },
@@ -366,6 +379,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: !hasManagePermission.value,
         click: (row: Toolbox.ClamInfo) => {
             onDelete(row);
         },

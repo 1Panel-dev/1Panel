@@ -3,7 +3,7 @@
         <LayoutContent>
             <template #leftToolBar>
                 <div class="flex flex-wrap gap-3">
-                    <el-button type="primary" @click="openCreate">
+                    <el-button type="primary" :disabled="!hasManagePermission" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
                 </div>
@@ -83,6 +83,7 @@ import PortJumpDialog from '@/components/port-jump/index.vue';
 import PortJump from '@/views/website/runtime/components/port-jump.vue';
 
 import { reactive, onMounted, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { dateFormat } from '@/utils/date';
 import { AI } from '@/api/interface/ai';
 import { deleteTensorRTLLM, operateTensorRTLLM, pageTensorRTLLM } from '@/api/modules/ai';
@@ -180,6 +181,7 @@ const deleteLLM = async (row: AI.TensorRTLLM) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: () => !hasManagePermission.value || !hasManagePermission.value,
         click: (row: AI.TensorRTLLM) => {
             openEdit(row);
         },
@@ -187,7 +189,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.start'),
         disabled: (row: AI.TensorRTLLM) => {
-            return row.status === 'Running';
+            return row.status === 'Running' || !hasManagePermission.value;
         },
         click: (row: AI.TensorRTLLM) => {
             operate(row, 'start');
@@ -196,7 +198,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.stop'),
         disabled: (row: AI.TensorRTLLM) => {
-            return row.status !== 'Running';
+            return row.status !== 'Running' || !hasManagePermission.value;
         },
         click: (row: AI.TensorRTLLM) => {
             operate(row, 'stop');
@@ -204,12 +206,14 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
+        disabled: () => !hasManagePermission.value,
         click: (row: AI.TensorRTLLM) => {
             operate(row, 'restart');
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: () => !hasManagePermission.value,
         click: (row: AI.TensorRTLLM) => {
             deleteLLM(row);
         },

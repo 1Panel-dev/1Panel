@@ -3,7 +3,9 @@
         <template #content>
             <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
                 <template #toolbar>
-                    <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                    <el-button type="primary" :disabled="!hasManagePermission" @click="openCreate">
+                        {{ $t('commons.button.create') }}
+                    </el-button>
                 </template>
                 <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name"></el-table-column>
                 <el-table-column :label="$t('website.keyType')" show-overflow-tooltip prop="keyType">
@@ -38,11 +40,13 @@ import { Website } from '@/api/interface/website';
 import { deleteCA, searchCAs, downloadCAFile } from '@/api/modules/website';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import Create from './create/index.vue';
 import Detail from './detail/index.vue';
 import { getKeyName } from '@/utils/ssl';
 import { dateFormat } from '@/utils/date';
 import Obtain from './obtain/index.vue';
+const { hasManagePermission } = useMenuManagePermission();
 
 const open = ref(false);
 const loading = ref(false);

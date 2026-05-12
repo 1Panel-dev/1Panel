@@ -1,7 +1,7 @@
 <template>
     <ComplexTable :data="data" @search="search" v-loading="loading">
         <template #toolbar>
-            <el-button type="primary" plain @click="openCreate">
+            <el-button type="primary" plain :disabled="!hasManagePermission" @click="openCreate">
                 {{ $t('commons.button.create') }}
             </el-button>
         </template>
@@ -52,6 +52,7 @@
 import { Website } from '@/api/interface/website';
 import { operateRedirectConfig, getRedirectConfig } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
+import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import Create from './create/index.vue';
 import File from './file/index.vue';
 import i18n from '@/lang';
@@ -89,11 +90,11 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: (row: Website.ProxyConfig) => {
+            return !row.enable || !hasManagePermission.value;
+        },
         click: function (row: Website.RedirectConfig) {
             openEdit(row);
-        },
-        disabled: (row: Website.ProxyConfig) => {
-            return !row.enable;
         },
     },
     {
