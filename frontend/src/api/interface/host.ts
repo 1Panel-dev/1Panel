@@ -156,6 +156,7 @@ export namespace Host {
         status: string;
         hasRule: boolean;
         ruleStrategy: string;
+        ruleAddress: string;
     }
     export interface PortSecuritySummary {
         total: number;

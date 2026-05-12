@@ -84,7 +84,16 @@
                 <el-table-column :label="$t('commons.table.status')" :min-width="120">
                     <template #default="{ row }">
                         <div class="cell-inline">
-                            <el-tag :type="statusTagType(row.status)">
+                            <el-tooltip
+                                v-if="row.hasRule && hasSourceScope(row.ruleAddress)"
+                                :content="`${row.ruleStrategy} ${row.port}/${row.protocol} from ${row.ruleAddress}`"
+                                placement="top"
+                            >
+                                <el-tag :type="statusTagType(row.status)">
+                                    {{ $t('firewall.' + row.status) }}
+                                </el-tag>
+                            </el-tooltip>
+                            <el-tag v-else :type="statusTagType(row.status)">
                                 {{ $t('firewall.' + row.status) }}
                             </el-tag>
                             <el-tooltip
@@ -184,6 +193,10 @@ const statusTagType = (status: string) => {
         default:
             return 'info';
     }
+};
+
+const hasSourceScope = (addr: string) => {
+    return !!addr && addr !== 'Anywhere' && addr !== '0.0.0.0/0' && addr !== '::/0';
 };
 
 const onChipFilter = (status: string) => {

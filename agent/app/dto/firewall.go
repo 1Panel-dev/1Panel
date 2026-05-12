@@ -144,4 +144,5 @@ type PortSecurityItem struct {
 	Status        string `json:"status"`
 	HasRule       bool   `json:"hasRule"`
 	RuleStrategy  string `json:"ruleStrategy"`
+	RuleAddress   string `json:"ruleAddress"`
 }

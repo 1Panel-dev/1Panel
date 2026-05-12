@@ -34,6 +34,7 @@ type firewallRuleEntry struct {
 	strategy string
 	portStr  string
 	protocol string
+	address  string
 }
 
 // GetPortSecurityOverview scans all listening ports and cross-references them with
@@ -152,9 +153,10 @@ func (u *FirewallService) GetPortSecurityOverview(req dto.PortSecuritySearch) (*
 			item.AppName = "1panel"
 		}
 
-		ruleStrategy, hasRule := matchFirewallRule(ruleIndex, conn.Laddr.Port, proto)
+		ruleStrategy, hasRule, ruleAddress := matchFirewallRule(ruleIndex, conn.Laddr.Port, proto)
 		item.HasRule = hasRule
 		item.RuleStrategy = ruleStrategy
+		item.RuleAddress = ruleAddress
 
 		items = append(items, item)
 	}
@@ -182,9 +184,10 @@ func (u *FirewallService) GetPortSecurityOverview(req dto.PortSecuritySearch) (*
 			item.AppName = appName
 			item.SourceType = "appStore"
 		}
-		ruleStrategy, hasRule := matchFirewallRule(ruleIndex, key.port, key.protocol)
+		ruleStrategy, hasRule, ruleAddress := matchFirewallRule(ruleIndex, key.port, key.protocol)
 		item.HasRule = hasRule
 		item.RuleStrategy = ruleStrategy
+		item.RuleAddress = ruleAddress
 		seenIndex[key] = len(items)
 		items = append(items, item)
 	}
@@ -288,6 +291,7 @@ func buildFirewallRuleIndex(rules []fireClient.FireInfo, err error) []firewallRu
 			strategy: r.Strategy,
 			portStr:  r.Port,
 			protocol: r.Protocol,
+			address:  r.Address,
 		})
 	}
 	return entries
@@ -325,9 +329,10 @@ func buildAppPortMaps(ctx context.Context) (map[uint32]string, uint32) {
 // the port is reported as denied. It also keeps the result deterministic regardless of
 // the underlying backend's listing order (firewalld lists --list-ports accepts before
 // rich-rule drops, iptables lists by line number, ufw by rule index).
-func matchFirewallRule(rules []firewallRuleEntry, port uint32, proto string) (string, bool) {
+func matchFirewallRule(rules []firewallRuleEntry, port uint32, proto string) (string, bool, string) {
 	portStr := strconv.FormatUint(uint64(port), 10)
 	acceptStrategy := ""
+	acceptAddress := ""
 	foundAccept := false
 	for _, r := range rules {
 		if r.protocol != "" && r.protocol != "tcp/udp" && r.protocol != proto {
@@ -337,19 +342,28 @@ func matchFirewallRule(rules []firewallRuleEntry, port uint32, proto string) (st
 			continue
 		}
 		if r.strategy == "drop" || r.strategy == "reject" {
-			return r.strategy, true
+			return r.strategy, true, r.address
 		}
 		if !foundAccept {
 			acceptStrategy = r.strategy
+			acceptAddress = r.address
 			foundAccept = true
 		}
 	}
-	return acceptStrategy, foundAccept
+	return acceptStrategy, foundAccept, acceptAddress
 }
 
 func portMatchesRule(portStr string, portNum uint32, rulePort string) bool {
 	if rulePort == portStr {
 		return true
+	}
+	if strings.Contains(rulePort, ",") {
+		for _, p := range strings.Split(rulePort, ",") {
+			if strings.TrimSpace(p) == portStr {
+				return true
+			}
+		}
+		return false
 	}
 	sep := ""
 	if strings.Contains(rulePort, "-") {
