@@ -79,7 +79,7 @@
                                             {{ $t('commons.button.start') }}
                                         </el-button>
                                         <el-button
-                                            :style="mobile ? 'margin-left: -1px' : ''"
+                                            :style="isMobile ? 'margin-left: -1px' : ''"
                                             size="small"
                                             type="primary"
                                             link
@@ -89,7 +89,7 @@
                                             {{ $t('commons.button.stop') }}
                                         </el-button>
                                         <el-button
-                                            :style="mobile ? 'margin-left: -1px' : ''"
+                                            :style="isMobile ? 'margin-left: -1px' : ''"
                                             size="small"
                                             type="primary"
                                             link
@@ -98,7 +98,7 @@
                                             {{ $t('commons.button.restart') }}
                                         </el-button>
                                         <el-button
-                                            :style="mobile ? 'margin-left: -1px' : ''"
+                                            :style="isMobile ? 'margin-left: -1px' : ''"
                                             size="small"
                                             type="primary"
                                             link
@@ -134,21 +134,17 @@
 import { getAppIconUrl, installedOp } from '@/api/modules/app';
 import { changeLauncherStatus, loadAppLauncher, loadAppLauncherOption } from '@/api/modules/dashboard';
 import i18n from '@/lang';
-import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { jumpToInstall } from '@/utils/app';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
-
+const { isMobile } = useGlobalStore();
 let loading = ref(false);
 let apps = ref([]);
 const options = ref([]);
 const filter = ref();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const acceptParams = (): void => {
     search();

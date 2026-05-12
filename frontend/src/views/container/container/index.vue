@@ -99,7 +99,7 @@
                         prop="name"
                         sortable="custom"
                         fix
-                        :fixed="mobile ? false : 'left'"
+                        :fixed="isMobile ? false : 'left'"
                         show-overflow-tooltip
                     >
                         <template #default="{ row, $index }">
@@ -261,7 +261,7 @@
                     </el-table-column>
                     <el-table-column
                         :label="$t('container.ip')"
-                        :width="mobile ? 120 : 'auto'"
+                        :width="isMobile ? 120 : 'auto'"
                         min-width="120"
                         prop="network"
                     >
@@ -302,7 +302,7 @@
                     </el-table-column>
                     <el-table-column
                         :label="$t('commons.table.port')"
-                        :width="mobile ? 260 : 'auto'"
+                        :width="isMobile ? 260 : 'auto'"
                         min-width="200"
                         prop="ports"
                     >
@@ -366,7 +366,7 @@
                         :ellipsis="2"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        :fixed="mobile ? false : 'right'"
+                        :fixed="isMobile ? false : 'right'"
                         prop="operate"
                     />
                 </ComplexTable>
@@ -409,7 +409,7 @@ import Uploads from '@/components/upload/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import Status from '@/components/status/index.vue';
-import { reactive, onMounted, ref, computed } from 'vue';
+import { reactive, onMounted, ref } from 'vue';
 import {
     containerItemStats,
     containerListStats,
@@ -427,11 +427,11 @@ import router from '@/routers';
 import { computeSize2, computeSizeForDocker, computeCPU } from '@/utils/size';
 import { newUUID } from '@/utils/id';
 import { updateCommonDescription } from '@/api/modules/setting';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 const globalStore = GlobalStore();
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 const isActive = ref(false);
 const isExist = ref(false);
 

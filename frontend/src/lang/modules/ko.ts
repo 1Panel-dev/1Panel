@@ -940,6 +940,7 @@ const message = {
             addMapping: '매핑 추가',
             usageTrend: '사용 추세',
             providerDistribution: '제공자별 분포',
+            unmatched: '미일치',
             modelDistribution: '모델별 분포',
             serviceProvider: '제공자',
             tokenUsage: 'Token 사용량',

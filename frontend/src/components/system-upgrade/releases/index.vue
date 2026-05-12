@@ -30,7 +30,7 @@
                     <el-collapse-item :name="index">
                         <template #title>
                             <span class="version">{{ item.version }}</span>
-                            <span v-if="!mobile" class="date">{{ item.createdAt }}</span>
+                            <span v-if="!isMobile" class="date">{{ item.createdAt }}</span>
                             <svg-icon class="icon" iconName="p-featureshitu"></svg-icon>
                             <span class="icon-span">{{ item.newCount }}</span>
                             <svg-icon class="icon" iconName="p-youhuawendang"></svg-icon>
@@ -68,16 +68,13 @@ import MarkDownEditor from '@/components/mkdown-editor/index.vue';
 
 import { getSettingBaseInfo, listReleases, updateSetting } from '@/api/modules/setting';
 import { ref } from 'vue';
-import { GlobalStore } from '@/store';
 import { FormInstance } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+const { isMobile } = useGlobalStore();
 
 const drawerVisible = ref(false);
 const currentVersion = ref(0);

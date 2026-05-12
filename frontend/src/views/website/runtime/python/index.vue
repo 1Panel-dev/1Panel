@@ -76,8 +76,8 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 5"
-                        :min-width="mobile ? 'auto' : 300"
+                        :ellipsis="isMobile ? 0 : 5"
+                        :min-width="isMobile ? 'auto' : 300"
                         :buttons="buttons"
                         fixed="right"
                         :label="$t('commons.table.operate')"
@@ -112,13 +112,11 @@ import PortJump from '@/views/website/runtime/components/port-jump.vue';
 import Terminal from '@/views/website/runtime/components/terminal.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { disabledButton } from '@/utils/runtime';
-import { GlobalStore } from '@/store';
 import { operateRuntime, updateRuntimeRemark } from '../common/utils';
 import { routerToFileWithPath } from '@/utils/router';
-const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const items = ref<Runtime.RuntimeDTO[]>([]);

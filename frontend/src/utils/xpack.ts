@@ -102,6 +102,7 @@ export async function loadProductProFromDB() {
         globalStore.isEnterpriseLicensed = false;
     } else {
         globalStore.isEnterpriseLicensed = res.data.status === 'Bound';
+        globalStore.isProductPro = globalStore.isEnterpriseLicensed;
     }
 }
 

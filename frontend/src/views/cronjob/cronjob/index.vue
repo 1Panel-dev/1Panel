@@ -183,8 +183,8 @@
                         :buttons="buttons"
                         :ellipsis="2"
                         :label="$t('commons.table.operate')"
-                        min-width="mobile ? 'auto' : 200"
-                        :fixed="mobile ? false : 'right'"
+                        min-width="isMobile ? 'auto' : 200"
+                        :fixed="isMobile ? false : 'right'"
                         fix
                     />
                 </ComplexTable>
@@ -220,7 +220,7 @@
 import Records from '@/views/cronjob/cronjob/record/index.vue';
 import Backups from '@/views/cronjob/cronjob/backup/index.vue';
 import Import from '@/views/cronjob/cronjob/import/index.vue';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import {
     deleteCronjob,
     editCronjobGroup,
@@ -235,15 +235,12 @@ import GroupDialog from '@/components/group/index.vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { hasBackup, transSpecToStr } from './helper';
-import { GlobalStore } from '@/store';
 import { getCurrentDateFormatted } from '@/utils/date';
 import { getGroupList } from '@/api/modules/group';
 import { routerToNameWithQuery } from '@/utils/router';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+const { isMobile } = useGlobalStore();
 
 const loading = ref();
 const selects = ref<any>([]);

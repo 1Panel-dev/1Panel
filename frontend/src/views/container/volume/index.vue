@@ -36,7 +36,7 @@
                     <el-table-column
                         :label="$t('commons.table.name')"
                         min-width="100"
-                        :width="mobile ? 220 : 'auto'"
+                        :width="isMobile ? 220 : 'auto'"
                         prop="name"
                         fix
                         show-overflow-tooltip
@@ -124,7 +124,7 @@
 import CreateDialog from '@/views/container/volume/create/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
 import { deleteVolume, searchVolume, inspect, containerPrune } from '@/api/modules/container';
@@ -132,16 +132,13 @@ import { Container } from '@/api/interface/container';
 import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
-import { GlobalStore } from '@/store';
 import { routerToFileWithPath } from '@/utils/router';
 import { checkFile } from '@/api/modules/files';
 import { MsgError } from '@/utils/message';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
 const taskLogRef = ref();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const loading = ref();
 const myDetail = ref();

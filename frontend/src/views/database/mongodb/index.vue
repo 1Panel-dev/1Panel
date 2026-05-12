@@ -209,8 +209,8 @@
                         :formatter="dateFormat"
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 10"
-                        :min-width="mobile ? 'auto' : 300"
+                        :ellipsis="isMobile ? 0 : 10"
+                        :min-width="isMobile ? 'auto' : 300"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -318,7 +318,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, reactive, ref } from 'vue';
+import { nextTick, onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { getRandomStr } from '@/utils/id';
 import { Position } from '@element-plus/icons-vue';
@@ -351,11 +351,11 @@ import { MsgSuccess } from '@/utils/message';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import { GlobalStore } from '@/store';
 import Tooltip from '@/components/tooltip/index.vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 
 const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const loading = ref(false);
 const maskShow = ref(true);

@@ -87,6 +87,7 @@ const GlobalStore = defineStore({
             return isChinese ? CN_DOCS_URL : INTL_DOCS_URL;
         },
         isMaster: (state) => state.currentNode === 'local',
+        isMobile: (state) => state.device === DeviceType.Mobile,
     },
     actions: {
         setScreenFull() {
@@ -140,9 +141,6 @@ const GlobalStore = defineStore({
         toggleDevice(value: DeviceType) {
             this.device = value;
         },
-        isMobile() {
-            return this.device === DeviceType.Mobile;
-        },
         getMasterAlias() {
             return this.masterAlias || i18n.global.t('xpack.node.master');
         },
@@ -151,9 +149,6 @@ const GlobalStore = defineStore({
         },
         isXpackOrEE() {
             return (this.isEnterprise && this.isEnterpriseLicensed) || this.isMasterProductPro;
-        },
-        isXpackNodeOrEE() {
-            return (this.isEnterprise && this.isEnterpriseLicensed) || this.isProductPro;
         },
         isMasterPro() {
             return this.isMasterProductPro;

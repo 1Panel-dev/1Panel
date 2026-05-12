@@ -76,8 +76,8 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 5"
-                        :min-width="mobile ? 'auto' : 300"
+                        :ellipsis="isMobile ? 0 : 5"
+                        :min-width="isMobile ? 'auto' : 300"
                         :buttons="buttons"
                         fixed="right"
                         :label="$t('commons.table.operate')"
@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, computed } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { RuntimeDeleteCheck, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
 import { dateFormat } from '@/utils/date';
@@ -107,7 +107,6 @@ import RouterMenu from '../index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import AppResources from '@/views/website/runtime/php/check/index.vue';
-import { GlobalStore } from '@/store';
 import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
 import PortJump from '@/views/website/runtime/components/port-jump.vue';
 import Terminal from '@/views/website/runtime/components/terminal.vue';
@@ -115,6 +114,9 @@ import DockerStatus from '@/views/container/docker-status/index.vue';
 import { disabledButton } from '@/utils/runtime';
 import { operateRuntime, updateRuntimeRemark } from '../common/utils';
 import { routerToFileWithPath } from '@/utils/router';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const items = ref<Runtime.RuntimeDTO[]>([]);
@@ -126,11 +128,6 @@ const checkRef = ref();
 const terminalRef = ref();
 const isActive = ref(false);
 const isExist = ref(false);
-
-const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',

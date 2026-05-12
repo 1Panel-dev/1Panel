@@ -900,6 +900,7 @@ const message = {
             addMapping: '新增映射',
             usageTrend: '使用趨勢',
             providerDistribution: '按服務商分佈',
+            unmatched: '未匹配',
             modelDistribution: '按模型分佈',
             serviceProvider: '服務商',
             tokenUsage: 'Token 用量',

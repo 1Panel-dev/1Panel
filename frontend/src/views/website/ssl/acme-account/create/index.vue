@@ -6,7 +6,7 @@
                     <el-form-item :label="$t('website.email')" prop="email">
                         <el-input v-model.trim="account.email"></el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('website.useProxy')" prop="useProxy" v-if="globalStore.isXpackNodeOrEE()">
+                    <el-form-item :label="$t('website.useProxy')" prop="useProxy" v-if="isProductPro">
                         <el-switch v-model="account.useProxy"></el-switch>
                         <span class="input-help">
                             {{ $t('website.useProxyHelper') }}
@@ -91,9 +91,9 @@ import { createAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { AcmeAccountTypes, KeyTypes } from '@/global/mimetype';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isProductPro } = useGlobalStore();
 const open = ref();
 const loading = ref(false);
 const accountForm = ref<FormInstance>();
