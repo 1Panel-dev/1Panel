@@ -11,6 +11,7 @@ export default () => {
     const route = useRoute();
     const { globalStore, isMobile } = useGlobalStore();
     const menuStore = MenuStore();
+    const { isMobile } = useGlobalStore();
     const _isMobile = () => {
         const rect = document.body.getBoundingClientRect();
         return rect.width - 1 < WIDTH;
