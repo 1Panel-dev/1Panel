@@ -971,6 +971,7 @@ const message = {
             addMapping: 'Agregar mapeo',
             usageTrend: 'Tendencia de uso',
             providerDistribution: 'Distribución por proveedor',
+            unmatched: 'Sin coincidencia',
             modelDistribution: 'Distribución por modelo',
             serviceProvider: 'Proveedor',
             tokenUsage: 'Uso de tokens',

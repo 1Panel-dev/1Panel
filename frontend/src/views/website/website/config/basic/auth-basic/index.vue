@@ -20,7 +20,7 @@
                     width="260px"
                     :buttons="buttons"
                     :label="$t('commons.table.operate')"
-                    :fixed="mobile ? false : 'right'"
+                    :fixed="isMobile ? false : 'right'"
                     fix
                 />
             </ComplexTable>
@@ -41,7 +41,7 @@
                     width="260px"
                     :buttons="pathButtons"
                     :label="$t('commons.table.operate')"
-                    :fixed="mobile ? false : 'right'"
+                    :fixed="isMobile ? false : 'right'"
                     fix
                 />
             </ComplexTable>
@@ -65,10 +65,10 @@ import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import Create from './create/index.vue';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-defineOptions({ name: 'Proxy' });
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
+defineOptions({ name: 'Proxy' });
 const props = defineProps({
     id: {
         type: Number,
@@ -77,9 +77,6 @@ const props = defineProps({
 });
 const id = computed(() => {
     return props.id;
-});
-const mobile = computed(() => {
-    return globalStore.isMobile();
 });
 const loading = ref(false);
 const data = ref([]);

@@ -7,7 +7,7 @@
                     <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
                         <el-form
                             :model="form"
-                            :label-position="mobile ? 'top' : 'left'"
+                            :label-position="isMobile ? 'top' : 'left'"
                             ref="formRef"
                             label-width="130px"
                         >
@@ -100,7 +100,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref, computed } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import Swap from '@/views/toolbox/device/swap/index.vue';
 import Passwd from '@/views/toolbox/device/passwd/index.vue';
 import TimeZone from '@/views/toolbox/device/time-zone/index.vue';
@@ -112,11 +112,9 @@ import { getDeviceBase, updateDevice } from '@/api/modules/toolbox';
 import i18n from '@/lang';
 import { computeSize } from '@/utils/size';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 const loading = ref(false);
 
 const swapRef = ref();

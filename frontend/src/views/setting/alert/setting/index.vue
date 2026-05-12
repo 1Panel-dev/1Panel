@@ -13,7 +13,7 @@
                 <el-form
                     @submit.prevent
                     ref="alertFormRef"
-                    :label-position="mobile ? 'top' : 'left'"
+                    :label-position="isMobile ? 'top' : 'left'"
                     label-width="120px"
                 >
                     <el-row>
@@ -44,7 +44,7 @@
                     <template #title>
                         <div class="flex items-center justify-start">
                             {{ $t('xpack.alert.alertConfigHelper') }}
-                            <span v-if="!globalStore.isXpackNodeOrEE">
+                            <span v-if="!isProductPro">
                                 {{ $t('commons.units.semicolon') }}{{ $t('xpack.alert.alertConfigProHelper') }}
                             </span>
                             <el-link
@@ -89,7 +89,7 @@
                             <el-form
                                 @submit.prevent
                                 ref="alertFormRef"
-                                :label-position="mobile ? 'top' : 'left'"
+                                :label-position="isMobile ? 'top' : 'left'"
                                 label-width="110px"
                             >
                                 <el-form-item :label="$t('xpack.alert.displayName')" prop="displayName">
@@ -121,10 +121,7 @@
                             </el-button>
                         </div>
                     </el-card>
-                    <el-card
-                        class="rounded-2xl shadow hover:shadow-md transition-all"
-                        v-if="globalStore.isXpackNodeOrEE && !globalStore.isIntl"
-                    >
+                    <el-card class="rounded-2xl shadow hover:shadow-md transition-all" v-if="isProductPro && !isIntl">
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.weCom') }}</div>
                             <div>
@@ -154,7 +151,7 @@
                             <el-form
                                 @submit.prevent
                                 ref="alertFormRef"
-                                :label-position="mobile ? 'top' : 'left'"
+                                :label-position="isMobile ? 'top' : 'left'"
                                 label-width="110px"
                             >
                                 <el-form-item :label="$t('xpack.alert.webhookName')" prop="displayName">
@@ -186,10 +183,7 @@
                             </el-button>
                         </div>
                     </el-card>
-                    <el-card
-                        class="rounded-2xl shadow hover:shadow-md transition-all"
-                        v-if="globalStore.isXpackNodeOrEE && !globalStore.isIntl"
-                    >
+                    <el-card class="rounded-2xl shadow hover:shadow-md transition-all" v-if="isProductPro && !isIntl">
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.dingTalk') }}</div>
                             <div>
@@ -219,7 +213,7 @@
                             <el-form
                                 @submit.prevent
                                 ref="alertFormRef"
-                                :label-position="mobile ? 'top' : 'left'"
+                                :label-position="isMobile ? 'top' : 'left'"
                                 label-width="110px"
                             >
                                 <el-form-item :label="$t('xpack.alert.webhookName')" prop="displayName">
@@ -255,10 +249,7 @@
                             </el-button>
                         </div>
                     </el-card>
-                    <el-card
-                        class="rounded-2xl shadow hover:shadow-md transition-all"
-                        v-if="globalStore.isXpackNodeOrEE && !globalStore.isIntl"
-                    >
+                    <el-card class="rounded-2xl shadow hover:shadow-md transition-all" v-if="isProductPro && !isIntl">
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.feiShu') }}</div>
                             <div>
@@ -288,7 +279,7 @@
                             <el-form
                                 @submit.prevent
                                 ref="alertFormRef"
-                                :label-position="mobile ? 'top' : 'left'"
+                                :label-position="isMobile ? 'top' : 'left'"
                                 label-width="110px"
                             >
                                 <el-form-item :label="$t('xpack.alert.webhookName')" prop="displayName">
@@ -354,7 +345,7 @@
                             <el-form
                                 @submit.prevent
                                 ref="alertFormRef"
-                                :label-position="mobile ? 'top' : 'left'"
+                                :label-position="isMobile ? 'top' : 'left'"
                                 label-width="110px"
                             >
                                 <el-form-item :label="$t('xpack.alert.webhookName')" prop="displayName">
@@ -388,7 +379,7 @@
                     </el-card>
                     <el-card
                         class="rounded-2xl shadow hover:shadow-md transition-all"
-                        v-if="globalStore.isMasterPro() && !globalStore.isIntl && !globalStore.isEE()"
+                        v-if="globalStore.isMasterPro() && !isIntl && !globalStore.isEE()"
                     >
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">
@@ -411,7 +402,7 @@
                             <el-form
                                 @submit.prevent
                                 ref="alertFormRef"
-                                :label-position="mobile ? 'top' : 'left'"
+                                :label-position="isMobile ? 'top' : 'left'"
                                 label-width="110px"
                             >
                                 <el-form-item :label="$t('xpack.alert.phone')">
@@ -436,26 +427,25 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, Ref } from 'vue';
+import { onMounted, ref, Ref } from 'vue';
 import { GlobalStore } from '@/store';
 import { ListAlertConfigs, DeleteAlertConfig, UpdateAlertConfig } from '@/api/modules/alert';
-import { ElMessageBox, FormInstance } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import { View, Hide } from '@element-plus/icons-vue';
 import Phone from '@/views/setting/alert/setting/phone/index.vue';
 import SendTimeRange from '@/views/setting/alert/setting/time-range/index.vue';
 import i18n from '@/lang';
-import { storeToRefs } from 'pinia';
 import { MsgSuccess } from '@/utils/message';
 import EmailDrawer from '@/views/setting/alert/setting/email/index.vue';
 import WebhookDrawer from '@/views/setting/alert/setting/webhook/index.vue';
 import { Alert } from '@/api/interface/alert';
 import { getLicenseSmsInfo } from '@/api/modules/setting';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile, isProductPro, isMaster, isIntl } = useGlobalStore();
 
 const globalStore = GlobalStore();
-const { isMaster } = storeToRefs(globalStore);
 const loading = ref(false);
-
-const alertFormRef = ref<FormInstance>();
 const phoneRef = ref();
 const emailRef = ref();
 const webHookRef = ref();
@@ -578,9 +568,6 @@ const config = ref<Alert.AlertConfigInfo>({
 const licenseName = ref('-');
 const totalSms = ref(0);
 const usedSms = ref(0);
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 function parseConfig<T extends object>(raw: any, fallback: T): T {
     try {
@@ -770,7 +757,7 @@ const onChangeBark = (id: number) => {
 
 onMounted(async () => {
     await search();
-    if (globalStore.isXpackNodeOrEE() && !globalStore.isIntl) {
+    if (isProductPro.value && !isIntl.value) {
         await getSmsInfo();
     }
 });

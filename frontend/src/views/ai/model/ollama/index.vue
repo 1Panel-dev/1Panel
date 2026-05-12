@@ -110,8 +110,8 @@
                         :formatter="dateFormat"
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 10"
-                        :min-width="mobile ? 'auto' : 200"
+                        :ellipsis="isMobile ? 0 : 10"
+                        :min-width="isMobile ? 'auto' : 200"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -180,10 +180,9 @@ import Terminal from '@/views/ai/model/ollama/terminal/index.vue';
 import Del from '@/views/ai/model/ollama/del/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { App } from '@/api/interface/app';
-import { GlobalStore } from '@/store';
 import {
     deleteOllamaModel,
     loadOllamaModel,
@@ -198,8 +197,9 @@ import { newUUID } from '@/utils/id';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
 import BindDomain from '@/views/ai/model/ollama/domain/index.vue';
 import { routerToNameWithQuery } from '@/utils/router';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
 const loading = ref(false);
 const selects = ref<any>([]);
 const maskShow = ref(false);
@@ -234,10 +234,6 @@ const modelInfo = reactive({
     isExist: null,
     version: '',
     port: 11434,
-});
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
 });
 
 function selectable(row) {

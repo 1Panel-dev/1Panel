@@ -49,7 +49,7 @@
                         @size-change="sizeChange"
                         @current-change="currentChange"
                         :pager-count="responsivePagerCount"
-                        :size="mobile || paginationConfig.small ? 'small' : 'default'"
+                        :size="isMobile || paginationConfig.small ? 'small' : 'default'"
                         :layout="responsivePaginationLayout"
                     />
                 </slot>
@@ -77,6 +77,9 @@
 import { ref, computed, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
 const slots = useSlots();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 
 defineOptions({ name: 'ComplexTable' });
 export interface DropdownProps {
@@ -106,9 +109,6 @@ const props = defineProps({
 });
 const emit = defineEmits(['search', 'update:selects', 'update:paginationConfig']);
 const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 const tableRef = ref();
 const tableHeight = ref<number | string>('');
 const menuRef = ref<HTMLElement | null>(null);
@@ -206,7 +206,7 @@ const updatePaginationWidth = () => {
 };
 
 const responsivePaginationLayout = computed(() => {
-    if (mobile.value || props.paginationConfig?.small) {
+    if (isMobile.value || props.paginationConfig?.small) {
         return 'total, prev, pager, next';
     }
     if (paginationWidth.value < 520) {
@@ -216,7 +216,7 @@ const responsivePaginationLayout = computed(() => {
 });
 
 const responsivePagerCount = computed(() => {
-    if (mobile.value || props.paginationConfig?.small || paginationWidth.value < 720) {
+    if (isMobile.value || props.paginationConfig?.small || paginationWidth.value < 720) {
         return 5;
     }
     return 7;

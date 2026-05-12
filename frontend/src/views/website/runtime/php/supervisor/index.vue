@@ -114,7 +114,7 @@
                     :ellipsis="6"
                     :buttons="buttons"
                     :label="$t('commons.table.operate')"
-                    :fixed="mobile ? false : 'right'"
+                    :fixed="isMobile ? false : 'right'"
                     width="280px"
                     fix
                 />
@@ -127,16 +127,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { computed } from 'vue';
+
 import Create from './create/index.vue';
 import File from './file/index.vue';
 import { GetSupervisorProcess, operateSupervisorProcess } from '@/api/modules/runtime';
-import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
 const loading = ref(false);
 const fileRef = ref();
 const data = ref();
@@ -209,10 +209,6 @@ const loadStatus = async () => {
         }
     } catch (error) {}
 };
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const checkStatus = (status: HostTool.ProcessStatus[]): string => {
     if (!status || status.length === 0) return 'STOPPED';

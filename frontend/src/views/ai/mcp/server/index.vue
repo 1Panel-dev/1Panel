@@ -78,8 +78,8 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 2"
-                        :min-width="mobile ? 'auto' : 200"
+                        :ellipsis="isMobile ? 0 : 2"
+                        :min-width="isMobile ? 'auto' : 200"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -100,17 +100,17 @@
 import { AI } from '@/api/interface/ai';
 import { deleteMcpServer, operateMcpServer, pageMcpServer } from '@/api/modules/ai';
 import RouterMenu from '@/views/ai/mcp/index.vue';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import McpServerOperate from './operate/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
-import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import BindDomain from './bind/index.vue';
 import Config from './config/index.vue';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
 const loading = ref(false);
 const createRef = ref();
 const opRef = ref();
@@ -123,9 +123,6 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: Number(localStorage.getItem('mcp-server-page-size')) || 20,
     total: 0,
-});
-const mobile = computed(() => {
-    return globalStore.isMobile();
 });
 
 const getUrl = (row: AI.McpServer) => {

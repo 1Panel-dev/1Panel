@@ -104,8 +104,8 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 3"
-                        :width="mobile ? 'auto' : 300"
+                        :ellipsis="isMobile ? 0 : 3"
+                        :width="isMobile ? 'auto' : 300"
                         :buttons="buttons"
                         fixed="right"
                         :label="$t('commons.table.operate')"
@@ -155,11 +155,7 @@ import DockerStatus from '@/views/container/docker-status/index.vue';
 import { operateRuntime, updateRuntimeRemark } from '../common/utils';
 import { routerToFileWithPath } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { globalStore } = useGlobalStore();
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+const { isMobile } = useGlobalStore();
 
 const taskLogRef = ref();
 const paginationConfig = reactive({

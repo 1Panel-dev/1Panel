@@ -899,6 +899,7 @@ const message = {
             addMapping: '添加映射',
             usageTrend: '使用趋势',
             providerDistribution: '按服务商分布',
+            unmatched: '未匹配',
             modelDistribution: '按模型分布',
             serviceProvider: '服务商',
             tokenUsage: 'Token 用量',

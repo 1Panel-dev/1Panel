@@ -24,7 +24,7 @@
             :ellipsis="1"
             :buttons="buttons"
             :label="$t('commons.table.operate')"
-            :fixed="mobile ? false : 'right'"
+            :fixed="isMobile ? false : 'right'"
             fix
         />
     </ComplexTable>
@@ -39,12 +39,12 @@ import { deleteDomain, getWebsite, listDomains, updateDomain } from '@/api/modul
 import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import { Promotion } from '@element-plus/icons-vue';
-import { GlobalStore } from '@/store';
 import { checkAppInstalled } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import { GetPunyCodeDomain, isPunycoded } from '@/utils/misc';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
 const props = defineProps({
     id: {
         type: Number,
@@ -53,9 +53,6 @@ const props = defineProps({
 });
 const id = computed(() => {
     return props.id;
-});
-const mobile = computed(() => {
-    return globalStore.isMobile();
 });
 let loading = ref(false);
 const data = ref<Website.Domain[]>([]);

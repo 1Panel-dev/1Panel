@@ -628,11 +628,11 @@
                             </el-table-column>
                             <fu-table-operations
                                 :max-height="dropdownMaxHeight"
-                                :ellipsis="mobile ? 0 : 2"
+                                :ellipsis="isMobile ? 0 : 2"
                                 :buttons="tableMoreButtons"
                                 :label="$t('commons.table.operate')"
-                                :min-width="mobile ? 'auto' : 200"
-                                :fixed="mobile ? false : 'right'"
+                                :min-width="isMobile ? 'auto' : 200"
+                                :fixed="isMobile ? false : 'right'"
                                 width="200"
                                 fix
                             />
@@ -770,6 +770,9 @@ import { getComponentInfo } from '@/api/modules/host';
 import { routerToNameWithQuery } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
 import FileList from '@/components/file-list/index.vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 
 const globalStore = GlobalStore();
 
@@ -2668,19 +2671,12 @@ onBeforeUnmount(() => {
 }
 
 .file-row {
-    display: grid;
+ display: grid;
     grid-template-columns: 24px minmax(0, 1fr) auto auto;
     align-items: center;
     width: 100%;
     min-height: 28px;
     column-gap: 6px;
-}
-
-.file-row__icon,
-.file-row__actions {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .file-name {
