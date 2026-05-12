@@ -206,8 +206,8 @@
                         show-overflow-tooltip
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 10"
-                        :min-width="mobile ? 'auto' : 300"
+                        :ellipsis="isMobile ? 0 : 10"
+                        :min-width="isMobile ? 'auto' : 300"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -280,7 +280,7 @@ import PortJumpDialog from '@/components/port-jump/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import { dateFormat } from '@/utils/date';
 import { ElMessageBox } from 'element-plus';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import {
     deleteCheckMysqlDB,
     listDatabases,
@@ -295,11 +295,10 @@ import { getAppPort } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { routerToName, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+const { isMobile } = useGlobalStore();
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 const maskShow = ref(true);

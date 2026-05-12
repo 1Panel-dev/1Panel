@@ -223,7 +223,7 @@
                         width="180px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        :fixed="mobile ? false : 'right'"
+                        :fixed="isMobile ? false : 'right'"
                         fix
                     />
                     <template #footerLeft>
@@ -320,11 +320,11 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { getAgentGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
-import { GlobalStore } from '@/store';
 import { getWebsiteTypes } from '@/global/mimetype';
 import { routerToFileWithPath, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
 const shortcuts = [
     {
         text: useI18n().t('website.ever'),
@@ -388,9 +388,6 @@ let req = reactive({
     order: 'descending',
     websiteGroupId: 0,
     type: '',
-});
-const mobile = computed(() => {
-    return globalStore.isMobile();
 });
 
 const goRouter = async (key: string) => {

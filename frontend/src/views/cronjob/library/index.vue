@@ -102,8 +102,8 @@
                         :buttons="buttons"
                         :ellipsis="10"
                         :label="$t('commons.table.operate')"
-                        min-width="mobile ? 'auto' : 200"
-                        :fixed="mobile ? false : 'right'"
+                        min-width="isMobile ? 'auto' : 200"
+                        :fixed="isMobile ? false : 'right'"
                         fix
                     />
                 </ComplexTable>
@@ -136,11 +136,11 @@ import { getGroupList } from '@/api/modules/group';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import { MsgSuccess } from '@/utils/message';
 import { getSettingBaseInfo, updateSetting } from '@/api/modules/setting';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 
 const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 const myDetail = ref();
 
 const loading = ref();

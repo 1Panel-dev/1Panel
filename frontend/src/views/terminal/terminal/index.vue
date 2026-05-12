@@ -53,7 +53,7 @@
                 ></Terminal>
 
                 <div class="flex items-center gap-2 w-full py-2 flex-wrap">
-                    <AiSetting v-if="!mobile" class="shrink-0" />
+                    <AiSetting v-if="!isMobile" class="shrink-0" />
                     <el-cascader
                         v-model="quickCmd"
                         :options="commandTree"
@@ -217,7 +217,7 @@
         <el-tooltip :content="loadTooltip()" placement="top">
             <el-button
                 @click="toggleFullscreen"
-                v-if="!mobile"
+                v-if="!isMobile"
                 class="bg-transparent border-0 absolute right-[50px] font-semibold text-sm"
                 :style="{ top: loadFullScreenHeight() }"
                 icon="FullScreen"
@@ -249,13 +249,13 @@ import { getCommandTree } from '@/api/modules/command';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import AiSetting from '@/views/terminal/setting/ai/index.vue';
 import { MsgWarning } from '@/utils/message';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 
 const dialogRef = ref();
 const ctx = getCurrentInstance() as any;
 const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 const isNodeAdmin = computed(() => globalStore.isNodeAdmin);
 
 const toggleFullscreen = () => {
@@ -318,7 +318,7 @@ const acceptParams = async () => {
     timer = setInterval(() => {
         syncTerminal();
     }, 1000 * 5);
-    if (!mobile.value) {
+    if (!isMobile.value) {
         screenfull.on('change', () => {
             globalStore.isFullScreen = screenfull.isFullscreen;
         });

@@ -55,7 +55,7 @@
                             v-bind="paginationConfig"
                             @change="search(req)"
                             :page-sizes="[30, 60, 90]"
-                            :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
+                            :layout="isMobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
                         />
                     </div>
                 </div>
@@ -69,7 +69,7 @@
 
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { onMounted, reactive, ref, computed } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { searchApp, syncApp, syncCutomAppStore, syncLocalApp, getCurrentNodeCustomAppConfig } from '@/api/modules/app';
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
@@ -85,11 +85,7 @@ import AppCard from '@/views/app-store/apps/app/index.vue';
 import MainDiv from '@/components/main-div/index.vue';
 import { jumpToInstall } from '@/utils/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { globalStore, isProductPro, isOffline } = useGlobalStore();
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+const { isProductPro, isOffline, isMobile } = useGlobalStore();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'app-page-size',

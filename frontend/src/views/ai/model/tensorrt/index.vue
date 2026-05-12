@@ -59,8 +59,8 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 5"
-                        :min-width="mobile ? 'auto' : 300"
+                        :ellipsis="isMobile ? 0 : 5"
+                        :min-width="isMobile ? 'auto' : 300"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -89,12 +89,9 @@ import { deleteTensorRTLLM, operateTensorRTLLM, pageTensorRTLLM } from '@/api/mo
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+const { isMobile } = useGlobalStore();
 
 const loading = ref();
 const data = ref();

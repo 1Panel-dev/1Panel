@@ -43,7 +43,7 @@
                     <el-col :xs="24" :sm="24" :md="15" :lg="12" :xl="10">
                         <el-form
                             :model="form"
-                            :label-position="mobile ? 'top' : 'left'"
+                            :label-position="isMobile ? 'top' : 'left'"
                             :rules="rules"
                             ref="formRef"
                             label-width="auto"
@@ -226,7 +226,7 @@
 
 <script lang="ts" setup>
 import { ElMessageBox, FormInstance } from 'element-plus';
-import { onMounted, reactive, ref, computed } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import Mirror from '@/views/container/setting/mirror/index.vue';
 import Registry from '@/views/container/setting/registry/index.vue';
@@ -247,11 +247,11 @@ import { getAgentSettingInfo } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { checkNumberRange } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 const globalStore = GlobalStore();
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 const unset = ref(i18n.global.t('setting.unSetting'));
 const submitInput = ref();
 

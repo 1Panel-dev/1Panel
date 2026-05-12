@@ -957,6 +957,7 @@ const message = {
             addMapping: 'Add Mapping',
             usageTrend: 'Usage Trend',
             providerDistribution: 'Provider Distribution',
+            unmatched: 'Unmatched',
             modelDistribution: 'Model Distribution',
             serviceProvider: 'Provider',
             tokenUsage: 'Token Usage',

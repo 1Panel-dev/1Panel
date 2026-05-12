@@ -970,6 +970,7 @@ const message = {
             addMapping: 'Tambah pemetaan',
             usageTrend: 'Trend penggunaan',
             providerDistribution: 'Taburan mengikut penyedia',
+            unmatched: 'Tidak sepadan',
             modelDistribution: 'Taburan mengikut model',
             serviceProvider: 'Penyedia',
             tokenUsage: 'Penggunaan Token',

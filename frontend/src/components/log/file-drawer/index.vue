@@ -5,7 +5,7 @@
         @close="handleClose"
         :size="globalStore.isFullScreen ? 'full' : 'large'"
     >
-        <template #extra v-if="!mobile">
+        <template #extra v-if="!isMobile">
             <el-tooltip :content="loadTooltip()" placement="top">
                 <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
             </el-tooltip>
@@ -21,6 +21,9 @@ import LogFile from '@/components/log/file/index.vue';
 import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import screenfull from 'screenfull';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 
 const globalStore = GlobalStore();
 interface LogProps {
@@ -51,10 +54,6 @@ const handleClose = () => {
     em('close', false);
 };
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
-
 function toggleFullscreen() {
     globalStore.isFullScreen = !globalStore.isFullScreen;
 }
@@ -63,7 +62,7 @@ const loadTooltip = () => {
 };
 
 watch(open, (val) => {
-    if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
+    if (screenfull.isEnabled && !val && !isMobile.value) screenfull.exit();
 });
 
 const acceptParams = (logProps: LogProps) => {

@@ -4,7 +4,7 @@
 
         <div class="content-container__search">
             <el-card>
-                <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
                     <el-date-picker
                         @change="searchGlobal()"
                         v-model="timeRangeGlobal"
@@ -14,7 +14,7 @@
                         :end-placeholder="$t('commons.search.timeEnd')"
                         :shortcuts="shortcuts"
                         style="max-width: 360px; width: 100%"
-                        :size="mobile ? 'small' : 'default'"
+                        :size="isMobile ? 'small' : 'default'"
                     ></el-date-picker>
                     <TableRefresh class="float-right" @search="searchGlobal()" />
                 </div>
@@ -24,7 +24,7 @@
             <el-col :span="24">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">{{ $t('monitor.avgLoad') }}</span>
                             <el-date-picker
                                 @change="search('load')"
@@ -35,7 +35,7 @@
                                 :end-placeholder="$t('commons.search.timeEnd')"
                                 :shortcuts="shortcuts"
                                 style="max-width: 360px; width: 100%"
-                                :size="mobile ? 'small' : 'default'"
+                                :size="isMobile ? 'small' : 'default'"
                             ></el-date-picker>
                         </div>
                     </template>
@@ -56,7 +56,7 @@
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">CPU</span>
                             <el-date-picker
                                 @change="search('cpu')"
@@ -67,7 +67,7 @@
                                 :end-placeholder="$t('commons.search.timeEnd')"
                                 :shortcuts="shortcuts"
                                 style="max-width: 360px; width: 100%"
-                                :size="mobile ? 'small' : 'default'"
+                                :size="isMobile ? 'small' : 'default'"
                             ></el-date-picker>
                         </div>
                     </template>
@@ -86,7 +86,7 @@
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
                             <span class="title">{{ $t('monitor.memory') }}</span>
                             <el-date-picker
                                 @change="search('memory')"
@@ -97,7 +97,7 @@
                                 :end-placeholder="$t('commons.search.timeEnd')"
                                 :shortcuts="shortcuts"
                                 style="max-width: 360px; width: 100%"
-                                :size="mobile ? 'small' : 'default'"
+                                :size="isMobile ? 'small' : 'default'"
                             ></el-date-picker>
                         </div>
                     </template>
@@ -118,7 +118,7 @@
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
                             <div>
                                 <span class="title">{{ $t('monitor.disk') }} I/O{{ $t('commons.colon') }}</span>
                                 <el-dropdown max-height="300px">
@@ -148,7 +148,7 @@
                                 :end-placeholder="$t('commons.search.timeEnd')"
                                 :shortcuts="shortcuts"
                                 style="max-width: 360px; width: 100%"
-                                :size="mobile ? 'small' : 'default'"
+                                :size="isMobile ? 'small' : 'default'"
                             ></el-date-picker>
                         </div>
                     </template>
@@ -167,7 +167,7 @@
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <div :class="mobile ? 'flx-wrap' : 'flex justify-between'">
+                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
                             <div>
                                 <span class="title">{{ $t('monitor.network') }}{{ $t('commons.colon') }}</span>
                                 <el-dropdown max-height="300px">
@@ -197,7 +197,7 @@
                                 :end-placeholder="$t('commons.search.timeEnd')"
                                 :shortcuts="shortcuts"
                                 style="max-width: 360px; width: 100%"
-                                :size="mobile ? 'small' : 'default'"
+                                :size="isMobile ? 'small' : 'default'"
                             ></el-date-picker>
                         </div>
                     </template>
@@ -218,7 +218,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { loadMonitor, getNetworkOptions, getIOOptions } from '@/api/modules/host';
 import { computeSize, computeSizeFromKBs } from '@/utils/size';
 import { dateFormatWithoutYear } from '@/utils/date';
@@ -227,12 +227,11 @@ import MonitorRouter from '@/views/host/monitor/index.vue';
 import { GlobalStore } from '@/store';
 import { shortcuts } from '@/utils/shortcuts';
 import { Host } from '@/api/interface/host';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 
 const globalStore = GlobalStore();
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const monitorBase = ref();
 const timeRangeGlobal = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
@@ -447,7 +446,7 @@ function initLoadCharts(item: Host.MonitorData) {
                 alignTicks: true,
             },
         ],
-        grid: mobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
+        grid: isMobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
         tooltip: {
             trigger: 'axis',
             formatter: function (datas: any) {

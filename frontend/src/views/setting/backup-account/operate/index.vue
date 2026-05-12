@@ -8,7 +8,7 @@
                 <el-input v-else v-model="dialogData.rowData!.name" />
             </el-form-item>
             <el-form-item
-                v-if="globalStore.isXpackNodeOrEE()"
+                v-if="isProductPro"
                 :label="$t('setting.scope')"
                 prop="isPublic"
                 :rules="Rules.requiredSelect"
@@ -426,6 +426,9 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { Base64 } from 'js-base64';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isProductPro } = useGlobalStore();
 
 const loading = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
