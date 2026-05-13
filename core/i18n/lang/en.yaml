@@ -101,6 +101,7 @@ ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
 ErrRolePresetCannotUpdate: "System preset roles cannot be updated"
 ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
 ErrRolePresetCannotBind: "System preset roles cannot be assigned to users"
+ErrNodeAdminMasterForbidden: "Node Admin permissions cannot be added to the master node"
 ErrSuperAdminCannotDelete: "Super admin users cannot be deleted"
 
 InvalidRequestBodyType: "Invalid request body format. Ensure content matches the required format and retry."  

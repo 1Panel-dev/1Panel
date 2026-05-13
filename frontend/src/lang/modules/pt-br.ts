@@ -4056,10 +4056,12 @@ const message = {
             nodeAdminDesc:
                 'Possui permissões de gerenciamento para nós especificados e pode gerenciar recursos e configurações dentro desses nós.',
             bindNode: 'Vincular Nó',
+            boundUsers: 'Usuários vinculados',
             role: 'Função',
             roleName: 'Nome',
             permission: 'Permissões',
             permissionDuplicate: 'Apenas uma função pode ser atribuída a cada nó',
+            nodeAdminMasterForbidden: 'Permissões de administrador de nó não podem ser adicionadas ao nó principal',
             view: 'Visualizar',
             manage: 'Gerenciar',
             dashboard_view: 'Visualização do Painel',

@@ -94,6 +94,7 @@ ErrRolePresetCannotDelete: "Sistem ön tanımlı rolleri silinemez"
 ErrRolePresetCannotUpdate: "Sistem ön tanımlı rolleri güncellenemez"
 ErrRoleBoundToUser: "Bu rol zaten kullanıcılara bağlı ve silinemez"
 ErrRolePresetCannotBind: "Sistem ön tanımlı rolleri kullanıcılara atanamaz"
+ErrNodeAdminMasterForbidden: "Ana düğüme düğüm yöneticisi izni eklenemez"
 ErrSuperAdminCannotDelete: "Süper yönetici kullanıcılar silinemez"
 
 InvalidRequestBodyType: "Geçersiz istek gövdesi formatı, lütfen içeriğin format gereksinimlerine uygun olduğunu kontrol edip tekrar deneyin"
