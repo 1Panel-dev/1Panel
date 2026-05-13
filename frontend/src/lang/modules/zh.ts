@@ -916,6 +916,7 @@ const message = {
             failedRequests: '失败请求',
             averageTokenPerRequest: '平均 Token/请求',
             callLogs: '调用日志',
+            usageKeywordPlaceholder: '搜索 Request ID / 模型 / 上游模型 / 错误信息',
             attemptChain: '调用链路',
             attemptIndex: '调用顺序',
             noAttemptDetails: '本次请求一次命中，无 fallback 明细',

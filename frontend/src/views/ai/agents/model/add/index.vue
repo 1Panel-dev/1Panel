@@ -11,7 +11,12 @@
                         :key="item.value"
                         :label="item.label"
                         :value="item.value"
-                    />
+                    >
+                        <div class="provider-option">
+                            <ProviderLogo :provider="item.value" :display-name="item.label" />
+                            <span>{{ item.label }}</span>
+                        </div>
+                    </el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="API Key" prop="apiKey">
@@ -88,6 +93,7 @@ import i18n from '@/lang';
 import { getAgentProviderDisplayName } from '@/utils/agent';
 import { MsgError } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import ProviderLogo from '@/components/agent-provider-logo/index.vue';
 
 const emit = defineEmits(['search']);
 
@@ -355,3 +361,19 @@ defineExpose({
     open: openDrawer,
 });
 </script>
+
+<style scoped lang="scss">
+.provider-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    white-space: nowrap;
+
+    span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+</style>

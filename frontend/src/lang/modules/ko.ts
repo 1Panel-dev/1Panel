@@ -962,6 +962,7 @@ const message = {
             failedRequests: '실패한 요청',
             averageTokenPerRequest: '평균 Token/요청',
             callLogs: '호출 로그',
+            usageKeywordPlaceholder: 'Request ID / 모델 / 업스트림 모델 / 오류 메시지 검색',
             attemptChain: '시도 체인',
             attemptIndex: '호출 순서',
             noAttemptDetails: '이 요청은 한 번에 적중했으며 fallback 상세가 없습니다',
