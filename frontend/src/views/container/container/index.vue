@@ -859,7 +859,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('home.dir'),
-        permission: 'host_file_view',
+        permission: true,
         disabled: (row: Container.ContainerInfo) => {
             return row.state !== 'running';
         },
