@@ -1,6 +1,6 @@
 import router from '@/routers/router';
 import NProgress from '@/config/nprogress';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { AxiosCanceler } from '@/api/helper/axios-cancel';
 import { hasRouteAccess } from '@/utils/rbac';
 import { loadProductProFromDB } from '@/utils/xpack';
@@ -13,26 +13,27 @@ let isRedirecting = false;
 const enterpriseLicenseCheckWhiteList = ['EnterpriseLicenseRequired', 'entrance', 'login', 'Expired'];
 
 const clearLicenseStatus = () => {
-    const globalStore = GlobalStore();
-    globalStore.isEnterpriseLicensed = false;
-    globalStore.isEnterpriseLicenseLoaded = false;
+    const { isEnterpriseLicenseLoaded, isEnterpriseLicensed } = useGlobalStore();
+    isEnterpriseLicensed.value = false;
+    isEnterpriseLicenseLoaded.value = false;
 };
 
 const clearLoginStatus = () => {
-    const globalStore = GlobalStore();
+    const { globalStore } = useGlobalStore();
     globalStore.setLogStatus(false);
     globalStore.clearAuthInfo();
     clearLicenseStatus();
 };
 
 router.beforeEach(async (to, from, next) => {
+    const { entrance, isEnterprise, isEnterpriseLicenseLoaded, isEnterpriseLicensed, isLogin } = useGlobalStore();
     NProgress.start();
     axiosCanceler.removeAllPending();
-    const globalStore = GlobalStore();
-    if (!globalStore.isLogin) {
+
+    if (!isLogin.value) {
         clearLoginStatus();
     }
-    if (to.name !== 'entrance' && !globalStore.isLogin) {
+    if (to.name !== 'entrance' && !isLogin.value) {
         next({
             name: 'entrance',
             params: to.params,
@@ -40,8 +41,8 @@ router.beforeEach(async (to, from, next) => {
         NProgress.done();
         return;
     }
-    if (to.name === 'entrance' && globalStore.isLogin) {
-        if (to.params.code === globalStore.entrance) {
+    if (to.name === 'entrance' && isLogin.value) {
+        if (to.params.code === entrance.value) {
             next({
                 name: 'home',
             });
@@ -52,18 +53,18 @@ router.beforeEach(async (to, from, next) => {
         NProgress.done();
         return;
     }
-    if (globalStore.isLogin && globalStore.isEnterprise && !enterpriseLicenseCheckWhiteList.includes(String(to.name))) {
-        if (!globalStore.isEnterpriseLicenseLoaded) {
+    if (isLogin.value && isEnterprise.value && !enterpriseLicenseCheckWhiteList.includes(String(to.name))) {
+        if (!isEnterpriseLicenseLoaded.value) {
             await loadProductProFromDB();
         }
-        if (!globalStore.isEnterpriseLicensed) {
+        if (!isEnterpriseLicensed.value) {
             next({ name: 'EnterpriseLicenseRequired', query: { code: String(to.params.code || '') } });
             NProgress.done();
             return;
         }
     }
     if (to.name === 'EnterpriseLicenseRequired') {
-        if (!globalStore.isLogin) {
+        if (!isLogin.value) {
             next({
                 name: 'entrance',
                 params: to.params,
@@ -71,7 +72,7 @@ router.beforeEach(async (to, from, next) => {
             NProgress.done();
             return;
         }
-        if (!globalStore.isEnterprise || globalStore.isEnterpriseLicensed) {
+        if (!isEnterprise.value || isEnterpriseLicensed.value) {
             next({ name: 'home' });
             NProgress.done();
             return;

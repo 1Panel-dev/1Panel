@@ -9,23 +9,35 @@
                         <el-tag>{{ $t('app.version') }}: {{ $t('commons.colon') }}{{ data.version }}</el-tag>
                     </div>
                     <div class="mt-0.5" v-if="!data.init">
-                        <el-button type="primary" v-if="data.status != 'running'" link @click="onOperate('start')">
+                        <el-button
+                            v-permission
+                            type="primary"
+                            v-if="data.status != 'running'"
+                            link
+                            @click="onOperate('start')"
+                        >
                             {{ $t('commons.operate.start') }}
                         </el-button>
-                        <el-button type="primary" v-if="data.status == 'running'" link @click="onOperate('stop')">
+                        <el-button
+                            v-permission
+                            type="primary"
+                            v-if="data.status == 'running'"
+                            link
+                            @click="onOperate('stop')"
+                        >
                             {{ $t('commons.operate.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link @click="onOperate('restart')">
+                        <el-button v-permission type="primary" link @click="onOperate('restart')">
                             {{ $t('commons.button.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link @click="setting">
+                        <el-button v-permission type="primary" link @click="setting">
                             {{ $t('commons.button.set') }}
                         </el-button>
                     </div>
                     <div class="mt-0.5" v-else>
-                        <el-button type="primary" link @click="init">
+                        <el-button v-permission type="primary" link @click="init">
                             {{ $t('commons.button.init') }}
                         </el-button>
                     </div>
@@ -51,11 +63,7 @@
 
                         <template v-else-if="data.init">
                             <span>{{ $t('tool.supervisor.initHelper') }}</span>
-                            <span
-                                v-if="!globalStore.isFxplay"
-                                class="flex items-center justify-center gap-0.5"
-                                @click="toDoc()"
-                            >
+                            <span v-if="!isFxplay" class="flex items-center justify-center gap-0.5" @click="toDoc()">
                                 <el-icon><Position /></el-icon>
                                 {{ $t('commons.button.helpDoc') }}
                             </span>
@@ -87,10 +95,10 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { HostTool } from '@/api/interface/host-tool';
 import InitPage from './init/index.vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { routerToNameWithQuery } from '@/utils/router';
 
-const globalStore = GlobalStore();
+const { docsUrl, isFxplay } = useGlobalStore();
 
 let operateReq = reactive({
     installId: 0,
@@ -119,7 +127,7 @@ const toLibrary = () => {
 };
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
 };
 
 const init = async () => {

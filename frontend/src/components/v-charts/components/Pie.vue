@@ -4,8 +4,8 @@
 <script lang="ts" setup>
 import { onMounted, nextTick, watch, onBeforeUnmount, ref } from 'vue';
 import echarts from '@/utils/echarts';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { themeConfig } = useGlobalStore();
 const isDarkTheme = ref(false);
 let mediaQuery: MediaQueryList;
 
@@ -45,10 +45,10 @@ function getThemeColors() {
 }
 
 function initChart() {
-    if (globalStore.themeConfig.theme === 'auto') {
+    if (themeConfig.value.theme === 'auto') {
         isDarkTheme.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
     } else {
-        isDarkTheme.value = globalStore.themeConfig.theme === 'dark';
+        isDarkTheme.value = themeConfig.value.theme === 'dark';
     }
     let myChart = echarts?.getInstanceByDom(document.getElementById(props.id) as HTMLElement);
     if (myChart === null || myChart === undefined) {

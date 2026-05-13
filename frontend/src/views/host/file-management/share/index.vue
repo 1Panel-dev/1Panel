@@ -63,13 +63,13 @@
                 <el-button :disabled="loading" @click="handleClose">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button v-if="shareInfo" :disabled="loading" @click="cancelShare">
+                <el-button v-permission v-if="shareInfo" :disabled="loading" @click="cancelShare">
                     {{ $t('file.shareClose') }}
                 </el-button>
                 <el-button v-if="shareInfo" :disabled="loading" @click="copyLink">
                     {{ $t('file.shareCopyLink') }}
                 </el-button>
-                <el-button type="primary" :disabled="loading" @click="generate">
+                <el-button v-permission type="primary" :disabled="loading" @click="generate">
                     {{ shareInfo ? $t('file.shareRegenerate') : $t('file.shareGenerate') }}
                 </el-button>
             </span>
@@ -99,7 +99,7 @@ import { createFileShare, getFileShareDetail, removeFileShare } from '@/api/modu
 import { File } from '@/api/interface/file';
 import { CopyDocument, Download, Picture } from '@element-plus/icons-vue';
 import i18n from '@/lang';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { buildFileSharePageUrl, buildFileShareQrCodeUrl } from '@/utils/file';
 import { copyText } from '@/utils/clipboard';
 import { dateFormat as formatDateTime } from '@/utils/date';
@@ -110,7 +110,7 @@ interface ShareProps {
     path: string;
 }
 
-const globalStore = GlobalStore();
+const { currentNode } = useGlobalStore();
 const open = ref(false);
 const loading = ref(false);
 const changed = ref(false);
@@ -194,8 +194,8 @@ const applyShareInfo = (info: File.FileShareInfo | null) => {
         syncingPassword.value = false;
         return;
     }
-    shareUrl.value = buildFileSharePageUrl(info.code, globalStore.currentNode);
-    qrCodeUrl.value = buildFileShareQrCodeUrl(info.code, globalStore.currentNode);
+    shareUrl.value = buildFileSharePageUrl(info.code, currentNode.value);
+    qrCodeUrl.value = buildFileShareQrCodeUrl(info.code, currentNode.value);
     expiresAtText.value = info.permanent
         ? i18n.global.t('website.ever')
         : formatDateTime(null, null, info.expiresAt * 1000);

@@ -42,6 +42,11 @@ const emit = defineEmits(['update:modelValue', 'input', 'blur', 'enter']);
 
 const inputRef = ref();
 const isWrite = ref(false);
+const permissionDisabled = ref(false);
+
+const effectiveWriteTrigger = computed(() => {
+    return permissionDisabled.value ? 'disabled' : props.writeTrigger;
+});
 
 const displayValue = computed(() => {
     return props.modelValue === '' || props.modelValue === undefined || props.modelValue === null
@@ -61,13 +66,13 @@ const closeWrite = () => {
 };
 
 const handleReadClick = () => {
-    if (props.writeTrigger === 'onClick') {
+    if (effectiveWriteTrigger.value === 'onClick') {
         openWrite();
     }
 };
 
 const handleReadDblClick = () => {
-    if (props.writeTrigger === 'onDblclick') {
+    if (effectiveWriteTrigger.value === 'onDblclick') {
         openWrite();
     }
 };
@@ -89,4 +94,15 @@ const handleEnter = (event: KeyboardEvent) => {
     emit('enter', event);
     closeWrite();
 };
+
+defineExpose({
+    setPermissionDisabled: (disabled: boolean) => {
+        permissionDisabled.value = disabled;
+        if (disabled) {
+            isWrite.value = false;
+        }
+    },
+    write: openWrite,
+    read: closeWrite,
+});
 </script>

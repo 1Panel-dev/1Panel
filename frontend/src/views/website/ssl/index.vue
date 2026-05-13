@@ -3,22 +3,22 @@
         <RouterButton :buttons="routerButton" />
         <LayoutContent :title="$t('website.ssl', 2)">
             <template #leftToolBar>
-                <el-button type="primary" @click="openSSL()">
+                <el-button v-permission type="primary" @click="openSSL()">
                     {{ $t('ssl.create') }}
                 </el-button>
-                <el-button type="primary" @click="openUpload()">
+                <el-button v-permission type="primary" @click="openUpload()">
                     {{ $t('ssl.upload') }}
                 </el-button>
-                <el-button type="primary" plain @click="openCA()">
+                <el-button v-permission type="primary" plain @click="openCA()">
                     {{ $t('ssl.selfSigned') }}
                 </el-button>
-                <el-button type="primary" plain @click="openAcmeAccount()">
+                <el-button v-permission type="primary" plain @click="openAcmeAccount()">
                     {{ $t('website.acmeAccountManage') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDnsAccount()">
+                <el-button v-permission type="primary" plain @click="openDnsAccount()">
                     {{ $t('website.dnsAccountManage') }}
                 </el-button>
-                <el-button plain @click="deletessl(null)" :disabled="selects.length === 0">
+                <el-button v-permission plain @click="deletessl(null)" :disabled="selects.length === 0">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -117,7 +117,7 @@
                     ></el-table-column>
                     <el-table-column :label="$t('website.remark')" prop="description" width="100px">
                         <template #default="{ row }">
-                            <fu-read-write-switch>
+                            <fu-read-write-switch v-permission>
                                 <template #read>
                                     <MsgInfo :info="row.description" width="200" />
                                 </template>
@@ -130,6 +130,7 @@
                     <el-table-column :label="$t('ssl.autoRenew')" prop="autoRenew" width="200px">
                         <template #default="{ row }">
                             <el-switch
+                                v-permission
                                 :disabled="
                                     row.provider === 'dnsManual' ||
                                     row.provider === 'manual' ||
@@ -238,6 +239,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('ssl.apply'),
+        permission: true,
         disabled: function (row: Website.SSLDTO) {
             return row.status === 'applying' || row.provider === 'manual' || row.provider === 'fromMaster';
         },
@@ -254,6 +256,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.update'),
+        permission: true,
         click: function (row: Website.SSLDTO) {
             sslUploadRef.value.acceptParams(row);
         },
@@ -263,6 +266,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         disabled: function (row: Website.SSLDTO) {
             return row.provider === 'fromMaster';
         },
@@ -281,6 +285,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.SSLDTO) {
             deletessl(row);
         },

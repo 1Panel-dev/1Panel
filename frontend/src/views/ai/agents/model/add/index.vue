@@ -70,7 +70,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="open = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading" type="primary" @click="submit">
+                <el-button v-permission :disabled="loading" type="primary" @click="submit">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

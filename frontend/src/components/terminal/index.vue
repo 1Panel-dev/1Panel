@@ -22,10 +22,11 @@ import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
 import { decodeBase64, encodeBase64 } from '@/utils/base64';
-import { GlobalStore, TerminalStore } from '@/store';
+import { TerminalStore } from '@/store';
 import { MsgError } from '@/utils/message';
 import { checkStreamAuth } from '@/utils/stream-auth';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { currentNode } = useGlobalStore();
 
 const terminalElement = ref<HTMLDivElement | null>(null);
 const fitAddon = new FitAddon();
@@ -252,7 +253,7 @@ const initWebSocket = async (endpoint_: string, args: string = '') => {
     const protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     const host = href.split('//')[1].split('/')[0];
     const endpoint = endpoint_.replace(/^\/+/, '');
-    let node = args.indexOf('id=') !== -1 ? 'local' : globalStore.currentNode;
+    let node = args.indexOf('id=') !== -1 ? 'local' : currentNode.value;
     let conn = `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}&operateNode=${node}`;
     if (args.indexOf('operateNode=') !== -1) {
         conn = `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}`;

@@ -9,6 +9,7 @@ const cronRouter = {
     meta: {
         icon: 'p-plan',
         title: 'menu.cronjob',
+        permission: 'cronjob_view',
     },
     children: [
         {

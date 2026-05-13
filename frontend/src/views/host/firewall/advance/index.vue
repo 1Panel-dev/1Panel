@@ -36,16 +36,16 @@
                         <el-alert type="info" :closable="false" :title="loadPrompt()" />
                     </template>
                     <template #leftToolBar>
-                        <el-button type="primary" @click="onOpenDialog('create')">
+                        <el-button v-permission type="primary" @click="onOpenDialog('create')">
                             {{ $t('firewall.create') }}
                         </el-button>
-                        <el-button v-if="isBind" plain @click="onUnBind">
+                        <el-button v-if="isBind" v-permission plain @click="onUnBind">
                             {{ $t('commons.button.unbind') }}
                         </el-button>
-                        <el-button v-if="!isBind" plain @click="onBind">
+                        <el-button v-if="!isBind" v-permission plain @click="onBind">
                             {{ $t('commons.button.bind') }}
                         </el-button>
-                        <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
+                        <el-button v-permission @click="onDelete(null)" plain :disabled="selects.length === 0">
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </template>
@@ -117,6 +117,7 @@
                                 <template #default="{ row }">
                                     <fu-input-rw-switch
                                         v-model="row.description"
+                                        v-permission
                                         @enter="onChange(row)"
                                         @blur="onChange(row)"
                                     />
@@ -337,6 +338,7 @@ const onChange = async (row: any) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: Host.IptablesRules) => {
             onDelete(row);
         },

@@ -66,7 +66,7 @@
                     </el-select>
                     <span class="input-help">
                         {{ $t('aiTools.agents.noAccountHint') }}
-                        <el-button type="primary" link class="inline-link" @click="openAccountCreate">
+                        <el-button v-permission type="primary" link class="inline-link" @click="openAccountCreate">
                             {{ $t('commons.button.create') }}
                         </el-button>
                     </span>
@@ -95,7 +95,9 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="open = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit">{{ $t('commons.button.confirm') }}</el-button>
+                <el-button v-permission type="primary" @click="submit">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
             </span>
         </template>
     </DrawerPro>

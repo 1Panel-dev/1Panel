@@ -13,7 +13,7 @@
             <el-input v-model="form.userTimezone" />
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="saving" @click="saveConfig">
+            <el-button v-permission type="primary" :loading="saving" @click="saveConfig">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>

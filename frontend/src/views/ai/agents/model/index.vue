@@ -2,7 +2,9 @@
     <div>
         <LayoutContent>
             <template #leftToolBar>
-                <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                <el-button v-permission type="primary" @click="openCreate">
+                    {{ $t('commons.button.create') }}
+                </el-button>
             </template>
             <template #rightToolBar>
                 <TableSearch v-model:searchName="searchName" @search="search" />
@@ -68,6 +70,7 @@ const searchName = ref('');
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: (row: AI.AgentAccountItem) => onEdit(row),
     },
     {
@@ -76,6 +79,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: AI.AgentAccountItem) => onDelete(row),
     },
 ];

@@ -61,6 +61,7 @@
                                 <div class="skill-head">
                                     <div class="skill-name">{{ skill.name }}</div>
                                     <el-switch
+                                        v-permission
                                         :model-value="!skill.disabled"
                                         :loading="updatingSkill === skill.name"
                                         @change="(value) => toggleSkill(skill, Boolean(value))"
@@ -99,6 +100,7 @@
                                 <div class="skill-slug">{{ skill.slug }}</div>
                             </div>
                             <el-button
+                                v-permission
                                 type="primary"
                                 link
                                 :loading="installingSkill === skill.slug"
@@ -430,6 +432,7 @@ defineExpose({
     display: -webkit-box;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     color: var(--el-text-color-secondary);

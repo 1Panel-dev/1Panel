@@ -3,7 +3,7 @@
         <template #content>
             <ComplexTable :data="data" v-loading="loading" v-model:selects="selects">
                 <template #toolbar>
-                    <el-button type="primary" @click="openCreate">
+                    <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
                     <el-button
@@ -127,7 +127,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-
 import Create from './create/index.vue';
 import File from './file/index.vue';
 import { GetSupervisorProcess, operateSupervisorProcess } from '@/api/modules/runtime';

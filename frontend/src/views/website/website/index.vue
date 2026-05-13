@@ -20,16 +20,16 @@
                 ></AppStatus>
             </template>
             <template v-if="!openNginxConfig && nginxIsExist" #leftToolBar>
-                <el-button type="primary" @click="openCreate" :disabled="disabledConfig">
+                <el-button v-permission type="primary" @click="openCreate" :disabled="disabledConfig">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="openGroup" :disabled="disabledConfig">
+                <el-button v-permission type="primary" plain @click="openGroup" :disabled="disabledConfig">
                     {{ $t('commons.table.group') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDefault" :disabled="disabledConfig">
+                <el-button v-permission type="primary" plain @click="openDefault" :disabled="disabledConfig">
                     {{ $t('website.defaultServer') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDefaultHtml" :disabled="disabledConfig">
+                <el-button v-permission type="primary" plain @click="openDefaultHtml" :disabled="disabledConfig">
                     {{ $t('website.defaultHtml') }}
                 </el-button>
             </template>
@@ -121,7 +121,12 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.sitePath')" prop="sitePath" width="90px">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="routerToFileWithPath(row.sitePath + '/index')">
+                            <el-button
+                                v-permission:view="'host_file_view'"
+                                type="primary"
+                                link
+                                @click="routerToFileWithPath(row.sitePath + '/index')"
+                            >
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>
@@ -144,6 +149,7 @@
                             <span v-else>
                                 <Status
                                     v-if="row.status === 'Running'"
+                                    v-permission
                                     :operate="true"
                                     :status="row.status"
                                     @click="operateWebsite('stop', row)"
@@ -151,6 +157,7 @@
                                 <Status
                                     v-else
                                     :status="row.status"
+                                    v-permission
                                     :operate="true"
                                     @click="operateWebsite('start', row)"
                                 />
@@ -208,7 +215,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.remark')" prop="remark" min-width="150px">
                         <template #default="{ row }">
-                            <fu-read-write-switch>
+                            <fu-read-write-switch v-permission>
                                 <template #read>
                                     <MsgInfo :info="row.remark" :width="'150'" />
                                 </template>
@@ -253,6 +260,7 @@
                             <el-button
                                 class="ml-2"
                                 type="primary"
+                                v-permission
                                 :disabled="selects.length == 0 || batchReq.operate == ''"
                                 @click="batchOp"
                             >

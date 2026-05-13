@@ -5,7 +5,7 @@
                 <LogRouter current="LoginLog" />
             </template>
             <template #leftToolBar>
-                <el-button type="primary" plain @click="onClean()">
+                <el-button v-permission type="primary" plain @click="onClean()">
                     {{ $t('logs.deleteLogs') }}
                 </el-button>
             </template>

@@ -4,7 +4,7 @@
             <span>{{ $t('tool.supervisor.notStartWarn') }}</span>
         </el-card>
         <LayoutContent :title="$t(' tool.supervisor.list', 2)" v-loading="loading">
-            <template #prompt v-if="!globalStore.isFxplay">
+            <template #prompt v-if="!isFxplay">
                 <el-alert type="info" :closable="false">
                     <template #title>
                         {{ $t('toolbox.common.toolboxHelper') }}
@@ -23,7 +23,7 @@
                 />
             </template>
             <template v-if="showTable" #leftToolBar>
-                <el-button type="primary" @click="openCreate" :disabled="showStopped">
+                <el-button v-permission type="primary" @click="openCreate" :disabled="showStopped">
                     {{ $t('commons.button.create') }}
                 </el-button>
             </template>
@@ -74,16 +74,18 @@
                         <template #default="{ row }">
                             <div v-if="row.status && row.status.length > 0 && row.hasLoad">
                                 <Status
+                                    v-permission
                                     v-if="checkStatus(row.status) === 'RUNNING'"
                                     status="running"
                                     @click="operate('stop', row.name)"
                                 />
                                 <Status
+                                    v-permission
                                     v-else-if="checkStatus(row.status) === 'WARNING'"
                                     status="unhealthy"
                                     @click="operate('restart', row.name)"
                                 />
-                                <Status v-else status="stopped" @click="operate('start', row.name)" />
+                                <Status v-else v-permission status="stopped" @click="operate('start', row.name)" />
                             </div>
                             <div v-if="!row.hasLoad">
                                 <el-button link loading></el-button>
@@ -173,15 +175,13 @@ import Create from './create/index.vue';
 import File from './file/index.vue';
 import ProcessDetail from '@/views/host/process/process/detail/index.vue';
 import { getSupervisorProcess, operateSupervisorProcess } from '@/api/modules/host-tool';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
 import { routerToFileWithPath } from '@/utils/router';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
-const globalStore = GlobalStore();
+const { docsUrl, isFxplay, isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const setSuperVisor = ref(false);
@@ -341,12 +341,14 @@ const edit = (row: HostTool.SupervisorProcess) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             edit(row);
         },
     },
     {
         label: i18n.global.t('website.sourceFile'),
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             getFile(row.name, 'config');
         },
@@ -359,12 +361,14 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             operate('restart', row.name);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             operate('delete', row.name);
         },
@@ -372,7 +376,7 @@ const buttons = [
 ];
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
 };
 
 onMounted(() => {

@@ -22,9 +22,9 @@
 <script lang="ts" setup>
 import { ref, nextTick } from 'vue';
 import Terminal from '@/components/terminal/index.vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { currentNode } = useGlobalStore();
 const terminalVisible = ref(false);
 const terminalRef = ref<InstanceType<typeof Terminal> | null>(null);
 const scriptID = ref();
@@ -45,7 +45,7 @@ const initTerm = async () => {
     await nextTick();
     terminalRef.value!.acceptParams({
         endpoint: '/api/v2/core/script/run',
-        args: `script_id=${scriptID.value}&current_node=${globalStore.currentNode}`,
+        args: `script_id=${scriptID.value}&current_node=${currentNode.value}`,
         error: '',
         initCmd: '',
     });

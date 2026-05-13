@@ -22,7 +22,7 @@
             <el-form-item :label="$t('tool.supervisor.dir')" prop="dir">
                 <el-input v-model.trim="process.dir">
                     <template #prepend>
-                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
+                        <el-button v-permission icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
                     </template>
                 </el-input>
             </el-form-item>
@@ -47,7 +47,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(processForm)" :disabled="loading">
+                <el-button v-permission type="primary" @click="submit(processForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

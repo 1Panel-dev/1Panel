@@ -319,6 +319,7 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'rebuild');
         },
+        permission: true,
         disabled: (row: any) => {
             return (
                 row.status === 'DownloadErr' ||
@@ -333,6 +334,7 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'restart');
         },
+        permission: true,
         disabled: (row: any) => {
             return (
                 row.status === 'DownloadErr' ||
@@ -347,6 +349,7 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'start');
         },
+        permission: true,
         disabled: (row: any) => {
             return (
                 row.status === 'Running' ||
@@ -363,6 +366,7 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'stop');
         },
+        permission: true,
         disabled: (row: any) => {
             return (
                 row.status !== 'Running' ||
@@ -378,6 +382,7 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'delete');
         },
+        permission: true,
     },
     {
         label: i18n.global.t('app.params'),

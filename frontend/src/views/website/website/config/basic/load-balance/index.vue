@@ -2,7 +2,7 @@
     <div>
         <ComplexTable :data="data" @search="search" v-loading="loading" :heightDiff="420">
             <template #toolbar>
-                <el-button type="primary" plain @click="create()">
+                <el-button v-permission type="primary" plain @click="create()">
                     {{ $t('commons.button.create') }}
                 </el-button>
                 <el-alert :closable="false" class="!mt-2">
@@ -101,6 +101,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: (row: any) => {
             update(row);
         },

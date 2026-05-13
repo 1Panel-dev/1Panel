@@ -78,6 +78,9 @@ const GlobalStore = defineStore({
         isDarkGoldTheme: (state) => state.themeConfig.primary === '#F0BE96' && state.isProductPro,
         isNodeAdmin: (state) =>
             state.nodeRoles.some((item) => item.nodeName === state.currentNode && item.roleName === 'Node Admin'),
+        isAdminOrNodeAdmin: (state) =>
+            state.isAdmin ||
+            state.nodeRoles.some((item) => item.nodeName === state.currentNode && item.roleName === 'Node Admin'),
         docsUrl: (state) => {
             if (state.docWithRegion) {
                 return state.isIntl ? INTL_DOCS_URL : CN_DOCS_URL;
@@ -88,6 +91,12 @@ const GlobalStore = defineStore({
         },
         isMaster: (state) => state.currentNode === 'local',
         isMobile: (state) => state.device === DeviceType.Mobile,
+
+        isXpackOrEE: (state) => {
+            return (state.isEnterprise && state.isEnterpriseLicensed) || state.isMasterProductPro;
+        },
+        isEE: (state) => state.isEnterprise && state.isEnterpriseLicensed,
+        isMasterPro: (state) => state.isMasterProductPro,
     },
     actions: {
         setScreenFull() {
@@ -143,15 +152,6 @@ const GlobalStore = defineStore({
         },
         getMasterAlias() {
             return this.masterAlias || i18n.global.t('xpack.node.master');
-        },
-        isEE() {
-            return this.isEnterprise && this.isEnterpriseLicensed;
-        },
-        isXpackOrEE() {
-            return (this.isEnterprise && this.isEnterpriseLicensed) || this.isMasterProductPro;
-        },
-        isMasterPro() {
-            return this.isMasterProductPro;
         },
     },
     persist: piniaPersistConfig('GlobalState'),

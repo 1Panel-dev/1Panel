@@ -6,7 +6,9 @@
             </div>
             <ComplexTable :data="data" :pagination-config="paginationConfig" v-loading="loading">
                 <template #toolbar>
-                    <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                    <el-button v-permission type="primary" @click="openCreate">
+                        {{ $t('commons.button.create') }}
+                    </el-button>
                 </template>
                 <el-table-column
                     :label="$t('website.email')"

@@ -31,7 +31,7 @@
                 <el-button :disabled="loading" @click="onTest()">
                     {{ $t('toolbox.device.dnsCheck') }}
                 </el-button>
-                <el-button :disabled="loading" type="primary" @click="onSave()">
+                <el-button v-permission :disabled="loading" type="primary" @click="onSave()">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

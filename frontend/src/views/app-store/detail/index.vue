@@ -33,6 +33,7 @@
                         <el-button
                             round
                             v-if="appDetail.enable && operate === 'install'"
+                            v-permission
                             @click="openInstall"
                             type="primary"
                             class="brief-button"

@@ -146,7 +146,7 @@
                     </span>
                 </el-form-item>
                 <PushToNode
-                    v-if="globalStore.isMaster && globalStore.isXpackOrEE()"
+                    v-if="isMaster && isXpackOrEE"
                     :push-node="ssl.pushNode"
                     :nodes="ssl.pushNodes"
                     type="ssl"
@@ -179,8 +179,8 @@ import { MsgSuccess } from '@/utils/message';
 import { KeyTypes } from '@/global/mimetype';
 import { getDNSName, getAccountName } from '@/utils/ssl';
 import { defineAsyncComponent } from 'vue';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isMaster, isXpackOrEE } = useGlobalStore();
 
 const PushToNode = defineAsyncComponent(async () => {
     const modules = import.meta.glob('@/xpack/views/ssl/index.vue');

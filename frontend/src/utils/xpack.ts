@@ -9,21 +9,18 @@ import {
     searchXpackSetting,
     updateXpackSettingByKey as updateXpackSettingByKeyFromExtension,
 } from '@/extensions/xpack';
-import { GlobalStore } from '@/store';
-const { switchTheme } = useTheme();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import faviconUrl from '@/assets/images/favicon.svg';
 
-const getGlobalStore = () => GlobalStore();
-
 export function resetXSetting() {
-    const globalStore = getGlobalStore();
-    globalStore.themeConfig.title = '';
-    globalStore.themeConfig.logo = '';
-    globalStore.themeConfig.logoWithText = '';
-    globalStore.themeConfig.favicon = '';
-    globalStore.watermark = null;
-    globalStore.watermarkShow = false;
-    globalStore.masterAlias = '';
+    const { masterAlias, themeConfig, watermark, watermarkShow } = useGlobalStore();
+    themeConfig.value.title = '';
+    themeConfig.value.logo = '';
+    themeConfig.value.logoWithText = '';
+    themeConfig.value.favicon = '';
+    watermark.value = null;
+    watermarkShow.value = false;
+    masterAlias.value = '';
 }
 
 async function getColoredFavicon(url: string, color: string) {
@@ -34,11 +31,11 @@ async function getColoredFavicon(url: string, color: string) {
 }
 
 export async function initFavicon() {
-    const globalStore = getGlobalStore();
-    document.title = globalStore.themeConfig.panelName;
-    const favicon = globalStore.themeConfig.favicon;
-    const isPro = globalStore.isXpackOrEE();
-    const themeColor = globalStore.themeConfig.primary;
+    const { isXpackOrEE, themeConfig } = useGlobalStore();
+    document.title = themeConfig.value.panelName;
+    const favicon = themeConfig.value.favicon;
+    const isPro = isXpackOrEE.value;
+    const themeColor = themeConfig.value.primary;
     const customFaviconUrl = `/api/v2/images/favicon?t=${Date.now()}`;
     const fallbackSvg = isPro ? await getColoredFavicon(faviconUrl, themeColor) : '/public/favicon.png';
     const setLink = (href: string) => {
@@ -74,90 +71,91 @@ export async function getXpackSetting() {
 }
 
 const loadDataFromDB = async () => {
-    const globalStore = getGlobalStore();
+    const { entrance, openMenuTabs } = useGlobalStore();
     const res = await getSettingBaseInfo();
     document.title = res.data.panelName;
-    globalStore.entrance = res.data.securityEntrance;
-    globalStore.openMenuTabs = res.data.menuTabs === 'Enable';
+    entrance.value = res.data.securityEntrance;
+    openMenuTabs.value = res.data.menuTabs === 'Enable';
 };
 
 export async function loadProductProFromDB() {
-    const globalStore = getGlobalStore();
-    if (!globalStore.isEnterprise) {
-        globalStore.isEnterpriseLicenseLoaded = true;
+    const { isEnterprise, isEnterpriseLicenseLoaded, isEnterpriseLicensed, isProductPro, productProExpires } =
+        useGlobalStore();
+    if (!isEnterprise.value) {
+        isEnterpriseLicenseLoaded.value = true;
         const res = await getLicenseStatus();
         if (!res || !res.data) {
-            globalStore.isProductPro = false;
+            isProductPro.value = false;
         } else {
-            globalStore.isProductPro = res.data.status === 'Bound';
-            if (globalStore.isProductPro) {
-                globalStore.productProExpires = Number(res.data.productPro);
+            isProductPro.value = res.data.status === 'Bound';
+            if (isProductPro.value) {
+                productProExpires.value = Number(res.data.productPro);
             }
         }
         return;
     }
     const res = await getEnterpriseLicenseStatus();
-    globalStore.isEnterpriseLicenseLoaded = true;
+    isEnterpriseLicenseLoaded.value = true;
     if (!res || !res.data) {
-        globalStore.isEnterpriseLicensed = false;
+        isEnterpriseLicensed.value = false;
     } else {
-        globalStore.isEnterpriseLicensed = res.data.status === 'Bound';
-        globalStore.isProductPro = globalStore.isEnterpriseLicensed;
+        isEnterpriseLicensed.value = res.data.status === 'Bound';
+        isProductPro.value = isEnterpriseLicensed.value;
     }
 }
 
 export async function loadMasterProductProFromDB() {
-    const globalStore = getGlobalStore();
-    if (!globalStore.isEnterprise) {
-        globalStore.isEnterpriseLicenseLoaded = true;
+    const { isEnterprise, isEnterpriseLicenseLoaded, isEnterpriseLicensed, isMasterProductPro } = useGlobalStore();
+    if (!isEnterprise.value) {
+        isEnterpriseLicenseLoaded.value = true;
         const res = await getMasterLicenseStatus();
         if (!res || !res.data) {
-            globalStore.isMasterProductPro = false;
+            isMasterProductPro.value = false;
         } else {
-            globalStore.isMasterProductPro = res.data.status === 'Bound';
+            isMasterProductPro.value = res.data.status === 'Bound';
         }
     } else {
         const res = await getEnterpriseLicenseStatus();
-        globalStore.isEnterpriseLicenseLoaded = true;
+        isEnterpriseLicenseLoaded.value = true;
         if (!res || !res.data) {
-            globalStore.isEnterpriseLicensed = false;
+            isEnterpriseLicensed.value = false;
         } else {
-            globalStore.isEnterpriseLicensed = res.data.status === 'Bound';
-            globalStore.isMasterProductPro = res.data.status === 'Bound';
+            isEnterpriseLicensed.value = res.data.status === 'Bound';
+            isMasterProductPro.value = res.data.status === 'Bound';
         }
     }
-    switchTheme();
+    useTheme().switchTheme();
     initFavicon();
     loadDataFromDB();
 }
 
 export async function getXpackSettingForTheme() {
-    const globalStore = getGlobalStore();
+    const { masterAlias, themeConfig, watermark, watermarkShow } = useGlobalStore();
     const res2 = await searchXpackSetting();
     if (res2) {
-        globalStore.themeConfig.title = res2.data?.title;
-        globalStore.themeConfig.logo = res2.data?.logo;
-        globalStore.themeConfig.logoWithText = res2.data?.logoWithText;
-        globalStore.themeConfig.favicon = res2.data?.favicon;
-        globalStore.themeConfig.loginImage = res2.data?.loginImage;
-        globalStore.themeConfig.loginBgType = res2.data?.loginBgType;
-        globalStore.themeConfig.loginBackground = res2.data?.loginBackground;
-        globalStore.themeConfig.loginBtnLinkColor = res2.data?.loginBtnLinkColor;
-        globalStore.themeConfig.themeColor = res2.data?.themeColor;
-        globalStore.masterAlias = res2.data.masterAlias;
+        themeConfig.value.title = res2.data?.title;
+        themeConfig.value.logo = res2.data?.logo;
+        themeConfig.value.logoWithText = res2.data?.logoWithText;
+        themeConfig.value.favicon = res2.data?.favicon;
+        themeConfig.value.loginImage = res2.data?.loginImage;
+        themeConfig.value.loginBgType = res2.data?.loginBgType;
+        themeConfig.value.loginBackground = res2.data?.loginBackground;
+        themeConfig.value.loginBtnLinkColor = res2.data?.loginBtnLinkColor;
+        themeConfig.value.themeColor = res2.data?.themeColor;
+        masterAlias.value = res2.data.masterAlias;
         if (res2.data?.theme) {
-            globalStore.themeConfig.theme = res2.data.theme;
+            themeConfig.value.theme = res2.data.theme;
         }
-        globalStore.watermarkShow = res2.data.watermarkShow === 'Enable';
+        watermarkShow.value = res2.data.watermarkShow === 'Enable';
         try {
-            globalStore.watermark = JSON.parse(res2.data.watermark);
+            watermark.value = JSON.parse(res2.data.watermark);
         } catch {
-            globalStore.watermark = null;
+            watermark.value = null;
         }
     } else {
         resetXSetting();
     }
-    switchTheme();
+    useTheme().switchTheme();
     initFavicon();
 }
 

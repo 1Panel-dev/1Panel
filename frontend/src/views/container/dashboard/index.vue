@@ -107,6 +107,7 @@
                             <el-button
                                 v-if="countItem.imageReclaimable"
                                 class="-mt-0.5"
+                                v-permission
                                 @click="onClean('image', true)"
                                 link
                                 type="primary"
@@ -124,6 +125,7 @@
                             <el-button
                                 v-if="countItem.containerReclaimable"
                                 class="-mt-0.5"
+                                v-permission
                                 @click="onClean('container', false)"
                                 link
                                 type="primary"
@@ -141,6 +143,7 @@
                             <el-button
                                 v-if="countItem.volumeReclaimable"
                                 class="-mt-0.5"
+                                v-permission
                                 @click="onClean('volume', false)"
                                 link
                                 type="primary"
@@ -158,6 +161,7 @@
                             <el-button
                                 v-if="countItem.buildCacheUsage"
                                 class="-mt-0.5"
+                                v-permission
                                 @click="onClean('buildcache', false)"
                                 link
                                 type="primary"

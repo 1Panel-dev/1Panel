@@ -63,7 +63,7 @@
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button @click="onSaveStart(variableFormRef)" type="primary">
+                        <el-button v-permission @click="onSaveStart(variableFormRef)" type="primary">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-form-item>

@@ -3,7 +3,7 @@
         <LayoutContent>
             <template #leftToolBar>
                 <div class="flex flex-wrap gap-3">
-                    <el-button type="primary" @click="openCreate">
+                    <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
                 </div>
@@ -180,12 +180,14 @@ const deleteLLM = async (row: AI.TensorRTLLM) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: (row: AI.TensorRTLLM) => {
             openEdit(row);
         },
     },
     {
         label: i18n.global.t('commons.button.start'),
+        permission: true,
         disabled: (row: AI.TensorRTLLM) => {
             return row.status === 'Running';
         },
@@ -195,6 +197,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.stop'),
+        permission: true,
         disabled: (row: AI.TensorRTLLM) => {
             return row.status !== 'Running';
         },
@@ -204,12 +207,14 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
+        permission: true,
         click: (row: AI.TensorRTLLM) => {
             operate(row, 'restart');
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: AI.TensorRTLLM) => {
             deleteLLM(row);
         },

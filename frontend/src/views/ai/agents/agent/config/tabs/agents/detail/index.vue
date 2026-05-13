@@ -28,7 +28,7 @@
                 <el-button :loading="loading" :disabled="saving || !agentId || !workspace" @click="reloadFiles">
                     {{ $t('commons.button.refresh') }}
                 </el-button>
-                <el-button type="primary" :loading="saving" :disabled="!currentFile" @click="saveAllFiles">
+                <el-button v-permission type="primary" :loading="saving" :disabled="!currentFile" @click="saveAllFiles">
                     {{ $t('aiTools.agents.saveAllMd') }}
                 </el-button>
             </span>

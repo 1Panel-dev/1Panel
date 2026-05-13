@@ -56,6 +56,7 @@
                                 <div class="skill-head">
                                     <div class="skill-name">{{ skill.name }}</div>
                                     <el-button
+                                        v-permission
                                         v-if="skill.uninstallable"
                                         link
                                         type="danger"
@@ -97,6 +98,7 @@
                                 <div class="skill-slug">{{ skill.identifier || skill.slug }}</div>
                             </div>
                             <el-button
+                                v-permission
                                 type="primary"
                                 link
                                 :loading="installingSkill === (skill.identifier || skill.slug)"
@@ -387,6 +389,7 @@ defineExpose({
     display: -webkit-box;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }

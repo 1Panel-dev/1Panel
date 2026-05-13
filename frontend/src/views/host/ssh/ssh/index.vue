@@ -10,14 +10,14 @@
                         <Status class="mt-0.5" :status="form.isActive ? 'enable' : 'disable'" :msg="form.message" />
                     </div>
                     <div class="mt-0.5">
-                        <el-button v-if="form.isActive" type="primary" @click="onOperate('stop')" link>
+                        <el-button v-if="form.isActive" type="primary" v-permission @click="onOperate('stop')" link>
                             {{ $t('commons.button.stop') }}
                         </el-button>
-                        <el-button v-if="!form.isActive" type="primary" @click="onOperate('start')" link>
+                        <el-button v-if="!form.isActive" type="primary" v-permission @click="onOperate('start')" link>
                             {{ $t('commons.button.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" @click="onOperate('restart')" link>
+                        <el-button v-permission type="primary" @click="onOperate('restart')" link>
                             {{ $t('commons.button.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
@@ -25,6 +25,7 @@
                             {{ $t('ssh.autoStart') }}
                         </el-button>
                         <el-switch
+                            v-permission
                             size="small"
                             class="ml-2"
                             inactive-value="disable"
@@ -44,8 +45,8 @@
                     <el-radio-button value="all">{{ $t('database.allConf') }}</el-radio-button>
                 </el-radio-group>
 
-                <el-button @click="onOpenDrawer">{{ $t('ssh.pubkey') }}</el-button>
-                <el-button @click="onOpenAuthKeys">{{ $t('ssh.authKeys') }}</el-button>
+                <el-button v-permission @click="onOpenDrawer">{{ $t('ssh.pubkey') }}</el-button>
+                <el-button v-permission @click="onOpenAuthKeys">{{ $t('ssh.authKeys') }}</el-button>
             </template>
             <template #main>
                 <el-row class="mt-10" v-if="confShowType === 'base'">
@@ -54,7 +55,7 @@
                             <el-form-item :label="$t('ssh.port')" prop="port">
                                 <el-input disabled v-model="form.port">
                                     <template #append>
-                                        <el-button @click="onChangePort" icon="Setting">
+                                        <el-button v-permission @click="onChangePort" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -64,7 +65,7 @@
                             <el-form-item :label="$t('ssh.listenAddress')" prop="listenAddress">
                                 <el-input disabled v-model="form.listenAddressItem">
                                     <template #append>
-                                        <el-button @click="onChangeAddress" icon="Setting">
+                                        <el-button v-permission @click="onChangeAddress" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -74,7 +75,7 @@
                             <el-form-item :label="$t('ssh.permitRootLogin')" prop="permitRootLoginItem">
                                 <el-input disabled v-model="form.permitRootLoginItem">
                                     <template #append>
-                                        <el-button @click="onChangeRoot" icon="Setting">
+                                        <el-button v-permission @click="onChangeRoot" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -83,6 +84,7 @@
                             </el-form-item>
                             <el-form-item :label="$t('ssh.passwordAuthentication')" prop="passwordAuthentication">
                                 <el-switch
+                                    v-permission
                                     active-value="yes"
                                     inactive-value="no"
                                     @change="onSave(formRef, 'PasswordAuthentication', form.passwordAuthentication)"
@@ -92,6 +94,7 @@
                             </el-form-item>
                             <el-form-item :label="$t('ssh.pubkeyAuthentication')" prop="pubkeyAuthentication">
                                 <el-switch
+                                    v-permission
                                     active-value="yes"
                                     inactive-value="no"
                                     @change="onSave(formRef, 'PubkeyAuthentication', form.pubkeyAuthentication)"
@@ -101,6 +104,7 @@
                             </el-form-item>
                             <el-form-item :label="$t('ssh.useDNS')" prop="useDNS">
                                 <el-switch
+                                    v-permission
                                     active-value="yes"
                                     inactive-value="no"
                                     @change="onSave(formRef, 'UseDNS', form.useDNS)"
@@ -130,7 +134,7 @@
                         mode="nginx"
                         placeholder="# The SSH configuration file does not exist or is empty (/etc/ssh/sshd_config)"
                     ></CodemirrorPro>
-                    <el-button :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
+                    <el-button v-permission :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>

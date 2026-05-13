@@ -51,7 +51,7 @@
                                 class="ml-1 text-xs"
                                 type="primary"
                                 target="_blank"
-                                :href="globalStore.docsUrl + '/user_manual/settings/#3'"
+                                :href="docsUrl + '/user_manual/settings/#3'"
                             >
                                 {{ $t('commons.button.helpDoc') }}
                             </el-link>
@@ -379,7 +379,7 @@
                     </el-card>
                     <el-card
                         class="rounded-2xl shadow hover:shadow-md transition-all"
-                        v-if="globalStore.isMasterPro() && !isIntl && !globalStore.isEE()"
+                        v-if="isMasterPro && !isIntl && !isEE"
                     >
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">
@@ -428,7 +428,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, Ref } from 'vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { ListAlertConfigs, DeleteAlertConfig, UpdateAlertConfig } from '@/api/modules/alert';
 import { ElMessageBox } from 'element-plus';
 import { View, Hide } from '@element-plus/icons-vue';
@@ -440,11 +440,9 @@ import EmailDrawer from '@/views/setting/alert/setting/email/index.vue';
 import WebhookDrawer from '@/views/setting/alert/setting/webhook/index.vue';
 import { Alert } from '@/api/interface/alert';
 import { getLicenseSmsInfo } from '@/api/modules/setting';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile, isProductPro, isMaster, isIntl } = useGlobalStore();
+const { docsUrl, isEE, isIntl, isMaster, isMasterPro, isMobile, isProductPro } = useGlobalStore();
 
-const globalStore = GlobalStore();
 const loading = ref(false);
 const phoneRef = ref();
 const emailRef = ref();

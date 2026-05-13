@@ -4,7 +4,7 @@
         :header="$t('commons.button.log')"
         @close="handleClose"
         :resource="logSearch.container"
-        :size="globalStore.isFullScreen ? 'full' : '60%'"
+        :size="isFullScreen ? 'full' : '60%'"
     >
         <template #extra v-if="!isMobile">
             <el-tooltip :content="loadTooltip()" placement="top">
@@ -26,14 +26,12 @@
 import i18n from '@/lang';
 import { onBeforeUnmount, reactive, ref, watch } from 'vue';
 import screenfull from 'screenfull';
-import { GlobalStore } from '@/store';
 import ContainerLog from '@/components/log/container/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
+const { isMobile, isFullScreen } = useGlobalStore();
 
 const logVisible = ref(false);
-const globalStore = GlobalStore();
 const logSearch = reactive({
     isWatch: true,
     container: '',
@@ -50,16 +48,16 @@ defineProps({
 });
 
 function toggleFullscreen() {
-    globalStore.isFullScreen = !globalStore.isFullScreen;
+    isFullScreen.value = !isFullScreen.value;
 }
 
 const loadTooltip = () => {
-    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
+    return i18n.global.t('commons.button.' + (isFullScreen.value ? 'quitFullscreen' : 'fullscreen'));
 };
 
 const handleClose = async () => {
     logVisible.value = false;
-    globalStore.isFullScreen = false;
+    isFullScreen.value = false;
 };
 
 watch(logVisible, (val) => {
@@ -84,7 +82,7 @@ const acceptParams = (props: DialogProps): void => {
 
     if (!isMobile.value) {
         screenfull.on('change', () => {
-            globalStore.isFullScreen = screenfull.isFullscreen;
+            isFullScreen.value = screenfull.isFullscreen;
         });
     }
 };

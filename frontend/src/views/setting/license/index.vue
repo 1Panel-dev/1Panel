@@ -108,8 +108,8 @@ import BindXpack from '@/views/setting/license/bind/xpack.vue';
 import { dateFormat } from '@/utils/date';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { globalStore } = useGlobalStore();
 
 const loading = ref();
 const licenseRef = ref();

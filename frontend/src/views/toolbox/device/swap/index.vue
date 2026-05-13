@@ -67,7 +67,7 @@
             </el-table-column>
             <el-table-column min-width="70">
                 <template #default="scope">
-                    <el-button link type="primary" @click="onSave(scope.row)">
+                    <el-button v-permission link type="primary" @click="onSave(scope.row)">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </template>

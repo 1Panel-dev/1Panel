@@ -515,7 +515,7 @@ const props = defineProps<{
     listPath: string;
 }>();
 
-const { globalStore } = useGlobalStore();
+const { language } = useGlobalStore();
 
 const emit = defineEmits<{
     (e: 'update:modelValue', v: boolean): void;
@@ -809,7 +809,7 @@ const submitAiSearch = async () => {
         const payload: File.FileAISearchReq = {
             path: rootPath,
             query: q,
-            responseLanguage: globalStore.language,
+            responseLanguage: language.value,
             containSub: aiSearchContainSub.value,
             matchCase: aiSearchMatchCase.value,
             wholeWord: aiSearchWholeWord.value,

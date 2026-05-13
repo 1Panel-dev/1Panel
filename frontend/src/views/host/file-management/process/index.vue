@@ -65,12 +65,12 @@ import { fileWgetKeys, stopWgetFile } from '@/api/modules/files';
 import { computeSize } from '@/utils/size';
 import { onBeforeUnmount, ref } from 'vue';
 import MsgInfo from '@/components/msg-info/index.vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { checkStreamAuth } from '@/utils/stream-auth';
-const globalStore = GlobalStore();
+const { currentNode: globalCurrentNode } = useGlobalStore();
 
 let processSocket: WebSocket | null = null;
 let sendTimer: ReturnType<typeof setInterval> | null = null;
@@ -116,7 +116,7 @@ const initProcess = async () => {
     let href = window.location.href;
     let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     let ipLocal = href.split('//')[1].split('/')[0];
-    let currentNode = globalStore.currentNode;
+    let currentNode = globalCurrentNode.value;
     const url = `${protocol}://${ipLocal}/api/v2/files/wget/process?operateNode=${currentNode}`;
     const authError = await checkStreamAuth(url, currentNode);
     if (token !== initProcessToken || !open.value) {

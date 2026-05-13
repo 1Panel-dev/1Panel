@@ -9,6 +9,7 @@ const containerRouter = {
     meta: {
         icon: 'p-docker1',
         title: 'menu.container',
+        permission: 'container_view',
     },
     children: [
         {
