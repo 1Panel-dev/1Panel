@@ -110,7 +110,6 @@ const applyPermission = (el: HTMLElement, binding: DirectiveBinding<PermissionBi
     const controller = getComponentPermissionController(vnode);
 
     if (controller?.setPermissionDisabled) {
-        enableElement(el);
         controller.setPermissionDisabled(disabled);
         return;
     }
