@@ -3910,10 +3910,12 @@ const message = {
             nodeAdminDesc:
                 'Mempunyai kebenaran pengurusan untuk nod yang ditentukan dan boleh mengurus sumber serta konfigurasi dalam nod tersebut.',
             bindNode: 'Ikat Nod',
+            boundUsers: 'Pengguna Terikat',
             role: 'Peranan',
             roleName: 'Nama',
             permission: 'Kebenaran',
             permissionDuplicate: 'Setiap nod hanya boleh diberikan satu peranan',
+            nodeAdminMasterForbidden: 'Kebenaran Pentadbir Nod tidak boleh ditambah pada nod utama',
             view: 'Lihat',
             manage: 'Urus',
             dashboard_view: 'Paparan Papan Pemuka',

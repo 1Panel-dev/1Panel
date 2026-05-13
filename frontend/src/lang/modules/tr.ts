@@ -3903,10 +3903,12 @@ const message = {
             nodeAdminDesc:
                 'Belirtilen düğümler için yönetim izinlerine sahiptir ve bu düğümlerdeki kaynakları ve yapılandırmaları yönetebilir.',
             bindNode: 'Düğüm Bağla',
+            boundUsers: 'Bağlı Kullanıcılar',
             role: 'Rol',
             roleName: 'Ad',
             permission: 'İzinler',
             permissionDuplicate: 'Her düğüme yalnızca bir rol atanabilir',
+            nodeAdminMasterForbidden: 'Ana düğüme düğüm yöneticisi izni eklenemez',
             view: 'Görüntüle',
             manage: 'Yönet',
             dashboard_view: 'Panel Görünümü',

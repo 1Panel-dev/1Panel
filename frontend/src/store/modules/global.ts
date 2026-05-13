@@ -133,15 +133,6 @@ const GlobalStore = defineStore({
             const managePermission = getManagePermission(normalizedPermission);
             return managePermission ? this.permissions.includes(managePermission) : false;
         },
-        setGlobalLoading(loading: boolean) {
-            this.isLoading = loading;
-        },
-        setLoadingText(text: string) {
-            this.loadingText = text;
-        },
-        setCsrfToken(token: string) {
-            this.csrfToken = token;
-        },
         async updateLanguage(language: string) {
             const activeLocale = await setActiveLocale(language);
             this.language = activeLocale;

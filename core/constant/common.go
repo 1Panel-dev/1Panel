@@ -185,6 +185,7 @@ var WebUrlMap = map[string]struct{}{
 
 	"/enterprise/users/list":       {},
 	"/enterprise/users/roles":      {},
+	"/enterprise/license":          {},
 	"/enterprise/license-required": {},
 }
 
