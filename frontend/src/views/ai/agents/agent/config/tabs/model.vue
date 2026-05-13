@@ -22,7 +22,7 @@
                             :value="item.id"
                         />
                     </el-select>
-                    <el-button type="primary" plain :disabled="!fallbackCandidate" @click="addFallback">
+                    <el-button v-permission type="primary" plain :disabled="!fallbackCandidate" @click="addFallback">
                         {{ t('aiTools.agents.addFallbackModel') }}
                     </el-button>
                 </div>
@@ -46,7 +46,7 @@
                                 :disabled="$index === fallbackRows.length - 1"
                                 @click="moveFallback($index, 1)"
                             />
-                            <el-button link :icon="Delete" @click="removeFallback($index)" />
+                            <el-button v-permission link :icon="Delete" @click="removeFallback($index)" />
                         </template>
                     </el-table-column>
                     <template #empty>
@@ -56,7 +56,7 @@
             </div>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="saving" @click="saveModel">
+            <el-button v-permission type="primary" :loading="saving" @click="saveModel">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>

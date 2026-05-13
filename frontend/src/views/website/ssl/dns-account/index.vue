@@ -3,7 +3,7 @@
         <template #content>
             <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
                 <template #toolbar>
-                    <el-button type="primary" @click="openCreate">
+                    <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
                 </template>
@@ -53,6 +53,7 @@ const opRef = ref();
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: Website.DnsAccount) {
             openEdit(row);
         },

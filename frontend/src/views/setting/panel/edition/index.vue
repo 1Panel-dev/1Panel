@@ -38,8 +38,8 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { updateSetting } from '@/api/modules/setting';
 import { FormInstance } from 'element-plus';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { docWithRegion, isIntl } = useGlobalStore();
 
 interface DialogProps {
     edition: string;
@@ -92,11 +92,11 @@ const onSaveEdition = async () => {
     try {
         if (editionChanged) {
             await updateSetting({ key: 'Edition', value: form.edition });
-            globalStore.isIntl = form.edition === 'intl';
+            isIntl.value = form.edition === 'intl';
         }
         if (docSourceChanged) {
             await updateSetting({ key: 'DocSource', value: form.docSource });
-            globalStore.docWithRegion = form.docSource === 'withByRegion';
+            docWithRegion.value = form.docSource === 'withByRegion';
         }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         if (editionChanged) {

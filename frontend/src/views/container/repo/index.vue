@@ -9,7 +9,7 @@
 
         <LayoutContent v-if="isExist" :title="$t('container.repo', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="onOpenDialog('add')">
+                <el-button v-permission type="primary" @click="onOpenDialog('add')">
                     {{ $t('commons.button.add') }}
                 </el-button>
             </template>
@@ -170,6 +170,7 @@ const onCheckConn = async (row: Container.RepoInfo) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.sync'),
+        permission: true,
         disabled: (row: Container.RepoInfo) => {
             return row.id === 1;
         },
@@ -179,6 +180,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         disabled: (row: Container.RepoInfo) => {
             return row.id === 1;
         },
@@ -188,6 +190,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         disabled: (row: Container.RepoInfo) => {
             return row.id === 1;
         },

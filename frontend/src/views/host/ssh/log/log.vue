@@ -6,7 +6,7 @@
                 <div class="mt-2"><el-alert type="info" :title="$t('ssh.sshAlert')" :closable="false" /></div>
             </template>
             <template #leftToolBar>
-                <el-button type="primary" @click="onExport">
+                <el-button v-permission type="primary" @click="onExport">
                     {{ $t('commons.button.export') }}
                 </el-button>
             </template>
@@ -79,7 +79,7 @@
                     <el-button @click="open = false" :disabled="loading">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
-                    <el-button type="primary" @click="onSubmitExport" :disabled="loading">
+                    <el-button v-permission type="primary" @click="onSubmitExport" :disabled="loading">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -93,8 +93,8 @@ import { dateFormat } from '@/utils/date';
 import { downloadFile } from '@/utils/file';
 import { onMounted, reactive, ref } from 'vue';
 import { exportSSHLogs, loadSSHLogs } from '@/api/modules/host';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { currentNode } = useGlobalStore();
 
 const loading = ref();
 const data = ref();
@@ -148,7 +148,7 @@ const onSubmitExport = async () => {
     await exportSSHLogs(params)
         .then((res) => {
             if (res.data) {
-                downloadFile(res.data, globalStore.currentNode);
+                downloadFile(res.data, currentNode.value);
             }
             open.value = false;
         })

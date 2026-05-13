@@ -50,8 +50,8 @@ import { MsgSuccess } from '@/utils/message';
 import { updateBindInfo, loadInterfaceAddr } from '@/api/modules/setting';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { entrance, isLogin } = useGlobalStore();
 
 interface DialogProps {
     ipv6: string;
@@ -99,11 +99,11 @@ const onSavePort = async (formEl: FormInstance | undefined) => {
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    globalStore.isLogin = false;
+                    isLogin.value = false;
                     let href = window.location.href;
                     let address = '';
-                    if (globalStore.entrance) {
-                        address = href.replaceAll('settings/safe', globalStore.entrance);
+                    if (entrance.value) {
+                        address = href.replaceAll('settings/safe', entrance.value);
                     } else {
                         address = href.replaceAll('settings/safe', 'login');
                     }

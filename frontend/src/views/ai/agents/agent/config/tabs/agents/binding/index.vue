@@ -35,7 +35,7 @@
                 </el-table-column>
                 <el-table-column :label="$t('commons.table.operate')" width="100" align="right">
                     <template #default="{ $index }">
-                        <el-button link @click="removeBinding($index)">
+                        <el-button v-permission link @click="removeBinding($index)">
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </template>
@@ -45,7 +45,7 @@
                 <el-empty :description="$t('commons.msg.noneData')" :image-size="60" />
             </div>
             <div class="binding-dialog__actions">
-                <el-button type="primary" link :disabled="loading || submitting" @click="addBinding">
+                <el-button v-permission type="primary" link :disabled="loading || submitting" @click="addBinding">
                     {{ $t('commons.button.add') }}
                 </el-button>
             </div>
@@ -57,6 +57,7 @@
             <el-button
                 type="primary"
                 :loading="submitting"
+                v-permission
                 :disabled="loading || !form.bindings.length"
                 @click="submitBind"
             >

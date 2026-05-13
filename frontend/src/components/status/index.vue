@@ -21,7 +21,7 @@
                 </el-icon>
             </span>
         </el-tag>
-        <el-button size="small" v-else :type="getType(statusItem)" plain round>
+        <el-button size="small" v-else :type="getType(statusItem)" plain round :disabled="isDisabled">
             <span v-if="statusItem != ''">{{ $t('commons.status.' + statusItem) }}</span>
             <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
                 <Loading />
@@ -33,12 +33,13 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
     status: String,
     msg: String,
     hasIcon: Boolean,
+    disabled: Boolean,
     operate: {
         type: Boolean,
         default: false,
@@ -46,8 +47,20 @@ const props = defineProps({
     },
 });
 
+const permissionDisabled = ref(false);
+
+defineExpose({
+    setPermissionDisabled: (disabled: boolean) => {
+        permissionDisabled.value = disabled;
+    },
+});
+
 const statusItem = computed(() => {
     return props.status?.toLowerCase() || '';
+});
+
+const isDisabled = computed(() => {
+    return !!props.disabled || permissionDisabled.value;
 });
 
 const getType = (status: string) => {

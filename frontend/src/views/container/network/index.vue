@@ -9,13 +9,13 @@
 
         <LayoutContent v-if="isExist" :title="$t('container.network', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="onCreate()">
+                <el-button v-permission type="primary" @click="onCreate()">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="onClean()">
+                <el-button v-permission type="primary" plain @click="onClean()">
                     {{ $t('container.networkPrune') }}
                 </el-button>
-                <el-button :disabled="selects.length === 0" @click="batchDelete(null)">
+                <el-button v-permission :disabled="selects.length === 0" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -228,6 +228,7 @@ function isSystem(val: string) {
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: Container.NetworkInfo) => {
             batchDelete(row);
         },

@@ -3,7 +3,7 @@
         <el-tab-pane :label="$t('website.global')">
             <ComplexTable :data="data" @search="search" v-loading="loading" :heightDiff="420">
                 <template #toolbar>
-                    <el-button type="primary" plain @click="openCreate('root')">
+                    <el-button v-permission type="primary" plain @click="openCreate('root')">
                         {{ $t('commons.button.create') }}
                     </el-button>
                     <el-switch
@@ -28,7 +28,7 @@
         <el-tab-pane :label="$t('website.path')" v-if="showPath">
             <ComplexTable :data="pathData" @search="searchPath" v-loading="loading" :heightDiff="420">
                 <template #toolbar>
-                    <el-button type="primary" plain @click="openCreate('path')">
+                    <el-button v-permission type="primary" plain @click="openCreate('path')">
                         {{ $t('commons.button.create') }}
                     </el-button>
                 </template>
@@ -89,6 +89,7 @@ const showPath = ref(false);
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: Website.NginxAuthConfig) {
             row.scope = 'root';
             openEdit(row);
@@ -105,6 +106,7 @@ const buttons = [
 const pathButtons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: Website.NginxAuthConfig) {
             row.scope = 'path';
             openEdit(row);

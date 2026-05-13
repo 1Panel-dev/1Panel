@@ -59,6 +59,7 @@ import { computed, type PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { resolveMaybeFn, type FuTableOperationButton } from './shared';
+import { hasManagePermissionAccess } from '@/utils/permission';
 
 defineOptions({ name: 'FuTableOperations' });
 
@@ -204,7 +205,10 @@ const getMoreButtons = (row: any) => {
 };
 
 const isButtonDisabled = (button: FuTableOperationButton, row: any) => {
-    return Boolean(resolveMaybeFn(button.disabled ?? false, row));
+    const permissionDisabled =
+        button.permission !== undefined &&
+        !hasManagePermissionAccess(button.permission === true ? undefined : button.permission);
+    return permissionDisabled || Boolean(resolveMaybeFn(button.disabled ?? false, row));
 };
 
 const handleButtonClick = (button: FuTableOperationButton, row: any) => {

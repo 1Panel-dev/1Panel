@@ -2,15 +2,19 @@
     <div>
         <ComplexTable :data="data" @search="search()" :heightDiff="350" v-loading="loading">
             <template #toolbar>
-                <el-button type="primary" @click="openOperate">{{ $t('commons.button.create') }}</el-button>
-                <el-button type="primary" plain @click="buildNginx">{{ $t('nginx.build') }}</el-button>
+                <el-button v-permission type="primary" @click="openOperate">
+                    {{ $t('commons.button.create') }}
+                </el-button>
+                <el-button v-permission type="primary" plain @click="buildNginx">
+                    {{ $t('nginx.build') }}
+                </el-button>
                 <el-text type="warning" class="!ml-2">{{ $t('nginx.buildHelper') }}</el-text>
             </template>
             <el-table-column prop="name" :label="$t('commons.table.name')" />
             <el-table-column prop="params" :label="$t('nginx.params')" />
             <el-table-column :label="$t('commons.table.status')" fix>
                 <template #default="{ row }">
-                    <el-switch v-model="row.enable" @click="updateModule(row)" />
+                    <el-switch v-permission v-model="row.enable" @click="updateModule(row)" />
                 </template>
             </el-table-column>
             <fu-table-operations
@@ -40,12 +44,14 @@ const loading = ref(false);
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: Nginx.NginxModule) {
             openEdit(row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Nginx.NginxModule) {
             deleteModule(row);
         },

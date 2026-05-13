@@ -50,6 +50,20 @@ const emit = defineEmits(['update:modelValue', 'input', 'blur', 'change']);
 
 const selectRef = ref();
 const isWrite = ref(false);
+const permissionDisabled = ref(false);
+
+defineExpose({
+    setPermissionDisabled: (disabled: boolean) => {
+        permissionDisabled.value = disabled;
+        if (disabled) {
+            isWrite.value = false;
+        }
+    },
+});
+
+const effectiveWriteTrigger = computed(() => {
+    return permissionDisabled.value ? 'disabled' : props.writeTrigger;
+});
 
 const displayValue = computed(() => {
     return props.modelValue === '' || props.modelValue === undefined || props.modelValue === null
@@ -70,13 +84,13 @@ const closeWrite = () => {
 };
 
 const handleReadClick = () => {
-    if (props.writeTrigger === 'onClick') {
+    if (effectiveWriteTrigger.value === 'onClick') {
         openWrite();
     }
 };
 
 const handleReadDblClick = () => {
-    if (props.writeTrigger === 'onDblclick') {
+    if (effectiveWriteTrigger.value === 'onDblclick') {
         openWrite();
     }
 };

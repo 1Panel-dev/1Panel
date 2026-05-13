@@ -31,6 +31,7 @@
                             </el-tag>
                         </div>
                         <el-button
+                            v-permission
                             type="primary"
                             size="small"
                             plain

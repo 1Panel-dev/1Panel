@@ -10,29 +10,41 @@
                     </div>
                     <div class="mt-0.5">
                         <template v-if="baseInfo.name !== 'iptables'">
-                            <el-button type="primary" v-if="baseInfo.isActive" @click="onOperate('stop')" link>
+                            <el-button
+                                v-permission
+                                type="primary"
+                                v-if="baseInfo.isActive"
+                                @click="onOperate('stop')"
+                                link
+                            >
                                 {{ $t('commons.button.stop') }}
                             </el-button>
-                            <el-button type="primary" v-if="!baseInfo.isActive" @click="onOperate('start')" link>
+                            <el-button
+                                v-permission
+                                type="primary"
+                                v-if="!baseInfo.isActive"
+                                @click="onOperate('start')"
+                                link
+                            >
                                 {{ $t('commons.button.start') }}
                             </el-button>
                             <el-divider direction="vertical" />
-                            <el-button type="primary" @click="onOperate('restart')" link>
+                            <el-button v-permission type="primary" @click="onOperate('restart')" link>
                                 {{ $t('commons.button.restart') }}
                             </el-button>
                         </template>
                         <template v-if="!baseInfo.isInit || (props.currentTab === 'forward' && !baseInfo.isBind)">
                             <el-divider direction="vertical" />
-                            <el-button type="primary" link @click="onInit">
+                            <el-button v-permission type="primary" link @click="onInit">
                                 {{ $t('commons.button.init') }}
                             </el-button>
                         </template>
                         <template v-if="baseInfo.name === 'iptables' && baseInfo.isInit && props.currentTab == 'base'">
                             <el-divider direction="vertical" />
-                            <el-button v-if="baseInfo.isBind" type="primary" link @click="onUnBind">
+                            <el-button v-if="baseInfo.isBind" v-permission type="primary" link @click="onUnBind">
                                 {{ $t('commons.button.unbind') }}
                             </el-button>
-                            <el-button v-if="!baseInfo.isBind" type="primary" link @click="onBind">
+                            <el-button v-if="!baseInfo.isBind" v-permission type="primary" link @click="onBind">
                                 {{ $t('commons.button.bind') }}
                             </el-button>
                         </template>
@@ -40,6 +52,7 @@
                             <el-divider direction="vertical" />
                             <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
                             <el-switch
+                                v-permission
                                 size="small"
                                 class="ml-2"
                                 inactive-value="Disable"

@@ -14,14 +14,13 @@
     </DrawerPro>
 </template>
 <script lang="ts" setup>
-import { computed, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { updateSetting } from '@/api/modules/setting';
 import { FormInstance } from 'element-plus';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
-const themeConfig = computed(() => globalStore.themeConfig);
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { themeConfig } = useGlobalStore();
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -62,7 +61,7 @@ const onSavePanelName = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         await updateSetting({ key: 'PanelName', value: form.panelName })
             .then(async () => {
-                globalStore.themeConfig = { ...themeConfig.value, panelName: form.panelName };
+                themeConfig.value = { ...themeConfig.value, panelName: form.panelName };
                 document.title = form.panelName;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loading.value = false;

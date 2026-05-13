@@ -51,7 +51,7 @@
                         </el-table-column>
                         <el-table-column :label="$t('commons.table.operate')" width="90" align="center">
                             <template #default="{ $index }">
-                                <el-button link @click="removeBinding($index)">
+                                <el-button v-permission link @click="removeBinding($index)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </template>
@@ -59,7 +59,7 @@
                     </el-table>
                     <el-empty v-else :description="$t('commons.msg.noneData')" :image-size="60" />
                     <div class="bindings-footer">
-                        <el-button type="primary" link @click="addBinding">
+                        <el-button v-permission type="primary" link @click="addBinding">
                             {{ $t('commons.button.add') }}
                         </el-button>
                     </div>
@@ -68,7 +68,7 @@
         </div>
         <template #footer>
             <el-button :disabled="loading" @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button type="primary" :loading="loading" @click="submit">
+            <el-button v-permission type="primary" :loading="loading" @click="submit">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>

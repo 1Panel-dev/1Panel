@@ -51,10 +51,10 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { loadTimeZoneOptions, updateDevice } from '@/api/modules/toolbox';
 import { changeToLocal } from '@/utils/node';
-const globalStore = GlobalStore();
+const { currentNode, isLogin } = useGlobalStore();
 
 interface DialogProps {
     timeZone: string;
@@ -101,8 +101,8 @@ const onSave = async (formEl: FormInstance | undefined) => {
                 .then(async () => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    if (globalStore.currentNode === 'local') {
-                        globalStore.isLogin = false;
+                    if (currentNode.value === 'local') {
+                        isLogin.value = false;
                         let href = window.location.href;
                         window.open(href, '_self');
                     } else {

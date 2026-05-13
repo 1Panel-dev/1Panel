@@ -23,7 +23,7 @@
                 <el-button :disabled="loading" @click="passwordVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabled="loading" type="primary" @click="submitChangePassword(formRef)">
+                <el-button v-permission :disabled="loading" type="primary" @click="submitChangePassword(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

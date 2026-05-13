@@ -29,7 +29,7 @@
             <template #main>
                 <div v-if="activeName === 'conf'">
                     <CodemirrorPro :heightDiff="320" v-model="postgresqlConf"></CodemirrorPro>
-                    <el-button type="primary" class="mt-5" @click="onSaveConf">
+                    <el-button v-permission type="primary" class="mt-5" @click="onSaveConf">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>
@@ -42,7 +42,12 @@
                                     <el-input clearable type="number" v-model.number="baseInfo.port" />
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button type="primary" @click="onSavePort(panelFormRef)" icon="Collection">
+                                    <el-button
+                                        v-permission
+                                        type="primary"
+                                        @click="onSavePort(panelFormRef)"
+                                        icon="Collection"
+                                    >
                                         {{ $t('commons.button.save') }}
                                     </el-button>
                                 </el-form-item>

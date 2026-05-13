@@ -1,12 +1,12 @@
 <template>
     <el-form v-loading="deleting" label-position="top">
         <el-form-item v-if="configured">
-            <el-button type="danger" plain :loading="deleting" @click="deleteChannel">
+            <el-button v-permission type="danger" plain :loading="deleting" @click="deleteChannel">
                 {{ t('commons.button.delete') }}
             </el-button>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="loggingIn" @click="loginChannel">
+            <el-button v-permission type="primary" :loading="loggingIn" @click="loginChannel">
                 {{ t('aiTools.agents.scanConnect') }}
             </el-button>
         </el-form-item>

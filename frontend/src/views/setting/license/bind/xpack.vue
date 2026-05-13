@@ -52,9 +52,9 @@ import { MsgSuccess } from '@/utils/message';
 import { bindLicense, listNodeOptions } from '@/api/modules/setting';
 import DockerProxyDialog from '@/components/docker-proxy/dialog.vue';
 import { FormInstance } from 'element-plus';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { Rules } from '@/global/form-rules';
-const globalStore = GlobalStore();
+const { globalStore, isMasterProductPro } = useGlobalStore();
 
 interface DialogProps {
     licenseName: string;
@@ -112,7 +112,7 @@ const submit = async () => {
 };
 
 const loadNodes = async () => {
-    if (!globalStore.isMasterProductPro) {
+    if (!isMasterProductPro.value) {
         freeNodes.value = [{ id: 0, name: globalStore.getMasterAlias() }];
         return;
     }

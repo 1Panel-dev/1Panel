@@ -1,7 +1,7 @@
 <template>
     <ComplexTable :data="data" @search="search" v-loading="loading">
         <template #toolbar>
-            <el-button type="primary" plain @click="openCreate">
+            <el-button v-permission type="primary" plain @click="openCreate">
                 {{ $t('commons.button.create') }}
             </el-button>
         </template>
@@ -89,11 +89,12 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
-        click: function (row: Website.RedirectConfig) {
-            openEdit(row);
-        },
+        permission: true,
         disabled: (row: Website.ProxyConfig) => {
             return !row.enable;
+        },
+        click: function (row: Website.RedirectConfig) {
+            openEdit(row);
         },
     },
     {

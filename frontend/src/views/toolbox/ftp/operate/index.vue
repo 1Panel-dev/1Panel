@@ -13,14 +13,16 @@
             <el-form-item :label="$t('commons.login.password')" prop="password">
                 <el-input type="password" clearable v-model="dialogData.rowData!.password" show-password>
                     <template #append>
-                        <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
+                        <el-button v-permission @click="random">
+                            {{ $t('commons.button.random') }}
+                        </el-button>
                     </template>
                 </el-input>
             </el-form-item>
             <el-form-item :label="$t('file.root')" prop="path">
                 <el-input v-model="dialogData.rowData!.path">
                     <template #prepend>
-                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
+                        <el-button v-permission icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
                     </template>
                 </el-input>
                 <span class="input-help">{{ $t('toolbox.ftp.dirHelper') }}</span>
@@ -32,7 +34,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                <el-button v-permission :disabled="loading" type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

@@ -3,7 +3,7 @@
         <template #content>
             <div v-loading="loading">
                 <div class="toolbar">
-                    <el-button type="primary" @click="openCreate">
+                    <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.add') }}
                     </el-button>
                 </div>
@@ -62,7 +62,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button :disabled="saving" @click="editorOpen = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="saving" type="primary" @click="submit">
+                <el-button v-permission :disabled="saving" type="primary" @click="submit">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -131,10 +131,12 @@ const rules = reactive({
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: (row: AI.AgentAccountModel) => openEdit(row),
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: AI.AgentAccountModel) => onDelete(row),
     },
 ];

@@ -143,8 +143,8 @@ import { getFileType, isConvertible } from '@/utils/file';
 import { v4 as uuidv4 } from 'uuid';
 import TaskLog from '@/components/log/task/index.vue';
 import { TabsPaneContext } from 'element-plus';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { currentNode } = useGlobalStore();
 
 const activeName = ref('convert');
 const open = ref(false);
@@ -159,7 +159,7 @@ let selects = ref<any>([]);
 const taskLogRef = ref();
 const logs = ref([]);
 
-const CONVERT_KEY = 'convert-files:' + globalStore.currentNode;
+const CONVERT_KEY = 'convert-files:' + currentNode.value;
 const handleClose = () => {
     open.value = false;
     handleOutputFile.value = 'png';

@@ -32,6 +32,7 @@
                     <div class="mt-0.5">
                         <el-button
                             type="primary"
+                            v-permission
                             :disabled="dialogData.rowData.status === 'Pending'"
                             @click="onHandle(dialogData.rowData)"
                             link
@@ -42,6 +43,7 @@
                         <el-button
                             type="primary"
                             v-if="dialogData.rowData.status === 'Enable'"
+                            v-permission
                             @click="onChangeStatus(dialogData.rowData.id, 'disable')"
                             link
                         >
@@ -50,13 +52,14 @@
                         <el-button
                             type="primary"
                             v-if="dialogData.rowData.status === 'Disable'"
+                            v-permission
                             @click="onChangeStatus(dialogData.rowData.id, 'enable')"
                             link
                         >
                             {{ $t('commons.button.enable') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button :disabled="!hasRecords" type="primary" @click="onClean" link>
+                        <el-button v-permission :disabled="!hasRecords" type="primary" @click="onClean" link>
                             {{ $t('commons.button.clean') }}
                         </el-button>
                     </div>

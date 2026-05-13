@@ -47,7 +47,7 @@
                     <el-button class="mt-5" @click="getDefaultConfig()">
                         {{ $t('app.defaultConfig') }}
                     </el-button>
-                    <el-button type="primary" @click="onSaveFile" class="mt-5">
+                    <el-button v-permission type="primary" @click="onSaveFile" class="mt-5">
                         {{ $t('commons.button.save') }}
                     </el-button>
                     <el-row>
@@ -87,7 +87,7 @@
                                     <span class="input-help">{{ $t('database.maxmemoryHelper') }}</span>
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button type="primary" @click="onSubmitForm(formRef)">
+                                    <el-button v-permission type="primary" @click="onSubmitForm(formRef)">
                                         {{ $t('commons.button.save') }}
                                     </el-button>
                                 </el-form-item>
@@ -104,7 +104,7 @@
                                     <el-input clearable type="number" v-model.number="form.port" />
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button @click="onSavePort(portRef)" icon="Collection">
+                                    <el-button v-permission @click="onSavePort(portRef)" icon="Collection">
                                         {{ $t('commons.button.save') }}
                                     </el-button>
                                 </el-form-item>
