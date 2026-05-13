@@ -27,7 +27,7 @@
                 <el-button @click="onCancel">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" @click="onConfirm">
+                <el-button v-permission type="primary" @click="onConfirm">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

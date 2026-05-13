@@ -22,35 +22,43 @@
             </template>
 
             <template #leftToolBar>
-                <el-button type="primary" @click="onContainerOperate('')">
+                <el-button v-permission type="primary" @click="onContainerOperate('')">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="onImportCreate()">
+                <el-button v-permission type="primary" plain @click="onImportCreate()">
                     {{ $t('commons.button.import') }}
                 </el-button>
-                <el-button type="primary" plain @click="onClean()">
+                <el-button v-permission type="primary" plain @click="onClean()">
                     {{ $t('container.containerPrune') }}
                 </el-button>
                 <el-button-group class="button-group">
-                    <el-button :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
+                    <el-button v-permission :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
                         {{ $t('commons.operate.start') }}
                     </el-button>
-                    <el-button :disabled="checkStatus('stop', null)" @click="onOperate('stop', null)">
+                    <el-button v-permission :disabled="checkStatus('stop', null)" @click="onOperate('stop', null)">
                         {{ $t('commons.operate.stop') }}
                     </el-button>
-                    <el-button :disabled="checkStatus('restart', null)" @click="onOperate('restart', null)">
+                    <el-button
+                        v-permission
+                        :disabled="checkStatus('restart', null)"
+                        @click="onOperate('restart', null)"
+                    >
                         {{ $t('commons.button.restart') }}
                     </el-button>
-                    <el-button :disabled="checkStatus('kill', null)" @click="onOperate('kill', null)">
+                    <el-button v-permission :disabled="checkStatus('kill', null)" @click="onOperate('kill', null)">
                         {{ $t('container.kill') }}
                     </el-button>
-                    <el-button :disabled="checkStatus('pause', null)" @click="onOperate('pause', null)">
+                    <el-button v-permission :disabled="checkStatus('pause', null)" @click="onOperate('pause', null)">
                         {{ $t('container.pause') }}
                     </el-button>
-                    <el-button :disabled="checkStatus('unpause', null)" @click="onOperate('unpause', null)">
+                    <el-button
+                        v-permission
+                        :disabled="checkStatus('unpause', null)"
+                        @click="onOperate('unpause', null)"
+                    >
                         {{ $t('container.unpause') }}
                     </el-button>
-                    <el-button :disabled="checkStatus('remove', null)" @click="onOperate('remove', null)">
+                    <el-button v-permission :disabled="checkStatus('remove', null)" @click="onOperate('remove', null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </el-button-group>
@@ -117,6 +125,7 @@
                                         size="large"
                                         :icon="row.isPinned ? 'StarFilled' : 'Star'"
                                         type="warning"
+                                        v-permission
                                         @click="changePinned(row, true)"
                                     />
                                 </el-tooltip>
@@ -137,45 +146,51 @@
                                     (visible) => handleStatusDropdownVisibleChange(row.containerID, visible)
                                 "
                             >
-                                <Status :status="row.state" :operate="true"></Status>
+                                <Status v-permission :status="row.state" :operate="true" />
                                 <template #dropdown>
                                     <el-dropdown-menu v-if="activeDropdownContainerId === row.containerID">
-                                        <el-dropdown-item
+                                        <fu-dropdown-item
+                                            v-permission
                                             :disabled="checkStatus('start', row)"
                                             @click="onOperate('start', row)"
                                         >
                                             {{ $t('commons.operate.start') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item
+                                            v-permission
                                             :disabled="checkStatus('stop', row)"
                                             @click="onOperate('stop', row)"
                                         >
                                             {{ $t('commons.operate.stop') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item
+                                            v-permission
                                             :disabled="checkStatus('restart', row)"
                                             @click="onOperate('restart', row)"
                                         >
                                             {{ $t('commons.button.restart') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item
+                                            v-permission
                                             :disabled="checkStatus('kill', row)"
                                             @click="onOperate('kill', row)"
                                         >
                                             {{ $t('container.kill') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item
+                                            v-permission
                                             :disabled="checkStatus('pause', row)"
                                             @click="onOperate('pause', row)"
                                         >
                                             {{ $t('container.pause') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item
+                                            v-permission
                                             :disabled="checkStatus('unpause', row)"
                                             @click="onOperate('unpause', row)"
                                         >
                                             {{ $t('container.unpause') }}
-                                        </el-dropdown-item>
+                                        </fu-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -349,6 +364,7 @@
                         <template #default="{ row }">
                             <fu-input-rw-switch
                                 v-model="row.description"
+                                v-permission
                                 @enter="changePinned(row, false)"
                                 @blur="changePinned(row, false)"
                             />
@@ -421,16 +437,14 @@ import {
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import router from '@/routers';
 import { computeSize2, computeSizeForDocker, computeCPU } from '@/utils/size';
 import { newUUID } from '@/utils/id';
 import { updateCommonDescription } from '@/api/modules/setting';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
-const globalStore = GlobalStore();
+const { currentNode, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
 
 const isActive = ref(false);
 const isExist = ref(false);
@@ -521,7 +535,7 @@ const applyStatsToRows = (stats: Record<string, any>[]) => {
     }
 };
 
-const updateTags = (status: Record<string, number>) => {
+const updateTags = (status: Record<string, any>) => {
     const nextTags = [];
     if (status.containerCount) {
         nextTags.push({ key: 'all', count: status.containerCount });
@@ -707,7 +721,7 @@ const onImportCreate = () => {
         name: '',
         detailName: '',
         remark: '.tar.gz',
-        node: globalStore.currentNode,
+        node: currentNode.value,
     });
 };
 
@@ -831,7 +845,7 @@ const buttons = [
     {
         label: i18n.global.t('menu.terminal'),
         disabled: (row: Container.ContainerInfo) => {
-            return row.state !== 'running';
+            return row.state !== 'running' || !isAdminOrNodeAdmin.value;
         },
         click: (row: Container.ContainerInfo) => {
             onTerminal(row);
@@ -845,6 +859,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('home.dir'),
+        permission: 'host_file_view',
         disabled: (row: Container.ContainerInfo) => {
             return row.state !== 'running';
         },
@@ -854,18 +869,21 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: (row: Container.ContainerInfo) => {
             onContainerOperate(row.name);
         },
     },
     {
         label: i18n.global.t('commons.button.upgrade'),
+        permission: true,
         click: (row: Container.ContainerInfo) => {
             dialogUpgradeRef.value!.acceptParams({ container: row.name, image: row.imageName, fromApp: row.isFromApp });
         },
     },
     {
         label: i18n.global.t('commons.button.backup'),
+        permission: true,
         click: (row: Container.ContainerInfo) => {
             onBackup(row);
         },
@@ -881,6 +899,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('container.rename'),
+        permission: true,
         click: (row: Container.ContainerInfo) => {
             dialogRenameRef.value!.acceptParams({ container: row.name });
         },
@@ -890,6 +909,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('container.makeImage'),
+        permission: true,
         click: (row: Container.ContainerInfo) => {
             dialogCommitRef.value!.acceptParams({ containerID: row.containerID, containerName: row.name });
         },
@@ -899,6 +919,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: Container.ContainerInfo) => {
             onOperate('remove', row);
         },

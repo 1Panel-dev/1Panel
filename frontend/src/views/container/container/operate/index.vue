@@ -23,7 +23,14 @@
                                     type="error"
                                 />
 
-                                <el-button v-if="isCreate" type="primary" icon="EditPen" plain @click="toTerminal()">
+                                <el-button
+                                    v-if="isCreate"
+                                    :disabled="!isAdminOrNodeAdmin"
+                                    type="primary"
+                                    icon="EditPen"
+                                    plain
+                                    @click="toTerminal()"
+                                >
                                     {{ $t('container.commandInput') }}
                                 </el-button>
                                 <el-form-item class="mt-5" :label="$t('commons.table.name')" prop="name">
@@ -362,6 +369,9 @@ import { newUUID } from '@/utils/id';
 import router from '@/routers';
 import TerminalDialog from '@/views/host/file-management/terminal/index.vue';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isAdminOrNodeAdmin } = useGlobalStore();
 
 const loading = ref(false);
 const isCreate = ref();

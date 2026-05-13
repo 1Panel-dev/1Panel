@@ -47,7 +47,7 @@
                 <el-form-item>
                     <el-checkbox v-model="form.proxyPasswdKeepItem" :label="$t('setting.proxyPasswdKeep')" />
                 </el-form-item>
-                <el-form-item v-if="globalStore.isXpackOrEE()" :label="$t('setting.proxyDocker')" prop="proxyDocker">
+                <el-form-item v-if="isXpackOrEE" :label="$t('setting.proxyDocker')" prop="proxyDocker">
                     <el-checkbox v-model="form.proxyDocker" :label="$t('setting.proxyDocker')" />
                     <span class="input-help">{{ $t('setting.proxyDockerHelper') }}</span>
                 </el-form-item>
@@ -74,12 +74,12 @@ import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { updateProxy } from '@/api/modules/setting';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import DockerProxyDialog from '@/components/docker-proxy/dialog.vue';
 import { loadDockerStatus } from '@/api/modules/container';
 
-const globalStore = GlobalStore();
+const { isXpackOrEE } = useGlobalStore();
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const confirmDialogRef = ref();
@@ -164,7 +164,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         if (form.proxyType === 'http' || form.proxyType === 'https') {
             params.proxyUrl = form.proxyUrl;
         }
-        if (dockerStatus.value && globalStore.isXpackOrEE() && (params.proxyDocker || proxyDockerVisible.value)) {
+        if (dockerStatus.value && isXpackOrEE.value && (params.proxyDocker || proxyDockerVisible.value)) {
             dockerProxyRef.value.acceptParams({
                 syncList: 'SyncSystemProxy',
                 open: true,

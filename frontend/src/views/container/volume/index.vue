@@ -9,13 +9,13 @@
 
         <LayoutContent v-if="isExist" :title="$t('container.volume', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="onCreate()">
+                <el-button v-permission type="primary" @click="onCreate()">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="onClean()">
+                <el-button v-permission type="primary" plain @click="onClean()">
                     {{ $t('container.volumePrune') }}
                 </el-button>
-                <el-button :disabled="selects.length === 0" @click="batchDelete(null)">
+                <el-button v-permission :disabled="selects.length === 0" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -87,6 +87,7 @@
                         <template #default="{ row }">
                             <el-tooltip :content="row.mountpoint">
                                 <el-button
+                                    v-permission:view="'host_file_view'"
                                     type="primary"
                                     icon="FolderOpened"
                                     link
@@ -258,6 +259,7 @@ const batchDelete = async (row: Container.VolumeInfo | null) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: Container.VolumeInfo) => {
             batchDelete(row);
         },

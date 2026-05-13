@@ -1,9 +1,11 @@
 <template>
     <ComplexTable :data="data" @search="search" v-loading="loading">
         <template #toolbar>
-            <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
-            <el-button @click="openCache">{{ $t('website.proxyCache') }}</el-button>
-            <el-button type="primary" @click="clear" link>
+            <el-button v-permission type="primary" plain @click="openCreate">
+                {{ $t('commons.button.create') }}
+            </el-button>
+            <el-button v-permission @click="openCache">{{ $t('website.proxyCache') }}</el-button>
+            <el-button v-permission type="primary" @click="clear" link>
                 {{ $t('nginx.clearProxyCache') }}
             </el-button>
         </template>
@@ -24,7 +26,12 @@
         </el-table-column>
         <el-table-column :label="$t('commons.table.status')" prop="enable" width="100">
             <template #default="{ row }">
-                <Status :status="row.enable ? 'enable' : 'disable'" @click="opProxy(row)" :operate="true" />
+                <Status
+                    v-permission
+                    :status="row.enable ? 'enable' : 'disable'"
+                    @click="opProxy(row)"
+                    :operate="true"
+                />
             </template>
         </el-table-column>
         <fu-table-operations
@@ -87,15 +94,17 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
-        click: function (row: Website.ProxyConfig) {
-            openEdit(row);
-        },
+        permission: true,
         disabled: (row: Website.ProxyConfig) => {
             return !row.enable;
+        },
+        click: function (row: Website.ProxyConfig) {
+            openEdit(row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.ProxyConfig) {
             deleteProxy(row);
         },

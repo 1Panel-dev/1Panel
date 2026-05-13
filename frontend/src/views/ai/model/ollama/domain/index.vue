@@ -85,7 +85,7 @@
             <el-button @click="handleClose">
                 {{ $t('commons.button.cancel') }}
             </el-button>
-            <el-button type="primary" @click="onSubmit(formRef)">
+            <el-button v-permission type="primary" @click="onSubmit(formRef)">
                 {{ $t('commons.button.add') }}
             </el-button>
         </template>

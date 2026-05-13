@@ -1,4 +1,5 @@
 import { Comment, Fragment, Text, type VNode } from 'vue';
+import type { PermissionBindingValue } from '@/utils/permission';
 
 export interface FuTableColumnConfig {
     key: string;
@@ -12,6 +13,7 @@ export interface FuTableOperationButton {
     label?: string | number;
     click?: (row: any) => void;
     disabled?: boolean | ((row: any) => boolean);
+    permission?: true | PermissionBindingValue;
     show?: boolean | ((row: any) => boolean);
     type?: string;
     icon?: any;

@@ -234,7 +234,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, getCurrentInstance, watch, nextTick, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, getCurrentInstance, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import Terminal from '@/components/terminal/index.vue';
 import HostDialog from '@/views/terminal/terminal/host-create.vue';
 import type Node from 'element-plus/es/components/tree/src/model/node';
@@ -243,20 +243,17 @@ import screenfull from 'screenfull';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';
 import { getHostTree, testByID, testLocalConn } from '@/api/modules/terminal';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import router from '@/routers';
 import { getCommandTree } from '@/api/modules/command';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import AiSetting from '@/views/terminal/setting/ai/index.vue';
 import { MsgWarning } from '@/utils/message';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
+const { isFullScreen, isMobile, isNodeAdmin, openMenuTabs } = useGlobalStore();
 
 const dialogRef = ref();
 const ctx = getCurrentInstance() as any;
-const globalStore = GlobalStore();
-const isNodeAdmin = computed(() => globalStore.isNodeAdmin);
 
 const toggleFullscreen = () => {
     if (screenfull.isEnabled) {
@@ -264,7 +261,7 @@ const toggleFullscreen = () => {
     }
 };
 const loadTooltip = () => {
-    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
+    return i18n.global.t('commons.button.' + (isFullScreen.value ? 'quitFullscreen' : 'fullscreen'));
 };
 
 let timer: ReturnType<typeof setInterval> | null = null;
@@ -297,7 +294,7 @@ interface Tree {
 const initCmd = ref('');
 
 const acceptParams = async () => {
-    globalStore.isFullScreen = false;
+    isFullScreen.value = false;
     loadCommandTree();
     if (!isNodeAdmin.value) {
         loadHostTree();
@@ -320,7 +317,7 @@ const acceptParams = async () => {
     }, 1000 * 5);
     if (!isMobile.value) {
         screenfull.on('change', () => {
-            globalStore.isFullScreen = screenfull.isFullscreen;
+            isFullScreen.value = screenfull.isFullscreen;
         });
     }
 };
@@ -336,13 +333,13 @@ const cleanTimer = () => {
 };
 
 const loadHeight = () => {
-    return globalStore.openMenuTabs ? '250px' : '210px';
+    return openMenuTabs.value ? '250px' : '210px';
 };
 const loadEmptyHeight = () => {
-    return globalStore.openMenuTabs ? '201px' : '156px';
+    return openMenuTabs.value ? '201px' : '156px';
 };
 const loadFullScreenHeight = () => {
-    return globalStore.openMenuTabs ? '105px' : '60px';
+    return openMenuTabs.value ? '105px' : '60px';
 };
 
 const handleTabsRemove = (targetName: string, action: 'remove' | 'add') => {
@@ -546,7 +543,7 @@ function syncTerminal() {
 }
 
 const changeFullScreen = () => {
-    globalStore.isFullScreen = screenfull.isFullscreen;
+    isFullScreen.value = screenfull.isFullscreen;
 };
 
 defineExpose({

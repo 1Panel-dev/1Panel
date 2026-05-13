@@ -20,16 +20,28 @@
                 </el-alert>
             </template>
             <template #leftToolBar>
-                <el-button :disabled="modelInfo.status !== 'Running'" type="primary" @click="onCreate()">
+                <el-button v-permission :disabled="modelInfo.status !== 'Running'" type="primary" @click="onCreate()">
                     {{ $t('commons.button.add') }}
                 </el-button>
-                <el-button plain type="primary" :disabled="modelInfo.status !== 'Running'" @click="bindDomain">
+                <el-button
+                    v-permission
+                    plain
+                    type="primary"
+                    :disabled="modelInfo.status !== 'Running'"
+                    @click="bindDomain"
+                >
                     {{ $t('aiTools.proxy.proxy') }}
                 </el-button>
                 <el-button :disabled="modelInfo.status !== 'Running'" @click="onLoadConn" type="primary" plain>
                     {{ $t('database.databaseConnInfo') }}
                 </el-button>
-                <el-button :disabled="modelInfo.status !== 'Running'" type="primary" plain @click="onSync()">
+                <el-button
+                    v-permission
+                    :disabled="modelInfo.status !== 'Running'"
+                    type="primary"
+                    plain
+                    @click="onSync()"
+                >
                     {{ $t('database.loadFromRemote') }}
                 </el-button>
                 <el-button
@@ -42,7 +54,7 @@
                     OpenWebUI
                 </el-button>
 
-                <el-button plain :disabled="selects.length === 0" type="primary" @click="onDelete(null)">
+                <el-button v-permission plain :disabled="selects.length === 0" type="primary" @click="onDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -414,6 +426,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.retry'),
+        permission: true,
         click: (row: AI.OllamaModelInfo) => {
             onReCreate(row.name);
         },
@@ -423,6 +436,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: AI.OllamaModelInfo) => {
             onDelete(row);
         },

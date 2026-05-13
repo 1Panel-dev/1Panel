@@ -4,7 +4,7 @@
             <el-form-item :label="$t('toolbox.fail2ban.logPath')" prop="logPath" :rules="Rules.requiredInput">
                 <el-input v-model="form.logPath">
                     <template #prepend>
-                        <el-button icon="Folder" @click="fileRef.acceptParams({})" />
+                        <el-button v-permission icon="Folder" @click="fileRef.acceptParams({})" />
                     </template>
                 </el-input>
                 <span class="input-help">{{ $t('toolbox.fail2ban.logPathHelper') }}</span>
@@ -13,7 +13,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
+                <el-button v-permission :disabled="loading" type="primary" @click="onSave(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

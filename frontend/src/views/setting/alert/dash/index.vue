@@ -140,20 +140,15 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import AddTask from '@/views/setting/alert/dash/task/index.vue';
 import { Alert } from '@/api/interface/alert';
 import { UpdateAlertStatus, SearchAlerts, DeleteAlert } from '@/api/modules/alert';
-import { storeToRefs } from 'pinia';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
-
-const globalStore = GlobalStore();
-const { isMaster, isProductPro } = storeToRefs(globalStore);
+const { isMobile, isMaster, isProductPro } = useGlobalStore();
 
 const { t } = i18n.global;
 const loading = ref(false);

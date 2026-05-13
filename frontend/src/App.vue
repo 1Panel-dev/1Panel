@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { reactive, computed, ref, nextTick, provide } from 'vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import zhTw from 'element-plus/es/locale/lang/zh-tw';
 import en from 'element-plus/es/locale/lang/en';
@@ -20,22 +20,22 @@ import esES from 'element-plus/es/locale/lang/es';
 import { useTheme } from '@/global/use-theme';
 useTheme();
 
-const globalStore = GlobalStore();
+const { language } = useGlobalStore();
 const config = reactive({
     autoInsertSpace: false,
 });
 
 const i18nLocale = computed(() => {
-    if (globalStore.language === 'zh') return zhCn;
-    if (globalStore.language === 'zh-Hant') return zhTw;
-    if (globalStore.language === 'en') return en;
-    if (globalStore.language === 'ja') return ja;
-    if (globalStore.language === 'ms') return ms;
-    if (globalStore.language === 'ru') return ru;
-    if (globalStore.language === 'pt-BR') return ptBR;
-    if (globalStore.language === 'ko') return ko;
-    if (globalStore.language === 'tr') return tr;
-    if (globalStore.language === 'es-ES') return esES;
+    if (language.value === 'zh') return zhCn;
+    if (language.value === 'zh-Hant') return zhTw;
+    if (language.value === 'en') return en;
+    if (language.value === 'ja') return ja;
+    if (language.value === 'ms') return ms;
+    if (language.value === 'ru') return ru;
+    if (language.value === 'pt-BR') return ptBR;
+    if (language.value === 'ko') return ko;
+    if (language.value === 'tr') return tr;
+    if (language.value === 'es-ES') return esES;
     return zhCn;
 });
 

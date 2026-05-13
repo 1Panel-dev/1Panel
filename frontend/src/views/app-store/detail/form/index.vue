@@ -123,7 +123,7 @@
                 </el-form-item>
 
                 <PushToNode
-                    v-if="globalStore.isMaster && globalStore.isXpackOrEE() && batchInstallSupport"
+                    v-if="isMaster && isXpackOrEE && batchInstallSupport"
                     :push-node="formData.pushNode"
                     :nodes="formData.nodes"
                     type="app"
@@ -156,8 +156,8 @@ import { Container } from '@/api/interface/container';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { computeSizeFromMB } from '@/utils/size';
 import { loadResourceLimit } from '@/api/modules/container';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isMaster, isOffline, isXpackOrEE } = useGlobalStore();
 
 const PushToNode = defineAsyncComponent(async () => {
     const modules = import.meta.glob('@/xpack/views/ssl/index.vue');
@@ -322,7 +322,7 @@ const initForm = async (appKey: string) => {
         formData.value.version = defaultVersion;
         getVersionDetail(defaultVersion);
     }
-    if (globalStore.isOffline) {
+    if (isOffline.value) {
         formData.value.pullImage = false;
     }
 };

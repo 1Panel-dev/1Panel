@@ -79,9 +79,9 @@ import { dateFormatForName } from '@/utils/date';
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { checkStreamAuth } from '@/utils/stream-auth';
-const globalStore = GlobalStore();
+const { currentNode: globalCurrentNode } = useGlobalStore();
 
 const em = defineEmits(['update:loading']);
 
@@ -239,7 +239,7 @@ const searchLogs = async () => {
     stopListening();
     clearTerminal();
 
-    let currentNode = globalStore.currentNode;
+    let currentNode = globalCurrentNode.value;
     if (props.node && props.node !== '') {
         currentNode = props.node;
     }
@@ -311,7 +311,7 @@ const onClean = async () => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
-        let currentNode = globalStore.currentNode;
+        let currentNode = globalCurrentNode.value;
         if (props.node && props.node !== '') {
             currentNode = props.node;
         }

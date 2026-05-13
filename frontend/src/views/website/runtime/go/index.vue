@@ -4,7 +4,7 @@
         <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
         <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="openCreate">
+                <el-button v-permission type="primary" @click="openCreate">
                     {{ $t('commons.button.create') }}
                 </el-button>
             </template>
@@ -57,7 +57,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.remark')" prop="remark" min-width="150px">
                         <template #default="{ row }">
-                            <fu-read-write-switch>
+                            <fu-read-write-switch v-permission>
                                 <template #read>
                                     <MsgInfo :info="row.remark" :width="'150'" />
                                 </template>

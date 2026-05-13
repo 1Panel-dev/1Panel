@@ -48,7 +48,7 @@
                                 diskInfo.mountPoint == ''
                             "
                         >
-                            <el-button type="primary" size="small" @click="handlePartition(diskInfo)">
+                            <el-button v-permission type="primary" size="small" @click="handlePartition(diskInfo)">
                                 {{ $t('disk.handlePartition') }}
                             </el-button>
                         </div>
@@ -92,10 +92,18 @@
                 <el-table-column :label="$t('commons.table.operate')" width="150">
                     <template #default="{ row }">
                         <el-text type="info" v-if="scope === 'system'">{{ $t('disk.cannotOperate') }}</el-text>
-                        <el-button type="primary" link v-else-if="row.mountPoint != ''" @click="unmount(row)">
+                        <el-button
+                            v-permission
+                            type="primary"
+                            link
+                            v-else-if="row.mountPoint != ''"
+                            @click="unmount(row)"
+                        >
                             {{ $t('disk.unmount') }}
                         </el-button>
-                        <el-button type="primary" link v-else @click="mount(row)">{{ $t('disk.mount') }}</el-button>
+                        <el-button v-permission type="primary" link v-else @click="mount(row)">
+                            {{ $t('disk.mount') }}
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -137,10 +145,18 @@
                 <el-table-column :label="$t('commons.table.operate')" width="150">
                     <template #default="{ row }">
                         <el-text type="info" v-if="scope === 'system'">{{ $t('disk.cannotOperate') }}</el-text>
-                        <el-button type="primary" link v-else-if="row.mountPoint != ''" @click="unmount(row)">
+                        <el-button
+                            v-permission
+                            type="primary"
+                            link
+                            v-else-if="row.mountPoint != ''"
+                            @click="unmount(row)"
+                        >
                             {{ $t('disk.unmount') }}
                         </el-button>
-                        <el-button type="primary" link v-else @click="mount(row)">{{ $t('disk.mount') }}</el-button>
+                        <el-button v-permission type="primary" link v-else @click="mount(row)">
+                            {{ $t('disk.mount') }}
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>

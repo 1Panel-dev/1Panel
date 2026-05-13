@@ -14,6 +14,7 @@
                     <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
                         <el-form-item :label="$t('app.uninstallDeleteBackup')" prop="uninstallDeleteBackup">
                             <el-switch
+                                v-permission
                                 v-model="config.uninstallDeleteBackup"
                                 active-value="Enable"
                                 inactive-value="Disable"
@@ -23,6 +24,7 @@
                         </el-form-item>
                         <el-form-item :label="$t('app.uninstallDeleteImage')" prop="uninstallDeleteImage">
                             <el-switch
+                                v-permission
                                 v-model="config.uninstallDeleteImage"
                                 active-value="Enable"
                                 inactive-value="Disable"
@@ -32,6 +34,7 @@
                         </el-form-item>
                         <el-form-item :label="$t('app.upgradeBackup')" prop="upgradeBackup">
                             <el-switch
+                                v-permission
                                 v-model="config.upgradeBackup"
                                 active-value="Enable"
                                 inactive-value="Disable"
@@ -41,6 +44,7 @@
                         </el-form-item>
                         <el-form-item :label="$t('app.installAllowPort')" prop="installAllowPort">
                             <el-switch
+                                v-permission
                                 v-model="config.installAllowPort"
                                 active-value="Enable"
                                 inactive-value="Disable"
@@ -48,7 +52,7 @@
                                 @change="updateConfig('InstallAllowPort', config.installAllowPort)"
                             />
                         </el-form-item>
-                        <CustomSetting v-if="globalStore.isXpackOrEE()" />
+                        <CustomSetting v-if="isXpackOrEE" />
                         <span class="input-help logText" v-else>
                             {{ $t('xpack.customApp.licenseHelper') }}
                             <el-link class="link" @click="toUpload" type="primary">
@@ -71,8 +75,8 @@ import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { defineAsyncComponent } from 'vue';
 import { loadOptionalComponent } from '@/extensions/optional';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isXpackOrEE } = useGlobalStore();
 
 const CustomSetting = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/appstore/index.vue'));
 
@@ -111,7 +115,7 @@ const toUpload = () => {
 };
 
 const getNodeConfig = async () => {
-    if (globalStore.isXpackOrEE()) {
+    if (isXpackOrEE.value) {
         return;
     }
     const res = await getCurrentNodeCustomAppConfig();

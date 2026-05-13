@@ -1,7 +1,7 @@
 <template>
     <el-form ref="formRef" v-loading="deleting" :model="form" :rules="rules" label-position="top">
         <el-form-item v-if="configured">
-            <el-button type="danger" plain :loading="deleting" @click="deleteChannel">
+            <el-button v-permission type="danger" plain :loading="deleting" @click="deleteChannel">
                 {{ t('commons.button.delete') }}
             </el-button>
         </el-form-item>
@@ -24,7 +24,7 @@
             </el-select>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="saving" @click="save">
+            <el-button v-permission type="primary" :loading="saving" @click="save">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
@@ -34,7 +34,7 @@
                 <el-input v-model="pairingCode" :placeholder="t('aiTools.agents.pairingCodePlaceholder')" />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" plain :loading="approving" @click="approvePairing">
+                <el-button v-permission type="primary" plain :loading="approving" @click="approvePairing">
                     {{ t('aiTools.agents.approvePairing') }}
                 </el-button>
             </el-form-item>

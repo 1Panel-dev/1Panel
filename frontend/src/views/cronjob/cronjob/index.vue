@@ -2,29 +2,39 @@
     <div>
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('menu.cronjob')">
             <template #leftToolBar>
-                <el-button type="primary" @click="onOpenDialog('')">
+                <el-button v-permission type="primary" @click="onOpenDialog('')">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button @click="onOpenGroupDialog()">
+                <el-button v-permission @click="onOpenGroupDialog()">
                     {{ $t('commons.table.group') }}
                 </el-button>
                 <el-button-group>
-                    <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('enable')">
+                    <el-button
+                        v-permission
+                        plain
+                        :disabled="selects.length === 0"
+                        @click="onBatchChangeStatus('enable')"
+                    >
                         {{ $t('commons.button.enable') }}
                     </el-button>
-                    <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('disable')">
+                    <el-button
+                        v-permission
+                        plain
+                        :disabled="selects.length === 0"
+                        @click="onBatchChangeStatus('disable')"
+                    >
                         {{ $t('commons.button.disable') }}
                     </el-button>
-                    <el-button plain :disabled="selects.length === 0" @click="onDelete(null)">
+                    <el-button v-permission plain :disabled="selects.length === 0" @click="onDelete(null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </el-button-group>
 
                 <el-button-group>
-                    <el-button @click="onImport">
+                    <el-button v-permission @click="onImport">
                         {{ $t('commons.button.import') }}
                     </el-button>
-                    <el-button :disabled="selects.length === 0" @click="onExport">
+                    <el-button v-permission :disabled="selects.length === 0" @click="onExport">
                         {{ $t('commons.button.export') }}
                     </el-button>
                 </el-button-group>
@@ -70,7 +80,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.group')" min-width="120" prop="group">
                         <template #default="{ row }">
-                            <fu-select-rw-switch v-model="row.groupID" @change="updateGroup(row)">
+                            <fu-select-rw-switch v-permission v-model="row.groupID" @change="updateGroup(row)">
                                 <template #read>
                                     {{ row.groupBelong === 'Default' ? $t('commons.table.default') : row.groupBelong }}
                                 </template>
@@ -88,12 +98,14 @@
                     <el-table-column :label="$t('commons.table.status')" :min-width="90" prop="status" sortable>
                         <template #default="{ row }">
                             <Status
+                                v-permission
                                 v-if="row.status === 'Enable'"
                                 @click="onChangeStatus(row.id, 'disable')"
                                 :status="row.status"
                                 :operate="true"
                             />
                             <Status
+                                v-permission
                                 v-if="row.status === 'Disable'"
                                 @click="onChangeStatus(row.id, 'enable')"
                                 :status="row.status"
@@ -125,7 +137,13 @@
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.retainCopies')" :min-width="120" prop="retainCopies">
                         <template #default="{ row }">
-                            <el-button v-if="hasBackup(row.type)" @click="loadBackups(row)" plain size="small">
+                            <el-button
+                                v-permission
+                                v-if="hasBackup(row.type)"
+                                @click="loadBackups(row)"
+                                plain
+                                size="small"
+                            >
                                 {{ row.retainCopies }}{{ $t('cronjob.retainCopiesUnit') }}
                             </el-button>
                             <span v-else>{{ row.retainCopies }}</span>
@@ -490,6 +508,7 @@ const loadDetail = (row: any) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.handle'),
+        permission: true,
         click: (row: Cronjob.CronjobInfo) => {
             onHandle(row);
         },
@@ -505,12 +524,14 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: (row: Cronjob.CronjobInfo) => {
             onOpenDialog(row.id + '');
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: Cronjob.CronjobInfo) => {
             onDelete(row);
         },

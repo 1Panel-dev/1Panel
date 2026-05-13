@@ -1,33 +1,31 @@
 import { Setting } from '@/api/interface/setting';
 import { listNodeOptions, loadNodeByUser } from '@/api/modules/setting';
-import { GlobalStore } from '@/store';
-
-const getGlobalStore = () => GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 export const changeToLocal = async () => {
-    const globalStore = getGlobalStore();
+    const { currentNode, currentNodeAddr, isAdmin } = useGlobalStore();
     let nodes = await listNodes('all');
     if (nodes.length === 0) {
         setDefaultNodeInfo();
         return;
     }
-    if (globalStore.isAdmin) {
+    if (isAdmin.value) {
         for (const item of nodes) {
             if (item.name === 'local') {
-                globalStore.currentNode = 'local';
-                globalStore.currentNodeAddr = item.addr;
+                currentNode.value = 'local';
+                currentNodeAddr.value = item.addr;
                 return;
             }
         }
     }
-    globalStore.currentNode = nodes[0].name;
-    globalStore.currentNodeAddr = nodes[0].addr;
+    currentNode.value = nodes[0].name;
+    currentNodeAddr.value = nodes[0].addr;
 };
 
 export async function listNodes(type: string): Promise<Array<Setting.NodeItem>> {
-    const globalStore = getGlobalStore();
+    const { isAdmin } = useGlobalStore();
     try {
-        if (globalStore.isAdmin) {
+        if (isAdmin.value) {
             const res = await listNodeOptions(type);
             return res.data || [];
         } else {
@@ -40,7 +38,7 @@ export async function listNodes(type: string): Promise<Array<Setting.NodeItem>> 
 }
 
 export const setDefaultNodeInfo = () => {
-    const globalStore = getGlobalStore();
-    globalStore.currentNode = 'local';
-    globalStore.currentNodeAddr = '127.0.0.1';
+    const { currentNode, currentNodeAddr } = useGlobalStore();
+    currentNode.value = 'local';
+    currentNodeAddr.value = '127.0.0.1';
 };

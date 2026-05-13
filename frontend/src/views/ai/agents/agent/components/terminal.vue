@@ -5,7 +5,7 @@
         @close="handleClose"
         :resource="title"
         fullScreen
-        :size="globalStore.isFullScreen ? 'full' : 'large'"
+        :size="isFullScreen ? 'full' : 'large'"
         :autoClose="false"
     >
         <template #content>
@@ -33,7 +33,7 @@ import { nextTick, reactive, ref } from 'vue';
 import Terminal from '@/components/terminal/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { globalStore, currentNode } = useGlobalStore();
+const { currentNode, isFullScreen } = useGlobalStore();
 
 const title = ref('');
 const terminalVisible = ref(false);

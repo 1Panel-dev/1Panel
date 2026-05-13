@@ -9,14 +9,14 @@
                         <el-tag>{{ form.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
-                        <el-button v-if="form.isActive" type="primary" @click="onOperate('stop')" link>
+                        <el-button v-if="form.isActive" v-permission type="primary" @click="onOperate('stop')" link>
                             {{ $t('commons.button.stop') }}
                         </el-button>
-                        <el-button v-if="!form.isActive" type="primary" @click="onOperate('start')" link>
+                        <el-button v-if="!form.isActive" v-permission type="primary" @click="onOperate('start')" link>
                             {{ $t('commons.button.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" @click="onOperate('restart')" link>
+                        <el-button v-permission type="primary" @click="onOperate('restart')" link>
                             {{ $t('commons.button.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
@@ -24,6 +24,7 @@
                             {{ $t('ssh.autoStart') }}
                         </el-button>
                         <el-switch
+                            v-permission
                             size="small"
                             class="ml-2"
                             inactive-value="disable"
@@ -38,7 +39,7 @@
 
         <div v-if="form.isExist">
             <LayoutContent title="Fail2ban" :divider="true">
-                <template #promp v-if="!globalStore.isFxplay">
+                <template #promp v-if="!isFxplay">
                     <el-alert type="info" :closable="false">
                         <template #title>
                             {{ $t('toolbox.common.toolboxHelper') }}
@@ -49,10 +50,22 @@
                     </el-alert>
                 </template>
                 <template #leftToolBar>
-                    <el-button :disabled="!form.isActive" type="primary" plain @click="onLoadList('ignore')">
+                    <el-button
+                        v-permission
+                        :disabled="!form.isActive"
+                        type="primary"
+                        plain
+                        @click="onLoadList('ignore')"
+                    >
                         {{ $t('toolbox.fail2ban.ignoreIP') }}
                     </el-button>
-                    <el-button :disabled="!form.isActive" type="primary" plain @click="onLoadList('banned')">
+                    <el-button
+                        v-permission
+                        :disabled="!form.isActive"
+                        type="primary"
+                        plain
+                        @click="onLoadList('banned')"
+                    >
                         {{ $t('toolbox.fail2ban.bannedIP') }}
                     </el-button>
                 </template>
@@ -68,7 +81,7 @@
                                 <el-form-item :label="$t('toolbox.fail2ban.sshPort')" prop="port">
                                     <el-input disabled v-model="form.port">
                                         <template #append>
-                                            <el-button @click="onChangePort" icon="Setting">
+                                            <el-button v-permission @click="onChangePort" icon="Setting">
                                                 {{ $t('commons.button.set') }}
                                             </el-button>
                                         </template>
@@ -78,7 +91,7 @@
                                 <el-form-item :label="$t('toolbox.fail2ban.maxRetry')" prop="maxRetry">
                                     <el-input disabled v-model="form.maxRetry">
                                         <template #append>
-                                            <el-button @click="onChangeMaxRetry" icon="Setting">
+                                            <el-button v-permission @click="onChangeMaxRetry" icon="Setting">
                                                 {{ $t('commons.button.set') }}
                                             </el-button>
                                         </template>
@@ -87,7 +100,7 @@
                                 <el-form-item :label="$t('toolbox.fail2ban.banTime')" prop="banTime">
                                     <el-input disabled v-model="form.banTimeItem">
                                         <template #append>
-                                            <el-button @click="onChangeBanTime" icon="Setting">
+                                            <el-button v-permission @click="onChangeBanTime" icon="Setting">
                                                 {{ $t('commons.button.set') }}
                                             </el-button>
                                         </template>
@@ -97,7 +110,7 @@
                                 <el-form-item :label="$t('toolbox.fail2ban.findTime')" prop="findTime">
                                     <el-input disabled v-model="form.findTimeItem">
                                         <template #append>
-                                            <el-button @click="onChangeFindTime" icon="Setting">
+                                            <el-button v-permission @click="onChangeFindTime" icon="Setting">
                                                 {{ $t('commons.button.set') }}
                                             </el-button>
                                         </template>
@@ -106,7 +119,7 @@
                                 <el-form-item :label="$t('toolbox.fail2ban.banAction')" prop="banAction">
                                     <el-input disabled v-model="form.banAction">
                                         <template #append>
-                                            <el-button @click="onChangeBanAction" icon="Setting">
+                                            <el-button v-permission @click="onChangeBanAction" icon="Setting">
                                                 {{ $t('commons.button.set') }}
                                             </el-button>
                                         </template>
@@ -115,7 +128,7 @@
                                 <el-form-item :label="$t('toolbox.fail2ban.logPath')" prop="logPath">
                                     <el-input disabled v-model="form.logPath">
                                         <template #append>
-                                            <el-button @click="onChangeLogPath" icon="Setting">
+                                            <el-button v-permission @click="onChangeLogPath" icon="Setting">
                                                 {{ $t('commons.button.set') }}
                                             </el-button>
                                         </template>
@@ -132,7 +145,7 @@
                             v-model="fail2banConf"
                             :heightDiff="460"
                         ></CodemirrorPro>
-                        <el-button :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
+                        <el-button v-permission :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </div>
@@ -167,9 +180,9 @@ import { MsgSuccess } from '@/utils/message';
 import { getFail2banConf, getFail2banBase, operateFail2ban, updateFail2banByFile } from '@/api/modules/toolbox';
 import { ElMessageBox } from 'element-plus';
 import { transTimeUnit } from '@/utils/validate';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { docsUrl, isFxplay } = useGlobalStore();
 
 const loading = ref(false);
 const formRef = ref();
@@ -300,7 +313,7 @@ const search = async () => {
 };
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/toolbox/fail2ban/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/toolbox/fail2ban/', '_blank', 'noopener,noreferrer');
 };
 
 onMounted(() => {

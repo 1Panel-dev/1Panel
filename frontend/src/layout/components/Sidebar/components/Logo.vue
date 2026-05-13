@@ -2,7 +2,7 @@
     <div class="logo" style="cursor: pointer" @click="goHome">
         <template v-if="isCollapse">
             <img
-                v-if="globalStore.themeConfig.logo && !logoLoadFailed"
+                v-if="themeConfig.logo && !logoLoadFailed"
                 :src="`/api/v2/images/logo?t=${Date.now()}`"
                 style="cursor: pointer"
                 alt="logo"
@@ -12,7 +12,7 @@
         </template>
         <template v-else>
             <img
-                v-if="globalStore.themeConfig.logoWithText && !logoWithTextLoadFailed"
+                v-if="themeConfig.logoWithText && !logoWithTextLoadFailed"
                 :src="`/api/v2/images/logoWithText?t=${Date.now()}`"
                 style="cursor: pointer"
                 alt="logo"
@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import PrimaryLogo from '@/assets/images/1panel-logo.svg?component';
 import MenuLogo from '@/assets/images/1panel-menu-logo.svg?component';
 import { ref } from 'vue';
@@ -34,7 +34,7 @@ defineProps<{ isCollapse: boolean }>();
 
 const logoLoadFailed = ref(false);
 const logoWithTextLoadFailed = ref(false);
-const globalStore = GlobalStore();
+const { themeConfig } = useGlobalStore();
 
 const goHome = () => {
     routerToNameWithQuery('home', { t: Date.now() });

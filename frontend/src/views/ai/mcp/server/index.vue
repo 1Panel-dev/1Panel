@@ -4,10 +4,10 @@
         <LayoutContent :title="'Servers'" v-loading="loading">
             <template #leftToolBar>
                 <div class="flex flex-wrap gap-3">
-                    <el-button type="primary" @click="openCreate">
+                    <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
-                    <el-button type="primary" plain @click="openDomain">
+                    <el-button v-permission type="primary" plain @click="openDomain">
                         {{ $t('aiTools.mcp.bindDomain') }}
                     </el-button>
                 </div>
@@ -136,18 +136,21 @@ const getUrl = (row: AI.McpServer) => {
 const buttons = [
     {
         label: i18n.global.t('menu.config'),
+        permission: true,
         click: (row: AI.McpServer) => {
             openConfig(row);
         },
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: (row: AI.McpServer) => {
             openDetail(row);
         },
     },
     {
         label: i18n.global.t('commons.button.start'),
+        permission: true,
         click: (row: AI.McpServer) => {
             opServer(row, 'start');
         },
@@ -157,6 +160,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.stop'),
+        permission: true,
         click: (row: AI.McpServer) => {
             opServer(row, 'stop');
         },
@@ -166,12 +170,14 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
+        permission: true,
         click: (row: AI.McpServer) => {
             opServer(row, 'restart');
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: AI.McpServer) => {
             deleteServer(row);
         },

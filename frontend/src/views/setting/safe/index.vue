@@ -164,11 +164,9 @@ import { updateSetting, getSettingInfo, getSystemAvailable, updateSSL, loadSSLIn
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { Setting } from '@/api/interface/setting';
-import { GlobalStore } from '@/store';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
-const globalStore = GlobalStore();
+const { entrance, isLogin, isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const entranceRef = ref();
@@ -278,10 +276,10 @@ const handleSSL = async () => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             lastSSL.value = 'Disable';
             let href = window.location.href;
-            globalStore.isLogin = false;
+            isLogin.value = false;
             let address = href.split('://')[1];
-            if (globalStore.entrance) {
-                address = address.replaceAll('settings/safe', globalStore.entrance);
+            if (entrance.value) {
+                address = address.replaceAll('settings/safe', entrance.value);
             } else {
                 address = address.replaceAll('settings/safe', 'login');
             }

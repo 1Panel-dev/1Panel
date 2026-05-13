@@ -3,7 +3,9 @@
         <template #content>
             <ComplexTable :data="data" @search="search()" :pagination-config="paginationConfig">
                 <template #toolbar>
-                    <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                    <el-button v-permission type="primary" @click="openCreate">
+                        {{ $t('commons.button.create') }}
+                    </el-button>
                 </template>
                 <el-table-column :label="$t('commons.table.name')" width="150px" prop="name"></el-table-column>
                 <el-table-column :label="$t('php.extension')" fix prop="extensions"></el-table-column>
@@ -43,6 +45,7 @@ const paginationConfig = reactive({
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: Runtime.PHPExtensions) {
             openUpdate(row);
         },

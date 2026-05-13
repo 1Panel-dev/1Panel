@@ -75,11 +75,10 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { GlobalStore } from '@/store';
-const slots = useSlots();
 import { useGlobalStore } from '@/composables/useGlobalStore';
+const slots = useSlots();
 
-const { isMobile } = useGlobalStore();
+const { isMobile, openMenuTabs } = useGlobalStore();
 
 defineOptions({ name: 'ComplexTable' });
 export interface DropdownProps {
@@ -108,7 +107,7 @@ const props = defineProps({
     },
 });
 const emit = defineEmits(['search', 'update:selects', 'update:paginationConfig']);
-const globalStore = GlobalStore();
+
 const tableRef = ref();
 const tableHeight = ref<number | string>('');
 const menuRef = ref<HTMLElement | null>(null);
@@ -280,7 +279,7 @@ defineExpose({
 
 function calcHeight() {
     let heightDiff = props.heightDiff ?? 320;
-    let tabHeight = globalStore.openMenuTabs ? 48 : 0;
+    let tabHeight = openMenuTabs.value ? 48 : 0;
 
     if (props.height) {
         tableHeight.value = props.height - tabHeight;

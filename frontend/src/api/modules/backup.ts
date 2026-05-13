@@ -4,8 +4,7 @@ import { encodeBase64Fields } from '@/utils/base64';
 import { ResPage } from '../interface';
 import { Backup } from '../interface/backup';
 import { TimeoutEnum } from '@/enums/http-enum';
-import { GlobalStore } from '@/store';
-const getGlobalStore = () => GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 // backup-agent
 export const getLocalBackupDir = (node?: string) => {
@@ -16,19 +15,19 @@ export const searchBackup = (params: Backup.SearchWithType) => {
     return http.post<ResPage<Backup.BackupInfo>>(`/backups/search`, params);
 };
 export const checkBackup = (params: Backup.BackupOperate) => {
-    const globalStore = getGlobalStore();
+    const { isProductPro } = useGlobalStore();
     let request = deepCopy(params) as Backup.BackupOperate;
     encodeBase64Fields(request, ['accessKey', 'credential']);
-    if (!params.isPublic || !globalStore.isProductPro) {
+    if (!params.isPublic || !isProductPro.value) {
         return http.postLocalNode<Backup.CheckResult>(`/backups/conn/check`, request);
     }
     return http.post<Backup.CheckResult>(`/backups/conn/check`, request);
 };
 export const listBucket = (params: Backup.ForBucket) => {
-    const globalStore = getGlobalStore();
+    const { isProductPro } = useGlobalStore();
     let request = deepCopy(params) as Backup.BackupOperate;
     encodeBase64Fields(request, ['accessKey', 'credential']);
-    if (!params.isPublic || !globalStore.isProductPro) {
+    if (!params.isPublic || !isProductPro.value) {
         return http.postLocalNode('/backups/buckets', request, TimeoutEnum.T_40S);
     }
     return http.post('/backups/buckets', request, TimeoutEnum.T_40S);

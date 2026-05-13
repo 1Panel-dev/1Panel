@@ -65,7 +65,7 @@
                 <el-input v-model="form.secret" type="password" show-password />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
+                <el-button v-permission type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
                     {{ t('commons.button.save') }}
                 </el-button>
             </el-form-item>
@@ -77,7 +77,13 @@
                     <el-input v-model="pairingCode" :placeholder="t('aiTools.agents.pairingCodePlaceholder')" />
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" :loading="approving" :disabled="!installed" @click="approvePairing">
+                    <el-button
+                        v-permission
+                        type="primary"
+                        :loading="approving"
+                        :disabled="!installed"
+                        @click="approvePairing"
+                    >
                         {{ t('aiTools.agents.approvePairing') }}
                     </el-button>
                 </el-form-item>

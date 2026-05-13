@@ -36,7 +36,7 @@
                                     </div>
                                     <div>
                                         <el-button
-                                            v-if="globalStore.isXpackOrEE()"
+                                            v-if="isXpackOrEE"
                                             @click="onChangeThemeColor"
                                             icon="Setting"
                                             class="!h-[32px] sm:!h-[33.5px]"
@@ -58,11 +58,7 @@
                                 </el-radio-group>
                             </el-form-item>
 
-                            <el-form-item
-                                :label="$t('setting.watermark')"
-                                v-if="globalStore.isXpackOrEE()"
-                                prop="watermark"
-                            >
+                            <el-form-item :label="$t('setting.watermark')" v-if="isXpackOrEE" prop="watermark">
                                 <el-radio-group class="w-full" @change="onChangeWatermark" v-model="form.watermarkShow">
                                     <el-radio-button value="Enable">
                                         <span>{{ $t('commons.button.enable') }}</span>
@@ -156,11 +152,7 @@
                                 </el-button>
                             </el-form-item>
 
-                            <el-form-item
-                                :label="$t('setting.offlineEnv')"
-                                v-if="globalStore.isEnterprise"
-                                prop="isOffline"
-                            >
+                            <el-form-item :label="$t('setting.offlineEnv')" v-if="isEnterprise" prop="isOffline">
                                 <el-switch
                                     v-model="form.isOffline"
                                     active-value="Enable"
@@ -195,7 +187,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
 import { getSettingInfo, updateSetting, getSystemAvailable, getAgentSettingInfo } from '@/api/modules/setting';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { useTheme } from '@/global/use-theme';
 import { MsgSuccess } from '@/utils/message';
 import ThemeColor from '@/views/setting/panel/theme-color/index.vue';
@@ -209,12 +201,21 @@ import { getXpackProxyDocker } from '@/extensions/xpack';
 import { getXpackSetting, updateXpackSettingByKey } from '@/utils/xpack';
 import { setPrimaryColor } from '@/utils/theme';
 import i18n from '@/lang';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
+const {
+    globalStore,
+    isEnterprise,
+    isIntl,
+    isMobile,
+    isOffline,
+    isXpackOrEE,
+    openMenuTabs,
+    themeConfig,
+    watermark,
+    watermarkShow,
+} = useGlobalStore();
 
 const loading = ref(false);
-const globalStore = GlobalStore();
 
 const { switchTheme } = useTheme();
 
@@ -267,7 +268,7 @@ const unset = ref(i18n.global.t('setting.unSetting'));
 const languageOptions = ref([
     { value: 'zh', label: '中文(简体)' },
     { value: 'zh-Hant', label: '中文(繁體)' },
-    ...(!globalStore.isIntl ? [{ value: 'en', label: 'English' }] : []),
+    ...(!isIntl.value ? [{ value: 'en', label: 'English' }] : []),
     { value: 'ja', label: '日本語' },
     { value: 'pt-BR', label: 'Português (Brasil)' },
     { value: 'ko', label: '한국어' },
@@ -277,7 +278,7 @@ const languageOptions = ref([
     { value: 'es-ES', label: 'España - Español' },
 ]);
 
-if (globalStore.isIntl) {
+if (isIntl.value) {
     languageOptions.value.unshift({ value: 'en', label: 'English' });
 }
 
@@ -305,29 +306,29 @@ const search = async () => {
     form.developerMode = res.data.developerMode;
     form.hideMenu = res.data.hideMenu;
 
-    if (globalStore.isXpackOrEE()) {
+    if (isXpackOrEE.value) {
         const [xpackRes, proxyDockerRes] = await Promise.all([
             getXpackSetting(),
             getXpackProxyDocker().catch(() => null),
         ]);
         if (xpackRes) {
-            form.theme = xpackRes.data.theme || globalStore.themeConfig.theme || 'light';
+            form.theme = xpackRes.data.theme || themeConfig.value.theme || 'light';
             form.themeColor = JSON.parse(xpackRes.data.themeColor || '{"light":"#005eeb","dark":"#F0BE96"}');
-            globalStore.themeConfig.themeColor = xpackRes.data.themeColor
+            themeConfig.value.themeColor = xpackRes.data.themeColor
                 ? xpackRes.data.themeColor
                 : '{"light":"#005eeb","dark":"#F0BE96"}';
-            globalStore.themeConfig.theme = form.theme;
+            themeConfig.value.theme = form.theme;
             form.watermark = xpackRes.data.watermark;
             form.watermarkShow = xpackRes.data.watermarkShow;
             try {
-                globalStore.watermark = JSON.parse(xpackRes.data.watermark);
+                watermark.value = JSON.parse(xpackRes.data.watermark);
             } catch {
-                globalStore.watermark = null;
+                watermark.value = null;
             }
         }
         form.proxyDocker = proxyDockerRes?.data?.proxyDocker || '';
     } else {
-        globalStore.themeConfig.theme = form.theme;
+        themeConfig.value.theme = form.theme;
     }
 };
 
@@ -364,8 +365,8 @@ const runtimeEnvLabel = () => {
 };
 
 const onChangeThemeColor = () => {
-    const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);
-    themeColorRef.value.acceptParams({ themeColor: themeColor, theme: globalStore.themeConfig.theme });
+    const themeColor: ThemeColor = JSON.parse(themeConfig.value.themeColor);
+    themeColorRef.value.acceptParams({ themeColor: themeColor, theme: themeConfig.value.theme });
 };
 
 const onChangeWatermark = async () => {
@@ -382,8 +383,8 @@ const onChangeWatermark = async () => {
             await updateXpackSettingByKey('WatermarkShow', 'Disable')
                 .then(() => {
                     loading.value = false;
-                    globalStore.watermark = null;
-                    globalStore.watermarkShow = false;
+                    watermark.value = null;
+                    watermarkShow.value = false;
                     search();
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
@@ -418,19 +419,19 @@ const onChangeOfflineEnv = async (val: string | number | boolean) => {
 };
 
 const handleThemeChange = async (val: string) => {
-    globalStore.themeConfig.theme = val;
+    themeConfig.value.theme = val;
     switchTheme();
-    if (globalStore.isXpackOrEE()) {
+    if (isXpackOrEE.value) {
         await updateXpackSettingByKey('Theme', val);
         let color: string;
-        const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);
+        const themeColor: ThemeColor = JSON.parse(themeConfig.value.themeColor);
         if (val === 'auto') {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
             color = prefersDark.matches ? themeColor.dark : themeColor.light;
         } else {
             color = val === 'dark' ? themeColor.dark : themeColor.light;
         }
-        globalStore.themeConfig.primary = color;
+        themeConfig.value.primary = color;
         setPrimaryColor(color);
     }
 };
@@ -447,14 +448,14 @@ const onSave = async (key: string, val: any) => {
                 handleThemeChange(val);
                 break;
             case 'MenuTabs':
-                globalStore.openMenuTabs = val === 'Enable';
+                openMenuTabs.value = val === 'Enable';
                 break;
             case 'Language':
                 await globalStore.updateLanguage(val);
                 location.reload();
                 break;
             case 'IsOffline':
-                globalStore.isOffline = val === 'Enable';
+                isOffline.value = val === 'Enable';
                 break;
         }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
