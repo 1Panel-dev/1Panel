@@ -101,6 +101,7 @@ ErrRolePresetCannotDelete: "No se pueden eliminar los roles predefinidos del sis
 ErrRolePresetCannotUpdate: "No se pueden actualizar los roles predefinidos del sistema"
 ErrRoleBoundToUser: "Este rol ya está vinculado a usuarios y no se puede eliminar"
 ErrRolePresetCannotBind: "Los roles predefinidos del sistema no se pueden asignar a usuarios"
+ErrNodeAdminMasterForbidden: "No se pueden agregar permisos de administrador de nodo al nodo principal"
 ErrSuperAdminCannotDelete: "No se pueden eliminar usuarios superadministradores"
 
 InvalidRequestBodyType: "Formato del cuerpo de la solicitud no válido, por favor revisa y asegúrate de que el contenido cumpla con el formato requerido antes de reintentar."

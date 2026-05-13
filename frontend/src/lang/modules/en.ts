@@ -3817,10 +3817,12 @@ const message = {
             nodeAdminDesc:
                 'Has management permissions for specified nodes and can manage resources and configurations within those nodes.',
             bindNode: 'Bind Node',
+            boundUsers: 'Bound Users',
             role: 'Role',
             roleName: 'Name',
             permission: 'Permissions',
             permissionDuplicate: 'Only one role can be assigned to each node',
+            nodeAdminMasterForbidden: 'Node Admin permissions cannot be added to the master node',
             view: 'View',
             manage: 'Manage',
             dashboard_view: 'Dashboard View',

@@ -96,6 +96,7 @@ ErrRolePresetCannotDelete: "システム既定ロールは削除できません"
 ErrRolePresetCannotUpdate: "システム既定ロールは更新できません"
 ErrRoleBoundToUser: "このロールはすでにユーザーに紐付いているため削除できません"
 ErrRolePresetCannotBind: "システム既定ロールはユーザーに割り当てできません"
+ErrNodeAdminMasterForbidden: "マスターノードにノード管理者権限を追加することはできません"
 ErrSuperAdminCannotDelete: "スーパー管理者ユーザーは削除できません"
 
 InvalidRequestBodyType: "リクエストボディの形式が無効です。内容が要求された形式に準拠しているか確認してから再試行してください！"

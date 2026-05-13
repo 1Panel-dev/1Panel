@@ -3871,10 +3871,12 @@ const message = {
             nodeAdminDesc:
                 'Tiene permisos de administración para nodos especificados y puede gestionar recursos y configuraciones dentro de esos nodos.',
             bindNode: 'Vincular nodo',
+            boundUsers: 'Usuarios vinculados',
             role: 'Rol',
             roleName: 'Nombre',
             permission: 'Permisos',
             permissionDuplicate: 'Solo se puede asignar un rol a cada nodo',
+            nodeAdminMasterForbidden: 'No se pueden agregar permisos de administrador de nodo al nodo principal',
             view: 'Ver',
             manage: 'Gestionar',
             dashboard_view: 'Vista del panel',

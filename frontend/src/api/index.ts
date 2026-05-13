@@ -3,7 +3,7 @@ import { ResultData } from '@/api/interface';
 import { ResultEnum } from '@/enums/http-enum';
 import { checkStatus } from './helper/check-status';
 import router from '@/routers';
-import { useGlobalStore } from '@/composables/useGlobalStore';
+import { GlobalStore } from '@/store';
 import { MsgError } from '@/utils/message';
 import { encodeBase64 } from '@/utils/base64';
 import i18n from '@/lang';
@@ -28,13 +28,13 @@ class RequestHttp {
         this.service = axios.create(config);
         this.service.interceptors.request.use(
             (config: AxiosRequestConfig) => {
-                const { csrfToken: csrfTokenRef, currentNode, entrance, language } = useGlobalStore();
+                const globalStore = GlobalStore();
                 config.headers = {
-                    'Accept-Language': language.value,
+                    'Accept-Language': globalStore.language,
                     ...config.headers,
                 };
                 if (config.headers.CurrentNode == undefined) {
-                    config.headers.CurrentNode = encodeURIComponent(currentNode.value);
+                    config.headers.CurrentNode = encodeURIComponent(globalStore.currentNode);
                 } else {
                     config.headers.CurrentNode = encodeURIComponent(String(config.headers.CurrentNode));
                 }
@@ -44,7 +44,7 @@ class RequestHttp {
                     config.url === '/core/auth/passkey/begin' ||
                     config.url === '/core/auth/passkey/finish'
                 ) {
-                    config.headers.EntranceCode = encodeBase64(entrance.value);
+                    config.headers.EntranceCode = encodeBase64(globalStore.entrance);
                 }
                 const method = (config.method || 'get').toUpperCase();
                 const requiresToken = !['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(method);
@@ -52,7 +52,7 @@ class RequestHttp {
                     const csrfToken = getCookie('pcsrftoken');
                     if (csrfToken) {
                         config.headers['X-CSRF-Token'] = csrfToken;
-                        csrfTokenRef.value = csrfToken;
+                        globalStore.csrfToken = csrfToken;
                     }
                 }
                 return {
@@ -66,7 +66,7 @@ class RequestHttp {
 
         this.service.interceptors.response.use(
             (response: AxiosResponse) => {
-                const { isEnterpriseLicensed, isLoading, isLogin, isProductPro, loadingText } = useGlobalStore();
+                const globalStore = GlobalStore();
                 const { data } = response;
                 const authResult = handleAuthResponseCode(data, { showRBACMessage: true });
                 if (authResult.handled) {
@@ -76,14 +76,14 @@ class RequestHttp {
                     return Promise.reject(data);
                 }
                 if (data.code == ResultEnum.ERR_XPACK) {
-                    isProductPro.value = false;
+                    globalStore.isProductPro = false;
                     window.location.reload();
                     return Promise.reject(data);
                 }
                 if (data.code == ResultEnum.ERR_ENTERPRISE) {
-                    isEnterpriseLicensed.value = false;
+                    globalStore.isEnterpriseLicensed = false;
                     const routeName = router.currentRoute.value.name;
-                    if (isLogin.value && routeName !== 'EnterpriseLicenseRequired') {
+                    if (globalStore.isLogin && routeName !== 'EnterpriseLicenseRequired') {
                         router.push({ name: 'EnterpriseLicenseRequired' });
                     }
                     return Promise.reject(data);
@@ -94,12 +94,12 @@ class RequestHttp {
                     return;
                 }
                 if (data.code == ResultEnum.ERR_GLOBAL_LOADING) {
-                    isLoading.value = true;
-                    loadingText.value = data.message;
+                    globalStore.isLoading = true;
+                    globalStore.loadingText = data.message;
                     return;
                 } else {
-                    if (isLoading.value) {
-                        isLoading.value = false;
+                    if (globalStore.isLoading) {
+                        globalStore.isLoading = false;
                     }
                 }
                 if (data.code == ResultEnum.ERR_AUTH) {
