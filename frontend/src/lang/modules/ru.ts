@@ -972,6 +972,7 @@ const message = {
             failedRequests: 'Неуспешные запросы',
             averageTokenPerRequest: 'Среднее Token/запрос',
             callLogs: 'Журнал вызовов',
+            usageKeywordPlaceholder: 'Поиск по Request ID / модели / upstream-модели / сообщению об ошибке',
             attemptChain: 'Цепочка попыток',
             attemptIndex: 'Порядок вызова',
             noAttemptDetails: 'Запрос выполнен с первой попытки, деталей fallback нет',

@@ -978,6 +978,7 @@ const message = {
             failedRequests: 'Requisições com falha',
             averageTokenPerRequest: 'Média de Token/requisição',
             callLogs: 'Logs de chamadas',
+            usageKeywordPlaceholder: 'Pesquisar Request ID / modelo / modelo upstream / mensagem de erro',
             attemptChain: 'Cadeia de tentativas',
             attemptIndex: 'Ordem de chamada',
             noAttemptDetails: 'Esta requisição acertou na primeira tentativa; sem detalhes de fallback',

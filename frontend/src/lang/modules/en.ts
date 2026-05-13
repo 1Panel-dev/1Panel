@@ -969,6 +969,7 @@ const message = {
             failedRequests: 'Failed Requests',
             averageTokenPerRequest: 'Avg Tokens/Request',
             callLogs: 'Call Logs',
+            usageKeywordPlaceholder: 'Search Request ID / model / upstream model / error message',
             attemptChain: 'Attempt Chain',
             attemptIndex: 'Call Order',
             noAttemptDetails: 'This request hit once; no fallback details',

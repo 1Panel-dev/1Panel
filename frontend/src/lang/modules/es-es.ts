@@ -983,6 +983,7 @@ const message = {
             failedRequests: 'Solicitudes fallidas',
             averageTokenPerRequest: 'Tokens promedio/solicitud',
             callLogs: 'Registros de llamadas',
+            usageKeywordPlaceholder: 'Buscar Request ID / modelo / modelo upstream / mensaje de error',
             attemptChain: 'Cadena de intentos',
             attemptIndex: 'Orden de llamada',
             noAttemptDetails: 'Esta solicitud acertó en el primer intento; no hay detalles de fallback',
