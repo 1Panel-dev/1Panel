@@ -38,9 +38,7 @@
         "build/**/*.ts",
         "build/**/*.d.ts",
         "vite.config.ts",
-        "auto-imports.d.ts",
-        "components.d.ts",
-        "vite-env.d.ts"
+        "auto-imports.d.ts"
     ],
     "exclude": ["node_modules", "dist", "**/*.js", "*.json", "*.md"]
 }
