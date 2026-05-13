@@ -922,6 +922,7 @@ const message = {
             failedRequests: '失敗請求',
             averageTokenPerRequest: '平均 Token/請求',
             callLogs: '呼叫日誌',
+            usageKeywordPlaceholder: '搜尋 Request ID / 模型 / 上游模型 / 錯誤資訊',
             attemptChain: '呼叫鏈路',
             attemptIndex: '調用順序',
             noAttemptDetails: '本次請求一次命中，無 fallback 明細',

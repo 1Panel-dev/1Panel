@@ -985,6 +985,7 @@ const message = {
             failedRequests: 'Başarısız istekler',
             averageTokenPerRequest: 'Ortalama Token/istek',
             callLogs: 'Çağrı günlükleri',
+            usageKeywordPlaceholder: 'Request ID / model / upstream model / hata mesajı ara',
             attemptChain: 'Deneme zinciri',
             attemptIndex: 'Çağrı sırası',
             noAttemptDetails: 'Bu istek tek denemede isabet etti; fallback ayrıntısı yok',

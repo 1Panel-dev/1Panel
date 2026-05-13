@@ -978,6 +978,7 @@ const message = {
             failedRequests: '失敗リクエスト',
             averageTokenPerRequest: '平均 Token/リクエスト',
             callLogs: '呼び出しログ',
+            usageKeywordPlaceholder: 'Request ID / モデル / 上流モデル / エラーメッセージを検索',
             attemptChain: '試行チェーン',
             attemptIndex: '呼び出し順',
             noAttemptDetails: 'このリクエストは 1 回で命中しました。fallback 明細はありません',

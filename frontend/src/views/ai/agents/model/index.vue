@@ -15,7 +15,13 @@
                     <el-table-column :label="$t('commons.table.name')" prop="name" min-width="200" />
                     <el-table-column :label="$t('aiTools.agents.provider')" prop="provider" width="200">
                         <template #default="{ row }">
-                            {{ getAgentProviderDisplayName(row.provider, row.providerName) }}
+                            <div class="provider-cell">
+                                <ProviderLogo
+                                    :provider="row.provider"
+                                    :display-name="getAgentProviderDisplayName(row.provider, row.providerName)"
+                                />
+                                <span>{{ getAgentProviderDisplayName(row.provider, row.providerName) }}</span>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column label="Base URL" prop="baseUrl" min-width="200" />
@@ -57,6 +63,7 @@ import { deleteAgentAccount, pageAgentAccounts } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import AddDialog from '@/views/ai/agents/model/add/index.vue';
 import ModelPoolDialog from '@/views/ai/agents/model/pool/index.vue';
+import ProviderLogo from '@/components/agent-provider-logo/index.vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { dateFormat } from '@/utils/date';
@@ -177,3 +184,19 @@ onMounted(async () => {
     await search();
 });
 </script>
+
+<style scoped lang="scss">
+.provider-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    white-space: nowrap;
+
+    span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+</style>

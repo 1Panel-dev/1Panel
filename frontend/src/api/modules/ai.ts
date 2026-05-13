@@ -200,8 +200,13 @@ export const updateAgentAccount = (req: AI.AgentAccountUpdateReq) => {
     return http.post(`/ai/agents/accounts/update`, req);
 };
 
-export const pageAgentAccounts = (req: AI.AgentAccountSearch) => {
-    return http.post<ResPage<AI.AgentAccountItem>>(`/ai/agents/accounts/search`, req);
+export const pageAgentAccounts = (req: AI.AgentAccountSearch, currentNode?: string) => {
+    return http.post<ResPage<AI.AgentAccountItem>>(
+        `/ai/agents/accounts/search`,
+        req,
+        undefined,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 
 export const getAgentAccountModels = (req: AI.AgentAccountModelReq) => {

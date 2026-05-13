@@ -987,6 +987,7 @@ const message = {
             failedRequests: 'Permintaan gagal',
             averageTokenPerRequest: 'Purata Token/permintaan',
             callLogs: 'Log panggilan',
+            usageKeywordPlaceholder: 'Cari Request ID / model / model upstream / mesej ralat',
             attemptChain: 'Rantaian percubaan',
             attemptIndex: 'Urutan panggilan',
             noAttemptDetails: 'Permintaan ini berjaya sekali percubaan; tiada butiran fallback',
