@@ -31,9 +31,7 @@ import { stopProcess } from '@/api/modules/process';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { checkStreamAuth } from '@/utils/stream-auth';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
 
 const sshSearch = reactive({
     type: 'ssh',
@@ -43,7 +41,7 @@ const sshSearch = reactive({
 const buttons = [
     {
         label: i18n.global.t('commons.button.disConn'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: function (row: any) {
             stop(row.PID);
         },

@@ -29,9 +29,6 @@ import { File } from '@/api/interface/file';
 import i18n from '@/lang';
 import { dateFormat as formatDateTime } from '@/utils/date';
 import { computed, reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
-
-const { hasManagePermission } = useMenuManagePermission();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'share-page-size',
@@ -92,7 +89,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('file.shareClose'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: File.FileShareInfo) => {
             closeShare(row.path);
         },

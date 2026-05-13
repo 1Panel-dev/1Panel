@@ -13,7 +13,7 @@
             <el-input v-model="form.userTimezone" />
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" :loading="saving" :disabled="!hasManagePermission" @click="saveConfig">
+            <el-button v-permission type="primary" :loading="saving" @click="saveConfig">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
@@ -24,7 +24,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import { Rules } from '@/global/form-rules';
 import { AI } from '@/api/interface/ai';
@@ -32,7 +31,6 @@ import { getAgentOtherConfig, updateAgentOtherConfig } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 
 const { t } = useI18n();
-const { hasManagePermission } = useMenuManagePermission();
 const loading = ref(false);
 const saving = ref(false);
 const agentId = ref(0);

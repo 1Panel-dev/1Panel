@@ -6,7 +6,7 @@
             </div>
             <ComplexTable :data="data" :pagination-config="paginationConfig" v-loading="loading">
                 <template #toolbar>
-                    <el-button type="primary" :disabled="!hasManagePermission" @click="openCreate">
+                    <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
                 </template>

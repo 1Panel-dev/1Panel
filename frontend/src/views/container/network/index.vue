@@ -9,13 +9,13 @@
 
         <LayoutContent v-if="isExist" :title="$t('container.network', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" :disabled="!hasManagePermission" @click="onCreate()">
+                <el-button v-permission type="primary" @click="onCreate()">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onClean()">
+                <el-button v-permission type="primary" plain @click="onClean()">
                     {{ $t('container.networkPrune') }}
                 </el-button>
-                <el-button :disabled="selects.length === 0 || !hasManagePermission" @click="batchDelete(null)">
+                <el-button v-permission :disabled="selects.length === 0" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -96,7 +96,6 @@
 import CreateDialog from '@/views/container/network/create/index.vue';
 import DetailDrawer from '@/views/container/network/detail/index.vue';
 import { reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
 import { deleteNetwork, searchNetwork, inspect, containerPrune } from '@/api/modules/container';
@@ -119,7 +118,6 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
-const { hasManagePermission } = useMenuManagePermission();
 
 const opRef = ref();
 const isActive = ref(false);
@@ -230,11 +228,12 @@ function isSystem(val: string) {
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: Container.NetworkInfo) => {
             batchDelete(row);
         },
         disabled: (row: any) => {
-            return row.isSystem || !hasManagePermission.value;
+            return row.isSystem;
         },
     },
 ];

@@ -5,7 +5,7 @@
                 <LogRouter current="OperationLog" />
             </template>
             <template #leftToolBar>
-                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onClean()">
+                <el-button v-permission type="primary" plain @click="onClean()">
                     {{ $t('logs.deleteLogs') }}
                 </el-button>
             </template>
@@ -103,10 +103,8 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { listNodes } from '@/utils/node';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const loading = ref();
-const { hasManagePermission } = useMenuManagePermission();
 const data = ref();
 const confirmDialogRef = ref();
 const paginationConfig = reactive({

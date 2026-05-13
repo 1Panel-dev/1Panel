@@ -17,26 +17,14 @@
                         <el-tag>{{ $t('app.version') }}: {{ form.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
-                        <el-button
-                            v-if="isActive"
-                            type="primary"
-                            :disabled="!hasManagePermission"
-                            @click="onOperator('stop')"
-                            link
-                        >
+                        <el-button v-if="isActive" type="primary" v-permission @click="onOperator('stop')" link>
                             {{ $t('commons.operate.stop') }}
                         </el-button>
-                        <el-button
-                            v-if="!isActive"
-                            type="primary"
-                            :disabled="!hasManagePermission"
-                            @click="onOperator('start')"
-                            link
-                        >
+                        <el-button v-if="!isActive" type="primary" v-permission @click="onOperator('start')" link>
                             {{ $t('commons.operate.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" :disabled="!hasManagePermission" @click="onOperator('restart')" link>
+                        <el-button v-permission type="primary" @click="onOperator('restart')" link>
                             {{ $t('commons.button.restart') }}
                         </el-button>
                     </div>
@@ -70,7 +58,7 @@
                                         style="width: calc(100% - 80px)"
                                     />
                                     <el-button
-                                        :disabled="!hasManagePermission"
+                                        v-permission
                                         @click="onChangeMirrors"
                                         icon="Setting"
                                         class="custom-input-textarea"
@@ -80,11 +68,7 @@
                                 </div>
                                 <el-input disabled v-if="!form.mirrors" v-model="unset">
                                     <template #append>
-                                        <el-button
-                                            :disabled="!hasManagePermission"
-                                            @click="onChangeMirrors"
-                                            icon="Setting"
-                                        >
+                                        <el-button v-permission @click="onChangeMirrors" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -106,21 +90,13 @@
                                         v-model="form.registries"
                                         style="width: calc(100% - 80px)"
                                     />
-                                    <el-button
-                                        :disabled="!hasManagePermission"
-                                        @click="onChangeRegistries"
-                                        icon="Setting"
-                                    >
+                                    <el-button v-permission @click="onChangeRegistries" icon="Setting">
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                 </div>
                                 <el-input disabled v-if="!form.registries" v-model="unset">
                                     <template #append>
-                                        <el-button
-                                            :disabled="!hasManagePermission"
-                                            @click="onChangeRegistries"
-                                            icon="Setting"
-                                        >
+                                        <el-button v-permission @click="onChangeRegistries" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -128,11 +104,7 @@
                             </el-form-item>
 
                             <el-form-item label="IPv6" prop="ipv6">
-                                <el-switch
-                                    :disabled="!hasManagePermission"
-                                    v-model="form.ipv6"
-                                    @change="handleIPv6"
-                                ></el-switch>
+                                <el-switch v-permission v-model="form.ipv6" @change="handleIPv6"></el-switch>
                                 <span class="input-help"></span>
                                 <div v-if="ipv6OptionShow">
                                     <el-tag>{{ $t('container.subnet') }}: {{ form.fixedCidrV6 }}</el-tag>
@@ -146,7 +118,7 @@
 
                             <el-form-item :label="$t('container.cutLog')" prop="hasLogOption">
                                 <el-switch
-                                    :disabled="!hasManagePermission"
+                                    v-permission
                                     v-model="form.logOptionShow"
                                     @change="handleLogOption"
                                 ></el-switch>
@@ -163,16 +135,13 @@
                             </el-form-item>
 
                             <el-form-item label="iptables" prop="iptables">
-                                <el-switch
-                                    :disabled="!hasManagePermission"
-                                    v-model="form.iptables"
-                                    @change="handleIptables"
-                                ></el-switch>
+                                <el-switch v-permission v-model="form.iptables" @change="handleIptables"></el-switch>
                                 <span class="input-help">{{ $t('container.iptablesHelper1') }}</span>
                             </el-form-item>
                             <el-form-item label="Live restore" prop="liveRestore">
                                 <el-switch
-                                    :disabled="form.isSwarm || !hasManagePermission"
+                                    v-permission
+                                    :disabled="form.isSwarm"
                                     v-model="form.liveRestore"
                                     @change="handleLive"
                                 ></el-switch>
@@ -182,11 +151,7 @@
                                 </span>
                             </el-form-item>
                             <el-form-item label="Cgroup Driver" prop="cgroupDriver">
-                                <el-radio-group
-                                    :disabled="!hasManagePermission"
-                                    v-model="form.cgroupDriver"
-                                    @change="handleCgroup"
-                                >
+                                <el-radio-group v-permission v-model="form.cgroupDriver" @change="handleCgroup">
                                     <el-radio value="cgroupfs">cgroupfs</el-radio>
                                     <el-radio value="systemd">systemd</el-radio>
                                 </el-radio-group>
@@ -194,11 +159,7 @@
                             <el-form-item :label="$t('container.sockPath')" prop="dockerSockPath">
                                 <el-input disabled v-model="form.dockerSockPath">
                                     <template #append>
-                                        <el-button
-                                            :disabled="!hasManagePermission"
-                                            @click="onChangeSockPath"
-                                            icon="Setting"
-                                        >
+                                        <el-button v-permission @click="onChangeSockPath" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -218,12 +179,7 @@
                         mode="json"
                         placeholder="# The Docker configuration file does not exist or is empty"
                     ></CodemirrorPro>
-                    <el-button
-                        :disabled="loading || !hasManagePermission"
-                        type="primary"
-                        @click="onSaveFile"
-                        class="mt-2.5"
-                    >
+                    <el-button v-permission :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>
@@ -253,7 +209,8 @@
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button
-                        :disabled="submitInput !== $t('database.restartNow') || !hasManagePermission"
+                        v-permission
+                        :disabled="submitInput !== $t('database.restartNow')"
                         type="primary"
                         @click="onSubmitCloseIPtable"
                     >
@@ -305,7 +262,6 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const { isMobile } = useGlobalStore();
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
 
 const unset = ref(i18n.global.t('setting.unSetting'));
 const submitInput = ref();

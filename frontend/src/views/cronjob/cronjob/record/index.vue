@@ -32,7 +32,8 @@
                     <div class="mt-0.5">
                         <el-button
                             type="primary"
-                            :disabled="dialogData.rowData.status === 'Pending' || !hasManagePermission"
+                            v-permission
+                            :disabled="dialogData.rowData.status === 'Pending'"
                             @click="onHandle(dialogData.rowData)"
                             link
                         >
@@ -42,7 +43,7 @@
                         <el-button
                             type="primary"
                             v-if="dialogData.rowData.status === 'Enable'"
-                            :disabled="!hasManagePermission"
+                            v-permission
                             @click="onChangeStatus(dialogData.rowData.id, 'disable')"
                             link
                         >
@@ -51,14 +52,14 @@
                         <el-button
                             type="primary"
                             v-if="dialogData.rowData.status === 'Disable'"
-                            :disabled="!hasManagePermission"
+                            v-permission
                             @click="onChangeStatus(dialogData.rowData.id, 'enable')"
                             link
                         >
                             {{ $t('commons.button.enable') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button :disabled="!hasRecords || !hasManagePermission" type="primary" @click="onClean" link>
+                        <el-button v-permission :disabled="!hasRecords" type="primary" @click="onClean" link>
                             {{ $t('commons.button.clean') }}
                         </el-button>
                     </div>
@@ -263,8 +264,6 @@ import { listDbItems } from '@/api/modules/database';
 import { listAppInstalled } from '@/api/modules/app';
 import { shortcuts } from '@/utils/shortcuts';
 import { hasBackup } from '../helper';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
-const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref();
 const hasRecords = ref();

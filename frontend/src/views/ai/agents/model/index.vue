@@ -2,7 +2,7 @@
     <div>
         <LayoutContent>
             <template #leftToolBar>
-                <el-button type="primary" :disabled="!hasManagePermission" @click="openCreate">
+                <el-button v-permission type="primary" @click="openCreate">
                     {{ $t('commons.button.create') }}
                 </el-button>
             </template>
@@ -53,7 +53,6 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { deleteAgentAccount, pageAgentAccounts } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import AddDialog from '@/views/ai/agents/model/add/index.vue';
@@ -67,12 +66,11 @@ const items = ref<AI.AgentAccountItem[]>([]);
 const addRef = ref();
 const modelPoolRef = ref();
 const searchName = ref('');
-const { hasManagePermission } = useMenuManagePermission();
 
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: AI.AgentAccountItem) => onEdit(row),
     },
     {
@@ -81,7 +79,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: AI.AgentAccountItem) => onDelete(row),
     },
 ];

@@ -25,7 +25,7 @@
             <template #leftToolBar>
                 <el-button
                     v-if="currentDB && (currentDB.from !== 'local' || postgresqlStatus === 'Running')"
-                    :disabled="!hasManagePermission"
+                    v-permission
                     type="primary"
                     @click="onOpenDialog()"
                 >
@@ -36,7 +36,7 @@
                 </el-button>
                 <el-button
                     v-if="currentDB && (currentDB.from !== 'local' || postgresqlStatus === 'Running')"
-                    :disabled="!hasManagePermission"
+                    v-permission
                     @click="loadDB"
                     type="primary"
                     plain
@@ -167,8 +167,7 @@
                         <template #default="{ row }">
                             <fu-input-rw-switch
                                 v-model="row.description"
-                                :write-trigger="hasManagePermission ? 'onClick' : 'disabled'"
-                                :disabled="!hasManagePermission"
+                                v-permission
                                 @enter="onChange(row)"
                                 @blur="onChange(row)"
                             />
@@ -549,8 +548,9 @@ const onChangePassword = async (row: Database.PostgresqlDBInfo) => {
 const buttons = [
     {
         label: i18n.global.t('database.changePassword'),
+        permission: true,
         disabled: (row: Database.PostgresqlDBInfo) => {
-            return !row.username || row.isDelete || !hasManagePermission.value;
+            return !row.username || row.isDelete;
         },
         click: (row: Database.PostgresqlDBInfo) => {
             onChangePassword(row);
@@ -558,8 +558,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.permission'),
+        permission: true,
         disabled: (row: Database.PostgresqlDBInfo) => {
-            return !row.username || row.isDelete || !hasManagePermission.value;
+            return !row.username || row.isDelete;
         },
         click: (row: Database.PostgresqlDBInfo) => {
             let param = {
@@ -573,8 +574,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.backupList'),
+        permission: true,
         disabled: (row: Database.PostgresqlDBInfo) => {
-            return row.isDelete || !hasManagePermission.value;
+            return row.isDelete;
         },
         click: (row: Database.PostgresqlDBInfo) => {
             let params = {
@@ -587,8 +589,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.loadBackup'),
+        permission: true,
         disabled: (row: Database.PostgresqlDBInfo) => {
-            return row.isDelete || !hasManagePermission.value;
+            return row.isDelete;
         },
         click: (row: Database.PostgresqlDBInfo) => {
             let params = {
@@ -602,9 +605,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        disabled: () => {
-            return !hasManagePermission.value;
-        },
+        permission: true,
         click: (row: Database.PostgresqlDBInfo) => {
             onDelete(row);
         },

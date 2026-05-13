@@ -66,13 +66,7 @@
                     </el-select>
                     <span class="input-help">
                         {{ $t('aiTools.agents.noAccountHint') }}
-                        <el-button
-                            type="primary"
-                            link
-                            class="inline-link"
-                            :disabled="!hasManagePermission"
-                            @click="openAccountCreate"
-                        >
+                        <el-button v-permission type="primary" link class="inline-link" @click="openAccountCreate">
                             {{ $t('commons.button.create') }}
                         </el-button>
                     </span>
@@ -101,7 +95,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="open = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" :disabled="!hasManagePermission" @click="submit">
+                <el-button v-permission type="primary" @click="submit">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -113,7 +107,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
 import { FormInstance } from 'element-plus';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import { createAgent, getAgentProviders, pageAgentAccounts } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
@@ -132,7 +125,6 @@ import AccountAddDialog from '@/views/ai/agents/model/add/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const emit = defineEmits(['search', 'task']);
-const { hasManagePermission } = useMenuManagePermission();
 
 const open = ref(false);
 const formRef = ref<FormInstance>();

@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <LayoutContent backName="MySQL" :title="$t('database.remoteDB')">
             <template #leftToolBar>
-                <el-button type="primary" :disabled="!hasManagePermission" @click="onOpenDialog('create')">
+                <el-button v-permission type="primary" @click="onOpenDialog('create')">
                     {{ $t('database.createRemoteDB') }}
                 </el-button>
             </template>
@@ -82,9 +82,6 @@ import OperateDialog from '@/views/database/mysql/remote/operate/index.vue';
 import DeleteDialog from '@/views/database/mysql/remote/delete/index.vue';
 import i18n from '@/lang';
 import { Database } from '@/api/interface/database';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
-
-const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref(false);
 
@@ -155,14 +152,14 @@ const onDelete = async (row: Database.DatabaseInfo) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: Database.DatabaseInfo) => {
             onOpenDialog('edit', row);
         },
     },
     {
         label: i18n.global.t('commons.button.unbind'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: Database.DatabaseInfo) => {
             onDelete(row);
         },

@@ -26,7 +26,7 @@
             <template #leftToolBar>
                 <el-button
                     v-if="currentDB && (currentDB.from !== 'local' || mongodbStatus === 'Running')"
-                    :disabled="!hasManagePermission"
+                    v-permission
                     type="primary"
                     @click="openCreateDrawer"
                 >
@@ -39,7 +39,7 @@
                     v-if="currentDB && (currentDB.from !== 'local' || mongodbStatus === 'Running')"
                     type="primary"
                     plain
-                    :disabled="!hasManagePermission"
+                    v-permission
                     @click="onLoadFromRemote"
                 >
                     {{ $t('database.loadFromRemote') }}
@@ -203,8 +203,7 @@
                         <template #default="{ row }">
                             <fu-input-rw-switch
                                 v-model="row.description"
-                                :write-trigger="hasManagePermission ? 'onClick' : 'disabled'"
-                                :disabled="!hasManagePermission"
+                                v-permission
                                 @enter="onChange(row)"
                                 @blur="onChange(row)"
                             />
@@ -544,8 +543,9 @@ const search = (column?: { prop?: string; order?: string }) => {
 const buttons = [
     {
         label: i18n.global.t('database.changePassword'),
+        permission: true,
         disabled: (row: Database.MongodbDBInfo) => {
-            return !row.username || row.isDelete || !hasManagePermission.value;
+            return !row.username || row.isDelete;
         },
         click: (row: Database.MongodbDBInfo) => {
             onChangePassword(row);
@@ -553,8 +553,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.permission'),
+        permission: true,
         disabled: (row: Database.MongodbDBInfo) => {
-            return !row.username || row.isDelete || !hasManagePermission.value;
+            return !row.username || row.isDelete;
         },
         click: (row: Database.MongodbDBInfo) => {
             let param = {
@@ -567,8 +568,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.backupList'),
+        permission: true,
         disabled: (row: Database.MongodbDBInfo) => {
-            return row.isDelete || !hasManagePermission.value;
+            return row.isDelete;
         },
         click: (row: Database.MongodbDBInfo) => {
             openBackupList(row);
@@ -576,8 +578,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.loadBackup'),
+        permission: true,
         disabled: (row: Database.MongodbDBInfo) => {
-            return row.isDelete || !hasManagePermission.value;
+            return row.isDelete;
         },
         click: (row: Database.MongodbDBInfo) => {
             openUploadDialog(row);
@@ -585,9 +588,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        disabled: () => {
-            return !hasManagePermission.value;
-        },
+        permission: true,
         click: (row: Database.MongodbDBInfo) => {
             onDelete(row);
         },

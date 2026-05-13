@@ -2,7 +2,7 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.login')">
             <template #leftToolBar>
-                <el-button type="primary" :disabled="!hasManagePermission" @click="onOpenDialog('create')">
+                <el-button v-permission type="primary" @click="onOpenDialog('create')">
                     {{ $t('commons.button.create') }}
                 </el-button>
                 <el-dropdown @command="handleSyncOp" class="mr-2.5">
@@ -12,23 +12,15 @@
                     </el-button>
                     <template #dropdown>
                         <el-dropdown-menu>
-                            <el-dropdown-item command="sync" :disabled="!hasManagePermission">
+                            <fu-dropdown-item v-permission command="sync">
                                 {{ $t('cronjob.library.syncNow') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item
-                                v-if="scriptSync === 'Disable'"
-                                command="turnOnSync"
-                                :disabled="!hasManagePermission"
-                            >
+                            </fu-dropdown-item>
+                            <fu-dropdown-item v-permission v-if="scriptSync === 'Disable'" command="turnOnSync">
                                 {{ $t('cronjob.library.turnOnSync') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item
-                                v-if="scriptSync === 'Enable'"
-                                command="turnOffSync"
-                                :disabled="!hasManagePermission"
-                            >
+                            </fu-dropdown-item>
+                            <fu-dropdown-item v-permission v-if="scriptSync === 'Enable'" command="turnOffSync">
                                 {{ $t('cronjob.library.turnOffSync') }}
-                            </el-dropdown-item>
+                            </fu-dropdown-item>
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
@@ -36,7 +28,7 @@
                 <el-button type="primary" plain @click="onOpenGroupDialog()">
                     {{ $t('commons.table.group') }}
                 </el-button>
-                <el-button plain :disabled="selects.length === 0 || !hasManagePermission" @click="onDelete(null)">
+                <el-button v-permission plain :disabled="selects.length === 0" @click="onDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -137,7 +129,6 @@ import OperateDialog from '@/views/cronjob/library/operate/index.vue';
 import TerminalDialog from '@/views/cronjob/library/run/index.vue';
 import { deleteScript, searchScript, syncScript } from '@/api/modules/cronjob';
 import { onMounted, reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { Cronjob } from '@/api/interface/cronjob';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
@@ -336,8 +327,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.clone'),
+        permission: true,
         disabled: (row: any) => {
-            return !row.isSystem || !hasManagePermission.value;
+            return !row.isSystem;
         },
         click: (row: Cronjob.ScriptInfo) => {
             let item = deepCopy(row) as Cronjob.ScriptInfo;
@@ -350,8 +342,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         disabled: (row: any) => {
-            return row.isSystem || !hasManagePermission.value;
+            return row.isSystem;
         },
         click: (row: Cronjob.ScriptInfo) => {
             onOpenDialog('edit', row);
@@ -359,8 +352,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         disabled: (row: any) => {
-            return row.isSystem || !hasManagePermission.value;
+            return row.isSystem;
         },
         click: (row: Cronjob.ScriptInfo) => {
             onDelete(row);

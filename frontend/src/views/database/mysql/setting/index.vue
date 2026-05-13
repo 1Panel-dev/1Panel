@@ -57,7 +57,7 @@
                     <el-button class="mt-2.5" @click="getDefaultConfig()">
                         {{ $t('app.defaultConfig') }}
                     </el-button>
-                    <el-button :disabled="!hasManagePermission" type="primary" class="mt-2.5" @click="onSaveConf">
+                    <el-button v-permission type="primary" class="mt-2.5" @click="onSaveConf">
                         {{ $t('commons.button.save') }}
                     </el-button>
                     <el-row>
@@ -84,8 +84,8 @@
                                 </el-form-item>
                                 <el-form-item>
                                     <el-button
+                                        v-permission
                                         type="primary"
-                                        :disabled="!hasManagePermission"
                                         @click="onSavePort(panelFormRef)"
                                         icon="Collection"
                                     >
@@ -139,8 +139,6 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { routerToName } from '@/utils/router';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
-const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref(false);
 

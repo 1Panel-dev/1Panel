@@ -8,26 +8,14 @@
                         <Status class="mt-0.5" :status="form.isActive ? 'enable' : 'disable'" />
                     </div>
                     <div class="mt-0.5">
-                        <el-button
-                            v-if="form.isActive"
-                            type="primary"
-                            :disabled="!hasManagePermission"
-                            @click="onOperate('stop')"
-                            link
-                        >
+                        <el-button v-if="form.isActive" v-permission type="primary" @click="onOperate('stop')" link>
                             {{ $t('commons.button.stop') }}
                         </el-button>
-                        <el-button
-                            v-if="!form.isActive"
-                            type="primary"
-                            :disabled="!hasManagePermission"
-                            @click="onOperate('start')"
-                            link
-                        >
+                        <el-button v-if="!form.isActive" v-permission type="primary" @click="onOperate('start')" link>
                             {{ $t('commons.button.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" :disabled="!hasManagePermission" @click="onOperate('restart')" link>
+                        <el-button v-permission type="primary" @click="onOperate('restart')" link>
                             {{ $t('commons.button.restart') }}
                         </el-button>
                     </div>
@@ -47,13 +35,13 @@
                     </el-alert>
                 </template>
                 <template #leftToolBar>
-                    <el-button type="primary" :disabled="!hasManagePermission" @click="onOpenDialog('add')">
+                    <el-button v-permission type="primary" @click="onOpenDialog('add')">
                         {{ $t('commons.button.add') }}
                     </el-button>
-                    <el-button :disabled="!hasManagePermission" @click="onSync()">
+                    <el-button v-permission @click="onSync()">
                         {{ $t('commons.button.sync') }}
                     </el-button>
-                    <el-button plain :disabled="selects.length === 0 || !hasManagePermission" @click="onDelete(null)">
+                    <el-button v-permission plain :disabled="selects.length === 0" @click="onDelete(null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </template>
@@ -137,7 +125,7 @@
                             <template #default="{ row }">
                                 <fu-input-rw-switch
                                     v-model="row.description"
-                                    :write-trigger="hasManagePermission ? 'onClick' : 'disabled'"
+                                    v-permission
                                     @enter="onChange(row)"
                                     @blur="onChange(row)"
                                 />
@@ -177,9 +165,7 @@ import { Toolbox } from '@/api/interface/toolbox';
 import { GlobalStore } from '@/store';
 import { routerToFileWithPath } from '@/utils/router';
 import { getRandomStr } from '@/utils/id';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref();
 const selects = ref<any>([]);
@@ -350,8 +336,9 @@ const onSubmitDelete = async () => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         disabled: (row: Toolbox.FtpInfo) => {
-            return row.status === 'deleted' || !hasManagePermission.value;
+            return row.status === 'deleted';
         },
         click: (row: Toolbox.FtpInfo) => {
             onOpenDialog('edit', row);
@@ -368,7 +355,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: Toolbox.FtpInfo) => {
             onDelete(row);
         },

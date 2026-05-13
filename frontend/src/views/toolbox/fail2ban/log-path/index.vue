@@ -4,7 +4,7 @@
             <el-form-item :label="$t('toolbox.fail2ban.logPath')" prop="logPath" :rules="Rules.requiredInput">
                 <el-input v-model="form.logPath">
                     <template #prepend>
-                        <el-button icon="Folder" :disabled="!hasManagePermission" @click="fileRef.acceptParams({})" />
+                        <el-button v-permission icon="Folder" @click="fileRef.acceptParams({})" />
                     </template>
                 </el-input>
                 <span class="input-help">{{ $t('toolbox.fail2ban.logPathHelper') }}</span>
@@ -13,7 +13,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading || !hasManagePermission" type="primary" @click="onSave(formRef)">
+                <el-button v-permission :disabled="loading" type="primary" @click="onSave(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -29,10 +29,8 @@ import FileList from '@/components/file-list/index.vue';
 import { updateFail2ban } from '@/api/modules/toolbox';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
-const { hasManagePermission } = useMenuManagePermission();
 
 interface DialogProps {
     logPath: string;

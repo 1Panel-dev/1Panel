@@ -96,20 +96,29 @@ const search = async () => {
         version.value = '';
     }
 
+    if (!settingInfo?.hideMenu) {
+        setFallbackMenuListIfEmpty();
+        return;
+    }
+
     try {
-        const rstMenuList = buildMenuListFromSettings(settingInfo?.hideMenu);
+        const rstMenuList = buildMenuListFromSettings(settingInfo.hideMenu);
         if (!isSameMenuList(menuStore.menuList as RouteRecordRaw[], rstMenuList)) {
             menuStore.setMenuList(rstMenuList);
         }
     } catch (error) {
-        if (!menuStore.menuList || menuStore.menuList.length === 0) {
-            menuStore.setMenuList(buildAuthVisibleMenuList(menuList));
-        }
+        setFallbackMenuListIfEmpty();
     }
 };
 
 function isSameMenuList(source: RouteRecordRaw[], target: RouteRecordRaw[]) {
     return JSON.stringify(source) === JSON.stringify(target);
+}
+
+function setFallbackMenuListIfEmpty() {
+    if (!menuStore.menuList || menuStore.menuList.length === 0) {
+        menuStore.setMenuList(buildAuthVisibleMenuList(menuList));
+    }
 }
 
 function allowMenuItem(item: RouteRecordRaw) {

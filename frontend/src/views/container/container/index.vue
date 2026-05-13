@@ -22,56 +22,43 @@
             </template>
 
             <template #leftToolBar>
-                <el-button type="primary" :disabled="!hasManagePermission" @click="onContainerOperate('')">
+                <el-button v-permission type="primary" @click="onContainerOperate('')">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onImportCreate()">
+                <el-button v-permission type="primary" plain @click="onImportCreate()">
                     {{ $t('commons.button.import') }}
                 </el-button>
-                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onClean()">
+                <el-button v-permission type="primary" plain @click="onClean()">
                     {{ $t('container.containerPrune') }}
                 </el-button>
                 <el-button-group class="button-group">
-                    <el-button
-                        :disabled="!hasManagePermission || checkStatus('start', null)"
-                        @click="onOperate('start', null)"
-                    >
+                    <el-button v-permission :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
                         {{ $t('commons.operate.start') }}
                     </el-button>
-                    <el-button
-                        :disabled="!hasManagePermission || checkStatus('stop', null)"
-                        @click="onOperate('stop', null)"
-                    >
+                    <el-button v-permission :disabled="checkStatus('stop', null)" @click="onOperate('stop', null)">
                         {{ $t('commons.operate.stop') }}
                     </el-button>
                     <el-button
-                        :disabled="!hasManagePermission || checkStatus('restart', null)"
+                        v-permission
+                        :disabled="checkStatus('restart', null)"
                         @click="onOperate('restart', null)"
                     >
                         {{ $t('commons.button.restart') }}
                     </el-button>
-                    <el-button
-                        :disabled="!hasManagePermission || checkStatus('kill', null)"
-                        @click="onOperate('kill', null)"
-                    >
+                    <el-button v-permission :disabled="checkStatus('kill', null)" @click="onOperate('kill', null)">
                         {{ $t('container.kill') }}
                     </el-button>
-                    <el-button
-                        :disabled="!hasManagePermission || checkStatus('pause', null)"
-                        @click="onOperate('pause', null)"
-                    >
+                    <el-button v-permission :disabled="checkStatus('pause', null)" @click="onOperate('pause', null)">
                         {{ $t('container.pause') }}
                     </el-button>
                     <el-button
-                        :disabled="!hasManagePermission || checkStatus('unpause', null)"
+                        v-permission
+                        :disabled="checkStatus('unpause', null)"
                         @click="onOperate('unpause', null)"
                     >
                         {{ $t('container.unpause') }}
                     </el-button>
-                    <el-button
-                        :disabled="!hasManagePermission || checkStatus('remove', null)"
-                        @click="onOperate('remove', null)"
-                    >
+                    <el-button v-permission :disabled="checkStatus('remove', null)" @click="onOperate('remove', null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </el-button-group>
@@ -138,7 +125,7 @@
                                         size="large"
                                         :icon="row.isPinned ? 'StarFilled' : 'Star'"
                                         type="warning"
-                                        :disabled="!hasManagePermission"
+                                        v-permission
                                         @click="changePinned(row, true)"
                                     />
                                 </el-tooltip>
@@ -159,45 +146,51 @@
                                     (visible) => handleStatusDropdownVisibleChange(row.containerID, visible)
                                 "
                             >
-                                <Status :status="row.state" :disabled="!hasManagePermission" :operate="true" />
+                                <Status v-permission :status="row.state" :operate="true" />
                                 <template #dropdown>
                                     <el-dropdown-menu v-if="activeDropdownContainerId === row.containerID">
-                                        <el-dropdown-item
-                                            :disabled="!hasManagePermission || checkStatus('start', row)"
+                                        <fu-dropdown-item
+                                            v-permission
+                                            :disabled="checkStatus('start', row)"
                                             @click="onOperate('start', row)"
                                         >
                                             {{ $t('commons.operate.start') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item
-                                            :disabled="!hasManagePermission || checkStatus('stop', row)"
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item
+                                            v-permission
+                                            :disabled="checkStatus('stop', row)"
                                             @click="onOperate('stop', row)"
                                         >
                                             {{ $t('commons.operate.stop') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item
-                                            :disabled="!hasManagePermission || checkStatus('restart', row)"
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item
+                                            v-permission
+                                            :disabled="checkStatus('restart', row)"
                                             @click="onOperate('restart', row)"
                                         >
                                             {{ $t('commons.button.restart') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item
-                                            :disabled="!hasManagePermission || checkStatus('kill', row)"
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item
+                                            v-permission
+                                            :disabled="checkStatus('kill', row)"
                                             @click="onOperate('kill', row)"
                                         >
                                             {{ $t('container.kill') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item
-                                            :disabled="!hasManagePermission || checkStatus('pause', row)"
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item
+                                            v-permission
+                                            :disabled="checkStatus('pause', row)"
                                             @click="onOperate('pause', row)"
                                         >
                                             {{ $t('container.pause') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item
-                                            :disabled="!hasManagePermission || checkStatus('unpause', row)"
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item
+                                            v-permission
+                                            :disabled="checkStatus('unpause', row)"
                                             @click="onOperate('unpause', row)"
                                         >
                                             {{ $t('container.unpause') }}
-                                        </el-dropdown-item>
+                                        </fu-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -371,7 +364,7 @@
                         <template #default="{ row }">
                             <fu-input-rw-switch
                                 v-model="row.description"
-                                :write-trigger="hasManagePermission ? 'onClick' : 'disabled'"
+                                v-permission
                                 @enter="changePinned(row, false)"
                                 @blur="changePinned(row, false)"
                             />
@@ -454,8 +447,7 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const { isMobile } = useGlobalStore();
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
-const { hasPermission: hasFilePermission } = useMenuManagePermission('host_file_view');
+const hasFilePermission = useCan('host_file_view');
 
 const isActive = ref(false);
 const isExist = ref(false);
@@ -879,21 +871,21 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: Container.ContainerInfo) => {
             onContainerOperate(row.name);
         },
     },
     {
         label: i18n.global.t('commons.button.upgrade'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: Container.ContainerInfo) => {
             dialogUpgradeRef.value!.acceptParams({ container: row.name, image: row.imageName, fromApp: row.isFromApp });
         },
     },
     {
         label: i18n.global.t('commons.button.backup'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: Container.ContainerInfo) => {
             onBackup(row);
         },
@@ -909,29 +901,32 @@ const buttons = [
     },
     {
         label: i18n.global.t('container.rename'),
+        permission: true,
         click: (row: Container.ContainerInfo) => {
             dialogRenameRef.value!.acceptParams({ container: row.name });
         },
         disabled: (row: any) => {
-            return row.isFromCompose || !hasManagePermission.value;
+            return row.isFromCompose;
         },
     },
     {
         label: i18n.global.t('container.makeImage'),
+        permission: true,
         click: (row: Container.ContainerInfo) => {
             dialogCommitRef.value!.acceptParams({ containerID: row.containerID, containerName: row.name });
         },
         disabled: (row: any) => {
-            return checkStatus('commit', row) || !hasManagePermission.value;
+            return checkStatus('commit', row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: Container.ContainerInfo) => {
             onOperate('remove', row);
         },
         disabled: (row: any) => {
-            return checkStatus('remove', row) || !hasManagePermission.value;
+            return checkStatus('remove', row);
         },
     },
 ];

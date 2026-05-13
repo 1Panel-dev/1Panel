@@ -65,12 +65,7 @@
                 <el-input v-model="form.secret" type="password" show-password />
             </el-form-item>
             <el-form-item>
-                <el-button
-                    type="primary"
-                    :loading="saving"
-                    :disabled="!installed || !hasManagePermission"
-                    @click="saveChannel"
-                >
+                <el-button v-permission type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
                     {{ t('commons.button.save') }}
                 </el-button>
             </el-form-item>
@@ -83,9 +78,10 @@
                 </el-form-item>
                 <el-form-item>
                     <el-button
+                        v-permission
                         type="primary"
                         :loading="approving"
-                        :disabled="!installed || !hasManagePermission"
+                        :disabled="!installed"
                         @click="approvePairing"
                     >
                         {{ t('aiTools.agents.approvePairing') }}
@@ -99,7 +95,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { approveAgentChannelPairing, getAgentWecomConfig, updateAgentWecomConfig } from '@/api/modules/ai';
@@ -114,7 +109,6 @@ interface WecomForm extends Omit<AI.AgentWecomConfig, 'installed' | 'allowFrom' 
 }
 
 const { t } = useI18n();
-const { hasManagePermission } = useMenuManagePermission();
 const saving = ref(false);
 const approving = ref(false);
 const pairingCode = ref('');

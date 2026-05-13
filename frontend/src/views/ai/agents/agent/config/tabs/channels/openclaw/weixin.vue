@@ -17,9 +17,10 @@
         <template v-if="installed">
             <el-form-item class="mt-4">
                 <el-button
+                    v-permission
                     type="primary"
                     :loading="loggingIn"
-                    :disabled="!installed || !hasManagePermission"
+                    :disabled="!installed"
                     @click="loginChannel"
                 >
                     {{ t('aiTools.agents.scanConnect') }}
@@ -33,7 +34,6 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import { loginAgentWeixinChannel } from '@/api/modules/ai';
 import { newUUID } from '@/utils/id';
@@ -49,7 +49,6 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const { hasManagePermission } = useMenuManagePermission();
 const loggingIn = ref(false);
 const loginTaskLogRef = ref();
 const {

@@ -9,23 +9,24 @@
 
         <LayoutContent v-if="isExist" :title="$t('container.composeTemplate', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" :disabled="!hasManagePermission" @click="onOpenDialog('create')">
+                <el-button v-permission type="primary" @click="onOpenDialog('create')">
                     {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button
+                    v-permission
                     type="primary"
                     plain
-                    :disabled="selects.length === 0 || !hasManagePermission"
+                    :disabled="selects.length === 0"
                     @click="onBatchDelete(null)"
                 >
                     {{ $t('commons.button.delete') }}
                 </el-button>
 
                 <el-button-group>
-                    <el-button :disabled="!hasManagePermission" @click="onImport">
+                    <el-button v-permission @click="onImport">
                         {{ $t('commons.button.import') }}
                     </el-button>
-                    <el-button :disabled="selects.length === 0 || !hasManagePermission" @click="onExport">
+                    <el-button v-permission :disabled="selects.length === 0" @click="onExport">
                         {{ $t('commons.button.export') }}
                     </el-button>
                 </el-button-group>
@@ -79,7 +80,6 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { dateFormat, getCurrentDateFormatted } from '@/utils/date';
 import { downloadWithContent } from '@/utils/file';
 import { Container } from '@/api/interface/container';
@@ -93,7 +93,6 @@ import i18n from '@/lang';
 const loading = ref();
 const data = ref();
 const selects = ref<any>([]);
-const { hasManagePermission } = useMenuManagePermission();
 
 const dialogImportRef = ref();
 const detailRef = ref();
@@ -201,8 +200,9 @@ const onBatchDelete = async (row: Container.RepoInfo | null) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         disabled: (row: Container.RepoInfo) => {
-            return row.downloadUrl === 'docker.io' || !hasManagePermission.value;
+            return row.downloadUrl === 'docker.io';
         },
         click: (row: Container.RepoInfo) => {
             onOpenDialog('edit', row);
@@ -210,8 +210,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         disabled: (row: Container.RepoInfo) => {
-            return row.downloadUrl === 'docker.io' || !hasManagePermission.value;
+            return row.downloadUrl === 'docker.io';
         },
         click: (row: Container.RepoInfo) => {
             onBatchDelete(row);

@@ -56,10 +56,10 @@
                                 <div class="skill-head">
                                     <div class="skill-name">{{ skill.name }}</div>
                                     <el-button
+                                        v-permission
                                         v-if="skill.uninstallable"
                                         link
                                         type="danger"
-                                        :disabled="!hasManagePermission"
                                         :loading="uninstallingSkill === skill.name"
                                         @click="uninstallSkill(skill)"
                                     >
@@ -98,9 +98,9 @@
                                 <div class="skill-slug">{{ skill.identifier || skill.slug }}</div>
                             </div>
                             <el-button
+                                v-permission
                                 type="primary"
                                 link
-                                :disabled="!hasManagePermission"
                                 :loading="installingSkill === (skill.identifier || skill.slug)"
                                 @click="installSkill(skill)"
                             >
@@ -136,7 +136,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Refresh, Search } from '@element-plus/icons-vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { installAgentSkill, listAgentSkills, searchAgentSkills, uninstallAgentSkill } from '@/api/modules/ai';
@@ -148,7 +147,6 @@ type SkillViewMode = 'installed' | 'market';
 type HermesSkillMarketSource = 'official' | 'skills-sh';
 
 const { t } = useI18n();
-const { hasManagePermission } = useMenuManagePermission();
 const loading = ref(false);
 const searching = ref(false);
 const mode = ref<SkillViewMode>('market');
@@ -391,6 +389,7 @@ defineExpose({
     display: -webkit-box;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }

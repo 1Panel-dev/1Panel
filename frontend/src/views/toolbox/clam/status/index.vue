@@ -13,7 +13,7 @@
                             type="primary"
                             v-if="!data.isActive"
                             link
-                            :disabled="!hasManagePermission"
+                            v-permission
                             @click="onOperate('ClamAV', 'start')"
                         >
                             {{ $t('commons.operate.start') }}
@@ -22,22 +22,17 @@
                             type="primary"
                             v-if="data.isActive"
                             link
-                            :disabled="!hasManagePermission"
+                            v-permission
                             @click="onOperate('ClamAV', 'stop')"
                         >
                             {{ $t('commons.operate.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button
-                            type="primary"
-                            link
-                            :disabled="!hasManagePermission"
-                            @click="onOperate('ClamAV', 'restart')"
-                        >
+                        <el-button type="primary" link v-permission @click="onOperate('ClamAV', 'restart')">
                             {{ $t('commons.button.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link :disabled="!hasManagePermission" @click="setting">
+                        <el-button v-permission type="primary" link @click="setting">
                             {{ $t('commons.button.set') }}
                         </el-button>
                         <el-divider direction="vertical" />
@@ -60,7 +55,7 @@
                             type="primary"
                             v-if="!data.freshIsActive"
                             link
-                            :disabled="!hasManagePermission"
+                            v-permission
                             @click="onOperate('FreshClam', 'start')"
                         >
                             {{ $t('commons.operate.start') }}
@@ -69,18 +64,13 @@
                             type="primary"
                             v-if="data.freshIsActive"
                             link
-                            :disabled="!hasManagePermission"
+                            v-permission
                             @click="onOperate('FreshClam', 'stop')"
                         >
                             {{ $t('commons.operate.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button
-                            type="primary"
-                            link
-                            :disabled="!hasManagePermission"
-                            @click="onOperate('FreshClam', 'restart')"
-                        >
+                        <el-button type="primary" link v-permission @click="onOperate('FreshClam', 'restart')">
                             {{ $t('commons.button.restart') }}
                         </el-button>
                     </div>
@@ -97,7 +87,6 @@ import { onMounted, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const data = ref({
     isExist: true,
@@ -110,7 +99,6 @@ const data = ref({
 });
 const loading = ref(false);
 const showFresh = ref(localStorage.getItem('clam-fresh-show') !== 'hide');
-const { hasManagePermission } = useMenuManagePermission();
 
 const em = defineEmits(['setting', 'getStatus', 'update:loading', 'update:maskShow']);
 

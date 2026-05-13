@@ -223,14 +223,14 @@
                                 </el-button>
                                 <template #dropdown>
                                     <el-dropdown-menu>
-                                        <el-dropdown-item command="dir" :disabled="!hasManagePermission">
+                                        <fu-dropdown-item v-permission command="dir">
                                             <svg-icon iconName="p-file-folder"></svg-icon>
                                             {{ $t('file.dir') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item command="file" :disabled="!hasManagePermission">
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item v-permission command="file">
                                             <svg-icon iconName="p-file-normal"></svg-icon>
                                             {{ $t('menu.files') }}
-                                        </el-dropdown-item>
+                                        </fu-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -241,14 +241,14 @@
                                 </el-button>
                                 <template #dropdown>
                                     <el-dropdown-menu>
-                                        <el-dropdown-item @click="openUpload" :disabled="!hasManagePermission">
+                                        <fu-dropdown-item v-permission @click="openUpload">
                                             <el-icon><ElUpload /></el-icon>
                                             {{ $t('commons.button.upload') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item @click="openWget" :disabled="!hasManagePermission">
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item v-permission @click="openWget">
                                             <el-icon><ElDownload /></el-icon>
                                             {{ $t('file.remoteFile') }}
-                                        </el-dropdown-item>
+                                        </fu-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -386,14 +386,15 @@
                                         </el-button>
                                         <template #dropdown>
                                             <el-dropdown-menu>
-                                                <el-dropdown-item
+                                                <fu-dropdown-item
+                                                    v-permission
                                                     v-for="btn in moreButtons"
                                                     :key="btn.label"
                                                     @click="btn.action"
                                                     :disabled="selects.length === 0"
                                                 >
                                                     {{ $t(btn.label) }}
-                                                </el-dropdown-item>
+                                                </fu-dropdown-item>
                                             </el-dropdown-menu>
                                         </template>
                                     </el-dropdown>
@@ -402,9 +403,10 @@
                                     <el-button-group class="flex items-center">
                                         <template v-for="btn in visibleButtons" :key="btn.label">
                                             <el-button
+                                                v-permission
                                                 plain
                                                 @click="btn.action"
-                                                :disabled="selects.length === 0 || !hasManagePermission"
+                                                :disabled="selects.length === 0"
                                             >
                                                 {{ $t(btn.label) }}
                                             </el-button>
@@ -417,14 +419,15 @@
                                             </el-button>
                                             <template #dropdown>
                                                 <el-dropdown-menu>
-                                                    <el-dropdown-item
+                                                    <fu-dropdown-item
+                                                        v-permission
                                                         v-for="btn in moreButtons"
                                                         :key="btn.label"
                                                         @click="btn.action"
                                                         :disabled="selects.length === 0"
                                                     >
                                                         {{ $t(btn.label) }}
-                                                    </el-dropdown-item>
+                                                    </fu-dropdown-item>
                                                 </el-dropdown-menu>
                                             </template>
                                         </el-dropdown>
@@ -438,7 +441,7 @@
                                     :content="$t('file.paste')"
                                     placement="bottom"
                                 >
-                                    <el-button plain :disabled="!hasManagePermission" @click="openPaste">
+                                    <el-button v-permission plain @click="openPaste">
                                         {{ $t('file.paste') }}({{ fileMove.count }})
                                     </el-button>
                                 </el-tooltip>
@@ -477,12 +480,7 @@
                                         </template>
                                     </el-input>
                                 </div>
-                                <el-button
-                                    plain
-                                    type="primary"
-                                    :disabled="!hasManagePermission"
-                                    @click="openAiSearchDrawer"
-                                >
+                                <el-button v-permission plain type="primary" @click="openAiSearchDrawer">
                                     {{ $t('file.aiSearch') }}
                                 </el-button>
                             </div>
@@ -548,30 +546,30 @@
                                         <div>
                                             <el-button
                                                 v-if="row.shareCode"
+                                                v-permission
                                                 link
                                                 type="primary"
                                                 size="large"
                                                 icon="Share"
-                                                :disabled="!hasManagePermission"
                                                 @click="openShareFile(row)"
                                             ></el-button>
                                         </div>
                                         <div>
                                             <el-button
                                                 v-if="row.favoriteID > 0"
+                                                v-permission
                                                 link
                                                 type="warning"
                                                 size="large"
                                                 icon="StarFilled"
-                                                :disabled="!hasManagePermission"
                                                 @click="remove(row.favoriteID)"
                                             ></el-button>
                                             <div v-else>
                                                 <el-button
                                                     v-if="hoveredRowPath === row.path"
+                                                    v-permission
                                                     link
                                                     icon="Star"
-                                                    :disabled="!hasManagePermission"
                                                     @click="addToFavorite(row)"
                                                 ></el-button>
                                             </div>
@@ -581,7 +579,7 @@
                             </el-table-column>
                             <el-table-column :label="$t('file.mode')" prop="mode" width="80">
                                 <template #default="{ row }">
-                                    <el-link underline="never" :disabled="!hasManagePermission" @click="openMode(row)">
+                                    <el-link v-permission underline="never" @click="openMode(row)">
                                         {{ row.mode }}
                                     </el-link>
                                 </template>
@@ -593,7 +591,7 @@
                                 width="200"
                             >
                                 <template #default="{ row }">
-                                    <el-link underline="never" :disabled="!hasManagePermission" @click="openChown(row)">
+                                    <el-link v-permission underline="never" @click="openChown(row)">
                                         {{ row.user ? row.user : '-' }} ({{ row.uid }}) /
                                         {{ row.group ? row.group : '-' }} ({{ row.gid }})
                                     </el-link>
@@ -772,7 +770,6 @@ import TerminalDialog from './terminal/index.vue';
 import { Dashboard } from '@/api/interface/dashboard';
 import { CompressExtension, MimetypeByExtensionObject } from '@/enums/files';
 import type { TabPaneName } from 'element-plus';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { getComponentInfo } from '@/api/modules/host';
 import { routerToNameWithQuery } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
@@ -782,7 +779,6 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 const { isMobile } = useGlobalStore();
 
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
 
 interface FilePaths {
     url: string;
@@ -1788,24 +1784,25 @@ const beforeButtons = [
     },
     {
         label: i18n.global.t('commons.button.copy'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: File.File) => openMoveBtn('copy', row),
     },
     {
         label: i18n.global.t('file.move'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: File.File) => openMoveBtn('cut', row),
     },
     {
         label: i18n.global.t('file.paste'),
+        permission: true,
         click: openPaste,
         disabled: () => {
-            return !moveOpen.value || !hasManagePermission.value;
+            return !moveOpen.value;
         },
     },
     {
         label: i18n.global.t('file.compress'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: File.File) => {
             openCompress([row]);
         },
@@ -1819,7 +1816,7 @@ const beforeButtons = [
     },
     {
         label: i18n.global.t('file.editPermissions'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: File.File) => {
             openBatchRole([row]);
         },
@@ -1827,7 +1824,7 @@ const beforeButtons = [
     {
         label: i18n.global.t('file.setRemark'),
         hideOnRemarkBlackList: true,
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: File.File) => {
             openRemark(row);
         },
@@ -1836,8 +1833,9 @@ const beforeButtons = [
 const afterButtons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         disabled: (row: File.File) => {
-            return row.name == '.1panel_clash' || !hasManagePermission.value;
+            return row.name == '.1panel_clash';
         },
         click: delFile,
         divided: true,
@@ -1848,7 +1846,7 @@ const afterButtons = [
     },
     {
         label: i18n.global.t('file.addFavoriteAction'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: File.File) => {
             addToFavorite(row);
         },
@@ -1856,7 +1854,7 @@ const afterButtons = [
     },
     {
         label: i18n.global.t('file.removeFavoriteAction'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: File.File) => {
             remove(row?.favoriteID);
         },
@@ -1864,7 +1862,7 @@ const afterButtons = [
     },
     {
         label: i18n.global.t('file.shareFile'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: openShareFile,
         show: (row: File.File) => {
             return !row?.isDir && !row?.shareCode;
@@ -1872,7 +1870,7 @@ const afterButtons = [
     },
     {
         label: i18n.global.t('file.shareCancel'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: File.File) => {
             removeShareByPath(row.path);
         },
@@ -1882,11 +1880,12 @@ const afterButtons = [
     },
     {
         label: i18n.global.t('file.convert'),
+        permission: true,
         click: (row: File.File) => {
             openConvert(row);
         },
         disabled: (row: File.File) => {
-            return row?.isDir || !isConvertible(row?.extension, row?.mimeType) || !hasManagePermission.value;
+            return row?.isDir || !isConvertible(row?.extension, row?.mimeType);
         },
     },
     {
@@ -1903,7 +1902,7 @@ const afterButtons = [
 const rightBtnRename = [
     {
         label: i18n.global.t('file.rename'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: File.File) => {
             openRename(row, 'right');
         },
@@ -1912,7 +1911,7 @@ const rightBtnRename = [
 const moreBtnRename = [
     {
         label: i18n.global.t('file.rename'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: File.File) => {
             openRename(row, 'more');
         },

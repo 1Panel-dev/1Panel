@@ -37,13 +37,7 @@
                         :disabled="!canUpdate()"
                         :placeholder="$t('commons.msg.noneData')"
                     ></CodemirrorPro>
-                    <el-button
-                        type="primary"
-                        class="mt-5"
-                        v-if="canUpdate()"
-                        :disabled="!hasManagePermission"
-                        @click="onSave"
-                    >
+                    <el-button type="primary" class="mt-5" v-if="canUpdate()" v-permission @click="onSave">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>
@@ -61,10 +55,8 @@ import { searchClamFile, updateClamFile } from '@/api/modules/toolbox';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const loading = ref(false);
-const { hasManagePermission } = useMenuManagePermission();
 
 const activeName = ref('clamd');
 const tail = ref(200);

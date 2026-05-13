@@ -1,11 +1,11 @@
 <template>
     <ComplexTable :data="data" @search="search" v-loading="loading">
         <template #toolbar>
-            <el-button type="primary" plain :disabled="!hasManagePermission" @click="openCreate">
+            <el-button v-permission type="primary" plain @click="openCreate">
                 {{ $t('commons.button.create') }}
             </el-button>
-            <el-button :disabled="!hasManagePermission" @click="openCache">{{ $t('website.proxyCache') }}</el-button>
-            <el-button type="primary" :disabled="!hasManagePermission" @click="clear" link>
+            <el-button v-permission @click="openCache">{{ $t('website.proxyCache') }}</el-button>
+            <el-button v-permission type="primary" @click="clear" link>
                 {{ $t('nginx.clearProxyCache') }}
             </el-button>
         </template>
@@ -27,8 +27,8 @@
         <el-table-column :label="$t('commons.table.status')" prop="enable" width="100">
             <template #default="{ row }">
                 <Status
+                    v-permission
                     :status="row.enable ? 'enable' : 'disable'"
-                    :disabled="!hasManagePermission"
                     @click="opProxy(row)"
                     :operate="true"
                 />
@@ -54,7 +54,6 @@
 import { Website } from '@/api/interface/website';
 import { getProxyConfig, deleteProxyConfig, updateProxyConfigStatus, clearProxyCache } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
@@ -95,8 +94,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         disabled: (row: Website.ProxyConfig) => {
-            return !row.enable || !hasManagePermission.value;
+            return !row.enable;
         },
         click: function (row: Website.ProxyConfig) {
             openEdit(row);
@@ -104,7 +104,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: function (row: Website.ProxyConfig) {
             deleteProxy(row);
         },

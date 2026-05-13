@@ -22,7 +22,7 @@
                 :height-diff="300"
             >
                 <template #button>
-                    <el-button @click="cleanLog" icon="Delete" :disabled="hasContent === false || !hasManagePermission">
+                    <el-button v-permission @click="cleanLog" icon="Delete" :disabled="hasContent === false">
                         {{ $t('commons.button.clean') }}
                     </el-button>
                 </template>
@@ -45,9 +45,7 @@ import { GlobalStore } from '@/store';
 import { operateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { TabsPaneContext } from 'element-plus';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
 
 const logConfig = reactive({
     type: 'supervisor',

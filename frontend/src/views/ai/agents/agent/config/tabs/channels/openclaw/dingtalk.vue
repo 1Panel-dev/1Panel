@@ -93,12 +93,7 @@
                 @save="saveChannel"
             />
             <el-form-item class="mt-4">
-                <el-button
-                    type="primary"
-                    :loading="saving"
-                    :disabled="!installed || !hasManagePermission"
-                    @click="saveChannel"
-                >
+                <el-button v-permission type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
                     {{ t('commons.button.save') }}
                 </el-button>
             </el-form-item>
@@ -109,7 +104,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { getAgentDingTalkConfig, updateAgentDingTalkConfig } from '@/api/modules/ai';
@@ -120,8 +114,6 @@ import PluginInstall from '../components/plugin-install.vue';
 import VersionSupport from '../../components/version-support.vue';
 import { useAgentPluginChannel } from './useAgentPluginChannel';
 import ChannelBots from '../components/channel-bots.vue';
-
-const { hasManagePermission } = useMenuManagePermission();
 
 interface DingTalkForm extends Omit<AI.AgentDingTalkConfig, 'installed' | 'allowFrom' | 'groupAllowFrom'> {
     allowFromText: string;

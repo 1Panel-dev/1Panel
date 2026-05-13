@@ -34,12 +34,7 @@
                 @save="saveChannel"
             />
             <el-form-item class="mt-4">
-                <el-button
-                    type="primary"
-                    :loading="saving"
-                    :disabled="!installed || !hasManagePermission"
-                    @click="saveChannel"
-                >
+                <el-button v-permission type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
                     {{ t('commons.button.save') }}
                 </el-button>
             </el-form-item>
@@ -49,7 +44,6 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { getAgentQQBotConfig, updateAgentQQBotConfig } from '@/api/modules/ai';
@@ -76,7 +70,6 @@ interface QQBotForm {
 }
 
 const { t } = useI18n();
-const { hasManagePermission } = useMenuManagePermission();
 const saving = ref(false);
 const {
     agentId,

@@ -79,7 +79,7 @@
                                             type="primary"
                                             link
                                             v-if="app.currentRow.status !== 'Running'"
-                                            :disabled="!hasManagePermission"
+                                            v-permission="'app_manage'"
                                             @click="onOperate('start', app.currentRow)"
                                         >
                                             {{ $t('commons.button.start') }}
@@ -90,7 +90,7 @@
                                             type="primary"
                                             link
                                             v-else
-                                            :disabled="!hasManagePermission"
+                                            v-permission="'app_manage'"
                                             @click="onOperate('stop', app.currentRow)"
                                         >
                                             {{ $t('commons.button.stop') }}
@@ -100,7 +100,7 @@
                                             size="small"
                                             type="primary"
                                             link
-                                            :disabled="!hasManagePermission"
+                                            v-permission="'app_manage'"
                                             @click="onOperate('restart', app.currentRow)"
                                         >
                                             {{ $t('commons.button.restart') }}
@@ -110,7 +110,7 @@
                                             size="small"
                                             type="primary"
                                             link
-                                            :disabled="!hasManagePermission"
+                                            v-permission="'app_manage'"
                                             @click="routerToName('AppInstalled')"
                                         >
                                             {{ $t('tabs.more') }}
@@ -124,11 +124,9 @@
                                     type="primary"
                                     plain
                                     round
+                                    v-permission="'app_manage'"
                                     size="small"
-                                    :disabled="
-                                        (app.limit == 1 && app.detail && app.detail.length !== 0) ||
-                                        !hasManagePermission
-                                    "
+                                    :disabled="app.limit == 1 && app.detail && app.detail.length !== 0"
                                     @click="goInstall(app.key, app.appType)"
                                 >
                                     {{ $t('commons.button.install') }}

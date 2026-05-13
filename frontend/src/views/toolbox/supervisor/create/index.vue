@@ -22,11 +22,7 @@
             <el-form-item :label="$t('tool.supervisor.dir')" prop="dir">
                 <el-input v-model.trim="process.dir">
                     <template #prepend>
-                        <el-button
-                            icon="Folder"
-                            :disabled="!hasManagePermission"
-                            @click="fileRef.acceptParams({ dir: true })"
-                        />
+                        <el-button v-permission icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
                     </template>
                 </el-input>
             </el-form-item>
@@ -51,7 +47,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(processForm)" :disabled="loading || !hasManagePermission">
+                <el-button v-permission type="primary" @click="submit(processForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -69,10 +65,8 @@ import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { HostTool } from '@/api/interface/host-tool';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const open = ref(false);
-const { hasManagePermission } = useMenuManagePermission();
 const loading = ref(false);
 const fileRef = ref();
 const processForm = ref<FormInstance>();

@@ -8,7 +8,7 @@
         :description="t('aiTools.agents.pluginInstallNPMRegistryHelper')"
     />
     <el-form-item v-if="!installed" class="mt-4">
-        <el-button type="primary" :loading="installing" :disabled="!hasManagePermission" @click="handleInstall">
+        <el-button v-permission type="primary" :loading="installing" @click="handleInstall">
             {{ t('commons.button.install') }}
         </el-button>
     </el-form-item>
@@ -18,14 +18,7 @@
                 <span class="plugin-install-status__label">{{ t('app.version') }}</span>
                 <span class="plugin-install-status__value">{{ currentVersion || '-' }}</span>
             </div>
-            <el-button
-                type="danger"
-                plain
-                size="small"
-                :loading="uninstalling"
-                :disabled="!hasManagePermission"
-                @click="handleUninstall"
-            >
+            <el-button type="danger" plain size="small" :loading="uninstalling" v-permission @click="handleUninstall">
                 {{ t('commons.button.uninstall') }}
             </el-button>
         </div>
@@ -34,13 +27,7 @@
                 <span class="plugin-install-status__label">{{ t('app.newVersion') }}</span>
                 <span class="plugin-install-status__value">{{ latestVersion || '-' }}</span>
             </div>
-            <el-button
-                type="primary"
-                size="small"
-                :loading="upgrading"
-                :disabled="!hasManagePermission"
-                @click="handleUpgrade"
-            >
+            <el-button type="primary" size="small" :loading="upgrading" v-permission @click="handleUpgrade">
                 {{ t('commons.button.upgrade') }}
             </el-button>
         </div>
@@ -50,7 +37,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import TaskLog from '@/components/log/task/index.vue';
 
@@ -69,7 +55,6 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const { hasManagePermission } = useMenuManagePermission();
 const taskLogRef = ref();
 
 const openTaskLog = (taskID: string) => {

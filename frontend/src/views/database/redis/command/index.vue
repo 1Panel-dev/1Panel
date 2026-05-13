@@ -1,10 +1,10 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('database.redisQuickCmd')" @close="handleClose" size="large">
         <template #content>
-            <el-button type="primary" :disabled="!hasManagePermission" @click="handleCmdAdd()">
+            <el-button v-permission type="primary" @click="handleCmdAdd()">
                 {{ $t('commons.button.add') }}
             </el-button>
-            <el-button :disabled="!hasManagePermission" @click="batchDelete(null)">
+            <el-button v-permission @click="batchDelete(null)">
                 {{ $t('commons.button.delete') }}
             </el-button>
             <el-table :data="data" class="mt-5" @selection-change="handleSelectionChange">
@@ -30,7 +30,7 @@
                             v-if="scope.row.lineStatus === 'create' || scope.row.lineStatus === 'edit'"
                             link
                             type="primary"
-                            :disabled="!hasManagePermission"
+                            v-permission
                             @click="handleCmdSave(scope.row)"
                         >
                             {{ $t('commons.button.save') }}
@@ -39,7 +39,7 @@
                             v-if="!scope.row.lineStatus || scope.row.lineStatus === 'saved'"
                             link
                             type="primary"
-                            :disabled="!hasManagePermission"
+                            v-permission
                             @click="scope.row.lineStatus = 'edit'"
                         >
                             {{ $t('commons.button.edit') }}
@@ -56,7 +56,7 @@
                             v-if="scope.row.lineStatus !== 'create' && scope.row.lineStatus !== 'edit'"
                             link
                             type="primary"
-                            :disabled="!hasManagePermission"
+                            v-permission
                             @click="handleCmdDelete(scope.$index)"
                         >
                             {{ $t('commons.button.delete') }}
@@ -78,10 +78,8 @@
 import { Command } from '@/api/interface/command';
 import { deleteCommand, getCommandPage, addCommand, editCommand } from '@/api/modules/command';
 import { reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
-const { hasManagePermission } = useMenuManagePermission();
 
 const drawerVisible = ref();
 const loading = ref();

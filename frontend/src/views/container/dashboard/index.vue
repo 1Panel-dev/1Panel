@@ -107,7 +107,7 @@
                             <el-button
                                 v-if="countItem.imageReclaimable"
                                 class="-mt-0.5"
-                                :disabled="!hasManagePermission"
+                                v-permission
                                 @click="onClean('image', true)"
                                 link
                                 type="primary"
@@ -125,7 +125,7 @@
                             <el-button
                                 v-if="countItem.containerReclaimable"
                                 class="-mt-0.5"
-                                :disabled="!hasManagePermission"
+                                v-permission
                                 @click="onClean('container', false)"
                                 link
                                 type="primary"
@@ -143,7 +143,7 @@
                             <el-button
                                 v-if="countItem.volumeReclaimable"
                                 class="-mt-0.5"
-                                :disabled="!hasManagePermission"
+                                v-permission
                                 @click="onClean('volume', false)"
                                 link
                                 type="primary"
@@ -161,7 +161,7 @@
                             <el-button
                                 v-if="countItem.buildCacheUsage"
                                 class="-mt-0.5"
-                                :disabled="!hasManagePermission"
+                                v-permission
                                 @click="onClean('buildcache', false)"
                                 link
                                 type="primary"
@@ -206,11 +206,9 @@ import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
 import { routerToName } from '@/utils/router';
 import { onMounted, reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import i18n from '@/lang';
 
 const taskLogRef = ref();
-const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref();
 const usageLoading = ref(false);

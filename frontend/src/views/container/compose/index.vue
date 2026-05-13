@@ -9,10 +9,10 @@
 
         <LayoutContent v-if="isExist" :title="$t('container.compose', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" :disabled="!hasManagePermission" @click="onOpenDialog()">
+                <el-button v-permission type="primary" @click="onOpenDialog()">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain :disabled="!hasManagePermission" @click="onImportCompose()">
+                <el-button v-permission type="primary" plain @click="onImportCompose()">
                     {{ $t('commons.button.import') }}
                 </el-button>
             </template>
@@ -81,45 +81,45 @@
                                             <div class="compose-actions" @click.stop>
                                                 <el-dropdown placement="bottom">
                                                     <Status
+                                                        v-permission
                                                         :status="getComposeStatus(row)"
-                                                        :disabled="!hasManagePermission"
                                                         :operate="true"
                                                     />
                                                     <template #dropdown>
                                                         <el-dropdown-menu>
-                                                            <el-dropdown-item
+                                                            <fu-dropdown-item
+                                                                v-permission
                                                                 :disabled="
-                                                                    !hasManagePermission ||
-                                                                    (row.containerCount === row.runningCount &&
-                                                                        row.runningCount > 0)
+                                                                    row.containerCount === row.runningCount &&
+                                                                    row.runningCount > 0
                                                                 "
                                                                 @click="handleComposeOperate('up', row)"
                                                             >
                                                                 {{ $t('commons.operate.start') }}
-                                                            </el-dropdown-item>
-                                                            <el-dropdown-item
-                                                                :disabled="
-                                                                    row.runningCount === 0 || !hasManagePermission
-                                                                "
+                                                            </fu-dropdown-item>
+                                                            <fu-dropdown-item
+                                                                v-permission
+                                                                :disabled="row.runningCount === 0"
                                                                 @click="handleComposeOperate('stop', row)"
                                                             >
                                                                 {{ $t('commons.operate.stop') }}
-                                                            </el-dropdown-item>
-                                                            <el-dropdown-item
-                                                                :disabled="!hasManagePermission"
+                                                            </fu-dropdown-item>
+                                                            <fu-dropdown-item
+                                                                v-permission
                                                                 @click="handleComposeOperate('restart', row)"
                                                             >
                                                                 {{ $t('commons.button.restart') }}
-                                                            </el-dropdown-item>
+                                                            </fu-dropdown-item>
                                                         </el-dropdown-menu>
                                                     </template>
                                                 </el-dropdown>
                                                 <el-button
+                                                    v-permission:view="'host_file_view'"
                                                     plain
                                                     round
                                                     size="small"
                                                     class="round-btn ml-3"
-                                                    :disabled="!row?.workdir || !hasFilePermission"
+                                                    :disabled="!row?.workdir"
                                                     @click="openComposeFolder(row)"
                                                 >
                                                     {{ $t('home.dir') }}
@@ -129,7 +129,7 @@
                                                     round
                                                     size="small"
                                                     class="round-btn"
-                                                    :disabled="!hasManagePermission"
+                                                    v-permission
                                                     @click="onBackupList(row)"
                                                 >
                                                     {{ $t('commons.button.backup') }}
@@ -139,7 +139,7 @@
                                                     round
                                                     size="small"
                                                     class="round-btn"
-                                                    :disabled="!hasManagePermission"
+                                                    v-permission
                                                     @click="onDelete(row)"
                                                 >
                                                     {{ $t('commons.operate.delete') }}
@@ -316,8 +316,8 @@
                                 </el-radio-group>
                                 <el-button
                                     v-if="showType !== 'log' && !(showType === 'env' && isAppStoreCompose)"
+                                    v-permission
                                     type="primary"
-                                    :disabled="!hasManagePermission"
                                     @click="onSubmitEdit"
                                 >
                                     {{ $t('commons.button.save') }}
@@ -452,12 +452,7 @@
                                 </el-form-item>
                             </el-form>
 
-                            <el-button
-                                type="primary"
-                                class="mt-2"
-                                :disabled="!hasManagePermission"
-                                @click="onSubmit(formRef)"
-                            >
+                            <el-button v-permission type="primary" class="mt-2" @click="onSubmit(formRef)">
                                 {{ $t('commons.button.save') }}
                             </el-button>
                         </el-card>
@@ -485,7 +480,6 @@
 
 <script lang="ts" setup>
 import { computed, h, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import ContainerLog from '@/components/log/container/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
@@ -521,8 +515,6 @@ import { ElCheckbox, ElForm } from 'element-plus';
 import { GlobalStore } from '@/store';
 
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
-const { hasPermission: hasFilePermission } = useMenuManagePermission('host_file_view');
 
 const data = ref<any[]>([]);
 const loading = ref(false);

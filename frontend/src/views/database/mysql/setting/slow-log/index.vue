@@ -3,7 +3,7 @@
         <el-form label-position="left" label-width="80px" @submit.prevent>
             <el-form-item :label="$t('database.isOn')">
                 <el-switch
-                    :disabled="!hasManagePermission"
+                    v-permission
                     v-model="variables.slow_query_log"
                     active-value="ON"
                     inactive-value="OFF"
@@ -31,8 +31,6 @@ import { updateMysqlVariables } from '@/api/modules/database';
 import LogFile from '@/components/log/file/index.vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
-const { hasManagePermission } = useMenuManagePermission();
 
 const detailShow = ref();
 const currentStatus = ref();

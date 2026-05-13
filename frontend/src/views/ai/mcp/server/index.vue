@@ -4,10 +4,10 @@
         <LayoutContent :title="'Servers'" v-loading="loading">
             <template #leftToolBar>
                 <div class="flex flex-wrap gap-3">
-                    <el-button type="primary" :disabled="!hasManagePermission" @click="openCreate">
+                    <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
-                    <el-button type="primary" plain :disabled="!hasManagePermission" @click="openDomain">
+                    <el-button v-permission type="primary" plain @click="openDomain">
                         {{ $t('aiTools.mcp.bindDomain') }}
                     </el-button>
                 </div>
@@ -136,46 +136,48 @@ const getUrl = (row: AI.McpServer) => {
 const buttons = [
     {
         label: i18n.global.t('menu.config'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: AI.McpServer) => {
             openConfig(row);
         },
     },
     {
         label: i18n.global.t('commons.button.edit'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: AI.McpServer) => {
             openDetail(row);
         },
     },
     {
         label: i18n.global.t('commons.button.start'),
+        permission: true,
         click: (row: AI.McpServer) => {
             opServer(row, 'start');
         },
         disabled: (row: AI.McpServer) => {
-            return row.status === 'Running' || !hasManagePermission.value;
+            return row.status === 'Running';
         },
     },
     {
         label: i18n.global.t('commons.button.stop'),
+        permission: true,
         click: (row: AI.McpServer) => {
             opServer(row, 'stop');
         },
         disabled: (row: AI.McpServer) => {
-            return row.status === 'Stopped' || !hasManagePermission.value;
+            return row.status === 'Stopped';
         },
     },
     {
         label: i18n.global.t('commons.button.restart'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: AI.McpServer) => {
             opServer(row, 'restart');
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: AI.McpServer) => {
             deleteServer(row);
         },

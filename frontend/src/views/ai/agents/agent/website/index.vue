@@ -22,7 +22,7 @@
             <el-button @click="open = false" :disabled="loading">
                 {{ $t('commons.button.cancel') }}
             </el-button>
-            <el-button type="primary" @click="submit" :disabled="loading || !hasManagePermission">
+            <el-button v-permission type="primary" @click="submit" :disabled="loading">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -32,7 +32,6 @@
 <script setup lang="ts">
 import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { AI } from '@/api/interface/ai';
 import { Website } from '@/api/interface/website';
 import { bindAgentWebsite } from '@/api/modules/ai';
@@ -43,7 +42,6 @@ import i18n from '@/lang';
 
 const open = ref(false);
 const loading = ref(false);
-const { hasManagePermission } = useMenuManagePermission();
 const agentName = ref('');
 const websites = ref<Website.WebsiteOption[]>([]);
 const formRef = ref<FormInstance>();

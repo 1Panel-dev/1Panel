@@ -1,6 +1,7 @@
 import { type App } from 'vue';
 
 import FuInputRwSwitch from './FuInputRwSwitch.vue';
+import FuDropdownItem from './FuDropdownItem.vue';
 import FuReadWriteSwitch from './FuReadWriteSwitch.vue';
 import FuSelectRwSwitch from './FuSelectRwSwitch.vue';
 import FuStep from './FuStep';
@@ -14,6 +15,7 @@ const components = [
     FuTable,
     FuTableOperations,
     FuTablePagination,
+    FuDropdownItem,
     FuInputRwSwitch,
     FuReadWriteSwitch,
     FuSelectRwSwitch,

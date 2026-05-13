@@ -28,7 +28,7 @@
                 <el-button @click="handleClose()" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" @click="openSubmit(initForm)" :disabled="loading || !hasManagePermission">
+                <el-button v-permission type="primary" @click="openSubmit(initForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -44,10 +44,8 @@ import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const open = ref(false);
-const { hasManagePermission } = useMenuManagePermission();
 const loading = ref(false);
 const initForm = ref<FormInstance>();
 const rules = ref({

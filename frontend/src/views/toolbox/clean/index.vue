@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <LayoutContent :title="$t('setting.diskClean')" :divider="true">
             <template #leftToolBar>
-                <el-button type="primary" :disabled="!hasManagePermission" @click="scanData">
+                <el-button v-permission type="primary" @click="scanData">
                     {{ $t('clean.scan') }}
                 </el-button>
             </template>
@@ -78,9 +78,10 @@
                     <div>
                         <el-text class="clean_title">{{ $t('clean.totalScan') }} {{ computeSize(totalSize) }}</el-text>
                         <el-button
+                            v-permission
                             type="primary"
                             class="-mt-2 ml-20"
-                            :disabled="selectSize <= 0 || !hasManagePermission"
+                            :disabled="selectSize <= 0"
                             @click="onSubmitClean"
                         >
                             {{ $t('clean.clean') }}
@@ -261,10 +262,8 @@ import { getAgentSettingInfo } from '@/api/modules/setting';
 import { clean, scan } from '@/api/modules/toolbox';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const loading = ref();
-const { hasManagePermission } = useMenuManagePermission();
 const totalSize = ref<number>(0);
 const selectSize = ref<number>(0);
 

@@ -23,7 +23,7 @@
                 />
             </template>
             <template v-if="showTable" #leftToolBar>
-                <el-button type="primary" @click="openCreate" :disabled="showStopped || !hasManagePermission">
+                <el-button v-permission type="primary" @click="openCreate" :disabled="showStopped">
                     {{ $t('commons.button.create') }}
                 </el-button>
             </template>
@@ -74,23 +74,18 @@
                         <template #default="{ row }">
                             <div v-if="row.status && row.status.length > 0 && row.hasLoad">
                                 <Status
+                                    v-permission
                                     v-if="checkStatus(row.status) === 'RUNNING'"
                                     status="running"
-                                    :disabled="!hasManagePermission"
                                     @click="operate('stop', row.name)"
                                 />
                                 <Status
+                                    v-permission
                                     v-else-if="checkStatus(row.status) === 'WARNING'"
                                     status="unhealthy"
-                                    :disabled="!hasManagePermission"
                                     @click="operate('restart', row.name)"
                                 />
-                                <Status
-                                    v-else
-                                    status="stopped"
-                                    :disabled="!hasManagePermission"
-                                    @click="operate('start', row.name)"
-                                />
+                                <Status v-else v-permission status="stopped" @click="operate('start', row.name)" />
                             </div>
                             <div v-if="!row.hasLoad">
                                 <el-button link loading></el-button>
@@ -189,7 +184,6 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const { isMobile } = useGlobalStore();
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref(false);
 const setSuperVisor = ref(false);
@@ -349,14 +343,14 @@ const edit = (row: HostTool.SupervisorProcess) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
-        disabled: !hasManagePermission.value,
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             edit(row);
         },
     },
     {
         label: i18n.global.t('website.sourceFile'),
-        disabled: !hasManagePermission.value,
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             getFile(row.name, 'config');
         },
@@ -369,14 +363,14 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
-        disabled: !hasManagePermission.value,
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             operate('restart', row.name);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        disabled: !hasManagePermission.value,
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             operate('delete', row.name);
         },

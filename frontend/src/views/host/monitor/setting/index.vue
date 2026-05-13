@@ -10,7 +10,7 @@
                         <el-col :span="12">
                             <el-form-item :label="$t('monitor.enableMonitor')" prop="monitorStatus">
                                 <el-switch
-                                    :disabled="!hasManagePermission"
+                                    v-permission
                                     @change="onSaveStatus"
                                     v-model="form.monitorStatus"
                                     active-value="Enable"
@@ -20,11 +20,7 @@
                             <el-form-item :label="$t('monitor.storeDays')" prop="monitorStoreDays">
                                 <el-input disabled v-model="form.monitorStoreDays">
                                     <template #append>
-                                        <el-button
-                                            :disabled="!hasManagePermission"
-                                            @click="onChangeStoreDays"
-                                            icon="Setting"
-                                        >
+                                        <el-button v-permission @click="onChangeStoreDays" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -33,11 +29,7 @@
                             <el-form-item :label="$t('monitor.interval')" prop="monitorIntervalItem">
                                 <el-input disabled v-model="form.monitorIntervalItem">
                                     <template #append>
-                                        <el-button
-                                            :disabled="!hasManagePermission"
-                                            @click="onChangeInterval"
-                                            icon="Setting"
-                                        >
+                                        <el-button v-permission @click="onChangeInterval" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -46,11 +38,7 @@
                             <el-form-item :label="$t('monitor.defaultNetwork')">
                                 <el-input disabled v-model="form.defaultNetwork">
                                     <template #append>
-                                        <el-button
-                                            :disabled="!hasManagePermission"
-                                            @click="onChangeNetwork"
-                                            icon="Setting"
-                                        >
+                                        <el-button v-permission @click="onChangeNetwork" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -60,7 +48,7 @@
                             <el-form-item :label="$t('monitor.defaultIO')">
                                 <el-input disabled v-model="form.defaultIO">
                                     <template #append>
-                                        <el-button :disabled="!hasManagePermission" @click="onChangeIO" icon="Setting">
+                                        <el-button v-permission @click="onChangeIO" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -68,7 +56,7 @@
                                 <span class="input-help">{{ $t('monitor.defaultIOHelper') }}</span>
                             </el-form-item>
                             <el-form-item>
-                                <el-button :disabled="!hasManagePermission" @click="onClean()" icon="Delete">
+                                <el-button v-permission @click="onClean()" icon="Delete">
                                     {{ $t('monitor.cleanMonitor') }}
                                 </el-button>
                             </el-form-item>
@@ -97,9 +85,7 @@ import IO from '@/views/host/monitor/setting/default-io/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { splitTimeFromSecond, transTimeUnit } from '@/utils/validate';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const loading = ref();
-const { hasManagePermission } = useMenuManagePermission();
 const form = reactive({
     monitorStatus: 'Disable',
     monitorStoreDays: 30,

@@ -30,24 +30,20 @@
             <el-form-item :label="$t('disk.mountPoint')" prop="mountPoint">
                 <el-input v-model="form.mountPoint">
                     <template #prepend>
-                        <el-button
-                            icon="Folder"
-                            :disabled="!hasManagePermission"
-                            @click="fileRef.acceptParams({ dir: true })"
-                        />
+                        <el-button icon="Folder" v-permission @click="fileRef.acceptParams({ dir: true })" />
                     </template>
                 </el-input>
             </el-form-item>
             <el-form-item :label="$t('disk.autoMount')" prop="autoMount">
-                <el-switch :disabled="!hasManagePermission" v-model="form.autoMount" />
+                <el-switch v-permission v-model="form.autoMount" />
             </el-form-item>
             <el-form-item :label="$t('disk.noFail')" prop="noFail" v-if="form.autoMount">
-                <el-switch :disabled="!hasManagePermission" v-model="form.noFail" />
+                <el-switch v-permission v-model="form.noFail" />
             </el-form-item>
         </el-form>
         <template #footer>
             <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button type="primary" @click="submit" :disabled="loading || !hasManagePermission">
+            <el-button v-permission type="primary" @click="submit" :disabled="loading">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -61,9 +57,6 @@ import { mountDisk, partitionDisk } from '@/api/modules/host';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
-
-const { hasManagePermission } = useMenuManagePermission();
 
 const rules = ref<any>({
     filesystem: [Rules.requiredInput],

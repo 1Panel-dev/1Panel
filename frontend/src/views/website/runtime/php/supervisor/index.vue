@@ -3,7 +3,7 @@
         <template #content>
             <ComplexTable :data="data" v-loading="loading" v-model:selects="selects">
                 <template #toolbar>
-                    <el-button type="primary" :disabled="!hasManagePermission" @click="openCreate">
+                    <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
                     <el-button

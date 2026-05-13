@@ -61,8 +61,8 @@
                                 <div class="skill-head">
                                     <div class="skill-name">{{ skill.name }}</div>
                                     <el-switch
+                                        v-permission
                                         :model-value="!skill.disabled"
-                                        :disabled="!hasManagePermission"
                                         :loading="updatingSkill === skill.name"
                                         @change="(value) => toggleSkill(skill, Boolean(value))"
                                     />
@@ -100,9 +100,9 @@
                                 <div class="skill-slug">{{ skill.slug }}</div>
                             </div>
                             <el-button
+                                v-permission
                                 type="primary"
                                 link
-                                :disabled="!hasManagePermission"
                                 :loading="installingSkill === skill.slug"
                                 @click="installSkill(skill)"
                             >
@@ -144,7 +144,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Refresh, Search } from '@element-plus/icons-vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { installAgentSkill, listAgentSkills, searchAgentSkills, updateAgentSkill } from '@/api/modules/ai';
@@ -165,7 +164,6 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const { hasManagePermission } = useMenuManagePermission();
 const { isIntl } = useGlobalStore();
 const loading = ref(false);
 const searching = ref(false);
@@ -434,6 +432,7 @@ defineExpose({
     display: -webkit-box;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     color: var(--el-text-color-secondary);

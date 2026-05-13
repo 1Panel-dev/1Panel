@@ -34,10 +34,10 @@
                         {{ $t('commons.button.watch') }}
                     </el-checkbox>
                 </el-button>
-                <el-button @click="onDownload" icon="Download" :disabled="!hasContent || !hasManagePermission">
+                <el-button v-permission @click="onDownload" icon="Download" :disabled="!hasContent">
                     {{ $t('commons.button.download') }}
                 </el-button>
-                <el-button type="primary" plain @click="onClean()" :disabled="!hasContent || !hasManagePermission">
+                <el-button v-permission type="primary" plain @click="onClean()" :disabled="!hasContent">
                     {{ $t('logs.deleteLogs') }}
                 </el-button>
             </template>
@@ -66,7 +66,6 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import LogFile from '@/components/log/file/index.vue';
 import MainDiv from '@/components/main-div/index.vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const logConfig = reactive({
     type: 'website',
@@ -81,7 +80,6 @@ const confirmDialogRef = ref();
 const tailLog = ref(false);
 const logRef = ref();
 const hasContent = ref(false);
-const { hasManagePermission } = useMenuManagePermission();
 
 const searchLog = () => {
     showLog.value = false;

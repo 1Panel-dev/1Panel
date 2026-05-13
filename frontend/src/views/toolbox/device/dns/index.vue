@@ -31,7 +31,7 @@
                 <el-button :disabled="loading" @click="onTest()">
                     {{ $t('toolbox.device.dnsCheck') }}
                 </el-button>
-                <el-button :disabled="loading || !hasManagePermission" type="primary" @click="onSave()">
+                <el-button v-permission :disabled="loading" type="primary" @click="onSave()">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -43,10 +43,8 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { loadDeviceConf, checkDNS, updateDevice, updateDeviceByConf } from '@/api/modules/toolbox';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
-const { hasManagePermission } = useMenuManagePermission();
 
 const confShowType = ref('form');
 const dnsConf = ref();

@@ -10,34 +10,34 @@
                     </div>
                     <div class="mt-0.5" v-if="!data.init">
                         <el-button
+                            v-permission
                             type="primary"
                             v-if="data.status != 'running'"
                             link
-                            :disabled="!hasManagePermission"
                             @click="onOperate('start')"
                         >
                             {{ $t('commons.operate.start') }}
                         </el-button>
                         <el-button
+                            v-permission
                             type="primary"
                             v-if="data.status == 'running'"
                             link
-                            :disabled="!hasManagePermission"
                             @click="onOperate('stop')"
                         >
                             {{ $t('commons.operate.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link :disabled="!hasManagePermission" @click="onOperate('restart')">
+                        <el-button v-permission type="primary" link @click="onOperate('restart')">
                             {{ $t('commons.button.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link :disabled="!hasManagePermission" @click="setting">
+                        <el-button v-permission type="primary" link @click="setting">
                             {{ $t('commons.button.set') }}
                         </el-button>
                     </div>
                     <div class="mt-0.5" v-else>
-                        <el-button type="primary" link :disabled="!hasManagePermission" @click="init">
+                        <el-button v-permission type="primary" link @click="init">
                             {{ $t('commons.button.init') }}
                         </el-button>
                     </div>
@@ -101,10 +101,8 @@ import { HostTool } from '@/api/interface/host-tool';
 import InitPage from './init/index.vue';
 import { GlobalStore } from '@/store';
 import { routerToNameWithQuery } from '@/utils/router';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
 
 let operateReq = reactive({
     installId: 0,

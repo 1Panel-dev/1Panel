@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <LayoutContent :title="$t('database.remoteDB', 2)" backName="Redis">
             <template #leftToolBar>
-                <el-button type="primary" :disabled="!hasManagePermission" @click="onOpenDialog('create')">
+                <el-button v-permission type="primary" @click="onOpenDialog('create')">
                     {{ $t('database.createRemoteDB') }}
                 </el-button>
             </template>
@@ -75,7 +75,6 @@
 <script lang="ts" setup>
 import { dateFormat } from '@/utils/date';
 import { onMounted, reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { deleteCheckDatabase, searchDatabases } from '@/api/modules/database';
 import AppResources from '@/views/database/redis/check/index.vue';
 import OperateDialog from '@/views/database/redis/remote/operate/index.vue';
@@ -84,7 +83,6 @@ import i18n from '@/lang';
 import { Database } from '@/api/interface/database';
 
 const loading = ref(false);
-const { hasManagePermission } = useMenuManagePermission();
 
 const dialogRef = ref();
 const checkRef = ref();
@@ -154,14 +152,14 @@ const onDelete = async (row: Database.DatabaseInfo) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: Database.DatabaseInfo) => {
             onOpenDialog('edit', row);
         },
     },
     {
         label: i18n.global.t('commons.button.unbind'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: Database.DatabaseInfo) => {
             onDelete(row);
         },

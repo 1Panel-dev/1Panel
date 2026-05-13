@@ -17,7 +17,6 @@
                     v-for="(disk, index) in diskInfo.unpartitionedDisks"
                     :key="index"
                     :diskInfo="disk"
-                    :has-manage-permission="hasManagePermission"
                     scope="unpartitioned"
                     @partition="(diskInfo) => partitionRef.acceptParams(diskInfo, 'partition')"
                     @search="() => getDisk()"
@@ -29,7 +28,6 @@
                     v-for="(disk, index) in diskInfo.disks"
                     :key="index"
                     :diskInfo="disk"
-                    :has-manage-permission="hasManagePermission"
                     @mount="(diskInfo) => partitionRef.acceptParams(diskInfo, 'mount')"
                     scope="normal"
                     @search="() => getDisk()"
@@ -45,10 +43,8 @@ import { listDisks } from '@/api/modules/host';
 import DiskRouter from '@/views/host/disk-management/index.vue';
 import DiskCard from '@/views/host/disk-management/components/disk-card.vue';
 import Partition from '@/views/host/disk-management/partition/index.vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const loading = ref(false);
-const { hasManagePermission } = useMenuManagePermission();
 const partitionRef = ref();
 const diskInfo = ref<Host.CompleteDiskInfo>();
 

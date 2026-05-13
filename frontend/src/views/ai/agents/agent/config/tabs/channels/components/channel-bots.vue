@@ -2,7 +2,7 @@
     <div class="channel-bots">
         <div class="channel-bots__header">
             <span class="channel-bots__title">{{ title || t('aiTools.agents.bots') }}</span>
-            <el-button type="primary" link :disabled="addDisabled || !hasManagePermission" @click="openCreate">
+            <el-button v-permission type="primary" link :disabled="addDisabled" @click="openCreate">
                 {{ t('aiTools.agents.addBot') }}
             </el-button>
         </div>
@@ -32,8 +32,9 @@
             >
                 <template #default="{ row, $index }">
                     <el-switch
+                        v-permission
                         :model-value="row.enabled"
-                        :disabled="disabled || isBotActionDisabled(row) || !hasManagePermission"
+                        :disabled="disabled || isBotActionDisabled(row)"
                         @change="updateEnabled($index, $event)"
                     />
                 </template>
@@ -41,21 +42,16 @@
             <el-table-column :label="t('commons.table.operate')" width="240" fixed="right">
                 <template #default="{ row, $index }">
                     <div class="channel-bots__actions">
-                        <el-button
-                            link
-                            type="primary"
-                            :disabled="disabled || !hasManagePermission"
-                            @click="openEdit(row, $index)"
-                        >
+                        <el-button v-permission link type="primary" :disabled="disabled" @click="openEdit(row, $index)">
                             {{ t('commons.button.edit') }}
                         </el-button>
                         <el-button
                             v-if="approvable"
+                            v-permission
                             link
                             type="primary"
                             :disabled="
                                 disabled ||
-                                !hasManagePermission ||
                                 !row.enabled ||
                                 isBotActionDisabled(row) ||
                                 (approveDisabled ? approveDisabled(row) : false)
@@ -65,9 +61,8 @@
                             {{ t('aiTools.agents.approvePairing') }}
                         </el-button>
                         <el-button
-                            :disabled="
-                                disabled || !hasManagePermission || undeletableAccountIds.includes(row.accountId)
-                            "
+                            v-permission
+                            :disabled="disabled || undeletableAccountIds.includes(row.accountId)"
                             link
                             type="primary"
                             @click="removeBot($index)"
@@ -79,18 +74,19 @@
                             trigger="hover"
                             @command="handleMoreCommand(row, $index, $event)"
                         >
-                            <el-button link type="primary" :disabled="disabled || !hasManagePermission">
+                            <el-button v-permission link type="primary" :disabled="disabled">
                                 {{ t('tabs.more') }}
                             </el-button>
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <el-dropdown-item
+                                    <fu-dropdown-item
                                         v-if="defaultable && !row.isDefault"
+                                        v-permission
                                         command="default"
-                                        :disabled="disabled || !hasManagePermission || isBotActionDisabled(row)"
+                                        :disabled="disabled || isBotActionDisabled(row)"
                                     >
                                         {{ t('aiTools.agents.setDefaultBot') }}
-                                    </el-dropdown-item>
+                                    </fu-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>
@@ -102,23 +98,25 @@
         <DialogPro v-model="dialogVisible" :title="dialogTitle">
             <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
                 <el-form-item v-if="showNameField" :label="t('commons.table.name')" prop="name">
-                    <el-input v-model="form.name" :disabled="disabled || !hasManagePermission" />
+                    <el-input v-permission v-model="form.name" :disabled="disabled" />
                 </el-form-item>
                 <el-form-item :label="t('aiTools.agents.accountId')" prop="accountId">
                     <el-input
+                        v-permission
                         v-model="form.accountId"
-                        :disabled="disabled || !hasManagePermission || accountIdLocked"
+                        :disabled="disabled || accountIdLocked"
                         :placeholder="t('aiTools.agents.accountIdPlaceholder')"
                     />
                 </el-form-item>
                 <el-form-item :label="t('commons.table.status')">
-                    <el-switch v-model="form.enabled" :disabled="disabled || !hasManagePermission" />
+                    <el-switch v-permission v-model="form.enabled" :disabled="disabled" />
                 </el-form-item>
                 <el-form-item v-for="field in fields" :key="field.prop" :label="field.label" :prop="field.prop">
                     <el-select
                         v-if="field.type === 'select'"
+                        v-permission
                         v-model="form[field.prop]"
-                        :disabled="disabled || !hasManagePermission"
+                        :disabled="disabled"
                         :placeholder="field.placeholder"
                     >
                         <el-option
@@ -130,31 +128,34 @@
                     </el-select>
                     <el-input
                         v-else-if="field.type === 'password'"
+                        v-permission
                         v-model="form[field.prop]"
                         type="password"
                         show-password
-                        :disabled="disabled || !hasManagePermission"
+                        :disabled="disabled"
                         :placeholder="field.placeholder"
                     />
                     <el-input
                         v-else-if="field.type === 'textarea'"
+                        v-permission
                         v-model="form[field.prop]"
                         type="textarea"
                         :rows="3"
-                        :disabled="disabled || !hasManagePermission"
+                        :disabled="disabled"
                         :placeholder="field.placeholder"
                     />
                     <el-input
                         v-else
+                        v-permission
                         v-model="form[field.prop]"
-                        :disabled="disabled || !hasManagePermission"
+                        :disabled="disabled"
                         :placeholder="field.placeholder"
                     />
                 </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="dialogVisible = false">{{ t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" :disabled="disabled || !hasManagePermission" @click="saveBot">
+                <el-button v-permission type="primary" :disabled="disabled" @click="saveBot">
                     {{ t('commons.button.save') }}
                 </el-button>
             </template>
@@ -166,11 +167,9 @@
 import { computed, reactive, ref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import type { PropType } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import { Rules } from '@/global/form-rules';
 import { MsgWarning } from '@/utils/message';
-const { hasManagePermission } = useMenuManagePermission();
 
 interface ChannelBotField {
     prop: string;
@@ -311,8 +310,9 @@ const rules = computed<FormRules>(() => {
         config[field.prop] = [Rules.requiredInput];
     }
     if (props.uniqueFieldProp) {
+        const existingRules = config[props.uniqueFieldProp];
         config[props.uniqueFieldProp] = [
-            ...(config[props.uniqueFieldProp] || []),
+            ...(Array.isArray(existingRules) ? existingRules : existingRules ? [existingRules] : []),
             {
                 validator: (_rule, value, callback) => {
                     const exists = props.bots.some(

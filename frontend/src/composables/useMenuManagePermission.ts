@@ -1,6 +1,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { GlobalStore } from '@/store';
+import { hasManagePermissionAccess, hasPermissionAccess, toManagePermission } from '@/utils/permission';
 
 const getRoutePermission = (route: ReturnType<typeof useRoute>) => {
     const metaPermission = route.meta?.permission;
@@ -18,13 +19,6 @@ const getRoutePermission = (route: ReturnType<typeof useRoute>) => {
     return '';
 };
 
-const toManagePermission = (permission: string) => {
-    if (!permission) {
-        return '';
-    }
-    return permission.endsWith('_view') ? permission.replace(/_view$/, '_manage') : permission;
-};
-
 export const useMenuManagePermission = (permission?: string) => {
     const route = useRoute();
     const globalStore = GlobalStore();
@@ -40,28 +34,10 @@ export const useMenuManagePermission = (permission?: string) => {
     });
     const hasAdminManagePermission = computed(() => globalStore.isAdmin || globalStore.isNodeAdmin);
     const hasPermission = computed(() => {
-        if (hasAdminManagePermission.value) {
-            return true;
-        }
-        if (!sourcePermission.value) {
-            return false;
-        }
-        if (sourcePermission.value.endsWith('_view')) {
-            return (
-                globalStore.hasPermission(sourcePermission.value) ||
-                globalStore.hasPermission(toManagePermission(sourcePermission.value))
-            );
-        }
-        return globalStore.hasPermission(sourcePermission.value);
+        return hasPermissionAccess(sourcePermission.value || []);
     });
     const hasManagePermission = computed(() => {
-        if (hasAdminManagePermission.value) {
-            return true;
-        }
-        if (!managePermission.value) {
-            return false;
-        }
-        return globalStore.hasPermission(managePermission.value);
+        return hasManagePermissionAccess(managePermission.value || []);
     });
 
     return {
@@ -70,4 +46,8 @@ export const useMenuManagePermission = (permission?: string) => {
         hasPermission,
         hasManagePermission,
     };
+};
+
+export const useCan = (permission?: string) => {
+    return useMenuManagePermission(permission).hasPermission;
 };

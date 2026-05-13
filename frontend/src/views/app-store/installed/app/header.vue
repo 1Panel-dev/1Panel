@@ -32,8 +32,8 @@
                 <span class="ml-1">
                     <el-tooltip effect="dark" :content="$t('app.toFolder')" placement="top">
                         <el-button
+                            v-permission:view="'host_file_view'"
                             type="primary"
-                            :disabled="!hasFilePermission"
                             link
                             @click="$emit('toFolder')"
                             icon="FolderOpened"
@@ -88,20 +88,22 @@
                         v-if="installed.favorite"
                     >
                         <el-button
+                            v-permission
                             link
                             size="large"
                             icon="StarFilled"
                             type="warning"
-                            :disabled="sortMode || !hasManagePermission"
+                            :disabled="sortMode"
                             @click="$emit('favoriteInstall')"
                         ></el-button>
                     </el-tooltip>
                     <el-tooltip effect="dark" :content="$t('website.favorite')" placement="top-start" v-else>
                         <el-button
+                            v-permission
                             link
                             icon="Star"
                             type="info"
-                            :disabled="sortMode || !hasManagePermission"
+                            :disabled="sortMode"
                             @click="$emit('favoriteInstall')"
                         ></el-button>
                     </el-tooltip>
@@ -115,7 +117,7 @@
                     size="small"
                     @click="$emit('openUploads')"
                     v-if="mode === 'installed'"
-                    :disabled="!hasManagePermission"
+                    v-permission
                 >
                     {{ $t('database.loadBackup') }}
                 </el-button>
@@ -126,7 +128,7 @@
                     size="small"
                     @click="$emit('openBackups')"
                     v-if="mode === 'installed'"
-                    :disabled="!hasManagePermission"
+                    v-permission
                 >
                     {{ $t('commons.button.backup') }}
                 </el-button>
@@ -135,21 +137,22 @@
                     plain
                     round
                     size="small"
-                    :disabled="installed.status === 'Upgrading' || !hasManagePermission"
+                    v-permission
+                    :disabled="installed.status === 'Upgrading'"
                     @click="$emit('ignoreApp')"
                     v-if="mode === 'upgrade'"
                 >
                     {{ $t('commons.button.ignore') }}
                 </el-button>
                 <el-button
+                    v-permission
                     class="h-button"
                     plain
                     round
                     size="small"
                     :disabled="
                         (installed.status !== 'Running' && installed.status !== 'UpgradeErr') ||
-                        installed.appStatus === 'TakeDown' ||
-                        !hasManagePermission
+                        installed.appStatus === 'TakeDown'
                     "
                     @click="$emit('openOperate')"
                     v-if="mode === 'upgrade'"
@@ -163,12 +166,9 @@
 
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { GlobalStore } from '@/store';
 
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
-const { hasPermission: hasFilePermission } = useMenuManagePermission('host_file_view');
 
 interface Props {
     installed: App.AppInstalled;

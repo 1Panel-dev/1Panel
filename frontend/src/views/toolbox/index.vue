@@ -3,11 +3,11 @@
         <RouterButton :buttons="buttons">
             <template #route-button>
                 <div class="router-button">
-                    <el-button link type="primary" :disabled="!hasManagePermission" @click="onRestart('1panel')">
+                    <el-button v-permission link type="primary" @click="onRestart('1panel')">
                         {{ $t('home.restart_1panel') }}
                     </el-button>
                     <el-divider direction="vertical" />
-                    <el-button link type="primary" :disabled="!hasManagePermission" @click="onRestart('system')">
+                    <el-button v-permission link type="primary" @click="onRestart('system')">
                         {{ $t('home.restart_system') }}
                     </el-button>
                 </div>
@@ -28,12 +28,10 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { systemRestart } from '@/api/modules/dashboard';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const restartType = ref();
 const confirmDialogRef = ref();
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
 
 const onRestart = (type: string) => {
     let header = i18n.global.t('home.restart_' + type);

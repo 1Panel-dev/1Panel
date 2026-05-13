@@ -67,7 +67,7 @@
             </el-table-column>
             <el-table-column min-width="70">
                 <template #default="scope">
-                    <el-button link type="primary" :disabled="!hasManagePermission" @click="onSave(scope.row)">
+                    <el-button v-permission link type="primary" @click="onSave(scope.row)">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </template>
@@ -91,9 +91,6 @@ import { computeSize, splitSize } from '@/utils/size';
 import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
 import { loadBaseDir } from '@/api/modules/setting';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
-
-const { hasManagePermission } = useMenuManagePermission();
 
 const form = reactive({
     swapMemoryTotal: '',

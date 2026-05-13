@@ -27,11 +27,7 @@
                                     </el-radio-group>
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button
-                                        :disabled="!hasManagePermission"
-                                        type="primary"
-                                        @click="onSave(formRef, 'aof')"
-                                    >
+                                    <el-button v-permission type="primary" @click="onSave(formRef, 'aof')">
                                         {{ $t('commons.button.save') }}
                                     </el-button>
                                 </el-form-item>
@@ -66,7 +62,7 @@
                                     link
                                     type="primary"
                                     style="font-size: 10px"
-                                    :disabled="!hasManagePermission"
+                                    v-permission
                                     @click="handleDelete(index)"
                                 >
                                     {{ $t('commons.button.delete') }}
@@ -75,7 +71,7 @@
                         </tr>
                         <tr>
                             <td align="left">
-                                <el-button :disabled="!hasManagePermission" @click="handleAdd()">
+                                <el-button v-permission @click="handleAdd()">
                                     {{ $t('commons.button.add') }}
                                 </el-button>
                             </td>
@@ -84,12 +80,7 @@
                     <div>
                         <span style="margin-left: 2px; margin-top: 5px">{{ $t('database.rdbHelper3') }}</span>
                     </div>
-                    <el-button
-                        :disabled="!hasManagePermission"
-                        type="primary"
-                        @click="onSave(undefined, 'rbd')"
-                        style="margin-top: 10px"
-                    >
+                    <el-button v-permission type="primary" @click="onSave(undefined, 'rbd')" style="margin-top: 10px">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </el-card>
@@ -98,13 +89,14 @@
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
                 <template #toolbar>
-                    <el-button :disabled="!hasManagePermission" type="primary" @click="onBackup">
+                    <el-button v-permission type="primary" @click="onBackup">
                         {{ $t('commons.button.backup') }}
                     </el-button>
                     <el-button
+                        v-permission
                         type="primary"
                         plain
-                        :disabled="selects.length === 0 || !hasManagePermission"
+                        :disabled="selects.length === 0"
                         @click="onBatchDelete(null)"
                     >
                         {{ $t('commons.button.delete') }}
@@ -145,7 +137,6 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { Database } from '@/api/interface/database';
 import { redisPersistenceConf, updateRedisPersistenceConf } from '@/api/modules/database';
 import { deleteBackupRecord, handleBackup, handleRecover, searchBackupRecords } from '@/api/modules/backup';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { Rules } from '@/global/form-rules';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
@@ -154,7 +145,6 @@ import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
 import { Backup } from '@/api/interface/backup';
-const { hasManagePermission } = useMenuManagePermission();
 
 interface saveStruct {
     second: number;
@@ -285,7 +275,7 @@ const onBatchDelete = async (row: Backup.RecordInfo | null) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.recover'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: Backup.RecordInfo) => {
             currentRow.value = row;
             let params = {
@@ -298,7 +288,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: (row: Backup.RecordInfo) => {
             onBatchDelete(row);
         },

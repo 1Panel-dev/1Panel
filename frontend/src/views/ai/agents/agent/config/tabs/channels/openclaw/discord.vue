@@ -33,7 +33,7 @@
             @approve="approvePairing"
         />
         <el-form-item class="mt-4">
-            <el-button type="primary" :loading="saving" :disabled="!hasManagePermission" @click="saveChannel">
+            <el-button v-permission type="primary" :loading="saving" @click="saveChannel">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
@@ -53,7 +53,6 @@ import { Rules } from '@/global/form-rules';
 import ChannelBots from '../components/channel-bots.vue';
 
 const { t } = useI18n();
-const { hasManagePermission } = useMenuManagePermission();
 type BotField = {
     prop: string;
     label: string;

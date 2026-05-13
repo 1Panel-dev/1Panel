@@ -112,7 +112,8 @@
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button
-                    :disabled="loading || form.status !== 'Running' || !hasManagePermission"
+                    v-permission
+                    :disabled="loading || form.status !== 'Running'"
                     type="primary"
                     @click="onSave(formRef)"
                 >
@@ -125,7 +126,6 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
@@ -137,7 +137,6 @@ import { copyText } from '@/utils/clipboard';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref(false);
 

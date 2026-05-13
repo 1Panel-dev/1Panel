@@ -45,8 +45,9 @@
                                     <template v-if="editingSessionId === item.id">
                                         <el-button
                                             link
+                                            v-permission
                                             type="primary"
-                                            :disabled="!canSaveSessionTitle || !hasManagePermission"
+                                            :disabled="!canSaveSessionTitle"
                                             @click.stop="saveSessionTitle(item)"
                                         >
                                             {{ $t('commons.button.save') }}
@@ -58,18 +59,19 @@
                                     <el-button
                                         v-else-if="!terminalOpen"
                                         link
+                                        v-permission
                                         icon="Edit"
                                         class="hermes-chat-dialog__edit-button"
-                                        :disabled="!hasManagePermission"
                                         @mousedown.stop
                                         @click.stop="startEditSessionTitle(item)"
                                     />
                                     <el-button
                                         v-if="editingSessionId !== item.id"
                                         link
+                                        v-permission
                                         type="danger"
                                         icon="Delete"
-                                        :disabled="isDeleteDisabled(item) || !hasManagePermission"
+                                        :disabled="isDeleteDisabled(item)"
                                         :loading="deletingSessionId === item.id"
                                         @mousedown.stop
                                         @click.stop="deleteSession(item)"
@@ -98,7 +100,6 @@
 <script setup lang="ts">
 import { ElMessageBox } from 'element-plus';
 import { computed, nextTick, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import { useI18n } from 'vue-i18n';
 import DialogPro from '@/components/dialog-pro/index.vue';
 import Terminal from '@/components/terminal/index.vue';
@@ -114,7 +115,6 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 
 const { currentNode } = useGlobalStore();
 const { t } = useI18n();
-const { hasManagePermission } = useMenuManagePermission();
 
 interface HermesChatDialogParams {
     agentId: number;

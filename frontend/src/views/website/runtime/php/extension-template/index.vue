@@ -3,7 +3,7 @@
         <template #content>
             <ComplexTable :data="data" @search="search()" :pagination-config="paginationConfig">
                 <template #toolbar>
-                    <el-button type="primary" :disabled="!hasManagePermission" @click="openCreate">
+                    <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
                 </template>
@@ -26,11 +26,9 @@
 <script lang="ts" setup>
 import { DeletePHPExtensions, SearchPHPExtensions } from '@/api/modules/runtime';
 import { reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import Create from './operate/index.vue';
 import { Runtime } from '@/api/interface/runtime';
 import i18n from '@/lang';
-const { hasManagePermission } = useMenuManagePermission();
 
 const open = ref(false);
 const data = ref();
@@ -47,7 +45,7 @@ const paginationConfig = reactive({
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: function (row: Runtime.PHPExtensions) {
             openUpdate(row);
         },

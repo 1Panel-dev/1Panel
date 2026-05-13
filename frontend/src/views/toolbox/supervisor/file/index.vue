@@ -15,7 +15,7 @@
         <template #footer>
             <span>
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" :disabled="loading || !hasManagePermission" @click="submit()">
+                <el-button v-permission type="primary" :disabled="loading" @click="submit()">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -28,9 +28,7 @@ import { getSupervisorProcessFile, operateSupervisorProcessFile } from '@/api/mo
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const globalStore = GlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
 
 const loading = ref(false);
 const content = ref('');

@@ -23,11 +23,7 @@
                 <el-button :disabled="loading" @click="passwordVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button
-                    :disabled="loading || !hasManagePermission"
-                    type="primary"
-                    @click="submitChangePassword(formRef)"
-                >
+                <el-button v-permission :disabled="loading" type="primary" @click="submitChangePassword(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -42,10 +38,8 @@ import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { updateDevicePasswd } from '@/api/modules/toolbox';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const formRef = ref<FormInstance>();
-const { hasManagePermission } = useMenuManagePermission();
 const passRules = reactive({
     user: Rules.requiredInput,
     newPassword: [Rules.requiredInput, Rules.noSpace, { validator: checkPassword, trigger: 'blur' }],

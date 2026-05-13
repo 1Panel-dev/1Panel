@@ -3,7 +3,7 @@
         <template #content>
             <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
                 <template #toolbar>
-                    <el-button type="primary" :disabled="!hasManagePermission" @click="openCreate">
+                    <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
                 </template>
@@ -37,10 +37,8 @@ import Create from './create/index.vue';
 import { Website } from '@/api/interface/website';
 import { deleteDnsAccount, searchDnsAccount } from '@/api/modules/website';
 import { onMounted, reactive, ref } from 'vue';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 import i18n from '@/lang';
 import { getDNSName } from '@/utils/ssl';
-const { hasManagePermission } = useMenuManagePermission();
 const paginationConfig = reactive({
     cacheSizeKey: 'dns-account-page-size',
     currentPage: 1,
@@ -55,7 +53,7 @@ const opRef = ref();
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: function (row: Website.DnsAccount) {
             openEdit(row);
         },

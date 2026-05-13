@@ -9,7 +9,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading || !hasManagePermission" type="primary" @click="onSaveHostname(formRef)">
+                <el-button v-permission :disabled="loading" type="primary" @click="onSaveHostname(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -23,10 +23,8 @@ import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { updateDevice } from '@/api/modules/toolbox';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
-const { hasManagePermission } = useMenuManagePermission();
 
 interface DialogProps {
     hostname: string;

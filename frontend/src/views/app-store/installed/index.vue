@@ -160,9 +160,7 @@ import { MsgSuccess } from '@/utils/message';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
 const { currentNode, isMaster, currentNodeAddr, isIntl } = useGlobalStore();
-const { hasManagePermission } = useMenuManagePermission();
 
 const data = ref<any>();
 const loading = ref(false);
@@ -321,13 +319,13 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'rebuild');
         },
+        permission: true,
         disabled: (row: any) => {
             return (
                 row.status === 'DownloadErr' ||
                 row.status === 'Upgrading' ||
                 row.status === 'Rebuilding' ||
-                row.status === 'Uninstalling' ||
-                !hasManagePermission.value
+                row.status === 'Uninstalling'
             );
         },
     },
@@ -336,13 +334,13 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'restart');
         },
+        permission: true,
         disabled: (row: any) => {
             return (
                 row.status === 'DownloadErr' ||
                 row.status === 'Upgrading' ||
                 row.status === 'Rebuilding' ||
-                row.status === 'Uninstalling' ||
-                !hasManagePermission.value
+                row.status === 'Uninstalling'
             );
         },
     },
@@ -351,6 +349,7 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'start');
         },
+        permission: true,
         disabled: (row: any) => {
             return (
                 row.status === 'Running' ||
@@ -358,8 +357,7 @@ const buttons = [
                 row.status === 'DownloadErr' ||
                 row.status === 'Upgrading' ||
                 row.status === 'Rebuilding' ||
-                row.status === 'Uninstalling' ||
-                !hasManagePermission.value
+                row.status === 'Uninstalling'
             );
         },
     },
@@ -368,14 +366,14 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'stop');
         },
+        permission: true,
         disabled: (row: any) => {
             return (
                 row.status !== 'Running' ||
                 row.status === 'DownloadErr' ||
                 row.status === 'Upgrading' ||
                 row.status === 'Rebuilding' ||
-                row.status === 'Uninstalling' ||
-                !hasManagePermission.value
+                row.status === 'Uninstalling'
             );
         },
     },
@@ -384,9 +382,7 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'delete');
         },
-        disabled: () => {
-            return !hasManagePermission.value;
-        },
+        permission: true,
     },
     {
         label: i18n.global.t('app.params'),

@@ -3,22 +3,22 @@
         <RouterButton :buttons="routerButton" />
         <LayoutContent :title="$t('website.ssl', 2)">
             <template #leftToolBar>
-                <el-button type="primary" :disabled="!hasManagePermission" @click="openSSL()">
+                <el-button v-permission type="primary" @click="openSSL()">
                     {{ $t('ssl.create') }}
                 </el-button>
-                <el-button type="primary" :disabled="!hasManagePermission" @click="openUpload()">
+                <el-button v-permission type="primary" @click="openUpload()">
                     {{ $t('ssl.upload') }}
                 </el-button>
-                <el-button type="primary" plain :disabled="!hasManagePermission" @click="openCA()">
+                <el-button v-permission type="primary" plain @click="openCA()">
                     {{ $t('ssl.selfSigned') }}
                 </el-button>
-                <el-button type="primary" plain :disabled="!hasManagePermission" @click="openAcmeAccount()">
+                <el-button v-permission type="primary" plain @click="openAcmeAccount()">
                     {{ $t('website.acmeAccountManage') }}
                 </el-button>
-                <el-button type="primary" plain :disabled="!hasManagePermission" @click="openDnsAccount()">
+                <el-button v-permission type="primary" plain @click="openDnsAccount()">
                     {{ $t('website.dnsAccountManage') }}
                 </el-button>
-                <el-button plain @click="deletessl(null)" :disabled="selects.length === 0 || !hasManagePermission">
+                <el-button v-permission plain @click="deletessl(null)" :disabled="selects.length === 0">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -117,16 +117,12 @@
                     ></el-table-column>
                     <el-table-column :label="$t('website.remark')" prop="description" width="100px">
                         <template #default="{ row }">
-                            <fu-read-write-switch :write-trigger="hasManagePermission ? 'onClick' : 'disabled'">
+                            <fu-read-write-switch v-permission>
                                 <template #read>
                                     <MsgInfo :info="row.description" width="200" />
                                 </template>
                                 <template #default="{ read }">
-                                    <el-input
-                                        v-model="row.description"
-                                        :disabled="!hasManagePermission"
-                                        @blur="updateDesc(row, read)"
-                                    />
+                                    <el-input v-model="row.description" @blur="updateDesc(row, read)" />
                                 </template>
                             </fu-read-write-switch>
                         </template>
@@ -134,8 +130,8 @@
                     <el-table-column :label="$t('ssl.autoRenew')" prop="autoRenew" width="200px">
                         <template #default="{ row }">
                             <el-switch
+                                v-permission
                                 :disabled="
-                                    !hasManagePermission ||
                                     row.provider === 'dnsManual' ||
                                     row.provider === 'manual' ||
                                     row.provider === 'fromMaster'
@@ -243,13 +239,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('ssl.apply'),
+        permission: true,
         disabled: function (row: Website.SSLDTO) {
-            return (
-                row.status === 'applying' ||
-                row.provider === 'manual' ||
-                row.provider === 'fromMaster' ||
-                !hasManagePermission.value
-            );
+            return row.status === 'applying' || row.provider === 'manual' || row.provider === 'fromMaster';
         },
         click: function (row: Website.SSLDTO) {
             if (row.provider === 'dnsManual') {
@@ -264,7 +256,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.update'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: function (row: Website.SSLDTO) {
             sslUploadRef.value.acceptParams(row);
         },
@@ -274,8 +266,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         disabled: function (row: Website.SSLDTO) {
-            return row.provider === 'fromMaster' || !hasManagePermission.value;
+            return row.provider === 'fromMaster';
         },
         click: function (row: Website.SSLDTO) {
             onEdit(row);
@@ -292,7 +285,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        disabled: () => !hasManagePermission.value,
+        permission: true,
         click: function (row: Website.SSLDTO) {
             deletessl(row);
         },

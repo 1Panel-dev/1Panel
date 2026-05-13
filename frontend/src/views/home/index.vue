@@ -492,7 +492,7 @@ import {
     setDashboardCache,
 } from '@/utils/dashboardCache';
 import { MsgSuccess } from '@/utils/message';
-import { useMenuManagePermission } from '@/composables/useMenuManagePermission';
+import { useCan } from '@/composables/useMenuManagePermission';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -576,17 +576,19 @@ const hasRefreshedOptionsOnHover = ref(false);
 const licenseRef = ref();
 const quickJumpRef = ref();
 const { isProductPro, isEnterprise, isOffline } = storeToRefs(globalStore);
-const quickJumpPermissionMap = {
-    Agent: useMenuManagePermission('ai_agent_view').hasPermission,
-    Website: useMenuManagePermission('website_view').hasPermission,
-    Database: useMenuManagePermission('database_view').hasPermission,
-    Cronjob: useMenuManagePermission('cronjob_view').hasPermission,
-    AppInstalled: useMenuManagePermission('app_view').hasPermission,
-    File: useMenuManagePermission('host_file_view').hasPermission,
-} as const;
+const quickJumpPermissionMap = Object.fromEntries(
+    [
+        ['Agent', 'ai_agent_view'],
+        ['Website', 'website_view'],
+        ['Database', 'database_view'],
+        ['Cronjob', 'cronjob_view'],
+        ['AppInstalled', 'app_view'],
+        ['File', 'host_file_view'],
+    ].map(([name, permission]) => [name, useCan(permission)]),
+) as Record<string, ReturnType<typeof useCan>>;
 
 const checkPermission = (item: string) => {
-    return quickJumpPermissionMap[item as keyof typeof quickJumpPermissionMap]?.value ?? true;
+    return quickJumpPermissionMap[item]?.value ?? true;
 };
 
 const searchInfo = reactive({
