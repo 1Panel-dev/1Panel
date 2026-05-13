@@ -24,7 +24,7 @@
         </div>
         <div v-if="form.isExist">
             <LayoutContent v-loading="loading" :title="$t('toolbox.ftp.ftp', 2)" :class="{ mask: !form.isActive }">
-                <template #prompt v-if="!globalStore.isFxplay">
+                <template #prompt v-if="!isFxplay">
                     <el-alert type="info" :closable="false">
                         <template #title>
                             {{ $t('toolbox.common.toolboxHelper') }}
@@ -162,10 +162,10 @@ import { deleteFtp, searchFtp, updateFtp, syncFtp, operateFtp, getFtpBase } from
 import OperateDialog from '@/views/toolbox/ftp/operate/index.vue';
 import LogDialog from '@/views/toolbox/ftp/log/index.vue';
 import { Toolbox } from '@/api/interface/toolbox';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { routerToFileWithPath } from '@/utils/router';
 import { getRandomStr } from '@/utils/id';
-const globalStore = GlobalStore();
+const { docsUrl, isFxplay } = useGlobalStore();
 
 const loading = ref();
 const selects = ref<any>([]);
@@ -363,7 +363,7 @@ const buttons = [
 ];
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/toolbox/ftp/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/toolbox/ftp/', '_blank', 'noopener,noreferrer');
 };
 
 onMounted(() => {

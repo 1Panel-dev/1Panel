@@ -128,8 +128,8 @@ import { downloadSSL, updateSSL } from '@/api/modules/setting';
 import { Rules } from '@/global/form-rules';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { entrance, isLogin } = useGlobalStore();
 
 const loading = ref();
 const drawerVisible = ref();
@@ -251,10 +251,10 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
             await updateSSL(param).then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 let href = window.location.href;
-                globalStore.isLogin = false;
+                isLogin.value = false;
                 let address = href.split('://')[1];
-                if (globalStore.entrance) {
-                    address = address.replaceAll('settings/safe', globalStore.entrance);
+                if (entrance.value) {
+                    address = address.replaceAll('settings/safe', entrance.value);
                 } else {
                     address = address.replaceAll('settings/safe', '');
                 }

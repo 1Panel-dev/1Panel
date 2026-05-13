@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { hasManagePermissionAccess, hasPermissionAccess, toManagePermission } from '@/utils/permission';
 
 const getRoutePermission = (route: ReturnType<typeof useRoute>) => {
@@ -21,7 +21,7 @@ const getRoutePermission = (route: ReturnType<typeof useRoute>) => {
 
 export const useMenuManagePermission = (permission?: string) => {
     const route = useRoute();
-    const globalStore = GlobalStore();
+    const { isAdmin, isNodeAdmin } = useGlobalStore();
 
     const sourcePermission = computed(() => {
         if (permission) {
@@ -32,7 +32,7 @@ export const useMenuManagePermission = (permission?: string) => {
     const managePermission = computed(() => {
         return toManagePermission(sourcePermission.value);
     });
-    const hasAdminManagePermission = computed(() => globalStore.isAdmin || globalStore.isNodeAdmin);
+    const hasAdminManagePermission = computed(() => isAdmin.value || isNodeAdmin.value);
     const hasPermission = computed(() => {
         return hasPermissionAccess(sourcePermission.value || []);
     });

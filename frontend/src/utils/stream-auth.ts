@@ -1,16 +1,16 @@
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { handleAuthResponseCode, handleAuthResponseStatus } from '@/utils/auth-response';
 
 export const checkStreamAuth = async (url: string, currentNode?: string) => {
-    const globalStore = GlobalStore();
+    const { currentNode: storeCurrentNode, language } = useGlobalStore();
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 5000);
     try {
         const res = await fetch(url.replace(/^ws/, 'http'), {
             credentials: 'include',
             headers: {
-                'Accept-Language': globalStore.language,
-                CurrentNode: encodeURIComponent(currentNode || globalStore.currentNode),
+                'Accept-Language': language.value,
+                CurrentNode: encodeURIComponent(currentNode || storeCurrentNode.value),
             },
             signal: controller.signal,
         });

@@ -121,7 +121,7 @@
                             </el-input>
                         </div>
                     </el-form-item>
-                    <div v-if="globalStore.isIntl">
+                    <div v-if="isIntl">
                         <el-form-item v-if="dialogData.rowData!.hasSpec && !isProductPro">
                             <span class="input-help logText">
                                 {{ $t('toolbox.clam.alertHelper') }}
@@ -131,7 +131,7 @@
                             </span>
                         </el-form-item>
                     </div>
-                    <div v-if="!globalStore.isIntl">
+                    <div v-if="!isIntl">
                         <el-form-item prop="hasAlert">
                             <el-checkbox v-model="dialogData.rowData!.hasAlert" :label="$t('xpack.alert.isAlert')" />
                             <span class="input-help">{{ $t('xpack.alert.clamHelper') }}</span>
@@ -161,26 +161,26 @@
                                 <el-option v-if="!isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                                 <el-option
                                     value="weCom"
-                                    v-if="!globalStore.isIntl"
+                                    v-if="!isIntl"
                                     :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
                                     :label="$t('xpack.alert.weCom')"
                                 />
                                 <el-option
                                     value="dingTalk"
-                                    v-if="!globalStore.isIntl"
+                                    v-if="!isIntl"
                                     :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
                                     :label="$t('xpack.alert.dingTalk')"
                                 />
                                 <el-option
                                     value="feiShu"
-                                    v-if="!globalStore.isIntl"
+                                    v-if="!isIntl"
                                     :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
                                     :label="$t('xpack.alert.feiShu')"
                                 />
                                 <el-option v-if="isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                                 <el-option
                                     value="sms"
-                                    v-if="!globalStore.isIntl"
+                                    v-if="!isIntl"
                                     :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
                                     :label="$t('xpack.alert.sms')"
                                 />
@@ -242,15 +242,13 @@ import LicenseImport from '@/components/license-import/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Toolbox } from '@/api/interface/toolbox';
 import { createClam, updateClam } from '@/api/modules/toolbox';
-import { storeToRefs } from 'pinia';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { specOptions, transObjToSpec, transSpecToObj, weekOptions } from '@/views/cronjob/cronjob/helper';
 import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/validate';
-const globalStore = GlobalStore();
+const { isIntl, isProductPro } = useGlobalStore();
 const licenseRef = ref();
 const scanDirRef = ref();
 const infectedDirRef = ref();
-const { isProductPro } = storeToRefs(globalStore);
 interface DialogProps {
     title: string;
     rowData?: Toolbox.ClamInfo;

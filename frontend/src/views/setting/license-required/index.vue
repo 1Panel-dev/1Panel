@@ -67,7 +67,7 @@ import type { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFil
 import { genFileId } from 'element-plus';
 import { getEnterpriseLicense, uploadEnterpriseLicense } from '@/api/modules/setting';
 import { getLoginSetting } from '@/api/modules/auth';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { MsgSuccess } from '@/utils/message';
 import { preloadImage } from '@/utils/browser';
 import { adjustColorToRGBA } from '@/utils/color';
@@ -76,7 +76,19 @@ import { copyText } from '@/utils/clipboard';
 import i18n from '@/lang';
 
 const router = useRouter();
-const globalStore = GlobalStore();
+const {
+    entrance,
+    isEnterprise,
+    isEnterpriseLicenseLoaded,
+    isEnterpriseLicensed,
+    isFxplay,
+    isIntl,
+    isLogin,
+    isMasterProductPro,
+    isOffline,
+    openMenuTabs,
+    themeConfig,
+} = useGlobalStore();
 const loading = ref(false);
 const uploadRef = ref<UploadInstance>();
 const uploaderFiles = ref<UploadFiles>([]);
@@ -117,7 +129,7 @@ const onImgError = (event: Event) => {
 };
 
 const loadImage = (name: string) => {
-    const { loginImage, loginBackground, loginBgType } = globalStore.themeConfig;
+    const { loginImage, loginBackground, loginBgType } = themeConfig.value;
     if (name === 'loginImage') {
         return loginImage === 'loginImage' ? loadedLoginImage.value : defaultLoginImage;
     }
@@ -134,7 +146,7 @@ const loadImage = (name: string) => {
 };
 
 const applyLoginThemeColor = () => {
-    const loginBtnLinkColor = globalStore.themeConfig.loginBtnLinkColor || '#005eeb';
+    const loginBtnLinkColor = themeConfig.value.loginBtnLinkColor || '#005eeb';
     document.documentElement.style.setProperty('--login-btn-link-color', loginBtnLinkColor);
     document.documentElement.style.setProperty(
         '--login-btn-link-hover-color',
@@ -148,23 +160,21 @@ const applyLoginThemeColor = () => {
 
 const loadLoginTheme = async () => {
     const res = await getLoginSetting();
-    globalStore.isEnterprise = res.data.isEnterprise;
-    globalStore.isEnterpriseLicenseLoaded = !res.data.isEnterprise;
-    globalStore.isIntl = res.data.isIntl;
-    globalStore.isFxplay = res.data.isFxplay;
-    globalStore.isOffline = res.data.isOffline;
-    globalStore.openMenuTabs = res.data.menuTabs === 'Enable';
-    globalStore.themeConfig = {
-        ...globalStore.themeConfig,
+    isEnterprise.value = res.data.isEnterprise;
+    isEnterpriseLicenseLoaded.value = !res.data.isEnterprise;
+    isIntl.value = res.data.isIntl;
+    isFxplay.value = res.data.isFxplay;
+    isOffline.value = res.data.isOffline;
+    openMenuTabs.value = res.data.menuTabs === 'Enable';
+    themeConfig.value = {
+        ...themeConfig.value,
         theme: res.data.theme,
         panelName: res.data.panelName,
     };
     document.title = res.data.panelName;
     applyLoginThemeColor();
-    if (!globalStore.isEnterprise) {
-        router.replace(
-            globalStore.isLogin ? { name: 'home' } : { name: 'entrance', params: { code: globalStore.entrance } },
-        );
+    if (!isEnterprise.value) {
+        router.replace(isLogin.value ? { name: 'home' } : { name: 'entrance', params: { code: entrance.value } });
         return false;
     }
     return true;
@@ -186,9 +196,9 @@ const loadBackground = async () => {
         preloadImage(loginImageUrl),
         preloadImage(backgroundImageUrl),
     ]);
-    if (globalStore.themeConfig.loginBgType === 'color') {
+    if (themeConfig.value.loginBgType === 'color') {
         backgroundStyle.value = {
-            backgroundColor: globalStore.themeConfig.loginBackground,
+            backgroundColor: themeConfig.value.loginBackground,
         };
         return;
     }
@@ -209,14 +219,14 @@ const loadBackground = async () => {
 
 const loadLicenseInfo = async () => {
     const res = await getEnterpriseLicense();
-    globalStore.isEnterpriseLicenseLoaded = true;
+    isEnterpriseLicenseLoaded.value = true;
     licenseInfo.deviceID = res.data.deviceID;
     if (res.data.status === 'Bound') {
-        globalStore.isEnterpriseLicensed = true;
+        isEnterpriseLicensed.value = true;
         router.replace({ name: 'home' });
         return;
     }
-    globalStore.isEnterpriseLicensed = false;
+    isEnterpriseLicensed.value = false;
 };
 
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
@@ -250,8 +260,8 @@ const submit = async () => {
     loading.value = true;
     await uploadEnterpriseLicense(formData)
         .then(() => {
-            globalStore.isEnterpriseLicensed = true;
-            globalStore.isMasterProductPro = true;
+            isEnterpriseLicensed.value = true;
+            isMasterProductPro.value = true;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             router.replace({ name: 'home' });
         })

@@ -63,11 +63,7 @@
 
                         <template v-else-if="data.init">
                             <span>{{ $t('tool.supervisor.initHelper') }}</span>
-                            <span
-                                v-if="!globalStore.isFxplay"
-                                class="flex items-center justify-center gap-0.5"
-                                @click="toDoc()"
-                            >
+                            <span v-if="!isFxplay" class="flex items-center justify-center gap-0.5" @click="toDoc()">
                                 <el-icon><Position /></el-icon>
                                 {{ $t('commons.button.helpDoc') }}
                             </span>
@@ -99,10 +95,10 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { HostTool } from '@/api/interface/host-tool';
 import InitPage from './init/index.vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { routerToNameWithQuery } from '@/utils/router';
 
-const globalStore = GlobalStore();
+const { docsUrl, isFxplay } = useGlobalStore();
 
 let operateReq = reactive({
     installId: 0,
@@ -131,7 +127,7 @@ const toLibrary = () => {
 };
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
 };
 
 const init = async () => {

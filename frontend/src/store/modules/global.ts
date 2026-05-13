@@ -91,6 +91,12 @@ const GlobalStore = defineStore({
         },
         isMaster: (state) => state.currentNode === 'local',
         isMobile: (state) => state.device === DeviceType.Mobile,
+
+        isXpackOrEE: (state) => {
+            return (state.isEnterprise && state.isEnterpriseLicensed) || state.isMasterProductPro;
+        },
+        isEE: (state) => state.isEnterprise && state.isEnterpriseLicensed,
+        isMasterPro: (state) => state.isMasterProductPro,
     },
     actions: {
         setScreenFull() {
@@ -146,15 +152,6 @@ const GlobalStore = defineStore({
         },
         getMasterAlias() {
             return this.masterAlias || i18n.global.t('xpack.node.master');
-        },
-        isEE() {
-            return this.isEnterprise && this.isEnterpriseLicensed;
-        },
-        isXpackOrEE() {
-            return (this.isEnterprise && this.isEnterpriseLicensed) || this.isMasterProductPro;
-        },
-        isMasterPro() {
-            return this.isMasterProductPro;
         },
     },
     persist: piniaPersistConfig('GlobalState'),

@@ -52,7 +52,7 @@
                                 @change="updateConfig('InstallAllowPort', config.installAllowPort)"
                             />
                         </el-form-item>
-                        <CustomSetting v-if="globalStore.isXpackOrEE()" />
+                        <CustomSetting v-if="isXpackOrEE" />
                         <span class="input-help logText" v-else>
                             {{ $t('xpack.customApp.licenseHelper') }}
                             <el-link class="link" @click="toUpload" type="primary">
@@ -75,8 +75,8 @@ import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { defineAsyncComponent } from 'vue';
 import { loadOptionalComponent } from '@/extensions/optional';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isXpackOrEE } = useGlobalStore();
 
 const CustomSetting = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/appstore/index.vue'));
 
@@ -115,7 +115,7 @@ const toUpload = () => {
 };
 
 const getNodeConfig = async () => {
-    if (globalStore.isXpackOrEE()) {
+    if (isXpackOrEE.value) {
         return;
     }
     const res = await getCurrentNodeCustomAppConfig();

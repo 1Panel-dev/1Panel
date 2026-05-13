@@ -131,16 +131,14 @@ import { deleteScript, searchScript, syncScript } from '@/api/modules/cronjob';
 import { onMounted, reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import i18n from '@/lang';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { getGroupList } from '@/api/modules/group';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import { MsgSuccess } from '@/utils/message';
 import { getSettingBaseInfo, updateSetting } from '@/api/modules/setting';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
+const { globalStore, currentNode, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
 
-const globalStore = GlobalStore();
 const myDetail = ref();
 
 const loading = ref();
@@ -306,12 +304,12 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.handle'),
         disabled: () => {
-            return !globalStore.isAdminOrNodeAdmin;
+            return !isAdminOrNodeAdmin.value;
         },
         click: (row: Cronjob.ScriptInfo) => {
             ElMessageBox.confirm(
                 i18n.global.t('cronjob.library.handleHelper', [
-                    globalStore.currentNode === 'local' ? globalStore.getMasterAlias() : globalStore.currentNode,
+                    currentNode.value === 'local' ? globalStore.getMasterAlias() : currentNode.value,
                     row.name,
                 ]),
                 i18n.global.t('commons.button.handle'),

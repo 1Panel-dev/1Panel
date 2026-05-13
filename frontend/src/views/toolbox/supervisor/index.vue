@@ -4,7 +4,7 @@
             <span>{{ $t('tool.supervisor.notStartWarn') }}</span>
         </el-card>
         <LayoutContent :title="$t(' tool.supervisor.list', 2)" v-loading="loading">
-            <template #prompt v-if="!globalStore.isFxplay">
+            <template #prompt v-if="!isFxplay">
                 <el-alert type="info" :closable="false">
                     <template #title>
                         {{ $t('toolbox.common.toolboxHelper') }}
@@ -175,15 +175,13 @@ import Create from './create/index.vue';
 import File from './file/index.vue';
 import ProcessDetail from '@/views/host/process/process/detail/index.vue';
 import { getSupervisorProcess, operateSupervisorProcess } from '@/api/modules/host-tool';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
 import { routerToFileWithPath } from '@/utils/router';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
-const globalStore = GlobalStore();
+const { docsUrl, isFxplay, isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const setSuperVisor = ref(false);
@@ -378,7 +376,7 @@ const buttons = [
 ];
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
 };
 
 onMounted(() => {

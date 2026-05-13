@@ -116,8 +116,8 @@
                 </el-form-item>
             </el-form>
 
-            <el-form v-if="globalStore.isAdmin" label-position="top" :model="form" class="setting-section">
-                <el-form-item v-if="globalStore.isAdmin">
+            <el-form v-if="isAdmin" label-position="top" :model="form" class="setting-section">
+                <el-form-item v-if="isAdmin">
                     <template #label>
                         <span class="label-with-help">
                             {{ $t('setting.apiInterface') }}
@@ -135,7 +135,7 @@
                                                 {{ $t('setting.apiInterfaceAlert3') }}
                                             </el-link>
                                         </li>
-                                        <li v-if="!globalStore.isFxplay">
+                                        <li v-if="!isFxplay">
                                             <el-link :href="panelURL" target="_blank" class="tooltip-help-link">
                                                 {{ $t('setting.apiInterfaceAlert4') }}
                                             </el-link>
@@ -407,7 +407,7 @@ import {
 import { Setting } from '@/api/interface/setting';
 import { getSettingBaseInfo, getSettingInfo, updateSetting } from '@/api/modules/setting';
 import i18n from '@/lang';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { base64UrlToBuffer, bufferToBase64Url } from '@/utils/auth';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { checkNumberRange, Rules } from '@/global/form-rules';
@@ -417,7 +417,7 @@ const props = defineProps<{ currentUser?: Login.AuthInfo }>();
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const complexityVerification = ref(false);
-const globalStore = GlobalStore();
+const { globalStore, docsUrl, entrance, isAdmin, isFxplay } = useGlobalStore();
 const router = useRouter();
 const open = ref(false);
 const loading = ref(false);
@@ -443,7 +443,7 @@ const passkeyMaxCount = 5;
 const apiURL = `${window.location.protocol}//${window.location.hostname}${
     window.location.port ? `:${window.location.port}` : ''
 }/1panel/swagger/index.html`;
-const panelURL = `${globalStore.docsUrl}/dev_manual/api_manual/`;
+const panelURL = `${docsUrl.value}/dev_manual/api_manual/`;
 const form = reactive({
     id: 0,
     name: '',
@@ -875,7 +875,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             if (needReLogin) {
                 globalStore.setLogStatus(false);
                 globalStore.clearAuthInfo();
-                router.push({ name: 'entrance', params: { code: globalStore.entrance } });
+                router.push({ name: 'entrance', params: { code: entrance.value } });
                 return;
             }
             emit('search');

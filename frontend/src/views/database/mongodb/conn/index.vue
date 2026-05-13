@@ -141,9 +141,9 @@ import { getRandomStr } from '@/utils/id';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import { copyText } from '@/utils/clipboard';
 import i18n from '@/lang';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { currentNodeAddr } = useGlobalStore();
 const loading = ref(false);
 const dialogVisible = ref(false);
 
@@ -193,7 +193,7 @@ const random = () => {
 
 const loadSystemIP = async () => {
     const res = await getAgentSettingInfo();
-    form.systemIP = res.data.systemIP || globalStore.currentNodeAddr || i18n.global.t('database.localIP');
+    form.systemIP = res.data.systemIP || currentNodeAddr.value || i18n.global.t('database.localIP');
 };
 
 const loadConnInfo = async () => {

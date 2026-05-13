@@ -5,7 +5,7 @@
             :content="loadContent()"
             :font="{
                 fontSize: form.fontSize,
-                color: globalStore.isDarkTheme ? form.darkColor : form.lightColor,
+                color: isDarkTheme ? form.darkColor : form.lightColor,
                 textBaseline: 'top',
             }"
             :rotate="form.rotate"
@@ -55,9 +55,9 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { updateXpackSettingByKey } from '@/utils/xpack';
-const globalStore = GlobalStore();
+const { globalStore, currentNode, currentNodeAddr, isDarkTheme, watermark, watermarkShow } = useGlobalStore();
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -89,9 +89,9 @@ const acceptParams = (watermark: string): void => {
 const loadContent = () => {
     let itemName = form.content.replaceAll(
         '${nodeName}',
-        globalStore.currentNode === 'local' ? globalStore.getMasterAlias() : globalStore.currentNode,
+        currentNode.value === 'local' ? globalStore.getMasterAlias() : currentNode.value,
     );
-    itemName = itemName.replaceAll('${nodeAddr}', globalStore.currentNodeAddr);
+    itemName = itemName.replaceAll('${nodeAddr}', currentNodeAddr.value);
     return itemName;
 };
 
@@ -119,7 +119,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    globalStore.watermark = {
+                    watermark.value = {
                         lightColor: form.lightColor,
                         darkColor: form.darkColor,
                         fontSize: form.fontSize,
@@ -127,7 +127,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
                         rotate: form.rotate,
                         gap: form.gap,
                     };
-                    globalStore.watermarkShow = true;
+                    watermarkShow.value = true;
                     handleClose();
                     return;
                 })

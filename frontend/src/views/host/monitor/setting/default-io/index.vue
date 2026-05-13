@@ -29,8 +29,8 @@ import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { getIOOptions, updateMonitorSetting } from '@/api/modules/host';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { defaultIO } = useGlobalStore();
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -64,7 +64,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         await updateMonitorSetting('DefaultIO', form.defaultIO)
             .then(async () => {
-                globalStore.defaultIO = form.defaultIO;
+                defaultIO.value = form.defaultIO;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loading.value = false;
                 drawerVisible.value = false;

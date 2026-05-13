@@ -145,14 +145,14 @@ import AppStatus from '@/components/app-status/index.vue';
 import QuickCmd from '@/views/database/redis/command/index.vue';
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { checkAppInstalled } from '@/api/modules/app';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { listDatabases, checkRedisCli, installRedisCli } from '@/api/modules/database';
 import { Database } from '@/api/interface/database';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { getCommandList } from '@/api/modules/command';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
-const globalStore = GlobalStore();
+const { currentRedisDB, openMenuTabs } = useGlobalStore();
 
 const loading = ref(false);
 
@@ -192,7 +192,7 @@ const onSetting = async () => {
 };
 
 const loadHeight = () => {
-    return globalStore.openMenuTabs ? '470px' : '380px';
+    return openMenuTabs.value ? '470px' : '380px';
 };
 
 const getAppDetail = (key: string) => {
@@ -200,7 +200,7 @@ const getAppDetail = (key: string) => {
 };
 const goRemoteDB = async () => {
     if (currentDB.value) {
-        globalStore.currentRedisDB = currentDBName.value;
+        currentRedisDB.value = currentDBName.value;
     }
     routerToName('Redis-Remote');
 };
@@ -226,7 +226,7 @@ const changeDatabase = async () => {
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
-            globalStore.currentRedisDB = currentDB.value.database;
+            currentRedisDB.value = currentDB.value.database;
             appKey.value = item.type;
             appName.value = item.database;
             appStatusRef.value?.onCheck(appKey.value, appName.value);
@@ -237,7 +237,7 @@ const changeDatabase = async () => {
     for (const item of dbOptionsRemote.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
-            globalStore.currentRedisDB = currentDB.value.database;
+            currentRedisDB.value = currentDB.value.database;
             break;
         }
     }
@@ -250,7 +250,7 @@ const loadDBOptions = async () => {
         let datas = res.data || [];
         dbOptionsLocal.value = [];
         dbOptionsRemote.value = [];
-        currentDBName.value = globalStore.currentRedisDB;
+        currentDBName.value = currentRedisDB.value;
         for (const item of datas) {
             if (currentDBName.value && item.database === currentDBName.value) {
                 currentDB.value = item;

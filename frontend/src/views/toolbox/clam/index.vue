@@ -5,7 +5,7 @@
                 <el-alert type="info" :closable="false">
                     <template #title>
                         {{ $t('toolbox.clam.clamHelper') }}
-                        <el-link class="ml-1 text-xs" v-if="!globalStore.isFxplay" @click="toDoc()" type="primary">
+                        <el-link class="ml-1 text-xs" v-if="!isFxplay" @click="toDoc()" type="primary">
                             {{ $t('commons.button.helpDoc') }}
                         </el-link>
                     </template>
@@ -188,15 +188,13 @@ import ClamStatus from '@/views/toolbox/clam/status/index.vue';
 import SettingDialog from '@/views/toolbox/clam/setting/index.vue';
 import { Toolbox } from '@/api/interface/toolbox';
 import { transSpecToStr } from '@/views/cronjob/cronjob/helper';
-import { GlobalStore } from '@/store';
-import { storeToRefs } from 'pinia';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { routerToFileWithPath, routerToName } from '@/utils/router';
 
 const loading = ref();
 const selects = ref<any>([]);
 
-const globalStore = GlobalStore();
-const { isProductPro } = storeToRefs(globalStore);
+const { docsUrl, isFxplay, isProductPro } = useGlobalStore();
 const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'clam-page-size',
@@ -254,7 +252,7 @@ const getStatus = (status: any) => {
 };
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
 };
 
 const onChange = async (row: any) => {

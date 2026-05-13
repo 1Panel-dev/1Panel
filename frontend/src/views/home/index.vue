@@ -19,19 +19,14 @@
             </template>
         </RouterButton>
 
-        <el-alert
-            v-if="!isSafety && globalStore.showEntranceWarn"
-            class="card-interval"
-            type="warning"
-            @close="hideEntrance"
-        >
+        <el-alert v-if="!isSafety && showEntranceWarn" class="card-interval" type="warning" @close="hideEntrance">
             <template #title>
                 <span class="flx-align-center">
                     <span>{{ $t('home.entranceHelper') }}</span>
                     <el-link
                         style="font-size: 12px; margin-left: 5px"
                         icon="Position"
-                        v-if="globalStore.isAdmin"
+                        v-if="isAdmin"
                         @click="jumpToPath(router, '/settings/safe')"
                         type="primary"
                     >
@@ -47,7 +42,7 @@
                     <template #header-r>
                         <el-button
                             class="h-button-setting"
-                            :disabled="!globalStore.isAdminOrNodeAdmin"
+                            :disabled="!isAdminOrNodeAdmin"
                             @click="quickJumpRef.acceptParams()"
                             link
                             icon="Setting"
@@ -235,7 +230,7 @@
                                     <template #reference>
                                         <el-button
                                             class="h-button-setting"
-                                            :disabled="!globalStore.isAdminOrNodeAdmin"
+                                            :disabled="!isAdminOrNodeAdmin"
                                             link
                                             icon="Setting"
                                         />
@@ -349,7 +344,7 @@
                                 <el-tooltip v-if="!memoEditing" :content="$t('commons.button.edit')" placement="top">
                                     <el-button
                                         class="h-button-setting"
-                                        :disabled="!globalStore.isAdminOrNodeAdmin"
+                                        :disabled="!isAdminOrNodeAdmin"
                                         @click="startMemoEdit"
                                         link
                                         icon="Edit"
@@ -481,8 +476,6 @@ import {
     updateMemo,
     updateSetting,
 } from '@/api/modules/setting';
-import { GlobalStore } from '@/store';
-import { storeToRefs } from 'pinia';
 import { routerToFileWithPath, routerToNameWithQuery, routerToPath } from '@/utils/router';
 import { getWelcomePage } from '@/api/modules/auth';
 import {
@@ -494,7 +487,20 @@ import {
 import { MsgSuccess } from '@/utils/message';
 import { useCan } from '@/composables/useMenuManagePermission';
 const router = useRouter();
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const {
+    isProductPro,
+    isEnterprise,
+    isOffline,
+    showEntranceWarn,
+    defaultNetwork,
+    defaultIO,
+    isAdmin,
+    isOnRestart,
+    hasNewVersion,
+    isAdminOrNodeAdmin,
+    isXpackOrEE,
+} = useGlobalStore();
 
 const DASHBOARD_CACHE_TTL = {
     safeStatus: 10 * 60 * 1000,
@@ -575,7 +581,6 @@ const hasRefreshedOptionsOnHover = ref(false);
 
 const licenseRef = ref();
 const quickJumpRef = ref();
-const { isProductPro, isEnterprise, isOffline } = storeToRefs(globalStore);
 const quickJumpPermissionMap = Object.fromEntries(
     [
         ['Agent', 'ai_agent_view'],
@@ -710,7 +715,7 @@ const changeOption = async () => {
 
 const applyDefaultNetOption = () => {
     if (!netOptions.value || netOptions.value.length === 0) return;
-    const defaultNet = globalStore.defaultNetwork || netOptions.value[0];
+    const defaultNet = defaultNetwork.value || netOptions.value[0];
     if (defaultNet && searchInfo.netOption !== defaultNet) {
         searchInfo.netOption = defaultNet;
     }
@@ -718,8 +723,8 @@ const applyDefaultNetOption = () => {
 
 const onLoadAgentSettingInfo = async () => {
     await getAgentSettingInfo().then((res) => {
-        globalStore.defaultIO = res.data.defaultIO;
-        globalStore.defaultNetwork = res.data.defaultNetwork;
+        defaultIO.value = res.data.defaultIO;
+        defaultNetwork.value = res.data.defaultNetwork;
     });
 };
 
@@ -739,7 +744,7 @@ const onLoadNetworkOptions = async (force?: boolean) => {
 };
 
 const onLoadSimpleNode = async () => {
-    if (!globalStore.isAdmin) {
+    if (!isAdmin.value) {
         simpleNodes.value = [];
         return;
     }
@@ -749,9 +754,9 @@ const onLoadSimpleNode = async () => {
 
 const applyDefaultIOOption = async () => {
     if (!ioOptions.value || ioOptions.value.length === 0) return;
-    const defaultIO = globalStore.defaultIO || ioOptions.value[0];
-    if (defaultIO && searchInfo.ioOption !== defaultIO) {
-        searchInfo.ioOption = defaultIO;
+    const defaultIOOption = defaultIO.value || ioOptions.value[0];
+    if (defaultIOOption && searchInfo.ioOption !== defaultIOOption) {
+        searchInfo.ioOption = defaultIOOption;
     }
 };
 
@@ -802,7 +807,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
                 if (!isCurrentActive.value) {
                     throw new Error('jump out');
                 }
-                if (isActive.value && !globalStore.isOnRestart) {
+                if (isActive.value && !isOnRestart.value) {
                     await onLoadCurrentInfo();
                     await onLoadSimpleNode();
                 }
@@ -821,7 +826,7 @@ const quickJump = (item: any) => {
 };
 
 const showSimpleNode = () => {
-    return simpleNodeCarouselSetting.value === 'Enable' && globalStore.isXpackOrEE() && simpleNodes.value?.length !== 0;
+    return simpleNodeCarouselSetting.value === 'Enable' && isXpackOrEE.value && simpleNodes.value?.length !== 0;
 };
 
 const toggleSensitiveInfo = () => {
@@ -1013,18 +1018,18 @@ const loadData = async () => {
 };
 
 const hideEntrance = () => {
-    globalStore.showEntranceWarn = false;
+    showEntranceWarn.value = false;
 };
 
 const loadUpgradeStatus = async () => {
-    if (!globalStore.isAdmin) {
+    if (!isAdmin.value) {
         return;
     }
     const res = await loadUpgradeInfo();
     if (res && (res.data.testVersion || res.data.newVersion || res.data.latestVersion)) {
-        globalStore.hasNewVersion = true;
+        hasNewVersion.value = true;
     } else {
-        globalStore.hasNewVersion = false;
+        hasNewVersion.value = false;
     }
 };
 

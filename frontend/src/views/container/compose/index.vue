@@ -294,7 +294,7 @@
                                         <el-button
                                             type="primary"
                                             link
-                                            :disabled="!globalStore.isAdminOrNodeAdmin"
+                                            :disabled="!isAdminOrNodeAdmin"
                                             @click="onOpenTerminal(row)"
                                         >
                                             {{ $t('menu.terminal') }}
@@ -512,9 +512,9 @@ import { newUUID } from '@/utils/id';
 import { Rules } from '@/global/form-rules';
 import { loadBaseDir } from '@/api/modules/setting';
 import { ElCheckbox, ElForm } from 'element-plus';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { currentNode, isAdminOrNodeAdmin } = useGlobalStore();
 
 const data = ref<any[]>([]);
 const loading = ref(false);
@@ -783,7 +783,7 @@ const onBackupList = (row: Container.ComposeInfo) => {
         type: 'compose',
         name: row.name,
         detailName: '',
-        node: globalStore.currentNode,
+        node: currentNode.value,
     });
 };
 
@@ -793,7 +793,7 @@ const onImportCompose = () => {
         name: '',
         detailName: '',
         remark: '.tar.gz',
-        node: globalStore.currentNode,
+        node: currentNode.value,
     });
 };
 

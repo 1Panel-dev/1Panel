@@ -1,6 +1,6 @@
 import { watch, onBeforeMount, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
-import { GlobalStore, MenuStore } from '@/store';
+import { MenuStore } from '@/store';
 import { DeviceType } from '@/enums/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 /** 参考 Bootstrap 的响应式设计 WIDTH = 600 */
@@ -9,7 +9,7 @@ const WIDTH = 600;
 /** 根据大小变化重新布局 */
 export default () => {
     const route = useRoute();
-    const globalStore = GlobalStore();
+    const { globalStore } = useGlobalStore();
     const menuStore = MenuStore();
     const { isMobile } = useGlobalStore();
     const _isMobile = () => {

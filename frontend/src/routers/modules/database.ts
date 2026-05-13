@@ -9,6 +9,7 @@ const databaseRouter = {
     meta: {
         icon: 'p-database',
         title: 'menu.database',
+        permission: 'database_view',
     },
     children: [
         {

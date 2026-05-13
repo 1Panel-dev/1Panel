@@ -87,12 +87,12 @@
 </template>
 
 <script setup lang="ts">
-import { GlobalStore, MenuStore } from '@/store';
+import { MenuStore } from '@/store';
 import { countExecutingTask } from '@/api/modules/log';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { getAgentSettingInfo } from '@/api/modules/setting';
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import bus from '@/global/bus';
 import { logOutApi } from '@/api/modules/auth';
 import router from '@/routers';
@@ -102,10 +102,12 @@ import { changeToLocal, listNodes, setDefaultNodeInfo } from '@/utils/node';
 import { Login } from '@/api/interface/auth';
 import { syncAuthInfo } from '@/utils/rbac';
 import UserInfo from './user-info/index.vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const filter = ref();
 const currentUser = ref<Login.AuthInfo>();
-const globalStore = GlobalStore();
+const { globalStore, currentNode, currentNodeAddr, defaultNetwork, entrance, isEnterprise, isXpackOrEE } =
+    useGlobalStore();
 const menuStore = MenuStore();
 const nodes = ref([]);
 const nodeOptions = ref([]);
@@ -115,9 +117,6 @@ const userInfoRef = ref();
 const props = defineProps({
     version: String,
 });
-const isXpackOrEE = computed(() => {
-    return globalStore.isXpackOrEE();
-});
 
 const emit = defineEmits(['openTask', 'refresh']);
 bus.on('refreshTask', () => {
@@ -125,11 +124,11 @@ bus.on('refreshTask', () => {
 });
 
 const loadCurrentName = () => {
-    if (globalStore.currentNode) {
-        if (globalStore.currentNode === 'local') {
+    if (currentNode.value) {
+        if (currentNode.value === 'local') {
             return globalStore.getMasterAlias();
         }
-        return globalStore.currentNode;
+        return currentNode.value;
     }
     return globalStore.getMasterAlias();
 };
@@ -177,7 +176,7 @@ const loadNodes = async () => {
         });
 };
 const changeNode = async (command: string) => {
-    if (globalStore.currentNode === command || switchingNode.value) {
+    if (currentNode.value === command || switchingNode.value) {
         return;
     }
     switchingNode.value = true;
@@ -185,12 +184,12 @@ const changeNode = async (command: string) => {
         for (const item of nodes.value) {
             if (item.name == command) {
                 if (command == 'local') {
-                    if (globalStore.isEnterprise) {
+                    if (isEnterprise.value) {
                         await loadCurrentUser('local');
                     }
                     await loadGlobalSetting('local');
-                    globalStore.currentNode = 'local';
-                    globalStore.currentNodeAddr = item.addr;
+                    currentNode.value = 'local';
+                    currentNodeAddr.value = item.addr;
                     localStorage.removeItem('dashboardCache');
                     localStorage.removeItem('upgradeChecked');
                     menuStore.setMenuList([]);
@@ -214,9 +213,9 @@ const changeNode = async (command: string) => {
                 await loadGlobalSetting(command);
                 localStorage.removeItem('dashboardCache');
                 localStorage.removeItem('upgradeChecked');
-                globalStore.currentNode = command;
-                globalStore.currentNodeAddr = item.addr;
-                if (globalStore.isEnterprise) {
+                currentNode.value = command;
+                currentNodeAddr.value = item.addr;
+                if (isEnterprise.value) {
                     await loadCurrentUser(command);
                 }
                 menuStore.setMenuList([]);
@@ -233,7 +232,7 @@ const changeNode = async (command: string) => {
 
 const loadGlobalSetting = async (currentNode?: string) => {
     await getAgentSettingInfo(currentNode).then((res) => {
-        globalStore.defaultNetwork = res.data.defaultNetwork;
+        defaultNetwork.value = res.data.defaultNetwork;
     });
 };
 
@@ -267,7 +266,7 @@ const logout = () => {
             await logOutApi();
             globalStore.setLogStatus(false);
             globalStore.clearAuthInfo();
-            router.push({ name: 'entrance', params: { code: globalStore.entrance } });
+            router.push({ name: 'entrance', params: { code: entrance.value } });
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {});

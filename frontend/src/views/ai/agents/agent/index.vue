@@ -262,7 +262,7 @@ import NoApp from '@/views/app-store/apps/no-app/index.vue';
 import openclawIcon from '@/assets/images/ai-agent-openclaw.svg';
 import copawIcon from '@/assets/images/ai-agent-copaw.svg';
 import hermesIcon from '@/assets/images/ai-agent-hermes-agent.svg';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const items = ref<AI.AgentItem[]>([]);
 const loading = ref(false);
@@ -287,7 +287,7 @@ const searchName = ref('');
 const defaultHttpsPort = ref(443);
 const openrestyPortLoaded = ref(false);
 const websiteDomainsMap = ref<Record<number, Website.Domain[]>>({});
-const globalStore = GlobalStore();
+const { isAdminOrNodeAdmin } = useGlobalStore();
 
 const headerButtons = [
     {
@@ -306,7 +306,7 @@ const buttons = [
     {
         label: i18n.global.t('aiTools.agents.hermesChatAction'),
         click: (row: AI.AgentItem) => openHermesChat(row),
-        disabled: () => !globalStore.isAdminOrNodeAdmin,
+        disabled: () => !isAdminOrNodeAdmin.value,
         show: (row: AI.AgentItem) => row.agentType === 'hermes-agent' && row.status === 'Running',
     },
     {
@@ -316,7 +316,7 @@ const buttons = [
     {
         label: i18n.global.t('menu.terminal'),
         click: (row: AI.AgentItem) => openTerminal(row),
-        disabled: () => !globalStore.isAdminOrNodeAdmin,
+        disabled: () => !isAdminOrNodeAdmin.value,
     },
     {
         label: i18n.global.t('menu.home'),

@@ -39,7 +39,7 @@
 
         <div v-if="form.isExist">
             <LayoutContent title="Fail2ban" :divider="true">
-                <template #promp v-if="!globalStore.isFxplay">
+                <template #promp v-if="!isFxplay">
                     <el-alert type="info" :closable="false">
                         <template #title>
                             {{ $t('toolbox.common.toolboxHelper') }}
@@ -180,9 +180,9 @@ import { MsgSuccess } from '@/utils/message';
 import { getFail2banConf, getFail2banBase, operateFail2ban, updateFail2banByFile } from '@/api/modules/toolbox';
 import { ElMessageBox } from 'element-plus';
 import { transTimeUnit } from '@/utils/validate';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { docsUrl, isFxplay } = useGlobalStore();
 
 const loading = ref(false);
 const formRef = ref();
@@ -313,7 +313,7 @@ const search = async () => {
 };
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/toolbox/fail2ban/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/toolbox/fail2ban/', '_blank', 'noopener,noreferrer');
 };
 
 onMounted(() => {

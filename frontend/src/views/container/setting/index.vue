@@ -74,7 +74,7 @@
                                     </template>
                                 </el-input>
                                 <span class="input-help">{{ $t('container.mirrorsHelper') }}</span>
-                                <span class="input-help flex flx-align-center" v-if="!globalStore.isFxplay">
+                                <span class="input-help flex flx-align-center" v-if="!isFxplay">
                                     {{ $t('container.mirrorsHelper2') }}
                                     <el-link class="p-ml-5 text-xs" icon="Position" @click="toDoc()" type="primary">
                                         {{ $t('firewall.quickJump') }}
@@ -257,11 +257,9 @@ import {
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { checkNumberRange } from '@/global/form-rules';
-import { GlobalStore } from '@/store';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
-const globalStore = GlobalStore();
+const { docsUrl, isFxplay, isMobile, openMenuTabs } = useGlobalStore();
 
 const unset = ref(i18n.global.t('setting.unSetting'));
 const submitInput = ref();
@@ -327,7 +325,7 @@ const onSaveFile = async () => {
 };
 
 const loadHeight = () => {
-    return globalStore.openMenuTabs ? 450 : 430;
+    return openMenuTabs.value ? 450 : 430;
 };
 
 const onChangeMirrors = () => {
@@ -436,7 +434,7 @@ const save = async (key: string, value: string) => {
 };
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/containers/setting/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/containers/setting/', '_blank', 'noopener,noreferrer');
 };
 
 const onOperator = async (operation: string) => {

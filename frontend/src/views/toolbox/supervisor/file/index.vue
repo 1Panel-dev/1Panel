@@ -3,7 +3,7 @@
         v-model="open"
         :header="$t('website.source')"
         @close="handleClose"
-        :size="globalStore.isFullScreen ? 'full' : 'large'"
+        :size="isFullScreen ? 'full' : 'large'"
         :fullScreen="true"
     >
         <template #content>
@@ -27,8 +27,8 @@ import { onUnmounted, reactive, ref } from 'vue';
 import { getSupervisorProcessFile, operateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isFullScreen } = useGlobalStore();
 
 const loading = ref(false);
 const content = ref('');

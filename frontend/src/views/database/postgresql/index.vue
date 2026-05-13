@@ -48,7 +48,7 @@
                 </el-button>
                 <el-button
                     @click="goTerminal()"
-                    :disabled="currentDB?.from !== 'local' || !globalStore.isAdminOrNodeAdmin"
+                    :disabled="currentDB?.from !== 'local' || !isAdminOrNodeAdmin"
                     type="primary"
                     plain
                 >
@@ -268,12 +268,10 @@ import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
 import { getAppPort } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-import { routerToName, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { routerToName, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 
-const { isMobile } = useGlobalStore();
-const globalStore = GlobalStore();
+const { currentPgDB, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const maskShow = ref(true);
@@ -342,7 +340,7 @@ const onChangeConn = async () => {
 
 const goRemoteDB = async () => {
     if (currentDB.value) {
-        globalStore.currentPgDB = currentDB.value.database;
+        currentPgDB.value = currentDB.value.database;
     }
     routerToName('PostgreSQL-Remote');
 };
@@ -355,7 +353,7 @@ const passwordRef = ref();
 
 const onSetting = async () => {
     if (currentDB.value) {
-        globalStore.currentPgDB = currentDB.value.database;
+        currentPgDB.value = currentDB.value.database;
     }
     routerToNameWithParams('PostgreSQL-Setting', { type: currentDB.value.type, database: currentDB.value.database });
 };
@@ -364,7 +362,7 @@ const changeDatabase = async () => {
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
-            globalStore.currentPgDB = currentDB.value.database;
+            currentPgDB.value = currentDB.value.database;
             appKey.value = item.type;
             appName.value = item.database;
             search();
@@ -376,7 +374,7 @@ const changeDatabase = async () => {
         if (item.database == currentDBName.value) {
             maskShow.value = false;
             currentDB.value = item;
-            globalStore.currentPgDB = currentDB.value.database;
+            currentPgDB.value = currentDB.value.database;
             break;
         }
     }
@@ -470,7 +468,7 @@ const loadDBOptions = async () => {
         let datas = res.data || [];
         dbOptionsLocal.value = [];
         dbOptionsRemote.value = [];
-        currentDBName.value = globalStore.currentPgDB;
+        currentDBName.value = currentPgDB.value;
         for (const item of datas) {
             if (currentDBName.value && item.database === currentDBName.value) {
                 currentDB.value = item;

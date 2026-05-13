@@ -75,8 +75,8 @@ import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { initFavicon, updateXpackSettingByKey } from '@/utils/xpack';
 import { setPrimaryColor } from '@/utils/theme';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isXpackOrEE, themeConfig } = useGlobalStore();
 const emit = defineEmits<(e: 'search') => void>();
 const drawerVisible = ref();
 const loading = ref();
@@ -247,10 +247,10 @@ const onSave = async (formEl: FormInstance | undefined) => {
         await formEl.validate(async (valid) => {
             if (!valid) return;
             form.themeColor = { light: form.light, dark: form.dark, themePredefineColors: themeColors.value };
-            if (globalStore.isXpackOrEE()) {
+            if (isXpackOrEE.value) {
                 await updateXpackSettingByKey('ThemeColor', JSON.stringify(form.themeColor));
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                globalStore.themeConfig.themeColor = JSON.stringify(form.themeColor);
+                themeConfig.value.themeColor = JSON.stringify(form.themeColor);
                 loading.value = false;
                 let color: string;
                 if (form.theme === 'auto') {
@@ -259,7 +259,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
                 } else {
                     color = form.theme === 'dark' ? form.dark : form.light;
                 }
-                globalStore.themeConfig.primary = color;
+                themeConfig.value.primary = color;
                 setPrimaryColor(color);
                 initFavicon();
                 drawerVisible.value = false;
@@ -275,7 +275,7 @@ const onReSet = async () => {
         type: 'info',
     }).then(async () => {
         form.themeColor = { light: '#005eeb', dark: '#F0BE96', themePredefineColors: themeColors.value };
-        if (globalStore.isXpackOrEE()) {
+        if (isXpackOrEE.value) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultColors));
             themeColors.value = { ...defaultColors };
             darkColors = [...defaultDarkColors];
@@ -283,7 +283,7 @@ const onReSet = async () => {
             await updateXpackSettingByKey('ThemeColor', JSON.stringify(form.themeColor));
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             loading.value = false;
-            globalStore.themeConfig.themeColor = JSON.stringify(form.themeColor);
+            themeConfig.value.themeColor = JSON.stringify(form.themeColor);
             let color: string;
             if (form.theme === 'auto') {
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
@@ -291,7 +291,7 @@ const onReSet = async () => {
             } else {
                 color = form.theme === 'dark' ? '#F0BE96' : '#005eeb';
             }
-            globalStore.themeConfig.primary = color;
+            themeConfig.value.primary = color;
             setPrimaryColor(color);
             initFavicon();
             drawerVisible.value = false;

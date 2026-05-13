@@ -1,5 +1,5 @@
 import router from '@/routers';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 export type PermissionBindingValue = string | string[] | undefined;
 export type PermissionMode = 'manage' | 'view';
@@ -42,8 +42,8 @@ export const toPermissionList = (value: PermissionBindingValue) => {
 };
 
 export const hasManagePermissionAccess = (value?: PermissionBindingValue) => {
-    const globalStore = GlobalStore();
-    if (globalStore.isAdmin || globalStore.isNodeAdmin) {
+    const { globalStore, isAdmin, isNodeAdmin } = useGlobalStore();
+    if (isAdmin.value || isNodeAdmin.value) {
         return true;
     }
     const permissions = toPermissionList(value).map(toManagePermission).filter(Boolean);
@@ -54,8 +54,9 @@ export const hasManagePermissionAccess = (value?: PermissionBindingValue) => {
 };
 
 export const hasPermissionAccess = (value?: PermissionBindingValue) => {
-    const globalStore = GlobalStore();
-    if (globalStore.isAdmin || globalStore.isNodeAdmin) {
+    const { globalStore, isAdmin, isNodeAdmin } = useGlobalStore();
+
+    if (isAdmin.value || isNodeAdmin.value) {
         return true;
     }
     const permissions = toPermissionList(value);

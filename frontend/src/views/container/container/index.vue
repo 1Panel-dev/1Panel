@@ -437,17 +437,14 @@ import {
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import router from '@/routers';
 import { computeSize2, computeSizeForDocker, computeCPU } from '@/utils/size';
 import { newUUID } from '@/utils/id';
 import { updateCommonDescription } from '@/api/modules/setting';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
-const globalStore = GlobalStore();
-const hasFilePermission = useCan('host_file_view');
+const { currentNode, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
 
 const isActive = ref(false);
 const isExist = ref(false);
@@ -724,7 +721,7 @@ const onImportCreate = () => {
         name: '',
         detailName: '',
         remark: '.tar.gz',
-        node: globalStore.currentNode,
+        node: currentNode.value,
     });
 };
 
@@ -848,7 +845,7 @@ const buttons = [
     {
         label: i18n.global.t('menu.terminal'),
         disabled: (row: Container.ContainerInfo) => {
-            return row.state !== 'running' || !globalStore.isAdminOrNodeAdmin;
+            return row.state !== 'running' || !isAdminOrNodeAdmin.value;
         },
         click: (row: Container.ContainerInfo) => {
             onTerminal(row);
@@ -862,8 +859,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('home.dir'),
+        permission: 'host_file_view',
         disabled: (row: Container.ContainerInfo) => {
-            return row.state !== 'running' || !hasFilePermission.value;
+            return row.state !== 'running';
         },
         click: (row: Container.ContainerInfo) => {
             onOpenFileBrowser(row);

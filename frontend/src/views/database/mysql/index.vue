@@ -50,7 +50,7 @@
                 </el-button>
                 <el-button
                     @click="goTerminal()"
-                    :disabled="currentDB?.from !== 'local' || !globalStore.isAdminOrNodeAdmin"
+                    :disabled="currentDB?.from !== 'local' || !isAdminOrNodeAdmin"
                     type="primary"
                     plain
                 >
@@ -301,12 +301,10 @@ import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
 import { getAppPort } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-import { routerToName, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { routerToName, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 
-const { isMobile } = useGlobalStore();
-const globalStore = GlobalStore();
+const { currentDB: globalCurrentDB, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const maskShow = ref(true);
@@ -383,7 +381,7 @@ const mysqlName = (appType: string) => {
 
 const goRemoteDB = async () => {
     if (currentDB.value) {
-        globalStore.currentDB = currentDB.value.database;
+        globalCurrentDB.value = currentDB.value.database;
     }
     routerToName('MySQL-Remote');
 };
@@ -396,7 +394,7 @@ const passwordRef = ref();
 
 const onSetting = async () => {
     if (currentDB.value) {
-        globalStore.currentDB = currentDB.value.database;
+        globalCurrentDB.value = currentDB.value.database;
     }
     routerToNameWithParams('MySQL-Setting', { type: currentDB.value.type, database: currentDB.value.database });
 };
@@ -405,7 +403,7 @@ const changeDatabase = async () => {
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
-            globalStore.currentDB = currentDB.value.database;
+            globalCurrentDB.value = currentDB.value.database;
             appKey.value = item.type;
             appName.value = item.database;
             search();
@@ -417,7 +415,7 @@ const changeDatabase = async () => {
         if (item.database == currentDBName.value) {
             maskShow.value = false;
             currentDB.value = item;
-            globalStore.currentDB = currentDB.value.database;
+            globalCurrentDB.value = currentDB.value.database;
             break;
         }
     }
@@ -522,7 +520,7 @@ const loadDBOptions = async () => {
         let datas = res.data || [];
         dbOptionsLocal.value = [];
         dbOptionsRemote.value = [];
-        currentDBName.value = globalStore.currentDB;
+        currentDBName.value = globalCurrentDB.value;
         for (const item of datas) {
             if (currentDBName.value && item.database === currentDBName.value) {
                 currentDB.value = item;

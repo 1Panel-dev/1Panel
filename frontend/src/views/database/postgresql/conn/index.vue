@@ -135,8 +135,8 @@ import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/id';
 import { copyText } from '@/utils/clipboard';
 import { getAgentSettingInfo } from '@/api/modules/setting';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { currentNodeAddr } = useGlobalStore();
 
 const loading = ref(false);
 
@@ -210,7 +210,7 @@ const loadAccess = async () => {
 
 const loadSystemIP = async () => {
     const res = await getAgentSettingInfo();
-    form.systemIP = res.data.systemIP || globalStore.currentNodeAddr || i18n.global.t('database.localIP');
+    form.systemIP = res.data.systemIP || currentNodeAddr.value || i18n.global.t('database.localIP');
 };
 
 const loadPassword = async () => {

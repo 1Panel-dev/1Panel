@@ -63,10 +63,11 @@
 <script setup lang="ts">
 import FireRouter from '@/views/host/process/index.vue';
 import { ref, onMounted, onUnmounted, watch, h } from 'vue';
-import { GlobalStore, ProcessStore } from '@/store';
+import { ProcessStore } from '@/store';
 import { SortBy, TableV2SortOrder, ElIcon } from 'element-plus';
 import { Filter } from '@element-plus/icons-vue';
 import i18n from '@/lang';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const statusOptions = [
     { text: 'LISTEN', value: 'LISTEN' },
@@ -76,7 +77,7 @@ const statusOptions = [
     { text: 'NONE', value: 'NONE' },
 ];
 
-const globalStore = GlobalStore();
+const { currentNode } = useGlobalStore();
 const processStore = ProcessStore();
 
 const quickSearchName = (name: string) => {
@@ -236,7 +237,7 @@ const search = () => {
 };
 
 onMounted(() => {
-    processStore.connect(globalStore.currentNode);
+    processStore.connect(currentNode.value);
     const initialDelay = processStore.netData.length > 0 ? 500 : 0;
     processStore.startPolling('net', 3000, initialDelay);
 });

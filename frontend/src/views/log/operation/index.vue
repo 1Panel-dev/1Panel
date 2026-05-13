@@ -42,7 +42,7 @@
                     <el-option :label="$t('commons.status.success')" value="Success" />
                     <el-option :label="$t('commons.status.failed')" value="Failed" />
                 </el-select>
-                <el-select v-if="globalStore.isAdmin" v-model="searchNode" @change="search()" clearable class="p-w-200">
+                <el-select v-if="isAdmin" v-model="searchNode" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('xpack.node.node') }}</template>
                     <el-option :label="$t('commons.table.all')" value="" />
                     <el-option v-for="(node, index) in nodes" :key="index" :label="node.name" :value="node.name" />
@@ -63,13 +63,13 @@
                     <el-table-column :label="$t('commons.table.user')" prop="user" show-overflow-tooltip />
                     <el-table-column :label="$t('commons.table.operate')" min-width="150px" prop="detailZH">
                         <template #default="{ row }">
-                            <span v-if="globalStore.language === 'zh' || globalStore.language === 'zh-Hant'">
+                            <span v-if="language === 'zh' || language === 'zh-Hant'">
                                 {{ row.detailZH }}
                             </span>
-                            <span v-if="globalStore.language === 'en'">{{ row.detailEN }}</span>
+                            <span v-if="language === 'en'">{{ row.detailEN }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column v-if="globalStore.isXpackOrEE()" :label="$t('xpack.node.node')" prop="node">
+                    <el-table-column v-if="isXpackOrEE" :label="$t('xpack.node.node')" prop="node">
                         <template #default="{ row }">
                             <span>{{ row.node === 'local' ? globalStore.getMasterAlias() : row.node }}</span>
                         </template>
@@ -101,7 +101,7 @@ import { cleanLogs, getOperationLogs } from '@/api/modules/log';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { listNodes } from '@/utils/node';
 
 const loading = ref();
@@ -119,7 +119,7 @@ const searchStatus = ref<string>('');
 const searchNode = ref<string>('');
 const nodes = ref();
 
-const globalStore = GlobalStore();
+const { globalStore, currentNode, isAdmin, isXpackOrEE, language } = useGlobalStore();
 
 const search = async () => {
     let params = {
@@ -135,7 +135,7 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             data.value = res.data.items || [];
-            if (globalStore.language === 'zh' || globalStore.language === 'zh-Hant') {
+            if (language.value === 'zh' || language.value === 'zh-Hant') {
                 for (const item of data.value) {
                     item.detailZH = loadDetail(item.detailZH);
                 }
@@ -284,10 +284,10 @@ const onSubmitClean = async () => {
 };
 
 onMounted(() => {
-    if (globalStore.isAdmin && globalStore.isXpackOrEE()) {
+    if (isAdmin.value && isXpackOrEE.value) {
         loadNodes();
     }
-    searchNode.value = globalStore.isAdmin ? '' : globalStore.currentNode;
+    searchNode.value = isAdmin.value ? '' : currentNode.value;
     search();
 });
 </script>

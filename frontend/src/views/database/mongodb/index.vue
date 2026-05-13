@@ -51,10 +51,7 @@
                     type="primary"
                     plain
                     :disabled="
-                        !currentDB ||
-                        currentDB.from !== 'local' ||
-                        mongodbStatus !== 'Running' ||
-                        !globalStore.isAdminOrNodeAdmin
+                        !currentDB || currentDB.from !== 'local' || mongodbStatus !== 'Running' || !isAdminOrNodeAdmin
                     "
                     @click="goTerminal"
                 >
@@ -357,13 +354,10 @@ import {
 } from '@/api/modules/database';
 import { MsgSuccess } from '@/utils/message';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
-import { GlobalStore } from '@/store';
-import Tooltip from '@/components/tooltip/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import Tooltip from '@/components/tooltip/index.vue';
 
-const { isMobile } = useGlobalStore();
-
-const globalStore = GlobalStore();
+const { currentMongodbDB, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const maskShow = ref(true);
@@ -488,7 +482,7 @@ const loadMongoExpressPort = async () => {
 
 const goRemoteDB = async () => {
     if (currentDB.value) {
-        globalStore.currentMongodbDB = currentDBName.value;
+        currentMongodbDB.value = currentDBName.value;
     }
     routerToName('MongoDB-Remote');
 };
@@ -619,7 +613,7 @@ const changeDatabase = async () => {
         if (item.database === currentDBName.value) {
             currentDB.value = item;
             appName.value = item.database;
-            globalStore.currentMongodbDB = item.database;
+            currentMongodbDB.value = item.database;
             await nextTick();
             appStatusRef.value?.onCheck('mongodb', item.database);
             return;
@@ -631,7 +625,7 @@ const changeDatabase = async () => {
             appName.value = '';
             mongodbStatus.value = '';
             maskShow.value = false;
-            globalStore.currentMongodbDB = item.database;
+            currentMongodbDB.value = item.database;
             await loadData(true);
             return;
         }
@@ -645,7 +639,7 @@ const loadDBOptions = async () => {
         dbOptionsLocal.value = [];
         dbOptionsRemote.value = [];
         currentDB.value = undefined;
-        currentDBName.value = globalStore.currentMongodbDB;
+        currentDBName.value = currentMongodbDB.value;
         for (const item of datas) {
             if (currentDBName.value && item.database === currentDBName.value) {
                 currentDB.value = item;
@@ -670,7 +664,7 @@ const loadDBOptions = async () => {
             appName.value = '';
         }
         if (currentDB.value) {
-            globalStore.currentMongodbDB = currentDBName.value;
+            currentMongodbDB.value = currentDBName.value;
             if (currentDB.value.from === 'remote') {
                 maskShow.value = false;
                 await loadData(true);

@@ -28,11 +28,11 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { updateSetting } from '@/api/modules/setting';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { getRandomStr } from '@/utils/id';
 import { FormInstance } from 'element-plus';
 import { clearDashboardCacheByPrefix } from '@/utils/dashboardCache';
-const globalStore = GlobalStore();
+const { entrance, showEntranceWarn } = useGlobalStore();
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -64,7 +64,7 @@ function checkSecurityEntrance(rule: any, value: any, callback: any) {
 
 const acceptParams = (params: DialogProps): void => {
     form.securityEntrance = params.securityEntrance;
-    show.value = globalStore.showEntranceWarn;
+    show.value = showEntranceWarn.value;
     drawerVisible.value = true;
 };
 
@@ -84,8 +84,8 @@ const submitEntrance = async (formEl: FormInstance | undefined) => {
         await updateSetting(param)
             .then(() => {
                 clearDashboardCacheByPrefix(['safeStatus']);
-                globalStore.showEntranceWarn = show.value;
-                globalStore.entrance = form.securityEntrance;
+                showEntranceWarn.value = show.value;
+                entrance.value = form.securityEntrance;
                 loading.value = false;
                 drawerVisible.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

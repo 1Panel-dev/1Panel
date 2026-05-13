@@ -724,19 +724,19 @@
                                             />
                                             <el-option
                                                 value="weCom"
-                                                v-if="!globalStore.isIntl"
+                                                v-if="!isIntl"
                                                 :disabled="!form.hasAlert || !isProductPro"
                                                 :label="$t('xpack.alert.weCom')"
                                             />
                                             <el-option
                                                 value="dingTalk"
-                                                v-if="!globalStore.isIntl"
+                                                v-if="!isIntl"
                                                 :disabled="!form.hasAlert || !isProductPro"
                                                 :label="$t('xpack.alert.dingTalk')"
                                             />
                                             <el-option
                                                 value="feiShu"
-                                                v-if="!globalStore.isIntl"
+                                                v-if="!isIntl"
                                                 :disabled="!form.hasAlert || !isProductPro"
                                                 :label="$t('xpack.alert.feiShu')"
                                             />
@@ -747,7 +747,7 @@
                                             />
                                             <el-option
                                                 value="sms"
-                                                v-if="!globalStore.isIntl"
+                                                v-if="!isIntl"
                                                 :disabled="!form.hasAlert || !isProductPro"
                                                 :label="$t('xpack.alert.sms')"
                                             />
@@ -863,8 +863,7 @@ import {
 } from '../helper';
 import { loadUsers } from '@/api/modules/toolbox';
 import { loadContainerUsers } from '@/api/modules/container';
-import { storeToRefs } from 'pinia';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import LicenseImport from '@/components/license-import/index.vue';
 import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/validate';
 import { getGroupList } from '@/api/modules/group';
@@ -872,12 +871,11 @@ import { routerToName, routerToPath } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
 const router = useRouter();
 
-const globalStore = GlobalStore();
+const { docsUrl, isFxplay, isIntl, isProductPro } = useGlobalStore();
 const licenseRef = ref();
 const scriptFileRef = ref();
 const dirRef = ref();
 const fileRef = ref();
-const { isProductPro, isFxplay } = storeToRefs(globalStore);
 const loading = ref();
 const nextTimes = ref([]);
 
@@ -1260,7 +1258,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/cronjobs/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/cronjobs/', '_blank', 'noopener,noreferrer');
 };
 
 const loadDir = async (path: string) => {

@@ -63,7 +63,7 @@
                             type="primary"
                             link
                             @click="$emit('openTerminal')"
-                            :disabled="installed.status !== 'Running' || !globalStore.isAdminOrNodeAdmin"
+                            :disabled="installed.status !== 'Running' || !isAdminOrNodeAdmin"
                         >
                             <el-icon>
                                 <SvgIcon iconName="p-terminal2" />
@@ -166,9 +166,9 @@
 
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { isAdminOrNodeAdmin } = useGlobalStore();
 
 interface Props {
     installed: App.AppInstalled;

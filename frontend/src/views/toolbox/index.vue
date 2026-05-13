@@ -25,17 +25,17 @@
 import i18n from '@/lang';
 import { ref } from 'vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { MsgSuccess } from '@/utils/message';
 import { systemRestart } from '@/api/modules/dashboard';
 
 const restartType = ref();
 const confirmDialogRef = ref();
-const globalStore = GlobalStore();
+const { currentNode, isOnRestart } = useGlobalStore();
 
 const onRestart = (type: string) => {
     let header = i18n.global.t('home.restart_' + type);
-    if (globalStore.currentNode != 'local' && type === '1panel') {
+    if (currentNode.value != 'local' && type === '1panel') {
         type = '1panel-agent';
     }
     restartType.value = type;
@@ -47,7 +47,7 @@ const onRestart = (type: string) => {
     confirmDialogRef.value!.acceptParams(params);
 };
 const onSave = async () => {
-    globalStore.isOnRestart = true;
+    isOnRestart.value = true;
     MsgSuccess(i18n.global.t('home.operationSuccess'));
     await systemRestart(restartType.value);
 };

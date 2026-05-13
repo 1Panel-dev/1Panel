@@ -224,14 +224,11 @@ import { computeSize, computeSizeFromKBs } from '@/utils/size';
 import { dateFormatWithoutYear } from '@/utils/date';
 import i18n from '@/lang';
 import MonitorRouter from '@/views/host/monitor/index.vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { shortcuts } from '@/utils/shortcuts';
 import { Host } from '@/api/interface/host';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
-
-const globalStore = GlobalStore();
+const { defaultIO, defaultNetwork, isMobile } = useGlobalStore();
 
 const monitorBase = ref();
 const timeRangeGlobal = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
@@ -356,12 +353,12 @@ const changeIO = (item: string) => {
 const loadOptions = async () => {
     const res = await getNetworkOptions();
     netOptions.value = res.data;
-    searchInfo.network = globalStore.defaultNetwork || (netOptions.value && netOptions.value[0]);
+    searchInfo.network = defaultNetwork.value || (netOptions.value && netOptions.value[0]);
     networkChoose.value = searchInfo.network;
 
     const res1 = await getIOOptions();
     ioOptions.value = res1.data;
-    searchInfo.io = globalStore.defaultIO || (ioOptions.value && ioOptions.value[0]);
+    searchInfo.io = defaultIO.value || (ioOptions.value && ioOptions.value[0]);
     ioChoose.value = searchInfo.io;
 
     search('all');

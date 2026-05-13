@@ -256,7 +256,7 @@
                                 <el-button class="btn" @click="openRecycleBin">
                                     {{ $t('file.recycleBin') }}
                                 </el-button>
-                                <el-button class="btn" @click="toTerminal" :disabled="!globalStore.isAdminOrNodeAdmin">
+                                <el-button class="btn" @click="toTerminal" :disabled="!isAdminOrNodeAdmin">
                                     {{ $t('menu.terminal') }}
                                 </el-button>
                                 <el-popover
@@ -736,7 +736,7 @@ import { useRouter } from 'vue-router';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useMultipleSearchable } from './hooks/searchable';
 import { ResultData } from '@/api/interface';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { Download as ElDownload, Upload as ElUpload, View, Hide } from '@element-plus/icons-vue';
 
 import i18n from '@/lang';
@@ -774,11 +774,8 @@ import { getComponentInfo } from '@/api/modules/host';
 import { routerToNameWithQuery } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
 import FileList from '@/components/file-list/index.vue';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
-
-const globalStore = GlobalStore();
+const { currentNode, isAdminOrNodeAdmin, isMobile, lastFilePath, openMenuTabs } = useGlobalStore();
 
 interface FilePaths {
     url: string;
@@ -1166,12 +1163,12 @@ const jump = async (url: string) => {
     let searchResult = await searchFile();
     if (!searchResult.data.path) {
         req.path = oldUrl;
-        globalStore.lastFilePath = req.path;
+        lastFilePath.value = req.path;
         MsgWarning(i18n.global.t('commons.res.notFound'));
         return;
     }
     req.path = searchResult.data.path;
-    globalStore.lastFilePath = req.path;
+    lastFilePath.value = req.path;
     handleSearchResult(searchResult);
     getPaths(req.path);
     updateTab(req.path);
@@ -1411,7 +1408,7 @@ const openPreview = (item: File.File, fileType: string) => {
     filePreview.extension = item.extension;
     filePreview.fileType = fileType;
     filePreview.imageFiles = imageFiles.value;
-    filePreview.currentNode = globalStore.currentNode;
+    filePreview.currentNode = currentNode.value;
 
     previewRef.value.acceptParams(filePreview);
 };
@@ -1621,7 +1618,7 @@ function onLoading(isLoading: boolean) {
 }
 
 const openDownload = (file: File.File) => {
-    downloadFile(file.path, globalStore.currentNode);
+    downloadFile(file.path, currentNode.value);
 };
 
 const fileShareRef = ref<InstanceType<typeof FileShare> | null>(null);
@@ -2091,18 +2088,18 @@ function getInitialPath(): string {
     if (routePath && typeof routePath === 'string') {
         const p = routePath.trim();
         if (p !== '') {
-            globalStore.lastFilePath = p;
+            lastFilePath.value = p;
             return p;
         }
     }
     const tab = editableTabs.value.find((t) => t.id === editableTabsKey.value);
     if (tab && typeof tab.path === 'string' && tab.path.trim() !== '') {
         const p = tab.path.trim();
-        globalStore.lastFilePath = p;
+        lastFilePath.value = p;
         return p;
     }
-    if (typeof globalStore.lastFilePath === 'string' && globalStore.lastFilePath.trim() !== '') {
-        return globalStore.lastFilePath;
+    if (typeof lastFilePath.value === 'string' && lastFilePath.value.trim() !== '') {
+        return lastFilePath.value;
     }
 
     return '/';
@@ -2193,7 +2190,7 @@ const changeTab = (targetPath: TabPaneName) => {
     saveStorageTabs();
     saveStorageTabsKey();
     req.path = current ? current.path : '';
-    globalStore.lastFilePath = req.path;
+    lastFilePath.value = req.path;
     getPaths(req.path);
     search();
 };
@@ -2218,7 +2215,7 @@ const removeTab = (targetId: TabPaneName) => {
 };
 
 const checkFFmpeg = () => {
-    getComponentInfo('ffmpeg', globalStore.currentNode).then((res) => {
+    getComponentInfo('ffmpeg', currentNode.value).then((res) => {
         ffmpegExist.value = res.data.exists ?? false;
     });
 };
@@ -2226,7 +2223,7 @@ const checkFFmpeg = () => {
 const updateHeight = () => {
     const el = fileTableRef.value;
     if (!el) return;
-    let tabHeight = globalStore.openMenuTabs ? 40 : -4;
+    let tabHeight = openMenuTabs.value ? 40 : -4;
     const half = (el.offsetHeight + tabHeight) / 2;
     dropdownMaxHeight.value = Math.max(half, 300);
 };

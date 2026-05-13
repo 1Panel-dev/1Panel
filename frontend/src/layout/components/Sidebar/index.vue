@@ -35,14 +35,15 @@ import Logo from './components/Logo.vue';
 import Collapse from './components/Collapse.vue';
 import SubItem from './components/SubItem.vue';
 import { menuList } from '@/routers/router';
-import { GlobalStore, MenuStore } from '@/store';
+import { MenuStore } from '@/store';
 import { getSettingBaseInfo } from '@/api/modules/setting';
 import PrimaryMenu from '@/assets/images/menu-bg.svg?component';
 import { hasPermission, hasRouteRoleAccess } from '@/utils/rbac';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const route = useRoute();
 const menuStore = MenuStore();
-const globalStore = GlobalStore();
+const { currentNode, isAdmin, isEE, isIntl, permissions } = useGlobalStore();
 const version = ref();
 
 const activeMenu = computed(() => {
@@ -122,7 +123,7 @@ function setFallbackMenuListIfEmpty() {
 }
 
 function allowMenuItem(item: RouteRecordRaw) {
-    if (globalStore.isAdmin) {
+    if (isAdmin.value) {
         return true;
     }
     if (!hasRouteRoleAccess(item.meta)) {
@@ -199,7 +200,7 @@ function buildVisibleMenu(menu: RouteRecordRaw, showSet: Set<string>): RouteReco
 
     const visibleChildren = children
         .map((item) => {
-            if (item.name === 'Upage' && (globalStore.isIntl || globalStore.isEE())) {
+            if (item.name === 'Upage' && (isIntl.value || isEE.value)) {
                 return null;
             }
             return buildVisibleMenu(item, showSet);
@@ -277,13 +278,13 @@ function adjustAndCleanMenu(menuItem, list) {
 
 onMounted(() => {
     if (!menuStore.menuList || menuStore.menuList.length === 0) {
-        menuStore.setMenuList(globalStore.isAdmin ? menuList : buildAuthVisibleMenuList(menuList));
+        menuStore.setMenuList(isAdmin.value ? menuList : buildAuthVisibleMenuList(menuList));
     }
     search();
 });
 
 watch(
-    () => [globalStore.currentNode, globalStore.permissions.join('|')],
+    () => [currentNode.value, permissions.value.join('|')],
     () => {
         search();
     },

@@ -20,7 +20,7 @@
                     <template #reference>
                         <el-button
                             class="h-button-setting"
-                            :disabled="!globalStore.isAdminOrNodeAdmin"
+                            :disabled="!isAdminOrNodeAdmin"
                             link
                             icon="Setting"
                         ></el-button>
@@ -150,7 +150,7 @@ import { jumpToInstall } from '@/utils/app';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
+const { isMobile, isAdminOrNodeAdmin } = useGlobalStore();
 let loading = ref(false);
 let apps = ref([]);
 const options = ref([]);

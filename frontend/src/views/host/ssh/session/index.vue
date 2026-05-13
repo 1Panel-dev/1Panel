@@ -29,9 +29,9 @@ import { ref, onMounted, onUnmounted, reactive } from 'vue';
 import i18n from '@/lang';
 import { stopProcess } from '@/api/modules/process';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { checkStreamAuth } from '@/utils/stream-auth';
-const globalStore = GlobalStore();
+const { currentNode: globalCurrentNode } = useGlobalStore();
 
 const sshSearch = reactive({
     type: 'ssh',
@@ -89,7 +89,7 @@ const initProcess = async () => {
     let href = window.location.href;
     let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     let ipLocal = href.split('//')[1].split('/')[0];
-    let currentNode = globalStore.currentNode;
+    let currentNode = globalCurrentNode.value;
     const url = `${protocol}://${ipLocal}/api/v2/process/ws?operateNode=${currentNode}`;
     const authError = await checkStreamAuth(url, currentNode);
     if (token !== initProcessToken) {

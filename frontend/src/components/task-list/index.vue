@@ -55,8 +55,8 @@ import { searchTasks } from '@/api/modules/log';
 import { reactive, ref } from 'vue';
 import { Log } from '@/api/interface/log';
 import bus from '@/global/bus';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { currentNode } = useGlobalStore();
 
 const open = ref(false);
 const handleClose = () => {
@@ -101,7 +101,7 @@ const openTaskLog = (row: Log.Task) => {
 };
 
 const acceptParams = () => {
-    targeNode.value = globalStore.currentNode;
+    targeNode.value = currentNode.value;
     search();
     open.value = true;
 };
