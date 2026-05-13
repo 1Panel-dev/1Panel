@@ -41,27 +41,23 @@ export const toPermissionList = (value: PermissionBindingValue) => {
     return routePermission ? [routePermission] : [];
 };
 
-export const hasManagePermissionAccess = (value?: PermissionBindingValue) => {
+const hasPermissionAccessByMode = (mode: PermissionMode, value?: PermissionBindingValue) => {
     const globalStore = GlobalStore();
-    if (globalStore.isAdmin || globalStore.isNodeAdmin) {
-        return true;
-    }
-    const permissions = toPermissionList(value).map(toManagePermission).filter(Boolean);
-    if (permissions.length === 0) {
-        return false;
-    }
-    return permissions.every((permission) => globalStore.hasPermission(permission));
-};
-
-export const hasPermissionAccess = (value?: PermissionBindingValue) => {
-    const globalStore = GlobalStore();
-
     if (globalStore.isAdmin || globalStore.isNodeAdmin) {
         return true;
     }
     const permissions = toPermissionList(value);
-    if (permissions.length === 0) {
+    const normalizedPermissions = mode === 'manage' ? permissions.map(toManagePermission).filter(Boolean) : permissions;
+    if (normalizedPermissions.length === 0) {
         return false;
     }
-    return permissions.every((permission) => globalStore.hasPermission(permission));
+    return normalizedPermissions.every((permission) => globalStore.hasPermission(permission));
+};
+
+export const hasManagePermissionAccess = (value?: PermissionBindingValue) => {
+    return hasPermissionAccessByMode('manage', value);
+};
+
+export const hasPermissionAccess = (value?: PermissionBindingValue) => {
+    return hasPermissionAccessByMode('view', value);
 };
