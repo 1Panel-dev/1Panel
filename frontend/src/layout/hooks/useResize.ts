@@ -9,9 +9,8 @@ const WIDTH = 600;
 /** 根据大小变化重新布局 */
 export default () => {
     const route = useRoute();
-    const { globalStore } = useGlobalStore();
+    const { globalStore, isMobile } = useGlobalStore();
     const menuStore = MenuStore();
-    const { isMobile } = useGlobalStore();
     const _isMobile = () => {
         const rect = document.body.getBoundingClientRect();
         return rect.width - 1 < WIDTH;

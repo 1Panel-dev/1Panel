@@ -39,7 +39,7 @@ const buttons = computed(() => {
                   },
               ]
             : []),
-        ...(isOffline.value || !isAdmin.value
+        ...((isOffline.value && !isEnterprise.value) || (isEnterprise.value && !isAdmin.value)
             ? []
             : [
                   {

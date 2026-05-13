@@ -96,6 +96,7 @@ ErrRolePresetCannotDelete: "系統預設角色，無法刪除"
 ErrRolePresetCannotUpdate: "系統預設角色，無法修改"
 ErrRoleBoundToUser: "角色已被使用者綁定，無法刪除"
 ErrRolePresetCannotBind: "系統預設角色，無法分配給使用者"
+ErrNodeAdminMasterForbidden: "主節點不允許新增節點管理員權限"
 ErrSuperAdminCannotDelete: "超級管理員使用者無法刪除"
 
 InvalidRequestBodyType: "請求內容格式錯誤，請檢查請求內容是否符合格式要求後重試！"

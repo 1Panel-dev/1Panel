@@ -96,6 +96,7 @@ ErrRolePresetCannotDelete: "시스템 기본 역할은 삭제할 수 없습니�
 ErrRolePresetCannotUpdate: "시스템 기본 역할은 수정할 수 없습니다"
 ErrRoleBoundToUser: "이 역할은 이미 사용자에게 연결되어 있어 삭제할 수 없습니다"
 ErrRolePresetCannotBind: "시스템 기본 역할은 사용자에게 할당할 수 없습니다"
+ErrNodeAdminMasterForbidden: "마스터 노드에는 노드 관리자 권한을 추가할 수 없습니다"
 ErrSuperAdminCannotDelete: "슈퍼 관리자 사용자는 삭제할 수 없습니다"
 
 InvalidRequestBodyType: "요청 본문 형식이 잘못되었습니다. 내용이 형식 요구 사항을 충족하는지 확인한 후 다시 시도하세요"

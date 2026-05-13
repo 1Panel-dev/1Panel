@@ -96,6 +96,7 @@ ErrRolePresetCannotDelete: "Funções predefinidas do sistema não podem ser exc
 ErrRolePresetCannotUpdate: "Funções predefinidas do sistema não podem ser atualizadas"
 ErrRoleBoundToUser: "Esta função já está vinculada a usuários e não pode ser excluída"
 ErrRolePresetCannotBind: "Funções predefinidas do sistema não podem ser atribuídas a usuários"
+ErrNodeAdminMasterForbidden: "Permissões de administrador de nó não podem ser adicionadas ao nó principal"
 ErrSuperAdminCannotDelete: "Usuários superadministradores não podem ser excluídos"
 
 InvalidRequestBodyType: "Formato do corpo da requisição inválido. Verifique se o conteúdo está no formato correto e tente novamente"

@@ -91,6 +91,7 @@ ErrRolePresetCannotDelete: "Peranan pratetap sistem tidak boleh dipadam"
 ErrRolePresetCannotUpdate: "Peranan pratetap sistem tidak boleh dikemas kini"
 ErrRoleBoundToUser: "Peranan ini sudah terikat kepada pengguna dan tidak boleh dipadam"
 ErrRolePresetCannotBind: "Peranan pratetap sistem tidak boleh diberikan kepada pengguna"
+ErrNodeAdminMasterForbidden: "Kebenaran Pentadbir Nod tidak boleh ditambah pada nod utama"
 ErrSuperAdminCannotDelete: "Pengguna super admin tidak boleh dipadam"
 
 InvalidRequestBodyType: "Format badan permintaan tidak sah, sila periksa dan pastikan kandungan memenuhi format yang diperlukan sebelum mencuba semula"

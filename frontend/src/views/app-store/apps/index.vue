@@ -7,7 +7,13 @@
             </template>
             <template #leftToolBar>
                 <el-button v-permission @click="sync" type="primary" plain :disabled="syncing">
-                    <span>{{ syncCustomAppstore || isOffline ? $t('app.syncCustomApp') : $t('app.syncAppList') }}</span>
+                    <span>
+                        {{
+                            syncCustomAppstore || (isOffline && !isEnterprise)
+                                ? $t('app.syncCustomApp')
+                                : $t('app.syncAppList')
+                        }}
+                    </span>
                 </el-button>
                 <el-button v-permission @click="syncLocal" type="primary" plain :disabled="syncing" class="ml-2">
                     {{ $t('app.syncLocalApp') }}
@@ -85,7 +91,7 @@ import AppCard from '@/views/app-store/apps/app/index.vue';
 import MainDiv from '@/components/main-div/index.vue';
 import { jumpToInstall } from '@/utils/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isProductPro, isOffline, isMobile } = useGlobalStore();
+const { isProductPro, isOffline, isMobile, isEnterprise } = useGlobalStore();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'app-page-size',
@@ -176,7 +182,7 @@ const sync = async () => {
     };
     try {
         let res;
-        if (isOffline.value || (isProductPro.value && syncCustomAppstore.value)) {
+        if ((isOffline.value && !isEnterprise.value) || (isProductPro.value && syncCustomAppstore.value)) {
             res = await syncCutomAppStore(syncReq);
         } else {
             res = await syncApp(syncReq);
