@@ -143,7 +143,7 @@ const treeData = reactive({
 
 const removeUpage = (data: any): any => {
     return data
-        .filter((item: { label: string }) => item.label !== 'Upage')
+        .filter((item: { label: string }) => item.label !== 'Upage' && item.label !== 'XApp')
         .map((item: { children: any }) => {
             if (Array.isArray(item.children)) {
                 item.children = removeUpage(item.children);
