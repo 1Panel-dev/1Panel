@@ -4465,6 +4465,15 @@ const message = {
             nodeUpgrade: 'Configuración de Actualización',
             nodeUpgradeHelper:
                 'Los nodos seleccionados comenzarán a actualizarse automáticamente después de que se complete la actualización del nodo maestro, sin necesidad de operación manual.',
+            nodeUpgradeAuto: 'Actualización Automática',
+            nodeUpgradePackageManage: 'Gestión de Paquetes de Actualización',
+            nodeUpgradePackageClean: 'Limpiar',
+            nodeUpgradePackageFormatHelper:
+                'Solo se admiten paquetes de instalación `1panel-agent_v*_*` o `1panel-v*-linux-*`',
+            nodeUpgradePackageHostConfirm: 'Se seleccionará el archivo del servidor {0}. ¿Continuar?',
+            nodeUpgradePackageCleanHelper: 'Se limpiarán todos los paquetes de actualización de versiones anteriores. ¿Continuar?',
+            nodeUpgradeOfflinePackageHelper:
+                'En entornos sin conexión, los nodos con arquitecturas diferentes deben subir primero el paquete de actualización correspondiente.',
             nodeUnhealthy: 'Estado del nodo anómalo',
             deletedNode: 'El nodo eliminado {0} no soporta operaciones de actualización.',
             nodeUnhealthyHelper:
