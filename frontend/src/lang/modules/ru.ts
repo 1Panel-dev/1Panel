@@ -4530,6 +4530,15 @@ const message = {
             nodeUpgrade: 'Настройки Обновления',
             nodeUpgradeHelper:
                 'Выбранные узлы автоматически начнут обновляться после завершения обновления основного узла, ручное вмешательство не требуется.',
+            nodeUpgradeAuto: 'Автообновление',
+            nodeUpgradePackageManage: 'Управление Пакетами Обновления',
+            nodeUpgradePackageClean: 'Очистить',
+            nodeUpgradePackageFormatHelper:
+                'Поддерживаются только установочные пакеты `1panel-agent_v*_*` или `1panel-v*-linux-*`',
+            nodeUpgradePackageHostConfirm: 'Будет выбран файл сервера {0}. Продолжить?',
+            nodeUpgradePackageCleanHelper: 'Все пакеты обновления более ранних версий будут очищены. Продолжить?',
+            nodeUpgradeOfflinePackageHelper:
+                'В автономной среде для узлов с другой архитектурой сначала загрузите соответствующий пакет обновления.',
             nodeUnhealthy: 'Некорректное состояние узла',
             deletedNode: 'Удалённый узел {0} в настоящее время не поддерживает операции обновления!',
             nodeUnhealthyHelper:

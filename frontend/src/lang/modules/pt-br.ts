@@ -4679,6 +4679,15 @@ const message = {
             nodeUpgrade: 'Configurações de Atualização',
             nodeUpgradeHelper:
                 'Os nós selecionados começarão a atualizar automaticamente após a conclusão da atualização do nó mestre, nenhuma operação manual necessária.',
+            nodeUpgradeAuto: 'Atualização Automática',
+            nodeUpgradePackageManage: 'Gerenciamento de Pacotes de Atualização',
+            nodeUpgradePackageClean: 'Limpar',
+            nodeUpgradePackageFormatHelper:
+                'Somente pacotes de instalação `1panel-agent_v*_*` ou `1panel-v*-linux-*` são suportados',
+            nodeUpgradePackageHostConfirm: 'O arquivo do servidor {0} será selecionado. Continuar?',
+            nodeUpgradePackageCleanHelper: 'Todos os pacotes de atualização de versões anteriores serão limpos. Continuar?',
+            nodeUpgradeOfflinePackageHelper:
+                'Em ambientes offline, nós com arquiteturas diferentes devem enviar o pacote de atualização correspondente antes de atualizar.',
             nodeUnhealthy: 'Estado do nó anormal',
             deletedNode: 'O nó excluído {0} não suporta atualmente operações de atualização!',
             nodeUnhealthyHelper:

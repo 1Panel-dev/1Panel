@@ -4526,6 +4526,15 @@ const message = {
             nodeUpgrade: 'Güncelleme Ayarları',
             nodeUpgradeHelper:
                 'Seçilen düğümler, ana düğüm yükseltmesi tamamlandıktan sonra otomatik olarak yükseltmeye başlayacaktır, manuel işlem gerekmez.',
+            nodeUpgradeAuto: 'Otomatik Güncelleme',
+            nodeUpgradePackageManage: 'Güncelleme Paketi Yönetimi',
+            nodeUpgradePackageClean: 'Temizle',
+            nodeUpgradePackageFormatHelper:
+                'Yalnızca `1panel-agent_v*_*` veya `1panel-v*-linux-*` kurulum paketleri desteklenir',
+            nodeUpgradePackageHostConfirm: 'Sunucu dosyası {0} seçilecek. Devam edilsin mi?',
+            nodeUpgradePackageCleanHelper: 'Tüm düşük sürüm güncelleme paketleri temizlenecek. Devam edilsin mi?',
+            nodeUpgradeOfflinePackageHelper:
+                'Çevrimdışı ortamlarda, farklı mimarideki düğümler güncellenmeden önce eşleşen güncelleme paketi yüklenmelidir.',
             nodeUnhealthy: 'Düğüm durumu anormal',
             deletedNode: 'Silinmiş düğüm {0} şu anda yükseltme işlemlerini desteklemiyor!',
             nodeUnhealthyHelper:
