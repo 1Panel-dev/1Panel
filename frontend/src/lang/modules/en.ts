@@ -4451,6 +4451,15 @@ const message = {
             nodeUpgrade: 'Update Settings',
             nodeUpgradeHelper:
                 'Selected nodes will automatically start upgrading after the master node upgrade is completed, no manual operation required.',
+            nodeUpgradeAuto: 'Auto Update',
+            nodeUpgradePackageManage: 'Update Package Management',
+            nodeUpgradePackageClean: 'Clean',
+            nodeUpgradePackageFormatHelper:
+                'Only `1panel-agent_v*_*` or `1panel-v*-linux-*` installation packages are supported',
+            nodeUpgradePackageHostConfirm: 'The server file {0} will be selected. Continue?',
+            nodeUpgradePackageCleanHelper: 'All lower-version update packages will be cleaned. Continue?',
+            nodeUpgradeOfflinePackageHelper:
+                'In offline environments, nodes with different architectures must upload the matching update package before updating.',
             nodeUnhealthy: 'Node status abnormal',
             deletedNode: 'Deleted node {0} does not currently support upgrade operations!',
             nodeUnhealthyHelper: 'Abnormal node status detected. Please check in [Node Management] and try again!',
