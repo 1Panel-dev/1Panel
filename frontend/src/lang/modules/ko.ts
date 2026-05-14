@@ -4350,6 +4350,15 @@ const message = {
             nodeUpgrade: '업데이트 설정',
             nodeUpgradeHelper:
                 '선택된 노드는 마스터 노드 업그레이드 완료 후 자동으로 업그레이드를 시작하며 수동 작업이 필요하지 않습니다.',
+            nodeUpgradeAuto: '자동 업데이트',
+            nodeUpgradePackageManage: '업데이트 패키지 관리',
+            nodeUpgradePackageClean: '정리',
+            nodeUpgradePackageFormatHelper:
+                '`1panel-agent_v*_*` 또는 `1panel-v*-linux-*` 설치 패키지만 지원됩니다',
+            nodeUpgradePackageHostConfirm: '서버 파일 {0}을(를) 선택합니다. 계속하시겠습니까?',
+            nodeUpgradePackageCleanHelper: '모든 낮은 버전의 업데이트 패키지를 정리합니다. 계속하시겠습니까?',
+            nodeUpgradeOfflinePackageHelper:
+                '오프라인 환경에서는 다른 아키텍처의 노드를 업데이트하기 전에 해당 업데이트 패키지를 먼저 업로드해야 합니다.',
             nodeUnhealthy: '노드 상태 이상',
             deletedNode: '삭제된 노드 {0}은(는) 현재 업그레이드 작업을 지원하지 않습니다!',
             nodeUnhealthyHelper: '노드 상태 이상이 감지되었습니다. [노드 관리]에서 확인 후 다시 시도하세요!',

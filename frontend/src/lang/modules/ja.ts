@@ -4449,6 +4449,15 @@ const message = {
             nodeUpgrade: '更新設定',
             nodeUpgradeHelper:
                 '選択したノードは、マスターノードのアップグレード完了後に自動的にアップグレードを開始し、手動操作は不要です。',
+            nodeUpgradeAuto: '自動更新',
+            nodeUpgradePackageManage: '更新パッケージ管理',
+            nodeUpgradePackageClean: 'クリーンアップ',
+            nodeUpgradePackageFormatHelper:
+                '`1panel-agent_v*_*` または `1panel-v*-linux-*` のインストールパッケージのみ対応しています',
+            nodeUpgradePackageHostConfirm: 'サーバーファイル {0} を選択します。続行しますか？',
+            nodeUpgradePackageCleanHelper: 'すべての低バージョン更新パッケージをクリーンアップします。続行しますか？',
+            nodeUpgradeOfflinePackageHelper:
+                'オフライン環境では、異なるアーキテクチャのノードは対応する更新パッケージを先にアップロードしてから更新してください。',
             nodeUnhealthy: 'ノード状態異常',
             deletedNode: '削除済みノード {0} は現在アップグレード操作をサポートしていません！',
             nodeUnhealthyHelper: 'ノード状態異常を検出しました。[ノード管理]で確認してから再試行してください！',

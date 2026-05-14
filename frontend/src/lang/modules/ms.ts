@@ -4515,6 +4515,15 @@ const message = {
             nodeUpgrade: 'Tetapan Kemas Kini',
             nodeUpgradeHelper:
                 'Nod terpilih akan mula dinaik taraf secara automatik selepas naik taraf nod induk selesai, tiada operasi manual diperlukan.',
+            nodeUpgradeAuto: 'Kemas Kini Automatik',
+            nodeUpgradePackageManage: 'Pengurusan Pakej Kemas Kini',
+            nodeUpgradePackageClean: 'Bersihkan',
+            nodeUpgradePackageFormatHelper:
+                'Hanya pakej pemasangan `1panel-agent_v*_*` atau `1panel-v*-linux-*` disokong',
+            nodeUpgradePackageHostConfirm: 'Fail pelayan {0} akan dipilih. Teruskan?',
+            nodeUpgradePackageCleanHelper: 'Semua pakej kemas kini versi lebih rendah akan dibersihkan. Teruskan?',
+            nodeUpgradeOfflinePackageHelper:
+                'Dalam persekitaran luar talian, nod berbeza seni bina perlu memuat naik pakej kemas kini yang sepadan sebelum dikemas kini.',
             nodeUnhealthy: 'Status nod tidak normal',
             deletedNode: 'Nod {0} yang telah dipadam tidak menyokong operasi naik taraf buat masa ini!',
             nodeUnhealthyHelper: 'Status nod tidak normal dikesan. Sila semak dalam [Pengurusan Nod] dan cuba lagi!',
