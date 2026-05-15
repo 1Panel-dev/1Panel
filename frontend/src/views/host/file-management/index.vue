@@ -711,6 +711,7 @@ import {
     computeDirSize,
     fileWgetKeys,
     getFileContent,
+    checkFile,
     removeFileShare,
     getFilesList,
     setFileRemark,
@@ -1067,8 +1068,58 @@ const handleSearchResult = (res: ResultData<File.File>) => {
     paginationConfig.total = res.data.itemTotal;
     dirNum.value = data.value.filter((item) => item.isDir).length;
     fileNum.value = data.value.filter((item) => !item.isDir).length;
-    req.path = res.data.path;
+    if (res.data.path) {
+        req.path = res.data.path;
+    }
     scheduleRemarkLoad();
+};
+
+const normalizeFilePath = (filePath: string) => {
+    if (!filePath) {
+        return '/';
+    }
+    const normalized = `/${filePath.split('/').filter(Boolean).join('/')}`;
+    return normalized === '' ? '/' : normalized;
+};
+
+const findExistingPath = async (filePath: string) => {
+    const segments = normalizeFilePath(filePath).split('/').filter(Boolean);
+    while (segments.length > 0) {
+        const current = `/${segments.join('/')}`;
+        try {
+            const res = await checkFile(current, false);
+            if (res.data) {
+                return current;
+            }
+        } catch {
+            // ignore check errors
+        }
+        segments.pop();
+    }
+    return '/';
+};
+
+const loadInitialExistingPath = async (url: string) => {
+    const existingPath = await findExistingPath(url);
+    if (existingPath === normalizeFilePath(url)) {
+        return;
+    }
+    const { pageSize: oldPageSize, sortBy: oldSortBy, sortOrder: oldSortOrder, showHidden } = req;
+    Object.assign(req, initData(), {
+        path: existingPath,
+        containSub: false,
+        search: '',
+        pageSize: oldPageSize,
+        sortBy: oldSortBy,
+        sortOrder: oldSortOrder,
+        showHidden,
+    });
+    globalStore.lastFilePath = req.path;
+    getPaths(req.path);
+    updateTab(req.path);
+    paths.value = buildPaths(req.path);
+    resetPaths();
+    MsgWarning(i18n.global.t('commons.res.notFound'));
 };
 
 const viewHideFile = async () => {
@@ -2202,8 +2253,9 @@ function buildPaths(path: string) {
         }, []);
 }
 
-function initHistory() {
-    search();
+async function initHistory() {
+    await loadInitialExistingPath(req.path);
+    await search();
     history.push(req.path);
     pointer = history.length - 1;
 }
@@ -2363,7 +2415,7 @@ onMounted(async () => {
     initShowHidden();
     initTabsAndPaths();
     await getHostMount();
-    initHistory();
+    await initHistory();
     checkFFmpeg();
     await nextTick(function () {
         handlePath();
