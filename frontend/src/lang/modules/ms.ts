@@ -2802,6 +2802,7 @@ const message = {
         licenseUnbindHelper: 'Nod Edisi Komuniti dikesan untuk lesen ini. Sila lepaskan ikatan dan cuba lagi!',
         subscription: 'Langganan',
         perpetual: 'Lesen Perpetual',
+        product: 'Produk',
         versionConstraint: '{0} Pembelian versi',
         forceUnbind: 'Paksakan Nyahikat',
         forceUnbindHelper:
@@ -2838,7 +2839,6 @@ const message = {
         edition: 'Edisi',
         standard: 'Standard',
         enterprise: 'Perusahaan',
-        licenseVersion: 'Versi lesen',
         count: 'Kuantiti lesen',
         serialNo: 'Nombor siri',
         remark: 'Catatan',

@@ -2921,6 +2921,7 @@ const message = {
             'Nós da Edição Comunitária detectados para esta licença. Por favor, desvincule e tente novamente!',
         subscription: 'Assinatura',
         perpetual: 'Licença Perpétua',
+        product: 'Produto',
         versionConstraint: '{0} Compra do versão',
         forceUnbind: 'Forçar Desvinculação',
         forceUnbindHelper:
@@ -2959,7 +2960,6 @@ const message = {
         edition: 'Edição',
         standard: 'Padrão',
         enterprise: 'Enterprise',
-        licenseVersion: 'Versão da licença',
         count: 'Quantidade licenciada',
         serialNo: 'Número de série',
         remark: 'Observação',
@@ -4629,7 +4629,8 @@ const message = {
             nodeUpgradePackageFormatHelper:
                 'Somente pacotes de instalação `1panel-agent_v*_*` ou `1panel-v*-linux-*` são suportados',
             nodeUpgradePackageHostConfirm: 'O arquivo do servidor {0} será selecionado. Continuar?',
-            nodeUpgradePackageCleanHelper: 'Todos os pacotes de atualização de versões anteriores serão limpos. Continuar?',
+            nodeUpgradePackageCleanHelper:
+                'Todos os pacotes de atualização de versões anteriores serão limpos. Continuar?',
             nodeUpgradeOfflinePackageHelper:
                 'Em ambientes offline, nós com arquiteturas diferentes devem enviar o pacote de atualização correspondente antes de atualizar.',
             nodeUnhealthy: 'Estado do nó anormal',

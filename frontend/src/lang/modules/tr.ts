@@ -2789,6 +2789,7 @@ const message = {
             'Bu lisans için Topluluk Sürümü düğümleri tespit edildi. Lütfen bağlamayı kaldırın ve tekrar deneyin!',
         subscription: 'Abonelik',
         perpetual: 'Süresiz',
+        product: 'Ürün',
         versionConstraint: '{0} Sürüm Satın Alma',
         forceUnbind: 'Zorla Bağlantıyı Kaldır',
         forceUnbindHelper:
@@ -2825,7 +2826,6 @@ const message = {
         edition: 'Sürüm',
         standard: 'Standart',
         enterprise: 'Kurumsal',
-        licenseVersion: 'Lisans sürümü',
         count: 'Lisans sayısı',
         serialNo: 'Seri numarası',
         remark: 'Not',
