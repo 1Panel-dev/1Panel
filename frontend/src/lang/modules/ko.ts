@@ -2690,6 +2690,7 @@ const message = {
         licenseUnbindHelper: '이 라이선스에 커뮤니티 에디션 노드가 존재합니다. 바인딩 해제 후 다시 시도하세요!',
         subscription: '구독',
         perpetual: '영구 라이선스',
+        product: '제품',
         versionConstraint: '{0} 버전 일시불 구매',
         forceUnbind: '강제 바인딩 해제',
         forceUnbindHelper:
@@ -2725,7 +2726,6 @@ const message = {
         edition: '에디션',
         standard: '스탠다드',
         enterprise: '엔터프라이즈',
-        licenseVersion: '라이선스 버전',
         count: '허가 수량',
         serialNo: '시리얼 번호',
         remark: '비고',
@@ -4316,8 +4316,7 @@ const message = {
             nodeUpgradeAuto: '자동 업데이트',
             nodeUpgradePackageManage: '업데이트 패키지 관리',
             nodeUpgradePackageClean: '정리',
-            nodeUpgradePackageFormatHelper:
-                '`1panel-agent_v*_*` 또는 `1panel-v*-linux-*` 설치 패키지만 지원됩니다',
+            nodeUpgradePackageFormatHelper: '`1panel-agent_v*_*` 또는 `1panel-v*-linux-*` 설치 패키지만 지원됩니다',
             nodeUpgradePackageHostConfirm: '서버 파일 {0}을(를) 선택합니다. 계속하시겠습니까?',
             nodeUpgradePackageCleanHelper: '모든 낮은 버전의 업데이트 패키지를 정리합니다. 계속하시겠습니까?',
             nodeUpgradeOfflinePackageHelper:

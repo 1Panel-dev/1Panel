@@ -2800,6 +2800,7 @@ const message = {
         licenseUnbindHelper: 'Nodos Community detectados en esta licencia. Desvincule e intente nuevamente.',
         subscription: 'Suscripción',
         perpetual: 'Perpetua',
+        product: 'Producto',
         versionConstraint: '{0} Compra de versión',
         forceUnbind: 'Desvinculación forzada',
         forceUnbindHelper: 'La desvinculación forzada ignorará errores y liberará la licencia.',
@@ -2833,7 +2834,6 @@ const message = {
         edition: 'Edición',
         standard: 'Estándar',
         enterprise: 'Enterprise',
-        licenseVersion: 'Versión de licencia',
         count: 'Cantidad autorizada',
         serialNo: 'Número de serie',
         remark: 'Observación',
@@ -4434,7 +4434,8 @@ const message = {
             nodeUpgradePackageFormatHelper:
                 'Solo se admiten paquetes de instalación `1panel-agent_v*_*` o `1panel-v*-linux-*`',
             nodeUpgradePackageHostConfirm: 'Se seleccionará el archivo del servidor {0}. ¿Continuar?',
-            nodeUpgradePackageCleanHelper: 'Se limpiarán todos los paquetes de actualización de versiones anteriores. ¿Continuar?',
+            nodeUpgradePackageCleanHelper:
+                'Se limpiarán todos los paquetes de actualización de versiones anteriores. ¿Continuar?',
             nodeUpgradeOfflinePackageHelper:
                 'En entornos sin conexión, los nodos con arquitecturas diferentes deben subir primero el paquete de actualización correspondiente.',
             nodeUnhealthy: 'Estado del nodo anómalo',
