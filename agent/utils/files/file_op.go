@@ -32,6 +32,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/mholt/archiver/v4"
 	"github.com/spf13/afero"
+	"golang.org/x/sync/singleflight"
 )
 
 const (
@@ -53,6 +54,11 @@ var protectedPaths = []string{
 	"/sys",
 	"/root",
 }
+
+var (
+	dirSizeGroup   singleflight.Group
+	dirSizeLimiter = make(chan struct{}, 2)
+)
 
 func IsProtected(path string) bool {
 	real, err := filepath.EvalSymlinks(path)
@@ -682,7 +688,24 @@ func (f FileOp) CopyFile(src, dst string) error {
 }
 
 func (f FileOp) GetDirSize(path string) (int64, error) {
-	duCmd := exec.Command("du", "-s", path)
+	cleanPath := filepath.Clean(path)
+	result, err, _ := dirSizeGroup.Do("single:"+cleanPath, func() (interface{}, error) {
+		dirSizeLimiter <- struct{}{}
+		defer func() {
+			<-dirSizeLimiter
+		}()
+		return f.getDirSize(cleanPath)
+	})
+	if err != nil {
+		return 0, err
+	}
+	return result.(int64), nil
+}
+
+func (f FileOp) getDirSize(path string) (int64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), cmdRecursiveTimeout)
+	defer cancel()
+	duCmd := exec.CommandContext(ctx, "du", "-s", path)
 	output, err := duCmd.Output()
 	if err == nil {
 		fields := strings.Fields(string(output))
@@ -693,6 +716,9 @@ func (f FileOp) GetDirSize(path string) (int64, error) {
 				return cmdSize * 1024, nil
 			}
 		}
+	}
+	if ctx.Err() != nil {
+		return 0, ctx.Err()
 	}
 
 	var size int64
@@ -717,12 +743,31 @@ type DirSize struct {
 }
 
 func (f FileOp) GetDepthDirSize(path string) ([]DirSize, error) {
+	cleanPath := filepath.Clean(path)
+	result, err, _ := dirSizeGroup.Do("depth:"+cleanPath, func() (interface{}, error) {
+		dirSizeLimiter <- struct{}{}
+		defer func() {
+			<-dirSizeLimiter
+		}()
+		return f.getDepthDirSize(cleanPath)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.([]DirSize), nil
+}
+
+func (f FileOp) getDepthDirSize(path string) ([]DirSize, error) {
 	var result []DirSize
 	sizeMap := make(map[string]int64)
-	duCmd := exec.Command("du", "-k", "--max-depth=1", "--exclude=proc", path)
+	ctx, cancel := context.WithTimeout(context.Background(), cmdRecursiveTimeout)
+	defer cancel()
+	duCmd := exec.CommandContext(ctx, "du", "-k", "--max-depth=1", "--exclude=proc", path)
 	output, err := duCmd.Output()
 	if err == nil {
 		parseDUOutput(output, sizeMap)
+	} else if ctx.Err() != nil {
+		return nil, ctx.Err()
 	} else {
 		calculateDirSizeFallback(path, sizeMap)
 	}
@@ -743,12 +788,17 @@ func parseDUOutput(output []byte, sizeMap map[string]int64) {
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
-		fields := strings.Fields(line)
-		if len(fields) == 2 {
-			if sizeKB, err := strconv.ParseInt(fields[0], 10, 64); err == nil {
-				dir := fields[1]
-				sizeMap[dir] = sizeKB * 1024
+		sizeText, dir, ok := strings.Cut(strings.TrimSpace(line), "\t")
+		if !ok {
+			fields := strings.Fields(line)
+			if len(fields) < 2 {
+				continue
 			}
+			sizeText = fields[0]
+			dir = strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(line), sizeText))
+		}
+		if sizeKB, err := strconv.ParseInt(strings.TrimSpace(sizeText), 10, 64); err == nil {
+			sizeMap[strings.TrimSpace(dir)] = sizeKB * 1024
 		}
 	}
 }
