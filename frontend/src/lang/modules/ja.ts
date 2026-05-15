@@ -2758,6 +2758,7 @@ const message = {
             'このライセンスにコミュニティ版ノードが存在します。バインドを解除してから再試行してください！',
         subscription: 'サブスクリプション',
         perpetual: '永久ライセンス',
+        product: '製品',
         versionConstraint: '{0} バージョン買い取り',
         forceUnbind: '強制バインド解除',
         forceUnbindHelper:
@@ -2794,7 +2795,6 @@ const message = {
         edition: 'エディション',
         standard: 'Standard',
         enterprise: 'Enterprise',
-        licenseVersion: 'ライセンスバージョン',
         count: '許可数',
         serialNo: 'シリアル番号',
         remark: '備考',

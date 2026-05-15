@@ -2789,6 +2789,7 @@ const message = {
             'Обнаружены узлы Community Edition для этой лицензии. Отвяжите лицензию и повторите попытку!',
         subscription: 'Подписка',
         perpetual: 'Пожизненная лицензия',
+        product: 'Продукт',
         versionConstraint: '{0} Выкуп версии',
         forceUnbind: 'Принудительное отвязывание',
         forceUnbindHelper:
@@ -2826,7 +2827,6 @@ const message = {
         edition: 'Редакция',
         standard: 'Стандарт',
         enterprise: 'Enterprise',
-        licenseVersion: 'Версия лицензии',
         count: 'Количество лицензий',
         serialNo: 'Серийный номер',
         remark: 'Примечание',
