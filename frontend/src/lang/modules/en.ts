@@ -862,13 +862,18 @@ const message = {
             downloader: 'Downloader',
             modelDir: 'Model directory',
             manualDownload: 'Manual Download',
+            modelSource: 'Model source',
             repoID: 'Repository ID',
+            modelScopeEndpoint: 'ModelScope endpoint',
+            modelScopeToken: 'ModelScope Token (optional)',
             hfToken: 'HF Token (optional)',
             hfEndpoint: 'HuggingFace acceleration endpoint',
             hfEndpointHelper:
                 'Configure an acceleration endpoint when HuggingFace access is unstable. Search, details, and downloads will use it.',
+            searchModelScope: 'Search ModelScope',
             searchHuggingFace: 'Search HuggingFace',
             sortTrending: 'Trending',
+            sortLikes: 'Most liked',
             sortDownloads: 'Most downloaded',
             sortUpdated: 'Recently updated',
             sortCreated: 'Newest',
@@ -2610,6 +2615,8 @@ const message = {
         app: 'Upgrade to Pro to view service details, anomaly monitoring, and more in the mobile app.',
         cluster: 'Upgrade to Pro Edition to manage MySQL/Postgres/Redis primary-replica clusters.',
         vllm: 'Upgrade to Pro Edition to manage vLLM services in 1Panel with centralized deployment, configuration, lifecycle operations, and task tracking.',
+        'model-downloader':
+            'Upgrade to Pro Edition to search, download, and manage local model files from HuggingFace, ModelScope, or compatible mirrors with centralized model directories and download tasks.',
     },
     clean: {
         scan: 'Start scanning',
@@ -4188,6 +4195,18 @@ const message = {
             vllmTitle4: 'Controlled Configuration',
             vllmContent4:
                 'Standardize ports, containers, startup commands, and Compose settings through advanced options for easier delivery and later adjustments.',
+            modelDownloaderTitle1: 'Model Discovery',
+            modelDownloaderContent1:
+                'Search HuggingFace model repositories directly and view downloads, likes, model details, and file lists.',
+            modelDownloaderTitle2: 'Accelerated Downloads',
+            modelDownloaderContent2:
+                'Configure a HuggingFace acceleration endpoint and HF Token for the official site, mirrors, and private models.',
+            modelDownloaderTitle3: 'Task Tracking',
+            modelDownloaderContent3:
+                'Review download queues, task status, progress, and errors, with support for canceling, retrying, and clearing records.',
+            modelDownloaderTitle4: 'Local Management',
+            modelDownloaderContent4:
+                'Manage local model directories in one place, including paths, sizes, timestamps, and deleting unused model files.',
         },
         node: {
             master: 'Main Node',

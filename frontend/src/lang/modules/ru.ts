@@ -865,13 +865,18 @@ const message = {
             downloader: 'Загрузчик',
             modelDir: 'Каталог модели',
             manualDownload: 'Ручная загрузка',
+            modelSource: 'Источник модели',
             repoID: 'ID репозитория',
+            modelScopeEndpoint: 'Endpoint ModelScope',
+            modelScopeToken: 'ModelScope Token (необязательно)',
             hfToken: 'HF Token (необязательно)',
             hfEndpoint: 'Endpoint ускорения HuggingFace',
             hfEndpointHelper:
                 'Настройте endpoint ускорения, если доступ к HuggingFace нестабилен. Он будет использоваться для поиска, деталей и загрузок.',
+            searchModelScope: 'Поиск в ModelScope',
             searchHuggingFace: 'Поиск в HuggingFace',
             sortTrending: 'Популярное',
+            sortLikes: 'Больше всего лайков',
             sortDownloads: 'Больше всего загрузок',
             sortUpdated: 'Недавно обновлено',
             sortCreated: 'Недавно создано',
@@ -2657,6 +2662,8 @@ const message = {
         app: 'Обновите до профессиональной версии, чтобы просматривать информацию о сервисах, мониторинг аномалий и т.д. через мобильное приложение.',
         cluster:
             'Обновление до профессиональной версии позволяет управлять кластерами мастер-слейв MySQL/Postgres/Redis.',
+        'model-downloader':
+            'Обновите до Pro, чтобы искать, загружать и управлять локальными файлами моделей из HuggingFace, ModelScope или совместимых зеркал, централизованно управляя каталогами моделей и задачами загрузки.',
         exceptionalHelper:
             'Проверка синхронизации лицензии выполнена с ошибкой. Нажмите синхронизацию вручную для корректной работы Pro. Детали: ',
         tamperHelper: 'Операция не выполнена: для файла или папки включена защита от изменений. Проверьте и повторите!',
@@ -4252,6 +4259,18 @@ const message = {
             clusterTitle3: 'Состояние репликации',
             clusterContent3:
                 'Отображает состояние репликации мастер-слейв и информацию о задержке, помогая в устранении проблем синхронизации',
+            modelDownloaderTitle1: 'Поиск моделей',
+            modelDownloaderContent1:
+                'Ищите репозитории моделей HuggingFace напрямую и просматривайте загрузки, лайки, сведения о модели и список файлов.',
+            modelDownloaderTitle2: 'Ускоренные загрузки',
+            modelDownloaderContent2:
+                'Настройте endpoint ускорения HuggingFace и HF Token для официального сайта, зеркал и приватных моделей.',
+            modelDownloaderTitle3: 'Отслеживание задач',
+            modelDownloaderContent3:
+                'Просматривайте очередь загрузок, статус, прогресс и ошибки, отменяйте, повторяйте и очищайте записи.',
+            modelDownloaderTitle4: 'Локальное управление',
+            modelDownloaderContent4:
+                'Управляйте локальными каталогами моделей в одном месте: пути, размеры, время и удаление неиспользуемых файлов моделей.',
         },
         node: {
             master: 'Главный узел',

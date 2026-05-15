@@ -873,13 +873,18 @@ const message = {
             downloader: 'İndirici',
             modelDir: 'Model dizini',
             manualDownload: 'Manuel indirme',
+            modelSource: 'Model kaynağı',
             repoID: 'Depo ID',
+            modelScopeEndpoint: 'ModelScope endpointi',
+            modelScopeToken: 'ModelScope Token (isteğe bağlı)',
             hfToken: 'HF Token (isteğe bağlı)',
             hfEndpoint: 'HuggingFace hızlandırma endpointi',
             hfEndpointHelper:
                 'HuggingFace erişimi kararsız olduğunda bir hızlandırma endpointi yapılandırın. Arama, ayrıntılar ve indirmeler bunu kullanır.',
+            searchModelScope: 'ModelScope ara',
             searchHuggingFace: 'HuggingFace ara',
             sortTrending: 'Popüler trendler',
+            sortLikes: 'En çok beğenilen',
             sortDownloads: 'En çok indirilenler',
             sortUpdated: 'Son güncellenenler',
             sortCreated: 'Yeni oluşturulanlar',
@@ -2663,6 +2668,8 @@ const message = {
         fileExchange: 'Pro Sürüme yükselterek birden fazla sunucu arasında dosyaları hızlıca aktarabilirsiniz.',
         app: 'Pro sürüme yükselterek mobil uygulamada hizmet bilgilerini ve anormallik izlemeyi görüntüleyebilirsiniz.',
         cluster: 'Pro Sürüme yükselterek MySQL/Postgres/Redis birincil-kopya kümelerini yönetebilirsiniz.',
+        'model-downloader':
+            'Pro sürümüne yükselterek HuggingFace, ModelScope veya uyumlu aynalardan yerel model dosyalarını arayabilir, indirebilir ve yönetebilir; model dizinlerini ve indirme görevlerini merkezi olarak takip edebilirsiniz.',
     },
     clean: {
         scan: 'Taramayı başlat',
@@ -4251,6 +4258,18 @@ const message = {
             clusterTitle3: 'Çoğaltma Durumu',
             clusterContent3:
                 'Ana-çalışan çoğaltma durumunu ve gecikme bilgilerini görüntüleyerek senkronizasyon sorunlarını gidermeye yardımcı olur',
+            modelDownloaderTitle1: 'Model Keşfi',
+            modelDownloaderContent1:
+                'HuggingFace model depolarını doğrudan arayın; indirme sayısı, beğeni, model ayrıntıları ve dosya listesini görüntüleyin.',
+            modelDownloaderTitle2: 'Hızlandırılmış İndirme',
+            modelDownloaderContent2:
+                'Resmi site, aynalar ve özel modeller için HuggingFace hızlandırma endpointi ve HF Token yapılandırın.',
+            modelDownloaderTitle3: 'Görev Takibi',
+            modelDownloaderContent3:
+                'İndirme kuyruğunu, görev durumunu, ilerlemeyi ve hataları görüntüleyin; iptal, yeniden deneme ve kayıt temizlemeyi destekler.',
+            modelDownloaderTitle4: 'Yerel Yönetim',
+            modelDownloaderContent4:
+                'Yerel model dizinlerini tek yerden yönetin; yolları, boyutları, zamanları görüntüleyin ve kullanılmayan model dosyalarını silin.',
         },
         node: {
             master: 'Ana Düğüm',
