@@ -875,13 +875,18 @@ const message = {
             downloader: 'Pemuat Turun',
             modelDir: 'Direktori Model',
             manualDownload: 'Muat Turun Manual',
+            modelSource: 'Sumber model',
             repoID: 'ID Repositori',
+            modelScopeEndpoint: 'Endpoint ModelScope',
+            modelScopeToken: 'Token ModelScope (pilihan)',
             hfToken: 'HF Token (pilihan)',
             hfEndpoint: 'Titik akhir pecutan HuggingFace',
             hfEndpointHelper:
                 'Konfigurasikan titik akhir pecutan apabila akses HuggingFace tidak stabil. Carian, butiran dan muat turun akan menggunakannya.',
+            searchModelScope: 'Cari ModelScope',
             searchHuggingFace: 'Cari HuggingFace',
             sortTrending: 'Trend popular',
+            sortLikes: 'Paling disukai',
             sortDownloads: 'Paling banyak dimuat turun',
             sortUpdated: 'Dikemas kini baru-baru ini',
             sortCreated: 'Terbaru dibuat',
@@ -2673,6 +2678,8 @@ const message = {
         fileExchange: 'Naik taraf ke Edisi Pro untuk memindahkan fail dengan pantas antara pelayan.',
         app: 'Naik taraf ke Edisi Pro untuk melihat maklumat perkhidmatan dan pemantauan anomali dalam aplikasi mudah alih.',
         cluster: 'Naik taraf ke Edisi Pro untuk mengurus kelompok utama-replika MySQL/Postgres/Redis.',
+        'model-downloader':
+            'Naik taraf kepada edisi Pro untuk mencari, memuat turun dan mengurus fail model tempatan daripada HuggingFace, ModelScope atau cermin serasi, dengan direktori model dan tugasan muat turun berpusat.',
         exceptionalHelper:
             'Pengesahan penyegerakan lesen tidak normal. Klik butang sync secara manual untuk pastikan fungsi Pro berjalan baik. butiran: ',
         tamperHelper: 'Operasi gagal, fail atau folder mempunyai perlindungan gangguan. Sila semak dan cuba lagi!',
@@ -4258,6 +4265,18 @@ const message = {
             clusterTitle3: 'Status Replikasi',
             clusterContent3:
                 'Memaparkan status replikasi utama-hamba dan maklumat kelewatan, membantu menyelesaikan masalah sinkronisasi',
+            modelDownloaderTitle1: 'Penemuan Model',
+            modelDownloaderContent1:
+                'Cari repositori model HuggingFace secara langsung dan lihat muat turun, suka, butiran model dan senarai fail.',
+            modelDownloaderTitle2: 'Muat Turun Dipercepat',
+            modelDownloaderContent2:
+                'Konfigurasikan titik akhir pecutan HuggingFace dan HF Token untuk laman rasmi, cermin dan model persendirian.',
+            modelDownloaderTitle3: 'Penjejakan Tugas',
+            modelDownloaderContent3:
+                'Semak baris gilir muat turun, status tugas, kemajuan dan ralat, dengan sokongan batal, cuba semula dan bersihkan rekod.',
+            modelDownloaderTitle4: 'Pengurusan Tempatan',
+            modelDownloaderContent4:
+                'Urus direktori model tempatan di satu tempat, termasuk laluan, saiz, masa dan pemadaman fail model yang tidak digunakan.',
         },
         node: {
             master: 'Nod Utama',

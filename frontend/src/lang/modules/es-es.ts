@@ -875,13 +875,18 @@ const message = {
             downloader: 'Descargador',
             modelDir: 'Directorio del modelo',
             manualDownload: 'Descarga manual',
+            modelSource: 'Fuente del modelo',
             repoID: 'ID del repositorio',
+            modelScopeEndpoint: 'Endpoint de ModelScope',
+            modelScopeToken: 'Token de ModelScope (opcional)',
             hfToken: 'HF Token (opcional)',
             hfEndpoint: 'Endpoint de aceleración de HuggingFace',
             hfEndpointHelper:
                 'Configure un endpoint de aceleración cuando el acceso a HuggingFace sea inestable. La búsqueda, los detalles y las descargas lo utilizarán.',
+            searchModelScope: 'Buscar en ModelScope',
             searchHuggingFace: 'Buscar en HuggingFace',
             sortTrending: 'Tendencias',
+            sortLikes: 'Más valorados',
             sortDownloads: 'Más descargados',
             sortUpdated: 'Actualizados recientemente',
             sortCreated: 'Más recientes',
@@ -2670,6 +2675,8 @@ const message = {
         fileExchange: 'Pro permite transferir archivos entre varios servidores.',
         app: 'Pro permite ver información de servicio, monitoreo, etc. vía app móvil.',
         cluster: 'Actualizar a la edición Pro permite gestionar clústeres primario-réplica de MySQL/Postgres/Redis.',
+        'model-downloader':
+            'Actualiza a la edición Pro para buscar, descargar y gestionar archivos de modelos locales desde HuggingFace, ModelScope o espejos compatibles, con directorios de modelos y tareas de descarga centralizados.',
         offLine: 'Sin conexión',
     },
     clean: {
@@ -4209,6 +4216,18 @@ const message = {
             clusterTitle3: 'Estado de Replicación',
             clusterContent3:
                 'Muestra estado de replicación maestro-esclavo y retrasos, ayudando a diagnosticar problemas de sincronización',
+            modelDownloaderTitle1: 'Descubrimiento de modelos',
+            modelDownloaderContent1:
+                'Busca repositorios de modelos de HuggingFace directamente y consulta descargas, me gusta, detalles y archivos.',
+            modelDownloaderTitle2: 'Descargas aceleradas',
+            modelDownloaderContent2:
+                'Configura un endpoint de aceleración de HuggingFace y HF Token para el sitio oficial, espejos y modelos privados.',
+            modelDownloaderTitle3: 'Seguimiento de tareas',
+            modelDownloaderContent3:
+                'Consulta la cola, el estado, el progreso y los errores de descarga, con soporte para cancelar, reintentar y limpiar registros.',
+            modelDownloaderTitle4: 'Gestión local',
+            modelDownloaderContent4:
+                'Gestiona directorios de modelos locales en un solo lugar, incluyendo rutas, tamaños, fechas y eliminación de modelos no usados.',
         },
         node: {
             master: 'Nodo Principal',

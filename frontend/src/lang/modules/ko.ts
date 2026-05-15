@@ -850,13 +850,18 @@ const message = {
             downloader: '다운로더',
             modelDir: '모델 디렉토리',
             manualDownload: '수동 다운로드',
+            modelSource: '모델 소스',
             repoID: '저장소 ID',
+            modelScopeEndpoint: 'ModelScope 엔드포인트',
+            modelScopeToken: 'ModelScope Token (선택)',
             hfToken: 'HF Token (선택 사항)',
             hfEndpoint: 'HuggingFace 가속 엔드포인트',
             hfEndpointHelper:
                 'HuggingFace 접속이 불안정할 때 가속 엔드포인트를 설정하세요. 검색, 상세 정보, 다운로드에 사용됩니다.',
+            searchModelScope: 'ModelScope 검색',
             searchHuggingFace: 'HuggingFace 검색',
             sortTrending: '인기 트렌드',
+            sortLikes: '좋아요 많은 순',
             sortDownloads: '다운로드 많은 순',
             sortUpdated: '최근 업데이트',
             sortCreated: '최신 생성',
@@ -2564,6 +2569,8 @@ const message = {
         fileExchange: 'Pro Edition으로 업그레이드하면 여러 서버 간에 파일을 빠르게 전송할 수 있습니다.',
         app: 'Pro로 업그레이드하면 모바일 앱에서 서비스 정보와 이상 모니터링을 확인할 수 있습니다.',
         cluster: 'Pro Edition으로 업그레이드하면 MySQL/Postgres/Redis 기본-복제 클러스터를 관리할 수 있습니다.',
+        'model-downloader':
+            'Pro로 업그레이드하면 HuggingFace, ModelScope 또는 호환 미러에서 로컬 모델 파일을 검색, 다운로드 및 관리하고 모델 디렉터리와 다운로드 작업을 통합 관리할 수 있습니다.',
         exceptionalHelper:
             '라이선스 동기화 검증이 비정상입니다. 수동으로 동기화해 Pro 기능이 정상적으로 동작하는지 확인하세요. 상세: ',
         tamperHelper: '작업 실패, 파일/폴더에 변조 방지가 활성화되어 있습니다. 확인 후 다시 시도하세요!',
@@ -4099,6 +4106,18 @@ const message = {
             clusterTitle3: '복제 상태',
             clusterContent3:
                 '마스터-슬레이브 복제 상태 및 지연 정보를 표시하여 동기화 문제를 해결하는 데 도움을 줍니다',
+            modelDownloaderTitle1: '모델 탐색',
+            modelDownloaderContent1:
+                'HuggingFace 모델 저장소를 직접 검색하고 다운로드 수, 좋아요, 모델 상세 정보, 파일 목록을 확인합니다.',
+            modelDownloaderTitle2: '가속 다운로드',
+            modelDownloaderContent2:
+                'HuggingFace 가속 엔드포인트와 HF Token을 설정하여 공식 사이트, 미러, 비공개 모델에 대응합니다.',
+            modelDownloaderTitle3: '작업 추적',
+            modelDownloaderContent3:
+                '다운로드 대기열, 작업 상태, 진행률, 오류를 한곳에서 확인하고 취소, 재시도, 기록 정리를 지원합니다.',
+            modelDownloaderTitle4: '로컬 관리',
+            modelDownloaderContent4:
+                '로컬 모델 디렉토리를 중앙에서 관리하고 경로, 크기, 시간을 확인하며 불필요한 모델 파일을 삭제합니다.',
         },
         node: {
             master: '주 노드',

@@ -871,13 +871,18 @@ const message = {
             downloader: 'Baixador',
             modelDir: 'Diretório do modelo',
             manualDownload: 'Download manual',
+            modelSource: 'Fonte do modelo',
             repoID: 'ID do repositório',
+            modelScopeEndpoint: 'Endpoint do ModelScope',
+            modelScopeToken: 'Token do ModelScope (opcional)',
             hfToken: 'HF Token (opcional)',
             hfEndpoint: 'Endpoint de aceleração do HuggingFace',
             hfEndpointHelper:
                 'Configure um endpoint de aceleração quando o acesso ao HuggingFace estiver instável. A pesquisa, os detalhes e os downloads usarão esse endereço.',
+            searchModelScope: 'Pesquisar no ModelScope',
             searchHuggingFace: 'Pesquisar no HuggingFace',
             sortTrending: 'Tendências',
+            sortLikes: 'Mais curtidos',
             sortDownloads: 'Mais baixados',
             sortUpdated: 'Atualizados recentemente',
             sortCreated: 'Criados recentemente',
@@ -2795,6 +2800,8 @@ const message = {
         fileExchange: 'Atualize para a edição Pro para transferir arquivos rapidamente entre vários servidores.',
         app: 'Faça upgrade para a edição Pro para visualizar informações do serviço e monitoramento de anomalias no aplicativo móvel.',
         cluster: 'Atualize para a edição Pro para gerenciar clusters primário-réplica de MySQL/Postgres/Redis.',
+        'model-downloader':
+            'Atualize para a edição Pro para pesquisar, baixar e gerenciar arquivos de modelos locais do HuggingFace, ModelScope ou mirrors compatíveis, com diretórios de modelos e tarefas de download centralizados.',
         exceptionalHelper:
             'A verificação da sincronização da licença está anormal. Clique em sincronizar manualmente para garantir o funcionamento da edição Pro. detalhe: ',
         tamperHelper:
@@ -4403,6 +4410,18 @@ const message = {
             clusterTitle3: 'Estado de Replicação',
             clusterContent3:
                 'Exibe o estado de replicação mestre-escravo e informações de atraso, auxiliando na resolução de problemas de sincronização',
+            modelDownloaderTitle1: 'Descoberta de modelos',
+            modelDownloaderContent1:
+                'Pesquise repositórios de modelos do HuggingFace diretamente e veja downloads, curtidas, detalhes do modelo e lista de arquivos.',
+            modelDownloaderTitle2: 'Downloads acelerados',
+            modelDownloaderContent2:
+                'Configure um endpoint de aceleração do HuggingFace e HF Token para o site oficial, espelhos e modelos privados.',
+            modelDownloaderTitle3: 'Acompanhamento de tarefas',
+            modelDownloaderContent3:
+                'Veja filas de download, status, progresso e erros, com suporte para cancelar, tentar novamente e limpar registros.',
+            modelDownloaderTitle4: 'Gerenciamento local',
+            modelDownloaderContent4:
+                'Gerencie diretórios de modelos locais em um só lugar, incluindo caminhos, tamanhos, horários e exclusão de modelos não usados.',
         },
         node: {
             master: 'Nó Principal',

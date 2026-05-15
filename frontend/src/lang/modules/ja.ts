@@ -866,13 +866,18 @@ const message = {
             downloader: 'ダウンローダー',
             modelDir: 'モデルディレクトリ',
             manualDownload: '手動ダウンロード',
+            modelSource: 'モデルソース',
             repoID: 'リポジトリ ID',
+            modelScopeEndpoint: 'ModelScope エンドポイント',
+            modelScopeToken: 'ModelScope Token（任意）',
             hfToken: 'HF Token（任意）',
             hfEndpoint: 'HuggingFace アクセラレーションエンドポイント',
             hfEndpointHelper:
                 'HuggingFace へのアクセスが不安定な場合はアクセラレーションエンドポイントを設定してください。検索、詳細、ダウンロードで使用されます。',
+            searchModelScope: 'ModelScope を検索',
             searchHuggingFace: 'HuggingFace を検索',
             sortTrending: 'トレンド',
+            sortLikes: 'いいね順',
             sortDownloads: 'ダウンロード数順',
             sortUpdated: '最近更新',
             sortCreated: '新規作成',
@@ -2626,6 +2631,8 @@ const message = {
             'Pro Edition にアップグレードすると、マルチノードのアプリ、Web サイト、データベース、スケジュールタスクを一元管理できます。',
         fileExchange: 'Pro Edition にアップグレードすると、複数サーバー間でファイルをすばやく転送できます。',
         cluster: 'Pro Edition にアップグレードすると、MySQL/Postgres/Redis のプライマリ/レプリカ構成を管理できます。',
+        'model-downloader':
+            'Pro にアップグレードすると、HuggingFace、ModelScope、または互換ミラーからローカルモデルファイルを検索、ダウンロード、管理できます。モデルディレクトリとダウンロードタスクを一元管理できます。',
         exceptionalHelper: 'ライセンス同期検証が異常です。手動で同期して機能を確認してください。詳細: ',
         tamperHelper: '操作失敗。ファイル/フォルダの改ざん保護を確認してください。',
     },
@@ -4196,6 +4203,18 @@ const message = {
             clusterTitle3: 'レプリケーション状態',
             clusterContent3:
                 'マスタースレーブレプリケーション状態と遅延情報を表示し、同期の問題を解決するのに役立ちます',
+            modelDownloaderTitle1: 'モデル検索',
+            modelDownloaderContent1:
+                'HuggingFace のモデルリポジトリを直接検索し、ダウンロード数、いいね、モデル詳細、ファイル一覧を確認できます。',
+            modelDownloaderTitle2: '高速ダウンロード',
+            modelDownloaderContent2:
+                'HuggingFace アクセラレーションエンドポイントと HF Token を設定し、公式サイト、ミラー、プライベートモデルに対応します。',
+            modelDownloaderTitle3: 'タスク追跡',
+            modelDownloaderContent3:
+                'ダウンロードキュー、タスク状態、進捗、エラーを一元確認し、キャンセル、再試行、記録の削除を行えます。',
+            modelDownloaderTitle4: 'ローカル管理',
+            modelDownloaderContent4:
+                'ローカルモデルディレクトリを一元管理し、パス、サイズ、日時の確認と不要なモデルファイルの削除を行えます。',
         },
         node: {
             master: '主ノード',
