@@ -2732,6 +2732,7 @@ const message = {
         licenseUnbindHelper: 'Community Edition nodes detected for this license. Please unbind and try again!',
         subscription: 'Subscription',
         perpetual: 'Perpetual',
+        product: 'Product',
         versionConstraint: '{0} Version Buyout',
         forceUnbind: 'Force Unbind',
         forceUnbindHelper:
@@ -2767,7 +2768,6 @@ const message = {
         edition: 'Edition',
         standard: 'Standard',
         enterprise: 'Enterprise',
-        licenseVersion: 'License version',
         count: 'License count',
         serialNo: 'Serial number',
         remark: 'Remark',
