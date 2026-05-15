@@ -62,7 +62,11 @@
                     <template #header>
                         <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                             <el-tabs v-model="scope" type="card" class="flex-1" @tab-change="handleScopeChange">
-                                <el-tab-pane :label="$t('file.historyCurrentScope')" name="current" />
+                                <el-tab-pane
+                                    :label="$t('file.historyCurrentScope')"
+                                    name="current"
+                                    :disabled="!canSwitchToCurrentScope"
+                                />
                                 <el-tab-pane :label="$t('file.historyAllScope')" name="all" />
                             </el-tabs>
                             <div class="flex flex-wrap items-center gap-2">
@@ -336,12 +340,13 @@ const isVersionRecord = (operation: string) => operation === 'save' || operation
 const canRestoreSelected = computed(() => isVersionRecord(selectedHistory.value?.operation || ''));
 const isRestoringCurrentFile = computed(() => selectedHistory.value?.path === currentFile.value.path);
 const getCurrentTargetPath = (row: File.FileHistoryInfo) => row.currentPath || row.path;
+const canSwitchToCurrentScope = computed(() => !!currentFile.value.path || historyItems.value.length > 0);
 
 const syncCurrentFileContext = (history?: File.FileHistoryInfo | null) => {
     if (currentFile.value.path) {
         return;
     }
-    const target = history || selectedHistory.value || historyItems.value[0];
+    const target = history || historyItems.value[0];
     if (!target) {
         return;
     }
@@ -576,8 +581,12 @@ const deleteSelected = async (row: File.FileHistoryInfo | null) => {
 };
 
 const handleScopeChange = async () => {
+    if (scope.value === 'current' && !canSwitchToCurrentScope.value) {
+        scope.value = 'all';
+        return;
+    }
     if (scope.value === 'current') {
-        syncCurrentFileContext();
+        syncCurrentFileContext(historyItems.value[0]);
     }
     await loadHistoryList(true);
 };
@@ -632,6 +641,9 @@ const acceptParams = async (params: HistoryDrawerProps): Promise<void> => {
     currentFile.value = params;
     operationFilter.value = '';
     scope.value = params.scope || 'current';
+    if (scope.value === 'current' && !params.path) {
+        scope.value = 'all';
+    }
     drawerVisible.value = true;
     if (scope.value === 'current') {
         syncCurrentFileContext();
