@@ -1179,7 +1179,7 @@ var AddOpsReportMenu = &gormigrate.Migration{
 		newItem := dto.ShowMenu{
 			ID:       "122",
 			Disabled: false,
-			Title:    "xpack.user.opsReport",
+			Title:    "xpack.opsReport.name",
 			IsShow:   true,
 			Label:    "OpsReport",
 			Path:     "/enterprise/ops-report",

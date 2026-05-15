@@ -122,7 +122,7 @@ func LoadMenus() string {
 			item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
 				ID:       "122",
 				Disabled: false,
-				Title:    "xpack.user.opsReport",
+				Title:    "xpack.opsReport.name",
 				IsShow:   true,
 				Label:    "OpsReport",
 				Path:     "/enterprise/ops-report",
