@@ -6,19 +6,16 @@ export namespace Log {
         id: number;
         source: string;
         user: string;
-        action: string;
+        node: string;
         ip: string;
         path: string;
         method: string;
         userAgent: string;
-        body: string;
-        resp: string;
-
-        status: number;
+        status: string;
         latency: number;
-        errorMessage: string;
-
-        detail: string;
+        message: string;
+        detailZH: string;
+        detailEN: string;
         createdAt: DateTimeFormats;
     }
     export interface SearchOpLog extends ReqPage {
