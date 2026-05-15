@@ -123,9 +123,12 @@ const rightClick = ref({
     top: 0,
     currentRow: null,
 });
+const selectedRows = ref<any[]>([]);
 const handleRightClick = (row, column, event) => {
-    clearSelects();
-    tableRef.value.refElTable.toggleRowSelection(row);
+    if (!selectedRows.value.includes(row)) {
+        clearSelects();
+        tableRef.value.refElTable.toggleRowSelection(row);
+    }
     if (!props.rightButtons) {
         return;
     }
@@ -140,7 +143,6 @@ const handleRightClick = (row, column, event) => {
 };
 const closeRightClick = () => {
     rightClick.value.visible = false;
-    clearSelects();
     document.removeEventListener('click', closeRightClick);
 };
 const disabled = computed(() => {
@@ -178,6 +180,7 @@ function sizeChange() {
 }
 
 function handleSelectionChange(row: any) {
+    selectedRows.value = row;
     emit('update:selects', row);
     if (row.length > 0) {
         leftSelect.value = true;
@@ -304,7 +307,7 @@ onMounted(() => {
     });
     window.addEventListener('resize', calcHeight);
     watch(
-        () => props.height,
+        () => [props.height, props.heightDiff],
         () => {
             calcHeight();
         },

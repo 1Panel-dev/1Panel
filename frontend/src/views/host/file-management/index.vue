@@ -1,5 +1,12 @@
 <template>
-    <div class="h-full" ref="fileTableRef" @dragover="handleDragover" @drop="handleDrop" @dragleave="handleDragleave">
+    <div
+        class="file-management-page h-full"
+        :class="{ 'is-drag-over': isDragOver }"
+        ref="fileTableRef"
+        @dragover="handleDragover"
+        @drop="handleDrop"
+        @dragleave="handleDragleave"
+    >
         <el-tabs
             type="card"
             class="file-tabs"
@@ -14,8 +21,8 @@
                 :label="item.name == '' ? $t('file.root') : item.name"
                 :name="item.id"
             >
-                <div class="flex sm:flex-row flex-col justify-start gap-y-2 items-center gap-x-4" ref="toolRef">
-                    <div class="flex-shrink-0 flex sm:w-min w-full items-center justify-start">
+                <div class="flex flex-wrap items-center gap-3 pb-3 pt-0.5" ref="toolRef">
+                    <div class="flex shrink-0 items-center gap-1.5 file-navigation__actions">
                         <el-tooltip :content="$t('file.back')" placement="top">
                             <el-button icon="Back" @click="back" circle />
                         </el-tooltip>
@@ -41,31 +48,32 @@
                             />
                         </el-tooltip>
                     </div>
-                    <div class="flex-1 sm:w-min w-full hidden sm:block" :ref="(el) => setPathRef(item.id, el)">
-                        <div
-                            v-show="!searchableStatus"
-                            @click="searchableStatus = true"
-                            class="address-bar shadow-md rounded-md px-4 py-2 flex items-center flex-grow"
-                        >
+                    <div class="min-w-0 flex-1 hidden sm:block" :ref="(el) => setPathRef(item.id, el)">
+                        <div v-show="!searchableStatus" @click="searchableStatus = true" class="address-bar">
                             <div ref="breadCrumbRef" class="flex items-center address-url">
-                                <span class="root mr-2">
+                                <span class="breadcrumb-root">
                                     <el-link @click.stop="jump('/')">
                                         <el-icon :size="20"><HomeFilled /></el-icon>
                                     </el-link>
                                 </span>
-                                <span v-for="(path, index) in paths" :key="path.url" class="inline-flex items-center">
-                                    <span class="mr-2 arrow">></span>
-                                    <template v-if="index === 0 && hidePaths.length > 0">
+                                <span
+                                    v-for="(path, index) in breadcrumbVisiblePaths"
+                                    :key="path.url"
+                                    class="breadcrumb-item inline-flex min-w-0 items-center"
+                                >
+                                    <span class="arrow">></span>
+                                    <template v-if="index === 1 && breadcrumbHiddenPaths.length > 0">
                                         <el-dropdown>
                                             <span
-                                                class="path-segment cursor-pointer mr-2 pathname focus:outline-none focus-visible:outline-none"
+                                                class="path-segment path-segment--overflow cursor-pointer pathname focus:outline-none focus-visible:outline-none"
+                                                @click.stop
                                             >
                                                 ..
                                             </span>
                                             <template #dropdown>
                                                 <el-dropdown-menu>
                                                     <el-dropdown-item
-                                                        v-for="hidePath in hidePaths"
+                                                        v-for="hidePath in breadcrumbHiddenPaths"
                                                         :key="hidePath.url"
                                                         @click.stop="jump(hidePath.url)"
                                                     >
@@ -85,7 +93,7 @@
                                                 </el-dropdown-menu>
                                             </template>
                                         </el-dropdown>
-                                        <span class="mr-2 arrow">></span>
+                                        <span class="arrow">></span>
                                         <el-tooltip
                                             class="box-item"
                                             effect="dark"
@@ -93,14 +101,10 @@
                                             placement="bottom"
                                         >
                                             <el-link
-                                                class="path-segment cursor-pointer mr-2 pathname"
+                                                class="path-segment cursor-pointer pathname"
                                                 @click.stop="jump(path.url)"
                                             >
-                                                {{
-                                                    path.name.length > 25
-                                                        ? path.name.substring(0, 22) + '...'
-                                                        : path.name
-                                                }}
+                                                {{ formatBreadcrumbName(path, index) }}
                                             </el-link>
                                         </el-tooltip>
                                     </template>
@@ -112,14 +116,10 @@
                                             placement="bottom"
                                         >
                                             <el-link
-                                                class="path-segment cursor-pointer mr-2 pathname"
+                                                class="path-segment cursor-pointer pathname"
                                                 @click.stop="jump(path.url)"
                                             >
-                                                {{
-                                                    path.name.length > 25
-                                                        ? path.name.substring(0, 22) + '...'
-                                                        : path.name
-                                                }}
+                                                {{ formatBreadcrumbName(path, index) }}
                                             </el-link>
                                         </el-tooltip>
                                     </template>
@@ -131,34 +131,39 @@
                             v-show="searchableStatus"
                             v-model="searchablePath"
                             @blur="searchableInputBlur"
-                            class="px-4 py-2 border rounded-md shadow-md"
+                            class="address-input"
                             @keyup.enter="
                                 jump(searchablePath);
                                 searchableStatus = false;
                             "
                         />
                     </div>
-                    <div class="flex-1 sm:w-min w-full sm:hidden block">
-                        <div class="address-bar shadow-md rounded-md px-4 py-2 flex items-center flex-grow">
+                    <div class="min-w-0 flex-1 sm:hidden block">
+                        <div class="address-bar">
                             <div class="flex items-center address-url">
-                                <span class="root mr-2">
+                                <span class="breadcrumb-root">
                                     <el-link @click.stop="jump('/')">
                                         <el-icon :size="20"><HomeFilled /></el-icon>
                                     </el-link>
                                 </span>
-                                <span v-for="(path, index) in paths" :key="path.url" class="inline-flex items-center">
-                                    <span class="mr-2 arrow">></span>
-                                    <template v-if="index === 0 && hidePaths.length > 0">
+                                <span
+                                    v-for="(path, index) in breadcrumbVisiblePaths"
+                                    :key="path.url"
+                                    class="breadcrumb-item inline-flex min-w-0 items-center"
+                                >
+                                    <span class="arrow">></span>
+                                    <template v-if="index === 1 && breadcrumbHiddenPaths.length > 0">
                                         <el-dropdown>
                                             <span
-                                                class="path-segment cursor-pointer mr-2 pathname focus:outline-none focus-visible:outline-none"
+                                                class="path-segment path-segment--overflow cursor-pointer pathname focus:outline-none focus-visible:outline-none"
+                                                @click.stop
                                             >
                                                 ..
                                             </span>
                                             <template #dropdown>
                                                 <el-dropdown-menu>
                                                     <el-dropdown-item
-                                                        v-for="hidePath in hidePaths"
+                                                        v-for="hidePath in breadcrumbHiddenPaths"
                                                         :key="hidePath.url"
                                                         @click.stop="jump(hidePath.url)"
                                                     >
@@ -180,7 +185,7 @@
                                         </el-dropdown>
                                     </template>
                                     <template v-else>
-                                        <span class="mr-2 arrow">></span>
+                                        <span class="arrow">></span>
                                         <el-tooltip
                                             class="box-item"
                                             effect="dark"
@@ -188,14 +193,10 @@
                                             placement="bottom"
                                         >
                                             <el-link
-                                                class="path-segment cursor-pointer mr-2 pathname"
+                                                class="path-segment cursor-pointer pathname"
                                                 @click.stop="jump(path.url)"
                                             >
-                                                {{
-                                                    path.name.length > 25
-                                                        ? path.name.substring(0, 22) + '...'
-                                                        : path.name
-                                                }}
+                                                {{ formatBreadcrumbName(path, index) }}
                                             </el-link>
                                         </el-tooltip>
                                     </template>
@@ -203,8 +204,31 @@
                             </div>
                         </div>
                     </div>
+                    <div class="flex w-full flex-wrap items-center justify-start gap-2 xl:w-auto xl:flex-nowrap">
+                        <div class="w-full min-w-0 sm:w-[300px]">
+                            <el-input
+                                v-model="req.search"
+                                clearable
+                                @clear="search()"
+                                @keydown.enter="search()"
+                                :placeholder="$t('file.search')"
+                            >
+                                <template #prepend>
+                                    <el-checkbox v-model="req.containSub">
+                                        {{ $t('file.sub') }}
+                                    </el-checkbox>
+                                </template>
+                                <template #append>
+                                    <el-button icon="Search" @click="search" round />
+                                </template>
+                            </el-input>
+                        </div>
+                        <el-button class="max-w-20" plain type="primary" @click="openAiSearchDrawer">
+                            {{ $t('file.aiSearch') }}
+                        </el-button>
+                    </div>
                 </div>
-                <LayoutContent :title="$t('menu.files')" v-loading="loading">
+                <LayoutContent class="file-layout" :title="$t('menu.files')" v-loading="loading">
                     <template #prompt>
                         <el-alert type="info" :closable="false">
                             <template #title>
@@ -215,8 +239,8 @@
                         </el-alert>
                     </template>
                     <template #leftToolBar>
-                        <div ref="leftWrapper" class="flex items-center gap-2 flex-wrap">
-                            <el-dropdown @command="handleCreate" class="mr-2.5">
+                        <div class="flex max-w-full flex-wrap items-center gap-2">
+                            <el-dropdown @command="handleCreate">
                                 <el-button type="primary">
                                     {{ $t('commons.button.create') }}
                                     <el-icon><arrow-down /></el-icon>
@@ -234,7 +258,7 @@
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
-                            <el-dropdown class="mr-2.5">
+                            <el-dropdown>
                                 <el-button>
                                     {{ $t('commons.button.upload') }}/{{ $t('commons.button.download') }}
                                     <el-icon><arrow-down /></el-icon>
@@ -252,7 +276,7 @@
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
-                            <el-button-group class="sm:!inline-block !flex flex-wrap gap-y-2">
+                            <el-button-group class="file-utility-group">
                                 <el-button class="btn" @click="openRecycleBin">
                                     {{ $t('file.recycleBin') }}
                                 </el-button>
@@ -345,7 +369,7 @@
                                     </el-button>
                                 </template>
                                 <template v-else>
-                                    <el-dropdown class="mr-2.5">
+                                    <el-dropdown>
                                         <el-button class="btn">
                                             {{ hostMount[0]?.path }} ({{ $t('file.root') }})
                                             {{ formatFileSize(hostMount[0]?.free) }}
@@ -376,13 +400,39 @@
                         </div>
                     </template>
                     <template #rightToolBar>
-                        <div :ref="(el) => setBtnWrapperRef(item.id, el)" class="flex items-center gap-2 flex-wrap">
-                            <div class="flex items-center gap-2 flex-wrap">
+                        <div
+                            :ref="(el) => setBtnWrapperRef(item.id, el)"
+                            :class="[
+                                'file-batch-toolbar flex max-w-full flex-nowrap items-center gap-2',
+                                isRightToolbarWrapped ? 'is-toolbar-wrapped w-full justify-start' : 'justify-end',
+                            ]"
+                        >
+                            <div class="flex min-w-0 flex-nowrap items-center gap-2">
+                                <el-button-group class="copy-button" v-if="moveOpen">
+                                    <el-tooltip
+                                        class="box-item"
+                                        effect="dark"
+                                        :content="$t('file.paste')"
+                                        placement="bottom"
+                                    >
+                                        <el-button plain @click="openPaste">
+                                            {{ $t('file.paste') }}({{ fileMove.count }})
+                                        </el-button>
+                                    </el-tooltip>
+                                    <el-tooltip
+                                        class="box-item"
+                                        effect="dark"
+                                        :content="$t('commons.button.cancel')"
+                                        placement="bottom"
+                                    >
+                                        <el-button plain class="close" icon="Close" @click="closeMove"></el-button>
+                                    </el-tooltip>
+                                </el-button-group>
                                 <template v-if="visibleButtons.length == 0">
                                     <el-dropdown v-if="moreButtons.length">
                                         <el-button>
                                             {{ $t('tabs.more') }}
-                                            <i class="el-icon-arrow-down el-icon--right" />
+                                            <el-icon><arrow-down /></el-icon>
                                         </el-button>
                                         <template #dropdown>
                                             <el-dropdown-menu>
@@ -399,17 +449,16 @@
                                     </el-dropdown>
                                 </template>
                                 <template v-if="visibleButtons.length > 0">
-                                    <el-button-group class="flex items-center">
+                                    <el-button-group class="flex max-w-full flex-nowrap items-center">
                                         <template v-for="btn in visibleButtons" :key="btn.label">
                                             <el-button plain @click="btn.action" :disabled="selects.length === 0">
                                                 {{ $t(btn.label) }}
                                             </el-button>
                                         </template>
-
                                         <el-dropdown v-if="moreButtons.length">
                                             <el-button>
                                                 {{ $t('tabs.more') }}
-                                                <i class="el-icon-arrow-down el-icon--right" />
+                                                <el-icon><arrow-down /></el-icon>
                                             </el-button>
                                             <template #dropdown>
                                                 <el-dropdown-menu>
@@ -426,28 +475,6 @@
                                         </el-dropdown>
                                     </el-button-group>
                                 </template>
-                            </div>
-                            <el-button-group class="copy-button" v-if="moveOpen">
-                                <el-tooltip
-                                    class="box-item"
-                                    effect="dark"
-                                    :content="$t('file.paste')"
-                                    placement="bottom"
-                                >
-                                    <el-button plain @click="openPaste">
-                                        {{ $t('file.paste') }}({{ fileMove.count }})
-                                    </el-button>
-                                </el-tooltip>
-                                <el-tooltip
-                                    class="box-item"
-                                    effect="dark"
-                                    :content="$t('commons.button.cancel')"
-                                    placement="bottom"
-                                >
-                                    <el-button plain class="close" icon="Close" @click="closeMove"></el-button>
-                                </el-tooltip>
-                            </el-button-group>
-                            <div class="flex items-center gap-2">
                                 <fu-table-column-select
                                     :columns="columns"
                                     trigger="hover"
@@ -455,32 +482,12 @@
                                     popper-class="popper-class"
                                     :only-icon="true"
                                 />
-                                <div class="w-80">
-                                    <el-input
-                                        v-model="req.search"
-                                        clearable
-                                        @clear="search()"
-                                        @keydown.enter="search()"
-                                        :placeholder="$t('file.search')"
-                                    >
-                                        <template #prepend>
-                                            <el-checkbox v-model="req.containSub">
-                                                {{ $t('file.sub') }}
-                                            </el-checkbox>
-                                        </template>
-                                        <template #append>
-                                            <el-button icon="Search" @click="search" round />
-                                        </template>
-                                    </el-input>
-                                </div>
-                                <el-button plain type="primary" @click="openAiSearchDrawer">
-                                    {{ $t('file.aiSearch') }}
-                                </el-button>
                             </div>
                         </div>
                     </template>
                     <template #main>
                         <ComplexTable
+                            class="file-table"
                             :pagination-config="paginationConfig"
                             v-model:selects="selects"
                             :ref="(el) => setTableRef(item.id, el)"
@@ -508,7 +515,7 @@
                             >
                                 <template #default="{ row }">
                                     <div class="file-row">
-                                        <div>
+                                        <div class="file-row__icon">
                                             <svg-icon
                                                 v-if="row.isDir"
                                                 className="table-icon"
@@ -536,7 +543,7 @@
                                             </span>
                                             <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
                                         </div>
-                                        <div>
+                                        <div class="file-row__actions">
                                             <el-button
                                                 v-if="row.shareCode"
                                                 link
@@ -546,7 +553,7 @@
                                                 @click="openShareFile(row)"
                                             ></el-button>
                                         </div>
-                                        <div>
+                                        <div class="file-row__actions">
                                             <el-button
                                                 v-if="row.favoriteID > 0"
                                                 link
@@ -630,7 +637,7 @@
                                 fix
                             />
                             <template #paginationLeft>
-                                <div class="flex justify-start items-center">
+                                <div class="file-pagination-summary">
                                     <el-text small>
                                         {{ $t('file.fileDirNum', [dirNum, fileNum]) }}
                                     </el-text>
@@ -660,8 +667,8 @@
 
         <CreateFile ref="createRef" @close="search" />
         <ChangeRole ref="roleRef" @close="search" />
-        <Compress ref="compressRef" @close="search" />
-        <Decompress ref="deCompressRef" @close="search" />
+        <Compress ref="compressRef" @close="search" @task-change="handleFileTaskChange('compress', $event)" />
+        <Decompress ref="deCompressRef" @close="search" @task-change="handleFileTaskChange('decompress', $event)" />
         <CodeEditor ref="codeEditorRef" @close="search" />
         <FileRename ref="renameRef" @close="search" />
         <Upload ref="uploadRef" @close="search" />
@@ -809,7 +816,8 @@ const initData = () => ({
 let req = reactive(initData());
 let loading = ref(false);
 const paths = ref<FilePaths[]>([]);
-const hidePaths = ref<FilePaths[]>([]);
+const breadcrumbVisiblePaths = ref<FilePaths[]>([]);
+const breadcrumbHiddenPaths = ref<FilePaths[]>([]);
 let pathWidth = ref(0);
 const history: string[] = [];
 let pointer = -1;
@@ -892,8 +900,10 @@ const textPreviewRef = ref();
 const processRef = ref();
 
 const MAX_OPEN_SIZE = 10 * 1024 * 1024;
+const MAX_DIR_SIZE_CONCURRENT = 2;
 const hostMount = ref<Dashboard.DiskInfo[]>([]);
 let resizeObserver: ResizeObserver;
+let depthSizeToken = 0;
 const dirTotalSize = ref(-1);
 const disableBtn = ref(false);
 const calculateBtn = ref(false);
@@ -901,7 +911,9 @@ const dirNum = ref(0);
 const fileNum = ref(0);
 const imageFiles = ref([]);
 const isEdit = ref(false);
+const isDragOver = ref(false);
 const convertRef = ref();
+const fileTaskStatus = reactive<Record<string, string>>({});
 
 const renameRefs = ref<Record<string, any>>({});
 
@@ -934,6 +946,91 @@ const paginationConfig = reactive({
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
+
+const btnWrapperRefs = ref<Record<string, any>>({});
+
+const setBtnWrapperRef = (key: string, el: any) => {
+    if (el) {
+        btnWrapperRefs.value[key] = el;
+    }
+};
+const getCurrentBtnWrapper = () => btnWrapperRefs.value[editableTabsKey.value];
+
+const toolButtons = ref([
+    {
+        label: 'commons.button.copy',
+        action: () => openMove('copy'),
+    },
+    {
+        label: 'file.move',
+        action: () => openMove('cut'),
+    },
+    {
+        label: 'file.compress',
+        action: () => openCompress(selects.value),
+    },
+    {
+        label: 'file.role',
+        action: () => openBatchRole(selects.value),
+    },
+    {
+        label: 'commons.button.delete',
+        action: () => batchDelFiles(),
+    },
+]);
+
+const visibleButtons = ref([...toolButtons.value]);
+const moreButtons = ref([]);
+const isRightToolbarWrapped = ref(false);
+const batchButtonMinWidths = [64, 64, 64, 64, 64];
+const moreButtonWidth = 76;
+const toolbarGap = 8;
+
+const updateButtons = async () => {
+    await nextTick();
+    const wrapper = getCurrentBtnWrapper();
+    if (!wrapper) {
+        return;
+    }
+    const slotWrapper = wrapper.parentElement as HTMLElement | null;
+    const titleRow = slotWrapper?.parentElement as HTMLElement | null;
+    const rowWidth = titleRow?.clientWidth || slotWrapper?.clientWidth || wrapper.offsetWidth || 0;
+    if (!rowWidth) {
+        visibleButtons.value = [...toolButtons.value];
+        moreButtons.value = [];
+        return;
+    }
+
+    const pasteEl = wrapper.querySelector<HTMLElement>('.copy-button');
+    const leftSibling = slotWrapper?.previousElementSibling as HTMLElement | null;
+    const pasteWidth = pasteEl?.offsetWidth || 0;
+    const pasteReserve = moveOpen.value ? pasteWidth + toolbarGap : 0;
+    const columnSelectWidth = 48;
+    const minBatchWidth = moreButtonWidth;
+    const sameLineReserve = leftSibling ? leftSibling.offsetWidth + 16 : 0;
+    const sameLineAvailable = rowWidth - sameLineReserve - pasteReserve - columnSelectWidth - toolbarGap;
+    isRightToolbarWrapped.value = !!leftSibling && sameLineAvailable < minBatchWidth;
+    const leftReserve = isRightToolbarWrapped.value ? 0 : sameLineReserve;
+    const rightLineWidth = Math.max(0, rowWidth - leftReserve - columnSelectWidth - toolbarGap);
+    const availableWidth = Math.max(0, rightLineWidth - pasteReserve);
+    let usedWidth = 0;
+    let visibleCount = 0;
+
+    for (const buttonWidth of batchButtonMinWidths) {
+        const nextUsedWidth = usedWidth + buttonWidth;
+        const remainingButtonCount = toolButtons.value.length - visibleCount - 1;
+        const reserveMoreWidth = remainingButtonCount > 0 ? moreButtonWidth : 0;
+        if (nextUsedWidth + reserveMoreWidth <= availableWidth) {
+            usedWidth = nextUsedWidth;
+            visibleCount++;
+        } else {
+            break;
+        }
+    }
+
+    visibleButtons.value = toolButtons.value.slice(0, visibleCount);
+    moreButtons.value = toolButtons.value.slice(visibleCount);
+};
 
 const search = async () => {
     dirTotalSize.value = -1;
@@ -1012,72 +1109,48 @@ const copyDir = (row: File.File) => {
     }
 };
 
-const leftWrapper = ref<HTMLElement | null>(null);
-const btnWrapperRefs = ref<Record<string, any>>({});
-
-const setBtnWrapperRef = (key: string, el: any) => {
-    if (el) {
-        btnWrapperRefs.value[key] = el;
+const formatBreadcrumbName = (path: FilePaths, index: number) => {
+    const isLast = index === breadcrumbVisiblePaths.value.length - 1;
+    if (isLast || path.name.length <= 25) {
+        return path.name;
     }
+    return `${path.name.substring(0, 22)}...`;
 };
-const getCurrentBtnWrapper = () => btnWrapperRefs.value[editableTabsKey.value];
 
-const toolButtons = ref([
-    {
-        label: 'commons.button.copy',
-        action: () => openMove('copy'),
-    },
-    {
-        label: 'file.move',
-        action: () => openMove('cut'),
-    },
-    {
-        label: 'file.compress',
-        action: () => openCompress(selects.value),
-    },
-    {
-        label: 'file.role',
-        action: () => openBatchRole(selects.value),
-    },
-    {
-        label: 'commons.button.delete',
-        action: () => batchDelFiles(),
-    },
-]);
+const getBreadcrumbElement = () => {
+    return getCurrentPath()?.querySelector<HTMLElement>('.address-url') || breadCrumbRef.value;
+};
 
-const visibleButtons = ref([...toolButtons.value]);
-const moreButtons = ref([]);
+const resetPaths = () => {
+    breadcrumbVisiblePaths.value = [...paths.value];
+    breadcrumbHiddenPaths.value = [];
+};
 
-const updateButtons = async () => {
+const handlePath = async () => {
+    resetPaths();
+    if (paths.value.length <= 2) {
+        return;
+    }
+
     await nextTick();
-    if (!getCurrentBtnWrapper()) return;
-    const pathWidth = toolRef.value.offsetWidth;
-    const leftWidth = leftWrapper.value.offsetWidth;
-    let num = Math.floor((pathWidth - leftWidth - 450) / 100);
-    if (num < 0) {
-        visibleButtons.value = toolButtons.value;
-        moreButtons.value = [];
-    } else {
-        visibleButtons.value = toolButtons.value.slice(0, num);
-        moreButtons.value = toolButtons.value.slice(num);
+    const breadcrumbEl = getBreadcrumbElement();
+    const pathEl = getCurrentPath();
+    const maxWidth = (pathEl?.clientWidth || toolRef.value?.clientWidth || 0) - 24;
+    if (!breadcrumbEl || maxWidth <= 0) {
+        return;
     }
-};
 
-const handlePath = (depth = 0) => {
-    if (depth > 10) return;
-    nextTick(function () {
-        let breadCrumbWidth = breadCrumbRef.value?.offsetWidth;
-        let pathWidth = toolRef.value?.offsetWidth;
-        if (pathWidth - breadCrumbWidth < 50 && paths.value.length > 1) {
-            const removed = paths.value.shift();
-            if (removed) hidePaths.value.push(removed);
-            handlePath(depth + 1);
-        }
-    });
+    let hiddenCount = 0;
+    const maxHiddenCount = Math.max(paths.value.length - 2, 0);
+    while (hiddenCount < maxHiddenCount && breadcrumbEl.scrollWidth > maxWidth) {
+        hiddenCount++;
+        breadcrumbHiddenPaths.value = paths.value.slice(1, 1 + hiddenCount);
+        breadcrumbVisiblePaths.value = [paths.value[0], ...paths.value.slice(1 + hiddenCount)];
+        await nextTick();
+    }
 };
 
 const resizeHandler = debounce(() => {
-    resetPaths();
     handlePath();
 }, 100);
 
@@ -1088,19 +1161,22 @@ const btnResizeHandler = debounce(() => {
 const observeResize = () => {
     const el = getCurrentPath();
     const ele = getCurrentBtnWrapper();
-    if (!el || !ele) return;
+    const titleRow = ele?.parentElement?.parentElement as HTMLElement | null;
+    if (!el && !ele && !titleRow) return;
 
     const observe = new ResizeObserver((entries) => {
         const isElChanged = entries.some((entry) => entry.target === el);
         const isEleChanged = entries.some((entry) => entry.target === ele);
+        const isTitleChanged = entries.some((entry) => entry.target === titleRow);
 
         if (isElChanged) resizeHandler();
-        if (isEleChanged) btnResizeHandler();
+        if (isEleChanged || isTitleChanged) btnResizeHandler();
         updateHeight();
     });
 
-    observe.observe(el);
-    observe.observe(ele);
+    if (el) observe.observe(el);
+    if (ele) observe.observe(ele);
+    if (titleRow) observe.observe(titleRow);
 
     resizeObserver = observe;
 };
@@ -1112,11 +1188,6 @@ function watchTitleHeight() {
         heightDiff.value = 325 + titleHeight;
     }
 }
-
-const resetPaths = () => {
-    paths.value = [...hidePaths.value, ...paths.value];
-    hidePaths.value = [];
-};
 
 const right = () => {
     if (pointer < history.length - 1) {
@@ -1150,8 +1221,16 @@ const jump = async (url: string) => {
     history.push(url);
     pointer = history.length - 1;
 
-    const { path: oldUrl, pageSize: oldPageSize } = req;
-    Object.assign(req, initData(), { path: url, containSub: false, search: '', pageSize: oldPageSize });
+    const { path: oldUrl, pageSize: oldPageSize, sortBy: oldSortBy, sortOrder: oldSortOrder, showHidden } = req;
+    Object.assign(req, initData(), {
+        path: url,
+        containSub: false,
+        search: '',
+        pageSize: oldPageSize,
+        sortBy: oldSortBy,
+        sortOrder: oldSortOrder,
+        showHidden,
+    });
     let searchResult = await searchFile();
     if (!searchResult.data.path) {
         req.path = oldUrl;
@@ -1170,12 +1249,16 @@ const jump = async (url: string) => {
 };
 
 const backForwardJump = async (url: string) => {
-    const oldPageSize = req.pageSize;
-    Object.assign(req, initData());
-    req.path = url;
-    req.containSub = false;
-    req.search = '';
-    req.pageSize = oldPageSize;
+    const { pageSize: oldPageSize, sortBy: oldSortBy, sortOrder: oldSortOrder, showHidden } = req;
+    Object.assign(req, initData(), {
+        path: url,
+        containSub: false,
+        search: '',
+        pageSize: oldPageSize,
+        sortBy: oldSortBy,
+        sortOrder: oldSortOrder,
+        showHidden,
+    });
     let searchResult = await searchFile();
     handleSearchResult(searchResult);
     getPaths(req.path);
@@ -1201,7 +1284,7 @@ const getPaths = (reqPath: string | undefined | null) => {
     }
 
     paths.value = breadcrumbs;
-    hidePaths.value = [];
+    resetPaths();
 };
 
 const handleCreate = (command: string) => {
@@ -1222,6 +1305,35 @@ const formatFileSize = (size: number) => {
     return computeSize(size);
 };
 
+const dirSizeQueue: Array<() => Promise<void>> = [];
+const dirSizeLoadingPaths = new Set<string>();
+let activeDirSizeRequests = 0;
+
+const flushDirSizeQueue = () => {
+    while (activeDirSizeRequests < MAX_DIR_SIZE_CONCURRENT && dirSizeQueue.length > 0) {
+        const task = dirSizeQueue.shift()!;
+        activeDirSizeRequests++;
+        task().finally(() => {
+            activeDirSizeRequests--;
+            flushDirSizeQueue();
+        });
+    }
+};
+
+const enqueueDirSizeTask = (task: () => Promise<void>) => {
+    return new Promise<void>((resolve, reject) => {
+        dirSizeQueue.push(async () => {
+            try {
+                await task();
+                resolve();
+            } catch (err) {
+                reject(err);
+            }
+        });
+        flushDirSizeQueue();
+    });
+};
+
 const getFileSize = async (path: string) => {
     codeReq.path = path;
     codeReq.expand = true;
@@ -1236,14 +1348,21 @@ const getFileSize = async (path: string) => {
 };
 
 const getDirSize = async (path: string) => {
+    if (dirSizeLoadingPaths.has(path)) {
+        return;
+    }
     const req = {
         path: path,
     };
+    dirSizeLoadingPaths.add(path);
     updateByPath(path, { btnLoading: true });
     try {
-        const res = await computeDirSize(req);
-        updateByPath(path, { dirSize: res.data.size });
+        await enqueueDirSizeTask(async () => {
+            const res = await computeDirSize(req);
+            updateByPath(path, { dirSize: res.data.size });
+        });
     } finally {
+        dirSizeLoadingPaths.delete(path);
         updateByPath(path, { btnLoading: false });
     }
 };
@@ -1253,31 +1372,38 @@ const updateByPath = (path: string, patch: Partial<(typeof data.value)[0]>) => {
 };
 
 const getDirTotalSize = async (path: string) => {
-    const req = {
+    const sizeReq = {
         path: path,
     };
     calculateBtn.value = true;
-    const res = await computeDirSize(req);
-    dirTotalSize.value = res.data.size;
-    calculateBtn.value = false;
+    try {
+        const res = await computeDirSize(sizeReq);
+        dirTotalSize.value = res.data.size;
+    } finally {
+        calculateBtn.value = false;
+    }
 };
 
 const calculateSize = (path: string) => {
-    const req = { path };
+    const token = ++depthSizeToken;
+    const sizeReq = { path };
     disableBtn.value = true;
     setTimeout(async () => {
         try {
-            const res = await computeDepthDirSize(req);
+            const res = await computeDepthDirSize(sizeReq);
+            if (token !== depthSizeToken || req.path !== path) {
+                return;
+            }
             const sizeMap = new Map(res.data.map((dir) => [dir.path, dir.size]));
-            data.value.forEach((item) => {
-                if (sizeMap.has(item.path)) {
-                    item.dirSize = sizeMap.get(item.path)!;
-                }
-            });
+            data.value = data.value.map((item) =>
+                sizeMap.has(item.path) ? { ...item, dirSize: sizeMap.get(item.path)! } : item,
+            );
         } catch (err) {
             console.error('Error computing dir size:', err);
         } finally {
-            disableBtn.value = false;
+            if (token === depthSizeToken) {
+                disableBtn.value = false;
+            }
         }
     }, 0);
 };
@@ -1581,6 +1707,7 @@ const openMove = (type: string) => {
     } else {
         MsgSuccess(i18n.global.t('file.copySuccess') + '! ' + i18n.global.t('file.pasteMsg'));
     }
+    updateButtons();
 };
 
 const openMoveBtn = (type: string, item: File.File) => {
@@ -1598,6 +1725,7 @@ const closeMove = () => {
     fileMove.count = 0;
     fileMove.isDir = false;
     moveOpen.value = false;
+    updateButtons();
 };
 
 const openPaste = () => {
@@ -1646,6 +1774,21 @@ const openFileHistoryCenter = () => {
         dirty: false,
         scope: 'all',
     });
+};
+
+const handleFileTaskChange = (type: string, payload: { taskID: string; status: string }) => {
+    if (!payload.taskID) {
+        return;
+    }
+    const taskKey = `${type}:${payload.taskID}`;
+    const previous = fileTaskStatus[taskKey];
+    fileTaskStatus[taskKey] = payload.status;
+    if (previous === 'Executing' && payload.status === 'Success') {
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    }
+    if (payload.status && payload.status !== 'Executing') {
+        delete fileTaskStatus[taskKey];
+    }
 };
 
 const changeSort = ({ prop, order }) => {
@@ -1962,6 +2105,7 @@ const getHostMount = async () => {
 
 const handleDrop = async (event: DragEvent) => {
     event.preventDefault();
+    isDragOver.value = false;
     fileUpload.path = req.path;
     if (!uploadRef.value?.open) {
         await uploadRef.value?.handleDrop(event);
@@ -1971,10 +2115,12 @@ const handleDrop = async (event: DragEvent) => {
 
 const handleDragover = (event: DragEvent) => {
     event.preventDefault();
+    isDragOver.value = true;
 };
 
 const handleDragleave = (event: { preventDefault: () => void }) => {
     event.preventDefault();
+    isDragOver.value = false;
 };
 
 function hideRightMenu() {
@@ -2036,6 +2182,7 @@ function initTabsAndPaths() {
     getPaths(path);
     updateTab(path);
     paths.value = buildPaths(path);
+    resetPaths();
     pathWidth.value = getCurrentPath()?.offsetWidth;
 }
 
@@ -2235,6 +2382,196 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+.file-management-page {
+    position: relative;
+
+    &::after {
+        position: absolute;
+        inset: 52px 12px 12px;
+        z-index: 20;
+        pointer-events: none;
+        content: '';
+        border: 1px dashed transparent;
+        border-radius: 8px;
+        transition:
+            background-color 0.2s,
+            border-color 0.2s;
+    }
+
+    &.is-drag-over::after {
+        background-color: var(--el-color-primary-light-9);
+        border-color: var(--el-color-primary);
+    }
+}
+
+.file-navigation {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 2px 0 12px;
+}
+
+.file-navigation__actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 6px;
+    .el-button + .el-button {
+        margin-left: 0px;
+    }
+}
+
+.file-navigation__path {
+    flex: 1;
+    min-width: 0;
+}
+
+.address-input {
+    width: 100%;
+}
+
+.address-bar {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    padding: 4px 8px;
+    overflow: hidden;
+    cursor: text;
+    background-color: var(--el-fill-color-lighter);
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 6px;
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+
+    &:hover {
+        border-color: var(--el-color-primary-light-5);
+        box-shadow: 0 0 0 2px var(--el-color-primary-light-9);
+    }
+
+    .arrow {
+        color: var(--el-text-color-placeholder);
+    }
+}
+
+.address-url {
+    gap: 2px;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.breadcrumb-root {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 24px;
+    color: var(--el-text-color-secondary);
+    transition: color 0.2s;
+
+    &:hover {
+        color: var(--el-color-primary);
+    }
+}
+
+.breadcrumb-item {
+    flex-shrink: 0;
+
+    &:last-child {
+        flex-shrink: 1;
+
+        .path-segment {
+            max-width: none;
+        }
+    }
+}
+
+.arrow {
+    margin: 0 2px;
+    font-size: 12px;
+    color: var(--el-text-color-placeholder);
+}
+
+.path-segment {
+    display: inline-block;
+    max-width: 180px;
+    padding: 0 2px;
+    overflow: hidden;
+    color: var(--el-text-color-regular);
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+    white-space: nowrap;
+    transition: color 0.2s;
+
+    &:hover {
+        color: var(--el-color-primary);
+    }
+
+    &.path-segment--overflow {
+        font-weight: 600;
+        color: var(--el-text-color-secondary);
+    }
+}
+
+.file-left-toolbar,
+.file-right-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+}
+
+.file-left-toolbar {
+    flex-wrap: wrap;
+}
+
+.file-utility-group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0;
+}
+
+.file-right-toolbar {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.file-batch-actions {
+    display: flex;
+    align-items: center;
+    order: 1;
+    min-width: 0;
+}
+
+.file-batch-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    max-width: 100%;
+}
+
+.file-search-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    order: 2;
+    gap: 8px;
+    min-width: 0;
+}
+
+.file-search-input {
+    max-width: 310px;
+    min-width: 290px;
+}
+
+.file-ai-button {
+    flex-shrink: 0;
+}
+
 .path {
     display: flex;
     align-items: center;
@@ -2260,20 +2597,17 @@ onBeforeUnmount(() => {
     }
 }
 
-.copy-button {
-    .close {
-        width: 10px;
-        .close-icon {
-            color: red;
-        }
-    }
-}
-
 .btn-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+}
+
+.copy-button {
+    .close {
+        width: 10px;
+    }
 }
 
 .favorite-item {
@@ -2282,25 +2616,36 @@ onBeforeUnmount(() => {
 }
 
 .file-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) auto auto;
     align-items: center;
     width: 100%;
+    min-height: 28px;
+    column-gap: 6px;
+}
+
+.file-row__icon,
+.file-row__actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .file-name {
-    flex-grow: 1;
-    margin-left: 1px;
-    width: 95%;
+    min-width: 0;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-.address-bar {
-    border: var(--el-border);
-    .arrow {
-        color: #726e6e;
-    }
+
+.file-pagination-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex-wrap: wrap;
 }
+
 .search-button {
     width: 20vw;
 }
@@ -2330,6 +2675,78 @@ onBeforeUnmount(() => {
     color: var(--el-color-primary) !important;
     .el-button {
         color: var(--el-color-primary) !important;
+    }
+}
+
+:deep(.file-layout .content-container__toolbar) {
+    row-gap: 10px;
+}
+
+:deep(.file-layout .content-container__title > .flex) {
+    width: 100%;
+}
+
+:deep(.file-layout .content-container__title > .flex > div:last-child) {
+    flex: 0 1 auto;
+    margin-left: auto;
+    min-width: 0;
+}
+
+:deep(.file-layout .content-container__title > .flex > div:last-child:has(.file-batch-toolbar.is-toolbar-wrapped)) {
+    flex: 1 1 100%;
+    margin-left: 0;
+}
+
+:deep(.file-table .el-table__row) {
+    cursor: default;
+}
+
+:deep(.file-table .el-table__row:hover > td.el-table__cell) {
+    background-color: var(--el-fill-color-light);
+}
+
+@media (max-width: 1200px) {
+    .file-right-toolbar {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .file-navigation {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .file-navigation__actions,
+    .file-search-actions,
+    .file-batch-actions,
+    .copy-button {
+        width: 100%;
+    }
+
+    .file-right-toolbar {
+        align-items: stretch;
+        justify-content: stretch;
+    }
+
+    .file-search-actions {
+        flex-wrap: wrap;
+        justify-content: stretch;
+    }
+
+    .file-batch-group {
+        flex-wrap: wrap;
+    }
+
+    .file-search-input,
+    .file-ai-button {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .file-batch-actions {
+        justify-content: flex-start;
     }
 }
 </style>
