@@ -4445,7 +4445,6 @@ const message = {
             permissionLinkageTip: '存在依赖时将自动勾选关联权限，手动取消后部分功能可能提示“当前用户无权限”。',
             view: '查看',
             manage: '管理',
-            dashboard_view: '仪表盘查看',
             app_view: '应用查看',
             app_manage: '应用管理',
             ai_agent_view: '智能体查看',

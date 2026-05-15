@@ -3865,7 +3865,6 @@ const message = {
             permissionLinkageTip: '存在依賴時將自動勾選關聯權限，手動取消後部分功能可能提示「目前使用者無權限」。',
             view: '檢視',
             manage: '管理',
-            dashboard_view: '儀表板檢視',
             app_view: '應用檢視',
             app_manage: '應用管理',
             ai_agent_view: 'AI 助理檢視',

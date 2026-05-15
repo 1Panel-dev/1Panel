@@ -4189,7 +4189,6 @@ const message = {
                 'Si hay dependencias, los permisos relacionados se seleccionarán automáticamente; tras quitarlos manualmente, algunas funciones pueden mostrar "El usuario actual no tiene permiso".',
             view: 'Ver',
             manage: 'Gestionar',
-            dashboard_view: 'Vista del panel',
             app_view: 'Vista de la app',
             app_manage: 'Gestión de la app',
             ai_agent_view: 'Vista del asistente de IA',

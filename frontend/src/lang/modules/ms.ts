@@ -4228,7 +4228,6 @@ const message = {
                 'Kebenaran berkaitan akan dipilih automatik jika ada kebergantungan; selepas dialih keluar manual, sesetengah ciri mungkin memaparkan "Pengguna semasa tiada kebenaran".',
             view: 'Lihat',
             manage: 'Urus',
-            dashboard_view: 'Paparan Papan Pemuka',
             app_view: 'Paparan Aplikasi',
             app_manage: 'Pengurusan Aplikasi',
             ai_agent_view: 'Paparan Pembantu AI',

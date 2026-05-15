@@ -4367,7 +4367,6 @@ const message = {
                 'Permissões relacionadas serão selecionadas automaticamente quando houver dependências; após removê-las manualmente, alguns recursos podem mostrar "O usuário atual não tem permissão".',
             view: 'Visualizar',
             manage: 'Gerenciar',
-            dashboard_view: 'Visualização do Painel',
             app_view: 'Visualização do APP',
             app_manage: 'Gerenciamento do APP',
             ai_agent_view: 'Visualização do Assistente de IA',

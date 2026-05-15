@@ -4221,7 +4221,6 @@ const message = {
                 'Bağımlılık varsa ilişkili izinler otomatik seçilir; manuel kaldırıldıktan sonra bazı özelliklerde "Geçerli kullanıcının izni yok" gösterilebilir.',
             view: 'Görüntüle',
             manage: 'Yönet',
-            dashboard_view: 'Panel Görünümü',
             app_view: 'Uygulama Görünümü',
             app_manage: 'Uygulama Yönetimi',
             ai_agent_view: 'Yapay Zeka Asistanı Görünümü',

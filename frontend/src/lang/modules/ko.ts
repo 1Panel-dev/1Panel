@@ -4087,7 +4087,6 @@ const message = {
                 '의존 관계가 있으면 관련 권한이 자동 선택되며, 수동으로 해제하면 일부 기능에서 "현재 사용자에게 권한이 없습니다"가 표시될 수 있습니다.',
             view: '보기',
             manage: '관리',
-            dashboard_view: '대시보드 보기',
             app_view: '앱 보기',
             app_manage: '앱 관리',
             ai_agent_view: 'AI 도우미 보기',

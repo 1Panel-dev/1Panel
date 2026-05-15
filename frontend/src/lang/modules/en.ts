@@ -4135,7 +4135,6 @@ const message = {
                 'Related permissions are selected automatically when dependencies exist; after manual removal, some features may show "Current user has no permission".',
             view: 'View',
             manage: 'Manage',
-            dashboard_view: 'Dashboard View',
             app_view: 'App View',
             app_manage: 'App Manage',
             ai_agent_view: 'AI Assistant View',
