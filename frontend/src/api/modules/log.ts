@@ -8,7 +8,7 @@ export const getOperationLogs = (info: Log.SearchOpLog) => {
 };
 
 export const getLoginLogs = (info: Log.SearchLgLog) => {
-    return http.post<ResPage<Log.OperationLog>>(`/core/logs/login`, info);
+    return http.post<ResPage<Log.LoginLogs>>(`/core/logs/login`, info);
 };
 
 export const getSystemFiles = (node?: string) => {
