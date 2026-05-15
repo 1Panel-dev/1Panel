@@ -810,13 +810,12 @@ func (f *FileService) ChangeName(req request.FileRename) error {
 		return buserr.New("ErrInvalidChar")
 	}
 	fo := files.NewFileOp()
-	info, _ := files.NewFileInfo(files.FileOption{Path: req.OldName, Expand: false})
-	content, shouldRecordHistory := readEditableFileHistoryContent(req.OldName, info)
+	content, mode, shouldRecordHistory := readEditableFileHistoryContent(req.OldName)
 	if err := fo.Rename(req.OldName, req.NewName); err != nil {
 		return err
 	}
 	if shouldRecordHistory {
-		if histErr := historyService.RecordOperation(fileHistoryOpRename, req.OldName, content, info.FileMode, req.OldName, req.NewName); histErr != nil {
+		if histErr := historyService.RecordOperation(fileHistoryOpRename, req.OldName, content, mode, req.OldName, req.NewName); histErr != nil {
 			global.LOG.Warnf("record file rename history failed for %s: %v", req.OldName, histErr)
 		}
 	}
@@ -848,19 +847,13 @@ func (f *FileService) MvFile(m request.FileMove) error {
 		mode    os.FileMode
 		record  bool
 	}
-	snapshots := make([]moveSnapshot, 0, len(m.OldPaths))
-	for _, oldPath := range m.OldPaths {
-		mode := os.FileMode(0640)
-		record := false
-		var content []byte
-		if info, err := files.NewFileInfo(files.FileOption{Path: oldPath, Expand: false}); err == nil {
-			mode = info.FileMode
-			content, record = readEditableFileHistoryContent(oldPath, info)
-		}
-		snapshots = append(snapshots, moveSnapshot{path: oldPath, content: content, mode: mode, record: record})
-	}
 	var errs []error
 	if m.Type == "cut" {
+		snapshots := make([]moveSnapshot, 0, len(m.OldPaths))
+		for _, oldPath := range m.OldPaths {
+			content, mode, record := readEditableFileHistoryContent(oldPath)
+			snapshots = append(snapshots, moveSnapshot{path: oldPath, content: content, mode: mode, record: record})
+		}
 		if len(m.CoverPaths) > 0 {
 			for _, src := range m.CoverPaths {
 				if err := fo.CopyAndReName(src, m.NewPath, "", true); err != nil {
@@ -909,32 +902,37 @@ func (f *FileService) MvFile(m request.FileMove) error {
 	return nil
 }
 
-func readEditableFileHistoryContent(filePath string, info *files.FileInfo) ([]byte, bool) {
-	if info == nil || info.IsDir || files.IsBlockDevice(info.FileMode) || info.Size > fileHistorySnapshotMaxSize {
-		return nil, false
+func readEditableFileHistoryContent(filePath string) ([]byte, os.FileMode, bool) {
+	info, err := os.Lstat(filePath)
+	if err != nil {
+		return nil, 0640, false
+	}
+	mode := info.Mode()
+	if mode.IsDir() || mode&os.ModeSymlink != 0 || !mode.IsRegular() || files.IsBlockDevice(mode) || info.Size() > fileHistorySnapshotMaxSize {
+		return nil, mode, false
 	}
 	file, err := os.Open(filePath)
 	if err != nil {
-		return nil, false
+		return nil, mode, false
 	}
 	defer file.Close()
 
 	headBuf := make([]byte, 1024)
 	n, err := file.Read(headBuf)
 	if err != nil && err != io.EOF {
-		return nil, false
+		return nil, mode, false
 	}
 	if n > 0 && files.DetectBinary(headBuf[:n]) {
-		return nil, false
+		return nil, mode, false
 	}
 	if _, err := file.Seek(0, 0); err != nil {
-		return nil, false
+		return nil, mode, false
 	}
 	content, err := io.ReadAll(io.LimitReader(file, fileHistorySnapshotMaxSize+1))
 	if err != nil || int64(len(content)) > fileHistorySnapshotMaxSize {
-		return nil, false
+		return nil, mode, false
 	}
-	return content, true
+	return content, mode, true
 }
 
 func buildHistoryMoveTargetPath(dst, name, sourcePath string, sourceCount int) string {
