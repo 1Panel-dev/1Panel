@@ -901,7 +901,7 @@ export namespace AI {
 
     export interface AgentSkillSearchReq {
         agentId: number;
-        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub' | 'official' | 'skills-sh';
+        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub' | 'official' | 'skills-sh' | 'local-hub';
         keyword: string;
     }
 
@@ -938,7 +938,7 @@ export namespace AI {
 
     export interface AgentSkillInstallReq {
         agentId: number;
-        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub' | 'official' | 'skills-sh';
+        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub' | 'official' | 'skills-sh' | 'local-hub';
         slug: string;
         taskID: string;
     }
