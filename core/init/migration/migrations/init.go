@@ -966,6 +966,15 @@ func buildAiMenuChildren(children []dto.ShowMenu) []dto.ShowMenu {
 			Sort:     150,
 		}, "AIProxyManagement"))
 		result = append(result, normalizeAiMenuChild(children, dto.ShowMenu{
+			ID:       "47",
+			Label:    "SkillsHub",
+			Disabled: false,
+			IsShow:   true,
+			Title:    "aiTools.skillsHub.title",
+			Path:     "/ai/skills-hub",
+			Sort:     155,
+		}, "SkillsHub"))
+		result = append(result, normalizeAiMenuChild(children, dto.ShowMenu{
 			ID:       "45",
 			Label:    "AIBenchmark",
 			Disabled: false,
@@ -1093,6 +1102,54 @@ var AddAIProxyMenu = &gormigrate.Migration{
 				continue
 			}
 			menus[i].Children = buildAiMenuChildren(menus[i].Children)
+			break
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
+}
+
+var AddSkillsHubMenu = &gormigrate.Migration{
+	ID: "20260517-add-skills-hub-menu",
+	Migrate: func(tx *gorm.DB) error {
+		if !global.CONF.Base.IsEnterprise {
+			return nil
+		}
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+		if menuJSON == "" {
+			menuJSON = helper.LoadMenus()
+		}
+
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		newItem := dto.ShowMenu{
+			ID:       "47",
+			Disabled: false,
+			Title:    "aiTools.skillsHub.title",
+			IsShow:   true,
+			Label:    "SkillsHub",
+			Path:     "/ai/skills-hub",
+			Sort:     155,
+		}
+		for i := range menus {
+			if menus[i].Label != "AI-Menu" {
+				continue
+			}
+			menus[i].Children = helper.UpsertMenuByLabel(menus[i].Children, newItem, "AIProxyManagement")
 			break
 		}
 

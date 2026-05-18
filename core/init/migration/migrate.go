@@ -45,6 +45,7 @@ func Init() {
 		migrations.AddOpsReportThresholdSetting,
 		migrations.AddAIBenchmarkMenu,
 		migrations.AddAIProxyMenu,
+		migrations.AddSkillsHubMenu,
 		migrations.AddOperationLogUser,
 		migrations.AddIsOfflineSetting,
 	})

@@ -97,6 +97,15 @@ func LoadMenus() string {
 					Sort:     150,
 				}, "AIModel")
 				item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
+					ID:       "47",
+					Disabled: false,
+					Title:    "aiTools.skillsHub.title",
+					IsShow:   true,
+					Label:    "SkillsHub",
+					Path:     "/ai/skills-hub",
+					Sort:     155,
+				}, "AIProxyManagement")
+				item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
 					ID:       "45",
 					Disabled: false,
 					Title:    "aiTools.benchmark.title",
@@ -104,7 +113,7 @@ func LoadMenus() string {
 					Label:    "AIBenchmark",
 					Path:     "/ai/benchmark",
 					Sort:     160,
-				}, "AIProxyManagement")
+				}, "SkillsHub")
 				continue
 			}
 			if item[i].Label != "Xpack-Menu" {
@@ -143,6 +152,7 @@ func MenuSort() []dto.MenuLabelSort {
 		{Label: "Agents", Sort: 50},
 		{Label: "AIModel", Sort: 100},
 		{Label: "AIProxyManagement", Sort: 150},
+		{Label: "SkillsHub", Sort: 155},
 		{Label: "AIBenchmark", Sort: 160},
 		{Label: "MCPServer", Sort: 200},
 		{Label: "GPU", Sort: 300},
