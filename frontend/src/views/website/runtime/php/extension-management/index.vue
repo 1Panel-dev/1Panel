@@ -57,6 +57,7 @@ const handleClose = () => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.install'),
+        permission: true,
         click: function (row: Runtime.SupportExtension) {
             installExtension(row);
         },
@@ -66,6 +67,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.uninstall'),
+        permission: true,
         click: function (row: Runtime.SupportExtension) {
             unInstallPHPExtension(row);
         },

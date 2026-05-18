@@ -1,10 +1,12 @@
-import { getCurrentScope, onScopeDispose } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { setPrimaryColor } from '@/utils/theme';
 
+let themeListenerInitialized = false;
+
 export const useTheme = () => {
+    const { isXpackOrEE, themeConfig } = useGlobalStore();
+
     const switchTheme = () => {
-        const { isXpackOrEE, themeConfig } = useGlobalStore();
         let itemTheme = themeConfig.value.theme;
         if (itemTheme === 'auto') {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -26,20 +28,23 @@ export const useTheme = () => {
         }
     };
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const onSystemThemeChange = () => {
-        const { themeConfig } = useGlobalStore();
-
-        if (themeConfig.value.theme === 'auto') {
-            switchTheme();
+    const ensureSystemThemeListener = () => {
+        if (themeListenerInitialized || typeof window === 'undefined') {
+            return;
         }
+
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const onSystemThemeChange = () => {
+            if (themeConfig.value.theme === 'auto') {
+                switchTheme();
+            }
+        };
+
+        mediaQuery.addEventListener('change', onSystemThemeChange);
+        themeListenerInitialized = true;
     };
-    mediaQuery.addEventListener('change', onSystemThemeChange);
-    if (getCurrentScope()) {
-        onScopeDispose(() => {
-            mediaQuery.removeEventListener('change', onSystemThemeChange);
-        });
-    }
+
+    ensureSystemThemeListener();
 
     return {
         switchTheme,

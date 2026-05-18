@@ -4352,13 +4352,17 @@ const message = {
             nodeAdmin: 'Pentadbir Nod',
             nodeAdminDesc:
                 'Mempunyai kebenaran pengurusan untuk nod yang ditentukan dan boleh mengurus sumber serta konfigurasi dalam nod tersebut.',
+            readOnly: 'Baca Sahaja',
+            readOnlyDesc:
+                'Mempunyai semua keizinan baca sahaja sistem dan boleh melihat semua sumber serta konfigurasi.',
             bindNode: 'Ikat Nod',
             boundUsers: 'Pengguna Terikat',
             role: 'Peranan',
             roleName: 'Nama',
             permission: 'Kebenaran',
             permissionDuplicate: 'Setiap nod hanya boleh diberikan satu peranan',
-            nodeAdminMasterForbidden: 'Kebenaran Pentadbir Nod tidak boleh ditambah pada nod utama',
+            nodeAdminMasterConfirm:
+                'Kebenaran Pentadbir Nod pada nod utama adalah tinggi. Tetapkannya dengan berhati-hati mengikut keperluan pengurusan sebenar.',
             permissionLinkageTip:
                 'Kebenaran berkaitan akan dipilih automatik jika ada kebergantungan; selepas dialih keluar manual, sesetengah ciri mungkin memaparkan "Pengguna semasa tiada kebenaran".',
             allViewPermissionHelper: 'Memberikan semua kebenaran paparan untuk AI Gateway.',

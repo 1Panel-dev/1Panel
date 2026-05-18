@@ -24,8 +24,9 @@
 
 <script lang="ts" setup>
 import { routerToNameWithQuery, routerToPathWithQuery } from '@/utils/router';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { hasPermissionMetaAccess } from '@/utils/rbac';
 
 defineOptions({ name: 'RouterButton' });
 
@@ -37,7 +38,7 @@ const props = defineProps({
 });
 
 const buttonArray = computed(() => {
-    return props.buttons;
+    return props.buttons.filter((button) => hasPermissionMetaAccess(button.permission));
 });
 
 const router = useRouter();
@@ -52,10 +53,25 @@ const handleChange = (label: string) => {
 };
 
 onMounted(() => {
+    syncActiveName();
+});
+
+watch(
+    () => [router.currentRoute.value.path, buttonArray.value.map((button) => button.label).join('|')],
+    () => {
+        syncActiveName();
+    },
+);
+
+function syncActiveName() {
+    if (!buttonArray.value.length) {
+        activeName.value = '';
+        return;
+    }
     if (buttonArray.value.length) {
         let isPathExist = false;
         const btn = buttonArray.value.find((btn) => {
-            return router.currentRoute.value.path.startsWith(btn.path);
+            return btn.path && router.currentRoute.value.path.startsWith(btn.path);
         });
         if (btn) {
             isPathExist = true;
@@ -65,7 +81,7 @@ onMounted(() => {
             activeName.value = buttonArray.value[0].label;
         }
     }
-});
+}
 </script>
 
 <style lang="scss" scoped>
