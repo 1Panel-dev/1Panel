@@ -4190,13 +4190,16 @@ const message = {
             nodeAdmin: 'Administrador de nodo',
             nodeAdminDesc:
                 'Tiene permisos de administración para nodos especificados y puede gestionar recursos y configuraciones dentro de esos nodos.',
+            readOnly: 'Solo lectura',
+            readOnlyDesc: 'Tiene acceso de solo lectura a todos los recursos y configuraciones del sistema.',
             bindNode: 'Vincular nodo',
             boundUsers: 'Usuarios vinculados',
             role: 'Rol',
             roleName: 'Nombre',
             permission: 'Permisos',
             permissionDuplicate: 'Solo se puede asignar un rol a cada nodo',
-            nodeAdminMasterForbidden: 'No se pueden agregar permisos de administrador de nodo al nodo principal',
+            nodeAdminMasterConfirm:
+                'Los permisos de administrador de nodo en el nodo principal son elevados. Asígnelos con cuidado según las necesidades reales de administración.',
             permissionLinkageTip:
                 'Si hay dependencias, los permisos relacionados se seleccionarán automáticamente; tras quitarlos manualmente, algunas funciones pueden mostrar "El usuario actual no tiene permiso".',
             allViewPermissionHelper: 'Concede todos los permisos de visualización para AI Gateway.',

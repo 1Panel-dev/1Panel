@@ -4222,13 +4222,16 @@ const message = {
             nodeAdmin: 'Düğüm Yöneticisi',
             nodeAdminDesc:
                 'Belirtilen düğümler için yönetim izinlerine sahiptir ve bu düğümlerdeki kaynakları ve yapılandırmaları yönetebilir.',
+            readOnly: 'Salt Okunur',
+            readOnlyDesc: 'Tüm sistem kaynaklarını ve yapılandırmalarını yalnızca görüntüleyebilir.',
             bindNode: 'Düğüm Bağla',
             boundUsers: 'Bağlı Kullanıcılar',
             role: 'Rol',
             roleName: 'Ad',
             permission: 'İzinler',
             permissionDuplicate: 'Her düğüme yalnızca bir rol atanabilir',
-            nodeAdminMasterForbidden: 'Ana düğüme düğüm yöneticisi izni eklenemez',
+            nodeAdminMasterConfirm:
+                'Ana düğümdeki Düğüm Yöneticisi izinleri yüksektir. Gerçek yönetim ihtiyaçlarına göre dikkatli şekilde atayın.',
             permissionLinkageTip:
                 'Bağımlılık varsa ilişkili izinler otomatik seçilir; manuel kaldırıldıktan sonra bazı özelliklerde "Geçerli kullanıcının izni yok" gösterilebilir.',
             allViewPermissionHelper: 'AI Gateway için tüm görüntüleme izinlerini verir.',

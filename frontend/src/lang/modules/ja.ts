@@ -4172,13 +4172,16 @@ const message = {
             superAdminDesc: 'システム全体の管理権限を持ち、すべてのリソースと設定を管理できます。',
             nodeAdmin: 'ノード管理者',
             nodeAdminDesc: '指定されたノードの管理権限を持ち、ノード内のリソースと設定を管理できます。',
+            readOnly: '読み取り専用',
+            readOnlyDesc: 'システムのすべての閲覧権限を持ち、すべてのリソースと設定を表示できます。',
             bindNode: 'ノードをバインド',
             boundUsers: 'バインド済みユーザー',
             role: 'ロール',
             roleName: '名前',
             permission: '権限',
             permissionDuplicate: '各ノードには1つのロールのみ割り当てられます',
-            nodeAdminMasterForbidden: 'マスターノードにノード管理者権限を追加することはできません',
+            nodeAdminMasterConfirm:
+                'マスターノードのノード管理者権限は高いため、実際の管理ニーズに合わせて慎重に割り当ててください。',
             permissionLinkageTip:
                 '依存関係がある場合、関連権限は自動選択されます。手動で解除すると、一部機能で「現在のユーザーには権限がありません」と表示される場合があります。',
             allViewPermissionHelper: 'AI ゲートウェイのすべての表示権限を付与します。',

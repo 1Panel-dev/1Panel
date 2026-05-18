@@ -4136,13 +4136,17 @@ const message = {
             nodeAdmin: 'Node Admin',
             nodeAdminDesc:
                 'Has management permissions for specified nodes and can manage resources and configurations within those nodes.',
+            readOnly: 'Read Only',
+            readOnlyDesc:
+                'Has read-only access to all system permissions and can view all resources and configurations.',
             bindNode: 'Bind Node',
             boundUsers: 'Bound Users',
             role: 'Role',
             roleName: 'Name',
             permission: 'Permissions',
             permissionDuplicate: 'Only one role can be assigned to each node',
-            nodeAdminMasterForbidden: 'Node Admin permissions cannot be added to the master node',
+            nodeAdminMasterConfirm:
+                'Node Admin permissions on the master node are elevated. Assign them carefully based on actual management needs.',
             permissionLinkageTip:
                 'Related permissions are selected automatically when dependencies exist; after manual removal, some features may show "Current user has no permission".',
             allViewPermissionHelper: 'Grants all view permissions for AI Gateway.',

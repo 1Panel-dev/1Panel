@@ -1,7 +1,7 @@
 import { getUserInfo } from '@/api/modules/auth';
 import { getEnterpriseUserInfo } from '@/extensions/xpack';
-import { useGlobalStore } from '@/composables/useGlobalStore';
 import type { RouteMeta } from 'vue-router';
+import { GlobalStore } from '@/store';
 
 type RouteAccessMeta = {
     adminOnly?: boolean;
@@ -17,12 +17,18 @@ type RouteAccessTarget = {
 };
 
 export const syncAuthInfo = async (currentNode?: string) => {
-    const { globalStore, currentNode: storeCurrentNode, isEnterprise } = useGlobalStore();
-    if (!isEnterprise.value) {
+    const globalStore = GlobalStore();
+    const storeCurrentNode = globalStore.currentNode;
+    if (!globalStore.isEnterprise) {
         const res = await getUserInfo();
+        globalStore.setAuthInfo({
+            isAdmin: res.data.role === 'ADMIN',
+            permissions: res.data.permissions || [],
+            nodeRoles: res.data.nodeRoles || [],
+        });
         return res.data;
     }
-    const res = await getEnterpriseUserInfo(currentNode ?? storeCurrentNode.value);
+    const res = await getEnterpriseUserInfo(currentNode ?? storeCurrentNode);
     globalStore.setAuthInfo({
         isAdmin: res.data.role === 'ADMIN',
         permissions: res.data.permissions || [],
@@ -32,7 +38,7 @@ export const syncAuthInfo = async (currentNode?: string) => {
 };
 
 export const hasPermission = (permission: string) => {
-    return useGlobalStore().globalStore.hasPermission(permission);
+    return GlobalStore().hasPermission(permission);
 };
 
 export const hasRouteRoleAccess = (meta?: RouteMeta & RouteAccessMeta) => {
