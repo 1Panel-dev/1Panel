@@ -555,6 +555,10 @@ export namespace AI {
         name: string;
     }
 
+    export interface AgentAccountProviderCountReq {
+        providers: string[];
+    }
+
     export interface AgentAccountItem {
         id: number;
         provider: string;

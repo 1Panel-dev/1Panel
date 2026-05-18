@@ -93,7 +93,7 @@ func LoadMenus() string {
 					Title:    "aiTools.aiProxy.title",
 					IsShow:   true,
 					Label:    "AIProxyManagement",
-					Path:     "/ai/ai-proxy",
+					Path:     "/ai/ai-proxy/model-pool",
 					Sort:     150,
 				}, "AIModel")
 				item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{

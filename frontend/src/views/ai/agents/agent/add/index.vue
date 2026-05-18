@@ -108,7 +108,7 @@
 import { computed, reactive, ref, watch } from 'vue';
 import { FormInstance } from 'element-plus';
 import { checkNumberRange, Rules } from '@/global/form-rules';
-import { createAgent, getAgentProviders, pageAgentAccounts } from '@/api/modules/ai';
+import { countAgentAccountsByProvider, createAgent, getAgentProviders, pageAgentAccounts } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import { getAppByKey, getAppDetail } from '@/api/modules/app';
 import { getAgentSettingInfo } from '@/api/modules/setting';
@@ -147,7 +147,7 @@ const form = reactive({
     appVersion: '',
     webUIPort: 18789,
     allowedOrigins: '',
-    provider: 'deepseek',
+    provider: '',
     accountId: undefined as unknown as number,
     model: '',
     baseURL: '',
@@ -286,25 +286,41 @@ const loadProviders = async () => {
         },
         {} as Record<string, AI.ProviderModelInfo[]>,
     );
+    await loadProviderAccountCounts(providerOptions.value.map((item) => item.value));
+    providerOptions.value.sort((a, b) => {
+        const aCount = providerAccountCount.value[a.value] || 0;
+        const bCount = providerAccountCount.value[b.value] || 0;
+        if (aCount > 0 && bCount === 0) {
+            return -1;
+        }
+        if (aCount === 0 && bCount > 0) {
+            return 1;
+        }
+        return 0;
+    });
     if (!providerOptions.value.find((item) => item.value === form.provider) && providerOptions.value.length > 0) {
         form.provider = providerOptions.value[0].value;
     }
-    await loadProviderAccountCounts(providerOptions.value.map((item) => item.value));
     setDefaultModel();
 };
 
 const loadProviderAccountCounts = async (providers: string[]) => {
-    const tasks = providers.map(async (provider) => {
-        const req: AI.AgentAccountSearch = {
-            page: 1,
-            pageSize: 1,
-            provider: provider,
-            name: '',
-        };
-        const res = await pageAgentAccounts(req);
-        providerAccountCount.value[provider] = res.data.total || 0;
+    const providerList = Array.from(new Set(providers.filter(Boolean)));
+    providerAccountCount.value = providerList.reduce(
+        (acc, provider) => {
+            acc[provider] = 0;
+            return acc;
+        },
+        {} as Record<string, number>,
+    );
+    if (providerList.length === 0) {
+        return;
+    }
+    const res = await countAgentAccountsByProvider({ providers: providerList });
+    const counts = res.data || {};
+    providerList.forEach((provider) => {
+        providerAccountCount.value[provider] = counts[provider] || 0;
     });
-    await Promise.all(tasks);
 };
 
 const loadAccounts = async () => {
@@ -357,7 +373,7 @@ const handleAgentTypeChange = async () => {
     setDefaultWebUIPort();
     form.appVersion = '';
     form.model = '';
-    form.provider = 'deepseek';
+    form.provider = '';
     form.accountId = undefined as unknown as number;
     form.baseURL = '';
     if (form.agentType === 'openclaw') {
