@@ -2733,7 +2733,7 @@ onBeforeUnmount(() => {
 }
 
 .file-row {
- display: grid;
+    display: grid;
     grid-template-columns: 24px minmax(0, 1fr) auto auto;
     align-items: center;
     width: 100%;

@@ -69,6 +69,7 @@ type IAgentService interface {
 	UpdateAccount(req dto.AgentAccountUpdateReq) error
 	SyncAgentsByAccount(account *model.AgentAccount) error
 	PageAccounts(req dto.AgentAccountSearch) (int64, []dto.AgentAccountInfo, error)
+	CountAccountsByProviders(req dto.AgentAccountProviderCountReq) (map[string]int64, error)
 	GetAccountModels(req dto.AgentAccountModelReq) ([]dto.AgentAccountModel, error)
 	CreateAccountModel(req dto.AgentAccountModelCreateReq) error
 	UpdateAccountModel(req dto.AgentAccountModelUpdateReq) error
@@ -674,6 +675,10 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 		items[i].Models = models
 	}
 	return count, items, nil
+}
+
+func (a AgentService) CountAccountsByProviders(req dto.AgentAccountProviderCountReq) (map[string]int64, error) {
+	return agentAccountRepo.CountByProviders(req.Providers)
 }
 
 func (a AgentService) GetAccountModels(req dto.AgentAccountModelReq) ([]dto.AgentAccountModel, error) {
