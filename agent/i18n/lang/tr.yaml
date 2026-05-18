@@ -166,6 +166,7 @@ ErrSSLValid: 'Sertifika dosyası anormal, lütfen sertifika durumunu kontrol edi
 ErrWebsiteDir: 'Lütfen web sitesi dizini içindeki bir dizin seçin.'
 ErrComposerFileNotFound: 'composer.json dosyası mevcut değil'
 ErrRuntimeNoPort: 'Çalışma zamanı ortamı bir porta sahip değil, lütfen önce çalışma zamanı ortamını düzenleyin.'
+ErrRuntimeProjectDirContainsCodeDir: 'Çalışma zamanı dizini, seçilen proje dizinini içeriyor. Lütfen başka bir proje dizini seçip yeniden oluşturun.'
 Status: 'Durum'
 start: 'Başlat'
 stop: 'Durdur'

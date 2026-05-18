@@ -41,19 +41,24 @@ import (
 
 func handleRuntime(create request.RuntimeCreate, runtime *model.Runtime, fileOp files.FileOp, appVersionDir string) (err error) {
 	runtimeDir := path.Join(global.Dir.RuntimeDir, create.Type)
+	projectDir := path.Join(runtimeDir, create.Name)
+	if create.CodeDir != "" && isPathInsideOrEqual(projectDir, create.CodeDir) {
+		return buserr.New("ErrRuntimeProjectDirContainsCodeDir")
+	}
 	if err = fileOp.CopyDir(appVersionDir, runtimeDir); err != nil {
 		return
 	}
 	versionDir := path.Join(runtimeDir, filepath.Base(appVersionDir))
-	projectDir := path.Join(runtimeDir, create.Name)
+	cleanupTarget := versionDir
 	defer func() {
 		if err != nil {
-			_ = fileOp.DeleteDir(projectDir)
+			_ = fileOp.DeleteDir(cleanupTarget)
 		}
 	}()
 	if err = fileOp.Rename(versionDir, projectDir); err != nil {
 		return
 	}
+	cleanupTarget = projectDir
 	composeContent, envContent, _, err := handleParams(create, projectDir)
 	if err != nil {
 		return
@@ -76,12 +81,36 @@ func handleRuntime(create request.RuntimeCreate, runtime *model.Runtime, fileOp 
 	return
 }
 
+func isPathInsideOrEqual(baseDir, targetDir string) bool {
+	baseAbs := resolveRuntimePath(baseDir)
+	targetAbs := resolveRuntimePath(targetDir)
+	rel, err := filepath.Rel(baseAbs, targetAbs)
+	if err != nil {
+		return false
+	}
+	return rel == "." || (rel != ".." && !strings.HasPrefix(rel, ".."+string(os.PathSeparator)))
+}
+
+func resolveRuntimePath(dir string) string {
+	cleanDir := filepath.Clean(dir)
+	if realDir, err := filepath.EvalSymlinks(cleanDir); err == nil {
+		return realDir
+	}
+	if absDir, err := filepath.Abs(cleanDir); err == nil {
+		return absDir
+	}
+	return cleanDir
+}
+
 func handlePHP(create request.RuntimeCreate, runtime *model.Runtime, fileOp files.FileOp, appVersionDir string) (err error) {
 	runtimeDir := path.Join(global.Dir.RuntimeDir, create.Type)
+	projectDir := path.Join(runtimeDir, create.Name)
+	if create.CodeDir != "" && isPathInsideOrEqual(projectDir, create.CodeDir) {
+		return buserr.New("ErrRuntimeProjectDirContainsCodeDir")
+	}
 	if err = fileOp.CopyDirWithNewName(appVersionDir, runtimeDir, create.Name); err != nil {
 		return
 	}
-	projectDir := path.Join(runtimeDir, create.Name)
 	defer func() {
 		if err != nil {
 			_ = fileOp.DeleteDir(projectDir)
