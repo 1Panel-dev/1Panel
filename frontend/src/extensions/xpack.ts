@@ -8,6 +8,10 @@ type EnterpriseUserModule = {
     getUserInfo?: (currentNode: string) => Promise<any>;
 };
 
+type EnterpriseSkillsHubModule = {
+    listPublishedSkillHub?: (params: { agentType?: string; keyword?: string }) => Promise<any>;
+};
+
 function findModule<T>(modules: Record<string, T>, suffix: string): T | null {
     for (const path in modules) {
         if (path.endsWith(suffix)) {
@@ -63,6 +67,22 @@ export async function getEnterpriseUserInfo(currentNode: string) {
         return null;
     }
     return module.getUserInfo(currentNode);
+}
+
+function getEnterpriseSkillsHubModule(): EnterpriseSkillsHubModule | null {
+    const enterpriseModules = import.meta.glob('@/enterprise/api/modules/skills-hub.ts', { eager: true }) as Record<
+        string,
+        EnterpriseSkillsHubModule
+    >;
+    return findModule(enterpriseModules, '/api/modules/skills-hub.ts');
+}
+
+export async function listEnterprisePublishedSkillHub(params: { agentType?: string; keyword?: string }) {
+    const module = getEnterpriseSkillsHubModule();
+    if (!module?.listPublishedSkillHub) {
+        return null;
+    }
+    return module.listPublishedSkillHub(params);
 }
 
 export const searchExtensionSetting = searchXpackSetting;
