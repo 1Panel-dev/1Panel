@@ -1,11 +1,19 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { hasManagePermissionAccess, hasPermissionAccess, toManagePermission } from '@/utils/permission';
+import {
+    hasManagePermissionAccess,
+    hasPermissionAccess,
+    toManagePermission,
+    type PermissionBindingValue,
+} from '@/utils/permission';
 
-const getRoutePermission = (route: ReturnType<typeof useRoute>) => {
+const getRoutePermission = (route: ReturnType<typeof useRoute>): PermissionBindingValue => {
     const metaPermission = route.meta?.permission;
     if (typeof metaPermission === 'string' && metaPermission) {
+        return metaPermission;
+    }
+    if (Array.isArray(metaPermission)) {
         return metaPermission;
     }
 
@@ -14,12 +22,22 @@ const getRoutePermission = (route: ReturnType<typeof useRoute>) => {
         if (typeof permission === 'string' && permission) {
             return permission;
         }
+        if (Array.isArray(permission)) {
+            return permission;
+        }
     }
 
     return '';
 };
 
-export const useMenuManagePermission = (permission?: string) => {
+const toManagePermissionValue = (permission: PermissionBindingValue) => {
+    if (Array.isArray(permission)) {
+        return permission.map(toManagePermission).filter(Boolean);
+    }
+    return toManagePermission(permission || '');
+};
+
+export const useMenuManagePermission = (permission?: PermissionBindingValue) => {
     const route = useRoute();
     const { isAdmin, isNodeAdmin } = useGlobalStore();
 
@@ -30,7 +48,7 @@ export const useMenuManagePermission = (permission?: string) => {
         return getRoutePermission(route);
     });
     const managePermission = computed(() => {
-        return toManagePermission(sourcePermission.value);
+        return toManagePermissionValue(sourcePermission.value);
     });
     const hasAdminManagePermission = computed(() => isAdmin.value || isNodeAdmin.value);
     const hasPermission = computed(() => {
@@ -48,6 +66,6 @@ export const useMenuManagePermission = (permission?: string) => {
     };
 };
 
-export const useCan = (permission?: string) => {
+export const useCan = (permission?: PermissionBindingValue) => {
     return useMenuManagePermission(permission).hasPermission;
 };

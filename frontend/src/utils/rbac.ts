@@ -3,16 +3,17 @@ import { getEnterpriseUserInfo } from '@/extensions/xpack';
 import type { RouteMeta } from 'vue-router';
 import { GlobalStore } from '@/store';
 
+export type PermissionMetaValue = string | string[];
+
 type RouteAccessMeta = {
     adminOnly?: boolean;
     protectedRoleOnly?: boolean;
+    permission?: PermissionMetaValue;
 };
 
 type RouteAccessTarget = {
     matched: Array<{
-        meta?: RouteMeta & {
-            permission?: string;
-        };
+        meta?: RouteMeta & RouteAccessMeta;
     }>;
 };
 
@@ -41,6 +42,17 @@ export const hasPermission = (permission: string) => {
     return GlobalStore().hasPermission(permission);
 };
 
+export const hasPermissionMetaAccess = (permission?: PermissionMetaValue) => {
+    if (!permission) {
+        return true;
+    }
+    if (Array.isArray(permission)) {
+        const permissions = permission.filter(Boolean);
+        return permissions.length === 0 || permissions.some((item) => hasPermission(item));
+    }
+    return hasPermission(permission);
+};
+
 export const hasRouteRoleAccess = (meta?: RouteMeta & RouteAccessMeta) => {
     const globalStore = GlobalStore();
 
@@ -60,14 +72,7 @@ export const hasRouteRoleAccess = (meta?: RouteMeta & RouteAccessMeta) => {
 };
 
 export const hasRoutePermissionAccess = (route: RouteAccessTarget) => {
-    const requiredPermissions = [
-        ...new Set(
-            route.matched
-                .map((record) => record.meta?.permission)
-                .filter((permission): permission is string => !!permission),
-        ),
-    ];
-    return requiredPermissions.every((permission) => hasPermission(permission));
+    return route.matched.every((record) => hasPermissionMetaAccess(record.meta?.permission));
 };
 
 export const hasRouteAccess = (route: RouteAccessTarget) => {

@@ -99,10 +99,14 @@ router.beforeEach(async (to, from, next) => {
         cachedRoute !== to.path &&
         !isRedirecting
     ) {
-        isRedirecting = true;
-        next(cachedRoute);
-        NProgress.done();
-        return;
+        const cachedRouteInfo = router.resolve(cachedRoute);
+        if (cachedRouteInfo.matched.length > 0 && hasRouteAccess(cachedRouteInfo)) {
+            isRedirecting = true;
+            next(cachedRoute);
+            NProgress.done();
+            return;
+        }
+        localStorage.removeItem(activeMenuKey);
     }
 
     if (!hasRouteAccess(to)) {
