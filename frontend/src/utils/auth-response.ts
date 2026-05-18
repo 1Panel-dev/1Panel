@@ -1,7 +1,7 @@
 import { ResultEnum } from '@/enums/http-enum';
 import i18n from '@/lang';
 import router from '@/routers';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { MsgError } from '@/utils/message';
 
 export type AuthResponseAction = 'reject' | 'return';
@@ -19,11 +19,11 @@ interface AuthResponseOptions {
 const forbiddenMessage = () => i18n.global.t('commons.res.forbidden');
 
 export const redirectToEntrance = () => {
-    const globalStore = GlobalStore();
-    globalStore.isLogin = false;
+    const { entrance, isLogin } = useGlobalStore();
+    isLogin.value = false;
     router.push({
         name: 'entrance',
-        params: { code: globalStore.entrance },
+        params: { code: entrance.value },
     });
 };
 

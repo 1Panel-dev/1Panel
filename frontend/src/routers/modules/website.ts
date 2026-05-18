@@ -9,7 +9,6 @@ const webSiteRouter = {
     meta: {
         icon: 'p-website',
         title: 'menu.website',
-        permission: 'website_view',
     },
     children: [
         {

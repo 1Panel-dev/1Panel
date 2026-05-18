@@ -4199,6 +4199,8 @@ const message = {
             nodeAdminMasterForbidden: 'No se pueden agregar permisos de administrador de nodo al nodo principal',
             permissionLinkageTip:
                 'Si hay dependencias, los permisos relacionados se seleccionarán automáticamente; tras quitarlos manualmente, algunas funciones pueden mostrar "El usuario actual no tiene permiso".',
+            allViewPermissionHelper: 'Concede todos los permisos de visualización para AI Gateway.',
+            apiKeyViewPermissionHelper: 'Solo permite ver las API Keys de AI Gateway.',
             view: 'Ver',
             manage: 'Gestionar',
         },
