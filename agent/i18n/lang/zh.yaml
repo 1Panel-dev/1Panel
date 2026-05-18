@@ -139,6 +139,7 @@ ExportDate: "时间"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
+ErrSensitiveFileRead: "不允许读取敏感文件"
 ErrFileToLarge: "文件超过 10M，无法打开"
 ErrPathNotFound: "目录不存在"
 ErrMovePathFailed: "目标路径不能包含原路径！"

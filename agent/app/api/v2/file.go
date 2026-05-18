@@ -640,6 +640,10 @@ func (b *BaseApi) MoveFile(c *gin.Context) {
 // @Router /files/download [get]
 func (b *BaseApi) Download(c *gin.Context) {
 	filePath := c.Query("path")
+	if files.ShouldDenySensitiveFileRead(filePath) {
+		helper.InternalServer(c, buserr.New("ErrSensitiveFileRead"))
+		return
+	}
 	file, err := os.Open(filePath)
 	if err != nil {
 		helper.InternalServer(c, err)
@@ -673,6 +677,10 @@ func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(req.Path) {
 		helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPathNotFound", nil)
+		return
+	}
+	if files.ShouldDenySensitiveFileRead(req.Path) {
+		helper.InternalServer(c, buserr.New("ErrSensitiveFileRead"))
 		return
 	}
 	filePath := req.Path
@@ -1333,6 +1341,10 @@ func (b *BaseApi) DownloadFileShare(c *gin.Context) {
 			return
 		}
 		helper.InternalServer(c, err)
+		return
+	}
+	if files.ShouldDenySensitiveFileRead(filePath) {
+		helper.InternalServer(c, buserr.New("ErrSensitiveFileRead"))
 		return
 	}
 	file, err := os.Open(filePath)

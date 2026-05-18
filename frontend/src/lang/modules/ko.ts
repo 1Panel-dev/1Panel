@@ -4209,13 +4209,16 @@ const message = {
             superAdminDesc: '시스템 전체 관리 권한을 보유하며 모든 리소스와 설정을 관리할 수 있습니다.',
             nodeAdmin: '노드 관리자',
             nodeAdminDesc: '지정된 노드의 관리 권한을 보유하며 노드 내 리소스와 설정을 관리할 수 있습니다.',
+            readOnly: '읽기 전용',
+            readOnlyDesc: '시스템의 모든 읽기 전용 권한을 보유하며 모든 리소스와 설정을 볼 수 있습니다.',
             bindNode: '노드 연결',
             boundUsers: '바인딩된 사용자',
             role: '역할',
             roleName: '이름',
             permission: '권한',
             permissionDuplicate: '각 노드에는 하나의 역할만 지정할 수 있습니다',
-            nodeAdminMasterForbidden: '마스터 노드에는 노드 관리자 권한을 추가할 수 없습니다',
+            nodeAdminMasterConfirm:
+                '마스터 노드의 노드 관리자 권한은 높은 수준이므로 실제 관리 필요에 따라 신중하게 할당하세요.',
             permissionLinkageTip:
                 '의존 관계가 있으면 관련 권한이 자동 선택되며, 수동으로 해제하면 일부 기능에서 "현재 사용자에게 권한이 없습니다"가 표시될 수 있습니다.',
             allViewPermissionHelper: 'AI 게이트웨이의 모든 보기 권한을 부여합니다.',

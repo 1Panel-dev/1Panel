@@ -38,7 +38,7 @@ import { menuList } from '@/routers/router';
 import { MenuStore } from '@/store';
 import { getSettingBaseInfo } from '@/api/modules/setting';
 import PrimaryMenu from '@/assets/images/menu-bg.svg?component';
-import { hasPermission, hasRouteRoleAccess } from '@/utils/rbac';
+import { hasPermissionMetaAccess, hasRouteRoleAccess } from '@/utils/rbac';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const route = useRoute();
@@ -129,12 +129,7 @@ function allowMenuItem(item: RouteRecordRaw) {
     if (!hasRouteRoleAccess(item.meta)) {
         return false;
     }
-    const permission = item.meta?.permission as string | undefined;
-    if (!permission) {
-        return true;
-    }
-    const allowed = hasPermission(permission);
-    return allowed;
+    return hasPermissionMetaAccess(item.meta?.permission as string | string[] | undefined);
 }
 
 function buildMenuListFromSettings(hideMenuValue?: string) {

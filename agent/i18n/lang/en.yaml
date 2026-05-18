@@ -139,6 +139,7 @@ ExportDate: "Time"
 
 #file
 ErrFileCanNotRead: 'File preview is not supported'
+ErrSensitiveFileRead: 'Reading sensitive files is not allowed'
 ErrFileToLarge: 'File is larger than 10 MB'
 ErrPathNotFound: 'Directory does not exist'
 ErrMovePathFailed: 'Target path cannot include source path'

@@ -4491,13 +4491,16 @@ const message = {
             nodeAdmin: 'Administrador de Nó',
             nodeAdminDesc:
                 'Possui permissões de gerenciamento para nós especificados e pode gerenciar recursos e configurações dentro desses nós.',
+            readOnly: 'Somente leitura',
+            readOnlyDesc: 'Tem acesso somente de leitura a todos os recursos e configurações do sistema.',
             bindNode: 'Vincular Nó',
             boundUsers: 'Usuários vinculados',
             role: 'Função',
             roleName: 'Nome',
             permission: 'Permissões',
             permissionDuplicate: 'Apenas uma função pode ser atribuída a cada nó',
-            nodeAdminMasterForbidden: 'Permissões de administrador de nó não podem ser adicionadas ao nó principal',
+            nodeAdminMasterConfirm:
+                'As permissões de Administrador de Nó no nó principal são elevadas. Atribua-as com cuidado conforme as necessidades reais de administração.',
             permissionLinkageTip:
                 'Permissões relacionadas serão selecionadas automaticamente quando houver dependências; após removê-las manualmente, alguns recursos podem mostrar "O usuário atual não tem permissão".',
             allViewPermissionHelper: 'Concede todas as permissões de visualização do AI Gateway.',
