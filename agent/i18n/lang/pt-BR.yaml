@@ -166,6 +166,7 @@ ErrSSLValid: 'O arquivo do certificado está anormal, verifique o status do cert
 ErrWebsiteDir: ', selecione um diretório dentro do diretório do site.'
 ErrComposerFileNotFound: 'O arquivo composer.json não existe'
 ErrRuntimeNoPort: 'O ambiente de tempo de execução não está configurado com uma porta, edite o ambiente de tempo de execução primeiro.'
+ErrRuntimeProjectDirContainsCodeDir: 'O diretório de execução inclui o diretório de projeto selecionado. Escolha outro diretório de projeto e crie novamente.'
 Status: 'Status'
 start: 'Iniciar'
 stop: 'Parar'

@@ -181,6 +181,7 @@ ErrSSLValid: 'Certificate file is invalid'
 ErrWebsiteDir: 'Select a subdirectory under the website directory'
 ErrComposerFileNotFound: "composer.json file does not exist"
 ErrRuntimeNoPort: 'Runtime port is not set'
+ErrRuntimeProjectDirContainsCodeDir: 'The runtime directory contains the selected project directory. Please choose another project directory and create it again.'
 Status: 'Status'
 start: 'Start'
 stop: 'Stop'
