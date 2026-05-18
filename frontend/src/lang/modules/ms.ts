@@ -4238,6 +4238,8 @@ const message = {
             nodeAdminMasterForbidden: 'Kebenaran Pentadbir Nod tidak boleh ditambah pada nod utama',
             permissionLinkageTip:
                 'Kebenaran berkaitan akan dipilih automatik jika ada kebergantungan; selepas dialih keluar manual, sesetengah ciri mungkin memaparkan "Pengguna semasa tiada kebenaran".',
+            allViewPermissionHelper: 'Memberikan semua kebenaran paparan untuk AI Gateway.',
+            apiKeyViewPermissionHelper: 'Hanya membenarkan paparan API Key AI Gateway.',
             view: 'Lihat',
             manage: 'Urus',
         },

@@ -107,7 +107,6 @@ const props = defineProps({
     },
 });
 const emit = defineEmits(['search', 'update:selects', 'update:paginationConfig']);
-
 const tableRef = ref();
 const tableHeight = ref<number | string>('');
 const menuRef = ref<HTMLElement | null>(null);

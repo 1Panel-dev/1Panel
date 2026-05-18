@@ -55,10 +55,10 @@ func RepoURL() string {
 }
 func ResourceURL() string {
 	if CONF.Base.IsEnterprise {
-		return "https://resource.fit2cloud.com/1panel/resource/enterprise"
+		return "https://resource.fit2cloud.com/1panel/resource/v2"
 	}
 	if CONF.Base.IsFxplay {
-		return "https://resource.fit2cloud.com/1panel/resource/fusionxplay"
+		return "https://resource.fit2cloud.com/1panel/resource/v2"
 	}
 	if CONF.Base.Edition != "intl" {
 		return "https://resource.fit2cloud.com/1panel/resource/v2"

@@ -4463,6 +4463,8 @@ const message = {
             permissionDuplicate: '每个节点只能添加一种角色',
             nodeAdminMasterForbidden: '主节点不允许添加节点管理员权限',
             permissionLinkageTip: '存在依赖时将自动勾选关联权限，手动取消后部分功能可能提示“当前用户无权限”。',
+            allViewPermissionHelper: '拥有 AI 网关的所有查看权限。',
+            apiKeyViewPermissionHelper: '仅能查看 AI 网关 API Key。',
             view: '查看',
             manage: '管理',
         },

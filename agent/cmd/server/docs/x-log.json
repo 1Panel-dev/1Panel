@@ -805,6 +805,51 @@
 		"formatZH": "更新快捷命令 [name]",
 		"formatEN": "update quick command [name]"
 	},
+	"/core/enterprise/user": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "添加用户 [name]",
+		"formatEN": "add user [name]"
+	},
+	"/core/enterprise/users/del": {
+		"bodyKeys": [
+			"ids"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"db": "users",
+				"output_column": "name",
+				"output_value": "names"
+			}
+		],
+		"formatZH": "删除用户 [names]",
+		"formatEN": "delete user [names]"
+	},
+	"/core/enterprise/users/info/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 [name] 认证信息",
+		"formatEN": "update user [name] auth info"
+	},
+	"/core/enterprise/users/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 [name]",
+		"formatEN": "update user [name]"
+	},
 	"/core/groups": {
 		"bodyKeys": [
 			"name",

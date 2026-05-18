@@ -999,10 +999,6 @@ const paginationConfig = reactive({
     total: 0,
 });
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
-
 const btnWrapperRefs = ref<Record<string, any>>({});
 
 const setBtnWrapperRef = (key: string, el: any) => {
@@ -1169,7 +1165,7 @@ const loadInitialExistingPath = async (url: string) => {
         sortOrder: oldSortOrder,
         showHidden,
     });
-    globalStore.lastFilePath = req.path;
+    lastFilePath.value = req.path;
     getPaths(req.path);
     updateTab(req.path);
     paths.value = buildPaths(req.path);

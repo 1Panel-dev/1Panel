@@ -14155,6 +14155,41 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/files/decompress/stop": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.FileDeCompressStopReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Stop decompress task",
+				"tags": [
+					"File"
+				]
+			}
+		},
 		"/files/del": {
 			"post": {
 				"consumes": [
@@ -20160,6 +20195,30 @@ const docTemplate = `{
 					"formatZH": "修改系统配置 [key] =\u003e [value]",
 					"paramKeys": []
 				}
+			}
+		},
+		"/settings/website/dir": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load website dir",
+				"tags": [
+					"System Setting"
+				]
 			}
 		},
 		"/toolbox/clam": {
@@ -34334,6 +34393,9 @@ const docTemplate = `{
 				"proxyType": {
 					"type": "string"
 				},
+				"scriptSync": {
+					"type": "string"
+				},
 				"securityEntrance": {
 					"type": "string"
 				},
@@ -36577,6 +36639,9 @@ const docTemplate = `{
 				"secret": {
 					"type": "string"
 				},
+				"taskID": {
+					"type": "string"
+				},
 				"type": {
 					"type": "string"
 				}
@@ -36585,6 +36650,17 @@ const docTemplate = `{
 				"dst",
 				"path",
 				"type"
+			],
+			"type": "object"
+		},
+		"request.FileDeCompressStopReq": {
+			"properties": {
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"taskID"
 			],
 			"type": "object"
 		},
@@ -36877,8 +36953,7 @@ const docTemplate = `{
 			},
 			"required": [
 				"page",
-				"pageSize",
-				"type"
+				"pageSize"
 			],
 			"type": "object"
 		},

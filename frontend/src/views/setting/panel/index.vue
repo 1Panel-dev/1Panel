@@ -215,6 +215,19 @@ const {
     watermarkShow,
 } = useGlobalStore();
 
+const {
+    globalStore,
+    isEnterprise,
+    isIntl,
+    isMobile,
+    isOffline,
+    isXpackOrEE,
+    openMenuTabs,
+    themeConfig,
+    watermark,
+    watermarkShow,
+} = useGlobalStore();
+
 const loading = ref(false);
 
 const { switchTheme } = useTheme();

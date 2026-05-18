@@ -136,7 +136,7 @@ export async function loadMasterProductProFromDB() {
             globalStore.isProductPro = res.data.status === 'Bound';
         }
     }
-    switchTheme();
+    useTheme().switchTheme();
     initFavicon();
     loadDataFromDB();
 }
@@ -167,7 +167,7 @@ export async function getXpackSettingForTheme() {
     } else {
         resetXSetting();
     }
-    switchTheme();
+    useTheme().switchTheme();
     initFavicon();
 }
 

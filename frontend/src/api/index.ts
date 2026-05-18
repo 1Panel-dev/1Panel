@@ -3,13 +3,13 @@ import { ResultData } from '@/api/interface';
 import { ResultEnum } from '@/enums/http-enum';
 import { checkStatus } from './helper/check-status';
 import router from '@/routers';
-import { GlobalStore } from '@/store';
 import { MsgError } from '@/utils/message';
 import { encodeBase64 } from '@/utils/base64';
 import i18n from '@/lang';
 import { changeToLocal } from '@/utils/node';
 import { getCookie } from '@/utils/auth';
 import { handleAuthResponseCode } from '@/utils/auth-response';
+import { GlobalStore } from '@/store';
 
 const config = {
     baseURL: import.meta.env.VITE_API_URL as string,
