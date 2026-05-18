@@ -29,7 +29,7 @@ func HandleNotRoute(c *gin.Context) bool {
 		HandleNotSecurity(c, "err_ip_limit")
 		return false
 	}
-	if checkFrontendPath(c) {
+	if CanServeFrontendPath(c) {
 		ToIndexHtml(c)
 		return false
 	}
@@ -122,8 +122,8 @@ func HandleNotSecurity(c *gin.Context, resType string) {
 	c.Data(statusCode, "text/html; charset=utf-8", data)
 }
 
-func isFrontendPath(c *gin.Context) bool {
-	reqUri := strings.TrimSuffix(c.Request.URL.Path, "/")
+func IsFrontendPath(path string) bool {
+	reqUri := strings.TrimSuffix(path, "/")
 	if _, ok := constant.WebUrlMap[reqUri]; ok {
 		return true
 	}
@@ -135,8 +135,8 @@ func isFrontendPath(c *gin.Context) bool {
 	return false
 }
 
-func checkFrontendPath(c *gin.Context) bool {
-	if !isFrontendPath(c) {
+func CanServeFrontendPath(c *gin.Context) bool {
+	if !IsFrontendPath(c.Request.URL.Path) {
 		return false
 	}
 	if isPublicFileSharePagePath(c.Request.URL.Path) {
@@ -144,7 +144,7 @@ func checkFrontendPath(c *gin.Context) bool {
 	}
 	authService := service.NewIAuthService()
 	if authService.GetSecurityEntrance() != "" {
-		return authService.IsLogin(c)
+		return checkEntrance(c) || authService.IsLogin(c)
 	}
 	return true
 }

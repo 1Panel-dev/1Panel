@@ -22,6 +22,8 @@ func TestGenerateXlog(t *testing.T) {
 		filepath.Join(workDir, "core/app/api/v2"),
 		filepath.Join(workDir, "agent/xpack/app/api/v2"),
 		filepath.Join(workDir, "core/xpack/app/api/v2"),
+		filepath.Join(workDir, "agent/enterprise/app/api/v2"),
+		filepath.Join(workDir, "core/enterprise/app/api/v2"),
 	}
 
 	xlogMap := make(map[string]operationJson)
@@ -89,7 +91,7 @@ func TestGenerateSwaggerDoc(t *testing.T) {
 	cmd2.Dir = workDir
 	std2, err := cmd2.CombinedOutput()
 	if err != nil {
-		fmt.Printf("generate swagger doc of core failed, std1: %v, err: %v", string(std2), err)
+		fmt.Printf("generate swagger doc of core failed, std2: %v, err: %v", string(std2), err)
 		return
 	}
 

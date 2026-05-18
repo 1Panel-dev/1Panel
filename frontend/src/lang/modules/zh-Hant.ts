@@ -3875,6 +3875,8 @@ const message = {
             permissionDuplicate: '每個節點只能新增一種角色',
             nodeAdminMasterForbidden: '主節點不允許新增節點管理員權限',
             permissionLinkageTip: '存在依賴時將自動勾選關聯權限，手動取消後部分功能可能提示「目前使用者無權限」。',
+            allViewPermissionHelper: '擁有 AI 閘道的所有檢視權限。',
+            apiKeyViewPermissionHelper: '僅能檢視 AI 閘道 API Key。',
             view: '檢視',
             manage: '管理',
         },

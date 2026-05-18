@@ -4232,6 +4232,8 @@ const message = {
             nodeAdminMasterForbidden: 'Права администратора узла нельзя добавить к главному узлу',
             permissionLinkageTip:
                 'При наличии зависимостей связанные права выбираются автоматически; после ручного снятия некоторые функции могут показать "У текущего пользователя нет разрешения".',
+            allViewPermissionHelper: 'Предоставляет все права просмотра для AI Gateway.',
+            apiKeyViewPermissionHelper: 'Разрешает просматривать только API Key AI Gateway.',
             view: 'Просмотр',
             manage: 'Управление',
         },

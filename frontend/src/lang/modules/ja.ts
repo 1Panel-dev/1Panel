@@ -4181,6 +4181,8 @@ const message = {
             nodeAdminMasterForbidden: 'マスターノードにノード管理者権限を追加することはできません',
             permissionLinkageTip:
                 '依存関係がある場合、関連権限は自動選択されます。手動で解除すると、一部機能で「現在のユーザーには権限がありません」と表示される場合があります。',
+            allViewPermissionHelper: 'AI ゲートウェイのすべての表示権限を付与します。',
+            apiKeyViewPermissionHelper: 'AI ゲートウェイの API Key のみ表示できます。',
             view: '表示',
             manage: '管理',
         },
