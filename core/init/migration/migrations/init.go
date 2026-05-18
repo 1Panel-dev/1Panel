@@ -962,7 +962,7 @@ func buildAiMenuChildren(children []dto.ShowMenu) []dto.ShowMenu {
 			Disabled: false,
 			IsShow:   true,
 			Title:    "aiTools.aiProxy.title",
-			Path:     "/ai/ai-proxy",
+			Path:     "/ai/ai-proxy/model-pool",
 			Sort:     150,
 		}, "AIProxyManagement"))
 		result = append(result, normalizeAiMenuChild(children, dto.ShowMenu{

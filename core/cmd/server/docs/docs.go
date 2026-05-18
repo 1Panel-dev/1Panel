@@ -56,7 +56,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/ai/agents/accounts": {
+		"/ai/accounts": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -85,13 +85,13 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Create Agent account",
+				"summary": "Create model account",
 				"tags": [
 					"AI"
 				]
 			}
 		},
-		"/ai/agents/accounts/delete": {
+		"/ai/accounts/delete": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -120,13 +120,13 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Delete Agent account",
+				"summary": "Delete model account",
 				"tags": [
 					"AI"
 				]
 			}
 		},
-		"/ai/agents/accounts/models": {
+		"/ai/accounts/models": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -161,13 +161,13 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "List Agent account models",
+				"summary": "List model account models",
 				"tags": [
 					"AI"
 				]
 			}
 		},
-		"/ai/agents/accounts/models/create": {
+		"/ai/accounts/models/create": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -196,13 +196,13 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Create Agent account model",
+				"summary": "Create model account model",
 				"tags": [
 					"AI"
 				]
 			}
 		},
-		"/ai/agents/accounts/models/delete": {
+		"/ai/accounts/models/delete": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -231,13 +231,13 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Delete Agent account model",
+				"summary": "Delete model account model",
 				"tags": [
 					"AI"
 				]
 			}
 		},
-		"/ai/agents/accounts/models/update": {
+		"/ai/accounts/models/update": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -266,13 +266,13 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Update Agent account model",
+				"summary": "Update model account model",
 				"tags": [
 					"AI"
 				]
 			}
 		},
-		"/ai/agents/accounts/search": {
+		"/ai/accounts/search": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -304,13 +304,54 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Page Agent accounts",
+				"summary": "Page model accounts",
 				"tags": [
 					"AI"
 				]
 			}
 		},
-		"/ai/agents/accounts/update": {
+		"/ai/accounts/counts": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountProviderCountReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"additionalProperties": {
+								"type": "integer"
+							},
+							"type": "object"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Count model accounts by provider",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/accounts/update": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -339,13 +380,13 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Update Agent account",
+				"summary": "Update model account",
 				"tags": [
 					"AI"
 				]
 			}
 		},
-		"/ai/agents/accounts/verify": {
+		"/ai/accounts/verify": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -374,7 +415,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Verify Agent account",
+				"summary": "Verify model account",
 				"tags": [
 					"AI"
 				]
@@ -1849,7 +1890,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/ai/agents/providers": {
+		"/ai/accounts/providers": {
 			"get": {
 				"responses": {
 					"200": {
@@ -1870,7 +1911,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Get Providers",
+				"summary": "Get model account providers",
 				"tags": [
 					"AI"
 				]
@@ -25884,6 +25925,17 @@ const docTemplate = `{
 				"page",
 				"pageSize"
 			],
+			"type": "object"
+		},
+		"dto.AgentAccountProviderCountReq": {
+			"properties": {
+				"providers": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				}
+			},
 			"type": "object"
 		},
 		"dto.AgentAccountUpdateReq": {

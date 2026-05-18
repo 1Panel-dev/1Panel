@@ -189,48 +189,52 @@ export const updateAgentRoleMarkdownFile = (req: AI.AgentRoleMarkdownFilesUpdate
 };
 
 export const getAgentProviders = () => {
-    return http.get<AI.ProviderInfo[]>(`/ai/agents/providers`);
+    return http.get<AI.ProviderInfo[]>(`/ai/accounts/providers`);
 };
 
 export const createAgentAccount = (req: AI.AgentAccountCreateReq) => {
-    return http.post(`/ai/agents/accounts`, req);
+    return http.post(`/ai/accounts`, req);
 };
 
 export const updateAgentAccount = (req: AI.AgentAccountUpdateReq) => {
-    return http.post(`/ai/agents/accounts/update`, req);
+    return http.post(`/ai/accounts/update`, req);
 };
 
 export const pageAgentAccounts = (req: AI.AgentAccountSearch, currentNode?: string) => {
     return http.post<ResPage<AI.AgentAccountItem>>(
-        `/ai/agents/accounts/search`,
+        `/ai/accounts/search`,
         req,
         undefined,
         currentNode ? { CurrentNode: currentNode } : undefined,
     );
 };
 
+export const countAgentAccountsByProvider = (req: AI.AgentAccountProviderCountReq) => {
+    return http.post<Record<string, number>>(`/ai/accounts/counts`, req);
+};
+
 export const getAgentAccountModels = (req: AI.AgentAccountModelReq) => {
-    return http.post<AI.AgentAccountModel[]>(`/ai/agents/accounts/models`, req);
+    return http.post<AI.AgentAccountModel[]>(`/ai/accounts/models`, req);
 };
 
 export const createAgentAccountModel = (req: AI.AgentAccountModelCreateReq) => {
-    return http.post(`/ai/agents/accounts/models/create`, req);
+    return http.post(`/ai/accounts/models/create`, req);
 };
 
 export const updateAgentAccountModel = (req: AI.AgentAccountModelUpdateReq) => {
-    return http.post(`/ai/agents/accounts/models/update`, req);
+    return http.post(`/ai/accounts/models/update`, req);
 };
 
 export const deleteAgentAccountModel = (req: AI.AgentAccountModelDeleteReq) => {
-    return http.post(`/ai/agents/accounts/models/delete`, req);
+    return http.post(`/ai/accounts/models/delete`, req);
 };
 
 export const verifyAgentAccount = (req: AI.AgentAccountVerifyReq) => {
-    return http.post(`/ai/agents/accounts/verify`, req);
+    return http.post(`/ai/accounts/verify`, req);
 };
 
 export const deleteAgentAccount = (req: AI.AgentAccountDeleteReq) => {
-    return http.post(`/ai/agents/accounts/delete`, req);
+    return http.post(`/ai/accounts/delete`, req);
 };
 
 export const getAgentFeishuConfig = (req: AI.AgentFeishuConfigReq) => {

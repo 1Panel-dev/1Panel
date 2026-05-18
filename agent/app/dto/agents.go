@@ -274,6 +274,10 @@ type AgentAccountSearch struct {
 	Name     string `json:"name"`
 }
 
+type AgentAccountProviderCountReq struct {
+	Providers []string `json:"providers"`
+}
+
 type AgentAccountInfo struct {
 	ID             uint                `json:"id"`
 	Provider       string              `json:"provider"`
