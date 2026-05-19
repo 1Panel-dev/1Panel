@@ -18,44 +18,6 @@ const docTemplate = `{
 	"host": "",
 	"basePath": "/api/v2",
 	"paths": {
-		"/ai/agents": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.AgentCreateReq"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.AgentItem"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Create Agent",
-				"tags": [
-					"AI"
-				]
-			}
-		},
 		"/ai/accounts": {
 			"post": {
 				"consumes": [
@@ -86,6 +48,48 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Create model account",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/accounts/counts": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountProviderCountReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"additionalProperties": {
+								"format": "int64",
+								"type": "integer"
+							},
+							"type": "object"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Count model accounts by provider",
 				"tags": [
 					"AI"
 				]
@@ -272,6 +276,33 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/accounts/providers": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.ProviderInfo"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get model account providers",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/accounts/search": {
 			"post": {
 				"consumes": [
@@ -305,47 +336,6 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Page model accounts",
-				"tags": [
-					"AI"
-				]
-			}
-		},
-		"/ai/accounts/counts": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.AgentAccountProviderCountReq"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"additionalProperties": {
-								"type": "integer"
-							},
-							"type": "object"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Count model accounts by provider",
 				"tags": [
 					"AI"
 				]
@@ -416,6 +406,44 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Verify model account",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentCreateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentItem"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create Agent",
 				"tags": [
 					"AI"
 				]
@@ -1885,33 +1913,6 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Upgrade Agent plugin",
-				"tags": [
-					"AI"
-				]
-			}
-		},
-		"/ai/accounts/providers": {
-			"get": {
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"$ref": "#/definitions/dto.ProviderInfo"
-							},
-							"type": "array"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Get model account providers",
 				"tags": [
 					"AI"
 				]
@@ -24077,7 +24078,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/websites/log": {
+		"/websites/log/operate": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -24095,10 +24096,7 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/response.WebsiteLog"
-						}
+						"description": "OK"
 					}
 				},
 				"security": [
@@ -24132,6 +24130,44 @@ const docTemplate = `{
 					"formatZH": "[domain][operate] 日志",
 					"paramKeys": []
 				}
+			}
+		},
+		"/websites/log/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.WebsiteLogSearchReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.WebsiteLog"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get website log",
+				"tags": [
+					"Website"
+				]
 			}
 		},
 		"/websites/nginx/update": {
@@ -25965,6 +26001,17 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.AgentAccountProviderCountReq": {
+			"properties": {
+				"providers": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
 		"dto.AgentAccountSearch": {
 			"properties": {
 				"name": {
@@ -25984,17 +26031,6 @@ const docTemplate = `{
 				"page",
 				"pageSize"
 			],
-			"type": "object"
-		},
-		"dto.AgentAccountProviderCountReq": {
-			"properties": {
-				"providers": {
-					"items": {
-						"type": "string"
-					},
-					"type": "array"
-				}
-			},
 			"type": "object"
 		},
 		"dto.AgentAccountUpdateReq": {
@@ -27451,7 +27487,8 @@ const docTemplate = `{
 						"clawhub-cn",
 						"skillhub",
 						"official",
-						"skills-sh"
+						"skills-sh",
+						"local-hub"
 					],
 					"type": "string"
 				},
@@ -27551,7 +27588,8 @@ const docTemplate = `{
 						"clawhub-cn",
 						"skillhub",
 						"official",
-						"skills-sh"
+						"skills-sh",
+						"local-hub"
 					],
 					"type": "string"
 				}
@@ -39225,9 +39263,38 @@ const docTemplate = `{
 					"type": "integer"
 				},
 				"logType": {
+					"enum": [
+						"access.log",
+						"error.log"
+					],
 					"type": "string"
 				},
 				"operate": {
+					"enum": [
+						"enable",
+						"disable",
+						"delete"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
+				"logType",
+				"operate"
+			],
+			"type": "object"
+		},
+		"request.WebsiteLogSearchReq": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"logType": {
+					"enum": [
+						"access.log",
+						"error.log"
+					],
 					"type": "string"
 				},
 				"page": {
@@ -39239,8 +39306,7 @@ const docTemplate = `{
 			},
 			"required": [
 				"id",
-				"logType",
-				"operate"
+				"logType"
 			],
 			"type": "object"
 		},

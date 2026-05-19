@@ -3066,7 +3066,7 @@
 		"formatZH": "更新域名 [domain]",
 		"formatEN": "Update domain [domain]"
 	},
-	"/websites/log": {
+	"/websites/log/operate": {
 		"bodyKeys": [
 			"id",
 			"operate"
