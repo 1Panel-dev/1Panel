@@ -41,10 +41,6 @@ const (
 	masterSocketFilePermMask = 0o077
 )
 
-// prepareMasterSocketDir ensures the directory holding the master agent socket
-// exists with locked-down permissions (0700) and is owned by the current
-// process. Any other-readable/writable bits are stripped so that arbitrary
-// local users cannot reach the socket through the directory.
 func prepareMasterSocketDir(dir string) error {
 	if err := os.MkdirAll(dir, masterSocketDirPerm); err != nil {
 		return fmt.Errorf("create master socket dir %s failed: %w", dir, err)
@@ -70,9 +66,6 @@ func prepareMasterSocketDir(dir string) error {
 	return nil
 }
 
-// secureMasterSocket ensures the unix domain socket has 0600 permissions and is
-// owned by the current process. Without this, any local user able to traverse
-// the parent directory could connect and hit privileged agent APIs.
 func secureMasterSocket(sockPath string) error {
 	if err := os.Chmod(sockPath, masterSocketFilePerm); err != nil {
 		return fmt.Errorf("chmod master socket %s failed: %w", sockPath, err)

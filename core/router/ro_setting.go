@@ -11,16 +11,12 @@ type SettingRouter struct{}
 func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 	baseApi := v2.ApiGroupApp.BaseApi
 
-	// authRouter: routes that require an authenticated session but no further
-	// password-expired enforcement.
 	authRouter := Router.Group("settings").
 		Use(middleware.SessionAuth())
 	{
 		authRouter.POST("/search/base", baseApi.GetSettingBaseInfo)
 	}
 
-	// settingRouter: routes that require both authentication and a non-expired
-	// password. This is the default tier for the settings module.
 	settingRouter := Router.Group("settings").
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
@@ -49,11 +45,6 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/memo", baseApi.UpdateMemo)
 	}
 
-	// internalRouter: routes that bypass session auth on purpose because the
-	// caller is the local node itself (e.g. the agent calling back into core
-	// after writing the system SSL files). The handler is responsible for
-	// verifying that the caller is local; do NOT add new endpoints here
-	// without local-only enforcement.
 	internalRouter := Router.Group("settings")
 	{
 		internalRouter.POST("/ssl/reload", baseApi.ReloadSSL)
