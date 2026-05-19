@@ -73,6 +73,8 @@ var WebUrlMap = map[string]struct{}{
 	"/ai/ai-proxy/groups":     {},
 	"/ai/ai-proxy/usage":      {},
 	"/ai/ai-proxy/content":    {},
+	"/ai/skills-hub":          {},
+	"/ai/skills-hub/targets":  {},
 	"/ai/benchmark":           {},
 	"/ai/model/account":       {},
 	"/ai/model/local":         {},
