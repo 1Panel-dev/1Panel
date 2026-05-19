@@ -1,5 +1,6 @@
 import router from '@/routers';
 import { GlobalStore } from '@/store';
+import { normalizeToManageCode } from '@/utils/permission-codes';
 
 export type PermissionBindingValue = string | string[] | undefined;
 export type PermissionMode = 'manage' | 'view';
@@ -27,12 +28,7 @@ const getRoutePermission = (): PermissionBindingValue => {
     return '';
 };
 
-export const toManagePermission = (permission: string) => {
-    if (!permission) {
-        return '';
-    }
-    return permission.endsWith('_view') ? permission.replace(/_view$/, '_manage') : permission;
-};
+export const toManagePermission = normalizeToManageCode;
 
 export const toPermissionList = (value: PermissionBindingValue) => {
     if (Array.isArray(value)) {
