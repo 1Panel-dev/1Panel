@@ -87,8 +87,7 @@
                                                     />
                                                     <template #dropdown>
                                                         <el-dropdown-menu>
-                                                            <fu-dropdown-item
-                                                                v-permission
+                                                            <el-dropdown-item
                                                                 :disabled="
                                                                     row.containerCount === row.runningCount &&
                                                                     row.runningCount > 0
@@ -96,20 +95,18 @@
                                                                 @click="handleComposeOperate('up', row)"
                                                             >
                                                                 {{ $t('commons.operate.start') }}
-                                                            </fu-dropdown-item>
-                                                            <fu-dropdown-item
-                                                                v-permission
+                                                            </el-dropdown-item>
+                                                            <el-dropdown-item
                                                                 :disabled="row.runningCount === 0"
                                                                 @click="handleComposeOperate('stop', row)"
                                                             >
                                                                 {{ $t('commons.operate.stop') }}
-                                                            </fu-dropdown-item>
-                                                            <fu-dropdown-item
-                                                                v-permission
+                                                            </el-dropdown-item>
+                                                            <el-dropdown-item
                                                                 @click="handleComposeOperate('restart', row)"
                                                             >
                                                                 {{ $t('commons.button.restart') }}
-                                                            </fu-dropdown-item>
+                                                            </el-dropdown-item>
                                                         </el-dropdown-menu>
                                                     </template>
                                                 </el-dropdown>

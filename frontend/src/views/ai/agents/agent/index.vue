@@ -39,27 +39,24 @@
                                 <Status v-permission :status="row.status" :operate="true" />
                                 <template #dropdown>
                                     <el-dropdown-menu>
-                                        <fu-dropdown-item
-                                            v-permission
+                                        <el-dropdown-item
                                             :disabled="checkStatus('start', row)"
                                             @click="onOperate(row, 'start')"
                                         >
                                             {{ $t('commons.operate.start') }}
-                                        </fu-dropdown-item>
-                                        <fu-dropdown-item
-                                            v-permission
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
                                             :disabled="checkStatus('stop', row)"
                                             @click="onOperate(row, 'stop')"
                                         >
                                             {{ $t('commons.operate.stop') }}
-                                        </fu-dropdown-item>
-                                        <fu-dropdown-item
-                                            v-permission
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
                                             :disabled="checkStatus('restart', row)"
                                             @click="onOperate(row, 'restart')"
                                         >
                                             {{ $t('commons.button.restart') }}
-                                        </fu-dropdown-item>
+                                        </el-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>

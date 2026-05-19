@@ -123,6 +123,25 @@ const rightClick = ref({
 });
 const selectedRows = ref<any[]>([]);
 const handleRightClick = (row, column, event) => {
+    if (!tableRef.value) return;
+
+    try {
+        const selectionColumn = tableRef.value.refElTable.columns.find((col) => col.type === 'selection');
+        const isSelectable = selectionColumn?.selectable ? selectionColumn.selectable(row) : true;
+        if (!isSelectable) {
+            if (!props.rightButtons) return;
+            event.preventDefault();
+            rightClick.value = {
+                visible: true,
+                left: event.clientX + 5,
+                top: event.clientY,
+                currentRow: row,
+            };
+            document.addEventListener('click', closeRightClick);
+            return;
+        }
+    } catch {}
+
     if (!selectedRows.value.includes(row)) {
         clearSelects();
         tableRef.value.refElTable.toggleRowSelection(row);
