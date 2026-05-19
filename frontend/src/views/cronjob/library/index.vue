@@ -15,10 +15,10 @@
                             <fu-dropdown-item v-permission command="sync">
                                 {{ $t('cronjob.library.syncNow') }}
                             </fu-dropdown-item>
-                            <fu-dropdown-item v-permission v-if="scriptSync === 'Disable'" command="turnOnSync">
+                            <fu-dropdown-item v-if="scriptSync === 'Disable'" v-permission command="turnOnSync">
                                 {{ $t('cronjob.library.turnOnSync') }}
                             </fu-dropdown-item>
-                            <fu-dropdown-item v-permission v-if="scriptSync === 'Enable'" command="turnOffSync">
+                            <fu-dropdown-item v-if="scriptSync === 'Enable'" v-permission command="turnOffSync">
                                 {{ $t('cronjob.library.turnOffSync') }}
                             </fu-dropdown-item>
                         </el-dropdown-menu>

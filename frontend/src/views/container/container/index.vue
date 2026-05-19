@@ -149,48 +149,42 @@
                                 <Status v-permission :status="row.state" :operate="true" />
                                 <template #dropdown>
                                     <el-dropdown-menu v-if="activeDropdownContainerId === row.containerID">
-                                        <fu-dropdown-item
-                                            v-permission
+                                        <el-dropdown-item
                                             :disabled="checkStatus('start', row)"
                                             @click="onOperate('start', row)"
                                         >
                                             {{ $t('commons.operate.start') }}
-                                        </fu-dropdown-item>
-                                        <fu-dropdown-item
-                                            v-permission
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
                                             :disabled="checkStatus('stop', row)"
                                             @click="onOperate('stop', row)"
                                         >
                                             {{ $t('commons.operate.stop') }}
-                                        </fu-dropdown-item>
-                                        <fu-dropdown-item
-                                            v-permission
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
                                             :disabled="checkStatus('restart', row)"
                                             @click="onOperate('restart', row)"
                                         >
                                             {{ $t('commons.button.restart') }}
-                                        </fu-dropdown-item>
-                                        <fu-dropdown-item
-                                            v-permission
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
                                             :disabled="checkStatus('kill', row)"
                                             @click="onOperate('kill', row)"
                                         >
                                             {{ $t('container.kill') }}
-                                        </fu-dropdown-item>
-                                        <fu-dropdown-item
-                                            v-permission
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
                                             :disabled="checkStatus('pause', row)"
                                             @click="onOperate('pause', row)"
                                         >
                                             {{ $t('container.pause') }}
-                                        </fu-dropdown-item>
-                                        <fu-dropdown-item
-                                            v-permission
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
                                             :disabled="checkStatus('unpause', row)"
                                             @click="onOperate('unpause', row)"
                                         >
                                             {{ $t('container.unpause') }}
-                                        </fu-dropdown-item>
+                                        </el-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
