@@ -90,7 +90,7 @@ func OperationLog() gin.HandlerFunc {
 			}
 		}
 		needAgentResolve := len(operationDic.BeforeFunctions) != 0 && len(currentNode) != 0 && currentNode != "local" && !strings.HasPrefix(record.Path, "/core")
-		allowCoreFallback := strings.HasPrefix(record.Path, "/core/xpack") || !willProxy(c.Request.URL.Path, currentNode) || len(currentNode) == 0 || currentNode == "local"
+		allowCoreFallback := strings.HasPrefix(record.Path, "/core/xpack") || !ShouldProxyToAgent(c.Request.URL.Path) || len(currentNode) == 0 || currentNode == "local"
 		if needAgentResolve {
 			c.Request.Header.Set(headerNeedOperationResolve, "1")
 			defer func() {
@@ -400,19 +400,6 @@ func hasAllResolvedData(values map[string]interface{}, beforeFunctions []functio
 			continue
 		}
 		return false
-	}
-	return true
-}
-
-func willProxy(reqPath, currentNode string) bool {
-	if strings.HasPrefix(reqPath, "/1panel/swagger") || !strings.HasPrefix(reqPath, "/api/v2") {
-		return false
-	}
-	if strings.HasPrefix(reqPath, "/api/v2/core") && !strings.HasPrefix(reqPath, "/api/v2/core/xpack") {
-		return false
-	}
-	if !strings.HasPrefix(reqPath, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0) {
-		return true
 	}
 	return true
 }
