@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/repo"
@@ -41,7 +40,9 @@ func HandleNotRoute(c *gin.Context) bool {
 }
 
 func CheckSecurity(c *gin.Context) bool {
-	if !checkEntrance(c) && !checkSession(c) {
+	authService := service.NewIAuthService()
+	entrance := authService.GetSecurityEntrance()
+	if entrance != "" && !checkEntrance(c) && !checkSession(c) {
 		HandleNotSecurity(c, "")
 		return false
 	}
@@ -95,18 +96,14 @@ func checkEntrance(c *gin.Context) bool {
 }
 
 func HandleNotSecurity(c *gin.Context, resType string) {
-	resPage, err := service.NewIAuthService().GetResponsePage()
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Internal Server Error")
-		return
-	}
-	if resPage == "444" {
+	code := LoadErrCode()
+	if code == 444 {
 		CloseDirectly(c)
 		return
 	}
 
-	file := fmt.Sprintf("html/%s.html", resPage)
-	if resPage == "200" && resType != "" {
+	file := fmt.Sprintf("html/%d.html", code)
+	if code == http.StatusOK && resType != "" {
 		file = fmt.Sprintf("html/200_%s.html", resType)
 	}
 	data, err := res.ErrorMsg.ReadFile(file)
@@ -114,12 +111,36 @@ func HandleNotSecurity(c *gin.Context, resType string) {
 		c.String(http.StatusInternalServerError, "Internal Server Error")
 		return
 	}
-	statusCode, err := strconv.Atoi(resPage)
+	c.Data(code, "text/html; charset=utf-8", data)
+}
+
+func LoadErrCode() int {
+	settingRepo := repo.NewISettingRepo()
+	codeVal, err := settingRepo.GetValueByKey("NoAuthSetting")
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Internal Server Error")
-		return
+		return http.StatusInternalServerError
 	}
-	c.Data(statusCode, "text/html; charset=utf-8", data)
+
+	switch codeVal {
+	case "400":
+		return http.StatusBadRequest
+	case "401":
+		return http.StatusUnauthorized
+	case "403":
+		return http.StatusForbidden
+	case "404":
+		return http.StatusNotFound
+	case "408":
+		return http.StatusRequestTimeout
+	case "416":
+		return http.StatusRequestedRangeNotSatisfiable
+	case "500":
+		return http.StatusInternalServerError
+	case "444":
+		return 444
+	default:
+		return http.StatusOK
+	}
 }
 
 func IsFrontendPath(path string) bool {

@@ -1,11 +1,12 @@
 package middleware
 
 import (
-	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
+	"github.com/1Panel-dev/1Panel/core/utils/security"
 	"github.com/gin-gonic/gin"
 )
 
@@ -43,7 +44,7 @@ func WhiteAllow() gin.HandlerFunc {
 				return
 			}
 		}
-		code := LoadErrCode()
+		code := security.LoadErrCode()
 		helper.ErrWithHtml(c, code, "err_ip_limit")
 	}
 }
