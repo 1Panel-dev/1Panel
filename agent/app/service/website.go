@@ -85,7 +85,8 @@ type IWebsiteService interface {
 	ChangeGroup(group, newGroup uint) error
 	ChangeDefaultServer(id uint) error
 	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
-	OpWebsiteLog(req request.WebsiteLogReq) (*response.WebsiteLog, error)
+	GetWebsiteLog(req request.WebsiteLogSearchReq) (*response.WebsiteLog, error)
+	OpWebsiteLog(req request.WebsiteLogReq) error
 	UpdateStream(req request.StreamUpdate) error
 
 	GetNginxConfigByScope(req request.NginxScopeReq) (*response.WebsiteNginxConfig, error)
@@ -1124,7 +1125,7 @@ func (w WebsiteService) UpdateNginxConfigFile(req request.WebsiteNginxUpdate) er
 	return nginxCheckAndReload(nginxFull.SiteConfig.OldContent, filePath, nginxFull.Install.ContainerName)
 }
 
-func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.WebsiteLog, error) {
+func (w WebsiteService) GetWebsiteLog(req request.WebsiteLogSearchReq) (*response.WebsiteLog, error) {
 	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return nil, err
@@ -1133,29 +1134,36 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 	res := &response.WebsiteLog{
 		Content: "",
 	}
+	switch req.LogType {
+	case constant.AccessLog:
+		res.Enable = website.AccessLog
+		if !website.AccessLog {
+			return res, nil
+		}
+	case constant.ErrorLog:
+		res.Enable = website.ErrorLog
+		if !website.ErrorLog {
+			return res, nil
+		}
+	}
+	filePath := path.Join(sitePath, "log", req.LogType)
+	logFileRes, err := files.ReadFileByLine(filePath, req.Page, req.PageSize, false)
+	if err != nil {
+		return nil, err
+	}
+	res.End = logFileRes.IsEndOfFile
+	res.Path = filePath
+	res.Content = strings.Join(logFileRes.Lines, "\n")
+	return res, nil
+}
+
+func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) error {
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	sitePath := GetSitePath(website, SiteDir)
 	switch req.Operate {
-	case constant.GetLog:
-		switch req.LogType {
-		case constant.AccessLog:
-			res.Enable = website.AccessLog
-			if !website.AccessLog {
-				return res, nil
-			}
-		case constant.ErrorLog:
-			res.Enable = website.ErrorLog
-			if !website.ErrorLog {
-				return res, nil
-			}
-		}
-		filePath := path.Join(sitePath, "log", req.LogType)
-		logFileRes, err := files.ReadFileByLine(filePath, req.Page, req.PageSize, false)
-		if err != nil {
-			return nil, err
-		}
-		res.End = logFileRes.IsEndOfFile
-		res.Path = filePath
-		res.Content = strings.Join(logFileRes.Lines, "\n")
-		return res, nil
 	case constant.DisableLog:
 		params := dto.NginxParam{}
 		switch req.LogType {
@@ -1172,10 +1180,10 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 		nginxParams = append(nginxParams, params)
 
 		if err := updateNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
-			return nil, err
+			return err
 		}
 		if err := websiteRepo.Save(context.Background(), &website); err != nil {
-			return nil, err
+			return err
 		}
 	case constant.EnableLog:
 		key := "access_log"
@@ -1194,18 +1202,18 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 			website.ErrorLog = true
 		}
 		if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: key, Params: params}}, &website); err != nil {
-			return nil, err
+			return err
 		}
 		if err := websiteRepo.Save(context.Background(), &website); err != nil {
-			return nil, err
+			return err
 		}
 	case constant.DeleteLog:
 		logPath := path.Join(sitePath, "log", req.LogType)
 		if err := files.NewFileOp().WriteFile(logPath, strings.NewReader(""), constant.DirPerm); err != nil {
-			return nil, err
+			return err
 		}
 	}
-	return res, nil
+	return nil
 }
 
 func (w WebsiteService) ChangeDefaultServer(id uint) error {
