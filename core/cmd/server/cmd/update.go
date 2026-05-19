@@ -60,7 +60,7 @@ var updateUserName = &cobra.Command{
 			return nil
 		}
 		if isEnterprise() && len(strings.TrimSpace(updateUserNameFlag)) == 0 {
-			fmt.Println(i18n.GetMsgByKey("UsernameNeed"))
+			fmt.Println(i18n.GetMsgByKeyForCmd("UsernameNeed"))
 			return nil
 		}
 		username()
@@ -77,7 +77,7 @@ var updatePassword = &cobra.Command{
 			return nil
 		}
 		if isEnterprise() && len(strings.TrimSpace(updatePasswordUserName)) == 0 {
-			fmt.Println(i18n.GetMsgByKey("UsernameNeed"))
+			fmt.Println(i18n.GetMsgByKeyForCmd("UsernameNeed"))
 			return nil
 		}
 		password()
@@ -268,16 +268,18 @@ func password() {
 			return
 		}
 		if err := updateEnterprisePassword(enterpriseDB, strings.TrimSpace(updatePasswordUserName), p); err != nil {
-			fmt.Println("\n", i18n.GetMsgWithMapForCmd("UpdatePortErr", map[string]interface{}{"err": err.Error()}))
+			fmt.Println("\n", i18n.GetMsgWithMapForCmd("UpdatePasswordErr", map[string]interface{}{"err": err.Error()}))
 			return
 		}
 	} else if err := setSettingByKey(db, "Password", p); err != nil {
-		fmt.Println("\n", i18n.GetMsgWithMapForCmd("UpdatePortErr", map[string]interface{}{"err": err.Error()}))
+		fmt.Println("\n", i18n.GetMsgWithMapForCmd("UpdatePasswordErr", map[string]interface{}{"err": err.Error()}))
 		return
 	}
-	username := getSettingByKey(db, "UserName")
+	username := ""
 	if isEnterprise() {
 		username = strings.TrimSpace(updatePasswordUserName)
+	} else {
+		username = getSettingByKey(db, "UserName")
 	}
 
 	fmt.Println("\n" + i18n.GetMsgByKeyForCmd("UpdateSuccessful"))

@@ -26,7 +26,7 @@
 import { routerToNameWithQuery, routerToPathWithQuery } from '@/utils/router';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { hasPermissionMetaAccess } from '@/utils/rbac';
+import { hasPermissionMetaAccess, hasRouteAccess } from '@/utils/rbac';
 
 defineOptions({ name: 'RouterButton' });
 
@@ -37,11 +37,20 @@ const props = defineProps({
     },
 });
 
+const router = useRouter();
 const buttonArray = computed(() => {
-    return props.buttons.filter((button) => hasPermissionMetaAccess(button.permission));
+    return props.buttons.filter((button) => {
+        if (!hasPermissionMetaAccess(button.permission)) {
+            return false;
+        }
+        if (button.path || button.name) {
+            const route = router.resolve(button.path ? { path: button.path } : { name: button.name });
+            return route.matched.length === 0 || hasRouteAccess(route);
+        }
+        return true;
+    });
 });
 
-const router = useRouter();
 const activeName = ref('');
 
 const handleChange = (label: string) => {

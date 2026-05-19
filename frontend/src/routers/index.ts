@@ -11,6 +11,7 @@ const axiosCanceler = new AxiosCanceler();
 
 let isRedirecting = false;
 const enterpriseLicenseCheckWhiteList = ['EnterpriseLicenseRequired', 'entrance', 'login', 'Expired'];
+const noLoginWhiteList = ['entrance', 'login', 'file-share', '404', 'Expired'];
 
 const clearLicenseStatus = () => {
     const { isEnterpriseLicenseLoaded, isEnterpriseLicensed } = useGlobalStore();
@@ -33,10 +34,31 @@ router.beforeEach(async (to, from, next) => {
     if (!isLogin.value) {
         clearLoginStatus();
     }
-    if (to.name !== 'entrance' && !isLogin.value) {
+    if (!isLogin.value && !noLoginWhiteList.includes(String(to.name))) {
+        next(
+            entrance.value
+                ? {
+                      name: 'entrance',
+                      params: { code: entrance.value },
+                  }
+                : {
+                      name: 'login',
+                  },
+        );
+        NProgress.done();
+        return;
+    }
+    if (to.name === 'login' && !isLogin.value && entrance.value) {
         next({
             name: 'entrance',
-            params: to.params,
+            params: { code: entrance.value },
+        });
+        NProgress.done();
+        return;
+    }
+    if (to.name === 'login' && isLogin.value) {
+        next({
+            name: 'home',
         });
         NProgress.done();
         return;
