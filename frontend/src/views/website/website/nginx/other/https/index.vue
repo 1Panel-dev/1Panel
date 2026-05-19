@@ -1,7 +1,7 @@
 <template>
     <el-row :gutter="20" v-loading="loading">
         <el-col :xs="24" :sm="20" :md="16" :lg="14" :xl="14">
-            <el-form ref="nginxForm" label-position="right" label-width="140px" :model="form" :rules="rules">
+            <el-form ref="nginxForm" label-position="right" label-width="140px" :model="form">
                 <el-form-item :label="$t('commons.table.status')" prop="enable">
                     <el-switch v-model="enable"></el-switch>
                     <span class="input-help">{{ $t('nginx.defaultHttpsHelper1') }}</span>
@@ -11,7 +11,7 @@
                     <span class="input-help">{{ $t('nginx.sslRejectHandshakeHelper') }}</span>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="submit()" :disabled="loading">
+                    <el-button v-permission type="primary" @click="submit()" :disabled="loading">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </el-form-item>

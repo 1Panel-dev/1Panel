@@ -4,11 +4,11 @@
             <div class="flex flex-col gap-1">
                 <span class="font-medium">{{ $t('website.enableCors') }}</span>
             </div>
-            <el-switch v-model="corsEnabled" size="large" @change="handleCorsChange" />
+            <el-switch v-permission v-model="corsEnabled" size="large" @change="handleCorsChange" />
         </div>
 
         <el-form-item :label="$t('website.enableCors')" v-if="enableSize == 'small'">
-            <el-switch v-model="corsEnabled" size="large" @change="handleCorsChange" />
+            <el-switch v-permission v-model="corsEnabled" size="large" @change="handleCorsChange" />
         </el-form-item>
 
         <el-collapse-transition>
@@ -36,11 +36,11 @@
                 </el-form-item>
 
                 <el-form-item :label="$t('website.allowCredentials')" prop="allowCredentials">
-                    <el-switch v-model="corsConfig.allowCredentials" @change="emitUpdate" />
+                    <el-switch v-permission v-model="corsConfig.allowCredentials" @change="emitUpdate" />
                 </el-form-item>
 
                 <el-form-item :label="$t('website.preflight')" prop="preflight">
-                    <el-switch v-model="corsConfig.preflight" @change="emitUpdate" />
+                    <el-switch v-permission v-model="corsConfig.preflight" @change="emitUpdate" />
                     <span class="input-help">{{ $t('website.preflightHleper') }}</span>
                 </el-form-item>
             </div>

@@ -3,7 +3,7 @@
         <el-col :xs="24" :sm="18" :md="8" :lg="8" :xl="8">
             <el-form ref="limitForm" label-position="right" :model="form" :rules="rules" label-width="100px">
                 <el-form-item prop="enable" :label="$t('website.enableOrNot')">
-                    <el-switch v-model="enable" @change="changeEnable"></el-switch>
+                    <el-switch v-permission v-model="enable" @change="changeEnable"></el-switch>
                 </el-form-item>
                 <el-form-item :label="$t('website.limit')">
                     <el-select v-model="ruleKey" @change="changeRule(ruleKey)">
@@ -29,7 +29,7 @@
                     <span class="input-help">{{ $t('website.rateLimitHelper') }}</span>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="submit(limitForm)" :disabled="loading">
+                    <el-button v-permission type="primary" @click="submit(limitForm)" :disabled="loading">
                         <span v-if="enable">{{ $t('commons.button.save') }}</span>
                         <span v-else>{{ $t('commons.button.saveAndEnable') }}</span>
                     </el-button>

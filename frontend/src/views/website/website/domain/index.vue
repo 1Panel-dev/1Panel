@@ -60,11 +60,18 @@
                     </tbody>
                 </table>
             </el-popover>
-            <el-button link icon="edit" class="ml-2.5" @click="startEdit" v-if="!isEditing"></el-button>
+            <el-button v-permission link icon="edit" class="ml-2.5" @click="startEdit" v-if="!isEditing"></el-button>
         </div>
         <div>
             <el-tooltip effect="dark" :content="$t('website.cancelFavorite')" placement="top-start" v-if="row.favorite">
-                <el-button link size="large" icon="StarFilled" type="warning" @click="favoriteWebsite(row)"></el-button>
+                <el-button
+                    v-permission
+                    link
+                    size="large"
+                    icon="StarFilled"
+                    type="warning"
+                    @click="favoriteWebsite(row)"
+                ></el-button>
             </el-tooltip>
 
             <el-tooltip
@@ -73,7 +80,7 @@
                 placement="top-start"
                 v-if="!row.favorite && isHovered"
             >
-                <el-button link icon="Star" type="info" @click="favoriteWebsite(row)"></el-button>
+                <el-button v-permission link icon="Star" type="info" @click="favoriteWebsite(row)"></el-button>
             </el-tooltip>
         </div>
     </div>

@@ -1,7 +1,7 @@
 <template>
     <div v-loading="loading">
         <CodemirrorPro v-model="content" mode="nginx" :heightDiff="400" />
-        <el-button type="primary" @click="submit()" class="mt-2.5">
+        <el-button v-permission type="primary" @click="submit()" class="mt-2.5">
             {{ $t('nginx.saveAndReload') }}
         </el-button>
     </div>

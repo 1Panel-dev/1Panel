@@ -32,7 +32,7 @@
                 <div class="flex justify-start items-center gap-x-4 card-action">
                     <el-text class="cursor-pointer" @click="handleReset">{{ $t('commons.button.reset') }}</el-text>
                     <el-divider direction="vertical" class="!mx-0" />
-                    <el-text class="cursor-pointer ml-0" @click="saveContent()">
+                    <el-text v-permission class="cursor-pointer ml-0" @click="saveContent()">
                         {{ $t('commons.button.save') }}
                     </el-text>
                     <el-divider direction="vertical" class="!mx-0" />
@@ -127,14 +127,14 @@
                                 </el-text>
                                 <template #dropdown>
                                     <el-dropdown-menu>
-                                        <el-dropdown-item command="dir" class="!px-2">
+                                        <fu-dropdown-item v-permission command="dir" class="!px-2">
                                             <svg-icon class="!w-5 !h-5" iconName="p-file-folder"></svg-icon>
                                             {{ $t('file.dir') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item command="file" class="!px-2">
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item v-permission command="file" class="!px-2">
                                             <svg-icon class="!w-5 !h-5" iconName="p-file-normal"></svg-icon>
                                             {{ $t('menu.files') }}
-                                        </el-dropdown-item>
+                                        </fu-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>

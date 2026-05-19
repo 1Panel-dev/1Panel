@@ -95,6 +95,7 @@ const Algorithms = getAlgorithms('');
 const buttons = [
     {
         label: i18n.global.t('website.sourceFile'),
+        permission: true,
         click: function (row: any) {
             openEditFile(row);
         },
@@ -108,6 +109,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: any) => {
             deleteLb(row);
         },

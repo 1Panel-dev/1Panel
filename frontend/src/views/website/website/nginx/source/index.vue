@@ -2,10 +2,10 @@
     <div v-loading="loading">
         <CodemirrorPro v-model="content" mode="nginx" :heightDiff="350"></CodemirrorPro>
         <div class="mt-2.5">
-            <el-button @click="getDefaultConfig()" :disabled="loading">
+            <el-button v-permission @click="getDefaultConfig()" :disabled="loading">
                 {{ $t('app.defaultConfig') }}
             </el-button>
-            <el-button type="primary" @click="submit()" :disabled="loading">
+            <el-button v-permission type="primary" @click="submit()" :disabled="loading">
                 {{ $t('commons.button.save') }}
             </el-button>
         </div>

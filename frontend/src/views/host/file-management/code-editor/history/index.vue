@@ -93,7 +93,7 @@
                                 </el-button>
                                 <el-button
                                     class="w-full sm:w-auto !ml-0"
-                                    type="danger"
+                                    v-permission
                                     :disabled="selected.length === 0"
                                     :loading="deleteLoading"
                                     @click="deleteSelected(null)"
@@ -152,7 +152,7 @@
                                         <el-button link type="primary" @click.stop="openHistoryRecord(row)">
                                             {{ $t('commons.button.view') }}
                                         </el-button>
-                                        <el-button link type="danger" @click.stop="deleteSelected(row)">
+                                        <el-button v-permission link type="primary" @click.stop="deleteSelected(row)">
                                             {{ $t('commons.button.delete') }}
                                         </el-button>
                                     </template>
@@ -183,6 +183,7 @@
                                 <el-tag effect="plain">{{ computeSize(selectedHistory.contentSize) }}</el-tag>
                                 <el-button
                                     v-if="canRestoreSelected"
+                                    v-permission
                                     type="primary"
                                     :loading="restoreLoading"
                                     @click="confirmRestoreSelected"

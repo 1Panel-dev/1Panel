@@ -11,6 +11,7 @@
                 >
                     <span>{{ rewrite.name }}</span>
                     <el-button
+                        v-permission
                         class="float-right mt-1.5"
                         v-if="rewrite.resource == 'custom'"
                         link
@@ -26,10 +27,10 @@
             <el-form-item>
                 <el-alert :title="$t('website.rewriteHelper')" type="info" :closable="false" />
             </el-form-item>
-            <el-button type="primary" @click="submit()">
+            <el-button v-permission type="primary" @click="submit()">
                 {{ $t('nginx.saveAndReload') }}
             </el-button>
-            <el-button type="primary" @click="opCustomRewrite()" :disabled="content == ''">
+            <el-button v-permission type="primary" @click="opCustomRewrite()" :disabled="content == ''">
                 {{ $t('website.saveCustom') }}
             </el-button>
         </div>

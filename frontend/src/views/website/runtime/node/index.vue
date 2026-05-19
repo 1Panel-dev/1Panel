@@ -152,6 +152,7 @@ const req = reactive<Runtime.RuntimeReq>({
 const buttons = [
     {
         label: i18n.global.t('runtime.module'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openModules(row);
         },
@@ -161,6 +162,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.operate.stop'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             operateRuntime('down', row.id, loading, search);
         },
@@ -170,6 +172,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.operate.start'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             operateRuntime('up', row.id, loading, search);
         },
@@ -179,6 +182,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             operateRuntime('restart', row.id, loading, search);
         },
@@ -188,6 +192,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openDetail(row);
         },
@@ -197,6 +202,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('menu.terminal'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openTerminal(row);
         },
@@ -206,6 +212,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openDelete(row);
         },

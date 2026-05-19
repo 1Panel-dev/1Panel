@@ -7,6 +7,7 @@
                         {{ $t('commons.button.create') }}
                     </el-button>
                     <el-switch
+                        v-permission
                         class="ml-5"
                         v-model="enable"
                         @change="changeEnable"
@@ -97,6 +98,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.NginxAuthConfig) {
             deleteAuth(row);
         },
@@ -114,6 +116,7 @@ const pathButtons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.NginxPathAuthConfig) {
             deletePathAuth(row);
         },

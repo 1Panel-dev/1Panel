@@ -1,7 +1,7 @@
 <template>
     <ComplexTable :data="data" @search="search" v-loading="loading" :heightDiff="400">
         <template #toolbar>
-            <el-button type="primary" plain @click="openCreate">{{ $t('website.addDomain') }}</el-button>
+            <el-button v-permission type="primary" plain @click="openCreate">{{ $t('website.addDomain') }}</el-button>
         </template>
         <el-table-column width="30px">
             <template #default="{ row }">
@@ -17,7 +17,7 @@
         <el-table-column :label="$t('commons.table.port')" prop="port"></el-table-column>
         <el-table-column :label="'SSL'" prop="ssl">
             <template #default="{ row }">
-                <el-switch v-model="row.ssl" @change="update(row)" :disabled="row.port == 80" />
+                <el-switch v-permission v-model="row.ssl" @change="update(row)" :disabled="row.port == 80" />
             </template>
         </el-table-column>
         <fu-table-operations
@@ -65,6 +65,7 @@ const httpsPort = ref(443);
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.Domain) {
             deleteWebsiteDomain(row);
         },

@@ -8,7 +8,12 @@
                     </el-input>
                 </el-col>
                 <el-col :span="14">
-                    <el-button @click="operateModule('install', module)" type="primary" :disabled="module === ''">
+                    <el-button
+                        v-permission
+                        @click="operateModule('install', module)"
+                        type="primary"
+                        :disabled="module === ''"
+                    >
                         {{ $t('commons.button.install') }}
                     </el-button>
                 </el-col>
@@ -67,12 +72,14 @@ const loading = ref(false);
 const buttons = [
     {
         label: i18n.global.t('commons.button.update'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             operateModule('update', row.name);
         },
     },
     {
         label: i18n.global.t('commons.button.uninstall'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             operateModule('uninstall', row.name);
         },

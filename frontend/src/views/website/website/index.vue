@@ -194,7 +194,12 @@
                                 ></el-date-picker>
                             </div>
                             <div v-else>
-                                <el-link type="primary" underline="never" @click.stop="openDatePicker(row)">
+                                <el-link
+                                    v-permission
+                                    type="primary"
+                                    underline="never"
+                                    @click.stop="openDatePicker(row)"
+                                >
                                     <span v-if="isEver(row.expireDate)">
                                         {{ $t('website.neverExpire') }}
                                     </span>
@@ -561,12 +566,14 @@ const updateWebsitConfig = (row: any) => {
 const buttons = [
     {
         label: i18n.global.t('menu.config'),
+        permission: true,
         click: function (row: Website.Website) {
             openConfig(row.id);
         },
     },
     {
         label: i18n.global.t('database.backupList'),
+        permission: true,
         click: (row: Website.Website) => {
             let params = {
                 type: 'website',
@@ -578,6 +585,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.loadBackup'),
+        permission: true,
         click: (row: Website.Website) => {
             let params = {
                 type: 'website',
@@ -589,6 +597,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.Website) {
             openDelete(row);
         },
