@@ -74,7 +74,7 @@
                             trigger="hover"
                             @command="handleMoreCommand(row, $index, $event)"
                         >
-                            <el-button v-permission link type="primary" :disabled="disabled">
+                            <el-button link type="primary" :disabled="disabled">
                                 {{ t('tabs.more') }}
                             </el-button>
                             <template #dropdown>
