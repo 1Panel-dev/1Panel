@@ -3,6 +3,7 @@ import piniaPersistConfig from '@/config/pinia-persist';
 import { GlobalState } from '../interface';
 import { DeviceType } from '@/enums/app';
 import i18n, { setActiveLocale } from '@/lang';
+import { toManageCode } from '@/utils/permission-codes';
 
 const CN_DOCS_URL = 'https://1panel.cn/docs/v2';
 const INTL_DOCS_URL = 'https://docs.1panel.pro/v2';
@@ -130,7 +131,7 @@ const GlobalStore = defineStore({
             if (this.permissions.includes(normalizedPermission)) {
                 return true;
             }
-            const managePermission = getManagePermission(normalizedPermission);
+            const managePermission = toManageCode(normalizedPermission);
             return managePermission ? this.permissions.includes(managePermission) : false;
         },
         async updateLanguage(language: string) {
@@ -149,10 +150,3 @@ const GlobalStore = defineStore({
 });
 
 export default GlobalStore;
-
-function getManagePermission(permission: string) {
-    if (permission.endsWith('_view')) {
-        return permission.replace(/_view$/, '_manage');
-    }
-    return '';
-}

@@ -9,17 +9,22 @@ import (
 type SettingRouter struct{}
 
 func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
-	router := Router.Group("settings").
+	baseApi := v2.ApiGroupApp.BaseApi
+
+	// authRouter: routes that require an authenticated session but no further
+	// password-expired enforcement.
+	authRouter := Router.Group("settings").
 		Use(middleware.SessionAuth())
+	{
+		authRouter.POST("/search/base", baseApi.GetSettingBaseInfo)
+	}
+
+	// settingRouter: routes that require both authentication and a non-expired
+	// password. This is the default tier for the settings module.
 	settingRouter := Router.Group("settings").
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
-
-	noAuthRouter := Router.Group("settings")
-	baseApi := v2.ApiGroupApp.BaseApi
 	{
-		router.POST("/search/base", baseApi.GetSettingBaseInfo)
-
 		settingRouter.POST("/search", baseApi.GetSettingInfo)
 		settingRouter.POST("/terminal/search", baseApi.GetTerminalSettingInfo)
 		settingRouter.GET("/search/available", baseApi.GetSystemAvailable)
@@ -38,13 +43,19 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/upgrade/notes", baseApi.GetNotesByVersion)
 		settingRouter.GET("/upgrade/releases", baseApi.LoadRelease)
 		settingRouter.GET("/upgrade", baseApi.GetUpgradeInfo)
-
-		noAuthRouter.POST("/ssl/reload", baseApi.ReloadSSL)
-
 		settingRouter.POST("/apps/store/update", baseApi.UpdateAppstoreConfig)
 		settingRouter.GET("/apps/store/config", baseApi.GetAppstoreConfig)
-
 		settingRouter.GET("/memo", baseApi.GetMemo)
 		settingRouter.POST("/memo", baseApi.UpdateMemo)
+	}
+
+	// internalRouter: routes that bypass session auth on purpose because the
+	// caller is the local node itself (e.g. the agent calling back into core
+	// after writing the system SSL files). The handler is responsible for
+	// verifying that the caller is local; do NOT add new endpoints here
+	// without local-only enforcement.
+	internalRouter := Router.Group("settings")
+	{
+		internalRouter.POST("/ssl/reload", baseApi.ReloadSSL)
 	}
 }
