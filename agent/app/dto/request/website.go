@@ -223,9 +223,14 @@ type WebsiteNginxUpdate struct {
 }
 
 type WebsiteLogReq struct {
+	ID      uint   `json:"id" validate:"required"`
+	Operate string `json:"operate" validate:"required,oneof=enable disable delete"`
+	LogType string `json:"logType" validate:"required,oneof=access.log error.log"`
+}
+
+type WebsiteLogSearchReq struct {
 	ID       uint   `json:"id" validate:"required"`
-	Operate  string `json:"operate" validate:"required"`
-	LogType  string `json:"logType" validate:"required"`
+	LogType  string `json:"logType" validate:"required,oneof=access.log error.log"`
 	Page     int    `json:"page"`
 	PageSize int    `json:"pageSize"`
 }

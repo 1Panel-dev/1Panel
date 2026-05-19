@@ -130,8 +130,13 @@ export namespace Website {
         id: number;
         operate: string;
         logType: string;
+    }
+
+    export interface WebSiteLogReq {
+        id: number;
         page?: number;
         pageSize?: number;
+        logType: string;
     }
 
     export interface OptionReq {
