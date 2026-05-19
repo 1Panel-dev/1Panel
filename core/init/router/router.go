@@ -67,6 +67,7 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 
 func Routers() *gin.Engine {
 	Router = gin.New()
+	configureTrustedProxies(Router)
 	Router.Use(i18n.UseI18n())
 	Router.Use(middleware.WhiteAllow())
 	Router.Use(middleware.BindDomain())
@@ -107,6 +108,10 @@ func Routers() *gin.Engine {
 	})
 
 	return Router
+}
+
+func configureTrustedProxies(router *gin.Engine) {
+	_ = router.SetTrustedProxies(nil)
 }
 
 func RegisterImages(rootRouter *gin.RouterGroup) {

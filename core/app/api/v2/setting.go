@@ -364,11 +364,6 @@ func (b *BaseApi) UpdatePort(c *gin.Context) {
 }
 
 func (b *BaseApi) ReloadSSL(c *gin.Context) {
-	clientIP := c.ClientIP()
-	if clientIP != "127.0.0.1" {
-		helper.InternalServer(c, errors.New("only localhost can reload ssl"))
-		return
-	}
 	if err := settingService.UpdateSystemSSL(); err != nil {
 		helper.InternalServer(c, err)
 		return

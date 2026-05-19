@@ -15,6 +15,7 @@ var (
 
 func Routers() *gin.Engine {
 	Router = gin.Default()
+	configureTrustedProxies(Router)
 	Router.Use(i18n.UseI18n())
 
 	PrivateGroup := Router.Group("/api/v2")
@@ -28,4 +29,8 @@ func Routers() *gin.Engine {
 	PrivateGroup.GET("/health/check", v2.ApiGroupApp.BaseApi.CheckHealth)
 
 	return Router
+}
+
+func configureTrustedProxies(router *gin.Engine) {
+	_ = router.SetTrustedProxies(nil)
 }

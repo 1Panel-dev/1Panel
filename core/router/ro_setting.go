@@ -39,7 +39,7 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.GET("/upgrade/releases", baseApi.LoadRelease)
 		settingRouter.GET("/upgrade", baseApi.GetUpgradeInfo)
 
-		noAuthRouter.POST("/ssl/reload", baseApi.ReloadSSL)
+		noAuthRouter.POST("/ssl/reload", middleware.LocalReqCheck(), baseApi.ReloadSSL)
 
 		settingRouter.POST("/apps/store/update", baseApi.UpdateAppstoreConfig)
 		settingRouter.GET("/apps/store/config", baseApi.GetAppstoreConfig)

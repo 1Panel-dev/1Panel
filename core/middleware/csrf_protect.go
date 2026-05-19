@@ -33,6 +33,9 @@ func CSRFTokenGuard() gin.HandlerFunc {
 }
 
 func requiresCSRFTokenCheck(c *gin.Context) bool {
+	if IsLocalRequest(c) {
+		return false
+	}
 	unsafeMethod := c.Request.Method != http.MethodGet &&
 		c.Request.Method != http.MethodHead &&
 		c.Request.Method != http.MethodOptions &&
