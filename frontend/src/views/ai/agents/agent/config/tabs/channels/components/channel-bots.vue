@@ -81,7 +81,6 @@
                                 <el-dropdown-menu>
                                     <fu-dropdown-item
                                         v-if="defaultable && !row.isDefault"
-                                        v-permission
                                         command="default"
                                         :disabled="disabled || isBotActionDisabled(row)"
                                     >
