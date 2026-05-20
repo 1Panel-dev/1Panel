@@ -4,35 +4,21 @@
             <el-card>
                 <div>
                     <el-button
+                        v-for="item in alertTabs"
+                        :key="item.key"
                         class="tag-button"
-                        :class="index === '0' ? '' : 'no-active'"
-                        :type="index === '0' ? 'primary' : ''"
-                        @click="changeTab('0')"
+                        :class="index === item.value ? '' : 'no-active'"
+                        :type="index === item.value ? 'primary' : ''"
+                        @click="changeTab(item.value)"
                     >
-                        {{ $t('xpack.alert.list') }}
-                    </el-button>
-                    <el-button
-                        class="tag-button"
-                        :class="index === '1' ? '' : 'no-active'"
-                        :type="index === '1' ? 'primary' : ''"
-                        @click="changeTab('1')"
-                    >
-                        {{ $t('xpack.alert.logs') }}
-                    </el-button>
-                    <el-button
-                        class="tag-button"
-                        :class="index === '2' ? '' : 'no-active'"
-                        :type="index === '2' ? 'primary' : ''"
-                        @click="changeTab('2')"
-                    >
-                        {{ $t('commons.button.set') }}
+                        {{ $t(item.label) }}
                     </el-button>
                 </div>
             </el-card>
         </div>
-        <AlertDash v-if="index == '0'" />
-        <AlertLogs v-if="index == '1'" />
-        <AlertSetting v-if="index == '2'" />
+        <AlertDash v-if="index === ALERT_NOTICE_TAB.tasks" />
+        <AlertLogs v-if="index === ALERT_NOTICE_TAB.logs" />
+        <AlertSetting v-if="index === ALERT_NOTICE_TAB.config" />
     </div>
 </template>
 <script setup lang="ts">
@@ -40,16 +26,33 @@ import AlertDash from '@/views/setting/alert/dash/index.vue';
 import AlertLogs from '@/views/setting/alert/log/index.vue';
 import AlertSetting from '@/views/setting/alert/setting/index.vue';
 
-const index = ref('0');
+const ALERT_NOTICE_TAB_STORAGE_KEY = 'alert-notice-tab';
+const ALERT_NOTICE_TAB = {
+    tasks: '0',
+    logs: '1',
+    config: '2',
+} as const;
+const alertTabs = [
+    { key: 'tasks', value: ALERT_NOTICE_TAB.tasks, label: 'xpack.alert.list' },
+    { key: 'logs', value: ALERT_NOTICE_TAB.logs, label: 'xpack.alert.logs' },
+    { key: 'config', value: ALERT_NOTICE_TAB.config, label: 'commons.button.set' },
+];
+type AlertNoticeTabValue = (typeof ALERT_NOTICE_TAB)[keyof typeof ALERT_NOTICE_TAB];
 
-const changeTab = (ind: string) => {
+const index = ref<AlertNoticeTabValue>(ALERT_NOTICE_TAB.tasks);
+
+const isAlertNoticeTab = (value: string | null): value is AlertNoticeTabValue => {
+    return alertTabs.some((item) => item.value === value);
+};
+
+const changeTab = (ind: AlertNoticeTabValue) => {
     index.value = ind;
-    localStorage.setItem('alert-notice-tab', index.value);
+    localStorage.setItem(ALERT_NOTICE_TAB_STORAGE_KEY, index.value);
 };
 
 onMounted(async () => {
-    const tab = localStorage.getItem('alert-notice-tab');
-    if (tab) {
+    const tab = localStorage.getItem(ALERT_NOTICE_TAB_STORAGE_KEY);
+    if (isAlertNoticeTab(tab)) {
         index.value = tab;
     }
 });
