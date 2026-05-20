@@ -3,7 +3,7 @@
         <DialogPro v-model="open" class="level-up-pro" @close="handleClose">
             <div style="text-align: center" v-loading="loading">
                 <span class="text-3xl font-medium title">
-                    {{ isImport ? $t('license.importLicense') : $t('license.levelUpPro') }}
+                    {{ $t('license.importLicense') }}
                 </span>
                 <el-row type="flex" justify="center" class="mt-6">
                     <el-col :span="22">
@@ -45,10 +45,10 @@
                     plain
                     @click="submit"
                 >
-                    {{ isImport ? $t('commons.button.confirm') : $t('commons.button.power') }}
+                    {{ $t('commons.button.power') }}
                 </el-button>
                 <div class="mt-3 mb-5">
-                    <el-button text type="primary" @click="toLxware">{{ $t('license.knowMorePro') }}</el-button>
+                    <el-button text type="primary" @click="toEdition">{{ $t('license.knowMorePro') }}</el-button>
                 </div>
             </div>
         </DialogPro>
@@ -111,9 +111,9 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
     uploadRef.value!.handleStart(file);
 };
 
-const toLxware = () => {
+const toEdition = () => {
     if (!globalStore.isIntl) {
-        window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
+        window.open('https://1panel.cn/versions.html' + '', '_blank', 'noopener,noreferrer');
     } else {
         window.open('https://1panel.pro/pricing' + '', '_blank', 'noopener,noreferrer');
     }
