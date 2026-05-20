@@ -669,7 +669,7 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 		for _, host := range create.ExtraHosts {
 			extraHosts = append(extraHosts, fmt.Sprintf("%s:%s", host.Hostname, host.IP))
 		}
-		delete(serviceValue, "extraHosts")
+		delete(serviceValue, "extra_hosts")
 		if len(extraHosts) > 0 {
 			serviceValue["extra_hosts"] = extraHosts
 		}
