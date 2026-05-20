@@ -83,6 +83,7 @@ ErrNodeBoundDelete: "This license is bound and does not support delete operation
 ErrNodeBoundLimit: "The current free node has reached its limit, check and try again!"
 ErrLicenseFree: "Free nodes are available only when the license is correctly bound to a node. Verify and retry."
 ErrLicenseUnbind: "Community Edition nodes are still linked to this license. Unbind them in Panel Settings > License and try again."
+ErrLicenseBindCount: "The new license free node count is less than the currently linked Community Edition node count. Check and try again."
 ErrNoSuchNode: "Node information not found, check and retry!"
 ErrNodeUnbind: "This node is not within the license binding range, check and retry!"
 ErrNodeBind: "This node is already bound to a license, check and retry!"

@@ -72,6 +72,7 @@ ErrNodeBoundDelete: "Lisensi ini telah diikat dan tidak menyokong operasi pengha
 ErrNodeBoundLimit: "Nod percuma semasa telah mencapai had, sila semak dan cuba lagi"
 ErrLicenseFree: "Nod percuma hanya boleh digunakan apabila lesen terikat dengan betul pada nod. Sila semak dan cuba lagi"
 ErrLicenseUnbind: "Lesen ini masih terikat pada nod Edisi Community. Nyahikat di Tetapan Panel > Lesen dan cuba lagi"
+ErrLicenseBindCount: "Bilangan nod percuma lesen baharu kurang daripada bilangan nod Edisi Community yang sedang terikat. Sila semak dan cuba lagi"
 ErrNoSuchNode: "Maklumat nod tidak ditemui, sila semak dan cuba lagi"
 ErrNodeUnbind: "Nod di luar skop lesen dikesan, sila semak dan cuba lagi"
 ErrNodeBind: "Nod ini telah diikat dengan lesen, sila semak dan cuba lagi"

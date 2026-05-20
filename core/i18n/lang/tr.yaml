@@ -76,6 +76,7 @@ ErrNodeBoundDelete: "Bu lisans bağlı ve silme işlemlerini desteklemiyor. Lüt
 ErrNodeBoundLimit: "Mevcut ücretsiz düğüm limitine ulaştı, lütfen kontrol edip tekrar deneyin"
 ErrLicenseFree: "Ücretsiz düğümler yalnızca lisans bir düğüme düzgün şekilde bağlandığında kullanılabilir. Lütfen doğrulayın ve tekrar deneyin"
 ErrLicenseUnbind: "Bu lisansa hala Community Sürümü düğümleri bağlı. Panel Ayarları > Lisans bölümünden bağlantıyı kaldırıp tekrar deneyin"
+ErrLicenseBindCount: "Yeni lisansın ücretsiz düğüm sayısı mevcut bağlı Community Sürümü düğüm sayısından az. Lütfen kontrol edip tekrar deneyin"
 ErrNoSuchNode: "Düğüm bilgisi bulunamadı, lütfen kontrol edip tekrar deneyin"
 ErrNodeUnbind: "Bu düğüm lisans bağlama aralığında değil, lütfen kontrol edip tekrar deneyin"
 ErrNodeBind: "Bu düğüm zaten bir lisansa bağlı, lütfen kontrol edip tekrar deneyin"
