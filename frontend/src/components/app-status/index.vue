@@ -11,6 +11,7 @@
                 <div class="mt-0.5">
                     <el-button
                         type="primary"
+                        v-permission="'app_manage'"
                         v-if="data.status != 'Running'"
                         link
                         @click="onOperate('start')"
@@ -18,12 +19,19 @@
                     >
                         {{ $t('commons.operate.start') }}
                     </el-button>
-                    <el-button type="primary" v-if="data.status === 'Running'" link @click="onOperate('stop')">
+                    <el-button
+                        type="primary"
+                        v-permission="'app_manage'"
+                        v-if="data.status === 'Running'"
+                        link
+                        @click="onOperate('stop')"
+                    >
                         {{ $t('commons.operate.stop') }}
                     </el-button>
                     <el-divider direction="vertical" />
                     <el-button
                         type="primary"
+                        v-permission="'app_manage'"
                         link
                         :disabled="data.status === 'Installing'"
                         @click="onOperate('restart')"
@@ -34,6 +42,7 @@
                     <el-button
                         type="primary"
                         link
+                        v-permission:view="'website_manage'"
                         v-if="data.app === 'OpenResty'"
                         @click="onOperate('reload')"
                         :disabled="data.status !== 'Running'"

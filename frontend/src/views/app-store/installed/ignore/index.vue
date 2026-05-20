@@ -11,7 +11,7 @@
                 </el-table-column>
                 <el-table-column prop="scope" :label="$t('commons.table.operate')">
                     <template #default="{ row }">
-                        <el-button type="primary" link @click="cancelIgnore(row.ID)">
+                        <el-button v-permission type="primary" link @click="cancelIgnore(row.ID)">
                             {{ $t('app.cancelIgnore') }}
                         </el-button>
                     </template>

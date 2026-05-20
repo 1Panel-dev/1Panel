@@ -9,6 +9,7 @@
             </el-button>
             <el-button
                 @click="enterSortMode"
+                v-permission
                 type="primary"
                 plain
                 v-if="mode === 'installed' && !sortMode && data != null"
@@ -86,19 +87,20 @@
                                         class="d-button flex flex-wrap items-center justify-start gap-1.5"
                                         v-if="mode === 'installed' && installed.status != 'Installing'"
                                     >
-                                        <el-button
-                                            class="app-button"
-                                            v-for="(button, key) in buttons"
-                                            :key="key"
-                                            :type="button.disabled && button.disabled(installed) ? 'info' : ''"
-                                            plain
-                                            round
-                                            size="small"
-                                            @click="button.click(installed)"
-                                            :disabled="button.disabled && button.disabled(installed)"
-                                        >
-                                            {{ button.label }}
-                                        </el-button>
+                                        <template v-for="(button, key) in buttons" :key="key">
+                                            <el-button
+                                                v-permission
+                                                class="app-button"
+                                                :type="button.disabled && button.disabled(installed) ? 'info' : ''"
+                                                plain
+                                                round
+                                                size="small"
+                                                @click="button.click(installed)"
+                                                :disabled="button.disabled && button.disabled(installed)"
+                                            >
+                                                {{ button.label }}
+                                            </el-button>
+                                        </template>
                                     </div>
                                 </template>
                             </AppCard>

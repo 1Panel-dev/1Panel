@@ -64,6 +64,7 @@ const detailRef = ref();
 const buttons = [
     {
         label: i18n.global.t('ssl.selfSign'),
+        permission: true,
         click: function (row: Website.CA) {
             obtain(row);
         },
@@ -82,6 +83,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.CA) {
             deleteca(row);
         },

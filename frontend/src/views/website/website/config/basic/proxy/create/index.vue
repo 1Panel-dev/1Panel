@@ -222,7 +222,7 @@
                             </el-row>
                         </div>
                         <div class="mt-4">
-                            <el-button type="primary" @click="addReplaces" :icon="Plus">
+                            <el-button v-permission type="primary" @click="addReplaces" :icon="Plus">
                                 {{ $t('website.addReplace') }}
                             </el-button>
                             <span class="input-help mt-4">{{ $t('website.replaceHelper') }}</span>
@@ -233,7 +233,7 @@
         </el-form>
         <template #footer>
             <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button type="primary" @click="submit(proxyForm)" :disabled="loading">
+            <el-button v-permission type="primary" @click="submit(proxyForm)" :disabled="loading">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>

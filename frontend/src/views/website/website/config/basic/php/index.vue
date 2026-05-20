@@ -23,6 +23,7 @@
                             </el-col>
                             <el-col :span="4">
                                 <el-button
+                                    v-permission
                                     type="primary"
                                     @click="submit()"
                                     :disabled="versionReq.runtimeID === oldRuntimeID"
@@ -40,7 +41,7 @@
             >
                 <el-form label-position="right" label-width="100px" v-if="tabIndex == '1'">
                     <el-form-item :label="$t('website.openBaseDir')">
-                        <el-switch v-model="openBaseDir" @change="operateCrossSite"></el-switch>
+                        <el-switch v-permission v-model="openBaseDir" @change="operateCrossSite"></el-switch>
                         <span class="input-help">{{ $t('website.openBaseDirHelper') }}</span>
                     </el-form-item>
                 </el-form>

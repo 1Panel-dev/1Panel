@@ -29,7 +29,7 @@
                 </el-table-column>
                 <el-table-column :label="$t('website.useProxy')" min-width="100px" v-if="isProductPro">
                     <template #default="{ row }">
-                        <el-switch v-model="row.useProxy" @change="update(row)"></el-switch>
+                        <el-switch v-permission v-model="row.useProxy" @change="update(row)"></el-switch>
                     </template>
                 </el-table-column>
                 <el-table-column label="URL" show-overflow-tooltip prop="url" min-width="300px"></el-table-column>
@@ -73,6 +73,7 @@ const opRef = ref();
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.AcmeAccount) {
             deleteAccount(row);
         },

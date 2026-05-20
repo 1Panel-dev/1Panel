@@ -1,7 +1,7 @@
 <template>
     <div v-loading="loading">
         <CodemirrorPro v-model="content"></CodemirrorPro>
-        <el-button type="primary" @click="openUpdate()" class="mt-2.5">
+        <el-button v-permission type="primary" @click="openUpdate()" class="mt-2.5">
             {{ $t('nginx.saveAndReload') }}
         </el-button>
     </div>

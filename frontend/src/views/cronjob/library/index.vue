@@ -25,7 +25,7 @@
                     </template>
                 </el-dropdown>
 
-                <el-button type="primary" plain @click="onOpenGroupDialog()">
+                <el-button v-permission type="primary" plain @click="onOpenGroupDialog()">
                     {{ $t('commons.table.group') }}
                 </el-button>
                 <el-button v-permission plain :disabled="selects.length === 0" @click="onDelete(null)">

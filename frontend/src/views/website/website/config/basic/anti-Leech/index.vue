@@ -14,7 +14,7 @@
                 </el-form-item>
                 <el-divider content-position="left">{{ $t('website.antiLeech') }}</el-divider>
                 <el-form-item :label="$t('website.enableOrNot')" prop="enable">
-                    <el-switch v-model="form.enable" @change="changeEnable"></el-switch>
+                    <el-switch v-permission v-model="form.enable" @change="changeEnable"></el-switch>
                 </el-form-item>
                 <template v-if="form.enable">
                     <el-form-item :label="$t('website.accessDomain')" prop="domains">
@@ -26,6 +26,7 @@
                                     class="flex-1 mr-2"
                                 ></el-input>
                                 <el-button
+                                    v-permission
                                     type="danger"
                                     size="small"
                                     :icon="Delete"
@@ -33,7 +34,7 @@
                                     v-if="domainList.length > 1"
                                 ></el-button>
                             </div>
-                            <el-button type="primary" size="small" :icon="Plus" @click="addDomain" plain>
+                            <el-button v-permission type="primary" size="small" :icon="Plus" @click="addDomain" plain>
                                 {{ $t('commons.button.add') }}
                             </el-button>
                         </div>
@@ -92,7 +93,7 @@
                     <span class="input-help">{{ $t('website.leechlogControlHelper') }}</span>
                 </el-form-item>
                 <div class="flex items-center gap-4 mt-2">
-                    <el-button type="primary" @click="submit(leechRef, form.enable)" :disabled="loading">
+                    <el-button v-permission type="primary" @click="submit(leechRef, form.enable)" :disabled="loading">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>

@@ -21,7 +21,7 @@
             </el-col>
             <el-col :span="2">
                 <el-form-item>
-                    <el-button type="primary" @click="removePort(index)" link class="mt-1">
+                    <el-button v-permission type="primary" @click="removePort(index)" link class="mt-1">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </el-form-item>
@@ -29,7 +29,7 @@
         </el-row>
         <el-row :gutter="20">
             <el-col :span="4">
-                <el-button @click="addPort">{{ $t('commons.button.add') }}</el-button>
+                <el-button v-permission @click="addPort">{{ $t('commons.button.add') }}</el-button>
             </el-col>
         </el-row>
     </div>

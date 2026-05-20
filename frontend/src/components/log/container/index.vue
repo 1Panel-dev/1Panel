@@ -25,7 +25,7 @@
         <el-button class="margin-button" @click="openDownloadDialog" icon="Download">
             {{ $t('commons.button.download') }}
         </el-button>
-        <el-button class="margin-button" @click="onClean" icon="Delete">
+        <el-button v-permission="'container_manage'" class="margin-button" @click="onClean" icon="Delete">
             {{ $t('commons.button.clean') }}
         </el-button>
     </div>

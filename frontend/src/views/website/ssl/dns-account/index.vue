@@ -60,6 +60,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.DnsAccount) {
             deleteAccount(row);
         },
