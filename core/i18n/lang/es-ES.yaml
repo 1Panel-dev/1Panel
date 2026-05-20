@@ -83,6 +83,7 @@ ErrNodeBoundDelete: "Esta licencia está vinculada y no admite operaciones de el
 ErrNodeBoundLimit: "El nodo gratuito actual ha alcanzado su límite, verifique e intente de nuevo"
 ErrLicenseFree: "Los nodos gratuitos solo pueden usarse si la licencia está correctamente vinculada a un nodo. Verifique e intente de nuevo"
 ErrLicenseUnbind: "Esta licencia todavía tiene nodos de la edición Community vinculados. Desvincúlalos en Configuración del panel > Licencia y vuelve a intentarlo."
+ErrLicenseBindCount: "El número de nodos gratuitos de la nueva licencia es menor que el número actual de nodos de la edición Community vinculados. Verifique e intente de nuevo."
 ErrNoSuchNode: "Información del nodo no encontrada, verifique e intente de nuevo"
 ErrNodeUnbind: "Este nodo no está dentro del rango de vinculación de la licencia, verifique e intente de nuevo"
 ErrNodeBind: "Este nodo ya está vinculado a una licencia, verifique e intente de nuevo"
