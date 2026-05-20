@@ -1675,7 +1675,7 @@ const message = {
         clam: {
             clam: 'Varredura de vírus',
             cron: 'Varredura agendada',
-            cronHelper: 'A edição Pro oferece suporte a varreduras agendadas',
+            cronHelper: 'A edição Business oferece suporte a varreduras agendadas',
             specErr: 'Formato do agendamento inválido, verifique e tente novamente!',
             disableMsg: 'Parar a execução agendada impedirá a execução automática desta tarefa. Continuar?',
             enableMsg:
@@ -1709,7 +1709,7 @@ const message = {
             clamLog: 'Logs de @:toolbox.clam.clamConf',
             freshClam: 'FreshClam',
             freshClamLog: 'Logs de @:toolbox.clam.freshClam',
-            alertHelper: 'A edição Pro oferece suporte a varreduras agendadas e alertas por SMS',
+            alertHelper: 'A edição Business oferece suporte a varreduras agendadas e alertas por SMS',
             alertTitle: 'Tarefa de varredura de vírus "{0}" detectou arquivo infectado',
         },
     },
@@ -1788,7 +1788,7 @@ const message = {
     clam: {
         clam: 'Scan de vírus',
         cron: 'Scan agendado',
-        cronHelper: 'A edição Pro oferece suporte a scans agendados',
+        cronHelper: 'A edição Business oferece suporte a scans agendados',
         specErr: 'Erro no formato do agendamento, por favor, verifique e tente novamente!',
         disableMsg:
             'Parar a execução agendada impedirá que esta tarefa de scan seja executada automaticamente. Deseja continuar?',
@@ -1823,7 +1823,7 @@ const message = {
         clamLog: '@:toolbox.clam.clamConf logs',
         freshClam: 'FreshClam',
         freshClamLog: '@:toolbox.clam.freshClam logs',
-        alertHelper: 'A edição Pro oferece suporte a scans agendados e alertas por SMS',
+        alertHelper: 'A edição Business oferece suporte a scans agendados e alertas por SMS',
         alertTitle: 'Tarefa de scan de vírus 「{0}」 detectou alerta de arquivo infectado',
     },
     logs: {
@@ -2328,14 +2328,14 @@ const message = {
             'Redirecionamentos de aplicativos, acesso a containers e outras funcionalidades usarão este endereço para roteamento. Cada nó pode ser configurado com um endereço diferente.',
         proxy: 'Proxy do servidor',
         proxyHelper: 'Será eficaz nos seguintes cenários após configurar o servidor proxy:',
-        proxyHelper1: 'Download de pacotes de instalação e sincronização da loja de aplicativos (somente edição Pro)',
-        proxyHelper2: 'Atualizações do sistema e verificação de atualizações (somente edição Pro)',
+        proxyHelper1: 'Download de pacotes de instalação e sincronização da loja de aplicativos (somente edição Business)',
+        proxyHelper2: 'Atualizações do sistema e verificação de atualizações (somente edição Business)',
         proxyHelper4:
-            'Solicitações de rede, como pull de imagens Docker, serão feitas pelo servidor proxy (somente edição Pro)',
+            'Solicitações de rede, como pull de imagens Docker, serão feitas pelo servidor proxy (somente edição Business)',
         proxyHelper3: 'Verificação e sincronização da licença do sistema',
         proxyHelper5:
-            'Download e sincronização unificados para bibliotecas de scripts do sistema (recurso da edição Pro)',
-        proxyHelper6: 'Solicitar certificado (Funcionalidade da versão Pro)',
+            'Download e sincronização unificados para bibliotecas de scripts do sistema (recurso da edição Business)',
+        proxyHelper6: 'Solicitar certificado (Funcionalidade da versão Business)',
         proxyType: 'Tipo de proxy',
         proxyUrl: 'Endereço do proxy',
         proxyPort: 'Porta do proxy',
@@ -2750,7 +2750,7 @@ const message = {
         offLine: 'Versão Offline',
         community: 'Gratuito',
         oss: 'Open Source Software',
-        pro: 'Pro',
+        pro: 'Business',
         trial: 'Teste',
         add: 'Adicionar Edição Comunitária',
         licenseBindHelper: 'As cotas de nó gratuitas só podem ser usadas quando a licença está vinculada a um nó',
@@ -2770,40 +2770,40 @@ const message = {
         authorizationId: 'ID da Assinatura',
         authorizedUser: 'Usuário autorizado',
         lostHelper:
-            'A licença atingiu o limite de tentativas. Execute a sincronização manualmente para garantir que os recursos da edição Pro continuem funcionando. detalhes: ',
+            'A licença atingiu o limite de tentativas. Execute a sincronização manualmente para garantir que os recursos da edição Business continuem funcionando. detalhes: ',
         disableHelper:
-            'A verificação da sincronização da licença falhou. Execute a sincronização manualmente para garantir que os recursos da edição Pro funcionem corretamente. detalhes: ',
+            'A verificação da sincronização da licença falhou. Execute a sincronização manualmente para garantir que os recursos da edição Business funcionem corretamente. detalhes: ',
         quickUpdate: 'Atualização rápida',
         power: 'Autorizar',
         unbindHelper:
-            'Todas as configurações relacionadas ao Pro serão limpas após a desvinculação. Você deseja continuar?',
+            'Todas as configurações relacionadas ao Business serão limpas após a desvinculação. Você deseja continuar?',
         importLicense: 'Licença',
         importHelper: 'Clique ou arraste o arquivo de licença aqui',
         technicalAdvice: 'Consultoria técnica',
         advice: 'Consultoria',
-        levelUpPro: 'Fazer upgrade para a edição Pro',
+        levelUpPro: 'Fazer upgrade para a edição Business',
         licenseSync: 'Sincronização de Licença',
-        knowMorePro: 'Saiba mais',
+        knowMorePro: 'Saiba sobre Business',
         closeAlert: 'A página atual pode ser fechada nas configurações do painel',
         introduce: 'Introdução de recursos',
-        waf: 'Faça upgrade para a edição Pro para usar mapa de bloqueios, logs, registros de bloqueio, bloqueio geográfico, regras personalizadas, páginas de bloqueio personalizadas e mais.',
-        tamper: 'Faça upgrade para a edição Pro para proteger sites contra alterações ou adulterações não autorizadas.',
-        setting: 'Faça upgrade para a edição Pro para personalizar o logo do painel, a mensagem de boas-vindas e mais.',
+        waf: 'Faça upgrade para a edição Business para usar mapa de bloqueios, logs, registros de bloqueio, bloqueio geográfico, regras personalizadas, páginas de bloqueio personalizadas e mais.',
+        tamper: 'Faça upgrade para a edição Business para proteger sites contra alterações ou adulterações não autorizadas.',
+        setting: 'Faça upgrade para a edição Business para personalizar o logo do painel, a mensagem de boas-vindas e mais.',
         monitor:
-            'Faça upgrade para a edição Pro para acompanhar o status do site em tempo real, tendências de visitantes, origens de tráfego, logs de requisições e mais.',
-        alert: 'Faça upgrade para a edição Pro para receber alertas por SMS e consultar os logs de alertas.',
-        node: 'Atualize para a edição Pro para gerenciar vários servidores Linux com o 1Panel.',
+            'Faça upgrade para a edição Business para acompanhar o status do site em tempo real, tendências de visitantes, origens de tráfego, logs de requisições e mais.',
+        alert: 'Faça upgrade para a edição Business para receber alertas por SMS e consultar os logs de alertas.',
+        node: 'Atualize para a edição Business para gerenciar vários servidores Linux com o 1Panel.',
         nodeApp:
-            'Atualize para a edição Pro para atualizar versões de aplicativos multi-nó sem alternar manualmente entre os nós.',
+            'Atualize para a edição Business para atualizar versões de aplicativos multi-nó sem alternar manualmente entre os nós.',
         nodeDashboard:
-            'Atualize para a edição Pro para gerenciar aplicativos, sites, bancos de dados e tarefas agendadas multi-nó de forma centralizada.',
-        fileExchange: 'Atualize para a edição Pro para transferir arquivos rapidamente entre vários servidores.',
-        app: 'Faça upgrade para a edição Pro para visualizar informações do serviço e monitoramento de anomalias no aplicativo móvel.',
-        cluster: 'Atualize para a edição Pro para gerenciar clusters primário-réplica de MySQL/Postgres/Redis.',
+            'Atualize para a edição Business para gerenciar aplicativos, sites, bancos de dados e tarefas agendadas multi-nó de forma centralizada.',
+        fileExchange: 'Atualize para a edição Business para transferir arquivos rapidamente entre vários servidores.',
+        app: 'Faça upgrade para a edição Business para visualizar informações do serviço e monitoramento de anomalias no aplicativo móvel.',
+        cluster: 'Atualize para a edição Business para gerenciar clusters primário-réplica de MySQL/Postgres/Redis.',
         'model-downloader':
-            'Atualize para a edição Pro para pesquisar, baixar e gerenciar arquivos de modelos locais do HuggingFace, ModelScope ou mirrors compatíveis, com diretórios de modelos e tarefas de download centralizados.',
+            'Atualize para a edição Business para pesquisar, baixar e gerenciar arquivos de modelos locais do HuggingFace, ModelScope ou mirrors compatíveis, com diretórios de modelos e tarefas de download centralizados.',
         exceptionalHelper:
-            'A verificação da sincronização da licença está anormal. Clique em sincronizar manualmente para garantir o funcionamento da edição Pro. detalhe: ',
+            'A verificação da sincronização da licença está anormal. Clique em sincronizar manualmente para garantir o funcionamento da edição Business. detalhe: ',
         tamperHelper:
             'Falha na operação, o arquivo ou pasta tem proteção contra alteração habilitada. Verifique e tente novamente!',
     },
@@ -3858,12 +3858,12 @@ const message = {
     },
     xpack: {
         expiresTrialAlert:
-            'Lembrete: Sua avaliação Pro expira em {0} dias. Depois disso, todos os recursos da edição Pro deixarão de ficar disponíveis. Renove ou faça upgrade em tempo hábil.',
+            'Lembrete: Sua avaliação Business expira em {0} dias. Depois disso, todos os recursos da edição Business deixarão de ficar disponíveis. Renove ou faça upgrade em tempo hábil.',
         expiresAlert:
-            'Lembrete: Sua licença Pro expira em {0} dias. Depois disso, todos os recursos da edição Pro deixarão de ficar disponíveis. Renove a licença para manter o uso contínuo.',
-        menu: 'Pro',
+            'Lembrete: Sua licença Business expira em {0} dias. Depois disso, todos os recursos da edição Business deixarão de ficar disponíveis. Renove a licença para manter o uso contínuo.',
+        menu: 'Business',
         upage: 'Construtor de Sites com IA',
-        proAlert: 'Atualize para Pro para usar este recurso',
+        proAlert: 'Atualize para Business para usar este recurso',
         app: {
             app: 'APP',
             title: 'Apelido do Painel',
@@ -4468,7 +4468,7 @@ const message = {
             syncHelper: 'Quando os dados do nó mestre mudam, são sincronizados em tempo real para este nó filho,',
             syncBackupAccount: 'Configurações de conta de backup',
             syncWithMaster:
-                'Após atualizar para Pro, todos os dados serão sincronizados por padrão. As políticas de sincronização podem ser ajustadas manualmente no gerenciamento de nós.',
+                'Após atualizar para Business, todos os dados serão sincronizados por padrão. As políticas de sincronização podem ser ajustadas manualmente no gerenciamento de nós.',
             syncProxy: 'Configurações de proxy do sistema',
             syncProxyHelper: 'Sincronizar configurações de proxy do sistema requer reinicialização do Docker',
             syncProxyHelper1: 'Reiniciar o Docker pode afetar os serviços de contêiner em execução.',
@@ -4547,7 +4547,7 @@ const message = {
             nodes: 'Selecionar Nós',
             selectNode: 'Selecionar Node',
             selectNodeError: 'Por favor, selecione um nó',
-            licenseHelper: 'A versão Pro suporta o recurso de repositório de aplicativos personalizados',
+            licenseHelper: 'A versão Business suporta o recurso de repositório de aplicativos personalizados',
             databaseHelper: 'Banco de dados associado ao aplicativo, selecione o banco de dados do nó de destino',
             nodeHelper: 'Não é possível selecionar o nó atual',
             migrateHelper:
@@ -4562,7 +4562,7 @@ const message = {
             alertCount: 'Contagem de Alertas',
             clamHelper: 'Dispara alerta via ao detectar arquivos infectados durante a varredura',
             cronJobHelper: 'Dispara alerta via ao falhar na execução de tarefas',
-            licenseHelper: 'A edição Pro oferece suporte a alertas via',
+            licenseHelper: 'A edição Business oferece suporte a alertas via',
             alertCountHelper: 'Frequência máxima diária de alertas',
             alert: 'Alerta por SMS',
             logs: 'Registros de Alerta',
@@ -4772,7 +4772,7 @@ const message = {
             barkConfigHelper: 'Configuração de notificação de alerta Bark',
             webhookName: 'Nome do bot',
             webhookUrl: 'URL do Webhook',
-            alertConfigProHelper: 'A edição Pro também oferece suporte a alertas via WeCom, DingTalk, Feishu e SMS.',
+            alertConfigProHelper: 'A edição Business também oferece suporte a alertas via WeCom, DingTalk, Feishu e SMS.',
         },
         theme: {
             lingXiaGold: 'LXware Gold',
