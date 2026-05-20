@@ -2383,7 +2383,7 @@ const message = {
         offLine: '離線版',
         community: '社區版',
         oss: '社區版',
-        pro: '商業版',
+        pro: '專業版',
         trial: '試用',
         add: '新增社區版',
         licenseBindHelper: '僅當授權已綁定節點時，才能使用其免費節點額度',

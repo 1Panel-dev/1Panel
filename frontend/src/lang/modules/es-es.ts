@@ -2213,7 +2213,8 @@ const message = {
             'La dirección se utilizará para la redirección de aplicaciones, el acceso a contenedores y otras funciones. Cada nodo puede configurarse con una dirección diferente.',
         proxy: 'Proxy del servidor',
         proxyHelper: 'Tendrá efecto en los siguientes escenarios después de configurar el servidor proxy:',
-        proxyHelper1: 'Descarga de paquetes de instalación y sincronización de la tienda de aplicaciones (solo Business)',
+        proxyHelper1:
+            'Descarga de paquetes de instalación y sincronización de la tienda de aplicaciones (solo Business)',
         proxyHelper2: 'Actualización del sistema y comprobación de actualizaciones (solo Business)',
         proxyHelper3: 'Verificación y sincronización de licencias del sistema',
         proxyHelper4:
@@ -2646,7 +2647,8 @@ const message = {
         trialInfo: 'Versión',
         authorizationId: 'ID de autorización',
         authorizedUser: 'Usuario autorizado',
-        lostHelper: 'La licencia alcanzó el máximo de reintentos. Sincronícela manualmente para activar funciones Business.',
+        lostHelper:
+            'La licencia alcanzó el máximo de reintentos. Sincronícela manualmente para activar funciones Business.',
         exceptionalHelper:
             'Verificación de licencia anómala. Sincronícela manualmente para activar funciones Business. detalle: ',
         quickUpdate: 'Actualización rápida',
@@ -2674,7 +2676,8 @@ const message = {
             'Actualizar a la edición Business permite la gestión centralizada de aplicaciones, sitios web, bases de datos y tareas programadas multinodo.',
         fileExchange: 'Business permite transferir archivos entre varios servidores.',
         app: 'Business permite ver información de servicio, monitoreo, etc. vía app móvil.',
-        cluster: 'Actualizar a la edición Business permite gestionar clústeres primario-réplica de MySQL/Postgres/Redis.',
+        cluster:
+            'Actualizar a la edición Business permite gestionar clústeres primario-réplica de MySQL/Postgres/Redis.',
         'model-downloader':
             'Actualiza a la edición Business para buscar, descargar y gestionar archivos de modelos locales desde HuggingFace, ModelScope o espejos compatibles, con directorios de modelos y tareas de descarga centralizados.',
         offLine: 'Sin conexión',

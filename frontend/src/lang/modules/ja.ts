@@ -2583,7 +2583,7 @@ const message = {
         offLine: 'オフライン版',
         community: '無料',
         oss: '無料',
-        pro: '専門',
+        pro: 'Pro',
         trial: '体験',
         add: 'コミュニティ版を追加',
         licenseBindHelper: 'ライセンスがノードにバインドされている場合にのみ、無料ノードクォータを使用できます',

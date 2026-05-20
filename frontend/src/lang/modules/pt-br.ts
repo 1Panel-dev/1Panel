@@ -2328,7 +2328,8 @@ const message = {
             'Redirecionamentos de aplicativos, acesso a containers e outras funcionalidades usarão este endereço para roteamento. Cada nó pode ser configurado com um endereço diferente.',
         proxy: 'Proxy do servidor',
         proxyHelper: 'Será eficaz nos seguintes cenários após configurar o servidor proxy:',
-        proxyHelper1: 'Download de pacotes de instalação e sincronização da loja de aplicativos (somente edição Business)',
+        proxyHelper1:
+            'Download de pacotes de instalação e sincronização da loja de aplicativos (somente edição Business)',
         proxyHelper2: 'Atualizações do sistema e verificação de atualizações (somente edição Business)',
         proxyHelper4:
             'Solicitações de rede, como pull de imagens Docker, serão feitas pelo servidor proxy (somente edição Business)',
@@ -2750,7 +2751,7 @@ const message = {
         offLine: 'Versão Offline',
         community: 'Gratuito',
         oss: 'Open Source Software',
-        pro: 'Business',
+        pro: 'Pro',
         trial: 'Teste',
         add: 'Adicionar Edição Comunitária',
         licenseBindHelper: 'As cotas de nó gratuitas só podem ser usadas quando a licença está vinculada a um nó',
@@ -2788,7 +2789,8 @@ const message = {
         introduce: 'Introdução de recursos',
         waf: 'Faça upgrade para a edição Business para usar mapa de bloqueios, logs, registros de bloqueio, bloqueio geográfico, regras personalizadas, páginas de bloqueio personalizadas e mais.',
         tamper: 'Faça upgrade para a edição Business para proteger sites contra alterações ou adulterações não autorizadas.',
-        setting: 'Faça upgrade para a edição Business para personalizar o logo do painel, a mensagem de boas-vindas e mais.',
+        setting:
+            'Faça upgrade para a edição Business para personalizar o logo do painel, a mensagem de boas-vindas e mais.',
         monitor:
             'Faça upgrade para a edição Business para acompanhar o status do site em tempo real, tendências de visitantes, origens de tráfego, logs de requisições e mais.',
         alert: 'Faça upgrade para a edição Business para receber alertas por SMS e consultar os logs de alertas.',
@@ -4772,7 +4774,8 @@ const message = {
             barkConfigHelper: 'Configuração de notificação de alerta Bark',
             webhookName: 'Nome do bot',
             webhookUrl: 'URL do Webhook',
-            alertConfigProHelper: 'A edição Business também oferece suporte a alertas via WeCom, DingTalk, Feishu e SMS.',
+            alertConfigProHelper:
+                'A edição Business também oferece suporte a alertas via WeCom, DingTalk, Feishu e SMS.',
         },
         theme: {
             lingXiaGold: 'LXware Gold',

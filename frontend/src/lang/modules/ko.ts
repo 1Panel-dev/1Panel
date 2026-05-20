@@ -2522,7 +2522,7 @@ const message = {
         offLine: '오프라인 버전',
         community: 'OSS',
         oss: '오픈 소스 소프트웨어',
-        pro: 'Business Edition',
+        pro: 'Pro',
         trial: '체험판',
         add: '커뮤니티 에디션 추가',
         licenseBindHelper: '라이선스가 노드에 바인딩된 경우에만 무료 노드 할당량을 사용할 수 있습니다',

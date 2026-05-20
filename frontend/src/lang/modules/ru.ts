@@ -2611,7 +2611,7 @@ const message = {
         offLine: 'Офлайн версия',
         community: 'OSS',
         oss: 'Open Source Software',
-        pro: 'Коммерческая версия',
+        pro: 'Pro',
         trial: 'Пробная версия',
         add: 'Добавить Community Edition',
         licenseBindHelper: 'Бесплатные квоты узлов можно использовать только тогда, когда лицензия привязана к узлу',
