@@ -578,6 +578,9 @@ func checkAgentUpgradable(install model.AppInstall) bool {
 	if install.App.ID == 0 {
 		return false
 	}
+	if ignoreUpdate(install) {
+		return false
+	}
 	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(install.App.ID))
 	if err != nil || len(details) == 0 {
 		return false

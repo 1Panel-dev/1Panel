@@ -341,7 +341,7 @@ const buttons = [
         label: i18n.global.t('commons.button.upgrade'),
         permission: true,
         click: (row: AI.AgentItem) => openUpgrade(row),
-        disabled: (row: AI.AgentItem) => !row.upgradable,
+        show: (row: AI.AgentItem) => row.upgradable,
     },
     {
         label: i18n.global.t('commons.button.delete'),
