@@ -30,7 +30,7 @@
         </el-table-column>
         <el-table-column :label="$t('commons.table.status')" prop="enable" min-width="50px">
             <template #default="{ row }">
-                <Status :status="row.enable ? 'enable' : 'disable'" @click="opProxy(row)" />
+                <Status v-permission :status="row.enable ? 'enable' : 'disable'" @click="opProxy(row)" />
             </template>
         </el-table-column>
         <fu-table-operations
@@ -80,6 +80,7 @@ const opRef = ref();
 const buttons = [
     {
         label: i18n.global.t('website.sourceFile'),
+        permission: true,
         click: function (row: Website.RedirectConfig) {
             openEditFile(row);
         },
@@ -99,6 +100,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.RedirectConfig) {
             deleteProxy(row);
         },

@@ -326,12 +326,12 @@
                                         </template>
                                         <template #dropdown>
                                             <el-dropdown-menu>
-                                                <el-dropdown-item @click="openShareList">
+                                                <fu-dropdown-item @click="openShareList">
                                                     {{ $t('file.shareList') }}
-                                                </el-dropdown-item>
-                                                <el-dropdown-item @click="openFileHistoryCenter">
+                                                </fu-dropdown-item>
+                                                <fu-dropdown-item @click="openFileHistoryCenter">
                                                     {{ $t('file.history') }}
-                                                </el-dropdown-item>
+                                                </fu-dropdown-item>
                                             </el-dropdown-menu>
                                         </template>
                                     </el-dropdown>

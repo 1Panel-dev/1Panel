@@ -2,12 +2,12 @@
     <div v-loading="loading">
         <div>
             <el-form-item :label="$t('website.enable')">
-                <el-switch v-model="data.enable" @change="updateEnable"></el-switch>
+                <el-switch v-permission v-model="data.enable" @change="updateEnable"></el-switch>
             </el-form-item>
         </div>
         <LogFile :config="{ id: id, type: 'website', name: logName, colorMode: 'nginx' }" ref="logRef">
             <template #button>
-                <el-button @click="cleanLog" icon="Delete">
+                <el-button v-permission @click="cleanLog" icon="Delete">
                     {{ $t('commons.button.clean') }}
                 </el-button>
             </template>

@@ -12,7 +12,7 @@
                     {{ $t('php.extensions') }}
                 </el-button>
 
-                <el-button type="primary" plain @click="onOpenBuildCache()">
+                <el-button v-permission type="primary" plain @click="onOpenBuildCache()">
                     {{ $t('container.cleanBuildCache') }}
                 </el-button>
             </template>
@@ -193,6 +193,7 @@ const isExist = ref(false);
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openDetail(row);
         },
@@ -202,6 +203,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('runtime.extension'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openExtensionsManagement(row);
         },
@@ -211,6 +213,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('menu.terminal'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openTerminal(row);
         },
@@ -220,6 +223,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.operate.stop'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             operateRuntime('down', row.id, loading, search);
         },
@@ -229,6 +233,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.operate.start'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             operateRuntime('up', row.id, loading, search);
         },
@@ -238,6 +243,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             operateRuntime('restart', row.id, loading, search);
         },
@@ -247,6 +253,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('menu.config'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openConfig(row);
         },
@@ -256,6 +263,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('menu.supervisor'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openSupervisor(row);
         },
@@ -266,6 +274,7 @@ const buttons = [
 
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openDelete(row);
         },

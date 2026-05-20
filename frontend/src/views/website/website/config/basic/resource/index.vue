@@ -37,7 +37,7 @@
                 <el-text type="warning">{{ $t('website.changeDatabaseHelper2') }}</el-text>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submit()">
+                <el-button v-permission type="primary" @click="submit()">
                     {{ $t('commons.button.save') }}
                 </el-button>
             </el-form-item>

@@ -56,7 +56,7 @@
                     </el-form-item>
                 </div>
                 <el-form-item>
-                    <el-button type="primary" @click="submit(realIPForm)" :loading="loading">
+                    <el-button v-permission type="primary" @click="submit(realIPForm)" :loading="loading">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </el-form-item>

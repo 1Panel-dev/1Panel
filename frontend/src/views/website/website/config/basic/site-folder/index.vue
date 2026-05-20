@@ -28,7 +28,7 @@
                                 :key="index"
                             ></el-option>
                         </el-select>
-                        <el-button type="primary" @click="submit(siteForm)">
+                        <el-button v-permission type="primary" @click="submit(siteForm)">
                             {{ $t('nginx.saveAndReload') }}
                         </el-button>
                     </el-space>
@@ -44,7 +44,7 @@
                         <el-input v-model="updatePermission.group" class="user-num-input">
                             <template #prepend>{{ $t('website.uGroup') }}</template>
                         </el-input>
-                        <el-button type="primary" @click="submitPermission()">
+                        <el-button v-permission type="primary" @click="submitPermission()">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-space>

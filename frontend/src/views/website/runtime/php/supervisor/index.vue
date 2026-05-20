@@ -7,6 +7,7 @@
                         {{ $t('commons.button.create') }}
                     </el-button>
                     <el-button
+                        v-permission
                         @click="batchRestart"
                         :disabled="!selects.length || selects.every((item) => item.name === 'php-fpm')"
                     >
@@ -50,16 +51,18 @@
                     <template #default="{ row }">
                         <div v-if="row.status && row.status.length > 0 && row.hasLoad">
                             <Status
+                                v-permission
                                 v-if="checkStatus(row.status) === 'RUNNING'"
                                 status="running"
                                 @click="operate('stop', row.name)"
                             />
                             <Status
+                                v-permission
                                 v-else-if="checkStatus(row.status) === 'WARNING'"
                                 status="unhealthy"
                                 @click="operate('restart', row.name)"
                             />
-                            <Status v-else status="stopped" @click="operate('start', row.name)" />
+                            <Status v-else v-permission status="stopped" @click="operate('start', row.name)" />
                         </div>
                         <div v-if="!row.hasLoad">
                             <el-button link loading></el-button>
@@ -306,6 +309,7 @@ const edit = (row: HostTool.SupervisorProcess) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             edit(row);
         },
@@ -315,6 +319,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('website.sourceFile'),
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             getFile(row.name, 'config', runtimeID.value);
         },
@@ -333,6 +338,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             operate('restart', row.name);
         },
@@ -342,6 +348,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             operate('delete', row.name);
         },

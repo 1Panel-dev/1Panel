@@ -6,7 +6,7 @@
                     <el-input v-model="defaultModel.index" type="textarea" :rows="8"></el-input>
                 </el-form-item>
             </el-form>
-            <el-button type="primary" @click="submit(defaultForm)" :disabled="loading">
+            <el-button v-permission type="primary" @click="submit(defaultForm)" :disabled="loading">
                 {{ $t('commons.button.save') }}
             </el-button>
         </el-col>
