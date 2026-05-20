@@ -2617,7 +2617,7 @@ const message = {
         offLine: 'Çevrimdışı Sürüm',
         community: 'OSS',
         oss: 'Açık Kaynak Yazılım',
-        pro: 'Business',
+        pro: 'Pro',
         trial: 'Deneme',
         add: 'Topluluk Sürümünü Ekle',
         licenseBindHelper: 'Ücretsiz düğüm kotası yalnızca lisans bir düğüme bağlı olduğunda kullanılabilir',
@@ -2643,7 +2643,8 @@ const message = {
         quickUpdate: 'Hızlı güncelleme',
         import: 'İçe aktar',
         power: 'Yetkilendir',
-        unbindHelper: 'Bağlantı kaldırıldığında tüm Business ile ilgili ayarlar temizlenecek. Devam etmek istiyor musunuz? ',
+        unbindHelper:
+            'Bağlantı kaldırıldığında tüm Business ile ilgili ayarlar temizlenecek. Devam etmek istiyor musunuz? ',
         importLicense: 'Lisansı içe aktar',
         importHelper: 'Lütfen lisans dosyasını buraya tıklayın veya sürükleyin',
         levelUpPro: 'Business Sürüme Yükselt',

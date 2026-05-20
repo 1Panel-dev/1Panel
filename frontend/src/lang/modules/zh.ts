@@ -2377,7 +2377,7 @@ const message = {
         offLine: '离线版',
         community: '社区版',
         oss: '社区版',
-        pro: '商业版',
+        pro: '专业版',
         trial: '试用',
         add: '添加社区版',
         licenseBindHelper: '仅当许可证已绑定节点时，才能使用其免费节点额度',

@@ -2568,7 +2568,7 @@ const message = {
         offLine: 'Offline',
         community: 'OSS',
         oss: 'Open Source Software',
-        pro: 'Business Edition',
+        pro: 'Pro',
         trial: 'Trial',
         add: 'Add Community Edition',
         licenseBindHelper: 'Free node quotas can only be used when the license is bound to a node',

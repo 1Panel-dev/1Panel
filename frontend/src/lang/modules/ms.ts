@@ -2218,7 +2218,8 @@ const message = {
         proxyHelper: 'Ia akan berkuat kuasa dalam senario berikut selepas anda menyediakan pelayan proksi:',
         proxyHelper1: 'Muat turun pakej pemasangan dan penyelarasan daripada kedai aplikasi (Edisi Business sahaja)',
         proxyHelper2: 'Kemas kini sistem dan semakan maklumat kemas kini (Edisi Business sahaja)',
-        proxyHelper4: 'Permintaan rangkaian seperti tarikan imej Docker akan melalui pelayan proksi (Edisi Business sahaja)',
+        proxyHelper4:
+            'Permintaan rangkaian seperti tarikan imej Docker akan melalui pelayan proksi (Edisi Business sahaja)',
         proxyHelper3: 'Pengesahan dan penyelarasan lesen sistem',
         proxyHelper5: 'Muat turun dan penyegerakan bersepadu untuk pustaka skrip sistem (ciri Edisi Business)',
         proxyHelper6: 'Mohon sijil (Fungsi versi Business)',
@@ -2631,7 +2632,7 @@ const message = {
         offLine: 'Versi Luar Talian',
         community: 'OSS',
         oss: 'Perisian Sumber Terbuka',
-        pro: 'Business',
+        pro: 'Pro',
         trial: 'Percubaan',
         add: 'Tambah Edisi Komuniti',
         licenseBindHelper: 'Kuota nod percuma hanya boleh digunakan apabila lesen terikat pada nod',
@@ -2654,7 +2655,8 @@ const message = {
             'Pengesahan penyegerakan lesen gagal. Jalankan penyegerakan secara manual untuk memastikan ciri Business berfungsi dengan baik. butiran: ',
         quickUpdate: 'Kemas Kini Pantas',
         power: 'Kebenaran',
-        unbindHelper: 'Semua Tetapan berkaitan Business akan dibersihkan selepas nyahikat. Adakah anda mahu meneruskan?',
+        unbindHelper:
+            'Semua Tetapan berkaitan Business akan dibersihkan selepas nyahikat. Adakah anda mahu meneruskan?',
         importLicense: 'Lesen',
         importHelper: 'Sila klik atau seret fail lesen ke sini',
         technicalAdvice: 'Konsultasi Teknikal',
