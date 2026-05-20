@@ -1332,6 +1332,9 @@ func (f FileOp) TarGzExtractPro(src, dst string, secret string) error {
 		global.LOG.Debug(commands)
 	}
 	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(dst), cmd.WithIgnoreExist1())
+	if len(secret) == 0 {
+		return cmdMgr.Run("tar", "zxvf", src)
+	}
 	return cmdMgr.RunBashC(commands)
 }
 func CopyCustomAppFile(srcPath, dstPath string) error {
