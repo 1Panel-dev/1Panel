@@ -204,6 +204,28 @@
                             </div>
                         </div>
                     </div>
+                    <div class="flex w-full flex-wrap items-center justify-start gap-2 xl:w-auto xl:flex-nowrap">
+                        <div class="w-full min-w-0 sm:w-[300px]">
+                            <el-input
+                                v-model="req.search"
+                                @clear="search()"
+                                @keydown.enter="search()"
+                                :placeholder="$t('file.search')"
+                            >
+                                <template #prepend>
+                                    <el-checkbox v-model="req.containSub">
+                                        {{ $t('file.sub') }}
+                                    </el-checkbox>
+                                </template>
+                                <template #append>
+                                    <el-button icon="Search" @click="search" round />
+                                </template>
+                            </el-input>
+                        </div>
+                        <el-button v-permission class="max-w-20" plain type="primary" @click="openAiSearchDrawer">
+                            {{ $t('file.aiSearch') }}
+                        </el-button>
+                    </div>
                 </div>
                 <LayoutContent class="file-layout" :title="$t('menu.files')" v-loading="loading">
                     <template #prompt>
@@ -488,27 +510,6 @@
                                     popper-class="popper-class"
                                     :only-icon="true"
                                 />
-                                <div class="w-80">
-                                    <el-input
-                                        v-model="req.search"
-                                        clearable
-                                        @clear="search()"
-                                        @keydown.enter="search()"
-                                        :placeholder="$t('file.search')"
-                                    >
-                                        <template #prepend>
-                                            <el-checkbox v-model="req.containSub">
-                                                {{ $t('file.sub') }}
-                                            </el-checkbox>
-                                        </template>
-                                        <template #append>
-                                            <el-button icon="Search" @click="search" round />
-                                        </template>
-                                    </el-input>
-                                </div>
-                                <el-button v-permission plain type="primary" @click="openAiSearchDrawer">
-                                    {{ $t('file.aiSearch') }}
-                                </el-button>
                             </div>
                         </div>
                     </template>
