@@ -1,10 +1,13 @@
 package service
 
 import (
+	"bufio"
 	"bytes"
+	"compress/gzip"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"os/user"
@@ -30,6 +33,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/pkg/errors"
 )
 
@@ -568,21 +572,17 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []d
 		return 0, data, err
 	}
 	for _, item := range fileItems {
-		if item.IsDir() || (!strings.HasPrefix(item.Name(), "secure") && !strings.HasPrefix(item.Name(), "auth")) {
+		if item.IsDir() || (!strings.HasPrefix(item.Name(), "secure") && !strings.HasPrefix(item.Name(), "auth.log")) {
 			continue
 		}
 		info, _ := item.Info()
 		itemPath := path.Join(baseDir, info.Name())
-		if !strings.HasSuffix(item.Name(), ".gz") {
-			fileList = append(fileList, sshFileItem{Name: itemPath, Year: info.ModTime().Year()})
-			continue
-		}
-		itemFileName := strings.TrimSuffix(itemPath, ".gz")
-		if _, err := os.Stat(itemFileName); err != nil && os.IsNotExist(err) {
-			if err := handleGunzip(itemPath); err == nil {
-				fileList = append(fileList, sshFileItem{Name: itemFileName, Year: info.ModTime().Year()})
+		if strings.HasSuffix(itemPath, ".gz") {
+			if _, err := os.Stat(strings.TrimSuffix(itemPath, ".gz")); err == nil {
+				continue
 			}
 		}
+		fileList = append(fileList, sshFileItem{Name: itemPath, Year: info.ModTime().Year()})
 	}
 	fileList = sortFileList(fileList)
 
@@ -599,7 +599,7 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []d
 	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	itemFailed, itemTotal := 0, 0
 	for _, file := range fileList {
-		dataItem, successCount, failedCount := loadSSHData(ctx, file.Name, path.Base(file.Name), req.Status, filter, showCountFrom, showCountTo, file.Year, nyc)
+		dataItem, successCount, failedCount := loadSSHData(ctx, file.Name, req.Status, filter, showCountFrom, showCountTo, file.Year, nyc)
 		itemFailed += failedCount
 		itemTotal += successCount + failedCount
 		showCountFrom = showCountFrom - (successCount + failedCount)
@@ -1103,7 +1103,22 @@ func isSSHConfigPathAllowed(fileName string) bool {
 	return false
 }
 
-func loadSSHData(ctx *gin.Context, filePath, fileName, status, filter string, showCountFrom, showCountTo, currentYear int, nyc *time.Location) ([]dto.SSHHistory, int, int) {
+type sshLogHeader struct {
+	DateStr string
+	Process string
+	PID     string
+	Message string
+}
+
+type sshParsedLog struct {
+	History    dto.SSHHistory
+	SessionKey string
+	Raw        string
+	Search     string
+	Index      int
+}
+
+func loadSSHData(ctx *gin.Context, filePath, status, filter string, showCountFrom, showCountTo, currentYear int, nyc *time.Location) ([]dto.SSHHistory, int, int) {
 	var (
 		datas        []dto.SSHHistory
 		successCount int
@@ -1113,157 +1128,287 @@ func loadSSHData(ctx *gin.Context, filePath, fileName, status, filter string, sh
 	if err != nil {
 		return datas, 0, 0
 	}
-	content, err := os.ReadFile(filePath)
+	lines, err := loadSSHLogLines(filePath)
 	if err != nil {
 		return datas, 0, 0
 	}
-	lines := strings.Split(string(content), "\n")
-	for i := len(lines) - 1; i >= 0; i-- {
-		if !matchSSHLogLine(fileName, status, filter, lines[i]) {
+	items := collectSSHLogItems(lines, filter, status)
+	for i := len(items) - 1; i >= 0; i-- {
+		itemData := items[i].History
+		if !matchSSHLogStatus(status, itemData.Status) || !checkIsStandard(itemData) {
 			continue
 		}
-		var itemData dto.SSHHistory
-		switch {
-		case strings.Contains(lines[i], "Failed password for"):
-			itemData = loadFailedSecureDatas(lines[i])
-			if checkIsStandard(itemData) {
-				if successCount+failedCount >= showCountFrom && (showCountTo == -1 || successCount+failedCount < showCountTo) {
-					itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
-					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
-					datas = append(datas, itemData)
-				}
-				failedCount++
-			}
-		case strings.Contains(lines[i], "Connection closed by authenticating user"):
-			itemData = loadFailedAuthDatas(lines[i])
-			if checkIsStandard(itemData) {
-				if successCount+failedCount >= showCountFrom && (showCountTo == -1 || successCount+failedCount < showCountTo) {
-					itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
-					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
-					datas = append(datas, itemData)
-				}
-				failedCount++
-			}
-		case strings.Contains(lines[i], "Accepted "):
-			itemData = loadSuccessDatas(lines[i])
-			if checkIsStandard(itemData) {
-				if successCount+failedCount >= showCountFrom && (showCountTo == -1 || successCount+failedCount < showCountTo) {
-					itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
-					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
-					datas = append(datas, itemData)
-				}
-				successCount++
-			}
+		if successCount+failedCount >= showCountFrom && (showCountTo == -1 || successCount+failedCount < showCountTo) {
+			itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
+			itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
+			datas = append(datas, itemData)
+		}
+		if itemData.Status == constant.StatusSuccess {
+			successCount++
+		} else {
+			failedCount++
 		}
 	}
 	return datas, successCount, failedCount
 }
 
-func matchSSHLogLine(fileName, status, filter, line string) bool {
-	if filter != "" && !strings.Contains(line, filter) {
+func collectSSHLogItems(lines []string, filter, status string) []sshParsedLog {
+	var items []sshParsedLog
+	auxiliaryIndex := make(map[string]int)
+	sessionHasAuthEvent := make(map[string]bool)
+	for lineIndex, line := range lines {
+		if !shouldParseSSHLogLine(line, status, filter) {
+			continue
+		}
+		item, ok := parseSSHLogLine(line)
+		if !ok || !checkIsStandard(item.History) {
+			continue
+		}
+		item.Index = lineIndex
+		item.Search = line
+		if isSSHAuthEvent(item) && item.SessionKey != "" {
+			sessionHasAuthEvent[item.SessionKey] = true
+			items = append(items, item)
+			continue
+		}
+		if index, ok := auxiliaryIndex[item.SessionKey]; ok {
+			items[index].Search += "\n" + line
+			continue
+		}
+		auxiliaryIndex[item.SessionKey] = len(items)
+		items = append(items, item)
+	}
+	items = filterRedundantSSHSessionItems(items, sessionHasAuthEvent)
+	if filter != "" {
+		filteredItems := make([]sshParsedLog, 0, len(items))
+		for _, item := range items {
+			if strings.Contains(item.Search, filter) {
+				filteredItems = append(filteredItems, item)
+			}
+		}
+		items = filteredItems
+	}
+	sort.SliceStable(items, func(i, j int) bool {
+		return items[i].Index < items[j].Index
+	})
+	return items
+}
+
+func filterRedundantSSHSessionItems(items []sshParsedLog, sessionHasAuthEvent map[string]bool) []sshParsedLog {
+	filteredItems := make([]sshParsedLog, 0, len(items))
+	for _, item := range items {
+		if !isSSHAuthEvent(item) && item.SessionKey != "" && sessionHasAuthEvent[item.SessionKey] {
+			continue
+		}
+		filteredItems = append(filteredItems, item)
+	}
+	return filteredItems
+}
+
+func isSSHAuthEvent(item sshParsedLog) bool {
+	return item.History.Status == constant.StatusSuccess || item.History.AuthMode != ""
+}
+
+func shouldParseSSHLogLine(line, status, filter string) bool {
+	if !strings.Contains(line, "sshd") {
 		return false
 	}
-	containsFailed := strings.Contains(line, "Failed password for")
-	containsClosed := strings.Contains(line, "Connection closed by authenticating user")
-	containsAccepted := strings.Contains(line, "Accepted ")
-	switch {
-	case strings.HasPrefix(fileName, "secure"):
-		switch status {
-		case constant.StatusSuccess:
-			return containsAccepted
-		case constant.StatusFailed:
-			return containsFailed
-		default:
-			return containsFailed || containsAccepted
-		}
-	case strings.HasPrefix(fileName, "auth.log"):
-		switch status {
-		case constant.StatusSuccess:
-			return containsAccepted
-		case constant.StatusFailed:
-			return containsFailed || containsClosed
-		default:
-			return containsFailed || containsClosed || containsAccepted
-		}
+	if filter != "" {
+		return containsKnownSSHLogMessage(line)
+	}
+	switch status {
+	case constant.StatusSuccess:
+		return strings.Contains(line, "Accepted ")
+	case constant.StatusFailed:
+		// Accepted lines are still needed here to suppress redundant session failure records from the same SSH session.
+		return containsFailedSSHLogMessage(line) || strings.Contains(line, "Accepted ")
 	default:
-		switch status {
-		case constant.StatusSuccess:
-			return containsAccepted
-		case constant.StatusFailed:
-			return containsFailed || containsClosed
-		default:
-			return containsFailed || containsClosed || containsAccepted
-		}
+		return containsKnownSSHLogMessage(line)
 	}
 }
 
-func loadSuccessDatas(line string) dto.SSHHistory {
-	var data dto.SSHHistory
-	parts := strings.Fields(line)
-	index, dataStr := analyzeDateStr(parts)
-	if dataStr == "" {
-		return data
-	}
-	data.DateStr = dataStr
-	data.AuthMode = parts[4+index]
-	data.User = parts[6+index]
-	data.Address = parts[8+index]
-	data.Port = parts[10+index]
-	data.Status = constant.StatusSuccess
-	return data
+func containsKnownSSHLogMessage(line string) bool {
+	return strings.Contains(line, "Accepted ") || containsFailedSSHLogMessage(line)
 }
-func loadFailedAuthDatas(line string) dto.SSHHistory {
-	var data dto.SSHHistory
-	parts := strings.Fields(line)
-	index, dataStr := analyzeDateStr(parts)
-	if dataStr == "" {
-		return data
+
+func containsFailedSSHLogMessage(line string) bool {
+	return strings.Contains(line, "Failed ") ||
+		strings.Contains(line, "Invalid user ") ||
+		strings.Contains(line, "Connection closed by ") ||
+		strings.Contains(line, "Disconnected from ") ||
+		strings.Contains(line, "Received disconnect from ") ||
+		strings.Contains(line, "maximum authentication attempts exceeded") ||
+		strings.Contains(line, " not allowed")
+}
+
+func loadSSHLogLines(filePath string) ([]string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
 	}
-	data.DateStr = dataStr
-	switch index {
-	case 1:
-		data.User = parts[9]
-	case 2:
-		data.User = parts[10]
+	defer file.Close()
+
+	var reader io.Reader = file
+	if strings.HasSuffix(filePath, ".gz") {
+		gzipReader, err := gzip.NewReader(file)
+		if err != nil {
+			return nil, err
+		}
+		defer gzipReader.Close()
+		reader = gzipReader
+	}
+
+	var lines []string
+	scanner := bufio.NewScanner(reader)
+	buf := make([]byte, 0, 64*1024)
+	scanner.Buffer(buf, 1024*1024)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, scanner.Err()
+}
+
+func matchSSHLogStatus(requestStatus, itemStatus string) bool {
+	switch requestStatus {
+	case constant.StatusSuccess:
+		return itemStatus == constant.StatusSuccess
+	case constant.StatusFailed:
+		return itemStatus == constant.StatusFailed
 	default:
-		data.User = parts[7]
+		return true
 	}
-	data.AuthMode = parts[6+index]
-	data.Address = parts[9+index]
-	data.Port = parts[11+index]
-	data.Status = constant.StatusFailed
-	if strings.Contains(line, ": ") {
-		data.Message = strings.Split(line, ": ")[1]
-	}
-	return data
 }
-func loadFailedSecureDatas(line string) dto.SSHHistory {
-	var data dto.SSHHistory
-	parts := strings.Fields(line)
-	index, dataStr := analyzeDateStr(parts)
-	if dataStr == "" {
-		return data
+
+func parseSSHLogLine(line string) (sshParsedLog, bool) {
+	header, ok := parseSSHLogHeader(line)
+	if !ok {
+		return sshParsedLog{}, false
 	}
-	data.DateStr = dataStr
-	if strings.Contains(line, " invalid ") {
-		data.AuthMode = parts[4+index]
-		index += 2
-	} else {
-		data.AuthMode = parts[4+index]
+	data, ok := parseSSHLogMessage(header.Message)
+	if !ok {
+		return sshParsedLog{}, false
 	}
-	data.User = parts[6+index]
-	data.Address = parts[8+index]
-	data.Port = parts[10+index]
-	data.Status = constant.StatusFailed
-	if strings.Contains(line, ": ") {
-		data.Message = strings.Split(line, ": ")[1]
+	data.DateStr = header.DateStr
+	data.Message = header.Message
+	sessionKey := loadSSHLogSessionKey(header, data, line)
+	return sshParsedLog{History: data, SessionKey: sessionKey, Raw: line}, true
+}
+
+func parseSSHLogHeader(line string) (sshLogHeader, bool) {
+	for _, pattern := range []string{re.SSHRFC3339LinePattern, re.SSHDateTimeLinePattern, re.SSHSyslogLinePattern} {
+		matches := re.GetRegex(pattern).FindStringSubmatch(line)
+		if len(matches) != 5 {
+			continue
+		}
+		dateStr := normalizeSSHLogDate(matches[1])
+		if dateStr == "" {
+			return sshLogHeader{}, false
+		}
+		return sshLogHeader{DateStr: dateStr, Process: matches[2], PID: matches[3], Message: matches[4]}, true
 	}
-	return data
+	return sshLogHeader{}, false
+}
+
+func loadSSHLogSessionKey(header sshLogHeader, data dto.SSHHistory, line string) string {
+	if header.Process == "sshd-session" && data.Address != "" && data.Port != "" {
+		return data.Address + ":" + data.Port
+	}
+	if header.PID != "" {
+		return "pid:" + header.PID
+	}
+	if data.Address != "" && data.Port != "" {
+		return data.Address + ":" + data.Port
+	}
+	return line
+}
+
+func normalizeSSHLogDate(dateStr string) string {
+	if t, err := time.Parse(time.RFC3339Nano, dateStr); err == nil {
+		return t.Format("2006 Jan 2 15:04:05")
+	}
+	if t, err := time.Parse(constant.DateTimeLayout, dateStr); err == nil {
+		return t.Format("2006 Jan 2 15:04:05")
+	}
+	if _, err := time.Parse("Jan 2 15:04:05", dateStr); err == nil {
+		return dateStr
+	}
+	return ""
+}
+
+func parseSSHLogMessage(message string) (dto.SSHHistory, bool) {
+	if matches := re.GetRegex(re.SSHAcceptedPattern).FindStringSubmatch(message); len(matches) == 5 {
+		return dto.SSHHistory{
+			AuthMode: matches[1],
+			User:     matches[2],
+			Address:  matches[3],
+			Port:     matches[4],
+			Status:   constant.StatusSuccess,
+		}, true
+	}
+	if matches := re.GetRegex(re.SSHFailedPattern).FindStringSubmatch(message); len(matches) == 6 {
+		return dto.SSHHistory{
+			AuthMode: matches[1],
+			User:     matches[3],
+			Address:  matches[4],
+			Port:     matches[5],
+			Status:   constant.StatusFailed,
+		}, true
+	}
+	if matches := re.GetRegex(re.SSHInvalidUserPattern).FindStringSubmatch(message); len(matches) == 4 {
+		return dto.SSHHistory{
+			User:    matches[1],
+			Address: matches[2],
+			Port:    matches[3],
+			Status:  constant.StatusFailed,
+		}, true
+	}
+	if matches := re.GetRegex(re.SSHClosedPattern).FindStringSubmatch(message); len(matches) == 4 {
+		return dto.SSHHistory{
+			User:    matches[1],
+			Address: matches[2],
+			Port:    matches[3],
+			Status:  constant.StatusFailed,
+		}, true
+	}
+	if matches := re.GetRegex(re.SSHDisconnectedPattern).FindStringSubmatch(message); len(matches) == 4 {
+		return dto.SSHHistory{
+			User:    matches[1],
+			Address: matches[2],
+			Port:    matches[3],
+			Status:  constant.StatusFailed,
+		}, true
+	}
+	if matches := re.GetRegex(re.SSHDisconnectPattern).FindStringSubmatch(message); len(matches) == 3 {
+		return dto.SSHHistory{
+			Address: matches[1],
+			Port:    matches[2],
+			Status:  constant.StatusFailed,
+		}, true
+	}
+	if matches := re.GetRegex(re.SSHMaxAuthPattern).FindStringSubmatch(message); len(matches) == 4 {
+		return dto.SSHHistory{
+			User:    matches[1],
+			Address: matches[2],
+			Port:    matches[3],
+			Status:  constant.StatusFailed,
+		}, true
+	}
+	if matches := re.GetRegex(re.SSHNotAllowedPattern).FindStringSubmatch(message); len(matches) == 3 {
+		return dto.SSHHistory{
+			User:    matches[1],
+			Address: matches[2],
+			Status:  constant.StatusFailed,
+		}, true
+	}
+	return dto.SSHHistory{}, false
 }
 
 func checkIsStandard(item dto.SSHHistory) bool {
 	if len(item.Address) == 0 || net.ParseIP(item.Address) == nil {
 		return false
+	}
+	if item.Port == "" {
+		return true
 	}
 	portItem, _ := strconv.Atoi(item.Port)
 	return portItem > 0 && portItem < 65536
@@ -1292,28 +1437,6 @@ func loadDate(currentYear int, DateStr string, nyc *time.Location) time.Time {
 		itemDate, _ = time.ParseInLocation("2006 Jan 2 15:04:05", DateStr, nyc)
 	}
 	return itemDate
-}
-
-func analyzeDateStr(parts []string) (int, string) {
-	t, err := time.Parse(time.RFC3339Nano, parts[0])
-	if err == nil {
-		if len(parts) < 12 {
-			return 0, ""
-		}
-		return 0, t.Format("2006 Jan 2 15:04:05")
-	}
-	t, err = time.Parse(constant.DateTimeLayout, fmt.Sprintf("%s %s", parts[0], parts[1]))
-	if err == nil {
-		if len(parts) < 14 {
-			return 0, ""
-		}
-		return 1, t.Format("2006 Jan 2 15:04:05")
-	}
-
-	if len(parts) < 14 {
-		return 0, ""
-	}
-	return 2, fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2])
 }
 
 func loadEncryptioMode(content string) string {

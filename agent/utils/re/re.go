@@ -33,6 +33,17 @@ const (
 	SQLIdentifierPattern               = `^[A-Za-z_][A-Za-z0-9_]*$`
 	NginxHostPattern                   = `^[a-zA-Z0-9.-]+(:[0-9]+)?$`
 	NginxPathPattern                   = `^/[a-zA-Z0-9._/\-]*$`
+	SSHSyslogLinePattern               = `^([A-Z][a-z]{2}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})\s+\S+\s+(sshd(?:-session)?)(?:\[(\d+)\])?:\s+(.*)$`
+	SSHRFC3339LinePattern              = `^(\d{4}-\d{2}-\d{2}T\S+)\s+\S+\s+(sshd(?:-session)?)(?:\[(\d+)\])?:\s+(.*)$`
+	SSHDateTimeLinePattern             = `^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+\S+\s+(sshd(?:-session)?)(?:\[(\d+)\])?:\s+(.*)$`
+	SSHAcceptedPattern                 = `^Accepted (\S+) for (.+?) from ([0-9a-fA-F:.]+) port (\d+)`
+	SSHFailedPattern                   = `^Failed (\S+) for (?:(invalid user) )?(.+?) from ([0-9a-fA-F:.]+) port (\d+)`
+	SSHInvalidUserPattern              = `^Invalid user (.+?) from ([0-9a-fA-F:.]+)(?: port (\d+))?`
+	SSHClosedPattern                   = `^Connection closed by (?:(?:authenticating|invalid) user (.+?) )?([0-9a-fA-F:.]+) port (\d+)`
+	SSHDisconnectedPattern             = `^Disconnected from (?:(?:authenticating|invalid) user (.+?) )?([0-9a-fA-F:.]+) port (\d+)`
+	SSHDisconnectPattern               = `^Received disconnect from ([0-9a-fA-F:.]+) port (\d+)`
+	SSHMaxAuthPattern                  = `^error: maximum authentication attempts exceeded for (?:(?:invalid user) )?(.+?) from ([0-9a-fA-F:.]+) port (\d+)`
+	SSHNotAllowedPattern               = `^User (.+?) from ([0-9a-fA-F:.]+) not allowed`
 )
 
 var regexMap = make(map[string]*regexp.Regexp)
@@ -66,6 +77,17 @@ func Init() {
 		SQLIdentifierPattern,
 		NginxHostPattern,
 		NginxPathPattern,
+		SSHSyslogLinePattern,
+		SSHRFC3339LinePattern,
+		SSHDateTimeLinePattern,
+		SSHAcceptedPattern,
+		SSHFailedPattern,
+		SSHInvalidUserPattern,
+		SSHClosedPattern,
+		SSHDisconnectedPattern,
+		SSHDisconnectPattern,
+		SSHMaxAuthPattern,
+		SSHNotAllowedPattern,
 	}
 
 	for _, pattern := range patterns {
