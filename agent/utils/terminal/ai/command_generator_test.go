@@ -86,6 +86,23 @@ func TestGenerateRejectsInterpreterCommand(t *testing.T) {
 	}
 }
 
+func TestGenerateRejectsControlCharacterCommand(t *testing.T) {
+	generator, err := NewCommandGenerator(&stubChatClient{
+		resp: &ChatCompletionResponse{
+			Model:   "test-model",
+			Content: "\x1b[31mls -la /tmp\x1b[0m",
+		},
+	})
+	if err != nil {
+		t.Fatalf("NewCommandGenerator() error = %v", err)
+	}
+
+	_, err = generator.Generate(context.Background(), CommandGenerateRequest{Input: "list files"})
+	if err == nil {
+		t.Fatal("Generate() error = nil, want control-character command to be rejected")
+	}
+}
+
 func TestGeneratePropagatesClientError(t *testing.T) {
 	wantErr := errors.New("boom")
 	generator, err := NewCommandGenerator(&stubChatClient{err: wantErr})

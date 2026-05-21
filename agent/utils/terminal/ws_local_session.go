@@ -124,11 +124,7 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 						sws.aiInterceptor.SetCurrentLine(msgObj.Line)
 					}
 					if generated, handled := sws.aiInterceptor.HandleEnter(sws.notifyAIThinking, sws.notifyAIDone, sws.notifyAIError); handled {
-						payload := []byte{lineClearControl}
-						if strings.TrimSpace(generated) != "" {
-							payload = append(payload, []byte(generated)...)
-						}
-						sws.sendWebsocketInputCommandToSshSessionStdinPipe(payload)
+						sws.sendWebsocketInputCommandToSshSessionStdinPipe(buildAIPastePayload(generated))
 						continue
 					}
 				}
@@ -205,4 +201,16 @@ func (sws *LocalWsSession) sendWebsocketInputCommandToSshSessionStdinPipe(cmdByt
 	if _, err := sws.slave.Write(cmdBytes); err != nil {
 		global.LOG.Errorf("ws cmd bytes write to ssh.stdin pipe failed, err: %v", err)
 	}
+}
+
+func buildAIPastePayload(generated string) []byte {
+	payload := []byte{lineClearControl}
+	generated = strings.TrimSpace(generated)
+	if generated == "" {
+		return payload
+	}
+	payload = append(payload, []byte("\x1b[200~")...)
+	payload = append(payload, []byte(generated)...)
+	payload = append(payload, []byte("\x1b[201~")...)
+	return payload
 }

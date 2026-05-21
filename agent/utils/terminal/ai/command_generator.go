@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"unicode"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
 )
@@ -173,6 +174,9 @@ func validateGeneratedCommand(command string) error {
 	if command == "" {
 		return fmt.Errorf("model returned empty command")
 	}
+	if containsControlCharacters(command) {
+		return fmt.Errorf("model returned unsafe command")
+	}
 	if strings.ContainsAny(command, "\x00\r\n") {
 		return fmt.Errorf("model returned unsafe command")
 	}
@@ -194,6 +198,15 @@ func containsShellControlSyntax(command string) bool {
 	}
 	if strings.Contains(command, "$(") || strings.Contains(command, "${") {
 		return true
+	}
+	return false
+}
+
+func containsControlCharacters(command string) bool {
+	for _, r := range command {
+		if unicode.IsControl(r) {
+			return true
+		}
 	}
 	return false
 }
