@@ -28,15 +28,10 @@
                         <span v-else-if="isMasterPro">
                             {{ $t('license.pro') }}
                         </span>
-                        <span v-else-if="isOffline">
-                    </el-link>
-                    <el-link v-else-if="isOffLine" underline="never" type="primary" @click="to1Panel">
-                        <span v-if="isOffLine">
+                        <span v-else-if="isOffLine">
                             {{ $t('license.offLine') }}
                         </span>
-                    </el-link>
-                    <el-link v-else underline="never" type="primary" @click="toEdition">
-                        <span>
+                        <span v-else>
                             {{ $t('license.community') }}
                         </span>
                     </el-link>
