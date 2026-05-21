@@ -1,7 +1,7 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('commons.button.upgrade')" @close="handleClose" size="large">
         <div class="panel-MdEditor">
-            <div class="default-theme" style="margin-left: 20px">
+            <div class="default-theme">
                 <h2 class="inline-block">{{ $t('app.version') }}</h2>
             </div>
             <el-radio-group class="inline-block tag" v-model="upgradeVersion" @change="changeOption">
