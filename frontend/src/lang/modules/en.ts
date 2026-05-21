@@ -4351,7 +4351,6 @@ const message = {
             view: 'View',
             manage: 'Manage',
         },
-        proAlert: 'Upgrade to Business Edition to use this feature',
         app: {
             app: 'APP',
             title: 'Panel Alias',
