@@ -1962,7 +1962,7 @@ const message = {
         clam: {
             clam: 'Escaneo de virus',
             cron: 'Escaneo programado',
-            cronHelper: 'Pro admite escaneos programados',
+            cronHelper: 'La edición comercial admite escaneos programados',
             specErr: 'Formato de horario incorrecto, ¡verifique e intente nuevamente!',
             disableMsg:
                 'Detener la ejecución programada impedirá que esta tarea se ejecute automáticamente. ¿Desea continuar?',
@@ -1997,7 +1997,7 @@ const message = {
             clamLog: '@:toolbox.clam.clamConf logs',
             freshClam: 'FreshClam',
             freshClamLog: '@:toolbox.clam.freshClam logs',
-            alertHelper: 'Pro admite escaneos programados y alertas por SMS',
+            alertHelper: 'La edición comercial admite escaneos programados y alertas por SMS',
             alertTitle: 'La tarea de escaneo de virus 「{0}」 detectó archivos infectados',
         },
     },
@@ -2506,13 +2506,14 @@ const message = {
             'La dirección se utilizará para la redirección de aplicaciones, el acceso a contenedores y otras funciones. Cada nodo puede configurarse con una dirección diferente.',
         proxy: 'Proxy del servidor',
         proxyHelper: 'Tendrá efecto en los siguientes escenarios después de configurar el servidor proxy:',
-        proxyHelper1: 'Descarga de paquetes de instalación y sincronización de la tienda de aplicaciones (solo Pro)',
-        proxyHelper2: 'Actualización del sistema y comprobación de actualizaciones (solo Pro)',
+        proxyHelper1:
+            'Descarga de paquetes de instalación y sincronización de la tienda de aplicaciones (solo edición comercial)',
+        proxyHelper2: 'Actualización del sistema y comprobación de actualizaciones (solo edición comercial)',
         proxyHelper3: 'Verificación y sincronización de licencias del sistema',
         proxyHelper4:
-            'Las solicitudes de red, como la descarga de imágenes de Docker, pasarán por el servidor proxy (solo Pro)',
-        proxyHelper5: 'Descarga y sincronización unificadas de bibliotecas de scripts del sistema (función Pro)',
-        proxyHelper6: 'Solicitud de certificado (función Pro)',
+            'Las solicitudes de red, como la descarga de imágenes de Docker, pasarán por el servidor proxy (solo edición comercial)',
+        proxyHelper5: 'Descarga y sincronización unificadas de bibliotecas de scripts del sistema (función comercial)',
+        proxyHelper6: 'Solicitud de certificado (función comercial)',
         proxyType: 'Tipo de proxy',
         proxyUrl: 'Dirección del proxy',
         proxyPort: 'Puerto del proxy',
@@ -2941,13 +2942,14 @@ const message = {
         trialInfo: 'Versión',
         authorizationId: 'ID de autorización',
         authorizedUser: 'Usuario autorizado',
-        lostHelper: 'La licencia alcanzó el máximo de reintentos. Sincronícela manualmente para activar funciones Pro.',
+        lostHelper:
+            'La licencia alcanzó el máximo de reintentos. Sincronícela manualmente para activar funciones comerciales.',
         exceptionalHelper:
-            'Verificación de licencia anómala. Sincronícela manualmente para activar funciones Pro. detalle: ',
+            'Verificación de licencia anómala. Sincronícela manualmente para activar funciones comerciales. detalle: ',
         quickUpdate: 'Actualización rápida',
         import: 'Importar',
         power: 'Autorizar',
-        unbindHelper: 'Se eliminarán todos los ajustes Pro tras desvincular. ¿Desea continuar?',
+        unbindHelper: 'Se eliminarán todos los ajustes comerciales tras desvincular. ¿Desea continuar?',
         importLicense: 'Importar licencia',
         importHelper: 'Haga clic o arrastre el archivo de licencia aquí',
         licenseRequiredTip:
@@ -2956,7 +2958,7 @@ const message = {
             'Primero copie el ID del dispositivo para obtener una licencia. Podrá iniciar sesión después de importarla.',
         licenseRequiredUserTip:
             'La licencia Enterprise Edition no está vinculada. Contacte con un superadministrador para importar la licencia.',
-        levelUpPro: 'Actualizar a la edición Pro',
+        levelUpPro: 'Actualizar a la edición comercial',
         licenseSync: 'Sincronizar licencia',
         knowMorePro: 'Ver más',
         closeAlert: 'Puede cerrar la página en la configuración del panel',
@@ -2970,23 +2972,24 @@ const message = {
         count: 'Cantidad autorizada',
         serialNo: 'Número de serie',
         remark: 'Observación',
-        waf: 'Actualizar a Pro permite interceptación, logs, geobloqueo, reglas, páginas personalizadas, etc.',
-        tamper: 'Actualizar a Pro protege sitios ante modificaciones no autorizadas.',
+        waf: 'Actualizar a la edición comercial permite interceptación, logs, geobloqueo, reglas, páginas personalizadas, etc.',
+        tamper: 'Actualizar a la edición comercial protege sitios ante modificaciones no autorizadas.',
         tamperHelper:
             'La operación falló, el archivo/carpeta tiene protección antimanipulación. Revise e intente de nuevo.',
-        setting: 'Actualizar a Pro permite personalizar logo, mensaje de bienvenida y más.',
-        monitor: 'Pro permite ver estado web en tiempo real, tendencias, logs, etc.',
-        alert: 'Pro permite recibir alertas SMS y ver logs, control total de eventos clave.',
-        node: 'Actualizar a la edición Pro permite administrar varios servidores Linux con 1Panel.',
+        setting: 'Actualizar a la edición comercial permite personalizar logo, mensaje de bienvenida y más.',
+        monitor: 'La edición comercial permite ver estado web en tiempo real, tendencias, logs, etc.',
+        alert: 'La edición comercial permite recibir alertas SMS y ver logs, control total de eventos clave.',
+        node: 'Actualizar a la edición comercial permite administrar varios servidores Linux con 1Panel.',
         nodeApp:
-            'Actualizar a la edición Pro permite actualizar versiones de aplicaciones multinodo sin cambiar de nodo manualmente.',
+            'Actualizar a la edición comercial permite actualizar versiones de aplicaciones multinodo sin cambiar de nodo manualmente.',
         nodeDashboard:
-            'Actualizar a la edición Pro permite la gestión centralizada de aplicaciones, sitios web, bases de datos y tareas programadas multinodo.',
-        fileExchange: 'Pro permite transferir archivos entre varios servidores.',
-        app: 'Pro permite ver información de servicio, monitoreo, etc. vía app móvil.',
-        cluster: 'Actualizar a la edición Pro permite gestionar clústeres primario-réplica de MySQL/Postgres/Redis.',
+            'Actualizar a la edición comercial permite la gestión centralizada de aplicaciones, sitios web, bases de datos y tareas programadas multinodo.',
+        fileExchange: 'La edición comercial permite transferir archivos entre varios servidores.',
+        app: 'La edición comercial permite ver información de servicio, monitoreo, etc. vía app móvil.',
+        cluster:
+            'Actualizar a la edición comercial permite gestionar clústeres primario-réplica de MySQL/Postgres/Redis.',
         'model-downloader':
-            'Actualiza a la edición Pro para buscar, descargar y gestionar archivos de modelos locales desde HuggingFace, ModelScope o espejos compatibles, con directorios de modelos y tareas de descarga centralizados.',
+            'Actualiza a la edición comercial para buscar, descargar y gestionar archivos de modelos locales desde HuggingFace, ModelScope o espejos compatibles, con directorios de modelos y tareas de descarga centralizados.',
         offLine: 'Sin conexión',
     },
     clean: {
@@ -3990,12 +3993,12 @@ const message = {
     },
     xpack: {
         expiresTrialAlert:
-            'Aviso: Tu prueba de Pro expirará en {0} días y todas las funciones Pro dejarán de estar disponibles. Renueva o actualiza a la versión completa a tiempo.',
+            'Aviso: Tu prueba de la edición comercial expirará en {0} días y todas las funciones comerciales dejarán de estar disponibles. Renueva o actualiza a la versión completa a tiempo.',
         expiresAlert:
-            'Aviso: Tu licencia Pro expirará en {0} días y todas las funciones Pro dejarán de estar disponibles. Renueva pronto para asegurar el uso continuo.',
+            'Aviso: Tu licencia la edición comercial expirará en {0} días y todas las funciones comerciales dejarán de estar disponibles. Renueva pronto para asegurar el uso continuo.',
         menu: 'Pro',
         upage: 'Constructor Web con IA',
-        proAlert: 'Actualiza a Pro para usar esta función',
+        proAlert: 'Actualiza a la edición comercial para usar esta función',
         opsReport: {
             name: 'Informe de operaciones',
             overview: 'Resumen',
@@ -5000,7 +5003,7 @@ const message = {
                 'Cuando cambian los datos en el nodo principal, se sincronizan en tiempo real con este nodo secundario.',
             syncBackupAccount: 'Configuración de Cuentas de Respaldo',
             syncWithMaster:
-                'Tras actualizar a Pro, todos los datos se sincronizarán por defecto. Las políticas de sincronización se pueden ajustar manualmente en la gestión de nodos.',
+                'Tras actualizar a la edición comercial, todos los datos se sincronizarán por defecto. Las políticas de sincronización se pueden ajustar manualmente en la gestión de nodos.',
             syncProxy: 'Configuración del Proxy del Sistema',
             syncProxyHelper: 'La sincronización del proxy del sistema requiere reiniciar Docker.',
             syncProxyHelper1: 'Reiniciar Docker puede afectar a los contenedores actualmente en ejecución.',
@@ -5084,7 +5087,7 @@ const message = {
             nodes: 'Nodos',
             selectNode: 'Seleccionar Nodo',
             selectNodeError: 'Por favor, selecciona un nodo',
-            licenseHelper: 'La versión Pro admite la función de repositorio de aplicaciones personalizadas',
+            licenseHelper: 'La versión comercial admite la función de repositorio de aplicaciones personalizadas',
             databaseHelper: 'Base de datos asociada a la aplicación, seleccione la base de datos del nodo destino',
             nodeHelper: 'No se puede seleccionar el nodo actual',
             migrateHelper:
@@ -5099,7 +5102,7 @@ const message = {
             alertCount: 'Número de alertas',
             clamHelper: 'Generar alerta al detectar archivos infectados en escaneo',
             cronJobHelper: 'Generar alerta cuando falle la ejecución de una tarea programada',
-            licenseHelper: 'La versión Pro soporta alertas',
+            licenseHelper: 'La versión comercial soporta alertas',
             alertCountHelper: 'Frecuencia máxima diaria de alertas',
             alert: 'Alerta SMS',
             logs: 'Logs de alertas',
@@ -5301,7 +5304,7 @@ const message = {
             barkConfigHelper: 'Configuración de notificación de alerta Bark',
             webhookName: 'Nombre del bot',
             webhookUrl: 'URL de Webhook',
-            alertConfigProHelper: 'La edición Pro también admite alertas mediante WeCom, DingTalk, Feishu y SMS.',
+            alertConfigProHelper: 'La edición comercial también admite alertas mediante WeCom, DingTalk, Feishu y SMS.',
         },
         theme: {
             lingXiaGold: 'LXware Gold',

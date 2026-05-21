@@ -21,19 +21,17 @@
                     <el-divider direction="vertical" />
                 </span>
                 <div class="flex flex-wrap items-center">
-                    <el-link underline="never" type="primary" @click="toLxware">
-                        <span v-if="isEE">
-                            {{ $t('license.ee') }}
-                        </span>
-                        <span v-else-if="isMasterPro">
-                            {{ $t('license.pro') }}
-                        </span>
-                        <span v-else-if="isOffLine">
-                            {{ $t('license.offLine') }}
-                        </span>
-                        <span v-else>
-                            {{ $t('license.community') }}
-                        </span>
+                    <el-link v-if="isEE" underline="never" type="primary" @click="toEdition">
+                        {{ $t('license.ee') }}
+                    </el-link>
+                    <el-link v-else-if="isMasterPro" underline="never" type="primary" @click="toLxware">
+                        {{ $t('license.pro') }}
+                    </el-link>
+                    <el-link v-else-if="isOffline" underline="never" type="primary" @click="to1Panel">
+                        {{ $t('license.offLine') }}
+                    </el-link>
+                    <el-link v-else underline="never" type="primary" @click="toEdition">
+                        {{ $t('license.community') }}
                     </el-link>
                     <el-link underline="never" class="version" type="primary" @click="getVersionLog()">
                         {{ version }}
@@ -88,17 +86,13 @@ const search = async () => {
 };
 
 const getVersionLog = () => {
-    if (isOffLine.value) {
+    if (isOffline.value) {
         return;
     }
     releasesRef.value.acceptParams();
 };
 
 const toLxware = () => {
-    if (isOffline.value) {
-        to1Panel();
-        return;
-    }
     if (!isIntl.value) {
         window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
     } else {
@@ -116,7 +110,7 @@ const toDoc = () => {
 };
 
 const toEdition = () => {
-    if (!globalStore.isIntl) {
+    if (!isIntl.value) {
         window.open('https://1panel.cn/versions.html' + '', '_blank', 'noopener,noreferrer');
     } else {
         window.open('https://1panel.pro/pricing' + '', '_blank', 'noopener,noreferrer');

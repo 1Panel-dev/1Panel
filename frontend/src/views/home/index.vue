@@ -7,17 +7,7 @@
                     path: '/',
                 },
             ]"
-        >
-            <template #route-button>
-                <div class="router-button" v-if="!isOffline">
-                    <template v-if="!isProductPro && !isEnterprise">
-                        <el-button link type="primary" @click="toUpload">
-                            {{ $t('license.levelUpPro') }}
-                        </el-button>
-                    </template>
-                </div>
-            </template>
-        </RouterButton>
+        />
 
         <el-alert v-if="!isSafety && showEntranceWarn" class="card-interval" type="warning" @close="hideEntrance">
             <template #title>
@@ -487,9 +477,6 @@ import { useCan } from '@/composables/useMenuManagePermission';
 const router = useRouter();
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const {
-    isProductPro,
-    isEnterprise,
-    isOffline,
     showEntranceWarn,
     defaultNetwork,
     defaultIO,

@@ -111,9 +111,9 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
     uploadRef.value!.handleStart(file);
 };
 
-const toLxware = () => {
+const toEdition = () => {
     if (!isIntl.value) {
-        window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
+        window.open('https://1panel.cn/versions.html' + '', '_blank', 'noopener,noreferrer');
     } else {
         window.open('https://1panel.pro/pricing' + '', '_blank', 'noopener,noreferrer');
     }
