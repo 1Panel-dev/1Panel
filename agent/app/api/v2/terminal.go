@@ -8,7 +8,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -19,117 +21,29 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (b *BaseApi) WsSSH(c *gin.Context) {
-	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		global.LOG.Errorf("gin context http handler failed, err: %v", err)
-		return
-	}
-	defer wsConn.Close()
-
-	if global.CONF.Base.IsDemo {
-		if wshandleError(wsConn, errors.New("   demo server, prohibit this operation!")) {
-			return
-		}
-	}
-
-	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
-	if wshandleError(wsConn, errors.WithMessage(err, "invalid param cols in request")) {
-		return
-	}
-	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
-	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
-		return
-	}
-
-	hostID, _ := strconv.Atoi(c.DefaultQuery("id", "0"))
-	var client *ssh.SSHClient
-	if hostID > 0 {
-		host, err := service.GetHostInfo(uint(hostID))
-		if wshandleError(wsConn, errors.WithMessage(err, "load host info by id failed")) {
-			return
-		}
-		connInfo := ssh.ConnInfo{
-			Addr:       host.Addr,
-			Port:       int(host.Port),
-			User:       host.User,
-			AuthMode:   host.AuthMode,
-			Password:   host.Password,
-			PrivateKey: []byte(host.PrivateKey),
-		}
-		if len(host.PassPhrase) != 0 {
-			connInfo.PassPhrase = []byte(host.PassPhrase)
-		}
-		client, err = ssh.NewClient(connInfo)
-		if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
-			return
-		}
-	} else {
-		client, err = loadLocalConn()
-		if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
-			return
-		}
-	}
-	defer client.Close()
-	command := c.DefaultQuery("command", "")
-	sws, err := terminal.NewLogicSshWsSession(cols, rows, client.Client, wsConn, command)
-	if wshandleError(wsConn, err) {
-		return
-	}
-	defer sws.Close()
-
-	quitChan := make(chan bool, 3)
-	sws.Start(quitChan)
-	go sws.Wait(quitChan)
-
-	<-quitChan
-
-	dt := time.Now().Add(time.Second)
-	_ = wsConn.WriteControl(websocket.CloseMessage, nil, dt)
+func (b *BaseApi) WsLocalTerminal(c *gin.Context) {
+	b.runSSHSession(c, loadLocalConn, c.DefaultQuery("command", ""))
 }
 
-func (b *BaseApi) ContainerWsSSH(c *gin.Context) {
-	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		global.LOG.Errorf("gin context http handler failed, err: %v", err)
+func (b *BaseApi) WsHostSSH(c *gin.Context) {
+	b.runSSHSession(c, func() (*ssh.SSHClient, error) {
+		hostID, _ := strconv.Atoi(c.DefaultQuery("id", "0"))
+		if hostID <= 0 {
+			return nil, errors.New("missing host id")
+		}
+		host, err := service.GetHostInfo(uint(hostID))
+		return newHostSSHClient(host, err)
+	}, c.DefaultQuery("command", ""))
+}
+
+func (b *BaseApi) WsContainerTerminal(c *gin.Context) {
+	wsConn, cols, rows, ok := prepareTerminalSession(c)
+	if !ok {
 		return
 	}
 	defer wsConn.Close()
 
-	if global.CONF.Base.IsDemo {
-		if wshandleError(wsConn, errors.New("   demo server, prohibit this operation!")) {
-			return
-		}
-	}
-
-	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
-	if wshandleError(wsConn, errors.WithMessage(err, "invalid param cols in request")) {
-		return
-	}
-	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
-	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
-		return
-	}
-	source := c.Query("source")
-	var initCmd []string
-	switch source {
-	case "redis", "redis-cluster":
-		initCmd, err = loadRedisInitCmd(c, source)
-	case "ollama":
-		initCmd, err = loadOllamaInitCmd(c)
-	case "container":
-		initCmd, err = loadContainerInitCmd(c)
-	case "database":
-		initCmd, err = loadDatabaseInitCmd(c)
-	default:
-		if wshandleError(wsConn, fmt.Errorf("not support such source %s", source)) {
-			return
-		}
-	}
-	if wshandleError(wsConn, err) {
-		return
-	}
-	slave, err := terminal.NewCommand("docker", initCmd...)
+	slave, err := loadContainerTerminalCommand(c)
 	if wshandleError(wsConn, err) {
 		return
 	}
@@ -147,8 +61,110 @@ func (b *BaseApi) ContainerWsSSH(c *gin.Context) {
 	<-quitChan
 
 	global.LOG.Info("websocket finished")
+	closeTerminalConn(wsConn)
+}
+
+func prepareTerminalSession(c *gin.Context) (*websocket.Conn, int, int, bool) {
+	if !websocket.IsWebSocketUpgrade(c.Request) {
+		helper.Success(c)
+		return nil, 0, 0, false
+	}
+	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		global.LOG.Errorf("gin context http handler failed, err: %v", err)
+		return nil, 0, 0, false
+	}
+
+	if global.CONF.Base.IsDemo {
+		if wshandleError(wsConn, errors.New("   demo server, prohibit this operation!")) {
+			return nil, 0, 0, false
+		}
+	}
+
+	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param cols in request")) {
+		return nil, 0, 0, false
+	}
+	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
+		return nil, 0, 0, false
+	}
+	return wsConn, cols, rows, true
+}
+
+func (b *BaseApi) runSSHSession(c *gin.Context, connect func() (*ssh.SSHClient, error), command string) {
+	wsConn, cols, rows, ok := prepareTerminalSession(c)
+	if !ok {
+		return
+	}
+	defer wsConn.Close()
+
+	client, clientErr := connect()
+	if wshandleError(wsConn, errors.WithMessage(clientErr, "failed to set up the connection. Please check the host information")) {
+		return
+	}
+	defer client.Close()
+
+	sws, err := terminal.NewLogicSshWsSession(cols, rows, client.Client, wsConn, command)
+	if wshandleError(wsConn, err) {
+		return
+	}
+	defer sws.Close()
+
+	quitChan := make(chan bool, 3)
+	sws.Start(quitChan)
+	go sws.Wait(quitChan)
+
+	<-quitChan
+
+	closeTerminalConn(wsConn)
+}
+
+func closeTerminalConn(wsConn *websocket.Conn) {
 	dt := time.Now().Add(time.Second)
 	_ = wsConn.WriteControl(websocket.CloseMessage, nil, dt)
+}
+
+func newHostSSHClient(host *model.Host, err error) (*ssh.SSHClient, error) {
+	if err != nil {
+		return nil, errors.WithMessage(err, "load host info by id failed")
+	}
+	connInfo := ssh.ConnInfo{
+		Addr:       host.Addr,
+		Port:       int(host.Port),
+		User:       host.User,
+		AuthMode:   host.AuthMode,
+		Password:   host.Password,
+		PrivateKey: []byte(host.PrivateKey),
+	}
+	if len(host.PassPhrase) != 0 {
+		connInfo.PassPhrase = []byte(host.PassPhrase)
+	}
+	return ssh.NewClient(connInfo)
+}
+
+func loadContainerTerminalCommand(c *gin.Context) (*terminal.LocalCommand, error) {
+	source := c.Query("source")
+	var (
+		initCmd []string
+		err     error
+	)
+	switch source {
+	case "redis", "redis-cluster":
+		initCmd, err = loadRedisInitCmd(c, source)
+	case "ollama":
+		initCmd, err = loadOllamaInitCmd(c)
+	case "container":
+		initCmd, err = loadContainerInitCmd(c)
+	case "database":
+		initCmd, err = loadDatabaseInitCmd(c)
+	default:
+		return nil, fmt.Errorf("not support such source %s", source)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return terminal.NewCommand("docker", initCmd...)
 }
 
 func loadRedisInitCmd(c *gin.Context, redisType string) ([]string, error) {

@@ -3,6 +3,7 @@
         <el-form label-position="left" label-width="80px" @submit.prevent>
             <el-form-item :label="$t('database.isOn')">
                 <el-switch
+                    v-permission
                     v-model="variables.slow_query_log"
                     active-value="ON"
                     inactive-value="OFF"

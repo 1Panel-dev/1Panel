@@ -1,24 +1,25 @@
-import { getCurrentScope, onScopeDispose } from 'vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { setPrimaryColor } from '@/utils/theme';
 
+let themeListenerInitialized = false;
+
 export const useTheme = () => {
+    const { isXpackOrEE, themeConfig } = useGlobalStore();
+
     const switchTheme = () => {
-        const globalStore = GlobalStore();
-        const themeConfig = globalStore.themeConfig;
-        let itemTheme = themeConfig.theme;
+        let itemTheme = themeConfig.value.theme;
         if (itemTheme === 'auto') {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             itemTheme = prefersDark ? 'dark' : 'light';
         }
         document.documentElement.className = itemTheme === 'dark' ? 'dark' : 'light';
-        if (globalStore.isMasterProductPro && themeConfig.themeColor) {
+        if (isXpackOrEE.value && themeConfig.value.themeColor) {
             try {
-                const themeColor = JSON.parse(themeConfig.themeColor);
+                const themeColor = JSON.parse(themeConfig.value.themeColor);
                 const color = itemTheme === 'dark' ? themeColor.dark : themeColor.light;
 
                 if (color) {
-                    themeConfig.primary = color;
+                    themeConfig.value.primary = color;
                     setPrimaryColor(color);
                 }
             } catch (e) {
@@ -27,19 +28,23 @@ export const useTheme = () => {
         }
     };
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const onSystemThemeChange = () => {
-        const globalStore = GlobalStore();
-        if (globalStore.themeConfig.theme === 'auto') {
-            switchTheme();
+    const ensureSystemThemeListener = () => {
+        if (themeListenerInitialized || typeof window === 'undefined') {
+            return;
         }
+
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const onSystemThemeChange = () => {
+            if (themeConfig.value.theme === 'auto') {
+                switchTheme();
+            }
+        };
+
+        mediaQuery.addEventListener('change', onSystemThemeChange);
+        themeListenerInitialized = true;
     };
-    mediaQuery.addEventListener('change', onSystemThemeChange);
-    if (getCurrentScope()) {
-        onScopeDispose(() => {
-            mediaQuery.removeEventListener('change', onSystemThemeChange);
-        });
-    }
+
+    ensureSystemThemeListener();
 
     return {
         switchTheme,

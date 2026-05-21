@@ -47,6 +47,44 @@ export namespace AI {
         migMode: string;
         processes: Process[];
     }
+    export interface MonitorGPUSearch {
+        productName: string;
+        startTime: Date;
+        endTime: Date;
+    }
+    export interface MonitorGPUOptions {
+        gpuType: string;
+        options: Array<string>;
+        chartHide: Array<ChartHide>;
+    }
+    export interface ChartHide {
+        productName: string;
+        process: boolean;
+        gpu: boolean;
+        memory: boolean;
+        power: boolean;
+        temperature: boolean;
+        speed: boolean;
+    }
+    export interface MonitorGPUData {
+        date: Array<Date>;
+        gpuValue: Array<number>;
+        temperatureValue: Array<number>;
+        powerTotal: Array<number>;
+        powerUsed: Array<number>;
+        powerPercent: Array<number>;
+        memoryTotal: Array<number>;
+        memoryUsed: Array<number>;
+        memoryPercent: Array<number>;
+        speedValue: Array<number>;
+        gpuProcesses: Array<Array<GPUProcess>>;
+    }
+    export interface GPUProcess {
+        pid: string;
+        type: string;
+        processName: string;
+        usedMemory: string;
+    }
     export interface Process {
         pid: string;
         type: string;
@@ -517,6 +555,10 @@ export namespace AI {
         name: string;
     }
 
+    export interface AgentAccountProviderCountReq {
+        providers: string[];
+    }
+
     export interface AgentAccountItem {
         id: number;
         provider: string;
@@ -859,7 +901,7 @@ export namespace AI {
 
     export interface AgentSkillSearchReq {
         agentId: number;
-        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub' | 'official' | 'skills-sh';
+        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub' | 'official' | 'skills-sh' | 'local-hub';
         keyword: string;
     }
 
@@ -896,7 +938,7 @@ export namespace AI {
 
     export interface AgentSkillInstallReq {
         agentId: number;
-        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub' | 'official' | 'skills-sh';
+        source: 'clawhub-global' | 'clawhub-cn' | 'skillhub' | 'official' | 'skills-sh' | 'local-hub';
         slug: string;
         taskID: string;
     }

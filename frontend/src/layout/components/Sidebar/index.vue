@@ -23,25 +23,27 @@
                 <SubItem :menuList="routerMenus" :level="0" />
             </el-menu>
         </el-scrollbar>
-        <Collapse :version="version" @open-task="openTask" />
+        <Collapse :version="version" @open-task="openTask" @refresh="search" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { RouteRecordRaw, useRoute } from 'vue-router';
 import { loadingSvg } from '@/utils/svg';
 import Logo from './components/Logo.vue';
 import Collapse from './components/Collapse.vue';
 import SubItem from './components/SubItem.vue';
 import { menuList } from '@/routers/router';
-import { GlobalStore, MenuStore } from '@/store';
-import { getSettingInfo } from '@/api/modules/setting';
+import { MenuStore } from '@/store';
+import { getSettingBaseInfo } from '@/api/modules/setting';
 import PrimaryMenu from '@/assets/images/menu-bg.svg?component';
+import { hasPermissionMetaAccess, hasRouteRoleAccess } from '@/utils/rbac';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const route = useRoute();
 const menuStore = MenuStore();
-const globalStore = GlobalStore();
+const { currentNode, isAdmin, isEE, isIntl, permissions } = useGlobalStore();
 const version = ref();
 
 const activeMenu = computed(() => {
@@ -86,46 +88,138 @@ const openTask = () => {
 };
 
 const search = async () => {
+    let settingInfo: { systemVersion: string; hideMenu?: string } | null = null;
     try {
-        const res = await getSettingInfo();
+        const res = await getSettingBaseInfo();
+        settingInfo = res.data;
         version.value = res.data.systemVersion;
-        let hideMenu = JSON.parse(res.data.hideMenu);
-        const showSet = new Set<string>();
-        getCheckedLabels(hideMenu, showSet);
-        const rstMenuList: RouteRecordRaw[] = [];
-        const resMenuList = adjustAndCleanMenu(hideMenu, menuList);
-        for (const menu of resMenuList) {
-            let menuItem = JSON.parse(JSON.stringify(menu));
-            if (!showSet.has(menuItem.name as string)) {
-                continue;
-            } else if (menuItem.name === 'Xpack-Menu') {
-                menuItem.meta.hideInSidebar = false;
-            }
-            const itemChildren =
-                (menuItem.children ?? []).filter(
-                    (item) =>
-                        item.name && showSet.has(item.name as string) && !(item.name === 'Upage' && globalStore.isIntl),
-                ) || [];
+    } catch (error) {
+        version.value = '';
+    }
 
-            if (itemChildren.length === 1) {
-                menuItem.meta.icon = itemChildren[0].meta.icon;
-                menuItem.meta.title = itemChildren[0].meta.title;
-            }
-            menuItem.children = itemChildren;
-            rstMenuList.push(menuItem);
-        }
+    if (!settingInfo?.hideMenu) {
+        setFallbackMenuListIfEmpty();
+        return;
+    }
+
+    try {
+        const rstMenuList = buildMenuListFromSettings(settingInfo.hideMenu);
         if (!isSameMenuList(menuStore.menuList as RouteRecordRaw[], rstMenuList)) {
             menuStore.setMenuList(rstMenuList);
         }
     } catch (error) {
-        if (!menuStore.menuList || menuStore.menuList.length === 0) {
-            menuStore.setMenuList(menuList);
-        }
+        setFallbackMenuListIfEmpty();
     }
 };
 
 function isSameMenuList(source: RouteRecordRaw[], target: RouteRecordRaw[]) {
     return JSON.stringify(source) === JSON.stringify(target);
+}
+
+function setFallbackMenuListIfEmpty() {
+    if (!menuStore.menuList || menuStore.menuList.length === 0) {
+        menuStore.setMenuList(buildAuthVisibleMenuList(menuList));
+    }
+}
+
+function allowMenuItem(item: RouteRecordRaw) {
+    if (isAdmin.value) {
+        return true;
+    }
+    if (!hasRouteRoleAccess(item.meta)) {
+        return false;
+    }
+    return hasPermissionMetaAccess(item.meta?.permission as string | string[] | undefined);
+}
+
+function buildMenuListFromSettings(hideMenuValue?: string) {
+    const hideMenu = JSON.parse(hideMenuValue || '[]');
+    const showSet = new Set<string>();
+    getCheckedLabels(hideMenu, showSet);
+    const rstMenuList: RouteRecordRaw[] = [];
+    const resMenuList = adjustAndCleanMenu(hideMenu, menuList);
+    for (const menu of resMenuList) {
+        const menuItem = buildVisibleMenu(menu, showSet);
+        if (menuItem) {
+            rstMenuList.push(menuItem);
+        }
+    }
+    return rstMenuList;
+}
+
+function buildAuthVisibleMenuList(source: RouteRecordRaw[]) {
+    return source
+        .map((item) => {
+            if (!allowMenuItem(item)) {
+                return null;
+            }
+            const menuItem = JSON.parse(JSON.stringify(item));
+            const children = Array.isArray(menuItem.children) ? menuItem.children : [];
+            if (children.length === 0) {
+                return menuItem;
+            }
+            menuItem.children = buildAuthVisibleMenuList(children).filter(Boolean);
+            if (menuItem.children.length === 0) {
+                return null;
+            }
+            if (menuItem.children.length === 1) {
+                const onlyChild = menuItem.children[0];
+                if (onlyChild.meta?.icon) {
+                    menuItem.meta.icon = onlyChild.meta.icon;
+                }
+                if (onlyChild.meta?.title) {
+                    menuItem.meta.title = onlyChild.meta.title;
+                }
+            }
+            if (menuItem.name === 'Xpack-Menu') {
+                menuItem.meta.hideInSidebar = false;
+            }
+            return menuItem;
+        })
+        .filter(Boolean) as RouteRecordRaw[];
+}
+
+function buildVisibleMenu(menu: RouteRecordRaw, showSet: Set<string>): RouteRecordRaw | null {
+    const menuItem = JSON.parse(JSON.stringify(menu));
+    if (!menuItem?.name || !showSet.has(menuItem.name as string)) {
+        return null;
+    }
+    if (!allowMenuItem(menuItem)) {
+        return null;
+    }
+
+    const children = Array.isArray(menuItem.children) ? menuItem.children : [];
+    if (children.length === 0) {
+        return menuItem;
+    }
+
+    const visibleChildren = children
+        .map((item) => {
+            if ((item.name === 'Upage' || item.name === 'XApp') && (isIntl.value || isEE.value)) {
+                return null;
+            }
+            return buildVisibleMenu(item, showSet);
+        })
+        .filter(Boolean) as RouteRecordRaw[];
+
+    menuItem.children = visibleChildren;
+    if (menuItem.children.length === 0) {
+        return null;
+    }
+
+    if (menuItem.children.length === 1) {
+        const onlyChild = menuItem.children[0];
+        if (onlyChild.meta?.icon) {
+            menuItem.meta.icon = onlyChild.meta.icon;
+        }
+        if (onlyChild.meta?.title) {
+            menuItem.meta.title = onlyChild.meta.title;
+        }
+    }
+    if (menuItem.name === 'Xpack-Menu') {
+        menuItem.meta.hideInSidebar = false;
+    }
+    return menuItem;
 }
 
 function adjustAndCleanMenu(menuItem, list) {
@@ -164,8 +258,13 @@ function adjustAndCleanMenu(menuItem, list) {
     const newMenu = buildTree(menuItem);
     for (const menu of newMenu) {
         if (menu.children?.length === 1) {
-            menu.meta.icon = menu.children[0].meta.icon;
-            menu.meta.title = menu.children[0].meta.title;
+            const onlyChild = menu.children[0];
+            if (onlyChild.meta?.icon) {
+                menu.meta.icon = onlyChild.meta.icon;
+            }
+            if (onlyChild.meta?.title) {
+                menu.meta.title = onlyChild.meta.title;
+            }
         }
     }
 
@@ -174,10 +273,17 @@ function adjustAndCleanMenu(menuItem, list) {
 
 onMounted(() => {
     if (!menuStore.menuList || menuStore.menuList.length === 0) {
-        menuStore.setMenuList(menuList);
+        menuStore.setMenuList(isAdmin.value ? menuList : buildAuthVisibleMenuList(menuList));
     }
     search();
 });
+
+watch(
+    () => [currentNode.value, permissions.value.join('|')],
+    () => {
+        search();
+    },
+);
 </script>
 
 <style lang="scss" scoped>

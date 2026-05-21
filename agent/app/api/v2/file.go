@@ -640,6 +640,10 @@ func (b *BaseApi) MoveFile(c *gin.Context) {
 // @Router /files/download [get]
 func (b *BaseApi) Download(c *gin.Context) {
 	filePath := c.Query("path")
+	if files.ShouldDenySensitiveFileRead(filePath) {
+		helper.InternalServer(c, buserr.New("ErrSensitiveFileRead"))
+		return
+	}
 	file, err := os.Open(filePath)
 	if err != nil {
 		helper.InternalServer(c, err)
@@ -673,6 +677,10 @@ func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(req.Path) {
 		helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPathNotFound", nil)
+		return
+	}
+	if files.ShouldDenySensitiveFileRead(req.Path) {
+		helper.InternalServer(c, buserr.New("ErrSensitiveFileRead"))
 		return
 	}
 	filePath := req.Path
@@ -927,6 +935,10 @@ var wsUpgrade = websocket.Upgrader{
 }
 
 func (b *BaseApi) WgetProcess(c *gin.Context) {
+	if !websocket.IsWebSocketUpgrade(c.Request) {
+		helper.Success(c)
+		return
+	}
 	ws, err := wsUpgrade.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		return
@@ -965,6 +977,9 @@ func (b *BaseApi) ReadFileByLine(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	if readType := strings.TrimSpace(c.Param("type")); readType != "" {
+		req.Type = readType
+	}
 	res, err := fileService.ReadLogByLine(req)
 	if err != nil {
 		helper.InternalServer(c, err)
@@ -995,16 +1010,6 @@ func (b *BaseApi) BatchChangeModeAndOwner(c *gin.Context) {
 		helper.InternalServer(c, err)
 	}
 	helper.Success(c)
-}
-
-func (b *BaseApi) GetPathByType(c *gin.Context) {
-	pathType, ok := c.Params.Get("type")
-	if !ok {
-		helper.BadRequest(c, errors.New("error pathType id in path"))
-		return
-	}
-	resPath := fileService.GetPathByType(pathType)
-	helper.SuccessWithData(c, resPath)
 }
 
 // @Tags File
@@ -1336,6 +1341,10 @@ func (b *BaseApi) DownloadFileShare(c *gin.Context) {
 			return
 		}
 		helper.InternalServer(c, err)
+		return
+	}
+	if files.ShouldDenySensitiveFileRead(filePath) {
+		helper.InternalServer(c, buserr.New("ErrSensitiveFileRead"))
 		return
 	}
 	file, err := os.Open(filePath)

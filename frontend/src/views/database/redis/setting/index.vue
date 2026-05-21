@@ -47,7 +47,7 @@
                     <el-button class="mt-5" @click="getDefaultConfig()">
                         {{ $t('app.defaultConfig') }}
                     </el-button>
-                    <el-button type="primary" @click="onSaveFile" class="mt-5">
+                    <el-button v-permission type="primary" @click="onSaveFile" class="mt-5">
                         {{ $t('commons.button.save') }}
                     </el-button>
                     <el-row>
@@ -62,7 +62,9 @@
                         </el-col>
                     </el-row>
                 </div>
-                <Status v-show="activeName === 'status'" ref="statusRef" />
+                <div v-show="activeName === 'status'">
+                    <Status ref="statusRef" />
+                </div>
                 <div v-if="activeName === 'tuning'">
                     <el-form :model="form" ref="formRef" :rules="rules" label-position="top">
                         <el-row class="mt-10">
@@ -85,7 +87,7 @@
                                     <span class="input-help">{{ $t('database.maxmemoryHelper') }}</span>
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button type="primary" @click="onSubmitForm(formRef)">
+                                    <el-button v-permission type="primary" @click="onSubmitForm(formRef)">
                                         {{ $t('commons.button.save') }}
                                     </el-button>
                                 </el-form-item>
@@ -102,7 +104,7 @@
                                     <el-input clearable type="number" v-model.number="form.port" />
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button @click="onSavePort(portRef)" icon="Collection">
+                                    <el-button v-permission @click="onSavePort(portRef)" icon="Collection">
                                         {{ $t('commons.button.save') }}
                                     </el-button>
                                 </el-form-item>
@@ -110,7 +112,9 @@
                         </el-row>
                     </el-form>
                 </div>
-                <Persistence @loading="changeLoading" v-show="activeName === 'persistence'" ref="persistenceRef" />
+                <div v-show="activeName === 'persistence'">
+                    <Persistence @loading="changeLoading" ref="persistenceRef" />
+                </div>
             </template>
         </LayoutContent>
 

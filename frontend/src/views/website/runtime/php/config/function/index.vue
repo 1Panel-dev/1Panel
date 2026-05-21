@@ -8,14 +8,14 @@
             </el-form>
             <ComplexTable :data="data" v-loading="loading">
                 <template #toolbar>
-                    <el-button type="primary" icon="Plus" @click="openCreate(formRef)">
+                    <el-button v-permission type="primary" icon="Plus" @click="openCreate(formRef)">
                         {{ $t('commons.button.add') }}
                     </el-button>
                 </template>
                 <el-table-column :label="$t('commons.table.name')" prop="func"></el-table-column>
                 <el-table-column :label="$t('commons.table.operate')">
                     <template #default="{ $index }">
-                        <el-button link type="primary" @click="remove($index)">
+                        <el-button v-permission link type="primary" @click="remove($index)">
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </template>

@@ -2,9 +2,8 @@ import { jumpToPath } from './router';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
 
-const globalStore = GlobalStore();
-
 export const jumpToInstall = (type: string, key: string) => {
+    const globalStore = GlobalStore();
     switch (type) {
         case 'php':
         case 'node':

@@ -9,6 +9,7 @@ const toolboxRouter = {
     meta: {
         title: 'menu.toolbox',
         icon: 'p-toolbox',
+        permission: 'toolbox_view',
     },
     children: [
         {
@@ -27,7 +28,7 @@ const toolboxRouter = {
                         parent: 'menu.toolbox',
                         title: 'toolbox.device.toolbox',
                         activeMenu: '/toolbox',
-                        requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
                 {
@@ -39,7 +40,7 @@ const toolboxRouter = {
                         parent: 'menu.toolbox',
                         title: 'menu.supervisor',
                         activeMenu: '/toolbox',
-                        requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
                 {
@@ -51,7 +52,7 @@ const toolboxRouter = {
                         parent: 'menu.toolbox',
                         title: 'toolbox.clam.clam',
                         activeMenu: '/toolbox',
-                        requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
                 {
@@ -62,7 +63,7 @@ const toolboxRouter = {
                     meta: {
                         ignoreTab: true,
                         activeMenu: '/toolbox',
-                        requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
                 {
@@ -74,7 +75,7 @@ const toolboxRouter = {
                         parent: 'menu.toolbox',
                         title: 'FTP',
                         activeMenu: '/toolbox',
-                        requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
                 {
@@ -86,7 +87,7 @@ const toolboxRouter = {
                         parent: 'menu.toolbox',
                         title: 'Fail2Ban',
                         activeMenu: '/toolbox',
-                        requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
                 {
@@ -98,7 +99,7 @@ const toolboxRouter = {
                         parent: 'menu.toolbox',
                         title: 'setting.diskClean',
                         activeMenu: '/toolbox',
-                        requiresAuth: false,
+                        permission: 'toolbox_view',
                     },
                 },
             ],

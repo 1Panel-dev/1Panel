@@ -29,7 +29,7 @@
                         </el-tab-pane>
                     </el-tabs>
                     <el-form-item class="mt-2">
-                        <el-button type="primary" @click="onSaveStart(runtimeForm)">
+                        <el-button v-permission type="primary" @click="onSaveStart(runtimeForm)">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-form-item>

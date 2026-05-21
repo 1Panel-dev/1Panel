@@ -4,7 +4,7 @@
         <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
         <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="openCreate">
+                <el-button v-permission type="primary" @click="openCreate">
                     {{ $t('commons.button.create') }}
                 </el-button>
 
@@ -12,7 +12,7 @@
                     {{ $t('php.extensions') }}
                 </el-button>
 
-                <el-button type="primary" plain @click="onOpenBuildCache()">
+                <el-button v-permission type="primary" plain @click="onOpenBuildCache()">
                     {{ $t('container.cleanBuildCache') }}
                 </el-button>
             </template>
@@ -45,7 +45,12 @@
                     </el-table-column>
                     <el-table-column :label="$t('home.dir')" prop="codeDir" width="100px">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="routerToFileWithPath(row.path)">
+                            <el-button
+                                v-permission:view="'host_file_view'"
+                                type="primary"
+                                link
+                                @click="routerToFileWithPath(row.path)"
+                            >
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>
@@ -85,7 +90,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.remark')" prop="remark" min-width="150px">
                         <template #default="{ row }">
-                            <fu-read-write-switch>
+                            <fu-read-write-switch v-permission>
                                 <template #read>
                                     <MsgInfo :info="row.remark" :width="'150'" />
                                 </template>
@@ -104,8 +109,8 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 3"
-                        :width="mobile ? 'auto' : 300"
+                        :ellipsis="isMobile ? 0 : 3"
+                        :width="isMobile ? 'auto' : 300"
                         :buttons="buttons"
                         fixed="right"
                         :label="$t('commons.table.operate')"
@@ -155,11 +160,7 @@ import DockerStatus from '@/views/container/docker-status/index.vue';
 import { operateRuntime, updateRuntimeRemark } from '../common/utils';
 import { routerToFileWithPath } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { globalStore } = useGlobalStore();
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+const { isMobile } = useGlobalStore();
 
 const taskLogRef = ref();
 const paginationConfig = reactive({
@@ -192,6 +193,7 @@ const isExist = ref(false);
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openDetail(row);
         },
@@ -201,6 +203,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('runtime.extension'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openExtensionsManagement(row);
         },
@@ -210,6 +213,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('menu.terminal'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openTerminal(row);
         },
@@ -219,6 +223,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.operate.stop'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             operateRuntime('down', row.id, loading, search);
         },
@@ -228,6 +233,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.operate.start'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             operateRuntime('up', row.id, loading, search);
         },
@@ -237,6 +243,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             operateRuntime('restart', row.id, loading, search);
         },
@@ -246,6 +253,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('menu.config'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openConfig(row);
         },
@@ -255,6 +263,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('menu.supervisor'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openSupervisor(row);
         },
@@ -265,6 +274,7 @@ const buttons = [
 
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Runtime.Runtime) {
             openDelete(row);
         },

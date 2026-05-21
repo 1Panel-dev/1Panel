@@ -3,6 +3,7 @@ import piniaPersistConfig from '@/config/pinia-persist';
 import { GlobalState } from '../interface';
 import { DeviceType } from '@/enums/app';
 import i18n, { setActiveLocale } from '@/lang';
+import { toManageCode } from '@/utils/permission-codes';
 
 const CN_DOCS_URL = 'https://1panel.cn/docs/v2';
 const INTL_DOCS_URL = 'https://docs.1panel.pro/v2';
@@ -10,12 +11,8 @@ const INTL_DOCS_URL = 'https://docs.1panel.pro/v2';
 const GlobalStore = defineStore({
     id: 'GlobalState',
     state: (): GlobalState => ({
-        isLoading: false,
-        loadingText: '',
-        isLogin: false,
-        csrfToken: '',
-        entrance: '',
         language: i18n.global.locale.value,
+        device: DeviceType.Desktop,
         themeConfig: {
             panelName: '',
             primary: '#005eeb',
@@ -31,15 +28,21 @@ const GlobalStore = defineStore({
             loginBgType: '',
             loginBtnLinkColor: '',
         },
+        // ui
+        isFullScreen: false,
+        openMenuTabs: false,
         watermark: null,
         watermarkShow: false,
-        openMenuTabs: false,
-        isFullScreen: false,
-        isOnRestart: false,
-        agreeLicense: false,
-        hasNewVersion: false,
+        isLoading: false,
+        loadingText: '',
+        csrfToken: '',
+        // auth
         ignoreCaptcha: true,
-        device: DeviceType.Desktop,
+        agreeLicense: false,
+        isLogin: false,
+        entrance: '',
+        // context
+        hasNewVersion: false,
         lastFilePath: '',
         currentDB: '',
         currentPgDB: '',
@@ -48,15 +51,23 @@ const GlobalStore = defineStore({
         showEntranceWarn: true,
         defaultNetwork: 'all',
         defaultIO: 'all',
-        isFxplay: false,
-
-        isProductPro: false,
+        isOnRestart: false,
+        // tags
+        isAdmin: false,
+        permissions: [],
+        nodeRoles: [],
+        isEnterprise: false,
         isIntl: false,
         docWithRegion: true,
+        isFxplay: false,
+        isOffline: false,
+        // license
+        isProductPro: false,
         productProExpires: 0,
         isMasterProductPro: false,
-        isOffLine: false,
-
+        isEnterpriseLicensed: false,
+        isEnterpriseLicenseLoaded: false,
+        // multi-node
         masterAlias: '',
         currentNode: 'local',
         currentNodeAddr: '',
@@ -66,6 +77,11 @@ const GlobalStore = defineStore({
             state.themeConfig.theme === 'dark' ||
             (state.themeConfig.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches),
         isDarkGoldTheme: (state) => state.themeConfig.primary === '#F0BE96' && state.isProductPro,
+        isNodeAdmin: (state) =>
+            state.nodeRoles.some((item) => item.nodeName === state.currentNode && item.roleName === 'Node Admin'),
+        isAdminOrNodeAdmin: (state) =>
+            state.isAdmin ||
+            state.nodeRoles.some((item) => item.nodeName === state.currentNode && item.roleName === 'Node Admin'),
         docsUrl: (state) => {
             if (state.docWithRegion) {
                 return state.isIntl ? INTL_DOCS_URL : CN_DOCS_URL;
@@ -75,10 +91,48 @@ const GlobalStore = defineStore({
             return isChinese ? CN_DOCS_URL : INTL_DOCS_URL;
         },
         isMaster: (state) => state.currentNode === 'local',
+        isMobile: (state) => state.device === DeviceType.Mobile,
+
+        isXpackOrEE: (state) => {
+            return (state.isEnterprise && state.isEnterpriseLicensed) || state.isMasterProductPro;
+        },
+        isEE: (state) => state.isEnterprise && state.isEnterpriseLicensed,
+        isMasterPro: (state) => state.isMasterProductPro,
     },
     actions: {
         setScreenFull() {
             this.isFullScreen = !this.isFullScreen;
+        },
+        setLogStatus(login: boolean) {
+            this.isLogin = login;
+        },
+        setAuthInfo(payload: {
+            isAdmin: boolean;
+            permissions: string[];
+            nodeRoles?: Array<{ nodeId: number; nodeName: string; roleId: number; roleName: string }>;
+        }) {
+            this.isAdmin = !!payload.isAdmin;
+            this.permissions = payload.permissions || [];
+            this.nodeRoles = payload.nodeRoles || [];
+        },
+        clearAuthInfo() {
+            this.permissions = [];
+            this.nodeRoles = [];
+            this.isAdmin = false;
+        },
+        hasPermission(permission: string) {
+            if (this.isAdmin) {
+                return true;
+            }
+            const normalizedPermission = permission.trim();
+            if (!normalizedPermission) {
+                return false;
+            }
+            if (this.permissions.includes(normalizedPermission)) {
+                return true;
+            }
+            const managePermission = toManageCode(normalizedPermission);
+            return managePermission ? this.permissions.includes(managePermission) : false;
         },
         async updateLanguage(language: string) {
             const activeLocale = await setActiveLocale(language);
@@ -88,14 +142,8 @@ const GlobalStore = defineStore({
         toggleDevice(value: DeviceType) {
             this.device = value;
         },
-        isMobile() {
-            return this.device === DeviceType.Mobile;
-        },
         getMasterAlias() {
             return this.masterAlias || i18n.global.t('xpack.node.master');
-        },
-        isMasterPro() {
-            return this.isMasterProductPro;
         },
     },
     persist: piniaPersistConfig('GlobalState'),

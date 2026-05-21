@@ -2,6 +2,7 @@ package client
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"database/sql"
 	"fmt"
@@ -23,6 +24,37 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
+
+const maxPgDumpStderrCapture = 64 * 1024
+
+var pgDumpMagic = []byte("PGDMP")
+
+type limitedBuffer struct {
+	buf       bytes.Buffer
+	limit     int
+	truncated int
+}
+
+func (b *limitedBuffer) Write(p []byte) (int, error) {
+	if b.limit > 0 && b.buf.Len() >= b.limit {
+		b.truncated += len(p)
+		return len(p), nil
+	}
+	if b.limit > 0 && b.buf.Len()+len(p) > b.limit {
+		keep := b.limit - b.buf.Len()
+		_, _ = b.buf.Write(p[:keep])
+		b.truncated += len(p) - keep
+		return len(p), nil
+	}
+	return b.buf.Write(p)
+}
+
+func (b *limitedBuffer) String() string {
+	if b.truncated == 0 {
+		return b.buf.String()
+	}
+	return fmt.Sprintf("%s\n... truncated %d bytes ...", b.buf.String(), b.truncated)
+}
 
 type Remote struct {
 	Client   *sql.DB
@@ -160,21 +192,51 @@ func (r *Remote) Backup(info BackupInfo) error {
 		}
 	}
 	fileNameItem := info.TargetDir + "/" + strings.TrimSuffix(info.FileName, ".gz")
-	backupCommand := exec.Command("bash", "-c",
-		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD='\\''%s'\\'' pg_dump  -h %s -p %d --no-owner -Fc -U %s %s' > %s",
-			imageTag, r.Password, r.Address, r.Port, r.User, info.Name, fileNameItem))
-	_ = backupCommand.Run()
-	b := make([]byte, 5)
-	n := []byte{80, 71, 68, 77, 80}
+	backupFile, err := os.OpenFile(fileNameItem, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	backupFileClosed := false
+	defer func() {
+		if !backupFileClosed {
+			_ = backupFile.Close()
+		}
+	}()
+	backupCommand := exec.Command(
+		"docker",
+		"run", "--rm", "--net=host", "-i",
+		"-e", "PGPASSWORD="+r.Password,
+		imageTag,
+		"pg_dump",
+		"-h", r.Address,
+		"-p", fmt.Sprintf("%d", r.Port),
+		"--no-owner",
+		"-Fc",
+		"-U", r.User,
+		info.Name,
+	)
+	backupCommand.Stdout = backupFile
+	stderr := &limitedBuffer{limit: maxPgDumpStderrCapture}
+	backupCommand.Stderr = stderr
+	if err := backupCommand.Run(); err != nil {
+		return fmt.Errorf("backup failed, stderr: %s, err: %v", strings.TrimSpace(stderr.String()), err)
+	}
+	if err := backupFile.Close(); err != nil {
+		return fmt.Errorf("close backup file failed, err: %v", err)
+	}
+	backupFileClosed = true
+
+	b := make([]byte, len(pgDumpMagic))
 	handle, err := os.OpenFile(fileNameItem, os.O_RDONLY, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("backup file not found,err:%v", err)
 	}
 	defer handle.Close()
-	_, _ = handle.Read(b)
-	if string(b) != string(n) {
-		errBytes, _ := os.ReadFile(fileNameItem)
-		return fmt.Errorf("backup failed, err: %s", string(errBytes))
+	if _, err := io.ReadFull(handle, b); err != nil {
+		return fmt.Errorf("read backup header failed, stderr: %s, err: %v", strings.TrimSpace(stderr.String()), err)
+	}
+	if !bytes.Equal(b, pgDumpMagic) {
+		return fmt.Errorf("backup failed, invalid pg dump header: %q, stderr: %s", string(b), strings.TrimSpace(stderr.String()))
 	}
 
 	gzipCmd := exec.Command("gzip", fileNameItem)
@@ -207,9 +269,32 @@ func (r *Remote) Recover(info RecoverInfo) error {
 			_, _ = gzipCmd.CombinedOutput()
 		}()
 	}
-	recoverCommand := exec.Command("bash", "-c",
-		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD='\\''%s'\\'' pg_restore -h %s -p %d --verbose --clean --no-privileges --no-owner -Fc -c  --if-exists --no-owner -U %s -d %s --role=%s' < %s",
-			imageTag, r.Password, r.Address, r.Port, r.User, info.Name, info.Username, fileName))
+	restoreFile, err := os.Open(fileName)
+	if err != nil {
+		return err
+	}
+	defer restoreFile.Close()
+	recoverCommand := exec.Command(
+		"docker",
+		"run", "--rm", "--net=host", "-i",
+		"-e", "PGPASSWORD="+r.Password,
+		imageTag,
+		"pg_restore",
+		"-h", r.Address,
+		"-p", fmt.Sprintf("%d", r.Port),
+		"--verbose",
+		"--clean",
+		"--no-privileges",
+		"--no-owner",
+		"-Fc",
+		"-c",
+		"--if-exists",
+		"--no-owner",
+		"-U", r.User,
+		"-d", info.Name,
+		"--role="+info.Username,
+	)
+	recoverCommand.Stdin = restoreFile
 	pipe, _ := recoverCommand.StdoutPipe()
 	stderrPipe, _ := recoverCommand.StderrPipe()
 	defer pipe.Close()
@@ -229,6 +314,11 @@ func (r *Remote) Recover(info RecoverInfo) error {
 			return err
 		}
 		global.LOG.Infof("[PostgreSQL] DB:[%s] Restoring: %s", info.Name, readString)
+	}
+	if err := recoverCommand.Wait(); err != nil {
+		all, _ := io.ReadAll(stderrPipe)
+		global.LOG.Errorf("[PostgreSQL] DB:[%s] Recover Error: %s", info.Name, string(all))
+		return err
 	}
 
 	return nil

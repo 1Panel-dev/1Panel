@@ -33,7 +33,7 @@
             @approve="approvePairing"
         />
         <el-form-item class="mt-4">
-            <el-button type="primary" :loading="saving" @click="saveChannel">
+            <el-button v-permission type="primary" :loading="saving" @click="saveChannel">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>

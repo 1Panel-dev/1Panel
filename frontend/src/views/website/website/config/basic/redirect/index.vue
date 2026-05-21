@@ -1,7 +1,7 @@
 <template>
     <ComplexTable :data="data" @search="search" v-loading="loading">
         <template #toolbar>
-            <el-button type="primary" plain @click="openCreate">
+            <el-button v-permission type="primary" plain @click="openCreate">
                 {{ $t('commons.button.create') }}
             </el-button>
         </template>
@@ -30,7 +30,7 @@
         </el-table-column>
         <el-table-column :label="$t('commons.table.status')" prop="enable" min-width="50px">
             <template #default="{ row }">
-                <Status :status="row.enable ? 'enable' : 'disable'" @click="opProxy(row)" />
+                <Status v-permission :status="row.enable ? 'enable' : 'disable'" @click="opProxy(row)" />
             </template>
         </el-table-column>
         <fu-table-operations
@@ -38,7 +38,7 @@
             width="180px"
             :buttons="buttons"
             :label="$t('commons.table.operate')"
-            :fixed="mobile ? false : 'right'"
+            :fixed="isMobile ? false : 'right'"
             fix
         />
     </ComplexTable>
@@ -57,10 +57,10 @@ import File from './file/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
-import { GlobalStore } from '@/store';
-defineOptions({ name: 'Proxy' });
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
+defineOptions({ name: 'Proxy' });
 const props = defineProps({
     id: {
         type: Number,
@@ -68,9 +68,6 @@ const props = defineProps({
     },
 });
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 const id = computed(() => {
     return props.id;
 });
@@ -83,6 +80,7 @@ const opRef = ref();
 const buttons = [
     {
         label: i18n.global.t('website.sourceFile'),
+        permission: true,
         click: function (row: Website.RedirectConfig) {
             openEditFile(row);
         },
@@ -92,15 +90,17 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
-        click: function (row: Website.RedirectConfig) {
-            openEdit(row);
-        },
+        permission: true,
         disabled: (row: Website.ProxyConfig) => {
             return !row.enable;
+        },
+        click: function (row: Website.RedirectConfig) {
+            openEdit(row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.RedirectConfig) {
             deleteProxy(row);
         },

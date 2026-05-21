@@ -68,10 +68,10 @@
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { getSettingInfo } from '@/api/modules/setting';
+import { getAgentSettingInfo } from '@/api/modules/setting';
 import { getBindDomain } from '@/api/modules/ai';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { currentNode } = useGlobalStore();
 
 const loading = ref(false);
 
@@ -106,11 +106,11 @@ const handleClose = () => {
 };
 
 const loadSystemIP = async () => {
-    if (globalStore.currentNode !== 'local') {
-        form.systemIP = globalStore.currentNode || i18n.global.t('database.localIP');
+    if (currentNode.value !== 'local') {
+        form.systemIP = currentNode.value || i18n.global.t('database.localIP');
         return;
     }
-    const res = await getSettingInfo();
+    const res = await getAgentSettingInfo();
     form.systemIP = res.data.systemIP || i18n.global.t('database.localIP');
 };
 

@@ -31,7 +31,13 @@
                 </span>
                 <span class="ml-1">
                     <el-tooltip effect="dark" :content="$t('app.toFolder')" placement="top">
-                        <el-button type="primary" link @click="$emit('toFolder')" icon="FolderOpened"></el-button>
+                        <el-button
+                            v-permission:view="'host_file_view'"
+                            type="primary"
+                            link
+                            @click="$emit('toFolder')"
+                            icon="FolderOpened"
+                        ></el-button>
                     </el-tooltip>
                 </span>
                 <span class="ml-1">
@@ -57,7 +63,7 @@
                             type="primary"
                             link
                             @click="$emit('openTerminal')"
-                            :disabled="installed.status !== 'Running'"
+                            :disabled="installed.status !== 'Running' || !isAdminOrNodeAdmin"
                         >
                             <el-icon>
                                 <SvgIcon iconName="p-terminal2" />
@@ -82,6 +88,7 @@
                         v-if="installed.favorite"
                     >
                         <el-button
+                            v-permission
                             link
                             size="large"
                             icon="StarFilled"
@@ -92,6 +99,7 @@
                     </el-tooltip>
                     <el-tooltip effect="dark" :content="$t('website.favorite')" placement="top-start" v-else>
                         <el-button
+                            v-permission
                             link
                             icon="Star"
                             type="info"
@@ -109,6 +117,7 @@
                     size="small"
                     @click="$emit('openUploads')"
                     v-if="mode === 'installed'"
+                    v-permission
                 >
                     {{ $t('database.loadBackup') }}
                 </el-button>
@@ -119,6 +128,7 @@
                     size="small"
                     @click="$emit('openBackups')"
                     v-if="mode === 'installed'"
+                    v-permission
                 >
                     {{ $t('commons.button.backup') }}
                 </el-button>
@@ -127,6 +137,7 @@
                     plain
                     round
                     size="small"
+                    v-permission
                     :disabled="installed.status === 'Upgrading'"
                     @click="$emit('ignoreApp')"
                     v-if="mode === 'upgrade'"
@@ -134,6 +145,7 @@
                     {{ $t('commons.button.ignore') }}
                 </el-button>
                 <el-button
+                    v-permission
                     class="h-button"
                     plain
                     round
@@ -154,6 +166,9 @@
 
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isAdminOrNodeAdmin } = useGlobalStore();
 
 interface Props {
     installed: App.AppInstalled;

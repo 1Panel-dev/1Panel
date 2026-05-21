@@ -76,7 +76,6 @@ type IFileService interface {
 	BatchChangeModeAndOwner(op request.FileRoleReq) error
 	ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error)
 
-	GetPathByType(pathType string) string
 	BatchCheckFiles(req request.FilePathsCheck) []response.ExistFileInfo
 	GetHostMount() []dto.DiskInfo
 	GetUsersAndGroups() (*response.UserGroupResponse, error)
@@ -670,6 +669,9 @@ func applyDecompressOwnership(srcPath, dstPath string) error {
 }
 
 func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, error) {
+	if files.ShouldDenySensitiveFileRead(op.Path) {
+		return response.FileInfo{}, buserr.New("ErrSensitiveFileRead")
+	}
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:     op.Path,
 		Expand:   true,
@@ -706,6 +708,9 @@ func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, 
 }
 
 func (f *FileService) GetPreviewContent(op request.FileContentReq) (response.FileInfo, error) {
+	if files.ShouldDenySensitiveFileRead(op.Path) {
+		return response.FileInfo{}, buserr.New("ErrSensitiveFileRead")
+	}
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:     op.Path,
 		Expand:   false,
@@ -946,6 +951,11 @@ func buildHistoryMoveTargetPath(dst, name, sourcePath string, sourceCount int) s
 }
 
 func (f *FileService) FileDownload(d request.FileDownload) (string, error) {
+	for _, p := range d.Paths {
+		if files.ShouldDenySensitiveFileRead(p) {
+			return "", buserr.New("ErrSensitiveFileRead")
+		}
+	}
 	filePath := d.Paths[0]
 	if d.Compress {
 		tempPath := filepath.Join(os.TempDir(), fmt.Sprintf("%d", time.Now().UnixNano()))
@@ -1077,6 +1087,14 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		logFilePath, _ = ini_conf.GetIniValue(configPath, "supervisord", "logfile")
 	case constant.Supervisor:
 		logFilePath = path.Join(global.Dir.DataDir, "tools", "supervisord", "log", req.Name)
+	case "ai-proxy":
+		safeName := path.Base(req.Name)
+		if safeName != req.Name || strings.Contains(safeName, "..") {
+			return nil, buserr.New("ErrInvalidParams")
+		}
+		logFilePath = path.Join(global.Dir.LogDir, "ai", safeName)
+	default:
+		return nil, buserr.New("ErrNotSupportType")
 	}
 
 	file, err := os.Open(logFilePath)
@@ -1120,17 +1138,6 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		res.End = logFileRes.IsEndOfFile
 	}
 	return res, nil
-}
-
-func (f *FileService) GetPathByType(pathType string) string {
-	if pathType == "websiteDir" {
-		value, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
-		if value == "" {
-			return path.Join(global.Dir.BaseDir, "1panel", "www")
-		}
-		return value
-	}
-	return ""
 }
 
 func (f *FileService) BatchCheckFiles(req request.FilePathsCheck) []response.ExistFileInfo {

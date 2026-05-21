@@ -3,9 +3,9 @@
         v-model="open"
         :header="$t('commons.button.log')"
         @close="handleClose"
-        :size="globalStore.isFullScreen ? 'full' : 'large'"
+        :size="isFullScreen ? 'full' : 'large'"
     >
-        <template #extra v-if="!mobile">
+        <template #extra v-if="!isMobile">
             <el-tooltip :content="loadTooltip()" placement="top">
                 <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
             </el-tooltip>
@@ -18,11 +18,12 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import LogFile from '@/components/log/file/index.vue';
-import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import screenfull from 'screenfull';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { isMobile, isFullScreen } = useGlobalStore();
+
 interface LogProps {
     id: number;
     type: string;
@@ -47,23 +48,19 @@ const em = defineEmits(['close']);
 
 const handleClose = () => {
     open.value = false;
-    globalStore.isFullScreen = false;
+    isFullScreen.value = false;
     em('close', false);
 };
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
-
 function toggleFullscreen() {
-    globalStore.isFullScreen = !globalStore.isFullScreen;
+    isFullScreen.value = !isFullScreen.value;
 }
 const loadTooltip = () => {
-    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
+    return i18n.global.t('commons.button.' + (isFullScreen.value ? 'quitFullscreen' : 'fullscreen'));
 };
 
 watch(open, (val) => {
-    if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
+    if (screenfull.isEnabled && !val && !isMobile.value) screenfull.exit();
 });
 
 const acceptParams = (logProps: LogProps) => {

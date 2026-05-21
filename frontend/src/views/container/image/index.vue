@@ -10,19 +10,19 @@
 
         <LayoutContent v-if="isExist" :title="$t('container.image', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" plain @click="onOpenPull">
+                <el-button v-permission type="primary" plain @click="onOpenPull">
                     {{ $t('container.imagePull') }}
                 </el-button>
-                <el-button type="primary" plain @click="onOpenLoad">
+                <el-button v-permission type="primary" plain @click="onOpenLoad">
                     {{ $t('container.importImage') }}
                 </el-button>
-                <el-button type="primary" plain @click="onOpenBuild">
+                <el-button v-permission type="primary" plain @click="onOpenBuild">
                     {{ $t('container.imageBuild') }}
                 </el-button>
-                <el-button type="primary" plain @click="onOpenBuildCache()">
+                <el-button v-permission type="primary" plain @click="onOpenBuildCache()">
                     {{ $t('container.cleanBuildCache') }}
                 </el-button>
-                <el-button type="primary" plain @click="onOpenPrune()">
+                <el-button v-permission type="primary" plain @click="onOpenPrune()">
                     {{ $t('container.imagePrune') }}
                 </el-button>
             </template>
@@ -57,6 +57,7 @@
                                         size="large"
                                         :icon="row.isPinned ? 'StarFilled' : 'Star'"
                                         type="warning"
+                                        v-permission
                                         @click="changePinned(row, true)"
                                     />
                                 </el-tooltip>
@@ -73,7 +74,7 @@
                         prop="tags"
                         sortable="custom"
                         min-width="160"
-                        :width="mobile ? 400 : 'auto'"
+                        :width="isMobile ? 400 : 'auto'"
                         fix
                     >
                         <template #default="{ row }">
@@ -135,7 +136,7 @@
                     <el-button @click="handleUpdateDialogClose">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
-                    <el-button type="primary" @click="submitUpdateSelection">
+                    <el-button v-permission type="primary" @click="submitUpdateSelection">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -174,16 +175,13 @@ import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import { searchImage, listImageRepo, imageRemove, inspect, containerPrune, imagePull } from '@/api/modules/container';
 import i18n from '@/lang';
-import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
 import { updateCommonDescription } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
 const taskLogRef = ref();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const loading = ref(false);
 
@@ -423,6 +421,7 @@ const submitUpdateSelection = async () => {
 const buttons = [
     {
         label: i18n.global.t('container.push'),
+        permission: true,
         click: (row: Container.ImageInfo) => {
             let params = {
                 repos: repos.value,
@@ -433,6 +432,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('container.export'),
+        permission: true,
         click: (row: Container.ImageInfo) => {
             let params = {
                 repos: repos.value,
@@ -443,12 +443,14 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.update'),
+        permission: true,
         click: (row: Container.ImageInfo) => {
             onUpdate(row);
         },
     },
     {
         label: i18n.global.t('container.tag'),
+        permission: true,
         click: (row: Container.ImageInfo) => {
             let params = {
                 repos: repos.value,
@@ -460,6 +462,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: async (row: Container.ImageInfo) => {
             if (row.tags && row.tags.length > 1) {
                 let params = {

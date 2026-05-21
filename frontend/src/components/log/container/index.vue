@@ -25,7 +25,7 @@
         <el-button class="margin-button" @click="openDownloadDialog" icon="Download">
             {{ $t('commons.button.download') }}
         </el-button>
-        <el-button class="margin-button" @click="onClean" icon="Delete">
+        <el-button v-permission="'container_manage'" class="margin-button" @click="onClean" icon="Delete">
             {{ $t('commons.button.clean') }}
         </el-button>
     </div>
@@ -79,8 +79,9 @@ import { dateFormatForName } from '@/utils/date';
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+import { checkStreamAuth } from '@/utils/stream-auth';
+const { currentNode: globalCurrentNode } = useGlobalStore();
 
 const em = defineEmits(['update:loading']);
 
@@ -196,6 +197,11 @@ const bindXTermEvents = () => {
     });
 };
 
+const showEventSourceAuthError = (message: string) => {
+    MsgError(message);
+    writeLogLine(message);
+};
+
 const initTerminal = () => {
     if (!terminalElement.value || term) return;
     term = new Terminal({
@@ -233,7 +239,7 @@ const searchLogs = async () => {
     stopListening();
     clearTerminal();
 
-    let currentNode = globalStore.currentNode;
+    let currentNode = globalCurrentNode.value;
     if (props.node && props.node !== '') {
         currentNode = props.node;
     }
@@ -243,6 +249,11 @@ const searchLogs = async () => {
         url = `/api/v2/containers/search/log?compose=${logSearch.compose}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&timestamp=${logSearch.isShowTimestamp}&operateNode=${currentNode}`;
     }
 
+    const authError = await checkStreamAuth(url, currentNode);
+    if (authError) {
+        showEventSourceAuthError(authError);
+        return;
+    }
     eventSource = new EventSource(url);
     eventSource.onmessage = (event: MessageEvent) => {
         writeLogLine(event.data);
@@ -300,7 +311,7 @@ const onClean = async () => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
-        let currentNode = globalStore.currentNode;
+        let currentNode = globalCurrentNode.value;
         if (props.node && props.node !== '') {
             currentNode = props.node;
         }

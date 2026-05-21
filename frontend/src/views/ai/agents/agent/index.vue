@@ -4,7 +4,7 @@
         <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
         <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="openCreate" :disabled="noApp">
+                <el-button v-permission type="primary" @click="openCreate" :disabled="noApp">
                     {{ $t('commons.button.create') }}
                 </el-button>
             </template>
@@ -36,7 +36,7 @@
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="120">
                         <template #default="{ row }">
                             <el-dropdown placement="bottom">
-                                <Status :status="row.status" :operate="true" />
+                                <Status v-permission :status="row.status" :operate="true" />
                                 <template #dropdown>
                                     <el-dropdown-menu>
                                         <el-dropdown-item
@@ -66,7 +66,13 @@
                         <template #default="{ row }">
                             <div class="version-cell">
                                 <span>{{ row.appVersion }}</span>
-                                <el-button v-if="row.upgradable" link type="primary" @click="openUpgrade(row)">
+                                <el-button
+                                    v-permission
+                                    v-if="row.upgradable"
+                                    link
+                                    type="primary"
+                                    @click="openUpgrade(row)"
+                                >
                                     {{ $t('commons.button.upgrade') }}
                                 </el-button>
                             </div>
@@ -134,19 +140,20 @@
                                     link
                                     type="primary"
                                     class="website-link-cell__unbind"
+                                    v-permission
                                     @click="onUnbindWebsite(row)"
                                 >
                                     {{ $t('commons.button.unbind') }}
                                 </el-button>
                             </div>
-                            <el-button v-else link type="primary" @click="openBindWebsite(row)">
+                            <el-button v-else link type="primary" v-permission @click="openBindWebsite(row)">
                                 {{ $t('commons.button.bind') }}
                             </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('website.remark')" prop="remark" min-width="150">
                         <template #default="{ row }">
-                            <fu-read-write-switch>
+                            <fu-read-write-switch v-permission>
                                 <template #read>
                                     <MsgInfo :info="row.remark" :width="'150'" />
                                 </template>
@@ -158,7 +165,12 @@
                     </el-table-column>
                     <el-table-column :label="$t('runtime.workDir')" min-width="90">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="openWorkDir(row)">
+                            <el-button
+                                v-permission:view="'host_file_view'"
+                                type="primary"
+                                link
+                                @click="openWorkDir(row)"
+                            >
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>
@@ -169,7 +181,7 @@
                         <template #default="{ row }">
                             <el-space v-if="supportsAgentToken(row.agentType)">
                                 <CopyButton :content="row.token" />
-                                <el-button link type="primary" @click="onResetToken(row)">
+                                <el-button v-permission link type="primary" @click="onResetToken(row)">
                                     {{ $t('commons.button.reset') }}
                                 </el-button>
                             </el-space>
@@ -247,6 +259,7 @@ import NoApp from '@/views/app-store/apps/no-app/index.vue';
 import openclawIcon from '@/assets/images/ai-agent-openclaw.svg';
 import copawIcon from '@/assets/images/ai-agent-copaw.svg';
 import hermesIcon from '@/assets/images/ai-agent-hermes-agent.svg';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const items = ref<AI.AgentItem[]>([]);
 const loading = ref(false);
@@ -271,6 +284,7 @@ const searchName = ref('');
 const defaultHttpsPort = ref(443);
 const openrestyPortLoaded = ref(false);
 const websiteDomainsMap = ref<Record<number, Website.Domain[]>>({});
+const { isAdminOrNodeAdmin } = useGlobalStore();
 
 const headerButtons = [
     {
@@ -289,6 +303,7 @@ const buttons = [
     {
         label: i18n.global.t('aiTools.agents.hermesChatAction'),
         click: (row: AI.AgentItem) => openHermesChat(row),
+        disabled: () => !isAdminOrNodeAdmin.value,
         show: (row: AI.AgentItem) => row.agentType === 'hermes-agent' && row.status === 'Running',
     },
     {
@@ -298,6 +313,7 @@ const buttons = [
     {
         label: i18n.global.t('menu.terminal'),
         click: (row: AI.AgentItem) => openTerminal(row),
+        disabled: () => !isAdminOrNodeAdmin.value,
     },
     {
         label: i18n.global.t('menu.home'),
@@ -306,25 +322,30 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.operate.start'),
+        permission: true,
         click: (row: AI.AgentItem) => onOperate(row, 'start'),
         disabled: (row: AI.AgentItem) => row.status === 'Running',
     },
     {
         label: i18n.global.t('commons.operate.stop'),
+        permission: true,
         click: (row: AI.AgentItem) => onOperate(row, 'stop'),
         disabled: (row: AI.AgentItem) => row.status !== 'Running',
     },
     {
         label: i18n.global.t('commons.operate.restart'),
+        permission: true,
         click: (row: AI.AgentItem) => onOperate(row, 'restart'),
     },
     {
         label: i18n.global.t('commons.button.upgrade'),
+        permission: true,
         click: (row: AI.AgentItem) => openUpgrade(row),
-        disabled: (row: AI.AgentItem) => !row.upgradable,
+        show: (row: AI.AgentItem) => row.upgradable,
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: AI.AgentItem) => onDelete(row),
     },
 ];

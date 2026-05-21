@@ -24,7 +24,7 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <el-button class="ml-3 mt-2" @click="handleHostsAdd()">
+            <el-button v-permission class="ml-3 mt-2" @click="handleHostsAdd()">
                 {{ $t('commons.button.add') }}
             </el-button>
         </div>
@@ -39,7 +39,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading" type="primary" @click="onSave()">
+                <el-button v-permission :disabled="loading" type="primary" @click="onSave()">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

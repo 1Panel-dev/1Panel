@@ -53,7 +53,7 @@
                 ></Terminal>
 
                 <div class="flex items-center gap-2 w-full py-2 flex-wrap">
-                    <AiSetting v-if="!mobile" class="shrink-0" />
+                    <AiSetting v-if="!isMobile" class="shrink-0" />
                     <el-cascader
                         v-model="quickCmd"
                         :options="commandTree"
@@ -112,6 +112,7 @@
                         <div class="p-2 space-y-2">
                             <div class="flex gap-2">
                                 <button
+                                    v-if="!isNodeAdmin"
                                     @click="onNewSsh"
                                     class="flex-1 flex flex-col items-center justify-center px-3 py-2.5 bg-[var(--el-fill-color-light)] hover:bg-[var(--panel-main-bg-color-9)] rounded transition-colors duration-200 cursor-pointer group border-0 outline-none"
                                 >
@@ -142,65 +143,66 @@
                                     </span>
                                 </button>
                             </div>
+                            <template v-if="!isNodeAdmin">
+                                <el-divider class="my-0" />
 
-                            <el-divider class="my-0" />
-
-                            <div class="search-container px-1 py-1 bg-[var(--el-fill-color-light)] rounded">
-                                <el-input
-                                    v-model="hostFilterInfo"
-                                    class="w-full"
-                                    clearable
-                                    suffix-icon="Search"
-                                    :placeholder="$t('commons.button.search')"
-                                    size="small"
+                                <div class="search-container px-1 py-1 bg-[var(--el-fill-color-light)] rounded">
+                                    <el-input
+                                        v-model="hostFilterInfo"
+                                        class="w-full"
+                                        clearable
+                                        suffix-icon="Search"
+                                        :placeholder="$t('commons.button.search')"
+                                        size="small"
+                                    >
+                                        <template #prefix>
+                                            <el-icon class="el-input__icon"><Search /></el-icon>
+                                        </template>
+                                    </el-input>
+                                </div>
+                                <el-tree
+                                    ref="treeRef"
+                                    :expand-on-click-node="false"
+                                    node-key="id"
+                                    :default-expand-all="true"
+                                    :data="hostTree"
+                                    :props="defaultProps"
+                                    :filter-node-method="filterHost"
+                                    :empty-text="$t('terminal.noHost')"
+                                    class="host-tree"
                                 >
-                                    <template #prefix>
-                                        <el-icon class="el-input__icon"><Search /></el-icon>
-                                    </template>
-                                </el-input>
-                            </div>
-                            <el-tree
-                                ref="treeRef"
-                                :expand-on-click-node="false"
-                                node-key="id"
-                                :default-expand-all="true"
-                                :data="hostTree"
-                                :props="defaultProps"
-                                :filter-node-method="filterHost"
-                                :empty-text="$t('terminal.noHost')"
-                                class="host-tree"
-                            >
-                                <template #default="{ node, data }">
-                                    <span class="custom-tree-node w-full">
-                                        <span
-                                            v-if="node.label === 'Default'"
-                                            class="text-xs font-medium text-[var(--el-text-color-primary)]"
-                                        >
-                                            {{ $t('commons.table.default') }}
-                                        </span>
-                                        <div v-else class="w-full min-w-0">
-                                            <span v-if="node.label.length <= 22">
-                                                <a
-                                                    @click="onClickConn(node, data)"
-                                                    class="text-xs text-[var(--el-text-color-primary)] hover:text-[var(--el-color-primary)] transition-colors cursor-pointer block truncate"
-                                                >
-                                                    {{ node.label }}
-                                                </a>
+                                    <template #default="{ node, data }">
+                                        <span class="custom-tree-node w-full">
+                                            <span
+                                                v-if="node.label === 'Default'"
+                                                class="text-xs font-medium text-[var(--el-text-color-primary)]"
+                                            >
+                                                {{ $t('commons.table.default') }}
                                             </span>
-                                            <el-tooltip v-else :content="node.label" placement="right">
-                                                <span>
+                                            <div v-else class="w-full min-w-0">
+                                                <span v-if="node.label.length <= 22">
                                                     <a
                                                         @click="onClickConn(node, data)"
                                                         class="text-xs text-[var(--el-text-color-primary)] hover:text-[var(--el-color-primary)] transition-colors cursor-pointer block truncate"
                                                     >
-                                                        {{ node.label.substring(0, 30) }}...
+                                                        {{ node.label }}
                                                     </a>
                                                 </span>
-                                            </el-tooltip>
-                                        </div>
-                                    </span>
-                                </template>
-                            </el-tree>
+                                                <el-tooltip v-else :content="node.label" placement="right">
+                                                    <span>
+                                                        <a
+                                                            @click="onClickConn(node, data)"
+                                                            class="text-xs text-[var(--el-text-color-primary)] hover:text-[var(--el-color-primary)] transition-colors cursor-pointer block truncate"
+                                                        >
+                                                            {{ node.label.substring(0, 30) }}...
+                                                        </a>
+                                                    </span>
+                                                </el-tooltip>
+                                            </div>
+                                        </span>
+                                    </template>
+                                </el-tree>
+                            </template>
                         </div>
                     </el-popover>
                 </template>
@@ -215,7 +217,7 @@
         <el-tooltip :content="loadTooltip()" placement="top">
             <el-button
                 @click="toggleFullscreen"
-                v-if="!mobile"
+                v-if="!isMobile"
                 class="bg-transparent border-0 absolute right-[50px] font-semibold text-sm"
                 :style="{ top: loadFullScreenHeight() }"
                 icon="FullScreen"
@@ -232,7 +234,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, getCurrentInstance, watch, nextTick, computed, onMounted } from 'vue';
+import { ref, getCurrentInstance, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import Terminal from '@/components/terminal/index.vue';
 import HostDialog from '@/views/terminal/terminal/host-create.vue';
 import type Node from 'element-plus/es/components/tree/src/model/node';
@@ -241,18 +243,17 @@ import screenfull from 'screenfull';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';
 import { getHostTree, testByID, testLocalConn } from '@/api/modules/terminal';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import router from '@/routers';
 import { getCommandTree } from '@/api/modules/command';
-import { getAgentSettingByKey } from '@/api/modules/setting';
+import { getAgentSettingInfo } from '@/api/modules/setting';
 import AiSetting from '@/views/terminal/setting/ai/index.vue';
+import { MsgWarning } from '@/utils/message';
+
+const { isFullScreen, isMobile, isNodeAdmin, openMenuTabs } = useGlobalStore();
 
 const dialogRef = ref();
 const ctx = getCurrentInstance() as any;
-const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const toggleFullscreen = () => {
     if (screenfull.isEnabled) {
@@ -260,7 +261,7 @@ const toggleFullscreen = () => {
     }
 };
 const loadTooltip = () => {
-    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
+    return i18n.global.t('commons.button.' + (isFullScreen.value ? 'quitFullscreen' : 'fullscreen'));
 };
 
 let timer: ReturnType<typeof setInterval> | null = null;
@@ -293,22 +294,30 @@ interface Tree {
 const initCmd = ref('');
 
 const acceptParams = async () => {
-    globalStore.isFullScreen = false;
+    isFullScreen.value = false;
     loadCommandTree();
-    loadHostTree();
+    if (!isNodeAdmin.value) {
+        loadHostTree();
+    } else {
+        hostTree.value = [];
+    }
     if (terminalTabs.value.length === 0) {
-        await getAgentSettingByKey('LocalSSHConnShow').then((res) => {
-            if (res.data === 'Enable') {
-                onNewLocal();
-            }
-        });
+        if (isNodeAdmin.value) {
+            onNewLocal();
+        } else {
+            await getAgentSettingInfo().then((res) => {
+                if (res.data?.localSSHConnShow === 'Enable') {
+                    onNewLocal();
+                }
+            });
+        }
     }
     timer = setInterval(() => {
         syncTerminal();
     }, 1000 * 5);
-    if (!mobile.value) {
+    if (!isMobile.value) {
         screenfull.on('change', () => {
-            globalStore.isFullScreen = screenfull.isFullscreen;
+            isFullScreen.value = screenfull.isFullscreen;
         });
     }
 };
@@ -324,13 +333,13 @@ const cleanTimer = () => {
 };
 
 const loadHeight = () => {
-    return globalStore.openMenuTabs ? '250px' : '210px';
+    return openMenuTabs.value ? '250px' : '210px';
 };
 const loadEmptyHeight = () => {
-    return globalStore.openMenuTabs ? '201px' : '156px';
+    return openMenuTabs.value ? '201px' : '156px';
 };
 const loadFullScreenHeight = () => {
-    return globalStore.openMenuTabs ? '105px' : '60px';
+    return openMenuTabs.value ? '105px' : '60px';
 };
 
 const handleTabsRemove = (targetName: string, action: 'remove' | 'add') => {
@@ -357,6 +366,10 @@ const handleTabsRemove = (targetName: string, action: 'remove' | 'add') => {
 };
 
 const loadHostTree = async () => {
+    if (isNodeAdmin.value) {
+        hostTree.value = [];
+        return;
+    }
     const res = await getHostTree({});
     hostTree.value = res.data;
 };
@@ -420,6 +433,10 @@ function beforeLeave(activeName: string) {
 }
 
 const onNewSsh = () => {
+    if (isNodeAdmin.value) {
+        MsgWarning(i18n.global.t('terminal.nodeAdminLocalOnly'));
+        return;
+    }
     dialogRef.value!.acceptParams({ isLocal: false });
 };
 const onNewLocal = async () => {
@@ -439,7 +456,7 @@ const onNewLocal = async () => {
     nextTick(() => {
         ctx.refs[`t-${terminalValue.value}`] &&
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
-                endpoint: '/api/v2/hosts/terminal',
+                endpoint: '/api/v2/hosts/terminal/local',
                 initCmd: initCmd.value,
                 error: '',
             });
@@ -465,7 +482,7 @@ const onReconnect = async (item: any) => {
         nextTick(() => {
             ctx.refs[`t-${item.index}`] &&
                 ctx.refs[`t-${item.index}`][0].acceptParams({
-                    endpoint: '/api/v2/hosts/terminal',
+                    endpoint: '/api/v2/hosts/terminal/local',
                     initCmd: initCmd.value,
                     error: res.data ? '' : 'Failed to set up the connection. Please check the host information',
                 });
@@ -479,7 +496,7 @@ const onReconnect = async (item: any) => {
     nextTick(() => {
         ctx.refs[`t-${item.index}`] &&
             ctx.refs[`t-${item.index}`][0].acceptParams({
-                endpoint: '/api/v2/hosts/terminal',
+                endpoint: '/api/v2/hosts/terminal/ssh',
                 args: `id=${item.wsID}`,
                 initCmd: initCmd.value,
                 error: res.data ? '' : 'Failed to set up the connection. Please check the host information',
@@ -490,6 +507,10 @@ const onReconnect = async (item: any) => {
 };
 
 const onConnTerminal = async (title: string, wsID: number) => {
+    if (isNodeAdmin.value) {
+        MsgWarning(i18n.global.t('terminal.nodeAdminLocalOnly'));
+        return;
+    }
     const res = await testByID(wsID);
     terminalTabs.value.push({
         index: tabIndex,
@@ -502,7 +523,7 @@ const onConnTerminal = async (title: string, wsID: number) => {
     nextTick(() => {
         ctx.refs[`t-${terminalValue.value}`] &&
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
-                endpoint: '/api/v2/hosts/terminal',
+                endpoint: '/api/v2/hosts/terminal/ssh',
                 args: `id=${wsID}`,
                 initCmd: initCmd.value,
                 error: res.data ? '' : 'Authentication failed. Please check the host information!',
@@ -522,7 +543,7 @@ function syncTerminal() {
 }
 
 const changeFullScreen = () => {
-    globalStore.isFullScreen = screenfull.isFullscreen;
+    isFullScreen.value = screenfull.isFullscreen;
 };
 
 defineExpose({

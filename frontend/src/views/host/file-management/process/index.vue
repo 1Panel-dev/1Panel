@@ -10,7 +10,7 @@
                 >
                     <div class="flex items-center gap-3">
                         <div class="flex-1">
-                            <MsgInfo :info="value.name" :width="300" class="text-gray-700" />
+                            <MsgInfo :info="value.name" width="300" class="text-gray-700" />
                             <div class="text-gray-500">
                                 {{ value.percent === 100 ? $t('file.downloadSuccess') : $t('file.downloading') }}
                             </div>
@@ -65,13 +65,16 @@ import { fileWgetKeys, stopWgetFile } from '@/api/modules/files';
 import { computeSize } from '@/utils/size';
 import { onBeforeUnmount, ref } from 'vue';
 import MsgInfo from '@/components/msg-info/index.vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { ElMessageBox } from 'element-plus';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
-const globalStore = GlobalStore();
+import { checkStreamAuth } from '@/utils/stream-auth';
+const { currentNode: globalCurrentNode } = useGlobalStore();
 
-let processSocket = ref(null) as unknown as WebSocket;
+let processSocket: WebSocket | null = null;
+let sendTimer: ReturnType<typeof setInterval> | null = null;
+let initProcessToken = 0;
 const res = ref([]);
 const keys = ref(['']);
 const open = ref(false);
@@ -85,13 +88,20 @@ const handleClose = () => {
 };
 
 const isWsOpen = () => {
-    const readyState = processSocket && processSocket.readyState;
-    return readyState === 1;
+    return processSocket?.readyState === WebSocket.OPEN;
+};
+const clearSendTimer = () => {
+    if (sendTimer) {
+        clearInterval(sendTimer);
+        sendTimer = null;
+    }
 };
 const closeSocket = () => {
+    clearSendTimer();
     if (isWsOpen()) {
-        processSocket && processSocket.close();
+        processSocket.close();
     }
+    processSocket = null;
 };
 
 const onOpenProcess = () => {};
@@ -101,12 +111,23 @@ const onMessage = (message: any) => {
 const onerror = () => {};
 const onClose = () => {};
 
-const initProcess = () => {
+const initProcess = async () => {
+    const token = ++initProcessToken;
     let href = window.location.href;
     let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     let ipLocal = href.split('//')[1].split('/')[0];
-    let currentNode = globalStore.currentNode;
-    processSocket = new WebSocket(`${protocol}://${ipLocal}/api/v2/files/wget/process?operateNode=${currentNode}`);
+    let currentNode = globalCurrentNode.value;
+    const url = `${protocol}://${ipLocal}/api/v2/files/wget/process?operateNode=${currentNode}`;
+    const authError = await checkStreamAuth(url, currentNode);
+    if (token !== initProcessToken || !open.value) {
+        return;
+    }
+    if (authError) {
+        MsgError(authError);
+        return;
+    }
+    closeSocket();
+    processSocket = new WebSocket(url);
     processSocket.onopen = onOpenProcess;
     processSocket.onmessage = onMessage;
     processSocket.onerror = onerror;
@@ -131,9 +152,10 @@ const getKeys = async () => {
 };
 
 const sendMsg = () => {
-    setInterval(() => {
+    clearSendTimer();
+    sendTimer = setInterval(() => {
         if (isWsOpen()) {
-            processSocket.send(
+            processSocket?.send(
                 JSON.stringify({
                     type: 'wget',
                     keys: keys.value,
@@ -171,6 +193,7 @@ const onStop = async (index: number) => {
 };
 
 onBeforeUnmount(() => {
+    initProcessToken++;
     closeSocket();
 });
 

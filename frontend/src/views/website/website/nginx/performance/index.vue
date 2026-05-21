@@ -49,7 +49,7 @@
                 </el-col>
             </el-row>
             <el-form-item>
-                <el-button type="primary" @click="submit(nginxFormRef)">
+                <el-button v-permission type="primary" @click="submit(nginxFormRef)">
                     {{ $t('commons.button.save') }}
                 </el-button>
             </el-form-item>

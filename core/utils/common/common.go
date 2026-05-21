@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -52,25 +53,6 @@ func Md5(val string) string {
 	hash := md5.New()
 	hash.Write([]byte(val))
 	return hex.EncodeToString(hash.Sum(nil))
-}
-
-func LoadTimeZoneByCmd() string {
-	loc := time.Now().Location().String()
-	if _, err := time.LoadLocation(loc); err != nil {
-		loc = "Asia/Shanghai"
-	}
-	std, err := cmd.RunDefaultWithStdoutBashC("timedatectl | grep 'Time zone'")
-	if err != nil {
-		return loc
-	}
-	fields := strings.Fields(string(std))
-	if len(fields) != 5 {
-		return loc
-	}
-	if _, err := time.LoadLocation(fields[2]); err != nil {
-		return loc
-	}
-	return fields[2]
 }
 
 func ScanPort(port int) bool {
@@ -145,8 +127,27 @@ func SplitStr(str string, spi ...string) []string {
 	return results
 }
 
+func UniqueUints(items []uint) []uint {
+	result := make([]uint, 0, len(items))
+	seen := make(map[uint]struct{}, len(items))
+	for _, item := range items {
+		if item == 0 {
+			continue
+		}
+		if _, ok := seen[item]; ok {
+			continue
+		}
+		seen[item] = struct{}{}
+		result = append(result, item)
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i] < result[j]
+	})
+	return result
+}
+
 func LoadArch() (string, error) {
-	std, err := cmd.RunDefaultWithStdoutBashC("uname -a")
+	std, err := cmd.NewCommandMgr().RunWithStdout("uname", "-a")
 	if err != nil {
 		return "", fmt.Errorf("std: %s, err: %s", std, err.Error())
 	}
@@ -242,25 +243,6 @@ func HandleIPList(content string) ([]string, error) {
 		res = append(res, ip)
 	}
 	return res, nil
-}
-
-func LoadParams(param string) string {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
-	if err != nil {
-		panic(err)
-	}
-	info := strings.ReplaceAll(stdout, "\n", "")
-	if len(info) == 0 || info == `""` {
-		panic(fmt.Sprintf("error `%s` find in /usr/local/bin/1pctl", param))
-	}
-	return info
-}
-func LoadParamsWithoutPanic(param string) string {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
-	if err != nil {
-		return ""
-	}
-	return strings.ReplaceAll(stdout, "\n", "")
 }
 
 func GetRealClientIP(c *gin.Context) string {

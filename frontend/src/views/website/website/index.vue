@@ -20,16 +20,16 @@
                 ></AppStatus>
             </template>
             <template v-if="!openNginxConfig && nginxIsExist" #leftToolBar>
-                <el-button type="primary" @click="openCreate" :disabled="disabledConfig">
+                <el-button v-permission type="primary" @click="openCreate" :disabled="disabledConfig">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="openGroup" :disabled="disabledConfig">
+                <el-button v-permission type="primary" plain @click="openGroup" :disabled="disabledConfig">
                     {{ $t('commons.table.group') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDefault" :disabled="disabledConfig">
+                <el-button v-permission type="primary" plain @click="openDefault" :disabled="disabledConfig">
                     {{ $t('website.defaultServer') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDefaultHtml" :disabled="disabledConfig">
+                <el-button v-permission type="primary" plain @click="openDefaultHtml" :disabled="disabledConfig">
                     {{ $t('website.defaultHtml') }}
                 </el-button>
             </template>
@@ -121,7 +121,12 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.sitePath')" prop="sitePath" width="90px">
                         <template #default="{ row }">
-                            <el-button type="primary" link @click="routerToFileWithPath(row.sitePath + '/index')">
+                            <el-button
+                                v-permission:view="'host_file_view'"
+                                type="primary"
+                                link
+                                @click="routerToFileWithPath(row.sitePath + '/index')"
+                            >
                                 <el-icon>
                                     <FolderOpened />
                                 </el-icon>
@@ -144,6 +149,7 @@
                             <span v-else>
                                 <Status
                                     v-if="row.status === 'Running'"
+                                    v-permission
                                     :operate="true"
                                     :status="row.status"
                                     @click="operateWebsite('stop', row)"
@@ -151,6 +157,7 @@
                                 <Status
                                     v-else
                                     :status="row.status"
+                                    v-permission
                                     :operate="true"
                                     @click="operateWebsite('start', row)"
                                 />
@@ -187,7 +194,12 @@
                                 ></el-date-picker>
                             </div>
                             <div v-else>
-                                <el-link type="primary" underline="never" @click.stop="openDatePicker(row)">
+                                <el-link
+                                    v-permission
+                                    type="primary"
+                                    underline="never"
+                                    @click.stop="openDatePicker(row)"
+                                >
                                     <span v-if="isEver(row.expireDate)">
                                         {{ $t('website.neverExpire') }}
                                     </span>
@@ -208,7 +220,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('website.remark')" prop="remark" min-width="150px">
                         <template #default="{ row }">
-                            <fu-read-write-switch>
+                            <fu-read-write-switch v-permission>
                                 <template #read>
                                     <MsgInfo :info="row.remark" :width="'150'" />
                                 </template>
@@ -223,7 +235,7 @@
                         width="180px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        :fixed="mobile ? false : 'right'"
+                        :fixed="isMobile ? false : 'right'"
                         fix
                     />
                     <template #footerLeft>
@@ -253,6 +265,7 @@
                             <el-button
                                 class="ml-2"
                                 type="primary"
+                                v-permission
                                 :disabled="selects.length == 0 || batchReq.operate == ''"
                                 @click="batchOp"
                             >
@@ -320,11 +333,11 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { getAgentGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
-import { GlobalStore } from '@/store';
 import { getWebsiteTypes } from '@/global/mimetype';
 import { routerToFileWithPath, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
 const shortcuts = [
     {
         text: useI18n().t('website.ever'),
@@ -388,9 +401,6 @@ let req = reactive({
     order: 'descending',
     websiteGroupId: 0,
     type: '',
-});
-const mobile = computed(() => {
-    return globalStore.isMobile();
 });
 
 const goRouter = async (key: string) => {
@@ -556,12 +566,14 @@ const updateWebsitConfig = (row: any) => {
 const buttons = [
     {
         label: i18n.global.t('menu.config'),
+        permission: true,
         click: function (row: Website.Website) {
             openConfig(row.id);
         },
     },
     {
         label: i18n.global.t('database.backupList'),
+        permission: true,
         click: (row: Website.Website) => {
             let params = {
                 type: 'website',
@@ -573,6 +585,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.loadBackup'),
+        permission: true,
         click: (row: Website.Website) => {
             let params = {
                 type: 'website',
@@ -584,6 +597,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.Website) {
             openDelete(row);
         },

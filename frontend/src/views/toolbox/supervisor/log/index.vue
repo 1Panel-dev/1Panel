@@ -3,7 +3,7 @@
         v-model="open"
         :header="$t('commons.button.log') + ' - ' + supervisorName"
         @close="handleClose"
-        :size="globalStore.isFullScreen ? 'full' : 'large'"
+        :size="isFullScreen ? 'full' : 'large'"
         :fullScreen="true"
     >
         <template #content>
@@ -22,7 +22,7 @@
                 :height-diff="300"
             >
                 <template #button>
-                    <el-button @click="cleanLog" icon="Delete" :disabled="hasContent === false">
+                    <el-button v-permission @click="cleanLog" icon="Delete" :disabled="hasContent === false">
                         {{ $t('commons.button.clean') }}
                     </el-button>
                 </template>
@@ -41,11 +41,11 @@
 import LogFile from '@/components/log/file/index.vue';
 
 import { onUnmounted, reactive, ref } from 'vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { operateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { TabsPaneContext } from 'element-plus';
-const globalStore = GlobalStore();
+const { isFullScreen } = useGlobalStore();
 
 const logConfig = reactive({
     type: 'supervisor',

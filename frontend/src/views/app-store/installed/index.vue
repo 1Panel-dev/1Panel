@@ -9,6 +9,7 @@
             </el-button>
             <el-button
                 @click="enterSortMode"
+                v-permission
                 type="primary"
                 plain
                 v-if="mode === 'installed' && !sortMode && data != null"
@@ -86,19 +87,20 @@
                                         class="d-button flex flex-wrap items-center justify-start gap-1.5"
                                         v-if="mode === 'installed' && installed.status != 'Installing'"
                                     >
-                                        <el-button
-                                            class="app-button"
-                                            v-for="(button, key) in buttons"
-                                            :key="key"
-                                            :type="button.disabled && button.disabled(installed) ? 'info' : ''"
-                                            plain
-                                            round
-                                            size="small"
-                                            @click="button.click(installed)"
-                                            :disabled="button.disabled && button.disabled(installed)"
-                                        >
-                                            {{ button.label }}
-                                        </el-button>
+                                        <template v-for="(button, key) in buttons" :key="key">
+                                            <el-button
+                                                v-permission
+                                                class="app-button"
+                                                :type="button.disabled && button.disabled(installed) ? 'info' : ''"
+                                                plain
+                                                round
+                                                size="small"
+                                                @click="button.click(installed)"
+                                                :disabled="button.disabled && button.disabled(installed)"
+                                            >
+                                                {{ button.label }}
+                                            </el-button>
+                                        </template>
                                     </div>
                                 </template>
                             </AppCard>
@@ -157,7 +159,7 @@ import { App } from '@/api/interface/app';
 import { jumpToPath } from '@/utils/router';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
-import { getAgentSettingByKey } from '@/api/modules/setting';
+import { getAgentSettingInfo } from '@/api/modules/setting';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { currentNode, isMaster, currentNodeAddr, isIntl } = useGlobalStore();
@@ -319,6 +321,7 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'rebuild');
         },
+        permission: true,
         disabled: (row: any) => {
             return (
                 row.status === 'DownloadErr' ||
@@ -333,6 +336,7 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'restart');
         },
+        permission: true,
         disabled: (row: any) => {
             return (
                 row.status === 'DownloadErr' ||
@@ -347,6 +351,7 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'start');
         },
+        permission: true,
         disabled: (row: any) => {
             return (
                 row.status === 'Running' ||
@@ -363,6 +368,7 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'stop');
         },
+        permission: true,
         disabled: (row: any) => {
             return (
                 row.status !== 'Running' ||
@@ -378,6 +384,7 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'delete');
         },
+        permission: true,
     },
     {
         label: i18n.global.t('app.params'),
@@ -510,9 +517,9 @@ const exitSortMode = () => {
 
 const getConfig = async () => {
     try {
-        const res = await getAgentSettingByKey('SystemIP');
-        if (res.data != '') {
-            defaultLink.value = res.data;
+        const res = await getAgentSettingInfo();
+        if (res.data?.systemIP) {
+            defaultLink.value = res.data.systemIP;
             return;
         }
         if (!isMaster.value || currentNodeAddr.value != '127.0.0.1') {

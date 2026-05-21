@@ -1,10 +1,10 @@
 import i18n from '@/lang';
 import router from '@/routers';
 import { MsgError } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 export const checkStatus = (status: number, msg: string): void => {
+    const { entrance, isLogin } = useGlobalStore();
     switch (status) {
         case 400:
             MsgError(msg ? msg : i18n.global.t('commons.res.paramError'));
@@ -13,8 +13,8 @@ export const checkStatus = (status: number, msg: string): void => {
             MsgError(msg ? msg : i18n.global.t('commons.res.notFound'));
             break;
         case 403:
-            globalStore.isLogin = false;
-            router.replace({ name: 'entrance', params: { code: globalStore.entrance } });
+            isLogin.value = false;
+            router.replace({ name: 'entrance', params: { code: entrance.value } });
             MsgError(msg ? msg : i18n.global.t('commons.res.forbidden'));
             break;
         case 500:

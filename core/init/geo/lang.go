@@ -61,7 +61,7 @@ func initLang() {
 			downloadLangFromRemote()
 			return
 		}
-		if err := cmd.RunDefaultBashCf("cp -r %s %s", path.Join(tmpPath, "lang"), "/usr/local/bin/"); err != nil {
+		if err := cmd.NewCommandMgr().Run("cp", "-r", "--", path.Join(tmpPath, "lang"), "/usr/local/bin/"); err != nil {
 			global.LOG.Errorf("load lang from package failed, %v", err)
 			return
 		}
@@ -72,7 +72,11 @@ func initLang() {
 			downloadGeoFromRemote(geoPath)
 			return
 		}
-		if err := cmd.RunDefaultBashCf("mkdir %s && cp %s %s/", path.Dir(geoPath), path.Join(tmpPath, "GeoIP.mmdb"), path.Dir(geoPath)); err != nil {
+		if err := os.MkdirAll(path.Dir(geoPath), os.ModePerm); err != nil {
+			global.LOG.Errorf("mkdir geo ip dir failed, %v", err)
+			return
+		}
+		if err := cmd.NewCommandMgr().Run("cp", "--", path.Join(tmpPath, "GeoIP.mmdb"), path.Dir(geoPath)+"/"); err != nil {
 			global.LOG.Errorf("load geo ip from package failed, %v", err)
 			return
 		}
@@ -104,7 +108,7 @@ func loadRestorePath(upgradeDir string) (string, error) {
 }
 
 func downloadLangFromRemote() {
-	path := fmt.Sprintf("%s/language/lang.tar.gz", global.RepoURL())
+	path := fmt.Sprintf("%s/language/lang.tar.gz", global.ResourceURL())
 	if err := fileUtils.DownloadFile(path, "/usr/local/bin/lang.tar.gz"); err != nil {
 		global.LOG.Errorf("download lang.tar.gz failed, err: %v", err)
 		return
@@ -113,7 +117,7 @@ func downloadLangFromRemote() {
 		global.LOG.Error("download lang.tar.gz failed, no such file")
 		return
 	}
-	if err := cmd.RunDefaultBashCf("tar zxvfC %s %s", "/usr/local/bin/lang.tar.gz", "/usr/local/bin/"); err != nil {
+	if err := cmd.NewCommandMgr().Run("tar", "zxvfC", "/usr/local/bin/lang.tar.gz", "/usr/local/bin/"); err != nil {
 		global.LOG.Errorf("decompress lang.tar.gz failed, %v", err)
 		return
 	}
@@ -122,7 +126,7 @@ func downloadLangFromRemote() {
 }
 func downloadGeoFromRemote(targetPath string) {
 	_ = os.MkdirAll(path.Dir(targetPath), os.ModePerm)
-	pathItem := fmt.Sprintf("%s/geo/GeoIP.mmdb", global.RepoURL())
+	pathItem := fmt.Sprintf("%s/geo/GeoIP.mmdb", global.ResourceURL())
 	if err := fileUtils.DownloadFile(pathItem, targetPath); err != nil {
 		global.LOG.Errorf("download geo ip failed, err: %v", err)
 		return

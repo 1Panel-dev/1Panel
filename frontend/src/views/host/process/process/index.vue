@@ -64,15 +64,17 @@
 
 <script setup lang="ts">
 import FireRouter from '@/views/host/process/index.vue';
-import { ref, onMounted, onUnmounted, computed, watch, h } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch, h, resolveDirective, withDirectives } from 'vue';
 import ProcessDetail from './detail/index.vue';
 import i18n from '@/lang';
 import { stopProcess } from '@/api/modules/process';
-import { GlobalStore, ProcessStore } from '@/store';
+import { ProcessStore } from '@/store';
 import { SortBy, TableV2SortOrder, ElButton } from 'element-plus';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { currentNode } = useGlobalStore();
 const processStore = ProcessStore();
+const permissionDirective = resolveDirective('permission');
 
 const statusOptions = computed(() => [
     { text: i18n.global.t('process.running'), value: 'running' },
@@ -186,6 +188,15 @@ const columns = ref([
         dataKey: 'actions',
         width: 300,
         cellRenderer: ({ rowData }) => {
+            const stopButton = h(
+                ElButton,
+                {
+                    type: 'text',
+                    onClick: () => stop(rowData),
+                },
+                () => i18n.global.t('process.stopProcess'),
+            );
+
             return h('div', { class: 'action-buttons' }, [
                 h(
                     ElButton,
@@ -195,14 +206,7 @@ const columns = ref([
                     },
                     () => i18n.global.t('process.viewDetails'),
                 ),
-                h(
-                    ElButton,
-                    {
-                        type: 'text',
-                        onClick: () => stop(rowData),
-                    },
-                    () => i18n.global.t('process.stopProcess'),
-                ),
+                permissionDirective ? withDirectives(stopButton, [[permissionDirective]]) : stopButton,
             ]);
         },
     },
@@ -270,7 +274,7 @@ const stop = async (row: any) => {
 };
 
 onMounted(() => {
-    processStore.connect(globalStore.currentNode);
+    processStore.connect(currentNode.value);
     const initialDelay = processStore.psData.length > 0 ? 500 : 0;
     processStore.startPolling('ps', 3000, initialDelay);
 });

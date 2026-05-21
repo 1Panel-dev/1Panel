@@ -45,20 +45,20 @@
             </el-col>
             <el-col :span="4" v-if="index == 0">
                 <el-form-item :label="$t('commons.table.operate')">
-                    <el-button @click="addDomain">
+                    <el-button v-permission @click="addDomain">
                         <el-icon><Plus /></el-icon>
                     </el-button>
                 </el-form-item>
             </el-col>
             <el-col :span="4" v-else>
                 <el-form-item>
-                    <el-button @click="removeDomain(index)">
+                    <el-button v-permission @click="removeDomain(index)">
                         <el-icon><Delete /></el-icon>
                     </el-button>
                 </el-form-item>
             </el-col>
         </el-row>
-        <el-button @click="openBatchDialog" type="primary" plain>
+        <el-button v-permission @click="openBatchDialog" type="primary" plain>
             {{ $t('website.batchInput') }}
         </el-button>
 
@@ -71,7 +71,7 @@
             ></el-input>
             <template #footer>
                 <el-button @click="batchDialogVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="saveBatchInput" :disabled="create.domainStr == ''">
+                <el-button v-permission type="primary" @click="saveBatchInput" :disabled="create.domainStr == ''">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </template>

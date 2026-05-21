@@ -27,7 +27,11 @@ export const opWebsite = (req: Website.WebSiteOp, node?: string) => {
 };
 
 export const opWebsiteLog = (req: Website.WebSiteOpLog) => {
-    return http.post<Website.WebSiteLog>(`/websites/log`, req);
+    return http.post<any>(`/websites/log/operate`, req);
+};
+
+export const getWebsiteLog = (req: Website.WebSiteLogReq) => {
+    return http.post<Website.WebSiteLog>(`/websites/log/search`, req);
 };
 
 export const updateWebsite = (req: Website.WebSiteUpdateReq) => {

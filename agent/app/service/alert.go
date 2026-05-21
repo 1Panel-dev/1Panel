@@ -3,6 +3,12 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"mime"
+	"sort"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -15,11 +21,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/email"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/shirou/gopsutil/v4/disk"
-	"mime"
-	"sort"
-	"strings"
-	"sync"
-	"time"
 )
 
 type AlertService struct{}
@@ -308,12 +309,25 @@ func (a AlertService) GetDisks() ([]dto.DiskDTO, error) {
 
 func executeDiskCommand() (string, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Second))
-	stdout, err := cmdMgr.RunWithStdoutBashC("df -hT -P | grep '/' | grep -v tmpfs | grep -v 'snap/core' | grep -v udev")
+	stdout, err := cmdMgr.RunWithStdout("df", "-hT", "-P")
 	if err != nil {
 		cmdMgr2 := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
-		stdout, err = cmdMgr2.RunWithStdoutBashC("df -lhT -P | grep '/' | grep -v tmpfs | grep -v 'snap/core' | grep -v udev")
+		stdout, err = cmdMgr2.RunWithStdout("df", "-lhT", "-P")
 	}
-	return stdout, err
+	if err != nil {
+		return stdout, err
+	}
+	var lines []string
+	for _, line := range strings.Split(stdout, "\n") {
+		if !strings.Contains(line, "/") || strings.Contains(line, "tmpfs") || strings.Contains(line, "snap/core") || strings.Contains(line, "udev") {
+			continue
+		}
+		lines = append(lines, line)
+	}
+	if len(lines) == 0 {
+		return "", nil
+	}
+	return strings.Join(lines, "\n"), nil
 }
 
 func shouldExclude(fields []string, mountPoint string, excludes map[string]struct{}) bool {
@@ -501,7 +515,7 @@ func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {
 		Body:    i18n.GetMsgByKey("TestAlert"),
 		IsHTML:  false,
 	}
-	transport := xpack.LoadRequestTransport()
+	transport := xpack.MultiNodeProvider.LoadRequestTransport()
 	if err := email.SendMail(cfg, msg, transport); err != nil {
 		return false, err
 	}

@@ -27,6 +27,7 @@
             <template #leftToolBar>
                 <el-button
                     v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
+                    v-permission
                     type="primary"
                     @click="onOpenDialog()"
                 >
@@ -37,6 +38,7 @@
                 </el-button>
                 <el-button
                     v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
+                    v-permission
                     @click="loadDB"
                     type="primary"
                     plain
@@ -46,7 +48,12 @@
                 <el-button @click="goRemoteDB()" type="primary" plain>
                     {{ $t('database.remoteDB') }}
                 </el-button>
-                <el-button @click="goTerminal()" :disabled="currentDB?.from !== 'local'" type="primary" plain>
+                <el-button
+                    @click="goTerminal()"
+                    :disabled="currentDB?.from !== 'local' || !isAdminOrNodeAdmin"
+                    type="primary"
+                    plain
+                >
                     {{ $t('menu.terminal') }}
                 </el-button>
                 <el-dropdown>
@@ -194,6 +201,7 @@
                         <template #default="{ row }">
                             <fu-input-rw-switch
                                 v-model="row.description"
+                                v-permission
                                 @enter="onChange(row)"
                                 @blur="onChange(row)"
                             />
@@ -206,8 +214,8 @@
                         show-overflow-tooltip
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 10"
-                        :min-width="mobile ? 'auto' : 300"
+                        :ellipsis="isMobile ? 0 : 10"
+                        :min-width="isMobile ? 'auto' : 300"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -280,7 +288,7 @@ import PortJumpDialog from '@/components/port-jump/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import { dateFormat } from '@/utils/date';
 import { ElMessageBox } from 'element-plus';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import {
     deleteCheckMysqlDB,
     listDatabases,
@@ -293,13 +301,10 @@ import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
 import { getAppPort } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { routerToName, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
-const globalStore = GlobalStore();
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+const { currentDB: globalCurrentDB, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const maskShow = ref(true);
@@ -376,7 +381,7 @@ const mysqlName = (appType: string) => {
 
 const goRemoteDB = async () => {
     if (currentDB.value) {
-        globalStore.currentDB = currentDB.value.database;
+        globalCurrentDB.value = currentDB.value.database;
     }
     routerToName('MySQL-Remote');
 };
@@ -389,7 +394,7 @@ const passwordRef = ref();
 
 const onSetting = async () => {
     if (currentDB.value) {
-        globalStore.currentDB = currentDB.value.database;
+        globalCurrentDB.value = currentDB.value.database;
     }
     routerToNameWithParams('MySQL-Setting', { type: currentDB.value.type, database: currentDB.value.database });
 };
@@ -398,7 +403,7 @@ const changeDatabase = async () => {
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
-            globalStore.currentDB = currentDB.value.database;
+            globalCurrentDB.value = currentDB.value.database;
             appKey.value = item.type;
             appName.value = item.database;
             search();
@@ -410,7 +415,7 @@ const changeDatabase = async () => {
         if (item.database == currentDBName.value) {
             maskShow.value = false;
             currentDB.value = item;
-            globalStore.currentDB = currentDB.value.database;
+            globalCurrentDB.value = currentDB.value.database;
             break;
         }
     }
@@ -515,7 +520,7 @@ const loadDBOptions = async () => {
         let datas = res.data || [];
         dbOptionsLocal.value = [];
         dbOptionsRemote.value = [];
-        currentDBName.value = globalStore.currentDB;
+        currentDBName.value = globalCurrentDB.value;
         for (const item of datas) {
             if (currentDBName.value && item.database === currentDBName.value) {
                 currentDB.value = item;
@@ -602,6 +607,7 @@ const onChangePassword = async (row: Database.MysqlDBInfo) => {
 const buttons = [
     {
         label: i18n.global.t('database.changePassword'),
+        permission: true,
         disabled: (row: Database.MysqlDBInfo) => {
             return !row.username || row.isDelete;
         },
@@ -611,6 +617,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.permission'),
+        permission: true,
         disabled: (row: Database.MysqlDBInfo) => {
             return !row.password || row.isDelete;
         },
@@ -637,6 +644,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.backupList'),
+        permission: true,
         disabled: (row: Database.MysqlDBInfo) => {
             return row.isDelete;
         },
@@ -651,6 +659,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.loadBackup'),
+        permission: true,
         disabled: (row: Database.MysqlDBInfo) => {
             return row.isDelete;
         },
@@ -666,6 +675,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: Database.MysqlDBInfo) => {
             onDelete(row);
         },

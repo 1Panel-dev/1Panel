@@ -122,8 +122,8 @@
                     <span class="input-help">{{ $t('app.pullImageHelper') }}</span>
                 </el-form-item>
 
-                <PushtoNode
-                    v-if="isMaster && isMasterProductPro && batchInstallSupport"
+                <PushToNode
+                    v-if="isMaster && isXpackOrEE && batchInstallSupport"
                     :push-node="formData.pushNode"
                     :nodes="formData.nodes"
                     type="app"
@@ -157,11 +157,16 @@ import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { computeSizeFromMB } from '@/utils/size';
 import { loadResourceLimit } from '@/api/modules/container';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { loadOptionalComponent } from '@/extensions/optional';
-defineOptions({ name: 'AppInstallForm' });
-const { isOffLine, isMasterProductPro, isMaster } = useGlobalStore();
+const { isMaster, isOffline, isXpackOrEE } = useGlobalStore();
 
-const PushtoNode = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/ssl/index.vue'));
+const PushToNode = defineAsyncComponent(async () => {
+    const modules = import.meta.glob('@/xpack/views/ssl/index.vue');
+    const loader = modules['/src/xpack/views/ssl/index.vue'];
+    if (loader) {
+        return ((await loader()) as any).default;
+    }
+    return { template: '<div></div>' };
+});
 
 interface ClusterProps {
     key: string;
@@ -317,7 +322,7 @@ const initForm = async (appKey: string) => {
         formData.value.version = defaultVersion;
         getVersionDetail(defaultVersion);
     }
-    if (isOffLine.value) {
+    if (isOffline.value) {
         formData.value.pullImage = false;
     }
 };

@@ -36,7 +36,7 @@
             </el-input>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" @click="exec">{{ $t('commons.button.handle') }}</el-button>
+            <el-button v-permission type="primary" @click="exec">{{ $t('commons.button.handle') }}</el-button>
         </el-form-item>
     </el-form>
     <TaskLog ref="taskLogRef" @close="search" />

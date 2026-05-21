@@ -1,7 +1,7 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('commons.button.upgrade')" @close="handleClose" size="large">
         <div class="panel-MdEditor">
-            <div class="default-theme" style="margin-left: 20px">
+            <div class="default-theme">
                 <h2 class="inline-block">{{ $t('app.version') }}</h2>
             </div>
             <el-radio-group class="inline-block tag" v-model="upgradeVersion" @change="changeOption">
@@ -15,7 +15,9 @@
                     {{ upgradeInfo.testVersion }}
                 </el-radio>
             </el-radio-group>
-            <MarkDownEditor v-loading="loading" :content="upgradeInfo.releaseNote" />
+            <div v-loading="loading">
+                <MarkDownEditor :content="upgradeInfo.releaseNote" />
+            </div>
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -33,10 +35,10 @@ import { loadReleaseNotes, upgrade } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ref } from 'vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { ElMessageBox } from 'element-plus';
 
-const globalStore = GlobalStore();
+const { isLoading, isOnRestart } = useGlobalStore();
 
 const drawerVisible = ref(false);
 const upgradeInfo = ref();
@@ -78,8 +80,8 @@ const onUpgrade = async () => {
         type: 'info',
     }).then(async () => {
         await upgrade(upgradeVersion.value);
-        globalStore.isLoading = true;
-        globalStore.isOnRestart = true;
+        isLoading.value = true;
+        isOnRestart.value = true;
         drawerVisible.value = false;
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         emit('search');

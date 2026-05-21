@@ -6,7 +6,9 @@
             </div>
             <ComplexTable :data="data" :pagination-config="paginationConfig" v-loading="loading">
                 <template #toolbar>
-                    <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                    <el-button v-permission type="primary" @click="openCreate">
+                        {{ $t('commons.button.create') }}
+                    </el-button>
                 </template>
                 <el-table-column
                     :label="$t('website.email')"
@@ -25,9 +27,9 @@
                         {{ getKeyName(row.keyType) }}
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('website.useProxy')" min-width="100px" v-if="globalStore.isProductPro">
+                <el-table-column :label="$t('website.useProxy')" min-width="100px" v-if="isProductPro">
                     <template #default="{ row }">
-                        <el-switch v-model="row.useProxy" @change="update(row)"></el-switch>
+                        <el-switch v-permission v-model="row.useProxy" @change="update(row)"></el-switch>
                     </template>
                 </el-table-column>
                 <el-table-column label="URL" show-overflow-tooltip prop="url" min-width="300px"></el-table-column>
@@ -53,9 +55,9 @@ import { reactive, ref } from 'vue';
 import Create from './create/index.vue';
 import { getAccountName, getKeyName } from '@/utils/ssl';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isProductPro } = useGlobalStore();
 const open = ref(false);
 const loading = ref(false);
 const data = ref();
@@ -71,6 +73,7 @@ const opRef = ref();
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.AcmeAccount) {
             deleteAccount(row);
         },

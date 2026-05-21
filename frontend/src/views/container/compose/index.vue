@@ -9,10 +9,10 @@
 
         <LayoutContent v-if="isExist" :title="$t('container.compose', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="onOpenDialog()">
+                <el-button v-permission type="primary" @click="onOpenDialog()">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="onImportCompose()">
+                <el-button v-permission type="primary" plain @click="onImportCompose()">
                     {{ $t('commons.button.import') }}
                 </el-button>
             </template>
@@ -43,7 +43,7 @@
                                                     v-if="!row.composeFileExists"
                                                     :content="$t('container.composeFileMissing')"
                                                 >
-                                                    <el-button link icon="WarningFilled">
+                                                    <el-button link icon="WarningFilled" @click.stop>
                                                         <WarningFilled />
                                                     </el-button>
                                                 </el-tooltip>
@@ -78,9 +78,13 @@
                                                     }}
                                                 </el-text>
                                             </div>
-                                            <div class="compose-actions">
+                                            <div class="compose-actions" @click.stop>
                                                 <el-dropdown placement="bottom">
-                                                    <Status :status="getComposeStatus(row)" :operate="true" />
+                                                    <Status
+                                                        v-permission
+                                                        :status="getComposeStatus(row)"
+                                                        :operate="true"
+                                                    />
                                                     <template #dropdown>
                                                         <el-dropdown-menu>
                                                             <el-dropdown-item
@@ -107,6 +111,7 @@
                                                     </template>
                                                 </el-dropdown>
                                                 <el-button
+                                                    v-permission:view="'host_file_view'"
                                                     plain
                                                     round
                                                     size="small"
@@ -121,6 +126,7 @@
                                                     round
                                                     size="small"
                                                     class="round-btn"
+                                                    v-permission
                                                     @click="onBackupList(row)"
                                                 >
                                                     {{ $t('commons.button.backup') }}
@@ -130,6 +136,7 @@
                                                     round
                                                     size="small"
                                                     class="round-btn"
+                                                    v-permission
                                                     @click="onDelete(row)"
                                                 >
                                                     {{ $t('commons.operate.delete') }}
@@ -281,7 +288,12 @@
                                 </el-table-column>
                                 <el-table-column :label="$t('commons.table.operate')" width="160">
                                     <template #default="{ row }">
-                                        <el-button type="primary" link @click="onOpenTerminal(row)">
+                                        <el-button
+                                            type="primary"
+                                            link
+                                            :disabled="!isAdminOrNodeAdmin"
+                                            @click="onOpenTerminal(row)"
+                                        >
                                             {{ $t('menu.terminal') }}
                                         </el-button>
                                         <el-button type="primary" link @click="onOpenLog(row)">
@@ -301,6 +313,7 @@
                                 </el-radio-group>
                                 <el-button
                                     v-if="showType !== 'log' && !(showType === 'env' && isAppStoreCompose)"
+                                    v-permission
                                     type="primary"
                                     @click="onSubmitEdit"
                                 >
@@ -436,7 +449,7 @@
                                 </el-form-item>
                             </el-form>
 
-                            <el-button type="primary" class="mt-2" @click="onSubmit(formRef)">
+                            <el-button v-permission type="primary" class="mt-2" @click="onSubmit(formRef)">
                                 {{ $t('commons.button.save') }}
                             </el-button>
                         </el-card>
@@ -496,9 +509,9 @@ import { newUUID } from '@/utils/id';
 import { Rules } from '@/global/form-rules';
 import { loadBaseDir } from '@/api/modules/setting';
 import { ElCheckbox, ElForm } from 'element-plus';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { currentNode, isAdminOrNodeAdmin } = useGlobalStore();
 
 const data = ref<any[]>([]);
 const loading = ref(false);
@@ -767,7 +780,7 @@ const onBackupList = (row: Container.ComposeInfo) => {
         type: 'compose',
         name: row.name,
         detailName: '',
-        node: globalStore.currentNode,
+        node: currentNode.value,
     });
 };
 
@@ -777,7 +790,7 @@ const onImportCompose = () => {
         name: '',
         detailName: '',
         remark: '.tar.gz',
-        node: globalStore.currentNode,
+        node: currentNode.value,
     });
 };
 

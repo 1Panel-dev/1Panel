@@ -27,12 +27,14 @@ import (
 type HostToolService struct{}
 
 type IHostToolService interface {
-	GetToolStatus(req request.HostToolReq) (*response.HostToolRes, error)
+	GetToolStatus(req request.HostToolTypeReq) (*response.HostToolRes, error)
 	CreateToolConfig(req request.HostToolCreate) error
-	OperateTool(req request.HostToolReq) error
-	OperateToolConfig(req request.HostToolConfig) (*response.HostToolConfig, error)
+	OperateTool(req request.HostToolOperateReq) error
+	GetToolConfig(req request.HostToolTypeReq) (*response.HostToolConfig, error)
+	UpdateToolConfig(req request.HostToolConfigUpdate) error
 	OperateSupervisorProcess(req request.SupervisorProcessConfig) error
 	GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error)
+	GetSupervisorProcessFile(req request.HostSupervisorProcessFileGetReq) (string, error)
 	OperateSupervisorProcessFile(req request.SupervisorProcessFileReq) (string, error)
 }
 
@@ -40,7 +42,7 @@ func NewIHostToolService() IHostToolService {
 	return &HostToolService{}
 }
 
-func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.HostToolRes, error) {
+func (h *HostToolService) GetToolStatus(req request.HostToolTypeReq) (*response.HostToolRes, error) {
 	res := &response.HostToolRes{}
 	res.Type = req.Type
 	switch req.Type {
@@ -71,7 +73,7 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 			supervisorConfig.ServiceName = serviceNameSet.Value
 		}
 
-		versionRes, _ := cmd.RunDefaultWithStdoutBashC("supervisord -v")
+		versionRes, _ := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("supervisord", "-v")
 		supervisorConfig.Version = strings.TrimSuffix(versionRes, "\n")
 		_, ctlRrr := exec.LookPath("supervisorctl")
 		supervisorConfig.CtlExist = ctlRrr == nil
@@ -201,7 +203,7 @@ func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
 	return nil
 }
 
-func (h *HostToolService) OperateTool(req request.HostToolReq) error {
+func (h *HostToolService) OperateTool(req request.HostToolOperateReq) error {
 	serviceName := req.Type
 	if req.Type == constant.Supervisord {
 		serviceNameSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName))
@@ -212,12 +214,10 @@ func (h *HostToolService) OperateTool(req request.HostToolReq) error {
 	return controller.Handle(req.Operate, serviceName)
 }
 
-func (h *HostToolService) OperateToolConfig(req request.HostToolConfig) (*response.HostToolConfig, error) {
-	fileOp := files.NewFileOp()
-	res := &response.HostToolConfig{}
+func (h *HostToolService) loadToolConfigInfo(toolType string) (string, string) {
 	configPath := ""
 	serviceName := "supervisord"
-	switch req.Type {
+	switch toolType {
 	case constant.Supervisord:
 		pathSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorConfigPath))
 		if pathSet.ID != 0 || pathSet.Value != "" {
@@ -227,37 +227,48 @@ func (h *HostToolService) OperateToolConfig(req request.HostToolConfig) (*respon
 		if serviceNameSet.ID != 0 || serviceNameSet.Value != "" {
 			serviceName = serviceNameSet.Value
 		}
+	default:
+		return "", ""
 	}
-	switch req.Operate {
-	case "get":
-		content, err := fileOp.GetContent(configPath)
-		if err != nil {
-			return nil, err
-		}
-		res.Content = string(content)
-	case "set":
-		file, err := fileOp.OpenFile(configPath)
-		if err != nil {
-			return nil, err
-		}
-		oldContent, err := fileOp.GetContent(configPath)
-		if err != nil {
-			return nil, err
-		}
-		fileInfo, err := file.Stat()
-		if err != nil {
-			return nil, err
-		}
-		if err = fileOp.WriteFile(configPath, strings.NewReader(req.Content), fileInfo.Mode()); err != nil {
-			return nil, err
-		}
-		if err = controller.HandleRestart(serviceName); err != nil {
-			_ = fileOp.WriteFile(configPath, bytes.NewReader(oldContent), fileInfo.Mode())
-			return nil, err
-		}
+	return configPath, serviceName
+}
+
+func (h *HostToolService) GetToolConfig(req request.HostToolTypeReq) (*response.HostToolConfig, error) {
+	fileOp := files.NewFileOp()
+	res := &response.HostToolConfig{}
+	configPath, _ := h.loadToolConfigInfo(req.Type)
+	content, err := fileOp.GetContent(configPath)
+	if err != nil {
+		return nil, err
+	}
+	res.Content = string(content)
+	return res, nil
+}
+
+func (h *HostToolService) UpdateToolConfig(req request.HostToolConfigUpdate) error {
+	fileOp := files.NewFileOp()
+	configPath, serviceName := h.loadToolConfigInfo(req.Type)
+	file, err := fileOp.OpenFile(configPath)
+	if err != nil {
+		return err
+	}
+	oldContent, err := fileOp.GetContent(configPath)
+	if err != nil {
+		return err
+	}
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return err
+	}
+	if err = fileOp.WriteFile(configPath, strings.NewReader(req.Content), fileInfo.Mode()); err != nil {
+		return err
+	}
+	if err = controller.HandleRestart(serviceName); err != nil {
+		_ = fileOp.WriteFile(configPath, bytes.NewReader(oldContent), fileInfo.Mode())
+		return err
 	}
 
-	return res, nil
+	return nil
 }
 
 func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcessConfig) error {
@@ -451,7 +462,19 @@ func (h *HostToolService) OperateSupervisorProcessFile(req request.SupervisorPro
 	return handleSupervisorFile(req, includeDir, "", "")
 }
 
+func (h *HostToolService) GetSupervisorProcessFile(req request.HostSupervisorProcessFileGetReq) (string, error) {
+	return h.OperateSupervisorProcessFile(request.SupervisorProcessFileReq{
+		Name:    req.Name,
+		Operate: "get",
+		File:    req.File,
+	})
+}
+
 func handleSupervisorFile(req request.SupervisorProcessFileReq, includeDir, containerName, logFile string) (string, error) {
+	safeName := path.Base(req.Name)
+	if safeName != req.Name || strings.Contains(safeName, "..") {
+		return "", buserr.New("ErrInvalidParams")
+	}
 	var (
 		fileOp     = files.NewFileOp()
 		group      = fmt.Sprintf("program:%s", req.Name)
@@ -550,8 +573,8 @@ func operateSupervisorCtl(operate, name, group, includeDir, containerName string
 		err    error
 	)
 	if containerName != "" {
-		cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(30 * time.Second))
-		output, err = cmdMgr.RunWithStdoutBashCf("docker exec  %s supervisorctl %s", containerName, strings.Join(processNames, " "))
+		args := append([]string{"supervisorctl"}, processNames...)
+		output, err = cmd.RunDockerExecWithStdout(30*time.Second, containerName, args...)
 	} else {
 		var out []byte
 		out, err = exec.Command("supervisorctl", processNames...).Output()
@@ -593,8 +616,8 @@ func getProcessStatus(config *response.SupervisorProcessConfig, containerName st
 	)
 	processNames = append(processNames, getProcessName(config.Name, config.Numprocs)...)
 	if containerName != "" {
-		cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(3 * time.Second))
-		output, err = cmdMgr.RunWithStdoutBashCf("docker exec %s supervisorctl %s", containerName, strings.Join(processNames, " "))
+		args := append([]string{"supervisorctl"}, processNames...)
+		output, err = cmd.RunDockerExecWithStdout(3*time.Second, containerName, args...)
 	} else {
 		var out []byte
 		out, err = exec.Command("supervisorctl", processNames...).Output()

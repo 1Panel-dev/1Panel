@@ -15,7 +15,7 @@
             v-loading="loading"
         >
             <el-form-item>
-                <el-button @click="importRef.acceptParams()" type="primary" plain>
+                <el-button v-permission @click="importRef.acceptParams()" type="primary" plain>
                     {{ $t('aiTools.mcp.importMcpJson') }}
                 </el-button>
             </el-form-item>
@@ -60,7 +60,7 @@
                         </el-col>
                         <el-col :span="4">
                             <el-form-item>
-                                <el-button type="primary" @click="removeEnv(index)" link class="mt-1">
+                                <el-button v-permission type="primary" @click="removeEnv(index)" link class="mt-1">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </el-form-item>
@@ -68,7 +68,9 @@
                     </el-row>
                     <el-row :gutter="20">
                         <el-col :span="4">
-                            <el-button class="mb-2" @click="addEnv">{{ $t('commons.button.add') }}</el-button>
+                            <el-button v-permission class="mb-2" @click="addEnv">
+                                {{ $t('commons.button.add') }}
+                            </el-button>
                         </el-col>
                     </el-row>
                 </div>
@@ -128,7 +130,7 @@
         <template #footer>
             <span>
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(mcpServerForm)" :disabled="loading">
+                <el-button v-permission type="primary" @click="submit(mcpServerForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

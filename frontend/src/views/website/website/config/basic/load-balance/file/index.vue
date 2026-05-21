@@ -3,13 +3,13 @@
         v-model="open"
         :header="$t('website.sourceFile')"
         @close="handleClose"
-        :size="mobile ? 'full' : 'normal'"
+        :size="isMobile ? 'full' : 'normal'"
     >
         <CodemirrorPro v-model="req.content" mode="nginx"></CodemirrorPro>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit()" :disabled="loading">
+                <el-button v-permission type="primary" @click="submit()" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -20,17 +20,14 @@
 <script lang="ts" setup>
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
-import { computed, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { updateLoadBalanceFile } from '@/api/modules/website';
-import { GlobalStore } from '@/store';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { Website } from '@/api/interface/website';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+const { isMobile } = useGlobalStore();
 
 const proxyForm = ref<FormInstance>();
 const open = ref(false);

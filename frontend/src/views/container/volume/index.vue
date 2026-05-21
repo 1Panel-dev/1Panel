@@ -9,13 +9,13 @@
 
         <LayoutContent v-if="isExist" :title="$t('container.volume', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
-                <el-button type="primary" @click="onCreate()">
+                <el-button v-permission type="primary" @click="onCreate()">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="onClean()">
+                <el-button v-permission type="primary" plain @click="onClean()">
                     {{ $t('container.volumePrune') }}
                 </el-button>
-                <el-button :disabled="selects.length === 0" @click="batchDelete(null)">
+                <el-button v-permission :disabled="selects.length === 0" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -36,7 +36,7 @@
                     <el-table-column
                         :label="$t('commons.table.name')"
                         min-width="100"
-                        :width="mobile ? 220 : 'auto'"
+                        :width="isMobile ? 220 : 'auto'"
                         prop="name"
                         fix
                         show-overflow-tooltip
@@ -87,6 +87,7 @@
                         <template #default="{ row }">
                             <el-tooltip :content="row.mountpoint">
                                 <el-button
+                                    v-permission:view="'host_file_view'"
                                     type="primary"
                                     icon="FolderOpened"
                                     link
@@ -124,7 +125,7 @@
 import CreateDialog from '@/views/container/volume/create/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
 import { deleteVolume, searchVolume, inspect, containerPrune } from '@/api/modules/container';
@@ -132,16 +133,13 @@ import { Container } from '@/api/interface/container';
 import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
-import { GlobalStore } from '@/store';
 import { routerToFileWithPath } from '@/utils/router';
 import { checkFile } from '@/api/modules/files';
 import { MsgError } from '@/utils/message';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
 const taskLogRef = ref();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const loading = ref();
 const myDetail = ref();
@@ -261,6 +259,7 @@ const batchDelete = async (row: Container.VolumeInfo | null) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: Container.VolumeInfo) => {
             batchDelete(row);
         },

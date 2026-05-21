@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <LayoutContent :title="$t('database.remoteDB', 2)" backName="PostgreSQL">
             <template #leftToolBar>
-                <el-button type="primary" @click="onOpenDialog('create')">
+                <el-button v-permission type="primary" @click="onOpenDialog('create')">
                     {{ $t('database.createRemoteDB') }}
                 </el-button>
             </template>
@@ -152,12 +152,14 @@ const onDelete = async (row: Database.DatabaseInfo) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: (row: Database.DatabaseInfo) => {
             onOpenDialog('edit', row);
         },
     },
     {
         label: i18n.global.t('commons.button.unbind'),
+        permission: true,
         click: (row: Database.DatabaseInfo) => {
             onDelete(row);
         },

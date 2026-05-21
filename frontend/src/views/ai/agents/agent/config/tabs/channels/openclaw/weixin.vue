@@ -16,7 +16,13 @@
         />
         <template v-if="installed">
             <el-form-item class="mt-4">
-                <el-button type="primary" :loading="loggingIn" :disabled="!installed" @click="loginChannel">
+                <el-button
+                    v-permission
+                    type="primary"
+                    :loading="loggingIn"
+                    :disabled="!installed"
+                    @click="loginChannel"
+                >
                     {{ t('aiTools.agents.scanConnect') }}
                 </el-button>
             </el-form-item>

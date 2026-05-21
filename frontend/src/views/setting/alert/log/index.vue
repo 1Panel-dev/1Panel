@@ -4,7 +4,7 @@
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">
-                        <el-button type="primary" @click="syncAll" v-if="isProductPro && !globalStore.isIntl">
+                        <el-button type="primary" @click="syncAll" v-if="isProductPro && !isIntl">
                             {{ $t('commons.button.sync') }}
                         </el-button>
                         <el-button type="primary" plain @click="onClean">{{ $t('xpack.alert.cleanLog') }}</el-button>
@@ -61,12 +61,12 @@
                         </template>
                     </el-table-column>
                     <fu-table-operations
-                        v-if="isProductPro && !globalStore.isIntl"
+                        v-if="isProductPro && !isIntl"
                         :ellipsis="2"
                         width="130px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        :fixed="mobile ? false : 'right'"
+                        :fixed="isMobile ? false : 'right'"
                         fix
                     />
                 </ComplexTable>
@@ -76,11 +76,10 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref, computed } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
-import { GlobalStore } from '@/store';
 import { Alert } from '@/api/interface/alert';
 import {
     SearchAlertLogs,
@@ -91,10 +90,10 @@ import {
     ListAlertConfigs,
 } from '@/api/modules/alert';
 import { ElMessageBox } from 'element-plus';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { isMobile, isProductPro, isIntl, isMaster } = useGlobalStore();
 const { t } = i18n.global;
-const isProductPro = ref(false);
 const loading = ref(false);
 const data = ref();
 const isOffline = ref('Disable');
@@ -124,9 +123,6 @@ const req = reactive({
     message: '',
     CreatedAt: '',
     status: '',
-});
-const mobile = computed(() => {
-    return globalStore.isMobile();
 });
 
 const buttons = [
@@ -162,7 +158,7 @@ const syncAlert = (row: Alert.AlertLog) => {
         confirmButtonText: t('commons.button.confirm'),
         cancelButtonText: t('commons.button.cancel'),
     }).then(async () => {
-        if (!globalStore.isMaster && isOffline.value == 'Enable') {
+        if (!isMaster.value && isOffline.value == 'Enable') {
             await SyncOfflineAlert();
         } else {
             await SyncAlertInfo({ id: row.id });
@@ -274,7 +270,7 @@ const syncAll = async () => {
 };
 
 const syncAllAlert = async () => {
-    if (!globalStore.isMaster && isOffline.value == 'Enable') {
+    if (!isMaster.value && isOffline.value == 'Enable') {
         await SyncOfflineAlert();
     } else {
         await SyncAlertAll();
@@ -302,7 +298,7 @@ const onClean = async () => {
 };
 
 const searchAlertInfo = async () => {
-    if (!globalStore.isMaster) {
+    if (!isMaster.value) {
         loading.value = true;
         try {
             const res = await ListAlertConfigs();
@@ -318,8 +314,7 @@ const searchAlertInfo = async () => {
 
 onMounted(async () => {
     await searchAlertInfo();
-    isProductPro.value = globalStore.isProductPro;
-    if (globalStore.isProductPro && !globalStore.isIntl) {
+    if (isProductPro.value && !isIntl.value) {
         await syncAllAlert();
     }
 });

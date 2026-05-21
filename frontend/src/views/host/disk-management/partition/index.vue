@@ -30,20 +30,20 @@
             <el-form-item :label="$t('disk.mountPoint')" prop="mountPoint">
                 <el-input v-model="form.mountPoint">
                     <template #prepend>
-                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
+                        <el-button icon="Folder" v-permission @click="fileRef.acceptParams({ dir: true })" />
                     </template>
                 </el-input>
             </el-form-item>
             <el-form-item :label="$t('disk.autoMount')" prop="autoMount">
-                <el-switch v-model="form.autoMount" />
+                <el-switch v-permission v-model="form.autoMount" />
             </el-form-item>
             <el-form-item :label="$t('disk.noFail')" prop="noFail" v-if="form.autoMount">
-                <el-switch v-model="form.noFail" />
+                <el-switch v-permission v-model="form.noFail" />
             </el-form-item>
         </el-form>
         <template #footer>
             <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button type="primary" @click="submit" :disabled="loading">
+            <el-button v-permission type="primary" @click="submit" :disabled="loading">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>

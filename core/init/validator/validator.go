@@ -20,7 +20,37 @@ func Init() {
 	if err := validator.RegisterValidation("password", checkPasswordPattern); err != nil {
 		panic(err)
 	}
+	if err := validator.RegisterValidation("base_setting_key", checkBaseSettingKey); err != nil {
+		panic(err)
+	}
 	global.VALID = validator
+}
+
+var baseSettingKeys = map[string]struct{}{
+	"PanelName":                  {},
+	"Theme":                      {},
+	"MenuTabs":                   {},
+	"Language":                   {},
+	"DeveloperMode":              {},
+	"UpgradeBackupCopies":        {},
+	"SecurityEntrance":           {},
+	"BindDomain":                 {},
+	"AllowIPs":                   {},
+	"PasskeyTrustedProxies":      {},
+	"ComplexityVerification":     {},
+	"NoAuthSetting":              {},
+	"DashboardMemoVisible":       {},
+	"DashboardSimpleNodeVisible": {},
+	"Edition":                    {},
+	"DocSource":                  {},
+	"IsOffline":                  {},
+	"AppStoreLastModified":       {},
+	"ScriptSync":                 {},
+	"HideMenu":                   {},
+	"OpsReportExportFormat":      {},
+	"OpsReportSchedule":          {},
+	"OpsReportSavePath":          {},
+	"OpsReportThreshold":         {},
 }
 
 func checkNamePattern(fl validator.FieldLevel) bool {
@@ -62,4 +92,9 @@ func checkPasswordPattern(fl validator.FieldLevel) bool {
 	}
 
 	return false
+}
+
+func checkBaseSettingKey(fl validator.FieldLevel) bool {
+	_, ok := baseSettingKeys[fl.Field().String()]
+	return ok
 }

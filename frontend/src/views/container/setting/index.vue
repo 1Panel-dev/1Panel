@@ -17,14 +17,14 @@
                         <el-tag>{{ $t('app.version') }}: {{ form.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
-                        <el-button v-if="isActive" type="primary" @click="onOperator('stop')" link>
+                        <el-button v-if="isActive" type="primary" v-permission @click="onOperator('stop')" link>
                             {{ $t('commons.operate.stop') }}
                         </el-button>
-                        <el-button v-if="!isActive" type="primary" @click="onOperator('start')" link>
+                        <el-button v-if="!isActive" type="primary" v-permission @click="onOperator('start')" link>
                             {{ $t('commons.operate.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" @click="onOperator('restart')" link>
+                        <el-button v-permission type="primary" @click="onOperator('restart')" link>
                             {{ $t('commons.button.restart') }}
                         </el-button>
                     </div>
@@ -43,7 +43,7 @@
                     <el-col :xs="24" :sm="24" :md="15" :lg="12" :xl="10">
                         <el-form
                             :model="form"
-                            :label-position="mobile ? 'top' : 'left'"
+                            :label-position="isMobile ? 'top' : 'left'"
                             :rules="rules"
                             ref="formRef"
                             label-width="auto"
@@ -57,19 +57,24 @@
                                         v-model="form.mirrors"
                                         style="width: calc(100% - 80px)"
                                     />
-                                    <el-button @click="onChangeMirrors" icon="Setting" class="custom-input-textarea">
+                                    <el-button
+                                        v-permission
+                                        @click="onChangeMirrors"
+                                        icon="Setting"
+                                        class="custom-input-textarea"
+                                    >
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                 </div>
                                 <el-input disabled v-if="!form.mirrors" v-model="unset">
                                     <template #append>
-                                        <el-button @click="onChangeMirrors" icon="Setting">
+                                        <el-button v-permission @click="onChangeMirrors" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
                                 </el-input>
                                 <span class="input-help">{{ $t('container.mirrorsHelper') }}</span>
-                                <span class="input-help flex flx-align-center" v-if="!globalStore.isFxplay">
+                                <span class="input-help flex flx-align-center" v-if="!isFxplay">
                                     {{ $t('container.mirrorsHelper2') }}
                                     <el-link class="p-ml-5 text-xs" icon="Position" @click="toDoc()" type="primary">
                                         {{ $t('firewall.quickJump') }}
@@ -85,13 +90,13 @@
                                         v-model="form.registries"
                                         style="width: calc(100% - 80px)"
                                     />
-                                    <el-button @click="onChangeRegistries" icon="Setting">
+                                    <el-button v-permission @click="onChangeRegistries" icon="Setting">
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                 </div>
                                 <el-input disabled v-if="!form.registries" v-model="unset">
                                     <template #append>
-                                        <el-button @click="onChangeRegistries" icon="Setting">
+                                        <el-button v-permission @click="onChangeRegistries" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -99,7 +104,7 @@
                             </el-form-item>
 
                             <el-form-item label="IPv6" prop="ipv6">
-                                <el-switch v-model="form.ipv6" @change="handleIPv6"></el-switch>
+                                <el-switch v-permission v-model="form.ipv6" @change="handleIPv6"></el-switch>
                                 <span class="input-help"></span>
                                 <div v-if="ipv6OptionShow">
                                     <el-tag>{{ $t('container.subnet') }}: {{ form.fixedCidrV6 }}</el-tag>
@@ -112,7 +117,11 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('container.cutLog')" prop="hasLogOption">
-                                <el-switch v-model="form.logOptionShow" @change="handleLogOption"></el-switch>
+                                <el-switch
+                                    v-permission
+                                    v-model="form.logOptionShow"
+                                    @change="handleLogOption"
+                                ></el-switch>
                                 <span class="input-help"></span>
                                 <div v-if="logOptionShow">
                                     <el-tag>{{ $t('container.maxSize') }}: {{ form.logMaxSize }}</el-tag>
@@ -126,11 +135,12 @@
                             </el-form-item>
 
                             <el-form-item label="iptables" prop="iptables">
-                                <el-switch v-model="form.iptables" @change="handleIptables"></el-switch>
+                                <el-switch v-permission v-model="form.iptables" @change="handleIptables"></el-switch>
                                 <span class="input-help">{{ $t('container.iptablesHelper1') }}</span>
                             </el-form-item>
                             <el-form-item label="Live restore" prop="liveRestore">
                                 <el-switch
+                                    v-permission
                                     :disabled="form.isSwarm"
                                     v-model="form.liveRestore"
                                     @change="handleLive"
@@ -141,7 +151,7 @@
                                 </span>
                             </el-form-item>
                             <el-form-item label="Cgroup Driver" prop="cgroupDriver">
-                                <el-radio-group v-model="form.cgroupDriver" @change="handleCgroup">
+                                <el-radio-group v-permission v-model="form.cgroupDriver" @change="handleCgroup">
                                     <el-radio value="cgroupfs">cgroupfs</el-radio>
                                     <el-radio value="systemd">systemd</el-radio>
                                 </el-radio-group>
@@ -149,7 +159,7 @@
                             <el-form-item :label="$t('container.sockPath')" prop="dockerSockPath">
                                 <el-input disabled v-model="form.dockerSockPath">
                                     <template #append>
-                                        <el-button @click="onChangeSockPath" icon="Setting">
+                                        <el-button v-permission @click="onChangeSockPath" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -169,7 +179,7 @@
                         mode="json"
                         placeholder="# The Docker configuration file does not exist or is empty"
                     ></CodemirrorPro>
-                    <el-button :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
+                    <el-button v-permission :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>
@@ -199,6 +209,7 @@
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button
+                        v-permission
                         :disabled="submitInput !== $t('database.restartNow')"
                         type="primary"
                         @click="onSubmitCloseIPtable"
@@ -226,7 +237,7 @@
 
 <script lang="ts" setup>
 import { ElMessageBox, FormInstance } from 'element-plus';
-import { onMounted, reactive, ref, computed } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import Mirror from '@/views/container/setting/mirror/index.vue';
 import Registry from '@/views/container/setting/registry/index.vue';
@@ -246,12 +257,10 @@ import {
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { checkNumberRange } from '@/global/form-rules';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+const { docsUrl, isFxplay, isMobile, openMenuTabs } = useGlobalStore();
+
 const unset = ref(i18n.global.t('setting.unSetting'));
 const submitInput = ref();
 
@@ -316,7 +325,7 @@ const onSaveFile = async () => {
 };
 
 const loadHeight = () => {
-    return globalStore.openMenuTabs ? 450 : 430;
+    return openMenuTabs.value ? 450 : 430;
 };
 
 const onChangeMirrors = () => {
@@ -425,7 +434,7 @@ const save = async (key: string, value: string) => {
 };
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/containers/setting/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/containers/setting/', '_blank', 'noopener,noreferrer');
 };
 
 const onOperator = async (operation: string) => {

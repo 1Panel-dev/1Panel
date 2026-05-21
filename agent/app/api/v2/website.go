@@ -330,25 +330,45 @@ func (b *BaseApi) UpdateWebsiteNginxConfig(c *gin.Context) {
 }
 
 // @Tags Website
-// @Summary Operate website log
+// @Summary Get website log
 // @Accept json
-// @Param request body request.WebsiteLogReq true "request"
+// @Param request body request.WebsiteLogSearchReq true "request"
 // @Success 200 {object} response.WebsiteLog
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /websites/log [post]
+// @Router /websites/log/search [post]
+func (b *BaseApi) GetWebsiteLog(c *gin.Context) {
+	var req request.WebsiteLogSearchReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := websiteService.GetWebsiteLog(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Operate website log
+// @Accept json
+// @Param request body request.WebsiteLogReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/log/operate [post]
 // @x-panel-log {"bodyKeys":["id", "operate"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[domain][operate] 日志","formatEN":"[domain][operate] logs"}
 func (b *BaseApi) OpWebsiteLog(c *gin.Context) {
 	var req request.WebsiteLogReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	res, err := websiteService.OpWebsiteLog(req)
-	if err != nil {
+	if err := websiteService.OpWebsiteLog(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, res)
+	helper.Success(c)
 }
 
 // @Tags Website

@@ -1,13 +1,14 @@
 import http from '@/api';
 import { ResPage } from '../interface';
 import { Log } from '../interface/log';
+import { TimeoutEnum } from '@/enums/http-enum';
 
 export const getOperationLogs = (info: Log.SearchOpLog) => {
     return http.post<ResPage<Log.OperationLog>>(`/core/logs/operation`, info);
 };
 
 export const getLoginLogs = (info: Log.SearchLgLog) => {
-    return http.post<ResPage<Log.OperationLog>>(`/core/logs/login`, info);
+    return http.post<ResPage<Log.LoginLogs>>(`/core/logs/login`, info);
 };
 
 export const getSystemFiles = (node?: string) => {
@@ -22,6 +23,11 @@ export const cleanLogs = (param: Log.CleanLog) => {
 export const searchTasks = (req: Log.SearchTaskReq, node?: string) => {
     const params = node ? `?operateNode=${node}` : '';
     return http.post<ResPage<Log.Task>>(`/logs/tasks/search${params}`, req);
+};
+
+export const readTaskLogByLine = (req: Log.TaskLogReadReq, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.post<any>(`/logs/tasks/read${params}`, req, TimeoutEnum.T_40S);
 };
 
 export const countExecutingTask = () => {

@@ -6,18 +6,18 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
+	appauth "github.com/1Panel-dev/1Panel/core/app/auth"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
-	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
-	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/gin-gonic/gin"
 )
 
@@ -37,17 +37,13 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 }
 
 // @Tags System Setting
-// @Summary Load system setting by key
-// @Success 200 {string} info
+// @Summary Load base system setting info
+// @Success 200 {object} dto.SettingBaseInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /core/settings/by [post]
-func (b *BaseApi) GetSettingByKey(c *gin.Context) {
-	var req dto.SettingKey
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-	setting, err := repo.NewISettingRepo().GetValueByKey(req.Key)
+// @Router /core/settings/search/base [post]
+func (b *BaseApi) GetSettingBaseInfo(c *gin.Context) {
+	setting, err := settingService.GetSettingBaseInfo()
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -108,13 +104,57 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 		}
 		req.Value = value
 	}
+	if req.Key == "OpsReportExportFormat" {
+		if !global.CONF.Base.IsEnterprise {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrNotSupportType", errors.New(req.Key))
+			return
+		}
+		if _, ok := constant.OpsReportExportFormats[req.Value]; !ok {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrNotSupportType", errors.New(req.Value))
+			return
+		}
+	}
+	if req.Key == "OpsReportSchedule" {
+		if !global.CONF.Base.IsEnterprise {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrNotSupportType", errors.New(req.Key))
+			return
+		}
+		if _, ok := constant.OpsReportSchedules[req.Value]; !ok {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrNotSupportType", errors.New(req.Value))
+			return
+		}
+	}
+	if req.Key == "OpsReportSavePath" {
+		if !global.CONF.Base.IsEnterprise {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrNotSupportType", errors.New(req.Key))
+			return
+		}
+		value := strings.TrimSpace(req.Value)
+		if value == "" || !filepath.IsAbs(value) {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", errors.New(req.Value))
+			return
+		}
+		req.Value = filepath.Clean(value)
+	}
+	if req.Key == "OpsReportThreshold" {
+		if !global.CONF.Base.IsEnterprise {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrNotSupportType", errors.New(req.Key))
+			return
+		}
+		threshold, err := strconv.Atoi(strings.TrimSpace(req.Value))
+		if err != nil || threshold < 1 || threshold > 100 {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", errors.New(req.Value))
+			return
+		}
+		req.Value = strconv.Itoa(threshold)
+	}
 
-	if err := settingService.Update(req.Key, req.Value); err != nil {
+	if err := settingService.Update(c, req.Key, req.Value); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
 	if req.Key == "SecurityEntrance" {
-		service.SetSecurityEntranceCookie(c, req.Value)
+		appauth.SetSecurityEntranceCookie(c, req.Value)
 	}
 	helper.Success(c)
 }
@@ -187,7 +227,7 @@ func (b *BaseApi) UpdateMenu(c *gin.Context) {
 		return
 	}
 
-	if err := settingService.Update(req.Key, req.Value); err != nil {
+	if err := settingService.Update(c, req.Key, req.Value); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -204,28 +244,6 @@ func (b *BaseApi) UpdateMenu(c *gin.Context) {
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"初始化菜单","formatEN":"Init menu."}
 func (b *BaseApi) DefaultMenu(c *gin.Context) {
 	if err := settingService.DefaultMenu(); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags System Setting
-// @Summary Update system password
-// @Accept json
-// @Param request body dto.PasswordUpdate true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/password/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改系统密码","formatEN":"update system password"}
-func (b *BaseApi) UpdatePassword(c *gin.Context) {
-	var req dto.PasswordUpdate
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	if err := settingService.UpdatePassword(c, req.OldPassword, req.NewPassword); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -345,170 +363,6 @@ func (b *BaseApi) UpdatePort(c *gin.Context) {
 	helper.Success(c)
 }
 
-// @Tags System Setting
-// @Summary Reset system password expired
-// @Accept json
-// @Param request body dto.PasswordUpdate true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/expired/handle [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"重置过期密码","formatEN":"reset an expired Password"}
-func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
-	var req dto.PasswordUpdate
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	if err := settingService.HandlePasswordExpired(c, req.OldPassword, req.NewPassword); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags System Setting
-// @Summary Load mfa info
-// @Accept json
-// @Param request body dto.MfaCredential true "request"
-// @Success 200 {object} mfa.Otp
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/mfa [post]
-func (b *BaseApi) LoadMFA(c *gin.Context) {
-	var req dto.MfaRequest
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	otp, err := mfa.GetOtp("admin", req.Title, req.Interval)
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-
-	helper.SuccessWithData(c, otp)
-}
-
-// @Tags System Setting
-// @Summary Bind mfa
-// @Accept json
-// @Param request body dto.MfaCredential true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/mfa/bind [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"mfa 绑定","formatEN":"bind mfa"}
-func (b *BaseApi) MFABind(c *gin.Context) {
-	var req dto.MfaCredential
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	success := mfa.ValidCode(req.Code, req.Interval, req.Secret)
-	if !success {
-		helper.InternalServer(c, errors.New("code is not valid"))
-		return
-	}
-
-	if err := settingService.Update("MFAInterval", req.Interval); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-
-	if err := settingService.Update("MFAStatus", constant.StatusEnable); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-
-	if err := settingService.Update("MFASecret", req.Secret); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-
-	helper.Success(c)
-}
-
-// @Tags System Setting
-// @Summary Begin passkey registration
-// @Accept json
-// @Param request body dto.PasskeyRegisterRequest true "request"
-// @Success 200 {object} dto.PasskeyBeginResponse
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/passkey/register/begin [post]
-func (b *BaseApi) PasskeyRegisterBegin(c *gin.Context) {
-	var req dto.PasskeyRegisterRequest
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-	res, msgKey, err := authService.PasskeyBeginRegister(c, req.Name)
-	if msgKey != "" {
-		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
-		return
-	}
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, res)
-}
-
-// @Tags System Setting
-// @Summary Finish passkey registration
-// @Accept json
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/passkey/register/finish [post]
-func (b *BaseApi) PasskeyRegisterFinish(c *gin.Context) {
-	sessionID := c.GetHeader("Passkey-Session")
-	msgKey, err := authService.PasskeyFinishRegister(c, sessionID)
-	if msgKey != "" {
-		helper.ErrorWithDetail(c, http.StatusBadRequest, msgKey, err)
-		return
-	}
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags System Setting
-// @Summary List passkeys
-// @Success 200 {array} dto.PasskeyInfo
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/passkey/list [get]
-func (b *BaseApi) PasskeyList(c *gin.Context) {
-	list, err := authService.PasskeyList()
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, list)
-}
-
-// @Tags System Setting
-// @Summary Delete passkey
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/passkey/{id} [delete]
-func (b *BaseApi) PasskeyDelete(c *gin.Context) {
-	id := c.Param("id")
-	if id == "" {
-		helper.BadRequest(c, errors.New("passkey id is required"))
-		return
-	}
-	if err := authService.PasskeyDelete(id); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
 func (b *BaseApi) ReloadSSL(c *gin.Context) {
 	clientIP := c.ClientIP()
 	if clientIP != "127.0.0.1" {
@@ -516,55 +370,6 @@ func (b *BaseApi) ReloadSSL(c *gin.Context) {
 		return
 	}
 	if err := settingService.UpdateSystemSSL(); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags System Setting
-// @Summary generate api key
-// @Accept json
-// @Success 200 {string} key
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/api/config/generate/key [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"生成 API 接口密钥","formatEN":"generate api key"}
-func (b *BaseApi) GenerateApiKey(c *gin.Context) {
-	panelToken := c.GetHeader("1Panel-Token")
-	if panelToken != "" {
-		helper.BadAuth(c, "ErrApiConfigDisable", nil)
-		return
-	}
-	apiKey, err := settingService.GenerateApiKey()
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, apiKey)
-}
-
-// @Tags System Setting
-// @Summary Update api config
-// @Accept json
-// @Param request body dto.ApiInterfaceConfig true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/settings/api/config/update [post]
-// @x-panel-log {"bodyKeys":["ipWhiteList"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 API 接口配置 => IP 白名单: [ipWhiteList]","formatEN":"update api config => IP White List: [ipWhiteList]"}
-func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
-	panelToken := c.GetHeader("1Panel-Token")
-	if panelToken != "" {
-		helper.BadAuth(c, "ErrApiConfigDisable", nil)
-		return
-	}
-	var req dto.ApiInterfaceConfig
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	if err := settingService.UpdateApiConfig(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

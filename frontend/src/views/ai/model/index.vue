@@ -14,18 +14,23 @@ import LocalView from '@/views/ai/model/local/index.vue';
 
 const route = useRoute();
 
-const buttons = [
-    {
-        label: i18n.global.t('aiTools.agents.account'),
-        path: '/ai/model/account',
-    },
-    {
-        label: i18n.global.t('aiTools.model.localModel'),
-        path: '/ai/model/local',
-    },
-];
+const buttons = computed<RouterButton[]>(() => {
+    return [
+        {
+            label: i18n.global.t('aiTools.agents.account'),
+            path: '/ai/model/account',
+        },
+        {
+            label: i18n.global.t('aiTools.model.localModel'),
+            path: '/ai/model/local',
+        },
+    ];
+});
 
 const currentComponent = computed(() => {
-    return route.path === '/ai/model/local' ? LocalView : AccountView;
+    if (route.path === '/ai/model/local') {
+        return LocalView;
+    }
+    return AccountView;
 });
 </script>

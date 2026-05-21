@@ -14,9 +14,13 @@ import (
 )
 
 type SessionUser struct {
-	ID   uint   `json:"id"`
+	ID   string `json:"id"`
+	Role string `json:"role"`
 	Name string `json:"name"`
 }
+
+const SuperAdminSessionUserID = "__super_admin__"
+const GinContextSessionUserKey = "session_user"
 
 type sessionItem struct {
 	CreatedAt time.Time
@@ -32,7 +36,7 @@ type PSession struct {
 	lastFullCleanup time.Time
 }
 
-const maxSessionEntries = 64
+const maxSessionEntries = 1024
 
 func NewPSession(_ string) *PSession {
 	return &PSession{
@@ -197,6 +201,20 @@ func (p *PSession) CheckCSRFToken(c *gin.Context, token string) bool {
 		return false
 	}
 	return item.CSRFToken == token
+}
+
+func (p *PSession) DeleteByID(id string) error {
+	if id == "" {
+		return nil
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	for sessionID, item := range p.sessions {
+		if item.User.ID == id {
+			delete(p.sessions, sessionID)
+		}
+	}
+	return nil
 }
 
 func (p *PSession) Clean() error {

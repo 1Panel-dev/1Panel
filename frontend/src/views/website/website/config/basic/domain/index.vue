@@ -1,7 +1,7 @@
 <template>
     <ComplexTable :data="data" @search="search" v-loading="loading" :heightDiff="400">
         <template #toolbar>
-            <el-button type="primary" plain @click="openCreate">{{ $t('website.addDomain') }}</el-button>
+            <el-button v-permission type="primary" plain @click="openCreate">{{ $t('website.addDomain') }}</el-button>
         </template>
         <el-table-column width="30px">
             <template #default="{ row }">
@@ -17,14 +17,14 @@
         <el-table-column :label="$t('commons.table.port')" prop="port"></el-table-column>
         <el-table-column :label="'SSL'" prop="ssl">
             <template #default="{ row }">
-                <el-switch v-model="row.ssl" @change="update(row)" :disabled="row.port == 80" />
+                <el-switch v-permission v-model="row.ssl" @change="update(row)" :disabled="row.port == 80" />
             </template>
         </el-table-column>
         <fu-table-operations
             :ellipsis="1"
             :buttons="buttons"
             :label="$t('commons.table.operate')"
-            :fixed="mobile ? false : 'right'"
+            :fixed="isMobile ? false : 'right'"
             fix
         />
     </ComplexTable>
@@ -39,12 +39,12 @@ import { deleteDomain, getWebsite, listDomains, updateDomain } from '@/api/modul
 import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import { Promotion } from '@element-plus/icons-vue';
-import { GlobalStore } from '@/store';
 import { checkAppInstalled } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import { GetPunyCodeDomain, isPunycoded } from '@/utils/misc';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
 const props = defineProps({
     id: {
         type: Number,
@@ -53,9 +53,6 @@ const props = defineProps({
 });
 const id = computed(() => {
     return props.id;
-});
-const mobile = computed(() => {
-    return globalStore.isMobile();
 });
 let loading = ref(false);
 const data = ref<Website.Domain[]>([]);
@@ -68,6 +65,7 @@ const httpsPort = ref(443);
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.Domain) {
             deleteWebsiteDomain(row);
         },

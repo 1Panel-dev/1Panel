@@ -49,7 +49,7 @@
                         @size-change="sizeChange"
                         @current-change="currentChange"
                         :pager-count="responsivePagerCount"
-                        :size="mobile || paginationConfig.small ? 'small' : 'default'"
+                        :size="isMobile || paginationConfig.small ? 'small' : 'default'"
                         :layout="responsivePaginationLayout"
                     />
                 </slot>
@@ -75,8 +75,10 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 const slots = useSlots();
+
+const { isMobile, openMenuTabs } = useGlobalStore();
 
 defineOptions({ name: 'ComplexTable' });
 export interface DropdownProps {
@@ -105,10 +107,6 @@ const props = defineProps({
     },
 });
 const emit = defineEmits(['search', 'update:selects', 'update:paginationConfig']);
-const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 const tableRef = ref();
 const tableHeight = ref<number | string>('');
 const menuRef = ref<HTMLElement | null>(null);
@@ -125,6 +123,25 @@ const rightClick = ref({
 });
 const selectedRows = ref<any[]>([]);
 const handleRightClick = (row, column, event) => {
+    if (!tableRef.value) return;
+
+    try {
+        const selectionColumn = tableRef.value.refElTable.columns.find((col) => col.type === 'selection');
+        const isSelectable = selectionColumn?.selectable ? selectionColumn.selectable(row) : true;
+        if (!isSelectable) {
+            if (!props.rightButtons) return;
+            event.preventDefault();
+            rightClick.value = {
+                visible: true,
+                left: event.clientX + 5,
+                top: event.clientY,
+                currentRow: row,
+            };
+            document.addEventListener('click', closeRightClick);
+            return;
+        }
+    } catch {}
+
     if (!selectedRows.value.includes(row)) {
         clearSelects();
         tableRef.value.refElTable.toggleRowSelection(row);
@@ -206,7 +223,7 @@ const updatePaginationWidth = () => {
 };
 
 const responsivePaginationLayout = computed(() => {
-    if (mobile.value || props.paginationConfig?.small) {
+    if (isMobile.value || props.paginationConfig?.small) {
         return 'total, prev, pager, next';
     }
     if (paginationWidth.value < 520) {
@@ -216,7 +233,7 @@ const responsivePaginationLayout = computed(() => {
 });
 
 const responsivePagerCount = computed(() => {
-    if (mobile.value || props.paginationConfig?.small || paginationWidth.value < 720) {
+    if (isMobile.value || props.paginationConfig?.small || paginationWidth.value < 720) {
         return 5;
     }
     return 7;
@@ -283,7 +300,7 @@ defineExpose({
 
 function calcHeight() {
     let heightDiff = props.heightDiff ?? 320;
-    let tabHeight = globalStore.openMenuTabs ? 48 : 0;
+    let tabHeight = openMenuTabs.value ? 48 : 0;
 
     if (props.height) {
         tableHeight.value = props.height - tabHeight;

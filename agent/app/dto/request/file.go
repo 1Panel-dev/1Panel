@@ -162,10 +162,17 @@ type FileRoleUpdate struct {
 type FileReadByLineReq struct {
 	Page     int    `json:"page" validate:"required"`
 	PageSize int    `json:"pageSize" validate:"required"`
-	Type     string `json:"type" validate:"required"`
+	Type     string `json:"type"`
 	ID       uint   `json:"ID"`
 	Name     string `json:"name"`
 	Latest   bool   `json:"latest"`
+	TaskReq
+}
+
+type TaskLogReadReq struct {
+	Page     int  `json:"page" validate:"required,min=1"`
+	PageSize int  `json:"pageSize" validate:"required,min=1"`
+	Latest   bool `json:"latest"`
 	TaskReq
 }
 

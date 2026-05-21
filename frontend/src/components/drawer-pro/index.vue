@@ -4,6 +4,7 @@
         @close="handleClose"
         :destroy-on-close="true"
         :before-close="beforeClose"
+        append-to-body
         :size="isFull ? '100%' : size"
         :close-on-press-escape="autoClose"
         :close-on-click-modal="autoClose"
@@ -58,9 +59,8 @@
 import { computed, useSlots, ref } from 'vue';
 defineOptions({ name: 'DrawerPro' });
 import i18n from '@/lang';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
-const drawerContent = ref();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isFullScreen } = useGlobalStore();
 
 const isFull = ref();
 
@@ -131,7 +131,7 @@ const handleBack = () => {
                 props.back();
             } else {
                 localOpenPage.value = false;
-                globalStore.isFullScreen = false;
+                isFullScreen.value = false;
             }
         };
         emit('beforeClose', done);
@@ -140,14 +140,14 @@ const handleBack = () => {
             props.back();
         } else {
             localOpenPage.value = false;
-            globalStore.isFullScreen = false;
+            isFullScreen.value = false;
         }
     }
 };
 
 const handleClose = () => {
     localOpenPage.value = false;
-    globalStore.isFullScreen = false;
+    isFullScreen.value = false;
     emit('close');
 };
 
@@ -160,10 +160,10 @@ const beforeClose = (done: () => void) => {
 };
 
 function toggleFullscreen() {
-    globalStore.isFullScreen = !globalStore.isFullScreen;
-    isFull.value = globalStore.isFullScreen;
+    isFullScreen.value = !isFullScreen.value;
+    isFull.value = isFullScreen.value;
 }
 const loadTooltip = () => {
-    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
+    return i18n.global.t('commons.button.' + (isFullScreen.value ? 'quitFullscreen' : 'fullscreen'));
 };
 </script>

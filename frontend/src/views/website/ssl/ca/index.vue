@@ -3,7 +3,9 @@
         <template #content>
             <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
                 <template #toolbar>
-                    <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                    <el-button v-permission type="primary" @click="openCreate">
+                        {{ $t('commons.button.create') }}
+                    </el-button>
                 </template>
                 <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name"></el-table-column>
                 <el-table-column :label="$t('website.keyType')" show-overflow-tooltip prop="keyType">
@@ -62,6 +64,7 @@ const detailRef = ref();
 const buttons = [
     {
         label: i18n.global.t('ssl.selfSign'),
+        permission: true,
         click: function (row: Website.CA) {
             obtain(row);
         },
@@ -80,6 +83,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.CA) {
             deleteca(row);
         },

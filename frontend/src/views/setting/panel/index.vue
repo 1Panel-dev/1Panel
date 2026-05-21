@@ -2,30 +2,10 @@
     <div v-loading="loading">
         <LayoutContent :title="$t('setting.panel')" :divider="true">
             <template #main>
-                <el-form :model="form" :label-position="mobile ? 'top' : 'left'" label-width="150px">
+                <el-form :model="form" :label-position="isMobile ? 'top' : 'left'" label-width="150px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
-                            <el-form-item :label="$t('setting.user')" prop="userName">
-                                <el-input disabled v-model="form.userName">
-                                    <template #append>
-                                        <el-button @click="onChangeUserName()" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.passwd')" prop="password">
-                                <el-input type="password" disabled v-model="form.password">
-                                    <template #append>
-                                        <el-button icon="Setting" @click="onChangePassword">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
                             <el-form-item :label="$t('setting.theme')" prop="theme">
                                 <div class="flex justify-center items-center sm:gap-6 gap-2">
                                     <div class="sm:contents hidden">
@@ -56,7 +36,7 @@
                                     </div>
                                     <div>
                                         <el-button
-                                            v-if="isMasterProductPro"
+                                            v-if="isXpackOrEE"
                                             @click="onChangeThemeColor"
                                             icon="Setting"
                                             class="!h-[32px] sm:!h-[33.5px]"
@@ -78,7 +58,7 @@
                                 </el-radio-group>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.watermark')" v-if="isMasterProductPro" prop="watermark">
+                            <el-form-item :label="$t('setting.watermark')" v-if="isXpackOrEE" prop="watermark">
                                 <el-radio-group class="w-full" @change="onChangeWatermark" v-model="form.watermarkShow">
                                     <el-radio-button value="Enable">
                                         <span>{{ $t('commons.button.enable') }}</span>
@@ -123,19 +103,6 @@
                                 </el-select>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
-                                <el-input disabled v-model.number="form.sessionTimeout">
-                                    <template #append>
-                                        <el-button @click="onChangeTimeout" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <span class="input-help">
-                                    {{ $t('setting.sessionTimeoutHelper', [form.sessionTimeout]) }}
-                                </span>
-                            </el-form-item>
-
                             <el-form-item :label="$t('setting.systemIP')" prop="systemIP">
                                 <el-input disabled v-if="form.systemIP" v-model="form.systemIP">
                                     <template #append>
@@ -154,7 +121,7 @@
                                 <span class="input-help">{{ $t('setting.systemIPHelper') }}</span>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.proxy')" prop="proxyShow" v-if="isMaster">
+                            <el-form-item :label="$t('setting.proxy')" prop="proxyShow">
                                 <el-input disabled v-model="form.proxyShow">
                                     <template #append>
                                         <el-button @click="onChangeProxy" icon="Setting">
@@ -162,23 +129,6 @@
                                         </el-button>
                                     </template>
                                 </el-input>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.apiInterface')" prop="apiInterface" v-if="isMaster">
-                                <el-switch
-                                    @change="onChangeApiInterfaceStatus"
-                                    v-model="form.apiInterfaceStatus"
-                                    active-value="Enable"
-                                    inactive-value="Disable"
-                                />
-                                <span class="input-help">{{ $t('setting.apiInterfaceHelper') }}</span>
-                                <div v-if="form.apiInterfaceStatus === 'Enable'">
-                                    <div>
-                                        <el-button link type="primary" @click="onChangeApiInterfaceStatus">
-                                            {{ $t('commons.button.view') }}
-                                        </el-button>
-                                    </div>
-                                </div>
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.developerMode')" prop="developerMode">
@@ -202,6 +152,16 @@
                                 </el-button>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.offlineEnv')" v-if="isEnterprise" prop="isOffline">
+                                <el-switch
+                                    v-model="form.isOffline"
+                                    active-value="Enable"
+                                    inactive-value="Disable"
+                                    @change="onChangeOfflineEnv"
+                                />
+                                <span class="input-help">{{ $t('setting.offlineEnvHelper') }}</span>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.runtimeEnv')" prop="edition">
                                 <el-button icon="Setting" @click="onChangeRegion">
                                     {{ runtimeEnvLabel() }}
@@ -213,13 +173,9 @@
             </template>
         </LayoutContent>
 
-        <Password ref="passwordRef" />
-        <UserName ref="userNameRef" />
         <PanelName ref="panelNameRef" @search="search()" />
         <SystemIP ref="systemIPRef" @search="search()" />
         <Proxy ref="proxyRef" @search="search()" />
-        <ApiInterface ref="apiInterfaceRef" @search="search()" />
-        <Timeout ref="timeoutRef" @search="search()" />
         <HideMenu ref="hideMenuRef" @search="search()" />
         <ThemeColor ref="themeColorRef" />
         <Watermark ref="watermarkRef" @search="search()" />
@@ -228,43 +184,40 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
-import {
-    getSettingInfo,
-    updateSetting,
-    getSystemAvailable,
-    updateApiConfig,
-    getAgentSettingInfo,
-} from '@/api/modules/setting';
-import { GlobalStore } from '@/store';
+import { getSettingInfo, updateSetting, getSystemAvailable, getAgentSettingInfo } from '@/api/modules/setting';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { useTheme } from '@/global/use-theme';
 import { MsgSuccess } from '@/utils/message';
 import ThemeColor from '@/views/setting/panel/theme-color/index.vue';
-import ApiInterface from '@/views/setting/panel/api-interface/index.vue';
-import Password from '@/views/setting/panel/password/index.vue';
 import Watermark from '@/views/setting/panel/watermark/index.vue';
-import UserName from '@/views/setting/panel/username/index.vue';
-import Timeout from '@/views/setting/panel/timeout/index.vue';
+import Edition from '@/views/setting/panel/edition/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import Proxy from '@/views/setting/panel/proxy/index.vue';
 import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
-import Edition from '@/views/setting/panel/edition/index.vue';
-import { storeToRefs } from 'pinia';
+import { getXpackProxyDocker } from '@/extensions/xpack';
 import { getXpackSetting, updateXpackSettingByKey } from '@/utils/xpack';
 import { setPrimaryColor } from '@/utils/theme';
 import i18n from '@/lang';
 
-const loading = ref(false);
-const globalStore = GlobalStore();
+const {
+    globalStore,
+    isEnterprise,
+    isIntl,
+    isMobile,
+    isOffline,
+    isXpackOrEE,
+    openMenuTabs,
+    themeConfig,
+    watermark,
+    watermarkShow,
+} = useGlobalStore();
 
-const { isMasterProductPro, isMaster } = storeToRefs(globalStore);
+const loading = ref(false);
 
 const { switchTheme } = useTheme();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 interface ThemeColor {
     light: string;
@@ -276,9 +229,6 @@ interface ThemeColor {
 }
 
 const form = reactive({
-    userName: '',
-    password: '',
-    sessionTimeout: 0,
     panelName: '',
     theme: '',
     watermark: '',
@@ -288,7 +238,7 @@ const form = reactive({
     language: '',
     docSource: 'withByRegion',
     edition: '',
-    complexityVerification: '',
+    isOffline: 'Disable',
     developerMode: '',
     systemIP: '',
 
@@ -301,33 +251,24 @@ const form = reactive({
     proxyPasswdKeep: '',
     proxyDocker: '',
 
-    apiInterfaceStatus: 'Disable',
-    apiKey: '',
-    ipWhiteList: '',
-    apiKeyValidityTime: 120,
-
     hideMenu: '',
 });
 
 const show = ref();
 
-const userNameRef = ref();
-const passwordRef = ref();
 const panelNameRef = ref();
 const systemIPRef = ref();
 const proxyRef = ref();
-const timeoutRef = ref();
 const hideMenuRef = ref();
 const watermarkRef = ref();
 const themeColorRef = ref();
-const apiInterfaceRef = ref();
 const editionRef = ref();
 const unset = ref(i18n.global.t('setting.unSetting'));
 
 const languageOptions = ref([
     { value: 'zh', label: '中文(简体)' },
     { value: 'zh-Hant', label: '中文(繁體)' },
-    ...(!globalStore.isIntl ? [{ value: 'en', label: 'English' }] : []),
+    ...(!isIntl.value ? [{ value: 'en', label: 'English' }] : []),
     { value: 'ja', label: '日本語' },
     { value: 'pt-BR', label: 'Português (Brasil)' },
     { value: 'ko', label: '한국어' },
@@ -337,7 +278,7 @@ const languageOptions = ref([
     { value: 'es-ES', label: 'España - Español' },
 ]);
 
-if (globalStore.isIntl) {
+if (isIntl.value) {
     languageOptions.value.unshift({ value: 'en', label: 'English' });
 }
 
@@ -346,15 +287,13 @@ const search = async () => {
     form.systemIP = agentRes.data.systemIP;
 
     const res = await getSettingInfo();
-    form.userName = res.data.userName;
-    form.password = '******';
     form.theme = res.data.theme;
     form.menuTabs = res.data.menuTabs;
     form.panelName = res.data.panelName;
     form.language = res.data.language;
     form.docSource = res.data.docSource || 'withByRegion';
     form.edition = res.data.edition;
-    form.sessionTimeout = Number(res.data.sessionTimeout);
+    form.isOffline = res.data.isOffline || 'Disable';
 
     form.proxyUrl = res.data.proxyUrl;
     form.proxyType = res.data.proxyType;
@@ -364,50 +303,37 @@ const search = async () => {
     form.proxyPasswd = res.data.proxyPasswd;
     form.proxyPasswdKeep = res.data.proxyPasswdKeep;
 
-    form.apiInterfaceStatus = res.data.apiInterfaceStatus;
-    form.apiKey = res.data.apiKey;
-    form.ipWhiteList = res.data.ipWhiteList;
-    form.apiKeyValidityTime = res.data.apiKeyValidityTime;
-
     form.developerMode = res.data.developerMode;
     form.hideMenu = res.data.hideMenu;
 
-    form.complexityVerification = res.data.complexityVerification;
-
-    if (isMasterProductPro.value) {
-        const xpackRes = await getXpackSetting();
+    if (isXpackOrEE.value) {
+        const [xpackRes, proxyDockerRes] = await Promise.all([
+            getXpackSetting(),
+            getXpackProxyDocker().catch(() => null),
+        ]);
         if (xpackRes) {
-            form.theme = xpackRes.data.theme || globalStore.themeConfig.theme || 'light';
+            form.theme = xpackRes.data.theme || themeConfig.value.theme || 'light';
             form.themeColor = JSON.parse(xpackRes.data.themeColor || '{"light":"#005eeb","dark":"#F0BE96"}');
-            globalStore.themeConfig.themeColor = xpackRes.data.themeColor
+            themeConfig.value.themeColor = xpackRes.data.themeColor
                 ? xpackRes.data.themeColor
                 : '{"light":"#005eeb","dark":"#F0BE96"}';
-            globalStore.themeConfig.theme = form.theme;
-            form.proxyDocker = xpackRes.data.proxyDocker;
+            themeConfig.value.theme = form.theme;
             form.watermark = xpackRes.data.watermark;
             form.watermarkShow = xpackRes.data.watermarkShow;
             try {
-                globalStore.watermark = JSON.parse(xpackRes.data.watermark);
+                watermark.value = JSON.parse(xpackRes.data.watermark);
             } catch {
-                globalStore.watermark = null;
+                watermark.value = null;
             }
         }
+        form.proxyDocker = proxyDockerRes?.data?.proxyDocker || '';
     } else {
-        globalStore.themeConfig.theme = form.theme;
+        themeConfig.value.theme = form.theme;
     }
 };
 
-const onChangePassword = () => {
-    passwordRef.value.acceptParams({ complexityVerification: form.complexityVerification });
-};
-const onChangeUserName = () => {
-    userNameRef.value.acceptParams({ userName: form.userName });
-};
 const onChangeTitle = () => {
     panelNameRef.value.acceptParams({ panelName: form.panelName });
-};
-const onChangeTimeout = () => {
-    timeoutRef.value.acceptParams({ sessionTimeout: form.sessionTimeout });
 };
 const onChangeSystemIP = () => {
     systemIPRef.value.acceptParams({ systemIP: form.systemIP });
@@ -439,8 +365,8 @@ const runtimeEnvLabel = () => {
 };
 
 const onChangeThemeColor = () => {
-    const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);
-    themeColorRef.value.acceptParams({ themeColor: themeColor, theme: globalStore.themeConfig.theme });
+    const themeColor: ThemeColor = JSON.parse(themeConfig.value.themeColor);
+    themeColorRef.value.acceptParams({ themeColor: themeColor, theme: themeConfig.value.theme });
 };
 
 const onChangeWatermark = async () => {
@@ -457,8 +383,8 @@ const onChangeWatermark = async () => {
             await updateXpackSettingByKey('WatermarkShow', 'Disable')
                 .then(() => {
                     loading.value = false;
-                    globalStore.watermark = null;
-                    globalStore.watermarkShow = false;
+                    watermark.value = null;
+                    watermarkShow.value = false;
                     search();
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
@@ -471,58 +397,41 @@ const onChangeWatermark = async () => {
         });
 };
 
-const onChangeApiInterfaceStatus = async () => {
-    if (form.apiInterfaceStatus === 'Enable') {
-        apiInterfaceRef.value.acceptParams({
-            apiInterfaceStatus: form.apiInterfaceStatus,
-            apiKey: form.apiKey,
-            ipWhiteList: form.ipWhiteList,
-            apiKeyValidityTime: form.apiKeyValidityTime,
+const onChangeOfflineEnv = async (val: string | number | boolean) => {
+    const value = val + '';
+    const oldValue = value === 'Enable' ? 'Disable' : 'Enable';
+    const message =
+        value === 'Enable'
+            ? i18n.global.t('setting.offlineEnvOpenHelper')
+            : i18n.global.t('setting.offlineEnvCloseHelper');
+    try {
+        await ElMessageBox.confirm(message, i18n.global.t('setting.offlineEnv'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
         });
-        return;
+        const success = await onSave('IsOffline', value);
+        if (!success) {
+            form.isOffline = oldValue;
+        }
+    } catch {
+        form.isOffline = oldValue;
     }
-    ElMessageBox.confirm(i18n.global.t('setting.apiInterfaceClose'), i18n.global.t('setting.apiInterface'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    })
-        .then(async () => {
-            loading.value = true;
-            form.apiInterfaceStatus = 'Disable';
-            let param = {
-                apiKey: form.apiKey,
-                ipWhiteList: form.ipWhiteList,
-                apiInterfaceStatus: form.apiInterfaceStatus,
-                apiKeyValidityTime: form.apiKeyValidityTime,
-            };
-            await updateApiConfig(param)
-                .then(() => {
-                    loading.value = false;
-                    search();
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                })
-                .catch(() => {
-                    loading.value = false;
-                });
-        })
-        .catch(() => {
-            form.apiInterfaceStatus = 'Enable';
-        });
 };
 
 const handleThemeChange = async (val: string) => {
-    globalStore.themeConfig.theme = val;
+    themeConfig.value.theme = val;
     switchTheme();
-    if (globalStore.isMasterProductPro) {
+    if (isXpackOrEE.value) {
         await updateXpackSettingByKey('Theme', val);
         let color: string;
-        const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);
+        const themeColor: ThemeColor = JSON.parse(themeConfig.value.themeColor);
         if (val === 'auto') {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
             color = prefersDark.matches ? themeColor.dark : themeColor.light;
         } else {
             color = val === 'dark' ? themeColor.dark : themeColor.light;
         }
-        globalStore.themeConfig.primary = color;
+        themeConfig.value.primary = color;
         setPrimaryColor(color);
     }
 };
@@ -539,20 +448,24 @@ const onSave = async (key: string, val: any) => {
                 handleThemeChange(val);
                 break;
             case 'MenuTabs':
-                globalStore.openMenuTabs = val === 'Enable';
+                openMenuTabs.value = val === 'Enable';
                 break;
             case 'Language':
                 await globalStore.updateLanguage(val);
                 location.reload();
+                break;
+            case 'IsOffline':
+                isOffline.value = val === 'Enable';
                 break;
         }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     } catch (error) {
         loading.value = false;
-        return;
+        return false;
     }
     loading.value = false;
+    return true;
 };
 
 onMounted(() => {

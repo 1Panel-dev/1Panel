@@ -69,6 +69,7 @@ type IAgentService interface {
 	UpdateAccount(req dto.AgentAccountUpdateReq) error
 	SyncAgentsByAccount(account *model.AgentAccount) error
 	PageAccounts(req dto.AgentAccountSearch) (int64, []dto.AgentAccountInfo, error)
+	CountAccountsByProviders(req dto.AgentAccountProviderCountReq) (map[string]int64, error)
 	GetAccountModels(req dto.AgentAccountModelReq) ([]dto.AgentAccountModel, error)
 	CreateAccountModel(req dto.AgentAccountModelCreateReq) error
 	UpdateAccountModel(req dto.AgentAccountModelUpdateReq) error
@@ -127,7 +128,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	if installs, _ := appInstallRepo.ListBy(context.Background(), repo.WithByLowerName(req.Name)); len(installs) > 0 {
 		return nil, buserr.New("ErrNameIsExist")
 	}
-	if !xpack.IsXpack() {
+	if !xpack.MultiNodeProvider.IsXpack() {
 		count, _, err := agentRepo.Page(1, 1)
 		if err != nil {
 			return nil, err
@@ -676,6 +677,10 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 	return count, items, nil
 }
 
+func (a AgentService) CountAccountsByProviders(req dto.AgentAccountProviderCountReq) (map[string]int64, error) {
+	return agentAccountRepo.CountByProviders(req.Providers)
+}
+
 func (a AgentService) GetAccountModels(req dto.AgentAccountModelReq) ([]dto.AgentAccountModel, error) {
 	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
 	if err != nil {
@@ -990,7 +995,7 @@ func validateAgentConfigFileContent(agentType, content string) error {
 }
 
 func getOpenclawNPMRegistry(containerName string) (string, error) {
-	registry, err := runDockerExecWithStdout(20*time.Second, containerName, "npm", "get", "registry")
+	registry, err := cmd.RunDockerExecWithStdout(20*time.Second, containerName, "npm", "get", "registry")
 	if err != nil {
 		return "", err
 	}
@@ -1002,7 +1007,7 @@ func getOpenclawNPMRegistry(containerName string) (string, error) {
 }
 
 func setOpenclawNPMRegistry(containerName, registry string) error {
-	return cmd.RunDefaultBashCf("docker exec %s npm set registry %q", containerName, registry)
+	return cmd.NewCommandMgr().Run("docker", "exec", containerName, "npm", "set", "registry", registry)
 }
 
 func (a AgentService) loadAgentAndInstall(agentID uint) (*model.Agent, *model.AppInstall, error) {

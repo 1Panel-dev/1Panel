@@ -23,9 +23,10 @@
 </template>
 
 <script lang="ts" setup>
-import { routerToName, routerToPath } from '@/utils/router';
-import { computed, onMounted, ref } from 'vue';
+import { routerToNameWithQuery, routerToPathWithQuery } from '@/utils/router';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { hasPermissionMetaAccess, hasRouteAccess } from '@/utils/rbac';
 
 defineOptions({ name: 'RouterButton' });
 
@@ -36,26 +37,50 @@ const props = defineProps({
     },
 });
 
+const router = useRouter();
 const buttonArray = computed(() => {
-    return props.buttons;
+    return props.buttons.filter((button) => {
+        if (!hasPermissionMetaAccess(button.permission)) {
+            return false;
+        }
+        if (button.path || button.name) {
+            const route = router.resolve(button.path ? { path: button.path } : { name: button.name });
+            return route.matched.length === 0 || hasRouteAccess(route);
+        }
+        return true;
+    });
 });
 
-const router = useRouter();
 const activeName = ref('');
 
 const handleChange = (label: string) => {
     const btn = buttonArray.value.find((btn) => btn.label === label);
     if (!btn) return;
-    if (btn.path) routerToPath(btn.path);
-    else if (btn.name) routerToName(btn.name);
+    if (btn.path) routerToPathWithQuery(btn.path, { uncached: 'true' });
+    else if (btn.name) routerToNameWithQuery(btn.name, { uncached: 'true' });
     activeName.value = btn.label;
 };
 
 onMounted(() => {
+    syncActiveName();
+});
+
+watch(
+    () => [router.currentRoute.value.path, buttonArray.value.map((button) => button.label).join('|')],
+    () => {
+        syncActiveName();
+    },
+);
+
+function syncActiveName() {
+    if (!buttonArray.value.length) {
+        activeName.value = '';
+        return;
+    }
     if (buttonArray.value.length) {
         let isPathExist = false;
         const btn = buttonArray.value.find((btn) => {
-            return router.currentRoute.value.path.startsWith(btn.path);
+            return btn.path && router.currentRoute.value.path.startsWith(btn.path);
         });
         if (btn) {
             isPathExist = true;
@@ -65,7 +90,7 @@ onMounted(() => {
             activeName.value = buttonArray.value[0].label;
         }
     }
-});
+}
 </script>
 
 <style lang="scss" scoped>
@@ -85,6 +110,7 @@ onMounted(() => {
         height: 100%;
         background-color: var(--panel-button-active) !important;
         box-shadow: none !important;
+        outline: none !important;
         border: 2px solid transparent !important;
         color: var(--el-text-color-regular) !important;
     }

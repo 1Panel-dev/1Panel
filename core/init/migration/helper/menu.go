@@ -7,8 +7,36 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/global"
 	"gorm.io/gorm"
 )
+
+func UpsertMenuByLabel(children []dto.ShowMenu, newMenu dto.ShowMenu, afterLabel string) []dto.ShowMenu {
+	for i := range children {
+		if children[i].Label != newMenu.Label {
+			continue
+		}
+		children[i].Disabled = newMenu.Disabled
+		children[i].Title = newMenu.Title
+		children[i].Path = newMenu.Path
+		children[i].Sort = newMenu.Sort
+		children[i].IsShow = newMenu.IsShow
+		return children
+	}
+
+	insertIndex := len(children)
+	for i := range children {
+		if children[i].Label == afterLabel {
+			insertIndex = i + 1
+			break
+		}
+	}
+
+	children = append(children, dto.ShowMenu{})
+	copy(children[insertIndex+1:], children[insertIndex:])
+	children[insertIndex] = newMenu
+	return children
+}
 
 func LoadMenus() string {
 	item := []dto.ShowMenu{
@@ -56,6 +84,62 @@ func LoadMenus() string {
 		{ID: "12", Disabled: false, Title: "menu.logs", IsShow: true, Label: "Log-Menu", Path: "/logs", Sort: 1200},
 		{ID: "13", Disabled: true, Title: "menu.settings", IsShow: true, Label: "Setting-Menu", Path: "/settings", Sort: 1300},
 	}
+	if global.CONF.Base.IsEnterprise {
+		for i := range item {
+			if item[i].Label == "AI-Menu" {
+				item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
+					ID:       "46",
+					Disabled: false,
+					Title:    "aiTools.aiProxy.title",
+					IsShow:   true,
+					Label:    "AIProxyManagement",
+					Path:     "/ai/ai-proxy/model-pool",
+					Sort:     150,
+				}, "AIModel")
+				item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
+					ID:       "47",
+					Disabled: false,
+					Title:    "aiTools.skillsHub.title",
+					IsShow:   true,
+					Label:    "SkillsHub",
+					Path:     "/ai/skills-hub",
+					Sort:     155,
+				}, "AIProxyManagement")
+				item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
+					ID:       "45",
+					Disabled: false,
+					Title:    "aiTools.benchmark.title",
+					IsShow:   true,
+					Label:    "AIBenchmark",
+					Path:     "/ai/benchmark",
+					Sort:     160,
+				}, "SkillsHub")
+				continue
+			}
+			if item[i].Label != "Xpack-Menu" {
+				continue
+			}
+			item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
+				ID:       "121",
+				Disabled: false,
+				Title:    "xpack.user.userManage",
+				IsShow:   true,
+				Label:    "UserManagement",
+				Path:     "/enterprise/users",
+				Sort:     350,
+			}, "NodeDashboard")
+			item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
+				ID:       "122",
+				Disabled: false,
+				Title:    "xpack.opsReport.name",
+				IsShow:   true,
+				Label:    "OpsReport",
+				Path:     "/enterprise/ops-report",
+				Sort:     360,
+			}, "UserManagement")
+			break
+		}
+	}
 	menu, _ := json.Marshal(item)
 	return string(menu)
 }
@@ -67,6 +151,9 @@ func MenuSort() []dto.MenuLabelSort {
 		{Label: "AI-Menu", Sort: 300},
 		{Label: "Agents", Sort: 50},
 		{Label: "AIModel", Sort: 100},
+		{Label: "AIProxyManagement", Sort: 150},
+		{Label: "SkillsHub", Sort: 155},
+		{Label: "AIBenchmark", Sort: 160},
 		{Label: "MCPServer", Sort: 200},
 		{Label: "GPU", Sort: 300},
 		{Label: "Website-Menu", Sort: 400},
@@ -89,6 +176,9 @@ func MenuSort() []dto.MenuLabelSort {
 		{Label: "XApp", Sort: 100},
 		{Label: "Dashboard", Sort: 200},
 		{Label: "Node", Sort: 300},
+		{Label: "NodeDashboard", Sort: 300},
+		{Label: "UserManagement", Sort: 350},
+		{Label: "OpsReport", Sort: 360},
 		{Label: "Upage", Sort: 400},
 		{Label: "MonitorDashboard", Sort: 500},
 		{Label: "Tamper", Sort: 600},

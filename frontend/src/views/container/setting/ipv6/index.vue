@@ -1,7 +1,7 @@
 <template>
     <div>
         <DrawerPro v-model="drawerVisible" header="IPv6" @close="handleClose" size="small">
-            <el-alert class="common-prompt" :closable="false" type="warning" v-if="!globalStore.isFxplay">
+            <el-alert class="common-prompt" :closable="false" type="warning" v-if="!isFxplay">
                 <template #default>
                     <span class="input-help">
                         {{ $t('container.ipv6Helper') }}
@@ -54,8 +54,8 @@ import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { updateIpv6Option } from '@/api/modules/container';
 import { checkIpV6 } from '@/utils/validate';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { docsUrl, isFxplay } = useGlobalStore();
 
 const loading = ref();
 const drawerVisible = ref();
@@ -93,7 +93,7 @@ function checkFixedCidrV6(rule: any, value: any, callback: any) {
 }
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/containers/setting/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/containers/setting/', '_blank', 'noopener,noreferrer');
 };
 
 const emit = defineEmits<{ (e: 'search'): void }>();

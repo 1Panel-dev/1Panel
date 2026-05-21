@@ -22,12 +22,12 @@ func (f *Firewall) Name() string {
 }
 
 func (f *Firewall) Status() (bool, error) {
-	stdout, _ := cmd.RunDefaultWithStdoutBashC("LANGUAGE=en_US:en firewall-cmd --state")
+	stdout, _ := cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en")).RunWithStdout("firewall-cmd", "--state")
 	return stdout == "running\n", nil
 }
 
 func (f *Firewall) Version() (string, error) {
-	stdout, err := cmd.RunDefaultWithStdoutBashC("LANGUAGE=en_US:en firewall-cmd --version")
+	stdout, err := cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en")).RunWithStdout("firewall-cmd", "--version")
 	if err != nil {
 		return "", fmt.Errorf("load the firewall version failed, %v", err)
 	}
@@ -56,7 +56,7 @@ func (f *Firewall) Restart() error {
 }
 
 func (f *Firewall) Reload() error {
-	if err := cmd.RunDefaultBashC("firewall-cmd --reload"); err != nil {
+	if err := cmd.NewCommandMgr().Run("firewall-cmd", "--reload"); err != nil {
 		return fmt.Errorf("reload firewall failed, err: %v", err)
 	}
 	return nil
@@ -68,7 +68,7 @@ func (f *Firewall) ListPort() ([]FireInfo, error) {
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		stdout, err := cmd.RunDefaultWithStdoutBashC("firewall-cmd --zone=public --list-ports")
+		stdout, err := cmd.NewCommandMgr().RunWithStdout("firewall-cmd", "--zone=public", "--list-ports")
 		if err != nil {
 			return
 		}
@@ -89,7 +89,7 @@ func (f *Firewall) ListPort() ([]FireInfo, error) {
 
 	go func() {
 		defer wg.Done()
-		stdout1, err := cmd.RunDefaultWithStdoutBashC("firewall-cmd --zone=public --list-rich-rules")
+		stdout1, err := cmd.NewCommandMgr().RunWithStdout("firewall-cmd", "--zone=public", "--list-rich-rules")
 		if err != nil {
 			return
 		}
@@ -112,7 +112,7 @@ func (f *Firewall) ListForward() ([]FireInfo, error) {
 	if err := f.EnableForward(); err != nil {
 		global.LOG.Errorf("init port forward failed, err: %v", err)
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashC("firewall-cmd --zone=public --list-forward-ports")
+	stdout, err := cmd.NewCommandMgr().RunWithStdout("firewall-cmd", "--zone=public", "--list-forward-ports")
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func (f *Firewall) ListForward() ([]FireInfo, error) {
 }
 
 func (f *Firewall) ListAddress() ([]FireInfo, error) {
-	stdout, err := cmd.RunDefaultWithStdoutBashC("firewall-cmd --zone=public --list-rich-rules")
+	stdout, err := cmd.NewCommandMgr().RunWithStdout("firewall-cmd", "--zone=public", "--list-rich-rules")
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func (f *Firewall) Port(port FireInfo, operation string) error {
 		return buserr.New("ErrCmdIllegal")
 	}
 
-	if err := cmd.RunDefaultBashCf("firewall-cmd --zone=public --%s-port=%s/%s --permanent", operation, port.Port, port.Protocol); err != nil {
+	if err := cmd.NewCommandMgr().Run("firewall-cmd", "--zone=public", "--"+operation+"-port="+port.Port+"/"+port.Protocol, "--permanent"); err != nil {
 		return fmt.Errorf("%s (port: %s/%s strategy: %s) failed, %v", operation, port.Port, port.Protocol, port.Strategy, err)
 	}
 	return nil
@@ -184,12 +184,13 @@ func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 		ruleStr += fmt.Sprintf("protocol=%s ", rule.Protocol)
 	}
 	ruleStr += rule.Strategy
-	if err := cmd.RunDefaultBashCf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleStr); err != nil {
+	if err := cmd.NewCommandMgr().Run("firewall-cmd", "--zone=public", "--"+operation+"-rich-rule", ruleStr, "--permanent"); err != nil {
 		return fmt.Errorf("%s rich rules (%s) failed, %v", operation, ruleStr, err)
 	}
 	if len(rule.Address) == 0 {
-		if err := cmd.RunDefaultBashCf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, strings.ReplaceAll(ruleStr, "family=ipv4 ", "family=ipv6 ")); err != nil {
-			return fmt.Errorf("%s rich rules (%s) failed, %v", operation, strings.ReplaceAll(ruleStr, "family=ipv4 ", "family=ipv6 "), err)
+		ipv6Rule := strings.ReplaceAll(ruleStr, "family=ipv4 ", "family=ipv6 ")
+		if err := cmd.NewCommandMgr().Run("firewall-cmd", "--zone=public", "--"+operation+"-rich-rule", ipv6Rule, "--permanent"); err != nil {
+			return fmt.Errorf("%s rich rules (%s) failed, %v", operation, ipv6Rule, err)
 		}
 	}
 	return nil
@@ -199,12 +200,12 @@ func (f *Firewall) PortForward(info Forward, operation string) error {
 	if cmd.CheckIllegal(operation, info.Port, info.Protocol, info.TargetIP, info.TargetPort) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	ruleStr := fmt.Sprintf("firewall-cmd --zone=public --%s-forward-port=port=%s:proto=%s:toport=%s --permanent", operation, info.Port, info.Protocol, info.TargetPort)
+	forwardRule := fmt.Sprintf("--%s-forward-port=port=%s:proto=%s:toport=%s", operation, info.Port, info.Protocol, info.TargetPort)
 	if info.TargetIP != "" && info.TargetIP != "127.0.0.1" && info.TargetIP != "localhost" {
-		ruleStr = fmt.Sprintf("firewall-cmd --zone=public --%s-forward-port=port=%s:proto=%s:toaddr=%s:toport=%s --permanent", operation, info.Port, info.Protocol, info.TargetIP, info.TargetPort)
+		forwardRule = fmt.Sprintf("--%s-forward-port=port=%s:proto=%s:toaddr=%s:toport=%s", operation, info.Port, info.Protocol, info.TargetIP, info.TargetPort)
 	}
 
-	if err := cmd.RunDefaultBashC(ruleStr); err != nil {
+	if err := cmd.NewCommandMgr().Run("firewall-cmd", "--zone=public", forwardRule, "--permanent"); err != nil {
 		return fmt.Errorf("%s port forward failed, %s", operation, err)
 	}
 	if err := f.Reload(); err != nil {
@@ -236,10 +237,10 @@ func (f *Firewall) loadInfo(line string) FireInfo {
 }
 
 func (f *Firewall) EnableForward() error {
-	stdout, err := cmd.RunDefaultWithStdoutBashC("firewall-cmd --zone=public --query-masquerade")
+	stdout, err := cmd.NewCommandMgr().RunWithStdout("firewall-cmd", "--zone=public", "--query-masquerade")
 	if err != nil {
 		if strings.HasSuffix(strings.TrimSpace(stdout), "no") {
-			if err := cmd.RunDefaultBashC("firewall-cmd --zone=public --add-masquerade --permanent"); err != nil {
+			if err := cmd.NewCommandMgr().Run("firewall-cmd", "--zone=public", "--add-masquerade", "--permanent"); err != nil {
 				return err
 			}
 			return f.Reload()

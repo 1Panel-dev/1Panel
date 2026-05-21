@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	appauth "github.com/1Panel-dev/1Panel/core/app/auth"
 	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/web"
@@ -16,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/middleware"
 	rou "github.com/1Panel-dev/1Panel/core/router"
 	"github.com/1Panel-dev/1Panel/core/utils/security"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 )
@@ -56,7 +58,7 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 		}
 		entrance = authService.GetSecurityEntrance()
 		if entrance != "" {
-			service.SetSecurityEntranceCookie(c, entrance)
+			appauth.SetSecurityEntranceCookie(c, entrance)
 		}
 		staticServer := http.FileServer(http.FS(web.IndexHtml))
 		staticServer.ServeHTTP(c.Writer, c.Request)
@@ -82,11 +84,14 @@ func Routers() *gin.Engine {
 		Router.Use(middleware.DemoHandle())
 	}
 
+	Router.Use(middleware.FrontendFallback())
 	Router.Use(middleware.OperationLog())
 	Router.Use(middleware.GlobalLoading())
+	Router.Use(xpack.AuthProvider.CoreAPIAuthMiddleware())
 	Router.Use(middleware.PasswordExpired())
-	Router.Use(middleware.ApiAuth())
 	Router.Use(middleware.CSRFTokenGuard())
+	Router.Use(xpack.AuthProvider.CoreRBACMiddlewares()...)
+	Router.Use(Proxy())
 
 	PrivateGroup := Router.Group("/api/v2/core")
 	PrivateGroup.Use(middleware.SetPasswordPublicKey())
@@ -94,7 +99,6 @@ func Routers() *gin.Engine {
 		router.InitRouter(PrivateGroup)
 	}
 
-	Router.Use(Proxy())
 	Router.NoRoute(func(c *gin.Context) {
 		if !security.HandleNotRoute(c) {
 			return

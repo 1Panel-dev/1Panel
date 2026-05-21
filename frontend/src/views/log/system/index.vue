@@ -14,12 +14,7 @@
                         {{ $t('commons.button.watch') }}
                     </el-checkbox>
                 </el-button>
-                <el-radio-group
-                    v-if="globalStore.currentNode === 'local'"
-                    class="ml-2"
-                    @change="search()"
-                    v-model="itemType"
-                >
+                <el-radio-group v-if="currentNode === 'local'" class="ml-2" @change="search()" v-model="itemType">
                     <el-radio-button :label="$t('logs.agent')" value="Agent" />
                     <el-radio-button :label="$t('logs.core')" value="Core" />
                 </el-radio-group>
@@ -44,8 +39,8 @@ import LogFile from '@/components/log/file/index.vue';
 import LogRouter from '@/views/log/router/index.vue';
 import { nextTick, onMounted, reactive, ref } from 'vue';
 import { getSystemFiles } from '@/api/modules/log';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { currentNode } = useGlobalStore();
 
 const loading = ref();
 const isWatch = ref();

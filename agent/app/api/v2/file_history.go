@@ -11,7 +11,7 @@ import (
 // @Summary Load file history list
 // @Accept json
 // @Param request body request.FileHistorySearchReq true "request"
-// @Success 200 {object} response.PageResult
+// @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/history/search [post]

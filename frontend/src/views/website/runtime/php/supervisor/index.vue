@@ -3,10 +3,11 @@
         <template #content>
             <ComplexTable :data="data" v-loading="loading" v-model:selects="selects">
                 <template #toolbar>
-                    <el-button type="primary" @click="openCreate">
+                    <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
                     <el-button
+                        v-permission
                         @click="batchRestart"
                         :disabled="!selects.length || selects.every((item) => item.name === 'php-fpm')"
                     >
@@ -50,16 +51,18 @@
                     <template #default="{ row }">
                         <div v-if="row.status && row.status.length > 0 && row.hasLoad">
                             <Status
+                                v-permission
                                 v-if="checkStatus(row.status) === 'RUNNING'"
                                 status="running"
                                 @click="operate('stop', row.name)"
                             />
                             <Status
+                                v-permission
                                 v-else-if="checkStatus(row.status) === 'WARNING'"
                                 status="unhealthy"
                                 @click="operate('restart', row.name)"
                             />
-                            <Status v-else status="stopped" @click="operate('start', row.name)" />
+                            <Status v-else v-permission status="stopped" @click="operate('start', row.name)" />
                         </div>
                         <div v-if="!row.hasLoad">
                             <el-button link loading></el-button>
@@ -114,7 +117,7 @@
                     :ellipsis="6"
                     :buttons="buttons"
                     :label="$t('commons.table.operate')"
-                    :fixed="mobile ? false : 'right'"
+                    :fixed="isMobile ? false : 'right'"
                     width="280px"
                     fix
                 />
@@ -127,16 +130,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { computed } from 'vue';
 import Create from './create/index.vue';
 import File from './file/index.vue';
 import { GetSupervisorProcess, operateSupervisorProcess } from '@/api/modules/runtime';
-import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
 const loading = ref(false);
 const fileRef = ref();
 const data = ref();
@@ -209,10 +211,6 @@ const loadStatus = async () => {
         }
     } catch (error) {}
 };
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const checkStatus = (status: HostTool.ProcessStatus[]): string => {
     if (!status || status.length === 0) return 'STOPPED';
@@ -311,6 +309,7 @@ const edit = (row: HostTool.SupervisorProcess) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             edit(row);
         },
@@ -320,6 +319,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('website.sourceFile'),
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             getFile(row.name, 'config', runtimeID.value);
         },
@@ -338,6 +338,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             operate('restart', row.name);
         },
@@ -347,6 +348,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: HostTool.SupervisorProcess) {
             operate('delete', row.name);
         },

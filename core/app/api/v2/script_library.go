@@ -135,6 +135,10 @@ func (b *BaseApi) UpdateScript(c *gin.Context) {
 }
 
 func (b *BaseApi) RunScript(c *gin.Context) {
+	if !websocket.IsWebSocketUpgrade(c.Request) {
+		helper.Success(c)
+		return
+	}
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		global.LOG.Errorf("gin context http handler failed, err: %v", err)
@@ -186,7 +190,7 @@ func (b *BaseApi) RunScript(c *gin.Context) {
 		tty.Start(quitChan)
 		go slave.Wait(quitChan)
 	} else {
-		connInfo, _, err := xpack.LoadNodeInfo(currentNode)
+		connInfo, _, err := xpack.MultiNodeProvider.LoadNodeInfo(currentNode)
 		if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
 			return
 		}

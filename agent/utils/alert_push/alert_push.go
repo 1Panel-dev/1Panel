@@ -42,7 +42,7 @@ func PushAlert(pushAlert dto.PushAlert) error {
 				AlertId: alert.ID,
 				Count:   todayCount + 1,
 			}
-			err = xpack.CreateTaskScanSMSAlertLog(alert, alert.Type, create, pushAlert, constant.SMS)
+			err = xpack.AlertProvider.CreateTaskScanSMSAlertLog(alert, alert.Type, create, pushAlert, constant.SMS)
 			if err != nil {
 				global.LOG.Errorf("%s alert sms push failed: %v", alert.Type, err)
 				continue
@@ -58,8 +58,8 @@ func PushAlert(pushAlert dto.PushAlert) error {
 				AlertId: alert.ID,
 				Count:   todayCount + 1,
 			}
-			transport := xpack.LoadRequestTransport()
-			agentInfo, _ := xpack.GetAgentInfo()
+			transport := xpack.MultiNodeProvider.LoadRequestTransport()
+			agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
 			err = alertUtil.CreateTaskScanEmailAlertLog(alert, create, pushAlert, constant.Email, transport, agentInfo)
 			if err != nil {
 				global.LOG.Errorf("%s alert email push failed: %v", alert.Type, err)
@@ -76,8 +76,8 @@ func PushAlert(pushAlert dto.PushAlert) error {
 				AlertId: alert.ID,
 				Count:   todayCount + 1,
 			}
-			transport := xpack.LoadRequestTransport()
-			agentInfo, _ := xpack.GetAgentInfo()
+			transport := xpack.MultiNodeProvider.LoadRequestTransport()
+			agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
 			params := alertUtil.CreateAlertParams(alertUtil.GetCronJobTypeName(pushAlert.Param))
 			alertDetail := alertUtil.ProcessAlertDetail(alert, pushAlert.TaskName, params, constant.Bark)
 			alertRule := alertUtil.ProcessAlertRule(alert)
@@ -99,9 +99,9 @@ func PushAlert(pushAlert dto.PushAlert) error {
 				AlertId: alert.ID,
 				Count:   todayCount + 1,
 			}
-			transport := xpack.LoadRequestTransport()
-			agentInfo, _ := xpack.GetAgentInfo()
-			err = xpack.CreateTaskScanWebhookAlertLog(alert, alert.Type, create, pushAlert, m, transport, agentInfo)
+			transport := xpack.MultiNodeProvider.LoadRequestTransport()
+			agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
+			err = xpack.AlertProvider.CreateTaskScanWebhookAlertLog(alert, alert.Type, create, pushAlert, m, transport, agentInfo)
 			if err != nil {
 				global.LOG.Errorf("%s alert %s webhook push failed: %v", alert.Type, m, err)
 				continue

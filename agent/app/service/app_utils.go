@@ -665,7 +665,7 @@ func buildNginx(parentTask *task.Task) error {
 	logStr := fmt.Sprintf("%s %s", i18n.GetMsgByKey("TaskBuild"), i18n.GetMsgByKey("Image"))
 	parentTask.LogStart(logStr)
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*parentTask), cmd.WithTimeout(60*time.Minute))
-	if err = cmdMgr.RunBashCf("docker compose -f %s build", nginxInstall.GetComposePath()); err != nil {
+	if err = cmdMgr.Run("docker", "compose", "-f", nginxInstall.GetComposePath(), "build"); err != nil {
 		return err
 	}
 	parentTask.LogSuccess(logStr)
@@ -768,8 +768,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			}
 		}
 
-		command := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rn %s/* %s || true", detailDir, install.GetPath()))
-		_, _ = command.CombinedOutput()
+		_ = copyAppDetailMissing(fileOp, detailDir, install.GetPath())
 		if install.App.Key == constant.AppOpenresty {
 			installBuildDir := path.Join(install.GetPath(), "build")
 			detailBuildDir := path.Join(detailDir, "build")
@@ -1129,7 +1128,7 @@ func runScript(task *task.Task, appInstall *model.AppInstall, operate string) er
 	task.LogStart(logStr)
 
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute), cmd.WithWorkDir(workDir))
-	if err := cmdMgr.RunBashC(scriptPath); err != nil {
+	if err := cmdMgr.Run("bash", scriptPath); err != nil {
 		task.LogFailedWithErr(logStr, err)
 		return err
 	}
@@ -1178,7 +1177,7 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 			if err != nil {
 				return err
 			}
-			imagePrefix := xpack.GetImagePrefix()
+			imagePrefix := xpack.MultiNodeProvider.GetImagePrefix()
 			dockerCLi, err := docker.NewClient()
 			if err != nil {
 				return err
@@ -1778,7 +1777,7 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 	if !serviceValid {
 		return buserr.New("ErrFileParse")
 	}
-	imagePreFix := xpack.GetImagePrefix()
+	imagePreFix := xpack.MultiNodeProvider.GetImagePrefix()
 	if imagePreFix != "" {
 		for _, service := range services {
 			serviceValue := service.(map[string]interface{})
@@ -1933,6 +1932,39 @@ func isHostModel(dockerCompose string) bool {
 		}
 	}
 	return false
+}
+
+func copyAppDetailMissing(fileOp files.FileOp, srcDir, dstDir string) error {
+	entries, err := os.ReadDir(srcDir)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		if strings.HasPrefix(entry.Name(), ".") {
+			continue
+		}
+		srcPath := path.Join(srcDir, entry.Name())
+		dstPath := path.Join(dstDir, entry.Name())
+		if !fileOp.Stat(dstPath) {
+			if entry.IsDir() {
+				if err := fileOp.CopyDir(srcPath, dstDir); err != nil {
+					return err
+				}
+				continue
+			}
+			if err := fileOp.CopyFile(srcPath, dstDir); err != nil {
+				return err
+			}
+			continue
+		}
+		if !entry.IsDir() {
+			continue
+		}
+		if err := copyAppDetailMissing(fileOp, srcPath, dstPath); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func getRestartPolicy(yml string) string {

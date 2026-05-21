@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -19,7 +20,7 @@ func Certificate() gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		if !xpack.ValidateCertificate(c) {
+		if !xpack.MultiNodeProvider.ValidateCertificate(c) {
 			CloseDirectly(c)
 			return
 		}
@@ -29,7 +30,7 @@ func Certificate() gin.HandlerFunc {
 			return
 		}
 		masterProxyID := c.Request.Header.Get("Proxy-Id")
-		proxyID, err := cmd.RunDefaultWithStdoutBashC("cat /etc/1panel/.nodeProxyID")
+		proxyID, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("cat", "/etc/1panel/.nodeProxyID")
 		if err == nil && len(proxyID) != 0 && strings.TrimSpace(proxyID) != strings.TrimSpace(masterProxyID) {
 			helper.InternalServer(c, fmt.Errorf("err proxy id"))
 			return

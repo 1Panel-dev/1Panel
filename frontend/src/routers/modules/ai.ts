@@ -18,7 +18,7 @@ const aiRouter = {
             meta: {
                 icon: 'p-jiqiren2',
                 title: 'aiTools.agents.agent',
-                requiresAuth: true,
+                permission: 'ai_agent_view',
             },
         },
         {
@@ -28,7 +28,7 @@ const aiRouter = {
             meta: {
                 icon: 'p-moxing-menu',
                 title: 'aiTools.model.model',
-                requiresAuth: true,
+                permission: 'ai_model_view',
             },
         },
         {
@@ -39,7 +39,7 @@ const aiRouter = {
             meta: {
                 title: 'aiTools.model.localModel',
                 activeMenu: '/ai/model/account',
-                requiresAuth: true,
+                permission: 'ai_model_view',
             },
         },
         {
@@ -49,7 +49,7 @@ const aiRouter = {
             meta: {
                 icon: 'p-mcp-menu',
                 title: 'menu.mcp',
-                requiresAuth: true,
+                permission: 'ai_mcp_view',
             },
         },
         {
@@ -60,17 +60,18 @@ const aiRouter = {
                 icon: 'p-gpu-menu',
                 title: 'aiTools.gpu.gpu',
                 activeMenu: '/ai/gpu/current',
-                requiresAuth: true,
+                permission: 'ai_gpu_view',
             },
         },
         {
             path: '/ai/gpu/history',
             name: 'GPUHistory',
             component: () => import('@/views/ai/gpu/history/index.vue'),
+            hidden: true,
             meta: {
                 title: 'aiTools.gpu.history',
                 activeMenu: '/ai/gpu/current',
-                requiresAuth: true,
+                permission: 'ai_gpu_view',
             },
         },
     ],

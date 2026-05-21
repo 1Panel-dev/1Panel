@@ -18,7 +18,12 @@
                         </el-table-column>
                     </el-table>
                     <template #reference>
-                        <el-button class="h-button-setting" link icon="Setting"></el-button>
+                        <el-button
+                            class="h-button-setting"
+                            :disabled="!isAdminOrNodeAdmin"
+                            link
+                            icon="Setting"
+                        ></el-button>
                     </template>
                 </el-popover>
             </template>
@@ -74,34 +79,38 @@
                                             type="primary"
                                             link
                                             v-if="app.currentRow.status !== 'Running'"
+                                            v-permission="'app_manage'"
                                             @click="onOperate('start', app.currentRow)"
                                         >
                                             {{ $t('commons.button.start') }}
                                         </el-button>
                                         <el-button
-                                            :style="mobile ? 'margin-left: -1px' : ''"
+                                            :style="isMobile ? 'margin-left: -1px' : ''"
                                             size="small"
                                             type="primary"
                                             link
                                             v-else
+                                            v-permission="'app_manage'"
                                             @click="onOperate('stop', app.currentRow)"
                                         >
                                             {{ $t('commons.button.stop') }}
                                         </el-button>
                                         <el-button
-                                            :style="mobile ? 'margin-left: -1px' : ''"
+                                            :style="isMobile ? 'margin-left: -1px' : ''"
                                             size="small"
                                             type="primary"
                                             link
+                                            v-permission="'app_manage'"
                                             @click="onOperate('restart', app.currentRow)"
                                         >
                                             {{ $t('commons.button.restart') }}
                                         </el-button>
                                         <el-button
-                                            :style="mobile ? 'margin-left: -1px' : ''"
+                                            :style="isMobile ? 'margin-left: -1px' : ''"
                                             size="small"
                                             type="primary"
                                             link
+                                            v-permission="'app_manage'"
                                             @click="routerToName('AppInstalled')"
                                         >
                                             {{ $t('tabs.more') }}
@@ -115,6 +124,7 @@
                                     type="primary"
                                     plain
                                     round
+                                    v-permission="'app_manage'"
                                     size="small"
                                     :disabled="app.limit == 1 && app.detail && app.detail.length !== 0"
                                     @click="goInstall(app.key, app.appType)"
@@ -134,21 +144,17 @@
 import { getAppIconUrl, installedOp } from '@/api/modules/app';
 import { changeLauncherStatus, loadAppLauncher, loadAppLauncherOption } from '@/api/modules/dashboard';
 import i18n from '@/lang';
-import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { jumpToInstall } from '@/utils/app';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
-
+const { isMobile, isAdminOrNodeAdmin } = useGlobalStore();
 let loading = ref(false);
 let apps = ref([]);
 const options = ref([]);
 const filter = ref();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const acceptParams = (): void => {
     search();

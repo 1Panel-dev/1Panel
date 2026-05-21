@@ -9,7 +9,7 @@
                         </el-input>
                     </el-form-item>
                 </el-form>
-                <el-button type="primary" @click="openCreate(phpFormRef)">
+                <el-button v-permission type="primary" @click="openCreate(phpFormRef)">
                     {{ $t('commons.button.save') }}
                 </el-button>
             </el-col>

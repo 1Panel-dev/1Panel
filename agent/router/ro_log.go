@@ -13,6 +13,7 @@ func (s *LogRouter) InitRouter(Router *gin.RouterGroup) {
 	{
 		operationRouter.GET("/system/files", baseApi.GetSystemFiles)
 		operationRouter.POST("/tasks/search", baseApi.PageTasks)
+		operationRouter.POST("/tasks/read", baseApi.ReadTaskLogByLine)
 		operationRouter.GET("/tasks/executing/count", baseApi.CountExecutingTasks)
 	}
 }

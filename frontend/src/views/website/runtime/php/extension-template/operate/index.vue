@@ -22,8 +22,8 @@
                     <el-link
                         target="_blank"
                         type="primary"
-                        v-if="!globalStore.isFxplay"
-                        :href="globalStore.docsUrl + '/user_manual/websites/php/#php_1'"
+                        v-if="!isFxplay"
+                        :href="docsUrl + '/user_manual/websites/php/#php_1'"
                     >
                         {{ $t('php.toExtensionsList') }}
                     </el-link>
@@ -35,7 +35,7 @@
                 <el-button @click="handleClose" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" @click="submit(extensionsForm)" :disabled="loading">
+                <el-button v-permission type="primary" @click="submit(extensionsForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -51,8 +51,8 @@ import { MsgSuccess } from '@/utils/message';
 import { CreatePHPExtensions, UpdatePHPExtensions } from '@/api/modules/runtime';
 import i18n from '@/lang';
 import { Runtime } from '@/api/interface/runtime';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { docsUrl, isFxplay } = useGlobalStore();
 
 const open = ref(false);
 const operate = ref('create');

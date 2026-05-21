@@ -2,7 +2,7 @@
     <div>
         <ComplexTable :data="data" @search="search" v-loading="loading" :heightDiff="420">
             <template #toolbar>
-                <el-button type="primary" plain @click="create()">
+                <el-button v-permission type="primary" plain @click="create()">
                     {{ $t('commons.button.create') }}
                 </el-button>
                 <el-alert :closable="false" class="!mt-2">
@@ -95,18 +95,21 @@ const Algorithms = getAlgorithms('');
 const buttons = [
     {
         label: i18n.global.t('website.sourceFile'),
+        permission: true,
         click: function (row: any) {
             openEditFile(row);
         },
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: (row: any) => {
             update(row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: any) => {
             deleteLb(row);
         },

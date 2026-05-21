@@ -47,7 +47,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
-import { getSettingInfo, handleExpired } from '@/api/modules/setting';
+import { getSettingBaseInfo } from '@/api/modules/setting';
+import { handleExpired } from '@/api/modules/auth';
 import { ElForm } from 'element-plus';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
@@ -94,7 +95,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
     });
 };
 const search = async () => {
-    const res = await getSettingInfo();
+    const res = await getSettingBaseInfo();
     let settingForm = res.data;
     isComplexity.value = settingForm?.complexityVerification === 'Enable';
 };

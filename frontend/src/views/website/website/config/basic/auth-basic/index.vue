@@ -3,10 +3,11 @@
         <el-tab-pane :label="$t('website.global')">
             <ComplexTable :data="data" @search="search" v-loading="loading" :heightDiff="420">
                 <template #toolbar>
-                    <el-button type="primary" plain @click="openCreate('root')">
+                    <el-button v-permission type="primary" plain @click="openCreate('root')">
                         {{ $t('commons.button.create') }}
                     </el-button>
                     <el-switch
+                        v-permission
                         class="ml-5"
                         v-model="enable"
                         @change="changeEnable"
@@ -20,7 +21,7 @@
                     width="260px"
                     :buttons="buttons"
                     :label="$t('commons.table.operate')"
-                    :fixed="mobile ? false : 'right'"
+                    :fixed="isMobile ? false : 'right'"
                     fix
                 />
             </ComplexTable>
@@ -28,7 +29,7 @@
         <el-tab-pane :label="$t('website.path')" v-if="showPath">
             <ComplexTable :data="pathData" @search="searchPath" v-loading="loading" :heightDiff="420">
                 <template #toolbar>
-                    <el-button type="primary" plain @click="openCreate('path')">
+                    <el-button v-permission type="primary" plain @click="openCreate('path')">
                         {{ $t('commons.button.create') }}
                     </el-button>
                 </template>
@@ -41,7 +42,7 @@
                     width="260px"
                     :buttons="pathButtons"
                     :label="$t('commons.table.operate')"
-                    :fixed="mobile ? false : 'right'"
+                    :fixed="isMobile ? false : 'right'"
                     fix
                 />
             </ComplexTable>
@@ -65,10 +66,10 @@ import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import Create from './create/index.vue';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-defineOptions({ name: 'Proxy' });
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile } = useGlobalStore();
+defineOptions({ name: 'Proxy' });
 const props = defineProps({
     id: {
         type: Number,
@@ -77,9 +78,6 @@ const props = defineProps({
 });
 const id = computed(() => {
     return props.id;
-});
-const mobile = computed(() => {
-    return globalStore.isMobile();
 });
 const loading = ref(false);
 const data = ref([]);
@@ -92,6 +90,7 @@ const showPath = ref(false);
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: Website.NginxAuthConfig) {
             row.scope = 'root';
             openEdit(row);
@@ -99,6 +98,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.NginxAuthConfig) {
             deleteAuth(row);
         },
@@ -108,6 +108,7 @@ const buttons = [
 const pathButtons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: Website.NginxAuthConfig) {
             row.scope = 'path';
             openEdit(row);
@@ -115,6 +116,7 @@ const pathButtons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.NginxPathAuthConfig) {
             deletePathAuth(row);
         },

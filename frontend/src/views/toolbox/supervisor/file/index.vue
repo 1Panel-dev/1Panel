@@ -3,7 +3,7 @@
         v-model="open"
         :header="$t('website.source')"
         @close="handleClose"
-        :size="globalStore.isFullScreen ? 'full' : 'large'"
+        :size="isFullScreen ? 'full' : 'large'"
         :fullScreen="true"
     >
         <template #content>
@@ -15,7 +15,7 @@
         <template #footer>
             <span>
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" :disabled="loading" @click="submit()">
+                <el-button v-permission type="primary" :disabled="loading" @click="submit()">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -24,11 +24,11 @@
 </template>
 <script lang="ts" setup>
 import { onUnmounted, reactive, ref } from 'vue';
-import { operateSupervisorProcessFile } from '@/api/modules/host-tool';
+import { getSupervisorProcessFile, operateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { isFullScreen } = useGlobalStore();
 
 const loading = ref(false);
 const content = ref('');
@@ -45,7 +45,7 @@ const em = defineEmits(['search']);
 
 const getContent = () => {
     loading.value = true;
-    operateSupervisorProcessFile(req)
+    getSupervisorProcessFile({ name: req.name, file: req.file })
         .then((res) => {
             content.value = res.data;
         })

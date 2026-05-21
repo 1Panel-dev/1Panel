@@ -3,10 +3,10 @@
         v-model="open"
         :header="resource"
         @close="handleClose"
-        :size="globalStore.isFullScreen ? 'full' : '60%'"
+        :size="isFullScreen ? 'full' : '60%'"
         :resource="container"
     >
-        <template #extra v-if="!mobile">
+        <template #extra v-if="!isMobile">
             <el-tooltip :content="loadTooltip()" placement="top">
                 <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
             </el-tooltip>
@@ -25,15 +25,15 @@
 
 <script lang="ts" setup>
 import i18n from '@/lang';
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
-import { GlobalStore } from '@/store';
+import { onBeforeUnmount, ref, watch } from 'vue';
 import screenfull from 'screenfull';
 import ContainerLog from '@/components/log/container/index.vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
+const { isMobile, isFullScreen } = useGlobalStore();
 const open = ref(false);
 const resource = ref('');
 const container = ref('');
-const globalStore = GlobalStore();
 const logVisible = ref(false);
 const compose = ref('');
 const highlightDiff = ref(150);
@@ -53,24 +53,20 @@ const defaultProps = defineProps({
     },
 });
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
-
 const handleClose = () => {
     open.value = false;
-    globalStore.isFullScreen = false;
+    isFullScreen.value = false;
 };
 
 function toggleFullscreen() {
-    globalStore.isFullScreen = !globalStore.isFullScreen;
+    isFullScreen.value = !isFullScreen.value;
 }
 const loadTooltip = () => {
-    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
+    return i18n.global.t('commons.button.' + (isFullScreen.value ? 'quitFullscreen' : 'fullscreen'));
 };
 
 watch(logVisible, (val) => {
-    if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
+    if (screenfull.isEnabled && !val && !isMobile.value) screenfull.exit();
 });
 
 const acceptParams = (props: DialogProps): void => {

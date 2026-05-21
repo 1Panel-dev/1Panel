@@ -25,10 +25,7 @@
                                 />
                             </template>
                         </el-select>
-                        <span
-                            class="input-help"
-                            v-if="dialogData.rowData!.type === 'panelPwdEndTime' && expirationDays === 0"
-                        >
+                        <span class="input-help" v-if="dialogData.rowData!.type === 'panelPwdEndTime'">
                             {{ $t('xpack.alert.panelPwdEndTimeRulesHelper') }}
                             <el-link
                                 style="font-size: 12px; margin-left: 5px"
@@ -324,30 +321,30 @@
                     <el-form-item :label="$t('xpack.alert.alertMethod')" prop="sendMethod">
                         <el-select class="selectClass" v-model="dialogData.rowData!.sendMethod" multiple cleanable>
                             <el-option value="mail" :label="$t('xpack.alert.mail')" />
-                            <el-option v-if="!globalStore.isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
+                            <el-option v-if="!isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                             <el-option
                                 value="weCom"
-                                v-if="!globalStore.isIntl"
-                                :disabled="!globalStore.isProductPro"
+                                v-if="!isIntl"
+                                :disabled="!isProductPro"
                                 :label="$t('xpack.alert.weCom')"
                             />
                             <el-option
                                 value="dingTalk"
-                                v-if="!globalStore.isIntl"
-                                :disabled="!globalStore.isProductPro"
+                                v-if="!isIntl"
+                                :disabled="!isProductPro"
                                 :label="$t('xpack.alert.dingTalk')"
                             />
                             <el-option
                                 value="feiShu"
-                                v-if="!globalStore.isIntl"
-                                :disabled="!globalStore.isProductPro"
+                                v-if="!isIntl"
+                                :disabled="!isProductPro"
                                 :label="$t('xpack.alert.feiShu')"
                             />
-                            <el-option v-if="globalStore.isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
+                            <el-option v-if="isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                             <el-option
                                 value="sms"
-                                v-if="!globalStore.isIntl"
-                                :disabled="!globalStore.isProductPro"
+                                v-if="!isIntl"
+                                :disabled="!isProductPro"
                                 :label="$t('xpack.alert.sms')"
                             />
                         </el-select>
@@ -368,7 +365,7 @@
                 <el-button
                     type="primary"
                     @click="onSubmit(formRef)"
-                    :disabled="dialogData.rowData?.type === 'panelPwdEndTime' && expirationDays === 0 && loading"
+                    :disabled="dialogData.rowData?.type === 'panelPwdEndTime' && loading"
                 >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
@@ -386,13 +383,11 @@ import { CreateAlert, ListDisks, UpdateAlert, ListClams, ListCronJob } from '@/a
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { getSettingInfo } from '@/api/modules/setting';
-import { GlobalStore } from '@/store';
-import { storeToRefs } from 'pinia';
 import { routerToName } from '@/utils/router';
 import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
-const globalStore = GlobalStore();
-const { isMaster, isProductPro } = storeToRefs(globalStore);
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMaster, isProductPro, isIntl } = useGlobalStore();
 
 interface DialogProps {
     title: string;
@@ -405,7 +400,6 @@ const { t } = i18n.global;
 const loading = ref(false);
 const visible = ref(false);
 const websiteOptions = ref();
-const expirationDays = ref(0);
 const sslOptions = ref([]);
 const diskOptions = ref([]);
 const clamsOptions = ref([]);
@@ -563,9 +557,6 @@ const initOptions = (type: string, subType: string) => {
     if (type === 'siteEndTime') {
         loadWebsites();
     }
-    if (type === 'panelPwdEndTime') {
-        loadSettings();
-    }
     if (diskTypes.includes(type)) {
         loadDisks();
     }
@@ -718,11 +709,6 @@ const loadCronJob = async (jobType: string) => {
     });
     cronJobOptions.value = res.data || [];
     dialogData.value.rowData.project = dialogData.value.rowData.project || String(cronJobOptions.value[0].id);
-};
-
-const loadSettings = async () => {
-    const res = await getSettingInfo();
-    expirationDays.value = Number(res.data.expirationDays);
 };
 
 const formatTitle = (row: Alert.AlertInfo) => {

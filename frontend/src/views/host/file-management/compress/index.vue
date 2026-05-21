@@ -110,9 +110,9 @@ import TaskLog from '@/components/log/task/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { getErrorMessage } from '@/utils/misc';
 import { newUUID } from '@/utils/id';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { currentNode } = useGlobalStore();
 
 interface CompressProps {
     files: Array<any>;
@@ -199,7 +199,7 @@ const loadTaskInfo = async () => {
                 page: 1,
                 pageSize: 1,
             },
-            globalStore.currentNode,
+            currentNode.value,
         );
         taskInfo.value = res.data.items?.[0] || null;
         emitTaskChange();
@@ -291,7 +291,7 @@ const openTaskLog = () => {
     if (!currentTaskID.value) {
         return;
     }
-    taskLogRef.value?.openWithTaskID(currentTaskID.value, true, globalStore.currentNode);
+    taskLogRef.value?.openWithTaskID(currentTaskID.value, true, currentNode.value);
 };
 
 const getLinkPath = (path: string) => {

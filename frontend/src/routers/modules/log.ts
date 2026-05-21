@@ -9,6 +9,7 @@ const logsRouter = {
     meta: {
         title: 'menu.logs',
         icon: 'p-log',
+        permission: 'log_view',
     },
     children: [
         {
@@ -27,7 +28,7 @@ const logsRouter = {
                         parent: 'menu.logs',
                         title: 'logs.operation',
                         activeMenu: '/logs',
-                        requiresAuth: false,
+                        permission: 'log_view',
                     },
                 },
                 {
@@ -39,7 +40,7 @@ const logsRouter = {
                         parent: 'menu.logs',
                         title: 'logs.login',
                         activeMenu: '/logs',
-                        requiresAuth: false,
+                        permission: 'log_view',
                     },
                 },
                 {
@@ -51,7 +52,7 @@ const logsRouter = {
                         parent: 'menu.logs',
                         title: 'logs.websiteLog',
                         activeMenu: '/logs',
-                        requiresAuth: false,
+                        permission: 'log_view',
                     },
                 },
                 {
@@ -63,7 +64,7 @@ const logsRouter = {
                         parent: 'menu.logs',
                         title: 'logs.system',
                         activeMenu: '/logs',
-                        requiresAuth: false,
+                        permission: 'log_view',
                     },
                 },
                 {
@@ -75,7 +76,7 @@ const logsRouter = {
                         parent: 'menu.logs',
                         title: 'ssh.loginLogs',
                         activeMenu: '/logs',
-                        requiresAuth: false,
+                        permission: 'log_view',
                     },
                 },
                 {
@@ -87,7 +88,7 @@ const logsRouter = {
                         parent: 'menu.logs',
                         title: 'logs.task',
                         activeMenu: '/logs',
-                        requiresAuth: false,
+                        permission: 'log_view',
                     },
                 },
             ],

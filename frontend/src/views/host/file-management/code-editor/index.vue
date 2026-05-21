@@ -14,7 +14,7 @@
                     <el-tooltip :content="loadTooltip()" placement="top">
                         <el-button
                             @click="toggleFullscreen"
-                            v-if="!mobile"
+                            v-if="!isMobile"
                             class="!border-none !bg-transparent !text-base !font-semibold !py-2 !px-1 mr-2.5"
                             icon="FullScreen"
                         ></el-button>
@@ -32,7 +32,7 @@
                 <div class="flex justify-start items-center gap-x-4 card-action">
                     <el-text class="cursor-pointer" @click="handleReset">{{ $t('commons.button.reset') }}</el-text>
                     <el-divider direction="vertical" class="!mx-0" />
-                    <el-text class="cursor-pointer ml-0" @click="saveContent()">
+                    <el-text v-permission class="cursor-pointer ml-0" @click="saveContent()">
                         {{ $t('commons.button.save') }}
                     </el-text>
                     <el-divider direction="vertical" class="!mx-0" />
@@ -119,22 +119,22 @@
                                 </el-icon>
                                 <span class="sm:inline hidden pl-1">{{ $t('commons.button.refresh') }}</span>
                             </el-text>
-                            <el-divider direction="vertical" v-if="!mobile" class="!mx-0" />
-                            <el-dropdown @command="handleCreate" v-if="!mobile" trigger="click">
+                            <el-divider direction="vertical" v-if="!isMobile" class="!mx-0" />
+                            <el-dropdown @command="handleCreate" v-if="!isMobile" trigger="click">
                                 <el-text size="small">
                                     {{ $t('commons.button.create') }}
                                     <el-icon><arrow-down /></el-icon>
                                 </el-text>
                                 <template #dropdown>
                                     <el-dropdown-menu>
-                                        <el-dropdown-item command="dir" class="!px-2">
+                                        <fu-dropdown-item v-permission command="dir" class="!px-2">
                                             <svg-icon class="!w-5 !h-5" iconName="p-file-folder"></svg-icon>
                                             {{ $t('file.dir') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item command="file" class="!px-2">
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item v-permission command="file" class="!px-2">
                                             <svg-icon class="!w-5 !h-5" iconName="p-file-normal"></svg-icon>
                                             {{ $t('menu.files') }}
-                                        </el-dropdown-item>
+                                        </fu-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -416,10 +416,12 @@ import { newUUID } from '@/utils/id';
 import { TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
 import { DArrowLeft, DArrowRight, Refresh, Top } from '@element-plus/icons-vue';
 import { loadBaseDir } from '@/api/modules/setting';
-import { GlobalStore } from '@/store';
 import CodeTabs from './tabs/index.vue';
 import FileHistoryDrawer from './history/index.vue';
 import noUpdateImage from '@/assets/images/no_update_app.svg';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile } = useGlobalStore();
 
 type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
 
@@ -565,11 +567,6 @@ const expandedNodeIds = ref(new Set());
 const toggleShow = () => {
     isShow.value = !isShow.value;
 };
-
-const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 type WordWrapOptions = 'off' | 'on' | 'wordWrapColumn' | 'bounded';
 

@@ -1,21 +1,19 @@
 package middleware
 
 import (
-	"strconv"
-	"strings"
-
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
-	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	psessionUtils "github.com/1Panel-dev/1Panel/core/init/session/psession"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
 
 func SessionAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		apiReq := c.GetBool("API_AUTH")
-		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core/auth") || apiReq {
+		if isAnonymousAuthPath(c.Request.URL.Path) || apiReq {
 			c.Next()
 			return
 		}
@@ -30,19 +28,20 @@ func SessionAuth() gin.HandlerFunc {
 			helper.BadAuth(c, "ErrNotLogin", err)
 			return
 		}
-		settingRepo := repo.NewISettingRepo()
-		sessionTimeout, err := settingRepo.GetValueByKey("SessionTimeout")
-		if err != nil {
-			global.LOG.Errorf("create operation record failed, err: %v", err)
+		if len(psession.Name) == 0 || len(psession.ID) == 0 {
+			helper.BadAuth(c, "ErrNotLogin", err)
 			return
 		}
-		lifeTime, _ := strconv.Atoi(sessionTimeout)
-		ssl, err := settingRepo.GetValueByKey("SSL")
+		c.Set(psessionUtils.GinContextSessionUserKey, psession)
+		lifeTime, err := xpack.AuthProvider.LoadSessionTimeout(c, psession)
 		if err != nil {
-			global.LOG.Errorf("create operation record failed, err: %v", err)
+			global.LOG.Errorf("get session timeout failed, err: %v", err)
+			helper.InternalServer(c, err)
+			c.Abort()
 			return
 		}
-		if _, err := global.SESSION.RefreshIfNeeded(c, psession, ssl == constant.StatusEnable, lifeTime); err != nil {
+
+		if _, err := global.SESSION.RefreshIfNeeded(c, psession, global.CONF.Conn.SSL == constant.StatusEnable, lifeTime); err != nil {
 			errItem := err.Error()
 			if errItem == "ErrSessionDataFormat" || errItem == "ErrSessionDataNotFound" {
 				helper.BadAuth(c, "ErrNotLogin", buserr.New(errItem))
@@ -53,5 +52,21 @@ func SessionAuth() gin.HandlerFunc {
 			return
 		}
 		c.Next()
+	}
+}
+
+func isAnonymousAuthPath(path string) bool {
+	switch path {
+	case "/api/v2/core/auth/captcha",
+		"/api/v2/core/auth/passkey/begin",
+		"/api/v2/core/auth/passkey/finish",
+		"/api/v2/core/auth/mfalogin",
+		"/api/v2/core/auth/login",
+		"/api/v2/core/auth/logout",
+		"/api/v2/core/auth/setting",
+		"/api/v2/core/auth/welcome":
+		return true
+	default:
+		return false
 	}
 }

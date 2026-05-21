@@ -19,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
@@ -58,11 +57,6 @@ func ensureContainerRunning(containerName string) error {
 		return fmt.Errorf("container %s is not running, please check and retry", containerName)
 	}
 	return nil
-}
-
-func runDockerExecWithStdout(timeout time.Duration, containerName string, args ...string) (string, error) {
-	commandArgs := append([]string{"exec", containerName}, args...)
-	return cmd.NewCommandMgr(cmd.WithTimeout(timeout)).RunWithStdout("docker", commandArgs...)
 }
 
 func resolveAgentAccountInput(provider, apiKey, baseURL string) (resolvedAgentAccountInput, error) {
@@ -582,6 +576,9 @@ func checkAgentUpgradable(install model.AppInstall) bool {
 		return false
 	}
 	if install.App.ID == 0 {
+		return false
+	}
+	if ignoreUpdate(install) {
 		return false
 	}
 	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(install.App.ID))

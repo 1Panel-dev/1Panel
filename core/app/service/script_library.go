@@ -124,7 +124,7 @@ func (u *ScriptService) Create(req dto.ScriptOperate) error {
 	if req.IsInteractive {
 		return nil
 	}
-	if err := xpack.Sync(constant.SyncScripts); err != nil {
+	if err := xpack.MultiNodeProvider.Sync(constant.SyncScripts); err != nil {
 		global.LOG.Errorf("sync scripts to node failed, err: %v", err)
 	}
 	return nil
@@ -140,7 +140,7 @@ func (u *ScriptService) Delete(req dto.OperateByIDs) error {
 			return err
 		}
 	}
-	if err := xpack.Sync(constant.SyncScripts); err != nil {
+	if err := xpack.MultiNodeProvider.Sync(constant.SyncScripts); err != nil {
 		global.LOG.Errorf("sync scripts to node failed, err: %v", err)
 	}
 	return nil
@@ -160,7 +160,7 @@ func (u *ScriptService) Update(req dto.ScriptOperate) error {
 	if err := scriptRepo.Update(req.ID, updateMap); err != nil {
 		return err
 	}
-	if err := xpack.Sync(constant.SyncScripts); err != nil {
+	if err := xpack.MultiNodeProvider.Sync(constant.SyncScripts); err != nil {
 		global.LOG.Errorf("sync scripts to node failed, err: %v", err)
 	}
 	return nil
@@ -172,7 +172,7 @@ func StartSync() {
 	}
 	service := NewIScriptService()
 	scriptSync, _ := repo.NewISettingRepo().GetValueByKey("ScriptSync")
-	if !global.CONF.Base.IsOffLine && scriptSync == constant.StatusEnable {
+	if !global.CONF.Base.IsOffline && scriptSync == constant.StatusEnable {
 		minuteRand, err := rand.Int(rand.Reader, big.NewInt(60))
 		if err != nil {
 			global.LOG.Errorf("generate random minute failed: %v", err)
@@ -202,7 +202,7 @@ func LoadScriptInfo(id uint) (model.ScriptLibrary, error) {
 }
 
 func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
-	if global.CONF.Base.IsOffLine {
+	if global.CONF.Base.IsOffline {
 		return nil
 	}
 	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("RemoteScriptLibrary"), task.TaskSync, task.TaskScopeScript, req.TaskID, 0)
@@ -276,7 +276,7 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 		if err := global.DB.Model(&model.Setting{}).Where("key = ?", "ScriptVersion").Updates(map[string]interface{}{"value": string(versionRes)}).Error; err != nil {
 			return fmt.Errorf("update script version in db failed, err: %v", err)
 		}
-		if err := xpack.Sync(constant.SyncScripts); err != nil {
+		if err := xpack.MultiNodeProvider.Sync(constant.SyncScripts); err != nil {
 			global.LOG.Errorf("sync scripts to node failed, err: %v", err)
 		}
 		return nil

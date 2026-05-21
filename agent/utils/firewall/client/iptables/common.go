@@ -24,8 +24,8 @@ const (
 )
 
 const (
-	EstablishedRule = "-m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT -m comment --comment 'ESTABLISHED Whitelist'"
-	IoRuleIn        = "-i lo -j ACCEPT -m comment --comment 'Loopback Whitelist'"
+	EstablishedRule = "-m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT -m comment --comment \"ESTABLISHED Whitelist\""
+	IoRuleIn        = "-i lo -j ACCEPT -m comment --comment \"Loopback Whitelist\""
 	DropAllTcp      = "-p tcp -j DROP"
 	DropAllUdp      = "-p udp -j DROP"
 	AllowSSH        = "-p tcp --dport ssh -j ACCEPT"
@@ -43,72 +43,91 @@ const (
 	NatTab    = "nat"
 )
 
-func RunWithStd(tab, rule string) (string, error) {
-	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(60*time.Second))
-	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -w -t %s %s", cmd.SudoHandleCmd(), tab, rule)
+func runIptables(tab string, ignoreExist1, withWait bool, ruleArgs ...string) (string, error) {
+	options := []cmd.Option{cmd.WithTimeout(60 * time.Second)}
+	if ignoreExist1 {
+		options = append(options, cmd.WithIgnoreExist1())
+	}
+	cmdMgr := cmd.NewCommandMgr(options...)
+	args := []string{"-t", tab}
+	if withWait {
+		args = append(args, "-w")
+	}
+	args = append(args, ruleArgs...)
+	return cmdMgr.RunWithOptionalSudoAndStdout("iptables", args...)
+}
+
+func RunWithStd(tab string, args ...string) (string, error) {
+	stdout, err := runIptables(tab, true, true, args...)
 	if err != nil {
-		global.LOG.Errorf("iptables command failed [table=%s, rule=%s]: %v", tab, rule, err)
+		global.LOG.Errorf("iptables command failed [table=%s, args=%s]: %v", tab, strings.Join(args, " "), err)
 		return stdout, err
 	}
 	return stdout, nil
 }
-func RunWithoutIgnore(tab, rule string) (string, error) {
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(60 * time.Second))
-	stdout, err := cmdMgr.RunWithStdoutBashCf("%s iptables -t %s %s", cmd.SudoHandleCmd(), tab, rule)
+func RunWithoutIgnore(tab string, args ...string) (string, error) {
+	stdout, err := runIptables(tab, false, false, args...)
 	if err != nil {
 		return stdout, err
 	}
 	return stdout, nil
 }
-func Run(tab, rule string) error {
-	if _, err := RunWithStd(tab, rule); err != nil {
+func Run(tab string, args ...string) error {
+	if _, err := RunWithStd(tab, args...); err != nil {
 		return err
 	}
 	return nil
 }
 
 func NewChain(tab, chain string) error {
-	return Run(tab, "-N "+chain)
+	return Run(tab, "-N", chain)
 }
 
 func ClearChain(tab, chain string) error {
-	return Run(tab, "-F "+chain)
+	return Run(tab, "-F", chain)
 }
 
-func AddRule(tab, chain, rule string) error {
-	if CheckRuleExist(tab, chain, rule) {
+func AddRule(tab, chain string, ruleArgs ...string) error {
+	if CheckRuleExist(tab, chain, ruleArgs...) {
 		return nil
 	}
-	return Run(tab, fmt.Sprintf("-A %s %s", chain, rule))
+	args := append([]string{"-A", chain}, ruleArgs...)
+	return Run(tab, args...)
 }
-func DeleteRule(tab, chain, rule string) error {
-	return Run(tab, fmt.Sprintf("-D %s %s", chain, rule))
+func DeleteRule(tab, chain string, ruleArgs ...string) error {
+	args := append([]string{"-D", chain}, ruleArgs...)
+	return Run(tab, args...)
 }
 
 func CheckChainExist(tab, chain string) (bool, error) {
-	stdout, err := RunWithStd(tab, fmt.Sprintf("-S | grep -w 'N %s'", chain))
+	stdout, err := RunWithStd(tab, "-S")
 	if err != nil {
 		global.LOG.Errorf("check chain %s from tab %s exist failed, err: %v", chain, tab, err)
 		return false, fmt.Errorf("check chain %s from tab %s exist failed, err: %v", chain, tab, err)
 	}
-	if strings.TrimSpace(stdout) == "" {
-		return false, nil
+	for _, line := range strings.Split(stdout, "\n") {
+		if strings.TrimSpace(line) == "-N "+chain {
+			return true, nil
+		}
 	}
-	return true, nil
+	return false, nil
 }
 func CheckChainBind(tab, parentChain, chain string) (bool, error) {
-	stdout, err := RunWithStd(tab, fmt.Sprintf("-S %s | grep -- '-j %s'", parentChain, chain))
+	stdout, err := RunWithStd(tab, "-S", parentChain)
 	if err != nil {
 		global.LOG.Errorf("check chain %s from tab %s is bind to %s failed, err: %v", chain, tab, parentChain, err)
 		return false, fmt.Errorf("check chain %s from tab %s is bind to %s failed, err: %v", chain, tab, parentChain, err)
 	}
-	if strings.TrimSpace(stdout) == "" {
-		return false, nil
+	for _, line := range strings.Split(stdout, "\n") {
+		if strings.Contains(line, "-j "+chain) {
+			return true, nil
+		}
 	}
-	return true, nil
+	return false, nil
 }
-func CheckRuleExist(tab, chain, rule string) bool {
-	_, err := RunWithoutIgnore(tab, fmt.Sprintf("-C %s %s", chain, rule))
+func CheckRuleExist(tab, chain string, ruleArgs ...string) bool {
+	args := append([]string{"-C", chain}, ruleArgs...)
+	_, err := RunWithoutIgnore(tab, args...)
 	return err == nil
 }
 
@@ -130,7 +149,7 @@ func BindChain(tab, targetChain, chain string, position int) error {
 		return fmt.Errorf("find chain %s number from %s failed, err: %w", chain, targetChain, err)
 	}
 	if line == 0 {
-		if err := Run(tab, fmt.Sprintf("-I %s %d -j %s", targetChain, position, chain)); err != nil {
+		if err := Run(tab, "-I", targetChain, strconv.Itoa(position), "-j", chain); err != nil {
 			return fmt.Errorf("bind chain %s to %s failed, err: %w", chain, targetChain, err)
 		}
 	}
@@ -142,13 +161,18 @@ func UnbindChain(tab, targetChain, chain string) error {
 		return fmt.Errorf("find chain %s number from %s failed, err: %w", chain, targetChain, err)
 	}
 	if line != 0 {
-		return Run(tab, fmt.Sprintf("-D %s %v", targetChain, line))
+		return Run(tab, "-D", targetChain, strconv.Itoa(line))
 	}
 	return nil
 }
 
 func FindChainNum(tab, targetChain, chain string) (int, error) {
-	stdout, err := RunWithStd(tab, fmt.Sprintf("-L %s --line-numbers -n | grep -w %s", targetChain, chain))
+	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(60*time.Second))
+	commandName, commandArgs := cmd.WrapWithOptionalSudo("iptables", "-w", "-t", tab, "-L", targetChain, "--line-numbers", "-n")
+	stdout, err := cmdMgr.RunPipe(
+		cmd.PipeCommand{Name: commandName, Args: commandArgs},
+		cmd.PipeCommand{Name: "grep", Args: []string{"-w", chain}},
+	)
 	if err != nil {
 		return 0, fmt.Errorf("failed to list rules in chain %s: %w", targetChain, err)
 	}
@@ -190,5 +214,5 @@ func AddChainWithAppend(tab, parentChain, chain string) error {
 	return nil
 }
 func AppendChain(tab string, parentChain, chain string) error {
-	return Run(tab, fmt.Sprintf("-A %s -j %s", parentChain, chain))
+	return Run(tab, "-A", parentChain, "-j", chain)
 }

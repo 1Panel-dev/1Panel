@@ -13,7 +13,6 @@ var whiteUrlList = map[string]struct{}{
 	"/api/v2/dashboard/app/launcher/option": {},
 	"/api/v2/websites/config":               {},
 	"/api/v2/websites/waf/config":           {},
-	"/api/v2/files/loadfile":                {},
 	"/api/v2/files/size":                    {},
 	"/api/v2/runtimes/sync":                 {},
 	"/api/v2/toolbox/device/base":           {},
@@ -21,7 +20,6 @@ var whiteUrlList = map[string]struct{}{
 	"/api/v2/files/mount":                   {},
 	"/api/v2/hosts/ssh/log":                 {},
 	"/api/v2/toolbox/clam/base":             {},
-	"/api/v2/hosts/too":                     {},
 	"/api/v2/backups/record/size":           {},
 
 	"/api/v2/core/auth/login":     {},

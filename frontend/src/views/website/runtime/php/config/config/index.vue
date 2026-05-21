@@ -40,7 +40,7 @@
                         <span class="input-help">{{ $t('php.max_file_uploads') }}</span>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="onSaveStart(phpFormRef)">
+                        <el-button v-permission type="primary" @click="onSaveStart(phpFormRef)">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-form-item>

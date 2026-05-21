@@ -9,6 +9,7 @@ const databaseRouter = {
     meta: {
         icon: 'p-database',
         title: 'menu.database',
+        permission: 'database_view',
     },
     children: [
         {
@@ -25,9 +26,9 @@ const databaseRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/databases',
-                        requiresAuth: false,
                         parent: 'menu.database',
                         title: 'MySQL',
+                        permission: 'database_view',
                     },
                 },
                 {
@@ -38,8 +39,8 @@ const databaseRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/databases',
-                        requiresAuth: false,
                         ignoreTab: true,
+                        permission: 'database_view',
                     },
                 },
                 {
@@ -49,10 +50,10 @@ const databaseRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/databases',
-                        requiresAuth: false,
                         parent: 'menu.database',
                         title: 'MySQL',
                         detail: 'database.remote',
+                        permission: 'database_view',
                     },
                 },
                 {
@@ -62,9 +63,9 @@ const databaseRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/databases',
-                        requiresAuth: false,
                         parent: 'menu.database',
                         title: 'PostgreSQL',
+                        permission: 'database_view',
                     },
                 },
                 {
@@ -74,10 +75,10 @@ const databaseRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/databases',
-                        requiresAuth: false,
                         parent: 'menu.database',
                         title: 'PostgreSQL',
                         detail: 'database.remote',
+                        permission: 'database_view',
                     },
                 },
                 {
@@ -88,8 +89,8 @@ const databaseRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/databases',
-                        requiresAuth: false,
                         ignoreTab: true,
+                        permission: 'database_view',
                     },
                 },
                 {
@@ -99,9 +100,9 @@ const databaseRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/databases',
-                        requiresAuth: false,
                         parent: 'menu.database',
                         title: 'Redis',
+                        permission: 'database_view',
                     },
                 },
                 {
@@ -111,10 +112,10 @@ const databaseRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/databases',
-                        requiresAuth: false,
                         parent: 'menu.database',
                         title: 'Redis',
                         detail: 'database.remote',
+                        permission: 'database_view',
                     },
                 },
                 {
@@ -127,6 +128,7 @@ const databaseRouter = {
                         requiresAuth: false,
                         parent: 'menu.database',
                         title: 'MongoDB',
+                        permission: 'database_view',
                     },
                 },
                 {
@@ -140,6 +142,7 @@ const databaseRouter = {
                         parent: 'menu.database',
                         title: 'MongoDB',
                         detail: 'database.remote',
+                        permission: 'database_view',
                     },
                 },
             ],

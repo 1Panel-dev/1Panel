@@ -5,7 +5,7 @@
         @close="handleClose"
         :resource="title"
         fullScreen
-        :size="globalStore.isFullScreen ? 'full' : 'large'"
+        :size="isFullScreen ? 'full' : 'large'"
         :autoClose="false"
     >
         <template #content>
@@ -33,9 +33,9 @@
 <script lang="ts" setup>
 import { reactive, ref, nextTick } from 'vue';
 import Terminal from '@/components/terminal/index.vue';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { isFullScreen } = useGlobalStore();
 const title = ref();
 const terminalVisible = ref(false);
 const terminalOpen = ref(false);
@@ -68,7 +68,7 @@ const initTerm = async () => {
     terminalOpen.value = true;
     await nextTick();
     terminalRef.value!.acceptParams({
-        endpoint: '/api/v2/containers/exec',
+        endpoint: '/api/v2/hosts/terminal/container',
         args: `source=container&containerid=${form.containerID}&user=${form.user}&command=${form.command}`,
         error: '',
         initCmd: '',

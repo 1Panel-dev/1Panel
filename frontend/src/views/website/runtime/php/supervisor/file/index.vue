@@ -9,7 +9,7 @@
                 <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail">
                     {{ $t('commons.button.watch') }}
                 </el-checkbox>
-                <el-button class="ml-5" @click="cleanLog" icon="Delete">
+                <el-button v-permission class="ml-5" @click="cleanLog" icon="Delete">
                     {{ $t('commons.button.clean') }}
                 </el-button>
             </div>
@@ -22,7 +22,13 @@
         <template #footer>
             <span>
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" :disabled="loading" @click="submit()" v-if="req.file === 'config'">
+                <el-button
+                    v-permission
+                    type="primary"
+                    :disabled="loading"
+                    @click="submit()"
+                    v-if="req.file === 'config'"
+                >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

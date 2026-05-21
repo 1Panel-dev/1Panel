@@ -22,8 +22,11 @@ import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
 import { decodeBase64, encodeBase64 } from '@/utils/base64';
-import { GlobalStore, TerminalStore } from '@/store';
-const globalStore = GlobalStore();
+import { TerminalStore } from '@/store';
+import { MsgError } from '@/utils/message';
+import { checkStreamAuth } from '@/utils/stream-auth';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+const { currentNode } = useGlobalStore();
 
 const terminalElement = ref<HTMLDivElement | null>(null);
 const fitAddon = new FitAddon();
@@ -32,6 +35,7 @@ const webSocketReady = ref(false);
 const term = ref();
 const terminalSocket = ref<WebSocket>();
 const heartbeatTimer = ref<NodeJS.Timer>();
+let initWebSocketToken = 0;
 const latency = ref(0);
 const initCmd = ref('');
 const hideInitCmdEcho = ref(false);
@@ -181,11 +185,18 @@ const initError = (errorInfo: string) => {
 };
 
 function onClose(isKeepShow: boolean = false) {
+    initWebSocketToken++;
     window.removeEventListener('resize', changeTerminalSize);
     clearAINotice();
+    webSocketReady.value = false;
     try {
         terminalSocket.value?.close();
     } catch {}
+    if (heartbeatTimer.value) {
+        clearInterval(Number(heartbeatTimer.value));
+        heartbeatTimer.value = undefined;
+    }
+    terminalSocket.value = undefined;
     if (!isKeepShow) {
         try {
             term.value.dispose();
@@ -236,15 +247,27 @@ function changeTerminalSize() {
 
 // websocket 相关代码 start
 
-const initWebSocket = (endpoint_: string, args: string = '') => {
+const initWebSocket = async (endpoint_: string, args: string = '') => {
+    const token = ++initWebSocketToken;
     const href = window.location.href;
     const protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     const host = href.split('//')[1].split('/')[0];
     const endpoint = endpoint_.replace(/^\/+/, '');
-    let node = args.indexOf('id=') !== -1 ? 'local' : globalStore.currentNode;
+    let node = args.indexOf('id=') !== -1 ? 'local' : currentNode.value;
     let conn = `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}&operateNode=${node}`;
     if (args.indexOf('operateNode=') !== -1) {
         conn = `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}`;
+    }
+    const authError = await checkStreamAuth(conn);
+    if (token !== initWebSocketToken || !termReady.value) {
+        return;
+    }
+    if (authError) {
+        showWebSocketAuthError(authError);
+        return;
+    }
+    if (heartbeatTimer.value) {
+        clearInterval(Number(heartbeatTimer.value));
     }
     terminalSocket.value = new WebSocket(conn);
     terminalSocket.value.onopen = runRealTerminal;
@@ -261,6 +284,12 @@ const initWebSocket = (endpoint_: string, args: string = '') => {
             );
         }
     }, 1000 * 10);
+};
+
+const showWebSocketAuthError = (message: string) => {
+    clearAINotice();
+    MsgError(message);
+    term.value?.write(`\x1b[31m${message}\x1b[m\r\n`);
 };
 
 const runRealTerminal = () => {
@@ -350,9 +379,12 @@ const errorRealTerminal = (ex: any) => {
 
 const closeRealTerminal = (ev: CloseEvent) => {
     clearAINotice();
+    webSocketReady.value = false;
     if (heartbeatTimer.value) {
         clearInterval(Number(heartbeatTimer.value));
+        heartbeatTimer.value = undefined;
     }
+    terminalSocket.value = undefined;
     term.value?.write('The connection has been disconnected.');
     term.value?.write(ev.reason);
 };

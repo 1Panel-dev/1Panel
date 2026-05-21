@@ -391,7 +391,7 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 
 func backupLogFile(dstFilePath, websiteLogDir string, fileOp files.FileOp) error {
 	cmdMgr := cmd.NewCommandMgr()
-	if err := cmdMgr.RunBashCf("tar -czf %s -C %s %s", dstFilePath, websiteLogDir, strings.Join([]string{"access.log", "error.log"}, " ")); err != nil {
+	if err := cmdMgr.Run("tar", "-czf", dstFilePath, "-C", websiteLogDir, "access.log", "error.log"); err != nil {
 		dstDir := pathUtils.Dir(dstFilePath)
 		if err = fileOp.Copy(pathUtils.Join(websiteLogDir, "access.log"), dstDir); err != nil {
 			return err
@@ -399,7 +399,7 @@ func backupLogFile(dstFilePath, websiteLogDir string, fileOp files.FileOp) error
 		if err = fileOp.Copy(pathUtils.Join(websiteLogDir, "error.log"), dstDir); err != nil {
 			return err
 		}
-		if err = cmdMgr.RunBashCf("tar -czf %s -C %s %s", dstFilePath, dstDir, strings.Join([]string{"access.log", "error.log"}, " ")); err != nil {
+		if err = cmdMgr.Run("tar", "-czf", dstFilePath, "-C", dstDir, "access.log", "error.log"); err != nil {
 			return err
 		}
 		_ = fileOp.DeleteFile(pathUtils.Join(dstDir, "access.log"))

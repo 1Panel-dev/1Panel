@@ -145,8 +145,8 @@
                         {{ $t('ssl.shellHelper') }}
                     </span>
                 </el-form-item>
-                <PushtoNode
-                    v-if="isMaster && isMasterProductPro"
+                <PushToNode
+                    v-if="isMaster && isXpackOrEE"
                     :push-node="ssl.pushNode"
                     :nodes="ssl.pushNodes"
                     type="ssl"
@@ -158,7 +158,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(sslForm)" :disabled="loading">
+                <el-button v-permission type="primary" @click="submit(sslForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -180,10 +180,16 @@ import { KeyTypes } from '@/global/mimetype';
 import { getDNSName, getAccountName } from '@/utils/ssl';
 import { defineAsyncComponent } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { loadOptionalComponent } from '@/extensions/optional';
-const { isMasterProductPro, isMaster } = useGlobalStore();
+const { isMaster, isXpackOrEE } = useGlobalStore();
 
-const PushtoNode = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/ssl/index.vue'));
+const PushToNode = defineAsyncComponent(async () => {
+    const modules = import.meta.glob('@/xpack/views/ssl/index.vue');
+    const loader = modules['/src/xpack/views/ssl/index.vue'];
+    if (loader) {
+        return ((await loader()) as any).default;
+    }
+    return { template: '<div></div>' };
+});
 
 const props = defineProps({
     id: {

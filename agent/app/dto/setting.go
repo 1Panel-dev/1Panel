@@ -23,11 +23,17 @@ type SettingInfo struct {
 	AppStoreLastModified string `json:"appStoreLastModified"`
 	AppStoreSyncStatus   string `json:"appStoreSyncStatus"`
 
-	FileRecycleBin string `json:"fileRecycleBin"`
+	FileRecycleBin   string `json:"fileRecycleBin"`
+	LocalSSHConnShow string `json:"localSSHConnShow"`
 }
 
 type SettingUpdate struct {
 	Key   string `json:"key" validate:"required"`
+	Value string `json:"value"`
+}
+
+type AgentSettingUpdate struct {
+	Key   string `json:"key" validate:"required,oneof=SystemIP DockerSockPath FileRecycleBin"`
 	Value string `json:"value"`
 }
 

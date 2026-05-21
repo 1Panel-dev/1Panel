@@ -4,9 +4,9 @@
         :header="$t('commons.button.log')"
         @close="handleClose"
         :resource="logSearch.container"
-        :size="globalStore.isFullScreen ? 'full' : '60%'"
+        :size="isFullScreen ? 'full' : '60%'"
     >
-        <template #extra v-if="!mobile">
+        <template #extra v-if="!isMobile">
             <el-tooltip :content="loadTooltip()" placement="top">
                 <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
             </el-tooltip>
@@ -24,16 +24,14 @@
 
 <script lang="ts" setup>
 import i18n from '@/lang';
-import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
+import { onBeforeUnmount, reactive, ref, watch } from 'vue';
 import screenfull from 'screenfull';
-import { GlobalStore } from '@/store';
 import ContainerLog from '@/components/log/container/index.vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMobile, isFullScreen } = useGlobalStore();
 
 const logVisible = ref(false);
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
-const globalStore = GlobalStore();
 const logSearch = reactive({
     isWatch: true,
     container: '',
@@ -50,20 +48,20 @@ defineProps({
 });
 
 function toggleFullscreen() {
-    globalStore.isFullScreen = !globalStore.isFullScreen;
+    isFullScreen.value = !isFullScreen.value;
 }
 
 const loadTooltip = () => {
-    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
+    return i18n.global.t('commons.button.' + (isFullScreen.value ? 'quitFullscreen' : 'fullscreen'));
 };
 
 const handleClose = async () => {
     logVisible.value = false;
-    globalStore.isFullScreen = false;
+    isFullScreen.value = false;
 };
 
 watch(logVisible, (val) => {
-    if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
+    if (screenfull.isEnabled && !val && !isMobile.value) screenfull.exit();
 });
 
 interface DialogProps {
@@ -82,9 +80,9 @@ const acceptParams = (props: DialogProps): void => {
     logSearch.container = props.container;
     logVisible.value = true;
 
-    if (!mobile.value) {
+    if (!isMobile.value) {
         screenfull.on('change', () => {
-            globalStore.isFullScreen = screenfull.isFullscreen;
+            isFullScreen.value = screenfull.isFullscreen;
         });
     }
 };

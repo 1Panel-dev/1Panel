@@ -9,6 +9,7 @@ const appStoreRouter = {
     meta: {
         icon: 'p-appstore',
         title: 'menu.apps',
+        permission: 'app_view',
     },
     children: [
         {
@@ -16,7 +17,9 @@ const appStoreRouter = {
             name: 'App',
             redirect: '/apps/all',
             component: () => import('@/views/app-store/index.vue'),
-            meta: {},
+            meta: {
+                permission: 'app_view',
+            },
             children: [
                 {
                     path: 'all',
@@ -26,9 +29,9 @@ const appStoreRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/apps',
-                        requiresAuth: false,
                         parent: 'menu.app',
                         title: 'app.all',
+                        permission: 'app_view',
                     },
                 },
                 {
@@ -39,9 +42,9 @@ const appStoreRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/apps',
-                        requiresAuth: false,
                         parent: 'menu.app',
                         title: 'app.installed',
+                        permission: 'app_view',
                     },
                 },
                 {
@@ -52,9 +55,9 @@ const appStoreRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/apps',
-                        requiresAuth: false,
                         parent: 'menu.app',
                         title: 'app.canUpgrade',
+                        permission: 'app_view',
                     },
                 },
                 {
@@ -65,9 +68,9 @@ const appStoreRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/apps',
-                        requiresAuth: false,
                         parent: 'menu.app',
                         title: 'commons.button.set',
+                        permission: 'app_view',
                     },
                 },
             ],

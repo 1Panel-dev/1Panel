@@ -128,7 +128,7 @@
                         width="130px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        :fixed="mobile ? false : 'right'"
+                        :fixed="isMobile ? false : 'right'"
                         fix
                     />
                 </ComplexTable>
@@ -139,18 +139,16 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref } from 'vue';
-import { GlobalStore } from '@/store';
+import { onMounted, reactive, ref } from 'vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import AddTask from '@/views/setting/alert/dash/task/index.vue';
 import { Alert } from '@/api/interface/alert';
 import { UpdateAlertStatus, SearchAlerts, DeleteAlert } from '@/api/modules/alert';
-import { storeToRefs } from 'pinia';
 
-const globalStore = GlobalStore();
-const { isMaster, isProductPro } = storeToRefs(globalStore);
+const { isMobile, isMaster, isProductPro } = useGlobalStore();
 
 const { t } = i18n.global;
 const loading = ref(false);
@@ -174,10 +172,6 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const data = ref();
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const buttons = [
     {

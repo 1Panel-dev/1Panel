@@ -57,7 +57,7 @@
                     <el-button class="mt-2.5" @click="getDefaultConfig()">
                         {{ $t('app.defaultConfig') }}
                     </el-button>
-                    <el-button type="primary" class="mt-2.5" @click="onSaveConf">
+                    <el-button v-permission type="primary" class="mt-2.5" @click="onSaveConf">
                         {{ $t('commons.button.save') }}
                     </el-button>
                     <el-row>
@@ -83,7 +83,12 @@
                                     <el-input clearable type="number" v-model.number="baseInfo.port" />
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button type="primary" @click="onSavePort(panelFormRef)" icon="Collection">
+                                    <el-button
+                                        v-permission
+                                        type="primary"
+                                        @click="onSavePort(panelFormRef)"
+                                        icon="Collection"
+                                    >
                                         {{ $t('commons.button.save') }}
                                     </el-button>
                                 </el-form-item>

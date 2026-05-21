@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
@@ -18,18 +19,11 @@ func (s *Openrc) Name() string {
 	return "openrc"
 }
 func (s *Openrc) IsActive(serviceName string) (bool, error) {
-	out, err := cmd.RunDefaultWithStdoutBashCf("if service %s status >/dev/null 2>&1; then echo 'active'; else echo 'inactive'; fi", serviceName)
-	if err != nil {
-		return false, err
-	}
-	return out == "active\n", nil
+	_, err := cmd.NewCommandMgr().RunWithStdout("service", serviceName, "status")
+	return err == nil, nil
 }
 func (s *Openrc) IsEnable(serviceName string) (bool, error) {
-	out, err := cmd.RunDefaultWithStdoutBashCf("if ls /etc/rc*.d/S*%s >/dev/null 2>&1; then echo 'enabled'; else echo 'disabled'; fi", serviceName)
-	if err != nil {
-		return false, err
-	}
-	return out == "enabled\n", nil
+	return isSysvServiceEnabled(serviceName)
 }
 func (s *Openrc) IsExist(serviceName string) (bool, error) {
 	_, err := os.Stat(filepath.Join("/etc/init.d", serviceName))
@@ -58,4 +52,28 @@ func (s *Openrc) Operate(operate, serviceName string) error {
 
 func (s *Openrc) Reload() error {
 	return nil
+}
+
+func isSysvServiceEnabled(serviceName string) (bool, error) {
+	entries, err := os.ReadDir("/etc")
+	if err != nil {
+		return false, err
+	}
+	for _, entry := range entries {
+		name := entry.Name()
+		if !entry.IsDir() || !strings.HasPrefix(name, "rc") || !strings.HasSuffix(name, ".d") {
+			continue
+		}
+		items, err := os.ReadDir(filepath.Join("/etc", name))
+		if err != nil {
+			continue
+		}
+		for _, item := range items {
+			itemName := item.Name()
+			if strings.HasPrefix(itemName, "S") && strings.HasSuffix(itemName, serviceName) {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
 }

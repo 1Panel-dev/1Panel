@@ -3,13 +3,13 @@ import { ResultData } from '@/api/interface';
 import { ResultEnum } from '@/enums/http-enum';
 import { checkStatus } from './helper/check-status';
 import router from '@/routers';
-import { GlobalStore } from '@/store';
 import { MsgError } from '@/utils/message';
 import { encodeBase64 } from '@/utils/base64';
 import i18n from '@/lang';
 import { changeToLocal } from '@/utils/node';
 import { getCookie } from '@/utils/auth';
-const globalStore = GlobalStore();
+import { handleAuthResponseCode } from '@/utils/auth-response';
+import { GlobalStore } from '@/store';
 
 const config = {
     baseURL: import.meta.env.VITE_API_URL as string,
@@ -28,9 +28,9 @@ class RequestHttp {
         this.service = axios.create(config);
         this.service.interceptors.request.use(
             (config: AxiosRequestConfig) => {
-                let language = globalStore.language;
+                const globalStore = GlobalStore();
                 config.headers = {
-                    'Accept-Language': language,
+                    'Accept-Language': globalStore.language,
                     ...config.headers,
                 };
                 if (config.headers.CurrentNode == undefined) {
@@ -44,8 +44,7 @@ class RequestHttp {
                     config.url === '/core/auth/passkey/begin' ||
                     config.url === '/core/auth/passkey/finish'
                 ) {
-                    let entrance = encodeBase64(globalStore.entrance);
-                    config.headers.EntranceCode = entrance;
+                    config.headers.EntranceCode = encodeBase64(globalStore.entrance);
                 }
                 const method = (config.method || 'get').toUpperCase();
                 const requiresToken = !['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(method);
@@ -67,41 +66,43 @@ class RequestHttp {
 
         this.service.interceptors.response.use(
             (response: AxiosResponse) => {
+                const globalStore = GlobalStore();
                 const { data } = response;
-                if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
-                    globalStore.isLogin = false;
-                    router.push({
-                        name: 'entrance',
-                        params: { code: globalStore.entrance },
-                    });
+                const authResult = handleAuthResponseCode(data, { showRBACMessage: true });
+                if (authResult.handled) {
+                    if (authResult.action === 'return') {
+                        return;
+                    }
                     return Promise.reject(data);
                 }
-                if (data.code == ResultEnum.EXPIRED) {
-                    router.push({ name: 'Expired' });
-                    return;
-                }
-                if (data.code == ResultEnum.ERRXPACK) {
+                if (data.code == ResultEnum.ERR_XPACK) {
                     globalStore.isProductPro = false;
                     window.location.reload();
                     return Promise.reject(data);
                 }
-                if (data.code == ResultEnum.NodeUnBind) {
+                if (data.code == ResultEnum.ERR_ENTERPRISE) {
+                    globalStore.isEnterpriseLicensed = false;
+                    const routeName = router.currentRoute.value.name;
+                    if (globalStore.isLogin && routeName !== 'EnterpriseLicenseRequired') {
+                        router.push({ name: 'EnterpriseLicenseRequired' });
+                    }
+                    return Promise.reject(data);
+                }
+                if (data.code == ResultEnum.NODE_UNBIND) {
                     changeToLocal();
                     window.location.reload();
                     return;
                 }
-                if (data.code == ResultEnum.ERRGLOBALLOADING) {
-                    globalStore.$patch({
-                        isLoading: true,
-                        loadingText: data.message,
-                    });
+                if (data.code == ResultEnum.ERR_GLOBAL_LOADING) {
+                    globalStore.isLoading = true;
+                    globalStore.loadingText = data.message;
                     return;
                 } else {
                     if (globalStore.isLoading) {
                         globalStore.isLoading = false;
                     }
                 }
-                if (data.code == ResultEnum.ERRAUTH) {
+                if (data.code == ResultEnum.ERR_AUTH) {
                     return data;
                 }
                 if (data.code && data.code !== ResultEnum.SUCCESS) {

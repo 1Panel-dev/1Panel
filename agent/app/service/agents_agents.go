@@ -23,7 +23,7 @@ func (a AgentService) CreateRole(req dto.AgentRoleCreateReq) (*dto.AgentRoleCrea
 		return nil, err
 	}
 
-	args := []string{"exec", install.ContainerName, "openclaw", "agents", "add", req.Name}
+	args := []string{"openclaw", "agents", "add", req.Name}
 	workspace := "/home/node/.openclaw/workspace-agent_" + req.Name
 	agentDir := "/home/node/.openclaw/agents/" + req.Name
 	args = append(args, "--workspace", workspace)
@@ -43,8 +43,7 @@ func (a AgentService) CreateRole(req dto.AgentRoleCreateReq) (*dto.AgentRoleCrea
 	args = append(args, "--agent-dir", agentDir)
 	args = append(args, "--non-interactive", "--json")
 
-	mgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Minute))
-	output, err := mgr.RunWithStdout("docker", args...)
+	output, err := cmd.RunDockerExecWithStdout(5*time.Minute, install.ContainerName, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -125,10 +124,8 @@ func (a AgentService) DeleteRole(req dto.AgentRoleDeleteReq) error {
 		return buserr.New("ErrRecordNotFound")
 	}
 
-	args := []string{"exec", install.ContainerName, "openclaw", "agents", "delete", req.ID, "--force"}
-
-	mgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Minute))
-	if _, err = mgr.RunWithStdout("docker", args...); err != nil {
+	args := []string{"openclaw", "agents", "delete", req.ID, "--force"}
+	if _, err = cmd.RunDockerExecWithStdout(5*time.Minute, install.ContainerName, args...); err != nil {
 		return err
 	}
 	if target.Workspace != "" {
@@ -171,8 +168,6 @@ func (a AgentService) operateRoleBinding(req dto.AgentRoleBindReq, action string
 		return buserr.New("ErrInvalidParams")
 	}
 	args := []string{
-		"exec",
-		install.ContainerName,
 		"openclaw",
 		"agents",
 		action,
@@ -182,8 +177,7 @@ func (a AgentService) operateRoleBinding(req dto.AgentRoleBindReq, action string
 		binding,
 	}
 	args = append(args, "--json")
-	mgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Minute))
-	_, err = mgr.RunWithStdout("docker", args...)
+	_, err = cmd.RunDockerExecWithStdout(5*time.Minute, install.ContainerName, args...)
 	return err
 }
 

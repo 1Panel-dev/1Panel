@@ -9,7 +9,7 @@
             :placeholder="t('commons.msg.noneData')"
         />
         <div class="mt-4">
-            <el-button type="primary" :loading="saving" @click="confirmSave">
+            <el-button v-permission type="primary" :loading="saving" @click="confirmSave">
                 {{ t('commons.button.save') }}
             </el-button>
         </div>

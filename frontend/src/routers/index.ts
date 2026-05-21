@@ -1,27 +1,70 @@
 import router from '@/routers/router';
 import NProgress from '@/config/nprogress';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { AxiosCanceler } from '@/api/helper/axios-cancel';
+import { hasRouteAccess } from '@/utils/rbac';
+import { loadProductProFromDB } from '@/utils/xpack';
+import i18n from '@/lang';
+import { MsgError } from '@/utils/message';
 
 const axiosCanceler = new AxiosCanceler();
 
 let isRedirecting = false;
+const enterpriseLicenseCheckWhiteList = ['EnterpriseLicenseRequired', 'entrance', 'login', 'Expired'];
+const noLoginWhiteList = ['entrance', 'login', 'file-share', '404', 'Expired'];
 
-router.beforeEach((to, from, next) => {
+const clearLicenseStatus = () => {
+    const { isEnterpriseLicenseLoaded, isEnterpriseLicensed } = useGlobalStore();
+    isEnterpriseLicensed.value = false;
+    isEnterpriseLicenseLoaded.value = false;
+};
+
+const clearLoginStatus = () => {
+    const { globalStore } = useGlobalStore();
+    globalStore.setLogStatus(false);
+    globalStore.clearAuthInfo();
+    clearLicenseStatus();
+};
+
+router.beforeEach(async (to, from, next) => {
+    const { entrance, isEnterprise, isEnterpriseLicenseLoaded, isEnterpriseLicensed, isLogin } = useGlobalStore();
     NProgress.start();
     axiosCanceler.removeAllPending();
-    const globalStore = GlobalStore();
-    const isPublicRoute = to.name === 'entrance' || to.matched.some((record) => record.meta.requiresAuth === false);
-    if (!isPublicRoute && !globalStore.isLogin) {
+
+    if (!isLogin.value) {
+        clearLoginStatus();
+    }
+    if (!isLogin.value && !noLoginWhiteList.includes(String(to.name))) {
+        next(
+            entrance.value
+                ? {
+                      name: 'entrance',
+                      params: { code: entrance.value },
+                  }
+                : {
+                      name: 'login',
+                  },
+        );
+        NProgress.done();
+        return;
+    }
+    if (to.name === 'login' && !isLogin.value && entrance.value) {
         next({
             name: 'entrance',
-            params: to.params,
+            params: { code: entrance.value },
         });
         NProgress.done();
         return;
     }
-    if (to.name === 'entrance' && globalStore.isLogin) {
-        if (to.params.code === globalStore.entrance) {
+    if (to.name === 'login' && isLogin.value) {
+        next({
+            name: 'home',
+        });
+        NProgress.done();
+        return;
+    }
+    if (to.name === 'entrance' && isLogin.value) {
+        if (to.params.code === entrance.value) {
             next({
                 name: 'home',
             });
@@ -31,6 +74,32 @@ router.beforeEach((to, from, next) => {
         next({ name: '404' });
         NProgress.done();
         return;
+    }
+    if (isLogin.value && isEnterprise.value && !enterpriseLicenseCheckWhiteList.includes(String(to.name))) {
+        if (!isEnterpriseLicenseLoaded.value) {
+            await loadProductProFromDB();
+        }
+        if (!isEnterpriseLicensed.value) {
+            next({ name: 'EnterpriseLicenseRequired', query: { code: String(to.params.code || '') } });
+            NProgress.done();
+            return;
+        }
+    }
+    if (to.name === 'EnterpriseLicenseRequired') {
+        if (!isLogin.value) {
+            next({
+                name: 'entrance',
+                params: to.params,
+            });
+            NProgress.done();
+            return;
+        }
+        if (!isEnterprise.value || isEnterpriseLicensed.value) {
+            next({ name: 'home' });
+            NProgress.done();
+            return;
+        }
+        return next();
     }
 
     if (to.path === '/apps/all' && to.query.install != undefined) {
@@ -52,14 +121,22 @@ router.beforeEach((to, from, next) => {
         cachedRoute !== to.path &&
         !isRedirecting
     ) {
-        isRedirecting = true;
-        next(cachedRoute);
+        const cachedRouteInfo = router.resolve(cachedRoute);
+        if (cachedRouteInfo.matched.length > 0 && hasRouteAccess(cachedRouteInfo)) {
+            isRedirecting = true;
+            next(cachedRoute);
+            NProgress.done();
+            return;
+        }
+        localStorage.removeItem(activeMenuKey);
+    }
+
+    if (!hasRouteAccess(to)) {
+        MsgError(i18n.global.t('commons.res.forbidden'));
+        next(false);
         NProgress.done();
         return;
     }
-
-    if (!to.matched.some((record) => record.meta.requiresAuth)) return next();
-
     return next();
 });
 

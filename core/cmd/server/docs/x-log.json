@@ -690,6 +690,43 @@
 		"formatZH": "删除容器存储卷 [names]",
 		"formatEN": "delete container volume [names]"
 	},
+	"/core/auth/api/generate": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "生成 API 接口密钥",
+		"formatEN": "generate api key"
+	},
+	"/core/auth/api/update": {
+		"bodyKeys": [
+			"ipWhiteList"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 API 接口配置 =\u003e IP 白名单: [ipWhiteList]",
+		"formatEN": "update api config =\u003e IP White List: [ipWhiteList]"
+	},
+	"/core/auth/expired/reset": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "重置过期密码",
+		"formatEN": "reset an expired Password"
+	},
+	"/core/auth/mfa/bind": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "mfa 绑定",
+		"formatEN": "bind mfa"
+	},
+	"/core/auth/mfa/close": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "mfa 关闭",
+		"formatEN": "close mfa"
+	},
 	"/core/backups": {
 		"bodyKeys": [
 			"type"
@@ -768,6 +805,51 @@
 		"formatZH": "更新快捷命令 [name]",
 		"formatEN": "update quick command [name]"
 	},
+	"/core/enterprise/user": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "添加用户 [name]",
+		"formatEN": "add user [name]"
+	},
+	"/core/enterprise/users/del": {
+		"bodyKeys": [
+			"ids"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"db": "users",
+				"output_column": "name",
+				"output_value": "names"
+			}
+		],
+		"formatZH": "删除用户 [names]",
+		"formatEN": "delete user [names]"
+	},
+	"/core/enterprise/users/info/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 [name] 认证信息",
+		"formatEN": "update user [name] auth info"
+	},
+	"/core/enterprise/users/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 [name]",
+		"formatEN": "update user [name]"
+	},
 	"/core/groups": {
 		"bodyKeys": [
 			"name",
@@ -813,63 +895,6 @@
 		"beforeFunctions": [],
 		"formatZH": "更新组 [name][type]",
 		"formatEN": "update group [name][type]"
-	},
-	"/core/hosts": {
-		"bodyKeys": [
-			"name",
-			"addr"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建主机 [name][addr]",
-		"formatEN": "create host [name][addr]"
-	},
-	"/core/hosts/del": {
-		"bodyKeys": [
-			"ids"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "ids",
-				"isList": true,
-				"db": "hosts",
-				"output_column": "addr",
-				"output_value": "addrs"
-			}
-		],
-		"formatZH": "删除主机 [addrs]",
-		"formatEN": "delete host [addrs]"
-	},
-	"/core/hosts/update": {
-		"bodyKeys": [
-			"name",
-			"addr"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新主机信息 [name][addr]",
-		"formatEN": "update host [name][addr]"
-	},
-	"/core/hosts/update/group": {
-		"bodyKeys": [
-			"id",
-			"group"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "hosts",
-				"output_column": "addr",
-				"output_value": "addr"
-			}
-		],
-		"formatZH": "切换主机[addr]分组 =\u003e [group]",
-		"formatEN": "change host [addr] group =\u003e [group]"
 	},
 	"/core/licenses/add": {
 		"bodyKeys": [],
@@ -981,22 +1006,6 @@
 		"formatZH": "更新脚本库脚本 [name]",
 		"formatEN": "update script [name]"
 	},
-	"/core/settings/api/config/generate/key": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "生成 API 接口密钥",
-		"formatEN": "generate api key"
-	},
-	"/core/settings/api/config/update": {
-		"bodyKeys": [
-			"ipWhiteList"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新 API 接口配置 =\u003e IP 白名单: [ipWhiteList]",
-		"formatEN": "update api config =\u003e IP White List: [ipWhiteList]"
-	},
 	"/core/settings/bind/update": {
 		"bodyKeys": [
 			"ipv6",
@@ -1006,13 +1015,6 @@
 		"beforeFunctions": [],
 		"formatZH": "修改系统监听信息 =\u003e ipv6: [ipv6], 监听 IP: [bindAddress]",
 		"formatEN": "update system bind info =\u003e ipv6: [ipv6], 监听 IP: [bindAddress]"
-	},
-	"/core/settings/expired/handle": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "重置过期密码",
-		"formatEN": "reset an expired Password"
 	},
 	"/core/settings/memo": {
 		"bodyKeys": [],
@@ -1034,20 +1036,6 @@
 		"beforeFunctions": [],
 		"formatZH": "隐藏高级功能菜单",
 		"formatEN": "Hide advanced feature menu."
-	},
-	"/core/settings/mfa/bind": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "mfa 绑定",
-		"formatEN": "bind mfa"
-	},
-	"/core/settings/password/update": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "修改系统密码",
-		"formatEN": "update system password"
 	},
 	"/core/settings/port/update": {
 		"bodyKeys": [
@@ -1582,6 +1570,92 @@
 		"formatZH": "mysql 数据库 [name] 描述信息修改 [description]",
 		"formatEN": "The description of the mysql database [name] is modified =\u003e [description]"
 	},
+	"/databases/mongodb": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 mongodb 数据库 [name]",
+		"formatEN": "create mongodb database [name]"
+	},
+	"/databases/mongodb/bind": {
+		"bodyKeys": [
+			"database",
+			"name",
+			"username"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "绑定 mongodb 数据库 [database] [name] 用户 [username]",
+		"formatEN": "bind mongodb database [database] [name] user [username]"
+	},
+	"/databases/mongodb/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "database_mongodbs",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除 mongodb 数据库 [name]",
+		"formatEN": "delete mongodb database [name]"
+	},
+	"/databases/mongodb/description": {
+		"bodyKeys": [
+			"id",
+			"description"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "database_mongodbs",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "mongodb 数据库 [name] 描述信息修改 [description]",
+		"formatEN": "The description of the mongodb database [name] is modified =\u003e [description]"
+	},
+	"/databases/mongodb/password": {
+		"bodyKeys": [
+			"database",
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 mongodb 数据库 [database] [name] 密码",
+		"formatEN": "update mongodb database [database] [name] password"
+	},
+	"/databases/mongodb/privileges/change": {
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 mongodb 数据库 [database] 用户 [username] 权限",
+		"formatEN": "update mongodb database [database] user [username] privileges"
+	},
+	"/databases/mongodb/root/password": {
+		"bodyKeys": [
+			"database"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 mongodb 数据库 [database] root 密码",
+		"formatEN": "update mongodb database [database] root password"
+	},
 	"/databases/pg": {
 		"bodyKeys": [
 			"name"
@@ -1880,6 +1954,25 @@
 		"formatZH": "更新文件内容 [path]",
 		"formatEN": "Update file content [path]"
 	},
+	"/files/share/create": {
+		"bodyKeys": [
+			"path",
+			"expireMinutes"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建文件分享 [path]",
+		"formatEN": "Create file share [path]"
+	},
+	"/files/share/del": {
+		"bodyKeys": [
+			"path"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "关闭文件分享 [path]",
+		"formatEN": "Close file share [path]"
+	},
 	"/files/size": {
 		"bodyKeys": [
 			"path"
@@ -1909,6 +2002,15 @@
 		"beforeFunctions": [],
 		"formatZH": "下载 url =\u003e [path]/[name]",
 		"formatEN": "Download url =\u003e [path]/[name]"
+	},
+	"/files/wget/stop": {
+		"bodyKeys": [
+			"key"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "停止下载任务 [key]",
+		"formatEN": "Stop wget task [key]"
 	},
 	"/groups": {
 		"bodyKeys": [
@@ -2115,14 +2217,14 @@
 		"formatZH": "修改 SSH 配置 [key] =\u003e [newValue]",
 		"formatEN": "update SSH setting [key] =\u003e [newValue]"
 	},
-	"/hosts/tool/config": {
+	"/hosts/tool/config/set": {
 		"bodyKeys": [
-			"operate"
+			"type"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "[operate] 主机工具配置文件 ",
-		"formatEN": "[operate] tool config"
+		"formatZH": "更新 [type] 主机工具配置文件 ",
+		"formatEN": "update [type] tool config"
 	},
 	"/hosts/tool/init": {
 		"bodyKeys": [
@@ -2964,7 +3066,7 @@
 		"formatZH": "更新域名 [domain]",
 		"formatEN": "Update domain [domain]"
 	},
-	"/websites/log": {
+	"/websites/log/operate": {
 		"bodyKeys": [
 			"id",
 			"operate"

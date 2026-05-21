@@ -3,22 +3,22 @@
         <RouterButton :buttons="routerButton" />
         <LayoutContent :title="$t('website.ssl', 2)">
             <template #leftToolBar>
-                <el-button type="primary" @click="openSSL()">
+                <el-button v-permission type="primary" @click="openSSL()">
                     {{ $t('ssl.create') }}
                 </el-button>
-                <el-button type="primary" @click="openUpload()">
+                <el-button v-permission type="primary" @click="openUpload()">
                     {{ $t('ssl.upload') }}
                 </el-button>
-                <el-button type="primary" plain @click="openCA()">
+                <el-button v-permission type="primary" plain @click="openCA()">
                     {{ $t('ssl.selfSigned') }}
                 </el-button>
-                <el-button type="primary" plain @click="openAcmeAccount()">
+                <el-button v-permission type="primary" plain @click="openAcmeAccount()">
                     {{ $t('website.acmeAccountManage') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDnsAccount()">
+                <el-button v-permission type="primary" plain @click="openDnsAccount()">
                     {{ $t('website.dnsAccountManage') }}
                 </el-button>
-                <el-button plain @click="deletessl(null)" :disabled="selects.length === 0">
+                <el-button v-permission plain @click="deletessl(null)" :disabled="selects.length === 0">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -117,7 +117,7 @@
                     ></el-table-column>
                     <el-table-column :label="$t('website.remark')" prop="description" width="100px">
                         <template #default="{ row }">
-                            <fu-read-write-switch>
+                            <fu-read-write-switch v-permission>
                                 <template #read>
                                     <MsgInfo :info="row.description" width="200" />
                                 </template>
@@ -130,6 +130,7 @@
                     <el-table-column :label="$t('ssl.autoRenew')" prop="autoRenew" width="200px">
                         <template #default="{ row }">
                             <el-switch
+                                v-permission
                                 :disabled="
                                     row.provider === 'dnsManual' ||
                                     row.provider === 'manual' ||
@@ -152,7 +153,7 @@
                         :ellipsis="3"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        :fixed="mobile ? false : 'right'"
+                        :fixed="isMobile ? false : 'right'"
                         width="320px"
                         fix
                     />
@@ -173,7 +174,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref, computed } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { deleteSSL, downloadFile, searchSSL, updateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
@@ -185,14 +186,14 @@ import { getProvider } from '@/utils/ssl';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
 import SSLUpload from './upload/index.vue';
 import Apply from './apply/index.vue';
 import Log from '@/components/log/file-drawer/index.vue';
 import Obtain from './obtain/index.vue';
 import MsgInfo from '@/components/msg-info/index.vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
+const { isMobile } = useGlobalStore();
 const paginationConfig = reactive({
     cacheSizeKey: 'ssl-page-size',
     currentPage: 1,
@@ -238,6 +239,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('ssl.apply'),
+        permission: true,
         disabled: function (row: Website.SSLDTO) {
             return row.status === 'applying' || row.provider === 'manual' || row.provider === 'fromMaster';
         },
@@ -254,6 +256,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.update'),
+        permission: true,
         click: function (row: Website.SSLDTO) {
             sslUploadRef.value.acceptParams(row);
         },
@@ -263,6 +266,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         disabled: function (row: Website.SSLDTO) {
             return row.provider === 'fromMaster';
         },
@@ -281,6 +285,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Website.SSLDTO) {
             deletessl(row);
         },
@@ -303,10 +308,6 @@ const onDownload = (ssl: Website.SSLDTO) => {
             loading.value = false;
         });
 };
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 const changeSort = ({ order }) => {
     req.orderBy = 'expire_date';

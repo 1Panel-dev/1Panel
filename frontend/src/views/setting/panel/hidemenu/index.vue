@@ -53,10 +53,10 @@ import { AllowDropType, ElMessageBox, RenderContentContext } from 'element-plus'
 import i18n from '@/lang';
 import { defaultMenu, updateMenu } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { ArrowRight } from '@element-plus/icons-vue';
 import { sortMenu } from '@/utils/misc';
-const globalStore = GlobalStore();
+const { isEE, isIntl } = useGlobalStore();
 
 const drawerVisible = ref();
 const loading = ref();
@@ -69,7 +69,7 @@ const acceptParams = (params: DialogProps): void => {
     let hideMenu = JSON.parse(params.hideMenu);
     sortMenu(hideMenu);
     treeData.hideMenu = hideMenu;
-    if (globalStore.isIntl) {
+    if (isIntl.value || isEE.value) {
         treeData.hideMenu = removeUpage(treeData.hideMenu);
     }
 };
@@ -143,7 +143,7 @@ const treeData = reactive({
 
 const removeUpage = (data: any): any => {
     return data
-        .filter((item: { label: string }) => item.label !== 'Upage')
+        .filter((item: { label: string }) => item.label !== 'Upage' && item.label !== 'XApp')
         .map((item: { children: any }) => {
             if (Array.isArray(item.children)) {
                 item.children = removeUpage(item.children);

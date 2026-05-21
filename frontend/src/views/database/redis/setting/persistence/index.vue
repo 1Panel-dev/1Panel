@@ -27,7 +27,7 @@
                                     </el-radio-group>
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button type="primary" @click="onSave(formRef, 'aof')">
+                                    <el-button v-permission type="primary" @click="onSave(formRef, 'aof')">
                                         {{ $t('commons.button.save') }}
                                     </el-button>
                                 </el-form-item>
@@ -58,21 +58,29 @@
                                 {{ $t('database.rdbHelper2') }}
                             </td>
                             <td>
-                                <el-button link type="primary" style="font-size: 10px" @click="handleDelete(index)">
+                                <el-button
+                                    link
+                                    type="primary"
+                                    style="font-size: 10px"
+                                    v-permission
+                                    @click="handleDelete(index)"
+                                >
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </td>
                         </tr>
                         <tr>
                             <td align="left">
-                                <el-button @click="handleAdd()">{{ $t('commons.button.add') }}</el-button>
+                                <el-button v-permission @click="handleAdd()">
+                                    {{ $t('commons.button.add') }}
+                                </el-button>
                             </td>
                         </tr>
                     </table>
                     <div>
                         <span style="margin-left: 2px; margin-top: 5px">{{ $t('database.rdbHelper3') }}</span>
                     </div>
-                    <el-button type="primary" @click="onSave(undefined, 'rbd')" style="margin-top: 10px">
+                    <el-button v-permission type="primary" @click="onSave(undefined, 'rbd')" style="margin-top: 10px">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </el-card>
@@ -81,8 +89,16 @@
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
                 <template #toolbar>
-                    <el-button type="primary" @click="onBackup">{{ $t('commons.button.backup') }}</el-button>
-                    <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                    <el-button v-permission type="primary" @click="onBackup">
+                        {{ $t('commons.button.backup') }}
+                    </el-button>
+                    <el-button
+                        v-permission
+                        type="primary"
+                        plain
+                        :disabled="selects.length === 0"
+                        @click="onBatchDelete(null)"
+                    >
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </template>
@@ -259,6 +275,7 @@ const onBatchDelete = async (row: Backup.RecordInfo | null) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.recover'),
+        permission: true,
         click: (row: Backup.RecordInfo) => {
             currentRow.value = row;
             let params = {
@@ -271,6 +288,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: Backup.RecordInfo) => {
             onBatchDelete(row);
         },

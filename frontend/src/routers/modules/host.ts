@@ -19,7 +19,7 @@ const hostRouter = {
             meta: {
                 icon: 'p-file-menu',
                 title: 'menu.files',
-                requiresAuth: false,
+                permission: 'host_file_view',
             },
         },
         {
@@ -29,7 +29,7 @@ const hostRouter = {
             meta: {
                 icon: 'p-system-monitor-menu',
                 title: 'menu.monitor',
-                requiresAuth: false,
+                permission: 'host_monitor_view',
             },
         },
         {
@@ -41,7 +41,7 @@ const hostRouter = {
                 activeMenu: '/hosts/monitor/monitor',
                 title: 'menu.monitor',
                 detail: 'commons.button.set',
-                requiresAuth: false,
+                permission: 'host_monitor_view',
             },
         },
         {
@@ -53,7 +53,7 @@ const hostRouter = {
                 activeMenu: '/hosts/firewall/port',
                 title: 'menu.firewall',
                 detail: 'firewall.portRule',
-                requiresAuth: false,
+                permission: 'host_firewall_view',
             },
         },
         {
@@ -65,7 +65,7 @@ const hostRouter = {
                 activeMenu: '/hosts/firewall/port',
                 parent: 'menu.firewall',
                 title: 'firewall.forwardRule',
-                requiresAuth: false,
+                permission: 'host_firewall_view',
             },
         },
         {
@@ -77,7 +77,7 @@ const hostRouter = {
                 activeMenu: '/hosts/firewall/port',
                 parent: 'menu.firewall',
                 title: 'firewall.ipRule',
-                requiresAuth: false,
+                permission: 'host_firewall_view',
             },
         },
         {
@@ -89,7 +89,7 @@ const hostRouter = {
                 activeMenu: '/hosts/firewall/port',
                 parent: 'menu.firewall',
                 title: 'firewall.advancedControl',
-                requiresAuth: false,
+                permission: 'host_firewall_view',
             },
         },
         {
@@ -100,7 +100,7 @@ const hostRouter = {
             meta: {
                 icon: 'p-disk-menu',
                 title: 'menu.disk',
-                requiresAuth: false,
+                permission: 'host_disk_view',
             },
         },
         {
@@ -113,7 +113,7 @@ const hostRouter = {
                 detail: 'menu.process',
                 activeMenu: '/hosts/process/process',
                 keepAlive: true,
-                requiresAuth: false,
+                permission: 'host_process_view',
             },
         },
         {
@@ -125,7 +125,7 @@ const hostRouter = {
                 parent: 'menu.processManage',
                 title: 'menu.network',
                 activeMenu: '/hosts/process/process',
-                requiresAuth: false,
+                permission: 'host_process_view',
             },
         },
         {
@@ -138,7 +138,7 @@ const hostRouter = {
                 detail: 'menu.config',
                 activeMenu: '/hosts/ssh/ssh',
                 keepAlive: true,
-                requiresAuth: false,
+                permission: 'host_ssh_view',
             },
         },
         {
@@ -150,7 +150,7 @@ const hostRouter = {
                 parent: 'menu.ssh',
                 title: 'ssh.loginLogs',
                 activeMenu: '/hosts/ssh/ssh',
-                requiresAuth: false,
+                permission: 'host_ssh_view',
             },
         },
         {
@@ -162,7 +162,7 @@ const hostRouter = {
                 parent: 'menu.ssh',
                 title: 'ssh.session',
                 activeMenu: '/hosts/ssh/ssh',
-                requiresAuth: false,
+                permission: 'host_ssh_view',
             },
         },
     ],

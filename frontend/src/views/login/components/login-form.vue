@@ -52,10 +52,10 @@
                             </span>
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <el-dropdown-item v-if="globalStore.isIntl" command="en">English</el-dropdown-item>
+                                    <el-dropdown-item v-if="isIntl" command="en">English</el-dropdown-item>
                                     <el-dropdown-item command="zh">中文(简体)</el-dropdown-item>
                                     <el-dropdown-item command="zh-Hant">中文(繁體)</el-dropdown-item>
-                                    <el-dropdown-item v-if="!globalStore.isIntl" command="en">English</el-dropdown-item>
+                                    <el-dropdown-item v-if="!isIntl" command="en">English</el-dropdown-item>
                                     <el-dropdown-item command="ja">日本語</el-dropdown-item>
                                     <el-dropdown-item command="pt-BR">Português (Brasil)</el-dropdown-item>
                                     <el-dropdown-item command="ko">한국어</el-dropdown-item>
@@ -79,7 +79,7 @@
                             {{ $t('commons.login.passkeyToPassword') }}
                         </el-link>
                     </el-form-item>
-                    <el-form-item v-if="!isIntl && !isFxplay">
+                    <el-form-item v-if="!isIntl && !isEnterprise && !isFxplay">
                         <el-checkbox v-model="loginForm.agreeLicense">
                             <template #default>
                                 <span class="agree-title">
@@ -110,10 +110,10 @@
                             </span>
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <el-dropdown-item v-if="globalStore.isIntl" command="en">English</el-dropdown-item>
+                                    <el-dropdown-item v-if="isIntl" command="en">English</el-dropdown-item>
                                     <el-dropdown-item command="zh">中文(简体)</el-dropdown-item>
                                     <el-dropdown-item command="zh-Hant">中文(繁體)</el-dropdown-item>
-                                    <el-dropdown-item v-if="!globalStore.isIntl" command="en">English</el-dropdown-item>
+                                    <el-dropdown-item v-if="!isIntl" command="en">English</el-dropdown-item>
                                     <el-dropdown-item command="ja">日本語</el-dropdown-item>
                                     <el-dropdown-item command="pt-BR">Português (Brasil)</el-dropdown-item>
                                     <el-dropdown-item command="ko">한국어</el-dropdown-item>
@@ -151,7 +151,7 @@
                             ></el-input>
                         </el-form-item>
                         <el-row :gutter="10">
-                            <el-col :span="12" v-if="!globalStore.ignoreCaptcha">
+                            <el-col :span="12" v-if="!ignoreCaptcha">
                                 <el-form-item prop="captcha">
                                     <el-input
                                         v-model.trim="loginForm.captcha"
@@ -160,7 +160,7 @@
                                     ></el-input>
                                 </el-form-item>
                             </el-col>
-                            <el-col :span="12" v-if="!globalStore.ignoreCaptcha">
+                            <el-col :span="12" v-if="!ignoreCaptcha">
                                 <img
                                     class="w-full h-10"
                                     v-if="captcha.imagePath"
@@ -193,7 +193,7 @@
                         <el-text v-if="isDemo" type="danger" class="demo">
                             {{ $t('commons.login.username') }}:demo {{ $t('commons.login.password') }}:1panel
                         </el-text>
-                        <el-form-item prop="agreeLicense" v-if="!isIntl && !isFxplay">
+                        <el-form-item prop="agreeLicense" v-if="!isIntl && !isEnterprise && !isFxplay">
                             <el-checkbox v-model="loginForm.agreeLicense">
                                 <template #default>
                                     <span class="agree-title">
@@ -248,18 +248,35 @@ import {
     passkeyBeginApi,
     passkeyFinishApi,
 } from '@/api/modules/auth';
-import { GlobalStore, MenuStore, TabsStore } from '@/store';
+import { MenuStore, TabsStore } from '@/store';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { encryptPassword, base64UrlToBuffer, bufferToBase64Url } from '@/utils/auth';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 import { routerToName } from '@/utils/router';
-import { changeToLocal, setDefaultNodeInfo } from '@/utils/node';
 import { Key } from '@element-plus/icons-vue';
+import { changeToLocal } from '@/utils/node';
+import { syncAuthInfo } from '@/utils/rbac';
+import { adjustColorToRGBA } from '@/utils/color';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const i18n = useI18n();
-const themeConfig = computed(() => globalStore.themeConfig);
-const globalStore = GlobalStore();
+const {
+    globalStore,
+    agreeLicense,
+    currentNode,
+    ignoreCaptcha,
+    isAdmin,
+    isEnterprise,
+    isEnterpriseLicenseLoaded,
+    isFxplay,
+    isIntl,
+    isLogin,
+    isOffline,
+    isOnRestart,
+    openMenuTabs,
+    themeConfig,
+} = useGlobalStore();
 const menuStore = MenuStore();
 const tabsStore = TabsStore();
 
@@ -271,8 +288,6 @@ const passkeySupported = ref(false);
 const autoPasskeyEnabledKey = '1panel-passkey-auto-enabled';
 const showPasswordLogin = ref(false);
 const isDemo = ref(false);
-const isIntl = ref(true);
-const isFxplay = ref(false);
 const open = ref(false);
 const loginBtnLinkColor = ref<string | null>(null);
 
@@ -405,7 +420,7 @@ const login = (formEl: FormInstance | undefined) => {
     errCaptcha.value = false;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (isIntl.value || isFxplay.value) {
+        if (isIntl.value || isFxplay.value || isEnterprise.value) {
             loginForm.agreeLicense = true;
         }
         if (!loginForm.agreeLicense) {
@@ -423,7 +438,7 @@ const login = (formEl: FormInstance | undefined) => {
             authMethod: 'session',
             language: loginForm.language,
         };
-        if (!globalStore.ignoreCaptcha && requestLoginForm.captcha == '') {
+        if (!ignoreCaptcha.value && requestLoginForm.captcha == '') {
             errCaptcha.value = true;
             return;
         }
@@ -431,7 +446,7 @@ const login = (formEl: FormInstance | undefined) => {
             isLoggingIn = true;
             loading.value = true;
             const res = await loginApi(requestLoginForm);
-            globalStore.ignoreCaptcha = true;
+            ignoreCaptcha.value = true;
             if (res.data.mfaStatus === 'Enable') {
                 mfaLoginForm.sessionId = res.data.mfaSession || '';
                 mfaLoginForm.code = '';
@@ -443,13 +458,14 @@ const login = (formEl: FormInstance | undefined) => {
                 });
                 return;
             }
-            globalStore.isLogin = true;
-            globalStore.agreeLicense = true;
+            isLogin.value = true;
+            agreeLicense.value = true;
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
-            changeToLocal();
+            isAdmin.value = res.data.role === 'ADMIN';
+            await changeToLocal();
+            await syncAuthInfo(currentNode.value);
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            setDefaultNodeInfo();
             localStorage.removeItem('dashboardCache');
             localStorage.removeItem('upgradeChecked');
             routerToName('home');
@@ -457,7 +473,7 @@ const login = (formEl: FormInstance | undefined) => {
         } catch (res) {
             if (res.code === 401) {
                 if (res.message === 'ErrCaptchaCode') {
-                    globalStore.ignoreCaptcha = false;
+                    ignoreCaptcha.value = false;
                     loginForm.captcha = '';
                     errCaptcha.value = true;
                     errAuthInfo.value = false;
@@ -465,7 +481,7 @@ const login = (formEl: FormInstance | undefined) => {
                     return;
                 }
                 if (res.message === 'ErrAuth') {
-                    globalStore.ignoreCaptcha = false;
+                    ignoreCaptcha.value = false;
                     errCaptcha.value = false;
                     errAuthInfo.value = true;
                     loginVerify();
@@ -487,13 +503,14 @@ const mfaLogin = async (auto: boolean) => {
         isLoggingIn = true;
         try {
             errMfaInfo.value = false;
-            await mfaLoginApi(mfaLoginForm);
-            globalStore.isLogin = true;
+            const res = await mfaLoginApi(mfaLoginForm);
+            isLogin.value = true;
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            changeToLocal();
-            setDefaultNodeInfo();
+            isAdmin.value = res.data.role === 'ADMIN';
+            await changeToLocal();
+            await syncAuthInfo(currentNode.value);
             localStorage.removeItem('dashboardCache');
             localStorage.removeItem('upgradeChecked');
             routerToName('home');
@@ -501,7 +518,7 @@ const mfaLogin = async (auto: boolean) => {
         } catch (res) {
             if (res.code === 401) {
                 if (res.message === 'ErrCaptchaCode') {
-                    globalStore.ignoreCaptcha = false;
+                    ignoreCaptcha.value = false;
                     mfaLoginForm.code = '';
                     mfaShow.value = false;
                     loginVerify();
@@ -530,7 +547,7 @@ const passkeyLogin = async () => {
         MsgError(i18n.t('commons.login.passkeyNotSupported'));
         return;
     }
-    if (!isIntl.value && !isFxplay.value && !loginForm.agreeLicense) {
+    if (!isIntl.value && !isEnterprise.value && !isFxplay.value && !loginForm.agreeLicense) {
         if (_isMobile() || showPasskeyOnly.value) {
             pendingLoginMethod.value = 'passkey';
             open.value = true;
@@ -551,16 +568,17 @@ const passkeyLogin = async () => {
             return;
         }
         const payload = buildPasskeyAssertion(credential);
-        await passkeyFinishApi(payload, res.data.sessionId);
+        const loginRes = await passkeyFinishApi(payload, res.data.sessionId);
         enableAutoPasskey();
-        globalStore.ignoreCaptcha = true;
-        globalStore.isLogin = true;
-        globalStore.agreeLicense = true;
+        ignoreCaptcha.value = true;
+        isLogin.value = true;
+        agreeLicense.value = true;
         menuStore.setMenuList([]);
         tabsStore.removeAllTabs();
-        changeToLocal();
+        isAdmin.value = loginRes.data.role === 'ADMIN';
+        await changeToLocal();
+        await syncAuthInfo(currentNode.value);
         MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-        setDefaultNodeInfo();
         localStorage.removeItem('dashboardCache');
         localStorage.removeItem('upgradeChecked');
         routerToName('home');
@@ -622,18 +640,19 @@ const getSetting = async () => {
         await handleCommand(language);
         isIntl.value = res.data.isIntl;
         isFxplay.value = res.data.isFxplay;
-        globalStore.isFxplay = isFxplay.value;
-        globalStore.isOffLine = res.data.isOffLine;
-        globalStore.ignoreCaptcha = !res.data.needCaptcha;
+        isOffline.value = res.data.isOffline;
+        isEnterprise.value = res.data.isEnterprise;
+        isEnterpriseLicenseLoaded.value = !res.data.isEnterprise;
+        ignoreCaptcha.value = !res.data.needCaptcha;
         passkeySetting.value = res.data.passkeySetting;
-        if (!globalStore.ignoreCaptcha) {
+        if (!ignoreCaptcha.value) {
             loginVerify();
         }
 
         document.title = res.data.panelName;
         i18n.warnHtmlMessage = false;
-        globalStore.openMenuTabs = res.data.menuTabs === 'Enable';
-        globalStore.themeConfig = { ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName };
+        openMenuTabs.value = res.data.menuTabs === 'Enable';
+        themeConfig.value = { ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName };
 
         if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {
             loginForm.agreeLicense = true;
@@ -644,57 +663,16 @@ const getSetting = async () => {
     } catch (error) {}
 };
 
-function adjustColorToRGBA(color: string, percent: number, opacity: number): string {
-    let r = 0,
-        g = 0,
-        b = 0,
-        a = opacity;
-
-    color = color.trim();
-
-    if (color.startsWith('#')) {
-        if (color.length === 4) {
-            r = parseInt(color[1] + color[1], 16);
-            g = parseInt(color[2] + color[2], 16);
-            b = parseInt(color[3] + color[3], 16);
-        } else if (color.length === 7) {
-            r = parseInt(color.slice(1, 3), 16);
-            g = parseInt(color.slice(3, 5), 16);
-            b = parseInt(color.slice(5, 7), 16);
-        } else {
-            return color;
-        }
-    } else if (color.startsWith('rgb')) {
-        const result = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([0-9.]+))?\)/);
-        if (!result) return color;
-        r = parseInt(result[1], 10);
-        g = parseInt(result[2], 10);
-        b = parseInt(result[3], 10);
-        if (result[4] !== undefined) {
-            a = parseFloat(result[4]);
-        }
-    } else {
-        return color;
-    }
-
-    r = Math.min(255, Math.max(0, Math.round(r * (1 + percent / 100))));
-    g = Math.min(255, Math.max(0, Math.round(g * (1 + percent / 100))));
-    b = Math.min(255, Math.max(0, Math.round(b * (1 + percent / 100))));
-    a = Math.min(1, Math.max(0, opacity / 100));
-
-    return `rgba(${r}, ${g}, ${b}, ${a})`;
-}
-
 onMounted(() => {
-    globalStore.isOnRestart = false;
+    isOnRestart.value = false;
     passkeySupported.value = !!window.PublicKeyCredential && window.isSecureContext;
     getSetting();
     getXpackSettingForTheme();
-    if (!globalStore.ignoreCaptcha) {
+    if (!ignoreCaptcha.value) {
         loginVerify();
     }
-    document.title = globalStore.themeConfig.panelName;
-    loginBtnLinkColor.value = globalStore.themeConfig.loginBtnLinkColor || '#005eeb';
+    document.title = themeConfig.value.panelName;
+    loginBtnLinkColor.value = themeConfig.value.loginBtnLinkColor || '#005eeb';
     document.documentElement.style.setProperty('--login-btn-link-color', loginBtnLinkColor.value);
     document.documentElement.style.setProperty(
         '--login-btn-link-hover-color',
@@ -707,7 +685,7 @@ onMounted(() => {
     nextTick(() => {
         userNameRef.value?.focus();
     });
-    loginForm.agreeLicense = globalStore.agreeLicense;
+    loginForm.agreeLicense = agreeLicense.value;
     document.onkeydown = (e: any) => {
         e = window.event || e;
         if (e.keyCode === 13) {

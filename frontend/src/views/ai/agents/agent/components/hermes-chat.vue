@@ -45,6 +45,7 @@
                                     <template v-if="editingSessionId === item.id">
                                         <el-button
                                             link
+                                            v-permission
                                             type="primary"
                                             :disabled="!canSaveSessionTitle"
                                             @click.stop="saveSessionTitle(item)"
@@ -58,6 +59,7 @@
                                     <el-button
                                         v-else-if="!terminalOpen"
                                         link
+                                        v-permission
                                         icon="Edit"
                                         class="hermes-chat-dialog__edit-button"
                                         @mousedown.stop
@@ -66,6 +68,7 @@
                                     <el-button
                                         v-if="editingSessionId !== item.id"
                                         link
+                                        v-permission
                                         type="danger"
                                         icon="Delete"
                                         :disabled="isDeleteDisabled(item)"
@@ -154,7 +157,7 @@ const connectTerminal = async (initCmd: string) => {
         args += `&operateNode=${node.value}`;
     }
     terminalRef.value?.acceptParams({
-        endpoint: '/api/v2/containers/exec',
+        endpoint: '/api/v2/hosts/terminal/container',
         args,
         error: '',
         initCmd,

@@ -11,7 +11,7 @@
                     </el-form-item>
                     <LoadBalanceForm ref="lbFormRef" v-model="form" :disabled="true" />
                     <el-form-item>
-                        <el-button type="primary" @click="submit()" class="mt-2">
+                        <el-button v-permission type="primary" @click="submit()" class="mt-2">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-form-item>

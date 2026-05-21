@@ -208,7 +208,6 @@
                         <div class="w-full min-w-0 sm:w-[300px]">
                             <el-input
                                 v-model="req.search"
-                                clearable
                                 @clear="search()"
                                 @keydown.enter="search()"
                                 :placeholder="$t('file.search')"
@@ -223,7 +222,7 @@
                                 </template>
                             </el-input>
                         </div>
-                        <el-button class="max-w-20" plain type="primary" @click="openAiSearchDrawer">
+                        <el-button v-permission class="max-w-20" plain type="primary" @click="openAiSearchDrawer">
                             {{ $t('file.aiSearch') }}
                         </el-button>
                     </div>
@@ -247,14 +246,14 @@
                                 </el-button>
                                 <template #dropdown>
                                     <el-dropdown-menu>
-                                        <el-dropdown-item command="dir">
+                                        <fu-dropdown-item v-permission command="dir">
                                             <svg-icon iconName="p-file-folder"></svg-icon>
                                             {{ $t('file.dir') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item command="file">
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item v-permission command="file">
                                             <svg-icon iconName="p-file-normal"></svg-icon>
                                             {{ $t('menu.files') }}
-                                        </el-dropdown-item>
+                                        </fu-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -265,14 +264,14 @@
                                 </el-button>
                                 <template #dropdown>
                                     <el-dropdown-menu>
-                                        <el-dropdown-item @click="openUpload">
+                                        <fu-dropdown-item v-permission @click="openUpload">
                                             <el-icon><ElUpload /></el-icon>
                                             {{ $t('commons.button.upload') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item @click="openWget">
+                                        </fu-dropdown-item>
+                                        <fu-dropdown-item v-permission @click="openWget">
                                             <el-icon><ElDownload /></el-icon>
                                             {{ $t('file.remoteFile') }}
-                                        </el-dropdown-item>
+                                        </fu-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -280,7 +279,7 @@
                                 <el-button class="btn" @click="openRecycleBin">
                                     {{ $t('file.recycleBin') }}
                                 </el-button>
-                                <el-button class="btn" @click="toTerminal">
+                                <el-button class="btn" @click="toTerminal" :disabled="!isAdminOrNodeAdmin">
                                     {{ $t('menu.terminal') }}
                                 </el-button>
                                 <el-popover
@@ -349,12 +348,12 @@
                                         </template>
                                         <template #dropdown>
                                             <el-dropdown-menu>
-                                                <el-dropdown-item @click="openShareList">
+                                                <fu-dropdown-item @click="openShareList">
                                                     {{ $t('file.shareList') }}
-                                                </el-dropdown-item>
-                                                <el-dropdown-item @click="openFileHistoryCenter">
+                                                </fu-dropdown-item>
+                                                <fu-dropdown-item @click="openFileHistoryCenter">
                                                     {{ $t('file.history') }}
-                                                </el-dropdown-item>
+                                                </fu-dropdown-item>
                                             </el-dropdown-menu>
                                         </template>
                                     </el-dropdown>
@@ -436,14 +435,15 @@
                                         </el-button>
                                         <template #dropdown>
                                             <el-dropdown-menu>
-                                                <el-dropdown-item
+                                                <fu-dropdown-item
+                                                    v-permission
                                                     v-for="btn in moreButtons"
                                                     :key="btn.label"
                                                     @click="btn.action"
                                                     :disabled="selects.length === 0"
                                                 >
                                                     {{ $t(btn.label) }}
-                                                </el-dropdown-item>
+                                                </fu-dropdown-item>
                                             </el-dropdown-menu>
                                         </template>
                                     </el-dropdown>
@@ -451,7 +451,12 @@
                                 <template v-if="visibleButtons.length > 0">
                                     <el-button-group class="flex max-w-full flex-nowrap items-center">
                                         <template v-for="btn in visibleButtons" :key="btn.label">
-                                            <el-button plain @click="btn.action" :disabled="selects.length === 0">
+                                            <el-button
+                                                v-permission
+                                                plain
+                                                @click="btn.action"
+                                                :disabled="selects.length === 0"
+                                            >
                                                 {{ $t(btn.label) }}
                                             </el-button>
                                         </template>
@@ -462,19 +467,42 @@
                                             </el-button>
                                             <template #dropdown>
                                                 <el-dropdown-menu>
-                                                    <el-dropdown-item
+                                                    <fu-dropdown-item
+                                                        v-permission
                                                         v-for="btn in moreButtons"
                                                         :key="btn.label"
                                                         @click="btn.action"
                                                         :disabled="selects.length === 0"
                                                     >
                                                         {{ $t(btn.label) }}
-                                                    </el-dropdown-item>
+                                                    </fu-dropdown-item>
                                                 </el-dropdown-menu>
                                             </template>
                                         </el-dropdown>
                                     </el-button-group>
                                 </template>
+                            </div>
+                            <el-button-group class="copy-button" v-if="moveOpen">
+                                <el-tooltip
+                                    class="box-item"
+                                    effect="dark"
+                                    :content="$t('file.paste')"
+                                    placement="bottom"
+                                >
+                                    <el-button v-permission plain @click="openPaste">
+                                        {{ $t('file.paste') }}({{ fileMove.count }})
+                                    </el-button>
+                                </el-tooltip>
+                                <el-tooltip
+                                    class="box-item"
+                                    effect="dark"
+                                    :content="$t('commons.button.cancel')"
+                                    placement="bottom"
+                                >
+                                    <el-button plain class="close" icon="Close" @click="closeMove"></el-button>
+                                </el-tooltip>
+                            </el-button-group>
+                            <div class="flex items-center gap-2">
                                 <fu-table-column-select
                                     :columns="columns"
                                     trigger="hover"
@@ -546,6 +574,7 @@
                                         <div class="file-row__actions">
                                             <el-button
                                                 v-if="row.shareCode"
+                                                v-permission
                                                 link
                                                 type="primary"
                                                 size="large"
@@ -556,6 +585,7 @@
                                         <div class="file-row__actions">
                                             <el-button
                                                 v-if="row.favoriteID > 0"
+                                                v-permission
                                                 link
                                                 type="warning"
                                                 size="large"
@@ -565,6 +595,7 @@
                                             <div v-else>
                                                 <el-button
                                                     v-if="hoveredRowPath === row.path"
+                                                    v-permission
                                                     link
                                                     icon="Star"
                                                     @click="addToFavorite(row)"
@@ -576,7 +607,9 @@
                             </el-table-column>
                             <el-table-column :label="$t('file.mode')" prop="mode" width="80">
                                 <template #default="{ row }">
-                                    <el-link underline="never" @click="openMode(row)">{{ row.mode }}</el-link>
+                                    <el-link v-permission underline="never" @click="openMode(row)">
+                                        {{ row.mode }}
+                                    </el-link>
                                 </template>
                             </el-table-column>
                             <el-table-column
@@ -586,7 +619,7 @@
                                 width="200"
                             >
                                 <template #default="{ row }">
-                                    <el-link underline="never" @click="openChown(row)">
+                                    <el-link v-permission underline="never" @click="openChown(row)">
                                         {{ row.user ? row.user : '-' }} ({{ row.uid }}) /
                                         {{ row.group ? row.group : '-' }} ({{ row.gid }})
                                     </el-link>
@@ -628,11 +661,11 @@
                             </el-table-column>
                             <fu-table-operations
                                 :max-height="dropdownMaxHeight"
-                                :ellipsis="mobile ? 0 : 2"
+                                :ellipsis="isMobile ? 0 : 2"
                                 :buttons="tableMoreButtons"
                                 :label="$t('commons.table.operate')"
-                                :min-width="mobile ? 'auto' : 200"
-                                :fixed="mobile ? false : 'right'"
+                                :min-width="isMobile ? 'auto' : 200"
+                                :fixed="isMobile ? false : 'right'"
                                 width="200"
                                 fix
                             />
@@ -732,7 +765,7 @@ import { useRouter } from 'vue-router';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useMultipleSearchable } from './hooks/searchable';
 import { ResultData } from '@/api/interface';
-import { GlobalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { Download as ElDownload, Upload as ElUpload, View, Hide } from '@element-plus/icons-vue';
 
 import i18n from '@/lang';
@@ -771,7 +804,7 @@ import { routerToNameWithQuery } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
 import FileList from '@/components/file-list/index.vue';
 
-const globalStore = GlobalStore();
+const { currentNode, isAdminOrNodeAdmin, isMobile, lastFilePath, openMenuTabs } = useGlobalStore();
 
 interface FilePaths {
     url: string;
@@ -944,10 +977,6 @@ const paginationConfig = reactive({
     total: 0,
 });
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
-
 const btnWrapperRefs = ref<Record<string, any>>({});
 
 const setBtnWrapperRef = (key: string, el: any) => {
@@ -1114,7 +1143,7 @@ const loadInitialExistingPath = async (url: string) => {
         sortOrder: oldSortOrder,
         showHidden,
     });
-    globalStore.lastFilePath = req.path;
+    lastFilePath.value = req.path;
     getPaths(req.path);
     updateTab(req.path);
     paths.value = buildPaths(req.path);
@@ -1285,12 +1314,12 @@ const jump = async (url: string) => {
     let searchResult = await searchFile();
     if (!searchResult.data.path) {
         req.path = oldUrl;
-        globalStore.lastFilePath = req.path;
+        lastFilePath.value = req.path;
         MsgWarning(i18n.global.t('commons.res.notFound'));
         return;
     }
     req.path = searchResult.data.path;
-    globalStore.lastFilePath = req.path;
+    lastFilePath.value = req.path;
     handleSearchResult(searchResult);
     getPaths(req.path);
     updateTab(req.path);
@@ -1577,7 +1606,7 @@ const openPreview = (item: File.File, fileType: string) => {
     filePreview.extension = item.extension;
     filePreview.fileType = fileType;
     filePreview.imageFiles = imageFiles.value;
-    filePreview.currentNode = globalStore.currentNode;
+    filePreview.currentNode = currentNode.value;
 
     previewRef.value.acceptParams(filePreview);
 };
@@ -1789,7 +1818,7 @@ function onLoading(isLoading: boolean) {
 }
 
 const openDownload = (file: File.File) => {
-    downloadFile(file.path, globalStore.currentNode);
+    downloadFile(file.path, currentNode.value);
 };
 
 const fileShareRef = ref<InstanceType<typeof FileShare> | null>(null);
@@ -1967,14 +1996,17 @@ const beforeButtons = [
     },
     {
         label: i18n.global.t('commons.button.copy'),
+        permission: true,
         click: (row: File.File) => openMoveBtn('copy', row),
     },
     {
         label: i18n.global.t('file.move'),
+        permission: true,
         click: (row: File.File) => openMoveBtn('cut', row),
     },
     {
         label: i18n.global.t('file.paste'),
+        permission: true,
         click: openPaste,
         disabled: () => {
             return !moveOpen.value;
@@ -1982,6 +2014,7 @@ const beforeButtons = [
     },
     {
         label: i18n.global.t('file.compress'),
+        permission: true,
         click: (row: File.File) => {
             openCompress([row]);
         },
@@ -1995,6 +2028,7 @@ const beforeButtons = [
     },
     {
         label: i18n.global.t('file.editPermissions'),
+        permission: true,
         click: (row: File.File) => {
             openBatchRole([row]);
         },
@@ -2002,6 +2036,7 @@ const beforeButtons = [
     {
         label: i18n.global.t('file.setRemark'),
         hideOnRemarkBlackList: true,
+        permission: true,
         click: (row: File.File) => {
             openRemark(row);
         },
@@ -2010,6 +2045,7 @@ const beforeButtons = [
 const afterButtons = [
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         disabled: (row: File.File) => {
             return row.name == '.1panel_clash';
         },
@@ -2022,6 +2058,7 @@ const afterButtons = [
     },
     {
         label: i18n.global.t('file.addFavoriteAction'),
+        permission: true,
         click: (row: File.File) => {
             addToFavorite(row);
         },
@@ -2029,6 +2066,7 @@ const afterButtons = [
     },
     {
         label: i18n.global.t('file.removeFavoriteAction'),
+        permission: true,
         click: (row: File.File) => {
             remove(row?.favoriteID);
         },
@@ -2036,6 +2074,7 @@ const afterButtons = [
     },
     {
         label: i18n.global.t('file.shareFile'),
+        permission: true,
         click: openShareFile,
         show: (row: File.File) => {
             return !row?.isDir && !row?.shareCode;
@@ -2043,6 +2082,7 @@ const afterButtons = [
     },
     {
         label: i18n.global.t('file.shareCancel'),
+        permission: true,
         click: (row: File.File) => {
             removeShareByPath(row.path);
         },
@@ -2052,6 +2092,7 @@ const afterButtons = [
     },
     {
         label: i18n.global.t('file.convert'),
+        permission: true,
         click: (row: File.File) => {
             openConvert(row);
         },
@@ -2073,6 +2114,7 @@ const afterButtons = [
 const rightBtnRename = [
     {
         label: i18n.global.t('file.rename'),
+        permission: true,
         click: (row: File.File) => {
             openRename(row, 'right');
         },
@@ -2081,6 +2123,7 @@ const rightBtnRename = [
 const moreBtnRename = [
     {
         label: i18n.global.t('file.rename'),
+        permission: true,
         click: (row: File.File) => {
             openRename(row, 'more');
         },
@@ -2265,18 +2308,18 @@ function getInitialPath(): string {
     if (routePath && typeof routePath === 'string') {
         const p = routePath.trim();
         if (p !== '') {
-            globalStore.lastFilePath = p;
+            lastFilePath.value = p;
             return p;
         }
     }
     const tab = editableTabs.value.find((t) => t.id === editableTabsKey.value);
     if (tab && typeof tab.path === 'string' && tab.path.trim() !== '') {
         const p = tab.path.trim();
-        globalStore.lastFilePath = p;
+        lastFilePath.value = p;
         return p;
     }
-    if (typeof globalStore.lastFilePath === 'string' && globalStore.lastFilePath.trim() !== '') {
-        return globalStore.lastFilePath;
+    if (typeof lastFilePath.value === 'string' && lastFilePath.value.trim() !== '') {
+        return lastFilePath.value;
     }
 
     return '/';
@@ -2367,7 +2410,7 @@ const changeTab = (targetPath: TabPaneName) => {
     saveStorageTabs();
     saveStorageTabsKey();
     req.path = current ? current.path : '';
-    globalStore.lastFilePath = req.path;
+    lastFilePath.value = req.path;
     getPaths(req.path);
     search();
 };
@@ -2392,7 +2435,7 @@ const removeTab = (targetId: TabPaneName) => {
 };
 
 const checkFFmpeg = () => {
-    getComponentInfo('ffmpeg', globalStore.currentNode).then((res) => {
+    getComponentInfo('ffmpeg', currentNode.value).then((res) => {
         ffmpegExist.value = res.data.exists ?? false;
     });
 };
@@ -2400,7 +2443,7 @@ const checkFFmpeg = () => {
 const updateHeight = () => {
     const el = fileTableRef.value;
     if (!el) return;
-    let tabHeight = globalStore.openMenuTabs ? 40 : -4;
+    let tabHeight = openMenuTabs.value ? 40 : -4;
     const half = (el.offsetHeight + tabHeight) / 2;
     dropdownMaxHeight.value = Math.max(half, 300);
 };
@@ -2674,13 +2717,6 @@ onBeforeUnmount(() => {
     width: 100%;
     min-height: 28px;
     column-gap: 6px;
-}
-
-.file-row__icon,
-.file-row__actions {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .file-name {

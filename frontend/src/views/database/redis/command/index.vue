@@ -1,10 +1,10 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('database.redisQuickCmd')" @close="handleClose" size="large">
         <template #content>
-            <el-button type="primary" @click="handleCmdAdd()">
+            <el-button v-permission type="primary" @click="handleCmdAdd()">
                 {{ $t('commons.button.add') }}
             </el-button>
-            <el-button @click="batchDelete(null)">
+            <el-button v-permission @click="batchDelete(null)">
                 {{ $t('commons.button.delete') }}
             </el-button>
             <el-table :data="data" class="mt-5" @selection-change="handleSelectionChange">
@@ -30,6 +30,7 @@
                             v-if="scope.row.lineStatus === 'create' || scope.row.lineStatus === 'edit'"
                             link
                             type="primary"
+                            v-permission
                             @click="handleCmdSave(scope.row)"
                         >
                             {{ $t('commons.button.save') }}
@@ -38,6 +39,7 @@
                             v-if="!scope.row.lineStatus || scope.row.lineStatus === 'saved'"
                             link
                             type="primary"
+                            v-permission
                             @click="scope.row.lineStatus = 'edit'"
                         >
                             {{ $t('commons.button.edit') }}
@@ -54,6 +56,7 @@
                             v-if="scope.row.lineStatus !== 'create' && scope.row.lineStatus !== 'edit'"
                             link
                             type="primary"
+                            v-permission
                             @click="handleCmdDelete(scope.$index)"
                         >
                             {{ $t('commons.button.delete') }}

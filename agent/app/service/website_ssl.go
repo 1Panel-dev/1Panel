@@ -402,8 +402,7 @@ func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 				workDir = websiteSSL.Dir
 			}
 			printSSLLog(logger, "ExecShellStart", nil)
-			cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(30*time.Minute), cmd.WithLogger(logger), cmd.WithWorkDir(workDir))
-			if err = cmdMgr.RunBashC(websiteSSL.Shell); err != nil {
+			if err = runShellScriptFile(workDir, websiteSSL.Shell, logger); err != nil {
 				printSSLLog(logger, "ErrExecShell", map[string]interface{}{"err": err.Error()})
 			} else {
 				printSSLLog(logger, "ExecShellSuccess", nil)
@@ -436,7 +435,7 @@ func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 		reloadSystemSSL(websiteSSL, logger)
 		if websiteSSL.PushNode {
 			printSSLLog(logger, "StartPushSSLToNode", nil)
-			if err = xpack.PushSSLToNode(websiteSSL); err != nil {
+			if err = xpack.MultiNodeProvider.PushSSLToNode(websiteSSL); err != nil {
 				printSSLLog(logger, "PushSSLToNodeFailed", map[string]interface{}{"err": err.Error()})
 				return
 			}
@@ -445,6 +444,23 @@ func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 	}()
 
 	return nil
+}
+
+func runShellScriptFile(workDir, shell string, logger *log.Logger) error {
+	file, err := os.CreateTemp("", "1panel-shell-*.sh")
+	if err != nil {
+		return err
+	}
+	defer func() { _ = os.Remove(file.Name()) }()
+	if _, err := file.WriteString(shell); err != nil {
+		_ = file.Close()
+		return err
+	}
+	if err := file.Close(); err != nil {
+		return err
+	}
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(30*time.Minute), cmd.WithLogger(logger), cmd.WithWorkDir(workDir))
+	return cmdMgr.Run("bash", file.Name())
 }
 
 func handleError(websiteSSL *model.WebsiteSSL, err error) {

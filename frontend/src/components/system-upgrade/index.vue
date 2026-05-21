@@ -21,10 +21,14 @@
                     <el-divider direction="vertical" />
                 </span>
                 <div class="flex flex-wrap items-center">
-                    <el-link v-if="isMasterPro" underline="never" type="primary" @click="toLxware">
-                        <span>
+                    <el-link underline="never" type="primary" @click="toLxware">
+                        <span v-if="isEE">
+                            {{ $t('license.ee') }}
+                        </span>
+                        <span v-else-if="isMasterPro">
                             {{ $t('license.pro') }}
                         </span>
+                        <span v-else-if="isOffline">
                     </el-link>
                     <el-link v-else-if="isOffLine" underline="never" type="primary" @click="to1Panel">
                         <span v-if="isOffLine">
@@ -39,14 +43,13 @@
                     <el-link underline="never" class="version" type="primary" @click="getVersionLog()">
                         {{ version }}
                     </el-link>
-                    <el-badge is-dot class="-mt-0.5" :hidden="version === 'Waiting' || !globalStore.hasNewVersion">
-                        <el-link
-                            class="ml-2"
-                            underline="never"
-                            type="primary"
-                            @click="onLoadUpgradeInfo"
-                            v-if="!globalStore.isOffLine"
-                        >
+                    <el-badge
+                        is-dot
+                        v-if="isAdmin && !isOffline"
+                        class="-mt-0.5"
+                        :hidden="version === 'Waiting' || !hasNewVersion"
+                    >
+                        <el-link class="ml-2" underline="never" type="primary" @click="onLoadUpgradeInfo">
                             {{ $t('commons.button.update') }}
                         </el-link>
                     </el-badge>
@@ -61,22 +64,17 @@
 </template>
 
 <script setup lang="ts">
-import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
+import { getSettingBaseInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import Upgrade from '@/components/system-upgrade/upgrade/index.vue';
 import Releases from '@/components/system-upgrade/releases/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { onMounted, ref } from 'vue';
-import { GlobalStore } from '@/store';
-import { storeToRefs } from 'pinia';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const globalStore = GlobalStore();
-const { docsUrl, isOffLine, isFxplay } = storeToRefs(globalStore);
+const { docsUrl, isOffline, isFxplay, isMasterPro, isEE, isIntl, isAdmin, hasNewVersion } = useGlobalStore();
 const upgradeRef = ref();
 const releasesRef = ref();
-const isMasterPro = computed(() => {
-    return globalStore.isMasterPro();
-});
 
 const version = ref<string>('');
 const loading = ref(false);
@@ -90,7 +88,7 @@ const props = defineProps({
 });
 
 const search = async () => {
-    const res = await getSettingInfo();
+    const res = await getSettingBaseInfo();
     version.value = res.data.systemVersion;
 };
 
@@ -102,7 +100,11 @@ const getVersionLog = () => {
 };
 
 const toLxware = () => {
-    if (!globalStore.isIntl) {
+    if (isOffline.value) {
+        to1Panel();
+        return;
+    }
+    if (!isIntl.value) {
         window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
     } else {
         window.open('https://1panel.pro/pricing' + '', '_blank', 'noopener,noreferrer');
@@ -110,7 +112,7 @@ const toLxware = () => {
 };
 
 const to1Panel = () => {
-    let url = globalStore.isIntl ? 'https://1panel.pro' : 'https://1panel.cn';
+    let url = isIntl.value ? 'https://1panel.pro' : 'https://1panel.cn';
     window.open(url, '_blank', 'noopener,noreferrer');
 };
 
@@ -127,9 +129,7 @@ const toEdition = () => {
 };
 
 const toForum = () => {
-    let url = globalStore.isIntl
-        ? 'https://github.com/1Panel-dev/1Panel/discussions'
-        : 'https://bbs.fit2cloud.com/c/1p/7';
+    let url = isIntl.value ? 'https://github.com/1Panel-dev/1Panel/discussions' : 'https://bbs.fit2cloud.com/c/1p/7';
     window.open(url, '_blank', 'noopener,noreferrer');
 };
 

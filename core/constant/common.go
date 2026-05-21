@@ -14,6 +14,15 @@ const (
 	DateTimeLayout     = "2006-01-02 15:04:05" // or use time.DateTime while go version >= 1.20
 	DateTimeSlimLayout = "20060102150405"
 
+	OpsReportExportFormatPDF      = "PDF"
+	OpsReportExportFormatHTML     = "HTML"
+	OpsReportExportFormatMarkdown = "Markdown"
+	OpsReportScheduleDaily        = "daily"
+	OpsReportScheduleWeekly       = "weekly"
+	OpsReportScheduleMonthly      = "monthly"
+	OpsReportDefaultThreshold     = "80"
+	OpsReportDefaultSaveSubDir    = "1panel/data/ops-report"
+
 	OrderDesc = "descending"
 	OrderAsc  = "ascending"
 
@@ -57,14 +66,23 @@ var WebUrlMap = map[string]struct{}{
 	"/apps/upgrade":   {},
 	"/apps/setting":   {},
 
-	"/ai":               {},
-	"/ai/model/account": {},
-	"/ai/model/local":   {},
-	"/ai/gpu":           {},
-	"/ai/gpu/current":   {},
-	"/ai/gpu/history":   {},
-	"/ai/mcp":           {},
-	"/ai/agents/agent":  {},
+	"/ai":                     {},
+	"/ai/ai-proxy":            {},
+	"/ai/ai-proxy/model-pool": {},
+	"/ai/ai-proxy/api-keys":   {},
+	"/ai/ai-proxy/groups":     {},
+	"/ai/ai-proxy/usage":      {},
+	"/ai/ai-proxy/content":    {},
+	"/ai/skills-hub":          {},
+	"/ai/skills-hub/targets":  {},
+	"/ai/benchmark":           {},
+	"/ai/model/account":       {},
+	"/ai/model/local":         {},
+	"/ai/gpu":                 {},
+	"/ai/gpu/current":         {},
+	"/ai/gpu/history":         {},
+	"/ai/mcp":                 {},
+	"/ai/agents/agent":        {},
 
 	"/containers":                   {},
 	"/containers/container/operate": {},
@@ -180,6 +198,32 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/cluster/mysql":    {},
 	"/xpack/cluster/postgres": {},
 	"/xpack/cluster/redis":    {},
+
+	"/enterprise/users/list":          {},
+	"/enterprise/users/roles":         {},
+	"/enterprise/license":             {},
+	"/enterprise/license-required":    {},
+	"/enterprise/ops-report":          {},
+	"/enterprise/ops-report/overview": {},
+	"/enterprise/ops-report/system":   {},
+	"/enterprise/ops-report/login":    {},
+	"/enterprise/ops-report/website":  {},
+	"/enterprise/ops-report/resource": {},
+	"/enterprise/ops-report/cronjob":  {},
+	"/enterprise/ops-report/history":  {},
+	"/enterprise/ops-report/settings": {},
+}
+
+var OpsReportExportFormats = map[string]struct{}{
+	OpsReportExportFormatPDF:      {},
+	OpsReportExportFormatHTML:     {},
+	OpsReportExportFormatMarkdown: {},
+}
+
+var OpsReportSchedules = map[string]struct{}{
+	OpsReportScheduleDaily:   {},
+	OpsReportScheduleWeekly:  {},
+	OpsReportScheduleMonthly: {},
 }
 
 var DynamicRoutes = []string{

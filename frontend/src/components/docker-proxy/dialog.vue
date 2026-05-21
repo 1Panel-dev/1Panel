@@ -24,8 +24,8 @@
 </template>
 
 <script lang="ts" setup>
-import { getSettingInfo } from '@/api/modules/setting';
-import { searchXpackSetting } from '@/extensions/xpack';
+import { getSettingBaseInfo } from '@/api/modules/setting';
+import { getXpackProxyDocker } from '@/extensions/xpack';
 
 const open = ref(false);
 const restart = ref(true);
@@ -49,7 +49,7 @@ const acceptParams = async (props: DialogProps): Promise<void> => {
         return;
     }
     try {
-        const res = await getSettingInfo();
+        const res = await getSettingBaseInfo();
         if (res.data.proxyType === '' || res.data.proxyType === 'close') {
             emit();
             return;
@@ -59,12 +59,12 @@ const acceptParams = async (props: DialogProps): Promise<void> => {
         return;
     }
 
-    const res = await searchXpackSetting();
+    const res = await getXpackProxyDocker();
     if (!res) {
         emit();
         return;
     }
-    if (res.data.proxyDocker === '') {
+    if (res.data.proxyDocker !== 'Enable') {
         emit();
         return;
     }

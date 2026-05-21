@@ -20,6 +20,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"gorm.io/gorm"
 )
 
@@ -130,6 +131,9 @@ func (s *FileShareService) Create(req request.FileShareCreate) (*response.FileSh
 	path := strings.TrimSpace(req.Path)
 	if path == "" || strings.Contains(path, "..") {
 		return nil, buserr.New("ErrFileSharePath")
+	}
+	if files.ShouldDenySensitiveFileRead(path) {
+		return nil, buserr.New("ErrSensitiveFileRead")
 	}
 	info, err := os.Stat(path)
 	if err != nil || info.IsDir() {

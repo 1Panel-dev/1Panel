@@ -3,7 +3,7 @@
         <LayoutContent>
             <template #leftToolBar>
                 <div class="flex flex-wrap gap-3">
-                    <el-button type="primary" @click="openCreate">
+                    <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
                 </div>
@@ -59,8 +59,8 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 5"
-                        :min-width="mobile ? 'auto' : 300"
+                        :ellipsis="isMobile ? 0 : 5"
+                        :min-width="isMobile ? 'auto' : 300"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -89,12 +89,9 @@ import { deleteTensorRTLLM, operateTensorRTLLM, pageTensorRTLLM } from '@/api/mo
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+const { isMobile } = useGlobalStore();
 
 const loading = ref();
 const data = ref();
@@ -183,12 +180,14 @@ const deleteLLM = async (row: AI.TensorRTLLM) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: (row: AI.TensorRTLLM) => {
             openEdit(row);
         },
     },
     {
         label: i18n.global.t('commons.button.start'),
+        permission: true,
         disabled: (row: AI.TensorRTLLM) => {
             return row.status === 'Running';
         },
@@ -198,6 +197,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.stop'),
+        permission: true,
         disabled: (row: AI.TensorRTLLM) => {
             return row.status !== 'Running';
         },
@@ -207,12 +207,14 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.restart'),
+        permission: true,
         click: (row: AI.TensorRTLLM) => {
             operate(row, 'restart');
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: (row: AI.TensorRTLLM) => {
             deleteLLM(row);
         },

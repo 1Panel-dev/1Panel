@@ -54,7 +54,7 @@ func (f *FileRouter) InitRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/depth/size", baseApi.DepthDirSize)
 		fileRouter.GET("/wget/process", baseApi.WgetProcess)
 		fileRouter.GET("/wget/process/keys", baseApi.ProcessKeys)
-		fileRouter.POST("/read", baseApi.ReadFileByLine)
+		fileRouter.POST("/read/:type", baseApi.ReadFileByLine)
 		fileRouter.POST("/batch/role", baseApi.BatchChangeModeAndOwner)
 
 		fileRouter.POST("/recycle/search", baseApi.SearchRecycleBinFile)
@@ -66,7 +66,6 @@ func (f *FileRouter) InitRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/favorite", baseApi.CreateFavorite)
 		fileRouter.POST("/favorite/del", baseApi.DeleteFavorite)
 
-		fileRouter.GET("/path/:type", baseApi.GetPathByType)
 		fileRouter.POST("/mount", baseApi.GetHostMount)
 		fileRouter.POST("/user/group", baseApi.GetUsersAndGroups)
 		fileRouter.POST("/convert", baseApi.ConvertFile)

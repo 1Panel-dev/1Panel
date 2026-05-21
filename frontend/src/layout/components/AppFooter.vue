@@ -1,8 +1,8 @@
 <template>
-    <div class="footer" :style="{ height: mobile ? '108px' : '48px' }">
+    <div class="footer" :style="{ height: isMobile ? '108px' : '48px' }">
         <div class="flex w-full flex-col gap-4 md:justify-between md:flex-row">
             <div class="flex flex-wrap gap-4">
-                <a v-if="!globalStore.isIntl && !globalStore.isFxplay" href="https://fit2cloud.com/" target="_blank">
+                <a v-if="!isIntl && !isFxplay" href="https://fit2cloud.com/" target="_blank">
                     Copyright © 2014-{{ year }} {{ $t('commons.fit2cloud') }}
                 </a>
                 <a v-else href="https://1panel.pro/" target="_blank">
@@ -17,13 +17,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import SystemUpgrade from '@/components/system-upgrade/index.vue';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isFxplay, isIntl, isMobile } = useGlobalStore();
+
 const year = new Date().getFullYear();
 </script>
 

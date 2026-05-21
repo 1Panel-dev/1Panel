@@ -1,14 +1,15 @@
 import { watch, onBeforeMount, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
-import { GlobalStore, MenuStore } from '@/store';
+import { MenuStore } from '@/store';
 import { DeviceType } from '@/enums/app';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 /** 参考 Bootstrap 的响应式设计 WIDTH = 600 */
 const WIDTH = 600;
 
 /** 根据大小变化重新布局 */
 export default () => {
     const route = useRoute();
-    const globalStore = GlobalStore();
+    const { globalStore, isMobile } = useGlobalStore();
     const menuStore = MenuStore();
     const _isMobile = () => {
         const rect = document.body.getBoundingClientRect();
@@ -17,9 +18,9 @@ export default () => {
 
     const _resizeHandler = () => {
         if (!document.hidden) {
-            const isMobile = _isMobile();
-            globalStore.toggleDevice(isMobile ? DeviceType.Mobile : DeviceType.Desktop);
-            if (isMobile) {
+            const isMobileScreen = _isMobile();
+            globalStore.toggleDevice(isMobileScreen ? DeviceType.Mobile : DeviceType.Desktop);
+            if (isMobileScreen) {
                 menuStore.closeSidebar(true);
             }
         }
@@ -28,7 +29,7 @@ export default () => {
     watch(
         () => route.name,
         () => {
-            if (globalStore.device === DeviceType.Mobile && !menuStore.isCollapse) {
+            if (isMobile.value && !menuStore.isCollapse) {
                 menuStore.closeSidebar(false);
             }
         },

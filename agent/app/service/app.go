@@ -126,7 +126,7 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (*response.
 	lang := strings.ToLower(common.GetLang(ctx))
 	for _, ap := range apps {
 		if req.Type == "php" {
-			if !global.CONF.Base.IsOffLine && (ap.RequiredPanelVersion == 0 || !common.CompareAppVersion(common.GetSystemVersion(info.SystemVersion), fmt.Sprintf("%f", ap.RequiredPanelVersion))) {
+			if !global.CONF.Base.IsOffline && (ap.RequiredPanelVersion == 0 || !common.CompareAppVersion(common.GetSystemVersion(info.SystemVersion), fmt.Sprintf("%f", ap.RequiredPanelVersion))) {
 				continue
 			}
 		}
@@ -966,7 +966,7 @@ func deleteCustomApp() {
 }
 
 func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
-	if xpack.IsUseCustomApp() {
+	if xpack.MultiNodeProvider.IsUseCustomApp() {
 		return nil
 	}
 

@@ -24,8 +24,12 @@
                 </template>
                 <template v-else>
                     <el-select v-model="marketSource" class="p-w-200" @change="handleMarketSourceChange">
-                        <el-option :value="'official'" :label="t('aiTools.agents.skillsMarketSourceOfficial')" />
-                        <el-option :value="'skills-sh'" label="skills.sh" />
+                        <el-option
+                            v-for="source in marketSourceOptions"
+                            :key="source.value"
+                            :value="source.value"
+                            :label="source.label"
+                        />
                     </el-select>
                     <el-input
                         v-model="marketKeyword"
@@ -56,6 +60,7 @@
                                 <div class="skill-head">
                                     <div class="skill-name">{{ skill.name }}</div>
                                     <el-button
+                                        v-permission
                                         v-if="skill.uninstallable"
                                         link
                                         type="danger"
@@ -97,6 +102,7 @@
                                 <div class="skill-slug">{{ skill.identifier || skill.slug }}</div>
                             </div>
                             <el-button
+                                v-permission
                                 type="primary"
                                 link
                                 :loading="installingSkill === (skill.identifier || skill.slug)"
@@ -132,25 +138,34 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Refresh, Search } from '@element-plus/icons-vue';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
 import { installAgentSkill, listAgentSkills, searchAgentSkills, uninstallAgentSkill } from '@/api/modules/ai';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+import { listEnterprisePublishedSkillHub } from '@/extensions/xpack';
 import { MsgSuccess } from '@/utils/message';
 import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
 
 type SkillViewMode = 'installed' | 'market';
-type HermesSkillMarketSource = 'official' | 'skills-sh';
+type HermesSkillMarketSource = 'official' | 'skills-sh' | 'local-hub';
 
 const { t } = useI18n();
+const { isEE, isOffline } = useGlobalStore();
 const loading = ref(false);
 const searching = ref(false);
 const mode = ref<SkillViewMode>('market');
 const installedKeyword = ref('');
 const marketKeyword = ref('');
-const marketSource = ref<HermesSkillMarketSource>('official');
+const getDefaultMarketSource = (): HermesSkillMarketSource => {
+    if (isEE.value && isOffline.value) {
+        return 'local-hub';
+    }
+    return 'official';
+};
+const marketSource = ref<HermesSkillMarketSource>(getDefaultMarketSource());
 const marketSearched = ref(false);
 const agentId = ref(0);
 const installedSkills = ref<AI.AgentSkillItem[]>([]);
@@ -158,6 +173,35 @@ const marketResults = ref<AI.AgentSkillSearchItem[]>([]);
 const installingSkill = ref('');
 const uninstallingSkill = ref('');
 const taskLogRef = ref<InstanceType<typeof TaskLog>>();
+const marketSourceOptions = computed(() => {
+    if (isEE.value && isOffline.value) {
+        return [
+            { value: 'local-hub' as HermesSkillMarketSource, label: t('aiTools.agents.skillsMarketSourceLocalHub') },
+        ];
+    }
+    const options = [
+        { value: 'official' as HermesSkillMarketSource, label: t('aiTools.agents.skillsMarketSourceOfficial') },
+        { value: 'skills-sh' as HermesSkillMarketSource, label: 'skills.sh' },
+    ];
+    if (isEE.value) {
+        options.push({ value: 'local-hub', label: t('aiTools.agents.skillsMarketSourceLocalHub') });
+    }
+    return options;
+});
+
+function handleMarketSourceChange() {
+    marketResults.value = [];
+    marketSearched.value = false;
+}
+
+watch([isEE, isOffline], () => {
+    const allowed = marketSourceOptions.value.map((option) => option.value);
+    if (allowed.includes(marketSource.value)) {
+        return;
+    }
+    marketSource.value = getDefaultMarketSource();
+    handleMarketSourceChange();
+});
 
 const filteredInstalledSkills = computed(() => {
     const keyword = installedKeyword.value.trim().toLowerCase();
@@ -222,11 +266,33 @@ const loadInstalledSkills = async () => {
 };
 
 const searchMarketSkills = async () => {
-    if (!agentId.value || !marketKeyword.value.trim()) {
+    if (!agentId.value) {
+        return;
+    }
+    if (marketSource.value !== 'local-hub' && !marketKeyword.value.trim()) {
         return;
     }
     searching.value = true;
     try {
+        if (marketSource.value === 'local-hub') {
+            const res = await listEnterprisePublishedSkillHub({
+                agentType: 'hermes-agent',
+                keyword: marketKeyword.value.trim(),
+            });
+            marketResults.value = (res?.data || []).map((item) => ({
+                slug: String(item.id),
+                identifier: String(item.id),
+                name: item.name,
+                description: item.description,
+                summary: item.description,
+                version: item.version,
+                source: 'local-hub',
+                trust: item.riskLevel,
+                score: '',
+            }));
+            marketSearched.value = true;
+            return;
+        }
         const res = await searchAgentSkills({
             agentId: agentId.value,
             source: marketSource.value,
@@ -237,11 +303,6 @@ const searchMarketSkills = async () => {
     } finally {
         searching.value = false;
     }
-};
-
-const handleMarketSourceChange = () => {
-    marketResults.value = [];
-    marketSearched.value = false;
 };
 
 const handleModeChange = async (value: SkillViewMode) => {
@@ -256,7 +317,7 @@ const load = async (id: number) => {
     mode.value = 'market';
     installedKeyword.value = '';
     marketKeyword.value = '';
-    marketSource.value = 'official';
+    marketSource.value = getDefaultMarketSource();
     marketSearched.value = false;
     installedSkills.value = [];
     marketResults.value = [];
@@ -387,6 +448,7 @@ defineExpose({
     display: -webkit-box;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }
