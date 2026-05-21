@@ -182,6 +182,9 @@ func validateGeneratedCommand(command string) error {
 	if isRiskCommand(command, builtInRiskCommands) {
 		return fmt.Errorf("model returned risky command")
 	}
+	if isDangerousExecutionCommand(command) {
+		return fmt.Errorf("model returned unsafe command")
+	}
 	return nil
 }
 
@@ -210,6 +213,22 @@ func isRiskCommand(command string, riskCommands []string) bool {
 		}
 	}
 	return false
+}
+
+func isDangerousExecutionCommand(command string) bool {
+	fields := strings.Fields(strings.ToLower(strings.TrimSpace(command)))
+	if len(fields) == 0 {
+		return false
+	}
+
+	switch fields[0] {
+	case "bash", "sh", "zsh", "dash", "ksh", "fish", "tcsh", "csh",
+		"python", "python3", "perl", "ruby", "php", "node", "deno", "lua",
+		"pwsh", "powershell", "cmd", "osascript":
+		return true
+	default:
+		return false
+	}
 }
 
 func mustLoadBuiltInRiskCommands() []string {

@@ -69,6 +69,23 @@ func TestGenerateRejectsBuiltInRiskCommand(t *testing.T) {
 	}
 }
 
+func TestGenerateRejectsInterpreterCommand(t *testing.T) {
+	generator, err := NewCommandGenerator(&stubChatClient{
+		resp: &ChatCompletionResponse{
+			Model:   "test-model",
+			Content: "python3 -c \"print('hello')\"",
+		},
+	})
+	if err != nil {
+		t.Fatalf("NewCommandGenerator() error = %v", err)
+	}
+
+	_, err = generator.Generate(context.Background(), CommandGenerateRequest{Input: "run a script"})
+	if err == nil {
+		t.Fatal("Generate() error = nil, want interpreter command to be rejected")
+	}
+}
+
 func TestGeneratePropagatesClientError(t *testing.T) {
 	wantErr := errors.New("boom")
 	generator, err := NewCommandGenerator(&stubChatClient{err: wantErr})
