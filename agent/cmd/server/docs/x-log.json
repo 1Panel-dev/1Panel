@@ -805,6 +805,223 @@
 		"formatZH": "更新快捷命令 [name]",
 		"formatEN": "update quick command [name]"
 	},
+	"/core/enterprise/ai-benchmark/tasks": {
+		"bodyKeys": [
+			"model"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 AI 基准测试 [model]",
+		"formatEN": "create AI benchmark [model]"
+	},
+	"/core/enterprise/ai-benchmark/tasks/:id/cancel": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "取消 AI 基准测试",
+		"formatEN": "cancel AI benchmark"
+	},
+	"/core/enterprise/ai-benchmark/tasks/delete": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 AI 基准测试 [id]",
+		"formatEN": "delete AI benchmark [id]"
+	},
+	"/core/enterprise/ai-proxy/api-keys/create": {
+		"bodyKeys": [
+			"userId",
+			"groupId"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 AI 网关 API Key 用户 [userId] 分组 [groupId]",
+		"formatEN": "create AI proxy API key user [userId] group [groupId]"
+	},
+	"/core/enterprise/ai-proxy/api-keys/delete": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 AI 网关 API Key [id]",
+		"formatEN": "delete AI proxy API key [id]"
+	},
+	"/core/enterprise/ai-proxy/api-keys/reveal": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "查看 AI 网关 API Key [id]",
+		"formatEN": "reveal AI proxy API key [id]"
+	},
+	"/core/enterprise/ai-proxy/api-keys/update": {
+		"bodyKeys": [
+			"id",
+			"userId",
+			"groupId"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 AI 网关 API Key [id] 用户 [userId] 分组 [groupId]",
+		"formatEN": "update AI proxy API key [id] user [userId] group [groupId]"
+	},
+	"/core/enterprise/ai-proxy/backends/delete": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 AI 网关后端 [id]",
+		"formatEN": "delete AI proxy backend [id]"
+	},
+	"/core/enterprise/ai-proxy/backends/import": {
+		"bodyKeys": [
+			"accountId"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "导入 AI 网关后端账号 [accountId]",
+		"formatEN": "import AI proxy backend account [accountId]"
+	},
+	"/core/enterprise/ai-proxy/backends/status": {
+		"bodyKeys": [
+			"id",
+			"enabled"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 AI 网关后端 [id] 状态 [enabled]",
+		"formatEN": "update AI proxy backend [id] status [enabled]"
+	},
+	"/core/enterprise/ai-proxy/backends/update": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 AI 网关后端 [id]",
+		"formatEN": "update AI proxy backend [id]"
+	},
+	"/core/enterprise/ai-proxy/content/groups/create": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 AI 网关敏感词分组 [name]",
+		"formatEN": "create AI proxy sensitive group [name]"
+	},
+	"/core/enterprise/ai-proxy/content/groups/delete": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 AI 网关敏感词分组 [id]",
+		"formatEN": "delete AI proxy sensitive group [id]"
+	},
+	"/core/enterprise/ai-proxy/content/groups/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 AI 网关敏感词分组 [name]",
+		"formatEN": "update AI proxy sensitive group [name]"
+	},
+	"/core/enterprise/ai-proxy/content/settings/update": {
+		"bodyKeys": [
+			"enabled"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 AI 网关内容审查设置 [enabled]",
+		"formatEN": "update AI proxy content audit settings [enabled]"
+	},
+	"/core/enterprise/ai-proxy/content/words/create": {
+		"bodyKeys": [
+			"groupId"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 AI 网关敏感词，分组 [groupId]",
+		"formatEN": "create AI proxy sensitive word, group [groupId]"
+	},
+	"/core/enterprise/ai-proxy/content/words/delete": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 AI 网关敏感词 [id]",
+		"formatEN": "delete AI proxy sensitive word [id]"
+	},
+	"/core/enterprise/ai-proxy/content/words/import": {
+		"bodyKeys": [
+			"groupId"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "导入 AI 网关敏感词，分组 [groupId]",
+		"formatEN": "import AI proxy sensitive words, group [groupId]"
+	},
+	"/core/enterprise/ai-proxy/content/words/update": {
+		"bodyKeys": [
+			"id",
+			"groupId"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 AI 网关敏感词 [id] 分组 [groupId]",
+		"formatEN": "update AI proxy sensitive word [id] group [groupId]"
+	},
+	"/core/enterprise/ai-proxy/groups/create": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 AI 网关分组 [name]",
+		"formatEN": "create AI proxy group [name]"
+	},
+	"/core/enterprise/ai-proxy/groups/delete": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 AI 网关分组 [id]",
+		"formatEN": "delete AI proxy group [id]"
+	},
+	"/core/enterprise/ai-proxy/groups/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 AI 网关分组 [name]",
+		"formatEN": "update AI proxy group [name]"
+	},
+	"/core/enterprise/ai-proxy/service/operate": {
+		"bodyKeys": [
+			"operate"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "操作 AI 网关服务 [operate]",
+		"formatEN": "operate AI proxy service [operate]"
+	},
+	"/core/enterprise/ai-proxy/settings/update": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 AI 网关设置",
+		"formatEN": "update AI proxy settings"
+	},
 	"/core/enterprise/user": {
 		"bodyKeys": [
 			"name"

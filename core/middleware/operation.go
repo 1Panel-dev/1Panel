@@ -61,6 +61,11 @@ func OperationLog() gin.HandlerFunc {
 		}
 		operationDic, hasPath := swagger[record.Path]
 		if !hasPath {
+			if fullPath := normalizeOperationPath(c.FullPath()); fullPath != "" {
+				operationDic, hasPath = swagger[fullPath]
+			}
+		}
+		if !hasPath {
 			c.Next()
 			return
 		}
@@ -285,6 +290,12 @@ func loadLogInfo(path string) string {
 		return ""
 	}
 	return pathArrays[1]
+}
+
+func normalizeOperationPath(reqPath string) string {
+	pathItem := strings.TrimPrefix(reqPath, "/api/v2")
+	pathItem = strings.TrimPrefix(pathItem, "/api/v2/core")
+	return pathItem
 }
 
 func newDB(pathItem string) (*gorm.DB, error) {
