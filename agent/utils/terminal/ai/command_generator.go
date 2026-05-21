@@ -2,13 +2,18 @@ package ai
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/constant"
 )
 
 type CommandGenerator struct {
 	client Client
 }
+
+var builtInRiskCommands = mustLoadBuiltInRiskCommands()
 
 type CommandGenerateRequest struct {
 	Input          string
@@ -67,6 +72,9 @@ func (g *CommandGenerator) Generate(ctx context.Context, req CommandGenerateRequ
 	command := sanitizeCommand(resp.Content)
 	if command == "" {
 		return nil, fmt.Errorf("model returned empty command")
+	}
+	if err := validateGeneratedCommand(command); err != nil {
+		return nil, err
 	}
 
 	return &CommandGenerateResponse{
@@ -158,6 +166,58 @@ func sanitizeCommand(raw string) string {
 		return strings.Trim(line, "` ")
 	}
 	return ""
+}
+
+func validateGeneratedCommand(command string) error {
+	command = strings.TrimSpace(command)
+	if command == "" {
+		return fmt.Errorf("model returned empty command")
+	}
+	if strings.ContainsAny(command, "\x00\r\n") {
+		return fmt.Errorf("model returned unsafe command")
+	}
+	if containsShellControlSyntax(command) {
+		return fmt.Errorf("model returned unsafe command")
+	}
+	if isRiskCommand(command, builtInRiskCommands) {
+		return fmt.Errorf("model returned risky command")
+	}
+	return nil
+}
+
+func containsShellControlSyntax(command string) bool {
+	if strings.ContainsAny(command, ";|&`") {
+		return true
+	}
+	if strings.Contains(command, "$(") || strings.Contains(command, "${") {
+		return true
+	}
+	return false
+}
+
+func isRiskCommand(command string, riskCommands []string) bool {
+	command = strings.ToLower(strings.TrimSpace(command))
+	if command == "" {
+		return false
+	}
+	for _, riskCommand := range riskCommands {
+		riskCommand = strings.ToLower(strings.TrimSpace(riskCommand))
+		if riskCommand == "" {
+			continue
+		}
+		if strings.Contains(command, riskCommand) {
+			return true
+		}
+	}
+	return false
+}
+
+func mustLoadBuiltInRiskCommands() []string {
+	commands := make([]string, 0)
+	if err := json.Unmarshal([]byte(constant.DefaultTerminalAIRiskCommands), &commands); err != nil {
+		return nil
+	}
+	return commands
 }
 
 func providerNameFromModel(model string) string {
