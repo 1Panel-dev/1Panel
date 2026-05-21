@@ -1959,7 +1959,7 @@ const message = {
         clam: {
             clam: 'Imbasan virus',
             cron: 'Imbasan berjadual',
-            cronHelper: 'Edisi Pro menyokong imbasan berjadual',
+            cronHelper: 'Edisi Komersial menyokong imbasan berjadual',
             specErr: 'Ralat format jadual pelaksanaan, sila semak dan cuba lagi!',
             disableMsg:
                 'Menghentikan pelaksanaan berjadual akan menghalang tugas imbasan ini daripada berjalan secara automatik. Adakah anda mahu meneruskan?',
@@ -1994,7 +1994,7 @@ const message = {
             clamLog: '@:toolbox.clam.clamConf log',
             freshClam: 'FreshClam',
             freshClamLog: '@:toolbox.clam.freshClam log',
-            alertHelper: 'Edisi Pro menyokong imbasan berjadual dan amaran SMS',
+            alertHelper: 'Edisi Komersial menyokong imbasan berjadual dan amaran SMS',
             alertTitle: 'Tugas imbasan virus 「{0}」 mengesan amaran fail dijangkiti',
         },
     },
@@ -2508,12 +2508,13 @@ const message = {
             'Penghantaran semula aplikasi, akses kontena dan fungsi lain akan menggunakan alamat ini untuk penghalaan. Setiap nod boleh ditetapkan dengan alamat yang berbeza.',
         proxy: 'Proksi pelayan',
         proxyHelper: 'Ia akan berkuat kuasa dalam senario berikut selepas anda menyediakan pelayan proksi:',
-        proxyHelper1: 'Muat turun pakej pemasangan dan penyelarasan daripada kedai aplikasi (Edisi Pro sahaja)',
-        proxyHelper2: 'Kemas kini sistem dan semakan maklumat kemas kini (Edisi Pro sahaja)',
-        proxyHelper4: 'Permintaan rangkaian seperti tarikan imej Docker akan melalui pelayan proksi (Edisi Pro sahaja)',
+        proxyHelper1: 'Muat turun pakej pemasangan dan penyelarasan daripada kedai aplikasi (Edisi Komersial sahaja)',
+        proxyHelper2: 'Kemas kini sistem dan semakan maklumat kemas kini (Edisi Komersial sahaja)',
+        proxyHelper4:
+            'Permintaan rangkaian seperti tarikan imej Docker akan melalui pelayan proksi (Edisi Komersial sahaja)',
         proxyHelper3: 'Pengesahan dan penyelarasan lesen sistem',
-        proxyHelper5: 'Muat turun dan penyegerakan bersepadu untuk pustaka skrip sistem (ciri Edisi Pro)',
-        proxyHelper6: 'Mohon sijil (Fungsi versi Pro)',
+        proxyHelper5: 'Muat turun dan penyegerakan bersepadu untuk pustaka skrip sistem (ciri Edisi Komersial)',
+        proxyHelper6: 'Mohon sijil (Fungsi versi komersial)',
         proxyType: 'Jenis proksi',
         proxyUrl: 'Alamat proksi',
         proxyPort: 'Port proksi',
@@ -2944,12 +2945,13 @@ const message = {
         authorizationId: 'ID Langganan',
         authorizedUser: 'Pengguna yang Dibenarkan',
         lostHelper:
-            'Lesen telah mencapai had percubaan semula. Jalankan penyegerakan secara manual untuk memastikan ciri Pro terus berfungsi dengan baik. butiran: ',
+            'Lesen telah mencapai had percubaan semula. Jalankan penyegerakan secara manual untuk memastikan ciri Edisi Komersial terus berfungsi dengan baik. butiran: ',
         disableHelper:
-            'Pengesahan penyegerakan lesen gagal. Jalankan penyegerakan secara manual untuk memastikan ciri Pro berfungsi dengan baik. butiran: ',
+            'Pengesahan penyegerakan lesen gagal. Jalankan penyegerakan secara manual untuk memastikan ciri Edisi Komersial berfungsi dengan baik. butiran: ',
         quickUpdate: 'Kemas Kini Pantas',
         power: 'Kebenaran',
-        unbindHelper: 'Semua Tetapan berkaitan Pro akan dibersihkan selepas nyahikat. Adakah anda mahu meneruskan?',
+        unbindHelper:
+            'Semua Tetapan berkaitan Edisi Komersial akan dibersihkan selepas nyahikat. Adakah anda mahu meneruskan?',
         importLicense: 'Lesen',
         importHelper: 'Sila klik atau seret fail lesen ke sini',
         licenseRequiredTip:
@@ -2960,7 +2962,7 @@ const message = {
             'Lesen Enterprise Edition belum diikat. Hubungi pentadbir super untuk mengimport lesen.',
         technicalAdvice: 'Konsultasi Teknikal',
         advice: 'Konsultasi',
-        levelUpPro: 'Naik taraf ke Edisi Pro',
+        levelUpPro: 'Naik taraf ke Edisi Komersial',
         licenseSync: 'Penyegerakan Lesen',
         knowMorePro: 'Ketahui Lebih Lanjut',
         closeAlert: 'Halaman semasa boleh ditutup dalam tetapan panel',
@@ -2974,24 +2976,24 @@ const message = {
         count: 'Kuantiti lesen',
         serialNo: 'Nombor siri',
         remark: 'Catatan',
-        waf: 'Naik taraf ke Edisi Pro untuk menggunakan peta sekatan, log, rekod sekatan, sekatan geografi, peraturan tersuai, halaman sekatan tersuai dan banyak lagi.',
-        tamper: 'Naik taraf ke Edisi Pro untuk melindungi laman web daripada perubahan atau gangguan tanpa kebenaran.',
-        setting: 'Naik taraf ke Edisi Pro untuk menyesuaikan logo panel, mesej alu-aluan dan maklumat lain.',
+        waf: 'Naik taraf ke Edisi Komersial untuk menggunakan peta sekatan, log, rekod sekatan, sekatan geografi, peraturan tersuai, halaman sekatan tersuai dan banyak lagi.',
+        tamper: 'Naik taraf ke Edisi Komersial untuk melindungi laman web daripada perubahan atau gangguan tanpa kebenaran.',
+        setting: 'Naik taraf ke Edisi Komersial untuk menyesuaikan logo panel, mesej alu-aluan dan maklumat lain.',
         monitor:
-            'Naik taraf ke Edisi Pro untuk melihat status laman web masa nyata, trend pelawat, sumber trafik, log permintaan dan lain-lain.',
-        alert: 'Naik taraf ke Edisi Pro untuk menerima amaran SMS dan melihat log amaran.',
-        node: 'Naik taraf ke Edisi Pro untuk mengurus berbilang pelayan Linux dengan 1Panel.',
+            'Naik taraf ke Edisi Komersial untuk melihat status laman web masa nyata, trend pelawat, sumber trafik, log permintaan dan lain-lain.',
+        alert: 'Naik taraf ke Edisi Komersial untuk menerima amaran SMS dan melihat log amaran.',
+        node: 'Naik taraf ke Edisi Komersial untuk mengurus berbilang pelayan Linux dengan 1Panel.',
         nodeApp:
-            'Naik taraf ke Edisi Pro untuk menaik taraf versi aplikasi berbilang nod tanpa menukar nod secara manual.',
+            'Naik taraf ke Edisi Komersial untuk menaik taraf versi aplikasi berbilang nod tanpa menukar nod secara manual.',
         nodeDashboard:
-            'Naik taraf ke Edisi Pro untuk mengurus aplikasi, laman web, pangkalan data dan tugas berjadual berbilang nod secara berpusat.',
-        fileExchange: 'Naik taraf ke Edisi Pro untuk memindahkan fail dengan pantas antara pelayan.',
-        app: 'Naik taraf ke Edisi Pro untuk melihat maklumat perkhidmatan dan pemantauan anomali dalam aplikasi mudah alih.',
-        cluster: 'Naik taraf ke Edisi Pro untuk mengurus kelompok utama-replika MySQL/Postgres/Redis.',
+            'Naik taraf ke Edisi Komersial untuk mengurus aplikasi, laman web, pangkalan data dan tugas berjadual berbilang nod secara berpusat.',
+        fileExchange: 'Naik taraf ke Edisi Komersial untuk memindahkan fail dengan pantas antara pelayan.',
+        app: 'Naik taraf ke Edisi Komersial untuk melihat maklumat perkhidmatan dan pemantauan anomali dalam aplikasi mudah alih.',
+        cluster: 'Naik taraf ke Edisi Komersial untuk mengurus kelompok utama-replika MySQL/Postgres/Redis.',
         'model-downloader':
-            'Naik taraf kepada edisi Pro untuk mencari, memuat turun dan mengurus fail model tempatan daripada HuggingFace, ModelScope atau cermin serasi, dengan direktori model dan tugasan muat turun berpusat.',
+            'Naik taraf kepada edisi komersial untuk mencari, memuat turun dan mengurus fail model tempatan daripada HuggingFace, ModelScope atau cermin serasi, dengan direktori model dan tugasan muat turun berpusat.',
         exceptionalHelper:
-            'Pengesahan penyegerakan lesen tidak normal. Klik butang sync secara manual untuk pastikan fungsi Pro berjalan baik. butiran: ',
+            'Pengesahan penyegerakan lesen tidak normal. Klik butang sync secara manual untuk pastikan fungsi Edisi Komersial berjalan baik. butiran: ',
         tamperHelper: 'Operasi gagal, fail atau folder mempunyai perlindungan gangguan. Sila semak dan cuba lagi!',
     },
     clean: {
@@ -4028,12 +4030,12 @@ const message = {
     },
     xpack: {
         expiresTrialAlert:
-            'Peringatan mesra: Percubaan Pro anda akan tamat dalam {0} hari, dan semua ciri Pro tidak lagi dapat diakses. Sila perbaharui atau naik taraf ke versi penuh tepat pada masanya.',
+            'Peringatan mesra: Percubaan Edisi Komersial anda akan tamat dalam {0} hari, dan semua ciri Edisi Komersial tidak lagi dapat diakses. Sila perbaharui atau naik taraf ke versi penuh tepat pada masanya.',
         expiresAlert:
-            'Peringatan mesra: Lesen Pro anda akan tamat dalam {0} hari, dan semua ciri Pro tidak lagi dapat diakses. Sila perbaharui segera untuk memastikan penggunaan berterusan.',
+            'Peringatan mesra: Lesen Edisi Komersial anda akan tamat dalam {0} hari, dan semua ciri Edisi Komersial tidak lagi dapat diakses. Sila perbaharui segera untuk memastikan penggunaan berterusan.',
         menu: 'Pro',
         upage: 'Pembina Laman Web AI',
-        proAlert: 'Tingkatkan ke Pro untuk menggunakan ciri ini',
+        proAlert: 'Tingkatkan ke Edisi Komersial untuk menggunakan ciri ini',
         opsReport: {
             name: 'Laporan Operasi',
             overview: 'Gambaran Keseluruhan',
@@ -5052,7 +5054,7 @@ const message = {
             syncHelper: 'Apabila data nod induk berubah, ia akan disegerakkan ke nod anak ini secara masa nyata,',
             syncBackupAccount: 'Tetapan akaun sandaran',
             syncWithMaster:
-                'Selepas menaik taraf ke Pro, semua data akan diselaraskan secara lalai. Dasar penyelarasan boleh disesuaikan secara manual dalam pengurusan nod.',
+                'Selepas menaik taraf ke Edisi Komersial, semua data akan diselaraskan secara lalai. Dasar penyelarasan boleh disesuaikan secara manual dalam pengurusan nod.',
             syncProxy: 'Tetapan proksi sistem',
             syncProxyHelper: 'Penyelarasan tetapan proksi sistem memerlukan mulakan semula Docker',
             syncProxyHelper1: 'Memulakan semula Docker mungkin menjejaskan perkhidmatan kontena yang sedang berjalan.',
@@ -5132,7 +5134,7 @@ const message = {
             nodes: 'Pilih Node',
             selectNode: 'Pilih Node',
             selectNodeError: 'Sila pilih node',
-            licenseHelper: 'Versi Pro menyokong fungsi gudang aplikasi tersuai',
+            licenseHelper: 'Versi Komersial menyokong fungsi gudang aplikasi tersuai',
             databaseHelper: 'Pangkalan data berkaitan aplikasi, sila pilih pangkalan data nod sasaran',
             nodeHelper: 'Tidak boleh memilih nod semasa',
             migrateHelper:
@@ -5147,7 +5149,7 @@ const message = {
             alertCount: 'Bilangan Amaran',
             clamHelper: 'Hantar amaran apabila terdapat fail yang dijangkiti semasa imbasan',
             cronJobHelper: 'Hantar amaran apabila pelaksanaan tugas gagal',
-            licenseHelper: 'Edisi Pro menyokong lebih banyak saluran amaran',
+            licenseHelper: 'Edisi Komersial menyokong lebih banyak saluran amaran',
             alertCountHelper: 'Kekerapan maksimum amaran harian',
             alert: 'Amaran SMS',
             logs: 'Log Amaran',
@@ -5358,7 +5360,7 @@ const message = {
             barkConfigHelper: 'Konfigurasi pemberitahuan amaran Bark',
             webhookName: 'Nama bot',
             webhookUrl: 'URL Webhook',
-            alertConfigProHelper: 'Edisi Pro turut menyokong amaran WeCom, DingTalk, Feishu dan SMS.',
+            alertConfigProHelper: 'Edisi Komersial turut menyokong amaran WeCom, DingTalk, Feishu dan SMS.',
         },
         theme: {
             lingXiaGold: 'LXware Gold',
