@@ -1,7 +1,7 @@
 <template>
     <div>
         <RouterMenu />
-        <LayoutContent :title="'Servers'" v-loading="loading">
+        <LayoutContent :title="$t('menu.mcp')" v-loading="loading">
             <template #leftToolBar>
                 <div class="flex flex-wrap gap-3">
                     <el-button v-permission type="primary" @click="openCreate">
