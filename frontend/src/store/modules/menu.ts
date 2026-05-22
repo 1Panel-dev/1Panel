@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import type { StoreDefinition } from 'pinia';
 import { MenuState } from '../interface';
 import piniaPersistConfig from '@/config/pinia-persist';
 import { RouteRecordRaw } from 'vue-router';
@@ -28,6 +29,6 @@ export const MenuStore = defineStore('MenuState', {
         },
     },
     persist: piniaPersistConfig('MenuStore'),
-});
+}) as StoreDefinition<'MenuState', MenuState, any, any>;
 
 export default MenuStore;
