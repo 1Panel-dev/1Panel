@@ -2,8 +2,7 @@ import { defineStore } from 'pinia';
 import piniaPersistConfig from '@/config/pinia-persist';
 import { TerminalState } from '../interface';
 
-export const TerminalStore = defineStore({
-    id: 'TerminalState',
+export const TerminalStore = defineStore('TerminalState', {
     state: (): TerminalState => ({
         lineHeight: 1.2,
         letterSpacing: 1.2,

@@ -8,8 +8,7 @@ import { toManageCode } from '@/utils/permission-codes';
 const CN_DOCS_URL = 'https://1panel.cn/docs/v2';
 const INTL_DOCS_URL = 'https://docs.1panel.pro/v2';
 
-const GlobalStore = defineStore({
-    id: 'GlobalState',
+const GlobalStore = defineStore('GlobalState', {
     state: (): GlobalState => ({
         language: i18n.global.locale.value,
         device: DeviceType.Desktop,

@@ -4,8 +4,7 @@ import piniaPersistConfig from '@/config/pinia-persist';
 import { RouteRecordRaw } from 'vue-router';
 const whiteList = ['/login', '/error'];
 
-export const MenuStore = defineStore({
-    id: 'MenuState',
+export const MenuStore = defineStore('MenuState', {
     state: (): MenuState => ({
         isCollapse: false,
         menuList: [],
