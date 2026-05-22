@@ -4434,6 +4434,8 @@ const message = {
                 'Bağımlılık varsa ilişkili izinler otomatik seçilir; manuel kaldırıldıktan sonra bazı özelliklerde "Geçerli kullanıcının izni yok" gösterilebilir.',
             allViewPermissionHelper: 'AI Gateway için tüm görüntüleme izinlerini verir.',
             apiKeyViewPermissionHelper: 'Yalnızca AI Gateway API Key görüntülemeye izin verir.',
+            masterOnlyPermission: 'Ana düğüm izni',
+            masterOnlyPermissionHelper: 'Bu izin yalnızca ana düğümde geçerlidir.',
             view: 'Görüntüle',
             manage: 'Yönet',
         },

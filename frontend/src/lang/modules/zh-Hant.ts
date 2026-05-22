@@ -4069,6 +4069,8 @@ const message = {
             permissionLinkageTip: '存在依賴時將自動勾選關聯權限，手動取消後部分功能可能提示「目前使用者無權限」。',
             allViewPermissionHelper: '擁有 AI 閘道的所有檢視權限。',
             apiKeyViewPermissionHelper: '僅能檢視 AI 閘道 API Key。',
+            masterOnlyPermission: '主節點權限',
+            masterOnlyPermissionHelper: '該權限僅在主節點生效。',
             view: '檢視',
             manage: '管理',
         },
