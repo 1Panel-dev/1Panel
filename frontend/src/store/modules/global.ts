@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import type { StoreDefinition } from 'pinia';
 import piniaPersistConfig from '@/config/pinia-persist';
 import { GlobalState } from '../interface';
 import { DeviceType } from '@/enums/app';
@@ -146,6 +147,6 @@ const GlobalStore = defineStore('GlobalState', {
         },
     },
     persist: piniaPersistConfig('GlobalState'),
-});
+}) as StoreDefinition<'GlobalState', GlobalState, any, any>;
 
 export default GlobalStore;

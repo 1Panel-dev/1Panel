@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import type { StoreDefinition } from 'pinia';
 import piniaPersistConfig from '@/config/pinia-persist';
 import { TerminalState } from '../interface';
 
@@ -16,6 +17,6 @@ export const TerminalStore = defineStore('TerminalState', {
         scrollSensitivity: 6,
     }),
     persist: piniaPersistConfig('TerminalState'),
-});
+}) as StoreDefinition<'TerminalState', TerminalState, any, any>;
 
 export default TerminalStore;

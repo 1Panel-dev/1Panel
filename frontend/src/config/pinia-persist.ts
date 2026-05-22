@@ -1,7 +1,7 @@
-import { PersistedStateOptions } from 'pinia-plugin-persistedstate';
+import { PersistenceOptions } from 'pinia-plugin-persistedstate';
 
 const piniaPersistConfig = (key: string) => {
-    const persist: PersistedStateOptions = {
+    const persist: PersistenceOptions = {
         key,
         storage: window.localStorage,
     };
