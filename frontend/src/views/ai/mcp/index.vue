@@ -8,10 +8,12 @@
 </template>
 
 <script lang="ts" setup>
+import i18n from '@/lang';
+
 const buttons = [
     {
-        label: 'Servers',
-        path: '/ai/mcp/servers',
+        label: i18n.global.t('menu.mcp'),
+        path: '/ai/mcp',
     },
 ];
 </script>
