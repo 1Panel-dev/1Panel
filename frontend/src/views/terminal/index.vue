@@ -5,13 +5,13 @@
                 <el-radio-button class="router_card_button" size="large" value="terminal">
                     {{ $t('menu.terminal', 2) }}
                 </el-radio-button>
-                <el-radio-button class="router_card_button" size="large" value="host">
+                <el-radio-button v-if="isAdmin" class="router_card_button" size="large" value="host">
                     {{ $t('terminal.host', 2) }}
                 </el-radio-button>
                 <el-radio-button class="router_card_button" size="large" value="command">
                     {{ $t('terminal.quickCommand', 2) }}
                 </el-radio-button>
-                <el-radio-button class="router_card_button" size="large" value="setting">
+                <el-radio-button v-if="isAdmin" class="router_card_button" size="large" value="setting">
                     {{ $t('container.setting') }}
                 </el-radio-button>
             </el-radio-group>
@@ -20,13 +20,13 @@
         <div v-show="activeNames === 'terminal'">
             <TerminalTab ref="terminalTabRef" />
         </div>
-        <div v-if="activeNames === 'host'">
+        <div v-if="isAdmin && activeNames === 'host'">
             <HostTab ref="hostTabRef" />
         </div>
         <div v-if="activeNames === 'command'">
             <CommandTab ref="commandTabRef" />
         </div>
-        <div v-if="activeNames === 'setting'">
+        <div v-if="isAdmin && activeNames === 'setting'">
             <SettingTab ref="settingTabRef" />
         </div>
     </div>
@@ -40,8 +40,10 @@ import SettingTab from '@/views/terminal/setting/index.vue';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { getTerminalInfo } from '@/api/modules/setting';
 import { TerminalStore } from '@/store';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const terminalStore = TerminalStore();
+const { isAdmin } = useGlobalStore();
 const activeNames = ref<string>('terminal');
 const hostTabRef = ref();
 const commandTabRef = ref();
@@ -49,17 +51,17 @@ const terminalTabRef = ref();
 const settingTabRef = ref();
 
 const handleChange = (tab: any) => {
-    if (tab === 'host') {
-        hostTabRef.value!.acceptParams();
+    if (tab === 'host' && isAdmin.value) {
+        hostTabRef.value?.acceptParams();
     }
     if (tab === 'command') {
-        commandTabRef.value!.acceptParams();
+        commandTabRef.value?.acceptParams();
     }
     if (tab === 'terminal') {
-        terminalTabRef.value!.acceptParams();
+        terminalTabRef.value?.acceptParams();
     }
-    if (tab === 'setting') {
-        settingTabRef.value!.acceptParams();
+    if (tab === 'setting' && isAdmin.value) {
+        settingTabRef.value?.acceptParams();
     }
 };
 

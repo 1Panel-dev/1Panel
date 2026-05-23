@@ -4770,6 +4770,8 @@ const message = {
             permissionLinkageTip: '存在依赖时将自动勾选关联权限，手动取消后部分功能可能提示“当前用户无权限”。',
             allViewPermissionHelper: '拥有 AI 网关的所有查看权限。',
             apiKeyViewPermissionHelper: '仅能查看 AI 网关 API Key。',
+            masterOnlyPermission: '主节点权限',
+            masterOnlyPermissionHelper: '该权限仅在主节点生效。',
             view: '查看',
             manage: '管理',
         },

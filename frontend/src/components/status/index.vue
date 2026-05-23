@@ -1,34 +1,41 @@
 <template>
-    <el-tooltip v-if="msg && msg != ''" effect="dark" placement="bottom">
-        <template #content>
-            <div class="content">{{ msg }}</div>
+    <span
+        class="status-wrapper"
+        :class="{ 'is-disabled': isDisabled }"
+        :aria-disabled="isDisabled"
+        @click.capture="handlePermissionClick"
+    >
+        <el-tooltip v-if="msg && msg != ''" effect="dark" placement="bottom">
+            <template #content>
+                <div class="content">{{ msg }}</div>
+            </template>
+            <el-tag size="small" :type="getType(statusItem)" round effect="light">
+                <span class="flx-align-center">
+                    <span v-if="statusItem != ''">{{ $t('commons.status.' + statusItem) }}</span>
+                    <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
+                        <Loading />
+                    </el-icon>
+                </span>
+            </el-tag>
+        </el-tooltip>
+        <template v-else>
+            <el-tag size="small" :type="getType(statusItem)" round effect="light" v-if="!operate">
+                <span class="flx-align-center">
+                    <span v-if="statusItem != ''">{{ $t('commons.status.' + statusItem) }}</span>
+                    <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
+                        <Loading />
+                    </el-icon>
+                </span>
+            </el-tag>
+            <el-button size="small" v-else :type="getType(statusItem)" plain round :disabled="isDisabled">
+                <span v-if="statusItem != ''">{{ $t('commons.status.' + statusItem) }}</span>
+                <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
+                    <Loading />
+                </el-icon>
+                <svg-icon iconName="p-stop" className="status-icon" v-if="stopIcon(statusItem)"></svg-icon>
+                <svg-icon iconName="p-start" className="status-icon" v-if="runningIcon(statusItem)"></svg-icon>
+            </el-button>
         </template>
-        <el-tag size="small" :type="getType(statusItem)" round effect="light">
-            <span class="flx-align-center">
-                <span v-if="statusItem != ''">{{ $t('commons.status.' + statusItem) }}</span>
-                <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
-                    <Loading />
-                </el-icon>
-            </span>
-        </el-tag>
-    </el-tooltip>
-    <span v-else>
-        <el-tag size="small" :type="getType(statusItem)" round effect="light" v-if="!operate">
-            <span class="flx-align-center">
-                <span v-if="statusItem != ''">{{ $t('commons.status.' + statusItem) }}</span>
-                <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
-                    <Loading />
-                </el-icon>
-            </span>
-        </el-tag>
-        <el-button size="small" v-else :type="getType(statusItem)" plain round :disabled="isDisabled">
-            <span v-if="statusItem != ''">{{ $t('commons.status.' + statusItem) }}</span>
-            <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
-                <Loading />
-            </el-icon>
-            <svg-icon iconName="p-stop" className="status-icon" v-if="stopIcon(statusItem)"></svg-icon>
-            <svg-icon iconName="p-start" className="status-icon" v-if="runningIcon(statusItem)"></svg-icon>
-        </el-button>
     </span>
 </template>
 
@@ -62,6 +69,14 @@ const statusItem = computed(() => {
 const isDisabled = computed(() => {
     return !!props.disabled || permissionDisabled.value;
 });
+
+const handlePermissionClick = (event: MouseEvent) => {
+    if (!isDisabled.value) {
+        return;
+    }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+};
 
 const getType = (status: string) => {
     if (status.includes('error') || status.includes('err')) {
@@ -137,6 +152,19 @@ const runningIcon = (status: string): boolean => {
 </script>
 
 <style lang="scss" scoped>
+.status-wrapper {
+    display: inline-flex;
+}
+
+.status-wrapper.is-disabled {
+    cursor: not-allowed;
+}
+
+.status-wrapper.is-disabled :deep(.el-tag) {
+    opacity: 0.55;
+    filter: grayscale(1);
+}
+
 .content {
     width: 300px;
     word-break: break-all;

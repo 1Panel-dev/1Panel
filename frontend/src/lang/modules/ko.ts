@@ -4418,6 +4418,8 @@ const message = {
                 '의존 관계가 있으면 관련 권한이 자동 선택되며, 수동으로 해제하면 일부 기능에서 "현재 사용자에게 권한이 없습니다"가 표시될 수 있습니다.',
             allViewPermissionHelper: 'AI 게이트웨이의 모든 보기 권한을 부여합니다.',
             apiKeyViewPermissionHelper: 'AI 게이트웨이 API Key만 볼 수 있습니다.',
+            masterOnlyPermission: '마스터 노드 권한',
+            masterOnlyPermissionHelper: '이 권한은 마스터 노드에서만 적용됩니다.',
             view: '보기',
             manage: '관리',
         },

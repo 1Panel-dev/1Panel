@@ -48,13 +48,10 @@ export const toPermissionList = (value: PermissionBindingValue) => {
 
 const hasPermissionAccessByMode = (mode: PermissionMode, value?: PermissionBindingValue) => {
     const globalStore = GlobalStore();
-    if (globalStore.isAdmin || globalStore.isNodeAdmin) {
-        return true;
-    }
     const permissions = toPermissionList(value);
     const normalizedPermissions = mode === 'manage' ? permissions.map(toManagePermission).filter(Boolean) : permissions;
     if (normalizedPermissions.length === 0) {
-        return false;
+        return globalStore.isAdmin || globalStore.isNodeAdmin;
     }
     return normalizedPermissions.some((permission) => globalStore.hasPermission(permission));
 };

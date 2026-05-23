@@ -20,27 +20,55 @@
                 <div :class="licenseFormClass">
                     <div v-loading="loading" class="w-full h-full flex items-center justify-center px-8">
                         <div class="w-full flex-grow flex flex-col login-form">
-                            <div class="text-2xl font-medium text-gray-900">{{ $t('license.importLicense') }}</div>
+                            <div class="license-upload-section">
+                                <div class="license-section-title">{{ $t('license.importLicense') }}</div>
 
-                            <el-upload
-                                action="#"
-                                :auto-upload="false"
-                                ref="uploadRef"
-                                drag
-                                :limit="1"
-                                :on-change="fileOnChange"
-                                :on-exceed="handleExceed"
-                                v-model:file-list="uploaderFiles"
-                            >
-                                <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                                <div class="el-upload__text">
-                                    {{ $t('license.importHelper') }}
+                                <el-upload
+                                    action="#"
+                                    :auto-upload="false"
+                                    ref="uploadRef"
+                                    drag
+                                    :limit="1"
+                                    :on-change="fileOnChange"
+                                    :on-exceed="handleExceed"
+                                    v-model:file-list="uploaderFiles"
+                                >
+                                    <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                                    <div class="el-upload__text">
+                                        {{ $t('license.importHelper') }}
+                                    </div>
+                                </el-upload>
+                            </div>
+
+                            <div class="license-device-section">
+                                <div class="license-device-header">
+                                    <div class="license-helper-title">
+                                        {{ $t('license.deviceID') }}
+                                    </div>
+                                    <span class="input-help license-helper-desc">
+                                        {{ $t('license.licenseRequiredShortTip') }}
+                                    </span>
                                 </div>
-                            </el-upload>
 
-                            <div class="license-helper" @click="copyDeviceID">
-                                <div class="license-tip-text">{{ $t('license.licenseRequiredShortTip') }}</div>
-                                <el-button class="copy-tip" icon="DocumentCopy" link type="primary" />
+                                <el-input
+                                    v-model="licenseInfo.deviceID"
+                                    readonly
+                                    @focus="blurDeviceIDInput"
+                                    @mousedown.prevent
+                                >
+                                    {{ licenseInfo.deviceID }}
+                                    <template #append>
+                                        <el-button
+                                            class="copy-tip"
+                                            @click="copyDeviceID"
+                                            icon="DocumentCopy"
+                                            link
+                                            type="primary"
+                                        >
+                                            {{ $t('commons.button.copy') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
                             </div>
 
                             <el-button
@@ -247,6 +275,10 @@ const copyDeviceID = () => {
     copyText(licenseInfo.deviceID);
 };
 
+const blurDeviceIDInput = (event: FocusEvent) => {
+    (event.target as HTMLInputElement).blur();
+};
+
 const submit = async () => {
     if (uploaderFiles.value.length !== 1) {
         return;
@@ -300,8 +332,27 @@ onUnmounted(() => {
 
 .login-form {
     max-width: 560px;
-    gap: 14px;
+    gap: 16px;
+    transform: translateY(-8px);
     font-size: 13px;
+
+    .license-upload-section,
+    .license-device-section {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+    }
+
+    .license-upload-section {
+        gap: 10px;
+    }
+
+    .license-section-title {
+        color: var(--el-text-color-primary);
+        font-size: 24px;
+        font-weight: 500;
+        line-height: 32px;
+    }
 
     .login-button {
         background-color: var(--login-btn-link-color, #005eeb);
@@ -315,32 +366,50 @@ onUnmounted(() => {
         }
     }
 
-    .license-helper {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 9px 12px;
-        border: 1px dashed var(--el-border-color);
-        border-radius: 4px;
-        background-color: #ffffff;
-        color: var(--el-text-color-secondary);
-        cursor: pointer;
+    .license-device-section {
+        gap: 8px;
+        min-width: 0;
         font-size: 13px;
         line-height: 20px;
 
-        &:hover {
-            border-color: var(--login-btn-link-color, #005eeb);
+        .license-device-header {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
-    }
 
-    .license-tip-text {
-        flex: 1;
-        min-width: 0;
+        .license-helper-title {
+            color: var(--el-text-color-primary);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 22px;
+        }
+
+        .license-helper-desc {
+            display: block;
+            margin: 0;
+        }
+
+        :deep(.el-input) {
+            min-width: 0;
+        }
+
+        :deep(.el-input__wrapper) {
+            min-width: 0;
+            border: 1px dashed var(--el-border-color);
+            box-shadow: none;
+        }
+
+        :deep(.el-input__inner) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     }
 
     .copy-tip {
         flex-shrink: 0;
+        width: 80px;
         height: 20px;
         padding: 0;
         color: var(--login-btn-link-color, #005eeb);
@@ -357,12 +426,16 @@ onUnmounted(() => {
 }
 
 :deep(.el-upload-dragger) {
-    padding: 34px 12px;
+    padding: 18px 12px;
+}
+
+:deep(.el-upload) {
+    width: 100%;
 }
 
 :deep(.el-icon--upload) {
-    margin-bottom: 8px;
-    font-size: 42px;
+    margin-bottom: 4px;
+    font-size: 30px;
 }
 
 :deep(.el-upload__text) {

@@ -4467,6 +4467,8 @@ const message = {
                 'Related permissions are selected automatically when dependencies exist; after manual removal, some features may show "Current user has no permission".',
             allViewPermissionHelper: 'Grants all view permissions for AI Gateway.',
             apiKeyViewPermissionHelper: 'Only allows viewing AI Gateway API Keys.',
+            masterOnlyPermission: 'Master Node Permission',
+            masterOnlyPermissionHelper: 'This permission only takes effect on the master node.',
             view: 'View',
             manage: 'Manage',
         },

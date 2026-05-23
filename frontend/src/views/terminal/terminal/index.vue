@@ -302,15 +302,7 @@ const acceptParams = async () => {
         hostTree.value = [];
     }
     if (terminalTabs.value.length === 0) {
-        if (isNodeAdmin.value) {
-            onNewLocal();
-        } else {
-            await getAgentSettingInfo().then((res) => {
-                if (res.data?.localSSHConnShow === 'Enable') {
-                    onNewLocal();
-                }
-            });
-        }
+        await openDefaultLocalConn();
     }
     timer = setInterval(() => {
         syncTerminal();
@@ -320,6 +312,18 @@ const acceptParams = async () => {
             isFullScreen.value = screenfull.isFullscreen;
         });
     }
+};
+
+const openDefaultLocalConn = async () => {
+    if (isNodeAdmin.value) {
+        onNewLocal();
+        return;
+    }
+    await getAgentSettingInfo().then((res) => {
+        if (res.data?.localSSHConnShow === 'Enable') {
+            onNewLocal();
+        }
+    });
 };
 
 const cleanTimer = () => {

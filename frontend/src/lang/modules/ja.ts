@@ -2941,7 +2941,8 @@ const message = {
         cluster: '商用版にアップグレードすると、MySQL/Postgres/Redis のプライマリ/レプリカ構成を管理できます。',
         'model-downloader':
             '商用版にアップグレードすると、HuggingFace、ModelScope、または互換ミラーからローカルモデルファイルを検索、ダウンロード、管理できます。モデルディレクトリとダウンロードタスクを一元管理できます。',
-        exceptionalHelper: 'ライセンス同期検証が異常です。手動で同期して商用版機能が正常に動作していることを確認してください。詳細: ',
+        exceptionalHelper:
+            'ライセンス同期検証が異常です。手動で同期して商用版機能が正常に動作していることを確認してください。詳細: ',
         tamperHelper: '操作失敗。ファイル/フォルダの改ざん保護を確認してください。',
     },
     clean: {
@@ -4506,6 +4507,8 @@ const message = {
                 '依存関係がある場合、関連権限は自動選択されます。手動で解除すると、一部機能で「現在のユーザーには権限がありません」と表示される場合があります。',
             allViewPermissionHelper: 'AI ゲートウェイのすべての表示権限を付与します。',
             apiKeyViewPermissionHelper: 'AI ゲートウェイの API Key のみ表示できます。',
+            masterOnlyPermission: 'マスターノード権限',
+            masterOnlyPermissionHelper: 'この権限はマスターノードでのみ有効です。',
             view: '表示',
             manage: '管理',
         },

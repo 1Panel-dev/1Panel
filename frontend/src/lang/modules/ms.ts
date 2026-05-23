@@ -4562,6 +4562,8 @@ const message = {
                 'Kebenaran berkaitan akan dipilih automatik jika ada kebergantungan; selepas dialih keluar manual, sesetengah ciri mungkin memaparkan "Pengguna semasa tiada kebenaran".',
             allViewPermissionHelper: 'Memberikan semua kebenaran paparan untuk AI Gateway.',
             apiKeyViewPermissionHelper: 'Hanya membenarkan paparan API Key AI Gateway.',
+            masterOnlyPermission: 'Kebenaran nod utama',
+            masterOnlyPermissionHelper: 'Kebenaran ini hanya berkuat kuasa pada nod utama.',
             view: 'Lihat',
             manage: 'Urus',
         },

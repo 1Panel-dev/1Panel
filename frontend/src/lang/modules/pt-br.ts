@@ -4702,6 +4702,8 @@ const message = {
                 'Permissões relacionadas serão selecionadas automaticamente quando houver dependências; após removê-las manualmente, alguns recursos podem mostrar "O usuário atual não tem permissão".',
             allViewPermissionHelper: 'Concede todas as permissões de visualização do AI Gateway.',
             apiKeyViewPermissionHelper: 'Permite visualizar apenas as API Keys do AI Gateway.',
+            masterOnlyPermission: 'Permissão do nó principal',
+            masterOnlyPermissionHelper: 'Esta permissão só tem efeito no nó principal.',
             view: 'Visualizar',
             manage: 'Gerenciar',
         },
