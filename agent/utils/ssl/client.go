@@ -1,6 +1,7 @@
 package ssl
 
 import (
+	"context"
 	"crypto"
 	"crypto/rand"
 	"crypto/x509"
@@ -12,10 +13,10 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/go-acme/lego/v4/certificate"
-	"github.com/go-acme/lego/v4/challenge/dns01"
-	"github.com/go-acme/lego/v4/lego"
-	"github.com/go-acme/lego/v4/providers/http/webroot"
+	"github.com/go-acme/lego/v5/certificate"
+	"github.com/go-acme/lego/v5/challenge/dns01"
+	"github.com/go-acme/lego/v5/lego"
+	"github.com/go-acme/lego/v5/providers/http/webroot"
 	"github.com/pkg/errors"
 )
 
@@ -62,13 +63,19 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		_ = os.Setenv("LEGO_DISABLE_CNAME_SUPPORT", "false")
 	}
 
-	return c.Client.Challenge.SetDNS01Provider(p,
-		dns01.CondOption(len(nameservers) > 0,
-			dns01.AddRecursiveNameservers(nameservers)),
-		dns01.CondOption(websiteSSL.SkipDNS,
-			dns01.DisableAuthoritativeNssPropagationRequirement()),
-		dns01.AddDNSTimeout(dnsTimeOut),
-	)
+	// lego v5 removed dns01.AddRecursiveNameservers and dns01.AddDNSTimeout;
+	// configure them via dns01.NewClient(&dns01.Options{...}) + SetDefaultClient.
+	dns01.SetDefaultClient(dns01.NewClient(&dns01.Options{
+		RecursiveNameservers: nameservers,
+		Timeout:              dnsTimeOut,
+	}))
+
+	var opts []dns01.ChallengeOption
+	if websiteSSL.SkipDNS {
+		opts = append(opts, dns01.DisableAuthoritativeNssPropagationRequirement())
+	}
+
+	return c.Client.Challenge.SetDNS01Provider(p, opts...)
 }
 
 func (c *AcmeClient) UseHTTP(path string) error {
@@ -84,18 +91,24 @@ func (c *AcmeClient) UseHTTP(path string) error {
 	return nil
 }
 
-func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.PrivateKey) (certificate.Resource, error) {
+func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.Signer) (certificate.Resource, error) {
+	// lego v5 disables Common Name by default; explicitly enable it to keep
+	// the v4 behaviour, so legacy Java/router clients that still rely on the
+	// CommonName field do not fail TLS handshake.
 	request := certificate.ObtainRequest{
-		Domains:    domains,
-		Bundle:     true,
-		PrivateKey: privateKey,
+		Domains:          domains,
+		Bundle:           true,
+		PrivateKey:       privateKey,
+		EnableCommonName: true,
 	}
+
+	ctx := context.Background()
 
 	var certificates *certificate.Resource
 	var err error
 
 	for attempt := 1; attempt <= maxRetryAttempts; attempt++ {
-		certificates, err = c.Client.Certificate.Obtain(request)
+		certificates, err = c.Client.Certificate.Obtain(ctx, request)
 		if err == nil {
 			return *certificates, nil
 		}
@@ -114,7 +127,7 @@ func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.PrivateKey) (
 	return certificate.Resource{}, err
 }
 
-func (c *AcmeClient) ObtainIPSSL(ipAddress string, privKey crypto.PrivateKey) (certificate.Resource, error) {
+func (c *AcmeClient) ObtainIPSSL(ipAddress string, privKey crypto.Signer) (certificate.Resource, error) {
 	csrTemplate := &x509.CertificateRequest{
 		Subject: pkix.Name{
 			CommonName: "",
@@ -142,9 +155,11 @@ func (c *AcmeClient) ObtainIPSSL(ipAddress string, privKey crypto.PrivateKey) (c
 		Bundle:     true,
 	}
 
+	ctx := context.Background()
+
 	var certificates *certificate.Resource
 	for attempt := 1; attempt <= maxRetryAttempts; attempt++ {
-		certificates, err = c.Client.Certificate.ObtainForCSR(req)
+		certificates, err = c.Client.Certificate.ObtainForCSR(ctx, req)
 		if err == nil {
 			return *certificates, nil
 		}
@@ -163,5 +178,5 @@ func (c *AcmeClient) ObtainIPSSL(ipAddress string, privKey crypto.PrivateKey) (c
 }
 
 func (c *AcmeClient) RevokeSSL(pemSSL []byte) error {
-	return c.Client.Certificate.Revoke(pemSSL)
+	return c.Client.Certificate.Revoke(context.Background(), pemSSL)
 }

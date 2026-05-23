@@ -1260,3 +1260,56 @@ var AddFileHistoryTable = &gormigrate.Migration{
 		return nil
 	},
 }
+
+// MigrateLegoV5 normalizes data persisted under lego v4 so that lego v5 can read it.
+//
+// Two things changed in lego v5 that affect existing rows:
+//
+//  1. certcrypto.KeyType string values were renamed:
+//     "P256"->"EC256", "P384"->"EC384",
+//     "2048"->"RSA2048", "3072"->"RSA3072", "4096"->"RSA4096", "8192"->"RSA8192".
+//     We update every key_type column we own to the new form.
+//
+//  2. DnsPod provider was removed from upstream lego v5; the frontend already
+//     marked it deprecated. Existing DnsPod website_dns_accounts rows are kept
+//     so the user can decide what to do, but any website_ssls still pointing
+//     at a DnsPod account would fail to renew. We log a warning row count and
+//     leave deletion to the operator.
+var MigrateLegoV5 = &gormigrate.Migration{
+	ID: "20260523-migrate-lego-v5",
+	Migrate: func(tx *gorm.DB) error {
+		keyTypeMap := map[string]string{
+			"P256": "EC256",
+			"P384": "EC384",
+			"2048": "RSA2048",
+			"3072": "RSA3072",
+			"4096": "RSA4096",
+			"8192": "RSA8192",
+		}
+		for old, neu := range keyTypeMap {
+			if err := tx.Model(&model.WebsiteAcmeAccount{}).
+				Where("key_type = ?", old).
+				Update("key_type", neu).Error; err != nil {
+				return fmt.Errorf("migrate WebsiteAcmeAccount.key_type %s->%s: %w", old, neu, err)
+			}
+			if err := tx.Model(&model.WebsiteSSL{}).
+				Where("key_type = ?", old).
+				Update("key_type", neu).Error; err != nil {
+				return fmt.Errorf("migrate WebsiteSSL.key_type %s->%s: %w", old, neu, err)
+			}
+			if err := tx.Model(&model.WebsiteCA{}).
+				Where("key_type = ?", old).
+				Update("key_type", neu).Error; err != nil {
+				return fmt.Errorf("migrate WebsiteCA.key_type %s->%s: %w", old, neu, err)
+			}
+		}
+
+		var dnsPodCount int64
+		_ = tx.Model(&model.WebsiteDnsAccount{}).Where("type = ?", "DnsPod").Count(&dnsPodCount).Error
+		if dnsPodCount > 0 {
+			global.LOG.Warnf("lego v5 removed the DnsPod provider; %d existing DnsPod DNS account(s) will not be usable for renewal -- please switch them to TencentCloud", dnsPodCount)
+		}
+
+		return nil
+	},
+}

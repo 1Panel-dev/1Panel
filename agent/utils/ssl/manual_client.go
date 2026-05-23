@@ -11,7 +11,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/go-acme/lego/v4/certificate"
+	"github.com/go-acme/lego/v5/certificate"
 	"github.com/miekg/dns"
 	"golang.org/x/crypto/acme"
 	"log"
@@ -31,30 +31,16 @@ type RequestCertRequest struct {
 }
 
 func NewCustomAcmeClient(acmeAccount *model.WebsiteAcmeAccount, logger *log.Logger) (*ManualClient, error) {
-	var (
-		key crypto.PrivateKey
-		err error
-	)
-	switch KeyType(acmeAccount.KeyType) {
-	case KeyEC256, KeyEC384:
-		block, _ := pem.Decode([]byte(acmeAccount.PrivateKey))
-		key, err = x509.ParseECPrivateKey(block.Bytes)
-		if err != nil {
-			return nil, err
-		}
-	case KeyRSA2048, KeyRSA3072, KeyRSA4096:
-		block, _ := pem.Decode([]byte(acmeAccount.PrivateKey))
-		key, err = x509.ParsePKCS1PrivateKey(block.Bytes)
-		if err != nil {
-			return nil, err
-		}
+	key, err := parsePrivateKeyPEM([]byte(acmeAccount.PrivateKey))
+	if err != nil {
+		return nil, err
 	}
 	if logger == nil {
 		logger = log.Default()
 	}
 
 	client := &acme.Client{
-		Key:          key.(crypto.Signer),
+		Key:          key,
 		DirectoryURL: getCaDirURL(acmeAccount.Type, acmeAccount.CaDirURL),
 	}
 	return &ManualClient{
@@ -355,7 +341,7 @@ func (c *ManualClient) RequestCertificate(ctx context.Context, websiteSSL *model
 	}
 	c.logger.Printf("[INFO] acme: Server responded with a certificate.")
 	resource := certificate.Resource{
-		Domain:        domains[0],
+		Domains:       domains,
 		CertURL:       certURL,
 		CertStableURL: certURL,
 		PrivateKey:    []byte(privateKeyPEM),

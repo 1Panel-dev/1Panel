@@ -68,7 +68,7 @@ func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreat
 		return nil, err
 	}
 	acmeAccount.PrivateKey = string(privateKey)
-	acmeAccount.URL = client.User.Registration.URI
+	acmeAccount.URL = client.User.Registration.Location
 
 	if err := websiteAcmeRepo.Create(*acmeAccount); err != nil {
 		return nil, err

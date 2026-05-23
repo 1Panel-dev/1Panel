@@ -7,14 +7,15 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"os"
 	"path"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/go-acme/lego/v4/certificate"
-	legoLogger "github.com/go-acme/lego/v4/log"
+	"github.com/go-acme/lego/v5/certificate"
+	legoLogger "github.com/go-acme/lego/v5/log"
 	"github.com/jinzhu/gorm"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -343,7 +344,10 @@ func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 		if logFile != nil {
 			defer logFile.Close()
 		}
-		legoLogger.Logger = logger
+		// lego v5 switched to slog. Bridge it to the existing *log.Logger
+		// so the SSL apply log is still written to the per-domain file
+		// under SSLLogDir.
+		legoLogger.SetDefault(slog.New(slog.NewTextHandler(logger.Writer(), nil)))
 		startMsg := i18n.GetMsgWithMap("ApplySSLStart", map[string]interface{}{"domain": strings.Join(domains, ","), "type": i18n.GetMsgByKey(websiteSSL.Provider)})
 		if websiteSSL.Provider == constant.DNSAccount {
 			startMsg = startMsg + i18n.GetMsgWithMap("DNSAccountName", map[string]interface{}{"name": dnsAccount.Name, "type": dnsAccount.Type})
@@ -470,7 +474,9 @@ func handleError(websiteSSL *model.WebsiteSSL, err error) {
 		websiteSSL.Status = constant.SSLApplyError
 	}
 	websiteSSL.Message = err.Error()
-	legoLogger.Logger.Println(i18n.GetErrMsg("ApplySSLFailed", map[string]interface{}{"domain": websiteSSL.PrimaryDomain, "detail": err.Error()}))
+	// lego v5 uses slog; use the same global default logger to write the
+	// failure message to the SSL log.
+	legoLogger.Default().Error(i18n.GetErrMsg("ApplySSLFailed", map[string]interface{}{"domain": websiteSSL.PrimaryDomain, "detail": err.Error()}))
 	_ = websiteSSLRepo.Save(websiteSSL)
 }
 

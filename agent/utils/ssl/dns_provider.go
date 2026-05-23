@@ -2,40 +2,39 @@ package ssl
 
 import (
 	"encoding/json"
-	"github.com/go-acme/lego/v4/challenge"
-	"github.com/go-acme/lego/v4/providers/dns/acmedns"
-	"github.com/go-acme/lego/v4/providers/dns/alidns"
-	"github.com/go-acme/lego/v4/providers/dns/aliesa"
-	"github.com/go-acme/lego/v4/providers/dns/baiducloud"
-	"github.com/go-acme/lego/v4/providers/dns/clouddns"
-	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
-	"github.com/go-acme/lego/v4/providers/dns/cloudns"
-	"github.com/go-acme/lego/v4/providers/dns/dnspod"
-	"github.com/go-acme/lego/v4/providers/dns/dynu"
-	"github.com/go-acme/lego/v4/providers/dns/freemyip"
-	"github.com/go-acme/lego/v4/providers/dns/godaddy"
-	"github.com/go-acme/lego/v4/providers/dns/huaweicloud"
-	"github.com/go-acme/lego/v4/providers/dns/namecheap"
-	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
-	"github.com/go-acme/lego/v4/providers/dns/namesilo"
-	"github.com/go-acme/lego/v4/providers/dns/ovh"
-	"github.com/go-acme/lego/v4/providers/dns/porkbun"
-	"github.com/go-acme/lego/v4/providers/dns/rainyun"
-	"github.com/go-acme/lego/v4/providers/dns/regru"
-	"github.com/go-acme/lego/v4/providers/dns/route53"
-	"github.com/go-acme/lego/v4/providers/dns/spaceship"
-	"github.com/go-acme/lego/v4/providers/dns/technitium"
-	"github.com/go-acme/lego/v4/providers/dns/tencentcloud"
-	"github.com/go-acme/lego/v4/providers/dns/vercel"
-	"github.com/go-acme/lego/v4/providers/dns/volcengine"
-	"github.com/go-acme/lego/v4/providers/dns/westcn"
 	"time"
+
+	"github.com/go-acme/lego/v5/challenge"
+	"github.com/go-acme/lego/v5/providers/dns/acmedns"
+	"github.com/go-acme/lego/v5/providers/dns/alidns"
+	"github.com/go-acme/lego/v5/providers/dns/aliesa"
+	"github.com/go-acme/lego/v5/providers/dns/baiducloud"
+	"github.com/go-acme/lego/v5/providers/dns/clouddns"
+	"github.com/go-acme/lego/v5/providers/dns/cloudflare"
+	"github.com/go-acme/lego/v5/providers/dns/cloudns"
+	"github.com/go-acme/lego/v5/providers/dns/dynu"
+	"github.com/go-acme/lego/v5/providers/dns/freemyip"
+	"github.com/go-acme/lego/v5/providers/dns/godaddy"
+	"github.com/go-acme/lego/v5/providers/dns/huaweicloud"
+	"github.com/go-acme/lego/v5/providers/dns/namecheap"
+	"github.com/go-acme/lego/v5/providers/dns/namedotcom"
+	"github.com/go-acme/lego/v5/providers/dns/namesilo"
+	"github.com/go-acme/lego/v5/providers/dns/ovh"
+	"github.com/go-acme/lego/v5/providers/dns/porkbun"
+	"github.com/go-acme/lego/v5/providers/dns/rainyun"
+	"github.com/go-acme/lego/v5/providers/dns/regru"
+	"github.com/go-acme/lego/v5/providers/dns/route53"
+	"github.com/go-acme/lego/v5/providers/dns/spaceship"
+	"github.com/go-acme/lego/v5/providers/dns/technitium"
+	"github.com/go-acme/lego/v5/providers/dns/tencentcloud"
+	"github.com/go-acme/lego/v5/providers/dns/vercel"
+	"github.com/go-acme/lego/v5/providers/dns/volcengine"
+	"github.com/go-acme/lego/v5/providers/dns/westcn"
 )
 
 type DnsType string
 
 const (
-	DnsPod       DnsType = "DnsPod"
 	AliYun       DnsType = "AliYun"
 	AliESA       DnsType = "AliESA"
 	AWSRoute53   DnsType = "AWSRoute53"
@@ -60,7 +59,7 @@ const (
 	Ovh          DnsType = "Ovh"
 	AcmeDNS      DnsType = "AcmeDNS"
 	PorkBun      DnsType = "PorkBun"
-	Technitium	 DnsType = "Technitium"
+	Technitium   DnsType = "Technitium"
 )
 
 type DNSParam struct {
@@ -103,13 +102,6 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		return nil, err
 	}
 	switch dnsType {
-	case DnsPod:
-		config := dnspod.NewDefaultConfig()
-		config.LoginToken = param.ID + "," + param.Token
-		config.PropagationTimeout = propagationTimeout
-		config.PollingInterval = pollingInterval
-		config.TTL = ttl
-		p, err = dnspod.NewDNSProviderConfig(config)
 	case AliYun:
 		config := alidns.NewDefaultConfig()
 		config.SecretKey = param.SecretKey
