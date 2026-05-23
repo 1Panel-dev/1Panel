@@ -12,6 +12,7 @@ import (
 	"github.com/go-acme/lego/v5/providers/dns/clouddns"
 	"github.com/go-acme/lego/v5/providers/dns/cloudflare"
 	"github.com/go-acme/lego/v5/providers/dns/cloudns"
+	"github.com/go-acme/lego/v5/providers/dns/dynadot"
 	"github.com/go-acme/lego/v5/providers/dns/dynu"
 	"github.com/go-acme/lego/v5/providers/dns/freemyip"
 	"github.com/go-acme/lego/v5/providers/dns/godaddy"
@@ -55,6 +56,7 @@ const (
 	ClouDNS      DnsType = "ClouDNS"
 	RegRu        DnsType = "RegRu"
 	Dynu         DnsType = "Dynu"
+	Dynadot      DnsType = "Dynadot"
 	BaiduCloud   DnsType = "BaiduCloud"
 	Ovh          DnsType = "Ovh"
 	AcmeDNS      DnsType = "AcmeDNS"
@@ -266,6 +268,14 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
 		p, err = dynu.NewDNSProviderConfig(config)
+	case Dynadot:
+		config := dynadot.NewDefaultConfig()
+		config.APIKey = param.APIkey
+		config.APISecret = param.APISecret
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = dynadot.NewDNSProviderConfig(config)
 	case BaiduCloud:
 		config := baiducloud.NewDefaultConfig()
 		config.AccessKeyID = param.AccessKey

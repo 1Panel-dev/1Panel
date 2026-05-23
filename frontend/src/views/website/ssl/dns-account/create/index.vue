@@ -15,9 +15,6 @@
                                 :value="type.value"
                             ></el-option>
                         </el-select>
-                        <span class="input-help text-red-500" v-if="account.type === 'DnsPod'">
-                            {{ $t('ssl.deprecatedHelper') }}
-                        </span>
                     </el-form-item>
                     <div
                         v-if="
@@ -44,14 +41,6 @@
                         </el-form-item>
                         <el-form-item label="Secret Key" prop="authorization.secretKey">
                             <el-input v-model.trim="account.authorization['secretKey']"></el-input>
-                        </el-form-item>
-                    </div>
-                    <div v-if="account.type === 'DnsPod'">
-                        <el-form-item label="ID" prop="authorization.id">
-                            <el-input v-model.trim="account.authorization['id']"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Token" prop="authorization.token">
-                            <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>
                     </div>
                     <div v-if="account.type === 'Volcengine'">
@@ -93,6 +82,7 @@
                             account.type === 'Godaddy' ||
                             account.type === 'RainYun' ||
                             account.type === 'Spaceship' ||
+                            account.type === 'Dynadot' ||
                             account.type === 'Dynu'
                         "
                     >
@@ -104,7 +94,7 @@
                     <el-form-item
                         label="API Secret"
                         prop="authorization.apiSecret"
-                        v-if="account.type === 'Godaddy' || account.type === 'Spaceship'"
+                        v-if="account.type === 'Godaddy' || account.type === 'Spaceship' || account.type === 'Dynadot'"
                     >
                         <el-input v-model.trim="account.authorization['apiSecret']"></el-input>
                     </el-form-item>
@@ -260,7 +250,7 @@ const resetForm = () => {
     account.value = {
         id: 0,
         name: '',
-        type: 'DnsPod',
+        type: 'AliYun',
         authorization: {},
     };
     accountForm.value?.resetFields();

@@ -273,8 +273,8 @@ export const DNSTypes = [
         value: 'PorkBun',
     },
     {
-        label: 'DNSPod (' + i18n.global.t('ssl.deprecated') + ')',
-        value: 'DnsPod',
+        label: 'Dynadot',
+        value: 'Dynadot',
     },
     {
         label: 'Technitium',
