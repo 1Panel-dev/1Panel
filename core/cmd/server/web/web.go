@@ -5,7 +5,7 @@ import "embed"
 //go:embed index.html
 var IndexHtml embed.FS
 
-//go:embed assets/*
+//go:embed all:assets
 var Assets embed.FS
 
 //go:embed favicon.png
