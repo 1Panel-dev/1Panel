@@ -250,6 +250,9 @@ func GetCurrentUserInfo() (*dto.CurrentUserInfo, error) {
 	info.MFAInterval, _ = strconv.Atoi(settingMap["MFAInterval"])
 	info.ApiKeyValidityTime, _ = strconv.Atoi(settingMap["ApiKeyValidityTime"])
 	info.Name = settingMap["UserName"]
+	info.Role = "ADMIN"
+	info.Permissions = []string{}
+	info.NodeRoles = []dto.CurrentUserNodeRole{}
 	return &info, nil
 }
 func UpdateCurrentUserInfo(c *gin.Context, req dto.CurrentUserUpdate) error {
