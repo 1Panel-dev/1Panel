@@ -73,7 +73,19 @@ type CurrentUserInfo struct {
 	ApiKey             string `json:"apiKey"`
 	IpWhiteList        string `json:"ipWhiteList"`
 	ApiKeyValidityTime int    `json:"apiKeyValidityTime"`
+
+	Role        string                `json:"role"`
+	Permissions []string              `json:"permissions"`
+	NodeRoles   []CurrentUserNodeRole `json:"nodeRoles"`
 }
+
+type CurrentUserNodeRole struct {
+	NodeID   uint   `json:"nodeId"`
+	NodeName string `json:"nodeName"`
+	RoleID   uint   `json:"roleId"`
+	RoleName string `json:"roleName"`
+}
+
 type CurrentUserUpdate struct {
 	Name           string `json:"name" validate:"required"`
 	Password       string `json:"password"`
