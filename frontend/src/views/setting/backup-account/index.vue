@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <LayoutContent :title="$t('setting.backupAccount')">
             <template #leftToolBar>
-                <el-button type="primary" @click="onOpenDialog('create')">
+                <el-button v-permission type="primary" @click="onOpenDialog('create')">
                     {{ $t('commons.button.add') }}
                 </el-button>
             </template>
@@ -70,6 +70,7 @@
                                     {{ $t('setting.refreshTime') + ':' + row.varsJson['refresh_time'] }}
                                 </template>
                                 <el-button
+                                    v-permission
                                     type="primary"
                                     link
                                     icon="Refresh"
@@ -288,12 +289,14 @@ const refreshItemToken = async (row: any) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: (row: Backup.BackupInfo) => {
             onOpenDialog('edit', row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         disabled: (row: Backup.BackupInfo) => {
             return row.type === 'LOCAL';
         },

@@ -1,23 +1,42 @@
 import { Layout } from '@/routers/constant';
+import { GlobalStore } from '@/store';
+
+const settingPermissions = ['alert_view', 'backup_view'];
+
+const redirectToAvailableSetting = () => {
+    const globalStore = GlobalStore();
+    if (globalStore.isAdmin) {
+        return '/settings/panel';
+    }
+    if (globalStore.hasPermission('alert_view')) {
+        return '/settings/alert';
+    }
+    if (globalStore.hasPermission('backup_view')) {
+        return '/settings/backupaccount';
+    }
+    return '/settings/panel';
+};
 
 const settingRouter = {
     sort: 12,
     path: '/settings',
     name: 'Setting-Menu',
     component: Layout,
-    redirect: '/settings/panel',
+    redirect: redirectToAvailableSetting,
     meta: {
         title: 'menu.settings',
         icon: 'p-config',
-        adminOnly: true,
+        permission: settingPermissions,
     },
     children: [
         {
             path: '/settings',
             name: 'Setting',
-            redirect: '/settings/panel',
+            redirect: redirectToAvailableSetting,
             component: () => import('@/views/setting/index.vue'),
-            meta: {},
+            meta: {
+                permission: settingPermissions,
+            },
             children: [
                 {
                     path: 'panel',
@@ -40,7 +59,7 @@ const settingRouter = {
                         parent: 'menu.settings',
                         title: 'xpack.alert.alertNotice',
                         activeMenu: '/settings',
-                        adminOnly: true,
+                        permission: 'alert_view',
                     },
                 },
                 {
@@ -52,7 +71,7 @@ const settingRouter = {
                         parent: 'menu.settings',
                         title: 'setting.backupAccount',
                         activeMenu: '/settings',
-                        adminOnly: true,
+                        permission: 'backup_view',
                     },
                 },
                 {

@@ -4,10 +4,12 @@
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">
-                        <el-button type="primary" @click="syncAll" v-if="isProductPro && !isIntl">
+                        <el-button v-permission type="primary" @click="syncAll" v-if="isProductPro && !isIntl">
                             {{ $t('commons.button.sync') }}
                         </el-button>
-                        <el-button type="primary" plain @click="onClean">{{ $t('xpack.alert.cleanLog') }}</el-button>
+                        <el-button v-permission type="primary" plain @click="onClean">
+                            {{ $t('xpack.alert.cleanLog') }}
+                        </el-button>
                     </div>
                 </div>
             </template>
@@ -128,6 +130,7 @@ const req = reactive({
 const buttons = [
     {
         label: i18n.global.t('commons.button.sync'),
+        permission: true,
         click: function (row: Alert.AlertLog) {
             syncAlert(row);
         },

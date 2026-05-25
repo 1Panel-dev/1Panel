@@ -399,10 +399,10 @@
             <el-button :disabled="loading" @click="handleClose">
                 {{ $t('commons.button.cancel') }}
             </el-button>
-            <el-button :disabled="loading" @click="onCheck(formRef)">
+            <el-button v-permission :disabled="loading" @click="onCheck(formRef)">
                 {{ $t('terminal.testConn') }}
             </el-button>
-            <el-button type="primary" :disabled="!isOK || loading" @click="onSubmit()">
+            <el-button v-permission type="primary" :disabled="!isOK || loading" @click="onSubmit()">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
