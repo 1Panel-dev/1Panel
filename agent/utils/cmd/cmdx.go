@@ -26,6 +26,7 @@ type CommandHelper struct {
 	workDir      string
 	outputFile   string
 	scriptPath   string
+	stdin        io.Reader
 	env          []string
 	timeout      time.Duration
 	taskItem     *task.Task
@@ -331,6 +332,9 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 	if len(c.workDir) != 0 {
 		cmd.Dir = c.workDir
 	}
+	if c.stdin != nil {
+		cmd.Stdin = c.stdin
+	}
 	defer func() {
 		for _, closer := range loggerClosers {
 			_ = closer.Close()
@@ -433,6 +437,11 @@ func WithWorkDir(workDir string) Option {
 func WithScriptPath(scriptPath string) Option {
 	return func(s *CommandHelper) {
 		s.scriptPath = scriptPath
+	}
+}
+func WithStdin(stdin io.Reader) Option {
+	return func(s *CommandHelper) {
+		s.stdin = stdin
 	}
 }
 func WithEnv(env ...string) Option {

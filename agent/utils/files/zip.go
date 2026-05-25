@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"path"
-	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -43,7 +42,8 @@ func (z ZipArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile
 		relativePaths[i] = path.Base(sp)
 	}
 	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(baseDir), cmd.WithContext(ctx))
-	if err = cmdMgr.Run("zip", "-qr", tmpFile, strings.Join(relativePaths, " ")); err != nil {
+	args := append([]string{"-qr", tmpFile}, relativePaths...)
+	if err = cmdMgr.Run("zip", args...); err != nil {
 		return err
 	}
 	if err = op.Mv(tmpFile, dstFile); err != nil {
