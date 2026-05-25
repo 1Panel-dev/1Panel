@@ -753,13 +753,17 @@ func loadOpenclawSkillSearchOutput(containerName, source, keyword string) (strin
 	case "skillhub":
 		return cmd.RunDockerExecWithStdout(2*time.Minute, containerName, "skillhub", "search", keyword, "--json")
 	default:
-		return cmd.RunDockerExecWithStdout(
-			2*time.Minute,
-			containerName,
-			"sh",
-			"-c",
-			fmt.Sprintf("CLAWHUB_REGISTRY=%q clawhub search %q", resolveClawhubRegistry(source), keyword),
-		)
+		return cmd.NewCommandMgr(cmd.WithTimeout(2*time.Minute)).
+			RunWithStdout(
+				"docker",
+				"exec",
+				"-e",
+				"CLAWHUB_REGISTRY="+resolveClawhubRegistry(source),
+				containerName,
+				"clawhub",
+				"search",
+				keyword,
+			)
 	}
 }
 

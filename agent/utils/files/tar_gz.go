@@ -24,11 +24,11 @@ func (t TarGzArchiver) Extract(ctx context.Context, filePath, dstDir string, sec
 	if err := os.MkdirAll(dstDir, 0755); err != nil {
 		return fmt.Errorf("failed to create destination dir: %w", err)
 	}
+	cmdMgr := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithIgnoreExist1())
 	if len(secret) != 0 {
-		return runTarGzDecryptToDir(cmd.NewCommandMgr(cmd.WithIgnoreExist1()), filePath, dstDir, secret, false)
-	} else {
-		return runTarGzExtractToDir(cmd.NewCommandMgr(cmd.WithIgnoreExist1()), filePath, dstDir)
+		return runTarGzDecryptToDir(cmdMgr, filePath, dstDir, secret, false)
 	}
+	return runTarGzExtractToDir(cmdMgr, filePath, dstDir)
 }
 
 func (t TarGzArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, secret string) error {

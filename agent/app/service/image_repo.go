@@ -198,10 +198,10 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 }
 
 func (u *ImageRepoService) CheckConn(host, user, password string) error {
-	cmdMgr := cmd.NewCommandMgr()
-	stdout, err := cmdMgr.RunWithStdout("docker", "login", "-u", user, "-p", password, host)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithStdin(strings.NewReader(password)))
+	stdout, err := cmdMgr.RunWithStdout("docker", "login", "-u", user, "--password-stdin", host)
 	if err != nil {
-		return fmt.Errorf("stdout: %s, stderr: %v", stdout, err)
+		return fmt.Errorf("docker login failed: %v", err)
 	}
 	if strings.Contains(string(stdout), "Login Succeeded") {
 		return nil
