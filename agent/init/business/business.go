@@ -68,7 +68,7 @@ func initAcmeAccount() {
 		createAcmeAccount := request.WebsiteAcmeAccountCreate{
 			Email:   "acme@1paneldev.com",
 			Type:    "letsencrypt",
-			KeyType: "2048",
+			KeyType: "RSA2048",
 		}
 		systemProxy, _ := service.NewISettingService().GetSystemProxy()
 		if systemProxy.URL != "" {

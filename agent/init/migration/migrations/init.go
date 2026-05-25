@@ -233,7 +233,7 @@ var InitDefaultCA = &gormigrate.Migration{
 		if _, err := caService.Create(request.WebsiteCACreate{
 			CommonName:       "1Panel-CA",
 			Country:          "CN",
-			KeyType:          "P256",
+			KeyType:          "EC256",
 			Name:             "1Panel",
 			Organization:     "FIT2CLOUD",
 			OrganizationUint: "1Panel",
