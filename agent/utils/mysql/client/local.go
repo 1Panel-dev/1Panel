@@ -245,8 +245,8 @@ func (r *Local) Backup(info BackupInfo) error {
 		args = append(args, arg)
 	}
 	args = append(args, info.Name)
-	cmdMgr := cmd.NewCommandMgr(cmd.WithOutputFile(path.Join(info.TargetDir, info.FileName)))
-	if _, err := cmdMgr.RunPipe(
+	cmdMgr := cmd.NewCommandMgr()
+	if _, err := cmdMgr.RunPipeToFile(path.Join(info.TargetDir, info.FileName),
 		cmd.PipeCommand{Name: "docker", Args: args},
 		cmd.PipeCommand{Name: "gzip", Args: []string{"-cf"}},
 	); err != nil {

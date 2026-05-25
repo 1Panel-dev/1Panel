@@ -96,35 +96,27 @@ func (c *CommandHelper) RunPipe(commands ...PipeCommand) (string, error) {
 		return "", nil
 	}
 
-	ctx, cancel := c.pipeContext()
+	ctx, cancel, cmds := c.preparePipeCommands(commands)
 	if cancel != nil {
 		defer cancel()
 	}
 
-	cmds := c.buildPipeCommands(ctx, commands)
 	customWriter := &CustomWriter{taskItem: c.taskItem}
 	var outputFile *os.File
-	limitOutputCapture := c.taskItem != nil || c.logger != nil || len(c.outputFile) != 0
 	stdout, stderr := &lockedBuffer{}, &lockedBuffer{}
+	limitOutputCapture := c.taskItem != nil || c.logger != nil || len(c.outputFile) != 0
 	if limitOutputCapture {
 		stdout.limit = maxStreamOutputCapture
 		stderr.limit = maxStreamOutputCapture
-	}
-	if commands[0].Stdin != nil {
-		cmds[0].Stdin = commands[0].Stdin
 	}
 	var pipeStderr io.Writer = stderr
 	var lastStdout io.Writer = stdout
 	var lastStderr io.Writer = stderr
 	var streamWriter io.Writer
-	var streamClosers []io.Closer
 	if c.taskItem != nil {
 		streamWriter = customWriter
 	} else if c.logger != nil {
 		streamWriter = c.logger.Writer()
-		if closer, ok := streamWriter.(io.Closer); ok {
-			streamClosers = append(streamClosers, closer)
-		}
 	} else if len(c.outputFile) != 0 {
 		file, err := os.OpenFile(c.outputFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
 		if err != nil {
@@ -142,7 +134,7 @@ func (c *CommandHelper) RunPipe(commands ...PipeCommand) (string, error) {
 		if c.taskItem != nil {
 			customWriter.Flush()
 		}
-		for _, closer := range streamClosers {
+		if closer, ok := streamWriter.(io.Closer); ok {
 			_ = closer.Close()
 		}
 		if outputFile != nil {
@@ -152,19 +144,65 @@ func (c *CommandHelper) RunPipe(commands ...PipeCommand) (string, error) {
 	if err := connectPipeCommands(cmds, lastStdout, lastStderr, pipeStderr); err != nil {
 		return "", err
 	}
-
 	if err := startPipeCommands(cmds); err != nil {
 		return handleErrString(stdout.String(), stderr.String(), c.IgnoreExist1, err)
 	}
 
-	runErr := waitPipeCommands(ctx, cmds)
-	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return "", buserr.New("ErrCmdTimeout")
-	}
+	runErr := c.pipeResultErr(ctx, waitPipeCommands(ctx, cmds))
 	if runErr != nil {
 		return handleErrString(stdout.String(), stderr.String(), c.IgnoreExist1, runErr)
 	}
 	return stdout.String(), nil
+}
+
+func (c *CommandHelper) RunPipeToFile(outputFile string, commands ...PipeCommand) (string, error) {
+	if len(commands) == 0 {
+		return "", nil
+	}
+
+	ctx, cancel, cmds := c.preparePipeCommands(commands)
+	if cancel != nil {
+		defer cancel()
+	}
+
+	file, err := os.OpenFile(outputFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
+	if err != nil {
+		return "", err
+	}
+	defer func() { _ = file.Close() }()
+
+	stderr := &lockedBuffer{limit: maxStreamOutputCapture}
+	if err := connectPipeCommands(cmds, file, stderr, stderr); err != nil {
+		return "", err
+	}
+	if err := startPipeCommands(cmds); err != nil {
+		return handleErrString("", stderr.String(), c.IgnoreExist1, err)
+	}
+
+	runErr := c.pipeResultErr(ctx, waitPipeCommands(ctx, cmds))
+	if runErr != nil {
+		return handleErrString("", stderr.String(), c.IgnoreExist1, runErr)
+	}
+	return "", nil
+}
+
+func (c *CommandHelper) preparePipeCommands(commands []PipeCommand) (context.Context, context.CancelFunc, []*exec.Cmd) {
+	ctx, cancel := c.pipeContext()
+	cmds := c.buildPipeCommands(ctx, commands)
+	if commands[0].Stdin != nil {
+		cmds[0].Stdin = commands[0].Stdin
+	}
+	return ctx, cancel, cmds
+}
+
+func (c *CommandHelper) pipeResultErr(ctx context.Context, runErr error) error {
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		return buserr.New("ErrCmdTimeout")
+	}
+	if errors.Is(ctx.Err(), context.Canceled) {
+		return buserr.New("ErrShutDown")
+	}
+	return runErr
 }
 
 func (c *CommandHelper) pipeContext() (context.Context, context.CancelFunc) {
@@ -243,87 +281,108 @@ func waitPipeCommands(ctx context.Context, cmds []*exec.Cmd) error {
 
 func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 	var cmd *exec.Cmd
-	var ctx context.Context
+	var newContext context.Context
 	var cancel context.CancelFunc
+	var outputFile *os.File
 
 	if c.timeout != 0 {
 		if c.context == nil {
-			ctx, cancel = context.WithTimeout(context.Background(), c.timeout)
+			newContext, cancel = context.WithTimeout(context.Background(), c.timeout)
 		} else {
-			ctx, cancel = context.WithTimeout(c.context, c.timeout)
+			newContext, cancel = context.WithTimeout(c.context, c.timeout)
 		}
 		defer cancel()
-		cmd = exec.CommandContext(ctx, name, arg...)
 	} else if c.context != nil {
-		ctx = c.context
-		cmd = exec.CommandContext(ctx, name, arg...)
+		newContext = c.context
+	}
+
+	if newContext != nil {
+		cmd = exec.CommandContext(newContext, name, arg...)
 	} else {
 		cmd = exec.Command(name, arg...)
+	}
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
 	}
 
 	customWriter := &CustomWriter{taskItem: c.taskItem}
 	var stdout, stderr bytes.Buffer
-	var loggerClosers []io.Closer
+	var loggerCloser io.Closer
 	if c.taskItem != nil {
-		cmd.Stdout = customWriter
-		cmd.Stderr = customWriter
+		cmd.Stdout = io.MultiWriter(&stdout, customWriter)
+		cmd.Stderr = io.MultiWriter(&stderr, customWriter)
 	} else if c.logger != nil {
-		stdoutWriter := c.logger.Writer()
-		stderrWriter := c.logger.Writer()
-		if closer, ok := stdoutWriter.(io.Closer); ok {
-			loggerClosers = append(loggerClosers, closer)
+		streamWriter := c.logger.Writer()
+		if closer, ok := streamWriter.(io.Closer); ok {
+			loggerCloser = closer
 		}
-		if closer, ok := stderrWriter.(io.Closer); ok {
-			loggerClosers = append(loggerClosers, closer)
-		}
-		cmd.Stdout = stdoutWriter
-		cmd.Stderr = stderrWriter
+		cmd.Stdout = io.MultiWriter(&stdout, streamWriter)
+		cmd.Stderr = io.MultiWriter(&stderr, streamWriter)
 	} else if len(c.outputFile) != 0 {
-		file, err := os.OpenFile(c.outputFile, os.O_WRONLY|os.O_CREATE, constant.FilePerm)
+		file, err := os.OpenFile(c.outputFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
 		if err != nil {
 			return "", err
 		}
-		defer file.Close()
-		cmd.Stdout = file
-		cmd.Stderr = file
+		outputFile = file
+		cmd.Stdout = io.MultiWriter(&stdout, outputFile)
+		cmd.Stderr = io.MultiWriter(&stderr, outputFile)
 	} else {
 		cmd.Stdout = &stdout
 		cmd.Stderr = &stderr
 	}
-	env := os.Environ()
-	env = append(env, c.env...)
-	cmd.Env = env
+	cmd.Env = append(os.Environ(), c.env...)
 	if len(c.workDir) != 0 {
 		cmd.Dir = c.workDir
 	}
 	defer func() {
-		for _, closer := range loggerClosers {
-			_ = closer.Close()
+		if loggerCloser != nil {
+			_ = loggerCloser.Close()
+		}
+		if outputFile != nil {
+			_ = outputFile.Close()
 		}
 	}()
 
-	if c.timeout != 0 {
-		err := cmd.Run()
-		if c.taskItem != nil {
-			customWriter.Flush()
-		}
-		if ctx != nil && errors.Is(ctx.Err(), context.DeadlineExceeded) {
-			return "", buserr.New("ErrCmdTimeout")
-		}
-		if err != nil {
-			return handleErr(stdout, stderr, c.IgnoreExist1, err)
-		}
-		return stdout.String(), nil
+	if err := cmd.Start(); err != nil {
+		return "", fmt.Errorf("cmd start failed: %w", err)
+	}
+	if c.taskItem != nil {
+		defer customWriter.Flush()
 	}
 
-	err := cmd.Run()
-	if c.taskItem != nil {
-		customWriter.Flush()
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+	select {
+	case err := <-done:
+		if err != nil {
+			return handleErr(&stdout, &stderr, c.IgnoreExist1, err)
+		}
+		return stdout.String(), nil
+	case <-contextDone(newContext):
+		if cmd.Process != nil && cmd.Process.Pid > 0 {
+			_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+		}
+		var err error
+		switch newContext.Err() {
+		case context.DeadlineExceeded:
+			err = buserr.New("ErrCmdTimeout")
+		case context.Canceled:
+			err = buserr.New("ErrShutDown")
+		default:
+			err = newContext.Err()
+		}
+		<-done
+		return "", err
 	}
-	if err != nil {
-		return handleErr(stdout, stderr, c.IgnoreExist1, err)
+}
+
+func contextDone(ctx context.Context) <-chan struct{} {
+	if ctx == nil {
+		return nil
 	}
-	return stdout.String(), nil
+	return ctx.Done()
 }
 
 func killStarted(cmds []*exec.Cmd) {
@@ -348,36 +407,43 @@ func WithOutputFile(outputFile string) Option {
 		s.outputFile = outputFile
 	}
 }
+
 func WithContext(ctx context.Context) Option {
 	return func(s *CommandHelper) {
 		s.context = ctx
 	}
 }
+
 func WithTimeout(timeout time.Duration) Option {
 	return func(s *CommandHelper) {
 		s.timeout = timeout
 	}
 }
+
 func WithLogger(logger *log.Logger) Option {
 	return func(s *CommandHelper) {
 		s.logger = logger
 	}
 }
+
 func WithTask(taskItem task.Task) Option {
 	return func(s *CommandHelper) {
 		s.taskItem = &taskItem
 	}
 }
+
 func WithWorkDir(workDir string) Option {
 	return func(s *CommandHelper) {
 		s.workDir = workDir
 	}
 }
+
 func WithEnv(env ...string) Option {
 	return func(s *CommandHelper) {
 		s.env = append(s.env, env...)
 	}
 }
+
 func WithIgnoreExist1() Option {
 	return func(s *CommandHelper) {
 		s.IgnoreExist1 = true
@@ -385,11 +451,14 @@ func WithIgnoreExist1() Option {
 }
 
 type CustomWriter struct {
+	mu       sync.Mutex
 	taskItem *task.Task
 	buffer   bytes.Buffer
 }
 
 func (cw *CustomWriter) Write(p []byte) (n int, err error) {
+	cw.mu.Lock()
+	defer cw.mu.Unlock()
 	cw.buffer.Write(p)
 	lines := strings.Split(cw.buffer.String(), "\n")
 
@@ -401,14 +470,17 @@ func (cw *CustomWriter) Write(p []byte) (n int, err error) {
 
 	return len(p), nil
 }
+
 func (cw *CustomWriter) Flush() {
+	cw.mu.Lock()
+	defer cw.mu.Unlock()
 	if cw.buffer.Len() > 0 {
 		cw.taskItem.Log(cw.buffer.String())
 		cw.buffer.Reset()
 	}
 }
 
-func handleErr(stdout, stderr bytes.Buffer, ignoreExist1 bool, err error) (string, error) {
+func handleErr(stdout, stderr fmt.Stringer, ignoreExist1 bool, err error) (string, error) {
 	return handleErrString(stdout.String(), stderr.String(), ignoreExist1, err)
 }
 
