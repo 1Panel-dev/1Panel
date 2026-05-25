@@ -47,6 +47,7 @@
                         <div class="flex items-center gap-2">
                             <span class="el-form-item__label">SSL</span>
                             <el-switch
+                                v-permission
                                 v-model="form.config.encryption"
                                 :active-value="'SSL'"
                                 :inactive-value="form.config.encryption === 'SSL' ? 'NONE' : form.config.encryption"
@@ -58,6 +59,7 @@
                         <div class="flex items-center gap-2">
                             <span class="el-form-item__label">TLS</span>
                             <el-switch
+                                v-permission
                                 v-model="form.config.encryption"
                                 :active-value="'TLS'"
                                 :inactive-value="form.config.encryption === 'TLS' ? 'NONE' : form.config.encryption"
@@ -75,12 +77,12 @@
         </el-form>
         <template #footer>
             <div class="flex items-center justify-between">
-                <el-button @click="onTest(formRef)" plain type="primary">
+                <el-button v-permission @click="onTest(formRef)" plain type="primary">
                     {{ $t('xpack.alert.test') }}
                 </el-button>
                 <div>
                     <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading || !isOK" type="primary" @click="onSave(formRef)">
+                    <el-button v-permission :disabled="loading || !isOK" type="primary" @click="onSave(formRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </div>

@@ -4,7 +4,7 @@
             <template #title>
                 <div class="flex items-center justify-between">
                     <span>{{ $t('xpack.alert.commonConfig') }}</span>
-                    <el-button plain round size="default" @click="onChangeCommon(commonConfig.id)">
+                    <el-button v-permission plain round size="default" @click="onChangeCommon(commonConfig.id)">
                         {{ $t('commons.button.edit') }}
                     </el-button>
                 </div>
@@ -24,6 +24,7 @@
                             <div v-if="!isMaster">
                                 <el-form-item :label="$t('xpack.alert.offline')" prop="isOffline">
                                     <el-switch
+                                        v-permission
                                         @change="onChangeOffline"
                                         v-model="commonConfig.config.isOffline"
                                         active-value="Enable"
@@ -64,6 +65,7 @@
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.emailConfig') }}</div>
                             <div>
                                 <el-button
+                                    v-permission
                                     plain
                                     round
                                     size="default"
@@ -73,6 +75,7 @@
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
                                 <el-button
+                                    v-permission
                                     size="default"
                                     plain
                                     round
@@ -116,7 +119,7 @@
                             </el-form>
                         </div>
                         <div v-else class="flex items-center justify-center" style="height: 257px">
-                            <el-button size="large" round plain type="primary" @click="onChangeEmail(0)">
+                            <el-button v-permission size="large" round plain type="primary" @click="onChangeEmail(0)">
                                 {{ $t('commons.button.create') }}
                             </el-button>
                         </div>
@@ -126,6 +129,7 @@
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.weCom') }}</div>
                             <div>
                                 <el-button
+                                    v-permission
                                     plain
                                     round
                                     size="default"
@@ -135,6 +139,7 @@
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
                                 <el-button
+                                    v-permission
                                     size="default"
                                     plain
                                     round
@@ -178,7 +183,7 @@
                             </el-form>
                         </div>
                         <div v-else class="flex items-center justify-center" style="height: 257px">
-                            <el-button size="large" round plain type="primary" @click="onChangeWeCom(0)">
+                            <el-button v-permission size="large" round plain type="primary" @click="onChangeWeCom(0)">
                                 {{ $t('commons.button.create') }}
                             </el-button>
                         </div>
@@ -188,6 +193,7 @@
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.dingTalk') }}</div>
                             <div>
                                 <el-button
+                                    v-permission
                                     plain
                                     round
                                     size="default"
@@ -197,6 +203,7 @@
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
                                 <el-button
+                                    v-permission
                                     size="default"
                                     plain
                                     round
@@ -244,7 +251,14 @@
                             </el-form>
                         </div>
                         <div v-else class="flex items-center justify-center" style="height: 257px">
-                            <el-button size="large" round plain type="primary" @click="onChangeDingTalk(0)">
+                            <el-button
+                                v-permission
+                                size="large"
+                                round
+                                plain
+                                type="primary"
+                                @click="onChangeDingTalk(0)"
+                            >
                                 {{ $t('commons.button.create') }}
                             </el-button>
                         </div>
@@ -254,6 +268,7 @@
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.feiShu') }}</div>
                             <div>
                                 <el-button
+                                    v-permission
                                     plain
                                     round
                                     size="default"
@@ -263,6 +278,7 @@
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
                                 <el-button
+                                    v-permission
                                     size="default"
                                     plain
                                     round
@@ -310,7 +326,7 @@
                             </el-form>
                         </div>
                         <div v-else class="flex items-center justify-center" style="height: 257px">
-                            <el-button size="large" round plain type="primary" @click="onChangeFeiShu(0)">
+                            <el-button v-permission size="large" round plain type="primary" @click="onChangeFeiShu(0)">
                                 {{ $t('commons.button.create') }}
                             </el-button>
                         </div>
@@ -320,6 +336,7 @@
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.bark') }}</div>
                             <div>
                                 <el-button
+                                    v-permission
                                     plain
                                     round
                                     size="default"
@@ -329,6 +346,7 @@
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
                                 <el-button
+                                    v-permission
                                     size="default"
                                     plain
                                     round
@@ -372,7 +390,7 @@
                             </el-form>
                         </div>
                         <div v-else class="flex items-center justify-center" style="height: 257px">
-                            <el-button size="large" round plain type="primary" @click="onChangeBark(0)">
+                            <el-button v-permission size="large" round plain type="primary" @click="onChangeBark(0)">
                                 {{ $t('commons.button.create') }}
                             </el-button>
                         </div>
@@ -386,7 +404,7 @@
                                 {{ $t('xpack.alert.smsConfig') }}
                             </div>
                             <div>
-                                <el-button plain round @click="onChangePhone(smsConfig.id)">
+                                <el-button v-permission plain round @click="onChangePhone(smsConfig.id)">
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
                             </div>

@@ -9,7 +9,9 @@
                 </el-alert>
             </template>
             <template #leftToolBar>
-                <el-button type="primary" @click="openView('create')">{{ $t('xpack.alert.addTask') }}</el-button>
+                <el-button v-permission type="primary" @click="openView('create')">
+                    {{ $t('xpack.alert.addTask') }}
+                </el-button>
             </template>
             <template #rightToolBar>
                 <div class="dropdowns">
@@ -84,6 +86,7 @@
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="110px">
                         <template #default="{ row }">
                             <el-button
+                                v-permission
                                 v-if="row.status === 'Enable'"
                                 @click="updateAlertStatus('disable', row.id)"
                                 link
@@ -93,6 +96,7 @@
                                 {{ $t('commons.status.enabled') }}
                             </el-button>
                             <el-button
+                                v-permission
                                 v-else
                                 icon="VideoPause"
                                 link
@@ -176,12 +180,14 @@ const data = ref();
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
+        permission: true,
         click: function (row: Alert.AlertInfo) {
             openView('edit', row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        permission: true,
         click: function (row: Alert.AlertInfo) {
             onDelete(row);
         },

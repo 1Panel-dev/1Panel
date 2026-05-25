@@ -11,9 +11,9 @@
 import { computed } from 'vue';
 import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isOffline, isFxplay, isAdmin, isEnterprise } = useGlobalStore();
+const { globalStore, isOffline, isFxplay, isAdmin, isEnterprise } = useGlobalStore();
 
-const buttons = computed(() => {
+const buttons = computed<RouterButton[]>(() => {
     const items = [
         ...(isAdmin.value
             ? [
@@ -25,14 +25,28 @@ const buttons = computed(() => {
                       label: i18n.global.t('setting.safe'),
                       path: '/settings/safe',
                   },
+              ]
+            : []),
+        ...(globalStore.hasPermission('alert_view')
+            ? [
                   {
                       label: i18n.global.t('xpack.alert.alertNotice'),
                       path: '/settings/alert',
+                      permission: 'alert_view',
                   },
+              ]
+            : []),
+        ...(globalStore.hasPermission('backup_view')
+            ? [
                   {
                       label: i18n.global.t('setting.backupAccount', 2),
                       path: '/settings/backupaccount',
+                      permission: 'backup_view',
                   },
+              ]
+            : []),
+        ...(isAdmin.value
+            ? [
                   {
                       label: i18n.global.t('setting.snapshot', 2),
                       path: '/settings/snapshot',

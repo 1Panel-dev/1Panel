@@ -363,6 +363,7 @@
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="visible = false">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button
+                    v-permission
                     type="primary"
                     @click="onSubmit(formRef)"
                     :disabled="dialogData.rowData?.type === 'panelPwdEndTime' && loading"
