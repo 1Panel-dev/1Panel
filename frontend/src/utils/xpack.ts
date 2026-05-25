@@ -94,10 +94,13 @@ export async function loadProductProFromDB() {
         const res = await getLicenseStatus();
         if (!res || !res.data) {
             globalStore.isProductPro = false;
+            globalStore.productProExpires = 0;
         } else {
             globalStore.isProductPro = res.data.status === 'Bound';
             if (globalStore.isProductPro) {
                 globalStore.productProExpires = Number(res.data.productPro);
+            } else {
+                globalStore.productProExpires = 0;
             }
         }
         return;
@@ -107,9 +110,11 @@ export async function loadProductProFromDB() {
     if (!res || !res.data) {
         globalStore.isEnterpriseLicensed = false;
         globalStore.isProductPro = false;
+        globalStore.productProExpires = 0;
     } else {
         globalStore.isEnterpriseLicensed = res.data.status === 'Bound';
         globalStore.isProductPro = globalStore.isEnterpriseLicensed;
+        globalStore.productProExpires = globalStore.isProductPro ? Number(res.data.productPro) : 0;
     }
 }
 
@@ -130,10 +135,12 @@ export async function loadMasterProductProFromDB() {
             globalStore.isEnterpriseLicensed = false;
             globalStore.isMasterProductPro = false;
             globalStore.isProductPro = false;
+            globalStore.productProExpires = 0;
         } else {
             globalStore.isEnterpriseLicensed = res.data.status === 'Bound';
             globalStore.isMasterProductPro = res.data.status === 'Bound';
             globalStore.isProductPro = res.data.status === 'Bound';
+            globalStore.productProExpires = globalStore.isProductPro ? Number(res.data.productPro) : 0;
         }
     }
     switchTheme();

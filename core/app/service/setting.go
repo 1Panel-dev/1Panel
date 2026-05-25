@@ -108,30 +108,9 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	}
 	if !global.CONF.Base.IsEnterprise {
 		info.IsOffline = constant.StatusDisable
-	} else {
-		u.ensureOpsReportSettingDefaults(&info)
 	}
 
 	return &info, err
-}
-
-func (u *SettingService) ensureOpsReportSettingDefaults(info *dto.SettingInfo) {
-	if _, ok := constant.OpsReportExportFormats[info.OpsReportExportFormat]; !ok {
-		info.OpsReportExportFormat = constant.OpsReportExportFormatPDF
-		_ = settingRepo.UpdateOrCreate("OpsReportExportFormat", info.OpsReportExportFormat)
-	}
-	if _, ok := constant.OpsReportSchedules[info.OpsReportSchedule]; !ok {
-		info.OpsReportSchedule = constant.OpsReportScheduleWeekly
-		_ = settingRepo.UpdateOrCreate("OpsReportSchedule", info.OpsReportSchedule)
-	}
-	if strings.TrimSpace(info.OpsReportSavePath) == "" {
-		info.OpsReportSavePath = defaultOpsReportSavePath()
-		_ = settingRepo.UpdateOrCreate("OpsReportSavePath", info.OpsReportSavePath)
-	}
-	if !isValidOpsReportThreshold(info.OpsReportThreshold) {
-		info.OpsReportThreshold = constant.OpsReportDefaultThreshold
-		_ = settingRepo.UpdateOrCreate("OpsReportThreshold", info.OpsReportThreshold)
-	}
 }
 
 func defaultOpsReportSavePath() string {
