@@ -273,6 +273,11 @@ export const DNSTypes = [
         value: 'PorkBun',
     },
     {
+        label: 'DNSPod',
+        value: 'DnsPod',
+        deprecated: true,
+    },
+    {
         label: 'Dynadot',
         value: 'Dynadot',
     },

@@ -11,10 +11,14 @@
                             <el-option
                                 v-for="(type, index) in DNSTypes"
                                 :key="index"
-                                :label="type.label"
+                                :label="type.deprecated ? `${type.label} (${$t('ssl.dnsPodRemoved')})` : type.label"
                                 :value="type.value"
+                                :disabled="type.deprecated && accountData.mode === 'create'"
                             ></el-option>
                         </el-select>
+                        <span class="input-help text-red-500" v-if="account.type === 'DnsPod'">
+                            {{ $t('ssl.dnsPodRemovedTip') }}
+                        </span>
                     </el-form-item>
                     <div
                         v-if="

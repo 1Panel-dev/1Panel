@@ -27,6 +27,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	legoacme "github.com/go-acme/lego/v5/acme"
 	"github.com/go-acme/lego/v5/certcrypto"
+	"github.com/go-acme/lego/v5/certcrypto/compat"
 	"github.com/go-acme/lego/v5/lego"
 	"github.com/go-acme/lego/v5/registration"
 )
@@ -75,25 +76,16 @@ const (
 	KeyRSA4096 = certcrypto.RSA4096
 )
 
-// normalizeKeyType maps legacy v4 KeyType strings (P256/P384/2048/...) to v5 form (EC256/EC384/RSA2048/...).
-// Used as a safety net in case database migration has not run yet.
+// normalizeKeyType maps legacy v4 KeyType strings (P256/P384/2048/...) to the
+// v5 form (EC256/EC384/RSA2048/...) using lego v5's official compat helper, so
+// any account/SSL row written under v4 keeps loading without manual conversion.
+// Unknown values are returned as-is and let the downstream caller error out.
 func normalizeKeyType(stored string) KeyType {
-	switch stored {
-	case "P256":
-		return certcrypto.EC256
-	case "P384":
-		return certcrypto.EC384
-	case "2048":
-		return certcrypto.RSA2048
-	case "3072":
-		return certcrypto.RSA3072
-	case "4096":
-		return certcrypto.RSA4096
-	case "8192":
-		return certcrypto.RSA8192
-	default:
+	var k compat.KeyTypeCompat
+	if err := k.UnmarshalText([]byte(stored)); err != nil {
 		return KeyType(stored)
 	}
+	return KeyType(k)
 }
 
 // AcmeUser implements registration.User. Key is crypto.Signer
