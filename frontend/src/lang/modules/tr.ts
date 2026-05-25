@@ -3710,6 +3710,11 @@ const message = {
         deprecated: 'kaldırılacak',
         deprecatedHelper:
             'Bakım durduruldu ve gelecek bir sürümde terk edilebilir. Lütfen analiz için Tencent Cloud yöntemini kullanın',
+        dnsPodRemoved: 'kaldırıldı',
+        dnsPodRemovedTip:
+            'DnsPod, lego v5 sürümünde kaldırıldı; bu hesap sertifika başvurusu/yenilemesi için kullanılamaz. Lütfen TencentCloud DNS hesabına geçin.',
+        dnsPodRemovedSSLTip:
+            'Bu sertifikaya bağlı DnsPod hesabı lego v5 sürümünde kullanılamaz; otomatik yenileme başarısız olur. Lütfen DNS hesabını TencentCloud’a değiştirin.',
         disableCNAME: 'CNAME’yi devre dışı bırak',
         disableCNAMEHelper: 'Alan adında bir CNAME kaydı varsa ve istek başarısız olursa burayı işaretleyin.',
         nameserver: 'DNS sunucusu',

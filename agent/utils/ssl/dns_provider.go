@@ -2,6 +2,7 @@ package ssl
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/go-acme/lego/v5/challenge"
@@ -313,6 +314,16 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
 		p, err = technitium.NewDNSProviderConfig(config)
+	default:
+		// Surfaces clear errors for legacy values (e.g. "DnsPod", which lego v5
+		// removed) and for any future provider that the frontend can pick but
+		// the backend has not yet wired up. Without this default branch, p and
+		// err would both stay nil and the DNS-01 step would fail far away from
+		// the real cause.
+		if dnsType == "DnsPod" {
+			return nil, fmt.Errorf("DNS provider %q has been removed in lego v5; please switch this DNS account to TencentCloud, which manages DNSPod-hosted zones via the same underlying API", dnsType)
+		}
+		return nil, fmt.Errorf("unsupported DNS provider %q", dnsType)
 	}
 
 	if err != nil {

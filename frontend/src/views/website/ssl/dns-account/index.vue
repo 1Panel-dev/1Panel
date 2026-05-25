@@ -16,6 +16,11 @@
                 <el-table-column :label="$t('commons.table.type')" prop="type">
                     <template #default="{ row }">
                         <span>{{ getDNSName(row.type) }}</span>
+                        <el-tooltip v-if="row.type === 'DnsPod'" :content="$t('ssl.dnsPodRemovedTip')" placement="top">
+                            <el-tag type="danger" size="small" class="ml-2">
+                                {{ $t('ssl.dnsPodRemoved') }}
+                            </el-tag>
+                        </el-tooltip>
                     </template>
                 </el-table-column>
                 <fu-table-operations

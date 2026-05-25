@@ -8,6 +8,7 @@ import (
 	"crypto/x509/pkix"
 	"net"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -20,6 +21,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+// dnsChallengeMu serializes DNS-01 issuance flows because lego v5 keeps the
+// recursive-nameserver Client and the LEGO_DISABLE_CNAME_SUPPORT switch in
+// process-wide globals. Without this lock, two concurrent SSL applications
+// with different nameserver/CNAME settings would clobber each other and
+// occasionally fail propagation checks against the wrong resolver.
+var dnsChallengeMu sync.Mutex
+
 type AcmeClientOption func(*AcmeClientOptions)
 
 type AcmeClientOptions struct {
@@ -31,6 +39,11 @@ type AcmeClient struct {
 	Client   *lego.Client
 	User     *AcmeUser
 	ProxyURL string
+
+	// dnsChallengeLocked records whether this client currently holds
+	// dnsChallengeMu. It is set by UseDns and cleared by ObtainSSL/
+	// ObtainIPSSL once the DNS-01 flow finishes. UseHTTP does not touch it.
+	dnsChallengeLocked bool
 }
 
 func NewAcmeClient(acmeAccount *model.WebsiteAcmeAccount, systemProxy *dto.SystemProxy) (*AcmeClient, error) {
@@ -57,6 +70,15 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 	if websiteSSL.Nameserver2 != "" {
 		nameservers = append(nameservers, websiteSSL.Nameserver2)
 	}
+
+	// Hold the global DNS-01 lock for the entire flow that follows, including
+	// the Obtain call. lego v5 reads dns01.DefaultClient() inside its own
+	// propagation-precheck loop, so the lock cannot be released right after
+	// SetDefaultClient/SetDNS01Provider; it has to span the whole DNS-01
+	// challenge. ObtainSSL / ObtainIPSSL release it once the request returns.
+	dnsChallengeMu.Lock()
+	c.dnsChallengeLocked = true
+
 	if websiteSSL.DisableCNAME {
 		_ = os.Setenv("LEGO_DISABLE_CNAME_SUPPORT", "true")
 	} else {
@@ -75,7 +97,20 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		opts = append(opts, dns01.DisableAuthoritativeNssPropagationRequirement())
 	}
 
-	return c.Client.Challenge.SetDNS01Provider(p, opts...)
+	if err := c.Client.Challenge.SetDNS01Provider(p, opts...); err != nil {
+		c.releaseDNSLock()
+		return err
+	}
+	return nil
+}
+
+// releaseDNSLock releases dnsChallengeMu if it was acquired by UseDns.
+// Safe to call multiple times; calls after the first one are no-ops.
+func (c *AcmeClient) releaseDNSLock() {
+	if c.dnsChallengeLocked {
+		c.dnsChallengeLocked = false
+		dnsChallengeMu.Unlock()
+	}
 }
 
 func (c *AcmeClient) UseHTTP(path string) error {
@@ -92,6 +127,7 @@ func (c *AcmeClient) UseHTTP(path string) error {
 }
 
 func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.Signer) (certificate.Resource, error) {
+	defer c.releaseDNSLock()
 	// lego v5 disables Common Name by default; explicitly enable it to keep
 	// the v4 behaviour, so legacy Java/router clients that still rely on the
 	// CommonName field do not fail TLS handshake.
@@ -128,6 +164,7 @@ func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.Signer) (cert
 }
 
 func (c *AcmeClient) ObtainIPSSL(ipAddress string, privKey crypto.Signer) (certificate.Resource, error) {
+	defer c.releaseDNSLock()
 	csrTemplate := &x509.CertificateRequest{
 		Subject: pkix.Name{
 			CommonName: "",

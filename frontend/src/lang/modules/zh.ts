@@ -3368,6 +3368,11 @@ const message = {
         cfHelper: '请勿使用 Global API Key',
         deprecated: '即将废弃',
         deprecatedHelper: '已经停止维护，可能会在以后的某个版本废弃，请使用腾讯云方式解析',
+        dnsPodRemoved: '已移除',
+        dnsPodRemovedTip:
+            'DnsPod 已被 lego v5 移除，当前账号无法用于证书申请/续签，请改用腾讯云 DNS 账号',
+        dnsPodRemovedSSLTip:
+            '此证书绑定的 DnsPod 账号在 lego v5 已不可用，自动续签将失败，请将 DNS 账号切换到腾讯云',
         disableCNAME: '禁用 CNAME',
         disableCNAMEHelper: '有 CNAME 配置的域名，如果申请失败，可以勾选此处',
         nameserver: 'DNS 服务器',

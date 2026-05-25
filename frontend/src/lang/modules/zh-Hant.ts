@@ -3381,6 +3381,11 @@ const message = {
         cfHelper: '請勿使用 Global API Key',
         deprecated: '即將廢棄',
         deprecatedHelper: '已經停止維護，可能會在以後的某個版本廢棄，請使用騰訊雲方式解析',
+        dnsPodRemoved: '已移除',
+        dnsPodRemovedTip:
+            'DnsPod 已被 lego v5 移除，當前帳號無法用於證書申請/續簽，請改用騰訊雲 DNS 帳號',
+        dnsPodRemovedSSLTip:
+            '此證書綁定的 DnsPod 帳號在 lego v5 已不可用，自動續簽將失敗，請將 DNS 帳號切換到騰訊雲',
         disableCNAME: '停用 CNAME',
         disableCNAMEHelper: '有 CNAME 設定的域名，如果申請失敗，可以勾選此處',
         nameserver: 'DNS 伺服器',

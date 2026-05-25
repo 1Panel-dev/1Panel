@@ -3629,6 +3629,11 @@ const message = {
         deprecated: 'will be deprecated',
         deprecatedHelper:
             'Maintenance has been stopped and may be abandoned in a future version. Please use Tencent Cloud method for analysis',
+        dnsPodRemoved: 'removed',
+        dnsPodRemovedTip:
+            'DnsPod has been removed in lego v5; this account cannot be used for new certificates or renewals. Please switch to a TencentCloud DNS account.',
+        dnsPodRemovedSSLTip:
+            'This certificate is bound to a DnsPod DNS account, which is no longer usable in lego v5. Auto-renewal will fail. Please switch the DNS account to TencentCloud.',
         disableCNAME: 'Disable CNAME',
         disableCNAMEHelper: 'Check here if the domain name has a CNAME record and the request fails.',
         nameserver: 'DNS server',

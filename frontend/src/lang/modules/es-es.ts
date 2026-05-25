@@ -3680,6 +3680,11 @@ const message = {
         cfHelper: 'No uses la clave API Global',
         deprecated: 'será obsoleto',
         deprecatedHelper: 'El soporte se ha detenido y puede eliminarse en el futuro. Usa el método Tencent Cloud.',
+        dnsPodRemoved: 'eliminado',
+        dnsPodRemovedTip:
+            'DnsPod ha sido eliminado en lego v5; esta cuenta no puede usarse para emisión o renovación de certificados. Cambia a una cuenta DNS de TencentCloud.',
+        dnsPodRemovedSSLTip:
+            'La cuenta DnsPod asociada a este certificado ya no es válida en lego v5; la renovación automática fallará. Cambia la cuenta DNS a TencentCloud.',
         disableCNAME: 'Deshabilitar CNAME',
         disableCNAMEHelper: 'Marca si el dominio tiene un CNAME y falla la solicitud.',
         nameserver: 'Servidor DNS',
