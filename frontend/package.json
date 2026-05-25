@@ -50,7 +50,7 @@
         "qs": "^6.15.2",
         "screenfull": "^6.0.2",
         "sortablejs": "^1.15.7",
-        "uuid": "^10.0.0",
+        "uuid": "^14.0.0",
         "vue": "^3.5.32",
         "vue-clipboard3": "^2.0.0",
         "vue-codemirror": "^6.1.1",
