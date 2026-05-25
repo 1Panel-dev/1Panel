@@ -169,7 +169,11 @@ func (sws *LogicSshWsSession) receiveWsMsg(exitCh chan bool) {
 						sws.aiInterceptor.SetCurrentLine(msgObj.Line)
 					}
 					if generated, handled := sws.aiInterceptor.HandleEnter(sws.notifyAIThinking, sws.notifyAIDone, sws.notifyAIError); handled {
-						sws.sendWebsocketInputCommandToSshSessionStdinPipe(buildAIPastePayload(generated))
+						if payload, err := buildAIPastePayload(generated); err != nil {
+							global.LOG.Errorf("ai generated command rejected before ssh.stdin pipe write, err: %v", err)
+						} else {
+							sws.sendWebsocketInputCommandToSshSessionStdinPipe(payload)
+						}
 						continue
 					}
 				}

@@ -3,6 +3,7 @@ package terminal
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"sync"
 
@@ -124,7 +125,11 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 						sws.aiInterceptor.SetCurrentLine(msgObj.Line)
 					}
 					if generated, handled := sws.aiInterceptor.HandleEnter(sws.notifyAIThinking, sws.notifyAIDone, sws.notifyAIError); handled {
-						sws.sendWebsocketInputCommandToSshSessionStdinPipe(buildAIPastePayload(generated))
+						if payload, err := buildAIPastePayload(generated); err != nil {
+							global.LOG.Errorf("ai generated command rejected before ssh.stdin pipe write, err: %v", err)
+						} else {
+							sws.sendWebsocketInputCommandToSshSessionStdinPipe(payload)
+						}
 						continue
 					}
 				}
@@ -203,14 +208,32 @@ func (sws *LocalWsSession) sendWebsocketInputCommandToSshSessionStdinPipe(cmdByt
 	}
 }
 
-func buildAIPastePayload(generated string) []byte {
+func buildAIPastePayload(generated string) ([]byte, error) {
 	payload := []byte{lineClearControl}
 	generated = strings.TrimSpace(generated)
 	if generated == "" {
-		return payload
+		return payload, nil
+	}
+	if err := validateTerminalInputPayload([]byte(generated)); err != nil {
+		return nil, err
 	}
 	payload = append(payload, []byte("\x1b[200~")...)
 	payload = append(payload, []byte(generated)...)
 	payload = append(payload, []byte("\x1b[201~")...)
-	return payload
+	return payload, nil
+}
+
+func validateTerminalInputPayload(cmdBytes []byte) error {
+	if len(cmdBytes) == 0 {
+		return fmt.Errorf("empty terminal input payload")
+	}
+	if len(strings.TrimSpace(string(cmdBytes))) == 0 {
+		return fmt.Errorf("empty terminal input payload")
+	}
+	for _, r := range string(cmdBytes) {
+		if r == '\n' || r == '\r' || r == 0 || r == 0x1b || r < 0x20 || r == 0x7f {
+			return fmt.Errorf("terminal input payload contains control characters")
+		}
+	}
+	return nil
 }

