@@ -10,16 +10,11 @@ import (
 
 	"github.com/compose-spec/compose-go/v2/loader"
 	"github.com/compose-spec/compose-go/v2/types"
-	"github.com/docker/compose/v2/pkg/api"
 	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v3"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
-
-type ComposeService struct {
-	api.Compose
-}
 
 func GetComposeProject(projectName, workDir string, yml []byte, env []byte, skipNormalization bool) (*types.Project, error) {
 	var configFiles []types.ConfigFile
