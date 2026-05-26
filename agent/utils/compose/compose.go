@@ -43,7 +43,7 @@ func Up(filePath string) (string, error) {
 		return "", err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args := append(extra, loadFiles(filePath)...)
 	args = append(args, "up", "-d")
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
@@ -53,9 +53,9 @@ func UpWithTask(filePath string, task *task.Task, forcePull bool) error {
 		return err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args := append(extra, loadFiles(filePath)...)
 	args = append(args, "up", "-d")
-	return cmd.NewCommandMgr(cmd.WithTask(*task)).Run(base, args...)
+	return cmd.NewCommandMgr(cmd.WithTask(*task), cmd.WithTimeout(20*time.Minute)).Run(base, args...)
 }
 
 func pullComposeImages(filePath string, forcePull bool, task *task.Task) error {
@@ -139,7 +139,7 @@ func getComposeImagesByCommand(filePath string) ([]string, error) {
 		return nil, err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args := append(extra, loadFiles(filePath)...)
 	args = append(args, "config", "--format", "json", "--no-normalize")
 	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(5*time.Minute)).
 		RunWithStdout(base, args...)
@@ -180,7 +180,7 @@ func Down(filePath string) (string, error) {
 		return "", err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args := append(extra, loadFiles(filePath)...)
 	args = append(args, "down", "--remove-orphans")
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
@@ -190,7 +190,7 @@ func Stop(filePath string) (string, error) {
 		return "", err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args := append(extra, loadFiles(filePath)...)
 	args = append(args, "stop")
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
@@ -200,7 +200,7 @@ func Restart(filePath string) (string, error) {
 		return "", err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args := append(extra, loadFiles(filePath)...)
 	args = append(args, "restart")
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
@@ -210,7 +210,7 @@ func Operate(filePath, operation string) (string, error) {
 		return "", err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, strings.Fields(loadFiles(filePath))...)
+	args := append(extra, loadFiles(filePath)...)
 	args = append(args, operation)
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
@@ -221,24 +221,24 @@ func DownAndUp(filePath string) (string, error) {
 	}
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Minute))
 	base, extra := getComposeBaseCmd()
-	argsDown := append(extra, strings.Fields(loadFiles(filePath))...)
+	argsDown := append(extra, loadFiles(filePath)...)
 	argsDown = append(argsDown, "down")
 	stdout, err := cmdMgr.RunWithStdout(base, argsDown...)
 	if err != nil {
 		return stdout, err
 	}
-	argsUp := append(extra, strings.Fields(loadFiles(filePath))...)
+	argsUp := append(extra, loadFiles(filePath)...)
 	argsUp = append(argsUp, "up", "-d")
 	stdout, err = cmdMgr.RunWithStdout(base, argsUp...)
 	return stdout, err
 }
 
-func loadFiles(filePath string) string {
+func loadFiles(filePath string) []string {
 	var fileItem []string
 	for _, item := range strings.Split(filePath, ",") {
 		if len(item) != 0 {
-			fileItem = append(fileItem, fmt.Sprintf("-f %s", item))
+			fileItem = append(fileItem, "-f", item)
 		}
 	}
-	return strings.Join(fileItem, " ")
+	return fileItem
 }

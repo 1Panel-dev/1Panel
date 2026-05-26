@@ -548,14 +548,14 @@ func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
 	}
 	args = append(args, oldPaths...)
 	args = append(args, dstPath)
-	if err := cmd.NewCommandMgr().Run("mv", args...); err != nil {
+	if err := cmd.NewCommandMgr(cmd.WithTimeout(cmdRecursiveTimeout)).Run("mv", args...); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (f FileOp) Mv(oldPath, dstPath string) error {
-	if err := cmd.NewCommandMgr().Run("mv", oldPath, dstPath); err != nil {
+	if err := cmd.NewCommandMgr(cmd.WithTimeout(cmdRecursiveTimeout)).Run("mv", oldPath, dstPath); err != nil {
 		return err
 	}
 	return nil
@@ -611,22 +611,22 @@ func (f FileOp) CopyAndReName(src, dst, name string, cover bool) error {
 		if name != "" && !cover {
 			dstPath = filepath.Join(dst, name)
 		}
-		return cmd.NewCommandMgr().Run("cp", "-rfp", src, dstPath)
+		return cmd.NewCommandMgr(cmd.WithTimeout(cmdRecursiveTimeout)).Run("cp", "-rfp", src, dstPath)
 	} else {
 		dstPath := filepath.Join(dst, name)
 		if cover {
 			dstPath = dst
 		}
-		return cmd.NewCommandMgr().Run("cp", "-fp", src, dstPath)
+		return cmd.NewCommandMgr(cmd.WithTimeout(cmdRecursiveTimeout)).Run("cp", "-fp", src, dstPath)
 	}
 }
 
 func (f FileOp) CopyDirWithNewName(src, dst, newName string) error {
 	if newName == "." || newName == "" {
-		return cmd.NewCommandMgr().Run("cp", "-rfp", filepath.Clean(src)+"/.", dst)
+		return cmd.NewCommandMgr(cmd.WithTimeout(cmdRecursiveTimeout)).Run("cp", "-rfp", filepath.Clean(src)+"/.", dst)
 	}
 	dstDir := filepath.Join(dst, newName)
-	return cmd.NewCommandMgr().Run("cp", "-rfp", src, dstDir)
+	return cmd.NewCommandMgr(cmd.WithTimeout(cmdRecursiveTimeout)).Run("cp", "-rfp", src, dstDir)
 }
 
 func (f FileOp) CopyDir(src, dst string) error {

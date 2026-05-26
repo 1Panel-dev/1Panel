@@ -127,7 +127,7 @@ func runRemoteShellScript(url string, args ...string) error {
 	if statusCode < http.StatusOK || statusCode >= http.StatusMultipleChoices {
 		return fmt.Errorf("download script failed, status code: %d", statusCode)
 	}
-	_, err = cmd.NewCommandMgr(cmd.WithOutputFile(os.DevNull)).RunPipe(cmd.PipeCommand{
+	_, err = cmd.NewCommandMgr().RunPipeToFile(os.DevNull, cmd.PipeCommand{
 		Name:  "sh",
 		Args:  append([]string{"-s"}, args...),
 		Stdin: bytes.NewReader(script),

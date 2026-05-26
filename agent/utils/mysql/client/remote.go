@@ -281,8 +281,8 @@ func (r *Remote) Backup(info BackupInfo) error {
 		}
 	}
 	global.LOG.Debug("docker " + strings.Join(debugArgs, " "))
-	cmdMgr := cmd.NewCommandMgr(cmd.WithOutputFile(path.Join(info.TargetDir, info.FileName)))
-	if _, err := cmdMgr.RunPipe(
+	cmdMgr := cmd.NewCommandMgr()
+	if _, err := cmdMgr.RunPipeToFile(path.Join(info.TargetDir, info.FileName),
 		cmd.PipeCommand{Name: "docker", Args: backupArgs},
 		cmd.PipeCommand{Name: "gzip", Args: []string{"-cf"}},
 	); err != nil {

@@ -136,8 +136,8 @@ func (r *Local) Backup(info BackupInfo) error {
 	}
 	global.LOG.Infof("start to pg_dump | gzip > %s.gzip", info.TargetDir+"/"+info.FileName)
 
-	cmdMgr := cmd.NewCommandMgr(cmd.WithOutputFile(path.Join(info.TargetDir, info.FileName)))
-	if _, err := cmdMgr.RunPipe(
+	cmdMgr := cmd.NewCommandMgr()
+	if _, err := cmdMgr.RunPipeToFile(path.Join(info.TargetDir, info.FileName),
 		cmd.PipeCommand{Name: "docker", Args: []string{"exec", "-i", "-e", "PGPASSWORD=" + r.Password, r.ContainerName, "pg_dump", "-F", "c", "-U", r.Username, "-d", info.Name}},
 		cmd.PipeCommand{Name: "gzip", Args: []string{"-cf"}},
 	); err != nil {

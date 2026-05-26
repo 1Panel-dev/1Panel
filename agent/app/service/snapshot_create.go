@@ -406,8 +406,8 @@ func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) err
 		snap.Task.Log(strings.Join(imageList, " "))
 		snap.Task.Logf("docker save %s | gzip -c > %s", strings.Join(imageList, " "), path.Join(targetDir, "images.tar.gz"))
 		outputPath := path.Join(targetDir, "images.tar.gz")
-		cmdMgr := cmd.NewCommandMgr(cmd.WithOutputFile(outputPath))
-		if _, err := cmdMgr.RunPipe(
+		cmdMgr := cmd.NewCommandMgr()
+		if _, err := cmdMgr.RunPipeToFile(outputPath,
 			cmd.PipeCommand{Name: "docker", Args: append([]string{"save"}, imageList...)},
 			cmd.PipeCommand{Name: "gzip", Args: []string{"-c"}},
 		); err != nil {
