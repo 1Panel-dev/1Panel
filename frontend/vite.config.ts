@@ -25,6 +25,7 @@ function patchCodeFilterOverflow(): Plugin {
         },
     };
 }
+
 const prefix = `monaco-editor/esm/vs`;
 
 function getManualChunkName(id: string): string | undefined {
@@ -126,14 +127,10 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                 defaultImport: 'url',
             }),
         ],
-        esbuild: {
-            pure: viteEnv.VITE_DROP_CONSOLE ? ['console.log'] : [],
-            drop: viteEnv.VITE_DROP_CONSOLE && isProduction ? ['debugger'] : [],
-        },
         build: {
             sourcemap: false,
             outDir: '../core/cmd/server/web',
-            minify: 'esbuild',
+            minify: 'oxc',
             target: 'esnext',
             cssCodeSplit: false,
             rollupOptions: {
@@ -141,6 +138,15 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                     chunkFileNames: 'assets/js/[name]-[hash].js',
                     entryFileNames: 'assets/js/[name]-[hash].js',
                     assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+                    minify: {
+                        compress: {
+                            dropDebugger: viteEnv.VITE_DROP_CONSOLE && isProduction,
+                            treeshake: {
+                                manualPureFunctions: viteEnv.VITE_DROP_CONSOLE ? ['console.log'] : [],
+                            },
+                        },
+                        mangle: true,
+                    },
                     manualChunks: getManualChunkName,
                 },
             },

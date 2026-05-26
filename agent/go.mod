@@ -6,7 +6,7 @@ replace github.com/moby/go-archive => github.com/moby/go-archive v0.1.0
 
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
-	github.com/compose-spec/compose-go/v2 v2.10.2
+	github.com/compose-spec/compose-go/v2 v2.11.0
 	github.com/creack/pty v1.1.24
 	github.com/docker/cli v29.5.2+incompatible
 	github.com/docker/docker v28.5.2+incompatible
@@ -19,7 +19,7 @@ require (
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-resty/resty/v2 v2.17.2
-	github.com/go-sql-driver/mysql v1.9.3
+	github.com/go-sql-driver/mysql v1.10.0
 	github.com/goh-chunlin/go-onedrive v1.1.1
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
@@ -37,9 +37,9 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/sftp v1.13.10
-	github.com/qiniu/go-sdk/v7 v7.26.4
+	github.com/qiniu/go-sdk/v7 v7.26.12
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/shirou/gopsutil/v4 v4.26.3
+	github.com/shirou/gopsutil/v4 v4.26.4
 	github.com/sirupsen/logrus v1.9.4
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/afero v1.15.0
