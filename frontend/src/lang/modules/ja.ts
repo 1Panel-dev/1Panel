@@ -3667,6 +3667,11 @@ const message = {
         deprecated: '非推奨されます',
         deprecatedHelper:
             'メンテナンスは停止されており、将来のバージョンでは放棄される可能性があります。分析にはTencent Cloudメソッドを使用してください',
+        dnsPodRemoved: '削除済み',
+        dnsPodRemovedTip:
+            'DnsPod は lego v5 で削除されました。このアカウントは証明書の申請/更新に使用できません。Tencent Cloud DNS アカウントに切り替えてください。',
+        dnsPodRemovedSSLTip:
+            'この証明書がバインドされている DnsPod アカウントは lego v5 では使用できません。自動更新は失敗します。DNS アカウントを Tencent Cloud に切り替えてください。',
         disableCNAME: 'cnameを無効にします',
         disableCNAMEHelper: 'ドメイン名にCNAMEレコードがあり、リクエストが失敗するかどうかを確認してください。',
         nameserver: 'DNSサーバー',

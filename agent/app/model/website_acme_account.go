@@ -8,7 +8,7 @@ type WebsiteAcmeAccount struct {
 	Type       string `gorm:"not null;default:letsencrypt" json:"type"`
 	EabKid     string `json:"eabKid"`
 	EabHmacKey string `json:"eabHmacKey"`
-	KeyType    string `gorm:"not null;default:2048" json:"keyType"`
+	KeyType    string `gorm:"not null;default:RSA2048" json:"keyType"`
 	UseProxy   bool   `gorm:"default:false" json:"useProxy"`
 	CaDirURL   string `json:"caDirURL"`
 	UseEAB     bool   `json:"useEAB"`

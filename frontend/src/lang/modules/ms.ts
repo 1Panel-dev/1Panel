@@ -3717,6 +3717,11 @@ const message = {
         deprecated: 'akan dihentikan',
         deprecatedHelper:
             'Penyelenggaraan telah dihentikan dan mungkin akan dibuang dalam versi masa hadapan. Sila gunakan kaedah Tencent Cloud untuk analisis',
+        dnsPodRemoved: 'dialih keluar',
+        dnsPodRemovedTip:
+            'DnsPod telah dialih keluar dalam lego v5; akaun ini tidak boleh digunakan untuk permohonan/pembaharuan sijil. Sila tukar kepada akaun TencentCloud DNS.',
+        dnsPodRemovedSSLTip:
+            'Akaun DnsPod yang dikaitkan dengan sijil ini tidak lagi boleh digunakan dalam lego v5; pembaharuan automatik akan gagal. Sila tukar akaun DNS kepada TencentCloud.',
         disableCNAME: 'Lumpuhkan CNAME',
         disableCNAMEHelper: 'Semak di sini jika nama domain mempunyai rekod CNAME dan permintaan gagal.',
         nameserver: 'Pelayan DNS',

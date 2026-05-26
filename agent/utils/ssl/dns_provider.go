@@ -2,40 +2,41 @@ package ssl
 
 import (
 	"encoding/json"
-	"github.com/go-acme/lego/v4/challenge"
-	"github.com/go-acme/lego/v4/providers/dns/acmedns"
-	"github.com/go-acme/lego/v4/providers/dns/alidns"
-	"github.com/go-acme/lego/v4/providers/dns/aliesa"
-	"github.com/go-acme/lego/v4/providers/dns/baiducloud"
-	"github.com/go-acme/lego/v4/providers/dns/clouddns"
-	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
-	"github.com/go-acme/lego/v4/providers/dns/cloudns"
-	"github.com/go-acme/lego/v4/providers/dns/dnspod"
-	"github.com/go-acme/lego/v4/providers/dns/dynu"
-	"github.com/go-acme/lego/v4/providers/dns/freemyip"
-	"github.com/go-acme/lego/v4/providers/dns/godaddy"
-	"github.com/go-acme/lego/v4/providers/dns/huaweicloud"
-	"github.com/go-acme/lego/v4/providers/dns/namecheap"
-	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
-	"github.com/go-acme/lego/v4/providers/dns/namesilo"
-	"github.com/go-acme/lego/v4/providers/dns/ovh"
-	"github.com/go-acme/lego/v4/providers/dns/porkbun"
-	"github.com/go-acme/lego/v4/providers/dns/rainyun"
-	"github.com/go-acme/lego/v4/providers/dns/regru"
-	"github.com/go-acme/lego/v4/providers/dns/route53"
-	"github.com/go-acme/lego/v4/providers/dns/spaceship"
-	"github.com/go-acme/lego/v4/providers/dns/technitium"
-	"github.com/go-acme/lego/v4/providers/dns/tencentcloud"
-	"github.com/go-acme/lego/v4/providers/dns/vercel"
-	"github.com/go-acme/lego/v4/providers/dns/volcengine"
-	"github.com/go-acme/lego/v4/providers/dns/westcn"
+	"fmt"
 	"time"
+
+	"github.com/go-acme/lego/v5/challenge"
+	"github.com/go-acme/lego/v5/providers/dns/acmedns"
+	"github.com/go-acme/lego/v5/providers/dns/alidns"
+	"github.com/go-acme/lego/v5/providers/dns/aliesa"
+	"github.com/go-acme/lego/v5/providers/dns/baiducloud"
+	"github.com/go-acme/lego/v5/providers/dns/clouddns"
+	"github.com/go-acme/lego/v5/providers/dns/cloudflare"
+	"github.com/go-acme/lego/v5/providers/dns/cloudns"
+	"github.com/go-acme/lego/v5/providers/dns/dynadot"
+	"github.com/go-acme/lego/v5/providers/dns/dynu"
+	"github.com/go-acme/lego/v5/providers/dns/freemyip"
+	"github.com/go-acme/lego/v5/providers/dns/godaddy"
+	"github.com/go-acme/lego/v5/providers/dns/huaweicloud"
+	"github.com/go-acme/lego/v5/providers/dns/namecheap"
+	"github.com/go-acme/lego/v5/providers/dns/namedotcom"
+	"github.com/go-acme/lego/v5/providers/dns/namesilo"
+	"github.com/go-acme/lego/v5/providers/dns/ovh"
+	"github.com/go-acme/lego/v5/providers/dns/porkbun"
+	"github.com/go-acme/lego/v5/providers/dns/rainyun"
+	"github.com/go-acme/lego/v5/providers/dns/regru"
+	"github.com/go-acme/lego/v5/providers/dns/route53"
+	"github.com/go-acme/lego/v5/providers/dns/spaceship"
+	"github.com/go-acme/lego/v5/providers/dns/technitium"
+	"github.com/go-acme/lego/v5/providers/dns/tencentcloud"
+	"github.com/go-acme/lego/v5/providers/dns/vercel"
+	"github.com/go-acme/lego/v5/providers/dns/volcengine"
+	"github.com/go-acme/lego/v5/providers/dns/westcn"
 )
 
 type DnsType string
 
 const (
-	DnsPod       DnsType = "DnsPod"
 	AliYun       DnsType = "AliYun"
 	AliESA       DnsType = "AliESA"
 	AWSRoute53   DnsType = "AWSRoute53"
@@ -56,11 +57,12 @@ const (
 	ClouDNS      DnsType = "ClouDNS"
 	RegRu        DnsType = "RegRu"
 	Dynu         DnsType = "Dynu"
+	Dynadot      DnsType = "Dynadot"
 	BaiduCloud   DnsType = "BaiduCloud"
 	Ovh          DnsType = "Ovh"
 	AcmeDNS      DnsType = "AcmeDNS"
 	PorkBun      DnsType = "PorkBun"
-	Technitium	 DnsType = "Technitium"
+	Technitium   DnsType = "Technitium"
 )
 
 type DNSParam struct {
@@ -103,13 +105,6 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		return nil, err
 	}
 	switch dnsType {
-	case DnsPod:
-		config := dnspod.NewDefaultConfig()
-		config.LoginToken = param.ID + "," + param.Token
-		config.PropagationTimeout = propagationTimeout
-		config.PollingInterval = pollingInterval
-		config.TTL = ttl
-		p, err = dnspod.NewDNSProviderConfig(config)
 	case AliYun:
 		config := alidns.NewDefaultConfig()
 		config.SecretKey = param.SecretKey
@@ -274,6 +269,14 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
 		p, err = dynu.NewDNSProviderConfig(config)
+	case Dynadot:
+		config := dynadot.NewDefaultConfig()
+		config.APIKey = param.APIkey
+		config.APISecret = param.APISecret
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = dynadot.NewDNSProviderConfig(config)
 	case BaiduCloud:
 		config := baiducloud.NewDefaultConfig()
 		config.AccessKeyID = param.AccessKey
@@ -311,6 +314,16 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
 		p, err = technitium.NewDNSProviderConfig(config)
+	default:
+		// Surfaces clear errors for legacy values (e.g. "DnsPod", which lego v5
+		// removed) and for any future provider that the frontend can pick but
+		// the backend has not yet wired up. Without this default branch, p and
+		// err would both stay nil and the DNS-01 step would fail far away from
+		// the real cause.
+		if dnsType == "DnsPod" {
+			return nil, fmt.Errorf("DNS provider %q has been removed in lego v5; please switch this DNS account to TencentCloud, which manages DNSPod-hosted zones via the same underlying API", dnsType)
+		}
+		return nil, fmt.Errorf("unsupported DNS provider %q", dnsType)
 	}
 
 	if err != nil {

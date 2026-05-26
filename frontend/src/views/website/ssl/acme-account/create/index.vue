@@ -111,7 +111,7 @@ const initData = () => ({
     type: 'letsencrypt',
     eabKid: '',
     eabHmacKey: '',
-    keyType: 'P256',
+    keyType: 'EC256',
     useProxy: false,
     caDirURL: '',
     useEAB: false,

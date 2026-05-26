@@ -2153,7 +2153,7 @@ func handleSSLConfig(appInstall *model.AppInstall, hasDefaultWebsite bool, sslRe
 		caRequest := request.WebsiteCAObtain{
 			ID:      ca.ID,
 			Domains: "localhost",
-			KeyType: "4096",
+			KeyType: "RSA4096",
 			Time:    99,
 			Unit:    "year",
 			Dir:     sslDir,

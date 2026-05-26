@@ -103,7 +103,7 @@ const rules = ref({
 });
 
 const initData = () => ({
-    keyType: 'P256',
+    keyType: 'EC256',
     domains: '',
     id: 0,
     time: 10,

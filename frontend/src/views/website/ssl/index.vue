@@ -52,7 +52,20 @@
                         show-overflow-tooltip
                         prop="primaryDomain"
                         min-width="150px"
-                    ></el-table-column>
+                    >
+                        <template #default="{ row }">
+                            <span>{{ row.primaryDomain }}</span>
+                            <el-tooltip
+                                v-if="row.dnsAccount && row.dnsAccount.type === 'DnsPod'"
+                                :content="$t('ssl.dnsPodRemovedSSLTip')"
+                                placement="top"
+                            >
+                                <el-tag type="danger" size="small" class="ml-2">
+                                    DnsPod {{ $t('ssl.dnsPodRemoved') }}
+                                </el-tag>
+                            </el-tooltip>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         :label="$t('website.otherDomains')"
                         show-overflow-tooltip

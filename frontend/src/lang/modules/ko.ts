@@ -3583,6 +3583,11 @@ const message = {
         deprecated: '더 이상 지원되지 않습니다.',
         deprecatedHelper:
             '유지 관리가 중단되었으며 향후 버전에서 제외될 수 있습니다. Tencent Cloud 방법을 사용하여 분석하세요.',
+        dnsPodRemoved: '제거됨',
+        dnsPodRemovedTip:
+            'DnsPod는 lego v5에서 제거되었습니다. 이 계정은 인증서 신청/갱신에 사용할 수 없습니다. Tencent Cloud DNS 계정으로 전환해 주세요.',
+        dnsPodRemovedSSLTip:
+            '이 인증서에 연결된 DnsPod 계정은 lego v5에서 사용할 수 없습니다. 자동 갱신이 실패합니다. DNS 계정을 Tencent Cloud로 전환해 주세요.',
         disableCNAME: 'CNAME 비활성화',
         disableCNAMEHelper: '도메인 이름에 CNAME 레코드가 있고 요청이 실패할 경우 선택하세요.',
         nameserver: 'DNS 서버',

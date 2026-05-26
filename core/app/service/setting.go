@@ -407,7 +407,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		params["domains"] = req.Domain
 		params["time"] = 10
 		params["unit"] = "year"
-		params["keyType"] = "P256"
+		params["keyType"] = "EC256"
 		params["id"] = ca.ID
 		jsonData, err := json.Marshal(params)
 		if err != nil {

@@ -72,7 +72,7 @@ const rules = ref({
 
 const initData = () => ({
     name: '',
-    keyType: 'P256',
+    keyType: 'EC256',
     commonName: '',
     country: 'CN',
     organization: '',

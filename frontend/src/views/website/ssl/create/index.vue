@@ -242,7 +242,7 @@ const initData = () => ({
     acmeAccountId: undefined,
     dnsAccountId: undefined,
     autoRenew: true,
-    keyType: 'P256',
+    keyType: 'EC256',
     pushDir: false,
     dir: '',
     description: '',
