@@ -2025,6 +2025,8 @@ const message = {
             nodes: 'ノード',
             commands: 'クイックコマンド',
             opsReport: '運用レポート',
+            users: 'ユーザー管理',
+            auth: 'ログイン認証',
         },
         websiteLog: 'ウェブサイトログ',
         runLog: 'ログを実行します',
@@ -3994,10 +3996,10 @@ const message = {
         noFail: 'マウント失敗はシステム起動に影響しません',
     },
     xpack: {
-        expiresTrialAlert:
-            'ご注意: あなたの商用版トライアルは{0}日後に終了し、すべての商用版機能が使用できなくなります。適時に更新またはフルバージョンにアップグレードしてください。',
-        expiresAlert:
-            'ご注意: あなたの商用版ライセンスは{0}日後に終了し、すべての商用版機能が使用できなくなります。継続的な使用のために速やかに更新してください。',
+        expiresEnterpriseAlert:
+            'ご注意: あなたのEnterprise Editionライセンスは{0}日後に終了し、すべてのEnterprise Edition機能が使用できなくなります。継続的な使用のために速やかに更新してください。',
+        expiresProAlert:
+            'ご注意: あなたのPro Editionライセンスは{0}日後に終了し、すべてのPro Edition機能が使用できなくなります。継続的な使用のために速やかに更新してください。',
         menu: 'Рro',
         upage: 'AIウェブサイトビルダー',
         proAlert: 'この機能を使用するには商用版にアップグレードしてください',

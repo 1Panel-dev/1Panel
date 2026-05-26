@@ -1892,6 +1892,8 @@ const message = {
             nodes: '節點',
             commands: '快速指令',
             opsReport: '運維報表',
+            users: '使用者管理',
+            auth: '登入認證',
         },
         websiteLog: '網站日誌',
         runLog: '執行日誌',
@@ -3681,7 +3683,8 @@ const message = {
         noFail: '掛載失敗不影響系統啟動',
     },
     xpack: {
-        expiresAlert: '溫馨提醒：您的商業版許可證將在 {0} 天後到期，屆時所有商業版功能將無法繼續使用。',
+        expiresEnterpriseAlert: '溫馨提醒：您的企業版許可證將在 {0} 天後到期，屆時所有企業版功能將無法繼續使用。',
+        expiresProAlert: '溫馨提醒：您的專業版許可證將在 {0} 天後到期，屆時所有專業版功能將無法繼續使用。',
         name: '商業版',
         menu: '進階功能',
         upage: 'AI 建站',

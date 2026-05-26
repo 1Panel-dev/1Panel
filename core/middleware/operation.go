@@ -106,7 +106,7 @@ func OperationLog() gin.HandlerFunc {
 		writer := responseBodyWriter{
 			ResponseWriter: c.Writer,
 			body:           &bytes.Buffer{},
-			captureBody:    shouldCaptureResponseBody(c.Request.URL.Path),
+			captureBody:    !strings.Contains(strings.ToLower(c.Request.URL.Path), "download"),
 		}
 		c.Writer = &writer
 		now := time.Now()
@@ -272,16 +272,8 @@ func (r *responseBodyWriter) Write(b []byte) (int, error) {
 	return r.ResponseWriter.Write(b)
 }
 
-func shouldCaptureResponseBody(reqPath string) bool {
-	reqPath = strings.ToLower(reqPath)
-	if strings.Contains(reqPath, "download") {
-		return false
-	}
-	return true
-}
-
 func loadLogInfo(path string) string {
-	path = replaceStr(path, "/api/v2", "/core", "/xpack")
+	path = replaceStr(path, "/api/v2", "/core", "/xpack", "/enterprise")
 	if !strings.Contains(path, "/") {
 		return ""
 	}

@@ -2003,6 +2003,8 @@ const message = {
             nodes: 'Node',
             commands: 'Quick Commands',
             opsReport: 'Ops Report',
+            users: 'User Management',
+            auth: 'Login Authentication',
         },
         websiteLog: 'Website logs',
         runLog: 'Run logs',
@@ -3954,10 +3956,10 @@ const message = {
         noFail: 'Mount failure does not affect system startup',
     },
     xpack: {
-        expiresTrialAlert:
-            'Friendly reminder: Your Commercial Edition trial will expire in {0} days, and all Commercial Edition features will no longer be accessible. Please renew or upgrade to the full version in a timely manner.',
-        expiresAlert:
-            'Friendly reminder: Your Commercial Edition license will expire in {0} days, and all Commercial Edition features will no longer be accessible. Please renew promptly to ensure continued usage.',
+        expiresEnterpriseAlert:
+            'Friendly reminder: Your Enterprise Edition license will expire in {0} days, and all Enterprise Edition features will no longer be accessible. Please renew promptly to ensure continued usage.',
+        expiresProAlert:
+            'Friendly reminder: Your Pro Edition license will expire in {0} days, and all Pro Edition features will no longer be accessible. Please renew promptly to ensure continued usage.',
         menu: 'Pro',
         upage: 'AI Website Builder',
         proAlert: 'Upgrade to Commercial Edition to use this feature',

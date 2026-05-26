@@ -2047,6 +2047,8 @@ const message = {
             nodes: 'Düğüm',
             commands: 'Hızlı Komutlar',
             opsReport: 'Operasyon Raporu',
+            users: 'Kullanıcı yönetimi',
+            auth: 'Giriş kimlik doğrulaması',
         },
         websiteLog: 'Website logları',
         runLog: 'Çalıştırma logları',
@@ -4041,10 +4043,10 @@ const message = {
         noFail: 'Bağlama hatası sistem başlangıcını etkilemez',
     },
     xpack: {
-        expiresTrialAlert:
-            'Nazik hatırlatma: Ticari sürüm denemeniz {0} gün içinde sona erecek ve tüm Ticari sürüm özellikleri kullanılamaz hale gelecektir. Lütfen zamanında yenileyin veya tam sürüme yükseltin.',
-        expiresAlert:
-            'Nazik hatırlatma: Ticari sürüm lisansınız {0} gün içinde sona erecek ve tüm Ticari sürüm özellikleri kullanılamaz hale gelecektir. Lütfen devam eden kullanım için zamanında yenileyin.',
+        expiresEnterpriseAlert:
+            'Nazik hatırlatma: Enterprise Edition lisansınız {0} gün içinde sona erecek ve tüm Enterprise Edition özellikleri kullanılamaz hale gelecektir. Lütfen devam eden kullanım için zamanında yenileyin.',
+        expiresProAlert:
+            'Nazik hatırlatma: Pro Edition lisansınız {0} gün içinde sona erecek ve tüm Pro Edition özellikleri kullanılamaz hale gelecektir. Lütfen devam eden kullanım için zamanında yenileyin.',
         menu: 'Pro',
         upage: 'AI Web Sitesi Oluşturucu',
         proAlert: 'Bu özelliği kullanmak için Ticari sürüme yükseltin',

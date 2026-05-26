@@ -2165,6 +2165,8 @@ const message = {
             nodes: 'nós',
             commands: 'Comandos Rápidos',
             opsReport: 'Relatório de Operações',
+            users: 'Gerenciamento de usuários',
+            auth: 'Autenticação de login',
         },
         websiteLog: 'Logs do website',
         runLog: 'Logs de execução',
@@ -4188,10 +4190,10 @@ const message = {
         noFail: 'Falha na montagem não afeta a inicialização do sistema',
     },
     xpack: {
-        expiresTrialAlert:
-            'Lembrete: Sua avaliação da edição comercial expira em {0} dias. Depois disso, todos os recursos da edição comercial deixarão de ficar disponíveis. Renove ou faça upgrade em tempo hábil.',
-        expiresAlert:
-            'Lembrete: Sua licença da edição comercial expira em {0} dias. Depois disso, todos os recursos da edição comercial deixarão de ficar disponíveis. Renove a licença para manter o uso contínuo.',
+        expiresEnterpriseAlert:
+            'Lembrete: Sua licença da Enterprise Edition expira em {0} dias. Depois disso, todos os recursos da Enterprise Edition deixarão de ficar disponíveis. Renove a licença para manter o uso contínuo.',
+        expiresProAlert:
+            'Lembrete: Sua licença da Pro Edition expira em {0} dias. Depois disso, todos os recursos da Pro Edition deixarão de ficar disponíveis. Renove a licença para manter o uso contínuo.',
         menu: 'Pro',
         upage: 'Construtor de Sites com IA',
         proAlert: 'Atualize para comercial para usar este recurso',

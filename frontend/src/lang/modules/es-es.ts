@@ -2054,6 +2054,8 @@ const message = {
             nodes: 'Nodo',
             commands: 'Comandos rápidos',
             opsReport: 'Informe de operaciones',
+            users: 'Gestión de usuarios',
+            auth: 'Autenticación de inicio de sesión',
         },
         websiteLog: 'Logs de sitio web',
         runLog: 'Logs de ejecución',
@@ -4012,10 +4014,10 @@ const message = {
         noFail: 'El fallo de montaje no afecta al inicio del sistema',
     },
     xpack: {
-        expiresTrialAlert:
-            'Aviso: Tu prueba de la edición comercial expirará en {0} días y todas las funciones comerciales dejarán de estar disponibles. Renueva o actualiza a la versión completa a tiempo.',
-        expiresAlert:
-            'Aviso: Tu licencia la edición comercial expirará en {0} días y todas las funciones comerciales dejarán de estar disponibles. Renueva pronto para asegurar el uso continuo.',
+        expiresEnterpriseAlert:
+            'Aviso: Tu licencia de Enterprise Edition expirará en {0} días y todas las funciones de Enterprise Edition dejarán de estar disponibles. Renueva pronto para asegurar el uso continuo.',
+        expiresProAlert:
+            'Aviso: Tu licencia de Pro Edition expirará en {0} días y todas las funciones de Pro Edition dejarán de estar disponibles. Renueva pronto para asegurar el uso continuo.',
         menu: 'Pro',
         upage: 'Constructor Web con IA',
         proAlert: 'Actualiza a la edición comercial para usar esta función',

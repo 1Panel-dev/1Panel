@@ -248,7 +248,7 @@ onMounted(async () => {
             syncCustomAppstore.value = res.data.status === 'Enable';
         }
     }
-    if (isOffline.value) {
+    if (isOffline.value && !isEnterprise.value) {
         syncCustomAppstore.value = true;
     }
     mainHeight.value = window.innerHeight - 380;

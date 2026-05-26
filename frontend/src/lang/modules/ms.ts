@@ -2051,6 +2051,8 @@ const message = {
             nodes: 'nod',
             commands: 'Perintah Pantas',
             opsReport: 'Laporan Operasi',
+            users: 'Pengurusan pengguna',
+            auth: 'Pengesahan log masuk',
         },
         websiteLog: 'Log Laman Web',
         runLog: 'Log Jalankan',
@@ -4049,10 +4051,10 @@ const message = {
         mountPoint: 'Titik lekap',
     },
     xpack: {
-        expiresTrialAlert:
-            'Peringatan mesra: Percubaan Edisi Komersial anda akan tamat dalam {0} hari, dan semua ciri Edisi Komersial tidak lagi dapat diakses. Sila perbaharui atau naik taraf ke versi penuh tepat pada masanya.',
-        expiresAlert:
-            'Peringatan mesra: Lesen Edisi Komersial anda akan tamat dalam {0} hari, dan semua ciri Edisi Komersial tidak lagi dapat diakses. Sila perbaharui segera untuk memastikan penggunaan berterusan.',
+        expiresEnterpriseAlert:
+            'Peringatan mesra: Lesen Enterprise Edition anda akan tamat dalam {0} hari, dan semua ciri Enterprise Edition tidak lagi dapat diakses. Sila perbaharui segera untuk memastikan penggunaan berterusan.',
+        expiresProAlert:
+            'Peringatan mesra: Lesen Pro Edition anda akan tamat dalam {0} hari, dan semua ciri Pro Edition tidak lagi dapat diakses. Sila perbaharui segera untuk memastikan penggunaan berterusan.',
         menu: 'Pro',
         upage: 'Pembina Laman Web AI',
         proAlert: 'Tingkatkan ke Edisi Komersial untuk menggunakan ciri ini',
