@@ -76,6 +76,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { hasManagePermissionAccess, hasPermissionAccess } from '@/utils/permission';
 const slots = useSlots();
 
 const { isMobile, openMenuTabs } = useGlobalStore();
@@ -164,7 +165,15 @@ const closeRightClick = () => {
 };
 const disabled = computed(() => {
     return function (btn: any) {
-        return typeof btn.disabled === 'function' ? btn.disabled(rightClick.value.currentRow) : btn.disabled;
+        let permissionDisabled = false;
+        if (btn.permission === true) {
+            permissionDisabled = !hasManagePermissionAccess();
+        } else if (btn.permission !== undefined) {
+            permissionDisabled = !hasPermissionAccess(btn.permission);
+        }
+        const buttonDisabled =
+            typeof btn.disabled === 'function' ? btn.disabled(rightClick.value.currentRow) : btn.disabled;
+        return permissionDisabled || buttonDisabled;
     };
 });
 const visibleRightButtons = computed(() => {
