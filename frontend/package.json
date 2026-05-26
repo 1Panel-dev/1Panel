@@ -22,7 +22,7 @@
         "@codemirror/lang-html": "^6.4.10",
         "@codemirror/lang-json": "^6.0.2",
         "@codemirror/lang-php": "^6.0.2",
-        "@codemirror/language": "^6.11.3",
+        "@codemirror/language": "^6.12.3",
         "@codemirror/legacy-modes": "^6.5.3",
         "@codemirror/theme-one-dark": "^6.1.3",
         "@element-plus/icons-vue": "^1.1.4",
