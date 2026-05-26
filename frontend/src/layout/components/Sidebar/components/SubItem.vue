@@ -2,7 +2,7 @@
     <template v-for="subItem in menuList" :key="subItem.name">
         <el-sub-menu v-if="subItem?.children?.length > 1" :index="subItem.path" popper-class="sidebar-container-popper">
             <template #title>
-                <el-icon>
+                <el-icon v-if="subItem.meta?.icon">
                     <SvgIcon :iconName="subItem.meta?.icon as string" />
                 </el-icon>
                 <span>{{ $t(subItem.meta?.title as string, 2) }}</span>
@@ -11,7 +11,7 @@
         </el-sub-menu>
 
         <el-menu-item v-else-if="subItem?.children?.length === 1" :index="subItem.children[0].path">
-            <el-icon>
+            <el-icon v-if="subItem.meta?.icon">
                 <SvgIcon :iconName="subItem.meta?.icon as string" />
             </el-icon>
             <template #title>

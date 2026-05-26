@@ -1025,7 +1025,7 @@ const message = {
             auditLogs: 'Audit Logs',
         },
         skillsHub: {
-            title: 'Kedai Skill',
+            title: 'Skills Hub',
             upload: 'Muat naik Skill',
             importSkill: 'Import Skill',
             repositoryAddress: 'Alamat repositori',

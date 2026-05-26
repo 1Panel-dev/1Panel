@@ -38,7 +38,7 @@
                     </el-link>
                     <el-badge
                         is-dot
-                        v-if="isAdmin && !isOffline"
+                        v-if="isAdmin && !isOffline && !isEE"
                         class="-mt-0.5"
                         :hidden="version === 'Waiting' || !hasNewVersion"
                     >

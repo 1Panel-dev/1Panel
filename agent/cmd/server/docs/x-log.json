@@ -1022,6 +1022,29 @@
 		"formatZH": "更新 AI 网关设置",
 		"formatEN": "update AI proxy settings"
 	},
+	"/core/enterprise/ops-report/download": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "下载运维报表",
+		"formatEN": "download ops report"
+	},
+	"/core/enterprise/ops-report/generate": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "生成运维报表",
+		"formatEN": "generate ops report"
+	},
+	"/core/enterprise/ops-report/setting/update": {
+		"bodyKeys": [
+			"key"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新运维报表设置 [key]",
+		"formatEN": "update ops report setting [key]"
+	},
 	"/core/enterprise/user": {
 		"bodyKeys": [
 			"name"

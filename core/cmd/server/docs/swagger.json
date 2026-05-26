@@ -29953,8 +29953,40 @@
 				"name": {
 					"type": "string"
 				},
+				"nodeRoles": {
+					"items": {
+						"$ref": "#/definitions/dto.CurrentUserNodeRole"
+					},
+					"type": "array"
+				},
+				"permissions": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"role": {
+					"type": "string"
+				},
 				"sessionTimeout": {
 					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.CurrentUserNodeRole": {
+			"properties": {
+				"nodeId": {
+					"type": "integer"
+				},
+				"nodeName": {
+					"type": "string"
+				},
+				"roleId": {
+					"type": "integer"
+				},
+				"roleName": {
+					"type": "string"
 				}
 			},
 			"type": "object"
