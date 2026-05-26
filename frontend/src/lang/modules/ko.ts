@@ -1966,6 +1966,8 @@ const message = {
             nodes: '노드',
             commands: '빠른 명령',
             opsReport: '운영 보고서',
+            users: '사용자 관리',
+            auth: '로그인 인증',
         },
         websiteLog: '웹사이트 로그',
         runLog: '실행 로그',
@@ -3890,10 +3892,10 @@ const message = {
         noFail: '마운트 실패는 시스템 시작에 영향을 미치지 않습니다',
     },
     xpack: {
-        expiresTrialAlert:
-            '친절한 알림: 귀하의 상용 버전 체험판이 {0}일 후 만료되며, 모든 상용 버전 기능에 더 이상 접근할 수 없습니다. 제때 갱신하거나 전체 버전으로 업그레이드하시기 바랍니다.',
-        expiresAlert:
-            '친절한 알림: 귀하의 상용 버전 라이선스가 {0}일 후 만료되며, 모든 상용 버전 기능에 더 이상 접근할 수 없습니다. 지속적인 사용을 위해 신속하게 갱신하시기 바랍니다.',
+        expiresEnterpriseAlert:
+            '친절한 알림: 귀하의 Enterprise Edition 라이선스가 {0}일 후 만료되며, 모든 Enterprise Edition 기능에 더 이상 접근할 수 없습니다. 지속적인 사용을 위해 신속하게 갱신하시기 바랍니다.',
+        expiresProAlert:
+            '친절한 알림: 귀하의 Pro Edition 라이선스가 {0}일 후 만료되며, 모든 Pro Edition 기능에 더 이상 접근할 수 없습니다. 지속적인 사용을 위해 신속하게 갱신하시기 바랍니다.',
         menu: 'Pro',
         upage: 'AI 웹사이트 빌더',
         proAlert: '이 기능을 사용하려면 상용 버전으로 업그레이드하세요',
