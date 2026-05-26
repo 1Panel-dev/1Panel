@@ -1026,7 +1026,7 @@ const message = {
             auditLogs: 'Audit Logs',
         },
         skillsHub: {
-            title: 'Tienda de Skills',
+            title: 'Skills Hub',
             upload: 'Subir Skill',
             importSkill: 'Importar Skill',
             repositoryAddress: 'Dirección del repositorio',

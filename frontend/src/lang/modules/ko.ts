@@ -1000,7 +1000,7 @@ const message = {
             auditLogs: 'Audit Logs',
         },
         skillsHub: {
-            title: 'Skill 스토어',
+            title: 'Skills Hub',
             upload: 'Skill 업로드',
             importSkill: 'Skill 가져오기',
             repositoryAddress: '저장소 주소',

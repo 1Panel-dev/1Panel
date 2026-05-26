@@ -954,7 +954,7 @@ const message = {
             auditLogs: '审计日志',
         },
         skillsHub: {
-            title: 'Skills 商店',
+            title: 'Skills Hub',
             upload: '上传 Skill',
             importSkill: '导入 Skill',
             repositoryAddress: '仓库地址',

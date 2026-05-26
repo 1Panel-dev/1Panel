@@ -406,6 +406,7 @@ import { loadMonacoLanguageSupport, setupMonacoEnvironment } from '@/utils/monac
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { Languages } from '@/global/mimetype';
 import { resolveEditorLanguage } from '@/utils/file';
+import { hasManagePermissionAccess } from '@/utils/permission';
 
 import type { TabPaneName } from 'element-plus';
 import { ElMessageBox, ElTreeV2 } from 'element-plus';
@@ -1005,6 +1006,10 @@ const loadHistoryVersionCount = async (path: string) => {
 };
 
 const saveContent = async () => {
+    if (!hasManagePermissionAccess()) {
+        MsgError(i18n.global.t('commons.res.forbidden'));
+        return;
+    }
     if (isEdit.value) {
         loading.value = true;
         try {

@@ -1023,7 +1023,7 @@ const message = {
             auditLogs: 'Audit Logs',
         },
         skillsHub: {
-            title: 'Skill Mağazası',
+            title: 'Skills Hub',
             upload: 'Skill yükle',
             importSkill: 'Skill içe aktar',
             repositoryAddress: 'Depo adresi',

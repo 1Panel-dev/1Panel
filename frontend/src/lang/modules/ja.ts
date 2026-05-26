@@ -1016,7 +1016,7 @@ const message = {
             auditLogs: 'Audit Logs',
         },
         skillsHub: {
-            title: 'Skill ストア',
+            title: 'Skills Hub',
             upload: 'Skill をアップロード',
             importSkill: 'Skill をインポート',
             repositoryAddress: 'リポジトリアドレス',
