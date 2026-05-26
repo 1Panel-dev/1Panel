@@ -38,7 +38,7 @@ var userListCmd = &cobra.Command{
 }
 
 func listEnterpriseUsers(db *gorm.DB) error {
-	var userModels []enterpriseUserModel
+	var userModels []User
 	if err := db.Order("created_at desc").Find(&userModels).Error; err != nil {
 		return err
 	}
@@ -135,7 +135,7 @@ type enterpriseUserRow struct {
 	CreatedAt  string
 }
 
-type enterpriseUserModel struct {
+type User struct {
 	Name         string
 	MFAStatus    string
 	IsSuperAdmin bool
