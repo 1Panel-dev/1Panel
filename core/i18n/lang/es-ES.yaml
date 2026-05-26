@@ -81,7 +81,7 @@ ErrDeviceLost: "Faltan archivos necesarios para la verificación de licencia, ve
 ErrDeviceErr: "El entorno actual no coincide con el entorno de importación de la licencia. Edite la licencia e impórtela de nuevo"
 ErrXpackTimeout: "Tiempo de espera de la solicitud, puede que la conexión de red sea inestable, intente más tarde"
 ErrUnbindMaster: "Se detectaron nodos en la gestión de nodos, no se puede desvincular la licencia actual, elimine los nodos primero e intente de nuevo"
-ErrFreeNodeLimit: "Se alcanzó el límite de nodos de la edición Community. Ve a www.lxware.cn/1panel para actualizar y vuelve a intentarlo."
+ErrFreeNodeLimit: "Se alcanzó el límite de nodos que se pueden añadir. Compra y vuelve a intentarlo."
 ErrNodeBound: "Esta licencia está vinculada a otro nodo, verifique e intente de nuevo"
 ErrNodeBoundDelete: "Esta licencia está vinculada y no admite operaciones de eliminación. Verifique e intente de nuevo"
 ErrNodeBoundLimit: "El nodo gratuito actual ha alcanzado su límite, verifique e intente de nuevo"

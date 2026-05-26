@@ -75,7 +75,7 @@ ErrDeviceLost: "Arquivos necessários para a verificação da licença estão fa
 ErrDeviceErr: "O ambiente atual não corresponde ao ambiente de importação da licença. Por favor, edite a licença e reimporte"
 ErrXpackTimeout: "Requisição expirou, a conexão de rede pode estar instável, por favor tente novamente mais tarde"
 ErrUnbindMaster: "Foram encontrados nós na gestão de nós, remova-os primeiro e tente novamente"
-ErrFreeNodeLimit: "O limite de nós da edição Community foi atingido. Acesse www.lxware.cn/1panel para fazer upgrade e tente novamente."
+ErrFreeNodeLimit: "O limite de nós que podem ser adicionados foi atingido. Compre e tente novamente."
 ErrNodeBound: "Esta licença já está vinculada a outro nó, por favor verifique e tente novamente"
 ErrNodeBoundDelete: "Esta licença está vinculada e não suporta operações de exclusão. Por favor, verifique e tente novamente"
 ErrNodeBoundLimit: "O nó gratuito atual atingiu seu limite, por favor verifique e tente novamente"

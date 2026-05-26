@@ -74,7 +74,7 @@ ErrEnterpriseLicenseRequired: "Enterprise Edition lisansı içe aktarılmamış.
 ErrDeviceLost: "Lisans doğrulama için gerekli dosyalar eksik, lütfen kontrol edip tekrar deneyin"
 ErrXpackTimeout: "İstek zaman aşımı, ağ bağlantısı kararsız olabilir, lütfen daha sonra tekrar deneyin"
 ErrUnbindMaster: "Düğüm yönetiminde düğümler tespit edildi, mevcut lisansın bağı çözülemiyor, lütfen önce düğümleri kaldırın ve tekrar deneyin"
-ErrFreeNodeLimit: "Community Sürümü düğüm sınırına ulaşıldı. www.lxware.cn/1panel üzerinden yükseltip tekrar deneyin"
+ErrFreeNodeLimit: "Eklenebilecek düğüm sayısı sınırına ulaşıldı. Satın aldıktan sonra tekrar deneyin."
 ErrNodeBound: "Bu lisans başka bir düğüme bağlı, lütfen kontrol edip tekrar deneyin"
 ErrNodeBoundDelete: "Bu lisans bağlı ve silme işlemlerini desteklemiyor. Lütfen kontrol edip tekrar deneyin"
 ErrNodeBoundLimit: "Mevcut ücretsiz düğüm limitine ulaştı, lütfen kontrol edip tekrar deneyin"

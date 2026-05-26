@@ -81,7 +81,7 @@ ErrDeviceLost: "Required files for license verification are missing, check and t
 ErrDeviceErr: "Current environment does not match the license import environment. Edit the license and re-import."
 ErrXpackTimeout: "Request timeout, network connection might be unstable, try again later!"
 ErrUnbindMaster: "Nodes exist in node management. Remove nodes first, then unbind the current license."
-ErrFreeNodeLimit: "Community Edition node limit reached. Visit www.lxware.cn/1panel to upgrade and try again."
+ErrFreeNodeLimit: "The number of nodes that can be added has reached the limit. Purchase and try again."
 ErrNodeBound: "This license is bound to another node, check and retry!"
 ErrNodeBoundDelete: "This license is bound and does not support delete operations. Check and try again!"
 ErrNodeBoundLimit: "The current free node has reached its limit, check and try again!"
