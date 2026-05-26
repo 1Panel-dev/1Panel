@@ -1,6 +1,6 @@
 import router from '@/routers';
 import { GlobalStore } from '@/store';
-import { normalizeToManageCode } from '@/utils/permission-codes';
+import { isMasterOnlyPermissionCode, normalizeToManageCode } from '@/utils/permission-codes';
 
 export type PermissionBindingValue = string | string[] | undefined;
 export type PermissionMode = 'manage' | 'view';
@@ -52,6 +52,14 @@ const hasPermissionAccessByMode = (mode: PermissionMode, value?: PermissionBindi
     const normalizedPermissions = mode === 'manage' ? permissions.map(toManagePermission).filter(Boolean) : permissions;
     if (normalizedPermissions.length === 0) {
         return globalStore.isAdmin || globalStore.isNodeAdmin;
+    }
+    if (
+        mode === 'manage' &&
+        globalStore.isNodeAdmin &&
+        !globalStore.isMaster &&
+        normalizedPermissions.some((permission) => !isMasterOnlyPermissionCode(permission))
+    ) {
+        return true;
     }
     return normalizedPermissions.some((permission) => globalStore.hasPermission(permission));
 };
