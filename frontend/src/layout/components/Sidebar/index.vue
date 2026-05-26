@@ -98,7 +98,7 @@ const search = async () => {
     }
 
     if (!settingInfo?.hideMenu) {
-        setFallbackMenuListIfEmpty();
+        setDefaultMenuList();
         return;
     }
 
@@ -108,7 +108,7 @@ const search = async () => {
             menuStore.setMenuList(rstMenuList);
         }
     } catch (error) {
-        setFallbackMenuListIfEmpty();
+        setDefaultMenuList();
     }
 };
 
@@ -116,16 +116,14 @@ function isSameMenuList(source: RouteRecordRaw[], target: RouteRecordRaw[]) {
     return JSON.stringify(source) === JSON.stringify(target);
 }
 
-function setFallbackMenuListIfEmpty() {
-    if (!menuStore.menuList || menuStore.menuList.length === 0) {
-        menuStore.setMenuList(buildAuthVisibleMenuList(menuList));
+function setDefaultMenuList() {
+    const rstMenuList = buildAuthVisibleMenuList(menuList);
+    if (!isSameMenuList(menuStore.menuList as RouteRecordRaw[], rstMenuList)) {
+        menuStore.setMenuList(rstMenuList);
     }
 }
 
 function allowMenuItem(item: RouteRecordRaw) {
-    if (isAdmin.value) {
-        return true;
-    }
     if (!hasRouteRoleAccess(item.meta)) {
         return false;
     }
@@ -273,13 +271,13 @@ function adjustAndCleanMenu(menuItem, list) {
 
 onMounted(() => {
     if (!menuStore.menuList || menuStore.menuList.length === 0) {
-        menuStore.setMenuList(isAdmin.value ? menuList : buildAuthVisibleMenuList(menuList));
+        menuStore.setMenuList(buildAuthVisibleMenuList(menuList));
     }
     search();
 });
 
 watch(
-    () => [currentNode.value, permissions.value.join('|')],
+    () => [currentNode.value, isAdmin.value, permissions.value.join('|')],
     () => {
         search();
     },

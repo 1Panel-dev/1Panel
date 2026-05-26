@@ -19,12 +19,12 @@
                 <template #main>
                     <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="320">
                         <el-table-column :label="$t('logs.taskName')" prop="name" min-width="180px"></el-table-column>
-                        <el-table-column :label="$t('commons.table.status')" prop="status" max-width="100px">
+                        <el-table-column :label="$t('commons.table.status')" prop="status" max-width="80px">
                             <template #default="{ row }">
                                 <Status :status="row.status" :msg="row.errorMsg" />
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('commons.button.log')" prop="log" max-width="100px">
+                        <el-table-column :label="$t('commons.button.log')" prop="log" max-width="80px">
                             <template #default="{ row }">
                                 <el-button @click="openTaskLog(row)" link type="primary">
                                     {{ $t('website.check') }}
@@ -32,6 +32,7 @@
                             </template>
                         </el-table-column>
                         <el-table-column
+                            width="180px"
                             prop="createdAt"
                             :label="$t('commons.table.date')"
                             :formatter="dateFormat"

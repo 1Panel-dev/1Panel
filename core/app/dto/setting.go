@@ -46,11 +46,6 @@ type SettingInfo struct {
 	ProxyUser       string `json:"proxyUser"`
 	ProxyPasswd     string `json:"proxyPasswd"`
 	ProxyPasswdKeep string `json:"proxyPasswdKeep"`
-
-	OpsReportExportFormat string `json:"opsReportExportFormat"`
-	OpsReportSchedule     string `json:"opsReportSchedule"`
-	OpsReportSavePath     string `json:"opsReportSavePath"`
-	OpsReportThreshold    string `json:"opsReportThreshold"`
 }
 
 type SettingBaseInfo struct {
