@@ -110,22 +110,98 @@ func (u *SSHService) OperateSSH(operation string) error {
 	if err != nil {
 		return err
 	}
-	if operation == "enable" || operation == "disable" {
-		serviceName += ".service"
-	}
-	if operation == "stop" {
-		isSocketActive, _ := controller.CheckActive(serviceName + ".socket")
-		if isSocketActive {
-			if err := controller.HandleStop(serviceName + ".socket"); err != nil {
-				global.LOG.Errorf("handle stop %s.socket failed, err: %v", serviceName, err)
-			}
+	switch operation {
+	case "start", "restart":
+		if err := stopSSHSocketIfActive(serviceName); err != nil {
+			return err
 		}
+	case "stop":
+		if err := stopSSHSocketIfActive(serviceName); err != nil {
+			return err
+		}
+	case "enable", "disable":
+		if operation == "disable" {
+			if err := disableSSHSocket(serviceName, false); err != nil {
+				return err
+			}
+		} else {
+			if err := disableSSHSocket(serviceName, false); err != nil {
+				return err
+			}
+			if err := controller.Handle("enable", serviceName+".service"); err != nil {
+				return fmt.Errorf("enable %s.service failed, err: %v", serviceName, err)
+			}
+			return nil
+		}
+		serviceName += ".service"
 	}
 
 	if err := controller.Handle(operation, serviceName); err != nil {
 		return fmt.Errorf("%s %s failed, err: %v", operation, serviceName, err)
 	}
 	return nil
+}
+
+func restartSSHService(serviceName string) error {
+	if err := stopSSHSocketIfActive(serviceName); err != nil {
+		return err
+	}
+	if err := controller.HandleRestart(serviceName); err != nil {
+		return fmt.Errorf("restart %s failed, err: %v", serviceName, err)
+	}
+	return nil
+}
+
+func stopSSHSocketIfActive(serviceName string) error {
+	for _, socketName := range loadSSHSocketNames(serviceName) {
+		active, _ := controller.CheckActive(socketName)
+		if !active {
+			continue
+		}
+		if err := controller.HandleStop(socketName); err != nil {
+			return fmt.Errorf("stop %s failed, err: %v", socketName, err)
+		}
+	}
+	return nil
+}
+
+func disableSSHSocket(serviceName string, stopActive bool) error {
+	if stopActive {
+		if err := stopSSHSocketIfActive(serviceName); err != nil {
+			return err
+		}
+	}
+	for _, socketName := range loadSSHSocketNames(serviceName) {
+		if err := controller.Handle("disable", socketName); err != nil {
+			return fmt.Errorf("disable %s failed, err: %v", socketName, err)
+		}
+	}
+	return nil
+}
+
+func loadSSHSocketNames(serviceName string) []string {
+	baseName := strings.TrimSuffix(serviceName, ".service")
+	candidates := []string{baseName + ".socket"}
+	switch baseName {
+	case "ssh":
+		candidates = append(candidates, "sshd.socket")
+	case "sshd":
+		candidates = append(candidates, "ssh.socket")
+	}
+
+	seen := map[string]struct{}{}
+	var sockets []string
+	for _, candidate := range candidates {
+		if _, ok := seen[candidate]; ok {
+			continue
+		}
+		seen[candidate] = struct{}{}
+		exist, _ := controller.CheckExist(candidate)
+		if exist {
+			sockets = append(sockets, candidate)
+		}
+	}
+	return sockets
 }
 
 func (u *SSHService) Update(req dto.SSHUpdate) error {
@@ -146,8 +222,7 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 		handleSSHPortUpdate(oldPortValue, req.NewValue)
 	}
 
-	_ = controller.HandleRestart(serviceName)
-	return nil
+	return restartSSHService(serviceName)
 }
 
 func loadSSHServiceStatus(data *dto.SSHInfo) {
@@ -159,17 +234,37 @@ func loadSSHServiceStatus(data *dto.SSHInfo) {
 	}
 
 	active, err := controller.CheckActive(serviceName)
-	data.IsActive = active
+	data.IsActive = active || hasActiveSSHSocket(serviceName)
 	if !active && err != nil {
 		data.Message = err.Error()
 	}
 
 	enable, err := controller.CheckEnable(serviceName)
 	if err != nil {
-		data.AutoStart = false
+		data.AutoStart = hasEnabledSSHSocket(serviceName)
 		return
 	}
-	data.AutoStart = enable
+	data.AutoStart = enable || hasEnabledSSHSocket(serviceName)
+}
+
+func hasActiveSSHSocket(serviceName string) bool {
+	for _, socketName := range loadSSHSocketNames(serviceName) {
+		active, _ := controller.CheckActive(socketName)
+		if active {
+			return true
+		}
+	}
+	return false
+}
+
+func hasEnabledSSHSocket(serviceName string) bool {
+	for _, socketName := range loadSSHSocketNames(serviceName) {
+		enable, _ := controller.CheckEnable(socketName)
+		if enable {
+			return true
+		}
+	}
+	return false
 }
 
 func loadSSHConfigInfo(data *dto.SSHInfo) {
@@ -723,8 +818,7 @@ func (u *SSHService) UpdateByFile(req dto.SSHConfUpdate) error {
 	if err != nil {
 		return err
 	}
-	_ = controller.HandleRestart(serviceName)
-	return nil
+	return restartSSHService(serviceName)
 }
 
 func sortFileList(fileNames []sshFileItem) []sshFileItem {
