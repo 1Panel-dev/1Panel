@@ -3702,6 +3702,9 @@ const message = {
             setting: '設置',
             page: {
                 enterprise: '企業版',
+                reportNode: '報表節點',
+                selectReportNode: '選擇報表節點',
+                currentNode: '當前節點',
                 scoreMeta: '扣分 {0} 分 · 風險 {1} 項',
                 hostAddress: '主機地址',
                 panelVersion: '面板版本',
@@ -3913,7 +3916,7 @@ const message = {
                 alertFailedLogs: '失敗告警日誌',
                 alertPendingLogs: '待同步日誌',
                 alertPending: '待同步',
-                alertTaskTypeStats: '告警類型統計',
+                alertTaskStats: '告警任務統計',
                 alertTaskType: '告警類型',
                 alertLogStatusStats: '告警執行狀態',
                 alertHealthNormal: '正常',

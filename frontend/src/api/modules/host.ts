@@ -62,28 +62,50 @@ export const operateFilterChain = (name: string, op: string) => {
 };
 
 // monitors
-export const loadMonitor = (param: Host.MonitorSearch) => {
-    return http.post<Array<Host.MonitorData>>(`/hosts/monitor/search`, param);
+export const loadMonitor = (param: Host.MonitorSearch, currentNode?: string) => {
+    return http.post<Array<Host.MonitorData>>(
+        `/hosts/monitor/search`,
+        param,
+        TimeoutEnum.T_60S,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
-export const getNetworkOptions = () => {
-    return http.get<Array<string>>(`/hosts/monitor/netoptions`);
+export const getNetworkOptions = (currentNode?: string) => {
+    return http.get<Array<string>>(
+        `/hosts/monitor/netoptions`,
+        {},
+        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+    );
 };
-export const getIOOptions = () => {
-    return http.get<Array<string>>(`/hosts/monitor/iooptions`);
+export const getIOOptions = (currentNode?: string) => {
+    return http.get<Array<string>>(
+        `/hosts/monitor/iooptions`,
+        {},
+        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+    );
 };
 export const cleanMonitors = () => {
     return http.post(`/hosts/monitor/clean`, {});
 };
-export const loadMonitorSetting = () => {
-    return http.get<Host.MonitorSetting>(`/hosts/monitor/setting`, {});
+export const loadMonitorSetting = (currentNode?: string) => {
+    return http.get<Host.MonitorSetting>(
+        `/hosts/monitor/setting`,
+        {},
+        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+    );
 };
 export const updateMonitorSetting = (key: string, value: string) => {
     return http.post(`/hosts/monitor/setting/update`, { key: key, value: value });
 };
 
 // ssh
-export const getSSHInfo = () => {
-    return http.post<Host.SSHInfo>(`/hosts/ssh/search`);
+export const getSSHInfo = (currentNode?: string) => {
+    return http.post<Host.SSHInfo>(
+        `/hosts/ssh/search`,
+        {},
+        undefined,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 export const operateSSH = (operation: string) => {
     return http.post(`/hosts/ssh/operate`, { operation: operation }, TimeoutEnum.T_40S);
@@ -116,8 +138,13 @@ export const deleteCert = (ids: Array<number>, forceDelete: boolean) => {
 export const syncCert = () => {
     return http.post(`/hosts/ssh/cert/sync`);
 };
-export const loadSSHLogs = (params: Host.searchSSHLog) => {
-    return http.post<ResPage<Host.sshHistory>>(`/hosts/ssh/log`, params);
+export const loadSSHLogs = (params: Host.searchSSHLog, currentNode?: string) => {
+    return http.post<ResPage<Host.sshHistory>>(
+        `/hosts/ssh/log`,
+        params,
+        undefined,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 export const exportSSHLogs = (params: Host.searchSSHLog) => {
     return http.post<string>(`/hosts/ssh/log/export`, params, TimeoutEnum.T_40S);

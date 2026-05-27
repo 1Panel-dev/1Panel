@@ -47,8 +47,13 @@ export const deleteCronjob = (params: Cronjob.CronjobDelete) => {
     return http.post(`/cronjobs/del`, params);
 };
 
-export const searchRecords = (params: Cronjob.SearchRecord, timeout?: TimeoutEnum) => {
-    return http.post<ResPage<Cronjob.Record>>(`cronjobs/search/records`, params, timeout);
+export const searchRecords = (params: Cronjob.SearchRecord, timeout?: TimeoutEnum, currentNode?: string) => {
+    return http.post<ResPage<Cronjob.Record>>(
+        `cronjobs/search/records`,
+        params,
+        timeout,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 
 export const stopCronjob = (id: number) => {

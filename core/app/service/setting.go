@@ -113,15 +113,6 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	return &info, err
 }
 
-func defaultOpsReportSavePath() string {
-	return path.Join(global.CONF.Base.InstallDir, constant.OpsReportDefaultSaveSubDir)
-}
-
-func isValidOpsReportThreshold(value string) bool {
-	threshold, err := strconv.Atoi(strings.TrimSpace(value))
-	return err == nil && threshold >= 1 && threshold <= 100
-}
-
 func (u *SettingService) GetSettingBaseInfo() (*dto.SettingBaseInfo, error) {
 	setting, err := settingRepo.List()
 	if err != nil {

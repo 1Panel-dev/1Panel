@@ -68,8 +68,13 @@ export const stopDeCompressFile = (taskID: string) => {
     return http.post('files/decompress/stop', { taskID } as File.FileDeCompressStopReq);
 };
 
-export const getFileContent = (params: File.ReqFile) => {
-    return http.post<File.File>('files/content', params);
+export const getFileContent = (params: File.ReqFile, currentNode?: string) => {
+    return http.post<File.File>(
+        `files/content`,
+        params,
+        TimeoutEnum.T_3M,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 
 export const getPreviewContent = (params: File.PreviewContentReq) => {

@@ -110,8 +110,13 @@ export const updateAcmeAccount = (req: Website.AcmeAccountUpdate) => {
     return http.post<Website.AcmeAccount>(`/websites/acme/update`, req, TimeoutEnum.T_10M);
 };
 
-export const searchSSL = (req: ReqPage) => {
-    return http.post<ResPage<Website.SSLDTO>>(`/websites/ssl/search`, req);
+export const searchSSL = (req: ReqPage, currentNode?: string) => {
+    return http.post<ResPage<Website.SSLDTO>>(
+        `/websites/ssl/search`,
+        req,
+        TimeoutEnum.T_40S,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 
 export const listSSL = (req: Website.SSLReq) => {

@@ -195,8 +195,8 @@ export namespace Cronjob {
     }
     export interface SearchRecord extends ReqPage {
         cronjobID: number;
-        startTime: Date;
-        endTime: Date;
+        startTime: string | Date;
+        endTime: string | Date;
         status: string;
     }
     export interface Record {

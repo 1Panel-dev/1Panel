@@ -21,12 +21,20 @@ export const changeLauncherStatus = (key: string, val: string) => {
     return http.post(`/dashboard/app/launcher/show`, { key: key, value: val });
 };
 
-export const loadBaseInfo = (ioOption: string, netOption: string) => {
-    return http.get<Dashboard.BaseInfo>(`/dashboard/base/${ioOption}/${netOption}`);
+export const loadBaseInfo = (ioOption: string, netOption: string, currentNode?: string) => {
+    return http.get<Dashboard.BaseInfo>(
+        `/dashboard/base/${ioOption}/${netOption}`,
+        {},
+        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+    );
 };
 
-export const loadCurrentInfo = (ioOption: string, netOption: string) => {
-    return http.get<Dashboard.CurrentInfo>(`/dashboard/current/${ioOption}/${netOption}`);
+export const loadCurrentInfo = (ioOption: string, netOption: string, currentNode?: string) => {
+    return http.get<Dashboard.CurrentInfo>(
+        `/dashboard/current/${ioOption}/${netOption}`,
+        {},
+        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+    );
 };
 
 export const loadTopCPU = () => {

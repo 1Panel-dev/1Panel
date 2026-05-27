@@ -4063,6 +4063,9 @@ const message = {
             setting: 'Ayarlar',
             page: {
                 enterprise: 'Enterprise',
+                reportNode: 'Report Node',
+                selectReportNode: 'Select report node',
+                currentNode: 'Current',
                 scoreMeta: '{0} points deducted · {1} risks',
                 hostAddress: 'Host Address',
                 panelVersion: 'Panel Version',
@@ -4279,7 +4282,7 @@ const message = {
                 alertFailedLogs: 'Failed Alert Logs',
                 alertPendingLogs: 'Pending Sync Logs',
                 alertPending: 'Pending Sync',
-                alertTaskTypeStats: 'Alert Type Statistics',
+                alertTaskStats: 'Alert Task Statistics',
                 alertTaskType: 'Alert Type',
                 alertLogStatusStats: 'Alert Execution Status',
                 alertHealthNormal: 'Normal',

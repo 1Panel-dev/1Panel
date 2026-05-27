@@ -53,6 +53,9 @@ func (u *LogService) PageLoginLog(ctx *gin.Context, req dto.SearchLgLogWithPage)
 	if len(req.Status) != 0 {
 		options = append(options, repo.WithByStatus(req.Status))
 	}
+	if !req.StartTime.IsZero() && !req.EndTime.IsZero() {
+		options = append(options, repo.WithByCreatedAt(req.StartTime, req.EndTime))
+	}
 	total, ops, err := logRepo.PageLoginLog(
 		req.Page,
 		req.PageSize,
