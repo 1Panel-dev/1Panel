@@ -17,7 +17,7 @@ type ILogRepo interface {
 	CreateOperationLog(user *model.OperationLog) error
 	PageOperationLog(limit, offset int, opts ...global.DBOption) (int64, []model.OperationLog, error)
 
-	WithByIP(ip string) global.DBOption
+	WithByInfo(info string) global.DBOption
 	WithBySource(source string) global.DBOption
 	WithByLikeOperation(operation string) global.DBOption
 }
@@ -82,9 +82,13 @@ func (c *LogRepo) WithBySource(source string) global.DBOption {
 		return g.Where("source = ?", source)
 	}
 }
-func (c *LogRepo) WithByIP(ip string) global.DBOption {
+func (c *LogRepo) WithByInfo(info string) global.DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("ip LIKE ?", "%"+ip+"%")
+		if len(info) == 0 {
+			return g
+		}
+		infoStr := "%" + info + "%"
+		return g.Where("ip LIKE ? OR user LIKE ?", infoStr, infoStr)
 	}
 }
 

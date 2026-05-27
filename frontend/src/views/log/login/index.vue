@@ -16,13 +16,14 @@
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                     <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                 </el-select>
-                <TableSearch @search="search()" v-model:searchName="searchIP" />
+                <TableSearch @search="search()" v-model:searchName="searchInfo" />
                 <TableRefresh @search="search()" />
                 <TableSetting title="login-log-refresh" @search="search()" />
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="370">
                     <el-table-column :label="$t('logs.loginIP')" prop="ip" />
+                    <el-table-column v-if="isEnterprise" :label="$t('commons.login.username')" prop="user" />
                     <el-table-column :label="$t('logs.loginAddress')" prop="address" />
                     <el-table-column :label="$t('logs.loginAgent')" show-overflow-tooltip prop="agent" />
                     <el-table-column :label="$t('logs.loginStatus')" prop="status">
@@ -51,6 +52,9 @@ import { cleanLogs, getLoginLogs } from '@/api/modules/log';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isEnterprise } = useGlobalStore();
 
 const loading = ref();
 const data = ref();
@@ -61,12 +65,12 @@ const paginationConfig = reactive({
     pageSize: Number(localStorage.getItem('login-log-page-size')) || 20,
     total: 0,
 });
-const searchIP = ref<string>('');
+const searchInfo = ref<string>('');
 const searchStatus = ref<string>('');
 
 const search = async () => {
     let params = {
-        ip: searchIP.value,
+        info: searchInfo.value,
         status: searchStatus.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,

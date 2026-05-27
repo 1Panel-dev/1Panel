@@ -61,7 +61,7 @@ func (b *BaseApi) Login(c *gin.Context) {
 
 	user, msgKey, err := xpack.AuthProvider.Login(c, req, string(entrance))
 	if user == nil || user.MfaStatus != constant.StatusEnable {
-		go saveLoginLogs(c, wrapLoginErr(msgKey, err))
+		go saveLoginLogs(c, req.Name, wrapLoginErr(msgKey, err))
 	}
 	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
 		if msgKey == "ErrAuth" {
@@ -108,7 +108,7 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 	}
 
 	user, msgKey, err := xpack.AuthProvider.MFALogin(c, req, string(entrance))
-	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
+	go saveLoginLogs(c, loginLogUserName(user, req.SessionID), wrapLoginErr(msgKey, err))
 	if msgKey == "ErrMFA" {
 		global.IPTracker.RecordFailure(ip)
 		failures := initauth.GetMFASessionStore().RecordFailure(req.SessionID)
@@ -163,7 +163,7 @@ func (b *BaseApi) PasskeyFinishLogin(c *gin.Context) {
 	sessionID := c.GetHeader("Passkey-Session")
 	entrance := loadEntranceFromRequest(c)
 	user, msgKey, err := xpack.AuthProvider.PasskeyFinishLogin(c, sessionID, entrance)
-	go saveLoginLogs(c, wrapLoginErr(msgKey, err))
+	go saveLoginLogs(c, loginLogUserName(user, ""), wrapLoginErr(msgKey, err))
 	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
 		if msgKey == "ErrAuth" {
 			global.IPTracker.SetNeedCaptcha(common.GetRealClientIP(c))
@@ -500,7 +500,7 @@ func (b *BaseApi) ResetPassword(c *gin.Context) {
 	helper.Success(c)
 }
 
-func saveLoginLogs(c *gin.Context, err error) {
+func saveLoginLogs(c *gin.Context, userName string, err error) {
 	var logs model.LoginLog
 	if err != nil {
 		logs.Status = constant.StatusFailed
@@ -509,8 +509,22 @@ func saveLoginLogs(c *gin.Context, err error) {
 		logs.Status = constant.StatusSuccess
 	}
 	logs.IP = c.ClientIP()
+	logs.User = userName
 	logs.Agent = c.GetHeader("User-Agent")
 	_ = logService.CreateLoginLog(logs)
+}
+
+func loginLogUserName(user *dto.UserLoginInfo, mfaSessionID string) string {
+	if user != nil {
+		return user.Name
+	}
+	if mfaSessionID == "" {
+		return ""
+	}
+	if session, ok := initauth.GetMFASessionStore().Get(mfaSessionID); ok {
+		return session.Name
+	}
+	return ""
 }
 
 func wrapLoginErr(msgKey string, err error) error {
