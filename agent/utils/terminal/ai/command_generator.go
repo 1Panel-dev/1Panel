@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"unicode"
 )
 
 type CommandGenerator struct {
@@ -179,7 +180,7 @@ func isSingleLinePrintableCommand(command string) bool {
 		return false
 	}
 	for _, r := range command {
-		if r < 0x20 || r == 0x7f {
+		if unicode.IsControl(r) || unicode.In(r, unicode.Cf) {
 			return false
 		}
 	}

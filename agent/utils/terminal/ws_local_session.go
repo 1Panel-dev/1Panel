@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
@@ -217,9 +218,7 @@ func buildAIPastePayload(generated string) ([]byte, error) {
 	if err := validateTerminalInputPayload([]byte(generated)); err != nil {
 		return nil, err
 	}
-	payload = append(payload, []byte("\x1b[200~")...)
 	payload = append(payload, []byte(generated)...)
-	payload = append(payload, []byte("\x1b[201~")...)
 	return payload, nil
 }
 
@@ -231,7 +230,7 @@ func validateTerminalInputPayload(cmdBytes []byte) error {
 		return fmt.Errorf("empty terminal input payload")
 	}
 	for _, r := range string(cmdBytes) {
-		if r == '\n' || r == '\r' || r == 0 || r == 0x1b || r < 0x20 || r == 0x7f {
+		if unicode.IsControl(r) || unicode.In(r, unicode.Cf) {
 			return fmt.Errorf("terminal input payload contains control characters")
 		}
 	}
