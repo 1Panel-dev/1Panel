@@ -16,7 +16,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
-	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 	"gopkg.in/yaml.v3"
@@ -92,6 +91,13 @@ type serverConfig struct {
 	} `yaml:"base"`
 }
 
+type Node struct {
+	Name          string `gorm:"column:name"`
+	Addr          string `gorm:"column:addr"`
+	IsAutoUpgrade bool   `gorm:"column:is_auto_upgrade"`
+	Status        string `gorm:"column:status"`
+}
+
 func isEnterprise() bool {
 	var config serverConfig
 	if err := yaml.Unmarshal(conf.AppYaml, &config); err != nil {
@@ -158,7 +164,26 @@ var updateVersion = &cobra.Command{
 			fmt.Println(i18n.GetMsgWithMapForCmd("UpdateUserErr", map[string]interface{}{"err": err.Error()}))
 			return err
 		}
-		xpack.MultiNodeProvider.AutoUpgradeWithMaster()
+
+		xpackDB, err := loadDBConn("xpack.db")
+		if err != nil {
+			return nil
+		}
+		var nodes []Node
+		if err := xpackDB.Where("is_auto_upgrade = ? AND name != ?", true, "local").Find(&nodes).Error; err != nil {
+			fmt.Println(i18n.GetMsgWithMapForCmd("LoadAutoUpgradeNodesFailed", map[string]interface{}{"err": err.Error()}))
+		}
+		var nodeNames []string
+		for _, item := range nodes {
+			nodeNames = append(nodeNames, fmt.Sprintf("%s-%s", item.Name, item.Addr))
+		}
+		fmt.Println(i18n.GetMsgWithMapForCmd("AutoUpgradeNodes", map[string]interface{}{"nodes": strings.Join(nodeNames, ", ")}))
+		if err := xpackDB.Model(&Node{}).
+			Where("is_auto_upgrade = ? AND name != ?", true, "local").
+			Updates(map[string]interface{}{"status": constant.StatusWaitForUpgrade}).
+			Error; err != nil {
+			fmt.Println(i18n.GetMsgWithMapForCmd("UpdateAutoUpgradeNodesStatusFailed", map[string]interface{}{"err": err.Error()}))
+		}
 		return nil
 	},
 }

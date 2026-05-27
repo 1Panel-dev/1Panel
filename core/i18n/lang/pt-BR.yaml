@@ -173,6 +173,9 @@ NewSSHClient: "Inicializando a conexão SSH"
 BackupBeforeUpgrade: "Fazer backup dos dados antes da atualização"
 UploadUpgradeFile: "Distribuir arquivos necessários para a atualização"
 RestartAfterUpgrade: "Iniciar serviço após a atualização"
+LoadAutoUpgradeNodesFailed: "Falha ao carregar nós de atualização automática, erro: {{ .err }}"
+AutoUpgradeNodes: "Nós de atualização automática: {{ .nodes }}"
+UpdateAutoUpgradeNodesStatusFailed: "Falha ao atualizar o status dos nós de atualização automática, erro: {{ .err }}"
 
 #add node
 MasterData: "Dados do Nó Mestre"

@@ -168,6 +168,9 @@ NewSSHClient: "Memulakan sambungan SSH"
 BackupBeforeUpgrade: "Menyandarkan data sebelum naik taraf"
 UploadUpgradeFile: "Sebarkan fail naik taraf"
 RestartAfterUpgrade: "Mulakan perkhidmatan selepas naik taraf"
+LoadAutoUpgradeNodesFailed: "Gagal memuatkan nod naik taraf automatik, ralat: {{ .err }}"
+AutoUpgradeNodes: "Nod naik taraf automatik: {{ .nodes }}"
+UpdateAutoUpgradeNodesStatusFailed: "Gagal mengemas kini status nod naik taraf automatik, ralat: {{ .err }}"
 
 #add node
 MasterData: "Data Nod Master"

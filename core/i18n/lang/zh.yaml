@@ -182,6 +182,9 @@ NewSSHClient: "初始化 SSH 连接"
 BackupBeforeUpgrade: "升级前备份数据"
 UploadUpgradeFile: "下发升级所需文件"
 RestartAfterUpgrade: "升级后启动服务"
+LoadAutoUpgradeNodesFailed: "加载自动升级节点失败，错误: {{ .err }}"
+AutoUpgradeNodes: "自动升级节点: {{ .nodes }}"
+UpdateAutoUpgradeNodesStatusFailed: "更新自动升级节点状态失败，错误: {{ .err }}"
 
 #add node
 MasterData: "主节点数据"

@@ -174,6 +174,9 @@ NewSSHClient: "SSH接続の初期化"
 BackupBeforeUpgrade: "アップグレード前にデータをバックアップ"
 UploadUpgradeFile: "アップグレードに必要なファイルを配布"
 RestartAfterUpgrade: "アップグレード後にサービスを起動"
+LoadAutoUpgradeNodesFailed: "自動アップグレードノードの読み込みに失敗しました、エラー: {{ .err }}"
+AutoUpgradeNodes: "自動アップグレードノード: {{ .nodes }}"
+UpdateAutoUpgradeNodesStatusFailed: "自動アップグレードノードのステータス更新に失敗しました、エラー: {{ .err }}"
 
 #add node
 MasterData: "マスターノードデータ"

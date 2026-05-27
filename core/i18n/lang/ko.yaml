@@ -173,6 +173,9 @@ NewSSHClient: "SSH 연결 초기화"
 BackupBeforeUpgrade: "업그레이드 전 데이터 백업"
 UploadUpgradeFile: "업그레이드에 필요한 파일 전송"
 RestartAfterUpgrade: "업그레이드 후 서비스 시작"
+LoadAutoUpgradeNodesFailed: "자동 업그레이드 노드 로드 실패, 오류: {{ .err }}"
+AutoUpgradeNodes: "자동 업그레이드 노드: {{ .nodes }}"
+UpdateAutoUpgradeNodesStatusFailed: "자동 업그레이드 노드 상태 업데이트 실패, 오류: {{ .err }}"
 
 #add node
 MasterData: "마스터 노드 데이터"

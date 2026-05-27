@@ -172,6 +172,9 @@ NewSSHClient: "Инициализация SSH-соединения"
 BackupBeforeUpgrade: "Резервное копирование данных перед обновлением"
 UploadUpgradeFile: "Распределение файлов обновления"
 RestartAfterUpgrade: "Запуск службы после обновления"
+LoadAutoUpgradeNodesFailed: "Не удалось загрузить узлы автообновления, ошибка: {{ .err }}"
+AutoUpgradeNodes: "Узлы автообновления: {{ .nodes }}"
+UpdateAutoUpgradeNodesStatusFailed: "Не удалось обновить статус узлов автообновления, ошибка: {{ .err }}"
 
 #add node
 MasterData: "Данные главного узла"

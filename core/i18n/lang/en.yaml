@@ -180,6 +180,9 @@ NewSSHClient: "Initializing SSH connection"
 BackupBeforeUpgrade: "Backup data before upgrade"
 UploadUpgradeFile: "Distribute upgrade files"
 RestartAfterUpgrade: "Start service after upgrade"
+LoadAutoUpgradeNodesFailed: "Load auto upgrade nodes failed, err: {{ .err }}"
+AutoUpgradeNodes: "Auto upgrade nodes: {{ .nodes }}"
+UpdateAutoUpgradeNodesStatusFailed: "Update status of auto upgrade nodes failed, err: {{ .err }}"
 
 #add node
 MasterData: "Master Node Data"
