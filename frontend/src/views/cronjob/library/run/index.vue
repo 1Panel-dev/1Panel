@@ -45,7 +45,7 @@ const initTerm = async () => {
     await nextTick();
     terminalRef.value!.acceptParams({
         endpoint: '/api/v2/core/script/run',
-        args: `script_id=${scriptID.value}&current_node=${currentNode.value}`,
+        args: `script_id=${scriptID.value}&operateNode=${currentNode.value}`,
         error: '',
         initCmd: '',
     });
