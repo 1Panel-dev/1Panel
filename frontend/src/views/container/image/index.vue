@@ -143,7 +143,7 @@
             </template>
         </DialogPro>
 
-        <OpDialog ref="opRef" @search="search" />
+        <OpDialog ref="opRef" @submit="onSubmitDelete" />
         <Pull ref="dialogPullRef" @search="search" />
         <Tag ref="dialogTagRef" @search="search" />
         <Push ref="dialogPushRef" @search="search" />
@@ -152,7 +152,7 @@
         <Build ref="dialogBuildRef" @search="search" />
         <Delete ref="dialogDeleteRef" @search="search" />
         <Prune ref="dialogPruneRef" @search="search" />
-        <TaskLog ref="taskLogRef" width="70%" />
+        <TaskLog ref="taskLogRef" width="70%" @close="search" />
     </div>
 </template>
 
@@ -188,6 +188,7 @@ const loading = ref(false);
 const opRef = ref();
 
 const data = ref();
+const names = ref();
 const repos = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'container-image-page-size',
@@ -254,17 +255,31 @@ const loadRepos = async () => {
 };
 
 const onDelete = (row: Container.ImageInfo) => {
-    let names = [row.id.replaceAll('sha256:', '').substring(0, 12)];
+    names.value = [row.id.replaceAll('sha256:', '').substring(0, 12)];
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.delete'),
-        names: names,
+        names: names.value,
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('container.image'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: imageRemove,
-        params: { names: names },
+        api: null,
+        params: null,
     });
+};
+
+const onSubmitDelete = async () => {
+    loading.value = true;
+    let taskID = newUUID();
+    await imageRemove({ names: names.value, taskID: taskID })
+        .then(() => {
+            loading.value = false;
+            openTaskLog(taskID);
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const showFavorite = (row: any) => {

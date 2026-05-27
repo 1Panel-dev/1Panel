@@ -389,6 +389,7 @@ export namespace Container {
     }
 
     export interface BatchDelete {
+        taskID: string;
         names: Array<string>;
     }
 
