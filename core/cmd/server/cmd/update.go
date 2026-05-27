@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 	"gopkg.in/yaml.v3"
@@ -157,6 +158,7 @@ var updateVersion = &cobra.Command{
 			fmt.Println(i18n.GetMsgWithMapForCmd("UpdateUserErr", map[string]interface{}{"err": err.Error()}))
 			return err
 		}
+		xpack.MultiNodeProvider.AutoUpgradeWithMaster()
 		return nil
 	},
 }

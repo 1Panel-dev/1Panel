@@ -70,7 +70,7 @@ ErrDeviceErr: "Persekitaran semasa tidak sepadan dengan persekitaran import lese
 ErrXpackTimeout: "Permintaan tamat masa, sambungan rangkaian mungkin tidak stabil, sila cuba lagi kemudian"
 ErrUnbindMaster: "Terdapat nod dalam pengurusan nod, sila keluarkan dahulu dan cuba lagi"
 ErrEnterpriseLicenseRequired: "Lesen Edisi Enterprise belum diimport. Sila import lesen terlebih dahulu"
-ErrFreeNodeLimit: "Had nod Edisi Community telah dicapai. Pergi ke www.lxware.cn/1panel untuk naik taraf dan cuba lagi"
+ErrFreeNodeLimit: "Bilangan nod yang boleh ditambah telah mencapai had. Sila beli dan cuba lagi."
 ErrNodeBound: "Lesen ini telah diikat dengan nod lain, sila semak dan cuba lagi"
 ErrNodeBoundDelete: "Lisensi ini telah diikat dan tidak menyokong operasi penghapusan. Sila semak dan cuba lagi"
 ErrNodeBoundLimit: "Nod percuma semasa telah mencapai had, sila semak dan cuba lagi"
