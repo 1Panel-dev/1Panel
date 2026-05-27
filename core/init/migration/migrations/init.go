@@ -1328,6 +1328,13 @@ var AddOperationLogUser = &gormigrate.Migration{
 	},
 }
 
+var AddLoginLogUser = &gormigrate.Migration{
+	ID: "20260527-add-login-log-user",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.LoginLog{})
+	},
+}
+
 var AddIsOfflineSetting = &gormigrate.Migration{
 	ID: "20260429-add-is-offline-setting",
 	Migrate: func(tx *gorm.DB) error {

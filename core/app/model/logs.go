@@ -25,6 +25,7 @@ type OperationLog struct {
 type LoginLog struct {
 	BaseModel
 	IP      string `json:"ip"`
+	User    string `json:"user"`
 	Address string `json:"address"`
 	Agent   string `json:"agent"`
 	Status  string `json:"status"`

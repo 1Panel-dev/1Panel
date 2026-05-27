@@ -24,11 +24,12 @@ export namespace Log {
         operation: string;
     }
     export interface SearchLgLog extends ReqPage {
-        ip: string;
+        info: string;
         status: string;
     }
     export interface LoginLogs {
         ip: string;
+        user: string;
         address: string;
         agent: string;
         status: string;

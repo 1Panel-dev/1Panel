@@ -34284,7 +34284,7 @@ const docTemplate = `{
 		},
 		"dto.SearchLgLogWithPage": {
 			"properties": {
-				"ip": {
+				"info": {
 					"type": "string"
 				},
 				"page": {

@@ -47,6 +47,7 @@ func Init() {
 		migrations.AddAIProxyMenu,
 		migrations.AddSkillsHubMenu,
 		migrations.AddOperationLogUser,
+		migrations.AddLoginLogUser,
 		migrations.AddIsOfflineSetting,
 	})
 	if err := m.Migrate(); err != nil {
