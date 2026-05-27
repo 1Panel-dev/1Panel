@@ -172,6 +172,9 @@ NewSSHClient: "SSH bağlantısı başlatılıyor"
 BackupBeforeUpgrade: "Yükseltme öncesi veri yedekleme"
 UploadUpgradeFile: "Yükseltme dosyalarını dağıt"
 RestartAfterUpgrade: "Yükseltme sonrası servisi başlat"
+LoadAutoUpgradeNodesFailed: "Otomatik yükseltme düğümleri yüklenemedi, hata: {{ .err }}"
+AutoUpgradeNodes: "Otomatik yükseltme düğümleri: {{ .nodes }}"
+UpdateAutoUpgradeNodesStatusFailed: "Otomatik yükseltme düğümlerinin durumu güncellenemedi, hata: {{ .err }}"
 
 #add node
 MasterData: "Ana Düğüm Verisi"

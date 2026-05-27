@@ -175,6 +175,9 @@ NewSSHClient: "初始化 SSH 連接"
 BackupBeforeUpgrade: "升級前備份資料"
 UploadUpgradeFile: "發送升級所需檔案"
 RestartAfterUpgrade: "升級後啟動服務"
+LoadAutoUpgradeNodesFailed: "載入自動升級節點失敗，錯誤: {{ .err }}"
+AutoUpgradeNodes: "自動升級節點: {{ .nodes }}"
+UpdateAutoUpgradeNodesStatusFailed: "更新自動升級節點狀態失敗，錯誤: {{ .err }}"
 
 #add node
 MasterData: "主節點資料"
