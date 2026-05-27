@@ -3,8 +3,10 @@ package terminal
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
@@ -124,11 +126,11 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 						sws.aiInterceptor.SetCurrentLine(msgObj.Line)
 					}
 					if generated, handled := sws.aiInterceptor.HandleEnter(sws.notifyAIThinking, sws.notifyAIDone, sws.notifyAIError); handled {
-						payload := []byte{lineClearControl}
-						if strings.TrimSpace(generated) != "" {
-							payload = append(payload, []byte(generated)...)
+						if payload, err := buildAIPastePayload(generated); err != nil {
+							global.LOG.Errorf("ai generated command rejected before ssh.stdin pipe write, err: %v", err)
+						} else {
+							sws.sendWebsocketInputCommandToSshSessionStdinPipe(payload)
 						}
-						sws.sendWebsocketInputCommandToSshSessionStdinPipe(payload)
 						continue
 					}
 				}
@@ -205,4 +207,32 @@ func (sws *LocalWsSession) sendWebsocketInputCommandToSshSessionStdinPipe(cmdByt
 	if _, err := sws.slave.Write(cmdBytes); err != nil {
 		global.LOG.Errorf("ws cmd bytes write to ssh.stdin pipe failed, err: %v", err)
 	}
+}
+
+func buildAIPastePayload(generated string) ([]byte, error) {
+	payload := []byte{lineClearControl}
+	generated = strings.TrimSpace(generated)
+	if generated == "" {
+		return payload, nil
+	}
+	if err := validateTerminalInputPayload([]byte(generated)); err != nil {
+		return nil, err
+	}
+	payload = append(payload, []byte(generated)...)
+	return payload, nil
+}
+
+func validateTerminalInputPayload(cmdBytes []byte) error {
+	if len(cmdBytes) == 0 {
+		return fmt.Errorf("empty terminal input payload")
+	}
+	if len(strings.TrimSpace(string(cmdBytes))) == 0 {
+		return fmt.Errorf("empty terminal input payload")
+	}
+	for _, r := range string(cmdBytes) {
+		if unicode.IsControl(r) || unicode.In(r, unicode.Cf) {
+			return fmt.Errorf("terminal input payload contains control characters")
+		}
+	}
+	return nil
 }

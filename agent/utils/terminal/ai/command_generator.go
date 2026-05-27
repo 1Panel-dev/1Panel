@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"unicode"
 )
 
 type CommandGenerator struct {
@@ -67,6 +68,9 @@ func (g *CommandGenerator) Generate(ctx context.Context, req CommandGenerateRequ
 	command := sanitizeCommand(resp.Content)
 	if command == "" {
 		return nil, fmt.Errorf("model returned empty command")
+	}
+	if err := validateGeneratedCommand(command); err != nil {
+		return nil, err
 	}
 
 	return &CommandGenerateResponse{
@@ -158,6 +162,29 @@ func sanitizeCommand(raw string) string {
 		return strings.Trim(line, "` ")
 	}
 	return ""
+}
+
+func validateGeneratedCommand(command string) error {
+	command = strings.TrimSpace(command)
+	if command == "" {
+		return fmt.Errorf("model returned empty command")
+	}
+	if !isSingleLinePrintableCommand(command) {
+		return fmt.Errorf("model returned unsafe command")
+	}
+	return nil
+}
+
+func isSingleLinePrintableCommand(command string) bool {
+	if strings.ContainsAny(command, "\x00\r\n\x1b") {
+		return false
+	}
+	for _, r := range command {
+		if unicode.IsControl(r) || unicode.In(r, unicode.Cf) {
+			return false
+		}
+	}
+	return true
 }
 
 func providerNameFromModel(model string) string {
