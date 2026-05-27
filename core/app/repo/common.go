@@ -2,6 +2,7 @@ package repo
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -73,6 +74,13 @@ func WithByStatus(status string) global.DBOption {
 		return g.Where("status = ?", status)
 	}
 }
+
+func WithByCreatedAt(startTime, endTime time.Time) global.DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("created_at > ? AND created_at < ?", startTime, endTime)
+	}
+}
+
 func WithByNode(node string) global.DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("node = ?", node)

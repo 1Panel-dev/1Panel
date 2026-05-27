@@ -599,7 +599,18 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []d
 	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	itemFailed, itemTotal := 0, 0
 	for _, file := range fileList {
-		dataItem, successCount, failedCount := loadSSHData(ctx, file.Name, req.Status, filter, showCountFrom, showCountTo, file.Year, nyc)
+		dataItem, successCount, failedCount := loadSSHData(
+			ctx,
+			file.Name,
+			req.Status,
+			filter,
+			req.StartTime,
+			req.EndTime,
+			showCountFrom,
+			showCountTo,
+			file.Year,
+			nyc,
+		)
 		itemFailed += failedCount
 		itemTotal += successCount + failedCount
 		showCountFrom = showCountFrom - (successCount + failedCount)
@@ -1118,7 +1129,13 @@ type sshParsedLog struct {
 	Index      int
 }
 
-func loadSSHData(ctx *gin.Context, filePath, status, filter string, showCountFrom, showCountTo, currentYear int, nyc *time.Location) ([]dto.SSHHistory, int, int) {
+func loadSSHData(
+	ctx *gin.Context,
+	filePath, status, filter string,
+	startTime, endTime time.Time,
+	showCountFrom, showCountTo, currentYear int,
+	nyc *time.Location,
+) ([]dto.SSHHistory, int, int) {
 	var (
 		datas        []dto.SSHHistory
 		successCount int
@@ -1138,9 +1155,12 @@ func loadSSHData(ctx *gin.Context, filePath, status, filter string, showCountFro
 		if !matchSSHLogStatus(status, itemData.Status) || !checkIsStandard(itemData) {
 			continue
 		}
+		itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
+		if !isSSHLogWithinTimeRange(itemData.Date, startTime, endTime) {
+			continue
+		}
 		if successCount+failedCount >= showCountFrom && (showCountTo == -1 || successCount+failedCount < showCountTo) {
 			itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
-			itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
 			datas = append(datas, itemData)
 		}
 		if itemData.Status == constant.StatusSuccess {
@@ -1150,6 +1170,13 @@ func loadSSHData(ctx *gin.Context, filePath, status, filter string, showCountFro
 		}
 	}
 	return datas, successCount, failedCount
+}
+
+func isSSHLogWithinTimeRange(itemTime, startTime, endTime time.Time) bool {
+	if startTime.IsZero() || endTime.IsZero() {
+		return true
+	}
+	return itemTime.After(startTime) && itemTime.Before(endTime)
 }
 
 func collectSSHLogItems(lines []string, filter, status string) []sshParsedLog {

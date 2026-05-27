@@ -57,8 +57,10 @@ type SSHConfUpdate struct {
 }
 type SearchSSHLog struct {
 	PageInfo
-	Info   string `json:"info"`
-	Status string `json:"Status" validate:"required,oneof=Success Failed All"`
+	Info      string    `json:"info"`
+	Status    string    `json:"Status" validate:"required,oneof=Success Failed All"`
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
 }
 
 type SSHHistory struct {

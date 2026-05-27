@@ -33,8 +33,10 @@ type SearchOpLogWithPage struct {
 
 type SearchLgLogWithPage struct {
 	PageInfo
-	Info   string `json:"info"`
-	Status string `json:"status"`
+	Info      string    `json:"info"`
+	Status    string    `json:"status"`
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
 }
 
 type LoginLog struct {

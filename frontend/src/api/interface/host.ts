@@ -201,6 +201,8 @@ export namespace Host {
     export interface searchSSHLog extends ReqPage {
         info: string;
         status: string;
+        startTime?: string | Date;
+        endTime?: string | Date;
     }
     export interface analysisSSHLog extends ReqPage {
         orderBy: string;

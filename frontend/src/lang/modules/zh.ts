@@ -4290,6 +4290,9 @@ const message = {
             setting: '设置',
             page: {
                 enterprise: '企业版',
+                reportNode: '报表节点',
+                selectReportNode: '选择报表节点',
+                currentNode: '当前节点',
                 scoreMeta: '扣分 {0} 分 · 风险 {1} 项',
                 hostAddress: '主机地址',
                 panelVersion: '面板版本',
@@ -4511,7 +4514,7 @@ const message = {
                 alertFailedLogs: '失败告警日志',
                 alertPendingLogs: '待同步日志',
                 alertPending: '待同步',
-                alertTaskTypeStats: '告警类型统计',
+                alertTaskStats: '告警任务统计',
                 alertTaskType: '告警类型',
                 alertLogStatusStats: '告警执行状态',
                 alertHealthNormal: '正常',

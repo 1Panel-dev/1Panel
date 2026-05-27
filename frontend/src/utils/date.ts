@@ -100,6 +100,22 @@ export function dateFormatSimpleWithSecond(dataStr: any) {
     return `${String(y)}-${String(m)}-${String(d)} ${String(h)}:${String(minute)}:${String(second)}`;
 }
 
+export function dateFormatRFC3339(dataStr: any) {
+    const date = new Date(dataStr);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const h = String(date.getHours()).padStart(2, '0');
+    const minute = String(date.getMinutes()).padStart(2, '0');
+    const second = String(date.getSeconds()).padStart(2, '0');
+    const offset = -date.getTimezoneOffset();
+    const sign = offset >= 0 ? '+' : '-';
+    const absOffset = Math.abs(offset);
+    const offsetHour = String(Math.floor(absOffset / 60)).padStart(2, '0');
+    const offsetMinute = String(absOffset % 60).padStart(2, '0');
+    return `${y}-${m}-${d}T${h}:${minute}:${second}${sign}${offsetHour}:${offsetMinute}`;
+}
+
 export function dateFormatForName(dataStr: any) {
     const date = new Date(dataStr);
     const y = date.getFullYear();

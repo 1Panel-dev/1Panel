@@ -3,8 +3,13 @@ import { ResPage, SearchWithPage } from '../interface';
 import { Container } from '../interface/container';
 import { TimeoutEnum } from '@/enums/http-enum';
 
-export const searchContainer = (params: Container.ContainerSearch) => {
-    return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params, TimeoutEnum.T_40S);
+export const searchContainer = (params: Container.ContainerSearch, currentNode?: string) => {
+    return http.post<ResPage<Container.ContainerInfo>>(
+        `/containers/search`,
+        params,
+        TimeoutEnum.T_40S,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 export const listContainer = () => {
     return http.post<Array<Container.ContainerOption>>(`/containers/list`, {});
@@ -39,8 +44,12 @@ export const downloadContainerFile = (params: { containerID: string; path: strin
         timeout: TimeoutEnum.T_40S,
     });
 };
-export const loadContainerStatus = () => {
-    return http.get<Container.ContainerStatus>(`/containers/status`);
+export const loadContainerStatus = (currentNode?: string) => {
+    return http.get<Container.ContainerStatus>(
+        `/containers/status`,
+        {},
+        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+    );
 };
 export const loadResourceLimit = () => {
     return http.get<Container.ResourceLimit>(`/containers/limit`);
@@ -72,8 +81,13 @@ export const cleanContainerLog = (containerName: string, operateNode?: string) =
     const params = operateNode ? `?operateNode=${operateNode}` : '';
     return http.post(`/containers/clean/log${params}`, { name: containerName }, TimeoutEnum.T_60S);
 };
-export const containerItemStats = (containerID: string) => {
-    return http.post<Container.ContainerItemStats>(`/containers/item/stats`, { name: containerID }, TimeoutEnum.T_60S);
+export const containerItemStats = (containerID: string, currentNode?: string) => {
+    return http.post<Container.ContainerItemStats>(
+        `/containers/item/stats`,
+        { name: containerID },
+        TimeoutEnum.T_60S,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 export const containerListStats = () => {
     return http.get<Array<Container.ContainerListStats>>(`/containers/list/stats`);
