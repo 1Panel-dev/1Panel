@@ -47,8 +47,8 @@ func (u *LogService) PageLoginLog(ctx *gin.Context, req dto.SearchLgLogWithPage)
 	options := []global.DBOption{
 		repo.WithOrderDesc("created_at"),
 	}
-	if len(req.IP) != 0 {
-		options = append(options, logRepo.WithByIP(req.IP))
+	if len(req.Info) != 0 {
+		options = append(options, logRepo.WithByInfo(req.Info))
 	}
 	if len(req.Status) != 0 {
 		options = append(options, repo.WithByStatus(req.Status))

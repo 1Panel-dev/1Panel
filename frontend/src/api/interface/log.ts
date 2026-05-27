@@ -25,13 +25,14 @@ export namespace Log {
         node?: string;
     }
     export interface SearchLgLog extends ReqPage {
-        ip: string;
+        info: string;
         status: string;
         startTime?: string | Date;
         endTime?: string | Date;
     }
     export interface LoginLogs {
         ip: string;
+        user: string;
         address: string;
         agent: string;
         status: string;
