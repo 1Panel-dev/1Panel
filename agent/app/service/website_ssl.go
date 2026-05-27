@@ -273,6 +273,53 @@ func reloadSystemSSL(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 	}
 }
 
+// SyncSystemSSL reconciles the panel certificate on disk with the WebsiteSSL
+// row referenced by the SSLID setting. When they differ (typically because a
+// previous renewal's reloadSystemSSL was skipped by a transient nginx reload
+// failure or because the panel was restarted between the DB save and the file
+// rewrite), the on-disk cert is refreshed and core is asked to reload its TLS
+// store. Safe to call on every renewal cron tick: it is a no-op when SSL is
+// not enabled, when SSLID does not resolve, or when the cert already matches.
+func SyncSystemSSL() {
+	if !global.IsMaster {
+		return
+	}
+	systemSSLEnable, sslID := GetSystemSSL()
+	if !systemSSLEnable {
+		return
+	}
+	websiteSSL, err := websiteSSLRepo.GetFirst(repo.WithByID(sslID))
+	if err != nil {
+		return
+	}
+	if strings.TrimSpace(websiteSSL.Pem) == "" || strings.TrimSpace(websiteSSL.PrivateKey) == "" {
+		return
+	}
+	certPath := path.Join(global.Dir.DataDir, "secret/server.crt")
+	keyPath := path.Join(global.Dir.DataDir, "secret/server.key")
+	diskCert, _ := os.ReadFile(certPath)
+	diskKey, _ := os.ReadFile(keyPath)
+	if strings.TrimSpace(string(diskCert)) == strings.TrimSpace(websiteSSL.Pem) &&
+		strings.TrimSpace(string(diskKey)) == strings.TrimSpace(websiteSSL.PrivateKey) {
+		return
+	}
+	global.LOG.Infof("panel SSL on disk diverged from DB (SSLID=%d, domain=%s), syncing", websiteSSL.ID, websiteSSL.PrimaryDomain)
+	fileOp := files.NewFileOp()
+	if err := fileOp.WriteFile(certPath, strings.NewReader(websiteSSL.Pem), 0600); err != nil {
+		global.LOG.Errorf("sync panel SSL: write cert failed: %s", err.Error())
+		return
+	}
+	if err := fileOp.WriteFile(keyPath, strings.NewReader(websiteSSL.PrivateKey), 0600); err != nil {
+		global.LOG.Errorf("sync panel SSL: write key failed: %s", err.Error())
+		return
+	}
+	if err := req_helper.PostLocalCore("/core/settings/ssl/reload"); err != nil {
+		global.LOG.Errorf("sync panel SSL: notify core failed: %s", err.Error())
+		return
+	}
+	global.LOG.Info("panel SSL synced from DB to disk")
+}
+
 func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	return w.obtainSSL(apply.ID, false)
 }
@@ -430,15 +477,13 @@ func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 					printSSLLog(logger, "ErrUpdateWebsiteSSL", map[string]interface{}{"name": website.PrimaryDomain, "err": err.Error()})
 				}
 			}
-			nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-			if err != nil {
-				return
+			if nginxInstall, err := getAppInstallByKey(constant.AppOpenresty); err == nil {
+				if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+					printSSLLog(logger, "ErrSSLApply", nil)
+				} else {
+					printSSLLog(logger, "ApplyWebSiteSSLSuccess", nil)
+				}
 			}
-			if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
-				printSSLLog(logger, "ErrSSLApply", nil)
-				return
-			}
-			printSSLLog(logger, "ApplyWebSiteSSLSuccess", nil)
 		}
 		reloadSystemSSL(websiteSSL, logger)
 		if websiteSSL.PushNode {
