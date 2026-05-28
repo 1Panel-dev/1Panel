@@ -63,7 +63,7 @@ func (b *BaseApi) Login(c *gin.Context) {
 	if user == nil || user.MfaStatus != constant.StatusEnable {
 		go saveLoginLogs(c, req.Name, wrapLoginErr(msgKey, err))
 	}
-	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
+	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" || msgKey == "ErrNoneNode" {
 		if msgKey == "ErrAuth" {
 			global.IPTracker.RecordFailure(ip)
 			global.IPTracker.SetNeedCaptcha(ip)
@@ -109,6 +109,10 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 
 	user, msgKey, err := xpack.AuthProvider.MFALogin(c, req, string(entrance))
 	go saveLoginLogs(c, loginLogUserName(user, req.SessionID), wrapLoginErr(msgKey, err))
+	if msgKey == "ErrNoneNode" {
+		helper.BadAuth(c, msgKey, err)
+		return
+	}
 	if msgKey == "ErrMFA" {
 		global.IPTracker.RecordFailure(ip)
 		failures := initauth.GetMFASessionStore().RecordFailure(req.SessionID)
@@ -164,7 +168,7 @@ func (b *BaseApi) PasskeyFinishLogin(c *gin.Context) {
 	entrance := loadEntranceFromRequest(c)
 	user, msgKey, err := xpack.AuthProvider.PasskeyFinishLogin(c, sessionID, entrance)
 	go saveLoginLogs(c, loginLogUserName(user, ""), wrapLoginErr(msgKey, err))
-	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
+	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" || msgKey == "ErrNoneNode" {
 		if msgKey == "ErrAuth" {
 			global.IPTracker.SetNeedCaptcha(common.GetRealClientIP(c))
 		}

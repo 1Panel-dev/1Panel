@@ -183,14 +183,21 @@ func OperationLog() gin.HandlerFunc {
 
 func loadOperationUser(c *gin.Context) string {
 	sessionUser, ok := c.Get(psessionUtils.GinContextSessionUserKey)
+	if ok {
+		psession, ok := sessionUser.(psessionUtils.SessionUser)
+		if ok {
+			return psession.Name
+		}
+	}
+	apiUsername, ok := c.Get("API_AUTH_USERNAME")
 	if !ok {
 		return ""
 	}
-	psession, ok := sessionUser.(psessionUtils.SessionUser)
+	username, ok := apiUsername.(string)
 	if !ok {
 		return ""
 	}
-	return psession.Name
+	return username
 }
 
 func fillOperationDetail(operationDic *operationJson, formatMap map[string]interface{}) {

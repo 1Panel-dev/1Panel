@@ -104,7 +104,7 @@
                                         <el-table-column min-width="230px">
                                             <template #default="{ row }">
                                                 <span v-if="row.id === currentRecord.id" class="select-sign"></span>
-                                                <Status class="mr-2 ml-1 float-left w-20" :status="row.status" />
+                                                <Status class="mr-2 mt-1 ml-1 float-left w-20" :status="row.status" />
                                                 <div class="mt-0.5">
                                                     <span>
                                                         {{ row.startTime }}
