@@ -4489,6 +4489,10 @@ const message = {
                 defaultFormat: 'Default Format',
                 savePath: 'Save Directory',
                 savePathRequired: 'Set the report save directory',
+                autoExport: 'Enable Auto Export',
+                autoExportDesc: 'Generate an Ops Report automatically every day at 09:00 when enabled',
+                autoExportEnabled: 'Auto export enabled',
+                autoExportDisabled: 'Auto export disabled',
                 readOnlyPermissionTip:
                     'The current account can only view Ops Report settings. Contact an administrator to make changes.',
                 refreshing: 'Refreshing',

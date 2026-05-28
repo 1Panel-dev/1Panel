@@ -51,6 +51,7 @@ var baseSettingKeys = map[string]struct{}{
 	"OpsReportSchedule":          {},
 	"OpsReportSavePath":          {},
 	"OpsReportThreshold":         {},
+	"OpsReportAutoExport":        {},
 }
 
 func checkNamePattern(fl validator.FieldLevel) bool {
