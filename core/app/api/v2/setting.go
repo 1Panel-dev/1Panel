@@ -6,9 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
@@ -103,50 +101,6 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 			return
 		}
 		req.Value = value
-	}
-	if req.Key == "OpsReportExportFormat" {
-		if !global.CONF.Base.IsEnterprise {
-			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrNotSupportType", errors.New(req.Key))
-			return
-		}
-		if _, ok := constant.OpsReportExportFormats[req.Value]; !ok {
-			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrNotSupportType", errors.New(req.Value))
-			return
-		}
-	}
-	if req.Key == "OpsReportSchedule" {
-		if !global.CONF.Base.IsEnterprise {
-			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrNotSupportType", errors.New(req.Key))
-			return
-		}
-		if _, ok := constant.OpsReportSchedules[req.Value]; !ok {
-			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrNotSupportType", errors.New(req.Value))
-			return
-		}
-	}
-	if req.Key == "OpsReportSavePath" {
-		if !global.CONF.Base.IsEnterprise {
-			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrNotSupportType", errors.New(req.Key))
-			return
-		}
-		value := strings.TrimSpace(req.Value)
-		if value == "" || !filepath.IsAbs(value) {
-			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", errors.New(req.Value))
-			return
-		}
-		req.Value = filepath.Clean(value)
-	}
-	if req.Key == "OpsReportThreshold" {
-		if !global.CONF.Base.IsEnterprise {
-			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrNotSupportType", errors.New(req.Key))
-			return
-		}
-		threshold, err := strconv.Atoi(strings.TrimSpace(req.Value))
-		if err != nil || threshold < 1 || threshold > 100 {
-			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", errors.New(req.Value))
-			return
-		}
-		req.Value = strconv.Itoa(threshold)
 	}
 
 	if err := settingService.Update(c, req.Key, req.Value); err != nil {

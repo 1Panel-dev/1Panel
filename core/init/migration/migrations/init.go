@@ -1261,66 +1261,6 @@ var AddOpsReportMenu = &gormigrate.Migration{
 	},
 }
 
-var AddOpsReportSetting = &gormigrate.Migration{
-	ID: "20260512-add-ops-report-setting",
-	Migrate: func(tx *gorm.DB) error {
-		if !global.CONF.Base.IsEnterprise {
-			return nil
-		}
-		var count int64
-		if err := tx.Model(&model.Setting{}).Where("key = ?", "OpsReportExportFormat").Count(&count).Error; err != nil {
-			return err
-		}
-		if count > 0 {
-			return nil
-		}
-		return tx.Create(&model.Setting{Key: "OpsReportExportFormat", Value: constant.OpsReportExportFormatPDF}).Error
-	},
-}
-
-var AddOpsReportScheduleSetting = &gormigrate.Migration{
-	ID: "20260513-add-ops-report-schedule-setting",
-	Migrate: func(tx *gorm.DB) error {
-		if !global.CONF.Base.IsEnterprise {
-			return nil
-		}
-		settings := []model.Setting{
-			{Key: "OpsReportSchedule", Value: constant.OpsReportScheduleWeekly},
-			{Key: "OpsReportSavePath", Value: path.Join(global.CONF.Base.InstallDir, constant.OpsReportDefaultSaveSubDir)},
-		}
-		for _, item := range settings {
-			var count int64
-			if err := tx.Model(&model.Setting{}).Where("key = ?", item.Key).Count(&count).Error; err != nil {
-				return err
-			}
-			if count > 0 {
-				continue
-			}
-			if err := tx.Create(&item).Error; err != nil {
-				return err
-			}
-		}
-		return nil
-	},
-}
-
-var AddOpsReportThresholdSetting = &gormigrate.Migration{
-	ID: "20260513-add-ops-report-threshold-setting",
-	Migrate: func(tx *gorm.DB) error {
-		if !global.CONF.Base.IsEnterprise {
-			return nil
-		}
-		var count int64
-		if err := tx.Model(&model.Setting{}).Where("key = ?", "OpsReportThreshold").Count(&count).Error; err != nil {
-			return err
-		}
-		if count > 0 {
-			return nil
-		}
-		return tx.Create(&model.Setting{Key: "OpsReportThreshold", Value: constant.OpsReportDefaultThreshold}).Error
-	},
-}
-
 var AddOperationLogUser = &gormigrate.Migration{
 	ID: "20260424-add-operation-log-user",
 	Migrate: func(tx *gorm.DB) error {
