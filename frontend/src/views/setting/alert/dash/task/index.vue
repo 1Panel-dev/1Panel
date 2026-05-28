@@ -460,7 +460,7 @@ const allTaskOptions = [
     { value: 'licenseException', label: 'xpack.alert.licenseException', show: isMaster.value && isProductPro.value },
     { value: 'ssl', label: 'xpack.alert.ssl', show: true },
     { value: 'siteEndTime', label: 'xpack.alert.siteEndTime', show: true },
-    { value: 'nodeException', label: 'xpack.alert.nodeException', show: isMaster.value && isProductPro.value },
+    { value: 'nodeException', label: 'xpack.alert.nodeException', show: isMaster.value && isProductPro.value && !isEE.value },
     { value: 'cpu', label: 'xpack.alert.cpu', show: true },
     { value: 'memory', label: 'xpack.alert.memory', show: true },
     { value: 'disk', label: 'xpack.alert.disk', show: true },

@@ -30,7 +30,7 @@
                                 :label="$t('xpack.alert.licenseException')"
                             />
                             <el-option
-                                v-if="isProductPro"
+                                v-if="isProductPro && !isEE.value"
                                 value="nodeException"
                                 :label="$t('xpack.alert.nodeException')"
                             />
