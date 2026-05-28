@@ -2367,13 +2367,14 @@ func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
 	if err != nil {
 		return err
 	}
-	var command string
+	var composerArgs []string
 	if req.Command != "custom" {
-		command = fmt.Sprintf("%s %s", req.Command, req.ExtCommand)
+		composerArgs = append(composerArgs, req.Command)
+		composerArgs = append(composerArgs, strings.Fields(req.ExtCommand)...)
 	} else {
-		command = req.ExtCommand
+		composerArgs = strings.Fields(req.ExtCommand)
 	}
-	command = strings.TrimSpace(command)
+	command := strings.Join(composerArgs, " ")
 	resourceName := fmt.Sprintf("composer %s", command)
 	composerTask, err := task.NewTaskWithOps(resourceName, task.TaskExec, req.Command, req.TaskID, website.ID)
 	if err != nil {
@@ -2395,13 +2396,15 @@ func (w WebsiteService) ExecComposer(req request.ExecComposerReq) error {
 			return err
 		}
 
-		if err := cmdMgr.Run("docker", "exec",
+		execArgs := []string{
+			"exec",
 			"-u", req.User,
 			runtime.ContainerName,
 			"composer",
-			command,
-			"--working-dir="+execDir,
-		); err != nil {
+		}
+		execArgs = append(execArgs, composerArgs...)
+		execArgs = append(execArgs, "--working-dir="+execDir)
+		if err := cmdMgr.Run("docker", execArgs...); err != nil {
 			return err
 		}
 		return nil

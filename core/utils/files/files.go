@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -61,12 +62,20 @@ func CopyItem(isDir, withName bool, src, dst string) error {
 			_ = os.MkdirAll(dst, srcInfo.Mode())
 		}
 	}
-	cmdArgs := []string{"-rf", "--", src, dst + "/"}
-	cmdText := fmt.Sprintf("cp -rf -- %s %s", src, dst+"/")
-	if !isDir {
-		cmdArgs = []string{"-f", "--", src, dst + "/"}
-		cmdText = fmt.Sprintf("cp -f -- %s %s", src, dst+"/")
+	matches, err := filepath.Glob(src)
+	if err != nil {
+		return err
 	}
+	if len(matches) == 0 {
+		return fmt.Errorf("no files matched %s", src)
+	}
+	cmdArgs := append([]string{"-rf"}, matches...)
+	cmdText := fmt.Sprintf("cp -rf %s %s", strings.Join(matches, " "), dst+"/")
+	if !isDir {
+		cmdArgs = append([]string{"-f"}, matches...)
+		cmdText = fmt.Sprintf("cp -f %s %s", strings.Join(matches, " "), dst+"/")
+	}
+	cmdArgs = append(cmdArgs, dst+"/")
 	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithStdout("cp", cmdArgs...)
 	if err != nil {
 		return fmt.Errorf("handle %s failed, stdout: %s, err: %v", cmdText, stdout, err)
@@ -85,10 +94,10 @@ func CopyFileWithRename(src, dst string) error {
 		}
 	}
 	cmdMgr := cmd.NewCommandMgr()
-	if err := cmdMgr.Run("cp", "-f", "--", src, dst+".tmp"); err != nil {
+	if err := cmdMgr.Run("cp", "-f", src, dst+".tmp"); err != nil {
 		return fmt.Errorf("handle cp file failed, err: %v", err)
 	}
-	if err = cmdMgr.Run("mv", "--", dst+".tmp", dst); err != nil {
+	if err = cmdMgr.Run("mv", dst+".tmp", dst); err != nil {
 		return err
 	}
 	return nil
