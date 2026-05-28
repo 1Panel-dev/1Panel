@@ -25,7 +25,7 @@
                                 />
                             </template>
                         </el-select>
-                        <span class="input-help" v-if="dialogData.rowData!.type === 'panelPwdEndTime'">
+                        <span class="input-help" v-if="dialogData.rowData!.type === 'panelPwdEndTime' && !isEE">
                             {{ $t('xpack.alert.panelPwdEndTimeRulesHelper') }}
                             <el-link
                                 style="font-size: 12px; margin-left: 5px"
@@ -343,7 +343,7 @@
                             <el-option v-if="isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                             <el-option
                                 value="sms"
-                                v-if="!isIntl"
+                                v-if="!isIntl || !isEE"
                                 :disabled="!isProductPro"
                                 :label="$t('xpack.alert.sms')"
                             />
@@ -388,7 +388,7 @@ import { routerToName } from '@/utils/router';
 import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMaster, isProductPro, isIntl } = useGlobalStore();
+const { isMaster, isProductPro, isIntl, isEE } = useGlobalStore();
 
 interface DialogProps {
     title: string;
@@ -454,9 +454,9 @@ const rules = reactive({
 });
 
 const allTaskOptions = [
-    { value: 'panelPwdEndTime', label: 'xpack.alert.panelPwdEndTime', show: isMaster.value },
-    { value: 'panelLogin', label: 'xpack.alert.panelLogin', show: isMaster.value },
+    { value: 'panelPwdEndTime', label: 'xpack.alert.panelPwdEndTime', show: isMaster.value && !isEE.value },
     { value: 'sshLogin', label: 'xpack.alert.sshLogin', show: true },
+    { value: 'panelLogin', label: 'xpack.alert.panelLogin', show: isMaster.value },
     { value: 'licenseException', label: 'xpack.alert.licenseException', show: isMaster.value && isProductPro.value },
     { value: 'ssl', label: 'xpack.alert.ssl', show: true },
     { value: 'siteEndTime', label: 'xpack.alert.siteEndTime', show: true },
@@ -467,7 +467,7 @@ const allTaskOptions = [
     { value: 'load', label: 'xpack.alert.load', show: true },
     { value: 'cronJob', label: 'xpack.alert.cronjob', show: true },
     { value: 'clams', label: 'xpack.alert.clams', show: true },
-    { value: 'panelUpdate', label: 'xpack.alert.panelUpdate', show: isMaster.value },
+    { value: 'panelUpdate', label: 'xpack.alert.panelUpdate', show: isMaster.value && !isEE.value },
 ];
 
 function checkRange(value: any, min: number, max: number, callback: any) {
