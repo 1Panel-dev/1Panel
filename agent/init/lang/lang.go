@@ -62,7 +62,7 @@ func initLang() {
 			downloadLangFromRemote(fileOp)
 			return
 		}
-		if err := cmd.NewCommandMgr().Run("cp", "-r", "--", path.Join(tmpPath, "lang"), "/usr/local/bin/"); err != nil {
+		if err := cmd.NewCommandMgr().Run("cp", "-r", path.Join(tmpPath, "lang"), "/usr/local/bin/"); err != nil {
 			global.LOG.Errorf("load lang from package failed, %v", err)
 			return
 		}
@@ -77,7 +77,7 @@ func initLang() {
 			global.LOG.Errorf("load geo ip from package failed, %v", err)
 			return
 		}
-		if err := cmd.NewCommandMgr().Run("cp", "--", path.Join(tmpPath, "GeoIP.mmdb"), path.Dir(geoPath)+"/"); err != nil {
+		if err := cmd.NewCommandMgr().Run("cp", path.Join(tmpPath, "GeoIP.mmdb"), path.Dir(geoPath)+"/"); err != nil {
 			global.LOG.Errorf("load geo ip from package failed, %v", err)
 			return
 		}

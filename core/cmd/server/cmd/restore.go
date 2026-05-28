@@ -66,10 +66,10 @@ var restoreCmd = &cobra.Command{
 			return err
 		}
 		_, _ = cmdUtils.NewCommandMgr().RunWithStdout("chmod", "755", "/usr/local/bin/1pctl")
-		_, _ = cmdUtils.NewCommandMgr().RunWithStdout("cp", "-r", "--", path.Join(tmpPath, "lang"), "/usr/local/bin")
+		_, _ = cmdUtils.NewCommandMgr().RunWithStdout("cp", "-r", path.Join(tmpPath, "lang"), "/usr/local/bin")
 		geoPath := path.Join(global.CONF.Base.InstallDir, "1panel/geo")
 		_ = os.MkdirAll(geoPath, os.ModePerm)
-		_, _ = cmdUtils.NewCommandMgr().RunWithStdout("cp", "--", path.Join(tmpPath, "GeoIP.mmdb"), geoPath+"/")
+		_, _ = cmdUtils.NewCommandMgr().RunWithStdout("cp", path.Join(tmpPath, "GeoIP.mmdb"), geoPath+"/")
 
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep3"))
 		svcBasePath, _ := controller.GetServicePath("")
