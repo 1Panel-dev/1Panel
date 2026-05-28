@@ -377,6 +377,7 @@ func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) err
 		snap.Task.Log("load docker client failed, skip save app images")
 		return nil
 	}
+	defer client.Close()
 	images, err := client.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
 		snap.Task.Log("list docker images failed, skip save app images")

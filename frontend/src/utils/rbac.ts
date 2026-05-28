@@ -25,6 +25,7 @@ export const syncAuthInfo = async (currentNode?: string) => {
         globalStore.setAuthInfo({
             isAdmin: res.data.role === 'ADMIN',
             permissions: res.data.permissions || [],
+            masterOnlyPermissions: res.data.masterOnlyPermissions || [],
             nodeRoles: res.data.nodeRoles || [],
         });
         return res.data;
@@ -33,6 +34,7 @@ export const syncAuthInfo = async (currentNode?: string) => {
     globalStore.setAuthInfo({
         isAdmin: res.data.role === 'ADMIN',
         permissions: res.data.permissions || [],
+        masterOnlyPermissions: res.data.masterOnlyPermissions || [],
         nodeRoles: res.data.nodeRoles || [],
     });
     return res.data;

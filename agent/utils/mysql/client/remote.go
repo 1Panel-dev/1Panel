@@ -503,6 +503,7 @@ func loadImage(dbType, version string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer cli.Close()
 	images, err := cli.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
 		return "", err

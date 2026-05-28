@@ -57,6 +57,7 @@ export interface GlobalState {
     // tags
     isAdmin: boolean;
     permissions: string[];
+    masterOnlyPermissions: string[];
     nodeRoles: Array<{ nodeId: number; nodeName: string; roleId: number; roleName: string }>;
     isEnterprise: boolean;
     isIntl: boolean;

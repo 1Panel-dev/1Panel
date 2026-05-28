@@ -54,11 +54,11 @@ func handleRequestWithTransport(url, method string, transport *http.Transport, t
 	if err != nil {
 		return 0, nil, err
 	}
+	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return 0, nil, err
 	}
-	defer resp.Body.Close()
 
 	return resp.StatusCode, body, nil
 }
@@ -106,6 +106,7 @@ func handleGetWithTransport(url string, transport *http.Transport) (*http.Respon
 		}
 	}
 	if resp.StatusCode == 404 {
+		_ = resp.Body.Close()
 		return nil, buserr.WithErr("ErrHttpReqNotFound", errors.New("no such resource"))
 	}
 

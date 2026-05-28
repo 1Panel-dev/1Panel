@@ -1,14 +1,15 @@
-const masterOnlyPermissionCodes = new Set([
-    'ai_proxy_view',
-    'ai_proxy_manage',
-    'ai_proxy_key_view',
-    'ai_benchmark_view',
-    'ai_benchmark_manage',
-    'ai_skills_hub_view',
-    'ai_skills_hub_manage',
-    'xpack_ops_report_view',
-    'xpack_ops_report_manage',
-]);
+let masterOnlyPermissionCodes = new Set<string>();
+let masterOnlyPermissionCodesKey = '';
+
+export const setMasterOnlyPermissionCodes = (permissions?: string[]) => {
+    const codes = (permissions || []).filter(Boolean);
+    const key = codes.join('\n');
+    if (key === masterOnlyPermissionCodesKey) {
+        return;
+    }
+    masterOnlyPermissionCodesKey = key;
+    masterOnlyPermissionCodes = new Set(codes);
+};
 
 export const toManageCode = (permission: string): string => {
     if (!permission) {
