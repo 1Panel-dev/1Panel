@@ -18,7 +18,11 @@
                     <el-select filterable clearable v-model="req.type" @change="search()" class="!w-52 dropdown">
                         <template #prefix>{{ $t('commons.table.type') }}</template>
                         <template v-if="isMaster">
-                            <el-option value="panelPwdEndTime" :label="$t('xpack.alert.panelPwdEndTime')" />
+                            <el-option
+                                v-if="!isEE"
+                                value="panelPwdEndTime"
+                                :label="$t('xpack.alert.panelPwdEndTime')"
+                            />
                             <el-option value="panelLogin" :label="$t('xpack.alert.panelLogin')" />
                             <el-option
                                 v-if="isProductPro"
@@ -26,11 +30,11 @@
                                 :label="$t('xpack.alert.licenseException')"
                             />
                             <el-option
-                                v-if="isProductPro"
+                                v-if="isProductPro && !isEE.value"
                                 value="nodeException"
                                 :label="$t('xpack.alert.nodeException')"
                             />
-                            <el-option value="panelUpdate" :label="$t('xpack.alert.panelUpdate')" />
+                            <el-option v-if="!isEE" value="panelUpdate" :label="$t('xpack.alert.panelUpdate')" />
                         </template>
                         <el-option value="sshLogin" :label="$t('xpack.alert.sshLogin')" />
                         <el-option value="ssl" :label="$t('xpack.alert.ssl')" />
@@ -152,7 +156,7 @@ import AddTask from '@/views/setting/alert/dash/task/index.vue';
 import { Alert } from '@/api/interface/alert';
 import { UpdateAlertStatus, SearchAlerts, DeleteAlert } from '@/api/modules/alert';
 
-const { isMobile, isMaster, isProductPro } = useGlobalStore();
+const { isMobile, isMaster, isProductPro, isEE } = useGlobalStore();
 
 const { t } = i18n.global;
 const loading = ref(false);
@@ -197,7 +201,7 @@ const buttons = [
 const openView = async (
     title: string,
     rowData: Partial<Alert.AlertInfo> = {
-        type: isMaster.value ? 'panelPwdEndTime' : 'sshLogin',
+        type: isMaster.value && !isEE.value ? 'panelPwdEndTime' : 'sshLogin',
         cycle: 15,
         count: 0,
         sendCount: 3,

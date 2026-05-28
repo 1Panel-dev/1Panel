@@ -180,7 +180,7 @@
                                 <el-option v-if="isProductPro" value="bark" :label="$t('xpack.alert.bark')" />
                                 <el-option
                                     value="sms"
-                                    v-if="!isIntl"
+                                    v-if="!isIntl || !isEE"
                                     :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
                                     :label="$t('xpack.alert.sms')"
                                 />
@@ -245,7 +245,7 @@ import { createClam, updateClam } from '@/api/modules/toolbox';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { specOptions, transObjToSpec, transSpecToObj, weekOptions } from '@/views/cronjob/cronjob/helper';
 import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/validate';
-const { isIntl, isProductPro } = useGlobalStore();
+const { isIntl, isProductPro, isEE } = useGlobalStore();
 const licenseRef = ref();
 const scanDirRef = ref();
 const infectedDirRef = ref();

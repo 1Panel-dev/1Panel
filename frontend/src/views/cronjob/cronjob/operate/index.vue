@@ -747,7 +747,7 @@
                                             />
                                             <el-option
                                                 value="sms"
-                                                v-if="!isIntl"
+                                                v-if="!isIntl || !isEE"
                                                 :disabled="!form.hasAlert || !isProductPro"
                                                 :label="$t('xpack.alert.sms')"
                                             />
@@ -871,7 +871,7 @@ import { routerToName, routerToPath } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
 const router = useRouter();
 
-const { docsUrl, isFxplay, isIntl, isProductPro } = useGlobalStore();
+const { docsUrl, isFxplay, isIntl, isEE, isProductPro } = useGlobalStore();
 const licenseRef = ref();
 const scriptFileRef = ref();
 const dirRef = ref();
