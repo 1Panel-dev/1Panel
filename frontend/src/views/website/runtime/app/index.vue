@@ -32,10 +32,11 @@
 
 <script setup lang="ts">
 import { App } from '@/api/interface/app';
-import { getAppByKey, getAppDetail, searchApp } from '@/api/modules/app';
+import { getAppByKey, getAppDetail, getCurrentNodeCustomAppConfig, searchApp } from '@/api/modules/app';
 import { useVModel } from '@vueuse/core';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isOffline } = useGlobalStore();
+import { resolveRuntimeAppResource } from '@/utils/runtime-app-resource';
+const { isOffline, isXpackOrEE } = useGlobalStore();
 
 const props = defineProps({
     mode: {
@@ -91,11 +92,24 @@ const getApp = async (appkey: string, mode: string) => {
     } catch (error) {}
 };
 
+const loadRuntimeAppResource = async () => {
+    if (isOffline.value) {
+        return 'custom';
+    }
+    if (!isXpackOrEE.value) {
+        return 'remote';
+    }
+    try {
+        const res = await getCurrentNodeCustomAppConfig();
+        return resolveRuntimeAppResource(isOffline.value, res.data?.status);
+    } catch (error) {
+        return 'remote';
+    }
+};
+
 const searchAppList = async (appID: number) => {
     try {
-        if (isOffline.value) {
-            appReq.resource = 'custom';
-        }
+        appReq.resource = await loadRuntimeAppResource();
         const res = await searchApp(appReq);
         apps.value = res.data.items || [];
         if (res.data && res.data.items && res.data.items.length > 0) {
