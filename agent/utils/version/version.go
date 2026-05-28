@@ -190,6 +190,7 @@ func HandleRequest(url, method string, timeout int) (int, []byte, error) {
 	if err != nil {
 		return 0, nil, err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		return 0, nil, errors.New(resp.Status)
 	}
@@ -197,7 +198,6 @@ func HandleRequest(url, method string, timeout int) (int, []byte, error) {
 	if err != nil {
 		return 0, nil, err
 	}
-	defer resp.Body.Close()
 
 	return resp.StatusCode, body, nil
 }

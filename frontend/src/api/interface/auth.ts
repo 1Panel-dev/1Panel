@@ -55,6 +55,7 @@ export namespace Login {
         mfaInterval: number;
         role: string;
         permissions: string[];
+        masterOnlyPermissions?: string[];
         nodeRoles: Array<{ nodeId: number; nodeName: string; roleId: number; roleName: string }>;
 
         apiInterfaceStatus: string;

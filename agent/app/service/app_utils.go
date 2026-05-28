@@ -748,7 +748,6 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		if err != nil {
 			return err
 		}
-		dockerCLi, _ := docker.NewClient()
 		if req.PullImage {
 			composeContent := []byte(detail.DockerCompose)
 			if req.DockerCompose != "" {
@@ -758,6 +757,11 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			if err != nil {
 				return err
 			}
+			dockerCLi, err := docker.NewClient()
+			if err != nil {
+				return err
+			}
+			defer dockerCLi.Close()
 			for _, image := range images {
 				t.Log(i18n.GetWithName("PullImageStart", image))
 				if err = dockerCLi.PullImageWithProcess(t, image); err != nil {
@@ -1182,6 +1186,7 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 			if err != nil {
 				return err
 			}
+			defer dockerCLi.Close()
 			for _, image := range images {
 				if imagePrefix != "" {
 					lastSlashIndex := strings.LastIndex(image, "/")

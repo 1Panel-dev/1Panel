@@ -807,10 +807,10 @@ func checkProxy(req dto.ProxyUpdate) error {
 	if err != nil {
 		return buserr.WithErr("ErrProxySetting", err)
 	}
+	defer resp.Body.Close()
 	if _, err := io.ReadAll(resp.Body); err != nil {
 		return buserr.WithErr("ErrProxySetting", err)
 	}
-	defer resp.Body.Close()
 	return nil
 }
 

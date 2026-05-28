@@ -4,7 +4,7 @@ import piniaPersistConfig from '@/config/pinia-persist';
 import { GlobalState } from '../interface';
 import { DeviceType } from '@/enums/app';
 import i18n, { setActiveLocale } from '@/lang';
-import { isMasterOnlyPermissionCode, toManageCode } from '@/utils/permission-codes';
+import { isMasterOnlyPermissionCode, setMasterOnlyPermissionCodes, toManageCode } from '@/utils/permission-codes';
 
 const CN_DOCS_URL = 'https://1panel.cn/docs/v2';
 const INTL_DOCS_URL = 'https://docs.1panel.pro/v2';
@@ -55,6 +55,7 @@ const GlobalStore = defineStore('GlobalState', {
         // tags
         isAdmin: false,
         permissions: [],
+        masterOnlyPermissions: [],
         nodeRoles: [],
         isEnterprise: false,
         isIntl: false,
@@ -109,18 +110,24 @@ const GlobalStore = defineStore('GlobalState', {
         setAuthInfo(payload: {
             isAdmin: boolean;
             permissions: string[];
+            masterOnlyPermissions?: string[];
             nodeRoles?: Array<{ nodeId: number; nodeName: string; roleId: number; roleName: string }>;
         }) {
             this.isAdmin = !!payload.isAdmin;
             this.permissions = payload.permissions || [];
+            this.masterOnlyPermissions = payload.masterOnlyPermissions || [];
             this.nodeRoles = payload.nodeRoles || [];
+            setMasterOnlyPermissionCodes(this.masterOnlyPermissions);
         },
         clearAuthInfo() {
             this.permissions = [];
+            this.masterOnlyPermissions = [];
             this.nodeRoles = [];
             this.isAdmin = false;
+            setMasterOnlyPermissionCodes([]);
         },
         hasPermission(permission: string) {
+            setMasterOnlyPermissionCodes(this.masterOnlyPermissions);
             const normalizedPermission = permission.trim();
             if (!normalizedPermission) {
                 return false;

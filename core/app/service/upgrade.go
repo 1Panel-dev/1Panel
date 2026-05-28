@@ -314,11 +314,11 @@ func (u *UpgradeService) LoadRelease() ([]dto.ReleasesNotes, error) {
 	if err != nil {
 		return notes, err
 	}
+	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return notes, err
 	}
-	defer resp.Body.Close()
 	var nodeItem noteHelper
 	if err := json.Unmarshal(body, &nodeItem); err != nil {
 		return notes, err
