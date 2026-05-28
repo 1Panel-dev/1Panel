@@ -80,7 +80,7 @@
                                         <el-table-column>
                                             <template #default="{ row }">
                                                 <span v-if="row.id === currentRecord.id" class="select-sign"></span>
-                                                <Status class="mr-2 ml-1 float-left" :status="row.status" />
+                                                <Status class="mr-2 mt-1 ml-1 float-left" :status="row.status" />
                                                 <div class="mt-0.5 float-left">
                                                     <span>
                                                         {{ dateFormat(0, 0, row.startTime) }}
