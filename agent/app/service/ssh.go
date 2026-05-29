@@ -125,7 +125,7 @@ func (u *SSHService) OperateSSH(operation string) error {
 				return err
 			}
 		} else {
-			if err := disableSSHSocket(serviceName, false); err != nil {
+			if err := disableSSHSocket(serviceName, true); err != nil {
 				return err
 			}
 			if err := controller.Handle("enable", serviceName+".service"); err != nil {
