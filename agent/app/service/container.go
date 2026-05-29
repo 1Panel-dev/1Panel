@@ -527,6 +527,7 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate, inThread bo
 		if err != nil {
 			return err
 		}
+		removeUnsupportedEndpointStaticIPAM(client, networkConf, nil)
 		con, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
 		if err != nil {
 			taskItem.Log(i18n.GetMsgByKey("ContainerCreateFailed"))
@@ -675,6 +676,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 				reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
 				return err
 			}
+			removeUnsupportedEndpointStaticIPAM(client, networkConf, nil)
 
 			con, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
 			if err != nil {
@@ -738,20 +740,13 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 				config := oldContainer.Config
 				config.Image = req.Image
 				hostConf := oldContainer.HostConfig
-				var networkConf network.NetworkingConfig
-				if oldContainer.NetworkSettings != nil {
-					for networkKey := range oldContainer.NetworkSettings.Networks {
-						networkConf.EndpointsConfig = map[string]*network.EndpointSettings{networkKey: {}}
-						break
-					}
-				}
 				err := client.ContainerRemove(ctx, item, container.RemoveOptions{Force: true})
 				taskItem.LogWithStatus(i18n.GetWithName("ContainerRemoveOld", item), err)
 				if err != nil {
 					return err
 				}
 
-				con, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, item)
+				con, err := createContainerWithOldNetworks(ctx, client, config, hostConf, oldContainer.NetworkSettings, item)
 				if err != nil {
 					taskItem.Log(i18n.GetMsgByKey("ContainerRecreate"))
 					reCreateAfterUpdate(item, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
@@ -1951,15 +1946,7 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *conta
 func reCreateAfterUpdate(name string, client *client.Client, config *container.Config, hostConf *container.HostConfig, networkConf *container.NetworkSettings) {
 	ctx := context.Background()
 
-	var oldNetworkConf network.NetworkingConfig
-	if networkConf != nil {
-		for networkKey := range networkConf.Networks {
-			oldNetworkConf.EndpointsConfig = map[string]*network.EndpointSettings{networkKey: {}}
-			break
-		}
-	}
-
-	oldContainer, err := client.ContainerCreate(ctx, config, hostConf, &oldNetworkConf, &v1.Platform{}, name)
+	oldContainer, err := createContainerWithOldNetworks(ctx, client, config, hostConf, networkConf, name)
 	if err != nil {
 		global.LOG.Errorf("recreate after container update failed, err: %v", err)
 		return
@@ -1968,6 +1955,29 @@ func reCreateAfterUpdate(name string, client *client.Client, config *container.C
 		global.LOG.Errorf("restart after container update failed, err: %v", err)
 	}
 	global.LOG.Info("recreate after container update successful")
+}
+
+func createContainerWithOldNetworks(ctx context.Context, client *client.Client, config *container.Config, hostConf *container.HostConfig, networkSettings *container.NetworkSettings, name string) (container.CreateResponse, error) {
+	networkConf, extraNetworks := buildContainerRecoverNetworkConfig(networkSettings, hostConf)
+	removeUnsupportedEndpointStaticIPAM(client, networkConf, extraNetworks)
+
+	created, err := client.ContainerCreate(ctx, config, hostConf, networkConf, nil, name)
+	if err != nil {
+		return created, err
+	}
+
+	extraNames := make([]string, 0, len(extraNetworks))
+	for item := range extraNetworks {
+		extraNames = append(extraNames, item)
+	}
+	sort.Strings(extraNames)
+	for _, item := range extraNames {
+		if err := client.NetworkConnect(ctx, item, created.ID, extraNetworks[item]); err != nil {
+			_ = client.ContainerRemove(ctx, created.ID, container.RemoveOptions{Force: true})
+			return created, err
+		}
+	}
+	return created, nil
 }
 
 func loadVolumeBinds(binds []container.MountPoint) []dto.VolumeHelper {

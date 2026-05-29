@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"net/netip"
 	"os"
 	"path"
 	"sort"
@@ -595,35 +596,22 @@ func stepRecreateContainer(recoverCtx *containerRecoverContext, taskItem *task.T
 		return err
 	}
 
-	networkConfig, extraNetworks := buildContainerRecoverNetworkConfig(recoverCtx.inspectInfo.NetworkSettings, hostConfig)
-	removeBridgeDriverIPAM(recoverCtx.client, networkConfig, extraNetworks)
-	createRes, err := recoverCtx.client.ContainerCreate(ctx, config, hostConfig, networkConfig, nil, recoverCtx.targetName)
+	createRes, err := createContainerWithOldNetworks(ctx, recoverCtx.client, config, hostConfig, recoverCtx.inspectInfo.NetworkSettings, recoverCtx.targetName)
 	if err != nil {
 		return err
 	}
 	recoverCtx.createdContainerID = createRes.ID
-
-	extraNames := make([]string, 0, len(extraNetworks))
-	for name := range extraNetworks {
-		extraNames = append(extraNames, name)
-	}
-	sort.Strings(extraNames)
-	for _, item := range extraNames {
-		if err := recoverCtx.client.NetworkConnect(ctx, item, recoverCtx.createdContainerID, extraNetworks[item]); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
-func removeBridgeDriverIPAM(cli *client.Client, primary *network.NetworkingConfig, extras map[string]*network.EndpointSettings) {
+func removeUnsupportedEndpointStaticIPAM(cli *client.Client, primary *network.NetworkingConfig, extras map[string]*network.EndpointSettings) {
 	if primary != nil {
-		removeBridgeDriverIPAMFromEndpoints(cli, primary.EndpointsConfig)
+		removeUnsupportedEndpointStaticIPAMFromEndpoints(cli, primary.EndpointsConfig)
 	}
-	removeBridgeDriverIPAMFromEndpoints(cli, extras)
+	removeUnsupportedEndpointStaticIPAMFromEndpoints(cli, extras)
 }
 
-func removeBridgeDriverIPAMFromEndpoints(cli *client.Client, endpoints map[string]*network.EndpointSettings) {
+func removeUnsupportedEndpointStaticIPAMFromEndpoints(cli *client.Client, endpoints map[string]*network.EndpointSettings) {
 	for netName, endpoint := range endpoints {
 		if endpoint == nil || endpoint.IPAMConfig == nil {
 			continue
@@ -632,10 +620,59 @@ func removeBridgeDriverIPAMFromEndpoints(cli *client.Client, endpoints map[strin
 		if err != nil {
 			continue
 		}
-		if info.Driver == "bridge" {
-			endpoint.IPAMConfig = nil
+		removeUnsupportedEndpointStaticIP(netName, info, endpoint)
+	}
+}
+
+func removeUnsupportedEndpointStaticIP(netName string, info network.Inspect, endpoint *network.EndpointSettings) {
+	if endpoint == nil || endpoint.IPAMConfig == nil {
+		return
+	}
+	if isDefaultBridgeNetwork(netName, info) {
+		endpoint.IPAMConfig = nil
+		return
+	}
+
+	if endpoint.IPAMConfig.IPv4Address != "" && !networkSupportsStaticIP(info, endpoint.IPAMConfig.IPv4Address, false) {
+		endpoint.IPAMConfig.IPv4Address = ""
+	}
+	if endpoint.IPAMConfig.IPv6Address != "" && !networkSupportsStaticIP(info, endpoint.IPAMConfig.IPv6Address, true) {
+		endpoint.IPAMConfig.IPv6Address = ""
+	}
+	if endpoint.IPAMConfig.IPv4Address == "" && endpoint.IPAMConfig.IPv6Address == "" {
+		endpoint.IPAMConfig = nil
+	}
+}
+
+func isDefaultBridgeNetwork(netName string, info network.Inspect) bool {
+	return info.Driver == "bridge" && (netName == "bridge" || info.Name == "bridge")
+}
+
+func networkSupportsStaticIP(info network.Inspect, ip string, isIPv6 bool) bool {
+	if ip == "" {
+		return true
+	}
+	addr, err := netip.ParseAddr(ip)
+	if err != nil {
+		return false
+	}
+	if addr.Is6() != isIPv6 {
+		return false
+	}
+
+	for _, item := range info.IPAM.Config {
+		if item.Subnet == "" {
+			continue
+		}
+		subnet, err := netip.ParsePrefix(item.Subnet)
+		if err != nil || subnet.Addr().Is6() != isIPv6 {
+			continue
+		}
+		if subnet.Contains(addr) {
+			return true
 		}
 	}
+	return false
 }
 
 func ensureContainerRecoverNetworks(recoverCtx *containerRecoverContext) error {
