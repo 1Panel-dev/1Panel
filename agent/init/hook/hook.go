@@ -16,18 +16,38 @@ import (
 )
 
 func Init() {
+	global.LOG.Info("agent hook: init global data start")
 	initGlobalData()
+	global.LOG.Info("agent hook: init global data done")
+	global.LOG.Info("agent hook: handle cronjob status start")
 	handleCronjobStatus()
+	global.LOG.Info("agent hook: handle cronjob status done")
+	global.LOG.Info("agent hook: handle clam status start")
 	handleClamStatus()
+	global.LOG.Info("agent hook: handle clam status done")
+	global.LOG.Info("agent hook: handle record status start")
 	handleRecordStatus()
+	global.LOG.Info("agent hook: handle record status done")
+	global.LOG.Info("agent hook: handle snapshot status start")
 	handleSnapStatus()
+	global.LOG.Info("agent hook: handle snapshot status done")
+	global.LOG.Info("agent hook: handle ollama model status start")
 	handleOllamaModelStatus()
+	global.LOG.Info("agent hook: handle ollama model status done")
 
+	global.LOG.Info("agent hook: load local dir start")
 	loadLocalDir()
+	global.LOG.Info("agent hook: load local dir done")
 
+	global.LOG.Info("agent hook: init docker config start")
 	initDockerConf()
+	global.LOG.Info("agent hook: init docker config done")
+	global.LOG.Info("agent hook: init alert task start")
 	initAlertTask()
+	global.LOG.Info("agent hook: init alert task done")
+	global.LOG.Info("agent hook: init monitor db start")
 	initMonitorDB()
+	global.LOG.Info("agent hook: init monitor db done")
 }
 
 func initGlobalData() {

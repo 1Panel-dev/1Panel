@@ -682,6 +682,9 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	if err != nil {
 		return err
 	}
+	if install.App.Key == vllmAppKeyForUpgrade && !isVllmUpgradeVersionAllowed(install.Version, detail.Version, loadVllmImageFromEnv(install.Env)) {
+		return errors.New("vLLM can only upgrade within the same image type")
+	}
 	if install.Version == detail.Version {
 		return errors.New("two version is same")
 	}
@@ -748,8 +751,25 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		if err != nil {
 			return err
 		}
+		if install.App.Key == vllmAppKeyForUpgrade {
+			envs := make(map[string]interface{})
+			if err = json.Unmarshal([]byte(install.Env), &envs); err != nil {
+				return err
+			}
+			image := buildVllmUpgradeImage(loadVllmImageFromEnv(install.Env), oldVersion, detail.Version)
+			envs[vllmImageEnvKey] = image
+			paramByte, err := json.Marshal(envs)
+			if err != nil {
+				return err
+			}
+			install.Env = string(paramByte)
+			content = setVllmImageInEnvContent(content, image)
+		}
 		if req.PullImage {
 			composeContent := []byte(detail.DockerCompose)
+			if install.App.Key == vllmAppKeyForUpgrade {
+				composeContent = []byte(install.DockerCompose)
+			}
 			if req.DockerCompose != "" {
 				composeContent = []byte(req.DockerCompose)
 			}
@@ -811,9 +831,13 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			return err
 		}
 		if req.DockerCompose == "" {
-			newCompose, err = getUpgradeCompose(install, detail)
-			if err != nil {
-				return err
+			if install.App.Key == vllmAppKeyForUpgrade {
+				newCompose = install.DockerCompose
+			} else {
+				newCompose, err = getUpgradeCompose(install, detail)
+				if err != nil {
+					return err
+				}
 			}
 		} else {
 			newCompose = req.DockerCompose

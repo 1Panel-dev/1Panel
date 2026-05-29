@@ -589,7 +589,12 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 		if common.IsCrossVersion(install.Version, detail.Version) && !app.CrossVersionUpdate {
 			continue
 		}
-		if common.CompareVersion(detail.Version, install.Version) {
+		canUpgrade := common.CompareVersion(detail.Version, install.Version)
+		if app.Key == vllmAppKeyForUpgrade {
+			currentImage := loadVllmImageFromEnv(install.Env)
+			canUpgrade = isVllmUpgradeCandidate(install.Version, detail.Version, currentImage)
+		}
+		if canUpgrade {
 			var newCompose string
 			if req.UpdateVersion != "" && req.UpdateVersion == detail.Version && detail.DockerCompose == "" && !app.IsLocalApp() {
 				filename := filepath.Base(detail.DownloadUrl)
