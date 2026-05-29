@@ -45,7 +45,7 @@ func Proxy() gin.HandlerFunc {
 			return
 		}
 
-		if reqPath == "/api/v2/hosts/terminal" && (currentNode == "local" || len(currentNode) == 0) {
+		if reqPath == "/api/v2/hosts/terminal/local" && (currentNode == "local" || len(currentNode) == 0) {
 			proxyLocalAgent(c)
 			return
 		}
