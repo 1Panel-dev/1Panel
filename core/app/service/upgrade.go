@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"sort"
 	"strconv"
 	"strings"
 	"syscall"
@@ -24,6 +23,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/ctl_conf"
 	"github.com/1Panel-dev/1Panel/core/utils/files"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
+	upgradeUtil "github.com/1Panel-dev/1Panel/core/utils/upgrade"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 )
 
@@ -574,29 +574,7 @@ func loadArch() (string, error) {
 
 func dropBackupCopies() {
 	backupCopies, _ := settingRepo.GetValueByKey("UpgradeBackupCopies")
-	copies, _ := strconv.Atoi(backupCopies)
-	if copies == 0 {
-		return
-	}
-	backupDir := path.Join(global.CONF.Base.InstallDir, "1panel/tmp/upgrade")
-	upgradeDir, err := os.ReadDir(backupDir)
-	if err != nil {
+	if err := upgradeUtil.DropBackupCopies(global.CONF.Base.InstallDir, backupCopies); err != nil {
 		global.LOG.Errorf("read upgrade dir failed, err: %v", err)
-		return
-	}
-	var versions []string
-	for _, item := range upgradeDir {
-		if item.IsDir() && strings.HasPrefix(item.Name(), "v") {
-			versions = append(versions, item.Name())
-		}
-	}
-	if len(versions) <= copies {
-		return
-	}
-	sort.Slice(versions, func(i, j int) bool {
-		return common.ComparePanelVersion(versions[i], versions[j])
-	})
-	for i := copies; i < len(versions); i++ {
-		_ = os.RemoveAll(backupDir + "/" + versions[i])
 	}
 }
