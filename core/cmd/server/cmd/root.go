@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"os/user"
 	"path"
-	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/server"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/ctl_conf"
-	"github.com/glebarez/sqlite"
 	"github.com/spf13/cobra"
 	"gorm.io/gorm"
 )
@@ -38,22 +37,27 @@ type setting struct {
 }
 
 func loadDBConn(dbName string) (*gorm.DB, error) {
-	baseDir, err := ctl_conf.LoadFromFile("/usr/local/bin/1pctl", "BASE_DIR")
+	baseDir, err := loadBaseDir()
 	if err != nil {
-		return nil, fmt.Errorf("handle load `BASE_DIR` failed, err: %v", err)
-	}
-	if len(baseDir) == 0 {
-		return nil, fmt.Errorf("error `BASE_DIR` find in /usr/local/bin/1pctl")
-	}
-	if strings.HasSuffix(baseDir, "/") {
-		baseDir = baseDir[:strings.LastIndex(baseDir, "/")]
+		return nil, err
 	}
 
-	db, err := gorm.Open(sqlite.Open(path.Join(baseDir, "1panel/db", dbName)), &gorm.Config{})
+	db, err := common.GetDBWithPath(path.Join(baseDir, "1panel/db", dbName))
 	if err != nil {
 		return nil, fmt.Errorf("init my db conn failed, err: %v", err)
 	}
 	return db, nil
+}
+
+func loadBaseDir() (string, error) {
+	baseDir, err := ctl_conf.LoadFromFile("/usr/local/bin/1pctl", "BASE_DIR")
+	if err != nil {
+		return "", fmt.Errorf("handle load `BASE_DIR` failed, err: %v", err)
+	}
+	if len(baseDir) == 0 {
+		return "", fmt.Errorf("error `BASE_DIR` find in /usr/local/bin/1pctl")
+	}
+	return baseDir, nil
 }
 
 func getSettingByKey(db *gorm.DB, key string) string {
