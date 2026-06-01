@@ -3718,6 +3718,10 @@ const message = {
         bindHelper: '바인딩 - 방화벽 규칙은 상태가 바인딩된 경우에만 효과가 있습니다. 확인하시겠습니까?',
         unbindHelper:
             '바인딩 해제 - 바인딩 해제 시 추가된 모든 방화벽 규칙이 무효화됩니다. 주의하여 진행하세요. 확인하시겠습니까?',
+        whiteList: '화이트리스트',
+        portWhiteList: '포트 화이트리스트',
+        portWhiteListAlter: '방화벽을 초기화하거나 시작할 때 화이트리스트의 포트가 자동으로 허용됩니다.',
+        portWhiteListHelper: '80/tcp 또는 443/udp처럼 프로토콜을 지정할 수 있습니다. 생략하면 기본값은 tcp입니다.',
         defaultStrategy: '현재 체인 {0}의 기본 정책은 {1}입니다',
         defaultStrategy2:
             '현재 체인 {0}의 기본 정책은 {1}입니다. 현재 상태는 바인딩되지 않았습니다. 추가된 방화벽 규칙은 바인딩 후에 효과가 발생합니다!',
@@ -3952,8 +3956,7 @@ const message = {
                 reportDate: '보고서 날짜',
                 serverSecurityOverview: '서버 보안 운영 개요',
                 securityScore: '보안 점수',
-                overviewSummary:
-                    '현재 보안 등급: {0}. 총 감점 {1}점, {2}개 위험 항목 발견, {3}개 검사 대상 포함.',
+                overviewSummary: '현재 보안 등급: {0}. 총 감점 {1}점, {2}개 위험 항목 발견, {3}개 검사 대상 포함.',
                 riskDistribution: '위험 분포',
                 totalDeducted: '총 감점',
                 noRiskDeducted: '미감점',
@@ -4092,8 +4095,7 @@ const message = {
                 recent24Hours: '최근 24시간',
                 currentService: '현재 서비스',
                 riskItemsExist: '{0}개 위험 항목 존재',
-                loginHealthRiskDesc:
-                    '{0}개의 위험 설정이 감지되었습니다. 로그인 보안을 강화하여 침입 위험을 낮추세요.',
+                loginHealthRiskDesc: '{0}개의 위험 설정이 감지되었습니다. 로그인 보안을 강화하여 침입 위험을 낮추세요.',
                 loginHealthNormalDesc: '현재 로그인 및 SSH 보안 설정이 정상 상태입니다',
                 loginHealthNormalReason: '로그인 보안 설정 정상',
                 securityEntranceConfiguredDesc: '보안 입구가 구성되어 기본 입구 노출 위험이 감소됩니다',

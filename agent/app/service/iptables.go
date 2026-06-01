@@ -228,6 +228,12 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 		if err := iptables.BindChain(iptables.FilterTab, iptables.ChainInput, iptables.Chain1PanelBasicAfter, 3); err != nil {
 			return err
 		}
+		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.BasicBeforeFileName); err != nil {
+			return err
+		}
+		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.BasicAfterFileName); err != nil {
+			return err
+		}
 		_ = settingRepo.Update("IptablesStatus", constant.StatusEnable)
 		return nil
 	case "bind-base-without-init":
@@ -365,17 +371,11 @@ func initPreRules() error {
 	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicBefore, "-m", "conntrack", "--ctstate", "RELATED,ESTABLISHED", "-j", "ACCEPT", "-m", "comment", "--comment", "ESTABLISHED Whitelist"); err != nil {
 		return err
 	}
-	panelPort := LoadPanelPort()
-	if len(panelPort) == 0 {
-		return errors.New("find 1panel service port failed")
+	portWhiteList, err := loadFirewallPortWhiteList()
+	if err != nil {
+		return err
 	}
-	ports := []string{"80", "443", panelPort, loadSSHPort()}
-	for _, item := range ports {
-		if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicBefore, "-p", "tcp", "-m", "tcp", "--dport", item, "-j", "ACCEPT"); err != nil {
-			return err
-		}
-	}
-	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicAfter, "-p", "udp", "-m", "udp", "--dport", "443", "-j", "ACCEPT"); err != nil {
+	if err := applyFirewallPortWhiteListRules(portWhiteList, false); err != nil {
 		return err
 	}
 	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicAfter, "-p", "tcp", "-j", "DROP"); err != nil {
@@ -383,6 +383,67 @@ func initPreRules() error {
 	}
 	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicAfter, "-p", "udp", "-j", "DROP"); err != nil {
 		return err
+	}
+	return nil
+}
+
+func applyFirewallPortWhiteListRules(portWhiteList []firewallPortWhitelist, withSave bool) error {
+	if err := syncFirewallPortWhiteListRules(portWhiteList); err != nil {
+		return err
+	}
+	for _, item := range portWhiteList {
+		if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicBefore, "-p", item.Protocol, "-m", item.Protocol, "--dport", item.Port, "-j", "ACCEPT"); err != nil {
+			return err
+		}
+	}
+	if !withSave {
+		return nil
+	}
+	if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.BasicBeforeFileName); err != nil {
+		return err
+	}
+	return iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.BasicAfterFileName)
+}
+
+func syncFirewallPortWhiteListRules(portWhiteList []firewallPortWhitelist) error {
+	tcpWhitelist := make(map[string]struct{})
+	udpWhitelist := make(map[string]struct{})
+	for _, item := range portWhiteList {
+		if item.Protocol == "udp" {
+			udpWhitelist[item.Port] = struct{}{}
+			continue
+		}
+		tcpWhitelist[item.Port] = struct{}{}
+	}
+
+	if err := cleanExtraFirewallPortRules(iptables.Chain1PanelBasicBefore, "tcp", tcpWhitelist); err != nil {
+		return err
+	}
+	if err := cleanExtraFirewallPortRules(iptables.Chain1PanelBasicBefore, "udp", udpWhitelist); err != nil {
+		return err
+	}
+	return cleanExtraFirewallPortRules(iptables.Chain1PanelBasicAfter, "udp", map[string]struct{}{})
+}
+
+func cleanExtraFirewallPortRules(chain, protocol string, whitelist map[string]struct{}) error {
+	rules, err := iptables.ReadFilterRulesByChain(chain)
+	if err != nil {
+		return err
+	}
+	kept := make(map[string]struct{})
+	for _, rule := range rules {
+		if rule.Strategy != "accept" || rule.Protocol != protocol || rule.DstPort == "" || rule.SrcIP != "" || rule.DstIP != "" || rule.SrcPort != "" {
+			continue
+		}
+		if _, ok := whitelist[rule.DstPort]; ok {
+			if _, seen := kept[rule.DstPort]; !seen {
+				kept[rule.DstPort] = struct{}{}
+				continue
+			}
+		}
+		if err := iptables.DeleteRule(iptables.FilterTab, chain, "-p", protocol, "-m", protocol, "--dport", rule.DstPort, "-j", "ACCEPT"); err != nil {
+			return err
+		}
 	}
 	return nil
 }

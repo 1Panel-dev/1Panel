@@ -3857,6 +3857,12 @@ const message = {
         bindHelper: 'Ikat - Peraturan firewall hanya akan berkuat kuasa apabila status terikat. Sahkan?',
         unbindHelper:
             'Nyahikat - Apabila tidak terikat, semua peraturan firewall yang ditambah akan menjadi tidak sah. Teruskan dengan berhati-hati. Sahkan?',
+        whiteList: 'Senarai putih',
+        portWhiteList: 'Senarai putih port',
+        portWhiteListAlter:
+            'Port dalam senarai putih akan dibuka secara automatik apabila firewall dimulakan atau dihidupkan.',
+        portWhiteListHelper:
+            'Protokol boleh ditentukan, contohnya 80/tcp atau 443/udp. Jika diabaikan, tcp digunakan secara lalai.',
         defaultStrategy: 'Dasar lalai untuk rantaian semasa {0} adalah {1}',
         defaultStrategy2:
             'Dasar lalai untuk rantaian semasa {0} adalah {1}, status semasa adalah tidak terikat. Peraturan firewall yang ditambah akan berkuat kuasa selepas pengikatan!',
@@ -4239,8 +4245,10 @@ const message = {
                     '{0} konfigurasi berisiko dikesan. Kukuhkan keselamatan log masuk untuk mengurangkan risiko pencerobohan.',
                 loginHealthNormalDesc: 'Konfigurasi keselamatan log masuk dan SSH semasa adalah normal',
                 loginHealthNormalReason: 'Keselamatan log masuk adalah normal',
-                securityEntranceConfiguredDesc: 'Pintu masuk keselamatan dikonfigurasi untuk mengurangkan pendedahan laluan lalai',
-                securityEntranceRiskDesc: 'Pintu masuk keselamatan tidak didayakan. Sembunyikan pintu masuk log masuk lalai',
+                securityEntranceConfiguredDesc:
+                    'Pintu masuk keselamatan dikonfigurasi untuk mengurangkan pendedahan laluan lalai',
+                securityEntranceRiskDesc:
+                    'Pintu masuk keselamatan tidak didayakan. Sembunyikan pintu masuk log masuk lalai',
                 allowIPsRestrictedDesc: 'IP dibenarkan dihadkan untuk akses panel',
                 allowIPsRiskDesc: 'IP akses tidak dihadkan. Konfigurasikan IP dibenarkan untuk persekitaran awam',
                 bindDomainRestrictedDesc: 'Domain akses telah diikat',

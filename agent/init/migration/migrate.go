@@ -84,6 +84,7 @@ func InitAgentDB() {
 		migrations.AddFileShareTable,
 		migrations.AddFileHistoryTable,
 		migrations.MigrateLegoV5,
+		migrations.InitFirewallPortWhiteList,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

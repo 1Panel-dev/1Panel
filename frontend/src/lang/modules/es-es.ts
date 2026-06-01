@@ -3819,6 +3819,12 @@ const message = {
             'Vincular: las reglas de firewall solo surtirán efecto cuando el estado esté vinculado. ¿Confirmar?',
         unbindHelper:
             'Desvincular: al desvincular, todas las reglas de firewall agregadas se volverán inválidas. Proceda con precaución. ¿Confirmar?',
+        whiteList: 'Lista blanca',
+        portWhiteList: 'Lista blanca de puertos',
+        portWhiteListAlter:
+            'Los puertos de la lista blanca se abrirán automáticamente al inicializar o iniciar el firewall.',
+        portWhiteListHelper:
+            'Puede especificar el protocolo, por ejemplo 80/tcp o 443/udp. Si se omite, se usa tcp por defecto.',
         defaultStrategy: 'La política predeterminada para la cadena actual {0} es {1}',
         defaultStrategy2:
             'La política predeterminada para la cadena actual {0} es {1}, el estado actual es no vinculado. ¡Las reglas de firewall agregadas surtirán efecto después de la vinculación!',
@@ -4096,7 +4102,8 @@ const message = {
                 scoreWebsiteHTTP: '{0} no usa HTTPS',
                 scoreWebsiteStopped: 'Estado anormal de {0}',
                 scoreWebsiteMonitorUnavailable: 'El monitoreo web detectó un sitio no disponible',
-                scoreWebsiteMonitorAvailability: 'La disponibilidad del monitoreo web ({0}%) está por debajo del umbral',
+                scoreWebsiteMonitorAvailability:
+                    'La disponibilidad del monitoreo web ({0}%) está por debajo del umbral',
                 scoreWafDisabled: 'WAF deshabilitado, los sitios web no están protegidos',
                 scoreWafHighRiskHit: 'WAF detectó {0} reglas de riesgo en el periodo del informe',
                 scoreCronjobFailed: '{0} registros de fallos de tareas programadas en los últimos 7 días',
@@ -4202,8 +4209,10 @@ const message = {
                     'Se detectaron {0} configuraciones de riesgo. Refuerce la seguridad de acceso para reducir el riesgo de intrusión.',
                 loginHealthNormalDesc: 'Las configuraciones de acceso y SSH están en estado normal',
                 loginHealthNormalReason: 'La seguridad de acceso es normal',
-                securityEntranceConfiguredDesc: 'Entrada de seguridad configurada para reducir la exposición de la entrada predeterminada',
-                securityEntranceRiskDesc: 'Entrada de seguridad deshabilitada. Se recomienda ocultar la entrada predeterminada',
+                securityEntranceConfiguredDesc:
+                    'Entrada de seguridad configurada para reducir la exposición de la entrada predeterminada',
+                securityEntranceRiskDesc:
+                    'Entrada de seguridad deshabilitada. Se recomienda ocultar la entrada predeterminada',
                 allowIPsRestrictedDesc: 'IPs autorizadas restringidas para el acceso al panel',
                 allowIPsRiskDesc: 'IPs de acceso sin restricciones. Configure IPs autorizadas para entornos públicos',
                 bindDomainRestrictedDesc: 'Dominio de acceso vinculado',
@@ -4223,11 +4232,15 @@ const message = {
                 mfaRiskDesc: 'Autenticación MFA deshabilitada. Se recomienda habilitar la autenticación multifactor',
                 passwordExpiration: 'Fecha de vencimiento de contraseña',
                 passwordExpirationNormalDesc: 'La fecha de vencimiento de contraseña está en un rango seguro',
-                passwordExpirationUnsetDesc: 'Fecha de vencimiento de contraseña no configurada. Se recomienda configurarla pronto',
-                passwordExpirationRiskDesc: 'La contraseña vence en {0} días. Se recomienda gestionarla con anticipación',
-                passwordExpirationExpiredDesc: 'La contraseña expiró hace {0} días. Por favor, gestionar lo antes posible',
+                passwordExpirationUnsetDesc:
+                    'Fecha de vencimiento de contraseña no configurada. Se recomienda configurarla pronto',
+                passwordExpirationRiskDesc:
+                    'La contraseña vence en {0} días. Se recomienda gestionarla con anticipación',
+                passwordExpirationExpiredDesc:
+                    'La contraseña expiró hace {0} días. Por favor, gestionar lo antes posible',
                 sessionTimeoutNormalDesc: 'El tiempo de espera de sesión está en un rango seguro',
-                sessionTimeoutRiskDesc: 'Tiempo de espera de sesión largo. Se recomienda limitar la duración de sesiones inactivas',
+                sessionTimeoutRiskDesc:
+                    'Tiempo de espera de sesión largo. Se recomienda limitar la duración de sesiones inactivas',
                 sshServiceNormalDesc: 'El servicio SSH está ejecutándose normalmente',
                 sshServiceRiskDesc: 'El servicio SSH no está ejecutándose o está en estado anormal',
                 sshPortNormalDesc: 'El puerto SSH se ha cambiado del puerto predeterminado',
@@ -4235,9 +4248,11 @@ const message = {
                 rootLoginNormalDesc: 'El usuario root no puede iniciar sesión directamente',
                 rootLoginRiskDesc: 'El usuario root puede iniciar sesión directamente. Se recomienda deshabilitarlo',
                 passwordAuthNormalDesc: 'El inicio de sesión SSH por contraseña está deshabilitado',
-                passwordAuthRiskDesc: 'El inicio de sesión por contraseña está permitido, aumentando el riesgo de fuerza bruta',
+                passwordAuthRiskDesc:
+                    'El inicio de sesión por contraseña está permitido, aumentando el riesgo de fuerza bruta',
                 keyAuthNormalDesc: 'La autenticación SSH por clave está habilitada',
-                keyAuthRiskDesc: 'La autenticación por clave no está habilitada. Se recomienda usar inicio de sesión por clave',
+                keyAuthRiskDesc:
+                    'La autenticación por clave no está habilitada. Se recomienda usar inicio de sesión por clave',
                 websiteOverview: 'Resumen de sitios web',
                 primaryDomain: 'Dominio principal',
                 expireTime: 'Fecha de vencimiento',
@@ -4277,7 +4292,8 @@ const message = {
                 alertHealthAttention: 'Requiere atención',
                 alertHealthRisk: 'Riesgo alto',
                 alertHealthSummary: 'Estado de salud de alertas',
-                alertHealthNormalReason: 'Tareas de alerta, canales de notificación y registros de ejecución están saludables',
+                alertHealthNormalReason:
+                    'Tareas de alerta, canales de notificación y registros de ejecución están saludables',
                 alertNoChannelReason: 'No hay canal de notificación de alerta habilitado',
                 alertFailedLogReason: '{0} registros de fallos de alerta encontrados',
                 alertPendingReason: '{0} registros de alerta pendientes de sincronización',
@@ -4354,7 +4370,8 @@ const message = {
                 viewHostMonitor: 'Ver monitoreo del host',
                 systemHealthAttentionDesc:
                     '{0} elementos de riesgo detectados en las últimas 24 horas. Priorice los picos de recursos y el uso de disco.',
-                systemHealthNormalDesc: 'Las métricas de ejecución del host estuvieron normales en las últimas 24 horas',
+                systemHealthNormalDesc:
+                    'Las métricas de ejecución del host estuvieron normales en las últimas 24 horas',
                 monitorEnabled: 'Monitoreo habilitado',
                 cpuCoreUsage: '{0} / {1} núcleos',
                 load1Minute: 'Carga 1 min',
@@ -4521,7 +4538,8 @@ const message = {
                 savePath: 'Directorio de guardado',
                 savePathRequired: 'Configure el directorio de guardado del informe',
                 autoExport: 'Habilitar exportación automática',
-                autoExportDesc: 'Generar automáticamente un informe de operaciones cada día a las 09:00 cuando esté habilitado',
+                autoExportDesc:
+                    'Generar automáticamente un informe de operaciones cada día a las 09:00 cuando esté habilitado',
                 autoExportEnabled: 'Exportación automática habilitada',
                 autoExportDisabled: 'Exportación automática deshabilitada',
                 readOnlyPermissionTip:

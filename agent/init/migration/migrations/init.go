@@ -846,6 +846,23 @@ var InitIptablesStatus = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "IptablesOutputStatus", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: constant.FirewallPortWhiteList, Value: constant.FirewallPortWhiteListValue}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var InitFirewallPortWhiteList = &gormigrate.Migration{
+	ID: "20260601-init-firewall-port-whitelist",
+	Migrate: func(tx *gorm.DB) error {
+		var setting model.Setting
+		if err := tx.Where("key = ?", constant.FirewallPortWhiteList).First(&setting).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return tx.Create(&model.Setting{Key: constant.FirewallPortWhiteList, Value: constant.FirewallPortWhiteListValue}).Error
+			}
+			return err
+		}
 		return nil
 	},
 }
