@@ -851,6 +851,11 @@ const message = {
             from_remote: '이 모델은 1Panel을 통해 다운로드되지 않았으며 관련 풀 로그가 없습니다.',
             no_logs: '이 모델의 풀 로그가 삭제되어 관련 로그를 볼 수 없습니다.',
             vllmVersionHelper: 'FusionXpark GB 10 서버는 -cu130 버전을 선택하세요.',
+            syncModelAccount: '모델 계정에 동기화',
+            modelAccountAddressHelper:
+                '컨테이너 주소는 에이전트 컨테이너 호출에 적합합니다. 127.0.0.1, 시스템 IP 또는 사용자 지정 주소는 AI Gateway 또는 외부 서비스 호출에 적합합니다.',
+            containerAddress: '컨테이너 주소',
+            customAddress: '사용자 지정 주소',
             downloader: '다운로더',
             modelDir: '모델 디렉토리',
             manualDownload: '수동 다운로드',
