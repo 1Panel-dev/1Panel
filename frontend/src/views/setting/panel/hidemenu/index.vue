@@ -56,7 +56,7 @@ import { MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { ArrowRight } from '@element-plus/icons-vue';
 import { sortMenu } from '@/utils/misc';
-const { isEE, isIntl } = useGlobalStore();
+const { isEE, isIntl, isAdmin } = useGlobalStore();
 
 const drawerVisible = ref();
 const loading = ref();
@@ -69,7 +69,7 @@ const acceptParams = (params: DialogProps): void => {
     let hideMenu = JSON.parse(params.hideMenu);
     sortMenu(hideMenu);
     treeData.hideMenu = hideMenu;
-    if (isIntl.value || isEE.value) {
+    if (isIntl.value || (isEE.value && !isAdmin.value)) {
         treeData.hideMenu = removeUpage(treeData.hideMenu);
     }
 };

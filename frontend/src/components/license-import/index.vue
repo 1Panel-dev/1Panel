@@ -130,7 +130,7 @@ const submit = async () => {
         loading.value = true;
         await uploadEnterpriseLicense(formData)
             .then(async () => {
-                handleAfterSubmit();
+                await handleAfterSubmit();
             })
             .catch(() => {
                 loading.value = false;
@@ -150,7 +150,7 @@ const submit = async () => {
     loading.value = true;
     await uploadLicense(oldLicense.value, formData)
         .then(async () => {
-            handleAfterSubmit();
+            await handleAfterSubmit();
         })
         .catch(() => {
             loading.value = false;
@@ -159,7 +159,7 @@ const submit = async () => {
         });
 };
 
-const handleAfterSubmit = () => {
+const handleAfterSubmit = async () => {
     loading.value = false;
     uploadRef.value!.clearFiles();
     uploaderFiles.value = [];
@@ -172,9 +172,9 @@ const handleAfterSubmit = () => {
         isEnterpriseLicensed.value = true;
     }
     if (!withoutReload.value) {
-        loadMasterProductProFromDB();
-        loadProductProFromDB();
-        getXpackSettingForTheme();
+        await loadMasterProductProFromDB();
+        await loadProductProFromDB();
+        await getXpackSettingForTheme();
         window.location.reload();
     } else {
         em('search');

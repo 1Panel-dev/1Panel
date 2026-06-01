@@ -7,7 +7,8 @@ export const useTheme = () => {
     const { isXpackOrEE, themeConfig } = useGlobalStore();
 
     const switchTheme = () => {
-        let itemTheme = themeConfig.value.theme;
+        const rawTheme = themeConfig.value.theme;
+        let itemTheme = rawTheme;
         if (itemTheme === 'auto') {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             itemTheme = prefersDark ? 'dark' : 'light';
