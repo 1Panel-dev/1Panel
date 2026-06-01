@@ -3805,6 +3805,10 @@ const message = {
         bindHelper: 'バインド - ファイアウォールルールは状態がバインドされている場合のみ有効になります。確認しますか？',
         unbindHelper:
             'アンバインド - アンバインドすると、追加されたすべてのファイアウォールルールが無効になります。注意して操作してください。確認しますか？',
+        whiteList: 'ホワイトリスト',
+        portWhiteList: 'ポートホワイトリスト',
+        portWhiteListAlter: 'ファイアウォールの初期化または起動時に、ホワイトリスト内のポートは自動的に許可されます。',
+        portWhiteListHelper: '80/tcp や 443/udp のようにプロトコルを指定できます。省略時は tcp が使用されます。',
         defaultStrategy: '現在のチェーン {0} のデフォルトポリシーは {1} です',
         defaultStrategy2:
             '現在のチェーン {0} のデフォルトポリシーは {1} です。現在の状態は未バインドです。追加されたファイアウォールルールはバインド後に有効になります！',
@@ -4184,12 +4188,15 @@ const message = {
                     '{0} 件のリスク設定を検出しました。ログインセキュリティを強化して侵入リスクを低減してください。',
                 loginHealthNormalDesc: '現在のログインとSSHセキュリティ設定は正常です',
                 loginHealthNormalReason: 'ログインセキュリティは正常です',
-                securityEntranceConfiguredDesc: 'セキュリティエントランスが設定済みで、デフォルト入口の露出リスクを低減しています',
-                securityEntranceRiskDesc: 'セキュリティエントランスが無効です。デフォルトのログイン入口を隠すことをお勧めします',
+                securityEntranceConfiguredDesc:
+                    'セキュリティエントランスが設定済みで、デフォルト入口の露出リスクを低減しています',
+                securityEntranceRiskDesc:
+                    'セキュリティエントランスが無効です。デフォルトのログイン入口を隠すことをお勧めします',
                 allowIPsRestrictedDesc: 'パネルアクセス許可IPが制限されています',
                 allowIPsRiskDesc: 'アクセスIPが制限されていません。公開環境では許可IPの設定をお勧めします',
                 bindDomainRestrictedDesc: 'アクセスドメインがバインドされています',
-                bindDomainRiskDesc: 'アクセスドメインがバインドされていません。固定ドメインへのアクセス制限をお勧めします',
+                bindDomainRiskDesc:
+                    'アクセスドメインがバインドされていません。固定ドメインへのアクセス制限をお勧めします',
                 accessRestrictionValue: '許可IP: {0} / バインドドメイン: {1}',
                 accessRestrictionNormalDesc:
                     '許可IPまたはバインドドメインが設定済みで、パネルアクセス元が制限されています',
@@ -4198,8 +4205,7 @@ const message = {
                 panelHTTPSNormalDesc: 'パネルHTTPSが有効です',
                 panelHTTPSRiskDesc: 'パネルHTTPSが無効です。ログイン通信が平文で露出するリスクがあります',
                 passwordComplexityNormalDesc: 'パスワード複雑性検証が有効です',
-                passwordComplexityRiskDesc:
-                    'パスワード複雑性検証が無効で、弱パスワードのリスクが高いです',
+                passwordComplexityRiskDesc: 'パスワード複雑性検証が無効で、弱パスワードのリスクが高いです',
                 mfa: 'MFA 認証',
                 mfaNormalDesc: 'MFA認証が有効で、ログインセキュリティが強化されています',
                 mfaRiskDesc: 'MFA認証が無効です。多要素認証の有効化をお勧めします',
@@ -4209,7 +4215,8 @@ const message = {
                 passwordExpirationRiskDesc: 'パスワードが{0}日以内に期限切れになります。事前に対応してください',
                 passwordExpirationExpiredDesc: 'パスワードが{0}日前に期限切れになりました。至急対応してください',
                 sessionTimeoutNormalDesc: 'セッションタイムアウトは安全な範囲内です',
-                sessionTimeoutRiskDesc: 'セッションタイムアウトが長めです。アイドルセッションの有効期間を制限することをお勧めします',
+                sessionTimeoutRiskDesc:
+                    'セッションタイムアウトが長めです。アイドルセッションの有効期間を制限することをお勧めします',
                 sshServiceNormalDesc: 'SSHサービスは正常に稼働しています',
                 sshServiceRiskDesc: 'SSHサービスが未稼働または異常です',
                 sshPortNormalDesc: 'SSHポートがデフォルトポートから変更済みです',

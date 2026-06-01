@@ -3993,6 +3993,12 @@ const message = {
             'Vincular - As regras de firewall só entrarão em vigor quando o status estiver vinculado. Confirmar?',
         unbindHelper:
             'Desvincular - Quando desvinculado, todas as regras de firewall adicionadas se tornarão inválidas. Prossiga com cautela. Confirmar?',
+        whiteList: 'Lista branca',
+        portWhiteList: 'Lista branca de portas',
+        portWhiteListAlter:
+            'As portas na lista branca serão abertas automaticamente ao inicializar ou iniciar o firewall.',
+        portWhiteListHelper:
+            'O protocolo pode ser especificado, por exemplo 80/tcp ou 443/udp. Se omitido, o padrão é tcp.',
         defaultStrategy: 'A política padrão para a cadeia atual {0} é {1}',
         defaultStrategy2:
             'A política padrão para a cadeia atual {0} é {1}, o status atual é não vinculado. As regras de firewall adicionadas entrarão em vigor após a vinculação!',
@@ -4378,7 +4384,8 @@ const message = {
                     '{0} configurações de risco detectadas. Fortaleça a segurança de login para reduzir o risco de invasão.',
                 loginHealthNormalDesc: 'As configurações atuais de login e segurança SSH estão normais',
                 loginHealthNormalReason: 'Segurança de login está normal',
-                securityEntranceConfiguredDesc: 'Entrada de segurança configurada para reduzir a exposição da entrada padrão',
+                securityEntranceConfiguredDesc:
+                    'Entrada de segurança configurada para reduzir a exposição da entrada padrão',
                 securityEntranceRiskDesc: 'Entrada de segurança desativada. Oculte a entrada de login padrão',
                 allowIPsRestrictedDesc: 'IPs autorizados estão restritos para acesso ao painel',
                 allowIPsRiskDesc: 'IPs de acesso sem restrição. Configure IPs autorizados para ambientes públicos',
@@ -4445,7 +4452,8 @@ const message = {
                 alertHealthAttention: 'Atenção necessária',
                 alertHealthRisk: 'Alto risco',
                 alertHealthSummary: 'Saúde do alerta',
-                alertHealthNormalReason: 'Tarefas de alerta, canais de notificação e registros de execução estão saudáveis',
+                alertHealthNormalReason:
+                    'Tarefas de alerta, canais de notificação e registros de execução estão saudáveis',
                 alertNoChannelReason: 'Nenhum canal de notificação está ativado',
                 alertFailedLogReason: '{0} registros de alerta com falha encontrados',
                 alertPendingReason: '{0} registros de alerta pendentes de sincronização',

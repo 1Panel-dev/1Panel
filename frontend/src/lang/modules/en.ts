@@ -3769,6 +3769,11 @@ const message = {
         bindHelper: 'Bind - Firewall rules will only take effect when the status is bound. Confirm?',
         unbindHelper:
             'Unbind - When unbound, all added firewall rules will become invalid. Proceed with caution. Confirm?',
+        whiteList: 'Allowlist',
+        portWhiteList: 'Port allowlist',
+        portWhiteListAlter:
+            'Ports in the allowlist are opened automatically when the firewall is initialized or started.',
+        portWhiteListHelper: 'Protocol can be specified, e.g. 80/tcp or 443/udp. Defaults to tcp when omitted.',
         defaultStrategy: 'Default policy for current chain {0} is {1}',
         defaultStrategy2:
             'Default policy for current chain {0} is {1}, current status is unbound. Added firewall rules will take effect after binding!',

@@ -26,6 +26,7 @@ export namespace Setting {
 
         fileRecycleBin: string;
         localSSHConnShow: string;
+        firewallPortWhiteList: string;
     }
     export interface SettingInfo {
         systemVersion: string;
