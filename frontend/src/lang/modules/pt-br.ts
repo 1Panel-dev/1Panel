@@ -872,6 +872,11 @@ const message = {
             from_remote: 'Model ini tidak dimuat turun melalui 1Panel, tiada log pengambilan berkaitan.',
             no_logs: 'Log pengambilan untuk model ini telah dipadam dan tidak dapat dilihat.',
             vllmVersionHelper: 'Para servidores FusionXpark GB 10, selecione a versão -cu130.',
+            syncModelAccount: 'Sincronizar com conta de modelo',
+            modelAccountAddressHelper:
+                'Use o endereço do contêiner para agentes; 127.0.0.1, IP do sistema ou endereço personalizado para AI Gateway ou serviços externos.',
+            containerAddress: 'Endereço do contêiner',
+            customAddress: 'Endereço personalizado',
             downloader: 'Baixador',
             modelDir: 'Diretório do modelo',
             manualDownload: 'Download manual',

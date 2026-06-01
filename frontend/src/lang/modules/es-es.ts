@@ -876,6 +876,11 @@ const message = {
             from_remote: 'Este modelo no fue descargado vía 1Panel, no hay registros de descarga relacionados.',
             no_logs: 'Los registros de descarga de este modelo han sido eliminados y no se pueden consultar.',
             vllmVersionHelper: 'Para servidores FusionXpark GB 10, seleccione la versión -cu130.',
+            syncModelAccount: 'Sincronizar con cuenta de modelo',
+            modelAccountAddressHelper:
+                'La dirección del contenedor es para contenedores de agentes; 127.0.0.1, IP del sistema o dirección personalizada es para AI Gateway o servicios externos.',
+            containerAddress: 'Dirección del contenedor',
+            customAddress: 'Dirección personalizada',
             downloader: 'Descargador',
             modelDir: 'Directorio del modelo',
             manualDownload: 'Descarga manual',

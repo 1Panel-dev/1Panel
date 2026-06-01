@@ -867,6 +867,11 @@ const message = {
             from_remote: 'このモデルは1Panelを介してダウンロードされておらず、関連するプルログはありません。',
             no_logs: 'このモデルのプルログは削除されており、関連するログを表示できません。',
             vllmVersionHelper: 'FusionXpark GB 10 サーバーでは -cu130 バージョンを選択してください。',
+            syncModelAccount: 'モデルアカウントに同期',
+            modelAccountAddressHelper:
+                'コンテナアドレスはエージェントコンテナ向けです。127.0.0.1、システム IP、カスタムアドレスは AI Gateway または外部サービス向けです。',
+            containerAddress: 'コンテナアドレス',
+            customAddress: 'カスタムアドレス',
             downloader: 'ダウンローダー',
             modelDir: 'モデルディレクトリ',
             manualDownload: '手動ダウンロード',

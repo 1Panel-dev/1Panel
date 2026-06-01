@@ -863,6 +863,11 @@ const message = {
             from_remote: 'This model was not downloaded via 1Panel, no related pull logs.',
             no_logs: 'The pull logs for this model have been deleted and cannot be viewed.',
             vllmVersionHelper: 'For FusionXpark GB 10 servers, please select the -cu130 version.',
+            syncModelAccount: 'Sync to model account',
+            modelAccountAddressHelper:
+                'Container address is for agent containers; 127.0.0.1, system IP, or custom address is for AI Gateway or external services.',
+            containerAddress: 'Container address',
+            customAddress: 'Custom address',
             downloader: 'Downloader',
             modelDir: 'Model directory',
             manualDownload: 'Manual Download',

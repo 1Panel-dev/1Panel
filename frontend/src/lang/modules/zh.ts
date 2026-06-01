@@ -809,6 +809,11 @@ const message = {
             from_remote: '该模型并非通过 1Panel 下载，无相关拉取日志。',
             no_logs: '该模型的拉取日志已被删除，无法查看相关日志。',
             vllmVersionHelper: 'FusionXpark GB 10 服务器请选择 -cu130 版本',
+            syncModelAccount: '同步到模型账号',
+            modelAccountAddressHelper:
+                '容器地址适合智能体容器调用；127.0.0.1、本机 IP 或自定义地址适合 AI 网关或外部服务调用。',
+            containerAddress: '容器地址',
+            customAddress: '自定义地址',
             downloader: '下载器',
             modelDir: '模型目录',
             manualDownload: '手动下载',

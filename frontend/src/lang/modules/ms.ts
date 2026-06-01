@@ -876,6 +876,11 @@ const message = {
             from_remote: 'Este modelo não foi baixado via 1Panel, sem logs de pull relacionados.',
             no_logs: 'Os logs de pull deste modelo foram excluídos e não podem ser visualizados.',
             vllmVersionHelper: 'Untuk pelayan FusionXpark GB 10, sila pilih versi -cu130.',
+            syncModelAccount: 'Segerakkan ke akaun model',
+            modelAccountAddressHelper:
+                'Alamat kontena sesuai untuk kontena agen; 127.0.0.1, IP sistem, atau alamat tersuai sesuai untuk AI Gateway atau perkhidmatan luaran.',
+            containerAddress: 'Alamat kontena',
+            customAddress: 'Alamat tersuai',
             downloader: 'Pemuat Turun',
             modelDir: 'Direktori Model',
             manualDownload: 'Muat Turun Manual',
