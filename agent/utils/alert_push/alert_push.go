@@ -57,8 +57,6 @@ func pushByLegacyMethod(alertRepo repo.IAlertRepo, alert dto.AlertDTO, pushAlert
 	configType := method
 	if mapped, ok := typeMap[method]; ok {
 		configType = mapped
-	} else {
-		configType = method
 	}
 	config, err := alertRepo.GetConfig(alertRepo.WithByType(configType))
 	if err != nil {

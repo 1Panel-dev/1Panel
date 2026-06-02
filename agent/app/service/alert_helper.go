@@ -623,10 +623,8 @@ func sendAlertsByLegacyMethod(alert dto.AlertDTO, alertType, quota, quotaType st
 		constant.Bark: constant.Bark,
 		constant.SMS:  constant.SMS,
 	}
-	configType := method
-	if mapped, ok := typeMap[method]; ok {
-		configType = mapped
-	} else {
+	configType, ok := typeMap[method]
+	if !ok {
 		configType = method
 	}
 	config, err := alertRepo.GetConfig(alertRepo.WithByType(configType))
