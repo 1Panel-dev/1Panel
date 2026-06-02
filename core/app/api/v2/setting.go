@@ -317,6 +317,9 @@ func (b *BaseApi) UpdatePort(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags System Setting
+// @Summary Reload SSL
+// @Router /core/settings/ssl/reload [post]
 func (b *BaseApi) ReloadSSL(c *gin.Context) {
 	clientIP := c.ClientIP()
 	if clientIP != "127.0.0.1" {

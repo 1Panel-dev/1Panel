@@ -74,6 +74,9 @@ func (b *BaseApi) LoadPersistenceConf(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// @Tags Database Redis
+// @Summary Check has cli
+// @Router /databases/redis/check [get]
 func (b *BaseApi) CheckHasCli(c *gin.Context) {
 	helper.SuccessWithData(c, redisService.CheckHasCli())
 }

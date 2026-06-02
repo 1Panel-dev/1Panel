@@ -5,6 +5,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Tags Health
+// @Summary Check health
+// @Router /health/check [get]
 func (b *BaseApi) CheckHealth(c *gin.Context) {
 	helper.Success(c)
 }

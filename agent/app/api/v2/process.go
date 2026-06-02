@@ -8,6 +8,9 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// @Tags Process
+// @Summary Process ws
+// @Router /process/ws [get]
 func (b *BaseApi) ProcessWs(c *gin.Context) {
 	if !websocket.IsWebSocketUpgrade(c.Request) {
 		helper.Success(c)

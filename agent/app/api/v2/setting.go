@@ -24,6 +24,9 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 	helper.SuccessWithData(c, setting)
 }
 
+// @Tags System Setting
+// @Summary Get terminal AI setting info
+// @Router /settings/terminal/ai/search [post]
 func (b *BaseApi) GetTerminalAISettingInfo(c *gin.Context) {
 	setting, err := settingService.GetTerminalAIInfo()
 	if err != nil {
@@ -65,6 +68,9 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags System Setting
+// @Summary Update terminal AI setting
+// @Router /settings/terminal/ai/update [post]
 func (b *BaseApi) UpdateTerminalAISetting(c *gin.Context) {
 	var req dto.TerminalAIInfo
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -78,6 +84,9 @@ func (b *BaseApi) UpdateTerminalAISetting(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags System Setting
+// @Summary Get file manage AI setting info
+// @Router /settings/files/ai/search [post]
 func (b *BaseApi) GetFileManageAISettingInfo(c *gin.Context) {
 	setting, err := settingService.GetFileManageAIInfo()
 	if err != nil {
@@ -87,6 +96,9 @@ func (b *BaseApi) GetFileManageAISettingInfo(c *gin.Context) {
 	helper.SuccessWithData(c, setting)
 }
 
+// @Tags System Setting
+// @Summary Update file manage AI setting
+// @Router /settings/files/ai/update [post]
 func (b *BaseApi) UpdateFileManageAISetting(c *gin.Context) {
 	var req dto.FileManageAIInfo
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -164,6 +176,9 @@ func (b *BaseApi) LoadLocalConn(c *gin.Context) {
 	helper.SuccessWithData(c, settingService.GetLocalConn())
 }
 
+// @Tags System Setting
+// @Summary Check local conn
+// @Router /settings/ssh/check [post]
 func (b *BaseApi) CheckLocalConn(c *gin.Context) {
 	client, err := loadLocalConn()
 	if err == nil && client != nil {
@@ -179,7 +194,7 @@ func (b *BaseApi) CheckLocalConn(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /settings/ssh/conn/default [post]
+// @Router /settings/ssh/default [post]
 // @x-panel-log {"bodyKeys":["defaultConn"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"本地终端默认连接 [defaultConn]","formatEN":"update system default conn [defaultConn]"}
 func (b *BaseApi) SetDefaultIsConn(c *gin.Context) {
 	var req dto.SSHDefaultConn

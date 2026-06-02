@@ -17,7 +17,7 @@ import (
 // @Success 200 {string} path
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /core/commands/import [post]
+// @Router /core/commands/upload [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"上传快速命令文件","formatEN":"upload quick commands with csv"}
 func (b *BaseApi) UploadCommandCsv(c *gin.Context) {
 	form, err := c.MultipartForm()
@@ -157,7 +157,7 @@ func (b *BaseApi) SearchCommand(c *gin.Context) {
 // @Success 200 {array} dto.CommandTree
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /core/commands/tree [get]
+// @Router /core/commands/tree [post]
 func (b *BaseApi) SearchCommandTree(c *gin.Context) {
 	var req dto.OperateByType
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -180,7 +180,7 @@ func (b *BaseApi) SearchCommandTree(c *gin.Context) {
 // @Success 200 {object} dto.CommandInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /core/commands/command [get]
+// @Router /core/commands/list [post]
 func (b *BaseApi) ListCommand(c *gin.Context) {
 	var req dto.OperateByType
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

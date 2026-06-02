@@ -7,6 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Tags Host
+// @Summary Create host
+// @Router /hosts [post]
 func (b *BaseApi) CreateHost(c *gin.Context) {
 	var req dto.HostOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -21,6 +24,9 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 	helper.SuccessWithData(c, host)
 }
 
+// @Tags Host
+// @Summary Test by info
+// @Router /hosts/test/byinfo [post]
 func (b *BaseApi) TestByInfo(c *gin.Context) {
 	var req dto.HostConnTest
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -30,6 +36,9 @@ func (b *BaseApi) TestByInfo(c *gin.Context) {
 	helper.SuccessWithData(c, hostService.TestByInfo(req))
 }
 
+// @Tags Host
+// @Summary Test by ID
+// @Router /hosts/test/byid [post]
 func (b *BaseApi) TestByID(c *gin.Context) {
 	var req dto.OperateByID
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -39,6 +48,9 @@ func (b *BaseApi) TestByID(c *gin.Context) {
 	helper.SuccessWithData(c, hostService.TestLocalConn(req.ID))
 }
 
+// @Tags Host
+// @Summary Host tree
+// @Router /hosts/tree [post]
 func (b *BaseApi) HostTree(c *gin.Context) {
 	var req dto.SearchForTree
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -53,6 +65,9 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// @Tags Host
+// @Summary Search host
+// @Router /hosts/search [post]
 func (b *BaseApi) SearchHost(c *gin.Context) {
 	var req dto.SearchPageWithGroup
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -68,6 +83,9 @@ func (b *BaseApi) SearchHost(c *gin.Context) {
 	helper.SuccessWithData(c, dto.PageResult{Items: list, Total: total})
 }
 
+// @Tags Host
+// @Summary Delete host
+// @Router /hosts/del [post]
 func (b *BaseApi) DeleteHost(c *gin.Context) {
 	var req dto.OperateByIDs
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -81,6 +99,9 @@ func (b *BaseApi) DeleteHost(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Host
+// @Summary Update host
+// @Router /hosts/update [post]
 func (b *BaseApi) UpdateHost(c *gin.Context) {
 	var req dto.HostOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -140,6 +161,9 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	helper.SuccessWithData(c, hostItem)
 }
 
+// @Tags Host
+// @Summary Update host group
+// @Router /hosts/update/group [post]
 func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 	var req dto.ChangeGroup
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -153,6 +177,9 @@ func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Host
+// @Summary Get host by ID
+// @Router /hosts/info [post]
 func (b *BaseApi) GetHostByID(c *gin.Context) {
 	var req dto.OperateByID
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

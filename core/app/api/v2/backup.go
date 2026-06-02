@@ -56,6 +56,7 @@ func (b *BaseApi) RefreshToken(c *gin.Context) {
 // @Success 200 {object} dto.BackupClientInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
+// @Param clientType path string true "clientType"
 // @Router /core/backups/client/:clientType [get]
 func (b *BaseApi) LoadBackupClientInfo(c *gin.Context) {
 	clientType, ok := c.Params.Get("clientType")
@@ -101,7 +102,7 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/backups/update [post]
-// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新备份账号 [types]","formatEN":"update backup account [types]"}
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新备份账号 [type]","formatEN":"update backup account [type]"}
 func (b *BaseApi) UpdateBackup(c *gin.Context) {
 	var req dto.BackupOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

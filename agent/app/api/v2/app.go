@@ -107,7 +107,7 @@ func (b *BaseApi) GetApp(c *gin.Context) {
 // @Accept json
 // @Param appId path integer true "app id"
 // @Param version path string true "app 版本"
-// @Param version path string true "app 类型"
+// @Param type path string true "app 类型"
 // @Success 200 {object} response.AppDetailDTO
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -131,7 +131,7 @@ func (b *BaseApi) GetAppDetail(c *gin.Context) {
 // @Tags App
 // @Summary Get app detail by id
 // @Accept json
-// @Param appId path integer true "id"
+// @Param id path integer true "id"
 // @Success 200 {object} response.AppDetailDTO
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -172,6 +172,9 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 	helper.SuccessWithData(c, install)
 }
 
+// @Tags App
+// @Summary Get app tags
+// @Router /apps/tags [get]
 func (b *BaseApi) GetAppTags(c *gin.Context) {
 	tags, err := appService.GetAppTags(c)
 	if err != nil {
@@ -199,7 +202,7 @@ func (b *BaseApi) GetAppListUpdate(c *gin.Context) {
 // @Tags App
 // @Summary Get app icon by app_id
 // @Accept json
-// @Param appId path integer true "app id"
+// @Param key path string true "app key"
 // @Success 200 {file} file "app icon"
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -237,7 +240,7 @@ func (b *BaseApi) GetAppIcon(c *gin.Context) {
 // @Tags App
 // @Summary Search app detail by appkey and version
 // @Accept json
-// @Param appId path integer true "app key"
+// @Param appKey path string true "app key"
 // @Param version path string true "app version"
 // @Success 200 {object} response.AppDetailSimpleDTO
 // @Security ApiKeyAuth

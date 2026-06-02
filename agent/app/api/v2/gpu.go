@@ -40,6 +40,9 @@ func (b *BaseApi) LoadGpuInfo(c *gin.Context) {
 	helper.SuccessWithData(c, &common.GpuInfo{})
 }
 
+// @Tags AI
+// @Summary Get CPU options
+// @Router /ai/gpu/options [get]
 func (b *BaseApi) GetCPUOptions(c *gin.Context) {
 	helper.SuccessWithData(c, monitorService.LoadGPUOptions())
 }

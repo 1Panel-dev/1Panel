@@ -201,6 +201,8 @@ func (b *BaseApi) GetBindDomain(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
+// @Tags AI
+// @Summary Update bind domain
 // Tags AI
 // Summary Update bind domain
 // Accept json
@@ -209,6 +211,7 @@ func (b *BaseApi) GetBindDomain(c *gin.Context) {
 // Security ApiKeyAuth
 // Security Timestamp
 // Router /ai/domain/update [post]
+// @Router /ai/domain/update [post]
 func (b *BaseApi) UpdateBindDomain(c *gin.Context) {
 	var req dto.OllamaBindDomain
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

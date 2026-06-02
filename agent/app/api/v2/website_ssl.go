@@ -333,6 +333,9 @@ func (b *BaseApi) DownloadWebsiteSSL(c *gin.Context) {
 	http.ServeContent(c.Writer, c.Request, info.Name(), info.ModTime(), file)
 }
 
+// @Tags Website SSL
+// @Summary Import master SSL
+// @Router /websites/ssl/import [post]
 func (b *BaseApi) ImportMasterSSL(c *gin.Context) {
 	var req model.WebsiteSSL
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

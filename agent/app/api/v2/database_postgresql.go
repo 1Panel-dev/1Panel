@@ -92,7 +92,7 @@ func (b *BaseApi) UpdatePostgresqlDescription(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /databases/pg/privileges [post]
-// @x-panel-log {"bodyKeys":["database", "username"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新数据库 [database] 用户 [username] 权限","formatEN":"Update [user] privileges of database [database]"}
+// @x-panel-log {"bodyKeys":["database", "username"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新数据库 [database] 用户 [username] 权限","formatEN":"Update [username] privileges of database [database]"}
 func (b *BaseApi) ChangePostgresqlPrivileges(c *gin.Context) {
 	var req dto.PostgresqlPrivileges
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -170,6 +170,7 @@ func (b *BaseApi) SearchPostgresql(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
+// @Param database path string true "database"
 // @Router /databases/pg/:database/load [post]
 func (b *BaseApi) LoadPostgresqlDBFromRemote(c *gin.Context) {
 	database, err := helper.GetStrParamByKey(c, "database")

@@ -7,6 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Tags Alert
+// @Summary Page alert
+// @Router /alert/search [post]
 func (b *BaseApi) PageAlert(c *gin.Context) {
 	var req dto.AlertSearch
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -32,6 +35,9 @@ func (b *BaseApi) GetAlerts(c *gin.Context) {
 	helper.SuccessWithData(c, alerts)
 }
 
+// @Tags Alert
+// @Summary Create alert
+// @Router /alert [post]
 func (b *BaseApi) CreateAlert(c *gin.Context) {
 	var req dto.AlertCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -45,6 +51,9 @@ func (b *BaseApi) CreateAlert(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Alert
+// @Summary Delete alert
+// @Router /alert/del [post]
 func (b *BaseApi) DeleteAlert(c *gin.Context) {
 	var req dto.DeleteRequest
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -58,6 +67,9 @@ func (b *BaseApi) DeleteAlert(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Alert
+// @Summary Update alert
+// @Router /alert/update [post]
 func (b *BaseApi) UpdateAlert(c *gin.Context) {
 	var req dto.AlertUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -84,6 +96,9 @@ func (b *BaseApi) GetAlert(c *gin.Context) {
 	helper.SuccessWithData(c, alert)
 }
 
+// @Tags Alert
+// @Summary Update alert status
+// @Router /alert/status [post]
 func (b *BaseApi) UpdateAlertStatus(c *gin.Context) {
 	var req dto.AlertUpdateStatus
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -97,6 +112,9 @@ func (b *BaseApi) UpdateAlertStatus(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Alert
+// @Summary Get disks
+// @Router /alert/disks/list [get]
 func (b *BaseApi) GetDisks(c *gin.Context) {
 	alerts, err := alertService.GetDisks()
 	if err != nil {
@@ -106,6 +124,9 @@ func (b *BaseApi) GetDisks(c *gin.Context) {
 	helper.SuccessWithData(c, alerts)
 }
 
+// @Tags Alert
+// @Summary Page alert logs
+// @Router /alert/logs/search [post]
 func (b *BaseApi) PageAlertLogs(c *gin.Context) {
 	var req dto.AlertLogSearch
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -122,6 +143,9 @@ func (b *BaseApi) PageAlertLogs(c *gin.Context) {
 	})
 }
 
+// @Tags Alert
+// @Summary Clean alert logs
+// @Router /alert/logs/clean [post]
 func (b *BaseApi) CleanAlertLogs(c *gin.Context) {
 	if err := alertService.CleanAlertLogs(); err != nil {
 		helper.InternalServer(c, err)
@@ -130,6 +154,9 @@ func (b *BaseApi) CleanAlertLogs(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Alert
+// @Summary Get clams
+// @Router /alert/clams/list [get]
 func (b *BaseApi) GetClams(c *gin.Context) {
 	clams, err := alertService.GetClams()
 	if err != nil {
@@ -139,6 +166,9 @@ func (b *BaseApi) GetClams(c *gin.Context) {
 	helper.SuccessWithData(c, clams)
 }
 
+// @Tags Alert
+// @Summary Get cron jobs
+// @Router /alert/cronjob/list [post]
 func (b *BaseApi) GetCronJobs(c *gin.Context) {
 	var req dto.CronJobReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -152,6 +182,9 @@ func (b *BaseApi) GetCronJobs(c *gin.Context) {
 	helper.SuccessWithData(c, cronJobs)
 }
 
+// @Tags Alert
+// @Summary Get alert config
+// @Router /alert/config/info [post]
 func (b *BaseApi) GetAlertConfig(c *gin.Context) {
 	config, err := alertService.GetAlertConfig()
 	if err != nil {
@@ -161,6 +194,9 @@ func (b *BaseApi) GetAlertConfig(c *gin.Context) {
 	helper.SuccessWithData(c, config)
 }
 
+// @Tags Alert
+// @Summary Update alert config
+// @Router /alert/config/update [post]
 func (b *BaseApi) UpdateAlertConfig(c *gin.Context) {
 	var req dto.AlertConfigUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -173,6 +209,9 @@ func (b *BaseApi) UpdateAlertConfig(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Alert
+// @Summary Delete alert config
+// @Router /alert/config/del [post]
 func (b *BaseApi) DeleteAlertConfig(c *gin.Context) {
 	var req dto.DeleteRequest
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -186,6 +225,9 @@ func (b *BaseApi) DeleteAlertConfig(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Alert
+// @Summary Test alert config
+// @Router /alert/config/test [post]
 func (b *BaseApi) TestAlertConfig(c *gin.Context) {
 	var req dto.AlertConfigTest
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

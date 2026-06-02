@@ -61,7 +61,7 @@ func (b *BaseApi) CreateRuntime(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /runtimes/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除运行环境 [name]","formatEN":"Delete runtime [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除运行环境 [id]","formatEN":"Delete runtime [id]"}
 func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 	var req request.RuntimeDelete
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -81,6 +81,7 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 // @Success 200 {array} dto.AppResource
 // @Security ApiKeyAuth
 // @Security Timestamp
+// @Param id path integer true "id"
 // @Router /runtimes/installed/delete/check/:id [get]
 func (b *BaseApi) DeleteRuntimeCheck(c *gin.Context) {
 	runTimeId, err := helper.GetIntParamByKey(c, "id")
@@ -120,7 +121,7 @@ func (b *BaseApi) UpdateRuntime(c *gin.Context) {
 // @Tags Runtime
 // @Summary Get runtime
 // @Accept json
-// @Param id path string true "request"
+// @Param id path integer true "request"
 // @Success 200 {object} response.RuntimeDTO
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -168,7 +169,7 @@ func (b *BaseApi) GetNodePackageRunScript(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /runtimes/operate [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"操作运行环境 [name]","formatEN":"Operate runtime [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"操作运行环境 [id]","formatEN":"Operate runtime [id]"}
 func (b *BaseApi) OperateRuntime(c *gin.Context) {
 	var req request.RuntimeOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -242,7 +243,7 @@ func (b *BaseApi) SyncStatus(c *gin.Context) {
 // @Tags Runtime
 // @Summary Get php runtime extension
 // @Accept json
-// @Param id path string true "request"
+// @Param id path integer true "request"
 // @Success 200 {object} response.PHPExtensionRes
 // @Security ApiKeyAuth
 // @Security Timestamp

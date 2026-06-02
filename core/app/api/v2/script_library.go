@@ -134,6 +134,9 @@ func (b *BaseApi) UpdateScript(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags ScriptLibrary
+// @Summary Run script
+// @Router /core/script/run [get]
 func (b *BaseApi) RunScript(c *gin.Context) {
 	if !websocket.IsWebSocketUpgrade(c.Request) {
 		helper.Success(c)

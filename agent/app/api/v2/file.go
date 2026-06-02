@@ -193,7 +193,7 @@ func (b *BaseApi) BatchDeleteFile(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/mode [post]
-// @x-panel-log {"bodyKeys":["path","mode"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改权限 [paths] => [mode]","formatEN":"Change mode [paths] => [mode]"}
+// @x-panel-log {"bodyKeys":["path","mode"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改权限 [path] => [mode]","formatEN":"Change mode [path] => [mode]"}
 func (b *BaseApi) ChangeFileMode(c *gin.Context) {
 	var req request.FileCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -215,7 +215,7 @@ func (b *BaseApi) ChangeFileMode(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/owner [post]
-// @x-panel-log {"bodyKeys":["path","user","group"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改用户/组 [paths] => [user]/[group]","formatEN":"Change owner [paths] => [user]/[group]"}
+// @x-panel-log {"bodyKeys":["path","user","group"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改用户/组 [path] => [user]/[group]","formatEN":"Change owner [path] => [user]/[group]"}
 func (b *BaseApi) ChangeFileOwner(c *gin.Context) {
 	var req request.FileRoleUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -934,6 +934,9 @@ var wsUpgrade = websocket.Upgrader{
 	},
 }
 
+// @Tags File
+// @Summary Wget process
+// @Router /files/wget/process [get]
 func (b *BaseApi) WgetProcess(c *gin.Context) {
 	if !websocket.IsWebSocketUpgrade(c.Request) {
 		helper.Success(c)
@@ -948,6 +951,9 @@ func (b *BaseApi) WgetProcess(c *gin.Context) {
 	go wsClient.Write()
 }
 
+// @Tags File
+// @Summary Process keys
+// @Router /files/wget/process/keys [get]
 func (b *BaseApi) ProcessKeys(c *gin.Context) {
 	res := &response.FileProcessKeys{}
 	keys := global.CACHE.PrefixScanKey("file-wget-")
@@ -967,11 +973,12 @@ func (b *BaseApi) ProcessKeys(c *gin.Context) {
 
 // @Tags File
 // @Summary Read file by Line
+// @Param type path string true "type"
 // @Param request body request.FileReadByLineReq true "request"
 // @Success 200 {object} response.FileLineContent
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /files/read [post]
+// @Router /files/read/{type} [post]
 func (b *BaseApi) ReadFileByLine(c *gin.Context) {
 	var req request.FileReadByLineReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
