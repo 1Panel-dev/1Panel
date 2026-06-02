@@ -138,6 +138,8 @@ PushAppInstallTaskToNode: "Enviar tarefa de instalação de aplicativo para o n�
 TaskPush: "Enviar"
 AppInstallTask: "Tarefa de instalação de aplicativo"
 PushAppFailed: "Falha ao enviar tarefa de instalação de aplicativo"
+SkillHubInstallTask: "Instalar skill [{{ .name }}]"
+SkillHubInstallToTarget: "Instalar skill no destino [{{ .name }}]"
 Success: "Sucesso"
 
 #script

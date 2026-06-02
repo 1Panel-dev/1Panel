@@ -140,6 +140,8 @@ FailedStatus: "{{ .name }} fallida {{ .err }}"
 Start: "Iniciar"
 SubTask: "Subtarea"
 Skip: "Omitir errores y continuar..."
+SkillHubInstallTask: "Instalar skill [{{ .name }}]"
+SkillHubInstallToTarget: "Instalar skill en destino [{{ .name }}]"
 
 #script
 ScriptLibrary: "Biblioteca de scripts"

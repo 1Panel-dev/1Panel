@@ -139,6 +139,8 @@ PushAppInstallTaskToNode: "傳送應用安裝任務到節點 [{{ .name }}]"
 TaskPush: "傳送"
 AppInstallTask: "應用安裝任務"
 PushAppFailed: "傳送應用安裝任務失敗"
+SkillHubInstallTask: "安裝技能 [{{ .name }}]"
+SkillHubInstallToTarget: "安裝技能到目標 [{{ .name }}]"
 Success: "成功"
 
 #script

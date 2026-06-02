@@ -145,6 +145,8 @@ PushAppInstallTaskToNode: "Push app installation task to node [{{ .name }}]"
 TaskPush: "Push"
 AppInstallTask: "App installation task"
 PushAppFailed: "Failed to push app installation task"
+SkillHubInstallTask: "Install skill [{{ .name }}]"
+SkillHubInstallToTarget: "Install skill to target [{{ .name }}]"
 Success: "Success"
 
 #script

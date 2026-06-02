@@ -138,6 +138,8 @@ PushAppInstallTaskToNode: "노드 [{{ .name }}]로 앱 설치 작업 전송"
 TaskPush: "전송"
 AppInstallTask: "앱 설치 작업"
 PushAppFailed: "앱 설치 작업 전송 실패"
+SkillHubInstallTask: "스킬 설치 [{{ .name }}]"
+SkillHubInstallToTarget: "대상에 스킬 설치 [{{ .name }}]"
 Success: "성공"
 
 #script

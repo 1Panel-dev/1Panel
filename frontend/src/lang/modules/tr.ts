@@ -1089,7 +1089,7 @@ const message = {
             containerized: 'Konteynerli',
             containerName: 'Konteyner adı',
             hostSkillDir: 'Skill dizini',
-            hostSkillDirHelper: '1Panelin kurulu olduğu sunucudaki Skill dizini yolunu girin.',
+            hostSkillDirHelper: 'Düğümdeki Skill dizini yolunu girin.',
             containerSkillDir: 'Konteyner içi Skill dizini',
             installMethod: 'Kurulum yöntemi',
             copy: 'Kopyala',
@@ -1125,6 +1125,7 @@ const message = {
                 published: 'Yayınlandı',
                 disabled: 'Yayından kaldırıldı',
                 rejected: 'Reddedildi',
+                deleted: 'Silindi',
             },
             agent: {
                 common: 'Ortak',

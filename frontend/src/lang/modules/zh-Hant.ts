@@ -1025,7 +1025,7 @@ const message = {
             containerized: '容器化',
             containerName: '容器名稱',
             hostSkillDir: 'Skill 目錄',
-            hostSkillDirHelper: '請填寫 1Panel 所在伺服器上的 Skill 目錄路徑。',
+            hostSkillDirHelper: '請填寫節點 Skill 目錄路徑。',
             containerSkillDir: '容器內 Skill 目錄',
             installMethod: '安裝方式',
             copy: '複製',
@@ -1058,6 +1058,7 @@ const message = {
                 published: '已上架',
                 disabled: '已下架',
                 rejected: '審核未通過',
+                deleted: '已刪除',
             },
             agent: {
                 common: '通用',

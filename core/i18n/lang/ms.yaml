@@ -133,6 +133,8 @@ PushAppInstallTaskToNode: "Hantar tugas pemasangan aplikasi ke nod [{{ .name }}]
 TaskPush: "Hantar"
 AppInstallTask: "Tugas pemasangan aplikasi"
 PushAppFailed: "Gagal menghantar tugas pemasangan aplikasi"
+SkillHubInstallTask: "Pasang kemahiran [{{ .name }}]"
+SkillHubInstallToTarget: "Pasang kemahiran ke sasaran [{{ .name }}]"
 Success: "Berjaya"
 
 #script 

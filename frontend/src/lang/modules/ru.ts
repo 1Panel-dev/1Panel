@@ -1081,7 +1081,7 @@ const message = {
             containerized: 'В контейнере',
             containerName: 'Имя контейнера',
             hostSkillDir: 'Каталог Skills',
-            hostSkillDirHelper: 'Введите путь к каталогу Skills на сервере, где установлен 1Panel.',
+            hostSkillDirHelper: 'Введите путь к каталогу Skills на узле.',
             containerSkillDir: 'Каталог Skills в контейнере',
             installMethod: 'Способ установки',
             copy: 'Копировать',
@@ -1118,6 +1118,7 @@ const message = {
                 published: 'Опубликован',
                 disabled: 'Снят с публикации',
                 rejected: 'Отклонен',
+                deleted: 'Удален',
             },
             agent: {
                 common: 'Общий',
