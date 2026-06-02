@@ -357,6 +357,7 @@ func (b *BaseApi) GetAppInstallInfo(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /apps/installed/sort/update [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新已安装应用排序","formatEN":"update installed app sort"}
 func (b *BaseApi) UpdateAppInstallSort(c *gin.Context) {
 	var req request.AppInstallSort
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

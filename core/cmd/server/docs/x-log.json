@@ -1,4 +1,13 @@
 {
+	"/ai/domain/update": {
+		"bodyKeys": [
+			"domain"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 Ollama 绑定域名 [domain]",
+		"formatEN": "update Ollama bind domain [domain]"
+	},
 	"/ai/ollama/close": {
 		"bodyKeys": [
 			"name"
@@ -50,6 +59,109 @@
 		"beforeFunctions": [],
 		"formatZH": "同步 Ollama 模型列表",
 		"formatEN": "sync Ollama model list"
+	},
+	"/ai/tensorrt/create": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 TensorRT LLM [name]",
+		"formatEN": "create TensorRT LLM [name]"
+	},
+	"/ai/tensorrt/delete": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 TensorRT LLM [id]",
+		"formatEN": "delete TensorRT LLM [id]"
+	},
+	"/ai/tensorrt/operate": {
+		"bodyKeys": [
+			"id",
+			"operate"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "操作 TensorRT LLM [id][operate]",
+		"formatEN": "operate TensorRT LLM [id][operate]"
+	},
+	"/ai/tensorrt/update": {
+		"bodyKeys": [
+			"id",
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 TensorRT LLM [id][name]",
+		"formatEN": "update TensorRT LLM [id][name]"
+	},
+	"/alert": {
+		"bodyKeys": [
+			"type",
+			"method"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建告警任务 [type][method]",
+		"formatEN": "create alert [type][method]"
+	},
+	"/alert/config/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除告警配置 [id]",
+		"formatEN": "delete alert config [id]"
+	},
+	"/alert/config/update": {
+		"bodyKeys": [
+			"type",
+			"title"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新告警配置 [type][title]",
+		"formatEN": "update alert config [type][title]"
+	},
+	"/alert/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除告警任务 [id]",
+		"formatEN": "delete alert [id]"
+	},
+	"/alert/logs/clean": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "清空告警日志",
+		"formatEN": "clean alert logs"
+	},
+	"/alert/status": {
+		"bodyKeys": [
+			"id",
+			"status"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新告警任务 [id] 状态 [status]",
+		"formatEN": "update alert [id] status [status]"
+	},
+	"/alert/update": {
+		"bodyKeys": [
+			"id",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新告警任务 [id][type]",
+		"formatEN": "update alert [id][type]"
 	},
 	"/apps/ignored/cancel": {
 		"bodyKeys": [],
@@ -147,6 +259,13 @@
 		"beforeFunctions": [],
 		"formatZH": "应用端口修改 [key]-[name] =\u003e [port]",
 		"formatEN": "Application port update [key]-[name] =\u003e [port]"
+	},
+	"/apps/installed/sort/update": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新已安装应用排序",
+		"formatEN": "update installed app sort"
 	},
 	"/apps/installed/sync": {
 		"bodyKeys": [],
@@ -265,8 +384,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新备份账号 [types]",
-		"formatEN": "update backup account [types]"
+		"formatZH": "更新备份账号 [type]",
+		"formatEN": "update backup account [type]"
 	},
 	"/backups/upload": {
 		"bodyKeys": [
@@ -751,8 +870,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新备份账号 [types]",
-		"formatEN": "update backup account [types]"
+		"formatZH": "更新备份账号 [type]",
+		"formatEN": "update backup account [type]"
 	},
 	"/core/commands": {
 		"bodyKeys": [
@@ -804,6 +923,13 @@
 		"beforeFunctions": [],
 		"formatZH": "更新快捷命令 [name]",
 		"formatEN": "update quick command [name]"
+	},
+	"/core/commands/upload": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "上传快速命令文件",
+		"formatEN": "upload quick commands with csv"
 	},
 	"/core/enterprise/ai-benchmark/tasks": {
 		"bodyKeys": [
@@ -857,6 +983,15 @@
 		"beforeFunctions": [],
 		"formatZH": "查看 AI 网关 API Key [id]",
 		"formatEN": "reveal AI proxy API key [id]"
+	},
+	"/core/enterprise/ai-proxy/api-keys/token/reset": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "重置 AI 网关 API Key Token [id]",
+		"formatEN": "reset AI proxy API key token [id]"
 	},
 	"/core/enterprise/ai-proxy/api-keys/update": {
 		"bodyKeys": [
@@ -1045,7 +1180,7 @@
 		"formatZH": "更新运维报表设置 [key]",
 		"formatEN": "update ops report setting [key]"
 	},
-	"/core/enterprise/user": {
+	"/core/enterprise/users": {
 		"bodyKeys": [
 			"name"
 		],
@@ -1136,13 +1271,6 @@
 		"formatZH": "更新组 [name][type]",
 		"formatEN": "update group [name][type]"
 	},
-	"/core/licenses/add": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "添加许可证",
-		"formatEN": "import license"
-	},
 	"/core/licenses/bind": {
 		"bodyKeys": [],
 		"paramKeys": [],
@@ -1184,6 +1312,13 @@
 		"beforeFunctions": [],
 		"formatZH": "替换许可证",
 		"formatEN": "change license"
+	},
+	"/core/licenses/upload": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "添加许可证",
+		"formatEN": "import license"
 	},
 	"/core/logs/clean": {
 		"bodyKeys": [
@@ -1295,6 +1430,13 @@
 		"beforeFunctions": [],
 		"formatZH": "服务器代理配置 [proxyPort]:[proxyPort]",
 		"formatEN": "set proxy [proxyPort]:[proxyPort]."
+	},
+	"/core/settings/ssl/reload": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "重载系统 SSL",
+		"formatEN": "reload system SSL"
 	},
 	"/core/settings/ssl/update": {
 		"bodyKeys": [
@@ -1978,7 +2120,7 @@
 		"paramKeys": [],
 		"beforeFunctions": [],
 		"formatZH": "更新数据库 [database] 用户 [username] 权限",
-		"formatEN": "Update [user] privileges of database [database]"
+		"formatEN": "Update [username] privileges of database [database]"
 	},
 	"/databases/redis/conf/update": {
 		"bodyKeys": [],
@@ -2126,8 +2268,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改权限 [paths] =\u003e [mode]",
-		"formatEN": "Change mode [paths] =\u003e [mode]"
+		"formatZH": "修改权限 [path] =\u003e [mode]",
+		"formatEN": "Change mode [path] =\u003e [mode]"
 	},
 	"/files/move": {
 		"bodyKeys": [
@@ -2147,8 +2289,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改用户/组 [paths] =\u003e [user]/[group]",
-		"formatEN": "Change owner [paths] =\u003e [user]/[group]"
+		"formatZH": "修改用户/组 [path] =\u003e [user]/[group]",
+		"formatEN": "Change owner [path] =\u003e [user]/[group]"
 	},
 	"/files/preview": {
 		"bodyKeys": [
@@ -2298,6 +2440,34 @@
 		"formatZH": "更新组 [name][type]",
 		"formatEN": "update group [name][type]"
 	},
+	"/hosts": {
+		"bodyKeys": [
+			"name",
+			"addr"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建主机 [name][addr]",
+		"formatEN": "create host [name][addr]"
+	},
+	"/hosts/del": {
+		"bodyKeys": [
+			"ids"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"db": "hosts",
+				"output_column": "name",
+				"output_value": "names"
+			}
+		],
+		"formatZH": "删除主机 [names]",
+		"formatEN": "delete host [names]"
+	},
 	"/hosts/disks/mount": {
 		"bodyKeys": [
 			"device",
@@ -2398,8 +2568,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改默认监控网卡 [name]-[value]",
-		"formatEN": "update default monitor [name]-[value]"
+		"formatZH": "修改默认监控网卡 [key]-[value]",
+		"formatEN": "update default monitor [key]-[value]"
 	},
 	"/hosts/ssh/cert": {
 		"bodyKeys": [],
@@ -2503,6 +2673,35 @@
 		"formatZH": "[operate] Supervisor 进程文件 ",
 		"formatEN": "[operate] Supervisor Process Config file"
 	},
+	"/hosts/update": {
+		"bodyKeys": [
+			"name",
+			"addr"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新主机 [name][addr]",
+		"formatEN": "update host [name][addr]"
+	},
+	"/hosts/update/group": {
+		"bodyKeys": [
+			"id",
+			"groupID"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "hosts",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "更新主机 [name] 分组",
+		"formatEN": "update host [name] group"
+	},
 	"/openresty/build": {
 		"bodyKeys": [],
 		"paramKeys": [],
@@ -2566,8 +2765,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "删除运行环境 [name]",
-		"formatEN": "Delete runtime [name]"
+		"formatZH": "删除运行环境 [id]",
+		"formatEN": "Delete runtime [id]"
 	},
 	"/runtimes/operate": {
 		"bodyKeys": [
@@ -2575,8 +2774,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "操作运行环境 [name]",
-		"formatEN": "Operate runtime [name]"
+		"formatZH": "操作运行环境 [id]",
+		"formatEN": "Operate runtime [id]"
 	},
 	"/runtimes/php/config": {
 		"bodyKeys": [
@@ -2622,6 +2821,16 @@
 		"beforeFunctions": [],
 		"formatZH": "更新运行环境 [name]",
 		"formatEN": "Update runtime [name]"
+	},
+	"/settings/files/ai/update": {
+		"bodyKeys": [
+			"aiStatus",
+			"aiAccountId"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新文件管理 AI 设置 [aiStatus][aiAccountId]",
+		"formatEN": "update file manage AI setting [aiStatus][aiAccountId]"
 	},
 	"/settings/snapshot": {
 		"bodyKeys": [
@@ -2734,7 +2943,7 @@
 		"formatZH": "从系统快照 [name] 回滚",
 		"formatEN": "Rollback from system backup [name]"
 	},
-	"/settings/ssh/conn/default": {
+	"/settings/ssh/default": {
 		"bodyKeys": [
 			"defaultConn"
 		],
@@ -2742,6 +2951,16 @@
 		"beforeFunctions": [],
 		"formatZH": "本地终端默认连接 [defaultConn]",
 		"formatEN": "update system default conn [defaultConn]"
+	},
+	"/settings/terminal/ai/update": {
+		"bodyKeys": [
+			"aiStatus",
+			"aiAccountId"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新终端 AI 设置 [aiStatus][aiAccountId]",
+		"formatEN": "update terminal AI setting [aiStatus][aiAccountId]"
 	},
 	"/settings/update": {
 		"bodyKeys": [
@@ -3306,6 +3525,16 @@
 		"formatZH": "更新域名 [domain]",
 		"formatEN": "Update domain [domain]"
 	},
+	"/websites/group/change": {
+		"bodyKeys": [
+			"group",
+			"newGroup"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "网站分组 [group] 迁移到 [newGroup]",
+		"formatEN": "change website group [group] to [newGroup]"
+	},
 	"/websites/log/operate": {
 		"bodyKeys": [
 			"id",
@@ -3582,6 +3811,15 @@
 		"formatZH": "下载证书文件 [domain]",
 		"formatEN": "download ssl file [domain]"
 	},
+	"/websites/ssl/import": {
+		"bodyKeys": [
+			"primaryDomain"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "导入主节点证书 [primaryDomain]",
+		"formatEN": "import master SSL [primaryDomain]"
+	},
 	"/websites/ssl/obtain": {
 		"bodyKeys": [
 			"ID"
@@ -3652,19 +3890,19 @@
 		"formatZH": "更新全局设置",
 		"formatEN": "update global config"
 	},
-	"/xpack/monitor/log/clear": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "清空日志",
-		"formatEN": "clear log"
-	},
-	"/xpack/monitor/site/update": {
+	"/xpack/monitor/config/site/update": {
 		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
 		"formatZH": "更新网站设置",
 		"formatEN": "update website config"
+	},
+	"/xpack/monitor/logs/clear": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "清空日志",
+		"formatEN": "clear log"
 	},
 	"/xpack/tampers/template": {
 		"bodyKeys": [
@@ -3704,33 +3942,6 @@
 		"beforeFunctions": [],
 		"formatZH": "更新防篡改信息 [website][path] =\u003e [status]",
 		"formatEN": "update tamper info [website][path] =\u003e [status]"
-	},
-	"/xpack/waf/acl/create": {
-		"bodyKeys": [
-			"name"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建自定义规则 [name]",
-		"formatEN": "create acl [name]"
-	},
-	"/xpack/waf/acl/delete": {
-		"bodyKeys": [
-			"name"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "删除自定义规则 [name]",
-		"formatEN": "delete acl [name]"
-	},
-	"/xpack/waf/acl/update": {
-		"bodyKeys": [
-			"name"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新自定义规则 [name]",
-		"formatEN": "update acl [name]"
 	},
 	"/xpack/waf/block/remove": {
 		"bodyKeys": [
@@ -3839,6 +4050,33 @@
 		"formatZH": "清空 WAF 日志",
 		"formatEN": "clear waf log"
 	},
+	"/xpack/waf/rule/acl/create": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建自定义规则 [name]",
+		"formatEN": "create acl [name]"
+	},
+	"/xpack/waf/rule/acl/delete": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除自定义规则 [name]",
+		"formatEN": "delete acl [name]"
+	},
+	"/xpack/waf/rule/acl/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新自定义规则 [name]",
+		"formatEN": "update acl [name]"
+	},
 	"/xpack/waf/rule/cc": {
 		"bodyKeys": [
 			"scope"
@@ -3934,6 +4172,15 @@
 		"formatZH": "更新日志配置",
 		"formatEN": "update waf log config"
 	},
+	"/xpack/waf/rule/simple/create": {
+		"bodyKeys": [
+			"scope"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建规则 [scope]",
+		"formatEN": "create rule [scope]"
+	},
 	"/xpack/waf/rule/urlcc/create": {
 		"bodyKeys": [],
 		"paramKeys": [],
@@ -3965,14 +4212,14 @@
 		"formatZH": "添加 URL [url] 到默认[type]组",
 		"formatEN": "add URL [url] to default[type]group"
 	},
-	"/xpack/website/rule/cc": {
+	"/xpack/waf/website/rule/cc": {
 		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
 		"formatZH": "更新网站频率访问限制",
 		"formatEN": "update website CC config"
 	},
-	"/xpack/website/rule/geo": {
+	"/xpack/waf/website/rule/geo": {
 		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],

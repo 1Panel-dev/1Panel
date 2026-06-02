@@ -26,8 +26,6 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Get terminal AI setting info
-// @Accept json
-// @Param request body dto.AgentSettingUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -81,6 +79,7 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /settings/terminal/ai/update [post]
+// @x-panel-log {"bodyKeys":["aiStatus","aiAccountId"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新终端 AI 设置 [aiStatus][aiAccountId]","formatEN":"update terminal AI setting [aiStatus][aiAccountId]"}
 func (b *BaseApi) UpdateTerminalAISetting(c *gin.Context) {
 	var req dto.TerminalAIInfo
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -96,8 +95,6 @@ func (b *BaseApi) UpdateTerminalAISetting(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Get file manage AI setting info
-// @Accept json
-// @Param request body dto.FileManageAIInfo true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -119,6 +116,7 @@ func (b *BaseApi) GetFileManageAISettingInfo(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /settings/files/ai/update [post]
+// @x-panel-log {"bodyKeys":["aiStatus","aiAccountId"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新文件管理 AI 设置 [aiStatus][aiAccountId]","formatEN":"update file manage AI setting [aiStatus][aiAccountId]"}
 func (b *BaseApi) UpdateFileManageAISetting(c *gin.Context) {
 	var req dto.FileManageAIInfo
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -198,8 +196,6 @@ func (b *BaseApi) LoadLocalConn(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Check local conn
-// @Accept json
-// @Param request body dto.SSHDefaultConn true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp

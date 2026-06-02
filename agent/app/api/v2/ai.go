@@ -209,6 +209,7 @@ func (b *BaseApi) GetBindDomain(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /ai/domain/update [post]
+// @x-panel-log {"bodyKeys":["domain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 Ollama 绑定域名 [domain]","formatEN":"update Ollama bind domain [domain]"}
 func (b *BaseApi) UpdateBindDomain(c *gin.Context) {
 	var req dto.OllamaBindDomain
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

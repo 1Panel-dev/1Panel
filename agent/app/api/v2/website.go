@@ -968,6 +968,7 @@ func (b *BaseApi) UpdateLoadBalanceFile(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/group/change [post]
+// @x-panel-log {"bodyKeys":["group","newGroup"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"网站分组 [group] 迁移到 [newGroup]","formatEN":"change website group [group] to [newGroup]"}
 func (b *BaseApi) ChangeWebsiteGroup(c *gin.Context) {
 	var req dto.UpdateGroup
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
