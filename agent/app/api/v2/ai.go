@@ -203,14 +203,11 @@ func (b *BaseApi) GetBindDomain(c *gin.Context) {
 
 // @Tags AI
 // @Summary Update bind domain
-// Tags AI
-// Summary Update bind domain
-// Accept json
-// Param request body dto.OllamaBindDomain true "request"
-// Success 200
-// Security ApiKeyAuth
-// Security Timestamp
-// Router /ai/domain/update [post]
+// @Accept json
+// @Param request body dto.OllamaBindDomain true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /ai/domain/update [post]
 func (b *BaseApi) UpdateBindDomain(c *gin.Context) {
 	var req dto.OllamaBindDomain

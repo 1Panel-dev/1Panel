@@ -668,6 +668,11 @@ func (b *BaseApi) Inspect(c *gin.Context) {
 
 // @Tags Container
 // @Summary Download container logs
+// @Accept json
+// @Param request body dto.ContainerLog true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /containers/download/log [post]
 func (b *BaseApi) DownloadContainerLogs(c *gin.Context) {
 	var req dto.ContainerLog

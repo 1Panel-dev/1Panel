@@ -174,6 +174,9 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 
 // @Tags App
 // @Summary Get app tags
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/tags [get]
 func (b *BaseApi) GetAppTags(c *gin.Context) {
 	tags, err := appService.GetAppTags(c)

@@ -8,6 +8,11 @@ import (
 
 // @Tags TensorRT LLM
 // @Summary Page TensorRT LLMs
+// @Accept json
+// @Param request body request.TensorRTLLMSearch true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /ai/tensorrt/search [post]
 func (b *BaseApi) PageTensorRTLLMs(c *gin.Context) {
 	var req request.TensorRTLLMSearch
@@ -20,6 +25,11 @@ func (b *BaseApi) PageTensorRTLLMs(c *gin.Context) {
 
 // @Tags TensorRT LLM
 // @Summary Create TensorRT LLM
+// @Accept json
+// @Param request body request.TensorRTLLMCreate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /ai/tensorrt/create [post]
 func (b *BaseApi) CreateTensorRTLLM(c *gin.Context) {
 	var req request.TensorRTLLMCreate
@@ -36,6 +46,11 @@ func (b *BaseApi) CreateTensorRTLLM(c *gin.Context) {
 
 // @Tags TensorRT LLM
 // @Summary Update TensorRT LLM
+// @Accept json
+// @Param request body request.TensorRTLLMUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /ai/tensorrt/update [post]
 func (b *BaseApi) UpdateTensorRTLLM(c *gin.Context) {
 	var req request.TensorRTLLMUpdate
@@ -52,6 +67,11 @@ func (b *BaseApi) UpdateTensorRTLLM(c *gin.Context) {
 
 // @Tags TensorRT LLM
 // @Summary Delete TensorRT LLM
+// @Accept json
+// @Param request body request.TensorRTLLMDelete true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /ai/tensorrt/delete [post]
 func (b *BaseApi) DeleteTensorRTLLM(c *gin.Context) {
 	var req request.TensorRTLLMDelete
@@ -68,6 +88,11 @@ func (b *BaseApi) DeleteTensorRTLLM(c *gin.Context) {
 
 // @Tags TensorRT LLM
 // @Summary Operate TensorRT LLM
+// @Accept json
+// @Param request body request.TensorRTLLMOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /ai/tensorrt/operate [post]
 func (b *BaseApi) OperateTensorRTLLM(c *gin.Context) {
 	var req request.TensorRTLLMOperate

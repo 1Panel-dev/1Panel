@@ -42,6 +42,9 @@ func (b *BaseApi) LoadGpuInfo(c *gin.Context) {
 
 // @Tags AI
 // @Summary Get CPU options
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /ai/gpu/options [get]
 func (b *BaseApi) GetCPUOptions(c *gin.Context) {
 	helper.SuccessWithData(c, monitorService.LoadGPUOptions())

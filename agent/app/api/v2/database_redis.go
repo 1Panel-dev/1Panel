@@ -76,6 +76,9 @@ func (b *BaseApi) LoadPersistenceConf(c *gin.Context) {
 
 // @Tags Database Redis
 // @Summary Check has cli
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /databases/redis/check [get]
 func (b *BaseApi) CheckHasCli(c *gin.Context) {
 	helper.SuccessWithData(c, redisService.CheckHasCli())

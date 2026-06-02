@@ -962,6 +962,11 @@ func (b *BaseApi) UpdateLoadBalanceFile(c *gin.Context) {
 
 // @Tags Website
 // @Summary Change website group
+// @Accept json
+// @Param request body dto.UpdateGroup true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/group/change [post]
 func (b *BaseApi) ChangeWebsiteGroup(c *gin.Context) {
 	var req dto.UpdateGroup

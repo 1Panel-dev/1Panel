@@ -9,6 +9,11 @@ import (
 
 // @Tags Host
 // @Summary Create host
+// @Accept json
+// @Param request body dto.HostOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts [post]
 func (b *BaseApi) CreateHost(c *gin.Context) {
 	var req dto.HostOperate
@@ -26,6 +31,11 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 
 // @Tags Host
 // @Summary Test by info
+// @Accept json
+// @Param request body dto.HostConnTest true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/test/byinfo [post]
 func (b *BaseApi) TestByInfo(c *gin.Context) {
 	var req dto.HostConnTest
@@ -38,6 +48,11 @@ func (b *BaseApi) TestByInfo(c *gin.Context) {
 
 // @Tags Host
 // @Summary Test by ID
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/test/byid [post]
 func (b *BaseApi) TestByID(c *gin.Context) {
 	var req dto.OperateByID
@@ -50,6 +65,11 @@ func (b *BaseApi) TestByID(c *gin.Context) {
 
 // @Tags Host
 // @Summary Host tree
+// @Accept json
+// @Param request body dto.SearchForTree true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/tree [post]
 func (b *BaseApi) HostTree(c *gin.Context) {
 	var req dto.SearchForTree
@@ -67,6 +87,11 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 
 // @Tags Host
 // @Summary Search host
+// @Accept json
+// @Param request body dto.SearchPageWithGroup true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/search [post]
 func (b *BaseApi) SearchHost(c *gin.Context) {
 	var req dto.SearchPageWithGroup
@@ -85,6 +110,11 @@ func (b *BaseApi) SearchHost(c *gin.Context) {
 
 // @Tags Host
 // @Summary Delete host
+// @Accept json
+// @Param request body dto.OperateByIDs true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/del [post]
 func (b *BaseApi) DeleteHost(c *gin.Context) {
 	var req dto.OperateByIDs
@@ -101,6 +131,11 @@ func (b *BaseApi) DeleteHost(c *gin.Context) {
 
 // @Tags Host
 // @Summary Update host
+// @Accept json
+// @Param request body dto.HostOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/update [post]
 func (b *BaseApi) UpdateHost(c *gin.Context) {
 	var req dto.HostOperate
@@ -163,6 +198,11 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 
 // @Tags Host
 // @Summary Update host group
+// @Accept json
+// @Param request body dto.ChangeGroup true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/update/group [post]
 func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 	var req dto.ChangeGroup
@@ -179,6 +219,11 @@ func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 
 // @Tags Host
 // @Summary Get host by ID
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/info [post]
 func (b *BaseApi) GetHostByID(c *gin.Context) {
 	var req dto.OperateByID

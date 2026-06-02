@@ -9,6 +9,11 @@ import (
 
 // @Tags Alert
 // @Summary Page alert
+// @Accept json
+// @Param request body dto.AlertSearch true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/search [post]
 func (b *BaseApi) PageAlert(c *gin.Context) {
 	var req dto.AlertSearch
@@ -37,6 +42,11 @@ func (b *BaseApi) GetAlerts(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Create alert
+// @Accept json
+// @Param request body dto.AlertCreate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert [post]
 func (b *BaseApi) CreateAlert(c *gin.Context) {
 	var req dto.AlertCreate
@@ -53,6 +63,11 @@ func (b *BaseApi) CreateAlert(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Delete alert
+// @Accept json
+// @Param request body dto.DeleteRequest true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/del [post]
 func (b *BaseApi) DeleteAlert(c *gin.Context) {
 	var req dto.DeleteRequest
@@ -69,6 +84,11 @@ func (b *BaseApi) DeleteAlert(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Update alert
+// @Accept json
+// @Param request body dto.AlertUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/update [post]
 func (b *BaseApi) UpdateAlert(c *gin.Context) {
 	var req dto.AlertUpdate
@@ -98,6 +118,11 @@ func (b *BaseApi) GetAlert(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Update alert status
+// @Accept json
+// @Param request body dto.AlertUpdateStatus true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/status [post]
 func (b *BaseApi) UpdateAlertStatus(c *gin.Context) {
 	var req dto.AlertUpdateStatus
@@ -114,6 +139,9 @@ func (b *BaseApi) UpdateAlertStatus(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Get disks
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/disks/list [get]
 func (b *BaseApi) GetDisks(c *gin.Context) {
 	alerts, err := alertService.GetDisks()
@@ -126,6 +154,11 @@ func (b *BaseApi) GetDisks(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Page alert logs
+// @Accept json
+// @Param request body dto.AlertLogSearch true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/logs/search [post]
 func (b *BaseApi) PageAlertLogs(c *gin.Context) {
 	var req dto.AlertLogSearch
@@ -145,6 +178,11 @@ func (b *BaseApi) PageAlertLogs(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Clean alert logs
+// @Accept json
+// @Param request body dto.CronJobReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/logs/clean [post]
 func (b *BaseApi) CleanAlertLogs(c *gin.Context) {
 	if err := alertService.CleanAlertLogs(); err != nil {
@@ -156,6 +194,9 @@ func (b *BaseApi) CleanAlertLogs(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Get clams
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/clams/list [get]
 func (b *BaseApi) GetClams(c *gin.Context) {
 	clams, err := alertService.GetClams()
@@ -168,6 +209,11 @@ func (b *BaseApi) GetClams(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Get cron jobs
+// @Accept json
+// @Param request body dto.CronJobReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/cronjob/list [post]
 func (b *BaseApi) GetCronJobs(c *gin.Context) {
 	var req dto.CronJobReq
@@ -184,6 +230,11 @@ func (b *BaseApi) GetCronJobs(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Get alert config
+// @Accept json
+// @Param request body dto.AlertConfigUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/config/info [post]
 func (b *BaseApi) GetAlertConfig(c *gin.Context) {
 	config, err := alertService.GetAlertConfig()
@@ -196,6 +247,11 @@ func (b *BaseApi) GetAlertConfig(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Update alert config
+// @Accept json
+// @Param request body dto.AlertConfigUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/config/update [post]
 func (b *BaseApi) UpdateAlertConfig(c *gin.Context) {
 	var req dto.AlertConfigUpdate
@@ -211,6 +267,11 @@ func (b *BaseApi) UpdateAlertConfig(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Delete alert config
+// @Accept json
+// @Param request body dto.DeleteRequest true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/config/del [post]
 func (b *BaseApi) DeleteAlertConfig(c *gin.Context) {
 	var req dto.DeleteRequest
@@ -227,6 +288,11 @@ func (b *BaseApi) DeleteAlertConfig(c *gin.Context) {
 
 // @Tags Alert
 // @Summary Test alert config
+// @Accept json
+// @Param request body dto.AlertConfigTest true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /alert/config/test [post]
 func (b *BaseApi) TestAlertConfig(c *gin.Context) {
 	var req dto.AlertConfigTest

@@ -26,6 +26,11 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Get terminal AI setting info
+// @Accept json
+// @Param request body dto.AgentSettingUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/terminal/ai/search [post]
 func (b *BaseApi) GetTerminalAISettingInfo(c *gin.Context) {
 	setting, err := settingService.GetTerminalAIInfo()
@@ -70,6 +75,11 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update terminal AI setting
+// @Accept json
+// @Param request body dto.TerminalAIInfo true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/terminal/ai/update [post]
 func (b *BaseApi) UpdateTerminalAISetting(c *gin.Context) {
 	var req dto.TerminalAIInfo
@@ -86,6 +96,11 @@ func (b *BaseApi) UpdateTerminalAISetting(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Get file manage AI setting info
+// @Accept json
+// @Param request body dto.FileManageAIInfo true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/files/ai/search [post]
 func (b *BaseApi) GetFileManageAISettingInfo(c *gin.Context) {
 	setting, err := settingService.GetFileManageAIInfo()
@@ -98,6 +113,11 @@ func (b *BaseApi) GetFileManageAISettingInfo(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update file manage AI setting
+// @Accept json
+// @Param request body dto.FileManageAIInfo true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/files/ai/update [post]
 func (b *BaseApi) UpdateFileManageAISetting(c *gin.Context) {
 	var req dto.FileManageAIInfo
@@ -178,6 +198,11 @@ func (b *BaseApi) LoadLocalConn(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Check local conn
+// @Accept json
+// @Param request body dto.SSHDefaultConn true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/ssh/check [post]
 func (b *BaseApi) CheckLocalConn(c *gin.Context) {
 	client, err := loadLocalConn()

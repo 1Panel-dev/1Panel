@@ -86,6 +86,9 @@ func (b *BaseApi) UpdateMonitorSetting(c *gin.Context) {
 
 // @Tags Monitor
 // @Summary Get network options
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/monitor/netoptions [get]
 func (b *BaseApi) GetNetworkOptions(c *gin.Context) {
 	netStat, _ := net.IOCounters(true)
@@ -100,6 +103,9 @@ func (b *BaseApi) GetNetworkOptions(c *gin.Context) {
 
 // @Tags Monitor
 // @Summary Get IO options
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/monitor/iooptions [get]
 func (b *BaseApi) GetIOOptions(c *gin.Context) {
 	diskStat, _ := disk.IOCounters()

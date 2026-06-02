@@ -13,6 +13,9 @@ import (
 // @Tags Backup Account
 // @Summary Check backup used
 // @Param name path string true "name"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /backups/check/{name} [get]
 func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
 	name, err := helper.GetStrParamByKey(c, "name")

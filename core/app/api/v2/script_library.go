@@ -136,6 +136,13 @@ func (b *BaseApi) UpdateScript(c *gin.Context) {
 
 // @Tags ScriptLibrary
 // @Summary Run script
+// @Param cols query integer false "cols"
+// @Param rows query integer false "rows"
+// @Param script_id query integer false "script_id"
+// @Param operateNode query string false "operateNode"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/script/run [get]
 func (b *BaseApi) RunScript(c *gin.Context) {
 	if !websocket.IsWebSocketUpgrade(c.Request) {

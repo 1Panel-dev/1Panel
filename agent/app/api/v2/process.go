@@ -10,6 +10,9 @@ import (
 
 // @Tags Process
 // @Summary Process ws
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /process/ws [get]
 func (b *BaseApi) ProcessWs(c *gin.Context) {
 	if !websocket.IsWebSocketUpgrade(c.Request) {

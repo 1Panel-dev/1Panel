@@ -335,6 +335,11 @@ func (b *BaseApi) DownloadWebsiteSSL(c *gin.Context) {
 
 // @Tags Website SSL
 // @Summary Import master SSL
+// @Accept json
+// @Param request body model.WebsiteSSL true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/ssl/import [post]
 func (b *BaseApi) ImportMasterSSL(c *gin.Context) {
 	var req model.WebsiteSSL

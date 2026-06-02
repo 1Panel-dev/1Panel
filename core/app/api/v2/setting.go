@@ -319,6 +319,11 @@ func (b *BaseApi) UpdatePort(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Reload SSL
+// @Accept json
+// @Param request body dto.AppstoreUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/settings/ssl/reload [post]
 func (b *BaseApi) ReloadSSL(c *gin.Context) {
 	clientIP := c.ClientIP()

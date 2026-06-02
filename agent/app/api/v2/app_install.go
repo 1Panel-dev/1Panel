@@ -351,6 +351,11 @@ func (b *BaseApi) GetAppInstallInfo(c *gin.Context) {
 
 // @Tags App
 // @Summary Update app install sort
+// @Accept json
+// @Param request body request.AppInstallSort true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/sort/update [post]
 func (b *BaseApi) UpdateAppInstallSort(c *gin.Context) {
 	var req request.AppInstallSort

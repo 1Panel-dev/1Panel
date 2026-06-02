@@ -936,6 +936,9 @@ var wsUpgrade = websocket.Upgrader{
 
 // @Tags File
 // @Summary Wget process
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /files/wget/process [get]
 func (b *BaseApi) WgetProcess(c *gin.Context) {
 	if !websocket.IsWebSocketUpgrade(c.Request) {
@@ -953,6 +956,9 @@ func (b *BaseApi) WgetProcess(c *gin.Context) {
 
 // @Tags File
 // @Summary Process keys
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /files/wget/process/keys [get]
 func (b *BaseApi) ProcessKeys(c *gin.Context) {
 	res := &response.FileProcessKeys{}
