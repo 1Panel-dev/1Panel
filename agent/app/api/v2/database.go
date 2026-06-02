@@ -95,6 +95,7 @@ func (b *BaseApi) SearchDatabase(c *gin.Context) {
 // @Success 200 {array} dto.DatabaseOption
 // @Security ApiKeyAuth
 // @Security Timestamp
+// @Param type path string true "type"
 // @Router /databases/db/list/:type [get]
 func (b *BaseApi) ListDatabase(c *gin.Context) {
 	dbType, err := helper.GetStrParamByKey(c, "type")
@@ -116,6 +117,7 @@ func (b *BaseApi) ListDatabase(c *gin.Context) {
 // @Success 200 {array} dto.DatabaseItem
 // @Security ApiKeyAuth
 // @Security Timestamp
+// @Param type path string true "type"
 // @Router /databases/db/item/:type [get]
 func (b *BaseApi) LoadDatabaseItems(c *gin.Context) {
 	dbType, err := helper.GetStrParamByKey(c, "type")
@@ -137,6 +139,7 @@ func (b *BaseApi) LoadDatabaseItems(c *gin.Context) {
 // @Success 200 {object} dto.DatabaseInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
+// @Param name path string true "name"
 // @Router /databases/db/:name [get]
 func (b *BaseApi) GetDatabase(c *gin.Context) {
 	name, err := helper.GetStrParamByKey(c, "name")

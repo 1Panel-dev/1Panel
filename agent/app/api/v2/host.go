@@ -7,6 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Tags Host
+// @Summary Create host
+// @Accept json
+// @Param request body dto.HostOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts [post]
+// @x-panel-log {"bodyKeys":["name","addr"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建主机 [name][addr]","formatEN":"create host [name][addr]"}
 func (b *BaseApi) CreateHost(c *gin.Context) {
 	var req dto.HostOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -21,6 +30,14 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 	helper.SuccessWithData(c, host)
 }
 
+// @Tags Host
+// @Summary Test by info
+// @Accept json
+// @Param request body dto.HostConnTest true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/test/byinfo [post]
 func (b *BaseApi) TestByInfo(c *gin.Context) {
 	var req dto.HostConnTest
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -30,6 +47,14 @@ func (b *BaseApi) TestByInfo(c *gin.Context) {
 	helper.SuccessWithData(c, hostService.TestByInfo(req))
 }
 
+// @Tags Host
+// @Summary Test by ID
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/test/byid [post]
 func (b *BaseApi) TestByID(c *gin.Context) {
 	var req dto.OperateByID
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -39,6 +64,14 @@ func (b *BaseApi) TestByID(c *gin.Context) {
 	helper.SuccessWithData(c, hostService.TestLocalConn(req.ID))
 }
 
+// @Tags Host
+// @Summary Host tree
+// @Accept json
+// @Param request body dto.SearchForTree true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/tree [post]
 func (b *BaseApi) HostTree(c *gin.Context) {
 	var req dto.SearchForTree
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -53,6 +86,14 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// @Tags Host
+// @Summary Search host
+// @Accept json
+// @Param request body dto.SearchPageWithGroup true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/search [post]
 func (b *BaseApi) SearchHost(c *gin.Context) {
 	var req dto.SearchPageWithGroup
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -68,6 +109,15 @@ func (b *BaseApi) SearchHost(c *gin.Context) {
 	helper.SuccessWithData(c, dto.PageResult{Items: list, Total: total})
 }
 
+// @Tags Host
+// @Summary Delete host
+// @Accept json
+// @Param request body dto.OperateByIDs true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/del [post]
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"hosts","output_column":"name","output_value":"names"}],"formatZH":"删除主机 [names]","formatEN":"delete host [names]"}
 func (b *BaseApi) DeleteHost(c *gin.Context) {
 	var req dto.OperateByIDs
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -81,6 +131,15 @@ func (b *BaseApi) DeleteHost(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Host
+// @Summary Update host
+// @Accept json
+// @Param request body dto.HostOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/update [post]
+// @x-panel-log {"bodyKeys":["name","addr"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新主机 [name][addr]","formatEN":"update host [name][addr]"}
 func (b *BaseApi) UpdateHost(c *gin.Context) {
 	var req dto.HostOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -140,6 +199,15 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	helper.SuccessWithData(c, hostItem)
 }
 
+// @Tags Host
+// @Summary Update host group
+// @Accept json
+// @Param request body dto.ChangeGroup true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/update/group [post]
+// @x-panel-log {"bodyKeys":["id","groupID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"hosts","output_column":"name","output_value":"name"}],"formatZH":"更新主机 [name] 分组","formatEN":"update host [name] group"}
 func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 	var req dto.ChangeGroup
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -153,6 +221,14 @@ func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Host
+// @Summary Get host by ID
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/info [post]
 func (b *BaseApi) GetHostByID(c *gin.Context) {
 	var req dto.OperateByID
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

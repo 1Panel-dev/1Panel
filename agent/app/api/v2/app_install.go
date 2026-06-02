@@ -203,7 +203,6 @@ func (b *BaseApi) GetServices(c *gin.Context) {
 // @Tags App
 // @Summary Search app update version by install id
 // @Accept json
-// @Param appInstallId path integer true "request"
 // @Success 200 {array} dto.AppVersion
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -267,7 +266,7 @@ func (b *BaseApi) GetDefaultConfig(c *gin.Context) {
 // @Tags App
 // @Summary Search params by appInstallId
 // @Accept json
-// @Param appInstallId path string true "request"
+// @Param appInstallId path integer true "request"
 // @Success 200 {object} response.AppConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -350,6 +349,15 @@ func (b *BaseApi) GetAppInstallInfo(c *gin.Context) {
 	helper.SuccessWithData(c, info)
 }
 
+// @Tags App
+// @Summary Update app install sort
+// @Accept json
+// @Param request body request.AppInstallSort true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /apps/installed/sort/update [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新已安装应用排序","formatEN":"update installed app sort"}
 func (b *BaseApi) UpdateAppInstallSort(c *gin.Context) {
 	var req request.AppInstallSort
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

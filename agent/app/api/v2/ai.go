@@ -201,14 +201,15 @@ func (b *BaseApi) GetBindDomain(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
-// Tags AI
-// Summary Update bind domain
-// Accept json
-// Param request body dto.OllamaBindDomain true "request"
-// Success 200
-// Security ApiKeyAuth
-// Security Timestamp
-// Router /ai/domain/update [post]
+// @Tags AI
+// @Summary Update bind domain
+// @Accept json
+// @Param request body dto.OllamaBindDomain true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/domain/update [post]
+// @x-panel-log {"bodyKeys":["domain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 Ollama 绑定域名 [domain]","formatEN":"update Ollama bind domain [domain]"}
 func (b *BaseApi) UpdateBindDomain(c *gin.Context) {
 	var req dto.OllamaBindDomain
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

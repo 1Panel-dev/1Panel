@@ -70,7 +70,7 @@ func (b *BaseApi) LoadMonitorSetting(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/monitor/setting/update [post]
-// @x-panel-log {"bodyKeys":["key", "value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改默认监控网卡 [name]-[value]","formatEN":"update default monitor [name]-[value]"}
+// @x-panel-log {"bodyKeys":["key", "value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改默认监控网卡 [key]-[value]","formatEN":"update default monitor [key]-[value]"}
 func (b *BaseApi) UpdateMonitorSetting(c *gin.Context) {
 	var req dto.MonitorSettingUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -84,6 +84,12 @@ func (b *BaseApi) UpdateMonitorSetting(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Monitor
+// @Summary Get network options
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/monitor/netoptions [get]
 func (b *BaseApi) GetNetworkOptions(c *gin.Context) {
 	netStat, _ := net.IOCounters(true)
 	var options []string
@@ -95,6 +101,12 @@ func (b *BaseApi) GetNetworkOptions(c *gin.Context) {
 	helper.SuccessWithData(c, options)
 }
 
+// @Tags Monitor
+// @Summary Get IO options
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/monitor/iooptions [get]
 func (b *BaseApi) GetIOOptions(c *gin.Context) {
 	diskStat, _ := disk.IOCounters()
 	var options []string

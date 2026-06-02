@@ -10,6 +10,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Tags Backup Account
+// @Summary Check backup used
+// @Param name path string true "name"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /backups/check/{name} [get]
 func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
 	name, err := helper.GetStrParamByKey(c, "name")
 	if err != nil {
@@ -32,7 +39,7 @@ func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /backups/check [post]
+// @Router /backups/conn/check [post]
 func (b *BaseApi) CheckBackup(c *gin.Context) {
 	var req dto.BackupOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -136,7 +143,7 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /backups/update [post]
-// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新备份账号 [types]","formatEN":"update backup account [types]"}
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新备份账号 [type]","formatEN":"update backup account [type]"}
 func (b *BaseApi) UpdateBackup(c *gin.Context) {
 	var req dto.BackupOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

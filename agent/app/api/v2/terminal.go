@@ -21,10 +21,25 @@ import (
 	"github.com/pkg/errors"
 )
 
+// @Tags Terminal
+// @Summary Ws local terminal
+// @Param command query string false "command"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/terminal/local [get]
 func (b *BaseApi) WsLocalTerminal(c *gin.Context) {
 	b.runSSHSession(c, loadLocalConn, c.DefaultQuery("command", ""))
 }
 
+// @Tags Terminal
+// @Summary Ws host SSH
+// @Param id query integer false "id"
+// @Param command query string false "command"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/terminal/ssh [get]
 func (b *BaseApi) WsHostSSH(c *gin.Context) {
 	b.runSSHSession(c, func() (*ssh.SSHClient, error) {
 		hostID, _ := strconv.Atoi(c.DefaultQuery("id", "0"))
@@ -36,6 +51,14 @@ func (b *BaseApi) WsHostSSH(c *gin.Context) {
 	}, c.DefaultQuery("command", ""))
 }
 
+// @Tags Terminal
+// @Summary Ws container terminal
+// @Param cols query integer false "cols"
+// @Param rows query integer false "rows"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/terminal/container [get]
 func (b *BaseApi) WsContainerTerminal(c *gin.Context) {
 	wsConn, cols, rows, ok := prepareTerminalSession(c)
 	if !ok {

@@ -236,7 +236,7 @@ func (b *BaseApi) UpdateAddrRule(c *gin.Context) {
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/firewall/filter/search [post]
+// @Router /hosts/firewall/filter/rule/search [post]
 func (b *BaseApi) SearchFilterRules(c *gin.Context) {
 	var req dto.SearchPageWithType
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

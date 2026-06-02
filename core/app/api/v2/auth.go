@@ -215,6 +215,12 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 	helper.SuccessWithData(c, captcha)
 }
 
+// @Tags Auth
+// @Summary Get welcome page
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/auth/welcome [get]
 func (b *BaseApi) GetWelcomePage(c *gin.Context) {
 	count, _, _ := logService.PageLoginLog(c, dto.SearchLgLogWithPage{PageInfo: dto.PageInfo{Page: 1, PageSize: 10}})
 	if count != 1 {

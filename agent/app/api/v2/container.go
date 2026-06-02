@@ -395,6 +395,7 @@ func (b *BaseApi) ContainerInfo(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// @Tags Container
 // @Summary Load container limits
 // @Success 200 {object} dto.ResourceLimit
 // @Security ApiKeyAuth
@@ -409,6 +410,7 @@ func (b *BaseApi) LoadResourceLimit(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// @Tags Container
 // @Summary Load container stats
 // @Success 200 {array} dto.ContainerListStats
 // @Security ApiKeyAuth
@@ -423,6 +425,7 @@ func (b *BaseApi) ContainerListStats(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// @Tags Container
 // @Summary Load container stats size
 // @Accept json
 // @Param request body dto.OperationWithName true "request"
@@ -663,6 +666,14 @@ func (b *BaseApi) Inspect(c *gin.Context) {
 	helper.SuccessWithData(c, result)
 }
 
+// @Tags Container
+// @Summary Download container logs
+// @Accept json
+// @Param request body dto.ContainerLog true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /containers/download/log [post]
 func (b *BaseApi) DownloadContainerLogs(c *gin.Context) {
 	var req dto.ContainerLog
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

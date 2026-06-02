@@ -333,6 +333,15 @@ func (b *BaseApi) DownloadWebsiteSSL(c *gin.Context) {
 	http.ServeContent(c.Writer, c.Request, info.Name(), info.ModTime(), file)
 }
 
+// @Tags Website SSL
+// @Summary Import master SSL
+// @Accept json
+// @Param request body model.WebsiteSSL true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/ssl/import [post]
+// @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"导入主节点证书 [primaryDomain]","formatEN":"import master SSL [primaryDomain]"}
 func (b *BaseApi) ImportMasterSSL(c *gin.Context) {
 	var req model.WebsiteSSL
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

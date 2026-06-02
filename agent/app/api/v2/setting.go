@@ -24,6 +24,12 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 	helper.SuccessWithData(c, setting)
 }
 
+// @Tags System Setting
+// @Summary Get terminal AI setting info
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/terminal/ai/search [post]
 func (b *BaseApi) GetTerminalAISettingInfo(c *gin.Context) {
 	setting, err := settingService.GetTerminalAIInfo()
 	if err != nil {
@@ -65,6 +71,15 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags System Setting
+// @Summary Update terminal AI setting
+// @Accept json
+// @Param request body dto.TerminalAIInfo true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/terminal/ai/update [post]
+// @x-panel-log {"bodyKeys":["aiStatus","aiAccountId"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新终端 AI 设置 [aiStatus][aiAccountId]","formatEN":"update terminal AI setting [aiStatus][aiAccountId]"}
 func (b *BaseApi) UpdateTerminalAISetting(c *gin.Context) {
 	var req dto.TerminalAIInfo
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -78,6 +93,12 @@ func (b *BaseApi) UpdateTerminalAISetting(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags System Setting
+// @Summary Get file manage AI setting info
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/files/ai/search [post]
 func (b *BaseApi) GetFileManageAISettingInfo(c *gin.Context) {
 	setting, err := settingService.GetFileManageAIInfo()
 	if err != nil {
@@ -87,6 +108,15 @@ func (b *BaseApi) GetFileManageAISettingInfo(c *gin.Context) {
 	helper.SuccessWithData(c, setting)
 }
 
+// @Tags System Setting
+// @Summary Update file manage AI setting
+// @Accept json
+// @Param request body dto.FileManageAIInfo true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/files/ai/update [post]
+// @x-panel-log {"bodyKeys":["aiStatus","aiAccountId"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新文件管理 AI 设置 [aiStatus][aiAccountId]","formatEN":"update file manage AI setting [aiStatus][aiAccountId]"}
 func (b *BaseApi) UpdateFileManageAISetting(c *gin.Context) {
 	var req dto.FileManageAIInfo
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -164,6 +194,12 @@ func (b *BaseApi) LoadLocalConn(c *gin.Context) {
 	helper.SuccessWithData(c, settingService.GetLocalConn())
 }
 
+// @Tags System Setting
+// @Summary Check local conn
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/ssh/check [post]
 func (b *BaseApi) CheckLocalConn(c *gin.Context) {
 	client, err := loadLocalConn()
 	if err == nil && client != nil {
@@ -179,7 +215,7 @@ func (b *BaseApi) CheckLocalConn(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /settings/ssh/conn/default [post]
+// @Router /settings/ssh/default [post]
 // @x-panel-log {"bodyKeys":["defaultConn"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"本地终端默认连接 [defaultConn]","formatEN":"update system default conn [defaultConn]"}
 func (b *BaseApi) SetDefaultIsConn(c *gin.Context) {
 	var req dto.SSHDefaultConn
