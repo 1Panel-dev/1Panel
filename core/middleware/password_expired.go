@@ -2,13 +2,17 @@ package middleware
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
+	baseRepo "github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	psessionUtils "github.com/1Panel-dev/1Panel/core/init/session/psession"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
@@ -52,13 +56,25 @@ func PasswordExpired() gin.HandlerFunc {
 			helper.BadAuth(c, "ErrNotLogin", err)
 			return
 		}
-		needCheck, expiredTime, err := xpack.AuthProvider.LoadExpired(c, psession)
+		settingRepo := baseRepo.NewISettingRepo()
+		expirationDays, err := settingRepo.GetValueByKey("ExpirationDays")
 		if err != nil {
 			helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPasswordExpired", err)
 			return
 		}
-		if !needCheck {
+		expiredDays, _ := strconv.Atoi(expirationDays)
+		if expiredDays == 0 {
 			c.Next()
+			return
+		}
+		expirationTime, err := xpack.AuthProvider.LoadPasswordExpirationTime(c)
+		if err != nil {
+			helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPasswordExpired", err)
+			return
+		}
+		expiredTime, err := time.ParseInLocation(constant.DateTimeLayout, expirationTime, common.LoadExpiredLocation())
+		if err != nil {
+			helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPasswordExpired", err)
 			return
 		}
 

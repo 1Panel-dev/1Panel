@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
@@ -94,6 +95,10 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 			return
 		}
 	}
+	if !checkSettingValueRange(req.Key, req.Value) {
+		helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", buserr.WithName("ErrInvalidParams", req.Value))
+		return
+	}
 	if req.Key == "PasskeyTrustedProxies" {
 		value, err := normalizePasskeyTrustedProxies(req.Value)
 		if err != nil {
@@ -111,6 +116,25 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 		appauth.SetSecurityEntranceCookie(c, req.Value)
 	}
 	helper.Success(c)
+}
+
+func checkSettingValueRange(key, value string) bool {
+	switch key {
+	case "SessionTimeout":
+		valueNum, err := strconv.Atoi(value)
+		if err != nil {
+			return false
+		}
+		return valueNum >= 300 && valueNum <= 864000
+	case "ExpirationDays":
+		valueNum, err := strconv.Atoi(value)
+		if err != nil {
+			return false
+		}
+		return valueNum >= 0 && valueNum <= 60
+	default:
+		return true
+	}
 }
 
 // @Tags System Setting

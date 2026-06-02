@@ -1,12 +1,14 @@
 package middleware
 
 import (
+	"strconv"
+
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
+	baseRepo "github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	psessionUtils "github.com/1Panel-dev/1Panel/core/init/session/psession"
-	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,13 +35,14 @@ func SessionAuth() gin.HandlerFunc {
 			return
 		}
 		c.Set(psessionUtils.GinContextSessionUserKey, psession)
-		lifeTime, err := xpack.AuthProvider.LoadSessionTimeout(c, psession)
+		sessionTimeout, err := baseRepo.NewISettingRepo().GetValueByKey("SessionTimeout")
 		if err != nil {
 			global.LOG.Errorf("get session timeout failed, err: %v", err)
 			helper.InternalServer(c, err)
 			c.Abort()
 			return
 		}
+		lifeTime, _ := strconv.Atoi(sessionTimeout)
 
 		if _, err := global.SESSION.RefreshIfNeeded(c, psession, global.CONF.Conn.SSL == constant.StatusEnable, lifeTime); err != nil {
 			errItem := err.Error()

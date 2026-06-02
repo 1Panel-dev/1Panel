@@ -31,6 +31,8 @@ var baseSettingKeys = map[string]struct{}{
 	"Theme":                      {},
 	"MenuTabs":                   {},
 	"Language":                   {},
+	"SessionTimeout":             {},
+	"ExpirationDays":             {},
 	"DeveloperMode":              {},
 	"UpgradeBackupCopies":        {},
 	"SecurityEntrance":           {},

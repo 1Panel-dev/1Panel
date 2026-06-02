@@ -1,11 +1,8 @@
 package helper
 
 import (
-	"time"
-
 	"github.com/1Panel-dev/1Panel/core/app/auth"
 	baseDto "github.com/1Panel-dev/1Panel/core/app/dto"
-	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack/providers"
 	"github.com/gin-gonic/gin"
@@ -54,13 +51,6 @@ func (a *authHelper) ResetSuperAdminUser(name, password string) error {
 	return nil
 }
 
-func (a *authHelper) LoadSessionTimeout(_ *gin.Context, sessionUser psession.SessionUser) (int, error) {
-	return auth.LoadSessionTimeout(sessionUser)
-}
-func (a *authHelper) LoadExpired(_ *gin.Context, sessionUser psession.SessionUser) (bool, time.Time, error) {
-	return auth.LoadExpired(sessionUser)
-}
-
 func (a *authHelper) CoreAPIAuthMiddleware() gin.HandlerFunc {
 	return auth.APIAuthMiddleware(auth.LoadAPIAuthConfig, nil)
 }
@@ -85,6 +75,12 @@ func (a *authHelper) UpdateApiConfig(c *gin.Context, req baseDto.ApiInterfaceCon
 
 func (a *authHelper) GetCurrentUserInfo(_ *gin.Context) (*baseDto.CurrentUserInfo, error) {
 	return auth.GetCurrentUserInfo()
+}
+func (a *authHelper) LoadPasswordExpirationTime(c *gin.Context) (string, error) {
+	return auth.LoadPasswordExpirationTime(c)
+}
+func (a *authHelper) SyncPasswordExpirationTime(expirationDays string) error {
+	return auth.SyncPasswordExpirationTime(expirationDays)
 }
 func (a *authHelper) UpdateCurrentUserInfo(c *gin.Context, req baseDto.CurrentUserUpdate) error {
 	return auth.UpdateCurrentUserInfo(c, req)

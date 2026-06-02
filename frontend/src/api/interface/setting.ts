@@ -34,6 +34,7 @@ export namespace Setting {
         developerMode: string;
 
         sessionTimeout: number;
+        expirationDays: number;
 
         panelName: string;
         edition: string;

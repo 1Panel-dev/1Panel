@@ -858,6 +858,15 @@
 		"formatZH": "查看 AI 网关 API Key [id]",
 		"formatEN": "reveal AI proxy API key [id]"
 	},
+	"/core/enterprise/ai-proxy/api-keys/token/reset": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "重置 AI 网关 API Key Token [id]",
+		"formatEN": "reset AI proxy API key token [id]"
+	},
 	"/core/enterprise/ai-proxy/api-keys/update": {
 		"bodyKeys": [
 			"id",

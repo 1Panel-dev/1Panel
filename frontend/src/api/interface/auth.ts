@@ -48,9 +48,6 @@ export namespace Login {
     export interface AuthInfo {
         id: number;
         name: string;
-        sessionTimeout: number;
-        expirationDays: number;
-        expirationTime: string;
         mfaStatus: string;
         mfaInterval: number;
         role: string;
@@ -68,9 +65,6 @@ export namespace Login {
         name: string;
         password: string;
         oldPassword: string;
-        sessionTimeout: number;
-        expirationDays: number;
-        expirationTime: string;
     }
     export interface MFARequest {
         title: string;

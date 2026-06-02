@@ -40,29 +40,6 @@
                         autocomplete="current-password"
                     />
                 </el-form-item>
-                <el-form-item :label="$t('setting.days')" prop="expirationDays">
-                    <el-input
-                        clearable
-                        v-model.number="form.expirationDays"
-                        name="profile-expiration-days"
-                        autocomplete="off"
-                    />
-                    <div>
-                        <span class="input-help" v-if="form.expirationDays !== 0">
-                            {{ $t('setting.timeoutHelper', [loadTimeOut()]) }}
-                        </span>
-                        <span class="input-help" v-else>
-                            {{ $t('setting.noneSetting') }}
-                        </span>
-                    </div>
-                    <span class="input-help">{{ $t('setting.expirationHelper') }}</span>
-                </el-form-item>
-                <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
-                    <el-input v-model.number="form.sessionTimeout" name="profile-session-timeout" autocomplete="off" />
-                    <span class="input-help">
-                        {{ $t('setting.sessionTimeoutHelper', [form.sessionTimeout]) }}
-                    </span>
-                </el-form-item>
             </el-form>
 
             <el-form label-position="top" :model="form" class="setting-section">
@@ -449,11 +426,8 @@ const form = reactive({
     name: '',
     password: '',
     oldPassword: '',
-    sessionTimeout: 0,
     mfaStatus: 'Disable',
     mfaInterval: 30,
-    expirationDays: 0,
-    expirationTime: '',
     apiInterfaceStatus: 'Disable',
     apiKey: '',
     ipWhiteList: '',
@@ -514,8 +488,6 @@ const userRules = reactive({
     name: [Rules.requiredInput, Rules.noSpace],
     oldPassword: [Rules.requiredInput],
     password: [{ validator: validatePassword, trigger: 'blur' }],
-    sessionTimeout: [Rules.integerNumber, checkNumberRange(300, 864000)],
-    expirationDays: [Rules.integerNumberWith0, checkNumberRange(0, 60)],
 });
 const mfaRules = reactive({
     code: [Rules.requiredInput],
@@ -529,7 +501,7 @@ const apiRules = reactive({
 });
 
 const getUserFormFields = () => {
-    const fields = ['name', 'password', 'sessionTimeout', 'expirationDays'];
+    const fields = ['name', 'password'];
     if (form.password) {
         fields.push('oldPassword');
     }
@@ -559,15 +531,11 @@ const syncCurrentUser = (currentUser: Login.AuthInfo) => {
     form.name = currentUser.name;
     form.password = '';
     form.oldPassword = '';
-    form.sessionTimeout = currentUser.sessionTimeout;
-    form.expirationTime = currentUser.expirationTime;
-    form.expirationDays = currentUser.expirationDays;
     form.mfaStatus = currentUser.mfaStatus || 'Disable';
     form.mfaInterval = currentUser.mfaInterval;
     savedMfaStatus.value = form.mfaStatus;
     mfaDialogOpen.value = false;
     apiDialogOpen.value = false;
-    form.expirationDays = form.expirationDays ? form.expirationDays : 0;
     syncApiConfig(currentUser);
 };
 
@@ -862,9 +830,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         name: form.name,
         password: form.password,
         oldPassword: form.oldPassword,
-        sessionTimeout: form.sessionTimeout,
-        expirationDays: form.expirationDays,
-        expirationTime: form.expirationTime,
     };
     loading.value = true;
     await updateUserInfo(param)
@@ -932,26 +897,6 @@ const onSaveApi = async (formEl: FormInstance | undefined) => {
             loading.value = false;
         });
 };
-
-function loadTimeOut() {
-    if (!form.expirationTime) {
-        if (form.expirationDays) {
-            return form.expirationDays;
-        } else {
-            return '-';
-        }
-    }
-    if (form.expirationDays === 0) {
-        form.expirationTime = '-';
-        return '-';
-    }
-    let stayGap = new Date(form.expirationTime).getTime() - new Date().getTime();
-    if (stayGap < 0) {
-        form.expirationTime = '-';
-        return '-';
-    }
-    return Math.floor(stayGap / (3600 * 1000 * 24));
-}
 
 const handleMFA = async () => {
     if (!form.mfaStatus) {

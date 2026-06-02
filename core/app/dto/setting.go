@@ -9,16 +9,17 @@ type SettingInfo struct {
 	DeveloperMode       string `json:"developerMode"`
 	UpgradeBackupCopies string `json:"upgradeBackupCopies"`
 
-	Port        string `json:"port"`
-	Ipv6        string `json:"ipv6"`
-	BindAddress string `json:"bindAddress"`
-	PanelName   string `json:"panelName"`
-	Edition     string `json:"edition"`
-	Theme       string `json:"theme"`
-	MenuTabs    string `json:"menuTabs"`
-	Language    string `json:"language"`
-	DocSource   string `json:"docSource"`
-	IsOffline   string `json:"isOffline"`
+	SessionTimeout string `json:"sessionTimeout"`
+	Port           string `json:"port"`
+	Ipv6           string `json:"ipv6"`
+	BindAddress    string `json:"bindAddress"`
+	PanelName      string `json:"panelName"`
+	Edition        string `json:"edition"`
+	Theme          string `json:"theme"`
+	MenuTabs       string `json:"menuTabs"`
+	Language       string `json:"language"`
+	DocSource      string `json:"docSource"`
+	IsOffline      string `json:"isOffline"`
 
 	ServerPort                 string `json:"serverPort"`
 	SSL                        string `json:"ssl"`
@@ -30,7 +31,6 @@ type SettingInfo struct {
 	DashboardMemoVisible       string `json:"dashboardMemoVisible"`
 	DashboardSimpleNodeVisible string `json:"dashboardSimpleNodeVisible"`
 	ExpirationDays             string `json:"expirationDays"`
-	ExpirationTime             string `json:"expirationTime"`
 	ComplexityVerification     string `json:"complexityVerification"`
 
 	AppStoreVersion      string `json:"appStoreVersion"`
