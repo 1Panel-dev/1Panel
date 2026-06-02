@@ -2429,6 +2429,50 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/domain/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OllamaBindDomain"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update bind domain",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"domain"
+					],
+					"formatEN": "update Ollama bind domain [domain]",
+					"formatZH": "更新 Ollama 绑定域名 [domain]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/ai/gpu/load": {
 			"get": {
 				"consumes": [
@@ -2448,6 +2492,27 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Load gpu / xpu info",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/gpu/options": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get CPU options",
 				"tags": [
 					"AI"
 				]
@@ -3058,6 +3123,718 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/ai/tensorrt/create": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.TensorRTLLMCreate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create TensorRT LLM",
+				"tags": [
+					"TensorRT LLM"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name"
+					],
+					"formatEN": "create TensorRT LLM [name]",
+					"formatZH": "创建 TensorRT LLM [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/tensorrt/delete": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.TensorRTLLMDelete"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete TensorRT LLM",
+				"tags": [
+					"TensorRT LLM"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "delete TensorRT LLM [id]",
+					"formatZH": "删除 TensorRT LLM [id]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/tensorrt/operate": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.TensorRTLLMOperate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Operate TensorRT LLM",
+				"tags": [
+					"TensorRT LLM"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"id",
+						"operate"
+					],
+					"formatEN": "operate TensorRT LLM [id][operate]",
+					"formatZH": "操作 TensorRT LLM [id][operate]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/tensorrt/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.TensorRTLLMSearch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page TensorRT LLMs",
+				"tags": [
+					"TensorRT LLM"
+				]
+			}
+		},
+		"/ai/tensorrt/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.TensorRTLLMUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update TensorRT LLM",
+				"tags": [
+					"TensorRT LLM"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"id",
+						"name"
+					],
+					"formatEN": "update TensorRT LLM [id][name]",
+					"formatZH": "更新 TensorRT LLM [id][name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/alert": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AlertCreate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create alert",
+				"tags": [
+					"Alert"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"type",
+						"method"
+					],
+					"formatEN": "create alert [type][method]",
+					"formatZH": "创建告警任务 [type][method]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/alert/clams/list": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get clams",
+				"tags": [
+					"Alert"
+				]
+			}
+		},
+		"/alert/config/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.DeleteRequest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete alert config",
+				"tags": [
+					"Alert"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "delete alert config [id]",
+					"formatZH": "删除告警配置 [id]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/alert/config/info": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get alert config",
+				"tags": [
+					"Alert"
+				]
+			}
+		},
+		"/alert/config/test": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AlertConfigTest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Test alert config",
+				"tags": [
+					"Alert"
+				]
+			}
+		},
+		"/alert/config/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AlertConfigUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update alert config",
+				"tags": [
+					"Alert"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"type",
+						"title"
+					],
+					"formatEN": "update alert config [type][title]",
+					"formatZH": "更新告警配置 [type][title]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/alert/cronjob/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.CronJobReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get cron jobs",
+				"tags": [
+					"Alert"
+				]
+			}
+		},
+		"/alert/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.DeleteRequest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete alert",
+				"tags": [
+					"Alert"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "delete alert [id]",
+					"formatZH": "删除告警任务 [id]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/alert/disks/list": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get disks",
+				"tags": [
+					"Alert"
+				]
+			}
+		},
+		"/alert/logs/clean": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Clean alert logs",
+				"tags": [
+					"Alert"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "clean alert logs",
+					"formatZH": "清空告警日志",
+					"paramKeys": []
+				}
+			}
+		},
+		"/alert/logs/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AlertLogSearch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page alert logs",
+				"tags": [
+					"Alert"
+				]
+			}
+		},
+		"/alert/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AlertSearch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page alert",
+				"tags": [
+					"Alert"
+				]
+			}
+		},
+		"/alert/status": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AlertUpdateStatus"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update alert status",
+				"tags": [
+					"Alert"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"id",
+						"status"
+					],
+					"formatEN": "update alert [id] status [status]",
+					"formatZH": "更新告警任务 [id] 状态 [status]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/alert/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AlertUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update alert",
+				"tags": [
+					"Alert"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"id",
+						"type"
+					],
+					"formatEN": "update alert [id][type]",
+					"formatZH": "更新告警任务 [id][type]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/apps/:key": {
 			"get": {
 				"consumes": [
@@ -3141,7 +3918,7 @@ const docTemplate = `{
 					{
 						"description": "app 类型",
 						"in": "path",
-						"name": "version",
+						"name": "type",
 						"required": true,
 						"type": "string"
 					}
@@ -3177,9 +3954,9 @@ const docTemplate = `{
 					{
 						"description": "app key",
 						"in": "path",
-						"name": "appId",
+						"name": "appKey",
 						"required": true,
-						"type": "integer"
+						"type": "string"
 					},
 					{
 						"description": "app version",
@@ -3220,7 +3997,7 @@ const docTemplate = `{
 					{
 						"description": "id",
 						"in": "path",
-						"name": "appId",
+						"name": "id",
 						"required": true,
 						"type": "integer"
 					}
@@ -3254,11 +4031,11 @@ const docTemplate = `{
 				],
 				"parameters": [
 					{
-						"description": "app id",
+						"description": "app key",
 						"in": "path",
-						"name": "appId",
+						"name": "key",
 						"required": true,
-						"type": "integer"
+						"type": "string"
 					}
 				],
 				"responses": {
@@ -3827,7 +4604,7 @@ const docTemplate = `{
 						"in": "path",
 						"name": "appInstallId",
 						"required": true,
-						"type": "string"
+						"type": "integer"
 					}
 				],
 				"responses": {
@@ -3989,6 +4766,48 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/apps/installed/sort/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.AppInstallSort"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update app install sort",
+				"tags": [
+					"App"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "update installed app sort",
+					"formatZH": "更新已安装应用排序",
+					"paramKeys": []
+				}
+			}
+		},
 		"/apps/installed/sync": {
 			"post": {
 				"responses": {
@@ -4021,15 +4840,6 @@ const docTemplate = `{
 			"post": {
 				"consumes": [
 					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "path",
-						"name": "appInstallId",
-						"required": true,
-						"type": "integer"
-					}
 				],
 				"responses": {
 					"200": {
@@ -4189,6 +4999,27 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/apps/tags": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get app tags",
+				"tags": [
+					"App"
+				]
+			}
+		},
 		"/backups": {
 			"post": {
 				"consumes": [
@@ -4320,7 +5151,37 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/backups/check": {
+		"/backups/check/{name}": {
+			"get": {
+				"parameters": [
+					{
+						"description": "name",
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check backup used",
+				"tags": [
+					"Backup Account"
+				]
+			}
+		},
+		"/backups/conn/check": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -4958,8 +5819,8 @@ const docTemplate = `{
 					"bodyKeys": [
 						"type"
 					],
-					"formatEN": "update backup account [types]",
-					"formatZH": "更新备份账号 [types]",
+					"formatEN": "update backup account [type]",
+					"formatZH": "更新备份账号 [type]",
 					"paramKeys": []
 				}
 			}
@@ -5644,6 +6505,41 @@ const docTemplate = `{
 				"summary": "Load docker status",
 				"tags": [
 					"Container Docker"
+				]
+			}
+		},
+		"/containers/download/log": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ContainerLog"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Download container logs",
+				"tags": [
+					"Container"
 				]
 			}
 		},
@@ -6502,7 +7398,10 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Load container stats size"
+				"summary": "Load container stats size",
+				"tags": [
+					"Container"
+				]
 			}
 		},
 		"/containers/limit": {
@@ -6523,7 +7422,10 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Load container limits"
+				"summary": "Load container limits",
+				"tags": [
+					"Container"
+				]
 			}
 		},
 		"/containers/list": {
@@ -6613,7 +7515,10 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Load container stats"
+				"summary": "Load container stats",
+				"tags": [
+					"Container"
+				]
 			}
 		},
 		"/containers/logoption/update": {
@@ -8488,6 +9393,27 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/core/auth/welcome": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get welcome page",
+				"tags": [
+					"Auth"
+				]
+			}
+		},
 		"/core/backups": {
 			"post": {
 				"consumes": [
@@ -8536,6 +9462,15 @@ const docTemplate = `{
 			"get": {
 				"consumes": [
 					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "clientType",
+						"in": "path",
+						"name": "clientType",
+						"required": true,
+						"type": "string"
+					}
 				],
 				"responses": {
 					"200": {
@@ -8676,8 +9611,8 @@ const docTemplate = `{
 					"bodyKeys": [
 						"type"
 					],
-					"formatEN": "update backup account [types]",
-					"formatZH": "更新备份账号 [types]",
+					"formatEN": "update backup account [type]",
+					"formatZH": "更新备份账号 [type]",
 					"paramKeys": []
 				}
 			}
@@ -8725,44 +9660,6 @@ const docTemplate = `{
 					"formatZH": "创建快捷命令 [name][command]",
 					"paramKeys": []
 				}
-			}
-		},
-		"/core/commands/command": {
-			"get": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.OperateByType"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.CommandInfo"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "List commands",
-				"tags": [
-					"Command"
-				]
 			}
 		},
 		"/core/commands/del": {
@@ -8880,6 +9777,44 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/core/commands/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperateByType"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.CommandInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List commands",
+				"tags": [
+					"Command"
+				]
+			}
+		},
 		"/core/commands/search": {
 			"post": {
 				"consumes": [
@@ -8919,7 +9854,7 @@ const docTemplate = `{
 			}
 		},
 		"/core/commands/tree": {
-			"get": {
+			"post": {
 				"consumes": [
 					"application/json"
 				],
@@ -8999,6 +9934,37 @@ const docTemplate = `{
 					],
 					"formatEN": "update quick command [name]",
 					"formatZH": "更新快捷命令 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/core/commands/upload": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Upload command csv for list",
+				"tags": [
+					"Command"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "upload quick commands with csv",
+					"formatZH": "上传快速命令文件",
 					"paramKeys": []
 				}
 			}
@@ -9413,6 +10379,53 @@ const docTemplate = `{
 					"formatZH": "删除脚本库脚本 [names]",
 					"paramKeys": []
 				}
+			}
+		},
+		"/core/script/run": {
+			"get": {
+				"parameters": [
+					{
+						"description": "cols",
+						"in": "query",
+						"name": "cols",
+						"type": "integer"
+					},
+					{
+						"description": "rows",
+						"in": "query",
+						"name": "rows",
+						"type": "integer"
+					},
+					{
+						"description": "script_id",
+						"in": "query",
+						"name": "script_id",
+						"type": "integer"
+					},
+					{
+						"description": "operateNode",
+						"in": "query",
+						"name": "operateNode",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Run script",
+				"tags": [
+					"ScriptLibrary"
+				]
 			}
 		},
 		"/core/script/search": {
@@ -10020,6 +11033,34 @@ const docTemplate = `{
 				"tags": [
 					"System Setting"
 				]
+			}
+		},
+		"/core/settings/ssl/reload": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Reload SSL",
+				"tags": [
+					"System Setting"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "reload system SSL",
+					"formatZH": "重载系统 SSL",
+					"paramKeys": []
+				}
 			}
 		},
 		"/core/settings/ssl/update": {
@@ -11760,6 +12801,15 @@ const docTemplate = `{
 		},
 		"/databases/db/:name": {
 			"get": {
+				"parameters": [
+					{
+						"description": "name",
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"type": "string"
+					}
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
@@ -11926,6 +12976,15 @@ const docTemplate = `{
 		},
 		"/databases/db/item/:type": {
 			"get": {
+				"parameters": [
+					{
+						"description": "type",
+						"in": "path",
+						"name": "type",
+						"required": true,
+						"type": "string"
+					}
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
@@ -11953,6 +13012,15 @@ const docTemplate = `{
 		},
 		"/databases/db/list/:type": {
 			"get": {
+				"parameters": [
+					{
+						"description": "type",
+						"in": "path",
+						"name": "type",
+						"required": true,
+						"type": "string"
+					}
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
@@ -12825,6 +13893,13 @@ const docTemplate = `{
 						"schema": {
 							"$ref": "#/definitions/dto.PostgresqlLoadDB"
 						}
+					},
+					{
+						"description": "database",
+						"in": "path",
+						"name": "database",
+						"required": true,
+						"type": "string"
 					}
 				],
 				"responses": {
@@ -13131,7 +14206,7 @@ const docTemplate = `{
 						"database",
 						"username"
 					],
-					"formatEN": "Update [user] privileges of database [database]",
+					"formatEN": "Update [username] privileges of database [database]",
 					"formatZH": "更新数据库 [database] 用户 [username] 权限",
 					"paramKeys": []
 				}
@@ -13172,6 +14247,27 @@ const docTemplate = `{
 				"summary": "Page postgresql databases",
 				"tags": [
 					"Database PostgreSQL"
+				]
+			}
+		},
+		"/databases/redis/check": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check has cli",
+				"tags": [
+					"Database Redis"
 				]
 			}
 		},
@@ -14676,8 +15772,8 @@ const docTemplate = `{
 						"path",
 						"mode"
 					],
-					"formatEN": "Change mode [paths] =\u003e [mode]",
-					"formatZH": "修改权限 [paths] =\u003e [mode]",
+					"formatEN": "Change mode [path] =\u003e [mode]",
+					"formatZH": "修改权限 [path] =\u003e [mode]",
 					"paramKeys": []
 				}
 			}
@@ -14794,8 +15890,8 @@ const docTemplate = `{
 						"user",
 						"group"
 					],
-					"formatEN": "Change owner [paths] =\u003e [user]/[group]",
-					"formatZH": "修改用户/组 [paths] =\u003e [user]/[group]",
+					"formatEN": "Change owner [path] =\u003e [user]/[group]",
+					"formatZH": "修改用户/组 [path] =\u003e [user]/[group]",
 					"paramKeys": []
 				}
 			}
@@ -14847,9 +15943,16 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/files/read": {
+		"/files/read/{type}": {
 			"post": {
 				"parameters": [
+					{
+						"description": "type",
+						"in": "path",
+						"name": "type",
+						"required": true,
+						"type": "string"
+					},
 					{
 						"description": "request",
 						"in": "body",
@@ -15764,6 +16867,48 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/files/wget/process": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Wget process",
+				"tags": [
+					"File"
+				]
+			}
+		},
+		"/files/wget/process/keys": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Process keys",
+				"tags": [
+					"File"
+				]
+			}
+		},
 		"/files/wget/stop": {
 			"post": {
 				"consumes": [
@@ -16000,6 +17145,72 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/health/check": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check health",
+				"tags": [
+					"Health"
+				]
+			}
+		},
+		"/hosts": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.HostOperate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create host",
+				"tags": [
+					"Host"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"addr"
+					],
+					"formatEN": "create host [name][addr]",
+					"formatZH": "创建主机 [name][addr]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/hosts/components/{name}": {
 			"get": {
 				"consumes": [
@@ -16034,6 +17245,59 @@ const docTemplate = `{
 				"tags": [
 					"Host"
 				]
+			}
+		},
+		"/hosts/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperateByIDs"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete host",
+				"tags": [
+					"Host"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "hosts",
+							"input_column": "id",
+							"input_value": "ids",
+							"isList": true,
+							"output_column": "name",
+							"output_value": "names"
+						}
+					],
+					"bodyKeys": [
+						"ids"
+					],
+					"formatEN": "delete host [names]",
+					"formatZH": "删除主机 [names]",
+					"paramKeys": []
+				}
 			}
 		},
 		"/hosts/disks": {
@@ -16444,7 +17708,7 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/hosts/firewall/filter/search": {
+		"/hosts/firewall/filter/rule/search": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -16801,6 +18065,41 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/hosts/info": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperateByID"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get host by ID",
+				"tags": [
+					"Host"
+				]
+			}
+		},
 		"/hosts/monitor/clean": {
 			"post": {
 				"responses": {
@@ -16827,6 +18126,48 @@ const docTemplate = `{
 					"formatZH": "清空监控数据",
 					"paramKeys": []
 				}
+			}
+		},
+		"/hosts/monitor/iooptions": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get IO options",
+				"tags": [
+					"Monitor"
+				]
+			}
+		},
+		"/hosts/monitor/netoptions": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get network options",
+				"tags": [
+					"Monitor"
+				]
 			}
 		},
 		"/hosts/monitor/search": {
@@ -16927,10 +18268,45 @@ const docTemplate = `{
 						"key",
 						"value"
 					],
-					"formatEN": "update default monitor [name]-[value]",
-					"formatZH": "修改默认监控网卡 [name]-[value]",
+					"formatEN": "update default monitor [key]-[value]",
+					"formatZH": "修改默认监控网卡 [key]-[value]",
 					"paramKeys": []
 				}
+			}
+		},
+		"/hosts/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.SearchPageWithGroup"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Search host",
+				"tags": [
+					"Host"
+				]
 			}
 		},
 		"/hosts/ssh/cert": {
@@ -17396,6 +18772,175 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/hosts/terminal/container": {
+			"get": {
+				"parameters": [
+					{
+						"description": "cols",
+						"in": "query",
+						"name": "cols",
+						"type": "integer"
+					},
+					{
+						"description": "rows",
+						"in": "query",
+						"name": "rows",
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Ws container terminal",
+				"tags": [
+					"Terminal"
+				]
+			}
+		},
+		"/hosts/terminal/local": {
+			"get": {
+				"parameters": [
+					{
+						"description": "command",
+						"in": "query",
+						"name": "command",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Ws local terminal",
+				"tags": [
+					"Terminal"
+				]
+			}
+		},
+		"/hosts/terminal/ssh": {
+			"get": {
+				"parameters": [
+					{
+						"description": "id",
+						"in": "query",
+						"name": "id",
+						"type": "integer"
+					},
+					{
+						"description": "command",
+						"in": "query",
+						"name": "command",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Ws host SSH",
+				"tags": [
+					"Terminal"
+				]
+			}
+		},
+		"/hosts/test/byid": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperateByID"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Test by ID",
+				"tags": [
+					"Host"
+				]
+			}
+		},
+		"/hosts/test/byinfo": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.HostConnTest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Test by info",
+				"tags": [
+					"Host"
+				]
+			}
+		},
 		"/hosts/tool/config/get": {
 			"post": {
 				"consumes": [
@@ -17757,6 +19302,140 @@ const docTemplate = `{
 				"tags": [
 					"Host tool"
 				]
+			}
+		},
+		"/hosts/tree": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.SearchForTree"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Host tree",
+				"tags": [
+					"Host"
+				]
+			}
+		},
+		"/hosts/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.HostOperate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update host",
+				"tags": [
+					"Host"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"addr"
+					],
+					"formatEN": "update host [name][addr]",
+					"formatZH": "更新主机 [name][addr]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/hosts/update/group": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ChangeGroup"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update host group",
+				"tags": [
+					"Host"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "hosts",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						}
+					],
+					"bodyKeys": [
+						"id",
+						"groupID"
+					],
+					"formatEN": "update host [name] group",
+					"formatZH": "更新主机 [name] 分组",
+					"paramKeys": []
+				}
 			}
 		},
 		"/logs/system/files": {
@@ -18294,6 +19973,27 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/process/ws": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Process ws",
+				"tags": [
+					"Process"
+				]
+			}
+		},
 		"/process/{pid}": {
 			"get": {
 				"parameters": [
@@ -18382,7 +20082,7 @@ const docTemplate = `{
 						"in": "path",
 						"name": "id",
 						"required": true,
-						"type": "string"
+						"type": "integer"
 					}
 				],
 				"responses": {
@@ -18445,8 +20145,8 @@ const docTemplate = `{
 					"bodyKeys": [
 						"id"
 					],
-					"formatEN": "Delete runtime [name]",
-					"formatZH": "删除运行环境 [name]",
+					"formatEN": "Delete runtime [id]",
+					"formatZH": "删除运行环境 [id]",
 					"paramKeys": []
 				}
 			}
@@ -18455,6 +20155,15 @@ const docTemplate = `{
 			"get": {
 				"consumes": [
 					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "id",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"type": "integer"
+					}
 				],
 				"responses": {
 					"200": {
@@ -18636,8 +20345,8 @@ const docTemplate = `{
 					"bodyKeys": [
 						"id"
 					],
-					"formatEN": "Operate runtime [name]",
-					"formatZH": "操作运行环境 [name]",
+					"formatEN": "Operate runtime [id]",
+					"formatZH": "操作运行环境 [id]",
 					"paramKeys": []
 				}
 			}
@@ -18653,7 +20362,7 @@ const docTemplate = `{
 						"in": "path",
 						"name": "id",
 						"required": true,
-						"type": "string"
+						"type": "integer"
 					}
 				],
 				"responses": {
@@ -19618,6 +21327,72 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/settings/files/ai/search": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get file manage AI setting info",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
+		"/settings/files/ai/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.FileManageAIInfo"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update file manage AI setting",
+				"tags": [
+					"System Setting"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"aiStatus",
+						"aiAccountId"
+					],
+					"formatEN": "update file manage AI setting [aiStatus][aiAccountId]",
+					"formatZH": "更新文件管理 AI 设置 [aiStatus][aiAccountId]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/settings/search": {
 			"post": {
 				"responses": {
@@ -20102,6 +21877,27 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/settings/ssh/check": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check local conn",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
 		"/settings/ssh/check/info": {
 			"post": {
 				"responses": {
@@ -20150,7 +21946,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/settings/ssh/conn/default": {
+		"/settings/ssh/default": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -20190,6 +21986,72 @@ const docTemplate = `{
 					],
 					"formatEN": "update system default conn [defaultConn]",
 					"formatZH": "本地终端默认连接 [defaultConn]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/settings/terminal/ai/search": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get terminal AI setting info",
+				"tags": [
+					"System Setting"
+				]
+			}
+		},
+		"/settings/terminal/ai/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.TerminalAIInfo"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update terminal AI setting",
+				"tags": [
+					"System Setting"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"aiStatus",
+						"aiAccountId"
+					],
+					"formatEN": "update terminal AI setting [aiStatus][aiAccountId]",
+					"formatZH": "更新终端 AI 设置 [aiStatus][aiAccountId]",
 					"paramKeys": []
 				}
 			}
@@ -21879,6 +23741,13 @@ const docTemplate = `{
 						"name": "id",
 						"required": true,
 						"type": "integer"
+					},
+					{
+						"description": "type",
+						"in": "path",
+						"name": "type",
+						"required": true,
+						"type": "string"
 					}
 				],
 				"responses": {
@@ -21951,6 +23820,13 @@ const docTemplate = `{
 						"schema": {
 							"$ref": "#/definitions/request.WebsiteHTTPSOp"
 						}
+					},
+					{
+						"description": "id",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"type": "string"
 					}
 				],
 				"responses": {
@@ -22368,41 +24244,6 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/websites/batch/https": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/request.BatchWebsiteHttps"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Batch set HTTPS for websites",
-				"tags": [
-					"Website"
-				]
-			}
-		},
 		"/websites/batch/operate": {
 			"post": {
 				"consumes": [
@@ -22433,6 +24274,41 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Batch operate websites",
+				"tags": [
+					"Website"
+				]
+			}
+		},
+		"/websites/batch/ssl": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.BatchWebsiteHttps"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch set HTTPS for websites",
 				"tags": [
 					"Website"
 				]
@@ -23073,6 +24949,15 @@ const docTemplate = `{
 			"get": {
 				"consumes": [
 					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "type",
+						"in": "path",
+						"name": "type",
+						"required": true,
+						"type": "string"
+					}
 				],
 				"responses": {
 					"200": {
@@ -23797,8 +25682,8 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/websites/lbs": {
-			"get": {
+		"/websites/group/change": {
+			"post": {
 				"consumes": [
 					"application/json"
 				],
@@ -23809,19 +25694,13 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/request.WebsiteCommonReq"
+							"$ref": "#/definitions/dto.UpdateGroup"
 						}
 					}
 				],
 				"responses": {
 					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"$ref": "#/definitions/dto.NginxUpstream"
-							},
-							"type": "array"
-						}
+						"description": "OK"
 					}
 				},
 				"security": [
@@ -23832,10 +25711,20 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Get website upstreams",
+				"summary": "Change website group",
 				"tags": [
 					"Website"
-				]
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"group",
+						"newGroup"
+					],
+					"formatEN": "change website group [group] to [newGroup]",
+					"formatZH": "网站分组 [group] 迁移到 [newGroup]",
+					"paramKeys": []
+				}
 			}
 		},
 		"/websites/lbs/create": {
@@ -24709,7 +26598,10 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Get website proxy cache config"
+				"summary": "Get website proxy cache config",
+				"tags": [
+					"Website"
+				]
 			}
 		},
 		"/websites/realip/config": {
@@ -25365,6 +27257,50 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/websites/ssl/import": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/model.WebsiteSSL"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Import master SSL",
+				"tags": [
+					"Website SSL"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"primaryDomain"
+					],
+					"formatEN": "import master SSL [primaryDomain]",
+					"formatZH": "导入主节点证书 [primaryDomain]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/websites/ssl/list": {
 			"post": {
 				"consumes": [
@@ -25819,6 +27755,45 @@ const docTemplate = `{
 					"formatZH": "更新网站 [primaryDomain]",
 					"paramKeys": []
 				}
+			}
+		},
+		"/websites/{id}/lbs": {
+			"get": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "id",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.NginxUpstream"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get website upstreams",
+				"tags": [
+					"Website"
+				]
 			}
 		}
 	},
@@ -27929,6 +29904,206 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.AlertConfigTest": {
+			"properties": {
+				"displayName": {
+					"type": "string"
+				},
+				"encryption": {
+					"description": "\"ssl\" / \"tls\" / \"none\"",
+					"type": "string"
+				},
+				"host": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				},
+				"port": {
+					"type": "integer"
+				},
+				"recipient": {
+					"type": "string"
+				},
+				"sender": {
+					"type": "string"
+				},
+				"userName": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AlertConfigUpdate": {
+			"properties": {
+				"config": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"status": {
+					"type": "string"
+				},
+				"title": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AlertCreate": {
+			"properties": {
+				"advancedParams": {
+					"type": "string"
+				},
+				"count": {
+					"type": "integer"
+				},
+				"cycle": {
+					"type": "integer"
+				},
+				"method": {
+					"type": "string"
+				},
+				"project": {
+					"type": "string"
+				},
+				"sendCount": {
+					"type": "integer"
+				},
+				"status": {
+					"type": "string"
+				},
+				"title": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"method",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.AlertLogSearch": {
+			"properties": {
+				"count": {
+					"type": "integer"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				},
+				"status": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"page",
+				"pageSize"
+			],
+			"type": "object"
+		},
+		"dto.AlertSearch": {
+			"properties": {
+				"method": {
+					"type": "string"
+				},
+				"order": {
+					"enum": [
+						"null",
+						"ascending",
+						"descending"
+					],
+					"type": "string"
+				},
+				"orderBy": {
+					"enum": [
+						"created_at"
+					],
+					"type": "string"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				},
+				"status": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"order",
+				"orderBy",
+				"page",
+				"pageSize"
+			],
+			"type": "object"
+		},
+		"dto.AlertUpdate": {
+			"properties": {
+				"advancedParams": {
+					"type": "string"
+				},
+				"count": {
+					"type": "integer"
+				},
+				"cycle": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"method": {
+					"type": "string"
+				},
+				"project": {
+					"type": "string"
+				},
+				"sendCount": {
+					"type": "integer"
+				},
+				"status": {
+					"type": "string"
+				},
+				"title": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.AlertUpdateStatus": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"status": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
+				"status"
+			],
+			"type": "object"
+		},
 		"dto.ApiInterfaceConfig": {
 			"properties": {
 				"apiInterfaceStatus": {
@@ -29306,6 +31481,29 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.ContainerLog": {
+			"properties": {
+				"container": {
+					"type": "string"
+				},
+				"containerType": {
+					"type": "string"
+				},
+				"since": {
+					"type": "string"
+				},
+				"tail": {
+					"type": "integer"
+				},
+				"timestamp": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"container"
+			],
+			"type": "object"
+		},
 		"dto.ContainerNetwork": {
 			"properties": {
 				"ipv4": {
@@ -29616,6 +31814,20 @@ const docTemplate = `{
 				"image",
 				"names"
 			],
+			"type": "object"
+		},
+		"dto.CronJobReq": {
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.CronjobBatchDelete": {
@@ -30627,6 +32839,17 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.DeleteRequest": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
 		"dto.DeviceBaseInfo": {
 			"properties": {
 				"dns": {
@@ -30878,6 +33101,17 @@ const docTemplate = `{
 			"required": [
 				"key"
 			],
+			"type": "object"
+		},
+		"dto.FileManageAIInfo": {
+			"properties": {
+				"aiAccountId": {
+					"type": "string"
+				},
+				"aiStatus": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.FilePath": {
@@ -31211,6 +33445,43 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.HostConnTest": {
+			"properties": {
+				"addr": {
+					"type": "string"
+				},
+				"authMode": {
+					"enum": [
+						"password",
+						"key"
+					],
+					"type": "string"
+				},
+				"passPhrase": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				},
+				"port": {
+					"maximum": 65535,
+					"minimum": 1,
+					"type": "integer"
+				},
+				"privateKey": {
+					"type": "string"
+				},
+				"user": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"addr",
+				"port",
+				"user"
+			],
+			"type": "object"
+		},
 		"dto.HostHelper": {
 			"properties": {
 				"host": {
@@ -31220,6 +33491,58 @@ const docTemplate = `{
 					"type": "string"
 				}
 			},
+			"type": "object"
+		},
+		"dto.HostOperate": {
+			"properties": {
+				"addr": {
+					"type": "string"
+				},
+				"authMode": {
+					"enum": [
+						"password",
+						"key"
+					],
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"groupID": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"passPhrase": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				},
+				"port": {
+					"maximum": 65535,
+					"minimum": 1,
+					"type": "integer"
+				},
+				"privateKey": {
+					"type": "string"
+				},
+				"rememberPassword": {
+					"type": "boolean"
+				},
+				"user": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"addr",
+				"port",
+				"user"
+			],
 			"type": "object"
 		},
 		"dto.ImageBuild": {
@@ -34260,6 +36583,14 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.SearchForTree": {
+			"properties": {
+				"info": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.SearchLgLogWithPage": {
 			"properties": {
 				"endTime": {
@@ -34857,6 +37188,34 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.TerminalAIInfo": {
+			"properties": {
+				"aiAccountId": {
+					"type": "string"
+				},
+				"aiPrefix": {
+					"enum": [
+						"@ai",
+						"#ai",
+						"/ai"
+					],
+					"type": "string"
+				},
+				"aiRiskCommands": {
+					"type": "string"
+				},
+				"aiRiskCommandsDefault": {
+					"type": "string"
+				},
+				"aiStatus": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"aiPrefix"
+			],
+			"type": "object"
+		},
 		"dto.TerminalInfo": {
 			"properties": {
 				"backgroundColor": {
@@ -34974,6 +37333,17 @@ const docTemplate = `{
 			"required": [
 				"strategy"
 			],
+			"type": "object"
+		},
+		"dto.UpdateGroup": {
+			"properties": {
+				"group": {
+					"type": "integer"
+				},
+				"newGroup": {
+					"type": "integer"
+				}
+			},
 			"type": "object"
 		},
 		"dto.Upgrade": {
@@ -35911,6 +38281,31 @@ const docTemplate = `{
 				"appDetailId",
 				"name"
 			],
+			"type": "object"
+		},
+		"request.AppInstallSort": {
+			"properties": {
+				"items": {
+					"items": {
+						"$ref": "#/definitions/request.AppInstallSortItem"
+					},
+					"type": "array"
+				}
+			},
+			"required": [
+				"items"
+			],
+			"type": "object"
+		},
+		"request.AppInstallSortItem": {
+			"properties": {
+				"installID": {
+					"type": "integer"
+				},
+				"sortOrder": {
+					"type": "integer"
+				}
+			},
 			"type": "object"
 		},
 		"request.AppInstalledInfo": {
@@ -38609,6 +41004,164 @@ const docTemplate = `{
 			"required": [
 				"page",
 				"pageSize"
+			],
+			"type": "object"
+		},
+		"request.TensorRTLLMCreate": {
+			"properties": {
+				"command": {
+					"type": "string"
+				},
+				"containerName": {
+					"type": "string"
+				},
+				"environments": {
+					"items": {
+						"$ref": "#/definitions/request.Environment"
+					},
+					"type": "array"
+				},
+				"exposedPorts": {
+					"items": {
+						"$ref": "#/definitions/request.ExposedPort"
+					},
+					"type": "array"
+				},
+				"image": {
+					"type": "string"
+				},
+				"modelDir": {
+					"type": "string"
+				},
+				"modelSpeedup": {
+					"type": "boolean"
+				},
+				"modelType": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"version": {
+					"type": "string"
+				},
+				"volumes": {
+					"items": {
+						"$ref": "#/definitions/request.Volume"
+					},
+					"type": "array"
+				}
+			},
+			"required": [
+				"command",
+				"containerName",
+				"image",
+				"modelDir",
+				"name",
+				"version"
+			],
+			"type": "object"
+		},
+		"request.TensorRTLLMDelete": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"request.TensorRTLLMOperate": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"operate": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
+				"operate"
+			],
+			"type": "object"
+		},
+		"request.TensorRTLLMSearch": {
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"page",
+				"pageSize"
+			],
+			"type": "object"
+		},
+		"request.TensorRTLLMUpdate": {
+			"properties": {
+				"command": {
+					"type": "string"
+				},
+				"containerName": {
+					"type": "string"
+				},
+				"environments": {
+					"items": {
+						"$ref": "#/definitions/request.Environment"
+					},
+					"type": "array"
+				},
+				"exposedPorts": {
+					"items": {
+						"$ref": "#/definitions/request.ExposedPort"
+					},
+					"type": "array"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"image": {
+					"type": "string"
+				},
+				"modelDir": {
+					"type": "string"
+				},
+				"modelSpeedup": {
+					"type": "boolean"
+				},
+				"modelType": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"version": {
+					"type": "string"
+				},
+				"volumes": {
+					"items": {
+						"$ref": "#/definitions/request.Volume"
+					},
+					"type": "array"
+				}
+			},
+			"required": [
+				"command",
+				"containerName",
+				"id",
+				"image",
+				"modelDir",
+				"name",
+				"version"
 			],
 			"type": "object"
 		},
