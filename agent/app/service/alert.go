@@ -25,15 +25,18 @@ import (
 
 type AlertService struct{}
 
+var eeHiddenAlertTypes = []string{"licenseException", "panelUpdate", "panelPwdEndTime"}
+var hiddenAlertConfigTypes = []string{"sms"}
+
 type IAlertService interface {
 	PageAlert(req dto.AlertSearch) (int64, []dto.AlertDTO, error)
 	GetAlerts() ([]dto.AlertDTO, error)
-	CreateAlert(create dto.AlertCreate) error
-	UpdateAlert(req dto.AlertUpdate) error
+	CreateAlert(create dto.AlertCreate, operator string) error
+	UpdateAlert(req dto.AlertUpdate, operator string) error
 	DeleteAlert(id uint) error
 	GetAlert(id uint) (dto.AlertDTO, error)
 	UpdateStatus(id uint, status string) error
-	ExternalUpdateAlert(req dto.AlertCreate) error
+	ExternalUpdateAlert(req dto.AlertCreate, operator string) error
 
 	GetDisks() ([]dto.DiskDTO, error)
 	PageAlertLogs(req dto.AlertLogSearch) (int64, []dto.AlertLogDTO, error)
@@ -42,7 +45,8 @@ type IAlertService interface {
 	GetCronJobs(req dto.CronJobReq) ([]dto.CronJobDTO, error)
 
 	GetAlertConfig() ([]model.AlertConfig, error)
-	UpdateAlertConfig(req dto.AlertConfigUpdate) error
+	PageAlertConfig(req dto.PageInfo) (int64, []model.AlertConfig, error)
+	UpdateAlertConfig(req dto.AlertConfigUpdate, operator string) error
 	DeleteAlertConfig(id uint) error
 	TestAlertConfig(req dto.AlertConfigTest) (bool, error)
 }
@@ -56,6 +60,9 @@ func (a AlertService) PageAlert(search dto.AlertSearch) (int64, []dto.AlertDTO, 
 		opts   []repo.DBOption
 		result []dto.AlertDTO
 	)
+	if global.CONF.Base.IsEnterprise {
+		opts = append(opts, alertRepo.WithByTypeNotIn(eeHiddenAlertTypes))
+	}
 	if search.Status != "" {
 		opts = append(opts, repo.WithByStatus(search.Status))
 	}
@@ -82,6 +89,8 @@ func (a AlertService) PageAlert(search dto.AlertSearch) (int64, []dto.AlertDTO, 
 			Status:         item.Status,
 			SendCount:      item.SendCount,
 			AdvancedParams: item.AdvancedParams,
+			CreateUser:     item.CreateUser,
+			UpdateUser:     item.UpdateUser,
 			CreatedAt:      item.CreatedAt,
 			UpdatedAt:      item.UpdatedAt,
 		})
@@ -113,6 +122,8 @@ func (a AlertService) GetAlerts() ([]dto.AlertDTO, error) {
 			Status:         item.Status,
 			SendCount:      item.SendCount,
 			AdvancedParams: item.AdvancedParams,
+			CreateUser:     item.CreateUser,
+			UpdateUser:     item.UpdateUser,
 			CreatedAt:      item.CreatedAt,
 			UpdatedAt:      item.UpdatedAt,
 		})
@@ -121,7 +132,7 @@ func (a AlertService) GetAlerts() ([]dto.AlertDTO, error) {
 	return result, err
 }
 
-func (a AlertService) CreateAlert(create dto.AlertCreate) error {
+func (a AlertService) CreateAlert(create dto.AlertCreate, operator string) error {
 	var alertID uint
 	var alertInfo model.Alert
 	if create.Project != "" {
@@ -138,7 +149,7 @@ func (a AlertService) CreateAlert(create dto.AlertCreate) error {
 			return buserr.WithErr("ErrStructTransform", err)
 		}
 		upAlert.ID = alertID
-		err := a.UpdateAlert(upAlert)
+		err := a.UpdateAlert(upAlert, operator)
 		if err != nil {
 			return err
 		}
@@ -147,6 +158,8 @@ func (a AlertService) CreateAlert(create dto.AlertCreate) error {
 		if err := copier.Copy(&alertInfo, &create); err != nil {
 			return buserr.WithErr("ErrStructTransform", err)
 		}
+		alertInfo.CreateUser = operator
+		alertInfo.UpdateUser = operator
 
 		if err := alertRepo.Create(&alertInfo); err != nil {
 			return err
@@ -157,7 +170,7 @@ func (a AlertService) CreateAlert(create dto.AlertCreate) error {
 	return nil
 }
 
-func (a AlertService) UpdateAlert(req dto.AlertUpdate) error {
+func (a AlertService) UpdateAlert(req dto.AlertUpdate, operator string) error {
 
 	upMap := make(map[string]interface{})
 	upMap["id"] = req.ID
@@ -170,6 +183,7 @@ func (a AlertService) UpdateAlert(req dto.AlertUpdate) error {
 	upMap["status"] = req.Status
 	upMap["send_count"] = req.SendCount
 	upMap["advanced_params"] = req.AdvancedParams
+	upMap["update_user"] = operator
 
 	if err := alertRepo.Update(upMap, repo.WithByID(req.ID)); err != nil {
 		return err
@@ -460,12 +474,29 @@ func (a AlertService) GetAlertConfig() ([]model.AlertConfig, error) {
 		opts    []repo.DBOption
 		configs []model.AlertConfig
 	)
+	if global.CONF.Base.IsEnterprise || global.CONF.Base.Edition == "intl" {
+		opts = append(opts, alertRepo.WithByTypeNotIn(hiddenAlertConfigTypes))
+	}
 	opts = append(opts, repo.WithByStatus(constant.AlertEnable))
 	configs, err := alertRepo.AlertConfigList(opts...)
 	return configs, err
 }
 
-func (a AlertService) UpdateAlertConfig(req dto.AlertConfigUpdate) error {
+func (a AlertService) PageAlertConfig(req dto.PageInfo) (int64, []model.AlertConfig, error) {
+	opts := []repo.DBOption{
+		alertRepo.WithByTypeNotIn([]string{"common"}),
+		repo.WithOrderDesc("created_at"),
+	}
+	if global.CONF.Base.IsEnterprise || global.CONF.Base.Edition == "intl" {
+		opts = append(opts, alertRepo.WithByTypeNotIn(hiddenAlertConfigTypes))
+	}
+	return alertRepo.PageAlertConfig(req.Page, req.PageSize, opts...)
+}
+
+func (a AlertService) UpdateAlertConfig(req dto.AlertConfigUpdate, operator string) error {
+	if err := a.checkAlertConfigDisplayNameUnique(req); err != nil {
+		return err
+	}
 	if req.ID != 0 {
 		upMap := make(map[string]interface{})
 		upMap["id"] = req.ID
@@ -473,6 +504,7 @@ func (a AlertService) UpdateAlertConfig(req dto.AlertConfigUpdate) error {
 		upMap["title"] = req.Title
 		upMap["status"] = req.Status
 		upMap["config"] = req.Config
+		upMap["update_user"] = operator
 		if err := alertRepo.UpdateAlertConfig(upMap, repo.WithByID(req.ID)); err != nil {
 			return err
 		}
@@ -481,6 +513,8 @@ func (a AlertService) UpdateAlertConfig(req dto.AlertConfigUpdate) error {
 		if err := copier.Copy(&alertConfig, &req); err != nil {
 			return buserr.WithErr("ErrStructTransform", err)
 		}
+		alertConfig.CreateUser = operator
+		alertConfig.UpdateUser = operator
 		if err := alertRepo.CreateAlertConfig(&alertConfig); err != nil {
 			return err
 		}
@@ -489,7 +523,70 @@ func (a AlertService) UpdateAlertConfig(req dto.AlertConfigUpdate) error {
 	return nil
 }
 
+func (a AlertService) checkAlertConfigDisplayNameUnique(req dto.AlertConfigUpdate) error {
+	displayName := alertConfigDisplayName(req.Type, req.Config)
+	if displayName == "" {
+		return nil
+	}
+
+	configs, err := alertRepo.AlertConfigList(alertRepo.WithByType(req.Type))
+	if err != nil {
+		return err
+	}
+
+	for _, config := range configs {
+		if req.ID != 0 && config.ID == req.ID {
+			continue
+		}
+		if alertConfigDisplayName(config.Type, config.Config) == displayName {
+			return buserr.New("ErrNameIsExist")
+		}
+	}
+
+	return nil
+}
+
+func alertConfigDisplayName(configType, configData string) string {
+	switch configType {
+	case constant.Email, constant.WeCom, constant.DingTalk, constant.FeiShu, constant.Bark:
+		var cfg struct {
+			DisplayName string `json:"displayName"`
+		}
+		if err := json.Unmarshal([]byte(configData), &cfg); err != nil {
+			return ""
+		}
+		return strings.TrimSpace(cfg.DisplayName)
+	default:
+		return ""
+	}
+}
+
 func (a AlertService) DeleteAlertConfig(id uint) error {
+	config, err := alertRepo.GetConfigById(id)
+	if err != nil {
+		return err
+	}
+	usedAlerts, err := alertRepo.List(alertRepo.WithByMethodConfigID(id))
+	if err != nil {
+		return err
+	}
+	if config.Type == constant.SMS {
+		legacyAlerts, err := alertRepo.List(alertRepo.WithByMethod(constant.SMS))
+		if err != nil {
+			return err
+		}
+		usedAlerts = append(usedAlerts, legacyAlerts...)
+	}
+	if legacyMethod := legacyAlertMethodByConfigType(config.Type); legacyMethod != "" {
+		legacyAlerts, err := alertRepo.List(alertRepo.WithByMethod(legacyMethod))
+		if err != nil {
+			return err
+		}
+		usedAlerts = append(usedAlerts, legacyAlerts...)
+	}
+	if len(usedAlerts) > 0 {
+		return fmt.Errorf("alert config is in use")
+	}
 	return alertRepo.DeleteAlertConfig(repo.WithByID(id))
 }
 
@@ -522,7 +619,7 @@ func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {
 	return true, nil
 }
 
-func (a AlertService) ExternalUpdateAlert(updateAlert dto.AlertCreate) error {
+func (a AlertService) ExternalUpdateAlert(updateAlert dto.AlertCreate, operator string) error {
 	upMap := make(map[string]interface{})
 	var newStatus string
 	if updateAlert.SendCount == 0 {
@@ -566,11 +663,30 @@ func (a AlertService) ExternalUpdateAlert(updateAlert dto.AlertCreate) error {
 	} else {
 		if updateAlert.Method != "" && updateAlert.Title != "" {
 			updateAlert.Status = newStatus
-			if err := a.CreateAlert(updateAlert); err != nil {
+			if err := a.CreateAlert(updateAlert, operator); err != nil {
 				return err
 			}
 		}
 	}
 
 	return nil
+}
+
+func legacyAlertMethodByConfigType(configType string) string {
+	switch configType {
+	case constant.Email:
+		return "mail"
+	case constant.SMS:
+		return constant.SMS
+	case constant.Bark:
+		return constant.Bark
+	case constant.WeCom:
+		return constant.WeCom
+	case constant.DingTalk:
+		return constant.DingTalk
+	case constant.FeiShu:
+		return constant.FeiShu
+	default:
+		return ""
+	}
 }

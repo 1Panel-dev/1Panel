@@ -6,6 +6,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"google.golang.org/genproto/googleapis/type/date"
 	"gorm.io/gorm"
+	"strconv"
 	"time"
 )
 
@@ -21,6 +22,7 @@ type IAlertRepo interface {
 	WithByLicenseId(licenseId string) DBOption
 	WithByRecordId(recordId uint) DBOption
 	WithByMethod(method string) DBOption
+	WithByMethodConfigID(id uint) DBOption
 
 	Create(alert *model.Alert) error
 	Get(opts ...DBOption) (model.Alert, error)
@@ -47,10 +49,14 @@ type IAlertRepo interface {
 	GetLicensePushCount(method string) (uint, error)
 
 	GetConfig(opts ...DBOption) (model.AlertConfig, error)
+	GetConfigById(id uint) (model.AlertConfig, error)
 	AlertConfigList(opts ...DBOption) ([]model.AlertConfig, error)
 	UpdateAlertConfig(maps map[string]interface{}, opts ...DBOption) error
 	CreateAlertConfig(config *model.AlertConfig) error
 	DeleteAlertConfig(opts ...DBOption) error
+
+	WithByTypeNotIn(types []string) DBOption
+	PageAlertConfig(page, size int, opts ...DBOption) (int64, []model.AlertConfig, error)
 
 	SyncAll(data []model.AlertConfig) error
 }
@@ -103,7 +109,14 @@ func (a *AlertRepo) WithByRecordId(recordId uint) DBOption {
 
 func (a *AlertRepo) WithByMethod(method string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("method = ?", method)
+		return g.Where("(method = ? OR method LIKE ? OR method LIKE ? OR method LIKE ?)", method, method+",%", "%,"+method, "%,"+method+",%")
+	}
+}
+
+func (a *AlertRepo) WithByMethodConfigID(id uint) DBOption {
+	method := strconv.Itoa(int(id))
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("(method = ? OR method LIKE ? OR method LIKE ? OR method LIKE ?)", method, method+",%", "%,"+method, "%,"+method+",%")
 	}
 }
 
@@ -306,32 +319,86 @@ func (a *AlertRepo) GetConfig(opts ...DBOption) (model.AlertConfig, error) {
 	return alertConfig, err
 }
 
+func (a *AlertRepo) GetConfigById(id uint) (model.AlertConfig, error) {
+	var config model.AlertConfig
+	err := global.AlertDB.First(&config, id).Error
+	return config, err
+}
+
+func (a *AlertRepo) WithByTypeNotIn(types []string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("`type` NOT IN (?)", types)
+	}
+}
+
+func (a *AlertRepo) PageAlertConfig(page, size int, opts ...DBOption) (int64, []model.AlertConfig, error) {
+	var configs []model.AlertConfig
+	db := global.AlertDB.Model(&model.AlertConfig{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	count := int64(0)
+	db = db.Count(&count)
+	err := db.Limit(size).Offset(size * (page - 1)).Find(&configs).Error
+	return count, configs, err
+}
+
+var singletonTypes = map[string]bool{
+	constant.CommonConfig: true,
+}
+
 func (a *AlertRepo) SyncAll(data []model.AlertConfig) error {
 	tx := global.AlertDB.Begin()
 	var oldConfigs []model.AlertConfig
 	_ = tx.Find(&oldConfigs).Error
 	oldConfigMap := make(map[string]uint)
+	nonSingletonTypes := make(map[string]struct{})
 	for _, item := range oldConfigs {
-		oldConfigMap[item.Type] = item.ID
+		if singletonTypes[item.Type] {
+			oldConfigMap[item.Type] = item.ID
+			continue
+		}
+		nonSingletonTypes[item.Type] = struct{}{}
 	}
 	for _, item := range data {
-		if val, ok := oldConfigMap[item.Type]; ok {
-			item.ID = val
-			delete(oldConfigMap, item.Type)
-		} else {
-			item.ID = 0
+		if !singletonTypes[item.Type] {
+			nonSingletonTypes[item.Type] = struct{}{}
 		}
-		if err := tx.Model(model.AlertConfig{}).Where("id = ?", item.ID).Save(&item).Error; err != nil {
+	}
+	for itemType := range nonSingletonTypes {
+		if err := tx.Where("type = ?", itemType).Delete(&model.AlertConfig{}).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
 	}
-	for _, val := range oldConfigMap {
-		if err := tx.Where("id = ?", val).Delete(&model.AlertConfig{}).Error; err != nil {
+	for _, item := range data {
+		if singletonTypes[item.Type] {
+			if val, ok := oldConfigMap[item.Type]; ok {
+				item.ID = val
+				delete(oldConfigMap, item.Type)
+			} else {
+				item.ID = 0
+			}
+			if err := tx.Model(model.AlertConfig{}).Where("id = ?", item.ID).Save(&item).Error; err != nil {
+				tx.Rollback()
+				return err
+			}
+			continue
+		}
+		item.ID = 0
+		if err := tx.Create(&item).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
 	}
-	tx.Commit()
+	for _, id := range oldConfigMap {
+		if err := tx.Where("id = ?", id).Delete(&model.AlertConfig{}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	if err := tx.Commit().Error; err != nil {
+		return err
+	}
 	return nil
 }

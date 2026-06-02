@@ -389,16 +389,20 @@ var InitAlertConfig = &gormigrate.Migration{
 	Migrate: func(tx *gorm.DB) error {
 		records := []model.AlertConfig{
 			{
-				Type:   "sms",
-				Title:  "xpack.alert.smsConfig",
-				Status: "Enable",
-				Config: `{"alertDailyNum":50}`,
+				Type:       "sms",
+				Title:      "xpack.alert.smsConfig",
+				Status:     "Enable",
+				Config:     `{"alertDailyNum":50}`,
+				CreateUser: "system",
+				UpdateUser: "system",
 			},
 			{
-				Type:   "common",
-				Title:  "xpack.alert.commonConfig",
-				Status: "Enable",
-				Config: `{"isOffline":"Disable","alertSendTimeRange":{"noticeAlert":{"sendTimeRange":"08:00:00 - 23:59:59","type":["ssl","siteEndTime","panelPwdEndTime","panelUpdate"]},"resourceAlert":{"sendTimeRange":"00:00:00 - 23:59:59","type":["clams","cronJob","cpu","memory","load","disk"]}}}`,
+				Type:       "common",
+				Title:      "xpack.alert.commonConfig",
+				Status:     "Enable",
+				Config:     `{"isOffline":"Disable","alertSendTimeRange":{"noticeAlert":{"sendTimeRange":"08:00:00 - 23:59:59","type":["ssl","siteEndTime","panelPwdEndTime","panelUpdate"]},"resourceAlert":{"sendTimeRange":"00:00:00 - 23:59:59","type":["clams","cronJob","cpu","memory","load","disk"]}}}`,
+				CreateUser: "system",
+				UpdateUser: "system",
 			},
 		}
 		for _, r := range records {
@@ -475,6 +479,95 @@ var AddColumnToAlert = &gormigrate.Migration{
 		}
 		return nil
 	},
+}
+
+var MigrateAlertMethodConfigIDs = &gormigrate.Migration{
+	ID: "20251001-migrate-alert-method-config-ids",
+	Migrate: func(tx *gorm.DB) error {
+		if err := global.AlertDB.AutoMigrate(&model.Alert{}, &model.AlertLog{}, &model.AlertTask{}, &model.AlertConfig{}); err != nil {
+			return err
+		}
+		if err := migrateAlertMethodConfigIDs(global.AlertDB); err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var AddAlertAuditUser = &gormigrate.Migration{
+	ID: "20260602-add-alert-audit-user",
+	Migrate: func(tx *gorm.DB) error {
+		return global.AlertDB.AutoMigrate(&model.Alert{}, &model.AlertConfig{})
+	},
+}
+
+func migrateAlertMethodConfigIDs(tx *gorm.DB) error {
+	if err := tx.Model(&model.AlertConfig{}).Where("type = ?", "mail").Update("type", constant.EmailConfig).Error; err != nil {
+		return err
+	}
+
+	typeMap := map[string]string{
+		"mail":            constant.Email,
+		constant.Email:    constant.Email,
+		constant.SMS:      constant.SMS,
+		constant.Bark:     constant.Bark,
+		constant.WeCom:    constant.WeCom,
+		constant.DingTalk: constant.DingTalk,
+		constant.FeiShu:   constant.FeiShu,
+	}
+	configIDs := map[string]string{}
+	for _, configType := range typeMap {
+		if _, ok := configIDs[configType]; ok {
+			continue
+		}
+		var config model.AlertConfig
+		if err := tx.Where("type = ?", configType).Order("id ASC").First(&config).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				continue
+			}
+			return err
+		}
+		configIDs[configType] = strconv.Itoa(int(config.ID))
+	}
+
+	var alerts []model.Alert
+	if err := tx.Find(&alerts).Error; err != nil {
+		return err
+	}
+	for _, alert := range alerts {
+		method := migrateAlertMethodValue(alert.Method, typeMap, configIDs)
+		if method == alert.Method {
+			continue
+		}
+		if err := tx.Model(&model.Alert{}).Where("id = ?", alert.ID).Update("method", method).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func migrateAlertMethodValue(method string, typeMap map[string]string, configIDs map[string]string) string {
+	items := strings.Split(method, ",")
+	next := make([]string, 0, len(items))
+	seen := map[string]struct{}{}
+	for _, item := range items {
+		item = strings.TrimSpace(item)
+		if item == "" {
+			continue
+		}
+		configType, ok := typeMap[item]
+		if ok {
+			if id, exists := configIDs[configType]; exists {
+				item = id
+			}
+		}
+		if _, exists := seen[item]; exists {
+			continue
+		}
+		seen[item] = struct{}{}
+		next = append(next, item)
+	}
+	return strings.Join(next, ",")
 }
 
 var UpdateWebsiteSSL = &gormigrate.Migration{

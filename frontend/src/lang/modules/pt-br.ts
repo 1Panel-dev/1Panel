@@ -227,6 +227,7 @@ const message = {
             requiredSelect: 'Selecione um item na lista',
             illegalChar: 'Atualmente não há suporte para injeção dos caracteres & ; $ \' ` ( ) " > < |',
             illegalInput: 'Este campo não deve conter caracteres ilegais.',
+            duplicate: 'Este valor deve ser único.',
             commonName:
                 'Este campo deve começar com caracteres não especiais e consistir em letras, números, ".", "-", e "_" com comprimento de 1-128.',
             userName: 'Suporta não começar com caracteres especiais, inglês, chinês, números e _, comprimento 3-30',

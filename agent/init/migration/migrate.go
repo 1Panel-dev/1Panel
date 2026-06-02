@@ -36,6 +36,8 @@ func InitAgentDB() {
 		migrations.UpdateMcpServer,
 		migrations.InitCronjobGroup,
 		migrations.AddColumnToAlert,
+		migrations.MigrateAlertMethodConfigIDs,
+		migrations.AddAlertAuditUser,
 		migrations.UpdateWebsiteSSL,
 		migrations.AddQuickJump,
 		migrations.UpdateMcpServerAddType,

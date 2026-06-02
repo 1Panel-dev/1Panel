@@ -26,7 +26,7 @@ func (b *BaseApi) CreateCronjob(c *gin.Context) {
 		return
 	}
 
-	if err := cronjobService.Create(req); err != nil {
+	if err := cronjobService.Create(req, loadAuditUser(c)); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -91,7 +91,7 @@ func (b *BaseApi) ImportCronjob(c *gin.Context) {
 		return
 	}
 
-	if err := cronjobService.Import(req.Cronjobs); err != nil {
+	if err := cronjobService.Import(req.Cronjobs, loadAuditUser(c)); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -285,7 +285,7 @@ func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 		return
 	}
 
-	if err := cronjobService.Update(req.ID, req); err != nil {
+	if err := cronjobService.Update(req.ID, req, loadAuditUser(c)); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

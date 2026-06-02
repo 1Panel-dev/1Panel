@@ -27,10 +27,10 @@ type CronjobService struct{}
 type ICronjobService interface {
 	SearchWithPage(search dto.PageCronjob) (int64, interface{}, error)
 	SearchRecords(search dto.SearchRecord) (int64, interface{}, error)
-	Create(cronjobDto dto.CronjobOperate) error
+	Create(cronjobDto dto.CronjobOperate, operator string) error
 	LoadNextHandle(spec string) ([]string, error)
 	HandleOnce(id uint) error
-	Update(id uint, req dto.CronjobOperate) error
+	Update(id uint, req dto.CronjobOperate, operator string) error
 	UpdateStatus(id uint, status string) error
 	UpdateGroup(req dto.ChangeGroup) error
 	Delete(req dto.CronjobBatchDelete) error
@@ -39,7 +39,7 @@ type ICronjobService interface {
 	HandleStop(id uint) error
 
 	Export(req dto.OperateByIDs) (string, error)
-	Import(req []dto.CronjobTrans) error
+	Import(req []dto.CronjobTrans, operator string) error
 	LoadScriptOptions() []dto.ScriptOptions
 
 	LoadInfo(req dto.OperateByID) (*dto.CronjobOperate, error)
@@ -212,7 +212,7 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 	return string(itemJson), nil
 }
 
-func (u *CronjobService) Import(req []dto.CronjobTrans) error {
+func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) error {
 	for _, item := range req {
 		cronjobItem, _ := cronjobRepo.Get(repo.WithByName(item.Name))
 		if cronjobItem.ID != 0 {
@@ -405,7 +405,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 				Project:   strconv.Itoa(int(cronjob.ID)),
 				Status:    constant.AlertEnable,
 			}
-			_ = NewIAlertService().CreateAlert(createAlert)
+			_ = NewIAlertService().CreateAlert(createAlert, operator)
 		}
 	}
 	return nil
@@ -558,7 +558,7 @@ func (u *CronjobService) HandleOnce(id uint) error {
 	return nil
 }
 
-func (u *CronjobService) Create(req dto.CronjobOperate) error {
+func (u *CronjobService) Create(req dto.CronjobOperate, operator string) error {
 	cronjob, _ := cronjobRepo.Get(repo.WithByName(req.Name))
 	if cronjob.ID != 0 {
 		return buserr.New("ErrRecordExist")
@@ -607,7 +607,7 @@ func (u *CronjobService) Create(req dto.CronjobOperate) error {
 			Project:   strconv.Itoa(int(cronjob.ID)),
 			Status:    constant.AlertEnable,
 		}
-		err := NewIAlertService().CreateAlert(createAlert)
+		err := NewIAlertService().CreateAlert(createAlert, operator)
 		if err != nil {
 			return err
 		}
@@ -678,7 +678,7 @@ func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
 	return nil
 }
 
-func (u *CronjobService) Update(id uint, req dto.CronjobOperate) error {
+func (u *CronjobService) Update(id uint, req dto.CronjobOperate, operator string) error {
 	var cronjob model.Cronjob
 	if err := copier.Copy(&cronjob, &req); err != nil {
 		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
@@ -756,7 +756,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate) error {
 		Type:      cronjob.Type,
 		Project:   strconv.Itoa(int(cronModel.ID)),
 	}
-	err = NewIAlertService().ExternalUpdateAlert(updateAlert)
+	err = NewIAlertService().ExternalUpdateAlert(updateAlert, operator)
 	if err != nil {
 		return err
 	}

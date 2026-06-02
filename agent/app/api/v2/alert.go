@@ -2,10 +2,15 @@ package v2
 
 import (
 	"errors"
+	"net/url"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/gin-gonic/gin"
 )
+
+const defaultAuditUser = "system"
 
 // @Tags Alert
 // @Summary Page alert
@@ -54,7 +59,7 @@ func (b *BaseApi) CreateAlert(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	err := alertService.CreateAlert(req)
+	err := alertService.CreateAlert(req, loadAuditUser(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -98,7 +103,7 @@ func (b *BaseApi) UpdateAlert(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := alertService.UpdateAlert(req); err != nil {
+	if err := alertService.UpdateAlert(req, loadAuditUser(c)); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -247,6 +252,30 @@ func (b *BaseApi) GetAlertConfig(c *gin.Context) {
 }
 
 // @Tags Alert
+// @Summary Page alert config
+// @Accept json
+// @Param request body dto.PageInfo true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /alert/config/search [post]
+func (b *BaseApi) PageAlertConfig(c *gin.Context) {
+	var req dto.PageInfo
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	total, configs, err := alertService.PageAlertConfig(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, dto.PageResult{
+		Total: total,
+		Items: configs,
+	})
+}
+
+// @Tags Alert
 // @Summary Update alert config
 // @Accept json
 // @Param request body dto.AlertConfigUpdate true "request"
@@ -260,11 +289,22 @@ func (b *BaseApi) UpdateAlertConfig(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := alertService.UpdateAlertConfig(req); err != nil {
+	if err := alertService.UpdateAlertConfig(req, loadAuditUser(c)); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
 	helper.Success(c)
+}
+
+func loadAuditUser(c *gin.Context) string {
+	userName := strings.TrimSpace(c.GetHeader("X-Panel-User"))
+	if userName == "" {
+		return defaultAuditUser
+	}
+	if decoded, err := url.QueryUnescape(userName); err == nil {
+		return decoded
+	}
+	return userName
 }
 
 // @Tags Alert

@@ -712,45 +712,44 @@
                                     >
                                         <el-select
                                             class="selectClass"
+                                            popper-class="alert-config-method-dropdown"
                                             v-model="form.alertMethodItems"
                                             multiple
                                             cleanable
+                                            collapse-tags
+                                            collapse-tags-tooltip
+                                            :max-collapse-tags="3"
                                         >
-                                            <el-option value="mail" :label="$t('xpack.alert.mail')" />
-                                            <el-option
-                                                v-if="!isProductPro"
-                                                value="bark"
-                                                :label="$t('xpack.alert.bark')"
-                                            />
-                                            <el-option
-                                                value="weCom"
-                                                v-if="!isIntl"
-                                                :disabled="!form.hasAlert || !isProductPro"
-                                                :label="$t('xpack.alert.weCom')"
-                                            />
-                                            <el-option
-                                                value="dingTalk"
-                                                v-if="!isIntl"
-                                                :disabled="!form.hasAlert || !isProductPro"
-                                                :label="$t('xpack.alert.dingTalk')"
-                                            />
-                                            <el-option
-                                                value="feiShu"
-                                                v-if="!isIntl"
-                                                :disabled="!form.hasAlert || !isProductPro"
-                                                :label="$t('xpack.alert.feiShu')"
-                                            />
-                                            <el-option
-                                                v-if="isProductPro"
-                                                value="bark"
-                                                :label="$t('xpack.alert.bark')"
-                                            />
-                                            <el-option
-                                                value="sms"
-                                                v-if="!isIntl || !isEE"
-                                                :disabled="!form.hasAlert || !isProductPro"
-                                                :label="$t('xpack.alert.sms')"
-                                            />
+                                            <el-option-group
+                                                v-for="group in groupedAlertConfigOptions"
+                                                :key="group.type"
+                                                :label="
+                                                    i18n.global.t(
+                                                        'xpack.alert.' + (group.type === 'email' ? 'mail' : group.type),
+                                                    )
+                                                "
+                                            >
+                                                <el-option
+                                                    v-for="opt in group.options"
+                                                    :key="opt.value"
+                                                    :value="opt.value"
+                                                    :label="opt.label"
+                                                >
+                                                    <div class="alert-config-option">
+                                                        <span class="alert-config-option__name" :title="opt.label">
+                                                            {{ opt.label }}
+                                                        </span>
+                                                        <el-tag
+                                                            class="alert-config-option__tag"
+                                                            effect="light"
+                                                            size="small"
+                                                            round
+                                                        >
+                                                            {{ opt.typeLabel }}
+                                                        </el-tag>
+                                                    </div>
+                                                </el-option>
+                                            </el-option-group>
                                         </el-select>
                                     </el-form-item>
                                 </LayoutCol>
@@ -837,7 +836,7 @@ import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import InputTag from '@/components/input-tag/index.vue';
 import LayoutCol from '@/components/layout-col/form.vue';
 import CleanLogConfig from '@/views/cronjob/cronjob/config/clean-log.vue';
-import { reactive, ref } from 'vue';
+import { reactive, ref, computed, onMounted } from 'vue';
 import { Rules } from '@/global/form-rules';
 import { listBackupOptions } from '@/api/modules/backup';
 import i18n from '@/lang';
@@ -851,6 +850,8 @@ import { useRouter } from 'vue-router';
 import { listContainer } from '@/api/modules/container';
 import { Database } from '@/api/interface/database';
 import { listAppInstalled } from '@/api/modules/app';
+import { Alert } from '@/api/interface/alert';
+import { ListAlertConfigs } from '@/api/modules/alert';
 import {
     loadDefaultSpec,
     loadDefaultSpecCustom,
@@ -883,6 +884,88 @@ const baseDir = ref();
 
 const isCreate = ref();
 const defaultGroupID = ref();
+
+const alertConfigs = ref<Alert.AlertConfigInfo[]>([]);
+const loadAlertConfigs = async () => {
+    try {
+        const res = await ListAlertConfigs();
+        alertConfigs.value = res.data || [];
+    } catch {}
+};
+onMounted(() => {
+    loadAlertConfigs();
+});
+
+const alertConfigOptions = computed(() => {
+    const hiddenTypes: string[] = [];
+    if (isIntl.value || isEE.value) hiddenTypes.push('sms');
+    return alertConfigs.value
+        .filter((c) => c.status === 'Enable' && c.type !== 'common' && !hiddenTypes.includes(c.type))
+        .map((c) => ({
+            value: String(c.id),
+            label: getAlertConfigOptionLabel(c),
+            type: c.type,
+        }));
+});
+
+const legacyAlertMethodTypeMap: Record<string, string> = {
+    mail: 'email',
+    email: 'email',
+    sms: 'sms',
+    bark: 'bark',
+    weCom: 'weCom',
+    dingTalk: 'dingTalk',
+    feiShu: 'feiShu',
+};
+
+const normalizeAlertMethodItems = (methods: string[]) => {
+    return methods.map((method) => {
+        if (/^\d+$/.test(method)) return method;
+        const configType = legacyAlertMethodTypeMap[method];
+        const matched = alertConfigOptions.value.find((item) => item.type === configType);
+        return matched?.value || method;
+    });
+};
+
+const groupedAlertConfigOptions = computed(() => {
+    const typeMap = new Map<string, { value: string; label: string }[]>();
+    for (const opt of alertConfigOptions.value) {
+        if (!typeMap.has(opt.type)) typeMap.set(opt.type, []);
+        typeMap.get(opt.type)!.push({ value: opt.value, label: opt.label });
+    }
+    const groups: {
+        type: string;
+        options: { value: string; label: string; typeLabel: string }[];
+    }[] = [];
+    const typeOrder = ['email', 'sms', 'weCom', 'dingTalk', 'feiShu', 'bark'];
+    for (const t of typeOrder) {
+        if (typeMap.has(t)) {
+            const typeLabel = getConfigTypeLabel(t);
+            groups.push({
+                type: t,
+                options: typeMap.get(t)!.map((item) => ({
+                    ...item,
+                    typeLabel,
+                })),
+            });
+        }
+    }
+    return groups;
+});
+
+const getConfigTypeLabel = (type: string): string => {
+    return i18n.global.t(`xpack.alert.${type === 'email' ? 'mail' : type}`);
+};
+
+const getAlertConfigOptionLabel = (c: Alert.AlertConfigInfo): string => {
+    try {
+        const cfg = JSON.parse(c.config || '{}');
+        return cfg.displayName || i18n.global.t(`xpack.alert.${c.type === 'email' ? 'mail' : c.type}`);
+    } catch {
+        return i18n.global.t(`xpack.alert.${c.type === 'email' ? 'mail' : c.type}`);
+    }
+};
+
 const form = reactive<Cronjob.CronjobInfo>({
     id: 0,
     name: '',
@@ -1040,7 +1123,7 @@ const search = async () => {
                 form.alertCount = res.data.alertCount || 3;
                 form.alertTitle = res.data.alertTitle;
                 if (res.data.alertMethod) {
-                    form.alertMethodItems = res.data.alertMethod.split(',') || [];
+                    form.alertMethodItems = normalizeAlertMethodItems(res.data.alertMethod.split(',') || []);
                 } else {
                     form.alertMethodItems = [];
                 }
@@ -1644,6 +1727,36 @@ onMounted(() => {
     font-size: 12px;
     margin-top: 5px;
 }
+
+.alert-config-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+}
+
+.alert-config-option__name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.alert-config-option__tag {
+    flex: 0 0 auto;
+}
+
+:global(.alert-config-method-dropdown .el-select-dropdown__item) {
+    padding-right: 52px;
+}
+
+:global(.alert-config-method-dropdown .el-select-dropdown__item.is-selected::after) {
+    right: 16px;
+}
+
 .logText {
     line-height: 22px;
     font-size: 12px;

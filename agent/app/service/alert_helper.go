@@ -174,10 +174,16 @@ func baseTask(baseAlert []dto.AlertDTO) {
 		case "siteEndTime":
 			loadWebsiteInfo(alert)
 		case "panelPwdEndTime":
+			if global.CONF.Base.IsEnterprise {
+				continue
+			}
 			if global.IsMaster {
 				loadPanelPwd(alert)
 			}
 		case "panelUpdate":
+			if global.CONF.Base.IsEnterprise {
+				continue
+			}
 			if global.IsMaster {
 				loadPanelUpdate(alert)
 			}
@@ -210,6 +216,9 @@ func resourceTask(resourceAlert []dto.AlertDTO) {
 				loadNodeException(alert)
 			}
 		case "licenseException":
+			if global.CONF.Base.IsEnterprise {
+				continue
+			}
 			if execute && global.IsMaster {
 				loadLicenseException(alert)
 			}
@@ -590,91 +599,138 @@ func sendAlerts(alert dto.AlertDTO, alertType, quota, quotaType string, params [
 	if newDate.IsZero() || calculateMinutesDifference(newDate) > ResourceAlertInterval {
 		for _, m := range methods {
 			m = strings.TrimSpace(m)
-			switch m {
-			case constant.SMS:
-				if !alertUtil.CheckSMSSendLimit(constant.SMS) {
-					continue
-				}
-				todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, constant.SMS)
-				if !isValid {
-					continue
-				}
-				create := dto.AlertLogCreate{
-					Type:    alertType,
-					AlertId: alert.ID,
-					Count:   todayCount + 1,
-				}
-				alertErr := xpack.AlertProvider.CreateSMSAlertLog(alertType, alert, create, quotaType, params, constant.SMS)
-				if alertErr != nil {
-					global.LOG.Infof("%s alert sms push faild, err: %v", alertType, alertErr.Error())
-					continue
-				}
-				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, constant.SMS)
-			case constant.Email:
-				todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, constant.Email)
-				if !isValid {
-					continue
-				}
-				create := dto.AlertLogCreate{
-					Type:    alertType,
-					AlertId: alert.ID,
-					Count:   todayCount + 1,
-				}
-				alertInfo := alert
-				alertInfo.Type = alertType
-				create.AlertRule = alertUtil.ProcessAlertRule(alert)
-				create.AlertDetail = alertUtil.ProcessAlertDetail(alertInfo, quotaType, params, constant.Email)
-				transport := xpack.MultiNodeProvider.LoadRequestTransport()
-				agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
-				alertErr := alertUtil.CreateEmailAlertLog(create, alertInfo, params, transport, agentInfo)
-				if alertErr != nil {
-					global.LOG.Infof("%s alert email push faild, err: %v", alertType, alertErr.Error())
-					continue
-				}
-				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, constant.Email)
-			case constant.WeCom, constant.DingTalk, constant.FeiShu:
-				todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, m)
-				if !isValid {
-					continue
-				}
-				var create = dto.AlertLogCreate{
-					Type:    alertUtil.GetCronJobType(alert.Type),
-					AlertId: alert.ID,
-					Count:   todayCount + 1,
-				}
-				transport := xpack.MultiNodeProvider.LoadRequestTransport()
-				agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
-				err := xpack.AlertProvider.CreateWebhookAlertLog(alertType, alert, create, quotaType, params, m, transport, agentInfo)
-				if err != nil {
-					global.LOG.Infof("%s alert webhook %s push faild, err: %v", alertType, m, err)
-					continue
-				}
-				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, m)
-			case constant.Bark:
-				todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, m)
-				if !isValid {
-					continue
-				}
-				var create = dto.AlertLogCreate{
-					Type:    alertUtil.GetCronJobType(alert.Type),
-					AlertId: alert.ID,
-					Count:   todayCount + 1,
-				}
-				alertInfo := alert
-				alertInfo.Type = alertType
-				create.AlertRule = alertUtil.ProcessAlertRule(alert)
-				create.AlertDetail = alertUtil.ProcessAlertDetail(alertInfo, quotaType, params, m)
-				transport := xpack.MultiNodeProvider.LoadRequestTransport()
-				agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
-				alertErr := alertUtil.CreateBarkAlertLog(create, alertInfo, params, transport, agentInfo)
-				if alertErr != nil {
-					global.LOG.Infof("%s alert %s push failed, err: %v", alertType, m, alertErr.Error())
-					continue
-				}
-				alertUtil.CreateNewAlertTask(quota, alertType, quotaType, m)
-			default:
+			if configId, err := strconv.ParseUint(m, 10, 64); err == nil {
+				sendAlertsByConfigId(alert, alertType, quota, quotaType, params, uint(configId))
+			} else {
+				sendAlertsByLegacyMethod(alert, alertType, quota, quotaType, params, m)
 			}
 		}
+	}
+}
+
+func sendAlertsByConfigId(alert dto.AlertDTO, alertType, quota, quotaType string, params []dto.Param, configId uint) {
+	config, err := alertRepo.GetConfigById(configId)
+	if err != nil {
+		global.LOG.Errorf("alert config not found for id %d: %v", configId, err)
+		return
+	}
+	doSendAlert(alert, alertType, quota, quotaType, params, config)
+}
+
+func sendAlertsByLegacyMethod(alert dto.AlertDTO, alertType, quota, quotaType string, params []dto.Param, method string) {
+	typeMap := map[string]string{
+		"mail":        constant.Email,
+		constant.Bark: constant.Bark,
+		constant.SMS:  constant.SMS,
+	}
+	configType := method
+	if mapped, ok := typeMap[method]; ok {
+		configType = mapped
+	} else {
+		configType = method
+	}
+	config, err := alertRepo.GetConfig(alertRepo.WithByType(configType))
+	if err != nil {
+		global.LOG.Errorf("alert config not found for type %s: %v", configType, err)
+		return
+	}
+	doSendAlert(alert, alertType, quota, quotaType, params, config)
+}
+
+func doSendAlert(alert dto.AlertDTO, alertType, quota, quotaType string, params []dto.Param, config model.AlertConfig) {
+	if !alertUtil.IsAlertConfigEnabled(config) {
+		return
+	}
+	methodStr := strconv.Itoa(int(config.ID))
+	switch config.Type {
+	case constant.SMS:
+		if !alertUtil.CheckSMSSendLimit(config, methodStr) {
+			return
+		}
+		todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, methodStr)
+		if !isValid {
+			return
+		}
+		create := dto.AlertLogCreate{
+			Type:    alertType,
+			AlertId: alert.ID,
+			Count:   todayCount + 1,
+			Method:  methodStr,
+		}
+		alertErr := xpack.AlertProvider.CreateSMSAlertLog(alertType, alert, create, quotaType, params, config, methodStr)
+		if alertErr != nil {
+			global.LOG.Infof("%s alert sms push faild, err: %v", alertType, alertErr.Error())
+			return
+		}
+		alertUtil.CreateNewAlertTask(quota, alertType, quotaType, methodStr)
+
+	case constant.Email:
+		todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, methodStr)
+		if !isValid {
+			return
+		}
+		create := dto.AlertLogCreate{
+			Type:    alertType,
+			AlertId: alert.ID,
+			Count:   todayCount + 1,
+			Method:  methodStr,
+		}
+		alertInfo := alert
+		alertInfo.Type = alertType
+		create.AlertRule = alertUtil.ProcessAlertRule(alert)
+		create.AlertDetail = alertUtil.ProcessAlertDetail(alertInfo, quotaType, params, constant.Email)
+		transport := xpack.MultiNodeProvider.LoadRequestTransport()
+		agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
+		alertErr := alertUtil.CreateEmailAlertLog(create, alertInfo, params, transport, agentInfo, config)
+		if alertErr != nil {
+			global.LOG.Infof("%s alert email push faild, err: %v", alertType, alertErr.Error())
+			return
+		}
+		alertUtil.CreateNewAlertTask(quota, alertType, quotaType, methodStr)
+
+	case constant.Bark:
+		todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, methodStr)
+		if !isValid {
+			return
+		}
+		create := dto.AlertLogCreate{
+			Type:    alertType,
+			AlertId: alert.ID,
+			Count:   todayCount + 1,
+			Method:  methodStr,
+		}
+		alertInfo := alert
+		alertInfo.Type = alertType
+		create.AlertRule = alertUtil.ProcessAlertRule(alert)
+		create.AlertDetail = alertUtil.ProcessAlertDetail(alertInfo, quotaType, params, constant.Bark)
+		transport := xpack.MultiNodeProvider.LoadRequestTransport()
+		agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
+		alertErr := alertUtil.CreateBarkAlertLog(create, alertInfo, params, transport, agentInfo, config)
+		if alertErr != nil {
+			global.LOG.Infof("%s alert %s push failed, err: %v", alertType, methodStr, alertErr.Error())
+			return
+		}
+		alertUtil.CreateNewAlertTask(quota, alertType, quotaType, methodStr)
+
+	case constant.WeCom, constant.DingTalk, constant.FeiShu:
+		todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, methodStr)
+		if !isValid {
+			return
+		}
+		create := dto.AlertLogCreate{
+			Type:    alertType,
+			AlertId: alert.ID,
+			Count:   todayCount + 1,
+			Method:  methodStr,
+		}
+		transport := xpack.MultiNodeProvider.LoadRequestTransport()
+		agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
+		alertErr := xpack.AlertProvider.CreateWebhookAlertLog(alertType, alert, create, quotaType, params, config, transport, agentInfo)
+		if alertErr != nil {
+			global.LOG.Infof("%s alert webhook %s push faild, err: %v", alertType, methodStr, alertErr)
+			return
+		}
+		alertUtil.CreateNewAlertTask(quota, alertType, quotaType, methodStr)
 	}
 }
 

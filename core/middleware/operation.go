@@ -113,7 +113,7 @@ func OperationLog() gin.HandlerFunc {
 
 		c.Next()
 
-		record.User = loadOperationUser(c)
+		record.User = LoadOperationUser(c)
 
 		if len(operationDic.BeforeFunctions) != 0 {
 			if needAgentResolve {
@@ -181,7 +181,7 @@ func OperationLog() gin.HandlerFunc {
 	}
 }
 
-func loadOperationUser(c *gin.Context) string {
+func LoadOperationUser(c *gin.Context) string {
 	sessionUser, ok := c.Get(psessionUtils.GinContextSessionUserKey)
 	if ok {
 		psession, ok := sessionUser.(psessionUtils.SessionUser)

@@ -62,6 +62,15 @@ export const ListAlertConfigs = (currentNode?: string) => {
     );
 };
 
+export const PageAlertConfigs = (req: Alert.AlertConfigPageReq, currentNode?: string) => {
+    return http.post<ResPage<Alert.AlertConfigInfo>>(
+        `/alert/config/search`,
+        req,
+        undefined,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
+};
+
 export const DeleteAlertConfig = (req: Alert.DelReq) => {
     return http.post<any>(`/alert/config/del`, req);
 };

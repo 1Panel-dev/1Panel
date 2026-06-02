@@ -69,8 +69,33 @@
                             {{ $t('xpack.alert.tlsHelper') }}
                         </span>
                     </el-form-item>
-                    <el-form-item :label="$t('xpack.alert.recipient')" prop="recipient">
-                        <el-input v-model="form.config.recipient" />
+                    <el-form-item :label="$t('xpack.alert.recipient')" prop="recipients">
+                        <div class="w-full">
+                            <div
+                                v-for="(item, index) in form.config.recipients"
+                                :key="index"
+                                class="flex items-center mb-2 gap-2"
+                            >
+                                <el-input
+                                    v-model="form.config.recipients[index]"
+                                    :placeholder="$t('xpack.alert.recipientPlaceholder')"
+                                />
+                                <el-button
+                                    v-permission
+                                    type="danger"
+                                    plain
+                                    circle
+                                    @click="removeRecipient(index)"
+                                    :disabled="form.config.recipients.length <= 1"
+                                >
+                                    <el-icon><Minus /></el-icon>
+                                </el-button>
+                            </div>
+                            <el-button v-permission type="primary" plain @click="addRecipient">
+                                <el-icon><Plus /></el-icon>
+                                {{ $t('xpack.alert.addRecipient') }}
+                            </el-button>
+                        </div>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -97,6 +122,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { TestAlertConfig, UpdateAlertConfig } from '@/api/modules/alert';
 import { Rules } from '@/global/form-rules';
+import { Plus, Minus } from '@element-plus/icons-vue';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -105,7 +131,23 @@ const rules = {
     sender: [Rules.requiredInput],
     host: [Rules.requiredInput],
     port: [Rules.requiredInput],
-    recipient: [Rules.requiredInput],
+    recipients: [
+        {
+            validator: (rule: any, value: string[], callback: any) => {
+                if (!value || value.length === 0) {
+                    callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+                } else {
+                    const hasEmpty = value.some((item) => !item || !item.trim());
+                    if (hasEmpty) {
+                        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+                    } else {
+                        callback();
+                    }
+                }
+            },
+            trigger: 'blur',
+        },
+    ],
 };
 interface Config {
     status: string;
@@ -116,7 +158,8 @@ interface Config {
     host: string;
     port: number;
     encryption: string;
-    recipient: string;
+    recipient?: string;
+    recipients?: string[];
 }
 interface DialogProps {
     id: number;
@@ -126,7 +169,7 @@ const drawerVisible = ref();
 const loading = ref();
 
 const form = reactive({
-    id: undefined,
+    id: undefined as number | undefined,
     config: {
         displayName: '',
         sender: '',
@@ -136,7 +179,7 @@ const form = reactive({
         port: 465,
         encryption: 'NONE',
         status: 'Enable',
-        recipient: '',
+        recipients: [''] as string[],
     },
 });
 const isOK = ref(false);
@@ -144,8 +187,37 @@ const formRef = ref<FormInstance>();
 
 const acceptParams = (params: DialogProps): void => {
     form.id = params.id;
-    form.config = params.config;
+    form.config.displayName = params.config.displayName || '';
+    form.config.sender = params.config.sender || '';
+    form.config.password = params.config.password || '';
+    form.config.userName = params.config.userName || '';
+    form.config.host = params.config.host || '';
+    form.config.port = params.config.port || 465;
+    form.config.encryption = params.config.encryption || 'NONE';
+    form.config.status = params.config.status || 'Enable';
+
+    if (params.config.recipients && params.config.recipients.length > 0) {
+        form.config.recipients = [...params.config.recipients];
+    } else if (params.config.recipient) {
+        form.config.recipients = params.config.recipient
+            .split(',')
+            .map((r) => r.trim())
+            .filter((r) => r);
+    } else {
+        form.config.recipients = [''];
+    }
+
     drawerVisible.value = true;
+};
+
+const addRecipient = () => {
+    form.config.recipients.push('');
+};
+
+const removeRecipient = (index: number) => {
+    if (form.config.recipients.length > 1) {
+        form.config.recipients.splice(index, 1);
+    }
 };
 
 const onSave = async (formEl: FormInstance | undefined) => {
@@ -155,7 +227,10 @@ const onSave = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         try {
             form.config.status = 'Enable';
-            const configInfo = form.config;
+            const configInfo = {
+                ...form.config,
+                recipient: form.config.recipients.filter((r) => r && r.trim()).join(','),
+            };
             await UpdateAlertConfig({
                 id: form.id,
                 type: 'email',
@@ -180,7 +255,11 @@ const onTest = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         loading.value = true;
         try {
-            await TestAlertConfig(form.config)
+            const testConfig = {
+                ...form.config,
+                recipient: form.config.recipients.filter((r) => r && r.trim()).join(','),
+            };
+            await TestAlertConfig(testConfig)
                 .then((res) => {
                     loading.value = false;
                     if (res.data) {

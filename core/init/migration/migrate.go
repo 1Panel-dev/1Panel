@@ -46,6 +46,7 @@ func Init() {
 		migrations.AddOperationLogUser,
 		migrations.AddLoginLogUser,
 		migrations.AddIsOfflineSetting,
+		migrations.AddAlertAuditUser,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

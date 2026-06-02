@@ -231,6 +231,7 @@ const message = {
             requiredSelect: 'Listeden bir öğe seçin',
             illegalChar: '& ; $ ` ( ) " > < | karakterlerinin enjekte edilmesi şu anda desteklenmiyor',
             illegalInput: 'Bu alan yasadışı karakterler içermemelidir.',
+            duplicate: 'Bu değer benzersiz olmalıdır.',
             commonName:
                 'Bu alan özel olmayan karakterlerle başlamalı ve İngilizce, Çince, rakam, ".", "-", ve "_" karakterlerinden oluşmalı, uzunluk 1-128 olmalıdır.',
             userName: 'Bu alan İngilizce, Çince, rakam ve "_" karakterlerinden oluşmalı, uzunluk 3-30 olmalıdır.',

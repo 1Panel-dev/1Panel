@@ -229,6 +229,7 @@ const message = {
             requiredSelect: 'Pilih satu item dalam senarai',
             illegalChar: 'Suntikan aksara & ; $ \' ` ( ) " > < | tidak disokong buat masa ini',
             illegalInput: 'Ruangan ini tidak boleh mengandungi aksara tidak sah.',
+            duplicate: 'Nilai ini mesti unik.',
             commonName:
                 'Ruangan ini mesti bermula dengan aksara bukan khas dan mesti terdiri daripada aksara rumi, Cina, nombor, ".", "-", dan "_" dengan panjang 1-128 aksara.',
             userName:
