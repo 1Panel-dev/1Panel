@@ -21,12 +21,11 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column :label="$t('xpack.alert.alertMethod')" prop="method" width="150px">
+                    <el-table-column :label="$t('xpack.alert.alertMethod')" prop="method" width="200px">
                         <template #default="{ row }">
                             {{ formatMethod(row) }}
                         </template>
                     </el-table-column>
-
                     <el-table-column
                         :label="$t('commons.table.status')"
                         fix
@@ -90,6 +89,7 @@ import {
     SyncAlertAll,
     SyncOfflineAlert,
     ListAlertConfigs,
+    PageAlertConfigs,
 } from '@/api/modules/alert';
 import { ElMessageBox } from 'element-plus';
 import { useGlobalStore } from '@/composables/useGlobalStore';
@@ -99,6 +99,18 @@ const { t } = i18n.global;
 const loading = ref(false);
 const data = ref();
 const isOffline = ref('Disable');
+const configMap = ref<Map<string, Alert.AlertConfigInfo>>(new Map());
+
+const loadConfigMap = async () => {
+    try {
+        const res = await PageAlertConfigs({ page: 1, pageSize: 1000 });
+        const map = new Map<string, Alert.AlertConfigInfo>();
+        for (const c of res.data?.items || []) {
+            map.set(String(c.id), c);
+        }
+        configMap.value = map;
+    } catch {}
+};
 const resourceTypes = [
     'cpu',
     'memory',
@@ -135,10 +147,14 @@ const buttons = [
             syncAlert(row);
         },
         disabled: (row: Alert.AlertLog) => {
-            return (
-                (row.method != 'sms' && row.status != 'PushSuccess' && row.status != 'SyncError') ||
-                row.status == 'Success'
-            );
+            const isSms = row.method
+                .split(',')
+                .filter(Boolean)
+                .some((item) => {
+                    const config = configMap.value.get(item.trim());
+                    return config ? config.type === 'sms' : item.trim() === 'sms';
+                });
+            return (!isSms && row.status != 'PushSuccess' && row.status != 'SyncError') || row.status == 'Success';
         },
     },
 ];
@@ -213,26 +229,50 @@ const formatMessage = (row: Alert.AlertInfo) => {
 };
 
 const formatMethod = (row: Alert.AlertLog) => {
-    switch (row.method) {
-        case 'mail':
-            return t('xpack.alert.mail');
-        case 'dingTalk':
-            return t('xpack.alert.dingTalk');
-        case 'weCom':
-            return t('xpack.alert.weCom');
-        case 'feiShu':
-            return t('xpack.alert.feiShu');
-        case 'wechat':
-            return t('xpack.alert.wechat');
-        case 'sms':
-            return t('xpack.alert.sms');
-        case 'webhook':
-            return t('xpack.alert.webhook');
-        case 'bark':
-            return t('xpack.alert.bark');
-        default:
-            return t('xpack.alert.unknown');
-    }
+    if (!row.method) return '-';
+
+    const formatMethodPart = (method: string) => {
+        const config = configMap.value.get(method);
+        if (config) {
+            const typeKey = config.type === 'email' ? 'mail' : config.type;
+            const typeLabel = i18n.global.t('xpack.alert.' + typeKey);
+            try {
+                const cfg = JSON.parse(config.config || '{}');
+                const name = cfg.displayName || cfg.sender || cfg.phone || '';
+                return name ? `${name}(${typeLabel})` : typeLabel;
+            } catch {
+                return typeLabel;
+            }
+        }
+
+        switch (method) {
+            case 'mail':
+            case 'email':
+                return t('xpack.alert.mail');
+            case 'dingTalk':
+                return t('xpack.alert.dingTalk');
+            case 'weCom':
+                return t('xpack.alert.weCom');
+            case 'feiShu':
+                return t('xpack.alert.feiShu');
+            case 'wechat':
+                return t('xpack.alert.wechat');
+            case 'sms':
+                return t('xpack.alert.sms');
+            case 'webhook':
+                return t('xpack.alert.webhook');
+            case 'bark':
+                return t('xpack.alert.bark');
+            default:
+                return /^\d+$/.test(method) ? `#${method}` : method;
+        }
+    };
+
+    return `「${row.method
+        .split(',')
+        .filter(Boolean)
+        .map((item) => formatMethodPart(item.trim()))
+        .join('｜')}」`;
 };
 
 const formatCount = (row: Alert.AlertInfo) => {
@@ -253,6 +293,7 @@ const search = async () => {
         status: req.status,
     };
     try {
+        await loadConfigMap();
         const res = await SearchAlertLogs(params);
         data.value = res.data.items || [];
         paginationConfig.total = res.data.total || 0;

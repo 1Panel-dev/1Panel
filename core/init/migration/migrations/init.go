@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/init/migration/helper"
@@ -1280,6 +1281,47 @@ var AddIsOfflineSetting = &gormigrate.Migration{
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.Create(&model.Setting{Key: "IsOffline", Value: constant.StatusDisable}).Error; err != nil {
 			return err
+		}
+		return nil
+	},
+}
+
+var AddAlertAuditUser = &gormigrate.Migration{
+	ID: "20260602-add-alert-audit-user",
+	Migrate: func(tx *gorm.DB) error {
+		if !global.AlertDB.Migrator().HasTable(&helper.AlertAuditAlert{}) || !global.AlertDB.Migrator().HasTable(&helper.AlertAuditConfig{}) {
+			return nil
+		}
+		if err := global.AlertDB.AutoMigrate(&helper.AlertAuditAlert{}, &helper.AlertAuditConfig{}); err != nil {
+			return err
+		}
+		username, err := repo.NewISettingRepo().GetValueByKey("UserName")
+		if err != nil || strings.TrimSpace(username) == "" {
+			username = global.CONF.Base.Username
+		}
+		username = strings.TrimSpace(username)
+		if username == "" {
+			return nil
+		}
+		updates := []struct {
+			table string
+			field string
+		}{
+			{table: "alerts", field: "create_user"},
+			{table: "alerts", field: "update_user"},
+			{table: "alert_configs", field: "create_user"},
+			{table: "alert_configs", field: "update_user"},
+		}
+		for _, item := range updates {
+			if err := global.AlertDB.Exec(fmt.Sprintf(
+				"UPDATE %s SET %s = ? WHERE %s IS NULL OR %s = ''",
+				item.table,
+				item.field,
+				item.field,
+				item.field,
+			), username).Error; err != nil {
+				return err
+			}
 		}
 		return nil
 	},

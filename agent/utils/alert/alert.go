@@ -4,6 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"mime"
+	network "net"
+	"net/http"
+	"os"
+	"os/exec"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -16,29 +26,20 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/psutil"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/jinzhu/copier"
-	"mime"
-	network "net"
-	"net/http"
-	"os"
-	"os/exec"
-	"strconv"
-	"strings"
-	"sync"
-	"time"
 )
 
 var cronJobAlertTypes = []string{"shell", "app", "website", "database", "directory", "log", "snapshot", "curl", "cutWebsiteLog", "clean", "ntp"}
 
-func CreateTaskScanEmailAlertLog(alert dto.AlertDTO, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string, transport *http.Transport, agentInfo *dto.AgentInfo) error {
+func CreateTaskScanEmailAlertLog(alert dto.AlertDTO, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string, transport *http.Transport, agentInfo *dto.AgentInfo, emailConfig model.AlertConfig) error {
 	params := CreateAlertParams(GetCronJobTypeName(pushAlert.Param))
 	alertDetail := ProcessAlertDetail(alert, pushAlert.TaskName, params, method)
 	alertRule := ProcessAlertRule(alert)
 	create.AlertRule = alertRule
 	create.AlertDetail = alertDetail
-	return CreateEmailAlertLog(create, alert, params, transport, agentInfo)
+	return CreateEmailAlertLog(create, alert, params, transport, agentInfo, emailConfig)
 }
 
-func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params []dto.Param, transport *http.Transport, agentInfo *dto.AgentInfo) error {
+func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params []dto.Param, transport *http.Transport, agentInfo *dto.AgentInfo, emailConfig model.AlertConfig) error {
 	var alertLog model.AlertLog
 	alertRepo := repo.NewIAlertRepo()
 	config, err := alertRepo.GetConfig(alertRepo.WithByType(constant.CommonConfig))
@@ -47,11 +48,6 @@ func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params [
 	}
 	var cfg dto.AlertCommonConfig
 	err = json.Unmarshal([]byte(config.Config), &cfg)
-	if err != nil {
-		return err
-	}
-	create.Method = constant.Email
-	emailConfig, err := alertRepo.GetConfig(alertRepo.WithByType(constant.EmailConfig))
 	if err != nil {
 		return err
 	}
@@ -104,17 +100,11 @@ func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params [
 	}
 }
 
-func CreateBarkAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params []dto.Param, transport *http.Transport, agentInfo *dto.AgentInfo) error {
+func CreateBarkAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params []dto.Param, transport *http.Transport, agentInfo *dto.AgentInfo, barkConfig model.AlertConfig) error {
 	var alertLog model.AlertLog
-	alertRepo := repo.NewIAlertRepo()
 
-	create.Method = constant.Bark
-	barkConfig, err := alertRepo.GetConfig(alertRepo.WithByType(constant.Bark))
-	if err != nil {
-		return err
-	}
 	var barkInfo dto.AlertWebhookConfig
-	err = json.Unmarshal([]byte(barkConfig.Config), &barkInfo)
+	err := json.Unmarshal([]byte(barkConfig.Config), &barkInfo)
 	if err != nil {
 		return err
 	}
@@ -244,14 +234,13 @@ func CreateAlertParams(param string) []dto.Param {
 
 var checkTaskMutex sync.Mutex
 
-func CheckSMSSendLimit(method string) bool {
-	alertRepo := repo.NewIAlertRepo()
-	config, err := alertRepo.GetConfig(alertRepo.WithByType(constant.SMSConfig))
-	if err != nil {
+func CheckSMSSendLimit(config model.AlertConfig, method string) bool {
+	if config.Type != constant.SMS {
 		return false
 	}
+	alertRepo := repo.NewIAlertRepo()
 	var cfg dto.AlertSmsConfig
-	cfg, err = ParseAlertSmsConfig(config.Config)
+	cfg, err := ParseAlertSmsConfig(config.Config)
 	if err != nil {
 		return false
 	}
@@ -271,6 +260,10 @@ func CheckSMSSendLimit(method string) bool {
 	}
 
 	return true
+}
+
+func IsAlertConfigEnabled(config model.AlertConfig) bool {
+	return config.Status == constant.AlertEnable
 }
 
 type Settings struct {

@@ -9,9 +9,11 @@ type Alert struct {
 	Count          uint   `gorm:"type:integer;not null" json:"count"`
 	Project        string `gorm:"type:varchar(64)" json:"project"`
 	Status         string `gorm:"type:varchar(64);not null" json:"status"`
-	Method         string `gorm:"type:varchar(64);not null" json:"method"`
+	Method         string `gorm:"type:text;not null" json:"method"`
 	SendCount      uint   `gorm:"type:integer" json:"sendCount"`
 	AdvancedParams string `gorm:"type:longText" json:"advancedParams"`
+	CreateUser     string `gorm:"type:varchar(256)" json:"createUser"`
+	UpdateUser     string `gorm:"type:varchar(256)" json:"updateUser"`
 }
 
 type AlertTask struct {
@@ -19,7 +21,7 @@ type AlertTask struct {
 	Type      string `gorm:"type:varchar(64);not null" json:"type"`
 	Quota     string `gorm:"type:varchar(64)" json:"quota"`
 	QuotaType string `gorm:"type:varchar(64)" json:"quotaType"`
-	Method    string `gorm:"type:varchar(64);not null;default:'sms'" json:"method"`
+	Method    string `gorm:"type:varchar(128);not null;default:'sms'" json:"method"`
 }
 
 type AlertLog struct {
@@ -34,15 +36,17 @@ type AlertLog struct {
 	Message     string `gorm:"type:varchar(256);" json:"message"`
 	RecordId    uint   `gorm:"type:integer;" json:"recordId"`
 	LicenseId   string `gorm:"type:varchar(256);not null;" json:"licenseId" `
-	Method      string `gorm:"type:varchar(64);not null;default:'sms'" json:"method"`
+	Method      string `gorm:"type:varchar(128);not null;default:'sms'" json:"method"`
 }
 
 type AlertConfig struct {
 	BaseModel
-	Type   string `gorm:"type:varchar(64);not null" json:"type"`
-	Title  string `gorm:"type:varchar(64);not null" json:"title"`
-	Status string `gorm:"type:varchar(64);not null" json:"status"`
-	Config string `gorm:"type:varchar(256);not null" json:"config"`
+	Type       string `gorm:"type:varchar(64);not null" json:"type"`
+	Title      string `gorm:"type:varchar(64);not null" json:"title"`
+	Status     string `gorm:"type:varchar(64);not null" json:"status"`
+	Config     string `gorm:"type:varchar(256);not null" json:"config"`
+	CreateUser string `gorm:"type:varchar(256)" json:"createUser"`
+	UpdateUser string `gorm:"type:varchar(256)" json:"updateUser"`
 }
 
 type LoginLog struct {

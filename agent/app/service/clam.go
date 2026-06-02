@@ -36,8 +36,8 @@ type IClamService interface {
 	LoadBaseInfo() (dto.ClamBaseInfo, error)
 	Operate(operate string) error
 	SearchWithPage(search dto.SearchClamWithPage) (int64, interface{}, error)
-	Create(req dto.ClamCreate) error
-	Update(req dto.ClamUpdate) error
+	Create(req dto.ClamCreate, operator string) error
+	Update(req dto.ClamUpdate, operator string) error
 	UpdateStatus(id uint, status string) error
 	Delete(req dto.ClamDelete) error
 	HandleOnce(id uint) error
@@ -165,7 +165,7 @@ func (c *ClamService) SearchWithPage(req dto.SearchClamWithPage) (int64, interfa
 	return total, datas, err
 }
 
-func (c *ClamService) Create(req dto.ClamCreate) error {
+func (c *ClamService) Create(req dto.ClamCreate, operator string) error {
 	clam, _ := clamRepo.Get(repo.WithByName(req.Name))
 	if clam.ID != 0 {
 		return buserr.New("ErrRecordExist")
@@ -199,7 +199,7 @@ func (c *ClamService) Create(req dto.ClamCreate) error {
 			Project:   strconv.Itoa(int(clam.ID)),
 			Status:    constant.AlertEnable,
 		}
-		err := NewIAlertService().CreateAlert(createAlert)
+		err := NewIAlertService().CreateAlert(createAlert, operator)
 		if err != nil {
 			return err
 		}
@@ -207,7 +207,7 @@ func (c *ClamService) Create(req dto.ClamCreate) error {
 	return nil
 }
 
-func (c *ClamService) Update(req dto.ClamUpdate) error {
+func (c *ClamService) Update(req dto.ClamUpdate, operator string) error {
 	if cmd.CheckIllegal(req.Path) {
 		return buserr.New("ErrCmdIllegal")
 	}
@@ -260,7 +260,7 @@ func (c *ClamService) Update(req dto.ClamUpdate) error {
 		Type:      "clams",
 		Project:   strconv.Itoa(int(clam.ID)),
 	}
-	err := NewIAlertService().ExternalUpdateAlert(updateAlert)
+	err := NewIAlertService().ExternalUpdateAlert(updateAlert, operator)
 	if err != nil {
 		return err
 	}

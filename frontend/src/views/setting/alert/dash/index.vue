@@ -25,12 +25,12 @@
                             />
                             <el-option value="panelLogin" :label="$t('xpack.alert.panelLogin')" />
                             <el-option
-                                v-if="isProductPro"
+                                v-if="isProductPro && !isEE"
                                 value="licenseException"
                                 :label="$t('xpack.alert.licenseException')"
                             />
                             <el-option
-                                v-if="isProductPro && !isEE.value"
+                                v-if="isProductPro && !isEE"
                                 value="nodeException"
                                 :label="$t('xpack.alert.nodeException')"
                             />
@@ -131,6 +131,17 @@
                             {{ formatRule(row) }}
                         </template>
                     </el-table-column>
+                    <el-table-column
+                        v-if="isEE"
+                        :label="$t('commons.table.creator')"
+                        prop="createUser"
+                        width="100px"
+                        show-overflow-tooltip
+                    >
+                        <template #default="{ row }">
+                            {{ row.createUser || '-' }}
+                        </template>
+                    </el-table-column>
                     <fu-table-operations
                         :ellipsis="2"
                         width="130px"
@@ -154,7 +165,7 @@ import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import AddTask from '@/views/setting/alert/dash/task/index.vue';
 import { Alert } from '@/api/interface/alert';
-import { UpdateAlertStatus, SearchAlerts, DeleteAlert } from '@/api/modules/alert';
+import { UpdateAlertStatus, SearchAlerts, DeleteAlert, PageAlertConfigs } from '@/api/modules/alert';
 
 const { isMobile, isMaster, isProductPro, isEE } = useGlobalStore();
 
@@ -261,13 +272,46 @@ const formatRule = (row: Alert.AlertInfo) => {
     return ruleTemplates[row.type] ? ruleTemplates[row.type]() : '';
 };
 
+const configMap = ref<Map<string, Alert.AlertConfigInfo>>(new Map());
+
+const loadConfigMap = async () => {
+    try {
+        const res = await PageAlertConfigs({ page: 1, pageSize: 1000 });
+        const map = new Map<string, Alert.AlertConfigInfo>();
+        for (const c of res.data?.items || []) {
+            map.set(String(c.id), c);
+        }
+        configMap.value = map;
+    } catch {}
+};
+
 const formatMethod = (row: Alert.AlertInfo) => {
     if (!row.method) return '';
 
-    const sendMethod = row.method.split(',').filter(Boolean);
-    const methodStr = sendMethod.map((item) => t('xpack.alert.' + item)).join('｜');
+    const resolveMethodLabel = (method: string) => {
+        const config = configMap.value.get(method);
+        if (config) {
+            const typeLabel = i18n.global.t(`xpack.alert.${config.type === 'email' ? 'mail' : config.type}`);
+            try {
+                const cfg = JSON.parse(config.config || '{}');
+                const name = cfg.displayName || cfg.sender || cfg.phone || '';
+                return name ? `${name}(${typeLabel})` : typeLabel;
+            } catch {
+                return typeLabel;
+            }
+        }
+        const oldLabel = i18n.global.t(`xpack.alert.${method}`);
+        if (!oldLabel || oldLabel === `xpack.alert.${method}` || oldLabel.includes('.')) {
+            return /^\d+$/.test(method) ? `#${method}` : method;
+        }
+        return oldLabel;
+    };
 
-    return `「${methodStr}」`;
+    return `「${row.method
+        .split(',')
+        .filter(Boolean)
+        .map((item) => resolveMethodLabel(item.trim()))
+        .join('｜')}」`;
 };
 
 const search = async () => {
@@ -285,6 +329,7 @@ const search = async () => {
         order: paginationConfig.order,
     };
     try {
+        await loadConfigMap();
         const res = await SearchAlerts(params);
         data.value = res.data.items || [];
         paginationConfig.total = res.data.total || 0;

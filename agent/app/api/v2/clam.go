@@ -21,7 +21,7 @@ func (b *BaseApi) CreateClam(c *gin.Context) {
 		return
 	}
 
-	if err := clamService.Create(req); err != nil {
+	if err := clamService.Create(req, loadAuditUser(c)); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -43,7 +43,7 @@ func (b *BaseApi) UpdateClam(c *gin.Context) {
 		return
 	}
 
-	if err := clamService.Update(req); err != nil {
+	if err := clamService.Update(req, loadAuditUser(c)); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

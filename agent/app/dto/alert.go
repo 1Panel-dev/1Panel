@@ -46,6 +46,8 @@ type AlertDTO struct {
 	Status         string    `json:"status"`
 	SendCount      uint      `json:"sendCount"`
 	AdvancedParams string    `json:"advancedParams"`
+	CreateUser     string    `json:"createUser"`
+	UpdateUser     string    `json:"updateUser"`
 	CreatedAt      time.Time `json:"createdAt"`
 	UpdatedAt      time.Time `json:"updatedAt"`
 }

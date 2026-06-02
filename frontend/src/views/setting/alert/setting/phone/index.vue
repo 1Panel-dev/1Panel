@@ -41,6 +41,7 @@ interface DialogProps {
     phone: string;
     dailyAlertNum: number;
     id: number;
+    status?: string;
 }
 const drawerVisible = ref();
 const loading = ref();
@@ -49,6 +50,7 @@ const form = reactive({
     phone: '',
     dailyAlertNum: 50,
     id: undefined,
+    status: 'Enable',
 });
 
 const formRef = ref<FormInstance>();
@@ -57,6 +59,7 @@ const acceptParams = (params: DialogProps): void => {
     form.phone = params.phone;
     form.id = params.id;
     form.dailyAlertNum = Number(params.dailyAlertNum);
+    form.status = params.status || 'Enable';
     drawerVisible.value = true;
 };
 
@@ -71,7 +74,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
                 id: form.id,
                 type: 'sms',
                 title: 'xpack.alert.smsConfig',
-                status: 'Enable',
+                status: form.status,
                 config: JSON.stringify(configInfo),
             });
 

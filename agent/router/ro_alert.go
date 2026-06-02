@@ -25,6 +25,7 @@ func (a *AlertRouter) InitRouter(Router *gin.RouterGroup) {
 
 		alertRouter.POST("/config/update", baseApi.UpdateAlertConfig)
 		alertRouter.POST("/config/info", baseApi.GetAlertConfig)
+		alertRouter.POST("/config/search", baseApi.PageAlertConfig)
 		alertRouter.POST("/config/del", baseApi.DeleteAlertConfig)
 		alertRouter.POST("/config/test", baseApi.TestAlertConfig)
 	}
