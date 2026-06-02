@@ -169,10 +169,16 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 	if oldVal.Value == value {
 		return nil
 	}
+	sessionLifeTime := 0
 	switch key {
 	case "IsOffline":
 		if !global.CONF.Base.IsEnterprise {
 			return buserr.New("ErrNotSupportInEnterpriseEdition")
+		}
+	case "SessionTimeout":
+		sessionLifeTime, err = strconv.Atoi(value)
+		if err != nil {
+			return err
 		}
 	case "AppStoreLastModified":
 		exist, _ := settingRepo.Get(repo.WithByKey("AppStoreLastModified"))
@@ -199,6 +205,14 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 
 	if err := settingRepo.Update(key, value); err != nil {
 		return err
+	}
+	if key == "ExpirationDays" {
+		if err := xpack.AuthProvider.SyncPasswordExpirationTime(value); err != nil {
+			return err
+		}
+	}
+	if key == "SessionTimeout" {
+		global.SESSION.ApplyTimeout(sessionLifeTime)
 	}
 
 	switch key {
@@ -502,37 +516,6 @@ func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
 		data.Timeout = ssl.ExpireDate.Format(constant.DateTimeLayout)
 	}
 	return &data, nil
-}
-
-func (u *SettingService) HandlePasswordExpired(c *gin.Context, old, new string) error {
-	setting, err := settingRepo.Get(repo.WithByKey("Password"))
-	if err != nil {
-		return err
-	}
-	passwordFromDB, err := encrypt.StringDecrypt(setting.Value)
-	if err != nil {
-		return err
-	}
-	if passwordFromDB == old {
-		newPassword, err := encrypt.StringEncrypt(new)
-		if err != nil {
-			return err
-		}
-		if err := settingRepo.Update("Password", newPassword); err != nil {
-			return err
-		}
-
-		expiredSetting, err := settingRepo.Get(repo.WithByKey("ExpirationDays"))
-		if err != nil {
-			return err
-		}
-		timeout, _ := strconv.Atoi(expiredSetting.Value)
-		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format(constant.DateTimeLayout)); err != nil {
-			return err
-		}
-		return nil
-	}
-	return buserr.New("ErrInitialPassword")
 }
 
 func (u *SettingService) GetTerminalInfo() (*dto.TerminalInfo, error) {

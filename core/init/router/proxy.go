@@ -3,9 +3,11 @@ package router
 import (
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
+	baseRepo "github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -75,11 +77,12 @@ func checkSession(c *gin.Context) bool {
 		return false
 	}
 	c.Set(psessionUtils.GinContextSessionUserKey, psession)
-	lifeTime, err := xpack.AuthProvider.LoadSessionTimeout(c, psession)
+	sessionTimeout, err := baseRepo.NewISettingRepo().GetValueByKey("SessionTimeout")
 	if err != nil {
 		global.LOG.Errorf("get session timeout failed, err: %v", err)
 		return false
 	}
+	lifeTime, _ := strconv.Atoi(sessionTimeout)
 	if _, err := global.SESSION.RefreshIfNeeded(c, psession, global.CONF.Conn.SSL == constant.StatusEnable, lifeTime); err != nil {
 		global.LOG.Warnf("proxy refresh session failed, path=%s, err=%v", c.Request.URL.Path, err)
 		return false

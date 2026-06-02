@@ -245,8 +245,6 @@ func GetCurrentUserInfo() (*dto.CurrentUserInfo, error) {
 	if err := json.Unmarshal(arr, &info); err != nil {
 		return nil, err
 	}
-	info.SessionTimeout, _ = strconv.Atoi(settingMap["SessionTimeout"])
-	info.ExpirationDays, _ = strconv.Atoi(settingMap["ExpirationDays"])
 	info.MFAInterval, _ = strconv.Atoi(settingMap["MFAInterval"])
 	info.ApiKeyValidityTime, _ = strconv.Atoi(settingMap["ApiKeyValidityTime"])
 	info.Name = settingMap["UserName"]
@@ -254,6 +252,13 @@ func GetCurrentUserInfo() (*dto.CurrentUserInfo, error) {
 	info.Permissions = []string{}
 	info.NodeRoles = []dto.CurrentUserNodeRole{}
 	return &info, nil
+}
+func LoadPasswordExpirationTime(_ *gin.Context) (string, error) {
+	return repo.NewISettingRepo().GetValueByKey("ExpirationTime")
+}
+func SyncPasswordExpirationTime(expirationDays string) error {
+	expiredDays, _ := strconv.Atoi(expirationDays)
+	return repo.NewISettingRepo().Update("ExpirationTime", buildPasswordExpirationTime(expiredDays))
 }
 func UpdateCurrentUserInfo(c *gin.Context, req dto.CurrentUserUpdate) error {
 	settingRepo := repo.NewISettingRepo()
@@ -279,20 +284,6 @@ func UpdateCurrentUserInfo(c *gin.Context, req dto.CurrentUserUpdate) error {
 		}
 	}
 	if err := settingRepo.Update("UserName", req.Name); err != nil {
-		return err
-	}
-	if err := settingRepo.Update("SessionTimeout", strconv.Itoa(req.SessionTimeout)); err != nil {
-		return err
-	}
-	if err := settingRepo.Update("ExpirationDays", strconv.Itoa(req.ExpirationDays)); err != nil {
-		return err
-	}
-
-	expirationTime := ""
-	if req.ExpirationDays != 0 {
-		expirationTime = time.Now().AddDate(0, 0, req.ExpirationDays).Format(constant.DateTimeLayout)
-	}
-	if err := settingRepo.Update("ExpirationTime", expirationTime); err != nil {
 		return err
 	}
 	if shouldDeleteSession {
@@ -349,7 +340,7 @@ func HandlePasswordExpired(c *gin.Context, old, new string) error {
 			return err
 		}
 		timeout, _ := strconv.Atoi(expiredSetting.Value)
-		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format(constant.DateTimeLayout)); err != nil {
+		if err := settingRepo.Update("ExpirationTime", buildPasswordExpirationTime(timeout)); err != nil {
 			return err
 		}
 		return nil
@@ -357,35 +348,11 @@ func HandlePasswordExpired(c *gin.Context, old, new string) error {
 	return buserr.New("ErrInitialPassword")
 }
 
-func LoadSessionTimeout(sessionUser psession.SessionUser) (int, error) {
-	settingRepo := repo.NewISettingRepo()
-	sessionTimeout, err := settingRepo.GetValueByKey("SessionTimeout")
-	if err != nil {
-		return 0, err
+func buildPasswordExpirationTime(expirationDays int) string {
+	if expirationDays == 0 {
+		return ""
 	}
-	lifeTime, _ := strconv.Atoi(sessionTimeout)
-	return lifeTime, nil
-}
-func LoadExpired(sessionUser psession.SessionUser) (bool, time.Time, error) {
-	settingRepo := repo.NewISettingRepo()
-	expirationDays, err := settingRepo.GetValueByKey("ExpirationDays")
-	if err != nil {
-		return true, time.Time{}, err
-	}
-	expiredDays, _ := strconv.Atoi(expirationDays)
-	if expiredDays == 0 {
-		return false, time.Time{}, nil
-	}
-
-	expirationTime, err := settingRepo.GetValueByKey("ExpirationTime")
-	if err != nil {
-		return true, time.Time{}, err
-	}
-	expiredTime, err := time.ParseInLocation(constant.DateTimeLayout, expirationTime, common.LoadExpiredLocation())
-	if err != nil {
-		return true, time.Time{}, err
-	}
-	return true, expiredTime, nil
+	return time.Now().AddDate(0, 0, expirationDays).Format(constant.DateTimeLayout)
 }
 
 func deleteCurrentSession(c *gin.Context) {

@@ -27456,7 +27456,8 @@
 					"enum": [
 						"SystemIP",
 						"DockerSockPath",
-						"FileRecycleBin"
+						"FileRecycleBin",
+						"FirewallPortWhiteList"
 					],
 					"type": "string"
 				},
@@ -29935,12 +29936,6 @@
 				"complexitySetting": {
 					"type": "string"
 				},
-				"expirationDays": {
-					"type": "integer"
-				},
-				"expirationTime": {
-					"type": "string"
-				},
 				"ipWhiteList": {
 					"type": "string"
 				},
@@ -29967,9 +29962,6 @@
 				},
 				"role": {
 					"type": "string"
-				},
-				"sessionTimeout": {
-					"type": "integer"
 				}
 			},
 			"type": "object"
@@ -29993,14 +29985,6 @@
 		},
 		"dto.CurrentUserUpdate": {
 			"properties": {
-				"expirationDays": {
-					"maximum": 60,
-					"minimum": 0,
-					"type": "integer"
-				},
-				"expirationTime": {
-					"type": "string"
-				},
 				"name": {
 					"type": "string"
 				},
@@ -30009,16 +29993,10 @@
 				},
 				"password": {
 					"type": "string"
-				},
-				"sessionTimeout": {
-					"maximum": 864000,
-					"minimum": 300,
-					"type": "integer"
 				}
 			},
 			"required": [
-				"name",
-				"sessionTimeout"
+				"name"
 			],
 			"type": "object"
 		},
@@ -34280,6 +34258,9 @@
 		},
 		"dto.SearchLgLogWithPage": {
 			"properties": {
+				"endTime": {
+					"type": "string"
+				},
 				"info": {
 					"type": "string"
 				},
@@ -34288,6 +34269,9 @@
 				},
 				"pageSize": {
 					"type": "integer"
+				},
+				"startTime": {
+					"type": "string"
 				},
 				"status": {
 					"type": "string"
@@ -34405,6 +34389,9 @@
 					],
 					"type": "string"
 				},
+				"endTime": {
+					"type": "string"
+				},
 				"info": {
 					"type": "string"
 				},
@@ -34413,6 +34400,9 @@
 				},
 				"pageSize": {
 					"type": "integer"
+				},
+				"startTime": {
+					"type": "string"
 				}
 			},
 			"required": [
@@ -34553,6 +34543,9 @@
 					"type": "string"
 				},
 				"fileRecycleBin": {
+					"type": "string"
+				},
+				"firewallPortWhiteList": {
 					"type": "string"
 				},
 				"lastCleanData": {

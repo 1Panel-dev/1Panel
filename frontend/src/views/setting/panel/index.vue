@@ -103,6 +103,19 @@
                                 </el-select>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
+                                <el-input disabled v-model.number="form.sessionTimeout">
+                                    <template #append>
+                                        <el-button @click="onChangeTimeout" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <span class="input-help">
+                                    {{ $t('setting.sessionTimeoutHelper', [form.sessionTimeout]) }}
+                                </span>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.systemIP')" prop="systemIP">
                                 <el-input disabled v-if="form.systemIP" v-model="form.systemIP">
                                     <template #append>
@@ -176,6 +189,7 @@
         <PanelName ref="panelNameRef" @search="search()" />
         <SystemIP ref="systemIPRef" @search="search()" />
         <Proxy ref="proxyRef" @search="search()" />
+        <Timeout ref="timeoutRef" @search="search()" />
         <HideMenu ref="hideMenuRef" @search="search()" />
         <ThemeColor ref="themeColorRef" />
         <Watermark ref="watermarkRef" @search="search()" />
@@ -193,6 +207,7 @@ import { MsgSuccess } from '@/utils/message';
 import ThemeColor from '@/views/setting/panel/theme-color/index.vue';
 import Watermark from '@/views/setting/panel/watermark/index.vue';
 import Edition from '@/views/setting/panel/edition/index.vue';
+import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
 import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import Proxy from '@/views/setting/panel/proxy/index.vue';
@@ -236,6 +251,7 @@ const form = reactive({
     themeColor: {} as ThemeColor,
     menuTabs: '',
     language: '',
+    sessionTimeout: 0,
     docSource: 'withByRegion',
     edition: '',
     isOffline: 'Disable',
@@ -259,6 +275,7 @@ const show = ref();
 const panelNameRef = ref();
 const systemIPRef = ref();
 const proxyRef = ref();
+const timeoutRef = ref();
 const hideMenuRef = ref();
 const watermarkRef = ref();
 const themeColorRef = ref();
@@ -291,6 +308,7 @@ const search = async () => {
     form.menuTabs = res.data.menuTabs;
     form.panelName = res.data.panelName;
     form.language = res.data.language;
+    form.sessionTimeout = Number(res.data.sessionTimeout || 0);
     form.docSource = res.data.docSource || 'withByRegion';
     form.edition = res.data.edition;
     form.isOffline = res.data.isOffline || 'Disable';
@@ -334,6 +352,9 @@ const search = async () => {
 
 const onChangeTitle = () => {
     panelNameRef.value.acceptParams({ panelName: form.panelName });
+};
+const onChangeTimeout = () => {
+    timeoutRef.value.acceptParams({ sessionTimeout: form.sessionTimeout });
 };
 const onChangeSystemIP = () => {
     systemIPRef.value.acceptParams({ systemIP: form.systemIP });

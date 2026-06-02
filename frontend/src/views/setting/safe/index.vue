@@ -123,6 +123,22 @@
                                     </div>
                                 </div>
                             </el-form-item>
+                            <el-form-item :label="$t('setting.expirationTime')" prop="expirationDays">
+                                <el-input disabled v-model="form.expirationDays">
+                                    <template #append>
+                                        <el-button @click="onChangeExpirationDays" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <span class="input-help">
+                                    {{
+                                        form.expirationDays === 0
+                                            ? $t('setting.noneSetting')
+                                            : $t('setting.expirationHelper')
+                                    }}
+                                </span>
+                            </el-form-item>
                             <el-form-item :label="$t('setting.complexity')" prop="complexityVerification">
                                 <el-switch
                                     @change="onSaveComplexity"
@@ -146,6 +162,7 @@
         <EntranceSetting ref="entranceRef" @search="search" />
         <DomainSetting ref="domainRef" @search="search" />
         <AllowIPsSetting ref="allowIPsRef" @search="search" />
+        <ExpirationSetting ref="expirationRef" @search="search" />
         <ResponseSetting ref="responseRef" @search="search()" />
     </div>
 </template>
@@ -157,6 +174,7 @@ import PortSetting from '@/views/setting/safe/port/index.vue';
 import BindSetting from '@/views/setting/safe/bind/index.vue';
 import ResponseSetting from '@/views/setting/safe/response/index.vue';
 import SSLSetting from '@/views/setting/safe/ssl/index.vue';
+import ExpirationSetting from '@/views/setting/safe/expiration/index.vue';
 import EntranceSetting from '@/views/setting/safe/entrance/index.vue';
 import DomainSetting from '@/views/setting/safe/domain/index.vue';
 import AllowIPsSetting from '@/views/setting/safe/allowips/index.vue';
@@ -172,6 +190,7 @@ const loading = ref(false);
 const entranceRef = ref();
 const portRef = ref();
 const bindRef = ref();
+const expirationRef = ref();
 const responseRef = ref();
 
 const sslRef = ref();
@@ -188,6 +207,7 @@ const form = reactive({
     sslItem: 'Disable',
     sslType: 'self',
     securityEntrance: '',
+    expirationDays: 0,
     complexityVerification: 'Disable',
     allowIPs: '',
     bindDomain: '',
@@ -210,6 +230,7 @@ const search = async () => {
         loadInfo();
     }
     form.securityEntrance = res.data.securityEntrance;
+    form.expirationDays = Number(res.data.expirationDays);
     form.complexityVerification = res.data.complexityVerification;
     form.allowIPs = res.data.allowIPs.replaceAll(',', '\n');
     form.bindDomain = res.data.bindDomain;
@@ -255,6 +276,9 @@ const onChangeBindDomain = () => {
 };
 const onChangeAllowIPs = () => {
     allowIPsRef.value.acceptParams({ allowIPs: form.allowIPs });
+};
+const onChangeExpirationDays = async () => {
+    expirationRef.value.acceptParams({ expirationDays: form.expirationDays });
 };
 const handleSSL = async () => {
     if (form.sslItem !== 'Disable') {

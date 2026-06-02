@@ -1,10 +1,7 @@
 package providers
 
 import (
-	"time"
-
 	"github.com/1Panel-dev/1Panel/core/app/dto"
-	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/gin-gonic/gin"
 )
@@ -14,9 +11,6 @@ type AuthProvider interface {
 	MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, string, error)
 
 	ResetSuperAdminUser(name, password string) error
-
-	LoadSessionTimeout(c *gin.Context, sessionUser psession.SessionUser) (int, error)
-	LoadExpired(c *gin.Context, sessionUser psession.SessionUser) (bool, time.Time, error)
 
 	LoadMFA(c *gin.Context, req dto.MfaRequest) (mfa.Otp, error)
 	MFABind(c *gin.Context, req dto.MfaCredential) error
@@ -35,6 +29,8 @@ type AuthProvider interface {
 	ClearPasskeys() error
 
 	GetCurrentUserInfo(c *gin.Context) (*dto.CurrentUserInfo, error)
+	LoadPasswordExpirationTime(c *gin.Context) (string, error)
+	SyncPasswordExpirationTime(expirationDays string) error
 	UpdateCurrentUserInfo(c *gin.Context, req dto.CurrentUserUpdate) error
 	HandlePasswordExpired(c *gin.Context, old, new string) error
 

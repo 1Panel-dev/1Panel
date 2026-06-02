@@ -27460,7 +27460,8 @@ const docTemplate = `{
 					"enum": [
 						"SystemIP",
 						"DockerSockPath",
-						"FileRecycleBin"
+						"FileRecycleBin",
+						"FirewallPortWhiteList"
 					],
 					"type": "string"
 				},
@@ -29939,12 +29940,6 @@ const docTemplate = `{
 				"complexitySetting": {
 					"type": "string"
 				},
-				"expirationDays": {
-					"type": "integer"
-				},
-				"expirationTime": {
-					"type": "string"
-				},
 				"ipWhiteList": {
 					"type": "string"
 				},
@@ -29971,9 +29966,6 @@ const docTemplate = `{
 				},
 				"role": {
 					"type": "string"
-				},
-				"sessionTimeout": {
-					"type": "integer"
 				}
 			},
 			"type": "object"
@@ -29997,14 +29989,6 @@ const docTemplate = `{
 		},
 		"dto.CurrentUserUpdate": {
 			"properties": {
-				"expirationDays": {
-					"maximum": 60,
-					"minimum": 0,
-					"type": "integer"
-				},
-				"expirationTime": {
-					"type": "string"
-				},
 				"name": {
 					"type": "string"
 				},
@@ -30013,16 +29997,10 @@ const docTemplate = `{
 				},
 				"password": {
 					"type": "string"
-				},
-				"sessionTimeout": {
-					"maximum": 864000,
-					"minimum": 300,
-					"type": "integer"
 				}
 			},
 			"required": [
-				"name",
-				"sessionTimeout"
+				"name"
 			],
 			"type": "object"
 		},
@@ -34284,6 +34262,9 @@ const docTemplate = `{
 		},
 		"dto.SearchLgLogWithPage": {
 			"properties": {
+				"endTime": {
+					"type": "string"
+				},
 				"info": {
 					"type": "string"
 				},
@@ -34292,6 +34273,9 @@ const docTemplate = `{
 				},
 				"pageSize": {
 					"type": "integer"
+				},
+				"startTime": {
+					"type": "string"
 				},
 				"status": {
 					"type": "string"
@@ -34409,6 +34393,9 @@ const docTemplate = `{
 					],
 					"type": "string"
 				},
+				"endTime": {
+					"type": "string"
+				},
 				"info": {
 					"type": "string"
 				},
@@ -34417,6 +34404,9 @@ const docTemplate = `{
 				},
 				"pageSize": {
 					"type": "integer"
+				},
+				"startTime": {
+					"type": "string"
 				}
 			},
 			"required": [
@@ -34557,6 +34547,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"fileRecycleBin": {
+					"type": "string"
+				},
+				"firewallPortWhiteList": {
 					"type": "string"
 				},
 				"lastCleanData": {
