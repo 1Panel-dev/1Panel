@@ -48,6 +48,7 @@ type SubTask struct {
 }
 
 const (
+	TaskInstall        = "TaskInstall"
 	TaskUpgrade        = "TaskUpgrade"
 	TaskAddNode        = "TaskAddNode"
 	TaskSync           = "TaskSync"

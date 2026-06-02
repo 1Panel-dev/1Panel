@@ -139,6 +139,8 @@ PushAppInstallTaskToNode: "ノード [{{ .name }}] にアプリインストー�
 TaskPush: "送信"
 AppInstallTask: "アプリインストールタスク"
 PushAppFailed: "アプリインストールタスクの送信に失敗しました"
+SkillHubInstallTask: "スキルをインストール [{{ .name }}]"
+SkillHubInstallToTarget: "ターゲットにスキルをインストール [{{ .name }}]"
 Success: "成功"
 
 #script

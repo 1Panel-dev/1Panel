@@ -137,6 +137,8 @@ PushAppInstallTaskToNode: "Uygulama kurulum görevini düğüme [{{ .name }}] g�
 TaskPush: "Gönder"
 AppInstallTask: "Uygulama kurulum görevi"
 PushAppFailed: "Uygulama kurulum görevi gönderilemedi"
+SkillHubInstallTask: "Skill yükle [{{ .name }}]"
+SkillHubInstallToTarget: "Skill hedefe yükle [{{ .name }}]"
 Success: "Başarılı"
 
 #script

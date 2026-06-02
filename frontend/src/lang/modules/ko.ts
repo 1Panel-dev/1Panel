@@ -1066,7 +1066,7 @@ const message = {
             containerized: '컨테이너화',
             containerName: '컨테이너 이름',
             hostSkillDir: 'Skill 디렉터리',
-            hostSkillDirHelper: '1Panel이 설치된 서버의 Skill 디렉터리 경로를 입력하세요.',
+            hostSkillDirHelper: '노드의 Skill 디렉터리 경로를 입력하세요.',
             containerSkillDir: '컨테이너 내 Skill 디렉터리',
             installMethod: '설치 방식',
             copy: '복사',
@@ -1102,6 +1102,7 @@ const message = {
                 published: '게시됨',
                 disabled: '게시 해제됨',
                 rejected: '거부됨',
+                deleted: '삭제됨',
             },
             agent: {
                 common: '공통',

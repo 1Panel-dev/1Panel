@@ -1078,7 +1078,7 @@ const message = {
             containerized: 'Containerized',
             containerName: 'Container Name',
             hostSkillDir: 'Skill Directory',
-            hostSkillDirHelper: 'Enter the Skill directory path on the server where 1Panel is installed.',
+            hostSkillDirHelper: 'Enter the Skill directory path on the node.',
             containerSkillDir: 'Container Skill Directory',
             installMethod: 'Install Method',
             copy: 'Copy',
@@ -1113,6 +1113,7 @@ const message = {
                 published: 'Published',
                 disabled: 'Unpublished',
                 rejected: 'Rejected',
+                deleted: 'Deleted',
             },
             agent: {
                 common: 'Common',

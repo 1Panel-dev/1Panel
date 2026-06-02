@@ -137,6 +137,8 @@ Skip: "Пропустить ошибки и продолжить..."
 TaskPush: "Отправить"
 AppInstallTask: "Задача установки приложения"
 PushAppFailed: "Не удалось отправить задачу установки приложения"
+SkillHubInstallTask: "Установить навык [{{ .name }}]"
+SkillHubInstallToTarget: "Установить навык в цель [{{ .name }}]"
 Success: "Успешно"
 
 #script

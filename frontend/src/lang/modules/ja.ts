@@ -1082,8 +1082,7 @@ const message = {
             containerized: 'コンテナ化',
             containerName: 'コンテナ名',
             hostSkillDir: 'Skill ディレクトリ',
-            hostSkillDirHelper:
-                '1Panel がインストールされているサーバー上の Skill ディレクトリパスを入力してください。',
+            hostSkillDirHelper: 'ノードの Skill ディレクトリパスを入力してください。',
             containerSkillDir: 'コンテナ内 Skill ディレクトリ',
             installMethod: 'インストール方法',
             copy: 'コピー',
@@ -1120,6 +1119,7 @@ const message = {
                 published: '公開済み',
                 disabled: '非公開',
                 rejected: '却下',
+                deleted: '削除済み',
             },
             agent: {
                 common: '共通',

@@ -1091,7 +1091,7 @@ const message = {
             containerized: 'Berkontena',
             containerName: 'Nama kontena',
             hostSkillDir: 'Direktori Skill',
-            hostSkillDirHelper: 'Masukkan laluan direktori Skill pada pelayan tempat 1Panel dipasang.',
+            hostSkillDirHelper: 'Masukkan laluan direktori Skill pada nod.',
             containerSkillDir: 'Direktori Skill dalam kontena',
             installMethod: 'Kaedah pemasangan',
             copy: 'Salin',
@@ -1126,6 +1126,7 @@ const message = {
                 published: 'Diterbitkan',
                 disabled: 'Dinyahterbit',
                 rejected: 'Ditolak',
+                deleted: 'Dipadam',
             },
             agent: {
                 common: 'Umum',
