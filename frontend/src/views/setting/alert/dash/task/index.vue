@@ -354,17 +354,17 @@
                                 </div>
                             </el-option>
                         </el-select>
+                        <span class="input-help">
+                            {{
+                                intervalTypes.includes(dialogData.rowData!.type)
+                                    ? $t('xpack.alert.resourceAlertRulesHelper')
+                                    : ''
+                            }}
+                        </span>
                     </el-form-item>
-                    <span class="input-help">
-                        {{
-                            intervalTypes.includes(dialogData.rowData!.type)
-                                ? $t('xpack.alert.resourceAlertRulesHelper')
-                                : ''
-                        }}
-                    </span>
 
                     <el-form-item v-if="dialogData.title === 'edit' && isEE" :label="$t('commons.table.updater')">
-                        <el-input :model-value="dialogData.rowData?.updateUser || '-'" readonly />
+                        <el-input :model-value="dialogData.rowData?.updateUser || '-'" readonly disabled />
                     </el-form-item>
                 </el-col>
             </el-row>

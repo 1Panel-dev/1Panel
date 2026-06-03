@@ -5007,6 +5007,7 @@ const message = {
             offlineCloseHelper: '关闭离线告警，告警需通过子节点自行告警，请保证子节点网络畅通，以避免告警失败',
             alertNotice: '告警通知',
             methodConfig: '发送方式配置',
+            createMethod: '创建发送方式',
             commonConfig: '全局配置',
             smsConfig: '短信通知',
             smsConfigHelper: '配置短信通知号码',

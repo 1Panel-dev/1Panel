@@ -68,7 +68,10 @@
                             <span class="input-help">{{ $t('xpack.alert.tlsHelper') }}</span>
                         </el-form-item>
                         <el-form-item :label="$t('xpack.alert.recipient')" prop="recipient">
-                            <el-input v-model.trim="form.recipient" placeholder="a@example.com,b@example.com" />
+                            <el-input
+                                v-model.trim="form.recipient"
+                                :placeholder="$t('xpack.alert.recipientPlaceholder')"
+                            />
                         </el-form-item>
                     </template>
 
@@ -170,7 +173,7 @@ const typeOptions = computed(() => {
         options.push({ value: 'feiShu', label: i18n.global.t('xpack.alert.feiShu') });
     }
     options.push({ value: 'bark', label: i18n.global.t('xpack.alert.bark') });
-    if (!isEE.value && !isIntl.value) {
+    if (isProductPro.value && !isEE.value && !isIntl.value) {
         options.push({ value: 'sms', label: i18n.global.t('xpack.alert.sms') });
     }
     return options;

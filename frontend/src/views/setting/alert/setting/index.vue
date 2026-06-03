@@ -39,10 +39,9 @@
             </template>
         </LayoutContent>
         <LayoutContent :title="$t('xpack.alert.methodConfig')" v-loading="loading" :divider="true">
-            <template #leftToolBar>{{ $t('xpack.alert.methodConfig') }}</template>
-            <template #rightToolBar>
+            <template #leftToolBar>
                 <el-button v-permission type="primary" @click="onCreate">
-                    {{ $t('commons.button.create') }}
+                    {{ $t('xpack.alert.createMethod') }}
                 </el-button>
             </template>
             <template #main>
@@ -68,7 +67,7 @@
                     class="mt-3"
                     :pagination-config="paginationConfig"
                     :data="allConfigs"
-                    :empty-text="$t('commons.table.noData')"
+                    :empty-text="$t('commons.msg.noneData')"
                     @search="searchConfigs"
                 >
                     <el-table-column :label="$t('commons.table.type')" min-width="120">
@@ -90,10 +89,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('xpack.alert.configDetail')" min-width="240" prop="details">
                         <template #default="{ row }">
-                            <div
-                                class="text-sm text-gray-500 cursor-pointer select-none"
-                                @click="toggleDetail(row.id!)"
-                            >
+                            <div class="text-sm cursor-pointer select-none" @click="toggleDetail(row.id!)">
                                 <template v-if="expandedIds.has(row.id!)">
                                     {{ getConfigDetails(row) }}
                                     <el-icon class="ml-1 align-middle text-gray-400"><View /></el-icon>
