@@ -296,15 +296,18 @@ func (u *SettingService) GetSystemProxy() (*dto.SystemProxy, error) {
 
 func (u *SettingService) loadLocalConn() dto.SSHConnData {
 	var data dto.SSHConnData
-	data.LocalSSHConnShow, _ = settingRepo.GetValueByKey("LocalSSHConnShow")
+	localSSHConnShow, _ := settingRepo.GetValueByKey("LocalSSHConnShow")
+	data.LocalSSHConnShow = localSSHConnShow
 	connItem, _ := settingRepo.GetValueByKey("LocalSSHConn")
 	if len(connItem) == 0 {
 		return data
 	}
 	connInfoInDB, _ := encrypt.StringDecrypt(connItem)
 	if err := json.Unmarshal([]byte(connInfoInDB), &data); err != nil {
+		data.LocalSSHConnShow = localSSHConnShow
 		return data
 	}
+	data.LocalSSHConnShow = localSSHConnShow
 	return data
 }
 

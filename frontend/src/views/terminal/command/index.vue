@@ -207,14 +207,12 @@ const batchDelete = async (row: Command.CommandInfo | null) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
-        icon: 'Edit',
         click: (row: any) => {
             onOpenDialog('edit', row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        icon: 'Delete',
         click: batchDelete,
     },
 ];
