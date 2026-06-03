@@ -2427,11 +2427,6 @@ const message = {
         auto: '시스템 따라가기',
         language: '언어',
         runtimeEnv: '실행 환경',
-        offlineEnv: '오프라인 환경',
-        offlineEnvHelper:
-            '활성화하면 앱 스토어 등의 리소스를 기본적으로 서버 로컬 디렉터리에서 읽습니다.\n시스템 업그레이드와 에이전트 업그레이드는 오프라인 패키지를 수동으로 다운로드해야 합니다.',
-        offlineEnvOpenHelper: '오프라인 환경을 활성화하시겠습니까?',
-        offlineEnvCloseHelper: '오프라인 환경을 비활성화하시겠습니까?',
         docSource: '문서 출처',
         withByRegion: '운영 지역 따름(기본값)',
         withByLang: '시스템 언어 따름',

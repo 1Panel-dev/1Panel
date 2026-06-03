@@ -2455,11 +2455,6 @@ const message = {
         auto: 'Follow System',
         language: 'Language',
         runtimeEnv: 'Runtime environment',
-        offlineEnv: 'Offline environment',
-        offlineEnvHelper:
-            'After it is enabled, resources such as the App Store are read from the local server directory by default.\nSystem upgrades and agent upgrades require manually downloaded offline packages.',
-        offlineEnvOpenHelper: 'Are you sure you want to enable the offline environment?',
-        offlineEnvCloseHelper: 'Are you sure you want to disable the offline environment?',
         docSource: 'Documentation Source',
         withByRegion: 'Match Region Setting (Default)',
         withByLang: 'Match System Language',

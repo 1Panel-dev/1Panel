@@ -144,7 +144,11 @@
                                 </el-input>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.developerMode')" prop="developerMode">
+                            <el-form-item
+                                v-if="!isEnterprise"
+                                :label="$t('setting.developerMode')"
+                                prop="developerMode"
+                            >
                                 <el-radio-group
                                     @change="onSave('DeveloperMode', form.developerMode)"
                                     v-model="form.developerMode"
@@ -163,16 +167,6 @@
                                 <el-button v-show="!show" @click="onChangeHideMenus" icon="Setting">
                                     {{ $t('commons.button.set') }}
                                 </el-button>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.offlineEnv')" v-if="isEnterprise" prop="isOffline">
-                                <el-switch
-                                    v-model="form.isOffline"
-                                    active-value="Enable"
-                                    inactive-value="Disable"
-                                    @change="onChangeOfflineEnv"
-                                />
-                                <span class="input-help">{{ $t('setting.offlineEnvHelper') }}</span>
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.runtimeEnv')" prop="edition">
@@ -222,7 +216,6 @@ const {
     isEnterprise,
     isIntl,
     isMobile,
-    isOffline,
     isXpackOrEE,
     openMenuTabs,
     themeConfig,
@@ -254,7 +247,6 @@ const form = reactive({
     sessionTimeout: 0,
     docSource: 'withByRegion',
     edition: '',
-    isOffline: 'Disable',
     developerMode: '',
     systemIP: '',
 
@@ -311,7 +303,6 @@ const search = async () => {
     form.sessionTimeout = Number(res.data.sessionTimeout || 0);
     form.docSource = res.data.docSource || 'withByRegion';
     form.edition = res.data.edition;
-    form.isOffline = res.data.isOffline || 'Disable';
 
     form.proxyUrl = res.data.proxyUrl;
     form.proxyType = res.data.proxyType;
@@ -418,27 +409,6 @@ const onChangeWatermark = async () => {
         });
 };
 
-const onChangeOfflineEnv = async (val: string | number | boolean) => {
-    const value = val + '';
-    const oldValue = value === 'Enable' ? 'Disable' : 'Enable';
-    const message =
-        value === 'Enable'
-            ? i18n.global.t('setting.offlineEnvOpenHelper')
-            : i18n.global.t('setting.offlineEnvCloseHelper');
-    try {
-        await ElMessageBox.confirm(message, i18n.global.t('setting.offlineEnv'), {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        });
-        const success = await onSave('IsOffline', value);
-        if (!success) {
-            form.isOffline = oldValue;
-        }
-    } catch {
-        form.isOffline = oldValue;
-    }
-};
-
 const handleThemeChange = async (val: string) => {
     themeConfig.value.theme = val;
     switchTheme();
@@ -474,9 +444,6 @@ const onSave = async (key: string, val: any) => {
             case 'Language':
                 await globalStore.updateLanguage(val);
                 location.reload();
-                break;
-            case 'IsOffline':
-                isOffline.value = val === 'Enable';
                 break;
         }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

@@ -19,7 +19,6 @@ type SettingInfo struct {
 	MenuTabs       string `json:"menuTabs"`
 	Language       string `json:"language"`
 	DocSource      string `json:"docSource"`
-	IsOffline      string `json:"isOffline"`
 
 	ServerPort                 string `json:"serverPort"`
 	SSL                        string `json:"ssl"`

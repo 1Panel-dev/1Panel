@@ -45,7 +45,6 @@ var baseSettingKeys = map[string]struct{}{
 	"DashboardSimpleNodeVisible": {},
 	"Edition":                    {},
 	"DocSource":                  {},
-	"IsOffline":                  {},
 	"AppStoreLastModified":       {},
 	"ScriptSync":                 {},
 	"HideMenu":                   {},

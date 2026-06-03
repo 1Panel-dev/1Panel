@@ -2469,11 +2469,6 @@ const message = {
         auto: 'システムをフォローします',
         language: '言語',
         runtimeEnv: '実行環境',
-        offlineEnv: 'オフライン環境',
-        offlineEnvHelper:
-            '有効にすると、アプリストアなどのリソースはデフォルトでサーバーのローカルディレクトリから読み込まれます。\nシステムアップグレードとエージェントアップグレードには、手動でダウンロードしたオフラインパッケージが必要です。',
-        offlineEnvOpenHelper: 'オフライン環境を有効にしてもよろしいですか？',
-        offlineEnvCloseHelper: 'オフライン環境を無効にしてもよろしいですか？',
         docSource: 'ドキュメントの参照先',
         withByRegion: '運用リージョンに従う（デフォルト）',
         withByLang: 'システム言語に従う',
