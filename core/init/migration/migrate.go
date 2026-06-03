@@ -45,7 +45,6 @@ func Init() {
 		migrations.AddSkillsHubMenu,
 		migrations.AddOperationLogUser,
 		migrations.AddLoginLogUser,
-		migrations.AddIsOfflineSetting,
 		migrations.AddAlertAuditUser,
 	})
 	if err := m.Migrate(); err != nil {

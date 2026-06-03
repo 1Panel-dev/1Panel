@@ -2623,11 +2623,6 @@ const message = {
         auto: 'Seguir o sistema',
         language: 'Idioma',
         runtimeEnv: 'Ambiente de execução',
-        offlineEnv: 'Ambiente offline',
-        offlineEnvHelper:
-            'Após ativar, recursos como a Loja de Aplicativos serão lidos por padrão do diretório local do servidor.\nAtualizações do sistema e de agentes exigem pacotes offline baixados manualmente.',
-        offlineEnvOpenHelper: 'Tem certeza de que deseja ativar o ambiente offline?',
-        offlineEnvCloseHelper: 'Tem certeza de que deseja desativar o ambiente offline?',
         docSource: 'Fonte da documentação',
         withByRegion: 'Seguir região de operação (Padrão)',
         withByLang: 'Seguir idioma do sistema',

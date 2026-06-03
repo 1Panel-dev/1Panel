@@ -2500,11 +2500,6 @@ const message = {
         auto: 'Sistemi takip et',
         language: 'Dil',
         runtimeEnv: 'Çalışma ortamı',
-        offlineEnv: 'Çevrimdışı ortam',
-        offlineEnvHelper:
-            'Etkinleştirildikten sonra App Store gibi kaynaklar varsayılan olarak sunucunun yerel dizininden okunur.\nSistem yükseltmeleri ve aracı yükseltmeleri için çevrimdışı paketlerin manuel olarak indirilmesi gerekir.',
-        offlineEnvOpenHelper: 'Çevrimdışı ortamı etkinleştirmek istediğinizden emin misiniz?',
-        offlineEnvCloseHelper: 'Çevrimdışı ortamı devre dışı bırakmak istediğinizden emin misiniz?',
         docSource: 'Dokümantasyon kaynağı',
         withByRegion: 'Çalışma bölgesini takip et (Varsayılan)',
         withByLang: 'Sistem dilini takip et',

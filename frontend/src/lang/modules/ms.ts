@@ -2511,11 +2511,6 @@ const message = {
         auto: 'Ikut Sistem',
         language: 'Bahasa',
         runtimeEnv: 'Persekitaran operasi',
-        offlineEnv: 'Persekitaran luar talian',
-        offlineEnvHelper:
-            'Selepas diaktifkan, sumber seperti App Store akan dibaca secara lalai daripada direktori setempat pelayan.\nNaik taraf sistem dan naik taraf ejen memerlukan pakej luar talian yang dimuat turun secara manual.',
-        offlineEnvOpenHelper: 'Adakah anda pasti mahu mengaktifkan persekitaran luar talian?',
-        offlineEnvCloseHelper: 'Adakah anda pasti mahu menyahaktifkan persekitaran luar talian?',
         docSource: 'Sumber dokumentasi',
         withByRegion: 'Ikut wilayah operasi (Lalai)',
         withByLang: 'Ikut bahasa sistem',

@@ -106,9 +106,6 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	} else {
 		info.ProxyPasswd, _ = encrypt.StringDecrypt(info.ProxyPasswd)
 	}
-	if !global.CONF.Base.IsEnterprise {
-		info.IsOffline = constant.StatusDisable
-	}
 
 	return &info, err
 }
@@ -171,10 +168,6 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 	}
 	sessionLifeTime := 0
 	switch key {
-	case "IsOffline":
-		if !global.CONF.Base.IsEnterprise {
-			return buserr.New("ErrNotSupportInEnterpriseEdition")
-		}
 	case "SessionTimeout":
 		sessionLifeTime, err = strconv.Atoi(value)
 		if err != nil {

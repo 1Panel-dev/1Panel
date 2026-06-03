@@ -1276,16 +1276,6 @@ var AddLoginLogUser = &gormigrate.Migration{
 	},
 }
 
-var AddIsOfflineSetting = &gormigrate.Migration{
-	ID: "20260429-add-is-offline-setting",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "IsOffline", Value: constant.StatusDisable}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
 var AddAlertAuditUser = &gormigrate.Migration{
 	ID: "20260602-add-alert-audit-user",
 	Migrate: func(tx *gorm.DB) error {

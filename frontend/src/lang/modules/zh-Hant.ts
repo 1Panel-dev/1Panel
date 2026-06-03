@@ -2318,11 +2318,6 @@ const message = {
         auto: '跟隨系統',
         language: '系統語言',
         runtimeEnv: '運行環境',
-        offlineEnv: '離線環境',
-        offlineEnvHelper:
-            '開啟後，應用商店等資源將預設從伺服器本機目錄讀取。\n系統升級和從節點升級需手動下載離線包完成。',
-        offlineEnvOpenHelper: '是否確認開啟離線環境？',
-        offlineEnvCloseHelper: '是否確認關閉離線環境？',
         docSource: '文件來源',
         withByRegion: '跟隨運行區域（預設）',
         withByLang: '跟隨系統語言',

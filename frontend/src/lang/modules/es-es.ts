@@ -2506,11 +2506,6 @@ const message = {
         auto: 'Seguir sistema',
         language: 'Idioma',
         runtimeEnv: 'Entorno de ejecución',
-        offlineEnv: 'Entorno sin conexión',
-        offlineEnvHelper:
-            'Después de habilitarlo, recursos como la Tienda de aplicaciones se leerán de forma predeterminada desde el directorio local del servidor.\nLas actualizaciones del sistema y de agentes requieren paquetes sin conexión descargados manualmente.',
-        offlineEnvOpenHelper: '¿Seguro que quieres habilitar el entorno sin conexión?',
-        offlineEnvCloseHelper: '¿Seguro que quieres deshabilitar el entorno sin conexión?',
         docSource: 'Fuente de documentación',
         withByRegion: 'Seguir región de operación (Predeterminado)',
         withByLang: 'Seguir idioma del sistema',

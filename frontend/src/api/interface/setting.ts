@@ -42,7 +42,6 @@ export namespace Setting {
         menuTabs: string;
         language: string;
         docSource: string;
-        isOffline: string;
 
         serverPort: number;
         ipv6: string;
