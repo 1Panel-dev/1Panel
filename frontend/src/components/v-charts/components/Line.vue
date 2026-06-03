@@ -9,7 +9,9 @@ import { computeSizeFromKBs, computeSizeFromKB, computeSizeFromMB } from '@/util
 import i18n from '@/lang';
 const { themeConfig } = useGlobalStore();
 const isDarkTheme = ref(false);
+const LineChartRef = ref<HTMLElement>();
 let mediaQuery: MediaQueryList;
+let resizeObserver: ResizeObserver | undefined;
 const props = defineProps({
     id: {
         type: String,
@@ -99,16 +101,20 @@ const seriesStyle = [
 ];
 
 function initChart() {
+    const chartDom = LineChartRef.value;
+    if (!chartDom) {
+        return;
+    }
     if (themeConfig.value.theme === 'auto') {
         isDarkTheme.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
     } else {
         isDarkTheme.value = themeConfig.value.theme === 'dark';
     }
-    let itemChart = echarts?.getInstanceByDom(document.getElementById(props.id) as HTMLElement);
+    let itemChart = echarts?.getInstanceByDom(chartDom);
     const optionItem = itemChart?.getOption();
     const itemSelect = optionItem?.legend;
     if (itemChart == null) {
-        itemChart = echarts.init(document.getElementById(props.id) as HTMLElement);
+        itemChart = echarts.init(chartDom);
     }
 
     const series = [];
@@ -243,7 +249,11 @@ function initChart() {
 }
 
 function changeChartSize() {
-    echarts.getInstanceByDom(document.getElementById(props.id) as HTMLElement)?.resize();
+    const chartDom = LineChartRef.value;
+    if (!chartDom) {
+        return;
+    }
+    echarts.getInstanceByDom(chartDom)?.resize();
 }
 
 watch(
@@ -267,13 +277,20 @@ onMounted(() => {
         mediaQuery.addEventListener('change', handleThemeChange);
         initChart();
         window.addEventListener('resize', changeChartSize);
+        if (LineChartRef.value) {
+            resizeObserver = new ResizeObserver(changeChartSize);
+            resizeObserver.observe(LineChartRef.value);
+        }
     });
 });
 
 onBeforeUnmount(() => {
-    echarts.getInstanceByDom(document.getElementById(props.id) as HTMLElement).dispose();
+    if (LineChartRef.value) {
+        echarts.getInstanceByDom(LineChartRef.value)?.dispose();
+    }
     window.removeEventListener('resize', changeChartSize);
-    mediaQuery.removeEventListener('change', handleThemeChange);
+    mediaQuery?.removeEventListener('change', handleThemeChange);
+    resizeObserver?.disconnect();
 });
 </script>
 <style lang="scss" scoped></style>
