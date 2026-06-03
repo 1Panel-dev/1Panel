@@ -223,7 +223,7 @@ func doSystemClean(taskItem *task.Task) func(t *task.Task) error {
 			}
 		}
 
-		dropWithExclude(path.Join(global.Dir.BaseDir, uploadPath), []string{"theme"}, taskItem, &size, &fileCount)
+		dropWithExclude(path.Join(global.Dir.BaseDir, uploadPath), []string{"theme", "skills-hub"}, taskItem, &size, &fileCount)
 		dropWithTask(path.Join(global.Dir.BaseDir, downloadPath), taskItem, &size, &fileCount)
 
 		logFiles, _ := os.ReadDir(global.Dir.LogDir)
@@ -863,7 +863,7 @@ func loadTreeWithAllFile(isCheck bool, originalPath, treeType, pathItem string, 
 		return lists
 	}
 	for _, file := range files {
-		if treeType == "upload" && (file.Name() == "theme" && file.IsDir()) {
+		if treeType == "upload" && ((file.Name() == "theme" || file.Name() == "skills-hub") && file.IsDir()) {
 			continue
 		}
 		if treeType == "system_log" && (file.Name() == "1Panel-Core.log" || file.Name() == "1Panel.log" || file.IsDir()) {

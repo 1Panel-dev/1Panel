@@ -1,6 +1,7 @@
 <template>
     <div>
         <el-popover
+            v-model:visible="popoverVisible"
             placement="right-end"
             :show-arrow="false"
             :offset="0"
@@ -44,16 +45,16 @@
                 <el-divider v-if="isXpackOrEE" class="divider" />
 
                 <div v-if="showNodes()">
-                    <el-scrollbar max-height="168px" :noresize="true">
+                    <el-scrollbar max-height="288px" :noresize="true">
                         <div
                             class="dropdown-item"
                             @click="changeNode(item.name)"
                             :disabled="item.status !== 'Healthy'"
-                            v-for="item in nodeOptions"
+                            v-for="item in visibleNodeOptions"
                             :key="item.name"
                         >
                             <SvgIcon class="icon" iconName="p-zhuji" />
-                            {{ item.name === 'local' ? globalStore.getMasterAlias() : item.name }}
+                            <span class="node-name">{{ displayNodeName(item) }}</span>
                             <el-tooltip
                                 v-if="item.status !== 'Healthy' || !item.isBound"
                                 :content="item.isBound ? $t('xpack.node.nodeUnhealthy') : $t('xpack.node.nodeUnbind')"
@@ -65,16 +66,11 @@
                             </el-tooltip>
                         </div>
                     </el-scrollbar>
+                    <div v-if="showMoreNodes" class="dropdown-item more-node-button" @click.stop="openNodeDrawer">
+                        <span>{{ $t('tabs.more') }}...</span>
+                        <span class="more-node-count">{{ nodeOptions.length - defaultNodeLimit }}</span>
+                    </div>
                 </div>
-                <el-input
-                    v-if="showNodes() && nodes?.length > 5"
-                    suffix-icon="Search"
-                    v-model="filter"
-                    @input="changeFilter"
-                    class="w-full filter-input"
-                    size="small"
-                    clearable
-                />
                 <el-divider class="divider" />
                 <div class="dropdown-item" @click="logout">
                     <SvgIcon class="icon" iconName="p-tuichudenglu3" />
@@ -82,6 +78,13 @@
                 </div>
             </div>
         </el-popover>
+        <NodeDrawer
+            v-model="nodeDrawerVisible"
+            :nodes="nodeOptions"
+            :master-alias="globalStore.getMasterAlias()"
+            @change="changeNode"
+            @favorite-change="handleFavoriteChange"
+        />
         <UserInfo ref="userInfoRef" :currentUser="currentUser" @search="loadCurrentUser()" />
     </div>
 </template>
@@ -92,7 +95,7 @@ import { countExecutingTask } from '@/api/modules/log';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { getAgentSettingInfo } from '@/api/modules/setting';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import bus from '@/global/bus';
 import { logOutApi } from '@/api/modules/auth';
 import router from '@/routers';
@@ -102,9 +105,9 @@ import { changeToLocal, listNodes, setDefaultNodeInfo } from '@/utils/node';
 import { Login } from '@/api/interface/auth';
 import { syncAuthInfo } from '@/utils/rbac';
 import UserInfo from './user-info/index.vue';
+import NodeDrawer from './node-drawer/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const filter = ref();
 const currentUser = ref<Login.AuthInfo>();
 const { globalStore, currentNode, currentNodeAddr, defaultNetwork, entrance, isEnterprise, isXpackOrEE } =
     useGlobalStore();
@@ -113,10 +116,14 @@ const nodes = ref([]);
 const nodeOptions = ref([]);
 const loading = ref();
 const switchingNode = ref(false);
+const popoverVisible = ref(false);
+const nodeDrawerVisible = ref(false);
 const userInfoRef = ref();
 const props = defineProps({
     version: String,
 });
+
+const defaultNodeLimit = 8;
 
 const emit = defineEmits(['openTask', 'refresh']);
 bus.on('refreshTask', () => {
@@ -133,19 +140,28 @@ const loadCurrentName = () => {
     return globalStore.getMasterAlias();
 };
 
+const visibleNodeOptions = computed(() => {
+    return nodeOptions.value.slice(0, defaultNodeLimit);
+});
+const showMoreNodes = computed(() => {
+    return nodeOptions.value.length > defaultNodeLimit;
+});
+
 const showPopover = async () => {
-    filter.value = '';
     await loadNodes();
-    changeFilter();
 };
 
-const changeFilter = () => {
-    nodeOptions.value = [];
-    for (const item of nodes.value) {
-        if (item.name.indexOf(filter.value) !== -1) {
-            nodeOptions.value.push(item);
-        }
-    }
+const displayNodeName = (item) => {
+    return item.name === 'local' ? globalStore.getMasterAlias() : item.name;
+};
+
+const openNodeDrawer = () => {
+    nodeDrawerVisible.value = true;
+    popoverVisible.value = false;
+};
+
+const handleFavoriteChange = async () => {
+    await loadNodes();
 };
 
 const loadNodes = async () => {
@@ -162,11 +178,6 @@ const loadNodes = async () => {
             if (nodes.value.length === 0) {
                 setDefaultNodeInfo();
             }
-            nodes.value.sort((a, b) => {
-                if (a.name === 'local') return -1;
-                if (b.name === 'local') return 1;
-                return 0;
-            });
             nodeOptions.value = nodes.value || [];
             loading.value = false;
         })
@@ -362,9 +373,28 @@ onMounted(() => {
         }
     }
 }
-.filter-input {
-    padding: 0 8px;
-    margin-bottom: 4px;
+.node-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.more-node-button {
+    padding-left: 34px;
+    color: var(--el-color-primary);
+}
+.more-node-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: 9px;
+    color: var(--el-color-primary);
+    background: var(--el-color-primary-light-9);
+    line-height: 18px;
 }
 .dropdown-item:hover {
     background: var(--el-menu-item-bg-color-active);

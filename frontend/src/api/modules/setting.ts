@@ -43,6 +43,9 @@ export const loadLicenseOptions = () => {
 export const listNodeOptions = (type: string) => {
     return http.post<Array<Setting.NodeItem>>(`/core/nodes/list`, { type: type });
 };
+export const updateNodeFavorite = (id: number, isFavorite: boolean) => {
+    return http.post(`/core/xpack/nodes/favorite`, { id, isFavorite });
+};
 export const listAllSimpleNodes = () => {
     return http.get<Array<Setting.SimpleNodeItem>>(`/core/nodes/simple/all`);
 };

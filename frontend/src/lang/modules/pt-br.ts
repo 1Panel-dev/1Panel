@@ -5352,6 +5352,8 @@ const message = {
             memTotal: 'Memória Total',
             nodeManagement: 'Gerenciamento Multi-Máquina',
             multiOverview: 'Multi-Máquina',
+            commonNodes: 'Nós frequentes',
+            searchNodePlaceholder: 'Pesquise nome, grupo ou endereço do nó',
             nodeItem: 'Gerenciamento de Nós',
             panelItem: 'Gerenciamento de Painéis',
             addPanel: 'Adicionar Painel',

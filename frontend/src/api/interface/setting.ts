@@ -307,11 +307,14 @@ export namespace Setting {
     }
     export interface NodeItem {
         id: number;
+        groupID?: number;
+        groupBelong?: string;
         addr: string;
         status: string;
         version: string;
         isXpack: boolean;
         isBound: boolean;
+        isFavorite?: boolean;
         name: string;
     }
     export interface SimpleNodeItem {

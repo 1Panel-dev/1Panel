@@ -5126,6 +5126,8 @@ const message = {
             memTotal: 'Total Memory',
             nodeManagement: 'Multi-Machine Management',
             multiOverview: 'Multi-Machine',
+            commonNodes: 'Frequently Used Nodes',
+            searchNodePlaceholder: 'Search node name, group, or address',
             nodeItem: 'Node Management',
             panelItem: 'Panel Management',
             addPanel: 'Add Panel',

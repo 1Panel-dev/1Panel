@@ -5194,6 +5194,8 @@ const message = {
             memTotal: 'Toplam Bellek',
             nodeManagement: 'Çoklu Makine Yönetimi',
             multiOverview: 'Çoklu Makine',
+            commonNodes: 'Sık Kullanılan Düğümler',
+            searchNodePlaceholder: 'Düğüm adı, grup veya adres ara',
             nodeItem: 'Düğüm Yönetimi',
             panelItem: 'Panel Yönetimi',
             addPanel: 'Panel Ekle',
