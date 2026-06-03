@@ -4594,7 +4594,6 @@ const message = {
                 passwordExpirationRiskDesc:
                     'Parolanın süresi {days} gün içinde dolacak. Lütfen en kısa sürede değiştirin',
                 passwordExpirationExpiredDesc: 'Parolanın süresi {days} gün önce doldu. Lütfen hemen değiştirin',
-                passwordExpirationExpiredDesc: '密码已过期 {days} 天，请立即修改',
             },
         },
         user: {
