@@ -4773,6 +4773,8 @@ const message = {
             memTotal: '記憶體總計',
             nodeManagement: '多機管理',
             multiOverview: '多機概覽',
+            commonNodes: '常用節點',
+            searchNodePlaceholder: '搜尋節點名稱、群組或地址',
             nodeItem: '節點管理',
             panelItem: '面板管理',
             addPanel: '添加面板',

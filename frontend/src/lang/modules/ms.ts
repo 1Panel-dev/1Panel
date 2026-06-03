@@ -5209,6 +5209,8 @@ const message = {
             memTotal: 'Jumlah Memori',
             nodeManagement: 'Pengurusan Multi-Mesin',
             multiOverview: 'Multi-Mesin',
+            commonNodes: 'Nod Kerap Digunakan',
+            searchNodePlaceholder: 'Cari nama nod, kumpulan atau alamat',
             nodeItem: 'Pengurusan Nod',
             panelItem: 'Pengurusan Panel',
             addPanel: 'Tambah Panel',

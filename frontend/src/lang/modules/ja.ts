@@ -5151,6 +5151,8 @@ const message = {
             memTotal: '総メモリ',
             nodeManagement: 'マルチマシン管理',
             multiOverview: 'マルチマシン',
+            commonNodes: 'よく使うノード',
+            searchNodePlaceholder: 'ノード名、グループ、アドレスを検索',
             nodeItem: 'ノード管理',
             panelItem: 'パネル管理',
             addPanel: 'パネル追加',

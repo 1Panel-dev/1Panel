@@ -5041,6 +5041,8 @@ const message = {
             memTotal: '총 메모리',
             nodeManagement: '다중 머신 관리',
             multiOverview: '다중 머신',
+            commonNodes: '자주 사용하는 노드',
+            searchNodePlaceholder: '노드 이름, 그룹 또는 주소 검색',
             nodeItem: '노드 관리',
             panelItem: '패널 관리',
             addPanel: '패널 추가',

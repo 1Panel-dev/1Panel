@@ -5212,6 +5212,8 @@ const message = {
             memTotal: 'Общая память',
             nodeManagement: 'Управление Несколькими Машинами',
             multiOverview: 'Несколько Машин',
+            commonNodes: 'Часто используемые узлы',
+            searchNodePlaceholder: 'Поиск по имени узла, группе или адресу',
             nodeItem: 'Управление Узлами',
             panelItem: 'Управление Панелями',
             addPanel: 'Добавить Панель',
