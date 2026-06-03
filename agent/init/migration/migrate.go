@@ -10,6 +10,7 @@ import (
 func Init() {
 	InitAgentDB()
 	InitTaskDB()
+	InitAlertDB()
 	global.LOG.Info("Migration run successfully")
 }
 
@@ -36,8 +37,6 @@ func InitAgentDB() {
 		migrations.UpdateMcpServer,
 		migrations.InitCronjobGroup,
 		migrations.AddColumnToAlert,
-		migrations.MigrateAlertMethodConfigIDs,
-		migrations.AddAlertAuditUser,
 		migrations.UpdateWebsiteSSL,
 		migrations.AddQuickJump,
 		migrations.UpdateMcpServerAddType,
@@ -97,6 +96,17 @@ func InitAgentDB() {
 func InitTaskDB() {
 	m := gormigrate.New(global.TaskDB, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		migrations.AddTaskTable,
+	})
+	if err := m.Migrate(); err != nil {
+		global.LOG.Error(err)
+		panic(err)
+	}
+}
+
+func InitAlertDB() {
+	m := gormigrate.New(global.AlertDB, gormigrate.DefaultOptions, []*gormigrate.Migration{
+		migrations.MigrateAlertMethodConfigIDs,
+		migrations.AddAlertAuditUser,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
