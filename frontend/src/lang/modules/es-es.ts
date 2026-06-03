@@ -5160,7 +5160,8 @@ const message = {
                 'Realice la creación, edición, inicio, detención, reinicio y eliminación de instancias desde una sola interfaz para simplificar la operación diaria.',
             vllmTitle4: 'Control avanzado',
             vllmContent4:
-                'Personalice puertos, contenedores, comandos de arranque y archivos Compose con opciones avanzadas para lograr implementaciones más flexibles y estandarizadas.',        },
+                'Personalice puertos, contenedores, comandos de arranque y archivos Compose con opciones avanzadas para lograr implementaciones más flexibles y estandarizadas.',
+        },
         node: {
             master: 'Nodo Principal',
             masterBackup: 'Respaldo del Nodo Principal',

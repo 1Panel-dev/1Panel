@@ -4264,12 +4264,15 @@ const message = {
                 accessRestrictionRiskDesc:
                     'IP dibenarkan dan domain terikat tidak dikonfigurasi atau akses tidak terhad. Konfigurasikan sekurang-kurangnya satu',
                 mfaNormalDesc: 'MFA telah diaktifkan',
-                mfaRiskDesc: 'MFA belum diaktifkan. Disyorkan untuk mengaktifkannya bagi meningkatkan keselamatan akaun',
+                mfaRiskDesc:
+                    'MFA belum diaktifkan. Disyorkan untuk mengaktifkannya bagi meningkatkan keselamatan akaun',
                 passwordExpiration: 'Tempoh Tamat Kata Laluan',
                 passwordExpirationNormalDesc: 'Kata laluan akan tamat tempoh dalam {days} hari',
                 passwordExpirationUnsetDesc: 'Tiada tempoh tamat ditetapkan untuk kata laluan',
-                passwordExpirationRiskDesc: 'Kata laluan akan tamat tempoh dalam masa {days} hari. Sila tukar kata laluan anda secepat mungkin',
-                passwordExpirationExpiredDesc: 'Kata laluan telah tamat tempoh selama {days} hari. Sila tukar kata laluan anda dengan segera',
+                passwordExpirationRiskDesc:
+                    'Kata laluan akan tamat tempoh dalam masa {days} hari. Sila tukar kata laluan anda secepat mungkin',
+                passwordExpirationExpiredDesc:
+                    'Kata laluan telah tamat tempoh selama {days} hari. Sila tukar kata laluan anda dengan segera',
                 panelHTTPSNormalDesc: 'Panel HTTPS didayakan',
                 panelHTTPSRiskDesc: 'Panel HTTPS dilumpuhkan. Laluan log masuk mungkin terdedah',
                 passwordComplexityNormalDesc: 'Pengesahan kerumitan kata laluan didayakan',

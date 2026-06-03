@@ -4741,7 +4741,8 @@ const message = {
                 passwordExpirationNormalDesc: 'A senha expirará em {days} dias',
                 passwordExpirationUnsetDesc: 'Nenhum prazo de expiração foi definido para a senha',
                 passwordExpirationRiskDesc: 'A senha expirará em {days} dias. Altere-a o quanto antes',
-                passwordExpirationExpiredDesc: 'A senha expirou há {days} dias. Altere-a imediatamente',            },
+                passwordExpirationExpiredDesc: 'A senha expirou há {days} dias. Altere-a imediatamente',
+            },
         },
         user: {
             user: 'Usuário',
