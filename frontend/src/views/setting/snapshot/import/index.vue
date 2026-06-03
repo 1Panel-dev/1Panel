@@ -113,7 +113,7 @@ const toFolder = async () => {
 
 const loadBackupDir = async () => {
     const res = await getLocalBackupDir(currentNode.value);
-    backupPath.value = res.data;
+    backupPath.value = `${res.data}${res.data.endsWith('/') ? '' : '/'}system_snapshot`;
 };
 
 const submitImport = async (formEl: FormInstance | undefined) => {

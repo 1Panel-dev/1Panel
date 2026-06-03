@@ -402,6 +402,8 @@ const load18n = (node: any, label: string) => {
                 return i18n.global.t('setting.snapshotLabel');
             case 'master':
                 return i18n.global.t('xpack.node.masterBackup');
+            case 'file-history':
+                return i18n.global.t('file.file');
             default:
                 return label;
         }

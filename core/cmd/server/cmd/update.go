@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/1Panel-dev/1Panel/core/cmd/server/conf"
@@ -179,7 +180,9 @@ var updateVersion = &cobra.Command{
 		for _, item := range nodes {
 			nodeNames = append(nodeNames, fmt.Sprintf("%s-%s", item.Name, item.Addr))
 		}
-		fmt.Println(i18n.GetMsgWithMapForCmd("AutoUpgradeNodes", map[string]interface{}{"nodes": strings.Join(nodeNames, ", ")}))
+		if len(nodeNames) > 0 {
+			fmt.Printf("[%s] %s\n", time.Now().Format("2006-01-02 15:04:05"), i18n.GetMsgWithMapForCmd("AutoUpgradeNodes", map[string]interface{}{"nodes": strings.Join(nodeNames, ", ")}))
+		}
 		if err := xpackDB.Model(&Node{}).
 			Where("is_auto_upgrade = ? AND name != ?", true, "local").
 			Updates(map[string]interface{}{"status": constant.StatusWaitForUpgrade}).

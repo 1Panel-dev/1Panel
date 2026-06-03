@@ -420,7 +420,6 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        icon: 'Delete',
         click: batchDelete,
     },
 ];
