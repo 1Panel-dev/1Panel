@@ -162,7 +162,10 @@ import { MsgSuccess } from '@/utils/message';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
+
 const { currentNode, isMaster, currentNodeAddr, isIntl } = useGlobalStore();
+useOperateNodeContext(currentNode);
 
 const data = ref<any>();
 const loading = ref(false);

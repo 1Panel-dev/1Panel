@@ -355,9 +355,11 @@ import {
 import { MsgSuccess } from '@/utils/message';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
 import Tooltip from '@/components/tooltip/index.vue';
 
-const { currentMongodbDB, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
+const { currentNode, currentMongodbDB, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
+useOperateNodeContext(currentNode);
 
 const loading = ref(false);
 const maskShow = ref(true);

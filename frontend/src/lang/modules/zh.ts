@@ -4297,6 +4297,8 @@ const message = {
 
             appUpgrade: '应用升级',
             appUpgradeHelper: '有 {0} 个应用需要升级',
+            dashboardSetting: '概览设置',
+            keepOneDashboardComponent: '请至少保留一个概览板块',
         },
         opsReport: {
             name: '运维报表',

@@ -257,8 +257,10 @@ import { getCurrentDateFormatted } from '@/utils/date';
 import { getGroupList } from '@/api/modules/group';
 import { routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
 
-const { isMobile } = useGlobalStore();
+const { currentNode, isMobile } = useGlobalStore();
+useOperateNodeContext(currentNode);
 
 const loading = ref();
 const selects = ref<any>([]);

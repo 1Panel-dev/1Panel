@@ -205,8 +205,10 @@ import Log from '@/components/log/file-drawer/index.vue';
 import Obtain from './obtain/index.vue';
 import MsgInfo from '@/components/msg-info/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
 
-const { isMobile } = useGlobalStore();
+const { currentNode, isMobile } = useGlobalStore();
+useOperateNodeContext(currentNode);
 const paginationConfig = reactive({
     cacheSizeKey: 'ssl-page-size',
     currentPage: 1,

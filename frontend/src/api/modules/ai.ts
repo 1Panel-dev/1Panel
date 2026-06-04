@@ -104,8 +104,13 @@ export const createAgent = (req: AI.AgentCreateReq) => {
     return http.post<AI.AgentItem>(`/ai/agents`, req, TimeoutEnum.T_5M);
 };
 
-export const pageAgents = (req: SearchWithPage) => {
-    return http.post<ResPage<AI.AgentItem>>(`/ai/agents/search`, req);
+export const pageAgents = (req: SearchWithPage, currentNode?: string) => {
+    return http.post<ResPage<AI.AgentItem>>(
+        `/ai/agents/search`,
+        req,
+        undefined,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 
 export const deleteAgentCheck = (req: AI.AgentIDReq) => {
