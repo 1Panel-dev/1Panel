@@ -10,6 +10,7 @@ import { changeToLocal } from '@/utils/node';
 import { getCookie } from '@/utils/auth';
 import { handleAuthResponseCode } from '@/utils/auth-response';
 import { GlobalStore } from '@/store';
+import { getOperateNodeOverride } from '@/utils/operate-node';
 
 const config = {
     baseURL: import.meta.env.VITE_API_URL as string,
@@ -34,7 +35,9 @@ class RequestHttp {
                     ...config.headers,
                 };
                 if (config.headers.CurrentNode == undefined) {
-                    config.headers.CurrentNode = encodeURIComponent(globalStore.currentNode);
+                    config.headers.CurrentNode = encodeURIComponent(
+                        getOperateNodeOverride() || globalStore.currentNode,
+                    );
                 } else {
                     config.headers.CurrentNode = encodeURIComponent(String(config.headers.CurrentNode));
                 }

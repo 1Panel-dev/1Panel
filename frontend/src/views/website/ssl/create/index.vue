@@ -158,7 +158,12 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button v-permission type="primary" @click="submit(sslForm)" :disabled="loading">
+                <el-button
+                    v-permission="'website_cert_manage'"
+                    type="primary"
+                    @click="submit(sslForm)"
+                    :disabled="loading"
+                >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -289,12 +294,12 @@ const changeIP = () => {
     }
 };
 
-const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
+const acceptParams = (op: string, websiteSSL?: Website.SSLDTO) => {
     operate.value = op;
     if (op == 'create') {
         resetForm();
     }
-    if (op == 'edit') {
+    if (op == 'edit' && websiteSSL) {
         ssl.value.acmeAccountId = websiteSSL.acmeAccountId;
         if (websiteSSL.dnsAccountId > 0) {
             ssl.value.dnsAccountId = websiteSSL.dnsAccountId;

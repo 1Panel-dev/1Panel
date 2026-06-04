@@ -5213,6 +5213,8 @@ const message = {
             offlineHelper: 'Used when the node is in an offline environment',
             appUpgrade: 'App Upgrade',
             appUpgradeHelper: 'There are {0} apps that need to be upgraded',
+            dashboardSetting: 'Overview Settings',
+            keepOneDashboardComponent: 'Keep at least one overview section',
         },
         customApp: {
             name: 'Custom App Repository',

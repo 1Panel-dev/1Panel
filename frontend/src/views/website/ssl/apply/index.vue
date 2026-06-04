@@ -27,7 +27,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button v-permission type="primary" @click="submit()" :disabled="loading">
+                <el-button v-permission="'website_cert_manage'" type="primary" @click="submit()" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

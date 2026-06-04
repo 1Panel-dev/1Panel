@@ -260,6 +260,7 @@ import openclawIcon from '@/assets/images/ai-agent-openclaw.svg';
 import copawIcon from '@/assets/images/ai-agent-copaw.svg';
 import hermesIcon from '@/assets/images/ai-agent-hermes-agent.svg';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
 
 const items = ref<AI.AgentItem[]>([]);
 const loading = ref(false);
@@ -284,7 +285,8 @@ const searchName = ref('');
 const defaultHttpsPort = ref(443);
 const openrestyPortLoaded = ref(false);
 const websiteDomainsMap = ref<Record<number, Website.Domain[]>>({});
-const { isAdminOrNodeAdmin } = useGlobalStore();
+const { currentNode, isAdminOrNodeAdmin } = useGlobalStore();
+useOperateNodeContext(currentNode);
 
 const headerButtons = [
     {

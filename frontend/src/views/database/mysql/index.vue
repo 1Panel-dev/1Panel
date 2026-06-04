@@ -302,9 +302,11 @@ import { App } from '@/api/interface/app';
 import { getAppPort } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
 import { routerToName, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 
-const { currentDB: globalCurrentDB, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
+const { currentNode, currentDB: globalCurrentDB, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
+useOperateNodeContext(currentNode);
 
 const loading = ref(false);
 const maskShow = ref(true);

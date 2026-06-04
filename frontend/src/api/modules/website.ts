@@ -34,8 +34,9 @@ export const getWebsiteLog = (req: Website.WebSiteLogReq) => {
     return http.post<Website.WebSiteLog>(`/websites/log/search`, req);
 };
 
-export const updateWebsite = (req: Website.WebSiteUpdateReq) => {
-    return http.post<any>(`/websites/update`, req);
+export const updateWebsite = (req: Website.WebSiteUpdateReq, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post<any>(`/websites/update${query}`, req);
 };
 
 export const getWebsite = (id: number) => {

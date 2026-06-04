@@ -73,7 +73,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button v-permission type="primary" @click="submit()" :disabled="loading">
+                <el-button v-permission="'website_cert_manage'" type="primary" @click="submit()" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -148,7 +148,7 @@ const handleCertificateChange = (file: any) => {
     certificateFileList.value = [file];
 };
 
-const acceptParams = (websiteSSL: Website.SSLDTO) => {
+const acceptParams = (websiteSSL?: Website.SSLDTO) => {
     resetForm();
     if (websiteSSL && websiteSSL.id > 0) {
         ssl.value.sslID = websiteSSL.id;
