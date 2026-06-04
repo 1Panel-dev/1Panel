@@ -872,7 +872,7 @@ import { routerToName, routerToPath } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
 const router = useRouter();
 
-const { docsUrl, isFxplay, isIntl, isEE, isProductPro } = useGlobalStore();
+const { docsUrl, isFxplay, isProductPro } = useGlobalStore();
 const licenseRef = ref();
 const scriptFileRef = ref();
 const dirRef = ref();
@@ -889,7 +889,7 @@ const alertConfigs = ref<Alert.AlertConfigInfo[]>([]);
 const loadAlertConfigs = async () => {
     try {
         const res = await ListAlertConfigs();
-        alertConfigs.value = res.data || [];
+        alertConfigs.value = res.data?.filter((item: Alert.AlertConfigInfo) => item.type !== 'common') || [];
     } catch {}
 };
 onMounted(() => {
@@ -897,10 +897,8 @@ onMounted(() => {
 });
 
 const alertConfigOptions = computed(() => {
-    const hiddenTypes: string[] = [];
-    if (isIntl.value || isEE.value) hiddenTypes.push('sms');
     return alertConfigs.value
-        .filter((c) => c.status === 'Enable' && c.type !== 'common' && !hiddenTypes.includes(c.type))
+        .filter((c) => c.status === 'Enable' && c.type !== 'common')
         .map((c) => ({
             value: String(c.id),
             label: getAlertConfigOptionLabel(c),

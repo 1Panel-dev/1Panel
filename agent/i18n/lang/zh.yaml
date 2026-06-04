@@ -74,6 +74,7 @@ ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
 ErrBackupCheck: "备份账号测试连接失败 {{ .err }}"
 ErrBackupLocalDelete: "暂不支持删除本地服务器备份账号"
 ErrBackupLocalCreate: "暂不支持创建本地服务器备份账号"
+ErrAlertConfigInUse: "告警配置正在使用中，无法删除"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被占用！"

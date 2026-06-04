@@ -2,6 +2,18 @@ import http from '@/api';
 import { ResPage } from '@/api/interface';
 import { Alert } from '../interface/alert';
 import { deepCopy } from '@/utils/misc';
+import { GlobalStore } from '@/store';
+
+const alertConfigHiddenTypes = ['sms'];
+
+const resolveAlertConfigExcludeTypes = (excludeTypes: string[] = []) => {
+    const globalStore = GlobalStore();
+    const types = new Set(excludeTypes);
+    if (!(globalStore.isProductPro && !globalStore.isIntl && !globalStore.isEE)) {
+        alertConfigHiddenTypes.forEach((type) => types.add(type));
+    }
+    return Array.from(types);
+};
 export const SearchAlerts = (req: Alert.AlertSearch, currentNode?: string) => {
     return http.post<ResPage<Alert.AlertInfo>>(
         `/alert/search`,
@@ -53,19 +65,27 @@ export const ListCronJob = (req: Alert.CronJobReq) => {
     return http.post<Alert.CronJobDTO[]>(`/alert/cronjob/list`, req);
 };
 
-export const ListAlertConfigs = (currentNode?: string) => {
+export const ListAlertConfigs = (req: Alert.AlertConfigFilterReq = {}, currentNode?: string) => {
+    const request = {
+        ...req,
+        excludeTypes: resolveAlertConfigExcludeTypes(req.excludeTypes),
+    };
     return http.post<Alert.AlertConfigInfo[]>(
         `/alert/config/info`,
-        {},
+        request,
         undefined,
         currentNode ? { CurrentNode: currentNode } : undefined,
     );
 };
 
 export const PageAlertConfigs = (req: Alert.AlertConfigPageReq, currentNode?: string) => {
+    const request = {
+        ...req,
+        excludeTypes: resolveAlertConfigExcludeTypes(req.excludeTypes),
+    };
     return http.post<ResPage<Alert.AlertConfigInfo>>(
         `/alert/config/search`,
-        req,
+        request,
         undefined,
         currentNode ? { CurrentNode: currentNode } : undefined,
     );

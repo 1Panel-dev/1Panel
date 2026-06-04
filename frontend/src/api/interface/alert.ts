@@ -147,6 +147,11 @@ export namespace Alert {
     export interface AlertConfigPageReq {
         page: number;
         pageSize: number;
+        excludeTypes?: string[];
+    }
+
+    export interface AlertConfigFilterReq {
+        excludeTypes?: string[];
     }
 
     export interface AlertConfigUpdateReq {

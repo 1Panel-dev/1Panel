@@ -26,7 +26,6 @@ import (
 type AlertService struct{}
 
 var eeHiddenAlertTypes = []string{"licenseException", "panelUpdate", "panelPwdEndTime"}
-var hiddenAlertConfigTypes = []string{"sms"}
 
 type IAlertService interface {
 	PageAlert(req dto.AlertSearch) (int64, []dto.AlertDTO, error)
@@ -44,8 +43,8 @@ type IAlertService interface {
 	GetClams() ([]dto.ClamDTO, error)
 	GetCronJobs(req dto.CronJobReq) ([]dto.CronJobDTO, error)
 
-	GetAlertConfig() ([]model.AlertConfig, error)
-	PageAlertConfig(req dto.PageInfo) (int64, []model.AlertConfig, error)
+	GetAlertConfig(req dto.AlertConfigQuery) ([]model.AlertConfig, error)
+	PageAlertConfig(req dto.AlertConfigPageReq) (int64, []model.AlertConfig, error)
 	UpdateAlertConfig(req dto.AlertConfigUpdate, operator string) error
 	DeleteAlertConfig(id uint) error
 	TestAlertConfig(req dto.AlertConfigTest) (bool, error)
@@ -469,26 +468,26 @@ func (a AlertService) GetCronJobs(req dto.CronJobReq) ([]dto.CronJobDTO, error) 
 	return cronJobs, err
 }
 
-func (a AlertService) GetAlertConfig() ([]model.AlertConfig, error) {
+func (a AlertService) GetAlertConfig(req dto.AlertConfigQuery) ([]model.AlertConfig, error) {
 	var (
 		opts    []repo.DBOption
 		configs []model.AlertConfig
 	)
-	if global.CONF.Base.IsEnterprise || global.CONF.Base.Edition == "intl" {
-		opts = append(opts, alertRepo.WithByTypeNotIn(hiddenAlertConfigTypes))
+	if len(req.ExcludeTypes) > 0 {
+		opts = append(opts, alertRepo.WithByTypeNotIn(req.ExcludeTypes))
 	}
 	opts = append(opts, repo.WithByStatus(constant.AlertEnable))
 	configs, err := alertRepo.AlertConfigList(opts...)
 	return configs, err
 }
 
-func (a AlertService) PageAlertConfig(req dto.PageInfo) (int64, []model.AlertConfig, error) {
+func (a AlertService) PageAlertConfig(req dto.AlertConfigPageReq) (int64, []model.AlertConfig, error) {
 	opts := []repo.DBOption{
 		alertRepo.WithByTypeNotIn([]string{"common"}),
 		repo.WithOrderDesc("created_at"),
 	}
-	if global.CONF.Base.IsEnterprise || global.CONF.Base.Edition == "intl" {
-		opts = append(opts, alertRepo.WithByTypeNotIn(hiddenAlertConfigTypes))
+	if len(req.ExcludeTypes) > 0 {
+		opts = append(opts, alertRepo.WithByTypeNotIn(req.ExcludeTypes))
 	}
 	return alertRepo.PageAlertConfig(req.Page, req.PageSize, opts...)
 }
@@ -585,7 +584,7 @@ func (a AlertService) DeleteAlertConfig(id uint) error {
 		usedAlerts = append(usedAlerts, legacyAlerts...)
 	}
 	if len(usedAlerts) > 0 {
-		return fmt.Errorf("alert config is in use")
+		return buserr.New("ErrAlertConfigInUse")
 	}
 	return alertRepo.DeleteAlertConfig(repo.WithByID(id))
 }

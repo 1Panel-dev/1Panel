@@ -390,7 +390,7 @@ import { reactive, ref, onMounted, computed } from 'vue';
 import { ElForm } from 'element-plus';
 import { Alert } from '@/api/interface/alert';
 import { listSSL, listWebsites } from '@/api/modules/website';
-import { CreateAlert, ListDisks, UpdateAlert, ListClams, ListCronJob, PageAlertConfigs } from '@/api/modules/alert';
+import { CreateAlert, ListDisks, UpdateAlert, ListClams, ListCronJob, ListAlertConfigs } from '@/api/modules/alert';
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -398,13 +398,13 @@ import { routerToName } from '@/utils/router';
 import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMaster, isProductPro, isIntl, isEE } = useGlobalStore();
+const { isMaster, isProductPro, isEE } = useGlobalStore();
 
 const alertConfigs = ref<Alert.AlertConfigInfo[]>([]);
 const loadAlertConfigs = async () => {
     try {
-        const res = await PageAlertConfigs({ page: 1, pageSize: 1000 });
-        alertConfigs.value = res.data?.items || [];
+        const res = await ListAlertConfigs();
+        alertConfigs.value = res.data?.filter((item: Alert.AlertConfigInfo) => item.type !== 'common') || [];
     } catch {}
 };
 onMounted(() => {
@@ -414,12 +414,8 @@ onMounted(() => {
 const ALL_SEND_METHOD = '__all__';
 
 const configOptions = computed(() => {
-    const hiddenTypes: string[] = [];
-    if (isIntl.value || isEE.value) {
-        hiddenTypes.push('sms');
-    }
     return alertConfigs.value
-        .filter((c) => c.type !== 'common' && !hiddenTypes.includes(c.type))
+        .filter((c) => c.type !== 'common')
         .map((c) => ({
             value: String(c.id),
             label: getConfigOptionLabel(c),

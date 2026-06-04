@@ -120,7 +120,7 @@ func isValid1PanelToken(panelToken string, panelTimestamp string, apiKey string)
 }
 
 func isIPInWhiteList(clientIP string, ipWhiteString string) bool {
-	if len(ipWhiteString) == 0 {
+	if strings.TrimSpace(ipWhiteString) == "" {
 		global.LOG.Error("IP whitelist is empty")
 		return false
 	}
@@ -136,7 +136,15 @@ func isIPInWhiteList(clientIP string, ipWhiteString string) bool {
 	iPv4 := clientParsedIP.To4()
 	iPv6 := clientParsedIP.To16()
 	for _, cidr := range ipWhiteList {
+		cidr = strings.TrimSpace(cidr)
+		if cidr == "" {
+			continue
+		}
 		if (iPv4 != nil && (cidr == "0.0.0.0" || cidr == "0.0.0.0/0" || iPv4.String() == cidr)) || (iPv6 != nil && (cidr == "::/0" || iPv6.String() == cidr)) {
+			return true
+		}
+		whiteIP := net.ParseIP(cidr)
+		if whiteIP != nil && whiteIP.Equal(clientParsedIP) {
 			return true
 		}
 		_, ipNet, err := net.ParseCIDR(cidr)

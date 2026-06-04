@@ -89,8 +89,12 @@ export const containerItemStats = (containerID: string, currentNode?: string) =>
         currentNode ? { CurrentNode: currentNode } : undefined,
     );
 };
-export const containerListStats = () => {
-    return http.get<Array<Container.ContainerListStats>>(`/containers/list/stats`);
+export const containerListStats = (currentNode?: string) => {
+    return http.get<Array<Container.ContainerListStats>>(
+        `/containers/list/stats`,
+        {},
+        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+    );
 };
 export const containerStats = (id: string) => {
     return http.get<Container.ContainerStats>(`/containers/stats/${id}`);

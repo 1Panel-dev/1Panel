@@ -137,7 +137,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
-import { PageAlertConfigs, TestAlertConfig, UpdateAlertConfig } from '@/api/modules/alert';
+import { ListAlertConfigs, TestAlertConfig, UpdateAlertConfig } from '@/api/modules/alert';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { Alert } from '@/api/interface/alert';
@@ -200,8 +200,8 @@ const alertConfigs = ref<Alert.AlertConfigInfo[]>([]);
 
 const loadAlertConfigs = async () => {
     try {
-        const res = await PageAlertConfigs({ page: 1, pageSize: 1000 });
-        alertConfigs.value = res.data?.items?.filter((item: Alert.AlertConfigInfo) => item.type !== 'common') || [];
+        const res = await ListAlertConfigs();
+        alertConfigs.value = res.data?.filter((item: Alert.AlertConfigInfo) => item.type !== 'common') || [];
     } catch {
         alertConfigs.value = [];
     }
@@ -397,7 +397,7 @@ const onTest = async (formEl: FormInstance | undefined) => {
             const testConfig = {
                 ...form.config,
                 recipient: form.recipient,
-            };
+            } as Alert.AlertConfigTest;
             const res = await TestAlertConfig(testConfig);
             loading.value = false;
             if (res.data) {
