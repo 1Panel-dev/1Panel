@@ -230,6 +230,7 @@ func HandleIPList(content string) ([]string, error) {
 	ipList := strings.Split(content, "\n")
 	var res []string
 	for _, ip := range ipList {
+		ip = strings.TrimSpace(ip)
 		if ip == "" {
 			continue
 		}

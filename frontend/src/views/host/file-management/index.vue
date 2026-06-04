@@ -205,7 +205,7 @@
                         </div>
                     </div>
                     <div class="flex w-full flex-wrap items-center justify-start gap-2 xl:w-auto xl:flex-nowrap">
-                        <div class="w-full min-w-0 sm:w-[300px]">
+                        <div class="file-search-input-shell w-full min-w-0">
                             <el-input
                                 v-model="req.search"
                                 @clear="search()"
@@ -482,26 +482,6 @@
                                     </el-button-group>
                                 </template>
                             </div>
-                            <el-button-group class="copy-button" v-if="moveOpen">
-                                <el-tooltip
-                                    class="box-item"
-                                    effect="dark"
-                                    :content="$t('file.paste')"
-                                    placement="bottom"
-                                >
-                                    <el-button v-permission plain @click="openPaste">
-                                        {{ $t('file.paste') }}({{ fileMove.count }})
-                                    </el-button>
-                                </el-tooltip>
-                                <el-tooltip
-                                    class="box-item"
-                                    effect="dark"
-                                    :content="$t('commons.button.cancel')"
-                                    placement="bottom"
-                                >
-                                    <el-button plain class="close" icon="Close" @click="closeMove"></el-button>
-                                </el-tooltip>
-                            </el-button-group>
                             <div class="flex items-center gap-2">
                                 <fu-table-column-select
                                     :columns="columns"
@@ -2663,6 +2643,12 @@ onBeforeUnmount(() => {
     min-width: 290px;
 }
 
+.file-search-input-shell {
+    flex: 1 1 320px;
+    min-width: 240px;
+    max-width: 420px;
+}
+
 .file-ai-button {
     flex-shrink: 0;
 }
@@ -2831,6 +2817,10 @@ onBeforeUnmount(() => {
     .file-ai-button {
         width: 100%;
         min-width: 0;
+    }
+
+    .file-search-input-shell {
+        max-width: none;
     }
 
     .file-batch-actions {

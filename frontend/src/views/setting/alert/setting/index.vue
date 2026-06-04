@@ -323,10 +323,18 @@ const getTypeTagType = (type: string) => {
     return map[type] || 'info';
 };
 
-const searchCommonConfig = async () => {
+const searchConfigs = async () => {
+    loading.value = true;
     try {
-        const res = await ListAlertConfigs();
-        const commonFound = res.data.find((s: Alert.AlertConfigInfo) => s.type === 'common');
+        const [configRes, pageRes] = await Promise.all([
+            ListAlertConfigs(),
+            PageAlertConfigs({
+                page: paginationConfig.currentPage,
+                pageSize: paginationConfig.pageSize,
+            }),
+        ]);
+
+        const commonFound = configRes.data?.find((s: Alert.AlertConfigInfo) => s.type === 'common');
         if (commonFound) {
             const parsedConfig = parseConfig(commonFound, defaultCommonConfig.config);
             commonConfig.value = {
@@ -347,42 +355,29 @@ const searchCommonConfig = async () => {
                 i18n.global.t('xpack.alert.resourceAlert') +
                 ': ' +
                 resourceTimeRange;
+        } else {
+            commonConfig.value = { ...defaultCommonConfig };
+            sendTimeRangeValue.value = commonConfig.value.config.alertSendTimeRange;
+            sendTimeRange.value = commonConfig.value.config.alertSendTimeRange;
         }
         isInitialized.value = true;
-    } catch {}
-};
 
-const searchConfigs = async () => {
-    loading.value = true;
-    try {
-        const res = await PageAlertConfigs({
-            page: paginationConfig.currentPage,
-            pageSize: paginationConfig.pageSize,
-        });
-        allConfigs.value = res.data.items || [];
-        paginationConfig.total = res.data.total || 0;
+        allConfigs.value = pageRes.data?.items || [];
+        paginationConfig.total = pageRes.data?.total || 0;
     } catch {
-        try {
-            const res = await ListAlertConfigs();
-            allConfigs.value = res.data.filter((s: Alert.AlertConfigInfo) => s.type !== 'common');
-            paginationConfig.total = allConfigs.value.length;
-        } catch {}
+        allConfigs.value = [];
+        paginationConfig.total = 0;
     } finally {
         loading.value = false;
     }
 };
 
 const search = async () => {
-    loading.value = true;
-    try {
-        await Promise.all([searchCommonConfig(), searchConfigs()]);
-    } finally {
-        loading.value = false;
-    }
+    await searchConfigs();
 };
 
 const onDrawerSearch = () => {
-    searchConfigs();
+    void searchConfigs();
 };
 
 const onChangeCommon = (id: any) => {
@@ -418,7 +413,7 @@ const onChangeOffline = async () => {
                     config.value.config = JSON.stringify(commonConfig.value.config);
                     await UpdateAlertConfig(config.value);
                     loading.value = false;
-                    await search();
+                    await searchConfigs();
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 } catch {
                     loading.value = false;
@@ -494,7 +489,7 @@ const buttons = computed(() => [
 ]);
 
 onMounted(async () => {
-    await search();
+    await searchConfigs();
 });
 </script>
 

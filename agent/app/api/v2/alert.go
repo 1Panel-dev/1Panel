@@ -243,7 +243,11 @@ func (b *BaseApi) GetCronJobs(c *gin.Context) {
 // @Security Timestamp
 // @Router /alert/config/info [post]
 func (b *BaseApi) GetAlertConfig(c *gin.Context) {
-	config, err := alertService.GetAlertConfig()
+	var req dto.AlertConfigQuery
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	config, err := alertService.GetAlertConfig(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -254,13 +258,13 @@ func (b *BaseApi) GetAlertConfig(c *gin.Context) {
 // @Tags Alert
 // @Summary Page alert config
 // @Accept json
-// @Param request body dto.PageInfo true "request"
+// @Param request body dto.AlertConfigPageReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /alert/config/search [post]
 func (b *BaseApi) PageAlertConfig(c *gin.Context) {
-	var req dto.PageInfo
+	var req dto.AlertConfigPageReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}

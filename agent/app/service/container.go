@@ -297,14 +297,14 @@ func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error
 	if err != nil {
 		return nil, err
 	}
-	var datas []dto.ContainerListStats
+	datas := make([]dto.ContainerListStats, len(list))
 	var wg sync.WaitGroup
 	wg.Add(len(list))
 	for i := 0; i < len(list); i++ {
-		go func(item container.Summary) {
-			datas = append(datas, loadCpuAndMem(client, item.ID))
+		go func(index int, item container.Summary) {
+			datas[index] = loadCpuAndMem(client, item.ID)
 			wg.Done()
-		}(list[i])
+		}(i, list[i])
 	}
 	wg.Wait()
 	return datas, nil

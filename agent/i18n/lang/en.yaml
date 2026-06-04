@@ -74,6 +74,7 @@ ErrBackupInUsed: 'Backup account is in use by a scheduled task'
 ErrBackupCheck: 'Backup account connectivity test failed: {{ .err }}'
 ErrBackupLocalDelete: 'Local backup accounts cannot be deleted'
 ErrBackupLocalCreate: 'Local backup accounts cannot be created'
+ErrAlertConfigInUse: 'Alert configuration is in use and cannot be deleted'
 
 #app
 ErrPortInUsed: '{{ .detail }} port is already occupied!'

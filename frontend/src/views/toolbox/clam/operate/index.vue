@@ -121,17 +121,7 @@
                             </el-input>
                         </div>
                     </el-form-item>
-                    <div v-if="isIntl">
-                        <el-form-item v-if="dialogData.rowData!.hasSpec && !isProductPro">
-                            <span class="input-help logText">
-                                {{ $t('toolbox.clam.alertHelper') }}
-                                <el-link class="link" type="primary" @click="toUpload">
-                                    {{ $t('license.levelUpPro') }}
-                                </el-link>
-                            </span>
-                        </el-form-item>
-                    </div>
-                    <div v-if="!isIntl">
+                    <div>
                         <el-form-item prop="hasAlert">
                             <el-checkbox v-model="dialogData.rowData!.hasAlert" :label="$t('xpack.alert.isAlert')" />
                             <span class="input-help">{{ $t('xpack.alert.clamHelper') }}</span>
@@ -247,13 +237,13 @@ import { Alert } from '@/api/interface/alert';
 import { ListAlertConfigs } from '@/api/modules/alert';
 import { specOptions, transObjToSpec, transSpecToObj, weekOptions } from '@/views/cronjob/cronjob/helper';
 import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/validate';
-const { isIntl, isProductPro, isEE } = useGlobalStore();
+const { isProductPro } = useGlobalStore();
 
 const alertConfigs = ref<Alert.AlertConfigInfo[]>([]);
 const loadAlertConfigs = async () => {
     try {
         const res = await ListAlertConfigs();
-        alertConfigs.value = res.data || [];
+        alertConfigs.value = res.data?.filter((item: Alert.AlertConfigInfo) => item.type !== 'common') || [];
     } catch {}
 };
 onMounted(() => {
@@ -261,10 +251,8 @@ onMounted(() => {
 });
 
 const alertConfigOptions = computed(() => {
-    const hiddenTypes: string[] = [];
-    if (isIntl.value || isEE.value) hiddenTypes.push('sms');
     return alertConfigs.value
-        .filter((c) => c.status === 'Enable' && c.type !== 'common' && !hiddenTypes.includes(c.type))
+        .filter((c) => c.status === 'Enable' && c.type !== 'common')
         .map((c) => ({
             value: String(c.id),
             label: getAlertConfigOptionLabel(c),

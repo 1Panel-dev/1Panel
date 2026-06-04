@@ -35,6 +35,15 @@ type AlertSearch struct {
 	Method  string `json:"method"`
 }
 
+type AlertConfigQuery struct {
+	ExcludeTypes []string `json:"excludeTypes"`
+}
+
+type AlertConfigPageReq struct {
+	PageInfo
+	ExcludeTypes []string `json:"excludeTypes"`
+}
+
 type AlertDTO struct {
 	ID             uint      `json:"id"`
 	Type           string    `json:"type"`

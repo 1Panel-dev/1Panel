@@ -201,6 +201,7 @@ var WebUrlMap = map[string]struct{}{
 	"/enterprise/ops-report/website":  {},
 	"/enterprise/ops-report/resource": {},
 	"/enterprise/ops-report/cronjob":  {},
+	"/enterprise/ops-report/alert":    {},
 	"/enterprise/ops-report/history":  {},
 	"/enterprise/ops-report/settings": {},
 }
