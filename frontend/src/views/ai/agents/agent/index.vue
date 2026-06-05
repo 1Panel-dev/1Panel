@@ -7,6 +7,7 @@
                 <el-button v-permission type="primary" @click="openCreate" :disabled="noApp">
                     {{ $t('commons.button.create') }}
                 </el-button>
+                <EnterpriseBatchInstall @success="search" @task="openTaskLog" />
             </template>
             <template #rightToolBar>
                 <TableSearch v-model:searchName="searchName" @search="search" />
@@ -35,7 +36,14 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="120">
                         <template #default="{ row }">
-                            <el-dropdown placement="bottom">
+                            <Status
+                                v-if="isAgentTaskRunning(row)"
+                                v-permission
+                                :status="row.status"
+                                class="cursor-pointer"
+                                @click="openLog(row)"
+                            />
+                            <el-dropdown v-else placement="bottom">
                                 <Status v-permission :status="row.status" :operate="true" />
                                 <template #dropdown>
                                     <el-dropdown-menu>
@@ -221,7 +229,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { defineAsyncComponent, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { deleteAgentCheck, pageAgents, resetAgentToken, unbindAgentWebsite, updateAgentRemark } from '@/api/modules/ai';
 import { checkAppInstalled, installedOp, searchApp, searchAppInstalled } from '@/api/modules/app';
@@ -260,7 +268,12 @@ import openclawIcon from '@/assets/images/ai-agent-openclaw.svg';
 import copawIcon from '@/assets/images/ai-agent-copaw.svg';
 import hermesIcon from '@/assets/images/ai-agent-hermes-agent.svg';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { loadOptionalComponent } from '@/extensions/optional';
 import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
+
+const EnterpriseBatchInstall = defineAsyncComponent(() =>
+    loadOptionalComponent('/src/enterprise/views/ai/agents/batch-install/index.vue'),
+);
 
 const items = ref<AI.AgentItem[]>([]);
 const loading = ref(false);
@@ -448,6 +461,11 @@ const openTaskLog = (taskID: string) => {
     }
 };
 
+const isAgentTaskRunning = (row: AI.AgentItem) => {
+    const status = row.status?.toLowerCase();
+    return status === 'installing' || status === 'upgrading';
+};
+
 const checkStatus = (operate: string, row: AI.AgentItem) => {
     const status = row.status.toLowerCase();
     switch (operate) {
@@ -480,6 +498,10 @@ const onOperate = async (row: AI.AgentItem, operate: string) => {
 const openLog = (row: AI.AgentItem) => {
     if (row.status === 'Installing') {
         taskLogRef.value?.openWithResourceID('App', 'TaskInstall', row.appInstallId);
+        return;
+    }
+    if (row.status === 'Upgrading') {
+        taskLogRef.value?.openWithResourceID('App', 'TaskUpgrade', row.appInstallId);
         return;
     }
     composeLogRef.value?.acceptParams({

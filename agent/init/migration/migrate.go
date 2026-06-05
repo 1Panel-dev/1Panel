@@ -75,6 +75,7 @@ func InitAgentDB() {
 		migrations.NormalizeAgentAccountVerifiedStatus,
 		migrations.NormalizeOllamaAccountAPIType,
 		migrations.InitAgentAccountModelPool,
+		migrations.AddAgentAccountMasterID,
 		migrations.AddHostTable,
 		migrations.AddAITerminalSettings,
 		migrations.UpdateAgentQuickJumpTitle,

@@ -56,6 +56,7 @@ import { readTaskLogByLine } from '@/api/modules/log';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import bus from '@/global/bus';
 import Highlight from '@/components/log/custom-highlight/index.vue';
+import { translateTaskText } from '@/utils/task';
 const { currentNode } = useGlobalStore();
 
 interface LogProps {
@@ -304,7 +305,7 @@ const getContent = async (pre: boolean) => {
                 return String.fromCharCode(parseInt(grp, 16));
             }),
         );
-        const newLogs = res.data.lines;
+        const newLogs = res.data.lines.map((line) => translateTaskText(line));
         if (tailLog.value && newLogs.length === readReq.pageSize && readReq.page < res.data.total) {
             readReq.page++;
         }

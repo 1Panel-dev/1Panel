@@ -17,7 +17,11 @@
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="370">
-                    <el-table-column :label="$t('logs.taskName')" prop="name" min-width="180px"></el-table-column>
+                    <el-table-column :label="$t('logs.taskName')" prop="name" min-width="180px">
+                        <template #default="{ row }">
+                            {{ translateTaskText(row.name) }}
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status" max-width="100px">
                         <template #default="{ row }">
                             <Status :status="row.status" :msg="row.errorMsg" />
@@ -52,6 +56,7 @@ import { onMounted, reactive, ref } from 'vue';
 import { Log } from '@/api/interface/log';
 import TaskLog from '@/components/log/task/index.vue';
 import bus from '@/global/bus';
+import { translateTaskText } from '@/utils/task';
 
 const loading = ref();
 const data = ref();
