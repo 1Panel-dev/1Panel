@@ -663,15 +663,7 @@ const getSetting = async () => {
     } catch (error) {}
 };
 
-onMounted(() => {
-    isOnRestart.value = false;
-    passkeySupported.value = !!window.PublicKeyCredential && window.isSecureContext;
-    getSetting();
-    getXpackSettingForTheme();
-    if (!ignoreCaptcha.value) {
-        loginVerify();
-    }
-    document.title = themeConfig.value.panelName;
+const applyLoginButtonTheme = () => {
     loginBtnLinkColor.value = themeConfig.value.loginBtnLinkColor || '#005eeb';
     document.documentElement.style.setProperty('--login-btn-link-color', loginBtnLinkColor.value);
     document.documentElement.style.setProperty(
@@ -682,6 +674,23 @@ onMounted(() => {
         '--login-loading-mask-color',
         adjustColorToRGBA(loginBtnLinkColor.value, 30, 15),
     );
+};
+
+onMounted(async () => {
+    isOnRestart.value = false;
+    passkeySupported.value = !!window.PublicKeyCredential && window.isSecureContext;
+    applyLoginButtonTheme();
+    await getSetting();
+    try {
+        await getXpackSettingForTheme();
+    } catch (error) {
+        // 即使获取失败也不影响登录，默认为之前的主题配置
+    }
+    applyLoginButtonTheme();
+    if (!ignoreCaptcha.value) {
+        loginVerify();
+    }
+    document.title = themeConfig.value.panelName;
     nextTick(() => {
         userNameRef.value?.focus();
     });

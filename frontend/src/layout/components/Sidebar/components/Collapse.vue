@@ -67,8 +67,11 @@
                         </div>
                     </el-scrollbar>
                     <div v-if="showMoreNodes" class="dropdown-item more-node-button" @click.stop="openNodeDrawer">
-                        <span>{{ $t('tabs.more') }}...</span>
-                        <span class="more-node-count">{{ nodeOptions.length - defaultNodeLimit }}</span>
+                        <span class="more-node-label">{{ $t('tabs.more') }}</span>
+                        <span class="more-node-count">+{{ nodeOptions.length - defaultNodeLimit }}</span>
+                        <el-icon class="more-node-arrow">
+                            <ArrowRight />
+                        </el-icon>
                     </div>
                 </div>
                 <el-divider class="divider" />
@@ -381,23 +384,33 @@ onMounted(() => {
     white-space: nowrap;
 }
 .more-node-button {
-    padding-left: 34px;
+    margin: 4px 8px 0;
+    padding: 5px 8px 5px 26px;
+    border-radius: 4px;
     color: var(--el-color-primary);
+    font-size: 12px;
+    line-height: 24px;
+}
+.more-node-label {
+    flex: 1;
+    min-width: 0;
 }
 .more-node-count {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 20px;
+    min-width: 24px;
     height: 18px;
-    padding: 0 6px;
+    padding: 0 7px;
     border-radius: 9px;
     color: var(--el-color-primary);
-    background: var(--el-color-primary-light-9);
     line-height: 18px;
+    font-size: 12px;
+    font-weight: 500;
 }
-.dropdown-item:hover {
-    background: var(--el-menu-item-bg-color-active);
+.more-node-arrow {
+    margin-left: 2px;
+    font-size: 12px;
 }
 .ellipsis-text {
     display: inline-block;
