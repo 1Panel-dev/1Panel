@@ -1,6 +1,7 @@
 package captcha
 
 import (
+	"image/color"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
@@ -8,6 +9,16 @@ import (
 )
 
 var store = base64Captcha.DefaultMemStore
+
+const (
+	captchaWidth  = 160
+	captchaHeight = 48
+	captchaNoise  = 0
+)
+
+var captchaFonts = []string{
+	base64Captcha.FontRitaSmith,
+}
 
 func VerifyCode(codeID string, code string) string {
 	vv := store.Get(codeID, true)
@@ -23,14 +34,15 @@ func VerifyCode(codeID string, code string) string {
 }
 
 func CreateCaptcha() (*dto.CaptchaResponse, error) {
-	var driverString base64Captcha.DriverString
-	driverString.Source = "1234567890QWERTYUPLKJHGFDSAZXCVBNMqwertyupkjhgfdsazxcvbnm"
-	driverString.Width = 120
-	driverString.Height = 50
-	driverString.NoiseCount = 0
-	driverString.Length = 4
-	driverString.Fonts = []string{"RitaSmith.ttf", "actionj.ttf", "chromohv.ttf"}
-	driver := driverString.ConvertFonts()
+	driver := base64Captcha.NewDriverMath(
+		captchaHeight,
+		captchaWidth,
+		captchaNoise,
+		0,
+		&color.RGBA{R: 246, G: 248, B: 251, A: 255},
+		nil,
+		captchaFonts,
+	)
 	c := base64Captcha.NewCaptcha(driver, store)
 	id, b64s, _, err := c.Generate()
 	if err != nil {
