@@ -212,6 +212,7 @@ export namespace Alert {
         title: string;
         status: string;
         config: {
+            displayName?: string;
             phone?: string;
             alertDailyNum?: number;
         };
