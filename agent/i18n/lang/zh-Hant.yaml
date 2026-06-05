@@ -6,6 +6,8 @@ ErrFileAINotEnabled: '請先在檔案管理頁透過「AI 帳號」啟用檔案 
 ErrFileAISearchBadPattern: '搜尋條件無效（正則或全詞）: {{ .detail }}'
 ErrWgetRemoteFailed: '遠端下載網址無效或無法存取：{{ .detail }}'
 ErrWgetInvalidContentType: '遠端網址未回傳檔案內容（可能是錯誤頁），{{ .detail }}'
+ErrWgetProxyNotConfigured: '請先在面板設定中設定代理伺服器'
+ErrWgetProxyInvalid: '代理伺服器位址無效：{{ .detail }}'
 ErrRecordExist: '記錄已存在'
 ErrRecordNotFound: '記錄未能找到'
 ErrStructTransform: '型別轉換失敗: {{ .err }}'

@@ -2326,6 +2326,8 @@ const message = {
         ignoreCertificate: '不安定なサーバー接続を許可します',
         ignoreCertificateHelper:
             '不安定なサーバー接続を可能にすると、データが漏れたり改ざんしたりする可能性があります。ダウンロードソースを信頼する場合にのみ、このオプションを使用します。',
+        useProxy: 'プロキシでダウンロード',
+        useProxyHelper: 'パネル設定のプロキシサーバーを使用してリモート URL にアクセスします',
         uploadOverLimit: 'ファイルの数は1000を超えています！圧縮してアップロードしてください',
         clashDidNotSupport: 'ファイル名は、.1panel_clashを含むことを禁止されています',
         clashDeleteAlert: '「リサイクルビン」フォルダーを削除することはできません',

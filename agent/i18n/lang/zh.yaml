@@ -6,6 +6,8 @@ ErrFileAINotEnabled: "生成 AI 总结需在文件管理中启用并保存文件
 ErrFileAISearchBadPattern: "搜索条件无效（正则或全词匹配）: {{ .detail }}"
 ErrWgetRemoteFailed: "远程下载地址无效或无法访问：{{ .detail }}"
 ErrWgetInvalidContentType: "远程地址返回的不是文件内容（可能是错误页），{{ .detail }}"
+ErrWgetProxyNotConfigured: "请先在面板设置中配置代理服务器"
+ErrWgetProxyInvalid: "代理服务器地址无效：{{ .detail }}"
 ErrRecordExist: "记录已存在"
 ErrRecordNotFound: "记录不存在"
 ErrStructTransform: "类型转换失败: {{ .err }}"

@@ -2302,6 +2302,8 @@ const message = {
         ignoreCertificate: 'Allow insecure server connections',
         ignoreCertificateHelper:
             'Allowing inscure server connections may lead to data leak or tampering. Use this option only when trusting the download source.',
+        useProxy: 'Use proxy for download',
+        useProxyHelper: 'Use the proxy server configured in panel settings to access the remote download URL',
         uploadOverLimit: 'The number of files exceeds 1000! Please compress and upload',
         clashDidNotSupport: 'File names are prohibited from containing .1panel_clash',
         clashDeleteAlert: 'The "Recycle Bin" folder can\'t be deleted',

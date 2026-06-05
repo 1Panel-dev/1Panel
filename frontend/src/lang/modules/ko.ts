@@ -2284,6 +2284,8 @@ const message = {
         ignoreCertificate: '안전하지 않은 서버 연결 허용',
         ignoreCertificateHelper:
             '안전하지 않은 서버 연결을 허용하면 데이터 유출 또는 변조가 발생할 수 있습니다. 이 옵션은 다운로드 소스를 신뢰할 때만 사용하세요.',
+        useProxy: '프록시로 다운로드',
+        useProxyHelper: '패널 설정의 프록시 서버로 원격 다운로드 주소에 접근합니다',
         uploadOverLimit: '파일 수가 1000 개를 초과했습니다! 압축하여 업로드하세요.',
         clashDidNotSupport: '파일 이름에 .1panel_clash 를 포함할 수 없습니다.',
         clashDeleteAlert: '"휴지통" 폴더는 삭제할 수 없습니다.',

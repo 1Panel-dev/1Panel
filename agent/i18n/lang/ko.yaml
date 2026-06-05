@@ -6,6 +6,8 @@ ErrFileAINotEnabled: '파일 관리에서 「AI 계정」으로 파일 AI 검색
 ErrFileAISearchBadPattern: '검색 패턴이 잘못되었습니다(정규식 등): {{ .detail }}'
 ErrWgetRemoteFailed: '원격 다운로드 주소가 잘못되었거나 접근할 수 없습니다: {{ .detail }}'
 ErrWgetInvalidContentType: '원격 주소가 파일이 아닌 콘텐츠를 반환했습니다 (오류 페이지일 수 있음), {{ .detail }}'
+ErrWgetProxyNotConfigured: '먼저 패널 설정에서 프록시 서버를 구성하세요'
+ErrWgetProxyInvalid: '프록시 서버 주소가 잘못되었습니다: {{ .detail }}'
 ErrRecordExist: '레코드가 이미 있습니다'
 ErrRecordNotFound: '레코드를 찾을 수 없습니다'
 ErrStructTransform: '형 변환 실패: {{ .err }}'

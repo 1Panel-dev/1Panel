@@ -6,6 +6,8 @@ ErrFileAINotEnabled: 'Поиск с AI в файлах выключен или �
 ErrFileAISearchBadPattern: 'Недопустимый шаблон поиска (regex и т.п.): {{ .detail }}'
 ErrWgetRemoteFailed: 'Неверный или недоступный URL удалённой загрузки: {{ .detail }}'
 ErrWgetInvalidContentType: 'Удалённый сервер вернул не файл (возможно, страницу ошибки), {{ .detail }}'
+ErrWgetProxyNotConfigured: 'Сначала настройте прокси-сервер в настройках панели'
+ErrWgetProxyInvalid: 'Недопустимый адрес прокси-сервера: {{ .detail }}'
 ErrRecordExist: 'Запись уже существует'
 ErrRecordNotFound: 'Запись не найдена'
 ErrStructTransform: 'Ошибка преобразования: {{ .err }}'

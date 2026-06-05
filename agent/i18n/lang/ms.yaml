@@ -6,6 +6,8 @@ ErrFileAINotEnabled: 'Carian AI fail dimatikan atau tiada akaun. Dalam Pengurusa
 ErrFileAISearchBadPattern: 'Corak carian tidak sah (regex dsb.): {{ .detail }}'
 ErrWgetRemoteFailed: 'Muat turun jauh gagal atau URL tidak boleh diakses: {{ .detail }}'
 ErrWgetInvalidContentType: 'URL jauh tidak mengembalikan fail (mungkin halaman ralat), {{ .detail }}'
+ErrWgetProxyNotConfigured: 'Sila konfigurasikan pelayan proksi dalam tetapan panel dahulu'
+ErrWgetProxyInvalid: 'Alamat pelayan proksi tidak sah: {{ .detail }}'
 ErrRecordExist: 'Rekod sudah wujud'
 ErrRecordNotFound: 'Rekod tidak ditemui'
 ErrStructTransform: 'Ralat penukaran: {{ .err }}'

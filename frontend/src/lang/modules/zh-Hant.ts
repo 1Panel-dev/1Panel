@@ -2191,6 +2191,8 @@ const message = {
         ignoreCertificate: '忽略不可信憑證',
         ignoreCertificateHelper:
             '下載時忽略不可信憑證可能導致資料洩露或篡改。請謹慎使用此選項，僅在信任下載源的情況下啟用',
+        useProxy: '使用代理下載',
+        useProxyHelper: '使用面板設定中的代理伺服器存取遠端下載網址',
         uploadOverLimit: '檔案數量超過 1000請壓縮後上傳',
         clashDidNotSupport: '檔名禁止包含 .1panel_clash',
         clashDeleteAlert: '回收站資料夾不能刪除',

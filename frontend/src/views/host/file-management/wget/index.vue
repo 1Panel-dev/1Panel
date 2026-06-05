@@ -22,6 +22,12 @@
                 <el-input v-model="addForm.name"></el-input>
             </el-form-item>
             <el-form-item>
+                <el-checkbox v-model="addForm.useProxy">
+                    {{ $t('file.useProxy') }}
+                </el-checkbox>
+                <span class="input-help">{{ $t('file.useProxyHelper') }}</span>
+            </el-form-item>
+            <el-form-item>
                 <el-checkbox v-model="addForm.ignoreCertificate">
                     {{ $t('file.ignoreCertificate') }}
                 </el-checkbox>
@@ -88,6 +94,7 @@ const addForm = reactive({
     path: '',
     name: '',
     ignoreCertificate: false,
+    useProxy: false,
 });
 
 const em = defineEmits(['close']);
@@ -136,6 +143,7 @@ const acceptParams = (props: WgetProps) => {
     open.value = true;
     submitData.value = false;
     addForm.ignoreCertificate = false;
+    addForm.useProxy = false;
 };
 
 defineExpose({ acceptParams });

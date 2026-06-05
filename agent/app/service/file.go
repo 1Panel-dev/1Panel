@@ -830,7 +830,23 @@ func (f *FileService) ChangeName(req request.FileRename) error {
 func (f *FileService) Wget(w request.FileWget) (string, error) {
 	fo := files.NewFileOp()
 	key := "file-wget-" + common.GetUuid()
-	return key, fo.DownloadFileWithProcess(w.Url, filepath.Join(w.Path, w.Name), key, w.IgnoreCertificate)
+	options := files.DownloadOptions{
+		IgnoreCertificate: w.IgnoreCertificate,
+	}
+	if w.UseProxy {
+		systemProxy, err := NewISettingService().GetSystemProxy()
+		if err != nil {
+			return "", err
+		}
+		options.Proxy = &files.DownloadProxyConfig{
+			Type:     systemProxy.Type,
+			URL:      systemProxy.URL,
+			Port:     systemProxy.Port,
+			User:     systemProxy.User,
+			Password: systemProxy.Password,
+		}
+	}
+	return key, fo.DownloadFileWithProcess(w.Url, filepath.Join(w.Path, w.Name), key, options)
 }
 
 func (f *FileService) MvFile(m request.FileMove) error {

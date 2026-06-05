@@ -6,6 +6,8 @@ ErrFileAINotEnabled: 'Dosya yönetimi AI araması kapalı veya hesap yok. Dosya 
 ErrFileAISearchBadPattern: 'Geçersiz arama deseni (regex vb.): {{ .detail }}'
 ErrWgetRemoteFailed: 'Uzak indirme başarısız veya URL erişilemiyor: {{ .detail }}'
 ErrWgetInvalidContentType: 'Uzak URL bir dosya değil, muhtemelen bir hata sayfası döndürdü, {{ .detail }}'
+ErrWgetProxyNotConfigured: 'Önce panel ayarlarında bir proxy sunucusu yapılandırın'
+ErrWgetProxyInvalid: 'Proxy sunucusu adresi geçersiz: {{ .detail }}'
 ErrRecordExist: 'Kayıt zaten var'
 ErrRecordNotFound: 'Kayıt bulunamadı'
 ErrStructTransform: 'Dönüşüm hatası: {{ .err }}'

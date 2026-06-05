@@ -2476,6 +2476,8 @@ const message = {
         ignoreCertificate: 'Permitir conexões inseguras com o servidor',
         ignoreCertificateHelper:
             'Permitir conexões inseguras com o servidor pode levar a vazamento ou adulteração de dados. Use esta opção apenas quando confiar na fonte de download.',
+        useProxy: 'Baixar via proxy',
+        useProxyHelper: 'Usar o servidor proxy configurado no painel para acessar a URL remota',
         uploadOverLimit: 'O número de arquivos excede 1000! Por favor, compacte e envie novamente',
         clashDidNotSupport: 'Os nomes de arquivos são proibidos de conter .1panel_clash',
         clashDeleteAlert: 'A pasta "Lixeira" não pode ser excluída',
