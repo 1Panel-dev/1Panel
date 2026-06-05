@@ -34,15 +34,6 @@
     white-space: nowrap;
 }
 
-html.dark .fu-table-operations {
-    --fu-table-operations-disabled-color: var(--panel-main-bg-color-4);
-}
-
-.fu-table-operations__button.is-link.is-disabled,
-.fu-table-operations__button.is-link.is-disabled:hover {
-    color: var(--fu-table-operations-disabled-color);
-}
-
 .fu-table-more-button {
     display: inline-flex;
 }

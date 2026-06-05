@@ -219,6 +219,7 @@ watch(
 .node-grid {
     display: grid;
     grid-template-columns: 1fr;
+    align-content: start;
     gap: 8px;
     flex: 1;
     min-height: 0;

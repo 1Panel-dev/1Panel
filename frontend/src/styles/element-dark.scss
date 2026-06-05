@@ -290,8 +290,11 @@ html.dark {
         background: var(--panel-main-bg-color-9);
     }
 
-    .el-button--primary.is-link.is-disabled {
-        color: var(--panel-main-bg-color-8);
+    .el-button--primary.is-link.is-disabled,
+    .el-button--primary.is-link.is-disabled:hover,
+    .el-button--primary.is-link.is-disabled:focus,
+    .el-button--primary.is-link.is-disabled:active {
+        color: var(--panel-main-bg-color-6);
     }
 
     .el-dropdown-menu__item:hover {
