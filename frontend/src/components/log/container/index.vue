@@ -215,8 +215,19 @@ const initTerminal = () => {
         fontWeight: '500',
         lineHeight: 1.2,
         theme: {
-            background: '#1e1e1e',
-            foreground: '#666666',
+            background: '#111827',
+            foreground: '#e5e7eb',
+            cursor: '#e5e7eb',
+            black: '#111827',
+            brightBlack: '#6b7280',
+            red: '#f87171',
+            green: '#34d399',
+            yellow: '#fbbf24',
+            blue: '#60a5fa',
+            magenta: '#c084fc',
+            cyan: '#22d3ee',
+            white: '#e5e7eb',
+            brightWhite: '#f9fafb',
             selectionBackground: 'rgba(102, 178, 255, 0.30)',
             selectionInactiveBackground: 'rgba(102, 178, 255, 0.20)',
         },
@@ -405,7 +416,10 @@ onUnmounted(() => {
     height: calc(100vh - var(--custom-height, 320px));
     overflow: hidden;
     position: relative;
-    background-color: #1e1e1e;
+    background-color: #111827;
+    border: 1px solid #374151;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
     margin-top: 10px;
 }
 
@@ -415,6 +429,10 @@ onUnmounted(() => {
 }
 
 :deep(.xterm) {
-    padding: 2px !important;
+    padding: 6px 8px !important;
+}
+
+:deep(.xterm-viewport) {
+    background-color: #111827 !important;
 }
 </style>
