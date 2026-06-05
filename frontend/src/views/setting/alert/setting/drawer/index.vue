@@ -76,15 +76,15 @@
                     </template>
 
                     <template v-else-if="form.type === 'sms'">
-                        <el-form-item :label="$t('xpack.alert.phone')" prop="smsPhone" :rules="[Rules.phone]">
-                            <el-input clearable v-model="form.smsPhone" />
+                        <el-form-item :label="$t('xpack.alert.displayName')" prop="smsDisplayName">
+                            <el-input v-model.trim="form.smsDisplayName" />
+                            <span class="input-help">{{ $t('xpack.alert.displayNameHelper') }}</span>
+                        </el-form-item>
+                        <el-form-item :label="$t('xpack.alert.phone')" prop="smsPhone">
+                            <el-input clearable v-model.trim="form.smsPhone" />
                             <span class="input-help">{{ $t('xpack.alert.phoneHelper') }}</span>
                         </el-form-item>
-                        <el-form-item
-                            :label="$t('xpack.alert.dailyAlertNum')"
-                            prop="smsDailyAlertNum"
-                            :rules="[Rules.integerNumber, checkNumberRange(20, 100)]"
-                        >
+                        <el-form-item :label="$t('xpack.alert.dailyAlertNum')" prop="smsDailyAlertNum">
                             <el-input clearable v-model.number="form.smsDailyAlertNum" min="20" max="100" />
                             <span class="input-help">{{ $t('xpack.alert.dailyAlertNumHelper') }}</span>
                         </el-form-item>
@@ -154,6 +154,12 @@ const emailRules = {
     recipient: [Rules.requiredInput],
 };
 
+const smsRules = {
+    smsDisplayName: [Rules.requiredInput, { validator: checkSmsDisplayNameDuplicate, trigger: 'blur' }],
+    smsPhone: [Rules.requiredInput, Rules.phone, { validator: checkPhoneDuplicate, trigger: 'blur' }],
+    smsDailyAlertNum: [Rules.integerNumber, checkNumberRange(20, 100)],
+};
+
 const webhookRules = {
     webhookName: [Rules.requiredInput, { validator: checkDisplayNameDuplicate, trigger: 'blur' }],
     webhookUrl: [Rules.requiredInput],
@@ -161,7 +167,7 @@ const webhookRules = {
 
 const currentRules = computed(() => {
     if (form.type === 'email') return emailRules;
-    if (form.type === 'sms') return {};
+    if (form.type === 'sms') return smsRules;
     return webhookRules;
 });
 
@@ -199,11 +205,14 @@ const formRef = ref<FormInstance>();
 const alertConfigs = ref<Alert.AlertConfigInfo[]>([]);
 
 const loadAlertConfigs = async () => {
+    loading.value = true;
     try {
         const res = await ListAlertConfigs();
         alertConfigs.value = res.data?.filter((item: Alert.AlertConfigInfo) => item.type !== 'common') || [];
     } catch {
         alertConfigs.value = [];
+    } finally {
+        loading.value = false;
     }
 };
 
@@ -217,6 +226,7 @@ const form = reactive({
     recipient: '',
     webhookName: '',
     webhookUrl: '',
+    smsDisplayName: '',
     smsPhone: '',
     smsDailyAlertNum: 50,
 });
@@ -260,6 +270,66 @@ function checkDisplayNameDuplicate(_rule: unknown, value: string, callback: (err
     callback();
 }
 
+function checkSmsDisplayNameDuplicate(_rule: unknown, value: string, callback: (error?: Error) => void) {
+    const currentValue = normalizeDisplayName(value);
+    if (!currentValue) {
+        callback();
+        return;
+    }
+
+    const duplicated = alertConfigs.value.some((item) => {
+        if (item.type !== 'sms') {
+            return false;
+        }
+        if (form.id && item.id === form.id) {
+            return false;
+        }
+        try {
+            const config = JSON.parse(item.config || '{}') as { displayName?: string };
+            return normalizeDisplayName(config.displayName) === currentValue;
+        } catch {
+            return false;
+        }
+    });
+
+    if (duplicated) {
+        callback(new Error(i18n.global.t('commons.rule.duplicate')));
+        return;
+    }
+
+    callback();
+}
+
+function checkPhoneDuplicate(_rule: unknown, value: string, callback: (error?: Error) => void) {
+    const currentValue = normalizeDisplayName(value);
+    if (!currentValue) {
+        callback();
+        return;
+    }
+
+    const duplicated = alertConfigs.value.some((item) => {
+        if (item.type !== 'sms') {
+            return false;
+        }
+        if (form.id && item.id === form.id) {
+            return false;
+        }
+        try {
+            const config = JSON.parse(item.config || '{}') as { phone?: string };
+            return normalizeDisplayName(config.phone) === currentValue;
+        } catch {
+            return false;
+        }
+    });
+
+    if (duplicated) {
+        callback(new Error(i18n.global.t('commons.rule.duplicate')));
+        return;
+    }
+
+    callback();
+}
+
 const titleMap: Record<string, string> = {
     email: 'xpack.alert.emailConfig',
     weCom: 'xpack.alert.weCom',
@@ -290,6 +360,7 @@ const acceptParams = (params: DrawerProps): void => {
             form.config = { ...defaultEmailForm, ...(params.config || {}) };
             form.recipient = params.config?.recipient || '';
         } else if (form.type === 'sms') {
+            form.smsDisplayName = params.config?.displayName || '';
             form.smsPhone = params.config?.phone || '';
             form.smsDailyAlertNum = params.config?.alertDailyNum || 50;
         } else {
@@ -305,6 +376,7 @@ const acceptParams = (params: DrawerProps): void => {
         form.updateUser = '';
         form.config = { ...defaultEmailForm };
         form.recipient = '';
+        form.smsDisplayName = '';
         form.webhookName = '';
         form.webhookUrl = '';
         form.smsPhone = '';
@@ -322,6 +394,7 @@ const onTypeChange = (type: string) => {
         form.config = { ...defaultEmailForm };
         form.recipient = '';
     } else if (type === 'sms') {
+        form.smsDisplayName = '';
         form.smsPhone = '';
         form.smsDailyAlertNum = 50;
     } else {
@@ -348,7 +421,11 @@ const buildSavePayload = () => {
         };
     }
     if (form.type === 'sms') {
-        const configInfo = { phone: form.smsPhone, alertDailyNum: form.smsDailyAlertNum };
+        const configInfo = {
+            displayName: form.smsDisplayName,
+            phone: form.smsPhone,
+            alertDailyNum: form.smsDailyAlertNum,
+        };
         return {
             id: form.id,
             type: 'sms',
@@ -428,6 +505,15 @@ watch(
     () => {
         if (form.type === 'email') {
             isOK.value = false;
+        }
+    },
+);
+
+watch(
+    () => [form.smsDisplayName, form.smsPhone, form.smsDailyAlertNum],
+    () => {
+        if (form.type === 'sms') {
+            formRef.value?.clearValidate(['smsDisplayName', 'smsPhone']);
         }
     },
 );

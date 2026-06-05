@@ -36,7 +36,7 @@ function checkIPs(rule: any, value: any, callback: any) {
             if (item === '') {
                 continue;
             }
-            if (item === '0.0.0.0' || item === '::') {
+            if (item.includes('0.0.0.0') || item.includes('::')) {
                 return callback(new Error(i18n.global.t('firewall.addressFormatError')));
             }
             if (item.indexOf('/') !== -1) {
