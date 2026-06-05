@@ -11,6 +11,7 @@
             <fu-table
                 v-bind="$attrs"
                 ref="tableRef"
+                @select="handleSelect"
                 @selection-change="handleSelectionChange"
                 :max-height="tableHeight"
                 @row-contextmenu="handleRightClick"
@@ -74,11 +75,11 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, useAttrs } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { hasManagePermissionAccess, hasPermissionAccess } from '@/utils/permission';
 const slots = useSlots();
-
+const attrs = useAttrs();
 const { isMobile, openMenuTabs } = useGlobalStore();
 
 defineOptions({ name: 'ComplexTable' });
@@ -115,6 +116,10 @@ const paginationRef = ref<HTMLElement | null>(null);
 const leftSelect = ref(false);
 const paginationWidth = ref(0);
 let paginationResizeObserver: ResizeObserver | null = null;
+const shiftPressed = ref(false);
+const lastSelectedRow = ref<any | null>(null);
+const rangeBaseRows = ref<any[]>([]);
+let isRangeSelecting = false;
 
 const rightClick = ref({
     visible: false,
@@ -212,7 +217,85 @@ function handleSelectionChange(row: any) {
         leftSelect.value = true;
     } else {
         leftSelect.value = false;
+        if (!isRangeSelecting) {
+            lastSelectedRow.value = null;
+            rangeBaseRows.value = [];
+        }
     }
+}
+
+const getTableData = () => {
+    const data = attrs.data;
+    return Array.isArray(data) ? data : [];
+};
+
+function isRowSelectable(row: any) {
+    try {
+        const selectionColumn = tableRef.value?.refElTable.columns.find((col) => col.type === 'selection');
+        return typeof selectionColumn?.selectable === 'function' ? selectionColumn.selectable(row) : true;
+    } catch {
+        return true;
+    }
+}
+
+function updateRowSelection(row: any, selected: boolean) {
+    tableRef.value?.refElTable.toggleRowSelection(row, selected);
+}
+
+function syncSelection(targetRows: any[]) {
+    const currentRows = selectedRows.value;
+    const targetSet = new Set(targetRows);
+    for (const row of currentRows) {
+        if (!targetSet.has(row)) {
+            updateRowSelection(row, false);
+        }
+    }
+    for (const row of targetRows) {
+        if (!currentRows.includes(row)) {
+            updateRowSelection(row, true);
+        }
+    }
+}
+
+function applyRangeSelection(targetRow: any) {
+    const table = tableRef.value?.refElTable;
+    if (!table || !lastSelectedRow.value) {
+        return false;
+    }
+    const tableData = getTableData();
+    const startIndex = tableData.indexOf(lastSelectedRow.value);
+    const endIndex = tableData.indexOf(targetRow);
+    if (startIndex === -1 || endIndex === -1) {
+        return false;
+    }
+    const [start, end] = [startIndex, endIndex].sort((a, b) => a - b);
+    const nextRangeRows = tableData.slice(start, end + 1).filter((row) => isRowSelectable(row));
+    const nextSelectionRows = [...rangeBaseRows.value];
+    for (const row of nextRangeRows) {
+        if (!nextSelectionRows.includes(row)) {
+            nextSelectionRows.push(row);
+        }
+    }
+    isRangeSelecting = true;
+    try {
+        syncSelection(nextSelectionRows);
+    } finally {
+        isRangeSelecting = false;
+    }
+    return true;
+}
+
+function handleSelect(selection: any[], row: any) {
+    if (isRangeSelecting) {
+        return;
+    }
+    if (shiftPressed.value && applyRangeSelection(row)) {
+        clearTextSelection();
+        return;
+    }
+    lastSelectedRow.value = row;
+    rangeBaseRows.value = selection.filter((item) => item !== row);
+    clearTextSelection();
 }
 
 function sort(prop: string, order: string) {
@@ -221,10 +304,19 @@ function sort(prop: string, order: string) {
 
 function clearSelects() {
     tableRef.value.refElTable.clearSelection();
+    lastSelectedRow.value = null;
+    rangeBaseRows.value = [];
 }
 
 function clearSort() {
     tableRef.value.refElTable.clearSort();
+}
+
+function clearTextSelection() {
+    const selection = window.getSelection?.();
+    if (selection && selection.rangeCount > 0) {
+        selection.removeAllRanges();
+    }
 }
 
 const updatePaginationWidth = () => {
@@ -278,11 +370,7 @@ watch(
 
 function handleRowClick(row: any, column: any, event: any) {
     if (!tableRef.value) return;
-    try {
-        const selectionColumn = tableRef.value.refElTable.columns.find((col) => col.type === 'selection');
-        const isSelectable = selectionColumn.selectable(row);
-        if (!isSelectable) return;
-    } catch {}
+    if (!isRowSelectable(row)) return;
 
     const target = event.target as HTMLElement;
 
@@ -297,7 +385,15 @@ function handleRowClick(row: any, column: any, event: any) {
     ) {
         return;
     }
+    if (event.shiftKey && applyRangeSelection(row)) {
+        clearTextSelection();
+        return;
+    }
+    const selected = !selectedRows.value.includes(row);
     tableRef.value.refElTable.toggleRowSelection(row);
+    lastSelectedRow.value = row;
+    rangeBaseRows.value = selected ? selectedRows.value : selectedRows.value.filter((item) => item !== row);
+    clearTextSelection();
 }
 
 defineExpose({
@@ -322,6 +418,18 @@ const toggleSelection = () => {
     tableRef.value.refElTable.toggleAllSelection();
 };
 
+const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Shift') {
+        shiftPressed.value = true;
+    }
+};
+
+const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key === 'Shift') {
+        shiftPressed.value = false;
+    }
+};
+
 onMounted(() => {
     calcHeight();
     nextTick(() => {
@@ -332,6 +440,8 @@ onMounted(() => {
         }
     });
     window.addEventListener('resize', calcHeight);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
     watch(
         () => [props.height, props.heightDiff],
         () => {
@@ -342,6 +452,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     window.removeEventListener('resize', calcHeight);
+    window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keyup', handleKeyUp);
     paginationResizeObserver?.disconnect();
     paginationResizeObserver = null;
 });
