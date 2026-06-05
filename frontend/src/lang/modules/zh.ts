@@ -1906,6 +1906,7 @@ const message = {
             opsReport: '运维报表',
             users: '用户管理',
             auth: '登陆认证',
+            alert: '告警通知',
         },
         websiteLog: '网站日志',
         runLog: '运行日志',

@@ -2075,6 +2075,7 @@ const message = {
             opsReport: 'Operasyon Raporu',
             users: 'Kullanıcı yönetimi',
             auth: 'Giriş kimlik doğrulaması',
+            alert: 'Uyarı bildirimleri',
         },
         websiteLog: 'Website logları',
         runLog: 'Çalıştırma logları',

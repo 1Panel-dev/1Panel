@@ -3467,6 +3467,41 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/alert/config/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AlertConfigPageReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page alert config",
+				"tags": [
+					"Alert"
+				]
+			}
+		},
 		"/alert/config/test": {
 			"post": {
 				"consumes": [
@@ -29901,6 +29936,27 @@ const docTemplate = `{
 			"required": [
 				"agentId",
 				"taskID"
+			],
+			"type": "object"
+		},
+		"dto.AlertConfigPageReq": {
+			"properties": {
+				"excludeTypes": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"page",
+				"pageSize"
 			],
 			"type": "object"
 		},

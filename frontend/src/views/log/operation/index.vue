@@ -32,6 +32,7 @@
                     <el-option :label="$t('logs.detail.licenses')" value="licenses" />
                     <el-option :label="$t('logs.detail.logs')" value="logs" />
                     <el-option :label="$t('logs.detail.settings')" value="settings" />
+                    <el-option :label="$t('logs.detail.alert')" value="alert" />
                     <el-option :label="$t('logs.detail.backups')" value="backups" />
                     <el-option :label="$t('logs.detail.groups')" value="groups" />
                     <el-option :label="$t('logs.detail.commands')" value="commands" />

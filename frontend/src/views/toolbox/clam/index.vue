@@ -67,7 +67,7 @@
                     <el-table-column
                         :label="$t('toolbox.clam.scanDir')"
                         :min-width="120"
-                        prop="path"
+                        prop="scanDir"
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">

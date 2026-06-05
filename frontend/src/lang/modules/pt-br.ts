@@ -2193,6 +2193,7 @@ const message = {
             opsReport: 'Relatório de Operações',
             users: 'Gerenciamento de usuários',
             auth: 'Autenticação de login',
+            alert: 'Notificações de alerta',
         },
         websiteLog: 'Logs do website',
         runLog: 'Logs de execução',

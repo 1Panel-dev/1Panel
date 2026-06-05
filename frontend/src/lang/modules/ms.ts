@@ -2079,6 +2079,7 @@ const message = {
             opsReport: 'Laporan Operasi',
             users: 'Pengurusan pengguna',
             auth: 'Pengesahan log masuk',
+            alert: 'Pemberitahuan amaran',
         },
         websiteLog: 'Log Laman Web',
         runLog: 'Log Jalankan',

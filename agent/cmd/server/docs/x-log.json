@@ -1633,21 +1633,21 @@
 	},
 	"/core/xpack/nodes/upgrade": {
 		"bodyKeys": [
-			"id"
+			"ids"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [
 			{
 				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
+				"input_value": "ids",
+				"isList": true,
 				"db": "nodes",
 				"output_column": "name",
-				"output_value": "name"
+				"output_value": "names"
 			}
 		],
-		"formatZH": "升级节点 [name]",
-		"formatEN": "upgrade node [name]"
+		"formatZH": "升级节点 [names]",
+		"formatEN": "upgrade node [names]"
 	},
 	"/core/xpack/nodes/upgrade/log/del": {
 		"bodyKeys": [
