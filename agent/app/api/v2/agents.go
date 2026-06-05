@@ -28,6 +28,69 @@ func (b *BaseApi) CreateAgent(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Batch install Agent
+// @Accept json
+// @Param request body dto.AgentBatchInstallReq true "request"
+// @Success 200 {object} dto.AgentItem
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/batch/install [post]
+func (b *BaseApi) BatchInstallAgent(c *gin.Context) {
+	var req dto.AgentBatchInstallReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := agentService.BatchInstall(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags AI
+// @Summary Batch upgrade Agent
+// @Accept json
+// @Param request body dto.AgentBatchUpgradeReq true "request"
+// @Success 200 {array} dto.AgentBatchUpgradeResult
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/batch/upgrade [post]
+func (b *BaseApi) BatchUpgradeAgent(c *gin.Context) {
+	var req dto.AgentBatchUpgradeReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := agentService.BatchUpgrade(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags AI
+// @Summary Batch install Agent Skill
+// @Accept json
+// @Param request body dto.AgentBatchSkillInstallReq true "request"
+// @Success 200 {array} dto.AgentBatchSkillInstallResult
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/batch/skill/install [post]
+func (b *BaseApi) BatchInstallAgentSkill(c *gin.Context) {
+	var req dto.AgentBatchSkillInstallReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := agentService.BatchInstallSkill(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags AI
 // @Summary Page Agents
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"

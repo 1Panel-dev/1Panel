@@ -2,14 +2,15 @@ package model
 
 type AgentAccount struct {
 	BaseModel
-	Provider       string `json:"provider"`
-	Name           string `json:"name"`
-	APIKey         string `json:"apiKey"`
-	BaseURL        string `json:"baseUrl"`
-	APIType        string `json:"apiType"`
-	RememberAPIKey bool   `json:"rememberApiKey"`
-	Verified       bool   `json:"verified"`
-	Remark         string `json:"remark"`
+	Provider        string `json:"provider"`
+	Name            string `json:"name"`
+	APIKey          string `json:"apiKey"`
+	BaseURL         string `json:"baseUrl"`
+	APIType         string `json:"apiType"`
+	RememberAPIKey  bool   `json:"rememberApiKey"`
+	Verified        bool   `json:"verified"`
+	Remark          string `json:"remark"`
+	MasterAccountID uint   `json:"masterAccountId" gorm:"index"`
 }
 
 func (AgentAccount) TableName() string {

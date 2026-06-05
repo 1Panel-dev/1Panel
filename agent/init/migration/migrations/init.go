@@ -1118,6 +1118,13 @@ var InitAgentAccountModelPool = &gormigrate.Migration{
 	},
 }
 
+var AddAgentAccountMasterID = &gormigrate.Migration{
+	ID: "20260401-add-agent-account-master-id",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.AgentAccount{})
+	},
+}
+
 var AddHostTable = &gormigrate.Migration{
 	ID: "20260318-add-host-table",
 	Migrate: func(tx *gorm.DB) error {

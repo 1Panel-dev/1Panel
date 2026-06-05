@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"gorm.io/gorm"
 )
 
 type AgentAccountRepo struct{}
@@ -11,6 +12,7 @@ type AgentAccountRepo struct{}
 type IAgentAccountRepo interface {
 	Page(page, size int, opts ...DBOption) (int64, []model.AgentAccount, error)
 	GetFirst(opts ...DBOption) (*model.AgentAccount, error)
+	WithByMasterAccountID(masterID uint) DBOption
 	Create(account *model.AgentAccount) error
 	Save(account *model.AgentAccount) error
 	DeleteByID(id uint) error
@@ -37,6 +39,12 @@ func (a AgentAccountRepo) GetFirst(opts ...DBOption) (*model.AgentAccount, error
 		return nil, err
 	}
 	return &account, nil
+}
+
+func (a AgentAccountRepo) WithByMasterAccountID(masterID uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("master_account_id = ?", masterID)
+	}
 }
 
 func (a AgentAccountRepo) Create(account *model.AgentAccount) error {
