@@ -6,6 +6,8 @@ ErrFileAINotEnabled: 'ファイル管理の「AI アカウント」でファイ�
 ErrFileAISearchBadPattern: '検索パターンが無効です（正規表現など）: {{ .detail }}'
 ErrWgetRemoteFailed: 'リモートのダウンロード URL が無効か、到達できません：{{ .detail }}'
 ErrWgetInvalidContentType: 'リモート URL がファイルではなくエラーページ等を返しました、{{ .detail }}'
+ErrWgetProxyNotConfigured: '先にパネル設定でプロキシサーバーを設定してください'
+ErrWgetProxyInvalid: 'プロキシサーバーのアドレスが無効です：{{ .detail }}'
 ErrRecordExist: 'レコードが既に存在します'
 ErrRecordNotFound: 'レコードが見つかりません'
 ErrStructTransform: '型変換エラー: {{ .err }}'

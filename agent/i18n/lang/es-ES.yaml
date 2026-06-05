@@ -6,6 +6,8 @@ ErrFileAINotEnabled: 'La búsqueda con IA de archivos está desactivada o sin cu
 ErrFileAISearchBadPattern: 'Patrón de búsqueda no válido (regex u otra opción): {{ .detail }}'
 ErrWgetRemoteFailed: 'La descarga remota falló o la URL no es accesible: {{ .detail }}'
 ErrWgetInvalidContentType: 'La URL remota no devolvió un archivo (posiblemente una página de error), {{ .detail }}'
+ErrWgetProxyNotConfigured: 'Configure primero un servidor proxy en los ajustes del panel'
+ErrWgetProxyInvalid: 'Dirección del servidor proxy no válida: {{ .detail }}'
 ErrRecordExist: 'Registro ya existe'
 ErrRecordNotFound: 'Registro no encontrado'
 ErrStructTransform: 'Error de conversión: {{ .err }}'

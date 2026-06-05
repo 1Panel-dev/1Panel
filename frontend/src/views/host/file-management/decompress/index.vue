@@ -7,7 +7,7 @@
             >
                 <div class="flex items-center justify-between gap-3">
                     <div class="space-y-1">
-                        <div class="text-sm font-medium">
+                        <div class="text-sm font-medium text-[var(--el-text-color-secondary)]">
                             {{ $t('commons.status.executing') }}
                         </div>
                         <div class="text-xs text-[var(--el-text-color-secondary)]">

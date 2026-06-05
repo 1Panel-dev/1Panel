@@ -2359,6 +2359,8 @@ const message = {
         ignoreCertificate: 'Permitir conexiones inseguras',
         ignoreCertificateHelper:
             'Permitir conexiones inseguras puede provocar fugas o alteraciones de datos. Úselo solo si confía en la fuente.',
+        useProxy: 'Descargar mediante proxy',
+        useProxyHelper: 'Usar el servidor proxy configurado en el panel para acceder a la URL remota',
         uploadOverLimit: '¡El número de archivos supera los 1000! Por favor, comprima y cargue',
         clashDidNotSupport: 'Los nombres de archivo no pueden contener .1panel_clash',
         clashDeleteAlert: 'No se puede eliminar la carpeta "Papelera"',

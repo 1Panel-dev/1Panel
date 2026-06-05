@@ -6,6 +6,8 @@ ErrFileAINotEnabled: 'File-management AI summary requires an enabled AI account 
 ErrFileAISearchBadPattern: 'Invalid file search pattern (regex or whole word): {{ .detail }}'
 ErrWgetRemoteFailed: 'Remote download failed or URL is unreachable: {{ .detail }}'
 ErrWgetInvalidContentType: 'Remote URL did not return a file (possibly an error page), {{ .detail }}'
+ErrWgetProxyNotConfigured: 'Configure a proxy server in panel settings first'
+ErrWgetProxyInvalid: 'Invalid proxy server address: {{ .detail }}'
 ErrRecordExist: 'Record already exists'
 ErrRecordNotFound: 'Record not found'
 ErrStructTransform: 'Type conversion failed: {{ .err }}'

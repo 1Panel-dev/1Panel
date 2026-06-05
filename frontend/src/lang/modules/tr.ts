@@ -2352,6 +2352,8 @@ const message = {
         ignoreCertificate: 'Güvensiz sunucu bağlantılarına izin ver',
         ignoreCertificateHelper:
             'Güvensiz sunucu bağlantılarına izin vermek, veri sızıntısına veya değiştirilmesine yol açabilir. Bu seçeneği yalnızca indirme kaynağına güvendiğinizde kullanın.',
+        useProxy: 'Proxy ile indir',
+        useProxyHelper: 'Uzak indirme URL’sine erişmek için panel ayarlarındaki proxy sunucusunu kullanır',
         uploadOverLimit: 'Dosya sayısı 1000’i aşıyor! Lütfen sıkıştırıp yükleyin',
         clashDidNotSupport: 'Dosya adlarının .1panel_clash içermesi yasaktır',
         clashDeleteAlert: '"Geri Dönüşüm Kutusu" klasörü silinemez',

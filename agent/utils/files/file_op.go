@@ -10,7 +10,9 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path"
@@ -365,6 +367,19 @@ type Process struct {
 	Name    string  `json:"name"`
 }
 
+type DownloadProxyConfig struct {
+	Type     string
+	URL      string
+	Port     string
+	User     string
+	Password string
+}
+
+type DownloadOptions struct {
+	IgnoreCertificate bool
+	Proxy             *DownloadProxyConfig
+}
+
 func (w *WriteCounter) Write(p []byte) (n int, err error) {
 	n = len(p)
 	w.Written += uint64(n)
@@ -392,12 +407,62 @@ func (w *WriteCounter) SaveProcess() {
 	}
 }
 
-func (f FileOp) DownloadFileWithProcess(url, dst, key string, ignoreCertificate bool) error {
-	client := &http.Client{}
-	if ignoreCertificate {
-		client.Transport = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+func buildDownloadProxyURL(proxy DownloadProxyConfig) (*url.URL, error) {
+	proxyType := strings.TrimSpace(proxy.Type)
+	proxyHost := strings.TrimSpace(proxy.URL)
+	if proxyType == "" || proxyHost == "" {
+		return nil, buserr.New("ErrWgetProxyNotConfigured")
+	}
+	if !strings.Contains(proxyHost, "://") {
+		proxyHost = fmt.Sprintf("%s://%s", proxyType, proxyHost)
+	}
+	parsedURL, err := url.Parse(proxyHost)
+	if err != nil {
+		return nil, buserr.WithDetail("ErrWgetProxyInvalid", err.Error(), err)
+	}
+	if parsedURL.Scheme == "" {
+		parsedURL.Scheme = proxyType
+	}
+	if parsedURL.Host == "" && parsedURL.Path != "" {
+		parsedURL.Host = parsedURL.Path
+		parsedURL.Path = ""
+	}
+	if parsedURL.Host == "" {
+		return nil, buserr.New("ErrWgetProxyNotConfigured")
+	}
+	if strings.TrimSpace(proxy.Port) != "" && parsedURL.Port() == "" {
+		parsedURL.Host = net.JoinHostPort(parsedURL.Hostname(), strings.TrimSpace(proxy.Port))
+	}
+	if proxy.User != "" && proxy.Password != "" {
+		parsedURL.User = url.UserPassword(proxy.User, proxy.Password)
+	} else if proxy.User != "" {
+		parsedURL.User = url.User(proxy.User)
+	}
+	return parsedURL, nil
+}
+
+func newDownloadHTTPClient(options DownloadOptions) (*http.Client, error) {
+	if !options.IgnoreCertificate && options.Proxy == nil {
+		return &http.Client{}, nil
+	}
+	transport := &http.Transport{}
+	if options.IgnoreCertificate {
+		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+	if options.Proxy != nil {
+		proxyURL, err := buildDownloadProxyURL(*options.Proxy)
+		if err != nil {
+			return nil, err
 		}
+		transport.Proxy = http.ProxyURL(proxyURL)
+	}
+	return &http.Client{Transport: transport}, nil
+}
+
+func (f FileOp) DownloadFileWithProcess(url, dst, key string, options DownloadOptions) error {
+	client, err := newDownloadHTTPClient(options)
+	if err != nil {
+		return err
 	}
 	defer client.CloseIdleConnections()
 

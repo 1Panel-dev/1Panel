@@ -2363,6 +2363,8 @@ const message = {
         ignoreCertificate: 'Benarkan sambungan pelayan tidak selamat',
         ignoreCertificateHelper:
             'Membenarkan sambungan pelayan tidak selamat boleh menyebabkan kebocoran atau pengubahan data. Gunakan pilihan ini hanya jika mempercayai sumber muat turun.',
+        useProxy: 'Muat turun melalui proksi',
+        useProxyHelper: 'Gunakan pelayan proksi dalam tetapan panel untuk mengakses URL muat turun jauh',
         uploadOverLimit: 'Bilangan fail melebihi 1000! Sila mampatkan dan muat naik',
         clashDidNotSupport: 'Nama fail dilarang mengandungi .1panel_clash',
         clashDeleteAlert: 'Folder "Tong Kitar Semula" tidak boleh dipadamkan',
