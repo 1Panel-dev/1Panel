@@ -2052,6 +2052,7 @@ const message = {
             opsReport: '運用レポート',
             users: 'ユーザー管理',
             auth: 'ログイン認証',
+            alert: 'アラート通知',
         },
         websiteLog: 'ウェブサイトログ',
         runLog: 'ログを実行します',

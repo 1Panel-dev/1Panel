@@ -1922,6 +1922,7 @@ const message = {
             opsReport: '運維報表',
             users: '使用者管理',
             auth: '登入認證',
+            alert: '告警通知',
         },
         websiteLog: '網站日誌',
         runLog: '執行日誌',

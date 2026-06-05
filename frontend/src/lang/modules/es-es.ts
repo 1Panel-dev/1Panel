@@ -2081,6 +2081,7 @@ const message = {
             opsReport: 'Informe de operaciones',
             users: 'Gestión de usuarios',
             auth: 'Autenticación de inicio de sesión',
+            alert: 'Notificaciones de alerta',
         },
         websiteLog: 'Logs de sitio web',
         runLog: 'Logs de ejecución',

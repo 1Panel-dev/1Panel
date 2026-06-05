@@ -2010,6 +2010,7 @@ const message = {
             opsReport: '운영 보고서',
             users: '사용자 관리',
             auth: '로그인 인증',
+            alert: '경고 알림',
         },
         websiteLog: '웹사이트 로그',
         runLog: '실행 로그',

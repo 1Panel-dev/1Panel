@@ -2026,6 +2026,7 @@ const message = {
             opsReport: 'Ops Report',
             users: 'User Management',
             auth: 'Login Authentication',
+            alert: 'Alert Notifications',
         },
         websiteLog: 'Website logs',
         runLog: 'Run logs',
