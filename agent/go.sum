@@ -296,8 +296,8 @@ github.com/go-acme/alidns-20150109/v5 v5.4.1 h1:Bp+EDtIGxBVKnIq1hPECBFf6eueTiESY
 github.com/go-acme/alidns-20150109/v5 v5.4.1/go.mod h1:L+SrZRmoQFx2UzOqng3z3+LA/gNgFCaLXrwr/ndyW6g=
 github.com/go-acme/esa-20240910/v3 v3.2.2 h1:dZ+HKddDMUcPr46gkFYdn5FbtJwIic59+MEaCaH/cxM=
 github.com/go-acme/esa-20240910/v3 v3.2.2/go.mod h1:qn4WK9pNgXoS5ypmiZfCWSYdOtWcte9GDuhDjKP752A=
-github.com/go-acme/lego/v5 v5.2.1 h1:LvOL09QvWBylPQ+YWCf/8nnewdtBdpqF7x1GuVSa0FI=
-github.com/go-acme/lego/v5 v5.2.1/go.mod h1:H/hb7OJKmpVGa8zypgZh0ys5P4VUu++ZNgAEcOwq+OI=
+github.com/go-acme/lego/v5 v5.2.2 h1:KqFas/Ak2QDdU+Qm7MO9OEnS35zC000kPmM+5tLdZKk=
+github.com/go-acme/lego/v5 v5.2.2/go.mod h1:H/hb7OJKmpVGa8zypgZh0ys5P4VUu++ZNgAEcOwq+OI=
 github.com/go-acme/tencentclouddnspod v1.3.24 h1:uCSiOW1EJttcnOON+MVVyVDJguFL/Q4NIGkq1CrT9p8=
 github.com/go-acme/tencentclouddnspod v1.3.24/go.mod h1:RKcB2wSoZncjBA0OEFj59s1ko1XDy+ZsAtk+9uMxUF0=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
