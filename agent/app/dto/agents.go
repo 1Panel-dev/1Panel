@@ -89,6 +89,22 @@ type AgentBatchSkillInstallResult struct {
 	Message      string `json:"message"`
 }
 
+type AgentBatchOperateReq struct {
+	AgentType   string `json:"agentType" validate:"required,oneof=openclaw copaw hermes-agent"`
+	Operate     string `json:"operate" validate:"required,oneof=start stop restart delete"`
+	ForceDelete bool   `json:"forceDelete"`
+	TaskID      string `json:"taskID"`
+}
+
+type AgentBatchOperateResult struct {
+	AgentID      uint   `json:"agentID"`
+	AgentName    string `json:"agentName"`
+	AppInstallID uint   `json:"appInstallID"`
+	Success      bool   `json:"success"`
+	Skipped      bool   `json:"skipped"`
+	Message      string `json:"message"`
+}
+
 type AgentItem struct {
 	ID                   uint      `json:"id"`
 	Name                 string    `json:"name"`
