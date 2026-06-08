@@ -186,6 +186,9 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 		if err := client.Restart(); err != nil {
 			return err
 		}
+		if err := u.addPortsBeforeStart(client); err != nil {
+			return err
+		}
 		needRestartDocker = true
 	case "disableBanPing":
 		if err := firewall.UpdatePingStatus("0"); err != nil {
