@@ -123,7 +123,7 @@ func (b *BaseApi) LoadClamBaseInfo(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /toolbox/clam/operate [post]
-// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operation] Clam","formatEN":"[operation] FTP"}
+// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operation] Clam","formatEN":"[operation] Clam"}
 func (b *BaseApi) OperateClam(c *gin.Context) {
 	var req dto.Operate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

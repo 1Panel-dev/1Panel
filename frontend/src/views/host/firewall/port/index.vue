@@ -46,9 +46,6 @@
                         <el-button v-permission type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}
                         </el-button>
-                        <el-button v-permission @click="onOpenWhiteList" plain>
-                            {{ $t('firewall.portWhiteList') }}
-                        </el-button>
                         <el-button v-permission @click="onDelete(null)" plain :disabled="selects.length === 0">
                             {{ $t('commons.button.delete') }}
                         </el-button>
@@ -161,7 +158,6 @@
         <OperateDialog @search="search" ref="dialogRef" />
         <ImportDialog @search="search" ref="dialogImportRef" />
         <ProcessDetail ref="processDetailRef" />
-        <WhiteList ref="whiteListRef" />
     </div>
 </template>
 
@@ -169,7 +165,6 @@
 import FireRouter from '@/views/host/firewall/index.vue';
 import OperateDialog from '@/views/host/firewall/port/operate/index.vue';
 import ImportDialog from '@/views/host/firewall/port/import/index.vue';
-import WhiteList from '@/views/host/firewall/port/white-list/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import ProcessDetail from '@/views/host/process/process/detail/index.vue';
 import { onMounted, reactive, ref } from 'vue';
@@ -199,7 +194,6 @@ const fireStatusRef = ref();
 const opRef = ref();
 const dialogImportRef = ref();
 const processDetailRef = ref();
-const whiteListRef = ref();
 
 const listeningProcesses = ref<Process.ListeningProcess[]>([]);
 
@@ -402,10 +396,6 @@ const onDelete = async (row: Host.RuleInfo | null) => {
 
 const onImport = () => {
     dialogImportRef.value.acceptParams();
-};
-
-const onOpenWhiteList = () => {
-    whiteListRef.value.acceptParams();
 };
 
 const onExport = () => {
