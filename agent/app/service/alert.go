@@ -561,27 +561,13 @@ func alertConfigDisplayName(configType, configData string) string {
 }
 
 func (a AlertService) DeleteAlertConfig(id uint) error {
-	config, err := alertRepo.GetConfigById(id)
+	_, err := alertRepo.GetConfigById(id)
 	if err != nil {
 		return err
 	}
-	usedAlerts, err := alertRepo.List(alertRepo.WithByMethodConfigID(id))
+	usedAlerts, err := alertRepo.List(alertRepo.WithByAlertMethodContainsConfigID(id))
 	if err != nil {
 		return err
-	}
-	if config.Type == constant.SMS {
-		legacyAlerts, err := alertRepo.List(alertRepo.WithByMethod(constant.SMS))
-		if err != nil {
-			return err
-		}
-		usedAlerts = append(usedAlerts, legacyAlerts...)
-	}
-	if legacyMethod := legacyAlertMethodByConfigType(config.Type); legacyMethod != "" {
-		legacyAlerts, err := alertRepo.List(alertRepo.WithByMethod(legacyMethod))
-		if err != nil {
-			return err
-		}
-		usedAlerts = append(usedAlerts, legacyAlerts...)
 	}
 	if len(usedAlerts) > 0 {
 		return buserr.New("ErrAlertConfigInUse")
@@ -669,23 +655,4 @@ func (a AlertService) ExternalUpdateAlert(updateAlert dto.AlertCreate, operator 
 	}
 
 	return nil
-}
-
-func legacyAlertMethodByConfigType(configType string) string {
-	switch configType {
-	case constant.Email:
-		return "mail"
-	case constant.SMS:
-		return constant.SMS
-	case constant.Bark:
-		return constant.Bark
-	case constant.WeCom:
-		return constant.WeCom
-	case constant.DingTalk:
-		return constant.DingTalk
-	case constant.FeiShu:
-		return constant.FeiShu
-	default:
-		return ""
-	}
 }

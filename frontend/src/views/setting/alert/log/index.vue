@@ -293,7 +293,6 @@ const search = async () => {
         status: req.status,
     };
     try {
-        await loadConfigMap();
         const res = await SearchAlertLogs(params);
         data.value = res.data.items || [];
         paginationConfig.total = res.data.total || 0;
@@ -309,6 +308,7 @@ const syncAll = async () => {
         cancelButtonText: t('commons.button.cancel'),
     }).then(async () => {
         await syncAllAlert();
+        await search();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
@@ -319,7 +319,6 @@ const syncAllAlert = async () => {
     } else {
         await SyncAlertAll();
     }
-    await search();
 };
 
 const onClean = async () => {
@@ -353,13 +352,14 @@ const searchAlertInfo = async () => {
             loading.value = false;
         }
     }
-    await search();
 };
 
 onMounted(async () => {
+    await loadConfigMap();
     await searchAlertInfo();
     if (isProductPro.value && !isIntl.value) {
         await syncAllAlert();
     }
+    await search();
 });
 </script>

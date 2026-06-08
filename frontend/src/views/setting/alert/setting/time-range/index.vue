@@ -70,8 +70,10 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { UpdateAlertConfig } from '@/api/modules/alert';
 import { Alert } from '@/api/interface/alert';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
+const { isProductPro, isIntl, isEE } = useGlobalStore();
 
 interface Option {
     key: string;
@@ -123,7 +125,7 @@ const config = ref<Alert.AlertConfigInfo>({
     status: '',
     config: '',
 });
-const resourceValue = ref([
+const defaultResourceValue = [
     'clams',
     'cronJob',
     'cpu',
@@ -134,17 +136,21 @@ const resourceValue = ref([
     'licenseException',
     'panelLogin',
     'sshLogin',
-]);
+];
 const noticeDefaultTime: [Date, Date] = [new Date(0, 0, 1, 8, 0, 0), new Date(0, 0, 1, 23, 59, 59)];
 const resourceDefaultTime: [Date, Date] = [new Date(0, 0, 1, 0, 0, 0), new Date(0, 0, 1, 23, 59, 59)];
 const noticeTimeRange = ref(noticeDefaultTime);
 const resourceTimeRange = ref(resourceDefaultTime);
 const generateData = (): Option[] => {
     const data: Option[] = [];
-    data.push({ key: 'panelPwdEndTime', label: i18n.global.t('xpack.alert.panelPwdEndTime'), disabled: false });
+    if (!isEE.value) {
+        data.push({ key: 'panelPwdEndTime', label: i18n.global.t('xpack.alert.panelPwdEndTime'), disabled: false });
+    }
     data.push({ key: 'panelLogin', label: i18n.global.t('xpack.alert.panelLogin'), disabled: false });
     data.push({ key: 'sshLogin', label: i18n.global.t('xpack.alert.sshLogin'), disabled: false });
-    data.push({ key: 'licenseException', label: i18n.global.t('xpack.alert.licenseException'), disabled: false });
+    if (isProductPro.value && !isIntl.value && !isEE.value) {
+        data.push({ key: 'licenseException', label: i18n.global.t('xpack.alert.licenseException'), disabled: false });
+    }
     data.push({ key: 'nodeException', label: i18n.global.t('xpack.alert.nodeException'), disabled: false });
     data.push({ key: 'ssl', label: i18n.global.t('xpack.alert.ssl'), disabled: false });
     data.push({ key: 'siteEndTime', label: i18n.global.t('xpack.alert.siteEndTime'), disabled: false });
@@ -154,11 +160,15 @@ const generateData = (): Option[] => {
     data.push({ key: 'load', label: i18n.global.t('xpack.alert.load'), disabled: false });
     data.push({ key: 'clams', label: i18n.global.t('xpack.alert.clams'), disabled: false });
     data.push({ key: 'cronJob', label: i18n.global.t('xpack.alert.cronjob'), disabled: false });
-    data.push({ key: 'panelUpdate', label: i18n.global.t('xpack.alert.panelUpdate'), disabled: false });
+    if (!isEE.value) {
+        data.push({ key: 'panelUpdate', label: i18n.global.t('xpack.alert.panelUpdate'), disabled: false });
+    }
     return data;
 };
 
-const data = ref(generateData());
+const data = computed(() => generateData());
+const dataKeySet = computed(() => new Set(data.value.map((item) => item.key)));
+const resourceValue = ref(defaultResourceValue.filter((item) => dataKeySet.value.has(item)));
 const formRef = ref<FormInstance>();
 const noticeValue: ComputedRef<string[]> = computed(() => {
     return data.value.filter((item) => !resourceValue.value.includes(item.key)).map((item) => item.key);
@@ -168,7 +178,7 @@ const acceptParams = (params: DialogProps): void => {
     if (typeof params.sendTimeRange === 'object' && params.sendTimeRange !== null) {
         noticeTimeRange.value = parseTimeRange(params.sendTimeRange.noticeAlert.sendTimeRange);
         resourceTimeRange.value = parseTimeRange(params.sendTimeRange.resourceAlert.sendTimeRange);
-        resourceValue.value = params.sendTimeRange.resourceAlert.type;
+        resourceValue.value = params.sendTimeRange.resourceAlert.type.filter((item) => dataKeySet.value.has(item));
     }
     isOffline.value = params.isOffline;
     id.value = params.id;

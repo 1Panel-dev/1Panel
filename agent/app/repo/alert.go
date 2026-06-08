@@ -21,8 +21,8 @@ type IAlertRepo interface {
 	WithByCreateAt(date *date.Date) DBOption
 	WithByLicenseId(licenseId string) DBOption
 	WithByRecordId(recordId uint) DBOption
-	WithByMethod(method string) DBOption
-	WithByMethodConfigID(id uint) DBOption
+	WithByAlertMethodContainsConfigID(id uint) DBOption
+	WithByMethodConfigIDs(ids []uint) DBOption
 
 	Create(alert *model.Alert) error
 	Get(opts ...DBOption) (model.Alert, error)
@@ -107,16 +107,20 @@ func (a *AlertRepo) WithByRecordId(recordId uint) DBOption {
 	}
 }
 
-func (a *AlertRepo) WithByMethod(method string) DBOption {
+func (a *AlertRepo) WithByAlertMethodContainsConfigID(id uint) DBOption {
+	method := strconv.Itoa(int(id))
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("(method = ? OR method LIKE ? OR method LIKE ? OR method LIKE ?)", method, method+",%", "%,"+method, "%,"+method+",%")
 	}
 }
 
-func (a *AlertRepo) WithByMethodConfigID(id uint) DBOption {
-	method := strconv.Itoa(int(id))
+func (a *AlertRepo) WithByMethodConfigIDs(ids []uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("(method = ? OR method LIKE ? OR method LIKE ? OR method LIKE ?)", method, method+",%", "%,"+method, "%,"+method+",%")
+		methods := make([]string, 0, len(ids))
+		for _, id := range ids {
+			methods = append(methods, strconv.Itoa(int(id)))
+		}
+		return g.Where("method IN ?", methods)
 	}
 }
 
