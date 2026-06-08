@@ -7,6 +7,14 @@ const taskTextMap: Record<string, string> = {
     DispatchAgentUpgradeTasks: 'aiTools.agents.dispatchAgentUpgradeTasks',
     BatchInstallAgentSkill: 'aiTools.agents.batchInstallAgentSkill',
     DispatchAgentSkillInstallTasks: 'aiTools.agents.dispatchAgentSkillInstallTasks',
+    BatchStartAgent: 'aiTools.agents.batchStartAgent',
+    DispatchAgentStartTasks: 'aiTools.agents.dispatchAgentStartTasks',
+    BatchStopAgent: 'aiTools.agents.batchStopAgent',
+    DispatchAgentStopTasks: 'aiTools.agents.dispatchAgentStopTasks',
+    BatchRestartAgent: 'aiTools.agents.batchRestartAgent',
+    DispatchAgentRestartTasks: 'aiTools.agents.dispatchAgentRestartTasks',
+    BatchDeleteAgent: 'aiTools.agents.batchDeleteAgent',
+    DispatchAgentDeleteTasks: 'aiTools.agents.dispatchAgentDeleteTasks',
 };
 
 export const translateTaskText = (value?: string) => {

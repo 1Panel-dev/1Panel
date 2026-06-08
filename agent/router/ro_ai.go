@@ -59,6 +59,7 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/agents/batch/install", baseApi.BatchInstallAgent)
 		aiToolsRouter.POST("/agents/batch/upgrade", baseApi.BatchUpgradeAgent)
 		aiToolsRouter.POST("/agents/batch/skill/install", baseApi.BatchInstallAgentSkill)
+		aiToolsRouter.POST("/agents/batch/operate", baseApi.BatchOperateAgent)
 		aiToolsRouter.POST("/agents/search", baseApi.PageAgents)
 		aiToolsRouter.POST("/agents/delete/check", baseApi.DeleteCheckAgent)
 		aiToolsRouter.POST("/agents/delete", baseApi.DeleteAgent)

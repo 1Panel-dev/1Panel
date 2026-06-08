@@ -50,12 +50,12 @@
                     <el-row :gutter="20" v-for="(env, index) in mcpServer.environments" :key="index">
                         <el-col :span="8">
                             <el-form-item :prop="`environments.${index}.key`" :rules="rules.key">
-                                <el-input v-model="env.key" :placeholder="$t('mcp.envKey')" />
+                                <el-input v-model="env.key" :placeholder="$t('aiTools.mcp.envKey')" />
                             </el-form-item>
                         </el-col>
                         <el-col :span="8">
                             <el-form-item :prop="`environments.${index}.value`" :rules="rules.value">
-                                <el-input v-model="env.value" :placeholder="$t('mcp.envValue')" />
+                                <el-input v-model="env.value" :placeholder="$t('aiTools.mcp.envValue')" />
                             </el-form-item>
                         </el-col>
                         <el-col :span="4">

@@ -91,6 +91,27 @@ func (b *BaseApi) BatchInstallAgentSkill(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Batch operate Agent
+// @Accept json
+// @Param request body dto.AgentBatchOperateReq true "request"
+// @Success 200 {array} dto.AgentBatchOperateResult
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/batch/operate [post]
+func (b *BaseApi) BatchOperateAgent(c *gin.Context) {
+	var req dto.AgentBatchOperateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := agentService.BatchOperate(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags AI
 // @Summary Page Agents
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"

@@ -53,7 +53,7 @@ const onConfirm = async () => {
     try {
         const data = JSON.parse(mcpServerJson.value);
         if (!data.mcpServers || typeof data.mcpServers !== 'object') {
-            throw new Error(i18n.global.t('mcp.importMcpJsonError'));
+            throw new Error(i18n.global.t('aiTools.mcp.importMcpJsonError'));
         }
         mcpServerConfig.value = Object.entries(data.mcpServers).map(([name, config]: any) => ({
             name,

@@ -35,6 +35,7 @@ type IAgentService interface {
 	BatchInstall(req dto.AgentBatchInstallReq) (*dto.AgentItem, error)
 	BatchUpgrade(req dto.AgentBatchUpgradeReq) ([]dto.AgentBatchUpgradeResult, error)
 	BatchInstallSkill(req dto.AgentBatchSkillInstallReq) ([]dto.AgentBatchSkillInstallResult, error)
+	BatchOperate(req dto.AgentBatchOperateReq) ([]dto.AgentBatchOperateResult, error)
 	Page(req dto.SearchWithPage) (int64, []dto.AgentItem, error)
 	DeleteCheck(req dto.AgentIDReq) ([]dto.AppResource, error)
 	Delete(req dto.AgentDeleteReq) error
@@ -423,6 +424,75 @@ func (a AgentService) BatchInstallSkill(req dto.AgentBatchSkillInstallReq) ([]dt
 	return results, nil
 }
 
+func (a AgentService) BatchOperate(req dto.AgentBatchOperateReq) ([]dto.AgentBatchOperateResult, error) {
+	operate := constant.AppOperate(strings.TrimSpace(req.Operate))
+	if operate != constant.Start && operate != constant.Stop && operate != constant.Restart && operate != constant.Delete {
+		return nil, fmt.Errorf("operate %s is not supported", req.Operate)
+	}
+	agents, err := agentRepo.List(func(db *gorm.DB) *gorm.DB {
+		return db.Where("agent_type = ?", req.AgentType).Order("id ASC")
+	})
+	if err != nil {
+		return nil, err
+	}
+	results := make([]dto.AgentBatchOperateResult, 0, len(agents))
+	for _, agent := range agents {
+		result := dto.AgentBatchOperateResult{
+			AgentID:      agent.ID,
+			AgentName:    agent.Name,
+			AppInstallID: agent.AppInstallID,
+		}
+		if operate == constant.Delete {
+			if err := a.Delete(dto.AgentDeleteReq{
+				ID:          agent.ID,
+				TaskID:      buildBatchOperateTaskID(req.TaskID, agent.ID),
+				ForceDelete: req.ForceDelete,
+			}); err != nil {
+				result.Message = err.Error()
+			} else {
+				result.Success = true
+			}
+			results = append(results, result)
+			continue
+		}
+		if agent.AppInstallID == 0 {
+			result.Message = "agent app install id is empty"
+			results = append(results, result)
+			continue
+		}
+		install, err := appInstallRepo.GetFirst(repo.WithByID(agent.AppInstallID))
+		if err != nil {
+			result.Message = err.Error()
+			results = append(results, result)
+			continue
+		}
+		result.AppInstallID = install.ID
+		if install.App.Key != req.AgentType {
+			result.Message = fmt.Sprintf("app key %s does not match agent type %s", install.App.Key, req.AgentType)
+			results = append(results, result)
+			continue
+		}
+		if message := batchOperateSkipMessage(operate, install.Status); message != "" {
+			result.Success = true
+			result.Skipped = true
+			result.Message = message
+			results = append(results, result)
+			continue
+		}
+		if err := NewIAppInstalledService().Operate(request.AppInstalledOperate{
+			InstallId: install.ID,
+			Operate:   operate,
+			TaskID:    buildBatchOperateTaskID(req.TaskID, agent.ID),
+		}); err != nil {
+			result.Message = err.Error()
+		} else {
+			result.Success = true
+		}
+		results = append(results, result)
+	}
+	return results, nil
+}
+
 func buildBatchUpgradePlans(req dto.AgentBatchUpgradeReq) ([]batchUpgradePlan, []dto.AgentBatchUpgradeResult, error) {
 	agents, err := agentRepo.List(func(db *gorm.DB) *gorm.DB {
 		return db.Where("agent_type = ?", req.AgentType).Order("id ASC")
@@ -506,6 +576,36 @@ func buildBatchSkillInstallTaskID(taskID string, agentID uint) string {
 		taskID = fmt.Sprintf("batch-skill-install-%d-%d", agentID, time.Now().UnixNano())
 	}
 	return fmt.Sprintf("%s-%d", taskID, agentID)
+}
+
+func buildBatchOperateTaskID(taskID string, agentID uint) string {
+	taskID = strings.TrimSpace(taskID)
+	if taskID == "" {
+		taskID = fmt.Sprintf("batch-operate-%d-%d", agentID, time.Now().UnixNano())
+	}
+	return fmt.Sprintf("%s-%d", taskID, agentID)
+}
+
+func batchOperateSkipMessage(operate constant.AppOperate, status string) string {
+	switch status {
+	case constant.StatusInstalling, constant.StatusUpgrading, constant.StatusUninstalling, constant.StatusRebuilding:
+		return fmt.Sprintf("agent status is %s", status)
+	}
+	switch operate {
+	case constant.Start:
+		if status == constant.StatusRunning || status == constant.StatusStarting || status == constant.StatusRestarting {
+			return fmt.Sprintf("agent status is %s", status)
+		}
+	case constant.Stop:
+		if status != constant.StatusRunning {
+			return fmt.Sprintf("agent status is %s", status)
+		}
+	case constant.Restart:
+		if status == constant.StatusStarting {
+			return fmt.Sprintf("agent status is %s", status)
+		}
+	}
+	return ""
 }
 
 func buildCreateReqFromBatchInstallReq(req dto.AgentBatchInstallReq) dto.AgentCreateReq {
