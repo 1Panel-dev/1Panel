@@ -48,6 +48,14 @@
                                 {{ $t('commons.button.bind') }}
                             </el-button>
                         </template>
+
+                        <template v-if="props.currentTab == 'base'">
+                            <el-divider direction="vertical" />
+                            <el-button link type="primary" v-permission @click="onOpenWhiteList" plain>
+                                {{ $t('firewall.portWhiteList') }}
+                            </el-button>
+                        </template>
+
                         <span v-if="onPing !== 'None'">
                             <el-divider direction="vertical" />
                             <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
@@ -90,6 +98,7 @@
                 <span>{{ $t('firewall.' + operation + 'FirewallHelper') }}</span>
             </template>
         </DockerRestart>
+        <WhiteList ref="whiteListRef" @search="search" />
     </div>
 </template>
 
@@ -99,6 +108,7 @@ import { loadFireBaseInfo, operateFilterChain, operateFire } from '@/api/modules
 import i18n from '@/lang';
 import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
+import WhiteList from '@/views/host/firewall/status/white-list/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { ref } from 'vue';
@@ -120,6 +130,7 @@ const baseInfo = ref<Host.FirewallBase>({
 const onPing = ref('Disable');
 const oldStatus = ref();
 const dockerRef = ref();
+const whiteListRef = ref();
 const operation = ref('restart');
 const dockerStatus = ref();
 const withDockerRestart = ref(false);
@@ -167,6 +178,10 @@ const loadBaseInfo = async (search: boolean) => {
 const loadDocker = async () => {
     const res = await loadDockerStatus();
     dockerStatus.value = res.data.isExist;
+};
+
+const onOpenWhiteList = () => {
+    whiteListRef.value.acceptParams();
 };
 
 const loadInitMsg = () => {
@@ -284,6 +299,10 @@ const onPingOperate = async (operation: string) => {
             emit('update:maskShow', true);
             onPing.value = oldStatus.value;
         });
+};
+
+const search = () => {
+    emit('search');
 };
 
 defineExpose({

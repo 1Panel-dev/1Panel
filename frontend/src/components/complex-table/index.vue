@@ -378,6 +378,13 @@ function handleRowClick(row: any, column: any, event: any) {
     if (
         target.closest('button') ||
         target.closest('a') ||
+        target.closest('input') ||
+        target.closest('textarea') ||
+        target.closest('[contenteditable="true"]') ||
+        target.closest('.el-input') ||
+        target.closest('.el-textarea') ||
+        target.closest('.el-input-number') ||
+        target.closest('.el-date-editor') ||
         target.closest('.el-switch') ||
         target.closest('.el-select') ||
         target.closest('.table-link') ||
