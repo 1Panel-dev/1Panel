@@ -5,7 +5,15 @@
                 <span class="text-3xl font-medium title">
                     {{ $t('license.importLicense') }}
                 </span>
-                <el-row type="flex" justify="center" class="mt-6">
+                <el-row type="flex" justify="center" class="mt-4">
+                    <el-col :span="22">
+                        <div class="license-security-tip">
+                            <div class="license-security-title">{{ $t('license.securityWarningTitle') }}</div>
+                            <div>{{ $t('license.securityWarningContent') }}</div>
+                        </div>
+                    </el-col>
+                </el-row>
+                <el-row type="flex" justify="center" class="mt-4">
                     <el-col :span="22">
                         <el-upload
                             action="#"
@@ -185,3 +193,23 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss" scoped>
+.license-security-tip {
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 12px;
+    line-height: 20px;
+    color: var(--el-text-color-regular);
+    background: var(--el-color-warning-light-9);
+    border: 1px solid var(--el-color-warning-light-7);
+    border-left: 3px solid var(--el-color-warning);
+    border-radius: 4px;
+}
+
+.license-security-title {
+    margin-bottom: 2px;
+    font-weight: 600;
+    color: var(--el-color-warning-dark-2);
+}
+</style>

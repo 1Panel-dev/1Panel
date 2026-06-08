@@ -3008,6 +3008,9 @@ const message = {
         power: 'Autorizar',
         unbindHelper: 'Se eliminarán todos los ajustes comerciales tras desvincular. ¿Desea continuar?',
         importLicense: 'Importar licencia',
+        securityWarningTitle: 'No uses licencias crackeadas ni de origen desconocido.',
+        securityWarningContent:
+            '1Panel debe ejecutarse con un usuario con permisos de administración del sistema. Las licencias no oficiales o las versiones manipuladas pueden causar pérdida de control del servidor, filtraciones de datos y otros riesgos graves de seguridad. Obtén licencias e instaladores solo desde canales oficiales de FIT2CLOUD.',
         importHelper: 'Haga clic o arrastre el archivo de licencia aquí',
         licenseRequiredTip:
             'La licencia aún no se ha importado. Copie el ID del dispositivo, obtenga la licencia e impórtela antes de iniciar sesión.',

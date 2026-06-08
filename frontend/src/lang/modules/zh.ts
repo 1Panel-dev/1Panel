@@ -2723,6 +2723,9 @@ const message = {
         quickUpdate: '快速更新',
         unbindHelper: '解除绑定后将清除该节点所有商业版相关设置，是否继续？',
         importLicense: '导入许可证',
+        securityWarningTitle: '请勿使用破解版或来源不明的许可证！',
+        securityWarningContent:
+            '1Panel 需要以具备系统管理权限的用户运行，非官方许可证或被篡改版本可能导致服务器失控、数据泄露等严重安全风险。请通过飞致云官方渠道获取许可证和安装包。',
         importHelper: '请点击或拖动许可文件到此处',
         licenseRequiredTip: '当前尚未导入许可证，复制设备 ID 后获取许可证并导入后才能登录使用。',
         licenseRequiredShortTip: '请先复制设备 ID 获取许可证，导入许可证后即可登录。',

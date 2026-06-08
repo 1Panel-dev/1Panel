@@ -2895,6 +2895,9 @@ const message = {
         power: '권한 부여',
         unbindHelper: '연결 해제 후 모든 상용 버전 관련 설정이 초기화됩니다. 계속하시겠습니까?',
         importLicense: '라이센스',
+        securityWarningTitle: '크랙 버전 또는 출처를 알 수 없는 라이선스를 사용하지 마세요.',
+        securityWarningContent:
+            '1Panel은 시스템 관리 권한을 가진 사용자로 실행해야 합니다. 비공식 라이선스 또는 변조된 버전은 서버 제어 상실, 데이터 유출 등 심각한 보안 위험을 초래할 수 있습니다. 라이선스와 설치 패키지는 FIT2CLOUD 공식 채널을 통해 받으세요.',
         importHelper: '라이센스 파일을 여기에 클릭하거나 드래그하세요',
         licenseRequiredTip:
             '아직 라이선스를 가져오지 않았습니다. 장치 ID를 복사해 라이선스를 받은 뒤 가져와야 로그인할 수 있습니다.',

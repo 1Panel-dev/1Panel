@@ -2998,6 +2998,9 @@ const message = {
         unbindHelper:
             'Bağlantı kaldırıldığında tüm Ticari sürümle ilgili ayarlar temizlenecek. Devam etmek istiyor musunuz? ',
         importLicense: 'Lisansı içe aktar',
+        securityWarningTitle: 'Kırılmış veya kaynağı bilinmeyen lisansları kullanmayın.',
+        securityWarningContent:
+            '1Panel sistem yönetimi yetkilerine sahip bir kullanıcıyla çalışmalıdır. Resmi olmayan lisanslar veya değiştirilmiş sürümler sunucu kontrolünün kaybına, veri sızıntılarına ve diğer ciddi güvenlik risklerine neden olabilir. Lisansları ve kurulum paketlerini yalnızca resmi FIT2CLOUD kanallarından edinin.',
         importHelper: 'Lütfen lisans dosyasını buraya tıklayın veya sürükleyin',
         licenseRequiredTip:
             'Lisans henüz içe aktarılmadı. Cihaz kimliğini kopyalayıp lisansı alın ve giriş yapmadan önce içe aktarın.',

@@ -2929,6 +2929,9 @@ const message = {
         power: 'Authorize',
         unbindHelper: 'All Commercial Edition related settings will be cleaned after unbinding. Continue? ',
         importLicense: 'Import license',
+        securityWarningTitle: 'Do not use cracked licenses or licenses from unknown sources.',
+        securityWarningContent:
+            '1Panel runs with system administration privileges. Unofficial licenses or tampered builds may cause server takeover, data leaks, and other serious security risks. Obtain licenses and installers only from official FIT2CLOUD channels.',
         importHelper: 'Click or drag the license file here',
         licenseRequiredTip:
             'The license has not been imported yet. Copy the device ID, obtain the license, and import it before logging in.',
