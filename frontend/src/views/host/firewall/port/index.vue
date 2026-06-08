@@ -82,20 +82,17 @@
                             <el-table-column :label="$t('commons.table.port')" :min-width="70" prop="port" />
                             <el-table-column :label="$t('commons.table.status')" :min-width="120">
                                 <template #default="{ row }">
-                                    <div v-if="isSinglePort(row.port)">
-                                        <el-tag type="success" v-if="row.usedStatus">
-                                            {{ $t('firewall.used') + ' (' + row.usedStatus + ')' }}
-                                            <el-icon
-                                                v-if="row.processInfo"
-                                                @click="showProcessDetail(row.processInfo.PID)"
-                                                style="margin-left: 4px; cursor: pointer; vertical-align: middle"
-                                            >
-                                                <Expand />
-                                            </el-icon>
-                                        </el-tag>
-                                        <el-tag type="info" v-else>{{ $t('firewall.unUsed') }}</el-tag>
-                                    </div>
-                                    <span v-else>-</span>
+                                    <el-tag type="success" v-if="row.usedStatus">
+                                        {{ $t('firewall.used') + ' (' + row.usedStatus + ')' }}
+                                        <el-icon
+                                            v-if="row.processInfo"
+                                            @click="showProcessDetail(row.processInfo.PID)"
+                                            style="margin-left: 4px; cursor: pointer; vertical-align: middle"
+                                        >
+                                            <Expand />
+                                        </el-icon>
+                                    </el-tag>
+                                    <el-tag type="info" v-else>{{ $t('firewall.unUsed') }}</el-tag>
                                 </template>
                             </el-table-column>
                             <el-table-column :min-width="80" :label="$t('firewall.strategy')" prop="strategy">
@@ -211,8 +208,28 @@ const extractPortsFromObject = (portObj: { [key: string]: {} }): number[] => {
         .filter((port) => !isNaN(port));
 };
 
-const isSinglePort = (portStr: string): boolean => {
-    return portStr.indexOf('-') === -1 && portStr.indexOf(':') === -1 && portStr.indexOf(',') === -1;
+const isPortInRule = (rulePort: string, port: number): boolean => {
+    const segments = rulePort.split(',');
+    for (const segment of segments) {
+        const portSegment = segment.trim();
+        if (!portSegment) {
+            continue;
+        }
+
+        const rangeDelimiter = portSegment.includes('-') && !portSegment.startsWith('-') ? '-' : ':';
+        if (portSegment.includes(rangeDelimiter) && !portSegment.startsWith(rangeDelimiter)) {
+            const [startPort, endPort] = portSegment.split(rangeDelimiter).map((item) => parseInt(item.trim()));
+            if (!isNaN(startPort) && !isNaN(endPort) && port >= startPort && port <= endPort) {
+                return true;
+            }
+            continue;
+        }
+
+        if (parseInt(portSegment) === port) {
+            return true;
+        }
+    }
+    return false;
 };
 
 const loadListeningProcesses = async () => {
@@ -221,20 +238,17 @@ const loadListeningProcesses = async () => {
         listeningProcesses.value = res.data || [];
 
         for (const item of data.value) {
-            if (!item.usedStatus && isSinglePort(item.port)) {
-                const portNum = parseInt(item.port.trim());
-                if (!isNaN(portNum)) {
-                    const protocolNum =
-                        item.protocol.toLowerCase() === 'tcp' ? 1 : item.protocol.toLowerCase() === 'udp' ? 2 : 0;
+            if (!item.processInfo) {
+                const protocolNum =
+                    item.protocol.toLowerCase() === 'tcp' ? 1 : item.protocol.toLowerCase() === 'udp' ? 2 : 0;
 
-                    for (const proc of listeningProcesses.value) {
-                        if (proc.Protocol === protocolNum) {
-                            const procPorts = extractPortsFromObject(proc.Port);
-                            if (procPorts.includes(portNum)) {
-                                item.usedStatus = proc.Name;
-                                item.processInfo = proc;
-                                break;
-                            }
+                for (const proc of listeningProcesses.value) {
+                    if (proc.Protocol === protocolNum) {
+                        const procPorts = extractPortsFromObject(proc.Port);
+                        if (procPorts.some((port) => isPortInRule(item.port, port))) {
+                            item.usedStatus = proc.Name;
+                            item.processInfo = proc;
+                            break;
                         }
                     }
                 }
