@@ -319,6 +319,11 @@ function clearTextSelection() {
     }
 }
 
+function hasActiveTextSelection() {
+    const selection = window.getSelection?.();
+    return !!selection && !selection.isCollapsed && selection.toString().trim().length > 0;
+}
+
 const updatePaginationWidth = () => {
     paginationWidth.value = paginationRef.value?.clientWidth || 0;
 };
@@ -373,6 +378,9 @@ function handleRowClick(row: any, column: any, event: any) {
     if (!isRowSelectable(row)) return;
 
     const target = event.target as HTMLElement;
+    if (hasActiveTextSelection() && !event.shiftKey) {
+        return;
+    }
 
     if (target.closest('.el-checkbox')) return;
     if (

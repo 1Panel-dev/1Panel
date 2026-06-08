@@ -494,7 +494,7 @@ func (c *ClamService) loadConfigPath(confType string) string {
 
 func handleAlert(infectedFiles, clamName string, clamId uint) {
 	itemInfected, _ := strconv.Atoi(strings.TrimSpace(infectedFiles))
-	if itemInfected < 0 {
+	if itemInfected <= 0 {
 		return
 	}
 	pushAlert := dto.PushAlert{

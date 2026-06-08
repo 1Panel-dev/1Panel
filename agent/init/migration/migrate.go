@@ -107,6 +107,7 @@ func InitTaskDB() {
 func InitAlertDB() {
 	m := gormigrate.New(global.AlertDB, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		migrations.MigrateAlertMethodConfigIDs,
+		migrations.MigrateAlertLogTaskMethodConfigIDs,
 		migrations.AddAlertAuditUser,
 	})
 	if err := m.Migrate(); err != nil {

@@ -487,7 +487,23 @@ var MigrateAlertMethodConfigIDs = &gormigrate.Migration{
 		if err := global.AlertDB.AutoMigrate(&model.Alert{}, &model.AlertLog{}, &model.AlertTask{}, &model.AlertConfig{}); err != nil {
 			return err
 		}
-		if err := migrateAlertMethodConfigIDs(global.AlertDB); err != nil {
+		if err := migrateAlertMethodConfigIDs(tx); err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var MigrateAlertLogTaskMethodConfigIDs = &gormigrate.Migration{
+	ID: "20260608-migrate-alert-log-task-method-config-ids",
+	Migrate: func(tx *gorm.DB) error {
+		if err := global.AlertDB.AutoMigrate(&model.AlertLog{}, &model.AlertTask{}, &model.AlertConfig{}); err != nil {
+			return err
+		}
+		if err := migrateAlertMethodRecords(tx, &model.AlertLog{}); err != nil {
+			return err
+		}
+		if err := migrateAlertMethodRecords(tx, &model.AlertTask{}); err != nil {
 			return err
 		}
 		return nil
@@ -506,28 +522,9 @@ func migrateAlertMethodConfigIDs(tx *gorm.DB) error {
 		return err
 	}
 
-	typeMap := map[string]string{
-		"mail":            constant.Email,
-		constant.Email:    constant.Email,
-		constant.SMS:      constant.SMS,
-		constant.Bark:     constant.Bark,
-		constant.WeCom:    constant.WeCom,
-		constant.DingTalk: constant.DingTalk,
-		constant.FeiShu:   constant.FeiShu,
-	}
-	configIDs := map[string]string{}
-	for _, configType := range typeMap {
-		if _, ok := configIDs[configType]; ok {
-			continue
-		}
-		var config model.AlertConfig
-		if err := tx.Where("type = ?", configType).Order("id ASC").First(&config).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				continue
-			}
-			return err
-		}
-		configIDs[configType] = strconv.Itoa(int(config.ID))
+	configIDs, err := loadAlertConfigIDs(tx)
+	if err != nil {
+		return err
 	}
 
 	var alerts []model.Alert
@@ -535,7 +532,7 @@ func migrateAlertMethodConfigIDs(tx *gorm.DB) error {
 		return err
 	}
 	for _, alert := range alerts {
-		method := migrateAlertMethodValue(alert.Method, typeMap, configIDs)
+		method := migrateAlertMethodValue(alert.Method, alertLegacyMethodTypeMap(), configIDs)
 		if method == alert.Method {
 			continue
 		}
@@ -544,6 +541,76 @@ func migrateAlertMethodConfigIDs(tx *gorm.DB) error {
 		}
 	}
 	return nil
+}
+
+func migrateAlertMethodRecords(tx *gorm.DB, modelValue interface{}) error {
+	configIDs, err := loadAlertConfigIDs(tx)
+	if err != nil {
+		return err
+	}
+
+	switch modelValue.(type) {
+	case *model.AlertLog:
+		var logs []model.AlertLog
+		if err := tx.Find(&logs).Error; err != nil {
+			return err
+		}
+		for _, item := range logs {
+			method := migrateAlertMethodValue(item.Method, alertLegacyMethodTypeMap(), configIDs)
+			if method == item.Method {
+				continue
+			}
+			if err := tx.Model(&model.AlertLog{}).Where("id = ?", item.ID).Update("method", method).Error; err != nil {
+				return err
+			}
+		}
+	case *model.AlertTask:
+		var tasks []model.AlertTask
+		if err := tx.Find(&tasks).Error; err != nil {
+			return err
+		}
+		for _, item := range tasks {
+			method := migrateAlertMethodValue(item.Method, alertLegacyMethodTypeMap(), configIDs)
+			if method == item.Method {
+				continue
+			}
+			if err := tx.Model(&model.AlertTask{}).Where("id = ?", item.ID).Update("method", method).Error; err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func loadAlertConfigIDs(tx *gorm.DB) (map[string]string, error) {
+	configIDs := map[string]string{}
+	for _, configType := range alertLegacyMethodTypeMap() {
+		if _, ok := configIDs[configType]; ok {
+			continue
+		}
+		var config model.AlertConfig
+		if err := tx.Where("type = ?", configType).Order("id ASC").First(&config).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				continue
+			}
+			return nil, err
+		}
+		configIDs[configType] = strconv.Itoa(int(config.ID))
+	}
+	return configIDs, nil
+}
+
+func alertLegacyMethodTypeMap() map[string]string {
+	return map[string]string{
+		"mail":            constant.Email,
+		constant.Email:    constant.Email,
+		constant.SMS:      constant.SMS,
+		constant.Bark:     constant.Bark,
+		constant.WeChat:   constant.WeCom,
+		constant.WeCom:    constant.WeCom,
+		constant.DingTalk: constant.DingTalk,
+		constant.FeiShu:   constant.FeiShu,
+	}
 }
 
 func migrateAlertMethodValue(method string, typeMap map[string]string, configIDs map[string]string) string {
