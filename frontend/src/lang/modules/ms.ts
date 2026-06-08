@@ -3011,6 +3011,9 @@ const message = {
         unbindHelper:
             'Semua Tetapan berkaitan Edisi Komersial akan dibersihkan selepas nyahikat. Adakah anda mahu meneruskan?',
         importLicense: 'Lesen',
+        securityWarningTitle: 'Jangan gunakan lesen retak atau lesen daripada sumber yang tidak diketahui.',
+        securityWarningContent:
+            '1Panel perlu dijalankan oleh pengguna dengan keistimewaan pentadbiran sistem. Lesen tidak rasmi atau versi yang diubah suai boleh menyebabkan pelayan hilang kawalan, kebocoran data dan risiko keselamatan serius lain. Dapatkan lesen dan pakej pemasangan hanya melalui saluran rasmi FIT2CLOUD.',
         importHelper: 'Sila klik atau seret fail lesen ke sini',
         licenseRequiredTip:
             'Lesen belum diimport. Salin ID peranti, dapatkan lesen dan importkannya sebelum anda boleh log masuk.',

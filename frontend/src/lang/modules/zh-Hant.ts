@@ -2747,6 +2747,9 @@ const message = {
         power: '授權',
         unbindHelper: '解除綁定後將清除該節點所有商業版相關設定，是否繼續？',
         importLicense: '匯入許可證',
+        securityWarningTitle: '請勿使用破解版或來源不明的許可證！',
+        securityWarningContent:
+            '1Panel 需要以具備系統管理權限的使用者執行，非官方許可證或被竄改版本可能導致伺服器失控、資料外洩等嚴重安全風險。請透過飛致雲官方管道取得許可證和安裝包。',
         importHelper: '請點選或拖動許可檔案到此處',
         licenseRequiredTip: '目前尚未匯入許可證，複製裝置 ID 後取得許可證並匯入後才能登入使用。',
         licenseRequiredShortTip: '請先複製裝置 ID 取得許可證，匯入許可證後即可登入。',
