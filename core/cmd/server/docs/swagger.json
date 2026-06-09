@@ -746,6 +746,167 @@
 				]
 			}
 		},
+		"/ai/agents/batch/install": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentBatchInstallReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentItem"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch install Agent",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/batch/operate": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentBatchOperateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentBatchOperateResult"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch operate Agent",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/batch/skill/install": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentBatchSkillInstallReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentBatchSkillInstallResult"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch install Agent Skill",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/batch/upgrade": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentBatchUpgradeReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentBatchUpgradeResult"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch upgrade Agent",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/agents/channel/delete": {
 			"post": {
 				"consumes": [
@@ -3368,11 +3529,10 @@
 				"x-panel-log": {
 					"BeforeFunctions": [],
 					"bodyKeys": [
-						"type",
-						"method"
+						"title"
 					],
-					"formatEN": "create alert [type][method]",
-					"formatZH": "创建告警任务 [type][method]",
+					"formatEN": "create alert [title]",
+					"formatZH": "创建告警任务 [title]",
 					"paramKeys": []
 				}
 			}
@@ -3569,11 +3729,10 @@
 				"x-panel-log": {
 					"BeforeFunctions": [],
 					"bodyKeys": [
-						"type",
 						"title"
 					],
-					"formatEN": "update alert config [type][title]",
-					"formatZH": "更新告警配置 [type][title]",
+					"formatEN": "update alert config [title]",
+					"formatZH": "更新告警配置 [title]",
 					"paramKeys": []
 				}
 			}
@@ -3857,11 +4016,10 @@
 				"x-panel-log": {
 					"BeforeFunctions": [],
 					"bodyKeys": [
-						"id",
-						"type"
+						"title"
 					],
-					"formatEN": "update alert [id][type]",
-					"formatZH": "更新告警任务 [id][type]",
+					"formatEN": "update alert [title]",
+					"formatZH": "更新告警任务 [title]",
 					"paramKeys": []
 				}
 			}
@@ -22445,7 +22603,7 @@
 					"bodyKeys": [
 						"operation"
 					],
-					"formatEN": "[operation] FTP",
+					"formatEN": "[operation] Clam",
 					"formatZH": "[operation] Clam",
 					"paramKeys": []
 				}
@@ -27922,6 +28080,53 @@
 			],
 			"type": "object"
 		},
+		"dto.AgentAccountInfo": {
+			"properties": {
+				"apiKey": {
+					"type": "string"
+				},
+				"apiType": {
+					"type": "string"
+				},
+				"baseUrl": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"masterAccountId": {
+					"type": "integer"
+				},
+				"models": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentAccountModel"
+					},
+					"type": "array"
+				},
+				"name": {
+					"type": "string"
+				},
+				"provider": {
+					"type": "string"
+				},
+				"providerName": {
+					"type": "string"
+				},
+				"remark": {
+					"type": "string"
+				},
+				"rememberApiKey": {
+					"type": "boolean"
+				},
+				"verified": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
 		"dto.AgentAccountModel": {
 			"properties": {
 				"contextWindow": {
@@ -28090,6 +28295,263 @@
 				"apiKey",
 				"provider"
 			],
+			"type": "object"
+		},
+		"dto.AgentBatchInstallReq": {
+			"properties": {
+				"accountId": {
+					"type": "integer"
+				},
+				"accountModels": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentAccountModel"
+					},
+					"type": "array"
+				},
+				"accountSnapshot": {
+					"$ref": "#/definitions/dto.AgentAccountInfo"
+				},
+				"advanced": {
+					"type": "boolean"
+				},
+				"agentType": {
+					"enum": [
+						"openclaw",
+						"copaw",
+						"hermes-agent"
+					],
+					"type": "string"
+				},
+				"allowPort": {
+					"type": "boolean"
+				},
+				"allowedOrigins": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"appVersion": {
+					"type": "string"
+				},
+				"bridgePort": {
+					"type": "integer"
+				},
+				"containerName": {
+					"type": "string"
+				},
+				"cpuQuota": {
+					"type": "number"
+				},
+				"dockerCompose": {
+					"type": "string"
+				},
+				"editCompose": {
+					"type": "boolean"
+				},
+				"fallbackAccessHost": {
+					"type": "string"
+				},
+				"masterAccountId": {
+					"type": "integer"
+				},
+				"memoryLimit": {
+					"type": "number"
+				},
+				"memoryUnit": {
+					"type": "string"
+				},
+				"model": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"pullImage": {
+					"type": "boolean"
+				},
+				"remark": {
+					"type": "string"
+				},
+				"restartPolicy": {
+					"type": "string"
+				},
+				"specifyIP": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"token": {
+					"type": "string"
+				},
+				"webUIPort": {
+					"maximum": 65535,
+					"minimum": 1,
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentType",
+				"appVersion",
+				"webUIPort"
+			],
+			"type": "object"
+		},
+		"dto.AgentBatchOperateReq": {
+			"properties": {
+				"agentType": {
+					"enum": [
+						"openclaw",
+						"copaw",
+						"hermes-agent"
+					],
+					"type": "string"
+				},
+				"forceDelete": {
+					"type": "boolean"
+				},
+				"operate": {
+					"enum": [
+						"start",
+						"stop",
+						"restart",
+						"delete"
+					],
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentType",
+				"operate"
+			],
+			"type": "object"
+		},
+		"dto.AgentBatchOperateResult": {
+			"properties": {
+				"agentID": {
+					"type": "integer"
+				},
+				"agentName": {
+					"type": "string"
+				},
+				"appInstallID": {
+					"type": "integer"
+				},
+				"message": {
+					"type": "string"
+				},
+				"skipped": {
+					"type": "boolean"
+				},
+				"success": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentBatchSkillInstallReq": {
+			"properties": {
+				"agentType": {
+					"enum": [
+						"openclaw",
+						"hermes-agent"
+					],
+					"type": "string"
+				},
+				"packagePath": {
+					"type": "string"
+				},
+				"skillName": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentType",
+				"packagePath",
+				"skillName"
+			],
+			"type": "object"
+		},
+		"dto.AgentBatchSkillInstallResult": {
+			"properties": {
+				"agentID": {
+					"type": "integer"
+				},
+				"agentName": {
+					"type": "string"
+				},
+				"appInstallID": {
+					"type": "integer"
+				},
+				"message": {
+					"type": "string"
+				},
+				"skipped": {
+					"type": "boolean"
+				},
+				"success": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentBatchUpgradeReq": {
+			"properties": {
+				"agentType": {
+					"enum": [
+						"openclaw",
+						"copaw",
+						"hermes-agent"
+					],
+					"type": "string"
+				},
+				"backup": {
+					"type": "boolean"
+				},
+				"pullImage": {
+					"type": "boolean"
+				},
+				"targetVersion": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentType",
+				"targetVersion"
+			],
+			"type": "object"
+		},
+		"dto.AgentBatchUpgradeResult": {
+			"properties": {
+				"agentID": {
+					"type": "integer"
+				},
+				"agentName": {
+					"type": "string"
+				},
+				"appInstallID": {
+					"type": "integer"
+				},
+				"message": {
+					"type": "string"
+				},
+				"skipped": {
+					"type": "boolean"
+				},
+				"success": {
+					"type": "boolean"
+				}
+			},
 			"type": "object"
 		},
 		"dto.AgentChannelDeleteReq": {
@@ -39645,6 +40107,9 @@
 				},
 				"url": {
 					"type": "string"
+				},
+				"useProxy": {
+					"type": "boolean"
 				}
 			},
 			"required": [

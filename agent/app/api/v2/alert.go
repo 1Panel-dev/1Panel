@@ -53,7 +53,7 @@ func (b *BaseApi) GetAlerts(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /alert [post]
-// @x-panel-log {"bodyKeys":["type","method"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建告警任务 [title]","formatEN":"create alert [title]"}
+// @x-panel-log {"bodyKeys":["title"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建告警任务 [title]","formatEN":"create alert [title]"}
 func (b *BaseApi) CreateAlert(c *gin.Context) {
 	var req dto.AlertCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -97,7 +97,7 @@ func (b *BaseApi) DeleteAlert(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /alert/update [post]
-// @x-panel-log {"bodyKeys":["id","type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新告警任务 [id][title]","formatEN":"update alert [id][title]"}
+// @x-panel-log {"bodyKeys":["title"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新告警任务 [title]","formatEN":"update alert [title]"}
 func (b *BaseApi) UpdateAlert(c *gin.Context) {
 	var req dto.AlertUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -287,7 +287,7 @@ func (b *BaseApi) PageAlertConfig(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /alert/config/update [post]
-// @x-panel-log {"bodyKeys":["type","title"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新告警配置 [id][type]","formatEN":"update alert config [id][type]"}
+// @x-panel-log {"bodyKeys":["title"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新告警配置 [title]","formatEN":"update alert config [title]"}
 func (b *BaseApi) UpdateAlertConfig(c *gin.Context) {
 	var req dto.AlertConfigUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
