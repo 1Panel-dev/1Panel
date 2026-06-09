@@ -106,8 +106,13 @@ type IAgentService interface {
 }
 
 type batchUpgradePlan struct {
-	agent model.Agent
-	req   request.AppInstallUpgrade
+	ctx batchAgentInstallContext
+	req request.AppInstallUpgrade
+}
+
+type batchAgentInstallContext struct {
+	agent   model.Agent
+	install model.AppInstall
 }
 
 const (
@@ -333,9 +338,9 @@ func (a AgentService) BatchUpgrade(req dto.AgentBatchUpgradeReq) ([]dto.AgentBat
 	}
 	for _, plan := range plans {
 		result := dto.AgentBatchUpgradeResult{
-			AgentID:      plan.agent.ID,
-			AgentName:    plan.agent.Name,
-			AppInstallID: plan.agent.AppInstallID,
+			AgentID:      plan.ctx.agent.ID,
+			AgentName:    plan.ctx.agent.Name,
+			AppInstallID: plan.ctx.agent.AppInstallID,
 		}
 		if err := upgradeInstall(plan.req); err != nil {
 			result.Message = err.Error()
@@ -361,9 +366,7 @@ func (a AgentService) BatchInstallSkill(req dto.AgentBatchSkillInstallReq) ([]dt
 		return nil, fmt.Errorf("only .zip skill packages can be installed")
 	}
 	skillName := sanitizeLocalSkillDirName(req.SkillName, packagePath, req.SkillName)
-	agents, err := agentRepo.List(func(db *gorm.DB) *gorm.DB {
-		return db.Where("agent_type = ?", req.AgentType).Order("id ASC")
-	})
+	agents, err := listBatchAgents(req.AgentType)
 	if err != nil {
 		return nil, err
 	}
@@ -374,23 +377,14 @@ func (a AgentService) BatchInstallSkill(req dto.AgentBatchSkillInstallReq) ([]dt
 			AgentName:    agent.Name,
 			AppInstallID: agent.AppInstallID,
 		}
-		if agent.AppInstallID == 0 {
-			result.Message = "agent app install id is empty"
+		ctx, message := loadBatchAgentInstall(agent, req.AgentType)
+		if message != "" {
+			result.Message = message
 			results = append(results, result)
 			continue
 		}
-		install, err := appInstallRepo.GetFirst(repo.WithByID(agent.AppInstallID))
-		if err != nil {
-			result.Message = err.Error()
-			results = append(results, result)
-			continue
-		}
+		install := ctx.install
 		result.AppInstallID = install.ID
-		if install.App.Key != req.AgentType {
-			result.Message = fmt.Sprintf("app key %s does not match agent type %s", install.App.Key, req.AgentType)
-			results = append(results, result)
-			continue
-		}
 		if install.Status == constant.StatusInstalling || install.Status == constant.StatusUpgrading {
 			result.Message = fmt.Sprintf("agent status is %s", install.Status)
 			results = append(results, result)
@@ -407,8 +401,8 @@ func (a AgentService) BatchInstallSkill(req dto.AgentBatchSkillInstallReq) ([]dt
 			results = append(results, result)
 			continue
 		}
-		currentAgent := agent
-		currentInstall := install
+		currentAgent := ctx.agent
+		currentInstall := ctx.install
 		installTask.AddSubTask("Install local skill", func(t *task.Task) error {
 			mgr := cmd.NewCommandMgr(cmd.WithTask(*t), cmd.WithContext(t.TaskCtx), cmd.WithTimeout(20*time.Minute))
 			return installLocalSkillPackage(mgr, currentInstall.ContainerName, currentAgent.AgentType, currentAgent.ConfigPath, packagePath, skillName)
@@ -429,9 +423,7 @@ func (a AgentService) BatchOperate(req dto.AgentBatchOperateReq) ([]dto.AgentBat
 	if operate != constant.Start && operate != constant.Stop && operate != constant.Restart && operate != constant.Delete {
 		return nil, fmt.Errorf("operate %s is not supported", req.Operate)
 	}
-	agents, err := agentRepo.List(func(db *gorm.DB) *gorm.DB {
-		return db.Where("agent_type = ?", req.AgentType).Order("id ASC")
-	})
+	agents, err := listBatchAgents(req.AgentType)
 	if err != nil {
 		return nil, err
 	}
@@ -455,23 +447,14 @@ func (a AgentService) BatchOperate(req dto.AgentBatchOperateReq) ([]dto.AgentBat
 			results = append(results, result)
 			continue
 		}
-		if agent.AppInstallID == 0 {
-			result.Message = "agent app install id is empty"
+		ctx, message := loadBatchAgentInstall(agent, req.AgentType)
+		if message != "" {
+			result.Message = message
 			results = append(results, result)
 			continue
 		}
-		install, err := appInstallRepo.GetFirst(repo.WithByID(agent.AppInstallID))
-		if err != nil {
-			result.Message = err.Error()
-			results = append(results, result)
-			continue
-		}
+		install := ctx.install
 		result.AppInstallID = install.ID
-		if install.App.Key != req.AgentType {
-			result.Message = fmt.Sprintf("app key %s does not match agent type %s", install.App.Key, req.AgentType)
-			results = append(results, result)
-			continue
-		}
 		if message := batchOperateSkipMessage(operate, install.Status); message != "" {
 			result.Success = true
 			result.Skipped = true
@@ -493,10 +476,30 @@ func (a AgentService) BatchOperate(req dto.AgentBatchOperateReq) ([]dto.AgentBat
 	return results, nil
 }
 
-func buildBatchUpgradePlans(req dto.AgentBatchUpgradeReq) ([]batchUpgradePlan, []dto.AgentBatchUpgradeResult, error) {
-	agents, err := agentRepo.List(func(db *gorm.DB) *gorm.DB {
-		return db.Where("agent_type = ?", req.AgentType).Order("id ASC")
+func listBatchAgents(agentType string) ([]model.Agent, error) {
+	return agentRepo.List(func(db *gorm.DB) *gorm.DB {
+		return db.Where("agent_type = ?", agentType).Order("id ASC")
 	})
+}
+
+func loadBatchAgentInstall(agent model.Agent, agentType string) (batchAgentInstallContext, string) {
+	ctx := batchAgentInstallContext{agent: agent}
+	if agent.AppInstallID == 0 {
+		return ctx, "agent app install id is empty"
+	}
+	install, err := appInstallRepo.GetFirst(repo.WithByID(agent.AppInstallID))
+	if err != nil {
+		return ctx, err.Error()
+	}
+	ctx.install = install
+	if install.App.Key != agentType {
+		return ctx, fmt.Sprintf("app key %s does not match agent type %s", install.App.Key, agentType)
+	}
+	return ctx, ""
+}
+
+func buildBatchUpgradePlans(req dto.AgentBatchUpgradeReq) ([]batchUpgradePlan, []dto.AgentBatchUpgradeResult, error) {
+	agents, err := listBatchAgents(req.AgentType)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -508,23 +511,14 @@ func buildBatchUpgradePlans(req dto.AgentBatchUpgradeReq) ([]batchUpgradePlan, [
 			AgentName:    agent.Name,
 			AppInstallID: agent.AppInstallID,
 		}
-		if agent.AppInstallID == 0 {
-			result.Message = "agent app install id is empty"
+		ctx, message := loadBatchAgentInstall(agent, req.AgentType)
+		if message != "" {
+			result.Message = message
 			results = append(results, result)
 			continue
 		}
-		install, err := appInstallRepo.GetFirst(repo.WithByID(agent.AppInstallID))
-		if err != nil {
-			result.Message = err.Error()
-			results = append(results, result)
-			continue
-		}
+		install := ctx.install
 		result.AppInstallID = install.ID
-		if install.App.Key != req.AgentType {
-			result.Message = fmt.Sprintf("app key %s does not match agent type %s", install.App.Key, req.AgentType)
-			results = append(results, result)
-			continue
-		}
 		if install.Status == constant.StatusInstalling || install.Status == constant.StatusUpgrading {
 			result.Message = fmt.Sprintf("agent status is %s", install.Status)
 			results = append(results, result)
@@ -549,7 +543,7 @@ func buildBatchUpgradePlans(req dto.AgentBatchUpgradeReq) ([]batchUpgradePlan, [
 			continue
 		}
 		plans = append(plans, batchUpgradePlan{
-			agent: agent,
+			ctx: ctx,
 			req: request.AppInstallUpgrade{
 				InstallID: install.ID,
 				DetailID:  detail.ID,
