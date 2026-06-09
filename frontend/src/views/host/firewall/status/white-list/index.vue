@@ -108,6 +108,10 @@ const saveRow = (row: WhiteListItem) => {
     if (!validatePort(row.port)) {
         return;
     }
+    if (hasDuplicatePort(row)) {
+        MsgError(i18n.global.t('commons.rule.duplicate'));
+        return;
+    }
     row.port = normalizePort(row.port);
     row.oldPort = row.port;
     row.edit = false;
@@ -134,6 +138,13 @@ const normalizePort = (value: string): string => {
     return protocol ? `${port}/${protocol}` : port;
 };
 
+const normalizePortKey = (value: string): string => {
+    const segments = value.split('/');
+    const port = segments[0];
+    const protocol = segments[1] ? segments[1].toLowerCase() : 'tcp';
+    return `${port}/${protocol}`;
+};
+
 const validatePort = (value: string): boolean => {
     if (value === '') {
         MsgError(i18n.global.t('firewall.portFormatError'));
@@ -148,12 +159,30 @@ const validatePort = (value: string): boolean => {
     return true;
 };
 
+const hasDuplicatePort = (currentRow?: WhiteListItem): boolean => {
+    const ports = new Set<string>();
+    for (const item of data.value) {
+        if (item === currentRow || item.port === '') {
+            continue;
+        }
+        ports.add(normalizePortKey(item.port));
+    }
+    return currentRow ? ports.has(normalizePortKey(currentRow.port)) : false;
+};
+
 const onSubmit = async () => {
     const ports = data.value.map((item) => item.port).filter((item) => item !== '');
+    const portSet = new Set<string>();
     for (const port of ports) {
         if (!validatePort(port)) {
             return;
         }
+        const portKey = normalizePortKey(port);
+        if (portSet.has(portKey)) {
+            MsgError(i18n.global.t('commons.rule.duplicate'));
+            return;
+        }
+        portSet.add(portKey);
     }
     loading.value = true;
     await updateAgentSetting({
