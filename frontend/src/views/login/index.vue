@@ -62,11 +62,23 @@ const getStatus = async () => {
 const loadImage = (name: string) => {
     const { loginImage, loginBackground, loginBgType } = themeConfig.value;
     if (name === 'loginImage') {
-        return loginImage === 'loginImage' ? loadedLoginImage.value : currentDefaultLoginImage.value;
+        if (loginImage === 'loginImage') {
+            return loadedLoginImage.value || currentDefaultLoginImage.value;
+        }
+        if (loginImage) {
+            return loginImage;
+        }
+        return currentDefaultLoginImage.value;
     }
     if (name === 'loginBackground') {
         if (loginBgType === 'image') {
-            return loginBackground === 'loginBackground' ? loadedBackgroundImage.value : defaultLoginBgImage;
+            if (loginBackground === 'loginBackground') {
+                return loadedBackgroundImage.value || defaultLoginBgImage;
+            }
+            if (loginBackground) {
+                return loginBackground;
+            }
+            return defaultLoginBgImage;
         }
         if (loginBgType === 'color') {
             return loginBackground;
@@ -85,8 +97,12 @@ onMounted(async () => {
     await getStatus();
     const loginImageUrl = `/api/v2/images/loginImage?t=${Date.now()}`;
     const backgroundImageUrl = `/api/v2/images/loginBackground?t=${Date.now()}`;
-    loadedLoginImage.value = await preloadImage(loginImageUrl);
-    loadedBackgroundImage.value = await preloadImage(backgroundImageUrl);
+    if (themeConfig.value.loginImage === 'loginImage') {
+        loadedLoginImage.value = await preloadImage(loginImageUrl);
+    }
+    if (themeConfig.value.loginBgType === 'image' && themeConfig.value.loginBackground === 'loginBackground') {
+        loadedBackgroundImage.value = await preloadImage(backgroundImageUrl);
+    }
     if (themeConfig.value.loginBgType === 'color') {
         backgroundStyle.value = {
             backgroundColor: themeConfig.value.loginBackground,
@@ -101,7 +117,7 @@ onMounted(async () => {
         };
         img.onerror = () => {
             backgroundStyle.value = {
-                backgroundImage: `url(${defaultLoginBgImage})`, // 你定义的默认图
+                backgroundImage: `url(${defaultLoginBgImage})`,
             };
         };
         img.src = url;
