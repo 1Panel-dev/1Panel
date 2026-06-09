@@ -962,6 +962,7 @@ const message = {
             importModelAccount: 'Importar conta de modelo',
             editModelAccount: 'Editar conta de modelo',
             selectModelAccount: 'Selecionar uma conta de modelo existente',
+            upstreamApiAddress: 'Endereço da API upstream',
             priority: 'Prioridade',
             healthStatus: 'Saúde',
             failureCount: 'Falhas',

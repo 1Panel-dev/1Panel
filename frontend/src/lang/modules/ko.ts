@@ -941,6 +941,7 @@ const message = {
             importModelAccount: '모델 계정 가져오기',
             editModelAccount: '모델 계정 편집',
             selectModelAccount: '기존 모델 계정 선택',
+            upstreamApiAddress: '업스트림 API 주소',
             priority: '우선순위',
             healthStatus: '상태',
             failureCount: '실패 횟수',

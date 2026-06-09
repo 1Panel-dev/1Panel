@@ -966,6 +966,7 @@ const message = {
             importModelAccount: 'Import akaun model',
             editModelAccount: 'Edit akaun model',
             selectModelAccount: 'Pilih akaun model sedia ada',
+            upstreamApiAddress: 'Alamat API Hulu',
             priority: 'Keutamaan',
             healthStatus: 'Status kesihatan',
             failureCount: 'Bilangan gagal',

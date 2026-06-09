@@ -957,6 +957,7 @@ const message = {
             importModelAccount: 'モデルアカウントをインポート',
             editModelAccount: 'モデルアカウントを編集',
             selectModelAccount: '既存のモデルアカウントを選択',
+            upstreamApiAddress: '上流 API アドレス',
             priority: '優先度',
             healthStatus: 'ヘルス状態',
             failureCount: '失敗回数',

@@ -964,6 +964,7 @@ const message = {
             importModelAccount: 'Model hesabını içe aktar',
             editModelAccount: 'Model hesabını düzenle',
             selectModelAccount: 'Mevcut bir model hesabı seçin',
+            upstreamApiAddress: 'Yukarı Akış API Adresi',
             priority: 'Öncelik',
             healthStatus: 'Sağlık durumu',
             failureCount: 'Hata sayısı',

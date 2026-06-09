@@ -897,6 +897,7 @@ const message = {
             importModelAccount: '导入模型账号',
             editModelAccount: '编辑模型账号',
             selectModelAccount: '选择已有模型账号',
+            upstreamApiAddress: '上游 API 地址',
             priority: '优先级',
             healthStatus: '健康状态',
             failureCount: '失败次数',

@@ -956,6 +956,7 @@ const message = {
             importModelAccount: 'Импортировать аккаунт модели',
             editModelAccount: 'Редактировать аккаунт модели',
             selectModelAccount: 'Выберите существующий аккаунт модели',
+            upstreamApiAddress: 'Адрес API upstream',
             priority: 'Приоритет',
             healthStatus: 'Состояние',
             failureCount: 'Ошибки',
