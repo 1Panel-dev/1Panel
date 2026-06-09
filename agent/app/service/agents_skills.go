@@ -28,6 +28,7 @@ const clawhubGlobalRegistry = "https://clawhub.com"
 const clawhubChinaRegistry = "https://mirror-cn.clawhub.com"
 const localSkillHubSource = "local-hub"
 const localSkillHubPublishedStatus = "published"
+const clawHubSkillTmpSubDir = "1panel/tmp/clawhub-skills"
 const hermesManagedSkillsDir = "/opt/data/skills"
 
 type openclawSkillsList struct {
@@ -337,18 +338,7 @@ func validateLocalSkillPackagePath(packagePath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	root := filepath.Join(global.CONF.Base.InstallDir, "1panel", "uploads", "skills-hub")
-	absRoot, err := filepath.Abs(root)
-	if err != nil {
-		return "", err
-	}
-	resolvedRoot, err := filepath.EvalSymlinks(absRoot)
-	if err != nil {
-		// upload directory may not exist yet on agent host; treat as invalid
-		return "", fmt.Errorf("invalid local skill package path")
-	}
-	rel, err := filepath.Rel(resolvedRoot, resolvedPath)
-	if err != nil || rel == "." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) || rel == ".." {
+	if !isLocalSkillPackageAllowedPath(resolvedPath) {
 		return "", fmt.Errorf("invalid local skill package path")
 	}
 	info, err := os.Stat(resolvedPath)
@@ -359,6 +349,32 @@ func validateLocalSkillPackagePath(packagePath string) (string, error) {
 		return "", fmt.Errorf("skill package must be a file")
 	}
 	return resolvedPath, nil
+}
+
+func isLocalSkillPackageAllowedPath(resolvedPath string) bool {
+	roots := []string{
+		filepath.Join(global.CONF.Base.InstallDir, "1panel", "uploads", "skills-hub"),
+		filepath.Join(global.CONF.Base.InstallDir, filepath.FromSlash(clawHubSkillTmpSubDir)),
+	}
+	for _, root := range roots {
+		if isPathInsideResolvedRoot(resolvedPath, root) {
+			return true
+		}
+	}
+	return false
+}
+
+func isPathInsideResolvedRoot(resolvedPath, root string) bool {
+	absRoot, err := filepath.Abs(root)
+	if err != nil {
+		return false
+	}
+	resolvedRoot, err := filepath.EvalSymlinks(absRoot)
+	if err != nil {
+		return false
+	}
+	rel, err := filepath.Rel(resolvedRoot, resolvedPath)
+	return err == nil && rel != "." && rel != ".." && !strings.HasPrefix(rel, ".."+string(os.PathSeparator))
 }
 
 func normalizeLocalSkillInstallRoot(extractRoot, installRoot, skillName string) (string, string, error) {

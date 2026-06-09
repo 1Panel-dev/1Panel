@@ -207,16 +207,20 @@ defineExpose({ acceptParams });
 
 <style lang="scss" scoped>
 .download-item.completed {
-    @apply bg-green-50/50;
+    background-color: rgb(240 253 244 / 0.5);
 }
 
 .progress-bar {
     :deep(.el-progress-bar__outer) {
-        @apply rounded-full bg-gray-100;
+        border-radius: 9999px;
+        background-color: rgb(243 244 246);
     }
 
     :deep(.el-progress-bar__inner) {
-        @apply rounded-full transition-all duration-300;
+        border-radius: 9999px;
+        transition-property: all;
+        transition-duration: 300ms;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     }
 }
 

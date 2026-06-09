@@ -21,7 +21,7 @@ module.exports = {
     },
     /* 继承某些已有的规则 */
     extends: [
-        'plugin:vue/vue3-recommended',
+        'plugin:vue/recommended',
         'plugin:@typescript-eslint/recommended',
         'prettier',
         'plugin:prettier/recommended',
@@ -59,7 +59,6 @@ module.exports = {
 
         // vue (https://eslint.vuejs.org/rules)
         'vue/no-v-html': 'off', // 禁止使用 v-html
-        'vue/script-setup-uses-vars': 'error', // 防止<script setup>使用的变量<template>被标记为未使用，此规则仅在启用该no-unused-vars规则时有效。
         'vue/v-slot-style': 'error', // 强制执行 v-slot 指令样式
         'vue/no-mutating-props': 'off', // 不允许组件 prop的改变（明天找原因）
         'vue/custom-event-name-casing': 'off', // 为自定义事件名称强制使用特定大小写

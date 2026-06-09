@@ -74,7 +74,6 @@ const docTemplate = `{
 						"description": "OK",
 						"schema": {
 							"additionalProperties": {
-								"format": "int64",
 								"type": "integer"
 							},
 							"type": "object"
@@ -745,6 +744,167 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Unbind Agent role channel",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/batch/install": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentBatchInstallReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.AgentItem"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch install Agent",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/batch/operate": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentBatchOperateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentBatchOperateResult"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch operate Agent",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/batch/skill/install": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentBatchSkillInstallReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentBatchSkillInstallResult"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch install Agent Skill",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/batch/upgrade": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentBatchUpgradeReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentBatchUpgradeResult"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Batch upgrade Agent",
 				"tags": [
 					"AI"
 				]
@@ -28082,6 +28242,53 @@ const docTemplate = `{
 			"required": [
 				"id"
 			],
+			"type": "object"
+		},
+		"dto.AgentAccountInfo": {
+			"properties": {
+				"apiKey": {
+					"type": "string"
+				},
+				"apiType": {
+					"type": "string"
+				},
+				"baseUrl": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"masterAccountId": {
+					"type": "integer"
+				},
+				"models": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentAccountModel"
+					},
+					"type": "array"
+				},
+				"name": {
+					"type": "string"
+				},
+				"provider": {
+					"type": "string"
+				},
+				"providerName": {
+					"type": "string"
+				},
+				"remark": {
+					"type": "string"
+				},
+				"rememberApiKey": {
+					"type": "boolean"
+				},
+				"verified": {
+					"type": "boolean"
+				}
+			},
 			"type": "object"
 		},
 		"dto.AgentAccountInfo": {
