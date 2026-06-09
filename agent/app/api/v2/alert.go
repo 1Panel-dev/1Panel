@@ -287,7 +287,7 @@ func (b *BaseApi) PageAlertConfig(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /alert/config/update [post]
-// @x-panel-log {"bodyKeys":["title"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新告警配置 [title]","formatEN":"update alert config [title]"}
+// @x-panel-log {"bodyKeys":["id","type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新告警配置 [id][type]","formatEN":"update alert config [id][type]"}
 func (b *BaseApi) UpdateAlertConfig(c *gin.Context) {
 	var req dto.AlertConfigUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

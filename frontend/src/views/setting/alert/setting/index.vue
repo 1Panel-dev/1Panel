@@ -107,6 +107,7 @@
                                 v-model="row.status"
                                 active-value="Enable"
                                 inactive-value="Disable"
+                                :disabled="!isProductPro && ['weCom', 'dingTalk', 'feiShu', 'sms'].includes(row.type)"
                                 @change="onStatusChange(row)"
                             />
                         </template>
@@ -478,6 +479,8 @@ const buttons = computed(() => [
         click: (row: Alert.AlertConfigInfo) => {
             openEditDrawer(row);
         },
+        disabled: (row: Alert.AlertConfigInfo) =>
+            !isProductPro.value && ['weCom', 'dingTalk', 'feiShu', 'sms'].includes(row.type),
     },
     {
         label: i18n.global.t('commons.button.delete'),

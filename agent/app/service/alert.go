@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"mime"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -26,6 +27,12 @@ import (
 type AlertService struct{}
 
 var eeHiddenAlertTypes = []string{"licenseException", "panelUpdate", "panelPwdEndTime"}
+var communityAlertMethodTypeNames = map[string]string{
+	constant.WeCom:    "WeCom",
+	constant.DingTalk: "DingTalk",
+	constant.FeiShu:   "FeiShu",
+	constant.SMS:      "SMS",
+}
 
 type IAlertService interface {
 	PageAlert(req dto.AlertSearch) (int64, []dto.AlertDTO, error)
@@ -132,6 +139,9 @@ func (a AlertService) GetAlerts() ([]dto.AlertDTO, error) {
 }
 
 func (a AlertService) CreateAlert(create dto.AlertCreate, operator string) error {
+	if err := a.validateCommunityAlertMethod(create.Method); err != nil {
+		return err
+	}
 	var alertID uint
 	var alertInfo model.Alert
 	if create.Project != "" {
@@ -170,6 +180,9 @@ func (a AlertService) CreateAlert(create dto.AlertCreate, operator string) error
 }
 
 func (a AlertService) UpdateAlert(req dto.AlertUpdate, operator string) error {
+	if err := a.validateCommunityAlertMethod(req.Method); err != nil {
+		return err
+	}
 
 	upMap := make(map[string]interface{})
 	upMap["id"] = req.ID
@@ -493,6 +506,9 @@ func (a AlertService) PageAlertConfig(req dto.AlertConfigPageReq) (int64, []mode
 }
 
 func (a AlertService) UpdateAlertConfig(req dto.AlertConfigUpdate, operator string) error {
+	if err := a.validateCommunityAlertConfigType(req.Type); err != nil {
+		return err
+	}
 	if err := a.checkAlertConfigDisplayNameUnique(req); err != nil {
 		return err
 	}
@@ -542,6 +558,47 @@ func (a AlertService) checkAlertConfigDisplayNameUnique(req dto.AlertConfigUpdat
 		}
 	}
 
+	return nil
+}
+
+func (a AlertService) validateCommunityAlertMethod(method string) error {
+	if global.CONF.Base.IsEnterprise {
+		return nil
+	}
+	if strings.TrimSpace(method) == "" {
+		return nil
+	}
+
+	for _, item := range strings.Split(method, ",") {
+		item = strings.TrimSpace(item)
+		if item == "" {
+			continue
+		}
+		if configID, err := strconv.ParseUint(item, 10, 64); err == nil {
+			config, err := alertRepo.GetConfigById(uint(configID))
+			if err != nil {
+				return err
+			}
+			if name, ok := communityAlertMethodTypeNames[config.Type]; ok {
+				return buserr.WithMap("ErrAlertMethodNotSupported", map[string]interface{}{"name": name}, nil)
+			}
+			continue
+		}
+		if name, ok := communityAlertMethodTypeNames[item]; ok {
+			return buserr.WithMap("ErrAlertMethodNotSupported", map[string]interface{}{"name": name}, nil)
+		}
+	}
+
+	return nil
+}
+
+func (a AlertService) validateCommunityAlertConfigType(configType string) error {
+	if global.CONF.Base.IsEnterprise {
+		return nil
+	}
+	if name, ok := communityAlertMethodTypeNames[configType]; ok {
+		return buserr.WithMap("ErrAlertMethodNotSupported", map[string]interface{}{"name": name}, nil)
+	}
 	return nil
 }
 
@@ -605,6 +662,9 @@ func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {
 }
 
 func (a AlertService) ExternalUpdateAlert(updateAlert dto.AlertCreate, operator string) error {
+	if err := a.validateCommunityAlertMethod(updateAlert.Method); err != nil {
+		return err
+	}
 	upMap := make(map[string]interface{})
 	var newStatus string
 	if updateAlert.SendCount == 0 {

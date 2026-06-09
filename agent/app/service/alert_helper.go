@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"net"
 	"sort"
 	"strconv"
 	"strings"
@@ -24,7 +25,7 @@ import (
 	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/shirou/gopsutil/v4/load"
 	"github.com/shirou/gopsutil/v4/mem"
-	"github.com/shirou/gopsutil/v4/net"
+	gnet "github.com/shirou/gopsutil/v4/net"
 )
 
 const (
@@ -35,7 +36,7 @@ const (
 
 type AlertTaskHelper struct {
 	DiskIO chan []disk.IOCountersStat
-	NetIO  chan []net.IOCountersStat
+	NetIO  chan []gnet.IOCountersStat
 }
 
 type IAlertTaskHelper interface {
@@ -55,7 +56,7 @@ var resourceTypes = map[string]bool{"cpu": true, "memory": true, "disk": true, "
 func NewIAlertTaskHelper() IAlertTaskHelper {
 	return &AlertTaskHelper{
 		DiskIO: make(chan []disk.IOCountersStat, 1),
-		NetIO:  make(chan []net.IOCountersStat, 1),
+		NetIO:  make(chan []gnet.IOCountersStat, 1),
 	}
 }
 func (m *AlertTaskHelper) StartTask() {
@@ -485,6 +486,7 @@ func loadPanelLogin(alert dto.AlertDTO) {
 	if err != nil {
 		global.LOG.Errorf("Failed to check recent failed ip login logs: %v", err)
 	}
+	records = filterLoginLogsNotInWhitelist(records, whitelist)
 	if len(records) > 0 {
 		quota := strings.Join(func() []string {
 			var ips []string
@@ -534,6 +536,7 @@ func loadSSHLogin(alert dto.AlertDTO) {
 	if err != nil {
 		global.LOG.Errorf("Failed to check recent failed ip ssh login logs: %v", err)
 	}
+	records = filterSSHLoginEntriesNotInWhitelist(records, whitelist)
 	if len(records) > 0 {
 		quota := strings.Join(records, "\n")
 		params := []dto.Param{
@@ -550,6 +553,60 @@ func loadSSHLogin(alert dto.AlertDTO) {
 		}
 		sendAlerts(alert, "sshIpLogin", quota, "sshIpLogin", params)
 	}
+}
+
+func filterLoginLogsNotInWhitelist(records []model.LoginLog, whitelist []string) []model.LoginLog {
+	filtered := make([]model.LoginLog, 0, len(records))
+	for _, record := range records {
+		if !isIPInWhitelist(record.IP, whitelist) {
+			filtered = append(filtered, record)
+		}
+	}
+	return filtered
+}
+
+func filterSSHLoginEntriesNotInWhitelist(records []string, whitelist []string) []string {
+	filtered := make([]string, 0, len(records))
+	for _, record := range records {
+		ip := record
+		if idx := strings.Index(record, "-"); idx >= 0 {
+			ip = record[:idx]
+		}
+		if !isIPInWhitelist(ip, whitelist) {
+			filtered = append(filtered, record)
+		}
+	}
+	return filtered
+}
+
+func isIPInWhitelist(ip string, whitelist []string) bool {
+	targetIP := net.ParseIP(strings.TrimSpace(ip))
+	if targetIP == nil {
+		return false
+	}
+	for _, item := range whitelist {
+		item = strings.TrimSpace(item)
+		if item == "" {
+			continue
+		}
+		if item == ip {
+			return true
+		}
+		if whiteIP := net.ParseIP(item); whiteIP != nil {
+			if whiteIP.Equal(targetIP) {
+				return true
+			}
+			continue
+		}
+		_, ipNet, err := net.ParseCIDR(item)
+		if err != nil {
+			continue
+		}
+		if ipNet.Contains(targetIP) {
+			return true
+		}
+	}
+	return false
 }
 
 func loadNodeException(alert dto.AlertDTO) {
