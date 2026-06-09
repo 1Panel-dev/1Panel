@@ -187,6 +187,9 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.BasicBeforeFileName); err != nil {
 			return err
 		}
+		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasic, iptables.BasicFileName); err != nil {
+			return err
+		}
 		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.BasicAfterFileName); err != nil {
 			return err
 		}
@@ -229,6 +232,9 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 			return err
 		}
 		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.BasicBeforeFileName); err != nil {
+			return err
+		}
+		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasic, iptables.BasicFileName); err != nil {
 			return err
 		}
 		if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.BasicAfterFileName); err != nil {
@@ -371,11 +377,7 @@ func initPreRules() error {
 	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicBefore, "-m", "conntrack", "--ctstate", "RELATED,ESTABLISHED", "-j", "ACCEPT", "-m", "comment", "--comment", "ESTABLISHED Whitelist"); err != nil {
 		return err
 	}
-	portWhiteList, err := loadFirewallPortWhiteList()
-	if err != nil {
-		return err
-	}
-	if err := applyFirewallPortWhiteListRules(portWhiteList, false); err != nil {
+	if err := syncIptablesFirewallPortWhiteList(false); err != nil {
 		return err
 	}
 	if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasicAfter, "-p", "tcp", "-j", "DROP"); err != nil {
@@ -387,8 +389,23 @@ func initPreRules() error {
 	return nil
 }
 
-func applyFirewallPortWhiteListRules(portWhiteList []firewallPortWhitelist, withSave bool) error {
-	if err := syncFirewallPortWhiteListRules(portWhiteList); err != nil {
+func syncIptablesFirewallPortWhiteList(withSave bool, oldConfiguredPortWhiteList ...[]firewallPortWhitelist) error {
+	requiredPorts, err := loadRequiredFirewallPortWhiteList()
+	if err != nil {
+		return err
+	}
+	if err := applyRequiredFirewallPortWhiteListRules(requiredPorts, withSave); err != nil {
+		return err
+	}
+	portWhiteList, err := loadConfiguredFirewallPortWhiteList()
+	if err != nil {
+		return err
+	}
+	return applyFirewallPortWhiteListRules(portWhiteList, withSave, oldConfiguredPortWhiteList...)
+}
+
+func applyRequiredFirewallPortWhiteListRules(portWhiteList []firewallPortWhitelist, withSave bool) error {
+	if err := syncRequiredFirewallPortWhiteListRules(portWhiteList); err != nil {
 		return err
 	}
 	for _, item := range portWhiteList {
@@ -405,7 +422,22 @@ func applyFirewallPortWhiteListRules(portWhiteList []firewallPortWhitelist, with
 	return iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasicAfter, iptables.BasicAfterFileName)
 }
 
-func syncFirewallPortWhiteListRules(portWhiteList []firewallPortWhitelist) error {
+func applyFirewallPortWhiteListRules(portWhiteList []firewallPortWhitelist, withSave bool, oldConfiguredPortWhiteList ...[]firewallPortWhitelist) error {
+	if err := syncFirewallPortWhiteListRules(portWhiteList, oldConfiguredPortWhiteList...); err != nil {
+		return err
+	}
+	for _, item := range portWhiteList {
+		if err := iptables.AddRule(iptables.FilterTab, iptables.Chain1PanelBasic, "-p", item.Protocol, "-m", item.Protocol, "--dport", item.Port, "-j", "ACCEPT"); err != nil {
+			return err
+		}
+	}
+	if !withSave {
+		return nil
+	}
+	return iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelBasic, iptables.BasicFileName)
+}
+
+func syncRequiredFirewallPortWhiteListRules(portWhiteList []firewallPortWhitelist) error {
 	tcpWhitelist := make(map[string]struct{})
 	udpWhitelist := make(map[string]struct{})
 	for _, item := range portWhiteList {
@@ -423,6 +455,25 @@ func syncFirewallPortWhiteListRules(portWhiteList []firewallPortWhitelist) error
 		return err
 	}
 	return cleanExtraFirewallPortRules(iptables.Chain1PanelBasicAfter, "udp", map[string]struct{}{})
+}
+
+func syncFirewallPortWhiteListRules(portWhiteList []firewallPortWhitelist, oldConfiguredPortWhiteList ...[]firewallPortWhitelist) error {
+	portWhitelist := firewallPortWhiteListMap(portWhiteList)
+	if len(oldConfiguredPortWhiteList) == 0 {
+		return nil
+	}
+	for _, item := range oldConfiguredPortWhiteList[0] {
+		if _, ok := portWhitelist[firewallPortWhiteListKey(item)]; ok {
+			continue
+		}
+		if !iptables.CheckRuleExist(iptables.FilterTab, iptables.Chain1PanelBasic, "-p", item.Protocol, "--dport", item.Port, "-j", "ACCEPT") {
+			continue
+		}
+		if err := iptables.DeleteRule(iptables.FilterTab, iptables.Chain1PanelBasic, "-p", item.Protocol, "--dport", item.Port, "-j", "ACCEPT"); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func cleanExtraFirewallPortRules(chain, protocol string, whitelist map[string]struct{}) error {
