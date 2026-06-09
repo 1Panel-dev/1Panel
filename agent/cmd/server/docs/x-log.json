@@ -100,13 +100,12 @@
 	},
 	"/alert": {
 		"bodyKeys": [
-			"type",
-			"method"
+			"title"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "创建告警任务 [type][method]",
-		"formatEN": "create alert [type][method]"
+		"formatZH": "创建告警任务 [title]",
+		"formatEN": "create alert [title]"
 	},
 	"/alert/config/del": {
 		"bodyKeys": [
@@ -119,13 +118,12 @@
 	},
 	"/alert/config/update": {
 		"bodyKeys": [
-			"type",
 			"title"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新告警配置 [type][title]",
-		"formatEN": "update alert config [type][title]"
+		"formatZH": "更新告警配置 [title]",
+		"formatEN": "update alert config [title]"
 	},
 	"/alert/del": {
 		"bodyKeys": [
@@ -155,13 +153,12 @@
 	},
 	"/alert/update": {
 		"bodyKeys": [
-			"id",
-			"type"
+			"title"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新告警任务 [id][type]",
-		"formatEN": "update alert [id][type]"
+		"formatZH": "更新告警任务 [title]",
+		"formatEN": "update alert [title]"
 	},
 	"/apps/ignored/cancel": {
 		"bodyKeys": [],
@@ -931,6 +928,50 @@
 		"formatZH": "上传快速命令文件",
 		"formatEN": "upload quick commands with csv"
 	},
+	"/core/enterprise/agents/batch-install": {
+		"bodyKeys": [
+			"nodeIDs",
+			"agentType",
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "批量安装智能体 [agentType] 到节点 [nodeIDs]",
+		"formatEN": "batch install agent [agentType] to nodes [nodeIDs]"
+	},
+	"/core/enterprise/agents/batch-operate": {
+		"bodyKeys": [
+			"nodeIDs",
+			"agentType",
+			"operate"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "批量操作智能体 [agentType] [operate]",
+		"formatEN": "batch operate agent [agentType] [operate]"
+	},
+	"/core/enterprise/agents/batch-skill-install": {
+		"bodyKeys": [
+			"nodeIDs",
+			"agentType",
+			"skillID"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "批量安装智能体技能 [skillID] 到 [agentType]",
+		"formatEN": "batch install agent skill [skillID] to [agentType]"
+	},
+	"/core/enterprise/agents/batch-upgrade": {
+		"bodyKeys": [
+			"nodeIDs",
+			"agentType",
+			"targetVersion"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "批量升级智能体 [agentType] 到 [targetVersion]",
+		"formatEN": "batch upgrade agent [agentType] to [targetVersion]"
+	},
 	"/core/enterprise/ai-benchmark/tasks": {
 		"bodyKeys": [
 			"model"
@@ -1157,6 +1198,13 @@
 		"formatZH": "更新 AI 网关设置",
 		"formatEN": "update AI proxy settings"
 	},
+	"/core/enterprise/licenses/upload": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "上传许可证",
+		"formatEN": "upload license"
+	},
 	"/core/enterprise/ops-report/download": {
 		"bodyKeys": [],
 		"paramKeys": [],
@@ -1179,6 +1227,180 @@
 		"beforeFunctions": [],
 		"formatZH": "更新运维报表设置 [key]",
 		"formatEN": "update ops report setting [key]"
+	},
+	"/core/enterprise/roles": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建角色 [name]",
+		"formatEN": "create role [name]"
+	},
+	"/core/enterprise/roles/delete": {
+		"bodyKeys": [
+			"ids"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "ids",
+				"isList": true,
+				"db": "roles",
+				"output_column": "name",
+				"output_value": "names"
+			}
+		],
+		"formatZH": "删除角色 [names]",
+		"formatEN": "delete role [names]"
+	},
+	"/core/enterprise/roles/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新角色 [name]",
+		"formatEN": "update role [name]"
+	},
+	"/core/enterprise/skills-hub/delete": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "skill_hub_items",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除 Skills Hub 技能 [name]",
+		"formatEN": "delete Skills Hub skill [name]"
+	},
+	"/core/enterprise/skills-hub/download": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "skill_hub_items",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "下载 Skills Hub 技能 [name]",
+		"formatEN": "download Skills Hub skill [name]"
+	},
+	"/core/enterprise/skills-hub/import": {
+		"bodyKeys": [
+			"type",
+			"repoURL",
+			"packageURL"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "导入 Skills Hub 技能 [type]",
+		"formatEN": "import Skills Hub skill [type]"
+	},
+	"/core/enterprise/skills-hub/status": {
+		"bodyKeys": [
+			"id",
+			"operate"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "skill_hub_items",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "更新 Skills Hub 技能 [name] 状态 [operate]",
+		"formatEN": "update Skills Hub skill [name] status [operate]"
+	},
+	"/core/enterprise/skills-hub/targets/create": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 Skills Hub 安装目标 [name]",
+		"formatEN": "create Skills Hub install target [name]"
+	},
+	"/core/enterprise/skills-hub/targets/delete": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "skill_hub_install_targets",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除 Skills Hub 安装目标 [name]",
+		"formatEN": "delete Skills Hub install target [name]"
+	},
+	"/core/enterprise/skills-hub/targets/install": {
+		"bodyKeys": [
+			"skillID",
+			"targetIDs"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "安装 Skills Hub 技能 [skillID] 到目标 [targetIDs]",
+		"formatEN": "install Skills Hub skill [skillID] to targets [targetIDs]"
+	},
+	"/core/enterprise/skills-hub/targets/status": {
+		"bodyKeys": [
+			"id",
+			"enabled"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "skill_hub_install_targets",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "更新 Skills Hub 安装目标 [name] 状态 [enabled]",
+		"formatEN": "update Skills Hub install target [name] status [enabled]"
+	},
+	"/core/enterprise/skills-hub/targets/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 Skills Hub 安装目标 [name]",
+		"formatEN": "update Skills Hub install target [name]"
+	},
+	"/core/enterprise/skills-hub/upload": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "上传 Skills Hub 技能包",
+		"formatEN": "upload Skills Hub package"
 	},
 	"/core/enterprise/users": {
 		"bodyKeys": [
@@ -1473,6 +1695,92 @@
 		"formatZH": "更新系统 =\u003e [version]",
 		"formatEN": "upgrade system =\u003e [version]"
 	},
+	"/core/xapp/appQRCode": {
+		"bodyKeys": [
+			"panelName",
+			"panelUrl"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "生成移动端绑定二维码 [panelName]",
+		"formatEN": "generate mobile app QR code [panelName]"
+	},
+	"/core/xapp/verifyQRCode": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "校验移动端绑定二维码",
+		"formatEN": "verify mobile app QR code"
+	},
+	"/core/xpack/alert/offline/sync": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步离线告警",
+		"formatEN": "sync offline alert"
+	},
+	"/core/xpack/cluster": {
+		"bodyKeys": [
+			"clusterName",
+			"node",
+			"app"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建集群 [clusterName]",
+		"formatEN": "create cluster [clusterName]"
+	},
+	"/core/xpack/cluster/node": {
+		"bodyKeys": [
+			"clusterID",
+			"node",
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "clusterID",
+				"isList": false,
+				"db": "clusters",
+				"output_column": "name",
+				"output_value": "clusterName"
+			}
+		],
+		"formatZH": "添加集群 [clusterName] 节点 [node]",
+		"formatEN": "add node [node] to cluster [clusterName]"
+	},
+	"/core/xpack/cluster/node/delete": {
+		"bodyKeys": [
+			"clusterID",
+			"clusterNodeID"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "clusterID",
+				"isList": false,
+				"db": "clusters",
+				"output_column": "name",
+				"output_value": "clusterName"
+			}
+		],
+		"formatZH": "删除集群 [clusterName] 节点 [clusterNodeID]",
+		"formatEN": "delete node [clusterNodeID] from cluster [clusterName]"
+	},
+	"/core/xpack/exchange/file": {
+		"bodyKeys": [
+			"source",
+			"dest",
+			"sourcePath",
+			"destPath"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "交换文件 [sourcePath] 到 [destPath]",
+		"formatEN": "exchange file [sourcePath] to [destPath]"
+	},
 	"/core/xpack/nodes": {
 		"bodyKeys": [
 			"name"
@@ -1488,6 +1796,13 @@
 		"beforeFunctions": [],
 		"formatZH": "备份主节点数据",
 		"formatEN": "backup master data"
+	},
+	"/core/xpack/nodes/backup/clean": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "清理主节点备份记录",
+		"formatEN": "clean master backup records"
 	},
 	"/core/xpack/nodes/backup/update": {
 		"bodyKeys": [],
@@ -1514,6 +1829,25 @@
 		"formatZH": "删除节点 [names]",
 		"formatEN": "delete node [names]"
 	},
+	"/core/xpack/nodes/favorite": {
+		"bodyKeys": [
+			"id",
+			"isFavorite"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "nodes",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "更新节点 [name] 收藏状态 [isFavorite]",
+		"formatEN": "update node [name] favorite [isFavorite]"
+	},
 	"/core/xpack/nodes/fix": {
 		"bodyKeys": [
 			"id"
@@ -1531,6 +1865,43 @@
 		],
 		"formatZH": "修复节点 [name]",
 		"formatEN": "fix node [name]"
+	},
+	"/core/xpack/nodes/reinstall": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "nodes",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "重装节点 [name]",
+		"formatEN": "reinstall node [name]"
+	},
+	"/core/xpack/nodes/restart": {
+		"bodyKeys": [
+			"id",
+			"restartService"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "nodes",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "重启节点 [name] 服务 [restartService]",
+		"formatEN": "restart node [name] service [restartService]"
 	},
 	"/core/xpack/nodes/rollback": {
 		"bodyKeys": [
@@ -1631,6 +2002,25 @@
 		"formatZH": "更新 [name] 基础信息",
 		"formatEN": "update base info for node [name]"
 	},
+	"/core/xpack/nodes/update/proxy": {
+		"bodyKeys": [
+			"id",
+			"enable"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "nodes",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "更新节点 [name] 代理设置 [enable]",
+		"formatEN": "update node [name] proxy setting [enable]"
+	},
 	"/core/xpack/nodes/upgrade": {
 		"bodyKeys": [
 			"ids"
@@ -1649,6 +2039,22 @@
 		"formatZH": "升级节点 [names]",
 		"formatEN": "upgrade node [names]"
 	},
+	"/core/xpack/nodes/upgrade/auto": {
+		"bodyKeys": [
+			"nodes"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新节点自动升级设置",
+		"formatEN": "update node auto upgrade setting"
+	},
+	"/core/xpack/nodes/upgrade/clean": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "清理节点升级包",
+		"formatEN": "clean node upgrade package"
+	},
 	"/core/xpack/nodes/upgrade/log/del": {
 		"bodyKeys": [
 			"nodeID"
@@ -1666,6 +2072,73 @@
 		],
 		"formatZH": "删除节点更新日志 [name]",
 		"formatEN": "delete node upgrade log [name]"
+	},
+	"/core/xpack/settings/app/custom": {
+		"bodyKeys": [
+			"status",
+			"appStoreUrl",
+			"appStoreType"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新自定义应用配置 [status]",
+		"formatEN": "update custom app config [status]"
+	},
+	"/core/xpack/settings/reset": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "重置专业版设置",
+		"formatEN": "reset xpack settings"
+	},
+	"/core/xpack/settings/update": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新专业版设置",
+		"formatEN": "update xpack settings"
+	},
+	"/core/xpack/settings/update/item": {
+		"bodyKeys": [
+			"key",
+			"value"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新专业版设置 [key]",
+		"formatEN": "update xpack setting [key]"
+	},
+	"/core/xpack/sync/app": {
+		"bodyKeys": [
+			"sourceNode",
+			"targetNode",
+			"appInstallID",
+			"appBackupID"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步应用备份 [appInstallID] 到节点 [targetNode]",
+		"formatEN": "sync app backup [appInstallID] to node [targetNode]"
+	},
+	"/core/xpack/sync/app/install": {
+		"bodyKeys": [
+			"appKey",
+			"version",
+			"nodes"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "安装应用 [appKey] [version] 到节点 [nodes]",
+		"formatEN": "install app [appKey] [version] to nodes [nodes]"
+	},
+	"/core/xpack/sync/ssl": {
+		"bodyKeys": [
+			"primaryDomain"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步 SSL 证书 [primaryDomain]",
+		"formatEN": "sync SSL certificate [primaryDomain]"
 	},
 	"/cronjobs": {
 		"bodyKeys": [
@@ -1785,6 +2258,53 @@
 		],
 		"formatZH": "更新计划任务 [name]",
 		"formatEN": "update cronjob [name]"
+	},
+	"/custom/app/config": {
+		"bodyKeys": [
+			"status",
+			"appStoreUrl",
+			"appStoreType"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新自定义应用配置 [status]",
+		"formatEN": "update custom app config [status]"
+	},
+	"/custom/app/install": {
+		"bodyKeys": [
+			"name",
+			"appKey"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "从节点安装应用 [name]",
+		"formatEN": "install app [name] from node"
+	},
+	"/custom/app/install/check": {
+		"bodyKeys": [
+			"name",
+			"appKey"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "检查应用安装 [name]",
+		"formatEN": "check app install [name]"
+	},
+	"/custom/app/push": {
+		"bodyKeys": [
+			"appBackupID"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "推送应用备份 [appBackupID] 到节点",
+		"formatEN": "push app backup [appBackupID] to node"
+	},
+	"/custom/app/sync": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步自定义应用商店",
+		"formatEN": "sync custom app store"
 	},
 	"/dashboard/app/launcher/show": {
 		"bodyKeys": [
@@ -3025,7 +3545,7 @@
 		"paramKeys": [],
 		"beforeFunctions": [],
 		"formatZH": "[operation] Clam",
-		"formatEN": "[operation] FTP"
+		"formatEN": "[operation] Clam"
 	},
 	"/toolbox/clam/record/clean": {
 		"bodyKeys": [
@@ -3883,6 +4403,125 @@
 		"formatZH": "更新网站 [primaryDomain]",
 		"formatEN": "Update website [primaryDomain]"
 	},
+	"/xpack/alert/logs/sync": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步短信告警信息 [id]",
+		"formatEN": "sync SMS alert info [id]"
+	},
+	"/xpack/alert/logs/sync/all": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步全部短信告警信息",
+		"formatEN": "sync all SMS alert info"
+	},
+	"/xpack/alert/offline/update": {
+		"bodyKeys": [
+			"id",
+			"type",
+			"licenseId"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新离线告警日志 [id]",
+		"formatEN": "update offline alert log [id]"
+	},
+	"/xpack/model/downloader/hf/download": {
+		"bodyKeys": [
+			"repoID",
+			"revision"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "下载 Hugging Face 模型 [repoID]",
+		"formatEN": "download Hugging Face model [repoID]"
+	},
+	"/xpack/model/downloader/local/delete": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除本地模型 [name]",
+		"formatEN": "delete local model [name]"
+	},
+	"/xpack/model/downloader/modelscope/download": {
+		"bodyKeys": [
+			"repoID",
+			"revision"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "下载 ModelScope 模型 [repoID]",
+		"formatEN": "download ModelScope model [repoID]"
+	},
+	"/xpack/model/downloader/settings": {
+		"bodyKeys": [
+			"modelDir"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新模型下载设置 [modelDir]",
+		"formatEN": "update model downloader settings [modelDir]"
+	},
+	"/xpack/model/downloader/tasks/cancel": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "model_download_tasks",
+				"output_column": "repo_id",
+				"output_value": "repoID"
+			}
+		],
+		"formatZH": "取消模型下载任务 [repoID]",
+		"formatEN": "cancel model download task [repoID]"
+	},
+	"/xpack/model/downloader/tasks/remove": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "model_download_tasks",
+				"output_column": "repo_id",
+				"output_value": "repoID"
+			}
+		],
+		"formatZH": "移除模型下载任务 [repoID]",
+		"formatEN": "remove model download task [repoID]"
+	},
+	"/xpack/model/downloader/tasks/retry": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "model_download_tasks",
+				"output_column": "repo_id",
+				"output_value": "repoID"
+			}
+		],
+		"formatZH": "重试模型下载任务 [repoID]",
+		"formatEN": "retry model download task [repoID]"
+	},
 	"/xpack/monitor/config/global": {
 		"bodyKeys": [],
 		"paramKeys": [],
@@ -3903,6 +4542,17 @@
 		"beforeFunctions": [],
 		"formatZH": "清空日志",
 		"formatEN": "clear log"
+	},
+	"/xpack/tampers/del": {
+		"bodyKeys": [
+			"website",
+			"path",
+			"withDelete"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除防篡改 [website][path]",
+		"formatEN": "delete tamper [website][path]"
 	},
 	"/xpack/tampers/template": {
 		"bodyKeys": [
@@ -3942,6 +4592,90 @@
 		"beforeFunctions": [],
 		"formatZH": "更新防篡改信息 [website][path] =\u003e [status]",
 		"formatEN": "update tamper info [website][path] =\u003e [status]"
+	},
+	"/xpack/vllm/command-template/create": {
+		"bodyKeys": [
+			"name",
+			"imageType"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 vLLM 命令模板 [name]",
+		"formatEN": "create vLLM command template [name]"
+	},
+	"/xpack/vllm/command-template/delete": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vllm_command_templates",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除 vLLM 命令模板 [name]",
+		"formatEN": "delete vLLM command template [name]"
+	},
+	"/xpack/vllm/command-template/update": {
+		"bodyKeys": [
+			"id",
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 vLLM 命令模板 [name]",
+		"formatEN": "update vLLM command template [name]"
+	},
+	"/xpack/vllm/create": {
+		"bodyKeys": [
+			"name",
+			"appVersion"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 vLLM [name]",
+		"formatEN": "create vLLM [name]"
+	},
+	"/xpack/vllm/operate": {
+		"bodyKeys": [
+			"id",
+			"operate"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vllms",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "操作 vLLM [name] [operate]",
+		"formatEN": "operate vLLM [name] [operate]"
+	},
+	"/xpack/vllm/update": {
+		"bodyKeys": [
+			"id",
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 vLLM [name]",
+		"formatEN": "update vLLM [name]"
+	},
+	"/xpack/waf/block/export": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "导出 WAF 封锁 IP",
+		"formatEN": "export WAF blocked IP"
 	},
 	"/xpack/waf/block/remove": {
 		"bodyKeys": [
@@ -4025,6 +4759,22 @@
 		"formatZH": "删除 IP 组 [name]",
 		"formatEN": "delete ip group [name]"
 	},
+	"/xpack/waf/ip/group/export": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "导出 IP 组 [name]",
+		"formatEN": "export IP group [name]"
+	},
+	"/xpack/waf/ip/group/import": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "导入 IP 组",
+		"formatEN": "import IP group"
+	},
 	"/xpack/waf/ip/group/update": {
 		"bodyKeys": [
 			"name"
@@ -4049,6 +4799,13 @@
 		"beforeFunctions": [],
 		"formatZH": "清空 WAF 日志",
 		"formatEN": "clear waf log"
+	},
+	"/xpack/waf/log/export": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "导出 WAF 日志",
+		"formatEN": "export WAF log"
 	},
 	"/xpack/waf/rule/acl/create": {
 		"bodyKeys": [
@@ -4076,6 +4833,16 @@
 		"beforeFunctions": [],
 		"formatZH": "更新自定义规则 [name]",
 		"formatEN": "update acl [name]"
+	},
+	"/xpack/waf/rule/app/update": {
+		"bodyKeys": [
+			"name",
+			"state"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新应用规则 [name] 状态 [state]",
+		"formatEN": "update app rule [name] state [state]"
 	},
 	"/xpack/waf/rule/cc": {
 		"bodyKeys": [
@@ -4202,6 +4969,16 @@
 		"formatZH": "更新 URL 频率访问限制规则",
 		"formatEN": "update URL CC rule"
 	},
+	"/xpack/waf/rule/vuln/update": {
+		"bodyKeys": [
+			"id",
+			"state"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新漏洞规则 [id] 状态 [state]",
+		"formatEN": "update vuln rule [id] state [state]"
+	},
 	"/xpack/waf/url/default": {
 		"bodyKeys": [
 			"url",
@@ -4225,5 +5002,12 @@
 		"beforeFunctions": [],
 		"formatZH": "更新网站地区访问限制",
 		"formatEN": "update geo restrict"
+	},
+	"/xpack/xsetting/sync": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "从主节点同步设置",
+		"formatEN": "sync settings from master"
 	}
 }

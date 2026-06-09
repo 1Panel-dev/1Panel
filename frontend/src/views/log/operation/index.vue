@@ -46,7 +46,12 @@
                 <el-select v-if="isAdmin" v-model="searchNode" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('xpack.node.node') }}</template>
                     <el-option :label="$t('commons.table.all')" value="" />
-                    <el-option v-for="(node, index) in nodes" :key="index" :label="node.name" :value="node.name" />
+                    <el-option
+                        v-for="(node, index) in nodes"
+                        :key="index"
+                        :label="loadNodeName(node.name)"
+                        :value="node.name"
+                    />
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
                 <TableRefresh @search="search()" />
@@ -72,7 +77,7 @@
                     </el-table-column>
                     <el-table-column v-if="isXpackOrEE" :label="$t('xpack.node.node')" prop="node">
                         <template #default="{ row }">
-                            <span>{{ row.node === 'local' ? globalStore.getMasterAlias() : row.node }}</span>
+                            <span>{{ loadNodeName(row.node) }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status">
@@ -148,6 +153,13 @@ const search = async () => {
         });
 };
 
+const loadNodeName = (node: string) => {
+    if (node === 'local') {
+        return globalStore.getMasterAlias();
+    }
+    return node;
+};
+
 const onClean = async () => {
     let params = {
         header: i18n.global.t('logs.deleteLogs'),
@@ -168,7 +180,7 @@ const loadDetail = (log: string) => {
 };
 
 const loadNodes = async () => {
-    await listNodes('')
+    await listNodes('all')
         .then((res) => {
             nodes.value = res || [];
         })
