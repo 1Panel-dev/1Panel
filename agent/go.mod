@@ -50,12 +50,12 @@ require (
 	github.com/tomasen/fcgi_client v0.0.0-20180423082037-2bb3d819fd19
 	github.com/upyun/go-sdk v2.1.0+incompatible
 	go.mongodb.org/mongo-driver/v2 v2.6.0
-	golang.org/x/crypto v0.52.0
+	golang.org/x/crypto v0.53.0
 	golang.org/x/net v0.55.0
 	golang.org/x/oauth2 v0.36.0
-	golang.org/x/sync v0.20.0
-	golang.org/x/sys v0.45.0
-	golang.org/x/text v0.37.0
+	golang.org/x/sync v0.21.0
+	golang.org/x/sys v0.46.0
+	golang.org/x/text v0.38.0
 	golang.org/x/time v0.15.0
 	google.golang.org/genproto v0.0.0-20260414002931-afd174a4e478
 	gopkg.in/ini.v1 v1.67.2
@@ -121,7 +121,6 @@ require (
 	github.com/go-acme/alidns-20150109/v5 v5.4.1 // indirect
 	github.com/go-acme/esa-20240910/v3 v3.2.2 // indirect
 	github.com/go-acme/tencentclouddnspod v1.3.24 // indirect
-	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
