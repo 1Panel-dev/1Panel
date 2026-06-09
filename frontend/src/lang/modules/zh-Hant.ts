@@ -905,6 +905,7 @@ const message = {
             importModelAccount: '匯入模型帳號',
             editModelAccount: '編輯模型帳號',
             selectModelAccount: '選擇已有模型帳號',
+            upstreamApiAddress: '上游 API 地址',
             priority: '優先級',
             healthStatus: '健康狀態',
             failureCount: '失敗次數',

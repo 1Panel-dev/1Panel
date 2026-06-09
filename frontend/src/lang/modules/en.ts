@@ -953,6 +953,7 @@ const message = {
             importModelAccount: 'Import Model Account',
             editModelAccount: 'Edit Model Account',
             selectModelAccount: 'Select an existing model account',
+            upstreamApiAddress: 'Upstream API Address',
             priority: 'Priority',
             healthStatus: 'Health',
             failureCount: 'Failures',

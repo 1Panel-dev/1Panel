@@ -15,7 +15,7 @@ require (
 	github.com/gin-gonic/gin v1.12.0
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-acme/lego/v5 v5.2.2
-	github.com/go-gormigrate/gormigrate/v2 v2.1.5
+	github.com/go-gormigrate/gormigrate/v2 v2.1.6
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-resty/resty/v2 v2.17.2
@@ -30,7 +30,7 @@ require (
 	github.com/klauspost/compress v1.18.6
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
 	github.com/miekg/dns v1.1.72
-	github.com/minio/minio-go/v7 v7.1.0
+	github.com/minio/minio-go/v7 v7.2.0
 	github.com/nicksnyder/go-i18n/v2 v2.6.1
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/oschwald/maxminddb-golang v1.13.1
