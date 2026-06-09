@@ -16,7 +16,7 @@ require (
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-acme/lego/v5 v5.2.2
 	github.com/go-gormigrate/gormigrate/v2 v2.1.6
-	github.com/go-playground/validator/v10 v10.30.2
+	github.com/go-playground/validator/v10 v10.30.3
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/go-sql-driver/mysql v1.10.0
@@ -121,7 +121,6 @@ require (
 	github.com/go-acme/alidns-20150109/v5 v5.4.1 // indirect
 	github.com/go-acme/esa-20240910/v3 v3.2.2 // indirect
 	github.com/go-acme/tencentclouddnspod v1.3.24 // indirect
-	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
