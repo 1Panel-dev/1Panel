@@ -1301,8 +1301,8 @@ onBeforeUnmount(() => {
 
     :deep(.md-editor-content .md-editor-preview) {
         padding: 0;
-        font-size: 11px;
-        line-height: 1.2;
+        font-size: 14px;
+        line-height: 1.6;
         word-break: break-word;
         white-space: pre-wrap;
     }
@@ -1312,8 +1312,8 @@ onBeforeUnmount(() => {
     :deep(.md-editor-preview table),
     :deep(.md-editor-preview blockquote),
     :deep(.md-editor-preview code) {
-        font-size: 11px;
-        line-height: 1.4;
+        font-size: 14px;
+        line-height: 1.6;
     }
 
     :deep(.md-editor-preview h1),
