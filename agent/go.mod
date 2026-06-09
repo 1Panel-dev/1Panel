@@ -54,7 +54,7 @@ require (
 	golang.org/x/net v0.55.0
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.20.0
-	golang.org/x/sys v0.45.0
+	golang.org/x/sys v0.46.0
 	golang.org/x/text v0.37.0
 	golang.org/x/time v0.15.0
 	google.golang.org/genproto v0.0.0-20260414002931-afd174a4e478
@@ -121,7 +121,6 @@ require (
 	github.com/go-acme/alidns-20150109/v5 v5.4.1 // indirect
 	github.com/go-acme/esa-20240910/v3 v3.2.2 // indirect
 	github.com/go-acme/tencentclouddnspod v1.3.24 // indirect
-	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
