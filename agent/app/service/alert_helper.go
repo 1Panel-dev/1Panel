@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -46,6 +47,7 @@ type IAlertTaskHelper interface {
 
 var cpuLoad1, cpuLoad5, cpuLoad15 []float64
 var memoryLoad1, memoryLoad5, memoryLoad15 []float64
+var alertTaskMu sync.Mutex
 
 var baseTypes = map[string]bool{"ssl": true, "siteEndTime": true, "panelPwdEndTime": true, "panelUpdate": true}
 var resourceTypes = map[string]bool{"cpu": true, "memory": true, "disk": true, "load": true, "panelLogin": true, "sshLogin": true, "nodeException": true, "licenseException": true}
@@ -57,32 +59,49 @@ func NewIAlertTaskHelper() IAlertTaskHelper {
 	}
 }
 func (m *AlertTaskHelper) StartTask() {
+	alertTaskMu.Lock()
+	defer alertTaskMu.Unlock()
+	m.startTaskLocked()
+}
+
+func (m *AlertTaskHelper) startTaskLocked() {
 	baseAlert, resourceAlert := m.getClassifiedAlerts()
 	if len(baseAlert) == 0 && len(resourceAlert) == 0 {
 		return
 	}
-	handleBaseAlerts(baseAlert)
-	handleResourceAlerts(resourceAlert)
+	handleBaseAlertsLocked(baseAlert)
+	handleResourceAlertsLocked(resourceAlert)
 }
 
 func (m *AlertTaskHelper) StopTask() {
-	stopBaseJob()
-	stopResourceJob()
+	alertTaskMu.Lock()
+	defer alertTaskMu.Unlock()
+	stopBaseJobLocked()
+	stopResourceJobLocked()
 }
 
 func (m *AlertTaskHelper) ResetTask() {
-	m.StopTask()
-	m.StartTask()
+	alertTaskMu.Lock()
+	defer alertTaskMu.Unlock()
+	stopBaseJobLocked()
+	stopResourceJobLocked()
+	m.startTaskLocked()
 }
 
 func (m *AlertTaskHelper) InitTask(alertType string) {
+	alertTaskMu.Lock()
+	defer alertTaskMu.Unlock()
+	m.initTaskLocked(alertType)
+}
+
+func (m *AlertTaskHelper) initTaskLocked(alertType string) {
 	resetAlertState(alertType)
 	if baseTypes[alertType] {
-		stopBaseJob()
+		stopBaseJobLocked()
 	} else if resourceTypes[alertType] {
-		stopResourceJob()
+		stopResourceJobLocked()
 	}
-	m.StartTask()
+	m.startTaskLocked()
 }
 
 func resetAlertState(alertType string) {
@@ -110,14 +129,14 @@ func (m *AlertTaskHelper) getClassifiedAlerts() (baseAlerts, resourceAlerts []dt
 	return
 }
 
-func handleBaseAlerts(baseAlerts []dto.AlertDTO) {
+func handleBaseAlertsLocked(baseAlerts []dto.AlertDTO) {
 	if len(baseAlerts) == 0 {
-		stopBaseJob()
+		stopBaseJobLocked()
 		return
 	}
 	if global.AlertBaseJobID == 0 {
 		baseTask(baseAlerts)
-		jobID, err := global.Cron.AddFunc("*/30 * * * *", func() {
+		jobID, err := global.Cron.AddFunc("@every 30m", func() {
 			baseTask(baseAlerts)
 		})
 		if err != nil {
@@ -129,9 +148,9 @@ func handleBaseAlerts(baseAlerts []dto.AlertDTO) {
 	}
 }
 
-func handleResourceAlerts(resourceAlerts []dto.AlertDTO) {
+func handleResourceAlertsLocked(resourceAlerts []dto.AlertDTO) {
 	if len(resourceAlerts) == 0 {
-		stopResourceJob()
+		stopResourceJobLocked()
 		return
 	}
 	if global.AlertResourceJobID == 0 {
@@ -147,7 +166,7 @@ func handleResourceAlerts(resourceAlerts []dto.AlertDTO) {
 	}
 }
 
-func stopBaseJob() {
+func stopBaseJobLocked() {
 	if global.AlertBaseJobID != 0 {
 		global.Cron.Remove(global.AlertBaseJobID)
 		global.AlertBaseJobID = 0
@@ -155,7 +174,7 @@ func stopBaseJob() {
 	}
 }
 
-func stopResourceJob() {
+func stopResourceJobLocked() {
 	if global.AlertResourceJobID != 0 {
 		global.Cron.Remove(global.AlertResourceJobID)
 		global.AlertResourceJobID = 0
