@@ -1293,18 +1293,38 @@ onBeforeUnmount(() => {
 .memo-content {
     min-height: 218px;
     border-radius: 4px;
-    font-size: 13px;
-    margin-top: -15px;
-    margin-left: -10px;
-    word-wrap: break-word;
-    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 
     :deep(.md-editor) {
         background-color: transparent;
     }
 
     :deep(.md-editor-content .md-editor-preview) {
-        font-size: 13px;
+        padding: 0;
+        font-size: 11px;
+        line-height: 1.2;
+        word-break: break-word;
+        white-space: pre-wrap;
+    }
+
+    :deep(.md-editor-preview p),
+    :deep(.md-editor-preview li),
+    :deep(.md-editor-preview table),
+    :deep(.md-editor-preview blockquote),
+    :deep(.md-editor-preview code) {
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    :deep(.md-editor-preview h1),
+    :deep(.md-editor-preview h2),
+    :deep(.md-editor-preview h3),
+    :deep(.md-editor-preview h4),
+    :deep(.md-editor-preview h5),
+    :deep(.md-editor-preview h6) {
+        margin: 0.5em 0;
+        font-size: 12px;
+        line-height: 1.4;
     }
 }
 
