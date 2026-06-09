@@ -108,11 +108,12 @@ const saveRow = (row: WhiteListItem) => {
     if (!validatePort(row.port)) {
         return;
     }
-    if (hasDuplicatePort(row)) {
+    const port = normalizePort(row.port);
+    if (hasDuplicatePort(port, row)) {
         MsgError(i18n.global.t('commons.rule.duplicate'));
         return;
     }
-    row.port = normalizePort(row.port);
+    row.port = port;
     row.oldPort = row.port;
     row.edit = false;
     row.isNew = false;
@@ -159,30 +160,33 @@ const validatePort = (value: string): boolean => {
     return true;
 };
 
-const hasDuplicatePort = (currentRow?: WhiteListItem): boolean => {
-    const ports = new Set<string>();
-    for (const item of data.value) {
-        if (item === currentRow || item.port === '') {
-            continue;
+const hasDuplicatePort = (port: string, row?: WhiteListItem): boolean => {
+    const portKey = normalizePortKey(port);
+    return data.value.some((item) => item !== row && item.port !== '' && normalizePortKey(item.port) === portKey);
+};
+
+const hasDuplicatePorts = (ports: string[]): boolean => {
+    const portSet = new Set<string>();
+    for (const port of ports) {
+        const portKey = normalizePortKey(port);
+        if (portSet.has(portKey)) {
+            return true;
         }
-        ports.add(normalizePortKey(item.port));
+        portSet.add(portKey);
     }
-    return currentRow ? ports.has(normalizePortKey(currentRow.port)) : false;
+    return false;
 };
 
 const onSubmit = async () => {
     const ports = data.value.map((item) => item.port).filter((item) => item !== '');
-    const portSet = new Set<string>();
     for (const port of ports) {
         if (!validatePort(port)) {
             return;
         }
-        const portKey = normalizePortKey(port);
-        if (portSet.has(portKey)) {
-            MsgError(i18n.global.t('commons.rule.duplicate'));
-            return;
-        }
-        portSet.add(portKey);
+    }
+    if (hasDuplicatePorts(ports)) {
+        MsgError(i18n.global.t('commons.rule.duplicate'));
+        return;
     }
     loading.value = true;
     await updateAgentSetting({

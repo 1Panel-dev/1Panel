@@ -80,18 +80,58 @@
                             <el-table-column type="selection" fix />
                             <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
                             <el-table-column :label="$t('commons.table.port')" :min-width="70" prop="port" />
-                            <el-table-column :label="$t('commons.table.status')" :min-width="120">
+                            <el-table-column :label="$t('commons.table.status')" :min-width="180">
                                 <template #default="{ row }">
-                                    <el-tag type="success" v-if="row.usedStatus">
-                                        {{ $t('firewall.used') + ' (' + row.usedStatus + ')' }}
-                                        <el-icon
-                                            v-if="row.processInfo"
-                                            @click="showProcessDetail(row.processInfo.PID)"
-                                            style="margin-left: 4px; cursor: pointer; vertical-align: middle"
-                                        >
-                                            <Expand />
-                                        </el-icon>
-                                    </el-tag>
+                                    <template v-if="row.usedStatus">
+                                        <template v-if="row.processInfos?.length">
+                                            <span class="process-list">
+                                                <span
+                                                    v-for="(process, index) in row.processInfos"
+                                                    v-show="row.expand || index < 3"
+                                                    :key="`${process.PID || formatProcessInfo(process)}-${index}`"
+                                                >
+                                                    <el-button
+                                                        v-if="process.PID"
+                                                        size="small"
+                                                        class="process-link"
+                                                        :title="`${formatProcessInfo(process)} (PID: ${process.PID})`"
+                                                        @click.stop="showProcessDetail(process.PID)"
+                                                    >
+                                                        {{ formatProcessInfo(process) }}
+                                                        <el-icon class="process-detail-icon">
+                                                            <Expand />
+                                                        </el-icon>
+                                                    </el-button>
+                                                    <span v-else class="process-name">
+                                                        <el-button size="small">
+                                                            {{ formatProcessInfo(process) }}
+                                                        </el-button>
+                                                    </span>
+                                                </span>
+                                                <el-button
+                                                    v-if="!row.expand && row.processInfos.length > 3"
+                                                    type="primary"
+                                                    link
+                                                    class="process-toggle"
+                                                    @click.stop="row.expand = true"
+                                                >
+                                                    {{ $t('commons.button.expand') }}...
+                                                </el-button>
+                                                <el-button
+                                                    v-if="row.expand && row.processInfos.length > 3"
+                                                    type="primary"
+                                                    link
+                                                    class="process-toggle"
+                                                    @click.stop="row.expand = false"
+                                                >
+                                                    {{ $t('commons.button.collapse') }}
+                                                </el-button>
+                                            </span>
+                                        </template>
+                                        <span v-else class="process-list">
+                                            <span class="process-name">{{ row.usedStatus }}</span>
+                                        </span>
+                                    </template>
                                     <el-tag type="info" v-else>{{ $t('firewall.unUsed') }}</el-tag>
                                 </template>
                             </el-table-column>
@@ -194,7 +234,18 @@ const processDetailRef = ref();
 
 const listeningProcesses = ref<Process.ListeningProcess[]>([]);
 
-const data = ref();
+type RuleInfoWithProcess = Host.RuleInfo & {
+    expand?: boolean;
+    processInfo?: Process.ListeningProcess;
+    processInfos?: ProcessInfoDisplay[];
+};
+
+type ProcessInfoDisplay = Partial<Process.ListeningProcess> & {
+    Name: string;
+    ports: number[];
+};
+
+const data = ref<RuleInfoWithProcess[]>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'firewall-port-page-size',
     currentPage: 1,
@@ -232,26 +283,188 @@ const isPortInRule = (rulePort: string, port: number): boolean => {
     return false;
 };
 
+const formatProcessInfo = (process: ProcessInfoDisplay): string => {
+    const ports = process.ports.join(', ');
+    if (!process.Name) {
+        return ports;
+    }
+    if (!ports) {
+        return process.Name;
+    }
+    return `${process.Name} (${ports})`;
+};
+
+const parseUsedStatus = (usedStatus: string, rulePort: string): ProcessInfoDisplay[] => {
+    if (!usedStatus) {
+        return [];
+    }
+
+    return usedStatus
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item)
+        .map((item) => {
+            const appMatch = item.match(/^(\d+)\s+\((.+)\)$/);
+            if (appMatch) {
+                return {
+                    Name: appMatch[2],
+                    ports: [Number(appMatch[1])],
+                };
+            }
+
+            const port = Number(item);
+            if (!isNaN(port)) {
+                return {
+                    Name: '',
+                    ports: [port],
+                };
+            }
+
+            const rulePorts = extractPortsFromRule(rulePort);
+            return {
+                Name: item,
+                ports: rulePorts.length === 1 ? rulePorts : [],
+            };
+        });
+};
+
+const extractPortsFromRule = (rulePort: string): number[] => {
+    const ports: number[] = [];
+    const segments = rulePort.split(',');
+    for (const segment of segments) {
+        const portSegment = segment.trim();
+        if (!portSegment) {
+            continue;
+        }
+
+        const rangeDelimiter = portSegment.includes('-') && !portSegment.startsWith('-') ? '-' : ':';
+        if (portSegment.includes(rangeDelimiter) && !portSegment.startsWith(rangeDelimiter)) {
+            const [startPort, endPort] = portSegment.split(rangeDelimiter).map((item) => parseInt(item.trim()));
+            if (!isNaN(startPort) && !isNaN(endPort)) {
+                for (let port = startPort; port <= endPort; port++) {
+                    ports.push(port);
+                }
+            }
+            continue;
+        }
+
+        const port = parseInt(portSegment);
+        if (!isNaN(port)) {
+            ports.push(port);
+        }
+    }
+    return ports;
+};
+
+const getProtocolNums = (protocol: string): number[] => {
+    const protocolValue = protocol.toLowerCase();
+    if (protocolValue === 'tcp') {
+        return [1];
+    }
+    if (protocolValue === 'udp') {
+        return [2];
+    }
+    if (protocolValue.includes('tcp') && protocolValue.includes('udp')) {
+        return [1, 2];
+    }
+    return [];
+};
+
+const loadMatchedListeningProcesses = (rule: RuleInfoWithProcess): ProcessInfoDisplay[] => {
+    const protocolNums = getProtocolNums(rule.protocol);
+    const matchedProcesses: ProcessInfoDisplay[] = [];
+
+    for (const proc of listeningProcesses.value) {
+        if (!protocolNums.includes(proc.Protocol)) {
+            continue;
+        }
+
+        const matchedPorts = extractPortsFromObject(proc.Port)
+            .filter((port) => isPortInRule(rule.port, port))
+            .sort((a, b) => a - b);
+        if (matchedPorts.length > 0) {
+            matchedProcesses.push({
+                ...proc,
+                ports: matchedPorts,
+            });
+        }
+    }
+
+    return matchedProcesses;
+};
+
+const applyProcessPID = (processInfos: ProcessInfoDisplay[], matchedProcesses: ProcessInfoDisplay[]) => {
+    for (const processInfo of processInfos) {
+        const matchedProcess = matchedProcesses.find((proc) =>
+            processInfo.ports.some((port) => proc.ports.includes(port)),
+        );
+        if (!matchedProcess) {
+            continue;
+        }
+
+        processInfo.PID = matchedProcess.PID;
+        processInfo.Port = matchedProcess.Port;
+        processInfo.Protocol = matchedProcess.Protocol;
+        if (processInfo.ports.length === 0) {
+            processInfo.ports = matchedProcess.ports;
+        }
+    }
+};
+
+const mergeListeningProcesses = (processInfos: ProcessInfoDisplay[], matchedProcesses: ProcessInfoDisplay[]) => {
+    const displayedPorts = new Set<number>();
+    for (const processInfo of processInfos) {
+        for (const port of processInfo.ports) {
+            displayedPorts.add(port);
+        }
+    }
+
+    for (const matchedProcess of matchedProcesses) {
+        const missingPorts = matchedProcess.ports.filter((port) => !displayedPorts.has(port));
+        if (missingPorts.length === 0) {
+            continue;
+        }
+
+        const sameProcess = processInfos.find(
+            (processInfo) => processInfo.PID && processInfo.PID === matchedProcess.PID,
+        );
+        if (sameProcess) {
+            sameProcess.ports = [...sameProcess.ports, ...missingPorts].sort((a, b) => a - b);
+        } else {
+            processInfos.push({
+                ...matchedProcess,
+                ports: missingPorts,
+            });
+        }
+
+        for (const port of missingPorts) {
+            displayedPorts.add(port);
+        }
+    }
+};
+
 const loadListeningProcesses = async () => {
     try {
         const res = await getListeningProcess();
         listeningProcesses.value = res.data || [];
 
         for (const item of data.value) {
-            if (!item.processInfo) {
-                const protocolNum =
-                    item.protocol.toLowerCase() === 'tcp' ? 1 : item.protocol.toLowerCase() === 'udp' ? 2 : 0;
+            const matchedProcesses = loadMatchedListeningProcesses(item);
 
-                for (const proc of listeningProcesses.value) {
-                    if (proc.Protocol === protocolNum) {
-                        const procPorts = extractPortsFromObject(proc.Port);
-                        if (procPorts.some((port) => isPortInRule(item.port, port))) {
-                            item.usedStatus = proc.Name;
-                            item.processInfo = proc;
-                            break;
-                        }
-                    }
-                }
+            if (item.usedStatus) {
+                item.expand = false;
+                item.processInfos = parseUsedStatus(item.usedStatus, item.port);
+                applyProcessPID(item.processInfos, matchedProcesses);
+                mergeListeningProcesses(item.processInfos, matchedProcesses);
+                item.processInfo = item.processInfos.find((proc) => proc.PID) as Process.ListeningProcess;
+                continue;
+            }
+
+            if (matchedProcesses.length > 0) {
+                item.expand = false;
+                item.usedStatus = matchedProcesses.map((proc) => proc.Name).join(', ');
+                item.processInfo = matchedProcesses[0] as Process.ListeningProcess;
+                item.processInfos = matchedProcesses;
             }
         }
     } catch (error) {
@@ -469,5 +682,33 @@ onMounted(() => {
     font-size: 8px;
     margin-bottom: -4px;
     cursor: pointer;
+}
+
+.process-name,
+.process-link {
+    display: block;
+}
+
+.process-link {
+    cursor: pointer;
+}
+
+.process-port {
+    margin-left: 8px;
+}
+
+.process-list {
+    display: block;
+    margin-top: 2px;
+}
+
+.process-detail-icon {
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+.process-toggle {
+    height: 20px;
+    padding: 0;
 }
 </style>
