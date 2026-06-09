@@ -342,7 +342,7 @@
                                 :key="opt.value"
                                 :value="opt.value"
                                 :label="opt.label"
-                                :disabled="opt.disabled"
+                                :disabled="isLockedMethodOption(opt)"
                             >
                                 <div class="alert-config-option">
                                     <span class="alert-config-option__name" :title="opt.label">
@@ -421,9 +421,16 @@ const configOptions = computed(() => {
             label: getConfigOptionLabel(c),
             typeLabel: getConfigTypeLabel(c.type),
             type: c.type,
-            disabled: c.status !== 'Enable',
-        }));
+            disabled:
+                c.status !== 'Enable' ||
+                (!isProductPro.value && ['weCom', 'dingTalk', 'feiShu', 'sms'].includes(c.type)),
+        }))
+        .sort((a, b) => Number(a.disabled) - Number(b.disabled));
 });
+
+const isLockedMethodOption = (opt: { value: string; disabled: boolean }) => {
+    return opt.disabled && !dialogData.value.rowData?.sendMethod.includes(opt.value);
+};
 
 const allConfigValues = computed(() => configOptions.value.filter((c) => !c.disabled).map((c) => c.value));
 
@@ -444,6 +451,14 @@ const normalizeMethodValues = (methods: string[]) => {
         const matched = configOptions.value.find((item) => item.type === configType);
         return matched?.value || method;
     });
+};
+
+const isAllEnabledMethodsSelected = (methods: string[]) => {
+    return (
+        methods.length > 0 &&
+        methods.every((item) => allConfigValues.value.includes(item)) &&
+        allConfigValues.value.every((item) => methods.includes(item))
+    );
 };
 
 const getConfigTypeLabel = (type: string): string => {
@@ -473,16 +488,28 @@ const getConfigOptionLabel = (c: Alert.AlertConfigInfo): string => {
     return getConfigTypeLabel(c.type);
 };
 
+const lastSendMethod = ref<string[]>([]);
+
 const handleSendMethodChange = (values: string[]) => {
     if (!dialogData.value.rowData) return;
-    if (
-        allConfigValues.value.length > 0 &&
-        (values.includes(ALL_SEND_METHOD) || allConfigValues.value.every((item) => values.includes(item)))
-    ) {
+    if (values.includes(ALL_SEND_METHOD)) {
         dialogData.value.rowData.sendMethod = [ALL_SEND_METHOD];
+        lastSendMethod.value = [...allConfigValues.value];
         return;
     }
-    dialogData.value.rowData.sendMethod = values.filter((item) => item !== ALL_SEND_METHOD);
+    const disabledValues = new Set(configOptions.value.filter((c) => c.disabled).map((c) => c.value));
+    const prev = new Set(lastSendMethod.value);
+    const filteredValues = values.filter((value) => !disabledValues.has(value) || prev.has(value));
+    const nonAllValues = filteredValues.filter((item) => item !== ALL_SEND_METHOD);
+    const hasLockedValues = nonAllValues.some((item) => disabledValues.has(item));
+
+    if (!hasLockedValues && isAllEnabledMethodsSelected(nonAllValues)) {
+        dialogData.value.rowData.sendMethod = [ALL_SEND_METHOD];
+        lastSendMethod.value = [...allConfigValues.value];
+        return;
+    }
+    dialogData.value.rowData.sendMethod = nonAllValues;
+    lastSendMethod.value = [...nonAllValues];
 };
 
 interface DialogProps {
@@ -526,16 +553,15 @@ const cronjobTypes = [
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     dialogData.value.rowData.sendMethod = [];
+    lastSendMethod.value = [];
     if (dialogData.value.rowData.method != '') {
         const sendMethods = normalizeMethodValues(dialogData.value.rowData.method.split(',').filter(Boolean));
-        if (
-            sendMethods.length > 0 &&
-            allConfigValues.value.length > 0 &&
-            allConfigValues.value.every((item) => sendMethods.includes(item))
-        ) {
+        if (isAllEnabledMethodsSelected(sendMethods)) {
             dialogData.value.rowData.sendMethod = [ALL_SEND_METHOD];
+            lastSendMethod.value = [...allConfigValues.value];
         } else {
             dialogData.value.rowData.sendMethod = sendMethods;
+            lastSendMethod.value = [...sendMethods];
         }
     }
     if (cronjobTypes.includes(dialogData.value.rowData.type)) {
