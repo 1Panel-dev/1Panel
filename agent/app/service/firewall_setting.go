@@ -16,7 +16,7 @@ type firewallPortWhitelist struct {
 	Protocol string
 }
 
-func loadFirewallPortWhiteList() ([]firewallPortWhitelist, error) {
+func loadConfiguredFirewallPortWhiteList() ([]firewallPortWhitelist, error) {
 	value, err := settingRepo.GetValueByKey(constant.FirewallPortWhiteList)
 	if err != nil {
 		value = constant.FirewallPortWhiteListValue
@@ -24,21 +24,30 @@ func loadFirewallPortWhiteList() ([]firewallPortWhitelist, error) {
 			return nil, err
 		}
 	}
-	return parseFullFirewallPortWhiteList(value)
+	return parseFirewallPortWhiteList(value)
 }
 
-func parseFullFirewallPortWhiteList(value string) ([]firewallPortWhitelist, error) {
-	portWhiteList, err := parseFirewallPortWhiteList(value)
+func loadFirewallPortWhiteList() ([]firewallPortWhitelist, error) {
+	portWhiteList, err := loadConfiguredFirewallPortWhiteList()
 	if err != nil {
 		return nil, err
 	}
+	requiredPorts, err := loadRequiredFirewallPortWhiteList()
+	if err != nil {
+		return nil, err
+	}
+	return normalizeFirewallPortWhiteList(append(portWhiteList, requiredPorts...)), nil
+}
+
+func loadRequiredFirewallPortWhiteList() ([]firewallPortWhitelist, error) {
 	panelPort := LoadPanelPort()
 	if panelPort == "" {
 		return nil, fmt.Errorf("find 1panel service port failed")
 	}
-	portWhiteList = append(portWhiteList, firewallPortWhitelist{Port: panelPort, Protocol: "tcp"})
-	portWhiteList = append(portWhiteList, firewallPortWhitelist{Port: loadSSHPort(), Protocol: "tcp"})
-	return normalizeFirewallPortWhiteList(portWhiteList), nil
+	return normalizeFirewallPortWhiteList([]firewallPortWhitelist{
+		{Port: panelPort, Protocol: "tcp"},
+		{Port: loadSSHPort(), Protocol: "tcp"},
+	}), nil
 }
 
 func parseFirewallPortWhiteList(value string) ([]firewallPortWhitelist, error) {
@@ -97,22 +106,36 @@ func syncFirewallPortWhiteListAfterUpdate(oldValue string) error {
 	if err != nil {
 		return err
 	}
+	if client.Name() == "iptables" {
+		isInit, _ := iptables.LoadInitStatus("iptables", "base")
+		if !isInit {
+			return nil
+		}
+		oldPortWhiteList, err := parseFirewallPortWhiteList(oldValue)
+		if err != nil {
+			return err
+		}
+		return syncIptablesFirewallPortWhiteList(true, oldPortWhiteList)
+	}
+
+	isActive, _ := client.Status()
+	if !isActive {
+		return nil
+	}
 	portWhiteList, err := loadFirewallPortWhiteList()
 	if err != nil {
 		return err
 	}
-	if client.Name() != "iptables" {
-		oldPortWhiteList, err := parseFullFirewallPortWhiteList(oldValue)
-		if err != nil {
-			return err
-		}
-		return syncFirewallClientPortWhiteList(client, oldPortWhiteList, portWhiteList)
+	oldPortWhiteList, err := parseFirewallPortWhiteList(oldValue)
+	if err != nil {
+		return err
 	}
-	isInit, _ := iptables.LoadInitStatus("iptables", "base")
-	if !isInit {
-		return nil
+	requiredPorts, err := loadRequiredFirewallPortWhiteList()
+	if err != nil {
+		return err
 	}
-	return applyFirewallPortWhiteListRules(portWhiteList, true)
+	oldPortWhiteList = normalizeFirewallPortWhiteList(append(oldPortWhiteList, requiredPorts...))
+	return syncFirewallClientPortWhiteList(client, oldPortWhiteList, portWhiteList)
 }
 
 func syncFirewallClientPortWhiteList(client firewall.FirewallClient, oldPortWhiteList, portWhiteList []firewallPortWhitelist) error {

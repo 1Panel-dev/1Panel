@@ -186,6 +186,9 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 		if err := client.Restart(); err != nil {
 			return err
 		}
+		if err := u.addPortsBeforeStart(client); err != nil {
+			return err
+		}
 		needRestartDocker = true
 	case "disableBanPing":
 		if err := firewall.UpdatePingStatus("0"); err != nil {
@@ -579,6 +582,13 @@ func (u *FirewallService) cleanUnUsedData(client firewall.FirewallClient) {
 }
 
 func (u *FirewallService) addPortsBeforeStart(client firewall.FirewallClient) error {
+	if client.Name() == "iptables" {
+		isInit, _ := iptables.LoadInitStatus("iptables", "base")
+		if !isInit {
+			return nil
+		}
+		return syncIptablesFirewallPortWhiteList(true)
+	}
 	portWhiteList, err := loadFirewallPortWhiteList()
 	if err != nil {
 		return err
