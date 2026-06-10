@@ -59,7 +59,6 @@ const message = {
             get: 'Get',
             upgrade: 'Upgrade',
             update: 'Update',
-            updateNow: 'Update now',
             ignore: 'Ignore update',
             copy: 'Copy',
             random: 'Generate',
@@ -228,7 +227,7 @@ const message = {
             rePassword: 'Confirm password is inconsistent with the password.',
             requiredInput: 'This field is required.',
             requiredSelect: 'Select an item in the list',
-            illegalChar: 'Injection of characters & ; $ \' ` ( ) " > < | is currently not supported',
+            illegalChar: 'Injection of characters & ; $ \' ` ( ) " > < ｜ is currently not supported',
             illegalInput: "This field mustn't contains illegal characters.",
             duplicate: 'This value must be unique.',
             commonName:
@@ -5162,8 +5161,7 @@ const message = {
             nodeUpgrade: 'Update Settings',
             nodeUpgradeHelper:
                 'Selected nodes will automatically start upgrading after the master node upgrade is completed, no manual operation required.',
-            nodeUpgradeAuto: 'Auto Update',
-            nodeUpgradePackageManage: 'Update Package Management',
+            nodeUpgradePackageManage: 'Installation Package Management',
             nodeUpgradePackageClean: 'Clean',
             nodeUpgradePackageFormatHelper:
                 'Only `1panel-agent_v*_*` or `1panel-v*-linux-*` installation packages are supported',

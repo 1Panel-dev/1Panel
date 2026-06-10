@@ -59,7 +59,6 @@ const message = {
             get: 'Al',
             upgrade: 'Yükselt',
             update: 'Güncelle',
-            updateNow: 'Şimdi Güncelle',
             ignore: 'Yükseltmeyi yoksay',
             copy: 'Kopyala',
             random: 'Oluştur',
@@ -231,7 +230,7 @@ const message = {
             rePassword: 'Şifre onayı, şifre ile tutarsız.',
             requiredInput: 'Bu alan gereklidir.',
             requiredSelect: 'Listeden bir öğe seçin',
-            illegalChar: '& ; $ ` ( ) " > < | karakterlerinin enjekte edilmesi şu anda desteklenmiyor',
+            illegalChar: '& ; $ ` ( ) " > < ｜ karakterlerinin enjekte edilmesi şu anda desteklenmiyor',
             illegalInput: 'Bu alan yasadışı karakterler içermemelidir.',
             duplicate: 'Bu değer benzersiz olmalıdır.',
             commonName:
@@ -5254,8 +5253,7 @@ const message = {
             nodeUpgrade: 'Güncelleme Ayarları',
             nodeUpgradeHelper:
                 'Seçilen düğümler, ana düğüm yükseltmesi tamamlandıktan sonra otomatik olarak yükseltmeye başlayacaktır, manuel işlem gerekmez.',
-            nodeUpgradeAuto: 'Otomatik Güncelleme',
-            nodeUpgradePackageManage: 'Güncelleme Paketi Yönetimi',
+            nodeUpgradePackageManage: 'Kurulum Paketi Yönetimi',
             nodeUpgradePackageClean: 'Temizle',
             nodeUpgradePackageFormatHelper:
                 'Yalnızca `1panel-agent_v*_*` veya `1panel-v*-linux-*` kurulum paketleri desteklenir',

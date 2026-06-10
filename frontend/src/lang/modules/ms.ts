@@ -57,7 +57,6 @@ const message = {
             get: 'Dapatkan',
             upgrade: 'Tingkatkan',
             update: 'Kemas Kini',
-            updateNow: 'Kemas Kini Sekarang',
             ignore: 'Abaikan peningkatan',
             install: 'Pasang',
             copy: 'Salin',
@@ -229,7 +228,7 @@ const message = {
             rePassword: 'Pengesahan kata laluan tidak sepadan dengan kata laluan.',
             requiredInput: 'Ruangan ini wajib diisi.',
             requiredSelect: 'Pilih satu item dalam senarai',
-            illegalChar: 'Suntikan aksara & ; $ \' ` ( ) " > < | tidak disokong buat masa ini',
+            illegalChar: 'Suntikan aksara & ; $ \' ` ( ) " > < ｜ tidak disokong buat masa ini',
             illegalInput: 'Ruangan ini tidak boleh mengandungi aksara tidak sah.',
             duplicate: 'Nilai ini mesti unik.',
             commonName:
@@ -5265,8 +5264,7 @@ const message = {
             nodeUpgrade: 'Tetapan Kemas Kini',
             nodeUpgradeHelper:
                 'Nod terpilih akan mula dinaik taraf secara automatik selepas naik taraf nod induk selesai, tiada operasi manual diperlukan.',
-            nodeUpgradeAuto: 'Kemas Kini Automatik',
-            nodeUpgradePackageManage: 'Pengurusan Pakej Kemas Kini',
+            nodeUpgradePackageManage: 'Pengurusan Pakej Pemasangan',
             nodeUpgradePackageClean: 'Bersihkan',
             nodeUpgradePackageFormatHelper:
                 'Hanya pakej pemasangan `1panel-agent_v*_*` atau `1panel-v*-linux-*` disokong',

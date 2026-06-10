@@ -57,7 +57,6 @@ const message = {
             get: 'Obter',
             upgrade: 'Fazer upgrade',
             update: 'Atualizar',
-            updateNow: 'Atualizar Agora',
             ignore: 'Ignorar atualização',
             install: 'Instalar',
             copy: 'Copiar',
@@ -227,7 +226,7 @@ const message = {
             rePassword: 'A confirmação da senha não corresponde à senha.',
             requiredInput: 'Este campo é obrigatório.',
             requiredSelect: 'Selecione um item na lista',
-            illegalChar: 'Atualmente não há suporte para injeção dos caracteres & ; $ \' ` ( ) " > < |',
+            illegalChar: 'Atualmente não há suporte para injeção dos caracteres & ; $ \' ` ( ) " > < ｜',
             illegalInput: 'Este campo não deve conter caracteres ilegais.',
             duplicate: 'Este valor deve ser único.',
             commonName:
@@ -5411,8 +5410,7 @@ const message = {
             nodeUpgrade: 'Configurações de Atualização',
             nodeUpgradeHelper:
                 'Os nós selecionados começarão a atualizar automaticamente após a conclusão da atualização do nó mestre, nenhuma operação manual necessária.',
-            nodeUpgradeAuto: 'Atualização Automática',
-            nodeUpgradePackageManage: 'Gerenciamento de Pacotes de Atualização',
+            nodeUpgradePackageManage: 'Gerenciamento de Pacotes de Instalação',
             nodeUpgradePackageClean: 'Limpar',
             nodeUpgradePackageFormatHelper:
                 'Somente pacotes de instalação `1panel-agent_v*_*` ou `1panel-v*-linux-*` são suportados',
