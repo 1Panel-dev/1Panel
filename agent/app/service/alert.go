@@ -512,6 +512,9 @@ func (a AlertService) UpdateAlertConfig(req dto.AlertConfigUpdate, operator stri
 	if err := a.checkAlertConfigDisplayNameUnique(req); err != nil {
 		return err
 	}
+	if err := a.checkAlertConfigSMSPhoneUnique(req); err != nil {
+		return err
+	}
 	if req.ID != 0 {
 		upMap := make(map[string]interface{})
 		upMap["id"] = req.ID
@@ -532,6 +535,29 @@ func (a AlertService) UpdateAlertConfig(req dto.AlertConfigUpdate, operator stri
 		alertConfig.UpdateUser = operator
 		if err := alertRepo.CreateAlertConfig(&alertConfig); err != nil {
 			return err
+		}
+	}
+
+	return nil
+}
+
+func (a AlertService) checkAlertConfigSMSPhoneUnique(req dto.AlertConfigUpdate) error {
+	if req.Type != constant.SMSConfig {
+		return nil
+	}
+
+	phone := alertConfigSMSPhone(req.Config)
+	configs, err := alertRepo.AlertConfigList(alertRepo.WithByType(req.Type))
+	if err != nil {
+		return err
+	}
+
+	for _, config := range configs {
+		if req.ID != 0 && config.ID == req.ID {
+			continue
+		}
+		if alertConfigSMSPhone(config.Config) == phone {
+			return buserr.New("ErrAlertConfigPhoneExist")
 		}
 	}
 
@@ -604,7 +630,7 @@ func (a AlertService) validateCommunityAlertConfigType(configType string) error 
 
 func alertConfigDisplayName(configType, configData string) string {
 	switch configType {
-	case constant.Email, constant.WeCom, constant.DingTalk, constant.FeiShu, constant.Bark:
+	case constant.Email, constant.WeCom, constant.DingTalk, constant.FeiShu, constant.Bark, constant.SMS:
 		var cfg struct {
 			DisplayName string `json:"displayName"`
 		}
@@ -615,6 +641,16 @@ func alertConfigDisplayName(configType, configData string) string {
 	default:
 		return ""
 	}
+}
+
+func alertConfigSMSPhone(configData string) string {
+	var cfg struct {
+		Phone string `json:"phone"`
+	}
+	if err := json.Unmarshal([]byte(configData), &cfg); err != nil {
+		return ""
+	}
+	return strings.TrimSpace(cfg.Phone)
 }
 
 func (a AlertService) DeleteAlertConfig(id uint) error {

@@ -151,7 +151,7 @@ import { MsgSuccess } from '@/utils/message';
 import AlertDrawer from '@/views/setting/alert/setting/drawer/index.vue';
 import { Alert } from '@/api/interface/alert';
 
-const { docsUrl, isMaster, isMobile, isProductPro, isEE } = useGlobalStore();
+const { docsUrl, isMaster, isMobile, isProductPro, isEE, isIntl } = useGlobalStore();
 
 const loading = ref(false);
 const alertDrawerRef = ref();
@@ -483,7 +483,7 @@ const buttons = computed(() => [
             openEditDrawer(row);
         },
         disabled: (row: Alert.AlertConfigInfo) =>
-            !isProductPro.value && ['weCom', 'dingTalk', 'feiShu', 'sms'].includes(row.type),
+            (isIntl.value || !isProductPro.value) && ['weCom', 'dingTalk', 'feiShu', 'sms'].includes(row.type),
     },
     {
         label: i18n.global.t('commons.button.delete'),

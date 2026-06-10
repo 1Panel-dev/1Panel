@@ -275,15 +275,15 @@
                             class="flex items-center flex-row md:flex-nowrap sm:flex-nowrap flex-wrap justify-between gap-2 w-full"
                         >
                             <el-form-item prop="cycle" class="md:flex-1 sm:flex-1">
-                                <el-input v-model.number="dialogData.rowData!.cycle" :max="200" width="200px">
-                                    <template #append>{{ $t('commons.units.minute') }}11</template>
+                                <el-input v-model.number="dialogData.rowData!.cycle" :max="200">
+                                    <template #append>{{ $t('commons.units.minute') }}</template>
                                 </el-input>
                             </el-form-item>
 
-                            <span class="whitespace-nowrap input-help w-[4.5rem]">
+                            <span class="whitespace-nowrap input-help !w-[5rem]">
                                 {{ $t('xpack.alert.loginFail') }}
                             </span>
-                            <el-form-item prop="count" class="md:flex-1 sm:flex-1 w-auto">
+                            <el-form-item prop="count" class="md:flex-1 sm:flex-1">
                                 <el-input v-model.number="dialogData.rowData!.count">
                                     <template #append>{{ $t('commons.units.time') }}</template>
                                 </el-input>
@@ -398,7 +398,7 @@ import { routerToName } from '@/utils/router';
 import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMaster, isProductPro, isEE } = useGlobalStore();
+const { isMaster, isProductPro, isEE, isIntl } = useGlobalStore();
 
 const alertConfigs = ref<Alert.AlertConfigInfo[]>([]);
 const loadAlertConfigs = async () => {
@@ -423,7 +423,7 @@ const configOptions = computed(() => {
             type: c.type,
             disabled:
                 c.status !== 'Enable' ||
-                (!isProductPro.value && ['weCom', 'dingTalk', 'feiShu', 'sms'].includes(c.type)),
+                ((isIntl.value || !isProductPro.value) && ['weCom', 'dingTalk', 'feiShu', 'sms'].includes(c.type)),
         }))
         .sort((a, b) => Number(a.disabled) - Number(b.disabled));
 });
