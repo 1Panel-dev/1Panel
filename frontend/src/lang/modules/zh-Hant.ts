@@ -1948,6 +1948,8 @@ const message = {
         detail: {
             dashboard: '概覽',
             ai: 'AI',
+            skills_hub: 'Skills Hub',
+            ai_proxy: 'AI 網關',
             groups: '分組',
             hosts: '主機',
             apps: '應用',

@@ -2052,6 +2052,8 @@ const message = {
         detail: {
             dashboard: 'Overview',
             ai: 'AI',
+            skills_hub: 'Skills Hub',
+            ai_proxy: 'AI Proxy',
             groups: 'Group',
             hosts: 'Host',
             apps: 'App',

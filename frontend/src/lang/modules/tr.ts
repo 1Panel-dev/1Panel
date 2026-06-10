@@ -2101,6 +2101,8 @@ const message = {
         detail: {
             dashboard: 'Genel Bakış',
             ai: 'AI',
+            skills_hub: 'Skills Hub',
+            ai_proxy: 'AI Proxy',
             groups: 'Grup',
             hosts: 'Ana Bilgisayar',
             apps: 'Uygulama',

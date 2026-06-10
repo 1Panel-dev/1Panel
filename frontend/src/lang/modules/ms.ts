@@ -2105,6 +2105,8 @@ const message = {
         detail: {
             dashboard: 'Overview',
             ai: 'AI',
+            skills_hub: 'Skills Hub',
+            ai_proxy: 'Proksi AI',
             groups: 'Kumpulan',
             hosts: 'Hos',
             apps: 'Aplikasi',
