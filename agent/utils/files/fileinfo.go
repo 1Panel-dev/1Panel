@@ -21,6 +21,76 @@ import (
 	"github.com/spf13/afero"
 )
 
+var binaryPreviewMimeTypes = map[string]struct{}{
+	"application/pdf":               {},
+	"application/zip":               {},
+	"application/gzip":              {},
+	"application/x-gzip":            {},
+	"application/x-7z-compressed":   {},
+	"application/x-rar-compressed":  {},
+	"application/x-bzip2":           {},
+	"application/x-xz":              {},
+	"application/x-tar":             {},
+	"application/java-archive":      {},
+	"application/msword":            {},
+	"application/vnd.ms-excel":      {},
+	"application/vnd.ms-powerpoint": {},
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document":   {},
+	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":         {},
+	"application/vnd.openxmlformats-officedocument.presentationml.presentation": {},
+}
+
+var binaryPreviewMimePrefixes = []string{
+	"image/",
+	"audio/",
+	"video/",
+	"application/vnd.ms-",
+	"application/vnd.openxmlformats-officedocument.",
+	"application/vnd.oasis.opendocument.",
+}
+
+var binaryPreviewExtensions = map[string]struct{}{
+	".pdf":  {},
+	".zip":  {},
+	".gz":   {},
+	".bz2":  {},
+	".xz":   {},
+	".tar":  {},
+	".tgz":  {},
+	".rar":  {},
+	".7z":   {},
+	".war":  {},
+	".doc":  {},
+	".docx": {},
+	".xls":  {},
+	".xlsx": {},
+	".ppt":  {},
+	".pptx": {},
+	".jpg":  {},
+	".jpeg": {},
+	".png":  {},
+	".bmp":  {},
+	".gif":  {},
+	".tiff": {},
+	".ico":  {},
+	".webp": {},
+	".svg":  {},
+	".mp3":  {},
+	".wav":  {},
+	".wma":  {},
+	".ape":  {},
+	".acc":  {},
+	".ogg":  {},
+	".flac": {},
+	".mp4":  {},
+	".webm": {},
+	".mov":  {},
+	".wmv":  {},
+	".mkv":  {},
+	".avi":  {},
+	".flv":  {},
+}
+
 type FileInfo struct {
 	Fs         afero.Fs    `json:"-"`
 	Path       string      `json:"path"`
@@ -418,6 +488,9 @@ func (f *FileInfo) getContent() error {
 	if f.Size > 10*1024*1024 {
 		return buserr.New("ErrFileToLarge")
 	}
+	if IsBinaryPreviewFile(f.MimeType, f.Extension) {
+		return buserr.New("ErrFileCanNotRead")
+	}
 	afs := &afero.Afero{Fs: f.Fs}
 	cByte, err := afs.ReadFile(f.Path)
 	if err != nil {
@@ -430,8 +503,39 @@ func (f *FileInfo) getContent() error {
 	return nil
 }
 
+func IsBinaryPreviewFile(mimeType, extension string) bool {
+	mimeType = strings.ToLower(strings.TrimSpace(mimeType))
+	extension = strings.ToLower(strings.TrimSpace(extension))
+
+	if mimeType == "" || mimeType == "application/octet-stream" {
+		_, ok := binaryPreviewExtensions[extension]
+		return ok
+	}
+
+	if strings.HasPrefix(mimeType, "text/") {
+		return false
+	}
+
+	for _, prefix := range binaryPreviewMimePrefixes {
+		if strings.HasPrefix(mimeType, prefix) {
+			return true
+		}
+	}
+
+	_, ok := binaryPreviewMimeTypes[mimeType]
+	if ok {
+		return true
+	}
+
+	_, ok = binaryPreviewExtensions[extension]
+	return ok
+}
+
 func DetectBinary(buf []byte) bool {
 	mimeType := http.DetectContentType(buf)
+	if IsBinaryPreviewFile(mimeType, "") {
+		return true
+	}
 	if !strings.HasPrefix(mimeType, "text/") {
 		whiteByte := 0
 		n := min(1024, len(buf))
@@ -445,7 +549,6 @@ func DetectBinary(buf []byte) bool {
 		return whiteByte < 1
 	}
 	return false
-
 }
 
 func min(x, y int) int {

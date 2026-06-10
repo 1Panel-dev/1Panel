@@ -105,7 +105,7 @@
                         class="monaco-editor sm:w-48 w-1/3 monaco-editor-background border-0 tree-container"
                         v-if="isShow"
                     >
-                        <div class="flex items-center justify-between pl-1 pr-1 py-0.5 h-6">
+                        <div class="flex items-center justify-between px-1 h-7">
                             <el-text size="small" @click="getUpData()" class="cursor-pointer">
                                 <el-icon>
                                     <Top />
@@ -245,22 +245,24 @@
                             :on-remove-other-tab="removeOtherTab"
                         ></CodeTabs>
                         <div ref="codeBox" class="relative" :style="{ height: codeHeight }">
-                            <el-icon
-                                v-if="isShow"
-                                class="cursor-pointer absolute bg-gray-100 py-2 rounded-l-sm block top-1/3 -left-[9px]"
-                                size="9"
-                                @click="toggleShow"
-                            >
-                                <DArrowLeft />
-                            </el-icon>
-                            <el-icon
-                                v-else
-                                class="cursor-pointer absolute bg-gray-100 py-2 rounded-r-sm block top-1/3 z-50"
-                                size="9"
-                                @click="toggleShow"
-                            >
-                                <DArrowRight />
-                            </el-icon>
+                            <div class="absolute top-1/3">
+                                <el-icon
+                                    v-if="isShow"
+                                    class="cursor-pointer bg-gray-100 py-2 rounded-l-sm block -left-[9px]"
+                                    size="9"
+                                    @click="toggleShow"
+                                >
+                                    <DArrowLeft />
+                                </el-icon>
+                                <el-icon
+                                    v-else
+                                    class="cursor-pointer bg-gray-100 py-2 rounded-r-sm block z-50"
+                                    size="9"
+                                    @click="toggleShow"
+                                >
+                                    <DArrowRight />
+                                </el-icon>
+                            </div>
                             <div class="flex justify-center items-center h-full" v-if="fileTabs.length === 0">
                                 <el-empty :image="noUpdateImage" />
                             </div>
@@ -268,7 +270,7 @@
                     </div>
                 </div>
                 <div
-                    class="hidden code-footer pl-4 h-6 sm:flex justify-end items-center gap-4 rounded-b"
+                    class="hidden code-footer pl-4 h-7 sm:flex justify-end items-center gap-4 rounded-b"
                     ref="dialogFooter"
                 >
                     <el-divider direction="vertical" class="!h-6" v-if="config.theme" />
@@ -305,8 +307,7 @@
                     </el-dropdown>
                     <el-divider direction="vertical" class="!h-6" />
                     <el-text class="cursor-pointer inline-flex items-center gap-1" @click="openHistoryDrawer">
-                        <span>{{ $t('file.history') }}</span>
-                        <span class="text-xs text-gray-500">({{ historyVersionCount }})</span>
+                        <span class="el-dropdown-link">{{ $t('file.history') }} ({{ historyVersionCount }})</span>
                     </el-text>
                     <el-divider direction="vertical" class="!h-6" />
                     <el-dropdown trigger="click" max-height="300" placement="top" @command="changeLanguage">

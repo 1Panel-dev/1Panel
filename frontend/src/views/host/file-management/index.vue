@@ -1548,6 +1548,10 @@ const getFileExtension = (name: string, extension?: string): string => {
 
 const openView = (item: File.File) => {
     const fileType = getFileType(item.extension);
+    if (fileType == 'pdf') {
+        MsgWarning(i18n.global.t('file.fileCanNotRead'));
+        return;
+    }
     if (fileType === 'image') {
         imageFiles.value = data.value
             .filter((item) => !item.isDir)
