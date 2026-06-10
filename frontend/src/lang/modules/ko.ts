@@ -2030,6 +2030,8 @@ const message = {
         detail: {
             dashboard: '개요',
             ai: 'AI',
+            skills_hub: 'Skills Hub',
+            ai_proxy: 'AI 프록시',
             groups: '그룹',
             hosts: '호스트',
             apps: '애플리케이션',

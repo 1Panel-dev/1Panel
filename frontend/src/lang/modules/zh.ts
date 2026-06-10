@@ -1926,6 +1926,8 @@ const message = {
         detail: {
             dashboard: '概览',
             ai: 'AI',
+            skills_hub: 'Skills Hub',
+            ai_proxy: 'AI 网关',
             groups: '分组',
             hosts: '主机',
             apps: '应用',

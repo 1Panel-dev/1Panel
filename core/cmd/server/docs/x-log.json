@@ -118,12 +118,13 @@
 	},
 	"/alert/config/update": {
 		"bodyKeys": [
-			"title"
+			"id",
+			"type"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新告警配置 [title]",
-		"formatEN": "update alert config [title]"
+		"formatZH": "更新告警配置 [id][type]",
+		"formatEN": "update alert config [id][type]"
 	},
 	"/alert/del": {
 		"bodyKeys": [
@@ -999,88 +1000,90 @@
 	},
 	"/core/enterprise/ai-proxy/api-keys/create": {
 		"bodyKeys": [
-			"userId",
 			"groupId"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建 AI 网关 API Key 用户 [userId] 分组 [groupId]",
-		"formatEN": "create AI proxy API key user [userId] group [groupId]"
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "groupId",
+				"isList": false,
+				"db": "ai_proxy_user_groups",
+				"output_column": "name",
+				"output_value": "groupName"
+			}
+		],
+		"formatZH": "创建 AI 网关 API Key 分组 [groupName]",
+		"formatEN": "create AI proxy API key group [groupName]"
 	},
 	"/core/enterprise/ai-proxy/api-keys/delete": {
-		"bodyKeys": [
-			"id"
-		],
+		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "删除 AI 网关 API Key [id]",
-		"formatEN": "delete AI proxy API key [id]"
+		"formatZH": "删除 AI 网关 API Key",
+		"formatEN": "delete AI proxy API key"
 	},
 	"/core/enterprise/ai-proxy/api-keys/reveal": {
-		"bodyKeys": [
-			"id"
-		],
+		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "查看 AI 网关 API Key [id]",
-		"formatEN": "reveal AI proxy API key [id]"
+		"formatZH": "查看 AI 网关 API Key",
+		"formatEN": "reveal AI proxy API key"
 	},
 	"/core/enterprise/ai-proxy/api-keys/token/reset": {
-		"bodyKeys": [
-			"id"
-		],
+		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "重置 AI 网关 API Key Token [id]",
-		"formatEN": "reset AI proxy API key token [id]"
+		"formatZH": "重置 AI 网关 API Key Token",
+		"formatEN": "reset AI proxy API key token"
 	},
 	"/core/enterprise/ai-proxy/api-keys/update": {
 		"bodyKeys": [
-			"id",
-			"userId",
 			"groupId"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新 AI 网关 API Key [id] 用户 [userId] 分组 [groupId]",
-		"formatEN": "update AI proxy API key [id] user [userId] group [groupId]"
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "groupId",
+				"isList": false,
+				"db": "ai_proxy_user_groups",
+				"output_column": "name",
+				"output_value": "groupName"
+			}
+		],
+		"formatZH": "更新 AI 网关 API Key 分组 [groupName]",
+		"formatEN": "update AI proxy API key group [groupName]"
 	},
 	"/core/enterprise/ai-proxy/backends/delete": {
-		"bodyKeys": [
-			"id"
-		],
+		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "删除 AI 网关后端 [id]",
-		"formatEN": "delete AI proxy backend [id]"
+		"formatZH": "删除 AI 网关后端",
+		"formatEN": "delete AI proxy backend"
 	},
 	"/core/enterprise/ai-proxy/backends/import": {
-		"bodyKeys": [
-			"accountId"
-		],
+		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "导入 AI 网关后端账号 [accountId]",
-		"formatEN": "import AI proxy backend account [accountId]"
+		"formatZH": "导入 AI 网关后端账号",
+		"formatEN": "import AI proxy backend account"
 	},
 	"/core/enterprise/ai-proxy/backends/status": {
 		"bodyKeys": [
-			"id",
 			"enabled"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新 AI 网关后端 [id] 状态 [enabled]",
-		"formatEN": "update AI proxy backend [id] status [enabled]"
+		"formatZH": "更新 AI 网关后端状态 [enabled]",
+		"formatEN": "update AI proxy backend status [enabled]"
 	},
 	"/core/enterprise/ai-proxy/backends/update": {
-		"bodyKeys": [
-			"id"
-		],
+		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新 AI 网关后端 [id]",
-		"formatEN": "update AI proxy backend [id]"
+		"formatZH": "更新 AI 网关后端",
+		"formatEN": "update AI proxy backend"
 	},
 	"/core/enterprise/ai-proxy/content/groups/create": {
 		"bodyKeys": [
@@ -1096,9 +1099,18 @@
 			"id"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "删除 AI 网关敏感词分组 [id]",
-		"formatEN": "delete AI proxy sensitive group [id]"
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "ai_proxy_sensitive_groups",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除 AI 网关敏感词分组 [name]",
+		"formatEN": "delete AI proxy sensitive group [name]"
 	},
 	"/core/enterprise/ai-proxy/content/groups/update": {
 		"bodyKeys": [
@@ -1123,27 +1135,54 @@
 			"groupId"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建 AI 网关敏感词，分组 [groupId]",
-		"formatEN": "create AI proxy sensitive word, group [groupId]"
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "groupId",
+				"isList": false,
+				"db": "ai_proxy_sensitive_groups",
+				"output_column": "name",
+				"output_value": "groupName"
+			}
+		],
+		"formatZH": "创建 AI 网关敏感词，分组 [groupName]",
+		"formatEN": "create AI proxy sensitive word, group [groupName]"
 	},
 	"/core/enterprise/ai-proxy/content/words/delete": {
 		"bodyKeys": [
 			"id"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "删除 AI 网关敏感词 [id]",
-		"formatEN": "delete AI proxy sensitive word [id]"
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "ai_proxy_sensitive_words",
+				"output_column": "word",
+				"output_value": "word"
+			}
+		],
+		"formatZH": "删除 AI 网关敏感词 [word]",
+		"formatEN": "delete AI proxy sensitive word [word]"
 	},
 	"/core/enterprise/ai-proxy/content/words/import": {
 		"bodyKeys": [
 			"groupId"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "导入 AI 网关敏感词，分组 [groupId]",
-		"formatEN": "import AI proxy sensitive words, group [groupId]"
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "groupId",
+				"isList": false,
+				"db": "ai_proxy_sensitive_groups",
+				"output_column": "name",
+				"output_value": "groupName"
+			}
+		],
+		"formatZH": "导入 AI 网关敏感词，分组 [groupName]",
+		"formatEN": "import AI proxy sensitive words, group [groupName]"
 	},
 	"/core/enterprise/ai-proxy/content/words/update": {
 		"bodyKeys": [
@@ -1151,9 +1190,26 @@
 			"groupId"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新 AI 网关敏感词 [id] 分组 [groupId]",
-		"formatEN": "update AI proxy sensitive word [id] group [groupId]"
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "ai_proxy_sensitive_words",
+				"output_column": "word",
+				"output_value": "word"
+			},
+			{
+				"input_column": "id",
+				"input_value": "groupId",
+				"isList": false,
+				"db": "ai_proxy_sensitive_groups",
+				"output_column": "name",
+				"output_value": "groupName"
+			}
+		],
+		"formatZH": "更新 AI 网关敏感词 [word] 分组 [groupName]",
+		"formatEN": "update AI proxy sensitive word [word] group [groupName]"
 	},
 	"/core/enterprise/ai-proxy/groups/create": {
 		"bodyKeys": [
@@ -1169,9 +1225,18 @@
 			"id"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "删除 AI 网关分组 [id]",
-		"formatEN": "delete AI proxy group [id]"
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "ai_proxy_user_groups",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除 AI 网关分组 [name]",
+		"formatEN": "delete AI proxy group [name]"
 	},
 	"/core/enterprise/ai-proxy/groups/update": {
 		"bodyKeys": [
@@ -1363,9 +1428,26 @@
 			"targetIDs"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "安装 Skills Hub 技能 [skillID] 到目标 [targetIDs]",
-		"formatEN": "install Skills Hub skill [skillID] to targets [targetIDs]"
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "skillID",
+				"isList": false,
+				"db": "skill_hub_items",
+				"output_column": "name",
+				"output_value": "skillName"
+			},
+			{
+				"input_column": "id",
+				"input_value": "targetIDs",
+				"isList": true,
+				"db": "skill_hub_install_targets",
+				"output_column": "name",
+				"output_value": "targetNames"
+			}
+		],
+		"formatZH": "安装 Skills Hub 技能 [skillName] 到目标 [targetNames]",
+		"formatEN": "install Skills Hub skill [skillName] to targets [targetNames]"
 	},
 	"/core/enterprise/skills-hub/targets/status": {
 		"bodyKeys": [

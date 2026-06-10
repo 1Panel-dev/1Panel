@@ -18,6 +18,8 @@
                     <el-option :label="$t('logs.detail.websites')" value="websites" />
                     <el-option :label="$t('logs.detail.runtimes')" value="runtimes" />
                     <el-option :label="$t('logs.detail.ai')" value="ai" />
+                    <el-option :label="$t('logs.detail.ai_proxy')" value="ai-proxy" />
+                    <el-option :label="$t('logs.detail.skills_hub')" value="skills-hub" />
                     <el-option :label="$t('logs.detail.databases')" value="databases" />
                     <el-option :label="$t('logs.detail.containers')" value="containers" />
                     <el-option :label="$t('menu.system')" value="hosts" />
@@ -61,9 +63,10 @@
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="370">
                     <el-table-column :label="$t('logs.resource')" prop="group" fix>
                         <template #default="{ row }">
-                            <span v-if="row.source">
+                            <span v-if="row.source && row.source.indexOf('-') === -1">
                                 {{ $t('logs.detail.' + row.source) }}
                             </span>
+                            <span v-else>{{ $t('logs.detail.' + row.source.replace('-', '_')) }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.user')" prop="user" show-overflow-tooltip />

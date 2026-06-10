@@ -2072,6 +2072,8 @@ const message = {
         detail: {
             dashboard: '概要',
             ai: 'AI',
+            skills_hub: 'Skills Hub',
+            ai_proxy: 'AIプロキシ',
             groups: 'グループ',
             hosts: 'ホスト',
             apps: 'アプリケーション',

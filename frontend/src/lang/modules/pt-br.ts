@@ -2213,6 +2213,8 @@ const message = {
         detail: {
             dashboard: 'Visão Geral',
             ai: 'AI',
+            skills_hub: 'Skills Hub',
+            ai_proxy: 'Proxy de IA',
             groups: 'Grupos',
             hosts: 'Hosts',
             apps: 'Aplicativos',

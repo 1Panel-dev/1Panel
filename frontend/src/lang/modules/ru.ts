@@ -2086,6 +2086,8 @@ const message = {
         detail: {
             dashboard: 'Обзор',
             ai: 'AI',
+            skills_hub: 'Skills Hub',
+            ai_proxy: 'AI Proxy',
             groups: 'Группы',
             hosts: 'Хосты',
             apps: 'Приложения',
