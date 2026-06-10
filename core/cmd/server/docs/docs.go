@@ -3732,10 +3732,11 @@ const docTemplate = `{
 				"x-panel-log": {
 					"BeforeFunctions": [],
 					"bodyKeys": [
-						"title"
+						"id",
+						"displayName"
 					],
-					"formatEN": "update alert config [title]",
-					"formatZH": "更新告警配置 [title]",
+					"formatEN": "update alert config [id][displayName]",
+					"formatZH": "更新告警配置 [id][displayName]",
 					"paramKeys": []
 				}
 			}
@@ -30454,6 +30455,9 @@ const docTemplate = `{
 		"dto.AlertConfigUpdate": {
 			"properties": {
 				"config": {
+					"type": "string"
+				},
+				"displayName": {
 					"type": "string"
 				},
 				"id": {

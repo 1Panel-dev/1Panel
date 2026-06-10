@@ -160,6 +160,7 @@ export namespace Alert {
         title: string;
         config: string;
         status: string;
+        displayName: string;
     }
 
     export interface AlertConfigTest {

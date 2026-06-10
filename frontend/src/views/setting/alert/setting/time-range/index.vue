@@ -118,12 +118,13 @@ const configInfo = ref<ConfigInfo>({
         resourceAlert: { sendTimeRange: '', type: [] },
     },
 });
-const config = ref<Alert.AlertConfigInfo>({
+const config = ref<Alert.AlertConfigUpdateReq>({
     id: 0,
     type: '',
     title: '',
     status: '',
     config: '',
+    displayName: '',
 });
 const defaultResourceValue = [
     'clams',
@@ -207,6 +208,7 @@ const onSave = async () => {
             config.value.title = 'xpack.alert.commonConfig';
             config.value.status = 'Enable';
             config.value.config = JSON.stringify(configInfo.value);
+            config.value.displayName = i18n.global.t('xpack.alert.commonConfig');
             await UpdateAlertConfig(config.value);
 
             loading.value = false;
