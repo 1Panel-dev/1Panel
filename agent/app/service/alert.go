@@ -562,7 +562,7 @@ func (a AlertService) checkAlertConfigDisplayNameUnique(req dto.AlertConfigUpdat
 }
 
 func (a AlertService) validateCommunityAlertMethod(method string) error {
-	if global.CONF.Base.IsEnterprise {
+	if global.CONF.Base.IsEnterprise || global.CONF.Base.Edition == "cn" {
 		return nil
 	}
 	if strings.TrimSpace(method) == "" {
@@ -579,13 +579,13 @@ func (a AlertService) validateCommunityAlertMethod(method string) error {
 			if err != nil {
 				return err
 			}
-			if name, ok := communityAlertMethodTypeNames[config.Type]; ok {
-				return buserr.WithMap("ErrAlertMethodNotSupported", map[string]interface{}{"name": name}, nil)
+			if _, ok := communityAlertMethodTypeNames[config.Type]; ok {
+				return buserr.WithErr("ErrAlertMethodNotSupported", nil)
 			}
 			continue
 		}
-		if name, ok := communityAlertMethodTypeNames[item]; ok {
-			return buserr.WithMap("ErrAlertMethodNotSupported", map[string]interface{}{"name": name}, nil)
+		if _, ok := communityAlertMethodTypeNames[item]; ok {
+			return buserr.WithErr("ErrAlertMethodNotSupported", nil)
 		}
 	}
 
@@ -593,11 +593,11 @@ func (a AlertService) validateCommunityAlertMethod(method string) error {
 }
 
 func (a AlertService) validateCommunityAlertConfigType(configType string) error {
-	if global.CONF.Base.IsEnterprise {
+	if global.CONF.Base.IsEnterprise || global.CONF.Base.Edition == "cn" {
 		return nil
 	}
-	if name, ok := communityAlertMethodTypeNames[configType]; ok {
-		return buserr.WithMap("ErrAlertMethodNotSupported", map[string]interface{}{"name": name}, nil)
+	if _, ok := communityAlertMethodTypeNames[configType]; ok {
+		return buserr.WithErr("ErrAlertMethodNotSupported", nil)
 	}
 	return nil
 }
