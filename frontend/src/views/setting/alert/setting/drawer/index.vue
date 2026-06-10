@@ -156,7 +156,7 @@ const emailRules = {
 
 const smsRules = {
     smsDisplayName: [Rules.requiredInput, { validator: checkSmsDisplayNameDuplicate, trigger: 'blur' }],
-    smsPhone: [Rules.requiredInput, Rules.phone, { validator: checkPhoneDuplicate, trigger: 'blur' }],
+    smsPhone: [Rules.phone, { validator: checkPhoneDuplicate, trigger: 'blur' }],
     smsDailyAlertNum: [Rules.integerNumber, checkNumberRange(20, 100)],
 };
 
@@ -302,10 +302,6 @@ function checkSmsDisplayNameDuplicate(_rule: unknown, value: string, callback: (
 
 function checkPhoneDuplicate(_rule: unknown, value: string, callback: (error?: Error) => void) {
     const currentValue = normalizeDisplayName(value);
-    if (!currentValue) {
-        callback();
-        return;
-    }
 
     const duplicated = alertConfigs.value.some((item) => {
         if (item.type !== 'sms') {

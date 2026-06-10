@@ -79,6 +79,7 @@ ErrBackupCheck: 'Проверка подключения не удалась: {{
 ErrBackupLocalDelete: 'Нельзя удалить локальные бэкапы'
 ErrBackupLocalCreate: 'Нельзя создать локальные бэкапы'
 ErrAlertConfigInUse: 'Конфигурация оповещений используется и не может быть удалена'
+ErrAlertConfigPhoneExist: 'Номер телефона уже существует'
 ErrPortInUsed: '{{ .detail }} порт уже занят'
 ErrAppLimit: 'Количество установленных приложений превысило лимит'
 ErrNotInstall: 'Приложение не установлено'

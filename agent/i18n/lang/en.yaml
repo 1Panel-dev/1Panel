@@ -78,6 +78,7 @@ ErrBackupCheck: 'Backup account connectivity test failed: {{ .err }}'
 ErrBackupLocalDelete: 'Local backup accounts cannot be deleted'
 ErrBackupLocalCreate: 'Local backup accounts cannot be created'
 ErrAlertConfigInUse: 'Alert configuration is in use and cannot be deleted'
+ErrAlertConfigPhoneExist: 'Phone number already exists'
 
 #app
 ErrPortInUsed: '{{ .detail }} port is already occupied!'
