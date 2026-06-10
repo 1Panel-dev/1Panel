@@ -199,6 +199,7 @@ const config = ref<Alert.AlertConfigUpdateReq>({
     title: '',
     status: '',
     config: '',
+    displayName: '',
 });
 
 const paginationConfig = reactive({
@@ -412,6 +413,7 @@ const onChangeOffline = async () => {
                     config.value.title = 'xpack.alert.commonConfig';
                     config.value.status = 'Enable';
                     config.value.config = JSON.stringify(commonConfig.value.config);
+                    config.value.displayName = i18n.global.t('xpack.alert.commonConfig');
                     await UpdateAlertConfig(config.value);
                     loading.value = false;
                     await searchConfigs();
@@ -434,6 +436,7 @@ const onStatusChange = (row: Alert.AlertConfigInfo) => {
         title: row.title,
         status: row.status,
         config: row.config,
+        displayName: i18n.global.t(row.title),
     })
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

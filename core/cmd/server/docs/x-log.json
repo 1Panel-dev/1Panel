@@ -119,12 +119,12 @@
 	"/alert/config/update": {
 		"bodyKeys": [
 			"id",
-			"type"
+			"displayName"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新告警配置 [id][type]",
-		"formatEN": "update alert config [id][type]"
+		"formatZH": "更新告警配置 [id][displayName]",
+		"formatEN": "update alert config [id][displayName]"
 	},
 	"/alert/del": {
 		"bodyKeys": [

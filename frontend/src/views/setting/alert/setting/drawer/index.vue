@@ -418,6 +418,7 @@ const buildSavePayload = () => {
             title: titleMap['email'],
             status: form.status,
             config: JSON.stringify(configInfo),
+            displayName: form.config.displayName,
         };
     }
     if (form.type === 'sms') {
@@ -432,6 +433,7 @@ const buildSavePayload = () => {
             title: titleMap['sms'],
             status: form.status,
             config: JSON.stringify(configInfo),
+            displayName: configInfo.displayName,
         };
     }
     const configInfo = {
@@ -444,6 +446,7 @@ const buildSavePayload = () => {
         title: form.title,
         status: form.status,
         config: JSON.stringify(configInfo),
+        displayName: configInfo.displayName,
     };
 };
 

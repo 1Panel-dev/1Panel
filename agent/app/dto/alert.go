@@ -2,8 +2,9 @@ package dto
 
 import (
 	"encoding/json"
-	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 )
 
 type CreateOrUpdateAlert struct {
@@ -292,11 +293,12 @@ type OfflineQueryRequest struct {
 }
 
 type AlertConfigUpdate struct {
-	ID     uint   `json:"id"`
-	Type   string `json:"type"`
-	Title  string `json:"title"`
-	Status string `json:"status"`
-	Config string `json:"config"`
+	ID          uint   `json:"id"`
+	Type        string `json:"type"`
+	Title       string `json:"title"`
+	Status      string `json:"status"`
+	Config      string `json:"config"`
+	DisplayName string `json:"displayName"`
 }
 
 type AlertConfigTest struct {
