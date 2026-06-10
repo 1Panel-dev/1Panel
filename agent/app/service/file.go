@@ -720,6 +720,9 @@ func (f *FileService) GetPreviewContent(op request.FileContentReq) (response.Fil
 		return response.FileInfo{}, err
 	}
 
+	if files.IsBinaryPreviewFile(info.MimeType, info.Extension) {
+		return response.FileInfo{}, buserr.New("ErrFileCanNotRead")
+	}
 	if files.IsBlockDevice(info.FileMode) {
 		return response.FileInfo{FileInfo: *info}, nil
 	}
@@ -930,6 +933,9 @@ func readEditableFileHistoryContent(filePath string) ([]byte, os.FileMode, bool)
 	}
 	mode := info.Mode()
 	if mode.IsDir() || mode&os.ModeSymlink != 0 || !mode.IsRegular() || files.IsBlockDevice(mode) || info.Size() > fileHistorySnapshotMaxSize {
+		return nil, mode, false
+	}
+	if files.IsBinaryPreviewFile(files.GetMimeType(filePath), filepath.Ext(info.Name())) {
 		return nil, mode, false
 	}
 	file, err := os.Open(filePath)
