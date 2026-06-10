@@ -82,7 +82,7 @@
         "standard-version": "^9.5.0",
         "tailwindcss": "^4.3.0",
         "typescript": "^6.0.3",
-        "unplugin-auto-import": "^0.16.7",
+        "unplugin-auto-import": "^21.0.0",
         "unplugin-vue-components": "^32.1.0",
         "vite": "^8.0.16",
         "vite-plugin-compression": "^0.5.1",
