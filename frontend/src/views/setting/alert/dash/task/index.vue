@@ -275,15 +275,15 @@
                             class="flex items-center flex-row md:flex-nowrap sm:flex-nowrap flex-wrap justify-between gap-2 w-full"
                         >
                             <el-form-item prop="cycle" class="md:flex-1 sm:flex-1">
-                                <el-input v-model.number="dialogData.rowData!.cycle" :max="200">
-                                    <template #append>{{ $t('commons.units.minute') }}</template>
+                                <el-input v-model.number="dialogData.rowData!.cycle" :max="200" width="200px">
+                                    <template #append>{{ $t('commons.units.minute') }}11</template>
                                 </el-input>
                             </el-form-item>
 
                             <span class="whitespace-nowrap input-help w-[4.5rem]">
                                 {{ $t('xpack.alert.loginFail') }}
                             </span>
-                            <el-form-item prop="count" class="md:flex-1 sm:flex-1">
+                            <el-form-item prop="count" class="md:flex-1 sm:flex-1 w-auto">
                                 <el-input v-model.number="dialogData.rowData!.count">
                                     <template #append>{{ $t('commons.units.time') }}</template>
                                 </el-input>
@@ -597,7 +597,7 @@ const allTaskOptions = [
     {
         value: 'nodeException',
         label: 'xpack.alert.nodeException',
-        show: isMaster.value && isProductPro.value,
+        show: isMaster.value && isProductPro.value && !isEE.value,
     },
     { value: 'cpu', label: 'xpack.alert.cpu', show: true },
     { value: 'memory', label: 'xpack.alert.memory', show: true },
