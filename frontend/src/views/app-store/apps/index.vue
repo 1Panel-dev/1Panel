@@ -8,11 +8,7 @@
             <template #leftToolBar>
                 <el-button v-permission @click="sync" type="primary" plain :disabled="syncing">
                     <span>
-                        {{
-                            syncCustomAppstore || (isOffline && !isEnterprise)
-                                ? $t('app.syncCustomApp')
-                                : $t('app.syncAppList')
-                        }}
+                        {{ customAppStoreEnabled ? $t('app.syncCustomApp') : $t('app.syncAppList') }}
                     </span>
                 </el-button>
                 <el-button v-permission @click="syncLocal" type="primary" plain :disabled="syncing" class="ml-2">
@@ -119,6 +115,7 @@ const mainHeight = ref(0);
 const detailRef = ref();
 const taskLogRef = ref();
 const syncCustomAppstore = ref(false);
+const customAppStoreEnabled = ref(false);
 const isActive = ref(false);
 const isExist = ref(false);
 const noApp = ref(false);
@@ -245,11 +242,11 @@ onMounted(async () => {
     if (isProductPro.value) {
         const res = await getCurrentNodeCustomAppConfig();
         if (res && res.data) {
-            syncCustomAppstore.value = res.data.status === 'Enable';
+            customAppStoreEnabled.value = res.data.status === 'Enable';
+            syncCustomAppstore.value = customAppStoreEnabled.value;
         }
-    }
-    if (isOffline.value && !isEnterprise.value) {
-        syncCustomAppstore.value = true;
+    } else {
+        syncCustomAppstore.value = isOffline.value;
     }
     mainHeight.value = window.innerHeight - 380;
     window.onresize = () => {
