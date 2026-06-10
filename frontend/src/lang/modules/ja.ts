@@ -57,7 +57,6 @@ const message = {
             get: '取得',
             upgrade: 'アップグレード',
             update: '更新',
-            updateNow: '今すぐ更新',
             ignore: '更新を無視',
             copy: 'コピー',
             random: '生成',
@@ -228,7 +227,7 @@ const message = {
             rePassword: 'パスワードがパスワードと矛盾することを確認してください。',
             requiredInput: 'この項目は必須です。',
             requiredSelect: 'リスト内のアイテムを選択します',
-            illegalChar: '現在、文字 & ; $ \' ` ( ) " > < | の注入はサポートされていません',
+            illegalChar: '現在、文字 & ; $ \' ` ( ) " > < ｜ の注入はサポートされていません',
             illegalInput: 'このフィールドには違法なキャラクターが含まれてはなりません。',
             duplicate: 'この値は一意である必要があります。',
             commonName:
@@ -5199,8 +5198,7 @@ const message = {
             nodeUpgrade: '更新設定',
             nodeUpgradeHelper:
                 '選択したノードは、マスターノードのアップグレード完了後に自動的にアップグレードを開始し、手動操作は不要です。',
-            nodeUpgradeAuto: '自動更新',
-            nodeUpgradePackageManage: '更新パッケージ管理',
+            nodeUpgradePackageManage: 'インストールパッケージ管理',
             nodeUpgradePackageClean: 'クリーンアップ',
             nodeUpgradePackageFormatHelper:
                 '`1panel-agent_v*_*` または `1panel-v*-linux-*` のインストールパッケージのみ対応しています',

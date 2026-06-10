@@ -57,7 +57,6 @@ const message = {
             get: 'Получить',
             upgrade: 'Обновить',
             update: 'Обновить',
-            updateNow: 'Обновить сейчас',
             ignore: 'Игнорировать обновление',
             install: 'Установить',
             copy: 'Копировать',
@@ -227,7 +226,7 @@ const message = {
             rePassword: 'Подтверждение пароля не совпадает с паролем.',
             requiredInput: 'Это поле обязательно для заполнения.',
             requiredSelect: 'Выберите элемент из списка',
-            illegalChar: 'В настоящее время не поддерживается вставка символов & ; $ \' ` ( ) " > < |',
+            illegalChar: 'В настоящее время не поддерживается вставка символов & ; $ \' ` ( ) " > < ｜',
             illegalInput: 'Это поле не должно содержать недопустимых символов.',
             duplicate: 'Значение должно быть уникальным.',
             commonName:
@@ -5258,8 +5257,7 @@ const message = {
             nodeUpgrade: 'Настройки Обновления',
             nodeUpgradeHelper:
                 'Выбранные узлы автоматически начнут обновляться после завершения обновления основного узла, ручное вмешательство не требуется.',
-            nodeUpgradeAuto: 'Автообновление',
-            nodeUpgradePackageManage: 'Управление Пакетами Обновления',
+            nodeUpgradePackageManage: 'Управление пакетами установки',
             nodeUpgradePackageClean: 'Очистить',
             nodeUpgradePackageFormatHelper:
                 'Поддерживаются только установочные пакеты `1panel-agent_v*_*` или `1panel-v*-linux-*`',

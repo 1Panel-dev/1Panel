@@ -57,7 +57,6 @@ const message = {
             get: '가져오기',
             upgrade: '업그레이드',
             update: '업데이트',
-            updateNow: '지금 업데이트',
             ignore: '업그레이드 무시',
             install: '설치',
             copy: '복사',
@@ -226,7 +225,7 @@ const message = {
             rePassword: '확인 비밀번호가 비밀번호와 일치하지 않습니다.',
             requiredInput: '이 필드는 필수 항목입니다.',
             requiredSelect: '목록에서 항목을 선택하세요',
-            illegalChar: '현재 & ; $ \' ` ( ) " > < | 문자 주입은 지원되지 않습니다',
+            illegalChar: '현재 & ; $ \' ` ( ) " > < ｜ 문자 주입은 지원되지 않습니다',
             illegalInput: '이 필드에는 유효하지 않은 문자가 포함될 수 없습니다.',
             duplicate: '이 값은 고유해야 합니다.',
             commonName:
@@ -5090,8 +5089,7 @@ const message = {
             nodeUpgrade: '업데이트 설정',
             nodeUpgradeHelper:
                 '선택된 노드는 마스터 노드 업그레이드 완료 후 자동으로 업그레이드를 시작하며 수동 작업이 필요하지 않습니다.',
-            nodeUpgradeAuto: '자동 업데이트',
-            nodeUpgradePackageManage: '업데이트 패키지 관리',
+            nodeUpgradePackageManage: '설치 패키지 관리',
             nodeUpgradePackageClean: '정리',
             nodeUpgradePackageFormatHelper: '`1panel-agent_v*_*` 또는 `1panel-v*-linux-*` 설치 패키지만 지원됩니다',
             nodeUpgradePackageHostConfirm: '서버 파일 {0}을(를) 선택합니다. 계속하시겠습니까?',

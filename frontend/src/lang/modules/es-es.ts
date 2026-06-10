@@ -59,7 +59,6 @@ const message = {
             get: 'Obtener',
             upgrade: 'Actualizar',
             update: 'Actualizar',
-            updateNow: 'Actualizar Ahora',
             ignore: 'Ignorar actualización',
             copy: 'Copiar',
             random: 'Generar',
@@ -229,7 +228,7 @@ const message = {
             rePassword: 'La confirmación de la contraseña no coincide con la contraseña.',
             requiredInput: 'Este campo es obligatorio.',
             requiredSelect: 'Seleccione un elemento de la lista',
-            illegalChar: 'Actualmente no se admite la inyección de caracteres & ; $ \' ` ( ) " > < |',
+            illegalChar: 'Actualmente no se admite la inyección de caracteres & ; $ \' ` ( ) " > < ｜',
             illegalInput: 'Este campo no debe contener caracteres no permitidos.',
             duplicate: 'Este valor debe ser único.',
             commonName:
@@ -5225,8 +5224,7 @@ const message = {
             nodeUpgrade: 'Configuración de Actualización',
             nodeUpgradeHelper:
                 'Los nodos seleccionados comenzarán a actualizarse automáticamente después de que se complete la actualización del nodo maestro, sin necesidad de operación manual.',
-            nodeUpgradeAuto: 'Actualización Automática',
-            nodeUpgradePackageManage: 'Gestión de Paquetes de Actualización',
+            nodeUpgradePackageManage: 'Gestión de Paquetes de Instalación',
             nodeUpgradePackageClean: 'Limpiar',
             nodeUpgradePackageFormatHelper:
                 'Solo se admiten paquetes de instalación `1panel-agent_v*_*` o `1panel-v*-linux-*`',
