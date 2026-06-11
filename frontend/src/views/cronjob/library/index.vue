@@ -2,7 +2,7 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.login')">
             <template #leftToolBar>
-                <el-button v-permission type="primary" @click="onOpenDialog('create')">
+                <el-button v-permission v-node-admin type="primary" @click="onOpenDialog('create')">
                     {{ $t('commons.button.create') }}
                 </el-button>
                 <el-dropdown @command="handleSyncOp" class="mr-2.5">
@@ -12,23 +12,33 @@
                     </el-button>
                     <template #dropdown>
                         <el-dropdown-menu>
-                            <fu-dropdown-item v-permission command="sync">
+                            <fu-dropdown-item v-permission v-node-admin command="sync">
                                 {{ $t('cronjob.library.syncNow') }}
                             </fu-dropdown-item>
-                            <fu-dropdown-item v-if="scriptSync === 'Disable'" v-permission command="turnOnSync">
+                            <fu-dropdown-item
+                                v-if="scriptSync === 'Disable'"
+                                v-permission
+                                v-node-admin
+                                command="turnOnSync"
+                            >
                                 {{ $t('cronjob.library.turnOnSync') }}
                             </fu-dropdown-item>
-                            <fu-dropdown-item v-if="scriptSync === 'Enable'" v-permission command="turnOffSync">
+                            <fu-dropdown-item
+                                v-if="scriptSync === 'Enable'"
+                                v-permission
+                                v-node-admin
+                                command="turnOffSync"
+                            >
                                 {{ $t('cronjob.library.turnOffSync') }}
                             </fu-dropdown-item>
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
 
-                <el-button v-permission type="primary" plain @click="onOpenGroupDialog()">
+                <el-button v-permission v-node-admin type="primary" plain @click="onOpenGroupDialog()">
                     {{ $t('commons.table.group') }}
                 </el-button>
-                <el-button v-permission plain :disabled="selects.length === 0" @click="onDelete(null)">
+                <el-button v-permission v-node-admin plain :disabled="selects.length === 0" @click="onDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -326,6 +336,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.clone'),
         permission: true,
+        nodeAdmin: true,
         disabled: (row: any) => {
             return !row.isSystem;
         },
@@ -341,6 +352,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
+        nodeAdmin: true,
         disabled: (row: any) => {
             return row.isSystem;
         },
@@ -351,6 +363,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
+        nodeAdmin: true,
         disabled: (row: any) => {
             return row.isSystem;
         },

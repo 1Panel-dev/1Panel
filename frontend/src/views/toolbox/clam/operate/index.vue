@@ -19,7 +19,12 @@
                     <el-form-item :label="$t('toolbox.clam.scanDir')" prop="path">
                         <el-input v-model="dialogData.rowData!.path">
                             <template #prepend>
-                                <el-button icon="Folder" v-permission @click="scanDirRef.acceptParams({ dir: true })" />
+                                <el-button
+                                    icon="Folder"
+                                    v-permission
+                                    v-node-admin
+                                    @click="scanDirRef.acceptParams({ dir: true })"
+                                />
                             </template>
                         </el-input>
                     </el-form-item>
@@ -41,6 +46,7 @@
                                 <el-button
                                     icon="Folder"
                                     v-permission
+                                    v-node-admin
                                     @click="infectedDirRef.acceptParams({ dir: true })"
                                 />
                             </template>
@@ -211,7 +217,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button v-permission :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                <el-button v-permission v-node-admin :disabled="loading" type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

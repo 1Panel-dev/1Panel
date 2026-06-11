@@ -4,13 +4,13 @@
             <div class="mb-4">
                 <el-alert :closable="false">{{ $t('ssh.pubKeyHelper', [currentUser]) }}</el-alert>
             </div>
-            <el-button v-permission type="primary" plain @click="onOpenDialog('create')">
+            <el-button v-permission v-node-admin type="primary" plain @click="onOpenDialog('create')">
                 {{ $t('commons.button.create') }}
             </el-button>
-            <el-button v-permission plain @click="onSync()">
+            <el-button v-permission v-node-admin plain @click="onSync()">
                 {{ $t('commons.button.sync') }}
             </el-button>
-            <el-button v-permission plain :disabled="selects.length === 0" @click="onDelete(null)">
+            <el-button v-permission v-node-admin plain :disabled="selects.length === 0" @click="onDelete(null)">
                 {{ $t('commons.button.delete') }}
             </el-button>
             <ComplexTable
@@ -262,6 +262,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
+        nodeAdmin: true,
         click: (row: Host.RootCertInfo) => {
             onOpenDialog('edit', row);
         },
@@ -276,6 +277,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
+        nodeAdmin: true,
         click: (row: Host.RootCertInfo) => {
             onDelete(row);
         },

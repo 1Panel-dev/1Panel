@@ -48,7 +48,13 @@
                                 diskInfo.mountPoint == ''
                             "
                         >
-                            <el-button v-permission type="primary" size="small" @click="handlePartition(diskInfo)">
+                            <el-button
+                                v-permission
+                                v-node-admin
+                                type="primary"
+                                size="small"
+                                @click="handlePartition(diskInfo)"
+                            >
                                 {{ $t('disk.handlePartition') }}
                             </el-button>
                         </div>
@@ -94,6 +100,7 @@
                         <el-text type="info" v-if="scope === 'system'">{{ $t('disk.cannotOperate') }}</el-text>
                         <el-button
                             v-permission
+                            v-node-admin
                             type="primary"
                             link
                             v-else-if="row.mountPoint != ''"
@@ -101,7 +108,7 @@
                         >
                             {{ $t('disk.unmount') }}
                         </el-button>
-                        <el-button v-permission type="primary" link v-else @click="mount(row)">
+                        <el-button v-permission v-node-admin type="primary" link v-else @click="mount(row)">
                             {{ $t('disk.mount') }}
                         </el-button>
                     </template>
@@ -147,6 +154,7 @@
                         <el-text type="info" v-if="scope === 'system'">{{ $t('disk.cannotOperate') }}</el-text>
                         <el-button
                             v-permission
+                            v-node-admin
                             type="primary"
                             link
                             v-else-if="row.mountPoint != ''"
@@ -154,7 +162,7 @@
                         >
                             {{ $t('disk.unmount') }}
                         </el-button>
-                        <el-button v-permission type="primary" link v-else @click="mount(row)">
+                        <el-button v-permission v-node-admin type="primary" link v-else @click="mount(row)">
                             {{ $t('disk.mount') }}
                         </el-button>
                     </template>

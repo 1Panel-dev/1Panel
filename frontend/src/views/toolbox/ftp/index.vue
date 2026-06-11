@@ -8,14 +8,28 @@
                         <Status class="mt-0.5" :status="form.isActive ? 'enable' : 'disable'" />
                     </div>
                     <div class="mt-0.5">
-                        <el-button v-if="form.isActive" v-permission type="primary" @click="onOperate('stop')" link>
+                        <el-button
+                            v-if="form.isActive"
+                            v-permission
+                            v-node-admin
+                            type="primary"
+                            @click="onOperate('stop')"
+                            link
+                        >
                             {{ $t('commons.button.stop') }}
                         </el-button>
-                        <el-button v-if="!form.isActive" v-permission type="primary" @click="onOperate('start')" link>
+                        <el-button
+                            v-if="!form.isActive"
+                            v-permission
+                            v-node-admin
+                            type="primary"
+                            @click="onOperate('start')"
+                            link
+                        >
                             {{ $t('commons.button.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button v-permission type="primary" @click="onOperate('restart')" link>
+                        <el-button v-permission v-node-admin type="primary" @click="onOperate('restart')" link>
                             {{ $t('commons.button.restart') }}
                         </el-button>
                     </div>
@@ -35,13 +49,13 @@
                     </el-alert>
                 </template>
                 <template #leftToolBar>
-                    <el-button v-permission type="primary" @click="onOpenDialog('add')">
+                    <el-button v-permission v-node-admin type="primary" @click="onOpenDialog('add')">
                         {{ $t('commons.button.add') }}
                     </el-button>
-                    <el-button v-permission @click="onSync()">
+                    <el-button v-permission v-node-admin @click="onSync()">
                         {{ $t('commons.button.sync') }}
                     </el-button>
-                    <el-button v-permission plain :disabled="selects.length === 0" @click="onDelete(null)">
+                    <el-button v-permission v-node-admin plain :disabled="selects.length === 0" @click="onDelete(null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </template>
@@ -126,6 +140,7 @@
                                 <fu-input-rw-switch
                                     v-model="row.description"
                                     v-permission
+                                    v-node-admin
                                     @enter="onChange(row)"
                                     @blur="onChange(row)"
                                 />
@@ -337,6 +352,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
+        nodeAdmin: true,
         disabled: (row: Toolbox.FtpInfo) => {
             return row.status === 'deleted';
         },
@@ -356,6 +372,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
+        nodeAdmin: true,
         click: (row: Toolbox.FtpInfo) => {
             onDelete(row);
         },

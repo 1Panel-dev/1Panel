@@ -4,6 +4,9 @@ import { normalizeToManageCode } from '@/utils/permission-codes';
 
 export type PermissionBindingValue = string | string[] | undefined;
 export type PermissionMode = 'manage' | 'view';
+export type PermissionAccessOptions = {
+    nodeAdmin?: boolean;
+};
 
 const getRoutePermission = (): PermissionBindingValue => {
     const route = router.currentRoute.value;
@@ -46,8 +49,15 @@ export const toPermissionList = (value: PermissionBindingValue) => {
     return routePermission ? [routePermission] : [];
 };
 
-const hasPermissionAccessByMode = (mode: PermissionMode, value?: PermissionBindingValue) => {
+const hasPermissionAccessByMode = (
+    mode: PermissionMode,
+    value?: PermissionBindingValue,
+    options: PermissionAccessOptions = {},
+) => {
     const globalStore = GlobalStore();
+    if (options.nodeAdmin && globalStore.isNodeAdmin) {
+        return true;
+    }
     const permissions = toPermissionList(value);
     const normalizedPermissions = mode === 'manage' ? permissions.map(toManagePermission).filter(Boolean) : permissions;
     if (normalizedPermissions.length === 0) {
@@ -56,10 +66,10 @@ const hasPermissionAccessByMode = (mode: PermissionMode, value?: PermissionBindi
     return normalizedPermissions.some((permission) => globalStore.hasPermission(permission));
 };
 
-export const hasManagePermissionAccess = (value?: PermissionBindingValue) => {
-    return hasPermissionAccessByMode('manage', value);
+export const hasManagePermissionAccess = (value?: PermissionBindingValue, options?: PermissionAccessOptions) => {
+    return hasPermissionAccessByMode('manage', value, options);
 };
 
-export const hasPermissionAccess = (value?: PermissionBindingValue) => {
-    return hasPermissionAccessByMode('view', value);
+export const hasPermissionAccess = (value?: PermissionBindingValue, options?: PermissionAccessOptions) => {
+    return hasPermissionAccessByMode('view', value, options);
 };

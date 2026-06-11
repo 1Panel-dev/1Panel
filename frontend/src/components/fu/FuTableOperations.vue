@@ -206,10 +206,11 @@ const getMoreButtons = (row: any) => {
 
 const isButtonDisabled = (button: FuTableOperationButton, row: any) => {
     let permissionDisabled = false;
+    const permissionOptions = { nodeAdmin: button.nodeAdmin === true };
     if (button.permission === true) {
-        permissionDisabled = !hasManagePermissionAccess();
+        permissionDisabled = !hasManagePermissionAccess(undefined, permissionOptions);
     } else if (button.permission !== undefined) {
-        permissionDisabled = !hasPermissionAccess(button.permission);
+        permissionDisabled = !hasPermissionAccess(button.permission, permissionOptions);
     }
     return permissionDisabled || Boolean(resolveMaybeFn(button.disabled ?? false, row));
 };

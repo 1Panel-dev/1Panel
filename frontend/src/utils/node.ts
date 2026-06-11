@@ -1,5 +1,5 @@
 import { Setting } from '@/api/interface/setting';
-import { listNodeOptions, loadNodeByUser } from '@/api/modules/setting';
+import { listNodeOptions } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 
 export const changeToLocal = async () => {
@@ -23,15 +23,9 @@ export const changeToLocal = async () => {
 };
 
 export async function listNodes(type: string): Promise<Array<Setting.NodeItem>> {
-    const globalStore = GlobalStore();
     try {
-        if (globalStore.isAdmin) {
-            const res = await listNodeOptions(type);
-            return res.data || [];
-        } else {
-            const res = await loadNodeByUser();
-            return res.data || [];
-        }
+        const res = await listNodeOptions(type);
+        return res.data || [];
     } catch (error) {
         return [];
     }

@@ -171,10 +171,11 @@ const closeRightClick = () => {
 const disabled = computed(() => {
     return function (btn: any) {
         let permissionDisabled = false;
+        const permissionOptions = { nodeAdmin: btn.nodeAdmin === true };
         if (btn.permission === true) {
-            permissionDisabled = !hasManagePermissionAccess();
+            permissionDisabled = !hasManagePermissionAccess(undefined, permissionOptions);
         } else if (btn.permission !== undefined) {
-            permissionDisabled = !hasPermissionAccess(btn.permission);
+            permissionDisabled = !hasPermissionAccess(btn.permission, permissionOptions);
         }
         const buttonDisabled =
             typeof btn.disabled === 'function' ? btn.disabled(rightClick.value.currentRow) : btn.disabled;

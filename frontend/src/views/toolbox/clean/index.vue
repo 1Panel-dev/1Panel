@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <LayoutContent :title="$t('setting.diskClean')" :divider="true">
             <template #leftToolBar>
-                <el-button v-permission type="primary" @click="scanData">
+                <el-button v-permission v-node-admin type="primary" @click="scanData">
                     {{ $t('clean.scan') }}
                 </el-button>
             </template>
@@ -79,6 +79,7 @@
                         <el-text class="clean_title">{{ $t('clean.totalScan') }} {{ computeSize(totalSize) }}</el-text>
                         <el-button
                             v-permission
+                            v-node-admin
                             type="primary"
                             class="-mt-2 ml-20"
                             :disabled="selectSize <= 0"

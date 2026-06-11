@@ -36,16 +36,22 @@
                         <el-alert type="info" :closable="false" :title="loadPrompt()" />
                     </template>
                     <template #leftToolBar>
-                        <el-button v-permission type="primary" @click="onOpenDialog('create')">
+                        <el-button v-permission v-node-admin type="primary" @click="onOpenDialog('create')">
                             {{ $t('firewall.create') }}
                         </el-button>
-                        <el-button v-if="isBind" v-permission plain @click="onUnBind">
+                        <el-button v-if="isBind" v-permission v-node-admin plain @click="onUnBind">
                             {{ $t('commons.button.unbind') }}
                         </el-button>
-                        <el-button v-if="!isBind" v-permission plain @click="onBind">
+                        <el-button v-if="!isBind" v-permission v-node-admin plain @click="onBind">
                             {{ $t('commons.button.bind') }}
                         </el-button>
-                        <el-button v-permission @click="onDelete(null)" plain :disabled="selects.length === 0">
+                        <el-button
+                            v-permission
+                            v-node-admin
+                            @click="onDelete(null)"
+                            plain
+                            :disabled="selects.length === 0"
+                        >
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </template>
@@ -118,6 +124,7 @@
                                     <fu-input-rw-switch
                                         v-model="row.description"
                                         v-permission
+                                        v-node-admin
                                         @enter="onChange(row)"
                                         @blur="onChange(row)"
                                     />
@@ -339,6 +346,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
+        nodeAdmin: true,
         click: (row: Host.IptablesRules) => {
             onDelete(row);
         },

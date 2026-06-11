@@ -3,13 +3,34 @@
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('toolbox.device.syncSite')" prop="ntpSite" :rules="Rules.domain">
                 <el-input v-model="form.ntpSite" />
-                <el-button type="primary" link class="tagClass" v-permission @click="form.ntpSite = 'pool.ntp.org'">
+                <el-button
+                    type="primary"
+                    link
+                    class="tagClass"
+                    v-permission
+                    v-node-admin
+                    @click="form.ntpSite = 'pool.ntp.org'"
+                >
                     {{ $t('commons.table.default') }}
                 </el-button>
-                <el-button type="primary" link class="tagClass" v-permission @click="form.ntpSite = 'ntp.aliyun.com'">
+                <el-button
+                    type="primary"
+                    link
+                    class="tagClass"
+                    v-permission
+                    v-node-admin
+                    @click="form.ntpSite = 'ntp.aliyun.com'"
+                >
                     {{ $t('toolbox.device.ntpALi') }}
                 </el-button>
-                <el-button type="primary" link class="tagClass" v-permission @click="form.ntpSite = 'time.google.com'">
+                <el-button
+                    type="primary"
+                    link
+                    class="tagClass"
+                    v-permission
+                    v-node-admin
+                    @click="form.ntpSite = 'time.google.com'"
+                >
                     {{ $t('toolbox.device.ntpGoogle') }}
                 </el-button>
             </el-form-item>
@@ -17,7 +38,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button v-permission :disabled="loading" type="primary" @click="onSyncTime(formRef)">
+                <el-button v-permission v-node-admin :disabled="loading" type="primary" @click="onSyncTime(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

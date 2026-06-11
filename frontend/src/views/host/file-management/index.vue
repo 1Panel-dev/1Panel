@@ -222,7 +222,14 @@
                                 </template>
                             </el-input>
                         </div>
-                        <el-button v-permission class="max-w-20" plain type="primary" @click="openAiSearchDrawer">
+                        <el-button
+                            v-permission
+                            v-node-admin
+                            class="max-w-20"
+                            plain
+                            type="primary"
+                            @click="openAiSearchDrawer"
+                        >
                             {{ $t('file.aiSearch') }}
                         </el-button>
                     </div>
@@ -246,11 +253,11 @@
                                 </el-button>
                                 <template #dropdown>
                                     <el-dropdown-menu>
-                                        <fu-dropdown-item v-permission command="dir">
+                                        <fu-dropdown-item v-permission v-node-admin command="dir">
                                             <svg-icon iconName="p-file-folder"></svg-icon>
                                             {{ $t('file.dir') }}
                                         </fu-dropdown-item>
-                                        <fu-dropdown-item v-permission command="file">
+                                        <fu-dropdown-item v-permission v-node-admin command="file">
                                             <svg-icon iconName="p-file-normal"></svg-icon>
                                             {{ $t('menu.files') }}
                                         </fu-dropdown-item>
@@ -264,11 +271,11 @@
                                 </el-button>
                                 <template #dropdown>
                                     <el-dropdown-menu>
-                                        <fu-dropdown-item v-permission @click="openUpload">
+                                        <fu-dropdown-item v-permission v-node-admin @click="openUpload">
                                             <el-icon><ElUpload /></el-icon>
                                             {{ $t('commons.button.upload') }}
                                         </fu-dropdown-item>
-                                        <fu-dropdown-item v-permission @click="openWget">
+                                        <fu-dropdown-item v-permission v-node-admin @click="openWget">
                                             <el-icon><ElDownload /></el-icon>
                                             {{ $t('file.remoteFile') }}
                                         </fu-dropdown-item>
@@ -437,6 +444,7 @@
                                             <el-dropdown-menu>
                                                 <fu-dropdown-item
                                                     v-permission
+                                                    v-node-admin
                                                     v-for="btn in moreButtons"
                                                     :key="btn.label"
                                                     @click="btn.action"
@@ -453,6 +461,7 @@
                                         <template v-for="btn in visibleButtons" :key="btn.label">
                                             <el-button
                                                 v-permission
+                                                v-node-admin
                                                 plain
                                                 @click="btn.action"
                                                 :disabled="selects.length === 0"
@@ -469,6 +478,7 @@
                                                 <el-dropdown-menu>
                                                     <fu-dropdown-item
                                                         v-permission
+                                                        v-node-admin
                                                         v-for="btn in moreButtons"
                                                         :key="btn.label"
                                                         @click="btn.action"
@@ -555,6 +565,7 @@
                                             <el-button
                                                 v-if="row.shareCode"
                                                 v-permission
+                                                v-node-admin
                                                 link
                                                 type="primary"
                                                 size="large"
@@ -566,6 +577,7 @@
                                             <el-button
                                                 v-if="row.favoriteID > 0"
                                                 v-permission
+                                                v-node-admin
                                                 link
                                                 type="warning"
                                                 size="large"
@@ -576,6 +588,7 @@
                                                 <el-button
                                                     v-if="hoveredRowPath === row.path"
                                                     v-permission
+                                                    v-node-admin
                                                     link
                                                     icon="Star"
                                                     @click="addToFavorite(row)"
@@ -587,7 +600,7 @@
                             </el-table-column>
                             <el-table-column :label="$t('file.mode')" prop="mode" width="80">
                                 <template #default="{ row }">
-                                    <el-link v-permission underline="never" @click="openMode(row)">
+                                    <el-link v-permission v-node-admin underline="never" @click="openMode(row)">
                                         {{ row.mode }}
                                     </el-link>
                                 </template>
@@ -599,7 +612,7 @@
                                 width="200"
                             >
                                 <template #default="{ row }">
-                                    <el-link v-permission underline="never" @click="openChown(row)">
+                                    <el-link v-permission v-node-admin underline="never" @click="openChown(row)">
                                         {{ row.user ? row.user : '-' }} ({{ row.uid }}) /
                                         {{ row.group ? row.group : '-' }} ({{ row.gid }})
                                     </el-link>
@@ -1981,16 +1994,19 @@ const beforeButtons = [
     {
         label: i18n.global.t('commons.button.copy'),
         permission: true,
+        nodeAdmin: true,
         click: (row: File.File) => openMoveBtn('copy', row),
     },
     {
         label: i18n.global.t('file.move'),
         permission: true,
+        nodeAdmin: true,
         click: (row: File.File) => openMoveBtn('cut', row),
     },
     {
         label: i18n.global.t('file.paste'),
         permission: true,
+        nodeAdmin: true,
         click: openPaste,
         disabled: () => {
             return !moveOpen.value;
@@ -1999,6 +2015,7 @@ const beforeButtons = [
     {
         label: i18n.global.t('file.compress'),
         permission: true,
+        nodeAdmin: true,
         click: (row: File.File) => {
             openCompress([row]);
         },
@@ -2013,6 +2030,7 @@ const beforeButtons = [
     {
         label: i18n.global.t('file.editPermissions'),
         permission: true,
+        nodeAdmin: true,
         click: (row: File.File) => {
             openBatchRole([row]);
         },
@@ -2021,6 +2039,7 @@ const beforeButtons = [
         label: i18n.global.t('file.setRemark'),
         hideOnRemarkBlackList: true,
         permission: true,
+        nodeAdmin: true,
         click: (row: File.File) => {
             openRemark(row);
         },
@@ -2030,6 +2049,7 @@ const afterButtons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
+        nodeAdmin: true,
         disabled: (row: File.File) => {
             return row.name == '.1panel_clash';
         },
@@ -2043,6 +2063,7 @@ const afterButtons = [
     {
         label: i18n.global.t('file.addFavoriteAction'),
         permission: true,
+        nodeAdmin: true,
         click: (row: File.File) => {
             addToFavorite(row);
         },
@@ -2051,6 +2072,7 @@ const afterButtons = [
     {
         label: i18n.global.t('file.removeFavoriteAction'),
         permission: true,
+        nodeAdmin: true,
         click: (row: File.File) => {
             remove(row?.favoriteID);
         },
@@ -2059,6 +2081,7 @@ const afterButtons = [
     {
         label: i18n.global.t('file.shareFile'),
         permission: true,
+        nodeAdmin: true,
         click: openShareFile,
         show: (row: File.File) => {
             return !row?.isDir && !row?.shareCode;
@@ -2067,6 +2090,7 @@ const afterButtons = [
     {
         label: i18n.global.t('file.shareCancel'),
         permission: true,
+        nodeAdmin: true,
         click: (row: File.File) => {
             removeShareByPath(row.path);
         },
@@ -2077,6 +2101,7 @@ const afterButtons = [
     {
         label: i18n.global.t('file.convert'),
         permission: true,
+        nodeAdmin: true,
         click: (row: File.File) => {
             openConvert(row);
         },
@@ -2099,6 +2124,7 @@ const rightBtnRename = [
     {
         label: i18n.global.t('file.rename'),
         permission: true,
+        nodeAdmin: true,
         click: (row: File.File) => {
             openRename(row, 'right');
         },
@@ -2108,6 +2134,7 @@ const moreBtnRename = [
     {
         label: i18n.global.t('file.rename'),
         permission: true,
+        nodeAdmin: true,
         click: (row: File.File) => {
             openRename(row, 'more');
         },

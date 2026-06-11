@@ -14,6 +14,7 @@ export interface FuTableOperationButton {
     click?: (row: any) => void;
     disabled?: boolean | ((row: any) => boolean);
     permission?: true | PermissionBindingValue;
+    nodeAdmin?: boolean;
     show?: boolean | ((row: any) => boolean);
     type?: string;
     icon?: any;
