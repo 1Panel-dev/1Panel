@@ -148,6 +148,61 @@ function initChart() {
     }
 
     const grid = props.option.grid || { left: '7%', right: '7%', bottom: '20%' };
+    const defaultTooltip = {
+        trigger: 'axis',
+        formatter: function (datas: any) {
+            let res = datas[0].name + '<br/>';
+            switch (props.option.formatStr) {
+                case 'KB/s':
+                    for (const item of datas) {
+                        res +=
+                            item.marker +
+                            ' ' +
+                            item.seriesName +
+                            i18n.global.t('commons.colon') +
+                            computeSizeFromKBs(item.data) +
+                            '<br/>';
+                    }
+                    break;
+                case 'KB':
+                    for (const item of datas) {
+                        res +=
+                            item.marker +
+                            ' ' +
+                            item.seriesName +
+                            i18n.global.t('commons.colon') +
+                            computeSizeFromKB(item.data) +
+                            '<br/>';
+                    }
+                    break;
+                case 'MB':
+                    for (const item of datas) {
+                        res +=
+                            item.marker +
+                            ' ' +
+                            item.seriesName +
+                            i18n.global.t('commons.colon') +
+                            computeSizeFromMB(item.data) +
+                            '<br/>';
+                    }
+                    break;
+                default:
+                    for (const item of datas) {
+                        res +=
+                            item.marker +
+                            ' ' +
+                            item.seriesName +
+                            i18n.global.t('commons.colon') +
+                            item.data +
+                            props.option.formatStr +
+                            '<br/>';
+                    }
+                    break;
+            }
+            return res;
+        },
+    };
+    const tooltip = props.option.tooltip || defaultTooltip;
     const option = {
         title: [
             {
@@ -158,59 +213,10 @@ function initChart() {
         ],
         zlevel: 1,
         z: 1,
-        tooltip: props.option.tooltip || {
-            trigger: 'axis',
-            formatter: function (datas: any) {
-                let res = datas[0].name + '<br/>';
-                switch (props.option.formatStr) {
-                    case 'KB/s':
-                        for (const item of datas) {
-                            res +=
-                                item.marker +
-                                ' ' +
-                                item.seriesName +
-                                i18n.global.t('commons.colon') +
-                                computeSizeFromKBs(item.data) +
-                                '<br/>';
-                        }
-                        break;
-                    case 'KB':
-                        for (const item of datas) {
-                            res +=
-                                item.marker +
-                                ' ' +
-                                item.seriesName +
-                                i18n.global.t('commons.colon') +
-                                computeSizeFromKB(item.data) +
-                                '<br/>';
-                        }
-                        break;
-                    case 'MB':
-                        for (const item of datas) {
-                            res +=
-                                item.marker +
-                                ' ' +
-                                item.seriesName +
-                                i18n.global.t('commons.colon') +
-                                computeSizeFromMB(item.data) +
-                                '<br/>';
-                        }
-                        break;
-                    default:
-                        for (const item of datas) {
-                            res +=
-                                item.marker +
-                                ' ' +
-                                item.seriesName +
-                                i18n.global.t('commons.colon') +
-                                item.data +
-                                props.option.formatStr +
-                                '<br/>';
-                        }
-                        break;
-                }
-                return res;
-            },
+        tooltip: {
+            appendToBody: true,
+            ...tooltip,
+            extraCssText: `${tooltip.extraCssText || ''}; z-index: 3000;`,
         },
         grid,
         legend: itemSelect || {
