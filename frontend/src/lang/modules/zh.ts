@@ -5070,6 +5070,7 @@ const message = {
             alertNotice: '告警通知',
             methodConfig: '发送方式配置',
             createMethod: '创建发送方式',
+            methodInvalid: '失效配置 {0}',
             commonConfig: '全局配置',
             smsConfig: '短信通知',
             smsConfigHelper: '配置短信通知号码',

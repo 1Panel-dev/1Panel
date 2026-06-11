@@ -21,7 +21,12 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column :label="$t('xpack.alert.alertMethod')" prop="method" width="200px">
+                    <el-table-column
+                        :label="$t('xpack.alert.alertMethod')"
+                        prop="method"
+                        width="200px"
+                        show-overflow-tooltip
+                    >
                         <template #default="{ row }">
                             {{ formatMethod(row) }}
                         </template>
@@ -245,6 +250,9 @@ const formatMethod = (row: Alert.AlertLog) => {
             }
         }
 
+        const invalidLabel = /^\d+$/.test(method)
+            ? i18n.global.t('xpack.alert.methodInvalid', [`#${method}`])
+            : i18n.global.t('xpack.alert.methodInvalid', [method]);
         switch (method) {
             case 'mail':
             case 'email':
@@ -264,7 +272,7 @@ const formatMethod = (row: Alert.AlertLog) => {
             case 'bark':
                 return t('xpack.alert.bark');
             default:
-                return /^\d+$/.test(method) ? `#${method}` : method;
+                return invalidLabel;
         }
     };
 

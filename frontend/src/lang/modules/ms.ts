@@ -5577,6 +5577,7 @@ const message = {
             alertNotice: 'Pemberitahuan Amaran',
             methodConfig: 'Konfigurasi Kaedah Pemberitahuan',
             createMethod: 'Cipta Kaedah Pemberitahuan',
+            methodInvalid: 'Konfigurasi tidak sah {0}',
             commonConfig: 'Konfigurasi Global',
             smsConfig: 'SMS',
             smsConfigHelper: 'Konfigurasi nombor untuk pemberitahuan SMS',

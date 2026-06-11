@@ -5723,6 +5723,7 @@ const message = {
             alertNotice: 'Notificação de Alerta',
             methodConfig: 'Configuração do Método de Notificação',
             createMethod: 'Criar Método de Notificação',
+            methodInvalid: 'Configuração inválida {0}',
             commonConfig: 'Configuração Global',
             smsConfig: 'SMS',
             smsConfigHelper: 'Configure os números para notificação por SMS',

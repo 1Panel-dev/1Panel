@@ -5463,6 +5463,7 @@ const message = {
             alertNotice: 'Alert Notification',
             methodConfig: 'Notification Method Configuration',
             createMethod: 'Create Notification Method',
+            methodInvalid: 'Invalid configuration {0}',
             commonConfig: 'Global Configuration',
             smsConfig: 'SMS',
             smsConfigHelper: 'Configure phone numbers for SMS notifications',

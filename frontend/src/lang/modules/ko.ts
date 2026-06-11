@@ -5390,6 +5390,7 @@ const message = {
             alertNotice: '알림 통지',
             methodConfig: '알림 방법 설정',
             createMethod: '알림 방법 생성',
+            methodInvalid: '유효하지 않은 설정 {0}',
             commonConfig: '전역 설정',
             smsConfig: 'SMS',
             smsConfigHelper: 'SMS 알림을 받을 전화번호를 설정합니다',

@@ -5567,6 +5567,7 @@ const message = {
             alertNotice: 'Uyarı Bildirimi',
             methodConfig: 'Bildirim Yöntemi Ayarı',
             createMethod: 'Bildirim Yöntemi Oluştur',
+            methodInvalid: 'Geçersiz yapılandırma {0}',
             commonConfig: 'Genel Ayar',
             smsConfig: 'SMS',
             smsConfigHelper: 'SMS bildirimi için telefon numaralarını yapılandırın',
