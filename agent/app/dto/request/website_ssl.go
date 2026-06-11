@@ -6,7 +6,7 @@ type WebsiteSSLSearch struct {
 	dto.PageInfo
 	AcmeAccountID string `json:"acmeAccountID"`
 	Domain        string `json:"domain"`
-	OrderBy       string `json:"orderBy" validate:"omitempty,oneof=created_at expire_date"`
+	OrderBy       string `json:"orderBy" validate:"omitempty,oneof=created_at updated_at expire_date"`
 	Order         string `json:"order" validate:"omitempty,oneof=null ascending descending"`
 }
 

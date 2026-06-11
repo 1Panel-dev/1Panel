@@ -141,7 +141,7 @@ export const getSSL = (id: number) => {
 };
 
 export const obtainSSL = (req: Website.SSLObtain) => {
-    return http.post<any>(`/websites/ssl/obtain`, req);
+    return http.post<any>(`/websites/ssl/obtain`, req, TimeoutEnum.T_10M);
 };
 
 export const updateSSL = (req: Website.SSLUpdate) => {

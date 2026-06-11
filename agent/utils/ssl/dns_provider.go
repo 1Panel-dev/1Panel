@@ -3,6 +3,8 @@ package ssl
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"reflect"
 	"time"
 
 	"github.com/go-acme/lego/v5/challenge"
@@ -95,7 +97,7 @@ var (
 	manualDnsTimeout   = 10 * time.Minute
 )
 
-func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, error) {
+func getDNSProviderConfig(dnsType DnsType, params string, httpClient *http.Client) (challenge.Provider, error) {
 	var (
 		param DNSParam
 		p     challenge.Provider
@@ -106,7 +108,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 	}
 	switch dnsType {
 	case AliYun:
-		config := alidns.NewDefaultConfig()
+		config := newDNSProviderConfig(alidns.NewDefaultConfig(), httpClient)
 		config.SecretKey = param.SecretKey
 		config.APIKey = param.AccessKey
 		config.PropagationTimeout = propagationTimeout
@@ -114,7 +116,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = alidns.NewDNSProviderConfig(config)
 	case AliESA:
-		config := aliesa.NewDefaultConfig()
+		config := newDNSProviderConfig(aliesa.NewDefaultConfig(), httpClient)
 		config.SecretKey = param.SecretKey
 		config.APIKey = param.AccessKey
 		config.PropagationTimeout = propagationTimeout
@@ -122,7 +124,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = aliesa.NewDNSProviderConfig(config)
 	case AWSRoute53:
-		config := route53.NewDefaultConfig()
+		config := newDNSProviderConfig(route53.NewDefaultConfig(), httpClient)
 		config.AccessKeyID = param.AccessKey
 		config.SecretAccessKey = param.SecretKey
 		config.Region = param.Region
@@ -135,7 +137,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = route53.NewDNSProviderConfig(config)
 	case CloudFlare:
-		config := cloudflare.NewDefaultConfig()
+		config := newDNSProviderConfig(cloudflare.NewDefaultConfig(), httpClient)
 		config.AuthEmail = param.Email
 		config.AuthToken = param.APIkey
 		config.PropagationTimeout = propagationTimeout
@@ -143,7 +145,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = cloudflare.NewDNSProviderConfig(config)
 	case CloudDns:
-		config := clouddns.NewDefaultConfig()
+		config := newDNSProviderConfig(clouddns.NewDefaultConfig(), httpClient)
 		config.ClientID = param.ClientID
 		config.Email = param.Email
 		config.Password = param.Password
@@ -152,7 +154,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = clouddns.NewDNSProviderConfig(config)
 	case NameCheap:
-		config := namecheap.NewDefaultConfig()
+		config := newDNSProviderConfig(namecheap.NewDefaultConfig(), httpClient)
 		config.APIKey = param.APIkey
 		config.APIUser = param.APIUser
 		config.PropagationTimeout = propagationTimeout
@@ -160,14 +162,14 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = namecheap.NewDNSProviderConfig(config)
 	case NameSilo:
-		config := namesilo.NewDefaultConfig()
+		config := newDNSProviderConfig(namesilo.NewDefaultConfig(), httpClient)
 		config.APIKey = param.APIkey
 		config.PropagationTimeout = propagationTimeout
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
 		p, err = namesilo.NewDNSProviderConfig(config)
 	case Godaddy:
-		config := godaddy.NewDefaultConfig()
+		config := newDNSProviderConfig(godaddy.NewDefaultConfig(), httpClient)
 		config.APIKey = param.APIkey
 		config.APISecret = param.APISecret
 		config.PropagationTimeout = propagationTimeout
@@ -175,7 +177,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = godaddy.NewDNSProviderConfig(config)
 	case NameCom:
-		config := namedotcom.NewDefaultConfig()
+		config := newDNSProviderConfig(namedotcom.NewDefaultConfig(), httpClient)
 		config.APIToken = param.Token
 		config.Username = param.APIUser
 		config.PropagationTimeout = propagationTimeout
@@ -183,7 +185,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = namedotcom.NewDNSProviderConfig(config)
 	case TencentCloud:
-		config := tencentcloud.NewDefaultConfig()
+		config := newDNSProviderConfig(tencentcloud.NewDefaultConfig(), httpClient)
 		config.SecretID = param.SecretID
 		config.SecretKey = param.SecretKey
 		config.PropagationTimeout = propagationTimeout
@@ -191,14 +193,14 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = tencentcloud.NewDNSProviderConfig(config)
 	case RainYun:
-		config := rainyun.NewDefaultConfig()
+		config := newDNSProviderConfig(rainyun.NewDefaultConfig(), httpClient)
 		config.APIKey = param.APIkey
 		config.PropagationTimeout = propagationTimeout
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
 		p, err = rainyun.NewDNSProviderConfig(config)
 	case Volcengine:
-		config := volcengine.NewDefaultConfig()
+		config := newDNSProviderConfig(volcengine.NewDefaultConfig(), httpClient)
 		config.SecretKey = param.SecretKey
 		config.AccessKey = param.AccessKey
 		config.PropagationTimeout = propagationTimeout
@@ -206,7 +208,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = volcengine.NewDNSProviderConfig(config)
 	case HuaweiCloud:
-		config := huaweicloud.NewDefaultConfig()
+		config := newDNSProviderConfig(huaweicloud.NewDefaultConfig(), httpClient)
 		config.AccessKeyID = param.AccessKey
 		config.SecretAccessKey = param.SecretKey
 		config.Region = param.Region
@@ -218,19 +220,19 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = int32(ttl)
 		p, err = huaweicloud.NewDNSProviderConfig(config)
 	case FreeMyIP:
-		config := freemyip.NewDefaultConfig()
+		config := newDNSProviderConfig(freemyip.NewDefaultConfig(), httpClient)
 		config.Token = param.Token
 		config.PropagationTimeout = propagationTimeout
 		config.PollingInterval = pollingInterval
 		p, err = freemyip.NewDNSProviderConfig(config)
 	case Vercel:
-		config := vercel.NewDefaultConfig()
+		config := newDNSProviderConfig(vercel.NewDefaultConfig(), httpClient)
 		config.AuthToken = param.Token
 		config.PropagationTimeout = propagationTimeout
 		config.PollingInterval = pollingInterval
 		p, err = vercel.NewDNSProviderConfig(config)
 	case Spaceship:
-		config := spaceship.NewDefaultConfig()
+		config := newDNSProviderConfig(spaceship.NewDefaultConfig(), httpClient)
 		config.APIKey = param.APIkey
 		config.APISecret = param.APISecret
 		config.PropagationTimeout = propagationTimeout
@@ -238,7 +240,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = spaceship.NewDNSProviderConfig(config)
 	case WestCN:
-		config := westcn.NewDefaultConfig()
+		config := newDNSProviderConfig(westcn.NewDefaultConfig(), httpClient)
 		config.Username = param.Username
 		config.Password = param.Password
 		config.PropagationTimeout = propagationTimeout
@@ -246,7 +248,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = westcn.NewDNSProviderConfig(config)
 	case ClouDNS:
-		config := cloudns.NewDefaultConfig()
+		config := newDNSProviderConfig(cloudns.NewDefaultConfig(), httpClient)
 		config.AuthID = param.AuthID
 		config.SubAuthID = param.SubAuthID
 		config.AuthPassword = param.AuthPassword
@@ -255,7 +257,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = cloudns.NewDNSProviderConfig(config)
 	case RegRu:
-		config := regru.NewDefaultConfig()
+		config := newDNSProviderConfig(regru.NewDefaultConfig(), httpClient)
 		config.Username = param.Username
 		config.Password = param.Password
 		config.PropagationTimeout = propagationTimeout
@@ -263,14 +265,14 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = regru.NewDNSProviderConfig(config)
 	case Dynu:
-		config := dynu.NewDefaultConfig()
+		config := newDNSProviderConfig(dynu.NewDefaultConfig(), httpClient)
 		config.APIKey = param.APIkey
 		config.PropagationTimeout = propagationTimeout
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
 		p, err = dynu.NewDNSProviderConfig(config)
 	case Dynadot:
-		config := dynadot.NewDefaultConfig()
+		config := newDNSProviderConfig(dynadot.NewDefaultConfig(), httpClient)
 		config.APIKey = param.APIkey
 		config.APISecret = param.APISecret
 		config.PropagationTimeout = propagationTimeout
@@ -278,7 +280,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = dynadot.NewDNSProviderConfig(config)
 	case BaiduCloud:
-		config := baiducloud.NewDefaultConfig()
+		config := newDNSProviderConfig(baiducloud.NewDefaultConfig(), httpClient)
 		config.AccessKeyID = param.AccessKey
 		config.SecretAccessKey = param.SecretKey
 		config.PropagationTimeout = propagationTimeout
@@ -286,7 +288,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = baiducloud.NewDNSProviderConfig(config)
 	case Ovh:
-		config := ovh.NewDefaultConfig()
+		config := newDNSProviderConfig(ovh.NewDefaultConfig(), httpClient)
 		config.APIEndpoint = param.Endpoint
 		config.AccessToken = param.AccessToken
 		config.PropagationTimeout = propagationTimeout
@@ -294,12 +296,12 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = ovh.NewDNSProviderConfig(config)
 	case AcmeDNS:
-		config := acmedns.NewDefaultConfig()
+		config := newDNSProviderConfig(acmedns.NewDefaultConfig(), httpClient)
 		config.APIBase = param.Endpoint
 		config.StorageBaseURL = param.BaseURL
 		p, err = acmedns.NewDNSProviderConfig(config)
 	case PorkBun:
-		config := porkbun.NewDefaultConfig()
+		config := newDNSProviderConfig(porkbun.NewDefaultConfig(), httpClient)
 		config.APIKey = param.APIkey
 		config.SecretAPIKey = param.SecretKey
 		config.PropagationTimeout = propagationTimeout
@@ -307,7 +309,7 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		config.TTL = ttl
 		p, err = porkbun.NewDNSProviderConfig(config)
 	case Technitium:
-		config := technitium.NewDefaultConfig()
+		config := newDNSProviderConfig(technitium.NewDefaultConfig(), httpClient)
 		config.BaseURL = param.BaseURL
 		config.APIToken = param.Token
 		config.PropagationTimeout = propagationTimeout
@@ -330,4 +332,28 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		return nil, err
 	}
 	return p, nil
+}
+
+func newDNSProviderConfig[T any](config *T, httpClient *http.Client) *T {
+	setDNSProviderHTTPClient(config, httpClient)
+	return config
+}
+
+func setDNSProviderHTTPClient(config any, httpClient *http.Client) {
+	if config == nil || httpClient == nil {
+		return
+	}
+	value := reflect.ValueOf(config)
+	if value.Kind() != reflect.Ptr || value.IsNil() {
+		return
+	}
+	field := value.Elem().FieldByName("HTTPClient")
+	if !field.IsValid() || !field.CanSet() {
+		return
+	}
+	httpClientType := reflect.TypeOf((*http.Client)(nil))
+	if field.Type() != httpClientType {
+		return
+	}
+	field.Set(reflect.ValueOf(httpClient))
 }

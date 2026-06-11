@@ -7,13 +7,16 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"net"
+	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	legoacme "github.com/go-acme/lego/v5/acme"
 	"github.com/go-acme/lego/v5/certificate"
 	"github.com/go-acme/lego/v5/challenge/dns01"
 	"github.com/go-acme/lego/v5/lego"
@@ -28,6 +31,8 @@ import (
 // occasionally fail propagation checks against the wrong resolver.
 var dnsChallengeMu sync.Mutex
 
+var ErrAcmeAccountURLMissing = errors.New("acme account url is empty")
+
 type AcmeClientOption func(*AcmeClientOptions)
 
 type AcmeClientOptions struct {
@@ -40,18 +45,35 @@ type AcmeClient struct {
 	User     *AcmeUser
 	ProxyURL string
 
-	// dnsChallengeLocked records whether this client currently holds
-	// dnsChallengeMu. It is set by UseDns and cleared by ObtainSSL/
-	// ObtainIPSSL once the DNS-01 flow finishes. UseHTTP does not touch it.
-	dnsChallengeLocked bool
+	dnsChallengeConfig *dnsChallengeConfig
+}
+
+type dnsChallengeConfig struct {
+	recursiveNameservers []string
+	timeout              time.Duration
+	disableCNAME         bool
 }
 
 func NewAcmeClient(acmeAccount *model.WebsiteAcmeAccount, systemProxy *dto.SystemProxy) (*AcmeClient, error) {
+	return NewAcmeClientWithContext(context.Background(), acmeAccount, systemProxy)
+}
+
+func NewAcmeClientWithContext(ctx context.Context, acmeAccount *model.WebsiteAcmeAccount, systemProxy *dto.SystemProxy) (*AcmeClient, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	if acmeAccount.Email == "" {
 		return nil, errors.New("email can not blank")
 	}
+	accountURL := strings.TrimSpace(acmeAccount.URL)
+	if accountURL == "" {
+		return nil, ErrAcmeAccountURLMissing
+	}
+	if strings.TrimSpace(acmeAccount.PrivateKey) == "" {
+		return nil, errors.New("private key can not blank")
+	}
 
-	client, err := NewRegisterClient(acmeAccount, systemProxy)
+	client, err := newAcmeClient(acmeAccount, systemProxy, &legoacme.ExtendedAccount{Location: accountURL})
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +81,11 @@ func NewAcmeClient(acmeAccount *model.WebsiteAcmeAccount, systemProxy *dto.Syste
 }
 
 func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.WebsiteSSL) error {
-	p, err := getDNSProviderConfig(dnsType, params)
+	var httpClient *http.Client
+	if c.Config != nil {
+		httpClient = c.Config.HTTPClient
+	}
+	p, err := getDNSProviderConfig(dnsType, params, httpClient)
 	if err != nil {
 		return err
 	}
@@ -71,46 +97,20 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		nameservers = append(nameservers, websiteSSL.Nameserver2)
 	}
 
-	// Hold the global DNS-01 lock for the entire flow that follows, including
-	// the Obtain call. lego v5 reads dns01.DefaultClient() inside its own
-	// propagation-precheck loop, so the lock cannot be released right after
-	// SetDefaultClient/SetDNS01Provider; it has to span the whole DNS-01
-	// challenge. ObtainSSL / ObtainIPSSL release it once the request returns.
-	dnsChallengeMu.Lock()
-	c.dnsChallengeLocked = true
-
-	if websiteSSL.DisableCNAME {
-		_ = os.Setenv("LEGO_DISABLE_CNAME_SUPPORT", "true")
-	} else {
-		_ = os.Setenv("LEGO_DISABLE_CNAME_SUPPORT", "false")
-	}
-
-	// lego v5 removed dns01.AddRecursiveNameservers and dns01.AddDNSTimeout;
-	// configure them via dns01.NewClient(&dns01.Options{...}) + SetDefaultClient.
-	dns01.SetDefaultClient(dns01.NewClient(&dns01.Options{
-		RecursiveNameservers: nameservers,
-		Timeout:              dnsTimeOut,
-	}))
-
 	var opts []dns01.ChallengeOption
 	if websiteSSL.SkipDNS {
 		opts = append(opts, dns01.DisableAuthoritativeNssPropagationRequirement())
 	}
 
 	if err := c.Client.Challenge.SetDNS01Provider(p, opts...); err != nil {
-		c.releaseDNSLock()
 		return err
 	}
-	return nil
-}
-
-// releaseDNSLock releases dnsChallengeMu if it was acquired by UseDns.
-// Safe to call multiple times; calls after the first one are no-ops.
-func (c *AcmeClient) releaseDNSLock() {
-	if c.dnsChallengeLocked {
-		c.dnsChallengeLocked = false
-		dnsChallengeMu.Unlock()
+	c.dnsChallengeConfig = &dnsChallengeConfig{
+		recursiveNameservers: append([]string(nil), nameservers...),
+		timeout:              dnsTimeOut,
+		disableCNAME:         websiteSSL.DisableCNAME,
 	}
+	return nil
 }
 
 func (c *AcmeClient) UseHTTP(path string) error {
@@ -123,11 +123,14 @@ func (c *AcmeClient) UseHTTP(path string) error {
 	if err != nil {
 		return err
 	}
+	c.dnsChallengeConfig = nil
 	return nil
 }
 
-func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.Signer) (certificate.Resource, error) {
-	defer c.releaseDNSLock()
+func (c *AcmeClient) ObtainSSL(ctx context.Context, domains []string, privateKey crypto.Signer) (certificate.Resource, error) {
+	unlockDNSChallenge := c.lockDNSChallenge()
+	defer unlockDNSChallenge()
+
 	// lego v5 disables Common Name by default; explicitly enable it to keep
 	// the v4 behaviour, so legacy Java/router clients that still rely on the
 	// CommonName field do not fail TLS handshake.
@@ -137,8 +140,6 @@ func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.Signer) (cert
 		PrivateKey:       privateKey,
 		EnableCommonName: true,
 	}
-
-	ctx := context.Background()
 
 	var certificates *certificate.Resource
 	var err error
@@ -152,7 +153,9 @@ func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.Signer) (cert
 		if isHTTP503Error(err) && attempt < maxRetryAttempts {
 			global.LOG.Warnf("ACME server returned 503, retrying in %v (attempt %d/%d)",
 				retryDelayOn503, attempt, maxRetryAttempts)
-			time.Sleep(retryDelayOn503)
+			if err := waitForRetry(ctx, retryDelayOn503); err != nil {
+				return certificate.Resource{}, err
+			}
 			continue
 		}
 
@@ -163,8 +166,10 @@ func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.Signer) (cert
 	return certificate.Resource{}, err
 }
 
-func (c *AcmeClient) ObtainIPSSL(ipAddress string, privKey crypto.Signer) (certificate.Resource, error) {
-	defer c.releaseDNSLock()
+func (c *AcmeClient) ObtainIPSSL(ctx context.Context, ipAddress string, privKey crypto.Signer) (certificate.Resource, error) {
+	unlockDNSChallenge := c.lockDNSChallenge()
+	defer unlockDNSChallenge()
+
 	csrTemplate := &x509.CertificateRequest{
 		Subject: pkix.Name{
 			CommonName: "",
@@ -192,8 +197,6 @@ func (c *AcmeClient) ObtainIPSSL(ipAddress string, privKey crypto.Signer) (certi
 		Bundle:     true,
 	}
 
-	ctx := context.Background()
-
 	var certificates *certificate.Resource
 	for attempt := 1; attempt <= maxRetryAttempts; attempt++ {
 		certificates, err = c.Client.Certificate.ObtainForCSR(ctx, req)
@@ -204,7 +207,9 @@ func (c *AcmeClient) ObtainIPSSL(ipAddress string, privKey crypto.Signer) (certi
 		if isHTTP503Error(err) && attempt < maxRetryAttempts {
 			global.LOG.Warnf("ACME server returned 503 for IP SSL, retrying in %v (attempt %d/%d)",
 				retryDelayOn503, attempt, maxRetryAttempts)
-			time.Sleep(retryDelayOn503)
+			if err := waitForRetry(ctx, retryDelayOn503); err != nil {
+				return certificate.Resource{}, err
+			}
 			continue
 		}
 
@@ -216,4 +221,49 @@ func (c *AcmeClient) ObtainIPSSL(ipAddress string, privKey crypto.Signer) (certi
 
 func (c *AcmeClient) RevokeSSL(pemSSL []byte) error {
 	return c.Client.Certificate.Revoke(context.Background(), pemSSL)
+}
+
+func (c *AcmeClient) lockDNSChallenge() func() {
+	if c.dnsChallengeConfig == nil {
+		return func() {}
+	}
+
+	dnsChallengeMu.Lock()
+
+	oldCNAME, hadCNAME := os.LookupEnv("LEGO_DISABLE_CNAME_SUPPORT")
+	if c.dnsChallengeConfig.disableCNAME {
+		_ = os.Setenv("LEGO_DISABLE_CNAME_SUPPORT", "true")
+	} else {
+		_ = os.Setenv("LEGO_DISABLE_CNAME_SUPPORT", "false")
+	}
+
+	previousClient := dns01.DefaultClient()
+	// lego v5 removed dns01.AddRecursiveNameservers and dns01.AddDNSTimeout;
+	// configure them via dns01.NewClient(&dns01.Options{...}) + SetDefaultClient.
+	dns01.SetDefaultClient(dns01.NewClient(&dns01.Options{
+		RecursiveNameservers: c.dnsChallengeConfig.recursiveNameservers,
+		Timeout:              c.dnsChallengeConfig.timeout,
+	}))
+
+	return func() {
+		dns01.SetDefaultClient(previousClient)
+		if hadCNAME {
+			_ = os.Setenv("LEGO_DISABLE_CNAME_SUPPORT", oldCNAME)
+		} else {
+			_ = os.Unsetenv("LEGO_DISABLE_CNAME_SUPPORT")
+		}
+		dnsChallengeMu.Unlock()
+	}
+}
+
+func waitForRetry(ctx context.Context, delay time.Duration) error {
+	timer := time.NewTimer(delay)
+	defer timer.Stop()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
 }

@@ -231,8 +231,8 @@ let selects = ref<any>([]);
 const columns = ref([]);
 const req = reactive({
     domain: '',
-    orderBy: 'expire_date',
-    order: 'ascending',
+    orderBy: 'updated_at',
+    order: 'descending',
 });
 
 const routerButton = [
@@ -325,7 +325,7 @@ const onDownload = (ssl: Website.SSLDTO) => {
 };
 
 const changeSort = ({ order }) => {
-    req.orderBy = 'expire_date';
+    req.orderBy = order ? 'expire_date' : 'updated_at';
     req.order = order || 'descending';
     search();
 };

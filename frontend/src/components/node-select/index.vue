@@ -38,7 +38,7 @@ const handleChange = (value) => {
 const search = async () => {
     try {
         const res = await listNodes('all');
-        nodes.value = res.data || [];
+        nodes.value = res || [];
     } catch (error) {}
 };
 
