@@ -31,7 +31,7 @@
         "@vueuse/core": "^14.3.0",
         "@xterm/addon-fit": "^0.10.0",
         "@xterm/xterm": "^5.5.0",
-        "anser": "^2.3.2",
+        "anser": "^2.3.5",
         "axios": "^1.17.0",
         "codemirror": "^6.0.2",
         "crypto-js": "^4.2.0",
