@@ -95,7 +95,7 @@ func checkSession(c *gin.Context) bool {
 }
 
 func isLocalAPI(urlPath string) bool {
-	return urlPath == "/api/v2/core/xpack/sync/ssl"
+	return urlPath == "/api/v2/core/xpack/sync/ssl" || urlPath == "/api/v2/core/xpack/settings/search"
 }
 
 func isPublicFileShareAPI(urlPath string) bool {
