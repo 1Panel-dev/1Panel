@@ -43,17 +43,23 @@
                         </el-alert>
                     </template>
                     <template #leftToolBar>
-                        <el-button v-permission type="primary" @click="onOpenDialog('create')">
+                        <el-button v-permission v-node-admin type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}
                         </el-button>
-                        <el-button v-permission @click="onDelete(null)" plain :disabled="selects.length === 0">
+                        <el-button
+                            v-permission
+                            v-node-admin
+                            @click="onDelete(null)"
+                            plain
+                            :disabled="selects.length === 0"
+                        >
                             {{ $t('commons.button.delete') }}
                         </el-button>
                         <el-button-group>
-                            <el-button v-permission @click="onImport">
+                            <el-button v-permission v-node-admin @click="onImport">
                                 {{ $t('commons.button.import') }}
                             </el-button>
-                            <el-button v-permission :disabled="selects.length === 0" @click="onExport">
+                            <el-button v-permission v-node-admin :disabled="selects.length === 0" @click="onExport">
                                 {{ $t('commons.button.export') }}
                             </el-button>
                         </el-button-group>
@@ -140,6 +146,7 @@
                                     <el-button
                                         v-if="row.strategy === 'accept'"
                                         v-permission
+                                        v-node-admin
                                         @click="onChangeStatus(row, 'drop')"
                                         link
                                         type="success"
@@ -151,6 +158,7 @@
                                         link
                                         type="danger"
                                         v-permission
+                                        v-node-admin
                                         @click="onChangeStatus(row, 'accept')"
                                     >
                                         {{ $t('firewall.drop') }}
@@ -173,6 +181,7 @@
                                     <fu-input-rw-switch
                                         v-model="row.description"
                                         v-permission
+                                        v-node-admin
                                         @enter="onChange(row)"
                                         @blur="onChange(row)"
                                     />
@@ -656,6 +665,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
+        nodeAdmin: true,
         click: (row: Host.RulePort) => {
             onOpenDialog('edit', row);
         },
@@ -663,6 +673,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
+        nodeAdmin: true,
         click: (row: Host.RuleInfo) => {
             onDelete(row);
         },

@@ -30,11 +30,24 @@
                         </el-tag>
 
                         <span class="mt-0.5">
-                            <el-button type="primary" v-permission @click="onHandle(dialogData.rowData)" link>
+                            <el-button
+                                type="primary"
+                                v-permission
+                                v-node-admin
+                                @click="onHandle(dialogData.rowData)"
+                                link
+                            >
                                 {{ $t('commons.button.handle') }}
                             </el-button>
                             <el-divider direction="vertical" />
-                            <el-button v-permission :disabled="!hasRecords" type="primary" @click="onClean" link>
+                            <el-button
+                                v-permission
+                                v-node-admin
+                                :disabled="!hasRecords"
+                                type="primary"
+                                @click="onClean"
+                                link
+                            >
                                 {{ $t('commons.button.clean') }}
                             </el-button>
                         </span>

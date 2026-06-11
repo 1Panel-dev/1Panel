@@ -56,10 +56,6 @@ export const listAppNodes = () => {
     return http.get<Array<Setting.NodeAppItem>>(`/core/xpack/nodes/apps/update`, {}, { timeout: TimeoutEnum.T_60S });
 };
 
-// enterprise
-export const loadNodeByUser = () => {
-    return http.get<Array<Setting.NodeItem>>(`/core/enterprise/users/nodes`);
-};
 export const uploadEnterpriseLicense = (params: FormData) => {
     return http.upload('/core/enterprise/licenses/upload', params);
 };

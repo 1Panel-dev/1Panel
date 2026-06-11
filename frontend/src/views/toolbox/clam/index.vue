@@ -20,11 +20,18 @@
                 />
             </template>
             <template #leftToolBar v-if="clamStatus.isExist">
-                <el-button v-permission type="primary" :disabled="!clamStatus.isRunning" @click="onOpenDialog('add')">
+                <el-button
+                    v-permission
+                    v-node-admin
+                    type="primary"
+                    :disabled="!clamStatus.isRunning"
+                    @click="onOpenDialog('add')"
+                >
                     {{ $t('toolbox.clam.clamCreate') }}
                 </el-button>
                 <el-button
                     v-permission
+                    v-node-admin
                     plain
                     :disabled="selects.length === 0 || !clamStatus.isRunning"
                     @click="onDelete(null)"
@@ -145,6 +152,7 @@
                             <fu-input-rw-switch
                                 v-model="row.description"
                                 v-permission
+                                v-node-admin
                                 @enter="onChange(row)"
                                 @blur="onChange(row)"
                             />
@@ -344,6 +352,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.handle'),
         permission: true,
+        nodeAdmin: true,
         click: async (row: Toolbox.ClamInfo) => {
             loading.value = true;
             await handleClamScan(row.id)
@@ -360,6 +369,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
+        nodeAdmin: true,
         click: (row: Toolbox.ClamInfo) => {
             onOpenDialog('edit', row);
         },
@@ -373,6 +383,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
+        nodeAdmin: true,
         click: (row: Toolbox.ClamInfo) => {
             onDelete(row);
         },

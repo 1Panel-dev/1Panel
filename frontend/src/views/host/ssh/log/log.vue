@@ -6,7 +6,7 @@
                 <div class="mt-2"><el-alert type="info" :title="$t('ssh.sshAlert')" :closable="false" /></div>
             </template>
             <template #leftToolBar>
-                <el-button v-permission type="primary" @click="onExport">
+                <el-button v-permission v-node-admin type="primary" @click="onExport">
                     {{ $t('commons.button.export') }}
                 </el-button>
             </template>
@@ -79,7 +79,7 @@
                     <el-button @click="open = false" :disabled="loading">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
-                    <el-button v-permission type="primary" @click="onSubmitExport" :disabled="loading">
+                    <el-button v-permission v-node-admin type="primary" @click="onSubmitExport" :disabled="loading">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>

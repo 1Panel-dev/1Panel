@@ -11,6 +11,7 @@
                     <div class="mt-0.5" v-if="!data.init">
                         <el-button
                             v-permission
+                            v-node-admin
                             type="primary"
                             v-if="data.status != 'running'"
                             link
@@ -20,6 +21,7 @@
                         </el-button>
                         <el-button
                             v-permission
+                            v-node-admin
                             type="primary"
                             v-if="data.status == 'running'"
                             link
@@ -28,16 +30,16 @@
                             {{ $t('commons.operate.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button v-permission type="primary" link @click="onOperate('restart')">
+                        <el-button v-permission v-node-admin type="primary" link @click="onOperate('restart')">
                             {{ $t('commons.button.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button v-permission type="primary" link @click="setting">
+                        <el-button v-permission v-node-admin type="primary" link @click="setting">
                             {{ $t('commons.button.set') }}
                         </el-button>
                     </div>
                     <div class="mt-0.5" v-else>
-                        <el-button v-permission type="primary" link @click="init">
+                        <el-button v-permission v-node-admin type="primary" link @click="init">
                             {{ $t('commons.button.init') }}
                         </el-button>
                     </div>

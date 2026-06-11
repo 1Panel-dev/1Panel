@@ -28,7 +28,7 @@
                 <el-button @click="handleClose()" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button v-permission type="primary" @click="openSubmit(initForm)" :disabled="loading">
+                <el-button v-permission v-node-admin type="primary" @click="openSubmit(initForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

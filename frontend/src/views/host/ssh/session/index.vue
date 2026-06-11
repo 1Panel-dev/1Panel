@@ -42,6 +42,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.disConn'),
         permission: true,
+        nodeAdmin: true,
         click: function (row: any) {
             stop(row.PID);
         },

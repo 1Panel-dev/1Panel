@@ -63,13 +63,13 @@
                 <el-button :disabled="loading" @click="handleClose">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button v-permission v-if="shareInfo" :disabled="loading" @click="cancelShare">
+                <el-button v-permission v-node-admin v-if="shareInfo" :disabled="loading" @click="cancelShare">
                     {{ $t('file.shareClose') }}
                 </el-button>
                 <el-button v-if="shareInfo" :disabled="loading" @click="copyLink">
                     {{ $t('file.shareCopyLink') }}
                 </el-button>
-                <el-button v-permission type="primary" :disabled="loading" @click="generate">
+                <el-button v-permission v-node-admin type="primary" :disabled="loading" @click="generate">
                     {{ shareInfo ? $t('file.shareRegenerate') : $t('file.shareGenerate') }}
                 </el-button>
             </span>

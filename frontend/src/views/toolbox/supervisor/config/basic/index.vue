@@ -10,7 +10,7 @@
                     <span class="input-help">{{ $t('tool.supervisor.serviceNameHelper') }}</span>
                 </el-form-item>
                 <el-form-item>
-                    <el-button v-permission type="primary" @click="submit(initForm)" :disabled="loading">
+                    <el-button v-permission v-node-admin type="primary" @click="submit(initForm)" :disabled="loading">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </el-form-item>

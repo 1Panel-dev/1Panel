@@ -18,7 +18,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button v-permission :disabled="loading" type="primary" @click="onSave(formRef)">
+                <el-button v-permission v-node-admin :disabled="loading" type="primary" @click="onSave(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

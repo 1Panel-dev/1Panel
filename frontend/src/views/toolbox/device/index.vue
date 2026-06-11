@@ -14,7 +14,7 @@
                             <el-form-item label="DNS" prop="dnsItem">
                                 <el-input disabled v-model="form.dnsItem">
                                     <template #append>
-                                        <el-button v-permission @click="onChangeDNS" icon="Setting">
+                                        <el-button v-permission v-node-admin @click="onChangeDNS" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -23,7 +23,7 @@
                             <el-form-item label="Hosts" prop="hosts">
                                 <el-input disabled v-model="form.hostItem">
                                     <template #append>
-                                        <el-button v-permission @click="onChangeHost" icon="Setting">
+                                        <el-button v-permission v-node-admin @click="onChangeHost" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -32,7 +32,7 @@
                             <el-form-item label="Swap" prop="swap">
                                 <el-input disabled v-model="form.swapItem">
                                     <template #append>
-                                        <el-button v-permission @click="onChangeSwap" icon="Setting">
+                                        <el-button v-permission v-node-admin @click="onChangeSwap" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -41,7 +41,7 @@
                             <el-form-item :label="$t('toolbox.device.hostname')" prop="hostname">
                                 <el-input disabled v-model="form.hostname">
                                     <template #append>
-                                        <el-button v-permission @click="onChangeHostname" icon="Setting">
+                                        <el-button v-permission v-node-admin @click="onChangeHostname" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -50,7 +50,7 @@
                             <el-form-item :label="$t('toolbox.device.passwd')" prop="passwd">
                                 <el-input disabled v-model="form.passwd" type="password">
                                     <template #append>
-                                        <el-button v-permission @click="onChangePasswd" icon="Setting">
+                                        <el-button v-permission v-node-admin @click="onChangePasswd" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -59,7 +59,7 @@
                             <el-form-item :label="$t('toolbox.device.syncSite')" prop="ntp">
                                 <el-input disabled v-model="form.ntp">
                                     <template #append>
-                                        <el-button v-permission @click="onChangeNtp" icon="Setting">
+                                        <el-button v-permission v-node-admin @click="onChangeNtp" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -68,7 +68,7 @@
                             <el-form-item :label="$t('toolbox.device.timeZone')" prop="timeZone">
                                 <el-input disabled v-model="form.timeZone">
                                     <template #append>
-                                        <el-button v-permission @click="onChangeTimeZone" icon="Setting">
+                                        <el-button v-permission v-node-admin @click="onChangeTimeZone" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -77,7 +77,13 @@
                             <el-form-item :label="$t('toolbox.device.localTime')" prop="localTime">
                                 <el-input disabled v-model="form.localTime">
                                     <template #append>
-                                        <el-button v-permission @click="onChangeLocalTime" icon="Refresh" width="150px">
+                                        <el-button
+                                            v-permission
+                                            v-node-admin
+                                            @click="onChangeLocalTime"
+                                            icon="Refresh"
+                                            width="150px"
+                                        >
                                             {{ $t('commons.button.sync') }}
                                         </el-button>
                                     </template>

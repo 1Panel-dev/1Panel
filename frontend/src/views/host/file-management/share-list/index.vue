@@ -90,6 +90,7 @@ const buttons = [
     {
         label: i18n.global.t('file.shareClose'),
         permission: true,
+        nodeAdmin: true,
         click: (row: File.FileShareInfo) => {
             closeShare(row.path);
         },

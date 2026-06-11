@@ -14,6 +14,7 @@ const PERMISSION_DISABLED_ATTR = 'data-permission-disabled';
 const PERMISSION_POINTER_EVENTS_ATTR = 'data-permission-pointer-events';
 const PERMISSION_NATIVE_DISABLED_ATTR = 'data-permission-native-disabled';
 const PERMISSION_TABINDEX_ATTR = 'data-permission-tabindex';
+const NODE_ADMIN_PERMISSION_ATTR = 'data-node-admin-permission';
 
 const getDisableTargets = (el: HTMLElement) => {
     const targets = [el, ...Array.from(el.querySelectorAll<HTMLElement>('button, input, select, textarea'))];
@@ -102,11 +103,16 @@ const getPermissionMode = (binding: DirectiveBinding<PermissionBindingValue>): P
     return binding.arg === 'view' ? 'view' : 'manage';
 };
 
+const hasNodeAdminDirective = (el: HTMLElement, vnode: VNode) => {
+    return el.hasAttribute(NODE_ADMIN_PERMISSION_ATTR) || !!vnode.dirs?.some((item) => item.dir === nodeAdminDirective);
+};
+
 const applyPermission = (el: HTMLElement, binding: DirectiveBinding<PermissionBindingValue>, vnode: VNode) => {
+    const options = { nodeAdmin: hasNodeAdminDirective(el, vnode) };
     const disabled =
         getPermissionMode(binding) === 'view'
-            ? !hasPermissionAccess(binding.value)
-            : !hasManagePermissionAccess(binding.value);
+            ? !hasPermissionAccess(binding.value, options)
+            : !hasManagePermissionAccess(binding.value, options);
     const controller = getComponentPermissionController(vnode);
 
     if (controller?.setPermissionDisabled) {
@@ -127,6 +133,18 @@ const permissionDirective: Directive<HTMLElement, PermissionBindingValue> = {
     },
     updated(el, binding, vnode) {
         applyPermission(el, binding, vnode);
+    },
+};
+
+export const nodeAdminDirective: Directive<HTMLElement, boolean | undefined> = {
+    mounted(el) {
+        el.setAttribute(NODE_ADMIN_PERMISSION_ATTR, 'true');
+    },
+    updated(el) {
+        el.setAttribute(NODE_ADMIN_PERMISSION_ATTR, 'true');
+    },
+    unmounted(el) {
+        el.removeAttribute(NODE_ADMIN_PERMISSION_ATTR);
     },
 };
 

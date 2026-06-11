@@ -9,14 +9,28 @@
                         <el-tag>{{ form.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
-                        <el-button v-if="form.isActive" v-permission type="primary" @click="onOperate('stop')" link>
+                        <el-button
+                            v-if="form.isActive"
+                            v-permission
+                            v-node-admin
+                            type="primary"
+                            @click="onOperate('stop')"
+                            link
+                        >
                             {{ $t('commons.button.stop') }}
                         </el-button>
-                        <el-button v-if="!form.isActive" v-permission type="primary" @click="onOperate('start')" link>
+                        <el-button
+                            v-if="!form.isActive"
+                            v-permission
+                            v-node-admin
+                            type="primary"
+                            @click="onOperate('start')"
+                            link
+                        >
                             {{ $t('commons.button.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button v-permission type="primary" @click="onOperate('restart')" link>
+                        <el-button v-permission v-node-admin type="primary" @click="onOperate('restart')" link>
                             {{ $t('commons.button.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
@@ -25,6 +39,7 @@
                         </el-button>
                         <el-switch
                             v-permission
+                            v-node-admin
                             size="small"
                             class="ml-2"
                             inactive-value="disable"
@@ -52,6 +67,7 @@
                 <template #leftToolBar>
                     <el-button
                         v-permission
+                        v-node-admin
                         :disabled="!form.isActive"
                         type="primary"
                         plain
@@ -61,6 +77,7 @@
                     </el-button>
                     <el-button
                         v-permission
+                        v-node-admin
                         :disabled="!form.isActive"
                         type="primary"
                         plain
@@ -81,7 +98,7 @@
                                 <el-form-item :label="$t('toolbox.fail2ban.sshPort')" prop="port">
                                     <el-input disabled v-model="form.port">
                                         <template #append>
-                                            <el-button v-permission @click="onChangePort" icon="Setting">
+                                            <el-button v-permission v-node-admin @click="onChangePort" icon="Setting">
                                                 {{ $t('commons.button.set') }}
                                             </el-button>
                                         </template>
@@ -91,7 +108,12 @@
                                 <el-form-item :label="$t('toolbox.fail2ban.maxRetry')" prop="maxRetry">
                                     <el-input disabled v-model="form.maxRetry">
                                         <template #append>
-                                            <el-button v-permission @click="onChangeMaxRetry" icon="Setting">
+                                            <el-button
+                                                v-permission
+                                                v-node-admin
+                                                @click="onChangeMaxRetry"
+                                                icon="Setting"
+                                            >
                                                 {{ $t('commons.button.set') }}
                                             </el-button>
                                         </template>
@@ -100,7 +122,12 @@
                                 <el-form-item :label="$t('toolbox.fail2ban.banTime')" prop="banTime">
                                     <el-input disabled v-model="form.banTimeItem">
                                         <template #append>
-                                            <el-button v-permission @click="onChangeBanTime" icon="Setting">
+                                            <el-button
+                                                v-permission
+                                                v-node-admin
+                                                @click="onChangeBanTime"
+                                                icon="Setting"
+                                            >
                                                 {{ $t('commons.button.set') }}
                                             </el-button>
                                         </template>
@@ -110,7 +137,12 @@
                                 <el-form-item :label="$t('toolbox.fail2ban.findTime')" prop="findTime">
                                     <el-input disabled v-model="form.findTimeItem">
                                         <template #append>
-                                            <el-button v-permission @click="onChangeFindTime" icon="Setting">
+                                            <el-button
+                                                v-permission
+                                                v-node-admin
+                                                @click="onChangeFindTime"
+                                                icon="Setting"
+                                            >
                                                 {{ $t('commons.button.set') }}
                                             </el-button>
                                         </template>
@@ -119,7 +151,12 @@
                                 <el-form-item :label="$t('toolbox.fail2ban.banAction')" prop="banAction">
                                     <el-input disabled v-model="form.banAction">
                                         <template #append>
-                                            <el-button v-permission @click="onChangeBanAction" icon="Setting">
+                                            <el-button
+                                                v-permission
+                                                v-node-admin
+                                                @click="onChangeBanAction"
+                                                icon="Setting"
+                                            >
                                                 {{ $t('commons.button.set') }}
                                             </el-button>
                                         </template>
@@ -128,7 +165,12 @@
                                 <el-form-item :label="$t('toolbox.fail2ban.logPath')" prop="logPath">
                                     <el-input disabled v-model="form.logPath">
                                         <template #append>
-                                            <el-button v-permission @click="onChangeLogPath" icon="Setting">
+                                            <el-button
+                                                v-permission
+                                                v-node-admin
+                                                @click="onChangeLogPath"
+                                                icon="Setting"
+                                            >
                                                 {{ $t('commons.button.set') }}
                                             </el-button>
                                         </template>
@@ -145,7 +187,14 @@
                             v-model="fail2banConf"
                             :heightDiff="460"
                         ></CodemirrorPro>
-                        <el-button v-permission :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
+                        <el-button
+                            v-permission
+                            v-node-admin
+                            :disabled="loading"
+                            type="primary"
+                            @click="onSaveFile"
+                            class="mt-2.5"
+                        >
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </div>

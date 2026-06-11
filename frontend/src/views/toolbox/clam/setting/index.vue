@@ -37,7 +37,7 @@
                         :disabled="!canUpdate()"
                         :placeholder="$t('commons.msg.noneData')"
                     ></CodemirrorPro>
-                    <el-button type="primary" class="mt-5" v-if="canUpdate()" v-permission @click="onSave">
+                    <el-button type="primary" class="mt-5" v-if="canUpdate()" v-permission v-node-admin @click="onSave">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>

@@ -14,6 +14,7 @@
                             v-if="!data.isActive"
                             link
                             v-permission
+                            v-node-admin
                             @click="onOperate('ClamAV', 'start')"
                         >
                             {{ $t('commons.operate.start') }}
@@ -23,16 +24,23 @@
                             v-if="data.isActive"
                             link
                             v-permission
+                            v-node-admin
                             @click="onOperate('ClamAV', 'stop')"
                         >
                             {{ $t('commons.operate.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link v-permission @click="onOperate('ClamAV', 'restart')">
+                        <el-button
+                            type="primary"
+                            link
+                            v-permission
+                            v-node-admin
+                            @click="onOperate('ClamAV', 'restart')"
+                        >
                             {{ $t('commons.button.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button v-permission type="primary" link @click="setting">
+                        <el-button v-permission v-node-admin type="primary" link @click="setting">
                             {{ $t('commons.button.set') }}
                         </el-button>
                         <el-divider direction="vertical" />
@@ -56,6 +64,7 @@
                             v-if="!data.freshIsActive"
                             link
                             v-permission
+                            v-node-admin
                             @click="onOperate('FreshClam', 'start')"
                         >
                             {{ $t('commons.operate.start') }}
@@ -65,12 +74,19 @@
                             v-if="data.freshIsActive"
                             link
                             v-permission
+                            v-node-admin
                             @click="onOperate('FreshClam', 'stop')"
                         >
                             {{ $t('commons.operate.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link v-permission @click="onOperate('FreshClam', 'restart')">
+                        <el-button
+                            type="primary"
+                            link
+                            v-permission
+                            v-node-admin
+                            @click="onOperate('FreshClam', 'restart')"
+                        >
                             {{ $t('commons.button.restart') }}
                         </el-button>
                     </div>

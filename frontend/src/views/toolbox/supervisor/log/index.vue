@@ -22,7 +22,13 @@
                 :height-diff="300"
             >
                 <template #button>
-                    <el-button v-permission @click="cleanLog" icon="Delete" :disabled="hasContent === false">
+                    <el-button
+                        v-permission
+                        v-node-admin
+                        @click="cleanLog"
+                        icon="Delete"
+                        :disabled="hasContent === false"
+                    >
                         {{ $t('commons.button.clean') }}
                     </el-button>
                 </template>

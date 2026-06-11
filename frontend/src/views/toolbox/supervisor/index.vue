@@ -23,7 +23,7 @@
                 />
             </template>
             <template v-if="showTable" #leftToolBar>
-                <el-button v-permission type="primary" @click="openCreate" :disabled="showStopped">
+                <el-button v-permission v-node-admin type="primary" @click="openCreate" :disabled="showStopped">
                     {{ $t('commons.button.create') }}
                 </el-button>
             </template>
@@ -75,17 +75,25 @@
                             <div v-if="row.status && row.status.length > 0 && row.hasLoad">
                                 <Status
                                     v-permission
+                                    v-node-admin
                                     v-if="checkStatus(row.status) === 'RUNNING'"
                                     status="running"
                                     @click="operate('stop', row.name)"
                                 />
                                 <Status
                                     v-permission
+                                    v-node-admin
                                     v-else-if="checkStatus(row.status) === 'WARNING'"
                                     status="unhealthy"
                                     @click="operate('restart', row.name)"
                                 />
-                                <Status v-else v-permission status="stopped" @click="operate('start', row.name)" />
+                                <Status
+                                    v-else
+                                    v-permission
+                                    v-node-admin
+                                    status="stopped"
+                                    @click="operate('start', row.name)"
+                                />
                             </div>
                             <div v-if="!row.hasLoad">
                                 <el-button link loading></el-button>
@@ -342,6 +350,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
+        nodeAdmin: true,
         click: function (row: HostTool.SupervisorProcess) {
             edit(row);
         },
@@ -349,6 +358,7 @@ const buttons = [
     {
         label: i18n.global.t('website.sourceFile'),
         permission: true,
+        nodeAdmin: true,
         click: function (row: HostTool.SupervisorProcess) {
             getFile(row.name, 'config');
         },
@@ -362,6 +372,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.restart'),
         permission: true,
+        nodeAdmin: true,
         click: function (row: HostTool.SupervisorProcess) {
             operate('restart', row.name);
         },
@@ -369,6 +380,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
+        nodeAdmin: true,
         click: function (row: HostTool.SupervisorProcess) {
             operate('delete', row.name);
         },

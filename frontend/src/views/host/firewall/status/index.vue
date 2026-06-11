@@ -12,6 +12,7 @@
                         <template v-if="baseInfo.name !== 'iptables'">
                             <el-button
                                 v-permission
+                                v-node-admin
                                 type="primary"
                                 v-if="baseInfo.isActive"
                                 @click="onOperate('stop')"
@@ -21,6 +22,7 @@
                             </el-button>
                             <el-button
                                 v-permission
+                                v-node-admin
                                 type="primary"
                                 v-if="!baseInfo.isActive"
                                 @click="onOperate('start')"
@@ -29,29 +31,43 @@
                                 {{ $t('commons.button.start') }}
                             </el-button>
                             <el-divider direction="vertical" />
-                            <el-button v-permission type="primary" @click="onOperate('restart')" link>
+                            <el-button v-permission v-node-admin type="primary" @click="onOperate('restart')" link>
                                 {{ $t('commons.button.restart') }}
                             </el-button>
                         </template>
                         <template v-if="!baseInfo.isInit || (props.currentTab === 'forward' && !baseInfo.isBind)">
                             <el-divider direction="vertical" />
-                            <el-button v-permission type="primary" link @click="onInit">
+                            <el-button v-permission v-node-admin type="primary" link @click="onInit">
                                 {{ $t('commons.button.init') }}
                             </el-button>
                         </template>
                         <template v-if="baseInfo.name === 'iptables' && baseInfo.isInit && props.currentTab == 'base'">
                             <el-divider direction="vertical" />
-                            <el-button v-if="baseInfo.isBind" v-permission type="primary" link @click="onUnBind">
+                            <el-button
+                                v-if="baseInfo.isBind"
+                                v-permission
+                                v-node-admin
+                                type="primary"
+                                link
+                                @click="onUnBind"
+                            >
                                 {{ $t('commons.button.unbind') }}
                             </el-button>
-                            <el-button v-if="!baseInfo.isBind" v-permission type="primary" link @click="onBind">
+                            <el-button
+                                v-if="!baseInfo.isBind"
+                                v-permission
+                                v-node-admin
+                                type="primary"
+                                link
+                                @click="onBind"
+                            >
                                 {{ $t('commons.button.bind') }}
                             </el-button>
                         </template>
 
                         <template v-if="props.currentTab == 'base'">
                             <el-divider direction="vertical" />
-                            <el-button link type="primary" v-permission @click="onOpenWhiteList" plain>
+                            <el-button link type="primary" v-permission v-node-admin @click="onOpenWhiteList" plain>
                                 {{ $t('firewall.portWhiteList') }}
                             </el-button>
                         </template>
@@ -61,6 +77,7 @@
                             <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
                             <el-switch
                                 v-permission
+                                v-node-admin
                                 size="small"
                                 class="ml-2"
                                 inactive-value="Disable"

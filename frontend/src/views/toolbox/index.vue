@@ -3,11 +3,11 @@
         <RouterButton :buttons="buttons">
             <template #route-button>
                 <div class="router-button">
-                    <el-button v-permission link type="primary" @click="onRestart('1panel')">
+                    <el-button v-permission v-node-admin link type="primary" @click="onRestart('1panel')">
                         {{ $t('home.restart_1panel') }}
                     </el-button>
                     <el-divider direction="vertical" />
-                    <el-button v-permission link type="primary" @click="onRestart('system')">
+                    <el-button v-permission v-node-admin link type="primary" @click="onRestart('system')">
                         {{ $t('home.restart_system') }}
                     </el-button>
                 </div>
