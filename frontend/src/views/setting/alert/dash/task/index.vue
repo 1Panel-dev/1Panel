@@ -597,7 +597,7 @@ const allTaskOptions = [
     {
         value: 'nodeException',
         label: 'xpack.alert.nodeException',
-        show: isMaster.value && isProductPro.value && !isEE.value,
+        show: isMaster.value && isProductPro.value,
     },
     { value: 'cpu', label: 'xpack.alert.cpu', show: true },
     { value: 'memory', label: 'xpack.alert.memory', show: true },
