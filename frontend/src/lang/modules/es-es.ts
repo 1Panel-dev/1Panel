@@ -5531,6 +5531,7 @@ const message = {
             alertNotice: 'Notificación de alerta',
             methodConfig: 'Config de métodos de notificación',
             createMethod: 'Crear método de notificación',
+            methodInvalid: 'Configuración inválida {0}',
             commonConfig: 'Config global',
             smsConfig: 'SMS',
             smsConfigHelper: 'Configura teléfonos para notificaciones SMS',

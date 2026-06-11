@@ -5575,6 +5575,7 @@ const message = {
             alertNotice: 'Уведомление об оповещении',
             methodConfig: 'Настройка способа уведомления',
             createMethod: 'Создать способ уведомления',
+            methodInvalid: 'Недопустимая конфигурация {0}',
             commonConfig: 'Глобальная настройка',
             smsConfig: 'SMS',
             smsConfigHelper: 'Настройка номеров для SMS-уведомлений',

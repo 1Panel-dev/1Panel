@@ -30,7 +30,7 @@
                                 :label="$t('xpack.alert.licenseException')"
                             />
                             <el-option
-                                v-if="isProductPro && !isEE"
+                                v-if="isProductPro"
                                 value="nodeException"
                                 :label="$t('xpack.alert.nodeException')"
                             />
@@ -214,7 +214,7 @@ const openView = async (
     rowData: Partial<Alert.AlertInfo> = {
         type: isMaster.value && !isEE.value ? 'panelPwdEndTime' : 'sshLogin',
         cycle: 15,
-        count: 0,
+        count: isMaster.value && !isEE.value ? 0 : 3,
         sendCount: 3,
         method: '',
         project: '',
@@ -300,9 +300,12 @@ const formatMethod = (row: Alert.AlertInfo) => {
                 return typeLabel;
             }
         }
+        const invalidLabel = /^\d+$/.test(method)
+            ? i18n.global.t('xpack.alert.methodInvalid', [`#${method}`])
+            : i18n.global.t('xpack.alert.methodInvalid', [method]);
         const oldLabel = i18n.global.t(`xpack.alert.${method}`);
         if (!oldLabel || oldLabel === `xpack.alert.${method}` || oldLabel.includes('.')) {
-            return /^\d+$/.test(method) ? `#${method}` : method;
+            return invalidLabel;
         }
         return oldLabel;
     };

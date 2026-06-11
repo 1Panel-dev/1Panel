@@ -5100,6 +5100,7 @@ const message = {
             alertNotice: '警報通知',
             methodConfig: '發送方式設定',
             createMethod: '建立發送方式',
+            methodInvalid: '失效設定 {0}',
             commonConfig: '全域設定',
             smsConfig: '簡訊',
             smsConfigHelper: '設定簡訊通知號碼',

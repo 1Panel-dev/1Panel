@@ -5505,6 +5505,7 @@ const message = {
             alertNotice: 'アラート通知',
             methodConfig: '通知方法の設定',
             createMethod: '通知方法を作成',
+            methodInvalid: '無効な設定 {0}',
             commonConfig: 'グローバル設定',
             smsConfig: 'SMS',
             smsConfigHelper: 'SMS 通知の電話番号を設定する',
