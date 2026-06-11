@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -12,6 +13,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-acme/lego/v5/certificate"
@@ -32,9 +34,64 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssl"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
+	gormv2 "gorm.io/gorm"
 )
 
 type WebsiteSSLService struct {
+}
+
+const sslObtainTimeout = time.Hour
+
+var legoLogMu sync.Mutex
+
+func withLegoLogger(logger *log.Logger, fn func() error) error {
+	if logger == nil {
+		logger = log.New(io.Discard, "", log.LstdFlags)
+	}
+
+	legoLogMu.Lock()
+	defer legoLogMu.Unlock()
+
+	oldLogger := legoLogger.Default()
+	legoLogger.SetDefault(slog.New(slog.NewTextHandler(logger.Writer(), nil)))
+	defer legoLogger.SetDefault(oldLogger)
+
+	return fn()
+}
+
+func withLegoLoggerTimeout(logger *log.Logger, timeout time.Duration, fn func(context.Context) error) error {
+	return withLegoLogger(logger, func() error {
+		ctx, cancel := context.WithTimeout(context.Background(), timeout)
+		defer cancel()
+		return fn(ctx)
+	})
+}
+
+func newWebsiteSSLLegoClient(ctx context.Context, acmeAccount *model.WebsiteAcmeAccount) (*ssl.AcmeClient, error) {
+	client, err := ssl.NewAcmeClientWithContext(ctx, acmeAccount, getSystemProxy(acmeAccount.UseProxy))
+	if err == nil {
+		return client, nil
+	}
+	if !errors.Is(err, ssl.ErrAcmeAccountURLMissing) {
+		return nil, err
+	}
+
+	client, err = ssl.NewRegisterClientWithContext(ctx, acmeAccount, getSystemProxy(acmeAccount.UseProxy))
+	if err != nil {
+		return nil, err
+	}
+	if client.User.GetRegistration() == nil || client.User.GetRegistration().Location == "" {
+		return nil, ssl.ErrAcmeAccountURLMissing
+	}
+
+	acmeAccount.URL = client.User.GetRegistration().Location
+	if acmeAccount.PrivateKey == "" {
+		return nil, errors.New("private key can not blank")
+	}
+	if err := websiteAcmeRepo.Save(*acmeAccount); err != nil {
+		return nil, err
+	}
+	return client, nil
 }
 
 type IWebsiteSSLService interface {
@@ -66,7 +123,7 @@ func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []respo
 	if search.OrderBy != "" && search.Order != "null" {
 		opts = append(opts, repo.WithOrderRuleBy(search.OrderBy, search.Order))
 	} else {
-		opts = append(opts, repo.WithOrderDesc("created_at"))
+		opts = append(opts, repo.WithOrderDesc("updated_at"))
 	}
 	if search.Domain != "" {
 		opts = append(opts, websiteSSLRepo.WithByDomain(search.Domain))
@@ -99,7 +156,7 @@ func (w WebsiteSSLService) Search(search request.WebsiteSSLListReq) ([]response.
 		opts   []repo.DBOption
 		result []response.WebsiteSSLDTO
 	)
-	opts = append(opts, repo.WithOrderDesc("created_at"))
+	opts = append(opts, repo.WithOrderDesc("updated_at"))
 	if search.AcmeAccountID != "" {
 		acmeAccountID, err := strconv.ParseUint(search.AcmeAccountID, 10, 64)
 		if err != nil {
@@ -330,18 +387,22 @@ func (w WebsiteSSLService) AutoRenewSSL(id uint) error {
 
 func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 	var (
-		err          error
-		websiteSSL   *model.WebsiteSSL
-		acmeAccount  *model.WebsiteAcmeAccount
-		dnsAccount   *model.WebsiteDnsAccount
-		client       *ssl.AcmeClient
-		manualClient *ssl.ManualClient
-		resource     certificate.Resource
+		err         error
+		websiteSSL  *model.WebsiteSSL
+		acmeAccount *model.WebsiteAcmeAccount
+		dnsAccount  *model.WebsiteDnsAccount
+		logFile     *os.File
+		logger      *log.Logger
+		resource    certificate.Resource
+		httpRoot    string
 	)
 
 	websiteSSL, err = websiteSSLRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return err
+	}
+	if websiteSSL.Status == constant.SSLApply {
+		return buserr.New("InExecuting")
 	}
 	acmeAccount, err = websiteAcmeRepo.GetFirst(repo.WithByID(websiteSSL.AcmeAccountID))
 	if err != nil {
@@ -352,18 +413,10 @@ func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 		domains = append(domains, strings.Split(websiteSSL.Domains, ",")...)
 	}
 	if websiteSSL.Provider != constant.DnsManual {
-		client, err = ssl.NewAcmeClient(acmeAccount, getSystemProxy(acmeAccount.UseProxy))
-		if err != nil {
-			return err
-		}
-
 		switch websiteSSL.Provider {
 		case constant.DNSAccount:
 			dnsAccount, err = websiteDnsRepo.GetFirst(repo.WithByID(websiteSSL.DnsAccountID))
 			if err != nil {
-				return err
-			}
-			if err = client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization, *websiteSSL); err != nil {
 				return err
 			}
 		case constant.Http:
@@ -379,55 +432,83 @@ func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 					return buserr.New("ErrWildcardDomain")
 				}
 			}
-			if err := client.UseHTTP(path.Join(appInstall.GetPath(), "root")); err != nil {
-				return err
-			}
+			httpRoot = path.Join(appInstall.GetPath(), "root")
 		}
 	}
-	websiteSSL.Status = constant.SSLApply
-	err = websiteSSLRepo.Save(websiteSSL)
+	marked, err := websiteSSLRepo.TryMarkApplying(websiteSSL.ID)
 	if err != nil {
 		return err
 	}
+	if !marked {
+		return buserr.New("InExecuting")
+	}
+	websiteSSL.Status = constant.SSLApply
 
-	go func() {
-		logFile, logger := newWebsiteSSLLogger(websiteSSL, autoRenew)
+	logFile, logger = newWebsiteSSLLogger(websiteSSL, autoRenew)
+	logFileOwnedByGoroutine := false
+	if logFile != nil {
+		defer func() {
+			if !logFileOwnedByGoroutine {
+				_ = logFile.Close()
+			}
+		}()
+	}
+	startMsg := i18n.GetMsgWithMap("ApplySSLStart", map[string]interface{}{"domain": strings.Join(domains, ","), "type": i18n.GetMsgByKey(websiteSSL.Provider)})
+	if websiteSSL.Provider == constant.DNSAccount {
+		startMsg = startMsg + i18n.GetMsgWithMap("DNSAccountName", map[string]interface{}{"name": dnsAccount.Name, "type": dnsAccount.Type})
+	}
+	logger.Println(startMsg)
+
+	logFileOwnedByGoroutine = true
+	go func(logFile *os.File, logger *log.Logger) {
 		if logFile != nil {
-			defer logFile.Close()
+			defer func() {
+				_ = logFile.Close()
+			}()
 		}
-		// lego v5 switched to slog. Bridge it to the existing *log.Logger
-		// so the SSL apply log is still written to the per-domain file
-		// under SSLLogDir.
-		legoLogger.SetDefault(slog.New(slog.NewTextHandler(logger.Writer(), nil)))
-		startMsg := i18n.GetMsgWithMap("ApplySSLStart", map[string]interface{}{"domain": strings.Join(domains, ","), "type": i18n.GetMsgByKey(websiteSSL.Provider)})
-		if websiteSSL.Provider == constant.DNSAccount {
-			startMsg = startMsg + i18n.GetMsgWithMap("DNSAccountName", map[string]interface{}{"name": dnsAccount.Name, "type": dnsAccount.Type})
-		}
-		logger.Println(startMsg)
 		if websiteSSL.Provider != constant.DnsManual {
 			privateKey, err := ssl.GetPrivateKeyByType(websiteSSL.KeyType, websiteSSL.PrivateKey)
 			if err != nil {
-				handleError(websiteSSL, err)
+				handleError(websiteSSL, logger, err)
 				return
 			}
-			if websiteSSL.IsIp {
-				resource, err = client.ObtainIPSSL(domains[0], privateKey)
-			} else {
-				resource, err = client.ObtainSSL(domains, privateKey)
-			}
+			err = withLegoLoggerTimeout(logger, sslObtainTimeout, func(ctx context.Context) error {
+				client, err := newWebsiteSSLLegoClient(ctx, acmeAccount)
+				if err != nil {
+					return err
+				}
+				switch websiteSSL.Provider {
+				case constant.DNSAccount:
+					if err = client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization, *websiteSSL); err != nil {
+						return err
+					}
+				case constant.Http:
+					if err = client.UseHTTP(httpRoot); err != nil {
+						return err
+					}
+				}
+				if websiteSSL.IsIp {
+					resource, err = client.ObtainIPSSL(ctx, domains[0], privateKey)
+				} else {
+					resource, err = client.ObtainSSL(ctx, domains, privateKey)
+				}
+				return err
+			})
 			if err != nil {
-				handleError(websiteSSL, err)
+				handleError(websiteSSL, logger, err)
 				return
 			}
 		} else {
-			manualClient, err = ssl.NewCustomAcmeClient(acmeAccount, logger)
+			manualClient, err := ssl.NewCustomAcmeClient(acmeAccount, getSystemProxy(acmeAccount.UseProxy), logger)
 			if err != nil {
-				handleError(websiteSSL, err)
+				handleError(websiteSSL, logger, err)
 				return
 			}
-			resource, err = manualClient.RequestCertificate(context.Background(), websiteSSL)
+			ctx, cancel := context.WithTimeout(context.Background(), sslObtainTimeout)
+			resource, err = manualClient.RequestCertificate(ctx, websiteSSL)
+			cancel()
 			if err != nil {
-				handleError(websiteSSL, err)
+				handleError(websiteSSL, logger, err)
 				return
 			}
 		}
@@ -435,10 +516,9 @@ func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 		websiteSSL.PrivateKey = string(resource.PrivateKey)
 		websiteSSL.Pem = string(resource.Certificate)
 		websiteSSL.CertURL = resource.CertURL
-		certBlock, _ := pem.Decode(resource.Certificate)
-		cert, err := x509.ParseCertificate(certBlock.Bytes)
+		cert, err := parseCertificatePEM(resource.Certificate)
 		if err != nil {
-			handleError(websiteSSL, err)
+			handleError(websiteSSL, logger, err)
 			return
 		}
 		websiteSSL.ExpireDate = cert.NotAfter
@@ -494,7 +574,7 @@ func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 			}
 			printSSLLog(logger, "PushSSLToNodeSuccess", nil)
 		}
-	}()
+	}(logFile, logger)
 
 	return nil
 }
@@ -516,16 +596,24 @@ func runShellScriptFile(workDir, shell string, logger *log.Logger) error {
 	return cmdMgr.Run("bash", file.Name())
 }
 
-func handleError(websiteSSL *model.WebsiteSSL, err error) {
+func parseCertificatePEM(certPEM []byte) (*x509.Certificate, error) {
+	certBlock, _ := pem.Decode(certPEM)
+	if certBlock == nil {
+		return nil, errors.New("invalid certificate PEM")
+	}
+	return x509.ParseCertificate(certBlock.Bytes)
+}
+
+func handleError(websiteSSL *model.WebsiteSSL, logger *log.Logger, err error) {
 	if websiteSSL.Status == constant.SSLInit || websiteSSL.Status == constant.SSLError {
 		websiteSSL.Status = constant.StatusError
 	} else {
 		websiteSSL.Status = constant.SSLApplyError
 	}
 	websiteSSL.Message = err.Error()
-	// lego v5 uses slog; use the same global default logger to write the
-	// failure message to the SSL log.
-	legoLogger.Default().Error(i18n.GetErrMsg("ApplySSLFailed", map[string]interface{}{"domain": websiteSSL.PrimaryDomain, "detail": err.Error()}))
+	if logger != nil {
+		logger.Println(i18n.GetErrMsg("ApplySSLFailed", map[string]interface{}{"domain": websiteSSL.PrimaryDomain, "detail": err.Error()}))
+	}
 	_ = websiteSSLRepo.Save(websiteSSL)
 }
 
@@ -534,7 +622,7 @@ func (w WebsiteSSLService) GetDNSResolve(req request.WebsiteDNSReq) ([]response.
 	if err != nil {
 		return nil, err
 	}
-	client, err := ssl.NewCustomAcmeClient(acmeAccount, nil)
+	client, err := ssl.NewCustomAcmeClient(acmeAccount, getSystemProxy(acmeAccount.UseProxy), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -580,7 +668,7 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 	for _, id := range ids {
 		if websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(id)); len(websites) > 0 {
 			oldSSL, _ := websiteSSLRepo.GetFirst(repo.WithByID(id))
-			if oldSSL.ID > 0 {
+			if oldSSL != nil && oldSSL.ID > 0 {
 				websiteSSLS = append(websiteSSLS, oldSSL.PrimaryDomain)
 			}
 			continue
@@ -608,12 +696,13 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 					global.LOG.Errorf("Failed to get acme account for SSL revoke, err: %v", err)
 					return
 				}
-				client, err := ssl.NewAcmeClient(acmeAccount, getSystemProxy(acmeAccount.UseProxy))
-				if err != nil {
-					global.LOG.Errorf("Failed to create ACME client for SSL revoke, err: %v", err)
-					return
-				}
-				err = client.RevokeSSL([]byte(websiteSSL.Pem))
+				err = withLegoLogger(nil, func() error {
+					client, err := newWebsiteSSLLegoClient(context.Background(), acmeAccount)
+					if err != nil {
+						return err
+					}
+					return client.RevokeSSL([]byte(websiteSSL.Pem))
+				})
 				if err != nil {
 					global.LOG.Errorf("Failed to revoke SSL for domain %s, err: %v", websiteSSL.PrimaryDomain, err)
 					return
@@ -851,7 +940,13 @@ func (w WebsiteSSLService) SyncForRestart() error {
 }
 
 func (w WebsiteSSLService) ImportMasterSSL(create model.WebsiteSSL) error {
-	websiteSSL, _ := websiteSSLRepo.GetFirst(websiteSSLRepo.WithByMasterSSLID(create.ID))
+	websiteSSL, err := websiteSSLRepo.GetFirst(websiteSSLRepo.WithByMasterSSLID(create.ID))
+	if err != nil {
+		if !errors.Is(err, gormv2.ErrRecordNotFound) {
+			return err
+		}
+		websiteSSL = &model.WebsiteSSL{}
+	}
 	websiteSSL.Status = constant.SSLReady
 	websiteSSL.Provider = constant.FromMaster
 	websiteSSL.PrimaryDomain = create.PrimaryDomain
@@ -865,8 +960,14 @@ func (w WebsiteSSLService) ImportMasterSSL(create model.WebsiteSSL) error {
 	websiteSSL.Organization = create.Organization
 	websiteSSL.MasterSSLID = create.ID
 	websiteSSL.Domains = create.Domains
-	if err := websiteSSLRepo.Save(websiteSSL); err != nil {
-		return err
+	if websiteSSL.ID == 0 {
+		if err := websiteSSLRepo.Create(context.Background(), websiteSSL); err != nil {
+			return err
+		}
+	} else {
+		if err := websiteSSLRepo.Save(websiteSSL); err != nil {
+			return err
+		}
 	}
 	websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(websiteSSL.ID))
 	if len(websites) == 0 {

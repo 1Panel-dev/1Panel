@@ -10,14 +10,17 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
+	"log"
+	"net"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/go-acme/lego/v5/certificate"
 	"github.com/miekg/dns"
 	"golang.org/x/crypto/acme"
-	"log"
-	"net"
-	"strings"
-	"time"
 )
 
 type ManualClient struct {
@@ -30,7 +33,34 @@ type RequestCertRequest struct {
 	WebsiteSSL *model.WebsiteSSL
 }
 
-func NewCustomAcmeClient(acmeAccount *model.WebsiteAcmeAccount, logger *log.Logger) (*ManualClient, error) {
+var manualOrders sync.Map
+
+func loadManualOrder(sslID uint) (*acme.Order, bool) {
+	value, ok := manualOrders.Load(sslID)
+	if !ok {
+		return nil, false
+	}
+	order, ok := value.(*acme.Order)
+	return order, ok && order != nil
+}
+
+func storeManualOrder(sslID uint, order *acme.Order) {
+	if order == nil {
+		manualOrders.Delete(sslID)
+		return
+	}
+	manualOrders.Store(sslID, order)
+}
+
+func deleteManualOrder(sslID uint, order *acme.Order) {
+	if order == nil {
+		manualOrders.Delete(sslID)
+		return
+	}
+	manualOrders.CompareAndDelete(sslID, order)
+}
+
+func NewCustomAcmeClient(acmeAccount *model.WebsiteAcmeAccount, proxy *dto.SystemProxy, logger *log.Logger) (*ManualClient, error) {
 	key, err := parsePrivateKeyPEM([]byte(acmeAccount.PrivateKey))
 	if err != nil {
 		return nil, err
@@ -38,9 +68,20 @@ func NewCustomAcmeClient(acmeAccount *model.WebsiteAcmeAccount, logger *log.Logg
 	if logger == nil {
 		logger = log.Default()
 	}
+	var (
+		proxyURL      string
+		proxyUser     string
+		proxyPassword string
+	)
+	if proxy != nil {
+		proxyURL = fmt.Sprintf("%s://%s:%s", proxy.Type, proxy.URL, proxy.Port)
+		proxyUser = proxy.User
+		proxyPassword = proxy.Password
+	}
 
 	client := &acme.Client{
 		Key:          key,
+		HTTPClient:   createHTTPClientWithProxy(proxyURL, proxyUser, proxyPassword),
 		DirectoryURL: getCaDirURL(acmeAccount.Type, acmeAccount.CaDirURL),
 	}
 	return &ManualClient{
@@ -61,7 +102,7 @@ func (c *ManualClient) GetDNSResolve(ctx context.Context, websiteSSL *model.Webs
 	var err error
 
 	// Check if we have an existing valid order for this SSL
-	existingOrder, exists := Orders[websiteSSL.ID]
+	existingOrder, exists := loadManualOrder(websiteSSL.ID)
 	if exists && existingOrder != nil {
 		// Verify the order is still valid (not expired and still pending)
 		// If Expires is zero, order is still valid (ACME doesn't always set expiry immediately)
@@ -75,7 +116,7 @@ func (c *ManualClient) GetDNSResolve(ctx context.Context, websiteSSL *model.Webs
 			// If extraction failed, fall through to create a new order
 		}
 		// Existing order is expired or invalid, remove it
-		delete(Orders, websiteSSL.ID)
+		deleteManualOrder(websiteSSL.ID, existingOrder)
 	}
 
 	// Create a new order
@@ -83,7 +124,7 @@ func (c *ManualClient) GetDNSResolve(ctx context.Context, websiteSSL *model.Webs
 	if err != nil {
 		return nil, err
 	}
-	Orders[websiteSSL.ID] = order
+	storeManualOrder(websiteSSL.ID, order)
 
 	return c.extractDNSChallenges(ctx, order)
 }
@@ -178,6 +219,9 @@ func (c *ManualClient) handleAuthorization(ctx context.Context, authzURL string,
 	c.logger.Printf("[INFO] [%s] acme: Checking TXT record  %s", domain, expectedRecord)
 
 	for {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		c.logger.Printf("[INFO] [%s] acme: Checking DNS record propagation.", domain)
 		var currentRecords map[string][]string
 		var queryErr error
@@ -218,7 +262,9 @@ func (c *ManualClient) handleAuthorization(ctx context.Context, authzURL string,
 			c.logger.Printf("[INFO] [%s] TXT record mismatch for %s: expected %s, got %v", domain, domain, expectedRecord, providedRecords)
 			return fmt.Errorf("TXT record mismatch for %s: expected %s, got %v", domain, expectedRecord, providedRecords)
 		}
-		time.Sleep(pollingInterval)
+		if err := waitForRetry(ctx, pollingInterval); err != nil {
+			return err
+		}
 	}
 
 	_, err = c.client.Accept(ctx, dnsChallenge)
@@ -226,7 +272,9 @@ func (c *ManualClient) handleAuthorization(ctx context.Context, authzURL string,
 		return fmt.Errorf("failed to accept challenge: %v", err)
 	}
 	for {
-		time.Sleep(pollingInterval)
+		if err := waitForRetry(ctx, pollingInterval); err != nil {
+			return err
+		}
 		authz, err = c.client.GetAuthorization(ctx, authzURL)
 		if err != nil {
 			return fmt.Errorf("failed to get authorization while polling: %v", err)
@@ -299,11 +347,11 @@ func (c *ManualClient) RequestCertificate(ctx context.Context, websiteSSL *model
 		return res, err
 	}
 
-	order, ok := Orders[websiteSSL.ID]
+	order, ok := loadManualOrder(websiteSSL.ID)
 	if !ok {
 		return res, fmt.Errorf("order not found")
 	}
-	defer delete(Orders, websiteSSL.ID)
+	defer deleteManualOrder(websiteSSL.ID, order)
 
 	for _, authzURL := range order.AuthzURLs {
 		if err := c.handleAuthorization(ctx, authzURL, getNameservers(*websiteSSL)); err != nil {
