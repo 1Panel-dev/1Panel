@@ -240,7 +240,7 @@ func (c *CommandHelper) pipeContext() (context.Context, context.CancelFunc) {
 func (c *CommandHelper) buildPipeCommands(ctx context.Context, commands []PipeCommand) []*exec.Cmd {
 	cmds := make([]*exec.Cmd, 0, len(commands))
 	for _, item := range commands {
-		cmdItem := exec.CommandContext(ctx, item.Name, filterEmptyArgs(item.Args)...)
+		cmdItem := exec.CommandContext(ctx, item.Name, item.Args...)
 		cmdItem.Env = append(os.Environ(), c.env...)
 		cmdItem.Env = append(cmdItem.Env, item.Env...)
 		cmdItem.Dir = c.workDir
@@ -305,7 +305,6 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 	var newContext context.Context
 	var cancel context.CancelFunc
 	var outputFile *os.File
-	arg = filterEmptyArgs(arg)
 
 	if c.timeout != 0 {
 		if c.context == nil {
@@ -410,20 +409,6 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 		<-done
 		return "", err
 	}
-}
-
-func filterEmptyArgs(args []string) []string {
-	if len(args) == 0 {
-		return args
-	}
-	filtered := args[:0]
-	for _, arg := range args {
-		if arg == "" {
-			continue
-		}
-		filtered = append(filtered, arg)
-	}
-	return filtered
 }
 
 func contextDone(ctx context.Context) <-chan struct{} {
