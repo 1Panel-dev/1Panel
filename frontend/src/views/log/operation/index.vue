@@ -16,9 +16,11 @@
                     <el-option :label="$t('logs.detail.apps')" value="apps" />
                     <el-option :label="$t('logs.detail.openresty')" value="openresty" />
                     <el-option :label="$t('logs.detail.websites')" value="websites" />
+                    <el-option :label="$t('logs.detail.monitor')" value="monitor" />
                     <el-option :label="$t('logs.detail.runtimes')" value="runtimes" />
                     <el-option :label="$t('logs.detail.ai')" value="ai" />
                     <el-option :label="$t('logs.detail.ai_proxy')" value="ai-proxy" />
+                    <el-option :label="$t('logs.detail.ai_benchmark')" value="ai_benchmark" />
                     <el-option :label="$t('logs.detail.skills_hub')" value="skills-hub" />
                     <el-option :label="$t('logs.detail.databases')" value="databases" />
                     <el-option :label="$t('logs.detail.containers')" value="containers" />
@@ -37,6 +39,7 @@
                     <el-option :label="$t('logs.detail.alert')" value="alert" />
                     <el-option :label="$t('logs.detail.backups')" value="backups" />
                     <el-option :label="$t('logs.detail.groups')" value="groups" />
+                    <el-option :label="$t('logs.detail.roles')" value="roles" />
                     <el-option :label="$t('logs.detail.commands')" value="commands" />
                 </el-select>
                 <el-select v-model="searchStatus" @change="search()" clearable class="p-w-200">
