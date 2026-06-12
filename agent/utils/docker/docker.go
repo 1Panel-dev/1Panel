@@ -208,6 +208,12 @@ func (c Client) PullImageWithProcessAndOptions(task *task.Task, imageName string
 			}
 			return err
 		}
+		if msg, ok := progress["errorDetail"]; ok {
+			return fmt.Errorf("image pull failed, err: %v", msg)
+		}
+		if msg, ok := progress["error"]; ok {
+			return fmt.Errorf("image pull failed, err: %v", msg)
+		}
 		status, _ := progress["status"].(string)
 		if status == "Downloading" || status == "Extracting" {
 			logProcess(progress, task)

@@ -788,6 +788,15 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 					err = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
 					return err
 				}
+				exist, err := dockerCLi.ImageExists(image)
+				if err != nil {
+					err = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
+					return err
+				}
+				if !exist {
+					err = buserr.WithNameAndErr("ErrDockerPullImage", "", fmt.Errorf("image %s not found", image))
+					return err
+				}
 				t.LogSuccess(i18n.GetMsgByKey("PullImage"))
 			}
 		}
