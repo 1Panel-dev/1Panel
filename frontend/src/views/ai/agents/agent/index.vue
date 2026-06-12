@@ -455,9 +455,9 @@ const openCreateFromQuery = async () => {
     await router.replace({ path: route.path, query: nextQuery });
 };
 
-const openTaskLog = (taskID: string) => {
+const openTaskLog = (taskID: string, operateNode?: string) => {
     if (taskLogRef.value?.openWithTaskID) {
-        taskLogRef.value.openWithTaskID(taskID);
+        taskLogRef.value.openWithTaskID(taskID, undefined, operateNode);
     }
 };
 
