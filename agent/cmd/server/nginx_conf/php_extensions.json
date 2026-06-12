@@ -434,5 +434,12 @@
     "file": "lz4.so",
     "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84","85"],
     "installed": false
+  },
+  {
+    "name": "msgpack",
+    "check": "msgpack",
+    "file": "msgpack.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84","85"],
+    "installed": false
   }
 ]
