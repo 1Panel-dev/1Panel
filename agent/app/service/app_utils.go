@@ -765,33 +765,6 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			install.Env = string(paramByte)
 			content = setVllmImageInEnvContent(content, image)
 		}
-		if req.PullImage {
-			composeContent := []byte(detail.DockerCompose)
-			if install.App.Key == vllmAppKeyForUpgrade {
-				composeContent = []byte(install.DockerCompose)
-			}
-			if req.DockerCompose != "" {
-				composeContent = []byte(req.DockerCompose)
-			}
-			images, err := docker.GetImagesFromDockerCompose(content, composeContent)
-			if err != nil {
-				return err
-			}
-			dockerCLi, err := docker.NewClient()
-			if err != nil {
-				return err
-			}
-			defer dockerCLi.Close()
-			for _, image := range images {
-				t.Log(i18n.GetWithName("PullImageStart", image))
-				if err = dockerCLi.PullImageWithProcess(t, image); err != nil {
-					err = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
-					return err
-				}
-				t.LogSuccess(i18n.GetMsgByKey("PullImage"))
-			}
-		}
-
 		_ = copyAppDetailMissing(fileOp, detailDir, install.GetPath())
 		if install.App.Key == constant.AppOpenresty {
 			installBuildDir := path.Join(install.GetPath(), "build")
@@ -846,6 +819,29 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		install.DockerCompose = newCompose
 		install.Version = detail.Version
 		install.AppDetailId = req.DetailID
+
+		if req.PullImage {
+			images, err := docker.GetImagesFromDockerCompose(content, []byte(install.DockerCompose))
+			if err != nil {
+				return err
+			}
+			dockerCLi, err := docker.NewClient()
+			if err != nil {
+				return err
+			}
+			defer dockerCLi.Close()
+			for _, image := range images {
+				t.Log(i18n.GetWithName("PullImageStart", image))
+				if err = dockerCLi.PullImageWithProcess(t, image); err != nil {
+					return buserr.WithNameAndErr("ErrDockerPullImage", "", err)
+				}
+				exist, err := dockerCLi.ImageExists(image)
+				if err != nil || !exist {
+					return buserr.WithNameAndErr("ErrDockerPullImage", "", fmt.Errorf("image %s does not exist after pull: %v", image, err))
+				}
+				t.LogSuccess(i18n.GetMsgByKey("PullImage"))
+			}
+		}
 
 		if out, err := compose.Down(install.GetComposePath()); err != nil {
 			if out != "" {
