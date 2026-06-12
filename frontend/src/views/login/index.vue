@@ -6,7 +6,7 @@
             class="bg-white shadow-lg relative z-10 border border-gray-200 flex overflow-hidden"
             id="login-container"
         >
-            <div class="grid grid-cols-1 md:grid-cols-2 items-stretch w-full">
+            <div class="grid items-stretch w-full" :style="loginGridStyle">
                 <div v-if="showLogo" class="flex justify-center" :style="{ height: containerHeight }">
                     <img
                         v-show="imgLoaded"
@@ -144,9 +144,12 @@ const { width } = useWindowSize();
 const showLogo = computed(() => width.value >= FIXED_WIDTH);
 const containerWidth = computed(() => `${FIXED_WIDTH}px`);
 const containerHeight = computed(() => `${FIXED_HEIGHT}px`);
+const loginGridStyle = computed(() => ({
+    gridTemplateColumns: showLogo.value ? 'repeat(2, minmax(0, 1fr))' : 'minmax(0, 1fr)',
+}));
 const loginFormClass = computed(() => {
     return showLogo.value
-        ? 'hidden md:flex items-center justify-center p-4'
-        : 'flex items-center justify-center p-4 w-full';
+        ? 'flex items-center justify-center p-4 min-w-0'
+        : 'flex items-center justify-center p-4 w-full min-w-0';
 });
 </script>
