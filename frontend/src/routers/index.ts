@@ -105,6 +105,9 @@ router.beforeEach(async (to, from, next) => {
     if (to.path === '/apps/all' && to.query.install != undefined) {
         return next();
     }
+    if (to.name === 'Expired') {
+        return next();
+    }
     const activeMenuKey = 'cachedRoute' + (to.meta.activeMenu || '');
     if (to.query.uncached != undefined) {
         const query = { ...to.query };
