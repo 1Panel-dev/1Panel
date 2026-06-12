@@ -225,7 +225,7 @@ func getDNSProviderConfig(dnsType DnsType, params string, httpClient *http.Clien
 		p, err = huaweicloud.NewDNSProviderConfig(config)
 	case Ionos:
 		config := newDNSProviderConfig(ionos.NewDefaultConfig(), httpClient)
-		config.APIKey = param.APIPrefix + '.' + param.APISecret
+		config.APIKey = param.APIPrefix + "." + param.APISecret
 		config.PropagationTimeout = propagationTimeout
 		config.PollingInterval = pollingInterval
 		config.TTL = ttl
