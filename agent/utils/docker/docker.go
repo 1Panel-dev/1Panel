@@ -199,20 +199,33 @@ func (c Client) PullImageWithProcessAndOptions(task *task.Task, imageName string
 		return err
 	}
 	defer out.Close()
+	return handlePullImageProcess(out, task)
+}
+
+func handlePullImageProcess(out io.Reader, task *task.Task) error {
 	decoder := json.NewDecoder(out)
 	for {
 		var progress map[string]interface{}
-		if err = decoder.Decode(&progress); err != nil {
+		if err := decoder.Decode(&progress); err != nil {
 			if err == io.EOF {
 				break
 			}
 			return err
 		}
-		status, _ := progress["status"].(string)
-		if status == "Downloading" || status == "Extracting" {
-			logProcess(progress, task)
+		if msg, ok := progress["errorDetail"]; ok {
+			return fmt.Errorf("image pull failed, err: %v", msg)
 		}
-		if status == "Pull complete" || status == "Download complete" {
+		if msg, ok := progress["error"]; ok {
+			return fmt.Errorf("image pull failed, err: %v", msg)
+		}
+		if task == nil {
+			continue
+		}
+		status, _ := progress["status"].(string)
+		switch status {
+		case "Downloading", "Extracting":
+			logProcess(progress, task)
+		case "Pull complete", "Download complete", "Already exists", "Verifying Checksum":
 			id, _ := progress["id"].(string)
 			progressStr := fmt.Sprintf("%s %s", status, id)
 			_ = setLog(id, progressStr, task)
