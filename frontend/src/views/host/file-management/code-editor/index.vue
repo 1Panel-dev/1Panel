@@ -1007,7 +1007,7 @@ const loadHistoryVersionCount = async (path: string) => {
 };
 
 const saveContent = async () => {
-    if (!hasManagePermissionAccess()) {
+    if (!hasManagePermissionAccess(undefined, { nodeAdmin: true })) {
         MsgError(i18n.global.t('commons.res.forbidden'));
         return;
     }

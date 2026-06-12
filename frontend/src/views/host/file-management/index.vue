@@ -1367,11 +1367,11 @@ const handleCreate = (command: string) => {
 };
 
 const delFile = async (row: File.File | null) => {
-    deleteRef.value.acceptParams([row]);
+    deleteRef.value.acceptParams([row], currentNode.value);
 };
 
 const batchDelFiles = () => {
-    deleteRef.value.acceptParams(selects.value);
+    deleteRef.value.acceptParams(selects.value, currentNode.value);
 };
 
 const formatFileSize = (size: number) => {
