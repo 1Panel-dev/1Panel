@@ -570,7 +570,6 @@ const acceptParams = (params: DialogProps): void => {
     }
     initOptions(dialogData.value.rowData.type, dialogData.value.rowData.subType);
     visible.value = true;
-    console.log(dialogData.value.rowData);
 };
 
 const rules = reactive({
