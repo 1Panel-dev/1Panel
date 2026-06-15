@@ -2888,6 +2888,8 @@ const message = {
             'Please ensure there is sufficient disk space on the server (Snapshot file size: {0}, Available space: {1})',
         recoverHelper3:
             'Please ensure the server architecture matches the architecture of the server where the snapshot was created (Current server architecture: {0})',
+        recoverHelper4:
+            'This operation only rolls back the primary node. If any upgraded secondary nodes exist, roll them back first before continuing.',
         rollback: 'Rollback',
         rollbackHelper:
             'Rolling back this recovery will replace all files from this recovery, and may require restarting Docker and 1Panel services. Continue?',

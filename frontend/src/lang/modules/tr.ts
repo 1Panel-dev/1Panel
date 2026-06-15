@@ -2949,6 +2949,8 @@ const message = {
             'Sunucuda yeterli disk alanının olduğundan emin olun (Anlık görüntü dosyası boyutu: {0}, Mevcut alan: {1})',
         recoverHelper3:
             'Sunucu mimarisinin, anlık görüntünün oluşturulduğu sunucu mimarisiyle eşleştiğinden emin olun (Geçerli sunucu mimarisi: {0})',
+        recoverHelper4:
+            'Bu işlem yalnızca ana düğümü geri alır. Yükseltilmiş alt düğümler varsa, devam etmeden önce önce bunları geri alın.',
         rollback: 'Geri al',
         rollbackHelper:
             'Bu kurtarmayı geri almak, bu kurtarmadan gelen tüm dosyaları değiştirecek ve Docker ile 1Panel servislerinin yeniden başlatılmasını gerektirebilir. Devam etmek istiyor musunuz?',

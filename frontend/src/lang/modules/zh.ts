@@ -2585,6 +2585,7 @@ const message = {
         recoverHelper1: '恢复需要重启 Docker 以及 1Panel 服务',
         recoverHelper2: '请确保服务器磁盘空间充足 ( 快照文件大小: {0}, 可用空间: {1} )',
         recoverHelper3: '请确保服务器架构与创建快照服务器架构信息保持一致 (当前服务器架构: {0} )',
+        recoverHelper4: '该操作仅回滚主节点，如存在已升级的子节点，请先回滚子节点后再执行此操作',
         rollback: '回滚',
         rollbackHelper:
             '即将回滚本次恢复，回滚将替换所有本次恢复的文件，过程中可能需要重启 Docker 以及 1Panel 服务，是否继续？',

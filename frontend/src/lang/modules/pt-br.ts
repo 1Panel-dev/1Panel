@@ -3059,6 +3059,8 @@ const message = {
             'Por favor, assegure-se de que há espaço suficiente em disco no servidor (Tamanho do arquivo de snapshot: {0}, Espaço disponível: {1})',
         recoverHelper3:
             'Por favor, assegure-se de que a arquitetura do servidor corresponda à arquitetura do servidor onde o snapshot foi criado (Arquitetura do servidor atual: {0})',
+        recoverHelper4:
+            'Esta operação faz rollback apenas do nó principal. Se houver nós secundários atualizados, faça o rollback deles primeiro antes de continuar.',
         rollback: 'Rollback',
         rollbackHelper:
             'Reverter essa recuperação substituirá todos os arquivos dessa recuperação e pode exigir reiniciar os serviços Docker e 1Panel. Você deseja continuar?',
