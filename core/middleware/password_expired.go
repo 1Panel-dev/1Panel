@@ -27,6 +27,7 @@ func PasswordExpired() gin.HandlerFunc {
 			c.Request.URL.Path == "/api/v2/core/settings/search" ||
 			c.Request.URL.Path == "/api/v2/core/settings/search/base" ||
 			c.Request.URL.Path == "/api/v2/core/xpack/settings/search" ||
+			c.Request.URL.Path == "/api/v2/core/xapp/verifyQRCode" ||
 			c.Request.URL.Path == "/api/v2/core/enterprise/users/info" ||
 			c.Request.URL.Path == "/api/v2/core/enterprise/licenses/info" ||
 			c.Request.URL.Path == "/api/v2/core/enterprise/licenses/status" ||
