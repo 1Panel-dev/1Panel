@@ -2962,6 +2962,8 @@ const message = {
             'Asegúrate de que haya suficiente espacio en disco en el servidor (Tamaño del archivo de instantánea: {0}, Espacio disponible: {1})',
         recoverHelper3:
             'Asegúrate de que la arquitectura del servidor coincida con la del servidor donde se creó la instantánea (Arquitectura actual: {0})',
+        recoverHelper4:
+            'Esta operación solo revierte el nodo principal. Si existen nodos secundarios actualizados, reviértelos primero antes de continuar.',
         rollback: 'Reversión',
         rollbackHelper:
             'Revertir esta recuperación reemplazará todos los archivos de esta recuperación y puede requerir reiniciar Docker y los servicios de 1Panel. ¿Deseas continuar?',

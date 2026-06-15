@@ -2611,6 +2611,7 @@ const message = {
         recoverHelper1: '復原需要重新啟動 Docker 以及 1Panel 服務',
         recoverHelper2: '請確保伺服器磁碟空間充足 ( 快照檔案大小: {0}, 可用空間: {1} )',
         recoverHelper3: '請確保伺服器架構與建立快照伺服器架構資訊保持一致 (目前伺服器架構: {0} )',
+        recoverHelper4: '此操作僅會回滾主節點，如存在已升級的子節點，請先回滾子節點後再執行此操作',
         rollback: '回滾',
         rollbackHelper:
             '即將回滾本次復原，回滾將取代所有本次復原的檔案，過程中可能需要重新啟動 Docker 以及 1Panel 服務，是否繼續？',

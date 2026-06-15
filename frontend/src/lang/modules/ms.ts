@@ -2946,6 +2946,8 @@ const message = {
             'Pastikan terdapat ruang cakera yang mencukupi pada pelayan (Saiz fail snapshot: {0}, Ruang tersedia: {1})',
         recoverHelper3:
             'Pastikan seni bina pelayan sepadan dengan seni bina pelayan di mana snapshot dicipta (Seni bina pelayan semasa: {0})',
+        recoverHelper4:
+            'Operasi ini hanya menggulung balik nod utama. Jika terdapat nod anak yang telah dinaik taraf, sila gulungkan balik nod anak terlebih dahulu sebelum meneruskan.',
         rollback: 'Pulangkan semula',
         rollbackHelper:
             'Pulangkan semula pemulihan ini akan menggantikan semua fail dari pemulihan ini, dan mungkin memerlukan mulakan semula perkhidmatan Docker dan 1Panel. Adakah anda mahu meneruskan?',

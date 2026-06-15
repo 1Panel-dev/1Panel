@@ -8,6 +8,10 @@
                     {{ $t('setting.recoverHelper1') }}
                 </div>
                 <div>
+                    <el-button style="margin-top: -4px" type="warning" link icon="WarningFilled" />
+                    {{ $t('setting.recoverHelper4') }}
+                </div>
+                <div>
                     <el-button
                         style="margin-top: -4px"
                         :type="isSizeOk() ? 'success' : 'danger'"
