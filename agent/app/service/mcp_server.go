@@ -400,17 +400,20 @@ func (m McpServerService) TestConnection(req request.McpServerConnectionTest) (r
 		return res, nil
 	}
 	defer httpRes.Body.Close()
-	respBody, _ := io.ReadAll(httpRes.Body)
-	if httpRes.StatusCode >= 200 && httpRes.StatusCode < 300 {
-		res.Success = true
-		res.Message = "ok"
-		return res, nil
-	}
-	res.Message = strings.TrimSpace(string(respBody))
-	if res.Message == "" {
-		res.Message = httpRes.Status
-	}
+	res.Success, res.Message = handleMcpConnectionHTTPResponse(httpRes)
 	return res, nil
+}
+
+func handleMcpConnectionHTTPResponse(httpRes *http.Response) (bool, string) {
+	if httpRes.StatusCode >= 200 && httpRes.StatusCode < 300 {
+		return true, "ok"
+	}
+	respBody, _ := io.ReadAll(httpRes.Body)
+	message := strings.TrimSpace(string(respBody))
+	if message == "" {
+		message = httpRes.Status
+	}
+	return false, message
 }
 
 func (m McpServerService) GetBindDomain() (response.McpBindDomainRes, error) {
