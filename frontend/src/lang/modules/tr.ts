@@ -1367,6 +1367,12 @@ const message = {
             streamableHttpPathHelper: 'Örneğin: /mcp, diğer Sunucularla çakışmaması gerektiğine dikkat edin',
             npxHelper: 'npx veya ikili dosya ile başlatılan mcp için uygundur',
             uvxHelper: 'uvx ile başlatılan mcp için uygundur',
+            protocolVersion: 'Protocol Version',
+            protocolVersionHelper:
+                'Only used by stateless Streamable HTTP to auto-initialize the downstream stdio MCP Server',
+            testConnection: 'Test Connection',
+            connectionSuccess: 'Connection succeeded',
+            connectionFailed: 'Connection failed',
         },
         tensorRT: {
             llm: 'TensorRT LLM',

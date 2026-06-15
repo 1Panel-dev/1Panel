@@ -21,6 +21,8 @@ type McpServerCreate struct {
 	StreamableHttpPath string        `json:"streamableHttpPath"`
 	OutputTransport    string        `json:"outputTransport" validate:"required"`
 	Type               string        `json:"type" validate:"required"`
+	GatewayImage       string        `json:"gatewayImage"`
+	ProtocolVersion    string        `json:"protocolVersion"`
 }
 
 type McpServerUpdate struct {
@@ -32,9 +34,21 @@ type McpServerDelete struct {
 	ID uint `json:"id" validate:"required"`
 }
 
+type McpServerDetail struct {
+	ID uint `json:"id" validate:"required"`
+}
+
+type McpServerStatusSync struct {
+	IDs []uint `json:"ids"`
+}
+
 type McpServerOperate struct {
 	ID      uint   `json:"id" validate:"required"`
 	Operate string `json:"operate" validate:"required"`
+}
+
+type McpServerConnectionTest struct {
+	ID uint `json:"id" validate:"required"`
 }
 
 type McpBindDomain struct {

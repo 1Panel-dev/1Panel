@@ -1371,6 +1371,12 @@ const message = {
             streamableHttpPathHelper: 'Contoh: /mcp, elakkan daripada bertindan dengan pelayan lain',
             npxHelper: 'Sesuai untuk mcp yang dimulakan dengan npx atau binari',
             uvxHelper: 'Sesuai untuk mcp yang dimulakan dengan uvx',
+            protocolVersion: 'Protocol Version',
+            protocolVersionHelper:
+                'Only used by stateless Streamable HTTP to auto-initialize the downstream stdio MCP Server',
+            testConnection: 'Test Connection',
+            connectionSuccess: 'Connection succeeded',
+            connectionFailed: 'Connection failed',
         },
         tensorRT: {
             llm: 'TensorRT LLM',

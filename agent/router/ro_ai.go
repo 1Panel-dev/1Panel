@@ -29,10 +29,13 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.GET("/gpu/options", baseApi.GetCPUOptions)
 
 		aiToolsRouter.POST("/mcp/search", baseApi.PageMcpServers)
+		aiToolsRouter.POST("/mcp/server/detail", baseApi.LoadMcpServerDetail)
 		aiToolsRouter.POST("/mcp/server", baseApi.CreateMcpServer)
 		aiToolsRouter.POST("/mcp/server/update", baseApi.UpdateMcpServer)
 		aiToolsRouter.POST("/mcp/server/del", baseApi.DeleteMcpServer)
 		aiToolsRouter.POST("/mcp/server/op", baseApi.OperateMcpServer)
+		aiToolsRouter.POST("/mcp/server/status/sync", baseApi.SyncMcpServerStatus)
+		aiToolsRouter.POST("/mcp/server/connection/test", baseApi.TestMcpServerConnection)
 		aiToolsRouter.POST("/mcp/domain/bind", baseApi.BindMcpDomain)
 		aiToolsRouter.GET("/mcp/domain/get", baseApi.GetMcpBindDomain)
 		aiToolsRouter.POST("/mcp/domain/update", baseApi.UpdateMcpBindDomain)

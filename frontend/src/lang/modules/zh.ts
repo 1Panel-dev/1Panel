@@ -1272,6 +1272,11 @@ const message = {
             streamableHttpPathHelper: '例如：/mcp, 注意不要与其他 Server 重复',
             npxHelper: '适合 npx 或 二进制启动的 mcp',
             uvxHelper: '适合 uvx 启动的 mcp',
+            protocolVersion: '协议版本',
+            protocolVersionHelper: '仅用于无状态 Streamable HTTP 自动初始化下游 stdio MCP Server',
+            testConnection: '测试连接',
+            connectionSuccess: '连接成功',
+            connectionFailed: '连接失败',
         },
         tensorRT: {
             llm: 'TensorRT LLM',

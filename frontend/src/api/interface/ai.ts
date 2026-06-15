@@ -180,6 +180,8 @@ export namespace AI {
         outputTransport: string;
         streamableHttpPath: string;
         type: string;
+        gatewayImage: string;
+        protocolVersion: string;
     }
 
     export interface McpServerSearch extends ReqPage {
@@ -190,9 +192,35 @@ export namespace AI {
         id: number;
     }
 
+    export interface McpServerDetail {
+        id: number;
+    }
+
+    export interface McpServerStatusSync {
+        ids: number[];
+    }
+
+    export interface McpServerStatus {
+        id: number;
+        status: string;
+        message: string;
+    }
+
     export interface McpServerOperate {
         id: number;
         operate: string;
+    }
+
+    export interface McpServerConnectionTest {
+        id: number;
+    }
+
+    export interface McpServerConnectionTestRes {
+        success: boolean;
+        endpoint: string;
+        outputTransport: string;
+        protocolVersion?: string;
+        message: string;
     }
 
     export interface McpBindDomain {

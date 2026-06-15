@@ -1340,6 +1340,12 @@ const message = {
             streamableHttpPathHelper: '예: /mcp, 다른 서버와 중복되지 않도록 주의하세요',
             npxHelper: 'npx 또는 바이너리로 시작하는 mcp에 적합',
             uvxHelper: 'uvx로 시작하는 mcp에 적합',
+            protocolVersion: 'Protocol Version',
+            protocolVersionHelper:
+                'Only used by stateless Streamable HTTP to auto-initialize the downstream stdio MCP Server',
+            testConnection: 'Test Connection',
+            connectionSuccess: 'Connection succeeded',
+            connectionFailed: 'Connection failed',
         },
         tensorRT: {
             llm: 'TensorRT LLM',

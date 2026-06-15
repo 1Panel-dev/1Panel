@@ -24,6 +24,27 @@ func (b *BaseApi) PageMcpServers(c *gin.Context) {
 }
 
 // @Tags McpServer
+// @Summary Load mcp server detail
+// @Accept json
+// @Param request body request.McpServerDetail true "request"
+// @Success 200 {object} response.McpServerDTO
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/mcp/server/detail [post]
+func (b *BaseApi) LoadMcpServerDetail(c *gin.Context) {
+	var req request.McpServerDetail
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := mcpServerService.Detail(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags McpServer
 // @Summary Create mcp server
 // @Accept json
 // @Param request body request.McpServerCreate true "request"
@@ -105,6 +126,48 @@ func (b *BaseApi) OperateMcpServer(c *gin.Context) {
 		return
 	}
 	helper.Success(c)
+}
+
+// @Tags McpServer
+// @Summary Sync mcp server status
+// @Accept json
+// @Param request body request.McpServerStatusSync true "request"
+// @Success 200 {array} response.McpServerStatusDTO
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/mcp/server/status/sync [post]
+func (b *BaseApi) SyncMcpServerStatus(c *gin.Context) {
+	var req request.McpServerStatusSync
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := mcpServerService.SyncStatus(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags McpServer
+// @Summary Test mcp server connection
+// @Accept json
+// @Param request body request.McpServerConnectionTest true "request"
+// @Success 200 {object} response.McpServerConnectionTestRes
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/mcp/server/connection/test [post]
+func (b *BaseApi) TestMcpServerConnection(c *gin.Context) {
+	var req request.McpServerConnectionTest
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := mcpServerService.TestConnection(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
 }
 
 // @Tags McpServer

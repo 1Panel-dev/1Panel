@@ -16,6 +16,12 @@ type McpServerDTO struct {
 	Volumes      []request.Volume      `json:"volumes"`
 }
 
+type McpServerStatusDTO struct {
+	ID      uint   `json:"id"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}
+
 type McpBindDomainRes struct {
 	Domain        string   `json:"domain"`
 	SSLID         uint     `json:"sslID"`
@@ -23,4 +29,12 @@ type McpBindDomainRes struct {
 	AllowIPs      []string `json:"allowIPs"`
 	WebsiteID     uint     `json:"websiteID"`
 	ConnUrl       string   `json:"connUrl"`
+}
+
+type McpServerConnectionTestRes struct {
+	Success         bool   `json:"success"`
+	Endpoint        string `json:"endpoint"`
+	OutputTransport string `json:"outputTransport"`
+	ProtocolVersion string `json:"protocolVersion,omitempty"`
+	Message         string `json:"message"`
 }
