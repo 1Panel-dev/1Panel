@@ -502,7 +502,7 @@ func (u *ImageService) ImageRemove(req dto.BatchDelete) error {
 		return err
 	}
 	defer client.Close()
-	taskItem, err := task.NewTaskWithOps(task.TaskScopeImage, task.TaskDelete, task.TaskScopeContainer, req.TaskID, 1)
+	taskItem, err := task.NewTaskWithOps(strings.Join(req.Names, ","), task.TaskDelete, task.TaskScopeImage, req.TaskID, 1)
 	if err != nil {
 		global.LOG.Errorf("new task for create container failed, err: %v", err)
 		return err
