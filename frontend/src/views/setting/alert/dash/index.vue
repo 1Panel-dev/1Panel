@@ -213,11 +213,11 @@ const openView = async (
     title: string,
     rowData: Partial<Alert.AlertInfo> = {
         type: isMaster.value && !isEE.value ? 'panelPwdEndTime' : 'sshLogin',
-        cycle: 15,
+        cycle: isMaster.value && !isEE.value ? 15 : 30,
         count: isMaster.value && !isEE.value ? 0 : 3,
         sendCount: 3,
         method: '',
-        project: '',
+        project: isMaster.value && !isEE.value ? '' : 'all',
         status: 'Enable',
         title: '',
     },
