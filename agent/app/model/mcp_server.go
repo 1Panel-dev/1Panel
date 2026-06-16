@@ -18,4 +18,6 @@ type McpServer struct {
 	StreamableHttpPath string `json:"streamableHttpPath"`
 	OutputTransport    string `json:"outputTransport"`
 	Type               string `json:"type"`
+	GatewayImage       string `json:"gatewayImage"`
+	ProtocolVersion    string `json:"protocolVersion"`
 }

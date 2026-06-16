@@ -44,50 +44,6 @@
                     "
                 ></el-input>
             </el-form-item>
-            <div>
-                <el-text>{{ $t('aiTools.mcp.environment') }}</el-text>
-                <div class="mt-1">
-                    <el-row :gutter="20" v-for="(env, index) in mcpServer.environments" :key="index">
-                        <el-col :span="8">
-                            <el-form-item :prop="`environments.${index}.key`" :rules="rules.key">
-                                <el-input v-model="env.key" :placeholder="$t('aiTools.mcp.envKey')" />
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="8">
-                            <el-form-item :prop="`environments.${index}.value`" :rules="rules.value">
-                                <el-input v-model="env.value" :placeholder="$t('aiTools.mcp.envValue')" />
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="4">
-                            <el-form-item>
-                                <el-button v-permission type="primary" @click="removeEnv(index)" link class="mt-1">
-                                    {{ $t('commons.button.delete') }}
-                                </el-button>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row :gutter="20">
-                        <el-col :span="4">
-                            <el-button v-permission class="mb-2" @click="addEnv">
-                                {{ $t('commons.button.add') }}
-                            </el-button>
-                        </el-col>
-                    </el-row>
-                </div>
-            </div>
-            <Volumes :volumes="mcpServer.volumes" class="mb-2" />
-            <el-row :gutter="20">
-                <el-col :span="8">
-                    <el-form-item :label="$t('commons.table.port')" prop="port">
-                        <el-input v-model.number="mcpServer.port" />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="6">
-                    <el-form-item :label="$t('app.allowPort')" prop="hostIP">
-                        <el-switch v-model="mcpServer.hostIP" :active-value="'0.0.0.0'" :inactive-value="'127.0.0.1'" />
-                    </el-form-item>
-                </el-col>
-            </el-row>
             <el-form-item :label="$t('aiTools.mcp.baseUrl')" prop="url">
                 <el-input v-model.trim="mcpServer.url">
                     <template #prepend>
@@ -100,9 +56,6 @@
                 <span class="input-help">
                     {{ $t('aiTools.mcp.baseUrlHelper') }}
                 </span>
-            </el-form-item>
-            <el-form-item :label="$t('app.containerName')" prop="containerName">
-                <el-input v-model.trim="mcpServer.containerName"></el-input>
             </el-form-item>
             <el-form-item :label="$t('aiTools.mcp.outputTransport')" prop="outputTransport">
                 <el-select v-model="mcpServer.outputTransport">
@@ -126,6 +79,77 @@
                     {{ $t('aiTools.mcp.streamableHttpPathHelper') }}
                 </span>
             </el-form-item>
+            <el-form-item
+                v-if="mcpServer.outputTransport === 'streamableHttp'"
+                :label="$t('aiTools.mcp.protocolVersion')"
+                prop="protocolVersion"
+            >
+                <el-input v-model.trim="mcpServer.protocolVersion" />
+                <span class="input-help">
+                    {{ $t('aiTools.mcp.protocolVersionHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item :label="$t('container.image')" prop="gatewayImage">
+                <el-input v-model.trim="mcpServer.gatewayImage" />
+            </el-form-item>
+            <el-form-item :label="$t('app.containerName')" prop="containerName">
+                <el-input v-model.trim="mcpServer.containerName"></el-input>
+            </el-form-item>
+            <el-tabs type="border-card" class="mt-2">
+                <el-tab-pane :label="$t('commons.table.port')">
+                    <div class="mt-1.5">
+                        <el-row :gutter="20">
+                            <el-col :span="8">
+                                <el-form-item :label="$t('commons.table.port')" prop="port">
+                                    <el-input v-model.number="mcpServer.port" />
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="6">
+                                <el-form-item :label="$t('app.allowPort')" prop="hostIP">
+                                    <el-switch
+                                        v-model="mcpServer.hostIP"
+                                        :active-value="'0.0.0.0'"
+                                        :inactive-value="'127.0.0.1'"
+                                    />
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                    </div>
+                </el-tab-pane>
+                <el-tab-pane :label="$t('runtime.environment')">
+                    <div class="mt-1.5">
+                        <el-row :gutter="20" v-for="(env, index) in mcpServer.environments" :key="index">
+                            <el-col :span="8">
+                                <el-form-item :prop="`environments.${index}.key`" :rules="rules.key">
+                                    <el-input v-model="env.key" :placeholder="$t('aiTools.mcp.envKey')" />
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="8">
+                                <el-form-item :prop="`environments.${index}.value`" :rules="rules.value">
+                                    <el-input v-model="env.value" :placeholder="$t('aiTools.mcp.envValue')" />
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="4">
+                                <el-form-item>
+                                    <el-button v-permission type="primary" @click="removeEnv(index)" link class="mt-1">
+                                        {{ $t('commons.button.delete') }}
+                                    </el-button>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20">
+                            <el-col :span="4">
+                                <el-button v-permission @click="addEnv">
+                                    {{ $t('commons.button.add') }}
+                                </el-button>
+                            </el-col>
+                        </el-row>
+                    </div>
+                </el-tab-pane>
+                <el-tab-pane :label="$t('container.mount')">
+                    <Volumes :volumes="mcpServer.volumes" />
+                </el-tab-pane>
+            </el-tabs>
         </el-form>
         <template #footer>
             <span>
@@ -155,6 +179,11 @@ const mode = ref('create');
 const loading = ref(false);
 const mcpServerForm = ref();
 const importRef = ref();
+const defaultProtocolVersion = '2025-06-18';
+const defaultGatewayImages: Record<string, string> = {
+    npx: 'supercorp/supergateway:3.4.3',
+    uvx: 'supercorp/supergateway:uvx',
+};
 const newMcpServer = () => {
     return {
         id: 0,
@@ -174,6 +203,8 @@ const newMcpServer = () => {
         outputTransport: 'sse',
         streamableHttpPath: '',
         type: 'npx',
+        gatewayImage: defaultGatewayImages.npx,
+        protocolVersion: defaultProtocolVersion,
     };
 };
 const em = defineEmits(['close']);
@@ -190,6 +221,8 @@ const rules = ref({
     outputTransport: [Rules.requiredSelect],
     streamableHttpPath: [Rules.requiredInput],
     type: [Rules.requiredSelect],
+    gatewayImage: [Rules.requiredInput],
+    protocolVersion: [Rules.requiredInput],
 });
 const hasWebsite = ref(false);
 
@@ -217,6 +250,8 @@ const acceptParams = async (params: AI.McpServer) => {
         mcpServer.value.url = parts[1];
         mcpServer.value.outputTransport = mcpServer.value.outputTransport || 'sse';
         mcpServer.value.type = mcpServer.value.type || 'npx';
+        mcpServer.value.gatewayImage = mcpServer.value.gatewayImage || defaultGatewayImages[mcpServer.value.type];
+        mcpServer.value.protocolVersion = mcpServer.value.protocolVersion || defaultProtocolVersion;
     } else {
         mcpServer.value = newMcpServer();
         if (params.port) {
@@ -238,9 +273,19 @@ watch(
         if (newVal && mode.value == 'create') {
             mcpServer.value.containerName = newVal;
             mcpServer.value.ssePath = '/' + newVal;
+            mcpServer.value.streamableHttpPath = '/' + newVal;
         }
     },
     { deep: true },
+);
+
+watch(
+    () => mcpServer.value.type,
+    (newVal, oldVal) => {
+        if (!oldVal || mcpServer.value.gatewayImage === defaultGatewayImages[oldVal]) {
+            mcpServer.value.gatewayImage = defaultGatewayImages[newVal] || defaultGatewayImages.npx;
+        }
+    },
 );
 
 const addEnv = () => {
@@ -252,6 +297,11 @@ const addEnv = () => {
 
 const removeEnv = (index: number) => {
     mcpServer.value.environments.splice(index, 1);
+};
+
+const normalizeGatewayConfig = () => {
+    mcpServer.value.gatewayImage = mcpServer.value.gatewayImage || defaultGatewayImages[mcpServer.value.type];
+    mcpServer.value.protocolVersion = mcpServer.value.protocolVersion || defaultProtocolVersion;
 };
 
 const handleClose = () => {
@@ -291,6 +341,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         try {
             loading.value = true;
+            normalizeGatewayConfig();
             mcpServer.value.baseUrl = mcpServer.value.protocol + mcpServer.value.url;
             if (mode.value == 'create') {
                 await createMcpServer(mcpServer.value);

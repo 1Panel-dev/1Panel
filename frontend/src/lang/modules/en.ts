@@ -1339,6 +1339,12 @@ const message = {
             streamableHttpPathHelper: 'For example: /mcp, note that it should not overlap with other Servers',
             npxHelper: 'Suitable for mcp started with npx or binary',
             uvxHelper: 'Suitable for mcp started with uvx',
+            protocolVersion: 'Protocol Version',
+            protocolVersionHelper:
+                'Only used by stateless Streamable HTTP to auto-initialize the downstream stdio MCP Server',
+            testConnection: 'Test Connection',
+            connectionSuccess: 'Connection succeeded',
+            connectionFailed: 'Connection failed',
         },
         tensorRT: {
             llm: 'TensorRT LLM',

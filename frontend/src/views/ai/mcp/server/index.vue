@@ -98,14 +98,21 @@
 
 <script lang="ts" setup>
 import { AI } from '@/api/interface/ai';
-import { deleteMcpServer, operateMcpServer, pageMcpServer } from '@/api/modules/ai';
+import {
+    deleteMcpServer,
+    loadMcpServerDetail,
+    operateMcpServer,
+    pageMcpServer,
+    syncMcpServerStatus,
+    testMcpServerConnection,
+} from '@/api/modules/ai';
 import RouterMenu from '@/views/ai/mcp/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import McpServerOperate from './operate/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import BindDomain from './bind/index.vue';
 import Config from './config/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
@@ -176,6 +183,13 @@ const buttons = [
         },
     },
     {
+        label: i18n.global.t('aiTools.mcp.testConnection'),
+        permission: true,
+        click: (row: AI.McpServer) => {
+            testConnection(row);
+        },
+    },
+    {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
         click: (row: AI.McpServer) => {
@@ -201,11 +215,36 @@ const search = () => {
         items.value = res.data.items;
         paginationConfig.total = res.data.total;
         loading.value = false;
+        syncStatus();
     });
 };
 
-const openDetail = (row: AI.McpServer) => {
-    createRef.value.acceptParams(row);
+const syncStatus = async () => {
+    const ids = items.value.map((item) => item.id).filter(Boolean);
+    if (ids.length === 0) {
+        return;
+    }
+    try {
+        const res = await syncMcpServerStatus({ ids });
+        const statusMap = new Map(res.data.map((item) => [item.id, item]));
+        for (const item of items.value) {
+            const status = statusMap.get(item.id);
+            if (status) {
+                item.status = status.status;
+                item.message = status.message;
+            }
+        }
+    } catch (error) {}
+};
+
+const openDetail = async (row: AI.McpServer) => {
+    loading.value = true;
+    try {
+        const res = await loadMcpServerDetail({ id: row.id });
+        createRef.value.acceptParams(res.data);
+    } finally {
+        loading.value = false;
+    }
 };
 
 const openCreate = () => {
@@ -258,6 +297,20 @@ const opServer = async (row: AI.McpServer, operate: string) => {
             search();
         } catch (error) {}
     });
+};
+
+const testConnection = async (row: AI.McpServer) => {
+    loading.value = true;
+    try {
+        const res = await testMcpServerConnection({ id: row.id });
+        if (res.data.success) {
+            MsgSuccess(res.data.message || i18n.global.t('aiTools.mcp.connectionSuccess'));
+            return;
+        }
+        MsgError(res.data.message || i18n.global.t('aiTools.mcp.connectionFailed'));
+    } finally {
+        loading.value = false;
+    }
 };
 
 const openDomain = () => {

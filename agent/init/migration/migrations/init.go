@@ -685,6 +685,25 @@ var UpdateMcpServerAddType = &gormigrate.Migration{
 	},
 }
 
+var UpdateMcpServerGatewayConfig = &gormigrate.Migration{
+	ID: "20260615-update-mcp-server-gateway-config",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.McpServer{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.McpServer{}).Where("gateway_image IS NULL OR gateway_image = ''").Where("type = ?", "uvx").Update("gateway_image", "supercorp/supergateway:uvx").Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&model.McpServer{}).Where("gateway_image IS NULL OR gateway_image = ''").Where("type <> ? OR type IS NULL OR type = ''", "uvx").Update("gateway_image", "supercorp/supergateway:3.4.3").Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&model.McpServer{}).Where("protocol_version IS NULL OR protocol_version = ''").Update("protocol_version", "2025-06-18").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
 var InitLocalSSHConn = &gormigrate.Migration{
 	ID: "20250905-init-local-ssh",
 	Migrate: func(tx *gorm.DB) error {

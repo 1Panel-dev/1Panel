@@ -1373,6 +1373,12 @@ const message = {
                 'Por ejemplo: /mcp, tenga en cuenta que no debe superponerse con otros servidores',
             npxHelper: 'Adecuado para mcp iniciado con npx o binario',
             uvxHelper: 'Adecuado para mcp iniciado con uvx',
+            protocolVersion: 'Protocol Version',
+            protocolVersionHelper:
+                'Only used by stateless Streamable HTTP to auto-initialize the downstream stdio MCP Server',
+            testConnection: 'Test Connection',
+            connectionSuccess: 'Connection succeeded',
+            connectionFailed: 'Connection failed',
         },
         tensorRT: {
             llm: 'TensorRT LLM',

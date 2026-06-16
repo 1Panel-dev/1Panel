@@ -1,12 +1,17 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -25,18 +30,30 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
+	"github.com/docker/docker/api/types/container"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
 )
 
 type McpServerService struct{}
 
+const (
+	defaultMcpGatewayImageNpx        = "supercorp/supergateway:3.4.3"
+	defaultMcpGatewayImageUvx        = "supercorp/supergateway:uvx"
+	defaultMcpProtocolVersion        = "2025-06-18"
+	mcpOutputTransportSSE            = "sse"
+	mcpOutputTransportStreamableHTTP = "streamableHttp"
+)
+
 type IMcpServerService interface {
 	Page(req request.McpServerSearch) response.McpServersRes
+	Detail(req request.McpServerDetail) (response.McpServerDTO, error)
 	Create(create request.McpServerCreate) error
 	Update(req request.McpServerUpdate) error
 	Delete(id uint) error
 	Operate(req request.McpServerOperate) error
+	SyncStatus(req request.McpServerStatusSync) ([]response.McpServerStatusDTO, error)
+	TestConnection(req request.McpServerConnectionTest) (response.McpServerConnectionTestRes, error)
 	GetBindDomain() (response.McpBindDomainRes, error)
 	BindDomain(req request.McpBindDomain) error
 	UpdateBindDomain(req request.McpBindDomainUpdate) error
@@ -54,44 +71,36 @@ func (m McpServerService) Page(req request.McpServerSearch) response.McpServersR
 
 	total, data, _ := mcpServerRepo.Page(req.PageInfo.Page, req.PageInfo.PageSize)
 	for _, item := range data {
-		_ = syncMcpServerContainerStatus(&item)
-		serverDTO := response.McpServerDTO{
+		normalizeMcpServerGateway(&item)
+		items = append(items, response.McpServerDTO{
 			McpServer:    item,
 			Environments: make([]request.Environment, 0),
 			Volumes:      make([]request.Volume, 0),
-		}
-		project, err := docker.GetComposeProject(item.Name, path.Join(global.Dir.McpDir, item.Name), []byte(item.DockerCompose), []byte(item.Env), true)
-		if err != nil {
-			global.LOG.Errorf("get mcp compose project error: %s", err.Error())
-			continue
-		}
-		for _, service := range project.Services {
-			if service.Environment != nil {
-				for key, value := range service.Environment {
-					serverDTO.Environments = append(serverDTO.Environments, request.Environment{
-						Key:   key,
-						Value: *value,
-					})
-				}
-			}
-			if service.Volumes != nil {
-				for _, volume := range service.Volumes {
-					serverDTO.Volumes = append(serverDTO.Volumes, request.Volume{
-						Source: volume.Source,
-						Target: volume.Target,
-					})
-				}
-			}
-		}
-		items = append(items, serverDTO)
+		})
 	}
 	res.Total = total
 	res.Items = items
 	return res
 }
 
+func (m McpServerService) Detail(req request.McpServerDetail) (response.McpServerDTO, error) {
+	mcpServer, err := mcpServerRepo.GetFirst(repo.WithByID(req.ID))
+	if err != nil {
+		return response.McpServerDTO{}, err
+	}
+	normalizeMcpServerGateway(mcpServer)
+	serverDTO := response.McpServerDTO{
+		McpServer:    *mcpServer,
+		Environments: make([]request.Environment, 0),
+		Volumes:      make([]request.Volume, 0),
+	}
+	if err := loadMcpServerComposeConfig(&serverDTO); err != nil {
+		return response.McpServerDTO{}, err
+	}
+	return serverDTO, nil
+}
+
 func (m McpServerService) Update(req request.McpServerUpdate) error {
-	go pullImage(req.Type)
 	mcpServer, err := mcpServerRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
@@ -115,7 +124,11 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 	mcpServer.HostIP = req.HostIP
 	mcpServer.OutputTransport = req.OutputTransport
 	mcpServer.Type = req.Type
-	if req.OutputTransport == "sse" {
+	mcpServer.GatewayImage = req.GatewayImage
+	mcpServer.ProtocolVersion = req.ProtocolVersion
+	normalizeMcpServerGateway(mcpServer)
+	go pullImage(mcpServer.GatewayImage)
+	if req.OutputTransport == mcpOutputTransportSSE {
 		mcpServer.SsePath = req.SsePath
 	} else {
 		mcpServer.StreamableHttpPath = req.StreamableHttpPath
@@ -142,7 +155,6 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 }
 
 func (m McpServerService) Create(create request.McpServerCreate) error {
-	go pullImage(create.Type)
 	servers, _ := mcpServerRepo.List()
 	for _, server := range servers {
 		if server.Port == create.Port {
@@ -177,8 +189,12 @@ func (m McpServerService) Create(create request.McpServerCreate) error {
 		HostIP:          create.HostIP,
 		OutputTransport: create.OutputTransport,
 		Type:            create.Type,
+		GatewayImage:    create.GatewayImage,
+		ProtocolVersion: create.ProtocolVersion,
 	}
-	if create.OutputTransport == "sse" {
+	normalizeMcpServerGateway(mcpServer)
+	go pullImage(mcpServer.GatewayImage)
+	if create.OutputTransport == mcpOutputTransportSSE {
 		mcpServer.SsePath = create.SsePath
 	} else {
 		mcpServer.StreamableHttpPath = create.StreamableHttpPath
@@ -235,6 +251,9 @@ func (m McpServerService) Operate(req request.McpServerOperate) error {
 	if err != nil {
 		return err
 	}
+	if err := refreshMcpServerFiles(mcpServer); err != nil {
+		return err
+	}
 	composePath := path.Join(mcpServer.Dir, "docker-compose.yml")
 	var out string
 	switch req.Operate {
@@ -253,6 +272,148 @@ func (m McpServerService) Operate(req request.McpServerOperate) error {
 		mcpServer.Message = out
 	}
 	return mcpServerRepo.Save(mcpServer)
+}
+
+func (m McpServerService) SyncStatus(req request.McpServerStatusSync) ([]response.McpServerStatusDTO, error) {
+	var (
+		servers []model.McpServer
+		err     error
+	)
+	if len(req.IDs) > 0 {
+		servers, err = mcpServerRepo.List(repo.WithByIDs(req.IDs))
+	} else {
+		servers, err = mcpServerRepo.List()
+	}
+	if err != nil {
+		return nil, err
+	}
+	if len(servers) == 0 {
+		return []response.McpServerStatusDTO{}, nil
+	}
+
+	containerNames := make([]string, 0, len(servers))
+	for _, server := range servers {
+		if server.ContainerName != "" {
+			containerNames = append(containerNames, server.ContainerName)
+		}
+	}
+	containerMap := make(map[string]*container.Summary)
+	if len(containerNames) > 0 {
+		cli, err := docker.NewClient()
+		if err != nil {
+			return nil, err
+		}
+		defer cli.Close()
+		containers, err := cli.ListContainersByName(containerNames)
+		if err != nil {
+			return nil, err
+		}
+		for i := range containers {
+			for _, name := range containers[i].Names {
+				containerMap[strings.TrimPrefix(name, "/")] = &containers[i]
+			}
+		}
+	}
+
+	res := make([]response.McpServerStatusDTO, 0, len(servers))
+	for i := range servers {
+		oldStatus := servers[i].Status
+		applyMcpContainerStatus(&servers[i], containerMap[servers[i].ContainerName])
+		if servers[i].Status != oldStatus {
+			if err := mcpServerRepo.Save(&servers[i]); err != nil {
+				return nil, err
+			}
+		}
+		res = append(res, response.McpServerStatusDTO{
+			ID:      servers[i].ID,
+			Status:  servers[i].Status,
+			Message: servers[i].Message,
+		})
+	}
+	return res, nil
+}
+
+func (m McpServerService) TestConnection(req request.McpServerConnectionTest) (response.McpServerConnectionTestRes, error) {
+	mcpServer, err := mcpServerRepo.GetFirst(repo.WithByID(req.ID))
+	if err != nil {
+		return response.McpServerConnectionTestRes{}, err
+	}
+	normalizeMcpServerGateway(mcpServer)
+	endpoint := buildMcpEndpoint(mcpServer)
+	res := response.McpServerConnectionTestRes{
+		Endpoint:        endpoint,
+		OutputTransport: mcpServer.OutputTransport,
+		ProtocolVersion: mcpServer.ProtocolVersion,
+	}
+	if endpoint == "" {
+		res.Message = "empty endpoint"
+		return res, nil
+	}
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	if mcpServer.OutputTransport == mcpOutputTransportSSE {
+		httpReq, err := http.NewRequest(http.MethodGet, endpoint, nil)
+		if err != nil {
+			res.Message = err.Error()
+			return res, nil
+		}
+		httpRes, err := client.Do(httpReq)
+		if err != nil {
+			res.Message = err.Error()
+			return res, nil
+		}
+		defer httpRes.Body.Close()
+		contentType := httpRes.Header.Get("Content-Type")
+		if httpRes.StatusCode >= 200 && httpRes.StatusCode < 300 && strings.Contains(contentType, "text/event-stream") {
+			res.Success = true
+			res.Message = "ok"
+			return res, nil
+		}
+		res.Message = fmt.Sprintf("unexpected response: status=%d content-type=%s", httpRes.StatusCode, contentType)
+		return res, nil
+	}
+
+	payload := map[string]interface{}{
+		"jsonrpc": "2.0",
+		"id":      1,
+		"method":  "initialize",
+		"params": map[string]interface{}{
+			"protocolVersion": mcpServer.ProtocolVersion,
+			"capabilities":    map[string]interface{}{},
+			"clientInfo": map[string]string{
+				"name":    "1Panel",
+				"version": "1.0.0",
+			},
+		},
+	}
+	body, _ := json.Marshal(payload)
+	httpReq, err := http.NewRequest(http.MethodPost, endpoint, bytes.NewReader(body))
+	if err != nil {
+		res.Message = err.Error()
+		return res, nil
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Accept", "application/json, text/event-stream")
+	httpRes, err := client.Do(httpReq)
+	if err != nil {
+		res.Message = err.Error()
+		return res, nil
+	}
+	defer httpRes.Body.Close()
+	res.Success, res.Message = handleMcpConnectionHTTPResponse(httpRes)
+	return res, nil
+}
+
+func handleMcpConnectionHTTPResponse(httpRes *http.Response) (bool, string) {
+	if httpRes.StatusCode >= 200 && httpRes.StatusCode < 300 {
+		return true, "ok"
+	}
+	respBody, _ := io.ReadAll(httpRes.Body)
+	message := strings.TrimSpace(string(respBody))
+	if message == "" {
+		message = httpRes.Status
+	}
+	return false, message
 }
 
 func (m McpServerService) GetBindDomain() (response.McpBindDomainRes, error) {
@@ -534,11 +695,9 @@ func addMCPProxy(websiteID uint) error {
 }
 
 func updateMcpServer(mcpServer *model.McpServer) error {
-	env := handleEnv(mcpServer)
-	if err := gotenv.Write(env, path.Join(mcpServer.Dir, ".env")); err != nil {
+	if err := refreshMcpServerFiles(mcpServer); err != nil {
 		return err
 	}
-	_ = mcpServerRepo.Save(mcpServer)
 	composePath := path.Join(global.Dir.McpDir, mcpServer.Name, "docker-compose.yml")
 	_, _ = compose.Down(composePath)
 	if _, err := compose.Up(composePath); err != nil {
@@ -546,6 +705,101 @@ func updateMcpServer(mcpServer *model.McpServer) error {
 		mcpServer.Message = err.Error()
 	}
 	return mcpServerRepo.Save(mcpServer)
+}
+
+func refreshMcpServerFiles(mcpServer *model.McpServer) error {
+	normalizeMcpServerGateway(mcpServer)
+	if err := handleCreateParams(mcpServer, nil, nil); err != nil {
+		return err
+	}
+	env := handleEnv(mcpServer)
+	if err := gotenv.Write(env, path.Join(mcpServer.Dir, ".env")); err != nil {
+		return err
+	}
+	composePath := path.Join(mcpServer.Dir, "docker-compose.yml")
+	if err := files.NewFileOp().SaveFile(composePath, mcpServer.DockerCompose, 0644); err != nil {
+		return err
+	}
+	return mcpServerRepo.Save(mcpServer)
+}
+
+func normalizeMcpServerGateway(mcpServer *model.McpServer) {
+	if mcpServer.Type == "" {
+		mcpServer.Type = "npx"
+	}
+	if strings.TrimSpace(mcpServer.GatewayImage) == "" {
+		if mcpServer.Type == "uvx" {
+			mcpServer.GatewayImage = defaultMcpGatewayImageUvx
+		} else {
+			mcpServer.GatewayImage = defaultMcpGatewayImageNpx
+		}
+	}
+	if strings.TrimSpace(mcpServer.ProtocolVersion) == "" {
+		mcpServer.ProtocolVersion = defaultMcpProtocolVersion
+	}
+}
+
+func buildSupergatewayCommand(mcpServer *model.McpServer) []string {
+	normalizeMcpServerGateway(mcpServer)
+	command := []string{
+		"--stdio", mcpServer.Command,
+		"--outputTransport", mcpServer.OutputTransport,
+		"--port", strconv.Itoa(mcpServer.Port),
+	}
+	if mcpServer.OutputTransport == mcpOutputTransportSSE {
+		return append(command,
+			"--baseUrl", mcpServer.BaseURL,
+			"--ssePath", mcpServer.SsePath,
+			"--messagePath", fmt.Sprintf("%s/messages", mcpServer.SsePath),
+		)
+	}
+	command = append(command, "--streamableHttpPath", mcpServer.StreamableHttpPath)
+	return append(command, "--protocolVersion", mcpServer.ProtocolVersion)
+}
+
+func buildMcpEndpoint(mcpServer *model.McpServer) string {
+	if mcpServer.BaseURL == "" {
+		return ""
+	}
+	if mcpServer.OutputTransport == mcpOutputTransportSSE {
+		return strings.TrimRight(mcpServer.BaseURL, "/") + "/" + strings.TrimLeft(mcpServer.SsePath, "/")
+	}
+	return strings.TrimRight(mcpServer.BaseURL, "/") + "/" + strings.TrimLeft(mcpServer.StreamableHttpPath, "/")
+}
+
+func loadMcpServerComposeConfig(serverDTO *response.McpServerDTO) error {
+	serverDTO.Environments = make([]request.Environment, 0)
+	serverDTO.Volumes = make([]request.Volume, 0)
+	dir := serverDTO.Dir
+	if dir == "" {
+		dir = path.Join(global.Dir.McpDir, serverDTO.Name)
+	}
+	project, err := docker.GetComposeProject(serverDTO.Name, dir, []byte(serverDTO.DockerCompose), []byte(serverDTO.Env), true)
+	if err != nil {
+		return err
+	}
+	for _, service := range project.Services {
+		if service.Environment != nil {
+			for key, value := range service.Environment {
+				if value == nil {
+					continue
+				}
+				serverDTO.Environments = append(serverDTO.Environments, request.Environment{
+					Key:   key,
+					Value: *value,
+				})
+			}
+		}
+		if service.Volumes != nil {
+			for _, volume := range service.Volumes {
+				serverDTO.Volumes = append(serverDTO.Volumes, request.Volume{
+					Source: volume.Source,
+					Target: volume.Target,
+				})
+			}
+		}
+	}
+	return nil
 }
 
 func handleEnv(mcpServer *model.McpServer) gotenv.Env {
@@ -558,6 +812,7 @@ func handleEnv(mcpServer *model.McpServer) gotenv.Env {
 	env["HOST_IP"] = mcpServer.HostIP
 	env["STREAMABLE_HTTP_PATH"] = mcpServer.StreamableHttpPath
 	env["OUTPUT_TRANSPORT"] = mcpServer.OutputTransport
+	env["GATEWAY_IMAGE"] = mcpServer.GatewayImage
 	envStr, _ := gotenv.Marshal(env)
 	mcpServer.Env = envStr
 	return env
@@ -592,26 +847,36 @@ func handleCreateParams(mcpServer *model.McpServer, environments []request.Envir
 		}
 		delete(services, serviceName)
 	}
+	normalizeMcpServerGateway(mcpServer)
+	serviceValue["command"] = buildSupergatewayCommand(mcpServer)
+	serviceValue["image"] = mcpServer.GatewayImage
+	oldEnv, hasOldEnv := serviceValue["environment"]
 	delete(serviceValue, "environment")
-	if len(environments) > 0 {
+	if environments != nil && len(environments) > 0 {
 		envMap := make(map[string]string)
 		for _, env := range environments {
 			envMap[env.Key] = env.Value
 		}
 		serviceValue["environment"] = envMap
+	} else if environments == nil {
+		// Preserve existing custom environment when regenerating compose during start/restart.
+		if mcpServer.ID > 0 && hasOldEnv {
+			serviceValue["environment"] = oldEnv
+		}
 	}
+	oldVolumes, hasOldVolumes := serviceValue["volumes"]
 	delete(serviceValue, "volumes")
-	if len(volumes) > 0 {
+	if volumes != nil && len(volumes) > 0 {
 		volumeList := make([]string, 0)
 		for _, volume := range volumes {
 			volumeList = append(volumeList, fmt.Sprintf("%s:%s", volume.Source, volume.Target))
 		}
 		serviceValue["volumes"] = volumeList
-	}
-	if mcpServer.Type == "npx" {
-		serviceValue["image"] = "supercorp/supergateway:latest"
-	} else {
-		serviceValue["image"] = "supercorp/supergateway:uvx"
+	} else if volumes == nil {
+		// Preserve existing custom volumes when regenerating compose during start/restart.
+		if mcpServer.ID > 0 && hasOldVolumes {
+			serviceValue["volumes"] = oldVolumes
+		}
 	}
 
 	services[mcpServer.Name] = serviceValue
@@ -624,6 +889,12 @@ func handleCreateParams(mcpServer *model.McpServer, environments []request.Envir
 }
 
 func startMcp(mcpServer *model.McpServer) {
+	if err := refreshMcpServerFiles(mcpServer); err != nil {
+		mcpServer.Status = constant.StatusError
+		mcpServer.Message = err.Error()
+		_ = mcpServerRepo.Save(mcpServer)
+		return
+	}
 	composePath := path.Join(global.Dir.McpDir, mcpServer.Name, "docker-compose.yml")
 	if mcpServer.Status != constant.StatusNormal {
 		_, _ = compose.Down(composePath)
@@ -650,11 +921,19 @@ func syncMcpServerContainerStatus(mcpServer *model.McpServer) error {
 		return err
 	}
 	if len(containers) == 0 {
-		mcpServer.Status = constant.StatusStopped
+		applyMcpContainerStatus(mcpServer, nil)
 		return mcpServerRepo.Save(mcpServer)
 	}
-	container := containers[0]
-	switch container.State {
+	applyMcpContainerStatus(mcpServer, &containers[0])
+	return mcpServerRepo.Save(mcpServer)
+}
+
+func applyMcpContainerStatus(mcpServer *model.McpServer, containerSummary *container.Summary) {
+	if containerSummary == nil {
+		mcpServer.Status = constant.StatusStopped
+		return
+	}
+	switch containerSummary.State {
 	case "exited":
 		mcpServer.Status = constant.StatusError
 	case "running":
@@ -668,7 +947,6 @@ func syncMcpServerContainerStatus(mcpServer *model.McpServer) error {
 			mcpServer.Status = constant.StatusStopped
 		}
 	}
-	return mcpServerRepo.Save(mcpServer)
 }
 
 func GetWebsiteID() uint {
@@ -680,17 +958,14 @@ func GetWebsiteID() uint {
 	return uint(websiteIDUint)
 }
 
-func pullImage(imageType string) {
+func pullImage(image string) {
 	if global.CONF.Base.IsOffline {
 		return
 	}
-	if imageType == "npx" {
-		if err := docker.PullImage("supercorp/supergateway:latest"); err != nil {
-			global.LOG.Errorf("docker pull mcp image error: %s", err.Error())
-		}
-	} else {
-		if err := docker.PullImage("supercorp/supergateway:uvx"); err != nil {
-			global.LOG.Errorf("docker pull mcp image error: %s", err.Error())
-		}
+	if image == "" {
+		image = defaultMcpGatewayImageNpx
+	}
+	if err := docker.PullImage(image); err != nil {
+		global.LOG.Errorf("docker pull mcp image error: %s", err.Error())
 	}
 }
