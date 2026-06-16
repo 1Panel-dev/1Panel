@@ -705,7 +705,6 @@ func sendAlertsByLegacyMethod(alert dto.AlertDTO, alertType, quota, quotaType st
 	}
 	config, err := alertRepo.GetConfig(alertRepo.WithByType(configType))
 	if err != nil {
-		global.LOG.Errorf("alert config not found for type %s: %v", configType, err)
 		return
 	}
 	doSendAlert(alert, alertType, quota, quotaType, params, config)
