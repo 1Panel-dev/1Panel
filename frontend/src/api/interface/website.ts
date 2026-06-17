@@ -295,6 +295,15 @@ export namespace Website {
         keyType: string;
         pushDir: boolean;
         dir: string;
+        pushNode?: boolean;
+        nodes?: string;
+    }
+
+    export interface SSLPush {
+        id: number;
+        pushNode: boolean;
+        nodes: string;
+        taskID: string;
     }
 
     export interface AcmeAccount extends CommonModel {
@@ -578,6 +587,9 @@ export namespace Website {
         certificatePath: string;
         type: string;
         sslID: number;
+        description?: string;
+        pushNode?: boolean;
+        nodes?: string;
     }
 
     export interface SSLObtain {
@@ -620,6 +632,8 @@ export namespace Website {
         pushDir: boolean;
         dir: string;
         description: string;
+        pushNode?: boolean;
+        nodes?: string;
     }
 
     export interface RenewSSLByCA {

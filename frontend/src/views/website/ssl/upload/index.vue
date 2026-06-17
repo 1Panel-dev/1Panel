@@ -69,6 +69,14 @@
             <el-form-item :label="$t('website.remark')" prop="description">
                 <el-input v-model="ssl.description"></el-input>
             </el-form-item>
+            <PushToNode
+                v-if="isMaster && isXpackOrEE"
+                :push-node="ssl.pushNode"
+                :nodes="ssl.pushNodes"
+                type="ssl"
+                @update:push-node="ssl.pushNode = $event"
+                @update:nodes="ssl.pushNodes = $event"
+            />
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -89,9 +97,21 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import FileList from '@/components/file-list/index.vue';
-import { ref } from 'vue';
+import { defineAsyncComponent, ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { Website } from '@/api/interface/website';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+
+const { isMaster, isXpackOrEE } = useGlobalStore();
+
+const PushToNode = defineAsyncComponent(async () => {
+    const modules = import.meta.glob('@/xpack/views/ssl/index.vue');
+    const loader = modules['/src/xpack/views/ssl/index.vue'];
+    if (loader) {
+        return ((await loader()) as any).default;
+    }
+    return { template: '<div></div>' };
+});
 
 const open = ref(false);
 const keyFileRef = ref();
@@ -111,6 +131,7 @@ const rules = ref({
     type: [Rules.requiredSelect],
     certificateFile: [Rules.requiredInput],
     privateKeyFile: [Rules.requiredInput],
+    pushNodes: [Rules.requiredSelect],
 });
 const initData = () => ({
     privateKey: '',
@@ -120,6 +141,9 @@ const initData = () => ({
     type: 'paste',
     sslID: 0,
     description: '',
+    pushNode: false,
+    pushNodes: [] as string[],
+    nodes: '',
     privateKeyFile: null as File | null,
     certificateFile: null as File | null,
 });
@@ -155,6 +179,13 @@ const acceptParams = (websiteSSL?: Website.SSLDTO) => {
         ssl.value.description = websiteSSL.description;
         ssl.value.privateKeyPath = websiteSSL.privateKeyPath;
         ssl.value.certificatePath = websiteSSL.certPath;
+        ssl.value.pushNode = websiteSSL.pushNode;
+        ssl.value.pushNodes = websiteSSL.nodes
+            ? websiteSSL.nodes
+                  .split(',')
+                  .map((item) => item.trim())
+                  .filter((item) => item !== '')
+            : [];
         if (ssl.value.certificatePath != '' && ssl.value.privateKeyPath != '') {
             ssl.value.type = 'local';
         }
@@ -174,11 +205,14 @@ const submit = async () => {
     try {
         await sslForm.value?.validate();
         loading.value = true;
+        ssl.value.nodes = ssl.value.pushNode ? ssl.value.pushNodes.join(',') : '';
         if (ssl.value.type === 'upload') {
             const formData = new FormData();
             formData.append('type', ssl.value.type);
             formData.append('description', ssl.value.description);
             formData.append('sslID', ssl.value.sslID.toString());
+            formData.append('pushNode', String(ssl.value.pushNode));
+            formData.append('nodes', ssl.value.nodes);
 
             if (ssl.value.privateKeyFile) {
                 formData.append('privateKeyFile', ssl.value.privateKeyFile);
