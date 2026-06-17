@@ -117,34 +117,7 @@
                     </div>
                 </el-tab-pane>
                 <el-tab-pane :label="$t('runtime.environment')">
-                    <div class="mt-1.5">
-                        <el-row :gutter="20" v-for="(env, index) in mcpServer.environments" :key="index">
-                            <el-col :span="8">
-                                <el-form-item :prop="`environments.${index}.key`" :rules="rules.key">
-                                    <el-input v-model="env.key" :placeholder="$t('aiTools.mcp.envKey')" />
-                                </el-form-item>
-                            </el-col>
-                            <el-col :span="8">
-                                <el-form-item :prop="`environments.${index}.value`" :rules="rules.value">
-                                    <el-input v-model="env.value" :placeholder="$t('aiTools.mcp.envValue')" />
-                                </el-form-item>
-                            </el-col>
-                            <el-col :span="4">
-                                <el-form-item>
-                                    <el-button v-permission type="primary" @click="removeEnv(index)" link class="mt-1">
-                                        {{ $t('commons.button.delete') }}
-                                    </el-button>
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
-                        <el-row :gutter="20">
-                            <el-col :span="4">
-                                <el-button v-permission @click="addEnv">
-                                    {{ $t('commons.button.add') }}
-                                </el-button>
-                            </el-col>
-                        </el-row>
-                    </div>
+                    <Environment :environments="mcpServer.environments" :show-helper="false" />
                 </el-tab-pane>
                 <el-tab-pane :label="$t('container.mount')">
                     <Volumes :volumes="mcpServer.volumes" />
@@ -171,7 +144,8 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { ref, watch } from 'vue';
-import Volumes from '../volume/index.vue';
+import Environment from '@/views/website/runtime/components/environment/index.vue';
+import Volumes from '@/views/website/runtime/components/volume/index.vue';
 import Import from '../import/index.vue';
 
 const open = ref(false);
@@ -216,8 +190,6 @@ const rules = ref({
     containerName: [Rules.requiredInput],
     url: [Rules.requiredInput],
     ssePath: [Rules.requiredInput],
-    key: [Rules.requiredInput],
-    value: [Rules.requiredInput],
     outputTransport: [Rules.requiredSelect],
     streamableHttpPath: [Rules.requiredInput],
     type: [Rules.requiredSelect],
@@ -287,17 +259,6 @@ watch(
         }
     },
 );
-
-const addEnv = () => {
-    mcpServer.value.environments.push({
-        key: '',
-        value: '',
-    });
-};
-
-const removeEnv = (index: number) => {
-    mcpServer.value.environments.splice(index, 1);
-};
 
 const normalizeGatewayConfig = () => {
     mcpServer.value.gatewayImage = mcpServer.value.gatewayImage || defaultGatewayImages[mcpServer.value.type];

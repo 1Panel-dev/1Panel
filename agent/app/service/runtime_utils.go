@@ -33,7 +33,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
@@ -464,7 +463,7 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 		return
 	}
 	for k := range env {
-		if strings.HasPrefix(k, "CONTAINER_PORT_") || strings.HasPrefix(k, "HOST_PORT_") || strings.HasPrefix(k, "HOST_IP_") || strings.Contains(k, "APP_PORT") {
+		if isComposePortEnvKey(k) || strings.Contains(k, "APP_PORT") {
 			delete(env, k)
 		}
 	}
@@ -621,15 +620,16 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 		if len(create.ExposedPorts) > 0 {
 			var ports []interface{}
 			for i, port := range create.ExposedPorts {
-				containerPortStr := fmt.Sprintf("CONTAINER_PORT_%d", i)
-				hostPortStr := fmt.Sprintf("HOST_PORT_%d", i)
+				containerPortStr, hostPortStr, hostIPStr, protocolStr := composePortEnvKeys(i)
 				existMap[containerPortStr] = struct{}{}
 				existMap[hostPortStr] = struct{}{}
-				hostIPStr := fmt.Sprintf("HOST_IP_%d", i)
-				ports = append(ports, fmt.Sprintf("${%s}:${%s}:${%s}", hostIPStr, hostPortStr, containerPortStr))
+				existMap[hostIPStr] = struct{}{}
+				existMap[protocolStr] = struct{}{}
+				ports = append(ports, formatComposePortMapping(hostIPStr, hostPortStr, containerPortStr, port.Protocol))
 				create.Params[containerPortStr] = port.ContainerPort
 				create.Params[hostPortStr] = port.HostPort
 				create.Params[hostIPStr] = port.HostIP
+				create.Params[protocolStr] = normalizeComposeProtocol(port.Protocol)
 			}
 			if create.Type == constant.RuntimePHP {
 				ports = append(ports, "127.0.0.1:${PANEL_APP_PORT_HTTP}:9000")
@@ -662,7 +662,7 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 			volumes = append(volumes, fmt.Sprintf("%s:%s", k, v))
 		}
 		for _, volume := range create.Volumes {
-			volumes = append(volumes, fmt.Sprintf("%s:%s", volume.Source, volume.Target))
+			volumes = append(volumes, formatComposeVolume(volume.Source, volume.Target, volume.Mode))
 		}
 
 		var extraHosts []interface{}
@@ -678,7 +678,7 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 		break
 	}
 	for k := range env {
-		if strings.Contains(k, "CONTAINER_PORT_") || strings.Contains(k, "HOST_PORT_") {
+		if isComposePortEnvKey(k) {
 			if _, ok := existMap[k]; !ok {
 				delete(env, k)
 			}
@@ -872,9 +872,14 @@ func getDockerComposeVolumes(yml []byte) ([]request.Volume, error) {
 			if len(envArray) > 1 {
 				target = envArray[1]
 			}
+			mode := ""
+			if len(envArray) > 2 {
+				mode = envArray[2]
+			}
 			res = append(res, request.Volume{
 				Source: source,
 				Target: target,
+				Mode:   normalizeComposeVolumeMode(mode),
 			})
 		}
 	}
@@ -1006,30 +1011,15 @@ func handleRuntimeDTO(res *response.RuntimeDTO, runtime model.Runtime) error {
 		return err
 	}
 	for k, v := range envs {
-		if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
-			if strings.Contains(k, "CONTAINER_PORT") {
-				matches := re.GetRegex(re.TrailingDigitsPattern).FindStringSubmatch(k)
-				if len(matches) < 2 {
-					return fmt.Errorf("invalid container port key: %s", k)
-				}
-				containerPort, err := strconv.Atoi(v)
-				if err != nil {
-					return err
-				}
-				hostPort, err := strconv.Atoi(envs[fmt.Sprintf("HOST_PORT_%s", matches[1])])
-				if err != nil {
-					return err
-				}
-				hostIP := envs[fmt.Sprintf("HOST_IP_%s", matches[1])]
-				res.ExposedPorts = append(res.ExposedPorts, request.ExposedPort{
-					ContainerPort: containerPort,
-					HostPort:      hostPort,
-					HostIP:        hostIP,
-				})
-			}
+		if isComposePortEnvKey(k) {
+			continue
 		} else {
 			res.Params[k] = v
 		}
+	}
+	res.ExposedPorts, err = loadComposeExposedPortsFromEnv(envs, "", true)
+	if err != nil {
+		return err
 	}
 	if v, ok := envs["CONTAINER_PACKAGE_URL"]; ok {
 		res.Source = v

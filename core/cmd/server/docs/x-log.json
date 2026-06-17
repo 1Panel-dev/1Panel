@@ -1247,6 +1247,33 @@
 		"formatZH": "更新 AI 网关分组 [name]",
 		"formatEN": "update AI proxy group [name]"
 	},
+	"/core/enterprise/ai-proxy/model-groups/create": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 AI 网关模型组 [name]",
+		"formatEN": "create AI proxy model group [name]"
+	},
+	"/core/enterprise/ai-proxy/model-groups/delete": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 AI 网关模型组 [id]",
+		"formatEN": "delete AI proxy model group [id]"
+	},
+	"/core/enterprise/ai-proxy/model-groups/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 AI 网关模型组 [name]",
+		"formatEN": "update AI proxy model group [name]"
+	},
 	"/core/enterprise/ai-proxy/service/operate": {
 		"bodyKeys": [
 			"operate"
@@ -2166,6 +2193,15 @@
 		"formatZH": "更新自定义应用配置 [status]",
 		"formatEN": "update custom app config [status]"
 	},
+	"/core/xpack/settings/app/image-prefix": {
+		"bodyKeys": [
+			"imagePrefix"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新应用镜像前缀 [imagePrefix]",
+		"formatEN": "update app image prefix [imagePrefix]"
+	},
 	"/core/xpack/settings/reset": {
 		"bodyKeys": [],
 		"paramKeys": [],
@@ -2193,25 +2229,13 @@
 	"/core/xpack/sync/app": {
 		"bodyKeys": [
 			"sourceNode",
-			"targetNode",
-			"appInstallID",
-			"appBackupID"
+			"targetNodes",
+			"appInstallID"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "同步应用备份 [appInstallID] 到节点 [targetNode]",
-		"formatEN": "sync app backup [appInstallID] to node [targetNode]"
-	},
-	"/core/xpack/sync/app/install": {
-		"bodyKeys": [
-			"appKey",
-			"version",
-			"nodes"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "安装应用 [appKey] [version] 到节点 [nodes]",
-		"formatEN": "install app [appKey] [version] to nodes [nodes]"
+		"formatZH": "同步应用 [appInstallID] 到节点 [targetNodes]",
+		"formatEN": "sync app [appInstallID] to nodes [targetNodes]"
 	},
 	"/core/xpack/sync/ssl": {
 		"bodyKeys": [
@@ -2352,6 +2376,15 @@
 		"formatZH": "更新自定义应用配置 [status]",
 		"formatEN": "update custom app config [status]"
 	},
+	"/custom/app/image-prefix": {
+		"bodyKeys": [
+			"imagePrefix"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新应用镜像前缀 [imagePrefix]",
+		"formatEN": "update app image prefix [imagePrefix]"
+	},
 	"/custom/app/install": {
 		"bodyKeys": [
 			"name",
@@ -2378,6 +2411,15 @@
 		"beforeFunctions": [],
 		"formatZH": "同步自定义应用商店",
 		"formatEN": "sync custom app store"
+	},
+	"/custom/app/sync/backup": {
+		"bodyKeys": [
+			"appInstallID"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建应用同步备份 [appInstallID]",
+		"formatEN": "create app sync backup [appInstallID]"
 	},
 	"/dashboard/app/launcher/show": {
 		"bodyKeys": [
@@ -4430,6 +4472,24 @@
 		],
 		"formatZH": "申请证书  [domain]",
 		"formatEN": "apply ssl [domain]"
+	},
+	"/websites/ssl/push": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "website_ssls",
+				"output_column": "primary_domain",
+				"output_value": "domain"
+			}
+		],
+		"formatZH": "推送证书到节点 [domain]",
+		"formatEN": "Push ssl to nodes [domain]"
 	},
 	"/websites/ssl/update": {
 		"bodyKeys": [

@@ -5202,7 +5202,7 @@ const message = {
             theworld: 'Navegador TheWorld',
             edge: 'Microsoft Edge',
             maxthon: 'Navegador Maxthon',
-            monitorStatusHelper: 'O monitoramento não está habilitado, por favor habilite-o nas configurações',
+            monitorStatusHelper: 'O monitoramento do site está desabilitado. Habilite agora',
             excludeIp: 'Excluir Endereços IP',
             excludeUa: 'Excluir User-Agent',
             remotePort: 'Porta Remota',

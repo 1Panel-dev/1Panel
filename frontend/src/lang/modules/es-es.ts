@@ -5018,7 +5018,7 @@ const message = {
             theworld: 'TheWorld Browser',
             edge: 'Microsoft Edge',
             maxthon: 'Maxthon Browser',
-            monitorStatusHelper: 'Monitorización no habilitada, actívala en Configuración',
+            monitorStatusHelper: 'La monitorización del sitio web está deshabilitada. Actívala ahora',
             excludeIp: 'Excluir IPs',
             excludeUa: 'Excluir User-Agent',
             remotePort: 'Puerto remoto',

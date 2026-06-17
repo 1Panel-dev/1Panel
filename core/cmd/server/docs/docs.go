@@ -2883,6 +2883,44 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/mcp/server/connection/test": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.McpServerConnectionTest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.McpServerConnectionTestRes"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Test mcp server connection",
+				"tags": [
+					"McpServer"
+				]
+			}
+		},
 		"/ai/mcp/server/del": {
 			"post": {
 				"consumes": [
@@ -2918,6 +2956,44 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/mcp/server/detail": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.McpServerDetail"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/response.McpServerDTO"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load mcp server detail",
+				"tags": [
+					"McpServer"
+				]
+			}
+		},
 		"/ai/mcp/server/op": {
 			"post": {
 				"consumes": [
@@ -2948,6 +3024,47 @@ const docTemplate = `{
 					}
 				],
 				"summary": "Operate mcp server",
+				"tags": [
+					"McpServer"
+				]
+			}
+		},
+		"/ai/mcp/server/status/sync": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.McpServerStatusSync"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/response.McpServerStatusDTO"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Sync mcp server status",
 				"tags": [
 					"McpServer"
 				]
@@ -27588,6 +27705,59 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/websites/ssl/push": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.WebsiteSSLPush"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Push ssl to nodes",
+				"tags": [
+					"Website SSL"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "website_ssls",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "primary_domain",
+							"output_value": "domain"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "Push ssl to nodes [domain]",
+					"formatZH": "推送证书到节点 [domain]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/websites/ssl/resolve": {
 			"post": {
 				"consumes": [
@@ -31530,6 +31700,9 @@ const docTemplate = `{
 				},
 				"fileName": {
 					"type": "string"
+				},
+				"isImmediate": {
+					"type": "boolean"
 				},
 				"name": {
 					"type": "string"
@@ -39396,6 +39569,9 @@ const docTemplate = `{
 				},
 				"hostPort": {
 					"type": "integer"
+				},
+				"protocol": {
+					"type": "string"
 				}
 			},
 			"type": "object"
@@ -40282,6 +40458,17 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"request.McpServerConnectionTest": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
 		"request.McpServerCreate": {
 			"properties": {
 				"baseUrl": {
@@ -40299,6 +40486,9 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
+				"gatewayImage": {
+					"type": "string"
+				},
 				"hostIP": {
 					"type": "string"
 				},
@@ -40310,6 +40500,9 @@ const docTemplate = `{
 				},
 				"port": {
 					"type": "integer"
+				},
+				"protocolVersion": {
+					"type": "string"
 				},
 				"ssePath": {
 					"type": "string"
@@ -40337,6 +40530,17 @@ const docTemplate = `{
 			"type": "object"
 		},
 		"request.McpServerDelete": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"request.McpServerDetail": {
 			"properties": {
 				"id": {
 					"type": "integer"
@@ -40383,6 +40587,17 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"request.McpServerStatusSync": {
+			"properties": {
+				"ids": {
+					"items": {
+						"type": "integer"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
 		"request.McpServerUpdate": {
 			"properties": {
 				"baseUrl": {
@@ -40400,6 +40615,9 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
+				"gatewayImage": {
+					"type": "string"
+				},
 				"hostIP": {
 					"type": "string"
 				},
@@ -40414,6 +40632,9 @@ const docTemplate = `{
 				},
 				"port": {
 					"type": "integer"
+				},
+				"protocolVersion": {
+					"type": "string"
 				},
 				"ssePath": {
 					"type": "string"
@@ -41691,6 +41912,9 @@ const docTemplate = `{
 		},
 		"request.Volume": {
 			"properties": {
+				"mode": {
+					"type": "string"
+				},
 				"source": {
 					"type": "string"
 				},
@@ -41852,7 +42076,13 @@ const docTemplate = `{
 					],
 					"type": "string"
 				},
+				"nodes": {
+					"type": "string"
+				},
 				"pushDir": {
+					"type": "boolean"
+				},
+				"pushNode": {
 					"type": "boolean"
 				},
 				"renew": {
@@ -42726,6 +42956,27 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"request.WebsiteSSLPush": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"nodes": {
+					"type": "string"
+				},
+				"pushNode": {
+					"type": "boolean"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
+				"taskID"
+			],
+			"type": "object"
+		},
 		"request.WebsiteSSLSearch": {
 			"properties": {
 				"acmeAccountID": {
@@ -42745,6 +42996,7 @@ const docTemplate = `{
 				"orderBy": {
 					"enum": [
 						"created_at",
+						"updated_at",
 						"expire_date"
 					],
 					"type": "string"
@@ -42843,11 +43095,17 @@ const docTemplate = `{
 				"description": {
 					"type": "string"
 				},
+				"nodes": {
+					"type": "string"
+				},
 				"privateKey": {
 					"type": "string"
 				},
 				"privateKeyPath": {
 					"type": "string"
+				},
+				"pushNode": {
+					"type": "boolean"
 				},
 				"sslID": {
 					"type": "integer"
@@ -43976,6 +44234,26 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"response.McpServerConnectionTestRes": {
+			"properties": {
+				"endpoint": {
+					"type": "string"
+				},
+				"message": {
+					"type": "string"
+				},
+				"outputTransport": {
+					"type": "string"
+				},
+				"protocolVersion": {
+					"type": "string"
+				},
+				"success": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
 		"response.McpServerDTO": {
 			"properties": {
 				"baseUrl": {
@@ -44005,6 +44283,9 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
+				"gatewayImage": {
+					"type": "string"
+				},
 				"hostIP": {
 					"type": "string"
 				},
@@ -44022,6 +44303,9 @@ const docTemplate = `{
 				},
 				"port": {
 					"type": "integer"
+				},
+				"protocolVersion": {
+					"type": "string"
 				},
 				"ssePath": {
 					"type": "string"
@@ -44046,6 +44330,20 @@ const docTemplate = `{
 				},
 				"websiteID": {
 					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"response.McpServerStatusDTO": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"message": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
 				}
 			},
 			"type": "object"

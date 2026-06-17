@@ -5049,7 +5049,7 @@ const message = {
             theworld: 'Браузер TheWorld',
             edge: 'Microsoft Edge',
             maxthon: 'Браузер Maxthon',
-            monitorStatusHelper: 'Мониторинг не включён, пожалуйста, включите его в настройках',
+            monitorStatusHelper: 'Мониторинг сайта сейчас отключён. Включите его сейчас',
             excludeIp: 'Исключить IP-адреса',
             excludeUa: 'Исключить User-Agent',
             remotePort: 'Удаленный порт',

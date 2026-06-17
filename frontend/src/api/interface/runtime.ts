@@ -71,6 +71,7 @@ export namespace Runtime {
         hostPort: number;
         containerPort: number;
         hostIP: string;
+        protocol: string;
     }
     export interface Environment {
         key: string;
@@ -79,6 +80,7 @@ export namespace Runtime {
     export interface Volume {
         source: string;
         target: string;
+        mode: string;
     }
 
     export interface ExtraHost {

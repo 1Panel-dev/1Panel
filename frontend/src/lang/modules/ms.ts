@@ -5058,7 +5058,7 @@ const message = {
             theworld: 'Pelayar TheWorld',
             edge: 'Microsoft Edge',
             maxthon: 'Pelayar Maxthon',
-            monitorStatusHelper: 'Pemantauan tidak diaktifkan, sila aktifkan dalam tetapan',
+            monitorStatusHelper: 'Pemantauan laman web belum diaktifkan. Aktifkan sekarang',
             excludeIp: 'Kecualikan Alamat IP',
             excludeUa: 'Kecualikan User-Agent',
             remotePort: 'Port Jauh',

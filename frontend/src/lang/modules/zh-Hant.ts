@@ -4645,7 +4645,7 @@ const message = {
             theworld: '世界之窗瀏覽器',
             edge: 'Edge',
             maxthon: '遨遊瀏覽器',
-            monitorStatusHelper: '監控未開啟，請在設定中開啟',
+            monitorStatusHelper: '目前網站監控未開啟，立即開啟',
             excludeIp: '排除 IP',
             excludeUa: '排除 User-Agent',
             remotePort: '遠端埠',

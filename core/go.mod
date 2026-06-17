@@ -32,7 +32,7 @@ require (
 	github.com/swaggo/swag v1.16.6
 	github.com/xlzd/gotp v0.1.0
 	golang.org/x/crypto v0.53.0
-	golang.org/x/net v0.55.0
+	golang.org/x/net v0.56.0
 	golang.org/x/sys v0.46.0
 	golang.org/x/term v0.44.0
 	golang.org/x/text v0.38.0

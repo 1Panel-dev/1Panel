@@ -792,9 +792,14 @@ func loadMcpServerComposeConfig(serverDTO *response.McpServerDTO) error {
 		}
 		if service.Volumes != nil {
 			for _, volume := range service.Volumes {
+				mode := "rw"
+				if volume.ReadOnly {
+					mode = "ro"
+				}
 				serverDTO.Volumes = append(serverDTO.Volumes, request.Volume{
 					Source: volume.Source,
 					Target: volume.Target,
+					Mode:   mode,
 				})
 			}
 		}
@@ -850,6 +855,9 @@ func handleCreateParams(mcpServer *model.McpServer, environments []request.Envir
 	normalizeMcpServerGateway(mcpServer)
 	serviceValue["command"] = buildSupergatewayCommand(mcpServer)
 	serviceValue["image"] = mcpServer.GatewayImage
+	serviceValue["ports"] = []string{
+		formatComposePortMapping("HOST_IP", "PANEL_APP_PORT_HTTP", "PANEL_APP_PORT_HTTP", ""),
+	}
 	oldEnv, hasOldEnv := serviceValue["environment"]
 	delete(serviceValue, "environment")
 	if environments != nil && len(environments) > 0 {
@@ -869,7 +877,7 @@ func handleCreateParams(mcpServer *model.McpServer, environments []request.Envir
 	if volumes != nil && len(volumes) > 0 {
 		volumeList := make([]string, 0)
 		for _, volume := range volumes {
-			volumeList = append(volumeList, fmt.Sprintf("%s:%s", volume.Source, volume.Target))
+			volumeList = append(volumeList, formatComposeVolume(volume.Source, volume.Target, volume.Mode))
 		}
 		serviceValue["volumes"] = volumeList
 	} else if volumes == nil {
