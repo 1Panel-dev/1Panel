@@ -5594,9 +5594,46 @@ const message = {
             setDefaultHelper: 'La paleta de colores volverá al estado inicial. ¿Continuar?',
             setHelper: 'Se guardará la paleta actual como tema. ¿Continuar?',
         },
-        exchange: {
-            exchange: 'Intercambio de archivos',
-            exchangeConfirm: '¿Quieres transferir {1} de {0} a {2}:{3}?',
+        sync: {
+            menu: 'Sincronización de Recursos',
+            file: 'Transferencia de archivos',
+            fileSyncConfirm: '¿Transferir el archivo/carpeta {1} del nodo {0} al directorio {3} del nodo {2}?',
+
+            image: 'Transferencia de imágenes',
+            imageBatchDesc:
+                'Seleccione primero el nodo de origen y las imágenes de origen, luego elija los nodos de destino para reenviar.',
+            imageBatchConfirmPrefix: 'Se enviarán {0} imágenes a {1} nodos, creando {2} tareas.',
+
+            cert: 'Sincronización de certificados',
+            certBatchDesc:
+                'Después de seleccionar el nodo de origen, los certificados especificados pueden sincronizarse con el entorno actual del panel.',
+            certBatchConfirmPrefix: 'Se sincronizarán {0} certificados a {1} nodos, creando {2} tareas.',
+
+            app: 'Transferencia de Aplicaciones',
+            appBatchDesc:
+                'Seleccione el nodo de origen, la aplicación y los nodos de destino, luego confirme las dependencias de recursos y ejecute la tarea de transferencia de aplicaciones.',
+            appSelectedApp: 'Aplicación seleccionada:',
+            appPreviewTitle: 'Vista previa de transferencia',
+            appPreviewDesc:
+                'Confirme los nodos de destino y los recursos dependientes antes de iniciar la transferencia de aplicaciones.',
+            appDatabaseDependency: 'Dependencia de base de datos',
+            appResourceRequired: 'Seleccione primero todos los recursos asociados requeridos.',
+            appUnsupportedMultipleResources:
+                'Actualmente solo se admite la migración de aplicaciones asociadas con un máximo de un recurso.',
+            appUnsupportedResourceType:
+                'Actualmente solo se admite la migración de aplicaciones sin dependencias de recursos o que dependan únicamente de MySQL, MariaDB o PostgreSQL.',
+
+            targetTitle: 'Nodos de destino',
+            targetDesc: 'El nodo de origen se excluye automáticamente. Puede seleccionar uno o más nodos de destino.',
+            targetSearchPlaceholder: 'Buscar nombre o dirección del nodo',
+            noTargetNodes: 'No hay nodos de destino disponibles',
+            noSourceNode: 'Seleccione primero un nodo de origen',
+            reviewTargets: 'Nodos de destino',
+            reviewEmpty: 'Seleccione primero los recursos y los nodos de destino',
+            selectSourceFirst: 'Seleccione primero un nodo de origen.',
+            selectResourceFirst: 'Seleccione primero un recurso para sincronizar.',
+            selectTargetFirst: 'Seleccione al menos un nodo de destino.',
+            submitSuccess: 'La tarea de sincronización se ha enviado correctamente.',
         },
         cluster: {
             cluster: 'Alta disponibilidad de aplicaciones',

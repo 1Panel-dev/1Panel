@@ -2372,15 +2372,6 @@
 		"formatZH": "检查应用安装 [name]",
 		"formatEN": "check app install [name]"
 	},
-	"/custom/app/push": {
-		"bodyKeys": [
-			"appBackupID"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "推送应用备份 [appBackupID] 到节点",
-		"formatEN": "push app backup [appBackupID] to node"
-	},
 	"/custom/app/sync": {
 		"bodyKeys": [],
 		"paramKeys": [],

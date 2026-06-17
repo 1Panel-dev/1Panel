@@ -107,6 +107,7 @@ ErrContainerMsg: 'O contêiner {{ .name }} está anormal., verifique o log na p�
 ErrAppBackup: '{{ .name }} falha no backup do aplicativo {{ .err }}'
 ErrVersionTooLow: 'A versão atual do 1Panel é muito antiga para atualizar a App Store., atualize a versão antes de operar.'
 ErrAppNameExist: 'O nome do aplicativo já existe'
+ErrAppInstallNameExist: 'O nome de instalação do aplicativo {{ .name }} já existe'
 AppStoreIsSyncing: 'A App Store está sincronizando mais tarde'
 ErrGetCompose: 'Falha ao obter o arquivo docker-compose.yml {{ .detail }}'
 ErrAppWarn: 'Status anormal, verifique o log'

@@ -5454,9 +5454,43 @@ const message = {
             setDefaultHelper: '테마 색상 스킴이 초기 상태로 복원됩니다. 계속하시겠습니까?',
             setHelper: '현재 선택한 테마 색상 스킴이 저장됩니다. 계속하시겠습니까?',
         },
-        exchange: {
-            exchange: '파일 교환',
-            exchangeConfirm: '{0} 노드의 파일/폴더 {1}을(를) {2} 노드의 {3} 디렉토리로 전송하시겠습니까?',
+        sync: {
+            menu: '리소스 동기화',
+            file: '파일 전송',
+            fileSyncConfirm: '{0} 노드의 파일/폴더 {1}을(를) {2} 노드의 디렉터리 {3}(으)로 전송하시겠습니까?',
+
+            image: '이미지 전송',
+            imageBatchDesc: '먼저 원본 노드와 원본 이미지를 선택한 후 대상 노드를 선택하여 전달합니다.',
+            imageBatchConfirmPrefix: '{0}개의 이미지를 {1}개 노드로 전달합니다. 총 {2}개의 작업이 생성됩니다.',
+
+            cert: '인증서 동기화',
+            certBatchDesc: '원본 노드를 선택한 후 지정된 인증서를 현재 패널 환경으로 동기화할 수 있습니다.',
+            certBatchConfirmPrefix: '{0}개의 인증서를 {1}개 노드로 동기화합니다. 총 {2}개의 작업이 생성됩니다.',
+
+            app: '애플리케이션 전송',
+            appBatchDesc:
+                '원본 노드, 애플리케이션 및 대상 노드를 선택한 후 리소스 종속성을 확인하고 애플리케이션 전송 작업을 실행합니다.',
+            appSelectedApp: '선택한 애플리케이션:',
+            appPreviewTitle: '전송 미리보기',
+            appPreviewDesc: '대상 노드와 종속 리소스를 확인한 후 애플리케이션 전송을 실행하세요.',
+            appDatabaseDependency: '데이터베이스 종속성',
+            appResourceRequired: '필수 연관 리소스를 모두 먼저 선택하세요.',
+            appUnsupportedMultipleResources:
+                '현재 최대 하나의 리소스만 연결된 애플리케이션만 마이그레이션할 수 있습니다.',
+            appUnsupportedResourceType:
+                '현재 리소스 종속성이 없거나 MySQL, MariaDB, PostgreSQL에만 의존하는 애플리케이션만 마이그레이션할 수 있습니다.',
+
+            targetTitle: '대상 노드',
+            targetDesc: '원본 노드는 자동으로 제외됩니다. 하나 이상의 대상 노드를 선택할 수 있습니다.',
+            targetSearchPlaceholder: '노드 이름 또는 주소 검색',
+            noTargetNodes: '선택 가능한 대상 노드가 없습니다',
+            noSourceNode: '먼저 원본 노드를 선택하세요',
+            reviewTargets: '대상 노드',
+            reviewEmpty: '먼저 리소스와 대상 노드를 선택하세요',
+            selectSourceFirst: '먼저 원본 노드를 선택하세요.',
+            selectResourceFirst: '먼저 동기화할 리소스를 선택하세요.',
+            selectTargetFirst: '최소 하나의 대상 노드를 선택하세요.',
+            submitSuccess: '동기화 작업이 제출되었습니다.',
         },
         cluster: {
             cluster: '애플리케이션 고가용성',

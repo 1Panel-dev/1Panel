@@ -322,6 +322,17 @@ HandlePublicKey: "处理节点公钥"
 ExchangeFile: "开始从 {{ .source }} 节点同步 {{ .sourcePath }} 到 {{ .dest  }} 节点 {{ .destPath }}"
 TaskRsync: "同步"
 NodeFile: "节点文件"
+ImageSyncTaskName: "镜像同步 {{ .source }} -> {{ .count }} 个节点"
+ImageSyncSave: "保存镜像 {{ .image }}"
+ImageSyncSaveTags: "保存镜像标签 {{ .tags }}"
+ImageSyncToNode: "同步镜像 {{ .image }} 到节点 {{ .node }}"
+ImageSyncLoad: "在节点 {{ .node }} 加载镜像 {{ .image }}"
+ImageSyncClean: "清理镜像 {{ .image }} 临时文件"
+ImageSyncNoTag: "镜像 {{ .image }} 没有标签，将使用镜像 ID 保存"
+ImageSyncFrontendTagsIgnored: "镜像 {{ .image }} 在源节点未查询到标签，已忽略前端传入标签"
+ImageSyncHandlePrivateKey: "处理镜像同步节点私钥"
+ImageSyncHandlePublicKey: "处理镜像同步节点公钥"
+ImageSyncTransfer: "开始传输镜像临时文件：{{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
 
 #mobile app
 ErrVerifyToken: '令牌验证错误，请重置后再次扫码'

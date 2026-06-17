@@ -5631,9 +5631,43 @@ const message = {
             setDefaultHelper: 'Tema renk şeması başlangıç durumuna geri yüklenecek. Devam etmek istiyor musunuz?',
             setHelper: 'Seçilen tema renk şeması kaydedilecek. Devam etmek istiyor musunuz?',
         },
-        exchange: {
-            exchange: 'Dosya Değişimi',
-            exchangeConfirm: '{0} düğümünden {1} dosya/klasörünü {2} düğümünün {3} dizinine aktarmak istiyor musunuz?',
+        sync: {
+            menu: 'Kaynak Senkronizasyonu',
+            file: 'Dosya Aktarımı',
+            fileSyncConfirm: '{0} düğümündeki {1} dosya/klasörü {2} düğümündeki {3} dizinine aktarmak istiyor musunuz?',
+
+            image: 'İmaj Aktarımı',
+            imageBatchDesc: 'Önce kaynak düğümü ve kaynak imajları seçin, ardından iletim için hedef düğümleri seçin.',
+            imageBatchConfirmPrefix: '{0} imaj {1} düğüme aktarılacak, toplam {2} görev oluşturulacak.',
+
+            cert: 'Sertifika Senkronizasyonu',
+            certBatchDesc:
+                'Kaynak düğüm seçildikten sonra belirtilen sertifikalar mevcut panel ortamına senkronize edilebilir.',
+            certBatchConfirmPrefix: '{0} sertifika {1} düğüme senkronize edilecek, toplam {2} görev oluşturulacak.',
+
+            app: 'Uygulama Aktarımı',
+            appBatchDesc:
+                'Kaynak düğümü, uygulamayı ve hedef düğümleri seçin, ardından kaynak bağımlılıklarını doğrulayarak uygulama aktarım görevini başlatın.',
+            appSelectedApp: 'Seçilen Uygulama:',
+            appPreviewTitle: 'Aktarım Önizlemesi',
+            appPreviewDesc: 'Uygulama aktarımını başlatmadan önce hedef düğümleri ve bağımlı kaynakları doğrulayın.',
+            appDatabaseDependency: 'Veritabanı Bağımlılığı',
+            appResourceRequired: 'Lütfen önce gerekli tüm ilişkili kaynakları seçin.',
+            appUnsupportedMultipleResources: 'Şu anda yalnızca en fazla bir kaynakla ilişkili uygulamalar taşınabilir.',
+            appUnsupportedResourceType:
+                'Şu anda yalnızca kaynak bağımlılığı olmayan veya yalnızca MySQL, MariaDB ya da PostgreSQL kullanan uygulamalar taşınabilir.',
+
+            targetTitle: 'Hedef Düğümler',
+            targetDesc: 'Kaynak düğüm otomatik olarak hariç tutulur. Bir veya daha fazla hedef düğüm seçebilirsiniz.',
+            targetSearchPlaceholder: 'Düğüm adı veya adres ara',
+            noTargetNodes: 'Kullanılabilir hedef düğüm yok',
+            noSourceNode: 'Lütfen önce bir kaynak düğüm seçin',
+            reviewTargets: 'Hedef Düğümler',
+            reviewEmpty: 'Lütfen önce kaynakları ve hedef düğümleri seçin',
+            selectSourceFirst: 'Lütfen önce bir kaynak düğüm seçin.',
+            selectResourceFirst: 'Lütfen önce senkronize edilecek kaynağı seçin.',
+            selectTargetFirst: 'Lütfen en az bir hedef düğüm seçin.',
+            submitSuccess: 'Senkronizasyon görevi başarıyla gönderildi.',
         },
         cluster: {
             cluster: 'Высокая доступность приложений',

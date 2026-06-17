@@ -108,6 +108,7 @@ ErrContainerMsg: '{{ .name }} 容器异常，具体请在容器页面查看日�
 ErrAppBackup: '{{ .name }} 应用备份失败 {{ .err }}'
 ErrVersionTooLow: '当前 1Panel 版本过低，无法更新应用商店，请升级版本之后操作'
 ErrAppNameExist: '应用名称已存在'
+ErrAppInstallNameExist: '应用安装名称 {{ .name }} 已存在'
 AppStoreIsSyncing: '应用商店同步中，请稍后重试'
 ErrGetCompose: "docker-compose.yml 文件获取失败！{{ .detail }}"
 ErrAppWarn: "状态异常，请查看日志"

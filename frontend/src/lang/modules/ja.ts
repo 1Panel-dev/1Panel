@@ -5569,9 +5569,43 @@ const message = {
             setDefaultHelper: 'テーマカラーを初期状態に戻そうとしています。続行しますか？',
             setHelper: '現在選択されているテーマカラーを保存しようとしています。続行しますか？',
         },
-        exchange: {
-            exchange: 'ファイル交換',
-            exchangeConfirm: '{0} ノードのファイル/フォルダ {1} を {2} ノードの {3} ディレクトリに転送しますか？',
+        sync: {
+            menu: 'リソース同期',
+            file: 'ファイル転送',
+            fileSyncConfirm: 'ノード {0} のファイル/フォルダ {1} をノード {2} のディレクトリ {3} に転送しますか？',
+
+            image: 'イメージ転送',
+            imageBatchDesc: 'まずソースノードとソースイメージを選択し、その後転送先ノードを選択してください。',
+            imageBatchConfirmPrefix:
+                '{0} 個のイメージを {1} 個のノードへ転送します。合計 {2} 件のタスクが作成されます。',
+
+            cert: '証明書同期',
+            certBatchDesc: 'ソースノードを選択すると、指定した証明書を現在のパネル環境へ同期できます。',
+            certBatchConfirmPrefix: '{0} 件の証明書を {1} 個のノードへ同期します。合計 {2} 件のタスクが作成されます。',
+
+            app: 'アプリ転送',
+            appBatchDesc:
+                'ソースノード、アプリケーション、ターゲットノードを選択し、リソース依存関係を確認してアプリ転送タスクを実行します。',
+            appSelectedApp: '選択したアプリ:',
+            appPreviewTitle: '転送プレビュー',
+            appPreviewDesc: 'ターゲットノードと依存リソースを確認してからアプリ転送を実行してください。',
+            appDatabaseDependency: 'データベース依存関係',
+            appResourceRequired: '必要な関連リソースをすべて選択してください。',
+            appUnsupportedMultipleResources: '現在、関連リソースが最大1つのアプリのみ移行できます。',
+            appUnsupportedResourceType:
+                '現在、リソース依存がないアプリ、または MySQL・MariaDB・PostgreSQL のみを利用するアプリのみ移行できます。',
+
+            targetTitle: 'ターゲットノード',
+            targetDesc: 'ソースノードは自動的に除外されます。1つ以上のターゲットノードを選択できます。',
+            targetSearchPlaceholder: 'ノード名またはアドレスを検索',
+            noTargetNodes: '利用可能なターゲットノードがありません',
+            noSourceNode: 'まずソースノードを選択してください',
+            reviewTargets: 'ターゲットノード',
+            reviewEmpty: 'まずリソースとターゲットノードを選択してください',
+            selectSourceFirst: 'まずソースノードを選択してください。',
+            selectResourceFirst: 'まず同期するリソースを選択してください。',
+            selectTargetFirst: '少なくとも1つのターゲットノードを選択してください。',
+            submitSuccess: '同期タスクが送信されました。',
         },
         cluster: {
             cluster: 'アプリケーションの高可用性',

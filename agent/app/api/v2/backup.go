@@ -413,8 +413,13 @@ func (b *BaseApi) Backup(c *gin.Context) {
 
 	switch req.Type {
 	case "app":
-		if _, err := backupService.AppBackup(req); err != nil {
+		record, err := backupService.AppBackup(req)
+		if err != nil {
 			helper.InternalServer(c, err)
+			return
+		}
+		if req.IsImmediate {
+			helper.SuccessWithData(c, record)
 			return
 		}
 	case "mysql", "mariadb", constant.AppMysqlCluster:

@@ -5534,9 +5534,42 @@ const message = {
             setDefaultHelper: 'The theme color scheme is about to be restored to its initial state. Continue?',
             setHelper: 'The currently selected theme color scheme is about to be saved. Continue?',
         },
-        exchange: {
-            exchange: 'File Exchange',
-            exchangeConfirm: "transfer the file/folder {1} from {0} node to {2} node's {3} directory?",
+        sync: {
+            menu: 'Resource Sync',
+            file: 'File Exchange',
+            fileSyncConfirm: 'Do you want to transfer file/folder {1} from node {0} to directory {3} on node {2}?',
+            image: 'Image Exchange',
+            imageBatchDesc: 'Select a source node and image first, then batch-transfer to multiple target nodes.',
+            imageBatchConfirmPrefix: 'About to transfer {0} images to {1} nodes, for a total of {2} tasks.',
+
+            cert: 'Certificate Sync',
+            certBatchDesc:
+                'After selecting a source node, sync the specified certificate into the current panel environment.',
+            certBatchConfirmPrefix: 'About to sync {0} certificates to {1} nodes, for a total of {2} tasks.',
+
+            app: 'Application Transfer',
+            appBatchDesc:
+                'Select the source node, application, and target nodes, then confirm resource dependencies and start the application transfer task.',
+            appSelectedApp: 'Selected Application:',
+            appPreviewTitle: 'Transfer Preview',
+            appPreviewDesc: 'Confirm target nodes and dependent resources before starting the application transfer.',
+            appDatabaseDependency: 'Database dependency',
+            appResourceRequired: 'Select all required linked resources first.',
+            appUnsupportedMultipleResources: 'Only apps with at most one linked resource can be migrated.',
+            appUnsupportedResourceType:
+                'Only apps with no resource dependency or a single MySQL, MariaDB, or PostgreSQL dependency can be migrated.',
+
+            targetTitle: 'Target nodes',
+            targetDesc: 'The source node is excluded automatically. Choose one or more target nodes.',
+            targetSearchPlaceholder: 'Search node name or address',
+            noTargetNodes: 'No target nodes available',
+            noSourceNode: 'Please select a source node first',
+            reviewTargets: 'Target nodes',
+            reviewEmpty: 'Please select resources and target nodes first',
+            selectSourceFirst: 'Please select a source node first.',
+            selectResourceFirst: 'Please select resources to sync first.',
+            selectTargetFirst: 'Please select at least one target node.',
+            submitSuccess: 'Sync task submitted.',
         },
         cluster: {
             cluster: 'Application High Availability',
