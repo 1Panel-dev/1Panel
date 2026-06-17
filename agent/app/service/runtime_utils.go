@@ -19,7 +19,6 @@ import (
 	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
 
 	"github.com/1Panel-dev/1Panel/agent/i18n"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -913,7 +912,31 @@ func getDockerComposeExtraHosts(yml []byte) ([]request.ExtraHost, error) {
 	return res, nil
 }
 
+func composePortCheckKey(port int, protocol string) string {
+	return fmt.Sprintf("%d/%s", port, normalizeComposeProtocol(protocol))
+}
+
+func runtimeOwnedPortKeys(envStr string) map[string]struct{} {
+	portKeys := make(map[string]struct{})
+	envs, err := gotenv.Unmarshal(envStr)
+	if err != nil {
+		return portKeys
+	}
+	exposedPorts, err := loadComposeExposedPortsFromEnv(envs, "", false)
+	if err != nil {
+		return portKeys
+	}
+	for _, port := range exposedPorts {
+		portKeys[composePortCheckKey(port.HostPort, port.Protocol)] = struct{}{}
+	}
+	return portKeys
+}
+
 func checkRuntimePortExist(port int, scanPort bool, runtimeID uint) error {
+	return checkRuntimePortExistWithProtocol(port, "", scanPort, runtimeID)
+}
+
+func checkRuntimePortExistWithProtocol(port int, protocol string, scanPort bool, runtimeID uint) error {
 	errMap := make(map[string]interface{})
 	errMap["port"] = port
 	appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithPort(port))
@@ -938,7 +961,7 @@ func checkRuntimePortExist(port int, scanPort bool, runtimeID uint) error {
 		errMap["name"] = domain.Domain
 		return buserr.WithMap("ErrPortExist", errMap, nil)
 	}
-	if scanPort && common.ScanPort(port) {
+	if scanPort && isPortInUse(port, protocol) {
 		return buserr.WithDetail("ErrPortInUsed", port, nil)
 	}
 	return nil

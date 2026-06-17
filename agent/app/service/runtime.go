@@ -137,7 +137,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		create.Install = true
 		for _, export := range create.ExposedPorts {
 			hostPorts = append(hostPorts, strconv.Itoa(export.HostPort))
-			if err := checkPortExist(export.HostPort); err != nil {
+			if err := checkPortExistWithProtocol(export.HostPort, export.Protocol); err != nil {
 				return nil, err
 			}
 		}
@@ -416,9 +416,11 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			return buserr.New("ErrImageExist")
 		}
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
+		ownedPortKeys := runtimeOwnedPortKeys(runtime.Env)
 		for _, export := range req.ExposedPorts {
 			hostPorts = append(hostPorts, strconv.Itoa(export.HostPort))
-			if err = checkRuntimePortExist(export.HostPort, false, runtime.ID); err != nil {
+			_, owned := ownedPortKeys[composePortCheckKey(export.HostPort, export.Protocol)]
+			if err = checkRuntimePortExistWithProtocol(export.HostPort, export.Protocol, !owned, runtime.ID); err != nil {
 				return err
 			}
 		}
@@ -1039,6 +1041,7 @@ func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) erro
 	var (
 		composeContent []byte
 	)
+	ownedPortKeys := runtimeOwnedPortKeys(runtime.Env)
 	for _, export := range req.ExposedPorts {
 		if strconv.Itoa(export.HostPort) == runtime.Port {
 			return buserr.WithName("ErrPHPRuntimePortFailed", strconv.Itoa(export.HostPort))
@@ -1046,7 +1049,8 @@ func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) erro
 		if export.ContainerPort == 9000 {
 			return buserr.New("ErrPHPPortIsDefault")
 		}
-		if err = checkRuntimePortExist(export.HostPort, false, runtime.ID); err != nil {
+		_, owned := ownedPortKeys[composePortCheckKey(export.HostPort, export.Protocol)]
+		if err = checkRuntimePortExistWithProtocol(export.HostPort, export.Protocol, !owned, runtime.ID); err != nil {
 			return err
 		}
 	}

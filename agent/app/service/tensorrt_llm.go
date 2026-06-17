@@ -189,7 +189,7 @@ func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
 		}
 	}
 	for _, export := range create.ExposedPorts {
-		if err := checkPortExist(export.HostPort); err != nil {
+		if err := checkPortExistWithProtocol(export.HostPort, export.Protocol); err != nil {
 			return err
 		}
 	}
