@@ -182,13 +182,47 @@
             <Log ref="logRef" @close="search()" :heightDiff="220" />
             <CA ref="caRef" @close="search()" />
             <Obtain ref="obtainRef" @close="search()" @submit="openLog" />
+            <DrawerPro v-model="pushOpen" :header="$t('commons.button.sync')" size="large" @close="handlePushClose">
+                <el-form
+                    ref="pushFormRef"
+                    label-position="top"
+                    :model="pushForm"
+                    :rules="pushRules"
+                    v-loading="pushLoading"
+                >
+                    <PushToNode
+                        v-if="isMaster && isXpackOrEE"
+                        :push-node="pushForm.pushNode"
+                        :nodes="pushForm.pushNodes"
+                        type="ssl"
+                        @update:push-node="pushForm.pushNode = $event"
+                        @update:nodes="pushForm.pushNodes = $event"
+                    />
+                </el-form>
+                <template #footer>
+                    <span class="dialog-footer">
+                        <el-button @click="handlePushClose" :disabled="pushLoading">
+                            {{ $t('commons.button.cancel') }}
+                        </el-button>
+                        <el-button
+                            v-permission="'website_cert_manage'"
+                            type="primary"
+                            @click="submitPush"
+                            :disabled="pushLoading"
+                        >
+                            {{ $t('commons.button.confirm') }}
+                        </el-button>
+                    </span>
+                </template>
+            </DrawerPro>
+            <TaskLog ref="taskLogRef" @close="search()" />
         </LayoutContent>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue';
-import { deleteSSL, downloadFile, searchSSL, updateSSL } from '@/api/modules/website';
+import { defineAsyncComponent, onMounted, reactive, ref } from 'vue';
+import { deleteSSL, downloadFile, pushSSLToNode, searchSSL, updateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
 import CA from './ca/index.vue';
@@ -206,9 +240,23 @@ import Obtain from './obtain/index.vue';
 import MsgInfo from '@/components/msg-info/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
+import TaskLog from '@/components/log/task/index.vue';
+import { newUUID } from '@/utils/id';
+import { Rules } from '@/global/form-rules';
+import { FormInstance } from 'element-plus';
 
-const { currentNode, isMobile } = useGlobalStore();
+const { currentNode, isMobile, isMaster, isXpackOrEE } = useGlobalStore();
 useOperateNodeContext(currentNode);
+
+const PushToNode = defineAsyncComponent(async () => {
+    const modules = import.meta.glob('@/xpack/views/ssl/index.vue');
+    const loader = modules['/src/xpack/views/ssl/index.vue'];
+    if (loader) {
+        return ((await loader()) as any).default;
+    }
+    return { template: '<div></div>' };
+});
+
 const paginationConfig = reactive({
     cacheSizeKey: 'ssl-page-size',
     currentPage: 1,
@@ -225,14 +273,26 @@ const opRef = ref();
 const sslUploadRef = ref();
 const applyRef = ref();
 const logRef = ref();
+const taskLogRef = ref();
 const caRef = ref();
 const obtainRef = ref();
+const pushFormRef = ref<FormInstance>();
+const pushOpen = ref(false);
+const pushLoading = ref(false);
 let selects = ref<any>([]);
 const columns = ref([]);
 const req = reactive({
     domain: '',
     orderBy: 'updated_at',
     order: 'descending',
+});
+const pushForm = ref({
+    id: 0,
+    pushNode: true,
+    pushNodes: [] as string[],
+});
+const pushRules = ref({
+    pushNodes: [Rules.requiredSelect],
 });
 
 const routerButton = [
@@ -290,6 +350,19 @@ const buttons = [
         },
         show: function (row: Website.SSLDTO) {
             return row.provider != 'manual';
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.sync'),
+        permission: true,
+        disabled: function (row: Website.SSLDTO) {
+            return row.status !== 'ready';
+        },
+        click: function (row: Website.SSLDTO) {
+            openPush(row);
+        },
+        show: function (row: Website.SSLDTO) {
+            return isMaster.value && isXpackOrEE.value && row.provider !== 'fromMaster';
         },
     },
     {
@@ -394,6 +467,58 @@ const openLog = (id: number) => {
 };
 const openSSLLog = (row: Website.SSL) => {
     logRef.value.acceptParams({ id: row.id, type: 'ssl', tail: row.status === 'applying' });
+};
+
+const parsePushNodes = (nodes: string) => {
+    return nodes
+        ? nodes
+              .split(',')
+              .map((item) => item.trim())
+              .filter((item) => item !== '')
+        : [];
+};
+
+const openPush = (row: Website.SSLDTO) => {
+    pushForm.value = {
+        id: row.id,
+        pushNode: true,
+        pushNodes: parsePushNodes(row.nodes),
+    };
+    pushOpen.value = true;
+};
+
+const handlePushClose = () => {
+    pushOpen.value = false;
+    pushFormRef.value?.resetFields();
+    pushForm.value = {
+        id: 0,
+        pushNode: true,
+        pushNodes: [],
+    };
+};
+
+const submitPush = async () => {
+    if (!pushForm.value.pushNode || pushForm.value.pushNodes.length === 0) {
+        MsgError(i18n.global.t('commons.rule.requiredSelect'));
+        return;
+    }
+    await pushFormRef.value?.validate();
+    const taskID = newUUID();
+    pushLoading.value = true;
+    pushSSLToNode({
+        id: pushForm.value.id,
+        pushNode: pushForm.value.pushNode,
+        nodes: pushForm.value.pushNodes.join(','),
+        taskID,
+    })
+        .then(() => {
+            handlePushClose();
+            taskLogRef.value.openWithTaskID(taskID);
+            search();
+        })
+        .finally(() => {
+            pushLoading.value = false;
+        });
 };
 
 const openCA = () => {

@@ -148,6 +148,10 @@ export const updateSSL = (req: Website.SSLUpdate) => {
     return http.post<any>(`/websites/ssl/update`, req);
 };
 
+export const pushSSLToNode = (req: Website.SSLPush) => {
+    return http.post<any>(`/websites/ssl/push`, req);
+};
+
 export const getDnsResolve = (req: Website.DNSResolveReq) => {
     return http.post<Website.DNSResolve[]>(`/websites/ssl/resolve`, req, TimeoutEnum.T_5M);
 };

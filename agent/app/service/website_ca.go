@@ -207,6 +207,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 			Description: req.Description,
 			ExecShell:   req.ExecShell,
 		}
+		setSSLPushConfig(websiteSSL, req.PushNode, req.Nodes)
 		if req.ExecShell {
 			websiteSSL.Shell = req.Shell
 		}

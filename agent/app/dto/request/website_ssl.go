@@ -126,6 +126,15 @@ type WebsiteSSLUpload struct {
 	Type            string `json:"type" validate:"required,oneof=paste local"`
 	SSLID           uint   `json:"sslID"`
 	Description     string `json:"description"`
+	PushNode        bool   `json:"pushNode"`
+	Nodes           string `json:"nodes"`
+}
+
+type WebsiteSSLPush struct {
+	ID       uint   `json:"id" validate:"required"`
+	PushNode bool   `json:"pushNode"`
+	Nodes    string `json:"nodes"`
+	TaskID   string `json:"taskID" validate:"required"`
 }
 
 type WebsiteCASearch struct {
@@ -157,6 +166,8 @@ type WebsiteCAObtain struct {
 	Description string `json:"description"`
 	ExecShell   bool   `json:"execShell"`
 	Shell       string `json:"shell"`
+	PushNode    bool   `json:"pushNode"`
+	Nodes       string `json:"nodes"`
 }
 
 type WebsiteCARenew struct {
@@ -167,4 +178,6 @@ type WebsiteSSLFileUpload struct {
 	Type        string `json:"type"`
 	Description string `json:"description"`
 	SSLID       uint64 `json:"sslID"`
+	PushNode    bool   `json:"pushNode"`
+	Nodes       string `json:"nodes"`
 }
