@@ -147,6 +147,7 @@
                             @node-expand="handleNodeExpand"
                             @node-collapse="handleNodeCollapse"
                             class="monaco-editor-tree monaco-editor-background pt-2"
+                            :default-expanded-keys="expandedNodeKeys"
                             :height="treeHeight"
                             :indent="6"
                             :item-size="26"
@@ -564,7 +565,20 @@ const rowRefs = ref();
 const isCreate = ref('none');
 const newFolder = ref();
 const selectedParentNode = ref(null);
-const expandedNodeIds = ref(new Set());
+const expandedNodeIds = ref<Set<string>>(new Set());
+const expandedNodeKeys = computed<string[]>(() => Array.from(expandedNodeIds.value));
+
+const addExpandedNode = (id: string) => {
+    expandedNodeIds.value.add(id);
+};
+
+const removeExpandedNode = (id: string) => {
+    expandedNodeIds.value.delete(id);
+};
+
+const resetExpandedNodes = () => {
+    expandedNodeIds.value = new Set<string>();
+};
 
 const toggleShow = () => {
     isShow.value = !isShow.value;
@@ -1121,6 +1135,7 @@ const onOpen = async () => {
 };
 
 const handleSearchResult = (res: ResultData<File.FileTree[]>) => {
+    resetExpandedNodes();
     if (res.data.length > 0 && res.data[0].children) {
         treeData.value = res.data[0].children.map((item) => ({
             ...item,
@@ -1137,6 +1152,7 @@ const getRefresh = (path: string) => {
         search(path).then((res) => {
             treeData.value = res.data[0].children;
             loadedNodes.value = new Set();
+            resetExpandedNodes();
             isCreate.value = 'none';
             currentPath.value = path;
             selectedParentNode.value = null;
@@ -1250,6 +1266,7 @@ const getUpData = async () => {
         const response = await search(newPath);
         treeData.value = response.data[0]?.children || [];
         loadedNodes.value = new Set();
+        resetExpandedNodes();
         isCreate.value = 'none';
         currentPath.value = newPath;
         selectedParentNode.value = null;
@@ -1269,7 +1286,7 @@ const treeProps = {
 
 const handleNodeCollapse = (data: TreeNodeData, node: any) => {
     isCreate.value = 'none';
-    expandedNodeIds.value.delete(data.id);
+    removeExpandedNode(data.id);
 
     const parentNode = node.parent;
     if (!parentNode) {
@@ -1296,7 +1313,7 @@ const handleNodeExpand = (data: TreeNodeData, node: any) => {
     if (node.data.isDir && isCreate.value == 'none') {
         currentPath.value = node.data.path;
         selectedParentNode.value = node;
-        expandedNodeIds.value.add(node.data.id);
+        addExpandedNode(node.data.id);
     }
     search(data.path)
         .then((response) => {
