@@ -4866,7 +4866,9 @@ const message = {
                 'Las IP bloqueadas se guardan temporalmente en OpenResty y se liberan tras reinicio. Para bloqueo permanente usa reglas',
             addWhiteUrlHelper: '¿Añadir URL {0} a la whitelist?',
             dashHelper: 'La versión community también soporta configuraciones globales y de sitio',
-            wafStatusHelper: 'WAF no está activo, habilítalo en Configuración Global',
+            wafStatusHelper:
+                'El firewall no está activado. La protección de seguridad del sitio web está pausada. Actívalo cuanto antes.',
+            enableProtection: 'Activar protección',
             ccMode: 'Modo',
             global: 'Modo global',
             uriMode: 'Modo URL',

@@ -4743,7 +4743,9 @@ const message = {
                 '차단된 IP는 OpenResty 에 일시적으로 저장되며, OpenResty 재시작 시 차단이 해제됩니다. 차단 기능을 통해 영구적으로 차단할 수 있습니다.',
             addWhiteUrlHelper: 'URL {0}를 화이트리스트에 추가하시겠습니까?',
             dashHelper: '커뮤니티 버전은 전역 설정 및 웹사이트 설정에서 기능을 사용할 수 있습니다.',
-            wafStatusHelper: 'WAF 가 활성화되지 않았습니다. 전역 설정에서 활성화해 주세요.',
+            wafStatusHelper:
+                '방화벽이 활성화되지 않아 웹사이트 보안 보호가 일시 중지되었습니다. 가능한 한 빨리 활성화하세요.',
+            enableProtection: '보호 활성화',
             ccMode: '모드',
             global: '전역 모드',
             uriMode: 'URL 모드',

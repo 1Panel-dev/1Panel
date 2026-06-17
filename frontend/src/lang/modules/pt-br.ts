@@ -5042,7 +5042,9 @@ const message = {
             addWhiteUrlHelper: 'Adicionar URL {0} à lista branca?',
             dashHelper:
                 'A versão comunitária também pode usar as funções nas configurações globais e configurações de site',
-            wafStatusHelper: 'O WAF não está ativado, por favor, ative-o nas configurações globais',
+            wafStatusHelper:
+                'O firewall não está ativado. A proteção de segurança do site está pausada. Ative-o assim que possível.',
+            enableProtection: 'Ativar Proteção',
             ccMode: 'Modo',
             global: 'Modo Global',
             uriMode: 'Modo URL',

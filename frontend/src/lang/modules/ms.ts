@@ -4900,7 +4900,9 @@ const message = {
                 'IP yang disekat disimpan sementara dalam OpenResty dan akan dibuka kunci apabila anda memulakan semula OpenResty. Mereka boleh disekat secara kekal melalui fungsi sekatan',
             addWhiteUrlHelper: 'Tambah URL {0} ke senarai putih?',
             dashHelper: 'Versi komuniti juga boleh menggunakan fungsi dalam tetapan global dan tetapan laman web',
-            wafStatusHelper: 'WAF tidak diaktifkan, sila aktifkan dalam tetapan global',
+            wafStatusHelper:
+                'Firewall belum diaktifkan. Perlindungan keselamatan laman web dijeda. Sila aktifkan segera.',
+            enableProtection: 'Aktifkan Perlindungan',
             ccMode: 'Mod',
             global: 'Mod Global',
             uriMode: 'Mod URL',

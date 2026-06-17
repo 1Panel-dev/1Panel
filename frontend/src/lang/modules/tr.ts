@@ -4889,7 +4889,9 @@ const message = {
                 'Engellenen IP’ler geçici olarak OpenResty’de saklanır ve OpenResty yeniden başlatıldığında engel kaldırılır. Engelleme fonksiyonu ile kalıcı olarak engellenebilir',
             addWhiteUrlHelper: 'URL {0}’ı beyaz listeye eklemek mi?',
             dashHelper: 'Topluluk sürümü, genel ayarlar ve web sitesi ayarlarındaki işlevleri de kullanabilir',
-            wafStatusHelper: 'WAF etkin değil, lütfen genel ayarlarda etkinleştirin',
+            wafStatusHelper:
+                'Güvenlik duvarı etkin değil. Web sitesi güvenlik koruması duraklatıldı. En kısa sürede etkinleştirmeniz önerilir.',
+            enableProtection: 'Korumayı Etkinleştir',
             ccMode: 'Mod',
             global: 'Genel Mod',
             uriMode: 'URL Modu',
