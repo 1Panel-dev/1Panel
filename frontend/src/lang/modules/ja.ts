@@ -4996,7 +4996,7 @@ const message = {
             theworld: 'TheWorldブラウザ',
             edge: 'Microsoft Edge',
             maxthon: 'Maxthonブラウザ',
-            monitorStatusHelper: 'モニタリングは有効ではありません。設定で有効にしてください',
+            monitorStatusHelper: '現在、Webサイト監視は有効になっていません。今すぐ有効にしてください',
             excludeIp: 'IPアドレスを除外',
             excludeUa: 'ユーザーエージェントを除外',
             remotePort: 'リモートポート',

@@ -4083,7 +4083,7 @@ const message = {
             theworld: '世界之窗浏览器',
             edge: 'Edge',
             maxthon: '遨游浏览器',
-            monitorStatusHelper: '监控未开启，请在设置中打开',
+            monitorStatusHelper: '当前网站监控未开启，立即开启',
             excludeIp: '排除 IP',
             excludeUa: '排除 User-Agent',
             remotePort: '远程端口',

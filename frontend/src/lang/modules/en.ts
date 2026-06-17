@@ -4958,7 +4958,7 @@ const message = {
             theworld: 'TheWorld Browser',
             edge: 'Microsoft Edge',
             maxthon: 'Maxthon Browser',
-            monitorStatusHelper: 'Monitoring is not enabled, please enable it in settings',
+            monitorStatusHelper: 'Website monitoring is currently disabled. Enable it now',
             excludeIp: 'Exclude IP Addresses',
             excludeUa: 'Exclude User-Agent',
             remotePort: 'Remote Port',

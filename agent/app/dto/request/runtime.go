@@ -42,12 +42,14 @@ type Environment struct {
 type Volume struct {
 	Source string `json:"source"`
 	Target string `json:"target"`
+	Mode   string `json:"mode"`
 }
 
 type ExposedPort struct {
 	HostPort      int    `json:"hostPort"`
 	ContainerPort int    `json:"containerPort"`
 	HostIP        string `json:"hostIP"`
+	Protocol      string `json:"protocol"`
 }
 
 type ExtraHost struct {

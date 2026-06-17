@@ -23,7 +23,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/env"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
 type TensorRTLLMService struct{}
@@ -59,33 +58,7 @@ func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorR
 		serverDTO.Image = envs["IMAGE"]
 		serverDTO.Command = getCommand(item.Env)
 
-		for k, v := range envs {
-			if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
-				if strings.Contains(k, "CONTAINER_PORT") {
-					matches := re.GetRegex(re.TrailingDigitsPattern).FindStringSubmatch(k)
-					if len(matches) < 2 {
-						continue
-					}
-					containerPort, err := strconv.Atoi(v)
-					if err != nil {
-						continue
-					}
-					hostPort, err := strconv.Atoi(envs[fmt.Sprintf("HOST_PORT_%s", matches[1])])
-					if err != nil {
-						continue
-					}
-					hostIP := envs[fmt.Sprintf("HOST_IP_%s", matches[1])]
-					if hostIP == "" {
-						hostIP = "0.0.0.0"
-					}
-					serverDTO.ExposedPorts = append(serverDTO.ExposedPorts, request.ExposedPort{
-						ContainerPort: containerPort,
-						HostPort:      hostPort,
-						HostIP:        hostIP,
-					})
-				}
-			}
-		}
+		serverDTO.ExposedPorts, _ = loadComposeExposedPortsFromEnv(envs, "0.0.0.0", false)
 
 		composeByte, err := files.NewFileOp().GetContent(path.Join(global.Dir.TensorRTLLMDir, item.Name, "docker-compose.yml"))
 		if err == nil {
@@ -149,11 +122,9 @@ func handleLLMParams(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) e
 	delete(serviceValue, "ports")
 	if len(create.ExposedPorts) > 0 {
 		var ports []interface{}
-		for i := range create.ExposedPorts {
-			containerPortStr := fmt.Sprintf("CONTAINER_PORT_%d", i)
-			hostPortStr := fmt.Sprintf("HOST_PORT_%d", i)
-			hostIPStr := fmt.Sprintf("HOST_IP_%d", i)
-			ports = append(ports, fmt.Sprintf("${%s}:${%s}:${%s}", hostIPStr, hostPortStr, containerPortStr))
+		for i, port := range create.ExposedPorts {
+			containerPortStr, hostPortStr, hostIPStr, _ := composePortEnvKeys(i)
+			ports = append(ports, formatComposePortMapping(hostIPStr, hostPortStr, containerPortStr, port.Protocol))
 		}
 		serviceValue["ports"] = ports
 	}
@@ -174,7 +145,7 @@ func handleLLMParams(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) e
 		volumes = append(volumes, fmt.Sprintf("%s:%s", k, v))
 	}
 	for _, volume := range create.Volumes {
-		volumes = append(volumes, fmt.Sprintf("%s:%s", volume.Source, volume.Target))
+		volumes = append(volumes, formatComposeVolume(volume.Source, volume.Target, volume.Mode))
 	}
 	serviceValue["volumes"] = volumes
 
@@ -195,12 +166,11 @@ func handleLLMEnv(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) gote
 	envMap["IMAGE"] = create.Image
 	envMap["COMMAND"] = create.Command
 	for i, port := range create.ExposedPorts {
-		containerPortStr := fmt.Sprintf("CONTAINER_PORT_%d", i)
-		hostPortStr := fmt.Sprintf("HOST_PORT_%d", i)
-		hostIPStr := fmt.Sprintf("HOST_IP_%d", i)
+		containerPortStr, hostPortStr, hostIPStr, protocolStr := composePortEnvKeys(i)
 		envMap[containerPortStr] = strconv.Itoa(port.ContainerPort)
 		envMap[hostPortStr] = strconv.Itoa(port.HostPort)
 		envMap[hostIPStr] = port.HostIP
+		envMap[protocolStr] = normalizeComposeProtocol(port.Protocol)
 	}
 	orders := []string{"MODEL_PATH", "COMMAND"}
 	envStr, _ := env.MarshalWithOrder(envMap, orders)
@@ -219,7 +189,7 @@ func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
 		}
 	}
 	for _, export := range create.ExposedPorts {
-		if err := checkPortExist(export.HostPort); err != nil {
+		if err := checkPortExistWithProtocol(export.HostPort, export.Protocol); err != nil {
 			return err
 		}
 	}

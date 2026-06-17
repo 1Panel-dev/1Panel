@@ -256,6 +256,7 @@ export namespace AI {
         hostPort: number;
         containerPort: number;
         hostIP: string;
+        protocol?: string;
     }
 
     export interface Environment {
@@ -265,6 +266,7 @@ export namespace AI {
     export interface Volume {
         source: string;
         target: string;
+        mode: string;
     }
 
     export interface ExtraHosts {

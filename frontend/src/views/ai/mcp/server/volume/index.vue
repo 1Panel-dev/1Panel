@@ -50,6 +50,7 @@ const addEnv = () => {
     props.volumes.push({
         source: '',
         target: '',
+        mode: 'rw',
     });
 };
 

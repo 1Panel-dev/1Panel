@@ -1,5 +1,5 @@
 <template>
-    <el-text type="info">{{ $t('php.dateTimezoneHelper') }}</el-text>
+    <el-text v-if="showHelper" type="info">{{ $t('php.dateTimezoneHelper') }}</el-text>
     <div class="mt-1.5">
         <el-row :gutter="20" v-for="(env, index) in environments" :key="index">
             <el-col :span="7">
@@ -42,7 +42,13 @@ const props = defineProps({
         type: Array<Runtime.Environment>,
         required: true,
     },
+    showHelper: {
+        type: Boolean,
+        default: true,
+    },
 });
+
+const { showHelper } = props;
 
 const rules = reactive<FormRules>({
     value: [Rules.requiredInput],

@@ -111,19 +111,22 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         if (runtime.exposedPorts && runtime.exposedPorts.length > 0) {
-            const containerPortMap = new Map();
-            const hostPortMap = new Map();
+            const containerPortMap = new Map<string, boolean>();
+            const hostPortMap = new Map<string, boolean>();
             for (const port of runtime.exposedPorts) {
-                if (containerPortMap[port.containerPort]) {
+                const protocol = port.protocol || 'tcp';
+                const containerPortKey = `${port.containerPort}/${protocol}`;
+                const hostPortKey = `${port.hostPort}/${protocol}`;
+                if (containerPortMap.has(containerPortKey)) {
                     MsgError(i18n.global.t('runtime.portError'));
                     return;
                 }
-                if (hostPortMap[port.hostPort]) {
+                if (hostPortMap.has(hostPortKey)) {
                     MsgError(i18n.global.t('runtime.portError'));
                     return;
                 }
-                hostPortMap[port.hostPort] = true;
-                containerPortMap[port.containerPort] = true;
+                hostPortMap.set(hostPortKey, true);
+                containerPortMap.set(containerPortKey, true);
             }
         }
 

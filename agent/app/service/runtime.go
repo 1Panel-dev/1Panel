@@ -137,7 +137,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		create.Install = true
 		for _, export := range create.ExposedPorts {
 			hostPorts = append(hostPorts, strconv.Itoa(export.HostPort))
-			if err := checkPortExist(export.HostPort); err != nil {
+			if err := checkPortExistWithProtocol(export.HostPort, export.Protocol); err != nil {
 				return nil, err
 			}
 		}
@@ -241,30 +241,11 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 			runtimeDTO.AppID = detail.AppId
 		}
 		for k, v := range envs {
-			runtimeDTO.Params[k] = v
-			if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
-				if strings.Contains(k, "CONTAINER_PORT") {
-					matches := re.GetRegex(re.TrailingDigitsPattern).FindStringSubmatch(k)
-					if len(matches) < 2 {
-						continue
-					}
-					containerPort, err := strconv.Atoi(v)
-					if err != nil {
-						continue
-					}
-					hostPort, err := strconv.Atoi(envs[fmt.Sprintf("HOST_PORT_%s", matches[1])])
-					if err != nil {
-						continue
-					}
-					hostIP := envs[fmt.Sprintf("HOST_IP_%s", matches[1])]
-					runtimeDTO.ExposedPorts = append(runtimeDTO.ExposedPorts, request.ExposedPort{
-						ContainerPort: containerPort,
-						HostPort:      hostPort,
-						HostIP:        hostIP,
-					})
-				}
+			if !isComposePortEnvKey(k) {
+				runtimeDTO.Params[k] = v
 			}
 		}
+		runtimeDTO.ExposedPorts, _ = loadComposeExposedPortsFromEnv(envs, "", false)
 		res = append(res, runtimeDTO)
 	}
 	return total, res, nil
@@ -435,9 +416,11 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			return buserr.New("ErrImageExist")
 		}
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
+		ownedPortKeys := runtimeOwnedPortKeys(runtime.Env)
 		for _, export := range req.ExposedPorts {
 			hostPorts = append(hostPorts, strconv.Itoa(export.HostPort))
-			if err = checkRuntimePortExist(export.HostPort, false, runtime.ID); err != nil {
+			_, owned := ownedPortKeys[composePortCheckKey(export.HostPort, export.Protocol)]
+			if err = checkRuntimePortExistWithProtocol(export.HostPort, export.Protocol, !owned, runtime.ID); err != nil {
 				return err
 			}
 		}
@@ -1058,6 +1041,7 @@ func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) erro
 	var (
 		composeContent []byte
 	)
+	ownedPortKeys := runtimeOwnedPortKeys(runtime.Env)
 	for _, export := range req.ExposedPorts {
 		if strconv.Itoa(export.HostPort) == runtime.Port {
 			return buserr.WithName("ErrPHPRuntimePortFailed", strconv.Itoa(export.HostPort))
@@ -1065,7 +1049,8 @@ func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) erro
 		if export.ContainerPort == 9000 {
 			return buserr.New("ErrPHPPortIsDefault")
 		}
-		if err = checkRuntimePortExist(export.HostPort, false, runtime.ID); err != nil {
+		_, owned := ownedPortKeys[composePortCheckKey(export.HostPort, export.Protocol)]
+		if err = checkRuntimePortExistWithProtocol(export.HostPort, export.Protocol, !owned, runtime.ID); err != nil {
 			return err
 		}
 	}
@@ -1090,7 +1075,7 @@ func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) erro
 		return err
 	}
 	for k := range envs {
-		if strings.HasPrefix(k, "CONTAINER_PORT_") || strings.HasPrefix(k, "HOST_PORT_") || strings.HasPrefix(k, "HOST_IP_") || strings.Contains(k, "APP_PORT") {
+		if isComposePortEnvKey(k) || strings.Contains(k, "APP_PORT") {
 			delete(envs, k)
 		}
 	}
@@ -1102,6 +1087,7 @@ func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) erro
 			ExposedPorts: req.ExposedPorts,
 			Environments: req.Environments,
 			Volumes:      req.Volumes,
+			ExtraHosts:   req.ExtraHosts,
 		},
 	}
 	composeContent, err = handleCompose(envs, composeContent, create, projectDir)

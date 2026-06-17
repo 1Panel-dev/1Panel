@@ -5046,7 +5046,7 @@ const message = {
             theworld: 'TheWorld Tarayıcı',
             edge: 'Microsoft Edge',
             maxthon: 'Maxthon Tarayıcı',
-            monitorStatusHelper: 'İzleme etkin değil, lütfen ayarlarda etkinleştirin',
+            monitorStatusHelper: 'Web sitesi izleme şu anda devre dışı. Şimdi etkinleştirin',
             excludeIp: 'IP Adreslerini Hariç Tut',
             excludeUa: 'Kullanıcı-Aracısını Hariç Tut',
             remotePort: 'Uzak Port',

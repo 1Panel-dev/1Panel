@@ -4899,7 +4899,7 @@ const message = {
             theworld: '더월드 브라우저',
             edge: '마이크로소프트 엣지',
             maxthon: '맥스톤 브라우저',
-            monitorStatusHelper: '모니터링이 활성화되지 않았습니다. 설정에서 활성화하세요',
+            monitorStatusHelper: '현재 웹사이트 모니터링이 비활성화되어 있습니다. 지금 활성화하세요',
             excludeIp: 'IP 주소 제외',
             excludeUa: '사용자 에이전트 제외',
             remotePort: '원격 포트',

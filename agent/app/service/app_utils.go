@@ -89,7 +89,15 @@ func checkPort(key string, params map[string]interface{}) (int, error) {
 	return 0, nil
 }
 
+func isPortInUse(port int, protocol string) bool {
+	return common.ScanPortWithProto(port, normalizeComposeProtocol(protocol))
+}
+
 func checkPortExist(port int) error {
+	return checkPortExistWithProtocol(port, "")
+}
+
+func checkPortExistWithProtocol(port int, protocol string) error {
 	errMap := make(map[string]interface{})
 	errMap["port"] = port
 	appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithPort(port))
@@ -110,7 +118,7 @@ func checkPortExist(port int) error {
 		errMap["name"] = domain.Domain
 		return buserr.WithMap("ErrPortExist", errMap, nil)
 	}
-	if common.ScanPort(port) {
+	if isPortInUse(port, protocol) {
 		return buserr.WithDetail("ErrPortInUsed", port, nil)
 	}
 	return nil

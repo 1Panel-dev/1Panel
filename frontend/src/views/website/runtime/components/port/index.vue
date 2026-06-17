@@ -1,17 +1,25 @@
 <template>
     <div class="mt-1.5">
         <el-row :gutter="20" v-for="(port, index) in exposedPorts" :key="index">
-            <el-col :span="7">
+            <el-col :span="6">
                 <el-form-item :prop="`exposedPorts.${index}.hostPort`" :rules="rules.port">
                     <el-input v-model.number="port.hostPort" :placeholder="$t('runtime.externalPort')" />
                 </el-form-item>
             </el-col>
-            <el-col :span="7">
+            <el-col :span="6">
                 <el-form-item :prop="`exposedPorts.${index}.containerPort`" :rules="rules.port">
                     <el-input v-model.number="port.containerPort" :placeholder="$t('runtime.appPort')" />
                 </el-form-item>
             </el-col>
-            <el-col :span="7">
+            <el-col :span="4">
+                <el-form-item>
+                    <el-select v-model="port.protocol" :placeholder="$t('commons.table.protocol')">
+                        <el-option label="tcp" value="tcp" />
+                        <el-option label="udp" value="udp" />
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="5">
                 <el-text>{{ $t('app.allowPort') }}</el-text>
                 <el-switch
                     class="ml-1"
@@ -60,6 +68,7 @@ const addPort = () => {
         hostPort: undefined,
         containerPort: undefined,
         hostIP: '',
+        protocol: 'tcp',
     });
 };
 
