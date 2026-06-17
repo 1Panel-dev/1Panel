@@ -3,6 +3,7 @@ package v2
 import (
 	"encoding/base64"
 	"errors"
+	"net"
 	"net/http"
 	"os"
 	"path"
@@ -350,7 +351,7 @@ func (b *BaseApi) UpdatePort(c *gin.Context) {
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"重载系统 SSL","formatEN":"reload system SSL"}
 func (b *BaseApi) ReloadSSL(c *gin.Context) {
 	clientIP := c.ClientIP()
-	if clientIP != "127.0.0.1" {
+	if ip := net.ParseIP(clientIP); ip == nil || !ip.IsLoopback() {
 		helper.InternalServer(c, errors.New("only localhost can reload ssl"))
 		return
 	}
