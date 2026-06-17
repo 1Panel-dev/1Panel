@@ -15,7 +15,7 @@ import (
 func SessionAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		apiReq := c.GetBool("API_AUTH")
-		if isAnonymousAuthPath(c.Request.URL.Path) || apiReq {
+		if isAnonymousAuthPath(c.Request.URL.Path) || apiReq || c.GetBool("LOCAL_REQUEST") {
 			c.Next()
 			return
 		}

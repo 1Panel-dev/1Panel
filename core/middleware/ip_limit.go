@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
@@ -14,7 +15,7 @@ func WhiteAllow() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("X-Panel-Local-Token")
 		clientIP := common.GetRealClientIP(c)
-		if clientIP == "127.0.0.1" && tokenString != "" && c.Request.URL.Path == "/api/v2/core/xpack/sync/ssl" {
+		if isLocalSyncRequest(c.Request.URL.Path, clientIP, tokenString) {
 			c.Set("LOCAL_REQUEST", true)
 			c.Next()
 			return
@@ -46,5 +47,21 @@ func WhiteAllow() gin.HandlerFunc {
 		}
 		code := security.LoadErrCode()
 		helper.ErrWithHtml(c, code, "err_ip_limit")
+	}
+}
+
+func isLocalSyncRequest(reqPath, clientIP, token string) bool {
+	ip := net.ParseIP(clientIP)
+	if ip == nil || !ip.IsLoopback() {
+		return false
+	}
+
+	switch reqPath {
+	case "/api/v2/core/xpack/sync/ssl":
+		return token != ""
+	case "/api/v2/core/settings/ssl/reload":
+		return true
+	default:
+		return false
 	}
 }
