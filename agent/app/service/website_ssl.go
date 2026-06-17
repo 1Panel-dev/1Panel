@@ -309,6 +309,19 @@ func pushSSLToNode(websiteSSL *model.WebsiteSSL, logger *log.Logger) error {
 	return nil
 }
 
+func pushSSLToNodeWithNewLogger(websiteSSL *model.WebsiteSSL) error {
+	if !websiteSSL.PushNode {
+		return nil
+	}
+	logFile, logger := newWebsiteSSLLogger(websiteSSL, false)
+	if logFile != nil {
+		defer func() {
+			_ = logFile.Close()
+		}()
+	}
+	return pushSSLToNode(websiteSSL, logger)
+}
+
 func newWebsiteSSLLogger(websiteSSL *model.WebsiteSSL, autoRenew bool) (*os.File, *log.Logger) {
 	flags := os.O_CREATE | os.O_WRONLY | os.O_TRUNC
 	if autoRenew {
@@ -917,9 +930,15 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 		if err := UpdateSSLConfig(*websiteSSL); err != nil {
 			return err
 		}
-		return websiteSSLRepo.Save(websiteSSL)
+		if err := websiteSSLRepo.Save(websiteSSL); err != nil {
+			return err
+		}
+		return pushSSLToNodeWithNewLogger(websiteSSL)
 	}
-	return websiteSSLRepo.Create(context.Background(), websiteSSL)
+	if err := websiteSSLRepo.Create(context.Background(), websiteSSL); err != nil {
+		return err
+	}
+	return pushSSLToNodeWithNewLogger(websiteSSL)
 }
 
 func (w WebsiteSSLService) PushToNode(req request.WebsiteSSLPush) error {
