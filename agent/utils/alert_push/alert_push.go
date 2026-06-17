@@ -60,7 +60,6 @@ func pushByLegacyMethod(alertRepo repo.IAlertRepo, alert dto.AlertDTO, pushAlert
 	}
 	config, err := alertRepo.GetConfig(alertRepo.WithByType(configType))
 	if err != nil {
-		global.LOG.Errorf("alert config not found for type %s: %v", configType, err)
 		return
 	}
 	sendAlert(alertRepo, alert, pushAlert, config)

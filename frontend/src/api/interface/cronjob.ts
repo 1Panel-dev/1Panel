@@ -201,6 +201,7 @@ export namespace Cronjob {
     }
     export interface Record {
         id: number;
+        cronjobName?: string;
         taskID: string;
         file: string;
         startTime: string;
