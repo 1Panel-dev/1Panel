@@ -4840,7 +4840,9 @@ const message = {
                 'ブロックされたIPはOpenRestyに一時的に保存され、OpenRestyを再起動すると解除されます。ブロック機能で永久的にブロックできます',
             addWhiteUrlHelper: 'URL {0} をホワイトリストに追加しますか？',
             dashHelper: 'コミュニティバージョンでもグローバル設定とウェブサイト設定の機能を使用できます',
-            wafStatusHelper: 'WAFが有効ではありません。グローバル設定で有効にしてください',
+            wafStatusHelper:
+                'ファイアウォールが有効ではありません。Webサイトの安全保護は一時停止されています。早めに有効化してください。',
+            enableProtection: '保護を有効化',
             ccMode: 'モード',
             global: 'グローバルモード',
             uriMode: 'URLモード',
