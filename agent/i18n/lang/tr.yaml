@@ -107,6 +107,7 @@ ErrContainerMsg: '{{ .name }} konteyneri anormal. Lütfen ayrıntılar için kon
 ErrAppBackup: '{{ .name }} uygulama yedeklemesi başarısız {{ .err }}'
 ErrVersionTooLow: 'Mevcut 1Panel sürümü Uygulama Mağazasını güncellemek için çok düşük. Lütfen işlemden önce sürümü yükseltin.'
 ErrAppNameExist: 'Uygulama adı zaten mevcut'
+ErrAppInstallNameExist: '{{ .name }} uygulama kurulum adı zaten mevcut'
 AppStoreIsSyncing: 'Uygulama Mağazası senkronize ediliyor, lütfen daha sonra tekrar deneyin'
 ErrGetCompose: 'docker-compose.yml dosyası alınamadı {{ .detail }}'
 ErrAppWarn: 'Anormal durum, lütfen günlüğü kontrol edin'

@@ -307,6 +307,25 @@ DBConnErr: "오류: 데이터베이스 연결 초기화 실패 {{ .err }}"
 SystemVersion: "버전: "
 SystemMode: "모드: "
 
+#exchange
+LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
+HandlePrivateKey: "Handle node private key"
+HandlePublicKey: "Handle node public key"
+ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
+TaskRsync: "Sync"
+NodeFile: "Node file"
+ImageSyncTaskName: "Image sync {{ .source }} -> {{ .count }} nodes"
+ImageSyncSave: "Save image {{ .image }}"
+ImageSyncSaveTags: "Save image tags {{ .tags }}"
+ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
+ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
+ImageSyncClean: "Clean temporary files for image {{ .image }}"
+ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
+ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
+ImageSyncHandlePrivateKey: "Handle image sync node private key"
+ImageSyncHandlePublicKey: "Handle image sync node public key"
+ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
+
 #mobile app
 ErrVerifyToken: '토큰 검증 오류가 발생했습니다. 재설정 후 다시 스캔해 주세요.'
 ErrInvalidToken: '유효하지 않은 토큰입니다. 재설정 후 다시 스캔해 주세요.'

@@ -131,6 +131,7 @@ type AppInstallDTO struct {
 	Container     string    `json:"container"`
 	IsEdit        bool      `json:"isEdit"`
 	LinkDB        bool      `json:"linkDB"`
+	ResourceKeys  []string  `json:"resourceKeys"`
 	ServiceName   string    `json:"serviceName"`
 }
 

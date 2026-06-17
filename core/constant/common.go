@@ -183,7 +183,10 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/node/dashboard":  {},
 	"/xpack/node":            {},
 	"/xpack/simple-node":     {},
-	"/xpack/exchange/file":   {},
+	"/xpack/sync":            {},
+	"/xpack/sync/image":      {},
+	"/xpack/sync/cert":       {},
+	"/xpack/sync/app":        {},
 	"/xpack/app":             {},
 	"/xpack/app-upgrade":     {},
 

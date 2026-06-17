@@ -107,6 +107,7 @@ ErrContainerMsg: 'El contenedor {{ .name }} presenta anomalías. Revise el log e
 ErrAppBackup: 'Falló el respaldo de la aplicación {{ .name }} {{ .err }}'
 ErrVersionTooLow: 'La versión actual de 1Panel es demasiado baja para actualizar la tienda de aplicaciones. Actualice primero.'
 ErrAppNameExist: 'El nombre de la aplicación ya existe'
+ErrAppInstallNameExist: 'El nombre de instalación de la aplicación {{ .name }} ya existe'
 AppStoreIsSyncing: 'La tienda de aplicaciones está sincronizando, inténtelo más tarde'
 ErrGetCompose: 'Fallo al obtener el archivo docker-compose.yml {{ .detail }}'
 ErrAppWarn: 'Estado anómalo, revise el log'

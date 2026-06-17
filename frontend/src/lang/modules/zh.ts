@@ -5157,9 +5157,40 @@ const message = {
             qrCodeExpired: '刷新时间',
             apiLeakageHelper: '请勿泄露二维码，确保仅在受信任的环境中使用',
         },
-        exchange: {
-            exchange: '文件对传',
-            exchangeConfirm: '是否将 {0} 节点文件/文件夹 {1} 传输到 {2} 节点 {3} 目录？',
+        sync: {
+            menu: '资源同步',
+            file: '文件对传',
+            fileSyncConfirm: '是否将 {0} 节点文件/文件夹 {1} 传输到 {2} 节点 {3} 目录？',
+
+            image: '镜像对传',
+            imageBatchDesc: '先选择源节点和源镜像，再批量选择目标节点进行转发。',
+            imageBatchConfirmPrefix: '即将把 {0} 张镜像转发到 {1} 个节点，共 {2} 个任务。',
+
+            cert: '证书同步',
+            certBatchDesc: '选择源节点后，可将指定证书同步到当前面板环境。',
+            certBatchConfirmPrefix: '即将把 {0} 张证书同步到 {1} 个节点，共 {2} 个任务。',
+
+            app: '应用对传',
+            appBatchDesc: '选择源节点、单个应用和目标节点后，确认资源依赖并执行应用对传任务。',
+            appSelectedApp: '已选应用：',
+            appPreviewTitle: '对传预览',
+            appPreviewDesc: '确认目标节点和依赖资源后执行应用对传。',
+            appDatabaseDependency: '数据库依赖',
+            appResourceRequired: '请先选择所有必需的关联资源。',
+            appUnsupportedMultipleResources: '当前仅支持迁移最多关联一个资源的应用。',
+            appUnsupportedResourceType: '当前仅支持迁移无资源依赖或仅依赖 MySQL、MariaDB、PostgreSQL 的应用。',
+
+            targetTitle: '目标节点',
+            targetDesc: '源节点会自动排除，可选择一个或多个目标节点。',
+            targetSearchPlaceholder: '搜索节点名称或地址',
+            noTargetNodes: '没有可选目标节点',
+            noSourceNode: '请先选择源节点',
+            reviewTargets: '目标节点',
+            reviewEmpty: '请先选择资源和目标节点',
+            selectSourceFirst: '请先选择源节点。',
+            selectResourceFirst: '请先选择要同步的资源。',
+            selectTargetFirst: '请先选择至少一个目标节点。',
+            submitSuccess: '同步任务已提交。',
         },
         cluster: {
             cluster: '应用高可用',

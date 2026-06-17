@@ -107,6 +107,7 @@ ErrContainerMsg: 'Контейнер {{ .name }} ненормален. Подр�
 ErrAppBackup: '{{ .name }} резервное копирование приложения не удалось {{ .err }}'
 ErrVersionTooLow: 'Текущая версия 1Panel слишком низкая для обновления App Store. Пожалуйста, обновите версию перед началом работы.'
 ErrAppNameExist: 'Имя приложения уже существует'
+ErrAppInstallNameExist: 'Имя установки приложения {{ .name }} уже существует'
 AppStoreIsSyncing: 'App Store синхронизируется, повторите попытку позже'
 ErrGetCompose: 'Не удалось получить файл docker-compose.yml {{ .detail }}'
 ErrAppWarn: 'Ненормальное состояние, проверьте журнал'

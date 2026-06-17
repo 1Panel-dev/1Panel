@@ -208,6 +208,7 @@ export namespace App {
         dockerCompose: string;
         app: App.AppDetail;
         linkDB: boolean;
+        resourceKeys?: string[];
     }
 
     export interface AppInstalledOption {

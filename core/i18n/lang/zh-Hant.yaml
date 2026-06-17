@@ -316,6 +316,17 @@ HandlePublicKey: "處理節點公鑰"
 ExchangeFile: "開始從 {{ .source }} 節點同步 {{ .sourcePath }} 到 {{ .dest  }} 節點 {{ .destPath }}"
 TaskRsync: "同步"
 NodeFile: "節點檔案"
+ImageSyncTaskName: "映像同步 {{ .source }} -> {{ .count }} 個節點"
+ImageSyncSave: "儲存映像 {{ .image }}"
+ImageSyncSaveTags: "儲存映像標籤 {{ .tags }}"
+ImageSyncToNode: "同步映像 {{ .image }} 到節點 {{ .node }}"
+ImageSyncLoad: "在節點 {{ .node }} 載入映像 {{ .image }}"
+ImageSyncClean: "清理映像 {{ .image }} 暫存檔案"
+ImageSyncNoTag: "映像 {{ .image }} 沒有標籤，將使用映像 ID 儲存"
+ImageSyncFrontendTagsIgnored: "映像 {{ .image }} 在來源節點未查詢到標籤，已忽略前端傳入標籤"
+ImageSyncHandlePrivateKey: "處理映像同步節點私鑰"
+ImageSyncHandlePublicKey: "處理映像同步節點公鑰"
+ImageSyncTransfer: "開始傳輸映像暫存檔案：{{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
 
 #mobile app
 ErrVerifyToken: '令牌驗證錯誤，請重設後再次掃碼'

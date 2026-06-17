@@ -43,6 +43,7 @@ func Init() {
 		migrations.AddAIBenchmarkMenu,
 		migrations.AddAIProxyMenu,
 		migrations.AddSkillsHubMenu,
+		migrations.UpdateXpackSyncMenu,
 		migrations.AddOperationLogUser,
 		migrations.AddLoginLogUser,
 		migrations.AddAlertAuditUser,

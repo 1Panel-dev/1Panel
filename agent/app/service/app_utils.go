@@ -1620,6 +1620,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 			synAppInstall(containersMap, &installed, false)
 		}
 
+		resourceKeys := getAppInstallResourceKeys(installed.ID)
 		installDTO := response.AppInstallDTO{
 			ID:          installed.ID,
 			Name:        installed.Name,
@@ -1641,14 +1642,15 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 				Website:  installed.App.Website,
 				Document: installed.App.Document,
 			},
-			Favorite:    installed.Favorite,
-			SortOrder:   installed.SortOrder,
-			Container:   installed.ContainerName,
-			ServiceName: strings.ToLower(installed.ServiceName),
+			Favorite:     installed.Favorite,
+			SortOrder:    installed.SortOrder,
+			Container:    installed.ContainerName,
+			ServiceName:  strings.ToLower(installed.ServiceName),
+			ResourceKeys: resourceKeys,
 		}
 
 		if !updated && !checkUpdate {
-			installDTO.LinkDB = hasLinkDB(installed.ID)
+			installDTO.LinkDB = hasLinkDBFromKeys(resourceKeys)
 			res = append(res, installDTO)
 			continue
 		}
@@ -1656,7 +1658,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 		if installed.Version == "latest" {
 			if checkUpdate {
 				installDTO.CanUpdate = false
-				installDTO.LinkDB = hasLinkDB(installed.ID)
+				installDTO.LinkDB = hasLinkDBFromKeys(resourceKeys)
 				res = append(res, installDTO)
 			}
 			continue
@@ -1685,7 +1687,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 		if len(versions) == 0 {
 			if checkUpdate {
 				installDTO.CanUpdate = false
-				installDTO.LinkDB = hasLinkDB(installed.ID)
+				installDTO.LinkDB = hasLinkDBFromKeys(resourceKeys)
 				res = append(res, installDTO)
 			}
 			continue
@@ -1717,7 +1719,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 				res = append(res, installDTO)
 			}
 		} else if checkUpdate {
-			installDTO.LinkDB = hasLinkDB(installed.ID)
+			installDTO.LinkDB = hasLinkDBFromKeys(resourceKeys)
 			res = append(res, installDTO)
 		}
 	}
@@ -2284,13 +2286,25 @@ func needsUpdate(localTag *model.Tag, remoteTag dto.Tag, translations string) bo
 }
 
 func hasLinkDB(installID uint) bool {
+	return hasLinkDBFromKeys(getAppInstallResourceKeys(installID))
+}
+
+func getAppInstallResourceKeys(installID uint) []string {
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(installID))
+	keys := make([]string, 0, len(resources))
+	for _, resource := range resources {
+		keys = append(keys, resource.Key)
+	}
+	return keys
+}
+
+func hasLinkDBFromKeys(resourceKeys []string) bool {
 	hasDB := false
-	if len(resources) > 0 {
-		for _, resource := range resources {
-			if resource.Key == constant.AppPostgres || resource.Key == constant.AppMysql ||
-				resource.Key == constant.AppMariaDB || resource.Key == constant.AppMysqlCluster ||
-				resource.Key == constant.AppPostgresql || resource.Key == constant.AppPostgresqlCluster {
+	if len(resourceKeys) > 0 {
+		for _, resourceKey := range resourceKeys {
+			if resourceKey == constant.AppPostgres || resourceKey == constant.AppMysql ||
+				resourceKey == constant.AppMariaDB || resourceKey == constant.AppMysqlCluster ||
+				resourceKey == constant.AppPostgresql || resourceKey == constant.AppPostgresqlCluster {
 				hasDB = true
 				break
 			}

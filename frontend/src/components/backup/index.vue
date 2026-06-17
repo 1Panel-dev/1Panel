@@ -174,7 +174,6 @@
 
     <OpDialog ref="opRef" @search="search" />
     <TaskLog ref="taskLogRef" @close="search" />
-    <PushApp ref="pushAppRef" />
 </template>
 
 <script lang="ts" setup>
@@ -201,19 +200,15 @@ import TaskLog from '@/components/log/task/index.vue';
 import { routerToFileWithPath } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { mysqlArgs } from '@/views/cronjob/cronjob/helper';
-import { loadOptionalComponent } from '@/extensions/optional';
 const { currentNode } = useGlobalStore();
 
 const emit = defineEmits(['close']);
-
-const PushApp = defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/appstore/push-app/index.vue'));
 
 const selects = ref<any>([]);
 const args = ref([]);
 const loading = ref();
 const opRef = ref();
 const taskLogRef = ref();
-const pushAppRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -455,21 +450,6 @@ const buttons = [
         },
         click: (row: Backup.RecordInfo) => {
             onRecover(row);
-        },
-    },
-    {
-        label: i18n.global.t('commons.button.migrate'),
-        disabled: (row: any) => {
-            return row.size === 0 || row.status === 'Failed' || row.accountType !== 'LOCAL';
-        },
-        show: () => {
-            return type.value === 'app';
-        },
-        click: (row: Backup.RecordInfo) => {
-            pushAppRef.value.acceptParams({
-                appInstallID: appInstallID.value,
-                appBackupID: row.id,
-            });
         },
     },
     {

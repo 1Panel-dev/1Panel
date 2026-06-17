@@ -107,6 +107,7 @@ ErrContainerMsg: 'Bekas ''{{ .name }} adalah tidak normal. Sila semak log pada h
 ErrAppBackup: '{{ .name }} sandaran aplikasi gagal {{ .err }}'
 ErrVersionTooLow: 'Versi 1Panel semasa terlalu rendah untuk mengemas kini App Store. Sila tingkatkan versi sebelum beroperasi.'
 ErrAppNameExist: 'Nama aplikasi sudah wujud'
+ErrAppInstallNameExist: 'Nama pemasangan aplikasi {{ .name }} sudah wujud'
 AppStoreIsSyncing: 'App Store sedang menyegerak, sila cuba sebentar lagi'
 ErrGetCompose: 'Gagal mendapatkan fail docker-compose.yml {{ .detail }}'
 ErrAppWarn: 'Status tidak normal, sila semak log'

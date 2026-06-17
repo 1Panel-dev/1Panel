@@ -5181,9 +5181,40 @@ const message = {
             qrCodeExpired: '重新整理時間',
             apiLeakageHelper: '請勿洩露二維碼，確保僅在受信任的環境中使用',
         },
-        exchange: {
-            exchange: '檔案對傳',
-            exchangeConfirm: '是否將 {0} 節點檔案/資料夾 {1} 傳輸到 {2} 節點 {3} 目錄？',
+        sync: {
+            menu: '資源同步',
+            file: '檔案對傳',
+            fileSyncConfirm: '是否將 {0} 節點檔案/資料夾 {1} 傳輸到 {2} 節點 {3} 目錄？',
+
+            image: '映像對傳',
+            imageBatchDesc: '先選擇來源節點和來源映像，再批次選擇目標節點進行轉發。',
+            imageBatchConfirmPrefix: '即將把 {0} 張映像轉發到 {1} 個節點，共 {2} 個任務。',
+
+            cert: '證書同步',
+            certBatchDesc: '選擇來源節點後，可將指定證書同步到目前面板環境。',
+            certBatchConfirmPrefix: '即將把 {0} 張證書同步到 {1} 個節點，共 {2} 個任務。',
+
+            app: '應用對傳',
+            appBatchDesc: '選擇來源節點、單個應用和目標節點後，確認資源依賴並執行應用對傳任務。',
+            appSelectedApp: '已選應用：',
+            appPreviewTitle: '對傳預覽',
+            appPreviewDesc: '確認目標節點和依賴資源後執行應用對傳。',
+            appDatabaseDependency: '資料庫依賴',
+            appResourceRequired: '請先選擇所有必需的關聯資源。',
+            appUnsupportedMultipleResources: '目前僅支援遷移最多關聯一個資源的應用。',
+            appUnsupportedResourceType: '目前僅支援遷移無資源依賴或僅依賴 MySQL、MariaDB、PostgreSQL 的應用。',
+
+            targetTitle: '目標節點',
+            targetDesc: '來源節點會自動排除，可選擇一個或多個目標節點。',
+            targetSearchPlaceholder: '搜尋節點名稱或位址',
+            noTargetNodes: '沒有可選目標節點',
+            noSourceNode: '請先選擇來源節點',
+            reviewTargets: '目標節點',
+            reviewEmpty: '請先選擇資源和目標節點',
+            selectSourceFirst: '請先選擇來源節點。',
+            selectResourceFirst: '請先選擇要同步的資源。',
+            selectTargetFirst: '請先選擇至少一個目標節點。',
+            submitSuccess: '同步任務已提交。',
         },
         cluster: {
             cluster: '應用高可用',

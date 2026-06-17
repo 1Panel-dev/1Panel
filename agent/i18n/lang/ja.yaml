@@ -107,6 +107,7 @@ ErrContainerMsg: '{{ .name }} コンテナが異常です。詳細について�
 ErrAppBackup: '{{ .name }} アプリケーションのバックアップに失敗しました。エラー {{ .err }}'
 ErrVersionTooLow: '現在の 1Panel のバージョンが低すぎるため、App Store を更新できません。操作する前にバージョンをアップグレードしてください。'
 ErrAppNameExist: 'アプリケーション名がすでに存在します'
+ErrAppInstallNameExist: 'アプリケーションインストール名 {{ .name }} はすでに存在します'
 AppStoreIsSyncing: 'App Store が同期中です。しばらくしてからもう一度お試しください'
 ErrGetCompose: 'docker-compose.yml ファイルの取得に失敗しました {{ .detail }}'
 ErrAppWarn: '異常な状態です。ログを確認してください'

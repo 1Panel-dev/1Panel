@@ -1164,6 +1164,50 @@ var AddSkillsHubMenu = &gormigrate.Migration{
 	},
 }
 
+var UpdateXpackSyncMenu = &gormigrate.Migration{
+	ID: "20260616-update-xpack-sync-menu",
+	Migrate: func(tx *gorm.DB) error {
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+		if menuJSON == "" {
+			menuJSON = helper.LoadMenus()
+		}
+
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		for i := range menus {
+			if menus[i].Label != "Xpack-Menu" {
+				continue
+			}
+			for j := range menus[i].Children {
+				if menus[i].Children[j].ID != "115" && menus[i].Children[j].Label != "FileExange" {
+					continue
+				}
+				menus[i].Children[j].Title = "xpack.sync.menu"
+				menus[i].Children[j].Label = "Sync"
+				menus[i].Children[j].Path = "/xpack/sync"
+				break
+			}
+			break
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
+}
+
 var AddUserManagementMenu = &gormigrate.Migration{
 	ID: "20260415-add-user-management-menu",
 	Migrate: func(tx *gorm.DB) error {
