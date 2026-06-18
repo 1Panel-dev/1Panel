@@ -1120,6 +1120,8 @@ const message = {
         },
         skillsHub: {
             title: 'Skills Hub',
+            skillList: 'Lista de Skills',
+            serverTab: 'Servidor',
             upload: 'Subir Skill',
             importSkill: 'Importar Skill',
             repositoryAddress: 'Dirección del repositorio',
@@ -1178,6 +1180,24 @@ const message = {
             noInstallTarget: 'No hay agentes personalizados disponibles. Configure primero un destino de instalación.',
             postInstallConfirm:
                 'Este destino tiene un comando posterior a la instalación. Confirme que el comando es confiable antes de ejecutarlo.',
+            serverStatusTitle: 'Skills Hub Server',
+            serverServiceOperateConfirm: '¿Seguro que desea {0} el servidor Skills Hub?',
+            serverAccessSetting: 'Configuración de acceso al servicio',
+            serverInfo: 'Información del servidor',
+            tokenSetting: 'Configuración de Token',
+            externalUrl: 'URL externa',
+            externalUrlRequired: 'Introduzca primero la URL externa.',
+            skillctlDownloadUrl: 'URL de descarga de skillctl',
+            skillctlArchitecture: 'Arquitectura del servidor',
+            registryUrl: 'URL del Registry',
+            loginCommand: 'Comando de inicio de sesión',
+            installCommand: 'Comando de instalación',
+            createToken: 'Crear Token',
+            tokenCreated: 'Token creado',
+            tokenVisibleOnce: 'El token en texto claro solo se muestra una vez. Cópielo y guárdelo ahora.',
+            disableTokenConfirm:
+                '¿Desactivar este Token? Después de desactivarlo, skillctl que use este Token ya no podrá instalar Skills.',
+            deleteTokenConfirm: '¿Eliminar este Token? Esta acción no se puede deshacer.',
             status: {
                 pending: 'Pendiente',
                 approved: 'Aprobado',

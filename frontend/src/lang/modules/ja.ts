@@ -1110,6 +1110,8 @@ const message = {
         },
         skillsHub: {
             title: 'Skills Hub',
+            skillList: 'Skill リスト',
+            serverTab: 'サーバー',
             upload: 'Skill をアップロード',
             importSkill: 'Skill をインポート',
             repositoryAddress: 'リポジトリアドレス',
@@ -1169,6 +1171,24 @@ const message = {
             noInstallTarget: '利用可能なカスタムエージェントがありません。先にインストール先を設定してください。',
             postInstallConfirm:
                 'この対象にはインストール後コマンドが設定されています。実行前に信頼できるコマンドか確認してください。',
+            serverStatusTitle: 'Skills Hub Server',
+            serverServiceOperateConfirm: 'Skills Hub サーバーを{0}しますか？',
+            serverAccessSetting: 'サービスアクセス設定',
+            serverInfo: 'サーバー情報',
+            tokenSetting: 'Token 設定',
+            externalUrl: '外部アクセス URL',
+            externalUrlRequired: '先に外部アクセス URL を入力してください。',
+            skillctlDownloadUrl: 'skillctl ダウンロード URL',
+            skillctlArchitecture: 'サーバーアーキテクチャ',
+            registryUrl: 'Registry URL',
+            loginCommand: 'ログインコマンド',
+            installCommand: 'インストールコマンド',
+            createToken: 'Token を作成',
+            tokenCreated: 'Token が作成されました',
+            tokenVisibleOnce: 'Token の平文は一度だけ表示されます。すぐにコピーして保存してください。',
+            disableTokenConfirm:
+                'この Token を無効にしますか？無効にすると、この Token を使用する skillctl は Skill をインストールできなくなります。',
+            deleteTokenConfirm: 'この Token を削除しますか？削除後は元に戻せません。',
             status: {
                 pending: 'レビュー待ち',
                 approved: '承認済み',
