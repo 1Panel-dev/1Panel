@@ -290,7 +290,13 @@ const rules = computed<FormRules>(() => {
                         (bot, index) => index !== editIndex.value && bot.accountId === value,
                     );
                     if (exists) {
-                        callback(new Error(t('aiTools.agents.botDuplicateAccountId')));
+                        callback(
+                            new Error(
+                                t('aiTools.agents.botDuplicateField', {
+                                    field: t('aiTools.agents.accountId'),
+                                }),
+                            ),
+                        );
                         return;
                     }
                     callback();

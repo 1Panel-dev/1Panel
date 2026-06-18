@@ -29,6 +29,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
@@ -82,6 +83,47 @@ func NewRuntimeService() IRuntimeService {
 	return &RuntimeService{}
 }
 
+var pullRuntimeComposeImages = compose.PullComposeImages
+var downRuntimeCompose = compose.Down
+
+type runtimeTaskMeta struct {
+	resourceName string
+	operate      string
+	scope        string
+	taskID       string
+	resourceID   uint
+}
+
+func buildRuntimeCreateTaskMeta(create request.RuntimeCreate, runtimeID uint) runtimeTaskMeta {
+	return runtimeTaskMeta{
+		resourceName: create.Name,
+		operate:      task.TaskCreate,
+		scope:        task.TaskScopeRuntime,
+		taskID:       create.TaskID,
+		resourceID:   runtimeID,
+	}
+}
+
+func buildRuntimeDeleteTaskMeta(deleteReq request.RuntimeDelete, runtime *model.Runtime) runtimeTaskMeta {
+	return runtimeTaskMeta{
+		resourceName: runtime.Name,
+		operate:      task.TaskDelete,
+		scope:        task.TaskScopeRuntime,
+		taskID:       deleteReq.TaskID,
+		resourceID:   deleteReq.ID,
+	}
+}
+
+func runtimeCreateInitialStatus(create request.RuntimeCreate) string {
+	if create.Type == constant.RuntimePHP {
+		if create.Resource == constant.ResourceLocal {
+			return constant.StatusNormal
+		}
+		return constant.StatusBuilding
+	}
+	return constant.StatusCreating
+}
+
 func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, error) {
 	var (
 		opts []repo.DBOption
@@ -104,20 +146,29 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 			return nil, err
 		}
 	}
+	if create.Type == constant.RuntimePHP && create.Resource == constant.ResourceLocal {
+		runtime := &model.Runtime{
+			Name:     create.Name,
+			Resource: create.Resource,
+			Type:     create.Type,
+			Version:  create.Version,
+			Status:   runtimeCreateInitialStatus(create),
+			Remark:   create.Remark,
+		}
+		if err := runtimeRepo.Create(context.Background(), runtime); err != nil {
+			return nil, err
+		}
+		if err := startRuntimeCreateTask(create, runtime, model.App{}, model.AppDetail{}, ""); err != nil {
+			runtime.Status = constant.StatusError
+			runtime.Message = err.Error()
+			_ = runtimeRepo.Save(runtime)
+			return nil, err
+		}
+		return runtime, nil
+	}
 	var hostPorts []string
 	switch create.Type {
 	case constant.RuntimePHP:
-		if create.Resource == constant.ResourceLocal {
-			runtime := &model.Runtime{
-				Name:     create.Name,
-				Resource: create.Resource,
-				Type:     create.Type,
-				Version:  create.Version,
-				Status:   constant.StatusNormal,
-				Remark:   create.Remark,
-			}
-			return nil, runtimeRepo.Create(context.Background(), runtime)
-		}
 		exist, _ = runtimeRepo.GetFirst(context.Background(), runtimeRepo.WithImage(create.Image))
 		if exist != nil {
 			return nil, buserr.New("ErrImageExist")
@@ -160,11 +211,6 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 	}
 
 	appVersionDir := filepath.Join(app.GetAppResourcePath(), appDetail.Version)
-	if !fileOp.Stat(appVersionDir) {
-		if err = downloadApp(app, appDetail, nil, nil); err != nil {
-			return nil, err
-		}
-	}
 
 	runtime := &model.Runtime{
 		Name:          create.Name,
@@ -176,22 +222,90 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		ContainerName: containerName.(string),
 		Port:          strings.Join(hostPorts, ","),
 		Remark:        create.Remark,
-	}
-
-	switch create.Type {
-	case constant.RuntimePHP:
-		if err = handlePHP(create, runtime, fileOp, appVersionDir); err != nil {
-			return nil, err
-		}
-	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
-		if err = handleRuntime(create, runtime, fileOp, appVersionDir); err != nil {
-			return nil, err
-		}
+		Status:        runtimeCreateInitialStatus(create),
 	}
 	if err := runtimeRepo.Create(context.Background(), runtime); err != nil {
 		return nil, err
 	}
+	if err := startRuntimeCreateTask(create, runtime, app, appDetail, appVersionDir); err != nil {
+		runtime.Status = constant.StatusError
+		runtime.Message = err.Error()
+		_ = runtimeRepo.Save(runtime)
+		return nil, err
+	}
 	return runtime, nil
+}
+
+func startRuntimeCreateTask(create request.RuntimeCreate, runtime *model.Runtime, app model.App, appDetail model.AppDetail, appVersionDir string) error {
+	meta := buildRuntimeCreateTaskMeta(create, runtime.ID)
+	createTask, err := task.NewTaskWithOps(meta.resourceName, meta.operate, meta.scope, meta.taskID, meta.resourceID)
+	if err != nil {
+		return err
+	}
+	createTask.AddSubTask(task.GetTaskName(create.Name, task.TaskCreate, task.TaskScopeRuntime), func(t *task.Task) error {
+		return executeRuntimeCreateTask(create, runtime, app, appDetail, appVersionDir, t)
+	}, nil)
+	go func() {
+		_ = createTask.Execute()
+	}()
+	return nil
+}
+
+func executeRuntimeCreateTask(create request.RuntimeCreate, runtime *model.Runtime, app model.App, appDetail model.AppDetail, appVersionDir string, taskItem *task.Task) error {
+	if create.Type == constant.RuntimePHP && create.Resource == constant.ResourceLocal {
+		runtime.Status = constant.StatusNormal
+		runtime.Message = ""
+		return runtimeRepo.Save(runtime)
+	}
+
+	if err := downloadApp(app, appDetail, nil, taskItem.Logger); err != nil {
+		return markRuntimeCreateFailed(runtime, err)
+	}
+	go func() {
+		RequestDownloadCallBack(appDetail.DownloadCallBackUrl)
+	}()
+
+	fileOp := files.NewFileOp()
+	var err error
+	switch create.Type {
+	case constant.RuntimePHP:
+		err = handlePHP(create, runtime, fileOp, appVersionDir)
+	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
+		err = handleRuntime(create, runtime, fileOp, appVersionDir)
+	}
+	if err != nil {
+		return markRuntimeCreateFailed(runtime, err)
+	}
+	if err = runtimeRepo.Save(runtime); err != nil {
+		return err
+	}
+
+	switch create.Type {
+	case constant.RuntimePHP:
+		return buildRuntimeWithResult(runtime, "", "", false)
+	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
+		if err := pullRuntimeImagesBeforeStart(create, runtime, taskItem); err != nil {
+			return markRuntimeCreateFailed(runtime, err)
+		}
+		return startRuntimeWithResult(runtime)
+	}
+	return nil
+}
+
+func pullRuntimeImagesBeforeStart(create request.RuntimeCreate, runtime *model.Runtime, taskItem *task.Task) error {
+	switch create.Type {
+	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
+		return pullRuntimeComposeImages(runtime.GetComposePath(), false, taskItem)
+	default:
+		return nil
+	}
+}
+
+func markRuntimeCreateFailed(runtime *model.Runtime, err error) error {
+	runtime.Status = constant.StatusError
+	runtime.Message = err.Error()
+	_ = runtimeRepo.Save(runtime)
+	return err
 }
 
 func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.RuntimeDTO, error) {
@@ -272,36 +386,157 @@ func (r *RuntimeService) Delete(runtimeDelete request.RuntimeDelete) error {
 	if website.ID > 0 {
 		return buserr.New("ErrDelWithWebsite")
 	}
+	return startRuntimeDeleteTask(runtimeDelete, runtime)
+}
+
+func startRuntimeDeleteTask(runtimeDelete request.RuntimeDelete, runtime *model.Runtime) error {
+	meta := buildRuntimeDeleteTaskMeta(runtimeDelete, runtime)
+	deleteTask, err := task.NewTaskWithOps(meta.resourceName, meta.operate, meta.scope, meta.taskID, meta.resourceID)
+	if err != nil {
+		return err
+	}
+	deleteTask.AddSubTask(task.GetTaskName(runtime.Name, task.TaskDelete, task.TaskScopeRuntime), func(t *task.Task) error {
+		return executeRuntimeDeleteTask(runtimeDelete, runtime, t)
+	}, nil)
+	go func() {
+		_ = deleteTask.Execute()
+	}()
+	return nil
+}
+
+func executeRuntimeDeleteTask(runtimeDelete request.RuntimeDelete, runtime *model.Runtime, taskItem *task.Task) error {
 	if runtime.Resource != constant.ResourceAppstore {
+		if runtimeDelete.DeleteImage {
+			deleteRuntimeImages(runtime, taskItem)
+		}
 		return runtimeRepo.DeleteBy(repo.WithByID(runtimeDelete.ID))
 	}
 	projectDir := runtime.GetPath()
-	if out, err := compose.Down(runtime.GetComposePath()); err != nil && !runtimeDelete.ForceDelete {
-		if out != "" {
-			return errors.New(out)
-		}
+	if err := stopRuntimeBeforeDelete(runtime, runtimeDelete.ForceDelete, taskItem); err != nil {
 		return err
 	}
-	if runtime.Type == constant.RuntimePHP {
-		client, err := docker.NewClient()
-		if err != nil {
-			return err
-		}
-		defer client.Close()
-		imageID, err := client.GetImageIDByName(runtime.Image)
-		if err != nil {
-			return err
-		}
-		if imageID != "" {
-			if err := client.DeleteImage(imageID); err != nil {
-				global.LOG.Errorf("delete image id [%s] error %v", imageID, err)
-			}
-		}
+	if runtimeDelete.DeleteImage {
+		deleteRuntimeImages(runtime, taskItem)
 	}
 	if err := files.NewFileOp().DeleteDir(projectDir); err != nil && !runtimeDelete.ForceDelete {
 		return err
 	}
 	return runtimeRepo.DeleteBy(repo.WithByID(runtimeDelete.ID))
+}
+
+func getRuntimeStopLog() string {
+	logStr := i18n.GetMsgByKey("Stop") + i18n.GetMsgByKey("Runtime")
+	if strings.TrimSpace(logStr) == "" {
+		return "StopRuntime"
+	}
+	return logStr
+}
+
+func stopRuntimeBeforeDelete(runtime *model.Runtime, forceDelete bool, taskItem *task.Task) error {
+	logStr := getRuntimeStopLog()
+	if taskItem != nil {
+		taskItem.Log(logStr)
+	}
+	out, err := downRuntimeCompose(runtime.GetComposePath())
+	if err != nil && !forceDelete {
+		if out != "" {
+			err = errors.New(out)
+		}
+		if taskItem != nil {
+			taskItem.LogFailedWithErr(logStr, err)
+		}
+		return err
+	}
+	if taskItem != nil {
+		taskItem.LogSuccess(logStr)
+	}
+	return nil
+}
+
+func getRuntimeDeleteImages(runtime *model.Runtime) ([]string, error) {
+	var images []string
+	imageMap := make(map[string]struct{})
+	appendImage := func(image string) {
+		image = strings.TrimSpace(image)
+		if image == "" {
+			return
+		}
+		if _, ok := imageMap[image]; ok {
+			return
+		}
+		imageMap[image] = struct{}{}
+		images = append(images, image)
+	}
+
+	appendImage(runtime.Image)
+	if runtime.DockerCompose != "" {
+		composeImages, err := docker.GetImagesFromDockerCompose([]byte(runtime.Env), []byte(runtime.DockerCompose))
+		if err != nil {
+			return nil, err
+		}
+		for _, image := range composeImages {
+			appendImage(image)
+		}
+	}
+	return images, nil
+}
+
+func deleteRuntimeImages(runtime *model.Runtime, taskItem *task.Task) {
+	logPrefix := i18n.GetMsgByKey("TaskDelete") + i18n.GetMsgByKey("Image")
+	images, err := getRuntimeDeleteImages(runtime)
+	if err != nil {
+		global.LOG.Errorf("get runtime [%s] delete images error %v", runtime.Name, err)
+		if taskItem != nil {
+			taskItem.LogFailedWithErr(logPrefix, err)
+		}
+		return
+	}
+	if len(images) == 0 {
+		if taskItem != nil {
+			taskItem.LogFailedWithErr(logPrefix, errors.New(i18n.GetWithName("ErrImageNotExist", runtime.Name)))
+		}
+		return
+	}
+	client, err := docker.NewClient()
+	if err != nil {
+		global.LOG.Errorf("delete runtime images [%s] error %v", runtime.Name, err)
+		if taskItem != nil {
+			taskItem.LogFailedWithErr(logPrefix, err)
+		}
+		return
+	}
+	defer client.Close()
+
+	for _, imageName := range images {
+		logStr := logPrefix + imageName
+		if taskItem != nil {
+			taskItem.Log(logStr)
+		}
+		imageID, err := client.GetImageIDByName(imageName)
+		if err != nil {
+			global.LOG.Errorf("get runtime image [%s] error %v", imageName, err)
+			if taskItem != nil {
+				taskItem.LogFailedWithErr(logStr, err)
+			}
+			continue
+		}
+		if imageID == "" {
+			if taskItem != nil {
+				taskItem.LogFailedWithErr(logStr, errors.New(i18n.GetWithName("ErrImageNotExist", imageName)))
+			}
+			continue
+		}
+		if err := client.DeleteImage(imageID); err != nil {
+			global.LOG.Errorf("delete image id [%s] error %v", imageID, err)
+			if taskItem != nil {
+				taskItem.LogFailedWithErr(logStr, err)
+			}
+			continue
+		}
+		if taskItem != nil {
+			taskItem.LogSuccess(logStr)
+		}
+	}
 }
 
 func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {

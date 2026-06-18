@@ -36,7 +36,14 @@
                     :rows="3"
                     :placeholder="t('aiTools.agents.allowFromPlaceholder')"
                 />
-                <span class="input-help">{{ t('aiTools.agents.allowFromHelper') }}</span>
+                <span class="input-help">
+                    {{
+                        t('aiTools.agents.allowlistPolicyHelper', [
+                            t('aiTools.agents.allowFromPlaceholder'),
+                            t('aiTools.agents.dmPolicy'),
+                        ])
+                    }}
+                </span>
             </el-form-item>
             <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
                 <el-select v-model="form.groupPolicy">
@@ -56,7 +63,14 @@
                     :rows="3"
                     :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
                 />
-                <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
+                <span class="input-help">
+                    {{
+                        t('aiTools.agents.allowlistPolicyHelper', [
+                            t('aiTools.agents.groupAllowFromPlaceholder'),
+                            t('aiTools.agents.groupPolicy'),
+                        ])
+                    }}
+                </span>
             </el-form-item>
             <el-form-item :label="t('aiTools.agents.botId')" prop="botId">
                 <el-input v-model="form.botId" />

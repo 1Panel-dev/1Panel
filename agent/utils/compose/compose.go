@@ -49,13 +49,17 @@ func Up(filePath string) (string, error) {
 }
 
 func UpWithTask(filePath string, task *task.Task, forcePull bool) error {
-	if err := pullComposeImages(filePath, forcePull, task); err != nil {
+	if err := PullComposeImages(filePath, forcePull, task); err != nil {
 		return err
 	}
 	base, extra := getComposeBaseCmd()
 	args := append(extra, loadFiles(filePath)...)
 	args = append(args, "up", "-d")
 	return cmd.NewCommandMgr(cmd.WithTask(*task), cmd.WithTimeout(20*time.Minute)).Run(base, args...)
+}
+
+func PullComposeImages(filePath string, forcePull bool, task *task.Task) error {
+	return pullComposeImages(filePath, forcePull, task)
 }
 
 func pullComposeImages(filePath string, forcePull bool, task *task.Task) error {

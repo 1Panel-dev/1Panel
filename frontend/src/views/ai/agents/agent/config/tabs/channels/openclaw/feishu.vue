@@ -52,7 +52,14 @@
                         :rows="3"
                         :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
                     />
-                    <span class="input-help">{{ t('aiTools.agents.groupAllowFromHelper') }}</span>
+                    <span class="input-help">
+                        {{
+                            t('aiTools.agents.allowlistPolicyHelper', [
+                                t('aiTools.agents.groupAllowFromPlaceholder'),
+                                t('aiTools.agents.groupPolicy'),
+                            ])
+                        }}
+                    </span>
                 </el-form-item>
             </div>
             <ChannelBots

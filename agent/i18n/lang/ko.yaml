@@ -72,7 +72,7 @@ ErrAIProxyModelMapInvalid: '모델 매핑은 유효한 JSON 객체여야 합니�
 ErrAIProxyModelMapEmpty: '모델 매핑은 비워 둘 수 없습니다'
 ErrAIProxyModelMapEmptyExternalModel: '모델 매핑에 빈 요청 모델이 있습니다'
 ErrAIProxyModelMapEmptyUpstreamModel: '{{ .model }}의 업스트림 모델은 비워 둘 수 없습니다'
-AIProxyUserFallback: '사용자 {{ .id }}'
+AIProxyUserFallback: '삭제된 사용자 (ID: {{ .id }})'
 Localhost: '로컬 머신'
 ErrBackupInUsed: '백업 계정이 예약에 사용 중'
 ErrBackupCheck: '연결 테스트 실패: {{ .err }}'

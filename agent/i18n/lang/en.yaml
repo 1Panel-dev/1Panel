@@ -610,4 +610,4 @@ ErrAIProxyModelMapInvalid: 'Model mapping must be a valid JSON object: {{ .err }
 ErrAIProxyModelMapEmpty: 'Model mapping cannot be empty'
 ErrAIProxyModelMapEmptyExternalModel: 'Model mapping contains an empty request model'
 ErrAIProxyModelMapEmptyUpstreamModel: 'Upstream model for {{ .model }} cannot be empty'
-AIProxyUserFallback: 'User {{ .id }}'
+AIProxyUserFallback: 'Deleted user (ID: {{ .id }})'

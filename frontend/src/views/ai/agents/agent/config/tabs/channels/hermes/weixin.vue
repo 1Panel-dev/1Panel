@@ -70,7 +70,7 @@ const deleteChannel = async () => {
             type: 'weixin',
         });
         await load();
-        MsgSuccess(t('aiTools.agents.deleteAndRestartSuccess'));
+        MsgSuccess(t('aiTools.agents.successAndRestart', [t('commons.msg.deleteSuccess')]));
     } finally {
         deleting.value = false;
     }

@@ -48,6 +48,7 @@ import { Runtime } from '@/api/interface/runtime';
 import { CreateRuntime, GetRuntime, UpdateRuntime } from '@/api/modules/runtime';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
+import { newUUID } from '@/utils/id';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
@@ -96,7 +97,7 @@ const rules = ref<any>({
     },
 });
 const scripts = ref<Runtime.NodeScripts[]>([]);
-const em = defineEmits(['close']);
+const em = defineEmits(['close', 'submit']);
 
 const handleClose = () => {
     open.value = false;
@@ -132,10 +133,13 @@ const submit = async (formEl: FormInstance | undefined) => {
 
         if (mode.value == 'create') {
             loading.value = true;
+            const taskID = newUUID();
+            runtime.taskID = taskID;
             CreateRuntime(runtime)
                 .then(() => {
                     MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                     handleClose();
+                    em('submit', taskID);
                 })
                 .finally(() => {
                     loading.value = false;

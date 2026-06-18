@@ -4,9 +4,9 @@
             <el-card class="form-card">
                 <el-form-item :label="`${$t('aiTools.agents.agent')}${$t('commons.table.type')}`" prop="agentType">
                     <el-select v-model="form.agentType" @change="handleAgentTypeChange">
-                        <el-option :label="$t('aiTools.agents.openclawType')" value="openclaw" />
-                        <el-option :label="$t('aiTools.agents.hermesType')" value="hermes-agent" />
-                        <el-option :label="$t('aiTools.agents.copawType')" value="copaw" />
+                        <el-option label="OpenClaw" value="openclaw" />
+                        <el-option label="Hermes Agent" value="hermes-agent" />
+                        <el-option label="QwenPaw" value="copaw" />
                     </el-select>
                 </el-form-item>
                 <el-form-item :label="$t('commons.table.name')" prop="name">

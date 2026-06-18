@@ -72,7 +72,7 @@ ErrAIProxyModelMapInvalid: 'Pemetaan model mestilah objek JSON yang sah: {{ .err
 ErrAIProxyModelMapEmpty: 'Pemetaan model tidak boleh kosong'
 ErrAIProxyModelMapEmptyExternalModel: 'Pemetaan model mengandungi model permintaan kosong'
 ErrAIProxyModelMapEmptyUpstreamModel: 'Model upstream untuk {{ .model }} tidak boleh kosong'
-AIProxyUserFallback: 'Pengguna {{ .id }}'
+AIProxyUserFallback: 'Pengguna dipadam (ID: {{ .id }})'
 Localhost: 'Mesin Tempatan'
 ErrBackupInUsed: 'Akaun sandaran sedang digunakan oleh tugas'
 ErrBackupCheck: 'Ujian sambungan gagal: {{ .err }}'
