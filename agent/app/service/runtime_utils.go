@@ -65,17 +65,6 @@ func handleRuntime(create request.RuntimeCreate, runtime *model.Runtime, fileOp 
 	runtime.Env = string(envContent)
 	runtime.Status = constant.StatusCreating
 	runtime.CodeDir = create.CodeDir
-
-	nodeDetail, err := appDetailRepo.GetFirst(repo.WithByID(runtime.AppDetailID))
-	if err != nil {
-		return err
-	}
-
-	go func() {
-		RequestDownloadCallBack(nodeDetail.DownloadCallBackUrl)
-	}()
-	go startRuntime(runtime)
-
 	return
 }
 
@@ -129,32 +118,28 @@ func handlePHP(create request.RuntimeCreate, runtime *model.Runtime, fileOp file
 	runtime.Env = string(envContent)
 	runtime.Params = string(forms)
 	runtime.Status = constant.StatusBuilding
-
-	go func() {
-		appDetail, err := appDetailRepo.GetFirst(repo.WithByID(runtime.AppDetailID))
-		if err == nil {
-			RequestDownloadCallBack(appDetail.DownloadCallBackUrl)
-		}
-	}()
-
-	go buildRuntime(runtime, "", "", false)
 	return
 }
 
 func startRuntime(runtime *model.Runtime) {
+	_ = startRuntimeWithResult(runtime)
+}
+
+func startRuntimeWithResult(runtime *model.Runtime) error {
 	if err := runComposeCmdWithLog("up", runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
 		runtime.Status = constant.StatusError
 		runtime.Message = err.Error()
 		_ = runtimeRepo.Save(runtime)
-		return
+		return err
 	}
 
 	if err := SyncRuntimeContainerStatus(runtime); err != nil {
 		runtime.Status = constant.StatusError
 		runtime.Message = err.Error()
 		_ = runtimeRepo.Save(runtime)
-		return
+		return err
 	}
+	return nil
 }
 
 func reCreateRuntime(runtime *model.Runtime) {
@@ -326,6 +311,10 @@ func deleteImageByID(oldImageID, imageName string, client docker.Client) {
 }
 
 func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool) {
+	_ = buildRuntimeWithResult(runtime, oldImageID, oldEnv, rebuild)
+}
+
+func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool) error {
 	runtimePath := runtime.GetPath()
 	composePath := runtime.GetComposePath()
 	logPath := path.Join(runtimePath, "build.log")
@@ -333,10 +322,16 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
 		global.LOG.Errorf("failed to open log file: %v", err)
-		return
+		runtime.Status = constant.StatusError
+		runtime.Message = err.Error()
+		_ = runtimeRepo.Save(runtime)
+		return err
 	}
 	defer func() {
 		_ = logFile.Close()
+	}()
+	defer func() {
+		_ = runtimeRepo.Save(runtime)
 	}()
 
 	newPHPVersion := getRuntimeEnv(runtime.Env, "PHP_VERSION")
@@ -369,16 +364,19 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 		} else {
 			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + stderrBuf.String()
 		}
-		_ = runtimeRepo.Save(runtime)
-		return
+		return err
 	}
 	if err = runComposeCmdWithLog(constant.RuntimeDown, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
-		return
+		runtime.Status = constant.StatusError
+		runtime.Message = err.Error()
+		return err
 	}
 	client, err := docker.NewClient()
 	if err != nil {
 		_, _ = logFile.WriteString(fmt.Sprintf("failed to connect to docker client: %v", err))
-		return
+		runtime.Status = constant.StatusError
+		runtime.Message = err.Error()
+		return err
 	}
 	runtime.Message = ""
 	if rebuild && runtime.ID > 0 {
@@ -404,14 +402,10 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 		}
 	}
 
-	defer func() {
-		_ = runtimeRepo.Save(runtime)
-	}()
-
 	if out, err := compose.Up(composePath); err != nil {
 		runtime.Status = constant.StatusStartErr
 		runtime.Message = out
-		return
+		return err
 	}
 	deleteImageID := ""
 	extensions := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
@@ -421,14 +415,14 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 		if err = cmdMgr.Run("docker", "exec", "-i", runtime.ContainerName, "install-ext", extensions); err != nil {
 			runtime.Status = constant.StatusError
 			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + err.Error()
-			return
+			return err
 		}
 		commitMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(10*time.Minute), cmd2.WithOutputFile(logPath))
 		err = commitMgr.Run("docker", "commit", runtime.ContainerName, runtime.Image)
 		if err != nil {
 			runtime.Status = constant.StatusError
 			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + err.Error()
-			return
+			return err
 		}
 	}
 	if oldImageID != "" {
@@ -441,10 +435,10 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 	if out, err := compose.DownAndUp(composePath); err != nil {
 		runtime.Status = constant.StatusStartErr
 		runtime.Message = out
-		return
+		return err
 	}
 	runtime.Status = constant.StatusRunning
-	_ = runtimeRepo.Save(runtime)
+	return nil
 }
 
 func handleParams(create request.RuntimeCreate, projectDir string) (composeContent []byte, envContent []byte, forms []byte, err error) {

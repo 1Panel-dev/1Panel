@@ -21,6 +21,7 @@ type RuntimeCreate struct {
 	Source      string `json:"source"`
 	CodeDir     string `json:"codeDir"`
 	Remark      string `json:"remark"`
+	TaskID      string `json:"taskID"`
 
 	Params map[string]interface{} `json:"params"`
 	NodeConfig
@@ -58,8 +59,10 @@ type ExtraHost struct {
 }
 
 type RuntimeDelete struct {
-	ID          uint `json:"id"`
-	ForceDelete bool `json:"forceDelete"`
+	ID          uint   `json:"id"`
+	ForceDelete bool   `json:"forceDelete"`
+	DeleteImage bool   `json:"deleteImage"`
+	TaskID      string `json:"taskID"`
 }
 
 type RuntimeUpdate struct {

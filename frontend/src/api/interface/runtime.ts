@@ -60,6 +60,7 @@ export namespace Runtime {
         source?: string;
         codeDir?: string;
         port?: number;
+        taskID?: string;
         exposedPorts?: ExposedPort[];
         environments?: Environment[];
         volumes?: Volume[];
@@ -103,6 +104,8 @@ export namespace Runtime {
     export interface RuntimeDelete {
         id: number;
         forceDelete: boolean;
+        deleteImage?: boolean;
+        taskID?: string;
     }
 
     export interface RuntimeOperate {

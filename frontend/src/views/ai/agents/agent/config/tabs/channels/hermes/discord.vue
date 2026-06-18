@@ -117,7 +117,7 @@ const save = async () => {
                 },
             ],
         });
-        MsgSuccess(t('aiTools.agents.saveAndRestartSuccess'));
+        MsgSuccess(t('aiTools.agents.successAndRestart', [t('aiTools.agents.saveSuccess')]));
         configured.value = true;
     } finally {
         saving.value = false;
@@ -140,7 +140,7 @@ const deleteChannel = async () => {
             type: 'discord',
         });
         await load(agentId.value);
-        MsgSuccess(t('aiTools.agents.deleteAndRestartSuccess'));
+        MsgSuccess(t('aiTools.agents.successAndRestart', [t('commons.msg.deleteSuccess')]));
     } finally {
         deleting.value = false;
     }

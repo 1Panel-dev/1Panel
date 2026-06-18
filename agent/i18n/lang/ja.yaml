@@ -72,7 +72,7 @@ ErrAIProxyModelMapInvalid: 'モデルマッピングは有効な JSON オブジ�
 ErrAIProxyModelMapEmpty: 'モデルマッピングは空にできません'
 ErrAIProxyModelMapEmptyExternalModel: 'モデルマッピングに空のリクエストモデルがあります'
 ErrAIProxyModelMapEmptyUpstreamModel: '{{ .model }} の上流モデルは空にできません'
-AIProxyUserFallback: 'ユーザー {{ .id }}'
+AIProxyUserFallback: '削除済みユーザー (ID: {{ .id }})'
 Localhost: 'ローカルマシン'
 ErrBackupInUsed: 'バックアップアカウントがスケジュールで使用中'
 ErrBackupCheck: '接続テストに失敗しました: {{ .err }}'

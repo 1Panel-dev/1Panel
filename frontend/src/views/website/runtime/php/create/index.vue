@@ -210,6 +210,7 @@ import { getAppByKey, getAppDetail, getCurrentNodeCustomAppConfig, searchApp } f
 import { CreateRuntime, GetRuntime, ListPHPExtensions, UpdateRuntime } from '@/api/modules/runtime';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
+import { newUUID } from '@/utils/id';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
@@ -432,18 +433,20 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         try {
-            let res;
             if (mode.value == 'create') {
                 loading.value = true;
-                res = await CreateRuntime(runtime);
+                const taskID = newUUID();
+                runtime.taskID = taskID;
+                await CreateRuntime(runtime);
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+                handleClose();
+                em('submit', taskID);
             } else {
                 loading.value = true;
-                res = await UpdateRuntime(runtime);
+                await UpdateRuntime(runtime);
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+                handleClose();
             }
-            handleClose();
-            em('submit', res.data.id);
         } catch (error) {
         } finally {
             loading.value = false;

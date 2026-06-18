@@ -72,7 +72,7 @@ ErrAIProxyModelMapInvalid: '模型映射必須是合法的 JSON 物件：{{ .err
 ErrAIProxyModelMapEmpty: '模型映射不能為空'
 ErrAIProxyModelMapEmptyExternalModel: '模型映射中存在空的請求模型'
 ErrAIProxyModelMapEmptyUpstreamModel: '模型 {{ .model }} 的上游模型不能為空'
-AIProxyUserFallback: '使用者 {{ .id }}'
+AIProxyUserFallback: '已刪除使用者 (ID: {{ .id }})'
 Localhost: '本機'
 ErrBackupInUsed: '此備份帳號已在排程任務中使用，無法刪除'
 ErrBackupCheck: '備份帳號測試連線失敗{{ .err }}'

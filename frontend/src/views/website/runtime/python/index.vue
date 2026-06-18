@@ -91,12 +91,13 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
-        <Operate ref="operateRef" @close="search" />
-        <Delete ref="deleteRef" @close="search" />
+        <Operate ref="operateRef" @close="search" @submit="openCreateTaskLog" />
+        <Delete ref="deleteRef" @close="search" @task="openCreateTaskLog" />
         <ComposeLogs ref="composeLogRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
-        <AppResources ref="checkRef" @close="search" />
+        <AppResources ref="checkRef" @close="search" @task="openCreateTaskLog" />
         <Terminal ref="terminalRef" />
+        <TaskLog ref="taskLogRef" width="70%" @close="search" />
     </div>
 </template>
 
@@ -114,6 +115,7 @@ import PortJumpDialog from '@/components/port-jump/index.vue';
 import AppResources from '@/views/website/runtime/php/check/index.vue';
 import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
 import PortJump from '@/views/website/runtime/components/port-jump.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import Terminal from '@/views/website/runtime/components/terminal.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { disabledButton } from '@/utils/runtime';
@@ -131,6 +133,7 @@ const dialogPortJumpRef = ref();
 const composeLogRef = ref();
 const checkRef = ref();
 const terminalRef = ref();
+const taskLogRef = ref();
 const isActive = ref(false);
 const isExist = ref(false);
 
@@ -226,6 +229,10 @@ const sync = () => {
 
 const openCreate = () => {
     operateRef.value.acceptParams({ type: 'python', mode: 'create' });
+};
+
+const openCreateTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID, true);
 };
 
 const openDetail = (row: Runtime.Runtime) => {

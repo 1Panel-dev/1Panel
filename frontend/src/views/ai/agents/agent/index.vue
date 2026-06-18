@@ -407,11 +407,11 @@ const search = async () => {
 const getAgentTypeLabel = (agentType: AI.AgentType) => {
     switch (agentType) {
         case 'copaw':
-            return i18n.global.t('aiTools.agents.copawType');
+            return 'QwenPaw';
         case 'hermes-agent':
-            return i18n.global.t('aiTools.agents.hermesType');
+            return 'Hermes Agent';
         default:
-            return i18n.global.t('aiTools.agents.openclawType');
+            return 'OpenClaw';
     }
 };
 

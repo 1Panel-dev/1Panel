@@ -131,7 +131,7 @@ const save = async () => {
                 },
             ],
         });
-        MsgSuccess(t('aiTools.agents.saveAndRestartSuccess'));
+        MsgSuccess(t('aiTools.agents.successAndRestart', [t('aiTools.agents.saveSuccess')]));
         configured.value = true;
     } finally {
         saving.value = false;
@@ -142,15 +142,11 @@ const deleteChannel = async () => {
     if (!agentId.value) {
         return;
     }
-    await ElMessageBox.confirm(
-        t('aiTools.agents.channelDeleteConfirm', [t('aiTools.agents.qq')]),
-        t('commons.msg.infoTitle'),
-        {
-            confirmButtonText: t('commons.button.confirm'),
-            cancelButtonText: t('commons.button.cancel'),
-            type: 'warning',
-        },
-    );
+    await ElMessageBox.confirm(t('aiTools.agents.channelDeleteConfirm', ['QQ']), t('commons.msg.infoTitle'), {
+        confirmButtonText: t('commons.button.confirm'),
+        cancelButtonText: t('commons.button.cancel'),
+        type: 'warning',
+    });
     deleting.value = true;
     try {
         await deleteAgentChannelConfig({
@@ -158,7 +154,7 @@ const deleteChannel = async () => {
             type: 'qqbot',
         });
         await load(agentId.value);
-        MsgSuccess(t('aiTools.agents.deleteAndRestartSuccess'));
+        MsgSuccess(t('aiTools.agents.successAndRestart', [t('commons.msg.deleteSuccess')]));
     } finally {
         deleting.value = false;
     }

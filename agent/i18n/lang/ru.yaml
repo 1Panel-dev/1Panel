@@ -72,7 +72,7 @@ ErrAIProxyModelMapInvalid: 'Сопоставление моделей должн
 ErrAIProxyModelMapEmpty: 'Сопоставление моделей не может быть пустым'
 ErrAIProxyModelMapEmptyExternalModel: 'Сопоставление моделей содержит пустую запрошенную модель'
 ErrAIProxyModelMapEmptyUpstreamModel: 'Upstream-модель для {{ .model }} не может быть пустой'
-AIProxyUserFallback: 'Пользователь {{ .id }}'
+AIProxyUserFallback: 'Удаленный пользователь (ID: {{ .id }})'
 Localhost: 'Локальная машина'
 ErrBackupInUsed: 'Аккаунт бэкапа занят задачей'
 ErrBackupCheck: 'Проверка подключения не удалась: {{ .err }}'

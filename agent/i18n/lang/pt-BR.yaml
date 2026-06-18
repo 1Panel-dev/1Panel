@@ -72,7 +72,7 @@ ErrAIProxyModelMapInvalid: 'O mapeamento de modelos deve ser um objeto JSON vál
 ErrAIProxyModelMapEmpty: 'O mapeamento de modelos não pode estar vazio'
 ErrAIProxyModelMapEmptyExternalModel: 'O mapeamento de modelos contém um modelo solicitado vazio'
 ErrAIProxyModelMapEmptyUpstreamModel: 'O modelo upstream de {{ .model }} não pode estar vazio'
-AIProxyUserFallback: 'Usuário {{ .id }}'
+AIProxyUserFallback: 'Usuário excluído (ID: {{ .id }})'
 Localhost: 'Máquina Local'
 ErrBackupInUsed: 'Conta de backup em uso por tarefa'
 ErrBackupCheck: 'Teste de conexão falhou: {{ .err }}'

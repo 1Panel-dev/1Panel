@@ -72,7 +72,7 @@ ErrAIProxyModelMapInvalid: 'Model eşlemesi geçerli bir JSON nesnesi olmalıdı
 ErrAIProxyModelMapEmpty: 'Model eşlemesi boş olamaz'
 ErrAIProxyModelMapEmptyExternalModel: 'Model eşlemesi boş bir istek modeli içeriyor'
 ErrAIProxyModelMapEmptyUpstreamModel: '{{ .model }} için upstream model boş olamaz'
-AIProxyUserFallback: 'Kullanıcı {{ .id }}'
+AIProxyUserFallback: 'Silinen kullanıcı (ID: {{ .id }})'
 Localhost: 'Yerel Makine'
 ErrBackupInUsed: 'Yedek hesabı görevde kullanılıyor'
 ErrBackupCheck: 'Bağlantı testi başarısız: {{ .err }}'
