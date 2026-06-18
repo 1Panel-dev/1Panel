@@ -1117,6 +1117,8 @@ const message = {
         },
         skillsHub: {
             title: 'Skills Hub',
+            skillList: 'Skill Listesi',
+            serverTab: 'Sunucu',
             upload: 'Skill yükle',
             importSkill: 'Skill içe aktar',
             repositoryAddress: 'Depo adresi',
@@ -1175,6 +1177,24 @@ const message = {
             noInstallTarget: 'Kullanılabilir özel ajan yok. Önce bir kurulum hedefi yapılandırın.',
             postInstallConfirm:
                 'Bu hedefte kurulum sonrası komut yapılandırılmış. Çalıştırmadan önce komutun güvenilir olduğunu doğrulayın.',
+            serverStatusTitle: 'Skills Hub Server',
+            serverServiceOperateConfirm: 'Skills Hub Server için {0} işlemini onaylıyor musunuz?',
+            serverAccessSetting: 'Hizmet erişim ayarları',
+            serverInfo: 'Sunucu bilgileri',
+            tokenSetting: 'Token ayarları',
+            externalUrl: 'Dış erişim adresi',
+            externalUrlRequired: 'Önce dış erişim adresini girin.',
+            skillctlDownloadUrl: 'skillctl indirme adresi',
+            skillctlArchitecture: 'Sunucu mimarisi',
+            registryUrl: 'Registry adresi',
+            loginCommand: 'Giriş komutu',
+            installCommand: 'Kurulum komutu',
+            createToken: 'Token oluştur',
+            tokenCreated: 'Token oluşturuldu',
+            tokenVisibleOnce: 'Token açık metni yalnızca bir kez gösterilir. Lütfen hemen kopyalayıp kaydedin.',
+            disableTokenConfirm:
+                'Bu Token devre dışı bırakılsın mı? Devre dışı bırakıldıktan sonra bu Tokenı kullanan skillctl artık Skill kuramaz.',
+            deleteTokenConfirm: 'Bu Token silinsin mi? Silindikten sonra geri alınamaz.',
             status: {
                 pending: 'İnceleme bekliyor',
                 approved: 'Onaylandı',

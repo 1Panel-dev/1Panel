@@ -1119,6 +1119,8 @@ const message = {
         },
         skillsHub: {
             title: 'Skills Hub',
+            skillList: 'Senarai Skill',
+            serverTab: 'Pelayan',
             upload: 'Muat naik Skill',
             importSkill: 'Import Skill',
             repositoryAddress: 'Alamat repositori',
@@ -1176,6 +1178,24 @@ const message = {
             noInstallTarget: 'Tiada agen tersuai tersedia. Konfigurasikan sasaran pemasangan dahulu.',
             postInstallConfirm:
                 'Sasaran ini mempunyai arahan selepas pemasangan. Sahkan arahan tersebut dipercayai sebelum dijalankan.',
+            serverStatusTitle: 'Skills Hub Server',
+            serverServiceOperateConfirm: 'Sahkan operasi {0} untuk pelayan Skills Hub?',
+            serverAccessSetting: 'Tetapan akses perkhidmatan',
+            serverInfo: 'Maklumat pelayan',
+            tokenSetting: 'Tetapan Token',
+            externalUrl: 'Alamat akses luaran',
+            externalUrlRequired: 'Masukkan alamat akses luaran dahulu.',
+            skillctlDownloadUrl: 'Alamat muat turun skillctl',
+            skillctlArchitecture: 'Seni bina pelayan',
+            registryUrl: 'Alamat Registry',
+            loginCommand: 'Arahan log masuk',
+            installCommand: 'Arahan pemasangan',
+            createToken: 'Cipta Token',
+            tokenCreated: 'Token telah dicipta',
+            tokenVisibleOnce: 'Teks jelas Token hanya dipaparkan sekali. Sila salin dan simpan segera.',
+            disableTokenConfirm:
+                'Sahkan nyahdayakan Token ini? Selepas dinyahdayakan, skillctl yang menggunakan Token ini tidak lagi boleh memasang Skill.',
+            deleteTokenConfirm: 'Sahkan padam Token ini? Selepas dipadam, ia tidak boleh dipulihkan.',
             status: {
                 pending: 'Menunggu semakan',
                 approved: 'Diluluskan',
