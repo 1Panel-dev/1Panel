@@ -4111,6 +4111,7 @@ const message = {
                 scoreWebsiteStopped: '{0} 状態が異常です',
                 scoreWebsiteMonitorUnavailable: 'Webサイト監視で利用不可のサイトを検出',
                 scoreWebsiteMonitorAvailability: 'Webサイト監視可用率 {0}% がしきい値を下回っています',
+                scoreWebsiteMonitorStatusAbnormal: 'Webサイト監視は有効ですが、初期化されていないか異常状態です',
                 scoreWafDisabled: 'WAFが無効で、Webサイトが保護されていません',
                 scoreWafHighRiskHit: 'WAFが集計期間内に {0} 件のリスクルールに該当',
                 scoreCronjobFailed: '過去7日間に {0} 件のスケジュールタスク失敗記録',

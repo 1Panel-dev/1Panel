@@ -4024,6 +4024,8 @@ const message = {
                 scoreWebsiteStopped: '{0} 상태 비정상',
                 scoreWebsiteMonitorUnavailable: '웹사이트 모니터링에서 사용 불가 사이트 감지',
                 scoreWebsiteMonitorAvailability: '웹사이트 모니터링 가용률 {0}%가 임계값 미달',
+                scoreWebsiteMonitorStatusAbnormal:
+                    '웹사이트 모니터링이 활성화되었지만 초기화되지 않았거나 비정상 상태입니다',
                 scoreWafDisabled: 'WAF 미활성화, 웹사이트 보호 미적용',
                 scoreWafHighRiskHit: 'WAF 보고 기간 내 {0}개 위험 규칙 매칭',
                 scoreCronjobFailed: '최근 7일간 {0}건의 예약 작업 실패 기록',
