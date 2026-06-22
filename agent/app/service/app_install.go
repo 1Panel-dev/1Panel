@@ -294,6 +294,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 			DetailID:      req.DetailId,
 			Backup:        req.Backup,
 			PullImage:     req.PullImage,
+			DeleteImage:   req.DeleteImage,
 			DockerCompose: req.DockerCompose,
 			TaskID:        req.TaskID,
 		}

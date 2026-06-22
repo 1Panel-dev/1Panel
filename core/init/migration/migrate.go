@@ -38,6 +38,7 @@ func Init() {
 		migrations.UpdateAiModelMenuStructure,
 		migrations.AddDocSourceSetting,
 		migrations.AddAppStoreInstallAllowPortSetting,
+		migrations.AddAppStoreUpgradeDeleteImageSetting,
 		migrations.AddUserManagementMenu,
 		migrations.AddOpsReportMenu,
 		migrations.AddAIBenchmarkMenu,

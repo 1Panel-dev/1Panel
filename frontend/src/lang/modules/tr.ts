@@ -3235,6 +3235,7 @@ const message = {
         uninstallDeleteBackup: 'Uygulamayı Kaldır - Yedeği Sil',
         uninstallDeleteImage: 'Uygulamayı Kaldır - Görüntüyü Sil',
         upgradeBackup: 'Yükseltmeden Önce Uygulamayı Yedekle',
+        upgradeDeleteImage: 'Uygulamayı Yükselt - Eski Görüntüyü Sil',
         installAllowPort: 'Uygulama kurulurken varsayılan olarak dış port erişimini aç',
         noAppHelper:
             'Uygulama tespit edilmedi, lütfen uygulama mağazası senkronizasyon günlüğünü görüntülemek için görev merkezine gidin',
@@ -4774,6 +4775,7 @@ const message = {
             redisConfig: 'Redis Yapılandırması',
             redisHelper: 'Geçici olarak engellenen IP’leri sürdürmek için Redis’i etkinleştirin',
             wafHelper: 'WAF kapatıldığında tüm web siteleri korumayı kaybeder',
+            websiteWafHelper: 'WAF kapatıldığında bu web sitesi korumayı kaybeder',
             attackIP: 'Saldıran IP',
             attackParam: 'Saldırı Detayları',
             execRule: 'Vurulan Kural',
@@ -4800,6 +4802,7 @@ const message = {
                 'İlk kullanım için başlatma gereklidir, web sitesi yapılandırma dosyası değiştirilecek ve mevcut WAF yapılandırması kaybolacaktır. Lütfen önceden OpenResty’yi yedeklediğinizden emin olun',
             initHelper: 'Başlatma işlemi mevcut WAF yapılandırmasını temizler. Başlatmak istediğinizden emin misiniz?',
             mainSwitch: 'Ana Anahtar',
+            websiteSwitch: 'Anahtar',
             websiteAlert: 'Lütfen önce bir web sitesi oluşturun',
             defaultUrlBlack: 'URL Kuralları',
             htmlRes: 'Engelleme Sayfası',

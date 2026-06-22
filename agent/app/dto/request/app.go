@@ -99,6 +99,7 @@ type AppInstallUpgrade struct {
 	DetailID      uint   `json:"detailId"`
 	Backup        bool   `json:"backup"`
 	PullImage     bool   `json:"pullImage"`
+	DeleteImage   bool   `json:"deleteImage"`
 	DockerCompose string `json:"dockerCompose"`
 	TaskID        string `json:"taskID"`
 }

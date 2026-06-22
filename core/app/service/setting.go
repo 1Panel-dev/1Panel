@@ -704,6 +704,10 @@ func (u *SettingService) GetAppstoreConfig() (*dto.AppstoreConfig, error) {
 	if res.UpgradeBackup == "" {
 		res.UpgradeBackup = constant.StatusDisable
 	}
+	res.UpgradeDeleteImage, _ = settingRepo.GetValueByKey("UpgradeDeleteImage")
+	if res.UpgradeDeleteImage == "" {
+		res.UpgradeDeleteImage = constant.StatusDisable
+	}
 	res.UninstallDeleteBackup, _ = settingRepo.GetValueByKey("UninstallDeleteBackup")
 	if res.UninstallDeleteBackup == "" {
 		res.UninstallDeleteBackup = constant.StatusDisable
