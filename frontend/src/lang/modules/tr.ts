@@ -4162,6 +4162,7 @@ const message = {
                 scoreWebsiteStopped: '{0} durumu anormal',
                 scoreWebsiteMonitorUnavailable: 'Web sitesi izleme kullanılamayan bir site algıladı',
                 scoreWebsiteMonitorAvailability: 'Web sitesi izleme kullanılabilirliği %{0} eşiğin altında',
+                scoreWebsiteMonitorStatusAbnormal: 'Web sitesi izleme etkin, ancak başlatılmadı veya anormal durumda',
                 scoreWafDisabled: 'WAF devre dışı, web siteleri koruma altında değil',
                 scoreWafHighRiskHit: 'WAF rapor döneminde {0} risk kuralı eşleştirdi',
                 scoreCronjobFailed: 'Son 7 günde {0} zamanlanmış görev başarısızlık kaydı',

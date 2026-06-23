@@ -4160,6 +4160,8 @@ const message = {
                 scoreWebsiteStopped: '{0} — аномальный статус',
                 scoreWebsiteMonitorUnavailable: 'Мониторинг сайтов обнаружил недоступный сайт',
                 scoreWebsiteMonitorAvailability: 'Доступность мониторинга сайтов {0}% ниже порога',
+                scoreWebsiteMonitorStatusAbnormal:
+                    'Мониторинг сайтов включён, но не инициализирован или находится в ненормальном состоянии',
                 scoreWafDisabled: 'WAF отключён, сайты не защищены',
                 scoreWafHighRiskHit: 'WAF зафиксировал {0} срабатываний рискованных правил за отчётный период',
                 scoreCronjobFailed: '{0} записей о сбоях плановых задач за последние 7 дней',

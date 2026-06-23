@@ -4169,6 +4169,8 @@ const message = {
                 scoreWebsiteStopped: 'Status {0} tidak normal',
                 scoreWebsiteMonitorUnavailable: 'Pemantauan laman web mengesan tapak tidak tersedia',
                 scoreWebsiteMonitorAvailability: 'Ketersediaan pemantauan laman web {0}% di bawah ambang',
+                scoreWebsiteMonitorStatusAbnormal:
+                    'Pemantauan laman web didayakan tetapi belum dimulakan atau dalam keadaan tidak normal',
                 scoreWafDisabled: 'WAF dilumpuhkan dan laman web tidak dilindungi',
                 scoreWafHighRiskHit: 'WAF sepadan dengan {0} peraturan risiko dalam tempoh laporan',
                 scoreCronjobFailed: '{0} rekod kegagalan tugas berjadual dalam 7 hari terakhir',

@@ -4133,6 +4133,8 @@ const message = {
                 scoreWebsiteMonitorUnavailable: 'El monitoreo web detectó un sitio no disponible',
                 scoreWebsiteMonitorAvailability:
                     'La disponibilidad del monitoreo web ({0}%) está por debajo del umbral',
+                scoreWebsiteMonitorStatusAbnormal:
+                    'El monitoreo web está habilitado, pero no se inicializó o está en un estado anormal',
                 scoreWafDisabled: 'WAF deshabilitado, los sitios web no están protegidos',
                 scoreWafHighRiskHit: 'WAF detectó {0} reglas de riesgo en el periodo del informe',
                 scoreCronjobFailed: '{0} registros de fallos de tareas programadas en los últimos 7 días',

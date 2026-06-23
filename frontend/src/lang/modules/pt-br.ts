@@ -4308,6 +4308,8 @@ const message = {
                 scoreWebsiteStopped: 'Status de {0} anormal',
                 scoreWebsiteMonitorUnavailable: 'Monitoramento de sites detectou um site indisponível',
                 scoreWebsiteMonitorAvailability: 'Disponibilidade do monitoramento de sites {0}% está abaixo do limite',
+                scoreWebsiteMonitorStatusAbnormal:
+                    'O monitoramento de sites está ativado, mas não foi inicializado ou está em um estado anormal',
                 scoreWafDisabled: 'WAF desativado e sites não estão protegidos',
                 scoreWafHighRiskHit: 'WAF encontrou {0} regras de risco no período do relatório',
                 scoreCronjobFailed: '{0} registros de falha de tarefas agendadas nos últimos 7 dias',
