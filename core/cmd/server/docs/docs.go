@@ -31046,6 +31046,9 @@ const docTemplate = `{
 				},
 				"upgradeBackup": {
 					"type": "string"
+				},
+				"upgradeDeleteImage": {
+					"type": "string"
 				}
 			},
 			"type": "object"
@@ -31056,6 +31059,7 @@ const docTemplate = `{
 					"enum": [
 						"UninstallDeleteImage",
 						"UpgradeBackup",
+						"UpgradeDeleteImage",
 						"UninstallDeleteBackup",
 						"InstallAllowPort"
 					],
@@ -41502,6 +41506,9 @@ const docTemplate = `{
 				"source": {
 					"type": "string"
 				},
+				"taskID": {
+					"type": "string"
+				},
 				"type": {
 					"type": "string"
 				},
@@ -41519,11 +41526,17 @@ const docTemplate = `{
 		},
 		"request.RuntimeDelete": {
 			"properties": {
+				"deleteImage": {
+					"type": "boolean"
+				},
 				"forceDelete": {
 					"type": "boolean"
 				},
 				"id": {
 					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
 				}
 			},
 			"type": "object"

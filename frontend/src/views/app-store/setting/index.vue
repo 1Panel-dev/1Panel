@@ -42,6 +42,16 @@
                                 @change="updateConfig('UpgradeBackup', config.upgradeBackup)"
                             />
                         </el-form-item>
+                        <el-form-item :label="$t('app.upgradeDeleteImage')" prop="upgradeDeleteImage">
+                            <el-switch
+                                v-permission
+                                v-model="config.upgradeDeleteImage"
+                                active-value="Enable"
+                                inactive-value="Disable"
+                                :loading="loading"
+                                @change="updateConfig('UpgradeDeleteImage', config.upgradeDeleteImage)"
+                            />
+                        </el-form-item>
                         <el-form-item :label="$t('app.installAllowPort')" prop="installAllowPort">
                             <el-switch
                                 v-permission
@@ -85,6 +95,7 @@ const config = ref({
     uninstallDeleteImage: '',
     uninstallDeleteBackup: '',
     upgradeBackup: '',
+    upgradeDeleteImage: '',
     installAllowPort: '',
 });
 const loading = ref(false);

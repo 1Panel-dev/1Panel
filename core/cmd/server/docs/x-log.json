@@ -4986,6 +4986,15 @@
 		"formatZH": "更新[scope]频率访问限制",
 		"formatEN": "update [scope] CC config"
 	},
+	"/xpack/waf/rule/common/apply": {
+		"bodyKeys": [
+			"scope"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "应用规则 [scope] 到网站",
+		"formatEN": "apply rule [scope] to websites"
+	},
 	"/xpack/waf/rule/common/create": {
 		"bodyKeys": [
 			"scope"

@@ -65,6 +65,9 @@
                     <el-checkbox v-model="operateReq.pullImage" :label="$t('app.pullImage')" size="large" />
                     <span class="input-help">{{ $t('app.pullImageHelper') }}</span>
                 </el-form-item>
+                <el-form-item prop="deleteImage" v-if="operateReq.operate === 'upgrade'">
+                    <el-checkbox v-model="operateReq.deleteImage" :label="$t('app.upgradeDeleteImage')" />
+                </el-form-item>
             </el-form>
             <div v-if="operateReq.operate === 'upgrade'">
                 <el-text type="danger" v-if="isEdit">{{ $t('app.isEdirWarn') }}</el-text>
@@ -121,6 +124,7 @@ const operateReq = reactive({
     installId: 0,
     backup: true,
     pullImage: true,
+    deleteImage: false,
     version: '',
     dockerCompose: '',
     taskID: '',
@@ -188,16 +192,17 @@ const initData = async () => {
     useNewCompose.value = false;
     operateReq.backup = config.data.upgradeBackup == 'Enable';
     operateReq.pullImage = true;
+    operateReq.deleteImage = config.data.upgradeDeleteImage == 'Enable';
     operateReq.dockerCompose = '';
 };
 
 const acceptParams = (appInstall: App.AppInstallDto, op: string, opNode?: string) => {
-    initData();
     if (opNode) {
         node.value = opNode;
     } else {
         node.value = currentNode.value;
     }
+    initData();
     isEdit.value = appInstall.isEdit;
     currentVersion.value = appInstall.version;
     currentAppKey.value = appInstall.appKey;

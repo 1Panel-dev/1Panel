@@ -3233,6 +3233,7 @@ const message = {
         uninstallDeleteBackup: 'Desinstalar - Eliminar respaldo',
         uninstallDeleteImage: 'Desinstalar - Eliminar imagen',
         upgradeBackup: 'Respaldar app antes de actualizar',
+        upgradeDeleteImage: 'Actualizar app - Eliminar imagen antigua',
         installAllowPort: 'Abrir el acceso externo al puerto por defecto al instalar apps',
         noAppHelper:
             'No se detectó ninguna aplicación, por favor vaya al centro de tareas para ver el registro de sincronización de la tienda de aplicaciones',
@@ -4753,6 +4754,7 @@ const message = {
             redisConfig: 'Configuración Redis',
             redisHelper: 'Habilita Redis para persistir IPs bloqueadas temporalmente',
             wafHelper: 'Todos los sitios perderán protección al deshabilitar',
+            websiteWafHelper: 'Este sitio perderá la protección al deshabilitar',
             attackIP: 'IP atacante',
             attackParam: 'Detalles del ataque',
             execRule: 'Regla aplicada',
@@ -4778,6 +4780,7 @@ const message = {
                 'La primera vez es necesario inicializar. El archivo de configuración será modificado y la configuración previa se perderá. Haz copia de seguridad',
             initHelper: 'La inicialización borrará la configuración existente del WAF. ¿Seguro que quieres continuar?',
             mainSwitch: 'Interruptor principal',
+            websiteSwitch: 'Interruptor',
             websiteAlert: 'Crea un sitio primero',
             defaultUrlBlack: 'Reglas de URL',
             htmlRes: 'Página de intercepción',

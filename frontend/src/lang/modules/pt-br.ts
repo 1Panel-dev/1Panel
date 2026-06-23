@@ -3369,6 +3369,7 @@ const message = {
         uninstallDeleteBackup: 'Desinstalar Aplicativo - Excluir Backup',
         uninstallDeleteImage: 'Desinstalar Aplicativo - Excluir Imagem',
         upgradeBackup: 'Fazer Backup do Aplicativo Antes de Atualizar',
+        upgradeDeleteImage: 'Atualizar Aplicativo - Excluir Imagem Antiga',
         installAllowPort: 'Abrir acesso externo à porta por padrão ao instalar aplicativos',
         noAppHelper:
             'Nenhuma aplicação detectada, por favor vá ao centro de tarefas para visualizar o log de sincronização da loja de aplicativos',
@@ -4925,6 +4926,7 @@ const message = {
             redisConfig: 'Configuração do Redis',
             redisHelper: 'Ativar o Redis para persistir IPs temporariamente bloqueados',
             wafHelper: 'Todos os sites perderão proteção após o fechamento',
+            websiteWafHelper: 'Este site perderá a proteção após o fechamento',
             attackIP: 'IP atacante',
             attackParam: 'Detalhes do ataque',
             execRule: 'Regra atingida',
@@ -4952,6 +4954,7 @@ const message = {
             initHelper:
                 'A operação de inicialização apagará a configuração WAF existente. Tem certeza de que deseja inicializar?',
             mainSwitch: 'Interruptor principal',
+            websiteSwitch: 'Interruptor',
             websiteAlert: 'Por favor, crie um site primeiro',
             defaultUrlBlack: 'Regras de URL',
             htmlRes: 'Página de interceptação',

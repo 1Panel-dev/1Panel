@@ -345,6 +345,7 @@ export namespace App {
         uninstallDeleteImage: string;
         uninstallDeleteBackup: string;
         upgradeBackup: string;
+        upgradeDeleteImage: string;
         installAllowPort: string;
     }
 

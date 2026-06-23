@@ -365,32 +365,12 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 				return err
 			}
 			if deleteReq.DeleteImage {
-				delImageStr := i18n.GetMsgByKey("TaskDelete") + i18n.GetMsgByKey("Image")
 				content, err := op.GetContent(install.GetEnvPath())
 				if err != nil {
 					return err
 				}
-				images, err := docker.GetImagesFromDockerCompose(content, []byte(install.DockerCompose))
-				if err != nil {
+				if err = deleteAppImagesByCompose(t, content, []byte(install.DockerCompose), nil); err != nil {
 					return err
-				}
-				client, err := docker.NewClient()
-				if err != nil {
-					return err
-				}
-				defer client.Close()
-				for _, image := range images {
-					imageID, err := client.GetImageIDByName(image)
-					if err == nil {
-						imgStr := delImageStr + image
-						t.Log(imgStr)
-
-						if err = client.DeleteImage(imageID); err != nil {
-							t.LogFailedWithErr(imgStr, err)
-							continue
-						}
-						t.LogSuccess(delImageStr + image)
-					}
 				}
 			}
 		}
@@ -473,6 +453,69 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 			_ = appInstallRepo.Save(context.Background(), &install)
 		}
 	}()
+	return nil
+}
+
+type appImageID struct {
+	name string
+	id   string
+}
+
+func getAppImageIDsByCompose(client docker.Client, envContent, composeContent []byte) ([]appImageID, error) {
+	images, err := docker.GetImagesFromDockerCompose(envContent, composeContent)
+	if err != nil {
+		return nil, err
+	}
+	imageIDs := make([]appImageID, 0, len(images))
+	for _, image := range images {
+		imageID, err := client.GetImageIDByName(image)
+		if err == nil && imageID != "" {
+			imageIDs = append(imageIDs, appImageID{name: image, id: imageID})
+		}
+	}
+	return imageIDs, nil
+}
+
+func deleteAppImagesByCompose(t *task.Task, envContent, composeContent []byte, excludeImages []string) error {
+	client, err := docker.NewClient()
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	imageIDs, err := getAppImageIDsByCompose(client, envContent, composeContent)
+	if err != nil {
+		return err
+	}
+	return deleteAppImagesByIDs(t, client, imageIDs, excludeImages)
+}
+
+func deleteAppImagesByIDs(t *task.Task, client docker.Client, imageIDs []appImageID, excludeImages []string) error {
+	delImageStr := i18n.GetMsgByKey("TaskDelete") + i18n.GetMsgByKey("Image")
+	excludeImageIDs := make(map[string]struct{}, len(excludeImages))
+	for _, image := range excludeImages {
+		imageID, err := client.GetImageIDByName(image)
+		if err == nil && imageID != "" {
+			excludeImageIDs[imageID] = struct{}{}
+		}
+	}
+	deletedImageIDs := make(map[string]struct{}, len(imageIDs))
+	for _, image := range imageIDs {
+		if _, ok := excludeImageIDs[image.id]; ok {
+			continue
+		}
+		if _, ok := deletedImageIDs[image.id]; ok {
+			continue
+		}
+		deletedImageIDs[image.id] = struct{}{}
+		imgStr := delImageStr + image.name
+		t.Log(imgStr)
+		if err := client.DeleteImage(image.id); err != nil {
+			t.LogFailedWithErr(imgStr, err)
+			continue
+		}
+		t.LogSuccess(imgStr)
+	}
 	return nil
 }
 
@@ -759,6 +802,8 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		if err != nil {
 			return err
 		}
+		oldEnvContent := append([]byte(nil), content...)
+		oldDockerCompose := install.DockerCompose
 		if install.App.Key == vllmAppKeyForUpgrade {
 			envs := make(map[string]interface{})
 			if err = json.Unmarshal([]byte(install.Env), &envs); err != nil {
@@ -828,6 +873,19 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		install.Version = detail.Version
 		install.AppDetailId = req.DetailID
 
+		var oldImageIDs []appImageID
+		if req.DeleteImage {
+			dockerCLi, err := docker.NewClient()
+			if err != nil {
+				return err
+			}
+			oldImageIDs, err = getAppImageIDsByCompose(dockerCLi, oldEnvContent, []byte(oldDockerCompose))
+			dockerCLi.Close()
+			if err != nil {
+				return err
+			}
+		}
+
 		if req.PullImage {
 			images, err := docker.GetImagesFromDockerCompose(content, []byte(install.DockerCompose))
 			if err != nil {
@@ -840,8 +898,12 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			defer dockerCLi.Close()
 			for _, image := range images {
 				t.Log(i18n.GetWithName("PullImageStart", image))
-				if err = dockerCLi.PullImageWithProcess(t, image); err != nil {
-					return buserr.WithNameAndErr("ErrDockerPullImage", "", err)
+				if pullErr := dockerCLi.PullImageWithProcess(t, image); pullErr != nil {
+					if exist, _ := dockerCLi.ImageExists(image); exist {
+						t.Log(i18n.GetMsgByKey("UseExistImage"))
+						continue
+					}
+					return buserr.WithNameAndErr("ErrDockerPullImage", "", pullErr)
 				}
 				exist, err := dockerCLi.ImageExists(image)
 				if err != nil || !exist {
@@ -901,7 +963,31 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 		t.LogSuccess(logStr)
 		install.Status = constant.StatusRunning
-		return appInstallRepo.Save(context.Background(), &install)
+		if err = appInstallRepo.Save(context.Background(), &install); err != nil {
+			return err
+		}
+		if req.DeleteImage {
+			newEnvContent, err := fileOp.GetContent(install.GetEnvPath())
+			if err != nil {
+				t.LogFailedWithErr(i18n.GetMsgByKey("TaskDelete")+i18n.GetMsgByKey("Image"), err)
+				return nil
+			}
+			excludeImages, err := docker.GetImagesFromDockerCompose(newEnvContent, []byte(install.DockerCompose))
+			if err != nil {
+				t.LogFailedWithErr(i18n.GetMsgByKey("TaskDelete")+i18n.GetMsgByKey("Image"), err)
+				return nil
+			}
+			dockerCLi, err := docker.NewClient()
+			if err != nil {
+				t.LogFailedWithErr(i18n.GetMsgByKey("TaskDelete")+i18n.GetMsgByKey("Image"), err)
+				return nil
+			}
+			defer dockerCLi.Close()
+			if err = deleteAppImagesByIDs(t, dockerCLi, oldImageIDs, excludeImages); err != nil {
+				t.LogFailedWithErr(i18n.GetMsgByKey("TaskDelete")+i18n.GetMsgByKey("Image"), err)
+			}
+		}
+		return nil
 	}
 
 	rollBackApp := func(t *task.Task) {

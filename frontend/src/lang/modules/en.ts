@@ -3172,6 +3172,7 @@ const message = {
         uninstallDeleteBackup: 'Uninstall App - Delete Backup',
         uninstallDeleteImage: 'Uninstall App - Delete Image',
         upgradeBackup: 'Backup App Before Upgrade',
+        upgradeDeleteImage: 'Upgrade App - Delete Old Image',
         installAllowPort: 'Open external port access by default when installing apps',
         noAppHelper: 'No application detected, go to the task center to view the app store sync log',
         isEdirWarn: 'Changes to docker-compose.yml were detected. Please review the diff.',
@@ -4696,6 +4697,7 @@ const message = {
             redisConfig: 'Redis Configuration',
             redisHelper: 'Enable Redis to persist temporarily blocked IPs',
             wafHelper: 'All websites will lose protection after closing',
+            websiteWafHelper: 'This website will lose protection after closing',
             attackIP: 'Attacking IP',
             attackParam: 'Attack Details',
             execRule: 'Hit Rule',
@@ -4723,6 +4725,7 @@ const message = {
             initHelper:
                 'The initialization operation will clear the existing WAF configuration. Are you sure you want to initialize? ',
             mainSwitch: 'Main Switch',
+            websiteSwitch: 'Switch',
             websiteAlert: 'Please create a website first',
             defaultUrlBlack: 'URL Rules',
             htmlRes: 'Intercept Page',

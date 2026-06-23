@@ -193,6 +193,9 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "UpgradeBackup", Value: "Enable"}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "UpgradeDeleteImage", Value: constant.StatusDisable}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.Setting{Key: "UninstallDeleteBackup", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
@@ -872,6 +875,23 @@ var AddAppStoreInstallAllowPortSetting = &gormigrate.Migration{
 		}
 		if setting.Value == "" {
 			return tx.Model(&model.Setting{}).Where("key = ?", "InstallAllowPort").Update("value", constant.StatusDisable).Error
+		}
+		return nil
+	},
+}
+
+var AddAppStoreUpgradeDeleteImageSetting = &gormigrate.Migration{
+	ID: "20260622-add-app-store-upgrade-delete-image-setting",
+	Migrate: func(tx *gorm.DB) error {
+		var setting model.Setting
+		if err := tx.Where("key = ?", "UpgradeDeleteImage").First(&setting).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return tx.Create(&model.Setting{Key: "UpgradeDeleteImage", Value: constant.StatusDisable}).Error
+			}
+			return err
+		}
+		if setting.Value == "" {
+			return tx.Model(&model.Setting{}).Where("key = ?", "UpgradeDeleteImage").Update("value", constant.StatusDisable).Error
 		}
 		return nil
 	},

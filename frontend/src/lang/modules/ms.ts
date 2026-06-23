@@ -3239,6 +3239,7 @@ const message = {
         uninstallDeleteBackup: 'Cop Terhapus Semasa Nyahpasang Aplikasi',
         uninstallDeleteImage: 'Imej Terhapus Semasa Nyahpasang Aplikasi',
         upgradeBackup: 'Sandaran Aplikasi Sebelum Naik Taraf',
+        upgradeDeleteImage: 'Naik Taraf Aplikasi - Padam Imej Lama',
         installAllowPort: 'Buka akses port luaran secara lalai semasa memasang aplikasi',
         noAppHelper: 'Tiada aplikasi dikesan, sila pergi ke pusat tugas untuk melihat log penyegerakan kedai aplikasi',
         isEdirWarn: 'Perubahan pada fail docker-compose.yml telah dikesan. Sila semak perbezaannya.',
@@ -4784,6 +4785,7 @@ const message = {
             redisConfig: 'Konfigurasi Redis',
             redisHelper: 'Aktifkan Redis untuk menyimpan IP yang disekat sementara',
             wafHelper: 'Semua laman web akan kehilangan perlindungan selepas menutup',
+            websiteWafHelper: 'Laman web ini akan kehilangan perlindungan selepas menutup',
             attackIP: 'IP Serangan',
             attackParam: 'Butiran Serangan',
             execRule: 'Peraturan Dilanggar',
@@ -4811,6 +4813,7 @@ const message = {
             initHelper:
                 'Operasi penyediaan akan membersihkan konfigurasi WAF yang sedia ada. Adakah anda pasti mahu menyediakan semula?',
             mainSwitch: 'Suis Utama',
+            websiteSwitch: 'Suis',
             websiteAlert: 'Sila cipta laman web terlebih dahulu',
             defaultUrlBlack: 'Peraturan URL',
             htmlRes: 'Halaman Sekat',

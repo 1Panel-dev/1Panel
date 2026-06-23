@@ -31042,6 +31042,9 @@
 				},
 				"upgradeBackup": {
 					"type": "string"
+				},
+				"upgradeDeleteImage": {
+					"type": "string"
 				}
 			},
 			"type": "object"
@@ -31052,6 +31055,7 @@
 					"enum": [
 						"UninstallDeleteImage",
 						"UpgradeBackup",
+						"UpgradeDeleteImage",
 						"UninstallDeleteBackup",
 						"InstallAllowPort"
 					],
@@ -41498,6 +41502,9 @@
 				"source": {
 					"type": "string"
 				},
+				"taskID": {
+					"type": "string"
+				},
 				"type": {
 					"type": "string"
 				},
@@ -41515,11 +41522,17 @@
 		},
 		"request.RuntimeDelete": {
 			"properties": {
+				"deleteImage": {
+					"type": "boolean"
+				},
 				"forceDelete": {
 					"type": "boolean"
 				},
 				"id": {
 					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
 				}
 			},
 			"type": "object"
