@@ -16,6 +16,7 @@ const LOCALE_LOADERS: Record<string, LocaleLoader> = {
     ms: () => import('./modules/ms'),
     ko: () => import('./modules/ko'),
     tr: () => import('./modules/tr'),
+    fa: () => import('./modules/fa'),
     'es-ES': () => import('./modules/es-es'),
 };
 
