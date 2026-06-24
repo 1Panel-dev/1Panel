@@ -41,6 +41,7 @@ export async function loadMonacoLanguageSupport() {
             import('monaco-editor/esm/vs/editor/contrib/folding/browser/folding.js'),
             import('monaco-editor/esm/vs/editor/contrib/contextmenu/browser/contextmenu.js'),
             import('monaco-editor/esm/vs/editor/contrib/clipboard/browser/clipboard.js'),
+            import('monaco-editor/esm/vs/editor/contrib/comment/browser/comment.js'),
             import('monaco-editor/esm/vs/editor/contrib/dropOrPasteInto/browser/copyPasteContribution.js'),
             import('monaco-editor/esm/vs/editor/contrib/find/browser/findController.js'),
             import('monaco-editor/esm/vs/editor/contrib/multicursor/browser/multicursor.js'),
