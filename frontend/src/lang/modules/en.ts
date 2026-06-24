@@ -2049,6 +2049,7 @@ const message = {
             nodes: 'Node',
             commands: 'Quick Commands',
             opsReport: 'Ops Report',
+            ops_report: 'Ops Report',
             users: 'User Management',
             roles: 'Role',
             auth: 'Login Authentication',

@@ -1932,6 +1932,7 @@ const message = {
             nodes: '節點',
             commands: '快速指令',
             opsReport: '運維報表',
+            ops_report: '運維報表',
             users: '使用者管理',
             roles: '角色',
             auth: '登入認證',
