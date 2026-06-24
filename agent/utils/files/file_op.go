@@ -1376,8 +1376,8 @@ func (f FileOp) TarGzFilesWithCompressPro(list []string, dst, secret string) err
 }
 
 func (f FileOp) TarGzExtractPro(src, dst string, secret string) error {
-	if _, err := os.Stat(path.Dir(dst)); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(path.Dir(dst), os.ModePerm); err != nil {
+	if _, err := os.Stat(dst); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(dst, os.ModePerm); err != nil {
 			return err
 		}
 	}
