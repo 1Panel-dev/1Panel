@@ -843,6 +843,8 @@ const message = {
             channelAutoRestartHelper: '저장하면 설정 적용을 위해 컨테이너가 자동으로 재시작됩니다.',
             channelDeleteConfirm: '{0} 채널 구성을 삭제하시겠습니까?',
             customProviderHelper: '사용자 정의 모델 공급자는 계정 사용 가능 여부를 검증하지 않습니다',
+            apiTypeBaseURLHelper: '이 유형은 최종적으로 {0}에 요청합니다. 권장 Base URL: {1}',
+            apiTypeBaseURLMismatch: '현재 Base URL은 {0} 경로처럼 보이지만 {1}이 선택되었습니다. 권장 URL: {2}',
         },
         model: {
             model: '모델',
@@ -1015,6 +1017,8 @@ const message = {
             healthUnknown: '알 수 없음',
             validationModelMapEmpty: '모델 매핑의 모델 이름은 비워 둘 수 없습니다',
             validationModelMapDuplicate: '요청 모델 {0}이(가) 중복되었습니다',
+            validateAvailability: '계정 사용 가능 여부 검증',
+            validateAvailabilityHelper: '저장 전에 최소 메시지를 보내 API 사용 가능 여부를 검증합니다',
             modelGroup: '모델 그룹',
             availableModels: '사용 가능한 모델',
             modelGroupModels: '요청 모델',

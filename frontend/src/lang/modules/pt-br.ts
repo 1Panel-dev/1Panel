@@ -861,6 +861,9 @@ const message = {
                 'Ao salvar, o contêiner será reiniciado automaticamente para que a configuração entre em vigor.',
             channelDeleteConfirm: 'Excluir a configuração do canal {0}?',
             customProviderHelper: 'Provedores de modelo personalizados não validam se a conta está disponível',
+            apiTypeBaseURLHelper: 'Este tipo envia requisições para {0}. Base URL recomendada: {1}',
+            apiTypeBaseURLMismatch:
+                'A Base URL atual parece um caminho {0}, mas {1} está selecionado. URL recomendada: {2}',
         },
         model: {
             model: 'Modelo',
@@ -1034,6 +1037,9 @@ const message = {
             healthUnknown: 'Desconhecido',
             validationModelMapEmpty: 'Os nomes no mapeamento de modelos não podem ficar vazios',
             validationModelMapDuplicate: 'O modelo solicitado {0} está duplicado',
+            validateAvailability: 'Validar disponibilidade da conta',
+            validateAvailabilityHelper:
+                'Envie uma mensagem mínima antes de salvar para validar a disponibilidade da API',
             modelGroup: 'Grupo de modelos',
             availableModels: 'Modelos disponíveis',
             modelGroupModels: 'Modelos solicitados',

@@ -802,6 +802,8 @@ const message = {
             channelAutoRestartHelper: '保存后将自动重启容器以使配置生效。',
             channelDeleteConfirm: '确认删除 {0} 频道配置？',
             customProviderHelper: '自定义模型供应商不验证账号是否可用',
+            apiTypeBaseURLHelper: '当前类型最终请求 {0}，Base URL 建议填写 {1}',
+            apiTypeBaseURLMismatch: '当前 Base URL 看起来是 {0} 路径，和已选择的 {1} 不一致，建议改为 {2}',
         },
         model: {
             model: '模型',
@@ -968,6 +970,8 @@ const message = {
             healthUnknown: '未知',
             validationModelMapEmpty: '模型映射的模型名不能为空',
             validationModelMapDuplicate: '请求模型 {0} 重复',
+            validateAvailability: '验证账号可用性',
+            validateAvailabilityHelper: '保存前发送最小消息验证接口可用性',
             modelGroup: '模型组',
             availableModels: '可用模型',
             modelGroupModels: '请求模型',

@@ -858,6 +858,8 @@ const message = {
             channelAutoRestartHelper: '保存後、設定を反映するためにコンテナが自動で再起動されます。',
             channelDeleteConfirm: '{0} チャンネルの設定を削除しますか？',
             customProviderHelper: 'カスタムモデルプロバイダーでは、アカウントの有効性を検証しません',
+            apiTypeBaseURLHelper: 'このタイプは最終的に {0} にリクエストします。推奨 Base URL: {1}',
+            apiTypeBaseURLMismatch: '現在の Base URL は {0} のパスに見えますが、{1} が選択されています。推奨 URL: {2}',
         },
         model: {
             model: 'モデル',
@@ -1030,6 +1032,8 @@ const message = {
             healthUnknown: '不明',
             validationModelMapEmpty: 'モデルマッピングのモデル名は空にできません',
             validationModelMapDuplicate: 'リクエストモデル {0} が重複しています',
+            validateAvailability: 'アカウントの可用性を検証',
+            validateAvailabilityHelper: '保存前に最小メッセージを送信して API の可用性を検証します',
             modelGroup: 'モデルグループ',
             availableModels: '利用可能なモデル',
             modelGroupModels: 'リクエストモデル',

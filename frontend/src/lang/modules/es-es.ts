@@ -866,6 +866,9 @@ const message = {
                 'Al guardar, el contenedor se reiniciará automáticamente para que la configuración surta efecto.',
             channelDeleteConfirm: '¿Eliminar la configuración del canal {0}?',
             customProviderHelper: 'En el proveedor de modelo personalizado no se valida si la cuenta está disponible',
+            apiTypeBaseURLHelper: 'Este tipo envía solicitudes a {0}. Base URL recomendada: {1}',
+            apiTypeBaseURLMismatch:
+                'La Base URL actual parece una ruta {0}, pero está seleccionado {1}. URL recomendada: {2}',
         },
         model: {
             model: 'Modelo',
@@ -1040,6 +1043,9 @@ const message = {
             healthUnknown: 'Desconocido',
             validationModelMapEmpty: 'Los nombres del mapeo de modelos no pueden estar vacíos',
             validationModelMapDuplicate: 'El modelo solicitado {0} está duplicado',
+            validateAvailability: 'Validar disponibilidad de la cuenta',
+            validateAvailabilityHelper:
+                'Enviar un mensaje mínimo antes de guardar para validar la disponibilidad de la API',
             modelGroup: 'Grupo de modelos',
             availableModels: 'Modelos disponibles',
             modelGroupModels: 'Modelos solicitados',

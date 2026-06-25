@@ -809,6 +809,8 @@ const message = {
             channelAutoRestartHelper: '保存後將自動重新啟動容器以使設定生效。',
             channelDeleteConfirm: '確認刪除 {0} 頻道設定？',
             customProviderHelper: '自訂模型供應商不驗證帳號是否可用',
+            apiTypeBaseURLHelper: '目前類型最終請求 {0}，Base URL 建議填寫 {1}',
+            apiTypeBaseURLMismatch: '目前 Base URL 看起來是 {0} 路徑，和已選擇的 {1} 不一致，建議改為 {2}',
         },
         model: {
             model: '模型',
@@ -977,6 +979,8 @@ const message = {
             healthUnknown: '未知',
             validationModelMapEmpty: '模型映射的模型名稱不能為空',
             validationModelMapDuplicate: '請求模型 {0} 重複',
+            validateAvailability: '驗證帳號可用性',
+            validateAvailabilityHelper: '儲存前發送最小訊息驗證介面可用性',
             modelGroup: '模型組',
             availableModels: '可用模型',
             modelGroupModels: '請求模型',

@@ -12,12 +12,16 @@ const (
 	vllmImageEnvKey      = "IMAGE"
 	vllmImageTypeNvidia  = "nvidia"
 	vllmImageTypeIntel   = "intel"
+	vllmImageTypeAscend  = "ascend"
 )
 
 func resolveVllmVersionFamily(version, image string) string {
 	normalizedVersion := strings.ToLower(strings.TrimSpace(version))
 	if strings.HasPrefix(normalizedVersion, vllmImageTypeIntel+"-") {
 		return vllmImageTypeIntel
+	}
+	if strings.HasPrefix(normalizedVersion, vllmImageTypeAscend+"-") {
+		return vllmImageTypeAscend
 	}
 	if strings.HasPrefix(normalizedVersion, vllmImageTypeNvidia+"-") {
 		return vllmImageTypeNvidia
@@ -26,13 +30,16 @@ func resolveVllmVersionFamily(version, image string) string {
 	if strings.Contains(normalizedImage, "intel/") || strings.Contains(normalizedImage, "llm-scaler-vllm") {
 		return vllmImageTypeIntel
 	}
+	if strings.Contains(normalizedImage, "ascend/") || strings.Contains(normalizedImage, "vllm-ascend") {
+		return vllmImageTypeAscend
+	}
 	return vllmImageTypeNvidia
 }
 
 func trimVllmVersionFamily(version string) string {
 	trimmed := strings.TrimSpace(version)
 	normalized := strings.ToLower(trimmed)
-	for _, family := range []string{vllmImageTypeNvidia, vllmImageTypeIntel} {
+	for _, family := range []string{vllmImageTypeNvidia, vllmImageTypeIntel, vllmImageTypeAscend} {
 		prefix := family + "-"
 		if strings.HasPrefix(normalized, prefix) {
 			return strings.TrimSpace(trimmed[len(prefix):])
@@ -43,11 +50,15 @@ func trimVllmVersionFamily(version string) string {
 
 func buildDefaultVllmImageByVersion(version string) string {
 	tag := trimVllmVersionFamily(version)
-	if resolveVllmVersionFamily(version, "") == vllmImageTypeIntel {
+	family := resolveVllmVersionFamily(version, "")
+	if family == vllmImageTypeIntel {
 		return "intel/llm-scaler-vllm:" + tag
 	}
 	if tag != "" && !strings.HasPrefix(strings.ToLower(tag), "v") {
 		tag = "v" + tag
+	}
+	if family == vllmImageTypeAscend {
+		return "quay.io/ascend/vllm-ascend:" + tag
 	}
 	return "vllm/vllm-openai:" + tag
 }
@@ -60,7 +71,9 @@ func isVllmUpgradeVersionAllowed(currentVersion, targetVersion, currentImage str
 
 func hasVllmVersionFamilyPrefix(version string) bool {
 	normalized := strings.ToLower(strings.TrimSpace(version))
-	return strings.HasPrefix(normalized, vllmImageTypeNvidia+"-") || strings.HasPrefix(normalized, vllmImageTypeIntel+"-")
+	return strings.HasPrefix(normalized, vllmImageTypeNvidia+"-") ||
+		strings.HasPrefix(normalized, vllmImageTypeIntel+"-") ||
+		strings.HasPrefix(normalized, vllmImageTypeAscend+"-")
 }
 
 func isVllmUpgradeCandidate(currentVersion, targetVersion, currentImage string) bool {
