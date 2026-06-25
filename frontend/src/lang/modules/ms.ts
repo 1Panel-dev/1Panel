@@ -865,6 +865,9 @@ const message = {
                 'Menyimpan akan memulakan semula bekas secara automatik supaya konfigurasi berkuat kuasa.',
             channelDeleteConfirm: 'Padam konfigurasi saluran {0}?',
             customProviderHelper: 'Penyedia model tersuai tidak mengesahkan sama ada akaun boleh digunakan',
+            apiTypeBaseURLHelper: 'Jenis ini menghantar permintaan ke {0}. Base URL yang disyorkan: {1}',
+            apiTypeBaseURLMismatch:
+                'Base URL semasa kelihatan seperti laluan {0}, tetapi {1} dipilih. URL yang disyorkan: {2}',
         },
         model: {
             model: 'Model',
@@ -1038,6 +1041,8 @@ const message = {
             healthUnknown: 'Tidak diketahui',
             validationModelMapEmpty: 'Nama model dalam pemetaan model tidak boleh kosong',
             validationModelMapDuplicate: 'Model permintaan {0} berulang',
+            validateAvailability: 'Sahkan Ketersediaan Akaun',
+            validateAvailabilityHelper: 'Hantar mesej minimum sebelum menyimpan untuk mengesahkan ketersediaan API',
             modelGroup: 'Kumpulan Model',
             availableModels: 'Model Tersedia',
             modelGroupModels: 'Model Permintaan',

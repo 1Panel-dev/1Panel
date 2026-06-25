@@ -856,6 +856,8 @@ const message = {
                 'После сохранения контейнер будет автоматически перезапущен, чтобы настройки вступили в силу.',
             channelDeleteConfirm: 'Удалить конфигурацию канала {0}?',
             customProviderHelper: 'Для пользовательского провайдера модели доступность учетной записи не проверяется',
+            apiTypeBaseURLHelper: 'Этот тип отправляет запросы в {0}. Рекомендуемый Base URL: {1}',
+            apiTypeBaseURLMismatch: 'Текущий Base URL похож на путь {0}, но выбран {1}. Рекомендуемый URL: {2}',
         },
         model: {
             model: 'Модель',
@@ -1029,6 +1031,9 @@ const message = {
             healthUnknown: 'Неизвестно',
             validationModelMapEmpty: 'Имена моделей в сопоставлении не могут быть пустыми',
             validationModelMapDuplicate: 'Запрошенная модель {0} дублируется',
+            validateAvailability: 'Проверить доступность аккаунта',
+            validateAvailabilityHelper:
+                'Отправить минимальное сообщение перед сохранением для проверки доступности API',
             modelGroup: 'Группа моделей',
             availableModels: 'Доступные модели',
             modelGroupModels: 'Запрошенные модели',

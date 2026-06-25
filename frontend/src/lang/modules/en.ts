@@ -855,6 +855,9 @@ const message = {
             channelAutoRestartHelper: 'Saving will automatically restart the container so the changes take effect.',
             channelDeleteConfirm: 'Delete the {0} channel configuration?',
             customProviderHelper: 'Custom model providers do not validate whether the account is available.',
+            apiTypeBaseURLHelper: 'This type sends requests to {0}. Recommended Base URL: {1}',
+            apiTypeBaseURLMismatch:
+                'The current Base URL looks like a {0} path, but {1} is selected. Recommended URL: {2}',
         },
         model: {
             model: 'Models',
@@ -1025,6 +1028,8 @@ const message = {
             healthUnknown: 'Unknown',
             validationModelMapEmpty: 'Model mapping names cannot be empty',
             validationModelMapDuplicate: 'Request model {0} is duplicated',
+            validateAvailability: 'Validate Account Availability',
+            validateAvailabilityHelper: 'Send a minimal message before saving to validate API availability',
             modelGroup: 'Model Group',
             availableModels: 'Available Models',
             modelGroupModels: 'Request Models',

@@ -864,6 +864,9 @@ const message = {
                 'Kaydettiğinizde ayarların etkili olması için konteyner otomatik olarak yeniden başlatılır.',
             channelDeleteConfirm: '{0} kanal yapılandırması silinsin mi?',
             customProviderHelper: 'Özel model sağlayıcısında hesabın kullanılabilirliği doğrulanmaz',
+            apiTypeBaseURLHelper: 'Bu tür istekleri {0} yoluna gönderir. Önerilen Base URL: {1}',
+            apiTypeBaseURLMismatch:
+                'Geçerli Base URL bir {0} yolu gibi görünüyor, ancak {1} seçildi. Önerilen URL: {2}',
         },
         model: {
             model: 'Model',
@@ -1037,6 +1040,9 @@ const message = {
             healthUnknown: 'Bilinmiyor',
             validationModelMapEmpty: 'Model eşlemesindeki model adları boş olamaz',
             validationModelMapDuplicate: 'İstek modeli {0} yineleniyor',
+            validateAvailability: 'Hesap Kullanılabilirliğini Doğrula',
+            validateAvailabilityHelper:
+                'Kaydetmeden önce API kullanılabilirliğini doğrulamak için en küçük iletiyi gönder',
             modelGroup: 'Model Grubu',
             availableModels: 'Kullanılabilir Modeller',
             modelGroupModels: 'İstek Modelleri',

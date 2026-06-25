@@ -811,9 +811,7 @@ func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig 
 	result.RequireMention = result.GroupPolicy == "allowlist"
 	result.GroupAllowFrom = extractStringList(telegram["groupAllowFrom"])
 	result.Proxy = extractStringValue(telegram["proxy"])
-	if streaming := extractStringValue(telegram["streaming"]); streaming != "" {
-		result.Streaming = streaming
-	}
+	result.Streaming = normalizeTelegramStreamingMode(telegram["streaming"], result.Streaming)
 	accounts := childMap(telegram, "accounts")
 	if len(accounts) == 0 {
 		botToken := extractStringValue(telegram["botToken"])
@@ -839,7 +837,7 @@ func extractTelegramConfig(conf map[string]interface{}) dto.AgentTelegramConfig 
 			BotToken:    extractStringValue(account["botToken"]),
 			DmPolicy:    extractStringValue(account["dmPolicy"]),
 			GroupPolicy: extractStringValue(account["groupPolicy"]),
-			Streaming:   extractStringValue(account["streaming"]),
+			Streaming:   normalizeTelegramStreamingMode(account["streaming"], result.Streaming),
 		})
 	}
 	result.DefaultAccount = normalizeDefaultAccount(extractStringValue(telegram["defaultAccount"]), getTelegramBotAccountIDs(bots))
@@ -879,7 +877,7 @@ func setTelegramConfig(conf map[string]interface{}, config dto.AgentTelegramConf
 	} else {
 		delete(telegram, "proxy")
 	}
-	telegram["streaming"] = config.Streaming
+	telegram["streaming"] = buildTelegramStreamingConfig(config.Streaming)
 	accounts := make(map[string]interface{}, len(config.Bots))
 	for _, bot := range config.Bots {
 		account := map[string]interface{}{
@@ -888,7 +886,7 @@ func setTelegramConfig(conf map[string]interface{}, config dto.AgentTelegramConf
 			"botToken":    bot.BotToken,
 			"dmPolicy":    bot.DmPolicy,
 			"groupPolicy": bot.GroupPolicy,
-			"streaming":   bot.Streaming,
+			"streaming":   buildTelegramStreamingConfig(bot.Streaming),
 		}
 		if bot.DmPolicy == "open" {
 			account["allowFrom"] = []string{"*"}
@@ -897,6 +895,29 @@ func setTelegramConfig(conf map[string]interface{}, config dto.AgentTelegramConf
 	}
 	telegram["accounts"] = accounts
 	delete(telegram, "botToken")
+}
+
+func normalizeTelegramStreamingMode(value interface{}, defaultMode string) string {
+	mode := defaultMode
+	switch typed := value.(type) {
+	case string:
+		mode = typed
+	case map[string]interface{}:
+		mode = extractStringValue(typed["mode"])
+	}
+	mode = strings.ToLower(strings.TrimSpace(mode))
+	switch mode {
+	case "off", "partial", "block", "progress":
+		return mode
+	default:
+		return "partial"
+	}
+}
+
+func buildTelegramStreamingConfig(mode string) map[string]interface{} {
+	return map[string]interface{}{
+		"mode": normalizeTelegramStreamingMode(mode, "partial"),
+	}
 }
 
 func extractDiscordConfig(conf map[string]interface{}) dto.AgentDiscordConfig {
