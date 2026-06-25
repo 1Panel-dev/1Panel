@@ -1055,8 +1055,6 @@ const message = {
         },
         skillsHub: {
             title: 'Skills Hub',
-            skillList: 'Список Skills',
-            serverTab: 'Сервер',
             upload: 'Загрузить Skill',
             importSkill: 'Импортировать Skill',
             repositoryAddress: 'Адрес репозитория',
@@ -1116,24 +1114,6 @@ const message = {
             noInstallTarget: 'Нет доступных пользовательских агентов. Сначала настройте цель установки.',
             postInstallConfirm:
                 'Для этой цели настроена команда после установки. Перед выполнением убедитесь, что команда надежна.',
-            serverStatusTitle: 'Skills Hub Server',
-            serverServiceOperateConfirm: 'Подтвердить действие «{0}» для сервера Skills Hub?',
-            serverAccessSetting: 'Настройки доступа к сервису',
-            serverInfo: 'Информация о сервере',
-            tokenSetting: 'Настройки Token',
-            externalUrl: 'Внешний URL',
-            externalUrlRequired: 'Сначала введите внешний URL.',
-            skillctlDownloadUrl: 'URL для скачивания skillctl',
-            skillctlArchitecture: 'Архитектура сервера',
-            registryUrl: 'URL Registry',
-            loginCommand: 'Команда входа',
-            installCommand: 'Команда установки',
-            createToken: 'Создать Token',
-            tokenCreated: 'Token создан',
-            tokenVisibleOnce: 'Значение Token показывается только один раз. Скопируйте и сохраните его сейчас.',
-            disableTokenConfirm:
-                'Отключить этот Token? После отключения skillctl, использующий этот Token, больше не сможет устанавливать Skills.',
-            deleteTokenConfirm: 'Удалить этот Token? Это действие нельзя отменить.',
             status: {
                 pending: 'Ожидает проверки',
                 approved: 'Одобрен',

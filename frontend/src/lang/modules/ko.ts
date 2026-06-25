@@ -1041,8 +1041,6 @@ const message = {
         },
         skillsHub: {
             title: 'Skills Hub',
-            skillList: 'Skill 목록',
-            serverTab: '서버',
             upload: 'Skill 업로드',
             importSkill: 'Skill 가져오기',
             repositoryAddress: '저장소 주소',
@@ -1101,24 +1099,6 @@ const message = {
             noInstallTarget: '사용 가능한 사용자 지정 에이전트가 없습니다. 먼저 설치 대상을 구성하세요.',
             postInstallConfirm:
                 '이 대상에는 설치 후 명령이 구성되어 있습니다. 실행 전에 신뢰할 수 있는 명령인지 확인하세요.',
-            serverStatusTitle: 'Skills Hub Server',
-            serverServiceOperateConfirm: 'Skills Hub 서버를 {0}하시겠습니까?',
-            serverAccessSetting: '서비스 접근 설정',
-            serverInfo: '서버 정보',
-            tokenSetting: 'Token 설정',
-            externalUrl: '외부 접근 주소',
-            externalUrlRequired: '먼저 외부 접근 주소를 입력하세요.',
-            skillctlDownloadUrl: 'skillctl 다운로드 주소',
-            skillctlArchitecture: '서버 아키텍처',
-            registryUrl: 'Registry 주소',
-            loginCommand: '로그인 명령',
-            installCommand: '설치 명령',
-            createToken: 'Token 생성',
-            tokenCreated: 'Token 생성됨',
-            tokenVisibleOnce: 'Token 원문은 한 번만 표시됩니다. 즉시 복사하여 저장하세요.',
-            disableTokenConfirm:
-                '이 Token을 비활성화하시겠습니까? 비활성화하면 이 Token을 사용하는 skillctl은 더 이상 Skill을 설치할 수 없습니다.',
-            deleteTokenConfirm: '이 Token을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.',
             status: {
                 pending: '검토 대기',
                 approved: '승인됨',
