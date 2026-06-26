@@ -698,6 +698,9 @@ const message = {
             syncAgentsHelper: 'Обновите openclaw.json для агентов, использующих этот аккаунт модели',
             appVersion: 'Версия приложения',
             webuiPort: 'Порт WebUI',
+            tokenOrAuth: 'Token/имя пользователя и пароль',
+            dashboardUsername: 'Имя пользователя Dashboard',
+            dashboardPassword: 'Пароль Dashboard',
             allowedOrigins: 'Адреса доступа',
             allowedOriginsRequired: 'Укажите хотя бы один адрес доступа',
             allowedOriginsInvalid: 'Используйте формат http(s)://host-or-ip[:port]',
@@ -854,6 +857,8 @@ const message = {
                 'Нажмите, чтобы запустить задачу входа по QR-коду. QR-код появится в журнале задач, а после успешного сканирования контейнер будет автоматически перезапущен.',
             channelAutoRestartHelper:
                 'После сохранения контейнер будет автоматически перезапущен, чтобы настройки вступили в силу.',
+            dashboardAuthAutoRebuildHelper:
+                'После сохранения имени пользователя или пароля Dashboard контейнер будет автоматически пересобран, чтобы изменения вступили в силу.',
             channelDeleteConfirm: 'Удалить конфигурацию канала {0}?',
             customProviderHelper: 'Для пользовательского провайдера модели доступность учетной записи не проверяется',
             apiTypeBaseURLHelper: 'Этот тип отправляет запросы в {0}. Рекомендуемый Base URL: {1}',

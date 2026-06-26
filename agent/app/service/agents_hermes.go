@@ -1,8 +1,10 @@
 package service
 
 import (
+	"crypto/rand"
 	"errors"
 	"fmt"
+	"math/big"
 	"path"
 	"strings"
 	"time"
@@ -21,6 +23,15 @@ import (
 
 const hermesWorkspaceDir = "/opt/data/workspace"
 const hermesExecutablePath = "/opt/hermes/.venv/bin/hermes"
+const hermesDashboardUsernameEnvKey = "HERMES_DASHBOARD_USERNAME"
+const hermesDashboardPasswordEnvKey = "HERMES_DASHBOARD_PASSWORD"
+const defaultHermesDashboardUsername = "admin"
+const hermesDashboardPasswordLength = 8
+
+type hermesDashboardAuth struct {
+	Username string
+	Password string
+}
 
 type hermesConfig struct {
 	Model    hermesModelConfig    `yaml:"model"`
@@ -110,6 +121,128 @@ func prepareHermesInstallFiles(appInstall *model.AppInstall, account *model.Agen
 		return err
 	}
 	return files.NewFileOp().ChownR(dataDir, "1000", "1000", true)
+}
+
+func normalizeHermesDashboardAuth(username, password string) hermesDashboardAuth {
+	auth := hermesDashboardAuth{
+		Username: strings.TrimSpace(username),
+		Password: strings.TrimSpace(password),
+	}
+	if auth.Username == "" {
+		auth.Username = defaultHermesDashboardUsername
+	}
+	if auth.Password == "" {
+		auth.Password = generateHermesDashboardPassword()
+	}
+	return auth
+}
+
+func generateHermesDashboardPassword() string {
+	const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	const lower = "abcdefghijklmnopqrstuvwxyz"
+	const digits = "0123456789"
+	const all = upper + lower + digits
+	for i := 0; i < 100; i++ {
+		value := randomHermesDashboardString(all, hermesDashboardPasswordLength)
+		if hermesDashboardPasswordValid(value) {
+			return value
+		}
+	}
+	return randomHermesDashboardString(upper, 1) +
+		randomHermesDashboardString(lower, 1) +
+		randomHermesDashboardString(digits, 1) +
+		randomHermesDashboardString(all, hermesDashboardPasswordLength-3)
+}
+
+func randomHermesDashboardString(charset string, length int) string {
+	if length <= 0 || charset == "" {
+		return ""
+	}
+	result := make([]byte, length)
+	max := big.NewInt(int64(len(charset)))
+	for i := range result {
+		num, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			result[i] = charset[i%len(charset)]
+			continue
+		}
+		result[i] = charset[num.Int64()]
+	}
+	return string(result)
+}
+
+func hermesDashboardPasswordValid(value string) bool {
+	if len(value) != hermesDashboardPasswordLength {
+		return false
+	}
+	var hasUpper, hasLower, hasDigit bool
+	for _, ch := range value {
+		switch {
+		case ch >= 'A' && ch <= 'Z':
+			hasUpper = true
+		case ch >= 'a' && ch <= 'z':
+			hasLower = true
+		case ch >= '0' && ch <= '9':
+			hasDigit = true
+		default:
+			return false
+		}
+	}
+	return hasUpper && hasLower && hasDigit
+}
+
+func writeHermesDashboardAuthEnv(envPath string, auth hermesDashboardAuth, overwrite bool) error {
+	envMap, err := readHermesEnvMap(envPath)
+	if err != nil {
+		return err
+	}
+	if overwrite || strings.TrimSpace(envMap[hermesDashboardUsernameEnvKey]) == "" {
+		envMap[hermesDashboardUsernameEnvKey] = auth.Username
+	}
+	if overwrite || strings.TrimSpace(envMap[hermesDashboardPasswordEnvKey]) == "" {
+		envMap[hermesDashboardPasswordEnvKey] = auth.Password
+	}
+	return writeHermesEnvMap(envPath, envMap, []string{
+		hermesDashboardUsernameEnvKey,
+		hermesDashboardPasswordEnvKey,
+	})
+}
+
+func readHermesDashboardAuthEnv(envPath string) (hermesDashboardAuth, error) {
+	envMap, err := readHermesEnvMap(envPath)
+	if err != nil {
+		return hermesDashboardAuth{}, err
+	}
+	return hermesDashboardAuth{
+		Username: strings.TrimSpace(envMap[hermesDashboardUsernameEnvKey]),
+		Password: strings.TrimSpace(envMap[hermesDashboardPasswordEnvKey]),
+	}, nil
+}
+
+func readHermesDashboardAuthFromInstall(appInstall *model.AppInstall) hermesDashboardAuth {
+	if appInstall == nil || appInstall.ID == 0 {
+		return hermesDashboardAuth{}
+	}
+	auth, err := readHermesDashboardAuthEnv(path.Join(appInstall.GetPath(), ".env"))
+	if err == nil && (auth.Username != "" || auth.Password != "") {
+		return auth
+	}
+	envMap := readInstallEnv(appInstall.Env)
+	return hermesDashboardAuth{
+		Username: readHermesDashboardAuthEnvValue(envMap, hermesDashboardUsernameEnvKey),
+		Password: readHermesDashboardAuthEnvValue(envMap, hermesDashboardPasswordEnvKey),
+	}
+}
+
+func readHermesDashboardAuthEnvValue(envMap map[string]interface{}, key string) string {
+	if envMap == nil {
+		return ""
+	}
+	value, ok := envMap[key]
+	if !ok || value == nil {
+		return ""
+	}
+	return strings.TrimSpace(fmt.Sprint(value))
 }
 
 func readHermesConfig(configPath string) (*hermesConfig, error) {

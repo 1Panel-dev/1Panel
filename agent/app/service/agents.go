@@ -52,6 +52,8 @@ type IAgentService interface {
 	GetProviders() ([]dto.ProviderInfo, error)
 	GetSecurityConfig(req dto.AgentIDReq) (*dto.AgentSecurityConfig, error)
 	UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error
+	GetHermesDashboardAuth(req dto.AgentHermesDashboardAuthReq) (*dto.AgentHermesDashboardAuth, error)
+	UpdateHermesDashboardAuth(req dto.AgentHermesDashboardAuthUpdateReq) error
 	GetOtherConfig(req dto.AgentIDReq) (*dto.AgentOtherConfig, error)
 	UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfigFile, error)
@@ -176,6 +178,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	var allowedOrigins []string
 	var account *model.AgentAccount
 	var installHooks *appInstallHooks
+	var hermesAuth hermesDashboardAuth
 
 	if agentType == constant.AppOpenclaw || agentType == constant.AppHermesAgent {
 		if req.AccountID == 0 {
@@ -222,9 +225,13 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 			},
 		}
 	} else if agentType == constant.AppHermesAgent {
+		hermesAuth = normalizeHermesDashboardAuth(req.DashboardUsername, req.DashboardPassword)
 		installHooks = &appInstallHooks{
 			AfterCopyData: func(appInstall *model.AppInstall) error {
-				return prepareHermesInstallFiles(appInstall, account, storedModel)
+				if err := prepareHermesInstallFiles(appInstall, account, storedModel); err != nil {
+					return err
+				}
+				return writeHermesDashboardAuthEnv(path.Join(appInstall.GetPath(), ".env"), hermesAuth, false)
 			},
 		}
 	}
@@ -247,6 +254,10 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		params["BASE_URL"] = baseURL
 		params["API_KEY"] = apiKey
 		params["OPENCLAW_GATEWAY_TOKEN"] = token
+	}
+	if agentType == constant.AppHermesAgent {
+		params[hermesDashboardUsernameEnvKey] = hermesAuth.Username
+		params[hermesDashboardPasswordEnvKey] = hermesAuth.Password
 	}
 
 	if req.EditCompose && strings.TrimSpace(req.DockerCompose) == "" {
@@ -604,28 +615,30 @@ func batchOperateSkipMessage(operate constant.AppOperate, status string) string 
 
 func buildCreateReqFromBatchInstallReq(req dto.AgentBatchInstallReq) dto.AgentCreateReq {
 	return dto.AgentCreateReq{
-		Name:           req.Name,
-		Remark:         req.Remark,
-		AppVersion:     req.AppVersion,
-		WebUIPort:      req.WebUIPort,
-		BridgePort:     req.BridgePort,
-		AllowedOrigins: req.AllowedOrigins,
-		AgentType:      req.AgentType,
-		Model:          req.Model,
-		AccountID:      req.AccountID,
-		Token:          req.Token,
-		TaskID:         req.TaskID,
-		Advanced:       req.Advanced,
-		ContainerName:  req.ContainerName,
-		AllowPort:      req.AllowPort,
-		SpecifyIP:      req.SpecifyIP,
-		RestartPolicy:  req.RestartPolicy,
-		CpuQuota:       req.CpuQuota,
-		MemoryLimit:    req.MemoryLimit,
-		MemoryUnit:     req.MemoryUnit,
-		PullImage:      req.PullImage,
-		EditCompose:    req.EditCompose,
-		DockerCompose:  req.DockerCompose,
+		Name:              req.Name,
+		Remark:            req.Remark,
+		AppVersion:        req.AppVersion,
+		WebUIPort:         req.WebUIPort,
+		BridgePort:        req.BridgePort,
+		AllowedOrigins:    req.AllowedOrigins,
+		AgentType:         req.AgentType,
+		Model:             req.Model,
+		AccountID:         req.AccountID,
+		Token:             req.Token,
+		DashboardUsername: req.DashboardUsername,
+		DashboardPassword: req.DashboardPassword,
+		TaskID:            req.TaskID,
+		Advanced:          req.Advanced,
+		ContainerName:     req.ContainerName,
+		AllowPort:         req.AllowPort,
+		SpecifyIP:         req.SpecifyIP,
+		RestartPolicy:     req.RestartPolicy,
+		CpuQuota:          req.CpuQuota,
+		MemoryLimit:       req.MemoryLimit,
+		MemoryUnit:        req.MemoryUnit,
+		PullImage:         req.PullImage,
+		EditCompose:       req.EditCompose,
+		DockerCompose:     req.DockerCompose,
 	}
 }
 
@@ -1317,6 +1330,33 @@ func (a AgentService) UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq)
 	return appInstallRepo.Save(context.Background(), install)
 }
 
+func (a AgentService) GetHermesDashboardAuth(req dto.AgentHermesDashboardAuthReq) (*dto.AgentHermesDashboardAuth, error) {
+	_, install, err := a.loadHermesAgentAndInstall(req.AgentID)
+	if err != nil {
+		return nil, err
+	}
+	auth := readHermesDashboardAuthFromInstall(install)
+	return &dto.AgentHermesDashboardAuth{
+		Username: auth.Username,
+		Password: auth.Password,
+	}, nil
+}
+
+func (a AgentService) UpdateHermesDashboardAuth(req dto.AgentHermesDashboardAuthUpdateReq) error {
+	_, install, err := a.loadHermesAgentAndInstall(req.AgentID)
+	if err != nil {
+		return err
+	}
+	auth := normalizeHermesDashboardAuth(req.Username, req.Password)
+	if err := writeHermesDashboardAuthEnv(path.Join(install.GetPath(), ".env"), auth, true); err != nil {
+		return err
+	}
+	return NewIAppInstalledService().Operate(request.AppInstalledOperate{
+		InstallId: install.ID,
+		Operate:   constant.Rebuild,
+	})
+}
+
 func (a AgentService) GetOtherConfig(req dto.AgentIDReq) (*dto.AgentOtherConfig, error) {
 	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
@@ -1473,6 +1513,17 @@ func (a AgentService) loadOpenclawAgentAndInstall(agentID uint) (*model.Agent, *
 		return nil, nil, err
 	}
 	if agent.AgentType != constant.AppOpenclaw {
+		return nil, nil, fmt.Errorf("%s does not support", agent.AgentType)
+	}
+	return agent, install, nil
+}
+
+func (a AgentService) loadHermesAgentAndInstall(agentID uint) (*model.Agent, *model.AppInstall, error) {
+	agent, install, err := a.loadAgentAndInstall(agentID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if agent.AgentType != constant.AppHermesAgent {
 		return nil, nil, fmt.Errorf("%s does not support", agent.AgentType)
 	}
 	return agent, install, nil

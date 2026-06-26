@@ -317,6 +317,8 @@ export namespace AI {
         model?: string;
         accountId?: number;
         token?: string;
+        dashboardUsername?: string;
+        dashboardPassword?: string;
         taskID: string;
         advanced: boolean;
         containerName: string;
@@ -345,6 +347,8 @@ export namespace AI {
         baseUrl: string;
         apiKey: string;
         token: string;
+        dashboardUsername: string;
+        dashboardPassword: string;
         status: string;
         message: string;
         appInstallId: number;
@@ -414,6 +418,21 @@ export namespace AI {
     export interface AgentHermesChatSessionDeleteReq {
         agentId: number;
         id: string;
+    }
+
+    export interface AgentHermesDashboardAuth {
+        username: string;
+        password: string;
+    }
+
+    export interface AgentHermesDashboardAuthReq {
+        agentId: number;
+    }
+
+    export interface AgentHermesDashboardAuthUpdateReq {
+        agentId: number;
+        username: string;
+        password: string;
     }
 
     export interface AgentOverviewReq {

@@ -376,6 +376,11 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 				item.BridgePort = toInt(bridge)
 			}
 		}
+		if agentType == constant.AppHermesAgent {
+			auth := readHermesDashboardAuthFromInstall(appInstall)
+			item.DashboardUsername = auth.Username
+			item.DashboardPassword = auth.Password
+		}
 	}
 	return item
 }

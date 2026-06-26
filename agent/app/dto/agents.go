@@ -3,28 +3,30 @@ package dto
 import "time"
 
 type AgentCreateReq struct {
-	Name           string   `json:"name" validate:"required"`
-	Remark         string   `json:"remark"`
-	AppVersion     string   `json:"appVersion" validate:"required"`
-	WebUIPort      int      `json:"webUIPort" validate:"required,min=1,max=65535"`
-	BridgePort     int      `json:"bridgePort"`
-	AllowedOrigins []string `json:"allowedOrigins"`
-	AgentType      string   `json:"agentType" validate:"required,oneof=openclaw copaw hermes-agent"`
-	Model          string   `json:"model"`
-	AccountID      uint     `json:"accountId"`
-	Token          string   `json:"token"`
-	TaskID         string   `json:"taskID"`
-	Advanced       bool     `json:"advanced"`
-	ContainerName  string   `json:"containerName"`
-	AllowPort      bool     `json:"allowPort"`
-	SpecifyIP      string   `json:"specifyIP"`
-	RestartPolicy  string   `json:"restartPolicy"`
-	CpuQuota       float64  `json:"cpuQuota"`
-	MemoryLimit    float64  `json:"memoryLimit"`
-	MemoryUnit     string   `json:"memoryUnit"`
-	PullImage      bool     `json:"pullImage"`
-	EditCompose    bool     `json:"editCompose"`
-	DockerCompose  string   `json:"dockerCompose"`
+	Name              string   `json:"name" validate:"required"`
+	Remark            string   `json:"remark"`
+	AppVersion        string   `json:"appVersion" validate:"required"`
+	WebUIPort         int      `json:"webUIPort" validate:"required,min=1,max=65535"`
+	BridgePort        int      `json:"bridgePort"`
+	AllowedOrigins    []string `json:"allowedOrigins"`
+	AgentType         string   `json:"agentType" validate:"required,oneof=openclaw copaw hermes-agent"`
+	Model             string   `json:"model"`
+	AccountID         uint     `json:"accountId"`
+	Token             string   `json:"token"`
+	DashboardUsername string   `json:"dashboardUsername"`
+	DashboardPassword string   `json:"dashboardPassword"`
+	TaskID            string   `json:"taskID"`
+	Advanced          bool     `json:"advanced"`
+	ContainerName     string   `json:"containerName"`
+	AllowPort         bool     `json:"allowPort"`
+	SpecifyIP         string   `json:"specifyIP"`
+	RestartPolicy     string   `json:"restartPolicy"`
+	CpuQuota          float64  `json:"cpuQuota"`
+	MemoryLimit       float64  `json:"memoryLimit"`
+	MemoryUnit        string   `json:"memoryUnit"`
+	PullImage         bool     `json:"pullImage"`
+	EditCompose       bool     `json:"editCompose"`
+	DockerCompose     string   `json:"dockerCompose"`
 }
 
 type AgentBatchInstallReq struct {
@@ -38,6 +40,8 @@ type AgentBatchInstallReq struct {
 	Model              string              `json:"model"`
 	AccountID          uint                `json:"accountId"`
 	Token              string              `json:"token"`
+	DashboardUsername  string              `json:"dashboardUsername"`
+	DashboardPassword  string              `json:"dashboardPassword"`
 	TaskID             string              `json:"taskID"`
 	Advanced           bool                `json:"advanced"`
 	ContainerName      string              `json:"containerName"`
@@ -119,6 +123,8 @@ type AgentItem struct {
 	BaseURL              string    `json:"baseUrl"`
 	APIKey               string    `json:"apiKey"`
 	Token                string    `json:"token"`
+	DashboardUsername    string    `json:"dashboardUsername"`
+	DashboardPassword    string    `json:"dashboardPassword"`
 	Status               string    `json:"status"`
 	Message              string    `json:"message"`
 	AppInstallID         uint      `json:"appInstallId"`
@@ -145,6 +151,21 @@ type AgentDeleteReq struct {
 
 type AgentTokenResetReq struct {
 	ID uint `json:"id" validate:"required"`
+}
+
+type AgentHermesDashboardAuth struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type AgentHermesDashboardAuthReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentHermesDashboardAuthUpdateReq struct {
+	AgentID  uint   `json:"agentId" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 type AgentRemarkUpdateReq struct {

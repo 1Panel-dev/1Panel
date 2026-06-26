@@ -12,12 +12,30 @@
         <el-form-item :label="t('aiTools.agents.timeZone')" prop="userTimezone">
             <el-input v-model="form.userTimezone" />
         </el-form-item>
+        <template v-if="agentType === 'hermes-agent'">
+            <el-form-item :label="t('aiTools.agents.dashboardUsername')" prop="dashboardUsername">
+                <el-input v-model="form.dashboardUsername" />
+            </el-form-item>
+            <el-form-item :label="t('aiTools.agents.dashboardPassword')" prop="dashboardPassword">
+                <el-input v-model="form.dashboardPassword" type="password" show-password>
+                    <template #append>
+                        <CopyButton :content="form.dashboardPassword" />
+                    </template>
+                </el-input>
+            </el-form-item>
+        </template>
         <el-form-item>
             <el-button v-permission type="primary" :loading="saving" @click="saveConfig">
                 {{ t('commons.button.save') }}
             </el-button>
         </el-form-item>
-        <span class="input-help">{{ t('aiTools.agents.channelAutoRestartHelper') }}</span>
+        <span class="input-help">
+            {{
+                agentType === 'hermes-agent'
+                    ? t('aiTools.agents.dashboardAuthAutoRebuildHelper')
+                    : t('aiTools.agents.channelAutoRestartHelper')
+            }}
+        </span>
     </el-form>
 </template>
 
@@ -27,7 +45,12 @@ import type { FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { Rules } from '@/global/form-rules';
 import { AI } from '@/api/interface/ai';
-import { getAgentOtherConfig, updateAgentOtherConfig } from '@/api/modules/ai';
+import {
+    getAgentHermesDashboardAuth,
+    getAgentOtherConfig,
+    updateAgentHermesDashboardAuth,
+    updateAgentOtherConfig,
+} from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 
 const { t } = useI18n();
@@ -38,10 +61,12 @@ const agentType = ref<AI.AgentType>('openclaw');
 const formRef = ref<FormInstance>();
 const defaultNPMRegistry = 'https://registry.npmjs.org/';
 
-const form = reactive<AI.AgentOtherConfig>({
+const form = reactive<AI.AgentOtherConfig & { dashboardUsername: string; dashboardPassword: string }>({
     userTimezone: '',
     browserEnabled: true,
     npmRegistry: defaultNPMRegistry,
+    dashboardUsername: 'admin',
+    dashboardPassword: '',
 });
 
 const npmRegistryOptions = [
@@ -66,6 +91,8 @@ const validateNPMRegistry = (_rule: any, value: string, callback: (error?: Error
 const rules = reactive({
     userTimezone: [Rules.requiredInput],
     npmRegistry: [{ validator: validateNPMRegistry, trigger: 'blur' }],
+    dashboardUsername: [Rules.requiredInput],
+    dashboardPassword: [Rules.requiredInput],
 });
 
 const load = async (params: { agentId: number; agentType: AI.AgentType }) => {
@@ -75,6 +102,11 @@ const load = async (params: { agentId: number; agentType: AI.AgentType }) => {
     try {
         const res = await getAgentOtherConfig({ agentId: params.agentId });
         Object.assign(form, res.data || {});
+        if (params.agentType === 'hermes-agent') {
+            const authRes = await getAgentHermesDashboardAuth({ agentId: params.agentId });
+            form.dashboardUsername = authRes.data?.username || 'admin';
+            form.dashboardPassword = authRes.data?.password || '';
+        }
     } finally {
         loading.value = false;
     }
@@ -93,6 +125,13 @@ const saveConfig = async () => {
             browserEnabled: form.browserEnabled,
             npmRegistry: agentType.value === 'openclaw' ? form.npmRegistry : defaultNPMRegistry,
         });
+        if (agentType.value === 'hermes-agent') {
+            await updateAgentHermesDashboardAuth({
+                agentId: agentId.value,
+                username: form.dashboardUsername,
+                password: form.dashboardPassword,
+            });
+        }
         MsgSuccess(t('aiTools.agents.saveSuccess'));
     } finally {
         saving.value = false;
