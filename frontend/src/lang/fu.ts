@@ -141,6 +141,20 @@ const fuLocales: Record<string, FuLocaleMessage> = {
             },
         },
     },
+    fa: {
+        fu: {
+            table: {
+                more: 'بیشتر',
+                custom_table_rows: 'ستون‌های سفارشی',
+            },
+            steps: {
+                cancel: 'لغو',
+                prev: 'قبلی',
+                next: 'بعدی',
+                finish: 'پایان',
+            },
+        },
+    },
 };
 
 export const getFuLocaleMessage = (locale: string) => {
