@@ -163,10 +163,9 @@ var catalog = map[string]Meta{
 			Input:         []string{"text"},
 		},
 		Models: []Model{
+			{ID: "minimax/MiniMax-M3", Name: "MiniMax M3", ContextWindow: 1000000, MaxTokens: 128000, Reasoning: true, Input: []string{"text", "image"}},
 			{ID: "minimax/MiniMax-M2.7", Name: "MiniMax M2.7"},
 			{ID: "minimax/MiniMax-M2.7-highspeed", Name: "MiniMax M2.7 highspeed"},
-			{ID: "minimax/MiniMax-M2.5", Name: "MiniMax M2.5", Reasoning: true},
-			{ID: "minimax/MiniMax-M2.5-highspeed", Name: "MiniMax M2.5 highspeed"},
 		},
 	},
 	"xiaomi": {
