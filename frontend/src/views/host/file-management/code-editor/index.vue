@@ -965,6 +965,8 @@ const initEditor = async () => {
     editor.getModel()?.pushEOL(config.eol);
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, quickSave);
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Slash, quickToggleComment);
+    editor.focus();
 
     editor.onDidChangeModelContent(() => {
         if (editor) {
@@ -978,6 +980,10 @@ const initEditor = async () => {
 
 const quickSave = () => {
     saveContent();
+};
+
+const quickToggleComment = () => {
+    void editor?.getAction('editor.action.commentLine')?.run();
 };
 
 const openHistoryDrawer = () => {

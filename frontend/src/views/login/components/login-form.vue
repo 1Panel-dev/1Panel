@@ -387,6 +387,7 @@ const languageLabelMap: Record<string, string> = {
     ms: 'Bahasa Melayu',
     tr: 'Turkish',
     'es-ES': 'España - Español',
+    fa: 'فارسی',
 };
 
 const handleCommand = async (command: string) => {

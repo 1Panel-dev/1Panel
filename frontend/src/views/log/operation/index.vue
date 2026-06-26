@@ -147,10 +147,9 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             data.value = res.data.items || [];
-            if (language.value === 'zh' || language.value === 'zh-Hant') {
-                for (const item of data.value) {
-                    item.detailZH = loadDetail(item.detailZH);
-                }
+            for (const item of data.value) {
+                item.detailZH = loadDetail(item.detailZH);
+                item.detailEN = loadDetail(item.detailEN);
             }
             paginationConfig.total = res.data.total;
         })
@@ -270,6 +269,11 @@ const exactReplacements: Record<string, string> = {
     SessionTimeout: 'setting.sessionTimeout',
     SecurityEntrance: 'setting.entrance',
     ExpirationDays: 'setting.expirationTime',
+    OpsReportExportFormat: 'xpack.opsReport.page.defaultFormat',
+    OpsReportSchedule: 'xpack.opsReport.page.generationRule',
+    OpsReportSavePath: 'xpack.opsReport.page.savePath',
+    OpsReportThreshold: 'xpack.opsReport.page.threshold',
+    OpsReportAutoExport: 'xpack.opsReport.page.autoExport',
     ComplexityVerification: 'setting.complexity',
     MFAStatus: 'setting.mfa',
     MonitorStatus: 'setting.enableMonitor',

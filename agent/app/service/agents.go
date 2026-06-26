@@ -176,6 +176,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	var allowedOrigins []string
 	var account *model.AgentAccount
 	var installHooks *appInstallHooks
+	var hermesAuth hermesDashboardAuth
 
 	if agentType == constant.AppOpenclaw || agentType == constant.AppHermesAgent {
 		if req.AccountID == 0 {
@@ -222,9 +223,13 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 			},
 		}
 	} else if agentType == constant.AppHermesAgent {
+		hermesAuth = normalizeHermesDashboardAuth(req.DashboardUsername, req.DashboardPassword)
 		installHooks = &appInstallHooks{
 			AfterCopyData: func(appInstall *model.AppInstall) error {
-				return prepareHermesInstallFiles(appInstall, account, storedModel)
+				if err := prepareHermesInstallFiles(appInstall, account, storedModel); err != nil {
+					return err
+				}
+				return writeHermesDashboardAuthEnv(path.Join(appInstall.GetPath(), ".env"), hermesAuth, false)
 			},
 		}
 	}
@@ -247,6 +252,10 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		params["BASE_URL"] = baseURL
 		params["API_KEY"] = apiKey
 		params["OPENCLAW_GATEWAY_TOKEN"] = token
+	}
+	if agentType == constant.AppHermesAgent {
+		params[hermesDashboardUsernameEnvKey] = hermesAuth.Username
+		params[hermesDashboardPasswordEnvKey] = hermesAuth.Password
 	}
 
 	if req.EditCompose && strings.TrimSpace(req.DockerCompose) == "" {
@@ -604,28 +613,30 @@ func batchOperateSkipMessage(operate constant.AppOperate, status string) string 
 
 func buildCreateReqFromBatchInstallReq(req dto.AgentBatchInstallReq) dto.AgentCreateReq {
 	return dto.AgentCreateReq{
-		Name:           req.Name,
-		Remark:         req.Remark,
-		AppVersion:     req.AppVersion,
-		WebUIPort:      req.WebUIPort,
-		BridgePort:     req.BridgePort,
-		AllowedOrigins: req.AllowedOrigins,
-		AgentType:      req.AgentType,
-		Model:          req.Model,
-		AccountID:      req.AccountID,
-		Token:          req.Token,
-		TaskID:         req.TaskID,
-		Advanced:       req.Advanced,
-		ContainerName:  req.ContainerName,
-		AllowPort:      req.AllowPort,
-		SpecifyIP:      req.SpecifyIP,
-		RestartPolicy:  req.RestartPolicy,
-		CpuQuota:       req.CpuQuota,
-		MemoryLimit:    req.MemoryLimit,
-		MemoryUnit:     req.MemoryUnit,
-		PullImage:      req.PullImage,
-		EditCompose:    req.EditCompose,
-		DockerCompose:  req.DockerCompose,
+		Name:              req.Name,
+		Remark:            req.Remark,
+		AppVersion:        req.AppVersion,
+		WebUIPort:         req.WebUIPort,
+		BridgePort:        req.BridgePort,
+		AllowedOrigins:    req.AllowedOrigins,
+		AgentType:         req.AgentType,
+		Model:             req.Model,
+		AccountID:         req.AccountID,
+		Token:             req.Token,
+		DashboardUsername: req.DashboardUsername,
+		DashboardPassword: req.DashboardPassword,
+		TaskID:            req.TaskID,
+		Advanced:          req.Advanced,
+		ContainerName:     req.ContainerName,
+		AllowPort:         req.AllowPort,
+		SpecifyIP:         req.SpecifyIP,
+		RestartPolicy:     req.RestartPolicy,
+		CpuQuota:          req.CpuQuota,
+		MemoryLimit:       req.MemoryLimit,
+		MemoryUnit:        req.MemoryUnit,
+		PullImage:         req.PullImage,
+		EditCompose:       req.EditCompose,
+		DockerCompose:     req.DockerCompose,
 	}
 }
 
@@ -1327,10 +1338,13 @@ func (a AgentService) GetOtherConfig(req dto.AgentIDReq) (*dto.AgentOtherConfig,
 		if err != nil {
 			return nil, err
 		}
+		auth := readHermesDashboardAuthFromInstall(install)
 		return &dto.AgentOtherConfig{
-			UserTimezone:   cfg.Timezone,
-			BrowserEnabled: true,
-			NPMRegistry:    "https://registry.npmjs.org/",
+			UserTimezone:      cfg.Timezone,
+			BrowserEnabled:    true,
+			NPMRegistry:       "https://registry.npmjs.org/",
+			DashboardUsername: auth.Username,
+			DashboardPassword: auth.Password,
 		}, nil
 	}
 	conf, err := readOpenclawConfig(agent.ConfigPath)
@@ -1355,12 +1369,21 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 		if err != nil {
 			return err
 		}
+		previousAuth := readHermesDashboardAuthFromInstall(install)
+		nextAuth := normalizeHermesDashboardAuth(req.DashboardUsername, req.DashboardPassword)
 		if err := writeHermesConfig(path.Dir(agent.ConfigPath), account, agent.Model, strings.TrimSpace(req.UserTimezone)); err != nil {
 			return err
 		}
+		if err := writeHermesDashboardAuthEnv(path.Join(install.GetPath(), ".env"), nextAuth, true); err != nil {
+			return err
+		}
+		operate := constant.Restart
+		if previousAuth.Username != nextAuth.Username || previousAuth.Password != nextAuth.Password {
+			operate = constant.Rebuild
+		}
 		return NewIAppInstalledService().Operate(request.AppInstalledOperate{
 			InstallId: install.ID,
-			Operate:   constant.Restart,
+			Operate:   operate,
 		})
 	}
 	if err := ensureContainerRunning(install.ContainerName); err != nil {

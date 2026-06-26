@@ -782,11 +782,6 @@ func buildContainerRecoverNetworkConfig(networkSettings *container.NetworkSettin
 				IPv4Address: endpoint.IPAMConfig.IPv4Address,
 				IPv6Address: endpoint.IPAMConfig.IPv6Address,
 			}
-		} else if endpoint.IPAddress != "" || endpoint.GlobalIPv6Address != "" {
-			endpointSetting.IPAMConfig = &network.EndpointIPAMConfig{
-				IPv4Address: endpoint.IPAddress,
-				IPv6Address: endpoint.GlobalIPv6Address,
-			}
 		}
 		if name == primaryName {
 			config.EndpointsConfig[name] = endpointSetting

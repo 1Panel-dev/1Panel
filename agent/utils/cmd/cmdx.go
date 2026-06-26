@@ -274,7 +274,10 @@ func startPipeCommands(cmds []*exec.Cmd) error {
 	for i := len(cmds) - 1; i >= 0; i-- {
 		if err := cmds[i].Start(); err != nil {
 			killStarted(cmds[i+1:])
-			return err
+			if os.IsNotExist(err) {
+				return fmt.Errorf("cmd start failed: %w%s", err, commandStartDiagnostics(cmds[i].Args[0], cmds[i].Path, cmds[i].Dir, cmds[i].Env))
+			}
+			return fmt.Errorf("cmd start failed: %w", err)
 		}
 	}
 	return nil
@@ -376,6 +379,9 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 	}()
 
 	if err := cmd.Start(); err != nil {
+		if os.IsNotExist(err) {
+			return "", fmt.Errorf("cmd start failed: %w%s", err, commandStartDiagnostics(cmd.Args[0], cmd.Path, cmd.Dir, cmd.Env))
+		}
 		return "", fmt.Errorf("cmd start failed: %w", err)
 	}
 	if c.taskItem != nil {

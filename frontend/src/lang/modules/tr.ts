@@ -702,6 +702,9 @@ const message = {
             syncAgentsHelper: 'Bu model hesabını kullanan ajanlar için openclaw.json dosyasını güncelleyin',
             appVersion: 'Uygulama sürümü',
             webuiPort: 'WebUI portu',
+            tokenOrAuth: 'Token/Kullanıcı adı ve parola',
+            dashboardUsername: 'Dashboard kullanıcı adı',
+            dashboardPassword: 'Dashboard parolası',
             allowedOrigins: 'Erişim adresleri',
             allowedOriginsRequired: 'En az bir erişim adresi girin',
             allowedOriginsInvalid: 'http(s)://host-veya-ip[:port] biçimini kullanın',
@@ -862,8 +865,13 @@ const message = {
                 'QR giriş görevini başlatmak için tıklayın. QR kodu görev günlüğünde görünecek ve tarama başarılı olduktan sonra konteyner otomatik olarak yeniden başlatılacaktır.',
             channelAutoRestartHelper:
                 'Kaydettiğinizde ayarların etkili olması için konteyner otomatik olarak yeniden başlatılır.',
+            dashboardAuthAutoRebuildHelper:
+                'Dashboard kullanıcı adı veya parolası kaydedildiğinde değişikliklerin etkili olması için konteyner otomatik olarak yeniden oluşturulur.',
             channelDeleteConfirm: '{0} kanal yapılandırması silinsin mi?',
             customProviderHelper: 'Özel model sağlayıcısında hesabın kullanılabilirliği doğrulanmaz',
+            apiTypeBaseURLHelper: 'Bu tür istekleri {0} yoluna gönderir. Önerilen Base URL: {1}',
+            apiTypeBaseURLMismatch:
+                'Geçerli Base URL bir {0} yolu gibi görünüyor, ancak {1} seçildi. Önerilen URL: {2}',
         },
         model: {
             model: 'Model',
@@ -1037,6 +1045,9 @@ const message = {
             healthUnknown: 'Bilinmiyor',
             validationModelMapEmpty: 'Model eşlemesindeki model adları boş olamaz',
             validationModelMapDuplicate: 'İstek modeli {0} yineleniyor',
+            validateAvailability: 'Hesap Kullanılabilirliğini Doğrula',
+            validateAvailabilityHelper:
+                'Kaydetmeden önce API kullanılabilirliğini doğrulamak için en küçük iletiyi gönder',
             modelGroup: 'Model Grubu',
             availableModels: 'Kullanılabilir Modeller',
             modelGroupModels: 'İstek Modelleri',
@@ -1063,8 +1074,6 @@ const message = {
         },
         skillsHub: {
             title: 'Skills Hub',
-            skillList: 'Skill Listesi',
-            serverTab: 'Sunucu',
             upload: 'Skill yükle',
             importSkill: 'Skill içe aktar',
             repositoryAddress: 'Depo adresi',
@@ -1077,6 +1086,13 @@ const message = {
             importSuccess: 'Skill başarıyla içe aktarıldı ve inceleme bekliyor.',
             source: 'Kaynak',
             applicableAgent: 'Uygulanabilir ajan',
+            overview: 'Genel bakış',
+            versionHistory: 'Sürüm geçmişi',
+            publishedAt: 'Yayınlanma zamanı',
+            versionMarker: 'İşaret',
+            currentVersion: 'Geçerli',
+            latestVersion: 'En son sürüm',
+            latestPublished: 'En son yayınlanan',
             riskLevel: 'Risk düzeyi',
             riskReferenceHint:
                 'Risk düzeyi Skill paketi içeriğinden otomatik oluşturulur ve yalnızca inceleme referansıdır.\nDüşük: belirgin risk yok\nOrta: script, bağımlılık, harici URL veya ortam değişkeni\nYüksek: uzak çalıştırma, hassas bilgi veya tehlikeli komut',
@@ -1111,6 +1127,8 @@ const message = {
             onlySupportedArchive: 'Yalnızca .zip, .7z, .tar ve .tar.gz Skill paketleri yüklenebilir',
             uploadSizeExceeded: 'Tek bir Skill paketi 5 MBı aşamaz',
             uploadSuccess: 'Skill başarıyla yüklendi ve inceleme bekliyor.',
+            versionAutoFillPlaceholder: 'Mümkünse dosya adından otomatik algılanır. Onaylayın veya manuel girin',
+            metadataOverwriteConfirm: 'Skill paketindeki sürüm mevcut girişten farklı. Mevcut giriş kullanılsın mı?',
             offlineNotice: 'Geçerli ortam çevrimdışı. Yalnızca yerel Skill Mağazasından Skill kurulabilir.',
             publishConfirm:
                 'Bu Skilli yayınlamak istiyor musunuz? Yayınlandıktan sonra yerel Skill Mağazasından kurulabilir.',
@@ -1123,24 +1141,6 @@ const message = {
             noInstallTarget: 'Kullanılabilir özel ajan yok. Önce bir kurulum hedefi yapılandırın.',
             postInstallConfirm:
                 'Bu hedefte kurulum sonrası komut yapılandırılmış. Çalıştırmadan önce komutun güvenilir olduğunu doğrulayın.',
-            serverStatusTitle: 'Skills Hub Server',
-            serverServiceOperateConfirm: 'Skills Hub Server için {0} işlemini onaylıyor musunuz?',
-            serverAccessSetting: 'Hizmet erişim ayarları',
-            serverInfo: 'Sunucu bilgileri',
-            tokenSetting: 'Token ayarları',
-            externalUrl: 'Dış erişim adresi',
-            externalUrlRequired: 'Önce dış erişim adresini girin.',
-            skillctlDownloadUrl: 'skillctl indirme adresi',
-            skillctlArchitecture: 'Sunucu mimarisi',
-            registryUrl: 'Registry adresi',
-            loginCommand: 'Giriş komutu',
-            installCommand: 'Kurulum komutu',
-            createToken: 'Token oluştur',
-            tokenCreated: 'Token oluşturuldu',
-            tokenVisibleOnce: 'Token açık metni yalnızca bir kez gösterilir. Lütfen hemen kopyalayıp kaydedin.',
-            disableTokenConfirm:
-                'Bu Token devre dışı bırakılsın mı? Devre dışı bırakıldıktan sonra bu Tokenı kullanan skillctl artık Skill kuramaz.',
-            deleteTokenConfirm: 'Bu Token silinsin mi? Silindikten sonra geri alınamaz.',
             status: {
                 pending: 'İnceleme bekliyor',
                 approved: 'Onaylandı',

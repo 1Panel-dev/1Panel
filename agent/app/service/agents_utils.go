@@ -20,8 +20,10 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	agentenv "github.com/1Panel-dev/1Panel/agent/utils/env"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
+	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
 
@@ -375,6 +377,11 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 			if bridge, ok := envMap["PANEL_APP_PORT_BRIDGE"]; ok {
 				item.BridgePort = toInt(bridge)
 			}
+		}
+		if agentType == constant.AppHermesAgent {
+			auth := readHermesDashboardAuthFromInstall(appInstall)
+			item.DashboardUsername = auth.Username
+			item.DashboardPassword = auth.Password
 		}
 	}
 	return item
@@ -860,13 +867,15 @@ func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName,
 	if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
 		return err
 	}
-	envPath := path.Join(confDir, ".env")
-	lines := []string{fmt.Sprintf("OPENCLAW_GATEWAY_TOKEN=%s", token)}
-	if envKey := providercatalog.EnvKey(account.Provider); envKey != "" && account.APIKey != "" {
-		lines = append(lines, fmt.Sprintf("%s=%s", envKey, account.APIKey))
+	envMap := map[string]string{
+		"OPENCLAW_GATEWAY_TOKEN": token,
 	}
-	content := strings.Join(lines, "\n") + "\n"
-	return fileOp.SaveFile(envPath, content, 0600)
+	order := []string{"OPENCLAW_GATEWAY_TOKEN"}
+	if envKey := providercatalog.EnvKey(account.Provider); envKey != "" && account.APIKey != "" {
+		envMap[envKey] = account.APIKey
+		order = append(order, envKey)
+	}
+	return writeAgentEnvMap(path.Join(confDir, ".env"), envMap, order)
 }
 
 func resolveOpenclawFallbackModels(account *model.AgentAccount, primaryModel string, fallbackIDs []string) ([]string, error) {
@@ -1522,6 +1531,41 @@ func readInstallEnv(envStr string) map[string]interface{} {
 		return nil
 	}
 	return data
+}
+
+func readAgentEnvMap(envPath string) (map[string]string, error) {
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(envPath) {
+		return map[string]string{}, nil
+	}
+	envMap, err := godotenv.Read(envPath)
+	if err != nil {
+		return nil, err
+	}
+	return envMap, nil
+}
+
+func writeAgentEnvMap(envPath string, envMap map[string]string, order []string) error {
+	if len(envMap) == 0 {
+		return files.NewFileOp().SaveFile(envPath, "", 0600)
+	}
+	return agentenv.WriteWithOrder(envMap, envPath, order)
+}
+
+func upsertAgentEnv(envPath string, values map[string]string, order []string, overwrite bool) error {
+	envMap, err := readAgentEnvMap(envPath)
+	if err != nil {
+		return err
+	}
+	for key, value := range values {
+		if key == "" {
+			continue
+		}
+		if overwrite || strings.TrimSpace(envMap[key]) == "" {
+			envMap[key] = value
+		}
+	}
+	return writeAgentEnvMap(envPath, envMap, order)
 }
 
 func maskKey(value string) string {

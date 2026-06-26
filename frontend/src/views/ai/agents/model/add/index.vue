@@ -30,6 +30,18 @@
             </el-form-item>
             <el-form-item label="Base URL" prop="baseURL">
                 <el-input v-model="form.baseURL" :disabled="!editableBaseURLProviders.includes(form.provider)" />
+                <span v-if="apiTypeBaseURLHelper" class="input-help">
+                    {{ apiTypeBaseURLHelper }}
+                </span>
+                <el-alert
+                    v-if="baseURLAPITypeMismatchTip"
+                    class="base-url-warning"
+                    type="warning"
+                    :closable="false"
+                    show-icon
+                >
+                    {{ baseURLAPITypeMismatchTip }}
+                </el-alert>
             </el-form-item>
             <el-form-item :label="'API ' + $t('commons.table.type')" prop="apiType">
                 <el-select v-model="form.apiType" :disabled="apiTypeOptions.length === 1">
@@ -132,6 +144,67 @@ const apiTypeOptions = computed(() => {
         return ['openai-completions', 'openai-responses', 'anthropic-messages'];
     }
     return ['openai-completions', 'openai-responses'];
+});
+const apiTypeURLHints: Record<string, { requestPath: string; example: string; endpointSuffixes: string[] }> = {
+    'openai-completions': {
+        requestPath: '/v1/chat/completions',
+        example: 'http://127.0.0.1:8000/v1',
+        endpointSuffixes: ['/v1/chat/completions', '/v1beta/chat/completions', '/chat/completions'],
+    },
+    'openai-responses': {
+        requestPath: '/v1/responses',
+        example: 'http://127.0.0.1:8000/v1',
+        endpointSuffixes: ['/v1/responses', '/responses'],
+    },
+    'anthropic-messages': {
+        requestPath: '/v1/messages',
+        example: 'http://127.0.0.1:8000',
+        endpointSuffixes: ['/v1/messages', '/messages'],
+    },
+};
+const showAPITypeBaseURLTips = computed(() => form.provider === 'vllm');
+const apiTypeBaseURLHelper = computed(() => {
+    const hint = apiTypeURLHints[form.apiType];
+    if (!showAPITypeBaseURLTips.value || !hint) {
+        return '';
+    }
+    return i18n.global.t('aiTools.agents.apiTypeBaseURLHelper', [hint.requestPath, hint.example]);
+});
+
+const normalizeBaseURLPath = (baseURL: string) => {
+    const value = baseURL.trim().replace(/\/+$/, '');
+    if (!value) {
+        return '';
+    }
+    try {
+        return (new URL(value).pathname || '/').replace(/\/+$/, '').toLowerCase();
+    } catch {
+        return value.split(/[?#]/)[0].replace(/\/+$/, '').toLowerCase();
+    }
+};
+
+const detectAPITypeFromBaseURL = (baseURL: string) => {
+    const path = normalizeBaseURLPath(baseURL);
+    if (!path) {
+        return '';
+    }
+    for (const [apiType, hint] of Object.entries(apiTypeURLHints)) {
+        if (hint.endpointSuffixes.some((suffix) => path.endsWith(suffix))) {
+            return apiType;
+        }
+    }
+    return '';
+};
+const baseURLAPITypeMismatchTip = computed(() => {
+    if (!showAPITypeBaseURLTips.value || !form.baseURL) {
+        return '';
+    }
+    const detectedAPIType = detectAPITypeFromBaseURL(form.baseURL);
+    const expected = apiTypeURLHints[form.apiType];
+    if (!detectedAPIType || detectedAPIType === form.apiType || !expected) {
+        return '';
+    }
+    return i18n.global.t('aiTools.agents.apiTypeBaseURLMismatch', [detectedAPIType, form.apiType, expected.example]);
 });
 
 const rules = reactive({
@@ -375,5 +448,9 @@ defineExpose({
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+}
+
+.base-url-warning {
+    margin-top: 8px;
 }
 </style>

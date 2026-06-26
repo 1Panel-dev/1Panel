@@ -700,6 +700,9 @@ const message = {
             syncAgentsHelper: 'Atualize o openclaw.json para agentes que usam esta conta de modelo',
             appVersion: 'Versão do app',
             webuiPort: 'Porta WebUI',
+            tokenOrAuth: 'Token/Usuário e senha',
+            dashboardUsername: 'Usuário do Dashboard',
+            dashboardPassword: 'Senha do Dashboard',
             allowedOrigins: 'Endereços de acesso',
             allowedOriginsRequired: 'Informe pelo menos um endereço de acesso',
             allowedOriginsInvalid: 'Use o formato http(s)://host-ou-ip[:porta]',
@@ -859,8 +862,13 @@ const message = {
                 'Clique para iniciar a tarefa de login por QR. O código QR aparecerá no log da tarefa e o contêiner será reiniciado automaticamente após a leitura ser concluída.',
             channelAutoRestartHelper:
                 'Ao salvar, o contêiner será reiniciado automaticamente para que a configuração entre em vigor.',
+            dashboardAuthAutoRebuildHelper:
+                'Ao salvar o usuário ou a senha do Dashboard, o contêiner será reconstruído automaticamente para que as alterações entrem em vigor.',
             channelDeleteConfirm: 'Excluir a configuração do canal {0}?',
             customProviderHelper: 'Provedores de modelo personalizados não validam se a conta está disponível',
+            apiTypeBaseURLHelper: 'Este tipo envia requisições para {0}. Base URL recomendada: {1}',
+            apiTypeBaseURLMismatch:
+                'A Base URL atual parece um caminho {0}, mas {1} está selecionado. URL recomendada: {2}',
         },
         model: {
             model: 'Modelo',
@@ -1034,6 +1042,9 @@ const message = {
             healthUnknown: 'Desconhecido',
             validationModelMapEmpty: 'Os nomes no mapeamento de modelos não podem ficar vazios',
             validationModelMapDuplicate: 'O modelo solicitado {0} está duplicado',
+            validateAvailability: 'Validar disponibilidade da conta',
+            validateAvailabilityHelper:
+                'Envie uma mensagem mínima antes de salvar para validar a disponibilidade da API',
             modelGroup: 'Grupo de modelos',
             availableModels: 'Modelos disponíveis',
             modelGroupModels: 'Modelos solicitados',
@@ -1060,8 +1071,6 @@ const message = {
         },
         skillsHub: {
             title: 'Skills Hub',
-            skillList: 'Lista de Skills',
-            serverTab: 'Servidor',
             upload: 'Enviar Skill',
             importSkill: 'Importar Skill',
             repositoryAddress: 'Endereço do repositório',
@@ -1074,6 +1083,13 @@ const message = {
             importSuccess: 'Skill importada com sucesso e agora está pendente de revisão.',
             source: 'Fonte',
             applicableAgent: 'Agente aplicável',
+            overview: 'Visão geral',
+            versionHistory: 'Histórico de versões',
+            publishedAt: 'Publicado em',
+            versionMarker: 'Marcador',
+            currentVersion: 'Atual',
+            latestVersion: 'Versão mais recente',
+            latestPublished: 'Mais recente publicada',
             riskLevel: 'Nível de risco',
             riskReferenceHint:
                 'O nível de risco é gerado automaticamente a partir do conteúdo do pacote Skill e serve apenas como referência.\nBaixo: nenhum risco evidente\nMédio: scripts, dependências, URLs externas ou variáveis de ambiente\nAlto: execução remota, informações sensíveis ou comandos perigosos',
@@ -1108,6 +1124,9 @@ const message = {
             onlySupportedArchive: 'Só é possível enviar pacotes Skill .zip, .7z, .tar e .tar.gz',
             uploadSizeExceeded: 'Um pacote Skill não pode exceder 5 MB',
             uploadSuccess: 'Skill enviada com sucesso e agora está pendente de revisão.',
+            versionAutoFillPlaceholder:
+                'Detectado automaticamente pelo nome do arquivo quando possível. Confirme ou preencha manualmente',
+            metadataOverwriteConfirm: 'A versão no pacote Skill difere do valor atual. Usar o valor atual?',
             offlineNotice: 'O ambiente atual está offline. Apenas Skills da loja local podem ser instaladas.',
             publishConfirm: 'Publicar esta Skill? Depois disso, ela poderá ser instalada pela loja local de Skills.',
             disableConfirm: 'Despublicar esta Skill? Skills já instaladas em agentes não serão afetadas.',
@@ -1120,24 +1139,6 @@ const message = {
             noInstallTarget: 'Nenhum agente personalizado disponível. Configure primeiro um destino de instalação.',
             postInstallConfirm:
                 'Este destino tem um comando pós-instalação. Confirme que o comando é confiável antes de executá-lo.',
-            serverStatusTitle: 'Skills Hub Server',
-            serverServiceOperateConfirm: 'Tem certeza de que deseja {0} o servidor Skills Hub?',
-            serverAccessSetting: 'Configurações de acesso ao serviço',
-            serverInfo: 'Informações do servidor',
-            tokenSetting: 'Configurações de Token',
-            externalUrl: 'URL externa',
-            externalUrlRequired: 'Insira a URL externa primeiro.',
-            skillctlDownloadUrl: 'URL de download do skillctl',
-            skillctlArchitecture: 'Arquitetura do servidor',
-            registryUrl: 'URL do Registry',
-            loginCommand: 'Comando de login',
-            installCommand: 'Comando de instalação',
-            createToken: 'Criar Token',
-            tokenCreated: 'Token criado',
-            tokenVisibleOnce: 'O token em texto claro é exibido apenas uma vez. Copie e salve agora.',
-            disableTokenConfirm:
-                'Desativar este Token? Após desativado, o skillctl que usa este Token não poderá mais instalar Skills.',
-            deleteTokenConfirm: 'Excluir este Token? Esta ação não pode ser desfeita.',
             status: {
                 pending: 'Pendente',
                 approved: 'Aprovado',
