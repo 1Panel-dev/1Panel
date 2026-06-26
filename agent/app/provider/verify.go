@@ -131,7 +131,7 @@ func BuildVerifyRequest(provider, baseURL, apiKey string) VerifyRequest {
 			request.URL = base + "/v1/messages"
 		}
 		request.Body = mustJSON(map[string]interface{}{
-			"model":      "MiniMax-M2.5",
+			"model":      "MiniMax-M3",
 			"max_tokens": 1,
 			"messages": []map[string]interface{}{{
 				"role": "user",
