@@ -121,6 +121,7 @@
                                     <el-dropdown-item command="ru">Русский</el-dropdown-item>
                                     <el-dropdown-item command="ms">Bahasa Melayu</el-dropdown-item>
                                     <el-dropdown-item command="tr">Turkish</el-dropdown-item>
+                                    <el-dropdown-item command="fa">فارسی</el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>

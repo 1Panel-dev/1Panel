@@ -23,7 +23,7 @@ type Login struct {
 	Password  string `json:"password" validate:"required"`
 	Captcha   string `json:"captcha"`
 	CaptchaID string `json:"captchaID"`
-	Language  string `json:"language" validate:"required,oneof=zh en 'zh-Hant' ko ja ru ms 'pt-BR' tr 'es-ES'"`
+	Language  string `json:"language" validate:"required,oneof=zh en 'zh-Hant' ko ja ru ms 'pt-BR' tr 'es-ES' fa"`
 }
 
 type SystemSetting struct {
