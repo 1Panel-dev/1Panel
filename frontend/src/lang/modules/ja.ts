@@ -1072,6 +1072,13 @@ const message = {
             importSuccess: 'Skill のインポートに成功しました。レビュー待ち状態になりました。',
             source: 'ソース',
             applicableAgent: '対象エージェント',
+            overview: '概要',
+            versionHistory: 'バージョン履歴',
+            publishedAt: '公開日時',
+            versionMarker: 'マーカー',
+            currentVersion: '現在表示中',
+            latestVersion: '最新バージョン',
+            latestPublished: '最新公開',
             riskLevel: 'リスクレベル',
             riskReferenceHint:
                 'リスクレベルは Skill パッケージの内容から自動検出されるレビュー参考情報です。\n低: 明らかなリスクなし\n中: スクリプト、依存関係、外部 URL、環境変数あり\n高: リモート実行、機密情報、高危険コマンドあり',
@@ -1106,6 +1113,9 @@ const message = {
             onlySupportedArchive: '.zip、.7z、.tar、.tar.gz 形式の Skill パッケージのみアップロードできます',
             uploadSizeExceeded: '1 つの Skill パッケージは 5 MB を超えることはできません',
             uploadSuccess: 'Skill のアップロードに成功しました。レビュー待ち状態になりました。',
+            versionAutoFillPlaceholder: '可能な場合はファイル名から自動検出されます。確認するか手動で入力してください',
+            metadataOverwriteConfirm:
+                'Skill パッケージ内のバージョンが現在の入力と異なります。現在の入力を使用しますか？',
             offlineNotice:
                 '現在の環境はオフラインです。ローカル Skill ストアからの Skill インストールのみ対応しています。',
             publishConfirm: 'この Skill を公開しますか？公開後、ローカル Skill ストアからインストールできます。',
