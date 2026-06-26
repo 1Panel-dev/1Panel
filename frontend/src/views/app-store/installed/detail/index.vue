@@ -396,6 +396,7 @@ const submit = async (formEl: FormInstance) => {
                 submitModel.cpuQuota = paramModel.cpuQuota;
                 submitModel.memoryUnit = paramModel.memoryUnit;
                 submitModel.allowPort = paramModel.allowPort;
+                submitModel.specifyIP = paramModel.specifyIP;
                 submitModel.containerName = paramModel.containerName;
                 if (paramModel.editCompose) {
                     submitModel.editCompose = paramModel.editCompose;
