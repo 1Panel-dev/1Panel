@@ -34,7 +34,7 @@ print('Restart the Hermes-Agent container to apply the new Weixin settings.')
 `
 
 func readHermesQQBotChannelConfig(confDir string) (*dto.AgentQQBotConfig, error) {
-	envMap, err := readHermesEnvMap(path.Join(confDir, ".env"))
+	envMap, err := readAgentEnvMap(path.Join(confDir, ".env"))
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func readHermesQQBotChannelConfig(confDir string) (*dto.AgentQQBotConfig, error)
 
 func writeHermesQQBotChannelConfig(confDir string, config dto.AgentQQBotConfig) error {
 	envPath := path.Join(confDir, ".env")
-	envMap, err := readHermesEnvMap(envPath)
+	envMap, err := readAgentEnvMap(envPath)
 	if err != nil {
 		return err
 	}
@@ -102,7 +102,7 @@ func writeHermesQQBotChannelConfig(confDir string, config dto.AgentQQBotConfig) 
 			envMap["QQ_GROUP_ALLOWED_USERS"] = allow
 		}
 	}
-	if err := writeHermesEnvMap(envPath, envMap, []string{
+	if err := writeAgentEnvMap(envPath, envMap, []string{
 		"QQ_APP_ID",
 		"QQ_CLIENT_SECRET",
 		"QQ_ALLOW_ALL_USERS",
@@ -163,7 +163,7 @@ func deleteHermesQQBotChannelConfig(confDir string) error {
 }
 
 func readHermesWecomChannelConfig(confDir string) (*dto.AgentWecomConfig, error) {
-	envMap, err := readHermesEnvMap(path.Join(confDir, ".env"))
+	envMap, err := readAgentEnvMap(path.Join(confDir, ".env"))
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +194,7 @@ func readHermesWecomChannelConfig(confDir string) (*dto.AgentWecomConfig, error)
 
 func writeHermesWecomChannelConfig(confDir string, config dto.AgentWecomConfig) error {
 	envPath := path.Join(confDir, ".env")
-	envMap, err := readHermesEnvMap(envPath)
+	envMap, err := readAgentEnvMap(envPath)
 	if err != nil {
 		return err
 	}
@@ -229,7 +229,7 @@ func writeHermesWecomChannelConfig(confDir string, config dto.AgentWecomConfig) 
 			envMap["WECOM_GROUP_ALLOWED_USERS"] = allow
 		}
 	}
-	if err := writeHermesEnvMap(envPath, envMap, []string{
+	if err := writeAgentEnvMap(envPath, envMap, []string{
 		"WECOM_BOT_ID",
 		"WECOM_SECRET",
 		"WECOM_DM_POLICY",
@@ -282,7 +282,7 @@ func deleteHermesWecomChannelConfig(confDir string) error {
 }
 
 func readHermesDingTalkChannelConfig(confDir string) (*dto.AgentDingTalkConfig, error) {
-	envMap, err := readHermesEnvMap(path.Join(confDir, ".env"))
+	envMap, err := readAgentEnvMap(path.Join(confDir, ".env"))
 	if err != nil {
 		return nil, err
 	}
@@ -332,7 +332,7 @@ func readHermesDingTalkChannelConfig(confDir string) (*dto.AgentDingTalkConfig, 
 
 func writeHermesDingTalkChannelConfig(confDir string, config dto.AgentDingTalkConfig) error {
 	envPath := path.Join(confDir, ".env")
-	envMap, err := readHermesEnvMap(envPath)
+	envMap, err := readAgentEnvMap(envPath)
 	if err != nil {
 		return err
 	}
@@ -356,7 +356,7 @@ func writeHermesDingTalkChannelConfig(confDir string, config dto.AgentDingTalkCo
 	} else if config.DmPolicy == "open" {
 		envMap["DINGTALK_ALLOW_ALL_USERS"] = "true"
 	}
-	if err := writeHermesEnvMap(envPath, envMap, []string{
+	if err := writeAgentEnvMap(envPath, envMap, []string{
 		"DINGTALK_CLIENT_ID",
 		"DINGTALK_CLIENT_SECRET",
 		"DINGTALK_ALLOW_ALL_USERS",
@@ -398,7 +398,7 @@ func deleteHermesDingTalkChannelConfig(confDir string) error {
 }
 
 func readHermesFeishuChannelConfig(confDir string) (*dto.AgentFeishuConfig, error) {
-	envMap, err := readHermesEnvMap(path.Join(confDir, ".env"))
+	envMap, err := readAgentEnvMap(path.Join(confDir, ".env"))
 	if err != nil {
 		return nil, err
 	}
@@ -452,7 +452,7 @@ func readHermesFeishuChannelConfig(confDir string) (*dto.AgentFeishuConfig, erro
 
 func writeHermesFeishuChannelConfig(confDir string, config dto.AgentFeishuConfig) error {
 	envPath := path.Join(confDir, ".env")
-	envMap, err := readHermesEnvMap(envPath)
+	envMap, err := readAgentEnvMap(envPath)
 	if err != nil {
 		return err
 	}
@@ -488,7 +488,7 @@ func writeHermesFeishuChannelConfig(confDir string, config dto.AgentFeishuConfig
 			envMap["FEISHU_ALLOWED_USERS"] = allow
 		}
 	}
-	if err := writeHermesEnvMap(envPath, envMap, []string{
+	if err := writeAgentEnvMap(envPath, envMap, []string{
 		"FEISHU_APP_ID",
 		"FEISHU_APP_SECRET",
 		"FEISHU_DOMAIN",
@@ -529,7 +529,7 @@ func deleteHermesFeishuChannelConfig(confDir string) error {
 }
 
 func readHermesWeixinChannelConfig(confDir string) (*dto.AgentWeixinConfig, error) {
-	envMap, err := readHermesEnvMap(path.Join(confDir, ".env"))
+	envMap, err := readAgentEnvMap(path.Join(confDir, ".env"))
 	if err != nil {
 		return nil, err
 	}

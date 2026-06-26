@@ -109,6 +109,54 @@
                             </el-button>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="150">
+                        <template #default="{ row }">
+                            <fu-read-write-switch v-permission>
+                                <template #read>
+                                    <MsgInfo :info="row.remark" :width="'150'" />
+                                </template>
+                                <template #default="{ read }">
+                                    <el-input v-model="row.remark" @blur="handleUpdateRemark(row, read)" />
+                                </template>
+                            </fu-read-write-switch>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('runtime.workDir')" min-width="90">
+                        <template #default="{ row }">
+                            <el-button
+                                v-permission:view="'host_file_view'"
+                                type="primary"
+                                link
+                                @click="openWorkDir(row)"
+                            >
+                                <el-icon>
+                                    <FolderOpened />
+                                </el-icon>
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('aiTools.agents.tokenOrAuth')" min-width="160">
+                        <template #default="{ row }">
+                            <el-space v-if="supportsAgentToken(row.agentType)">
+                                <CopyButton :content="row.token" />
+                                <el-button v-permission link type="primary" @click="onResetToken(row)">
+                                    {{ $t('commons.button.reset') }}
+                                </el-button>
+                            </el-space>
+                            <el-space
+                                v-else-if="row.agentType === 'hermes-agent'"
+                                direction="vertical"
+                                alignment="start"
+                            >
+                                <span>{{ row.dashboardUsername || '-' }}</span>
+                                <el-space>
+                                    <span>{{ row.dashboardPassword ? '********' : '-' }}</span>
+                                    <CopyButton v-if="row.dashboardPassword" :content="row.dashboardPassword" />
+                                </el-space>
+                            </el-space>
+                            <span v-else>-</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('menu.website')" min-width="180">
                         <template #default="{ row }">
                             <div v-if="row.websiteId > 0" class="website-link-cell">
@@ -157,43 +205,6 @@
                             <el-button v-else link type="primary" v-permission @click="openBindWebsite(row)">
                                 {{ $t('commons.button.bind') }}
                             </el-button>
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="150">
-                        <template #default="{ row }">
-                            <fu-read-write-switch v-permission>
-                                <template #read>
-                                    <MsgInfo :info="row.remark" :width="'150'" />
-                                </template>
-                                <template #default="{ read }">
-                                    <el-input v-model="row.remark" @blur="handleUpdateRemark(row, read)" />
-                                </template>
-                            </fu-read-write-switch>
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('runtime.workDir')" min-width="90">
-                        <template #default="{ row }">
-                            <el-button
-                                v-permission:view="'host_file_view'"
-                                type="primary"
-                                link
-                                @click="openWorkDir(row)"
-                            >
-                                <el-icon>
-                                    <FolderOpened />
-                                </el-icon>
-                            </el-button>
-                        </template>
-                    </el-table-column>
-                    <el-table-column label="Token" min-width="120">
-                        <template #default="{ row }">
-                            <el-space v-if="supportsAgentToken(row.agentType)">
-                                <CopyButton :content="row.token" />
-                                <el-button v-permission link type="primary" @click="onResetToken(row)">
-                                    {{ $t('commons.button.reset') }}
-                                </el-button>
-                            </el-space>
-                            <span v-else>-</span>
                         </template>
                     </el-table-column>
                     <el-table-column

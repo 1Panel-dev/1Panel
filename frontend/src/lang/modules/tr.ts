@@ -702,6 +702,9 @@ const message = {
             syncAgentsHelper: 'Bu model hesabını kullanan ajanlar için openclaw.json dosyasını güncelleyin',
             appVersion: 'Uygulama sürümü',
             webuiPort: 'WebUI portu',
+            tokenOrAuth: 'Token/Kullanıcı adı ve parola',
+            dashboardUsername: 'Dashboard kullanıcı adı',
+            dashboardPassword: 'Dashboard parolası',
             allowedOrigins: 'Erişim adresleri',
             allowedOriginsRequired: 'En az bir erişim adresi girin',
             allowedOriginsInvalid: 'http(s)://host-veya-ip[:port] biçimini kullanın',
@@ -862,6 +865,8 @@ const message = {
                 'QR giriş görevini başlatmak için tıklayın. QR kodu görev günlüğünde görünecek ve tarama başarılı olduktan sonra konteyner otomatik olarak yeniden başlatılacaktır.',
             channelAutoRestartHelper:
                 'Kaydettiğinizde ayarların etkili olması için konteyner otomatik olarak yeniden başlatılır.',
+            dashboardAuthAutoRebuildHelper:
+                'Dashboard kullanıcı adı veya parolası kaydedildiğinde değişikliklerin etkili olması için konteyner otomatik olarak yeniden oluşturulur.',
             channelDeleteConfirm: '{0} kanal yapılandırması silinsin mi?',
             customProviderHelper: 'Özel model sağlayıcısında hesabın kullanılabilirliği doğrulanmaz',
             apiTypeBaseURLHelper: 'Bu tür istekleri {0} yoluna gönderir. Önerilen Base URL: {1}',

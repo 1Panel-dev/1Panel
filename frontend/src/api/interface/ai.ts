@@ -317,6 +317,8 @@ export namespace AI {
         model?: string;
         accountId?: number;
         token?: string;
+        dashboardUsername?: string;
+        dashboardPassword?: string;
         taskID: string;
         advanced: boolean;
         containerName: string;
@@ -345,6 +347,8 @@ export namespace AI {
         baseUrl: string;
         apiKey: string;
         token: string;
+        dashboardUsername: string;
+        dashboardPassword: string;
         status: string;
         message: string;
         appInstallId: number;
@@ -604,12 +608,6 @@ export namespace AI {
         createdAt: string;
     }
 
-    export interface AgentAccountVerifyReq {
-        provider: string;
-        apiKey: string;
-        baseURL: string;
-    }
-
     export interface AgentAccountDeleteReq {
         id: number;
     }
@@ -658,11 +656,6 @@ export namespace AI {
         domain?: string;
         connectionMode?: 'websocket' | 'webhook';
         bots: AgentFeishuBot[];
-    }
-
-    export interface AgentFeishuPairingApproveReq {
-        agentId: number;
-        pairingCode: string;
     }
 
     export interface AgentTelegramConfigReq {
@@ -903,6 +896,8 @@ export namespace AI {
         userTimezone: string;
         browserEnabled: boolean;
         npmRegistry: string;
+        dashboardUsername: string;
+        dashboardPassword: string;
     }
 
     export interface AgentOtherConfigUpdateReq {
@@ -910,6 +905,8 @@ export namespace AI {
         userTimezone: string;
         browserEnabled: boolean;
         npmRegistry: string;
+        dashboardUsername?: string;
+        dashboardPassword?: string;
     }
 
     export interface AgentConfigFileReq {
