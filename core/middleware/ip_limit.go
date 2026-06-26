@@ -60,7 +60,7 @@ func isLocalSyncRequest(reqPath, clientIP, token string) bool {
 	case "/api/v2/core/xpack/sync/ssl":
 		return token != ""
 	case "/api/v2/core/settings/ssl/reload":
-		return true
+		return token != ""
 	default:
 		return false
 	}

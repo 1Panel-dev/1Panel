@@ -698,6 +698,9 @@ const message = {
             syncAgentsHelper: 'Обновите openclaw.json для агентов, использующих этот аккаунт модели',
             appVersion: 'Версия приложения',
             webuiPort: 'Порт WebUI',
+            tokenOrAuth: 'Token/имя пользователя и пароль',
+            dashboardUsername: 'Имя пользователя Dashboard',
+            dashboardPassword: 'Пароль Dashboard',
             allowedOrigins: 'Адреса доступа',
             allowedOriginsRequired: 'Укажите хотя бы один адрес доступа',
             allowedOriginsInvalid: 'Используйте формат http(s)://host-or-ip[:port]',
@@ -854,8 +857,12 @@ const message = {
                 'Нажмите, чтобы запустить задачу входа по QR-коду. QR-код появится в журнале задач, а после успешного сканирования контейнер будет автоматически перезапущен.',
             channelAutoRestartHelper:
                 'После сохранения контейнер будет автоматически перезапущен, чтобы настройки вступили в силу.',
+            dashboardAuthAutoRebuildHelper:
+                'После сохранения имени пользователя или пароля Dashboard контейнер будет автоматически пересобран, чтобы изменения вступили в силу.',
             channelDeleteConfirm: 'Удалить конфигурацию канала {0}?',
             customProviderHelper: 'Для пользовательского провайдера модели доступность учетной записи не проверяется',
+            apiTypeBaseURLHelper: 'Этот тип отправляет запросы в {0}. Рекомендуемый Base URL: {1}',
+            apiTypeBaseURLMismatch: 'Текущий Base URL похож на путь {0}, но выбран {1}. Рекомендуемый URL: {2}',
         },
         model: {
             model: 'Модель',
@@ -1029,6 +1036,9 @@ const message = {
             healthUnknown: 'Неизвестно',
             validationModelMapEmpty: 'Имена моделей в сопоставлении не могут быть пустыми',
             validationModelMapDuplicate: 'Запрошенная модель {0} дублируется',
+            validateAvailability: 'Проверить доступность аккаунта',
+            validateAvailabilityHelper:
+                'Отправить минимальное сообщение перед сохранением для проверки доступности API',
             modelGroup: 'Группа моделей',
             availableModels: 'Доступные модели',
             modelGroupModels: 'Запрошенные модели',
@@ -1055,8 +1065,6 @@ const message = {
         },
         skillsHub: {
             title: 'Skills Hub',
-            skillList: 'Список Skills',
-            serverTab: 'Сервер',
             upload: 'Загрузить Skill',
             importSkill: 'Импортировать Skill',
             repositoryAddress: 'Адрес репозитория',
@@ -1069,6 +1077,13 @@ const message = {
             importSuccess: 'Skill успешно импортирован и ожидает проверки.',
             source: 'Источник',
             applicableAgent: 'Применимый агент',
+            overview: 'Обзор',
+            versionHistory: 'История версий',
+            publishedAt: 'Опубликовано',
+            versionMarker: 'Метка',
+            currentVersion: 'Текущая',
+            latestVersion: 'Последняя версия',
+            latestPublished: 'Последняя опубликованная',
             riskLevel: 'Уровень риска',
             riskReferenceHint:
                 'Уровень риска автоматически определяется по содержимому пакета Skill и служит только справкой для проверки.\nНизкий: явные риски не найдены\nСредний: скрипты, зависимости, внешние URL или переменные окружения\nВысокий: удаленное выполнение, чувствительные данные или опасные команды',
@@ -1103,6 +1118,9 @@ const message = {
             onlySupportedArchive: 'Можно загружать только пакеты Skill форматов .zip, .7z, .tar и .tar.gz',
             uploadSizeExceeded: 'Один пакет Skill не должен превышать 5 MB',
             uploadSuccess: 'Skill успешно загружен и ожидает проверки.',
+            versionAutoFillPlaceholder:
+                'Автоматически определяется по имени файла, если возможно. Подтвердите или введите вручную',
+            metadataOverwriteConfirm: 'Версия в пакете Skill отличается от текущего ввода. Использовать текущий ввод?',
             offlineNotice: 'Текущая среда офлайн. Можно устанавливать только Skills из локального магазина.',
             publishConfirm:
                 'Опубликовать этот Skill? После публикации его можно установить из локального магазина Skills.',
@@ -1116,24 +1134,6 @@ const message = {
             noInstallTarget: 'Нет доступных пользовательских агентов. Сначала настройте цель установки.',
             postInstallConfirm:
                 'Для этой цели настроена команда после установки. Перед выполнением убедитесь, что команда надежна.',
-            serverStatusTitle: 'Skills Hub Server',
-            serverServiceOperateConfirm: 'Подтвердить действие «{0}» для сервера Skills Hub?',
-            serverAccessSetting: 'Настройки доступа к сервису',
-            serverInfo: 'Информация о сервере',
-            tokenSetting: 'Настройки Token',
-            externalUrl: 'Внешний URL',
-            externalUrlRequired: 'Сначала введите внешний URL.',
-            skillctlDownloadUrl: 'URL для скачивания skillctl',
-            skillctlArchitecture: 'Архитектура сервера',
-            registryUrl: 'URL Registry',
-            loginCommand: 'Команда входа',
-            installCommand: 'Команда установки',
-            createToken: 'Создать Token',
-            tokenCreated: 'Token создан',
-            tokenVisibleOnce: 'Значение Token показывается только один раз. Скопируйте и сохраните его сейчас.',
-            disableTokenConfirm:
-                'Отключить этот Token? После отключения skillctl, использующий этот Token, больше не сможет устанавливать Skills.',
-            deleteTokenConfirm: 'Удалить этот Token? Это действие нельзя отменить.',
             status: {
                 pending: 'Ожидает проверки',
                 approved: 'Одобрен',

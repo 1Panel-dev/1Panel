@@ -704,6 +704,9 @@ const message = {
             syncAgentsHelper: 'Actualiza openclaw.json para los agentes que usan esta cuenta de modelo',
             appVersion: 'Versión de la app',
             webuiPort: 'Puerto WebUI',
+            tokenOrAuth: 'Token/Usuario y contraseña',
+            dashboardUsername: 'Usuario del Dashboard',
+            dashboardPassword: 'Contraseña del Dashboard',
             allowedOrigins: 'Direcciones de acceso',
             allowedOriginsRequired: 'Introduce al menos una dirección de acceso',
             allowedOriginsInvalid: 'Usa el formato http(s)://host-o-ip[:puerto]',
@@ -864,8 +867,13 @@ const message = {
                 'Haga clic para iniciar la tarea de inicio de sesión por QR. El código QR aparecerá en el registro de tareas y el contenedor se reiniciará automáticamente después de completar el escaneo.',
             channelAutoRestartHelper:
                 'Al guardar, el contenedor se reiniciará automáticamente para que la configuración surta efecto.',
+            dashboardAuthAutoRebuildHelper:
+                'Al guardar el usuario o la contraseña del Dashboard, el contenedor se reconstruirá automáticamente para que los cambios surtan efecto.',
             channelDeleteConfirm: '¿Eliminar la configuración del canal {0}?',
             customProviderHelper: 'En el proveedor de modelo personalizado no se valida si la cuenta está disponible',
+            apiTypeBaseURLHelper: 'Este tipo envía solicitudes a {0}. Base URL recomendada: {1}',
+            apiTypeBaseURLMismatch:
+                'La Base URL actual parece una ruta {0}, pero está seleccionado {1}. URL recomendada: {2}',
         },
         model: {
             model: 'Modelo',
@@ -1040,6 +1048,9 @@ const message = {
             healthUnknown: 'Desconocido',
             validationModelMapEmpty: 'Los nombres del mapeo de modelos no pueden estar vacíos',
             validationModelMapDuplicate: 'El modelo solicitado {0} está duplicado',
+            validateAvailability: 'Validar disponibilidad de la cuenta',
+            validateAvailabilityHelper:
+                'Enviar un mensaje mínimo antes de guardar para validar la disponibilidad de la API',
             modelGroup: 'Grupo de modelos',
             availableModels: 'Modelos disponibles',
             modelGroupModels: 'Modelos solicitados',
@@ -1066,8 +1077,6 @@ const message = {
         },
         skillsHub: {
             title: 'Skills Hub',
-            skillList: 'Lista de Skills',
-            serverTab: 'Servidor',
             upload: 'Subir Skill',
             importSkill: 'Importar Skill',
             repositoryAddress: 'Dirección del repositorio',
@@ -1080,6 +1089,13 @@ const message = {
             importSuccess: 'Skill importado correctamente y en estado pendiente de revisión.',
             source: 'Fuente',
             applicableAgent: 'Agente aplicable',
+            overview: 'Resumen',
+            versionHistory: 'Historial de versiones',
+            publishedAt: 'Fecha de publicación',
+            versionMarker: 'Marcador',
+            currentVersion: 'Actual',
+            latestVersion: 'Última versión',
+            latestPublished: 'Última publicada',
             riskLevel: 'Nivel de riesgo',
             riskReferenceHint:
                 'El nivel de riesgo se genera automáticamente según el contenido del paquete Skill y es solo una referencia.\nBajo: sin riesgos evidentes\nMedio: scripts, dependencias, URL externas o variables de entorno\nAlto: ejecución remota, información sensible o comandos peligrosos',
@@ -1114,6 +1130,10 @@ const message = {
             onlySupportedArchive: 'Solo se pueden subir paquetes Skill .zip, .7z, .tar y .tar.gz',
             uploadSizeExceeded: 'Un paquete Skill no puede superar los 5 MB',
             uploadSuccess: 'Skill subido correctamente y en estado pendiente de revisión.',
+            versionAutoFillPlaceholder:
+                'Se detecta automáticamente desde el nombre del archivo cuando sea posible. Confirme o introdúzcalo manualmente',
+            metadataOverwriteConfirm:
+                'La versión del paquete Skill es diferente del valor introducido. ¿Usar el valor actual?',
             offlineNotice: 'El entorno actual está sin conexión. Solo se pueden instalar Skills desde la tienda local.',
             publishConfirm: '¿Publicar este Skill? Después se podrá instalar desde la tienda local de Skills.',
             disableConfirm: '¿Retirar este Skill? Los Skills ya instalados en agentes no se verán afectados.',
@@ -1126,24 +1146,6 @@ const message = {
             noInstallTarget: 'No hay agentes personalizados disponibles. Configure primero un destino de instalación.',
             postInstallConfirm:
                 'Este destino tiene un comando posterior a la instalación. Confirme que el comando es confiable antes de ejecutarlo.',
-            serverStatusTitle: 'Skills Hub Server',
-            serverServiceOperateConfirm: '¿Seguro que desea {0} el servidor Skills Hub?',
-            serverAccessSetting: 'Configuración de acceso al servicio',
-            serverInfo: 'Información del servidor',
-            tokenSetting: 'Configuración de Token',
-            externalUrl: 'URL externa',
-            externalUrlRequired: 'Introduzca primero la URL externa.',
-            skillctlDownloadUrl: 'URL de descarga de skillctl',
-            skillctlArchitecture: 'Arquitectura del servidor',
-            registryUrl: 'URL del Registry',
-            loginCommand: 'Comando de inicio de sesión',
-            installCommand: 'Comando de instalación',
-            createToken: 'Crear Token',
-            tokenCreated: 'Token creado',
-            tokenVisibleOnce: 'El token en texto claro solo se muestra una vez. Cópielo y guárdelo ahora.',
-            disableTokenConfirm:
-                '¿Desactivar este Token? Después de desactivarlo, skillctl que use este Token ya no podrá instalar Skills.',
-            deleteTokenConfirm: '¿Eliminar este Token? Esta acción no se puede deshacer.',
             status: {
                 pending: 'Pendiente',
                 approved: 'Aprobado',

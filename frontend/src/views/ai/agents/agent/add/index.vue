@@ -87,6 +87,23 @@
                         </template>
                     </el-input>
                 </el-form-item>
+                <template v-if="form.agentType === 'hermes-agent'">
+                    <el-form-item :label="$t('aiTools.agents.dashboardUsername')" prop="dashboardUsername">
+                        <el-input v-model="form.dashboardUsername" />
+                    </el-form-item>
+                    <el-form-item :label="$t('aiTools.agents.dashboardPassword')" prop="dashboardPassword">
+                        <el-input v-model="form.dashboardPassword" type="password" show-password>
+                            <template #append>
+                                <el-space>
+                                    <CopyButton :content="form.dashboardPassword" />
+                                    <el-button link type="primary" @click="generateDashboardPassword">
+                                        {{ $t('commons.button.random') }}
+                                    </el-button>
+                                </el-space>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                </template>
             </el-card>
             <el-card class="form-card">
                 <AdvancedSetting :form="form" />
@@ -152,6 +169,8 @@ const form = reactive({
     model: '',
     baseURL: '',
     token: '',
+    dashboardUsername: 'admin',
+    dashboardPassword: '',
     advanced: true,
     containerName: '',
     allowPort: true,
@@ -166,6 +185,22 @@ const form = reactive({
 });
 
 const showModelConfig = computed(() => form.agentType === 'openclaw' || form.agentType === 'hermes-agent');
+
+const generateDashboardPassword = () => {
+    form.dashboardPassword = getRandomStr(8);
+};
+
+const ensureHermesDashboardAuth = () => {
+    if (form.agentType !== 'hermes-agent') {
+        return;
+    }
+    if (!form.dashboardUsername) {
+        form.dashboardUsername = 'admin';
+    }
+    if (!form.dashboardPassword) {
+        generateDashboardPassword();
+    }
+};
 
 const setDefaultWebUIPort = () => {
     if (form.agentType === 'copaw') {
@@ -201,6 +236,8 @@ const rules = reactive({
     provider: [Rules.requiredSelect],
     accountId: [Rules.requiredSelect],
     model: [Rules.requiredInput],
+    dashboardUsername: [Rules.requiredInput],
+    dashboardPassword: [Rules.requiredInput],
     containerName: [Rules.containerName],
     restartPolicy: [Rules.requiredSelect],
     cpuQuota: [checkNumberRange(0, 99999)],
@@ -376,6 +413,7 @@ const handleAgentTypeChange = async () => {
     form.provider = '';
     form.accountId = undefined as unknown as number;
     form.baseURL = '';
+    ensureHermesDashboardAuth();
     if (form.agentType === 'openclaw') {
         await loadSystemIP();
         allowedOriginsAutoFilled.value = true;
@@ -451,6 +489,8 @@ const submit = async () => {
             model: showModelConfig.value ? form.model : undefined,
             accountId: showModelConfig.value ? form.accountId : undefined,
             token: form.agentType === 'openclaw' ? form.token : undefined,
+            dashboardUsername: form.agentType === 'hermes-agent' ? form.dashboardUsername : undefined,
+            dashboardPassword: form.agentType === 'hermes-agent' ? form.dashboardPassword : undefined,
             taskID: taskID,
             advanced: form.advanced,
             containerName: form.containerName,
@@ -481,6 +521,8 @@ const submit = async () => {
 const handleClose = () => {
     formRef.value?.resetFields();
     form.token = '';
+    form.dashboardUsername = 'admin';
+    form.dashboardPassword = '';
     form.remark = '';
     form.allowedOrigins = '';
     form.dockerCompose = '';
@@ -496,6 +538,7 @@ const openDrawer = async (agentType?: AI.AgentType) => {
     form.agentType = targetType;
     setDefaultWebUIPort();
     form.token = getRandomStr(32).toLowerCase();
+    ensureHermesDashboardAuth();
     if (form.agentType === 'copaw') {
         form.allowedOrigins = '';
         lastAutoAllowedOrigins.value = '';

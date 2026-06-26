@@ -174,7 +174,7 @@ const isSpecialEditorFileName = (value: string) => {
     if (!normalized) {
         return false;
     }
-    return specialEditorFileNames.some((filename) => normalized === filename || normalized.startsWith(`${filename}.`));
+    return specialEditorFileNames.some((filename) => normalized === filename);
 };
 
 export const resolveEditorLanguage = (path: string, extension = '', name = '') => {
