@@ -608,12 +608,6 @@ export namespace AI {
         createdAt: string;
     }
 
-    export interface AgentAccountVerifyReq {
-        provider: string;
-        apiKey: string;
-        baseURL: string;
-    }
-
     export interface AgentAccountDeleteReq {
         id: number;
     }
@@ -662,11 +656,6 @@ export namespace AI {
         domain?: string;
         connectionMode?: 'websocket' | 'webhook';
         bots: AgentFeishuBot[];
-    }
-
-    export interface AgentFeishuPairingApproveReq {
-        agentId: number;
-        pairingCode: string;
     }
 
     export interface AgentTelegramConfigReq {

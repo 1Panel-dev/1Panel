@@ -246,10 +246,6 @@ export const deleteAgentAccountModel = (req: AI.AgentAccountModelDeleteReq) => {
     return http.post(`/ai/accounts/models/delete`, req);
 };
 
-export const verifyAgentAccount = (req: AI.AgentAccountVerifyReq) => {
-    return http.post(`/ai/accounts/verify`, req);
-};
-
 export const deleteAgentAccount = (req: AI.AgentAccountDeleteReq) => {
     return http.post(`/ai/accounts/delete`, req);
 };

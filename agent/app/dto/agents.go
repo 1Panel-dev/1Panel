@@ -413,11 +413,6 @@ type AgentFeishuConfigUpdateReq struct {
 	Bots           []AgentFeishuBot `json:"bots" validate:"required,min=1"`
 }
 
-type AgentFeishuPairingApproveReq struct {
-	AgentID     uint   `json:"agentId" validate:"required"`
-	PairingCode string `json:"pairingCode" validate:"required"`
-}
-
 type AgentFeishuConfig struct {
 	Enabled        bool             `json:"enabled"`
 	ThreadSession  bool             `json:"threadSession"`

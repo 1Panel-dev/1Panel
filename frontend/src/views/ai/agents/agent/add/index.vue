@@ -186,20 +186,8 @@ const form = reactive({
 
 const showModelConfig = computed(() => form.agentType === 'openclaw' || form.agentType === 'hermes-agent');
 
-const dashboardPasswordLength = 8;
-
-const createDashboardPassword = () => {
-    for (let i = 0; i < 100; i++) {
-        const password = getRandomStr(dashboardPasswordLength);
-        if (/[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password)) {
-            return password;
-        }
-    }
-    return `Aa1${getRandomStr(dashboardPasswordLength - 3)}`;
-};
-
 const generateDashboardPassword = () => {
-    form.dashboardPassword = createDashboardPassword();
+    form.dashboardPassword = getRandomStr(8);
 };
 
 const ensureHermesDashboardAuth = () => {

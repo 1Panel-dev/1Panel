@@ -21,8 +21,6 @@ const hermesWorkspaceDir = "/opt/data/workspace"
 const hermesExecutablePath = "/opt/hermes/.venv/bin/hermes"
 const hermesDashboardUsernameEnvKey = "HERMES_DASHBOARD_USERNAME"
 const hermesDashboardPasswordEnvKey = "HERMES_DASHBOARD_PASSWORD"
-const defaultHermesDashboardUsername = "admin"
-const hermesDashboardPasswordLength = 8
 
 type hermesDashboardAuth struct {
 	Username string
@@ -125,42 +123,12 @@ func normalizeHermesDashboardAuth(username, password string) hermesDashboardAuth
 		Password: strings.TrimSpace(password),
 	}
 	if auth.Username == "" {
-		auth.Username = defaultHermesDashboardUsername
+		auth.Username = "admin"
 	}
 	if auth.Password == "" {
-		auth.Password = generateHermesDashboardPassword()
+		auth.Password = common.RandStr(8)
 	}
 	return auth
-}
-
-func generateHermesDashboardPassword() string {
-	for i := 0; i < 100; i++ {
-		value := common.RandStr(hermesDashboardPasswordLength)
-		if hermesDashboardPasswordValid(value) {
-			return value
-		}
-	}
-	return "Aa1" + common.RandStr(hermesDashboardPasswordLength-3)
-}
-
-func hermesDashboardPasswordValid(value string) bool {
-	if len(value) != hermesDashboardPasswordLength {
-		return false
-	}
-	var hasUpper, hasLower, hasDigit bool
-	for _, ch := range value {
-		switch {
-		case ch >= 'A' && ch <= 'Z':
-			hasUpper = true
-		case ch >= 'a' && ch <= 'z':
-			hasLower = true
-		case ch >= '0' && ch <= '9':
-			hasDigit = true
-		default:
-			return false
-		}
-	}
-	return hasUpper && hasLower && hasDigit
 }
 
 func writeHermesDashboardAuthEnv(envPath string, auth hermesDashboardAuth, overwrite bool) error {
@@ -679,24 +647,6 @@ func hermesManagedModelEnvKeys() []string {
 		appendKey(meta.EnvKey)
 	}
 	return result
-}
-
-func writeHermesEnv(envPath string, entries []hermesEnvEntry) error {
-	values := map[string]string{}
-	for _, entry := range entries {
-		if entry.Key == "" || entry.Value == "" {
-			continue
-		}
-		values[entry.Key] = entry.Value
-	}
-	order := make([]string, 0, len(entries))
-	for _, entry := range entries {
-		if entry.Key == "" {
-			continue
-		}
-		order = append(order, entry.Key)
-	}
-	return upsertAgentEnv(envPath, values, order, true)
 }
 
 func splitHermesEnvList(value string) []string {
