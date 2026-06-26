@@ -1086,6 +1086,13 @@ const message = {
             importSuccess: 'Skill başarıyla içe aktarıldı ve inceleme bekliyor.',
             source: 'Kaynak',
             applicableAgent: 'Uygulanabilir ajan',
+            overview: 'Genel bakış',
+            versionHistory: 'Sürüm geçmişi',
+            publishedAt: 'Yayınlanma zamanı',
+            versionMarker: 'İşaret',
+            currentVersion: 'Geçerli',
+            latestVersion: 'En son sürüm',
+            latestPublished: 'En son yayınlanan',
             riskLevel: 'Risk düzeyi',
             riskReferenceHint:
                 'Risk düzeyi Skill paketi içeriğinden otomatik oluşturulur ve yalnızca inceleme referansıdır.\nDüşük: belirgin risk yok\nOrta: script, bağımlılık, harici URL veya ortam değişkeni\nYüksek: uzak çalıştırma, hassas bilgi veya tehlikeli komut',
@@ -1120,6 +1127,8 @@ const message = {
             onlySupportedArchive: 'Yalnızca .zip, .7z, .tar ve .tar.gz Skill paketleri yüklenebilir',
             uploadSizeExceeded: 'Tek bir Skill paketi 5 MBı aşamaz',
             uploadSuccess: 'Skill başarıyla yüklendi ve inceleme bekliyor.',
+            versionAutoFillPlaceholder: 'Mümkünse dosya adından otomatik algılanır. Onaylayın veya manuel girin',
+            metadataOverwriteConfirm: 'Skill paketindeki sürüm mevcut girişten farklı. Mevcut giriş kullanılsın mı?',
             offlineNotice: 'Geçerli ortam çevrimdışı. Yalnızca yerel Skill Mağazasından Skill kurulabilir.',
             publishConfirm:
                 'Bu Skilli yayınlamak istiyor musunuz? Yayınlandıktan sonra yerel Skill Mağazasından kurulabilir.',

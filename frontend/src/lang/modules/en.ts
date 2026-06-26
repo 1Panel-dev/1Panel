@@ -1072,6 +1072,13 @@ const message = {
             importSuccess: 'Skill imported successfully and is now pending review.',
             source: 'Source',
             applicableAgent: 'Applicable Agent',
+            overview: 'Overview',
+            versionHistory: 'Version History',
+            publishedAt: 'Published At',
+            versionMarker: 'Marker',
+            currentVersion: 'Current',
+            latestVersion: 'Latest Version',
+            latestPublished: 'Latest Published',
             riskLevel: 'Risk Level',
             riskReferenceHint:
                 'The risk level is generated automatically from the Skill package content and is for review reference only.\nLow: no obvious risk found\nMedium: scripts, dependencies, external URLs, or environment variables\nHigh: remote execution, sensitive information, or dangerous commands',
@@ -1106,6 +1113,9 @@ const message = {
             onlySupportedArchive: 'Only .zip, .7z, .tar, and .tar.gz Skill packages can be uploaded',
             uploadSizeExceeded: 'A single skill package must not exceed 5 MB',
             uploadSuccess: 'Skill uploaded successfully and is now pending review.',
+            versionAutoFillPlaceholder: 'Auto-detected from filename when possible. Confirm or enter manually',
+            metadataOverwriteConfirm:
+                'The version in the Skill package differs from the current input. Use the current input instead?',
             offlineNotice: 'Current environment is offline. Only skills from the local Skill Store can be installed.',
             publishConfirm: 'Publish this skill? Published skills can be installed from the local Skill Store.',
             disableConfirm: 'Unpublish this skill? Skills already installed in agents will not be affected.',

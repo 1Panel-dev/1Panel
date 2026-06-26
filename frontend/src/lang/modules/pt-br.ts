@@ -1083,6 +1083,13 @@ const message = {
             importSuccess: 'Skill importada com sucesso e agora está pendente de revisão.',
             source: 'Fonte',
             applicableAgent: 'Agente aplicável',
+            overview: 'Visão geral',
+            versionHistory: 'Histórico de versões',
+            publishedAt: 'Publicado em',
+            versionMarker: 'Marcador',
+            currentVersion: 'Atual',
+            latestVersion: 'Versão mais recente',
+            latestPublished: 'Mais recente publicada',
             riskLevel: 'Nível de risco',
             riskReferenceHint:
                 'O nível de risco é gerado automaticamente a partir do conteúdo do pacote Skill e serve apenas como referência.\nBaixo: nenhum risco evidente\nMédio: scripts, dependências, URLs externas ou variáveis de ambiente\nAlto: execução remota, informações sensíveis ou comandos perigosos',
@@ -1117,6 +1124,9 @@ const message = {
             onlySupportedArchive: 'Só é possível enviar pacotes Skill .zip, .7z, .tar e .tar.gz',
             uploadSizeExceeded: 'Um pacote Skill não pode exceder 5 MB',
             uploadSuccess: 'Skill enviada com sucesso e agora está pendente de revisão.',
+            versionAutoFillPlaceholder:
+                'Detectado automaticamente pelo nome do arquivo quando possível. Confirme ou preencha manualmente',
+            metadataOverwriteConfirm: 'A versão no pacote Skill difere do valor atual. Usar o valor atual?',
             offlineNotice: 'O ambiente atual está offline. Apenas Skills da loja local podem ser instaladas.',
             publishConfirm: 'Publicar esta Skill? Depois disso, ela poderá ser instalada pela loja local de Skills.',
             disableConfirm: 'Despublicar esta Skill? Skills já instaladas em agentes não serão afetadas.',
