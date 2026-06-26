@@ -1,0 +1,73 @@
+<p align="center"><a href="https://1panel.pro"><img src="https://resource.1panel.pro/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
+
+<h3 align="center">پنل کنترل سرور مجازی متن‌باز با پشتیبانی بومی از عامل‌های هوش مصنوعی</h3>
+
+<p align="center">
+  مورد اعتماد <strong>بیش از ۲,۰۰۰,۰۰۰</strong> کاربر خودمیزبان در سراسر جهان
+</p>
+
+<p align="center">
+  <a href="https://trendshift.io/repositories/2462" target="_blank"><img src="https://trendshift.io/api/badge/repositories/2462" alt="1Panel-dev%2F1Panel | Trendshift" style="width: 240px; height: auto;" /></a>
+</p>
+
+<p align="center">
+  <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/1Panel-dev/1Panel?color=%231890FF" alt="مجوز: GPL v3"></a>
+  <a href="https://app.codacy.com/gh/1Panel-dev/1Panel"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
+  <a href="https://discord.gg/bUpUqWqdRr"><img src="https://img.shields.io/discord/1318846410149335080?logo=discord&labelColor=%20%235462eb&logoColor=%20%23f5f5f5&color=%20%235462eb" alt="Discord"></a>
+  <a href="https://github.com/1Panel-dev/1Panel/releases"><img src="https://img.shields.io/github/v/release/1Panel-dev/1Panel" alt="انتشار گیت‌هاب"></a>
+  <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="ستاره‌ها"></a>
+</p>
+
+<p align="center">
+  <a href="/README.md"><img alt="English" src="https://img.shields.io/badge/English-d9d9d9"></a>
+  <a href="/docs/README.zh-Hans.md"><img alt="中文(简体)" src="https://img.shields.io/badge/中文(简体)-d9d9d9"></a>
+  <a href="/docs/README.ja.md"><img alt="日本語" src="https://img.shields.io/badge/日本語-d9d9d9"></a>
+  <a href="/docs/README.pt-br.md"><img alt="Português (Brasil)" src="https://img.shields.io/badge/Português (Brasil)-d9d9d9"></a>
+  <a href="/docs/README.ar.md"><img alt="العربية" src="https://img.shields.io/badge/العربية-d9d9d9"></a>
+  <a href="/docs/README.de.md"><img alt="Deutsch" src="https://img.shields.io/badge/Deutsch-d9d9d9"></a>
+  <a href="/docs/README.es.md"><img alt="Español" src="https://img.shields.io/badge/Español-d9d9d9"></a>
+  <a href="/docs/README.fr.md"><img alt="français" src="https://img.shields.io/badge/français-d9d9d9"></a>
+  <a href="/docs/README.ko.md"><img alt="한국어" src="https://img.shields.io/badge/한국어-d9d9d9"></a>
+  <a href="/docs/README.id.md"><img alt="Bahasa Indonesia" src="https://img.shields.io/badge/Bahasa Indonesia-d9d9d9"></a>
+  <a href="/docs/README.zh-Hant.md"><img alt="中文(繁體)" src="https://img.shields.io/badge/中文(繁體)-d9d9d9"></a>
+  <a href="/docs/README.tr.md"><img alt="Türkçe" src="https://img.shields.io/badge/Türkçe-d9d9d9"></a>
+  <a href="/docs/README.ru.md"><img alt="Русский" src="https://img.shields.io/badge/Русский-d9d9d9"></a>
+  <a href="/docs/README.ms.md"><img alt="Bahasa Melayu" src="https://img.shields.io/badge/Bahasa Melayu-d9d9d9"></a>
+  <a href="/docs/README.fa.md"><img alt="Persian" src="https://img.shields.io/badge/%D9%81%D8%A7%D8%B1%D8%B3%DB%8C-d9d9d9"></a>
+</p>
+
+---
+
+## 1Panel چیست؟
+
+1Panel یک پنل کنترل سرور مجازی مدرن و متن‌باز است — و تنها پنلی که **پشتیبانی بومی از عامل‌های هوش مصنوعی** دارد. مدل‌های Ollama را اجرا کنید، عامل‌های شخصی OpenClaw را مستقر کنید و کل مجموعه سرور خود را از یک رابط وب تمیز مدیریت کنید. بدون نیاز به حفظ کردن دستورات CLI.
+
+👉 ویدیوی [معرفی ۲ دقیقه‌ای](https://www.youtube.com/watch?v=Jl_wqp-XA08) را تماشا کنید
+
+## چرا 1Panel؟
+
+| | 1Panel | cPanel / Plesk | aaPanel | Webmin |
+|--|--------|----------------|---------|--------|
+| رایگان و متن‌باز | ✅ | ❌ | جزئی | ✅ |
+| محیط اجرای بومی عامل هوش مصنوعی | ✅ | ❌ | ❌ | ❌ |
+| بازارچه برنامه‌های یک‌کلیکی | ✅ ۱۶۵+ برنامه | ❌ | ✅ | ❌ |
+| رابط کاربری مدرن (پس از ۲۰۲۰) | ✅ | ❌ | جزئی | ❌ |
+| مدیریت Docker / کانتینر | ✅ | ❌ | ❌ | ❌ |
+| توسعه فعال | ✅ | ✅ | ✅ | کند |
+
+## ویژگی‌های کلیدی
+
+- **محیط اجرای عامل هوش مصنوعی**: مدل‌های LLM Ollama را مستقر کنید، عامل‌های شخصی OpenClaw را راه‌اندازی کنید و مصرف GPU را نظارت کنید — همه از داخل داشبورد. بدون نیاز به مدیریت پشته هوش مصنوعی جداگانه.
+- **استقرار یک‌کلیکی وب‌سایت**: وب‌سایت‌های آماده تولید را با اتصال خودکار دامنه، تأمین گواهی SSL و پیکربندی Nginx راه‌اندازی کنید — بدون تنظیمات دستی.
+- **بازارچه برنامه**: ۱۶۵+ برنامه متن‌باز معتبر (Nextcloud، Bitwarden، Umami، NocoBase و موارد دیگر) که با یک کلیک نصب و به‌روزرسانی می‌شوند.
+- **مدیریت Docker و کانتینر**: کانتینرها، تصاویر، شبکه‌ها و حجم‌ها را از طریق رابط کاربری بصری ایجاد، شروع، متوقف و بررسی کنید — بدون نیاز به کار با CLI.
+- **امنیت از ابتدا**: قوانین دیواره آتش، fail2ban، ایزوله‌سازی کانتینر، WAF و لاگ‌های حسابرسی — از روز اول پیکربندی و فعال هستند.
+- **پشتیبان‌گیری و بازیابی**: پشتیبان‌گیری خودکار را به AWS S3، Cloudflare R2 یا ذخیره‌سازی محلی زمان‌بندی کنید. هر تصویر لحظه‌ای را با یک کلیک بازیابی کنید.
+
+## شروع سریع
+
+> **نیازمندی‌ها:** سرور مجازی لینوکس (Debian / Ubuntu / CentOS / Rocky)، ۱ گیگابایت رم، دسترسی به اینترنت.  
+> حدود ۶۰ ثانیه زمان می‌برد.
+
+```bash
+bash -c "$(curl -sSL https://resource.1panel.pro/v2/quick_start.sh)"

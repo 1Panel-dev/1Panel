@@ -217,6 +217,7 @@ Use [BCP 47](https://www.ietf.org/rfc/bcp/bcp47.txt) locale codes. Examples used
 | Turkish | `tr` |
 | Brazilian Portuguese | `pt-BR` |
 | Spanish (Spain) | `es-ES` |
+| Persian | `fa` |
 
 Use lowercase for simple codes (`ja`, `ko`) and the standard BCP 47 casing for regional variants (`pt-BR`, `es-ES`, `zh-Hant`).
 
