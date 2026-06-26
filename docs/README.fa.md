@@ -71,3 +71,46 @@
 
 ```bash
 bash -c "$(curl -sSL https://resource.1panel.pro/v2/quick_start.sh)"
+```
+
+پس از نصب، `http://<your-server-ip>:<port>/<security-path>` را در مرورگر خود باز کنید.  
+در صورت نیاز به دریافت اطلاعات ورود، دستور `1pctl user-info` را از طریق SSH اجرا کنید.
+
+## تصویر صفحه
+
+![رابط کاربری 1Panel](https://resource.1panel.pro/img/overview_en_v2.png)
+
+## نسخه حرفه‌ای
+
+1Panel OSS برای همیشه رایگان است. نسخه Pro ویژگی‌هایی را اضافه می‌کند که برای تیم‌ها و بارهای تولیدی طراحی شده‌اند:
+
+| ویژگی | OSS | Pro |
+|---------|:---:|:---:|
+| نصب یک‌کلیکی برنامه | ✅ | ✅ |
+| عامل‌های هوش مصنوعی (OpenClaw) | ۱ عامل | نامحدود |
+| WAF و امنیت پیشرفته | پایه | ✅ |
+| محافظت در برابر دستکاری وب‌سایت | ❌ | ✅ |
+| نظارت بر در دسترس بودن وب‌سایت | ❌ | ✅ |
+| مدیریت چند گره | ❌ | ✅ |
+| لوگو و تم سفارشی | ❌ | ✅ |
+| پشتیبانی اولویت‌دار | ❌ | ✅ |
+
+**از ۸۰ دلار در سال.** [مقایسه طرح‌ها و شروع دوره آزمایشی ۳۰ روزه رایگان →](https://1panel.pro/pricing)
+
+## تاریخچه ستاره
+
+[![نمودار تاریخچه ستاره](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)
+
+## انجمن و پشتیبانی
+
+- **Discord** — [به انجمن بپیوندید](https://discord.gg/bUpUqWqdRr) برای راهنمایی، درخواست ویژگی و نمایش و گفتگو
+- **مستندات** — [1panel.pro/docs](https://1panel.pro/docs)
+- **مشکلات** — [مشکلات گیت‌هاب](https://github.com/1Panel-dev/1Panel/issues) برای گزارش باگ
+
+## امنیت
+
+آسیب‌پذیری پیدا کردید؟ لطفاً قبل از افشا، [SECURITY.md](/SECURITY.md) را مطالعه کنید.
+
+## مجوز
+
+تحت مجوز [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html) مجوز دارد.
