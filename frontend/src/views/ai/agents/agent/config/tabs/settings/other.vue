@@ -45,12 +45,7 @@ import type { FormInstance } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { Rules } from '@/global/form-rules';
 import { AI } from '@/api/interface/ai';
-import {
-    getAgentHermesDashboardAuth,
-    getAgentOtherConfig,
-    updateAgentHermesDashboardAuth,
-    updateAgentOtherConfig,
-} from '@/api/modules/ai';
+import { getAgentOtherConfig, updateAgentOtherConfig } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 
 const { t } = useI18n();
@@ -61,7 +56,7 @@ const agentType = ref<AI.AgentType>('openclaw');
 const formRef = ref<FormInstance>();
 const defaultNPMRegistry = 'https://registry.npmjs.org/';
 
-const form = reactive<AI.AgentOtherConfig & { dashboardUsername: string; dashboardPassword: string }>({
+const form = reactive<AI.AgentOtherConfig>({
     userTimezone: '',
     browserEnabled: true,
     npmRegistry: defaultNPMRegistry,
@@ -102,10 +97,8 @@ const load = async (params: { agentId: number; agentType: AI.AgentType }) => {
     try {
         const res = await getAgentOtherConfig({ agentId: params.agentId });
         Object.assign(form, res.data || {});
-        if (params.agentType === 'hermes-agent') {
-            const authRes = await getAgentHermesDashboardAuth({ agentId: params.agentId });
-            form.dashboardUsername = authRes.data?.username || 'admin';
-            form.dashboardPassword = authRes.data?.password || '';
+        if (params.agentType === 'hermes-agent' && !form.dashboardUsername) {
+            form.dashboardUsername = 'admin';
         }
     } finally {
         loading.value = false;
@@ -124,14 +117,9 @@ const saveConfig = async () => {
             userTimezone: form.userTimezone,
             browserEnabled: form.browserEnabled,
             npmRegistry: agentType.value === 'openclaw' ? form.npmRegistry : defaultNPMRegistry,
+            dashboardUsername: agentType.value === 'hermes-agent' ? form.dashboardUsername : undefined,
+            dashboardPassword: agentType.value === 'hermes-agent' ? form.dashboardPassword : undefined,
         });
-        if (agentType.value === 'hermes-agent') {
-            await updateAgentHermesDashboardAuth({
-                agentId: agentId.value,
-                username: form.dashboardUsername,
-                password: form.dashboardPassword,
-            });
-        }
         MsgSuccess(t('aiTools.agents.saveSuccess'));
     } finally {
         saving.value = false;

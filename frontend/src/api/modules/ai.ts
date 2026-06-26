@@ -169,14 +169,6 @@ export const deleteAgentHermesChatSession = (req: AI.AgentHermesChatSessionDelet
     return http.post(`/ai/agents/hermes/chat/sessions/delete`, req);
 };
 
-export const getAgentHermesDashboardAuth = (req: AI.AgentHermesDashboardAuthReq) => {
-    return http.post<AI.AgentHermesDashboardAuth>(`/ai/agents/hermes/dashboard-auth/get`, req);
-};
-
-export const updateAgentHermesDashboardAuth = (req: AI.AgentHermesDashboardAuthUpdateReq) => {
-    return http.post(`/ai/agents/hermes/dashboard-auth/update`, req);
-};
-
 export const getAgentOverview = (req: AI.AgentOverviewReq) => {
     return http.post<AI.AgentOverview>(`/ai/agents/overview`, req, TimeoutEnum.T_5M);
 };

@@ -1,10 +1,8 @@
 package service
 
 import (
-	"crypto/rand"
 	"errors"
 	"fmt"
-	"math/big"
 	"path"
 	"strings"
 	"time"
@@ -15,9 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	agentenv "github.com/1Panel-dev/1Panel/agent/utils/env"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v3"
 )
 
@@ -138,37 +134,13 @@ func normalizeHermesDashboardAuth(username, password string) hermesDashboardAuth
 }
 
 func generateHermesDashboardPassword() string {
-	const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	const lower = "abcdefghijklmnopqrstuvwxyz"
-	const digits = "0123456789"
-	const all = upper + lower + digits
 	for i := 0; i < 100; i++ {
-		value := randomHermesDashboardString(all, hermesDashboardPasswordLength)
+		value := common.RandStr(hermesDashboardPasswordLength)
 		if hermesDashboardPasswordValid(value) {
 			return value
 		}
 	}
-	return randomHermesDashboardString(upper, 1) +
-		randomHermesDashboardString(lower, 1) +
-		randomHermesDashboardString(digits, 1) +
-		randomHermesDashboardString(all, hermesDashboardPasswordLength-3)
-}
-
-func randomHermesDashboardString(charset string, length int) string {
-	if length <= 0 || charset == "" {
-		return ""
-	}
-	result := make([]byte, length)
-	max := big.NewInt(int64(len(charset)))
-	for i := range result {
-		num, err := rand.Int(rand.Reader, max)
-		if err != nil {
-			result[i] = charset[i%len(charset)]
-			continue
-		}
-		result[i] = charset[num.Int64()]
-	}
-	return string(result)
+	return "Aa1" + common.RandStr(hermesDashboardPasswordLength-3)
 }
 
 func hermesDashboardPasswordValid(value string) bool {
@@ -192,24 +164,17 @@ func hermesDashboardPasswordValid(value string) bool {
 }
 
 func writeHermesDashboardAuthEnv(envPath string, auth hermesDashboardAuth, overwrite bool) error {
-	envMap, err := readHermesEnvMap(envPath)
-	if err != nil {
-		return err
-	}
-	if overwrite || strings.TrimSpace(envMap[hermesDashboardUsernameEnvKey]) == "" {
-		envMap[hermesDashboardUsernameEnvKey] = auth.Username
-	}
-	if overwrite || strings.TrimSpace(envMap[hermesDashboardPasswordEnvKey]) == "" {
-		envMap[hermesDashboardPasswordEnvKey] = auth.Password
-	}
-	return writeHermesEnvMap(envPath, envMap, []string{
+	return upsertAgentEnv(envPath, map[string]string{
+		hermesDashboardUsernameEnvKey: auth.Username,
+		hermesDashboardPasswordEnvKey: auth.Password,
+	}, []string{
 		hermesDashboardUsernameEnvKey,
 		hermesDashboardPasswordEnvKey,
-	})
+	}, overwrite)
 }
 
 func readHermesDashboardAuthEnv(envPath string) (hermesDashboardAuth, error) {
-	envMap, err := readHermesEnvMap(envPath)
+	envMap, err := readAgentEnvMap(envPath)
 	if err != nil {
 		return hermesDashboardAuth{}, err
 	}
@@ -224,25 +189,10 @@ func readHermesDashboardAuthFromInstall(appInstall *model.AppInstall) hermesDash
 		return hermesDashboardAuth{}
 	}
 	auth, err := readHermesDashboardAuthEnv(path.Join(appInstall.GetPath(), ".env"))
-	if err == nil && (auth.Username != "" || auth.Password != "") {
-		return auth
+	if err != nil {
+		return hermesDashboardAuth{}
 	}
-	envMap := readInstallEnv(appInstall.Env)
-	return hermesDashboardAuth{
-		Username: readHermesDashboardAuthEnvValue(envMap, hermesDashboardUsernameEnvKey),
-		Password: readHermesDashboardAuthEnvValue(envMap, hermesDashboardPasswordEnvKey),
-	}
-}
-
-func readHermesDashboardAuthEnvValue(envMap map[string]interface{}, key string) string {
-	if envMap == nil {
-		return ""
-	}
-	value, ok := envMap[key]
-	if !ok || value == nil {
-		return ""
-	}
-	return strings.TrimSpace(fmt.Sprint(value))
+	return auth
 }
 
 func readHermesConfig(configPath string) (*hermesConfig, error) {
@@ -285,7 +235,7 @@ func writeHermesConfigMap(configPath string, cfg map[string]interface{}) error {
 }
 
 func readHermesTelegramChannelConfig(confDir string) (*dto.AgentTelegramConfig, error) {
-	envMap, err := readHermesEnvMap(path.Join(confDir, ".env"))
+	envMap, err := readAgentEnvMap(path.Join(confDir, ".env"))
 	if err != nil {
 		return nil, err
 	}
@@ -342,7 +292,7 @@ func readHermesTelegramChannelConfig(confDir string) (*dto.AgentTelegramConfig, 
 
 func writeHermesTelegramChannelConfig(confDir string, config dto.AgentTelegramConfig) error {
 	envPath := path.Join(confDir, ".env")
-	envMap, err := readHermesEnvMap(envPath)
+	envMap, err := readAgentEnvMap(envPath)
 	if err != nil {
 		return err
 	}
@@ -362,7 +312,7 @@ func writeHermesTelegramChannelConfig(confDir string, config dto.AgentTelegramCo
 			envMap["TELEGRAM_ALLOWED_USERS"] = allow
 		}
 	}
-	if err := writeHermesEnvMap(envPath, envMap, []string{
+	if err := writeAgentEnvMap(envPath, envMap, []string{
 		"TELEGRAM_BOT_TOKEN",
 		"TELEGRAM_ALLOWED_USERS",
 		"TELEGRAM_ALLOW_ALL_USERS",
@@ -381,7 +331,7 @@ func writeHermesTelegramChannelConfig(confDir string, config dto.AgentTelegramCo
 }
 
 func readHermesDiscordChannelConfig(confDir string) (*dto.AgentDiscordConfig, error) {
-	envMap, err := readHermesEnvMap(path.Join(confDir, ".env"))
+	envMap, err := readAgentEnvMap(path.Join(confDir, ".env"))
 	if err != nil {
 		return nil, err
 	}
@@ -433,7 +383,7 @@ func readHermesDiscordChannelConfig(confDir string) (*dto.AgentDiscordConfig, er
 
 func writeHermesDiscordChannelConfig(confDir string, config dto.AgentDiscordConfig) error {
 	envPath := path.Join(confDir, ".env")
-	envMap, err := readHermesEnvMap(envPath)
+	envMap, err := readAgentEnvMap(envPath)
 	if err != nil {
 		return err
 	}
@@ -453,7 +403,7 @@ func writeHermesDiscordChannelConfig(confDir string, config dto.AgentDiscordConf
 			envMap["DISCORD_ALLOWED_USERS"] = allow
 		}
 	}
-	if err := writeHermesEnvMap(envPath, envMap, []string{
+	if err := writeAgentEnvMap(envPath, envMap, []string{
 		"DISCORD_BOT_TOKEN",
 		"DISCORD_ALLOWED_USERS",
 		"DISCORD_ALLOW_ALL_USERS",
@@ -473,14 +423,14 @@ func writeHermesDiscordChannelConfig(confDir string, config dto.AgentDiscordConf
 
 func deleteHermesEnvKeys(confDir string, keys ...string) error {
 	envPath := path.Join(confDir, ".env")
-	envMap, err := readHermesEnvMap(envPath)
+	envMap, err := readAgentEnvMap(envPath)
 	if err != nil {
 		return err
 	}
 	for _, key := range keys {
 		delete(envMap, key)
 	}
-	return writeHermesEnvMap(envPath, envMap, keys)
+	return writeAgentEnvMap(envPath, envMap, keys)
 }
 
 func deleteHermesConfigSections(confDir string, topLevelKeys []string, platformKeys []string) error {
@@ -665,7 +615,7 @@ func resolveHermesEnvEntries(account *model.AgentAccount) []hermesEnvEntry {
 }
 
 func writeHermesModelEnv(envPath string, account *model.AgentAccount) error {
-	envMap, err := readHermesEnvMap(envPath)
+	envMap, err := readAgentEnvMap(envPath)
 	if err != nil {
 		return err
 	}
@@ -681,7 +631,7 @@ func writeHermesModelEnv(envPath string, account *model.AgentAccount) error {
 		envMap[entry.Key] = entry.Value
 		order = append(order, entry.Key)
 	}
-	return writeHermesEnvMap(envPath, envMap, order)
+	return writeAgentEnvMap(envPath, envMap, order)
 }
 
 func hermesManagedModelEnvKeys() []string {
@@ -732,15 +682,12 @@ func hermesManagedModelEnvKeys() []string {
 }
 
 func writeHermesEnv(envPath string, entries []hermesEnvEntry) error {
-	envMap, err := readHermesEnvMap(envPath)
-	if err != nil {
-		return err
-	}
+	values := map[string]string{}
 	for _, entry := range entries {
 		if entry.Key == "" || entry.Value == "" {
 			continue
 		}
-		envMap[entry.Key] = entry.Value
+		values[entry.Key] = entry.Value
 	}
 	order := make([]string, 0, len(entries))
 	for _, entry := range entries {
@@ -749,26 +696,7 @@ func writeHermesEnv(envPath string, entries []hermesEnvEntry) error {
 		}
 		order = append(order, entry.Key)
 	}
-	return writeHermesEnvMap(envPath, envMap, order)
-}
-
-func readHermesEnvMap(envPath string) (map[string]string, error) {
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(envPath) {
-		return map[string]string{}, nil
-	}
-	envMap, err := godotenv.Read(envPath)
-	if err != nil {
-		return nil, err
-	}
-	return envMap, nil
-}
-
-func writeHermesEnvMap(envPath string, envMap map[string]string, order []string) error {
-	if len(envMap) == 0 {
-		return files.NewFileOp().SaveFile(envPath, "", 0600)
-	}
-	return agentenv.WriteWithOrder(envMap, envPath, order)
+	return upsertAgentEnv(envPath, values, order, true)
 }
 
 func splitHermesEnvList(value string) []string {

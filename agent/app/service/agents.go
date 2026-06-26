@@ -52,8 +52,6 @@ type IAgentService interface {
 	GetProviders() ([]dto.ProviderInfo, error)
 	GetSecurityConfig(req dto.AgentIDReq) (*dto.AgentSecurityConfig, error)
 	UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq) error
-	GetHermesDashboardAuth(req dto.AgentHermesDashboardAuthReq) (*dto.AgentHermesDashboardAuth, error)
-	UpdateHermesDashboardAuth(req dto.AgentHermesDashboardAuthUpdateReq) error
 	GetOtherConfig(req dto.AgentIDReq) (*dto.AgentOtherConfig, error)
 	UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 	GetConfigFile(req dto.AgentConfigFileReq) (*dto.AgentConfigFile, error)
@@ -1330,33 +1328,6 @@ func (a AgentService) UpdateSecurityConfig(req dto.AgentSecurityConfigUpdateReq)
 	return appInstallRepo.Save(context.Background(), install)
 }
 
-func (a AgentService) GetHermesDashboardAuth(req dto.AgentHermesDashboardAuthReq) (*dto.AgentHermesDashboardAuth, error) {
-	_, install, err := a.loadHermesAgentAndInstall(req.AgentID)
-	if err != nil {
-		return nil, err
-	}
-	auth := readHermesDashboardAuthFromInstall(install)
-	return &dto.AgentHermesDashboardAuth{
-		Username: auth.Username,
-		Password: auth.Password,
-	}, nil
-}
-
-func (a AgentService) UpdateHermesDashboardAuth(req dto.AgentHermesDashboardAuthUpdateReq) error {
-	_, install, err := a.loadHermesAgentAndInstall(req.AgentID)
-	if err != nil {
-		return err
-	}
-	auth := normalizeHermesDashboardAuth(req.Username, req.Password)
-	if err := writeHermesDashboardAuthEnv(path.Join(install.GetPath(), ".env"), auth, true); err != nil {
-		return err
-	}
-	return NewIAppInstalledService().Operate(request.AppInstalledOperate{
-		InstallId: install.ID,
-		Operate:   constant.Rebuild,
-	})
-}
-
 func (a AgentService) GetOtherConfig(req dto.AgentIDReq) (*dto.AgentOtherConfig, error) {
 	agent, install, err := a.loadAgentAndInstall(req.AgentID)
 	if err != nil {
@@ -1367,10 +1338,13 @@ func (a AgentService) GetOtherConfig(req dto.AgentIDReq) (*dto.AgentOtherConfig,
 		if err != nil {
 			return nil, err
 		}
+		auth := readHermesDashboardAuthFromInstall(install)
 		return &dto.AgentOtherConfig{
-			UserTimezone:   cfg.Timezone,
-			BrowserEnabled: true,
-			NPMRegistry:    "https://registry.npmjs.org/",
+			UserTimezone:      cfg.Timezone,
+			BrowserEnabled:    true,
+			NPMRegistry:       "https://registry.npmjs.org/",
+			DashboardUsername: auth.Username,
+			DashboardPassword: auth.Password,
 		}, nil
 	}
 	conf, err := readOpenclawConfig(agent.ConfigPath)
@@ -1395,12 +1369,21 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 		if err != nil {
 			return err
 		}
+		previousAuth := readHermesDashboardAuthFromInstall(install)
+		nextAuth := normalizeHermesDashboardAuth(req.DashboardUsername, req.DashboardPassword)
 		if err := writeHermesConfig(path.Dir(agent.ConfigPath), account, agent.Model, strings.TrimSpace(req.UserTimezone)); err != nil {
 			return err
 		}
+		if err := writeHermesDashboardAuthEnv(path.Join(install.GetPath(), ".env"), nextAuth, true); err != nil {
+			return err
+		}
+		operate := constant.Restart
+		if previousAuth.Username != nextAuth.Username || previousAuth.Password != nextAuth.Password {
+			operate = constant.Rebuild
+		}
 		return NewIAppInstalledService().Operate(request.AppInstalledOperate{
 			InstallId: install.ID,
-			Operate:   constant.Restart,
+			Operate:   operate,
 		})
 	}
 	if err := ensureContainerRunning(install.ContainerName); err != nil {
@@ -1513,17 +1496,6 @@ func (a AgentService) loadOpenclawAgentAndInstall(agentID uint) (*model.Agent, *
 		return nil, nil, err
 	}
 	if agent.AgentType != constant.AppOpenclaw {
-		return nil, nil, fmt.Errorf("%s does not support", agent.AgentType)
-	}
-	return agent, install, nil
-}
-
-func (a AgentService) loadHermesAgentAndInstall(agentID uint) (*model.Agent, *model.AppInstall, error) {
-	agent, install, err := a.loadAgentAndInstall(agentID)
-	if err != nil {
-		return nil, nil, err
-	}
-	if agent.AgentType != constant.AppHermesAgent {
 		return nil, nil, fmt.Errorf("%s does not support", agent.AgentType)
 	}
 	return agent, install, nil

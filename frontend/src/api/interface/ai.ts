@@ -420,21 +420,6 @@ export namespace AI {
         id: string;
     }
 
-    export interface AgentHermesDashboardAuth {
-        username: string;
-        password: string;
-    }
-
-    export interface AgentHermesDashboardAuthReq {
-        agentId: number;
-    }
-
-    export interface AgentHermesDashboardAuthUpdateReq {
-        agentId: number;
-        username: string;
-        password: string;
-    }
-
     export interface AgentOverviewReq {
         agentId: number;
     }
@@ -922,6 +907,8 @@ export namespace AI {
         userTimezone: string;
         browserEnabled: boolean;
         npmRegistry: string;
+        dashboardUsername: string;
+        dashboardPassword: string;
     }
 
     export interface AgentOtherConfigUpdateReq {
@@ -929,6 +916,8 @@ export namespace AI {
         userTimezone: string;
         browserEnabled: boolean;
         npmRegistry: string;
+        dashboardUsername?: string;
+        dashboardPassword?: string;
     }
 
     export interface AgentConfigFileReq {

@@ -153,21 +153,6 @@ type AgentTokenResetReq struct {
 	ID uint `json:"id" validate:"required"`
 }
 
-type AgentHermesDashboardAuth struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type AgentHermesDashboardAuthReq struct {
-	AgentID uint `json:"agentId" validate:"required"`
-}
-
-type AgentHermesDashboardAuthUpdateReq struct {
-	AgentID  uint   `json:"agentId" validate:"required"`
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
-}
-
 type AgentRemarkUpdateReq struct {
 	ID     uint   `json:"id" validate:"required"`
 	Remark string `json:"remark"`
@@ -681,16 +666,20 @@ type AgentSecurityConfig struct {
 }
 
 type AgentOtherConfigUpdateReq struct {
-	AgentID        uint   `json:"agentId" validate:"required"`
-	UserTimezone   string `json:"userTimezone" validate:"required"`
-	BrowserEnabled bool   `json:"browserEnabled"`
-	NPMRegistry    string `json:"npmRegistry" validate:"required"`
+	AgentID           uint   `json:"agentId" validate:"required"`
+	UserTimezone      string `json:"userTimezone" validate:"required"`
+	BrowserEnabled    bool   `json:"browserEnabled"`
+	NPMRegistry       string `json:"npmRegistry" validate:"required"`
+	DashboardUsername string `json:"dashboardUsername"`
+	DashboardPassword string `json:"dashboardPassword"`
 }
 
 type AgentOtherConfig struct {
-	UserTimezone   string `json:"userTimezone"`
-	BrowserEnabled bool   `json:"browserEnabled"`
-	NPMRegistry    string `json:"npmRegistry"`
+	UserTimezone      string `json:"userTimezone"`
+	BrowserEnabled    bool   `json:"browserEnabled"`
+	NPMRegistry       string `json:"npmRegistry"`
+	DashboardUsername string `json:"dashboardUsername"`
+	DashboardPassword string `json:"dashboardPassword"`
 }
 
 type AgentConfigFileReq struct {

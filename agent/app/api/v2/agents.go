@@ -380,47 +380,6 @@ func (b *BaseApi) DeleteHermesChatSession(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Get Hermes dashboard auth
-// @Accept json
-// @Param request body dto.AgentHermesDashboardAuthReq true "request"
-// @Success 200 {object} dto.AgentHermesDashboardAuth
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /ai/agents/hermes/dashboard-auth/get [post]
-func (b *BaseApi) GetHermesDashboardAuth(c *gin.Context) {
-	var req dto.AgentHermesDashboardAuthReq
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-	res, err := agentService.GetHermesDashboardAuth(req)
-	if err != nil {
-		helper.BadRequest(c, err)
-		return
-	}
-	helper.SuccessWithData(c, res)
-}
-
-// @Tags AI
-// @Summary Update Hermes dashboard auth
-// @Accept json
-// @Param request body dto.AgentHermesDashboardAuthUpdateReq true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /ai/agents/hermes/dashboard-auth/update [post]
-func (b *BaseApi) UpdateHermesDashboardAuth(c *gin.Context) {
-	var req dto.AgentHermesDashboardAuthUpdateReq
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-	if err := agentService.UpdateHermesDashboardAuth(req); err != nil {
-		helper.BadRequest(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags AI
 // @Summary Get model account providers
 // @Success 200 {array} dto.ProviderInfo
 // @Security ApiKeyAuth
