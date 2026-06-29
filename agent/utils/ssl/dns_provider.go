@@ -20,6 +20,8 @@ import (
 	"github.com/go-acme/lego/v5/providers/dns/freemyip"
 	"github.com/go-acme/lego/v5/providers/dns/godaddy"
 	"github.com/go-acme/lego/v5/providers/dns/huaweicloud"
+	"github.com/go-acme/lego/v5/providers/dns/ionos"
+	"github.com/go-acme/lego/v5/providers/dns/ionoscloud"
 	"github.com/go-acme/lego/v5/providers/dns/namecheap"
 	"github.com/go-acme/lego/v5/providers/dns/namedotcom"
 	"github.com/go-acme/lego/v5/providers/dns/namesilo"
@@ -37,34 +39,35 @@ import (
 )
 
 type DnsType string
-
 const (
+	AcmeDNS      DnsType = "AcmeDNS"
 	AliYun       DnsType = "AliYun"
 	AliESA       DnsType = "AliESA"
-	AWSRoute53   DnsType = "AWSRoute53"
-	CloudFlare   DnsType = "CloudFlare"
+	BaiduCloud   DnsType = "BaiduCloud"
 	CloudDns     DnsType = "CloudDns"
-	NameSilo     DnsType = "NameSilo"
+	CloudFlare   DnsType = "CloudFlare"
+	ClouDNS      DnsType = "ClouDNS"
+	Dynadot      DnsType = "Dynadot"
+	Dynu         DnsType = "Dynu"
+	FreeMyIP     DnsType = "FreeMyIP"
+	Godaddy      DnsType = "Godaddy"
+	HuaweiCloud  DnsType = "HuaweiCloud"
+	Ionos        DnsType = "Ionos"
+	IonosCloud   DnsType = "IonosCloud"
 	NameCheap    DnsType = "NameCheap"
 	NameCom      DnsType = "NameCom"
-	Godaddy      DnsType = "Godaddy"
-	TencentCloud DnsType = "TencentCloud"
-	RainYun      DnsType = "RainYun"
-	Volcengine   DnsType = "Volcengine"
-	HuaweiCloud  DnsType = "HuaweiCloud"
-	FreeMyIP     DnsType = "FreeMyIP"
-	Vercel       DnsType = "Vercel"
-	Spaceship    DnsType = "Spaceship"
-	WestCN       DnsType = "WestCN"
-	ClouDNS      DnsType = "ClouDNS"
-	RegRu        DnsType = "RegRu"
-	Dynu         DnsType = "Dynu"
-	Dynadot      DnsType = "Dynadot"
-	BaiduCloud   DnsType = "BaiduCloud"
+	NameSilo     DnsType = "NameSilo"
 	Ovh          DnsType = "Ovh"
-	AcmeDNS      DnsType = "AcmeDNS"
 	PorkBun      DnsType = "PorkBun"
+	RainYun      DnsType = "RainYun"
+	RegRu        DnsType = "RegRu"
+	AWSRoute53   DnsType = "AWSRoute53"
+	Spaceship    DnsType = "Spaceship"
 	Technitium   DnsType = "Technitium"
+	TencentCloud DnsType = "TencentCloud"
+	Vercel       DnsType = "Vercel"
+	Volcengine   DnsType = "Volcengine"
+	WestCN       DnsType = "WestCN"
 )
 
 type DNSParam struct {
@@ -76,6 +79,7 @@ type DNSParam struct {
 	APIkey       string `json:"apiKey"`
 	APIUser      string `json:"apiUser"`
 	APISecret    string `json:"apiSecret"`
+	APIPrefix    string `json:"apiPrefix"`
 	SecretID     string `json:"secretID"`
 	ClientID     string `json:"clientID"`
 	Password     string `json:"password"`
@@ -219,6 +223,20 @@ func getDNSProviderConfig(dnsType DnsType, params string, httpClient *http.Clien
 		config.PollingInterval = pollingInterval
 		config.TTL = int32(ttl)
 		p, err = huaweicloud.NewDNSProviderConfig(config)
+	case Ionos:
+		config := newDNSProviderConfig(ionos.NewDefaultConfig(), httpClient)
+		config.APIKey = param.APIPrefix + "." + param.APISecret
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = ionos.NewDNSProviderConfig(config)
+	case IonosCloud:
+		config := newDNSProviderConfig(ionoscloud.NewDefaultConfig(), httpClient)
+		config.APIToken = param.Token
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = ionoscloud.NewDNSProviderConfig(config)
 	case FreeMyIP:
 		config := newDNSProviderConfig(freemyip.NewDefaultConfig(), httpClient)
 		config.Token = param.Token

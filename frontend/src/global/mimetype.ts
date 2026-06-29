@@ -285,6 +285,14 @@ export const DNSTypes = [
         label: 'Technitium',
         value: 'Technitium',
     },
+    {
+        label: 'Ionos',
+        value: 'Ionos',
+    },
+    {
+        label: 'Ionos Cloud',
+        value: 'IonosCloud',
+    },
 ];
 
 export const Fields = [

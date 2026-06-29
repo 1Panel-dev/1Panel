@@ -110,9 +110,17 @@
                             <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>
                     </div>
-                    <div v-if="account.type === 'FreeMyIP' || account.type === 'Vercel'">
+                    <div v-if="account.type === 'FreeMyIP' || account.type === 'Vercel' || account.type === 'IonosCloud'">
                         <el-form-item label="Token" prop="authorization.token">
                             <el-input v-model.trim="account.authorization['token']"></el-input>
+                        </el-form-item>
+                    </div>
+                    <div v-if="account.type === 'Ionos'">
+                        <el-form-item label="API Prefix" prop="authorization.apiPrefix">
+                            <el-input v-model.trim="account.authorization['apiPrefix']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="API Secret" prop="authorization.apiSecret">
+                            <el-input v-model.trim="account.authorization['apiSecret']"></el-input>
                         </el-form-item>
                     </div>
                     <div v-if="account.type === 'ClouDNS'">
@@ -232,6 +240,7 @@ const rules = ref<any>({
         apiUser: [Rules.requiredInput],
         secretID: [Rules.requiredInput],
         apiSecret: [Rules.requiredInput],
+        apiPrefix: [Rules.requiredInput],
         username: [Rules.requiredInput],
         password: [Rules.requiredInput],
     },
