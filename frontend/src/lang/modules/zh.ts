@@ -1653,6 +1653,7 @@ const message = {
         cutWebsiteLog: '切割网站日志',
         cutWebsiteLogHelper: '切割的日志文件会备份到 1Panel 的 backup 目录下',
         syncIpGroup: '同步 WAF IP 组',
+        syncIpGroupHelper: '同步 WAF 黑白名单中的远程 IP 组',
 
         requestExpirationTime: '上传请求过期时间（小时）',
         unitHours: '单位：小时',

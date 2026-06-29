@@ -1742,6 +1742,7 @@ const message = {
         cutWebsiteLog: 'ウェブサイトのログローテーション',
         cutWebsiteLogHelper: '回転したログファイルは、1パネルのバックアップディレクトリにバックアップされます。',
         syncIpGroup: 'WAF IP グループを同期',
+        syncIpGroupHelper: 'WAF のブラック/ホワイトリストで使用するリモート IP グループを同期します',
         requestExpirationTime: 'リクエストの有効期限（時間）のアップロード',
         unitHours: 'ユニット:時間',
         alertTitle: '計画タスク -  {0}「{1}」タスク障害アラート',
