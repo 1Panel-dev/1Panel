@@ -1767,6 +1767,7 @@ const message = {
         cutWebsiteLog: 'Website log döndürme',
         cutWebsiteLogHelper: 'Döndürülen log dosyaları 1Panel yedek dizinine yedeklenecektir.',
         syncIpGroup: 'WAF IP gruplarını senkronize et',
+        syncIpGroupHelper: 'WAF kara/beyaz listelerinde kullanılan uzak IP gruplarını senkronize eder',
         requestExpirationTime: 'Yükleme isteği son kullanma süresi(Saat)',
         unitHours: 'Birim: Saat',
         alertTitle: 'Planlanmış Görev - {0} 「{1}」 Görev Başarısızlık Uyarısı',

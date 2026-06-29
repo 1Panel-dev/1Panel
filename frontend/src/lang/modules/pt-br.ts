@@ -1763,6 +1763,7 @@ const message = {
         cutWebsiteLog: 'Rotação de log do site',
         cutWebsiteLogHelper: 'Os arquivos de log rotacionados serão salvos no diretório de backup do 1Panel.',
         syncIpGroup: 'Sincronizar grupos de IP do WAF',
+        syncIpGroupHelper: 'Sincroniza grupos de IP remotos usados nas listas negra/branca do WAF',
         requestExpirationTime: 'Tempo de expiração da solicitação de upload (Horas)',
         unitHours: 'Unidade: Horas',
         alertTitle: 'Tarefa Planejada - {0} 「{1}」 Alerta de Falha na Tarefa',

@@ -64,6 +64,12 @@
                                         {{ $t('firewall.quickJump') }}
                                     </el-link>
                                 </span>
+                                <span class="input-help logText" v-if="form.type === 'syncIpGroup'">
+                                    {{ $t('cronjob.syncIpGroupHelper') }}
+                                    <el-link class="link" icon="Position" @click="goWafIpGroup" type="primary">
+                                        {{ $t('firewall.quickJump') }}
+                                    </el-link>
+                                </span>
                             </el-form-item>
                             <el-row :gutter="20">
                                 <LayoutCol>
@@ -1147,6 +1153,11 @@ const search = async () => {
 
 const goRouter = async (path: string) => {
     routerToPath(path);
+};
+
+const goWafIpGroup = async () => {
+    localStorage.setItem('black-white-tab', '3');
+    routerToPath('/xpack/waf/blackwhite');
 };
 
 const containerOptions = ref([]);

@@ -1,6 +1,8 @@
 package router
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"io"
 	"net/http"
 	"os"
@@ -145,6 +147,13 @@ func setStaticResource(rootRouter *gin.RouterGroup) {
 		data, err := web.Static.ReadFile(filePath)
 		if err != nil {
 			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		sum := sha256.Sum256(data)
+		etag := `"` + hex.EncodeToString(sum[:]) + `"`
+		c.Writer.Header().Set("ETag", etag)
+		if c.GetHeader("If-None-Match") == etag {
+			c.AbortWithStatus(http.StatusNotModified)
 			return
 		}
 		c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")

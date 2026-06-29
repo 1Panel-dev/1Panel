@@ -1765,6 +1765,7 @@ const message = {
         cutWebsiteLog: 'Putaran log laman web',
         cutWebsiteLogHelper: 'Fail log yang diputar akan disandarkan ke direktori sandaran 1Panel.',
         syncIpGroup: 'Segerakkan kumpulan IP WAF',
+        syncIpGroupHelper: 'Segerakkan kumpulan IP jauh yang digunakan dalam senarai hitam/putih WAF',
         requestExpirationTime: 'Waktu luput permintaan muat naik (Jam)',
         unitHours: 'Unit: Jam',
         alertTitle: 'Tugas Terancang - {0} 「{1}」 Amaran Kegagalan Tugas',

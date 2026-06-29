@@ -1743,6 +1743,7 @@ const message = {
         cutWebsiteLog: 'Website log rotation',
         cutWebsiteLogHelper: 'The rotated log files will be backed up to the backup directory of 1Panel.',
         syncIpGroup: 'Sync WAF IP groups',
+        syncIpGroupHelper: 'Sync remote IP groups used in WAF allowlists and blocklists',
         requestExpirationTime: 'Upload request expiration time(Hours)',
         unitHours: 'Unit: Hours',
         alertTitle: 'Planned Task - {0} 「{1}」 Task Failure Alert',

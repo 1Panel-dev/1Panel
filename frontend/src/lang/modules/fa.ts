@@ -1736,6 +1736,7 @@ const message = {
         cutWebsiteLog: 'چرخش لاگ وب‌سایت',
         cutWebsiteLogHelper: 'فایل‌های لاگ چرخش یافته به دایرکتوری پشتیبان 1Panel پشتیبان‌گیری می‌شوند.',
         syncIpGroup: 'همگام‌سازی گروه‌های IP WAF',
+        syncIpGroupHelper: 'گروه‌های IP راه دور استفاده‌شده در فهرست‌های سیاه/سفید WAF را همگام‌سازی می‌کند',
         requestExpirationTime: 'زمان انقضای درخواست بارگذاری (ساعت)',
         unitHours: 'واحد: ساعت',
         alertTitle: 'وظیفه زمان‌بندی - {0} «{1}» هشدار شکست وظیفه',
