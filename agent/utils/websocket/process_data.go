@@ -342,7 +342,7 @@ func loadLoginctlSSHSessions(ctx context.Context, config SSHSessionConfig) ([]ss
 			continue
 		}
 		sessionOutput, err := exec.CommandContext(ctx, "loginctl", "show-session", fields[0], "--no-pager",
-			"-p", "Name", "-p", "Remote", "-p", "RemoteHost", "-p", "TTY", "-p", "Timestamp", "-p", "Leader", "-p", "Service").Output()
+			"-p", "Name", "-p", "Remote", "-p", "RemoteHost", "-p", "TTY", "-p", "Timestamp", "-p", "Leader", "-p", "Service", "-p", "State").Output()
 		if err != nil {
 			continue
 		}
@@ -370,7 +370,7 @@ func parseLoginctlSSHSession(output string) (sshSession, bool) {
 		}
 	}
 	service := props["Service"]
-	if props["Remote"] != "yes" || props["Name"] == "" || props["RemoteHost"] == "" || (service != "sshd" && service != "ssh") {
+	if props["Remote"] != "yes" || props["Name"] == "" || props["RemoteHost"] == "" || props["State"] != "active" || (service != "sshd" && service != "ssh") {
 		return sshSession{}, false
 	}
 	pid, _ := strconv.ParseInt(props["Leader"], 10, 32)
