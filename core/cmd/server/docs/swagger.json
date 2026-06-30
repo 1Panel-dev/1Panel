@@ -70,6 +70,7 @@
 						"description": "OK",
 						"schema": {
 							"additionalProperties": {
+								"format": "int64",
 								"type": "integer"
 							},
 							"type": "object"
@@ -28513,6 +28514,12 @@
 				"cpuQuota": {
 					"type": "number"
 				},
+				"dashboardPassword": {
+					"type": "string"
+				},
+				"dashboardUsername": {
+					"type": "string"
+				},
 				"dockerCompose": {
 					"type": "string"
 				},
@@ -28885,6 +28892,12 @@
 				},
 				"cpuQuota": {
 					"type": "number"
+				},
+				"dashboardPassword": {
+					"type": "string"
+				},
+				"dashboardUsername": {
+					"type": "string"
 				},
 				"dockerCompose": {
 					"type": "string"
@@ -29460,6 +29473,12 @@
 				"createdAt": {
 					"type": "string"
 				},
+				"dashboardPassword": {
+					"type": "string"
+				},
+				"dashboardUsername": {
+					"type": "string"
+				},
 				"id": {
 					"type": "integer"
 				},
@@ -29561,6 +29580,12 @@
 				"browserEnabled": {
 					"type": "boolean"
 				},
+				"dashboardPassword": {
+					"type": "string"
+				},
+				"dashboardUsername": {
+					"type": "string"
+				},
 				"npmRegistry": {
 					"type": "string"
 				},
@@ -29577,6 +29602,12 @@
 				},
 				"browserEnabled": {
 					"type": "boolean"
+				},
+				"dashboardPassword": {
+					"type": "string"
+				},
+				"dashboardUsername": {
+					"type": "string"
 				},
 				"npmRegistry": {
 					"type": "string"
@@ -34631,6 +34662,9 @@
 				"es-es": {
 					"type": "string"
 				},
+				"fa": {
+					"type": "string"
+				},
 				"ja": {
 					"type": "string"
 				},
@@ -34688,7 +34722,8 @@
 						"ms",
 						"pt-BR",
 						"tr",
-						"es-ES"
+						"es-ES",
+						"fa"
 					],
 					"type": "string"
 				},
@@ -42974,6 +43009,9 @@
 					"type": "string"
 				},
 				"pushNode": {
+					"type": "boolean"
+				},
+				"sync": {
 					"type": "boolean"
 				},
 				"taskID": {

@@ -2099,6 +2099,7 @@ const message = {
             roles: 'Rol',
             auth: 'Autenticación de inicio de sesión',
             alert: 'Notificaciones de alerta',
+            sync: 'Sincronización de Recursos',
         },
         websiteLog: 'Logs de sitio web',
         runLog: 'Logs de ejecución',

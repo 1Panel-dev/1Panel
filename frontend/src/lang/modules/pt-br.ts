@@ -2209,6 +2209,7 @@ const message = {
             roles: 'Função',
             auth: 'Autenticação de login',
             alert: 'Notificações de alerta',
+            sync: 'Sincronização de Recursos',
         },
         websiteLog: 'Logs do website',
         runLog: 'Logs de execução',

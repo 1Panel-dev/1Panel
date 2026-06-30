@@ -2025,6 +2025,7 @@ const message = {
             roles: '역할',
             auth: '로그인 인증',
             alert: '경고 알림',
+            sync: '리소스 동기화',
         },
         websiteLog: '웹사이트 로그',
         runLog: '실행 로그',

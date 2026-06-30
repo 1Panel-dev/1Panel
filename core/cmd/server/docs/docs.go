@@ -74,6 +74,7 @@ const docTemplate = `{
 						"description": "OK",
 						"schema": {
 							"additionalProperties": {
+								"format": "int64",
 								"type": "integer"
 							},
 							"type": "object"
@@ -28517,6 +28518,12 @@ const docTemplate = `{
 				"cpuQuota": {
 					"type": "number"
 				},
+				"dashboardPassword": {
+					"type": "string"
+				},
+				"dashboardUsername": {
+					"type": "string"
+				},
 				"dockerCompose": {
 					"type": "string"
 				},
@@ -28889,6 +28896,12 @@ const docTemplate = `{
 				},
 				"cpuQuota": {
 					"type": "number"
+				},
+				"dashboardPassword": {
+					"type": "string"
+				},
+				"dashboardUsername": {
+					"type": "string"
 				},
 				"dockerCompose": {
 					"type": "string"
@@ -29464,6 +29477,12 @@ const docTemplate = `{
 				"createdAt": {
 					"type": "string"
 				},
+				"dashboardPassword": {
+					"type": "string"
+				},
+				"dashboardUsername": {
+					"type": "string"
+				},
 				"id": {
 					"type": "integer"
 				},
@@ -29565,6 +29584,12 @@ const docTemplate = `{
 				"browserEnabled": {
 					"type": "boolean"
 				},
+				"dashboardPassword": {
+					"type": "string"
+				},
+				"dashboardUsername": {
+					"type": "string"
+				},
 				"npmRegistry": {
 					"type": "string"
 				},
@@ -29581,6 +29606,12 @@ const docTemplate = `{
 				},
 				"browserEnabled": {
 					"type": "boolean"
+				},
+				"dashboardPassword": {
+					"type": "string"
+				},
+				"dashboardUsername": {
+					"type": "string"
 				},
 				"npmRegistry": {
 					"type": "string"
@@ -34635,6 +34666,9 @@ const docTemplate = `{
 				"es-es": {
 					"type": "string"
 				},
+				"fa": {
+					"type": "string"
+				},
 				"ja": {
 					"type": "string"
 				},
@@ -34692,7 +34726,8 @@ const docTemplate = `{
 						"ms",
 						"pt-BR",
 						"tr",
-						"es-ES"
+						"es-ES",
+						"fa"
 					],
 					"type": "string"
 				},
@@ -42978,6 +43013,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"pushNode": {
+					"type": "boolean"
+				},
+				"sync": {
 					"type": "boolean"
 				},
 				"taskID": {
