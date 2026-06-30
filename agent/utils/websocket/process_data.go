@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -250,8 +252,14 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
+	result = loadLoginctlSSHSessions(ctx, config)
+	if len(result) > 0 {
+		res, err = json.Marshal(result)
+		return
+	}
+
 	users, err = host.UsersWithContext(ctx)
-	if err != nil {
+	if err != nil || len(users) == 0 {
 		res, err = json.Marshal(result)
 		return
 	}
@@ -286,12 +294,12 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 		if name != "sshd" || proc.Pid == 0 {
 			continue
 		}
-		connections, _ := proc.Connections()
+		connections, _ := proc.ConnectionsWithContext(ctx)
 		if len(connections) == 0 {
 			continue
 		}
 
-		cmdline, cmdErr := proc.Cmdline()
+		cmdline, cmdErr := proc.CmdlineWithContext(ctx)
 		if cmdErr != nil {
 			continue
 		}
@@ -318,6 +326,78 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 	}
 	res, err = json.Marshal(result)
 	return
+}
+
+func loadLoginctlSSHSessions(ctx context.Context, config SSHSessionConfig) []sshSession {
+	if _, err := exec.LookPath("loginctl"); err != nil {
+		return nil
+	}
+	output, err := exec.CommandContext(ctx, "loginctl", "list-sessions", "--no-legend", "--no-pager").Output()
+	if err != nil {
+		return nil
+	}
+	var result []sshSession
+	for _, line := range strings.Split(string(output), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) == 0 {
+			continue
+		}
+		sessionOutput, err := exec.CommandContext(ctx, "loginctl", "show-session", fields[0], "--no-pager",
+			"-p", "Name", "-p", "Remote", "-p", "RemoteHost", "-p", "TTY", "-p", "Timestamp", "-p", "Leader", "-p", "Service").Output()
+		if err != nil {
+			continue
+		}
+		session, ok := parseLoginctlSSHSession(string(sessionOutput))
+		if !ok {
+			continue
+		}
+		if config.LoginUser != "" && !strings.Contains(session.Username, config.LoginUser) {
+			continue
+		}
+		if config.LoginIP != "" && !strings.Contains(session.Host, config.LoginIP) {
+			continue
+		}
+		result = append(result, session)
+	}
+	return result
+}
+
+func parseLoginctlSSHSession(output string) (sshSession, bool) {
+	props := map[string]string{}
+	for _, line := range strings.Split(output, "\n") {
+		key, value, ok := strings.Cut(line, "=")
+		if ok {
+			props[key] = strings.TrimSpace(value)
+		}
+	}
+	service := props["Service"]
+	if props["Remote"] != "yes" || props["Name"] == "" || props["RemoteHost"] == "" || (service != "sshd" && service != "ssh") {
+		return sshSession{}, false
+	}
+	pid, _ := strconv.ParseInt(props["Leader"], 10, 32)
+	return sshSession{
+		Username:  props["Name"],
+		Host:      props["RemoteHost"],
+		Terminal:  props["TTY"],
+		PID:       int32(pid),
+		LoginTime: parseLoginctlTimestamp(props["Timestamp"]),
+	}, true
+}
+
+func parseLoginctlTimestamp(value string) string {
+	fields := strings.Fields(value)
+	for i := 0; i < len(fields)-1; i++ {
+		if strings.Count(fields[i], "-") != 2 || strings.Count(fields[i+1], ":") != 2 {
+			continue
+		}
+		candidate := fields[i] + " " + fields[i+1]
+		t, err := time.ParseInLocation("2006-01-02 15:04:05", candidate, time.Local)
+		if err != nil {
+			return candidate
+		}
+		return t.Format("2006-1-2 15:04:05")
+	}
+	return value
 }
 
 func getNetConnections(config NetConfig) (res []byte, err error) {
