@@ -1,8 +1,11 @@
 package auth
 
 import (
+	"crypto/hmac"
 	"crypto/md5"
+	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"net"
 	"strconv"
 	"strings"
@@ -10,6 +13,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
@@ -42,6 +46,11 @@ func APIAuthMiddleware(loadConfig APIAuthConfigLoader, onSuccess APIAuthSuccessH
 
 		config, err := loadConfig(c)
 		if err != nil {
+			var bizErr buserr.BusinessError
+			if errors.As(err, &bizErr) && strings.HasPrefix(bizErr.Msg, "ErrApiConfig") {
+				helper.BadAuth(c, bizErr.Msg, bizErr.Err)
+				return
+			}
 			helper.InternalServer(c, err)
 			return
 		}
@@ -93,7 +102,7 @@ func LoadAPIAuthConfig(_ *gin.Context) (APIAuthConfig, error) {
 	return config, nil
 }
 
-func isValid1PanelTimestamp(panelTimestamp string, apiKeyValidityTime int) bool {
+func IsValid1PanelTimestamp(panelTimestamp string, apiKeyValidityTime int) bool {
 	apiTime := apiKeyValidityTime
 	if apiTime < 0 {
 		return false
@@ -115,11 +124,31 @@ func isValid1PanelTimestamp(panelTimestamp string, apiKeyValidityTime int) bool 
 	return nowTime-panelTime <= int64(apiTime)*60+tolerance
 }
 
-func isValid1PanelToken(panelToken string, panelTimestamp string, apiKey string) bool {
+func IsValid1PanelToken(panelToken string, panelTimestamp string, apiKey string) bool {
+	return IsValid1PanelTokenWithVersion(panelToken, panelTimestamp, apiKey, "")
+}
+
+func IsValid1PanelTokenWithVersion(panelToken string, panelTimestamp string, apiKey string, signatureVersion string) bool {
+	version := strings.ToLower(strings.TrimSpace(signatureVersion))
+	switch version {
+	case "v1", "md5":
+		return isValidMD5Token(panelToken, panelTimestamp, apiKey)
+	case "hmac-sha256":
+		return isValidHMACSHA256Token(panelToken, panelTimestamp, apiKey)
+	default:
+		return isValidMD5Token(panelToken, panelTimestamp, apiKey) || isValidHMACSHA256Token(panelToken, panelTimestamp, apiKey)
+	}
+}
+
+func isValidMD5Token(panelToken string, panelTimestamp string, apiKey string) bool {
 	return panelToken == GenerateMD5("1panel"+apiKey+panelTimestamp)
 }
 
-func isIPInWhiteList(clientIP string, ipWhiteString string) bool {
+func isValidHMACSHA256Token(panelToken string, panelTimestamp string, apiKey string) bool {
+	return panelToken == GenerateHMACSHA256(apiKey, "1panel:"+panelTimestamp)
+}
+
+func IsIPInWhiteList(clientIP string, ipWhiteString string) bool {
 	if strings.TrimSpace(ipWhiteString) == "" {
 		global.LOG.Error("IP whitelist is empty")
 		return false
@@ -158,8 +187,26 @@ func isIPInWhiteList(clientIP string, ipWhiteString string) bool {
 	return false
 }
 
+func isValid1PanelTimestamp(panelTimestamp string, apiKeyValidityTime int) bool {
+	return IsValid1PanelTimestamp(panelTimestamp, apiKeyValidityTime)
+}
+
+func isValid1PanelToken(panelToken string, panelTimestamp string, apiKey string) bool {
+	return IsValid1PanelToken(panelToken, panelTimestamp, apiKey)
+}
+
+func isIPInWhiteList(clientIP string, ipWhiteString string) bool {
+	return IsIPInWhiteList(clientIP, ipWhiteString)
+}
+
 func GenerateMD5(param string) string {
 	hash := md5.New()
 	hash.Write([]byte(param))
 	return hex.EncodeToString(hash.Sum(nil))
+}
+
+func GenerateHMACSHA256(secret string, message string) string {
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write([]byte(message))
+	return hex.EncodeToString(mac.Sum(nil))
 }

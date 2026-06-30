@@ -93,8 +93,8 @@
                 </el-form-item>
             </el-form>
 
-            <el-form v-if="isAdmin" label-position="top" :model="form" class="setting-section">
-                <el-form-item v-if="isAdmin">
+            <el-form label-position="top" :model="form" class="setting-section">
+                <el-form-item>
                     <template #label>
                         <span class="label-with-help">
                             {{ $t('setting.apiInterface') }}
@@ -394,7 +394,7 @@ const props = defineProps<{ currentUser?: Login.AuthInfo }>();
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const complexityVerification = ref(false);
-const { globalStore, docsUrl, entrance, isAdmin, isFxplay } = useGlobalStore();
+const { globalStore, docsUrl, entrance, isFxplay } = useGlobalStore();
 const router = useRouter();
 const open = ref(false);
 const loading = ref(false);
