@@ -27,10 +27,7 @@
                     {{ $t('commons.table.group') }}
                 </el-button>
                 <el-button v-permission type="primary" plain @click="openDefault" :disabled="disabledConfig">
-                    {{ $t('website.defaultServer') }}
-                </el-button>
-                <el-button v-permission type="primary" plain @click="openDefaultHtml" :disabled="disabledConfig">
-                    {{ $t('website.defaultHtml') }}
+                    {{ $t('website.advancedSettings') }}
                 </el-button>
             </template>
             <template v-if="!openNginxConfig && nginxIsExist" #rightToolBar>
@@ -298,7 +295,6 @@
         <DefaultServer ref="defaultRef" />
         <GroupDialog @search="listGroup" ref="groupRef" />
         <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
-        <DefaultHtml ref="defaultHtmlRef" />
         <TaskLog ref="taskLogRef" @close="search" />
         <OpDialog ref="opRef" @search="openTaskLog" />
         <BatchSetGroup ref="batchSetGroupRef" @close="search" />
@@ -310,7 +306,6 @@
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import DefaultServer from '@/views/website/website/default/index.vue';
-import DefaultHtml from '@/views/website/website/html/index.vue';
 import CreateWebSite from '@/views/website/website/create/index.vue';
 import DeleteWebsite from '@/views/website/website/delete/index.vue';
 import NginxConfig from '@/views/website/website/nginx/index.vue';
@@ -362,7 +357,6 @@ const maskShow = ref(false);
 const createRef = ref();
 const deleteRef = ref();
 const groupRef = ref();
-const defaultHtmlRef = ref();
 const openNginxConfig = ref(false);
 const nginxIsExist = ref(false);
 const containerName = ref('');
@@ -620,10 +614,6 @@ const openGroup = () => {
 
 const openDefault = () => {
     defaultRef.value.acceptParams();
-};
-
-const openDefaultHtml = () => {
-    defaultHtmlRef.value.acceptParams();
 };
 
 const checkExist = (data: App.CheckInstalled) => {
