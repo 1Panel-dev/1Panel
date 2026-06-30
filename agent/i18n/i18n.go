@@ -22,6 +22,7 @@ var langFiles = map[string]string{
 	"ru":      "lang/ru.yaml",
 	"ms":      "lang/ms.yaml",
 	"ko":      "lang/ko.yaml",
+	"lo":      "lang/lo.yaml",
 	"tr":      "lang/tr.yaml",
 	"es-ES":   "lang/es-ES.yaml",
 	"fa":   "lang/fa.yaml",
