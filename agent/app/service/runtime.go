@@ -185,7 +185,6 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		if !fileOp.Stat(create.CodeDir) {
 			return nil, buserr.New("ErrPathNotFound")
 		}
-		create.Install = true
 		for _, export := range create.ExposedPorts {
 			hostPorts = append(hostPorts, strconv.Itoa(export.HostPort))
 			if err := checkPortExistWithProtocol(export.HostPort, export.Protocol); err != nil {
@@ -696,7 +695,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		Version: req.Version,
 		Remark:  req.Remark,
 		NodeConfig: request.NodeConfig{
-			Install:      true,
+			Install:      req.Install,
 			ExposedPorts: req.ExposedPorts,
 			Environments: req.Environments,
 			Volumes:      req.Volumes,

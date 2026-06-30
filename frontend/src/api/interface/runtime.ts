@@ -61,6 +61,7 @@ export namespace Runtime {
         codeDir?: string;
         port?: number;
         taskID?: string;
+        install?: boolean;
         exposedPorts?: ExposedPort[];
         environments?: Environment[];
         volumes?: Volume[];
@@ -99,6 +100,7 @@ export namespace Runtime {
         appID?: number;
         version?: string;
         rebuild?: boolean;
+        install?: boolean;
     }
 
     export interface RuntimeDelete {

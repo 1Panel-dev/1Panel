@@ -68,6 +68,10 @@ func handleRuntime(create request.RuntimeCreate, runtime *model.Runtime, fileOp 
 	return
 }
 
+func runtimeNodeShouldInstallDependencies(create request.RuntimeCreate) bool {
+	return create.NodeConfig.Install == nil || *create.NodeConfig.Install
+}
+
 func isPathInsideOrEqual(baseDir, targetDir string) bool {
 	baseAbs := resolveRuntimePath(baseDir)
 	targetAbs := resolveRuntimePath(targetDir)
@@ -502,7 +506,7 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 	case constant.RuntimeNode:
 		create.Params["CODE_DIR"] = create.CodeDir
 		create.Params["NODE_VERSION"] = create.Version
-		if create.NodeConfig.Install {
+		if runtimeNodeShouldInstallDependencies(create) {
 			create.Params["RUN_INSTALL"] = "1"
 		} else {
 			create.Params["RUN_INSTALL"] = "0"
