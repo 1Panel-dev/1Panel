@@ -252,8 +252,7 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
-	result = loadLoginctlSSHSessions(ctx, config)
-	if len(result) > 0 {
+	if result, ok := loadLoginctlSSHSessions(ctx, config); ok {
 		res, err = json.Marshal(result)
 		return
 	}
@@ -328,13 +327,13 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 	return
 }
 
-func loadLoginctlSSHSessions(ctx context.Context, config SSHSessionConfig) []sshSession {
+func loadLoginctlSSHSessions(ctx context.Context, config SSHSessionConfig) ([]sshSession, bool) {
 	if _, err := exec.LookPath("loginctl"); err != nil {
-		return nil
+		return nil, false
 	}
 	output, err := exec.CommandContext(ctx, "loginctl", "list-sessions", "--no-legend", "--no-pager").Output()
 	if err != nil {
-		return nil
+		return nil, false
 	}
 	var result []sshSession
 	for _, line := range strings.Split(string(output), "\n") {
@@ -359,7 +358,7 @@ func loadLoginctlSSHSessions(ctx context.Context, config SSHSessionConfig) []ssh
 		}
 		result = append(result, session)
 	}
-	return result
+	return result, true
 }
 
 func parseLoginctlSSHSession(output string) (sshSession, bool) {
