@@ -28,7 +28,7 @@ type RuntimeCreate struct {
 }
 
 type NodeConfig struct {
-	Install      bool          `json:"install"`
+	Install      *bool         `json:"install"`
 	Clean        bool          `json:"clean"`
 	ExposedPorts []ExposedPort `json:"exposedPorts"`
 	Environments []Environment `json:"environments"`

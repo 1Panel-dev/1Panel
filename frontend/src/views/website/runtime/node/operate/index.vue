@@ -33,6 +33,9 @@
                     <el-option v-if="hasPnpm" label="pnpm" value="pnpm"></el-option>
                 </el-select>
             </el-form-item>
+            <el-form-item :label="$t('commons.button.install') + ' node_modules'" prop="install">
+                <el-switch v-model="runtime.install" />
+            </el-form-item>
             <el-form-item :label="$t('runtime.imageSource')" prop="source">
                 <el-select v-model="runtime.source" filterable allow-create default-first-option>
                     <el-option
@@ -98,6 +101,7 @@ const initData = (type: string) => ({
     type: type,
     resource: 'appstore',
     rebuild: false,
+    install: true,
     codeDir: '/',
     port: 4004,
     source: 'https://registry.npmjs.org/',
@@ -233,6 +237,7 @@ const getRuntime = async (id: number) => {
             codeDir: data.codeDir,
             port: data.port,
             remark: data.remark,
+            install: data.params['RUN_INSTALL'] !== '0',
         });
         runtime.exposedPorts = data.exposedPorts || [];
         runtime.environments = data.environments || [];
