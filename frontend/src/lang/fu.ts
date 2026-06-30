@@ -57,6 +57,20 @@ const fuLocales: Record<string, FuLocaleMessage> = {
             },
         },
     },
+    lo: {
+        fu: {
+            table: {
+                more: 'ເບິ່ງຕື່ມ',
+                custom_table_rows: 'ກຳນົດແຖວຕາຕະລາງເອງ',
+            },
+            steps: {
+                cancel: 'ຍົກເລີກ',
+                prev: 'ກ່ອນໜ້າ',
+                next: 'ຕໍ່ໄປ',
+                finish: 'ສຳເລັດ',
+            },
+        },
+    },    
     ms: {
         fu: {
             table: {
