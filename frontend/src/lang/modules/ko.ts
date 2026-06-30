@@ -5431,9 +5431,9 @@ const message = {
             imageBatchDesc: '먼저 원본 노드와 원본 이미지를 선택한 후 대상 노드를 선택하여 전달합니다.',
             imageBatchConfirmPrefix: '{0}개의 이미지를 {1}개 노드로 전달합니다. 총 {2}개의 작업이 생성됩니다.',
 
-            cert: '인증서 동기화',
-            certBatchDesc: '원본 노드를 선택한 후 지정된 인증서를 현재 패널 환경으로 동기화할 수 있습니다.',
-            certBatchConfirmPrefix: '{0}개의 인증서를 {1}개 노드로 동기화합니다. 총 {2}개의 작업이 생성됩니다.',
+            ssl: '인증서 동기화',
+            sslBatchDesc: '원본 노드를 선택한 후 지정된 인증서를 현재 패널 환경으로 동기화할 수 있습니다.',
+            sslBatchConfirmPrefix: '{0}개의 인증서를 {1}개 노드로 동기화합니다. 총 {2}개의 작업이 생성됩니다.',
 
             app: '애플리케이션 전송',
             appBatchDesc:

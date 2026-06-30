@@ -1715,6 +1715,8 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 		}
 
 		resourceKeys := getAppInstallResourceKeys(installed.ID)
+		envMap := make(map[string]interface{})
+		_ = json.Unmarshal([]byte(installed.Env), &envMap)
 		installDTO := response.AppInstallDTO{
 			ID:          installed.ID,
 			Name:        installed.Name,
@@ -1741,6 +1743,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 			Container:    installed.ContainerName,
 			ServiceName:  strings.ToLower(installed.ServiceName),
 			ResourceKeys: resourceKeys,
+			Env:          envMap,
 		}
 
 		if !updated && !checkUpdate {

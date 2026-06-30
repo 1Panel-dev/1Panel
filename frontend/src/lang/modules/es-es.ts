@@ -5575,10 +5575,10 @@ const message = {
                 'Seleccione primero el nodo de origen y las imágenes de origen, luego elija los nodos de destino para reenviar.',
             imageBatchConfirmPrefix: 'Se enviarán {0} imágenes a {1} nodos, creando {2} tareas.',
 
-            cert: 'Sincronización de certificados',
-            certBatchDesc:
+            ssl: 'Sincronización de certificados',
+            sslBatchDesc:
                 'Después de seleccionar el nodo de origen, los certificados especificados pueden sincronizarse con el entorno actual del panel.',
-            certBatchConfirmPrefix: 'Se sincronizarán {0} certificados a {1} nodos, creando {2} tareas.',
+            sslBatchConfirmPrefix: 'Se sincronizarán {0} certificados a {1} nodos, creando {2} tareas.',
 
             app: 'Transferencia de Aplicaciones',
             appBatchDesc:

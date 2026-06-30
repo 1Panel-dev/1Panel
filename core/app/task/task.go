@@ -65,6 +65,7 @@ const (
 	TaskScopeSystem     = "System"
 	TaskScopeScript     = "ScriptLibrary"
 	TaskScopeNodeFile   = "NodeFile"
+	TaskScopeNodeSSL    = "NodeSSL"
 	TaskScopeAppBackup  = "AppBackup"
 	TaskScopeCluster    = "Cluster"
 	TaskScopeAppInstall = "AppInstallTask"

@@ -181,7 +181,7 @@ export namespace App {
         message: string;
         httpPort: number;
         container: string;
-        env: { [key: string]: string };
+        env: { [key: string]: any };
         appKey: string;
     }
 
@@ -209,6 +209,7 @@ export namespace App {
         app: App.AppDetail;
         linkDB: boolean;
         resourceKeys?: string[];
+        env?: { [key: string]: any };
     }
 
     export interface AppInstalledOption {

@@ -5767,10 +5767,10 @@ const message = {
                 'Selecione primeiro o nó de origem e as imagens de origem e, em seguida, escolha os nós de destino para encaminhamento.',
             imageBatchConfirmPrefix: 'Serão encaminhadas {0} imagens para {1} nós, totalizando {2} tarefas.',
 
-            cert: 'Sincronização de Certificados',
-            certBatchDesc:
+            ssl: 'Sincronização de Certificados',
+            sslBatchDesc:
                 'Após selecionar o nó de origem, os certificados especificados podem ser sincronizados com o ambiente atual do painel.',
-            certBatchConfirmPrefix: 'Serão sincronizados {0} certificados para {1} nós, totalizando {2} tarefas.',
+            sslBatchConfirmPrefix: 'Serão sincronizados {0} certificados para {1} nós, totalizando {2} tarefas.',
 
             app: 'Transferência de Aplicativos',
             appBatchDesc:

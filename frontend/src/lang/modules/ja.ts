@@ -5546,9 +5546,9 @@ const message = {
             imageBatchConfirmPrefix:
                 '{0} 個のイメージを {1} 個のノードへ転送します。合計 {2} 件のタスクが作成されます。',
 
-            cert: '証明書同期',
-            certBatchDesc: 'ソースノードを選択すると、指定した証明書を現在のパネル環境へ同期できます。',
-            certBatchConfirmPrefix: '{0} 件の証明書を {1} 個のノードへ同期します。合計 {2} 件のタスクが作成されます。',
+            ssl: '証明書同期',
+            sslBatchDesc: 'ソースノードを選択すると、指定した証明書を現在のパネル環境へ同期できます。',
+            sslBatchConfirmPrefix: '{0} 件の証明書を {1} 個のノードへ同期します。合計 {2} 件のタスクが作成されます。',
 
             app: 'アプリ転送',
             appBatchDesc:

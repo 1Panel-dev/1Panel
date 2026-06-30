@@ -974,6 +974,10 @@ func (w WebsiteSSLService) PushToNode(req request.WebsiteSSLPush) error {
 	websiteSSL.PushNode = pushNode
 	websiteSSL.Nodes = nodes
 
+	if req.Sync {
+		return xpack.MultiNodeProvider.PushSSLToNode(websiteSSL)
+	}
+
 	pushTask, err := task.NewTaskWithOps(websiteSSL.PrimaryDomain, task.TaskPush, task.TaskScopeWebsite, req.TaskID, websiteSSL.ID)
 	if err != nil {
 		return err
