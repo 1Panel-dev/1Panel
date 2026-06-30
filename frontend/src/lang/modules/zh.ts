@@ -1933,6 +1933,7 @@ const message = {
             roles: '角色',
             auth: '登陆认证',
             alert: '告警通知',
+            sync: '资源同步',
         },
         websiteLog: '网站日志',
         runLog: '运行日志',

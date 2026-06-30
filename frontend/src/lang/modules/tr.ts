@@ -2091,6 +2091,7 @@ const message = {
             roles: 'Rol',
             auth: 'Giriş kimlik doğrulaması',
             alert: 'Uyarı bildirimleri',
+            sync: 'Kaynak Senkronizasyonu',
         },
         websiteLog: 'Website logları',
         runLog: 'Çalıştırma logları',

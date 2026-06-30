@@ -1395,13 +1395,14 @@
 	"/core/enterprise/skills-hub/import": {
 		"bodyKeys": [
 			"type",
+			"version",
 			"repoURL",
 			"packageURL"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "导入 Skills Hub 技能 [type]",
-		"formatEN": "import Skills Hub skill [type]"
+		"formatZH": "导入 Skills Hub 技能版本 [version]",
+		"formatEN": "import Skills Hub skill version [version]"
 	},
 	"/core/enterprise/skills-hub/status": {
 		"bodyKeys": [
@@ -1505,11 +1506,13 @@
 		"formatEN": "update Skills Hub install target [name]"
 	},
 	"/core/enterprise/skills-hub/upload": {
-		"bodyKeys": [],
+		"bodyKeys": [
+			"version"
+		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "上传 Skills Hub 技能包",
-		"formatEN": "upload Skills Hub package"
+		"formatZH": "上传 Skills Hub 技能包版本 [version]",
+		"formatEN": "upload Skills Hub package version [version]"
 	},
 	"/core/enterprise/users": {
 		"bodyKeys": [
@@ -1519,6 +1522,25 @@
 		"beforeFunctions": [],
 		"formatZH": "添加用户 [name]",
 		"formatEN": "add user [name]"
+	},
+	"/core/enterprise/users/api/update": {
+		"bodyKeys": [
+			"id",
+			"ipWhiteList"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "users",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "更新用户 [name] API 接口配置 =\u003e IP 白名单: [ipWhiteList]",
+		"formatEN": "update user [name] api config =\u003e IP White List: [ipWhiteList]"
 	},
 	"/core/enterprise/users/del": {
 		"bodyKeys": [
@@ -1890,6 +1912,20 @@
 		"formatZH": "交换文件 [sourcePath] 到 [targetPath]",
 		"formatEN": "exchange file [sourcePath] to [targetPath]"
 	},
+	"/core/xpack/exchange/image": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步节点镜像",
+		"formatEN": "sync images"
+	},
+	"/core/xpack/exchange/ssl": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步节点 SSL 证书",
+		"formatEN": "sync SSL certificates"
+	},
 	"/core/xpack/nodes": {
 		"bodyKeys": [
 			"name"
@@ -2227,15 +2263,11 @@
 		"formatEN": "update xpack setting [key]"
 	},
 	"/core/xpack/sync/app": {
-		"bodyKeys": [
-			"sourceNode",
-			"targetNodes",
-			"appInstallID"
-		],
+		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "同步应用 [appInstallID] 到节点 [targetNodes]",
-		"formatEN": "sync app [appInstallID] to nodes [targetNodes]"
+		"formatZH": "同步节点应用",
+		"formatEN": "sync app"
 	},
 	"/core/xpack/sync/ssl": {
 		"bodyKeys": [
@@ -2385,41 +2417,12 @@
 		"formatZH": "更新应用镜像前缀 [imagePrefix]",
 		"formatEN": "update app image prefix [imagePrefix]"
 	},
-	"/custom/app/install": {
-		"bodyKeys": [
-			"name",
-			"appKey"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "从节点安装应用 [name]",
-		"formatEN": "install app [name] from node"
-	},
-	"/custom/app/install/check": {
-		"bodyKeys": [
-			"name",
-			"appKey"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "检查应用安装 [name]",
-		"formatEN": "check app install [name]"
-	},
 	"/custom/app/sync": {
 		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
 		"formatZH": "同步自定义应用商店",
 		"formatEN": "sync custom app store"
-	},
-	"/custom/app/sync/backup": {
-		"bodyKeys": [
-			"appInstallID"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建应用同步备份 [appInstallID]",
-		"formatEN": "create app sync backup [appInstallID]"
 	},
 	"/dashboard/app/launcher/show": {
 		"bodyKeys": [

@@ -2093,6 +2093,7 @@ const message = {
             roles: 'Peranan',
             auth: 'Pengesahan log masuk',
             alert: 'Pemberitahuan amaran',
+            sync: 'Penyegerakan Sumber',
         },
         websiteLog: 'Log Laman Web',
         runLog: 'Log Jalankan',

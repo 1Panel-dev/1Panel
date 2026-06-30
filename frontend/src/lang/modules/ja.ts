@@ -2067,6 +2067,7 @@ const message = {
             roles: 'ロール',
             auth: 'ログイン認証',
             alert: 'アラート通知',
+            sync: 'リソース同期',
         },
         websiteLog: 'ウェブサイトログ',
         runLog: 'ログを実行します',

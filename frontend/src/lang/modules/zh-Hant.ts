@@ -1936,6 +1936,7 @@ const message = {
             roles: '角色',
             auth: '登入認證',
             alert: '告警通知',
+            sync: '資源同步',
         },
         websiteLog: '網站日誌',
         runLog: '執行日誌',

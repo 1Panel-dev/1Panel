@@ -2056,6 +2056,7 @@ const message = {
             roles: 'Role',
             auth: 'Login Authentication',
             alert: 'Alert Notifications',
+            sync: 'Resource Sync',
         },
         websiteLog: 'Website logs',
         runLog: 'Run logs',

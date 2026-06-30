@@ -2045,6 +2045,7 @@ const message = {
             roles: 'نقش',
             auth: 'احراز هویت ورود',
             alert: 'هشدارها',
+            sync: 'همگام‌سازی منابع',
         },
         websiteLog: 'لاگ وب‌سایت',
         runLog: 'لاگ اجرا',
