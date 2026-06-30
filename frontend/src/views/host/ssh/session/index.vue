@@ -134,6 +134,8 @@ const stop = async (PID: number) => {
         .then(async () => {
             try {
                 await stopProcess({ PID: PID });
+                data.value = data.value.filter((item: any) => item.PID !== PID);
+                search();
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             } catch (error) {
                 MsgError(error);
