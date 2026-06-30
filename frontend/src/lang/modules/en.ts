@@ -5527,10 +5527,10 @@ const message = {
             imageBatchDesc: 'Select a source node and image first, then batch-transfer to multiple target nodes.',
             imageBatchConfirmPrefix: 'About to transfer {0} images to {1} nodes, for a total of {2} tasks.',
 
-            cert: 'Certificate Sync',
-            certBatchDesc:
+            ssl: 'Certificate Sync',
+            sslBatchDesc:
                 'After selecting a source node, sync the specified certificate into the current panel environment.',
-            certBatchConfirmPrefix: 'About to sync {0} certificates to {1} nodes, for a total of {2} tasks.',
+            sslBatchConfirmPrefix: 'About to sync {0} certificates to {1} nodes, for a total of {2} tasks.',
 
             app: 'Application Transfer',
             appBatchDesc:

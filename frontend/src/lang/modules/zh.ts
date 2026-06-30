@@ -5140,9 +5140,9 @@ const message = {
             imageBatchDesc: '先选择源节点和源镜像，再批量选择目标节点进行转发。',
             imageBatchConfirmPrefix: '即将把 {0} 张镜像转发到 {1} 个节点，共 {2} 个任务。',
 
-            cert: '证书同步',
-            certBatchDesc: '选择源节点后，可将指定证书同步到当前面板环境。',
-            certBatchConfirmPrefix: '即将把 {0} 张证书同步到 {1} 个节点，共 {2} 个任务。',
+            ssl: '证书同步',
+            sslBatchDesc: '选择源节点后，可将指定证书同步到当前面板环境。',
+            sslBatchConfirmPrefix: '即将把 {0} 张证书同步到 {1} 个节点，共 {2} 个任务。',
 
             app: '应用对传',
             appBatchDesc: '选择源节点、单个应用和目标节点后，确认资源依赖并执行应用对传任务。',

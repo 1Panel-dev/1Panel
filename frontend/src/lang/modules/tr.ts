@@ -5608,10 +5608,10 @@ const message = {
             imageBatchDesc: 'Önce kaynak düğümü ve kaynak imajları seçin, ardından iletim için hedef düğümleri seçin.',
             imageBatchConfirmPrefix: '{0} imaj {1} düğüme aktarılacak, toplam {2} görev oluşturulacak.',
 
-            cert: 'Sertifika Senkronizasyonu',
-            certBatchDesc:
+            ssl: 'Sertifika Senkronizasyonu',
+            sslBatchDesc:
                 'Kaynak düğüm seçildikten sonra belirtilen sertifikalar mevcut panel ortamına senkronize edilebilir.',
-            certBatchConfirmPrefix: '{0} sertifika {1} düğüme senkronize edilecek, toplam {2} görev oluşturulacak.',
+            sslBatchConfirmPrefix: '{0} sertifika {1} düğüme senkronize edilecek, toplam {2} görev oluşturulacak.',
 
             app: 'Uygulama Aktarımı',
             appBatchDesc:

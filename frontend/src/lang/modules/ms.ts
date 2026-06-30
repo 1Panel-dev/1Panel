@@ -5618,10 +5618,10 @@ const message = {
                 'Pilih nod sumber dan imej sumber terlebih dahulu, kemudian pilih nod sasaran untuk pemindahan.',
             imageBatchConfirmPrefix: 'Akan memindahkan {0} imej ke {1} nod, dengan jumlah {2} tugasan.',
 
-            cert: 'Penyegerakan Sijil',
-            certBatchDesc:
+            ssl: 'Penyegerakan Sijil',
+            sslBatchDesc:
                 'Selepas memilih nod sumber, sijil yang ditentukan boleh disegerakkan ke persekitaran panel semasa.',
-            certBatchConfirmPrefix: 'Akan menyegerakkan {0} sijil ke {1} nod, dengan jumlah {2} tugasan.',
+            sslBatchConfirmPrefix: 'Akan menyegerakkan {0} sijil ke {1} nod, dengan jumlah {2} tugasan.',
 
             app: 'Pemindahan Aplikasi',
             appBatchDesc:

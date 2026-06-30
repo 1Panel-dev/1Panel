@@ -1880,15 +1880,15 @@
 	},
 	"/core/xpack/exchange/file": {
 		"bodyKeys": [
-			"source",
-			"dest",
+			"sourceNode",
+			"targetNode",
 			"sourcePath",
-			"destPath"
+			"targetPath"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "交换文件 [sourcePath] 到 [destPath]",
-		"formatEN": "exchange file [sourcePath] to [destPath]"
+		"formatZH": "交换文件 [sourcePath] 到 [targetPath]",
+		"formatEN": "exchange file [sourcePath] to [targetPath]"
 	},
 	"/core/xpack/nodes": {
 		"bodyKeys": [

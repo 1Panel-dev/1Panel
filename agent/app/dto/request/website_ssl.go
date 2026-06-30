@@ -135,6 +135,7 @@ type WebsiteSSLPush struct {
 	PushNode bool   `json:"pushNode"`
 	Nodes    string `json:"nodes"`
 	TaskID   string `json:"taskID" validate:"required"`
+	Sync     bool   `json:"sync"`
 }
 
 type WebsiteCASearch struct {

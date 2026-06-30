@@ -5151,9 +5151,9 @@ const message = {
             imageBatchDesc: '先選擇來源節點和來源映像，再批次選擇目標節點進行轉發。',
             imageBatchConfirmPrefix: '即將把 {0} 張映像轉發到 {1} 個節點，共 {2} 個任務。',
 
-            cert: '證書同步',
-            certBatchDesc: '選擇來源節點後，可將指定證書同步到目前面板環境。',
-            certBatchConfirmPrefix: '即將把 {0} 張證書同步到 {1} 個節點，共 {2} 個任務。',
+            ssl: '證書同步',
+            sslBatchDesc: '選擇來源節點後，可將指定證書同步到目前面板環境。',
+            sslBatchConfirmPrefix: '即將把 {0} 張證書同步到 {1} 個節點，共 {2} 個任務。',
 
             app: '應用對傳',
             appBatchDesc: '選擇來源節點、單個應用和目標節點後，確認資源依賴並執行應用對傳任務。',
