@@ -110,7 +110,9 @@
                             <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>
                     </div>
-                    <div v-if="account.type === 'FreeMyIP' || account.type === 'Vercel' || account.type === 'IonosCloud'">
+                    <div
+                        v-if="account.type === 'FreeMyIP' || account.type === 'Vercel' || account.type === 'IonosCloud'"
+                    >
                         <el-form-item label="Token" prop="authorization.token">
                             <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>
