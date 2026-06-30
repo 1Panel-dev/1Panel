@@ -252,8 +252,8 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
-	if result, ok := loadLoginctlSSHSessions(ctx, config); ok {
-		res, err = json.Marshal(result)
+	if sessions, ok := loadLoginctlSSHSessions(ctx); ok && len(sessions) > 0 {
+		res, err = json.Marshal(filterSSHSessions(sessions, config))
 		return
 	}
 
@@ -282,6 +282,22 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 		return
 	}
 
+	connections, err := net.ConnectionsMaxWithContext(ctx, "all", 32768)
+	if err != nil {
+		res, err = json.Marshal(result)
+		return
+	}
+	pidConnections := make(map[int32][]net.ConnectionStat, 256)
+	for _, conn := range connections {
+		if conn.Pid == 0 || conn.Raddr.IP == "" {
+			continue
+		}
+		if _, ok := usersByHost[conn.Raddr.IP]; !ok {
+			continue
+		}
+		pidConnections[conn.Pid] = append(pidConnections[conn.Pid], conn)
+	}
+
 	processes, err = process.ProcessesWithContext(ctx)
 	if err != nil {
 		res, err = json.Marshal(result)
@@ -293,7 +309,7 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 		if name != "sshd" || proc.Pid == 0 {
 			continue
 		}
-		connections, _ := proc.ConnectionsWithContext(ctx)
+		connections := pidConnections[proc.Pid]
 		if len(connections) == 0 {
 			continue
 		}
@@ -327,7 +343,7 @@ func getSSHSessions(config SSHSessionConfig) (res []byte, err error) {
 	return
 }
 
-func loadLoginctlSSHSessions(ctx context.Context, config SSHSessionConfig) ([]sshSession, bool) {
+func loadLoginctlSSHSessions(ctx context.Context) ([]sshSession, bool) {
 	if _, err := exec.LookPath("loginctl"); err != nil {
 		return nil, false
 	}
@@ -350,6 +366,14 @@ func loadLoginctlSSHSessions(ctx context.Context, config SSHSessionConfig) ([]ss
 		if !ok {
 			continue
 		}
+		result = append(result, session)
+	}
+	return result, true
+}
+
+func filterSSHSessions(sessions []sshSession, config SSHSessionConfig) []sshSession {
+	result := make([]sshSession, 0, len(sessions))
+	for _, session := range sessions {
 		if config.LoginUser != "" && !strings.Contains(session.Username, config.LoginUser) {
 			continue
 		}
@@ -358,7 +382,7 @@ func loadLoginctlSSHSessions(ctx context.Context, config SSHSessionConfig) ([]ss
 		}
 		result = append(result, session)
 	}
-	return result, true
+	return result
 }
 
 func parseLoginctlSSHSession(output string) (sshSession, bool) {
