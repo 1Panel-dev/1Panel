@@ -168,15 +168,13 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 	opts = append(opts, repo.WithOrderRuleBy(req.OrderBy, req.Order), repo.WithOrderRuleBy("updated_at", "descending"))
 	if req.Name != "" {
 		domains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomainLike(req.Name))
+		var websiteIds []uint
 		if len(domains) > 0 {
-			var websiteIds []uint
 			for _, domain := range domains {
 				websiteIds = append(websiteIds, domain.WebsiteID)
 			}
-			opts = append(opts, repo.WithByIDs(websiteIds))
-		} else {
-			opts = append(opts, websiteRepo.WithDomainLike(req.Name))
 		}
+		opts = append(opts, websiteRepo.WithSearchKeyword(req.Name, websiteIds))
 	}
 	if req.WebsiteGroupID != 0 {
 		opts = append(opts, websiteRepo.WithGroupID(req.WebsiteGroupID))

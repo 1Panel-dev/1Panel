@@ -4868,6 +4868,8 @@ const message = {
             urlcc: 'URL sıklık sınırı',
             method: 'İstek türü',
             addIpsToBlock: 'Toplu IP engelleme',
+            addIpSegmentToBlock: 'IP segmentini engelle',
+            addIpSegmentsToBlock: 'IP segmentlerini toplu engelle',
             addUrlsToWhite: 'Toplu URL’yi beyaz listeye ekleme',
             noBlackIp: 'IP zaten engellenmiş, tekrar engellemeye gerek yok',
             noWhiteUrl: 'URL zaten beyaz listede, tekrar eklemeye gerek yok',

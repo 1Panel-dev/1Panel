@@ -5023,6 +5023,8 @@ const message = {
             urlcc: 'Limitação de frequência de URL',
             method: 'Tipo de solicitação',
             addIpsToBlock: 'Bloquear IPs em massa',
+            addIpSegmentToBlock: 'Bloquear segmento de IP',
+            addIpSegmentsToBlock: 'Bloquear segmentos de IP em massa',
             addUrlsToWhite: 'Adicionar URLs à lista branca em massa',
             noBlackIp: 'O IP já está bloqueado, não é necessário bloquear novamente',
             noWhiteUrl: 'O URL já está na lista branca, não é necessário adicionar novamente',

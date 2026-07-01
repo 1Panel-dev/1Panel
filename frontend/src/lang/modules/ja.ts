@@ -4818,6 +4818,8 @@ const message = {
             urlcc: 'URL 頻度制限',
             method: 'リクエストタイプ',
             addIpsToBlock: 'IP を一括ブロック',
+            addIpSegmentToBlock: 'IP セグメントをブラック追加',
+            addIpSegmentsToBlock: 'IP セグメントを一括ブラック追加',
             addUrlsToWhite: 'URL を一括でホワイトリストに追加',
             noBlackIp: 'IP は既にブロックされているため、再度ブロックする必要はありません',
             noWhiteUrl: 'URL は既にホワイトリストに含まれているため、再度追加する必要はありません',

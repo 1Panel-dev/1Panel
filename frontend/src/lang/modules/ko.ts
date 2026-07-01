@@ -4720,6 +4720,8 @@ const message = {
             urlcc: 'URL 빈도 제한',
             method: '요청 유형',
             addIpsToBlock: 'IP 일괄 차단',
+            addIpSegmentToBlock: 'IP 대역 차단',
+            addIpSegmentsToBlock: 'IP 대역 일괄 차단',
             addUrlsToWhite: 'URL을 일괄 허용 목록에 추가',
             noBlackIp: 'IP가 이미 차단되어 있으므로 다시 차단할 필요가 없습니다',
             noWhiteUrl: 'URL이 이미 허용 목록에 포함되어 있으므로 다시 추가할 필요가 없습니다',

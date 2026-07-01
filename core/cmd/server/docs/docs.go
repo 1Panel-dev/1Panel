@@ -74,7 +74,6 @@ const docTemplate = `{
 						"description": "OK",
 						"schema": {
 							"additionalProperties": {
-								"format": "int64",
 								"type": "integer"
 							},
 							"type": "object"

@@ -3923,6 +3923,8 @@ const message = {
             urlcc: 'URL 频率限制',
             method: '请求类型',
             addIpsToBlock: '批量拉黑 IP',
+            addIpSegmentToBlock: '拉黑 IP 段',
+            addIpSegmentsToBlock: '批量拉黑 IP 段',
             addUrlsToWhite: '批量加白 URL',
             noBlackIp: 'IP 已拉黑，无需再次拉黑',
             noWhiteUrl: 'URL 已加白，无需再次加白',

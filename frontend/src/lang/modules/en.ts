@@ -4797,6 +4797,8 @@ const message = {
             urlcc: 'URL frequency limit',
             method: 'Request type',
             addIpsToBlock: 'Batch block IP',
+            addIpSegmentToBlock: 'Block IP segment',
+            addIpSegmentsToBlock: 'Batch block IP segments',
             addUrlsToWhite: 'Batch add URL to white list',
             noBlackIp: 'IP is already blocked, no need to block again',
             noWhiteUrl: 'URL is already in the white list, no need to add again',

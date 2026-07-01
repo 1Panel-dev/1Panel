@@ -4471,6 +4471,8 @@ const message = {
             urlcc: 'URL 頻率限制',
             method: '請求類型',
             addIpsToBlock: '批次封鎖 IP',
+            addIpSegmentToBlock: '封鎖 IP 段',
+            addIpSegmentsToBlock: '批次封鎖 IP 段',
             addUrlsToWhite: '批次加白 URL',
             noBlackIp: 'IP 已封鎖，無需再次封鎖',
             noWhiteUrl: 'URL 已加白，無需再次加白',

@@ -17,6 +17,7 @@ type IWebsiteRepo interface {
 	WithGroupID(groupId uint) DBOption
 	WithDefaultServer() DBOption
 	WithDomainLike(domain string) DBOption
+	WithSearchKeyword(keyword string, ids []uint) DBOption
 	WithRuntimeID(runtimeID uint) DBOption
 	WithParentID(websiteID uint) DBOption
 	WithType(websiteType string) DBOption
@@ -73,6 +74,19 @@ func (w *WebsiteRepo) WithDomain(domain string) DBOption {
 func (w *WebsiteRepo) WithDomainLike(domain string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("primary_domain like ?", "%"+domain+"%")
+	}
+}
+
+func (w *WebsiteRepo) WithSearchKeyword(keyword string, ids []uint) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		if keyword == "" {
+			return db
+		}
+		keyword = "%" + keyword + "%"
+		if len(ids) == 0 {
+			return db.Where("(primary_domain like ? OR alias like ?)", keyword, keyword)
+		}
+		return db.Where("(primary_domain like ? OR alias like ? OR id in (?))", keyword, keyword, ids)
 	}
 }
 
