@@ -1919,13 +1919,6 @@
 		"formatZH": "同步节点镜像",
 		"formatEN": "sync images"
 	},
-	"/core/xpack/exchange/ssl": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "同步节点 SSL 证书",
-		"formatEN": "sync SSL certificates"
-	},
 	"/core/xpack/nodes": {
 		"bodyKeys": [
 			"name"
