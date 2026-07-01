@@ -319,7 +319,7 @@ type ComposeCreate struct {
 type ComposeOperation struct {
 	Name      string `json:"name" validate:"required"`
 	Path      string `json:"path"`
-	Operation string `json:"operation" validate:"required,oneof=up start restart stop down delete"`
+	Operation string `json:"operation" validate:"required,oneof=up start restart stop down delete rebuild"`
 	WithFile  bool   `json:"withFile"`
 	Force     bool   `json:"force"`
 }

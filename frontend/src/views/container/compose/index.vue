@@ -107,6 +107,11 @@
                                                             >
                                                                 {{ $t('commons.button.restart') }}
                                                             </el-dropdown-item>
+                                                            <el-dropdown-item
+                                                                @click="handleComposeOperate('rebuild', row)"
+                                                            >
+                                                                {{ $t('commons.operate.rebuild') }}
+                                                            </el-dropdown-item>
                                                         </el-dropdown-menu>
                                                     </template>
                                                 </el-dropdown>
@@ -794,7 +799,7 @@ const onImportCompose = () => {
     });
 };
 
-const handleComposeOperate = async (operation: 'up' | 'stop' | 'restart', row: any) => {
+const handleComposeOperate = async (operation: 'up' | 'stop' | 'restart' | 'rebuild', row: any) => {
     const mes = i18n.global.t('container.composeOperatorHelper', [
         row.name,
         i18n.global.t('commons.operate.' + operation),

@@ -270,6 +270,10 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 		if stdout, err := compose.Up(req.Path); err != nil {
 			return fmt.Errorf("docker-compose up failed, std: %s, err: %v", stdout, err)
 		}
+	} else if req.Operation == "rebuild" {
+		if stdout, err := compose.DownAndUp(req.Path); err != nil {
+			return fmt.Errorf("docker-compose rebuild failed, std: %s, err: %v", stdout, err)
+		}
 	} else {
 		if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
 			return fmt.Errorf("docker-compose %s failed, std: %s, err: %v", req.Operation, stdout, err)
