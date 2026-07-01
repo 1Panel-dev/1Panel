@@ -7,6 +7,57 @@ import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 let initialized = false;
 let languageSupportPromise: Promise<void> | null = null;
 
+type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
+type PythonLanguageModule = typeof import('monaco-editor/esm/vs/basic-languages/python/python.js');
+
+export const buildPatchedPythonLanguage = (language: PythonLanguageModule['language']) => ({
+    ...language,
+    tokenizer: {
+        ...language.tokenizer,
+        strings: [
+            [/[rR]?[fF]'''|[fF][rR]'''/, 'string.escape', '@fLongStringBody'],
+            [/[rR]?[fF]"""|[fF][rR]"""/, 'string.escape', '@fLongDblStringBody'],
+            ...language.tokenizer.strings,
+        ],
+        fLongStringBody: [
+            [/'''/, 'string.escape', '@popall'],
+            [/\{[^\}':!=]+/, 'identifier', '@fStringDetail'],
+            [/\\./, 'string'],
+            [/[^\\'\{\}]+/, 'string'],
+            [/'/, 'string'],
+            [/\\$/, 'string'],
+        ],
+        fLongDblStringBody: [
+            [/"""/, 'string.escape', '@popall'],
+            [/\{[^\}':!=]+/, 'identifier', '@fStringDetail'],
+            [/\\./, 'string'],
+            [/[^\\"\{\}]+/, 'string'],
+            [/"/, 'string'],
+            [/\\$/, 'string'],
+        ],
+    },
+});
+
+const patchPythonLanguageSupport = async () => {
+    const [monaco, python] = await Promise.all([
+        import('monaco-editor/esm/vs/editor/editor.api'),
+        import('monaco-editor/esm/vs/basic-languages/python/python.js'),
+    ]);
+    const monacoApi = monaco as MonacoEditorApi;
+    const pythonModule = python as PythonLanguageModule;
+
+    monacoApi.languages.setLanguageConfiguration('python', pythonModule.conf);
+    monacoApi.languages.setMonarchTokensProvider('python', buildPatchedPythonLanguage(pythonModule.language));
+};
+
+const patchPythonLanguageSupportSafely = async () => {
+    try {
+        await patchPythonLanguageSupport();
+    } catch (error) {
+        console.warn('Failed to patch Monaco Python language support:', error);
+    }
+};
+
 export function setupMonacoEnvironment() {
     if (initialized) {
         return;
@@ -51,7 +102,9 @@ export async function loadMonacoLanguageSupport() {
             import('monaco-editor/esm/vs/language/css/monaco.contribution'),
             import('monaco-editor/esm/vs/language/html/monaco.contribution'),
             import('monaco-editor/esm/vs/language/typescript/monaco.contribution'),
-        ]).then(() => undefined);
+        ])
+            .then(() => patchPythonLanguageSupportSafely())
+            .then(() => undefined);
     }
 
     await languageSupportPromise;
