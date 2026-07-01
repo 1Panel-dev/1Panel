@@ -338,7 +338,7 @@ const checkAlias: RuleValidator = (_rule, value, callback) => {
         callback(new Error(i18n.global.t('commons.rule.alias')));
         return;
     }
-    const reg = /^(?![-_])[A-Za-z0-9._-]{1,128}(?<![-_])$/;
+    const reg = /^(?![-_])[A-Za-z0-9._-]{0,126}[A-Za-z0-9.]$/;
     if (!reg.test(value)) {
         callback(new Error(i18n.global.t('commons.rule.alias')));
     } else {
