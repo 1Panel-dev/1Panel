@@ -18,7 +18,6 @@ import (
 
 	"github.com/go-acme/lego/v5/certificate"
 	legoLogger "github.com/go-acme/lego/v5/log"
-	"github.com/jinzhu/gorm"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -462,7 +461,7 @@ func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 		case constant.Http:
 			appInstall, err := getAppInstallByKey(constant.AppOpenresty)
 			if err != nil {
-				if gorm.IsRecordNotFoundError(err) {
+				if errors.Is(err, gormv2.ErrRecordNotFound) {
 					return buserr.New("ErrOpenrestyNotFound")
 				}
 				return err

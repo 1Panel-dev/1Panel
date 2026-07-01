@@ -70,7 +70,7 @@
                 <span class="input-help" v-if="ssl.provider === 'dnsManual'">
                     {{ $t('ssl.dnsMauanlHelper') }}
                 </span>
-                <span class="input-help text-red-500" v-if="ssl.provider === 'http'">
+                <span class="input-help ssl-http-helper" v-if="ssl.provider === 'http'">
                     {{ $t('ssl.httpHelper') }}
                 </span>
             </el-form-item>
@@ -456,5 +456,9 @@ defineExpose({
     text-overflow: ellipsis;
     white-space: nowrap;
     vertical-align: top;
+}
+
+.ssl-http-helper {
+    color: var(--el-color-danger);
 }
 </style>
