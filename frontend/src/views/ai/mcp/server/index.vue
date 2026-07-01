@@ -88,11 +88,12 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
-        <McpServerOperate ref="createRef" @close="searchWithTimeOut" />
+        <McpServerOperate ref="createRef" @close="searchWithTimeOut" @task="openTaskLog" />
         <OpDialog ref="opRef" @search="search" />
         <ComposeLogs ref="composeLogRef" />
         <BindDomain ref="bindDomainRef" @close="searchWithTimeOut" />
         <Config ref="configRef" />
+        <TaskLog ref="taskLogRef" width="70%" @close="search" />
     </div>
 </template>
 
@@ -111,6 +112,7 @@ import { onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import McpServerOperate from './operate/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import BindDomain from './bind/index.vue';
@@ -122,6 +124,7 @@ const loading = ref(false);
 const createRef = ref();
 const opRef = ref();
 const composeLogRef = ref();
+const taskLogRef = ref();
 const bindDomainRef = ref();
 const configRef = ref();
 const items = ref<AI.McpServer[]>([]);
@@ -261,6 +264,10 @@ const openLog = (row: AI.McpServer) => {
         resource: row.name,
         container: row.containerName,
     });
+};
+
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const deleteServer = async (row: AI.McpServer) => {

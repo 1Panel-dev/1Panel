@@ -18,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/ai"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
@@ -127,7 +128,6 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 	mcpServer.GatewayImage = req.GatewayImage
 	mcpServer.ProtocolVersion = req.ProtocolVersion
 	normalizeMcpServerGateway(mcpServer)
-	go pullImage(mcpServer.GatewayImage)
 	if req.OutputTransport == mcpOutputTransportSSE {
 		mcpServer.SsePath = req.SsePath
 	} else {
@@ -150,7 +150,7 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 	if err := mcpServerRepo.Save(mcpServer); err != nil {
 		return err
 	}
-	go startMcp(mcpServer)
+	go runMcpServerTask(mcpServer, req.TaskID, task.TaskUpdate)
 	return nil
 }
 
@@ -193,7 +193,6 @@ func (m McpServerService) Create(create request.McpServerCreate) error {
 		ProtocolVersion: create.ProtocolVersion,
 	}
 	normalizeMcpServerGateway(mcpServer)
-	go pullImage(mcpServer.GatewayImage)
 	if create.OutputTransport == mcpOutputTransportSSE {
 		mcpServer.SsePath = create.SsePath
 	} else {
@@ -221,7 +220,7 @@ func (m McpServerService) Create(create request.McpServerCreate) error {
 		return err
 	}
 	addProxy(mcpServer)
-	go startMcp(mcpServer)
+	go runMcpServerTask(mcpServer, create.TaskID, task.TaskCreate)
 	return nil
 }
 
@@ -896,25 +895,56 @@ func handleCreateParams(mcpServer *model.McpServer, environments []request.Envir
 	return nil
 }
 
-func startMcp(mcpServer *model.McpServer) {
-	if err := refreshMcpServerFiles(mcpServer); err != nil {
+func runMcpServerTask(mcpServer *model.McpServer, taskID, operate string) {
+	mcpTask, err := task.NewTaskWithOps(mcpServer.Name, operate, task.TaskScopeAI, taskID, mcpServer.ID)
+	if err != nil {
 		mcpServer.Status = constant.StatusError
 		mcpServer.Message = err.Error()
 		_ = mcpServerRepo.Save(mcpServer)
 		return
 	}
+	mcpTask.AddSubTask(task.GetTaskName(mcpServer.Name, operate, task.TaskScopeAI), func(t *task.Task) error {
+		return startMcpWithTask(mcpServer, t)
+	}, nil)
+	_ = mcpTask.Execute()
+}
+
+func startMcp(mcpServer *model.McpServer) {
+	_ = startMcpWithTask(mcpServer, nil)
+}
+
+func startMcpWithTask(mcpServer *model.McpServer, taskItem *task.Task) error {
+	if err := refreshMcpServerFiles(mcpServer); err != nil {
+		mcpServer.Status = constant.StatusError
+		mcpServer.Message = err.Error()
+		_ = mcpServerRepo.Save(mcpServer)
+		return err
+	}
 	composePath := path.Join(global.Dir.McpDir, mcpServer.Name, "docker-compose.yml")
 	if mcpServer.Status != constant.StatusNormal {
 		_, _ = compose.Down(composePath)
 	}
-	if out, err := compose.Up(composePath); err != nil {
+	var err error
+	var out string
+	if taskItem != nil {
+		err = compose.UpWithTask(composePath, taskItem, false)
+	} else {
+		out, err = compose.Up(composePath)
+	}
+	if err != nil {
 		mcpServer.Status = constant.StatusError
-		mcpServer.Message = out
+		if out != "" {
+			mcpServer.Message = out
+		} else {
+			mcpServer.Message = err.Error()
+		}
+		_ = mcpServerRepo.Save(mcpServer)
+		return err
 	} else {
 		mcpServer.Status = constant.StatusRunning
 		mcpServer.Message = ""
 	}
-	_ = syncMcpServerContainerStatus(mcpServer)
+	return syncMcpServerContainerStatus(mcpServer)
 }
 
 func syncMcpServerContainerStatus(mcpServer *model.McpServer) error {
@@ -964,16 +994,4 @@ func GetWebsiteID() uint {
 	}
 	websiteIDUint, _ := strconv.ParseUint(websiteID.Value, 10, 64)
 	return uint(websiteIDUint)
-}
-
-func pullImage(image string) {
-	if global.CONF.Base.IsOffline {
-		return
-	}
-	if image == "" {
-		image = defaultMcpGatewayImageNpx
-	}
-	if err := docker.PullImage(image); err != nil {
-		global.LOG.Errorf("docker pull mcp image error: %s", err.Error())
-	}
 }
