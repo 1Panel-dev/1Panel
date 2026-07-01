@@ -31921,7 +31921,8 @@ const docTemplate = `{
 						"restart",
 						"stop",
 						"down",
-						"delete"
+						"delete",
+						"rebuild"
 					],
 					"type": "string"
 				},
