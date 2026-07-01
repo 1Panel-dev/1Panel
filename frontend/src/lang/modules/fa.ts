@@ -2046,6 +2046,8 @@ const message = {
             auth: 'احراز هویت ورود',
             alert: 'هشدارها',
             sync: 'همگام‌سازی منابع',
+            exchange: 'همگام‌سازی منابع',
+            xapp: 'App',
         },
         websiteLog: 'لاگ وب‌سایت',
         runLog: 'لاگ اجرا',

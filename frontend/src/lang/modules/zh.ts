@@ -1934,6 +1934,8 @@ const message = {
             auth: '登陆认证',
             alert: '告警通知',
             sync: '资源同步',
+            exchange: '资源同步',
+            xapp: 'APP',
         },
         websiteLog: '网站日志',
         runLog: '运行日志',

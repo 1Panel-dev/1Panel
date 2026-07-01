@@ -2057,6 +2057,8 @@ const message = {
             auth: 'Login Authentication',
             alert: 'Alert Notifications',
             sync: 'Resource Sync',
+            exchange: 'Resource Sync',
+            xapp: 'App',
         },
         websiteLog: 'Website logs',
         runLog: 'Run logs',
