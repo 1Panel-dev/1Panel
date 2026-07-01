@@ -4878,6 +4878,8 @@ const message = {
             urlcc: 'Had frekuensi URL',
             method: 'Jenis permintaan',
             addIpsToBlock: 'Sekat IP secara pukal',
+            addIpSegmentToBlock: 'Sekat segmen IP',
+            addIpSegmentsToBlock: 'Sekat segmen IP secara pukal',
             addUrlsToWhite: 'Tambah URL ke senarai putih secara pukal',
             noBlackIp: 'IP telah disekat, tidak perlu disekat semula',
             noWhiteUrl: 'URL telah dimasukkan ke senarai putih, tidak perlu ditambah semula',

@@ -4846,6 +4846,8 @@ const message = {
             urlcc: 'Límite de frecuencia por URL',
             method: 'Método de petición',
             addIpsToBlock: 'Bloqueo masivo de IPs',
+            addIpSegmentToBlock: 'Bloquear segmento IP',
+            addIpSegmentsToBlock: 'Bloqueo masivo de segmentos IP',
             addUrlsToWhite: 'Añadir URLs en whitelist en lote',
             noBlackIp: 'IP ya bloqueada',
             noWhiteUrl: 'URL ya en whitelist',

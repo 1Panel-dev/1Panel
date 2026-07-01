@@ -4872,6 +4872,8 @@ const message = {
             urlcc: 'Ограничение частоты URL',
             method: 'Тип запроса',
             addIpsToBlock: 'Массовая блокировка IP',
+            addIpSegmentToBlock: 'Блокировать IP-сегмент',
+            addIpSegmentsToBlock: 'Массовая блокировка IP-сегментов',
             addUrlsToWhite: 'Массовое добавление URL в белый список',
             noBlackIp: 'IP уже заблокирован, не нужно блокировать снова',
             noWhiteUrl: 'URL уже в белом списке, не нужно добавлять снова',

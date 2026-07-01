@@ -4768,6 +4768,8 @@ const message = {
             urlcc: 'محدودیت فرکانس URL',
             method: 'نوع درخواست',
             addIpsToBlock: 'مسدودسازی دسته‌ای IP',
+            addIpSegmentToBlock: 'مسدود کردن بخش IP',
+            addIpSegmentsToBlock: 'مسدودسازی دسته‌ای بخش‌های IP',
             addUrlsToWhite: 'افزودن دسته‌ای URL به لیست سفید',
             noBlackIp: 'IP از قبل مسدود شده است، نیازی به مسدودسازی مجدد نیست',
             noWhiteUrl: 'URL از قبل در لیست سفید است، نیازی به افزودن مجدد نیست',
