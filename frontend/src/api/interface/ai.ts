@@ -182,6 +182,7 @@ export namespace AI {
         type: string;
         gatewayImage: string;
         protocolVersion: string;
+        taskID?: string;
     }
 
     export interface McpServerSearch extends ReqPage {

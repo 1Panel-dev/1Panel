@@ -141,6 +141,7 @@ import { AI } from '@/api/interface/ai';
 import { createMcpServer, getMcpDomain, updateMcpServer } from '@/api/modules/ai';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
+import { newUUID } from '@/utils/id';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { ref, watch } from 'vue';
@@ -158,7 +159,7 @@ const defaultGatewayImages: Record<string, string> = {
     npx: 'supercorp/supergateway:3.4.3',
     uvx: 'supercorp/supergateway:uvx',
 };
-const newMcpServer = () => {
+const newMcpServer = (): AI.McpServer => {
     return {
         id: 0,
         name: '',
@@ -179,9 +180,10 @@ const newMcpServer = () => {
         type: 'npx',
         gatewayImage: defaultGatewayImages.npx,
         protocolVersion: defaultProtocolVersion,
+        taskID: '',
     };
 };
-const em = defineEmits(['close']);
+const em = defineEmits(['close', 'task']);
 const mcpServer = ref(newMcpServer());
 const rules = ref({
     name: [Rules.requiredInput, Rules.appName],
@@ -303,6 +305,8 @@ const submit = async (formEl: FormInstance | undefined) => {
         try {
             loading.value = true;
             normalizeGatewayConfig();
+            const taskID = newUUID();
+            mcpServer.value.taskID = taskID;
             mcpServer.value.baseUrl = mcpServer.value.protocol + mcpServer.value.url;
             if (mode.value == 'create') {
                 await createMcpServer(mcpServer.value);
@@ -311,6 +315,7 @@ const submit = async (formEl: FormInstance | undefined) => {
                 await updateMcpServer(mcpServer.value);
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             }
+            em('task', taskID);
             handleClose();
         } finally {
             loading.value = false;
