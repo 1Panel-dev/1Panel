@@ -2092,6 +2092,8 @@ const message = {
             auth: 'Giriş kimlik doğrulaması',
             alert: 'Uyarı bildirimleri',
             sync: 'Kaynak Senkronizasyonu',
+            exchange: 'Kaynak Senkronizasyonu',
+            xapp: 'App',
         },
         websiteLog: 'Website logları',
         runLog: 'Çalıştırma logları',

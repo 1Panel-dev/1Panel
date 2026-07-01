@@ -2094,6 +2094,8 @@ const message = {
             auth: 'Pengesahan log masuk',
             alert: 'Pemberitahuan amaran',
             sync: 'Penyegerakan Sumber',
+            exchange: 'Penyegerakan Sumber',
+            xapp: 'App',
         },
         websiteLog: 'Log Laman Web',
         runLog: 'Log Jalankan',

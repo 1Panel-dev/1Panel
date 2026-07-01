@@ -2068,6 +2068,8 @@ const message = {
             auth: 'ログイン認証',
             alert: 'アラート通知',
             sync: 'リソース同期',
+            exchange: 'リソース同期',
+            xapp: 'App',
         },
         websiteLog: 'ウェブサイトログ',
         runLog: 'ログを実行します',

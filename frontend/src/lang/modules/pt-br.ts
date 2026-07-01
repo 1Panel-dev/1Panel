@@ -2210,6 +2210,8 @@ const message = {
             auth: 'Autenticação de login',
             alert: 'Notificações de alerta',
             sync: 'Sincronização de Recursos',
+            exchange: 'Sincronização de Recursos',
+            xapp: 'App',
         },
         websiteLog: 'Logs do website',
         runLog: 'Logs de execução',
