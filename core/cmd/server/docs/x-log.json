@@ -1900,6 +1900,13 @@
 		"formatZH": "删除集群 [clusterName] 节点 [clusterNodeID]",
 		"formatEN": "delete node [clusterNodeID] from cluster [clusterName]"
 	},
+	"/core/xpack/exchange/app": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步节点应用",
+		"formatEN": "sync app"
+	},
 	"/core/xpack/exchange/file": {
 		"bodyKeys": [
 			"sourceNode",
@@ -2261,13 +2268,6 @@
 		"beforeFunctions": [],
 		"formatZH": "更新专业版设置 [key]",
 		"formatEN": "update xpack setting [key]"
-	},
-	"/core/xpack/sync/app": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "同步节点应用",
-		"formatEN": "sync app"
 	},
 	"/core/xpack/sync/ssl": {
 		"bodyKeys": [
