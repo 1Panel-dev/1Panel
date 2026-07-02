@@ -137,6 +137,15 @@ func LoadMenus() string {
 				Path:     "/enterprise/ops-report",
 				Sort:     360,
 			}, "UserManagement")
+			item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
+				ID:       "123",
+				Disabled: false,
+				Title:    "xpack.vm.title",
+				IsShow:   true,
+				Label:    "VirtualMachine",
+				Path:     "/xpack/vm",
+				Sort:     550,
+			}, "MonitorDashboard")
 			break
 		}
 	}
@@ -181,6 +190,7 @@ func MenuSort() []dto.MenuLabelSort {
 		{Label: "OpsReport", Sort: 360},
 		{Label: "Upage", Sort: 400},
 		{Label: "MonitorDashboard", Sort: 500},
+		{Label: "VirtualMachine", Sort: 550},
 		{Label: "Tamper", Sort: 600},
 		{Label: "Cluster", Sort: 700},
 		{Label: "Sync", Sort: 800},

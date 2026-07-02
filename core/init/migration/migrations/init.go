@@ -1326,6 +1326,55 @@ var AddOpsReportMenu = &gormigrate.Migration{
 	},
 }
 
+var AddVirtualMachineMenu = &gormigrate.Migration{
+	ID: "20260623-add-virtual-machine-menu",
+	Migrate: func(tx *gorm.DB) error {
+		if !global.CONF.Base.IsEnterprise {
+			return nil
+		}
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+		if menuJSON == "" {
+			menuJSON = helper.LoadMenus()
+		}
+
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		newItem := dto.ShowMenu{
+			ID:       "123",
+			Disabled: false,
+			Title:    "xpack.vm.title",
+			IsShow:   true,
+			Label:    "VirtualMachine",
+			Path:     "/xpack/vm",
+			Sort:     550,
+		}
+
+		for i := range menus {
+			if menus[i].Label != "Xpack-Menu" {
+				continue
+			}
+			menus[i].Children = helper.UpsertMenuByLabel(menus[i].Children, newItem, "MonitorDashboard")
+			break
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
+}
+
 var AddOperationLogUser = &gormigrate.Migration{
 	ID: "20260424-add-operation-log-user",
 	Migrate: func(tx *gorm.DB) error {

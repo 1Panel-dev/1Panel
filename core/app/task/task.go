@@ -49,6 +49,9 @@ type SubTask struct {
 
 const (
 	TaskInstall        = "TaskInstall"
+	TaskCreate         = "TaskCreate"
+	TaskUpdate         = "TaskUpdate"
+	TaskDelete         = "TaskDelete"
 	TaskUpgrade        = "TaskUpgrade"
 	TaskAddNode        = "TaskAddNode"
 	TaskSync           = "TaskSync"
@@ -70,6 +73,7 @@ const (
 	TaskScopeCluster    = "Cluster"
 	TaskScopeAppInstall = "AppInstallTask"
 	TaskScopeAI         = "AI"
+	TaskScopeVm         = "VirtualMachine"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {

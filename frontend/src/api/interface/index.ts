@@ -25,6 +25,7 @@ export interface SearchWithPage {
     orderBy?: string;
     order?: string;
     name?: string;
+    type?: string;
 }
 export interface CommonModel {
     id: number;

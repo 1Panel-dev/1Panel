@@ -5,7 +5,7 @@ import (
 	"unicode"
 
 	"github.com/1Panel-dev/1Panel/core/global"
-
+	"github.com/1Panel-dev/1Panel/core/utils/re"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -21,6 +21,12 @@ func Init() {
 		panic(err)
 	}
 	if err := validator.RegisterValidation("base_setting_key", checkBaseSettingKey); err != nil {
+		panic(err)
+	}
+	if err := validator.RegisterValidation("vm_name", checkVMNamePattern); err != nil {
+		panic(err)
+	}
+	if err := validator.RegisterValidation("vm_common", checkVMCommonPattern); err != nil {
 		panic(err)
 	}
 	global.VALID = validator
@@ -99,4 +105,13 @@ func checkPasswordPattern(fl validator.FieldLevel) bool {
 func checkBaseSettingKey(fl validator.FieldLevel) bool {
 	_, ok := baseSettingKeys[fl.Field().String()]
 	return ok
+}
+
+func checkVMNamePattern(fl validator.FieldLevel) bool {
+	value := fl.Field().String()
+	return re.GetRegex(re.VMNameValidationPattern).MatchString(value)
+}
+func checkVMCommonPattern(fl validator.FieldLevel) bool {
+	value := fl.Field().String()
+	return re.GetRegex(re.VMCommonPattern).MatchString(value)
 }

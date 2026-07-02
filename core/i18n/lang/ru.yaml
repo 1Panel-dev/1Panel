@@ -30,6 +30,21 @@ ErrEntranceFormat: "Защищенный вход {{ .name }} в настоящ�
 # common
 ErrDemoEnvironment: 'Недоступно в демо'
 ErrCmdTimeout: 'Команда завершилась по тайм-ауту'
+ErrVMNotFound: "Виртуальная машина не существует"
+ErrVMAlreadyExists: "Виртуальная машина уже существует"
+ErrVMRunning: "Виртуальная машина запущена"
+ErrVMLibvirtConnect: "Не удалось подключиться к libvirt: {{ .detail }}"
+ErrVMPermission: "Нет разрешения на операцию с виртуальной машиной: {{ .detail }}"
+ErrVMNetworkNotFound: "Сеть виртуальной машины не существует: {{ .detail }}"
+ErrVMInvalidPath: "Недопустимый путь виртуальной машины: {{ .detail }}"
+ErrVMInvalidInput: "Недопустимые параметры виртуальной машины: {{ .detail }}"
+ErrVMCommandFailed: "Ошибка выполнения команды виртуальной машины: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
 ErrEntrance: "Ошибка информации о безопасном входе, проверьте и повторите попытку"
 ErrGroupIsDefault: "Группу по умолчанию нельзя удалить"
 ErrGroupIsInUse: "Группа используется и не может быть удалена."

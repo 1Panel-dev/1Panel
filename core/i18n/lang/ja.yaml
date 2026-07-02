@@ -30,6 +30,21 @@ ErrEntranceFormat: "セキュリティエントランス {{ .name }} は現在�
 # common
 ErrDemoEnvironment: 'デモ環境では利用できません'
 ErrCmdTimeout: 'コマンドがタイムアウトしました'
+ErrVMNotFound: "仮想マシンが存在しません"
+ErrVMAlreadyExists: "仮想マシンは既に存在します"
+ErrVMRunning: "仮想マシンは実行中です"
+ErrVMLibvirtConnect: "libvirt への接続に失敗しました: {{ .detail }}"
+ErrVMPermission: "仮想マシンを操作する権限がありません: {{ .detail }}"
+ErrVMNetworkNotFound: "仮想マシンネットワークが存在しません: {{ .detail }}"
+ErrVMInvalidPath: "仮想マシンのパスが無効です: {{ .detail }}"
+ErrVMInvalidInput: "仮想マシンのパラメータが無効です: {{ .detail }}"
+ErrVMCommandFailed: "仮想マシンコマンドの実行に失敗しました: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
 ErrEntrance: "セキュリティ情報エラー、再確認してください！"
 ErrGroupIsDefault: "デフォルトグループの削除はできません"
 ErrGroupIsInUse: "グループは使用中のため、削除できません。"

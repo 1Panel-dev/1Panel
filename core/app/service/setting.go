@@ -766,7 +766,7 @@ func checkProxy(req dto.ProxyUpdate) error {
 	case "", "close":
 		return nil
 	default:
-		return buserr.WithDetail("ErrNotSupportType", req.ProxyType, nil)
+		return buserr.WithName("ErrNotSupportType", req.ProxyType)
 	}
 	defer func() {
 		if r := recover(); r != nil {

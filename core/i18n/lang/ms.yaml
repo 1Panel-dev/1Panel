@@ -30,6 +30,21 @@ ErrEntranceFormat: "Pintu masuk keselamatan {{ .name }} tidak disokong buat masa
 # common
 ErrDemoEnvironment: 'Tidak tersedia dalam demo'
 ErrCmdTimeout: 'Arahan tamat masa'
+ErrVMNotFound: "Mesin maya tidak wujud"
+ErrVMAlreadyExists: "Mesin maya sudah wujud"
+ErrVMRunning: "Mesin maya sedang berjalan"
+ErrVMLibvirtConnect: "Gagal menyambung ke libvirt: {{ .detail }}"
+ErrVMPermission: "Tiada kebenaran untuk mengendalikan mesin maya: {{ .detail }}"
+ErrVMNetworkNotFound: "Rangkaian mesin maya tidak wujud: {{ .detail }}"
+ErrVMInvalidPath: "Laluan mesin maya tidak sah: {{ .detail }}"
+ErrVMInvalidInput: "Parameter mesin maya tidak sah: {{ .detail }}"
+ErrVMCommandFailed: "Arahan mesin maya gagal: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
 ErrEntrance: "Maklumat pintu masuk keselamatan salah, sila periksa dan cuba lagi"
 ErrGroupIsDefault: "Kumpulan lalai tidak boleh dihapuskan"
 ErrGroupIsInUse: "Kumpulan sedang digunakan dan tidak boleh dipadam."

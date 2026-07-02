@@ -112,10 +112,16 @@ function initChart() {
     }
     let itemChart = echarts?.getInstanceByDom(chartDom);
     const optionItem = itemChart?.getOption();
-    const itemSelect = optionItem?.legend;
+    const itemSelect = Array.isArray(optionItem?.legend) ? optionItem?.legend?.[0] : optionItem?.legend;
     if (itemChart == null) {
         itemChart = echarts.init(chartDom);
     }
+    const style = getComputedStyle(document.documentElement);
+    const primaryTextColor = style.getPropertyValue('--el-text-color-primary').trim() || '#303133';
+    const regularTextColor = style.getPropertyValue('--el-text-color-regular').trim() || '#606266';
+    const secondaryTextColor = style.getPropertyValue('--el-text-color-secondary').trim() || '#909399';
+    const borderColor = style.getPropertyValue('--el-border-color-light').trim() || '#e4e7ed';
+    const tooltipBackgroundColor = style.getPropertyValue('--el-bg-color-overlay').trim() || '#ffffff';
 
     const series = [];
     if (props.option?.yData?.length) {
@@ -135,14 +141,25 @@ function initChart() {
     if (props.option.yAxis && props.option.yAxis.length > 0) {
         props.option.yAxis.forEach((item: any) => {
             yAxis.push({
+                ...item,
                 splitLine: {
+                    ...item.splitLine,
                     show: true,
                     lineStyle: {
+                        ...item.splitLine?.lineStyle,
                         type: 'dashed',
                         opacity: isDarkTheme.value ? 0.1 : 1,
+                        color: borderColor,
                     },
                 },
-                ...item,
+                axisLabel: {
+                    color: secondaryTextColor,
+                    ...item.axisLabel,
+                },
+                nameTextStyle: {
+                    color: secondaryTextColor,
+                    ...item.nameTextStyle,
+                },
             });
         });
     }
@@ -209,34 +226,74 @@ function initChart() {
                 left: 'center',
                 text: props.option.title,
                 show: props.option.title,
+                textStyle: {
+                    color: primaryTextColor,
+                    fontWeight: 500,
+                },
             },
         ],
         zlevel: 1,
         z: 1,
         tooltip: {
             appendToBody: true,
+            backgroundColor: tooltipBackgroundColor,
+            borderColor,
+            textStyle: {
+                color: regularTextColor,
+            },
             ...tooltip,
             extraCssText: `${tooltip.extraCssText || ''}; z-index: 3000;`,
         },
         grid,
-        legend: itemSelect || {
+        legend: {
+            ...itemSelect,
             right: grid.right || 10,
             itemWidth: 8,
             textStyle: {
-                color: '#646A73',
+                ...itemSelect?.textStyle,
+                color: regularTextColor,
             },
             icon: 'circle',
         },
-        xAxis: { data: props.option.xData, boundaryGap: false },
+        xAxis: {
+            ...props.option.xAxis,
+            data: props.option.xData,
+            boundaryGap: false,
+            axisLabel: {
+                ...props.option.xAxis?.axisLabel,
+                color: secondaryTextColor,
+            },
+            axisLine: {
+                ...props.option.xAxis?.axisLine,
+                lineStyle: {
+                    ...props.option.xAxis?.axisLine?.lineStyle,
+                    color: borderColor,
+                },
+            },
+            axisTick: {
+                ...props.option.xAxis?.axisTick,
+                lineStyle: {
+                    ...props.option.xAxis?.axisTick?.lineStyle,
+                    color: borderColor,
+                },
+            },
+        },
         yAxis: props.option.yAxis
             ? yAxis
             : {
                   name: '( ' + props.option.formatStr + ' )',
+                  nameTextStyle: {
+                      color: secondaryTextColor,
+                  },
+                  axisLabel: {
+                      color: secondaryTextColor,
+                  },
                   splitLine: {
                       //分隔辅助线
                       lineStyle: {
                           type: 'dashed', //线的类型 虚线0
                           opacity: isDarkTheme.value ? 0.1 : 1, //透明度
+                          color: borderColor,
                       },
                   },
               },
