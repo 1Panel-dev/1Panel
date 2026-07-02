@@ -58,6 +58,21 @@
                                 </el-radio-group>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.menuAccordion')" prop="menuAccordion">
+                                <el-radio-group
+                                    @change="onSave('MenuAccordion', form.menuAccordion)"
+                                    v-model="form.menuAccordion"
+                                >
+                                    <el-radio-button value="Enable">
+                                        <span>{{ $t('commons.button.enable') }}</span>
+                                    </el-radio-button>
+                                    <el-radio-button value="Disable">
+                                        <span>{{ $t('commons.button.disable') }}</span>
+                                    </el-radio-button>
+                                </el-radio-group>
+                                <span class="input-help">{{ $t('setting.menuAccordionHelper') }}</span>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.watermark')" v-if="isXpackOrEE" prop="watermark">
                                 <el-radio-group class="w-full" @change="onChangeWatermark" v-model="form.watermarkShow">
                                     <el-radio-button value="Enable">
@@ -217,6 +232,7 @@ const {
     isIntl,
     isMobile,
     isXpackOrEE,
+    menuAccordion,
     openMenuTabs,
     themeConfig,
     watermark,
@@ -243,6 +259,7 @@ const form = reactive({
     watermarkShow: '',
     themeColor: {} as ThemeColor,
     menuTabs: '',
+    menuAccordion: '',
     language: '',
     sessionTimeout: 0,
     docSource: 'withByRegion',
@@ -299,6 +316,8 @@ const search = async () => {
     const res = await getSettingInfo();
     form.theme = res.data.theme;
     form.menuTabs = res.data.menuTabs;
+    form.menuAccordion = res.data.menuAccordion || 'Disable';
+    menuAccordion.value = form.menuAccordion === 'Enable';
     form.panelName = res.data.panelName;
     form.language = res.data.language;
     form.sessionTimeout = Number(res.data.sessionTimeout || 0);
@@ -441,6 +460,9 @@ const onSave = async (key: string, val: any) => {
                 break;
             case 'MenuTabs':
                 openMenuTabs.value = val === 'Enable';
+                break;
+            case 'MenuAccordion':
+                menuAccordion.value = val === 'Enable';
                 break;
             case 'Language':
                 await globalStore.updateLanguage(val);

@@ -2538,6 +2538,9 @@ const message = {
         portChangeHelper: 'Ubah port perkhidmatan dan mulakan semula perkhidmatan. Adakah anda mahu meneruskan?',
         theme: 'Tema',
         menuTabs: 'Tab menu',
+        menuAccordion: 'Pengembangan berbilang menu',
+        menuAccordionHelper:
+            'Selepas diaktifkan, beberapa kumpulan menu bar sisi boleh kekal dikembangkan pada masa yang sama.',
         dark: 'Gelap',
         darkGold: 'Emas Gelap',
         light: 'Terang',

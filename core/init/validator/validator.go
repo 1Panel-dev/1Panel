@@ -36,6 +36,7 @@ var baseSettingKeys = map[string]struct{}{
 	"PanelName":                  {},
 	"Theme":                      {},
 	"MenuTabs":                   {},
+	"MenuAccordion":              {},
 	"Language":                   {},
 	"SessionTimeout":             {},
 	"ExpirationDays":             {},

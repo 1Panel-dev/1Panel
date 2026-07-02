@@ -16,7 +16,7 @@
                 :router="true"
                 :collapse="isCollapse"
                 :collapse-transition="false"
-                :unique-opened="true"
+                :unique-opened="!menuAccordion"
                 @select="handleMenuClick"
                 class="custom-menu"
             >
@@ -43,7 +43,7 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const route = useRoute();
 const menuStore = MenuStore();
-const { currentNode, isAdmin, isEE, isIntl, permissions } = useGlobalStore();
+const { currentNode, isAdmin, isEE, isIntl, menuAccordion, permissions } = useGlobalStore();
 const version = ref();
 
 const activeMenu = computed(() => {
@@ -88,11 +88,12 @@ const openTask = () => {
 };
 
 const search = async () => {
-    let settingInfo: { systemVersion: string; hideMenu?: string } | null = null;
+    let settingInfo: { systemVersion: string; hideMenu?: string; menuAccordion?: string } | null = null;
     try {
         const res = await getSettingBaseInfo();
         settingInfo = res.data;
         version.value = res.data.systemVersion;
+        menuAccordion.value = res.data.menuAccordion === 'Enable';
     } catch (error) {
         version.value = '';
     }

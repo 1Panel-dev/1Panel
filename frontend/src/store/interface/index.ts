@@ -33,6 +33,7 @@ export interface GlobalState {
     // ui
     isFullScreen: boolean;
     openMenuTabs: boolean;
+    menuAccordion: boolean;
     watermark: Watermark | null;
     watermarkShow: boolean;
     isLoading: boolean;

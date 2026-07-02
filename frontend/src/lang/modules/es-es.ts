@@ -2537,6 +2537,9 @@ const message = {
         portChangeHelper: 'Modificará el puerto del servicio y reiniciará el servicio. ¿Deseas continuar?',
         theme: 'Tema',
         menuTabs: 'Pestañas de menú',
+        menuAccordion: 'Expansión múltiple de menús',
+        menuAccordionHelper:
+            'Tras activarlo, varios grupos de menús de la barra lateral pueden permanecer expandidos al mismo tiempo.',
         dark: 'Oscuro',
         darkGold: 'Dorado oscuro',
         light: 'Claro',

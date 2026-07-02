@@ -63,6 +63,9 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "MenuTabs", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "MenuAccordion", Value: constant.StatusDisable}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.Setting{Key: "PanelName", Value: "1Panel"}).Error; err != nil {
 			return err
 		}
@@ -1425,6 +1428,23 @@ var AddAlertAuditUser = &gormigrate.Migration{
 			), username).Error; err != nil {
 				return err
 			}
+		}
+		return nil
+	},
+}
+
+var AddMenuAccordionSetting = &gormigrate.Migration{
+	ID: "20260701-add-menu-accordion-setting",
+	Migrate: func(tx *gorm.DB) error {
+		var setting model.Setting
+		if err := tx.Where("key = ?", "MenuAccordion").First(&setting).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return tx.Create(&model.Setting{Key: "MenuAccordion", Value: constant.StatusDisable}).Error
+			}
+			return err
+		}
+		if setting.Value == "" {
+			return tx.Model(&model.Setting{}).Where("key = ?", "MenuAccordion").Update("value", constant.StatusDisable).Error
 		}
 		return nil
 	},

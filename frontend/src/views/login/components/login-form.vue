@@ -277,6 +277,7 @@ const {
     isOffline,
     isOnRestart,
     openMenuTabs,
+    menuAccordion,
     themeConfig,
 } = useGlobalStore();
 const menuStore = MenuStore();
@@ -655,6 +656,7 @@ const getSetting = async () => {
         document.title = res.data.panelName;
         i18n.warnHtmlMessage = false;
         openMenuTabs.value = res.data.menuTabs === 'Enable';
+        menuAccordion.value = res.data.menuAccordion === 'Enable';
         themeConfig.value = { ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName };
 
         if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {

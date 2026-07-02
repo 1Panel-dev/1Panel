@@ -114,6 +114,7 @@ const {
     isLogin,
     isMasterProductPro,
     isOffline,
+    menuAccordion,
     openMenuTabs,
     themeConfig,
 } = useGlobalStore();
@@ -194,6 +195,7 @@ const loadLoginTheme = async () => {
     isFxplay.value = res.data.isFxplay;
     isOffline.value = res.data.isOffline;
     openMenuTabs.value = res.data.menuTabs === 'Enable';
+    menuAccordion.value = res.data.menuAccordion === 'Enable';
     themeConfig.value = {
         ...themeConfig.value,
         theme: res.data.theme,

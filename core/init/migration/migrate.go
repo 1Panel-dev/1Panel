@@ -49,6 +49,7 @@ func Init() {
 		migrations.AddOperationLogUser,
 		migrations.AddLoginLogUser,
 		migrations.AddAlertAuditUser,
+		migrations.AddMenuAccordionSetting,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

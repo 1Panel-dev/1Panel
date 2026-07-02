@@ -85,6 +85,7 @@ const loadDataFromDB = async () => {
     document.title = res.data.panelName;
     globalStore.entrance = res.data.securityEntrance;
     globalStore.openMenuTabs = res.data.menuTabs === 'Enable';
+    globalStore.menuAccordion = res.data.menuAccordion === 'Enable';
 };
 
 export async function loadProductProFromDB() {
