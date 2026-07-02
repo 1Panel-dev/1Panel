@@ -2529,6 +2529,9 @@ const message = {
         portChangeHelper: 'Servis portunu değiştir ve servisi yeniden başlat. Devam etmek istiyor musunuz?',
         theme: 'Tema',
         menuTabs: 'Menü sekmeleri',
+        menuAccordion: 'Çoklu menü genişletme',
+        menuAccordionHelper:
+            'Etkinleştirildikten sonra, yan çubuktaki birden fazla menü grubu aynı anda açık kalabilir.',
         dark: 'Koyu',
         darkGold: 'Koyu Altın',
         light: 'Açık',

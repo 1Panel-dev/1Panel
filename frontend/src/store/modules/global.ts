@@ -31,6 +31,7 @@ const GlobalStore = defineStore('GlobalState', {
         // ui
         isFullScreen: false,
         openMenuTabs: false,
+        menuAccordion: false,
         watermark: null,
         watermarkShow: false,
         isLoading: false,

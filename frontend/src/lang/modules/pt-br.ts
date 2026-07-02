@@ -2652,6 +2652,9 @@ const message = {
         portChangeHelper: 'Modificar a porta do serviço e reiniciar o serviço. Deseja continuar?',
         theme: 'Tema',
         menuTabs: 'Guias do menu',
+        menuAccordion: 'Expansão múltipla de menus',
+        menuAccordionHelper:
+            'Após ativar, vários grupos de menus da barra lateral podem permanecer expandidos ao mesmo tempo.',
         dark: 'Escuro',
         darkGold: 'Ouro escuro',
         light: 'Claro',

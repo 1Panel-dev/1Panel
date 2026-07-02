@@ -2343,6 +2343,8 @@ const message = {
         portChangeHelper: '服务端口修改需要重启服务，是否继续？',
         theme: '主题颜色',
         menuTabs: '菜单标签页',
+        menuAccordion: '菜单多项展开',
+        menuAccordionHelper: '开启后，侧边栏可同时展开多个菜单分组。',
         componentSize: '组件大小',
         dark: '暗色',
         darkGold: '黑金',

@@ -2455,6 +2455,8 @@ const message = {
         portChangeHelper: '서비스 포트를 수정하고 서비스를 다시 시작합니다. 계속하시겠습니까?',
         theme: '테마',
         menuTabs: '메뉴 탭',
+        menuAccordion: '메뉴 다중 펼침',
+        menuAccordionHelper: '활성화하면 사이드바의 여러 메뉴 그룹을 동시에 펼쳐 둘 수 있습니다.',
         dark: '다크',
         darkGold: '다크 골드',
         light: '라이트',

@@ -37,6 +37,7 @@ export namespace Login {
         isFxplay: boolean;
         language: string;
         menuTabs: string;
+        menuAccordion: string;
         panelName: string;
         theme: string;
         isOffline: boolean;

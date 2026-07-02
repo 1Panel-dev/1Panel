@@ -2494,6 +2494,8 @@ const message = {
         portChangeHelper: 'Modify the service port and restart the service. Continue?',
         theme: 'Theme',
         menuTabs: 'Menu tabs',
+        menuAccordion: 'Multiple menu expansion',
+        menuAccordionHelper: 'After enabling, multiple sidebar menu groups can stay expanded at the same time.',
         componentSize: 'Component Size',
         dark: 'Dark',
         darkGold: 'Dark Gold',

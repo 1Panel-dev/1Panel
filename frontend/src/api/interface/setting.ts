@@ -40,6 +40,7 @@ export namespace Setting {
         edition: string;
         theme: string;
         menuTabs: string;
+        menuAccordion: string;
         language: string;
         docSource: string;
 
@@ -88,6 +89,7 @@ export namespace Setting {
         edition: string;
         theme: string;
         menuTabs: string;
+        menuAccordion: string;
         language: string;
         hideMenu: string;
         docSource: string;

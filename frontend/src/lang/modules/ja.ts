@@ -2497,6 +2497,8 @@ const message = {
         portChangeHelper: 'サービスポートを変更し、サービスを再起動します。続けたいですか？',
         theme: 'テーマ',
         menuTabs: 'タブメニュー',
+        menuAccordion: 'メニューの複数展開',
+        menuAccordionHelper: '有効にすると、サイドバーの複数のメニューグループを同時に展開したままにできます。',
         dark: '暗い',
         darkGold: 'ダークゴールド',
         light: 'ライト',

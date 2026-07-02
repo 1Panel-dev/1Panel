@@ -129,6 +129,7 @@ func IsValid1PanelToken(panelToken string, panelTimestamp string, apiKey string)
 }
 
 func IsValid1PanelTokenWithVersion(panelToken string, panelTimestamp string, apiKey string, signatureVersion string) bool {
+	panelToken = strings.ToLower(strings.TrimSpace(panelToken))
 	version := strings.ToLower(strings.TrimSpace(signatureVersion))
 	switch version {
 	case "v1", "md5":

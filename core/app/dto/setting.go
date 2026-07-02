@@ -17,6 +17,7 @@ type SettingInfo struct {
 	Edition        string `json:"edition"`
 	Theme          string `json:"theme"`
 	MenuTabs       string `json:"menuTabs"`
+	MenuAccordion  string `json:"menuAccordion"`
 	Language       string `json:"language"`
 	DocSource      string `json:"docSource"`
 
@@ -52,16 +53,17 @@ type SettingBaseInfo struct {
 	DeveloperMode       string `json:"developerMode"`
 	UpgradeBackupCopies string `json:"upgradeBackupCopies"`
 
-	Port        string `json:"port"`
-	Ipv6        string `json:"ipv6"`
-	BindAddress string `json:"bindAddress"`
-	PanelName   string `json:"panelName"`
-	Edition     string `json:"edition"`
-	Theme       string `json:"theme"`
-	MenuTabs    string `json:"menuTabs"`
-	Language    string `json:"language"`
-	HideMenu    string `json:"hideMenu"`
-	DocSource   string `json:"docSource"`
+	Port          string `json:"port"`
+	Ipv6          string `json:"ipv6"`
+	BindAddress   string `json:"bindAddress"`
+	PanelName     string `json:"panelName"`
+	Edition       string `json:"edition"`
+	Theme         string `json:"theme"`
+	MenuTabs      string `json:"menuTabs"`
+	MenuAccordion string `json:"menuAccordion"`
+	Language      string `json:"language"`
+	HideMenu      string `json:"hideMenu"`
+	DocSource     string `json:"docSource"`
 
 	ServerPort             string `json:"serverPort"`
 	SecurityEntrance       string `json:"securityEntrance"`
@@ -265,6 +267,7 @@ type LoginSetting struct {
 	IsEnterprise   bool   `json:"isEnterprise"`
 	Language       string `json:"language"`
 	MenuTabs       string `json:"menuTabs"`
+	MenuAccordion  string `json:"menuAccordion"`
 	PanelName      string `json:"panelName"`
 	Theme          string `json:"theme"`
 	NeedCaptcha    bool   `json:"needCaptcha"`

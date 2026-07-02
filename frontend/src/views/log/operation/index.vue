@@ -266,6 +266,7 @@ const exactReplacements: Record<string, string> = {
     Language: 'setting.language',
     Theme: 'setting.theme',
     MenuTabs: 'setting.menuTabs',
+    MenuAccordion: 'setting.menuAccordion',
     SessionTimeout: 'setting.sessionTimeout',
     SecurityEntrance: 'setting.entrance',
     ExpirationDays: 'setting.expirationTime',
