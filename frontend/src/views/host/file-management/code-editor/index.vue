@@ -405,7 +405,7 @@ import {
 import i18n from '@/lang';
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import { loadMonacoLanguageSupport, setupMonacoEnvironment } from '@/utils/monaco';
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 import { Languages } from '@/global/mimetype';
 import { resolveEditorLanguage } from '@/utils/file';
 import { hasManagePermissionAccess } from '@/utils/permission';
@@ -423,8 +423,9 @@ import CodeTabs from './tabs/index.vue';
 import FileHistoryDrawer from './history/index.vue';
 import noUpdateImage from '@/assets/images/no_update_app.svg';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { CodeEditorTheme, getDefaultCodeEditorTheme, resolveCodeEditorTheme } from '@/utils/code-editor-theme';
 
-const { isMobile } = useGlobalStore();
+const { isDarkTheme, isMobile } = useGlobalStore();
 
 type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
 
@@ -487,7 +488,7 @@ interface EditProps {
 }
 
 interface EditorConfig {
-    theme: string;
+    theme: CodeEditorTheme;
     language: string;
     eol: number;
     wordWrap: WordWrapOptions;
@@ -891,25 +892,44 @@ const changeTheme = (command: string) => {
     if (!monacoApi) {
         return;
     }
-    config.theme = command;
+    config.theme = resolveCodeEditorTheme(command, isDarkTheme.value);
     monacoApi.editor.setTheme(config.theme);
-    const themes = {
+    applyTreeThemeClass();
+    localStorage.setItem(codeThemeKey, config.theme);
+};
+
+const applyTreeThemeClass = () => {
+    const themes: Record<CodeEditorTheme, string> = {
         vs: 'monaco-editor-tree-light',
         'vs-dark': 'monaco-editor-tree-dark',
         'hc-black': 'monaco-editor-tree-dark',
     };
 
-    if (treeRef.value) {
-        Object.values(themes).forEach((themeClass) => {
-            treeRef.value.$el.classList.remove(themeClass);
-        });
-        if (themes[config.theme]) {
-            treeRef.value.$el.classList.add(themes[config.theme]);
-        }
+    if (!treeRef.value) {
+        return;
     }
-
-    localStorage.setItem(codeThemeKey, config.theme);
+    Object.values(themes).forEach((themeClass) => {
+        treeRef.value.$el.classList.remove(themeClass);
+    });
+    treeRef.value.$el.classList.add(themes[config.theme]);
 };
+
+const syncDefaultThemeWithPanelTheme = () => {
+    if (localStorage.getItem(codeThemeKey)) {
+        return;
+    }
+    const nextTheme = getDefaultCodeEditorTheme(isDarkTheme.value);
+    if (config.theme === nextTheme) {
+        return;
+    }
+    config.theme = nextTheme;
+    if (monacoApi) {
+        monacoApi.editor.setTheme(config.theme);
+    }
+    applyTreeThemeClass();
+};
+
+watch(isDarkTheme, syncDefaultThemeWithPanelTheme);
 
 const changeEOL = (command: number) => {
     if (!editor) {
@@ -963,6 +983,7 @@ const initEditor = async () => {
     }
 
     editor.getModel()?.pushEOL(config.eol);
+    applyTreeThemeClass();
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, quickSave);
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Slash, quickToggleComment);
@@ -1088,7 +1109,7 @@ const acceptParams = async (props: EditProps) => {
         config.language = props.language;
     }
     config.eol = monaco.editor.EndOfLineSequence.LF;
-    config.theme = localStorage.getItem(codeThemeKey) || 'vs-dark';
+    config.theme = resolveCodeEditorTheme(localStorage.getItem(codeThemeKey), isDarkTheme.value);
     config.wordWrap = (localStorage.getItem(warpKey) as WordWrapOptions) || 'on';
     config.minimap = localStorage.getItem(minimapKey) !== null ? localStorage.getItem(minimapKey) === 'true' : true;
     open.value = true;
