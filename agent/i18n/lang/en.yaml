@@ -1,32 +1,47 @@
+# base errors
 ErrInvalidParams: 'Bad request: {{ .detail }}'
 ErrTokenParse: 'Token error: {{ .detail }}'
 ErrInitialPassword: 'Original password is incorrect'
 ErrInternalServer: 'Internal server error: {{ .detail }}'
+ErrRecordExist: 'Record already exists'
+ErrRecordNotFound: 'Record not found'
+ErrStructTransform: 'Type conversion failed: {{ .err }}'
+ErrNotSupportType: 'Unsupported type: {{ .name }}'
+
+# file AI
 ErrFileAINotEnabled: 'File-management AI summary requires an enabled AI account in File Management. Content-only search still works when AI is off.'
 ErrFileAISearchBadPattern: 'Invalid file search pattern (regex or whole word): {{ .detail }}'
+FileAISearchEmptyDir: 'No files or directories found under this path (or all entries were filtered).'
+
+# remote download
 ErrWgetRemoteFailed: 'Remote download failed or URL is unreachable: {{ .detail }}'
 ErrWgetInvalidContentType: 'Remote URL did not return a file (possibly an error page), {{ .detail }}'
 ErrWgetProxyNotConfigured: 'Configure a proxy server in panel settings first'
 ErrWgetProxyInvalid: 'Invalid proxy server address: {{ .detail }}'
-ErrRecordExist: 'Record already exists'
-ErrRecordNotFound: 'Record not found'
-ErrStructTransform: 'Type conversion failed: {{ .err }}'
+
+# login and security
 ErrNotLogin: 'Not logged in: {{ .detail }}'
 ErrPasswordExpired: 'Password expired: {{ .detail }}'
-ErrNotSupportType: 'Unsupported type: {{ .name }}'
-ErrAlertMethodNotSupported: 'This version does not support this alert method'
+
+# request and API
 ErrProxy: 'Request failed: {{ .detail }}'
 ErrApiConfigStatusInvalid: 'API access disabled: {{ .detail }}'
 ErrApiConfigKeyInvalid: 'Invalid API key: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP not in API allowlist: {{ .detail }}'
 ErrApiConfigDisable: 'Endpoint not allowed via API: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Invalid API timestamp: {{ .detail }}'
-ErrShutDown: 'Command stopped manually'
+ErrCreateHttpClient: 'Failed to create HTTP request: {{ .err }}'
+ErrHttpReqTimeOut: 'HTTP request timed out: {{ .err }}'
+ErrHttpReqFailed: 'HTTP request failed: {{ .err }}'
+ErrNoSuchHost: 'Host resolve failed: {{ .err }}'
+ErrHttpReqNotFound: 'Requested resource not found: {{ .err }}'
 
+# quick jump
 ErrMinQuickJump: 'Set at least one quick jump entry'
 ErrMaxQuickJump: 'At most 4 quick jump entries'
 
-#common
+# common
+ErrShutDown: 'Command stopped manually'
 ErrUsernameIsExist: 'Username already exists'
 ErrNameIsExist: 'Name already exists'
 ErrDemoEnvironment: 'Disabled in demo environment'
@@ -45,7 +60,7 @@ ErrGroupIsDefault: 'Default group, cannot be deleted'
 ErrGroupIsInWebsiteUse: 'Group is in use by a website'
 Decrypt: "Decrypt"
 
-#agent
+# agent
 ErrAgentAccountBound: 'Account is bound to an agent and cannot be deleted'
 ErrTerminalAIAccountInUse: 'This model account is currently used by Terminal AI. Switch the account in Terminal AI settings or disable Terminal AI and try again.'
 ErrAgentAccountUnavailable: 'Account connection unavailable: {{ .err }}'
@@ -71,7 +86,7 @@ ErrAgentWebsiteUnbindUnsupported: 'Deployment websites cannot be unbound manuall
 ErrHermesPairingCodeUnavailable: 'The pairing code is temporarily unavailable in Hermes, possibly due to network issues. Please try again later.'
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'When the Feishu group policy is Allowlist, the DM policy cannot be Pairing Code.'
 
-#backup
+# backup and alert settings
 Localhost: 'Local'
 ErrBackupInUsed: 'Backup account is in use by a scheduled task'
 ErrBackupCheck: 'Backup account connectivity test failed: {{ .err }}'
@@ -80,7 +95,7 @@ ErrBackupLocalCreate: 'Local backup accounts cannot be created'
 ErrAlertConfigInUse: 'Alert configuration is in use and cannot be deleted'
 ErrAlertConfigPhoneExist: 'Phone number already exists'
 
-#app
+# app
 ErrPortInUsed: '{{ .detail }} port is already occupied!'
 ErrAppLimit: 'App install limit reached'
 ErrNotInstall: 'Application not installed'
@@ -98,11 +113,6 @@ ErrFileParseApp: 'Failed to parse {{ .name }}: {{ .err }}'
 ErrAppDirNull: 'The version folder does not exist'
 LocalAppErr: 'Failed to sync app {{ .name }}: {{ .err }}'
 ErrContainerName: 'Container name already exists'
-ErrCreateHttpClient: 'Failed to create HTTP request: {{ .err }}'
-ErrHttpReqTimeOut: 'HTTP request timed out: {{ .err }}'
-ErrHttpReqFailed: 'HTTP request failed: {{ .err }}'
-ErrNoSuchHost: 'Host resolve failed: {{ .err }}'
-ErrHttpReqNotFound: 'Requested resource not found: {{ .err }}'
 ErrContainerNotFound: '{{ .name }} container does not exist'
 ErrContainerMsg: 'Container {{ .name }} is abnormal; check logs'
 ErrAppBackup: 'App backup failed: {{ .name }} {{ .err }}'
@@ -134,7 +144,7 @@ ErrDockerComposeCmdNotFound: 'Docker Compose not found on host'
 UseExistImage: 'Image exists; using existing image'
 ErrDatabaseNotFound: 'Database not found: {{ .name }}'
 
-#ssh
+# SSH
 ExportIP: "Login IP"
 ExportArea: "Location"
 ExportPort: "Port"
@@ -143,7 +153,7 @@ ExportUser: "User"
 ExportStatus: "Login Status"
 ExportDate: "Time"
 
-#file
+# file
 ErrFileCanNotRead: 'File preview is not supported'
 ErrSensitiveFileRead: 'Reading sensitive files is not allowed'
 ErrFileToLarge: 'File is larger than 10 MB'
@@ -171,7 +181,7 @@ FileDropSuccess: 'Cleaned {{ .name }}; files: {{ .count }}, freed: {{ .size }}'
 FileDropSum: 'Cleanup done; files: {{ .count }}, freed: {{ .size }}'
 ErrBadDecrypt: 'Wrong archive password; extract failed'
 
-#website
+# website
 ErrAliasIsExist: 'Alias already exists'
 ErrBackupMatch: 'Backup data mismatch: {{ .detail }}'
 ErrBackupExist: 'Backup source data missing: {{ .detail }}'
@@ -202,7 +212,7 @@ ErrDefaultWebsite: 'Default website already set; unset it first'
 SSL: 'Certificate'
 Set: 'Settings'
 
-#ssl
+# SSL certificate
 ErrSSLCannotDelete: 'Certificate {{ .name }} is in use by a website'
 ErrAccountCannotDelete: 'Account is linked to a certificate and cannot be deleted'
 ErrSSLApply: 'Certificate renewed; OpenResty reload failed'
@@ -238,7 +248,7 @@ StartPushSSLToNode: 'Push certificate to node'
 PushSSLToNodeFailed: "Failed to push certificate to node: {{ .err }}"
 PushSSLToNodeSuccess: 'Certificate pushed to node'
 
-#mysql
+# MySQL
 ErrUserIsExist: 'User already exists'
 ErrDatabaseIsExist: 'Database already exists'
 ErrExecTimeOut: 'SQL execution timed out'
@@ -248,10 +258,10 @@ RemoteBackup: 'Start local DB container with image {{ .name }} before backing up
 RemoteRecover: 'Start local DB container with image {{ .name }} before restoring remote DB'
 Arg: "Argument"
 
-#redis
+# Redis
 ErrTypeOfRedis: 'Backup file type does not match current persistence mode'
 
-#container
+# container
 ErrInUsed: "{{ .detail }} is in use and cannot be deleted!"
 ErrObjectInUsed: "This object is in use and cannot be deleted!"
 ErrObjectBeDependent: "This image is referenced by other images and cannot be deleted!"
@@ -294,7 +304,7 @@ ComposeRecoverContainers: 'Restore compose containers'
 ComposeRecoverRecord: 'Save compose record'
 ComposeRecoverCleanup: 'Cleanup compose restore workspace'
 
-#runtime
+# runtime
 ErrFileNotExist: 'Source file not found: {{ .detail }}'
 ErrImageBuildErr: 'Image build failed'
 ErrImageExist: "Image already exists. Use a different image name."
@@ -308,7 +318,7 @@ ErrContainerNameIsNull: 'Container name is empty'
 ErrPHPPortIsDefault: 'Port 9000 is reserved as default; use another port'
 ErrPHPRuntimePortFailed: 'Port {{ .name }} is already used by this runtime'
 
-#tool
+# tool
 ErrConfigNotFound: 'Configuration file does not exist'
 ErrConfigParse: 'Invalid configuration file format'
 ErrConfigIsNull: 'Configuration file cannot be empty'
@@ -316,7 +326,7 @@ ErrConfigDirNotFound: 'Run directory not found'
 ErrConfigAlreadyExist: 'Configuration file with the same name already exists'
 ErrUserFindErr: 'Failed to find user {{ .name }}: {{ .err }}'
 
-#cronjob
+# cron job
 CutWebsiteLogSuccess: 'Website log rotated: {{ .name }} (backup: {{ .path }})'
 HandleShell: 'Run script {{ .name }}'
 HandleCurl: 'Request URL {{ .name }}'
@@ -336,7 +346,7 @@ CleanLog: 'Clean logs'
 CleanLogByName: 'Clean {{ .name }} logs'
 WafIpGroupNotFound: "WAF IP group not found. Go to [Advanced Features -> WAF -> Black/White List -> IP Group] and add one using Remote Download."
 
-#toolbox
+# toolbox
 ErrNotExistUser: 'User does not exist'
 ErrBanAction: 'Config failed: service {{ .name }} unavailable'
 ErrClamdscanNotFound: 'clamdscan command not found'
@@ -346,14 +356,14 @@ CreateSwap: 'Create swap file'
 FormatSwap: 'Format swap file'
 EnableSwap: 'Enable swap'
 
-#tamper
+# tamper protection
 CleanTamperSetting: 'Clean historical protection settings'
 SetTamperWithRules: 'Enable directory protection by rules'
 ProtectDir: "Protect directory {{ .name }}"
 IgnoreFile: "Protect file {{ .name }}"
 TamperSetSuccessful: 'Protection set. Monitoring these directories:'
 
-#waf
+# WAF
 ErrScope: 'This config cannot be changed'
 ErrStateChange: 'Failed to change state'
 ErrRuleExist: 'Rule already exists'
@@ -409,7 +419,7 @@ remoteIpIsNull: "IP list is empty"
 OpenrestyVersionErr: 'OpenResty version too low; upgrade to 1.27.1.2-2-2-focal'
 ErrFileTooLarge: 'File is larger than 1 MB and cannot be uploaded'
 
-#task
+# task
 TaskStart: '{{ .name }} [START]'
 TaskEnd: '{{ .name }} [DONE]'
 TaskFailed: '{{ .name }} task failed'
@@ -471,16 +481,16 @@ TaskExec: 'Execute'
 TaskBatch: "Batch Operation"
 FileConvert: 'File Conversion'
 
-# task - clam
+# task - ClamAV
 Clamscan: "Scan {{ .name }}"
 TaskScan: "Scan"
 
-# task - ai
+# task - AI
 OllamaModelPull: 'Pull Ollama model {{ .name }}'
 OllamaModelSize: 'Get Ollama model size: {{ .name }}'
 AIBenchmarkRun: 'Run AI benchmark'
 
-# task-snapshot
+# task - snapshot
 Snapshot: 'Snapshot'
 SnapDBInfo: 'Write 1Panel DB info'
 SnapCopy: 'Copy files/directories {{ .name }}'
@@ -506,7 +516,6 @@ SnapCompressSize: 'Snapshot size {{ .name }}'
 SnapUpload: 'Upload snapshot file'
 SnapUploadTo: 'Upload snapshot to {{ .name }}'
 SnapUploadRes: 'Upload snapshot to {{ .name }}'
-
 SnapshotRecover: 'Recover snapshot'
 RecoverDownload: 'Download snapshot file'
 Download: 'Download'
@@ -563,10 +572,11 @@ RecoverFailedStartRollBack: 'Recovery failed; starting rollback'
 AppBackupFileIncomplete: 'Backup is incomplete: missing app.json or app.tar.gz'
 AppAttributesNotMatch: 'Application type or name does not match'
 
-#alert
+# alert
+ErrAlertMethodNotSupported: 'This version does not support this alert method'
 ErrAlertSync: 'Failed to sync alert message'
 
-#task - runtime
+# task - runtime
 ErrInstallExtension: 'Another extension install task is running'
 
 # alert mail template
@@ -587,7 +597,7 @@ NodeExceptionAlert: "Panel {{ .node }}{{ .ip }}: {{ .num }} nodes are abnormal. 
 LicenseExceptionAlert: "Panel {{ .node }}{{ .ip }}: {{ .num }} licenses are abnormal. Log in to view details."
 SSHAndPanelLoginAlert: "Panel {{ .node }}{{ .ip }}: abnormal {{ .name }} login from {{ .loginIp }}. Log in to view details."
 
-#disk
+# disk
 DeviceNotFound: "Device {{ .name }} not found"
 DeviceIsMounted: 'Device {{ .name }} is mounted; unmount first'
 PartitionDiskErr: 'Partition failed: {{ .err }}'
@@ -600,9 +610,8 @@ TerminalAIBlockedRiskyCommand: 'blocked risky command: {{ .command }}'
 TerminalAIThinking: 'AI is thinking...'
 TerminalAIReadyToExecute: 'Thinking complete, press Enter to execute (duration: {{ .duration }}, tokens: {{ .tokens }})'
 TerminalAIRequestFailed: 'AI request failed: {{ .err }}'
-FileAISearchEmptyDir: 'No files or directories found under this path (or all entries were filtered).'
 
-# ai proxy
+# AI gateway
 ErrAIProxyServiceNotInstalled: '{{ .name }} service is not installed'
 ErrAIProxyModelAccountNotFound: 'Model account {{ .id }} not found'
 ErrAIProxyModelMapRequired: 'This field is required.'

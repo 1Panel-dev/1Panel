@@ -1,29 +1,47 @@
+# erros básicos
 ErrInvalidParams: 'Requisição inválida: {{ .detail }}'
 ErrTokenParse: 'Erro de token: {{ .detail }}'
 ErrInitialPassword: 'Senha original incorreta'
 ErrInternalServer: 'Erro interno: {{ .detail }}'
+ErrRecordExist: 'Registro já existe'
+ErrRecordNotFound: 'Registro não encontrado'
+ErrStructTransform: 'Erro de conversão: {{ .err }}'
+ErrNotSupportType: 'Tipo não suportado: {{ .name }}'
+
+# IA de arquivos
 ErrFileAINotEnabled: 'A pesquisa com IA de arquivos está desativada ou sem conta. Em Gerenciamento de arquivos, use Conta de IA, ative e escolha uma conta.'
 ErrFileAISearchBadPattern: 'Padrão de busca inválido (regex ou opção): {{ .detail }}'
+FileAISearchEmptyDir: 'Nenhum arquivo ou pasta encontrado neste caminho (ou todos foram filtrados).'
+
+# download remoto
 ErrWgetRemoteFailed: 'Falha no download remoto ou URL inacessível: {{ .detail }}'
 ErrWgetInvalidContentType: 'A URL remota não retornou um arquivo (possivelmente uma página de erro), {{ .detail }}'
 ErrWgetProxyNotConfigured: 'Configure primeiro um servidor proxy nas configurações do painel'
 ErrWgetProxyInvalid: 'Endereço do servidor proxy inválido: {{ .detail }}'
-ErrRecordExist: 'Registro já existe'
-ErrRecordNotFound: 'Registro não encontrado'
-ErrStructTransform: 'Erro de conversão: {{ .err }}'
+
+# login e segurança
 ErrNotLogin: 'Sem sessão: {{ .detail }}'
 ErrPasswordExpired: 'Senha expirada: {{ .detail }}'
-ErrNotSupportType: 'Tipo não suportado: {{ .name }}'
-ErrAlertMethodNotSupported: 'Esta versão não oferece suporte a este método de alerta'
+
+# requisição e API
 ErrProxy: 'Requisição falhou: {{ .detail }}'
 ErrApiConfigStatusInvalid: 'API desativada: {{ .detail }}'
 ErrApiConfigKeyInvalid: 'Chave API inválida: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP sem permissão: {{ .detail }}'
 ErrApiConfigDisable: 'API bloqueada: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Timestamp inválido: {{ .detail }}'
-ErrShutDown: 'Comando parado manualmente'
+ErrCreateHttpClient: 'Falha ao criar solicitação {{ .err }}'
+ErrHttpReqTimeOut: 'Tempo limite da solicitação esgotado {{ .err }}'
+ErrHttpReqFailed: 'Falha na solicitação {{ .err }}'
+ErrNoSuchHost: 'Não foi possível encontrar o servidor solicitado {{ .err }}'
+ErrHttpReqNotFound: 'O recurso solicitado {{ .err }} não pôde ser encontrado'
+
+# atalho rápido
 ErrMinQuickJump: 'Adicione pelo menos um atalho rápido'
 ErrMaxQuickJump: 'Máximo 4 atalhos rápidos'
+
+# comum
+ErrShutDown: 'Comando parado manualmente'
 ErrUsernameIsExist: 'Usuário já existe'
 ErrNameIsExist: 'Nome já existe'
 ErrDemoEnvironment: 'Indisponível em demo'
@@ -41,6 +59,8 @@ SystemRestart: 'Tarefa interrompida devido à reinicialização do sistema'
 ErrGroupIsDefault: 'Grupo padrão, não pode ser excluído'
 ErrGroupIsInWebsiteUse: 'O grupo está sendo usado por outro site e não pode ser excluído.'
 Decrypt: 'Descriptografar'
+
+# agente
 ErrAgentAccountBound: 'Conta vinculada a agente'
 ErrTerminalAIAccountInUse: 'Esta conta de modelo esta sendo usada pelo Terminal AI. Troque a conta nas configuracoes do Terminal AI ou desative o Terminal AI e tente novamente.'
 ErrAgentAccountUnavailable: 'Conexão da conta indisponível: {{ .err }}'
@@ -65,14 +85,8 @@ ErrAgentWebsiteInUse: 'Este site já está vinculado a outro agente'
 ErrAgentWebsiteUnbindUnsupported: 'Sites implantados em um clique não podem ser desvinculados manualmente'
 ErrHermesPairingCodeUnavailable: 'O código de pareamento está temporariamente indisponível no Hermes, possivelmente por causa de rede. Tente novamente mais tarde.'
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'Quando a política de grupo do Feishu é Lista de permissões, a política de DM não pode ser Código de pareamento.'
-ErrAIProxyServiceNotInstalled: 'O serviço {{ .name }} não está instalado'
-ErrAIProxyModelAccountNotFound: 'Conta de modelo {{ .id }} não encontrada'
-ErrAIProxyModelMapRequired: 'Este campo é obrigatório.'
-ErrAIProxyModelMapInvalid: 'O mapeamento de modelos deve ser um objeto JSON válido: {{ .err }}'
-ErrAIProxyModelMapEmpty: 'O mapeamento de modelos não pode estar vazio'
-ErrAIProxyModelMapEmptyExternalModel: 'O mapeamento de modelos contém um modelo solicitado vazio'
-ErrAIProxyModelMapEmptyUpstreamModel: 'O modelo upstream de {{ .model }} não pode estar vazio'
-AIProxyUserFallback: 'Usuário excluído (ID: {{ .id }})'
+
+# backup e configurações de alerta
 Localhost: 'Máquina Local'
 ErrBackupInUsed: 'Conta de backup em uso por tarefa'
 ErrBackupCheck: 'Teste de conexão falhou: {{ .err }}'
@@ -80,6 +94,8 @@ ErrBackupLocalDelete: 'Não é permitido excluir contas locais'
 ErrBackupLocalCreate: 'Não é permitido criar contas locais'
 ErrAlertConfigInUse: 'A configuração de alerta está em uso e não pode ser excluída'
 ErrAlertConfigPhoneExist: 'O numero de telefone ja existe'
+
+# aplicativo
 ErrPortInUsed: 'A porta {{ .detail }} já está ocupada'
 ErrAppLimit: 'O número de aplicativos instalados excedeu o limite'
 ErrNotInstall: 'Aplicativo não instalado'
@@ -97,11 +113,6 @@ ErrFileParseApp: 'Falha na análise do arquivo {{ .name }} {{ .err }}'
 ErrAppDirNull: 'A pasta da versão não existe'
 LocalAppErr: 'Falha na sincronização do aplicativo {{ .name }} {{ .err }}'
 ErrContainerName: 'O nome do contêiner já existe'
-ErrCreateHttpClient: 'Falha ao criar solicitação {{ .err }}'
-ErrHttpReqTimeOut: 'Tempo limite da solicitação esgotado {{ .err }}'
-ErrHttpReqFailed: 'Falha na solicitação {{ .err }}'
-ErrNoSuchHost: 'Não foi possível encontrar o servidor solicitado {{ .err }}'
-ErrHttpReqNotFound: 'O recurso solicitado {{ .err }} não pôde ser encontrado'
 ErrContainerNotFound: '{{ .name }} container não existe'
 ErrContainerMsg: 'O contêiner {{ .name }} está anormal., verifique o log na página do contêiner para obter detalhes.'
 ErrAppBackup: '{{ .name }} falha no backup do aplicativo {{ .err }}'
@@ -132,6 +143,8 @@ ErrDockerFailed: 'O estado do Docker está anormal, verifique o status do servi�
 ErrDockerComposeCmdNotFound: 'O comando Docker Compose não existe, instale este comando na máquina host primeiro'
 UseExistImage: 'A imagem já existe, usando imagem existente'
 ErrDatabaseNotFound: 'O banco de dados {{ .name }} não existe'
+
+# SSH
 ExportIP: 'IP de Login'
 ExportArea: 'Localização'
 ExportPort: 'Porta'
@@ -139,6 +152,8 @@ ExportAuthMode: 'Método de Login'
 ExportUser: 'Usuário'
 ExportStatus: 'Status de Login'
 ExportDate: 'Hora'
+
+# arquivo
 ErrFileCanNotRead: 'Este arquivo não suporta visualização'
 ErrSensitiveFileRead: 'A leitura de arquivos sensíveis não é permitida'
 ErrFileToLarge: 'O arquivo é maior que 10M e não pode ser aberto'
@@ -165,6 +180,8 @@ FileDropFailed: 'Falha ao limpar arquivo {{ .name }}: {{ .err }}'
 FileDropSuccess: 'Arquivo {{ .name }} limpo com sucesso, {{ .count }} arquivos removidos, {{ .size }} de espaço em disco liberado'
 FileDropSum: 'Limpeza de arquivos concluída com sucesso, total de {{ .count }} arquivos removidos, total de {{ .size }} de espaço em disco liberado'
 ErrBadDecrypt: 'Erro de senha de descriptografia do pacote compactado, descompactação falhou, verifique e'
+
+# site
 ErrAliasIsExist: 'Alias já existe'
 ErrBackupMatch: 'O arquivo de backup não corresponde a alguns dados atuais do site {{ .detail }}'
 ErrBackupExist: 'A parte correspondente dos dados de origem no arquivo de backup não existe {{ .detail }}'
@@ -194,6 +211,8 @@ delete: 'Excluir'
 ErrDefaultWebsite: 'O site padrão já foi definido, cancele-o antes de definir'
 SSL: 'Certificado'
 Set: 'Configurações'
+
+# certificado SSL
 ErrSSLCannotDelete: 'O certificado {{ .name }} está sendo usado por um site e não pode ser excluído'
 ErrAccountCannotDelete: 'A conta está associada a um certificado e não pode ser excluída'
 ErrSSLApply: 'Renovação do certificado concluída, mas a recarga do OpenResty falhou. Verifique a configuração'
@@ -228,6 +247,8 @@ ErrApplySSLCanNotDelete: 'O certificado {{ .name }} que está sendo solicitado n
 StartPushSSLToNode: 'Iniciando o envio do certificado para o nó'
 PushSSLToNodeFailed: 'Falha ao enviar o certificado para o nó: {{ .err }}'
 PushSSLToNodeSuccess: 'Certificado enviado com sucesso para o nó'
+
+# MySQL
 ErrUserIsExist: 'O usuário atual já existe, digite novamente'
 ErrDatabaseIsExist: 'O banco de dados atual já existe, digite novamente'
 ErrExecTimeOut: 'Tempo limite de execução do SQL expirou, verifique o banco de dados'
@@ -236,7 +257,11 @@ ErrLocalExist: 'O nome já existe no banco de dados local, modifique-o e'
 RemoteBackup: 'Para fazer backup do banco de dados remoto, o serviço de banco de dados do contêiner local precisa ser iniciado primeiro usando a imagem {{ .name }} aguarde...'
 RemoteRecover: 'Para restaurar o banco de dados remoto, o serviço de banco de dados do contêiner local precisa ser iniciado primeiro usando a imagem {{ .name }} aguarde...'
 Arg: 'Argumento'
+
+# Redis
 ErrTypeOfRedis: 'O tipo de arquivo de recuperação não corresponde ao método de persistência atual, modifique-o e'
+
+# contêiner
 ErrInUsed: '{{ .detail }} está em uso e não pode ser excluído'
 ErrObjectInUsed: 'Este objeto está em uso e não pode ser excluído'
 ErrObjectBeDependent: 'Esta imagem é dependida por outras imagens e não pode ser excluída'
@@ -278,6 +303,8 @@ ComposeRecoverFiles: 'Restaurar arquivos do compose'
 ComposeRecoverContainers: 'Restaurar contêineres do compose'
 ComposeRecoverRecord: 'Salvar registro do compose'
 ComposeRecoverCleanup: 'Limpar área de restauração do compose'
+
+# runtime
 ErrFileNotExist: 'O arquivo {{ .detail }} não existe Verifique a integridade do arquivo de origem'
 ErrImageBuildErr: 'Falha na criação da imagem'
 ErrImageExist: 'A imagem já existe, modifique o nome da imagem.'
@@ -290,12 +317,16 @@ ErrNodeModulesNotFound: 'A pasta node_modules não existe Edite o ambiente de ex
 ErrContainerNameIsNull: 'O nome do contêiner não existe'
 ErrPHPPortIsDefault: 'A porta 9000 é a porta padrão. Altere-a e tente novamente'
 ErrPHPRuntimePortFailed: 'A porta {{ .name }} já está em uso neste runtime. Altere-a e tente novamente'
+
+# ferramenta
 ErrConfigNotFound: 'O arquivo de configuração não existe'
 ErrConfigParse: 'O formato do arquivo de configuração está incorreto'
 ErrConfigIsNull: 'O arquivo de configuração não pode estar vazio'
 ErrConfigDirNotFound: 'O diretório de execução não existe'
 ErrConfigAlreadyExist: 'Um arquivo de configuração com o mesmo nome já existe'
 ErrUserFindErr: 'Falha na pesquisa do usuário {{ .name }} {{ .err }}'
+
+# tarefa cron
 CutWebsiteLogSuccess: '{{ .name }} registro do site cortado com sucesso, caminho de backup {{ .path }}'
 HandleShell: 'Executar script {{ .name }}'
 HandleCurl: 'Acessar URL {{ .name }}'
@@ -314,6 +345,8 @@ NoSuchResource: 'Nenhum conteúdo de backup encontrado no banco de dados, ignora
 CleanLog: 'Limpar log'
 CleanLogByName: 'Limpar log de {{ .name }}'
 WafIpGroupNotFound: 'Grupo de IP do WAF não encontrado., vá para [Recursos Avançados - WAF - Lista Branca/Preta - Grupo de IP] para adicionar um grupo de IP via método de download remoto.'
+
+# caixa de ferramentas
 ErrNotExistUser: 'O usuário atual não existe, modifique e'
 ErrBanAction: 'Falha na configuração. O serviço atual {{ .name }} não está disponível. Verifique e'
 ErrClamdscanNotFound: 'O comando clamdscan não foi detectado, consulte a documentação para instalá-lo'
@@ -322,11 +355,15 @@ SetSwap: 'Configurar Swap {{ .path }} - {{ .size }}'
 CreateSwap: 'Criar Arquivo Swap'
 FormatSwap: 'Formatar Arquivo Swap'
 EnableSwap: 'Ativar Swap'
+
+# proteção contra adulteração
 CleanTamperSetting: 'Limpar configurações de proteção históricas'
 SetTamperWithRules: 'Iniciar proteção de diretório de acordo com as regras'
 ProtectDir: 'Proteger diretório {{ .name }}'
 IgnoreFile: 'Proteger arquivo {{ .name }}'
 TamperSetSuccessful: 'Configurações de proteção concluídas, iniciando monitoramento dos seguintes diretórios:'
+
+# WAF
 ErrScope: 'A modificação desta configuração não é suportada'
 ErrStateChange: 'Falha na alteração de estado'
 ErrRuleExist: 'A regra já existe'
@@ -381,6 +418,8 @@ OpenrestyNotFound: 'OpenResty não está instalado'
 remoteIpIsNull: 'A lista de IP está vazia'
 OpenrestyVersionErr: 'A versão do OpenResty é muito antiga. Atualize para 1.27.1.2-2-2-focal'
 ErrFileTooLarge: 'O arquivo excede 1 MB e não pode ser enviado'
+
+# tarefa
 TaskStart: '{{ .name }} A tarefa inicia [START]'
 TaskEnd: '{{ .name }} Tarefa concluída [CONCLUÍDA]'
 TaskFailed: '{{ .name }} tarefa falhou'
@@ -441,10 +480,17 @@ CustomAppstore: 'Armazém de aplicativos personalizados'
 TaskExec: 'Executar'
 TaskBatch: 'Operação em Lote'
 FileConvert: 'Conversão de Formato de Arquivo'
+
+# tarefa - ClamAV
 Clamscan: 'Escanear {{ .name }}'
 TaskScan: 'Escanear'
+
+# tarefa - IA
 OllamaModelPull: 'Puxar modelo Ollama {{ .name }}'
 OllamaModelSize: 'Obtenha o tamanho do modelo Ollama {{ .name }}'
+AIBenchmarkRun: "Executar benchmark de IA"
+
+# tarefa - snapshot
 Snapshot: 'Instantâneo'
 SnapDBInfo: 'Escrever informações do banco de dados 1Panel'
 SnapCopy: 'Copiar arquivos e diretórios {{ .name }}'
@@ -494,6 +540,8 @@ RecoverDaemonJson: 'Restaurar arquivo daemon.json de configuração do contêine
 RecoverDBData: 'Recuperar dados do banco de dados'
 RecoverBackups: 'Restaurar diretório de backup local'
 RecoverPanelData: 'Diretório de dados de recuperação'
+
+# tarefa - contêiner
 ContainerImagePull: 'Puxar imagem do contêiner {{ .name }}'
 ContainerRemoveOld: 'Remover o contêiner original {{ .name }}'
 ContainerImageCheck: 'Verifique se a imagem é extraída normalmente'
@@ -502,6 +550,8 @@ ContainerRecreate: 'A atualização do contêiner falhou, agora iniciando a rest
 ContainerCreate: 'Criar um novo contêiner {{ .name }}'
 ContainerCreateFailed: 'Falha na criação do contêiner, exclua o contêiner com falha'
 ContainerStartCheck: 'Verifique se o contêiner foi iniciado'
+
+# tarefa - imagem
 ImageBuild: 'Construção de imagem'
 ImagePull: 'Puxar imagem'
 ImageRepoAuthFromDB: 'Obter informações de autenticação do repositório do banco de dados'
@@ -509,6 +559,8 @@ ImagePush: 'Enviar imagem'
 ImageRenameTag: 'Modificar tag de imagem'
 ImageNewTag: 'Nova tag de imagem {{ .name }}'
 ComposeCreate: 'Criar uma composição'
+
+# tarefa - site
 BackupNginxConfig: 'Fazer backup do arquivo de configuração do OpenResty do site'
 CompressFileSuccess: 'Diretório compactado com sucesso, compactado para {{ .name }}'
 CompressDir: 'Diretório de compressão'
@@ -519,8 +571,15 @@ websiteDir: 'Diretório de sites'
 RecoverFailedStartRollBack: 'Falha na recuperação, iniciar reversão'
 AppBackupFileIncomplete: 'O arquivo de backup está incompleto e não contém os arquivos app.json ou app.tar.gz'
 AppAttributesNotMatch: 'O tipo ou nome do aplicativo não corresponde'
+
+# alerta
+ErrAlertMethodNotSupported: 'Esta versão não oferece suporte a este método de alerta'
 ErrAlertSync: 'Erro de sincronização de informações de alarme, verifique e'
+
+# tarefa - runtime
 ErrInstallExtension: 'Já existe uma tarefa de instalação em andamento, aguarde a conclusão da tarefa'
+
+# modelo de e-mail de alerta
 PanelAlertTitle: 'Notificação de Alerta do Painel'
 TestAlertTitle: 'E-mail de Teste - Verificar Conectividade de E-mail'
 TestAlert: 'Este é um e-mail de teste para verificar se sua configuração de envio de e-mails está correta.'
@@ -537,6 +596,8 @@ CommonAlert: 'Seu Painel {{ .node }}{{ .ip }}, {{ .msg }}. Faça login no painel
 NodeExceptionAlert: 'Seu Painel {{ .node }}{{ .ip }}, {{ .num }} nós estão anormais. Faça login no painel para obter detalhes.'
 LicenseExceptionAlert: 'Seu Painel {{ .node }}{{ .ip }}, {{ .num }} licenças estão anormais. Faça login no painel para obter detalhes.'
 SSHAndPanelLoginAlert: 'Seu Painel {{ .node }}{{ .ip }}, o login {{ .name }} a partir de {{ .loginIp }} é anormal. Faça login no painel para obter detalhes.'
+
+# disco
 DeviceNotFound: 'Dispositivo {{ .name }} não encontrado'
 DeviceIsMounted: 'Dispositivo {{ .name }} está montado desmonte primeiro'
 PartitionDiskErr: 'Falha ao particionar, {{ .err }}'
@@ -549,4 +610,13 @@ TerminalAIBlockedRiskyCommand: 'Comando de risco bloqueado: {{ .command }}'
 TerminalAIThinking: 'A IA está pensando...'
 TerminalAIReadyToExecute: 'Pensamento concluído, pressione Enter para executar (duração: {{ .duration }}, token: {{ .tokens }})'
 TerminalAIRequestFailed: 'Falha na solicitação de AI: {{ .err }}'
-FileAISearchEmptyDir: 'Nenhum arquivo ou pasta encontrado neste caminho (ou todos foram filtrados).'
+
+# gateway de IA
+ErrAIProxyServiceNotInstalled: 'O serviço {{ .name }} não está instalado'
+ErrAIProxyModelAccountNotFound: 'Conta de modelo {{ .id }} não encontrada'
+ErrAIProxyModelMapRequired: 'Este campo é obrigatório.'
+ErrAIProxyModelMapInvalid: 'O mapeamento de modelos deve ser um objeto JSON válido: {{ .err }}'
+ErrAIProxyModelMapEmpty: 'O mapeamento de modelos não pode estar vazio'
+ErrAIProxyModelMapEmptyExternalModel: 'O mapeamento de modelos contém um modelo solicitado vazio'
+ErrAIProxyModelMapEmptyUpstreamModel: 'O modelo upstream de {{ .model }} não pode estar vazio'
+AIProxyUserFallback: 'Usuário excluído (ID: {{ .id }})'

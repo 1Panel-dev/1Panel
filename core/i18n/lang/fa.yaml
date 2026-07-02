@@ -1,16 +1,36 @@
+# خطاهای پایه
 ErrInvalidParams: "پارامترهای درخواست نامعتبر: {{ .detail }}"
 ErrTokenParse: "خطا در تولید توکن: {{ .detail }}"
 ErrInitialPassword: "رمز عبور اولیه اشتباه است"
 ErrInternalServer: "خطای داخلی سرور: {{ .detail }}"
+ErrInternalServerKey: "خطای داخلی سرور:"
 ErrRecordExist: "رکورد از قبل وجود دارد"
 ErrRecordNotFound: "رکورد یافت نشد"
 ErrStructTransform: "تبدیل نوع ناموفق بود: {{ .detail }}"
+ErrNotSupportType: "نوع پشتیبانی نمی‌شود: {{ .name }}"
+ErrDemoEnvironment: "سرور آزمایشی، این عملیات ممنوع است!"
+ErrCmdTimeout: "زمان اجرای دستور به پایان رسید!"
+ErrPortInUsed: "پورت {{ .name }} قبلاً در حال استفاده است!"
+ErrFileNotFound: "فایل {{ .name }} وجود ندارد"
+ErrReqFailed: "درخواست {{.name}} ناموفق بود: {{ .err }}"
+
+# درخواست و ورودی امنیتی
+ErrNoSuchHost: "تفکیک میزبان ناموفق بود: {{ .err }}"
+ErrHttpReqNotFound: "منبع درخواستی یافت نشد: {{ .err }}"
+ErrHttpReqFailed: "درخواست ناموفق بود {{ .err }}"
+ErrHttpReqTimeOut: "زمان درخواست به پایان رسید {{ .err }}"
+ErrCreateHttpClient: "ایجاد درخواست ناموفق بود {{ .err }}"
+ErrProxy: "درخواست ناموفق بود؛ وضعیت این گره را بررسی کنید: {{ .detail }}"
+ErrProxySetting: "اطلاعات سرور پروکسی در دسترس نیست {{ .err }}، بررسی و دوباره تلاش کنید!"
+ErrEntrance: "خطا در اطلاعات ورودی امنیتی، بررسی و دوباره تلاش کنید!"
+ErrEntranceFormat: "ورودی امنیتی {{ .name }} پشتیبانی نمی‌شود. بررسی و دوباره تلاش کنید."
+
+# ورود و امنیت
 ErrNotLogin: "کاربر وارد نشده است: {{ .detail }}"
 ErrSessionDataNotFound: "جلسه منقضی شده است"
 ErrSessionDataFormat: "فرمت داده جلسه نامعتبر است"
 ErrPasswordExpired: "رمز عبور منقضی شده است: {{ .detail }}"
-ErrNotSupportType: "نوع پشتیبانی نمی‌شود: {{ .name }}"
-ErrProxy: "درخواست ناموفق بود؛ وضعیت این گره را بررسی کنید: {{ .detail }}"
+ErrLoginLocked: "تعداد تلاش‌های ناموفق زیاد است. ورود به مدت ۵ دقیقه به طور موقت قفل شده است."
 ErrApiConfigStatusInvalid: "دسترسی API غیرفعال است: {{ .detail }}"
 ErrApiConfigKeyInvalid: "کلید API نامعتبر است: {{ .detail }}"
 ErrApiConfigIPInvalid: "IP درخواست API در لیست سفید نیست: {{ .detail }}"
@@ -22,53 +42,24 @@ ErrPasskeyLimit: "محدودیت کلید عبور رسیده است (حداکث
 ErrPasskeySession: "جلسه کلید عبور منقضی یا نامعتبر است"
 ErrPasskeyDuplicate: "کلید عبور از قبل وجود دارد"
 ErrPasskeyVerify: "تأیید کلید عبور ناموفق بود"
-ErrLoginLocked: "تعداد تلاش‌های ناموفق زیاد است. ورود به مدت ۵ دقیقه به طور موقت قفل شده است."
 
-# request
-ErrNoSuchHost: "تفکیک میزبان ناموفق بود: {{ .err }}"
-ErrHttpReqNotFound: "منبع درخواستی یافت نشد: {{ .err }}"
-ErrHttpReqFailed: "درخواست ناموفق بود {{ .err }}"
-ErrHttpReqTimeOut: "زمان درخواست به پایان رسید {{ .err }}"
-ErrCreateHttpClient: "ایجاد درخواست ناموفق بود {{ .err }}"
-ErrProxySetting: "اطلاعات سرور پروکسی در دسترس نیست {{ .err }}، بررسی و دوباره تلاش کنید!"
-ErrEntranceFormat: "ورودی امنیتی {{ .name }} پشتیبانی نمی‌شود. بررسی و دوباره تلاش کنید."
-
-# common
-ErrDemoEnvironment: "سرور آزمایشی، این عملیات ممنوع است!"
-ErrCmdTimeout: "زمان اجرای دستور به پایان رسید!"
-ErrEntrance: "خطا در اطلاعات ورودی امنیتی، بررسی و دوباره تلاش کنید!"
+# کاربر و مجوزها
+ErrNoSuchUser: "اطلاعات کاربر یافت نشد، بررسی و دوباره تلاش کنید!"
+ErrToMaster: "این کاربر مجوز انجام این عملیات روی گره اصلی را ندارد. بررسی و دوباره تلاش کنید!"
+ErrToNode: "این کاربر مجوز انجام این عملیات روی این گره را ندارد. بررسی و دوباره تلاش کنید!"
+ErrRBAC: "مجوزهای کاربر ناکافی است. این عملیات قابل انجام نیست. بررسی و دوباره تلاش کنید!"
+ErrNoneNode: "این کاربر هیچ مجوز گره‌ای ندارد. با مدیر تماس بگیرید یا بررسی و دوباره تلاش کنید!"
+ErrOnlySuperAdmin: "فقط مدیران کل می‌توانند از این ویژگی استفاده کنند!"
+ErrRolePresetCannotDelete: "نقش‌های از پیش تعیین شده سیستم قابل حذف نیستند"
+ErrRolePresetCannotUpdate: "نقش‌های از پیش تعیین شده سیستم قابل به‌روزرسانی نیستند"
+ErrRoleBoundToUser: "این نقش قبلاً به کاربران متصل است و قابل حذف نیست"
+ErrRolePresetCannotBind: "نقش‌های از پیش تعیین شده سیستم قابل انتساب به کاربران نیستند"
+ErrNodeAdminMasterForbidden: "مجوزهای مدیر گره نمی‌توانند به گره اصلی اضافه شوند"
+ErrSuperAdminCannotDelete: "کاربران مدیر کل قابل حذف نیستند"
 ErrGroupIsDefault: "گروه پیش‌فرض، قابل حذف نیست"
 ErrGroupIsInUse: "گروه در حال استفاده است و قابل حذف نیست."
-ErrAIProxyUserGroupIsDefault: "گروه کاربری پیش‌فرض قابل حذف نیست."
-ErrAIProxyUserGroupInUse: "گروه کاربری در حال استفاده است و قابل حذف نیست."
-ErrAIProxyUserGroupExists: "نام گروه کاربری از قبل وجود دارد."
-ErrAIProxyBackendAccountExists: "این حساب مدل قبلاً به مجموعه حساب‌های دروازه AI وارد شده است."
-ErrAIProxyModelGroupInUse: "گروه مدل در حال استفاده است و قابل حذف نیست."
-ErrAIProxyModelGroupExists: "نام گروه مدل از قبل وجود دارد."
-ErrAIProxySensitiveGroupInUse: "گروه کلمات حساس در حال استفاده است و قابل حذف نیست."
-ErrAIProxySensitiveGroupExists: "نام گروه کلمات حساس از قبل وجود دارد."
-ErrLocalDelete: "گره محلی قابل حذف نیست!"
-ErrPortInUsed: "پورت {{ .name }} قبلاً در حال استفاده است!"
-ErrInternalServerKey: "خطای داخلی سرور:"
-MasterNode: "گره اصلی"
 
-# app
-CustomAppStoreFileValid: "بسته فروشگاه برنامه باید با فرمت .tar.gz باشد"
-ErrFileNotFound: "فایل {{ .name }} وجود ندارد"
-AppBackup: 'پشتیبان‌گیری از برنامه'
-AppBackupPush: 'انتقال فایل پشتیبان برنامه {{.file}} به گره {{ .name }}'
-ErrSourceTargetSame: 'گره منبع و گره هدف نمی‌توانند یکسان باشند!'
-AppInstall: 'نصب برنامه {{ .name }} روی گره {{ .targetNode }}'
-AppInstallCheck: 'بررسی محیط نصب برنامه'
-
-# backup
-ErrBackupInUsed: "این حساب پشتیبان در وظایف زمان‌بندی استفاده می‌شود و قابل حذف نیست"
-ErrBackupCheck: "تست اتصال حساب پشتیبان ناموفق بود {{ .err }}"
-ErrBackupLocal: "حساب پشتیبان سرور محلی از این عملیات پشتیبانی نمی‌کند!"
-ErrBackupPublic: "تشخیص داده شد که این حساب پشتیبان عمومی نیست، بررسی و دوباره تلاش کنید!"
-ErrOSSConn: "امکان دریافت آخرین نسخه وجود ندارد. اتصال اینترنت سرور را بررسی کنید."
-
-#license
+# مجوز
 LicenseCheck: 'بررسی در دسترس بودن مجوز'
 ErrLicenseInUsed: 'مجوز قبلاً متصل شده است. بررسی و دوباره تلاش کنید!'
 ErrLicenseExpired: 'مجوز منقضی شده است. بررسی و دوباره تلاش کنید!'
@@ -98,21 +89,6 @@ ErrNodeUnbind: "این گره در محدوده اتصال مجوز نیست، �
 ErrNodeBind: "این گره قبلاً به یک مجوز متصل است، بررسی و دوباره تلاش کنید!"
 ErrNodeLocalRollback: "گره اصلی از بازگشت مستقیم پشتیبانی نمی‌کند. برای بازگشت به صورت دستی '1pctl restore' را اجرا کنید."
 ErrIntlLicense: "نسخه فعلی از واردات مجوزهای بین‌المللی پشتیبانی نمی‌کند. منتظر به‌روزرسانی‌های بعدی باشید!"
-
-# user
-ErrNoSuchUser: "اطلاعات کاربر یافت نشد، بررسی و دوباره تلاش کنید!"
-ErrToMaster: "این کاربر مجوز انجام این عملیات روی گره اصلی را ندارد. بررسی و دوباره تلاش کنید!"
-ErrToNode: "این کاربر مجوز انجام این عملیات روی این گره را ندارد. بررسی و دوباره تلاش کنید!"
-ErrRBAC: "مجوزهای کاربر ناکافی است. این عملیات قابل انجام نیست. بررسی و دوباره تلاش کنید!"
-ErrNoneNode: "این کاربر هیچ مجوز گره‌ای ندارد. با مدیر تماس بگیرید یا بررسی و دوباره تلاش کنید!"
-ErrOnlySuperAdmin: "فقط مدیران کل می‌توانند از این ویژگی استفاده کنند!"
-ErrRolePresetCannotDelete: "نقش‌های از پیش تعیین شده سیستم قابل حذف نیستند"
-ErrRolePresetCannotUpdate: "نقش‌های از پیش تعیین شده سیستم قابل به‌روزرسانی نیستند"
-ErrRoleBoundToUser: "این نقش قبلاً به کاربران متصل است و قابل حذف نیست"
-ErrRolePresetCannotBind: "نقش‌های از پیش تعیین شده سیستم قابل انتساب به کاربران نیستند"
-ErrNodeAdminMasterForbidden: "مجوزهای مدیر گره نمی‌توانند به گره اصلی اضافه شوند"
-ErrSuperAdminCannotDelete: "کاربران مدیر کل قابل حذف نیستند"
-
 InvalidRequestBodyType: "فرمت بدنه درخواست نامعتبر است. اطمینان حاصل کنید که محتوا با فرمت مورد نیاز مطابقت دارد و دوباره تلاش کنید."
 InvalidLicenseCodeType: "فرمت کد مجوز ارائه شده نامعتبر است، بررسی و دوباره تلاش کنید!"
 LicenseNotFoundType: "مجوز یافت نشد، هیچ رکورد منطبقی در سیستم برای مجوز ارائه شده وجود ندارد. بررسی و دوباره تلاش کنید!"
@@ -123,10 +99,64 @@ InvalidAssigneeType: "اطلاعات کاربر یا دستگاه هدف برا�
 LicenseUsageNotFoundType: "هیچ رکورد استفاده‌ای یافت نشد. این مجوز هنوز فعال یا استفاده نشده است. بررسی و دوباره تلاش کنید!"
 LicenseUsageLimitExceededType: "این مجوز قبلاً به گره دیگری متصل است. بررسی و دوباره تلاش کنید!"
 
-# alert
+# گره و خوشه
+MasterNode: "گره اصلی"
+Node: "گره"
+ErrLocalDelete: "گره محلی قابل حذف نیست!"
+ErrMasterDelete: "گره اصلی قابل حذف نیست. ابتدا گره‌های برده را حذف کنید."
+ClusterNameIsExist: "نام خوشه از قبل وجود دارد."
+AppStatusUnHealthy: "دریافت وضعیت برنامه ناموفق بود. وضعیت گره نصب را در لیست گره‌ها بررسی کنید."
+MasterNodePortNotAvailable: "بررسی اتصال پورت {{ .port }} گره {{ .name }} ناموفق بود. تنظیمات دیواره آتش/گروه امنیتی و وضعیت گره اصلی را بررسی کنید."
+ClusterMasterNotExist: "گره اصلی خوشه قطع شده است. گره‌های زیرین را حذف کنید."
+
+# ماشین مجازی
+ErrVMNotFound: "ماشین مجازی وجود ندارد"
+ErrVMAlreadyExists: "ماشین مجازی از قبل وجود دارد"
+ErrVMRunning: "ماشین مجازی در حال اجرا است"
+ErrVMLibvirtConnect: "اتصال به libvirt ناموفق بود: {{ .detail }}"
+ErrVMPermission: "مجوز عملیات ماشین مجازی وجود ندارد: {{ .detail }}"
+ErrVMNetworkNotFound: "شبکه ماشین مجازی وجود ندارد: {{ .detail }}"
+ErrVMInvalidPath: "مسیر ماشین مجازی نامعتبر است: {{ .detail }}"
+ErrVMInvalidInput: "پارامتر ماشین مجازی نامعتبر است: {{ .detail }}"
+ErrVMCommandFailed: "اجرای دستور ماشین مجازی ناموفق بود: {{ .err }}"
+VMSnapshotCreateTask: "ایجاد اسنپ‌شات [{{ .snapshot }}] برای ماشین مجازی [{{ .vm }}]"
+VMSnapshotCreateStep: "ایجاد اسنپ‌شات ماشین مجازی [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "بازیابی اسنپ‌شات [{{ .snapshot }}] برای ماشین مجازی [{{ .vm }}]"
+VMSnapshotRecoverStep: "بازیابی اسنپ‌شات ماشین مجازی [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "حذف اسنپ‌شات [{{ .snapshot }}] برای ماشین مجازی [{{ .vm }}]"
+VMSnapshotDeleteStep: "حذف اسنپ‌شات ماشین مجازی [{{ .snapshot }}]"
+
+# برنامه
+CustomAppStoreFileValid: "بسته فروشگاه برنامه باید با فرمت .tar.gz باشد"
+AppBackup: 'پشتیبان‌گیری از برنامه'
+AppBackupPush: 'انتقال فایل پشتیبان برنامه {{.file}} به گره {{ .name }}'
+ErrSourceTargetSame: 'گره منبع و گره هدف نمی‌توانند یکسان باشند!'
+AppInstall: 'نصب برنامه {{ .name }} روی گره {{ .targetNode }}'
+AppInstallCheck: 'بررسی محیط نصب برنامه'
+
+# پشتیبان‌گیری
+ErrBackupInUsed: "این حساب پشتیبان در وظایف زمان‌بندی استفاده می‌شود و قابل حذف نیست"
+ErrBackupCheck: "تست اتصال حساب پشتیبان ناموفق بود {{ .err }}"
+ErrBackupLocal: "حساب پشتیبان سرور محلی از این عملیات پشتیبانی نمی‌کند!"
+ErrBackupPublic: "تشخیص داده شد که این حساب پشتیبان عمومی نیست، بررسی و دوباره تلاش کنید!"
+ErrOSSConn: "امکان دریافت آخرین نسخه وجود ندارد. اتصال اینترنت سرور را بررسی کنید."
+MvBackup: "انتقال داده‌ها به دایرکتوری پشتیبان"
+
+# هشدار
 ErrAlertSync: "خطا در همگام‌سازی اطلاعات هشدار، بررسی و دوباره تلاش کنید!"
 
-# task
+# دروازه هوش مصنوعی
+ErrAIProxyUserGroupIsDefault: "گروه کاربری پیش‌فرض قابل حذف نیست."
+ErrAIProxyUserGroupInUse: "گروه کاربری در حال استفاده است و قابل حذف نیست."
+ErrAIProxyUserGroupExists: "نام گروه کاربری از قبل وجود دارد."
+ErrAIProxyBackendAccountExists: "این حساب مدل قبلاً به مجموعه حساب‌های دروازه AI وارد شده است."
+ErrAIProxyModelGroupInUse: "گروه مدل در حال استفاده است و قابل حذف نیست."
+ErrAIProxyModelGroupExists: "نام گروه مدل از قبل وجود دارد."
+ErrAIProxySensitiveGroupInUse: "گروه کلمات حساس در حال استفاده است و قابل حذف نیست."
+ErrAIProxySensitiveGroupExists: "نام گروه کلمات حساس از قبل وجود دارد."
+AIBenchmarkRun: "اجرای معیار سنجش هوش مصنوعی"
+
+# وظیفه
 TaskStart: "وظیفه {{ .name }} شروع شد [شروع]"
 TaskEnd: "وظیفه {{ .name }} پایان یافت [تکمیل شد]"
 TaskFailed: "وظیفه {{ .name }} ناموفق بود"
@@ -140,6 +170,16 @@ TaskUpgrade: "ارتقاء"
 TaskSync: 'همگام‌سازی'
 TaskSyncForNode: "همگام‌سازی داده‌های گره"
 TaskBackup: "پشتیبان‌گیری"
+TaskPush: "ارسال"
+TaskRsync: "همگام‌سازی"
+SuccessStatus: "{{ .name }} با موفقیت انجام شد"
+FailedStatus: "{{ .name }} ناموفق بود {{ .err }}"
+Start: "شروع"
+SubTask: "وظیفه فرعی"
+Skip: "نادیده گرفتن خطاها و ادامه"
+Success: "موفق"
+
+# وظیفه دسته‌ای عامل
 BatchInstallAgent: "نصب دسته‌ای عامل"
 DispatchAgentInstallTasks: "ارسال وظایف نصب عامل"
 BatchUpgradeAgent: "ارتقاء دسته‌ای عامل"
@@ -173,21 +213,15 @@ AgentOperateStart: "شروع"
 AgentOperateStop: "توقف"
 AgentOperateRestart: "راه‌اندازی مجدد"
 AgentOperateDelete: "حذف"
-AIBenchmarkRun: "اجرای معیار سنجش هوش مصنوعی"
-SuccessStatus: "{{ .name }} با موفقیت انجام شد"
-FailedStatus: "{{ .name }} ناموفق بود {{ .err }}"
-Start: "شروع"
-SubTask: "وظیفه فرعی"
-Skip: "نادیده گرفتن خطاها و ادامه"
+
+# وظیفه برنامه و مهارت
 PushAppInstallTaskToNode: "ارسال وظیفه نصب برنامه به گره [{{ .name }}]"
-TaskPush: "ارسال"
 AppInstallTask: "وظیفه نصب برنامه"
 PushAppFailed: "ارسال وظیفه نصب برنامه ناموفق بود"
 SkillHubInstallTask: "نصب مهارت [{{ .name }}]"
 SkillHubInstallToTarget: "نصب مهارت به هدف [{{ .name }}]"
-Success: "موفق"
 
-#script
+# کتابخانه اسکریپت
 ScriptLibrary: "کتابخانه اسکریپت"
 RemoteScriptLibrary: "کتابخانه اسکریپت از راه دور"
 ScriptSyncSkip: "کتابخانه اسکریپت از قبل به‌روز است"
@@ -195,7 +229,7 @@ DownloadData: "دانلود فایل داده‌های کتابخانه اسکر
 DownloadPackage: "دانلود بسته کتابخانه اسکریپت"
 AnalyticCompletion: "تحلیل کامل شد، در حال همگام‌سازی با پایگاه داده..."
 
-Node: "گره"
+# همگام‌سازی گره
 SyncNode: "همگام‌سازی داده‌ها با گره {{ .name }}"
 LocalName: "نام 'local' فقط برای شناسایی محلی سیستم استفاده می‌شود"
 SyncPackageData: "همگام‌سازی داده‌های بسته"
@@ -211,7 +245,7 @@ SyncCustomApp: "برنامه سفارشی"
 SyncLanguage: "زبان سیستم"
 SyncEdition: "منطقه"
 
-#upgrade node
+# ارتقای گره
 NodeUpgrade: "ارتقاء گره {{ .name }}"
 UpgradeCheck: "بررسی به‌روزرسانی گره"
 UpgradeCheckLocal: "گره‌های محلی از ارتقاء دسته‌ای پشتیبانی نمی‌کنند، رد شد..."
@@ -224,12 +258,11 @@ LoadAutoUpgradeNodesFailed: "بارگذاری گره‌های ارتقاء خو�
 AutoUpgradeNodes: "گره‌های ارتقاء خودکار: {{ .nodes }}"
 UpdateAutoUpgradeNodesStatusFailed: "به‌روزرسانی وضعیت گره‌های ارتقاء خودکار ناموفق بود، خطا: {{ .err }}"
 
-#add node
+# افزودن گره
 MasterData: "داده‌های گره اصلی"
 LoadSftpClient: "بارگذاری کلاینت SFTP"
 PackageMasterData: "تولید بسته پشتیبان گره اصلی"
 UploadBackup: "بارگذاری داده‌های پشتیبان"
-MvBackup: "انتقال داده‌ها به دایرکتوری پشتیبان"
 TaskAddNode: "افزودن گره"
 LoadNodeArch: "دریافت اطلاعات معماری گره"
 LoadNodeArchDetail: "معماری گره اصلی شناسایی شد: {{ .local }}، معماری گره زیرین: {{ .node }}"
@@ -242,7 +275,35 @@ SendAgent: "توزیع بسته نصب گره"
 StartService: "شروع سرویس"
 NoBackupNode: "گره پشتیبان خالی است. ابتدا یکی را انتخاب کرده و ذخیره کنید"
 
-#cmd
+# همگام‌سازی فایل و تصویر گره
+LocalNodeIpFailed: "دریافت IP گره اصلی ناموفق بود. گره اصلی را ویرایش کرده و آدرس IP و اطلاعات احراز هویت SSH را اضافه کنید."
+HandlePrivateKey: "مدیریت کلید خصوصی گره"
+HandlePublicKey: "مدیریت کلید عمومی گره"
+ExchangeFile: "شروع همگام‌سازی {{ .sourcePath }} از گره {{ .source }} به گره {{ .dest }}:{{ .destPath }}"
+NodeFile: "فایل گره"
+ImageSyncTaskName: "Image sync {{ .count }} images"
+SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
+AppSyncTaskName: "App sync {{ .name }}"
+SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
+ImageSyncSave: "ذخیره تصویر {{ .image }}"
+ImageSyncSaveTags: "ذخیره برچسب‌های تصویر {{ .tags }}"
+ImageSyncToNode: "همگام‌سازی تصویر {{ .image }} به گره {{ .node }}"
+ImageSyncLoad: "بارگذاری تصویر {{ .image }} روی گره {{ .node }}"
+ImageSyncClean: "پاک‌سازی فایل‌های موقت تصویر {{ .image }}"
+ImageSyncNoTag: "تصویر {{ .image }} هیچ برچسبی ندارد و با شناسه تصویر ذخیره می‌شود"
+ImageSyncFrontendTagsIgnored: "هیچ برچسبی برای تصویر {{ .image }} در گره منبع یافت نشد. برچسب‌های فرانت‌اند نادیده گرفته شدند."
+ImageSyncHandlePrivateKey: "مدیریت کلید خصوصی گره همگام‌سازی تصویر"
+ImageSyncHandlePublicKey: "مدیریت کلید عمومی گره همگام‌سازی تصویر"
+ImageSyncTransfer: "شروع انتقال فایل موقت تصویر: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
+
+# خط فرمان
+SudoHelper: "از {{ .cmd }} استفاده کنید یا به کاربر root تغییر دهید"
+UsernameNeed: "نسخه سازمانی باید --username را مشخص کند"
+DBConnErr: "خطا: راه‌اندازی اتصال پایگاه داده ناموفق بود، {{ .err }}"
+SystemVersion: "نسخه: "
+SystemMode: "حالت: "
+
+# خط فرمان - برنامه
 AppVersion: "نسخه برنامه"
 AppCommands: "دستورات مرتبط با برنامه"
 AppInit: "راه‌اندازی برنامه"
@@ -254,12 +315,14 @@ AppMissVersion: "نسخه برنامه وجود ندارد، از -v برای م
 AppVersionExist: "نسخه از قبل وجود دارد!"
 AppCreateSuccessful: "ایجاد با موفقیت انجام شد!"
 AppWriteErr: "نوشتن فایل {{ .name }} ناموفق بود {{ .err }}"
-SudoHelper: "از {{ .cmd }} استفاده کنید یا به کاربر root تغییر دهید"
-UsernameNeed: "نسخه سازمانی باید --username را مشخص کند"
+
+# خط فرمان - IP شنود
 ListenIPCommands: "تغییر IP شنود"
 ListenIPv4: "شنود روی IPv4"
 ListenIPv6: "شنود روی IPv6"
 ListenChangeSuccessful: "تغییر با موفقیت انجام شد! در حال شنود روی {{ .value }}"
+
+# خط فرمان - بازنشانی
 ResetCommands: "بازنشانی اطلاعات سیستم"
 ResetMFA: "لغو احراز هویت دو مرحله‌ای 1Panel"
 ResetHttps: "لغو ورود https 1Panel"
@@ -267,12 +330,19 @@ ResetEntrance: "لغو ورودی امنیتی 1Panel"
 ResetIPs: "لغو محدودیت‌های IP مجاز 1Panel"
 ResetDomain: "لغو اتصال دامنه 1Panel"
 ResetPasskey: "پاک‌سازی کلیدهای عبور 1Panel"
+
+# خط فرمان - کاربر
 UserList: "دریافت لیست کاربران 1Panel"
 UserTableName: "نام"
 UserTableMFAStatus: "وضعیت MFA"
 UserTableSuperAdmin: "مدیر کل"
 UserTableCreatedAt: "تاریخ ایجاد"
 UserEmptyList: "هیچ کاربری یافت نشد"
+UserInfo: "دریافت اطلاعات پنل"
+UserInfoAddr: "آدرس پنل: "
+UserInfoPassHelp: "نکته: برای تغییر رمز عبور، می‌توانید دستور را اجرا کنید: "
+
+# خط فرمان - بازیابی
 RestoreCommands: "بازگشت سرویس و داده‌های 1Panel"
 RestoreNoSuchFile: "هیچ فایل بازگشتی یافت نشد"
 RestoreStep1: "(۱/۵) شروع بازگشت سرویس و داده‌های 1Panel از دایرکتوری {{ .name }}..."
@@ -281,6 +351,8 @@ RestoreStep3: "(۳/۵) بازگشت اسکریپت 1Panel تکمیل شد"
 RestoreStep4: "(۴/۵) بازگشت سرویس 1Panel تکمیل شد"
 RestoreStep5: "(۵/۵) بازگشت داده‌های 1Panel تکمیل شد"
 RestoreSuccessful: "بازگشت تکمیل شد. به نسخه {{ .version }} بازگردانده شد. در حال راه‌اندازی مجدد سرویس..."
+
+# خط فرمان - به‌روزرسانی
 UpdateCommands: "به‌روزرسانی اطلاعات پنل"
 UpdateUser: "به‌روزرسانی اطلاعات کاربر"
 UpdatePassword: "به‌روزرسانی رمز عبور کاربر"
@@ -307,50 +379,12 @@ UpdatePortResult: "پورت پنل: {{ .name }}"
 UpdatePortFirewallAdd: "افزودن قانون پورت دیواره آتش ناموفق بود، {{ .err }}، پورت {{ .name }} را به صورت دستی به قوانین دیواره آتش اضافه کنید."
 UpdatePortFirewallDel: "خطا: حذف پورت دیواره آتش ناموفق بود، {{ .err }}"
 UpdatePortFirewallReload: "بارگذاری مجدد دیواره آتش ناموفق بود، {{ .err }}، دیواره آتش را به صورت دستی بارگذاری مجدد کنید."
-UserInfo: "دریافت اطلاعات پنل"
-UserInfoAddr: "آدرس پنل: "
-UserInfoPassHelp: "نکته: برای تغییر رمز عبور، می‌توانید دستور را اجرا کنید: "
-DBConnErr: "خطا: راه‌اندازی اتصال پایگاه داده ناموفق بود، {{ .err }}"
-SystemVersion: "نسخه: "
-SystemMode: "حالت: "
 
-#exchange
-LocalNodeIpFailed: "دریافت IP گره اصلی ناموفق بود. گره اصلی را ویرایش کرده و آدرس IP و اطلاعات احراز هویت SSH را اضافه کنید."
-HandlePrivateKey: "مدیریت کلید خصوصی گره"
-HandlePublicKey: "مدیریت کلید عمومی گره"
-ExchangeFile: "شروع همگام‌سازی {{ .sourcePath }} از گره {{ .source }} به گره {{ .dest }}:{{ .destPath }}"
-TaskRsync: "همگام‌سازی"
-NodeFile: "فایل گره"
-ImageSyncTaskName: "Image sync {{ .count }} images"
-SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
-AppSyncTaskName: "App sync {{ .name }}"
-SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
-ImageSyncSave: "ذخیره تصویر {{ .image }}"
-ImageSyncSaveTags: "ذخیره برچسب‌های تصویر {{ .tags }}"
-ImageSyncToNode: "همگام‌سازی تصویر {{ .image }} به گره {{ .node }}"
-ImageSyncLoad: "بارگذاری تصویر {{ .image }} روی گره {{ .node }}"
-ImageSyncClean: "پاک‌سازی فایل‌های موقت تصویر {{ .image }}"
-ImageSyncNoTag: "تصویر {{ .image }} هیچ برچسبی ندارد و با شناسه تصویر ذخیره می‌شود"
-ImageSyncFrontendTagsIgnored: "هیچ برچسبی برای تصویر {{ .image }} در گره منبع یافت نشد. برچسب‌های فرانت‌اند نادیده گرفته شدند."
-ImageSyncHandlePrivateKey: "مدیریت کلید خصوصی گره همگام‌سازی تصویر"
-ImageSyncHandlePublicKey: "مدیریت کلید عمومی گره همگام‌سازی تصویر"
-ImageSyncTransfer: "شروع انتقال فایل موقت تصویر: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
-
-#mobile app
+# برنامه موبایل
 ErrVerifyToken: 'تأیید توکن ناموفق بود. بازنشانی کرده و دوباره اسکن کنید.'
 ErrInvalidToken: 'توکن نامعتبر است. بازنشانی کرده و دوباره اسکن کنید.'
 ErrExpiredToken: 'توکن منقضی شده است. بازنشانی کرده و دوباره اسکن کنید.'
 
-#cluster
-ErrMasterDelete: "گره اصلی قابل حذف نیست. ابتدا گره‌های برده را حذف کنید."
-ClusterNameIsExist: "نام خوشه از قبل وجود دارد."
-AppStatusUnHealthy: "دریافت وضعیت برنامه ناموفق بود. وضعیت گره نصب را در لیست گره‌ها بررسی کنید."
-MasterNodePortNotAvailable: "بررسی اتصال پورت {{ .port }} گره {{ .name }} ناموفق بود. تنظیمات دیواره آتش/گروه امنیتی و وضعیت گره اصلی را بررسی کنید."
-ClusterMasterNotExist: "گره اصلی خوشه قطع شده است. گره‌های زیرین را حذف کنید."
-
-#ssl
-ErrReqFailed: "درخواست {{.name}} ناموفق بود: {{ .err }}"
-
-#command
+# خروجی فرمان
 Name: "نام"
 Command: "دستور"

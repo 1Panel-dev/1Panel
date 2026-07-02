@@ -1,29 +1,47 @@
+# ralat asas
 ErrInvalidParams: 'Permintaan tidak sah: {{ .detail }}'
 ErrTokenParse: 'Token tidak sah: {{ .detail }}'
 ErrInitialPassword: 'Kata laluan asal salah'
 ErrInternalServer: 'Ralat pelayan: {{ .detail }}'
+ErrRecordExist: 'Rekod sudah wujud'
+ErrRecordNotFound: 'Rekod tidak ditemui'
+ErrStructTransform: 'Ralat penukaran: {{ .err }}'
+ErrNotSupportType: 'Jenis tidak disokong: {{ .name }}'
+
+# AI fail
 ErrFileAINotEnabled: 'Carian AI fail dimatikan atau tiada akaun. Dalam Pengurusan Fail, gunakan Akaun AI, aktifkan dan pilih akaun.'
 ErrFileAISearchBadPattern: 'Corak carian tidak sah (regex dsb.): {{ .detail }}'
+FileAISearchEmptyDir: 'Tiada fail atau direktori di bawah laluan ini (atau semua ditapis).'
+
+# muat turun jauh
 ErrWgetRemoteFailed: 'Muat turun jauh gagal atau URL tidak boleh diakses: {{ .detail }}'
 ErrWgetInvalidContentType: 'URL jauh tidak mengembalikan fail (mungkin halaman ralat), {{ .detail }}'
 ErrWgetProxyNotConfigured: 'Sila konfigurasikan pelayan proksi dalam tetapan panel dahulu'
 ErrWgetProxyInvalid: 'Alamat pelayan proksi tidak sah: {{ .detail }}'
-ErrRecordExist: 'Rekod sudah wujud'
-ErrRecordNotFound: 'Rekod tidak ditemui'
-ErrStructTransform: 'Ralat penukaran: {{ .err }}'
+
+# log masuk dan keselamatan
 ErrNotLogin: 'Belum log masuk: {{ .detail }}'
 ErrPasswordExpired: 'Kata laluan tamat: {{ .detail }}'
-ErrNotSupportType: 'Jenis tidak disokong: {{ .name }}'
-ErrAlertMethodNotSupported: 'Versi ini tidak menyokong kaedah amaran ini'
+
+# permintaan dan API
 ErrProxy: 'Permintaan gagal: {{ .detail }}'
 ErrApiConfigStatusInvalid: 'API dilumpuhkan: {{ .detail }}'
 ErrApiConfigKeyInvalid: 'Kunci API tidak sah: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP tidak dibenarkan: {{ .detail }}'
 ErrApiConfigDisable: 'API tidak dibenarkan: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Cap masa tidak sah: {{ .detail }}'
-ErrShutDown: 'Arahan diberhentikan manual'
+ErrCreateHttpClient: 'Gagal membuat permintaan {{ .err }}'
+ErrHttpReqTimeOut: 'Permintaan tamat masa {{ .err }}'
+ErrHttpReqFailed: 'Permintaan gagal {{ .err }}'
+ErrNoSuchHost: 'Tidak dapat mencari pelayan yang diminta {{ .err }}'
+ErrHttpReqNotFound: 'Sumber yang diminta {{ .err }} tidak dapat ditemui'
+
+# lompat pantas
 ErrMinQuickJump: 'Tambah sekurang-kurangnya satu pintasan pantas'
 ErrMaxQuickJump: 'Maksimum 4 pintasan pantas'
+
+# umum
+ErrShutDown: 'Arahan diberhentikan manual'
 ErrUsernameIsExist: 'Nama pengguna sudah wujud'
 ErrNameIsExist: 'Nama sudah wujud'
 ErrDemoEnvironment: 'Tidak tersedia dalam demo'
@@ -41,6 +59,8 @@ SystemRestart: 'Tugas terganggu kerana sistem mula semula'
 ErrGroupIsDefault: 'Kumpulan lalai, tidak boleh dipadamkan'
 ErrGroupIsInWebsiteUse: 'Kumpulan sedang digunakan oleh tapak web lain dan tidak boleh dipadamkan.'
 Decrypt: 'Dekripsi'
+
+# ejen
 ErrAgentAccountBound: 'Akaun terikat kepada ejen'
 ErrTerminalAIAccountInUse: 'Akaun model ini sedang digunakan oleh Terminal AI. Tukar akaun dalam tetapan Terminal AI atau nyahaktifkan Terminal AI, kemudian cuba lagi.'
 ErrAgentAccountUnavailable: 'Sambungan akaun tidak tersedia: {{ .err }}'
@@ -65,14 +85,8 @@ ErrAgentWebsiteInUse: 'Laman web ini sudah dipautkan ke ejen lain'
 ErrAgentWebsiteUnbindUnsupported: 'Laman web one-click deployment tidak menyokong nyahikat manual'
 ErrHermesPairingCodeUnavailable: 'Kod pasangan buat sementara waktu tidak wujud dalam Hermes, mungkin disebabkan masalah rangkaian. Sila cuba lagi sebentar nanti.'
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'Apabila dasar kumpulan Feishu ialah senarai benarkan, dasar DM tidak boleh menggunakan kod pasangan.'
-ErrAIProxyServiceNotInstalled: 'Perkhidmatan {{ .name }} belum dipasang'
-ErrAIProxyModelAccountNotFound: 'Akaun model {{ .id }} tidak ditemui'
-ErrAIProxyModelMapRequired: 'Medan ini wajib diisi.'
-ErrAIProxyModelMapInvalid: 'Pemetaan model mestilah objek JSON yang sah: {{ .err }}'
-ErrAIProxyModelMapEmpty: 'Pemetaan model tidak boleh kosong'
-ErrAIProxyModelMapEmptyExternalModel: 'Pemetaan model mengandungi model permintaan kosong'
-ErrAIProxyModelMapEmptyUpstreamModel: 'Model upstream untuk {{ .model }} tidak boleh kosong'
-AIProxyUserFallback: 'Pengguna dipadam (ID: {{ .id }})'
+
+# sandaran dan tetapan amaran
 Localhost: 'Mesin Tempatan'
 ErrBackupInUsed: 'Akaun sandaran sedang digunakan oleh tugas'
 ErrBackupCheck: 'Ujian sambungan gagal: {{ .err }}'
@@ -80,6 +94,8 @@ ErrBackupLocalDelete: 'Tidak boleh padam sandaran tempatan'
 ErrBackupLocalCreate: 'Tidak boleh buat sandaran tempatan'
 ErrAlertConfigInUse: 'Konfigurasi amaran sedang digunakan dan tidak boleh dipadamkan'
 ErrAlertConfigPhoneExist: 'Nombor telefon sudah wujud'
+
+# aplikasi
 ErrPortInUsed: 'Port {{ .detail }} sudah diduduki'
 ErrAppLimit: 'Bilangan aplikasi yang dipasang telah melebihi had'
 ErrNotInstall: 'Aplikasi tidak dipasang'
@@ -97,11 +113,6 @@ ErrFileParseApp: '{{ .name }} penghuraian fail gagal {{ .err }}'
 ErrAppDirNull: 'Folder versi tidak wujud'
 LocalAppErr: 'Penyegerakan {{ .name }} aplikasi gagal {{ .err }}'
 ErrContainerName: 'Nama kontena sudah wujud'
-ErrCreateHttpClient: 'Gagal membuat permintaan {{ .err }}'
-ErrHttpReqTimeOut: 'Permintaan tamat masa {{ .err }}'
-ErrHttpReqFailed: 'Permintaan gagal {{ .err }}'
-ErrNoSuchHost: 'Tidak dapat mencari pelayan yang diminta {{ .err }}'
-ErrHttpReqNotFound: 'Sumber yang diminta {{ .err }} tidak dapat ditemui'
 ErrContainerNotFound: 'Bekas {{ .name }} tidak wujud'
 ErrContainerMsg: 'Bekas ''{{ .name }} adalah tidak normal. Sila semak log pada halaman kontena untuk butiran'''
 ErrAppBackup: '{{ .name }} sandaran aplikasi gagal {{ .err }}'
@@ -132,6 +143,8 @@ ErrDockerFailed: 'Keadaan Docker tidak normal, sila periksa status perkhidmatan'
 ErrDockerComposeCmdNotFound: 'Perintah Docker Compose tidak wujud, sila pasang perintah ini di mesin tuan terlebih dahulu'
 UseExistImage: 'Imej sudah wujud, menggunakan imej sedia ada'
 ErrDatabaseNotFound: 'Pangkalan data {{ .name }} tidak wujud'
+
+# SSH
 ExportIP: 'IP Log Masuk'
 ExportArea: 'Lokasi'
 ExportPort: 'Port'
@@ -139,6 +152,8 @@ ExportAuthMode: 'Kaedah Log Masuk'
 ExportUser: 'Pengguna'
 ExportStatus: 'Status Log Masuk'
 ExportDate: 'Masa'
+
+# fail
 ErrFileCanNotRead: 'Fail ini tidak menyokong pratonton'
 ErrSensitiveFileRead: 'Membaca fail sensitif tidak dibenarkan'
 ErrFileToLarge: 'Fail lebih besar daripada 10M dan tidak boleh dibuka'
@@ -165,6 +180,8 @@ FileDropFailed: 'Gagal membersihkan fail {{ .name }}: {{ .err }}'
 FileDropSuccess: 'Berjaya membersihkan fail {{ .name }}, {{ .count }} fail dibersihkan, {{ .size }} ruang cakera dibebaskan'
 FileDropSum: 'Pembersihan fail selesai, sejumlah {{ .count }} fail dibersihkan, sejumlah {{ .size }} ruang cakera dibebaskan'
 ErrBadDecrypt: 'Kata laluan penyahsulitan pakej termampat salah, penyahmampatan gagal, sila periksa dan cuba lagi'
+
+# laman web
 ErrAliasIsExist: 'Alias sudah wujud'
 ErrBackupMatch: 'Fail sandaran tidak sepadan dengan beberapa data tapak web semasa {{ .detail }}'
 ErrBackupExist: 'Bahagian sepadan data sumber dalam fail sandaran tidak wujud {{ .detail }}'
@@ -194,6 +211,8 @@ delete: 'Padam'
 ErrDefaultWebsite: 'Laman web lalai telah ditetapkan, sila batalkan sebelum menetapkan'
 SSL: 'Sijil'
 Set: 'Tetapan'
+
+# sijil SSL
 ErrSSLCannotDelete: 'Sijil {{ .name }} sedang digunakan oleh tapak web dan tidak boleh dipadamkan'
 ErrAccountCannotDelete: 'Akaun dikaitkan dengan sijil dan tidak boleh dipadamkan'
 ErrSSLApply: 'Pembaharuan sijil berjaya, muat semula openresty gagal, sila semak konfigurasi'
@@ -228,6 +247,8 @@ ErrApplySSLCanNotDelete: 'Sertifikat {{ .name }} yang sedang diajukan tidak dapa
 StartPushSSLToNode: 'Mula menolak sijil ke nod'
 PushSSLToNodeFailed: 'Gagal menolak sijil ke nod: {{ .err }}'
 PushSSLToNodeSuccess: 'Berjaya menolak sijil ke nod'
+
+# MySQL
 ErrUserIsExist: 'Pengguna semasa sudah wujud, sila masukkan semula'
 ErrDatabaseIsExist: 'Pangkalan data semasa sudah wujud, sila masukkan semula'
 ErrExecTimeOut: 'Pelaksanaan SQL tamat masa, sila semak pangkalan data'
@@ -236,7 +257,11 @@ ErrLocalExist: 'Nama sudah wujud dalam pangkalan data tempatan, sila ubah suai d
 RemoteBackup: 'Untuk menyandarkan pangkalan data jauh, perkhidmatan pangkalan data bekas tempatan perlu dimulakan terlebih dahulu menggunakan imej {{ .name }}, sila tunggu...'
 RemoteRecover: 'Untuk memulihkan pangkalan data jauh, perkhidmatan pangkalan data bekas tempatan perlu dimulakan terlebih dahulu menggunakan imej {{ .name }}, sila tunggu...'
 Arg: 'Hujah'
+
+# Redis
 ErrTypeOfRedis: 'Jenis fail pemulihan tidak sepadan dengan kaedah kegigihan semasa, sila ubah suai dan cuba lagi'
+
+# bekas
 ErrInUsed: '{{ .detail }} sedang digunakan dan tidak boleh dipadam'
 ErrObjectInUsed: 'Objek ini sedang digunakan dan tidak boleh dipadam'
 ErrObjectBeDependent: 'Imej ini digantungkan oleh imej lain dan tidak boleh dipadam'
@@ -278,6 +303,8 @@ ComposeRecoverFiles: 'Pulihkan fail compose'
 ComposeRecoverContainers: 'Pulihkan kontena compose'
 ComposeRecoverRecord: 'Simpan rekod compose'
 ComposeRecoverCleanup: 'Bersihkan ruang kerja pemulihan compose'
+
+# runtime
 ErrFileNotExist: 'Fail {{ .detail }} tidak wujud Sila semak integriti fail sumber'
 ErrImageBuildErr: 'Pembinaan imej gagal'
 ErrImageExist: 'Imej sudah wujud Sila ubah nama imej.'
@@ -290,12 +317,16 @@ ErrNodeModulesNotFound: 'Folder node_modules tidak wujud Sila edit persekitaran 
 ErrContainerNameIsNull: 'Nama kontena tidak wujud'
 ErrPHPPortIsDefault: 'Port 9000 ialah port lalai. Sila tukar dan cuba lagi'
 ErrPHPRuntimePortFailed: 'Port {{ .name }} sudah digunakan oleh runtime semasa. Sila tukar dan cuba lagi'
+
+# alat
 ErrConfigNotFound: 'Fail konfigurasi tidak wujud'
 ErrConfigParse: 'Format fail konfigurasi tidak betul'
 ErrConfigIsNull: 'Fail konfigurasi tidak boleh kosong'
 ErrConfigDirNotFound: 'Direktori berjalan tidak wujud'
 ErrConfigAlreadyExist: 'Fail konfigurasi dengan nama yang sama sudah wujud'
 ErrUserFindErr: 'Pengguna {{ .name }} carian gagal {{ .err }}'
+
+# tugas cron
 CutWebsiteLogSuccess: '{{ .name }} log tapak web berjaya dipotong, laluan sandaran {{ .path }}'
 HandleShell: 'Laksanakan skrip {{ .name }}'
 HandleCurl: 'Akses URL {{ .name }}'
@@ -314,6 +345,8 @@ NoSuchResource: 'Tiada kandungan sandaran ditemui dalam pangkalan data, dilangka
 CleanLog: 'Bersihkan log'
 CleanLogByName: 'Bersihkan log {{ .name }}'
 WafIpGroupNotFound: 'Kumpulan IP WAF tidak ditemui. Sila pergi ke [Ciri Lanjutan - WAF - Senarai Hitam/Putih - Kumpulan IP] untuk menambah kumpulan IP melalui kaedah muat turun jauh.'
+
+# kotak alat
 ErrNotExistUser: 'Pengguna semasa tidak wujud, sila ubah suai dan cuba lagi'
 ErrBanAction: 'Tetapan gagal. Perkhidmatan {{ .name }} semasa tidak tersedia. Sila semak dan cuba lagi'
 ErrClamdscanNotFound: 'Arahan clamdscan tidak dikesan, sila rujuk dokumentasi untuk memasangnya'
@@ -322,11 +355,15 @@ SetSwap: 'Tetapkan Swap {{ .path }} - {{ .size }}'
 CreateSwap: 'Buat Fail Swap'
 FormatSwap: 'Format Fail Swap'
 EnableSwap: 'Dayakan Swap'
+
+# perlindungan ubah suai
 CleanTamperSetting: 'Bersihkan tetapan perlindungan sejarah'
 SetTamperWithRules: 'Mulakan perlindungan direktori mengikut peraturan'
 ProtectDir: 'Lindungi direktori {{ .name }}'
 IgnoreFile: 'Lindungi fail {{ .name }}'
 TamperSetSuccessful: 'Tetapan perlindungan selesai, mula memantau direktori berikut:'
+
+# WAF
 ErrScope: 'Mengubah suai konfigurasi ini tidak disokong'
 ErrStateChange: 'Perubahan keadaan gagal'
 ErrRuleExist: 'Peraturan sudah wujud'
@@ -381,6 +418,8 @@ OpenrestyNotFound: 'OpenResty tidak dipasang'
 remoteIpIsNull: 'Senarai IP kosong'
 OpenrestyVersionErr: 'Versi OpenResty terlalu lama. Naik taraf ke 1.27.1.2-2-2-focal'
 ErrFileTooLarge: 'Fail melebihi 1 MB dan tidak boleh dimuat naik'
+
+# tugas
 TaskStart: '{{ .name }} Task mula [MULA]'
 TaskEnd: '{{ .name }} Task selesai [SELESAI]'
 TaskFailed: 'tugas {{ .name }} gagal'
@@ -441,10 +480,17 @@ CustomAppstore: 'Gudang aplikasi tersuai'
 TaskExec: 'Laksanakan'
 TaskBatch: 'Operasi Batch'
 FileConvert: 'Penukaran Format Fail'
+
+# tugas - ClamAV
 Clamscan: 'Imbas {{ .name }}'
 TaskScan: 'Imbas'
+
+# tugas - AI
 OllamaModelPull: 'Tarik model Ollama {{ .name }}'
 OllamaModelSize: 'Dapatkan saiz model Ollama {{ .name }}'
+AIBenchmarkRun: "Jalankan penanda aras AI"
+
+# tugas - syot kilat
 Snapshot: 'Snapshot'
 SnapDBInfo: 'Tulis maklumat pangkalan data 1Panel'
 SnapCopy: 'Salin fail & direktori {{ .name }}'
@@ -494,6 +540,8 @@ RecoverDaemonJson: 'Pulihkan fail daemon.json konfigurasi bekas'
 RecoverDBData: 'Pulihkan data pangkalan data'
 RecoverBackups: 'Pulihkan direktori sandaran tempatan'
 RecoverPanelData: 'Direktori data pemulihan'
+
+# tugas - bekas
 ContainerImagePull: 'Tarik imej bekas {{ .name }}'
 ContainerRemoveOld: 'Alih keluar bekas asal {{ .name }}'
 ContainerImageCheck: 'Periksa sama ada imej ditarik seperti biasa'
@@ -502,6 +550,8 @@ ContainerRecreate: 'Kemas kini kontena gagal, kini mula memulihkan bekas asal'
 ContainerCreate: 'Buat bekas baharu {{ .name }}'
 ContainerCreateFailed: 'Penciptaan bekas gagal, padamkan bekas yang gagal'
 ContainerStartCheck: 'Periksa sama ada bekas telah dimulakan'
+
+# tugas - imej
 ImageBuild: 'Membina Imej'
 ImagePull: 'Tarik imej'
 ImageRepoAuthFromDB: 'Dapatkan maklumat pengesahan repositori daripada pangkalan data'
@@ -509,6 +559,8 @@ ImagePush: 'Tolak imej'
 ImageRenameTag: 'Ubah suai teg imej'
 ImageNewTag: 'Teg imej baharu {{ .name }}'
 ComposeCreate: 'Buat gubahan'
+
+# tugas - laman web
 BackupNginxConfig: 'Fail konfigurasi OpenResty tapak web sandaran'
 CompressFileSuccess: 'Mampatkan direktori berjaya, dimampatkan ke {{ .name }}'
 CompressDir: 'Direktori mampatan'
@@ -519,8 +571,15 @@ websiteDir: 'Direktori Laman Web'
 RecoverFailedStartRollBack: 'Pemulihan gagal, mulakan rollback'
 AppBackupFileIncomplete: 'Fail sandaran tidak lengkap dan tidak mempunyai fail app.json atau app.tar.gz'
 AppAttributesNotMatch: 'Jenis atau nama aplikasi tidak sepadan'
+
+# amaran
+ErrAlertMethodNotSupported: 'Versi ini tidak menyokong kaedah amaran ini'
 ErrAlertSync: 'Ralat penyegerakan maklumat penggera, sila semak dan cuba lagi'
+
+# tugas - runtime
 ErrInstallExtension: 'Tugas pemasangan sudah sedang berjalan, silakan tunggu tugas selesai'
+
+# templat mel amaran
 PanelAlertTitle: 'Notifikasi Amaran Panel'
 TestAlertTitle: 'E-mel Ujian - Sahkan Sambungan E-mel'
 TestAlert: 'Ini adalah e-mel ujian untuk mengesahkan konfigurasi penghantaran e-mel anda betul.'
@@ -537,6 +596,8 @@ CommonAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .msg }}. Sila log masuk ke pan
 NodeExceptionAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .num }} nod tidak normal. Sila log masuk ke panel untuk butiran lanjut.'
 LicenseExceptionAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .num }} lesen tidak normal. Sila log masuk ke panel untuk butiran lanjut.'
 SSHAndPanelLoginAlert: 'Panel {{ .node }}{{ .ip }} Anda, log masuk {{ .name }} dari {{ .loginIp }} tidak normal. Sila log masuk ke panel untuk butiran lanjut.'
+
+# cakera
 DeviceNotFound: 'Peranti {{ .name }} tidak ditemui'
 DeviceIsMounted: 'Peranti {{ .name }} telah dikaitkan, sila nyahkaitkan terlebih dahulu'
 PartitionDiskErr: 'Gagal membahagikan, {{ .err }}'
@@ -549,4 +610,13 @@ TerminalAIBlockedRiskyCommand: 'Perintah berisiko telah disekat: {{ .command }}'
 TerminalAIThinking: 'AI sedang berfikir...'
 TerminalAIReadyToExecute: 'Pemikiran selesai, tekan Enter untuk jalankan (tempoh: {{ .duration }}, token: {{ .tokens }})'
 TerminalAIRequestFailed: 'Permintaan AI gagal: {{ .err }}'
-FileAISearchEmptyDir: 'Tiada fail atau direktori di bawah laluan ini (atau semua ditapis).'
+
+# gerbang AI
+ErrAIProxyServiceNotInstalled: 'Perkhidmatan {{ .name }} belum dipasang'
+ErrAIProxyModelAccountNotFound: 'Akaun model {{ .id }} tidak ditemui'
+ErrAIProxyModelMapRequired: 'Medan ini wajib diisi.'
+ErrAIProxyModelMapInvalid: 'Pemetaan model mestilah objek JSON yang sah: {{ .err }}'
+ErrAIProxyModelMapEmpty: 'Pemetaan model tidak boleh kosong'
+ErrAIProxyModelMapEmptyExternalModel: 'Pemetaan model mengandungi model permintaan kosong'
+ErrAIProxyModelMapEmptyUpstreamModel: 'Model upstream untuk {{ .model }} tidak boleh kosong'
+AIProxyUserFallback: 'Pengguna dipadam (ID: {{ .id }})'

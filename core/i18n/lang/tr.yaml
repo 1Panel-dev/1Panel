@@ -1,35 +1,115 @@
+# temel hatalar
 ErrInvalidParams: 'İstek geçersiz: {{ .detail }}'
 ErrTokenParse: 'Token hatası: {{ .detail }}'
 ErrInitialPassword: 'Orijinal şifre yanlış'
 ErrInternalServer: 'Sunucu hatası: {{ .detail }}'
+ErrInternalServerKey: "İç sunucu hatası:"
 ErrRecordExist: 'Kayıt zaten var'
 ErrRecordNotFound: 'Kayıt bulunamadı'
 ErrStructTransform: 'Dönüşüm hatası: {{ .err }}'
-ErrNotLogin: 'Oturum açılmamış: {{ .detail }}'
-ErrSessionDataNotFound: "Mevcut oturumun süresi doldu"
-ErrSessionDataFormat: "Mevcut oturum verisi biçimi anormal"
-ErrPasswordExpired: 'Şifre süresi doldu: {{ .detail }}'
 ErrNotSupportType: 'Bu tür desteklenmiyor: {{ .name }}'
-ErrProxy: 'İstek başarısız: {{ .detail }}'
-ErrApiConfigStatusInvalid: 'API kapalı: {{ .detail }}'
-ErrApiConfigKeyInvalid: 'Geçersiz API anahtarı: {{ .detail }}'
-ErrApiConfigIPInvalid: 'IP izinli değil: {{ .detail }}'
-ErrApiConfigDisable: 'API erişimi kapalı: {{ .detail }}'
-ErrApiConfigKeyTimeInvalid: 'Zaman damgası hatalı: {{ .detail }}'
-ErrLoginLocked: "Çok fazla başarısız deneme yapıldı. Giriş 5 dakika boyunca geçici olarak kilitlendi."
+ErrDemoEnvironment: 'Demo modunda yok'
+ErrCmdTimeout: 'Komut zaman aşımına uğradı'
+ErrPortInUsed: "{{ .name }} portu zaten kullanımda"
+ErrFileNotFound: "{{ .name }} dosyası mevcut değil"
+ErrReqFailed: "{{.name}} istek başarısız: {{ .err }}"
 
-# request
+# istek ve güvenlik girişi
 ErrNoSuchHost: "İstenen sunucu bulunamıyor {{ .err }}"
 ErrHttpReqNotFound: "İstenen kaynak bulunamıyor {{ .err }}"
 ErrHttpReqFailed: "İstek başarısız {{ .err }}"
 ErrHttpReqTimeOut: "İstek zaman aşımına uğradı {{ .err }}"
 ErrCreateHttpClient: "İstek oluşturma başarısız {{ .err }}"
+ErrProxy: 'İstek başarısız: {{ .detail }}'
 ErrProxySetting: "Proxy sunucu bilgisi kullanılamıyor {{ .err }}, lütfen kontrol edip tekrar deneyin"
+ErrEntrance: "Güvenlik girişi bilgi hatası, lütfen kontrol edip tekrar deneyin"
 ErrEntranceFormat: "{{ .name }} güvenlik girişi şu anda desteklenmiyor. Lütfen kontrol edip tekrar deneyin"
 
-# common
-ErrDemoEnvironment: 'Demo modunda yok'
-ErrCmdTimeout: 'Komut zaman aşımına uğradı'
+# oturum açma ve güvenlik
+ErrNotLogin: 'Oturum açılmamış: {{ .detail }}'
+ErrSessionDataNotFound: "Mevcut oturumun süresi doldu"
+ErrSessionDataFormat: "Mevcut oturum verisi biçimi anormal"
+ErrPasswordExpired: 'Şifre süresi doldu: {{ .detail }}'
+ErrLoginLocked: "Çok fazla başarısız deneme yapıldı. Giriş 5 dakika boyunca geçici olarak kilitlendi."
+ErrApiConfigStatusInvalid: 'API kapalı: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'Geçersiz API anahtarı: {{ .detail }}'
+ErrApiConfigIPInvalid: 'IP izinli değil: {{ .detail }}'
+ErrApiConfigDisable: 'API erişimi kapalı: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'Zaman damgası hatalı: {{ .detail }}'
+ErrPasskeyDisabled: "Passkey kullanmak için HTTPS etkinleştirilmelidir"
+ErrPasskeyNotConfigured: "Passkey yapılandırılmamış"
+ErrPasskeyLimit: "Passkey sınırına ulaşıldı (en fazla 5)"
+ErrPasskeySession: "Passkey oturumu süresi dolmuş veya geçersiz"
+ErrPasskeyDuplicate: "Passkey zaten mevcut"
+ErrPasskeyVerify: "Passkey doğrulaması başarısız"
+
+# kullanıcı ve izin
+ErrNoSuchUser: "Kullanıcı bilgisi bulunamadı, lütfen kontrol edip tekrar deneyin"
+ErrToMaster: "Bu kullanıcının ana düğümde bu işlemi yapma izni yok, lütfen kontrol edip tekrar deneyin"
+ErrToNode: "Bu kullanıcının bu düğümde bu işlemi yapma izni yok, lütfen kontrol edip tekrar deneyin"
+ErrRBAC: "Kullanıcı izinleri yetersiz, bu işlem yapılamaz. Lütfen kontrol edip tekrar deneyin"
+ErrNoneNode: "Bu kullanıcının hiçbir düğüm izni yok. Lütfen yöneticiyle iletişime geçin veya kontrol edip tekrar deneyin"
+ErrOnlySuperAdmin: "Bu özellik yalnızca süper yöneticiler tarafından kullanılabilir"
+ErrRolePresetCannotDelete: "Sistem ön tanımlı rolleri silinemez"
+ErrRolePresetCannotUpdate: "Sistem ön tanımlı rolleri güncellenemez"
+ErrRoleBoundToUser: "Bu rol zaten kullanıcılara bağlı ve silinemez"
+ErrRolePresetCannotBind: "Sistem ön tanımlı rolleri kullanıcılara atanamaz"
+ErrNodeAdminMasterForbidden: "Ana düğüme düğüm yöneticisi izni eklenemez"
+ErrSuperAdminCannotDelete: "Süper yönetici kullanıcılar silinemez"
+ErrGroupIsDefault: "Varsayılan grup, silinemez"
+ErrGroupIsInUse: "Grup kullanımda ve silinemez."
+
+# lisans
+LicenseCheck: 'Lisansın mevcut olup olmadığını kontrol et'
+ErrLicenseInUsed: 'Lisans zaten bağlı. Lütfen kontrol edip tekrar deneyin'
+ErrLicenseExpired: 'Lisansın süresi dolmuş. Lütfen kontrol edip tekrar deneyin'
+ErrLicense: "Lisans format hatası, lütfen kontrol edip tekrar deneyin"
+ErrLicenseCheck: "Lisans doğrulama başarısız, lütfen kontrol edip tekrar deneyin"
+ErrXpackVersion: "Lisans doğrulama başarısız, bu lisans sürüm sınırlıdır, içe aktarılamıyor, lütfen kontrol edip tekrar deneyin"
+ErrLicenseSave: "Lisans bilgilerini kaydetme başarısız, hata {{ .err }}, lütfen tekrar deneyin"
+ErrLicenseSync: "Lisans senkronizasyonu başarısız, veritabanında lisans bilgisi tespit edilmedi"
+ErrLicenseExist: "Bu lisans kaydı zaten mevcut. Düğüm bağlama için doğrudan lisans sayfasına gidebilirsiniz."
+ErrXpackNotFound: "Bu bölüm Business Sürüm gerektirir. Lisansı Panel Ayarları > Lisans bölümünden içe aktarın"
+ErrXpackExceptional: "Bu bölüm Business Sürüm gerektirir. Lisans durumunu Panel Ayarları > Lisans bölümünden senkronize edin"
+ErrXpackLost: "Lisans yeniden deneme sınırına ulaştı. Panel Ayarları > Lisans bölümüne gidip manuel senkronizasyon çalıştırın"
+ErrEnterpriseLicenseRequired: "Enterprise Edition lisansı içe aktarılmamış. Önce bir lisans içe aktarın."
+ErrDeviceLost: "Lisans doğrulama için gerekli dosyalar eksik, lütfen kontrol edip tekrar deneyin"
+ErrDeviceErr: "Mevcut ortam lisans içe aktarma ortamıyla eşleşmiyor. Lütfen lisansı düzenleyip yeniden içe aktarın."
+ErrXpackTimeout: "İstek zaman aşımı, ağ bağlantısı kararsız olabilir, lütfen daha sonra tekrar deneyin"
+ErrUnbindMaster: "Düğüm yönetiminde düğümler tespit edildi, mevcut lisansın bağı çözülemiyor, lütfen önce düğümleri kaldırın ve tekrar deneyin"
+ErrFreeNodeLimit: "Eklenebilecek düğüm sayısı sınırına ulaşıldı. Satın aldıktan sonra tekrar deneyin."
+ErrNodeBound: "Bu lisans başka bir düğüme bağlı, lütfen kontrol edip tekrar deneyin"
+ErrNodeBoundDelete: "Bu lisans bağlı ve silme işlemlerini desteklemiyor. Lütfen kontrol edip tekrar deneyin"
+ErrNodeBoundLimit: "Mevcut ücretsiz düğüm limitine ulaştı, lütfen kontrol edip tekrar deneyin"
+ErrLicenseFree: "Ücretsiz düğümler yalnızca lisans bir düğüme düzgün şekilde bağlandığında kullanılabilir. Lütfen doğrulayın ve tekrar deneyin"
+ErrLicenseUnbind: "Bu lisansa hala Community Sürümü düğümleri bağlı. Panel Ayarları > Lisans bölümünden bağlantıyı kaldırıp tekrar deneyin"
+ErrLicenseBindCount: "Yeni lisansın ücretsiz düğüm sayısı mevcut bağlı Community Sürümü düğüm sayısından az. Lütfen kontrol edip tekrar deneyin"
+ErrNoSuchNode: "Düğüm bilgisi bulunamadı, lütfen kontrol edip tekrar deneyin"
+ErrNodeUnbind: "Bu düğüm lisans bağlama aralığında değil, lütfen kontrol edip tekrar deneyin"
+ErrNodeBind: "Bu düğüm zaten bir lisansa bağlı, lütfen kontrol edip tekrar deneyin"
+ErrNodeLocalRollback: "Ana düğüm doğrudan rollback'i desteklemez. Rollback için '1pctl restore' komutunu manuel çalıştırın"
+ErrIntlLicense: "Mevcut sürüm uluslararası sürüm lisansının içe aktarılmasını henüz desteklemiyor. Yakında"
+InvalidRequestBodyType: "Geçersiz istek gövdesi formatı, lütfen içeriğin format gereksinimlerine uygun olduğunu kontrol edip tekrar deneyin"
+InvalidLicenseCodeType: "Sağlanan lisans kodu formatı geçersiz, lütfen kontrol edip tekrar deneyin"
+LicenseNotFoundType: "Lisans bulunamadı, sistemde sağlanan lisansla eşleşen bir kayıt yok. Lütfen kontrol edip tekrar deneyin"
+LicenseRevokedType: "İstenen lisans iptal edilmiş ve artık kullanılamaz. Lütfen kontrol edip tekrar deneyin"
+LicenseExpiredType: "Lisansın süresi doldu. Lütfen yenileyin veya Panel Ayarları - Lisans bölümünden yeniden içe aktarın"
+LicenseProductMismatchType: "Lisans, istenen ürün veya hizmetle eşleşmiyor"
+InvalidAssigneeType: "Lisans ataması için hedef kullanıcı veya cihaz bilgisi geçersiz. Lütfen kontrol edip tekrar deneyin"
+LicenseUsageNotFoundType: "Kullanım kaydı bulunamadı. Bu lisans henüz etkinleştirilmemiş veya kullanılmamış. Lütfen kontrol edip tekrar deneyin"
+LicenseUsageLimitExceededType: "Bu lisans zaten başka bir düğüme bağlı. Lütfen kontrol edip tekrar deneyin"
+
+# düğüm ve küme
+MasterNode: "Ana Düğüm"
+Node: "Düğüm"
+ErrLocalDelete: "Yerel düğüm silinemez"
+ErrMasterDelete: "Ana düğümü silinemiyor, lütfen önce alt düğümleri silin."
+ClusterNameIsExist: "Küme adı zaten var."
+AppStatusUnHealthy: "Uygulama durumu alımı anormal, lütfen düğüm listesindeki yükleme düğümü durumunu kontrol edin."
+MasterNodePortNotAvailable: "Düğüm {{ .name }} portu {{ .port }} bağlantı doğrulaması başarısız oldu, lütfen güvenlik duvarı/güvenlik grubu ayarlarını ve ana düğüm durumunu kontrol edin."
+ClusterMasterNotExist: "Küme ana düğümü bağlantısı kesildi, lütfen alt düğümleri silin."
+
+# sanal makine
 ErrVMNotFound: "Sanal makine mevcut değil"
 ErrVMAlreadyExists: "Sanal makine zaten mevcut"
 ErrVMRunning: "Sanal makine çalışıyor"
@@ -45,9 +125,27 @@ VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [
 VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
 VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
 VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
-ErrEntrance: "Güvenlik girişi bilgi hatası, lütfen kontrol edip tekrar deneyin"
-ErrGroupIsDefault: "Varsayılan grup, silinemez"
-ErrGroupIsInUse: "Grup kullanımda ve silinemez."
+
+# uygulama
+CustomAppStoreFileValid: "Uygulama mağazası paketi .tar.gz formatında olmalıdır"
+AppBackup: 'Uygulama yedekleme'
+AppBackupPush: 'Uygulama yedek dosyası {{.file}} düğüm {{ .name }} a aktar'
+ErrSourceTargetSame: 'Kaynak düğüm ve hedef düğüm aynı olamaz'
+AppInstall: 'Düğüm {{ .targetNode }} üzerine {{ .name }} uygulamasını yükle'
+AppInstallCheck: 'Uygulama kurulum ortamını kontrol et'
+
+# yedekleme
+ErrBackupInUsed: 'Yedek hesabı görevde kullanılıyor'
+ErrBackupCheck: 'Bağlantı testi başarısız: {{ .err }}'
+ErrBackupLocal: "Yerel sunucu yedekleme hesabı bu işlemi desteklemiyor"
+ErrBackupPublic: "Bu yedekleme hesabının herkese açık olmadığı tespit edildi, lütfen kontrol edip tekrar deneyin"
+ErrOSSConn: "En son sürüm alınamıyor, lütfen sunucunun dış ağ bağlantısını kontrol edin."
+MvBackup: "Verileri yedek dizinine taşı"
+
+# uyarı
+ErrAlertSync: "Uyarı bilgisi senkronizasyon hatası, lütfen kontrol edip tekrar deneyin"
+
+# AI ağ geçidi
 ErrAIProxyUserGroupIsDefault: "Varsayılan kullanıcı grubu silinemez."
 ErrAIProxyUserGroupInUse: "Kullanıcı grubu kullanımda ve silinemez."
 ErrAIProxyUserGroupExists: "Kullanıcı grubu adı zaten mevcut."
@@ -56,85 +154,9 @@ ErrAIProxyModelGroupInUse: "Model grubu kullanımda ve silinemez."
 ErrAIProxyModelGroupExists: "Model grubu adı zaten mevcut."
 ErrAIProxySensitiveGroupInUse: "Hassas kelime grubu kullanımda ve silinemez."
 ErrAIProxySensitiveGroupExists: "Hassas kelime grubu adı zaten mevcut."
-ErrLocalDelete: "Yerel düğüm silinemez"
-ErrPortInUsed: "{{ .name }} portu zaten kullanımda"
-ErrInternalServerKey: "İç sunucu hatası:"
-MasterNode: "Ana Düğüm"
+AIBenchmarkRun: "AI kıyaslama testini çalıştır"
 
-# app
-CustomAppStoreFileValid: "Uygulama mağazası paketi .tar.gz formatında olmalıdır"
-ErrFileNotFound: "{{ .name }} dosyası mevcut değil"
-AppBackup: 'Uygulama yedekleme'
-AppBackupPush: 'Uygulama yedek dosyası {{.file}} düğüm {{ .name }} a aktar'
-ErrSourceTargetSame: 'Kaynak düğüm ve hedef düğüm aynı olamaz'
-AppInstall: 'Düğüm {{ .targetNode }} üzerine {{ .name }} uygulamasını yükle'
-AppInstallCheck: 'Uygulama kurulum ortamını kontrol et'
-
-# backup
-ErrBackupInUsed: 'Yedek hesabı görevde kullanılıyor'
-ErrBackupCheck: 'Bağlantı testi başarısız: {{ .err }}'
-ErrBackupLocal: "Yerel sunucu yedekleme hesabı bu işlemi desteklemiyor"
-ErrBackupPublic: "Bu yedekleme hesabının herkese açık olmadığı tespit edildi, lütfen kontrol edip tekrar deneyin"
-ErrOSSConn: "En son sürüm alınamıyor, lütfen sunucunun dış ağ bağlantısını kontrol edin."
-
-#license
-LicenseCheck: 'Lisansın mevcut olup olmadığını kontrol et'
-ErrLicenseInUsed: 'Lisans zaten bağlı. Lütfen kontrol edip tekrar deneyin'
-ErrLicenseExpired: 'Lisansın süresi dolmuş. Lütfen kontrol edip tekrar deneyin'
-ErrLicense: "Lisans format hatası, lütfen kontrol edip tekrar deneyin"
-ErrLicenseCheck: "Lisans doğrulama başarısız, lütfen kontrol edip tekrar deneyin"
-ErrXpackVersion: "Lisans doğrulama başarısız, bu lisans sürüm sınırlıdır, içe aktarılamıyor, lütfen kontrol edip tekrar deneyin"
-ErrLicenseSave: "Lisans bilgilerini kaydetme başarısız, hata {{ .err }}, lütfen tekrar deneyin"
-ErrLicenseSync: "Lisans senkronizasyonu başarısız, veritabanında lisans bilgisi tespit edilmedi"
-ErrLicenseExist: "Bu lisans kaydı zaten mevcut. Düğüm bağlama için doğrudan lisans sayfasına gidebilirsiniz."
-ErrXpackNotFound: "Bu bölüm Business Sürüm gerektirir. Lisansı Panel Ayarları > Lisans bölümünden içe aktarın"
-ErrXpackExceptional: "Bu bölüm Business Sürüm gerektirir. Lisans durumunu Panel Ayarları > Lisans bölümünden senkronize edin"
-ErrXpackLost: "Lisans yeniden deneme sınırına ulaştı. Panel Ayarları > Lisans bölümüne gidip manuel senkronizasyon çalıştırın"
-ErrEnterpriseLicenseRequired: "Enterprise Edition lisansı içe aktarılmamış. Önce bir lisans içe aktarın."
-ErrDeviceLost: "Lisans doğrulama için gerekli dosyalar eksik, lütfen kontrol edip tekrar deneyin"
-ErrXpackTimeout: "İstek zaman aşımı, ağ bağlantısı kararsız olabilir, lütfen daha sonra tekrar deneyin"
-ErrUnbindMaster: "Düğüm yönetiminde düğümler tespit edildi, mevcut lisansın bağı çözülemiyor, lütfen önce düğümleri kaldırın ve tekrar deneyin"
-ErrFreeNodeLimit: "Eklenebilecek düğüm sayısı sınırına ulaşıldı. Satın aldıktan sonra tekrar deneyin."
-ErrNodeBound: "Bu lisans başka bir düğüme bağlı, lütfen kontrol edip tekrar deneyin"
-ErrNodeBoundDelete: "Bu lisans bağlı ve silme işlemlerini desteklemiyor. Lütfen kontrol edip tekrar deneyin"
-ErrNodeBoundLimit: "Mevcut ücretsiz düğüm limitine ulaştı, lütfen kontrol edip tekrar deneyin"
-ErrLicenseFree: "Ücretsiz düğümler yalnızca lisans bir düğüme düzgün şekilde bağlandığında kullanılabilir. Lütfen doğrulayın ve tekrar deneyin"
-ErrLicenseUnbind: "Bu lisansa hala Community Sürümü düğümleri bağlı. Panel Ayarları > Lisans bölümünden bağlantıyı kaldırıp tekrar deneyin"
-ErrLicenseBindCount: "Yeni lisansın ücretsiz düğüm sayısı mevcut bağlı Community Sürümü düğüm sayısından az. Lütfen kontrol edip tekrar deneyin"
-ErrNoSuchNode: "Düğüm bilgisi bulunamadı, lütfen kontrol edip tekrar deneyin"
-ErrNodeUnbind: "Bu düğüm lisans bağlama aralığında değil, lütfen kontrol edip tekrar deneyin"
-ErrNodeBind: "Bu düğüm zaten bir lisansa bağlı, lütfen kontrol edip tekrar deneyin"
-ErrNodeLocalRollback: "Ana düğüm doğrudan rollback'i desteklemez. Rollback için '1pctl restore' komutunu manuel çalıştırın"
-ErrIntlLicense: "Mevcut sürüm uluslararası sürüm lisansının içe aktarılmasını henüz desteklemiyor. Yakında"
-
-# user
-ErrNoSuchUser: "Kullanıcı bilgisi bulunamadı, lütfen kontrol edip tekrar deneyin"
-ErrToMaster: "Bu kullanıcının ana düğümde bu işlemi yapma izni yok, lütfen kontrol edip tekrar deneyin"
-ErrToNode: "Bu kullanıcının bu düğümde bu işlemi yapma izni yok, lütfen kontrol edip tekrar deneyin"
-ErrRBAC: "Kullanıcı izinleri yetersiz, bu işlem yapılamaz. Lütfen kontrol edip tekrar deneyin"
-ErrNoneNode: "Bu kullanıcının hiçbir düğüm izni yok. Lütfen yöneticiyle iletişime geçin veya kontrol edip tekrar deneyin"
-ErrOnlySuperAdmin: "Bu özellik yalnızca süper yöneticiler tarafından kullanılabilir"
-ErrRolePresetCannotDelete: "Sistem ön tanımlı rolleri silinemez"
-ErrRolePresetCannotUpdate: "Sistem ön tanımlı rolleri güncellenemez"
-ErrRoleBoundToUser: "Bu rol zaten kullanıcılara bağlı ve silinemez"
-ErrRolePresetCannotBind: "Sistem ön tanımlı rolleri kullanıcılara atanamaz"
-ErrNodeAdminMasterForbidden: "Ana düğüme düğüm yöneticisi izni eklenemez"
-ErrSuperAdminCannotDelete: "Süper yönetici kullanıcılar silinemez"
-
-InvalidRequestBodyType: "Geçersiz istek gövdesi formatı, lütfen içeriğin format gereksinimlerine uygun olduğunu kontrol edip tekrar deneyin"
-InvalidLicenseCodeType: "Sağlanan lisans kodu formatı geçersiz, lütfen kontrol edip tekrar deneyin"
-LicenseNotFoundType: "Lisans bulunamadı, sistemde sağlanan lisansla eşleşen bir kayıt yok. Lütfen kontrol edip tekrar deneyin"
-LicenseRevokedType: "İstenen lisans iptal edilmiş ve artık kullanılamaz. Lütfen kontrol edip tekrar deneyin"
-LicenseExpiredType: "Lisansın süresi doldu. Lütfen yenileyin veya Panel Ayarları - Lisans bölümünden yeniden içe aktarın"
-LicenseProductMismatchType: "Lisans, istenen ürün veya hizmetle eşleşmiyor"
-InvalidAssigneeType: "Lisans ataması için hedef kullanıcı veya cihaz bilgisi geçersiz. Lütfen kontrol edip tekrar deneyin"
-LicenseUsageNotFoundType: "Kullanım kaydı bulunamadı. Bu lisans henüz etkinleştirilmemiş veya kullanılmamış. Lütfen kontrol edip tekrar deneyin"
-LicenseUsageLimitExceededType: "Bu lisans zaten başka bir düğüme bağlı. Lütfen kontrol edip tekrar deneyin"
-
-# alert
-ErrAlertSync: "Uyarı bilgisi senkronizasyon hatası, lütfen kontrol edip tekrar deneyin"
-
-# task
+# görev
 TaskStart: "{{ .name }} görevi başladı [BAŞLANGIÇ]"
 TaskEnd: "{{ .name }} görevi bitti [TAMAMLANDI]"
 TaskFailed: "{{ .name }} görevi başarısız"
@@ -148,6 +170,16 @@ TaskUpgrade: "Yükseltme"
 TaskSync: 'Senkronize'
 TaskSyncForNode: "Düğüm Verilerini Senkronize Et"
 TaskBackup: "Yedekleme"
+TaskPush: "Gönder"
+TaskRsync: "Sync"
+SuccessStatus: "{{ .name }} başarılı"
+FailedStatus: "{{ .name }} başarısız {{ .err }}"
+Start: "Başla"
+SubTask: "Alt görev"
+Skip: "Hataları atla ve devam et..."
+Success: "Başarılı"
+
+# ajan toplu görevi
 BatchInstallAgent: "Aracıları toplu kur"
 DispatchAgentInstallTasks: "Aracı kurulum görevlerini gönder"
 BatchUpgradeAgent: "Aracıları toplu yükselt"
@@ -181,20 +213,15 @@ AgentOperateStart: "Başlat"
 AgentOperateStop: "Durdur"
 AgentOperateRestart: "Yeniden başlat"
 AgentOperateDelete: "Sil"
-SuccessStatus: "{{ .name }} başarılı"
-FailedStatus: "{{ .name }} başarısız {{ .err }}"
-Start: "Başla"
-SubTask: "Alt görev"
-Skip: "Hataları atla ve devam et..."
+
+# uygulama ve beceri görevi
 PushAppInstallTaskToNode: "Uygulama kurulum görevini düğüme [{{ .name }}] gönder"
-TaskPush: "Gönder"
 AppInstallTask: "Uygulama kurulum görevi"
 PushAppFailed: "Uygulama kurulum görevi gönderilemedi"
 SkillHubInstallTask: "Skill yükle [{{ .name }}]"
 SkillHubInstallToTarget: "Skill hedefe yükle [{{ .name }}]"
-Success: "Başarılı"
 
-#script
+# betik kitaplığı
 ScriptLibrary: "Betik Kütüphanesi"
 RemoteScriptLibrary: "Uzak Komut Dosyası Kütüphanesi"
 ScriptSyncSkip: "Mevcut betik kütüphanesi zaten en son sürüm"
@@ -202,7 +229,7 @@ DownloadData: "Betik kütüphanesi dosyası data.yaml indiriliyor"
 DownloadPackage: "Betik kütüphanesi paketi indiriliyor"
 AnalyticCompletion: "Analiz tamamlandı, şimdi veritabanına senkronize ediliyor..."
 
-Node: "Düğüm"
+# düğüm senkronizasyonu
 SyncNode: "Verileri {{ .name }} düğümüne senkronize et"
 LocalName: "'local' adı yalnızca sistem yerel tanımlaması için kullanılır"
 SyncPackageData: "Paket senkronizasyon verisi"
@@ -218,7 +245,7 @@ SyncCustomApp: "Özel Uygulama"
 SyncLanguage: "Sistem Dili"
 SyncEdition: "Çalışma Bölgesi"
 
-#upgrade node
+# düğüm yükseltme
 NodeUpgrade: "Düğümü yükselt {{ .name }}"
 UpgradeCheck: "Düğüm güncellemelerini kontrol et"
 UpgradeCheckLocal: "Yerel düğümler toplu yükseltmeleri desteklemiyor, atlanıyor..."
@@ -231,12 +258,11 @@ LoadAutoUpgradeNodesFailed: "Otomatik yükseltme düğümleri yüklenemedi, hata
 AutoUpgradeNodes: "Otomatik yükseltme düğümleri: {{ .nodes }}"
 UpdateAutoUpgradeNodesStatusFailed: "Otomatik yükseltme düğümlerinin durumu güncellenemedi, hata: {{ .err }}"
 
-#add node
+# düğüm ekleme
 MasterData: "Ana Düğüm Verisi"
 LoadSftpClient: "SFTP İstemcisini Yükle"
 PackageMasterData: "Ana düğüm yedek paketi oluştur"
 UploadBackup: "Yedek verileri yükle"
-MvBackup: "Verileri yedek dizinine taşı"
 TaskAddNode: "Düğüm ekle"
 LoadNodeArch: "Düğüm mimari bilgilerini al"
 LoadNodeArchDetail: "Ana düğüm mimarisi tespit edildi: {{ .local }}, alt düğüm mimarisi: {{ .node }}"
@@ -249,7 +275,35 @@ SendAgent: "Düğüm kurulum paketini dağıt"
 StartService: "Servisi başlat"
 NoBackupNode: "Yedek düğüm şu anda boş. Lütfen kaydetmek için bir yedek düğüm seçin ve tekrar deneyin"
 
-#cmd
+# düğüm dosyası ve imaj senkronizasyonu
+LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
+HandlePrivateKey: "Handle node private key"
+HandlePublicKey: "Handle node public key"
+ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
+NodeFile: "Node file"
+ImageSyncTaskName: "Image sync {{ .count }} images"
+SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
+AppSyncTaskName: "App sync {{ .name }}"
+SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
+ImageSyncSave: "Save image {{ .image }}"
+ImageSyncSaveTags: "Save image tags {{ .tags }}"
+ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
+ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
+ImageSyncClean: "Clean temporary files for image {{ .image }}"
+ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
+ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
+ImageSyncHandlePrivateKey: "Handle image sync node private key"
+ImageSyncHandlePublicKey: "Handle image sync node public key"
+ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
+
+# komut satırı
+SudoHelper: "Lütfen {{ .cmd }} kullanın veya root kullanıcısına geçin"
+UsernameNeed: "Enterprise sürümü --username belirtmelidir"
+DBConnErr: "Hata: Veritabanı bağlantısını başlatma başarısız, {{ .err }}"
+SystemVersion: "sürüm: "
+SystemMode: "mod: "
+
+# komut satırı - uygulama
 AppVersion: "Uygulama sürümü"
 AppCommands: "Uygulama ile ilgili komutlar"
 AppInit: "Uygulamayı başlat"
@@ -261,12 +315,14 @@ AppMissVersion: "Uygulama sürümü eksik, belirtmek için -v kullanın"
 AppVersionExist: "Sürüm zaten mevcut"
 AppCreateSuccessful: "Oluşturma başarılı"
 AppWriteErr: "Dosya {{ .name }} yazma başarısız {{ .err }}"
-SudoHelper: "Lütfen {{ .cmd }} kullanın veya root kullanıcısına geçin"
-UsernameNeed: "Enterprise sürümü --username belirtmelidir"
+
+# komut satırı - dinleme IP
 ListenIPCommands: "Dinleme IP'sini değiştir"
 ListenIPv4: "IPv4'te dinle"
 ListenIPv6: "IPv6'da dinle"
 ListenChangeSuccessful: "Değişiklik başarılı Şimdi {{ .value }} üzerinde dinleniyor"
+
+# komut satırı - sıfırlama
 ResetCommands: "Sistem bilgilerini sıfırla"
 ResetMFA: "1Panel iki faktörlü kimlik doğrulamayı iptal et"
 ResetHttps: "1Panel https girişini iptal et"
@@ -274,12 +330,19 @@ ResetEntrance: "1Panel güvenli girişi iptal et"
 ResetIPs: "1Panel yetkili IP kısıtlamalarını iptal et"
 ResetDomain: "1Panel alan adı bağlamasını iptal et"
 ResetPasskey: "1Panel passkey'lerini sıfırla"
+
+# komut satırı - kullanıcı
 UserList: "1Panel kullanıcı listesini getir"
 UserTableName: "Ad"
 UserTableMFAStatus: "MFA Durumu"
 UserTableSuperAdmin: "Süper Yönetici"
 UserTableCreatedAt: "Oluşturulma"
 UserEmptyList: "Kullanıcı bulunamadı"
+UserInfo: "Panel bilgilerini al"
+UserInfoAddr: "Panel adresi: "
+UserInfoPassHelp: "İpucu: Şifreyi değiştirmek için komutu çalıştırabilirsiniz: "
+
+# komut satırı - geri yükleme
 RestoreCommands: "1Panel servisini ve verilerini geri al"
 RestoreNoSuchFile: "Rollback için dosya bulunamadı"
 RestoreStep1: "(1/5) {{ .name }} dizininden 1Panel hizmeti ve verileri geri alınıyor..."
@@ -288,6 +351,8 @@ RestoreStep3: "(3/5) 1Panel betikleri için geri alma tamamlandı"
 RestoreStep4: "(4/5) 1Panel hizmeti için geri alma tamamlandı"
 RestoreStep5: "(5/5) 1Panel verileri için geri alma tamamlandı"
 RestoreSuccessful: "Geri alma tamamlandı. {{ .version }} sürümüne dönüldü. Hizmet yeniden başlatılıyor..."
+
+# komut satırı - güncelleme
 UpdateCommands: "Panel bilgilerini güncelle"
 UpdateUser: "Kullanıcı bilgilerini güncelle"
 UpdatePassword: "Kullanıcı şifresini güncelle"
@@ -314,50 +379,12 @@ UpdatePortResult: "Panel Portu: {{ .name }}"
 UpdatePortFirewallAdd: "Güvenlik duvarı port kuralı ekleme başarısız, {{ .err }}, lütfen {{ .name }} portunu güvenlik duvarı kurallarına manuel olarak ekleyin."
 UpdatePortFirewallDel: "Hata: Güvenlik duvarı portu silme başarısız, {{ .err }}"
 UpdatePortFirewallReload: "Güvenlik duvarını yeniden yükleme başarısız, {{ .err }}, lütfen güvenlik duvarını manuel olarak yeniden yükleyin."
-UserInfo: "Panel bilgilerini al"
-UserInfoAddr: "Panel adresi: "
-UserInfoPassHelp: "İpucu: Şifreyi değiştirmek için komutu çalıştırabilirsiniz: "
-DBConnErr: "Hata: Veritabanı bağlantısını başlatma başarısız, {{ .err }}"
-SystemVersion: "sürüm: "
-SystemMode: "mod: "
 
-#exchange
-LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
-HandlePrivateKey: "Handle node private key"
-HandlePublicKey: "Handle node public key"
-ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
-TaskRsync: "Sync"
-NodeFile: "Node file"
-ImageSyncTaskName: "Image sync {{ .count }} images"
-SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
-AppSyncTaskName: "App sync {{ .name }}"
-SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
-ImageSyncSave: "Save image {{ .image }}"
-ImageSyncSaveTags: "Save image tags {{ .tags }}"
-ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
-ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
-ImageSyncClean: "Clean temporary files for image {{ .image }}"
-ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
-ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
-ImageSyncHandlePrivateKey: "Handle image sync node private key"
-ImageSyncHandlePublicKey: "Handle image sync node public key"
-ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
-
-#mobile app
+# mobil uygulama
 ErrVerifyToken: 'Token doğrulama hatası, lütfen sıfırlayın ve tekrar tarayın.'
 ErrInvalidToken: 'Geçersiz token, lütfen sıfırlayın ve tekrar tarayın.'
 ErrExpiredToken: 'Token süresi dolmuş, lütfen sıfırlayın ve tekrar tarayın.'
 
-#cluster
-ErrMasterDelete: "Ana düğümü silinemiyor, lütfen önce alt düğümleri silin."
-ClusterNameIsExist: "Küme adı zaten var."
-AppStatusUnHealthy: "Uygulama durumu alımı anormal, lütfen düğüm listesindeki yükleme düğümü durumunu kontrol edin."
-MasterNodePortNotAvailable: "Düğüm {{ .name }} portu {{ .port }} bağlantı doğrulaması başarısız oldu, lütfen güvenlik duvarı/güvenlik grubu ayarlarını ve ana düğüm durumunu kontrol edin."
-ClusterMasterNotExist: "Küme ana düğümü bağlantısı kesildi, lütfen alt düğümleri silin."
-
-#ssl
-ErrReqFailed: "{{.name}} istek başarısız: {{ .err }}"
-
-#command
+# komut dışa aktarma
 Name: "Ad"
 Command: "Komut"

@@ -1,32 +1,47 @@
+# 基础错误
 ErrInvalidParams: "参数错误: {{ .detail }}"
 ErrTokenParse: "Token 错误: {{ .detail }}"
 ErrInitialPassword: "原密码错误"
 ErrInternalServer: "服务错误: {{ .detail }}"
+ErrRecordExist: "记录已存在"
+ErrRecordNotFound: "记录不存在"
+ErrStructTransform: "类型转换失败: {{ .err }}"
+ErrNotSupportType: "不支持当前类型: {{ .name }}"
+
+# 文件 AI
 ErrFileAINotEnabled: "生成 AI 总结需在文件管理中启用并保存文件 AI 账号。关闭 AI 时仍可使用纯内容检索。"
 ErrFileAISearchBadPattern: "搜索条件无效（正则或全词匹配）: {{ .detail }}"
+FileAISearchEmptyDir: "当前目录下没有可列出的文件或文件夹（或均被过滤）。"
+
+# 远程下载
 ErrWgetRemoteFailed: "远程下载地址无效或无法访问：{{ .detail }}"
 ErrWgetInvalidContentType: "远程地址返回的不是文件内容（可能是错误页），{{ .detail }}"
 ErrWgetProxyNotConfigured: "请先在面板设置中配置代理服务器"
 ErrWgetProxyInvalid: "代理服务器地址无效：{{ .detail }}"
-ErrRecordExist: "记录已存在"
-ErrRecordNotFound: "记录不存在"
-ErrStructTransform: "类型转换失败: {{ .err }}"
+
+# 登录与安全
 ErrNotLogin: "用户未登录: {{ .detail }}"
 ErrPasswordExpired: "当前密码已过期: {{ .detail }}"
-ErrNotSupportType: "不支持当前类型: {{ .name }}"
-ErrAlertMethodNotSupported: "当前版本不支持此告警方式"
+
+# 请求与 API
 ErrProxy: "请求失败，请检查节点状态: {{ .detail }}"
 ErrApiConfigStatusInvalid: "API 禁止访问: {{ .detail }}"
 ErrApiConfigKeyInvalid: "API 接口密钥错误: {{ .detail }}"
 ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
 ErrApiConfigDisable: "此接口禁止 API 调用: {{ .detail }}"
 ErrApiConfigKeyTimeInvalid: "API 时间戳错误: {{ .detail }}"
-ErrShutDown: "命令已手动终止"
+ErrCreateHttpClient: "创建请求失败 {{ .err }}"
+ErrHttpReqTimeOut: "请求超时 {{ .err }}"
+ErrHttpReqFailed: "请求失败 {{ .err }}"
+ErrNoSuchHost: "无法找到请求的服务器 {{ .err }}"
+ErrHttpReqNotFound: "无法找到请求的资源 {{ .err }}"
 
+# 快速跳转
 ErrMinQuickJump: "至少设置 1 个快速跳转入口"
 ErrMaxQuickJump: "最多设置 4 个快速跳转入口"
 
-#common
+# 通用
+ErrShutDown: "命令已手动终止"
 ErrUsernameIsExist: "用户名已存在"
 ErrNameIsExist: "名称已存在"
 ErrDemoEnvironment: "演示环境，禁止操作"
@@ -45,7 +60,7 @@ ErrGroupIsDefault: "默认分组不可删除"
 ErrGroupIsInWebsiteUse: "分组正在被其他网站使用，无法删除"
 Decrypt: "解密"
 
-#agent
+# 智能体
 ErrAgentAccountBound: "该账号已绑定智能体，无法删除"
 ErrTerminalAIAccountInUse: "该模型账号正被终端 AI 使用，请在终端 AI 设置中更换账号或关闭终端 AI 后重试"
 ErrAgentAccountUnavailable: "账号连接信息不可用: {{ .err }}"
@@ -71,7 +86,7 @@ ErrAgentWebsiteUnbindUnsupported: "一键部署网站不支持手动解绑"
 ErrHermesPairingCodeUnavailable: "配对码在 hermes 中暂时不存在，可能是由于网络原因，请稍后尝试"
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: "飞书群组策略为白名单时，私聊策略不能为配对码"
 
-#backup
+# 备份与告警配置
 Localhost: '本机'
 ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
 ErrBackupCheck: "备份账号测试连接失败 {{ .err }}"
@@ -80,7 +95,7 @@ ErrBackupLocalCreate: "暂不支持创建本地服务器备份账号"
 ErrAlertConfigInUse: "告警配置正在使用中，无法删除"
 ErrAlertConfigPhoneExist: "手机号已存在"
 
-#app
+# 应用
 ErrPortInUsed: "{{ .detail }} 端口已被占用！"
 ErrAppLimit: "应用安装数量超限"
 ErrNotInstall: "应用未安装"
@@ -98,11 +113,6 @@ ErrFileParseApp: '{{ .name }} 文件解析失败 {{ .err }}'
 ErrAppDirNull: '版本文件夹不存在'
 LocalAppErr: "应用 {{ .name }} 同步失败！{{ .err }}"
 ErrContainerName: "容器名称已存在"
-ErrCreateHttpClient: "创建请求失败 {{ .err }}"
-ErrHttpReqTimeOut: "请求超时 {{ .err }}"
-ErrHttpReqFailed: "请求失败 {{ .err }}"
-ErrNoSuchHost: "无法找到请求的服务器 {{ .err }}"
-ErrHttpReqNotFound: "无法找到请求的资源 {{ .err }}"
 ErrContainerNotFound: '{{ .name }} 容器不存在'
 ErrContainerMsg: '{{ .name }} 容器异常，具体请在容器页面查看日志'
 ErrAppBackup: '{{ .name }} 应用备份失败 {{ .err }}'
@@ -134,7 +144,7 @@ ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，请先在宿主�
 UseExistImage: "镜像已存在，使用存量镜像"
 ErrDatabaseNotFound: "数据库 {{ .name }} 不存在"
 
-#ssh
+# SSH
 ExportIP: "登录 IP"
 ExportArea: "归属地"
 ExportPort: "端口"
@@ -143,7 +153,7 @@ ExportUser: "用户"
 ExportStatus: "登录状态"
 ExportDate: "时间"
 
-#file
+# 文件
 ErrFileCanNotRead: "此文件不支持预览"
 ErrSensitiveFileRead: "不允许读取敏感文件"
 ErrFileToLarge: "文件超过 10M，无法打开"
@@ -171,7 +181,7 @@ FileDropSuccess: "清理 {{ .name }} 成功，文件 {{ .count }}，释放 {{ .s
 FileDropSum: "文件清理完成，共 {{ .count }}，释放 {{ .size }}"
 ErrBadDecrypt: "压缩包密码错误，解压失败，请检查后重试"
 
-#website
+# 网站
 ErrAliasIsExist: "标识已存在"
 ErrBackupMatch: '该备份文件与当前网站部分数据不匹配 {{ .detail }}'
 ErrBackupExist: '该备份文件对应部分源数据不存在 {{ .detail }}'
@@ -202,7 +212,7 @@ ErrDefaultWebsite: "已设置默认网站，请先取消再设置"
 SSL: '证书'
 Set: '设置'
 
-#ssl
+# SSL 证书
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"
 ErrAccountCannotDelete: "账号关联证书，无法删除"
 ErrSSLApply: "证书续签成功，但 OpenResty reload 失败，请检查配置"
@@ -238,7 +248,7 @@ StartPushSSLToNode: "开始推送证书到节点"
 PushSSLToNodeFailed: "推送证书到节点失败: {{ .err }}"
 PushSSLToNodeSuccess: "推送证书到节点成功"
 
-#mysql
+# MySQL
 ErrUserIsExist: "用户已存在，请重新输入"
 ErrDatabaseIsExist: "数据库已存在，请重新输入"
 ErrExecTimeOut: "SQL 执行超时，请检查数据库"
@@ -248,10 +258,10 @@ RemoteBackup: "备份远程数据库前需先用镜像 {{ .name }} 启动本地�
 RemoteRecover: "恢复远程数据库前需先用镜像 {{ .name }} 启动本地容器数据库服务，请稍候"
 Arg: "参数"
 
-#redis
+# Redis
 ErrTypeOfRedis: "恢复文件类型与当前持久化方式不符，请修改后重试"
 
-#container
+# 容器
 ErrInUsed: "{{ .detail }} 正被使用，无法删除！"
 ErrObjectInUsed: "该对象正被使用，无法删除！"
 ErrObjectBeDependent: "该镜像正被其他镜像所依赖，无法删除！"
@@ -294,7 +304,7 @@ ComposeRecoverContainers: "恢复编排容器"
 ComposeRecoverRecord: "保存编排记录"
 ComposeRecoverCleanup: "清理编排恢复工作目录"
 
-#runtime
+# 运行环境
 ErrFileNotExist: "{{ .detail }} 文件不存在！请检查源文件完整性！"
 ErrImageBuildErr: "镜像 build 失败"
 ErrImageExist: "镜像已存在！请修改镜像名称"
@@ -308,7 +318,7 @@ ErrContainerNameIsNull: "容器名称不存在"
 ErrPHPPortIsDefault: "9000 端口为默认端口，请修改后重试"
 ErrPHPRuntimePortFailed: "{{ .name }} 端口已被当前运行环境使用，请修改后重试"
 
-#tool
+# 工具
 ErrConfigNotFound: "配置文件不存在"
 ErrConfigParse: "配置文件格式有误"
 ErrConfigIsNull: "配置文件不允许为空"
@@ -316,7 +326,7 @@ ErrConfigDirNotFound: "运行目录不存在"
 ErrConfigAlreadyExist: "已存在同名配置文件"
 ErrUserFindErr: "用户 {{ .name }} 查找失败 {{ .err }}"
 
-#cronjob
+# 计划任务
 CutWebsiteLogSuccess: "{{ .name }} 网站日志切割成功，备份路径 {{ .path }}"
 HandleShell: "执行脚本 {{ .name }}"
 HandleCurl: "访问 URL {{ .name }}"
@@ -336,7 +346,7 @@ CleanLog: "清理日志"
 CleanLogByName: "清理 {{ .name }} 日志"
 WafIpGroupNotFound: "WAF IP组未找到，请先到【高级功能-WAF-黑白名单-IP组】添加远程下载方式的IP组"
 
-#toolbox
+# 工具箱
 ErrNotExistUser: "当前用户不存在，请修改后重试！"
 ErrBanAction: "设置失败，{{ .name }} 服务不可用，请检查后重试"
 ErrClamdscanNotFound: "未检测到 clamdscan 命令，请按文档安装"
@@ -346,14 +356,14 @@ CreateSwap: "创建 Swap 文件"
 FormatSwap: "格式化 Swap 文件"
 EnableSwap: "启用 Swap"
 
-#tamper
+# 防篡改
 CleanTamperSetting: "清理历史防护设置"
 SetTamperWithRules: "根据规则启动目录防护"
 ProtectDir: "防护目录 {{ .name }}"
 IgnoreFile: "保护文件 {{ .name }}"
 TamperSetSuccessful: "防护设置完成，开始监听以下目录："
 
-#waf
+# WAF
 ErrScope: "不支持修改此配置"
 ErrStateChange: "状态修改失败"
 ErrRuleExist: "规则已存在"
@@ -409,7 +419,7 @@ remoteIpIsNull: "IP 列表为空"
 OpenrestyVersionErr: "OpenResty 版本过低，请升级到 1.27.1.2-2-2-focal"
 ErrFileTooLarge: "文件超过 1MB，无法上传"
 
-#task
+# 任务
 TaskStart: "{{ .name }} 任务开始 [START]"
 TaskEnd: "{{ .name }} 任务结束 [COMPLETED]"
 TaskFailed: "{{ .name }} 任务失败"
@@ -471,16 +481,16 @@ TaskExec: "执行"
 TaskBatch: "批量操作"
 FileConvert: "文件格式转换"
 
-# task - clam
+# 任务 - ClamAV
 Clamscan: "扫描 {{ .name }}"
 TaskScan: "扫描"
 
-# task - ai
+# 任务 - AI
 OllamaModelPull: "拉取 Ollama 模型 {{ .name }}"
 OllamaModelSize: "获取 Ollama 模型 {{ .name }} 大小"
 AIBenchmarkRun: "执行 AI 基准测试"
 
-# task - snapshot
+# 任务 - 快照
 Snapshot: "快照"
 SnapDBInfo: "写入 1Panel 数据库信息"
 SnapCopy: "复制文件/目录 {{ .name }}"
@@ -506,7 +516,6 @@ SnapCompressSize: "快照文件大小 {{ .name }}"
 SnapUpload: "上传快照文件"
 SnapUploadTo: "上传快照文件到 {{ .name }}"
 SnapUploadRes: "上传快照文件到 {{ .name }}"
-
 SnapshotRecover: "快照恢复"
 RecoverDownload: "下载快照文件"
 Download: "下载"
@@ -532,7 +541,7 @@ RecoverDBData: "恢复数据库数据"
 RecoverBackups: "恢复本地备份目录"
 RecoverPanelData: "恢复数据目录"
 
-# task - container
+# 任务 - 容器
 ContainerImagePull: "拉取容器镜像 {{ .name }}"
 ContainerRemoveOld: "删除原容器 {{ .name }}"
 ContainerImageCheck: "检查镜像是否正常拉取"
@@ -542,7 +551,7 @@ ContainerCreate: "创建新容器 {{ .name }}"
 ContainerCreateFailed: "容器创建失败，删除失败容器"
 ContainerStartCheck: "检查容器是否已启动"
 
-# task - image
+# 任务 - 镜像
 ImageBuild: "镜像构建"
 ImagePull: "拉取镜像"
 ImageRepoAuthFromDB: "从数据库获取仓库认证信息"
@@ -551,7 +560,7 @@ ImageRenameTag: "修改镜像 Tag"
 ImageNewTag: "新镜像 Tag {{ .name }}"
 ComposeCreate: "创建编排"
 
-# task - website
+# 任务 - 网站
 BackupNginxConfig: "备份网站 OpenResty 配置文件"
 CompressFileSuccess: "压缩目录成功，压缩为 {{ .name }}"
 CompressDir: "压缩目录"
@@ -563,13 +572,14 @@ RecoverFailedStartRollBack: "恢复失败，开始回滚"
 AppBackupFileIncomplete: "备份文件不完整，缺少 app.json 或 app.tar.gz 文件"
 AppAttributesNotMatch: "应用类型或名称不一致"
 
-#alert
+# 告警
+ErrAlertMethodNotSupported: "当前版本不支持此告警方式"
 ErrAlertSync: "告警信息同步错误，请检查后重试"
 
-#task - runtime
+# 任务 - 运行环境
 ErrInstallExtension: "已有安装任务正在进行，请等待任务结束"
 
-# alert mail template
+# 告警邮件模板
 PanelAlertTitle: "面板告警通知"
 TestAlertTitle: "测试邮件 - 验证邮箱连通性"
 TestAlert: "这是一封测试邮件，用于验证邮箱发件配置。"
@@ -587,7 +597,7 @@ NodeExceptionAlert: "您的 {{ .node }}{{ .ip }} 面板，{{ .num }} 个节点�
 LicenseExceptionAlert: "您的 {{ .node }}{{ .ip }} 面板，{{ .num }} 个许可证存在异常，请登录面板查看详情。"
 SSHAndPanelLoginAlert: "您的 {{ .node }}{{ .ip }} 面板，面板 {{ .name }} 登录 {{ .loginIp }} 异常，请登录面板查看详情。"
 
-#disk
+# 磁盘
 DeviceNotFound: "设备 {{ .name }} 未找到"
 DeviceIsMounted: "设备 {{ .name }} 已挂载，请先卸载"
 PartitionDiskErr: "分区失败，{{ .err }}"
@@ -595,14 +605,13 @@ FormatDiskErr: "格式化磁盘失败，{{ .err }}"
 MountDiskErr: "挂载磁盘失败，{{ .err }}"
 XfsNotFound: "未检测到 xfs 文件系统，请先安装 xfsprogs"
 
-# terminal
+# 终端
 TerminalAIBlockedRiskyCommand: "已拦截风险命令：{{ .command }}"
 TerminalAIThinking: "AI 正在思考..."
 TerminalAIReadyToExecute: "思考完成，请回车执行（耗时 {{ .duration }}，token：{{ .tokens }}）"
 TerminalAIRequestFailed: "AI 请求失败：{{ .err }}"
-FileAISearchEmptyDir: "当前目录下没有可列出的文件或文件夹（或均被过滤）。"
 
-# ai proxy
+# AI 网关
 ErrAIProxyServiceNotInstalled: "{{ .name }} 服务未安装"
 ErrAIProxyModelAccountNotFound: "模型账号 {{ .id }} 不存在"
 ErrAIProxyModelMapRequired: "请填写必填项"

@@ -1,83 +1,65 @@
+# базовые ошибки
 ErrInvalidParams: 'Неверный запрос: {{ .detail }}'
 ErrTokenParse: 'Ошибка токена: {{ .detail }}'
 ErrInitialPassword: 'Исходный пароль неверен'
 ErrInternalServer: 'Внутренняя ошибка: {{ .detail }}'
+ErrInternalServerKey: "Внутренняя ошибка сервера:"
 ErrRecordExist: 'Запись уже существует'
 ErrRecordNotFound: 'Запись не найдена'
 ErrStructTransform: 'Ошибка преобразования: {{ .err }}'
-ErrNotLogin: 'Не авторизован: {{ .detail }}'
-ErrSessionDataNotFound: "Текущая сессия истекла"
-ErrSessionDataFormat: "Ненормальный формат данных текущей сессии"
-ErrPasswordExpired: 'Пароль истёк: {{ .detail }}'
 ErrNotSupportType: 'Тип не поддерживается: {{ .name }}'
-ErrProxy: 'Запрос не удался: {{ .detail }}'
-ErrApiConfigStatusInvalid: 'API отключено: {{ .detail }}'
-ErrApiConfigKeyInvalid: 'Неверный API-ключ: {{ .detail }}'
-ErrApiConfigIPInvalid: 'IP не в списке: {{ .detail }}'
-ErrApiConfigDisable: 'Доступ по API запрещён: {{ .detail }}'
-ErrApiConfigKeyTimeInvalid: 'Неверная метка времени: {{ .detail }}'
-ErrLoginLocked: "Слишком много неудачных попыток. Вход временно заблокирован на 5 минут."
+ErrDemoEnvironment: 'Недоступно в демо'
+ErrCmdTimeout: 'Команда завершилась по тайм-ауту'
+ErrPortInUsed: "Порт {{ .name }} уже используется"
+ErrFileNotFound: "Файл {{ .name }} не найден"
+ErrReqFailed: "{{.name}} запрос не удался: {{ .err }}"
 
-# request
+# запрос и вход безопасности
 ErrNoSuchHost: "Не удалось найти запрашиваемый сервер {{ .err }}"
 ErrHttpReqNotFound: "Не удалось найти запрашиваемый ресурс {{ .err }}"
 ErrHttpReqFailed: "Ошибка запроса {{ .err }}"
 ErrHttpReqTimeOut: "Время ожидания запроса истекло {{ .err }}"
 ErrCreateHttpClient: "Ошибка создания запроса {{ .err }}"
+ErrProxy: 'Запрос не удался: {{ .detail }}'
 ErrProxySetting: "Информация о прокси-сервере недоступна {{ .err }}, проверьте и повторите попытку"
+ErrEntrance: "Ошибка информации о безопасном входе, проверьте и повторите попытку"
 ErrEntranceFormat: "Защищенный вход {{ .name }} в настоящее время не поддерживается. Пожалуйста, проверьте и повторите попытку"
 
-# common
-ErrDemoEnvironment: 'Недоступно в демо'
-ErrCmdTimeout: 'Команда завершилась по тайм-ауту'
-ErrVMNotFound: "Виртуальная машина не существует"
-ErrVMAlreadyExists: "Виртуальная машина уже существует"
-ErrVMRunning: "Виртуальная машина запущена"
-ErrVMLibvirtConnect: "Не удалось подключиться к libvirt: {{ .detail }}"
-ErrVMPermission: "Нет разрешения на операцию с виртуальной машиной: {{ .detail }}"
-ErrVMNetworkNotFound: "Сеть виртуальной машины не существует: {{ .detail }}"
-ErrVMInvalidPath: "Недопустимый путь виртуальной машины: {{ .detail }}"
-ErrVMInvalidInput: "Недопустимые параметры виртуальной машины: {{ .detail }}"
-ErrVMCommandFailed: "Ошибка выполнения команды виртуальной машины: {{ .err }}"
-VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
-VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
-VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
-ErrEntrance: "Ошибка информации о безопасном входе, проверьте и повторите попытку"
+# вход и безопасность
+ErrNotLogin: 'Не авторизован: {{ .detail }}'
+ErrSessionDataNotFound: "Текущая сессия истекла"
+ErrSessionDataFormat: "Ненормальный формат данных текущей сессии"
+ErrPasswordExpired: 'Пароль истёк: {{ .detail }}'
+ErrLoginLocked: "Слишком много неудачных попыток. Вход временно заблокирован на 5 минут."
+ErrApiConfigStatusInvalid: 'API отключено: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'Неверный API-ключ: {{ .detail }}'
+ErrApiConfigIPInvalid: 'IP не в списке: {{ .detail }}'
+ErrApiConfigDisable: 'Доступ по API запрещён: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'Неверная метка времени: {{ .detail }}'
+ErrPasskeyDisabled: "Для Passkey требуется включить HTTPS"
+ErrPasskeyNotConfigured: "Passkey не настроен"
+ErrPasskeyLimit: "Достигнут лимит Passkey (максимум 5)"
+ErrPasskeySession: "Сеанс Passkey истек или недействителен"
+ErrPasskeyDuplicate: "Passkey уже существует"
+ErrPasskeyVerify: "Не удалось проверить Passkey"
+
+# пользователь и права
+ErrNoSuchUser: "Информация о пользователе не найдена. Проверьте и повторите попытку."
+ErrToMaster: "У этого пользователя нет прав для выполнения этой операции на основном узле. Проверьте и повторите попытку."
+ErrToNode: "У этого пользователя нет прав для выполнения этой операции на этом узле. Проверьте и повторите попытку."
+ErrRBAC: "Недостаточно прав пользователя. Операция не может быть выполнена. Проверьте и повторите попытку."
+ErrNoneNode: "У этого пользователя нет прав ни на один узел. Обратитесь к администратору или проверьте и повторите попытку."
+ErrOnlySuperAdmin: "Эта функция доступна только супер администраторам."
+ErrRolePresetCannotDelete: "Системные предустановленные роли нельзя удалять"
+ErrRolePresetCannotUpdate: "Системные предустановленные роли нельзя обновлять"
+ErrRoleBoundToUser: "Эта роль уже привязана к пользователям и не может быть удалена"
+ErrRolePresetCannotBind: "Системные предустановленные роли нельзя назначать пользователям"
+ErrNodeAdminMasterForbidden: "Права администратора узла нельзя добавить к главному узлу"
+ErrSuperAdminCannotDelete: "Пользователей супер-администратора нельзя удалять"
 ErrGroupIsDefault: "Группу по умолчанию нельзя удалить"
 ErrGroupIsInUse: "Группа используется и не может быть удалена."
-ErrAIProxyUserGroupIsDefault: "Группу пользователей по умолчанию нельзя удалить."
-ErrAIProxyUserGroupInUse: "Группа пользователей используется и не может быть удалена."
-ErrAIProxyUserGroupExists: "Имя группы пользователей уже существует."
-ErrAIProxyBackendAccountExists: "Эта учетная запись модели уже импортирована в пул аккаунтов AI Gateway."
-ErrAIProxyModelGroupInUse: "Группа моделей используется и не может быть удалена."
-ErrAIProxyModelGroupExists: "Имя группы моделей уже существует."
-ErrAIProxySensitiveGroupInUse: "Группа чувствительных слов используется и не может быть удалена."
-ErrAIProxySensitiveGroupExists: "Имя группы чувствительных слов уже существует."
-ErrLocalDelete: "Локальный узел нельзя удалить"
-ErrPortInUsed: "Порт {{ .name }} уже используется"
-ErrInternalServerKey: "Внутренняя ошибка сервера:"
-MasterNode: "Главный узел"
 
-# app
-CustomAppStoreFileValid: "Пакет магазина приложений должен быть в формате .tar.gz"
-ErrFileNotFound: "Файл {{ .name }} не найден"
-AppBackup: 'Резервная копия приложения'
-AppBackupPush: 'Передать файл резервной копии приложения {{.file}} на узел {{ .name }}'
-ErrSourceTargetSame: 'Исходный узел и целевой узел не могут быть одинаковыми'
-AppInstall: 'Установить приложение {{ .name }} на узел {{ .targetNode }}'
-AppInstallCheck: 'Проверить среду установки приложения'
-
-# backup
-ErrBackupInUsed: 'Аккаунт бэкапа занят задачей'
-ErrBackupCheck: 'Проверка подключения не удалась: {{ .err }}'
-ErrBackupLocal: "Локальная учетная запись резервного копирования не поддерживает эту операцию"
-ErrBackupPublic: "Обнаружено, что эта учетная запись резервного копирования не является публичной, проверьте и повторите попытку"
-ErrOSSConn: "Не удалось получить последнюю версию, проверьте подключение сервера к внешней сети."
-
-#license
+# лицензия
 LicenseCheck: 'Проверить доступность лицензии'
 ErrLicenseInUsed: 'Лицензия уже привязана. Пожалуйста, проверьте и повторите попытку'
 ErrLicenseExpired: 'Срок действия лицензии истек. Пожалуйста, проверьте и повторите попытку'
@@ -107,21 +89,6 @@ ErrNodeUnbind: "Обнаружен узел вне области действи
 ErrNodeBind: "Этот узел уже связан с лицензией, проверьте и повторите попытку"
 ErrNodeLocalRollback: "Прямой откат на основном узле не поддерживается. Выполните '1pctl restore' вручную для отката"
 ErrIntlLicense: "Текущая версия пока не поддерживает импорт международной лицензии. Скоро будет доступно"
-
-# user
-ErrNoSuchUser: "Информация о пользователе не найдена. Проверьте и повторите попытку."
-ErrToMaster: "У этого пользователя нет прав для выполнения этой операции на основном узле. Проверьте и повторите попытку."
-ErrToNode: "У этого пользователя нет прав для выполнения этой операции на этом узле. Проверьте и повторите попытку."
-ErrRBAC: "Недостаточно прав пользователя. Операция не может быть выполнена. Проверьте и повторите попытку."
-ErrNoneNode: "У этого пользователя нет прав ни на один узел. Обратитесь к администратору или проверьте и повторите попытку."
-ErrOnlySuperAdmin: "Эта функция доступна только супер администраторам."
-ErrRolePresetCannotDelete: "Системные предустановленные роли нельзя удалять"
-ErrRolePresetCannotUpdate: "Системные предустановленные роли нельзя обновлять"
-ErrRoleBoundToUser: "Эта роль уже привязана к пользователям и не может быть удалена"
-ErrRolePresetCannotBind: "Системные предустановленные роли нельзя назначать пользователям"
-ErrNodeAdminMasterForbidden: "Права администратора узла нельзя добавить к главному узлу"
-ErrSuperAdminCannotDelete: "Пользователей супер-администратора нельзя удалять"
-
 InvalidRequestBodyType: "Неверный формат тела запроса. Проверьте, соответствует ли содержимое требуемому формату, и повторите попытку"
 InvalidLicenseCodeType: "Указан неверный формат лицензионного кода. Проверьте и повторите попытку"
 LicenseNotFoundType: "Лицензия не найдена. В системе нет записей, соответствующих указанной лицензии. Проверьте и повторите попытку"
@@ -132,10 +99,64 @@ InvalidAssigneeType: "Некорректная информация о целе�
 LicenseUsageNotFoundType: "Записи об использовании отсутствуют. Эта лицензия еще не активирована или не использовалась. Проверьте и повторите попытку"
 LicenseUsageLimitExceededType: "Эта лицензия уже привязана к другому узлу. Проверьте и повторите попытку"
 
-# alert
+# узел и кластер
+MasterNode: "Главный узел"
+Node: "Узел"
+ErrLocalDelete: "Локальный узел нельзя удалить"
+ErrMasterDelete: "Невозможно удалить основной узел, сначала удалите подчиненные узлы."
+ClusterNameIsExist: "Имя кластера уже существует."
+AppStatusUnHealthy: "Получение статуса приложения аномально, пожалуйста, проверьте статус узлов установки в списке узлов."
+MasterNodePortNotAvailable: "Проверка подключения порта {{ .port }} узла {{ .name }} не удалась, пожалуйста, проверьте настройки брандмауэра/группы безопасности и статус главного узла."
+ClusterMasterNotExist: "Основной узел кластера отключен, пожалуйста, удалите дочерние узлы."
+
+# виртуальная машина
+ErrVMNotFound: "Виртуальная машина не существует"
+ErrVMAlreadyExists: "Виртуальная машина уже существует"
+ErrVMRunning: "Виртуальная машина запущена"
+ErrVMLibvirtConnect: "Не удалось подключиться к libvirt: {{ .detail }}"
+ErrVMPermission: "Нет разрешения на операцию с виртуальной машиной: {{ .detail }}"
+ErrVMNetworkNotFound: "Сеть виртуальной машины не существует: {{ .detail }}"
+ErrVMInvalidPath: "Недопустимый путь виртуальной машины: {{ .detail }}"
+ErrVMInvalidInput: "Недопустимые параметры виртуальной машины: {{ .detail }}"
+ErrVMCommandFailed: "Ошибка выполнения команды виртуальной машины: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
+
+# приложение
+CustomAppStoreFileValid: "Пакет магазина приложений должен быть в формате .tar.gz"
+AppBackup: 'Резервная копия приложения'
+AppBackupPush: 'Передать файл резервной копии приложения {{.file}} на узел {{ .name }}'
+ErrSourceTargetSame: 'Исходный узел и целевой узел не могут быть одинаковыми'
+AppInstall: 'Установить приложение {{ .name }} на узел {{ .targetNode }}'
+AppInstallCheck: 'Проверить среду установки приложения'
+
+# резервное копирование
+ErrBackupInUsed: 'Аккаунт бэкапа занят задачей'
+ErrBackupCheck: 'Проверка подключения не удалась: {{ .err }}'
+ErrBackupLocal: "Локальная учетная запись резервного копирования не поддерживает эту операцию"
+ErrBackupPublic: "Обнаружено, что эта учетная запись резервного копирования не является публичной, проверьте и повторите попытку"
+ErrOSSConn: "Не удалось получить последнюю версию, проверьте подключение сервера к внешней сети."
+MvBackup: "Переместить данные в резервный каталог"
+
+# оповещение
 ErrAlertSync: "Ошибка синхронизации информации об оповещениях, пожалуйста, проверьте и повторите попытку"
 
-# task
+# AI-шлюз
+ErrAIProxyUserGroupIsDefault: "Группу пользователей по умолчанию нельзя удалить."
+ErrAIProxyUserGroupInUse: "Группа пользователей используется и не может быть удалена."
+ErrAIProxyUserGroupExists: "Имя группы пользователей уже существует."
+ErrAIProxyBackendAccountExists: "Эта учетная запись модели уже импортирована в пул аккаунтов AI Gateway."
+ErrAIProxyModelGroupInUse: "Группа моделей используется и не может быть удалена."
+ErrAIProxyModelGroupExists: "Имя группы моделей уже существует."
+ErrAIProxySensitiveGroupInUse: "Группа чувствительных слов используется и не может быть удалена."
+ErrAIProxySensitiveGroupExists: "Имя группы чувствительных слов уже существует."
+AIBenchmarkRun: "Выполнить тест производительности AI"
+
+# задача
 TaskStart: "{{ .name }} задача начата [START]"
 TaskEnd: "{{ .name }} задача завершена [COMPLETED]"
 TaskFailed: "{{ .name }} задача не выполнена"
@@ -149,6 +170,16 @@ TaskUpgrade: "Обновить"
 TaskSync: 'Синхронизация'
 TaskSyncForNode: "Синхронизировать Данные Узла"
 TaskBackup: "Резервная копия"
+TaskPush: "Отправить"
+TaskRsync: "Sync"
+SuccessStatus: "{{ .name }} успешно"
+FailedStatus: "{{ .name }} не удалось {{ .err }}"
+Start: "Начать"
+SubTask: "Подзадача"
+Skip: "Пропустить ошибки и продолжить..."
+Success: "Успешно"
+
+# пакетная задача агента
 BatchInstallAgent: "Пакетная установка агентов"
 DispatchAgentInstallTasks: "Отправить задачи установки агентов"
 BatchUpgradeAgent: "Пакетное обновление агентов"
@@ -182,19 +213,15 @@ AgentOperateStart: "Запустить"
 AgentOperateStop: "Остановить"
 AgentOperateRestart: "Перезапустить"
 AgentOperateDelete: "Удалить"
-SuccessStatus: "{{ .name }} успешно"
-FailedStatus: "{{ .name }} не удалось {{ .err }}"
-Start: "Начать"
-SubTask: "Подзадача"
-Skip: "Пропустить ошибки и продолжить..."
-TaskPush: "Отправить"
+
+# задача приложения и навыка
+PushAppInstallTaskToNode: "Отправить задачу установки приложения на узел [{{ .name }}]"
 AppInstallTask: "Задача установки приложения"
 PushAppFailed: "Не удалось отправить задачу установки приложения"
 SkillHubInstallTask: "Установить навык [{{ .name }}]"
 SkillHubInstallToTarget: "Установить навык в цель [{{ .name }}]"
-Success: "Успешно"
 
-#script
+# библиотека скриптов
 ScriptLibrary: "Библиотека скриптов"
 RemoteScriptLibrary: "Удаленная Библиотека Скриптов"
 ScriptSyncSkip: "Текущая библиотека скриптов уже является последней версией"
@@ -202,7 +229,7 @@ DownloadData: "Загрузка файла библиотеки скриптов
 DownloadPackage: "Загрузка архива библиотеки скриптов"
 AnalyticCompletion: "Анализ завершён, начинается синхронизация с базой данных..."
 
-Node: "Узел"
+# синхронизация узла
 SyncNode: "Синхронизировать данные с узлом {{ .name }}"
 LocalName: "Имя 'local' используется только для локальной идентификации в системе"
 SyncPackageData: "Упаковка данных синхронизации"
@@ -218,7 +245,7 @@ SyncCustomApp: "Пользовательское приложение"
 SyncLanguage: "Язык системы"
 SyncEdition: "Регион работы"
 
-#upgrade node
+# обновление узла
 NodeUpgrade: "Обновление узла {{ .name }}"
 UpgradeCheck: "Проверить обновления узла"
 UpgradeCheckLocal: "Локальные узлы не поддерживают массовое обновление, пропуск..."
@@ -231,12 +258,11 @@ LoadAutoUpgradeNodesFailed: "Не удалось загрузить узлы а�
 AutoUpgradeNodes: "Узлы автообновления: {{ .nodes }}"
 UpdateAutoUpgradeNodesStatusFailed: "Не удалось обновить статус узлов автообновления, ошибка: {{ .err }}"
 
-#add node
+# добавление узла
 MasterData: "Данные главного узла"
 LoadSftpClient: "Загрузить SFTP-клиент"
 PackageMasterData: "Создать архив резервной копии главного узла"
 UploadBackup: "Загрузить резервные данные"
-MvBackup: "Переместить данные в резервный каталог"
 TaskAddNode: "Добавить узел"
 LoadNodeArch: "Получить информацию об архитектуре узла"
 LoadNodeArchDetail: "Обнаружена архитектура главного узла: {{ .local }}, архитектура дочернего узла: {{ .node }}"
@@ -249,7 +275,35 @@ SendAgent: "Отправить установочный пакет узла"
 StartService: "Запустить сервис"
 NoBackupNode: "Резервный узел в настоящее время пуст. Выберите резервный узел для сохранения и повторите попытку"
 
-#cmd
+# синхронизация файлов и образов узла
+LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
+HandlePrivateKey: "Handle node private key"
+HandlePublicKey: "Handle node public key"
+ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
+NodeFile: "Node file"
+ImageSyncTaskName: "Image sync {{ .count }} images"
+SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
+AppSyncTaskName: "App sync {{ .name }}"
+SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
+ImageSyncSave: "Save image {{ .image }}"
+ImageSyncSaveTags: "Save image tags {{ .tags }}"
+ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
+ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
+ImageSyncClean: "Clean temporary files for image {{ .image }}"
+ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
+ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
+ImageSyncHandlePrivateKey: "Handle image sync node private key"
+ImageSyncHandlePublicKey: "Handle image sync node public key"
+ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
+
+# командная строка
+SudoHelper: "Пожалуйста, используйте {{ .cmd }} или переключитесь на пользователя root"
+UsernameNeed: "Для Enterprise-версии необходимо указать --username"
+DBConnErr: "Ошибка: не удалось инициализировать соединение с базой данных, {{ .err }}"
+SystemVersion: "Версия:"
+SystemMode: "Режим:"
+
+# командная строка - приложение
 AppVersion: "Версия приложения"
 AppCommands: "Команды приложения"
 AppInit: "Инициализация приложения"
@@ -261,12 +315,14 @@ AppMissVersion: "Отсутствует версия приложения, ис�
 AppVersionExist: "Версия уже существует"
 AppCreateSuccessful: "Успешно создано"
 AppWriteErr: "Не удалось записать файл {{ .name }} {{ .err }}"
-SudoHelper: "Пожалуйста, используйте {{ .cmd }} или переключитесь на пользователя root"
-UsernameNeed: "Для Enterprise-версии необходимо указать --username"
+
+# командная строка - IP прослушивания
 ListenIPCommands: "Переключить IP для прослушивания"
 ListenIPv4: "Прослушивание IPv4"
 ListenIPv6: "Прослушивание IPv6"
 ListenChangeSuccessful: "Переключено успешно Теперь прослушиваем {{ .value }}"
+
+# командная строка - сброс
 ResetCommands: "Сбросить информацию о системе"
 ResetMFA: "Отменить двухфакторную аутентификацию 1Panel"
 ResetHttps: "Отменить вход в 1Panel через https"
@@ -274,12 +330,19 @@ ResetEntrance: "Отменить безопасный вход 1Panel"
 ResetIPs: "Отменить ограничения авторизованных IP для 1Panel"
 ResetDomain: "Отменить привязку домена доступа 1Panel"
 ResetPasskey: "Сбросить passkey 1Panel"
+
+# командная строка - пользователь
 UserList: "Получить список пользователей 1Panel"
 UserTableName: "Имя"
 UserTableMFAStatus: "Статус MFA"
 UserTableSuperAdmin: "Суперадмин"
 UserTableCreatedAt: "Создано"
 UserEmptyList: "Пользователи не найдены"
+UserInfo: "Получить информацию о панели"
+UserInfoAddr: "Адрес панели:"
+UserInfoPassHelp: "Подсказка: для изменения пароля можно выполнить команду:"
+
+# командная строка - восстановление
 RestoreCommands: "Откатить сервис и данные 1Panel"
 RestoreNoSuchFile: "Файлы для отката не найдены"
 RestoreStep1: "(1/5) Начинаем откат сервиса и данных 1Panel из каталога {{ .name }}..."
@@ -288,6 +351,8 @@ RestoreStep3: "(3/5) Откат скриптов 1Panel завершён"
 RestoreStep4: "(4/5) Откат сервиса 1Panel завершён"
 RestoreStep5: "(5/5) Откат данных 1Panel завершён"
 RestoreSuccessful: "Откат завершён. Возвращено к версии {{ .version }}. Перезапускаем сервис..."
+
+# командная строка - обновление
 UpdateCommands: "Изменить информацию панели"
 UpdateUser: "Изменить информацию пользователя"
 UpdatePassword: "Изменить пароль пользователя"
@@ -314,50 +379,12 @@ UpdatePortResult: "Порт панели: {{ .name }}"
 UpdatePortFirewallAdd: "Не удалось добавить правило фаервола для порта, {{ .err }}, пожалуйста, вручную добавьте порт {{ .name }} в правила фаервола."
 UpdatePortFirewallDel: "Ошибка: не удалось удалить правило фаервола для порта, {{ .err }}"
 UpdatePortFirewallReload: "Не удалось перезагрузить фаервол, {{ .err }}, пожалуйста, вручную перезагрузите фаервол."
-UserInfo: "Получить информацию о панели"
-UserInfoAddr: "Адрес панели:"
-UserInfoPassHelp: "Подсказка: для изменения пароля можно выполнить команду:"
-DBConnErr: "Ошибка: не удалось инициализировать соединение с базой данных, {{ .err }}"
-SystemVersion: "Версия:"
-SystemMode: "Режим:"
 
-#exchange
-LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
-HandlePrivateKey: "Handle node private key"
-HandlePublicKey: "Handle node public key"
-ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
-TaskRsync: "Sync"
-NodeFile: "Node file"
-ImageSyncTaskName: "Image sync {{ .count }} images"
-SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
-AppSyncTaskName: "App sync {{ .name }}"
-SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
-ImageSyncSave: "Save image {{ .image }}"
-ImageSyncSaveTags: "Save image tags {{ .tags }}"
-ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
-ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
-ImageSyncClean: "Clean temporary files for image {{ .image }}"
-ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
-ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
-ImageSyncHandlePrivateKey: "Handle image sync node private key"
-ImageSyncHandlePublicKey: "Handle image sync node public key"
-ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
-
-#mobile app
+# мобильное приложение
 ErrVerifyToken: 'шибка проверки токена, пожалуйста, сбросьте и отсканируйте снова.'
 ErrInvalidToken: 'Неверный токен, пожалуйста, сбросьте и отсканируйте снова.'
 ErrExpiredToken: 'Токен истек, пожалуйста, сбросьте и отсканируйте снова.'
 
-#cluster
-ErrMasterDelete: "Невозможно удалить основной узел, сначала удалите подчиненные узлы."
-ClusterNameIsExist: "Имя кластера уже существует."
-AppStatusUnHealthy: "Получение статуса приложения аномально, пожалуйста, проверьте статус узлов установки в списке узлов."
-MasterNodePortNotAvailable: "Проверка подключения порта {{ .port }} узла {{ .name }} не удалась, пожалуйста, проверьте настройки брандмауэра/группы безопасности и статус главного узла."
-ClusterMasterNotExist: "Основной узел кластера отключен, пожалуйста, удалите дочерние узлы."
-
-#ssl
-ErrReqFailed: "{{.name}} запрос не удался: {{ .err }}"
-
-#command
+# экспорт команд
 Name: "Название"
 Command: "Команда"
