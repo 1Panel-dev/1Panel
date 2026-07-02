@@ -2065,6 +2065,7 @@ const message = {
             sync: 'Resource Sync',
             exchange: 'Resource Sync',
             xapp: 'App',
+            vm: 'Virtual Machines',
         },
         websiteLog: 'Website logs',
         runLog: 'Run logs',
@@ -5568,6 +5569,7 @@ const message = {
             submitSuccess: 'Sync task submitted.',
         },
         vm: {
+            vm: 'VM',
             title: 'Virtual Machines',
             dependencies: 'Dependencies',
             dependencyPurpose: 'Purpose',

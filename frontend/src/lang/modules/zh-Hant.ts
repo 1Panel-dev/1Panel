@@ -1941,6 +1941,7 @@ const message = {
             sync: '資源同步',
             exchange: '資源同步',
             xapp: 'APP',
+            vm: '虛擬機管理',
         },
         websiteLog: '網站日誌',
         runLog: '執行日誌',
@@ -5185,6 +5186,7 @@ const message = {
             submitSuccess: '同步任務已提交。',
         },
         vm: {
+            vm: '虛擬機',
             title: '虛擬機管理',
             dependencies: '依賴',
             dependencyPurpose: '作用',

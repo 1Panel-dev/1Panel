@@ -2030,6 +2030,7 @@ const message = {
             sync: '리소스 동기화',
             exchange: '리소스 동기화',
             xapp: 'App',
+            vm: '가상 머신 관리',
         },
         websiteLog: '웹사이트 로그',
         runLog: '실행 로그',
@@ -5468,6 +5469,7 @@ const message = {
             submitSuccess: '동기화 작업이 제출되었습니다.',
         },
         vm: {
+            vm: '가상 머신',
             title: '가상 머신 관리',
             dependencies: '종속성',
             dependencyPurpose: '용도',

@@ -2098,6 +2098,7 @@ const message = {
             sync: 'Penyegerakan Sumber',
             exchange: 'Penyegerakan Sumber',
             xapp: 'App',
+            vm: 'Pengurusan Mesin Maya',
         },
         websiteLog: 'Log Laman Web',
         runLog: 'Log Jalankan',
@@ -5657,6 +5658,7 @@ const message = {
             submitSuccess: 'Tugas penyegerakan berjaya dihantar.',
         },
         vm: {
+            vm: 'Mesin Maya',
             title: 'Pengurusan Mesin Maya',
             dependencies: 'Kebergantungan',
             dependencyPurpose: 'Tujuan',

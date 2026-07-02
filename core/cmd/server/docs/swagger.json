@@ -70,6 +70,7 @@
 						"description": "OK",
 						"schema": {
 							"additionalProperties": {
+								"format": "int64",
 								"type": "integer"
 							},
 							"type": "object"
@@ -31916,7 +31917,8 @@
 						"restart",
 						"stop",
 						"down",
-						"delete"
+						"delete",
+						"rebuild"
 					],
 					"type": "string"
 				},
@@ -40544,6 +40546,9 @@
 				"streamableHttpPath": {
 					"type": "string"
 				},
+				"taskID": {
+					"type": "string"
+				},
 				"type": {
 					"type": "string"
 				},
@@ -40674,6 +40679,9 @@
 					"type": "string"
 				},
 				"streamableHttpPath": {
+					"type": "string"
+				},
+				"taskID": {
 					"type": "string"
 				},
 				"type": {

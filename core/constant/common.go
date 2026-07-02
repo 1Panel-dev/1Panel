@@ -208,6 +208,11 @@ var WebUrlMap = map[string]struct{}{
 	"/enterprise/ops-report/alert":    {},
 	"/enterprise/ops-report/history":  {},
 	"/enterprise/ops-report/settings": {},
+	"/enterprise/vm/list":             {},
+	"/enterprise/vm/iso":              {},
+	"/enterprise/vm/templates":        {},
+	"/enterprise/vm/networks":         {},
+	"/enterprise/vm/storage-pools":    {},
 }
 
 var DynamicRoutes = []string{

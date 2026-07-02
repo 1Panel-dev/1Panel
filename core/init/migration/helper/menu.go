@@ -143,7 +143,7 @@ func LoadMenus() string {
 				Title:    "xpack.vm.title",
 				IsShow:   true,
 				Label:    "VirtualMachine",
-				Path:     "/xpack/vm",
+				Path:     "/enterprise/vm",
 				Sort:     550,
 			}, "MonitorDashboard")
 			break

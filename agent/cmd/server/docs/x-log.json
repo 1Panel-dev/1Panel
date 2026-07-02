@@ -1578,6 +1578,255 @@
 		"formatZH": "更新 [name]",
 		"formatEN": "update user [name]"
 	},
+	"/core/enterprise/vms": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机 [name]",
+		"formatEN": "create VM [name]"
+	},
+	"/core/enterprise/vms/del": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除虚拟机 [name]",
+		"formatEN": "delete VM [name]"
+	},
+	"/core/enterprise/vms/iso": {
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机镜像 [name] [type]",
+		"formatEN": "create VM ISO [name] [type]"
+	},
+	"/core/enterprise/vms/iso/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_isos",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机镜像 [name]",
+		"formatEN": "delete VM ISO [name]"
+	},
+	"/core/enterprise/vms/iso/update": {
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新虚拟机镜像 [name] [type]",
+		"formatEN": "update VM ISO [name] [type]"
+	},
+	"/core/enterprise/vms/networks": {
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机网络 [name] [type]",
+		"formatEN": "create VM network [name] [type]"
+	},
+	"/core/enterprise/vms/networks/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_networks",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机网络 [name]",
+		"formatEN": "delete VM network [name]"
+	},
+	"/core/enterprise/vms/networks/sync": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步虚拟机网络",
+		"formatEN": "sync VM networks"
+	},
+	"/core/enterprise/vms/networks/update": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_networks",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "更新虚拟机网络 [name]",
+		"formatEN": "update VM network [name]"
+	},
+	"/core/enterprise/vms/operate": {
+		"bodyKeys": [
+			"name",
+			"operate"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "操作虚拟机 [name] [operate]",
+		"formatEN": "operate VM [name] [operate]"
+	},
+	"/core/enterprise/vms/rename": {
+		"bodyKeys": [
+			"name",
+			"newName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "重命名虚拟机 [name] 为 [newName]",
+		"formatEN": "rename VM [name] to [newName]"
+	},
+	"/core/enterprise/vms/snapshots": {
+		"bodyKeys": [
+			"name",
+			"snapshotName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机 [name] 快照 [snapshotName]",
+		"formatEN": "create VM [name] snapshot [snapshotName]"
+	},
+	"/core/enterprise/vms/snapshots/del": {
+		"bodyKeys": [
+			"name",
+			"snapshotName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除虚拟机 [name] 快照 [snapshotName]",
+		"formatEN": "delete VM [name] snapshot [snapshotName]"
+	},
+	"/core/enterprise/vms/snapshots/recover": {
+		"bodyKeys": [
+			"name",
+			"snapshotName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "恢复虚拟机 [name] 快照 [snapshotName]",
+		"formatEN": "recover VM [name] snapshot [snapshotName]"
+	},
+	"/core/enterprise/vms/storages": {
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机存储 [name] [type]",
+		"formatEN": "create VM storage [name] [type]"
+	},
+	"/core/enterprise/vms/storages/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_storages",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机存储 [name]",
+		"formatEN": "delete VM storage [name]"
+	},
+	"/core/enterprise/vms/storages/sync": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步虚拟机存储",
+		"formatEN": "sync VM storages"
+	},
+	"/core/enterprise/vms/storages/update": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_storages",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "更新虚拟机存储 [name]",
+		"formatEN": "update VM storage [name]"
+	},
+	"/core/enterprise/vms/templates": {
+		"bodyKeys": [
+			"name",
+			"templateName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机 [name] 模板 [templateName]",
+		"formatEN": "create VM [name] template [templateName]"
+	},
+	"/core/enterprise/vms/templates/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_templates",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机模板 [name]",
+		"formatEN": "delete VM template [name]"
+	},
+	"/core/enterprise/vms/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新虚拟机 [name]",
+		"formatEN": "update VM [name]"
+	},
 	"/core/groups": {
 		"bodyKeys": [
 			"name",
@@ -1899,13 +2148,6 @@
 		],
 		"formatZH": "删除集群 [clusterName] 节点 [clusterNodeID]",
 		"formatEN": "delete node [clusterNodeID] from cluster [clusterName]"
-	},
-	"/core/xpack/exchange/app": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "同步节点应用",
-		"formatEN": "sync app"
 	},
 	"/core/xpack/exchange/file": {
 		"bodyKeys": [
@@ -2261,6 +2503,13 @@
 		"beforeFunctions": [],
 		"formatZH": "更新专业版设置 [key]",
 		"formatEN": "update xpack setting [key]"
+	},
+	"/core/xpack/sync/app": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步节点应用",
+		"formatEN": "sync app"
 	},
 	"/core/xpack/sync/ssl": {
 		"bodyKeys": [

@@ -1353,7 +1353,7 @@ var AddVirtualMachineMenu = &gormigrate.Migration{
 			Title:    "xpack.vm.title",
 			IsShow:   true,
 			Label:    "VirtualMachine",
-			Path:     "/xpack/vm",
+			Path:     "/enterprise/vm",
 			Sort:     550,
 		}
 

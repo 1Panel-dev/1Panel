@@ -2072,6 +2072,7 @@ const message = {
             sync: 'リソース同期',
             exchange: 'リソース同期',
             xapp: 'App',
+            vm: '仮想マシン管理',
         },
         websiteLog: 'ウェブサイトログ',
         runLog: 'ログを実行します',
@@ -5582,6 +5583,7 @@ const message = {
             submitSuccess: '同期タスクが送信されました。',
         },
         vm: {
+            vm: '仮想マシン',
             title: '仮想マシン管理',
             dependencies: '依存関係',
             dependencyPurpose: '用途',

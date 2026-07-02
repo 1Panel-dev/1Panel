@@ -2096,6 +2096,7 @@ const message = {
             sync: 'Kaynak Senkronizasyonu',
             exchange: 'Kaynak Senkronizasyonu',
             xapp: 'App',
+            vm: 'Sanal Makine Yönetimi',
         },
         websiteLog: 'Website logları',
         runLog: 'Çalıştırma logları',
@@ -5645,6 +5646,7 @@ const message = {
             submitSuccess: 'Senkronizasyon görevi başarıyla gönderildi.',
         },
         vm: {
+            vm: 'Sanal Makine',
             title: 'Sanal Makine Yönetimi',
             dependencies: 'Bağımlılıklar',
             dependencyPurpose: 'Amaç',

@@ -2104,6 +2104,7 @@ const message = {
             sync: 'Sincronización de Recursos',
             exchange: 'Sincronización de Recursos',
             xapp: 'App',
+            vm: 'Gestión de máquinas virtuales',
         },
         websiteLog: 'Logs de sitio web',
         runLog: 'Logs de ejecución',
@@ -5614,6 +5615,7 @@ const message = {
             submitSuccess: 'La tarea de sincronización se ha enviado correctamente.',
         },
         vm: {
+            vm: 'Máquina virtual',
             title: 'Gestión de máquinas virtuales',
             dependencies: 'Dependencias',
             dependencyPurpose: 'Propósito',
