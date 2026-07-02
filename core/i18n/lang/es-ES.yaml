@@ -1,88 +1,65 @@
+# errores básicos
 ErrInvalidParams: 'Solicitud inválida: {{ .detail }}'
 ErrTokenParse: 'Token inválido: {{ .detail }}'
 ErrInitialPassword: 'Contraseña original incorrecta'
 ErrInternalServer: 'Error interno: {{ .detail }}'
+ErrInternalServerKey: "Error interno del servidor:"
 ErrRecordExist: 'Registro ya existe'
 ErrRecordNotFound: 'Registro no encontrado'
 ErrStructTransform: 'Error de conversión: {{ .err }}'
-ErrNotLogin: 'No has iniciado sesión: {{ .detail }}'
-ErrSessionDataNotFound: "La sesión actual ha caducado"
-ErrSessionDataFormat: "El formato de los datos de la sesión actual es anómalo"
-ErrPasswordExpired: 'Contraseña expirada: {{ .detail }}'
 ErrNotSupportType: 'Tipo no soportado: {{ .name }}'
-ErrProxy: 'Solicitud fallida: {{ .detail }}'
-ErrApiConfigStatusInvalid: 'API desactivada: {{ .detail }}'
-ErrApiConfigKeyInvalid: 'Clave API inválida: {{ .detail }}'
-ErrApiConfigIPInvalid: 'IP no permitida: {{ .detail }}'
-ErrApiConfigDisable: 'API no permitida: {{ .detail }}'
-ErrApiConfigKeyTimeInvalid: 'Timestamp inválido: {{ .detail }}'
-ErrLoginLocked: "Demasiados intentos fallidos. El inicio de sesión se ha bloqueado temporalmente durante 5 minutos."
-PushAppInstallTaskToNode: "Enviar tarea de instalación de aplicación al nodo [{{ .name }}]"
-TaskPush: "Enviar"
-AppInstallTask: "Tarea de instalación de aplicación"
-PushAppFailed: "Error al enviar tarea de instalación de aplicación"
-Success: "Éxito"
+ErrDemoEnvironment: 'No disponible en demo'
+ErrCmdTimeout: 'Comando agotó tiempo'
+ErrPortInUsed: "El puerto {{ .name }} ya está en uso"
+ErrFileNotFound: "El archivo {{ .name }} no existe"
+ErrReqFailed: "{{.name}} petición fallida: {{ .err }}"
 
-# request
+# solicitud y entrada de seguridad
 ErrNoSuchHost: "No se pudo encontrar el servidor solicitado {{ .err }}"
 ErrHttpReqNotFound: "No se pudo encontrar el recurso solicitado {{ .err }}"
 ErrHttpReqFailed: "Solicitud fallida {{ .err }}"
 ErrHttpReqTimeOut: "La solicitud ha expirado {{ .err }}"
 ErrCreateHttpClient: "Error al crear la solicitud {{ .err }}"
+ErrProxy: 'Solicitud fallida: {{ .detail }}'
 ErrProxySetting: "Información del servidor proxy no disponible {{ .err }}, compruebe e inténtelo de nuevo"
+ErrEntrance: "Error en la información de entrada de seguridad, por favor revise e intente de nuevo"
 ErrEntranceFormat: "La entrada de seguridad {{ .name }} no está actualmente soportada. Por favor verifique e inténtelo de nuevo"
 
-# common
-ErrDemoEnvironment: 'No disponible en demo'
-ErrCmdTimeout: 'Comando agotó tiempo'
-ErrVMNotFound: "La máquina virtual no existe"
-ErrVMAlreadyExists: "La máquina virtual ya existe"
-ErrVMRunning: "La máquina virtual está en ejecución"
-ErrVMLibvirtConnect: "Error al conectar con libvirt: {{ .detail }}"
-ErrVMPermission: "Sin permiso para operar la máquina virtual: {{ .detail }}"
-ErrVMNetworkNotFound: "La red de la máquina virtual no existe: {{ .detail }}"
-ErrVMInvalidPath: "Ruta de máquina virtual no válida: {{ .detail }}"
-ErrVMInvalidInput: "Parámetro de máquina virtual no válido: {{ .detail }}"
-ErrVMCommandFailed: "Error al ejecutar el comando de la máquina virtual: {{ .err }}"
-VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
-VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
-VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
-ErrEntrance: "Error en la información de entrada de seguridad, por favor revise e intente de nuevo"
+# inicio de sesión y seguridad
+ErrNotLogin: 'No has iniciado sesión: {{ .detail }}'
+ErrSessionDataNotFound: "La sesión actual ha caducado"
+ErrSessionDataFormat: "El formato de los datos de la sesión actual es anómalo"
+ErrPasswordExpired: 'Contraseña expirada: {{ .detail }}'
+ErrLoginLocked: "Demasiados intentos fallidos. El inicio de sesión se ha bloqueado temporalmente durante 5 minutos."
+ErrApiConfigStatusInvalid: 'API desactivada: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'Clave API inválida: {{ .detail }}'
+ErrApiConfigIPInvalid: 'IP no permitida: {{ .detail }}'
+ErrApiConfigDisable: 'API no permitida: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'Timestamp inválido: {{ .detail }}'
+ErrPasskeyDisabled: "Passkey requiere que HTTPS esté habilitado"
+ErrPasskeyNotConfigured: "No hay Passkey configurado"
+ErrPasskeyLimit: "Límite de Passkey alcanzado (máximo 5)"
+ErrPasskeySession: "La sesión de Passkey ha expirado o no es válida"
+ErrPasskeyDuplicate: "Passkey ya existe"
+ErrPasskeyVerify: "Error al verificar Passkey"
+
+# usuario y permisos
+ErrNoSuchUser: "No se encontró la información del usuario. Verifique e intente de nuevo."
+ErrToMaster: "Este usuario no tiene permiso para realizar esta operación en el nodo principal. Verifique e intente de nuevo."
+ErrToNode: "Este usuario no tiene permiso para realizar esta operación en este nodo. Verifique e intente de nuevo."
+ErrRBAC: "Permisos de usuario insuficientes. No se puede realizar esta operación. Verifique e intente de nuevo."
+ErrNoneNode: "Este usuario no tiene permisos sobre ningún nodo. Contacte al administrador o verifique e intente de nuevo."
+ErrOnlySuperAdmin: "Solo los superadministradores pueden usar esta función."
+ErrRolePresetCannotDelete: "No se pueden eliminar los roles predefinidos del sistema"
+ErrRolePresetCannotUpdate: "No se pueden actualizar los roles predefinidos del sistema"
+ErrRoleBoundToUser: "Este rol ya está vinculado a usuarios y no se puede eliminar"
+ErrRolePresetCannotBind: "Los roles predefinidos del sistema no se pueden asignar a usuarios"
+ErrNodeAdminMasterForbidden: "No se pueden agregar permisos de administrador de nodo al nodo principal"
+ErrSuperAdminCannotDelete: "No se pueden eliminar usuarios superadministradores"
 ErrGroupIsDefault: "Grupo predeterminado, no se puede eliminar"
 ErrGroupIsInUse: "El grupo está en uso y no se puede eliminar."
-ErrAIProxyUserGroupIsDefault: "No se puede eliminar el grupo de usuarios predeterminado."
-ErrAIProxyUserGroupInUse: "El grupo de usuarios está en uso y no se puede eliminar."
-ErrAIProxyUserGroupExists: "El nombre del grupo de usuarios ya existe."
-ErrAIProxyBackendAccountExists: "Esta cuenta de modelo ya se importó al grupo de cuentas de AI Gateway."
-ErrAIProxyModelGroupInUse: "El grupo de modelos está en uso y no se puede eliminar."
-ErrAIProxyModelGroupExists: "El nombre del grupo de modelos ya existe."
-ErrAIProxySensitiveGroupInUse: "El grupo de palabras sensibles está en uso y no se puede eliminar."
-ErrAIProxySensitiveGroupExists: "El nombre del grupo de palabras sensibles ya existe."
-ErrLocalDelete: "No se puede eliminar el nodo local"
-ErrPortInUsed: "El puerto {{ .name }} ya está en uso"
-ErrInternalServerKey: "Error interno del servidor:"
-MasterNode: "Nodo Maestro"
 
-# app
-CustomAppStoreFileValid: "El paquete de la tienda de aplicaciones debe tener formato .tar.gz"
-ErrFileNotFound: "El archivo {{ .name }} no existe"
-AppBackup: 'Copia de seguridad de aplicación'
-AppBackupPush: 'Transferir archivo de copia de seguridad de aplicación {{.file}} al nodo {{ .name }}'
-ErrSourceTargetSame: 'El nodo de origen y el nodo de destino no pueden ser el mismo'
-AppInstall: 'Instalar aplicación {{ .name }} en nodo {{ .targetNode }}'
-AppInstallCheck: 'Verificar entorno de instalación de aplicación'
-
-# backup
-ErrBackupInUsed: 'Cuenta de respaldo en uso por tarea programada'
-ErrBackupCheck: 'Conexión de respaldo falló: {{ .err }}'
-ErrBackupLocal: "La cuenta de respaldo del servidor local no admite esta operación"
-ErrBackupPublic: "Se detectó que esta cuenta de respaldo no es pública, verifique e intente de nuevo"
-ErrOSSConn: "No se pudo obtener la última versión, por favor revise la conectividad de red externa del servidor."
-
-#license
+# licencia
 LicenseCheck: 'Comprobar si la licencia está disponible'
 ErrLicenseInUsed: 'La licencia ya está vinculada. Verifique e intente de nuevo'
 ErrLicenseExpired: 'La licencia ha expirado. Verifique e intente de nuevo'
@@ -94,7 +71,6 @@ ErrLicenseSync: "Sincronización de licencia fallida, no se detectó informació
 ErrLicenseExist: "Este registro de licencia ya existe. Puede ir directamente a la página de licencia para la vinculación del nodo."
 ErrXpackNotFound: "Esta sección requiere la edición Business. Importa una licencia en Configuración del panel > Licencia."
 ErrXpackExceptional: "Esta sección requiere la edición Business. Sincroniza el estado de la licencia en Configuración del panel > Licencia."
-ErrXpackOutOfDate: "La licencia actual ha expirado, importe nuevamente la licencia en Panel > Ajustes > Licencia"
 ErrXpackLost: "La licencia alcanzó el límite de reintentos. Ve a Configuración del panel > Licencia y ejecuta una sincronización manual."
 ErrEnterpriseLicenseRequired: "La licencia de la edición Enterprise no se ha importado. Importa primero una licencia."
 ErrDeviceLost: "Faltan archivos necesarios para la verificación de licencia, verifique e intente de nuevo"
@@ -113,21 +89,6 @@ ErrNodeUnbind: "Este nodo no está dentro del rango de vinculación de la licenc
 ErrNodeBind: "Este nodo ya está vinculado a una licencia, verifique e intente de nuevo"
 ErrNodeLocalRollback: "El nodo principal no admite la reversión directa. Ejecuta manualmente '1pctl restore' para revertir."
 ErrIntlLicense: "La versión actual aún no admite importar licencias de la edición internacional. Próximamente"
-
-# user
-ErrNoSuchUser: "No se encontró la información del usuario. Verifique e intente de nuevo."
-ErrToMaster: "Este usuario no tiene permiso para realizar esta operación en el nodo principal. Verifique e intente de nuevo."
-ErrToNode: "Este usuario no tiene permiso para realizar esta operación en este nodo. Verifique e intente de nuevo."
-ErrRBAC: "Permisos de usuario insuficientes. No se puede realizar esta operación. Verifique e intente de nuevo."
-ErrNoneNode: "Este usuario no tiene permisos sobre ningún nodo. Contacte al administrador o verifique e intente de nuevo."
-ErrOnlySuperAdmin: "Solo los superadministradores pueden usar esta función."
-ErrRolePresetCannotDelete: "No se pueden eliminar los roles predefinidos del sistema"
-ErrRolePresetCannotUpdate: "No se pueden actualizar los roles predefinidos del sistema"
-ErrRoleBoundToUser: "Este rol ya está vinculado a usuarios y no se puede eliminar"
-ErrRolePresetCannotBind: "Los roles predefinidos del sistema no se pueden asignar a usuarios"
-ErrNodeAdminMasterForbidden: "No se pueden agregar permisos de administrador de nodo al nodo principal"
-ErrSuperAdminCannotDelete: "No se pueden eliminar usuarios superadministradores"
-
 InvalidRequestBodyType: "Formato del cuerpo de la solicitud no válido, por favor revisa y asegúrate de que el contenido cumpla con el formato requerido antes de reintentar."
 InvalidLicenseCodeType: "Formato de código de licencia no válido, por favor revisa e inténtalo de nuevo."
 LicenseNotFoundType: "Licencia no encontrada, no existe ningún registro coincidente en el sistema para la licencia proporcionada. Por favor revisa e inténtalo de nuevo."
@@ -138,10 +99,64 @@ InvalidAssigneeType: "Información de usuario o dispositivo de destino no válid
 LicenseUsageNotFoundType: "No se encontraron registros de uso. Esta licencia no ha sido activada o utilizada aún. Por favor revisa e inténtalo de nuevo."
 LicenseUsageLimitExceededType: "Esta licencia ya está vinculada a otro nodo. Por favor revisa e inténtalo de nuevo."
 
-# alert
+# nodo y clúster
+MasterNode: "Nodo Maestro"
+Node: "Nodo"
+ErrLocalDelete: "No se puede eliminar el nodo local"
+ErrMasterDelete: "No se puede eliminar el nodo principal, elimine primero los nodos secundarios."
+ClusterNameIsExist: "El nombre del clúster ya existe."
+AppStatusUnHealthy: "Adquisición anormal del estado de la aplicación, revise el estado del nodo en la lista de nodos."
+MasterNodePortNotAvailable: "Verificación de conectividad del puerto {{ .port }} del nodo {{ .name }} fallida, verifique la configuración del firewall/grupo de seguridad y el estado del nodo principal."
+ClusterMasterNotExist: "El nodo principal del clúster está desconectado, elimine los nodos secundarios."
+
+# máquina virtual
+ErrVMNotFound: "La máquina virtual no existe"
+ErrVMAlreadyExists: "La máquina virtual ya existe"
+ErrVMRunning: "La máquina virtual está en ejecución"
+ErrVMLibvirtConnect: "Error al conectar con libvirt: {{ .detail }}"
+ErrVMPermission: "Sin permiso para operar la máquina virtual: {{ .detail }}"
+ErrVMNetworkNotFound: "La red de la máquina virtual no existe: {{ .detail }}"
+ErrVMInvalidPath: "Ruta de máquina virtual no válida: {{ .detail }}"
+ErrVMInvalidInput: "Parámetro de máquina virtual no válido: {{ .detail }}"
+ErrVMCommandFailed: "Error al ejecutar el comando de la máquina virtual: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
+
+# aplicación
+CustomAppStoreFileValid: "El paquete de la tienda de aplicaciones debe tener formato .tar.gz"
+AppBackup: 'Copia de seguridad de aplicación'
+AppBackupPush: 'Transferir archivo de copia de seguridad de aplicación {{.file}} al nodo {{ .name }}'
+ErrSourceTargetSame: 'El nodo de origen y el nodo de destino no pueden ser el mismo'
+AppInstall: 'Instalar aplicación {{ .name }} en nodo {{ .targetNode }}'
+AppInstallCheck: 'Verificar entorno de instalación de aplicación'
+
+# copia de seguridad
+ErrBackupInUsed: 'Cuenta de respaldo en uso por tarea programada'
+ErrBackupCheck: 'Conexión de respaldo falló: {{ .err }}'
+ErrBackupLocal: "La cuenta de respaldo del servidor local no admite esta operación"
+ErrBackupPublic: "Se detectó que esta cuenta de respaldo no es pública, verifique e intente de nuevo"
+ErrOSSConn: "No se pudo obtener la última versión, por favor revise la conectividad de red externa del servidor."
+MvBackup: "Mover datos al directorio de respaldos"
+
+# alerta
 ErrAlertSync: "Error al sincronizar la información de alertas, verifique e intente de nuevo"
 
-# task
+# puerta de enlace de IA
+ErrAIProxyUserGroupIsDefault: "No se puede eliminar el grupo de usuarios predeterminado."
+ErrAIProxyUserGroupInUse: "El grupo de usuarios está en uso y no se puede eliminar."
+ErrAIProxyUserGroupExists: "El nombre del grupo de usuarios ya existe."
+ErrAIProxyBackendAccountExists: "Esta cuenta de modelo ya se importó al grupo de cuentas de AI Gateway."
+ErrAIProxyModelGroupInUse: "El grupo de modelos está en uso y no se puede eliminar."
+ErrAIProxyModelGroupExists: "El nombre del grupo de modelos ya existe."
+ErrAIProxySensitiveGroupInUse: "El grupo de palabras sensibles está en uso y no se puede eliminar."
+ErrAIProxySensitiveGroupExists: "El nombre del grupo de palabras sensibles ya existe."
+AIBenchmarkRun: "Ejecutar prueba de referencia de IA"
+
+# tarea
 TaskStart: "Tarea {{ .name }} iniciada [INICIO]"
 TaskEnd: "Tarea {{ .name }} finalizada [COMPLETADA]"
 TaskFailed: "Tarea {{ .name }} fallida"
@@ -155,6 +170,16 @@ TaskUpgrade: "Actualizar"
 TaskSync: 'Sincronizar'
 TaskSyncForNode: "Sincronizar Datos del Nodo"
 TaskBackup: "Respaldar"
+TaskPush: "Enviar"
+TaskRsync: "Sync"
+SuccessStatus: "{{ .name }} correcta"
+FailedStatus: "{{ .name }} fallida {{ .err }}"
+Start: "Iniciar"
+SubTask: "Subtarea"
+Skip: "Omitir errores y continuar..."
+Success: "Éxito"
+
+# tarea por lotes de agentes
 BatchInstallAgent: "Instalación masiva de agentes"
 DispatchAgentInstallTasks: "Enviar tareas de instalación de agentes"
 BatchUpgradeAgent: "Actualización masiva de agentes"
@@ -188,15 +213,15 @@ AgentOperateStart: "Iniciar"
 AgentOperateStop: "Detener"
 AgentOperateRestart: "Reiniciar"
 AgentOperateDelete: "Eliminar"
-SuccessStatus: "{{ .name }} correcta"
-FailedStatus: "{{ .name }} fallida {{ .err }}"
-Start: "Iniciar"
-SubTask: "Subtarea"
-Skip: "Omitir errores y continuar..."
+
+# tarea de aplicación y habilidad
+PushAppInstallTaskToNode: "Enviar tarea de instalación de aplicación al nodo [{{ .name }}]"
+AppInstallTask: "Tarea de instalación de aplicación"
+PushAppFailed: "Error al enviar tarea de instalación de aplicación"
 SkillHubInstallTask: "Instalar skill [{{ .name }}]"
 SkillHubInstallToTarget: "Instalar skill en destino [{{ .name }}]"
 
-#script
+# biblioteca de scripts
 ScriptLibrary: "Biblioteca de scripts"
 RemoteScriptLibrary: "Biblioteca de Scripts Remota"
 ScriptSyncSkip: "La biblioteca de scripts ya está en la última versión"
@@ -204,7 +229,7 @@ DownloadData: "Descargando archivo de datos de la biblioteca de scripts data.yam
 DownloadPackage: "Descargando paquete de la biblioteca de scripts"
 AnalyticCompletion: "Análisis completado, sincronizando con la base de datos..."
 
-Node: "Nodo"
+# sincronización de nodos
 SyncNode: "Sincronizar datos del nodo"
 LocalName: "El nombre 'local' solo se utiliza para la identificación local del sistema"
 SyncPackageData: "Sincronizar datos del paquete [{{ .detail }}]"
@@ -220,7 +245,7 @@ SyncCustomApp: "Aplicación personalizada"
 SyncLanguage: "Idioma del sistema"
 SyncEdition: "Región"
 
-#upgrade node
+# actualización de nodos
 NodeUpgrade: "Actualizar nodo {{ .name }}"
 UpgradeCheck: "Comprobar actualizaciones de nodos"
 UpgradeCheckLocal: "Los nodos locales no admiten actualizaciones en lote, omitiendo..."
@@ -233,12 +258,11 @@ LoadAutoUpgradeNodesFailed: "Error al cargar nodos de actualización automática
 AutoUpgradeNodes: "Nodos de actualización automática: {{ .nodes }}"
 UpdateAutoUpgradeNodesStatusFailed: "Error al actualizar el estado de los nodos de actualización automática, error: {{ .err }}"
 
-#add node
+# agregar nodo
 MasterData: "Datos del nodo principal"
 LoadSftpClient: "Cargar cliente SFTP"
 PackageMasterData: "Generar paquete de respaldo del nodo principal"
 UploadBackup: "Subir datos de respaldo"
-MvBackup: "Mover datos al directorio de respaldos"
 TaskAddNode: "Agregar nodo"
 LoadNodeArch: "Obtener información de arquitectura del nodo"
 LoadNodeArchDetail: "Arquitectura detectada - principal: {{ .local }}, nodo secundario: {{ .node }}"
@@ -251,7 +275,35 @@ SendAgent: "Distribuir paquete de instalación del nodo"
 StartService: "Iniciar servicio"
 NoBackupNode: "Actualmente no hay nodo de respaldo. Seleccione uno para guardar e intente de nuevo."
 
-#cmd
+# sincronización de archivos e imágenes de nodo
+LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
+HandlePrivateKey: "Handle node private key"
+HandlePublicKey: "Handle node public key"
+ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
+NodeFile: "Node file"
+ImageSyncTaskName: "Image sync {{ .count }} images"
+SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
+AppSyncTaskName: "App sync {{ .name }}"
+SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
+ImageSyncSave: "Save image {{ .image }}"
+ImageSyncSaveTags: "Save image tags {{ .tags }}"
+ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
+ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
+ImageSyncClean: "Clean temporary files for image {{ .image }}"
+ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
+ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
+ImageSyncHandlePrivateKey: "Handle image sync node private key"
+ImageSyncHandlePublicKey: "Handle image sync node public key"
+ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
+
+# línea de comandos
+SudoHelper: "Por favor use {{ .cmd }} o cambie al usuario root"
+UsernameNeed: "La edición Enterprise debe especificar --username"
+DBConnErr: "Error: Fallo al inicializar la conexión a la base de datos, {{ .err }}"
+SystemVersion: "versión: "
+SystemMode: "modo: "
+
+# línea de comandos - aplicación
 AppVersion: "Versión de la aplicación"
 AppCommands: "Comandos relacionados con la app"
 AppInit: "Inicializar aplicación"
@@ -263,12 +315,14 @@ AppMissVersion: "Falta la versión de la app, use -v para especificar"
 AppVersionExist: "La versión ya existe"
 AppCreateSuccessful: "Creación finalizada con éxito"
 AppWriteErr: "Error al escribir el archivo {{ .name }} {{ .err }}"
-SudoHelper: "Por favor use {{ .cmd }} o cambie al usuario root"
-UsernameNeed: "La edición Enterprise debe especificar --username"
+
+# línea de comandos - IP de escucha
 ListenIPCommands: "Cambiar ip de escucha"
 ListenIPv4: "Escuchar en IPv4"
 ListenIPv6: "Escuchar en IPv6"
 ListenChangeSuccessful: "Cambio exitoso Ahora escuchando en {{ .value }}"
+
+# línea de comandos - restablecer
 ResetCommands: "Restablecer información del sistema"
 ResetMFA: "Cancelar autenticación de dos factores de 1Panel"
 ResetHttps: "Cancelar inicio de sesión https de 1Panel"
@@ -276,12 +330,19 @@ ResetEntrance: "Cancelar entrada segura de 1Panel"
 ResetIPs: "Cancelar restricciones de IP autorizadas de 1Panel"
 ResetDomain: "Cancelar vinculación de dominio de 1Panel"
 ResetPasskey: "Eliminar passkeys de 1Panel"
+
+# línea de comandos - usuario
 UserList: "Obtener la lista de usuarios de 1Panel"
 UserTableName: "Nombre"
 UserTableMFAStatus: "Estado MFA"
 UserTableSuperAdmin: "Superadministrador"
 UserTableCreatedAt: "Creado en"
 UserEmptyList: "No se encontraron usuarios"
+UserInfo: "Obtener información del panel"
+UserInfoAddr: "Dirección del panel: "
+UserInfoPassHelp: "Consejo: para cambiar la contraseña, ejecute el comando: "
+
+# línea de comandos - restaurar
 RestoreCommands: "Revertir el servicio y los datos de 1Panel"
 RestoreNoSuchFile: "No se encontraron archivos de reversión"
 RestoreStep1: "(1/5) Iniciando la reversión del servicio y los datos de 1Panel desde el directorio {{ .name }}..."
@@ -290,6 +351,8 @@ RestoreStep3: "(3/5) Reversión del script de 1Panel completada"
 RestoreStep4: "(4/5) Reversión del servicio de 1Panel completada"
 RestoreStep5: "(5/5) Reversión de los datos de 1Panel completada"
 RestoreSuccessful: "Reversión completada. Se volvió a {{ .version }}. Reiniciando el servicio..."
+
+# línea de comandos - actualizar
 UpdateCommands: "Actualizar información del panel"
 UpdateUser: "Actualizar información del usuario"
 UpdatePassword: "Actualizar contraseña del usuario"
@@ -316,50 +379,12 @@ UpdatePortResult: "Puerto del panel: {{ .name }}"
 UpdatePortFirewallAdd: "Fallo al agregar la regla de puerto al firewall, {{ .err }}, agregue manualmente el puerto {{ .name }} al firewall."
 UpdatePortFirewallDel: "Error: Fallo al eliminar el puerto del firewall, {{ .err }}"
 UpdatePortFirewallReload: "Fallo al recargar el firewall, {{ .err }}, recargue el firewall manualmente."
-UserInfo: "Obtener información del panel"
-UserInfoAddr: "Dirección del panel: "
-UserInfoPassHelp: "Consejo: para cambiar la contraseña, ejecute el comando: "
-DBConnErr: "Error: Fallo al inicializar la conexión a la base de datos, {{ .err }}"
-SystemVersion: "versión: "
-SystemMode: "modo: "
 
-#exchange
-LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
-HandlePrivateKey: "Handle node private key"
-HandlePublicKey: "Handle node public key"
-ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
-TaskRsync: "Sync"
-NodeFile: "Node file"
-ImageSyncTaskName: "Image sync {{ .count }} images"
-SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
-AppSyncTaskName: "App sync {{ .name }}"
-SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
-ImageSyncSave: "Save image {{ .image }}"
-ImageSyncSaveTags: "Save image tags {{ .tags }}"
-ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
-ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
-ImageSyncClean: "Clean temporary files for image {{ .image }}"
-ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
-ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
-ImageSyncHandlePrivateKey: "Handle image sync node private key"
-ImageSyncHandlePublicKey: "Handle image sync node public key"
-ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
-
-#mobile app
+# aplicación móvil
 ErrVerifyToken: 'Error al verificar el token, por favor restablezca y escanee de nuevo.'
 ErrInvalidToken: 'Token inválido, por favor restablezca y escanee de nuevo.'
 ErrExpiredToken: 'El token ha expirado, por favor restablezca y escanee de nuevo.'
 
-#cluster
-ErrMasterDelete: "No se puede eliminar el nodo principal, elimine primero los nodos secundarios."
-ClusterNameIsExist: "El nombre del clúster ya existe."
-AppStatusUnHealthy: "Adquisición anormal del estado de la aplicación, revise el estado del nodo en la lista de nodos."
-MasterNodePortNotAvailable: "Verificación de conectividad del puerto {{ .port }} del nodo {{ .name }} fallida, verifique la configuración del firewall/grupo de seguridad y el estado del nodo principal."
-ClusterMasterNotExist: "El nodo principal del clúster está desconectado, elimine los nodos secundarios."
-
-#ssl
-ErrReqFailed: "{{.name}} petición fallida: {{ .err }}"
-
-#command
+# exportación de comandos
 Name: "Nombre"
 Command: "Comando"

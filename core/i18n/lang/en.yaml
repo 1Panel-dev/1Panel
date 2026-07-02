@@ -1,16 +1,36 @@
+# base errors
 ErrInvalidParams: "Invalid request parameters: {{ .detail }}"
 ErrTokenParse: "Token generation error: {{ .detail }}"
 ErrInitialPassword: "Incorrect initial password"
 ErrInternalServer: "Internal server error: {{ .detail }}"
+ErrInternalServerKey: "Internal server error:"
 ErrRecordExist: "Record already exists"
 ErrRecordNotFound: "Record not found"
 ErrStructTransform: "Type conversion failed: {{ .detail }}"
+ErrNotSupportType: "Unsupported type: {{ .name }}"
+ErrDemoEnvironment: "Demo server, this operation is prohibited!"
+ErrCmdTimeout: "Command execution timeout!"
+ErrPortInUsed: "The {{ .name }} port is already in use!"
+ErrFileNotFound: "{{ .name }} file does not exist"
+ErrReqFailed: "{{.name}} request failed: {{ .err }}"
+
+# request and entrance
+ErrNoSuchHost: "Host resolution failed: {{ .err }}"
+ErrHttpReqNotFound: "Requested resource not found: {{ .err }}"
+ErrHttpReqFailed: "Request failed {{ .err }}"
+ErrHttpReqTimeOut: "Request timed out {{ .err }}"
+ErrCreateHttpClient: "Failed to create request {{ .err }}"
+ErrProxy: "Request failed; check this node status: {{ .detail }}"
+ErrProxySetting: "Proxy server information unavailable {{ .err }}, check and try again!"
+ErrEntrance: "Security entrance information error, check and try again!"
+ErrEntranceFormat: "Security entry {{ .name }} is not supported. Check and try again."
+
+# login and security
 ErrNotLogin: "User not logged in: {{ .detail }}"
 ErrSessionDataNotFound: "Session expired"
 ErrSessionDataFormat: "Invalid session data format"
 ErrPasswordExpired: "Password expired: {{ .detail }}"
-ErrNotSupportType: "Unsupported type: {{ .name }}"
-ErrProxy: "Request failed; check this node status: {{ .detail }}"
+ErrLoginLocked: "Too many failed attempts. Login is temporarily locked for 5 minutes."
 ErrApiConfigStatusInvalid: "API access disabled: {{ .detail }}"
 ErrApiConfigKeyInvalid: "Invalid API key: {{ .detail }}"
 ErrApiConfigIPInvalid: "The API request IP is not on the whitelist: {{ .detail }}"
@@ -22,68 +42,24 @@ ErrPasskeyLimit: "Passkey limit reached (max 5)"
 ErrPasskeySession: "Passkey session expired or invalid"
 ErrPasskeyDuplicate: "Passkey already exists"
 ErrPasskeyVerify: "Passkey verification failed"
-ErrLoginLocked: "Too many failed attempts. Login is temporarily locked for 5 minutes."
 
-# request
-ErrNoSuchHost: "Host resolution failed: {{ .err }}"
-ErrHttpReqNotFound: "Requested resource not found: {{ .err }}"
-ErrHttpReqFailed: "Request failed {{ .err }}"
-ErrHttpReqTimeOut: "Request timed out {{ .err }}"
-ErrCreateHttpClient: "Failed to create request {{ .err }}"
-ErrProxySetting: "Proxy server information unavailable {{ .err }}, check and try again!"
-ErrEntranceFormat: "Security entry {{ .name }} is not supported. Check and try again."
-
-# common
-ErrDemoEnvironment: "Demo server, this operation is prohibited!"
-ErrCmdTimeout: "Command execution timeout!"
-ErrVMNotFound: "Virtual machine does not exist"
-ErrVMAlreadyExists: "Virtual machine already exists"
-ErrVMRunning: "Virtual machine is running"
-ErrVMLibvirtConnect: "Failed to connect to libvirt"
-ErrVMPermission: "No permission to operate virtual machine: {{ .detail }}"
-ErrVMNetworkNotFound: "Virtual machine network does not exist"
-ErrVMInvalidPath: "Invalid virtual machine path"
-ErrVMInvalidInput: "Invalid virtual machine parameter"
-ErrVMCommandFailed: "Virtual machine command failed: {{ .err }}"
-VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
-VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
-VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
-ErrEntrance: "Security entrance information error, check and try again!"
+# user and permission
+ErrNoSuchUser: "User information not found, check and try again!"
+ErrToMaster: "This user does not have permission to perform this operation on the master node. Check and try again!"
+ErrToNode: "This user does not have permission to perform this operation on this node. Check and try again!"
+ErrRBAC: "Insufficient user permissions. This operation cannot be performed. Check and try again!"
+ErrNoneNode: "This user has no node permissions. Contact an administrator or check and try again!"
+ErrOnlySuperAdmin: "Only super admins can use this feature!"
+ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
+ErrRolePresetCannotUpdate: "System preset roles cannot be updated"
+ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
+ErrRolePresetCannotBind: "System preset roles cannot be assigned to users"
+ErrNodeAdminMasterForbidden: "Node Admin permissions cannot be added to the master node"
+ErrSuperAdminCannotDelete: "Super admin users cannot be deleted"
 ErrGroupIsDefault: "Default group, unable to delete"
 ErrGroupIsInUse: "The group is in use and cannot be deleted."
-ErrAIProxyUserGroupIsDefault: "Default user group cannot be deleted."
-ErrAIProxyUserGroupInUse: "The user group is in use and cannot be deleted."
-ErrAIProxyUserGroupExists: "The user group name already exists."
-ErrAIProxyBackendAccountExists: "This model account has already been imported into the AI Gateway account pool."
-ErrAIProxyModelGroupInUse: "The model group is in use and cannot be deleted."
-ErrAIProxyModelGroupExists: "The model group name already exists."
-ErrAIProxySensitiveGroupInUse: "The sensitive word group is in use and cannot be deleted."
-ErrAIProxySensitiveGroupExists: "The sensitive word group name already exists."
-ErrLocalDelete: "Cannot delete the local node!"
-ErrPortInUsed: "The {{ .name }} port is already in use!"
-ErrInternalServerKey: "Internal server error:"
-MasterNode: "Master Node"
 
-# app
-CustomAppStoreFileValid: "Application store package requires .tar.gz format"
-ErrFileNotFound: "{{ .name }} file does not exist"
-AppBackup: 'Application backup'
-AppBackupPush: 'Transfer application backup file {{.file}} to node {{ .name }}'
-ErrSourceTargetSame: 'Source node and target node cannot be the same!'
-AppInstall: 'Install application {{ .name }} on node {{ .targetNode }}'
-AppInstallCheck: 'Check application installation environment'
-
-# backup
-ErrBackupInUsed: "This backup account is used in scheduled tasks and cannot be deleted"
-ErrBackupCheck: "Backup account connection test failed {{ .err }}"
-ErrBackupLocal: "Local server backup account does not support this operation!"
-ErrBackupPublic: "Detected that this backup account is not public, check and try again!"
-ErrOSSConn: "Unable to get the latest version. Check server internet connectivity."
-
-#license
+# license
 LicenseCheck: 'Check if the license is available'
 ErrLicenseInUsed: 'The license is already bound. Check and try again!'
 ErrLicenseExpired: 'The license has expired. Check and try again!'
@@ -113,33 +89,72 @@ ErrNodeUnbind: "This node is not within the license binding range, check and ret
 ErrNodeBind: "This node is already bound to a license, check and retry!"
 ErrNodeLocalRollback: "The primary node does not support direct rollback. Run '1pctl restore' manually to roll back."
 ErrIntlLicense: "The current version does not support importing international licenses yet. Stay tuned!"
+InvalidRequestBodyType: "Invalid request body format. Ensure content matches the required format and retry."
+InvalidLicenseCodeType: "Invalid license code format provided, check and try again!"
+LicenseNotFoundType: "License not found, no matching record exists in the system for the provided license. Check and try again!"
+LicenseRevokedType: "The requested license has been revoked and is no longer usable. Check and try again!"
+LicenseExpiredType: "License expired. Renew it or re-import it in Panel Settings - License before retrying."
+LicenseProductMismatchType: "The license does not match the requested product or service!"
+InvalidAssigneeType: "Invalid target user or device information for license assignment. Check and try again!"
+LicenseUsageNotFoundType: "No usage records found. This license has not been activated or used yet. Check and try again!"
+LicenseUsageLimitExceededType: "This license is already bound to another node. Check and try again!"
 
-# user
-ErrNoSuchUser: "User information not found, check and try again!"
-ErrToMaster: "This user does not have permission to perform this operation on the master node. Check and try again!"
-ErrToNode: "This user does not have permission to perform this operation on this node. Check and try again!"
-ErrRBAC: "Insufficient user permissions. This operation cannot be performed. Check and try again!"
-ErrNoneNode: "This user has no node permissions. Contact an administrator or check and try again!"
-ErrOnlySuperAdmin: "Only super admins can use this feature!"
-ErrRolePresetCannotDelete: "System preset roles cannot be deleted"
-ErrRolePresetCannotUpdate: "System preset roles cannot be updated"
-ErrRoleBoundToUser: "This role is already bound to users and cannot be deleted"
-ErrRolePresetCannotBind: "System preset roles cannot be assigned to users"
-ErrNodeAdminMasterForbidden: "Node Admin permissions cannot be added to the master node"
-ErrSuperAdminCannotDelete: "Super admin users cannot be deleted"
+# node and cluster
+MasterNode: "Master Node"
+Node: "Node"
+ErrLocalDelete: "Cannot delete the local node!"
+ErrMasterDelete: "Unable to delete the master node. Delete slave nodes first."
+ClusterNameIsExist: "Cluster name already exists."
+AppStatusUnHealthy: "Failed to fetch application status. Check installation node status in the node list."
+MasterNodePortNotAvailable: "Node {{ .name }} port {{ .port }} connectivity check failed. Check firewall/security group settings and master node status."
+ClusterMasterNotExist: "Cluster master node is disconnected. Delete child nodes."
 
-InvalidRequestBodyType: "Invalid request body format. Ensure content matches the required format and retry."  
-InvalidLicenseCodeType: "Invalid license code format provided, check and try again!"  
-LicenseNotFoundType: "License not found, no matching record exists in the system for the provided license. Check and try again!"  
-LicenseRevokedType: "The requested license has been revoked and is no longer usable. Check and try again!"  
-LicenseExpiredType: "License expired. Renew it or re-import it in Panel Settings - License before retrying."  
-LicenseProductMismatchType: "The license does not match the requested product or service!"  
-InvalidAssigneeType: "Invalid target user or device information for license assignment. Check and try again!"  
-LicenseUsageNotFoundType: "No usage records found. This license has not been activated or used yet. Check and try again!"  
-LicenseUsageLimitExceededType: "This license is already bound to another node. Check and try again!"  
+# virtual machine
+ErrVMNotFound: "Virtual machine does not exist"
+ErrVMAlreadyExists: "Virtual machine already exists"
+ErrVMRunning: "Virtual machine is running"
+ErrVMLibvirtConnect: "Failed to connect to libvirt"
+ErrVMPermission: "No permission to operate virtual machine: {{ .detail }}"
+ErrVMNetworkNotFound: "Virtual machine network does not exist"
+ErrVMInvalidPath: "Invalid virtual machine path"
+ErrVMInvalidInput: "Invalid virtual machine parameter"
+ErrVMCommandFailed: "Virtual machine command failed: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
+
+# app
+CustomAppStoreFileValid: "Application store package requires .tar.gz format"
+AppBackup: 'Application backup'
+AppBackupPush: 'Transfer application backup file {{.file}} to node {{ .name }}'
+ErrSourceTargetSame: 'Source node and target node cannot be the same!'
+AppInstall: 'Install application {{ .name }} on node {{ .targetNode }}'
+AppInstallCheck: 'Check application installation environment'
+
+# backup
+ErrBackupInUsed: "This backup account is used in scheduled tasks and cannot be deleted"
+ErrBackupCheck: "Backup account connection test failed {{ .err }}"
+ErrBackupLocal: "Local server backup account does not support this operation!"
+ErrBackupPublic: "Detected that this backup account is not public, check and try again!"
+ErrOSSConn: "Unable to get the latest version. Check server internet connectivity."
+MvBackup: "Move data to backup directory"
 
 # alert
 ErrAlertSync: "Alert information sync error, check and retry!"
+
+# AI gateway
+ErrAIProxyUserGroupIsDefault: "Default user group cannot be deleted."
+ErrAIProxyUserGroupInUse: "The user group is in use and cannot be deleted."
+ErrAIProxyUserGroupExists: "The user group name already exists."
+ErrAIProxyBackendAccountExists: "This model account has already been imported into the AI Gateway account pool."
+ErrAIProxyModelGroupInUse: "The model group is in use and cannot be deleted."
+ErrAIProxyModelGroupExists: "The model group name already exists."
+ErrAIProxySensitiveGroupInUse: "The sensitive word group is in use and cannot be deleted."
+ErrAIProxySensitiveGroupExists: "The sensitive word group name already exists."
+AIBenchmarkRun: "Run AI benchmark"
 
 # task
 TaskStart: "{{ .name }} task started [START]"
@@ -155,6 +170,16 @@ TaskUpgrade: "Upgrade"
 TaskSync: 'Sync'
 TaskSyncForNode: "Sync node data"
 TaskBackup: "Backup"
+TaskPush: "Push"
+TaskRsync: "Sync"
+SuccessStatus: "{{ .name }} succeeded"
+FailedStatus: "{{ .name }} failed {{ .err }}"
+Start: "Start"
+SubTask: "Subtask"
+Skip: "Ignore errors and continue"
+Success: "Success"
+
+# agent batch task
 BatchInstallAgent: "Batch install agent"
 DispatchAgentInstallTasks: "Dispatch agent install tasks"
 BatchUpgradeAgent: "Batch upgrade agent"
@@ -188,21 +213,15 @@ AgentOperateStart: "Start"
 AgentOperateStop: "Stop"
 AgentOperateRestart: "Restart"
 AgentOperateDelete: "Delete"
-AIBenchmarkRun: "Run AI benchmark"
-SuccessStatus: "{{ .name }} succeeded"
-FailedStatus: "{{ .name }} failed {{ .err }}"
-Start: "Start"
-SubTask: "Subtask"
-Skip: "Ignore errors and continue"
+
+# app and skill task
 PushAppInstallTaskToNode: "Push app installation task to node [{{ .name }}]"
-TaskPush: "Push"
 AppInstallTask: "App installation task"
 PushAppFailed: "Failed to push app installation task"
 SkillHubInstallTask: "Install skill [{{ .name }}]"
 SkillHubInstallToTarget: "Install skill to target [{{ .name }}]"
-Success: "Success"
 
-#script
+# script library
 ScriptLibrary: "Script Library"
 RemoteScriptLibrary: "Remote Script Library"
 ScriptSyncSkip: "Script library is already up to date"
@@ -210,7 +229,7 @@ DownloadData: "Downloading script library file data.yaml"
 DownloadPackage: "Downloading script library package"
 AnalyticCompletion: "Analysis completed, now syncing to database..."
 
-Node: "Node"
+# node sync
 SyncNode: "Sync data to node {{ .name }}"
 LocalName: "'local' name is only used for system local identification"
 SyncPackageData: "Package sync data"
@@ -226,7 +245,7 @@ SyncCustomApp: "Custom App"
 SyncLanguage: "System Language"
 SyncEdition: "Region"
 
-#upgrade node
+# node upgrade
 NodeUpgrade: "Upgrade node {{ .name }}"
 UpgradeCheck: "Check for node updates"
 UpgradeCheckLocal: "Local nodes do not support batch upgrades, skipping..."
@@ -239,12 +258,11 @@ LoadAutoUpgradeNodesFailed: "Load auto upgrade nodes failed, err: {{ .err }}"
 AutoUpgradeNodes: "Auto upgrade nodes: {{ .nodes }}"
 UpdateAutoUpgradeNodesStatusFailed: "Update status of auto upgrade nodes failed, err: {{ .err }}"
 
-#add node
+# node add
 MasterData: "Master Node Data"
 LoadSftpClient: "Load SFTP Client"
 PackageMasterData: "Generate master node backup package"
 UploadBackup: "Upload backup data"
-MvBackup: "Move data to backup directory"
 TaskAddNode: "Add node"
 LoadNodeArch: "Get node architecture info"
 LoadNodeArchDetail: "Detected master node architecture: {{ .local }}, child node architecture: {{ .node }}"
@@ -257,7 +275,35 @@ SendAgent: "Distribute node installation package"
 StartService: "Start service"
 NoBackupNode: "Backup node is empty. Select one and save first"
 
-#cmd
+# node file and image sync
+LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
+HandlePrivateKey: "Handle node private key"
+HandlePublicKey: "Handle node public key"
+ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
+NodeFile: "Node file"
+ImageSyncTaskName: "Image sync {{ .count }} images"
+SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
+AppSyncTaskName: "App sync {{ .name }}"
+SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
+ImageSyncSave: "Save image {{ .image }}"
+ImageSyncSaveTags: "Save image tags {{ .tags }}"
+ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
+ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
+ImageSyncClean: "Clean temporary files for image {{ .image }}"
+ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
+ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
+ImageSyncHandlePrivateKey: "Handle image sync node private key"
+ImageSyncHandlePublicKey: "Handle image sync node public key"
+ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
+
+# command line
+SudoHelper: "Use {{ .cmd }} or switch to root user"
+UsernameNeed: "Enterprise edition must specify --username"
+DBConnErr: "Error: Failed to initialize database connection, {{ .err }}"
+SystemVersion: "version: "
+SystemMode: "mode: "
+
+# command line - app
 AppVersion: "App version"
 AppCommands: "App related commands"
 AppInit: "Initialize app"
@@ -269,12 +315,14 @@ AppMissVersion: "App version missing, use -v to specify"
 AppVersionExist: "Version already exists!"
 AppCreateSuccessful: "Creation successful!"
 AppWriteErr: "File {{ .name }} write failed {{ .err }}"
-SudoHelper: "Use {{ .cmd }} or switch to root user"
-UsernameNeed: "Enterprise edition must specify --username"
+
+# command line - listen IP
 ListenIPCommands: "Switch listening ip"
 ListenIPv4: "Listen on IPv4"
 ListenIPv6: "Listen on IPv6"
 ListenChangeSuccessful: "Switch successful! Now listening on {{ .value }}"
+
+# command line - reset
 ResetCommands: "Reset system info"
 ResetMFA: "Cancel 1Panel two-factor authentication"
 ResetHttps: "Cancel 1Panel https login"
@@ -282,12 +330,19 @@ ResetEntrance: "Cancel 1Panel secure entrance"
 ResetIPs: "Cancel 1Panel authorized ip restrictions"
 ResetDomain: "Cancel 1Panel domain binding"
 ResetPasskey: "Clear 1Panel passkeys"
+
+# command line - user
 UserList: "Get 1Panel user list"
 UserTableName: "Name"
 UserTableMFAStatus: "MFA Status"
 UserTableSuperAdmin: "Super Admin"
 UserTableCreatedAt: "Created At"
 UserEmptyList: "No users found"
+UserInfo: "Get panel information"
+UserInfoAddr: "Panel address: "
+UserInfoPassHelp: "Tip: To change the password, you can execute the command: "
+
+# command line - restore
 RestoreCommands: "Roll back 1Panel service and data"
 RestoreNoSuchFile: "No rollback files found"
 RestoreStep1: "(1/5) Starting rollback of 1Panel service and data from {{ .name }} directory..."
@@ -296,6 +351,8 @@ RestoreStep3: "(3/5) 1Panel script rollback completed"
 RestoreStep4: "(4/5) 1Panel service rollback completed"
 RestoreStep5: "(5/5) 1Panel data rollback completed"
 RestoreSuccessful: "Rollback completed. Reverted to {{ .version }}. Restarting service..."
+
+# command line - update
 UpdateCommands: "Update panel info"
 UpdateUser: "Update user information"
 UpdatePassword: "Update user password"
@@ -322,50 +379,12 @@ UpdatePortResult: "Panel Port: {{ .name }}"
 UpdatePortFirewallAdd: "Failed to add firewall port rule, {{ .err }}, manually add the {{ .name }} port to the firewall rules."
 UpdatePortFirewallDel: "Error: Failed to delete firewall port, {{ .err }}"
 UpdatePortFirewallReload: "Failed to reload the firewall, {{ .err }}, manually reload the firewall."
-UserInfo: "Get panel information"
-UserInfoAddr: "Panel address: "
-UserInfoPassHelp: "Tip: To change the password, you can execute the command: "
-DBConnErr: "Error: Failed to initialize database connection, {{ .err }}"
-SystemVersion: "version: "
-SystemMode: "mode: "
 
-#exchange
-LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
-HandlePrivateKey: "Handle node private key"
-HandlePublicKey: "Handle node public key"
-ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
-TaskRsync: "Sync"
-NodeFile: "Node file"
-ImageSyncTaskName: "Image sync {{ .count }} images"
-SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
-AppSyncTaskName: "App sync {{ .name }}"
-SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
-ImageSyncSave: "Save image {{ .image }}"
-ImageSyncSaveTags: "Save image tags {{ .tags }}"
-ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
-ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
-ImageSyncClean: "Clean temporary files for image {{ .image }}"
-ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
-ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
-ImageSyncHandlePrivateKey: "Handle image sync node private key"
-ImageSyncHandlePublicKey: "Handle image sync node public key"
-ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
-
-#mobile app
+# mobile app
 ErrVerifyToken: 'Token verification failed. Reset and scan again.'
 ErrInvalidToken: 'Invalid token. Reset and scan again.'
 ErrExpiredToken: 'Token expired. Reset and scan again.'
 
-#cluster
-ErrMasterDelete: "Unable to delete the master node. Delete slave nodes first."
-ClusterNameIsExist: "Cluster name already exists."
-AppStatusUnHealthy: "Failed to fetch application status. Check installation node status in the node list."
-MasterNodePortNotAvailable: "Node {{ .name }} port {{ .port }} connectivity check failed. Check firewall/security group settings and master node status."
-ClusterMasterNotExist: "Cluster master node is disconnected. Delete child nodes."
-
-#ssl
-ErrReqFailed: "{{.name}} request failed: {{ .err }}"
-
-#command
+# command export
 Name: "Name"
 Command: "Command"

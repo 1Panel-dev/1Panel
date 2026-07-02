@@ -1,29 +1,47 @@
+# 基礎錯誤
 ErrInvalidParams: '請求參數錯誤: {{ .detail }}'
 ErrTokenParse: 'Token 產生錯誤: {{ .detail }}'
 ErrInitialPassword: '原密碼錯誤'
 ErrInternalServer: '服務內部錯誤: {{ .detail }}'
+ErrRecordExist: '記錄已存在'
+ErrRecordNotFound: '記錄未能找到'
+ErrStructTransform: '型別轉換失敗: {{ .err }}'
+ErrNotSupportType: '系統暫不支援目前類型: {{ .name }}'
+
+# 檔案 AI
 ErrFileAINotEnabled: '請先在檔案管理頁透過「AI 帳號」啟用檔案 AI 搜尋並選擇帳號。'
 ErrFileAISearchBadPattern: '搜尋條件無效（正則或全詞）: {{ .detail }}'
+FileAISearchEmptyDir: '目前目錄下沒有可列出的檔案或資料夾（或均被過濾）。'
+
+# 遠端下載
 ErrWgetRemoteFailed: '遠端下載網址無效或無法存取：{{ .detail }}'
 ErrWgetInvalidContentType: '遠端網址未回傳檔案內容（可能是錯誤頁），{{ .detail }}'
 ErrWgetProxyNotConfigured: '請先在面板設定中設定代理伺服器'
 ErrWgetProxyInvalid: '代理伺服器位址無效：{{ .detail }}'
-ErrRecordExist: '記錄已存在'
-ErrRecordNotFound: '記錄未能找到'
-ErrStructTransform: '型別轉換失敗: {{ .err }}'
+
+# 登入與安全
 ErrNotLogin: '使用者未登入: {{ .detail }}'
 ErrPasswordExpired: '目前密碼已過期: {{ .detail }}'
-ErrNotSupportType: '系統暫不支援目前類型: {{ .name }}'
-ErrAlertMethodNotSupported: '當前版本不支援此告警方式'
+
+# 請求與 API
 ErrProxy: '請求錯誤，請檢查該節點狀態: {{ .detail }}'
 ErrApiConfigStatusInvalid: 'API 介面禁止存取: {{ .detail }}'
 ErrApiConfigKeyInvalid: 'API 介面金鑰錯誤: {{ .detail }}'
 ErrApiConfigIPInvalid: '呼叫 API 介面 IP 不在白名單: {{ .detail }}'
 ErrApiConfigDisable: '此介面禁止使用 API 介面呼叫: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'API 介面時間戳記錯誤: {{ .detail }}'
-ErrShutDown: '指令被手動結束！'
+ErrCreateHttpClient: '建立請求失敗{{ .err }}'
+ErrHttpReqTimeOut: '請求逾時{{ .err }}'
+ErrHttpReqFailed: '請求失敗{{ .err }}'
+ErrNoSuchHost: '無法找到請求的伺服器{{ .err }}'
+ErrHttpReqNotFound: '無法找到要求的資源{{ .err }}'
+
+# 快速跳轉
 ErrMinQuickJump: '請至少設定一個快速跳轉入口！'
 ErrMaxQuickJump: '最多可設定四個快速跳轉入口！'
+
+# 通用
+ErrShutDown: '指令被手動結束！'
 ErrUsernameIsExist: '使用者名稱已存在'
 ErrNameIsExist: '名稱已存在'
 ErrDemoEnvironment: '示範伺服器，禁止此操作!'
@@ -41,6 +59,8 @@ SystemRestart: '系統重新啟動導致任務中斷'
 ErrGroupIsDefault: '預設分組，無法刪除'
 ErrGroupIsInWebsiteUse: '分組正在被其他網站使用，無法刪除'
 Decrypt: '解密'
+
+# 智慧體
 ErrAgentAccountBound: '該帳號已綁定到智能體，無法刪除，請重試。'
 ErrTerminalAIAccountInUse: '該模型帳號正被終端 AI 使用，請在終端 AI 設定中更換帳號或關閉終端 AI 後再試。'
 ErrAgentAccountUnavailable: '帳號連線資訊不可用，錯誤：{{ .err }}，請重試'
@@ -65,14 +85,8 @@ ErrAgentWebsiteInUse: '該網站已被其他智能體關聯'
 ErrAgentWebsiteUnbindUnsupported: '一鍵部署網站不支援手動解綁'
 ErrHermesPairingCodeUnavailable: '配對碼在 Hermes 中暫時不存在，可能是由於網路原因，請稍後再試'
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: '飛書群組策略為白名單時，私聊策略不能為配對碼'
-ErrAIProxyServiceNotInstalled: '{{ .name }} 服務未安裝'
-ErrAIProxyModelAccountNotFound: '模型帳號 {{ .id }} 不存在'
-ErrAIProxyModelMapRequired: '請填寫必填項'
-ErrAIProxyModelMapInvalid: '模型映射必須是合法的 JSON 物件：{{ .err }}'
-ErrAIProxyModelMapEmpty: '模型映射不能為空'
-ErrAIProxyModelMapEmptyExternalModel: '模型映射中存在空的請求模型'
-ErrAIProxyModelMapEmptyUpstreamModel: '模型 {{ .model }} 的上游模型不能為空'
-AIProxyUserFallback: '已刪除使用者 (ID: {{ .id }})'
+
+# 備份與告警設定
 Localhost: '本機'
 ErrBackupInUsed: '此備份帳號已在排程任務中使用，無法刪除'
 ErrBackupCheck: '備份帳號測試連線失敗{{ .err }}'
@@ -80,6 +94,8 @@ ErrBackupLocalDelete: '暫時不支援刪除本機伺服器備份帳號'
 ErrBackupLocalCreate: '暫時不支援建立本機伺服器備份帳號'
 ErrAlertConfigInUse: '告警配置正在使用中，無法刪除'
 ErrAlertConfigPhoneExist: '手機號碼已存在'
+
+# 應用
 ErrPortInUsed: '{{ .detail }} 連接埠已被佔用！'
 ErrAppLimit: '應用程式超出安裝數量限制'
 ErrNotInstall: '應用程式未安裝'
@@ -97,11 +113,6 @@ ErrFileParseApp: '{{ .name }} 檔案解析失敗{{ .err }}'
 ErrAppDirNull: '版本資料夾不存在'
 LocalAppErr: '應用程式{{ .name }} 同步失敗！{{ .err }}'
 ErrContainerName: '容器名稱已存在'
-ErrCreateHttpClient: '建立請求失敗{{ .err }}'
-ErrHttpReqTimeOut: '請求逾時{{ .err }}'
-ErrHttpReqFailed: '請求失敗{{ .err }}'
-ErrNoSuchHost: '無法找到請求的伺服器{{ .err }}'
-ErrHttpReqNotFound: '無法找到要求的資源{{ .err }}'
 ErrContainerNotFound: '{{ .name }} 容器不存在'
 ErrContainerMsg: '{{ .name }} 容器異常，請在容器頁面上檢視日誌'
 ErrAppBackup: '{{ .name }} 應用備份失敗 {{ .err }}'
@@ -132,6 +143,8 @@ ErrDockerFailed: 'Docker 狀態異常，請檢查服務狀態'
 ErrDockerComposeCmdNotFound: 'Docker Compose 指令不存在，請先在宿主機安裝此指令'
 UseExistImage: '映像已存在，使用現有映像'
 ErrDatabaseNotFound: '資料庫 {{ .name }} 不存在'
+
+# SSH
 ExportIP: '登入IP'
 ExportArea: '歸屬地'
 ExportPort: '埠'
@@ -139,6 +152,8 @@ ExportAuthMode: '登入方式'
 ExportUser: '使用者'
 ExportStatus: '登入狀態'
 ExportDate: '時間'
+
+# 檔案
 ErrFileCanNotRead: '此檔案不支援預覽'
 ErrSensitiveFileRead: '不允許讀取敏感檔案'
 ErrFileToLarge: '檔案超過10M，無法開啟'
@@ -165,6 +180,8 @@ FileDropFailed: '清理檔案 {{ .name }} 失敗: {{ .err }}'
 FileDropSuccess: '清理檔案 {{ .name }} 成功，清理 {{ .count }} 個檔案，釋放 {{ .size }} 磁碟空間'
 FileDropSum: '檔案清理完成，共清理 {{ .count }} 個檔案，共釋放 {{ .size }} 磁碟空間'
 ErrBadDecrypt: '壓縮檔解壓密碼錯誤，解壓失敗，請重試。'
+
+# 網站
 ErrAliasIsExist: '代號已存在'
 ErrBackupMatch: '該備份檔案與目前網站部分資料不符{{ .detail }}'
 ErrBackupExist: '該備份檔案對應部分來源資料不存在{{ .detail }}'
@@ -194,6 +211,8 @@ delete: '刪除'
 ErrDefaultWebsite: '已經設定預設網站，請取消後再設定！'
 SSL: '憑證'
 Set: '設定'
+
+# SSL 憑證
 ErrSSLCannotDelete: '{{ .name }} 憑證正在被網站使用，無法刪除'
 ErrAccountCannotDelete: '帳號關聯憑證，無法刪除'
 ErrSSLApply: '憑證續簽成功，openresty reload 失敗，請檢查設定！'
@@ -228,6 +247,8 @@ ErrApplySSLCanNotDelete: '正在申請的憑證 {{ .name }} 無法刪除，請�
 StartPushSSLToNode: '開始推送憑證到節點'
 PushSSLToNodeFailed: '推送憑證到節點失敗: {{ .err }}'
 PushSSLToNodeSuccess: '推送憑證到節點成功'
+
+# MySQL
 ErrUserIsExist: '目前使用者已存在，請重新輸入'
 ErrDatabaseIsExist: '目前資料庫已存在，請重新輸入'
 ErrExecTimeOut: 'SQL 執行逾時，請檢查資料庫'
@@ -236,7 +257,11 @@ ErrLocalExist: '本機資料庫已存在該名稱，請修改後重試'
 RemoteBackup: '備份遠端資料庫需要先使用映像 {{ .name }} 啟動本機容器資料庫服務，請稍候...'
 RemoteRecover: '復原遠端資料庫需要先使用映像 {{ .name }} 啟動本機容器資料庫服務，請稍候...'
 Arg: '參數'
+
+# Redis
 ErrTypeOfRedis: '復原檔案類型與目前持久化方式不符，請修改後重試'
+
+# 容器
 ErrInUsed: '{{ .detail }} 正被使用，無法刪除！'
 ErrObjectInUsed: '該對象正被使用，無法刪除！'
 ErrObjectBeDependent: '該映像正被其他映像所依賴，無法刪除！'
@@ -278,6 +303,8 @@ ComposeRecoverFiles: '還原編排檔案'
 ComposeRecoverContainers: '還原編排容器'
 ComposeRecoverRecord: '保存編排記錄'
 ComposeRecoverCleanup: '清理編排還原工作目錄'
+
+# 執行環境
 ErrFileNotExist: '{{ .detail }} 檔案不存在！請檢查來源檔案完整性！'
 ErrImageBuildErr: '映像build 失敗'
 ErrImageExist: '映像已存在！請修改映像名稱。'
@@ -290,12 +317,16 @@ ErrNodeModulesNotFound: 'node_modules 資料夾不存在！請編輯執行環境
 ErrContainerNameIsNull: '容器名稱不存在'
 ErrPHPPortIsDefault: '9000 埠為預設埠，請修改後重試'
 ErrPHPRuntimePortFailed: '{{ .name }} 埠已被目前執行環境使用，請修改後重試'
+
+# 工具
 ErrConfigNotFound: '設定檔不存在'
 ErrConfigParse: '設定檔格式有誤'
 ErrConfigIsNull: '設定檔不允許為空'
 ErrConfigDirNotFound: '執行目錄不存在'
 ErrConfigAlreadyExist: '已存在同名設定檔'
 ErrUserFindErr: '使用者{{ .name }} 尋找失敗{{ .err }}'
+
+# 計劃任務
 CutWebsiteLogSuccess: '{{ .name }} 網站日誌切割成功，備份路徑{{ .path }}'
 HandleShell: '執行腳本{{ .name }}'
 HandleCurl: '存取 URL {{ .name }}'
@@ -314,6 +345,8 @@ NoSuchResource: '資料庫中未能查詢到備份內容，跳過...'
 CleanLog: '清理日誌'
 CleanLogByName: '清理 {{ .name }} 日誌'
 WafIpGroupNotFound: 'WAF IP 群組未找到，請先到【進階功能-WAF-黑白名單-IP群組】添加遠端下載方式的IP群組'
+
+# 工具箱
 ErrNotExistUser: '目前使用者不存在，請修改後重試！'
 ErrBanAction: '設定失敗，目前{{ .name }} 服務不可用，請重試'
 ErrClamdscanNotFound: '未偵測到clamdscan 指令，請參考檔案安裝！'
@@ -322,11 +355,15 @@ SetSwap: '設定 Swap {{ .path }} - {{ .size }}'
 CreateSwap: '建立 Swap 檔案'
 FormatSwap: '格式化 Swap 檔案'
 EnableSwap: '啟用 Swap'
+
+# 防篡改
 CleanTamperSetting: '清理歷史防護設定'
 SetTamperWithRules: '根據規則啟動目錄防護'
 ProtectDir: '防護目錄 {{ .name }}'
 IgnoreFile: '保護檔案 {{ .name }}'
 TamperSetSuccessful: '防護設定完成，開始監聽以下目錄：'
+
+# WAF
 ErrScope: '不支援修改此設定'
 ErrStateChange: '狀態修改失敗'
 ErrRuleExist: '規則已存在'
@@ -381,6 +418,8 @@ OpenrestyNotFound: 'OpenResty 未安裝'
 remoteIpIsNull: 'IP 列表為空'
 OpenrestyVersionErr: 'OpenResty 版本過低，請升級 OpenResty 至 1.27.1.2-2-2-focal'
 ErrFileTooLarge: '檔案超過 1MB，無法上傳'
+
+# 任務
 TaskStart: '{{ .name }} 任務開始[START]'
 TaskEnd: '{{ .name }} 任務結束[COMPLETED]'
 TaskFailed: '{{ .name }} 任務失敗'
@@ -441,11 +480,17 @@ CustomAppstore: '自訂應用程式倉庫'
 TaskExec: '執行'
 TaskBatch: '批次操作'
 FileConvert: '檔案格式轉換'
+
+# 任務 - ClamAV
 Clamscan: '掃描 {{ .name }}'
 TaskScan: '掃描'
+
+# 任務 - AI
 OllamaModelPull: '拉取 Ollama 模型{{ .name }}'
 OllamaModelSize: '取得 Ollama 模型{{ .name }} 大小'
 AIBenchmarkRun: '執行 AI 基準測試'
+
+# 任務 - 快照
 Snapshot: '快照'
 SnapDBInfo: '寫入1Panel 資料庫資訊'
 SnapCopy: '複製檔案&目錄{{ .name }}'
@@ -495,6 +540,8 @@ RecoverDaemonJson: '復原容器設定daemon.json 檔'
 RecoverDBData: '復原資料庫資料'
 RecoverBackups: '還原本機備份目錄'
 RecoverPanelData: '復原資料目錄'
+
+# 任務 - 容器
 ContainerImagePull: '拉取容器映像{{ .name }}'
 ContainerRemoveOld: '刪除原容器{{ .name }}'
 ContainerImageCheck: '檢查映像是否正常拉取'
@@ -503,6 +550,8 @@ ContainerRecreate: '容器更新失敗，現在開始復原原容器'
 ContainerCreate: '建立新容器{{ .name }}'
 ContainerCreateFailed: '容器建立失敗，刪除失敗容器'
 ContainerStartCheck: '檢查容器是否已啟動'
+
+# 任務 - 映像
 ImageBuild: '映像建置'
 ImagePull: '拉取映像'
 ImageRepoAuthFromDB: '從資料庫取得倉庫認證資訊'
@@ -510,6 +559,8 @@ ImagePush: '推播映像'
 ImageRenameTag: '修改映像Tag'
 ImageNewTag: '新映像Tag {{ .name }}'
 ComposeCreate: '建立編排'
+
+# 任務 - 網站
 BackupNginxConfig: '備份網站OpenResty 設定檔'
 CompressFileSuccess: '壓縮目錄成功，壓縮為{{ .name }}'
 CompressDir: '壓縮目錄'
@@ -520,8 +571,15 @@ websiteDir: '網站目錄'
 RecoverFailedStartRollBack: '復原失敗，開始回溯'
 AppBackupFileIncomplete: '備份檔案不完整缺少 app.json 或 app.tar.gz 檔案'
 AppAttributesNotMatch: '應用程式類型或名稱不一致'
+
+# 告警
+ErrAlertMethodNotSupported: '當前版本不支援此告警方式'
 ErrAlertSync: '警告訊息同步錯誤，請重試。'
+
+# 任務 - 執行環境
 ErrInstallExtension: '已有安裝任務正在進行，請等待任務結束'
+
+# 告警郵件範本
 PanelAlertTitle: '面板警示通知'
 TestAlertTitle: '測試郵件 - 驗證信箱連通性'
 TestAlert: '這是一封測試郵件，用於確認您的郵件發送設定是否正確。'
@@ -538,6 +596,8 @@ CommonAlert: '您的 {{ .node }}{{ .ip }} 面板，{{ .msg }}，詳情請登入�
 NodeExceptionAlert: '您的 {{ .node }}{{ .ip }} 面板，{{ .num }} 個節點出現異常，詳情請登入面板檢視。'
 LicenseExceptionAlert: '您的 {{ .node }}{{ .ip }} 面板，{{ .num }} 個授權出現異常，詳情請登入面板檢視。'
 SSHAndPanelLoginAlert: '您的 {{ .node }}{{ .ip }} 面板，來自 {{ .loginIp }} 的 {{ .name }} 登入出現異常，詳情請登入面板檢視。'
+
+# 磁碟
 DeviceNotFound: '裝置 {{ .name }} 未找到'
 DeviceIsMounted: '裝置 {{ .name }} 已掛載，請先移除'
 PartitionDiskErr: '分區失敗，{{ .err }}'
@@ -545,9 +605,18 @@ FormatDiskErr: '格式化磁碟失敗，{{ .err }}'
 MountDiskErr: '掛載磁碟失敗，{{ .err }}'
 XfsNotFound: '未偵測到 xfs 檔案系統，請先安裝 xfsprogs'
 
-# terminal
+# 終端
 TerminalAIBlockedRiskyCommand: '已攔截風險命令：{{ .command }}'
 TerminalAIThinking: 'AI 正在思考...'
 TerminalAIReadyToExecute: '思考完成，請按 Enter 執行（耗時 {{ .duration }}，token：{{ .tokens }}）'
 TerminalAIRequestFailed: 'AI 請求失敗：{{ .err }}'
-FileAISearchEmptyDir: '目前目錄下沒有可列出的檔案或資料夾（或均被過濾）。'
+
+# AI 閘道
+ErrAIProxyServiceNotInstalled: '{{ .name }} 服務未安裝'
+ErrAIProxyModelAccountNotFound: '模型帳號 {{ .id }} 不存在'
+ErrAIProxyModelMapRequired: '請填寫必填項'
+ErrAIProxyModelMapInvalid: '模型映射必須是合法的 JSON 物件：{{ .err }}'
+ErrAIProxyModelMapEmpty: '模型映射不能為空'
+ErrAIProxyModelMapEmptyExternalModel: '模型映射中存在空的請求模型'
+ErrAIProxyModelMapEmptyUpstreamModel: '模型 {{ .model }} 的上游模型不能為空'
+AIProxyUserFallback: '已刪除使用者 (ID: {{ .id }})'

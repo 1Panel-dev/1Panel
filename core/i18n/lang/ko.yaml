@@ -1,83 +1,65 @@
+# 기본 오류
 ErrInvalidParams: '잘못된 요청: {{ .detail }}'
 ErrTokenParse: '토큰 오류: {{ .detail }}'
 ErrInitialPassword: '원래 비밀번호가 틀립니다'
 ErrInternalServer: '서버 오류: {{ .detail }}'
+ErrInternalServerKey: "서버 내부 오류:"
 ErrRecordExist: '레코드가 이미 있습니다'
 ErrRecordNotFound: '레코드를 찾을 수 없습니다'
 ErrStructTransform: '형 변환 실패: {{ .err }}'
-ErrNotLogin: '로그인하지 않음: {{ .detail }}'
-ErrSessionDataNotFound: "현재 세션이 만료되었습니다"
-ErrSessionDataFormat: "현재 세션 데이터 형식이 비정상입니다"
-ErrPasswordExpired: '비밀번호 만료: {{ .detail }}'
 ErrNotSupportType: '지원하지 않는 타입: {{ .name }}'
-ErrProxy: '요청 실패: {{ .detail }}'
-ErrApiConfigStatusInvalid: 'API 사용 중지: {{ .detail }}'
-ErrApiConfigKeyInvalid: 'API 키가 잘못됨: {{ .detail }}'
-ErrApiConfigIPInvalid: 'IP 허용되지 않음: {{ .detail }}'
-ErrApiConfigDisable: 'API 접근 금지: {{ .detail }}'
-ErrApiConfigKeyTimeInvalid: '타임스탬프 오류: {{ .detail }}'
-ErrLoginLocked: "실패한 시도가 너무 많습니다. 로그인이 5분 동안 일시적으로 잠겼습니다."
+ErrDemoEnvironment: '데모 환경에서는 불가'
+ErrCmdTimeout: '명령이 시간 초과했습니다'
+ErrPortInUsed: "{{ .name }} 포트가 이미 사용 중입니다"
+ErrFileNotFound: "{{ .name }} 파일이 존재하지 않습니다"
+ErrReqFailed: "{{.name}} 요청 실패: {{ .err }}"
 
-# request
+# 요청 및 보안 입구
 ErrNoSuchHost: "요청한 서버를 찾을 수 없습니다 {{ .err }}"
 ErrHttpReqNotFound: "요청한 리소스를 찾을 수 없습니다 {{ .err }}"
 ErrHttpReqFailed: "요청 실패 {{ .err }}"
 ErrHttpReqTimeOut: "요청 시간이 초과되었습니다 {{ .err }}"
 ErrCreateHttpClient: "요청 생성 실패 {{ .err }}"
+ErrProxy: '요청 실패: {{ .detail }}'
 ErrProxySetting: "프록시 서버 정보를 사용할 수 없음 {{ .err }}, 확인 후 다시 시도하세요"
+ErrEntrance: "보안 정보 오류입니다. 확인 후 다시 시도하십시오"
 ErrEntranceFormat: "보안 입구 {{ .name }}은(는) 현재 지원되지 않습니다. 확인 후 다시 시도해 주세요"
 
-# common
-ErrDemoEnvironment: '데모 환경에서는 불가'
-ErrCmdTimeout: '명령이 시간 초과했습니다'
-ErrVMNotFound: "가상 머신이 존재하지 않습니다"
-ErrVMAlreadyExists: "가상 머신이 이미 존재합니다"
-ErrVMRunning: "가상 머신이 실행 중입니다"
-ErrVMLibvirtConnect: "libvirt 연결 실패: {{ .detail }}"
-ErrVMPermission: "가상 머신 작업 권한이 없습니다: {{ .detail }}"
-ErrVMNetworkNotFound: "가상 머신 네트워크가 존재하지 않습니다: {{ .detail }}"
-ErrVMInvalidPath: "가상 머신 경로가 유효하지 않습니다: {{ .detail }}"
-ErrVMInvalidInput: "가상 머신 매개변수가 유효하지 않습니다: {{ .detail }}"
-ErrVMCommandFailed: "가상 머신 명령 실행 실패: {{ .err }}"
-VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
-VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
-VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
-ErrEntrance: "보안 정보 오류입니다. 확인 후 다시 시도하십시오"
+# 로그인 및 보안
+ErrNotLogin: '로그인하지 않음: {{ .detail }}'
+ErrSessionDataNotFound: "현재 세션이 만료되었습니다"
+ErrSessionDataFormat: "현재 세션 데이터 형식이 비정상입니다"
+ErrPasswordExpired: '비밀번호 만료: {{ .detail }}'
+ErrLoginLocked: "실패한 시도가 너무 많습니다. 로그인이 5분 동안 일시적으로 잠겼습니다."
+ErrApiConfigStatusInvalid: 'API 사용 중지: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'API 키가 잘못됨: {{ .detail }}'
+ErrApiConfigIPInvalid: 'IP 허용되지 않음: {{ .detail }}'
+ErrApiConfigDisable: 'API 접근 금지: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: '타임스탬프 오류: {{ .detail }}'
+ErrPasskeyDisabled: "Passkey를 사용하려면 HTTPS를 활성화해야 합니다"
+ErrPasskeyNotConfigured: "Passkey가 구성되지 않았습니다"
+ErrPasskeyLimit: "Passkey 개수가 한도에 도달했습니다(최대 5개)"
+ErrPasskeySession: "Passkey 세션이 만료되었거나 유효하지 않습니다"
+ErrPasskeyDuplicate: "Passkey가 이미 존재합니다"
+ErrPasskeyVerify: "Passkey 검증에 실패했습니다"
+
+# 사용자 및 권한
+ErrNoSuchUser: "사용자 정보를 찾을 수 없습니다. 확인 후 다시 시도하세요"
+ErrToMaster: "이 사용자는 마스터 노드에서 이 작업을 수행할 권한이 없습니다. 확인 후 다시 시도하세요"
+ErrToNode: "이 사용자는 이 노드에서 이 작업을 수행할 권한이 없습니다. 확인 후 다시 시도하세요"
+ErrRBAC: "사용자 권한이 부족하여 이 작업을 수행할 수 없습니다. 확인 후 다시 시도하세요"
+ErrNoneNode: "이 사용자에게는 노드 권한이 없습니다. 관리자에게 문의하거나 확인 후 다시 시도하세요"
+ErrOnlySuperAdmin: "슈퍼 관리자만 이 기능을 사용할 수 있습니다"
+ErrRolePresetCannotDelete: "시스템 기본 역할은 삭제할 수 없습니다"
+ErrRolePresetCannotUpdate: "시스템 기본 역할은 수정할 수 없습니다"
+ErrRoleBoundToUser: "이 역할은 이미 사용자에게 연결되어 있어 삭제할 수 없습니다"
+ErrRolePresetCannotBind: "시스템 기본 역할은 사용자에게 할당할 수 없습니다"
+ErrNodeAdminMasterForbidden: "마스터 노드에는 노드 관리자 권한을 추가할 수 없습니다"
+ErrSuperAdminCannotDelete: "슈퍼 관리자 사용자는 삭제할 수 없습니다"
 ErrGroupIsDefault: "기본 그룹은 삭제할 수 없습니다"
 ErrGroupIsInUse: "그룹이 사용 중이므로 삭제할 수 없습니다."
-ErrAIProxyUserGroupIsDefault: "기본 사용자 그룹은 삭제할 수 없습니다"
-ErrAIProxyUserGroupInUse: "사용자 그룹이 사용 중이므로 삭제할 수 없습니다."
-ErrAIProxyUserGroupExists: "사용자 그룹 이름이 이미 존재합니다."
-ErrAIProxyBackendAccountExists: "이 모델 계정은 이미 AI 게이트웨이 계정 풀에 가져왔습니다."
-ErrAIProxyModelGroupInUse: "모델 그룹이 사용 중이므로 삭제할 수 없습니다."
-ErrAIProxyModelGroupExists: "모델 그룹 이름이 이미 존재합니다."
-ErrAIProxySensitiveGroupInUse: "민감 단어 그룹이 사용 중이므로 삭제할 수 없습니다."
-ErrAIProxySensitiveGroupExists: "민감 단어 그룹 이름이 이미 존재합니다."
-ErrLocalDelete: "로컬 노드는 삭제할 수 없습니다"
-ErrPortInUsed: "{{ .name }} 포트가 이미 사용 중입니다"
-ErrInternalServerKey: "서버 내부 오류:"
-MasterNode: "마스터 노드"
 
-# app
-CustomAppStoreFileValid: "앱 스토어 패키지는 .tar.gz 형식이어야 합니다"
-ErrFileNotFound: "{{ .name }} 파일이 존재하지 않습니다"
-AppBackup: '애플리케이션 백업'
-AppBackupPush: '애플리케이션 백업 파일 {{.file}}을(를) 노드 {{ .name }}(으)로 전송'
-ErrSourceTargetSame: '소스 노드와 대상 노드는 동일할 수 없습니다'
-AppInstall: '노드 {{ .targetNode }}에 애플리케이션 {{ .name }} 설치'
-AppInstallCheck: '애플리케이션 설치 환경 확인'
-
-# backup
-ErrBackupInUsed: '백업 계정이 예약에 사용 중'
-ErrBackupCheck: '연결 테스트 실패: {{ .err }}'
-ErrBackupLocal: "로컬 서버 백업 계정은 이 작업을 지원하지 않습니다"
-ErrBackupPublic: "이 백업 계정이 공개된 것으로 감지되지 않았습니다. 다시 확인하십시오"
-ErrOSSConn: "최신 버전을 가져올 수 없습니다. 외부 네트워크 연결을 확인하십시오."
-
-#license
+# 라이선스
 LicenseCheck: '라이선스 사용 가능 여부 확인'
 ErrLicenseInUsed: '해당 라이선스가 이미 연결되었습니다. 확인 후 다시 시도하세요'
 ErrLicenseExpired: '해당 라이선스가 만료되었습니다. 확인 후 다시 시도하세요'
@@ -107,21 +89,6 @@ ErrNodeUnbind: "이 노드가 라이선스 바인딩 범위에 있지 않음을 
 ErrNodeBind: "이 노드가 이미 라이선스에 바인딩되어 있음을 감지하였습니다. 다시 확인하고 시도해 주세요"
 ErrNodeLocalRollback: "마스터 노드는 직접 롤백을 지원하지 않습니다. '1pctl restore'를 수동으로 실행해 롤백하세요"
 ErrIntlLicense: "현재 버전에서는 국제판 라이선스 가져오기를 아직 지원하지 않습니다. 곧 제공될 예정입니다"
-
-# user
-ErrNoSuchUser: "사용자 정보를 찾을 수 없습니다. 확인 후 다시 시도하세요"
-ErrToMaster: "이 사용자는 마스터 노드에서 이 작업을 수행할 권한이 없습니다. 확인 후 다시 시도하세요"
-ErrToNode: "이 사용자는 이 노드에서 이 작업을 수행할 권한이 없습니다. 확인 후 다시 시도하세요"
-ErrRBAC: "사용자 권한이 부족하여 이 작업을 수행할 수 없습니다. 확인 후 다시 시도하세요"
-ErrNoneNode: "이 사용자에게는 노드 권한이 없습니다. 관리자에게 문의하거나 확인 후 다시 시도하세요"
-ErrOnlySuperAdmin: "슈퍼 관리자만 이 기능을 사용할 수 있습니다"
-ErrRolePresetCannotDelete: "시스템 기본 역할은 삭제할 수 없습니다"
-ErrRolePresetCannotUpdate: "시스템 기본 역할은 수정할 수 없습니다"
-ErrRoleBoundToUser: "이 역할은 이미 사용자에게 연결되어 있어 삭제할 수 없습니다"
-ErrRolePresetCannotBind: "시스템 기본 역할은 사용자에게 할당할 수 없습니다"
-ErrNodeAdminMasterForbidden: "마스터 노드에는 노드 관리자 권한을 추가할 수 없습니다"
-ErrSuperAdminCannotDelete: "슈퍼 관리자 사용자는 삭제할 수 없습니다"
-
 InvalidRequestBodyType: "요청 본문 형식이 잘못되었습니다. 내용이 형식 요구 사항을 충족하는지 확인한 후 다시 시도하세요"
 InvalidLicenseCodeType: "제공된 라이선스 코드 형식이 잘못되었습니다. 확인 후 다시 시도하세요"
 LicenseNotFoundType: "라이선스가 존재하지 않습니다. 시스템에서 제공된 라이선스와 일치하는 기록을 찾을 수 없습니다. 확인 후 다시 시도하세요"
@@ -132,10 +99,64 @@ InvalidAssigneeType: "라이선스 할당 대상 사용자 또는 장치 정보�
 LicenseUsageNotFoundType: "사용 기록이 없습니다. 이 라이선스는 아직 활성화되거나 사용되지 않았습니다. 확인 후 다시 시도하세요"
 LicenseUsageLimitExceededType: "이 라이선스는 이미 다른 노드에 연결되었습니다. 확인 후 다시 시도하세요"
 
-# alert
+# 노드 및 클러스터
+MasterNode: "마스터 노드"
+Node: "노드"
+ErrLocalDelete: "로컬 노드는 삭제할 수 없습니다"
+ErrMasterDelete: "마스터 노드를 삭제할 수 없습니다. 슬레이브 노드를 먼저 삭제하세요."
+ClusterNameIsExist: "클러스터 이름이 이미 존재합니다."
+AppStatusUnHealthy: "애플리케이션 상태 획득이 비정상입니다. 노드 목록에서 설치 노드 상태를 확인하세요."
+MasterNodePortNotAvailable: "노드 {{ .name }} 포트 {{ .port }} 연결성 검증에 실패했습니다. 방화벽/보안 그룹 설정 및 마스터 노드 상태를 확인하세요."
+ClusterMasterNotExist: "클러스터의 마스터 노드가 연결이 끊어졌습니다. 자식 노드를 삭제하세요."
+
+# 가상 머신
+ErrVMNotFound: "가상 머신이 존재하지 않습니다"
+ErrVMAlreadyExists: "가상 머신이 이미 존재합니다"
+ErrVMRunning: "가상 머신이 실행 중입니다"
+ErrVMLibvirtConnect: "libvirt 연결 실패: {{ .detail }}"
+ErrVMPermission: "가상 머신 작업 권한이 없습니다: {{ .detail }}"
+ErrVMNetworkNotFound: "가상 머신 네트워크가 존재하지 않습니다: {{ .detail }}"
+ErrVMInvalidPath: "가상 머신 경로가 유효하지 않습니다: {{ .detail }}"
+ErrVMInvalidInput: "가상 머신 매개변수가 유효하지 않습니다: {{ .detail }}"
+ErrVMCommandFailed: "가상 머신 명령 실행 실패: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
+
+# 앱
+CustomAppStoreFileValid: "앱 스토어 패키지는 .tar.gz 형식이어야 합니다"
+AppBackup: '애플리케이션 백업'
+AppBackupPush: '애플리케이션 백업 파일 {{.file}}을(를) 노드 {{ .name }}(으)로 전송'
+ErrSourceTargetSame: '소스 노드와 대상 노드는 동일할 수 없습니다'
+AppInstall: '노드 {{ .targetNode }}에 애플리케이션 {{ .name }} 설치'
+AppInstallCheck: '애플리케이션 설치 환경 확인'
+
+# 백업
+ErrBackupInUsed: '백업 계정이 예약에 사용 중'
+ErrBackupCheck: '연결 테스트 실패: {{ .err }}'
+ErrBackupLocal: "로컬 서버 백업 계정은 이 작업을 지원하지 않습니다"
+ErrBackupPublic: "이 백업 계정이 공개된 것으로 감지되지 않았습니다. 다시 확인하십시오"
+ErrOSSConn: "최신 버전을 가져올 수 없습니다. 외부 네트워크 연결을 확인하십시오."
+MvBackup: "데이터를 백업 디렉터리로 이동"
+
+# 알림
 ErrAlertSync: "경고 정보 동기화 오류, 다시 확인하고 시도해 주세요"
 
-#task
+# AI 게이트웨이
+ErrAIProxyUserGroupIsDefault: "기본 사용자 그룹은 삭제할 수 없습니다"
+ErrAIProxyUserGroupInUse: "사용자 그룹이 사용 중이므로 삭제할 수 없습니다."
+ErrAIProxyUserGroupExists: "사용자 그룹 이름이 이미 존재합니다."
+ErrAIProxyBackendAccountExists: "이 모델 계정은 이미 AI 게이트웨이 계정 풀에 가져왔습니다."
+ErrAIProxyModelGroupInUse: "모델 그룹이 사용 중이므로 삭제할 수 없습니다."
+ErrAIProxyModelGroupExists: "모델 그룹 이름이 이미 존재합니다."
+ErrAIProxySensitiveGroupInUse: "민감 단어 그룹이 사용 중이므로 삭제할 수 없습니다."
+ErrAIProxySensitiveGroupExists: "민감 단어 그룹 이름이 이미 존재합니다."
+AIBenchmarkRun: "AI 벤치마크 실행"
+
+# 작업
 TaskStart: "{{ .name }} 작업 시작 [START]"
 TaskEnd: "{{ .name }} 작업 종료 [COMPLETED]"
 TaskFailed: "{{ .name }} 작업 실패"
@@ -149,6 +170,16 @@ TaskUpgrade: "업그레이드"
 TaskSync: '동기화'
 TaskSyncForNode: "노드 데이터 동기화"
 TaskBackup: "백업"
+TaskPush: "전송"
+TaskRsync: "Sync"
+SuccessStatus: "{{ .name }} 성공"
+FailedStatus: "{{ .name }} 실패 {{ .err }}"
+Start: "시작"
+SubTask: "서브 작업"
+Skip: "오류 무시하고 계속..."
+Success: "성공"
+
+# 에이전트 일괄 작업
 BatchInstallAgent: "에이전트 일괄 설치"
 DispatchAgentInstallTasks: "에이전트 설치 작업 배포"
 BatchUpgradeAgent: "에이전트 일괄 업그레이드"
@@ -182,20 +213,15 @@ AgentOperateStart: "시작"
 AgentOperateStop: "중지"
 AgentOperateRestart: "재시작"
 AgentOperateDelete: "삭제"
-SuccessStatus: "{{ .name }} 성공"
-FailedStatus: "{{ .name }} 실패 {{ .err }}"
-Start: "시작"
-SubTask: "서브 작업"
-Skip: "오류 무시하고 계속..."
+
+# 앱 및 스킬 작업
 PushAppInstallTaskToNode: "노드 [{{ .name }}]로 앱 설치 작업 전송"
-TaskPush: "전송"
 AppInstallTask: "앱 설치 작업"
 PushAppFailed: "앱 설치 작업 전송 실패"
 SkillHubInstallTask: "스킬 설치 [{{ .name }}]"
 SkillHubInstallToTarget: "대상에 스킬 설치 [{{ .name }}]"
-Success: "성공"
 
-#script
+# 스크립트 라이브러리
 ScriptLibrary: "스크립트 라이브러리"
 RemoteScriptLibrary: "원격 스크립트 라이브러리"
 ScriptSyncSkip: "현재 스크립트 라이브러리가 이미 최신 버전입니다"
@@ -203,7 +229,7 @@ DownloadData: "스크립트 라이브러리 파일 data.yaml 다운로드 중"
 DownloadPackage: "스크립트 라이브러리 패키지 다운로드 중"
 AnalyticCompletion: "분석 완료, 데이터베이스에 동기화 중..."
 
-Node: "노드"
+# 노드 동기화
 SyncNode: "데이터를 노드 {{ .name }}(으)로 동기화"
 LocalName: "'local' 이름은 시스템 로컬 식별 전용으로 사용됩니다"
 SyncPackageData: "동기화 데이터 패키징"
@@ -219,7 +245,7 @@ SyncCustomApp: "사용자 정의 앱"
 SyncLanguage: "시스템 언어"
 SyncEdition: "운영 지역"
 
-#upgrade node
+# 노드 업그레이드
 NodeUpgrade: "{{ .name }} 노드 업그레이드"
 UpgradeCheck: "노드 업데이트 확인"
 UpgradeCheckLocal: "로컬 노드는 일괄 업그레이드를 지원하지 않으므로 건너뜁니다..."
@@ -232,12 +258,11 @@ LoadAutoUpgradeNodesFailed: "자동 업그레이드 노드 로드 실패, 오류
 AutoUpgradeNodes: "자동 업그레이드 노드: {{ .nodes }}"
 UpdateAutoUpgradeNodesStatusFailed: "자동 업그레이드 노드 상태 업데이트 실패, 오류: {{ .err }}"
 
-#add node
+# 노드 추가
 MasterData: "마스터 노드 데이터"
 LoadSftpClient: "SFTP 클라이언트 가져오기"
 PackageMasterData: "마스터 노드 백업 패키지 생성"
 UploadBackup: "백업 데이터 업로드"
-MvBackup: "데이터를 백업 디렉터리로 이동"
 TaskAddNode: "노드 추가"
 LoadNodeArch: "노드 아키텍처 정보 가져오기"
 LoadNodeArchDetail: "감지된 마스터 노드 아키텍처: {{ .local }}, 자식 노드 아키텍처: {{ .node }}"
@@ -250,7 +275,35 @@ SendAgent: "노드 설치 패키지 배포"
 StartService: "서비스 시작"
 NoBackupNode: "현재 백업 노드가 비어 있습니다. 저장할 백업 노드를 선택한 후 다시 시도하십시오"
 
-# CMD
+# 노드 파일 및 이미지 동기화
+LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
+HandlePrivateKey: "Handle node private key"
+HandlePublicKey: "Handle node public key"
+ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
+NodeFile: "Node file"
+ImageSyncTaskName: "Image sync {{ .count }} images"
+SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
+AppSyncTaskName: "App sync {{ .name }}"
+SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
+ImageSyncSave: "Save image {{ .image }}"
+ImageSyncSaveTags: "Save image tags {{ .tags }}"
+ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
+ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
+ImageSyncClean: "Clean temporary files for image {{ .image }}"
+ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
+ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
+ImageSyncHandlePrivateKey: "Handle image sync node private key"
+ImageSyncHandlePublicKey: "Handle image sync node public key"
+ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
+
+# 명령줄
+SudoHelper: "{{ .cmd }} 명령을 사용하거나 root 사용자로 전환하세요."
+UsernameNeed: "Enterprise 버전은 --username을 지정해야 합니다"
+DBConnErr: "오류: 데이터베이스 연결 초기화 실패 {{ .err }}"
+SystemVersion: "버전: "
+SystemMode: "모드: "
+
+# 명령줄 - 앱
 AppVersion: "앱 버전"
 AppCommands: "앱 관련 명령어"
 AppInit: "앱 초기화"
@@ -262,12 +315,14 @@ AppMissVersion: "앱 버전이 없습니다. -v 옵션으로 지정하세요."
 AppVersionExist: "버전이 이미 존재합니다"
 AppCreateSuccessful: "생성 성공"
 AppWriteErr: "파일 {{ .name }} 쓰기 실패 {{ .err }}"
-SudoHelper: "{{ .cmd }} 명령을 사용하거나 root 사용자로 전환하세요."
-UsernameNeed: "Enterprise 버전은 --username을 지정해야 합니다"
+
+# 명령줄 - 수신 IP
 ListenIPCommands: "IP 변경"
 ListenIPv4: "IPv4 에서 수신 대기"
 ListenIPv6: "IPv6 에서 수신 대기"
 ListenChangeSuccessful: "변경 성공 현재 {{ .value }}에서 수신 대기 중입니다."
+
+# 명령줄 - 재설정
 ResetCommands: "시스템 정보 초기화"
 ResetMFA: "1Panel 이중 인증 취소"
 ResetHttps: "1Panel HTTPS 로그인 취소"
@@ -275,12 +330,19 @@ ResetEntrance: "1Panel 보안 입구 취소"
 ResetIPs: "1Panel 허용 IP 제한 취소"
 ResetDomain: "1Panel 도메인 바인딩 취소"
 ResetPasskey: "1Panel 패스키 초기화"
+
+# 명령줄 - 사용자
 UserList: "1Panel 사용자 목록 가져오기"
 UserTableName: "이름"
 UserTableMFAStatus: "MFA 상태"
 UserTableSuperAdmin: "슈퍼 관리자"
 UserTableCreatedAt: "생성일"
 UserEmptyList: "사용자를 찾을 수 없습니다"
+UserInfo: "패널 정보 가져오기"
+UserInfoAddr: "패널 주소: "
+UserInfoPassHelp: "팁: 비밀번호를 변경하려면 다음 명령어를 실행할 수 있습니다: "
+
+# 명령줄 - 복원
 RestoreCommands: "1Panel 서비스와 데이터를 롤백"
 RestoreNoSuchFile: "롤백 파일을 찾을 수 없습니다"
 RestoreStep1: "(1/5) {{ .name }} 디렉터리에서 1Panel 서비스와 데이터의 롤백을 시작합니다..."
@@ -289,6 +351,8 @@ RestoreStep3: "(3/5) 1Panel 스크립트 롤백 완료"
 RestoreStep4: "(4/5) 1Panel 서비스 롤백 완료"
 RestoreStep5: "(5/5) 1Panel 데이터 롤백 완료"
 RestoreSuccessful: "롤백이 완료되었습니다. {{ .version }}(으)로 되돌리고 서비스를 다시 시작합니다..."
+
+# 명령줄 - 업데이트
 UpdateCommands: "패널 정보 업데이트"
 UpdateUser: "사용자 정보 업데이트"
 UpdatePassword: "사용자 비밀번호 업데이트"
@@ -315,50 +379,12 @@ UpdatePortResult: "패널 포트: {{ .name }}"
 UpdatePortFirewallAdd: "방화벽 포트 규칙 추가 실패 {{ .err }}, 방화벽 규칙에 {{ .name }} 포트를 수동으로 추가하세요."
 UpdatePortFirewallDel: "오류: 방화벽 포트 삭제 실패 {{ .err }}"
 UpdatePortFirewallReload: "방화벽 다시 로드 실패 {{ .err }}, 방화벽을 수동으로 다시 로드하세요."
-UserInfo: "패널 정보 가져오기"
-UserInfoAddr: "패널 주소: "
-UserInfoPassHelp: "팁: 비밀번호를 변경하려면 다음 명령어를 실행할 수 있습니다: "
-DBConnErr: "오류: 데이터베이스 연결 초기화 실패 {{ .err }}"
-SystemVersion: "버전: "
-SystemMode: "모드: "
 
-#exchange
-LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
-HandlePrivateKey: "Handle node private key"
-HandlePublicKey: "Handle node public key"
-ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
-TaskRsync: "Sync"
-NodeFile: "Node file"
-ImageSyncTaskName: "Image sync {{ .count }} images"
-SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
-AppSyncTaskName: "App sync {{ .name }}"
-SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
-ImageSyncSave: "Save image {{ .image }}"
-ImageSyncSaveTags: "Save image tags {{ .tags }}"
-ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
-ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
-ImageSyncClean: "Clean temporary files for image {{ .image }}"
-ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
-ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
-ImageSyncHandlePrivateKey: "Handle image sync node private key"
-ImageSyncHandlePublicKey: "Handle image sync node public key"
-ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
-
-#mobile app
+# 모바일 앱
 ErrVerifyToken: '토큰 검증 오류가 발생했습니다. 재설정 후 다시 스캔해 주세요.'
 ErrInvalidToken: '유효하지 않은 토큰입니다. 재설정 후 다시 스캔해 주세요.'
 ErrExpiredToken: '토큰이 만료되었습니다. 재설정 후 다시 스캔해 주세요.'
 
-#cluster
-ErrMasterDelete: "마스터 노드를 삭제할 수 없습니다. 슬레이브 노드를 먼저 삭제하세요."
-ClusterNameIsExist: "클러스터 이름이 이미 존재합니다."
-AppStatusUnHealthy: "애플리케이션 상태 획득이 비정상입니다. 노드 목록에서 설치 노드 상태를 확인하세요."
-MasterNodePortNotAvailable: "노드 {{ .name }} 포트 {{ .port }} 연결성 검증에 실패했습니다. 방화벽/보안 그룹 설정 및 마스터 노드 상태를 확인하세요."
-ClusterMasterNotExist: "클러스터의 마스터 노드가 연결이 끊어졌습니다. 자식 노드를 삭제하세요."
-
-#ssl
-ErrReqFailed: "{{.name}} 요청 실패: {{ .err }}"
-
-#command
+# 명령 내보내기
 Name: "이름"
 Command: "명령어"

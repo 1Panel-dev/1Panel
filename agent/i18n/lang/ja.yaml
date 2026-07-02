@@ -1,29 +1,47 @@
+# 基本エラー
 ErrInvalidParams: '不正なリクエスト: {{ .detail }}'
 ErrTokenParse: 'トークンエラー: {{ .detail }}'
 ErrInitialPassword: '元のパスワードが違います'
 ErrInternalServer: '内部エラー: {{ .detail }}'
+ErrRecordExist: 'レコードが既に存在します'
+ErrRecordNotFound: 'レコードが見つかりません'
+ErrStructTransform: '型変換エラー: {{ .err }}'
+ErrNotSupportType: '未対応のタイプ: {{ .name }}'
+
+# ファイルAI
 ErrFileAINotEnabled: 'ファイル管理の「AI アカウント」でファイル AI 検索を有効にし、アカウントを選んでください。'
 ErrFileAISearchBadPattern: '検索パターンが無効です（正規表現など）: {{ .detail }}'
+FileAISearchEmptyDir: 'このパス以下に一覧できるファイルまたはフォルダーがありません（またはすべて除外されました）。'
+
+# リモートダウンロード
 ErrWgetRemoteFailed: 'リモートのダウンロード URL が無効か、到達できません：{{ .detail }}'
 ErrWgetInvalidContentType: 'リモート URL がファイルではなくエラーページ等を返しました、{{ .detail }}'
 ErrWgetProxyNotConfigured: '先にパネル設定でプロキシサーバーを設定してください'
 ErrWgetProxyInvalid: 'プロキシサーバーのアドレスが無効です：{{ .detail }}'
-ErrRecordExist: 'レコードが既に存在します'
-ErrRecordNotFound: 'レコードが見つかりません'
-ErrStructTransform: '型変換エラー: {{ .err }}'
+
+# ログインとセキュリティ
 ErrNotLogin: 'ログインしていません: {{ .detail }}'
 ErrPasswordExpired: 'パスワード期限切れ: {{ .detail }}'
-ErrNotSupportType: '未対応のタイプ: {{ .name }}'
-ErrAlertMethodNotSupported: 'このバージョンではこの通知方法は利用できません'
+
+# リクエストとAPI
 ErrProxy: 'リクエストに失敗しました: {{ .detail }}'
 ErrApiConfigStatusInvalid: 'API利用不可: {{ .detail }}'
 ErrApiConfigKeyInvalid: 'APIキーが無効です: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IPが許可されていません: {{ .detail }}'
 ErrApiConfigDisable: 'APIは無効です: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'タイムスタンプが無効です: {{ .detail }}'
-ErrShutDown: 'コマンドは手動で停止されました'
+ErrCreateHttpClient: 'リクエスト {{ .err }} の作成に失敗しました'
+ErrHttpReqTimeOut: 'リクエストがタイムアウトしました {{ .err }}'
+ErrHttpReqFailed: 'リクエストが失敗しました {{ .err }}'
+ErrNoSuchHost: '要求されたサーバー {{ .err }} が見つかりません'
+ErrHttpReqNotFound: '要求されたリソース {{ .err }} が見つかりませんでした'
+
+# クイックジャンプ
 ErrMinQuickJump: 'クイックアクセスを1件以上追加'
 ErrMaxQuickJump: '最大4件のクイックアクセス'
+
+# 共通
+ErrShutDown: 'コマンドは手動で停止されました'
 ErrUsernameIsExist: 'ユーザー名はすでに使われています'
 ErrNameIsExist: '名称はすでに使われています'
 ErrDemoEnvironment: 'デモ環境では利用できません'
@@ -41,6 +59,8 @@ SystemRestart: 'システムの再起動によりタスクが中断されまし�
 ErrGroupIsDefault: 'デフォルト グループ、削除できません'
 ErrGroupIsInWebsiteUse: 'グループは別の Web サイトで使用されているため、削除できません。'
 Decrypt: '復号化'
+
+# エージェント
 ErrAgentAccountBound: 'アカウントはエージェントに紐づいています'
 ErrTerminalAIAccountInUse: 'このモデルアカウントは Terminal AI で使用中です。Terminal AI の設定で別のアカウントへ切り替えるか、Terminal AI を無効にしてから再試行してください。'
 ErrAgentAccountUnavailable: 'アカウント接続不可: {{ .err }}'
@@ -65,14 +85,8 @@ ErrAgentWebsiteInUse: 'このサイトはすでに別のエージェントに関
 ErrAgentWebsiteUnbindUnsupported: 'ワンクリックデプロイのサイトは手動で関連解除できません'
 ErrHermesPairingCodeUnavailable: 'Hermes でペアリングコードが一時的に見つかりません。ネットワーク要因の可能性があるため、しばらくしてから再試行してください。'
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'Feishu のグループポリシーが許可リストの場合、DM ポリシーをペアリングコードにはできません。'
-ErrAIProxyServiceNotInstalled: '{{ .name }} サービスはインストールされていません'
-ErrAIProxyModelAccountNotFound: 'モデルアカウント {{ .id }} が見つかりません'
-ErrAIProxyModelMapRequired: 'この項目は必須です。'
-ErrAIProxyModelMapInvalid: 'モデルマッピングは有効な JSON オブジェクトである必要があります: {{ .err }}'
-ErrAIProxyModelMapEmpty: 'モデルマッピングは空にできません'
-ErrAIProxyModelMapEmptyExternalModel: 'モデルマッピングに空のリクエストモデルがあります'
-ErrAIProxyModelMapEmptyUpstreamModel: '{{ .model }} の上流モデルは空にできません'
-AIProxyUserFallback: '削除済みユーザー (ID: {{ .id }})'
+
+# バックアップとアラート設定
 Localhost: 'ローカルマシン'
 ErrBackupInUsed: 'バックアップアカウントがスケジュールで使用中'
 ErrBackupCheck: '接続テストに失敗しました: {{ .err }}'
@@ -80,6 +94,8 @@ ErrBackupLocalDelete: 'ローカルバックアップは削除できません'
 ErrBackupLocalCreate: 'ローカルバックアップは作成できません'
 ErrAlertConfigInUse: 'アラート設定は使用中のため削除できません'
 ErrAlertConfigPhoneExist: '電話番号はすでに存在します'
+
+# アプリ
 ErrPortInUsed: '{{ .detail }} ポートはすでに使用されています'
 ErrAppLimit: 'インストールされているアプリケーションの数が制限を超えました'
 ErrNotInstall: 'アプリケーションがインストールされていません'
@@ -97,11 +113,6 @@ ErrFileParseApp: '{{ .name }} ファイルの解析に失敗しました {{ .err
 ErrAppDirNull: 'バージョン フォルダーが存在しません'
 LocalAppErr: 'アプリケーション {{ .name }} の同期に失敗しました {{ .err }}'
 ErrContainerName: 'コンテナ名が既に存在します'
-ErrCreateHttpClient: 'リクエスト {{ .err }} の作成に失敗しました'
-ErrHttpReqTimeOut: 'リクエストがタイムアウトしました {{ .err }}'
-ErrHttpReqFailed: 'リクエストが失敗しました {{ .err }}'
-ErrNoSuchHost: '要求されたサーバー {{ .err }} が見つかりません'
-ErrHttpReqNotFound: '要求されたリソース {{ .err }} が見つかりませんでした'
 ErrContainerNotFound: '{{ .name }} コンテナが存在しません'
 ErrContainerMsg: '{{ .name }} コンテナが異常です。詳細についてはコンテナページのログを確認してください。'
 ErrAppBackup: '{{ .name }} アプリケーションのバックアップに失敗しました。エラー {{ .err }}'
@@ -132,6 +143,8 @@ ErrDockerFailed: 'Docker の状態が異常です。サービス状態を確認�
 ErrDockerComposeCmdNotFound: 'Docker Compose コマンドは存在しません。ホストマシンにこのコマンドを先にインストールしてください'
 UseExistImage: 'イメージは既に存在します。既存のイメージを使用します'
 ErrDatabaseNotFound: 'データベース {{ .name }} は存在しません'
+
+# SSH
 ExportIP: 'ログインIP'
 ExportArea: '地域'
 ExportPort: 'ポート'
@@ -139,6 +152,8 @@ ExportAuthMode: 'ログイン方式'
 ExportUser: 'ユーザー'
 ExportStatus: 'ログイン状態'
 ExportDate: '時間'
+
+# ファイル
 ErrFileCanNotRead: 'このファイルはプレビューをサポートしていません'
 ErrSensitiveFileRead: '機密ファイルの読み取りは許可されていません'
 ErrFileToLarge: 'ファイルは 10M より大きいため開けません'
@@ -165,6 +180,8 @@ FileDropFailed: 'ファイル {{ .name }} のクリーンアップに失敗し�
 FileDropSuccess: 'ファイル {{ .name }} のクリーンアップに成功しました、{{ .count }} ファイルを削除、{{ .size }} のディスク領域を解放'
 FileDropSum: 'ファイルのクリーンアップが完了しました、合計 {{ .count }} ファイルを削除、合計 {{ .size }} のディスク領域を解放'
 ErrBadDecrypt: '圧縮パッケージの解凍パスワードが間違っています。解凍に失敗しました。確認後再試行！'
+
+# ウェブサイト
 ErrAliasIsExist: 'エイリアスがすでに存在します'
 ErrBackupMatch: 'バックアップ ファイルは、現在の Web サイト データ {{ .detail }} の一部と一致しません'
 ErrBackupExist: 'バックアップ ファイル内のソース データの対応する部分が存在しません {{ .detail }}'
@@ -194,6 +211,8 @@ delete: '削除'
 ErrDefaultWebsite: 'デフォルト Web サイトが既に設定されています。設定する前にキャンセルしてください！'
 SSL: '証明書'
 Set: '設定'
+
+# SSL証明書
 ErrSSLCannotDelete: '{{ .name }} 証明書は Web サイトで使用されているため、削除できません'
 ErrAccountCannotDelete: 'アカウントは証明書に関連付けられているため、削除できません'
 ErrSSLApply: '証明書の更新は成功しましたが、openresty の再ロードに失敗しました。設定を確認してください。'
@@ -228,6 +247,8 @@ ErrApplySSLCanNotDelete: '申請中の証明書 {{ .name }} は削除できま�
 StartPushSSLToNode: '証明書をノードにプッシュ開始'
 PushSSLToNodeFailed: 'ノードに証明書をプッシュ失敗: {{ .err }}'
 PushSSLToNodeSuccess: 'ノードに証明書をプッシュ成功'
+
+# MySQL
 ErrUserIsExist: '現在のユーザーは既に存在します。再入力してください'
 ErrDatabaseIsExist: '現在のデータベースは既に存在します。再入力してください'
 ErrExecTimeOut: 'SQL 実行がタイムアウトしました。データベースを確認してください'
@@ -236,7 +257,11 @@ ErrLocalExist: '名前はローカル データベースに既に存在します
 RemoteBackup: 'リモートデータベースをバックアップするには、まずイメージ {{ .name }} を使用してローカルコンテナデータベースサービスを起動する必要があります。しばらくお待ちください...'
 RemoteRecover: 'リモートデータベースを復元するには、まずイメージ {{ .name }} を使用してローカルコンテナデータベースサービスを起動する必要があります。しばらくお待ちください...'
 Arg: '引数'
+
+# Redis
 ErrTypeOfRedis: 'リカバリ ファイルの種類が現在の永続化方法と一致しません。変更して再試行してください'
+
+# コンテナ
 ErrInUsed: '{{ .detail }} は使用中であり、削除できません！'
 ErrObjectInUsed: 'このオブジェクトは使用中であり、削除できません！'
 ErrObjectBeDependent: 'このイメージは他のイメージに依存されているため、削除できません！'
@@ -278,6 +303,8 @@ ComposeRecoverFiles: 'Compose ファイルを復元'
 ComposeRecoverContainers: 'Compose コンテナを復元'
 ComposeRecoverRecord: 'Compose 記録を保存'
 ComposeRecoverCleanup: 'Compose 復元作業領域をクリーンアップ'
+
+# ランタイム
 ErrFileNotExist: '{{ .detail }} ファイルが存在しません。ソース ファイルの整合性を確認してください。'
 ErrImageBuildErr: 'イメージのビルドに失敗しました'
 ErrImageExist: 'イメージはすでに存在します！イメージ名を変更してください。'
@@ -290,12 +317,16 @@ ErrNodeModulesNotFound: 'node_modules フォルダが存在しません。ラン
 ErrContainerNameIsNull: 'コンテナ名が存在しません'
 ErrPHPPortIsDefault: 'ポート9000はデフォルトポートです。修正してから再試行してください'
 ErrPHPRuntimePortFailed: 'ポート {{ .name }} は現在のランタイム環境で使用されています。修正してから再試行してください'
+
+# ツール
 ErrConfigNotFound: '構成ファイルが存在しません'
 ErrConfigParse: '構成ファイルの形式が正しくありません'
 ErrConfigIsNull: '構成ファイルは空にできません'
 ErrConfigDirNotFound: '実行ディレクトリが存在しません'
 ErrConfigAlreadyExist: '同じ名前の設定ファイルがすでに存在します'
 ErrUserFindErr: 'ユーザー {{ .name }} の検索に失敗しました {{ .err }}'
+
+# Cronジョブ
 CutWebsiteLogSuccess: '{{ .name }} ウェブサイトのログが正常にカットされました。バックアップ パス {{ .path }}'
 HandleShell: 'スクリプト {{ .name }} を実行します'
 HandleCurl: 'URL {{ .name }} にアクセス'
@@ -314,6 +345,8 @@ NoSuchResource: 'データベースにバックアップ内容が見つかりま
 CleanLog: 'ログをクリーン'
 CleanLogByName: '{{ .name }} のログをクリーン'
 WafIpGroupNotFound: 'WAF IPグループが見つかりません。[高度な機能 - WAF - ブラックリスト/ホワイトリスト - IPグループ]に移動し、リモートダウンロード方式でIPグループを追加してください。'
+
+# ツールボックス
 ErrNotExistUser: '現在のユーザーは存在しません。変更してもう一度お試しください。'
 ErrBanAction: '設定に失敗しました。現在の {{ .name }} サービスは利用できません。確認してもう一度お試しください。'
 ErrClamdscanNotFound: 'clamdscan コマンドが検出されませんでした。インストールするにはドキュメントを参照してください。'
@@ -322,11 +355,15 @@ SetSwap: 'Swap設定 {{ .path }} - {{ .size }}'
 CreateSwap: 'Swapファイル作成'
 FormatSwap: 'Swapファイルフォーマット'
 EnableSwap: 'Swapファイル有効化'
+
+# 改ざん防止
 CleanTamperSetting: '履歴保護設定をクリーンアップ'
 SetTamperWithRules: 'ルールに従ってディレクトリ保護を開始'
 ProtectDir: 'ディレクトリを保護 {{ .name }}'
 IgnoreFile: 'ファイルを保護 {{ .name }}'
 TamperSetSuccessful: '保護設定が完了し、以下のディレクトリの監視を開始します：'
+
+# WAF
 ErrScope: 'この構成の変更はサポートされていません'
 ErrStateChange: '状態の変更に失敗しました'
 ErrRuleExist: 'ルールは既に存在します'
@@ -381,6 +418,8 @@ OpenrestyNotFound: 'OpenResty がインストールされていません'
 remoteIpIsNull: 'IPリストが空です'
 OpenrestyVersionErr: 'OpenResty のバージョンが古すぎます。1.27.1.2-2-2-focal 以降にアップグレードしてください'
 ErrFileTooLarge: 'ファイルが 1MB を超えているためアップロードできません'
+
+# タスク
 TaskStart: '{{ .name }} タスクが開始されました [START]'
 TaskEnd: '{{ .name }} タスクが完了しました [COMPLETED]'
 TaskFailed: '{{ .name }} タスクが失敗しました'
@@ -441,10 +480,17 @@ CustomAppstore: 'カスタム アプリケーション ウェアハウス'
 TaskExec: '実行'
 TaskBatch: '一括操作'
 FileConvert: 'ファイル形式の変換'
+
+# タスク - ClamAV
 Clamscan: '{{ .name }} をスキャン'
 TaskScan: 'スキャン'
+
+# タスク - AI
 OllamaModelPull: 'Ollama モデル {{ .name }} をプルします'
 OllamaModelSize: 'Ollama モデル {{ .name }} のサイズを取得します'
+AIBenchmarkRun: "AIベンチマークを実行"
+
+# タスク - スナップショット
 Snapshot: 'スナップショット'
 SnapDBInfo: '1Panel データベース情報を書き込む'
 SnapCopy: 'ファイルとディレクトリ {{ .name }} をコピーします'
@@ -494,6 +540,8 @@ RecoverDaemonJson: 'コンテナ構成 daemon.json ファイルを復元する'
 RecoverDBData: 'データベース データを回復する'
 RecoverBackups: 'ローカル バックアップ ディレクトリを復元する'
 RecoverPanelData: 'リカバリデータディレクトリ'
+
+# タスク - コンテナ
 ContainerImagePull: 'コンテナ イメージ {{ .name }} をプルします'
 ContainerRemoveOld: '元のコンテナ {{ .name }} を削除します'
 ContainerImageCheck: 'イメージが正常にプルされているかどうかを確認します'
@@ -502,6 +550,8 @@ ContainerRecreate: 'コンテナの更新に失敗しました。元のコンテ
 ContainerCreate: '新しいコンテナ {{ .name }} を作成します'
 ContainerCreateFailed: 'コンテナの作成に失敗しました。失敗したコンテナを削除してください'
 ContainerStartCheck: 'コンテナが起動されているかどうかを確認します'
+
+# タスク - イメージ
 ImageBuild: 'イメージビルド'
 ImagePull: '画像をプル'
 ImageRepoAuthFromDB: 'データベースからリポジトリ認証情報を取得する'
@@ -509,6 +559,8 @@ ImagePush: '画像をプッシュ'
 ImageRenameTag: '画像タグを変更する'
 ImageNewTag: '新しい画像タグ {{ .name }}'
 ComposeCreate: 'コンポジションを作成する'
+
+# タスク - ウェブサイト
 BackupNginxConfig: 'ウェブサイトの OpenResty 構成ファイルをバックアップする'
 CompressFileSuccess: 'ディレクトリを正常に圧縮しました。{{ .name }} に圧縮されました'
 CompressDir: '圧縮ディレクトリ'
@@ -519,8 +571,15 @@ websiteDir: 'ウェブサイトディレクトリ'
 RecoverFailedStartRollBack: 'リカバリに失敗しました。ロールバックを開始します'
 AppBackupFileIncomplete: 'バックアップ ファイルが不完全で、app.json または app.tar.gz ファイルが不足しています'
 AppAttributesNotMatch: 'アプリケーションの種類または名前が一致しません'
+
+# アラート
+ErrAlertMethodNotSupported: 'このバージョンではこの通知方法は利用できません'
 ErrAlertSync: 'アラーム情報の同期エラーです。確認してもう一度お試しください。'
+
+# タスク - ランタイム
 ErrInstallExtension: 'インストールタスクが進行中です、タスクが終了するのを待ってください'
+
+# アラートメールテンプレート
 PanelAlertTitle: 'パネルアラート通知'
 TestAlertTitle: 'テストメール - メール接続の確認'
 TestAlert: 'これはテストメールです。メール送信設定が正しく構成されているかを確認します。'
@@ -537,6 +596,8 @@ CommonAlert: 'あなたの {{ .node }}{{ .ip }} パネル、{{ .msg }}。詳細�
 NodeExceptionAlert: 'あなたの {{ .node }}{{ .ip }} パネル、{{ .num }} 個のノードに異常が発生しています。詳細はパネルにログインして'
 LicenseExceptionAlert: 'あなたの {{ .node }}{{ .ip }} パネル、{{ .num }} 個のライセンスに異常が発生しています。詳細はパネルにログインして'
 SSHAndPanelLoginAlert: 'あなたの {{ .node }}{{ .ip }} パネル、{{ .loginIp }} からの {{ .name }} ログインに異常があります。詳細はパネルにログインして'
+
+# ディスク
 DeviceNotFound: 'デバイス {{ .name }} が見つかりません'
 DeviceIsMounted: 'デバイス {{ .name }} はマウントされています、まずアンマウントしてください'
 PartitionDiskErr: 'パーティションに失敗しました、{{ .err }}'
@@ -544,9 +605,18 @@ FormatDiskErr: 'ディスクのフォーマットに失敗しました、{{ .err
 MountDiskErr: 'ディスクのマウントに失敗しました、{{ .err }}'
 XfsNotFound: 'xfs ファイルシステムが検出されませんでした、最初に xfsprogs をインストールしてください'
 
-# terminal
+# ターミナル
 TerminalAIBlockedRiskyCommand: '危険なコマンドをブロックしました: {{ .command }}'
 TerminalAIThinking: 'AI が考えています...'
 TerminalAIReadyToExecute: '思考が完了しました。Enter で実行してください（所要時間 {{ .duration }}、token: {{ .tokens }}）'
 TerminalAIRequestFailed: 'AI リクエストに失敗しました: {{ .err }}'
-FileAISearchEmptyDir: 'このパス以下に一覧できるファイルまたはフォルダーがありません（またはすべて除外されました）。'
+
+# AIゲートウェイ
+ErrAIProxyServiceNotInstalled: '{{ .name }} サービスはインストールされていません'
+ErrAIProxyModelAccountNotFound: 'モデルアカウント {{ .id }} が見つかりません'
+ErrAIProxyModelMapRequired: 'この項目は必須です。'
+ErrAIProxyModelMapInvalid: 'モデルマッピングは有効な JSON オブジェクトである必要があります: {{ .err }}'
+ErrAIProxyModelMapEmpty: 'モデルマッピングは空にできません'
+ErrAIProxyModelMapEmptyExternalModel: 'モデルマッピングに空のリクエストモデルがあります'
+ErrAIProxyModelMapEmptyUpstreamModel: '{{ .model }} の上流モデルは空にできません'
+AIProxyUserFallback: '削除済みユーザー (ID: {{ .id }})'

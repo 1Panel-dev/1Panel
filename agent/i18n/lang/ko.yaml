@@ -1,29 +1,47 @@
+# 기본 오류
 ErrInvalidParams: '잘못된 요청: {{ .detail }}'
 ErrTokenParse: '토큰 오류: {{ .detail }}'
 ErrInitialPassword: '원래 비밀번호가 틀립니다'
 ErrInternalServer: '서버 오류: {{ .detail }}'
+ErrRecordExist: '레코드가 이미 있습니다'
+ErrRecordNotFound: '레코드를 찾을 수 없습니다'
+ErrStructTransform: '형 변환 실패: {{ .err }}'
+ErrNotSupportType: '지원하지 않는 타입: {{ .name }}'
+
+# 파일 AI
 ErrFileAINotEnabled: '파일 관리에서 「AI 계정」으로 파일 AI 검색을 켜고 계정을 선택하세요.'
 ErrFileAISearchBadPattern: '검색 패턴이 잘못되었습니다(정규식 등): {{ .detail }}'
+FileAISearchEmptyDir: '이 경로에 나열할 파일이나 디렉터리가 없습니다(또는 모두 필터링됨).'
+
+# 원격 다운로드
 ErrWgetRemoteFailed: '원격 다운로드 주소가 잘못되었거나 접근할 수 없습니다: {{ .detail }}'
 ErrWgetInvalidContentType: '원격 주소가 파일이 아닌 콘텐츠를 반환했습니다 (오류 페이지일 수 있음), {{ .detail }}'
 ErrWgetProxyNotConfigured: '먼저 패널 설정에서 프록시 서버를 구성하세요'
 ErrWgetProxyInvalid: '프록시 서버 주소가 잘못되었습니다: {{ .detail }}'
-ErrRecordExist: '레코드가 이미 있습니다'
-ErrRecordNotFound: '레코드를 찾을 수 없습니다'
-ErrStructTransform: '형 변환 실패: {{ .err }}'
+
+# 로그인 및 보안
 ErrNotLogin: '로그인하지 않음: {{ .detail }}'
 ErrPasswordExpired: '비밀번호 만료: {{ .detail }}'
-ErrNotSupportType: '지원하지 않는 타입: {{ .name }}'
-ErrAlertMethodNotSupported: '현재 버전에서는 이 알림 방식을 지원하지 않습니다'
+
+# 요청 및 API
 ErrProxy: '요청 실패: {{ .detail }}'
 ErrApiConfigStatusInvalid: 'API 사용 중지: {{ .detail }}'
 ErrApiConfigKeyInvalid: 'API 키가 잘못됨: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP 허용되지 않음: {{ .detail }}'
 ErrApiConfigDisable: 'API 접근 금지: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: '타임스탬프 오류: {{ .detail }}'
-ErrShutDown: '명령이 수동으로 중단되었습니다'
+ErrCreateHttpClient: '요청 {{ .err }}을(를) 생성하지 못했습니다.'
+ErrHttpReqTimeOut: '요청 시간이 초과되었습니다 {{ .err }}'
+ErrHttpReqFailed: '요청이 실패했습니다 {{ .err }}'
+ErrNoSuchHost: '요청한 서버 {{ .err }}을 찾을 수 없습니다'
+ErrHttpReqNotFound: '요청한 리소스 {{ .err }}을 찾을 수 없습니다.'
+
+# 빠른 이동
 ErrMinQuickJump: '퀵 액세스를 하나 이상 추가하세요'
 ErrMaxQuickJump: '퀵 액세스는 최대 4개'
+
+# 공통
+ErrShutDown: '명령이 수동으로 중단되었습니다'
 ErrUsernameIsExist: '아이디가 이미 존재합니다'
 ErrNameIsExist: '이름이 이미 존재합니다'
 ErrDemoEnvironment: '데모 환경에서는 불가'
@@ -41,6 +59,8 @@ SystemRestart: '시스템 재시작으로 인해 작업이 중단되었습니다
 ErrGroupIsDefault: '기본 그룹, 삭제할 수 없습니다'
 ErrGroupIsInWebsiteUse: '그룹이 다른 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'
 Decrypt: '복호화'
+
+# 에이전트
 ErrAgentAccountBound: '계정이 에이전트에 묶여 있습니다'
 ErrTerminalAIAccountInUse: '이 모델 계정은 현재 터미널 AI에서 사용 중입니다. 터미널 AI 설정에서 다른 계정으로 변경하거나 터미널 AI를 비활성화한 뒤 다시 시도하세요.'
 ErrAgentAccountUnavailable: '계정 연결 불가: {{ .err }}'
@@ -65,14 +85,8 @@ ErrAgentWebsiteInUse: '이 웹사이트는 이미 다른 에이전트에 연결�
 ErrAgentWebsiteUnbindUnsupported: '원클릭 배포 웹사이트는 수동으로 연결 해제할 수 없습니다'
 ErrHermesPairingCodeUnavailable: 'Hermes에서 페어링 코드가 일시적으로 존재하지 않습니다. 네트워크 문제일 수 있으니 잠시 후 다시 시도해 주세요.'
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'Feishu 그룹 정책이 허용 목록이면 DM 정책을 페어링 코드로 설정할 수 없습니다.'
-ErrAIProxyServiceNotInstalled: '{{ .name }} 서비스가 설치되어 있지 않습니다'
-ErrAIProxyModelAccountNotFound: '모델 계정 {{ .id }}을(를) 찾을 수 없습니다'
-ErrAIProxyModelMapRequired: '이 필드는 필수입니다.'
-ErrAIProxyModelMapInvalid: '모델 매핑은 유효한 JSON 객체여야 합니다: {{ .err }}'
-ErrAIProxyModelMapEmpty: '모델 매핑은 비워 둘 수 없습니다'
-ErrAIProxyModelMapEmptyExternalModel: '모델 매핑에 빈 요청 모델이 있습니다'
-ErrAIProxyModelMapEmptyUpstreamModel: '{{ .model }}의 업스트림 모델은 비워 둘 수 없습니다'
-AIProxyUserFallback: '삭제된 사용자 (ID: {{ .id }})'
+
+# 백업 및 알림 설정
 Localhost: '로컬 머신'
 ErrBackupInUsed: '백업 계정이 예약에 사용 중'
 ErrBackupCheck: '연결 테스트 실패: {{ .err }}'
@@ -80,6 +94,8 @@ ErrBackupLocalDelete: '로컬 백업은 삭제할 수 없습니다'
 ErrBackupLocalCreate: '로컬 백업은 만들 수 없습니다'
 ErrAlertConfigInUse: '경고 설정이 사용 중이므로 삭제할 수 없습니다'
 ErrAlertConfigPhoneExist: '전화번호가 이미 존재합니다'
+
+# 앱
 ErrPortInUsed: '{{ .detail }} 포트가 이미 사용 중입니다'
 ErrAppLimit: '설치된 애플리케이션 수가 한도를 초과했습니다'
 ErrNotInstall: '응용 프로그램이 설치되지 않았습니다'
@@ -97,11 +113,6 @@ ErrFileParseApp: '{{ .name }} 파일 구문 분석에 실패했습니다 {{ .err
 ErrAppDirNull: '버전 폴더가 존재하지 않습니다'
 LocalAppErr: '애플리케이션 {{ .name }} 동기화에 실패했습니다 {{ .err }}'
 ErrContainerName: '컨테이너 이름이 이미 존재합니다'
-ErrCreateHttpClient: '요청 {{ .err }}을(를) 생성하지 못했습니다.'
-ErrHttpReqTimeOut: '요청 시간이 초과되었습니다 {{ .err }}'
-ErrHttpReqFailed: '요청이 실패했습니다 {{ .err }}'
-ErrNoSuchHost: '요청한 서버 {{ .err }}을 찾을 수 없습니다'
-ErrHttpReqNotFound: '요청한 리소스 {{ .err }}을 찾을 수 없습니다.'
 ErrContainerNotFound: '{{ .name }} 컨테이너가 존재하지 않습니다'
 ErrContainerMsg: '{{ .name }} 컨테이너가 비정상입니다. 자세한 내용은 컨테이너 페이지의 로그를 확인하세요.'
 ErrAppBackup: '{{ .name }} 애플리케이션 백업에 실패했습니다 {{ .err }}'
@@ -132,6 +143,8 @@ ErrDockerFailed: 'Docker의 상태가 비정상입니다. 서비스 상태를 �
 ErrDockerComposeCmdNotFound: 'Docker Compose 명령이 없습니다. 호스트 머신에 먼저 이 명령을 설치하세요'
 UseExistImage: '이미지가 이미 존재하여 기존 이미지를 사용합니다'
 ErrDatabaseNotFound: '데이터베이스 {{ .name }} 이(가) 존재하지 않습니다'
+
+# SSH
 ExportIP: '로그인 IP'
 ExportArea: '위치'
 ExportPort: '포트'
@@ -139,6 +152,8 @@ ExportAuthMode: '로그인 방식'
 ExportUser: '사용자'
 ExportStatus: '로그인 상태'
 ExportDate: '시간'
+
+# 파일
 ErrFileCanNotRead: '이 파일은 미리보기를 지원하지 않습니다'
 ErrSensitiveFileRead: '민감한 파일을 읽을 수 없습니다'
 ErrFileToLarge: '파일이 10M보다 커서 열 수 없습니다'
@@ -165,6 +180,8 @@ FileDropFailed: '파일 {{ .name }} 정리 실패: {{ .err }}'
 FileDropSuccess: '파일 {{ .name }} 정리 성공, {{ .count }}개 파일 삭제, {{ .size }} 디스크 공간 확보'
 FileDropSum: '파일 정리 완료, 총 {{ .count }}개 파일 삭제, 총 {{ .size }} 디스크 공간 확보'
 ErrBadDecrypt: '압축 패키지 암호 해제 비밀번호 오류, 압축 해제 실패, 확인 후 다시 시도하세요'
+
+# 웹사이트
 ErrAliasIsExist: '별칭이 이미 존재합니다'
 ErrBackupMatch: '백업 파일이 현재 웹사이트 데이터 중 일부 {{ .detail }}와 일치하지 않습니다.'
 ErrBackupExist: '백업 파일에 있는 소스 데이터의 해당 부분이 존재하지 않습니다 {{ .detail }}'
@@ -194,6 +211,8 @@ delete: '삭제'
 ErrDefaultWebsite: '기본 웹사이트가 이미 설정되었습니다. 설정하기 전에 취소하세요'
 SSL: '인증서'
 Set: '설정'
+
+# SSL 인증서
 ErrSSLCannotDelete: '{{ .name }} 인증서는 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'
 ErrAccountCannotDelete: '계정이 인증서와 연결되어 있어 삭제할 수 없습니다.'
 ErrSSLApply: '인증서 갱신이 성공했으나, openresty 재로드에 실패했습니다. 구성을 확인해 주세요'
@@ -228,6 +247,8 @@ ErrApplySSLCanNotDelete: '신청 중인 인증서 {{ .name }}는 삭제할 수 �
 StartPushSSLToNode: '인증서를 노드로 푸시 시작'
 PushSSLToNodeFailed: '노드로 인증서 푸시 실패: {{ .err }}'
 PushSSLToNodeSuccess: '노드로 인증서 푸시 성공'
+
+# MySQL
 ErrUserIsExist: '현재 사용자가 이미 존재합니다. 다시 입력하세요'
 ErrDatabaseIsExist: '현재 데이터베이스가 이미 존재합니다. 다시 입력하세요'
 ErrExecTimeOut: 'SQL 실행 시간이 초과되었습니다. 데이터베이스를 확인하십시오.'
@@ -236,7 +257,11 @@ ErrLocalExist: '이름이 로컬 데이터베이스에 이미 존재합니다. �
 RemoteBackup: '원격 데이터베이스를 백업하려면 먼저 이미지 {{ .name }}을(를) 사용하여 로컬 컨테이너 데이터베이스 서비스를 시작해야 합니다. 잠시만 기다려 주세요...'
 RemoteRecover: '원격 데이터베이스를 복원하려면 먼저 이미지 {{ .name }}을(를) 사용하여 로컬 컨테이너 데이터베이스 서비스를 시작해야 합니다. 잠시만 기다려 주세요...'
 Arg: '인수'
+
+# Redis
 ErrTypeOfRedis: '복구 파일 유형이 현재 지속성 방법과 일치하지 않습니다. 수정하고 다시 시도하세요'
+
+# 컨테이너
 ErrInUsed: '{{ .detail }}(이)가 사용 중이어서 삭제할 수 없습니다'
 ErrObjectInUsed: '이 객체는 사용 중이어서 삭제할 수 없습니다'
 ErrObjectBeDependent: '이 이미지는 다른 이미지에 의존되어 있어 삭제할 수 없습니다'
@@ -278,6 +303,8 @@ ComposeRecoverFiles: 'Compose 파일 복원'
 ComposeRecoverContainers: 'Compose 컨테이너 복원'
 ComposeRecoverRecord: 'Compose 기록 저장'
 ComposeRecoverCleanup: 'Compose 복원 작업 공간 정리'
+
+# 런타임
 ErrFileNotExist: '{{ .detail }} 파일이 존재하지 않습니다 소스 파일의 무결성을 확인하세요'
 ErrImageBuildErr: '이미지 빌드 실패'
 ErrImageExist: '이미지가 이미 존재합니다 이미지 이름을 수정하세요.'
@@ -290,12 +317,16 @@ ErrNodeModulesNotFound: 'node_modules 폴더가 없습니다 런타임 환경을
 ErrContainerNameIsNull: '컨테이너 이름이 존재하지 않습니다'
 ErrPHPPortIsDefault: '9000 포트는 기본 포트입니다. 수정 후 다시 시도하세요'
 ErrPHPRuntimePortFailed: '포트 {{ .name }} 는 현재 런타임 환경에서 이미 사용 중입니다. 수정 후 다시 시도하세요'
+
+# 도구
 ErrConfigNotFound: '구성 파일이 존재하지 않습니다'
 ErrConfigParse: '구성 파일 형식이 올바르지 않습니다'
 ErrConfigIsNull: '구성 파일은 비어 있을 수 없습니다'
 ErrConfigDirNotFound: '실행 디렉토리가 존재하지 않습니다'
 ErrConfigAlreadyExist: '같은 이름의 구성 파일이 이미 존재합니다'
 ErrUserFindErr: '사용자 {{ .name }} 검색에 실패했습니다 {{ .err }}'
+
+# 예약 작업
 CutWebsiteLogSuccess: '{{ .name }} 웹사이트 로그가 성공적으로 잘렸습니다. 백업 경로 {{ .path }}'
 HandleShell: '스크립트 {{ .name }} 실행'
 HandleCurl: 'URL {{ .name }} 접근'
@@ -314,6 +345,8 @@ NoSuchResource: '데이터베이스에서 백업 내용을 찾을 수 없어 건
 CleanLog: '로그 정리'
 CleanLogByName: '{{ .name }} 로그 정리'
 WafIpGroupNotFound: 'WAF IP 그룹을 찾을 수 없습니다. [고급 기능 - WAF - 블랙/화이트 목록 - IP 그룹]으로 이동하여 원격 다운로드 방식으로 IP 그룹을 추가하십시오.'
+
+# 도구 상자
 ErrNotExistUser: '현재 사용자가 존재하지 않습니다. 수정한 후 다시 시도하세요'
 ErrBanAction: '설정에 실패했습니다. 현재 {{ .name }} 서비스를 사용할 수 없습니다. 확인하고 다시 시도하세요'
 ErrClamdscanNotFound: 'clamdscan 명령이 감지되지 않았습니다. 설명서를 참조하여 설치하세요'
@@ -322,11 +355,15 @@ SetSwap: 'Swap 설정 {{ .path }} - {{ .size }}'
 CreateSwap: 'Swap 파일 생성'
 FormatSwap: 'Swap 파일 포맷'
 EnableSwap: 'Swap 활성화'
+
+# 변조 방지
 CleanTamperSetting: '히스토리 보호 설정 정리'
 SetTamperWithRules: '규칙에 따라 디렉토리 보호 시작'
 ProtectDir: '디렉토리 보호 {{ .name }}'
 IgnoreFile: '파일 보호 {{ .name }}'
 TamperSetSuccessful: '보호 설정 완료, 다음 디렉토리 모니터링 시작:'
+
+# WAF
 ErrScope: '이 구성을 수정하는 것은 지원되지 않습니다'
 ErrStateChange: '상태 변경에 실패했습니다'
 ErrRuleExist: '규칙이 이미 존재합니다'
@@ -381,6 +418,8 @@ OpenrestyNotFound: 'OpenResty가 설치되어 있지 않습니다'
 remoteIpIsNull: 'IP 목록이 비어 있습니다'
 OpenrestyVersionErr: 'OpenResty 버전이 너무 낮습니다. 1.27.1.2-2-2-focal 이상으로 업그레이드하세요'
 ErrFileTooLarge: '파일이 1MB를 초과하여 업로드할 수 없습니다'
+
+# 작업
 TaskStart: '[START] {{ .name }} 작업이 시작됩니다.'
 TaskEnd: '{{ .name }} 작업이 완료되었습니다 [완료]'
 TaskFailed: '{{ .name }} 작업이 실패했습니다'
@@ -441,10 +480,17 @@ CustomAppstore: '사용자 정의 애플리케이션 웨어하우스'
 TaskExec: '실행'
 TaskBatch: '일괄 작업'
 FileConvert: '파일 형식 변환'
+
+# 작업 - ClamAV
 Clamscan: '{{ .name }} 스캔'
 TaskScan: '스캔'
+
+# 작업 - AI
 OllamaModelPull: 'Ollama 모델 {{ .name }}을(를) 끌어오세요'
 OllamaModelSize: 'Ollama 모델 {{ .name }}의 크기를 가져옵니다'
+AIBenchmarkRun: "AI 벤치마크 실행"
+
+# 작업 - 스냅샷
 Snapshot: '스냅샷'
 SnapDBInfo: '1Panel 데이터베이스 정보 쓰기'
 SnapCopy: '파일 및 디렉토리 {{ .name }} 복사'
@@ -494,6 +540,8 @@ RecoverDaemonJson: '컨테이너 구성 daemon.json 파일 복원'
 RecoverDBData: '데이터베이스 데이터 복구'
 RecoverBackups: '로컬 백업 디렉토리 복원'
 RecoverPanelData: '복구 데이터 디렉토리'
+
+# 작업 - 컨테이너
 ContainerImagePull: '컨테이너 이미지 {{ .name }} 가져오기'
 ContainerRemoveOld: '원래 컨테이너 {{ .name }} 제거'
 ContainerImageCheck: '이미지가 정상적으로 당겨졌는지 확인'
@@ -502,6 +550,8 @@ ContainerRecreate: '컨테이너 업데이트에 실패했습니다. 이제 원�
 ContainerCreate: '새로운 컨테이너 {{ .name }}를 만듭니다'
 ContainerCreateFailed: '컨테이너 생성에 실패했습니다. 실패한 컨테이너를 삭제하세요'
 ContainerStartCheck: '컨테이너가 시작되었는지 확인'
+
+# 작업 - 이미지
 ImageBuild: '이미지 빌드'
 ImagePull: '이미지 가져오기'
 ImageRepoAuthFromDB: '데이터베이스에서 저장소 인증 정보 가져오기'
@@ -509,6 +559,8 @@ ImagePush: '이미지 푸시'
 ImageRenameTag: '이미지 태그 수정'
 ImageNewTag: '새로운 이미지 태그 {{ .name }}'
 ComposeCreate: '작곡 만들기'
+
+# 작업 - 웹사이트
 BackupNginxConfig: '웹사이트 OpenResty 구성 파일 백업'
 CompressFileSuccess: '디렉토리 압축이 성공했습니다. {{ .name }}으로 압축되었습니다.'
 CompressDir: '압축 디렉토리'
@@ -519,8 +571,15 @@ websiteDir: '웹사이트 디렉토리'
 RecoverFailedStartRollBack: '복구 실패, 롤백 시작'
 AppBackupFileIncomplete: '백업 파일이 불완전하며 app.json 또는 app.tar.gz 파일이 없습니다.'
 AppAttributesNotMatch: '애플리케이션 유형 또는 이름이 일치하지 않습니다'
+
+# 알림
+ErrAlertMethodNotSupported: '현재 버전에서는 이 알림 방식을 지원하지 않습니다'
 ErrAlertSync: '알람 정보 동기화 오류입니다. 확인하고 다시 시도하세요'
+
+# 작업 - 런타임
 ErrInstallExtension: '이미 설치 작업이 진행 중입니다. 작업이 완료될 때까지 기다려 주세요.'
+
+# 알림 메일 템플릿
 PanelAlertTitle: '패널 알림 통지'
 TestAlertTitle: '테스트 이메일 - 이메일 연결 확인'
 TestAlert: '이것은 테스트 이메일이며 이메일 발송 설정이 올바른지 확인합니다.'
@@ -537,6 +596,8 @@ CommonAlert: '귀하의 {{ .node }}{{ .ip }} 패널, {{ .msg }}。자세한 내�
 NodeExceptionAlert: '귀하의 {{ .node }}{{ .ip }} 패널, {{ .num }}개의 노드에 이상이 있습니다. 자세한 내용은 패널에 로그인하십시오.'
 LicenseExceptionAlert: '귀하의 {{ .node }}{{ .ip }} 패널, {{ .num }}개의 라이센스에 이상이 있습니다. 자세한 내용은 패널에 로그인하십시오.'
 SSHAndPanelLoginAlert: '귀하의 {{ .node }}{{ .ip }} 패널, {{ .loginIp }}에서의 {{ .name }} 로그인에 이상이 있습니다. 자세한 내용은 패널에 로그인하십시오.'
+
+# 디스크
 DeviceNotFound: '장치 {{ .name }} 을(를) 찾을 수 없습니다'
 DeviceIsMounted: '장치 {{ .name }} 이(가) 마운트되었습니다, 먼저 마운트 해제하세요'
 PartitionDiskErr: '파티션 분할에 실패했습니다, {{ .err }}'
@@ -544,9 +605,18 @@ FormatDiskErr: '디스크 포맷에 실패했습니다, {{ .err }}'
 MountDiskErr: '디스크 마운트에 실패했습니다, {{ .err }}'
 XfsNotFound: 'xfs 파일 시스템이 감지되지 않았습니다, 먼저 xfsprogs 를 설치하세요'
 
-# terminal
+# 터미널
 TerminalAIBlockedRiskyCommand: '위험한 명령이 차단되었습니다: {{ .command }}'
 TerminalAIThinking: 'AI가 생각 중입니다...'
 TerminalAIReadyToExecute: '생각이 완료되었습니다. Enter를 눌러 실행하세요 (소요 시간 {{ .duration }}, token: {{ .tokens }})'
 TerminalAIRequestFailed: 'AI 요청 실패: {{ .err }}'
-FileAISearchEmptyDir: '이 경로에 나열할 파일이나 디렉터리가 없습니다(또는 모두 필터링됨).'
+
+# AI 게이트웨이
+ErrAIProxyServiceNotInstalled: '{{ .name }} 서비스가 설치되어 있지 않습니다'
+ErrAIProxyModelAccountNotFound: '모델 계정 {{ .id }}을(를) 찾을 수 없습니다'
+ErrAIProxyModelMapRequired: '이 필드는 필수입니다.'
+ErrAIProxyModelMapInvalid: '모델 매핑은 유효한 JSON 객체여야 합니다: {{ .err }}'
+ErrAIProxyModelMapEmpty: '모델 매핑은 비워 둘 수 없습니다'
+ErrAIProxyModelMapEmptyExternalModel: '모델 매핑에 빈 요청 모델이 있습니다'
+ErrAIProxyModelMapEmptyUpstreamModel: '{{ .model }}의 업스트림 모델은 비워 둘 수 없습니다'
+AIProxyUserFallback: '삭제된 사용자 (ID: {{ .id }})'

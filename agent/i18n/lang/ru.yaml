@@ -1,29 +1,47 @@
+# базовые ошибки
 ErrInvalidParams: 'Неверный запрос: {{ .detail }}'
 ErrTokenParse: 'Ошибка токена: {{ .detail }}'
 ErrInitialPassword: 'Исходный пароль неверен'
 ErrInternalServer: 'Внутренняя ошибка: {{ .detail }}'
+ErrRecordExist: 'Запись уже существует'
+ErrRecordNotFound: 'Запись не найдена'
+ErrStructTransform: 'Ошибка преобразования: {{ .err }}'
+ErrNotSupportType: 'Тип не поддерживается: {{ .name }}'
+
+# файловый AI
 ErrFileAINotEnabled: 'Поиск с AI в файлах выключен или не выбран аккаунт. В управлении файлами откройте «AI-аккаунт», включите и выберите аккаунт.'
 ErrFileAISearchBadPattern: 'Недопустимый шаблон поиска (regex и т.п.): {{ .detail }}'
+FileAISearchEmptyDir: 'В этом пути нет файлов или каталогов для отображения (или все отфильтрованы).'
+
+# удаленная загрузка
 ErrWgetRemoteFailed: 'Неверный или недоступный URL удалённой загрузки: {{ .detail }}'
 ErrWgetInvalidContentType: 'Удалённый сервер вернул не файл (возможно, страницу ошибки), {{ .detail }}'
 ErrWgetProxyNotConfigured: 'Сначала настройте прокси-сервер в настройках панели'
 ErrWgetProxyInvalid: 'Недопустимый адрес прокси-сервера: {{ .detail }}'
-ErrRecordExist: 'Запись уже существует'
-ErrRecordNotFound: 'Запись не найдена'
-ErrStructTransform: 'Ошибка преобразования: {{ .err }}'
+
+# вход и безопасность
 ErrNotLogin: 'Не авторизован: {{ .detail }}'
 ErrPasswordExpired: 'Пароль истёк: {{ .detail }}'
-ErrNotSupportType: 'Тип не поддерживается: {{ .name }}'
-ErrAlertMethodNotSupported: 'Эта версия не поддерживает данный способ оповещения'
+
+# запрос и API
 ErrProxy: 'Запрос не удался: {{ .detail }}'
 ErrApiConfigStatusInvalid: 'API отключено: {{ .detail }}'
 ErrApiConfigKeyInvalid: 'Неверный API-ключ: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP не в списке: {{ .detail }}'
 ErrApiConfigDisable: 'Доступ по API запрещён: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Неверная метка времени: {{ .detail }}'
-ErrShutDown: 'Команда остановлена вручную'
+ErrCreateHttpClient: 'Не удалось создать запрос {{ .err }}'
+ErrHttpReqTimeOut: 'Истекло время ожидания запроса {{ .err }}'
+ErrHttpReqFailed: 'Запрос не выполнен {{ .err }}'
+ErrNoSuchHost: 'Не удалось найти запрошенный сервер {{ .err }}'
+ErrHttpReqNotFound: 'Запрошенный ресурс {{ .err }} не найден'
+
+# быстрый переход
 ErrMinQuickJump: 'Добавьте хотя бы одну быструю ссылку'
 ErrMaxQuickJump: 'Не более 4 быстрых ссылок'
+
+# общее
+ErrShutDown: 'Команда остановлена вручную'
 ErrUsernameIsExist: 'Имя пользователя занято'
 ErrNameIsExist: 'Имя уже занято'
 ErrDemoEnvironment: 'Недоступно в демо'
@@ -41,6 +59,8 @@ SystemRestart: 'Задача прервана из-за перезапуска �
 ErrGroupIsDefault: 'Группа по умолчанию, не может быть удалена'
 ErrGroupIsInWebsiteUse: 'Группа используется другим веб-сайтом и не может быть удалена.'
 Decrypt: 'Расшифровать'
+
+# агент
 ErrAgentAccountBound: 'Акаунт привязан к агенту'
 ErrTerminalAIAccountInUse: 'Эта учетная запись модели сейчас используется Terminal AI. Смените учетную запись в настройках Terminal AI или отключите Terminal AI и повторите попытку.'
 ErrAgentAccountUnavailable: 'Связь с аккаунтом недоступна: {{ .err }}'
@@ -65,14 +85,8 @@ ErrAgentWebsiteInUse: 'Этот сайт уже связан с другим а�
 ErrAgentWebsiteUnbindUnsupported: 'Сайты one-click deployment нельзя отвязать вручную'
 ErrHermesPairingCodeUnavailable: 'Код сопряжения временно недоступен в Hermes, возможно из-за проблем с сетью. Повторите попытку позже.'
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'Когда групповая политика Feishu — белый список, политика личных сообщений не может быть кодом сопряжения.'
-ErrAIProxyServiceNotInstalled: 'Сервис {{ .name }} не установлен'
-ErrAIProxyModelAccountNotFound: 'Аккаунт модели {{ .id }} не найден'
-ErrAIProxyModelMapRequired: 'Это поле обязательно.'
-ErrAIProxyModelMapInvalid: 'Сопоставление моделей должно быть допустимым JSON-объектом: {{ .err }}'
-ErrAIProxyModelMapEmpty: 'Сопоставление моделей не может быть пустым'
-ErrAIProxyModelMapEmptyExternalModel: 'Сопоставление моделей содержит пустую запрошенную модель'
-ErrAIProxyModelMapEmptyUpstreamModel: 'Upstream-модель для {{ .model }} не может быть пустой'
-AIProxyUserFallback: 'Удаленный пользователь (ID: {{ .id }})'
+
+# резервное копирование и настройки оповещений
 Localhost: 'Локальная машина'
 ErrBackupInUsed: 'Аккаунт бэкапа занят задачей'
 ErrBackupCheck: 'Проверка подключения не удалась: {{ .err }}'
@@ -80,6 +94,8 @@ ErrBackupLocalDelete: 'Нельзя удалить локальные бэкап
 ErrBackupLocalCreate: 'Нельзя создать локальные бэкапы'
 ErrAlertConfigInUse: 'Конфигурация оповещений используется и не может быть удалена'
 ErrAlertConfigPhoneExist: 'Номер телефона уже существует'
+
+# приложение
 ErrPortInUsed: '{{ .detail }} порт уже занят'
 ErrAppLimit: 'Количество установленных приложений превысило лимит'
 ErrNotInstall: 'Приложение не установлено'
@@ -97,11 +113,6 @@ ErrFileParseApp: '{{ .name }} анализ файла не удался {{ .err 
 ErrAppDirNull: 'Папка версии не существует'
 LocalAppErr: 'Синхронизация приложения {{ .name }} не удалась {{ .err }}'
 ErrContainerName: 'Имя контейнера уже существует'
-ErrCreateHttpClient: 'Не удалось создать запрос {{ .err }}'
-ErrHttpReqTimeOut: 'Истекло время ожидания запроса {{ .err }}'
-ErrHttpReqFailed: 'Запрос не выполнен {{ .err }}'
-ErrNoSuchHost: 'Не удалось найти запрошенный сервер {{ .err }}'
-ErrHttpReqNotFound: 'Запрошенный ресурс {{ .err }} не найден'
 ErrContainerNotFound: 'Контейнер {{ .name }} не существует'
 ErrContainerMsg: 'Контейнер {{ .name }} ненормален. Подробности смотрите в журнале на странице контейнера.'
 ErrAppBackup: '{{ .name }} резервное копирование приложения не удалось {{ .err }}'
@@ -132,6 +143,8 @@ ErrDockerFailed: 'Состояние Docker аномально, проверьт
 ErrDockerComposeCmdNotFound: 'Команда Docker Compose отсутствует, пожалуйста, установите эту команду на хост-машине сначала'
 UseExistImage: 'Образ уже существует, используется существующий образ'
 ErrDatabaseNotFound: 'База данных {{ .name }} не существует'
+
+# SSH
 ExportIP: 'IP входа'
 ExportArea: 'Местоположение'
 ExportPort: 'Порт'
@@ -139,6 +152,8 @@ ExportAuthMode: 'Способ входа'
 ExportUser: 'Пользователь'
 ExportStatus: 'Статус входа'
 ExportDate: 'Время'
+
+# файл
 ErrFileCanNotRead: 'Этот файл не поддерживает предварительный просмотр'
 ErrSensitiveFileRead: 'Чтение конфиденциальных файлов запрещено'
 ErrFileToLarge: 'Файл больше 10 МБ и не может быть открыт'
@@ -165,6 +180,8 @@ FileDropFailed: 'Не удалось очистить файл {{ .name }}: {{ .
 FileDropSuccess: 'Файл {{ .name }} успешно очищен, удалено {{ .count }} файлов, освобождено {{ .size }} дискового пространства'
 FileDropSum: 'Очистка файлов завершена успешно, всего удалено {{ .count }} файлов, освобождено {{ .size }} дискового пространства'
 ErrBadDecrypt: 'Ошибка пароля расшифровки сжатого пакета, распаковка не удалась, проверьте и повторите попытку'
+
+# сайт
 ErrAliasIsExist: 'Псевдоним уже существует'
 ErrBackupMatch: 'Файл резервной копии не соответствует некоторым текущим данным веб-сайта {{ .detail }}'
 ErrBackupExist: 'Соответствующая часть исходных данных в файле резервной копии не существует {{ .detail }}'
@@ -194,6 +211,8 @@ delete: 'Удалить'
 ErrDefaultWebsite: 'Веб-сайт по умолчанию уже установлен, отмените его перед настройкой'
 SSL: 'Сертификат'
 Set: 'Настройки'
+
+# SSL-сертификат
 ErrSSLCannotDelete: 'Сертификат {{ .name }} используется веб-сайтом и не может быть удален'
 ErrAccountCannotDelete: 'Учетная запись связана с сертификатом и не может быть удалена'
 ErrSSLApply: 'Обновление сертификата прошло успешно, перезагрузка OpenResty не удалась, проверьте конфигурацию'
@@ -228,6 +247,8 @@ ErrApplySSLCanNotDelete: 'Нельзя удалить сертификат {{ .n
 StartPushSSLToNode: 'Начало отправки сертификата на узел'
 PushSSLToNodeFailed: 'Не удалось отправить сертификат на узел: {{ .err }}'
 PushSSLToNodeSuccess: 'Сертификат успешно отправлен на узел'
+
+# MySQL
 ErrUserIsExist: 'Текущий пользователь уже существует, пожалуйста, введите еще раз'
 ErrDatabaseIsExist: 'Текущая база данных уже существует, пожалуйста, введите ее повторно'
 ErrExecTimeOut: 'Время выполнения SQL истекло, проверьте базу данных'
@@ -236,7 +257,11 @@ ErrLocalExist: 'Имя уже существует в локальной баз�
 RemoteBackup: 'Для резервного копирования удаленной базы данных необходимо сначала запустить службу базы данных локального контейнера с помощью образа {{ .name }}, пожалуйста, подождите...'
 RemoteRecover: 'Для восстановления удаленной базы данных необходимо сначала запустить службу базы данных локального контейнера с помощью образа {{ .name }}, пожалуйста, подождите...'
 Arg: 'Аргумент'
+
+# Redis
 ErrTypeOfRedis: 'Тип файла восстановления не соответствует текущему методу сохранения. Измените его и повторите попытку'
+
+# контейнер
 ErrInUsed: '{{ .detail }} используется и не может быть удалено'
 ErrObjectInUsed: 'Этот объект используется и не может быть удален'
 ErrObjectBeDependent: 'Этот образ зависит от других образов и не может быть удален'
@@ -278,6 +303,8 @@ ComposeRecoverFiles: 'Восстановить файлы compose'
 ComposeRecoverContainers: 'Восстановить контейнеры compose'
 ComposeRecoverRecord: 'Сохранить запись compose'
 ComposeRecoverCleanup: 'Очистить рабочую область восстановления compose'
+
+# среда выполнения
 ErrFileNotExist: 'Файл {{ .detail }} не существует Проверьте целостность исходного файла'
 ErrImageBuildErr: 'Сборка образа не удалась'
 ErrImageExist: 'Изображение уже существует Пожалуйста, измените имя изображения.'
@@ -290,12 +317,16 @@ ErrNodeModulesNotFound: 'Папка node_modules не существует Из�
 ErrContainerNameIsNull: 'Имя контейнера не существует'
 ErrPHPPortIsDefault: 'Порт 9000 зарезервирован как стандартный. Укажите другой порт'
 ErrPHPRuntimePortFailed: 'Порт {{ .name }} уже используется этой средой выполнения'
+
+# инструмент
 ErrConfigNotFound: 'Файл конфигурации не существует'
 ErrConfigParse: 'Неверный формат файла конфигурации'
 ErrConfigIsNull: 'Файл конфигурации не может быть пустым'
 ErrConfigDirNotFound: 'Рабочий каталог не существует'
 ErrConfigAlreadyExist: 'Файл конфигурации с таким именем уже существует'
 ErrUserFindErr: 'Поиск пользователя {{ .name }} не удался {{ .err }}'
+
+# задание cron
 CutWebsiteLogSuccess: 'Журнал веб-сайта {{ .name }} успешно вырезан, путь к резервной копии {{ .path }}'
 HandleShell: 'Выполнить скрипт {{ .name }}'
 HandleCurl: 'Доступ к URL {{ .name }}'
@@ -314,6 +345,8 @@ NoSuchResource: 'В базе данных не найдено содержимо
 CleanLog: 'Очистить журнал'
 CleanLogByName: 'Очистить журнал {{ .name }}'
 WafIpGroupNotFound: 'Группа IP WAF не найдена. Пожалуйста, перейдите в [Расширенные функции - WAF - Черный/Белый список - Группа IP], чтобы добавить группу IP с помощью метода удаленной загрузки.'
+
+# панель инструментов
 ErrNotExistUser: 'Текущий пользователь не существует, измените его и повторите попытку'
 ErrBanAction: 'Настройка не удалась. Текущая служба {{ .name }} недоступна. Проверьте и повторите попытку'
 ErrClamdscanNotFound: 'Команда clamdscan не обнаружена, обратитесь к документации, чтобы установить ее'
@@ -322,11 +355,15 @@ SetSwap: 'Настроить Swap {{ .path }} - {{ .size }}'
 CreateSwap: 'Создать Файл Swap'
 FormatSwap: 'Форматировать Файл Swap'
 EnableSwap: 'Включить Swap'
+
+# защита от изменений
 CleanTamperSetting: 'Очистить исторические настройки защиты'
 SetTamperWithRules: 'Запустить защиту каталога согласно правилам'
 ProtectDir: 'Защитить каталог {{ .name }}'
 IgnoreFile: 'Защитить файл {{ .name }}'
 TamperSetSuccessful: 'Настройки защиты завершены, начинаю мониторинг следующих каталогов:'
+
+# WAF
 ErrScope: 'Изменение этой конфигурации не поддерживается'
 ErrStateChange: 'He удалось изменить состояние'
 ErrRuleExist: 'Правило уже существует'
@@ -381,6 +418,8 @@ OpenrestyNotFound: 'OpenResty не установлен'
 remoteIpIsNull: 'Список IP пуст'
 OpenrestyVersionErr: 'Версия OpenResty слишком старая. Обновите до 1.27.1.2-2-2-focal'
 ErrFileTooLarge: 'Файл больше 1 МБ и не может быть загружен'
+
+# задача
 TaskStart: '{{ .name }} Задача начинается [START]'
 TaskEnd: '{{ .name }} Задача выполнена [ЗАВЕРШЕНО]'
 TaskFailed: 'Задача {{ .name }} не выполнена'
@@ -441,10 +480,17 @@ CustomAppstore: 'Хранилище пользовательских прило�
 TaskExec: 'Выполнить'
 TaskBatch: 'Пакетная операция'
 FileConvert: 'Преобразование формата файла'
+
+# задача - ClamAV
 Clamscan: 'Сканировать {{ .name }}'
 TaskScan: 'Сканировать'
+
+# задача - AI
 OllamaModelPull: 'Вытянуть модель Ollama {{ .name }}'
 OllamaModelSize: 'Получить размер модели Ollama {{ .name }}'
+AIBenchmarkRun: "Выполнить тест производительности AI"
+
+# задача - снимок
 Snapshot: 'Снимок'
 SnapDBInfo: 'Запись информации о базе данных 1Panel'
 SnapCopy: 'Копировать файлы и каталоги {{ .name }}'
@@ -494,6 +540,8 @@ RecoverDaemonJson: 'Восстановить файл конфигурации �
 RecoverDBData: 'Восстановить данные базы данных'
 RecoverBackups: 'Восстановить локальный каталог резервных копий'
 RecoverPanelData: 'Каталог данных восстановления'
+
+# задача - контейнер
 ContainerImagePull: 'Извлечь изображение контейнера {{ .name }}'
 ContainerRemoveOld: 'Удалить исходный контейнер {{ .name }}'
 ContainerImageCheck: 'Проверьте, нормально ли извлекается изображение'
@@ -502,6 +550,8 @@ ContainerRecreate: 'Обновление контейнера не удалос�
 ContainerCreate: 'Создать новый контейнер {{ .name }}'
 ContainerCreateFailed: 'Создание контейнера не удалось, удалите неудавшийся контейнер'
 ContainerStartCheck: 'Проверить, запущен ли контейнер'
+
+# задача - образ
 ImageBuild: 'Создание изображения'
 ImagePull: 'Вытащить изображение'
 ImageRepoAuthFromDB: 'Получить информацию об аутентификации репозитория из базы данных'
@@ -509,6 +559,8 @@ ImagePush: 'Отправить изображение'
 ImageRenameTag: 'Изменить тег изображения'
 ImageNewTag: 'Новый тег изображения {{ .name }}'
 ComposeCreate: 'Создать композицию'
+
+# задача - сайт
 BackupNginxConfig: 'Резервное копирование файла конфигурации OpenResty веб-сайта'
 CompressFileSuccess: 'Каталог успешно сжат, сжат в {{ .name }}'
 CompressDir: 'Каталог сжатия'
@@ -519,8 +571,15 @@ websiteDir: 'Каталог веб-сайтов'
 RecoverFailedStartRollBack: 'Восстановление не удалось, начать откат'
 AppBackupFileIncomplete: 'Файл резервной копии неполный и в нем отсутствуют файлы app.json или app.tar.gz'
 AppAttributesNotMatch: 'Тип или имя приложения не совпадают'
+
+# оповещение
+ErrAlertMethodNotSupported: 'Эта версия не поддерживает данный способ оповещения'
 ErrAlertSync: 'Ошибка синхронизации информации о тревоге, проверьте и повторите попытку'
+
+# задача - среда выполнения
 ErrInstallExtension: 'Уже выполняется задача установки, подождите, пока задача завершится'
+
+# шаблон письма оповещения
 PanelAlertTitle: 'Уведомление панели'
 TestAlertTitle: 'Тестовое письмо - проверка подключения'
 TestAlert: 'Это тестовое письмо для проверки правильности настройки отправки писем.'
@@ -537,6 +596,8 @@ CommonAlert: 'Ваш панель {{ .node }}{{ .ip }}, {{ .msg }}. Войдит
 NodeExceptionAlert: 'Ваш панель {{ .node }}{{ .ip }}, {{ .num }} узлов работают с ошибками. Войдите в панель для получения деталей.'
 LicenseExceptionAlert: 'Ваш панель {{ .node }}{{ .ip }}, {{ .num }} лицензий имеют ошибки. Войдите в панель для получения деталей.'
 SSHAndPanelLoginAlert: 'Ваш панель {{ .node }}{{ .ip }}, вход {{ .name }} с адреса {{ .loginIp }} является аномальным. Войдите в панель для получения деталей.'
+
+# диск
 DeviceNotFound: 'Устройство {{ .name }} не найдено'
 DeviceIsMounted: 'Устройство {{ .name }} подключено, сначала отключите'
 PartitionDiskErr: 'Не удалось разделить, {{ .err }}'
@@ -544,9 +605,18 @@ FormatDiskErr: 'Не удалось отформатировать диск, {{ 
 MountDiskErr: 'Не удалось подключить диск, {{ .err }}'
 XfsNotFound: 'Файловая система xfs не обнаружена, сначала установите xfsprogs'
 
-# terminal
+# терминал
 TerminalAIBlockedRiskyCommand: 'Опасная команда заблокирована: {{ .command }}'
 TerminalAIThinking: 'AI думает...'
 TerminalAIReadyToExecute: 'Обдумывание завершено, нажмите Enter для выполнения (время: {{ .duration }}, token: {{ .tokens }})'
 TerminalAIRequestFailed: 'Ошибка запроса AI: {{ .err }}'
-FileAISearchEmptyDir: 'В этом пути нет файлов или каталогов для отображения (или все отфильтрованы).'
+
+# AI-шлюз
+ErrAIProxyServiceNotInstalled: 'Сервис {{ .name }} не установлен'
+ErrAIProxyModelAccountNotFound: 'Аккаунт модели {{ .id }} не найден'
+ErrAIProxyModelMapRequired: 'Это поле обязательно.'
+ErrAIProxyModelMapInvalid: 'Сопоставление моделей должно быть допустимым JSON-объектом: {{ .err }}'
+ErrAIProxyModelMapEmpty: 'Сопоставление моделей не может быть пустым'
+ErrAIProxyModelMapEmptyExternalModel: 'Сопоставление моделей содержит пустую запрошенную модель'
+ErrAIProxyModelMapEmptyUpstreamModel: 'Upstream-модель для {{ .model }} не может быть пустой'
+AIProxyUserFallback: 'Удаленный пользователь (ID: {{ .id }})'

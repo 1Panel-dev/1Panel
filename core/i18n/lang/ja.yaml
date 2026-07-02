@@ -1,84 +1,65 @@
+# 基本エラー
 ErrInvalidParams: '不正なリクエスト: {{ .detail }}'
 ErrTokenParse: 'トークンエラー: {{ .detail }}'
 ErrInitialPassword: '元のパスワードが違います'
 ErrInternalServer: '内部エラー: {{ .detail }}'
+ErrInternalServerKey: "サーバー内部エラー: "
 ErrRecordExist: 'レコードが既に存在します'
 ErrRecordNotFound: 'レコードが見つかりません'
 ErrStructTransform: '型変換エラー: {{ .err }}'
-ErrNotLogin: 'ログインしていません: {{ .detail }}'
-ErrSessionDataNotFound: "現在のセッションは期限切れです！"
-ErrSessionDataFormat: "現在のセッションデータ形式が異常です！"
-ErrPasswordExpired: 'パスワード期限切れ: {{ .detail }}'
 ErrNotSupportType: '未対応のタイプ: {{ .name }}'
-ErrProxy: 'リクエストに失敗しました: {{ .detail }}'
-ErrApiConfigStatusInvalid: 'API利用不可: {{ .detail }}'
-ErrApiConfigKeyInvalid: 'APIキーが無効です: {{ .detail }}'
-ErrApiConfigIPInvalid: 'IPが許可されていません: {{ .detail }}'
-ErrApiConfigDisable: 'APIは無効です: {{ .detail }}'
-ErrApiConfigKeyTimeInvalid: 'タイムスタンプが無効です: {{ .detail }}'
-ErrLoginLocked: "失敗回数が多すぎます。ログインは 5 分間一時的にロックされています。"
+ErrDemoEnvironment: 'デモ環境では利用できません'
+ErrCmdTimeout: 'コマンドがタイムアウトしました'
+ErrPortInUsed: "{{ .name }} ポートはすでに使用されています！"
+ErrFileNotFound: "{{ .name }} ファイルが存在しません"
+ErrReqFailed: "{{.name}} リクエスト失敗: {{ .err }}"
 
-# request
+# リクエストとセキュリティ入口
 ErrNoSuchHost: "要求されたサーバーが見つかりません {{ .err }}"
 ErrHttpReqNotFound: "要求されたリソースが見つかりません {{ .err }}"
 ErrHttpReqFailed: "リクエスト失敗 {{ .err }}"
 ErrHttpReqTimeOut: "リクエストタイムアウト {{ .err }}"
 ErrCreateHttpClient: "リクエストの作成に失敗しました {{ .err }}"
+ErrProxy: 'リクエストに失敗しました: {{ .detail }}'
 ErrProxySetting: "プロキシサーバー情報が利用できません {{ .err }}、確認して再試行してください！"
+ErrEntrance: "セキュリティ情報エラー、再確認してください！"
 ErrEntranceFormat: "セキュリティエントランス {{ .name }} は現在サポートされていません。確認して再試行してください！"
 
-# common
-ErrDemoEnvironment: 'デモ環境では利用できません'
-ErrCmdTimeout: 'コマンドがタイムアウトしました'
-ErrVMNotFound: "仮想マシンが存在しません"
-ErrVMAlreadyExists: "仮想マシンは既に存在します"
-ErrVMRunning: "仮想マシンは実行中です"
-ErrVMLibvirtConnect: "libvirt への接続に失敗しました: {{ .detail }}"
-ErrVMPermission: "仮想マシンを操作する権限がありません: {{ .detail }}"
-ErrVMNetworkNotFound: "仮想マシンネットワークが存在しません: {{ .detail }}"
-ErrVMInvalidPath: "仮想マシンのパスが無効です: {{ .detail }}"
-ErrVMInvalidInput: "仮想マシンのパラメータが無効です: {{ .detail }}"
-ErrVMCommandFailed: "仮想マシンコマンドの実行に失敗しました: {{ .err }}"
-VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
-VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
-VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
-ErrEntrance: "セキュリティ情報エラー、再確認してください！"
+# ログインとセキュリティ
+ErrNotLogin: 'ログインしていません: {{ .detail }}'
+ErrSessionDataNotFound: "現在のセッションは期限切れです！"
+ErrSessionDataFormat: "現在のセッションデータ形式が異常です！"
+ErrPasswordExpired: 'パスワード期限切れ: {{ .detail }}'
+ErrLoginLocked: "失敗回数が多すぎます。ログインは 5 分間一時的にロックされています。"
+ErrApiConfigStatusInvalid: 'API利用不可: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'APIキーが無効です: {{ .detail }}'
+ErrApiConfigIPInvalid: 'IPが許可されていません: {{ .detail }}'
+ErrApiConfigDisable: 'APIは無効です: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'タイムスタンプが無効です: {{ .detail }}'
+ErrPasskeyDisabled: "Passkeyを使用するにはHTTPSを有効にする必要があります"
+ErrPasskeyNotConfigured: "Passkeyが設定されていません"
+ErrPasskeyLimit: "Passkeyの上限に達しました（最大5個）"
+ErrPasskeySession: "Passkeyセッションの有効期限が切れているか無効です"
+ErrPasskeyDuplicate: "Passkeyは既に存在します"
+ErrPasskeyVerify: "Passkeyの検証に失敗しました"
+
+# ユーザーと権限
+ErrNoSuchUser: "ユーザー情報が見つかりません。確認して再試行してください！"
+ErrToMaster: "このユーザーにはマスターノードでこの操作を実行する権限がありません。確認して再試行してください！"
+ErrToNode: "このユーザーにはこのノードでこの操作を実行する権限がありません。確認して再試行してください！"
+ErrRBAC: "ユーザー権限が不足しているため、この操作を実行できません。確認して再試行してください！"
+ErrNoneNode: "このユーザーにはノード権限がありません。管理者に連絡するか、確認して再試行してください！"
+ErrOnlySuperAdmin: "この機能はスーパー管理者のみ使用できます！"
+ErrRolePresetCannotDelete: "システム既定ロールは削除できません"
+ErrRolePresetCannotUpdate: "システム既定ロールは更新できません"
+ErrRoleBoundToUser: "このロールはすでにユーザーに紐付いているため削除できません"
+ErrRolePresetCannotBind: "システム既定ロールはユーザーに割り当てできません"
+ErrNodeAdminMasterForbidden: "マスターノードにノード管理者権限を追加することはできません"
+ErrSuperAdminCannotDelete: "スーパー管理者ユーザーは削除できません"
 ErrGroupIsDefault: "デフォルトグループの削除はできません"
 ErrGroupIsInUse: "グループは使用中のため、削除できません。"
-ErrAIProxyUserGroupIsDefault: "デフォルトユーザーグループは削除できません"
-ErrAIProxyUserGroupInUse: "ユーザーグループは使用中のため、削除できません。"
-ErrAIProxyUserGroupExists: "ユーザーグループ名は既に存在します。"
-ErrAIProxyBackendAccountExists: "このモデルアカウントは既に AI ゲートウェイのアカウントプールにインポートされています。"
-ErrAIProxyModelGroupInUse: "モデルグループは使用中のため、削除できません。"
-ErrAIProxyModelGroupExists: "モデルグループ名は既に存在します。"
-ErrAIProxySensitiveGroupInUse: "センシティブワードグループは使用中のため削除できません。"
-ErrAIProxySensitiveGroupExists: "センシティブワードグループ名は既に存在します。"
-ErrLocalDelete: "ローカルノードは削除できません！"
-ErrPortInUsed: "{{ .name }} ポートはすでに使用されています！"
-ErrInternalServerKey: "サーバー内部エラー: "
-MasterNode: "マスターノード"
 
-# app
-CustomAppStoreFileValid: "アプリストアパッケージは .tar.gz 形式である必要があります"
-ErrFileNotFound: "{{ .name }} ファイルが存在しません"
-AppBackup: 'アプリケーションバックアップ'
-AppBackupPush: 'アプリケーションバックアップファイル {{.file}} をノード {{ .name }} に転送'
-ErrSourceTargetSame: 'ソースノードとターゲットノードは同じにできません！'
-AppInstall: 'ノード {{ .targetNode }} にアプリケーション {{ .name }} をインストール'
-AppInstallCheck: 'アプリケーションインストール環境を確認'
-
-# backup
-ErrBackupInUsed: 'バックアップアカウントがスケジュールで使用中'
-ErrBackupCheck: '接続テストに失敗しました: {{ .err }}'
-ErrBackupLocal: "ローカルサーバーバックアップアカウントはこの操作をサポートしていません！"
-ErrBackupPublic: "このバックアップアカウントが公開されていないと検出されました。再確認してください！"
-ErrOSSConn: "最新バージョンを取得できません。外部ネットワーク接続を確認してください。"
-
-
-#license
+# ライセンス
 LicenseCheck: 'ライセンスが利用可能か確認する'
 ErrLicenseInUsed: 'このライセンスは既に紐付けられています。確認して再試行してください！'
 ErrLicenseExpired: 'このライセンスは期限切れです。確認して再試行してください！'
@@ -108,21 +89,6 @@ ErrNodeUnbind: "そのノードはライセンスのバインド範囲内では�
 ErrNodeBind: "そのノードはライセンスにバインドされています、確認して再試行してください"
 ErrNodeLocalRollback: "マスターノードでは直接ロールバックできません。'1pctl restore' を手動で実行してロールバックしてください"
 ErrIntlLicense: "現在のバージョンでは国際版ライセンスのインポートはまだサポートされていません。しばらくお待ちください！"
-
-# user
-ErrNoSuchUser: "ユーザー情報が見つかりません。確認して再試行してください！"
-ErrToMaster: "このユーザーにはマスターノードでこの操作を実行する権限がありません。確認して再試行してください！"
-ErrToNode: "このユーザーにはこのノードでこの操作を実行する権限がありません。確認して再試行してください！"
-ErrRBAC: "ユーザー権限が不足しているため、この操作を実行できません。確認して再試行してください！"
-ErrNoneNode: "このユーザーにはノード権限がありません。管理者に連絡するか、確認して再試行してください！"
-ErrOnlySuperAdmin: "この機能はスーパー管理者のみ使用できます！"
-ErrRolePresetCannotDelete: "システム既定ロールは削除できません"
-ErrRolePresetCannotUpdate: "システム既定ロールは更新できません"
-ErrRoleBoundToUser: "このロールはすでにユーザーに紐付いているため削除できません"
-ErrRolePresetCannotBind: "システム既定ロールはユーザーに割り当てできません"
-ErrNodeAdminMasterForbidden: "マスターノードにノード管理者権限を追加することはできません"
-ErrSuperAdminCannotDelete: "スーパー管理者ユーザーは削除できません"
-
 InvalidRequestBodyType: "リクエストボディの形式が無効です。内容が要求された形式に準拠しているか確認してから再試行してください！"
 InvalidLicenseCodeType: "提供されたライセンスコードの形式が無効です。確認してから再試行してください！"
 LicenseNotFoundType: "ライセンスが見つかりません。提供されたライセンスに一致する記録がシステム内に存在しません。確認してから再試行してください！"
@@ -133,10 +99,64 @@ InvalidAssigneeType: "ライセンス割り当ての対象ユーザーまたは�
 LicenseUsageNotFoundType: "使用記録がありません。このライセンスはまだ有効化または使用されていません。確認してから再試行してください！"
 LicenseUsageLimitExceededType: "このライセンスは既に他のノードにバインドされています。確認してから再試行してください！"
 
-# alert
+# ノードとクラスター
+MasterNode: "マスターノード"
+Node: "ノード"
+ErrLocalDelete: "ローカルノードは削除できません！"
+ErrMasterDelete: "マスターノードを削除できません。スレーブノードを先に削除してください。"
+ClusterNameIsExist: "クラスタ名は既に存在します。"
+AppStatusUnHealthy: "アプリケーションのステータス取得が異常です。ノードリストでインストールノードのステータスを確認してください。"
+MasterNodePortNotAvailable: "ノード {{ .name }} のポート {{ .port }} の接続性検証が失敗しました。ファイアウォール/セキュリティグループの設定とマスターノードのステータスを確認してください。"
+ClusterMasterNotExist: "クラスタのマスターノードが切断されています。子ノードを削除してください。"
+
+# 仮想マシン
+ErrVMNotFound: "仮想マシンが存在しません"
+ErrVMAlreadyExists: "仮想マシンは既に存在します"
+ErrVMRunning: "仮想マシンは実行中です"
+ErrVMLibvirtConnect: "libvirt への接続に失敗しました: {{ .detail }}"
+ErrVMPermission: "仮想マシンを操作する権限がありません: {{ .detail }}"
+ErrVMNetworkNotFound: "仮想マシンネットワークが存在しません: {{ .detail }}"
+ErrVMInvalidPath: "仮想マシンのパスが無効です: {{ .detail }}"
+ErrVMInvalidInput: "仮想マシンのパラメータが無効です: {{ .detail }}"
+ErrVMCommandFailed: "仮想マシンコマンドの実行に失敗しました: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
+
+# アプリ
+CustomAppStoreFileValid: "アプリストアパッケージは .tar.gz 形式である必要があります"
+AppBackup: 'アプリケーションバックアップ'
+AppBackupPush: 'アプリケーションバックアップファイル {{.file}} をノード {{ .name }} に転送'
+ErrSourceTargetSame: 'ソースノードとターゲットノードは同じにできません！'
+AppInstall: 'ノード {{ .targetNode }} にアプリケーション {{ .name }} をインストール'
+AppInstallCheck: 'アプリケーションインストール環境を確認'
+
+# バックアップ
+ErrBackupInUsed: 'バックアップアカウントがスケジュールで使用中'
+ErrBackupCheck: '接続テストに失敗しました: {{ .err }}'
+ErrBackupLocal: "ローカルサーバーバックアップアカウントはこの操作をサポートしていません！"
+ErrBackupPublic: "このバックアップアカウントが公開されていないと検出されました。再確認してください！"
+ErrOSSConn: "最新バージョンを取得できません。外部ネットワーク接続を確認してください。"
+MvBackup: "データをバックアップディレクトリに移動"
+
+# アラート
 ErrAlertSync: "アラート情報の同期エラーです。後で再試行してください！"
 
-#task
+# AIゲートウェイ
+ErrAIProxyUserGroupIsDefault: "デフォルトユーザーグループは削除できません"
+ErrAIProxyUserGroupInUse: "ユーザーグループは使用中のため、削除できません。"
+ErrAIProxyUserGroupExists: "ユーザーグループ名は既に存在します。"
+ErrAIProxyBackendAccountExists: "このモデルアカウントは既に AI ゲートウェイのアカウントプールにインポートされています。"
+ErrAIProxyModelGroupInUse: "モデルグループは使用中のため、削除できません。"
+ErrAIProxyModelGroupExists: "モデルグループ名は既に存在します。"
+ErrAIProxySensitiveGroupInUse: "センシティブワードグループは使用中のため削除できません。"
+ErrAIProxySensitiveGroupExists: "センシティブワードグループ名は既に存在します。"
+AIBenchmarkRun: "AIベンチマークを実行"
+
+# タスク
 TaskStart: "{{ .name }} タスク開始 [START]"
 TaskEnd: "{{ .name }} タスク終了 [COMPLETED]"
 TaskFailed: "{{ .name }} タスク失敗"
@@ -150,6 +170,16 @@ TaskUpgrade: "アップグレード"
 TaskSync: '同期'
 TaskSyncForNode: "ノードデータを同期"
 TaskBackup: "バックアップ"
+TaskPush: "送信"
+TaskRsync: "Sync"
+SuccessStatus: "{{ .name }} 成功"
+FailedStatus: "{{ .name }} 失敗 {{ .err }}"
+Start: "開始"
+SubTask: "サブタスク"
+Skip: "エラーを無視して続行..."
+Success: "成功"
+
+# エージェント一括タスク
 BatchInstallAgent: "エージェントの一括インストール"
 DispatchAgentInstallTasks: "エージェントインストールタスクを配信"
 BatchUpgradeAgent: "エージェントの一括アップグレード"
@@ -183,20 +213,15 @@ AgentOperateStart: "開始"
 AgentOperateStop: "停止"
 AgentOperateRestart: "再起動"
 AgentOperateDelete: "削除"
-SuccessStatus: "{{ .name }} 成功"
-FailedStatus: "{{ .name }} 失敗 {{ .err }}"
-Start: "開始"
-SubTask: "サブタスク"
-Skip: "エラーを無視して続行..."
+
+# アプリとスキルのタスク
 PushAppInstallTaskToNode: "ノード [{{ .name }}] にアプリインストールタスクを送信"
-TaskPush: "送信"
 AppInstallTask: "アプリインストールタスク"
 PushAppFailed: "アプリインストールタスクの送信に失敗しました"
 SkillHubInstallTask: "スキルをインストール [{{ .name }}]"
 SkillHubInstallToTarget: "ターゲットにスキルをインストール [{{ .name }}]"
-Success: "成功"
 
-#script
+# スクリプトライブラリ
 ScriptLibrary: "スクリプトライブラリ"
 RemoteScriptLibrary: "リモートスクリプトライブラリ"
 ScriptSyncSkip: "現在のスクリプトライブラリは最新バージョンです！"
@@ -204,7 +229,7 @@ DownloadData: "スクリプトライブラリファイル data.yaml をダウン
 DownloadPackage: "スクリプトライブラリパッケージをダウンロード中"
 AnalyticCompletion: "解析が完了しました、データベースに同期しています..."
 
-Node: "ノード"
+# ノード同期
 SyncNode: "データをノード {{ .name }} に同期"
 LocalName: "'local'名称はシステムのローカル識別のみに使用されます"
 SyncPackageData: "同期データのパッケージ化"
@@ -220,7 +245,7 @@ SyncCustomApp: "カスタムアプリ"
 SyncLanguage: "システム言語"
 SyncEdition: "実行リージョン"
 
-#upgrade node
+# ノードアップグレード
 NodeUpgrade: "{{ .name }} ノードのアップグレード"
 UpgradeCheck: "ノードの更新を確認"
 UpgradeCheckLocal: "ローカルノードは一括アップグレードをサポートしていないため、スキップします..."
@@ -233,12 +258,11 @@ LoadAutoUpgradeNodesFailed: "自動アップグレードノードの読み込み
 AutoUpgradeNodes: "自動アップグレードノード: {{ .nodes }}"
 UpdateAutoUpgradeNodesStatusFailed: "自動アップグレードノードのステータス更新に失敗しました、エラー: {{ .err }}"
 
-#add node
+# ノード追加
 MasterData: "マスターノードデータ"
 LoadSftpClient: "SFTPクライアントの取得"
 PackageMasterData: "マスターノードのバックアップパッケージを生成"
 UploadBackup: "バックアップデータをアップロード"
-MvBackup: "データをバックアップディレクトリに移動"
 TaskAddNode: "ノードを追加"
 LoadNodeArch: "ノードアーキテクチャ情報を取得"
 LoadNodeArchDetail: "検出されたマスターノードアーキテクチャ: {{ .local }}, 子ノードアーキテクチャ: {{ .node }}"
@@ -251,7 +275,35 @@ SendAgent: "ノードインストールパッケージを送信"
 StartService: "サービスを開始"
 NoBackupNode: "現在バックアップノードが空です。保存するバックアップノードを選択して再試行してください！"
 
-#cmd
+# ノードファイルとイメージ同期
+LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
+HandlePrivateKey: "Handle node private key"
+HandlePublicKey: "Handle node public key"
+ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
+NodeFile: "Node file"
+ImageSyncTaskName: "Image sync {{ .count }} images"
+SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
+AppSyncTaskName: "App sync {{ .name }}"
+SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
+ImageSyncSave: "Save image {{ .image }}"
+ImageSyncSaveTags: "Save image tags {{ .tags }}"
+ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
+ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
+ImageSyncClean: "Clean temporary files for image {{ .image }}"
+ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
+ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
+ImageSyncHandlePrivateKey: "Handle image sync node private key"
+ImageSyncHandlePublicKey: "Handle image sync node public key"
+ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
+
+# コマンドライン
+SudoHelper: "{{.cmd}}を使用するか、ルートユーザーに切り替えてください"
+UsernameNeed: "Enterprise版では --username を指定する必要があります"
+DBConnErr: "エラー: データベース接続の初期化に失敗しました、{{ .err }}"
+SystemVersion: "バージョン: "
+SystemMode: "モード: "
+
+# コマンドライン - アプリ
 AppVersion: "アプリバージョン"
 AppCommands: "アプリ関連のコマンド"
 AppInit: "アプリを初期化します"
@@ -263,12 +315,14 @@ AppMissVersion: "アプリバージョンがありません、-vを使用して�
 AppVersionExist: "バージョンはすでに存在します！"
 AppCreateSuccessful: "創造は成功しました！"
 AppWriteErr: "file {{ .name }} write failed {{ .err }}"
-SudoHelper: "{{.cmd}}を使用するか、ルートユーザーに切り替えてください"
-UsernameNeed: "Enterprise版では --username を指定する必要があります"
+
+# コマンドライン - 監視IP
 ListenIPCommands: "リスニングIPを切り替えます"
 ListenIPv4: "IPv4で聞いてください"
 ListenIPv6: "IPv6で聞く"
 ListenChangeSuccessful: "切り替え成功！{{.Value}}で聞いています"
+
+# コマンドライン - リセット
 ResetCommands: "システム情報をリセットします"
 ResetMFA: "1パネルの2要素認証をキャンセルします"
 ResetHttps: "1Panel HTTPSログインをキャンセルします"
@@ -276,12 +330,19 @@ ResetEntrance: "1パネルの安全な入り口をキャンセルします"
 ResetIPs: "1パネル認定IP制限をキャンセルします"
 ResetDomain: "1パネルドメインバインディングをキャンセルします"
 ResetPasskey: "1Panel のパスキーをクリアします"
+
+# コマンドライン - ユーザー
 UserList: "1Panel ユーザー一覧を取得します"
 UserTableName: "名前"
 UserTableMFAStatus: "MFA ステータス"
 UserTableSuperAdmin: "スーパー管理者"
 UserTableCreatedAt: "作成日時"
 UserEmptyList: "ユーザーが見つかりません"
+UserInfo: "パネル情報を取得します"
+UserInfoAddr: "パネルアドレス: "
+UserInfoPassHelp: "ヒント: パスワードを変更するには、コマンドを実行できます。"
+
+# コマンドライン - 復元
 RestoreCommands: "1Panel のサービスとデータをロールバック"
 RestoreNoSuchFile: "ロールバックに使えるファイルが見つかりません"
 RestoreStep1: "（1/5）{{ .name }} ディレクトリから 1Panel のサービスとデータのロールバックを開始しています..."
@@ -290,6 +351,8 @@ RestoreStep3: "（3/5）1Panel スクリプトのロールバックが完了し�
 RestoreStep4: "（4/5）1Panel サービスのロールバックが完了しました"
 RestoreStep5: "（5/5）1Panel データのロールバックが完了しました"
 RestoreSuccessful: "ロールバックが完了しました。{{ .version }} に戻し、サービスを再起動しています..."
+
+# コマンドライン - 更新
 UpdateCommands: "パネル情報を更新します"
 UpdateUser: "ユーザー情報を更新します"
 UpdatePassword: "ユーザーパスワードを更新します"
@@ -316,50 +379,12 @@ UpdatePortResult: "パネルポート: {{ .name }}"
 UpdatePortFirewallAdd: "ファイアウォールポートルールの追加に失敗した{{ .err }}、ファイアウォールルールに{{ .name }}ポートを手動で追加してください。"
 UpdatePortFirewallDel: "エラー: ファイアウォールポートの削除に失敗しました、{{ .err }}"
 UpdatePortFirewallReload: "ファイアウォールのリロードに失敗しました{{ .err }}、ファイアウォールを手動でリロードしてください。"
-UserInfo: "パネル情報を取得します"
-UserInfoAddr: "パネルアドレス: "
-UserInfoPassHelp: "ヒント: パスワードを変更するには、コマンドを実行できます。"
-DBConnErr: "エラー: データベース接続の初期化に失敗しました、{{ .err }}"
-SystemVersion: "バージョン: "
-SystemMode: "モード: "
 
-#exchange
-LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
-HandlePrivateKey: "Handle node private key"
-HandlePublicKey: "Handle node public key"
-ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
-TaskRsync: "Sync"
-NodeFile: "Node file"
-ImageSyncTaskName: "Image sync {{ .count }} images"
-SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
-AppSyncTaskName: "App sync {{ .name }}"
-SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
-ImageSyncSave: "Save image {{ .image }}"
-ImageSyncSaveTags: "Save image tags {{ .tags }}"
-ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
-ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
-ImageSyncClean: "Clean temporary files for image {{ .image }}"
-ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
-ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
-ImageSyncHandlePrivateKey: "Handle image sync node private key"
-ImageSyncHandlePublicKey: "Handle image sync node public key"
-ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
-
-#mobile app
+# モバイルアプリ
 ErrVerifyToken: 'トークンの検証エラーです。リセット後、再度QRコードをスキャンしてください。'
 ErrInvalidToken: '無効なトークンです。リセット後、再度QRコードをスキャンしてください。'
 ErrExpiredToken: 'トークンの有効期限が切れました。リセット後、再度QRコードをスキャンしてください。'
 
-#cluster
-ErrMasterDelete: "マスターノードを削除できません。スレーブノードを先に削除してください。"
-ClusterNameIsExist: "クラスタ名は既に存在します。"
-AppStatusUnHealthy: "アプリケーションのステータス取得が異常です。ノードリストでインストールノードのステータスを確認してください。"
-MasterNodePortNotAvailable: "ノード {{ .name }} のポート {{ .port }} の接続性検証が失敗しました。ファイアウォール/セキュリティグループの設定とマスターノードのステータスを確認してください。"
-ClusterMasterNotExist: "クラスタのマスターノードが切断されています。子ノードを削除してください。"
-
-#ssl
-ErrReqFailed: "{{.name}} リクエスト失敗: {{ .err }}"
-
-#command
+# コマンドエクスポート
 Name: "名前"
 Command: "コマンド"

@@ -1,32 +1,47 @@
+# خطاهای پایه
 ErrInvalidParams: 'درخواست نامعتبر: {{ .detail }}'
 ErrTokenParse: 'خطا در توکن: {{ .detail }}'
 ErrInitialPassword: 'رمز عبور اصلی اشتباه است'
 ErrInternalServer: 'خطای داخلی سرور: {{ .detail }}'
+ErrRecordExist: 'رکورد از قبل وجود دارد'
+ErrRecordNotFound: 'رکورد یافت نشد'
+ErrStructTransform: 'تبدیل نوع ناموفق بود: {{ .err }}'
+ErrNotSupportType: 'نوع پشتیبانی نمی‌شود: {{ .name }}'
+
+# هوش مصنوعی فایل
 ErrFileAINotEnabled: 'خلاصه‌سازی هوش مصنوعی مدیریت فایل نیاز به فعال بودن حساب هوش مصنوعی در مدیریت فایل دارد. جستجوی صرفاً محتوایی زمانی که هوش مصنوعی خاموش است همچنان کار می‌کند.'
 ErrFileAISearchBadPattern: 'الگوی جستجوی فایل نامعتبر است (عبارت منظم یا کل کلمه): {{ .detail }}'
+FileAISearchEmptyDir: 'هیچ فایل یا دایرکتوری در این مسیر یافت نشد (یا همه ورودی‌ها فیلتر شدند).'
+
+# دانلود از راه دور
 ErrWgetRemoteFailed: 'دانلود از راه دور ناموفق بود یا URL قابل دسترس نیست: {{ .detail }}'
 ErrWgetInvalidContentType: 'URL از راه دور فایلی را برنگرداند (احتمالاً صفحه خطا)، {{ .detail }}'
 ErrWgetProxyNotConfigured: 'ابتدا یک سرور پروکسی در تنظیمات پنل پیکربندی کنید'
 ErrWgetProxyInvalid: 'آدرس سرور پروکسی نامعتبر است: {{ .detail }}'
-ErrRecordExist: 'رکورد از قبل وجود دارد'
-ErrRecordNotFound: 'رکورد یافت نشد'
-ErrStructTransform: 'تبدیل نوع ناموفق بود: {{ .err }}'
+
+# ورود و امنیت
 ErrNotLogin: 'وارد نشده‌اید: {{ .detail }}'
 ErrPasswordExpired: 'رمز عبور منقضی شده است: {{ .detail }}'
-ErrNotSupportType: 'نوع پشتیبانی نمی‌شود: {{ .name }}'
-ErrAlertMethodNotSupported: 'این نسخه از این روش هشدار پشتیبانی نمی‌کند'
+
+# درخواست و API
 ErrProxy: 'درخواست ناموفق بود: {{ .detail }}'
 ErrApiConfigStatusInvalid: 'دسترسی API غیرفعال است: {{ .detail }}'
 ErrApiConfigKeyInvalid: 'کلید API نامعتبر است: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP در لیست سفید API نیست: {{ .detail }}'
 ErrApiConfigDisable: 'نقطه پایانی از طریق API مجاز نیست: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'مهر زمانی API نامعتبر است: {{ .detail }}'
-ErrShutDown: 'دستور به صورت دستی متوقف شد'
+ErrCreateHttpClient: 'ایجاد درخواست HTTP ناموفق بود: {{ .err }}'
+ErrHttpReqTimeOut: 'زمان درخواست HTTP به پایان رسید: {{ .err }}'
+ErrHttpReqFailed: 'درخواست HTTP ناموفق بود: {{ .err }}'
+ErrNoSuchHost: 'تفکیک میزبان ناموفق بود: {{ .err }}'
+ErrHttpReqNotFound: 'منبع درخواستی یافت نشد: {{ .err }}'
 
+# پرش سریع
 ErrMinQuickJump: 'حداقل یک ورودی پرش سریع تنظیم کنید'
 ErrMaxQuickJump: 'حداکثر ۴ ورودی پرش سریع'
 
-#common
+# عمومی
+ErrShutDown: 'دستور به صورت دستی متوقف شد'
 ErrUsernameIsExist: 'نام کاربری از قبل وجود دارد'
 ErrNameIsExist: 'نام از قبل وجود دارد'
 ErrDemoEnvironment: 'در محیط آزمایشی غیرفعال است'
@@ -45,7 +60,7 @@ ErrGroupIsDefault: 'گروه پیش‌فرض، قابل حذف نیست'
 ErrGroupIsInWebsiteUse: 'گروه توسط یک وب‌سایت در حال استفاده است'
 Decrypt: "رمزگشایی"
 
-#agent
+# عامل
 ErrAgentAccountBound: 'حساب به یک عامل متصل است و قابل حذف نیست'
 ErrTerminalAIAccountInUse: 'این حساب مدل در حال حاضر توسط ترمینال هوش مصنوعی استفاده می‌شود. حساب را در تنظیمات ترمینال هوش مصنوعی تغییر دهید یا ترمینال هوش مصنوعی را غیرفعال کرده و دوباره تلاش کنید.'
 ErrAgentAccountUnavailable: 'اتصال حساب در دسترس نیست: {{ .err }}'
@@ -71,7 +86,7 @@ ErrAgentWebsiteUnbindUnsupported: 'وب‌سایت‌های استقرار یا�
 ErrHermesPairingCodeUnavailable: 'کد جفت‌سازی به طور موقت در هرمس در دسترس نیست، احتمالاً به دلیل مشکلات شبکه. لطفاً بعداً دوباره تلاش کنید.'
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'وقتی خط مشی گروه فیشو لیست سفید باشد، خط مشی DM نمی‌تواند کد جفت‌سازی باشد.'
 
-#backup
+# پشتیبان‌گیری و تنظیمات هشدار
 Localhost: 'محلی'
 ErrBackupInUsed: 'حساب پشتیبان توسط یک وظیفه زمان‌بندی در حال استفاده است'
 ErrBackupCheck: 'تست اتصال حساب پشتیبان ناموفق بود: {{ .err }}'
@@ -80,7 +95,7 @@ ErrBackupLocalCreate: 'حساب‌های پشتیبان محلی قابل ایج
 ErrAlertConfigInUse: 'پیکربندی هشدار در حال استفاده است و قابل حذف نیست'
 ErrAlertConfigPhoneExist: 'شماره تلفن از قبل وجود دارد'
 
-#app
+# برنامه
 ErrPortInUsed: 'پورت {{ .detail }} قبلاً اشغال شده است!'
 ErrAppLimit: 'محدودیت نصب برنامه رسیده است'
 ErrNotInstall: 'برنامه نصب نشده است'
@@ -98,11 +113,6 @@ ErrFileParseApp: 'تجزیه {{ .name }} ناموفق بود: {{ .err }}'
 ErrAppDirNull: 'پوشه نسخه وجود ندارد'
 LocalAppErr: 'همگام‌سازی برنامه {{ .name }} ناموفق بود: {{ .err }}'
 ErrContainerName: 'نام کانتینر از قبل وجود دارد'
-ErrCreateHttpClient: 'ایجاد درخواست HTTP ناموفق بود: {{ .err }}'
-ErrHttpReqTimeOut: 'زمان درخواست HTTP به پایان رسید: {{ .err }}'
-ErrHttpReqFailed: 'درخواست HTTP ناموفق بود: {{ .err }}'
-ErrNoSuchHost: 'تفکیک میزبان ناموفق بود: {{ .err }}'
-ErrHttpReqNotFound: 'منبع درخواستی یافت نشد: {{ .err }}'
 ErrContainerNotFound: 'کانتینر {{ .name }} وجود ندارد'
 ErrContainerMsg: 'کانتینر {{ .name }} غیرعادی است؛ لاگ‌ها را بررسی کنید'
 ErrAppBackup: 'پشتیبان‌گیری از برنامه ناموفق بود: {{ .name }} {{ .err }}'
@@ -134,7 +144,7 @@ ErrDockerComposeCmdNotFound: 'Docker Compose روی میزبان یافت نشد
 UseExistImage: 'تصویر وجود دارد؛ استفاده از تصویر موجود'
 ErrDatabaseNotFound: 'پایگاه داده یافت نشد: {{ .name }}'
 
-#ssh
+# SSH
 ExportIP: "IP ورود"
 ExportArea: "مکان"
 ExportPort: "پورت"
@@ -143,7 +153,7 @@ ExportUser: "کاربر"
 ExportStatus: "وضعیت ورود"
 ExportDate: "زمان"
 
-#file
+# فایل
 ErrFileCanNotRead: 'پیش‌نمایش فایل پشتیبانی نمی‌شود'
 ErrSensitiveFileRead: 'خواندن فایل‌های حساس مجاز نیست'
 ErrFileToLarge: 'فایل بزرگتر از ۱۰ مگابایت است'
@@ -171,7 +181,7 @@ FileDropSuccess: 'پاک‌سازی {{ .name }}؛ فایل‌ها: {{ .count }}�
 FileDropSum: 'پاک‌سازی انجام شد؛ فایل‌ها: {{ .count }}، آزاد شده: {{ .size }}'
 ErrBadDecrypt: 'رمز عبور آرشیو اشتباه است؛ استخراج ناموفق بود'
 
-#website
+# وب‌سایت
 ErrAliasIsExist: 'نام مستعار از قبل وجود دارد'
 ErrBackupMatch: 'داده‌های پشتیبان مطابقت ندارند: {{ .detail }}'
 ErrBackupExist: 'داده‌های منبع پشتیبان وجود ندارند: {{ .detail }}'
@@ -202,7 +212,7 @@ ErrDefaultWebsite: 'وب‌سایت پیش‌فرض از قبل تنظیم شد�
 SSL: 'گواهی'
 Set: 'تنظیمات'
 
-#ssl
+# گواهی SSL
 ErrSSLCannotDelete: 'گواهی {{ .name }} توسط یک وب‌سایت در حال استفاده است'
 ErrAccountCannotDelete: 'حساب به یک گواهی متصل است و قابل حذف نیست'
 ErrSSLApply: 'گواهی تمدید شد؛ بارگذاری مجدد OpenResty ناموفق بود'
@@ -238,7 +248,7 @@ StartPushSSLToNode: 'ارسال گواهی به گره'
 PushSSLToNodeFailed: "ارسال گواهی به گره ناموفق بود: {{ .err }}"
 PushSSLToNodeSuccess: 'گواهی به گره ارسال شد'
 
-#mysql
+# MySQL
 ErrUserIsExist: 'کاربر از قبل وجود دارد'
 ErrDatabaseIsExist: 'پایگاه داده از قبل وجود دارد'
 ErrExecTimeOut: 'زمان اجرای SQL به پایان رسید'
@@ -248,10 +258,10 @@ RemoteBackup: 'قبل از پشتیبان‌گیری از پایگاه داده 
 RemoteRecover: 'قبل از بازیابی پایگاه داده از راه دور، کانتینر پایگاه داده محلی را با تصویر {{ .name }} راه‌اندازی کنید'
 Arg: "آرگومان"
 
-#redis
+# Redis
 ErrTypeOfRedis: 'نوع فایل پشتیبان با حالت ماندگاری فعلی مطابقت ندارد'
 
-#container
+# کانتینر
 ErrInUsed: "{{ .detail }} در حال استفاده است و قابل حذف نیست!"
 ErrObjectInUsed: "این شی در حال استفاده است و قابل حذف نیست!"
 ErrObjectBeDependent: "این تصویر توسط تصاویر دیگر ارجاع داده شده است و قابل حذف نیست!"
@@ -294,7 +304,7 @@ ComposeRecoverContainers: 'بازیابی کانتینرهای Compose'
 ComposeRecoverRecord: 'ذخیره رکورد Compose'
 ComposeRecoverCleanup: 'پاک‌سازی فضای کاری بازیابی Compose'
 
-#runtime
+# محیط اجرا
 ErrFileNotExist: 'فایل منبع یافت نشد: {{ .detail }}'
 ErrImageBuildErr: 'ساخت تصویر ناموفق بود'
 ErrImageExist: "تصویر از قبل وجود دارد. از نام تصویر دیگری استفاده کنید."
@@ -308,7 +318,7 @@ ErrContainerNameIsNull: 'نام کانتینر خالی است'
 ErrPHPPortIsDefault: 'پورت ۹۰۰۰ به عنوان پیش‌فرض رزرو شده است؛ از پورت دیگری استفاده کنید'
 ErrPHPRuntimePortFailed: 'پورت {{ .name }} قبلاً توسط این محیط اجرا استفاده می‌شود'
 
-#tool
+# ابزار
 ErrConfigNotFound: 'فایل پیکربندی وجود ندارد'
 ErrConfigParse: 'فرمت فایل پیکربندی نامعتبر است'
 ErrConfigIsNull: 'فایل پیکربندی نمی‌تواند خالی باشد'
@@ -316,7 +326,7 @@ ErrConfigDirNotFound: 'دایرکتوری اجرا یافت نشد'
 ErrConfigAlreadyExist: 'فایل پیکربندی با همین نام از قبل وجود دارد'
 ErrUserFindErr: 'یافتن کاربر {{ .name }} ناموفق بود: {{ .err }}'
 
-#cronjob
+# وظیفه زمان‌بندی‌شده
 CutWebsiteLogSuccess: 'لاگ وب‌سایت چرخش یافت: {{ .name }} (پشتیبان: {{ .path }})'
 HandleShell: 'اجرای اسکریپت {{ .name }}'
 HandleCurl: 'درخواست به URL {{ .name }}'
@@ -336,7 +346,7 @@ CleanLog: 'پاک‌سازی لاگ'
 CleanLogByName: 'پاک‌سازی لاگ‌های {{ .name }}'
 WafIpGroupNotFound: "گروه IP WAF یافت نشد. به [ویژگی‌های پیشرفته -> WAF -> لیست سیاه/سفید -> گروه IP] بروید و با استفاده از دانلود از راه دور یکی را اضافه کنید."
 
-#toolbox
+# جعبه‌ابزار
 ErrNotExistUser: 'کاربر وجود ندارد'
 ErrBanAction: 'پیکربندی ناموفق بود: سرویس {{ .name }} در دسترس نیست'
 ErrClamdscanNotFound: 'دستور clamdscan یافت نشد'
@@ -346,14 +356,14 @@ CreateSwap: 'ایجاد فایل swap'
 FormatSwap: 'فرمت فایل swap'
 EnableSwap: 'فعال‌سازی swap'
 
-#tamper
+# محافظت در برابر دستکاری
 CleanTamperSetting: 'پاک‌سازی تنظیمات حفاظتی قدیمی'
 SetTamperWithRules: 'فعال‌سازی محافظت دایرکتوری بر اساس قوانین'
 ProtectDir: "محافظت از دایرکتوری {{ .name }}"
 IgnoreFile: "محافظت از فایل {{ .name }}"
 TamperSetSuccessful: 'محافظت تنظیم شد. نظارت بر این دایرکتوری‌ها:'
 
-#waf
+# WAF
 ErrScope: 'این پیکربندی قابل تغییر نیست'
 ErrStateChange: 'تغییر وضعیت ناموفق بود'
 ErrRuleExist: 'قانون از قبل وجود دارد'
@@ -409,7 +419,7 @@ remoteIpIsNull: "لیست IP خالی است"
 OpenrestyVersionErr: 'نسخه OpenResty بسیار پایین است؛ به ۱.۲۷.۱.۲-۲-۲-focal ارتقاء دهید'
 ErrFileTooLarge: 'فایل بزرگتر از ۱ مگابایت است و قابل بارگذاری نیست'
 
-#task
+# وظیفه
 TaskStart: '{{ .name }} [شروع]'
 TaskEnd: '{{ .name }} [انجام شد]'
 TaskFailed: 'وظیفه {{ .name }} ناموفق بود'
@@ -471,16 +481,16 @@ TaskExec: 'اجرا'
 TaskBatch: "عملیات دسته‌ای"
 FileConvert: 'تبدیل فایل'
 
-# task - clam
+# وظیفه - ClamAV
 Clamscan: "اسکن {{ .name }}"
 TaskScan: "اسکن"
 
-# task - ai
+# وظیفه - هوش مصنوعی
 OllamaModelPull: 'دریافت مدل Ollama {{ .name }}'
 OllamaModelSize: 'دریافت اندازه مدل Ollama: {{ .name }}'
 AIBenchmarkRun: 'اجرای معیار سنجش هوش مصنوعی'
 
-# task-snapshot
+# وظیفه - اسنپ‌شات
 Snapshot: 'تصویر لحظه‌ای'
 SnapDBInfo: 'نوشتن اطلاعات پایگاه داده 1Panel'
 SnapCopy: 'کپی فایل‌ها/دایرکتوری‌ها {{ .name }}'
@@ -506,7 +516,6 @@ SnapCompressSize: 'اندازه تصویر لحظه‌ای {{ .name }}'
 SnapUpload: 'بارگذاری فایل تصویر لحظه‌ای'
 SnapUploadTo: 'بارگذاری تصویر لحظه‌ای به {{ .name }}'
 SnapUploadRes: 'بارگذاری تصویر لحظه‌ای به {{ .name }}'
-
 SnapshotRecover: 'بازیابی تصویر لحظه‌ای'
 RecoverDownload: 'دانلود فایل تصویر لحظه‌ای'
 Download: 'دانلود'
@@ -532,7 +541,7 @@ RecoverDBData: 'بازیابی داده‌های پایگاه داده'
 RecoverBackups: 'بازیابی دایرکتوری پشتیبان محلی'
 RecoverPanelData: 'بازیابی دایرکتوری داده'
 
-# task - container
+# وظیفه - کانتینر
 ContainerImagePull: 'دریافت تصویر کانتینر {{ .name }}'
 ContainerRemoveOld: 'حذف کانتینر اصلی {{ .name }}'
 ContainerImageCheck: 'بررسی نتیجه دریافت تصویر'
@@ -542,7 +551,7 @@ ContainerCreate: 'ایجاد کانتینر جدید {{ .name }}'
 ContainerCreateFailed: 'ایجاد کانتینر ناموفق بود؛ حذف کانتینر ناموفق'
 ContainerStartCheck: 'بررسی شروع کانتینر'
 
-# task - image
+# وظیفه - تصویر
 ImageBuild: 'ساخت تصویر'
 ImagePull: 'دریافت تصویر'
 ImageRepoAuthFromDB: 'بارگذاری احراز هویت مخزن از پایگاه داده'
@@ -551,7 +560,7 @@ ImageRenameTag: 'به‌روزرسانی برچسب تصویر'
 ImageNewTag: 'برچسب تصویر جدید {{ .name }}'
 ComposeCreate: 'ایجاد پروژه Compose'
 
-# task - website
+# وظیفه - وب‌سایت
 BackupNginxConfig: 'پشتیبان‌گیری از پیکربندی OpenResty وب‌سایت'
 CompressFileSuccess: 'دایرکتوری به {{ .name }} فشرده شد'
 CompressDir: 'فشرده‌سازی دایرکتوری'
@@ -563,13 +572,14 @@ RecoverFailedStartRollBack: 'بازیابی ناموفق بود؛ شروع با�
 AppBackupFileIncomplete: 'پشتیبان ناقص است: app.json یا app.tar.gz وجود ندارد'
 AppAttributesNotMatch: 'نوع یا نام برنامه مطابقت ندارد'
 
-#alert
+# هشدار
+ErrAlertMethodNotSupported: 'این نسخه از این روش هشدار پشتیبانی نمی‌کند'
 ErrAlertSync: 'همگام‌سازی پیام هشدار ناموفق بود'
 
-#task - runtime
+# وظیفه - محیط اجرا
 ErrInstallExtension: 'وظیفه نصب پسوند دیگری در حال اجراست'
 
-# alert mail template
+# قالب ایمیل هشدار
 PanelAlertTitle: "اعلان هشدار پنل"
 TestAlertTitle: "ایمیل آزمایشی - تأیید اتصال ایمیل"
 TestAlert: "این یک ایمیل آزمایشی برای تأیید صحت پیکربندی ارسال ایمیل شما است."
@@ -587,7 +597,7 @@ NodeExceptionAlert: "پنل {{ .node }}{{ .ip }}: {{ .num }} گره غیرعاد
 LicenseExceptionAlert: "پنل {{ .node }}{{ .ip }}: {{ .num }} مجوز غیرعادی است. برای مشاهده جزئیات وارد شوید."
 SSHAndPanelLoginAlert: "پنل {{ .node }}{{ .ip }}: ورود غیرعادی {{ .name }} از {{ .loginIp }}. برای مشاهده جزئیات وارد شوید."
 
-#disk
+# دیسک
 DeviceNotFound: "دستگاه {{ .name }} یافت نشد"
 DeviceIsMounted: 'دستگاه {{ .name }} متصل است؛ ابتدا قطع اتصال کنید'
 PartitionDiskErr: 'پارتیشن‌بندی ناموفق بود: {{ .err }}'
@@ -595,14 +605,13 @@ FormatDiskErr: 'فرمت کردن ناموفق بود: {{ .err }}'
 MountDiskErr: 'اتصال ناموفق بود: {{ .err }}'
 XfsNotFound: 'xfs یافت نشد؛ ابتدا xfsprogs را نصب کنید'
 
-# terminal
+# ترمینال
 TerminalAIBlockedRiskyCommand: 'دستور پرخطر مسدود شد: {{ .command }}'
 TerminalAIThinking: 'هوش مصنوعی در حال فکر کردن است...'
 TerminalAIReadyToExecute: 'تفکر کامل شد، برای اجرا Enter را فشار دهید (مدت زمان: {{ .duration }}، توکن‌ها: {{ .tokens }})'
 TerminalAIRequestFailed: 'درخواست هوش مصنوعی ناموفق بود: {{ .err }}'
-FileAISearchEmptyDir: 'هیچ فایل یا دایرکتوری در این مسیر یافت نشد (یا همه ورودی‌ها فیلتر شدند).'
 
-# ai proxy
+# دروازه هوش مصنوعی
 ErrAIProxyServiceNotInstalled: 'سرویس {{ .name }} نصب نشده است'
 ErrAIProxyModelAccountNotFound: 'حساب مدل {{ .id }} یافت نشد'
 ErrAIProxyModelMapRequired: 'این فیلد الزامی است.'

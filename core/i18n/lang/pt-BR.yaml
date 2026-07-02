@@ -1,83 +1,65 @@
+# erros básicos
 ErrInvalidParams: 'Requisição inválida: {{ .detail }}'
 ErrTokenParse: 'Erro de token: {{ .detail }}'
 ErrInitialPassword: 'Senha original incorreta'
 ErrInternalServer: 'Erro interno: {{ .detail }}'
+ErrInternalServerKey: "Erro interno do servidor:"
 ErrRecordExist: 'Registro já existe'
 ErrRecordNotFound: 'Registro não encontrado'
 ErrStructTransform: 'Erro de conversão: {{ .err }}'
-ErrNotLogin: 'Sem sessão: {{ .detail }}'
-ErrSessionDataNotFound: "A sessão atual expirou"
-ErrSessionDataFormat: "O formato dos dados da sessão atual está anormal"
-ErrPasswordExpired: 'Senha expirada: {{ .detail }}'
 ErrNotSupportType: 'Tipo não suportado: {{ .name }}'
-ErrProxy: 'Requisição falhou: {{ .detail }}'
-ErrApiConfigStatusInvalid: 'API desativada: {{ .detail }}'
-ErrApiConfigKeyInvalid: 'Chave API inválida: {{ .detail }}'
-ErrApiConfigIPInvalid: 'IP sem permissão: {{ .detail }}'
-ErrApiConfigDisable: 'API bloqueada: {{ .detail }}'
-ErrApiConfigKeyTimeInvalid: 'Timestamp inválido: {{ .detail }}'
-ErrLoginLocked: "Muitas tentativas falharam. O login foi bloqueado temporariamente por 5 minutos."
+ErrDemoEnvironment: 'Indisponível em demo'
+ErrCmdTimeout: 'Comando expirou'
+ErrPortInUsed: "A porta {{ .name }} já está em uso"
+ErrFileNotFound: "Arquivo {{ .name }} não encontrado"
+ErrReqFailed: "{{.name}} solicitação falhou: {{ .err }}"
 
-# request
+# requisição e entrada de segurança
 ErrNoSuchHost: "Servidor solicitado não encontrado {{ .err }}"
 ErrHttpReqNotFound: "Recurso solicitado não encontrado {{ .err }}"
 ErrHttpReqFailed: "Falha na requisição {{ .err }}"
 ErrHttpReqTimeOut: "Tempo de requisição esgotado {{ .err }}"
 ErrCreateHttpClient: "Falha ao criar a requisição {{ .err }}"
+ErrProxy: 'Requisição falhou: {{ .detail }}'
 ErrProxySetting: "Informação do servidor proxy indisponível {{ .err }}, verifique e tente novamente"
+ErrEntrance: "Erro nas informações de entrada de segurança, por favor, verifique e tente novamente"
 ErrEntranceFormat: "A entrada de segurança {{ .name }} não é suportada atualmente. Por favor verifique e tente novamente"
 
-# common
-ErrDemoEnvironment: 'Indisponível em demo'
-ErrCmdTimeout: 'Comando expirou'
-ErrVMNotFound: "Máquina virtual não existe"
-ErrVMAlreadyExists: "Máquina virtual já existe"
-ErrVMRunning: "Máquina virtual está em execução"
-ErrVMLibvirtConnect: "Falha ao conectar ao libvirt: {{ .detail }}"
-ErrVMPermission: "Sem permissão para operar a máquina virtual: {{ .detail }}"
-ErrVMNetworkNotFound: "Rede da máquina virtual não existe: {{ .detail }}"
-ErrVMInvalidPath: "Caminho da máquina virtual inválido: {{ .detail }}"
-ErrVMInvalidInput: "Parâmetro da máquina virtual inválido: {{ .detail }}"
-ErrVMCommandFailed: "Falha no comando da máquina virtual: {{ .err }}"
-VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
-VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
-VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
-VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
-ErrEntrance: "Erro nas informações de entrada de segurança, por favor, verifique e tente novamente"
+# login e segurança
+ErrNotLogin: 'Sem sessão: {{ .detail }}'
+ErrSessionDataNotFound: "A sessão atual expirou"
+ErrSessionDataFormat: "O formato dos dados da sessão atual está anormal"
+ErrPasswordExpired: 'Senha expirada: {{ .detail }}'
+ErrLoginLocked: "Muitas tentativas falharam. O login foi bloqueado temporariamente por 5 minutos."
+ErrApiConfigStatusInvalid: 'API desativada: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'Chave API inválida: {{ .detail }}'
+ErrApiConfigIPInvalid: 'IP sem permissão: {{ .detail }}'
+ErrApiConfigDisable: 'API bloqueada: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'Timestamp inválido: {{ .detail }}'
+ErrPasskeyDisabled: "Passkey requer HTTPS habilitado"
+ErrPasskeyNotConfigured: "Nenhum Passkey configurado"
+ErrPasskeyLimit: "Limite de Passkeys atingido (máximo 5)"
+ErrPasskeySession: "Sessão do Passkey expirada ou inválida"
+ErrPasskeyDuplicate: "Passkey já existe"
+ErrPasskeyVerify: "Falha na verificação do Passkey"
+
+# usuário e permissão
+ErrNoSuchUser: "Informações do usuário não encontradas. Verifique e tente novamente."
+ErrToMaster: "Este usuário não tem permissão para executar esta operação no nó principal. Verifique e tente novamente."
+ErrToNode: "Este usuário não tem permissão para executar esta operação neste nó. Verifique e tente novamente."
+ErrRBAC: "Permissões de usuário insuficientes. Não é possível executar esta operação. Verifique e tente novamente."
+ErrNoneNode: "Este usuário não tem permissões de nenhum nó. Contate o administrador ou verifique e tente novamente."
+ErrOnlySuperAdmin: "Somente superadministradores podem usar este recurso."
+ErrRolePresetCannotDelete: "Funções predefinidas do sistema não podem ser excluídas"
+ErrRolePresetCannotUpdate: "Funções predefinidas do sistema não podem ser atualizadas"
+ErrRoleBoundToUser: "Esta função já está vinculada a usuários e não pode ser excluída"
+ErrRolePresetCannotBind: "Funções predefinidas do sistema não podem ser atribuídas a usuários"
+ErrNodeAdminMasterForbidden: "Permissões de administrador de nó não podem ser adicionadas ao nó principal"
+ErrSuperAdminCannotDelete: "Usuários superadministradores não podem ser excluídos"
 ErrGroupIsDefault: "Grupo padrão não pode ser excluído"
 ErrGroupIsInUse: "O grupo está em uso e não pode ser excluído."
-ErrAIProxyUserGroupIsDefault: "O grupo de usuários padrão não pode ser excluído."
-ErrAIProxyUserGroupInUse: "O grupo de usuários está em uso e não pode ser excluído."
-ErrAIProxyUserGroupExists: "O nome do grupo de usuários já existe."
-ErrAIProxyBackendAccountExists: "Esta conta de modelo já foi importada para o pool de contas do AI Gateway."
-ErrAIProxyModelGroupInUse: "O grupo de modelos está em uso e não pode ser excluído."
-ErrAIProxyModelGroupExists: "O nome do grupo de modelos já existe."
-ErrAIProxySensitiveGroupInUse: "O grupo de palavras sensíveis está em uso e não pode ser excluído."
-ErrAIProxySensitiveGroupExists: "O nome do grupo de palavras sensíveis já existe."
-ErrLocalDelete: "O nó local não pode ser excluído"
-ErrPortInUsed: "A porta {{ .name }} já está em uso"
-ErrInternalServerKey: "Erro interno do servidor:"
-MasterNode: "Nó Mestre"
 
-# app
-CustomAppStoreFileValid: "O pacote da loja de aplicativos deve estar no formato .tar.gz"
-ErrFileNotFound: "Arquivo {{ .name }} não encontrado"
-AppBackup: 'Backup de aplicação'
-AppBackupPush: 'Transferir arquivo de backup de aplicação {{.file}} para o nó {{ .name }}'
-ErrSourceTargetSame: 'O nó de origem e o nó de destino não podem ser os mesmos'
-AppInstall: 'Instalar aplicação {{ .name }} no nó {{ .targetNode }}'
-AppInstallCheck: 'Verificar ambiente de instalação da aplicação'
-
-# backup
-ErrBackupInUsed: 'Conta de backup em uso por tarefa'
-ErrBackupCheck: 'Teste de conexão falhou: {{ .err }}'
-ErrBackupLocal: "A conta de backup do servidor local não suporta essa operação"
-ErrBackupPublic: "A conta de backup detectada não é pública, por favor verifique e tente novamente"
-ErrOSSConn: "Não foi possível obter a versão mais recente, verifique a conectividade externa do servidor."
-
-#license
+# licença
 LicenseCheck: 'Verificar se a licença está disponível'
 ErrLicenseInUsed: 'Esta licença já está vinculada. Por favor, verifique e tente novamente'
 ErrLicenseExpired: 'Esta licença expirou. Por favor, verifique e tente novamente'
@@ -107,21 +89,6 @@ ErrNodeUnbind: "Nó fora do escopo da licença detectado, por favor verifique e 
 ErrNodeBind: "Este nó já está vinculado a uma licença, por favor verifique e tente novamente"
 ErrNodeLocalRollback: "O nó principal não suporta rollback direto. Por favor, execute manualmente o comando '1pctl restore' para fazer o rollback"
 ErrIntlLicense: "A versão atual ainda não oferece suporte à importação de licença da edição internacional. Em breve"
-
-# user
-ErrNoSuchUser: "Informações do usuário não encontradas. Verifique e tente novamente."
-ErrToMaster: "Este usuário não tem permissão para executar esta operação no nó principal. Verifique e tente novamente."
-ErrToNode: "Este usuário não tem permissão para executar esta operação neste nó. Verifique e tente novamente."
-ErrRBAC: "Permissões de usuário insuficientes. Não é possível executar esta operação. Verifique e tente novamente."
-ErrNoneNode: "Este usuário não tem permissões de nenhum nó. Contate o administrador ou verifique e tente novamente."
-ErrOnlySuperAdmin: "Somente superadministradores podem usar este recurso."
-ErrRolePresetCannotDelete: "Funções predefinidas do sistema não podem ser excluídas"
-ErrRolePresetCannotUpdate: "Funções predefinidas do sistema não podem ser atualizadas"
-ErrRoleBoundToUser: "Esta função já está vinculada a usuários e não pode ser excluída"
-ErrRolePresetCannotBind: "Funções predefinidas do sistema não podem ser atribuídas a usuários"
-ErrNodeAdminMasterForbidden: "Permissões de administrador de nó não podem ser adicionadas ao nó principal"
-ErrSuperAdminCannotDelete: "Usuários superadministradores não podem ser excluídos"
-
 InvalidRequestBodyType: "Formato do corpo da requisição inválido. Verifique se o conteúdo está no formato correto e tente novamente"
 InvalidLicenseCodeType: "Formato do código de licença inválido. Verifique e tente novamente"
 LicenseNotFoundType: "Licença não encontrada. Não há registros correspondentes no sistema para a licença fornecida. Verifique e tente novamente"
@@ -132,10 +99,64 @@ InvalidAssigneeType: "Informações do usuário ou dispositivo alvo para atribui
 LicenseUsageNotFoundType: "Nenhum registro de uso encontrado. Esta licença ainda não foi ativada ou usada. Verifique e tente novamente"
 LicenseUsageLimitExceededType: "Esta licença já está vinculada a outro nó. Verifique e tente novamente"
 
-# alert
+# nó e cluster
+MasterNode: "Nó Mestre"
+Node: "Nó"
+ErrLocalDelete: "O nó local não pode ser excluído"
+ErrMasterDelete: "Não é possível excluir o nó mestre, exclua os nós escravos primeiro."
+ClusterNameIsExist: "O nome do cluster já existe."
+AppStatusUnHealthy: "A aquisição do status do aplicativo está anormal, verifique o status dos nós de instalação na lista de nós."
+MasterNodePortNotAvailable: "A verificação de conectividade da porta {{ .port }} do nó {{ .name }} falhou, verifique as configurações de firewall/grupo de segurança e o status do nó mestre."
+ClusterMasterNotExist: "O nó mestre do cluster está desconectado, por favor, exclua os nós filhos."
+
+# máquina virtual
+ErrVMNotFound: "Máquina virtual não existe"
+ErrVMAlreadyExists: "Máquina virtual já existe"
+ErrVMRunning: "Máquina virtual está em execução"
+ErrVMLibvirtConnect: "Falha ao conectar ao libvirt: {{ .detail }}"
+ErrVMPermission: "Sem permissão para operar a máquina virtual: {{ .detail }}"
+ErrVMNetworkNotFound: "Rede da máquina virtual não existe: {{ .detail }}"
+ErrVMInvalidPath: "Caminho da máquina virtual inválido: {{ .detail }}"
+ErrVMInvalidInput: "Parâmetro da máquina virtual inválido: {{ .detail }}"
+ErrVMCommandFailed: "Falha no comando da máquina virtual: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
+
+# aplicativo
+CustomAppStoreFileValid: "O pacote da loja de aplicativos deve estar no formato .tar.gz"
+AppBackup: 'Backup de aplicação'
+AppBackupPush: 'Transferir arquivo de backup de aplicação {{.file}} para o nó {{ .name }}'
+ErrSourceTargetSame: 'O nó de origem e o nó de destino não podem ser os mesmos'
+AppInstall: 'Instalar aplicação {{ .name }} no nó {{ .targetNode }}'
+AppInstallCheck: 'Verificar ambiente de instalação da aplicação'
+
+# backup
+ErrBackupInUsed: 'Conta de backup em uso por tarefa'
+ErrBackupCheck: 'Teste de conexão falhou: {{ .err }}'
+ErrBackupLocal: "A conta de backup do servidor local não suporta essa operação"
+ErrBackupPublic: "A conta de backup detectada não é pública, por favor verifique e tente novamente"
+ErrOSSConn: "Não foi possível obter a versão mais recente, verifique a conectividade externa do servidor."
+MvBackup: "Mover dados para diretório de backup"
+
+# alerta
 ErrAlertSync: "Erro na sincronização das informações de alerta, verifique e tente novamente"
 
-#task
+# gateway de IA
+ErrAIProxyUserGroupIsDefault: "O grupo de usuários padrão não pode ser excluído."
+ErrAIProxyUserGroupInUse: "O grupo de usuários está em uso e não pode ser excluído."
+ErrAIProxyUserGroupExists: "O nome do grupo de usuários já existe."
+ErrAIProxyBackendAccountExists: "Esta conta de modelo já foi importada para o pool de contas do AI Gateway."
+ErrAIProxyModelGroupInUse: "O grupo de modelos está em uso e não pode ser excluído."
+ErrAIProxyModelGroupExists: "O nome do grupo de modelos já existe."
+ErrAIProxySensitiveGroupInUse: "O grupo de palavras sensíveis está em uso e não pode ser excluído."
+ErrAIProxySensitiveGroupExists: "O nome do grupo de palavras sensíveis já existe."
+AIBenchmarkRun: "Executar benchmark de IA"
+
+# tarefa
 TaskStart: "{{ .name }} tarefa iniciada [START]"
 TaskEnd: "{{ .name }} tarefa finalizada [COMPLETED]"
 TaskFailed: "{{ .name }} tarefa falhou"
@@ -149,6 +170,16 @@ TaskUpgrade: "Atualizar"
 TaskSync: 'Sincronizar'
 TaskSyncForNode: "Sincronizar Dados do Nó"
 TaskBackup: "Backup"
+TaskPush: "Enviar"
+TaskRsync: "Sync"
+SuccessStatus: "{{ .name }} bem-sucedido"
+FailedStatus: "{{ .name }} falhou {{ .err }}"
+Start: "Iniciar"
+SubTask: "Subtarefa"
+Skip: "Ignorar erros e continuar..."
+Success: "Sucesso"
+
+# tarefa em lote do agente
 BatchInstallAgent: "Instalar agentes em lote"
 DispatchAgentInstallTasks: "Distribuir tarefas de instalação de agentes"
 BatchUpgradeAgent: "Atualizar agentes em lote"
@@ -182,20 +213,15 @@ AgentOperateStart: "Iniciar"
 AgentOperateStop: "Parar"
 AgentOperateRestart: "Reiniciar"
 AgentOperateDelete: "Excluir"
-SuccessStatus: "{{ .name }} bem-sucedido"
-FailedStatus: "{{ .name }} falhou {{ .err }}"
-Start: "Iniciar"
-SubTask: "Subtarefa"
-Skip: "Ignorar erros e continuar..."
+
+# tarefa de aplicativo e habilidade
 PushAppInstallTaskToNode: "Enviar tarefa de instalação de aplicativo para o nó [{{ .name }}]"
-TaskPush: "Enviar"
 AppInstallTask: "Tarefa de instalação de aplicativo"
 PushAppFailed: "Falha ao enviar tarefa de instalação de aplicativo"
 SkillHubInstallTask: "Instalar skill [{{ .name }}]"
 SkillHubInstallToTarget: "Instalar skill no destino [{{ .name }}]"
-Success: "Sucesso"
 
-#script
+# biblioteca de scripts
 ScriptLibrary: "Biblioteca de Scripts"
 RemoteScriptLibrary: "Biblioteca de Scripts Remota"
 ScriptSyncSkip: "A biblioteca de scripts atual já é a versão mais recente"
@@ -203,7 +229,7 @@ DownloadData: "Baixando arquivo data.yaml da biblioteca de scripts"
 DownloadPackage: "Baixando pacote da biblioteca de scripts"
 AnalyticCompletion: "Análise concluída, agora sincronizando com o banco de dados..."
 
-Node: "Nó"
+# sincronização de nós
 SyncNode: "Sincronizar dados para o nó {{ .name }}"
 LocalName: "O nome 'local' é usado apenas para identificação local do sistema"
 SyncPackageData: "Empacotar dados de sincronização"
@@ -219,7 +245,7 @@ SyncCustomApp: "Aplicativo Personalizado"
 SyncLanguage: "Idioma do Sistema"
 SyncEdition: "Região de Operação"
 
-#upgrade node
+# atualização de nós
 NodeUpgrade: "Atualizar nó {{ .name }}"
 UpgradeCheck: "Verificar atualizações do nó"
 UpgradeCheckLocal: "Nós locais não suportam atualização em lote, pulando..."
@@ -232,12 +258,11 @@ LoadAutoUpgradeNodesFailed: "Falha ao carregar nós de atualização automática
 AutoUpgradeNodes: "Nós de atualização automática: {{ .nodes }}"
 UpdateAutoUpgradeNodesStatusFailed: "Falha ao atualizar o status dos nós de atualização automática, erro: {{ .err }}"
 
-#add node
+# adicionar nó
 MasterData: "Dados do Nó Mestre"
 LoadSftpClient: "Carregar Cliente SFTP"
 PackageMasterData: "Gerar pacote de backup do nó mestre"
 UploadBackup: "Carregar dados de backup"
-MvBackup: "Mover dados para diretório de backup"
 TaskAddNode: "Adicionar nó"
 LoadNodeArch: "Obter informações de arquitetura do nó"
 LoadNodeArchDetail: "Arquitetura do nó mestre detectada: {{ .local }}, arquitetura do nó filho: {{ .node }}"
@@ -250,7 +275,35 @@ SendAgent: "Enviando pacote de instalação do nó"
 StartService: "Iniciando serviço"
 NoBackupNode: "O nó de backup está vazio atualmente. Selecione um nó de backup para salvar e tente novamente"
 
-#cmd
+# sincronização de arquivos e imagens do nó
+LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
+HandlePrivateKey: "Handle node private key"
+HandlePublicKey: "Handle node public key"
+ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
+NodeFile: "Node file"
+ImageSyncTaskName: "Image sync {{ .count }} images"
+SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
+AppSyncTaskName: "App sync {{ .name }}"
+SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
+ImageSyncSave: "Save image {{ .image }}"
+ImageSyncSaveTags: "Save image tags {{ .tags }}"
+ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
+ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
+ImageSyncClean: "Clean temporary files for image {{ .image }}"
+ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
+ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
+ImageSyncHandlePrivateKey: "Handle image sync node private key"
+ImageSyncHandlePublicKey: "Handle image sync node public key"
+ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
+
+# linha de comando
+SudoHelper: "Por favor, use {{ .cmd }} ou altere para o usuário root"
+UsernameNeed: "A edição Enterprise deve especificar --username"
+DBConnErr: "Erro: Falha ao inicializar a conexão com o banco de dados, {{ .err }}"
+SystemVersion: "versão: "
+SystemMode: "modo: "
+
+# linha de comando - aplicativo
 AppVersion: "Versão do aplicativo"
 AppCommands: "Comandos relacionados ao aplicativo"
 AppInit: "Inicializar aplicativo"
@@ -262,12 +315,14 @@ AppMissVersion: "Versão do aplicativo ausente, use -v para especificar"
 AppVersionExist: "A versão já existe"
 AppCreateSuccessful: "Criação bem-sucedida"
 AppWriteErr: "Falha ao escrever no arquivo {{ .name }} {{ .err }}"
-SudoHelper: "Por favor, use {{ .cmd }} ou altere para o usuário root"
-UsernameNeed: "A edição Enterprise deve especificar --username"
+
+# linha de comando - IP de escuta
 ListenIPCommands: "Trocar IP de escuta"
 ListenIPv4: "Escutando em IPv4"
 ListenIPv6: "Escutando em IPv6"
 ListenChangeSuccessful: "Troca bem-sucedida Agora escutando em {{ .value }}"
+
+# linha de comando - redefinir
 ResetCommands: "Redefinir informações do sistema"
 ResetMFA: "Cancelar autenticação de dois fatores do 1Panel"
 ResetHttps: "Cancelar login https do 1Panel"
@@ -275,12 +330,19 @@ ResetEntrance: "Cancelar entrada segura do 1Panel"
 ResetIPs: "Cancelar restrições de IP autorizado do 1Panel"
 ResetDomain: "Cancelar vinculação de domínio do 1Panel"
 ResetPasskey: "Redefinir passkeys do 1Panel"
+
+# linha de comando - usuário
 UserList: "Obter a lista de usuários do 1Panel"
 UserTableName: "Nome"
 UserTableMFAStatus: "Status MFA"
 UserTableSuperAdmin: "Superadministrador"
 UserTableCreatedAt: "Criado em"
 UserEmptyList: "Nenhum usuário encontrado"
+UserInfo: "Obter informações do painel"
+UserInfoAddr: "Endereço do painel: "
+UserInfoPassHelp: "Dica: Para alterar a senha, você pode executar o comando: "
+
+# linha de comando - restaurar
 RestoreCommands: "Fazer rollback do serviço e dos dados do 1Panel"
 RestoreNoSuchFile: "Nenhum arquivo de rollback encontrado"
 RestoreStep1: "(1/5) Iniciando o rollback do serviço e dos dados do 1Panel a partir do diretório {{ .name }}..."
@@ -289,6 +351,8 @@ RestoreStep3: "(3/5) Rollback dos scripts do 1Panel concluído"
 RestoreStep4: "(4/5) Rollback do serviço do 1Panel concluído"
 RestoreStep5: "(5/5) Rollback dos dados do 1Panel concluído"
 RestoreSuccessful: "Rollback concluído. Revertido para {{ .version }}. Reiniciando o serviço..."
+
+# linha de comando - atualizar
 UpdateCommands: "Atualizar informações do painel"
 UpdateUser: "Atualizar informações do usuário"
 UpdatePassword: "Atualizar senha do usuário"
@@ -315,50 +379,12 @@ UpdatePortResult: "Porta do painel: {{ .name }}"
 UpdatePortFirewallAdd: "Falha ao adicionar regra de porta ao firewall, {{ .err }}, por favor, adicione manualmente a porta {{ .name }} às regras do firewall."
 UpdatePortFirewallDel: "Erro: Falha ao excluir a porta do firewall, {{ .err }}"
 UpdatePortFirewallReload: "Falha ao recarregar o firewall, {{ .err }}, por favor, recarregue o firewall manualmente."
-UserInfo: "Obter informações do painel"
-UserInfoAddr: "Endereço do painel: "
-UserInfoPassHelp: "Dica: Para alterar a senha, você pode executar o comando: "
-DBConnErr: "Erro: Falha ao inicializar a conexão com o banco de dados, {{ .err }}"
-SystemVersion: "versão: "
-SystemMode: "modo: "
 
-#exchange
-LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add IP address and SSH authentication information."
-HandlePrivateKey: "Handle node private key"
-HandlePublicKey: "Handle node public key"
-ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
-TaskRsync: "Sync"
-NodeFile: "Node file"
-ImageSyncTaskName: "Image sync {{ .count }} images"
-SSLSyncTaskName: "Certificate sync {{ .count }} certificates"
-AppSyncTaskName: "App sync {{ .name }}"
-SSLSyncToNode: "Push certificate [{{ .cert }}] to node [{{ .node }}]"
-ImageSyncSave: "Save image {{ .image }}"
-ImageSyncSaveTags: "Save image tags {{ .tags }}"
-ImageSyncToNode: "Sync image {{ .image }} to node {{ .node }}"
-ImageSyncLoad: "Load image {{ .image }} on node {{ .node }}"
-ImageSyncClean: "Clean temporary files for image {{ .image }}"
-ImageSyncNoTag: "Image {{ .image }} has no tag and will be saved by image ID"
-ImageSyncFrontendTagsIgnored: "No tags were found for image {{ .image }} on the source node. Frontend tags were ignored."
-ImageSyncHandlePrivateKey: "Handle image sync node private key"
-ImageSyncHandlePublicKey: "Handle image sync node public key"
-ImageSyncTransfer: "Start transferring image temporary file: {{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
-
-#mobile app
+# aplicativo móvel
 ErrVerifyToken: 'Erro de verificação do token, por favor, reinicie e escaneie novamente.'
 ErrInvalidToken: 'Token inválido, por favor, reinicie e escaneie novamente.'
 ErrExpiredToken: 'O token expirou, por favor, reinicie e escaneie novamente.'
 
-#cluster
-ErrMasterDelete: "Não é possível excluir o nó mestre, exclua os nós escravos primeiro."
-ClusterNameIsExist: "O nome do cluster já existe."
-AppStatusUnHealthy: "A aquisição do status do aplicativo está anormal, verifique o status dos nós de instalação na lista de nós."
-MasterNodePortNotAvailable: "A verificação de conectividade da porta {{ .port }} do nó {{ .name }} falhou, verifique as configurações de firewall/grupo de segurança e o status do nó mestre."
-ClusterMasterNotExist: "O nó mestre do cluster está desconectado, por favor, exclua os nós filhos."
-
-#ssl
-ErrReqFailed: "{{.name}} solicitação falhou: {{ .err }}"
-
-#command
+# exportação de comandos
 Name: "Название"
 Command: "Команда"

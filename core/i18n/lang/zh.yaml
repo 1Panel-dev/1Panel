@@ -1,16 +1,36 @@
+# 基础错误
 ErrInvalidParams: "请求参数错误: {{ .detail }}"
 ErrTokenParse: "Token 生成错误: {{ .detail }}"
 ErrInitialPassword: "原密码错误"
 ErrInternalServer: "服务内部错误: {{ .detail }}"
+ErrInternalServerKey: "服务内部错误:"
 ErrRecordExist: "记录已存在"
 ErrRecordNotFound: "记录未能找到"
 ErrStructTransform: "类型转换失败: {{ .detail }}"
+ErrNotSupportType: "系统暂不支持当前类型: {{ .name }}"
+ErrDemoEnvironment: "演示服务器，禁止此操作!"
+ErrCmdTimeout: "命令执行超时！"
+ErrPortInUsed: "{{ .name }} 端口已被占用！"
+ErrFileNotFound: '{{ .name }} 文件不存在'
+ErrReqFailed: "{{.name}} 请求失败: {{ .err }}"
+
+# 请求与安全入口
+ErrNoSuchHost: "无法找到请求的服务器 {{ .err }}"
+ErrHttpReqNotFound: "无法找到请求的资源 {{ .err }}"
+ErrHttpReqFailed: "请求失败 {{ .err }}"
+ErrHttpReqTimeOut: "请求超时 {{ .err }}"
+ErrCreateHttpClient: "创建请求失败 {{ .err }}"
+ErrProxy: "请求错误，请检查该节点状态: {{ .detail }}"
+ErrProxySetting: "代理服务器信息不可用 {{ .err }}，请检查后重试！"
+ErrEntrance: "安全入口信息错误，请检查后重试！"
+ErrEntranceFormat: "暂不支持安全入口 {{ .name }} ，请检查后重试！"
+
+# 登录与安全
 ErrNotLogin: "用户未登录: {{ .detail }}"
 ErrSessionDataNotFound: "当前会话已过期！"
 ErrSessionDataFormat: "当前会话数据格式异常！"
 ErrPasswordExpired: "当前密码已过期: {{ .detail }}"
-ErrNotSupportType: "系统暂不支持当前类型: {{ .name }}"
-ErrProxy: "请求错误，请检查该节点状态: {{ .detail }}"
+ErrLoginLocked: "失败次数过多，当前登录已被临时锁定 5 分钟。"
 ErrApiConfigStatusInvalid: "API 接口禁止访问: {{ .detail }}"
 ErrApiConfigKeyInvalid: "API 接口密钥错误: {{ .detail }}"
 ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
@@ -22,68 +42,24 @@ ErrPasskeyLimit: "Passkey 数量已达上限（最多 5 个）"
 ErrPasskeySession: "Passkey 会话已过期或无效"
 ErrPasskeyDuplicate: "Passkey 已存在"
 ErrPasskeyVerify: "Passkey 验证失败"
-ErrLoginLocked: "失败次数过多，当前登录已被临时锁定 5 分钟。"
 
-#request
-ErrNoSuchHost: "无法找到请求的服务器 {{ .err }}"
-ErrHttpReqNotFound: "无法找到请求的资源 {{ .err }}"
-ErrHttpReqFailed: "请求失败 {{ .err }}"
-ErrHttpReqTimeOut: "请求超时 {{ .err }}"
-ErrCreateHttpClient: "创建请求失败 {{ .err }}"
-ErrProxySetting: "代理服务器信息不可用 {{ .err }}，请检查后重试！"
-ErrEntranceFormat: "暂不支持安全入口 {{ .name }} ，请检查后重试！"
-
-#common
-ErrDemoEnvironment: "演示服务器，禁止此操作!"
-ErrCmdTimeout: "命令执行超时！"
-ErrVMNotFound: "虚拟机不存在"
-ErrVMAlreadyExists: "虚拟机已存在"
-ErrVMRunning: "虚拟机正在运行"
-ErrVMLibvirtConnect: "连接 libvirt 失败: {{ .detail }}"
-ErrVMPermission: "没有虚拟机操作权限: {{ .detail }}"
-ErrVMNetworkNotFound: "虚拟机网络不存在: {{ .detail }}"
-ErrVMInvalidPath: "虚拟机路径非法: {{ .detail }}"
-ErrVMInvalidInput: "虚拟机参数非法: {{ .detail }}"
-ErrVMCommandFailed: "虚拟机命令执行失败: {{ .err }}"
-VMSnapshotCreateTask: "创建虚拟机 [{{ .vm }}] 快照 [{{ .snapshot }}]"
-VMSnapshotCreateStep: "创建虚拟机快照 [{{ .snapshot }}]"
-VMSnapshotRecoverTask: "恢复虚拟机 [{{ .vm }}] 快照 [{{ .snapshot }}]"
-VMSnapshotRecoverStep: "恢复虚拟机快照 [{{ .snapshot }}]"
-VMSnapshotDeleteTask: "删除虚拟机 [{{ .vm }}] 快照 [{{ .snapshot }}]"
-VMSnapshotDeleteStep: "删除虚拟机快照 [{{ .snapshot }}]"
-ErrEntrance: "安全入口信息错误，请检查后重试！"
+# 用户与权限
+ErrNoSuchUser: "未能找到该用户信息，请检查后重试！"
+ErrToMaster: "该用户无权限对主节点进行该操作，请检查后重试！"
+ErrToNode: "该用户无权限对该节点进行该操作，请检查后重试！"
+ErrRBAC: "用户权限不足，无法进行该操作，请检查后重试！"
+ErrNoneNode: "该用户无任何节点权限，请联系管理员或检查后重试！"
+ErrOnlySuperAdmin: "仅超级管理员支持该功能！"
+ErrRolePresetCannotDelete: "系统预设角色，无法删除"
+ErrRolePresetCannotUpdate: "系统预设角色，无法修改"
+ErrRoleBoundToUser: "角色已被用户绑定，无法删除"
+ErrRolePresetCannotBind: "系统预设角色，无法分配给用户"
+ErrNodeAdminMasterForbidden: "主节点不允许添加节点管理员权限"
+ErrSuperAdminCannotDelete: "超级管理员用户无法删除"
 ErrGroupIsDefault: "默认分组，无法删除"
 ErrGroupIsInUse: "分组正被使用，无法删除"
-ErrAIProxyUserGroupIsDefault: "默认用户组无法删除"
-ErrAIProxyUserGroupInUse: "用户组正被使用，无法删除"
-ErrAIProxyUserGroupExists: "用户组名称已存在"
-ErrAIProxyBackendAccountExists: "该模型账号已导入 AI 网关账号池，请勿重复导入"
-ErrAIProxyModelGroupInUse: "模型组正在使用，无法删除"
-ErrAIProxyModelGroupExists: "模型组名称已存在"
-ErrAIProxySensitiveGroupInUse: "敏感词分组正在使用，无法删除"
-ErrAIProxySensitiveGroupExists: "敏感词分组名称已存在"
-ErrLocalDelete: "无法删除本地节点！"
-ErrPortInUsed: "{{ .name }} 端口已被占用！"
-ErrInternalServerKey: "服务内部错误:"
-MasterNode: "主节点"
 
-#app
-CustomAppStoreFileValid: "应用商店包需要 .tar.gz 格式"
-ErrFileNotFound: '{{ .name }} 文件不存在'
-AppBackup: "应用备份"
-AppBackupPush: "传输应用备份文件 {{.file}} 到节点 {{ .name }}"
-ErrSourceTargetSame: "源节点和目标节点不能相同！"
-AppInstall: "在 {{ .targetNode }} 节点安装应用 {{ .name }}"
-AppInstallCheck: "检查应用安装环境"
-
-#backup
-ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
-ErrBackupCheck: "备份账号测试连接失败 {{ .err }}"
-ErrBackupLocal: "本地服务器备份账号暂不支持该操作！"
-ErrBackupPublic: "检测到该备份账号为非公用，请检查后重试！"
-ErrOSSConn: "无法获取最新版本，请确认服务器是否能够连接外部网络。"
-
-#license
+# 许可证
 LicenseCheck: '检查许可证是否可用'
 ErrLicenseInUsed: '检查到该许可证已被绑定，请检查后重试！'
 ErrLicenseExpired: '检查到该许可证已过期，请检查后重试！'
@@ -113,35 +89,74 @@ ErrNodeUnbind: "检测到该节点未在许可证绑定范围内，请检查后�
 ErrNodeBind: "检测到该节点已绑定许可证，请检查后重试！"
 ErrNodeLocalRollback: "主节点暂不支持直接回滚，请手动执行 1pctl restore 命令回滚！"
 ErrIntlLicense: "当前版本暂不支持导入国际版许可证，敬请期待！"
-
-# user
-ErrNoSuchUser: "未能找到该用户信息，请检查后重试！"
-ErrToMaster: "该用户无权限对主节点进行该操作，请检查后重试！"
-ErrToNode: "该用户无权限对该节点进行该操作，请检查后重试！"
-ErrRBAC: "用户权限不足，无法进行该操作，请检查后重试！"
-ErrNoneNode: "该用户无任何节点权限，请联系管理员或检查后重试！"
-ErrOnlySuperAdmin: "仅超级管理员支持该功能！"
-ErrRolePresetCannotDelete: "系统预设角色，无法删除"
-ErrRolePresetCannotUpdate: "系统预设角色，无法修改"
-ErrRoleBoundToUser: "角色已被用户绑定，无法删除"
-ErrRolePresetCannotBind: "系统预设角色，无法分配给用户"
-ErrNodeAdminMasterForbidden: "主节点不允许添加节点管理员权限"
-ErrSuperAdminCannotDelete: "超级管理员用户无法删除"
-
 InvalidRequestBodyType: "请求体格式错误，请检查请求内容是否符合格式要求后重试！"
-InvalidLicenseCodeType: "提供的许可证格式错误，请检查后重试！"       
-LicenseNotFoundType: "许可证不存在，系统中未找到与提供许可证匹配的记录，请检查后重试！"          
-LicenseRevokedType: "请求的许可证已被废弃，无法使用，请检查后重试！"           
-LicenseExpiredType: "许可证已超过有效期，请续费或在 面板设置-许可证 界面重新导入许可证后重试！"         
-LicenseProductMismatchType: "许可证与当前请求的产品或服务不匹配！"   
-InvalidAssigneeType: "许可证分配的目标用户或设备信息无效，请检查后重试！"         
-LicenseUsageNotFoundType: "无使用记录，当前许可证尚未被激活或使用，请检查后重试！"    
-LicenseUsageLimitExceededType: "该许可证已绑定到其他节点，请检查后重试！"    
+InvalidLicenseCodeType: "提供的许可证格式错误，请检查后重试！"
+LicenseNotFoundType: "许可证不存在，系统中未找到与提供许可证匹配的记录，请检查后重试！"
+LicenseRevokedType: "请求的许可证已被废弃，无法使用，请检查后重试！"
+LicenseExpiredType: "许可证已超过有效期，请续费或在 面板设置-许可证 界面重新导入许可证后重试！"
+LicenseProductMismatchType: "许可证与当前请求的产品或服务不匹配！"
+InvalidAssigneeType: "许可证分配的目标用户或设备信息无效，请检查后重试！"
+LicenseUsageNotFoundType: "无使用记录，当前许可证尚未被激活或使用，请检查后重试！"
+LicenseUsageLimitExceededType: "该许可证已绑定到其他节点，请检查后重试！"
 
-# alert
+# 节点与集群
+MasterNode: "主节点"
+Node: "节点"
+ErrLocalDelete: "无法删除本地节点！"
+ErrMasterDelete: "无法删除主节点，请先删除从节点"
+ClusterNameIsExist: "集群名称已存在"
+AppStatusUnHealthy: "应用获取状态异常，请在节点列表检查安装节点状态"
+MasterNodePortNotAvailable: "节点 {{ .name }} 端口 {{ .port }} 连通性校验失败，请检查防火墙/安全组设置和主节点状态"
+ClusterMasterNotExist: "集群主节点失联，请删除子节点"
+
+# 虚拟机
+ErrVMNotFound: "虚拟机不存在"
+ErrVMAlreadyExists: "虚拟机已存在"
+ErrVMRunning: "虚拟机正在运行"
+ErrVMLibvirtConnect: "连接 libvirt 失败: {{ .detail }}"
+ErrVMPermission: "没有虚拟机操作权限: {{ .detail }}"
+ErrVMNetworkNotFound: "虚拟机网络不存在: {{ .detail }}"
+ErrVMInvalidPath: "虚拟机路径非法: {{ .detail }}"
+ErrVMInvalidInput: "虚拟机参数非法: {{ .detail }}"
+ErrVMCommandFailed: "虚拟机命令执行失败: {{ .err }}"
+VMSnapshotCreateTask: "创建虚拟机 [{{ .vm }}] 快照 [{{ .snapshot }}]"
+VMSnapshotCreateStep: "创建虚拟机快照 [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "恢复虚拟机 [{{ .vm }}] 快照 [{{ .snapshot }}]"
+VMSnapshotRecoverStep: "恢复虚拟机快照 [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "删除虚拟机 [{{ .vm }}] 快照 [{{ .snapshot }}]"
+VMSnapshotDeleteStep: "删除虚拟机快照 [{{ .snapshot }}]"
+
+# 应用
+CustomAppStoreFileValid: "应用商店包需要 .tar.gz 格式"
+AppBackup: "应用备份"
+AppBackupPush: "传输应用备份文件 {{.file}} 到节点 {{ .name }}"
+ErrSourceTargetSame: "源节点和目标节点不能相同！"
+AppInstall: "在 {{ .targetNode }} 节点安装应用 {{ .name }}"
+AppInstallCheck: "检查应用安装环境"
+
+# 备份
+ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
+ErrBackupCheck: "备份账号测试连接失败 {{ .err }}"
+ErrBackupLocal: "本地服务器备份账号暂不支持该操作！"
+ErrBackupPublic: "检测到该备份账号为非公用，请检查后重试！"
+ErrOSSConn: "无法获取最新版本，请确认服务器是否能够连接外部网络。"
+MvBackup: "移动数据到备份目录"
+
+# 告警
 ErrAlertSync: "告警信息同步错误，请检查后重试！"
 
-#task
+# AI 网关
+ErrAIProxyUserGroupIsDefault: "默认用户组无法删除"
+ErrAIProxyUserGroupInUse: "用户组正被使用，无法删除"
+ErrAIProxyUserGroupExists: "用户组名称已存在"
+ErrAIProxyBackendAccountExists: "该模型账号已导入 AI 网关账号池，请勿重复导入"
+ErrAIProxyModelGroupInUse: "模型组正在使用，无法删除"
+ErrAIProxyModelGroupExists: "模型组名称已存在"
+ErrAIProxySensitiveGroupInUse: "敏感词分组正在使用，无法删除"
+ErrAIProxySensitiveGroupExists: "敏感词分组名称已存在"
+AIBenchmarkRun: "执行 AI 基准测试"
+
+# 任务
 TaskStart: "{{ .name }} 任务开始 [START]"
 TaskEnd: "{{ .name }} 任务结束 [COMPLETED]"
 TaskFailed: "{{ .name }} 任务失败"
@@ -155,6 +170,16 @@ TaskUpgrade: "升级"
 TaskSync: "同步"
 TaskSyncForNode: "同步节点数据"
 TaskBackup: "备份"
+TaskPush: "推送"
+TaskRsync: "同步"
+SuccessStatus: "{{ .name }} 成功"
+FailedStatus: "{{ .name }} 失败 {{ .err }}"
+Start: "开始"
+SubTask: "子任务"
+Skip: "忽略错误并继续..."
+Success: "成功"
+
+# 智能体批量任务
 BatchInstallAgent: "批量安装智能体"
 DispatchAgentInstallTasks: "下发智能体安装任务"
 BatchUpgradeAgent: "批量升级智能体"
@@ -188,21 +213,15 @@ AgentOperateStart: "启动"
 AgentOperateStop: "停止"
 AgentOperateRestart: "重启"
 AgentOperateDelete: "删除"
-AIBenchmarkRun: "执行 AI 基准测试"
-SuccessStatus: "{{ .name }} 成功"
-FailedStatus: "{{ .name }} 失败 {{ .err }}"
-Start: "开始"
-SubTask: "子任务"
-Skip: "忽略错误并继续..."
+
+# 应用与技能任务
 PushAppInstallTaskToNode: "推送应用安装任务到节点 [{{ .name }}]"
-TaskPush: "推送"
 AppInstallTask: "应用安装任务"
 PushAppFailed: "推送应用安装任务失败"
 SkillHubInstallTask: "安装技能 [{{ .name }}]"
 SkillHubInstallToTarget: "安装技能 {{ .name }} 到目标 {{ .target }}"
-Success: "成功"
 
-#script
+# 脚本库
 ScriptLibrary: "脚本库"
 RemoteScriptLibrary: "远程脚本库"
 ScriptSyncSkip: "检查到当前脚本库已是最新版本！"
@@ -210,8 +229,7 @@ DownloadData: "下载脚本库文件 data.yaml"
 DownloadPackage: "下载脚本库压缩包"
 AnalyticCompletion: "解析成功，现在开始同步到数据库..."
 
-#sync node
-Node: "节点"
+# 节点同步
 SyncNode: "同步数据到节点 {{ .name }}"
 LocalName: "local 名称仅用于系统本机标识"
 SyncPackageData: "打包同步数据"
@@ -227,8 +245,7 @@ SyncCustomApp: "自定义应用"
 SyncLanguage: "系统语言"
 SyncEdition: "运行区域"
 
-
-#upgrade node
+# 节点升级
 NodeUpgrade: "升级节点 {{ .name }}"
 UpgradeCheck: "检查节点更新"
 UpgradeCheckLocal: "本地节点不支持批量升级，跳过..."
@@ -241,7 +258,7 @@ LoadAutoUpgradeNodesFailed: "加载自动升级节点失败，错误: {{ .err }}
 AutoUpgradeNodes: "自动升级节点: {{ .nodes }}"
 UpdateAutoUpgradeNodesStatusFailed: "更新自动升级节点状态失败，错误: {{ .err }}"
 
-#add node
+# 添加节点
 MasterData: "主节点数据"
 LoadSftpClient: "获取上传客户端"
 PackageMasterData: "生成主节点备份压缩包"
@@ -258,7 +275,35 @@ SendAgent: "下发节点安装包"
 StartService: "启动服务"
 NoBackupNode: "当前备份节点为空，请选择备份节点保存后重试！"
 
-#cmd
+# 节点文件与镜像同步
+LocalNodeIpFailed: "无法获取主节点 IP ，请编辑主节点增加 IP 地址和 SSH 认证信息"
+HandlePrivateKey: "处理节点私钥"
+HandlePublicKey: "处理节点公钥"
+ExchangeFile: "开始从 {{ .source }} 节点同步 {{ .sourcePath }} 到 {{ .dest  }} 节点 {{ .destPath }}"
+NodeFile: "节点文件"
+ImageSyncTaskName: "镜像同步 {{ .count }} 张镜像"
+SSLSyncTaskName: "证书同步 {{ .count }} 张证书"
+AppSyncTaskName: "应用同步 {{ .name }}"
+SSLSyncToNode: "推送证书 [{{ .cert }}] 到节点 [{{ .node }}]"
+ImageSyncSave: "保存镜像 {{ .image }}"
+ImageSyncSaveTags: "保存镜像标签 {{ .tags }}"
+ImageSyncToNode: "同步镜像 {{ .image }} 到节点 {{ .node }}"
+ImageSyncLoad: "在节点 {{ .node }} 加载镜像 {{ .image }}"
+ImageSyncClean: "清理镜像 {{ .image }} 临时文件"
+ImageSyncNoTag: "镜像 {{ .image }} 没有标签，将使用镜像 ID 保存"
+ImageSyncFrontendTagsIgnored: "镜像 {{ .image }} 在源节点未查询到标签，已忽略前端传入标签"
+ImageSyncHandlePrivateKey: "处理镜像同步节点私钥"
+ImageSyncHandlePublicKey: "处理镜像同步节点公钥"
+ImageSyncTransfer: "开始传输镜像临时文件：{{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
+
+# 命令行
+SudoHelper: "请使用 {{ .cmd }} 或切换到 root 用户"
+UsernameNeed: "企业版必须指定 --username"
+DBConnErr: "错误: 初始化数据库连接失败，{{ .err }}"
+SystemVersion: "版本: "
+SystemMode: "模式: "
+
+# 命令行 - 应用
 AppVersion: "应用版本"
 AppCommands: "应用相关命令"
 AppInit: "初始化应用"
@@ -270,12 +315,14 @@ AppMissVersion: "应用版本缺失，使用 -v 指定"
 AppVersionExist: "版本已存在！"
 AppCreateSuccessful: "创建成功！"
 AppWriteErr: "文件 {{ .name }} 写入失败 {{ .err }}"
-SudoHelper: "请使用 {{ .cmd }} 或切换到 root 用户"
-UsernameNeed: "企业版必须指定 --username"
+
+# 命令行 - 监听 IP
 ListenIPCommands: "切换监听 IP"
 ListenIPv4: "监听 IPv4"
 ListenIPv6: "监听 IPv6"
 ListenChangeSuccessful: "切换成功！已切换至监听 {{ .value }}"
+
+# 命令行 - 重置
 ResetCommands: "重置系统信息"
 ResetMFA: "取消 1Panel 两步验证"
 ResetHttps: "取消 1Panel https 方式登录"
@@ -283,12 +330,19 @@ ResetEntrance: "取消 1Panel 安全入口"
 ResetIPs: "取消 1Panel 授权 IP 限制"
 ResetDomain: "取消 1Panel 访问域名绑定"
 ResetPasskey: "清空 1Panel 通行密钥"
+
+# 命令行 - 用户
 UserList: "获取 1Panel 用户列表"
 UserTableName: "名称"
 UserTableMFAStatus: "MFA 状态"
 UserTableSuperAdmin: "超级管理员"
 UserTableCreatedAt: "创建时间"
 UserEmptyList: "暂无用户"
+UserInfo: "获取面板信息"
+UserInfoAddr: "面板地址: "
+UserInfoPassHelp: "提示: 修改密码可执行命令: "
+
+# 命令行 - 回滚
 RestoreCommands: "回滚 1Panel 服务及数据"
 RestoreNoSuchFile: "暂无可回滚文件"
 RestoreStep1: "（1/5）开始从 {{ .name }} 目录回滚 1Panel 服务及数据... "
@@ -297,6 +351,8 @@ RestoreStep3: "（3/5）1Panel 脚本回滚成功"
 RestoreStep4: "（4/5）1Panel 服务回滚成功"
 RestoreStep5: "（5/5）1Panel 数据回滚成功"
 RestoreSuccessful: "回滚成功！已回滚到 {{ .version }}，正在重启服务，请稍候..."
+
+# 命令行 - 修改
 UpdateCommands: "修改面板信息"
 UpdateUser: "修改用户信息"
 UpdatePassword: "修改用户密码"
@@ -323,50 +379,12 @@ UpdatePortResult: "面板端口: {{ .name }}"
 UpdatePortFirewallAdd: "添加防火墙端口规则失败，{{ .err }}，请您手动将 {{ .name }} 端口添加至防火墙规则中。"
 UpdatePortFirewallDel: "错误: 防火墙端口删除失败，{{ .err }}"
 UpdatePortFirewallReload: "防火墙重载失败，{{ .err }}，请您手动重载防火墙。"
-UserInfo: "获取面板信息"
-UserInfoAddr: "面板地址: "
-UserInfoPassHelp: "提示: 修改密码可执行命令: "
-DBConnErr: "错误: 初始化数据库连接失败，{{ .err }}"
-SystemVersion: "版本: "
-SystemMode: "模式: "
 
-#exchange
-LocalNodeIpFailed: "无法获取主节点 IP ，请编辑主节点增加 IP 地址和 SSH 认证信息"
-HandlePrivateKey: "处理节点私钥"
-HandlePublicKey: "处理节点公钥"
-ExchangeFile: "开始从 {{ .source }} 节点同步 {{ .sourcePath }} 到 {{ .dest  }} 节点 {{ .destPath }}"
-TaskRsync: "同步"
-NodeFile: "节点文件"
-ImageSyncTaskName: "镜像同步 {{ .count }} 张镜像"
-SSLSyncTaskName: "证书同步 {{ .count }} 张证书"
-AppSyncTaskName: "应用同步 {{ .name }}"
-SSLSyncToNode: "推送证书 [{{ .cert }}] 到节点 [{{ .node }}]"
-ImageSyncSave: "保存镜像 {{ .image }}"
-ImageSyncSaveTags: "保存镜像标签 {{ .tags }}"
-ImageSyncToNode: "同步镜像 {{ .image }} 到节点 {{ .node }}"
-ImageSyncLoad: "在节点 {{ .node }} 加载镜像 {{ .image }}"
-ImageSyncClean: "清理镜像 {{ .image }} 临时文件"
-ImageSyncNoTag: "镜像 {{ .image }} 没有标签，将使用镜像 ID 保存"
-ImageSyncFrontendTagsIgnored: "镜像 {{ .image }} 在源节点未查询到标签，已忽略前端传入标签"
-ImageSyncHandlePrivateKey: "处理镜像同步节点私钥"
-ImageSyncHandlePublicKey: "处理镜像同步节点公钥"
-ImageSyncTransfer: "开始传输镜像临时文件：{{ .source }}:{{ .sourcePath }} -> {{ .dest }}:{{ .destPath }}"
-
-#mobile app
+# 移动端
 ErrVerifyToken: '令牌验证错误，请重置后再次扫码'
 ErrInvalidToken: '无效的令牌，请重置后再次扫码'
 ErrExpiredToken: '令牌过期，请重置后再次扫码'
 
-#cluster
-ErrMasterDelete: "无法删除主节点，请先删除从节点"
-ClusterNameIsExist: "集群名称已存在"
-AppStatusUnHealthy: "应用获取状态异常，请在节点列表检查安装节点状态"
-MasterNodePortNotAvailable: "节点 {{ .name }} 端口 {{ .port }} 连通性校验失败，请检查防火墙/安全组设置和主节点状态"
-ClusterMasterNotExist: "集群主节点失联，请删除子节点"
-
-#ssl
-ErrReqFailed: "{{.name}} 请求失败: {{ .err }}"
-
-#command
+# 命令导出
 Name: "名称"
 Command: "命令"
