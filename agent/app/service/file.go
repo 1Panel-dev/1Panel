@@ -1116,7 +1116,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		}
 		logFilePath = path.Join(global.Dir.LogDir, "ai", safeName)
 	default:
-		return nil, buserr.New("ErrNotSupportType")
+		return nil, buserr.WithName("ErrNotSupportType", req.Type)
 	}
 
 	file, err := os.Open(logFilePath)

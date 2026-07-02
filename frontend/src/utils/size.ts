@@ -2,6 +2,24 @@ function formattedNumber(num: string) {
     return num.endsWith('.00') ? Number(num.slice(0, -3)) : Number(num);
 }
 
+export type BinarySizeUnit = 'B' | 'KiB' | 'MiB' | 'GiB' | 'TiB';
+
+const binarySizeUnitPower: Record<BinarySizeUnit, number> = {
+    B: 0,
+    KiB: 1,
+    MiB: 2,
+    GiB: 3,
+    TiB: 4,
+};
+
+export function convertBinarySize(size: number, from: BinarySizeUnit, to: BinarySizeUnit, precision = 2): number {
+    if (!size || from === to) {
+        return size;
+    }
+    const bytes = size * Math.pow(1024, binarySizeUnitPower[from]);
+    return formattedNumber((bytes / Math.pow(1024, binarySizeUnitPower[to])).toFixed(precision));
+}
+
 export function computeSize(size: number): string {
     const num = 1024.0;
     if (size < num) return size + ' B';

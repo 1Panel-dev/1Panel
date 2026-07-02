@@ -30,6 +30,21 @@ ErrEntranceFormat: "A entrada de segurança {{ .name }} não é suportada atualm
 # common
 ErrDemoEnvironment: 'Indisponível em demo'
 ErrCmdTimeout: 'Comando expirou'
+ErrVMNotFound: "Máquina virtual não existe"
+ErrVMAlreadyExists: "Máquina virtual já existe"
+ErrVMRunning: "Máquina virtual está em execução"
+ErrVMLibvirtConnect: "Falha ao conectar ao libvirt: {{ .detail }}"
+ErrVMPermission: "Sem permissão para operar a máquina virtual: {{ .detail }}"
+ErrVMNetworkNotFound: "Rede da máquina virtual não existe: {{ .detail }}"
+ErrVMInvalidPath: "Caminho da máquina virtual inválido: {{ .detail }}"
+ErrVMInvalidInput: "Parâmetro da máquina virtual inválido: {{ .detail }}"
+ErrVMCommandFailed: "Falha no comando da máquina virtual: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
 ErrEntrance: "Erro nas informações de entrada de segurança, por favor, verifique e tente novamente"
 ErrGroupIsDefault: "Grupo padrão não pode ser excluído"
 ErrGroupIsInUse: "O grupo está em uso e não pode ser excluído."

@@ -30,6 +30,21 @@ ErrEntranceFormat: "보안 입구 {{ .name }}은(는) 현재 지원되지 않습
 # common
 ErrDemoEnvironment: '데모 환경에서는 불가'
 ErrCmdTimeout: '명령이 시간 초과했습니다'
+ErrVMNotFound: "가상 머신이 존재하지 않습니다"
+ErrVMAlreadyExists: "가상 머신이 이미 존재합니다"
+ErrVMRunning: "가상 머신이 실행 중입니다"
+ErrVMLibvirtConnect: "libvirt 연결 실패: {{ .detail }}"
+ErrVMPermission: "가상 머신 작업 권한이 없습니다: {{ .detail }}"
+ErrVMNetworkNotFound: "가상 머신 네트워크가 존재하지 않습니다: {{ .detail }}"
+ErrVMInvalidPath: "가상 머신 경로가 유효하지 않습니다: {{ .detail }}"
+ErrVMInvalidInput: "가상 머신 매개변수가 유효하지 않습니다: {{ .detail }}"
+ErrVMCommandFailed: "가상 머신 명령 실행 실패: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
 ErrEntrance: "보안 정보 오류입니다. 확인 후 다시 시도하십시오"
 ErrGroupIsDefault: "기본 그룹은 삭제할 수 없습니다"
 ErrGroupIsInUse: "그룹이 사용 중이므로 삭제할 수 없습니다."

@@ -43,6 +43,14 @@ func WithByName(name string) global.DBOption {
 		return g.Where("`name` = ?", name)
 	}
 }
+func WithByLikeName(name string) global.DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(name) == 0 {
+			return g
+		}
+		return g.Where("name like ?", "%"+name+"%")
+	}
+}
 func WithByUserID(userID string) global.DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("user_id = ?", userID)

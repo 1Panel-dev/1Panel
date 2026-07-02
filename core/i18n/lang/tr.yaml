@@ -30,6 +30,21 @@ ErrEntranceFormat: "{{ .name }} güvenlik girişi şu anda desteklenmiyor. Lütf
 # common
 ErrDemoEnvironment: 'Demo modunda yok'
 ErrCmdTimeout: 'Komut zaman aşımına uğradı'
+ErrVMNotFound: "Sanal makine mevcut değil"
+ErrVMAlreadyExists: "Sanal makine zaten mevcut"
+ErrVMRunning: "Sanal makine çalışıyor"
+ErrVMLibvirtConnect: "libvirt bağlantısı başarısız: {{ .detail }}"
+ErrVMPermission: "Sanal makine işlemi için izin yok: {{ .detail }}"
+ErrVMNetworkNotFound: "Sanal makine ağı mevcut değil: {{ .detail }}"
+ErrVMInvalidPath: "Geçersiz sanal makine yolu: {{ .detail }}"
+ErrVMInvalidInput: "Geçersiz sanal makine parametresi: {{ .detail }}"
+ErrVMCommandFailed: "Sanal makine komutu başarısız: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
 ErrEntrance: "Güvenlik girişi bilgi hatası, lütfen kontrol edip tekrar deneyin"
 ErrGroupIsDefault: "Varsayılan grup, silinemez"
 ErrGroupIsInUse: "Grup kullanımda ve silinemez."

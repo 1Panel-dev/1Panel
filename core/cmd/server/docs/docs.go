@@ -74,6 +74,7 @@ const docTemplate = `{
 						"description": "OK",
 						"schema": {
 							"additionalProperties": {
+								"format": "int64",
 								"type": "integer"
 							},
 							"type": "object"
@@ -40549,6 +40550,9 @@ const docTemplate = `{
 				"streamableHttpPath": {
 					"type": "string"
 				},
+				"taskID": {
+					"type": "string"
+				},
 				"type": {
 					"type": "string"
 				},
@@ -40679,6 +40683,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"streamableHttpPath": {
+					"type": "string"
+				},
+				"taskID": {
 					"type": "string"
 				},
 				"type": {

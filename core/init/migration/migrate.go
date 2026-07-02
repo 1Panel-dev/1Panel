@@ -45,6 +45,7 @@ func Init() {
 		migrations.AddAIProxyMenu,
 		migrations.AddSkillsHubMenu,
 		migrations.UpdateXpackSyncMenu,
+		migrations.AddVirtualMachineMenu,
 		migrations.AddOperationLogUser,
 		migrations.AddLoginLogUser,
 		migrations.AddAlertAuditUser,

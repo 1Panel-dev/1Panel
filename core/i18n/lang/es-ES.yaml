@@ -35,6 +35,21 @@ ErrEntranceFormat: "La entrada de seguridad {{ .name }} no está actualmente sop
 # common
 ErrDemoEnvironment: 'No disponible en demo'
 ErrCmdTimeout: 'Comando agotó tiempo'
+ErrVMNotFound: "La máquina virtual no existe"
+ErrVMAlreadyExists: "La máquina virtual ya existe"
+ErrVMRunning: "La máquina virtual está en ejecución"
+ErrVMLibvirtConnect: "Error al conectar con libvirt: {{ .detail }}"
+ErrVMPermission: "Sin permiso para operar la máquina virtual: {{ .detail }}"
+ErrVMNetworkNotFound: "La red de la máquina virtual no existe: {{ .detail }}"
+ErrVMInvalidPath: "Ruta de máquina virtual no válida: {{ .detail }}"
+ErrVMInvalidInput: "Parámetro de máquina virtual no válido: {{ .detail }}"
+ErrVMCommandFailed: "Error al ejecutar el comando de la máquina virtual: {{ .err }}"
+VMSnapshotCreateTask: "Create snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotCreateStep: "Create virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotRecoverTask: "Recover snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotRecoverStep: "Recover virtual machine snapshot [{{ .snapshot }}]"
+VMSnapshotDeleteTask: "Delete snapshot [{{ .snapshot }}] for virtual machine [{{ .vm }}]"
+VMSnapshotDeleteStep: "Delete virtual machine snapshot [{{ .snapshot }}]"
 ErrEntrance: "Error en la información de entrada de seguridad, por favor revise e intente de nuevo"
 ErrGroupIsDefault: "Grupo predeterminado, no se puede eliminar"
 ErrGroupIsInUse: "El grupo está en uso y no se puede eliminar."
