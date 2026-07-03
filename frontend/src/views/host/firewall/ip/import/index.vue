@@ -88,7 +88,7 @@ const displayData = ref<any>([]);
 const currentRules = ref<Host.RuleInfo[]>([]);
 
 const uploadRef = ref();
-const uploaderFiles = ref();
+const uploaderFiles = ref<UploadFiles>([]);
 const pageData = ref([]);
 const paginationConfig = reactive({
     currentPage: 1,
@@ -97,10 +97,21 @@ const paginationConfig = reactive({
 });
 
 const acceptParams = async (): Promise<void> => {
+    resetImportData();
     visible.value = true;
-    displayData.value = [];
-    selects.value = [];
+
     loadCurrentData();
+};
+
+const resetImportData = () => {
+    loading.value = false;
+    displayData.value = [];
+    pageData.value = [];
+    selects.value = [];
+    uploaderFiles.value = [];
+    paginationConfig.currentPage = 1;
+    paginationConfig.total = 0;
+    uploadRef.value?.clearFiles();
 };
 
 const loadCurrentData = async () => {
