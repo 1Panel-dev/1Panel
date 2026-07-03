@@ -49,6 +49,7 @@ const message = {
             verify: 'Sahkan',
             saveAndEnable: 'Simpan dan aktifkan',
             import: 'Import',
+            importAll: 'Import semua',
             export: 'Eksport',
             power: 'Hantar',
             search: 'Cari',

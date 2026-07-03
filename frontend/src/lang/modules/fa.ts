@@ -52,6 +52,7 @@ const message = {
             verify: 'تأیید',
             saveAndEnable: 'ذخیره و فعال‌سازی',
             import: 'واردات',
+            importAll: 'وارد کردن همه',
             export: 'خروجی',
             power: 'ارسال',
             search: 'جستجو',

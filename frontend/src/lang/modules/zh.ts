@@ -52,6 +52,7 @@ const message = {
             verify: '验证',
             saveAndEnable: '保存并启用',
             import: '导入',
+            importAll: '全部导入',
             export: '导出',
             power: '授权',
             search: '搜索',
