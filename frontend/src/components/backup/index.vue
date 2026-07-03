@@ -129,7 +129,7 @@
                 </el-checkbox>
                 <span class="input-help">{{ $t('database.mongodbRecoverDropAllCollectionsHelper') }}</span>
             </el-form-item>
-            <el-form-item v-if="type === 'mysql' || type === 'mysql-cluster'" :label="$t('cronjob.backupArgs')">
+            <el-form-item v-if="supportMysqlBackupArgs()" :label="$t('cronjob.backupArgs')">
                 <el-select v-model="args" filterable allow-create multiple>
                     <el-option v-for="item in mysqlArgs" :key="item.arg" :value="item.arg" :label="item.arg">
                         {{ item.arg }}
@@ -326,6 +326,10 @@ const loadSize = async (params: any) => {
 
 const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID, true, node.value);
+};
+
+const supportMysqlBackupArgs = () => {
+    return ['mysql', 'mysql-cluster', 'mariadb'].includes(type.value);
 };
 
 function selectable(row) {
