@@ -1,5 +1,7 @@
 export type CodeEditorTheme = 'vs' | 'vs-dark' | 'hc-black';
 
+export const codeEditorThemeStorageKey = 'code-theme';
+
 export const getDefaultCodeEditorTheme = (isDarkTheme: boolean): CodeEditorTheme => {
     return isDarkTheme ? 'vs-dark' : 'vs';
 };

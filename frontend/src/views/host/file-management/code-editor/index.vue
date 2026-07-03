@@ -423,7 +423,12 @@ import CodeTabs from './tabs/index.vue';
 import FileHistoryDrawer from './history/index.vue';
 import noUpdateImage from '@/assets/images/no_update_app.svg';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { CodeEditorTheme, getDefaultCodeEditorTheme, resolveCodeEditorTheme } from '@/utils/code-editor-theme';
+import {
+    CodeEditorTheme,
+    codeEditorThemeStorageKey,
+    getDefaultCodeEditorTheme,
+    resolveCodeEditorTheme,
+} from '@/utils/code-editor-theme';
 
 const { isDarkTheme, isMobile } = useGlobalStore();
 
@@ -541,7 +546,7 @@ const revealPendingInitialLine = () => {
 const open = ref(false);
 const loading = ref(false);
 const fileName = ref('');
-const codeThemeKey = 'code-theme';
+const codeThemeKey = codeEditorThemeStorageKey;
 const warpKey = 'code-warp';
 const minimapKey = 'code-minimap';
 const directoryPath = ref('');
@@ -888,14 +893,20 @@ const changeLanguage = (command: string) => {
     monacoApi.editor.setModelLanguage(model, config.language);
 };
 
-const changeTheme = (command: string) => {
+const applyCodeEditorTheme = (theme: CodeEditorTheme, persist = false) => {
+    config.theme = theme;
     if (!monacoApi) {
         return;
     }
-    config.theme = resolveCodeEditorTheme(command, isDarkTheme.value);
     monacoApi.editor.setTheme(config.theme);
     applyTreeThemeClass();
-    localStorage.setItem(codeThemeKey, config.theme);
+    if (persist) {
+        localStorage.setItem(codeThemeKey, config.theme);
+    }
+};
+
+const changeTheme = (command: string) => {
+    applyCodeEditorTheme(resolveCodeEditorTheme(command, isDarkTheme.value), true);
 };
 
 const applyTreeThemeClass = () => {
@@ -915,18 +926,9 @@ const applyTreeThemeClass = () => {
 };
 
 const syncDefaultThemeWithPanelTheme = () => {
-    if (localStorage.getItem(codeThemeKey)) {
-        return;
-    }
     const nextTheme = getDefaultCodeEditorTheme(isDarkTheme.value);
-    if (config.theme === nextTheme) {
-        return;
-    }
-    config.theme = nextTheme;
-    if (monacoApi) {
-        monacoApi.editor.setTheme(config.theme);
-    }
-    applyTreeThemeClass();
+    localStorage.removeItem(codeThemeKey);
+    applyCodeEditorTheme(nextTheme);
 };
 
 watch(isDarkTheme, syncDefaultThemeWithPanelTheme);
@@ -1155,7 +1157,7 @@ const getDirectoryPath = (filePath: string) => {
 
 const onOpen = async () => {
     await initEditor();
-    changeTheme(config.theme);
+    applyCodeEditorTheme(config.theme);
     search(directoryPath.value).then((res) => {
         handleSearchResult(res);
     });
