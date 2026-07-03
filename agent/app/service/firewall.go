@@ -222,7 +222,7 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 		req.Chain = iptables.Chain1PanelBasic
 	}
 	protos := strings.Split(req.Protocol, "/")
-	itemAddress := strings.Split(strings.TrimSuffix(req.Address, ","), ",")
+	itemAddress := splitFirewallRuleAddresses(req.Address)
 
 	if client.Name() == "ufw" {
 		if strings.Contains(req.Port, ",") || strings.Contains(req.Port, "-") {
@@ -515,6 +515,7 @@ func (u *FirewallService) operatePort(client firewall.FirewallClient, req dto.Po
 	if err := copier.Copy(&fireInfo, &req); err != nil {
 		return err
 	}
+	fireInfo.Address = normalizeFirewallRuleAddress(fireInfo.Address)
 
 	if client.Name() == "ufw" {
 		if len(fireInfo.Address) != 0 && !strings.EqualFold(fireInfo.Address, "Anywhere") {
@@ -527,6 +528,26 @@ func (u *FirewallService) operatePort(client firewall.FirewallClient, req dto.Po
 		return client.RichRules(fireInfo, req.Operation)
 	}
 	return client.Port(fireInfo, req.Operation)
+}
+
+func splitFirewallRuleAddresses(address string) []string {
+	parts := strings.Split(strings.TrimSuffix(address, ","), ",")
+	addresses := make([]string, 0, len(parts))
+	for _, part := range parts {
+		addresses = append(addresses, normalizeFirewallRuleAddress(part))
+	}
+	if len(addresses) == 0 {
+		return []string{""}
+	}
+	return addresses
+}
+
+func normalizeFirewallRuleAddress(address string) string {
+	address = strings.TrimSpace(address)
+	if strings.EqualFold(address, "Anywhere") {
+		return ""
+	}
+	return address
 }
 
 type portOfApp struct {

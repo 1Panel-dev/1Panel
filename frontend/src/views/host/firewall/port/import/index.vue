@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { genFileId, UploadFile, UploadFiles, UploadProps, UploadRawFile } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
@@ -175,29 +175,37 @@ const checkDataFormat = (item: any): boolean => {
     return true;
 };
 
+const normalizeRuleAddress = (address?: string): string => {
+    const normalized = (address || '').trim();
+    return normalized.toLowerCase() === 'anywhere' ? '' : normalized;
+};
+
 const compareRules = (importedRules: any[]) => {
     const newRules: any[] = [];
     const conflictRules: any[] = [];
     const duplicateRules: any[] = [];
 
     for (const importedRule of importedRules) {
-        const key = `${importedRule.address || 'Anywhere'}:${importedRule.port}:${importedRule.protocol}`;
+        const normalizedAddress = normalizeRuleAddress(importedRule.address);
+        const normalizedRule = { ...importedRule, address: normalizedAddress };
+        const key = `${normalizedAddress || 'Anywhere'}:${importedRule.port}:${importedRule.protocol}`;
 
         const existingRule = currentRules.value.find((rule) => {
-            const existingKey = `${rule.address || 'Anywhere'}:${rule.port}:${rule.protocol}`;
+            const existingAddress = normalizeRuleAddress(rule.address);
+            const existingKey = `${existingAddress || 'Anywhere'}:${rule.port}:${rule.protocol}`;
             return existingKey === key;
         });
 
         if (!existingRule) {
-            newRules.push({ ...importedRule, status: 'new' });
+            newRules.push({ ...normalizedRule, status: 'new' });
         } else if (existingRule.strategy !== importedRule.strategy) {
             conflictRules.push({
-                ...importedRule,
+                ...normalizedRule,
                 status: 'conflict',
                 existingStrategy: existingRule.strategy,
             });
         } else {
-            duplicateRules.push({ ...importedRule, status: 'duplicate' });
+            duplicateRules.push({ ...normalizedRule, status: 'duplicate' });
         }
     }
 
@@ -215,7 +223,7 @@ const onImport = async () => {
         try {
             const params: Host.RulePort = {
                 operation: 'add',
-                address: rule.address || 'Anywhere',
+                address: normalizeRuleAddress(rule.address),
                 port: rule.port,
                 source: '',
                 protocol: rule.protocol,
