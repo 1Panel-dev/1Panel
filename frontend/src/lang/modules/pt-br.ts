@@ -703,8 +703,6 @@ const message = {
             appVersion: 'Versão do app',
             webuiPort: 'Porta WebUI',
             tokenOrAuth: 'Token/Usuário e senha',
-            dashboardUsername: 'Usuário do Dashboard',
-            dashboardPassword: 'Senha do Dashboard',
             allowedOrigins: 'Endereços de acesso',
             allowedOriginsRequired: 'Informe pelo menos um endereço de acesso',
             allowedOriginsInvalid: 'Use o formato http(s)://host-ou-ip[:porta]',
@@ -865,7 +863,7 @@ const message = {
             channelAutoRestartHelper:
                 'Ao salvar, o contêiner será reiniciado automaticamente para que a configuração entre em vigor.',
             dashboardAuthAutoRebuildHelper:
-                'Ao salvar o usuário ou a senha do Dashboard, o contêiner será reconstruído automaticamente para que as alterações entrem em vigor.',
+                'Ao salvar o usuário ou a senha, o contêiner será reconstruído automaticamente para que as alterações entrem em vigor.',
             channelDeleteConfirm: 'Excluir a configuração do canal {0}?',
             customProviderHelper: 'Provedores de modelo personalizados não validam se a conta está disponível',
             apiTypeBaseURLHelper: 'Este tipo envia requisições para {0}. Base URL recomendada: {1}',

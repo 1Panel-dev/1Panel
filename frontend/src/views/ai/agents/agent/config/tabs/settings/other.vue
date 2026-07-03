@@ -13,10 +13,10 @@
             <el-input v-model="form.userTimezone" />
         </el-form-item>
         <template v-if="agentType === 'hermes-agent'">
-            <el-form-item :label="t('aiTools.agents.dashboardUsername')" prop="dashboardUsername">
+            <el-form-item :label="t('commons.login.username')" prop="dashboardUsername">
                 <el-input v-model="form.dashboardUsername" />
             </el-form-item>
-            <el-form-item :label="t('aiTools.agents.dashboardPassword')" prop="dashboardPassword">
+            <el-form-item :label="t('commons.login.password')" prop="dashboardPassword">
                 <el-input v-model="form.dashboardPassword" type="password" show-password>
                     <template #append>
                         <CopyButton :content="form.dashboardPassword" />

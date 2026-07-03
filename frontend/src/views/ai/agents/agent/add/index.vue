@@ -23,6 +23,20 @@
                 <el-form-item :label="$t('aiTools.agents.webuiPort')" prop="webUIPort">
                     <el-input-number v-model="form.webUIPort" :min="1" :max="65535" />
                 </el-form-item>
+                <template v-if="form.agentType === 'hermes-agent'">
+                    <el-form-item :label="$t('commons.login.username')" prop="dashboardUsername">
+                        <el-input v-model="form.dashboardUsername" />
+                    </el-form-item>
+                    <el-form-item :label="$t('commons.login.password')" prop="dashboardPassword">
+                        <div class="password-row">
+                            <el-input v-model="form.dashboardPassword" type="password" show-password />
+                            <CopyButton :content="form.dashboardPassword" />
+                            <el-button type="primary" plain @click="generateDashboardPassword">
+                                {{ $t('commons.button.random') }}
+                            </el-button>
+                        </div>
+                    </el-form-item>
+                </template>
                 <el-form-item
                     v-if="form.agentType === 'openclaw'"
                     :label="$t('aiTools.agents.allowedOrigins')"
@@ -87,23 +101,6 @@
                         </template>
                     </el-input>
                 </el-form-item>
-                <template v-if="form.agentType === 'hermes-agent'">
-                    <el-form-item :label="$t('aiTools.agents.dashboardUsername')" prop="dashboardUsername">
-                        <el-input v-model="form.dashboardUsername" />
-                    </el-form-item>
-                    <el-form-item :label="$t('aiTools.agents.dashboardPassword')" prop="dashboardPassword">
-                        <el-input v-model="form.dashboardPassword" type="password" show-password>
-                            <template #append>
-                                <el-space>
-                                    <CopyButton :content="form.dashboardPassword" />
-                                    <el-button link type="primary" @click="generateDashboardPassword">
-                                        {{ $t('commons.button.random') }}
-                                    </el-button>
-                                </el-space>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                </template>
             </el-card>
             <el-card class="form-card">
                 <AdvancedSetting :form="form" />
@@ -625,6 +622,17 @@ defineExpose({
     height: auto;
     line-height: inherit;
     font-size: inherit;
+}
+
+.password-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.password-row .el-input {
+    flex: 1;
 }
 
 .option-row {

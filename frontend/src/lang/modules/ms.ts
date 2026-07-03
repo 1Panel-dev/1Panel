@@ -709,8 +709,6 @@ const message = {
             appVersion: 'Versi aplikasi',
             webuiPort: 'Port WebUI',
             tokenOrAuth: 'Token/Nama pengguna & Kata laluan',
-            dashboardUsername: 'Nama pengguna Dashboard',
-            dashboardPassword: 'Kata laluan Dashboard',
             allowedOrigins: 'Alamat akses',
             allowedOriginsRequired: 'Masukkan sekurang-kurangnya satu alamat akses',
             allowedOriginsInvalid: 'Gunakan format http(s)://hos-atau-ip[:port]',
@@ -869,7 +867,7 @@ const message = {
             channelAutoRestartHelper:
                 'Menyimpan akan memulakan semula bekas secara automatik supaya konfigurasi berkuat kuasa.',
             dashboardAuthAutoRebuildHelper:
-                'Menyimpan nama pengguna atau kata laluan Dashboard akan membina semula bekas secara automatik supaya perubahan berkuat kuasa.',
+                'Menyimpan nama pengguna atau kata laluan akan membina semula bekas secara automatik supaya perubahan berkuat kuasa.',
             channelDeleteConfirm: 'Padam konfigurasi saluran {0}?',
             customProviderHelper: 'Penyedia model tersuai tidak mengesahkan sama ada akaun boleh digunakan',
             apiTypeBaseURLHelper: 'Jenis ini menghantar permintaan ke {0}. Base URL yang disyorkan: {1}',

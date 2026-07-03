@@ -702,8 +702,6 @@ const message = {
             appVersion: 'アプリバージョン',
             webuiPort: 'WebUI ポート',
             tokenOrAuth: 'Token/ユーザー名・パスワード',
-            dashboardUsername: 'Dashboard ユーザー名',
-            dashboardPassword: 'Dashboard パスワード',
             allowedOrigins: 'アクセスアドレス',
             allowedOriginsRequired: '少なくとも 1 つのアクセスアドレスを入力してください',
             allowedOriginsInvalid: 'http(s)://host-or-ip[:port] の形式で入力してください',
@@ -862,7 +860,7 @@ const message = {
                 'クリックして QR ログインタスクを開始します。QR コードはタスクログに表示され、スキャン成功後にコンテナが自動で再起動されます。',
             channelAutoRestartHelper: '保存後、設定を反映するためにコンテナが自動で再起動されます。',
             dashboardAuthAutoRebuildHelper:
-                'Dashboard のユーザー名またはパスワードを保存すると、変更を反映するためにコンテナが自動で再作成されます。',
+                'ユーザー名またはパスワードを保存すると、変更を反映するためにコンテナが自動で再作成されます。',
             channelDeleteConfirm: '{0} チャンネルの設定を削除しますか？',
             customProviderHelper: 'カスタムモデルプロバイダーでは、アカウントの有効性を検証しません',
             apiTypeBaseURLHelper: 'このタイプは最終的に {0} にリクエストします。推奨 Base URL: {1}',

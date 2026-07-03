@@ -705,8 +705,6 @@ const message = {
             appVersion: 'App Version',
             webuiPort: 'WebUI Port',
             tokenOrAuth: 'Token/Username & Password',
-            dashboardUsername: 'Dashboard Username',
-            dashboardPassword: 'Dashboard Password',
             allowedOrigins: 'Access Addresses',
             allowedOriginsRequired: 'Enter at least one access address',
             allowedOriginsInvalid: 'Use the format http(s)://host-or-ip[:port]',
@@ -863,7 +861,7 @@ const message = {
                 'Click to start the QR login task. The QR code will appear in the task log, and the container will restart automatically after the scan succeeds.',
             channelAutoRestartHelper: 'Saving will automatically restart the container so the changes take effect.',
             dashboardAuthAutoRebuildHelper:
-                'Saving the Dashboard username or password will automatically rebuild the container so the changes take effect.',
+                'Saving the username or password will automatically rebuild the container so the changes take effect.',
             channelDeleteConfirm: 'Delete the {0} channel configuration?',
             customProviderHelper: 'Custom model providers do not validate whether the account is available.',
             apiTypeBaseURLHelper: 'This type sends requests to {0}. Recommended Base URL: {1}',
