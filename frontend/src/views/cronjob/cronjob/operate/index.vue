@@ -352,13 +352,7 @@
                                         </el-select>
                                     </el-form-item>
                                 </LayoutCol>
-                                <LayoutCol
-                                    :span="20"
-                                    v-if="
-                                        form.type === 'database' &&
-                                        (form.dbType === 'mysql' || form.dbType === 'mysql-cluster')
-                                    "
-                                >
+                                <LayoutCol :span="20" v-if="form.type === 'database' && supportMysqlBackupArgs()">
                                     <el-form-item :label="$t('cronjob.backupArgs')">
                                         <el-select v-model="form.argItems" filterable allow-create multiple>
                                             <el-option
@@ -1414,6 +1408,9 @@ const isDir = () => {
 };
 const isDatabase = () => {
     return form.type === 'database';
+};
+const supportMysqlBackupArgs = () => {
+    return ['mysql', 'mysql-cluster', 'mariadb'].includes(form.dbType);
 };
 
 const loadNext = async (spec: any) => {
