@@ -2708,6 +2708,7 @@ const message = {
         license: '许可证',
         bindNode: '绑定节点',
         menuSetting: '菜单设置',
+        menuHide: '菜单隐藏',
         menuSettingHelper: '当只存在 1 个子菜单时，菜单栏将仅展示该子菜单',
         showAll: '全部显示',
         hideALL: '全部隐藏',

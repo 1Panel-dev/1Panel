@@ -58,21 +58,6 @@
                                 </el-radio-group>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.menuAccordion')" prop="menuAccordion">
-                                <el-radio-group
-                                    @change="onSave('MenuAccordion', form.menuAccordion)"
-                                    v-model="form.menuAccordion"
-                                >
-                                    <el-radio-button value="Enable">
-                                        <span>{{ $t('commons.button.enable') }}</span>
-                                    </el-radio-button>
-                                    <el-radio-button value="Disable">
-                                        <span>{{ $t('commons.button.disable') }}</span>
-                                    </el-radio-button>
-                                </el-radio-group>
-                                <span class="input-help">{{ $t('setting.menuAccordionHelper') }}</span>
-                            </el-form-item>
-
                             <el-form-item :label="$t('setting.watermark')" v-if="isXpackOrEE" prop="watermark">
                                 <el-radio-group class="w-full" @change="onChangeWatermark" v-model="form.watermarkShow">
                                     <el-radio-button value="Enable">
@@ -384,7 +369,10 @@ const onChangeProxy = () => {
 };
 
 const onChangeHideMenus = () => {
-    hideMenuRef.value.acceptParams({ hideMenu: form.hideMenu });
+    hideMenuRef.value.acceptParams({
+        hideMenu: form.hideMenu,
+        menuAccordion: form.menuAccordion,
+    });
 };
 
 const onChangeRegion = () => {

@@ -2836,6 +2836,7 @@ const message = {
         license: '라이선스',
         bindNode: '노드 바인딩',
         menuSetting: '메뉴 설정',
+        menuHide: '메뉴 숨김',
         menuSettingHelper: '하위 메뉴가 1개만 존재할 경우, 메뉴 바에는 해당 하위 메뉴만 표시됩니다',
         showAll: '모두 표시',
         hideALL: '모두 숨기기',

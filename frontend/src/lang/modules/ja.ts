@@ -2896,6 +2896,7 @@ const message = {
         license: 'ライセンス',
         bindNode: 'ノードをバインド',
         menuSetting: 'メニュー設定',
+        menuHide: 'メニュー非表示',
         menuSettingHelper: 'サブメニューが1つしか存在しない場合、メニューバーにはそのサブメニューのみが表示されます',
         showAll: 'すべてを表示します',
         hideALL: 'すべてを隠します',
