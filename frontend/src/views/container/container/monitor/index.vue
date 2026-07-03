@@ -22,6 +22,7 @@
                 height="200px"
                 id="cpuChart"
                 type="line"
+                renderer="svg"
                 :option="chartsOption['cpuChart']"
                 v-if="chartsOption['cpuChart']"
             />
@@ -31,6 +32,7 @@
                 height="200px"
                 id="memoryChart"
                 type="line"
+                renderer="svg"
                 :option="chartsOption['memoryChart']"
                 v-if="chartsOption['memoryChart']"
             />
@@ -40,6 +42,7 @@
                 height="200px"
                 id="ioChart"
                 type="line"
+                renderer="svg"
                 :option="chartsOption['ioChart']"
                 v-if="chartsOption['ioChart']"
             />
@@ -49,6 +52,7 @@
                 height="200px"
                 id="networkChart"
                 type="line"
+                renderer="svg"
                 :option="chartsOption['networkChart']"
                 v-if="chartsOption['networkChart']"
             />
