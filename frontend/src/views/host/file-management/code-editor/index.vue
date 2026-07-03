@@ -105,224 +105,217 @@
                 </div>
             </div>
             <div v-loading="loading">
-                <div class="flex">
-                    <div
-                        class="monaco-editor sm:w-48 w-1/3 monaco-editor-background border-0 tree-container"
-                        v-if="isShow"
+                <el-splitter
+                    class="code-splitter"
+                    :style="{ height: splitterHeight }"
+                    layout="horizontal"
+                    lazy
+                    @collapse="handleSplitterCollapse"
+                    @resize-end="handleSplitterResizeEnd"
+                >
+                    <el-splitter-panel
+                        v-model:size="treePanelSize"
+                        :min="isShow ? minTreePanelSize : 0"
+                        :max="maxTreePanelSize"
+                        :resizable="isShow"
+                        collapsible
+                        class="code-tree-panel"
+                        :class="{ 'is-collapsed': !isShow }"
+                        @update:size="handleTreePanelSizeChange"
                     >
-                        <div class="flex items-center justify-between px-1 h-7">
-                            <el-text size="small" @click="getUpData()" class="cursor-pointer">
-                                <el-icon>
-                                    <Top />
-                                </el-icon>
-                                <span class="sm:inline hidden pl-1">{{ $t('file.up') }}</span>
-                            </el-text>
-                            <el-divider direction="vertical" class="!mx-0" />
-                            <el-text size="small" @click="getRefresh(directoryPath)" class="cursor-pointer">
-                                <el-icon>
-                                    <Refresh />
-                                </el-icon>
-                                <span class="sm:inline hidden pl-1">{{ $t('commons.button.refresh') }}</span>
-                            </el-text>
-                            <el-divider direction="vertical" v-if="!isMobile" class="!mx-0" />
-                            <el-dropdown @command="handleCreate" v-if="!isMobile" trigger="click">
-                                <el-text size="small">
-                                    {{ $t('commons.button.create') }}
-                                    <el-icon><arrow-down /></el-icon>
+                        <div v-show="isShow" class="monaco-editor monaco-editor-background border-0 tree-container">
+                            <div class="flex items-center justify-between px-1 h-7">
+                                <el-text size="small" @click="getUpData()" class="cursor-pointer">
+                                    <el-icon>
+                                        <Top />
+                                    </el-icon>
+                                    <span class="sm:inline hidden pl-1">{{ $t('file.up') }}</span>
                                 </el-text>
-                                <template #dropdown>
-                                    <el-dropdown-menu>
-                                        <fu-dropdown-item v-permission v-node-admin command="dir" class="!px-2">
-                                            <svg-icon class="!w-5 !h-5" iconName="p-file-folder"></svg-icon>
-                                            {{ $t('file.dir') }}
-                                        </fu-dropdown-item>
-                                        <fu-dropdown-item v-permission v-node-admin command="file" class="!px-2">
-                                            <svg-icon class="!w-5 !h-5" iconName="p-file-normal"></svg-icon>
-                                            {{ $t('menu.files') }}
-                                        </fu-dropdown-item>
-                                    </el-dropdown-menu>
-                                </template>
-                            </el-dropdown>
-                        </div>
-                        <el-divider class="!my-0" />
-                        <el-tree-v2
-                            ref="treeRef"
-                            :data="treeData"
-                            :props="treeProps"
-                            @node-expand="handleNodeExpand"
-                            @node-collapse="handleNodeCollapse"
-                            @node-click="closeTreeContextMenu"
-                            @node-contextmenu="openTreeContextMenu"
-                            class="monaco-editor-tree monaco-editor-background pt-2"
-                            :default-expanded-keys="expandedNodeKeys"
-                            :height="treeHeight"
-                            :indent="6"
-                            :item-size="26"
-                            highlight-current
-                        >
-                            <template #default="{ node, data }">
-                                <span v-if="data.isDir" class="tree-node-content">
-                                    <template v-if="isCreate == 'dir' && data.id == 'new-dir'">
-                                        <div class="tree-node-editing">
+                                <el-divider direction="vertical" class="!mx-0" />
+                                <el-text size="small" @click="getRefresh(directoryPath)" class="cursor-pointer">
+                                    <el-icon>
+                                        <Refresh />
+                                    </el-icon>
+                                    <span class="sm:inline hidden pl-1">{{ $t('commons.button.refresh') }}</span>
+                                </el-text>
+                                <el-divider direction="vertical" v-if="!isMobile" class="!mx-0" />
+                                <el-dropdown @command="handleCreate" v-if="!isMobile" trigger="click">
+                                    <el-text size="small">
+                                        {{ $t('commons.button.create') }}
+                                        <el-icon><arrow-down /></el-icon>
+                                    </el-text>
+                                    <template #dropdown>
+                                        <el-dropdown-menu>
+                                            <fu-dropdown-item v-permission v-node-admin command="dir" class="!px-2">
+                                                <svg-icon class="!w-5 !h-5" iconName="p-file-folder"></svg-icon>
+                                                {{ $t('file.dir') }}
+                                            </fu-dropdown-item>
+                                            <fu-dropdown-item v-permission v-node-admin command="file" class="!px-2">
+                                                <svg-icon class="!w-5 !h-5" iconName="p-file-normal"></svg-icon>
+                                                {{ $t('menu.files') }}
+                                            </fu-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </template>
+                                </el-dropdown>
+                            </div>
+                            <el-divider class="!my-0" />
+                            <el-tree-v2
+                                ref="treeRef"
+                                :data="treeData"
+                                :props="treeProps"
+                                @node-expand="handleNodeExpand"
+                                @node-collapse="handleNodeCollapse"
+                                @node-click="closeTreeContextMenu"
+                                @node-contextmenu="openTreeContextMenu"
+                                class="monaco-editor-tree monaco-editor-background pt-2"
+                                :default-expanded-keys="expandedNodeKeys"
+                                :height="treeHeight"
+                                :indent="6"
+                                :item-size="26"
+                                highlight-current
+                            >
+                                <template #default="{ node, data }">
+                                    <span v-if="data.isDir" class="tree-node-content">
+                                        <template v-if="isCreate == 'dir' && data.id == 'new-dir'">
+                                            <div class="tree-node-editing">
+                                                <svg-icon class="table-icon" iconName="p-file-folder"></svg-icon>
+                                                <el-input
+                                                    size="small"
+                                                    class="!flex-1 !min-w-0"
+                                                    ref="rowRefs"
+                                                    v-model="newFolder"
+                                                ></el-input>
+                                                <el-icon
+                                                    class="cursor-pointer w-4 pl-1"
+                                                    size="small"
+                                                    @click.stop="createFolder(true)"
+                                                >
+                                                    <Check />
+                                                </el-icon>
+                                                <el-icon
+                                                    class="cursor-pointer w-4"
+                                                    size="small"
+                                                    @click.stop="cancelFolder()"
+                                                >
+                                                    <Close />
+                                                </el-icon>
+                                            </div>
+                                        </template>
+                                        <template v-else>
                                             <svg-icon class="table-icon" iconName="p-file-folder"></svg-icon>
-                                            <el-input
-                                                size="small"
-                                                class="!flex-1 !min-w-0"
-                                                ref="rowRefs"
-                                                v-model="newFolder"
-                                            ></el-input>
-                                            <el-icon
-                                                class="cursor-pointer w-4 pl-1"
-                                                size="small"
-                                                @click.stop="createFolder(true)"
-                                            >
-                                                <Check />
-                                            </el-icon>
-                                            <el-icon
-                                                class="cursor-pointer w-4"
-                                                size="small"
-                                                @click.stop="cancelFolder()"
-                                            >
-                                                <Close />
-                                            </el-icon>
-                                        </div>
-                                    </template>
-                                    <template v-else>
-                                        <svg-icon class="table-icon" iconName="p-file-folder"></svg-icon>
-                                        <small :title="node.label" class="tree-node-label">{{ node.label }}</small>
-                                    </template>
-                                </span>
-                                <span v-else class="tree-node-content" @click="getContent(data.path)">
-                                    <template v-if="isCreate == 'file' && data.id == 'new-file'">
-                                        <div class="tree-node-editing">
+                                            <small :title="node.label" class="tree-node-label">{{ node.label }}</small>
+                                        </template>
+                                    </span>
+                                    <span v-else class="tree-node-content" @click="getContent(data.path)">
+                                        <template v-if="isCreate == 'file' && data.id == 'new-file'">
+                                            <div class="tree-node-editing">
+                                                <svg-icon
+                                                    class="table-icon"
+                                                    :iconName="getIconName(data.extension)"
+                                                ></svg-icon>
+                                                <el-input
+                                                    size="small"
+                                                    ref="rowRefs"
+                                                    class="!flex-1 !min-w-0"
+                                                    v-model="newFolder"
+                                                ></el-input>
+                                                <el-icon
+                                                    class="cursor-pointer w-4 pl-1"
+                                                    size="small"
+                                                    @click.stop="createFolder(false)"
+                                                >
+                                                    <Check />
+                                                </el-icon>
+                                                <el-icon
+                                                    class="cursor-pointer w-4"
+                                                    size="small"
+                                                    @click.stop="cancelFolder()"
+                                                >
+                                                    <Close />
+                                                </el-icon>
+                                            </div>
+                                        </template>
+                                        <template v-else>
                                             <svg-icon
                                                 class="table-icon"
                                                 :iconName="getIconName(data.extension)"
                                             ></svg-icon>
-                                            <el-input
-                                                size="small"
-                                                ref="rowRefs"
-                                                class="!flex-1 !min-w-0"
-                                                v-model="newFolder"
-                                            ></el-input>
-                                            <el-icon
-                                                class="cursor-pointer w-4 pl-1"
-                                                size="small"
-                                                @click.stop="createFolder(false)"
-                                            >
-                                                <Check />
-                                            </el-icon>
-                                            <el-icon
-                                                class="cursor-pointer w-4"
-                                                size="small"
-                                                @click.stop="cancelFolder()"
-                                            >
-                                                <Close />
-                                            </el-icon>
-                                        </div>
-                                    </template>
-                                    <template v-else>
-                                        <svg-icon class="table-icon" :iconName="getIconName(data.extension)"></svg-icon>
-                                        <small :title="node.label" class="tree-node-label">{{ node.label }}</small>
-                                    </template>
-                                </span>
-                            </template>
-                        </el-tree-v2>
-                        <div
-                            v-if="treeContextMenu.visible"
-                            class="tree-context-menu"
-                            :style="{ left: `${treeContextMenu.x}px`, top: `${treeContextMenu.y}px` }"
-                            @click.stop
-                            @contextmenu.prevent
-                        >
+                                            <small :title="node.label" class="tree-node-label">{{ node.label }}</small>
+                                        </template>
+                                    </span>
+                                </template>
+                            </el-tree-v2>
                             <div
-                                v-if="treeContextMenu.data?.isDir"
-                                v-permission
-                                v-node-admin
-                                class="tree-context-menu__item"
-                                @click="createFromContextMenu('dir')"
+                                v-if="treeContextMenu.visible"
+                                class="tree-context-menu"
+                                :style="{ left: `${treeContextMenu.x}px`, top: `${treeContextMenu.y}px` }"
+                                @click.stop
+                                @contextmenu.prevent
                             >
-                                <svg-icon class="tree-context-menu__icon" iconName="p-file-folder"></svg-icon>
-                                <span>{{ $t('file.dir') }}</span>
-                            </div>
-                            <div
-                                v-if="treeContextMenu.data?.isDir"
-                                v-permission
-                                v-node-admin
-                                class="tree-context-menu__item"
-                                @click="createFromContextMenu('file')"
-                            >
-                                <svg-icon class="tree-context-menu__icon" iconName="p-file-normal"></svg-icon>
-                                <span>{{ $t('menu.files') }}</span>
-                            </div>
-                            <div class="tree-context-menu__item" @click="copyPathFromContextMenu">
-                                <el-icon class="tree-context-menu__icon"><CopyDocument /></el-icon>
-                                <span>{{ $t('file.copyDir') }}</span>
-                            </div>
-                            <div
-                                v-permission
-                                v-node-admin
-                                class="tree-context-menu__item"
-                                @click="renameFromContextMenu"
-                            >
-                                <el-icon class="tree-context-menu__icon"><Edit /></el-icon>
-                                <span>{{ $t('file.rename') }}</span>
-                            </div>
-                            <div
-                                v-permission
-                                v-node-admin
-                                class="tree-context-menu__item is-danger"
-                                @click="deleteFromContextMenu"
-                            >
-                                <el-icon class="tree-context-menu__icon"><Delete /></el-icon>
-                                <span>{{ $t('commons.button.delete') }}</span>
+                                <div
+                                    v-if="treeContextMenu.data?.isDir"
+                                    v-permission
+                                    v-node-admin
+                                    class="tree-context-menu__item"
+                                    @click="createFromContextMenu('dir')"
+                                >
+                                    <svg-icon class="tree-context-menu__icon" iconName="p-file-folder"></svg-icon>
+                                    <span>{{ $t('file.dir') }}</span>
+                                </div>
+                                <div
+                                    v-if="treeContextMenu.data?.isDir"
+                                    v-permission
+                                    v-node-admin
+                                    class="tree-context-menu__item"
+                                    @click="createFromContextMenu('file')"
+                                >
+                                    <svg-icon class="tree-context-menu__icon" iconName="p-file-normal"></svg-icon>
+                                    <span>{{ $t('menu.files') }}</span>
+                                </div>
+                                <div class="tree-context-menu__item" @click="copyPathFromContextMenu">
+                                    <el-icon class="tree-context-menu__icon"><CopyDocument /></el-icon>
+                                    <span>{{ $t('file.copyDir') }}</span>
+                                </div>
+                                <div
+                                    v-permission
+                                    v-node-admin
+                                    class="tree-context-menu__item"
+                                    @click="renameFromContextMenu"
+                                >
+                                    <el-icon class="tree-context-menu__icon"><Edit /></el-icon>
+                                    <span>{{ $t('file.rename') }}</span>
+                                </div>
+                                <div
+                                    v-permission
+                                    v-node-admin
+                                    class="tree-context-menu__item is-danger"
+                                    @click="deleteFromContextMenu"
+                                >
+                                    <el-icon class="tree-context-menu__icon"><Delete /></el-icon>
+                                    <span>{{ $t('commons.button.delete') }}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="relative">
-                        <el-divider
-                            v-if="isShow"
-                            direction="vertical"
-                            style="height: 100%; width: 0"
-                            class="!m-0 p-0"
-                            :class="isShow ? 'opacity-100' : 'opacity-0'"
-                        ></el-divider>
-                    </div>
-                    <div class="flex-1 sm:w-4/5 w-2/3 relative">
-                        <CodeTabs
-                            class="monaco-editor monaco-editor-background"
-                            :select-tab="selectTab"
-                            :file-tabs="fileTabs"
-                            :on-remove-tab="removeTab"
-                            :on-change-tab="changeTab"
-                            :on-remove-all-tab="removeAllTab"
-                            :on-remove-other-tab="removeOtherTab"
-                        ></CodeTabs>
-                        <div ref="codeBox" class="relative" :style="{ height: codeHeight }">
-                            <div class="absolute top-1/3">
-                                <el-icon
-                                    v-if="isShow"
-                                    class="cursor-pointer bg-gray-100 py-2 rounded-l-sm block -left-[9px]"
-                                    size="9"
-                                    @click="toggleShow"
-                                >
-                                    <DArrowLeft />
-                                </el-icon>
-                                <el-icon
-                                    v-else
-                                    class="cursor-pointer bg-gray-100 py-2 rounded-r-sm block z-50"
-                                    size="9"
-                                    @click="toggleShow"
-                                >
-                                    <DArrowRight />
-                                </el-icon>
-                            </div>
-                            <div class="flex justify-center items-center h-full" v-if="fileTabs.length === 0">
-                                <el-empty :image="noUpdateImage" />
+                    </el-splitter-panel>
+                    <el-splitter-panel min="240" class="code-editor-panel">
+                        <div class="code-editor-panel__inner relative">
+                            <CodeTabs
+                                class="monaco-editor monaco-editor-background"
+                                :select-tab="selectTab"
+                                :file-tabs="fileTabs"
+                                :on-remove-tab="removeTab"
+                                :on-change-tab="changeTab"
+                                :on-remove-all-tab="removeAllTab"
+                                :on-remove-other-tab="removeOtherTab"
+                            ></CodeTabs>
+                            <div ref="codeBox" class="code-box relative">
+                                <div class="flex justify-center items-center h-full" v-if="fileTabs.length === 0">
+                                    <el-empty :image="noUpdateImage" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </el-splitter-panel>
+                </el-splitter>
                 <div
                     class="hidden code-footer pl-4 h-7 sm:flex justify-end items-center gap-4 rounded-b"
                     ref="dialogFooter"
@@ -473,7 +466,7 @@ import { copyText } from '@/utils/clipboard';
 import { getIcon } from '@/utils/file';
 import { newUUID } from '@/utils/id';
 import { TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
-import { CopyDocument, DArrowLeft, DArrowRight, Delete, Edit, Refresh, Top } from '@element-plus/icons-vue';
+import { CopyDocument, Delete, Edit, Refresh, Top } from '@element-plus/icons-vue';
 import { loadBaseDir } from '@/api/modules/setting';
 import CodeTabs from './tabs/index.vue';
 import FileHistoryDrawer from './history/index.vue';
@@ -612,9 +605,14 @@ const treeData = ref([]);
 const codeBox = ref();
 const defaultHeight = ref(56);
 const treeHeight = ref(0);
-const codeHeight = ref('56vh');
+const splitterHeight = ref('56vh');
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
 const isShow = ref(true);
+const defaultTreePanelSize = 220;
+const minTreePanelSize = 160;
+const maxTreePanelSize = 420;
+const treePanelSize = ref(defaultTreePanelSize);
+const lastTreePanelSize = ref(defaultTreePanelSize);
 const isEdit = ref(false);
 const oldFileContent = ref('');
 const dialogHeader = ref(null);
@@ -642,8 +640,44 @@ const resetExpandedNodes = () => {
     expandedNodeIds.value = new Set<string>();
 };
 
-const toggleShow = () => {
-    isShow.value = !isShow.value;
+const refreshEditorLayout = () => {
+    nextTick(() => {
+        editor?.layout();
+    });
+};
+
+const syncTreePanelState = (size: number) => {
+    const nextSize = Math.max(size, 0);
+    treePanelSize.value = nextSize;
+    isShow.value = nextSize > 0;
+    if (nextSize > 0) {
+        lastTreePanelSize.value = nextSize;
+    }
+    closeTreeContextMenu();
+    refreshEditorLayout();
+};
+
+const handleTreePanelSizeChange = (size: string | number) => {
+    const nextSize = Number(size);
+    if (Number.isNaN(nextSize)) {
+        return;
+    }
+    syncTreePanelState(nextSize);
+};
+
+const handleSplitterResizeEnd = () => {
+    refreshEditorLayout();
+};
+
+const handleSplitterCollapse = (index: number, type: 'start' | 'end', sizes: number[]) => {
+    if (index !== 0 || !type) {
+        return;
+    }
+    const nextSize = sizes[0] || 0;
+    syncTreePanelState(nextSize > 0 ? nextSize : 0);
+    if (!nextSize && lastTreePanelSize.value < minTreePanelSize) {
+        lastTreePanelSize.value = defaultTreePanelSize;
+    }
 };
 
 type WordWrapOptions = 'off' | 'on' | 'wordWrapColumn' | 'bounded';
@@ -925,14 +959,14 @@ const updateHeights = () => {
         const headerHeight = dialogHeader.value.offsetHeight;
         const formHeight = dialogForm.value.offsetHeight;
         const footerHeight = dialogFooter.value.offsetHeight;
-        treeHeight.value = window.innerHeight - headerHeight - formHeight - footerHeight - paddingHeight - 31;
-        codeHeight.value = `${
-            ((window.innerHeight - headerHeight - formHeight - footerHeight - paddingHeight) / window.innerHeight) * 100
-        }vh`;
+        const contentHeight = window.innerHeight - headerHeight - formHeight - footerHeight - paddingHeight;
+        treeHeight.value = contentHeight - 31;
+        splitterHeight.value = `${contentHeight}px`;
     } else {
+        splitterHeight.value = `${defaultHeight.value}vh`;
         treeHeight.value = defaultHeight.value * vh - 31;
-        codeHeight.value = `${defaultHeight.value}vh`;
     }
+    refreshEditorLayout();
 };
 
 const toggleFullscreen = () => {
@@ -1837,6 +1871,58 @@ defineExpose({ acceptParams });
 .monaco-editor-background {
     outline-style: none;
     background-color: var(--vscode-editor-background) !important;
+}
+
+.code-splitter {
+    width: 100%;
+    min-width: 0;
+    background-color: var(--vscode-editor-background);
+}
+
+.code-splitter :deep(.el-splitter-bar__horizontal-collapse-icon-start),
+.code-splitter :deep(.el-splitter-bar__horizontal-collapse-icon-end) {
+    top: 33%;
+}
+
+.code-tree-panel,
+.code-editor-panel {
+    min-width: 0;
+    background-color: var(--vscode-editor-background);
+}
+
+.code-tree-panel.is-collapsed {
+    overflow: hidden;
+}
+
+.code-editor-panel__inner,
+.tree-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.code-editor-panel__inner {
+    display: flex;
+    flex-direction: column;
+}
+
+.code-box {
+    min-height: 0;
+    flex: 1;
+}
+
+:deep(.code-splitter .el-splitter-panel) {
+    min-width: 0;
+}
+
+:deep(.code-splitter .el-splitter-bar) {
+    width: 1px;
+    background-color: var(--el-border-color-light);
+}
+
+:deep(.code-splitter .el-splitter-bar__dragger-horizontal::before) {
+    width: 1px;
+    background-color: var(--el-border-color-light);
 }
 
 .tree-widget {
