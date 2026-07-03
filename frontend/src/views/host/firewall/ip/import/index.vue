@@ -63,7 +63,7 @@
                 <el-button type="primary" plain :disabled="displayData.length === 0" @click="onImportAll">
                     {{ $t('commons.button.importAll') }}
                 </el-button>
-                <el-button type="primary" :disabled="selects.length === 0" @click="onImport">
+                <el-button type="primary" :disabled="selects.length === 0" @click="() => onImport()">
                     {{ $t('commons.button.import') }}
                 </el-button>
             </span>
