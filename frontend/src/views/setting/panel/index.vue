@@ -224,6 +224,7 @@ import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
 import { getXpackProxyDocker } from '@/extensions/xpack';
 import { getXpackSetting, updateXpackSettingByKey } from '@/utils/xpack';
 import { setPrimaryColor } from '@/utils/theme';
+import { codeEditorThemeStorageKey } from '@/utils/code-editor-theme';
 import i18n from '@/lang';
 
 const {
@@ -430,6 +431,7 @@ const onChangeWatermark = async () => {
 };
 
 const handleThemeChange = async (val: string) => {
+    localStorage.removeItem(codeEditorThemeStorageKey);
     themeConfig.value.theme = val;
     switchTheme();
     if (isXpackOrEE.value) {
