@@ -79,8 +79,9 @@ type NodeCurrent struct {
 }
 
 type DashboardCurrent struct {
-	Uptime          uint64 `json:"uptime"`
-	TimeSinceUptime string `json:"timeSinceUptime"`
+	Uptime          uint64      `json:"uptime"`
+	TimeSinceUptime string      `json:"timeSinceUptime"`
+	RunningTime     RunningTime `json:"runningTime"`
 
 	Procs uint64 `json:"procs"`
 
@@ -126,6 +127,13 @@ type DashboardCurrent struct {
 	TopMemItems []Process `json:"topMemItems"`
 
 	ShotTime time.Time `json:"shotTime"`
+}
+
+type RunningTime struct {
+	Days    uint64 `json:"days"`
+	Hours   uint64 `json:"hours"`
+	Minutes uint64 `json:"minutes"`
+	Seconds uint64 `json:"seconds"`
 }
 
 type AppLauncherSync struct {

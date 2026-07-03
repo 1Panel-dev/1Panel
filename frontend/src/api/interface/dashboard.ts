@@ -70,6 +70,7 @@ export namespace Dashboard {
     export interface CurrentInfo {
         uptime: number;
         timeSinceUptime: string;
+        runningTime: RunningTime;
         procs: number;
 
         load1: number;
@@ -113,6 +114,12 @@ export namespace Dashboard {
         netBytesRecv: number;
 
         shotTime: Date;
+    }
+    export interface RunningTime {
+        days: number;
+        hours: number;
+        minutes: number;
+        seconds: number;
     }
     export interface Process {
         name: string;

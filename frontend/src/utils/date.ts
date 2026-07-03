@@ -1,50 +1,50 @@
 import i18n from '@/lang';
 
-export function loadUpTime(timeSince: string) {
-    if (!timeSince) {
+interface RunningTime {
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+}
+
+const formatDurationUnit = (value: number, unit: string) => `${value}${i18n.global.t(unit, value)}`;
+
+export function formatUptime(runningTime?: RunningTime) {
+    if (!runningTime) {
         return '';
     }
-    const targetTime = new Date(timeSince);
-    const currentTime = new Date();
-    const uptime = (currentTime.getTime() - targetTime.getTime()) / 1000;
-    if (uptime <= 0) {
+    const { days, hours, minutes, seconds } = runningTime;
+    if (days <= 0 && hours <= 0 && minutes <= 0 && seconds <= 0) {
         return '';
     }
-    let days = Math.floor(uptime / 86400);
-    let hours = Math.floor((uptime % 86400) / 3600);
-    let minutes = Math.floor((uptime % 3600) / 60);
-    let seconds = Math.floor(uptime % 60);
     if (days !== 0) {
         return (
-            days +
-            i18n.global.t('commons.units.day') +
+            formatDurationUnit(days, 'commons.units.day') +
             ' ' +
-            hours +
-            i18n.global.t('commons.units.hour') +
+            formatDurationUnit(hours, 'commons.units.hour') +
             ' ' +
-            minutes +
-            i18n.global.t('commons.units.minute') +
+            formatDurationUnit(minutes, 'commons.units.minute') +
             ' ' +
-            seconds +
-            i18n.global.t('commons.units.second')
+            formatDurationUnit(seconds, 'commons.units.second')
         );
     }
     if (hours !== 0) {
         return (
-            hours +
-            i18n.global.t('commons.units.hour') +
+            formatDurationUnit(hours, 'commons.units.hour') +
             ' ' +
-            minutes +
-            i18n.global.t('commons.units.minute') +
+            formatDurationUnit(minutes, 'commons.units.minute') +
             ' ' +
-            seconds +
-            i18n.global.t('commons.units.second')
+            formatDurationUnit(seconds, 'commons.units.second')
         );
     }
     if (minutes !== 0) {
-        return minutes + i18n.global.t('commons.units.minute') + ' ' + seconds + i18n.global.t('commons.units.second');
+        return (
+            formatDurationUnit(minutes, 'commons.units.minute') +
+            ' ' +
+            formatDurationUnit(seconds, 'commons.units.second')
+        );
     }
-    return seconds + i18n.global.t('commons.units.second');
+    return formatDurationUnit(seconds, 'commons.units.second');
 }
 
 export function getCurrentDateFormatted() {
