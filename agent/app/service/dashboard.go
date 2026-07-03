@@ -187,6 +187,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	hostInfo, _ := psutil.HOST.GetHostInfo(false)
 	currentInfo.Uptime = hostInfo.Uptime
 	currentInfo.TimeSinceUptime = time.Unix(int64(hostInfo.BootTime), 0).Format(constant.DateTimeLayout)
+	currentInfo.RunningTime = loadRunningTime(hostInfo.Uptime)
 	currentInfo.Procs = hostInfo.Procs
 	currentInfo.CPUTotal, _ = psutil.CPUInfo.GetLogicalCores(false)
 
@@ -265,6 +266,15 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 
 	currentInfo.ShotTime = time.Now()
 	return &currentInfo
+}
+
+func loadRunningTime(uptime uint64) dto.RunningTime {
+	return dto.RunningTime{
+		Days:    uptime / 86400,
+		Hours:   (uptime % 86400) / 3600,
+		Minutes: (uptime % 3600) / 60,
+		Seconds: uptime % 60,
+	}
 }
 
 func (u *DashboardService) LoadTopCPU() []dto.Process {

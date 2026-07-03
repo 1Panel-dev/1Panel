@@ -321,7 +321,7 @@
                                             <template #label>
                                                 <span class="system-label">{{ $t('home.runningTime') }}</span>
                                             </template>
-                                            {{ loadUpTime(currentInfo.timeSinceUptime) }}
+                                            {{ formatUptime(currentInfo.runningTime) }}
                                         </el-descriptions-item>
                                     </el-descriptions>
                                 </el-scrollbar>
@@ -448,7 +448,7 @@ import CardWithHeader from '@/components/card-with-header/index.vue';
 import MarkDownEditor from '@/components/mkdown-editor/index.vue';
 import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
-import { dateFormatForSecond, loadUpTime } from '@/utils/date';
+import { dateFormatForSecond, formatUptime } from '@/utils/date';
 import { computeSize, computeSizeFromKBs } from '@/utils/size';
 import { jumpToPath } from '@/utils/router';
 import { copyText } from '@/utils/clipboard';
@@ -625,6 +625,12 @@ const baseInfo = ref<Dashboard.BaseInfo>({
 const currentInfo = ref<Dashboard.CurrentInfo>({
     uptime: 0,
     timeSinceUptime: '',
+    runningTime: {
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+    },
     procs: 0,
 
     load1: 0,
@@ -848,6 +854,7 @@ const onLoadCurrentInfo = async () => {
     }
 
     currentInfo.value.timeSinceUptime = res.data.timeSinceUptime;
+    currentInfo.value.runningTime = res.data.runningTime;
 
     let timeInterval = Number(res.data.uptime - currentInfo.value.uptime) || 3;
     currentChartInfo.netBytesSent =
@@ -936,7 +943,7 @@ const handleCopy = () => {
         '\n' +
         i18n.global.t('home.runningTime') +
         ': ' +
-        loadUpTime(currentInfo.value.timeSinceUptime) +
+        formatUptime(currentInfo.value.runningTime) +
         '\n';
     copyText(content);
 };

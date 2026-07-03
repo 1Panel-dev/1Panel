@@ -423,6 +423,12 @@ const baseInfo = ref<Dashboard.BaseInfo>({
 const currentInfo = ref<Dashboard.CurrentInfo>({
     uptime: 0,
     timeSinceUptime: '',
+    runningTime: {
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+    },
     procs: 0,
 
     load1: 0,
