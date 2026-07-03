@@ -49,6 +49,7 @@ const message = {
             verify: 'Verificar',
             saveAndEnable: 'Salvar e ativar',
             import: 'Importar',
+            importAll: 'Importar tudo',
             export: 'Exportar',
             power: 'Enviar',
             search: 'Pesquisar',

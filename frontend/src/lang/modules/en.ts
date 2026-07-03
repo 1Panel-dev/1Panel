@@ -52,6 +52,7 @@ const message = {
             verify: 'Verify',
             saveAndEnable: 'Save and enable',
             import: 'Import',
+            importAll: 'Import all',
             export: 'Export',
             power: 'Submit',
             search: 'Search',

@@ -49,6 +49,7 @@ const message = {
             verify: '검증',
             saveAndEnable: '저장 및 활성화',
             import: '가져오기',
+            importAll: '모두 가져오기',
             export: '내보내기',
             power: '제출',
             search: '검색',

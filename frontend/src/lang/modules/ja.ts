@@ -49,6 +49,7 @@ const message = {
             verify: '検証',
             saveAndEnable: '保存して有効化',
             import: 'インポート',
+            importAll: 'すべてインポート',
             export: 'エクスポート',
             power: '送信',
             search: '検索',

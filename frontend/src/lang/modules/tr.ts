@@ -52,6 +52,7 @@ const message = {
             verify: 'Doğrula',
             saveAndEnable: 'Kaydet ve etkinleştir',
             import: 'İçe Aktar',
+            importAll: 'Tümünü içe aktar',
             export: 'Dışa Aktar',
             power: 'Gönder',
             search: 'Ara',
