@@ -2913,6 +2913,7 @@ const message = {
         license: 'License',
         bindNode: 'Bind Node',
         menuSetting: 'Menu Settings',
+        menuHide: 'Menu hiding',
         menuSettingHelper: 'When only 1 submenu exists, the menu bar will display only that submenu',
         showAll: 'Show All',
         hideALL: 'Hide All',

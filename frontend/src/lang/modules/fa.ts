@@ -2887,6 +2887,7 @@ const message = {
         license: 'مجوز',
         bindNode: 'اتصال گره',
         menuSetting: 'تنظیمات منو',
+        menuHide: 'مخفی‌سازی منو',
         menuSettingHelper: 'زمانی که فقط ۱ زیرمنو وجود دارد، نوار منو فقط آن زیرمنو را نمایش می‌دهد',
         showAll: 'نمایش همه',
         hideALL: 'مخفی کردن همه',

@@ -2958,6 +2958,7 @@ const message = {
         license: 'Lisans',
         bindNode: 'Düğüm Bağla',
         menuSetting: 'Menü Ayarları',
+        menuHide: 'Menüyü gizle',
         menuSettingHelper: 'Yalnızca 1 alt menü varsa, menü çubuğu yalnızca o alt menüyü gösterecektir',
         showAll: 'Tümünü Göster',
         hideALL: 'Tümünü Gizle',

@@ -2974,6 +2974,7 @@ const message = {
         license: 'Licencia',
         bindNode: 'Vincular nodo',
         menuSetting: 'Configuración de menú',
+        menuHide: 'Ocultar menú',
         menuSettingHelper: 'Cuando solo exista 1 submenú, la barra de menú mostrará únicamente ese submenú',
         showAll: 'Mostrar todo',
         hideALL: 'Ocultar todo',

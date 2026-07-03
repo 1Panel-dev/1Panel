@@ -1,40 +1,67 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('setting.menuSetting')" @close="handleClose" size="normal">
-        <el-alert :closable="false" :title="$t('setting.menuSettingHelper')" type="warning" />
-        <el-tree
-            :data="treeData.hideMenu"
-            :allow-drag="allowDrag"
-            :allow-drop="allowDrop"
-            draggable
-            node-key="id"
-            class="mt-3"
-            :icon="ArrowRight"
-            @node-drop="handleDrop"
-        >
-            <template #default="{ node, data }">
-                <div class="grid grid-cols-4 gap-4 items-center w-full py-2 group">
-                    <span class="col-span-2" :style="{ paddingLeft: `${(node.level - 1) * 16}px` }">
-                        {{ i18n.global.t(data.title) }}
-                    </span>
-                    <span class="flex justify-center w-[60px]">
-                        <el-switch
-                            v-if="!data.disabled"
-                            v-model="data.isShow"
-                            @change="onChangeShow(data)"
-                            @click.stop
-                            @mousedown.stop
-                        />
-                        <span v-else>-</span>
-                    </span>
-                    <span
-                        class="text-right hidden cursor-move"
-                        :class="data.label == 'Home-Menu' || data.children?.length > 0 ? '' : 'group-hover:block'"
+        <div class="menu-setting-cards">
+            <el-card shadow="never" class="menu-setting-card">
+                <div class="menu-setting-card__row">
+                    <div>
+                        <div class="menu-setting-card__label">{{ $t('setting.menuAccordion') }}</div>
+                        <span class="input-help">{{ $t('setting.menuAccordionHelper') }}</span>
+                    </div>
+                    <el-radio-group
+                        @change="onSaveSetting('MenuAccordion', form.menuAccordion)"
+                        v-model="form.menuAccordion"
                     >
-                        ⋮⋮
-                    </span>
+                        <el-radio-button value="Enable">
+                            <span>{{ $t('commons.button.enable') }}</span>
+                        </el-radio-button>
+                        <el-radio-button value="Disable">
+                            <span>{{ $t('commons.button.disable') }}</span>
+                        </el-radio-button>
+                    </el-radio-group>
                 </div>
-            </template>
-        </el-tree>
+            </el-card>
+
+            <el-card shadow="never" class="menu-setting-card">
+                <div class="menu-setting-card__label mb-3">{{ $t('setting.menuHide') }}</div>
+                <el-alert :closable="false" :title="$t('setting.menuSettingHelper')" type="warning" />
+                <el-tree
+                    :data="treeData.hideMenu"
+                    :allow-drag="allowDrag"
+                    :allow-drop="allowDrop"
+                    draggable
+                    node-key="id"
+                    class="mt-3 menu-hide-tree"
+                    :icon="ArrowRight"
+                    @node-drop="handleDrop"
+                >
+                    <template #default="{ node, data }">
+                        <div class="grid grid-cols-4 gap-4 items-center w-full py-2 group">
+                            <span class="col-span-2" :style="{ paddingLeft: `${(node.level - 1) * 16}px` }">
+                                {{ i18n.global.t(data.title) }}
+                            </span>
+                            <span class="flex justify-center w-[60px]">
+                                <el-switch
+                                    v-if="!data.disabled"
+                                    v-model="data.isShow"
+                                    @change="onChangeShow(data)"
+                                    @click.stop
+                                    @mousedown.stop
+                                />
+                                <span v-else>-</span>
+                            </span>
+                            <span
+                                class="text-right hidden cursor-move"
+                                :class="
+                                    data.label == 'Home-Menu' || data.children?.length > 0 ? '' : 'group-hover:block'
+                                "
+                            >
+                                ⋮⋮
+                            </span>
+                        </div>
+                    </template>
+                </el-tree>
+            </el-card>
+        </div>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="defaultHideMenus">{{ $t('commons.button.setDefault') }}</el-button>
@@ -51,21 +78,28 @@
 import { reactive, ref } from 'vue';
 import { AllowDropType, ElMessageBox, RenderContentContext } from 'element-plus';
 import i18n from '@/lang';
-import { defaultMenu, updateMenu } from '@/api/modules/setting';
+import { defaultMenu, updateMenu, updateSetting } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { ArrowRight } from '@element-plus/icons-vue';
 import { sortMenu } from '@/utils/misc';
-const { isEE, isIntl, isAdmin } = useGlobalStore();
+const { isEE, isIntl, isAdmin, menuAccordion } = useGlobalStore();
 
 const drawerVisible = ref();
 const loading = ref();
+const em = defineEmits(['search']);
 interface DialogProps {
     hideMenu: string;
+    menuAccordion: string;
 }
+
+const form = reactive({
+    menuAccordion: '',
+});
 
 const acceptParams = (params: DialogProps): void => {
     drawerVisible.value = true;
+    form.menuAccordion = params.menuAccordion || 'Disable';
     let hideMenu = JSON.parse(params.hideMenu);
     sortMenu(hideMenu);
     treeData.hideMenu = hideMenu;
@@ -183,6 +217,23 @@ const handleClose = () => {
     drawerVisible.value = false;
 };
 
+const onSaveSetting = async (key: string, val: string) => {
+    loading.value = true;
+    try {
+        await updateSetting({
+            key,
+            value: val,
+        });
+        if (key === 'MenuAccordion') {
+            menuAccordion.value = val === 'Enable';
+        }
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        em('search');
+    } finally {
+        loading.value = false;
+    }
+};
+
 const saveHideMenus = async () => {
     ElMessageBox.confirm(i18n.global.t('setting.confirmMessage'), i18n.global.t('setting.menuSetting'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -228,10 +279,50 @@ defineExpose({
 <style scoped lang="scss">
 :deep(.el-tree) {
     --el-tree-node-content-height: 26px;
-    font-size: 16px;
+    font-size: 14px;
 }
+
 :deep(.el-tree-node__content) {
     padding: 8px 8px !important;
     border-bottom: var(--panel-border);
+}
+
+.menu-setting-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.menu-setting-card {
+    --el-card-padding: 14px 16px;
+}
+
+.menu-setting-card__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.menu-setting-card__label {
+    color: var(--el-text-color-primary);
+    font-size: var(--el-font-size-base);
+}
+
+.menu-setting-card__title {
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 12px;
+    color: var(--el-text-color-primary);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+@media (max-width: 640px) {
+    .menu-setting-card__row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
 }
 </style>

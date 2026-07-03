@@ -2949,6 +2949,7 @@ const message = {
         license: 'Lesen',
         bindNode: 'Ikatan Nod',
         menuSetting: 'Tetapan Menu',
+        menuHide: 'Sembunyikan menu',
         menuSettingHelper: 'Apabila hanya terdapat 1 submenu, bar menu hanya akan memaparkan submenu tersebut',
         showAll: 'Papar Semua',
         hideALL: 'Sembunyikan Semua',

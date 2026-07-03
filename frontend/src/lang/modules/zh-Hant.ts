@@ -2715,6 +2715,7 @@ const message = {
         license: '許可證',
         bindNode: '綁定節點',
         menuSetting: '選單設定',
+        menuHide: '選單隱藏',
         menuSettingHelper: '當只存在 1 個子選單時，選單列將僅展示該子選單',
         showAll: '全部顯示',
         hideALL: '全部隱藏',
