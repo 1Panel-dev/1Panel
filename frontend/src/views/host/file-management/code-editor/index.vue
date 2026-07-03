@@ -9,7 +9,12 @@
     >
         <template #header>
             <div ref="dialogHeader" class="flex items-center justify-between code-header px-4 rounded-t">
-                <span class="truncate-text">{{ $t('home.dir') + ' - ' + form.path }}</span>
+                <div class="code-title">
+                    <span class="truncate-text">{{ $t('home.dir') + ' - ' + currentEditorPath }}</span>
+                    <el-tooltip v-if="currentEditorPath" :content="$t('file.copyDir')" placement="top">
+                        <CopyButton class="code-title-copy" :content="currentEditorPath" />
+                    </el-tooltip>
+                </div>
                 <el-space alignment="center" :size="1" class="dialog-header-icon">
                     <el-tooltip :content="loadTooltip()" placement="top">
                         <el-button
@@ -146,6 +151,8 @@
                             :props="treeProps"
                             @node-expand="handleNodeExpand"
                             @node-collapse="handleNodeCollapse"
+                            @node-click="closeTreeContextMenu"
+                            @node-contextmenu="openTreeContextMenu"
                             class="monaco-editor-tree monaco-editor-background pt-2"
                             :default-expanded-keys="expandedNodeKeys"
                             :height="treeHeight"
@@ -154,13 +161,13 @@
                             highlight-current
                         >
                             <template #default="{ node, data }">
-                                <span v-if="data.isDir" style="align-items: center">
+                                <span v-if="data.isDir" class="tree-node-content">
                                     <template v-if="isCreate == 'dir' && data.id == 'new-dir'">
-                                        <div class="flex justify-between items-center gap-0.5 pr-2">
+                                        <div class="tree-node-editing">
                                             <svg-icon class="table-icon" iconName="p-file-folder"></svg-icon>
                                             <el-input
                                                 size="small"
-                                                class="!flex-1 !min-w-16"
+                                                class="!flex-1 !min-w-0"
                                                 ref="rowRefs"
                                                 v-model="newFolder"
                                             ></el-input>
@@ -182,24 +189,20 @@
                                     </template>
                                     <template v-else>
                                         <svg-icon class="table-icon" iconName="p-file-folder"></svg-icon>
-                                        <small :title="node.label" class="min-w-32">{{ node.label }}</small>
+                                        <small :title="node.label" class="tree-node-label">{{ node.label }}</small>
                                     </template>
                                 </span>
-                                <span
-                                    v-else
-                                    style="display: inline-flex; align-items: center"
-                                    @click="getContent(data.path)"
-                                >
+                                <span v-else class="tree-node-content" @click="getContent(data.path)">
                                     <template v-if="isCreate == 'file' && data.id == 'new-file'">
-                                        <div class="flex justify-between items-center gap-0.5 pr-2">
+                                        <div class="tree-node-editing">
                                             <svg-icon
-                                                class="table-icon w-4"
+                                                class="table-icon"
                                                 :iconName="getIconName(data.extension)"
                                             ></svg-icon>
                                             <el-input
                                                 size="small"
                                                 ref="rowRefs"
-                                                class="!flex-1 !min-w-16"
+                                                class="!flex-1 !min-w-0"
                                                 v-model="newFolder"
                                             ></el-input>
                                             <el-icon
@@ -220,11 +223,61 @@
                                     </template>
                                     <template v-else>
                                         <svg-icon class="table-icon" :iconName="getIconName(data.extension)"></svg-icon>
-                                        <small :title="node.label" class="min-w-32">{{ node.label }}</small>
+                                        <small :title="node.label" class="tree-node-label">{{ node.label }}</small>
                                     </template>
                                 </span>
                             </template>
                         </el-tree-v2>
+                        <div
+                            v-if="treeContextMenu.visible"
+                            class="tree-context-menu"
+                            :style="{ left: `${treeContextMenu.x}px`, top: `${treeContextMenu.y}px` }"
+                            @click.stop
+                            @contextmenu.prevent
+                        >
+                            <div
+                                v-if="treeContextMenu.data?.isDir"
+                                v-permission
+                                v-node-admin
+                                class="tree-context-menu__item"
+                                @click="createFromContextMenu('dir')"
+                            >
+                                <svg-icon class="tree-context-menu__icon" iconName="p-file-folder"></svg-icon>
+                                <span>{{ $t('file.dir') }}</span>
+                            </div>
+                            <div
+                                v-if="treeContextMenu.data?.isDir"
+                                v-permission
+                                v-node-admin
+                                class="tree-context-menu__item"
+                                @click="createFromContextMenu('file')"
+                            >
+                                <svg-icon class="tree-context-menu__icon" iconName="p-file-normal"></svg-icon>
+                                <span>{{ $t('menu.files') }}</span>
+                            </div>
+                            <div class="tree-context-menu__item" @click="copyPathFromContextMenu">
+                                <el-icon class="tree-context-menu__icon"><CopyDocument /></el-icon>
+                                <span>{{ $t('file.copyDir') }}</span>
+                            </div>
+                            <div
+                                v-permission
+                                v-node-admin
+                                class="tree-context-menu__item"
+                                @click="renameFromContextMenu"
+                            >
+                                <el-icon class="tree-context-menu__icon"><Edit /></el-icon>
+                                <span>{{ $t('file.rename') }}</span>
+                            </div>
+                            <div
+                                v-permission
+                                v-node-admin
+                                class="tree-context-menu__item is-danger"
+                                @click="deleteFromContextMenu"
+                            >
+                                <el-icon class="tree-context-menu__icon"><Delete /></el-icon>
+                                <span>{{ $t('commons.button.delete') }}</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="relative">
                         <el-divider
@@ -397,8 +450,10 @@
 import {
     batchCheckFiles,
     createFile,
+    deleteFile,
     getFileContent,
     getFilesTree,
+    renameRile,
     saveFileContent,
     searchFileHistory,
 } from '@/api/modules/files';
@@ -414,10 +469,11 @@ import type { TabPaneName } from 'element-plus';
 import { ElMessageBox, ElTreeV2 } from 'element-plus';
 import { ResultData } from '@/api/interface';
 import { File } from '@/api/interface/file';
+import { copyText } from '@/utils/clipboard';
 import { getIcon } from '@/utils/file';
 import { newUUID } from '@/utils/id';
 import { TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
-import { DArrowLeft, DArrowRight, Refresh, Top } from '@element-plus/icons-vue';
+import { CopyDocument, DArrowLeft, DArrowRight, Delete, Edit, Refresh, Top } from '@element-plus/icons-vue';
 import { loadBaseDir } from '@/api/modules/setting';
 import CodeTabs from './tabs/index.vue';
 import FileHistoryDrawer from './history/index.vue';
@@ -802,6 +858,7 @@ let form = ref({
     content: '',
     path: '',
 });
+const currentEditorPath = computed(() => form.value.path || directoryPath.value || '');
 
 const em = defineEmits(['close']);
 
@@ -857,6 +914,8 @@ onMounted(() => {
     loadPath();
     updateHeights();
     window.addEventListener('resize', updateHeights);
+    document.addEventListener('click', closeTreeContextMenu);
+    window.addEventListener('scroll', closeTreeContextMenu, true);
 });
 
 const updateHeights = () => {
@@ -1307,13 +1366,47 @@ const getUpData = async () => {
 
 const treeRef = ref<InstanceType<typeof ElTreeV2>>();
 
+const treeContextMenu = reactive<{
+    visible: boolean;
+    x: number;
+    y: number;
+    data: any | null;
+    node: any | null;
+}>({
+    visible: false,
+    x: 0,
+    y: 0,
+    data: null,
+    node: null,
+});
+
 const treeProps = {
     value: 'id',
     label: 'name',
     children: 'children',
 };
 
+const closeTreeContextMenu = () => {
+    treeContextMenu.visible = false;
+    treeContextMenu.data = null;
+    treeContextMenu.node = null;
+};
+
+const openTreeContextMenu = (event: MouseEvent, data: any, node: any) => {
+    if (isMobile.value || data.id === 'new-dir' || data.id === 'new-file') {
+        return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    treeContextMenu.visible = true;
+    treeContextMenu.x = event.clientX;
+    treeContextMenu.y = event.clientY;
+    treeContextMenu.data = data;
+    treeContextMenu.node = node;
+};
+
 const handleNodeCollapse = (data: TreeNodeData, node: any) => {
+    closeTreeContextMenu();
     isCreate.value = 'none';
     removeExpandedNode(data.id);
 
@@ -1333,6 +1426,7 @@ const handleNodeCollapse = (data: TreeNodeData, node: any) => {
 };
 
 const handleNodeExpand = (data: TreeNodeData, node: any) => {
+    closeTreeContextMenu();
     if (node.data.id == 'new-dir' || node.data.id == 'new-file') {
         return;
     }
@@ -1359,6 +1453,50 @@ const handleNodeExpand = (data: TreeNodeData, node: any) => {
         .catch(() => {});
 };
 
+const getChildItems = (res: ResultData<File.FileTree[]>) => {
+    return res.data.length > 0 && res.data[0].children ? res.data[0].children : [];
+};
+
+const loadDirectoryChildren = async (data: any, node: any) => {
+    currentPath.value = data.path;
+    selectedParentNode.value = node;
+    addExpandedNode(data.id);
+    if (loadedNodes.value.has(data.path)) {
+        return;
+    }
+    const response = await search(data.path);
+    const children = getChildItems(response);
+    node.children = children;
+    node.data.children = children;
+    updateNodeChildren(treeData.value, data.path, children);
+    treeData.value = [...treeData.value];
+    loadedNodes.value.add(data.path);
+};
+
+const createFromContextMenu = async (command: string) => {
+    const data = treeContextMenu.data;
+    const node = treeContextMenu.node;
+    closeTreeContextMenu();
+    if (!data?.isDir || !node) {
+        return;
+    }
+    try {
+        await loadDirectoryChildren(data, node);
+        handleCreate(command);
+    } catch {
+        MsgError(i18n.global.t('commons.status.failed'));
+    }
+};
+
+const copyPathFromContextMenu = () => {
+    const path = treeContextMenu.data?.path;
+    closeTreeContextMenu();
+    if (!path) {
+        return;
+    }
+    copyText(path);
+};
+
 const updateNodeChildren = (nodes: any[], path: any, newChildren: File.FileTree[]) => {
     const updateNode = (nodes: string | any[]) => {
         for (const element of nodes) {
@@ -1372,6 +1510,179 @@ const updateNodeChildren = (nodes: any[], path: any, newChildren: File.FileTree[
         }
     };
     updateNode(nodes);
+};
+
+const joinPath = (dir: string, name: string) => {
+    if (dir === '/') {
+        return `/${name}`;
+    }
+    return `${dir}/${name}`;
+};
+
+const isPathAffected = (path: string, targetPath: string, targetIsDir: boolean) => {
+    return path === targetPath || (targetIsDir && path.startsWith(`${targetPath}/`));
+};
+
+const replaceAffectedPath = (path: string, oldPath: string, newPath: string, isDir: boolean) => {
+    if (path === oldPath) {
+        return newPath;
+    }
+    if (isDir && path.startsWith(`${oldPath}/`)) {
+        return `${newPath}${path.slice(oldPath.length)}`;
+    }
+    return path;
+};
+
+const renameTreeNodePaths = (nodes: any[], oldPath: string, newPath: string, newName: string, isDir: boolean) => {
+    for (const node of nodes) {
+        if (node.path === oldPath) {
+            node.name = newName;
+        }
+        node.path = replaceAffectedPath(node.path, oldPath, newPath, isDir);
+        if (node.children?.length) {
+            renameTreeNodePaths(node.children, oldPath, newPath, newName, isDir);
+        }
+    }
+};
+
+const removeTreeNodeByPath = (nodes: any[], targetPath: string, targetIsDir: boolean) => {
+    return nodes
+        .filter((node) => !isPathAffected(node.path, targetPath, targetIsDir))
+        .map((node) => {
+            if (node.children?.length) {
+                node.children = removeTreeNodeByPath(node.children, targetPath, targetIsDir);
+            }
+            return node;
+        });
+};
+
+const syncTabsAfterRename = (oldPath: string, newPath: string, newName: string, isDir: boolean) => {
+    const isCurrentFileRenamed = form.value.path === oldPath;
+    if (currentPath.value && isPathAffected(currentPath.value, oldPath, isDir)) {
+        currentPath.value = replaceAffectedPath(currentPath.value, oldPath, newPath, isDir);
+    }
+    if (directoryPath.value && isPathAffected(directoryPath.value, oldPath, isDir)) {
+        directoryPath.value = replaceAffectedPath(directoryPath.value, oldPath, newPath, isDir);
+    }
+    loadedNodes.value = new Set(
+        Array.from(loadedNodes.value).map((path) => replaceAffectedPath(String(path), oldPath, newPath, isDir)),
+    );
+    fileTabs.value = fileTabs.value.map((tab) => {
+        if (!isPathAffected(tab.path, oldPath, isDir)) {
+            return tab;
+        }
+        const nextPath = replaceAffectedPath(tab.path, oldPath, newPath, isDir);
+        return {
+            ...tab,
+            path: nextPath,
+            name: tab.path === oldPath ? newName : tab.name,
+        };
+    });
+    if (selectTab.value && isPathAffected(selectTab.value, oldPath, isDir)) {
+        selectTab.value = replaceAffectedPath(selectTab.value, oldPath, newPath, isDir);
+    }
+    if (form.value.path && isPathAffected(form.value.path, oldPath, isDir)) {
+        form.value.path = replaceAffectedPath(form.value.path, oldPath, newPath, isDir);
+        if (isCurrentFileRenamed) {
+            fileName.value = newName;
+        }
+    }
+    saveTabsToStorage();
+};
+
+const closeTabsAfterDelete = (targetPath: string, targetIsDir: boolean) => {
+    const removedCurrent = selectTab.value && isPathAffected(selectTab.value, targetPath, targetIsDir);
+    fileTabs.value = fileTabs.value.filter((tab) => !isPathAffected(tab.path, targetPath, targetIsDir));
+    if (!removedCurrent) {
+        saveTabsToStorage();
+        return;
+    }
+    isEdit.value = false;
+    const nextTab = fileTabs.value[fileTabs.value.length - 1];
+    if (nextTab) {
+        selectTab.value = nextTab.path;
+        getContent(nextTab.path, true);
+    } else {
+        selectTab.value = '';
+        form.value.content = '';
+        form.value.path = '';
+        oldFileContent.value = '';
+        fileName.value = '';
+        fileExtension.value = '';
+        historyVersionCount.value = 0;
+        disposeEditor();
+    }
+    saveTabsToStorage();
+};
+
+const renameFromContextMenu = async () => {
+    const data = treeContextMenu.data;
+    closeTreeContextMenu();
+    if (!data) {
+        return;
+    }
+    try {
+        const res = await ElMessageBox.prompt(i18n.global.t('file.rename'), i18n.global.t('file.rename'), {
+            inputValue: data.name,
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            inputValidator: (value) => !!value?.trim(),
+        });
+        const newName = String(res.value || '').trim();
+        if (!newName || newName === data.name) {
+            return;
+        }
+        const oldPath = data.path;
+        const parentPath = getDirectoryPath(oldPath);
+        const newPath = joinPath(parentPath, newName);
+        loading.value = true;
+        await renameRile({ oldName: oldPath, newName: newPath });
+        renameTreeNodePaths(treeData.value, oldPath, newPath, newName, data.isDir);
+        treeData.value = [...treeData.value];
+        syncTabsAfterRename(oldPath, newPath, newName, data.isDir);
+        loadedNodes.value.delete(oldPath);
+        loadedNodes.value.delete(newPath);
+        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+    } finally {
+        loading.value = false;
+    }
+};
+
+const deleteFromContextMenu = async () => {
+    const data = treeContextMenu.data;
+    closeTreeContextMenu();
+    if (!data) {
+        return;
+    }
+    try {
+        await ElMessageBox.confirm(
+            i18n.global.t(data.isDir ? 'file.deleteHelper' : 'file.deleteHelper2'),
+            i18n.global.t('commons.button.delete'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.delete'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'warning',
+            },
+        );
+        loading.value = true;
+        await deleteFile({ path: data.path, isDir: data.isDir, forceDelete: false });
+        closeTabsAfterDelete(data.path, data.isDir);
+        treeData.value = removeTreeNodeByPath(treeData.value, data.path, data.isDir);
+        loadedNodes.value.delete(data.path);
+        loadedNodes.value.delete(getDirectoryPath(data.path));
+        if (
+            selectedParentNode.value &&
+            isPathAffected(selectedParentNode.value.data?.path || '', data.path, data.isDir)
+        ) {
+            selectedParentNode.value = null;
+        }
+        if (currentPath.value && isPathAffected(currentPath.value, data.path, data.isDir)) {
+            currentPath.value = getDirectoryPath(data.path);
+        }
+        MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+    } finally {
+        loading.value = false;
+    }
 };
 
 const currentEditingNode = ref<any>(null);
@@ -1396,6 +1707,17 @@ const removeExistingNode = (data: any[], command: string) => {
     return data;
 };
 
+const getRawNodeChildren = (node: any) => {
+    if (!node?.data) {
+        return [];
+    }
+    if (!Array.isArray(node.data.children)) {
+        node.data.children = [];
+    }
+    node.data.children = node.data.children.map((child) => (child?.data?.path ? child.data : child));
+    return node.data.children;
+};
+
 const handleCreate = (command: string) => {
     removeExistingNode(treeData.value, command);
     if ((command === 'dir' && isCreate.value === 'file') || (command === 'file' && isCreate.value === 'dir')) {
@@ -1409,11 +1731,9 @@ const handleCreate = (command: string) => {
     newFolder.value = newFileNode.name;
     currentEditingNode.value = newFileNode;
     if (selectedParentNode.value) {
-        if (!selectedParentNode.value.children) {
-            selectedParentNode.value.children = [];
-        }
-        selectedParentNode.value.children.unshift(newFileNode);
-        updateNodeChildren(treeData.value, selectedParentNode.value.data.path, selectedParentNode.value.children);
+        const children = getRawNodeChildren(selectedParentNode.value);
+        children.unshift(newFileNode);
+        updateNodeChildren(treeData.value, selectedParentNode.value.data.path, children);
         treeData.value = [...treeData.value];
     } else {
         treeData.value = [newFileNode, ...treeData.value];
@@ -1445,13 +1765,10 @@ const cancelFolder = () => {
     const targetId = isCreate.value == 'dir' ? 'new-dir' : 'new-file';
     isCreate.value = 'none';
     newFolder.value = '';
-    if (selectedParentNode.value && selectedParentNode.value.children.length > 0) {
-        selectedParentNode.value.children = selectedParentNode.value.children.filter((node) => node.id !== targetId);
-        if (selectedParentNode.value.data?.children?.length > 0) {
-            selectedParentNode.value.data.children = selectedParentNode.value.data.children.filter(
-                (node) => node.id !== targetId,
-            );
-        }
+    if (selectedParentNode.value) {
+        selectedParentNode.value.data.children = getRawNodeChildren(selectedParentNode.value).filter(
+            (node) => node.id !== targetId,
+        );
     }
     treeData.value = filterNodes(treeData.value, targetId);
     loadedNodes.value.delete(currentPath.value);
@@ -1496,6 +1813,8 @@ onBeforeUnmount(() => {
     currentPath.value = '';
     selectedParentNode.value = null;
     window.removeEventListener('resize', updateHeights);
+    document.removeEventListener('click', closeTreeContextMenu);
+    window.removeEventListener('scroll', closeTreeContextMenu, true);
 });
 
 defineExpose({ acceptParams });
@@ -1508,6 +1827,7 @@ defineExpose({ acceptParams });
 
 .dialog-header-icon {
     color: var(--el-color-info);
+    flex-shrink: 0;
 }
 
 .monaco-editor-tree {
@@ -1523,12 +1843,59 @@ defineExpose({ acceptParams });
     background-color: var(--el-button--primary);
 }
 
+.tree-context-menu {
+    position: fixed;
+    z-index: 3000;
+    min-width: 148px;
+    padding: 4px;
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 4px;
+    background: var(--el-bg-color-overlay);
+    box-shadow: var(--el-box-shadow-light);
+}
+
+.tree-context-menu__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 30px;
+    padding: 0 8px;
+    border-radius: 3px;
+    color: var(--el-text-color-primary);
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.tree-context-menu__item:hover {
+    background: var(--el-fill-color-light);
+}
+
+.tree-context-menu__item.is-danger {
+    color: var(--el-color-danger);
+}
+
+.tree-context-menu__icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
 .truncate-text {
-    display: inline-block;
-    max-width: 800px;
+    display: block;
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.code-title {
+    display: inline-flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    margin-right: 8px;
+}
+.code-title-copy {
+    flex-shrink: 0;
 }
 .code-header {
     background-color: var(--panel-code-header-footer-color);
@@ -1557,8 +1924,32 @@ defineExpose({ acceptParams });
     width: 1.35em;
     height: 1.35em;
     position: relative;
+    flex-shrink: 0;
     fill: currentColor;
     vertical-align: middle;
+}
+
+.tree-node-content {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+}
+
+.tree-node-editing {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    min-width: 0;
+    padding-right: 8px;
+}
+
+.tree-node-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 :deep(.el-tabs) {
