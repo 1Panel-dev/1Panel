@@ -1,5 +1,12 @@
 <template>
-    <component :is="typeComponentMap[type]" :height="height" :option="option" :dataZoom="dataZoom" class="v-charts" />
+    <component
+        :is="typeComponentMap[type]"
+        :height="height"
+        :option="option"
+        :dataZoom="dataZoom"
+        :renderer="renderer"
+        class="v-charts"
+    />
 </template>
 <script lang="ts" setup>
 import line from './components/Line.vue';
@@ -15,6 +22,10 @@ defineProps({
         default: '200px',
     },
     dataZoom: Boolean,
+    renderer: {
+        type: String,
+        default: undefined,
+    },
     option: {
         type: Object,
         required: true,

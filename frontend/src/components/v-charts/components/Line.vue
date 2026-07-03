@@ -29,6 +29,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    renderer: {
+        type: String,
+        default: undefined,
+    },
     option: {
         type: Object,
         required: true,
@@ -114,7 +118,8 @@ function initChart() {
     const optionItem = itemChart?.getOption();
     const itemSelect = Array.isArray(optionItem?.legend) ? optionItem?.legend?.[0] : optionItem?.legend;
     if (itemChart == null) {
-        itemChart = echarts.init(chartDom);
+        const initOptions = props.renderer ? { renderer: props.renderer as 'canvas' | 'svg' } : undefined;
+        itemChart = echarts.init(chartDom, undefined, initOptions);
     }
     const style = getComputedStyle(document.documentElement);
     const primaryTextColor = style.getPropertyValue('--el-text-color-primary').trim() || '#303133';

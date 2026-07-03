@@ -13,7 +13,7 @@ import {
     DataZoomComponent,
 } from 'echarts/components';
 
-import { CanvasRenderer } from 'echarts/renderers';
+import { CanvasRenderer, SVGRenderer } from 'echarts/renderers';
 
 echarts.use([
     LineChart,
@@ -31,6 +31,7 @@ echarts.use([
     DataZoomComponent,
 
     CanvasRenderer,
+    SVGRenderer,
 ]);
 
 export default echarts;
