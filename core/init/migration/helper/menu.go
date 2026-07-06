@@ -2,14 +2,68 @@ package helper
 
 import (
 	"encoding/json"
-	"fmt"
-	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"gorm.io/gorm"
 )
+
+func UpdateHideMenu(tx *gorm.DB, update func([]dto.ShowMenu) []dto.ShowMenu) error {
+	var menuJSON string
+	if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+		return err
+	}
+	if menuJSON == "" {
+		menuJSON = LoadMenus()
+	}
+
+	var menus []dto.ShowMenu
+	if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", LoadMenus()).Error
+	}
+
+	updatedJSON, err := json.Marshal(update(menus))
+	if err != nil {
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", LoadMenus()).Error
+	}
+	return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+}
+
+func UpsertChildMenuByLabel(tx *gorm.DB, parentLabel string, newMenu dto.ShowMenu, afterLabel string) error {
+	return UpdateHideMenu(tx, func(menus []dto.ShowMenu) []dto.ShowMenu {
+		for i := range menus {
+			if menus[i].Label != parentLabel {
+				continue
+			}
+			menus[i].Children = UpsertMenuByLabel(menus[i].Children, newMenu, afterLabel)
+			break
+		}
+		return menus
+	})
+}
+
+func UpdateChildMenuSortByLabel(tx *gorm.DB, parentLabel string, menuSort []dto.MenuLabelSort) error {
+	sortMap := make(map[string]int)
+	for _, item := range menuSort {
+		sortMap[item.Label] = item.Sort
+	}
+
+	return UpdateHideMenu(tx, func(menus []dto.ShowMenu) []dto.ShowMenu {
+		for i := range menus {
+			if menus[i].Label != parentLabel {
+				continue
+			}
+			for j := range menus[i].Children {
+				if sortVal, ok := sortMap[menus[i].Children[j].Label]; ok {
+					menus[i].Children[j].Sort = sortVal
+				}
+			}
+			break
+		}
+		return menus
+	})
+}
 
 func UpsertMenuByLabel(children []dto.ShowMenu, newMenu dto.ShowMenu, afterLabel string) []dto.ShowMenu {
 	for i := range children {
@@ -74,12 +128,12 @@ func LoadMenus() string {
 				{ID: "118", Disabled: false, Title: "xpack.app.app", IsShow: true, Label: "XApp", Path: "/xpack/app", Sort: 100},
 				{ID: "112", Disabled: false, Title: "xpack.waf.name", IsShow: true, Label: "Dashboard", Path: "/xpack/waf/dashboard", Sort: 200},
 				{ID: "111", Disabled: false, Title: "xpack.node.nodeManagement", IsShow: true, Label: "NodeDashboard", Path: "/xpack/node/dashboard", Sort: 300},
-				{ID: "119", Disabled: false, Title: "xpack.upage", IsShow: true, Label: "Upage", Path: "/xpack/upage", Sort: 400},
-				{ID: "113", Disabled: false, Title: "xpack.monitor.name", IsShow: true, Label: "MonitorDashboard", Path: "/xpack/monitor/dashboard", Sort: 500},
-				{ID: "114", Disabled: false, Title: "xpack.tamper.tamper", IsShow: true, Label: "Tamper", Path: "/xpack/tamper", Sort: 600},
-				{ID: "120", Disabled: false, Title: "xpack.cluster.cluster", IsShow: true, Label: "Cluster", Path: "/xpack/cluster", Sort: 700},
-				{ID: "115", Disabled: false, Title: "xpack.sync.menu", IsShow: true, Label: "Sync", Path: "/xpack/sync", Sort: 800},
-				{ID: "117", Disabled: false, Title: "xpack.setting.setting", IsShow: true, Label: "XSetting", Path: "/xpack/setting", Sort: 900},
+				{ID: "113", Disabled: false, Title: "xpack.monitor.name", IsShow: true, Label: "MonitorDashboard", Path: "/xpack/monitor/dashboard", Sort: 600},
+				{ID: "115", Disabled: false, Title: "xpack.sync.menu", IsShow: true, Label: "Sync", Path: "/xpack/sync", Sort: 700},
+				{ID: "119", Disabled: false, Title: "xpack.upage", IsShow: true, Label: "Upage", Path: "/xpack/upage", Sort: 800},
+				{ID: "114", Disabled: false, Title: "xpack.tamper.tamper", IsShow: true, Label: "Tamper", Path: "/xpack/tamper", Sort: 1000},
+				{ID: "120", Disabled: false, Title: "xpack.cluster.cluster", IsShow: true, Label: "Cluster", Path: "/xpack/cluster", Sort: 1100},
+				{ID: "117", Disabled: false, Title: "xpack.setting.setting", IsShow: true, Label: "XSetting", Path: "/xpack/setting", Sort: 1200},
 			}},
 		{ID: "12", Disabled: false, Title: "menu.logs", IsShow: true, Label: "Log-Menu", Path: "/logs", Sort: 1200},
 		{ID: "13", Disabled: true, Title: "menu.settings", IsShow: true, Label: "Setting-Menu", Path: "/settings", Sort: 1300},
@@ -126,7 +180,7 @@ func LoadMenus() string {
 				IsShow:   true,
 				Label:    "UserManagement",
 				Path:     "/enterprise/users",
-				Sort:     350,
+				Sort:     400,
 			}, "NodeDashboard")
 			item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
 				ID:       "122",
@@ -135,7 +189,7 @@ func LoadMenus() string {
 				IsShow:   true,
 				Label:    "OpsReport",
 				Path:     "/enterprise/ops-report",
-				Sort:     360,
+				Sort:     500,
 			}, "UserManagement")
 			item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
 				ID:       "123",
@@ -144,8 +198,8 @@ func LoadMenus() string {
 				IsShow:   true,
 				Label:    "VirtualMachine",
 				Path:     "/enterprise/vm",
-				Sort:     550,
-			}, "MonitorDashboard")
+				Sort:     900,
+			}, "Upage")
 			break
 		}
 	}
@@ -182,61 +236,66 @@ func MenuSort() []dto.MenuLabelSort {
 		{Label: "Cronjob-Menu", Sort: 900},
 		{Label: "Toolbox-Menu", Sort: 1000},
 		{Label: "Xpack-Menu", Sort: 1100},
+		{Label: "Log-Menu", Sort: 1200},
+		{Label: "Setting-Menu", Sort: 1300},
+	}
+	MenuLabelsWithSort = append(MenuLabelsWithSort, XpackMenuSort()...)
+	return MenuLabelsWithSort
+}
+
+func XpackMenuSort() []dto.MenuLabelSort {
+	return []dto.MenuLabelSort{
 		{Label: "XApp", Sort: 100},
 		{Label: "Dashboard", Sort: 200},
 		{Label: "Node", Sort: 300},
 		{Label: "NodeDashboard", Sort: 300},
-		{Label: "UserManagement", Sort: 350},
-		{Label: "OpsReport", Sort: 360},
-		{Label: "Upage", Sort: 400},
-		{Label: "MonitorDashboard", Sort: 500},
-		{Label: "VirtualMachine", Sort: 550},
-		{Label: "Tamper", Sort: 600},
-		{Label: "Cluster", Sort: 700},
-		{Label: "Sync", Sort: 800},
-		{Label: "XSetting", Sort: 900},
-		{Label: "Log-Menu", Sort: 1200},
-		{Label: "Setting-Menu", Sort: 1300},
+		{Label: "UserManagement", Sort: 400},
+		{Label: "OpsReport", Sort: 500},
+		{Label: "MonitorDashboard", Sort: 600},
+		{Label: "Sync", Sort: 700},
+		{Label: "Upage", Sort: 800},
+		{Label: "VirtualMachine", Sort: 900},
+		{Label: "Tamper", Sort: 1000},
+		{Label: "Cluster", Sort: 1100},
+		{Label: "XSetting", Sort: 1200},
 	}
-	return MenuLabelsWithSort
 }
 
 func AddMenu(newMenu dto.ShowMenu, parentMenuID string, tx *gorm.DB) error {
-	var menuJSON string
-	if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
-		return err
-	}
-	if strings.Contains(menuJSON, fmt.Sprintf(`"%s"`, newMenu.Label)) && strings.Contains(menuJSON, fmt.Sprintf(`"%s"`, newMenu.Path)) {
-		return nil
-	}
-	var menus []dto.ShowMenu
-	if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
-		return tx.Model(&model.Setting{}).
-			Where("key = ?", "HideMenu").
-			Update("value", LoadMenus()).Error
-	}
-	for i, menu := range menus {
-		if menu.ID == parentMenuID {
-			exists := false
-			for _, child := range menu.Children {
-				if child.ID == newMenu.ID {
-					exists = true
-					break
-				}
+	return UpdateHideMenu(tx, func(menus []dto.ShowMenu) []dto.ShowMenu {
+		if menuExistsByLabelAndPath(menus, newMenu.Label, newMenu.Path) {
+			return menus
+		}
+		for i := range menus {
+			if menus[i].ID != parentMenuID || menuExistsByID(menus[i].Children, newMenu.ID) {
+				continue
 			}
-			if !exists {
-				menus[i].Children = append([]dto.ShowMenu{newMenu}, menus[i].Children...)
-			}
+			menus[i].Children = append([]dto.ShowMenu{newMenu}, menus[i].Children...)
 			break
 		}
+		return menus
+	})
+}
+
+func menuExistsByID(menus []dto.ShowMenu, id string) bool {
+	for _, menu := range menus {
+		if menu.ID == id || menuExistsByID(menu.Children, id) {
+			return true
+		}
 	}
-	updatedJSON, err := json.Marshal(menus)
-	if err != nil {
-		return tx.Model(&model.Setting{}).
-			Where("key = ?", "HideMenu").
-			Update("value", LoadMenus()).Error
+	return false
+}
+
+func menuExistsByLabelAndPath(menus []dto.ShowMenu, label, path string) bool {
+	for _, menu := range menus {
+		if menu.Label == label && menu.Path == path {
+			return true
+		}
+		if menuExistsByLabelAndPath(menu.Children, label, path) {
+			return true
+		}
 	}
-	return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	return false
 }
 
 func RemoveMenuByID(menus []dto.ShowMenu, id string) []dto.ShowMenu {
