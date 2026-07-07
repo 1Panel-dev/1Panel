@@ -112,6 +112,7 @@ ClusterMasterNotExist: "گره اصلی خوشه قطع شده است. گره‌
 # ماشین مجازی
 ErrVMNotFound: "ماشین مجازی وجود ندارد"
 ErrVMAlreadyExists: "ماشین مجازی از قبل وجود دارد"
+ErrVMStoragePathInUse: "مسیر استخر ذخیره‌سازی قبلاً توسط [{{ .name }}] استفاده شده است"
 ErrVMRunning: "ماشین مجازی در حال اجرا است"
 ErrVMLibvirtConnect: "اتصال به libvirt ناموفق بود: {{ .detail }}"
 ErrVMPermission: "مجوز عملیات ماشین مجازی وجود ندارد: {{ .detail }}"

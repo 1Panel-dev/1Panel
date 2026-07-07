@@ -112,6 +112,7 @@ ClusterMasterNotExist: "クラスタのマスターノードが切断されて�
 # 仮想マシン
 ErrVMNotFound: "仮想マシンが存在しません"
 ErrVMAlreadyExists: "仮想マシンは既に存在します"
+ErrVMStoragePathInUse: "ストレージプールのパスは既に [{{ .name }}] で使用されています"
 ErrVMRunning: "仮想マシンは実行中です"
 ErrVMLibvirtConnect: "libvirt への接続に失敗しました: {{ .detail }}"
 ErrVMPermission: "仮想マシンを操作する権限がありません: {{ .detail }}"

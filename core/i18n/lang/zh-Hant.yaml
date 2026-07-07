@@ -112,6 +112,7 @@ ClusterMasterNotExist: "叢集主節點失聯，請刪除子節點"
 # 虛擬機
 ErrVMNotFound: "虛擬機不存在"
 ErrVMAlreadyExists: "虛擬機已存在"
+ErrVMStoragePathInUse: "儲存池路徑已被 [{{ .name }}] 使用"
 ErrVMRunning: "虛擬機正在執行"
 ErrVMLibvirtConnect: "連接 libvirt 失敗: {{ .detail }}"
 ErrVMPermission: "沒有虛擬機操作權限: {{ .detail }}"

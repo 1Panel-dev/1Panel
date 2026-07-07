@@ -5727,7 +5727,6 @@ const message = {
             createSnapshot: 'Create Snapshot',
             recoverSnapshot: 'Recover Snapshot',
             snapshotName: 'Snapshot Name',
-            snapshotPath: 'Snapshot File',
             snapshotSize: 'Snapshot Size',
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
@@ -5743,11 +5742,20 @@ const message = {
             suspend: 'Suspender',
             resume: 'Reanudar',
             operateConfirm: '¿Confirmar {0} máquina virtual [{1}]?',
+            forceDelete: 'Forzar eliminación',
+            forceDeleteHelper:
+                'La eliminación forzada ignorará los errores al eliminar la VM, borrará los metadatos del panel y liberará el uso de recursos.',
             forceDeleteConfirm:
-                'La máquina virtual está en ejecución. Se detendrá forzosamente antes de eliminarla. ¿Continuar?',
-            createResource: 'Crear {0}',
+                'Si falla la limpieza de libvirt, la eliminación forzada puede ocultar una VM que aún existe o sigue ejecutándose en el host. ¿Continuar?',
+            deleteNameHelper: '" para eliminar esta máquina virtual',
             isoSource: 'Origen ISO',
-            isoUploadDirHelper: 'El archivo se subirá a: {0}',
+            isoTargetDir: 'Ruta de guardado ISO',
+            isoTargetDirHelper:
+                'Los ISO seleccionados desde el servidor y subidos localmente se guardarán en este directorio.',
+            isoTargetDirAvailable: 'La ruta de guardado ISO está disponible.',
+            isoTargetDirUnavailable:
+                'La ruta de guardado ISO debe estar dentro de un pool de almacenamiento de VM disponible.',
+            checkPath: 'Comprobar',
             isoSize: 'Tamaño ISO',
             dir: 'Directorio local',
         },

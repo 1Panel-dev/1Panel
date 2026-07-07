@@ -112,6 +112,7 @@ ClusterMasterNotExist: "Cluster master node is disconnected. Delete child nodes.
 # virtual machine
 ErrVMNotFound: "Virtual machine does not exist"
 ErrVMAlreadyExists: "Virtual machine already exists"
+ErrVMStoragePathInUse: "Storage pool path is already used by [{{ .name }}]"
 ErrVMRunning: "Virtual machine is running"
 ErrVMLibvirtConnect: "Failed to connect to libvirt"
 ErrVMPermission: "No permission to operate virtual machine: {{ .detail }}"

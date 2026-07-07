@@ -112,6 +112,7 @@ ClusterMasterNotExist: "Küme ana düğümü bağlantısı kesildi, lütfen alt 
 # sanal makine
 ErrVMNotFound: "Sanal makine mevcut değil"
 ErrVMAlreadyExists: "Sanal makine zaten mevcut"
+ErrVMStoragePathInUse: "Depolama havuzu yolu zaten [{{ .name }}] tarafından kullanılıyor"
 ErrVMRunning: "Sanal makine çalışıyor"
 ErrVMLibvirtConnect: "libvirt bağlantısı başarısız: {{ .detail }}"
 ErrVMPermission: "Sanal makine işlemi için izin yok: {{ .detail }}"
