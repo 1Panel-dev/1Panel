@@ -112,6 +112,7 @@ ClusterMasterNotExist: "클러스터의 마스터 노드가 연결이 끊어졌�
 # 가상 머신
 ErrVMNotFound: "가상 머신이 존재하지 않습니다"
 ErrVMAlreadyExists: "가상 머신이 이미 존재합니다"
+ErrVMStoragePathInUse: "스토리지 풀 경로가 이미 [{{ .name }}]에서 사용 중입니다"
 ErrVMRunning: "가상 머신이 실행 중입니다"
 ErrVMLibvirtConnect: "libvirt 연결 실패: {{ .detail }}"
 ErrVMPermission: "가상 머신 작업 권한이 없습니다: {{ .detail }}"

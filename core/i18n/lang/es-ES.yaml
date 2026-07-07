@@ -112,6 +112,7 @@ ClusterMasterNotExist: "El nodo principal del clúster está desconectado, elimi
 # máquina virtual
 ErrVMNotFound: "La máquina virtual no existe"
 ErrVMAlreadyExists: "La máquina virtual ya existe"
+ErrVMStoragePathInUse: "La ruta del pool de almacenamiento ya está usada por [{{ .name }}]"
 ErrVMRunning: "La máquina virtual está en ejecución"
 ErrVMLibvirtConnect: "Error al conectar con libvirt: {{ .detail }}"
 ErrVMPermission: "Sin permiso para operar la máquina virtual: {{ .detail }}"

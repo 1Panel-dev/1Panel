@@ -112,6 +112,7 @@ ClusterMasterNotExist: "Node utama kluster terputus, sila padamkan nod anak."
 # mesin maya
 ErrVMNotFound: "Mesin maya tidak wujud"
 ErrVMAlreadyExists: "Mesin maya sudah wujud"
+ErrVMStoragePathInUse: "Laluan kolam storan sudah digunakan oleh [{{ .name }}]"
 ErrVMRunning: "Mesin maya sedang berjalan"
 ErrVMLibvirtConnect: "Gagal menyambung ke libvirt: {{ .detail }}"
 ErrVMPermission: "Tiada kebenaran untuk mengendalikan mesin maya: {{ .detail }}"

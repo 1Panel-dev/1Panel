@@ -112,6 +112,7 @@ ClusterMasterNotExist: "Основной узел кластера отключ�
 # виртуальная машина
 ErrVMNotFound: "Виртуальная машина не существует"
 ErrVMAlreadyExists: "Виртуальная машина уже существует"
+ErrVMStoragePathInUse: "Путь пула хранения уже используется [{{ .name }}]"
 ErrVMRunning: "Виртуальная машина запущена"
 ErrVMLibvirtConnect: "Не удалось подключиться к libvirt: {{ .detail }}"
 ErrVMPermission: "Нет разрешения на операцию с виртуальной машиной: {{ .detail }}"

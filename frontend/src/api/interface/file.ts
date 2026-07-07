@@ -227,6 +227,9 @@ export namespace File {
         oldPaths: string[];
         newPath: string;
         type: string;
+        name?: string;
+        cover?: boolean;
+        coverPaths?: string[];
     }
 
     export interface FileDownload {

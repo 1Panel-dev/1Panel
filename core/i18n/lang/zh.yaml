@@ -112,6 +112,7 @@ ClusterMasterNotExist: "集群主节点失联，请删除子节点"
 # 虚拟机
 ErrVMNotFound: "虚拟机不存在"
 ErrVMAlreadyExists: "虚拟机已存在"
+ErrVMStoragePathInUse: "存储池路径已被 [{{ .name }}] 使用"
 ErrVMRunning: "虚拟机正在运行"
 ErrVMLibvirtConnect: "连接 libvirt 失败: {{ .detail }}"
 ErrVMPermission: "没有虚拟机操作权限: {{ .detail }}"
