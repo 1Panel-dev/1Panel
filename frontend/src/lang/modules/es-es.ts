@@ -5689,12 +5689,15 @@ const message = {
             cpu: 'CPU',
             memory: 'Memoria',
             disk: 'Disco',
-            memoryLimitHelper: 'Memoria máxima asignable: {0}',
-            memoryLimitExceeded:
-                'La asignación de memoria de la VM superará la memoria asignable del host. Reduzca la memoria e inténtelo de nuevo.',
+            cpuLimitHelper: 'CPU disponible actualmente: {0} núcleos',
+            cpuLimitExceeded: 'La CPU supera el límite. Máximo disponible actual: {0} núcleos.',
+            memoryLimitHelper: 'Memoria actualmente asignable: {0} (el host debe reservar {1} de memoria)',
+            memoryLimitExceeded: 'La memoria supera el límite. Máximo asignable actual: {0}.',
             storageLimitHelper: 'Espacio libre actual en el pool de almacenamiento de destino: {0}',
+            storageLimitExceeded: 'La capacidad del disco supera el límite. Máximo disponible actual: {0}.',
             iso: 'ISO',
-            createSource: 'Create Source',
+            createSource: 'Origen de creación',
+            createFromTemplate: 'Crear desde plantilla',
             blankDisk: 'Blank Disk',
             template: 'Template',
             templateName: 'Template Name',
@@ -5703,7 +5706,7 @@ const message = {
             sourceVM: 'Source VM',
             templateSize: 'Template Size',
             deleteTemplate: 'Delete Template',
-            deleteTemplateFile: 'Delete template disk file',
+            deleteTemplateConfirm: 'Eliminar plantilla {0}. Esta operación no se puede revertir. ¿Continuar?',
             diskSize: 'Tamaño del disco',
             diskPath: 'Ruta del disco',
             diskPathHelper:
@@ -5797,18 +5800,19 @@ const message = {
             forceDelete: 'Forzar eliminación',
             forceDeleteHelper:
                 'La eliminación forzada ignorará los errores al eliminar la VM, borrará los metadatos del panel y liberará el uso de recursos.',
-            forceDeleteConfirm:
-                'Si falla la limpieza de libvirt, la eliminación forzada puede ocultar una VM que aún existe o sigue ejecutándose en el host. ¿Continuar?',
             deleteNameHelper: '" para eliminar esta máquina virtual',
             isoSource: 'Origen ISO',
             isoTargetDir: 'Ruta de guardado ISO',
             isoTargetDirHelper:
                 'Los ISO seleccionados desde el servidor y subidos localmente se guardarán en este directorio.',
             isoTargetDirAvailable: 'La ruta de guardado ISO está disponible.',
-            isoTargetDirUnavailable:
-                'La ruta de guardado ISO debe estar dentro de un pool de almacenamiento de VM disponible.',
+            isoTargetDirUnavailable: 'La ruta de guardado ISO debe estar dentro de un pool de almacenamiento de VM disponible.',
+            isoTargetDirCheckRequired: 'Compruebe la ruta de guardado ISO antes de guardar.',
             checkPath: 'Comprobar',
             isoSize: 'Tamaño ISO',
+            deleteIsoConfirm: 'Esta operación de eliminación no se puede revertir. ¿Continuar?',
+            deleteSourceFile: 'Eliminar archivo de origen',
+            deleteSourceFileHelper: 'Si se marca, también se eliminará el archivo de origen referenciado por este registro ISO y no se podrá recuperar.',
             dir: 'Directorio local',
         },
         cluster: {
