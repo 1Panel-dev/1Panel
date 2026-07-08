@@ -533,7 +533,7 @@ func loadImage(dbType, version string) (string, error) {
 
 func loadVersion(dbType string, version string) string {
 	if dbType == "mariadb" {
-		return "mariadb:11.3.2 "
+		return "mariadb:11.3.2"
 	}
 	if strings.HasPrefix(version, "5.6") {
 		return "mysql:5.6.51"
