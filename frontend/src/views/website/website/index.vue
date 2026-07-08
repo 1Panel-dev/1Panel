@@ -19,7 +19,7 @@
                     ref="appStatusRef"
                 ></AppStatus>
             </template>
-            <template v-if="!openNginxConfig && nginxIsExist" #leftToolBar>
+            <template v-if="!openNginxConfig" #leftToolBar>
                 <el-button v-permission type="primary" @click="openCreate" :disabled="disabledConfig">
                     {{ $t('commons.button.create') }}
                 </el-button>
@@ -30,7 +30,7 @@
                     {{ $t('website.advancedSettings') }}
                 </el-button>
             </template>
-            <template v-if="!openNginxConfig && nginxIsExist" #rightToolBar>
+            <template v-if="!openNginxConfig" #rightToolBar>
                 <el-select class="p-w-200" v-model="req.type" @change="search()" :disabled="disabledConfig">
                     <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option :label="$t('commons.table.all')" :value="''"></el-option>
