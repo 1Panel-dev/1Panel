@@ -347,6 +347,11 @@ const message = {
             enable: 'Habilitado',
             disable: 'Deshabilitado',
             deleted: 'Eliminado',
+            notfound: 'No encontrado',
+            inactive: 'Inactivo',
+            degraded: 'Degradado',
+            inaccessible: 'Inaccesible',
+            unknown: 'Desconocido',
             downloading: 'Descargando',
             packing: 'Empaquetando',
             sending: 'Enviando',
@@ -5703,7 +5708,6 @@ const message = {
             blankDisk: 'Blank Disk',
             template: 'Template',
             templateName: 'Template Name',
-            templateHelper: 'Create a new VM by fully cloning the selected template disk.',
             convertToTemplate: 'Convert to Template',
             sourceVM: 'Source VM',
             templateSize: 'Template Size',
@@ -5716,13 +5720,8 @@ const message = {
             imagePath: 'Ruta de la imagen',
             imagePathHelper: 'Opcional. Si se define, use la ruta absoluta de una imagen qcow2 existente.',
             isoPath: 'Ruta ISO',
-            isoPathHelper: 'Opcional. Si se define, use la ruta absoluta de un ISO existente.',
             storagePool: 'Pool de almacenamiento',
-            storagePoolHelper:
-                'Usa el pool de almacenamiento default de forma predeterminada para crear y gestionar volúmenes de disco de VM.',
             network: 'Red',
-            networkHelper:
-                'Usa la red NAT default de forma predeterminada. También puede seleccionar o introducir un nombre de red libvirt existente.',
             bridgeName: 'Nombre del bridge',
             natNetworkHelper:
                 'NAT crea una red virtual libvirt para el acceso saliente de la VM. El nombre del bridge interno se genera automáticamente y no se requiere un bridge del host.',
@@ -5804,9 +5803,10 @@ const message = {
                 'La eliminación forzada ignorará los errores al eliminar la VM, borrará los metadatos del panel y liberará el uso de recursos.',
             deleteNameHelper: '" para eliminar esta máquina virtual',
             isoSource: 'Origen ISO',
+            downloadFromServer: 'Descargar desde el servidor',
             isoTargetDir: 'Ruta de destino ISO',
             isoTargetDirHelper:
-                'Si se define, el ISO se guardará en este directorio. Puede dejarse vacío para archivos ISO seleccionados del servidor.',
+                'Los ISO cargados localmente o descargados desde el servidor se guardarán en este directorio.',
             isoTargetDirOptional: 'No se definió una ruta de destino ISO. Se usará la ruta original del archivo ISO.',
             isoTargetDirAvailable: 'La ruta de destino ISO está disponible.',
             isoTargetDirUnavailable:

@@ -100,6 +100,8 @@ const getType = (status: string) => {
         case 'failed':
         case 'lost':
         case 'exited':
+        case 'notfound':
+        case 'inaccessible':
             return 'danger';
         case 'paused':
         case 'dead':
@@ -107,10 +109,13 @@ const getType = (status: string) => {
         case 'deleted':
         case 'conflict':
         case 'partial':
+        case 'degraded':
             return 'warning';
         case 'duplicate':
         case 'unexecuted':
         case 'canceled':
+        case 'inactive':
+        case 'unknown':
             return 'info';
         default:
             return 'primary';

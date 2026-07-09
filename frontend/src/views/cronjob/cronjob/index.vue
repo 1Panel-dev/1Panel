@@ -179,18 +179,16 @@
                             <div v-else>
                                 <div v-for="(item, index) of row.sourceAccounts" :key="index">
                                     <div v-if="row.accountExpand || (!row.accountExpand && index < 3)">
-                                        <div v-if="row.expand || (!row.expand && index < 3)">
-                                            <span type="info">
-                                                {{ item === 'localhost' ? $t('setting.LOCAL') : item }}
-                                                <el-icon
-                                                    v-if="item === row.downloadAccount"
-                                                    size="12"
-                                                    class="relative top-px left-1"
-                                                >
-                                                    <Star />
-                                                </el-icon>
-                                            </span>
-                                        </div>
+                                        <span type="info">
+                                            {{ item === 'localhost' ? $t('setting.LOCAL') : item }}
+                                            <el-icon
+                                                v-if="item === row.downloadAccount"
+                                                size="12"
+                                                class="relative top-px left-1"
+                                            >
+                                                <Star />
+                                            </el-icon>
+                                        </span>
                                     </div>
                                 </div>
                                 <div v-if="!row.accountExpand && row.sourceAccounts?.length > 3">
@@ -211,7 +209,7 @@
                         :buttons="buttons"
                         :ellipsis="2"
                         :label="$t('commons.table.operate')"
-                        min-width="isMobile ? 'auto' : 200"
+                        :min-width="isMobile ? 'auto' : 200"
                         :fixed="isMobile ? false : 'right'"
                         fix
                     />

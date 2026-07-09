@@ -343,6 +343,11 @@ const message = {
             enable: 'Habilitado',
             disable: 'Desabilitado',
             deleted: 'Excluído',
+            notfound: 'Não encontrado',
+            inactive: 'Inativo',
+            degraded: 'Degradado',
+            inaccessible: 'Inacessível',
+            unknown: 'Desconhecido',
             downloading: 'Baixando',
             packing: 'Empacotando',
             sending: 'Enviando',
@@ -5895,7 +5900,6 @@ const message = {
             blankDisk: 'Blank Disk',
             template: 'Template',
             templateName: 'Template Name',
-            templateHelper: 'Create a new VM by fully cloning the selected template disk.',
             convertToTemplate: 'Convert to Template',
             sourceVM: 'Source VM',
             templateSize: 'Template Size',
@@ -5908,13 +5912,8 @@ const message = {
             imagePath: 'Caminho da Imagem',
             imagePathHelper: 'Opcional. Se definido, use o caminho absoluto de uma imagem qcow2 existente.',
             isoPath: 'Caminho do ISO',
-            isoPathHelper: 'Opcional. Se definido, use o caminho absoluto de um ISO existente.',
             storagePool: 'Pool de Armazenamento',
-            storagePoolHelper:
-                'Usa o pool de armazenamento default por padrão para criar e gerenciar volumes de disco da VM.',
             network: 'Rede',
-            networkHelper:
-                'Usa a rede NAT default por padrão. Você também pode selecionar ou inserir um nome de rede libvirt existente.',
             bridgeName: 'Nome da Bridge',
             natNetworkHelper:
                 'NAT cria uma rede virtual libvirt para acesso externo da VM. O nome da bridge interna é gerado automaticamente e nenhuma bridge do host é necessária.',
@@ -5994,9 +5993,9 @@ const message = {
                 'A exclusão forçada ignorará erros de exclusão da VM, removerá os metadados do painel e liberará o uso de recursos.',
             deleteNameHelper: '" para excluir esta máquina virtual',
             isoSource: 'Origem do ISO',
+            downloadFromServer: 'Baixar do servidor',
             isoTargetDir: 'Caminho de destino ISO',
-            isoTargetDirHelper:
-                'Se definido, o ISO será salvo neste diretório. Pode ficar vazio para arquivos ISO selecionados no servidor.',
+            isoTargetDirHelper: 'ISOs enviados localmente ou baixados do servidor serão salvos neste diretório.',
             isoTargetDirOptional:
                 'Nenhum caminho de destino ISO foi definido. O caminho original do arquivo ISO será usado.',
             isoTargetDirAvailable: 'O caminho de destino ISO está disponível.',
