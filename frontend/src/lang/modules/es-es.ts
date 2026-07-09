@@ -1187,6 +1187,8 @@ const message = {
                 'Se detecta automáticamente desde el nombre del archivo cuando sea posible. Confirme o introdúzcalo manualmente',
             metadataOverwriteConfirm:
                 'La versión del paquete Skill es diferente del valor introducido. ¿Usar el valor actual?',
+            metadataOverwriteConfirmWithVersions:
+                'La versión del paquete Skill es diferente del valor introducido. Versión del paquete: {packageVersion}; versión introducida: {inputVersion}. ¿Usar el valor actual?',
             offlineNotice: 'El entorno actual está sin conexión. Solo se pueden instalar Skills desde la tienda local.',
             publishConfirm: '¿Publicar este Skill? Después se podrá instalar desde la tienda local de Skills.',
             disableConfirm: '¿Retirar este Skill? Los Skills ya instalados en agentes no se verán afectados.',

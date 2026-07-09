@@ -23,6 +23,10 @@ const isCsrfForbidden = (response?: AxiosResponse<any>) => {
     return typeof message === 'string' && message.toLowerCase().includes('csrf token invalid');
 };
 
+type RequestConfig = AxiosRequestConfig & {
+    skipErrorMessage?: boolean;
+};
+
 class RequestHttp {
     service: AxiosInstance;
     public constructor(config: AxiosRequestConfig) {
@@ -113,7 +117,9 @@ class RequestHttp {
                         MsgError(i18n.global.t('license.tamperHelper'));
                         return Promise.reject(data);
                     }
-                    MsgError(data.message);
+                    if (!(response.config as RequestConfig).skipErrorMessage) {
+                        MsgError(data.message);
+                    }
                     return Promise.reject(data);
                 }
                 return data;
@@ -171,6 +177,14 @@ class RequestHttp {
         }
         return this.service.post(url, params, config);
     }
+    postWithConfig<T>(url: string, params?: object, config?: RequestConfig): Promise<ResultData<T>> {
+        return this.service.post(url, params, {
+            baseURL: import.meta.env.VITE_API_URL as string,
+            timeout: ResultEnum.TIMEOUT as number,
+            withCredentials: true,
+            ...config,
+        });
+    }
     postLocalNode<T>(url: string, params?: object, timeout?: number): Promise<ResultData<T>> {
         return this.service.post(url, params, {
             baseURL: import.meta.env.VITE_API_URL as string,
@@ -190,7 +204,7 @@ class RequestHttp {
     download<BlobPart>(url: string, params?: object, _object = {}): Promise<BlobPart> {
         return this.service.post(url, params, _object);
     }
-    upload<T>(url: string, params: object = {}, config?: AxiosRequestConfig): Promise<ResultData<T>> {
+    upload<T>(url: string, params: object = {}, config?: RequestConfig): Promise<ResultData<T>> {
         return this.service.post(url, params, config);
     }
 }

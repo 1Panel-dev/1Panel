@@ -1180,6 +1180,8 @@ const message = {
             versionAutoFillPlaceholder:
                 'Detectado automaticamente pelo nome do arquivo quando possível. Confirme ou preencha manualmente',
             metadataOverwriteConfirm: 'A versão no pacote Skill difere do valor atual. Usar o valor atual?',
+            metadataOverwriteConfirmWithVersions:
+                'A versão no pacote Skill difere do valor atual. Versão do pacote: {packageVersion}; versão informada: {inputVersion}. Usar o valor atual?',
             offlineNotice: 'O ambiente atual está offline. Apenas Skills da loja local podem ser instaladas.',
             publishConfirm: 'Publicar esta Skill? Depois disso, ela poderá ser instalada pela loja local de Skills.',
             disableConfirm: 'Despublicar esta Skill? Skills já instaladas em agentes não serão afetadas.',

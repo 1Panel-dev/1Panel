@@ -1182,6 +1182,8 @@ const message = {
             uploadSuccess: 'Skill başarıyla yüklendi ve inceleme bekliyor.',
             versionAutoFillPlaceholder: 'Mümkünse dosya adından otomatik algılanır. Onaylayın veya manuel girin',
             metadataOverwriteConfirm: 'Skill paketindeki sürüm mevcut girişten farklı. Mevcut giriş kullanılsın mı?',
+            metadataOverwriteConfirmWithVersions:
+                'Skill paketindeki sürüm mevcut girişten farklı. Paket sürümü: {packageVersion}; girilen sürüm: {inputVersion}. Mevcut giriş kullanılsın mı?',
             offlineNotice: 'Geçerli ortam çevrimdışı. Yalnızca yerel Skill Mağazasından Skill kurulabilir.',
             publishConfirm:
                 'Bu Skilli yayınlamak istiyor musunuz? Yayınlandıktan sonra yerel Skill Mağazasından kurulabilir.',
