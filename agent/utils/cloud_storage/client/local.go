@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
@@ -39,6 +40,14 @@ func (c localClient) Delete(file string) (bool, error) {
 }
 
 func (c localClient) Upload(src, target string) (bool, error) {
+	return c.upload(src, target, 0, false)
+}
+
+func (c localClient) UploadWithTimeout(src, target string, timeout time.Duration) (bool, error) {
+	return c.upload(src, target, timeout, true)
+}
+
+func (c localClient) upload(src, target string, timeout time.Duration, useTimeout bool) (bool, error) {
 	fileOp := files.NewFileOp()
 	if _, err := os.Stat(path.Dir(target)); err != nil {
 		if os.IsNotExist(err) {
@@ -50,7 +59,13 @@ func (c localClient) Upload(src, target string) (bool, error) {
 		}
 	}
 
-	if err := fileOp.CopyAndReName(src, target, "", true); err != nil {
+	var err error
+	if useTimeout {
+		err = fileOp.CopyAndReNameWithTimeout(src, target, "", true, timeout)
+	} else {
+		err = fileOp.CopyAndReName(src, target, "", true)
+	}
+	if err != nil {
 		return false, fmt.Errorf("cp file failed, err: %v", err)
 	}
 	return true, nil

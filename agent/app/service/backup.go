@@ -436,6 +436,10 @@ type backupClientHelper struct {
 	message   string
 }
 
+type uploadWithTimeoutClient interface {
+	UploadWithTimeout(src, target string, timeout time.Duration) (bool, error)
+}
+
 func NewBackupClientMap(ids []string) map[string]backupClientHelper {
 	var accounts []model.BackupAccount
 	var idItems []uint
@@ -464,6 +468,14 @@ func NewBackupClientMap(ids []string) map[string]backupClientHelper {
 }
 
 func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper, src, dst, accountIDs string, downloadAccountID, retry uint) error {
+	return uploadWithMapInternal(taskItem, accountMap, src, dst, accountIDs, downloadAccountID, retry, 0, false)
+}
+
+func uploadWithMapWithTimeout(taskItem task.Task, accountMap map[string]backupClientHelper, src, dst, accountIDs string, downloadAccountID, retry uint, timeout time.Duration) error {
+	return uploadWithMapInternal(taskItem, accountMap, src, dst, accountIDs, downloadAccountID, retry, timeout, true)
+}
+
+func uploadWithMapInternal(taskItem task.Task, accountMap map[string]backupClientHelper, src, dst, accountIDs string, downloadAccountID, retry uint, timeout time.Duration, useTimeout bool) error {
 	accounts := strings.Split(accountIDs, ",")
 	for _, account := range accounts {
 		if len(account) == 0 {
@@ -489,7 +501,17 @@ func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper,
 			"backup": name,
 		}))
 		for i := 0; i < int(retry)+1; i++ {
-			_, err := itemBackup.client.Upload(src, path.Join(itemBackup.backupPath, dst))
+			uploadPath := path.Join(itemBackup.backupPath, dst)
+			var err error
+			if useTimeout {
+				if uploadClient, ok := itemBackup.client.(uploadWithTimeoutClient); ok {
+					_, err = uploadClient.UploadWithTimeout(src, uploadPath, timeout)
+				} else {
+					_, err = itemBackup.client.Upload(src, uploadPath)
+				}
+			} else {
+				_, err = itemBackup.client.Upload(src, uploadPath)
+			}
 			taskItem.LogWithStatus(i18n.GetMsgByKey("Upload"), err)
 			if err != nil {
 				if account == fmt.Sprintf("%d", downloadAccountID) {

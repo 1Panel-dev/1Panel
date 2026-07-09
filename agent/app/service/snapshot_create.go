@@ -196,7 +196,7 @@ func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID, retry, t
 		taskItem.AddSubTaskWithAliasAndOps(
 			"SnapUpload",
 			func(t *task.Task) error {
-				return snapUpload(itemHelper, req.SourceAccountIDs, req.DownloadAccountID, retry, fmt.Sprintf("%s.tar.gz", rootDir))
+				return snapUpload(itemHelper, req.SourceAccountIDs, req.DownloadAccountID, retry, fmt.Sprintf("%s.tar.gz", rootDir), time.Duration(timeout)*time.Second)
 			}, nil, int(retry), time.Duration(timeout)*time.Second,
 		)
 		req.InterruptStep = ""
@@ -561,7 +561,7 @@ func snapCompress(snap snapHelper, rootDir string, secret string) error {
 	return nil
 }
 
-func snapUpload(snap snapHelper, accounts string, downloadID, retry uint, file string) error {
+func snapUpload(snap snapHelper, accounts string, downloadID, retry uint, file string, timeout time.Duration) error {
 	snap.Task.Log("---------------------- 8 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapUpload"))
 
@@ -571,5 +571,5 @@ func snapUpload(snap snapHelper, accounts string, downloadID, retry uint, file s
 	if !accountMap[fmt.Sprintf("%d", downloadID)].isOk {
 		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", downloadID)].message))
 	}
-	return uploadWithMap(snap.Task, accountMap, src, dst, accounts, downloadID, retry)
+	return uploadWithMapWithTimeout(snap.Task, accountMap, src, dst, accounts, downloadID, retry, timeout)
 }
