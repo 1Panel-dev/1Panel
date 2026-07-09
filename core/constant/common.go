@@ -210,6 +210,7 @@ var WebUrlMap = map[string]struct{}{
 	"/enterprise/ops-report/alert":    {},
 	"/enterprise/ops-report/history":  {},
 	"/enterprise/ops-report/settings": {},
+	"/enterprise/vm/overview":         {},
 	"/enterprise/vm/list":             {},
 	"/enterprise/vm/isos":             {},
 	"/enterprise/vm/templates":        {},

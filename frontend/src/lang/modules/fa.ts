@@ -339,6 +339,11 @@ const message = {
             enable: 'فعال',
             disable: 'غیرفعال',
             deleted: 'حذف شده',
+            notfound: 'یافت نشد',
+            inactive: 'شروع نشده',
+            degraded: 'تنزل‌یافته',
+            inaccessible: 'غیرقابل دسترس',
+            unknown: 'نامشخص',
             downloading: 'در حال دانلود',
             packing: 'در حال بسته‌بندی',
             sending: 'در حال ارسال',
@@ -5619,7 +5624,6 @@ const message = {
             blankDisk: 'دیسک خالی',
             template: 'قالب',
             templateName: 'نام قالب',
-            templateHelper: 'دیسک قالب انتخاب‌شده را به طور کامل به عنوان دیسک ماشین مجازی جدید کلون می‌کند.',
             convertToTemplate: 'تبدیل به قالب',
             sourceVM: 'ماشین مجازی منبع',
             templateSize: 'اندازه قالب',
@@ -5632,13 +5636,8 @@ const message = {
             imagePath: 'مسیر ایمیج',
             imagePathHelper: 'اختیاری است. در صورت وارد کردن، باید مسیر مطلق یک ایمیج qcow2 موجود باشد.',
             isoPath: 'مسیر ISO',
-            isoPathHelper: 'اختیاری است. در صورت وارد کردن، باید مسیر مطلق یک ISO موجود باشد.',
             storagePool: 'استخر ذخیره‌سازی',
-            storagePoolHelper:
-                'به طور پیش‌فرض از استخر ذخیره‌سازی default برای ایجاد و مدیریت حجم‌های دیسک ماشین مجازی استفاده می‌شود.',
             network: 'شبکه',
-            networkHelper:
-                'به طور پیش‌فرض از شبکه NAT با نام default استفاده می‌شود. همچنین می‌توانید نام یک شبکه libvirt موجود را انتخاب یا وارد کنید.',
             bridgeName: 'نام Bridge',
             natNetworkHelper:
                 'NAT یک شبکه مجازی libvirt برای دسترسی خروجی VM ایجاد می‌کند. نام Bridge داخلی خودکار ساخته می‌شود و نیازی به انتخاب کارت شبکه Bridge میزبان نیست.',
@@ -5719,9 +5718,9 @@ const message = {
                 'حذف اجباری خطاهای حذف ماشین مجازی را نادیده می‌گیرد، فراداده پنل را حذف می‌کند و منابع را آزاد می‌کند.',
             deleteNameHelper: '" را برای حذف این ماشین مجازی وارد کنید',
             isoSource: 'منبع ISO',
+            downloadFromServer: 'دانلود از سرور',
             isoTargetDir: 'مسیر مقصد ISO',
-            isoTargetDirHelper:
-                'در صورت تکمیل، ISO در این دایرکتوری ذخیره می‌شود. برای ISO انتخاب‌شده از سرور می‌توان آن را خالی گذاشت.',
+            isoTargetDirHelper: 'ISO های آپلودشده محلی یا دانلودشده از سرور در این دایرکتوری ذخیره می‌شوند.',
             isoTargetDirOptional: 'مسیر مقصد ISO تنظیم نشده است. مسیر فایل منبع ISO اصلی استفاده خواهد شد.',
             isoTargetDirAvailable: 'مسیر مقصد ISO قابل استفاده است.',
             isoTargetDirUnavailable: 'مسیر مقصد ISO باید داخل یک استخر ذخیره‌سازی ماشین مجازی قابل استفاده باشد.',
@@ -5730,7 +5729,8 @@ const message = {
             isoSize: 'اندازه ISO',
             deleteIsoConfirm: 'این عملیات حذف قابل بازگشت نیست. ادامه می‌دهید؟',
             deleteSourceFile: 'حذف فایل منبع',
-            deleteSourceFileHelper: 'در صورت انتخاب، فایل منبع ارجاع‌شده توسط این رکورد ISO نیز حذف می‌شود و قابل بازیابی نیست.',
+            deleteSourceFileHelper:
+                'در صورت انتخاب، فایل منبع ارجاع‌شده توسط این رکورد ISO نیز حذف می‌شود و قابل بازیابی نیست.',
             dir: 'دایرکتوری محلی',
         },
         cluster: {

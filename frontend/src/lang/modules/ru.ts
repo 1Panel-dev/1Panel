@@ -341,6 +341,11 @@ const message = {
             enable: 'Включено',
             disable: 'Отключено',
             deleted: 'Удалено',
+            notfound: 'Не найдено',
+            inactive: 'Не запущено',
+            degraded: 'Деградировано',
+            inaccessible: 'Недоступно',
+            unknown: 'Неизвестно',
             downloading: 'Загрузка',
             packing: 'Упаковка',
             sending: 'Отправка',
@@ -5744,7 +5749,6 @@ const message = {
             blankDisk: 'Blank Disk',
             template: 'Template',
             templateName: 'Template Name',
-            templateHelper: 'Create a new VM by fully cloning the selected template disk.',
             convertToTemplate: 'Convert to Template',
             sourceVM: 'Source VM',
             templateSize: 'Template Size',
@@ -5758,13 +5762,8 @@ const message = {
             imagePathHelper:
                 'Можно оставить пустым. Если указано, используйте абсолютный путь к существующему образу qcow2.',
             isoPath: 'Путь к ISO',
-            isoPathHelper: 'Можно оставить пустым. Если указано, используйте абсолютный путь к существующему ISO.',
             storagePool: 'Пул хранения',
-            storagePoolHelper:
-                'По умолчанию используется пул хранения default для создания и управления дисковыми томами ВМ.',
             network: 'Сеть',
-            networkHelper:
-                'По умолчанию используется сеть NAT default. Также можно выбрать или ввести имя существующей сети libvirt.',
             bridgeName: 'Имя моста',
             natNetworkHelper:
                 'NAT создаёт виртуальную сеть libvirt для исходящего доступа ВМ. Имя внутреннего моста генерируется автоматически, выбирать мост хоста не нужно.',
@@ -5845,9 +5844,9 @@ const message = {
                 'Принудительное удаление проигнорирует ошибки удаления ВМ, удалит метаданные панели и освободит ресурсы.',
             deleteNameHelper: '" для удаления этой виртуальной машины',
             isoSource: 'Источник ISO',
+            downloadFromServer: 'Скачать с сервера',
             isoTargetDir: 'Целевой путь ISO',
-            isoTargetDirHelper:
-                'Если указано, ISO будет сохранен в этот каталог. Для ISO, выбранных на сервере, можно оставить пустым.',
+            isoTargetDirHelper: 'ISO, загруженные локально или скачанные с сервера, будут сохранены в этот каталог.',
             isoTargetDirOptional: 'Целевой путь ISO не указан. Будет использован исходный путь файла ISO.',
             isoTargetDirAvailable: 'Целевой путь ISO доступен.',
             isoTargetDirUnavailable: 'Целевой путь ISO должен находиться в доступном пуле хранения ВМ.',

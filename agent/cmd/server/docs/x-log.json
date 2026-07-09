@@ -1662,13 +1662,6 @@
 		"formatZH": "删除虚拟机网络 [name]",
 		"formatEN": "delete VM network [name]"
 	},
-	"/core/enterprise/vms/networks/sync": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "同步虚拟机网络",
-		"formatEN": "sync VM networks"
-	},
 	"/core/enterprise/vms/networks/update": {
 		"bodyKeys": [
 			"id"
@@ -1764,13 +1757,6 @@
 		],
 		"formatZH": "删除虚拟机存储 [name]",
 		"formatEN": "delete VM storage [name]"
-	},
-	"/core/enterprise/vms/storages/sync": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "同步虚拟机存储",
-		"formatEN": "sync VM storages"
 	},
 	"/core/enterprise/vms/storages/update": {
 		"bodyKeys": [

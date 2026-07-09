@@ -28,4 +28,10 @@ const (
 	StatusNormal     = "Normal"
 	StatusDeleted    = "Deleted"
 	StatusLoading    = "Loading"
+
+	StatusInactive     = "Inactive"
+	StatusUnknown      = "Unknown"
+	StatusBuilding     = "Building"
+	StatusDegraded     = "Degraded"
+	StatusInaccessible = "Inaccessible"
 )
