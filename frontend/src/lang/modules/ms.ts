@@ -959,6 +959,7 @@ const message = {
             resetToken: 'Tetapkan semula Token',
             resetTokenConfirm: 'Tetapkan semula penggunaan Token untuk {0}?',
             unlimited: 'Tanpa had',
+            unlimitedWithAuto: 'Tanpa had, termasuk auto',
             lastUsedAt: 'Terakhir digunakan',
             settingTitle: 'Tetapan gateway AI',
             basicSetting: 'Tetapan Asas',
@@ -1064,6 +1065,10 @@ const message = {
             availableModels: 'Model Tersedia',
             modelGroupModels: 'Model Permintaan',
             modelGroupModelsPlaceholder: 'Pilih atau masukkan nama model permintaan',
+            modelGroupModelsHelper:
+                'Masukkan model upstream sebenar sahaja; penghalaan pintar mencuba model mengikut susunan dan tidak mengimbang beban antara model.',
+            modelGroupGuide:
+                'Kumpulan model hanya mengandungi model upstream sebenar. auto ialah nama model maya yang digunakan klien semasa meminta AI Gateway.',
             modelGroupModelCount: '{0} model',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',
@@ -1083,11 +1088,18 @@ const message = {
             importResult: 'Imported {0}, duplicated {1}, invalid {2}',
             auditLogs: 'Audit Logs',
             smartRoute: 'Penghalaan Pintar',
+            smartRouteGuideTitle: 'Gunakan model=auto pada klien untuk memasuki penghalaan pintar',
+            smartRouteGuideReady:
+                'model=auto memilih kumpulan model ringkas atau kompleks mengikut kerumitan permintaan. Model lain dihantar seperti biasa.',
+            smartRouteGuideNotReady:
+                'Aktifkan penghalaan pintar dan konfigurasikan kumpulan ringkas/kompleks dahulu. Kemudian gunakan model=auto pada klien.',
+            copyAutoModel: 'Salin auto',
+            goSmartRouteSetting: 'Pergi ke tetapan',
             smartRoutePolicy: 'Polisi Penghalaan',
             routeConfig: 'Konfigurasi Penghalaan',
             embeddingConfig: 'Konfigurasi Embedding',
             embeddingConfigDesc:
-                'Digunakan untuk penghalaan pintar dan padanan sampel semantik pematuhan kandungan. Konfigurasikan sebelum membina semula vektor sampel.',
+                'Digunakan untuk penghalaan pintar dan padanan sampel semantik pematuhan kandungan. Disyorkan: llama.cpp + Qwen3-Embedding-0.6B. Konfigurasikan sebelum membina semula vektor sampel.',
             decisionConfig: 'Parameter Keputusan',
             simpleModelGroup: 'Kumpulan Model Ringkas',
             complexModelGroup: 'Kumpulan Model Kompleks',
@@ -1095,17 +1107,23 @@ const message = {
             embeddingModel: 'Model',
             embeddingApiKey: 'API Key',
             routeThreshold: 'Ambang Penghalaan',
-            routeThresholdHelper: 'Hanya nilai di atas ambang ini digunakan untuk menentukan ringkas/kompleks.',
+            routeThresholdHelper:
+                'Untuk Smart Route: guna padanan sampel hanya apabila persamaan permintaan mencapai nilai ini.',
             auditThreshold: 'Ambang Audit',
-            auditThresholdHelper: 'Hanya nilai di atas ambang ini dianggap sepadan dengan sampel audit.',
+            auditThresholdHelper:
+                'Untuk Pematuhan Kandungan: anggap sampel audit sepadan hanya apabila persamaan mencapai nilai ini.',
             topK: 'TopK',
             topKHelper: 'Bilangan sampel paling serupa yang dibandingkan setiap kali.',
-            selectionStrategy: 'Strategi Pemilihan',
             members: 'Ahli',
             samples: 'Sampel',
+            routeSamplesGuide:
+                'Sampel ialah contoh permintaan ringkas/kompleks untuk padanan persamaan Embedding. Gunakan permintaan pengguna sebenar, kemudian cipta atau bina semula vektor.',
             rebuildVectors: 'Bina Semula Vektor',
             rebuildVectorsConfirm:
                 'Membina semula vektor akan meminta perkhidmatan Embedding memproses sampel sekali lagi. Teruskan?',
+            createVectorOnImport: 'Cipta vektor selepas import',
+            createVectorOnImportHelper:
+                'Dipilih secara lalai. Jika Embedding dikonfigurasi, tugas latar belakang mencipta vektor; jika tidak, hanya sampel dicipta.',
             route: 'Laluan',
             audit: 'Audit',
             auditSamples: 'Sampel Audit',
@@ -1115,6 +1133,8 @@ const message = {
             vectorDim: 'Dimensi',
             threshold: 'Ambang',
             preview: 'Pratonton',
+            previewGuide:
+                'Pratonton menguji sama ada permintaan ringkas atau kompleks tanpa memanggil model upstream. Sumber ialah padanan sampel atau peraturan.',
             previewPlaceholder: 'Masukkan teks permintaan',
             confidence: 'Keyakinan',
             source: 'Sumber',
@@ -1125,7 +1145,12 @@ const message = {
             requestID: 'ID Permintaan',
             simple: 'Ringkas',
             complex: 'Kompleks',
+            sampleLabelSafe: 'Selamat',
+            sampleLabelReview: 'Semak',
+            sampleLabelBlock: 'Sekat',
             latencyMs: 'Latensi(ms)',
+            smartRouteSettingGuide:
+                'Selepas diaktifkan, hanya permintaan model=auto mencetuskan penghalaan pintar. Kumpulan ringkas untuk tugas kos rendah; kumpulan kompleks untuk analisis kod, reka bentuk seni bina dan penyelesaian masalah.',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: 'Satu sampel setiap baris',
             apiKeyCount: 'Kuantiti',

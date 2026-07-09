@@ -950,6 +950,7 @@ const message = {
             resetToken: 'Token をリセット',
             resetTokenConfirm: '{0} の Token 使用量をリセットしますか？',
             unlimited: '無制限',
+            unlimitedWithAuto: '無制限、auto を含む',
             lastUsedAt: '最終使用日時',
             settingTitle: 'AI ゲートウェイ設定',
             basicSetting: '基本設定',
@@ -1055,6 +1056,10 @@ const message = {
             availableModels: '利用可能なモデル',
             modelGroupModels: 'リクエストモデル',
             modelGroupModelsPlaceholder: 'リクエストモデル名を選択または入力してください',
+            modelGroupModelsHelper:
+                '実際の上流モデルのみ入力してください。スマートルーティングは順番にモデルを試し、モデル間の負荷分散は行いません。',
+            modelGroupGuide:
+                'モデルグループには実際の上流モデルだけを設定します。auto はクライアントが AI ゲートウェイにリクエストする時の仮想モデル名です。',
             modelGroupModelCount: '{0} モデル',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',
@@ -1074,11 +1079,18 @@ const message = {
             importResult: 'Imported {0}, duplicated {1}, invalid {2}',
             auditLogs: 'Audit Logs',
             smartRoute: 'スマートルーティング',
+            smartRouteGuideTitle: 'クライアントで model=auto を使用してスマートルーティングに入ります',
+            smartRouteGuideReady:
+                'model=auto はリクエストの複雑度に応じて簡単/複雑モデルグループから選択します。それ以外の model は通常通り転送されます。',
+            smartRouteGuideNotReady:
+                '先に設定でスマートルーティングを有効化し、簡単/複雑モデルグループを設定してください。その後クライアントで model=auto を使用します。',
+            copyAutoModel: 'auto をコピー',
+            goSmartRouteSetting: '設定へ移動',
             smartRoutePolicy: 'ルーティングポリシー',
             routeConfig: 'ルーティング設定',
             embeddingConfig: 'Embedding 設定',
             embeddingConfigDesc:
-                'スマートルーティングとコンテンツコンプライアンスの意味サンプル照合に使用します。サンプルベクトルを再構築する前に設定してください。',
+                'スマートルーティングとコンテンツコンプライアンスの意味サンプル照合に使用します。推奨: llama.cpp + Qwen3-Embedding-0.6B。サンプルベクトルを再構築する前に設定してください。',
             decisionConfig: '判定パラメータ',
             simpleModelGroup: '簡単モデルグループ',
             complexModelGroup: '複雑モデルグループ',
@@ -1086,16 +1098,22 @@ const message = {
             embeddingModel: 'モデル',
             embeddingApiKey: 'API Key',
             routeThreshold: 'ルーティングしきい値',
-            routeThresholdHelper: '類似度がこの値を超えた場合のみ簡単/複雑を判定します。',
+            routeThresholdHelper:
+                'スマートルーティング用：リクエストと簡単/複雑サンプルの類似度がこの値に達した場合のみサンプル一致を使用します。',
             auditThreshold: '監査しきい値',
-            auditThresholdHelper: '類似度がこの値を超えた場合のみ監査サンプルに命中とします。',
+            auditThresholdHelper:
+                'コンテンツコンプライアンス用：リクエストと監査サンプルの類似度がこの値に達した場合のみ命中とします。',
             topK: 'TopK',
             topKHelper: '毎回比較する最も類似したサンプル数です。',
-            selectionStrategy: '選択戦略',
             members: 'メンバー',
             samples: 'サンプル',
+            routeSamplesGuide:
+                'サンプルは簡単/複雑リクエストの例で、Embedding 類似度照合に使います。実際のユーザーリクエストを書き、追加後にベクトルを作成または再構築してください。',
             rebuildVectors: 'ベクトルを再構築',
             rebuildVectorsConfirm: 'ベクトルを再構築すると、Embedding サービスでサンプルを再処理します。続行しますか？',
+            createVectorOnImport: 'インポート後にベクトルを作成',
+            createVectorOnImportHelper:
+                'デフォルトで有効です。Embedding が設定済みの場合はバックグラウンドタスクでベクトルを作成し、未設定の場合はサンプルのみを作成します。',
             route: 'ルート',
             audit: '監査',
             auditSamples: '監査サンプル',
@@ -1105,6 +1123,8 @@ const message = {
             vectorDim: '次元',
             threshold: 'しきい値',
             preview: 'プレビュー',
+            previewGuide:
+                'プレビューはリクエストが簡単か複雑かをテストします。上流モデルは呼び出しません。ソースはサンプル一致またはルール判定です。',
             previewPlaceholder: 'リクエストテキストを入力',
             confidence: '信頼度',
             source: 'ソース',
@@ -1115,7 +1135,12 @@ const message = {
             requestID: 'リクエスト ID',
             simple: '簡単',
             complex: '複雑',
+            sampleLabelSafe: '安全',
+            sampleLabelReview: 'レビュー',
+            sampleLabelBlock: 'ブロック',
             latencyMs: 'レイテンシ(ms)',
+            smartRouteSettingGuide:
+                '有効化後、model=auto のリクエストだけがスマートルーティングを使用します。簡単モデルグループは低コストタスク、複雑モデルグループはコード分析、設計、障害調査などに使います。',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: '1行に1つのサンプル',
             apiKeyCount: '数量',

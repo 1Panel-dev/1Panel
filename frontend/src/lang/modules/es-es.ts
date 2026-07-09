@@ -961,6 +961,7 @@ const message = {
             resetToken: 'Restablecer tokens',
             resetTokenConfirm: '¿Restablecer el uso de tokens de {0}?',
             unlimited: 'Ilimitado',
+            unlimitedWithAuto: 'Ilimitado, incluye auto',
             lastUsedAt: 'Último uso',
             settingTitle: 'Configuración del gateway de IA',
             basicSetting: 'Configuración básica',
@@ -1067,6 +1068,10 @@ const message = {
             availableModels: 'Modelos disponibles',
             modelGroupModels: 'Modelos solicitados',
             modelGroupModelsPlaceholder: 'Seleccione o ingrese nombres de modelos solicitados',
+            modelGroupModelsHelper:
+                'Ingrese solo modelos upstream reales; el enrutamiento inteligente prueba los modelos en orden y no balancea carga entre modelos.',
+            modelGroupGuide:
+                'Los grupos de modelos solo contienen modelos upstream reales. auto es un nombre de modelo virtual usado por los clientes al llamar al gateway de IA.',
             modelGroupModelCount: '{0} modelos',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',
@@ -1086,11 +1091,18 @@ const message = {
             importResult: 'Imported {0}, duplicated {1}, invalid {2}',
             auditLogs: 'Audit Logs',
             smartRoute: 'Enrutamiento inteligente',
+            smartRouteGuideTitle: 'Use model=auto en el cliente para entrar al enrutamiento inteligente',
+            smartRouteGuideReady:
+                'model=auto elige entre el grupo simple o complejo según la complejidad de la solicitud. Cualquier otro modelo se reenvía normalmente.',
+            smartRouteGuideNotReady:
+                'Primero active el enrutamiento inteligente y configure los grupos simple/complejo. Luego use model=auto en el cliente.',
+            copyAutoModel: 'Copiar auto',
+            goSmartRouteSetting: 'Ir a configuración',
             smartRoutePolicy: 'Política de enrutamiento',
             routeConfig: 'Configuración de enrutamiento',
             embeddingConfig: 'Configuración de embedding',
             embeddingConfigDesc:
-                'Se usa para enrutamiento inteligente y coincidencia semántica de muestras de cumplimiento de contenido. Configúralo antes de reconstruir vectores.',
+                'Se usa para enrutamiento inteligente y coincidencia semántica de muestras de cumplimiento de contenido. Recomendado: llama.cpp + Qwen3-Embedding-0.6B. Configúralo antes de reconstruir vectores.',
             decisionConfig: 'Parámetros de decisión',
             simpleModelGroup: 'Grupo de modelos simples',
             complexModelGroup: 'Grupo de modelos complejos',
@@ -1098,17 +1110,23 @@ const message = {
             embeddingModel: 'Modelo',
             embeddingApiKey: 'API Key',
             routeThreshold: 'Umbral de enrutamiento',
-            routeThresholdHelper: 'Solo clasifica simple/complejo si la similitud supera este valor.',
+            routeThresholdHelper:
+                'Para Enrutamiento Inteligente: usa muestras solo cuando la similitud de la solicitud alcance este valor.',
             auditThreshold: 'Umbral de auditoría',
-            auditThresholdHelper: 'Solo considera coincidencia de auditoría si la similitud supera este valor.',
+            auditThresholdHelper:
+                'Para Cumplimiento de Contenido: considera coincidencia solo cuando la similitud alcance este valor.',
             topK: 'TopK',
             topKHelper: 'Número de muestras más similares para comparar cada vez.',
-            selectionStrategy: 'Estrategia de selección',
             members: 'Miembros',
             samples: 'Muestras',
+            routeSamplesGuide:
+                'Las muestras son ejemplos de solicitudes simples/complejas para coincidencia por similitud Embedding. Use solicitudes reales y luego cree o reconstruya vectores.',
             rebuildVectors: 'Reconstruir vectores',
             rebuildVectorsConfirm:
                 'Reconstruir vectores volverá a solicitar al servicio Embedding que procese las muestras. ¿Continuar?',
+            createVectorOnImport: 'Crear vectores después de importar',
+            createVectorOnImportHelper:
+                'Activado por defecto. Si Embedding está configurado, una tarea en segundo plano crea vectores; de lo contrario solo crea muestras.',
             route: 'Ruta',
             audit: 'Auditoría',
             auditSamples: 'Muestras de auditoría',
@@ -1118,6 +1136,8 @@ const message = {
             vectorDim: 'Dimensión',
             threshold: 'Umbral',
             preview: 'Vista previa',
+            previewGuide:
+                'La vista previa prueba si una solicitud es simple o compleja sin llamar al modelo upstream. La fuente es coincidencia de muestras o reglas.',
             previewPlaceholder: 'Introduce el texto de la solicitud',
             confidence: 'Confianza',
             source: 'Fuente',
@@ -1128,7 +1148,12 @@ const message = {
             requestID: 'ID de solicitud',
             simple: 'Simple',
             complex: 'Complejo',
+            sampleLabelSafe: 'Seguro',
+            sampleLabelReview: 'Revisar',
+            sampleLabelBlock: 'Bloquear',
             latencyMs: 'Latencia(ms)',
+            smartRouteSettingGuide:
+                'Después de activarlo, solo las solicitudes con model=auto usan enrutamiento inteligente. El grupo simple es para tareas de bajo costo; el complejo para análisis de código, arquitectura y diagnóstico.',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: 'Una muestra por línea',
             apiKeyCount: 'Cantidad',

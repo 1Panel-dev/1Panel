@@ -935,6 +935,7 @@ const message = {
             resetToken: 'Token 재설정',
             resetTokenConfirm: '{0}의 Token 사용량을 재설정하시겠습니까?',
             unlimited: '무제한',
+            unlimitedWithAuto: '무제한, auto 포함',
             lastUsedAt: '최근 사용 시간',
             settingTitle: 'AI 게이트웨이 설정',
             basicSetting: '기본 설정',
@@ -1040,6 +1041,10 @@ const message = {
             availableModels: '사용 가능한 모델',
             modelGroupModels: '요청 모델',
             modelGroupModelsPlaceholder: '요청 모델 이름을 선택하거나 입력하세요',
+            modelGroupModelsHelper:
+                '실제 업스트림 모델만 입력하세요. 스마트 라우팅은 순서대로 모델을 우선 선택하며 모델 간 부하 분산은 하지 않습니다.',
+            modelGroupGuide:
+                '모델 그룹에는 실제 업스트림 모델만 설정합니다. auto는 클라이언트가 AI 게이트웨이에 요청할 때 사용하는 가상 모델 이름입니다.',
             modelGroupModelCount: '{0}개 모델',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',
@@ -1059,11 +1064,18 @@ const message = {
             importResult: 'Imported {0}, duplicated {1}, invalid {2}',
             auditLogs: 'Audit Logs',
             smartRoute: '스마트 라우팅',
+            smartRouteGuideTitle: '클라이언트에서 model=auto를 사용해 스마트 라우팅에 진입합니다',
+            smartRouteGuideReady:
+                'model=auto는 요청 복잡도에 따라 간단/복잡 모델 그룹에서 모델을 선택합니다. 다른 model은 일반 AI 게이트웨이로 전달됩니다.',
+            smartRouteGuideNotReady:
+                '먼저 설정에서 스마트 라우팅을 켜고 간단/복잡 모델 그룹을 설정하세요. 이후 클라이언트에서 model=auto를 사용합니다.',
+            copyAutoModel: 'auto 복사',
+            goSmartRouteSetting: '설정으로 이동',
             smartRoutePolicy: '라우팅 정책',
             routeConfig: '라우팅 설정',
             embeddingConfig: 'Embedding 설정',
             embeddingConfigDesc:
-                '스마트 라우팅과 콘텐츠 컴플라이언스 의미 샘플 매칭에 사용됩니다. 샘플 벡터를 재생성하기 전에 설정하세요.',
+                '스마트 라우팅과 콘텐츠 컴플라이언스 의미 샘플 매칭에 사용됩니다. 권장: llama.cpp + Qwen3-Embedding-0.6B. 샘플 벡터를 재생성하기 전에 설정하세요.',
             decisionConfig: '판정 매개변수',
             simpleModelGroup: '간단 모델 그룹',
             complexModelGroup: '복잡 모델 그룹',
@@ -1071,16 +1083,22 @@ const message = {
             embeddingModel: '모델',
             embeddingApiKey: 'API Key',
             routeThreshold: '라우팅 임계값',
-            routeThresholdHelper: '유사도가 이 값보다 높을 때만 간단/복잡을 판단합니다.',
+            routeThresholdHelper:
+                '스마트 라우팅용: 요청과 간단/복잡 샘플의 유사도가 이 값에 도달한 경우에만 샘플 매칭을 사용합니다.',
             auditThreshold: '감사 임계값',
-            auditThresholdHelper: '유사도가 이 값보다 높을 때만 감사 샘플과 일치한 것으로 봅니다.',
+            auditThresholdHelper:
+                '콘텐츠 준수용: 요청과 감사 샘플의 유사도가 이 값에 도달한 경우에만 일치로 판단합니다.',
             topK: 'TopK',
             topKHelper: '매번 비교할 가장 유사한 샘플 수입니다.',
-            selectionStrategy: '선택 전략',
             members: '멤버',
             samples: '샘플',
+            routeSamplesGuide:
+                '샘플은 간단/복잡 요청 예시이며 Embedding 유사도 매칭에 사용됩니다. 실제 사용자 요청을 작성하고 추가 후 벡터를 생성하거나 재생성하세요.',
             rebuildVectors: '벡터 재생성',
             rebuildVectorsConfirm: '벡터를 재생성하면 Embedding 서비스가 샘플을 다시 처리합니다. 계속하시겠습니까?',
+            createVectorOnImport: '가져온 후 벡터 생성',
+            createVectorOnImportHelper:
+                '기본 선택입니다. Embedding이 설정되어 있으면 백그라운드 작업으로 벡터를 생성하고, 없으면 샘플만 생성합니다.',
             route: '라우팅',
             audit: '감사',
             auditSamples: '감사 샘플',
@@ -1090,6 +1108,8 @@ const message = {
             vectorDim: '차원',
             threshold: '임계값',
             preview: '미리보기',
+            previewGuide:
+                '미리보기는 요청이 간단한지 복잡한지 테스트하며 업스트림 모델을 호출하지 않습니다. 소스는 샘플 매칭 또는 규칙 판단입니다.',
             previewPlaceholder: '요청 텍스트 입력',
             confidence: '신뢰도',
             source: '소스',
@@ -1100,7 +1120,12 @@ const message = {
             requestID: '요청 ID',
             simple: '간단',
             complex: '복잡',
+            sampleLabelSafe: '안전',
+            sampleLabelReview: '검토',
+            sampleLabelBlock: '차단',
             latencyMs: '지연 시간(ms)',
+            smartRouteSettingGuide:
+                '활성화 후 model=auto 요청만 스마트 라우팅을 사용합니다. 간단 모델 그룹은 저비용 작업, 복잡 모델 그룹은 코드 분석, 아키텍처 설계, 장애 조사 등에 사용됩니다.',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: '한 줄에 샘플 하나',
             apiKeyCount: '数量',

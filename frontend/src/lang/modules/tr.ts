@@ -958,6 +958,7 @@ const message = {
             resetToken: 'Token sıfırla',
             resetTokenConfirm: '{0} için Token kullanımını sıfırlansın mı?',
             unlimited: 'Sınırsız',
+            unlimitedWithAuto: 'Sınırsız, auto dahil',
             lastUsedAt: 'Son kullanım',
             settingTitle: 'AI Ağ Geçidi ayarları',
             basicSetting: 'Temel Ayarlar',
@@ -1064,6 +1065,10 @@ const message = {
             availableModels: 'Kullanılabilir Modeller',
             modelGroupModels: 'İstek Modelleri',
             modelGroupModelsPlaceholder: 'İstek modeli adlarını seçin veya girin',
+            modelGroupModelsHelper:
+                'Yalnızca gerçek üst modelleri girin; akıllı yönlendirme modelleri sırayla dener ve modeller arasında yük dengelemez.',
+            modelGroupGuide:
+                'Model grupları yalnızca gerçek üst modelleri içerir. auto, istemcilerin AI Ağ Geçidi isteğinde kullandığı sanal model adıdır.',
             modelGroupModelCount: '{0} model',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',
@@ -1083,11 +1088,18 @@ const message = {
             importResult: 'Imported {0}, duplicated {1}, invalid {2}',
             auditLogs: 'Audit Logs',
             smartRoute: 'Akıllı Yönlendirme',
+            smartRouteGuideTitle: 'Akıllı yönlendirme için istemcide model=auto kullanın',
+            smartRouteGuideReady:
+                'model=auto isteğin karmaşıklığına göre basit veya karmaşık model grubundan seçim yapar. Diğer model değerleri normal şekilde iletilir.',
+            smartRouteGuideNotReady:
+                'Önce ayarlardan akıllı yönlendirmeyi etkinleştirip basit/karmaşık model gruplarını yapılandırın. Sonra istemcide model=auto kullanın.',
+            copyAutoModel: 'auto kopyala',
+            goSmartRouteSetting: 'Ayarlara git',
             smartRoutePolicy: 'Yönlendirme Politikası',
             routeConfig: 'Yönlendirme Yapılandırması',
             embeddingConfig: 'Embedding Yapılandırması',
             embeddingConfigDesc:
-                'Akıllı yönlendirme ve içerik uyumluluğu semantik örnek eşleştirmesi için kullanılır. Örnek vektörlerini yeniden oluşturmadan önce yapılandırın.',
+                'Akıllı yönlendirme ve içerik uyumluluğu semantik örnek eşleştirmesi için kullanılır. Önerilen: llama.cpp + Qwen3-Embedding-0.6B. Örnek vektörlerini yeniden oluşturmadan önce yapılandırın.',
             decisionConfig: 'Karar Parametreleri',
             simpleModelGroup: 'Basit Model Grubu',
             complexModelGroup: 'Karmaşık Model Grubu',
@@ -1095,17 +1107,23 @@ const message = {
             embeddingModel: 'Model',
             embeddingApiKey: 'API Key',
             routeThreshold: 'Yönlendirme Eşiği',
-            routeThresholdHelper: 'Benzerlik bu değerin üstündeyse basit/karmaşık olarak sınıflandırılır.',
+            routeThresholdHelper:
+                'Akıllı Yönlendirme için: istek benzerliği bu değere ulaştığında örnek eşleşmesi kullanılır.',
             auditThreshold: 'Denetim Eşiği',
-            auditThresholdHelper: 'Benzerlik bu değerin üstündeyse denetim örneği eşleşmiş sayılır.',
+            auditThresholdHelper:
+                'İçerik Uyumluluğu için: denetim örneği yalnızca benzerlik bu değere ulaştığında eşleşmiş sayılır.',
             topK: 'TopK',
             topKHelper: 'Her seferinde karşılaştırılacak en benzer örnek sayısı.',
-            selectionStrategy: 'Seçim Stratejisi',
             members: 'Üyeler',
             samples: 'Örnekler',
+            routeSamplesGuide:
+                'Örnekler, Embedding benzerlik eşleştirmesi için basit/karmaşık istek örnekleridir. Gerçek kullanıcı istekleri yazın, ardından vektör oluşturun veya yeniden oluşturun.',
             rebuildVectors: 'Vektörleri Yeniden Oluştur',
             rebuildVectorsConfirm:
                 'Vektörleri yeniden oluşturmak, Embedding hizmetinin örnekleri tekrar işlemesini ister. Devam edilsin mi?',
+            createVectorOnImport: 'İçe aktardıktan sonra vektör oluştur',
+            createVectorOnImportHelper:
+                'Varsayılan olarak seçilidir. Embedding yapılandırılmışsa arka plan görevi vektörleri oluşturur; değilse yalnızca örnekler oluşturulur.',
             route: 'Rota',
             audit: 'Denetim',
             auditSamples: 'Denetim Örnekleri',
@@ -1115,6 +1133,8 @@ const message = {
             vectorDim: 'Boyut',
             threshold: 'Eşik',
             preview: 'Önizleme',
+            previewGuide:
+                'Önizleme, isteğin basit mi karmaşık mı olduğunu üst modeli çağırmadan test eder. Kaynak örnek eşleşmesi veya kural yedeğidir.',
             previewPlaceholder: 'İstek metnini girin',
             confidence: 'Güven',
             source: 'Kaynak',
@@ -1125,7 +1145,12 @@ const message = {
             requestID: 'İstek ID',
             simple: 'Basit',
             complex: 'Karmaşık',
+            sampleLabelSafe: 'Güvenli',
+            sampleLabelReview: 'İncele',
+            sampleLabelBlock: 'Engelle',
             latencyMs: 'Gecikme(ms)',
+            smartRouteSettingGuide:
+                'Etkinleştirildikten sonra yalnızca model=auto istekleri akıllı yönlendirmeyi tetikler. Basit grup düşük maliyetli işler, karmaşık grup kod analizi, mimari tasarım ve sorun giderme için kullanılır.',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: 'Her satıra bir örnek',
             apiKeyCount: 'Miktar',

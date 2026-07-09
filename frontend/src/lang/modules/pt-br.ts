@@ -955,6 +955,7 @@ const message = {
             resetToken: 'Redefinir tokens',
             resetTokenConfirm: 'Redefinir o uso de tokens de {0}?',
             unlimited: 'Ilimitado',
+            unlimitedWithAuto: 'Ilimitado, inclui auto',
             lastUsedAt: 'Último uso',
             settingTitle: 'Configurações do gateway de IA',
             basicSetting: 'Configurações básicas',
@@ -1061,6 +1062,10 @@ const message = {
             availableModels: 'Modelos disponíveis',
             modelGroupModels: 'Modelos solicitados',
             modelGroupModelsPlaceholder: 'Selecione ou informe nomes de modelos solicitados',
+            modelGroupModelsHelper:
+                'Informe apenas modelos upstream reais; o roteamento inteligente tenta os modelos em ordem e não faz balanceamento entre modelos.',
+            modelGroupGuide:
+                'Grupos de modelos contêm apenas modelos upstream reais. auto é um nome de modelo virtual usado pelos clientes ao chamar o gateway de IA.',
             modelGroupModelCount: '{0} modelos',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',
@@ -1080,11 +1085,18 @@ const message = {
             importResult: 'Imported {0}, duplicated {1}, invalid {2}',
             auditLogs: 'Audit Logs',
             smartRoute: 'Roteamento inteligente',
+            smartRouteGuideTitle: 'Use model=auto no cliente para entrar no roteamento inteligente',
+            smartRouteGuideReady:
+                'model=auto escolhe o grupo de modelos simples ou complexos conforme a complexidade da solicitação. Outros modelos são encaminhados normalmente.',
+            smartRouteGuideNotReady:
+                'Ative o roteamento inteligente e configure os grupos simples/complexos primeiro. Depois use model=auto no cliente.',
+            copyAutoModel: 'Copiar auto',
+            goSmartRouteSetting: 'Ir para configurações',
             smartRoutePolicy: 'Política de roteamento',
             routeConfig: 'Configuração de roteamento',
             embeddingConfig: 'Configurações de embedding',
             embeddingConfigDesc:
-                'Usado para roteamento inteligente e correspondência semântica de amostras de conformidade de conteúdo. Configure antes de reconstruir vetores.',
+                'Usado para roteamento inteligente e correspondência semântica de amostras de conformidade de conteúdo. Recomendado: llama.cpp + Qwen3-Embedding-0.6B. Configure antes de reconstruir vetores.',
             decisionConfig: 'Parâmetros de decisão',
             simpleModelGroup: 'Grupo de modelos simples',
             complexModelGroup: 'Grupo de modelos complexos',
@@ -1092,17 +1104,23 @@ const message = {
             embeddingModel: 'Modelo',
             embeddingApiKey: 'API Key',
             routeThreshold: 'Limite de roteamento',
-            routeThresholdHelper: 'Só classifica simples/complexo quando a similaridade passa deste valor.',
+            routeThresholdHelper:
+                'Para Roteamento Inteligente: use amostras apenas quando a similaridade atingir este valor.',
             auditThreshold: 'Limite de auditoria',
-            auditThresholdHelper: 'Só considera amostra de auditoria correspondida acima deste valor.',
+            auditThresholdHelper:
+                'Para Conformidade de Conteúdo: considere amostras de auditoria apenas ao atingir este valor.',
             topK: 'TopK',
             topKHelper: 'Número de amostras mais semelhantes comparadas a cada vez.',
-            selectionStrategy: 'Estratégia de seleção',
             members: 'Membros',
             samples: 'Amostras',
+            routeSamplesGuide:
+                'Amostras são exemplos de solicitações simples/complexas para correspondência por similaridade Embedding. Use solicitações reais e depois crie ou reconstrua vetores.',
             rebuildVectors: 'Reconstruir vetores',
             rebuildVectorsConfirm:
                 'Reconstruir vetores solicitará novamente ao serviço Embedding que processe as amostras. Continuar?',
+            createVectorOnImport: 'Criar vetores após importar',
+            createVectorOnImportHelper:
+                'Ativado por padrão. Se o Embedding estiver configurado, uma tarefa em segundo plano cria vetores; caso contrário, apenas cria amostras.',
             route: 'Rota',
             audit: 'Auditoria',
             auditSamples: 'Amostras de auditoria',
@@ -1112,6 +1130,8 @@ const message = {
             vectorDim: 'Dimensão',
             threshold: 'Limite',
             preview: 'Pré-visualização',
+            previewGuide:
+                'A pré-visualização testa se uma solicitação é simples ou complexa sem chamar o modelo upstream. A fonte é correspondência de amostras ou regras.',
             previewPlaceholder: 'Insira o texto da solicitação',
             confidence: 'Confiança',
             source: 'Fonte',
@@ -1122,7 +1142,12 @@ const message = {
             requestID: 'ID da solicitação',
             simple: 'Simples',
             complex: 'Complexo',
+            sampleLabelSafe: 'Seguro',
+            sampleLabelReview: 'Revisar',
+            sampleLabelBlock: 'Bloquear',
             latencyMs: 'Latência(ms)',
+            smartRouteSettingGuide:
+                'Depois de ativado, apenas solicitações com model=auto usam o roteamento inteligente. O grupo simples é para tarefas de baixo custo; o complexo para análise de código, arquitetura e diagnóstico.',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: 'Uma amostra por linha',
             apiKeyCount: 'Quantidade',
