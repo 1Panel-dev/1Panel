@@ -757,6 +757,7 @@ import { resolveEditorLanguage } from '@/utils/file';
 import { useRouter } from 'vue-router';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useMultipleSearchable } from './hooks/searchable';
+import { mergeDirSizeCache, sortFilesByDisplaySize, updateDirSizeCache } from './size-cache';
 import { ResultData } from '@/api/interface';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { Download as ElDownload, Upload as ElUpload, View, Hide } from '@element-plus/icons-vue';
@@ -931,6 +932,7 @@ const MAX_DIR_SIZE_CONCURRENT = 2;
 const hostMount = ref<Dashboard.DiskInfo[]>([]);
 let resizeObserver: ResizeObserver;
 let depthSizeToken = 0;
+const dirSizeCache = new Map<string, number>();
 const dirTotalSize = ref(-1);
 const disableBtn = ref(false);
 const calculateBtn = ref(false);
@@ -1024,7 +1026,7 @@ const updateButtons = async () => {
         return;
     }
 
-    const pasteEl = wrapper.querySelector<HTMLElement>('.copy-button');
+    const pasteEl = wrapper.querySelector('.copy-button') as HTMLElement | null;
     const leftSibling = slotWrapper?.previousElementSibling as HTMLElement | null;
     const pasteWidth = pasteEl?.offsetWidth || 0;
     const pasteReserve = moveOpen.value ? pasteWidth + toolbarGap : 0;
@@ -1085,8 +1087,19 @@ const searchFile = async () => {
     }
 };
 
+const resetDirSizeCache = () => {
+    dirSizeCache.clear();
+};
+
 const handleSearchResult = (res: ResultData<File.File>) => {
-    data.value = res.data.items || [];
+    if (res.data.path && res.data.path !== req.path) {
+        resetDirSizeCache();
+    }
+    let items = mergeDirSizeCache(res.data.items || [], dirSizeCache);
+    if (req.sortBy === 'size') {
+        items = sortFilesByDisplaySize(items, req.sortOrder);
+    }
+    data.value = items;
     paginationConfig.total = res.data.itemTotal;
     dirNum.value = data.value.filter((item) => item.isDir).length;
     fileNum.value = data.value.filter((item) => !item.isDir).length;
@@ -1191,7 +1204,7 @@ const formatBreadcrumbName = (path: FilePaths, index: number) => {
 };
 
 const getBreadcrumbElement = () => {
-    return getCurrentPath()?.querySelector<HTMLElement>('.address-url') || breadCrumbRef.value;
+    return (getCurrentPath()?.querySelector('.address-url') as HTMLElement | null) || breadCrumbRef.value;
 };
 
 const resetPaths = () => {
@@ -1295,6 +1308,9 @@ const jump = async (url: string) => {
     pointer = history.length - 1;
 
     const { path: oldUrl, pageSize: oldPageSize, sortBy: oldSortBy, sortOrder: oldSortOrder, showHidden } = req;
+    if (oldUrl !== url) {
+        resetDirSizeCache();
+    }
     Object.assign(req, initData(), {
         path: url,
         containSub: false,
@@ -1323,6 +1339,9 @@ const jump = async (url: string) => {
 
 const backForwardJump = async (url: string) => {
     const { pageSize: oldPageSize, sortBy: oldSortBy, sortOrder: oldSortOrder, showHidden } = req;
+    if (req.path !== url) {
+        resetDirSizeCache();
+    }
     Object.assign(req, initData(), {
         path: url,
         containSub: false,
@@ -1414,6 +1433,7 @@ const getFileSize = async (path: string) => {
     updateByPath(path, { btnLoading: true });
     try {
         const res = await getFileContent(codeReq);
+        updateDirSizeCache(dirSizeCache, [{ path, size: res.data.size }]);
         updateByPath(path, { dirSize: res.data.size });
     } finally {
         updateByPath(path, { btnLoading: false });
@@ -1432,6 +1452,7 @@ const getDirSize = async (path: string) => {
     try {
         await enqueueDirSizeTask(async () => {
             const res = await computeDirSize(req);
+            updateDirSizeCache(dirSizeCache, [{ path, size: res.data.size }]);
             updateByPath(path, { dirSize: res.data.size });
         });
     } finally {
@@ -1468,6 +1489,7 @@ const calculateSize = (path: string) => {
                 return;
             }
             const sizeMap = new Map(res.data.map((dir) => [dir.path, dir.size]));
+            updateDirSizeCache(dirSizeCache, res.data);
             data.value = data.value.map((item) =>
                 sizeMap.has(item.path) ? { ...item, dirSize: sizeMap.get(item.path)! } : item,
             );
@@ -2420,6 +2442,9 @@ const changeTab = (targetPath: TabPaneName) => {
     editableTabsKey.value = current.id;
     saveStorageTabs();
     saveStorageTabsKey();
+    if (req.path !== current?.path) {
+        resetDirSizeCache();
+    }
     req.path = current ? current.path : '';
     lastFilePath.value = req.path;
     getPaths(req.path);
