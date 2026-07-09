@@ -144,7 +144,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	if installs, _ := appInstallRepo.ListBy(context.Background(), repo.WithByLowerName(req.Name)); len(installs) > 0 {
 		return nil, buserr.New("ErrNameIsExist")
 	}
-	if !xpack.MultiNodeProvider.IsXpack() {
+	if !global.CONF.Base.IsEnterprise && !xpack.MultiNodeProvider.IsXpack() {
 		count, _, err := agentRepo.Page(1, 1)
 		if err != nil {
 			return nil, err

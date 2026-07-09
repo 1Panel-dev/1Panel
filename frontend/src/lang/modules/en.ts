@@ -944,6 +944,7 @@ const message = {
             resetToken: 'Reset Tokens',
             resetTokenConfirm: 'Reset token usage for {0}?',
             unlimited: 'Unlimited',
+            unlimitedWithAuto: 'Unlimited, includes auto',
             apiKeyCount: 'API Keys',
             lastUsedAt: 'Last Used',
             settingTitle: 'AI Gateway Settings',
@@ -1050,6 +1051,10 @@ const message = {
             availableModels: 'Available Models',
             modelGroupModels: 'Request Models',
             modelGroupModelsPlaceholder: 'Select or enter request model names',
+            modelGroupModelsHelper:
+                'Only enter real upstream models; smart routing tries models in order and does not load balance between models.',
+            modelGroupGuide:
+                'Model groups only contain real upstream models. auto is a virtual model name used by clients when requesting the AI Gateway.',
             modelGroupModelCount: '{0} models',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',
@@ -1069,11 +1074,18 @@ const message = {
             importResult: 'Imported {0}, duplicated {1}, invalid {2}',
             auditLogs: 'Audit Logs',
             smartRoute: 'Smart Route',
+            smartRouteGuideTitle: 'Use model=auto on the client to enter smart routing',
+            smartRouteGuideReady:
+                'model=auto chooses from the simple or complex model group by request complexity. Any other model is forwarded normally.',
+            smartRouteGuideNotReady:
+                'Enable smart routing and configure simple/complex model groups first. Then use model=auto on the client.',
+            copyAutoModel: 'Copy auto',
+            goSmartRouteSetting: 'Go to Settings',
             smartRoutePolicy: 'Route Policy',
             routeConfig: 'Route Config',
             embeddingConfig: 'Embedding Settings',
             embeddingConfigDesc:
-                'Used for Smart Route and content compliance semantic sample matching. Configure it before rebuilding sample vectors.',
+                'Used for Smart Route and content compliance semantic sample matching. Recommended: llama.cpp + Qwen3-Embedding-0.6B. Configure it before rebuilding sample vectors.',
             decisionConfig: 'Decision Params',
             simpleModelGroup: 'Simple Model Group',
             complexModelGroup: 'Complex Model Group',
@@ -1081,17 +1093,23 @@ const message = {
             embeddingModel: 'Model',
             embeddingApiKey: 'API Key',
             routeThreshold: 'Route Threshold',
-            routeThresholdHelper: 'Only classify simple/complex when similarity is above this value.',
+            routeThresholdHelper:
+                'For Smart Route: use sample matching only when request similarity reaches this value.',
             auditThreshold: 'Audit Threshold',
-            auditThresholdHelper: 'Only treat audit samples as matched when similarity is above this value.',
+            auditThresholdHelper:
+                'For Content Compliance: treat audit samples as matched only when similarity reaches this value.',
             topK: 'TopK',
             topKHelper: 'Number of most similar samples to compare each time.',
-            selectionStrategy: 'Selection Strategy',
             members: 'Members',
             samples: 'Samples',
+            routeSamplesGuide:
+                'Samples are simple/complex request examples for Embedding similarity matching. Use real user requests, then create or rebuild vectors.',
             rebuildVectors: 'Rebuild Vectors',
             rebuildVectorsConfirm:
                 'Rebuilding vectors will request the Embedding service to process samples again. Continue?',
+            createVectorOnImport: 'Create vectors after import',
+            createVectorOnImportHelper:
+                'Enabled by default. If Embedding is configured, a background task creates vectors; otherwise only samples are created.',
             route: 'Route',
             audit: 'Audit',
             auditSamples: 'Audit Samples',
@@ -1101,6 +1119,8 @@ const message = {
             vectorDim: 'Dimension',
             threshold: 'Threshold',
             preview: 'Preview',
+            previewGuide:
+                'Preview tests whether a request is simple or complex without calling the upstream model. The source is sample matching or rule fallback.',
             previewPlaceholder: 'Input request text',
             confidence: 'Confidence',
             source: 'Source',
@@ -1111,7 +1131,12 @@ const message = {
             requestID: 'Request ID',
             simple: 'Simple',
             complex: 'Complex',
+            sampleLabelSafe: 'Safe',
+            sampleLabelReview: 'Review',
+            sampleLabelBlock: 'Block',
             latencyMs: 'Latency(ms)',
+            smartRouteSettingGuide:
+                'After enabled, only requests with model=auto trigger smart routing. The simple group is for low-cost tasks; the complex group is for code analysis, architecture design, troubleshooting, and similar work.',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: 'One sample per line',
         },

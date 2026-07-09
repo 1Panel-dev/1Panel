@@ -944,6 +944,7 @@ const message = {
             resetToken: 'Сбросить Token',
             resetTokenConfirm: 'Сбросить использование Token для {0}?',
             unlimited: 'Без ограничений',
+            unlimitedWithAuto: 'Без ограничений, включая auto',
             lastUsedAt: 'Последнее использование',
             settingTitle: 'Настройки AI-шлюза',
             basicSetting: 'Основные настройки',
@@ -1050,6 +1051,10 @@ const message = {
             availableModels: 'Доступные модели',
             modelGroupModels: 'Запрошенные модели',
             modelGroupModelsPlaceholder: 'Выберите или введите имена запрошенных моделей',
+            modelGroupModelsHelper:
+                'Указывайте только реальные upstream-модели; умная маршрутизация пробует модели по порядку и не балансирует нагрузку между моделями.',
+            modelGroupGuide:
+                'Группы моделей содержат только реальные upstream-модели. auto — виртуальное имя модели, которое клиент использует при запросе к AI-шлюзу.',
             modelGroupModelCount: '{0} моделей',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',
@@ -1069,11 +1074,18 @@ const message = {
             importResult: 'Imported {0}, duplicated {1}, invalid {2}',
             auditLogs: 'Audit Logs',
             smartRoute: 'Умная маршрутизация',
+            smartRouteGuideTitle: 'Используйте model=auto на клиенте для умной маршрутизации',
+            smartRouteGuideReady:
+                'model=auto выбирает простую или сложную группу моделей по сложности запроса. Любая другая модель пересылается обычным AI-шлюзом.',
+            smartRouteGuideNotReady:
+                'Сначала включите умную маршрутизацию и настройте простую/сложную группы моделей. Затем используйте model=auto на клиенте.',
+            copyAutoModel: 'Копировать auto',
+            goSmartRouteSetting: 'К настройкам',
             smartRoutePolicy: 'Политика маршрутизации',
             routeConfig: 'Настройка маршрутизации',
             embeddingConfig: 'Настройки Embedding',
             embeddingConfigDesc:
-                'Используется для умной маршрутизации и семантического сопоставления образцов контент-контроля. Настройте перед пересозданием векторов.',
+                'Используется для умной маршрутизации и семантического сопоставления образцов контент-контроля. Рекомендуется: llama.cpp + Qwen3-Embedding-0.6B. Настройте перед пересозданием векторов.',
             decisionConfig: 'Параметры решения',
             simpleModelGroup: 'Группа простых моделей',
             complexModelGroup: 'Группа сложных моделей',
@@ -1081,16 +1093,22 @@ const message = {
             embeddingModel: 'Модель',
             embeddingApiKey: 'API Key',
             routeThreshold: 'Порог маршрутизации',
-            routeThresholdHelper: 'Классифицировать простой/сложный запрос только выше этого сходства.',
+            routeThresholdHelper:
+                'Для Smart Route: использовать сэмплы только когда сходство запроса достигает этого значения.',
             auditThreshold: 'Порог аудита',
-            auditThresholdHelper: 'Считать аудит-сэмпл совпавшим только выше этого сходства.',
+            auditThresholdHelper:
+                'Для Content Compliance: считать аудит-сэмпл совпавшим только когда сходство достигает этого значения.',
             topK: 'TopK',
             topKHelper: 'Количество самых похожих сэмплов для сравнения.',
-            selectionStrategy: 'Стратегия выбора',
             members: 'Участники',
             samples: 'Образцы',
+            routeSamplesGuide:
+                'Образцы — это примеры простых/сложных запросов для сопоставления по Embedding-сходству. Используйте реальные запросы пользователей, затем создайте или пересоздайте векторы.',
             rebuildVectors: 'Пересоздать векторы',
             rebuildVectorsConfirm: 'Пересоздание векторов снова отправит образцы в сервис Embedding. Продолжить?',
+            createVectorOnImport: 'Создать векторы после импорта',
+            createVectorOnImportHelper:
+                'Включено по умолчанию. Если Embedding настроен, векторы создаются фоновой задачей; иначе создаются только образцы.',
             route: 'Маршрут',
             audit: 'Аудит',
             auditSamples: 'Образцы аудита',
@@ -1100,6 +1118,8 @@ const message = {
             vectorDim: 'Размерность',
             threshold: 'Порог',
             preview: 'Предпросмотр',
+            previewGuide:
+                'Предпросмотр проверяет, будет ли запрос простым или сложным, без вызова upstream-модели. Источник — совпадение образцов или правила.',
             previewPlaceholder: 'Введите текст запроса',
             confidence: 'Уверенность',
             source: 'Источник',
@@ -1110,7 +1130,12 @@ const message = {
             requestID: 'ID запроса',
             simple: 'Простой',
             complex: 'Сложный',
+            sampleLabelSafe: 'Безопасно',
+            sampleLabelReview: 'Проверка',
+            sampleLabelBlock: 'Блокировать',
             latencyMs: 'Задержка(ms)',
+            smartRouteSettingGuide:
+                'После включения только запросы с model=auto запускают умную маршрутизацию. Простая группа — для дешевых задач, сложная — для анализа кода, проектирования архитектуры и диагностики.',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: 'Один образец на строку',
             apiKeyCount: 'Количество',

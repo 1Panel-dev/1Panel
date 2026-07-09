@@ -927,6 +927,7 @@ const message = {
             resetToken: 'بازنشانی توکن‌ها',
             resetTokenConfirm: 'استفاده از توکن برای {0} بازنشانی شود؟',
             unlimited: 'نامحدود',
+            unlimitedWithAuto: 'نامحدود، شامل auto',
             apiKeyCount: 'کلیدهای API',
             lastUsedAt: 'آخرین استفاده',
             settingTitle: 'تنظیمات دروازه AI',
@@ -1031,6 +1032,10 @@ const message = {
             availableModels: 'مدل‌های موجود',
             modelGroupModels: 'مدل‌های درخواست',
             modelGroupModelsPlaceholder: 'نام‌های مدل درخواست را انتخاب یا وارد کنید',
+            modelGroupModelsHelper:
+                'فقط مدل‌های upstream واقعی را وارد کنید؛ مسیریابی هوشمند مدل‌ها را به‌ترتیب امتحان می‌کند و بین مدل‌ها توازن بار انجام نمی‌دهد.',
+            modelGroupGuide:
+                'گروه‌های مدل فقط شامل مدل‌های upstream واقعی هستند. auto نام مدل مجازی است که کلاینت هنگام درخواست به دروازه AI استفاده می‌کند.',
             modelGroupModelCount: '{0} مدل',
             contentCompliance: 'انطباق محتوا',
             contentAction: 'اقدام',
@@ -1050,11 +1055,18 @@ const message = {
             importResult: 'وارد شد {0}، تکراری {1}، نامعتبر {2}',
             auditLogs: 'لاگ‌های حسابرسی',
             smartRoute: 'مسیریابی هوشمند',
+            smartRouteGuideTitle: 'برای ورود به مسیریابی هوشمند در کلاینت از model=auto استفاده کنید',
+            smartRouteGuideReady:
+                'model=auto بر اساس پیچیدگی درخواست از گروه مدل ساده یا پیچیده انتخاب می‌کند. مدل‌های دیگر به‌صورت عادی ارسال می‌شوند.',
+            smartRouteGuideNotReady:
+                'ابتدا مسیریابی هوشمند را فعال و گروه‌های ساده/پیچیده را تنظیم کنید. سپس در کلاینت از model=auto استفاده کنید.',
+            copyAutoModel: 'کپی auto',
+            goSmartRouteSetting: 'رفتن به تنظیمات',
             smartRoutePolicy: 'سیاست مسیریابی',
             routeConfig: 'پیکربندی مسیریابی',
             embeddingConfig: 'پیکربندی Embedding',
             embeddingConfigDesc:
-                'برای مسیریابی هوشمند و تطبیق معنایی نمونه‌های انطباق محتوا استفاده می‌شود. پیش از بازسازی بردارهای نمونه آن را پیکربندی کنید.',
+                'برای مسیریابی هوشمند و تطبیق معنایی نمونه‌های انطباق محتوا استفاده می‌شود. پیشنهاد: llama.cpp + Qwen3-Embedding-0.6B. پیش از بازسازی بردارهای نمونه آن را پیکربندی کنید.',
             decisionConfig: 'پارامترهای تصمیم',
             simpleModelGroup: 'گروه مدل ساده',
             complexModelGroup: 'گروه مدل پیچیده',
@@ -1062,17 +1074,23 @@ const message = {
             embeddingModel: 'مدل',
             embeddingApiKey: 'کلید API',
             routeThreshold: 'آستانه مسیریابی',
-            routeThresholdHelper: 'فقط وقتی شباهت بالاتر از این مقدار باشد ساده/پیچیده تشخیص داده می‌شود.',
+            routeThresholdHelper:
+                'برای مسیریابی هوشمند: فقط وقتی شباهت درخواست به این مقدار برسد، نتیجه نمونه‌ها استفاده می‌شود.',
             auditThreshold: 'آستانه بازبینی',
-            auditThresholdHelper: 'فقط وقتی شباهت بالاتر از این مقدار باشد نمونه بازبینی تطبیق محسوب می‌شود.',
+            auditThresholdHelper:
+                'برای انطباق محتوا: فقط وقتی شباهت به این مقدار برسد، نمونه بازبینی تطبیق محسوب می‌شود.',
             topK: 'TopK',
             topKHelper: 'تعداد شبیه‌ترین نمونه‌هایی که هر بار مقایسه می‌شوند.',
-            selectionStrategy: 'راهبرد انتخاب',
             members: 'اعضا',
             samples: 'نمونه‌ها',
+            routeSamplesGuide:
+                'نمونه‌ها مثال‌های درخواست ساده/پیچیده برای تطبیق شباهت Embedding هستند. درخواست‌های واقعی کاربر را وارد کنید، سپس بردار بسازید یا بازسازی کنید.',
             rebuildVectors: 'بازسازی بردارها',
             rebuildVectorsConfirm:
                 'بازسازی بردارها باعث می‌شود سرویس Embedding دوباره نمونه‌ها را پردازش کند. ادامه می‌دهید؟',
+            createVectorOnImport: 'ایجاد بردار پس از واردسازی',
+            createVectorOnImportHelper:
+                'به‌صورت پیش‌فرض فعال است. اگر Embedding پیکربندی شده باشد، یک کار پس‌زمینه بردارها را می‌سازد؛ در غیر این صورت فقط نمونه‌ها ساخته می‌شوند.',
             route: 'مسیر',
             audit: 'بازبینی',
             auditSamples: 'نمونه‌های بازبینی',
@@ -1082,6 +1100,8 @@ const message = {
             vectorDim: 'بعد',
             threshold: 'آستانه',
             preview: 'پیش‌نمایش',
+            previewGuide:
+                'پیش‌نمایش بدون فراخوانی مدل upstream بررسی می‌کند درخواست ساده است یا پیچیده. منبع، تطبیق نمونه یا قاعده است.',
             previewPlaceholder: 'متن درخواست را وارد کنید',
             confidence: 'اطمینان',
             source: 'منبع',
@@ -1092,7 +1112,12 @@ const message = {
             requestID: 'شناسه درخواست',
             simple: 'ساده',
             complex: 'پیچیده',
+            sampleLabelSafe: 'ایمن',
+            sampleLabelReview: 'بازبینی',
+            sampleLabelBlock: 'مسدود',
             latencyMs: 'تاخیر(ms)',
+            smartRouteSettingGuide:
+                'پس از فعال‌سازی، فقط درخواست‌های model=auto مسیریابی هوشمند را فعال می‌کنند. گروه ساده برای وظایف کم‌هزینه و گروه پیچیده برای تحلیل کد، طراحی معماری و عیب‌یابی است.',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: 'هر خط یک نمونه',
         },
