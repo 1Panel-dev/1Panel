@@ -1173,6 +1173,8 @@ const message = {
             versionAutoFillPlaceholder: '可能な場合はファイル名から自動検出されます。確認するか手動で入力してください',
             metadataOverwriteConfirm:
                 'Skill パッケージ内のバージョンが現在の入力と異なります。現在の入力を使用しますか？',
+            metadataOverwriteConfirmWithVersions:
+                'Skill パッケージ内のバージョンが現在の入力と異なります。パッケージ内のバージョン：{packageVersion}、入力したバージョン：{inputVersion}。現在の入力を使用しますか？',
             offlineNotice:
                 '現在の環境はオフラインです。ローカル Skill ストアからの Skill インストールのみ対応しています。',
             publishConfirm: 'この Skill を公開しますか？公開後、ローカル Skill ストアからインストールできます。',

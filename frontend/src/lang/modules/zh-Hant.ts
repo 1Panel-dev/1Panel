@@ -1114,6 +1114,8 @@ const message = {
             uploadSuccess: 'Skill 上傳成功，已進入待審核狀態。',
             versionAutoFillPlaceholder: '可從檔案名稱自動識別，請確認或手動填寫',
             metadataOverwriteConfirm: 'Skill 包內的版本號與目前填寫內容不一致，是否以目前填寫內容為準？',
+            metadataOverwriteConfirmWithVersions:
+                'Skill 包內的版本號與目前填寫內容不一致，包內版本：{packageVersion}，填寫版本：{inputVersion}，是否以目前填寫內容為準？',
             offlineNotice: '當前為離線環境，僅支援從本地 Skill 商店安裝技能。',
             publishConfirm: '確認上架該 Skill？上架後可在智能體中從本地 Skill 商店安裝。',
             disableConfirm: '確認下架該 Skill？已安裝到智能體中的 Skill 不受影響。',

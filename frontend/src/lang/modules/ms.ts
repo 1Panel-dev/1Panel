@@ -1182,6 +1182,8 @@ const message = {
             uploadSuccess: 'Skill berjaya dimuat naik dan kini menunggu semakan.',
             versionAutoFillPlaceholder: 'Dikesan automatik daripada nama fail jika boleh. Sahkan atau isi manual',
             metadataOverwriteConfirm: 'Versi dalam pakej Skill berbeza daripada input semasa. Guna input semasa?',
+            metadataOverwriteConfirmWithVersions:
+                'Versi dalam pakej Skill berbeza daripada input semasa. Versi pakej: {packageVersion}; versi input: {inputVersion}. Guna input semasa?',
             offlineNotice: 'Persekitaran semasa di luar talian. Hanya Skill daripada kedai tempatan boleh dipasang.',
             publishConfirm: 'Terbitkan Skill ini? Selepas diterbitkan, ia boleh dipasang dari kedai Skill tempatan.',
             disableConfirm: 'Nyahterbit Skill ini? Skill yang telah dipasang pada agen tidak akan terjejas.',

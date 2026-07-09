@@ -1173,6 +1173,8 @@ const message = {
             versionAutoFillPlaceholder: 'Auto-detected from filename when possible. Confirm or enter manually',
             metadataOverwriteConfirm:
                 'The version in the Skill package differs from the current input. Use the current input instead?',
+            metadataOverwriteConfirmWithVersions:
+                'The version in the Skill package differs from the current input. Package version: {packageVersion}; input version: {inputVersion}. Use the current input instead?',
             offlineNotice: 'Current environment is offline. Only skills from the local Skill Store can be installed.',
             publishConfirm: 'Publish this skill? Published skills can be installed from the local Skill Store.',
             disableConfirm: 'Unpublish this skill? Skills already installed in agents will not be affected.',

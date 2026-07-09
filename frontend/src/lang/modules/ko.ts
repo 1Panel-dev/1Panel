@@ -1157,6 +1157,8 @@ const message = {
             uploadSuccess: 'Skill이 성공적으로 업로드되었으며 검토 대기 상태가 되었습니다.',
             versionAutoFillPlaceholder: '가능하면 파일명에서 자동 감지됩니다. 확인하거나 수동으로 입력하세요',
             metadataOverwriteConfirm: 'Skill 패키지의 버전이 현재 입력과 다릅니다. 현재 입력값을 사용하시겠습니까?',
+            metadataOverwriteConfirmWithVersions:
+                'Skill 패키지의 버전이 현재 입력과 다릅니다. 패키지 버전: {packageVersion}; 입력 버전: {inputVersion}. 현재 입력값을 사용하시겠습니까?',
             offlineNotice: '현재 환경은 오프라인입니다. 로컬 Skill 스토어에서만 Skill을 설치할 수 있습니다.',
             publishConfirm: '이 Skill을 게시하시겠습니까? 게시 후 로컬 Skill 스토어에서 설치할 수 있습니다.',
             disableConfirm: '이 Skill 게시를 해제하시겠습니까? 에이전트에 이미 설치된 Skill에는 영향이 없습니다.',
