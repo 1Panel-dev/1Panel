@@ -2265,7 +2265,7 @@ const message = {
             sync: 'Sincronização de Recursos',
             exchange: 'Sincronização de Recursos',
             xapp: 'App',
-            vm: 'Gerenciamento de Máquinas Virtuais',
+            vms: 'Gerenciamento de Máquinas Virtuais',
         },
         websiteLog: 'Logs do website',
         runLog: 'Logs de execução',
@@ -5992,16 +5992,21 @@ const message = {
                 'A exclusão forçada ignorará erros de exclusão da VM, removerá os metadados do painel e liberará o uso de recursos.',
             deleteNameHelper: '" para excluir esta máquina virtual',
             isoSource: 'Origem do ISO',
-            isoTargetDir: 'Caminho de salvamento ISO',
-            isoTargetDirHelper: 'ISOs selecionados no servidor e enviados localmente serão salvos neste diretório.',
-            isoTargetDirAvailable: 'O caminho de salvamento ISO está disponível.',
-            isoTargetDirUnavailable: 'O caminho de salvamento ISO deve estar em um pool de armazenamento de VM disponível.',
-            isoTargetDirCheckRequired: 'Verifique o caminho de salvamento ISO antes de salvar.',
+            isoTargetDir: 'Caminho de destino ISO',
+            isoTargetDirHelper:
+                'Se definido, o ISO será salvo neste diretório. Pode ficar vazio para arquivos ISO selecionados no servidor.',
+            isoTargetDirOptional:
+                'Nenhum caminho de destino ISO foi definido. O caminho original do arquivo ISO será usado.',
+            isoTargetDirAvailable: 'O caminho de destino ISO está disponível.',
+            isoTargetDirUnavailable:
+                'O caminho de destino ISO deve estar em um pool de armazenamento de VM disponível.',
+            isoTargetDirCheckRequired: 'Verifique o caminho de destino ISO antes de salvar.',
             checkPath: 'Verificar',
             isoSize: 'Tamanho do ISO',
             deleteIsoConfirm: 'Esta operação de exclusão não pode ser desfeita. Continuar?',
             deleteSourceFile: 'Excluir arquivo de origem',
-            deleteSourceFileHelper: 'Quando marcado, o arquivo de origem referenciado por este registro ISO também será excluído e não poderá ser recuperado.',
+            deleteSourceFileHelper:
+                'Quando marcado, o arquivo de origem referenciado por este registro ISO também será excluído e não poderá ser recuperado.',
             dir: 'Diretório Local',
         },
         cluster: {
