@@ -26,7 +26,7 @@ const clearLoginStatus = () => {
     clearLicenseStatus();
 };
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, from) => {
     const { entrance, isEnterprise, isEnterpriseLicenseLoaded, isEnterpriseLicensed, isLogin } = useGlobalStore();
     NProgress.start();
     axiosCanceler.removeAllPending();
@@ -35,85 +35,75 @@ router.beforeEach(async (to, from, next) => {
         clearLoginStatus();
     }
     if (!isLogin.value && !noLoginWhiteList.includes(String(to.name))) {
-        next(
-            entrance.value
-                ? {
-                      name: 'entrance',
-                      params: { code: entrance.value },
-                  }
-                : {
-                      name: 'login',
-                  },
-        );
         NProgress.done();
-        return;
+        return entrance.value
+            ? {
+                  name: 'entrance',
+                  params: { code: entrance.value },
+              }
+            : {
+                  name: 'login',
+              };
     }
     if (to.name === 'login' && !isLogin.value && entrance.value) {
-        next({
+        NProgress.done();
+        return {
             name: 'entrance',
             params: { code: entrance.value },
-        });
-        NProgress.done();
-        return;
+        };
     }
     if (to.name === 'login' && isLogin.value) {
-        next({
-            name: 'home',
-        });
         NProgress.done();
-        return;
+        return {
+            name: 'home',
+        };
     }
     if (to.name === 'entrance' && isLogin.value) {
         if (to.params.code === entrance.value) {
-            next({
-                name: 'home',
-            });
             NProgress.done();
-            return;
+            return {
+                name: 'home',
+            };
         }
-        next({ name: '404' });
         NProgress.done();
-        return;
+        return { name: '404' };
     }
     if (isLogin.value && isEnterprise.value && !enterpriseLicenseCheckWhiteList.includes(String(to.name))) {
         if (!isEnterpriseLicenseLoaded.value) {
             await loadProductProFromDB();
         }
         if (!isEnterpriseLicensed.value) {
-            next({ name: 'EnterpriseLicenseRequired', query: { code: String(to.params.code || '') } });
             NProgress.done();
-            return;
+            return { name: 'EnterpriseLicenseRequired', query: { code: String(to.params.code || '') } };
         }
     }
     if (to.name === 'EnterpriseLicenseRequired') {
         if (!isLogin.value) {
-            next({
+            NProgress.done();
+            return {
                 name: 'entrance',
                 params: to.params,
-            });
-            NProgress.done();
-            return;
+            };
         }
         if (!isEnterprise.value || isEnterpriseLicensed.value) {
-            next({ name: 'home' });
             NProgress.done();
-            return;
+            return { name: 'home' };
         }
-        return next();
+        return true;
     }
 
     if (to.path === '/apps/all' && to.query.install != undefined) {
-        return next();
+        return true;
     }
     if (to.name === 'Expired') {
-        return next();
+        return true;
     }
     const activeMenuKey = 'cachedRoute' + (to.meta.activeMenu || '');
     if (to.query.uncached != undefined) {
         const query = { ...to.query };
         delete query.uncached;
         localStorage.removeItem(activeMenuKey);
-        return next({ path: to.path, query });
+        return { path: to.path, query };
     }
 
     const cachedRoute = localStorage.getItem(activeMenuKey);
@@ -127,20 +117,18 @@ router.beforeEach(async (to, from, next) => {
         const cachedRouteInfo = router.resolve(cachedRoute);
         if (cachedRouteInfo.matched.length > 0 && hasRouteAccess(cachedRouteInfo)) {
             isRedirecting = true;
-            next(cachedRoute);
             NProgress.done();
-            return;
+            return cachedRoute;
         }
         localStorage.removeItem(activeMenuKey);
     }
 
     if (!hasRouteAccess(to)) {
         MsgError(i18n.global.t('commons.res.forbidden'));
-        next(false);
         NProgress.done();
-        return;
+        return false;
     }
-    return next();
+    return true;
 });
 
 router.afterEach((to) => {
