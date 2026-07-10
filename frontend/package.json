@@ -69,7 +69,7 @@
         "@vitejs/plugin-vue-jsx": "^5.1.5",
         "@vue/compiler-sfc": "^3.5.35",
         "autoprefixer": "^10.5.0",
-        "esbuild": "^0.28.0",
+        "esbuild": "^0.28.1",
         "eslint": "^10.6.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.5",
