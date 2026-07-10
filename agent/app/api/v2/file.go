@@ -880,6 +880,10 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		}
 	}
 	filename := c.PostForm("filename")
+	if filename == "" || filepath.Base(filename) != filename || strings.ContainsAny(filename, `/\\`) {
+		helper.BadRequest(c, errors.New("invalid filename"))
+		return
+	}
 	uploadID := strings.TrimSpace(c.PostForm("uploadID"))
 	cancellable := uploadID != ""
 	if cancellable && (filepath.Base(uploadID) != uploadID || strings.ContainsAny(uploadID, `/\\`)) {
