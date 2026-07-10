@@ -5855,6 +5855,7 @@ const message = {
             isoTargetDir: 'Целевой путь ISO',
             isoTargetDirHelper: 'ISO, загруженные локально или скачанные с сервера, будут сохранены в этот каталог.',
             addingIsoRecord: 'Добавление записи ISO',
+            transferInProgress: 'Передача ISO выполняется. Не закрывайте эту панель или страницу.',
             isoSize: 'Размер ISO',
             deleteIsoConfirm: 'Эту операцию удаления нельзя отменить. Продолжить?',
             deleteSourceFile: 'Удалить исходный файл',

@@ -5367,6 +5367,7 @@ const message = {
             isoTargetDir: '鏡像目標路徑',
             isoTargetDirHelper: '本機上傳或從伺服器下載的鏡像會儲存到該目錄。',
             addingIsoRecord: '正在新增 ISO 記錄',
+            transferInProgress: 'ISO 傳輸中，請勿關閉目前抽屜或頁面。',
             isoSize: '鏡像大小',
             deleteIsoConfirm: '刪除操作不可回滾，是否繼續？',
             deleteSourceFile: '刪除源檔案',

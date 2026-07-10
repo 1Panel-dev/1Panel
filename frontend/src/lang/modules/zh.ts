@@ -5387,6 +5387,7 @@ const message = {
             isoTargetDir: '镜像目标路径',
             isoTargetDirHelper: '本地上传或从服务器下载的镜像会保存到该目录。',
             addingIsoRecord: '正在添加 ISO 记录',
+            transferInProgress: 'ISO 传输中，请勿关闭当前抽屉或页面。',
             isoSize: '镜像大小',
             deleteIsoConfirm: '删除操作不可回滚，是否继续？',
             deleteSourceFile: '删除源文件',

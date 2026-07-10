@@ -5844,6 +5844,7 @@ const message = {
             isoTargetDir: 'ISO Hedef Yolu',
             isoTargetDirHelper: 'Yerel olarak yüklenen veya sunucudan indirilen ISO dosyaları bu dizine kaydedilir.',
             addingIsoRecord: 'ISO kaydı ekleniyor',
+            transferInProgress: 'ISO aktarımı devam ediyor. Bu paneli veya sayfayı kapatmayın.',
             isoSize: 'ISO Boyutu',
             deleteIsoConfirm: 'Bu silme işlemi geri alınamaz. Devam edilsin mi?',
             deleteSourceFile: 'Kaynak dosyayı sil',
