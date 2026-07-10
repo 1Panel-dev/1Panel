@@ -5780,6 +5780,7 @@ const message = {
             isoTargetDirHelper:
                 'ローカルアップロードまたはサーバーからダウンロードした ISO はこのディレクトリに保存されます。',
             addingIsoRecord: 'ISO レコードを追加しています',
+            transferInProgress: 'ISO 転送中です。このドロワーまたはページを閉じないでください。',
             isoSize: 'ISO サイズ',
             deleteIsoConfirm: 'この削除操作は元に戻せません。続行しますか？',
             deleteSourceFile: '元ファイルを削除',

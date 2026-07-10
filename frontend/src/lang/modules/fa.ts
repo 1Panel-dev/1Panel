@@ -5731,6 +5731,7 @@ const message = {
             isoTargetDir: 'مسیر مقصد ISO',
             isoTargetDirHelper: 'ISO های آپلودشده محلی یا دانلودشده از سرور در این دایرکتوری ذخیره می‌شوند.',
             addingIsoRecord: 'در حال افزودن رکورد ISO',
+            transferInProgress: 'انتقال ISO در حال انجام است. این پنل یا صفحه را نبندید.',
             isoSize: 'اندازه ISO',
             deleteIsoConfirm: 'این عملیات حذف قابل بازگشت نیست. ادامه می‌دهید؟',
             deleteSourceFile: 'حذف فایل منبع',

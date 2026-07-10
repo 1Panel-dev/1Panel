@@ -5816,6 +5816,7 @@ const message = {
             isoTargetDirHelper:
                 'Los ISO cargados localmente o descargados desde el servidor se guardarán en este directorio.',
             addingIsoRecord: 'Agregando registro ISO',
+            transferInProgress: 'La transferencia ISO está en curso. No cierre este panel ni la página.',
             isoSize: 'Tamaño ISO',
             deleteIsoConfirm: 'Esta operación de eliminación no se puede revertir. ¿Continuar?',
             deleteSourceFile: 'Eliminar archivo de origen',

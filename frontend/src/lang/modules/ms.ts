@@ -5856,6 +5856,7 @@ const message = {
             isoTargetDirHelper:
                 'ISO yang dimuat naik secara tempatan atau dimuat turun daripada pelayan akan disimpan ke direktori ini.',
             addingIsoRecord: 'Menambah rekod ISO',
+            transferInProgress: 'Pemindahan ISO sedang berlangsung. Jangan tutup panel atau halaman ini.',
             isoSize: 'Saiz ISO',
             deleteIsoConfirm: 'Operasi pemadaman ini tidak boleh dibuat asal. Teruskan?',
             deleteSourceFile: 'Padam fail sumber',

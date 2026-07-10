@@ -6006,6 +6006,7 @@ const message = {
             isoTargetDir: 'Caminho de destino ISO',
             isoTargetDirHelper: 'ISOs enviados localmente ou baixados do servidor serão salvos neste diretório.',
             addingIsoRecord: 'Adicionando registro ISO',
+            transferInProgress: 'A transferência ISO está em andamento. Não feche este painel ou a página.',
             isoSize: 'Tamanho do ISO',
             deleteIsoConfirm: 'Esta operação de exclusão não pode ser desfeita. Continuar?',
             deleteSourceFile: 'Excluir arquivo de origem',

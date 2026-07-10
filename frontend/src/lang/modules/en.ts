@@ -5793,6 +5793,7 @@ const message = {
             isoTargetDir: 'ISO Target Path',
             isoTargetDirHelper: 'ISO files uploaded locally or downloaded from the server are saved to this directory.',
             addingIsoRecord: 'Adding ISO record',
+            transferInProgress: 'The ISO transfer is in progress. Do not close this drawer or page.',
             isoSize: 'ISO Size',
             deleteIsoConfirm: 'This delete operation cannot be rolled back. Continue?',
             deleteSourceFile: 'Delete source file',

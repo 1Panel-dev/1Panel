@@ -5663,6 +5663,7 @@ const message = {
             isoTargetDir: 'ISO 대상 경로',
             isoTargetDirHelper: '로컬 업로드 또는 서버 다운로드 ISO가 이 디렉터리에 저장됩니다.',
             addingIsoRecord: 'ISO 레코드를 추가하는 중',
+            transferInProgress: 'ISO 전송이 진행 중입니다. 이 패널이나 페이지를 닫지 마세요.',
             isoSize: 'ISO 크기',
             deleteIsoConfirm: '이 삭제 작업은 되돌릴 수 없습니다. 계속하시겠습니까?',
             deleteSourceFile: '원본 파일 삭제',
