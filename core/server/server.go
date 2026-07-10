@@ -46,8 +46,9 @@ func Start() {
 	gob.Register(psession.SessionUser{})
 	cron.Init()
 	session.Init()
+	InitOthersBeforeHook()
 	hook.Init()
-	InitOthers()
+	InitOthersAfterHook()
 
 	proxy.Init()
 

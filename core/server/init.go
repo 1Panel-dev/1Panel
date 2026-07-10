@@ -2,5 +2,8 @@
 
 package server
 
-func InitOthers() {
+func InitOthersBeforeHook() {
+}
+
+func InitOthersAfterHook() {
 }
