@@ -12,7 +12,9 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -27,6 +29,11 @@ import (
 	"github.com/gorilla/websocket"
 	qrcode "github.com/skip2/go-qrcode"
 )
+
+var cancelledChunkUploads = struct {
+	sync.RWMutex
+	ids map[string]struct{}
+}{ids: make(map[string]struct{})}
 
 // @Tags File
 // @Summary List files
@@ -873,7 +880,20 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		}
 	}
 	filename := c.PostForm("filename")
-	fileDir := filepath.Join(tmpDir, filename)
+	uploadID := strings.TrimSpace(c.PostForm("uploadID"))
+	cancellable := uploadID != ""
+	if cancellable && (filepath.Base(uploadID) != uploadID || strings.ContainsAny(uploadID, `/\\`)) {
+		helper.BadRequest(c, errors.New("invalid upload ID"))
+		return
+	}
+	if !cancellable {
+		uploadID = filename
+	}
+	fileDir := filepath.Join(tmpDir, uploadID)
+	if cancellable && chunkUploadCancelled(uploadID) {
+		helper.BadRequest(c, errors.New("upload cancelled"))
+		return
+	}
 	if chunkIndex == 0 {
 		if fileOp.Stat(fileDir) {
 			_ = fileOp.DeleteDir(fileDir)
@@ -884,7 +904,7 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 
 	defer func() {
 		if err != nil {
-			_ = os.Remove(fileDir)
+			_ = os.RemoveAll(fileDir)
 		}
 	}()
 	var (
@@ -902,6 +922,11 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	chunkData, err = io.ReadAll(uploadFile)
 	if err != nil {
 		helper.InternalServer(c, buserr.WithMap("ErrFileUpload", map[string]interface{}{"name": filename, "detail": err.Error()}, err))
+		return
+	}
+	if cancellable && chunkUploadCancelled(uploadID) {
+		err = errors.New("upload cancelled")
+		helper.BadRequest(c, err)
 		return
 	}
 
@@ -922,10 +947,48 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 			helper.InternalServer(c, buserr.WithMap("ErrFileUpload", map[string]interface{}{"name": filename, "detail": err.Error()}, err))
 			return
 		}
+		if cancellable {
+			cancelledChunkUploads.Lock()
+			delete(cancelledChunkUploads.ids, uploadID)
+			cancelledChunkUploads.Unlock()
+		}
 		helper.SuccessWithData(c, true)
 	} else {
 		return
 	}
+}
+
+// StopChunkUpload removes temporary chunks left by a cancelled upload.
+func (b *BaseApi) StopChunkUpload(c *gin.Context) {
+	var req request.FileProcessReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	uploadID := strings.TrimSpace(req.Key)
+	if uploadID == "" || filepath.Base(uploadID) != uploadID || strings.ContainsAny(uploadID, `/\\`) {
+		helper.BadRequest(c, errors.New("invalid upload ID"))
+		return
+	}
+	cancelledChunkUploads.Lock()
+	cancelledChunkUploads.ids[uploadID] = struct{}{}
+	cancelledChunkUploads.Unlock()
+	time.AfterFunc(10*time.Minute, func() {
+		cancelledChunkUploads.Lock()
+		delete(cancelledChunkUploads.ids, uploadID)
+		cancelledChunkUploads.Unlock()
+	})
+	if err := os.RemoveAll(filepath.Join(global.Dir.TmpDir, "upload", uploadID)); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+func chunkUploadCancelled(uploadID string) bool {
+	cancelledChunkUploads.RLock()
+	_, ok := cancelledChunkUploads.ids[uploadID]
+	cancelledChunkUploads.RUnlock()
+	return ok
 }
 
 var wsUpgrade = websocket.Upgrader{

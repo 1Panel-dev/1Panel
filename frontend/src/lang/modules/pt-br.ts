@@ -5899,7 +5899,6 @@ const message = {
             dependencies: 'Dependências',
             dependencyPurpose: 'Finalidade',
             dependencyPurposeMap: {
-                kvm: 'Fornece suporte de virtualização por hardware para execução acelerada de VMs.',
                 libvirt:
                     'Fornece serviços de gerenciamento de VMs para controle de ciclo de vida e agendamento de recursos.',
                 storage:
@@ -5909,7 +5908,6 @@ const message = {
                 'As verificações de dependência da VM falharam. Corrija as dependências antes de usar máquinas virtuais.',
             helperUnavailable:
                 'A inicialização da capacidade de VM falhou. Verifique os logs do Core ou atualize novamente antes de usar VMs.',
-            helperNotStart: 'O serviço de VM não está em execução. Inicie o serviço antes de usar máquinas virtuais.',
             cpu: 'CPU',
             memory: 'Memória',
             disk: 'Disco',
@@ -5920,22 +5918,15 @@ const message = {
             storageLimitHelper: 'Espaço livre atual no pool de armazenamento de destino: {0}',
             storageLimitExceeded: 'A capacidade do disco excede o limite. Máximo disponível no momento: {0}.',
             iso: 'ISO',
-            createSource: 'Origem da criação',
             createFromTemplate: 'Criar a partir de modelo',
-            blankDisk: 'Blank Disk',
             template: 'Template',
             templateName: 'Template Name',
             convertToTemplate: 'Convert to Template',
             sourceVM: 'Source VM',
             templateSize: 'Template Size',
-            deleteTemplate: 'Delete Template',
             deleteTemplateConfirm: 'Excluir modelo {0}. Esta operação não pode ser desfeita. Continuar?',
             diskSize: 'Tamanho do Disco',
             diskPath: 'Caminho do Disco',
-            diskPathHelper:
-                'Opcional. Se vazio, o sistema cria <nome da VM>.qcow2 no diretório do pool de armazenamento selecionado. Valores personalizados devem ser caminhos absolutos.',
-            imagePath: 'Caminho da Imagem',
-            imagePathHelper: 'Opcional. Se definido, use o caminho absoluto de uma imagem qcow2 existente.',
             isoPath: 'Caminho do ISO',
             storagePool: 'Pool de Armazenamento',
             network: 'Rede',
@@ -5952,8 +5943,10 @@ const message = {
             dhcpStart: 'Início DHCP',
             dhcpEnd: 'Fim DHCP',
             bootOrder: 'Ordem de Boot',
-            bootOrderHelper:
-                'HD inicializa pelo disco primeiro e tenta o ISO se o disco não for inicializável. CD-ROM inicializa pelo ISO primeiro.',
+            bootDiskFirst: 'Disco primeiro (HD → CD-ROM)',
+            bootIsoFirst: 'ISO primeiro (CD-ROM → HD)',
+            bootOrderConfirm:
+                'Alterar a ordem de boot para {0}? Na próxima inicialização, a VM tentará nesta ordem os dispositivos inicializáveis que estiverem montados.',
             startAfterCreate: 'Iniciar após criação',
             autoStart: 'Inicialização automática',
             resourceAutoStart: 'Inicialização automática',
@@ -5961,16 +5954,6 @@ const message = {
             available: 'Disponível',
             vmCount: 'VMs Vinculadas',
             usedIPs: 'IPs Usados',
-            syncFromServer: 'Sincronizar do Servidor',
-            notFound: 'Não encontrado',
-            resourceStatus: {
-                running: 'Em execução',
-                inactive: 'Inativo',
-                building: 'Construindo',
-                degraded: 'Degradado',
-                inaccessible: 'Inacessível',
-                unknown: 'Desconhecido',
-            },
             monitor: 'Monitor',
             monitorNotReady: 'The virtual machine is not running. Monitoring data is unavailable.',
             monitorLoadFailed: 'Failed to get VM monitoring data.',
@@ -5997,10 +5980,11 @@ const message = {
             snapshot: 'Snapshot',
             createSnapshot: 'Create Snapshot',
             recoverSnapshot: 'Recover Snapshot',
-            snapshotName: 'Snapshot Name',
-            snapshotSize: 'Snapshot Size',
+            snapshotSize: 'Uso',
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
+            snapshotOperationHelper:
+                'O snapshot em uso não pode ser excluído. Os snapshots só podem ser restaurados quando a máquina virtual estiver desligada.',
             snapshotRecoverConfirm:
                 'Recover virtual machine [{1}] to snapshot [{0}]? The VM disk will be restored to the snapshot state.',
             interface: 'Interface de Rede',
@@ -6021,13 +6005,7 @@ const message = {
             downloadFromServer: 'Baixar do servidor',
             isoTargetDir: 'Caminho de destino ISO',
             isoTargetDirHelper: 'ISOs enviados localmente ou baixados do servidor serão salvos neste diretório.',
-            isoTargetDirOptional:
-                'Nenhum caminho de destino ISO foi definido. O caminho original do arquivo ISO será usado.',
-            isoTargetDirAvailable: 'O caminho de destino ISO está disponível.',
-            isoTargetDirUnavailable:
-                'O caminho de destino ISO deve estar em um pool de armazenamento de VM disponível.',
-            isoTargetDirCheckRequired: 'Verifique o caminho de destino ISO antes de salvar.',
-            checkPath: 'Verificar',
+            addingIsoRecord: 'Adicionando registro ISO',
             isoSize: 'Tamanho do ISO',
             deleteIsoConfirm: 'Esta operação de exclusão não pode ser desfeita. Continuar?',
             deleteSourceFile: 'Excluir arquivo de origem',

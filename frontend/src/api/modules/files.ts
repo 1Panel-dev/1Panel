@@ -125,6 +125,10 @@ export const chunkUploadFileData = (params: FormData, config: AxiosRequestConfig
     return http.upload<File.File>('files/chunkupload', params, config);
 };
 
+export const stopChunkUpload = (key: string) => {
+    return http.post('files/chunkupload/stop', { key });
+};
+
 export const renameRile = (params: File.FileRename) => {
     return http.post<File.File>('files/rename', params);
 };
