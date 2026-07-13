@@ -1110,7 +1110,8 @@ const message = {
             routeSamplesGuide:
                 'サンプルは簡単/複雑リクエストの例で、Embedding 類似度照合に使います。実際のユーザーリクエストを書き、追加後にベクトルを作成または再構築してください。',
             rebuildVectors: 'ベクトルを再構築',
-            rebuildVectorsConfirm: 'ベクトルを再構築すると、Embedding サービスでサンプルを再処理します。続行しますか？',
+            rebuildVectorsConfirm:
+                'ベクトルを再構築すると、Embedding サービスでスマートルーティングとコンテンツコンプライアンスのサンプルを再処理します。続行しますか？',
             createVectorOnImport: 'インポート後にベクトルを作成',
             createVectorOnImportHelper:
                 'デフォルトで有効です。Embedding が設定済みの場合はバックグラウンドタスクでベクトルを作成し、未設定の場合はサンプルのみを作成します。',
@@ -1127,6 +1128,7 @@ const message = {
                 'プレビューはリクエストが簡単か複雑かをテストします。上流モデルは呼び出しません。ソースはサンプル一致またはルール判定です。',
             previewPlaceholder: 'リクエストテキストを入力',
             confidence: '信頼度',
+            bestSampleSimilarity: '最高サンプル類似度',
             source: 'ソース',
             sourceHeuristic: 'ルール判定',
             sourceEmbedding: 'サンプル一致',

@@ -1111,7 +1111,7 @@ const message = {
                 'Samples are simple/complex request examples for Embedding similarity matching. Use real user requests, then create or rebuild vectors.',
             rebuildVectors: 'Rebuild Vectors',
             rebuildVectorsConfirm:
-                'Rebuilding vectors will request the Embedding service to process samples again. Continue?',
+                'Rebuilding vectors will request the Embedding service to process Smart Route and content compliance samples again. Continue?',
             createVectorOnImport: 'Create vectors after import',
             createVectorOnImportHelper:
                 'Enabled by default. If Embedding is configured, a background task creates vectors; otherwise only samples are created.',
@@ -1128,6 +1128,7 @@ const message = {
                 'Preview tests whether a request is simple or complex without calling the upstream model. The source is sample matching or rule fallback.',
             previewPlaceholder: 'Input request text',
             confidence: 'Confidence',
+            bestSampleSimilarity: 'Best sample similarity',
             source: 'Source',
             sourceHeuristic: 'Rule-based',
             sourceEmbedding: 'Sample Match',

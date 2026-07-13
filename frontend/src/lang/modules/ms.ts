@@ -1120,7 +1120,7 @@ const message = {
                 'Sampel ialah contoh permintaan ringkas/kompleks untuk padanan persamaan Embedding. Gunakan permintaan pengguna sebenar, kemudian cipta atau bina semula vektor.',
             rebuildVectors: 'Bina Semula Vektor',
             rebuildVectorsConfirm:
-                'Membina semula vektor akan meminta perkhidmatan Embedding memproses sampel sekali lagi. Teruskan?',
+                'Membina semula vektor akan meminta perkhidmatan Embedding memproses semula sampel Smart Route dan pematuhan kandungan. Teruskan?',
             createVectorOnImport: 'Cipta vektor selepas import',
             createVectorOnImportHelper:
                 'Dipilih secara lalai. Jika Embedding dikonfigurasi, tugas latar belakang mencipta vektor; jika tidak, hanya sampel dicipta.',
@@ -1137,6 +1137,7 @@ const message = {
                 'Pratonton menguji sama ada permintaan ringkas atau kompleks tanpa memanggil model upstream. Sumber ialah padanan sampel atau peraturan.',
             previewPlaceholder: 'Masukkan teks permintaan',
             confidence: 'Keyakinan',
+            bestSampleSimilarity: 'Kesamaan sampel tertinggi',
             source: 'Sumber',
             sourceHeuristic: 'Berdasarkan peraturan',
             sourceEmbedding: 'Padanan sampel',

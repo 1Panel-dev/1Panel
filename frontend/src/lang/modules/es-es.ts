@@ -1123,7 +1123,7 @@ const message = {
                 'Las muestras son ejemplos de solicitudes simples/complejas para coincidencia por similitud Embedding. Use solicitudes reales y luego cree o reconstruya vectores.',
             rebuildVectors: 'Reconstruir vectores',
             rebuildVectorsConfirm:
-                'Reconstruir vectores volverá a solicitar al servicio Embedding que procese las muestras. ¿Continuar?',
+                'Reconstruir vectores volverá a solicitar al servicio Embedding que procese las muestras de enrutamiento inteligente y cumplimiento de contenido. ¿Continuar?',
             createVectorOnImport: 'Crear vectores después de importar',
             createVectorOnImportHelper:
                 'Activado por defecto. Si Embedding está configurado, una tarea en segundo plano crea vectores; de lo contrario solo crea muestras.',
@@ -1140,6 +1140,7 @@ const message = {
                 'La vista previa prueba si una solicitud es simple o compleja sin llamar al modelo upstream. La fuente es coincidencia de muestras o reglas.',
             previewPlaceholder: 'Introduce el texto de la solicitud',
             confidence: 'Confianza',
+            bestSampleSimilarity: 'Mayor similitud de muestra',
             source: 'Fuente',
             sourceHeuristic: 'Reglas',
             sourceEmbedding: 'Coincidencia de muestras',

@@ -1051,7 +1051,7 @@ const message = {
             routeSamplesGuide:
                 '樣本是簡單/複雜問題的示例，用於 Embedding 相似度匹配；文字盡量寫真實使用者請求，新增後可生成或重建向量。',
             rebuildVectors: '重建向量',
-            rebuildVectorsConfirm: '重建向量會重新請求 Embedding 服務處理樣本，是否繼續？',
+            rebuildVectorsConfirm: '重建向量會重新請求 Embedding 服務處理智慧路由和內容合規樣本，是否繼續？',
             createVectorOnImport: '匯入後建立向量',
             createVectorOnImportHelper: '預設選中。已配置 Embedding 時會建立背景任務生成向量，未配置時僅建立樣本。',
             route: '路由',
@@ -1066,6 +1066,7 @@ const message = {
             previewGuide: '預覽用於測試一段請求會判為簡單還是複雜，不會真實呼叫上游模型；來源為樣本匹配或規則判斷。',
             previewPlaceholder: '輸入請求文字',
             confidence: '置信度',
+            bestSampleSimilarity: '最高樣本相似度',
             source: '來源',
             sourceHeuristic: '規則判斷',
             sourceEmbedding: '樣本匹配',
