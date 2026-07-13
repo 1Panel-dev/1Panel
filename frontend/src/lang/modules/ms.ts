@@ -5874,7 +5874,6 @@ const message = {
             snapshotSize: 'Penggunaan',
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
-                'Syot kilat yang sedang digunakan tidak boleh dipadam. Syot kilat hanya boleh dipulihkan apabila mesin maya dimatikan.',
             snapshotRecoverConfirm:
                 'Recover virtual machine [{1}] to snapshot [{0}]? The VM disk will be restored to the snapshot state.',
             interface: 'Antara Muka Rangkaian',

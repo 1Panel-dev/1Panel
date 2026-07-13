@@ -5875,7 +5875,6 @@ const message = {
             snapshotSize: 'Использовано',
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
-                'Используемый снимок нельзя удалить. Восстановление снимка доступно только при выключенной виртуальной машине.',
             snapshotRecoverConfirm:
                 'Recover virtual machine [{1}] to snapshot [{0}]? The VM disk will be restored to the snapshot state.',
             interface: 'Сетевой интерфейс',
