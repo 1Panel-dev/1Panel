@@ -5863,7 +5863,6 @@ const message = {
             snapshotSize: 'Kullanım',
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
-                'Kullanımdaki anlık görüntü silinemez. Anlık görüntüler yalnızca sanal makine kapalıyken geri yüklenebilir.',
             snapshotRecoverConfirm:
                 'Recover virtual machine [{1}] to snapshot [{0}]? The VM disk will be restored to the snapshot state.',
             interface: 'Ağ Arayüzü',

@@ -5799,7 +5799,6 @@ const message = {
             snapshotSize: '使用量',
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
-                '現在使用中のスナップショットは削除できません。スナップショットは仮想マシンがシャットオフ状態の場合にのみ復元できます。',
             snapshotRecoverConfirm:
                 'Recover virtual machine [{1}] to snapshot [{0}]? The VM disk will be restored to the snapshot state.',
             interface: 'ネットワークインターフェース',

@@ -5834,7 +5834,6 @@ const message = {
             snapshotSize: 'Uso',
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
-                'La instantánea en uso no se puede eliminar. Las instantáneas solo se pueden restaurar cuando la máquina virtual está apagada.',
             snapshotRecoverConfirm:
                 'Recover virtual machine [{1}] to snapshot [{0}]? The VM disk will be restored to the snapshot state.',
             interface: 'Interfaz de red',

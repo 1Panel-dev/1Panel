@@ -5683,7 +5683,6 @@ const message = {
             snapshotSize: '사용량',
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
-                '현재 사용 중인 스냅샷은 삭제할 수 없습니다. 가상 머신이 종료된 상태에서만 스냅샷을 복원할 수 있습니다.',
             snapshotRecoverConfirm:
                 'Recover virtual machine [{1}] to snapshot [{0}]? The VM disk will be restored to the snapshot state.',
             interface: '네트워크 인터페이스',

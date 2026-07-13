@@ -6025,7 +6025,6 @@ const message = {
             snapshotSize: 'Uso',
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
-                'O snapshot em uso não pode ser excluído. Os snapshots só podem ser restaurados quando a máquina virtual estiver desligada.',
             snapshotRecoverConfirm:
                 'Recover virtual machine [{1}] to snapshot [{0}]? The VM disk will be restored to the snapshot state.',
             interface: 'Interface de Rede',
