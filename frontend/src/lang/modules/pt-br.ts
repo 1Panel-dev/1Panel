@@ -504,6 +504,7 @@ const message = {
         deleteBackupHelper: 'Excluir backups do banco de dados simultaneamente',
         delete: 'A operação de exclusão não pode ser desfeita, insira "',
         deleteHelper: '" para excluir este banco de dados',
+        userBoundDatabases: 'vinculado aos seguintes bancos de dados:',
         noMysql: 'Serviço de banco de dados (MySQL ou MariaDB)',
         noPostgresql: 'Serviço de banco de dados PostgreSQL',
         goUpgrade: 'Ir para atualização',

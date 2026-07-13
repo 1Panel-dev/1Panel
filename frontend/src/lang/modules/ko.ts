@@ -500,6 +500,7 @@ const message = {
         deleteBackupHelper: '데이터베이스 백업을 동시에 삭제',
         delete: '삭제 작업은 되돌릴 수 없습니다. 삭제하려면 "',
         deleteHelper: '"를 입력하세요.',
+        userBoundDatabases: '다음 데이터베이스에 바인딩되어 있습니다:',
         noMysql: '데이터베이스 서비스 (MySQL 또는 MariaDB)',
         noPostgresql: '데이터베이스 서비스 PostgreSQL',
         goUpgrade: '업그레이드로 이동',

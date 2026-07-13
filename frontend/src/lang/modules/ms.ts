@@ -510,6 +510,7 @@ const message = {
         deleteBackupHelper: 'Padam sandaran pangkalan data secara serentak',
         delete: 'Operasi padam tidak boleh diundurkan, sila masukkan "',
         deleteHelper: '" untuk memadam pangkalan data ini',
+        userBoundDatabases: 'terikat dengan pangkalan data berikut:',
         noMysql: 'Perkhidmatan pangkalan data (MySQL atau MariaDB)',
         noPostgresql: 'Perkhidmatan pangkalan data PostgreSQL',
         goUpgrade: 'Pergi tingkatkan',

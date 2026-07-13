@@ -501,6 +501,7 @@ const message = {
         deleteBackupHelper: 'Удалить резервные копии базы данных одновременно',
         delete: 'Операция удаления не может быть отменена, пожалуйста, введите "',
         deleteHelper: '" для удаления этой базы данных',
+        userBoundDatabases: 'привязан к следующим базам данных:',
         noMysql: 'Сервис базы данных (MySQL или MariaDB)',
         noPostgresql: 'Сервис базы данных PostgreSQL',
         goUpgrade: 'Обновить',

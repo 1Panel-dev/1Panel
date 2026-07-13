@@ -19,10 +19,11 @@ var (
 	agentAccountRepo      = repo.NewIAgentAccountRepo()
 	agentAccountModelRepo = repo.NewIAgentAccountModelRepo()
 
-	mysqlRepo      = repo.NewIMysqlRepo()
-	postgresqlRepo = repo.NewIPostgresqlRepo()
-	mongodbRepo    = repo.NewIMongodbRepo()
-	databaseRepo   = repo.NewIDatabaseRepo()
+	mysqlRepo        = repo.NewIMysqlRepo()
+	postgresqlRepo   = repo.NewIPostgresqlRepo()
+	mongodbRepo      = repo.NewIMongodbRepo()
+	databaseRepo     = repo.NewIDatabaseRepo()
+	databaseUserRepo = repo.NewIDatabaseUserRepo()
 
 	imageRepoRepo = repo.NewIImageRepoRepo()
 	composeRepo   = repo.NewIComposeTemplateRepo()
