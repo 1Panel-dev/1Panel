@@ -1095,7 +1095,8 @@ const message = {
             routeSamplesGuide:
                 '샘플은 간단/복잡 요청 예시이며 Embedding 유사도 매칭에 사용됩니다. 실제 사용자 요청을 작성하고 추가 후 벡터를 생성하거나 재생성하세요.',
             rebuildVectors: '벡터 재생성',
-            rebuildVectorsConfirm: '벡터를 재생성하면 Embedding 서비스가 샘플을 다시 처리합니다. 계속하시겠습니까?',
+            rebuildVectorsConfirm:
+                '벡터를 재생성하면 Embedding 서비스가 스마트 라우팅 및 콘텐츠 컴플라이언스 샘플을 다시 처리합니다. 계속하시겠습니까?',
             createVectorOnImport: '가져온 후 벡터 생성',
             createVectorOnImportHelper:
                 '기본 선택입니다. Embedding이 설정되어 있으면 백그라운드 작업으로 벡터를 생성하고, 없으면 샘플만 생성합니다.',
@@ -1112,6 +1113,7 @@ const message = {
                 '미리보기는 요청이 간단한지 복잡한지 테스트하며 업스트림 모델을 호출하지 않습니다. 소스는 샘플 매칭 또는 규칙 판단입니다.',
             previewPlaceholder: '요청 텍스트 입력',
             confidence: '신뢰도',
+            bestSampleSimilarity: '최고 샘플 유사도',
             source: '소스',
             sourceHeuristic: '규칙 판단',
             sourceEmbedding: '샘플 매칭',

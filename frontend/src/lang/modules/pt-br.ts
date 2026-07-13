@@ -1117,7 +1117,7 @@ const message = {
                 'Amostras são exemplos de solicitações simples/complexas para correspondência por similaridade Embedding. Use solicitações reais e depois crie ou reconstrua vetores.',
             rebuildVectors: 'Reconstruir vetores',
             rebuildVectorsConfirm:
-                'Reconstruir vetores solicitará novamente ao serviço Embedding que processe as amostras. Continuar?',
+                'Reconstruir vetores solicitará novamente ao serviço Embedding que processe as amostras de roteamento inteligente e conformidade de conteúdo. Continuar?',
             createVectorOnImport: 'Criar vetores após importar',
             createVectorOnImportHelper:
                 'Ativado por padrão. Se o Embedding estiver configurado, uma tarefa em segundo plano cria vetores; caso contrário, apenas cria amostras.',
@@ -1134,6 +1134,7 @@ const message = {
                 'A pré-visualização testa se uma solicitação é simples ou complexa sem chamar o modelo upstream. A fonte é correspondência de amostras ou regras.',
             previewPlaceholder: 'Insira o texto da solicitação',
             confidence: 'Confiança',
+            bestSampleSimilarity: 'Maior similaridade da amostra',
             source: 'Fonte',
             sourceHeuristic: 'Regras',
             sourceEmbedding: 'Correspondência de amostras',

@@ -1120,7 +1120,7 @@ const message = {
                 'Örnekler, Embedding benzerlik eşleştirmesi için basit/karmaşık istek örnekleridir. Gerçek kullanıcı istekleri yazın, ardından vektör oluşturun veya yeniden oluşturun.',
             rebuildVectors: 'Vektörleri Yeniden Oluştur',
             rebuildVectorsConfirm:
-                'Vektörleri yeniden oluşturmak, Embedding hizmetinin örnekleri tekrar işlemesini ister. Devam edilsin mi?',
+                'Vektörleri yeniden oluşturmak, Embedding hizmetinin Smart Route ve içerik uyumluluğu örneklerini tekrar işlemesini ister. Devam edilsin mi?',
             createVectorOnImport: 'İçe aktardıktan sonra vektör oluştur',
             createVectorOnImportHelper:
                 'Varsayılan olarak seçilidir. Embedding yapılandırılmışsa arka plan görevi vektörleri oluşturur; değilse yalnızca örnekler oluşturulur.',
@@ -1137,6 +1137,7 @@ const message = {
                 'Önizleme, isteğin basit mi karmaşık mı olduğunu üst modeli çağırmadan test eder. Kaynak örnek eşleşmesi veya kural yedeğidir.',
             previewPlaceholder: 'İstek metnini girin',
             confidence: 'Güven',
+            bestSampleSimilarity: 'En yüksek örnek benzerliği',
             source: 'Kaynak',
             sourceHeuristic: 'Kural tabanlı',
             sourceEmbedding: 'Örnek eşleşmesi',
