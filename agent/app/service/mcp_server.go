@@ -127,6 +127,7 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 	mcpServer.Type = req.Type
 	mcpServer.GatewayImage = req.GatewayImage
 	mcpServer.ProtocolVersion = req.ProtocolVersion
+	mcpServer.OAuth2Bearer = req.OAuth2Bearer
 	normalizeMcpServerGateway(mcpServer)
 	if req.OutputTransport == mcpOutputTransportSSE {
 		mcpServer.SsePath = req.SsePath
@@ -191,6 +192,7 @@ func (m McpServerService) Create(create request.McpServerCreate) error {
 		Type:            create.Type,
 		GatewayImage:    create.GatewayImage,
 		ProtocolVersion: create.ProtocolVersion,
+		OAuth2Bearer:    create.OAuth2Bearer,
 	}
 	normalizeMcpServerGateway(mcpServer)
 	if create.OutputTransport == mcpOutputTransportSSE {
@@ -744,6 +746,9 @@ func buildSupergatewayCommand(mcpServer *model.McpServer) []string {
 		"--stdio", mcpServer.Command,
 		"--outputTransport", mcpServer.OutputTransport,
 		"--port", strconv.Itoa(mcpServer.Port),
+	}
+	if oauth2Bearer := strings.TrimSpace(mcpServer.OAuth2Bearer); oauth2Bearer != "" {
+		command = append(command, "--oauth2Bearer", oauth2Bearer)
 	}
 	if mcpServer.OutputTransport == mcpOutputTransportSSE {
 		return append(command,

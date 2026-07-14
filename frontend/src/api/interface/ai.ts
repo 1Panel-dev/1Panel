@@ -182,6 +182,7 @@ export namespace AI {
         type: string;
         gatewayImage: string;
         protocolVersion: string;
+        oauth2Bearer?: string;
         taskID?: string;
     }
 

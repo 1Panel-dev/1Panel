@@ -20,4 +20,5 @@ type McpServer struct {
 	Type               string `json:"type"`
 	GatewayImage       string `json:"gatewayImage"`
 	ProtocolVersion    string `json:"protocolVersion"`
+	OAuth2Bearer       string `gorm:"column:oauth2_bearer" json:"oauth2Bearer"`
 }

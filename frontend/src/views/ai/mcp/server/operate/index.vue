@@ -89,6 +89,9 @@
                     {{ $t('aiTools.mcp.protocolVersionHelper') }}
                 </span>
             </el-form-item>
+            <el-form-item label="OAuth2 Bearer Token">
+                <el-input v-model.trim="mcpServer.oauth2Bearer" type="password" show-password />
+            </el-form-item>
             <el-form-item :label="$t('container.image')" prop="gatewayImage">
                 <el-input v-model.trim="mcpServer.gatewayImage" />
             </el-form-item>
@@ -180,6 +183,7 @@ const newMcpServer = (): AI.McpServer => {
         type: 'npx',
         gatewayImage: defaultGatewayImages.npx,
         protocolVersion: defaultProtocolVersion,
+        oauth2Bearer: '',
         taskID: '',
     };
 };
@@ -226,6 +230,7 @@ const acceptParams = async (params: AI.McpServer) => {
         mcpServer.value.type = mcpServer.value.type || 'npx';
         mcpServer.value.gatewayImage = mcpServer.value.gatewayImage || defaultGatewayImages[mcpServer.value.type];
         mcpServer.value.protocolVersion = mcpServer.value.protocolVersion || defaultProtocolVersion;
+        mcpServer.value.oauth2Bearer = mcpServer.value.oauth2Bearer || '';
     } else {
         mcpServer.value = newMcpServer();
         if (params.port) {

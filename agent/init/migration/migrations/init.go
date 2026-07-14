@@ -1516,3 +1516,10 @@ var MigrateLegoV5 = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateMcpServerOAuth2Bearer = &gormigrate.Migration{
+	ID: "20260714-update-mcp-server-oauth2-bearer",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.McpServer{})
+	},
+}

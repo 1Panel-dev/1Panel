@@ -41,6 +41,7 @@ func InitAgentDB() {
 		migrations.AddQuickJump,
 		migrations.UpdateMcpServerAddType,
 		migrations.UpdateMcpServerGatewayConfig,
+		migrations.UpdateMcpServerOAuth2Bearer,
 		migrations.InitLocalSSHConn,
 		migrations.InitLocalSSHShow,
 		migrations.InitRecordStatus,
