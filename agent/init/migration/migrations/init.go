@@ -1516,3 +1516,10 @@ var MigrateLegoV5 = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddMcpServerGatewayArgs = &gormigrate.Migration{
+	ID: "20260714-add-mcp-server-gateway-args",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.McpServer{})
+	},
+}

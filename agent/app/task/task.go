@@ -169,8 +169,8 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 	}
 	taskRepo := repo.NewITaskRepo()
 	ctx, cancel := context.WithCancel(context.Background())
-	global.TaskCtxMap[taskID] = cancel
-	task := &Task{TaskCtx: ctx, Name: name, logFile: logFile, Logger: logger, taskRepo: taskRepo, Task: taskModel}
+	global.RegisterTaskCancel(taskID, cancel)
+	task := &Task{TaskCtx: ctx, TaskID: taskID, Name: name, logFile: logFile, Logger: logger, taskRepo: taskRepo, Task: taskModel}
 	return task, nil
 }
 
@@ -200,7 +200,7 @@ func ReNewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task,
 	logger.SetOutput(logFile)
 	logger.Print("\n --------------------------------------------------- \n")
 	taskItem.Status = constant.StatusExecuting
-	task := &Task{Name: name, logFile: logFile, Logger: logger, taskRepo: taskRepo, Task: &taskItem}
+	task := &Task{TaskID: taskID, Name: name, logFile: logFile, Logger: logger, taskRepo: taskRepo, Task: &taskItem}
 	task.updateTask(&taskItem)
 	return task, nil
 }
@@ -231,7 +231,7 @@ func (t *Task) AddSubTaskWithIgnoreErr(name string, action ActionFunc) {
 }
 
 func (s *SubTask) Execute() error {
-	defer delete(global.TaskCtxMap, s.RootTask.TaskID)
+	defer global.RemoveTaskCancel(s.RootTask.TaskID)
 	subTaskName := s.Name
 	if s.Name == "" {
 		subTaskName = i18n.GetMsgByKey("SubTask")
@@ -302,7 +302,11 @@ func (t *Task) Execute() error {
 				continue
 			}
 			t.Task.ErrorMsg = err.Error()
-			t.Task.Status = constant.StatusFailed
+			if errors.Is(err, context.Canceled) {
+				t.Task.Status = constant.StatusCanceled
+			} else {
+				t.Task.Status = constant.StatusFailed
+			}
 			for _, rollback := range t.Rollbacks {
 				rollback(t)
 			}

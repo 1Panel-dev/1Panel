@@ -1,10 +1,17 @@
 # 基础错误
 ErrInvalidParams: "参数错误: {{ .detail }}"
+ErrMcpGatewayArgsParse: "MCP 自定义参数格式错误"
+ErrMcpGatewayArgsConflict: "参数 {{ .name }} 由 1Panel 管理，不能在自定义参数中设置"
 ErrTokenParse: "Token 错误: {{ .detail }}"
 ErrInitialPassword: "原密码错误"
 ErrInternalServer: "服务错误: {{ .detail }}"
 ErrRecordExist: "记录已存在"
 ErrRecordNotFound: "记录不存在"
+WafLogExport: "WAF 日志导出"
+MonitorLogExport: "网站监控日志导出"
+LogExportNoData: "没有符合条件的日志"
+LogExportDiskSpace: "可用磁盘空间不足 1 GiB，导出任务已停止"
+LogExportRetentionInvalid: "导出记录保留天数必须在 1 到 30 天之间"
 ErrStructTransform: "类型转换失败: {{ .err }}"
 ErrNotSupportType: "不支持当前类型: {{ .name }}"
 

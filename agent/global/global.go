@@ -2,6 +2,7 @@ package global
 
 import (
 	"context"
+	"sync"
 
 	badger_db "github.com/1Panel-dev/1Panel/agent/init/cache/db"
 	"github.com/go-playground/validator/v10"
@@ -39,7 +40,27 @@ var (
 	AlertResourceJobID cron.EntryID
 
 	TaskCtxMap = make(map[string]context.CancelFunc)
+	taskCtxMu  sync.RWMutex
 )
+
+func RegisterTaskCancel(taskID string, cancel context.CancelFunc) {
+	taskCtxMu.Lock()
+	defer taskCtxMu.Unlock()
+	TaskCtxMap[taskID] = cancel
+}
+
+func LoadTaskCancel(taskID string) (context.CancelFunc, bool) {
+	taskCtxMu.RLock()
+	defer taskCtxMu.RUnlock()
+	cancel, ok := TaskCtxMap[taskID]
+	return cancel, ok
+}
+
+func RemoveTaskCancel(taskID string) {
+	taskCtxMu.Lock()
+	defer taskCtxMu.Unlock()
+	delete(TaskCtxMap, taskID)
+}
 
 func RepoURL() string {
 	if CONF.Base.IsEnterprise {

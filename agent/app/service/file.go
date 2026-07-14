@@ -485,7 +485,7 @@ func preflightDecompressTool(decompressType files.CompressType) error {
 }
 
 func (f *FileService) StopCompress(taskID string) error {
-	if cancel, ok := global.TaskCtxMap[taskID]; ok {
+	if cancel, ok := global.LoadTaskCancel(taskID); ok {
 		cancel()
 		return nil
 	}
@@ -493,7 +493,7 @@ func (f *FileService) StopCompress(taskID string) error {
 }
 
 func (f *FileService) StopDeCompress(taskID string) error {
-	if cancel, ok := global.TaskCtxMap[taskID]; ok {
+	if cancel, ok := global.LoadTaskCancel(taskID); ok {
 		cancel()
 		return nil
 	}

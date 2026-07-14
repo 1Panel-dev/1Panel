@@ -89,6 +89,18 @@
                     {{ $t('aiTools.mcp.protocolVersionHelper') }}
                 </span>
             </el-form-item>
+            <el-form-item :label="$t('app.params')" prop="gatewayArgs">
+                <el-input
+                    v-model="mcpServer.gatewayArgs"
+                    type="textarea"
+                    :rows="3"
+                    :maxlength="4096"
+                    placeholder='--header "x-user-id: 123" --logLevel debug'
+                />
+                <span class="input-help">
+                    {{ $t('aiTools.mcp.gatewayArgsHelper') }}
+                </span>
+            </el-form-item>
             <el-form-item :label="$t('container.image')" prop="gatewayImage">
                 <el-input v-model.trim="mcpServer.gatewayImage" />
             </el-form-item>
@@ -180,6 +192,7 @@ const newMcpServer = (): AI.McpServer => {
         type: 'npx',
         gatewayImage: defaultGatewayImages.npx,
         protocolVersion: defaultProtocolVersion,
+        gatewayArgs: '',
         taskID: '',
     };
 };
@@ -226,6 +239,7 @@ const acceptParams = async (params: AI.McpServer) => {
         mcpServer.value.type = mcpServer.value.type || 'npx';
         mcpServer.value.gatewayImage = mcpServer.value.gatewayImage || defaultGatewayImages[mcpServer.value.type];
         mcpServer.value.protocolVersion = mcpServer.value.protocolVersion || defaultProtocolVersion;
+        mcpServer.value.gatewayArgs = mcpServer.value.gatewayArgs || '';
     } else {
         mcpServer.value = newMcpServer();
         if (params.port) {

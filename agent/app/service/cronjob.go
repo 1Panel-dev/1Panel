@@ -644,7 +644,7 @@ func (u *CronjobService) HandleStop(id uint) error {
 	if len(record.TaskID) == 0 {
 		return nil
 	}
-	if cancel, ok := global.TaskCtxMap[record.TaskID]; ok {
+	if cancel, ok := global.LoadTaskCancel(record.TaskID); ok {
 		cancel()
 	}
 	return nil
