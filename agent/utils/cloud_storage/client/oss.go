@@ -1,7 +1,9 @@
 package client
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 
 	osssdk "github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
@@ -75,8 +77,15 @@ func (o ossClient) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (o ossClient) Upload(src, target string) (bool, error) {
-	bucket, err := o.client.Bucket(o.bucketStr)
+func (o ossClient) Upload(ctx context.Context, src, target string) (bool, error) {
+	if err := ctx.Err(); err != nil {
+		return false, err
+	}
+	client := o.client
+	if _, ok := ctx.Deadline(); ok {
+		client.HTTPClient = &http.Client{Transport: deadlineTransport{ctx: ctx, base: http.DefaultTransport}}
+	}
+	bucket, err := client.Bucket(o.bucketStr)
 	if err != nil {
 		return false, err
 	}

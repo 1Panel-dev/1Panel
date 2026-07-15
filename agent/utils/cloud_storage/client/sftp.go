@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"io"
 	"net"
 	"os"
@@ -60,7 +61,10 @@ func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
 	return &sftpClient{connInfo: addr, config: clientConfig}, nil
 }
 
-func (s sftpClient) Upload(src, target string) (bool, error) {
+func (s sftpClient) Upload(ctx context.Context, src, target string) (bool, error) {
+	if err := ctx.Err(); err != nil {
+		return false, err
+	}
 	sshClient, err := ssh.Dial("tcp", s.connInfo, s.config)
 	if err != nil {
 		return false, err

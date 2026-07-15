@@ -1,6 +1,8 @@
 package cloud_storage
 
 import (
+	"context"
+
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage/client"
@@ -11,7 +13,7 @@ type CloudStorageClient interface {
 	ListObjects(prefix string) ([]string, error)
 	Exist(path string) (bool, error)
 	Delete(path string) (bool, error)
-	Upload(src, target string) (bool, error)
+	Upload(ctx context.Context, src, target string) (bool, error)
 	Download(src, target string) (bool, error)
 
 	Size(path string) (int64, error)

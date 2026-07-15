@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -63,7 +64,7 @@ func (g *googleDriveClient) Delete(pathItem string) (bool, error) {
 	return true, nil
 }
 
-func (g *googleDriveClient) Upload(src, target string) (bool, error) {
+func (g *googleDriveClient) Upload(ctx context.Context, src, target string) (bool, error) {
 	target = path.Join("/root", target)
 	parentID := "root"
 	var err error
@@ -90,6 +91,7 @@ func (g *googleDriveClient) Upload(src, target string) (bool, error) {
 	urlItem := "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&supportsAllDrives=true"
 	client := resty.New()
 	resp, err := client.R().
+		SetContext(ctx).
 		SetHeader("Authorization", "Bearer "+g.accessToken).
 		SetBody(data).
 		Post(urlItem)
@@ -111,7 +113,7 @@ func (g *googleDriveClient) Upload(src, target string) (bool, error) {
 		chunk := buf[:n]
 		start := offset
 		end := offset + int64(n) - 1
-		if err = uploadChunk(client, uploadUrl, chunk, start, end, fileInfo.Size()); err != nil {
+		if err = uploadChunk(ctx, client, uploadUrl, chunk, start, end, fileInfo.Size()); err != nil {
 			return false, err
 		}
 		offset += int64(n)
@@ -122,10 +124,11 @@ func (g *googleDriveClient) Upload(src, target string) (bool, error) {
 	return true, nil
 }
 
-func uploadChunk(client *resty.Client, uploadURL string, chunk []byte, start, end, total int64) error {
+func uploadChunk(ctx context.Context, client *resty.Client, uploadURL string, chunk []byte, start, end, total int64) error {
 	contentRange := fmt.Sprintf("bytes %d-%d/%d", start, end, total)
 
 	resp, err := client.R().
+		SetContext(ctx).
 		SetHeader("Content-Length", strconv.Itoa(len(chunk))).
 		SetHeader("Content-Range", contentRange).
 		SetBody(chunk).

@@ -98,7 +98,7 @@ func (m minIoClient) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (m minIoClient) Upload(src, target string) (bool, error) {
+func (m minIoClient) Upload(ctx context.Context, src, target string) (bool, error) {
 	file, err := os.Open(src)
 	if err != nil {
 		return false, err
@@ -109,7 +109,7 @@ func (m minIoClient) Upload(src, target string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	_, err = m.client.PutObject(context.Background(), m.bucket, target, file, fileStat.Size(), minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	_, err = m.client.PutObject(ctx, m.bucket, target, file, fileStat.Size(), minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		return false, err
 	}

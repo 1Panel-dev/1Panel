@@ -2,6 +2,7 @@ package webdav
 
 import (
 	"bytes"
+	"context"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -219,6 +220,10 @@ func (c *Client) ReadStream(path string) (io.ReadCloser, error) {
 }
 
 func (c *Client) WriteStream(path string, stream io.Reader, _ os.FileMode) (err error) {
+	return c.WriteStreamWithContext(context.Background(), path, stream, 0)
+}
+
+func (c *Client) WriteStreamWithContext(ctx context.Context, path string, stream io.Reader, _ os.FileMode) (err error) {
 	err = c.MkdirAll(path, 0755)
 	if err != nil {
 		return err
@@ -246,7 +251,7 @@ func (c *Client) WriteStream(path string, stream io.Reader, _ os.FileMode) (err 
 		stream = buffer
 	}
 
-	s, err := c.put(path, stream, contentLength)
+	s, err := c.putWithContext(ctx, path, stream, contentLength)
 	if err != nil {
 		return err
 	}

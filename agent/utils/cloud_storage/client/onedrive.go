@@ -15,7 +15,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	odsdk "github.com/goh-chunlin/go-onedrive/onedrive"
@@ -96,7 +95,7 @@ func (o oneDriveClient) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (o oneDriveClient) Upload(src, target string) (bool, error) {
+func (o oneDriveClient) Upload(ctx context.Context, src, target string) (bool, error) {
 	target = "/" + strings.TrimPrefix(target, "/")
 	if _, err := o.loadIDByPath(path.Dir(target)); err != nil {
 		if !strings.Contains(err.Error(), "itemNotFound") {
@@ -107,7 +106,6 @@ func (o oneDriveClient) Upload(src, target string) (bool, error) {
 		}
 	}
 
-	ctx := context.Background()
 	folderID, err := o.loadIDByPath(path.Dir(target))
 	if err != nil {
 		return false, err
@@ -121,7 +119,7 @@ func (o oneDriveClient) Upload(src, target string) (bool, error) {
 	}
 	var isOk bool
 	if fileInfo.Size() < 4*1024*1024 {
-		isOk, err = o.upSmall(src, folderID, fileInfo.Size())
+		isOk, err = o.upSmall(ctx, src, folderID, fileInfo.Size())
 	} else {
 		isOk, err = o.upBig(ctx, src, folderID, fileInfo.Size())
 	}
@@ -291,14 +289,17 @@ type DriveItem struct {
 	WebURL      string `json:"webUrl"`
 }
 
-func (o *oneDriveClient) NewSessionFileUploadRequest(absoluteUrl string, grandOffset, grandTotalSize int64, byteReader *bytes.Reader) (*http.Request, error) {
+func (o *oneDriveClient) NewSessionFileUploadRequest(ctx context.Context, absoluteUrl string, grandOffset, grandTotalSize int64, byteReader *bytes.Reader) (*http.Request, error) {
 	apiUrl, err := o.client.BaseURL.Parse(absoluteUrl)
 	if err != nil {
 		return nil, err
 	}
 	absoluteUrl = apiUrl.String()
 	contentLength := byteReader.Size()
-	req, err := http.NewRequest("PUT", absoluteUrl, byteReader)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, absoluteUrl, byteReader)
+	if err != nil {
+		return nil, err
+	}
 	req.Header.Set("Content-Length", strconv.FormatInt(contentLength, 10))
 	preliminaryLength := grandOffset
 	preliminaryRange := grandOffset + contentLength - 1
@@ -311,7 +312,7 @@ func (o *oneDriveClient) NewSessionFileUploadRequest(absoluteUrl string, grandOf
 	return req, err
 }
 
-func (o *oneDriveClient) upSmall(srcPath, folderID string, fileSize int64) (bool, error) {
+func (o *oneDriveClient) upSmall(ctx context.Context, srcPath, folderID string, fileSize int64) (bool, error) {
 	file, err := os.Open(srcPath)
 	if err != nil {
 		return false, err
@@ -329,7 +330,7 @@ func (o *oneDriveClient) upSmall(srcPath, folderID string, fileSize int64) (bool
 		return false, err
 	}
 	var response *DriveItem
-	if err := o.client.Do(context.Background(), req, false, &response); err != nil {
+	if err := o.client.Do(ctx, req, false, &response); err != nil {
 		return false, fmt.Errorf("do request for list failed, err: %v", err)
 	}
 	return true, nil
@@ -373,7 +374,6 @@ func (o *oneDriveClient) upBig(ctx context.Context, srcPath, folderID string, fi
 	}
 	bfReader := bufio.NewReader(file)
 	httpClient := http.Client{
-		Timeout: time.Minute * 10,
 		Transport: &http.Transport{
 			Proxy:           http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -388,7 +388,7 @@ func (o *oneDriveClient) upBig(ctx context.Context, srcPath, folderID string, fi
 			bufferLast := buffer[:length]
 			buffer = bufferLast
 		}
-		sessionFileUploadReq, err := o.NewSessionFileUploadRequest(fileSessionUploadUrl, splitNow*sizePerSplit, fileSize, bytes.NewReader(buffer))
+		sessionFileUploadReq, err := o.NewSessionFileUploadRequest(ctx, fileSessionUploadUrl, splitNow*sizePerSplit, fileSize, bytes.NewReader(buffer))
 		if err != nil {
 			return false, err
 		}
@@ -396,11 +396,12 @@ func (o *oneDriveClient) upBig(ctx context.Context, srcPath, folderID string, fi
 		if err != nil {
 			return false, err
 		}
-		res.Body.Close()
 		if res.StatusCode != 201 && res.StatusCode != 202 && res.StatusCode != 200 {
 			data, _ := io.ReadAll(res.Body)
+			res.Body.Close()
 			return false, errors.New(string(data))
 		}
+		res.Body.Close()
 	}
 	return true, nil
 }

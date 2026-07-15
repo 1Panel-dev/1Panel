@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"errors"
@@ -79,7 +80,7 @@ func (a aliClient) Delete(pathItem string) (bool, error) {
 	return true, nil
 }
 
-func (a aliClient) Upload(src, target string) (bool, error) {
+func (a aliClient) Upload(ctx context.Context, src, target string) (bool, error) {
 	target = path.Join("/root", target)
 	parentID := "root"
 	var err error
@@ -114,6 +115,7 @@ func (a aliClient) Upload(src, target string) (bool, error) {
 	url := "https://api.alipan.com/v2/file/create"
 
 	resp, err := client.R().
+		SetContext(ctx).
 		SetHeader("Authorization", a.token).
 		SetBody(data).
 		Post(url)
@@ -126,13 +128,13 @@ func (a aliClient) Upload(src, target string) (bool, error) {
 		return false, err
 	}
 	for _, part := range createResp.PartInfoList {
-		err = a.uploadPart(part.UploadURL, io.LimitReader(file, 1024*1024*1024))
+		err = a.uploadPart(ctx, part.UploadURL, io.LimitReader(file, 1024*1024*1024))
 		if err != nil {
 			return false, err
 		}
 	}
 
-	if err := a.completeUpload(createResp.UploadID, createResp.FileID); err != nil {
+	if err := a.completeUpload(ctx, createResp.UploadID, createResp.FileID); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -413,8 +415,8 @@ type createFileResp struct {
 	PartInfoList []*partInfo `json:"part_info_list,omitempty"`
 }
 
-func (a aliClient) uploadPart(uri string, reader io.Reader) error {
-	req, err := http.NewRequest(http.MethodPut, uri, reader)
+func (a aliClient) uploadPart(ctx context.Context, uri string, reader io.Reader) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, uri, reader)
 	if err != nil {
 		return err
 	}
@@ -469,7 +471,7 @@ func (a aliClient) handleDownload(uri string, target string) error {
 	return nil
 }
 
-func (a *aliClient) completeUpload(uploadID, fileID string) error {
+func (a *aliClient) completeUpload(ctx context.Context, uploadID, fileID string) error {
 	client := resty.New()
 	client.SetTLSClientConfig(&tls.Config{
 		InsecureSkipVerify: true,
@@ -482,6 +484,7 @@ func (a *aliClient) completeUpload(uploadID, fileID string) error {
 
 	url := "https://api.aliyundrive.com/v2/file/complete"
 	resp, err := client.R().
+		SetContext(ctx).
 		SetHeader("Authorization", a.token).
 		SetBody(data).
 		Post(url)

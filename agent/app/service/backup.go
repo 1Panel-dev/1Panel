@@ -2,6 +2,7 @@ package service
 
 import (
 	"bufio"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -372,7 +373,7 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 		targetPath = strings.TrimPrefix(targetPath, "/")
 	}
 
-	if _, err := client.Upload(fileItem, targetPath); err != nil {
+	if _, err := client.Upload(context.Background(), fileItem, targetPath); err != nil {
 		return false, err
 	}
 	_, _ = client.Delete(path.Join(backup.BackupPath, "test/1panel"))
@@ -464,6 +465,10 @@ func NewBackupClientMap(ids []string) map[string]backupClientHelper {
 }
 
 func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper, src, dst, accountIDs string, downloadAccountID, retry uint, cleanOnFailure bool) error {
+	return uploadWithMapWithContext(context.Background(), taskItem, accountMap, src, dst, accountIDs, downloadAccountID, retry, cleanOnFailure)
+}
+
+func uploadWithMapWithContext(ctx context.Context, taskItem task.Task, accountMap map[string]backupClientHelper, src, dst, accountIDs string, downloadAccountID, retry uint, cleanOnFailure bool) error {
 	accounts := strings.Split(accountIDs, ",")
 	for _, account := range accounts {
 		if len(account) == 0 {
@@ -489,7 +494,7 @@ func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper,
 			"backup": name,
 		}))
 		for i := 0; i < int(retry)+1; i++ {
-			_, err := itemBackup.client.Upload(src, path.Join(itemBackup.backupPath, dst))
+			_, err := itemBackup.client.Upload(ctx, src, path.Join(itemBackup.backupPath, dst))
 			taskItem.LogWithStatus(i18n.GetMsgByKey("Upload"), err)
 			if err != nil {
 				if account == fmt.Sprintf("%d", downloadAccountID) {

@@ -650,6 +650,12 @@ func (f FileOp) Copy(src, dst string) error {
 }
 
 func (f FileOp) CopyAndReName(src, dst, name string, cover bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), cmdRecursiveTimeout)
+	defer cancel()
+	return f.CopyAndReNameWithContext(ctx, src, dst, name, cover)
+}
+
+func (f FileOp) CopyAndReNameWithContext(ctx context.Context, src, dst, name string, cover bool) error {
 	if src = path.Clean("/" + src); src == "" {
 		return os.ErrNotExist
 	}
@@ -676,13 +682,13 @@ func (f FileOp) CopyAndReName(src, dst, name string, cover bool) error {
 		if name != "" && !cover {
 			dstPath = filepath.Join(dst, name)
 		}
-		return cmd.NewCommandMgr(cmd.WithTimeout(cmdRecursiveTimeout)).Run("cp", "-rfp", src, dstPath)
+		return cmd.NewCommandMgr(cmd.WithContext(ctx)).Run("cp", "-rfp", src, dstPath)
 	} else {
 		dstPath := filepath.Join(dst, name)
 		if cover {
 			dstPath = dst
 		}
-		return cmd.NewCommandMgr(cmd.WithTimeout(cmdRecursiveTimeout)).Run("cp", "-fp", src, dstPath)
+		return cmd.NewCommandMgr(cmd.WithContext(ctx)).Run("cp", "-fp", src, dstPath)
 	}
 }
 
