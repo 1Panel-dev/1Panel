@@ -621,8 +621,15 @@ func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) (retErr e
 		return os.Chtimes(dstPath, info.ModTime(), info.ModTime())
 	}
 
-	if err := os.RemoveAll(dstPath); err != nil {
+	dstInfo, err := os.Lstat(dstPath)
+	keepExistingFile := err == nil && dstInfo.Mode().IsRegular()
+	if err != nil && !os.IsNotExist(err) {
 		return err
+	}
+	if !keepExistingFile {
+		if err := os.RemoveAll(dstPath); err != nil {
+			return err
+		}
 	}
 	if err := os.MkdirAll(filepath.Dir(dstPath), constant.DirPerm); err != nil {
 		return err
@@ -647,8 +654,10 @@ func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) (retErr e
 	if _, err := io.Copy(dstFile, srcFile); err != nil {
 		return err
 	}
-	if err := applyDecompressOwnership(srcPath, dstPath); err != nil {
-		return err
+	if !keepExistingFile {
+		if err := applyDecompressOwnership(srcPath, dstPath); err != nil {
+			return err
+		}
 	}
 	return os.Chtimes(dstPath, info.ModTime(), info.ModTime())
 }
