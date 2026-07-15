@@ -5312,6 +5312,8 @@ const message = {
         },
         tamper: {
             tamper: 'Proteção contra adulteração do site',
+            tamperCreateHint:
+                'O diretório atual pode ser afetado pela proteção contra alterações ou por atributos de arquivo, causando falha na criação.',
             ignoreTemplate: 'Modelo de Exclusão',
             protectTemplate: 'Modelo de Proteção',
             ignoreTemplateHelper:

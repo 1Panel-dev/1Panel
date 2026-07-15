@@ -5035,6 +5035,8 @@ const message = {
         },
         tamper: {
             tamper: 'محافظت در برابر دستکاری وب‌سایت',
+            tamperCreateHint:
+                'دایرکتوری فعلی ممکن است تحت تأثیر محافظت در برابر دستکاری یا ویژگی‌های فایل باشد و ایجاد با خطا مواجه شود.',
             ignoreTemplate: 'الگوی حذف',
             protectTemplate: 'الگوی محافظت',
             ignoreTemplateHelper:

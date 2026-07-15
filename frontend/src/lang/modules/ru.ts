@@ -5158,6 +5158,8 @@ const message = {
         },
         tamper: {
             tamper: 'Защита от подделки сайта',
+            tamperCreateHint:
+                'Текущий каталог может быть затронут защитой от изменений или атрибутами файла, что приведет к ошибке создания.',
             ignoreTemplate: 'Шаблон Исключения',
             protectTemplate: 'Шаблон Защиты',
             ignoreTemplateHelper:

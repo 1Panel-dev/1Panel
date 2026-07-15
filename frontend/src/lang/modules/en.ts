@@ -5087,6 +5087,8 @@ const message = {
         },
         tamper: {
             tamper: 'Website Tamper Protection',
+            tamperCreateHint:
+                'The current directory may be affected by tamper protection or file attributes, causing creation to fail.',
             ignoreTemplate: 'Exclusion Template',
             protectTemplate: 'Protection Template',
             ignoreTemplateHelper:

@@ -5155,6 +5155,8 @@ const message = {
         },
         tamper: {
             tamper: 'Web Sitesi Değiştirme Koruması',
+            tamperCreateHint:
+                'Geçerli dizin kurcalama korumasından veya dosya özniteliklerinden etkilenerek oluşturma işleminin başarısız olmasına neden olabilir.',
             ignoreTemplate: 'Hariç Tutma Şablonu',
             protectTemplate: 'Koruma Şablonu',
             ignoreTemplateHelper:

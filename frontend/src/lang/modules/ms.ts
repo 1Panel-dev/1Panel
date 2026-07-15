@@ -5166,6 +5166,8 @@ const message = {
         },
         tamper: {
             tamper: 'Perlindungan laman web',
+            tamperCreateHint:
+                'Direktori semasa mungkin dipengaruhi oleh perlindungan gangguan atau atribut fail, menyebabkan penciptaan gagal.',
             ignoreTemplate: 'Templat Pengecualian',
             protectTemplate: 'Templat Perlindungan',
             ignoreTemplateHelper:

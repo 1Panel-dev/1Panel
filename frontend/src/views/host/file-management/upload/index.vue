@@ -7,6 +7,13 @@
         :confirmBeforeClose="true"
     >
         <template #content>
+            <el-alert
+                v-if="isAppendOnly"
+                class="mb-4"
+                type="warning"
+                :title="$t('xpack.tamper.tamperCreateHint')"
+                :closable="false"
+            />
             <div class="upload-button flex flex-wrap justify-between items-center gap-4 pb-4 md:flex-nowrap">
                 <div class="flex flex-wrap gap-4">
                     <el-button type="primary" @click="upload('file')">
@@ -119,6 +126,7 @@ import ExistFileDialog from '@/components/exist-file/index.vue';
 
 interface UploadFileProps {
     path: string;
+    isAppendOnly?: boolean;
 }
 
 const uploadRef = ref<UploadInstance>();
@@ -136,6 +144,7 @@ const uploadOverallPercent = computed(() => {
     return Math.min(100, Math.round(raw));
 });
 const open = ref(false);
+const isAppendOnly = ref(false);
 const path = ref();
 let uploadHelper = ref('');
 const dialogExistFileRef = ref();
@@ -463,6 +472,7 @@ const getFilenameFromPath = (path: string) => {
 
 const acceptParams = (props: UploadFileProps) => {
     path.value = props.path;
+    isAppendOnly.value = Boolean(props.isAppendOnly);
     open.value = true;
     uploadPercent.value = 0;
     uploadTotalCount.value = 0;
