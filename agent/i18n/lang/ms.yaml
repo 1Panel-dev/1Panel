@@ -1,10 +1,17 @@
 # ralat asas
 ErrInvalidParams: 'Permintaan tidak sah: {{ .detail }}'
+ErrMcpGatewayArgsParse: 'Format argumen tersuai MCP tidak sah'
+ErrMcpGatewayArgsConflict: 'Argumen {{ .name }} diurus oleh 1Panel dan tidak boleh ditetapkan dalam argumen tersuai'
 ErrTokenParse: 'Token tidak sah: {{ .detail }}'
 ErrInitialPassword: 'Kata laluan asal salah'
 ErrInternalServer: 'Ralat pelayan: {{ .detail }}'
 ErrRecordExist: 'Rekod sudah wujud'
 ErrRecordNotFound: 'Rekod tidak ditemui'
+WafLogExport: 'Eksport log WAF'
+MonitorLogExport: 'Eksport log pemantauan laman web'
+LogExportNoData: 'Tiada log yang sepadan dengan penapis dipilih'
+LogExportDiskSpace: 'Ruang tersedia kurang daripada 1 GiB; eksport dihentikan'
+LogExportRetentionInvalid: 'Tempoh simpanan rekod eksport mestilah antara 1 hingga 30 hari'
 ErrStructTransform: 'Ralat penukaran: {{ .err }}'
 ErrNotSupportType: 'Jenis tidak disokong: {{ .name }}'
 

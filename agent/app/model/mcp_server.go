@@ -20,4 +20,5 @@ type McpServer struct {
 	Type               string `json:"type"`
 	GatewayImage       string `json:"gatewayImage"`
 	ProtocolVersion    string `json:"protocolVersion"`
+	GatewayArgs        string `json:"gatewayArgs"`
 }

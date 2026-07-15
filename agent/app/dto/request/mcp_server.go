@@ -23,6 +23,7 @@ type McpServerCreate struct {
 	Type               string        `json:"type" validate:"required"`
 	GatewayImage       string        `json:"gatewayImage"`
 	ProtocolVersion    string        `json:"protocolVersion"`
+	GatewayArgs        string        `json:"gatewayArgs" validate:"max=4096"`
 	TaskID             string        `json:"taskID"`
 }
 

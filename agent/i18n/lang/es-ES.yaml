@@ -1,10 +1,17 @@
 # errores básicos
 ErrInvalidParams: 'Solicitud inválida: {{ .detail }}'
+ErrMcpGatewayArgsParse: 'Formato de argumentos personalizados de MCP no válido'
+ErrMcpGatewayArgsConflict: 'El argumento {{ .name }} está gestionado por 1Panel y no puede definirse en los argumentos personalizados'
 ErrTokenParse: 'Token inválido: {{ .detail }}'
 ErrInitialPassword: 'Contraseña original incorrecta'
 ErrInternalServer: 'Error interno: {{ .detail }}'
 ErrRecordExist: 'Registro ya existe'
 ErrRecordNotFound: 'Registro no encontrado'
+WafLogExport: 'Exportación de registros WAF'
+MonitorLogExport: 'Exportación de registros de monitorización web'
+LogExportNoData: 'Ningún registro coincide con los filtros seleccionados'
+LogExportDiskSpace: 'Hay menos de 1 GiB disponible; la exportación se detuvo'
+LogExportRetentionInvalid: 'La retención del historial de exportación debe ser de 1 a 30 días'
 ErrStructTransform: 'Error de conversión: {{ .err }}'
 ErrNotSupportType: 'Tipo no soportado: {{ .name }}'
 

@@ -1,10 +1,17 @@
 # base errors
 ErrInvalidParams: 'Bad request: {{ .detail }}'
+ErrMcpGatewayArgsParse: 'Invalid MCP custom argument format'
+ErrMcpGatewayArgsConflict: 'Argument {{ .name }} is managed by 1Panel and cannot be set in custom arguments'
 ErrTokenParse: 'Token error: {{ .detail }}'
 ErrInitialPassword: 'Original password is incorrect'
 ErrInternalServer: 'Internal server error: {{ .detail }}'
 ErrRecordExist: 'Record already exists'
 ErrRecordNotFound: 'Record not found'
+WafLogExport: 'WAF log export'
+MonitorLogExport: 'Website monitoring log export'
+LogExportNoData: 'No logs match the selected filters'
+LogExportDiskSpace: 'Less than 1 GiB of disk space is available; the export was stopped'
+LogExportRetentionInvalid: 'Export record retention must be between 1 and 30 days'
 ErrStructTransform: 'Type conversion failed: {{ .err }}'
 ErrNotSupportType: 'Unsupported type: {{ .name }}'
 

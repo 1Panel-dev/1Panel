@@ -32,6 +32,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"github.com/docker/docker/api/types/container"
+	"github.com/mattn/go-shellwords"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
 )
@@ -127,6 +128,7 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 	mcpServer.Type = req.Type
 	mcpServer.GatewayImage = req.GatewayImage
 	mcpServer.ProtocolVersion = req.ProtocolVersion
+	mcpServer.GatewayArgs = req.GatewayArgs
 	normalizeMcpServerGateway(mcpServer)
 	if req.OutputTransport == mcpOutputTransportSSE {
 		mcpServer.SsePath = req.SsePath
@@ -191,6 +193,7 @@ func (m McpServerService) Create(create request.McpServerCreate) error {
 		Type:            create.Type,
 		GatewayImage:    create.GatewayImage,
 		ProtocolVersion: create.ProtocolVersion,
+		GatewayArgs:     create.GatewayArgs,
 	}
 	normalizeMcpServerGateway(mcpServer)
 	if create.OutputTransport == mcpOutputTransportSSE {
@@ -738,7 +741,52 @@ func normalizeMcpServerGateway(mcpServer *model.McpServer) {
 	}
 }
 
-func buildSupergatewayCommand(mcpServer *model.McpServer) []string {
+var managedMcpGatewayArgs = map[string]struct{}{
+	"--":                 {},
+	"stdio":              {},
+	"sse":                {},
+	"streamablehttp":     {},
+	"outputtransport":    {},
+	"port":               {},
+	"baseurl":            {},
+	"ssepath":            {},
+	"messagepath":        {},
+	"streamablehttppath": {},
+	"protocolversion":    {},
+}
+
+func normalizeMcpGatewayArgName(name string) string {
+	if name == "--" || !strings.HasPrefix(name, "--") {
+		return name
+	}
+	name = strings.TrimPrefix(name, "--")
+	name = strings.TrimPrefix(name, "no-")
+	name = strings.SplitN(name, ".", 2)[0]
+	return strings.ToLower(strings.ReplaceAll(name, "-", ""))
+}
+
+func parseMcpGatewayArgs(raw string) ([]string, error) {
+	if strings.TrimSpace(raw) == "" {
+		return nil, nil
+	}
+	parser := shellwords.NewParser()
+	args, err := parser.Parse(raw)
+	if err != nil {
+		return nil, buserr.New("ErrMcpGatewayArgsParse")
+	}
+	if parser.Position >= 0 {
+		return nil, buserr.New("ErrMcpGatewayArgsParse")
+	}
+	for _, arg := range args {
+		name := strings.SplitN(arg, "=", 2)[0]
+		if _, ok := managedMcpGatewayArgs[normalizeMcpGatewayArgName(name)]; ok {
+			return nil, buserr.WithName("ErrMcpGatewayArgsConflict", name)
+		}
+	}
+	return args, nil
+}
+
+func buildSupergatewayCommand(mcpServer *model.McpServer) ([]string, error) {
 	normalizeMcpServerGateway(mcpServer)
 	command := []string{
 		"--stdio", mcpServer.Command,
@@ -746,14 +794,22 @@ func buildSupergatewayCommand(mcpServer *model.McpServer) []string {
 		"--port", strconv.Itoa(mcpServer.Port),
 	}
 	if mcpServer.OutputTransport == mcpOutputTransportSSE {
-		return append(command,
+		command = append(command,
 			"--baseUrl", mcpServer.BaseURL,
 			"--ssePath", mcpServer.SsePath,
 			"--messagePath", fmt.Sprintf("%s/messages", mcpServer.SsePath),
 		)
+	} else {
+		command = append(command,
+			"--streamableHttpPath", mcpServer.StreamableHttpPath,
+			"--protocolVersion", mcpServer.ProtocolVersion,
+		)
 	}
-	command = append(command, "--streamableHttpPath", mcpServer.StreamableHttpPath)
-	return append(command, "--protocolVersion", mcpServer.ProtocolVersion)
+	gatewayArgs, err := parseMcpGatewayArgs(mcpServer.GatewayArgs)
+	if err != nil {
+		return nil, err
+	}
+	return append(command, gatewayArgs...), nil
 }
 
 func buildMcpEndpoint(mcpServer *model.McpServer) string {
@@ -852,7 +908,11 @@ func handleCreateParams(mcpServer *model.McpServer, environments []request.Envir
 		delete(services, serviceName)
 	}
 	normalizeMcpServerGateway(mcpServer)
-	serviceValue["command"] = buildSupergatewayCommand(mcpServer)
+	command, err := buildSupergatewayCommand(mcpServer)
+	if err != nil {
+		return err
+	}
+	serviceValue["command"] = command
 	serviceValue["image"] = mcpServer.GatewayImage
 	serviceValue["ports"] = []string{
 		formatComposePortMapping("HOST_IP", "PANEL_APP_PORT_HTTP", "PANEL_APP_PORT_HTTP", ""),

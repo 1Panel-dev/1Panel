@@ -1,10 +1,17 @@
 # 基礎錯誤
 ErrInvalidParams: '請求參數錯誤: {{ .detail }}'
+ErrMcpGatewayArgsParse: 'MCP 自訂參數格式錯誤'
+ErrMcpGatewayArgsConflict: '參數 {{ .name }} 由 1Panel 管理，不能在自訂參數中設定'
 ErrTokenParse: 'Token 產生錯誤: {{ .detail }}'
 ErrInitialPassword: '原密碼錯誤'
 ErrInternalServer: '服務內部錯誤: {{ .detail }}'
 ErrRecordExist: '記錄已存在'
 ErrRecordNotFound: '記錄未能找到'
+WafLogExport: 'WAF 日誌匯出'
+MonitorLogExport: '網站監控日誌匯出'
+LogExportNoData: '沒有符合條件的日誌'
+LogExportDiskSpace: '可用磁碟空間不足 1 GiB，匯出任務已停止'
+LogExportRetentionInvalid: '匯出記錄保留天數必須介於 1 到 30 天之間'
 ErrStructTransform: '型別轉換失敗: {{ .err }}'
 ErrNotSupportType: '系統暫不支援目前類型: {{ .name }}'
 

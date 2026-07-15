@@ -1,10 +1,17 @@
 # базовые ошибки
 ErrInvalidParams: 'Неверный запрос: {{ .detail }}'
+ErrMcpGatewayArgsParse: 'Неверный формат пользовательских аргументов MCP'
+ErrMcpGatewayArgsConflict: 'Аргумент {{ .name }} управляется 1Panel и не может быть задан в пользовательских аргументах'
 ErrTokenParse: 'Ошибка токена: {{ .detail }}'
 ErrInitialPassword: 'Исходный пароль неверен'
 ErrInternalServer: 'Внутренняя ошибка: {{ .detail }}'
 ErrRecordExist: 'Запись уже существует'
 ErrRecordNotFound: 'Запись не найдена'
+WafLogExport: 'Экспорт журналов WAF'
+MonitorLogExport: 'Экспорт журналов мониторинга веб-сайтов'
+LogExportNoData: 'Нет журналов, соответствующих выбранным фильтрам'
+LogExportDiskSpace: 'Доступно менее 1 GiB; экспорт остановлен'
+LogExportRetentionInvalid: 'Срок хранения истории экспорта должен быть от 1 до 30 дней'
 ErrStructTransform: 'Ошибка преобразования: {{ .err }}'
 ErrNotSupportType: 'Тип не поддерживается: {{ .name }}'
 
