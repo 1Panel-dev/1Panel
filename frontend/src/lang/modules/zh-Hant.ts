@@ -5424,6 +5424,8 @@ const message = {
             snapshotSize: '佔用',
             currentSnapshot: '目前',
             snapshotEmpty: '暫無快照',
+            snapshotHelper:
+                '快照會將虛擬機目前狀態儲存為還原點，後續資料變更會記錄在差異檔案中，不會影響原始磁碟。還原快照時，虛擬機會回到該時間點狀態。',
             snapshotRecoverConfirm: '確認將虛擬機 [{1}] 恢復到快照 [{0}]？恢復後虛擬機磁碟會回到該快照狀態。',
             interface: '網路介面',
             device: '裝置',

@@ -33211,6 +33211,9 @@ const docTemplate = `{
 				"procs": {
 					"type": "integer"
 				},
+				"runningTime": {
+					"$ref": "#/definitions/dto.RunningTime"
+				},
 				"shotTime": {
 					"type": "string"
 				},
@@ -34764,6 +34767,9 @@ const docTemplate = `{
 					"type": "boolean"
 				},
 				"language": {
+					"type": "string"
+				},
+				"menuAccordion": {
 					"type": "string"
 				},
 				"menuTabs": {
@@ -37020,6 +37026,23 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.RunningTime": {
+			"properties": {
+				"days": {
+					"type": "integer"
+				},
+				"hours": {
+					"type": "integer"
+				},
+				"minutes": {
+					"type": "integer"
+				},
+				"seconds": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
 		"dto.SSHConfUpdate": {
 			"properties": {
 				"key": {
@@ -37553,6 +37576,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"language": {
+					"type": "string"
+				},
+				"menuAccordion": {
 					"type": "string"
 				},
 				"menuTabs": {

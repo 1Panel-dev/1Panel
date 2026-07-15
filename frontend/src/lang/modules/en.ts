@@ -5301,6 +5301,13 @@ const message = {
             nodeUpgradePackageCleanHelper: 'All lower-version update packages will be cleaned. Continue?',
             nodeUpgradeOfflinePackageHelper:
                 'In offline environments, nodes with different architectures must upload the matching update package before updating.',
+            healthCheck: 'Health Check',
+            healthCheckFrequency: 'Check Frequency',
+            healthCheckFrequencyHelper: 'Periodically checks backend node health. Enter 0 to disable checks.',
+            healthCheckFrequencyLimit: 'The check frequency cannot exceed one day and must be a non-negative integer.',
+            loadFailedNodeResources: 'Load failed node resources',
+            loadFailedNodeResourcesHelper:
+                'When opening the node list, also load resource information for failed nodes.',
             nodeUnhealthy: 'Node status abnormal',
             deletedNode: 'Deleted node {0} does not currently support upgrade operations!',
             nodeUnhealthyHelper: 'Abnormal node status detected. Please check in [Node Management] and try again!',
@@ -5820,6 +5827,8 @@ const message = {
             snapshotSize: 'Usage',
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
+            snapshotHelper:
+                'A snapshot saves the current VM state as a restore point. Subsequent data changes are recorded in a delta file without changing the original disk. Restoring a snapshot returns the VM to that point in time.',
             snapshotOperationHelper:
                 'The current snapshot cannot be deleted. Snapshots can be recovered only when the virtual machine is shut off.',
             snapshotRecoverConfirm:

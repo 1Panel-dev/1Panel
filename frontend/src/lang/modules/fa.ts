@@ -5772,6 +5772,8 @@ const message = {
             snapshotSize: 'فضای مصرف‌شده',
             currentSnapshot: 'فعلی',
             snapshotEmpty: 'اسنپ‌شاتی وجود ندارد',
+            snapshotHelper:
+                'A snapshot saves the current VM state as a restore point. Subsequent data changes are recorded in a delta file without changing the original disk. Restoring a snapshot returns the VM to that point in time.',
             snapshotRecoverConfirm:
                 'ماشین مجازی [{1}] به اسنپ‌شات [{0}] بازیابی شود؟ پس از بازیابی، دیسک ماشین مجازی به وضعیت آن اسنپ‌شات برمی‌گردد.',
             interface: 'رابط شبکه',
