@@ -59,6 +59,7 @@ func (u *BackupService) RedisBackup(req dto.CommonBackup) error {
 	}
 
 	if err := handleRedisBackup(redisInfo, nil, record.ID, backupDir, fileName, req.Secret, req.TaskID); err != nil {
+		markBackupFailed(record.ID, err)
 		return err
 	}
 	return nil
@@ -129,7 +130,7 @@ func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, recordID
 	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskBackup"), backupDatabase, nil, 3, time.Hour)
 	go func() {
 		if err := itemTask.Execute(); err != nil {
-			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			markBackupFailed(recordID, err)
 			return
 		}
 		backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusSuccess})

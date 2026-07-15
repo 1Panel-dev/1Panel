@@ -60,7 +60,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 
 			src := path.Join(backupDir, record.FileName)
 			dst := strings.TrimPrefix(src, global.Dir.LocalBackupDir+"/tmp/")
-			if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes); err != nil {
+			if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes, true); err != nil {
 				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
 					retry++
 					return err
@@ -119,7 +119,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 
 			src := path.Join(backupDir, record.FileName)
 			dst := strings.TrimPrefix(src, global.Dir.LocalBackupDir+"/tmp/")
-			if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes); err != nil {
+			if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes, true); err != nil {
 				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
 					retry++
 					return err
@@ -216,7 +216,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 
 			src := path.Join(backupDir, record.FileName)
 			dst := strings.TrimPrefix(src, global.Dir.LocalBackupDir+"/tmp/")
-			if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes); err != nil {
+			if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes, true); err != nil {
 				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
 					retry++
 					return err
@@ -274,7 +274,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 
 		src := path.Join(backupDir, fileName)
 		dst := strings.TrimPrefix(src, global.Dir.LocalBackupDir+"/tmp/")
-		if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes); err != nil {
+		if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes, true); err != nil {
 			return err
 		}
 		record.FileDir = path.Dir(dst)
@@ -310,7 +310,7 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 
 		src := path.Join(path.Dir(backupDir), fileName)
 		dst := strings.TrimPrefix(src, global.Dir.LocalBackupDir+"/tmp/")
-		if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes); err != nil {
+		if err := uploadWithMap(*task, accountMap, src, dst, cronjob.SourceAccountIDs, cronjob.DownloadAccountID, cronjob.RetryTimes, true); err != nil {
 			return err
 		}
 		record.FileDir = path.Dir(dst)

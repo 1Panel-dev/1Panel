@@ -106,7 +106,7 @@ func (u *BackupService) ContainerBackup(req dto.CommonBackup) error {
 		return err
 	}
 	if err := handleContainerBackup(req.Name, nil, record.ID, backupDir, fileName, req.TaskID, req.Secret, req.StopBefore); err != nil {
-		backupRepo.UpdateRecordByMap(record.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+		markBackupFailed(record.ID, err)
 		return err
 	}
 	return nil
@@ -158,7 +158,7 @@ func handleContainerBackup(containerName string, parentTask *task.Task, recordID
 	go func() {
 		defer backupCtx.close()
 		if err := backupTask.Execute(); err != nil {
-			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			markBackupFailed(recordID, err)
 			return
 		}
 		backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusSuccess})
