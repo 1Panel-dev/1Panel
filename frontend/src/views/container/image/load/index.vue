@@ -2,7 +2,7 @@
     <DrawerPro v-model="loadVisible" :header="$t('container.importImage')" @close="handleClose" size="small">
         <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-form-item :label="$t('container.path')" :rules="Rules.requiredInput" prop="path">
-                <el-input v-model="form.path">
+                <el-input v-model="form.path" @input="handlePathChange">
                     <template #prepend>
                         <el-button icon="Folder" @click="fileRef.acceptParams({ dir: false, multiple: true })" />
                     </template>
@@ -14,7 +14,11 @@
                 <el-button :disabled="loading" @click="loadVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                <el-button
+                    :disabled="loading || !form.path.trim() || form.paths.length === 0"
+                    type="primary"
+                    @click="onSubmit(formRef)"
+                >
                     {{ $t('commons.button.import') }}
                 </el-button>
             </span>
@@ -60,7 +64,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
+    if (!formEl || !form.path.trim() || form.paths.length === 0) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
@@ -83,9 +87,15 @@ const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
 };
 
+const handlePathChange = () => {
+    if (!form.path.trim()) {
+        form.paths = [];
+    }
+};
+
 const loadLoadDir = async (paths: string | string[]) => {
     const newPaths = Array.isArray(paths) ? paths : [paths];
-    form.paths = [...new Set([...form.paths, ...newPaths])];
+    form.paths = [...new Set(newPaths)];
     form.path = form.paths.join('; ');
 };
 
