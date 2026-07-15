@@ -92,31 +92,33 @@ var binaryPreviewExtensions = map[string]struct{}{
 }
 
 type FileInfo struct {
-	Fs         afero.Fs    `json:"-"`
-	Path       string      `json:"path"`
-	Name       string      `json:"name"`
-	User       string      `json:"user"`
-	Group      string      `json:"group"`
-	Uid        string      `json:"uid"`
-	Gid        string      `json:"gid"`
-	Extension  string      `json:"extension"`
-	Content    string      `json:"content"`
-	Size       int64       `json:"size"`
-	IsDir      bool        `json:"isDir"`
-	IsSymlink  bool        `json:"isSymlink"`
-	IsHidden   bool        `json:"isHidden"`
-	LinkPath   string      `json:"linkPath"`
-	Type       string      `json:"type"`
-	Mode       string      `json:"mode"`
-	MimeType   string      `json:"mimeType"`
-	UpdateTime time.Time   `json:"updateTime"`
-	ModTime    time.Time   `json:"modTime"`
-	FileMode   os.FileMode `json:"-"`
-	Items      []*FileInfo `json:"items"`
-	ItemTotal  int         `json:"itemTotal"`
-	FavoriteID uint        `json:"favoriteID"`
-	ShareCode  string      `json:"shareCode"`
-	IsDetail   bool        `json:"isDetail"`
+	Fs           afero.Fs    `json:"-"`
+	Path         string      `json:"path"`
+	Name         string      `json:"name"`
+	User         string      `json:"user"`
+	Group        string      `json:"group"`
+	Uid          string      `json:"uid"`
+	Gid          string      `json:"gid"`
+	Extension    string      `json:"extension"`
+	Content      string      `json:"content"`
+	Size         int64       `json:"size"`
+	IsDir        bool        `json:"isDir"`
+	IsSymlink    bool        `json:"isSymlink"`
+	IsHidden     bool        `json:"isHidden"`
+	LinkPath     string      `json:"linkPath"`
+	Type         string      `json:"type"`
+	Mode         string      `json:"mode"`
+	MimeType     string      `json:"mimeType"`
+	UpdateTime   time.Time   `json:"updateTime"`
+	ModTime      time.Time   `json:"modTime"`
+	FileMode     os.FileMode `json:"-"`
+	Items        []*FileInfo `json:"items"`
+	ItemTotal    int         `json:"itemTotal"`
+	FavoriteID   uint        `json:"favoriteID"`
+	ShareCode    string      `json:"shareCode"`
+	IsDetail     bool        `json:"isDetail"`
+	IsAppendOnly bool        `json:"isAppendOnly"`
+	IsImmutable  bool        `json:"isImmutable"`
 }
 
 type FileOption struct {
@@ -173,6 +175,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	if favorite.ID > 0 {
 		file.FavoriteID = favorite.ID
 	}
+	file.IsAppendOnly, file.IsImmutable = getFileAttributes(op.Path)
 
 	if file.IsSymlink {
 		linkPath := GetSymlink(op.Path)
@@ -202,6 +205,18 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		}
 	}
 	return file, nil
+}
+
+func getFileAttributes(filePath string) (bool, bool) {
+	output, err := exec.Command("lsattr", "-d", "--", filePath).Output()
+	if err != nil {
+		return false, false
+	}
+	fields := strings.Fields(string(output))
+	if len(fields) == 0 {
+		return false, false
+	}
+	return strings.Contains(fields[0], "a"), strings.Contains(fields[0], "i")
 }
 
 func handleExpansion(file *FileInfo, op FileOption) error {

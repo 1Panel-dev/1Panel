@@ -4969,6 +4969,7 @@ const message = {
         },
         tamper: {
             tamper: '웹사이트 변조 방지',
+            tamperCreateHint: '현재 디렉터리는 변조 방지 또는 파일 속성의 영향을 받아 생성에 실패할 수 있습니다.',
             ignoreTemplate: '제외 템플릿',
             protectTemplate: '보호 템플릿',
             ignoreTemplateHelper:

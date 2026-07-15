@@ -25,6 +25,8 @@ export namespace File {
         favoriteID: number;
         shareCode: string;
         remark?: string;
+        isAppendOnly: boolean;
+        isImmutable: boolean;
     }
 
     export interface ReqFile extends ReqPage {
@@ -117,6 +119,7 @@ export namespace File {
         linkPath?: boolean;
         sub?: boolean;
         name?: string;
+        isAppendOnly?: boolean;
     }
 
     export interface FileDelete {

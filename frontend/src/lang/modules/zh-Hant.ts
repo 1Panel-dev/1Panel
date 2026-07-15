@@ -4710,6 +4710,7 @@ const message = {
         },
         tamper: {
             tamper: '網站防篡改',
+            tamperCreateHint: '目前目錄可能受防篡改或檔案屬性限制影響，導致建立失敗。',
             ignoreTemplate: '排除範本',
             protectTemplate: '保護範本',
             ignoreTemplateHelper:

@@ -34,6 +34,13 @@
                 <span class="input-help">{{ $t('file.ignoreCertificateHelper') }}</span>
             </el-form-item>
         </el-form>
+        <el-alert
+            v-if="isAppendOnly"
+            class="mt-4"
+            type="warning"
+            :title="$t('xpack.tamper.tamperCreateHint')"
+            :closable="false"
+        />
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose()" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -57,10 +64,12 @@ import { MsgSuccess } from '@/utils/message';
 
 interface WgetProps {
     path: string;
+    isAppendOnly?: boolean;
 }
 
 const fileForm = ref<FormInstance>();
 const loading = ref(false);
+const isAppendOnly = ref(false);
 let open = ref(false);
 let submitData = ref(false);
 const fileRef = ref();
@@ -140,6 +149,7 @@ const getFileName = (url: string) => {
 
 const acceptParams = (props: WgetProps) => {
     addForm.path = props.path;
+    isAppendOnly.value = Boolean(props.isAppendOnly);
     open.value = true;
     submitData.value = false;
     addForm.ignoreCertificate = false;

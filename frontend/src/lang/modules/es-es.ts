@@ -5092,6 +5092,8 @@ const message = {
         },
         tamper: {
             tamper: 'Anti-manipulación web',
+            tamperCreateHint:
+                'El directorio actual puede verse afectado por la protección antimanipulación o los atributos de archivo, lo que provoca un error de creación.',
             ignoreTemplate: 'Plantilla de Exclusión',
             protectTemplate: 'Plantilla de Protección',
             ignoreTemplateHelper:

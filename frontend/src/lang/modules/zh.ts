@@ -4159,6 +4159,7 @@ const message = {
         },
         tamper: {
             tamper: '网站防篡改',
+            tamperCreateHint: '当前目录可能受防篡改或文件属性限制影响，导致创建失败。',
             ignoreTemplate: '排除模版',
             protectTemplate: '保护模版',
             ignoreTemplateHelper:

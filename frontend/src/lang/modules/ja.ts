@@ -5065,6 +5065,7 @@ const message = {
         },
         tamper: {
             tamper: 'ウェブサイトの改ざん防止',
+            tamperCreateHint: '現在のディレクトリは改ざん防止またはファイル属性の影響を受け、作成に失敗する可能性があります。',
             ignoreTemplate: '除外テンプレート',
             protectTemplate: '保護テンプレート',
             ignoreTemplateHelper:
