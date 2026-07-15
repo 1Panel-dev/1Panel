@@ -203,11 +203,37 @@ func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID, retry, t
 	}
 	if err := taskItem.Execute(); err != nil {
 		_ = snapshotRepo.Update(req.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error(), "interrupt_step": taskItem.Task.CurrentStep})
+		if jobID != 0 {
+			cleanupFailedCronjobSnapshot(req, rootDir)
+		}
 		return err
 	}
 	_ = snapshotRepo.Update(req.ID, map[string]interface{}{"status": constant.StatusSuccess, "interrupt_step": ""})
 	_ = os.RemoveAll(rootDir)
 	return nil
+}
+
+func cleanupFailedCronjobSnapshot(req dto.SnapshotCreate, rootDir string) {
+	if err := os.RemoveAll(rootDir); err != nil {
+		global.LOG.Errorf("remove failed cronjob snapshot directory %s failed, err: %v", rootDir, err)
+	}
+
+	fileName := path.Base(rootDir) + ".tar.gz"
+	filePath := path.Join("system_snapshot", fileName)
+	if err := os.Remove(path.Join(global.Dir.LocalBackupDir, "tmp/system", fileName)); err != nil && !os.IsNotExist(err) {
+		global.LOG.Errorf("remove failed cronjob snapshot file %s failed, err: %v", filePath, err)
+	}
+
+	accounts := NewBackupClientMap(strings.Split(req.SourceAccountIDs, ","))
+	for _, account := range accounts {
+		if !account.isOk {
+			global.LOG.Errorf("remove failed cronjob snapshot file %s from %s failed, err: %s", filePath, account.name, account.message)
+			continue
+		}
+		if _, err := account.client.Delete(path.Join(account.backupPath, filePath)); err != nil {
+			global.LOG.Errorf("remove failed cronjob snapshot file %s from %s failed, err: %v", filePath, account.name, err)
+		}
+	}
 }
 
 type snapHelper struct {
@@ -571,5 +597,5 @@ func snapUpload(snap snapHelper, accounts string, downloadID, retry uint, file s
 	if !accountMap[fmt.Sprintf("%d", downloadID)].isOk {
 		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", downloadID)].message))
 	}
-	return uploadWithMap(snap.Task, accountMap, src, dst, accounts, downloadID, retry)
+	return uploadWithMap(snap.Task, accountMap, src, dst, accounts, downloadID, retry, false)
 }

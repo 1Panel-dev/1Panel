@@ -65,7 +65,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 
 	if !req.IsImmediate {
 		if err = handleAppBackup(&install, nil, record.ID, backupDir, fileName, "", req.Secret, req.TaskID); err != nil {
-			backupRepo.UpdateRecordByMap(record.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			markBackupFailed(record.ID, err)
 			global.LOG.Errorf("backup app %s failed, err: %v", req.DetailName, err)
 			return nil, err
 		}
@@ -74,13 +74,13 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 
 	backupTask, err := task.NewTaskWithOps(install.Name, task.TaskBackup, task.TaskScopeBackup, req.TaskID, install.ID)
 	if err != nil {
-		backupRepo.UpdateRecordByMap(record.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+		markBackupFailed(record.ID, err)
 		record.Status = constant.StatusFailed
 		record.Message = err.Error()
 		return nil, err
 	}
 	if err = doAppBackup(&install, backupTask, backupDir, fileName, "", req.Secret); err != nil {
-		backupRepo.UpdateRecordByMap(record.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+		markBackupFailed(record.ID, err)
 		record.Status = constant.StatusFailed
 		record.Message = err.Error()
 		return nil, err
@@ -162,7 +162,7 @@ func handleAppBackup(install *model.AppInstall, parentTask *task.Task, recordID 
 	backupTask.AddSubTaskWithOps(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeBackup), func(t *task.Task) error { return itemHandler() }, nil, 3, time.Hour)
 	go func() {
 		if err := backupTask.Execute(); err != nil {
-			backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			markBackupFailed(recordID, err)
 			return
 		}
 		backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusSuccess})

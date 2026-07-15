@@ -463,7 +463,7 @@ func NewBackupClientMap(ids []string) map[string]backupClientHelper {
 	return clientMap
 }
 
-func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper, src, dst, accountIDs string, downloadAccountID, retry uint) error {
+func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper, src, dst, accountIDs string, downloadAccountID, retry uint, cleanOnFailure bool) error {
 	accounts := strings.Split(accountIDs, ",")
 	for _, account := range accounts {
 		if len(account) == 0 {
@@ -493,6 +493,9 @@ func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper,
 			taskItem.LogWithStatus(i18n.GetMsgByKey("Upload"), err)
 			if err != nil {
 				if account == fmt.Sprintf("%d", downloadAccountID) {
+					if cleanOnFailure {
+						cleanupCronjobBackupArtifacts(accountMap, src, dst)
+					}
 					return err
 				}
 			} else {
@@ -504,6 +507,60 @@ func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper,
 	}
 	os.RemoveAll(src)
 	return nil
+}
+
+func cleanupCronjobBackupArtifacts(accountMap map[string]backupClientHelper, src, dst string) {
+	if err := os.RemoveAll(src); err != nil {
+		global.LOG.Errorf("remove failed local cronjob backup file %s failed, err: %v", src, err)
+	}
+	for _, account := range accountMap {
+		if !account.isOk {
+			continue
+		}
+		if _, err := account.client.Delete(path.Join(account.backupPath, dst)); err != nil {
+			global.LOG.Errorf("remove failed cronjob backup file %s failed, err: %v", dst, err)
+		}
+	}
+}
+
+func markBackupFailed(recordID uint, backupErr error) {
+	_ = backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusFailed, "message": backupErr.Error()})
+
+	record, err := backupRepo.GetRecord(repo.WithByID(recordID))
+	if err != nil || record.ID == 0 {
+		global.LOG.Errorf("load failed backup record %d for cleanup failed, err: %v", recordID, err)
+		return
+	}
+
+	filePath := path.Join(record.FileDir, record.FileName)
+	if err := os.Remove(path.Join(global.Dir.LocalBackupDir, filePath)); err != nil && !os.IsNotExist(err) {
+		global.LOG.Errorf("remove failed local backup file %s failed, err: %v", filePath, err)
+	}
+
+	cleaned := make(map[string]struct{})
+	for _, accountID := range strings.Split(record.SourceAccountIDs, ",") {
+		if accountID == "" {
+			continue
+		}
+		if _, ok := cleaned[accountID]; ok {
+			continue
+		}
+		cleaned[accountID] = struct{}{}
+
+		id, err := strconv.Atoi(accountID)
+		if err != nil {
+			global.LOG.Errorf("parse backup account %s for failed backup cleanup failed, err: %v", accountID, err)
+			continue
+		}
+		account, storageClient, err := NewBackupClientWithID(uint(id))
+		if err != nil {
+			global.LOG.Errorf("new backup client for failed backup cleanup failed, err: %v", err)
+			continue
+		}
+		if _, err := storageClient.Delete(path.Join(account.BackupPath, filePath)); err != nil {
+			global.LOG.Errorf("remove failed backup file %s failed, err: %v", filePath, err)
+		}
+	}
 }
 
 func newClient(account *model.BackupAccount, isEncrypt bool) (cloud_storage.CloudStorageClient, error) {
