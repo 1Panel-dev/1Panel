@@ -42,7 +42,7 @@
                     </el-checkbox>
                 </el-form-item>
                 <el-form-item :label="$t('website.acmeAccountManage')" prop="acmeAccountID" v-if="req.enableSSL">
-                    <el-select v-model="req.acmeAccountID" :placeholder="$t('website.selectAcme')" @change="listSSL">
+                    <el-select v-model="req.acmeAccountID" :placeholder="$t('website.selectAcme')" @change="listSSLs">
                         <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
                         <el-option
                             v-for="(acme, index) in acmeAccounts"
