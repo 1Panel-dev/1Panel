@@ -5834,6 +5834,8 @@ const message = {
             snapshotSize: 'Uso',
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
+            snapshotHelper:
+                'A snapshot saves the current VM state as a restore point. Subsequent data changes are recorded in a delta file without changing the original disk. Restoring a snapshot returns the VM to that point in time.',
             snapshotRecoverConfirm:
                 'Recover virtual machine [{1}] to snapshot [{0}]? The VM disk will be restored to the snapshot state.',
             interface: 'Interfaz de red',

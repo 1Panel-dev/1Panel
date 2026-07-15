@@ -1283,12 +1283,63 @@
 		"formatZH": "操作 AI 网关服务 [operate]",
 		"formatEN": "operate AI proxy service [operate]"
 	},
+	"/core/enterprise/ai-proxy/settings/logs/clear": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "清空 AI 网关日志",
+		"formatEN": "clear AI proxy logs"
+	},
 	"/core/enterprise/ai-proxy/settings/update": {
 		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
 		"formatZH": "更新 AI 网关设置",
 		"formatEN": "update AI proxy settings"
+	},
+	"/core/enterprise/ai-proxy/smart-route/policy/update": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 AI 网关智能路由策略",
+		"formatEN": "update AI proxy smart route policy"
+	},
+	"/core/enterprise/ai-proxy/smart-route/samples/create": {
+		"bodyKeys": [
+			"type",
+			"label"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 AI 网关智能路由样本 [type] [label]",
+		"formatEN": "create AI proxy smart route sample [type] [label]"
+	},
+	"/core/enterprise/ai-proxy/smart-route/samples/delete": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 AI 网关智能路由样本 [id]",
+		"formatEN": "delete AI proxy smart route sample [id]"
+	},
+	"/core/enterprise/ai-proxy/smart-route/samples/rebuild": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "重建 AI 网关智能路由样本向量",
+		"formatEN": "rebuild AI proxy smart route sample vectors"
+	},
+	"/core/enterprise/ai-proxy/smart-route/samples/update": {
+		"bodyKeys": [
+			"id",
+			"type",
+			"label"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 AI 网关智能路由样本 [id] [type] [label]",
+		"formatEN": "update AI proxy smart route sample [id] [type] [label]"
 	},
 	"/core/enterprise/licenses/upload": {
 		"bodyKeys": [],
@@ -1596,6 +1647,13 @@
 		"formatZH": "删除虚拟机 [name]",
 		"formatEN": "delete VM [name]"
 	},
+	"/core/enterprise/vms/environment/enable": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "启用虚拟机运行环境",
+		"formatEN": "enable VM runtime environment"
+	},
 	"/core/enterprise/vms/iso": {
 		"bodyKeys": [
 			"name",
@@ -1689,6 +1747,13 @@
 		"beforeFunctions": [],
 		"formatZH": "操作虚拟机 [name] [operate]",
 		"formatEN": "operate VM [name] [operate]"
+	},
+	"/core/enterprise/vms/orphans/clean": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "清理虚拟机孤立数据",
+		"formatEN": "clean VM orphaned data"
 	},
 	"/core/enterprise/vms/rename": {
 		"bodyKeys": [
@@ -2238,6 +2303,16 @@
 		],
 		"formatZH": "修复节点 [name]",
 		"formatEN": "fix node [name]"
+	},
+	"/core/xpack/nodes/health/setting": {
+		"bodyKeys": [
+			"interval",
+			"loadFailedResources"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新节点健康检查设置",
+		"formatEN": "update node health check setting"
 	},
 	"/core/xpack/nodes/reinstall": {
 		"bodyKeys": [

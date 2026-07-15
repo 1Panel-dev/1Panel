@@ -33207,6 +33207,9 @@
 				"procs": {
 					"type": "integer"
 				},
+				"runningTime": {
+					"$ref": "#/definitions/dto.RunningTime"
+				},
 				"shotTime": {
 					"type": "string"
 				},
@@ -34760,6 +34763,9 @@
 					"type": "boolean"
 				},
 				"language": {
+					"type": "string"
+				},
+				"menuAccordion": {
 					"type": "string"
 				},
 				"menuTabs": {
@@ -37016,6 +37022,23 @@
 			],
 			"type": "object"
 		},
+		"dto.RunningTime": {
+			"properties": {
+				"days": {
+					"type": "integer"
+				},
+				"hours": {
+					"type": "integer"
+				},
+				"minutes": {
+					"type": "integer"
+				},
+				"seconds": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
 		"dto.SSHConfUpdate": {
 			"properties": {
 				"key": {
@@ -37549,6 +37572,9 @@
 					"type": "string"
 				},
 				"language": {
+					"type": "string"
+				},
+				"menuAccordion": {
 					"type": "string"
 				},
 				"menuTabs": {

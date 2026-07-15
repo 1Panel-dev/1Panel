@@ -5336,6 +5336,12 @@ const message = {
             nodeUpgradePackageCleanHelper: 'Tüm düşük sürüm güncelleme paketleri temizlenecek. Devam edilsin mi?',
             nodeUpgradeOfflinePackageHelper:
                 'Çevrimdışı ortamlarda, farklı mimarideki düğümler güncellenmeden önce eşleşen güncelleme paketi yüklenmelidir.',
+            healthCheck: 'Sağlık Kontrolü',
+            healthCheckFrequency: 'Kontrol Sıklığı',
+            healthCheckFrequencyHelper: 'Arka uç düğümlerinin sağlığını düzenli olarak kontrol eder. Kontrolü kapatmak için 0 girin.',
+            healthCheckFrequencyLimit: 'Kontrol sıklığı bir günü aşamaz ve negatif olmayan bir tam sayı olmalıdır.',
+            loadFailedNodeResources: 'Başarısız düğüm kaynaklarını sorgula',
+            loadFailedNodeResourcesHelper: 'Düğüm listesi açıldığında başarısız düğümlerin kaynak bilgilerini de sorgular.',
             nodeUnhealthy: 'Düğüm durumu anormal',
             deletedNode: 'Silinmiş düğüm {0} şu anda yükseltme işlemlerini desteklemiyor!',
             nodeUnhealthyHelper:
@@ -5863,6 +5869,8 @@ const message = {
             snapshotSize: 'Kullanım',
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
+            snapshotHelper:
+                'A snapshot saves the current VM state as a restore point. Subsequent data changes are recorded in a delta file without changing the original disk. Restoring a snapshot returns the VM to that point in time.',
             snapshotRecoverConfirm:
                 'Recover virtual machine [{1}] to snapshot [{0}]? The VM disk will be restored to the snapshot state.',
             interface: 'Ağ Arayüzü',
