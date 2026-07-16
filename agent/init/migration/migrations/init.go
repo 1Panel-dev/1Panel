@@ -49,6 +49,7 @@ var AddTable = &gormigrate.Migration{
 			&model.Cronjob{},
 			&model.Database{},
 			&model.DatabaseMysql{},
+			&model.DatabaseUser{},
 			&model.DatabaseMongodb{},
 			&model.DatabasePostgresql{},
 			&model.Favorite{},
@@ -1461,6 +1462,106 @@ var AddFileHistoryTable = &gormigrate.Migration{
 			}
 		}
 		return nil
+	},
+}
+
+func loadDatabaseUserTypesForMigration(tx *gorm.DB, mysqlName string) []string {
+	var database model.Database
+	if err := tx.Where("name = ?", mysqlName).First(&database).Error; err == nil && len(database.Type) != 0 {
+		return []string{database.Type}
+	}
+
+	var appKey string
+	_ = tx.Table("app_installs").
+		Select("apps.`key`").
+		Joins("JOIN apps ON apps.id = app_installs.app_id").
+		Where("app_installs.name = ?", mysqlName).
+		Scan(&appKey).Error
+	switch appKey {
+	case constant.AppMariaDB, constant.AppMysqlCluster:
+		return []string{appKey}
+	case constant.AppMysql:
+		return []string{constant.AppMysql}
+	default:
+		return []string{constant.AppMysql, constant.AppMariaDB}
+	}
+}
+
+func normalizeDatabaseUserHostsForMigration(permission string) []string {
+	hostSet := make(map[string]struct{})
+	for _, host := range strings.Split(permission, ",") {
+		host = strings.TrimSpace(host)
+		if len(host) == 0 {
+			continue
+		}
+		hostSet[host] = struct{}{}
+	}
+	if len(hostSet) == 0 {
+		return []string{"%"}
+	}
+	hosts := make([]string, 0, len(hostSet))
+	for host := range hostSet {
+		hosts = append(hosts, host)
+	}
+	return hosts
+}
+
+func isDatabaseSystemUserForMigration(username string) bool {
+	switch strings.ToLower(username) {
+	case "root",
+		"mysql.session", "mysql.sys", "mysql.infoschema", "mysqlxsys",
+		"mariadb.sys", "mariadb-sys",
+		"debian-sys-maint":
+		return true
+	default:
+		return false
+	}
+}
+
+func migrateDatabaseUsers(tx *gorm.DB) error {
+	var mysqls []model.DatabaseMysql
+	if err := tx.Find(&mysqls).Error; err != nil {
+		return err
+	}
+	for _, item := range mysqls {
+		if len(item.Username) == 0 || len(item.Password) == 0 || isDatabaseSystemUserForMigration(item.Username) {
+			continue
+		}
+		for _, dbType := range loadDatabaseUserTypesForMigration(tx, item.MysqlName) {
+			if len(dbType) == 0 {
+				continue
+			}
+			for _, host := range normalizeDatabaseUserHostsForMigration(item.Permission) {
+				var old model.DatabaseUser
+				err := tx.Where("`type` = ? AND database = ? AND username = ? AND host = ?", dbType, item.MysqlName, item.Username, host).First(&old).Error
+				if err == nil {
+					continue
+				}
+				if !errors.Is(err, gorm.ErrRecordNotFound) {
+					return err
+				}
+				if err := tx.Create(&model.DatabaseUser{
+					Type:     dbType,
+					Database: item.MysqlName,
+					Username: item.Username,
+					Host:     host,
+					Password: item.Password,
+				}).Error; err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+var AddDatabaseUserTable = &gormigrate.Migration{
+	ID: "20260703-add-database-user-table",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.DatabaseUser{}); err != nil {
+			return err
+		}
+		return migrateDatabaseUsers(tx)
 	},
 }
 

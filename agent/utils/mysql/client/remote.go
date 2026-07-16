@@ -44,6 +44,21 @@ func NewRemote(db Remote) *Remote {
 }
 
 func (r *Remote) Create(info CreateInfo) error {
+	if err := r.CreateDatabase(info); err != nil {
+		return err
+	}
+	if len(info.Username) == 0 {
+		return nil
+	}
+	if err := r.CreateUser(info, true); err != nil {
+		_ = r.ExecSQL(fmt.Sprintf("drop database if exists `%s`", info.Name), info.Timeout)
+		return err
+	}
+
+	return nil
+}
+
+func (r *Remote) CreateDatabase(info CreateInfo) error {
 	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", info.Name, info.Format, info.Collation)
 	if len(info.Collation) == 0 {
 		createSql = fmt.Sprintf("create database `%s` default character set %s", info.Name, info.Format)
@@ -54,31 +69,13 @@ func (r *Remote) Create(info CreateInfo) error {
 		}
 		return err
 	}
-
-	if err := r.CreateUser(info, true); err != nil {
-		_ = r.ExecSQL(fmt.Sprintf("drop database if exists `%s`", info.Name), info.Timeout)
-		return err
-	}
-
 	return nil
 }
 
 func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
-	var userlist []string
-	if strings.Contains(info.Permission, ",") {
-		ips := strings.Split(info.Permission, ",")
-		for _, ip := range ips {
-			if len(ip) != 0 {
-				userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.Username, ip))
-			}
-		}
-	} else {
-		userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.Username, info.Permission))
-	}
-
-	for _, user := range userlist {
-		if err := r.ExecSQL(fmt.Sprintf("create user %s identified by '%s';", user, info.Password), info.Timeout); err != nil {
-			if strings.Contains(strings.ToLower(err.Error()), "error 1396") {
+	for _, user := range userIdentities(info.Username, info.Permission) {
+		if err := r.ExecSQL(createUserSQL(user, info.Password), info.Timeout); err != nil {
+			if isUserExistsErr(err) {
 				return buserr.New("ErrUserIsExist")
 			}
 			if withDeleteDB {
@@ -92,16 +89,7 @@ func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
 			}
 			return err
 		}
-		grantStr := fmt.Sprintf("grant all privileges on `%s`.* to %s", info.Name, user)
-		if info.Name == "*" {
-			grantStr = fmt.Sprintf("grant all privileges on *.* to %s", user)
-		}
-		if strings.HasPrefix(info.Version, "5.7") || strings.HasPrefix(info.Version, "5.6") {
-			grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, info.Password)
-		} else {
-			grantStr = grantStr + " with grant option;"
-		}
-		if err := r.ExecSQL(grantStr, info.Timeout); err != nil {
+		if err := r.ExecSQL(createUserGrantSQL(info, user), info.Timeout); err != nil {
 			if withDeleteDB {
 				_ = r.Delete(DeleteInfo{
 					Name:        info.Name,
@@ -117,20 +105,92 @@ func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
 	return nil
 }
 
-func (r *Remote) Delete(info DeleteInfo) error {
-	var userlist []string
-	if strings.Contains(info.Permission, ",") {
-		ips := strings.Split(info.Permission, ",")
-		for _, ip := range ips {
-			if len(ip) != 0 {
-				userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.Username, ip))
-			}
+func (r *Remote) CreateUserOnly(info UserInfo, password string, timeout uint) error {
+	if err := r.ExecSQL(createUserSQL(userIdentity(info.Username, info.Host), password), timeout); err != nil {
+		if isUserExistsErr(err) {
+			return buserr.New("ErrUserIsExist")
 		}
-	} else {
-		userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.Username, info.Permission))
+		return err
 	}
+	return nil
+}
 
-	for _, user := range userlist {
+func (r *Remote) GrantUser(info GrantInfo, timeout uint) error {
+	return r.ExecSQL(grantUserSQL(info), timeout)
+}
+
+func (r *Remote) RevokeGrant(info GrantInfo, timeout uint) error {
+	if err := r.ExecSQL(revokeGrantSQL(info), timeout); err != nil {
+		return err
+	}
+	_ = r.ExecSQL(revokeGrantOptionSQL(info), timeout)
+	return nil
+}
+
+func (r *Remote) DeleteUser(info UserInfo, version string, timeout uint) error {
+	return r.ExecSQL(dropUserSQL(info, version), timeout)
+}
+
+func (r *Remote) UpdateUser(info UserUpdateInfo, timeout uint) error {
+	if info.Host == info.NewHost {
+		return nil
+	}
+	return r.ExecSQL(renameUserSQL(info), timeout)
+}
+
+func (r *Remote) DeleteDatabase(info DeleteInfo) error {
+	if len(info.Name) == 0 {
+		return nil
+	}
+	if err := r.ExecSQL(dropDatabaseSQL(info.Name), info.Timeout); err != nil && !info.ForceDelete {
+		return fmt.Errorf("drop database failed, err: %v", err)
+	}
+	return nil
+}
+
+func (r *Remote) ListUsers(timeout uint) ([]UserInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	defer cancel()
+	rows, err := r.Client.QueryContext(ctx, "select user,host from mysql.user order by user,host")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	users := make([]UserInfo, 0)
+	for rows.Next() {
+		var user, host string
+		if err := rows.Scan(&user, &host); err != nil {
+			return nil, err
+		}
+		users = append(users, UserInfo{Username: user, Host: host})
+	}
+	return users, rows.Err()
+}
+
+func (r *Remote) ListGrants(timeout uint) ([]GrantInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	defer cancel()
+	rows, err := r.Client.QueryContext(ctx, "select db,user,host from mysql.db where db not in ('information_schema','mysql','performance_schema','sys','__recycle_bin__','recycle_bin') order by db,user,host")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	grants := make([]GrantInfo, 0)
+	for rows.Next() {
+		var db, user, host string
+		if err := rows.Scan(&db, &user, &host); err != nil {
+			return nil, err
+		}
+		if user == "root" {
+			continue
+		}
+		grants = append(grants, GrantInfo{Database: db, Username: user, Host: host})
+	}
+	return grants, rows.Err()
+}
+
+func (r *Remote) Delete(info DeleteInfo) error {
+	for _, user := range userIdentities(info.Username, info.Permission) {
 		if strings.HasPrefix(info.Version, "5.6") {
 			if err := r.ExecSQL(fmt.Sprintf("drop user %s", user), info.Timeout); err != nil && !info.ForceDelete {
 				return fmt.Errorf("drop user failed, err: %v", err)
@@ -142,7 +202,7 @@ func (r *Remote) Delete(info DeleteInfo) error {
 		}
 	}
 	if len(info.Name) != 0 {
-		if err := r.ExecSQL(fmt.Sprintf("drop database if exists `%s`", info.Name), info.Timeout); err != nil && !info.ForceDelete {
+		if err := r.ExecSQL(dropDatabaseSQL(info.Name), info.Timeout); err != nil && !info.ForceDelete {
 			return fmt.Errorf("drop database failed, err: %v", err)
 		}
 	}
@@ -155,24 +215,8 @@ func (r *Remote) Delete(info DeleteInfo) error {
 
 func (r *Remote) ChangePassword(info PasswordChangeInfo) error {
 	if info.Username != "root" {
-		var userlist []string
-		if strings.Contains(info.Permission, ",") {
-			ips := strings.Split(info.Permission, ",")
-			for _, ip := range ips {
-				if len(ip) != 0 {
-					userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.Username, ip))
-				}
-			}
-		} else {
-			userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", info.Username, info.Permission))
-		}
-
-		for _, user := range userlist {
-			passwordChangeSql := fmt.Sprintf("set password for %s = password('%s')", user, info.Password)
-			if !strings.HasPrefix(info.Version, "5.7") && !strings.HasPrefix(info.Version, "5.6") {
-				passwordChangeSql = fmt.Sprintf("ALTER USER %s IDENTIFIED BY '%s';", user, info.Password)
-			}
-			if err := r.ExecSQL(passwordChangeSql, info.Timeout); err != nil {
+		for _, user := range userIdentities(info.Username, info.Permission) {
+			if err := r.ExecSQL(changeUserPasswordSQL(user, info.Password, info.Version), info.Timeout); err != nil {
 				return err
 			}
 		}

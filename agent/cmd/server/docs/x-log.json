@@ -2753,51 +2753,23 @@
 		"formatZH": "创建 mysql 数据库 [name]",
 		"formatEN": "create mysql database [name]"
 	},
-	"/databases/bind": {
+	"/databases/change/access": {
 		"bodyKeys": [
-			"database",
-			"username"
+			"database"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "绑定 mysql 数据库名 [database] [username]",
-		"formatEN": "bind mysql database [database] [username]"
-	},
-	"/databases/change/access": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "database_mysqls",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "更新数据库 [name] 访问权限",
-		"formatEN": "Update database [name] access"
+		"formatZH": "更新数据库 [database] root 访问权限",
+		"formatEN": "Update database [database] root access"
 	},
 	"/databases/change/password": {
 		"bodyKeys": [
-			"id"
+			"database"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "database_mysqls",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "更新数据库 [name] 密码",
-		"formatEN": "Update database [name] password"
+		"beforeFunctions": [],
+		"formatZH": "更新数据库 [database] root 密码",
+		"formatEN": "Update database [database] root password"
 	},
 	"/databases/common/update/conf": {
 		"bodyKeys": [
@@ -2892,6 +2864,30 @@
 		],
 		"formatZH": "mysql 数据库 [name] 描述信息修改 [description]",
 		"formatEN": "The description of the mysql database [name] is modified =\u003e [description]"
+	},
+	"/databases/grants": {
+		"bodyKeys": [
+			"database",
+			"db",
+			"username",
+			"host"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "授权 mysql 数据库 [database] 用户 [username]@[host] 访问 [db]",
+		"formatEN": "grant mysql database [database] user [username]@[host] access to [db]"
+	},
+	"/databases/grants/del": {
+		"bodyKeys": [
+			"database",
+			"db",
+			"username",
+			"host"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "取消 mysql 数据库 [database] 用户 [username]@[host] 对 [db] 的授权",
+		"formatEN": "revoke mysql database [database] user [username]@[host] access to [db]"
 	},
 	"/databases/mongodb": {
 		"bodyKeys": [
@@ -3083,6 +3079,52 @@
 		"beforeFunctions": [],
 		"formatZH": "redis 数据库持久化配置更新",
 		"formatEN": "redis database persistence configuration update"
+	},
+	"/databases/users": {
+		"bodyKeys": [
+			"database",
+			"username",
+			"host"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 mysql 数据库 [database] 用户 [username]@[host]",
+		"formatEN": "create mysql database [database] user [username]@[host]"
+	},
+	"/databases/users/del": {
+		"bodyKeys": [
+			"database",
+			"username",
+			"host"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 mysql 数据库 [database] 用户 [username]@[host]",
+		"formatEN": "delete mysql database [database] user [username]@[host]"
+	},
+	"/databases/users/password": {
+		"bodyKeys": [
+			"database",
+			"username",
+			"host"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 mysql 数据库 [database] 用户 [username]@[host] 密码",
+		"formatEN": "update mysql database [database] user [username]@[host] password"
+	},
+	"/databases/users/update": {
+		"bodyKeys": [
+			"database",
+			"username",
+			"host",
+			"newHost",
+			"description"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 mysql 数据库 [database] 用户 [username] 访问权限 [host] =\u003e [newHost] 描述 [description]",
+		"formatEN": "update mysql database [database] user [username] access [host] =\u003e [newHost] description [description]"
 	},
 	"/databases/variables/update": {
 		"bodyKeys": [],

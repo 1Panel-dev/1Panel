@@ -487,6 +487,7 @@ const message = {
         deleteBackupHelper: '同時刪除資料庫備份',
         delete: '刪除操作無法回滾，請輸入 "',
         deleteHelper: '" 刪除此資料庫',
+        userBoundDatabases: '使用者已綁定如下資料庫：',
         noMysql: '資料庫服務 (MySQL 或 MariaDB)',
         noPostgresql: '資料庫服務 PostgreSQL',
         goUpgrade: '去應用列表升級',

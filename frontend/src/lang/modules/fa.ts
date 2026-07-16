@@ -499,6 +499,7 @@ const message = {
         deleteBackupHelper: 'همزمان پشتیبان‌های پایگاه داده را حذف کنید',
         delete: 'عملیات حذف قابل بازگشت نیست، لطفاً عبارت "',
         deleteHelper: '" را برای حذف این پایگاه داده وارد کنید',
+        userBoundDatabases: 'به پایگاه‌های داده زیر متصل است:',
         noMysql: 'سرویس پایگاه داده (MySQL یا MariaDB)',
         noPostgresql: 'سرویس پایگاه داده PostgreSQL',
         goUpgrade: 'رفتن به ارتقاء',

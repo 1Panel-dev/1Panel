@@ -60,23 +60,80 @@ type MysqlDBCreate struct {
 	Database    string `json:"database" validate:"required"`
 	Format      string `json:"format" validate:"required"`
 	Collation   string `json:"collation"`
-	Username    string `json:"username" validate:"required"`
-	Password    string `json:"password" validate:"required"`
+	Username    string `json:"username"`
+	Password    string `json:"password"`
 	Permission  string `json:"permission" validate:"required"`
 	Description string `json:"description"`
+}
+
+type MysqlUser struct {
+	Username    string `json:"username"`
+	Host        string `json:"host"`
+	Password    string `json:"password"`
+	Description string `json:"description"`
+}
+
+type MysqlGrant struct {
+	Database string `json:"database"`
+	Username string `json:"username"`
+	Host     string `json:"host"`
+}
+
+type MysqlGrantSummarySearch struct {
+	Database string   `json:"database" validate:"required"`
+	DBs      []string `json:"dbs" validate:"required"`
+}
+
+type MysqlUserSearch struct {
+	Database string `json:"database" validate:"required"`
+}
+
+type MysqlUserCreate struct {
+	Database    string `json:"database" validate:"required"`
+	Username    string `json:"username" validate:"required"`
+	Password    string `json:"password" validate:"required"`
+	Host        string `json:"host" validate:"required"`
+	Description string `json:"description"`
+}
+
+type MysqlUserDelete struct {
+	Database string `json:"database" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	Host     string `json:"host" validate:"required"`
+}
+
+type MysqlUserUpdate struct {
+	Database    string `json:"database" validate:"required"`
+	Username    string `json:"username" validate:"required"`
+	Host        string `json:"host" validate:"required"`
+	NewHost     string `json:"newHost" validate:"required"`
+	Description string `json:"description"`
+}
+
+type MysqlUserPassword struct {
+	Database string `json:"database" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	Host     string `json:"host" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type MysqlGrantCreate struct {
+	Database string `json:"database" validate:"required"`
+	DB       string `json:"db" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	Host     string `json:"host" validate:"required"`
+}
+
+type MysqlGrantDelete struct {
+	Database string `json:"database" validate:"required"`
+	DB       string `json:"db" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	Host     string `json:"host" validate:"required"`
 }
 
 type MysqlFormatCollationOption struct {
 	Format     string   `json:"format"`
 	Collations []string `json:"collations"`
-}
-
-type BindUser struct {
-	Database   string `json:"database" validate:"required"`
-	DB         string `json:"db" validate:"required"`
-	Username   string `json:"username" validate:"required"`
-	Password   string `json:"password" validate:"required"`
-	Permission string `json:"permission" validate:"required"`
 }
 
 type MysqlLoadDB struct {

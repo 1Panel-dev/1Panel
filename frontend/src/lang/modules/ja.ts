@@ -505,6 +505,7 @@ const message = {
         deleteBackupHelper: 'データベースのバックアップを同時に削除します',
         delete: '削除操作はロールバックできません、入力してください」',
         deleteHelper: '「このデータベースを削除します',
+        userBoundDatabases: 'は次のデータベースにバインドされています:',
         noMysql: 'データベースサービス（mysqlまたはmariadb）',
         noPostgresql: 'データベースサービスpostgreSql',
         goUpgrade: 'アップグレードに移動します',

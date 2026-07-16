@@ -41,20 +41,40 @@ func (b *BaseApi) CreateMysql(c *gin.Context) {
 }
 
 // @Tags Database Mysql
-// @Summary Bind user of mysql database
+// @Summary List mysql users
 // @Accept json
-// @Param request body dto.BindUser true "request"
-// @Success 200
+// @Param request body dto.MysqlUserSearch true "request"
+// @Success 200 {array} dto.MysqlUser
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /databases/bind [post]
-// @x-panel-log {"bodyKeys":["database", "username"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"绑定 mysql 数据库名 [database] [username]","formatEN":"bind mysql database [database] [username]"}
-func (b *BaseApi) BindUser(c *gin.Context) {
-	var req dto.BindUser
+// @Router /databases/users/search [post]
+func (b *BaseApi) ListMysqlUsers(c *gin.Context) {
+	var req dto.MysqlUserSearch
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	data, err := mysqlService.ListUsers(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
 
+// @Tags Database Mysql
+// @Summary Create mysql user
+// @Accept json
+// @Param request body dto.MysqlUserCreate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /databases/users [post]
+// @x-panel-log {"bodyKeys":["database","username","host"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建 mysql 数据库 [database] 用户 [username]@[host]","formatEN":"create mysql database [database] user [username]@[host]"}
+func (b *BaseApi) CreateMysqlUser(c *gin.Context) {
+	var req dto.MysqlUserCreate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
 	if len(req.Password) != 0 {
 		password, err := base64.StdEncoding.DecodeString(req.Password)
 		if err != nil {
@@ -63,8 +83,162 @@ func (b *BaseApi) BindUser(c *gin.Context) {
 		}
 		req.Password = string(password)
 	}
+	if err := mysqlService.CreateUser(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
 
-	if err := mysqlService.BindUser(req); err != nil {
+// @Tags Database Mysql
+// @Summary Delete mysql user
+// @Accept json
+// @Param request body dto.MysqlUserDelete true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /databases/users/del [post]
+// @x-panel-log {"bodyKeys":["database","username","host"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除 mysql 数据库 [database] 用户 [username]@[host]","formatEN":"delete mysql database [database] user [username]@[host]"}
+func (b *BaseApi) DeleteMysqlUser(c *gin.Context) {
+	var req dto.MysqlUserDelete
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := mysqlService.DeleteUser(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Database Mysql
+// @Summary Update mysql user
+// @Accept json
+// @Param request body dto.MysqlUserUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /databases/users/update [post]
+// @x-panel-log {"bodyKeys":["database","username","host","newHost","description"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 mysql 数据库 [database] 用户 [username] 访问权限 [host] => [newHost] 描述 [description]","formatEN":"update mysql database [database] user [username] access [host] => [newHost] description [description]"}
+func (b *BaseApi) UpdateMysqlUser(c *gin.Context) {
+	var req dto.MysqlUserUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := mysqlService.UpdateUser(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Database Mysql
+// @Summary Change mysql user password
+// @Accept json
+// @Param request body dto.MysqlUserPassword true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /databases/users/password [post]
+// @x-panel-log {"bodyKeys":["database","username","host"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 mysql 数据库 [database] 用户 [username]@[host] 密码","formatEN":"update mysql database [database] user [username]@[host] password"}
+func (b *BaseApi) ChangeMysqlUserPassword(c *gin.Context) {
+	var req dto.MysqlUserPassword
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if len(req.Password) != 0 {
+		password, err := base64.StdEncoding.DecodeString(req.Password)
+		if err != nil {
+			helper.BadRequest(c, err)
+			return
+		}
+		req.Password = string(password)
+	}
+	if err := mysqlService.ChangeUserPassword(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Database Mysql
+// @Summary List mysql grants
+// @Accept json
+// @Param request body dto.MysqlUserSearch true "request"
+// @Success 200 {array} dto.MysqlGrant
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /databases/grants/search [post]
+func (b *BaseApi) ListMysqlGrants(c *gin.Context) {
+	var req dto.MysqlUserSearch
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := mysqlService.ListGrants(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Database Mysql
+// @Summary List mysql grant summary
+// @Accept json
+// @Param request body dto.MysqlGrantSummarySearch true "request"
+// @Success 200 {object} map[string][]dto.MysqlUser
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /databases/grants/summary [post]
+func (b *BaseApi) ListMysqlGrantSummary(c *gin.Context) {
+	var req dto.MysqlGrantSummarySearch
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := mysqlService.ListGrantSummary(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Database Mysql
+// @Summary Grant mysql user
+// @Accept json
+// @Param request body dto.MysqlGrantCreate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /databases/grants [post]
+// @x-panel-log {"bodyKeys":["database","db","username","host"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"授权 mysql 数据库 [database] 用户 [username]@[host] 访问 [db]","formatEN":"grant mysql database [database] user [username]@[host] access to [db]"}
+func (b *BaseApi) GrantMysqlUser(c *gin.Context) {
+	var req dto.MysqlGrantCreate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := mysqlService.GrantUser(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Database Mysql
+// @Summary Revoke mysql grant
+// @Accept json
+// @Param request body dto.MysqlGrantDelete true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /databases/grants/del [post]
+// @x-panel-log {"bodyKeys":["database","db","username","host"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"取消 mysql 数据库 [database] 用户 [username]@[host] 对 [db] 的授权","formatEN":"revoke mysql database [database] user [username]@[host] access to [db]"}
+func (b *BaseApi) RevokeMysqlGrant(c *gin.Context) {
+	var req dto.MysqlGrantDelete
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := mysqlService.RevokeGrant(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -94,14 +268,14 @@ func (b *BaseApi) UpdateMysqlDescription(c *gin.Context) {
 }
 
 // @Tags Database Mysql
-// @Summary Change mysql password
+// @Summary Change mysql root password
 // @Accept json
 // @Param request body dto.ChangeDBInfo true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /databases/change/password [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"database_mysqls","output_column":"name","output_value":"name"}],"formatZH":"更新数据库 [name] 密码","formatEN":"Update database [name] password"}
+// @x-panel-log {"bodyKeys":["database"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新数据库 [database] root 密码","formatEN":"Update database [database] root password"}
 func (b *BaseApi) ChangeMysqlPassword(c *gin.Context) {
 	var req dto.ChangeDBInfo
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -125,14 +299,14 @@ func (b *BaseApi) ChangeMysqlPassword(c *gin.Context) {
 }
 
 // @Tags Database Mysql
-// @Summary Change mysql access
+// @Summary Change mysql root access
 // @Accept json
 // @Param request body dto.ChangeDBInfo true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /databases/change/access [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"database_mysqls","output_column":"name","output_value":"name"}],"formatZH":"更新数据库 [name] 访问权限","formatEN":"Update database [name] access"}
+// @x-panel-log {"bodyKeys":["database"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新数据库 [database] root 访问权限","formatEN":"Update database [database] root access"}
 func (b *BaseApi) ChangeMysqlAccess(c *gin.Context) {
 	var req dto.ChangeDBInfo
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

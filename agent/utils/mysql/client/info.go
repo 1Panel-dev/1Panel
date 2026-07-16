@@ -40,6 +40,23 @@ type CreateInfo struct {
 	Timeout uint `json:"timeout"` // second
 }
 
+type UserInfo struct {
+	Username string `json:"username"`
+	Host     string `json:"host"`
+}
+
+type UserUpdateInfo struct {
+	Username string `json:"username"`
+	Host     string `json:"host"`
+	NewHost  string `json:"newHost"`
+}
+
+type GrantInfo struct {
+	Database string `json:"database"`
+	Username string `json:"username"`
+	Host     string `json:"host"`
+}
+
 type DeleteInfo struct {
 	Name       string `json:"name"`
 	Version    string `json:"version"`

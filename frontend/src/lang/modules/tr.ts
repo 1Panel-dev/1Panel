@@ -505,6 +505,7 @@ const message = {
         deleteBackupHelper: 'Veritabanı yedeklerini aynı anda sil',
         delete: 'Silme işlemi geri alınamaz, lütfen "',
         deleteHelper: '" girerek bu veritabanını silin',
+        userBoundDatabases: 'aşağıdaki veritabanlarına bağlı:',
         noMysql: 'Veritabanı hizmeti (MySQL veya MariaDB)',
         noPostgresql: 'Veritabanı hizmeti PostgreSQL',
         goUpgrade: 'Yükseltmeye git',

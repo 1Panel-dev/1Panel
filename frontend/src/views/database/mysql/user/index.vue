@@ -1,0 +1,485 @@
+<template>
+    <DrawerPro v-model="drawerVisible" :header="$t('commons.table.user')" size="70%">
+        <div class="drawer-toolbar">
+            <el-button type="primary" @click="openUserDialog()">
+                {{ $t('commons.button.create') }}
+            </el-button>
+        </div>
+        <ComplexTable :data="users" :heightDiff="260">
+            <el-table-column
+                :label="$t('commons.login.username')"
+                prop="username"
+                show-overflow-tooltip
+                min-width="120"
+            />
+            <el-table-column :label="$t('commons.login.password')" prop="password" min-width="140">
+                <template #default="{ row }">
+                    <span v-if="!row.password">-</span>
+                    <div class="password-cell" v-else>
+                        <span v-if="!row.showPassword" class="password-text">**********</span>
+                        <span v-else class="password-text">{{ row.password }}</span>
+                        <el-button
+                            v-if="!row.showPassword"
+                            link
+                            @click="row.showPassword = true"
+                            icon="View"
+                            class="password-action"
+                        />
+                        <el-button
+                            v-if="row.showPassword"
+                            link
+                            @click="row.showPassword = false"
+                            icon="Hide"
+                            class="password-action"
+                        />
+                        <CopyButton class="password-copy" :content="row.password" />
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column :label="$t('database.permission')" prop="host" min-width="120">
+                <template #default="{ row }">
+                    {{ permissionLabel(row.host) }}
+                </template>
+            </el-table-column>
+            <el-table-column :label="$t('menu.database')" min-width="180">
+                <template #default="{ row }">
+                    <span v-if="userDatabases(row).length === 0">-</span>
+                    <div v-else class="bind-db-list">
+                        <el-tag v-for="item in userDatabases(row)" :key="row.username + row.host + item" size="small">
+                            {{ item }}
+                        </el-tag>
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column
+                :label="$t('commons.table.description')"
+                prop="description"
+                show-overflow-tooltip
+                min-width="160"
+            />
+            <fu-table-operations
+                :min-width="100"
+                :buttons="userButtons"
+                :label="$t('commons.table.operate')"
+                fixed="right"
+                fix
+            />
+        </ComplexTable>
+    </DrawerPro>
+
+    <DialogPro v-model="userDialogVisible" :title="userDialogTitle" size="small">
+        <el-form ref="userFormRef" :model="userForm" :rules="userRules" label-position="top" v-loading="loading">
+            <el-form-item :label="$t('commons.login.username')" prop="username">
+                <el-input v-model.trim="userForm.username" :disabled="userDialogMode === 'edit'" />
+            </el-form-item>
+            <el-form-item :label="$t('database.permission')" prop="permission">
+                <el-select v-model="userForm.permission" @change="changePermission">
+                    <el-option value="%" :label="$t('database.permissionAll')" />
+                    <el-option value="ip" :label="$t('database.permissionForIP')" />
+                </el-select>
+            </el-form-item>
+            <el-form-item v-if="userForm.permission === 'ip'" prop="host">
+                <el-input v-model.trim="userForm.host" />
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.password')" prop="password">
+                <el-input type="password" clearable show-password v-model.trim="userForm.password" />
+                <span v-if="userDialogMode === 'edit'" class="input-help">
+                    {{ $t('setting.passwordEmptyTip') }}
+                </span>
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.description')" prop="description">
+                <el-input type="textarea" clearable v-model="userForm.description" />
+            </el-form-item>
+            <el-form-item v-if="userDialogMode === 'edit'" :label="$t('menu.database')" prop="dbs">
+                <el-select v-model="userForm.dbs" filterable multiple collapse-tags collapse-tags-tooltip>
+                    <el-option v-for="item in databases" :key="item.name" :label="item.name" :value="item.name" />
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button @click="userDialogVisible = false" :disabled="loading">
+                {{ $t('commons.button.cancel') }}
+            </el-button>
+            <el-button type="primary" @click="submitUser()" :disabled="loading">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </DialogPro>
+
+    <DialogPro v-model="deleteDialogVisible" :title="$t('commons.button.delete')" size="small">
+        <div v-loading="loading">
+            <div class="delete-user-title">
+                <template v-if="deleteUserDbs.length > 0">
+                    {{ deleteUser.username }} {{ $t('database.userBoundDatabases') }}
+                </template>
+                <template v-else>{{ deleteUser.username }}</template>
+            </div>
+            <div class="delete-user-section">
+                <div v-if="deleteUserDbs.length === 0" class="delete-user-empty">-</div>
+                <div v-else class="bind-db-list delete-user-dbs">
+                    <el-tag v-for="item in deleteUserDbs" :key="item" size="small">
+                        {{ item }}
+                    </el-tag>
+                </div>
+            </div>
+            <div class="delete-user-section">
+                <div>
+                    <span style="font-size: 12px">{{ $t('database.delete') }}</span>
+                    <span style="font-size: 12px; color: red; font-weight: 500">{{ deleteUser.username }}</span>
+                    <span style="font-size: 12px">{{ $t('database.deleteUserHelper') }}</span>
+                </div>
+                <el-input v-model="deleteConfirmInput" :placeholder="deleteUser.username" />
+            </div>
+        </div>
+        <template #footer>
+            <el-button @click="deleteDialogVisible = false" :disabled="loading">
+                {{ $t('commons.button.cancel') }}
+            </el-button>
+            <el-button
+                type="primary"
+                @click="submitDeleteUser()"
+                :disabled="deleteConfirmInput !== deleteUser.username || loading"
+            >
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </DialogPro>
+</template>
+
+<script lang="ts" setup>
+import { computed, reactive, ref } from 'vue';
+import i18n from '@/lang';
+import { Rules } from '@/global/form-rules';
+import { MsgSuccess } from '@/utils/message';
+import { Database } from '@/api/interface/database';
+import {
+    createMysqlUser,
+    deleteMysqlUser,
+    grantMysqlUser,
+    revokeMysqlGrant,
+    searchMysqlDBs,
+    searchMysqlGrants,
+    searchMysqlUsers,
+    updateMysqlUser,
+    updateMysqlUserPassword,
+} from '@/api/modules/database';
+
+const emit = defineEmits<{ (e: 'search'): void }>();
+
+const drawerVisible = ref(false);
+const loading = ref(false);
+const database = ref('');
+const users = ref<Database.MysqlUser[]>([]);
+const grants = ref<Database.MysqlGrant[]>([]);
+const databases = ref<Database.MysqlDBInfo[]>([]);
+
+const userDialogVisible = ref(false);
+const userDialogMode = ref<'create' | 'edit'>('create');
+const userDialogTitle = computed(() =>
+    userDialogMode.value === 'create' ? i18n.global.t('commons.table.user') : i18n.global.t('commons.button.edit'),
+);
+const userFormRef = ref();
+const userForm = reactive({
+    username: '',
+    host: '%',
+    permission: '%',
+    password: '',
+    description: '',
+    dbs: [] as string[],
+});
+const originalDbs = ref<string[]>([]);
+const originalHost = ref('');
+const originalDescription = ref('');
+const deleteDialogVisible = ref(false);
+const deleteConfirmInput = ref('');
+const deleteUser = reactive({
+    username: '',
+    host: '',
+});
+const deleteUserDbs = ref<string[]>([]);
+const checkPassword = (_rule: unknown, value: string, callback: (error?: Error) => void) => {
+    if (!value && userDialogMode.value === 'edit') {
+        callback();
+        return;
+    }
+    if (!value) {
+        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+        return;
+    }
+    if (value.indexOf(' ') !== -1) {
+        callback(new Error(i18n.global.t('setting.noSpace')));
+        return;
+    }
+    if (/[&|;'`$()><]/.test(value)) {
+        callback(new Error(i18n.global.t('commons.rule.illegalInput')));
+        return;
+    }
+    callback();
+};
+const userRules = reactive({
+    username: [Rules.requiredInput, Rules.name],
+    permission: [Rules.requiredSelect],
+    host: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    password: [{ validator: checkPassword, trigger: 'blur' }],
+});
+
+interface DialogProps {
+    database: string;
+}
+
+const acceptParams = async (params: DialogProps) => {
+    database.value = params.database;
+    drawerVisible.value = true;
+    await loadContext();
+};
+
+const loadUsers = async () => {
+    const res = await searchMysqlUsers({ database: database.value });
+    users.value = res.data || [];
+};
+
+const loadGrants = async () => {
+    const res = await searchMysqlGrants({ database: database.value });
+    grants.value = res.data || [];
+};
+
+const loadDatabases = async () => {
+    const res = await searchMysqlDBs({
+        page: 1,
+        pageSize: 10000,
+        info: '',
+        database: database.value,
+        orderBy: 'createdAt',
+        order: 'null',
+    });
+    databases.value = res.data.items || [];
+};
+
+const loadContext = async () => {
+    await Promise.all([loadUsers(), loadGrants(), loadDatabases()]);
+};
+
+const userDatabases = (row: Database.MysqlUser) => {
+    return Array.from(
+        new Set(
+            grants.value
+                .filter((item) => item.username === row.username && item.host === row.host)
+                .map((item) => item.database),
+        ),
+    );
+};
+
+const permissionLabel = (host: string) => {
+    return host === '%' ? i18n.global.t('database.permissionAll') : host;
+};
+
+const changePermission = () => {
+    if (userForm.permission === '%') {
+        userForm.host = '%';
+    }
+};
+
+const openDeleteUserDialog = (row: Database.MysqlUser) => {
+    deleteUser.username = row.username;
+    deleteUser.host = row.host;
+    deleteUserDbs.value = userDatabases(row);
+    deleteConfirmInput.value = '';
+    deleteDialogVisible.value = true;
+};
+
+const openUserDialog = () => {
+    userDialogMode.value = 'create';
+    userForm.username = '';
+    userForm.host = '%';
+    userForm.permission = '%';
+    userForm.password = '';
+    userForm.description = '';
+    userForm.dbs = [];
+    originalDbs.value = [];
+    originalHost.value = '%';
+    originalDescription.value = '';
+    userDialogVisible.value = true;
+};
+
+const openUserEditDialog = async (row: Database.MysqlUser) => {
+    if (!databases.value.length) {
+        await loadDatabases();
+    }
+    userDialogMode.value = 'edit';
+    userForm.username = row.username;
+    userForm.host = row.host;
+    userForm.permission = row.host === '%' ? '%' : 'ip';
+    userForm.password = '';
+    userForm.description = row.description || '';
+    userForm.dbs = userDatabases(row);
+    originalDbs.value = [...userForm.dbs];
+    originalHost.value = row.host;
+    originalDescription.value = row.description || '';
+    userDialogVisible.value = true;
+};
+
+const submitUser = async () => {
+    if (!userFormRef.value) return;
+    await userFormRef.value.validate(async (valid: boolean) => {
+        if (!valid) return;
+        loading.value = true;
+        if (userDialogMode.value === 'edit') {
+            try {
+                const selectedDbs = userForm.dbs || [];
+                const addDbs = selectedDbs.filter((item) => !originalDbs.value.includes(item));
+                const removeDbs = originalDbs.value.filter((item) => !selectedDbs.includes(item));
+                if (userForm.host !== originalHost.value) {
+                    await updateMysqlUser({
+                        database: database.value,
+                        username: userForm.username,
+                        host: originalHost.value,
+                        newHost: userForm.host,
+                        description: userForm.description,
+                    });
+                } else if (userForm.description !== originalDescription.value) {
+                    await updateMysqlUser({
+                        database: database.value,
+                        username: userForm.username,
+                        host: originalHost.value,
+                        newHost: userForm.host,
+                        description: userForm.description,
+                    });
+                }
+                if (userForm.password) {
+                    await updateMysqlUserPassword({
+                        database: database.value,
+                        username: userForm.username,
+                        host: userForm.host,
+                        password: userForm.password,
+                    });
+                }
+                for (const item of addDbs) {
+                    await grantMysqlUser({
+                        database: database.value,
+                        db: item,
+                        username: userForm.username,
+                        host: userForm.host,
+                    });
+                }
+                for (const item of removeDbs) {
+                    await revokeMysqlGrant({
+                        database: database.value,
+                        db: item,
+                        username: userForm.username,
+                        host: userForm.host,
+                    });
+                }
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                userDialogVisible.value = false;
+                emit('search');
+            } finally {
+                await loadContext();
+                loading.value = false;
+            }
+            return;
+        }
+        await createMysqlUser({
+            database: database.value,
+            username: userForm.username,
+            host: userForm.host,
+            password: userForm.password,
+            description: userForm.description,
+        })
+            .then(() => {
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                userDialogVisible.value = false;
+                loadUsers();
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    });
+};
+
+const userButtons = [
+    {
+        label: i18n.global.t('commons.button.edit'),
+        permission: true,
+        click: (row: Database.MysqlUser) => {
+            openUserEditDialog(row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.delete'),
+        permission: true,
+        click: (row: Database.MysqlUser) => {
+            openDeleteUserDialog(row);
+        },
+    },
+];
+
+const submitDeleteUser = async () => {
+    loading.value = true;
+    await deleteMysqlUser({
+        database: database.value,
+        username: deleteUser.username,
+        host: deleteUser.host,
+    })
+        .then(() => {
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            deleteDialogVisible.value = false;
+            loadContext();
+            emit('search');
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
+defineExpose({
+    acceptParams,
+    loadContext,
+});
+</script>
+
+<style lang="scss" scoped>
+.drawer-toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.password-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+}
+.password-text {
+    overflow: hidden;
+    max-width: 96px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.password-action {
+    min-height: 20px;
+    padding: 0;
+}
+.password-copy {
+    margin-left: -2px;
+}
+.bind-db-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.delete-user-title {
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+}
+.delete-user-section {
+    margin-top: 12px;
+}
+.delete-user-empty {
+    margin-top: 6px;
+}
+.delete-user-dbs {
+    margin-top: 6px;
+}
+</style>

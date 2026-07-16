@@ -60,10 +60,36 @@ export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     encodeBase64Fields(request, ['password']);
     return http.post(`/databases`, request);
 };
-export const bindUser = (params: Database.BindUser) => {
-    let request = deepCopy(params) as Database.BindUser;
+export const searchMysqlUsers = (params: Database.MysqlUserSearch) => {
+    return http.post<Database.MysqlUser[]>(`/databases/users/search`, params);
+};
+export const createMysqlUser = (params: Database.MysqlUserCreate) => {
+    let request = deepCopy(params) as Database.MysqlUserCreate;
     encodeBase64Fields(request, ['password']);
-    return http.post(`/databases/bind`, request);
+    return http.post(`/databases/users`, request);
+};
+export const deleteMysqlUser = (params: Database.MysqlUserDelete) => {
+    return http.post(`/databases/users/del`, params);
+};
+export const updateMysqlUser = (params: Database.MysqlUserUpdate) => {
+    return http.post(`/databases/users/update`, params);
+};
+export const updateMysqlUserPassword = (params: Database.MysqlUserPassword) => {
+    let request = deepCopy(params) as Database.MysqlUserPassword;
+    encodeBase64Fields(request, ['password']);
+    return http.post(`/databases/users/password`, request);
+};
+export const searchMysqlGrants = (params: Database.MysqlUserSearch) => {
+    return http.post<Database.MysqlGrant[]>(`/databases/grants/search`, params);
+};
+export const searchMysqlGrantSummary = (params: Database.MysqlGrantSummarySearch) => {
+    return http.post<Record<string, Database.MysqlUser[]>>(`/databases/grants/summary`, params);
+};
+export const grantMysqlUser = (params: Database.MysqlGrantCreate) => {
+    return http.post(`/databases/grants`, params);
+};
+export const revokeMysqlGrant = (params: Database.MysqlGrantDelete) => {
+    return http.post(`/databases/grants/del`, params);
 };
 export const loadDBFromRemote = (params: Database.MysqlLoadDB) => {
     return http.post(`/databases/load`, params);

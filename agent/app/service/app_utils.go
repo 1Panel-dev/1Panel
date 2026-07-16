@@ -299,8 +299,8 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 					}
 					resourceId = oldMysqlDb.ID
 					if oldMysqlDb.ID > 0 {
-						if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
-							return buserr.New("ErrDbUserNotValid")
+						if err := ensureAppMysqlDBUser(database, dbConfig); err != nil {
+							return err
 						}
 					} else {
 						var createMysql dto.MysqlDBCreate
@@ -517,6 +517,44 @@ func deleteAppImagesByIDs(t *task.Task, client docker.Client, imageIDs []appImag
 		t.LogSuccess(imgStr)
 	}
 	return nil
+}
+
+func ensureAppMysqlDBUser(database model.Database, dbConfig dto.AppDatabase) error {
+	const host = "%"
+	mysqlService := NewIMysqlService()
+	users, err := mysqlService.ListUsers(dto.MysqlUserSearch{Database: database.Name})
+	if err != nil {
+		return err
+	}
+	userExists := false
+	passwordValid := false
+	for _, user := range users {
+		if user.Username != dbConfig.DbUser || user.Host != host {
+			continue
+		}
+		userExists = true
+		passwordValid = user.Password == dbConfig.Password
+		break
+	}
+	if !userExists || !passwordValid {
+		return buserr.New("ErrDbUserNotValid")
+	}
+
+	grants, err := mysqlService.ListGrants(dto.MysqlUserSearch{Database: database.Name})
+	if err != nil {
+		return err
+	}
+	for _, grant := range grants {
+		if grant.Database == dbConfig.DbName && grant.Username == dbConfig.DbUser && grant.Host == host {
+			return nil
+		}
+	}
+	return mysqlService.GrantUser(dto.MysqlGrantCreate{
+		Database: database.Name,
+		DB:       dbConfig.DbName,
+		Username: dbConfig.DbUser,
+		Host:     host,
+	})
 }
 
 func deleteLink(del dto.DelAppLink) error {

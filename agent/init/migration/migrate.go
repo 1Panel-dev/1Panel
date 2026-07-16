@@ -89,6 +89,7 @@ func InitAgentDB() {
 		migrations.MigrateLegoV5,
 		migrations.AddMcpServerGatewayArgs,
 		migrations.InitFirewallPortWhiteList,
+		migrations.AddDatabaseUserTable,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

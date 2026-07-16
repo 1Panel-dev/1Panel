@@ -419,15 +419,55 @@ func reCreateDB(dbID uint, database model.Database, envMap map[string]interface{
 		From:       database.From,
 		Database:   database.Name,
 		Format:     dbInfo.Format,
-		Username:   dbInfo.User,
-		Password:   dbInfo.Password,
 		Permission: "%",
 	})
 	if err != nil {
 		return nil, err
 	}
+	if len(dbInfo.User) != 0 {
+		if err := ensureMysqlDBUser(mysqlService, database, dbInfo); err != nil {
+			return nil, err
+		}
+	}
 	updateCronjobsDBRef(dbID, createDB.ID)
 	return createDB, nil
+}
+
+func ensureMysqlDBUser(mysqlService IMysqlService, database model.Database, dbInfo dbRecreateInfo) error {
+	const host = "%"
+	users, err := mysqlService.ListUsers(dto.MysqlUserSearch{Database: database.Name})
+	if err != nil {
+		return err
+	}
+	var oldUser dto.MysqlUser
+	exists := false
+	for _, user := range users {
+		if user.Username == dbInfo.User && user.Host == host {
+			oldUser = user
+			exists = true
+			break
+		}
+	}
+	if exists {
+		if len(oldUser.Password) != 0 && oldUser.Password != dbInfo.Password {
+			return buserr.New("ErrDbUserNotValid")
+		}
+	} else {
+		if err := mysqlService.CreateUser(dto.MysqlUserCreate{
+			Database: database.Name,
+			Username: dbInfo.User,
+			Host:     host,
+			Password: dbInfo.Password,
+		}); err != nil {
+			return err
+		}
+	}
+	return mysqlService.GrantUser(dto.MysqlGrantCreate{
+		Database: database.Name,
+		DB:       dbInfo.Name,
+		Username: dbInfo.User,
+		Host:     host,
+	})
 }
 
 func reCreatePostgresqlDB(dbID uint, database model.Database, envMap map[string]interface{}) (*model.DatabasePostgresql, error) {

@@ -17,6 +17,15 @@ import (
 type MysqlClient interface {
 	Create(info client.CreateInfo) error
 	CreateUser(info client.CreateInfo, withDeleteDB bool) error
+	CreateUserOnly(info client.UserInfo, password string, timeout uint) error
+	CreateDatabase(info client.CreateInfo) error
+	DeleteDatabase(info client.DeleteInfo) error
+	DeleteUser(info client.UserInfo, version string, timeout uint) error
+	UpdateUser(info client.UserUpdateInfo, timeout uint) error
+	GrantUser(info client.GrantInfo, timeout uint) error
+	RevokeGrant(info client.GrantInfo, timeout uint) error
+	ListUsers(timeout uint) ([]client.UserInfo, error)
+	ListGrants(timeout uint) ([]client.GrantInfo, error)
 	Delete(info client.DeleteInfo) error
 
 	ChangePassword(info client.PasswordChangeInfo) error

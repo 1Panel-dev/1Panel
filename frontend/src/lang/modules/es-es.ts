@@ -507,6 +507,7 @@ const message = {
         deleteBackupHelper: 'Eliminar copias de seguridad de la base de datos simultáneamente',
         delete: 'La operación de eliminación no se puede revertir, por favor introduzca "',
         deleteHelper: '" para eliminar esta base de datos',
+        userBoundDatabases: 'está vinculado a las siguientes bases de datos:',
         noMysql: 'Servicio de base de datos (MySQL o MariaDB)',
         noPostgresql: 'Servicio de base de datos PostgreSQL',
         goUpgrade: 'Ir a actualizar',
