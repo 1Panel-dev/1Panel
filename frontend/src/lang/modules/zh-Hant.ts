@@ -5376,9 +5376,8 @@ const message = {
             storagePool: '儲存池',
             network: '網路',
             bridgeName: '橋接名稱',
-            natNetworkHelper:
-                'NAT 會建立 libvirt 虛擬網路供虛擬機出網使用，內部橋接名稱會自動產生，不需要選擇主機橋接網卡。',
-            bridgeNetworkHelper: 'Bridge 會將虛擬機接入主機既有的 Linux bridge，使虛擬機加入主機所在的二層網路。',
+            natNetworkHelper: '虛擬機可透過主機存取網路，外部裝置通常無法直接存取虛擬機。',
+            bridgeNetworkHelper: '讓虛擬機接入主機既有的網橋（如 br0）。如主機有未使用的額外網卡，也可為其建立網橋後使用。',
             bridgeNameHelper:
                 '請選擇主機上已存在的 Linux bridge，例如 br0。實體網卡不是 bridge，docker/libvirt 管理的 bridge 不能在此選擇。',
             natCIDRHelper: 'CIDR、閘道和 DHCP 位址範圍將用於新建的 NAT 虛擬網路。',

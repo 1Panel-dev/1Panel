@@ -5857,10 +5857,9 @@ const message = {
             storagePool: 'Depolama Havuzu',
             network: 'Ağ',
             bridgeName: 'Bridge Adı',
-            natNetworkHelper:
-                'NAT, VM çıkış erişimi için libvirt sanal ağı oluşturur. Dahili bridge adı otomatik üretilir ve ana makine bridge seçimi gerekmez.',
+            natNetworkHelper: 'VM’ler ana makine üzerinden ağa erişebilir, ancak harici cihazlar genellikle onlara doğrudan erişemez.',
             bridgeNetworkHelper:
-                'Bridge, VMleri ana makinedeki mevcut Linux bridgee bağlayarak ana makineyle aynı Layer 2 ağına katılmalarını sağlar.',
+                'VM’leri ana makinedeki mevcut bir bridge’e (örneğin br0) bağlayın. Ana makinede kullanılmayan ek bir ağ kartı varsa, bunun için bir bridge oluşturup kullanabilirsiniz.',
             bridgeNameHelper:
                 'Ana makinede var olan br0 gibi bir Linux bridge seçin. Fiziksel NIC bridge değildir ve docker/libvirt tarafından yönetilen bridge burada seçilemez.',
             natCIDRHelper: 'CIDR, ağ geçidi ve DHCP aralığı yeni NAT sanal ağı tarafından kullanılır.',

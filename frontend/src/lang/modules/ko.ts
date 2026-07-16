@@ -5670,10 +5670,9 @@ const message = {
             storagePool: '스토리지 풀',
             network: '네트워크',
             bridgeName: '브리지 이름',
-            natNetworkHelper:
-                'NAT는 VM 외부 연결을 위한 libvirt 가상 네트워크를 생성합니다. 내부 브리지 이름은 자동 생성되며 호스트 브리지 NIC를 선택할 필요가 없습니다.',
+            natNetworkHelper: 'VM은 호스트를 통해 네트워크에 연결할 수 있지만, 외부 장치에서는 일반적으로 VM에 직접 접근할 수 없습니다.',
             bridgeNetworkHelper:
-                'Bridge는 VM을 호스트의 기존 Linux bridge에 연결하여 호스트와 같은 L2 네트워크에 참여시킵니다.',
+                'VM을 호스트의 기존 브리지(예: br0)에 연결합니다. 호스트에 사용하지 않는 추가 네트워크 카드가 있으면 브리지를 만들어 사용할 수 있습니다.',
             bridgeNameHelper:
                 'br0와 같이 호스트에 이미 존재하는 Linux bridge를 선택하세요. 물리 NIC는 bridge가 아니며 docker/libvirt가 관리하는 bridge는 여기서 선택할 수 없습니다.',
             natCIDRHelper: 'CIDR, 게이트웨이, DHCP 주소 범위는 새 NAT 가상 네트워크에 사용됩니다.',
