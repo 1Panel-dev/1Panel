@@ -5863,10 +5863,9 @@ const message = {
             storagePool: 'Kolam Storan',
             network: 'Rangkaian',
             bridgeName: 'Nama Bridge',
-            natNetworkHelper:
-                'NAT mencipta rangkaian maya libvirt untuk akses keluar VM. Nama bridge dalaman dijana secara automatik dan bridge hos tidak diperlukan.',
+            natNetworkHelper: 'VM boleh mengakses rangkaian melalui hos, tetapi peranti luar biasanya tidak boleh mengaksesnya secara langsung.',
             bridgeNetworkHelper:
-                'Bridge menyambungkan VM ke Linux bridge hos sedia ada supaya VM boleh menyertai rangkaian Layer 2 yang sama dengan hos.',
+                'Sambungkan VM ke bridge hos sedia ada (seperti br0). Jika hos mempunyai kad rangkaian tambahan yang tidak digunakan, anda boleh mencipta bridge untuknya dan menggunakannya.',
             bridgeNameHelper:
                 'Pilih Linux bridge sedia ada pada hos, seperti br0. NIC fizikal bukan bridge, dan bridge yang diurus docker/libvirt tidak boleh dipilih di sini.',
             natCIDRHelper: 'CIDR, get laluan dan julat DHCP digunakan oleh rangkaian maya NAT baharu.',

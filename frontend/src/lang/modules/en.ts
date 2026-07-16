@@ -5778,10 +5778,9 @@ const message = {
             storagePool: 'Storage Pool',
             network: 'Network',
             bridgeName: 'Bridge Name',
-            natNetworkHelper:
-                'NAT creates a libvirt virtual network for VM outbound access. The internal bridge name is generated automatically and no host bridge is required.',
+            natNetworkHelper: 'VMs can access the network through the host, but external devices usually cannot access them directly.',
             bridgeNetworkHelper:
-                'Bridge connects VMs to an existing host Linux bridge so they can join the same Layer 2 network as the host.',
+                'Connect VMs to an existing host bridge (such as br0). If the host has an unused additional NIC, create a bridge for it and use it.',
             bridgeNameHelper:
                 'Select an existing Linux bridge on the host, such as br0. Physical NICs are not bridges, and docker/libvirt managed bridges cannot be selected here.',
             natCIDRHelper: 'CIDR, gateway, and DHCP range are used by the new NAT virtual network.',

@@ -6014,10 +6014,9 @@ const message = {
             storagePool: 'Pool de Armazenamento',
             network: 'Rede',
             bridgeName: 'Nome da Bridge',
-            natNetworkHelper:
-                'NAT cria uma rede virtual libvirt para acesso externo da VM. O nome da bridge interna é gerado automaticamente e nenhuma bridge do host é necessária.',
+            natNetworkHelper: 'As VMs podem acessar a rede pelo host, mas dispositivos externos geralmente não podem acessá-las diretamente.',
             bridgeNetworkHelper:
-                'Bridge conecta VMs a uma Linux bridge existente no host para que elas entrem na mesma rede de camada 2 do host.',
+                'Conecte as VMs a uma bridge existente do host (como br0). Se o host tiver uma placa de rede adicional não utilizada, crie uma bridge para ela e use-a.',
             bridgeNameHelper:
                 'Selecione uma Linux bridge existente no host, como br0. NICs físicas não são bridges, e bridges gerenciadas por docker/libvirt não podem ser selecionadas aqui.',
             natCIDRHelper: 'CIDR, gateway e intervalo DHCP são usados pela nova rede virtual NAT.',
