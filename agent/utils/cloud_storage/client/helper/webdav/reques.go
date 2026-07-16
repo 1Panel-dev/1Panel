@@ -1,6 +1,7 @@
 package webdav
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -8,6 +9,10 @@ import (
 )
 
 func (c *Client) req(method, path string, body io.Reader, intercept func(*http.Request)) (rs *http.Response, err error) {
+	return c.reqWithContext(context.Background(), method, path, body, intercept)
+}
+
+func (c *Client) reqWithContext(ctx context.Context, method, path string, body io.Reader, intercept func(*http.Request)) (rs *http.Response, err error) {
 	var redo bool
 	var r *http.Request
 	var uri = PathEscape(Join(c.root, path))
@@ -15,7 +20,7 @@ func (c *Client) req(method, path string, body io.Reader, intercept func(*http.R
 	defer auth.Close()
 
 	for {
-		if r, err = http.NewRequest(method, uri, body); err != nil {
+		if r, err = http.NewRequestWithContext(ctx, method, uri, body); err != nil {
 			err = fmt.Errorf("handle request with uri: %s, method: %s failed, err: %v", uri, method, err)
 			return
 		}
@@ -57,7 +62,11 @@ func (c *Client) req(method, path string, body io.Reader, intercept func(*http.R
 }
 
 func (c *Client) propfind(path string, self bool, body string, resp interface{}, parse func(resp interface{}) error) error {
-	rs, err := c.req("PROPFIND", path, strings.NewReader(body), func(rq *http.Request) {
+	return c.propfindWithContext(context.Background(), path, self, body, resp, parse)
+}
+
+func (c *Client) propfindWithContext(ctx context.Context, path string, self bool, body string, resp interface{}, parse func(resp interface{}) error) error {
+	rs, err := c.reqWithContext(ctx, "PROPFIND", path, strings.NewReader(body), func(rq *http.Request) {
 		if self {
 			rq.Header.Add("Depth", "0")
 		} else {
@@ -82,7 +91,11 @@ func (c *Client) propfind(path string, self bool, body string, resp interface{},
 }
 
 func (c *Client) put(path string, stream io.Reader, contentLength int64) (status int, err error) {
-	rs, err := c.req("PUT", path, stream, func(r *http.Request) {
+	return c.putWithContext(context.Background(), path, stream, contentLength)
+}
+
+func (c *Client) putWithContext(ctx context.Context, path string, stream io.Reader, contentLength int64) (status int, err error) {
+	rs, err := c.reqWithContext(ctx, "PUT", path, stream, func(r *http.Request) {
 		r.ContentLength = contentLength
 	})
 	if err != nil {

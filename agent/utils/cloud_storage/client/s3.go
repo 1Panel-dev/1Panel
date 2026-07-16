@@ -120,7 +120,7 @@ func (s s3Client) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (s s3Client) Upload(src, target string) (bool, error) {
+func (s s3Client) Upload(ctx context.Context, src, target string) (bool, error) {
 	fileInfo, err := os.Stat(src)
 	if err != nil {
 		return false, err
@@ -143,8 +143,11 @@ func (s s3Client) Upload(src, target string) (bool, error) {
 	}
 	opts.PartSize = partSize
 
-	ctx, cancel := s.ctx(s3TransferTimeout)
-	defer cancel()
+	if _, ok := ctx.Deadline(); !ok {
+		var cancel context.CancelFunc
+		ctx, cancel = s.ctx(s3TransferTimeout)
+		defer cancel()
+	}
 	if _, err := s.client.PutObject(ctx, s.bucket, target, file, fileInfo.Size(), opts); err != nil {
 		return false, err
 	}

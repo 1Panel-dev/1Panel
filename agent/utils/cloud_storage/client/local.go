@@ -1,9 +1,11 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
@@ -38,7 +40,12 @@ func (c localClient) Delete(file string) (bool, error) {
 	return true, nil
 }
 
-func (c localClient) Upload(src, target string) (bool, error) {
+func (c localClient) Upload(ctx context.Context, src, target string) (bool, error) {
+	if _, ok := ctx.Deadline(); !ok {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, 24*time.Hour)
+		defer cancel()
+	}
 	fileOp := files.NewFileOp()
 	if _, err := os.Stat(path.Dir(target)); err != nil {
 		if os.IsNotExist(err) {
@@ -50,7 +57,7 @@ func (c localClient) Upload(src, target string) (bool, error) {
 		}
 	}
 
-	if err := fileOp.CopyAndReName(src, target, "", true); err != nil {
+	if err := fileOp.CopyAndReNameWithContext(ctx, src, target, "", true); err != nil {
 		return false, fmt.Errorf("cp file failed, err: %v", err)
 	}
 	return true, nil

@@ -2,6 +2,7 @@ package service
 
 import (
 	"bufio"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -372,7 +373,7 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 		targetPath = strings.TrimPrefix(targetPath, "/")
 	}
 
-	if _, err := client.Upload(fileItem, targetPath); err != nil {
+	if _, err := client.Upload(context.Background(), fileItem, targetPath); err != nil {
 		return false, err
 	}
 	_, _ = client.Delete(path.Join(backup.BackupPath, "test/1panel"))
@@ -437,6 +438,10 @@ type backupClientHelper struct {
 }
 
 func NewBackupClientMap(ids []string) map[string]backupClientHelper {
+	return NewBackupClientMapWithContext(context.Background(), ids)
+}
+
+func NewBackupClientMapWithContext(ctx context.Context, ids []string) map[string]backupClientHelper {
 	var accounts []model.BackupAccount
 	var idItems []uint
 	for i := 0; i < len(ids); i++ {
@@ -446,7 +451,7 @@ func NewBackupClientMap(ids []string) map[string]backupClientHelper {
 	accounts, _ = backupRepo.List(repo.WithByIDs(idItems))
 	clientMap := make(map[string]backupClientHelper)
 	for _, item := range accounts {
-		backClient, err := newClient(&item, true)
+		backClient, err := newClientWithContext(ctx, &item, true)
 		itemHelper := backupClientHelper{
 			client:      backClient,
 			name:        item.Name,
@@ -464,6 +469,10 @@ func NewBackupClientMap(ids []string) map[string]backupClientHelper {
 }
 
 func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper, src, dst, accountIDs string, downloadAccountID, retry uint, cleanOnFailure bool) error {
+	return uploadWithMapWithContext(context.Background(), taskItem, accountMap, src, dst, accountIDs, downloadAccountID, retry, cleanOnFailure, true)
+}
+
+func uploadWithMapWithContext(ctx context.Context, taskItem task.Task, accountMap map[string]backupClientHelper, src, dst, accountIDs string, downloadAccountID, retry uint, cleanOnFailure, removeSrc bool) error {
 	accounts := strings.Split(accountIDs, ",")
 	for _, account := range accounts {
 		if len(account) == 0 {
@@ -489,7 +498,7 @@ func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper,
 			"backup": name,
 		}))
 		for i := 0; i < int(retry)+1; i++ {
-			_, err := itemBackup.client.Upload(src, path.Join(itemBackup.backupPath, dst))
+			_, err := itemBackup.client.Upload(ctx, src, path.Join(itemBackup.backupPath, dst))
 			taskItem.LogWithStatus(i18n.GetMsgByKey("Upload"), err)
 			if err != nil {
 				if account == fmt.Sprintf("%d", downloadAccountID) {
@@ -505,7 +514,9 @@ func uploadWithMap(taskItem task.Task, accountMap map[string]backupClientHelper,
 		itemBackup.hasBackup = true
 		accountMap[account] = itemBackup
 	}
-	os.RemoveAll(src)
+	if removeSrc {
+		os.RemoveAll(src)
+	}
 	return nil
 }
 
@@ -564,6 +575,10 @@ func markBackupFailed(recordID uint, backupErr error) {
 }
 
 func newClient(account *model.BackupAccount, isEncrypt bool) (cloud_storage.CloudStorageClient, error) {
+	return newClientWithContext(context.Background(), account, isEncrypt)
+}
+
+func newClientWithContext(ctx context.Context, account *model.BackupAccount, isEncrypt bool) (cloud_storage.CloudStorageClient, error) {
 	varMap := make(map[string]interface{})
 	if len(account.Vars) != 0 {
 		if err := json.Unmarshal([]byte(account.Vars), &varMap); err != nil {
@@ -588,7 +603,7 @@ func newClient(account *model.BackupAccount, isEncrypt bool) (cloud_storage.Clou
 		varMap["password"] = account.Credential
 	}
 
-	client, err := cloud_storage.NewCloudStorageClient(account.Type, varMap)
+	client, err := cloud_storage.NewCloudStorageClientWithContext(ctx, account.Type, varMap)
 	if err != nil {
 		return nil, err
 	}

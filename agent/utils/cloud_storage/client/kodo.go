@@ -70,7 +70,7 @@ func (k kodoClient) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (k kodoClient) Upload(src, target string) (bool, error) {
+func (k kodoClient) Upload(ctx context.Context, src, target string) (bool, error) {
 
 	int64Value, _ := strconv.ParseInt(k.timeout, 10, 64)
 	unixTimestamp := int64Value * 3600
@@ -84,7 +84,7 @@ func (k kodoClient) Upload(src, target string) (bool, error) {
 	resumeUploader := storage.NewResumeUploaderV2(&cfg)
 	ret := storage.PutRet{}
 	putExtra := storage.RputV2Extra{}
-	if err := resumeUploader.PutFile(context.Background(), &ret, upToken, target, src, &putExtra); err != nil {
+	if err := resumeUploader.PutFile(ctx, &ret, upToken, target, src, &putExtra); err != nil {
 		return false, err
 	}
 	return true, nil

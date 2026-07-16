@@ -98,7 +98,7 @@ func (c cosClient) Delete(path string) (bool, error) {
 	return true, nil
 }
 
-func (c cosClient) Upload(src, target string) (bool, error) {
+func (c cosClient) Upload(ctx context.Context, src, target string) (bool, error) {
 	fileInfo, err := os.Stat(src)
 	if err != nil {
 		return false, err
@@ -114,13 +114,13 @@ func (c cosClient) Upload(src, target string) (bool, error) {
 			PartSize: 200,
 		}
 		if _, _, err := c.clientWithBucket.Object.MultiUpload(
-			context.Background(), target, src, opt,
+			ctx, target, src, opt,
 		); err != nil {
 			return false, err
 		}
 		return true, nil
 	}
-	if _, err := c.clientWithBucket.Object.PutFromFile(context.Background(), target, src, &cosSDK.ObjectPutOptions{
+	if _, err := c.clientWithBucket.Object.PutFromFile(ctx, target, src, &cosSDK.ObjectPutOptions{
 		ACLHeaderOptions: nil,
 		ObjectPutHeaderOptions: &cosSDK.ObjectPutHeaderOptions{
 			XCosStorageClass: c.scType,

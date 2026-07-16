@@ -1,6 +1,8 @@
 package client
 
 import (
+	"context"
+	"net/http"
 	"path"
 
 	"github.com/upyun/go-sdk/upyun"
@@ -29,11 +31,19 @@ func (o upClient) ListBuckets() ([]interface{}, error) {
 	return result, nil
 }
 
-func (s upClient) Upload(src, target string) (bool, error) {
-	if _, err := s.client.GetInfo(path.Dir(src)); err != nil {
-		_ = s.client.Mkdir(path.Dir(target))
+func (s upClient) Upload(ctx context.Context, src, target string) (bool, error) {
+	if err := ctx.Err(); err != nil {
+		return false, err
 	}
-	if err := s.client.Put(&upyun.PutObjectConfig{
+	client := s.client
+	if _, ok := ctx.Deadline(); ok {
+		client = upyun.NewUpYun(&s.client.UpYunConfig)
+		client.SetHTTPClient(&http.Client{Transport: deadlineTransport{ctx: ctx, base: http.DefaultTransport}})
+	}
+	if _, err := client.GetInfo(path.Dir(src)); err != nil {
+		_ = client.Mkdir(path.Dir(target))
+	}
+	if err := client.Put(&upyun.PutObjectConfig{
 		Path:            target,
 		LocalPath:       src,
 		UseResumeUpload: true,
