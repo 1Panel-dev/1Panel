@@ -707,7 +707,7 @@ const message = {
             syncAgentsHelper: 'このモデルアカウントを使用するエージェントの openclaw.json を更新',
             appVersion: 'アプリバージョン',
             webuiPort: 'WebUI ポート',
-            tokenOrAuth: 'Token/ユーザー名・パスワード',
+            tokenOrAuth: 'Token/認証',
             allowedOrigins: 'アクセスアドレス',
             allowedOriginsRequired: '少なくとも 1 つのアクセスアドレスを入力してください',
             allowedOriginsInvalid: 'http(s)://host-or-ip[:port] の形式で入力してください',
@@ -5103,7 +5103,8 @@ const message = {
         },
         tamper: {
             tamper: 'ウェブサイトの改ざん防止',
-            tamperCreateHint: '現在のディレクトリは改ざん防止またはファイル属性の影響を受け、作成に失敗する可能性があります。',
+            tamperCreateHint:
+                '現在のディレクトリは改ざん防止またはファイル属性の影響を受け、作成に失敗する可能性があります。',
             ignoreTemplate: '除外テンプレート',
             protectTemplate: '保護テンプレート',
             ignoreTemplateHelper:
@@ -5785,7 +5786,8 @@ const message = {
             storagePool: 'ストレージプール',
             network: 'ネットワーク',
             bridgeName: 'ブリッジ名',
-            natNetworkHelper: 'VM はホスト経由でネットワークに接続できますが、外部の機器から VM へ直接アクセスすることは通常できません。',
+            natNetworkHelper:
+                'VM はホスト経由でネットワークに接続できますが、外部の機器から VM へ直接アクセスすることは通常できません。',
             bridgeNetworkHelper:
                 'VM をホスト上の既存ブリッジ（br0 など）に接続します。未使用の追加 NIC がある場合は、その NIC 用のブリッジを作成して使用できます。',
             bridgeNameHelper:

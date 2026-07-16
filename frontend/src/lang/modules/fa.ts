@@ -700,6 +700,7 @@ const message = {
             syncAgentsHelper: 'به‌روزرسانی openclaw.json برای عامل‌هایی که از این حساب مدل استفاده می‌کنند',
             appVersion: 'نسخه برنامه',
             webuiPort: 'پورت WebUI',
+            tokenOrAuth: 'Token/احراز هویت',
             allowedOrigins: 'آدرس‌های دسترسی',
             allowedOriginsRequired: 'حداقل یک آدرس دسترسی وارد کنید',
             allowedOriginsInvalid: 'از فرمت http(s)://host-or-ip[:port] استفاده کنید',
@@ -5722,7 +5723,8 @@ const message = {
             storagePool: 'استخر ذخیره‌سازی',
             network: 'شبکه',
             bridgeName: 'نام Bridge',
-            natNetworkHelper: 'ماشین مجازی می‌تواند از طریق میزبان به شبکه دسترسی داشته باشد، اما دستگاه‌های خارجی معمولاً نمی‌توانند مستقیماً به آن دسترسی پیدا کنند.',
+            natNetworkHelper:
+                'ماشین مجازی می‌تواند از طریق میزبان به شبکه دسترسی داشته باشد، اما دستگاه‌های خارجی معمولاً نمی‌توانند مستقیماً به آن دسترسی پیدا کنند.',
             bridgeNetworkHelper:
                 'ماشین مجازی را به bridge موجود میزبان (مانند br0) متصل کنید. اگر میزبان کارت شبکه اضافیِ استفاده‌نشده دارد، می‌توانید برای آن bridge بسازید و استفاده کنید.',
             bridgeNameHelper:

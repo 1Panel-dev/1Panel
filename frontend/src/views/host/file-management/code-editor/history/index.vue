@@ -235,7 +235,7 @@ import { loadMonacoLanguageSupport, setupMonacoEnvironment } from '@/utils/monac
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import { Languages } from '@/global/mimetype';
 import i18n from '@/lang';
-import ComplexTable from '@/components/complex-table/index.vue';
+import ComplexTable from '@/components/table/complex/ComplexTable.vue';
 
 type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
 

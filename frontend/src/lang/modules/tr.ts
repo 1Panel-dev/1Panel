@@ -710,7 +710,7 @@ const message = {
             syncAgentsHelper: 'Bu model hesabını kullanan ajanlar için openclaw.json dosyasını güncelleyin',
             appVersion: 'Uygulama sürümü',
             webuiPort: 'WebUI portu',
-            tokenOrAuth: 'Token/Kullanıcı adı ve parola',
+            tokenOrAuth: 'Token/Kimlik Doğrulama',
             allowedOrigins: 'Erişim adresleri',
             allowedOriginsRequired: 'En az bir erişim adresi girin',
             allowedOriginsInvalid: 'http(s)://host-veya-ip[:port] biçimini kullanın',
@@ -5378,10 +5378,12 @@ const message = {
                 'Çevrimdışı ortamlarda, farklı mimarideki düğümler güncellenmeden önce eşleşen güncelleme paketi yüklenmelidir.',
             healthCheck: 'Sağlık Kontrolü',
             healthCheckFrequency: 'Kontrol Sıklığı',
-            healthCheckFrequencyHelper: 'Arka uç düğümlerinin sağlığını düzenli olarak kontrol eder. Kontrolü kapatmak için 0 girin.',
+            healthCheckFrequencyHelper:
+                'Arka uç düğümlerinin sağlığını düzenli olarak kontrol eder. Kontrolü kapatmak için 0 girin.',
             healthCheckFrequencyLimit: 'Kontrol sıklığı bir günü aşamaz ve negatif olmayan bir tam sayı olmalıdır.',
             loadFailedNodeResources: 'Başarısız düğüm kaynaklarını sorgula',
-            loadFailedNodeResourcesHelper: 'Düğüm listesi açıldığında başarısız düğümlerin kaynak bilgilerini de sorgular.',
+            loadFailedNodeResourcesHelper:
+                'Düğüm listesi açıldığında başarısız düğümlerin kaynak bilgilerini de sorgular.',
             nodeUnhealthy: 'Düğüm durumu anormal',
             deletedNode: 'Silinmiş düğüm {0} şu anda yükseltme işlemlerini desteklemiyor!',
             nodeUnhealthyHelper:
@@ -5857,7 +5859,8 @@ const message = {
             storagePool: 'Depolama Havuzu',
             network: 'Ağ',
             bridgeName: 'Bridge Adı',
-            natNetworkHelper: 'VM’ler ana makine üzerinden ağa erişebilir, ancak harici cihazlar genellikle onlara doğrudan erişemez.',
+            natNetworkHelper:
+                'VM’ler ana makine üzerinden ağa erişebilir, ancak harici cihazlar genellikle onlara doğrudan erişemez.',
             bridgeNetworkHelper:
                 'VM’leri ana makinedeki mevcut bir bridge’e (örneğin br0) bağlayın. Ana makinede kullanılmayan ek bir ağ kartı varsa, bunun için bir bridge oluşturup kullanabilirsiniz.',
             bridgeNameHelper:

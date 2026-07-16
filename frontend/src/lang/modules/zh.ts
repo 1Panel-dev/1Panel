@@ -676,7 +676,7 @@ const message = {
             syncAgentsHelper: '更新使用该模型账号的智能体 openclaw.json',
             appVersion: '应用版本',
             webuiPort: 'WebUI 端口',
-            tokenOrAuth: 'Token/用户名密码',
+            tokenOrAuth: 'Token/Auth',
             allowedOrigins: '访问地址',
             allowedOriginsRequired: '请至少填写一个访问地址',
             allowedOriginsInvalid: '访问地址格式错误，请输入 http(s)://域名或IP[:端口]',

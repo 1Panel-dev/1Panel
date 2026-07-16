@@ -64,6 +64,7 @@
                 </el-button-group>
             </template>
             <template #rightToolBar>
+                <TableViewSwitch v-model="viewMode" storage-key="container" />
                 <TableSearch @search="search()" v-model:searchName="searchName" />
                 <el-tooltip
                     :content="includeAppStore ? $t('container.includeAppstore') : $t('container.excludeAppstore')"
@@ -87,6 +88,7 @@
             <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
+                    v-model:view-mode="viewMode"
                     v-model:selects="selects"
                     :data="data"
                     row-key="containerID"
@@ -106,6 +108,7 @@
                         min-width="250"
                         prop="name"
                         sortable="custom"
+                        card-type="name"
                         fix
                         :fixed="isMobile ? false : 'left'"
                         show-overflow-tooltip
@@ -134,11 +137,17 @@
                     </el-table-column>
                     <el-table-column
                         :label="$t('container.image')"
+                        card-type="description"
                         show-overflow-tooltip
                         min-width="180"
                         prop="imageName"
                     />
-                    <el-table-column :label="$t('commons.table.status')" min-width="150" prop="state">
+                    <el-table-column
+                        card-type="status"
+                        :label="$t('commons.table.status')"
+                        min-width="150"
+                        prop="state"
+                    >
                         <template #default="{ row }">
                             <el-dropdown
                                 placement="bottom"
@@ -192,6 +201,7 @@
                     </el-table-column>
                     <el-table-column
                         :label="$t('container.source')"
+                        card-type="content"
                         show-overflow-tooltip
                         prop="resource"
                         min-width="120"
@@ -271,25 +281,28 @@
                     <el-table-column
                         :label="$t('container.ip')"
                         :width="isMobile ? 120 : 'auto'"
+                        card-type="content"
                         min-width="120"
                         prop="network"
                     >
                         <template #default="{ row }">
-                            <div v-if="row.network">
-                                <div v-for="(item, index) in row.network" :key="index">{{ item }}</div>
+                            <div v-if="getNetworkItems(row).length">
+                                <div v-for="(item, index) in getNetworkItems(row)" :key="index">{{ item }}</div>
                             </div>
+                            <span v-else>-</span>
                         </template>
                     </el-table-column>
                     <el-table-column
                         :label="$t('container.related')"
+                        card-type="description"
                         show-overflow-tooltip
                         min-width="210"
                         prop="appName"
                     >
                         <template #default="{ row }">
-                            <el-button v-if="row.appName != '' || row.websites != null" link icon="Position" />
+                            <el-button v-if="row.appName || row.websites?.length" link icon="Position" />
                             <el-text
-                                v-if="row.appName != ''"
+                                v-if="row.appName"
                                 link
                                 class="cursor-pointer"
                                 size="small"
@@ -298,7 +311,7 @@
                                 {{ $t('app.app') }}: {{ row.appName }} [{{ row.appInstallName }}]
                             </el-text>
                             <el-text
-                                v-if="row.websites != null"
+                                v-if="row.websites?.length"
                                 link
                                 class="cursor-pointer"
                                 size="small"
@@ -307,51 +320,52 @@
                                 {{ $t('menu.website') }}:
                                 {{ row.websites.join(',') }}
                             </el-text>
+                            <span v-if="!row.appName && !row.websites?.length">-</span>
                         </template>
                     </el-table-column>
                     <el-table-column
                         :label="$t('commons.table.port')"
                         :width="isMobile ? 260 : 'auto'"
+                        align="left"
+                        card-type="content-full"
                         min-width="200"
                         prop="ports"
                     >
-                        <template #default="{ row }">
-                            <div v-if="row.ports">
-                                <div v-for="(item, index) in row.ports" :key="index">
-                                    <div v-if="row.expand || (!row.expand && index < 3)">
-                                        <el-tooltip :hide-after="20" :content="item" placement="top">
-                                            <el-button
-                                                v-if="item.indexOf('->') !== -1"
-                                                @click="goDashboard(item)"
-                                                class="tagMargin"
-                                                icon="Position"
-                                                plain
-                                                size="small"
-                                            >
-                                                {{ item.length > 25 ? item.substring(0, 25) + '...' : item }}
-                                            </el-button>
-                                            <el-button v-else class="tagMargin" plain size="small">
-                                                {{ item }}
-                                            </el-button>
-                                        </el-tooltip>
-                                    </div>
-                                </div>
-                                <div v-if="!row.expand && row.ports.length > 3">
-                                    <el-button type="primary" link @click="row.expand = true">
-                                        {{ $t('commons.button.expand') }}...
+                        <template #default="{ row, viewMode: columnViewMode }">
+                            <div
+                                v-if="row.ports"
+                                class="container-port-list"
+                                :class="{ 'is-card': columnViewMode === 'card' }"
+                            >
+                                <el-tooltip
+                                    v-for="item in row.ports.slice(0, 2)"
+                                    :key="item"
+                                    :hide-after="20"
+                                    :content="item"
+                                    placement="top"
+                                >
+                                    <el-button
+                                        v-if="item.indexOf('->') !== -1"
+                                        @click="goDashboard(item)"
+                                        icon="Position"
+                                        plain
+                                        size="small"
+                                    >
+                                        {{ item }}
                                     </el-button>
-                                </div>
-                                <div v-if="row.expand && row.ports.length > 3">
-                                    <el-button type="primary" link @click="row.expand = false">
-                                        {{ $t('commons.button.collapse') }}
-                                    </el-button>
-                                </div>
+                                    <el-button v-else plain size="small">{{ item }}</el-button>
+                                </el-tooltip>
+                                <el-button v-if="row.ports.length > 2" plain size="small" @click="openPorts(row)">
+                                    +{{ row.ports.length - 2 }}
+                                </el-button>
                             </div>
+                            <div v-else class="container-port-empty"></div>
                         </template>
                     </el-table-column>
                     <el-table-column
                         min-width="200"
                         :label="$t('commons.table.description')"
+                        card-type="description"
                         prop="description"
                         show-overflow-tooltip
                     >
@@ -366,11 +380,13 @@
                     </el-table-column>
                     <el-table-column
                         :label="$t('container.upTime')"
+                        card-type="description"
                         min-width="200"
                         show-overflow-tooltip
                         prop="runTime"
                     />
                     <fu-table-operations
+                        card-type="button"
                         fix
                         width="220px"
                         :ellipsis="2"
@@ -381,6 +397,32 @@
                     />
                 </ComplexTable>
             </template>
+
+            <DialogPro
+                v-model="portsDialogVisible"
+                :title="`${$t('commons.table.port')} - ${portsDialogContainer}`"
+                size="small"
+            >
+                <template #content>
+                    <div class="container-port-dialog-filters">
+                        <el-input v-model="portFilter" clearable :placeholder="$t('commons.button.search')" />
+                        <el-checkbox border v-model="showIPv6Ports">IPv6</el-checkbox>
+                    </div>
+                    <div v-if="filteredPorts.length" class="container-port-dialog">
+                        <el-tooltip v-for="item in filteredPorts" :key="item" :content="item" placement="top">
+                            <el-button
+                                :icon="item.indexOf('->') !== -1 ? 'Position' : undefined"
+                                plain
+                                size="small"
+                                @click="item.indexOf('->') !== -1 && goDashboard(item)"
+                            >
+                                {{ item }}
+                            </el-button>
+                        </el-tooltip>
+                    </div>
+                    <el-empty v-else :image-size="80" />
+                </template>
+            </DialogPro>
         </LayoutContent>
 
         <OpDialog ref="opRef" @search="search" @submit="onSubmitOperate" />
@@ -419,7 +461,7 @@ import Uploads from '@/components/upload/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import Status from '@/components/status/index.vue';
-import { reactive, onMounted, ref } from 'vue';
+import { computed, reactive, onMounted, ref } from 'vue';
 import {
     containerItemStats,
     containerListStats,
@@ -444,7 +486,16 @@ const isActive = ref(false);
 const isExist = ref(false);
 
 const loading = ref(false);
+const viewMode = ref<'table' | 'card'>('table');
 const data = ref<any[]>([]);
+const networkItemsByRow = computed(
+    () => new Map(data.value.map((row) => [row, (row.network || []).filter((item: string) => item?.trim())])),
+);
+const portsDialogVisible = ref(false);
+const selectedPorts = ref<string[]>([]);
+const portsDialogContainer = ref('');
+const portFilter = ref('');
+const showIPv6Ports = ref(true);
 const selects = ref<any>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'container-page-size',
@@ -583,6 +634,31 @@ const goDashboard = async (port: any) => {
     let ip = matches && matches.length > 1 ? 'ipv6' : 'ipv4';
     dialogPortJumpRef.value.acceptParams({ port: portEx, ip: ip });
 };
+
+const openPorts = (row: Container.ContainerInfo) => {
+    selectedPorts.value = row.ports || [];
+    portsDialogContainer.value = row.name;
+    portFilter.value = '';
+    showIPv6Ports.value = true;
+    portsDialogVisible.value = true;
+};
+
+const isIPv6Port = (port: string) => {
+    const address = port.split('->')[0] || port;
+    return address.includes('[') || (address.match(/:/g)?.length || 0) > 1;
+};
+
+const getNetworkItems = (row: Container.ContainerInfo) => networkItemsByRow.value.get(row) || [];
+
+const filteredPorts = computed(() => {
+    const keyword = portFilter.value.trim().toLowerCase();
+    return selectedPorts.value.filter((port) => {
+        if (!showIPv6Ports.value && isIPv6Port(port)) {
+            return false;
+        }
+        return !keyword || port.toLowerCase().includes(keyword);
+    });
+});
 
 interface Filters {
     filters?: string;
@@ -932,6 +1008,68 @@ onMounted(() => {
 <style scoped lang="scss">
 .tagMargin {
     margin-top: 2px;
+}
+.container-port-list,
+.container-port-dialog {
+    display: flex;
+    justify-content: flex-start;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.container-port-empty {
+    min-height: 24px;
+}
+.container-port-list {
+    width: 100%;
+    text-align: left;
+
+    :deep(.el-button) {
+        max-width: calc(50% - 3px);
+        min-width: 0;
+    }
+
+    :deep(.el-button > span) {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    :deep(.el-button + .el-button) {
+        margin-left: 0;
+    }
+
+    &:not(.is-card) {
+        flex-direction: column;
+        align-items: flex-start;
+
+        :deep(.el-button) {
+            max-width: 100%;
+        }
+    }
+}
+.container-port-dialog-filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .el-input {
+        flex: 1;
+    }
+}
+.container-port-dialog {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    text-align: left;
+
+    :deep(.el-button) {
+        width: 100%;
+        margin-left: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 .source-font {
     font-size: 12px;

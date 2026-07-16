@@ -706,7 +706,7 @@ const message = {
             syncAgentsHelper: 'Обновите openclaw.json для агентов, использующих этот аккаунт модели',
             appVersion: 'Версия приложения',
             webuiPort: 'Порт WebUI',
-            tokenOrAuth: 'Token/имя пользователя и пароль',
+            tokenOrAuth: 'Token/Аутентификация',
             allowedOrigins: 'Адреса доступа',
             allowedOriginsRequired: 'Укажите хотя бы один адрес доступа',
             allowedOriginsInvalid: 'Используйте формат http(s)://host-or-ip[:port]',
@@ -5862,7 +5862,8 @@ const message = {
             storagePool: 'Пул хранения',
             network: 'Сеть',
             bridgeName: 'Имя моста',
-            natNetworkHelper: 'ВМ может выходить в сеть через хост, но внешние устройства обычно не могут обращаться к ней напрямую.',
+            natNetworkHelper:
+                'ВМ может выходить в сеть через хост, но внешние устройства обычно не могут обращаться к ней напрямую.',
             bridgeNetworkHelper:
                 'Подключите ВМ к существующему мосту хоста (например, br0). Если у хоста есть неиспользуемая дополнительная сетевая карта, для неё можно создать мост и использовать его.',
             bridgeNameHelper:
