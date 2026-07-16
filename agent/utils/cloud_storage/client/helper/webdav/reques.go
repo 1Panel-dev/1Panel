@@ -62,7 +62,11 @@ func (c *Client) reqWithContext(ctx context.Context, method, path string, body i
 }
 
 func (c *Client) propfind(path string, self bool, body string, resp interface{}, parse func(resp interface{}) error) error {
-	rs, err := c.req("PROPFIND", path, strings.NewReader(body), func(rq *http.Request) {
+	return c.propfindWithContext(context.Background(), path, self, body, resp, parse)
+}
+
+func (c *Client) propfindWithContext(ctx context.Context, path string, self bool, body string, resp interface{}, parse func(resp interface{}) error) error {
+	rs, err := c.reqWithContext(ctx, "PROPFIND", path, strings.NewReader(body), func(rq *http.Request) {
 		if self {
 			rq.Header.Add("Depth", "0")
 		} else {

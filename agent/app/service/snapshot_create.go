@@ -594,16 +594,30 @@ func snapUpload(snap snapHelper, accounts string, downloadID, retry uint, file s
 
 	src := path.Join(global.Dir.LocalBackupDir, "tmp/system", path.Base(file))
 	dst := path.Join("system_snapshot", path.Base(file))
-	accountMap := NewBackupClientMap(strings.Split(accounts, ","))
-	if !accountMap[fmt.Sprintf("%d", downloadID)].isOk {
-		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", downloadID)].message))
-	}
-
 	ctx := context.Background()
 	if timeout > 0 {
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, timeout)
 		defer cancel()
 	}
-	return uploadWithMapWithContext(ctx, snap.Task, accountMap, src, dst, accounts, downloadID, retry, false)
+	downloadAccount := fmt.Sprintf("%d", downloadID)
+	accountMap := NewBackupClientMapWithContext(ctx, []string{downloadAccount})
+	if !accountMap[fmt.Sprintf("%d", downloadID)].isOk {
+		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", accountMap[fmt.Sprintf("%d", downloadID)].message))
+	}
+	remainingAccounts := make([]string, 0)
+	for _, account := range strings.Split(accounts, ",") {
+		if account == "" || account == downloadAccount {
+			continue
+		}
+		remainingAccounts = append(remainingAccounts, account)
+	}
+	if err := uploadWithMapWithContext(ctx, snap.Task, accountMap, src, dst, downloadAccount, downloadID, retry, false, len(remainingAccounts) == 0); err != nil {
+		return err
+	}
+	if len(remainingAccounts) == 0 {
+		return nil
+	}
+	optionalMap := NewBackupClientMapWithContext(ctx, remainingAccounts)
+	return uploadWithMapWithContext(ctx, snap.Task, optionalMap, src, dst, strings.Join(remainingAccounts, ","), downloadID, retry, false, true)
 }

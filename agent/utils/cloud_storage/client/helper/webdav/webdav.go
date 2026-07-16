@@ -53,7 +53,11 @@ func (c *Client) SetTransport(transport http.RoundTripper) {
 }
 
 func (c *Client) Connect() error {
-	rs, err := c.req("OPTIONS", "/", nil, func(rq *http.Request) { rq.Header.Add("Depth", "0") })
+	return c.ConnectWithContext(context.Background())
+}
+
+func (c *Client) ConnectWithContext(ctx context.Context) error {
+	rs, err := c.reqWithContext(ctx, "OPTIONS", "/", nil, func(rq *http.Request) { rq.Header.Add("Depth", "0") })
 	if err != nil {
 		return err
 	}
@@ -136,6 +140,10 @@ func (c *Client) ReadDir(path string) ([]os.FileInfo, error) {
 }
 
 func (c *Client) Stat(path string) (os.FileInfo, error) {
+	return c.StatWithContext(context.Background(), path)
+}
+
+func (c *Client) StatWithContext(ctx context.Context, path string) (os.FileInfo, error) {
 	var f *File
 	parse := func(resp interface{}) error {
 		r := resp.(*response)
@@ -160,7 +168,7 @@ func (c *Client) Stat(path string) (os.FileInfo, error) {
 		return nil
 	}
 
-	if err := c.propfind(path, true, template, &response{}, parse); err != nil {
+	if err := c.propfindWithContext(ctx, path, true, template, &response{}, parse); err != nil {
 		if _, ok := err.(*os.PathError); !ok {
 			return f, fmt.Errorf("load file %s failed, path err: %v", path, err)
 		}
@@ -182,6 +190,10 @@ func (c *Client) RemoveAll(path string) error {
 }
 
 func (c *Client) MkdirAll(path string, _ os.FileMode) (err error) {
+	return c.MkdirAllWithContext(context.Background(), path, 0755)
+}
+
+func (c *Client) MkdirAllWithContext(ctx context.Context, path string, _ os.FileMode) (err error) {
 	parentPath := filepath.Dir(path)
 	if parentPath == "." || parentPath == "/" {
 		return nil
@@ -189,11 +201,11 @@ func (c *Client) MkdirAll(path string, _ os.FileMode) (err error) {
 
 	paths := SplitPathToHierarchy(parentPath)
 	for _, item := range paths {
-		itemFile, err := c.Stat(item)
+		itemFile, err := c.StatWithContext(ctx, item)
 		if err == nil && itemFile.IsDir() {
 			continue
 		}
-		rs, err := c.req("MKCOL", item, nil, nil)
+		rs, err := c.reqWithContext(ctx, "MKCOL", item, nil, nil)
 		if err != nil {
 			return fmt.Errorf("mkdir %s failed, err: %v", item, err)
 		}
@@ -224,7 +236,7 @@ func (c *Client) WriteStream(path string, stream io.Reader, _ os.FileMode) (err 
 }
 
 func (c *Client) WriteStreamWithContext(ctx context.Context, path string, stream io.Reader, _ os.FileMode) (err error) {
-	err = c.MkdirAll(path, 0755)
+	err = c.MkdirAllWithContext(ctx, path, 0755)
 	if err != nil {
 		return err
 	}

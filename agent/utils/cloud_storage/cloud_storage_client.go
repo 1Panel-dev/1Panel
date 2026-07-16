@@ -49,3 +49,14 @@ func NewCloudStorageClient(backupType string, vars map[string]interface{}) (Clou
 		return nil, buserr.WithName("ErrNotSupportType", backupType)
 	}
 }
+
+func NewCloudStorageClientWithContext(ctx context.Context, backupType string, vars map[string]interface{}) (CloudStorageClient, error) {
+	switch backupType {
+	case constant.Sftp:
+		return client.NewSftpClientWithContext(ctx, vars)
+	case constant.WebDAV:
+		return client.NewWebDAVClientWithContext(ctx, vars)
+	default:
+		return NewCloudStorageClient(backupType, vars)
+	}
+}

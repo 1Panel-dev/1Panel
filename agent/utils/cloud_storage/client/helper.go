@@ -17,7 +17,7 @@ func (t deadlineTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 	if err := t.ctx.Err(); err != nil {
 		return nil, err
 	}
-	return t.base.RoundTrip(req)
+	return t.base.RoundTrip(req.Clone(t.ctx))
 }
 
 func loadParamFromVars(key string, vars map[string]interface{}) string {

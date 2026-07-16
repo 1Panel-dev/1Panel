@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"path"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -19,6 +20,14 @@ type sftpClient struct {
 }
 
 func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
+	return newSftpClient(context.Background(), vars)
+}
+
+func NewSftpClientWithContext(ctx context.Context, vars map[string]interface{}) (*sftpClient, error) {
+	return newSftpClient(ctx, vars)
+}
+
+func newSftpClient(ctx context.Context, vars map[string]interface{}) (*sftpClient, error) {
 	address := loadParamFromVars("address", vars)
 	port := loadParamFromVars("port", vars)
 	if len(port) == 0 {
@@ -54,10 +63,11 @@ func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
 		},
 	}
 	addr := net.JoinHostPort(address, port)
-	if _, err := ssh.Dial("tcp", addr, clientConfig); err != nil {
+	sshClient, err := dialSSHWithContext(ctx, addr, clientConfig)
+	if err != nil {
 		return nil, err
 	}
-
+	_ = sshClient.Close()
 	return &sftpClient{connInfo: addr, config: clientConfig}, nil
 }
 
@@ -65,11 +75,28 @@ func (s sftpClient) Upload(ctx context.Context, src, target string) (bool, error
 	if err := ctx.Err(); err != nil {
 		return false, err
 	}
-	sshClient, err := ssh.Dial("tcp", s.connInfo, s.config)
+	sshClient, err := dialSSHWithContext(ctx, s.connInfo, s.config)
 	if err != nil {
 		return false, err
 	}
-	defer sshClient.Close()
+
+	done := make(chan struct{})
+	var closeOnce sync.Once
+	closeSSH := func() {
+		closeOnce.Do(func() {
+			_ = sshClient.Close()
+		})
+	}
+	defer closeSSH()
+	go func() {
+		select {
+		case <-ctx.Done():
+			closeSSH()
+		case <-done:
+		}
+	}()
+	defer close(done)
+
 	client, err := sftp.NewClient(sshClient)
 	if err != nil {
 		return false, err
@@ -101,9 +128,44 @@ func (s sftpClient) Upload(ctx context.Context, src, target string) (bool, error
 	defer dstFile.Close()
 
 	if _, err := io.Copy(dstFile, srcFile); err != nil {
+		if ctxErr := ctx.Err(); ctxErr != nil {
+			return false, ctxErr
+		}
 		return false, err
 	}
 	return true, nil
+}
+
+func dialSSHWithContext(ctx context.Context, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+	dialer := &net.Dialer{}
+	if config != nil && config.Timeout > 0 {
+		dialer.Timeout = config.Timeout
+	}
+	conn, err := dialer.DialContext(ctx, "tcp", addr)
+	if err != nil {
+		return nil, err
+	}
+	if deadline, ok := ctx.Deadline(); ok {
+		if err := conn.SetDeadline(deadline); err != nil {
+			_ = conn.Close()
+			return nil, err
+		}
+	} else if config != nil && config.Timeout > 0 {
+		if err := conn.SetDeadline(time.Now().Add(config.Timeout)); err != nil {
+			_ = conn.Close()
+			return nil, err
+		}
+	}
+	c, chans, reqs, err := ssh.NewClientConn(conn, addr, config)
+	if err != nil {
+		_ = conn.Close()
+		return nil, err
+	}
+	if err := conn.SetDeadline(time.Time{}); err != nil {
+		_ = conn.Close()
+		return nil, err
+	}
+	return ssh.NewClient(c, chans, reqs), nil
 }
 
 func (s sftpClient) ListBuckets() ([]interface{}, error) {

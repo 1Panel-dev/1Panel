@@ -20,6 +20,14 @@ type webDAVClient struct {
 }
 
 func NewWebDAVClient(vars map[string]interface{}) (*webDAVClient, error) {
+	return newWebDAVClient(context.Background(), vars)
+}
+
+func NewWebDAVClientWithContext(ctx context.Context, vars map[string]interface{}) (*webDAVClient, error) {
+	return newWebDAVClient(ctx, vars)
+}
+
+func newWebDAVClient(ctx context.Context, vars map[string]interface{}) (*webDAVClient, error) {
 	address := loadParamFromVars("address", vars)
 	port := loadParamFromVars("port", vars)
 	password := loadParamFromVars("password", vars)
@@ -39,7 +47,7 @@ func NewWebDAVClient(vars map[string]interface{}) (*webDAVClient, error) {
 		TLSClientConfig: tlsConfig,
 	}
 	client.SetTransport(transport)
-	if err := client.Connect(); err != nil {
+	if err := client.ConnectWithContext(ctx); err != nil {
 		return nil, err
 	}
 	return &webDAVClient{Bucket: bucket, client: client}, nil
