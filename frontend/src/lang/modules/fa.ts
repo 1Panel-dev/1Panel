@@ -708,6 +708,16 @@ const message = {
             accountModelsHelper:
                 'انتخاب کنید که این حساب چه مدل‌هایی را برای OpenClaw جهت انتخاب و پیکربندی در دسترس قرار دهد',
             accountModelsRequired: 'حداقل یک مدل انتخاب کنید',
+            verifyModel: 'مدل بررسی',
+            verifyModelHelper:
+                'مدلی را انتخاب کنید که این حساب به آن دسترسی دارد. هنگام ذخیره، یک درخواست حداقلی برای بررسی اتصال ارسال می‌شود.',
+            verifyModelRequired: 'یک مدل بررسی انتخاب کنید',
+            discoverModels: 'دریافت مدل‌ها',
+            automaticModelDiscovery: 'دریافت خودکار',
+            manualModelConfiguration: 'پیکربندی دستی',
+            discoverModelsHelper:
+                'مدل‌ها را از API ‏/v1/models ارائه‌دهنده دریافت و همه را به مجموعه مدل‌ها اضافه کنید',
+            discoverModelsFailedFallback: 'دریافت مدل‌ها ناموفق بود. مدل را به‌صورت دستی پیکربندی کنید.',
             accountModelsDuplicate: 'مدل‌های تکراری در کاتالوگ یافت شد',
             modelPool: 'مجموعه مدل‌ها',
             fallbackModels: 'مدل‌های جایگزین',
@@ -856,7 +866,6 @@ const message = {
                 'برای شروع کار ورود با QR کلیک کنید. کد QR در لاگ وظیفه ظاهر می‌شود و پس از اسکان موفق، کانتینر به طور خودکار مجدداً راه‌اندازی می‌شود.',
             channelAutoRestartHelper: 'ذخیره به طور خودکار کانتینر را مجدداً راه‌اندازی می‌کند تا تغییرات اعمال شوند.',
             channelDeleteConfirm: 'پیکربندی کانال {0} حذف شود؟',
-            customProviderHelper: 'ارائه‌دهندگان مدل سفارشی در دسترس بودن حساب را تأیید نمی‌کنند.',
         },
         model: {
             model: 'مدل‌ها',
@@ -4887,8 +4896,10 @@ const message = {
             noBlackIp: 'IP از قبل مسدود شده است، نیازی به مسدودسازی مجدد نیست',
             noWhiteUrl: 'URL از قبل در لیست سفید است، نیازی به افزودن مجدد نیست',
             spiderIpHelper:
-                'شامل Baidu، Bing، Google، 360، Shenma، Sogou، ByteDance، DuckDuckGo، Yandex. بستن این گزینه همه دسترسی‌های عنکبوتی را مسدود می‌کند.',
+                'در صورت فعال بودن، فقط خزنده‌های انتخاب‌شده مجازند؛ با غیرفعال کردن، دسترسی همه خزنده‌ها مسدود می‌شود.',
             spiderIp: 'مجموعه IP عنکبوت',
+            spiderAllowlist: 'خزنده‌های مجاز',
+            spiderAllowlistEmpty: 'هیچ خزنده‌ای انتخاب نشده است. با ذخیره، دسترسی همه خزنده‌ها مسدود می‌شود.',
             geoIp: 'کتابخانه آدرس IP',
             geoIpHelper: 'برای تأیید موقعیت جغرافیایی IP استفاده می‌شود',
             stat: 'گزارش حمله',
@@ -5012,6 +5023,7 @@ const message = {
             statusErr: 'فرمت کد وضعیت نامعتبر است',
             shenma: 'جستجوی شنما',
             duckduckgo: 'داک‌داک‌گو',
+            yandex: 'Yandex',
             excludeUri: 'رد کردن URI‌ها',
             top100Helper: 'نمایش ۱۰۰ داده برتر',
             logSaveDay: 'دوره نگهداری لاگ (روز)',

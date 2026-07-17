@@ -494,6 +494,7 @@ import { File } from '@/api/interface/file';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { isAgentAccountVerificationSkipped } from '@/utils/agent';
 import MkdownEditor from '@/components/mkdown-editor/index.vue';
 
 const AI_SEARCH_DEFAULT_MAX_ITEMS = 500;
@@ -660,20 +661,15 @@ const loadFileAiAgentAccounts = async () => {
     fileAiAgentAccountOptions.value = res.data?.items || [];
 };
 
-const fileAiVerificationSkipped = (provider?: string) => {
-    const key = (provider || '').toLowerCase();
-    return key === 'custom' || key === 'vllm' || key === 'ollama' || key === 'kimi-coding';
-};
-
 const fileAiVerificationLabel = (item: { provider?: string; verified?: boolean }) => {
-    if (fileAiVerificationSkipped(item.provider)) {
+    if (isAgentAccountVerificationSkipped(item.provider)) {
         return i18n.global.t('aiTools.agents.verifySkipped');
     }
     return item.verified ? 'OK' : 'N/A';
 };
 
 const fileAiVerificationTagType = (item: { provider?: string; verified?: boolean }) => {
-    if (fileAiVerificationSkipped(item.provider)) {
+    if (isAgentAccountVerificationSkipped(item.provider)) {
         return 'info';
     }
     return item.verified ? 'success' : 'warning';

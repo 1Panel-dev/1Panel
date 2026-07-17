@@ -118,8 +118,6 @@ type AgentItem struct {
 	ProviderName         string    `json:"providerName"`
 	Model                string    `json:"model"`
 	APIType              string    `json:"apiType"`
-	MaxTokens            int       `json:"maxTokens"`
-	ContextWindow        int       `json:"contextWindow"`
 	BaseURL              string    `json:"baseUrl"`
 	APIKey               string    `json:"apiKey"`
 	Token                string    `json:"token"`
@@ -292,17 +290,20 @@ type AgentOverviewSnapshot struct {
 }
 
 type AgentAccountModel struct {
-	RecordID      uint     `json:"recordId"`
-	ID            string   `json:"id"`
-	Name          string   `json:"name"`
-	ContextWindow int      `json:"contextWindow"`
-	MaxTokens     int      `json:"maxTokens"`
-	Reasoning     bool     `json:"reasoning"`
-	Input         []string `json:"input"`
+	RecordID uint   `json:"recordId"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
 }
 
 type AgentAccountModelReq struct {
 	AccountID uint `json:"accountId" validate:"required"`
+}
+
+type AgentAccountModelDiscoverReq struct {
+	Provider string `json:"provider" validate:"required"`
+	BaseURL  string `json:"baseURL" validate:"required"`
+	APIKey   string `json:"apiKey" validate:"required"`
+	APIType  string `json:"apiType" validate:"required"`
 }
 
 type AgentAccountModelCreateReq struct {
@@ -328,6 +329,8 @@ type AgentAccountCreateReq struct {
 	BaseURL        string              `json:"baseURL"`
 	Models         []AgentAccountModel `json:"models"`
 	APIType        string              `json:"apiType" validate:"required"`
+	AuthMode       string              `json:"authMode"`
+	VerifyModel    string              `json:"verifyModel"`
 	Remark         string              `json:"remark"`
 }
 
@@ -338,6 +341,8 @@ type AgentAccountUpdateReq struct {
 	RememberAPIKey bool   `json:"rememberApiKey"`
 	BaseURL        string `json:"baseURL"`
 	APIType        string `json:"apiType" validate:"required"`
+	AuthMode       string `json:"authMode"`
+	VerifyModel    string `json:"verifyModel"`
 	Remark         string `json:"remark"`
 	SyncAgents     bool   `json:"syncAgents"`
 }
@@ -346,6 +351,9 @@ type AgentAccountVerifyReq struct {
 	Provider string `json:"provider" validate:"required"`
 	APIKey   string `json:"apiKey" validate:"required"`
 	BaseURL  string `json:"baseURL"`
+	APIType  string `json:"apiType" validate:"required"`
+	AuthMode string `json:"authMode"`
+	Model    string `json:"model"`
 }
 
 type AgentAccountDeleteReq struct {
@@ -373,26 +381,34 @@ type AgentAccountInfo struct {
 	BaseURL         string              `json:"baseUrl"`
 	Models          []AgentAccountModel `json:"models"`
 	APIType         string              `json:"apiType"`
+	AuthMode        string              `json:"authMode"`
+	VerifyModel     string              `json:"verifyModel"`
 	Verified        bool                `json:"verified"`
 	Remark          string              `json:"remark"`
 	CreatedAt       time.Time           `json:"createdAt"`
 }
 
 type ProviderModelInfo struct {
-	ID            string   `json:"id"`
-	Name          string   `json:"name"`
-	ContextWindow int      `json:"contextWindow"`
-	MaxTokens     int      `json:"maxTokens"`
-	Reasoning     bool     `json:"reasoning"`
-	Input         []string `json:"input"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type ProviderAPIInfo struct {
+	APIType         string   `json:"apiType"`
+	BaseURL         string   `json:"baseUrl"`
+	EditableBaseURL bool     `json:"editableBaseUrl"`
+	DefaultAuthMode string   `json:"defaultAuthMode"`
+	AuthModes       []string `json:"authModes"`
 }
 
 type ProviderInfo struct {
-	Sort        uint                `json:"-"`
-	Provider    string              `json:"provider"`
-	DisplayName string              `json:"displayName"`
-	BaseURL     string              `json:"baseUrl"`
-	Models      []ProviderModelInfo `json:"models"`
+	Sort           uint                `json:"-"`
+	Provider       string              `json:"provider"`
+	DisplayName    string              `json:"displayName"`
+	BaseURL        string              `json:"baseUrl"`
+	DefaultAPIType string              `json:"defaultApiType"`
+	APITypes       []ProviderAPIInfo   `json:"apiTypes"`
+	Models         []ProviderModelInfo `json:"models"`
 }
 
 type AgentFeishuConfigReq struct {

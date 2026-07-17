@@ -344,8 +344,6 @@ export namespace AI {
         providerName: string;
         model: string;
         apiType: string;
-        maxTokens: number;
-        contextWindow: number;
         baseUrl: string;
         apiKey: string;
         token: string;
@@ -521,14 +519,17 @@ export namespace AI {
         recordId: number;
         id: string;
         name: string;
-        contextWindow: number;
-        maxTokens: number;
-        reasoning: boolean;
-        input: string[];
     }
 
     export interface AgentAccountModelReq {
         accountId: number;
+    }
+
+    export interface AgentAccountModelDiscoverReq {
+        provider: string;
+        baseURL: string;
+        apiKey: string;
+        apiType: string;
     }
 
     export interface AgentAccountModelCreateReq {
@@ -549,16 +550,22 @@ export namespace AI {
     export interface ProviderModelInfo {
         id: string;
         name: string;
-        contextWindow: number;
-        maxTokens: number;
-        reasoning: boolean;
-        input: string[];
+    }
+
+    export interface ProviderAPIInfo {
+        apiType: string;
+        baseUrl: string;
+        editableBaseUrl: boolean;
+        defaultAuthMode: string;
+        authModes: string[];
     }
 
     export interface ProviderInfo {
         provider: string;
         displayName: string;
         baseUrl: string;
+        defaultApiType: string;
+        apiTypes: ProviderAPIInfo[];
         models: ProviderModelInfo[];
     }
 
@@ -569,7 +576,9 @@ export namespace AI {
         rememberApiKey: boolean;
         baseURL: string;
         apiType: string;
+        authMode: string;
         models?: AgentAccountModel[];
+        verifyModel: string;
         remark: string;
     }
 
@@ -580,6 +589,8 @@ export namespace AI {
         rememberApiKey: boolean;
         baseURL: string;
         apiType: string;
+        authMode: string;
+        verifyModel: string;
         remark: string;
         syncAgents: boolean;
     }
@@ -605,6 +616,8 @@ export namespace AI {
         baseUrl: string;
         models: AgentAccountModel[];
         apiType: string;
+        authMode: string;
+        verifyModel: string;
         verified: boolean;
         remark: string;
         createdAt: string;

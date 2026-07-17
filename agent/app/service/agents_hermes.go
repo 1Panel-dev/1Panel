@@ -76,7 +76,7 @@ func writeHermesConfig(confDir string, account *model.AgentAccount, modelName st
 		}
 	}
 
-	provider := resolveHermesProvider(account.Provider)
+	provider := resolveHermesProvider(account.Provider, account.APIType)
 	configPath := path.Join(confDir, "config.yaml")
 	cfg, err := readHermesConfigMap(configPath)
 	if err != nil {
@@ -458,11 +458,18 @@ func normalizeHermesTimezone(timezone string) string {
 	return timezone
 }
 
-func resolveHermesProvider(provider string) string {
+func resolveHermesProvider(provider, apiType string) string {
+	if apiType == "anthropic-messages" && (provider == "deepseek" || provider == "bailian-coding-plan" || provider == "ark-coding-plan" || provider == "xiaomi") {
+		return "anthropic"
+	}
 	switch provider {
 	case "":
 		return "custom"
-	case "openrouter", "anthropic", "gemini", "zai", "kimi-coding", "xiaomi":
+	case "moonshot":
+		return "kimi-coding"
+	case "kimi":
+		return "kimi-coding-cn"
+	case "openrouter", "anthropic", "deepseek", "gemini", "zai", "kimi-coding", "xiaomi":
 		return provider
 	case "minimax":
 		return "minimax-cn"
@@ -479,17 +486,7 @@ func resolveHermesModel(sourceProvider, targetProvider, modelName string) string
 	if targetProvider != "custom" {
 		return target
 	}
-	if sourceProvider == "custom" || sourceProvider == "vllm" {
-		return normalizeCustomModel(target)
-	}
-	if strings.Contains(target, "/") {
-		parts := strings.SplitN(target, "/", 2)
-		model := strings.TrimSpace(parts[1])
-		if model != "" {
-			return model
-		}
-	}
-	return target
+	return providercatalog.NormalizeModelID(sourceProvider, target)
 }
 
 func resolveHermesConfiguredModelID(account *model.AgentAccount, accountModels []dto.AgentAccountModel, configuredModel string) (string, error) {
@@ -500,7 +497,7 @@ func resolveHermesConfiguredModelID(account *model.AgentAccount, accountModels [
 	if configuredModel == "" {
 		return "", buserr.New("ErrAgentModelNotInAccount")
 	}
-	provider := resolveHermesProvider(account.Provider)
+	provider := resolveHermesProvider(account.Provider, account.APIType)
 	for _, item := range accountModels {
 		if resolveHermesModel(account.Provider, provider, item.ID) == configuredModel {
 			return item.ID, nil
@@ -513,7 +510,8 @@ func resolveHermesEnvEntries(account *model.AgentAccount) []hermesEnvEntry {
 	if account == nil {
 		return nil
 	}
-	if resolveHermesProvider(account.Provider) == "custom" {
+	resolvedProvider := resolveHermesProvider(account.Provider, account.APIType)
+	if resolvedProvider == "custom" {
 		if account.APIKey == "" {
 			return nil
 		}
@@ -531,6 +529,11 @@ func resolveHermesEnvEntries(account *model.AgentAccount) []hermesEnvEntry {
 		}
 		entries = append(entries, hermesEnvEntry{Key: key, Value: value})
 	}
+	if resolvedProvider == "anthropic" {
+		appendEntry("ANTHROPIC_API_KEY", apiKey)
+		appendEntry("ANTHROPIC_BASE_URL", baseURL)
+		return entries
+	}
 
 	switch account.Provider {
 	case "openrouter":
@@ -538,6 +541,7 @@ func resolveHermesEnvEntries(account *model.AgentAccount) []hermesEnvEntry {
 		appendEntry("OPENROUTER_BASE_URL", baseURL)
 	case "anthropic":
 		appendEntry("ANTHROPIC_API_KEY", apiKey)
+		appendEntry("ANTHROPIC_BASE_URL", baseURL)
 	case "gemini":
 		appendEntry("GOOGLE_API_KEY", apiKey)
 		appendEntry("GEMINI_API_KEY", apiKey)
@@ -607,6 +611,7 @@ func hermesManagedModelEnvKeys() []string {
 		"OPENROUTER_API_KEY",
 		"OPENROUTER_BASE_URL",
 		"ANTHROPIC_API_KEY",
+		"ANTHROPIC_BASE_URL",
 		"GOOGLE_API_KEY",
 		"GEMINI_API_KEY",
 		"GEMINI_BASE_URL",

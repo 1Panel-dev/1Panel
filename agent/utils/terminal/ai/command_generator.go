@@ -35,6 +35,7 @@ func NewCommandGeneratorFromConfig(cfg GeneratorConfig) (*CommandGenerator, erro
 		APIKey:    cfg.APIKey,
 		Model:     cfg.Model,
 		APIType:   cfg.APIType,
+		AuthMode:  cfg.AuthMode,
 		MaxTokens: cfg.MaxTokens,
 	})
 	if err != nil {

@@ -162,7 +162,7 @@ func fillAgentWebsiteItems(items []dto.AgentItem, explicitWebsiteMap map[uint]mo
 	}
 }
 
-func uniqueDeploymentWebsiteMapByAppInstall(websites []model.Website) map[uint]model.Website {
+func UniqueDeploymentWebsiteMapByAppInstall(websites []model.Website) map[uint]model.Website {
 	websiteMap := make(map[uint]model.Website)
 	duplicateAppInstallIDs := make(map[uint]struct{})
 	for _, website := range websites {
@@ -180,10 +180,6 @@ func uniqueDeploymentWebsiteMapByAppInstall(websites []model.Website) map[uint]m
 		websiteMap[website.AppInstallID] = website
 	}
 	return websiteMap
-}
-
-func UniqueDeploymentWebsiteMapForMigration(websites []model.Website) map[uint]model.Website {
-	return uniqueDeploymentWebsiteMapByAppInstall(websites)
 }
 
 func uniqueUintList(items []uint) []uint {

@@ -8,8 +8,8 @@ import (
 	"os"
 	"path"
 	"sort"
-	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -29,6 +29,8 @@ import (
 	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
 )
+
+var agentAccountMutationMu sync.Mutex
 
 type IAgentService interface {
 	Create(req dto.AgentCreateReq) (*dto.AgentItem, error)
@@ -77,6 +79,7 @@ type IAgentService interface {
 	PageAccounts(req dto.AgentAccountSearch) (int64, []dto.AgentAccountInfo, error)
 	CountAccountsByProviders(req dto.AgentAccountProviderCountReq) (map[string]int64, error)
 	GetAccountModels(req dto.AgentAccountModelReq) ([]dto.AgentAccountModel, error)
+	DiscoverAccountModels(req dto.AgentAccountModelDiscoverReq) ([]dto.AgentAccountModel, error)
 	CreateAccountModel(req dto.AgentAccountModelCreateReq) error
 	UpdateAccountModel(req dto.AgentAccountModelUpdateReq) error
 	DeleteAccountModel(req dto.AgentAccountModelDeleteReq) error
@@ -165,8 +168,6 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	provider := ""
 	baseURL := ""
 	apiType := ""
-	maxTokens := 0
-	contextWindow := 0
 	apiKey := ""
 	runtimeModel := ""
 	accountID := uint(0)
@@ -197,8 +198,6 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		}
 		storedModel = resolvedRuntime.StoredModel
 		apiType = resolvedRuntime.APIType
-		maxTokens = resolvedRuntime.MaxTokens
-		contextWindow = resolvedRuntime.ContextWindow
 		runtimeModel = resolvedRuntime.PrimaryModel
 		apiKey = account.APIKey
 		accountID = account.ID
@@ -247,8 +246,6 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		params["PROVIDER"] = provider
 		params["MODEL"] = runtimeModel
 		params["API_TYPE"] = apiType
-		params["MAX_TOKENS"] = maxTokens
-		params["CONTEXT_WINDOW"] = contextWindow
 		params["BASE_URL"] = baseURL
 		params["API_KEY"] = apiKey
 		params["OPENCLAW_GATEWAY_TOKEN"] = token
@@ -291,22 +288,20 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		configPath = path.Join(appInstall.GetPath(), "data", "config.yaml")
 	}
 	agent := &model.Agent{
-		Name:          req.Name,
-		Remark:        req.Remark,
-		AgentType:     agentType,
-		Provider:      provider,
-		Model:         storedModel,
-		APIType:       apiType,
-		MaxTokens:     maxTokens,
-		ContextWindow: contextWindow,
-		BaseURL:       baseURL,
-		APIKey:        apiKey,
-		Token:         token,
-		Status:        appInstall.Status,
-		Message:       appInstall.Message,
-		AppInstallID:  appInstall.ID,
-		AccountID:     accountID,
-		ConfigPath:    configPath,
+		Name:         req.Name,
+		Remark:       req.Remark,
+		AgentType:    agentType,
+		Provider:     provider,
+		Model:        storedModel,
+		APIType:      apiType,
+		BaseURL:      baseURL,
+		APIKey:       apiKey,
+		Token:        token,
+		Status:       appInstall.Status,
+		Message:      appInstall.Message,
+		AppInstallID: appInstall.ID,
+		AccountID:    accountID,
+		ConfigPath:   configPath,
 	}
 	if err := agentRepo.Create(agent); err != nil {
 		return nil, err
@@ -404,7 +399,7 @@ func (a AgentService) BatchInstallSkill(req dto.AgentBatchSkillInstallReq) ([]dt
 			results = append(results, result)
 			continue
 		}
-		installTask, err := task.NewTaskWithOps(skillName, task.TaskInstall, task.TaskScopeAI, buildBatchSkillInstallTaskID(req.TaskID, agent.ID), agent.ID)
+		installTask, err := task.NewTaskWithOps(skillName, task.TaskInstall, task.TaskScopeAI, buildBatchTaskID(req.TaskID, "batch-skill-install", agent.ID), agent.ID)
 		if err != nil {
 			result.Message = err.Error()
 			results = append(results, result)
@@ -446,7 +441,7 @@ func (a AgentService) BatchOperate(req dto.AgentBatchOperateReq) ([]dto.AgentBat
 		if operate == constant.Delete {
 			if err := a.Delete(dto.AgentDeleteReq{
 				ID:          agent.ID,
-				TaskID:      buildBatchOperateTaskID(req.TaskID, agent.ID),
+				TaskID:      buildBatchTaskID(req.TaskID, "batch-operate", agent.ID),
 				ForceDelete: req.ForceDelete,
 			}); err != nil {
 				result.Message = err.Error()
@@ -474,7 +469,7 @@ func (a AgentService) BatchOperate(req dto.AgentBatchOperateReq) ([]dto.AgentBat
 		if err := NewIAppInstalledService().Operate(request.AppInstalledOperate{
 			InstallId: install.ID,
 			Operate:   operate,
-			TaskID:    buildBatchOperateTaskID(req.TaskID, agent.ID),
+			TaskID:    buildBatchTaskID(req.TaskID, "batch-operate", agent.ID),
 		}); err != nil {
 			result.Message = err.Error()
 		} else {
@@ -558,35 +553,19 @@ func buildBatchUpgradePlans(req dto.AgentBatchUpgradeReq) ([]batchUpgradePlan, [
 				DetailID:  detail.ID,
 				Backup:    req.Backup,
 				PullImage: req.PullImage,
-				TaskID:    buildBatchUpgradeTaskID(req.TaskID, install.ID),
+				TaskID:    buildBatchTaskID(req.TaskID, "batch-upgrade", install.ID),
 			},
 		})
 	}
 	return plans, results, nil
 }
 
-func buildBatchUpgradeTaskID(taskID string, appInstallID uint) string {
+func buildBatchTaskID(taskID, prefix string, id uint) string {
 	taskID = strings.TrimSpace(taskID)
 	if taskID == "" {
-		taskID = fmt.Sprintf("batch-upgrade-%d-%d", appInstallID, time.Now().UnixNano())
+		taskID = fmt.Sprintf("%s-%d-%d", prefix, id, time.Now().UnixNano())
 	}
-	return fmt.Sprintf("%s-%d", taskID, appInstallID)
-}
-
-func buildBatchSkillInstallTaskID(taskID string, agentID uint) string {
-	taskID = strings.TrimSpace(taskID)
-	if taskID == "" {
-		taskID = fmt.Sprintf("batch-skill-install-%d-%d", agentID, time.Now().UnixNano())
-	}
-	return fmt.Sprintf("%s-%d", taskID, agentID)
-}
-
-func buildBatchOperateTaskID(taskID string, agentID uint) string {
-	taskID = strings.TrimSpace(taskID)
-	if taskID == "" {
-		taskID = fmt.Sprintf("batch-operate-%d-%d", agentID, time.Now().UnixNano())
-	}
-	return fmt.Sprintf("%s-%d", taskID, agentID)
+	return fmt.Sprintf("%s-%d", taskID, id)
 }
 
 func batchOperateSkipMessage(operate constant.AppOperate, status string) string {
@@ -715,6 +694,7 @@ func (a AgentService) ensureBatchInstallAccount(req dto.AgentBatchInstallReq) (u
 	account.RememberAPIKey = snapshot.RememberAPIKey
 	account.BaseURL = snapshot.BaseURL
 	account.APIType = snapshot.APIType
+	account.AuthMode = snapshot.AuthMode
 	account.Remark = snapshot.Remark
 	account.Verified = true
 
@@ -722,6 +702,11 @@ func (a AgentService) ensureBatchInstallAccount(req dto.AgentBatchInstallReq) (u
 	if err != nil {
 		return 0, err
 	}
+	verifyModel, err := resolveAgentAccountVerifyModel(account.Provider, snapshot.VerifyModel, initialModels)
+	if err != nil {
+		return 0, err
+	}
+	account.VerifyModel = verifyModel
 	if err := global.DB.Transaction(func(tx *gorm.DB) error {
 		if account.ID == 0 {
 			if err := tx.Create(account).Error; err != nil {
@@ -959,7 +944,7 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 		return err
 	}
 	modelName := resolvedRuntime.StoredModel
-	apiType, maxTokens, contextWindow := resolvedRuntime.APIType, resolvedRuntime.MaxTokens, resolvedRuntime.ContextWindow
+	apiType := resolvedRuntime.APIType
 	confDir := path.Dir(agent.ConfigPath)
 	if agent.AgentType == constant.AppHermesAgent {
 		cfg, err := readHermesConfig(agent.ConfigPath)
@@ -980,8 +965,6 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 	agent.Provider = account.Provider
 	agent.Model = modelName
 	agent.APIType = apiType
-	agent.MaxTokens = maxTokens
-	agent.ContextWindow = contextWindow
 	agent.BaseURL = account.BaseURL
 	agent.APIKey = account.APIKey
 	agent.AccountID = account.ID
@@ -995,20 +978,29 @@ func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
 		models := make([]dto.ProviderModelInfo, 0, len(def.Models))
 		for _, item := range def.Models {
 			models = append(models, dto.ProviderModelInfo{
-				ID:            item.ID,
-				Name:          item.Name,
-				ContextWindow: item.ContextWindow,
-				MaxTokens:     item.MaxTokens,
-				Reasoning:     item.Reasoning,
-				Input:         append([]string(nil), item.Input...),
+				ID:   item.ID,
+				Name: item.Name,
 			})
 		}
+		apiTypes := make([]dto.ProviderAPIInfo, 0, len(def.APIConfigs))
+		for _, item := range def.APIConfigs {
+			apiTypes = append(apiTypes, dto.ProviderAPIInfo{
+				APIType:         item.APIType,
+				BaseURL:         item.BaseURL,
+				EditableBaseURL: item.EditableBaseURL,
+				DefaultAuthMode: item.DefaultAuthMode,
+				AuthModes:       item.AuthModes,
+			})
+		}
+		baseURL, _ := providercatalog.DefaultBaseURL(key)
 		providers = append(providers, dto.ProviderInfo{
-			Sort:        def.Sort,
-			Provider:    key,
-			DisplayName: def.DisplayName,
-			BaseURL:     def.DefaultBaseURL,
-			Models:      models,
+			Sort:           def.Sort,
+			Provider:       key,
+			DisplayName:    def.DisplayName,
+			BaseURL:        baseURL,
+			DefaultAPIType: def.DefaultAPIType,
+			APITypes:       apiTypes,
+			Models:         models,
 		})
 	}
 	sort.Slice(providers, func(i, j int) bool {
@@ -1018,11 +1010,21 @@ func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
 }
 
 func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
 	provider := req.Provider
-	if exist, _ := agentAccountRepo.GetFirst(repo.WithByProvider(provider), repo.WithByName(req.Name)); exist != nil && exist.ID > 0 {
-		return buserr.New("ErrRecordExist")
+	if err := ensureAgentAccountNameAvailable(provider, req.Name, 0); err != nil {
+		return err
 	}
-	resolvedInput, err := resolveAgentAccountInput(provider, req.APIKey, req.BaseURL)
+	initialModels, err := buildInitialAgentAccountModels(&model.AgentAccount{Provider: provider}, req.Models)
+	if err != nil {
+		return err
+	}
+	verifyModel, err := resolveAgentAccountVerifyModel(provider, req.VerifyModel, initialModels)
+	if err != nil {
+		return err
+	}
+	resolvedInput, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel)
 	if err != nil {
 		return err
 	}
@@ -1032,13 +1034,11 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 		APIKey:         resolvedInput.APIKey,
 		RememberAPIKey: req.RememberAPIKey,
 		BaseURL:        resolvedInput.BaseURL,
-		APIType:        req.APIType,
+		APIType:        resolvedInput.APIType,
+		AuthMode:       resolvedInput.AuthMode,
+		VerifyModel:    verifyModel,
 		Verified:       true,
 		Remark:         req.Remark,
-	}
-	initialModels, err := buildInitialAgentAccountModels(account, req.Models)
-	if err != nil {
-		return err
 	}
 	if err := global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(account).Error; err != nil {
@@ -1056,12 +1056,29 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 }
 
 func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
 	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
 	provider := account.Provider
-	resolvedInput, err := resolveAgentAccountInput(provider, req.APIKey, req.BaseURL)
+	if err := ensureAgentAccountNameAvailable(provider, req.Name, account.ID); err != nil {
+		return err
+	}
+	models, err := loadAgentAccountModels(account)
+	if err != nil {
+		return err
+	}
+	requestedVerifyModel := req.VerifyModel
+	if strings.TrimSpace(requestedVerifyModel) == "" {
+		requestedVerifyModel = account.VerifyModel
+	}
+	verifyModel, err := resolveAgentAccountVerifyModel(provider, requestedVerifyModel, models)
+	if err != nil {
+		return err
+	}
+	resolvedInput, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel)
 	if err != nil {
 		return err
 	}
@@ -1069,7 +1086,9 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	account.APIKey = resolvedInput.APIKey
 	account.RememberAPIKey = req.RememberAPIKey
 	account.BaseURL = resolvedInput.BaseURL
-	account.APIType = req.APIType
+	account.APIType = resolvedInput.APIType
+	account.AuthMode = resolvedInput.AuthMode
+	account.VerifyModel = verifyModel
 	account.Remark = req.Remark
 	account.Verified = true
 
@@ -1115,17 +1134,33 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 			BaseURL:         item.BaseURL,
 			Models:          nil,
 			APIType:         item.APIType,
+			AuthMode:        item.AuthMode,
+			VerifyModel:     item.VerifyModel,
 			Verified:        item.Verified,
 			Remark:          item.Remark,
 			CreatedAt:       item.CreatedAt,
 		})
 	}
-	for i := range items {
-		models, err := loadAgentAccountModels(&list[i])
-		if err != nil {
+	if len(list) > 0 {
+		accountIDs := make([]uint, 0, len(list))
+		for _, account := range list {
+			accountIDs = append(accountIDs, account.ID)
+		}
+		var rows []model.AgentAccountModel
+		if err := global.DB.Where("account_id IN ?", accountIDs).Order("account_id ASC, sort_order ASC, id ASC").Find(&rows).Error; err != nil {
 			return 0, nil, err
 		}
-		items[i].Models = models
+		modelsByAccount := make(map[uint][]dto.AgentAccountModel, len(list))
+		for _, row := range rows {
+			modelsByAccount[row.AccountID] = append(modelsByAccount[row.AccountID], dto.AgentAccountModel{
+				RecordID: row.ID,
+				ID:       strings.TrimSpace(row.Model),
+				Name:     strings.TrimSpace(row.Name),
+			})
+		}
+		for index, account := range list {
+			items[index].Models = modelsByAccount[account.ID]
+		}
 	}
 	return count, items, nil
 }
@@ -1142,6 +1177,21 @@ func (a AgentService) GetAccountModels(req dto.AgentAccountModelReq) ([]dto.Agen
 	return loadAgentAccountModels(account)
 }
 
+func (a AgentService) DiscoverAccountModels(req dto.AgentAccountModelDiscoverReq) ([]dto.AgentAccountModel, error) {
+	if req.APIType != "openai-completions" && req.APIType != "openai-responses" {
+		return nil, buserr.New("ErrAgentAccountModelsRequired")
+	}
+	baseURL, err := providercatalog.ResolveBaseURL(req.Provider, req.APIType, req.BaseURL)
+	if err != nil {
+		return nil, buserr.WithErr("ErrAgentAccountUnavailable", err)
+	}
+	models, err := providercatalog.DiscoverModels(baseURL, req.APIKey)
+	if err != nil {
+		return nil, buserr.WithErr("ErrAgentAccountUnavailable", err)
+	}
+	return buildDiscoveredAgentAccountModels(models), nil
+}
+
 func (a AgentService) CreateAccountModel(req dto.AgentAccountModelCreateReq) error {
 	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
 	if err != nil {
@@ -1151,24 +1201,19 @@ func (a AgentService) CreateAccountModel(req dto.AgentAccountModelCreateReq) err
 	if err != nil {
 		return err
 	}
-	nextModel := cloneAgentAccountModel(req.Model)
-	if _, ok := findAgentAccountModelForProvider(account.Provider, models, nextModel.ID); ok {
-		return buserr.New("ErrRecordExist")
-	}
-	inputPayload, err := json.Marshal(nextModel.Input)
+	nextModel, err := normalizeAgentAccountModel(account, req.Model)
 	if err != nil {
 		return err
 	}
+	if _, ok := findAgentAccountModelForProvider(account.Provider, models, nextModel.ID); ok {
+		return buserr.New("ErrRecordExist")
+	}
 	sortOrder := len(models) + 1
 	record := &model.AgentAccountModel{
-		AccountID:     account.ID,
-		Model:         nextModel.ID,
-		Name:          nextModel.Name,
-		ContextWindow: nextModel.ContextWindow,
-		MaxTokens:     nextModel.MaxTokens,
-		Reasoning:     nextModel.Reasoning,
-		Input:         string(inputPayload),
-		SortOrder:     sortOrder,
+		AccountID: account.ID,
+		Model:     nextModel.ID,
+		Name:      nextModel.Name,
+		SortOrder: sortOrder,
 	}
 	if err := agentAccountModelRepo.Create(record); err != nil {
 		return err
@@ -1189,7 +1234,11 @@ func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) err
 	if err != nil {
 		return err
 	}
-	nextModel := cloneAgentAccountModel(req.Model)
+	nextModel, err := normalizeAgentAccountModel(account, req.Model)
+	if err != nil {
+		return err
+	}
+	nextModel.RecordID = req.Model.RecordID
 	for _, item := range models {
 		if item.RecordID == req.Model.RecordID {
 			continue
@@ -1209,18 +1258,17 @@ func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) err
 	if err := ensureAccountModelsNotBound(account, nextModels); err != nil {
 		return err
 	}
-	inputPayload, err := json.Marshal(nextModel.Input)
-	if err != nil {
-		return err
-	}
+	previousModelID := record.Model
 	record.Model = nextModel.ID
 	record.Name = nextModel.Name
-	record.ContextWindow = nextModel.ContextWindow
-	record.MaxTokens = nextModel.MaxTokens
-	record.Reasoning = nextModel.Reasoning
-	record.Input = string(inputPayload)
 	if err := agentAccountModelRepo.Save(record); err != nil {
 		return err
+	}
+	if sameProviderModelID(account.Provider, account.VerifyModel, previousModelID) {
+		account.VerifyModel = nextModel.ID
+		if err := agentAccountRepo.Save(account); err != nil {
+			return err
+		}
 	}
 	terminalai.InvalidateTerminalRuntimeCache()
 	terminalai.InvalidateFileAIRuntimeCache()
@@ -1232,8 +1280,12 @@ func (a AgentService) DeleteAccountModel(req dto.AgentAccountModelDeleteReq) err
 	if err != nil {
 		return err
 	}
-	if _, err := agentAccountModelRepo.GetFirst(repo.WithByID(req.RecordID), repo.WithByAccountID(req.AccountID)); err != nil {
+	record, err := agentAccountModelRepo.GetFirst(repo.WithByID(req.RecordID), repo.WithByAccountID(req.AccountID))
+	if err != nil {
 		return err
+	}
+	if sameProviderModelID(account.Provider, account.VerifyModel, record.Model) {
+		return buserr.New("ErrAgentVerifyModelInUse")
 	}
 	models, err := loadAgentAccountModels(account)
 	if err != nil {
@@ -1268,25 +1320,45 @@ func (a AgentService) SyncAgentsByAccount(account *model.AgentAccount) error {
 }
 
 func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
-	_, err := resolveAgentAccountInput(req.Provider, req.APIKey, req.BaseURL)
+	_, err := resolveAgentAccountInput(req.Provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, req.Model)
 	return err
 }
 
 func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
-	if exists, _ := agentRepo.GetFirst(repo.WithByAccountID(req.ID)); exists != nil && exists.ID > 0 {
-		return buserr.New("ErrAgentAccountBound")
-	}
-	if aiStatus, _ := settingRepo.GetValueByKey("AIStatus"); strings.EqualFold(strings.TrimSpace(aiStatus), constant.StatusEnable) {
-		if aiAccountID, _ := settingRepo.GetValueByKey("AIAccountID"); strings.TrimSpace(aiAccountID) == strconv.FormatUint(uint64(req.ID), 10) {
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
+	if err := global.DB.Transaction(func(tx *gorm.DB) error {
+		var agentCount int64
+		if err := tx.Model(&model.Agent{}).Where("account_id = ?", req.ID).Count(&agentCount).Error; err != nil {
+			return err
+		}
+		if agentCount > 0 {
+			return buserr.New("ErrAgentAccountBound")
+		}
+		used, err := agentAccountUsedBySetting(tx, req.ID, "AIStatus", "AIAccountID")
+		if err != nil {
+			return err
+		}
+		if used {
 			return buserr.New("ErrTerminalAIAccountInUse")
 		}
-	}
-	if err := agentAccountModelRepo.Delete(repo.WithByAccountID(req.ID)); err != nil {
+		used, err = agentAccountUsedBySetting(tx, req.ID, "FileAIStatus", "FileAIAccountID")
+		if err != nil {
+			return err
+		}
+		if used {
+			return buserr.New("ErrFileAIAccountInUse")
+		}
+		if err := tx.Where("account_id = ?", req.ID).Delete(&model.AgentAccountModel{}).Error; err != nil {
+			return err
+		}
+		return tx.Delete(&model.AgentAccount{}, req.ID).Error
+	}); err != nil {
 		return err
 	}
 	terminalai.InvalidateTerminalRuntimeCache()
 	terminalai.InvalidateFileAIRuntimeCache()
-	return agentAccountRepo.DeleteByID(req.ID)
+	return nil
 }
 
 func (a AgentService) GetSecurityConfig(req dto.AgentIDReq) (*dto.AgentSecurityConfig, error) {
@@ -1557,7 +1629,7 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 			return err
 		}
 		modelName := resolvedRuntime.StoredModel
-		apiType, maxTokens, contextWindow := resolvedRuntime.APIType, resolvedRuntime.MaxTokens, resolvedRuntime.ContextWindow
+		apiType := resolvedRuntime.APIType
 		confDir := path.Dir(agent.ConfigPath)
 		switch agent.AgentType {
 		case constant.AppOpenclaw:
@@ -1585,8 +1657,6 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 		agent.Provider = account.Provider
 		agent.Model = modelName
 		agent.APIType = apiType
-		agent.MaxTokens = maxTokens
-		agent.ContextWindow = contextWindow
 		_ = agentRepo.Save(&agent)
 	}
 	return nil

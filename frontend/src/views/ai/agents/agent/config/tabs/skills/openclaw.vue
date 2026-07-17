@@ -411,6 +411,7 @@ defineExpose({
 
 <style scoped lang="scss">
 .view-switch {
+    padding-top: 1px;
     margin-bottom: 16px;
 }
 
