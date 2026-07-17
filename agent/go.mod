@@ -48,7 +48,7 @@ require (
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.74
 	github.com/tomasen/fcgi_client v0.0.0-20180423082037-2bb3d819fd19
 	github.com/upyun/go-sdk v2.1.0+incompatible
-	go.mongodb.org/mongo-driver/v2 v2.7.0
+	go.mongodb.org/mongo-driver/v2 v2.8.0
 	golang.org/x/crypto v0.53.0
 	golang.org/x/net v0.56.0
 	golang.org/x/sync v0.21.0
