@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,12 +16,15 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	odsdk "github.com/goh-chunlin/go-onedrive/onedrive"
-	"golang.org/x/oauth2"
 )
 
+const oneDriveGlobalBaseURL = "https://graph.microsoft.com/v1.0/"
+const oneDriveChinaBaseURL = "https://microsoftgraph.chinacloudapi.cn/v1.0/"
+
 type oneDriveClient struct {
-	client odsdk.Client
+	client  *http.Client
+	baseURL *url.URL
+	token   string
 }
 
 func NewOneDriveClient(vars map[string]interface{}) (*oneDriveClient, error) {
@@ -30,83 +32,56 @@ func NewOneDriveClient(vars map[string]interface{}) (*oneDriveClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	isCN := loadParamFromVars("isCN", vars)
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
 
-	client := odsdk.NewClient(tc)
-	if isCN == "true" {
-		client.BaseURL, _ = url.Parse("https://microsoftgraph.chinacloudapi.cn/v1.0/")
+	baseURL := oneDriveGlobalBaseURL
+	if loadParamFromVars("isCN", vars) == "true" {
+		baseURL = oneDriveChinaBaseURL
 	}
-	return &oneDriveClient{client: *client}, nil
-}
-
-func (o oneDriveClient) ListBuckets() ([]interface{}, error) {
-	return nil, nil
-}
-
-func (o oneDriveClient) Exist(path string) (bool, error) {
-	path = "/" + strings.TrimPrefix(path, "/")
-	fileID, err := o.loadIDByPath(path)
+	parsedBaseURL, err := url.Parse(baseURL)
 	if err != nil {
-		return false, err
+		return nil, fmt.Errorf("parse OneDrive base URL failed: %w", err)
 	}
-
-	return len(fileID) != 0, nil
+	return &oneDriveClient{client: http.DefaultClient, baseURL: parsedBaseURL, token: token}, nil
 }
 
-func (o oneDriveClient) Size(path string) (int64, error) {
-	path = "/" + strings.TrimPrefix(path, "/")
-	pathItem := "root:" + path
-	if path == "/" {
-		pathItem = "root"
-	}
-	req, err := o.client.NewRequest("GET", fmt.Sprintf("me/drive/%s", pathItem), nil)
-	if err != nil {
-		return 0, fmt.Errorf("new request for file id failed, err: %v", err)
-	}
-	var driveItem myDriverItem
-	if err := o.client.Do(context.Background(), req, false, &driveItem); err != nil {
-		return 0, fmt.Errorf("do request for file id failed, err: %v", err)
-	}
+func (o oneDriveClient) ListBuckets() ([]interface{}, error) { return nil, nil }
 
-	return driveItem.Size, nil
+func (o oneDriveClient) Exist(itemPath string) (bool, error) {
+	_, err := o.loadIDByPath(normalizeDrivePath(itemPath))
+	if isOneDriveNotFound(err) {
+		return false, nil
+	}
+	return err == nil, err
 }
 
-type myDriverItem struct {
-	Name string `json:"name"`
-	Id   string `json:"id"`
-	Size int64  `json:"size"`
+func (o oneDriveClient) Size(itemPath string) (int64, error) {
+	var item DriveItem
+	if err := o.getDriveItem(context.Background(), normalizeDrivePath(itemPath), &item); err != nil {
+		return 0, err
+	}
+	return item.Size, nil
 }
 
-func (o oneDriveClient) Delete(path string) (bool, error) {
-	path = "/" + strings.TrimPrefix(path, "/")
-	req, err := o.client.NewRequest("DELETE", fmt.Sprintf("me/drive/root:%s", path), nil)
-	if err != nil {
-		return false, fmt.Errorf("new request for delete file failed, err: %v \n", err)
+func (o oneDriveClient) Delete(itemPath string) (bool, error) {
+	itemPath = normalizeDrivePath(itemPath)
+	if err := o.doJSON(context.Background(), http.MethodDelete, "me/drive/root:"+escapeDrivePath(itemPath), nil, nil); err != nil {
+		return false, fmt.Errorf("delete OneDrive file failed: %w", err)
 	}
-	if err := o.client.Do(context.Background(), req, false, nil); err != nil {
-		return false, fmt.Errorf("do request for delete file failed, err: %v \n", err)
-	}
-
 	return true, nil
 }
 
 func (o oneDriveClient) Upload(ctx context.Context, src, target string) (bool, error) {
-	target = "/" + strings.TrimPrefix(target, "/")
-	if _, err := o.loadIDByPath(path.Dir(target)); err != nil {
-		if !strings.Contains(err.Error(), "itemNotFound") {
+	target = normalizeDrivePath(target)
+	parentPath := path.Dir(target)
+	if _, err := o.loadIDByPath(parentPath); err != nil {
+		if !isOneDriveNotFound(err) {
 			return false, err
 		}
-		if err := o.createFolder(path.Dir(target)); err != nil {
-			return false, fmt.Errorf("create dir before upload failed, err: %v", err)
+		if err := o.createFolder(parentPath); err != nil {
+			return false, fmt.Errorf("create directory before upload failed: %w", err)
 		}
 	}
-
-	folderID, err := o.loadIDByPath(path.Dir(target))
+	folderID, err := o.loadIDByPath(parentPath)
 	if err != nil {
 		return false, err
 	}
@@ -117,84 +92,269 @@ func (o oneDriveClient) Upload(ctx context.Context, src, target string) (bool, e
 	if fileInfo.IsDir() {
 		return false, errors.New("only file is allowed to be uploaded here")
 	}
-	var isOk bool
 	if fileInfo.Size() < 4*1024*1024 {
-		isOk, err = o.upSmall(ctx, src, folderID, fileInfo.Size())
-	} else {
-		isOk, err = o.upBig(ctx, src, folderID, fileInfo.Size())
+		return o.upSmall(ctx, src, folderID)
 	}
-	return isOk, err
+	return o.upBig(ctx, src, folderID, fileInfo.Size())
 }
 
 func (o oneDriveClient) Download(src, target string) (bool, error) {
-	src = "/" + strings.TrimPrefix(src, "/")
-	req, err := o.client.NewRequest("GET", fmt.Sprintf("me/drive/root:%s", src), nil)
-	if err != nil {
-		return false, fmt.Errorf("new request for file id failed, err: %v", err)
+	var item DriveItem
+	if err := o.getDriveItem(context.Background(), normalizeDrivePath(src), &item); err != nil {
+		return false, err
 	}
-	var driveItem *odsdk.DriveItem
-	if err := o.client.Do(context.Background(), req, false, &driveItem); err != nil {
-		return false, fmt.Errorf("do request for file id failed, err: %v", err)
+	if item.DownloadURL == "" {
+		return false, errors.New("OneDrive download URL is missing")
 	}
-
-	resp, err := http.Get(driveItem.DownloadURL)
+	resp, err := o.client.Get(item.DownloadURL)
 	if err != nil {
 		return false, err
 	}
 	defer resp.Body.Close()
-
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return false, newOneDriveHTTPError(resp)
+	}
 	out, err := os.Create(target)
 	if err != nil {
 		return false, err
 	}
 	defer out.Close()
-	buffer := make([]byte, 2*1024*1024)
-
-	_, err = io.CopyBuffer(out, resp.Body, buffer)
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
+	_, err = io.CopyBuffer(out, resp.Body, make([]byte, 2*1024*1024))
+	return err == nil, err
 }
 
 func (o *oneDriveClient) ListObjects(prefix string) ([]string, error) {
-	prefix = "/" + strings.TrimPrefix(prefix, "/")
-	folderID, err := o.loadIDByPath(prefix)
+	folderID, err := o.loadIDByPath(normalizeDrivePath(prefix))
 	if err != nil {
 		return nil, err
 	}
-
-	req, err := o.client.NewRequest("GET", fmt.Sprintf("me/drive/items/%s/children", folderID), nil)
-	if err != nil {
-		return nil, fmt.Errorf("new request for list failed, err: %v", err)
+	var items oneDriveItemsResponse
+	endpoint := fmt.Sprintf("me/drive/items/%s/children", url.PathEscape(folderID))
+	if err := o.doJSON(context.Background(), http.MethodGet, endpoint, nil, &items); err != nil {
+		return nil, fmt.Errorf("list OneDrive files failed: %w", err)
 	}
-	var driveItems *odsdk.OneDriveDriveItemsResponse
-	if err := o.client.Do(context.Background(), req, false, &driveItems); err != nil {
-		return nil, fmt.Errorf("do request for list failed, err: %v", err)
+	result := make([]string, 0, len(items.Value))
+	for _, item := range items.Value {
+		result = append(result, item.Name)
 	}
-
-	var itemList []string
-	for _, item := range driveItems.DriveItems {
-		itemList = append(itemList, item.Name)
-	}
-	return itemList, nil
+	return result, nil
 }
 
-func (o *oneDriveClient) loadIDByPath(path string) (string, error) {
-	pathItem := "root:" + path
-	if path == "/" {
-		pathItem = "root"
+func (o *oneDriveClient) loadIDByPath(itemPath string) (string, error) {
+	var item DriveItem
+	if err := o.getDriveItem(context.Background(), itemPath, &item); err != nil {
+		return "", err
 	}
-	req, err := o.client.NewRequest("GET", fmt.Sprintf("me/drive/%s", pathItem), nil)
+	return item.ID, nil
+}
+
+func (o *oneDriveClient) getDriveItem(ctx context.Context, itemPath string, result *DriveItem) error {
+	endpoint := "me/drive/root"
+	if itemPath != "/" {
+		endpoint += ":" + escapeDrivePath(itemPath)
+	}
+	if err := o.doJSON(ctx, http.MethodGet, endpoint, nil, result); err != nil {
+		return fmt.Errorf("get OneDrive item failed: %w", err)
+	}
+	return nil
+}
+
+func (o *oneDriveClient) createFolder(parent string) error {
+	if parent == "/" {
+		return nil
+	}
+	parentID, err := o.loadIDByPath(path.Dir(parent))
 	if err != nil {
-		return "", fmt.Errorf("new request for file id failed, err: %v", err)
+		if !isOneDriveNotFound(err) {
+			return err
+		}
+		if err := o.createFolder(path.Dir(parent)); err != nil {
+			return err
+		}
+		parentID, err = o.loadIDByPath(path.Dir(parent))
+		if err != nil {
+			return err
+		}
 	}
-	var driveItem *odsdk.DriveItem
-	if err := o.client.Do(context.Background(), req, false, &driveItem); err != nil {
-		return "", fmt.Errorf("do request for file id failed, err: %v", err)
+	body := struct {
+		Name   string                 `json:"name"`
+		Folder map[string]interface{} `json:"folder"`
+	}{Name: path.Base(parent), Folder: map[string]interface{}{}}
+	endpoint := fmt.Sprintf("me/drive/items/%s/children", url.PathEscape(parentID))
+	return o.doJSON(context.Background(), http.MethodPost, endpoint, body, nil)
+}
+
+func (o *oneDriveClient) upSmall(ctx context.Context, srcPath, folderID string) (bool, error) {
+	file, err := os.Open(srcPath)
+	if err != nil {
+		return false, err
 	}
-	return driveItem.Id, nil
+	defer file.Close()
+	endpoint := fmt.Sprintf("me/drive/items/%s:/%s:/content?@microsoft.graph.conflictBehavior=rename", url.PathEscape(folderID), url.PathEscape(path.Base(srcPath)))
+	req, err := o.newGraphRequest(ctx, http.MethodPut, endpoint, file)
+	if err != nil {
+		return false, err
+	}
+	req.Header.Set("Content-Type", files.GetMimeType(srcPath))
+	if err := o.do(req, nil); err != nil {
+		return false, fmt.Errorf("upload OneDrive file failed: %w", err)
+	}
+	return true, nil
+}
+
+func (o *oneDriveClient) upBig(ctx context.Context, srcPath, folderID string, fileSize int64) (bool, error) {
+	file, err := os.Open(srcPath)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+	body := struct {
+		Item struct {
+			ConflictBehavior string `json:"@microsoft.graph.conflictBehavior"`
+		} `json:"item"`
+	}{}
+	body.Item.ConflictBehavior = "rename"
+	var session oneDriveUploadSession
+	endpoint := fmt.Sprintf("me/drive/items/%s:/%s:/createUploadSession", url.PathEscape(folderID), url.PathEscape(path.Base(srcPath)))
+	if err := o.doJSON(ctx, http.MethodPost, endpoint, body, &session); err != nil {
+		return false, fmt.Errorf("create OneDrive upload session failed: %w", err)
+	}
+
+	const chunkSize int64 = 5 * 1024 * 1024
+	reader := bufio.NewReader(file)
+	buffer := make([]byte, chunkSize)
+	for offset := int64(0); offset < fileSize; {
+		length, readErr := io.ReadFull(reader, buffer)
+		if readErr != nil && !errors.Is(readErr, io.ErrUnexpectedEOF) && !errors.Is(readErr, io.EOF) {
+			return false, readErr
+		}
+		if length == 0 {
+			return false, io.ErrUnexpectedEOF
+		}
+		if err := o.uploadChunk(ctx, session.UploadURL, offset, fileSize, buffer[:length]); err != nil {
+			return false, err
+		}
+		offset += int64(length)
+	}
+	return true, nil
+}
+
+func (o *oneDriveClient) uploadChunk(ctx context.Context, uploadURL string, offset, total int64, chunk []byte) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, uploadURL, bytes.NewReader(chunk))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Length", strconv.Itoa(len(chunk)))
+	req.Header.Set("Content-Range", fmt.Sprintf("bytes %d-%d/%d", offset, offset+int64(len(chunk))-1, total))
+	resp, err := o.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusAccepted {
+		return newOneDriveHTTPError(resp)
+	}
+	return nil
+}
+
+func (o *oneDriveClient) doJSON(ctx context.Context, method, endpoint string, body, result interface{}) error {
+	var reader io.Reader
+	if body != nil {
+		data, err := json.Marshal(body)
+		if err != nil {
+			return err
+		}
+		reader = bytes.NewReader(data)
+	}
+	req, err := o.newGraphRequest(ctx, method, endpoint, reader)
+	if err != nil {
+		return err
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	return o.do(req, result)
+}
+
+func (o *oneDriveClient) newGraphRequest(ctx context.Context, method, endpoint string, body io.Reader) (*http.Request, error) {
+	apiURL, err := o.baseURL.Parse(endpoint)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, method, apiURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+o.token)
+	return req, nil
+}
+
+func (o *oneDriveClient) do(req *http.Request, result interface{}) error {
+	resp, err := o.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return newOneDriveHTTPError(resp)
+	}
+	if result == nil || resp.StatusCode == http.StatusNoContent {
+		return nil
+	}
+	return json.NewDecoder(resp.Body).Decode(result)
+}
+
+type DriveItem struct {
+	Name        string `json:"name"`
+	ID          string `json:"id"`
+	DownloadURL string `json:"@microsoft.graph.downloadUrl"`
+	Size        int64  `json:"size"`
+}
+
+type oneDriveItemsResponse struct {
+	Value []DriveItem `json:"value"`
+}
+
+type oneDriveUploadSession struct {
+	UploadURL string `json:"uploadUrl"`
+}
+
+type oneDriveError struct {
+	Details struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	} `json:"error"`
+	statusCode int
+}
+
+func (e *oneDriveError) Error() string {
+	if e.Details.Code != "" || e.Details.Message != "" {
+		return fmt.Sprintf("OneDrive API error: %s: %s", e.Details.Code, e.Details.Message)
+	}
+	return fmt.Sprintf("OneDrive API returned HTTP %d", e.statusCode)
+}
+
+func newOneDriveHTTPError(resp *http.Response) error {
+	apiErr := &oneDriveError{statusCode: resp.StatusCode}
+	if err := json.NewDecoder(resp.Body).Decode(apiErr); err != nil {
+		return fmt.Errorf("OneDrive API returned HTTP %d", resp.StatusCode)
+	}
+	return apiErr
+}
+
+func isOneDriveNotFound(err error) bool {
+	var apiErr *oneDriveError
+	return errors.As(err, &apiErr) && (apiErr.statusCode == http.StatusNotFound || apiErr.Details.Code == "itemNotFound")
+}
+
+func normalizeDrivePath(itemPath string) string { return "/" + strings.TrimPrefix(itemPath, "/") }
+
+func escapeDrivePath(itemPath string) string {
+	parts := strings.Split(strings.TrimPrefix(itemPath, "/"), "/")
+	for i, part := range parts {
+		parts[i] = url.PathEscape(part)
+	}
+	return "/" + strings.Join(parts, "/")
 }
 
 func RefreshToken(grantType string, tokenType string, varMap map[string]interface{}) (string, error) {
@@ -210,198 +370,34 @@ func RefreshToken(grantType string, tokenType string, varMap map[string]interfac
 		data.Set("code", loadParamFromVars("code", varMap))
 	}
 	data.Set("redirect_uri", loadParamFromVars("redirect_uri", varMap))
-	client := &http.Client{}
-	defer client.CloseIdleConnections()
-	url := "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+	tokenURL := "https://login.microsoftonline.com/common/oauth2/v2.0/token"
 	if isCN == "true" {
-		url = "https://login.chinacloudapi.cn/common/oauth2/v2.0/token"
+		tokenURL = "https://login.chinacloudapi.cn/common/oauth2/v2.0/token"
 	}
-	req, err := http.NewRequest("POST", url, strings.NewReader(data.Encode()))
+	req, err := http.NewRequest(http.MethodPost, tokenURL, strings.NewReader(data.Encode()))
 	if err != nil {
-		return "", fmt.Errorf("new http post client for access token failed, err: %v", err)
+		return "", fmt.Errorf("create access token request failed: %w", err)
 	}
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	resp, err := client.Do(req)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("request for access token failed, err: %v", err)
+		return "", fmt.Errorf("request access token failed: %w", err)
 	}
 	defer resp.Body.Close()
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("read data from response body failed, err: %v", err)
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return "", newOneDriveHTTPError(resp)
 	}
-
-	tokenMap := map[string]interface{}{}
-	if err := json.Unmarshal(respBody, &tokenMap); err != nil {
-		return "", fmt.Errorf("unmarshal data from response body failed, err: %v", err)
+	var tokenMap map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&tokenMap); err != nil {
+		return "", fmt.Errorf("decode token response failed: %w", err)
 	}
+	key := "refresh_token"
 	if tokenType == "accessToken" {
-		accessToken, ok := tokenMap["access_token"].(string)
-		if !ok {
-			return "", errors.New("no such access token in response")
-		}
-		tokenMap = nil
-		return accessToken, nil
+		key = "access_token"
 	}
-	refreshToken, ok := tokenMap["refresh_token"].(string)
+	token, ok := tokenMap[key].(string)
 	if !ok {
-		return "", errors.New("no such access token in response")
+		return "", fmt.Errorf("no %s in token response", key)
 	}
-	tokenMap = nil
-	return refreshToken, nil
-}
-
-func (o *oneDriveClient) createFolder(parent string) error {
-	if _, err := o.loadIDByPath(path.Dir(parent)); err != nil {
-		if !strings.Contains(err.Error(), "itemNotFound") {
-			return err
-		}
-		_ = o.createFolder(path.Dir(parent))
-	}
-	item2, err := o.loadIDByPath(path.Dir(parent))
-	if err != nil {
-		return err
-	}
-	if _, err := o.client.DriveItems.CreateNewFolder(context.Background(), "", item2, path.Base(parent)); err != nil {
-		return err
-	}
-	return nil
-}
-
-type NewUploadSessionCreationRequest struct {
-	ConflictBehavior string `json:"@microsoft.graph.conflictBehavior,omitempty"`
-}
-type NewUploadSessionCreationResponse struct {
-	UploadURL          string `json:"uploadUrl"`
-	ExpirationDateTime string `json:"expirationDateTime"`
-}
-type UploadSessionUploadResponse struct {
-	ExpirationDateTime string   `json:"expirationDateTime"`
-	NextExpectedRanges []string `json:"nextExpectedRanges"`
-	DriveItem
-}
-type DriveItem struct {
-	Name        string `json:"name"`
-	Id          string `json:"id"`
-	DownloadURL string `json:"@microsoft.graph.downloadUrl"`
-	Description string `json:"description"`
-	Size        int64  `json:"size"`
-	WebURL      string `json:"webUrl"`
-}
-
-func (o *oneDriveClient) NewSessionFileUploadRequest(ctx context.Context, absoluteUrl string, grandOffset, grandTotalSize int64, byteReader *bytes.Reader) (*http.Request, error) {
-	apiUrl, err := o.client.BaseURL.Parse(absoluteUrl)
-	if err != nil {
-		return nil, err
-	}
-	absoluteUrl = apiUrl.String()
-	contentLength := byteReader.Size()
-	req, err := http.NewRequestWithContext(ctx, http.MethodPut, absoluteUrl, byteReader)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Length", strconv.FormatInt(contentLength, 10))
-	preliminaryLength := grandOffset
-	preliminaryRange := grandOffset + contentLength - 1
-	if preliminaryRange >= grandTotalSize {
-		preliminaryRange = grandTotalSize - 1
-		preliminaryLength = preliminaryRange - grandOffset + 1
-	}
-	req.Header.Set("Content-Range", fmt.Sprintf("bytes %d-%d/%d", preliminaryLength, preliminaryRange, grandTotalSize))
-
-	return req, err
-}
-
-func (o *oneDriveClient) upSmall(ctx context.Context, srcPath, folderID string, fileSize int64) (bool, error) {
-	file, err := os.Open(srcPath)
-	if err != nil {
-		return false, err
-	}
-	defer file.Close()
-
-	buffer := make([]byte, fileSize)
-	_, _ = file.Read(buffer)
-	fileReader := bytes.NewReader(buffer)
-	apiURL := fmt.Sprintf("me/drive/items/%s:/%s:/content?@microsoft.graph.conflictBehavior=rename", url.PathEscape(folderID), path.Base(srcPath))
-
-	mimeType := files.GetMimeType(srcPath)
-	req, err := o.client.NewFileUploadRequest(apiURL, mimeType, fileReader)
-	if err != nil {
-		return false, err
-	}
-	var response *DriveItem
-	if err := o.client.Do(ctx, req, false, &response); err != nil {
-		return false, fmt.Errorf("do request for list failed, err: %v", err)
-	}
-	return true, nil
-}
-
-func (o *oneDriveClient) upBig(ctx context.Context, srcPath, folderID string, fileSize int64) (bool, error) {
-	file, err := os.Open(srcPath)
-	if err != nil {
-		return false, err
-	}
-	defer file.Close()
-
-	apiURL := fmt.Sprintf("me/drive/items/%s:/%s:/createUploadSession", url.PathEscape(folderID), path.Base(srcPath))
-	sessionCreationRequestInside := NewUploadSessionCreationRequest{
-		ConflictBehavior: "rename",
-	}
-
-	sessionCreationRequest := struct {
-		Item        NewUploadSessionCreationRequest `json:"item"`
-		DeferCommit bool                            `json:"deferCommit"`
-	}{sessionCreationRequestInside, false}
-
-	sessionCreationReq, err := o.client.NewRequest("POST", apiURL, sessionCreationRequest)
-	if err != nil {
-		return false, err
-	}
-
-	var sessionCreationResp *NewUploadSessionCreationResponse
-	err = o.client.Do(ctx, sessionCreationReq, false, &sessionCreationResp)
-	if err != nil {
-		return false, fmt.Errorf("session creation failed %w", err)
-	}
-
-	fileSessionUploadUrl := sessionCreationResp.UploadURL
-
-	sizePerSplit := int64(5 * 1024 * 1024)
-	buffer := make([]byte, 5*1024*1024)
-	splitCount := fileSize / sizePerSplit
-	if fileSize%sizePerSplit != 0 {
-		splitCount += 1
-	}
-	bfReader := bufio.NewReader(file)
-	httpClient := http.Client{
-		Transport: &http.Transport{
-			Proxy:           http.ProxyFromEnvironment,
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
-	for splitNow := int64(0); splitNow < splitCount; splitNow++ {
-		length, err := bfReader.Read(buffer)
-		if err != nil {
-			return false, err
-		}
-		if int64(length) < sizePerSplit {
-			bufferLast := buffer[:length]
-			buffer = bufferLast
-		}
-		sessionFileUploadReq, err := o.NewSessionFileUploadRequest(ctx, fileSessionUploadUrl, splitNow*sizePerSplit, fileSize, bytes.NewReader(buffer))
-		if err != nil {
-			return false, err
-		}
-		res, err := httpClient.Do(sessionFileUploadReq)
-		if err != nil {
-			return false, err
-		}
-		if res.StatusCode != 201 && res.StatusCode != 202 && res.StatusCode != 200 {
-			data, _ := io.ReadAll(res.Body)
-			res.Body.Close()
-			return false, errors.New(string(data))
-		}
-		res.Body.Close()
-	}
-	return true, nil
+	return token, nil
 }
