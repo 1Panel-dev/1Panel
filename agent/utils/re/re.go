@@ -44,6 +44,10 @@ const (
 	SSHDisconnectPattern               = `^Received disconnect from ([0-9a-fA-F:.]+) port (\d+)`
 	SSHMaxAuthPattern                  = `^error: maximum authentication attempts exceeded for (?:(?:invalid user) )?(.+?) from ([0-9a-fA-F:.]+) port (\d+)`
 	SSHNotAllowedPattern               = `^User (.+?) from ([0-9a-fA-F:.]+) not allowed`
+	SyslogPRIPattern                   = `^<(\d{1,3})>(?:\d\s+)?`
+	SyslogRFC3164Pattern               = `^([A-Z][a-z]{2}\s{1,2}\d{1,2}\s\d{2}:\d{2}:\d{2})\s+(.*)$`
+	SyslogRFC3339Pattern               = `^(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?)\s+(.*)$`
+	SyslogServicePattern               = `^(?:\S+\s+)?([[:alnum:]_.@/-]+)(?:\[\d+\])?:\s*(.*)$`
 )
 
 var regexMap = make(map[string]*regexp.Regexp)
@@ -88,6 +92,10 @@ func Init() {
 		SSHDisconnectPattern,
 		SSHMaxAuthPattern,
 		SSHNotAllowedPattern,
+		SyslogPRIPattern,
+		SyslogRFC3164Pattern,
+		SyslogRFC3339Pattern,
+		SyslogServicePattern,
 	}
 
 	for _, pattern := range patterns {

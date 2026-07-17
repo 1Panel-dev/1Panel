@@ -21,6 +21,16 @@ export const getSystemFiles = (node?: string) => {
     return http.get<Array<string>>(`/logs/system/files${params}`);
 };
 
+export const readSystemLogs = (params: Log.SystemLogSearch, node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.post<Log.SystemLog>(`/logs/system/read${query}`, params);
+};
+
+export const listRunningServices = (node?: string) => {
+    const query = node ? `?operateNode=${node}` : '';
+    return http.get<string[]>(`/logs/system/services${query}`);
+};
+
 export const cleanLogs = (param: Log.CleanLog) => {
     return http.post(`/core/logs/clean`, param);
 };
