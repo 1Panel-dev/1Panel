@@ -202,11 +202,11 @@
                         <template #default="{ row }">
                             <span v-if="!hasBackup(row.type)">-</span>
                             <div v-else>
-                                <span v-if="row.downloadAccount" type="info">
+                                <el-button plain size="small" v-if="row.downloadAccount">
                                     {{
                                         row.downloadAccount === 'localhost' ? $t('setting.LOCAL') : row.downloadAccount
                                     }}
-                                </span>
+                                </el-button>
                                 <span v-else>-</span>
                                 <el-button
                                     v-if="row.sourceAccounts?.length > 1"

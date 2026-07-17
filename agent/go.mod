@@ -20,7 +20,6 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/go-sql-driver/mysql v1.10.0
-	github.com/goh-chunlin/go-onedrive v1.1.1
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/jackc/pgx/v5 v5.10.0
@@ -52,7 +51,6 @@ require (
 	go.mongodb.org/mongo-driver/v2 v2.7.0
 	golang.org/x/crypto v0.53.0
 	golang.org/x/net v0.56.0
-	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.21.0
 	golang.org/x/sys v0.46.0
 	golang.org/x/text v0.39.0
@@ -134,7 +132,6 @@ require (
 	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/google/pprof v0.0.0-20250820193118-f64d9cf942d6 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 // indirect
-	github.com/h2non/filetype v1.1.3 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.198 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
@@ -216,6 +213,7 @@ require (
 	go4.org v0.0.0-20260112195520-a5071408f32f // indirect
 	golang.org/x/arch v0.26.0 // indirect
 	golang.org/x/mod v0.37.0 // indirect
+	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/tools v0.47.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	modernc.org/fileutil v1.4.0 // indirect
