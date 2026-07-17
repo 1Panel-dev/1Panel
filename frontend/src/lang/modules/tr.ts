@@ -4864,8 +4864,8 @@ const message = {
             regionPolicy: 'Bölge politikası',
             provincePolicy: 'İl politikası',
             provinceRuleLabel: 'İl',
-            provinceVersionAlert:
-                'İl politikalarının çalışması için OpenResty sürümü 1.31.1.1-0 sürümünden daha yeni olmalıdır.',
+            openRestyFeatureVersionAlert:
+                '{0} özelliğinin çalışması için OpenResty sürümü 1.31.1.1-0 sürümünden daha yeni olmalıdır.',
             ipLocation: 'IP Konumu',
             action: 'Eylem',
             ruleType: 'Saldırı Türü',
@@ -4953,6 +4953,7 @@ const message = {
             defaultUrlBlack: 'URL Kuralları',
             htmlRes: 'Engelleme Sayfası',
             urlSearchHelper: 'Bulanık arama için URL girin',
+            hostSearchHelper: 'Bulanık arama için Host girin',
             toCreate: 'Oluştur',
             closeWaf: 'WAF’ı Kapat',
             closeWafHelper:
@@ -4969,6 +4970,7 @@ const message = {
             attackCount: 'Saldırı sıklığı sınırı',
             fileExtCheck: 'Dosya yükleme sınırı',
             geoRestrict: 'Bölgesel erişim kısıtlaması',
+            originProtect: 'CDN kaynak koruması',
             attacklog: 'Engelleme Kaydı',
             unknownWebsite: 'Yetkisiz alan adı erişimi',
             geoRuleEmpty: 'En az bir bölge veya il seçin',
@@ -5019,6 +5021,7 @@ const message = {
             spiderIpHelper:
                 'Etkinleştirildiğinde yalnızca seçilen tarayıcılara izin verilir; devre dışı bırakıldığında tüm tarayıcılar engellenir.',
             spiderIp: 'Örümcek IP Havuzu',
+            spider: 'Örümcek',
             spiderAllowlist: 'İzin verilen tarayıcılar',
             spiderAllowlistEmpty: 'Hiçbir tarayıcı seçilmedi. Kaydedildiğinde tüm tarayıcılar engellenecek.',
             geoIp: 'IP Adres Kütüphanesi',
@@ -5139,6 +5142,7 @@ const message = {
             totalFlow: 'Toplam Trafik',
             logSize: 'Günlük Dosyası Boyutu',
             realIPType: 'Gerçek IP alma yöntemi',
+            realIPRecognition: 'Gerçek IP algılama',
             fromHeader: 'HTTP Başlığından Al',
             fromHeaders: 'Başlık listesinden Al',
             header: 'HTTP Başlığı',
@@ -5152,10 +5156,20 @@ const message = {
             monitorCDNHelper:
                 'Web sitesi izleme için CDN yapılandırmasını değiştirmek, WAF CDN ayarlarını da güncelleyecektir',
             wafCDNHelper: 'WAF CDN yapılandırmasını değiştirmek, web sitesi izleme CDN ayarlarını da güncelleyecektir',
+            originProtection: 'Kaynak sunucu koruması',
+            originProtectionHelper:
+                'Yalnızca seçilen IP gruplarındaki CDN düğümleri kaynağa bağlanabilir. Ziyaretçi gerçek IP tespiti ayrı bir anahtar kullanır.',
+            originProtectionIPGroups: 'CDN kaynak IP grupları',
+            originProtectionIPGroupsPlaceholder: 'Güvenilir CDN kaynak IP gruplarını seçin',
+            originProtectionWarning:
+                'Hatalı yapılandırma siteyi erişilemez yapabilir. Tüm CDN kaynak adreslerinin eklendiğini doğrulayın.',
+            originProtectionEnableConfirm:
+                'Seçilen IP grupları dışındaki bağlantılar kaynağa doğrudan erişim sayılarak engellenecektir. Devam edilsin mi?',
             statusErr: 'Geçersiz durum kodu formatı',
             shenma: 'Shenma Arama',
             duckduckgo: 'DuckDuckGo',
             yandex: 'Yandex',
+            gptbot: 'GPTBot',
             excludeUri: 'URI’leri Hariç Tut',
             top100Helper: 'İlk 100 veriyi göster',
             logSaveDay: 'Günlük Saklama Süresi (gün)',

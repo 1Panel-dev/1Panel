@@ -5017,8 +5017,7 @@ const message = {
             regionPolicy: 'Política regional',
             provincePolicy: 'Política de província',
             provinceRuleLabel: 'Província',
-            provinceVersionAlert:
-                'O OpenResty deve ser posterior à versão 1.31.1.1-0 para que as políticas de província funcionem.',
+            openRestyFeatureVersionAlert: 'A versão do OpenResty deve ser superior a 1.31.1.1-0 para que {0} funcione.',
             ipLocation: 'Localização do IP',
             action: 'Ação',
             ruleType: 'Tipo de ataque',
@@ -5107,6 +5106,7 @@ const message = {
             defaultUrlBlack: 'Regras de URL',
             htmlRes: 'Página de interceptação',
             urlSearchHelper: 'Por favor, insira a URL para suportar a pesquisa difusa',
+            hostSearchHelper: 'Insira o Host para pesquisa aproximada',
             toCreate: 'Criar',
             closeWaf: 'Fechar WAF',
             closeWafHelper: 'Fechar o WAF fará com que o site perca a proteção, você deseja continuar?',
@@ -5122,6 +5122,7 @@ const message = {
             attackCount: 'Limite de frequência de ataques',
             fileExtCheck: 'Limite de upload de arquivos',
             geoRestrict: 'Restrição de acesso regional',
+            originProtect: 'Proteção da origem CDN',
             attacklog: 'Registro de Interceptação',
             unknownWebsite: 'Acesso a nome de domínio não autorizado',
             geoRuleEmpty: 'Selecione pelo menos uma região ou província',
@@ -5174,6 +5175,7 @@ const message = {
             spiderIpHelper:
                 'Quando ativado, apenas os spiders selecionados são permitidos; quando desativado, todos são bloqueados.',
             spiderIp: 'Pool de IPs de spiders',
+            spider: 'Spider',
             spiderAllowlist: 'Spiders permitidos',
             spiderAllowlistEmpty: 'Nenhum spider selecionado. Ao salvar, todos os spiders serão bloqueados.',
             geoIp: 'Biblioteca de endereços IP',
@@ -5294,6 +5296,7 @@ const message = {
             totalFlow: 'Fluxo Total',
             logSize: 'Tamanho do Arquivo de Log',
             realIPType: 'Método de Obtenção do IP Real',
+            realIPRecognition: 'Identificação do IP real',
             fromHeader: 'Obter do Header HTTP',
             fromHeaders: 'Obter da lista de Headers',
             header: 'Header HTTP',
@@ -5309,10 +5312,20 @@ const message = {
                 'Modificar a configuração da CDN para monitoramento do site também atualizará as configurações de CDN do WAF',
             wafCDNHelper:
                 'Modificar a configuração de CDN do WAF também atualizará as configurações de CDN do monitoramento do site',
+            originProtection: 'Proteção do servidor de origem',
+            originProtectionHelper:
+                'Somente nós CDN nos grupos de IP selecionados podem conectar à origem. A detecção do IP real do visitante usa uma opção separada.',
+            originProtectionIPGroups: 'Grupos de IP de origem CDN',
+            originProtectionIPGroupsPlaceholder: 'Selecione grupos de IP de origem CDN confiáveis',
+            originProtectionWarning:
+                'Uma configuração incorreta pode tornar o site indisponível. Confirme se todos os endereços de retorno da CDN estão incluídos.',
+            originProtectionEnableConfirm:
+                'Conexões fora dos grupos de IP selecionados serão tratadas como acesso direto à origem e bloqueadas. Continuar?',
             statusErr: 'Formato de código de status inválido',
             shenma: 'Busca Shenma',
             duckduckgo: 'DuckDuckGo',
             yandex: 'Yandex',
+            gptbot: 'GPTBot',
             excludeUri: 'Excluir URIs',
             top100Helper: 'Mostrar os 100 principais dados',
             logSaveDay: 'Período de Retenção de Logs (dias)',

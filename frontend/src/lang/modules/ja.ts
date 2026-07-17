@@ -4815,8 +4815,8 @@ const message = {
             regionPolicy: '地域ポリシー',
             provincePolicy: '省ポリシー',
             provinceRuleLabel: '省',
-            provinceVersionAlert:
-                '省ポリシーを有効にするには、OpenResty のバージョンが 1.31.1.1-0 より新しい必要があります。',
+            openRestyFeatureVersionAlert:
+                '{0} を有効にするには、OpenResty のバージョンが 1.31.1.1-0 より新しい必要があります。',
             ipLocation: 'IP位置',
             action: 'アクション',
             ruleType: '攻撃タイプ',
@@ -4903,6 +4903,7 @@ const message = {
             defaultUrlBlack: 'URLルール',
             htmlRes: 'インターセプトページ',
             urlSearchHelper: 'URLを入力して、曖昧検索をサポートしてください',
+            hostSearchHelper: 'Host を入力してください（曖昧検索対応）',
             toCreate: '作成',
             closeWaf: 'WAFを閉じる',
             closeWafHelper: 'WAFを閉じると、ウェブサイトは保護を失います。続行しますか？',
@@ -4918,6 +4919,7 @@ const message = {
             attackCount: '攻撃頻度制限',
             fileExtCheck: 'ファイルアップロード制限',
             geoRestrict: '地域アクセス制限',
+            originProtect: 'CDN オリジン保護',
             attacklog: '遮断記録',
             unknownWebsite: '認証されていないドメイン名アクセス',
             geoRuleEmpty: '地域または省を1つ以上選択してください',
@@ -4968,6 +4970,7 @@ const message = {
             spiderIpHelper:
                 '有効にすると選択したクローラーのみ許可し、無効にするとすべてのクローラーをブロックします。',
             spiderIp: 'スパイダー IP プール',
+            spider: 'スパイダー',
             spiderAllowlist: '許可するクローラー',
             spiderAllowlistEmpty: 'クローラーが選択されていません。保存するとすべてのクローラーがブロックされます。',
             geoIp: 'IP アドレスライブラリ',
@@ -5088,6 +5091,7 @@ const message = {
             totalFlow: '総トラフィック',
             logSize: 'ログファイルのサイズ',
             realIPType: '実際のIP取得方法',
+            realIPRecognition: 'リアル IP の識別',
             fromHeader: 'HTTPヘッダーから取得',
             fromHeaders: 'ヘッダーリストから取得',
             header: 'HTTPヘッダー',
@@ -5100,10 +5104,20 @@ const message = {
             headersHelper: '一般的に使用されるCDNのHTTPヘッダーから実際のIPを取得し、最初の利用可能な値を選択',
             monitorCDNHelper: 'ウェブサイトモニタリングのためにCDN設定を変更すると、WAF CDN設定も更新されます',
             wafCDNHelper: 'WAF CDN設定を変更すると、ウェブサイトモニタリングのCDN設定も更新されます',
+            originProtection: 'オリジン保護',
+            originProtectionHelper:
+                '選択した IP グループ内の CDN ノードだけがオリジンへ接続できます。訪問者の実 IP 判定は別のスイッチです。',
+            originProtectionIPGroups: 'CDN オリジン IP グループ',
+            originProtectionIPGroupsPlaceholder: '信頼する CDN オリジン IP グループを選択',
+            originProtectionWarning:
+                '設定を誤るとサイトへ接続できなくなる可能性があります。すべての CDN 回送元アドレスを含めてください。',
+            originProtectionEnableConfirm:
+                '選択した IP グループ以外の接続はオリジンへの直接アクセスとしてブロックされます。続行しますか？',
             statusErr: '無効なステータスコード形式',
             shenma: '神馬検索',
             duckduckgo: 'DuckDuckGo',
             yandex: 'Yandex',
+            gptbot: 'GPTBot',
             excludeUri: 'URIを除外',
             top100Helper: '上位100データを表示',
             logSaveDay: 'ログ保持期間（日数）',
