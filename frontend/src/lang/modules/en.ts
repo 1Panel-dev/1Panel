@@ -722,6 +722,15 @@ const message = {
             accountModelsHelper:
                 'Choose which models this account makes available to OpenClaw for selection and configuration',
             accountModelsRequired: 'Select at least one model',
+            verifyModel: 'Verification Model',
+            verifyModelHelper:
+                'Select a model this account can access. It is used to send a minimal request when saving to verify connectivity.',
+            verifyModelRequired: 'Select a verification model',
+            discoverModels: 'Get Models',
+            automaticModelDiscovery: 'Auto fetch',
+            manualModelConfiguration: 'Manual setup',
+            discoverModelsHelper: 'Get models from the provider /v1/models API and add all of them to the model pool',
+            discoverModelsFailedFallback: 'Failed to get models. Configure a model manually.',
             accountModelsDuplicate: 'Duplicate models were found in the catalog',
             modelPool: 'Model Pool',
             fallbackModels: 'Fallback Models',
@@ -873,7 +882,6 @@ const message = {
             dashboardAuthAutoRebuildHelper:
                 'Saving the username or password will automatically rebuild the container so the changes take effect.',
             channelDeleteConfirm: 'Delete the {0} channel configuration?',
-            customProviderHelper: 'Custom model providers do not validate whether the account is available.',
             apiTypeBaseURLHelper: 'This type sends requests to {0}. Recommended Base URL: {1}',
             apiTypeBaseURLMismatch:
                 'The current Base URL looks like a {0} path, but {1} is selected. Recommended URL: {2}',
@@ -1054,8 +1062,6 @@ const message = {
             healthUnknown: 'Unknown',
             validationModelMapEmpty: 'Model mapping names cannot be empty',
             validationModelMapDuplicate: 'Request model {0} is duplicated',
-            validateAvailability: 'Validate Account Availability',
-            validateAvailabilityHelper: 'Send a minimal message before saving to validate API availability',
             modelGroup: 'Model Group',
             availableModels: 'Available Models',
             modelGroupModels: 'Request Models',
@@ -4930,8 +4936,10 @@ const message = {
             noBlackIp: 'IP is already blocked, no need to block again',
             noWhiteUrl: 'URL is already in the white list, no need to add again',
             spiderIpHelper:
-                'Includes Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo, Yandex. Closing this will block all spider access.',
+                'When enabled, only selected spiders are allowed. When disabled, all spider access is blocked.',
             spiderIp: 'Spider IP Pool',
+            spiderAllowlist: 'Allowed spiders',
+            spiderAllowlistEmpty: 'No spiders selected. Saving will block all spider access.',
             geoIp: 'IP Address Library',
             geoIpHelper: 'Used to confirm the geolocation of the IP',
             stat: 'Attack Report',
@@ -5067,6 +5075,7 @@ const message = {
             statusErr: 'Invalid status code format',
             shenma: 'Shenma Search',
             duckduckgo: 'DuckDuckGo',
+            yandex: 'Yandex',
             excludeUri: 'Exclude URIs',
             top100Helper: 'Show the top 100 data',
             logSaveDay: 'Log Retention Period (days)',

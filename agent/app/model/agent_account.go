@@ -7,6 +7,8 @@ type AgentAccount struct {
 	APIKey          string `json:"apiKey"`
 	BaseURL         string `json:"baseUrl"`
 	APIType         string `json:"apiType"`
+	AuthMode        string `json:"authMode"`
+	VerifyModel     string `json:"verifyModel"`
 	RememberAPIKey  bool   `json:"rememberApiKey"`
 	Verified        bool   `json:"verified"`
 	Remark          string `json:"remark"`

@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	providercatalog "github.com/1Panel-dev/1Panel/agent/app/provider"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -1212,6 +1213,57 @@ var AddAgentAccountMasterID = &gormigrate.Migration{
 	},
 }
 
+var NormalizeAgentAccountModelIDs = &gormigrate.Migration{
+	ID: "20260716-normalize-agent-account-model-ids",
+	Migrate: func(tx *gorm.DB) error {
+		return migrationutils.NormalizeAgentAccountModelIDs(tx)
+	},
+}
+
+var AddAgentAccountVerifyModel = &gormigrate.Migration{
+	ID: "20260716-add-agent-account-verify-model",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AgentAccount{}); err != nil {
+			return err
+		}
+		var accounts []model.AgentAccount
+		if err := tx.Where("verify_model = '' OR verify_model IS NULL").Find(&accounts).Error; err != nil {
+			return err
+		}
+		for _, account := range accounts {
+			var accountModel model.AgentAccountModel
+			err := tx.Where("account_id = ?", account.ID).Order("sort_order ASC, id ASC").First(&accountModel).Error
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				continue
+			}
+			if err != nil {
+				return err
+			}
+			if err := tx.Model(&model.AgentAccount{}).Where("id = ?", account.ID).Update("verify_model", accountModel.Model).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	},
+}
+
+var AddAgentAccountAuthMode = &gormigrate.Migration{
+	ID: "20260716-add-agent-account-auth-mode",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AgentAccount{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.AgentAccount{}).
+			Where("api_type = ? AND (auth_mode IS NULL OR auth_mode = '') AND provider IN ?", "anthropic-messages", []string{"bailian-coding-plan", "ark-coding-plan", "xiaomi"}).
+			Update("auth_mode", providercatalog.AuthModeBearer).Error; err != nil {
+			return err
+		}
+		return tx.Model(&model.AgentAccount{}).
+			Where("api_type = ? AND (auth_mode IS NULL OR auth_mode = '')", "anthropic-messages").
+			Update("auth_mode", providercatalog.AuthModeXAPIKey).Error
+	},
+}
+
 var AddHostTable = &gormigrate.Migration{
 	ID: "20260318-add-host-table",
 	Migrate: func(tx *gorm.DB) error {
@@ -1391,7 +1443,7 @@ var AddAgentWebsiteBinding = &gormigrate.Migration{
 		if err := tx.Where("type = ? AND app_install_id > 0", constant.Deployment).Find(&websites).Error; err != nil {
 			return err
 		}
-		websiteMap := service.UniqueDeploymentWebsiteMapForMigration(websites)
+		websiteMap := service.UniqueDeploymentWebsiteMapByAppInstall(websites)
 		for _, agent := range agents {
 			if agent.WebsiteID != 0 || agent.AppInstallID == 0 {
 				continue

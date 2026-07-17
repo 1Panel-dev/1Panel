@@ -52,6 +52,7 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/accounts/search", baseApi.PageAgentAccounts)
 		aiToolsRouter.POST("/accounts/counts", baseApi.CountAgentAccountsByProviders)
 		aiToolsRouter.POST("/accounts/models", baseApi.GetAgentAccountModels)
+		aiToolsRouter.POST("/accounts/models/discover", baseApi.DiscoverAgentAccountModels)
 		aiToolsRouter.POST("/accounts/models/create", baseApi.CreateAgentAccountModel)
 		aiToolsRouter.POST("/accounts/models/update", baseApi.UpdateAgentAccountModel)
 		aiToolsRouter.POST("/accounts/models/delete", baseApi.DeleteAgentAccountModel)

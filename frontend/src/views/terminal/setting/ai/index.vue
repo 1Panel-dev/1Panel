@@ -78,6 +78,7 @@ import i18n from '@/lang';
 import { pageAgentAccounts } from '@/api/modules/ai';
 import { getAgentTerminalAIInfo, updateAgentTerminalAIInfo } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
+import { isAgentAccountVerificationSkipped } from '@/utils/agent';
 import {
     AI_PREFIX_OPTIONS,
     DEFAULT_AI_PREFIX,
@@ -125,20 +126,15 @@ const openDrawer = () => {
     });
 };
 
-const isVerificationSkipped = (provider?: string) => {
-    const key = (provider || '').toLowerCase();
-    return key === 'custom' || key === 'vllm' || key === 'ollama' || key === 'kimi-coding';
-};
-
 const verificationLabel = (item: AgentAccountOption) => {
-    if (isVerificationSkipped(item.provider)) {
+    if (isAgentAccountVerificationSkipped(item.provider)) {
         return i18n.global.t('aiTools.agents.verifySkipped');
     }
     return item.verified ? 'OK' : 'N/A';
 };
 
 const verificationTagType = (item: AgentAccountOption) => {
-    if (isVerificationSkipped(item.provider)) {
+    if (isAgentAccountVerificationSkipped(item.provider)) {
         return 'info';
     }
     return item.verified ? 'success' : 'warning';

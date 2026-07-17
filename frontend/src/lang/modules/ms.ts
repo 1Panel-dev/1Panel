@@ -723,6 +723,16 @@ const message = {
             accountModelsHelper:
                 'Konfigurasikan model yang ditawarkan oleh akaun ini kepada OpenClaw untuk pemilihan dan tetapan',
             accountModelsRequired: 'Pilih sekurang-kurangnya satu model',
+            verifyModel: 'Model Pengesahan',
+            verifyModelHelper:
+                'Pilih model yang boleh dicapai oleh akaun ini. Permintaan minimum akan dihantar semasa menyimpan untuk mengesahkan sambungan.',
+            verifyModelRequired: 'Pilih model pengesahan',
+            discoverModels: 'Dapatkan model',
+            automaticModelDiscovery: 'Dapatkan automatik',
+            manualModelConfiguration: 'Konfigurasi manual',
+            discoverModelsHelper:
+                'Dapatkan model daripada API /v1/models penyedia dan tambahkan semuanya ke katalog model',
+            discoverModelsFailedFallback: 'Gagal mendapatkan model. Konfigurasikan model secara manual.',
             accountModelsDuplicate: 'Terdapat model pendua dalam katalog',
             modelPool: 'Katalog model',
             fallbackModels: 'Model fallback',
@@ -876,7 +886,6 @@ const message = {
             dashboardAuthAutoRebuildHelper:
                 'Menyimpan nama pengguna atau kata laluan akan membina semula bekas secara automatik supaya perubahan berkuat kuasa.',
             channelDeleteConfirm: 'Padam konfigurasi saluran {0}?',
-            customProviderHelper: 'Penyedia model tersuai tidak mengesahkan sama ada akaun boleh digunakan',
             apiTypeBaseURLHelper: 'Jenis ini menghantar permintaan ke {0}. Base URL yang disyorkan: {1}',
             apiTypeBaseURLMismatch:
                 'Base URL semasa kelihatan seperti laluan {0}, tetapi {1} dipilih. URL yang disyorkan: {2}',
@@ -1060,8 +1069,6 @@ const message = {
             healthUnknown: 'Tidak diketahui',
             validationModelMapEmpty: 'Nama model dalam pemetaan model tidak boleh kosong',
             validationModelMapDuplicate: 'Model permintaan {0} berulang',
-            validateAvailability: 'Sahkan Ketersediaan Akaun',
-            validateAvailabilityHelper: 'Hantar mesej minimum sebelum menyimpan untuk mengesahkan ketersediaan API',
             modelGroup: 'Kumpulan Model',
             availableModels: 'Model Tersedia',
             modelGroupModels: 'Model Permintaan',
@@ -5006,8 +5013,10 @@ const message = {
             noBlackIp: 'IP telah disekat, tidak perlu disekat semula',
             noWhiteUrl: 'URL telah dimasukkan ke senarai putih, tidak perlu ditambah semula',
             spiderIpHelper:
-                'Termasuk Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo, Yandex. Menutup ini akan menyekat semua akses labah-labah.',
+                'Apabila didayakan, hanya perangkak yang dipilih dibenarkan; apabila dilumpuhkan, semua akses perangkak disekat.',
             spiderIp: 'Kolam IP labah-labah',
+            spiderAllowlist: 'Perangkak dibenarkan',
+            spiderAllowlistEmpty: 'Tiada perangkak dipilih. Menyimpan akan menyekat semua akses perangkak.',
             geoIp: 'Pustaka Alamat IP',
             geoIpHelper: 'Digunakan untuk mengesahkan lokasi geografi IP',
             stat: 'Laporan Serangan',
@@ -5143,6 +5152,7 @@ const message = {
             statusErr: 'Format kod status tidak sah',
             shenma: 'Shenma Search',
             duckduckgo: 'DuckDuckGo',
+            yandex: 'Yandex',
             excludeUri: 'Kecualikan URI',
             top100Helper: 'Tunjukkan data 100 teratas',
             logSaveDay: 'Tempoh Penahanan Log (hari)',

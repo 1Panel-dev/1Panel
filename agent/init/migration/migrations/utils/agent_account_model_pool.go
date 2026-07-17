@@ -39,19 +39,11 @@ func MigrateAgentAccountModelPool(tx *gorm.DB) error {
 			continue
 		}
 		for index, item := range models {
-			inputPayload, err := json.Marshal(item.Input)
-			if err != nil {
-				return err
-			}
 			record := &model.AgentAccountModel{
-				AccountID:     account.ID,
-				Model:         item.ID,
-				Name:          item.Name,
-				ContextWindow: item.ContextWindow,
-				MaxTokens:     item.MaxTokens,
-				Reasoning:     item.Reasoning,
-				Input:         string(inputPayload),
-				SortOrder:     index + 1,
+				AccountID: account.ID,
+				Model:     item.ID,
+				Name:      item.Name,
+				SortOrder: index + 1,
 			}
 			if err := tx.Create(record).Error; err != nil {
 				return err
@@ -108,27 +100,47 @@ func buildMigratedAgentAccountModels(tx *gorm.DB, account *legacyAgentAccountMod
 		}
 		return nil, err
 	}
-	applyLegacyAgentAccountModelDefaults(account.Provider, models)
 	return models, nil
 }
 
-func applyLegacyAgentAccountModelDefaults(provider string, models []dto.AgentAccountModel) {
-	if provider != "custom" && provider != "ollama" && provider != "vllm" {
-		return
+func NormalizeAgentAccountModelIDs(tx *gorm.DB) error {
+	var accounts []model.AgentAccount
+	if err := tx.Find(&accounts).Error; err != nil {
+		return err
 	}
-	meta, ok := providercatalog.Get(provider)
-	if !ok {
-		return
+	for _, account := range accounts {
+		var accountModels []model.AgentAccountModel
+		if err := tx.Where("account_id = ?", account.ID).Find(&accountModels).Error; err != nil {
+			return err
+		}
+		for _, item := range accountModels {
+			normalized := providercatalog.NormalizeModelID(account.Provider, item.Model)
+			if normalized != item.Model {
+				if err := tx.Model(&model.AgentAccountModel{}).Where("id = ?", item.ID).Update("model", normalized).Error; err != nil {
+					return err
+				}
+			}
+		}
+
+		var agents []model.Agent
+		if err := tx.Where("account_id = ?", account.ID).Find(&agents).Error; err != nil {
+			return err
+		}
+		for _, agent := range agents {
+			normalized := providercatalog.NormalizeModelID(account.Provider, agent.Model)
+			if normalized != agent.Model {
+				if err := tx.Model(&model.Agent{}).Where("id = ?", agent.ID).Update("model", normalized).Error; err != nil {
+					return err
+				}
+			}
+		}
 	}
-	for i := range models {
-		if strings.TrimSpace(models[i].Name) == "" {
-			models[i].Name = strings.TrimSpace(models[i].ID)
-		}
-		if models[i].ContextWindow <= 0 {
-			models[i].ContextWindow = meta.Default.ContextWindow
-		}
-		if models[i].MaxTokens <= 0 {
-			models[i].MaxTokens = meta.Default.MaxTokens
-		}
+	if err := tx.Model(&model.AgentAccount{}).
+		Where("provider = ? AND api_type = ? AND (base_url = '' OR base_url = ? OR base_url = ?)", "deepseek", "anthropic-messages", "https://api.deepseek.com", "https://api.deepseek.com/v1").
+		Update("base_url", "https://api.deepseek.com/anthropic").Error; err != nil {
+		return err
 	}
+	return tx.Model(&model.AgentAccount{}).
+		Where("provider = ?", "gemini").
+		Update("api_type", "gemini-generate-content").Error
 }

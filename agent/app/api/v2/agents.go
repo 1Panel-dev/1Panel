@@ -501,6 +501,27 @@ func (b *BaseApi) GetAgentAccountModels(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Discover custom provider models
+// @Accept json
+// @Param request body dto.AgentAccountModelDiscoverReq true "request"
+// @Success 200 {array} dto.AgentAccountModel
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/accounts/models/discover [post]
+func (b *BaseApi) DiscoverAgentAccountModels(c *gin.Context) {
+	var req dto.AgentAccountModelDiscoverReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	list, err := agentService.DiscoverAccountModels(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags AI
 // @Summary Create model account model
 // @Accept json
 // @Param request body dto.AgentAccountModelCreateReq true "request"

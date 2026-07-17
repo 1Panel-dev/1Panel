@@ -20,6 +20,7 @@ const (
 	defaultTimeout        = 30 * time.Second
 	defaultUserAgent      = "1panel-terminal-ai/1.0"
 	defaultAnthropicToken = 1024
+	defaultTerminalTokens = 8192
 )
 
 type Client interface {
@@ -32,6 +33,7 @@ type ClientConfig struct {
 	APIKey     string
 	Model      string
 	APIType    string
+	AuthMode   string
 	MaxTokens  int
 	Timeout    time.Duration
 	HTTPClient *http.Client
@@ -43,6 +45,7 @@ type GeneratorConfig struct {
 	APIKey    string
 	Model     string
 	APIType   string
+	AuthMode  string
 	MaxTokens int
 }
 
@@ -99,6 +102,11 @@ func NewClient(cfg ClientConfig) (Client, error) {
 	cfg.Provider = providerKey
 	cfg.BaseURL = baseURL
 	cfg.APIType = normalizeClientAPIType(providerKey, cfg.APIType)
+	authMode, err := providercatalog.ResolveAuthMode(providerKey, cfg.APIType, cfg.AuthMode)
+	if err != nil {
+		return nil, err
+	}
+	cfg.AuthMode = authMode
 	if cfg.Timeout <= 0 {
 		cfg.Timeout = defaultTimeout
 	}
@@ -110,26 +118,6 @@ func NewClient(cfg ClientConfig) (Client, error) {
 		config:     cfg,
 		httpClient: client,
 	}, nil
-}
-
-type ClientOption func(*ClientConfig)
-
-func WithBaseURL(baseURL string) ClientOption {
-	return func(cfg *ClientConfig) {
-		cfg.BaseURL = baseURL
-	}
-}
-
-func WithTimeout(timeout time.Duration) ClientOption {
-	return func(cfg *ClientConfig) {
-		cfg.Timeout = timeout
-	}
-}
-
-func WithHTTPClient(client *http.Client) ClientOption {
-	return func(cfg *ClientConfig) {
-		cfg.HTTPClient = client
-	}
 }
 
 func (c *terminalAIClient) ChatCompletion(ctx context.Context, req ChatCompletionRequest) (*ChatCompletionResponse, error) {
@@ -150,7 +138,7 @@ func (c *terminalAIClient) ChatCompletion(ctx context.Context, req ChatCompletio
 
 func (c *terminalAIClient) chatCompletionOpenAI(ctx context.Context, req ChatCompletionRequest) (*ChatCompletionResponse, error) {
 	payload := openAIChatCompletionRequest{
-		Model:       normalizeModelID(c.config.Model),
+		Model:       strings.TrimSpace(c.config.Model),
 		Messages:    req.Messages,
 		MaxTokens:   firstPositive(req.MaxTokens, c.config.MaxTokens),
 		Temperature: req.Temperature,
@@ -195,7 +183,7 @@ func (c *terminalAIClient) chatCompletionOpenAI(ctx context.Context, req ChatCom
 
 func (c *terminalAIClient) chatCompletionOpenAIResponses(ctx context.Context, req ChatCompletionRequest) (*ChatCompletionResponse, error) {
 	payload := openAIResponsesRequest{
-		Model:           normalizeModelID(c.config.Model),
+		Model:           strings.TrimSpace(c.config.Model),
 		Input:           toResponsesInput(req.Messages),
 		MaxOutputTokens: firstPositive(req.MaxTokens, c.config.MaxTokens),
 		Temperature:     req.Temperature,
@@ -242,7 +230,7 @@ func (c *terminalAIClient) chatCompletionOpenAIResponses(ctx context.Context, re
 func (c *terminalAIClient) chatCompletionAnthropic(ctx context.Context, req ChatCompletionRequest) (*ChatCompletionResponse, error) {
 	system, messages := toAnthropicMessages(req.Messages)
 	payload := anthropicMessagesRequest{
-		Model:       normalizeModelID(c.config.Model),
+		Model:       strings.TrimSpace(c.config.Model),
 		System:      system,
 		Messages:    messages,
 		MaxTokens:   firstPositive(req.MaxTokens, c.config.MaxTokens, defaultAnthropicToken),
@@ -257,7 +245,11 @@ func (c *terminalAIClient) chatCompletionAnthropic(ctx context.Context, req Chat
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
-	httpReq.Header.Set("x-api-key", strings.TrimSpace(c.config.APIKey))
+	if c.config.AuthMode == providercatalog.AuthModeBearer {
+		httpReq.Header.Set("Authorization", "Bearer "+strings.TrimSpace(c.config.APIKey))
+	} else {
+		httpReq.Header.Set("x-api-key", strings.TrimSpace(c.config.APIKey))
+	}
 	httpReq.Header.Set("anthropic-version", "2023-06-01")
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Accept", "application/json")
@@ -299,7 +291,7 @@ func (c *terminalAIClient) chatCompletionGemini(ctx context.Context, req ChatCom
 	if err != nil {
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, buildGeminiGenerateContentURL(c.config.BaseURL, normalizeModelID(c.config.Model)), bytes.NewReader(body))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, buildGeminiGenerateContentURL(c.config.BaseURL, strings.TrimSpace(c.config.Model)), bytes.NewReader(body))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -592,40 +584,18 @@ func buildGeminiGenerateContentURL(baseURL, model string) string {
 	return parsed.String()
 }
 
-func normalizeModelID(model string) string {
-	model = strings.TrimSpace(model)
-	if parts := strings.SplitN(model, "/", 2); len(parts) == 2 {
-		return parts[1]
-	}
-	return model
-}
-
 func thinkingModeForModel(model string) *ThinkingMode {
-	if strings.EqualFold(normalizeModelID(model), "kimi-k2.5") {
+	if strings.EqualFold(strings.TrimSpace(model), "kimi-k2.5") {
 		return &ThinkingMode{Type: "disabled"}
 	}
 	return nil
 }
 
 func normalizeClientAPIType(provider, apiType string) string {
-	switch strings.ToLower(strings.TrimSpace(provider)) {
-	case "anthropic", "kimi-coding", "minimax":
-		return "anthropic-messages"
-	case "gemini":
-		return "gemini-generate-content"
-	case "ollama":
-		trim := strings.ToLower(strings.TrimSpace(apiType))
-		if trim == "openai-completions" {
-			return trim
-		}
-		return "openai-responses"
-	default:
-		trim := strings.ToLower(strings.TrimSpace(apiType))
-		if trim == "" {
-			return "openai-completions"
-		}
-		return trim
+	if value := strings.ToLower(strings.TrimSpace(apiType)); value != "" {
+		return value
 	}
+	return providercatalog.DefaultAPIType(strings.ToLower(strings.TrimSpace(provider)))
 }
 
 func extractAssistantContent(resp openAIChatCompletionResponse) string {

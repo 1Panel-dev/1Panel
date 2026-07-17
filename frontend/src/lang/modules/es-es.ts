@@ -721,6 +721,16 @@ const message = {
             accountModelsHelper:
                 'Configure los modelos que esta cuenta expone a OpenClaw para el cambio y la configuración',
             accountModelsRequired: 'Configure al menos un modelo',
+            verifyModel: 'Modelo de verificación',
+            verifyModelHelper:
+                'Seleccione un modelo al que esta cuenta tenga acceso. Se usará para enviar una solicitud mínima al guardar y verificar la conexión.',
+            verifyModelRequired: 'Seleccione un modelo de verificación',
+            discoverModels: 'Obtener modelos',
+            automaticModelDiscovery: 'Obtención automática',
+            manualModelConfiguration: 'Configuración manual',
+            discoverModelsHelper:
+                'Obtenga los modelos mediante la API /v1/models del proveedor y añádalos todos al conjunto de modelos',
+            discoverModelsFailedFallback: 'No se pudieron obtener los modelos. Configure un modelo manualmente.',
             accountModelsDuplicate: 'Existen modelos duplicados en el catálogo',
             modelPool: 'Pool de modelos',
             fallbackModels: 'Modelos de respaldo',
@@ -877,7 +887,6 @@ const message = {
             dashboardAuthAutoRebuildHelper:
                 'Al guardar el usuario o la contraseña, el contenedor se reconstruirá automáticamente para que los cambios surtan efecto.',
             channelDeleteConfirm: '¿Eliminar la configuración del canal {0}?',
-            customProviderHelper: 'En el proveedor de modelo personalizado no se valida si la cuenta está disponible',
             apiTypeBaseURLHelper: 'Este tipo envía solicitudes a {0}. Base URL recomendada: {1}',
             apiTypeBaseURLMismatch:
                 'La Base URL actual parece una ruta {0}, pero está seleccionado {1}. URL recomendada: {2}',
@@ -1062,9 +1071,6 @@ const message = {
             healthUnknown: 'Desconocido',
             validationModelMapEmpty: 'Los nombres del mapeo de modelos no pueden estar vacíos',
             validationModelMapDuplicate: 'El modelo solicitado {0} está duplicado',
-            validateAvailability: 'Validar disponibilidad de la cuenta',
-            validateAvailabilityHelper:
-                'Enviar un mensaje mínimo antes de guardar para validar la disponibilidad de la API',
             modelGroup: 'Grupo de modelos',
             availableModels: 'Modelos disponibles',
             modelGroupModels: 'Modelos solicitados',
@@ -4975,8 +4981,10 @@ const message = {
             noBlackIp: 'IP ya bloqueada',
             noWhiteUrl: 'URL ya en whitelist',
             spiderIpHelper:
-                'Incluye Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo, Yandex. Al cerrar se bloquea todo acceso de crawlers',
+                'Al activarlo, solo se permiten los crawlers seleccionados; al desactivarlo, se bloquean todos.',
             spiderIp: 'Pool de IPs de crawlers',
+            spiderAllowlist: 'Crawlers permitidos',
+            spiderAllowlistEmpty: 'No hay crawlers seleccionados. Al guardar, se bloquearán todos.',
             geoIp: 'Base de datos IP',
             geoIpHelper: 'Usada para geolocalizar IPs',
             stat: 'Reporte de ataques',
@@ -5108,6 +5116,7 @@ const message = {
             statusErr: 'Formato de código de estado inválido',
             shenma: 'Shenma',
             duckduckgo: 'DuckDuckGo',
+            yandex: 'Yandex',
             excludeUri: 'Excluir URIs',
             top100Helper: 'Mostrar top 100',
             logSaveDay: 'Retención de logs (días)',

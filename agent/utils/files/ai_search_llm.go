@@ -100,6 +100,7 @@ func RunFileAISearchLLM(ctx context.Context, cfg terminalai.GeneratorConfig, cli
 		APIKey:    cfg.APIKey,
 		Model:     cfg.Model,
 		APIType:   cfg.APIType,
+		AuthMode:  cfg.AuthMode,
 		MaxTokens: cfg.MaxTokens,
 		Timeout:   timeout,
 	})

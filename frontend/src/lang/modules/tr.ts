@@ -719,6 +719,16 @@ const message = {
             accountModelsHelper:
                 "Bu hesabın OpenClaw'a sunacağı modelleri yapılandırın; seçim ve ayarlarda kullanılacaktır.",
             accountModelsRequired: 'En az bir model seçin',
+            verifyModel: 'Doğrulama Modeli',
+            verifyModelHelper:
+                'Bu hesabın erişebildiği bir model seçin. Kaydederken bağlantıyı doğrulamak için en küçük istek gönderilir.',
+            verifyModelRequired: 'Bir doğrulama modeli seçin',
+            discoverModels: 'Modelleri getir',
+            automaticModelDiscovery: 'Otomatik getir',
+            manualModelConfiguration: 'Manuel yapılandır',
+            discoverModelsHelper:
+                'Sağlayıcının /v1/models API’sinden modelleri alın ve tümünü model kataloğuna ekleyin',
+            discoverModelsFailedFallback: 'Modeller alınamadı. Bir modeli elle yapılandırın.',
             accountModelsDuplicate: 'Katalogda yinelenen modeller bulundu',
             modelPool: 'Model kataloğu',
             fallbackModels: 'Yedek modeller',
@@ -875,7 +885,6 @@ const message = {
             dashboardAuthAutoRebuildHelper:
                 'Kullanıcı adı veya parola kaydedildiğinde değişikliklerin etkili olması için konteyner otomatik olarak yeniden oluşturulur.',
             channelDeleteConfirm: '{0} kanal yapılandırması silinsin mi?',
-            customProviderHelper: 'Özel model sağlayıcısında hesabın kullanılabilirliği doğrulanmaz',
             apiTypeBaseURLHelper: 'Bu tür istekleri {0} yoluna gönderir. Önerilen Base URL: {1}',
             apiTypeBaseURLMismatch:
                 'Geçerli Base URL bir {0} yolu gibi görünüyor, ancak {1} seçildi. Önerilen URL: {2}',
@@ -1059,9 +1068,6 @@ const message = {
             healthUnknown: 'Bilinmiyor',
             validationModelMapEmpty: 'Model eşlemesindeki model adları boş olamaz',
             validationModelMapDuplicate: 'İstek modeli {0} yineleniyor',
-            validateAvailability: 'Hesap Kullanılabilirliğini Doğrula',
-            validateAvailabilityHelper:
-                'Kaydetmeden önce API kullanılabilirliğini doğrulamak için en küçük iletiyi gönder',
             modelGroup: 'Model Grubu',
             availableModels: 'Kullanılabilir Modeller',
             modelGroupModels: 'İstek Modelleri',
@@ -4996,8 +5002,10 @@ const message = {
             noBlackIp: 'IP zaten engellenmiş, tekrar engellemeye gerek yok',
             noWhiteUrl: 'URL zaten beyaz listede, tekrar eklemeye gerek yok',
             spiderIpHelper:
-                "Baidu, Bing, Google, 360, Shenma, Sogou, ByteDance, DuckDuckGo, Yandex'i içerir. Bunu kapatmak tüm örümcek erişimlerini engeller.",
+                'Etkinleştirildiğinde yalnızca seçilen tarayıcılara izin verilir; devre dışı bırakıldığında tüm tarayıcılar engellenir.',
             spiderIp: 'Örümcek IP Havuzu',
+            spiderAllowlist: 'İzin verilen tarayıcılar',
+            spiderAllowlistEmpty: 'Hiçbir tarayıcı seçilmedi. Kaydedildiğinde tüm tarayıcılar engellenecek.',
             geoIp: 'IP Adres Kütüphanesi',
             geoIpHelper: 'IP’nin coğrafi konumunu doğrulamak için kullanılır',
             stat: 'Saldırı Raporu',
@@ -5132,6 +5140,7 @@ const message = {
             statusErr: 'Geçersiz durum kodu formatı',
             shenma: 'Shenma Arama',
             duckduckgo: 'DuckDuckGo',
+            yandex: 'Yandex',
             excludeUri: 'URI’leri Hariç Tut',
             top100Helper: 'İlk 100 veriyi göster',
             logSaveDay: 'Günlük Saklama Süresi (gün)',

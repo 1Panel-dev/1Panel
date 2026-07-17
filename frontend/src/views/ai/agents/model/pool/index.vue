@@ -10,20 +10,6 @@
                 <ComplexTable :data="items">
                     <el-table-column :label="$t('aiTools.model.model')" prop="id" min-width="220" />
                     <el-table-column :label="$t('commons.table.name')" prop="name" min-width="180" />
-                    <el-table-column label="Context Window" prop="contextWindow" min-width="140" />
-                    <el-table-column label="Max Tokens" prop="maxTokens" min-width="120" />
-                    <el-table-column :label="$t('aiTools.agents.modelInputTypes')" min-width="140">
-                        <template #default="{ row }">
-                            {{ (row.input || []).join(', ') || '-' }}
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('aiTools.agents.reasoning')" min-width="120">
-                        <template #default="{ row }">
-                            <el-tag :type="row.reasoning ? 'success' : 'info'">
-                                {{ row.reasoning ? $t('commons.true') : $t('commons.false') }}
-                            </el-tag>
-                        </template>
-                    </el-table-column>
                     <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fixed="right" />
                 </ComplexTable>
             </div>
@@ -42,21 +28,6 @@
             </el-form-item>
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input v-model="form.name" />
-            </el-form-item>
-            <el-form-item label="Context Window" prop="contextWindow">
-                <el-input-number v-model="form.contextWindow" :min="1" :max="2000000" />
-            </el-form-item>
-            <el-form-item label="Max Tokens" prop="maxTokens">
-                <el-input-number v-model="form.maxTokens" :min="1" :max="2000000" />
-            </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.modelInputTypes')" prop="input">
-                <el-checkbox-group v-model="form.input">
-                    <el-checkbox label="text">Text</el-checkbox>
-                    <el-checkbox label="image">Image</el-checkbox>
-                </el-checkbox-group>
-            </el-form-item>
-            <el-form-item :label="$t('aiTools.agents.reasoning')" prop="reasoning">
-                <el-switch v-model="form.reasoning" />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -105,10 +76,6 @@ const form = reactive<AI.AgentAccountModel>({
     recordId: 0,
     id: '',
     name: '',
-    contextWindow: 128000,
-    maxTokens: 8192,
-    reasoning: false,
-    input: ['text'],
 });
 
 const headerTitle = computed(() => {
@@ -122,10 +89,6 @@ const editorTitle = computed(() =>
 
 const rules = reactive({
     id: [Rules.requiredInput, Rules.noSpace],
-    name: [Rules.requiredInput],
-    contextWindow: [Rules.integerNumber],
-    maxTokens: [Rules.integerNumber],
-    input: [Rules.requiredSelect],
 });
 
 const buttons = [
@@ -145,10 +108,6 @@ const buildModelItem = (model?: Partial<AI.AgentAccountModel>): AI.AgentAccountM
     recordId: Number(model?.recordId || 0),
     id: String(model?.id || '').trim(),
     name: String(model?.name || '').trim(),
-    contextWindow: Number(model?.contextWindow || 0),
-    maxTokens: Number(model?.maxTokens || 0),
-    reasoning: Boolean(model?.reasoning),
-    input: Array.from(new Set((model?.input || []).filter((value) => value === 'text' || value === 'image'))),
 });
 
 const search = async () => {
@@ -169,10 +128,6 @@ const resetForm = () => {
     form.recordId = 0;
     form.id = '';
     form.name = '';
-    form.contextWindow = 128000;
-    form.maxTokens = 8192;
-    form.reasoning = false;
-    form.input = ['text'];
 };
 
 const openCreate = () => {

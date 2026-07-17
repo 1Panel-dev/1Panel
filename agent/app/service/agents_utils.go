@@ -4,10 +4,12 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -37,6 +39,39 @@ type resolvedAgentAccountInput struct {
 	Provider string
 	APIKey   string
 	BaseURL  string
+	APIType  string
+	AuthMode string
+}
+
+func ensureAgentAccountNameAvailable(provider, name string, excludeID uint) error {
+	opts := []repo.DBOption{repo.WithByProvider(provider), repo.WithByName(name)}
+	if excludeID > 0 {
+		opts = append(opts, repo.WithByNOTID(excludeID))
+	}
+	account, err := agentAccountRepo.GetFirst(opts...)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if account != nil && account.ID > 0 {
+		return buserr.New("ErrRecordExist")
+	}
+	return nil
+}
+
+func agentAccountUsedBySetting(tx *gorm.DB, accountID uint, statusKey, accountIDKey string) (bool, error) {
+	var settings []model.Setting
+	if err := tx.Where("key IN ?", []string{statusKey, accountIDKey}).Find(&settings).Error; err != nil {
+		return false, err
+	}
+	values := make(map[string]string, len(settings))
+	for _, setting := range settings {
+		values[setting.Key] = setting.Value
+	}
+	return strings.EqualFold(strings.TrimSpace(values[statusKey]), constant.StatusEnable) &&
+		strings.TrimSpace(values[accountIDKey]) == strconv.FormatUint(uint64(accountID), 10), nil
 }
 
 func loadOpenclawAgentByID(agentID uint) (*model.Agent, error) {
@@ -61,19 +96,26 @@ func ensureContainerRunning(containerName string) error {
 	return nil
 }
 
-func resolveAgentAccountInput(provider, apiKey, baseURL string) (resolvedAgentAccountInput, error) {
+func resolveAgentAccountInput(provider, apiType, authMode, apiKey, baseURL, modelID string) (resolvedAgentAccountInput, error) {
 	resolvedAPIKey := strings.TrimSpace(apiKey)
-	resolvedBaseURL := strings.TrimSpace(baseURL)
-	if resolvedBaseURL == "" {
-		if requiresInitialAgentAccountModels(provider) {
+	resolvedAPIType := strings.TrimSpace(apiType)
+	resolvedAuthMode, err := providercatalog.ResolveAuthMode(provider, resolvedAPIType, authMode)
+	if err != nil {
+		return resolvedAgentAccountInput{}, err
+	}
+	resolvedBaseURL, err := providercatalog.ResolveBaseURL(provider, resolvedAPIType, baseURL)
+	if err != nil {
+		if strings.Contains(err.Error(), "base url is required") {
 			return resolvedAgentAccountInput{}, buserr.New("ErrAgentBaseURLRequired")
 		}
-		if defaultURL, ok := providercatalog.DefaultBaseURL(provider); ok {
-			resolvedBaseURL = defaultURL
-		}
+		return resolvedAgentAccountInput{}, err
+	}
+	modelID = strings.TrimSpace(modelID)
+	if modelID == "" {
+		return resolvedAgentAccountInput{}, buserr.New("ErrAgentAccountModelsRequired")
 	}
 	if !providercatalog.SkipVerification(provider) {
-		if err := providercatalog.VerifyAccount(provider, resolvedBaseURL, resolvedAPIKey); err != nil {
+		if err := providercatalog.VerifyAccount(provider, resolvedAPIType, resolvedAuthMode, resolvedBaseURL, resolvedAPIKey, modelID); err != nil {
 			return resolvedAgentAccountInput{}, err
 		}
 	}
@@ -81,6 +123,8 @@ func resolveAgentAccountInput(provider, apiKey, baseURL string) (resolvedAgentAc
 		Provider: provider,
 		APIKey:   resolvedAPIKey,
 		BaseURL:  resolvedBaseURL,
+		APIType:  resolvedAPIType,
+		AuthMode: resolvedAuthMode,
 	}, nil
 }
 
@@ -337,26 +381,24 @@ func setOtherConfig(conf map[string]interface{}, config dto.AgentOtherConfig) {
 func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map[string]interface{}) dto.AgentItem {
 	agentType := agent.AgentType
 	item := dto.AgentItem{
-		ID:            agent.ID,
-		Name:          agent.Name,
-		Remark:        agent.Remark,
-		AgentType:     agentType,
-		Provider:      agent.Provider,
-		ProviderName:  providercatalog.DisplayName(agent.Provider),
-		Model:         agent.Model,
-		APIType:       agent.APIType,
-		MaxTokens:     agent.MaxTokens,
-		ContextWindow: agent.ContextWindow,
-		BaseURL:       agent.BaseURL,
-		APIKey:        maskKey(agent.APIKey),
-		Token:         agent.Token,
-		Status:        agent.Status,
-		Message:       agent.Message,
-		AppInstallID:  agent.AppInstallID,
-		WebsiteID:     agent.WebsiteID,
-		AccountID:     agent.AccountID,
-		ConfigPath:    agent.ConfigPath,
-		CreatedAt:     agent.CreatedAt,
+		ID:           agent.ID,
+		Name:         agent.Name,
+		Remark:       agent.Remark,
+		AgentType:    agentType,
+		Provider:     agent.Provider,
+		ProviderName: providercatalog.DisplayName(agent.Provider),
+		Model:        agent.Model,
+		APIType:      agent.APIType,
+		BaseURL:      agent.BaseURL,
+		APIKey:       maskKey(agent.APIKey),
+		Token:        agent.Token,
+		Status:       agent.Status,
+		Message:      agent.Message,
+		AppInstallID: agent.AppInstallID,
+		WebsiteID:    agent.WebsiteID,
+		AccountID:    agent.AccountID,
+		ConfigPath:   agent.ConfigPath,
+		CreatedAt:    agent.CreatedAt,
 	}
 	if appInstall != nil && appInstall.ID > 0 {
 		item.Container = appInstall.ContainerName
@@ -684,13 +726,9 @@ type modelProvider struct {
 }
 
 type modelEntry struct {
-	ID            string    `json:"id"`
-	Name          string    `json:"name"`
-	Reasoning     bool      `json:"reasoning"`
-	Input         []string  `json:"input"`
-	ContextWindow int       `json:"contextWindow"`
-	MaxTokens     int       `json:"maxTokens"`
-	Cost          modelCost `json:"cost"`
+	ID    string   `json:"id"`
+	Name  string   `json:"name"`
+	Input []string `json:"input,omitempty"`
 }
 
 func requiresOpenclawProviderModels(provider string) bool {
@@ -708,13 +746,6 @@ func applyOpenclawModelsConfig(conf map[string]interface{}, models *modelsConfig
 	}
 	conf["models"] = modelsMap
 	return nil
-}
-
-type modelCost struct {
-	Input      float64 `json:"input"`
-	Output     float64 `json:"output"`
-	CacheRead  float64 `json:"cacheRead"`
-	CacheWrite float64 `json:"cacheWrite"`
 }
 
 type browserConfig struct {
@@ -1062,7 +1093,7 @@ func buildOpenclawModelsFromAccount(account *model.AgentAccount, selectedModel s
 }
 
 func buildOpenclawAccountModelConfig(account *model.AgentAccount, model dto.AgentAccountModel) (string, modelEntry, string, modelProvider, error) {
-	providerPatch, err := providercatalog.BuildOpenClawProviderPatch(account.Provider, model.ID, account.APIType, account.BaseURL, account.APIKey)
+	providerPatch, err := providercatalog.BuildOpenClawProviderPatch(account.Provider, model.ID, account.APIType, account.AuthMode, account.BaseURL, account.APIKey)
 	if err != nil {
 		return "", modelEntry{}, "", modelProvider{}, err
 	}
@@ -1074,28 +1105,24 @@ func buildOpenclawAccountModelConfig(account *model.AgentAccount, model dto.Agen
 	}, nil
 }
 
+var openclawVisionModelPattern = regexp.MustCompile(`(?i)(\b(gpt-4o|gpt-4\.1|gpt-[5-9]|o[134])\b|\bclaude-(3|4|sonnet|opus|haiku)\b|\bgemini\b|\b(qwen[\w.-]*-?vl|qwen-vl|qwen3\.[5-9]-plus)\b|\b(kimi-k2\.(5|6)|kimi-k2\.7-code|minimax-m3)\b|\b(vision|llava|pixtral|internvl|mllama|minicpm-v|glm-4v|omni)\b|(^|[-_/])vl([-_/]|$))`)
+
 func buildOpenclawModelEntry(modelID string, model dto.AgentAccountModel) modelEntry {
 	name := strings.TrimSpace(model.Name)
 	if name == "" {
 		name = strings.TrimSpace(modelID)
 	}
-	return modelEntry{
-		ID:            strings.TrimSpace(modelID),
-		Name:          name,
-		Reasoning:     model.Reasoning,
-		Input:         sanitizeAgentAccountModelInputs(model.Input),
-		ContextWindow: model.ContextWindow,
-		MaxTokens:     model.MaxTokens,
-		Cost:          modelCost{},
+	entry := modelEntry{ID: strings.TrimSpace(modelID), Name: name}
+	if openclawVisionModelPattern.MatchString(modelID) {
+		entry.Input = []string{"text", "image"}
 	}
+	return entry
 }
 
 type openclawAccountModelRuntime struct {
-	StoredModel   string
-	PrimaryModel  string
-	APIType       string
-	MaxTokens     int
-	ContextWindow int
+	StoredModel  string
+	PrimaryModel string
+	APIType      string
 }
 
 func buildOpenclawAccountModelRuntime(account *model.AgentAccount, model dto.AgentAccountModel) (openclawAccountModelRuntime, error) {
@@ -1104,11 +1131,9 @@ func buildOpenclawAccountModelRuntime(account *model.AgentAccount, model dto.Age
 		return openclawAccountModelRuntime{}, err
 	}
 	return openclawAccountModelRuntime{
-		StoredModel:   model.ID,
-		PrimaryModel:  primaryModel,
-		APIType:       account.APIType,
-		MaxTokens:     model.MaxTokens,
-		ContextWindow: model.ContextWindow,
+		StoredModel:  model.ID,
+		PrimaryModel: primaryModel,
+		APIType:      account.APIType,
 	}, nil
 }
 
@@ -1128,15 +1153,11 @@ func buildInitialAgentAccountModels(account *model.AgentAccount, requested []dto
 	if account == nil {
 		return nil, fmt.Errorf("account is required")
 	}
-	if requiresInitialAgentAccountModels(account.Provider) && len(requested) > 1 {
+	if account.Provider != "custom" && requiresInitialAgentAccountModels(account.Provider) && len(requested) > 1 {
 		return nil, buserr.New("ErrAgentAccountSingleInitialModel")
 	}
 	if len(requested) > 0 {
-		models := make([]dto.AgentAccountModel, 0, len(requested))
-		for _, item := range requested {
-			models = append(models, cloneAgentAccountModel(item))
-		}
-		return models, nil
+		return normalizeAgentAccountModels(account, requested)
 	}
 	meta, ok := providercatalog.Get(account.Provider)
 	if !ok || len(meta.Models) == 0 {
@@ -1148,15 +1169,22 @@ func buildInitialAgentAccountModels(account *model.AgentAccount, requested []dto
 	requested = make([]dto.AgentAccountModel, 0, len(meta.Models))
 	for _, item := range meta.Models {
 		requested = append(requested, dto.AgentAccountModel{
-			ID:            item.ID,
-			Name:          item.Name,
-			ContextWindow: item.ContextWindow,
-			MaxTokens:     item.MaxTokens,
-			Reasoning:     item.Reasoning,
-			Input:         append([]string(nil), item.Input...),
+			ID:   item.ID,
+			Name: item.Name,
 		})
 	}
-	return requested, nil
+	return normalizeAgentAccountModels(account, requested)
+}
+
+func buildDiscoveredAgentAccountModels(modelIDs []string) []dto.AgentAccountModel {
+	models := make([]dto.AgentAccountModel, 0, len(modelIDs))
+	for _, modelID := range modelIDs {
+		models = append(models, dto.AgentAccountModel{
+			ID:   modelID,
+			Name: modelID,
+		})
+	}
+	return models
 }
 
 func compactPersistedAgentAccountModelSortOrder(accountID uint) error {
@@ -1184,18 +1212,6 @@ func loadAgentAccountModels(account *model.AgentAccount) ([]dto.AgentAccountMode
 	return listPersistedAgentAccountModels(account.ID)
 }
 
-func cloneAgentAccountModel(model dto.AgentAccountModel) dto.AgentAccountModel {
-	return dto.AgentAccountModel{
-		RecordID:      model.RecordID,
-		ID:            model.ID,
-		Name:          model.Name,
-		ContextWindow: model.ContextWindow,
-		MaxTokens:     model.MaxTokens,
-		Reasoning:     model.Reasoning,
-		Input:         append([]string(nil), model.Input...),
-	}
-}
-
 func MergeCatalogAgentAccountModelsForMigration(account *model.AgentAccount, existing []dto.AgentAccountModel) ([]dto.AgentAccountModel, error) {
 	if account == nil {
 		return nil, fmt.Errorf("account is required")
@@ -1219,12 +1235,8 @@ func MergeCatalogAgentAccountModelsForMigration(account *model.AgentAccount, exi
 			continue
 		}
 		requested = append(requested, dto.AgentAccountModel{
-			ID:            item.ID,
-			Name:          item.Name,
-			ContextWindow: item.ContextWindow,
-			MaxTokens:     item.MaxTokens,
-			Reasoning:     item.Reasoning,
-			Input:         append([]string(nil), item.Input...),
+			ID:   item.ID,
+			Name: item.Name,
 		})
 	}
 	if len(requested) == len(existing) {
@@ -1243,18 +1255,10 @@ func listPersistedAgentAccountModels(accountID uint) ([]dto.AgentAccountModel, e
 	}
 	result := make([]dto.AgentAccountModel, 0, len(rows))
 	for _, row := range rows {
-		inputs := []string{}
-		if strings.TrimSpace(row.Input) != "" {
-			_ = json.Unmarshal([]byte(row.Input), &inputs)
-		}
 		result = append(result, dto.AgentAccountModel{
-			RecordID:      row.ID,
-			ID:            strings.TrimSpace(row.Model),
-			Name:          strings.TrimSpace(row.Name),
-			ContextWindow: row.ContextWindow,
-			MaxTokens:     row.MaxTokens,
-			Reasoning:     row.Reasoning,
-			Input:         sanitizeAgentAccountModelInputs(inputs),
+			RecordID: row.ID,
+			ID:       strings.TrimSpace(row.Model),
+			Name:     strings.TrimSpace(row.Name),
 		})
 	}
 	return result, nil
@@ -1265,19 +1269,11 @@ func replacePersistedAgentAccountModelsWithTx(tx *gorm.DB, accountID uint, model
 		return err
 	}
 	for index, item := range models {
-		inputPayload, err := json.Marshal(sanitizeAgentAccountModelInputs(item.Input))
-		if err != nil {
-			return err
-		}
 		record := &model.AgentAccountModel{
-			AccountID:     accountID,
-			Model:         strings.TrimSpace(item.ID),
-			Name:          strings.TrimSpace(item.Name),
-			ContextWindow: item.ContextWindow,
-			MaxTokens:     item.MaxTokens,
-			Reasoning:     item.Reasoning,
-			Input:         string(inputPayload),
-			SortOrder:     index + 1,
+			AccountID: accountID,
+			Model:     strings.TrimSpace(item.ID),
+			Name:      strings.TrimSpace(item.Name),
+			SortOrder: index + 1,
 		}
 		if err := tx.Create(record).Error; err != nil {
 			return err
@@ -1318,84 +1314,15 @@ func normalizeAgentAccountModel(account *model.AgentAccount, model dto.AgentAcco
 	if modelID == "" {
 		return dto.AgentAccountModel{}, fmt.Errorf("model is required")
 	}
+	modelID = providercatalog.NormalizeModelID(account.Provider, modelID)
 	name := strings.TrimSpace(model.Name)
 	if name == "" {
 		name = modelID
 	}
-	inputs := sanitizeAgentAccountModelInputs(model.Input)
 	return dto.AgentAccountModel{
-		ID:            normalizeAgentAccountModelID(account.Provider, modelID),
-		Name:          name,
-		ContextWindow: model.ContextWindow,
-		MaxTokens:     model.MaxTokens,
-		Reasoning:     model.Reasoning,
-		Input:         inputs,
+		ID:   modelID,
+		Name: name,
 	}, nil
-}
-
-func normalizeAgentAccountModelID(provider, requestedID string) string {
-	switch provider {
-	case "custom", "vllm":
-		return normalizeCustomModel(requestedID)
-	case "ollama":
-		target := strings.TrimSpace(requestedID)
-		if strings.HasPrefix(target, "ollama/") {
-			return target
-		}
-		target = strings.TrimLeft(strings.TrimSpace(target), "/")
-		if target == "" {
-			return ""
-		}
-		return "ollama/" + target
-	default:
-		target := strings.TrimSpace(requestedID)
-		if target == "" {
-			return ""
-		}
-		prefix := poolModelPrefix(provider)
-		if strings.Contains(target, "/") {
-			parts := strings.SplitN(target, "/", 2)
-			targetPrefix := parts[0]
-			targetModel := strings.TrimSpace(parts[1])
-			if targetModel == "" {
-				return strings.TrimSpace(target)
-			}
-			for _, item := range supportedProviderModelPrefixes(provider) {
-				if item == targetPrefix {
-					if prefix != "" {
-						return prefix + "/" + targetModel
-					}
-					return strings.TrimSpace(target)
-				}
-			}
-			return strings.TrimSpace(target)
-		}
-		target = strings.TrimLeft(strings.TrimSpace(target), "/")
-		if prefix == "" {
-			return target
-		}
-		return prefix + "/" + target
-	}
-}
-
-func sanitizeAgentAccountModelInputs(values []string) []string {
-	result := make([]string, 0, len(values))
-	seen := make(map[string]struct{}, len(values))
-	for _, value := range values {
-		normalized := value
-		if normalized != "text" && normalized != "image" {
-			continue
-		}
-		if _, ok := seen[normalized]; ok {
-			continue
-		}
-		seen[normalized] = struct{}{}
-		result = append(result, normalized)
-	}
-	if len(result) == 0 {
-		return []string{"text"}
-	}
-	return result
 }
 
 func requiresInitialAgentAccountModels(provider string) bool {
@@ -1407,36 +1334,14 @@ func requiresInitialAgentAccountModels(provider string) bool {
 	}
 }
 
-func normalizeComparableProviderModelID(provider, modelID string) string {
-	target := strings.TrimSpace(modelID)
-	if target == "" {
-		return ""
-	}
-	if !strings.Contains(target, "/") {
-		return target
-	}
-	parts := strings.SplitN(target, "/", 2)
-	prefix := parts[0]
-	model := strings.TrimSpace(parts[1])
-	if model == "" {
-		return target
-	}
-	for _, item := range supportedProviderModelPrefixes(provider) {
-		if item == prefix {
-			return model
-		}
-	}
-	return target
-}
-
 func sameProviderModelID(provider, left, right string) bool {
 	leftTrimmed := strings.TrimSpace(left)
 	rightTrimmed := strings.TrimSpace(right)
 	if leftTrimmed == rightTrimmed {
 		return true
 	}
-	leftComparable := normalizeComparableProviderModelID(provider, leftTrimmed)
-	rightComparable := normalizeComparableProviderModelID(provider, rightTrimmed)
+	leftComparable := providercatalog.NormalizeModelID(provider, leftTrimmed)
+	rightComparable := providercatalog.NormalizeModelID(provider, rightTrimmed)
 	return leftComparable != "" && leftComparable == rightComparable
 }
 
@@ -1455,6 +1360,20 @@ func requireAgentAccountModelForProvider(provider string, models []dto.AgentAcco
 		return dto.AgentAccountModel{}, buserr.New("ErrAgentModelNotInAccount")
 	}
 	return selectedAccountModel, nil
+}
+
+func resolveAgentAccountVerifyModel(provider, requested string, models []dto.AgentAccountModel) (string, error) {
+	if len(models) == 0 {
+		return "", buserr.New("ErrAgentAccountModelsRequired")
+	}
+	if strings.TrimSpace(requested) == "" {
+		return models[0].ID, nil
+	}
+	selected, ok := findAgentAccountModelForProvider(provider, models, requested)
+	if !ok {
+		return "", buserr.New("ErrAgentModelNotInAccount")
+	}
+	return selected.ID, nil
 }
 
 func ensureAccountModelsNotBound(account *model.AgentAccount, models []dto.AgentAccountModel) error {
@@ -1593,57 +1512,6 @@ func toInt(value interface{}) int {
 	default:
 		return 0
 	}
-}
-
-func normalizeCustomModel(modelName string) string {
-	trim := strings.TrimSpace(modelName)
-	trim = strings.TrimLeft(trim, "/")
-	if parts := strings.SplitN(trim, "/", 2); len(parts) == 2 {
-		if strings.EqualFold(parts[0], "custom") {
-			return strings.TrimLeft(strings.TrimSpace(parts[1]), "/")
-		}
-	}
-	return trim
-}
-
-func runtimeProviderModelPrefix(provider string) string {
-	switch provider {
-	case "gemini":
-		return "google"
-	case "kimi":
-		return "moonshot"
-	default:
-		return provider
-	}
-}
-
-func poolModelPrefix(provider string) string {
-	meta, ok := providercatalog.Get(provider)
-	if ok && len(meta.Models) > 0 {
-		parts := strings.SplitN(strings.TrimSpace(meta.Models[0].ID), "/", 2)
-		if len(parts) == 2 && strings.TrimSpace(parts[0]) != "" {
-			return parts[0]
-		}
-	}
-	return provider
-}
-
-func supportedProviderModelPrefixes(provider string) []string {
-	values := []string{poolModelPrefix(provider), runtimeProviderModelPrefix(provider)}
-	result := make([]string, 0, len(values))
-	seen := make(map[string]struct{}, len(values))
-	for _, value := range values {
-		target := value
-		if target == "" {
-			continue
-		}
-		if _, ok := seen[target]; ok {
-			continue
-		}
-		seen[target] = struct{}{}
-		result = append(result, target)
-	}
-	return result
 }
 
 func generateToken() string {

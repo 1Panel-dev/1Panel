@@ -67,7 +67,7 @@ import ProviderLogo from '@/components/agent-provider-logo/index.vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { dateFormat } from '@/utils/date';
-import { getAgentProviderDisplayName } from '@/utils/agent';
+import { getAgentProviderDisplayName, isAgentAccountVerificationSkipped } from '@/utils/agent';
 
 const items = ref<AI.AgentAccountItem[]>([]);
 const addRef = ref();
@@ -111,9 +111,7 @@ const search = async () => {
 
 const openCreate = () => {
     if (addRef.value?.open) {
-        addRef.value.open({
-            provider: 'deepseek',
-        });
+        addRef.value.open();
     }
 };
 
@@ -127,6 +125,9 @@ const onEdit = (row: AI.AgentAccountItem) => {
             apiKey: row.apiKey,
             rememberApiKey: row.rememberApiKey,
             apiType: row.apiType,
+            authMode: row.authMode,
+            verifyModel: row.verifyModel,
+            models: row.models,
             remark: row.remark,
         });
     }
@@ -138,20 +139,15 @@ const onManageModelPool = (row: AI.AgentAccountItem) => {
     }
 };
 
-const isVerificationSkipped = (provider: string) => {
-    const key = (provider || '').toLowerCase();
-    return key === 'custom' || key === 'vllm' || key === 'ollama' || key === 'kimi-coding';
-};
-
 const verificationLabel = (row: AI.AgentAccountItem) => {
-    if (isVerificationSkipped(row.provider)) {
+    if (isAgentAccountVerificationSkipped(row.provider)) {
         return i18n.global.t('aiTools.agents.verifySkipped');
     }
     return row.verified ? 'OK' : 'N/A';
 };
 
 const verificationTagType = (row: AI.AgentAccountItem) => {
-    if (isVerificationSkipped(row.provider)) {
+    if (isAgentAccountVerificationSkipped(row.provider)) {
         return 'info';
     }
     return row.verified ? 'success' : 'info';

@@ -3,7 +3,9 @@ package provider
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -18,158 +20,106 @@ type VerifyRequest struct {
 	Body    []byte
 }
 
-const (
-	defaultVerifyTimeout = 30 * time.Second
-)
+type verifyErrorResponse struct {
+	Error struct {
+		Message string `json:"message"`
+	} `json:"error"`
+	Message string `json:"message"`
+}
 
-func SkipVerification(key string) bool {
-	switch key {
-	case "custom", "vllm", "ollama", "kimi-coding":
+const defaultVerifyTimeout = 30 * time.Second
+
+func SkipVerification(provider string) bool {
+	switch provider {
+	case "vllm", "ollama", "kimi-coding":
 		return true
 	default:
 		return false
 	}
 }
 
-func VerifyAccount(provider, baseURL, apiKey string) error {
-	req := BuildVerifyRequest(provider, baseURL, apiKey)
-	var body *bytes.Buffer
-	if len(req.Body) > 0 {
-		body = bytes.NewBuffer(req.Body)
-	} else {
-		body = bytes.NewBuffer(nil)
-	}
-	httpReq, err := http.NewRequest(req.Method, req.URL, body)
+func VerifyAccount(provider, apiType, authMode, baseURL, apiKey, model string) error {
+	req := BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model)
+	httpReq, err := http.NewRequest(req.Method, req.URL, bytes.NewReader(req.Body))
 	if err != nil {
 		return err
 	}
 	for key, value := range req.Headers {
 		httpReq.Header.Set(key, value)
 	}
-	resp, err := (&http.Client{Timeout: verifyTimeout()}).Do(httpReq)
+	httpReq.Header.Set("Accept", "application/json")
+	resp, err := (&http.Client{Timeout: defaultVerifyTimeout}).Do(httpReq)
 	if err != nil {
 		return buserr.WithErr("ErrAgentAccountUnavailable", err)
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode >= 400 {
-		return buserr.WithErr("ErrAgentAccountUnavailable", fmt.Errorf("verify failed: %s", resp.Status))
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		body, readErr := io.ReadAll(io.LimitReader(resp.Body, 1024*1024))
+		if readErr != nil {
+			return buserr.WithErr("ErrAgentAccountUnavailable", readErr)
+		}
+		return buserr.WithErr("ErrAgentAccountUnavailable", errors.New(verifyHTTPError(resp.StatusCode, body)))
 	}
 	return nil
 }
 
-func verifyTimeout() time.Duration {
-	return defaultVerifyTimeout
-}
+func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model string) VerifyRequest {
+	baseURL = strings.TrimRight(strings.TrimSpace(baseURL), "/")
+	headers := map[string]string{"Content-Type": "application/json"}
+	request := VerifyRequest{Method: http.MethodPost, Headers: headers}
 
-func BuildVerifyRequest(provider, baseURL, apiKey string) VerifyRequest {
-	base := strings.TrimRight(strings.TrimSpace(baseURL), "/")
-	headers := map[string]string{}
-	request := VerifyRequest{Method: http.MethodGet, Headers: headers}
-
-	switch provider {
-	case "anthropic", "kimi-coding":
-		headers["x-api-key"] = apiKey
-		headers["anthropic-version"] = "2023-06-01"
-		if strings.Contains(base, "/v1") {
-			request.URL = base + "/models"
-		} else {
-			request.URL = base + "/v1/models"
-		}
-	case "gemini":
-		request.Method = http.MethodPost
-		if strings.Contains(base, "/v1beta") {
-			request.URL = base + "/models/gemini-3-flash-preview:generateContent"
-		} else {
-			request.URL = base + "/v1beta/models/gemini-3-flash-preview:generateContent"
-		}
+	if provider == "gemini" {
+		request.URL = baseURL + "/v1beta/models/" + strings.TrimSpace(model) + ":generateContent"
 		headers["x-goog-api-key"] = apiKey
-		headers["Content-Type"] = "application/json"
 		request.Body = mustJSON(map[string]interface{}{
-			"contents": []map[string]interface{}{{
-				"parts": []map[string]string{{
-					"text": "Explain how AI works in a few words",
-				}},
-			}},
+			"contents": []map[string]interface{}{{"parts": []map[string]string{{"text": "test"}}}},
 		})
-	case "zai":
-		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
-		request.URL = base + "/models"
-	case "bailian-coding-plan":
-		request.Method = http.MethodPost
-		if !strings.Contains(base, "/v1") {
-			base = base + "/v1"
+		return request
+	}
+
+	switch apiType {
+	case "anthropic-messages":
+		request.URL = baseURL + "/v1/messages"
+		if authMode == AuthModeBearer {
+			headers["Authorization"] = "Bearer " + apiKey
+		} else {
+			headers["x-api-key"] = apiKey
 		}
-		request.URL = base + "/chat/completions"
-		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
-		headers["Content-Type"] = "application/json"
-		request.Body = mustJSON(map[string]interface{}{
-			"model":      "qwen3.5-plus",
-			"messages":   []map[string]string{{"role": "user", "content": "test"}},
-			"max_tokens": 1,
-		})
-	case "ark-coding-plan":
-		request.Method = http.MethodPost
-		if !strings.Contains(base, "/api/coding/v3") {
-			base = "https://ark.cn-beijing.volces.com/api/coding/v3"
-		}
-		request.URL = base + "/chat/completions"
-		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
-		headers["Content-Type"] = "application/json"
-		request.Body = mustJSON(map[string]interface{}{
-			"model":      "ark-code-latest",
-			"messages":   []map[string]string{{"role": "user", "content": "test"}},
-			"max_tokens": 1,
-		})
-	case "minimax":
-		request.Method = http.MethodPost
-		headers["x-api-key"] = apiKey
 		headers["anthropic-version"] = "2023-06-01"
-		headers["Content-Type"] = "application/json"
-		if strings.Contains(base, "/v1") {
-			request.URL = base + "/messages"
-		} else {
-			request.URL = base + "/v1/messages"
-		}
 		request.Body = mustJSON(map[string]interface{}{
-			"model":      "MiniMax-M3",
-			"max_tokens": 1,
-			"messages": []map[string]interface{}{{
-				"role": "user",
-				"content": []map[string]string{{
-					"type": "text",
-					"text": "test",
-				}},
-			}},
+			"model": model, "max_tokens": 1, "stream": false,
+			"messages": []map[string]interface{}{{"role": "user", "content": []map[string]string{{"type": "text", "text": "test"}}}},
 		})
-	case "xiaomi":
-		request.Method = http.MethodPost
-		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
-		headers["Content-Type"] = "application/json"
-		if !strings.Contains(base, "/v1") {
-			base = base + "/v1"
-		}
-		request.URL = base + "/chat/completions"
-		request.Body = mustJSON(map[string]interface{}{
-			"model":      "mimo-v2-flash",
-			"max_tokens": 1,
-			"messages":   []map[string]string{{"role": "user", "content": "test"}},
-		})
-	case "openrouter":
-		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
-		if strings.Contains(base, "/v1") {
-			request.URL = base + "/key"
-		} else {
-			request.URL = base + "/v1/key"
-		}
+	case "openai-responses":
+		request.URL = baseURL + "/responses"
+		headers["Authorization"] = "Bearer " + apiKey
+		request.Body = mustJSON(map[string]interface{}{"model": model, "input": "test", "max_output_tokens": 1, "stream": false})
 	default:
-		headers["Authorization"] = fmt.Sprintf("Bearer %s", apiKey)
-		if strings.Contains(base, "/v1") {
-			request.URL = base + "/models"
-		} else {
-			request.URL = base + "/v1/models"
+		request.URL = baseURL + "/chat/completions"
+		if provider != "ollama" || strings.TrimSpace(apiKey) != "" {
+			headers["Authorization"] = "Bearer " + apiKey
 		}
+		request.Body = mustJSON(map[string]interface{}{
+			"model": model, "messages": []map[string]string{{"role": "user", "content": "test"}}, "max_tokens": 1, "stream": false,
+		})
 	}
 	return request
+}
+
+func verifyHTTPError(statusCode int, body []byte) string {
+	message := strings.TrimSpace(string(body))
+	var payload verifyErrorResponse
+	if err := json.Unmarshal(body, &payload); err == nil {
+		if value := strings.TrimSpace(payload.Error.Message); value != "" {
+			message = value
+		} else if value := strings.TrimSpace(payload.Message); value != "" {
+			message = value
+		}
+	}
+	if message == "" {
+		return fmt.Sprintf("validation request returned status %d", statusCode)
+	}
+	return message
 }
 
 func mustJSON(value interface{}) []byte {

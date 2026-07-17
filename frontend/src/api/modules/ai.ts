@@ -234,6 +234,10 @@ export const getAgentAccountModels = (req: AI.AgentAccountModelReq) => {
     return http.post<AI.AgentAccountModel[]>(`/ai/accounts/models`, req);
 };
 
+export const discoverAgentAccountModels = (req: AI.AgentAccountModelDiscoverReq) => {
+    return http.post<AI.AgentAccountModel[]>(`/ai/accounts/models/discover`, req);
+};
+
 export const createAgentAccountModel = (req: AI.AgentAccountModelCreateReq) => {
     return http.post(`/ai/accounts/models/create`, req);
 };
