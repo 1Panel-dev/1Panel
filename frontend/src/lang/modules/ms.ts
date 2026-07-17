@@ -715,7 +715,7 @@ const message = {
             syncAgentsHelper: 'Kemas kini openclaw.json untuk agen yang menggunakan akaun model ini',
             appVersion: 'Versi aplikasi',
             webuiPort: 'Port WebUI',
-            tokenOrAuth: 'Token/Nama pengguna & Kata laluan',
+            tokenOrAuth: 'Token/Pengesahan',
             allowedOrigins: 'Alamat akses',
             allowedOriginsRequired: 'Masukkan sekurang-kurangnya satu alamat akses',
             allowedOriginsInvalid: 'Gunakan format http(s)://hos-atau-ip[:port]',
@@ -5864,7 +5864,8 @@ const message = {
             storagePool: 'Kolam Storan',
             network: 'Rangkaian',
             bridgeName: 'Nama Bridge',
-            natNetworkHelper: 'VM boleh mengakses rangkaian melalui hos, tetapi peranti luar biasanya tidak boleh mengaksesnya secara langsung.',
+            natNetworkHelper:
+                'VM boleh mengakses rangkaian melalui hos, tetapi peranti luar biasanya tidak boleh mengaksesnya secara langsung.',
             bridgeNetworkHelper:
                 'Sambungkan VM ke bridge hos sedia ada (seperti br0). Jika hos mempunyai kad rangkaian tambahan yang tidak digunakan, anda boleh mencipta bridge untuknya dan menggunakannya.',
             bridgeNameHelper:

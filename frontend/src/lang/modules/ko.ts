@@ -700,7 +700,7 @@ const message = {
             syncAgentsHelper: '이 모델 계정을 사용하는 에이전트의 openclaw.json 업데이트',
             appVersion: '앱 버전',
             webuiPort: 'WebUI 포트',
-            tokenOrAuth: 'Token/사용자 이름 및 비밀번호',
+            tokenOrAuth: 'Token/인증',
             allowedOrigins: '접속 주소',
             allowedOriginsRequired: '접속 주소를 하나 이상 입력하세요',
             allowedOriginsInvalid: 'http(s)://host-or-ip[:port] 형식으로 입력하세요',
@@ -5671,7 +5671,8 @@ const message = {
             storagePool: '스토리지 풀',
             network: '네트워크',
             bridgeName: '브리지 이름',
-            natNetworkHelper: 'VM은 호스트를 통해 네트워크에 연결할 수 있지만, 외부 장치에서는 일반적으로 VM에 직접 접근할 수 없습니다.',
+            natNetworkHelper:
+                'VM은 호스트를 통해 네트워크에 연결할 수 있지만, 외부 장치에서는 일반적으로 VM에 직접 접근할 수 없습니다.',
             bridgeNetworkHelper:
                 'VM을 호스트의 기존 브리지(예: br0)에 연결합니다. 호스트에 사용하지 않는 추가 네트워크 카드가 있으면 브리지를 만들어 사용할 수 있습니다.',
             bridgeNameHelper:

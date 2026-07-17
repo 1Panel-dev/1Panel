@@ -1,6 +1,6 @@
 <template>
     <div class="name-row">
-        <div class="name-main">
+        <div class="name-main" :class="{ 'name-main--actions-only': hideName && !isEditing }">
             <el-form :model="formData" :rules="rules" ref="formRef" v-if="isEditing" @submit.prevent>
                 <el-form-item prop="domainName" class="inline-form-item">
                     <el-input
@@ -14,7 +14,7 @@
                 </el-form-item>
             </el-form>
             <el-tooltip
-                v-else
+                v-else-if="!hideName"
                 effect="dark"
                 placement="bottom-start"
                 popper-class="website-domain-tooltip"
@@ -62,12 +62,12 @@
             </el-popover>
             <el-button v-permission link icon="edit" class="ml-2.5" @click="startEdit" v-if="!isEditing"></el-button>
         </div>
-        <div>
+        <div v-if="showFavorite">
             <el-tooltip effect="dark" :content="$t('website.cancelFavorite')" placement="top-start" v-if="row.favorite">
                 <el-button
                     v-permission
                     link
-                    size="large"
+                    :size="hideName ? 'default' : 'large'"
                     icon="StarFilled"
                     type="warning"
                     @click="favoriteWebsite(row)"
@@ -98,8 +98,13 @@ interface Props {
     isHovered: boolean;
     defaultHttpPort: number;
     defaultHttpsPort: number;
+    hideName?: boolean;
+    showFavorite?: boolean;
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    hideName: false,
+    showFavorite: true,
+});
 const emit = defineEmits(['favoriteChange', 'domainEdit']);
 const inputRef = ref();
 const isEditing = ref(false);
@@ -231,6 +236,10 @@ const shouldShowDomainTooltip = (domain: string) => {
     align-items: center;
     flex: 1;
     min-width: 0;
+}
+
+.name-main--actions-only {
+    flex: initial;
 }
 
 .domain-text {

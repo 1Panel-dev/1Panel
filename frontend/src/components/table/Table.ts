@@ -4,14 +4,14 @@ import { cloneVNode, computed, defineComponent, h, onMounted, ref, watch, type P
 import {
     FU_TABLE_STORAGE_PREFIX,
     flattenVNodes,
+    getTableColumnKey,
     isElTableColumnVNode,
     type FuTableColumnConfig,
     updateArrayInPlace,
 } from './shared';
 
 const buildColumnKey = (vnode: VNode, index: number) => {
-    const props = (vnode.props || {}) as Record<string, any>;
-    return String(props.columnKey || props.prop || props.label || `column-${index}`);
+    return getTableColumnKey(vnode) || `column-${index}`;
 };
 
 const buildColumnConfig = (vnode: VNode, index: number): FuTableColumnConfig => {
@@ -150,15 +150,17 @@ export default defineComponent({
                     if (!vnode) {
                         return null;
                     }
+                    const vnodeProps = (vnode.props || {}) as Record<string, any>;
                     return cloneVNode(vnode, {
                         key: column.key,
+                        fixed: vnodeProps.fixed ?? (vnodeProps.fix || undefined),
                     });
                 })
                 .filter((column): column is VNode => Boolean(column));
         });
 
         const renderedChildren = computed(() => {
-            if (orderedConfigurableChildren.value.length === 0) {
+            if (slotColumns.value.length === 0) {
                 return slotChildren.value;
             }
             const children: VNode[] = [];
@@ -187,7 +189,11 @@ export default defineComponent({
                 if (!props.localKey || !nextColumns || typeof window === 'undefined') {
                     return;
                 }
-                localStorage.setItem(`${FU_TABLE_STORAGE_PREFIX}${props.localKey}`, JSON.stringify(nextColumns));
+                try {
+                    localStorage.setItem(`${FU_TABLE_STORAGE_PREFIX}${props.localKey}`, JSON.stringify(nextColumns));
+                } catch {
+                    // Ignore unavailable or full browser storage; column configuration remains usable in memory.
+                }
             },
             {
                 deep: true,
@@ -203,6 +209,12 @@ export default defineComponent({
 
         expose({ refElTable });
 
+        const resolvedHeaderRowClassName = (scope: unknown) => {
+            const externalClassName = attrs.headerRowClassName ?? attrs['header-row-class-name'];
+            const className = typeof externalClassName === 'function' ? externalClassName(scope) : externalClassName;
+            return ['fu-table-header', className].filter(Boolean).join(' ');
+        };
+
         return () =>
             h(
                 ElTable as any,
@@ -210,7 +222,7 @@ export default defineComponent({
                     ...attrs,
                     ref: refElTable,
                     class: ['fu-table', attrs.class],
-                    headerRowClassName: 'fu-table-header',
+                    headerRowClassName: resolvedHeaderRowClassName,
                 },
                 {
                     ...slots,

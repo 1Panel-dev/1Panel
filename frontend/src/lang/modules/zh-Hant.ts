@@ -677,7 +677,7 @@ const message = {
             syncAgentsHelper: '更新使用該模型帳號的智能體 openclaw.json',
             appVersion: '應用版本',
             webuiPort: 'WebUI 埠',
-            tokenOrAuth: 'Token/使用者名稱密碼',
+            tokenOrAuth: 'Token/Auth',
             allowedOrigins: '訪問地址',
             allowedOriginsRequired: '請至少填寫一個訪問地址',
             allowedOriginsInvalid: '訪問地址格式錯誤，請輸入 http(s)://網域或IP[:埠]',
@@ -5378,7 +5378,8 @@ const message = {
             network: '網路',
             bridgeName: '橋接名稱',
             natNetworkHelper: '虛擬機可透過主機存取網路，外部裝置通常無法直接存取虛擬機。',
-            bridgeNetworkHelper: '讓虛擬機接入主機既有的網橋（如 br0）。如主機有未使用的額外網卡，也可為其建立網橋後使用。',
+            bridgeNetworkHelper:
+                '讓虛擬機接入主機既有的網橋（如 br0）。如主機有未使用的額外網卡，也可為其建立網橋後使用。',
             bridgeNameHelper:
                 '請選擇主機上已存在的 Linux bridge，例如 br0。實體網卡不是 bridge，docker/libvirt 管理的 bridge 不能在此選擇。',
             natCIDRHelper: 'CIDR、閘道和 DHCP 位址範圍將用於新建的 NAT 虛擬網路。',

@@ -10,19 +10,32 @@
                 <EnterpriseBatchInstall @success="search" @task="openTaskLog" />
             </template>
             <template #rightToolBar>
+                <TableViewSwitch v-model="viewMode" storage-key="ai-agent" />
                 <TableSearch v-model:searchName="searchName" @search="search" />
                 <TableRefresh @search="search" />
             </template>
             <template #main>
                 <NoApp v-if="noApp" />
-                <ComplexTable :data="items" :pagination-config="paginationConfig" @search="search" v-if="!noApp">
+                <ComplexTable
+                    v-if="!noApp"
+                    v-model:view-mode="viewMode"
+                    :data="items"
+                    :pagination-config="paginationConfig"
+                    @search="search"
+                >
                     <el-table-column
                         :label="$t('commons.table.name')"
                         show-overflow-tooltip
                         prop="name"
                         min-width="120"
+                        card-type="name"
                     />
-                    <el-table-column :label="$t('commons.table.type')" prop="agentType" min-width="150">
+                    <el-table-column
+                        :label="$t('commons.table.type')"
+                        prop="agentType"
+                        min-width="150"
+                        card-type="content"
+                    >
                         <template #default="{ row }">
                             <div class="agent-type-cell">
                                 <img
@@ -34,7 +47,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="status" width="120">
+                    <el-table-column :label="$t('commons.table.status')" prop="status" width="120" card-type="status">
                         <template #default="{ row }">
                             <Status
                                 v-if="isAgentTaskRunning(row)"
@@ -70,7 +83,12 @@
                             </el-dropdown>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('aiTools.agents.appVersion')" prop="appVersion" min-width="140">
+                    <el-table-column
+                        :label="$t('aiTools.agents.appVersion')"
+                        prop="appVersion"
+                        min-width="140"
+                        card-type="content"
+                    >
                         <template #default="{ row }">
                             <div class="version-cell">
                                 <span>{{ row.appVersion }}</span>
@@ -91,6 +109,7 @@
                         show-overflow-tooltip
                         prop="provider"
                         min-width="150"
+                        card-type="content-full"
                     >
                         <template #default="{ row }">
                             <template v-if="row.agentType === 'openclaw' || row.agentType === 'hermes-agent'">
@@ -102,14 +121,24 @@
                             <span v-else>-</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.port')" prop="webUIPort" min-width="180">
+                    <el-table-column
+                        :label="$t('commons.table.port')"
+                        prop="webUIPort"
+                        min-width="180"
+                        card-type="description"
+                    >
                         <template #default="{ row }">
                             <el-button icon="Position" plain size="small" @click="jumpWebUI(row)">
                                 {{ $t('aiTools.agents.webuiPort') }}: {{ row.webUIPort }}
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="150">
+                    <el-table-column
+                        :label="$t('website.remark')"
+                        prop="remark"
+                        min-width="150"
+                        card-type="description"
+                    >
                         <template #default="{ row }">
                             <fu-read-write-switch v-permission>
                                 <template #read>
@@ -121,7 +150,7 @@
                             </fu-read-write-switch>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('runtime.workDir')" min-width="90">
+                    <el-table-column :label="$t('runtime.workDir')" min-width="90" card-type="description">
                         <template #default="{ row }">
                             <el-button
                                 v-permission:view="'host_file_view'"
@@ -135,7 +164,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('aiTools.agents.tokenOrAuth')" min-width="160">
+                    <el-table-column :label="$t('aiTools.agents.tokenOrAuth')" min-width="160" card-type="content">
                         <template #default="{ row }">
                             <el-space v-if="supportsAgentToken(row.agentType)">
                                 <CopyButton :content="row.token" />
@@ -147,9 +176,10 @@
                                 v-else-if="row.agentType === 'hermes-agent'"
                                 direction="vertical"
                                 alignment="start"
+                                :size="2"
                             >
                                 <span>{{ row.dashboardUsername || '-' }}</span>
-                                <el-space>
+                                <el-space alignment="center">
                                     <span>{{ row.dashboardPassword ? '********' : '-' }}</span>
                                     <CopyButton v-if="row.dashboardPassword" :content="row.dashboardPassword" />
                                 </el-space>
@@ -157,7 +187,7 @@
                             <span v-else>-</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('menu.website')" min-width="180">
+                    <el-table-column :label="$t('menu.website')" min-width="180" card-type="description">
                         <template #default="{ row }">
                             <div v-if="row.websiteId > 0" class="website-link-cell">
                                 <el-popover
@@ -213,6 +243,7 @@
                         width="180"
                         :formatter="dateFormat"
                         show-overflow-tooltip
+                        card-type="description"
                     />
                     <fu-table-operations
                         :buttons="buttons"
@@ -220,6 +251,7 @@
                         :label="$t('commons.table.operate')"
                         fixed="right"
                         :ellipsis="3"
+                        card-type="button"
                     />
                 </ComplexTable>
             </template>
@@ -288,6 +320,7 @@ const EnterpriseBatchInstall = defineAsyncComponent(() =>
 
 const items = ref<AI.AgentItem[]>([]);
 const loading = ref(false);
+const viewMode = ref<'table' | 'card'>('table');
 const addRef = ref();
 const taskLogRef = ref();
 const deleteRef = ref();
@@ -345,23 +378,6 @@ const buttons = [
         label: i18n.global.t('menu.home'),
         click: (row: AI.AgentItem) => openOverview(row),
         show: (row: AI.AgentItem) => row.agentType === 'openclaw',
-    },
-    {
-        label: i18n.global.t('commons.operate.start'),
-        permission: true,
-        click: (row: AI.AgentItem) => onOperate(row, 'start'),
-        disabled: (row: AI.AgentItem) => row.status === 'Running',
-    },
-    {
-        label: i18n.global.t('commons.operate.stop'),
-        permission: true,
-        click: (row: AI.AgentItem) => onOperate(row, 'stop'),
-        disabled: (row: AI.AgentItem) => row.status !== 'Running',
-    },
-    {
-        label: i18n.global.t('commons.operate.restart'),
-        permission: true,
-        click: (row: AI.AgentItem) => onOperate(row, 'restart'),
     },
     {
         label: i18n.global.t('commons.button.upgrade'),

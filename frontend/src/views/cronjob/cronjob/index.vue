@@ -42,6 +42,7 @@
                 </el-button-group>
             </template>
             <template #rightToolBar>
+                <TableViewSwitch v-model="viewMode" storage-key="cronjob" />
                 <el-select v-model="searchGroupID" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('commons.table.group') }}</template>
                     <div v-for="item in groupOptions" :key="item.id">
@@ -60,6 +61,7 @@
             <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
+                    v-model:view-mode="viewMode"
                     v-model:selects="selects"
                     @sort-change="search"
                     @search="search"
@@ -72,6 +74,7 @@
                         :min-width="120"
                         prop="name"
                         sortable
+                        card-type="name"
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
@@ -80,7 +83,12 @@
                             </el-text>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.group')" min-width="120" prop="group">
+                    <el-table-column
+                        :label="$t('commons.table.group')"
+                        min-width="120"
+                        prop="group"
+                        card-type="content"
+                    >
                         <template #default="{ row }">
                             <fu-select-rw-switch
                                 v-permission
@@ -102,7 +110,13 @@
                             </fu-select-rw-switch>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" :min-width="90" prop="status" sortable>
+                    <el-table-column
+                        :label="$t('commons.table.status')"
+                        :min-width="90"
+                        prop="status"
+                        sortable
+                        card-type="status"
+                    >
                         <template #default="{ row }">
                             <Status
                                 v-permission
@@ -123,7 +137,12 @@
                             <Status v-if="row.status === 'Pending'" :status="row.status" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('cronjob.cronSpec')" show-overflow-tooltip :min-width="120">
+                    <el-table-column
+                        :label="$t('cronjob.cronSpec')"
+                        show-overflow-tooltip
+                        :min-width="120"
+                        card-type="description"
+                    >
                         <template #default="{ row }">
                             <div v-for="(item, index) of row.spec.split('&&')" :key="index">
                                 <div v-if="row.expand || (!row.expand && index < 3)">
@@ -144,7 +163,12 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('cronjob.retainCopies')" :min-width="120" prop="retainCopies">
+                    <el-table-column
+                        :label="$t('cronjob.retainCopies')"
+                        :min-width="120"
+                        prop="retainCopies"
+                        card-type="content"
+                    >
                         <template #default="{ row }">
                             <el-button
                                 v-permission
@@ -164,6 +188,7 @@
                         :min-width="120"
                         show-overflow-tooltip
                         prop="lastRecordTime"
+                        card-type="description"
                     >
                         <template #default="{ row }">
                             <el-button v-if="row.lastRecordStatus === 'Success'" icon="Select" link type="success" />
@@ -173,34 +198,24 @@
                             {{ row.lastRecordTime }}
                         </template>
                     </el-table-column>
-                    <el-table-column :min-width="120" :label="$t('setting.backupAccount')">
+                    <el-table-column :min-width="120" :label="$t('setting.backupAccount')" card-type="content-full">
                         <template #default="{ row }">
                             <span v-if="!hasBackup(row.type)">-</span>
                             <div v-else>
-                                <div v-for="(item, index) of row.sourceAccounts" :key="index">
-                                    <div v-if="row.accountExpand || (!row.accountExpand && index < 3)">
-                                        <span type="info">
-                                            {{ item === 'localhost' ? $t('setting.LOCAL') : item }}
-                                            <el-icon
-                                                v-if="item === row.downloadAccount"
-                                                size="12"
-                                                class="relative top-px left-1"
-                                            >
-                                                <Star />
-                                            </el-icon>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div v-if="!row.accountExpand && row.sourceAccounts?.length > 3">
-                                    <el-button type="primary" link @click="row.accountExpand = true">
-                                        {{ $t('commons.button.expand') }}...
-                                    </el-button>
-                                </div>
-                                <div v-if="row.accountExpand && row.sourceAccounts?.length > 3">
-                                    <el-button type="primary" link @click="row.accountExpand = false">
-                                        {{ $t('commons.button.collapse') }}
-                                    </el-button>
-                                </div>
+                                <span v-if="row.downloadAccount" type="info">
+                                    {{
+                                        row.downloadAccount === 'localhost' ? $t('setting.LOCAL') : row.downloadAccount
+                                    }}
+                                </span>
+                                <span v-else>-</span>
+                                <el-button
+                                    v-if="row.sourceAccounts?.length > 1"
+                                    plain
+                                    size="small"
+                                    @click="openBackupAccounts(row)"
+                                >
+                                    +{{ row.sourceAccounts.length - 1 }}
+                                </el-button>
                             </div>
                         </template>
                     </el-table-column>
@@ -212,6 +227,7 @@
                         :min-width="isMobile ? 'auto' : 200"
                         :fixed="isMobile ? false : 'right'"
                         fix
+                        card-type="button"
                     />
                 </ComplexTable>
             </template>
@@ -239,6 +255,12 @@
         <Records @search="search" ref="dialogRecordRef" />
         <Import @search="search" ref="dialogImportRef" />
         <Backups @search="search" ref="dialogBackupRef" />
+        <el-dialog v-model="backupAccountsVisible" :title="$t('setting.backupAccount')" width="400px">
+            <div v-for="account in backupAccounts" :key="account" class="mb-2">
+                {{ account === 'localhost' ? $t('setting.LOCAL') : account }}
+                <el-icon v-if="account === downloadAccount" size="12" class="relative top-px left-1"><Star /></el-icon>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -271,6 +293,7 @@ const { currentNode, isMobile } = useGlobalStore();
 useOperateNodeContext(currentNode);
 
 const loading = ref();
+const viewMode = ref<'table' | 'card'>('table');
 const selects = ref<any>([]);
 const isRecordShow = ref();
 const operateIDs = ref();
@@ -328,6 +351,9 @@ const search = async (column?: any) => {
 
 const dialogRecordRef = ref();
 const dialogBackupRef = ref();
+const backupAccountsVisible = ref(false);
+const backupAccounts = ref<string[]>([]);
+const downloadAccount = ref('');
 
 const onOpenDialog = async (id: string) => {
     routerToNameWithQuery('CronjobOperate', { id: id });
@@ -492,6 +518,12 @@ const onBatchChangeStatus = async (status: string) => {
 
 const loadBackups = async (row: any) => {
     dialogBackupRef.value!.acceptParams({ cronjobID: row.id, cronjob: row.name });
+};
+
+const openBackupAccounts = (row: Cronjob.CronjobInfo) => {
+    backupAccounts.value = row.sourceAccounts || [];
+    downloadAccount.value = row.downloadAccount;
+    backupAccountsVisible.value = true;
 };
 
 const onHandle = async (row: Cronjob.CronjobInfo) => {

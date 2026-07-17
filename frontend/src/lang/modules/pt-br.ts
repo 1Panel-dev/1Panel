@@ -709,7 +709,7 @@ const message = {
             syncAgentsHelper: 'Atualize o openclaw.json para agentes que usam esta conta de modelo',
             appVersion: 'Versão do app',
             webuiPort: 'Porta WebUI',
-            tokenOrAuth: 'Token/Usuário e senha',
+            tokenOrAuth: 'Token/Autenticação',
             allowedOrigins: 'Endereços de acesso',
             allowedOriginsRequired: 'Informe pelo menos um endereço de acesso',
             allowedOriginsInvalid: 'Use o formato http(s)://host-ou-ip[:porta]',
@@ -6015,7 +6015,8 @@ const message = {
             storagePool: 'Pool de Armazenamento',
             network: 'Rede',
             bridgeName: 'Nome da Bridge',
-            natNetworkHelper: 'As VMs podem acessar a rede pelo host, mas dispositivos externos geralmente não podem acessá-las diretamente.',
+            natNetworkHelper:
+                'As VMs podem acessar a rede pelo host, mas dispositivos externos geralmente não podem acessá-las diretamente.',
             bridgeNetworkHelper:
                 'Conecte as VMs a uma bridge existente do host (como br0). Se o host tiver uma placa de rede adicional não utilizada, crie uma bridge para ela e use-a.',
             bridgeNameHelper:
