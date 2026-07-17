@@ -20119,6 +20119,77 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/logs/system/read": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.SystemLogReq"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.SystemLogRes"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Read host logs",
+				"tags": [
+					"Logs"
+				]
+			}
+		},
+		"/logs/system/services": {
+			"get": {
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List running host services",
+				"tags": [
+					"Logs"
+				]
+			}
+		},
 		"/logs/tasks/executing/count": {
 			"get": {
 				"responses": {
@@ -38445,6 +38516,74 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.SystemLogItem": {
+			"properties": {
+				"message": {
+					"type": "string"
+				},
+				"priority": {
+					"type": "string"
+				},
+				"raw": {
+					"type": "string"
+				},
+				"service": {
+					"type": "string"
+				},
+				"time": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.SystemLogReq": {
+			"properties": {
+				"cursor": {
+					"type": "string"
+				},
+				"endTime": {
+					"type": "string"
+				},
+				"keyword": {
+					"type": "string"
+				},
+				"pageSize": {
+					"maximum": 500,
+					"minimum": 1,
+					"type": "integer"
+				},
+				"priority": {
+					"type": "string"
+				},
+				"service": {
+					"type": "string"
+				},
+				"startTime": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.SystemLogRes": {
+			"properties": {
+				"hasMore": {
+					"type": "boolean"
+				},
+				"items": {
+					"items": {
+						"$ref": "#/definitions/dto.SystemLogItem"
+					},
+					"type": "array"
+				},
+				"nextCursor": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.Tag": {
 			"properties": {
 				"key": {
@@ -38769,6 +38908,9 @@ const docTemplate = `{
 				"group": {
 					"type": "string"
 				},
+				"isAppendOnly": {
+					"type": "boolean"
+				},
 				"isDetail": {
 					"type": "boolean"
 				},
@@ -38776,6 +38918,9 @@ const docTemplate = `{
 					"type": "boolean"
 				},
 				"isHidden": {
+					"type": "boolean"
+				},
+				"isImmutable": {
 					"type": "boolean"
 				},
 				"isSymlink": {
@@ -41066,6 +41211,10 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
+				"gatewayArgs": {
+					"maxLength": 4096,
+					"type": "string"
+				},
 				"gatewayImage": {
 					"type": "string"
 				},
@@ -41197,6 +41346,10 @@ const docTemplate = `{
 						"$ref": "#/definitions/request.Environment"
 					},
 					"type": "array"
+				},
+				"gatewayArgs": {
+					"maxLength": 4096,
+					"type": "string"
 				},
 				"gatewayImage": {
 					"type": "string"
@@ -44612,6 +44765,9 @@ const docTemplate = `{
 				"group": {
 					"type": "string"
 				},
+				"isAppendOnly": {
+					"type": "boolean"
+				},
 				"isDetail": {
 					"type": "boolean"
 				},
@@ -44619,6 +44775,9 @@ const docTemplate = `{
 					"type": "boolean"
 				},
 				"isHidden": {
+					"type": "boolean"
+				},
+				"isImmutable": {
 					"type": "boolean"
 				},
 				"isSymlink": {
@@ -44880,6 +45039,9 @@ const docTemplate = `{
 						"$ref": "#/definitions/request.Environment"
 					},
 					"type": "array"
+				},
+				"gatewayArgs": {
+					"type": "string"
 				},
 				"gatewayImage": {
 					"type": "string"

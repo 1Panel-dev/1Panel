@@ -5174,6 +5174,15 @@
 		"formatZH": "更新 CDN 配置",
 		"formatEN": "update CDN config"
 	},
+	"/xpack/waf/config/global/spider": {
+		"bodyKeys": [
+			"rules"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新全局蜘蛛允许列表",
+		"formatEN": "update global spider allowlist"
+	},
 	"/xpack/waf/config/global/state": {
 		"bodyKeys": [
 			"scope",
@@ -5187,7 +5196,8 @@
 	"/xpack/waf/config/website/state": {
 		"bodyKeys": [
 			"scope",
-			"state"
+			"state",
+			"mode"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],

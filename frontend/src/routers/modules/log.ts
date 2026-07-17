@@ -68,6 +68,18 @@ const logsRouter = {
                     },
                 },
                 {
+                    path: 'host',
+                    name: 'HostSystemLog',
+                    component: () => import('@/views/log/host-system/index.vue'),
+                    hidden: true,
+                    meta: {
+                        parent: 'menu.logs',
+                        title: 'logs.hostSystem',
+                        activeMenu: '/logs',
+                        permission: 'log_view',
+                    },
+                },
+                {
                     path: 'ssh',
                     name: 'SSHLog2',
                     component: () => import('@/views/host/ssh/log/log.vue'),
