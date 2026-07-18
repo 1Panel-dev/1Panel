@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bufio"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -654,9 +653,56 @@ func handleUpgradeCompose(install model.AppInstall, detail model.AppDetail) (map
 	if oldServiceValue["restart"] != nil {
 		serviceValue["restart"] = oldServiceValue["restart"]
 	}
+	if install.App.Key == constant.AppOpenresty {
+		mergeOpenrestyModuleVolumes(serviceValue, oldServiceValue)
+	}
 	servicesMap[install.ServiceName] = serviceValue
 	composeMap["services"] = servicesMap
 	return composeMap, nil
+}
+
+// mergeOpenrestyModuleVolumes carries the dynamic module mounts of the old
+// compose over to the upgraded one when it does not declare them, so built
+// module artifacts and their load configuration stay mounted across upgrades.
+func mergeOpenrestyModuleVolumes(serviceValue, oldServiceValue map[string]interface{}) {
+	oldVolumes, ok := oldServiceValue["volumes"].([]interface{})
+	if !ok {
+		return
+	}
+	newVolumes, _ := serviceValue["volumes"].([]interface{})
+	existing := make(map[string]struct{}, len(newVolumes))
+	for _, volume := range newVolumes {
+		if containerPath, ok := composeVolumeContainerPath(volume); ok {
+			existing[containerPath] = struct{}{}
+		}
+	}
+	for _, volume := range oldVolumes {
+		containerPath, ok := composeVolumeContainerPath(volume)
+		if !ok {
+			continue
+		}
+		if !strings.Contains(containerPath, "modules-enabled") && !strings.Contains(containerPath, "nginx/modules/1panel") {
+			continue
+		}
+		if _, ok = existing[containerPath]; ok {
+			continue
+		}
+		newVolumes = append(newVolumes, volume)
+		existing[containerPath] = struct{}{}
+	}
+	serviceValue["volumes"] = newVolumes
+}
+
+func composeVolumeContainerPath(volume interface{}) (string, bool) {
+	volumeStr, ok := volume.(string)
+	if !ok {
+		return "", false
+	}
+	parts := strings.Split(volumeStr, ":")
+	if len(parts) < 2 {
+		return "", false
+	}
+	return parts[1], true
 }
 
 func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string, error) {
@@ -692,74 +738,35 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 	return string(composeByte), nil
 }
 
-func buildNginx(parentTask *task.Task) error {
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
+func buildNginx(parentTask *task.Task, nginxInstall model.AppInstall) error {
 	fileOp := files.NewFileOp()
 	buildPath := path.Join(nginxInstall.GetPath(), "build")
 	if !fileOp.Stat(buildPath) {
 		return buserr.New("ErrBuildDirNotFound")
 	}
-	moduleConfigPath := path.Join(buildPath, "module.json")
-	moduleContent, err := fileOp.GetContent(moduleConfigPath)
+	modules, err := loadNginxModules(nginxInstall)
 	if err != nil {
 		return err
 	}
-	var (
-		modules         []dto.NginxModule
-		addModuleParams []string
-		addPackages     []string
-	)
-	if len(moduleContent) > 0 {
-		_ = json.Unmarshal(moduleContent, &modules)
-		bashFile, err := os.OpenFile(path.Join(buildPath, "tmp", "pre.sh"), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.DirPerm)
-		if err != nil {
-			return err
-		}
-		defer bashFile.Close()
-		bashFileWriter := bufio.NewWriter(bashFile)
-		for _, module := range modules {
-			if !module.Enable {
-				continue
-			}
-			_, err = bashFileWriter.WriteString(module.Script + "\n")
-			if err != nil {
-				return err
-			}
-			addModuleParams = append(addModuleParams, module.Params)
-			addPackages = append(addPackages, module.Packages...)
-		}
-		err = bashFileWriter.Flush()
-		if err != nil {
-			return err
-		}
+	previousModules := cloneNginxModules(modules)
+	staticBuild := hasEnabledStaticNginxModules(modules)
+	if err = configureStaticNginxModules(nginxInstall, modules, ""); err != nil {
+		return err
 	}
-	envs, err := gotenv.Read(nginxInstall.GetEnvPath())
+	if staticBuild {
+		logStr := fmt.Sprintf("%s %s", i18n.GetMsgByKey("TaskBuild"), i18n.GetMsgByKey("Image"))
+		parentTask.LogStart(logStr)
+		cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*parentTask), cmd.WithTimeout(120*time.Minute))
+		if err = cmdMgr.Run("docker", "compose", "-f", nginxInstall.GetComposePath(), "build"); err != nil {
+			return err
+		}
+		parentTask.LogSuccess(logStr)
+	}
+	modules, err = buildDynamicNginxModules(nginxInstall, modules, nil, false, parentTask)
 	if err != nil {
 		return err
 	}
-	envs["RESTY_CONFIG_OPTIONS_MORE"] = ""
-	envs["RESTY_ADD_PACKAGE_BUILDDEPS"] = ""
-	if len(addModuleParams) > 0 {
-		envs["RESTY_CONFIG_OPTIONS_MORE"] = strings.Join(addModuleParams, " ")
-	}
-	if len(addPackages) > 0 {
-		envs["RESTY_ADD_PACKAGE_BUILDDEPS"] = strings.Join(addPackages, " ")
-	}
-	_ = gotenv.Write(envs, nginxInstall.GetEnvPath())
-	if len(addModuleParams) == 0 && len(addPackages) == 0 {
-		return nil
-	}
-	logStr := fmt.Sprintf("%s %s", i18n.GetMsgByKey("TaskBuild"), i18n.GetMsgByKey("Image"))
-	parentTask.LogStart(logStr)
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*parentTask), cmd.WithTimeout(60*time.Minute))
-	if err = cmdMgr.Run("docker", "compose", "-f", nginxInstall.GetComposePath(), "build"); err != nil {
-		return err
-	}
-	parentTask.LogSuccess(logStr)
-	return nil
+	return commitNginxModuleBuilds(nginxInstall, previousModules, modules, false)
 }
 
 func upgradeInstall(req request.AppInstallUpgrade) error {
@@ -875,6 +882,16 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			if err := fileOp.CopyFile(path.Join(detailBuildDir, "Dockerfile"), installBuildDir); err != nil {
 				return err
 			}
+			if fileOp.Stat(path.Join(detailBuildDir, "Dockerfile.modules")) {
+				if err := fileOp.CopyFile(path.Join(detailBuildDir, "Dockerfile.modules"), installBuildDir); err != nil {
+					return err
+				}
+			}
+			if fileOp.Stat(path.Join(detailBuildDir, "module.catalog.json")) {
+				if err := fileOp.CopyFile(path.Join(detailBuildDir, "module.catalog.json"), installBuildDir); err != nil {
+					return err
+				}
+			}
 			if err := fileOp.CopyFile(path.Join(detailBuildDir, "nginx.conf"), installBuildDir); err != nil {
 				return err
 			}
@@ -952,6 +969,33 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			}
 		}
 
+		if install.App.Key == constant.AppOpenresty {
+			modules, moduleErr := loadNginxModules(install)
+			if moduleErr != nil {
+				return moduleErr
+			}
+			// Build dynamic modules for the target version before stopping the
+			// current container. Static modules retain the full rebuild path.
+			if !hasEnabledStaticNginxModules(modules) {
+				previousModules := cloneNginxModules(modules)
+				modules, moduleErr = buildDynamicNginxModules(install, modules, nil, false, t)
+				if moduleErr != nil {
+					var buildFailed *nginxModuleBuildFailedError
+					if !errors.As(moduleErr, &buildFailed) || !fallbackNginxModuleToStatic(modules, buildFailed) {
+						return moduleErr
+					}
+					// The flipped module makes buildNginx below take the static
+					// chain; if that fails the upgrade fails with it, so unlike
+					// the UI build entry there is no restore-to-auto step here.
+					t.Logf("WARNING: dynamic build of module %s failed: %v; falling back to static build", buildFailed.Module, buildFailed.Err)
+				}
+				if moduleErr = saveNginxModules(install, modules); moduleErr != nil {
+					removeNginxModuleOutputsNotReferenced(install, modules, previousModules)
+					return moduleErr
+				}
+			}
+		}
+
 		if out, err := compose.Down(install.GetComposePath()); err != nil {
 			if out != "" {
 				upErr = errors.New(out)
@@ -986,7 +1030,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 
 		if install.App.Key == constant.AppOpenresty {
-			if err = buildNginx(t); err != nil {
+			if err = buildNginx(t, install); err != nil {
 				t.Log(err.Error())
 				return err
 			}

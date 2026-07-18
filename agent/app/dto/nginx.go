@@ -1,6 +1,8 @@
 package dto
 
 import (
+	"time"
+
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
 )
@@ -87,9 +89,41 @@ var LBAlgorithms = map[string]struct{}{"ip_hash": {}, "least_conn": {}}
 var RealIPKeys = map[string]struct{}{"X-Forwarded-For": {}, "X-Real-IP": {}, "CF-Connecting-IP": {}}
 
 type NginxModule struct {
-	Name     string   `json:"name"`
-	Script   string   `json:"script"`
-	Packages []string `json:"packages"`
-	Params   string   `json:"params"`
-	Enable   bool     `json:"enable"`
+	Name           string             `json:"name"`
+	Script         string             `json:"script"`
+	Packages       []string           `json:"packages"`
+	Params         string             `json:"params"`
+	Enable         bool               `json:"enable"`
+	Deleted        bool               `json:"deleted,omitempty"`
+	BuildMode      string             `json:"buildMode,omitempty"`
+	Provider       string             `json:"provider,omitempty"`
+	DynamicSupport string             `json:"dynamicSupport,omitempty"`
+	LoadOrder      int                `json:"loadOrder,omitempty"`
+	Builds         []NginxModuleBuild `json:"builds,omitempty"`
+	LastError      string             `json:"lastError,omitempty"`
+}
+
+type NginxModuleBuild struct {
+	Provider  string                `json:"provider"`
+	Status    string                `json:"status"`
+	Hash      string                `json:"hash"`
+	Target    NginxModuleTarget     `json:"target"`
+	Artifacts []NginxModuleArtifact `json:"artifacts,omitempty"`
+	Error     string                `json:"error,omitempty"`
+	BuiltAt   time.Time             `json:"builtAt,omitempty"`
+}
+
+type NginxModuleTarget struct {
+	Key              string `json:"key"`
+	OpenRestyVersion string `json:"openrestyVersion"`
+	Architecture     string `json:"architecture"`
+	Image            string `json:"image,omitempty"`
+	ImageDigest      string `json:"imageDigest,omitempty"`
+	BuilderDigest    string `json:"builderDigest,omitempty"`
+}
+
+type NginxModuleArtifact struct {
+	Name     string `json:"name"`
+	Path     string `json:"path"`
+	Checksum string `json:"checksum"`
 }
