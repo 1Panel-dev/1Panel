@@ -21,6 +21,16 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
+            <el-form-item v-if="moduleOptions.length > 0" :label="$t('nginx.modulesToBuild')" prop="modules">
+                <el-checkbox-group v-model="build.modules">
+                    <el-checkbox v-for="item in moduleOptions" :key="item.name" :value="item.name">
+                        {{ item.name }}
+                    </el-checkbox>
+                </el-checkbox-group>
+            </el-form-item>
+            <el-form-item :label="$t('nginx.forceBuild')">
+                <el-switch v-model="build.force" />
+            </el-form-item>
         </el-form>
         <template #footer>
             <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -33,21 +43,26 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-import { FormInstance } from 'element-plus';
+import { ElMessageBox, FormInstance } from 'element-plus';
 import { getNginxModules, buildNginx } from '@/api/modules/nginx';
 import i18n from '@/lang';
 import { newUUID } from '@/utils/id';
 import TaskLog from '@/components/log/task/index.vue';
 import { Rules } from '@/global/form-rules';
+import { Nginx } from '@/api/interface/nginx';
 
 const open = ref(false);
 const loading = ref(false);
 const buildForm = ref<FormInstance>();
 const build = ref({
     mirror: 'http://archive.ubuntu.com/ubuntu',
+    modules: [] as string[],
+    force: false,
 });
+const moduleOptions = ref<Nginx.NginxModule[]>([]);
 const rules = {
     mirror: [Rules.requiredSelect],
+    modules: [Rules.requiredSelect],
 };
 const taskLogRef = ref();
 
@@ -60,26 +75,30 @@ const getModules = async () => {
     try {
         const res = await getNginxModules();
         build.value.mirror = res.data.mirror;
+        moduleOptions.value = res.data.modules.filter((item) => item.enable && item.buildMode !== 'static');
+        build.value.modules = moduleOptions.value.map((item) => item.name);
     } catch (error) {}
 };
 
 const submit = async (form: FormInstance) => {
     await form.validate();
-    if (form.validate()) {
-        ElMessageBox.confirm(i18n.global.t('nginx.buildWarn'), i18n.global.t('nginx.build'), {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        }).then(async () => {
-            const taskID = newUUID();
-            try {
-                await buildNginx({
-                    taskID: taskID,
-                    mirror: build.value.mirror,
-                });
-                handleClose();
-                openTaskLog(taskID);
-            } catch (error) {}
+    await ElMessageBox.confirm(i18n.global.t('nginx.buildWarn'), i18n.global.t('nginx.build'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    });
+    const taskID = newUUID();
+    loading.value = true;
+    try {
+        await buildNginx({
+            taskID: taskID,
+            mirror: build.value.mirror,
+            modules: build.value.modules,
+            force: build.value.force,
         });
+        handleClose();
+        openTaskLog(taskID);
+    } finally {
+        loading.value = false;
     }
 };
 

@@ -32,6 +32,14 @@ export namespace Nginx {
     export interface NginxBuildReq {
         taskID: string;
         mirror: string;
+        modules?: string[];
+        force?: boolean;
+    }
+
+    export interface NginxModuleArtifact {
+        name: string;
+        path: string;
+        checksum: string;
     }
 
     export interface NginxModule {
@@ -40,6 +48,15 @@ export namespace Nginx {
         packages?: string;
         enable: boolean;
         params: string;
+        buildMode: 'auto' | 'dynamic' | 'static';
+        provider: 'local' | 'prebuilt';
+        dynamicSupport: 'unknown' | 'supported' | 'unsupported';
+        loadOrder: number;
+        buildStatus: 'pending' | 'ready' | 'failed';
+        loadStatus: 'enabled' | 'disabled';
+        compatibility: 'unknown' | 'compatible' | 'stale' | 'static';
+        artifacts?: NginxModuleArtifact[];
+        lastError?: string;
     }
 
     export interface NginxBuildConfig {
@@ -47,8 +64,16 @@ export namespace Nginx {
         modules: NginxModule[];
     }
 
-    export interface NginxModuleUpdate extends NginxModule {
+    export interface NginxModuleUpdate {
         operate: string;
+        name: string;
+        script?: string;
+        packages?: string;
+        enable?: boolean;
+        params?: string;
+        buildMode?: 'auto' | 'dynamic' | 'static';
+        provider?: 'local' | 'prebuilt';
+        loadOrder?: number;
     }
 
     export interface NginxHttpsStatus {

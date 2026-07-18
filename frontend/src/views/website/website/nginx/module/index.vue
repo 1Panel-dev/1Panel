@@ -11,10 +11,31 @@
                 <el-text type="warning" class="!ml-2">{{ $t('nginx.buildHelper') }}</el-text>
             </template>
             <el-table-column prop="name" :label="$t('commons.table.name')" />
-            <el-table-column prop="params" :label="$t('nginx.params')" />
+            <el-table-column :label="$t('nginx.buildMode')" width="150">
+                <template #default="{ row }">
+                    <el-tag effect="plain" :type="row.buildMode === 'static' ? 'warning' : 'primary'">
+                        {{ $t('nginx.buildMode' + capitalize(row.buildMode)) }}
+                    </el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column :label="$t('nginx.buildStatus')" width="120">
+                <template #default="{ row }">
+                    <el-tooltip v-if="row.lastError" :content="row.lastError" placement="top">
+                        <el-tag :type="statusType(row.buildStatus)">{{ $t('nginx.' + row.buildStatus) }}</el-tag>
+                    </el-tooltip>
+                    <el-tag v-else :type="statusType(row.buildStatus)">{{ $t('nginx.' + row.buildStatus) }}</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column :label="$t('nginx.compatibility')" width="130">
+                <template #default="{ row }">
+                    <el-tag effect="plain" :type="compatibilityType(row.compatibility)">
+                        {{ $t('nginx.' + row.compatibility) }}
+                    </el-tag>
+                </template>
+            </el-table-column>
             <el-table-column :label="$t('commons.table.status')" fix>
                 <template #default="{ row }">
-                    <el-switch v-permission v-model="row.enable" @click="updateModule(row)" />
+                    <el-switch v-permission v-model="row.enable" @change="updateModule(row)" />
                 </template>
             </el-table-column>
             <fu-table-operations
@@ -38,8 +59,9 @@ import { Nginx } from '@/api/interface/nginx';
 import { MsgSuccess } from '@/utils/message';
 import Operate from './operate/index.vue';
 import Build from './build/index.vue';
+import { onMounted, ref } from 'vue';
 
-const data = ref([]);
+const data = ref<Nginx.NginxModule[]>([]);
 const loading = ref(false);
 const buttons = [
     {
@@ -94,9 +116,28 @@ const updateModule = (row: Nginx.NginxModule) => {
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         })
+        .catch(() => {
+            row.enable = !row.enable;
+        })
         .finally(() => {
             loading.value = false;
+            search();
         });
+};
+
+const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
+
+const statusType = (status: string) => {
+    if (status === 'ready') return 'success';
+    if (status === 'failed') return 'danger';
+    return 'info';
+};
+
+const compatibilityType = (status: string) => {
+    if (status === 'compatible') return 'success';
+    if (status === 'stale') return 'warning';
+    if (status === 'static') return 'info';
+    return 'info';
 };
 
 const deleteModule = async (row: Nginx.NginxModule) => {
