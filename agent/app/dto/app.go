@@ -2,6 +2,7 @@ package dto
 
 import (
 	"context"
+
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 )
@@ -133,6 +134,7 @@ type Locale struct {
 	Tr     string `json:"tr"`
 	Es     string `json:"es-es" yaml:"es-es"`
 	Fa     string `json:"fa"`
+	Lo     string `json:"lo"`
 }
 
 type AppForm struct {

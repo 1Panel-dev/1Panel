@@ -63,6 +63,7 @@
                                     <el-dropdown-item command="ms">Bahasa Melayu</el-dropdown-item>
                                     <el-dropdown-item command="tr">Turkish</el-dropdown-item>
                                     <el-dropdown-item command="fa">فارسی</el-dropdown-item>
+                                    <el-dropdown-item command="lo">ພາສາລາວ</el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>
@@ -122,6 +123,7 @@
                                     <el-dropdown-item command="ms">Bahasa Melayu</el-dropdown-item>
                                     <el-dropdown-item command="tr">Turkish</el-dropdown-item>
                                     <el-dropdown-item command="fa">فارسی</el-dropdown-item>
+                                    <el-dropdown-item command="lo">ພາສາລາວ</el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>
@@ -389,6 +391,7 @@ const languageLabelMap: Record<string, string> = {
     tr: 'Turkish',
     'es-ES': 'España - Español',
     fa: 'فارسی',
+    lo: 'ພາສາລາວ',
 };
 
 const handleCommand = async (command: string) => {
