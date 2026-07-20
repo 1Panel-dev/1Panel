@@ -31,6 +31,8 @@ export namespace App {
         ko: string;
         tr: string;
         'es-es': string;
+        fa: string;
+        lo: string;
     }
 
     export interface AppDTO extends App {

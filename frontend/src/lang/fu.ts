@@ -70,7 +70,7 @@ const fuLocales: Record<string, FuLocaleMessage> = {
                 finish: 'ສຳເລັດ',
             },
         },
-    },    
+    },
     ms: {
         fu: {
             table: {

@@ -95,8 +95,7 @@
                         <pre
                             v-if="showScriptPreview"
                             class="vscode-open__script max-h-[430px] overflow-auto p-3 text-xs leading-6"
-                            >{{ scriptText }}</pre
-                        >
+                            >{{ scriptText }}</pre>
                     </div>
 
                     <div v-else class="flex h-full min-h-[320px] flex-col justify-between gap-4">

@@ -18,6 +18,7 @@ import ko from 'element-plus/es/locale/lang/ko';
 import tr from 'element-plus/es/locale/lang/tr';
 import esES from 'element-plus/es/locale/lang/es';
 import fa from 'element-plus/es/locale/lang/fa';
+import lo from 'element-plus/es/locale/lang/lo';
 import { useTheme } from '@/global/use-theme';
 useTheme();
 
@@ -38,6 +39,7 @@ const i18nLocale = computed(() => {
     if (language.value === 'tr') return tr;
     if (language.value === 'es-ES') return esES;
     if (language.value === 'fa') return fa;
+    if (language.value === 'lo') return lo;
     return zhCn;
 });
 

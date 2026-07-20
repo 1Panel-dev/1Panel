@@ -289,6 +289,7 @@ const languageOptions = ref([
     { value: 'tr', label: 'Turkish' },
     { value: 'es-ES', label: 'España - Español' },
     { value: 'fa', label: 'فارسی' },
+    { value: 'lo', label: 'ພາສາລາວ' },
 ]);
 
 if (isIntl.value) {
