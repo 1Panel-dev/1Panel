@@ -50,7 +50,6 @@ type AcmeClient struct {
 
 type dnsChallengeConfig struct {
 	recursiveNameservers []string
-	timeout              time.Duration
 	disableCNAME         bool
 }
 
@@ -107,7 +106,6 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 	}
 	c.dnsChallengeConfig = &dnsChallengeConfig{
 		recursiveNameservers: append([]string(nil), nameservers...),
-		timeout:              dnsTimeOut,
 		disableCNAME:         websiteSSL.DisableCNAME,
 	}
 	return nil
@@ -238,11 +236,9 @@ func (c *AcmeClient) lockDNSChallenge() func() {
 	}
 
 	previousClient := dns01.DefaultClient()
-	// lego v5 removed dns01.AddRecursiveNameservers and dns01.AddDNSTimeout;
-	// configure them via dns01.NewClient(&dns01.Options{...}) + SetDefaultClient.
+	// lego v5 configures custom recursive nameservers through a client instance.
 	dns01.SetDefaultClient(dns01.NewClient(&dns01.Options{
 		RecursiveNameservers: c.dnsChallengeConfig.recursiveNameservers,
-		Timeout:              c.dnsChallengeConfig.timeout,
 	}))
 
 	return func() {
