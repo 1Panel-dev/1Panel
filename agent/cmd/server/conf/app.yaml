@@ -4,7 +4,7 @@ base:
   is_demo: false
   is_offline: false
   is_fxplay: false
-  is_enterprise: true
+  is_enterprise: false
 
 log:
   level: debug
