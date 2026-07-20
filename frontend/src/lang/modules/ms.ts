@@ -4875,8 +4875,7 @@ const message = {
             regionPolicy: 'Dasar wilayah',
             provincePolicy: 'Dasar wilayah pentadbiran',
             provinceRuleLabel: 'Wilayah pentadbiran',
-            provinceVersionAlert:
-                'OpenResty mestilah lebih baharu daripada 1.31.1.1-0 untuk dasar wilayah pentadbiran berfungsi.',
+            openRestyFeatureVersionAlert: 'OpenResty mesti lebih baharu daripada 1.31.1.1-0 agar {0} berfungsi.',
             ipLocation: 'Lokasi IP',
             action: 'Tindakan',
             ruleType: 'Jenis Serangan',
@@ -4965,6 +4964,7 @@ const message = {
             defaultUrlBlack: 'Peraturan URL',
             htmlRes: 'Halaman Sekat',
             urlSearchHelper: 'Sila masukkan URL untuk sokongan carian samar',
+            hostSearchHelper: 'Masukkan Host untuk carian kabur',
             toCreate: 'Cipta',
             closeWaf: 'Tutup WAF',
             closeWafHelper: 'Menutup WAF akan menyebabkan laman web kehilangan perlindungan, adakah anda mahu teruskan',
@@ -4980,6 +4980,7 @@ const message = {
             attackCount: 'Had Kekerapan Serangan',
             fileExtCheck: 'Had Muat Naik Fail',
             geoRestrict: 'Sekatan Akses Wilayah',
+            originProtect: 'Perlindungan origin CDN',
             attacklog: 'Rekod Sekat',
             unknownWebsite: 'Akses domain yang tidak sah',
             geoRuleEmpty: 'Pilih sekurang-kurangnya satu wilayah atau wilayah pentadbiran',
@@ -5030,6 +5031,7 @@ const message = {
             spiderIpHelper:
                 'Apabila didayakan, hanya perangkak yang dipilih dibenarkan; apabila dilumpuhkan, semua akses perangkak disekat.',
             spiderIp: 'Kolam IP labah-labah',
+            spider: 'Spider',
             spiderAllowlist: 'Perangkak dibenarkan',
             spiderAllowlistEmpty: 'Tiada perangkak dipilih. Menyimpan akan menyekat semua akses perangkak.',
             geoIp: 'Pustaka Alamat IP',
@@ -5150,6 +5152,7 @@ const message = {
             totalFlow: 'Jumlah Trafik',
             logSize: 'Saiz Fail Log',
             realIPType: 'Kaedah pemerolehan IP sebenar',
+            realIPRecognition: 'Pengenalpastian IP sebenar',
             fromHeader: 'Dapatkan dari Header HTTP',
             fromHeaders: 'Dapatkan dari senarai Header',
             header: 'Header HTTP',
@@ -5164,10 +5167,20 @@ const message = {
             monitorCDNHelper:
                 'Mengubah konfigurasi CDN untuk pemantauan laman web juga akan mengemas kini tetapan WAF CDN',
             wafCDNHelper: 'Mengubah konfigurasi WAF CDN juga akan mengemas kini tetapan CDN pemantauan laman web',
+            originProtection: 'Perlindungan pelayan origin',
+            originProtectionHelper:
+                'Hanya nod CDN dalam kumpulan IP terpilih boleh menyambung ke origin. Pengesanan IP sebenar pelawat menggunakan suis berasingan.',
+            originProtectionIPGroups: 'Kumpulan IP origin CDN',
+            originProtectionIPGroupsPlaceholder: 'Pilih kumpulan IP origin CDN yang dipercayai',
+            originProtectionWarning:
+                'Konfigurasi yang salah boleh menyebabkan laman web tidak dapat dicapai. Pastikan semua alamat origin CDN disertakan.',
+            originProtectionEnableConfirm:
+                'Sambungan di luar kumpulan IP terpilih akan dianggap sebagai akses terus ke origin dan disekat. Teruskan?',
             statusErr: 'Format kod status tidak sah',
             shenma: 'Shenma Search',
             duckduckgo: 'DuckDuckGo',
             yandex: 'Yandex',
+            gptbot: 'GPTBot',
             excludeUri: 'Kecualikan URI',
             top100Helper: 'Tunjukkan data 100 teratas',
             logSaveDay: 'Tempoh Penahanan Log (hari)',
