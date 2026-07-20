@@ -97,7 +97,58 @@ export const loadMonitorSetting = (currentNode?: string) => {
 export const updateMonitorSetting = (key: string, value: string) => {
     return http.post(`/hosts/monitor/setting/update`, { key: key, value: value });
 };
-
+export const loadRuntimeDiagnosticsSummary = (currentNode?: string) => {
+    return http.get<Host.RuntimeDiagnosticsSummary>(
+        `/hosts/diagnostics/summary`,
+        {},
+        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+    );
+};
+export const loadRuntimeGoroutines = (currentNode?: string) => {
+    return http.get<Host.RuntimeGoroutineSnapshot>(
+        `/hosts/diagnostics/goroutines`,
+        {},
+        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+    );
+};
+export class RuntimeProfileDownloadError extends Error {
+    constructor(message = '') {
+        super(message);
+        this.name = 'RuntimeProfileDownloadError';
+    }
+}
+const parseRuntimeProfileError = async (data: unknown) => {
+    if (!(data instanceof Blob) || !data.type.includes('application/json')) {
+        return;
+    }
+    try {
+        const response = JSON.parse(await data.text()) as { message?: string };
+        return new RuntimeProfileDownloadError(response.message);
+    } catch {
+        return new RuntimeProfileDownloadError();
+    }
+};
+export const createRuntimeProfile = async (params: Host.RuntimeProfileCreate, currentNode?: string) => {
+    try {
+        const data = await http.download<Blob>(`/hosts/diagnostics/profiles`, params, {
+            responseType: 'blob',
+            timeout: TimeoutEnum.T_60S,
+            headers: currentNode ? { CurrentNode: currentNode } : undefined,
+        });
+        const profileError = await parseRuntimeProfileError(data);
+        if (profileError) {
+            throw profileError;
+        }
+        return data;
+    } catch (error) {
+        if (error instanceof RuntimeProfileDownloadError) {
+            throw error;
+        }
+        const responseData = (error as { response?: { data?: unknown } })?.response?.data;
+        const profileError = await parseRuntimeProfileError(responseData);
+        throw profileError || error;
+    }
+};
 // ssh
 export const getSSHInfo = (currentNode?: string) => {
     return http.post<Host.SSHInfo>(

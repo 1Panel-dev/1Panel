@@ -59,6 +59,7 @@
 
         <OpDialog ref="opRef" @search="search" />
         <ProcessDetail ref="detailRef" />
+        <RuntimeDiagnostics ref="runtimeDiagnosticsRef" />
     </div>
 </template>
 
@@ -71,6 +72,7 @@ import { stopProcess } from '@/api/modules/process';
 import { ProcessStore } from '@/store';
 import { SortBy, TableV2SortOrder, ElButton } from 'element-plus';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import RuntimeDiagnostics from './diagnostics/index.vue';
 
 const { currentNode } = useGlobalStore();
 const processStore = ProcessStore();
@@ -94,6 +96,7 @@ const sortState = ref<SortBy>({
 
 const data = ref<any[]>([]);
 const detailRef = ref();
+const runtimeDiagnosticsRef = ref<InstanceType<typeof RuntimeDiagnostics>>();
 const filters = ref<string[]>([]);
 
 const sortByNum = (a: any, b: any, prop: string): number => {
@@ -186,7 +189,7 @@ const columns = ref([
         key: 'actions',
         title: i18n.global.t('commons.table.operate'),
         dataKey: 'actions',
-        width: 300,
+        width: 420,
         cellRenderer: ({ rowData }) => {
             const stopButton = h(
                 ElButton,
@@ -197,7 +200,7 @@ const columns = ref([
                 () => i18n.global.t('process.stopProcess'),
             );
 
-            return h('div', { class: 'action-buttons' }, [
+            const buttons = [
                 h(
                     ElButton,
                     {
@@ -206,8 +209,23 @@ const columns = ref([
                     },
                     () => i18n.global.t('process.viewDetails'),
                 ),
-                permissionDirective ? withDirectives(stopButton, [[permissionDirective]]) : stopButton,
-            ]);
+            ];
+
+            if (rowData.name === '1panel-agent') {
+                buttons.push(
+                    h(
+                        ElButton,
+                        {
+                            type: 'text',
+                            onClick: openRuntimeDiagnostics,
+                        },
+                        () => i18n.global.t('monitor.runtimeDiagnostics'),
+                    ),
+                );
+            }
+
+            buttons.push(permissionDirective ? withDirectives(stopButton, [[permissionDirective]]) : stopButton);
+            return h('div', { class: 'action-buttons' }, buttons);
         },
     },
 ]);
@@ -248,6 +266,10 @@ watch(
 
 const openDetail = (row: any) => {
     detailRef.value.acceptParams(row.PID);
+};
+
+const openRuntimeDiagnostics = () => {
+    runtimeDiagnosticsRef.value?.acceptParams();
 };
 
 const changeSort = ({ key, order }) => {
