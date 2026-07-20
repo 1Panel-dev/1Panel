@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onBeforeUnmount, nextTick, computed, onMounted } from 'vue';
+import { ref, shallowRef, watch, onBeforeUnmount, nextTick, computed, onMounted } from 'vue';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
@@ -32,7 +32,7 @@ const terminalElement = ref<HTMLDivElement | null>(null);
 const fitAddon = new FitAddon();
 const termReady = ref(false);
 const webSocketReady = ref(false);
-const term = ref();
+const term = shallowRef<Terminal>();
 const terminalSocket = ref<WebSocket>();
 const heartbeatTimer = ref<NodeJS.Timer>();
 let initWebSocketToken = 0;
@@ -88,9 +88,9 @@ watch([backgroundColor, foregroundColor], ([newBackgroundColor, newForegroundCol
     applyTerminalBackground(newBackgroundColor);
 });
 const cursorStyle = computed(() => terminalStore.cursorStyle);
-watch(cursorStyle, (newCursorStyle) => {
+watch(cursorStyle, () => {
     if (!term.value) return;
-    term.value.options.cursorStyle = newCursorStyle;
+    term.value.options.cursorStyle = getStyle();
 });
 const cursorBlink = computed(() => terminalStore.cursorBlink);
 watch(cursorBlink, (newCursorBlink) => {
@@ -294,6 +294,7 @@ const showWebSocketAuthError = (message: string) => {
 
 const runRealTerminal = () => {
     webSocketReady.value = true;
+    term.value?.focus();
     if (initCmd.value !== '') {
         hideInitCmdEcho.value = true;
         initCmdEchoBuffer.value = '';
@@ -339,7 +340,6 @@ const onWSReceive = (message: MessageEvent) => {
     const wsMsg = JSON.parse(message.data);
     switch (wsMsg.type) {
         case 'cmd': {
-            term.value.element && term.value.focus();
             if (wsMsg.data) {
                 let receiveMsg = decodeBase64(wsMsg.data);
                 if (hideInitCmdEcho.value) {
