@@ -160,6 +160,29 @@ export namespace Host {
         endTime: Date;
     }
 
+    export interface RuntimeDiagnosticsSummary {
+        rss: number;
+        heapAlloc: number;
+        heapObjects: number;
+        goroutines: number;
+    }
+    export interface RuntimeGoroutineGroup {
+        state: string;
+        top: string;
+        count: number;
+        stack: string[];
+    }
+    export interface RuntimeGoroutineSnapshot {
+        total: number;
+        groupCount: number;
+        truncated: boolean;
+        capturedAt: string;
+        goroutines: RuntimeGoroutineGroup[];
+    }
+    export interface RuntimeProfileCreate {
+        type: 'cpu' | 'heap' | 'goroutine' | 'mutex' | 'block';
+        duration: number;
+    }
     export interface SSHInfo {
         autoStart: boolean;
         isActive: boolean;

@@ -1946,6 +1946,42 @@ const message = {
         down: 'Bajada',
         interval: 'Intervalo de Recolección',
         intervalHelper: 'Ingrese un intervalo de recolección de monitoreo apropiado (10 segundos - 12 horas)',
+        runtimeDiagnostics: 'Diagnóstico en tiempo de ejecución',
+        runtimeRSS: 'Memoria del proceso (RSS)',
+        runtimeHeapAlloc: 'Memoria del heap',
+        runtimeHeapObjects: 'Objetos del heap',
+        runtimeGoroutines: 'Goroutines',
+        goroutineSnapshot: 'Instantánea de Goroutines',
+        goroutineSummary: '{0} goroutines agrupadas en {1} pilas de llamadas',
+        goroutineTruncated: 'La instantánea es demasiado grande. Solo se muestran algunas pilas de llamadas.',
+        captureSnapshot: 'Actualizar instantánea',
+        count: 'Cantidad',
+        topFunction: 'Función superior',
+        manualCapture: 'Captura manual',
+        startCapture: 'Iniciar captura',
+        capturing: 'Capturando',
+        captureSuccess: 'Archivo de diagnóstico generado; descarga iniciada',
+        profileCPU: 'CPU',
+        profileHeap: 'Heap',
+        profileGoroutine: 'Goroutine',
+        profileMutex: 'Mutex',
+        profileBlock: 'Bloqueo',
+        runtimeRSSDesc:
+            'Memoria física ocupada por el proceso, incluido el heap de Go, las pilas de hilos y la memoria nativa.',
+        runtimeHeapAllocDesc:
+            'Memoria asignada en el heap de Go que aún no se ha liberado. Un crecimiento continuo puede indicar objetos retenidos.',
+        runtimeHeapObjectsDesc:
+            'Número de objetos vivos en el heap de Go. Un crecimiento continuo puede indicar objetos retenidos.',
+        runtimeGoroutineDesc:
+            'Tareas concurrentes ligeras actuales. Un crecimiento continuo puede indicar una fuga de goroutines.',
+        profileCPUDesc:
+            'Muestrea las pilas de CPU durante el tiempo seleccionado para localizar las funciones que consumen CPU.',
+        profileHeapDesc:
+            'Registra los objetos del heap aún en uso y sus pilas de asignación para investigar el crecimiento de memoria.',
+        profileGoroutineDesc: 'Guarda el estado y la pila de cada goroutine y agrupa las rutas de llamada idénticas.',
+        profileMutexDesc:
+            'Mide el tiempo de espera causado por la contención de mutex para localizar bloqueos disputados.',
+        profileBlockDesc: 'Mide los bloqueos en canales, select y primitivas de sincronización.',
     },
     terminal: {
         local: 'Local',

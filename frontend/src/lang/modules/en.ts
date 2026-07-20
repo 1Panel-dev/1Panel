@@ -1905,6 +1905,41 @@ const message = {
         down: 'Down',
         interval: 'Collection Interval',
         intervalHelper: 'Enter an appropriate monitoring collection interval (10 seconds - 12 hours)',
+        runtimeDiagnostics: 'Runtime Diagnostics',
+        runtimeRSS: 'Process Memory (RSS)',
+        runtimeHeapAlloc: 'Heap Memory',
+        runtimeHeapObjects: 'Heap Objects',
+        runtimeGoroutines: 'Goroutines',
+        goroutineSnapshot: 'Goroutine Snapshot',
+        goroutineSummary: '{0} goroutines grouped into {1} call stacks',
+        goroutineTruncated: 'The snapshot is too large. Only part of the call stacks are shown.',
+        captureSnapshot: 'Refresh Snapshot',
+        count: 'Count',
+        topFunction: 'Top Function',
+        manualCapture: 'Manual Capture',
+        startCapture: 'Start Capture',
+        capturing: 'Capturing',
+        captureSuccess: 'Diagnostic file generated; download started',
+        profileCPU: 'CPU',
+        profileHeap: 'Heap',
+        profileGoroutine: 'Goroutine',
+        profileMutex: 'Mutex',
+        profileBlock: 'Block',
+        runtimeRSSDesc:
+            'Physical memory currently occupied by the process, including the Go heap, thread stacks, and native memory.',
+        runtimeHeapAllocDesc:
+            'Memory allocated on the Go heap that has not been released. Sustained growth may indicate retained objects.',
+        runtimeHeapObjectsDesc:
+            'Number of live objects on the Go heap. Sustained growth may indicate retained objects.',
+        runtimeGoroutineDesc:
+            'Current lightweight concurrent tasks. Sustained growth usually warrants checking for goroutine leaks.',
+        profileCPUDesc:
+            'Samples CPU call stacks for the selected duration to locate functions that actually consume CPU.',
+        profileHeapDesc:
+            'Records Go heap objects still in use and their allocation stacks to investigate sustained memory growth.',
+        profileGoroutineDesc: 'Saves the state and call stack of every goroutine and groups identical call paths.',
+        profileMutexDesc: 'Measures wait time caused by mutex contention to locate lock contention hotspots.',
+        profileBlockDesc: 'Measures blocking on channels, select statements, and synchronization primitives.',
     },
     terminal: {
         local: 'Local',

@@ -1929,6 +1929,41 @@ const message = {
         down: 'Turun',
         interval: 'Selang Kumpulan',
         intervalHelper: 'Sila masukkan selang kumpulan pemantauan yang sesuai (10 saat - 12 jam)',
+        runtimeDiagnostics: 'Diagnostik Masa Jalan',
+        runtimeRSS: 'Memori Proses (RSS)',
+        runtimeHeapAlloc: 'Memori Heap',
+        runtimeHeapObjects: 'Objek Heap',
+        runtimeGoroutines: 'Goroutine',
+        goroutineSnapshot: 'Petikan Goroutine',
+        goroutineSummary: '{0} goroutine dikumpulkan kepada {1} tindanan panggilan',
+        goroutineTruncated: 'Petikan terlalu besar. Hanya sebahagian tindanan panggilan dipaparkan.',
+        captureSnapshot: 'Segarkan Petikan',
+        count: 'Bilangan',
+        topFunction: 'Fungsi Teratas',
+        manualCapture: 'Tangkapan Manual',
+        startCapture: 'Mula Tangkap',
+        capturing: 'Sedang Menangkap',
+        captureSuccess: 'Fail diagnostik dijana; muat turun dimulakan',
+        profileCPU: 'CPU',
+        profileHeap: 'Heap',
+        profileGoroutine: 'Goroutine',
+        profileMutex: 'Mutex',
+        profileBlock: 'Sekatan',
+        runtimeRSSDesc: 'Memori fizikal yang digunakan proses, termasuk heap Go, tindanan thread dan memori natif.',
+        runtimeHeapAllocDesc:
+            'Memori yang diperuntukkan pada heap Go dan belum dilepaskan. Pertumbuhan berterusan mungkin menunjukkan objek tertahan.',
+        runtimeHeapObjectsDesc:
+            'Bilangan objek hidup dalam heap Go. Pertumbuhan berterusan mungkin menunjukkan objek tertahan.',
+        runtimeGoroutineDesc:
+            'Bilangan tugas serentak ringan semasa. Pertumbuhan berterusan mungkin menunjukkan kebocoran Goroutine.',
+        profileCPUDesc:
+            'Mengambil sampel tindanan panggilan CPU untuk tempoh dipilih bagi mencari fungsi yang menggunakan CPU.',
+        profileHeapDesc:
+            'Merekod objek heap Go yang masih digunakan dan tindanan peruntukannya untuk menyiasat pertumbuhan memori.',
+        profileGoroutineDesc:
+            'Menyimpan keadaan dan tindanan panggilan setiap Goroutine serta mengumpulkan laluan yang sama.',
+        profileMutexDesc: 'Mengukur masa menunggu akibat persaingan mutex untuk mencari titik persaingan kunci.',
+        profileBlockDesc: 'Mengukur sekatan pada Channel, Select dan primitif penyegerakan.',
     },
     terminal: {
         local: 'Tempatan',
