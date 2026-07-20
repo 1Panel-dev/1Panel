@@ -8,7 +8,7 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/compose-spec/compose-go/v2 v2.13.0
 	github.com/creack/pty v1.1.24
-	github.com/docker/cli v29.6.1+incompatible
+	github.com/docker/cli v29.6.2+incompatible
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/docker/go-connections v0.7.0
 	github.com/fsnotify/fsnotify v1.10.1
