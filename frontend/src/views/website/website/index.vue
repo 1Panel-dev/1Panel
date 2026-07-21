@@ -67,6 +67,7 @@
             <template v-if="!openNginxConfig" #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
+                    :default-sort="tableSort.order ? tableSort : undefined"
                     v-model:view-mode="viewMode"
                     :data="data"
                     @sort-change="changeSort"
@@ -371,6 +372,7 @@ import { getWebsiteTypes } from '@/global/mimetype';
 import { routerToFileWithPath, routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
+import { usePageState } from '@/composables/usePageState';
 
 const { currentNode, isMobile } = useGlobalStore();
 useOperateNodeContext(currentNode);
@@ -423,21 +425,30 @@ const batchSetHttpsRef = ref();
 const nginxVersion = ref();
 const appStatusRef = ref();
 
-const paginationConfig = reactive({
-    cacheSizeKey: 'website-page-size',
-    currentPage: 1,
-    pageSize: Number(localStorage.getItem('website-page-size')) || 20,
-    total: 0,
-});
-let req = reactive({
-    name: '',
-    page: 1,
-    pageSize: 10,
-    orderBy: 'favorite',
-    order: 'descending',
-    websiteGroupId: 0,
-    type: '',
-});
+const pageState = usePageState(() => ({
+    paginationConfig: {
+        cacheSizeKey: 'website-page-size',
+        currentPage: 1,
+        pageSize: Number(localStorage.getItem('website-page-size')) || 20,
+        total: 0,
+    },
+    req: {
+        name: '',
+        page: 1,
+        pageSize: 10,
+        orderBy: 'favorite',
+        order: 'descending',
+        websiteGroupId: 0,
+        type: '',
+    },
+    tableSort: {
+        prop: '',
+        order: null as 'ascending' | 'descending' | null,
+    },
+}));
+const paginationConfig = pageState.paginationConfig;
+const req = pageState.req;
+const tableSort = pageState.tableSort;
 
 const goRouter = async (key: string) => {
     routerToNameWithQuery('AppAll', { install: key });
@@ -466,6 +477,8 @@ const disabledConfig = computed(() => {
 });
 
 const changeSort = ({ prop, order }) => {
+    tableSort.prop = prop || '';
+    tableSort.order = order || null;
     if (order) {
         switch (prop) {
             case 'primaryDomain':
@@ -502,9 +515,16 @@ const search = async () => {
         });
 };
 
-const listGroup = async () => {
+const listGroup = async (searchOnReset = true) => {
     const res = await getAgentGroupList('website');
     groups.value = res.data;
+    if (req.websiteGroupId !== 0 && !groups.value.some((group) => group.id === req.websiteGroupId)) {
+        req.websiteGroupId = 0;
+        paginationConfig.currentPage = 1;
+        if (searchOnReset) {
+            search();
+        }
+    }
 };
 
 const setting = () => {
@@ -728,9 +748,13 @@ const batchOp = () => {
     }
 };
 
-onMounted(() => {
+onMounted(async () => {
+    try {
+        await listGroup(false);
+    } catch {
+        // The request interceptor already reports the error; website loading should continue.
+    }
     search();
-    listGroup();
 });
 </script>
 

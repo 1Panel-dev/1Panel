@@ -4885,6 +4885,7 @@ const message = {
             provinceRuleLabel: 'Provincia',
             openRestyFeatureVersionAlert: 'OpenResty debe ser posterior a la versión 1.31.1.1-0 para que {0} funcione.',
             ipLocation: 'Ubicación IP',
+            ipLocationSearchHelper: 'Introduzca la ubicación de la IP; se admite búsqueda aproximada',
             action: 'Acción',
             ruleType: 'Tipo de ataque',
             ipHelper: 'Introduce la dirección IP',
@@ -5086,6 +5087,9 @@ const message = {
             observationModeConfirm:
                 'En el modo de observación, todas las coincidencias del WAF se registran sin bloquear solicitudes. ¿Continuar?',
             globalStrictRequired: 'Primero habilite el modo estricto en la configuración global',
+            websiteSearchHelper: 'Introduzca el dominio, alias o comentario del sitio web',
+            configReadFailed: 'No se pudo cargar la configuración',
+            detailSetting: 'Configuración detallada',
             observe: 'Observar',
             saveLog: 'Guardar log',
             remoteURLHelper: 'La URL remota debe tener solo una IP por línea y sin otros caracteres',

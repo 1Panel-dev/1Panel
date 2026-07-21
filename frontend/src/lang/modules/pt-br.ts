@@ -5054,6 +5054,7 @@ const message = {
             provinceRuleLabel: 'Província',
             openRestyFeatureVersionAlert: 'A versão do OpenResty deve ser superior a 1.31.1.1-0 para que {0} funcione.',
             ipLocation: 'Localização do IP',
+            ipLocationSearchHelper: 'Insira a localização do IP; pesquisa aproximada é suportada',
             action: 'Ação',
             ruleType: 'Tipo de ataque',
             ipHelper: 'Digite o endereço IP',
@@ -5262,6 +5263,9 @@ const message = {
             observationModeConfirm:
                 'No modo de observação, todas as correspondências do WAF são registradas sem bloquear solicitações. Continuar?',
             globalStrictRequired: 'Primeiro habilite o modo estrito nas configurações globais',
+            websiteSearchHelper: 'Digite o domínio, alias ou observação do site',
+            configReadFailed: 'Falha ao carregar a configuração',
+            detailSetting: 'Configurações detalhadas',
             observe: 'Observar',
             saveLog: 'Salvar log',
             remoteURLHelper: 'O URL remoto precisa garantir um IP por linha e nenhum outro caractere',

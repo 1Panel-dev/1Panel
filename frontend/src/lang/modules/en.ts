@@ -4835,6 +4835,7 @@ const message = {
             provinceRuleLabel: 'Province',
             openRestyFeatureVersionAlert: 'OpenResty must be newer than 1.31.1.1-0 for {0} to take effect.',
             ipLocation: 'IP Location',
+            ipLocationSearchHelper: 'Enter an IP location, fuzzy search supported',
             action: 'Action',
             ruleType: 'Attack Type',
             ipHelper: 'Enter the IP address',
@@ -5042,6 +5043,9 @@ const message = {
             observationModeConfirm:
                 'In observation mode, all WAF matches are logged without blocking requests. Continue?',
             globalStrictRequired: 'Enable strict mode in global settings first',
+            websiteSearchHelper: 'Enter a website domain, alias, or remark',
+            configReadFailed: 'Failed to load configuration',
+            detailSetting: 'Detailed settings',
             observe: 'Observe',
             saveLog: 'Save Log',
             remoteURLHelper: 'The remote URL needs to ensure one IP per line and no other characters',

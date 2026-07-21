@@ -4849,6 +4849,7 @@ const message = {
             openRestyFeatureVersionAlert:
                 '{0} を有効にするには、OpenResty のバージョンが 1.31.1.1-0 より新しい必要があります。',
             ipLocation: 'IP位置',
+            ipLocationSearchHelper: 'IP の所在地を入力してください（あいまい検索対応）',
             action: 'アクション',
             ruleType: '攻撃タイプ',
             ipHelper: 'IPアドレスを入力してください',
@@ -5053,6 +5054,9 @@ const message = {
             observationModeConfirm:
                 '監視モードでは、すべての WAF 検出をログに記録し、リクエストをブロックしません。続行しますか？',
             globalStrictRequired: '先にグローバル設定で厳格モードを有効にしてください',
+            websiteSearchHelper: 'サイトのドメイン、エイリアス、または備考を入力してください',
+            configReadFailed: '設定の読み込みに失敗しました',
+            detailSetting: '詳細設定',
             observe: '監視',
             saveLog: 'ログを保存',
             remoteURLHelper: 'リモート URL は、1行に1つのIPで、他の文字がないことを保証する必要があります',

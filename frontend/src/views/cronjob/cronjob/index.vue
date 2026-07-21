@@ -61,6 +61,11 @@
             <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
+                    :default-sort="
+                        paginationConfig.order !== 'null'
+                            ? { prop: paginationConfig.orderBy, order: paginationConfig.order }
+                            : undefined
+                    "
                     v-model:view-mode="viewMode"
                     v-model:selects="selects"
                     @sort-change="search"
@@ -268,7 +273,7 @@
 import Records from '@/views/cronjob/cronjob/record/index.vue';
 import Backups from '@/views/cronjob/cronjob/backup/index.vue';
 import Import from '@/views/cronjob/cronjob/import/index.vue';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, ref, toRefs } from 'vue';
 import {
     deleteCronjob,
     editCronjobGroup,
@@ -288,6 +293,7 @@ import { getGroupList } from '@/api/modules/group';
 import { routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
+import { usePageState } from '@/composables/usePageState';
 
 const { currentNode, isMobile } = useGlobalStore();
 useOperateNodeContext(currentNode);
@@ -306,24 +312,29 @@ const opExportRef = ref();
 const dialogImportRef = ref();
 
 const data = ref();
-const paginationConfig = reactive({
-    cacheSizeKey: 'cronjob-page-size',
-    currentPage: 1,
-    pageSize: Number(localStorage.getItem('cronjob-page-size')) || 20,
-    total: 0,
-    orderBy: 'createdAt',
-    order: 'null',
-});
-const searchName = ref();
-
-const defaultGroupID = ref<number>();
-const searchGroupID = ref<number>();
 const groupOptions = ref();
 const dialogGroupRef = ref();
+const pageState = usePageState(() => ({
+    paginationConfig: {
+        cacheSizeKey: 'cronjob-page-size',
+        currentPage: 1,
+        pageSize: Number(localStorage.getItem('cronjob-page-size')) || 20,
+        total: 0,
+        orderBy: 'createdAt',
+        order: 'null',
+    },
+    defaultGroupID: undefined as number | undefined,
+    searchName: undefined as string | undefined,
+    searchGroupID: undefined as number | undefined,
+}));
+const paginationConfig = pageState.paginationConfig;
+const { defaultGroupID, searchName, searchGroupID } = toRefs(pageState);
 
 const search = async (column?: any) => {
-    paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
-    paginationConfig.order = column?.order ? column.order : paginationConfig.order;
+    if (column) {
+        paginationConfig.orderBy = column.order ? column.prop : 'createdAt';
+        paginationConfig.order = column.order || 'null';
+    }
     let groupIDs;
     if (searchGroupID.value) {
         groupIDs = searchGroupID.value === defaultGroupID.value ? [searchGroupID.value, 0] : [searchGroupID.value];
@@ -454,6 +465,11 @@ const onSubmitExport = async () => {
 const loadGroups = async () => {
     const res = await getGroupList('cronjob');
     groupOptions.value = res.data || [];
+    const invalidGroup = searchGroupID.value && !groupOptions.value.some((group) => group.id === searchGroupID.value);
+    if (invalidGroup) {
+        searchGroupID.value = undefined;
+        paginationConfig.currentPage = 1;
+    }
     for (const group of groupOptions.value) {
         if (group.name === 'Default') {
             defaultGroupID.value = group.id;
@@ -477,6 +493,9 @@ const loadGroups = async () => {
             item.groupID = null;
             item.groupBelong = '-';
         }
+    }
+    if (invalidGroup) {
+        search();
     }
 };
 

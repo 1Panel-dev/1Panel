@@ -4753,6 +4753,7 @@ const message = {
             provinceRuleLabel: '성',
             openRestyFeatureVersionAlert: '{0}을(를) 적용하려면 OpenResty 버전이 1.31.1.1-0보다 높아야 합니다.',
             ipLocation: 'IP 위치',
+            ipLocationSearchHelper: 'IP 위치를 입력하세요. 부분 검색을 지원합니다',
             action: '동작',
             ruleType: '공격 유형',
             ipHelper: 'IP 주소를 입력하세요',
@@ -4953,6 +4954,9 @@ const message = {
             observationModeConfirm:
                 '관찰 모드에서는 모든 WAF 탐지를 기록하지만 요청을 차단하지 않습니다. 계속하시겠습니까?',
             globalStrictRequired: '먼저 전역 설정에서 엄격 모드를 활성화하세요',
+            websiteSearchHelper: '웹사이트 도메인, 별칭 또는 비고를 입력하세요',
+            configReadFailed: '설정을 불러오지 못했습니다',
+            detailSetting: '상세 설정',
             observe: '관찰',
             saveLog: '로그 저장',
             remoteURLHelper: '원격 URL은 한 줄에 하나의 IP만 포함하고 다른 문자는 포함하지 않아야 합니다',

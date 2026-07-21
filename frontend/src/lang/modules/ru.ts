@@ -4900,6 +4900,7 @@ const message = {
             provinceRuleLabel: 'Провинция',
             openRestyFeatureVersionAlert: 'Для работы функции «{0}» требуется версия OpenResty новее 1.31.1.1-0.',
             ipLocation: 'Местоположение IP',
+            ipLocationSearchHelper: 'Введите местоположение IP; поддерживается нечеткий поиск',
             action: 'Действие',
             ruleType: 'Тип атаки',
             ipHelper: 'Введите IP-адрес',
@@ -5108,6 +5109,9 @@ const message = {
             observationModeConfirm:
                 'В режиме наблюдения все срабатывания WAF записываются без блокировки запросов. Продолжить?',
             globalStrictRequired: 'Сначала включите строгий режим в глобальных настройках',
+            websiteSearchHelper: 'Введите домен, псевдоним или примечание сайта',
+            configReadFailed: 'Не удалось загрузить конфигурацию',
+            detailSetting: 'Подробные настройки',
             observe: 'Наблюдение',
             saveLog: 'Сохранить лог',
             remoteURLHelper: 'Удаленный URL должен содержать один IP на строку и не содержать других символов',

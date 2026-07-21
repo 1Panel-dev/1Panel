@@ -4912,6 +4912,7 @@ const message = {
             provinceRuleLabel: 'Wilayah pentadbiran',
             openRestyFeatureVersionAlert: 'OpenResty mesti lebih baharu daripada 1.31.1.1-0 agar {0} berfungsi.',
             ipLocation: 'Lokasi IP',
+            ipLocationSearchHelper: 'Masukkan lokasi IP; carian kabur disokong',
             action: 'Tindakan',
             ruleType: 'Jenis Serangan',
             ipHelper: 'Masukkan alamat IP',
@@ -5118,6 +5119,9 @@ const message = {
             observationModeConfirm:
                 'Dalam mod pemerhatian, semua padanan WAF direkod tanpa menyekat permintaan. Teruskan?',
             globalStrictRequired: 'Dayakan mod strict dalam tetapan global terlebih dahulu',
+            websiteSearchHelper: 'Masukkan domain, alias atau catatan laman web',
+            configReadFailed: 'Gagal memuatkan konfigurasi',
+            detailSetting: 'Tetapan terperinci',
             observe: 'Perhati',
             saveLog: 'Simpan Log',
             remoteURLHelper: 'URL jauh perlu memastikan satu IP setiap baris dan tiada aksara lain',

@@ -4897,6 +4897,7 @@ const message = {
             openRestyFeatureVersionAlert:
                 '{0} özelliğinin çalışması için OpenResty sürümü 1.31.1.1-0 sürümünden daha yeni olmalıdır.',
             ipLocation: 'IP Konumu',
+            ipLocationSearchHelper: 'IP konumunu girin; bulanık arama desteklenir',
             action: 'Eylem',
             ruleType: 'Saldırı Türü',
             ipHelper: 'IP adresini girin',
@@ -5103,6 +5104,9 @@ const message = {
             observationModeConfirm:
                 'Gözlem modunda tüm WAF eşleşmeleri istekler engellenmeden kaydedilir. Devam edilsin mi?',
             globalStrictRequired: 'Önce genel ayarlarda katı modu etkinleştirin',
+            websiteSearchHelper: 'Web sitesi alan adı, takma adı veya açıklaması girin',
+            configReadFailed: 'Yapılandırma yüklenemedi',
+            detailSetting: 'Ayrıntılı ayarlar',
             observe: 'Gözlem',
             saveLog: 'Günlüğü Kaydet',
             remoteURLHelper: 'Uzak URL, her satırda bir IP içermeli ve başka karakter olmamalıdır',
