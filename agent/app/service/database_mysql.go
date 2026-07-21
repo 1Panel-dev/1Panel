@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -28,6 +29,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 type MysqlService struct{}
@@ -50,6 +52,7 @@ type IMysqlService interface {
 	CreateUser(req dto.MysqlUserCreate) error
 	UpdateUser(req dto.MysqlUserUpdate) error
 	ChangeUserPassword(req dto.MysqlUserPassword) error
+	SaveUserPassword(req dto.MysqlUserPassword) error
 	DeleteUser(req dto.MysqlUserDelete) error
 	GrantUser(req dto.MysqlGrantCreate) error
 	RevokeGrant(req dto.MysqlGrantDelete) error
@@ -148,68 +151,118 @@ func saveDatabaseUserCredentials(dbType, database, username, permission, passwor
 	return nil
 }
 
-func loadDatabaseUserMetaMap(dbType, database string) (map[string]model.DatabaseUser, error) {
-	userMetas, err := databaseUserRepo.List(repo.WithByType(normalizeDatabaseUserType(dbType)), databaseUserRepo.WithByDatabase(database))
-	if err != nil {
-		return nil, err
-	}
-	metaMap := make(map[string]model.DatabaseUser, len(userMetas))
-	for _, item := range userMetas {
-		metaMap[databaseUserKey(item.Username, item.Host)] = item
-	}
-	return metaMap, nil
-}
-
-type mysqlPasswordAppTarget struct {
+type mysqlUserAppTarget struct {
 	Key  string
 	Name string
 }
 
-func loadMysqlPasswordAppTargets(dbType, database, username, host string, grants []client.GrantInfo) ([]mysqlPasswordAppTarget, error) {
-	targets := make([]mysqlPasswordAppTarget, 0)
-	for _, grant := range grants {
-		if grant.Username != username || grant.Host != host {
+func loadMysqlUserAppTargets(dbType, database, username, host string, dbNames ...string) ([]mysqlUserAppTarget, error) {
+	if host != "%" {
+		return nil, nil
+	}
+	dbNameSet := make(map[string]struct{}, len(dbNames))
+	for _, dbName := range dbNames {
+		dbNameSet[dbName] = struct{}{}
+	}
+	dbItems, err := mysqlRepo.List(mysqlRepo.WithByMysqlName(database))
+	if err != nil {
+		return nil, err
+	}
+	localResourceIDs := make([]uint, 0, len(dbItems))
+	remoteResourceIDs := make([]uint, 0, len(dbItems))
+	for _, dbItem := range dbItems {
+		if len(dbNameSet) != 0 {
+			if _, ok := dbNameSet[dbItem.Name]; !ok {
+				continue
+			}
+		}
+		if dbItem.ID == 0 {
 			continue
 		}
-		dbItem, err := mysqlRepo.Get(mysqlRepo.WithByMysqlName(database), repo.WithByName(grant.Database))
-		if err != nil || dbItem.ID == 0 {
-			continue
-		}
-		var appRess []model.AppInstallResource
 		if dbItem.From == "local" {
-			app, err := appInstallRepo.LoadBaseInfo(dbType, database)
-			if err != nil {
-				return nil, err
-			}
-			appRess, err = appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(dbItem.ID))
-			if err != nil {
-				return nil, err
-			}
+			localResourceIDs = append(localResourceIDs, dbItem.ID)
 		} else {
-			appRess, err = appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(dbItem.ID))
-			if err != nil {
-				return nil, err
-			}
+			remoteResourceIDs = append(remoteResourceIDs, dbItem.ID)
 		}
-		for _, appRes := range appRess {
-			appInstall, err := appInstallRepo.GetFirst(repo.WithByID(appRes.AppInstallId))
-			if err != nil {
-				return nil, err
-			}
-			appModel, err := appRepo.GetFirst(repo.WithByID(appInstall.AppId))
-			if err != nil {
-				return nil, err
-			}
-			if _, err := os.ReadFile(appInstall.GetEnvPath()); err != nil {
-				return nil, err
-			}
-			targets = append(targets, mysqlPasswordAppTarget{Key: appModel.Key, Name: appInstall.Name})
+	}
+
+	appResources := make([]model.AppInstallResource, 0)
+	if len(localResourceIDs) != 0 {
+		app, err := appInstallRepo.LoadBaseInfo(dbType, database)
+		if err != nil {
+			return nil, err
 		}
+		resources, err := appInstallResourceRepo.GetBy(
+			appInstallResourceRepo.WithLinkId(app.ID),
+			appInstallResourceRepo.WithResourceIds(localResourceIDs),
+		)
+		if err != nil {
+			return nil, err
+		}
+		appResources = append(appResources, resources...)
+	}
+	if len(remoteResourceIDs) != 0 {
+		resources, err := appInstallResourceRepo.GetBy(
+			appInstallResourceRepo.WithResourceIds(remoteResourceIDs),
+			appRepo.WithKey(dbType),
+		)
+		if err != nil {
+			return nil, err
+		}
+		appResources = append(appResources, resources...)
+	}
+
+	appInstallIDs := make([]uint, 0, len(appResources))
+	appInstallIDSet := make(map[uint]struct{}, len(appResources))
+	for _, appResource := range appResources {
+		if appResource.AppInstallId == 0 {
+			continue
+		}
+		if _, ok := appInstallIDSet[appResource.AppInstallId]; ok {
+			continue
+		}
+		appInstallIDSet[appResource.AppInstallId] = struct{}{}
+		appInstallIDs = append(appInstallIDs, appResource.AppInstallId)
+	}
+	if len(appInstallIDs) == 0 {
+		return nil, nil
+	}
+	appInstalls, err := appInstallRepo.ListBy(context.Background(), repo.WithByIDs(appInstallIDs))
+	if err != nil {
+		return nil, err
+	}
+	targets := make([]mysqlUserAppTarget, 0, len(appInstalls))
+	for _, appInstall := range appInstalls {
+		var envMap map[string]interface{}
+		if err := json.Unmarshal([]byte(appInstall.Env), &envMap); err != nil {
+			return nil, err
+		}
+		appUsername, ok := envMap["PANEL_DB_USER"].(string)
+		if !ok || appUsername != username {
+			continue
+		}
+		targets = append(targets, mysqlUserAppTarget{Key: appInstall.App.Key, Name: appInstall.Name})
 	}
 	return targets, nil
 }
 
-func updateMysqlPasswordAppTargets(targets []mysqlPasswordAppTarget, password string) error {
+func checkMysqlUserAppUsage(dbType, database, username, host string, dbNames ...string) error {
+	targets, err := loadMysqlUserAppTargets(dbType, database, username, host, dbNames...)
+	if err != nil {
+		return err
+	}
+	if len(targets) == 0 {
+		return nil
+	}
+	appNames := make([]string, 0, len(targets))
+	for _, target := range targets {
+		appNames = append(appNames, target.Name)
+	}
+	sort.Strings(appNames)
+	return buserr.WithDetail("ErrMysqlUserUsedByApps", strings.Join(appNames, ", "), nil)
+}
+
+func updateMysqlPasswordAppTargets(targets []mysqlUserAppTarget, password string) error {
 	for _, target := range targets {
 		global.LOG.Infof("start to update mysql password used by app %s-%s", target.Key, target.Name)
 		if err := updateInstallInfoInDB(target.Key, target.Name, "user-password", password); err != nil {
@@ -238,7 +291,7 @@ func syncDatabaseUserMetadata(dbType, database string, users []client.UserInfo) 
 		userMap[key] = struct{}{}
 		if meta, ok := metaMap[key]; ok {
 			if meta.IsDelete {
-				if err := databaseUserRepo.Update(map[string]interface{}{"is_delete": false}, repo.WithByType(dbType), databaseUserRepo.WithByDatabase(database), databaseUserRepo.WithByUser(item.Username, item.Host)); err != nil {
+				if err := databaseUserRepo.Update(map[string]interface{}{"is_delete": false, "password": ""}, repo.WithByType(dbType), databaseUserRepo.WithByDatabase(database), databaseUserRepo.WithByUser(item.Username, item.Host)); err != nil {
 					return err
 				}
 			}
@@ -263,11 +316,58 @@ func syncDatabaseUserMetadata(dbType, database string, users []client.UserInfo) 
 		if item.IsDelete {
 			continue
 		}
-		if err := databaseUserRepo.Update(map[string]interface{}{"is_delete": true}, repo.WithByType(dbType), databaseUserRepo.WithByDatabase(database), databaseUserRepo.WithByUser(item.Username, item.Host)); err != nil {
+		if err := databaseUserRepo.Update(map[string]interface{}{"is_delete": true, "password": ""}, repo.WithByType(dbType), databaseUserRepo.WithByDatabase(database), databaseUserRepo.WithByUser(item.Username, item.Host)); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func saveDatabaseUserGrant(dbType, database, dbName, username, host string) error {
+	dbType = normalizeDatabaseUserType(dbType)
+	grant, err := databaseUserGrantRepo.Get(
+		repo.WithByType(dbType),
+		databaseUserGrantRepo.WithByDatabase(database),
+		databaseUserGrantRepo.WithByDBName(dbName),
+		databaseUserGrantRepo.WithByUser(username, host),
+	)
+	if err == nil && grant.ID != 0 {
+		return nil
+	}
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+	return databaseUserGrantRepo.Save(&model.DatabaseUserGrant{
+		Type:     dbType,
+		Database: database,
+		DBName:   dbName,
+		Username: username,
+		Host:     host,
+	})
+}
+
+func syncDatabaseUserGrants(dbType, database string, grants []client.GrantInfo) error {
+	dbType = normalizeDatabaseUserType(dbType)
+	items := make([]model.DatabaseUserGrant, 0, len(grants))
+	grantMap := make(map[string]struct{}, len(grants))
+	for _, item := range grants {
+		if isMysqlSystemUser(item.Username) || item.Database == "*" {
+			continue
+		}
+		key := item.Database + "\x00" + item.Username + "\x00" + item.Host
+		if _, ok := grantMap[key]; ok {
+			continue
+		}
+		grantMap[key] = struct{}{}
+		items = append(items, model.DatabaseUserGrant{
+			Type:     dbType,
+			Database: database,
+			DBName:   item.Database,
+			Username: item.Username,
+			Host:     item.Host,
+		})
+	}
+	return databaseUserGrantRepo.Replace(dbType, database, items)
 }
 
 func (u *MysqlService) SearchWithPage(search dto.MysqlDBSearch) (int64, interface{}, error) {
@@ -368,6 +468,11 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		if err := saveDatabaseUserCredentials(dbType, req.Database, req.Username, req.Permission, req.Password, req.Description); err != nil {
 			return nil, err
 		}
+		for _, host := range splitMysqlHosts(req.Permission) {
+			if err := saveDatabaseUserGrant(dbType, req.Database, req.Name, req.Username, host); err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	global.LOG.Infof("create database %s successful!", req.Name)
@@ -382,50 +487,38 @@ func (u *MysqlService) ListUsers(req dto.MysqlUserSearch) ([]dto.MysqlUser, erro
 	if err != nil {
 		return nil, err
 	}
-	cli, _, err := LoadMysqlClientByFrom(req.Database)
-	if err != nil {
-		return nil, err
-	}
-	defer cli.Close()
-	users, err := cli.ListUsers(300)
+	users, err := databaseUserRepo.List(repo.WithByType(dbType), databaseUserRepo.WithByDatabase(req.Database))
 	if err != nil {
 		return nil, err
 	}
 	res := make([]dto.MysqlUser, 0, len(users))
-	metaMap, err := loadDatabaseUserMetaMap(dbType, req.Database)
-	if err != nil {
-		return nil, err
-	}
 	for _, user := range users {
 		if isMysqlSystemUser(user.Username) {
 			continue
 		}
-		item := dto.MysqlUser{Username: user.Username, Host: user.Host}
-		if meta, ok := metaMap[databaseUserKey(user.Username, user.Host)]; ok {
-			item.Password = meta.Password
-			item.Description = meta.Description
-		}
-		res = append(res, item)
+		res = append(res, dto.MysqlUser{
+			Username:    user.Username,
+			Host:        user.Host,
+			Password:    user.Password,
+			Description: user.Description,
+			IsDelete:    user.IsDelete,
+		})
 	}
 	return res, nil
 }
 
 func (u *MysqlService) ListGrants(req dto.MysqlUserSearch) ([]dto.MysqlGrant, error) {
-	cli, _, err := LoadMysqlClientByFrom(req.Database)
+	dbType, err := resolveDatabaseUserType(req.Database)
 	if err != nil {
 		return nil, err
 	}
-	defer cli.Close()
-	grants, err := cli.ListGrants(300)
+	grants, err := databaseUserGrantRepo.List(repo.WithByType(dbType), databaseUserGrantRepo.WithByDatabase(req.Database))
 	if err != nil {
 		return nil, err
 	}
 	res := make([]dto.MysqlGrant, 0, len(grants))
 	for _, grant := range grants {
-		if isMysqlSystemUser(grant.Username) {
-			continue
-		}
-		res = append(res, dto.MysqlGrant{Database: grant.Database, Username: grant.Username, Host: grant.Host})
+		res = append(res, dto.MysqlGrant{Database: grant.DBName, Username: grant.Username, Host: grant.Host})
 	}
 	return res, nil
 }
@@ -433,11 +526,16 @@ func (u *MysqlService) ListGrants(req dto.MysqlUserSearch) ([]dto.MysqlGrant, er
 func (u *MysqlService) ListGrantSummary(req dto.MysqlGrantSummarySearch) (map[string][]dto.MysqlUser, error) {
 	res := make(map[string][]dto.MysqlUser, len(req.DBs))
 	dbMap := make(map[string]struct{}, len(req.DBs))
+	dbNames := make([]string, 0, len(req.DBs))
 	for _, item := range req.DBs {
 		if item == "" {
 			continue
 		}
+		if _, ok := dbMap[item]; ok {
+			continue
+		}
 		dbMap[item] = struct{}{}
+		dbNames = append(dbNames, item)
 		res[item] = []dto.MysqlUser{}
 	}
 	if len(dbMap) == 0 {
@@ -447,35 +545,47 @@ func (u *MysqlService) ListGrantSummary(req dto.MysqlGrantSummarySearch) (map[st
 	if err != nil {
 		return nil, err
 	}
-
-	cli, _, err := LoadMysqlClientByFrom(req.Database)
+	grants, err := databaseUserGrantRepo.List(
+		repo.WithByType(dbType),
+		databaseUserGrantRepo.WithByDatabase(req.Database),
+		databaseUserGrantRepo.WithByDBNames(dbNames),
+	)
 	if err != nil {
 		return nil, err
 	}
-	defer cli.Close()
-	grants, err := cli.ListGrants(300)
+	userList := make([][2]string, 0, len(grants))
+	userSet := make(map[string]struct{}, len(grants))
+	for _, grant := range grants {
+		key := databaseUserKey(grant.Username, grant.Host)
+		if _, ok := userSet[key]; ok {
+			continue
+		}
+		userSet[key] = struct{}{}
+		userList = append(userList, [2]string{grant.Username, grant.Host})
+	}
+	userMetas, err := databaseUserRepo.List(
+		repo.WithByType(dbType),
+		databaseUserRepo.WithByDatabase(req.Database),
+		databaseUserRepo.WithByUserList(userList),
+	)
 	if err != nil {
 		return nil, err
 	}
-
-	metaMap, err := loadDatabaseUserMetaMap(dbType, req.Database)
-	if err != nil {
-		return nil, err
+	metaMap := make(map[string]model.DatabaseUser, len(userMetas))
+	for _, item := range userMetas {
+		metaMap[databaseUserKey(item.Username, item.Host)] = item
 	}
 
 	for _, grant := range grants {
-		if isMysqlSystemUser(grant.Username) {
+		if _, ok := dbMap[grant.DBName]; !ok {
 			continue
 		}
-		if _, ok := dbMap[grant.Database]; !ok {
+		meta, ok := metaMap[databaseUserKey(grant.Username, grant.Host)]
+		if !ok || meta.IsDelete {
 			continue
 		}
-		item := dto.MysqlUser{Username: grant.Username, Host: grant.Host}
-		if meta, ok := metaMap[databaseUserKey(grant.Username, grant.Host)]; ok {
-			item.Password = meta.Password
-			item.Description = meta.Description
-		}
-		res[grant.Database] = append(res[grant.Database], item)
+		item := dto.MysqlUser{Username: grant.Username, Host: grant.Host, Description: meta.Description}
+		res[grant.DBName] = append(res[grant.DBName], item)
 	}
 	return res, nil
 }
@@ -518,6 +628,9 @@ func (u *MysqlService) UpdateUser(req dto.MysqlUserUpdate) error {
 		if targetUser.ID != 0 {
 			return buserr.New("ErrRecordExist")
 		}
+		if err := checkMysqlUserAppUsage(dbType, req.Database, req.Username, req.Host); err != nil {
+			return err
+		}
 		cli, _, err := LoadMysqlClientByFrom(req.Database)
 		if err != nil {
 			return err
@@ -541,6 +654,14 @@ func (u *MysqlService) UpdateUser(req dto.MysqlUserUpdate) error {
 			if rollbackErr := cli.UpdateUser(client.UserUpdateInfo{Username: req.Username, Host: req.NewHost, NewHost: req.Host}, 300); rollbackErr != nil {
 				global.LOG.Errorf("rollback mysql user %s host from %s to %s failed, err: %v", req.Username, req.NewHost, req.Host, rollbackErr)
 			}
+			return err
+		}
+		if err := databaseUserGrantRepo.Update(
+			map[string]interface{}{"host": req.NewHost},
+			repo.WithByType(dbType),
+			databaseUserGrantRepo.WithByDatabase(req.Database),
+			databaseUserGrantRepo.WithByUser(req.Username, req.Host),
+		); err != nil {
 			return err
 		}
 		return nil
@@ -579,9 +700,18 @@ func (u *MysqlService) ChangeUserPassword(req dto.MysqlUserPassword) error {
 	if err != nil {
 		return err
 	}
-	appTargets, err := loadMysqlPasswordAppTargets(dbType, req.Database, req.Username, req.Host, grants)
-	if err != nil {
-		return err
+	grantDBs := make([]string, 0)
+	for _, grant := range grants {
+		if grant.Username == req.Username && grant.Host == req.Host {
+			grantDBs = append(grantDBs, grant.Database)
+		}
+	}
+	var appTargets []mysqlUserAppTarget
+	if len(grantDBs) != 0 {
+		appTargets, err = loadMysqlUserAppTargets(dbType, req.Database, req.Username, req.Host, grantDBs...)
+		if err != nil {
+			return err
+		}
 	}
 	if err := cli.ChangePassword(client.PasswordChangeInfo{
 		Username:   req.Username,
@@ -609,6 +739,28 @@ func (u *MysqlService) ChangeUserPassword(req dto.MysqlUserPassword) error {
 	return updateMysqlPasswordAppTargets(appTargets, req.Password)
 }
 
+func (u *MysqlService) SaveUserPassword(req dto.MysqlUserPassword) error {
+	if cmd.CheckIllegal(req.Username, req.Host, req.Password) {
+		return buserr.New("ErrCmdIllegal")
+	}
+	if err := checkMysqlNormalUser(req.Username); err != nil {
+		return err
+	}
+	dbType, err := resolveDatabaseUserType(req.Database)
+	if err != nil {
+		return err
+	}
+	user, err := databaseUserRepo.Get(repo.WithByType(dbType), databaseUserRepo.WithByDatabase(req.Database), databaseUserRepo.WithByUser(req.Username, req.Host))
+	if err != nil {
+		return err
+	}
+	if user.IsDelete {
+		return errors.New("cannot save password for a deleted mysql user")
+	}
+	user.Password = req.Password
+	return databaseUserRepo.Save(&user)
+}
+
 func (u *MysqlService) DeleteUser(req dto.MysqlUserDelete) error {
 	if cmd.CheckIllegal(req.Username, req.Host) {
 		return buserr.New("ErrCmdIllegal")
@@ -620,16 +772,27 @@ func (u *MysqlService) DeleteUser(req dto.MysqlUserDelete) error {
 	if err != nil {
 		return err
 	}
-	cli, version, err := LoadMysqlClientByFrom(req.Database)
-	if err != nil {
+	if err := checkMysqlUserAppUsage(dbType, req.Database, req.Username, req.Host); err != nil {
 		return err
 	}
-	defer cli.Close()
-	if err := cli.DeleteUser(client.UserInfo{Username: req.Username, Host: req.Host}, version, 300); err != nil {
+	user, err := databaseUserRepo.Get(repo.WithByType(dbType), databaseUserRepo.WithByDatabase(req.Database), databaseUserRepo.WithByUser(req.Username, req.Host))
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
-	_ = databaseUserRepo.Delete(repo.WithByType(dbType), databaseUserRepo.WithByDatabase(req.Database), databaseUserRepo.WithByUser(req.Username, req.Host))
-	return nil
+	if err != nil || !user.IsDelete {
+		cli, version, err := LoadMysqlClientByFrom(req.Database)
+		if err != nil {
+			return err
+		}
+		defer cli.Close()
+		if err := cli.DeleteUser(client.UserInfo{Username: req.Username, Host: req.Host}, version, 300); err != nil {
+			return err
+		}
+	}
+	if err := databaseUserGrantRepo.Delete(repo.WithByType(dbType), databaseUserGrantRepo.WithByDatabase(req.Database), databaseUserGrantRepo.WithByUser(req.Username, req.Host)); err != nil {
+		return err
+	}
+	return databaseUserRepo.Delete(repo.WithByType(dbType), databaseUserRepo.WithByDatabase(req.Database), databaseUserRepo.WithByUser(req.Username, req.Host))
 }
 
 func (u *MysqlService) GrantUser(req dto.MysqlGrantCreate) error {
@@ -642,6 +805,10 @@ func (u *MysqlService) GrantUser(req dto.MysqlGrantCreate) error {
 	if err := checkMysqlNormalUser(req.Username); err != nil {
 		return err
 	}
+	dbType, err := resolveDatabaseUserType(req.Database)
+	if err != nil {
+		return err
+	}
 	cli, _, err := LoadMysqlClientByFrom(req.Database)
 	if err != nil {
 		return err
@@ -650,7 +817,7 @@ func (u *MysqlService) GrantUser(req dto.MysqlGrantCreate) error {
 	if err := cli.GrantUser(client.GrantInfo{Database: req.DB, Username: req.Username, Host: req.Host}, 300); err != nil {
 		return err
 	}
-	return nil
+	return saveDatabaseUserGrant(dbType, req.Database, req.DB, req.Username, req.Host)
 }
 
 func (u *MysqlService) RevokeGrant(req dto.MysqlGrantDelete) error {
@@ -663,6 +830,13 @@ func (u *MysqlService) RevokeGrant(req dto.MysqlGrantDelete) error {
 	if err := checkMysqlNormalUser(req.Username); err != nil {
 		return err
 	}
+	dbType, err := resolveDatabaseUserType(req.Database)
+	if err != nil {
+		return err
+	}
+	if err := checkMysqlUserAppUsage(dbType, req.Database, req.Username, req.Host, req.DB); err != nil {
+		return err
+	}
 	cli, _, err := LoadMysqlClientByFrom(req.Database)
 	if err != nil {
 		return err
@@ -671,7 +845,12 @@ func (u *MysqlService) RevokeGrant(req dto.MysqlGrantDelete) error {
 	if err := cli.RevokeGrant(client.GrantInfo{Database: req.DB, Username: req.Username, Host: req.Host}, 300); err != nil {
 		return err
 	}
-	return nil
+	return databaseUserGrantRepo.Delete(
+		repo.WithByType(dbType),
+		databaseUserGrantRepo.WithByDatabase(req.Database),
+		databaseUserGrantRepo.WithByDBName(req.DB),
+		databaseUserGrantRepo.WithByUser(req.Username, req.Host),
+	)
 }
 
 func (u *MysqlService) LoadFromRemote(req dto.MysqlLoadDB) error {
@@ -683,6 +862,7 @@ func (u *MysqlService) LoadFromRemote(req dto.MysqlLoadDB) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	databases, err := mysqlRepo.List(mysqlRepo.WithByMysqlName(req.Database))
 	if err != nil {
@@ -696,7 +876,14 @@ func (u *MysqlService) LoadFromRemote(req dto.MysqlLoadDB) error {
 	if err != nil {
 		return err
 	}
+	grants, err := client.ListGrants(300)
+	if err != nil {
+		return err
+	}
 	if err := syncDatabaseUserMetadata(dbType, req.Database, users); err != nil {
+		return err
+	}
+	if err := syncDatabaseUserGrants(dbType, req.Database, grants); err != nil {
 		return err
 	}
 	deleteList := databases
@@ -735,22 +922,28 @@ func (u *MysqlService) UpdateDescription(req dto.UpdateDescription) error {
 	return mysqlRepo.Update(req.ID, map[string]interface{}{"description": req.Description})
 }
 
-func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]dto.DBResource, error) {
+func loadMysqlDeleteTarget(id uint) (model.DatabaseMysql, string, error) {
+	db, err := mysqlRepo.Get(repo.WithByID(id))
+	if err != nil {
+		return db, "", err
+	}
+	dbType, err := resolveDatabaseUserType(db.MysqlName)
+	if err != nil {
+		return db, "", err
+	}
+	return db, dbType, nil
+}
+
+func (u *MysqlService) deleteCheck(db model.DatabaseMysql, dbType string) ([]dto.DBResource, error) {
 	var res []dto.DBResource
-	db, err := mysqlRepo.Get(repo.WithByID(req.ID))
+	websites, err := websiteRepo.GetBy(
+		websiteRepo.WithDBTypes([]string{constant.AppMysql, constant.AppMariaDB, constant.AppMysqlCluster}),
+		websiteRepo.WithDBID(db.ID),
+	)
 	if err != nil {
 		return res, err
 	}
-
-	website, _ := websiteRepo.GetFirst(websiteRepo.WithDBType(constant.AppMysql), websiteRepo.WithDBID(req.ID))
-	if website.ID != 0 {
-		res = append(res, dto.DBResource{
-			Type: constant.TypeWebsite,
-			Name: website.PrimaryDomain,
-		})
-	}
-	website, _ = websiteRepo.GetFirst(websiteRepo.WithDBType(constant.AppMysqlCluster), websiteRepo.WithDBID(req.ID))
-	if website.ID != 0 {
+	for _, website := range websites {
 		res = append(res, dto.DBResource{
 			Type: constant.TypeWebsite,
 			Name: website.PrimaryDomain,
@@ -758,13 +951,22 @@ func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]dto.DBResource
 	}
 
 	if db.From == "local" {
-		app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
+		app, err := appInstallRepo.LoadBaseInfo(dbType, db.MysqlName)
 		if err != nil {
 			return res, err
 		}
-		apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(db.ID))
+		apps, err := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(db.ID))
+		if err != nil {
+			return res, err
+		}
 		for _, app := range apps {
-			appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
+			appInstall, err := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
+			if err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					continue
+				}
+				return res, err
+			}
 			if appInstall.ID != 0 {
 				res = append(res, dto.DBResource{
 					Type: constant.TypeApp,
@@ -773,9 +975,18 @@ func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]dto.DBResource
 			}
 		}
 	} else {
-		apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(db.ID), appRepo.WithKey(req.Type))
+		apps, err := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(db.ID), appRepo.WithKey(dbType))
+		if err != nil {
+			return res, err
+		}
 		for _, app := range apps {
-			appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
+			appInstall, err := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
+			if err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					continue
+				}
+				return res, err
+			}
 			if appInstall.ID != 0 {
 				res = append(res, dto.DBResource{
 					Type: constant.TypeApp,
@@ -788,12 +999,50 @@ func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]dto.DBResource
 	return res, nil
 }
 
+func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]dto.DBResource, error) {
+	db, dbType, err := loadMysqlDeleteTarget(req.ID)
+	if err != nil {
+		return nil, err
+	}
+	return u.deleteCheck(db, dbType)
+}
+
 func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error {
-	db, err := mysqlRepo.Get(repo.WithByID(req.ID))
-	if err != nil && !req.ForceDelete {
+	return u.delete(ctx, req, nil)
+}
+
+func (u *MysqlService) delete(ctx context.Context, req dto.MysqlDBDelete, exclusions []dto.DBResource) error {
+	db, dbType, err := loadMysqlDeleteTarget(req.ID)
+	if err != nil {
 		return err
 	}
-	cli, version, err := LoadMysqlClientByFrom(req.Database)
+	resources, err := u.deleteCheck(db, dbType)
+	if err != nil {
+		return err
+	}
+	if len(exclusions) != 0 {
+		exclusionMap := make(map[string]struct{}, len(exclusions))
+		for _, exclusion := range exclusions {
+			exclusionMap[exclusion.Type+"\x00"+exclusion.Name] = struct{}{}
+		}
+		filtered := resources[:0]
+		for _, resource := range resources {
+			if _, ok := exclusionMap[resource.Type+"\x00"+resource.Name]; ok {
+				continue
+			}
+			filtered = append(filtered, resource)
+		}
+		resources = filtered
+	}
+	if len(resources) != 0 {
+		names := make([]string, 0, len(resources))
+		for _, resource := range resources {
+			names = append(names, resource.Name)
+		}
+		sort.Strings(names)
+		return buserr.WithDetail("ErrInUsed", strings.Join(names, ", "), nil)
+	}
+	cli, version, err := LoadMysqlClientByFrom(db.MysqlName)
 	if err != nil {
 		return err
 	}
@@ -807,20 +1056,29 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 	}
 
 	if req.DeleteBackup {
-		uploadDir := filepath.Join(global.Dir.DataDir, fmt.Sprintf("uploads/database/%s/%s/%s", req.Type, req.Database, db.Name))
+		uploadDir := filepath.Join(global.Dir.DataDir, fmt.Sprintf("uploads/database/%s/%s/%s", dbType, db.MysqlName, db.Name))
 		if _, err := os.Stat(uploadDir); err == nil {
 			_ = os.RemoveAll(uploadDir)
 		}
-		backupDir := filepath.Join(global.Dir.LocalBackupDir, fmt.Sprintf("database/%s/%s/%s", req.Type, db.MysqlName, db.Name))
+		backupDir := filepath.Join(global.Dir.LocalBackupDir, fmt.Sprintf("database/%s/%s/%s", dbType, db.MysqlName, db.Name))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
-		_ = backupRepo.DeleteRecord(ctx, repo.WithByType(req.Type), repo.WithByName(req.Database), repo.WithByDetailName(db.Name))
-		global.LOG.Infof("delete database %s-%s backups successful", req.Database, db.Name)
+		_ = backupRepo.DeleteRecord(ctx, repo.WithByType(dbType), repo.WithByName(db.MysqlName), repo.WithByDetailName(db.Name))
+		global.LOG.Infof("delete database %s-%s backups successful", db.MysqlName, db.Name)
 	}
 
 	_ = mysqlRepo.Delete(ctx, repo.WithByID(db.ID))
 	return nil
+}
+
+func deleteMysqlDatabaseForResourceOwner(ctx context.Context, req dto.MysqlDBDelete, owner dto.DBResource) error {
+	return (&MysqlService{}).delete(ctx, req, []dto.DBResource{owner})
+}
+
+func isMysqlDatabaseResourceInUseError(err error) bool {
+	businessErr, ok := err.(buserr.BusinessError)
+	return ok && businessErr.Msg == "ErrInUsed"
 }
 
 func (u *MysqlService) ChangePassword(req dto.ChangeDBInfo) error {

@@ -79,6 +79,11 @@ export const updateMysqlUserPassword = (params: Database.MysqlUserPassword) => {
     encodeBase64Fields(request, ['password']);
     return http.post(`/databases/users/password`, request);
 };
+export const saveMysqlUserPassword = (params: Database.MysqlUserPassword) => {
+    let request = deepCopy(params) as Database.MysqlUserPassword;
+    encodeBase64Fields(request, ['password']);
+    return http.post(`/databases/users/password/save`, request);
+};
 export const searchMysqlGrants = (params: Database.MysqlUserSearch) => {
     return http.post<Database.MysqlGrant[]>(`/databases/grants/search`, params);
 };

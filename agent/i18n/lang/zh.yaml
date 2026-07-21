@@ -110,6 +110,7 @@ ErrAppLimit: "应用安装数量超限"
 ErrNotInstall: "应用未安装"
 ErrPortInOtherApp: "{{ .port }} 端口已被应用 {{ .apps }} 占用！"
 ErrDbUserNotValid: "存量数据库用户名或密码不匹配"
+ErrMysqlUserUsedByApps: "该数据库用户已被【{{ .detail }}】应用使用，无法修改 Host、删除或者撤销授权"
 ErrUpdateBuWebsite: '应用更新成功，但网站配置文件修改失败，请检查配置'
 Err1PanelNetworkFailed: '默认容器网络创建失败！{{ .detail }}'
 ErrFileParse: '应用 docker-compose 解析失败'

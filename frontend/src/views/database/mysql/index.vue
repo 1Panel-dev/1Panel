@@ -137,47 +137,16 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.login.username')" show-overflow-tooltip prop="username">
+                    <el-table-column :label="$t('database.authorizedUsers')" min-width="130">
                         <template #default="{ row }">
-                            <div class="flex items-center" v-if="row.username">
-                                <span>
-                                    {{ row.username }}
-                                </span>
-                            </div>
-                            <span v-else>-</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('commons.login.password')" prop="password">
-                        <template #default="{ row }">
-                            <span v-if="row.username === ''">-</span>
-                            <div class="flex items-center flex-wrap" v-if="row.password && row.username">
-                                <div class="star-center" v-if="!row.showPassword">
-                                    <span>**********</span>
-                                </div>
-                                <div>
-                                    <span v-if="row.showPassword">
-                                        {{ row.password }}
-                                    </span>
-                                </div>
-                                <el-button
-                                    v-if="!row.showPassword"
-                                    link
-                                    @click="row.showPassword = true"
-                                    icon="View"
-                                    class="ml-1.5"
-                                ></el-button>
-                                <el-button
-                                    v-if="row.showPassword"
-                                    link
-                                    @click="row.showPassword = false"
-                                    icon="Hide"
-                                    class="ml-1.5"
-                                ></el-button>
-                                <div>
-                                    <CopyButton :content="row.password" />
-                                </div>
-                            </div>
-                            <span v-if="row.password === '' && row.username">-</span>
+                            <el-button
+                                link
+                                type="primary"
+                                :disabled="row.isDelete"
+                                @click="openAuthorizationManagement(row)"
+                            >
+                                {{ $t('database.authorizedUserCount', [row.authorizedUsers?.length || 0]) }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.description')" prop="description" show-overflow-tooltip>
@@ -338,10 +307,13 @@ const mysqlVersion = ref();
 
 const dialogRef = ref();
 const onOpenDialog = async () => {
+    if (!currentDB.value?.database) {
+        return;
+    }
     let params = {
         from: currentDB.value.from,
         type: currentDB.value.type,
-        database: currentDBName.value,
+        database: currentDB.value.database,
     };
     dialogRef.value!.acceptParams(params);
 };
@@ -354,10 +326,13 @@ const uploadRef = ref();
 
 const connRef = ref();
 const onChangeConn = async () => {
+    if (!currentDB.value?.database) {
+        return;
+    }
     connRef.value!.acceptParams({
         from: currentDB.value.from,
         type: currentDB.value.type,
-        database: currentDBName.value,
+        database: currentDB.value.database,
     });
 };
 
@@ -395,7 +370,6 @@ const changeDatabase = async () => {
             appKey.value = item.type;
             appName.value = item.database;
             search();
-            userRef.value?.loadContext();
             appStatusRef.value?.onCheck(appKey.value, appName.value);
             return;
         }
@@ -409,7 +383,6 @@ const changeDatabase = async () => {
         }
     }
     search();
-    userRef.value?.loadContext();
 };
 
 const search = async (column?: any) => {
@@ -417,6 +390,9 @@ const search = async (column?: any) => {
 };
 
 const searchDatabases = async (column?: any) => {
+    if (!currentDB.value?.database) {
+        return;
+    }
     const requestID = ++grantSummaryRequestID;
     paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
     paginationConfig.order = column?.order ? column.order : paginationConfig.order;
@@ -438,7 +414,7 @@ const searchDatabases = async (column?: any) => {
 };
 
 const loadGrantSummary = async (items: Database.MysqlDBInfo[], requestID: number) => {
-    if (!currentDB.value || items.length === 0) {
+    if (!currentDB.value?.database || items.length === 0) {
         return;
     }
     try {
@@ -451,10 +427,7 @@ const loadGrantSummary = async (items: Database.MysqlDBInfo[], requestID: number
         }
         for (const item of data.value) {
             const users = res.data?.[item.name] || [];
-            const user = users.find((user) => user.password) || users[0];
-            item.username = user?.username || '';
-            item.password = user?.password || '';
-            item.permission = user?.host || '';
+            item.authorizedUsers = users;
         }
     } catch {
         return;
@@ -462,7 +435,20 @@ const loadGrantSummary = async (items: Database.MysqlDBInfo[], requestID: number
 };
 
 const openUserDrawer = async () => {
+    if (!currentDB.value?.database) {
+        return;
+    }
     userRef.value!.acceptParams({ database: currentDB.value.database });
+};
+
+const openAuthorizationManagement = (row: Database.MysqlDBInfo) => {
+    if (!currentDB.value) {
+        return;
+    }
+    bindRef.value!.acceptParams({
+        database: currentDB.value.database,
+        db: row.name,
+    });
 };
 
 const loadDB = async () => {
@@ -610,19 +596,6 @@ const onDelete = async (row: Database.MysqlDBInfo) => {
 
 const buttons = [
     {
-        label: i18n.global.t('database.userBind'),
-        permission: true,
-        disabled: (row: Database.MysqlDBInfo) => {
-            return row.isDelete;
-        },
-        click: (row: Database.MysqlDBInfo) => {
-            bindRef.value!.acceptParams({
-                database: currentDBName.value,
-                db: row.name,
-            });
-        },
-    },
-    {
         label: i18n.global.t('database.backupList'),
         permission: true,
         disabled: (row: Database.MysqlDBInfo) => {
@@ -664,7 +637,6 @@ const buttons = [
 
 const onBindSearch = async () => {
     await search();
-    userRef.value?.loadContext();
 };
 
 onMounted(() => {

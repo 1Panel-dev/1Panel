@@ -6,15 +6,23 @@
             </el-button>
         </div>
         <ComplexTable :data="users" :heightDiff="260">
-            <el-table-column
-                :label="$t('commons.login.username')"
-                prop="username"
-                show-overflow-tooltip
-                min-width="120"
-            />
-            <el-table-column :label="$t('commons.login.password')" prop="password" min-width="140">
+            <el-table-column :label="$t('commons.login.username')" prop="username" min-width="150">
                 <template #default="{ row }">
-                    <span v-if="!row.password">-</span>
+                    <span>{{ row.username }}@{{ row.host }}</span>
+                    <el-tag v-if="row.isDelete" round type="info" class="ml-1" size="small">
+                        {{ $t('database.isDelete') }}
+                    </el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column :label="$t('commons.login.password')" prop="password" min-width="180">
+                <template #default="{ row }">
+                    <span v-if="row.isDelete">-</span>
+                    <div v-else-if="!row.password" class="password-cell">
+                        <el-tag type="warning" size="small">{{ $t('database.passwordPendingSupplement') }}</el-tag>
+                        <el-button link type="primary" @click="openSupplementPasswordDialog(row)">
+                            {{ $t('database.supplementPassword') }}
+                        </el-button>
+                    </div>
                     <div class="password-cell" v-else>
                         <span v-if="!row.showPassword" class="password-text">**********</span>
                         <span v-else class="password-text">{{ row.password }}</span>
@@ -91,7 +99,7 @@
                 <el-input type="textarea" clearable v-model="userForm.description" />
             </el-form-item>
             <el-form-item v-if="userDialogMode === 'edit'" :label="$t('menu.database')" prop="dbs">
-                <el-select v-model="userForm.dbs" filterable multiple collapse-tags collapse-tags-tooltip>
+                <el-select v-model="userForm.dbs" filterable multiple collapse-tags-tooltip>
                     <el-option v-for="item in databases" :key="item.name" :label="item.name" :value="item.name" />
                 </el-select>
             </el-form-item>
@@ -101,6 +109,32 @@
                 {{ $t('commons.button.cancel') }}
             </el-button>
             <el-button type="primary" @click="submitUser()" :disabled="loading">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </DialogPro>
+
+    <DialogPro v-model="supplementDialogVisible" :title="$t('database.supplementPassword')" size="small">
+        <el-form
+            ref="supplementFormRef"
+            :model="supplementForm"
+            :rules="supplementRules"
+            label-position="top"
+            v-loading="loading"
+        >
+            <el-form-item :label="$t('commons.login.username')">
+                <el-input :model-value="`${supplementForm.username}@${supplementForm.host}`" disabled />
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.password')" prop="password">
+                <el-input type="password" clearable show-password v-model.trim="supplementForm.password" />
+                <span class="input-help">{{ $t('database.supplementPasswordHelper') }}</span>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button @click="supplementDialogVisible = false" :disabled="loading">
+                {{ $t('commons.button.cancel') }}
+            </el-button>
+            <el-button type="primary" @click="submitSupplementPassword" :disabled="loading">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -124,9 +158,16 @@
             </div>
             <div class="delete-user-section">
                 <div>
-                    <span style="font-size: 12px">{{ $t('database.delete') }}</span>
-                    <span style="font-size: 12px; color: red; font-weight: 500">{{ deleteUser.username }}</span>
-                    <span style="font-size: 12px">{{ $t('database.deleteUserHelper') }}</span>
+                    <template v-if="deleteUser.isDelete">
+                        <span style="font-size: 12px">{{ $t('database.deleteUserRecordHelper') }}</span>
+                    </template>
+                    <template v-else>
+                        <span style="font-size: 12px">{{ $t('database.delete') }}</span>
+                        <span style="font-size: 12px; color: red; font-weight: 500">
+                            {{ deleteUser.username }}
+                        </span>
+                        <span style="font-size: 12px">{{ $t('database.deleteUserHelper') }}</span>
+                    </template>
                 </div>
                 <el-input v-model="deleteConfirmInput" :placeholder="deleteUser.username" />
             </div>
@@ -160,6 +201,7 @@ import {
     searchMysqlDBs,
     searchMysqlGrants,
     searchMysqlUsers,
+    saveMysqlUserPassword,
     updateMysqlUser,
     updateMysqlUserPassword,
 } from '@/api/modules/database';
@@ -195,8 +237,19 @@ const deleteConfirmInput = ref('');
 const deleteUser = reactive({
     username: '',
     host: '',
+    isDelete: false,
 });
 const deleteUserDbs = ref<string[]>([]);
+const supplementDialogVisible = ref(false);
+const supplementFormRef = ref();
+const supplementForm = reactive({
+    username: '',
+    host: '',
+    password: '',
+});
+const supplementRules = reactive({
+    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+});
 const checkPassword = (_rule: unknown, value: string, callback: (error?: Error) => void) => {
     if (!value && userDialogMode.value === 'edit') {
         callback();
@@ -228,6 +281,9 @@ interface DialogProps {
 }
 
 const acceptParams = async (params: DialogProps) => {
+    if (!params.database) {
+        return;
+    }
     database.value = params.database;
     drawerVisible.value = true;
     await loadContext();
@@ -256,6 +312,9 @@ const loadDatabases = async () => {
 };
 
 const loadContext = async () => {
+    if (!drawerVisible.value || !database.value) {
+        return;
+    }
     await Promise.all([loadUsers(), loadGrants(), loadDatabases()]);
 };
 
@@ -282,9 +341,38 @@ const changePermission = () => {
 const openDeleteUserDialog = (row: Database.MysqlUser) => {
     deleteUser.username = row.username;
     deleteUser.host = row.host;
+    deleteUser.isDelete = row.isDelete;
     deleteUserDbs.value = userDatabases(row);
     deleteConfirmInput.value = '';
     deleteDialogVisible.value = true;
+};
+
+const openSupplementPasswordDialog = (row: Database.MysqlUser) => {
+    supplementForm.username = row.username;
+    supplementForm.host = row.host;
+    supplementForm.password = '';
+    supplementDialogVisible.value = true;
+};
+
+const submitSupplementPassword = async () => {
+    if (!supplementFormRef.value) return;
+    await supplementFormRef.value.validate(async (valid: boolean) => {
+        if (!valid) return;
+        loading.value = true;
+        try {
+            await saveMysqlUserPassword({
+                database: database.value,
+                username: supplementForm.username,
+                host: supplementForm.host,
+                password: supplementForm.password,
+            });
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            supplementDialogVisible.value = false;
+            await loadUsers();
+        } finally {
+            loading.value = false;
+        }
+    });
 };
 
 const openUserDialog = () => {
@@ -400,6 +488,7 @@ const userButtons = [
     {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
+        disabled: (row: Database.MysqlUser) => row.isDelete,
         click: (row: Database.MysqlUser) => {
             openUserEditDialog(row);
         },
@@ -433,7 +522,6 @@ const submitDeleteUser = async () => {
 
 defineExpose({
     acceptParams,
-    loadContext,
 });
 </script>
 

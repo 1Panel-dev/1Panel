@@ -162,6 +162,35 @@ func (b *BaseApi) ChangeMysqlUserPassword(c *gin.Context) {
 }
 
 // @Tags Database Mysql
+// @Summary Save mysql user password locally
+// @Accept json
+// @Param request body dto.MysqlUserPassword true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /databases/users/password/save [post]
+// @x-panel-log {"bodyKeys":["database","username","host"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"补充 mysql 数据库 [database] 用户 [username]@[host] 密码","formatEN":"save mysql database [database] user [username]@[host] password locally"}
+func (b *BaseApi) SaveMysqlUserPassword(c *gin.Context) {
+	var req dto.MysqlUserPassword
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if len(req.Password) != 0 {
+		password, err := base64.StdEncoding.DecodeString(req.Password)
+		if err != nil {
+			helper.BadRequest(c, err)
+			return
+		}
+		req.Password = string(password)
+	}
+	if err := mysqlService.SaveUserPassword(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Database Mysql
 // @Summary List mysql grants
 // @Accept json
 // @Param request body dto.MysqlUserSearch true "request"

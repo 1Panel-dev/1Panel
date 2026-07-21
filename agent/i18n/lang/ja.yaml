@@ -110,6 +110,7 @@ ErrAppLimit: 'インストールされているアプリケーションの数が
 ErrNotInstall: 'アプリケーションがインストールされていません'
 ErrPortInOtherApp: '{{ .port }} ポートは既にアプリケーション {{ .apps }} によって使用されています'
 ErrDbUserNotValid: '既存のデータベース、ユーザー名、およびパスワードが一致しません'
+ErrMysqlUserUsedByApps: 'このデータベースユーザーは【{{ .detail }}】で使用されているため、ホストの変更、削除、または権限の取り消しはできません'
 ErrUpdateBuWebsite: 'アプリケーションは正常に更新されましたが、Web サイト構成ファイルの変更に失敗しました。設定を確認してください'
 Err1PanelNetworkFailed: 'デフォルトのコンテナ ネットワークの作成に失敗しました。 {{ .detail }}'
 ErrFileParse: 'アプリケーションの docker-compose ファイルの解析に失敗しました'

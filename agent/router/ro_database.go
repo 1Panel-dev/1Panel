@@ -20,6 +20,7 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/users", baseApi.CreateMysqlUser)
 		cmdRouter.POST("/users/update", baseApi.UpdateMysqlUser)
 		cmdRouter.POST("/users/password", baseApi.ChangeMysqlUserPassword)
+		cmdRouter.POST("/users/password/save", baseApi.SaveMysqlUserPassword)
 		cmdRouter.POST("/users/del", baseApi.DeleteMysqlUser)
 		cmdRouter.POST("/grants/search", baseApi.ListMysqlGrants)
 		cmdRouter.POST("/grants/summary", baseApi.ListMysqlGrantSummary)
