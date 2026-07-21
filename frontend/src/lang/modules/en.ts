@@ -3819,6 +3819,7 @@ const message = {
         compatible: 'Compatible',
         stale: 'Rebuild required',
         static: 'Static build',
+        dynamicUnsupported: 'Dynamic build is not supported on the current OpenResty version',
         mirrorUrl: 'Software Source',
         paramsHelper: 'For example: --add-module=/tmp/ngx_brotli; dynamic mode converts it automatically',
         packagesHelper: 'For example: git, curl (separated by commas)',

@@ -3545,6 +3545,7 @@ const message = {
         compatible: '兼容',
         stale: '需要重新构建',
         static: '静态编译',
+        dynamicUnsupported: '当前 OpenResty 版本不支持动态构建',
         mirrorUrl: '软件源',
         paramsHelper: '例如：--add-module=/tmp/ngx_brotli，动态模式会自动转换参数',
         packagesHelper: '例如：git,curl 按,分割',
