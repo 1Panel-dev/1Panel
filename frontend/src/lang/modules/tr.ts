@@ -900,6 +900,8 @@ const message = {
             from_remote: 'Bu model 1Panel aracılığıyla indirilmedi, ilgili çekme logları yok.',
             no_logs: 'Bu modelin çekme logları silindi ve görüntülenemiyor.',
             vllmVersionHelper: 'FusionXpark GB 10 sunucuları için lütfen -cu130 sürümünü seçin.',
+            vllmCommandPortHelper:
+                'Başlatma komutu {0} numaralı bağlantı noktasını kullanmalıdır; aksi halde hizmete erişilemez.',
             syncModelAccount: 'Model hesabına senkronize et',
             modelAccountAddressHelper:
                 'Konteyner adresi ajan konteynerleri içindir; 127.0.0.1, sistem IP veya özel adres AI Gateway ya da harici servisler içindir.',
@@ -4913,6 +4915,7 @@ const message = {
             dirFilter: 'Dizin Filtresi',
             sqlInject: 'SQL Enjeksiyonu',
             xss: 'XSS',
+            webshell: 'WebShell',
             phpExec: 'PHP Betiği Yürütme',
             oneWordTrojan: 'Tek Kelime Truva Atı',
             appFilter: 'Tehlikeli Dizin Filtreleme',

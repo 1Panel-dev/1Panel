@@ -878,6 +878,8 @@ const message = {
             from_remote: 'این مدل از طریق 1Panel دانلود نشده است، لاگ مربوط به دریافت وجود ندارد.',
             no_logs: 'لاگ دریافت این مدل حذف شده است و قابل مشاهده نیست.',
             vllmVersionHelper: 'برای سرورهای FusionXpark GB 10، لطفاً نسخه -cu130 را انتخاب کنید.',
+            vllmCommandPortHelper:
+                'فرمان راه‌اندازی باید از پورت {0} استفاده کند؛ در غیر این صورت سرویس قابل دسترسی نخواهد بود.',
             syncModelAccount: 'همگام‌سازی با حساب مدل',
             modelAccountAddressHelper:
                 'آدرس کانتینر برای کانتینرهای عامل است؛ 127.0.0.1، IP سیستم یا آدرس سفارشی برای دروازه AI یا خدمات خارجی است.',
@@ -4812,6 +4814,7 @@ const message = {
             dirFilter: 'فیلتر دایرکتوری',
             sqlInject: 'تزریق SQL',
             xss: 'XSS',
+            webshell: 'WebShell',
             phpExec: 'اجرای اسکریپت PHP',
             oneWordTrojan: 'تروژان یک کلمه‌ای',
             appFilter: 'فیلتر دایرکتوری خطرناک',

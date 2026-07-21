@@ -897,6 +897,8 @@ const message = {
             from_remote: 'Model ini tidak dimuat turun melalui 1Panel, tiada log pengambilan berkaitan.',
             no_logs: 'Log pengambilan untuk model ini telah dipadam dan tidak dapat dilihat.',
             vllmVersionHelper: 'Para servidores FusionXpark GB 10, selecione a versão -cu130.',
+            vllmCommandPortHelper:
+                'O comando de inicialização deve usar a porta {0}; caso contrário, o serviço ficará inacessível.',
             syncModelAccount: 'Sincronizar com conta de modelo',
             modelAccountAddressHelper:
                 'Use o endereço do contêiner para agentes; 127.0.0.1, IP do sistema ou endereço personalizado para AI Gateway ou serviços externos.',
@@ -5070,6 +5072,7 @@ const message = {
             dirFilter: 'Filtro de diretório',
             sqlInject: 'Injeção de SQL',
             xss: 'XSS',
+            webshell: 'WebShell',
             phpExec: 'Execução de script PHP',
             oneWordTrojan: 'Cavalo de Troia de uma palavra',
             appFilter: 'Filtragem de diretórios perigosos',
