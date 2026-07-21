@@ -1841,6 +1841,13 @@
 		"formatZH": "更新虚拟机存储 [name]",
 		"formatEN": "update VM storage [name]"
 	},
+	"/core/enterprise/vms/sync": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步虚拟机",
+		"formatEN": "sync virtual machines"
+	},
 	"/core/enterprise/vms/templates": {
 		"bodyKeys": [
 			"name",

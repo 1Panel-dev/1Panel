@@ -485,15 +485,19 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate, inThread bo
 	if err != nil {
 		return err
 	}
-	defer client.Close()
+	unlock := containerOperationLock.lock(req.Name)
 	ctx := context.Background()
 	newContainer, _ := client.ContainerInspect(ctx, req.Name)
 	if newContainer.ContainerJSONBase != nil {
+		unlock()
+		_ = client.Close()
 		return buserr.New("ErrContainerName")
 	}
 
 	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeContainer, req.TaskID, 1)
 	if err != nil {
+		unlock()
+		_ = client.Close()
 		global.LOG.Errorf("new task for create container failed, err: %v", err)
 		return err
 	}
@@ -529,18 +533,20 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate, inThread bo
 		if err != nil {
 			return err
 		}
-		removeUnsupportedEndpointStaticIPAM(client, networkConf, nil)
+		normalizeContainerEndpointSettings(ctx, client, networkConf, nil)
 		con, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
 		if err != nil {
 			taskItem.Log(i18n.GetMsgByKey("ContainerCreateFailed"))
-			_ = client.ContainerRemove(ctx, req.Name, container.RemoveOptions{RemoveVolumes: true, Force: true})
+			if con.ID != "" {
+				_ = client.ContainerRemove(ctx, con.ID, container.RemoveOptions{RemoveVolumes: true, Force: true})
+			}
 			return err
 		}
 		err = client.ContainerStart(ctx, con.ID, container.StartOptions{})
 		taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerStartCheck"), err)
 		if err != nil {
 			taskItem.Log(i18n.GetMsgByKey("ContainerCreateFailed"))
-			_ = client.ContainerRemove(ctx, req.Name, container.RemoveOptions{RemoveVolumes: true, Force: true})
+			_ = client.ContainerRemove(ctx, con.ID, container.RemoveOptions{RemoveVolumes: true, Force: true})
 			return fmt.Errorf("create successful but start failed, err: %v", err)
 		}
 		return nil
@@ -548,12 +554,16 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate, inThread bo
 
 	if inThread {
 		go func() {
+			defer unlock()
+			defer client.Close()
 			if err := taskItem.Execute(); err != nil {
 				global.LOG.Error(err.Error())
 			}
 		}()
 		return nil
 	}
+	defer unlock()
+	defer client.Close()
 	return taskItem.Execute()
 }
 
@@ -574,21 +584,7 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	data.Image = oldContainer.Config.Image
 	if oldContainer.NetworkSettings != nil {
 		for net, val := range oldContainer.NetworkSettings.Networks {
-			netItem := dto.ContainerNetwork{
-				Network: net,
-				MacAddr: val.MacAddress,
-			}
-			if val.IPAMConfig != nil {
-				if netItem.Network != "bridge" {
-					netItem.Ipv4 = val.IPAMConfig.IPv4Address
-					netItem.Ipv6 = val.IPAMConfig.IPv6Address
-				}
-			} else {
-				if netItem.Network != "bridge" {
-					netItem.Ipv4 = val.IPAddress
-				}
-			}
-			data.Networks = append(data.Networks, netItem)
+			data.Networks = append(data.Networks, loadContainerNetworkInfo(net, val))
 		}
 	}
 
@@ -634,141 +630,40 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	return &data, nil
 }
 
-func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return err
+func loadContainerNetworkInfo(name string, endpoint *network.EndpointSettings) dto.ContainerNetwork {
+	item := dto.ContainerNetwork{Network: name}
+	if endpoint == nil {
+		return item
 	}
-	defer client.Close()
-	ctx := context.Background()
-	oldContainer, err := client.ContainerInspect(ctx, req.Name)
-	if err != nil {
-		return err
+	item.MacAddr = endpoint.MacAddress
+	item.Links = append([]string(nil), endpoint.Links...)
+	item.Aliases = append([]string(nil), endpoint.Aliases...)
+	item.DriverOpts = cloneStringMap(endpoint.DriverOpts)
+	item.GwPriority = endpoint.GwPriority
+	if endpoint.IPAMConfig != nil {
+		item.LinkLocalIPs = append([]string(nil), endpoint.IPAMConfig.LinkLocalIPs...)
 	}
-
-	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskUpdate, task.TaskScopeContainer, req.TaskID, 1)
-	if err != nil {
-		global.LOG.Errorf("new task for create container failed, err: %v", err)
-		return err
-	}
-	go func() {
-		taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
-			if !checkImageExist(client, req.Image) || req.ForcePull {
-				if err := pullImages(taskItem, client, req.Image); err != nil {
-					if !req.ForcePull {
-						return err
-					}
-					return fmt.Errorf("pull image %s failed, err: %v", req.Image, err)
-				}
-			}
-			return nil
-		}, nil)
-
-		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", req.Name), func(t *task.Task) error {
-			err := client.ContainerRemove(ctx, req.Name, container.RemoveOptions{Force: true})
-			taskItem.LogWithStatus(i18n.GetWithName("ContainerRemoveOld", req.Name), err)
-			if err != nil {
-				return err
-			}
-
-			config, hostConf, networkConf, err := loadConfigInfo(false, req, &oldContainer)
-			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerLoadInfo"), err)
-			if err != nil {
-				taskItem.Log(i18n.GetMsgByKey("ContainerRecreate"))
-				reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
-				return err
-			}
-			removeUnsupportedEndpointStaticIPAM(client, networkConf, nil)
-
-			con, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
-			if err != nil {
-				taskItem.Log(i18n.GetMsgByKey("ContainerRecreate"))
-				reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
-				return fmt.Errorf("update container failed, err: %v", err)
-			}
-			err = client.ContainerStart(ctx, con.ID, container.StartOptions{})
-			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerStartCheck"), err)
-			if err != nil {
-				return fmt.Errorf("update successful but start failed, err: %v", err)
-			}
-			return nil
-		}, nil)
-
-		if err := taskItem.Execute(); err != nil {
-			global.LOG.Error(err.Error())
+	if name != "bridge" {
+		if endpoint.IPAMConfig != nil {
+			item.Ipv4 = endpoint.IPAMConfig.IPv4Address
+			item.Ipv6 = endpoint.IPAMConfig.IPv6Address
+		} else {
+			item.Ipv4 = endpoint.IPAddress
+			item.Ipv6 = endpoint.GlobalIPv6Address
 		}
-	}()
-
-	return nil
+	}
+	return item
 }
 
-func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return err
+func cloneStringMap(source map[string]string) map[string]string {
+	if len(source) == 0 {
+		return nil
 	}
-	defer client.Close()
-	ctx := context.Background()
-	taskItem, err := task.NewTaskWithOps(req.Image, task.TaskUpgrade, task.TaskScopeImage, req.TaskID, 1)
-	if err != nil {
-		global.LOG.Errorf("new task for create container failed, err: %v", err)
-		return err
+	result := make(map[string]string, len(source))
+	for key, value := range source {
+		result[key] = value
 	}
-	go func() {
-		taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
-			taskItem.LogStart(i18n.GetWithName("ContainerImagePull", req.Image))
-			if !checkImageExist(client, req.Image) || req.ForcePull {
-				if err := pullImages(taskItem, client, req.Image); err != nil {
-					if !req.ForcePull {
-						return err
-					}
-					return fmt.Errorf("pull image %s failed, err: %v", req.Image, err)
-				}
-			}
-			return nil
-		}, nil)
-		for _, item := range req.Names {
-			var oldContainer container.InspectResponse
-			taskItem.AddSubTask(i18n.GetWithName("ContainerLoadInfo", item), func(t *task.Task) error {
-				taskItem.Logf("----------------- %s -----------------", item)
-				oldContainer, err = client.ContainerInspect(ctx, item)
-				if err != nil {
-					return err
-				}
-				return nil
-			}, nil)
-
-			taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", item), func(t *task.Task) error {
-				config := oldContainer.Config
-				config.Image = req.Image
-				hostConf := oldContainer.HostConfig
-				err := client.ContainerRemove(ctx, item, container.RemoveOptions{Force: true})
-				taskItem.LogWithStatus(i18n.GetWithName("ContainerRemoveOld", item), err)
-				if err != nil {
-					return err
-				}
-
-				con, err := createContainerWithOldNetworks(ctx, client, config, hostConf, oldContainer.NetworkSettings, item)
-				if err != nil {
-					taskItem.Log(i18n.GetMsgByKey("ContainerRecreate"))
-					reCreateAfterUpdate(item, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
-					return fmt.Errorf("upgrade container failed, err: %v", err)
-				}
-				err = client.ContainerStart(ctx, con.ID, container.StartOptions{})
-				taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerStartCheck"), err)
-				if err != nil {
-					return fmt.Errorf("upgrade successful but start failed, err: %v", err)
-				}
-				return nil
-			}, nil)
-
-		}
-		if err := taskItem.Execute(); err != nil {
-			global.LOG.Error(err.Error())
-		}
-	}()
-
-	return nil
+	return result
 }
 
 func (u *ContainerService) ContainerRename(req dto.ContainerRename) error {
@@ -778,6 +673,8 @@ func (u *ContainerService) ContainerRename(req dto.ContainerRename) error {
 		return err
 	}
 	defer client.Close()
+	unlock := containerOperationLock.lock(req.Name, req.NewName)
+	defer unlock()
 
 	newContainer, _ := client.ContainerInspect(ctx, req.NewName)
 	if newContainer.ContainerJSONBase != nil {
@@ -822,44 +719,48 @@ func (u *ContainerService) ContainerCommit(req dto.ContainerCommit) error {
 }
 
 func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error {
-	var err error
 	ctx := context.Background()
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return err
 	}
-	defer client.Close()
 	taskItem, err := task.NewTaskWithOps(strings.Join(req.Names, " "), req.Operation, task.TaskScopeContainer, req.TaskID, 1)
 	if err != nil {
+		_ = client.Close()
 		return fmt.Errorf("new task for container commit failed, err: %v", err)
 	}
 
 	for _, item := range req.Names {
+		item := item
 		taskItem.AddSubTask(item, func(t *task.Task) error {
+			unlock := containerOperationLock.lock(item)
+			defer unlock()
+			var operationErr error
 			switch req.Operation {
 			case constant.ContainerOpStart:
-				err = client.ContainerStart(ctx, item, container.StartOptions{})
+				operationErr = client.ContainerStart(ctx, item, container.StartOptions{})
 			case constant.ContainerOpStop:
-				err = client.ContainerStop(ctx, item, container.StopOptions{})
+				operationErr = client.ContainerStop(ctx, item, container.StopOptions{})
 			case constant.ContainerOpRestart:
-				err = client.ContainerRestart(ctx, item, container.StopOptions{})
+				operationErr = client.ContainerRestart(ctx, item, container.StopOptions{})
 			case constant.ContainerOpKill:
-				err = client.ContainerKill(ctx, item, "SIGKILL")
+				operationErr = client.ContainerKill(ctx, item, "SIGKILL")
 			case constant.ContainerOpPause:
-				err = client.ContainerPause(ctx, item)
+				operationErr = client.ContainerPause(ctx, item)
 			case constant.ContainerOpUnpause:
-				err = client.ContainerUnpause(ctx, item)
+				operationErr = client.ContainerUnpause(ctx, item)
 			case constant.ContainerOpRemove:
-				err = client.ContainerRemove(ctx, item, container.RemoveOptions{RemoveVolumes: true, Force: true})
+				operationErr = client.ContainerRemove(ctx, item, container.RemoveOptions{RemoveVolumes: true, Force: true})
 			}
-			return err
+			return operationErr
 		}, nil)
 	}
 
 	go func() {
+		defer client.Close()
 		_ = taskItem.Execute()
 	}()
-	return err
+	return nil
 }
 
 func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
@@ -868,6 +769,8 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 		return err
 	}
 	defer client.Close()
+	unlock := containerOperationLock.lock(req.Name)
+	defer unlock()
 	ctx := context.Background()
 	containerItem, err := client.ContainerInspect(ctx, req.Name)
 	if err != nil {
@@ -1832,7 +1735,7 @@ func loadCpuAndMem(client *client.Client, containerItem string) dto.ContainerLis
 	return data
 }
 
-func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
+func checkPortStats(ports []dto.PortHelper, checkInUse bool) (nat.PortMap, error) {
 	portMap := make(nat.PortMap)
 	if len(ports) == 0 {
 		return portMap, nil
@@ -1857,7 +1760,7 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 				portMap[nat.Port(fmt.Sprintf("%d/%s", containerStart+i, port.Protocol))] = []nat.PortBinding{bindItem}
 			}
 			for i := hostStart; i <= hostEnd; i++ {
-				if common.ScanPortWithIP(port.HostIP, i) {
+				if checkInUse && common.ScanPortWithIP(port.HostIP, i) {
 					return portMap, buserr.WithDetail("ErrPortInUsed", i, nil)
 				}
 			}
@@ -1868,7 +1771,7 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 			} else {
 				portItem, _ = strconv.Atoi(port.HostPort)
 			}
-			if common.ScanPortWithIP(port.HostIP, portItem) {
+			if checkInUse && common.ScanPortWithIP(port.HostIP, portItem) {
 				return portMap, buserr.WithDetail("ErrPortInUsed", portItem, nil)
 			}
 			bindItem := nat.PortBinding{HostPort: strconv.Itoa(portItem), HostIP: port.HostIP}
@@ -1887,7 +1790,7 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *conta
 	}
 	var networkConf network.NetworkingConfig
 
-	portMap, err := checkPortStats(req.ExposedPorts)
+	portMap, err := checkPortStats(req.ExposedPorts, isCreate)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -1915,15 +1818,21 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *conta
 			case "host", "none", "bridge":
 				hostConf.NetworkMode = container.NetworkMode(item.Network)
 			}
-			if item.Ipv4 != "" || item.Ipv6 != "" {
-				networkConf.EndpointsConfig[item.Network] = &network.EndpointSettings{
-					IPAMConfig: &network.EndpointIPAMConfig{
-						IPv4Address: item.Ipv4,
-						IPv6Address: item.Ipv6,
-					}, MacAddress: item.MacAddr}
-			} else {
-				networkConf.EndpointsConfig[item.Network] = &network.EndpointSettings{}
+			endpoint := &network.EndpointSettings{
+				Links:      append([]string(nil), item.Links...),
+				Aliases:    append([]string(nil), item.Aliases...),
+				DriverOpts: cloneStringMap(item.DriverOpts),
+				GwPriority: item.GwPriority,
+				MacAddress: item.MacAddr,
 			}
+			if item.Ipv4 != "" || item.Ipv6 != "" || len(item.LinkLocalIPs) != 0 {
+				endpoint.IPAMConfig = &network.EndpointIPAMConfig{
+					IPv4Address:  item.Ipv4,
+					IPv6Address:  item.Ipv6,
+					LinkLocalIPs: append([]string(nil), item.LinkLocalIPs...),
+				}
+			}
+			networkConf.EndpointsConfig[item.Network] = endpoint
 		}
 	} else {
 		return nil, nil, nil, fmt.Errorf("please set up the network")
@@ -1968,43 +1877,6 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *conta
 		config.Volumes[volume.ContainerDir] = struct{}{}
 	}
 	return &config, &hostConf, &networkConf, nil
-}
-
-func reCreateAfterUpdate(name string, client *client.Client, config *container.Config, hostConf *container.HostConfig, networkConf *container.NetworkSettings) {
-	ctx := context.Background()
-
-	oldContainer, err := createContainerWithOldNetworks(ctx, client, config, hostConf, networkConf, name)
-	if err != nil {
-		global.LOG.Errorf("recreate after container update failed, err: %v", err)
-		return
-	}
-	if err := client.ContainerStart(ctx, oldContainer.ID, container.StartOptions{}); err != nil {
-		global.LOG.Errorf("restart after container update failed, err: %v", err)
-	}
-	global.LOG.Info("recreate after container update successful")
-}
-
-func createContainerWithOldNetworks(ctx context.Context, client *client.Client, config *container.Config, hostConf *container.HostConfig, networkSettings *container.NetworkSettings, name string) (container.CreateResponse, error) {
-	networkConf, extraNetworks := buildContainerRecoverNetworkConfig(networkSettings, hostConf)
-	removeUnsupportedEndpointStaticIPAM(client, networkConf, extraNetworks)
-
-	created, err := client.ContainerCreate(ctx, config, hostConf, networkConf, nil, name)
-	if err != nil {
-		return created, err
-	}
-
-	extraNames := make([]string, 0, len(extraNetworks))
-	for item := range extraNetworks {
-		extraNames = append(extraNames, item)
-	}
-	sort.Strings(extraNames)
-	for _, item := range extraNames {
-		if err := client.NetworkConnect(ctx, item, created.ID, extraNetworks[item]); err != nil {
-			_ = client.ContainerRemove(ctx, created.ID, container.RemoveOptions{Force: true})
-			return created, err
-		}
-	}
-	return created, nil
 }
 
 func loadVolumeBinds(binds []container.MountPoint) []dto.VolumeHelper {

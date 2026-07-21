@@ -241,6 +241,47 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/accounts/models/discover": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentAccountModelDiscoverReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentAccountModel"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Discover custom provider models",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/accounts/models/update": {
 			"post": {
 				"consumes": [
@@ -17954,6 +17995,89 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/hosts/diagnostics/goroutines": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.RuntimeGoroutineSnapshot"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load grouped goroutine snapshot",
+				"tags": [
+					"RuntimeDiagnostics"
+				]
+			}
+		},
+		"/hosts/diagnostics/profiles": {
+			"post": {
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.RuntimeProfileCreate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "file"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Capture runtime profile",
+				"tags": [
+					"RuntimeDiagnostics"
+				]
+			}
+		},
+		"/hosts/diagnostics/summary": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.RuntimeDiagnosticsSummary"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load runtime diagnostics summary",
+				"tags": [
+					"RuntimeDiagnostics"
+				]
+			}
+		},
 		"/hosts/disks": {
 			"get": {
 				"description": "Get information about all disks including partitioned and unpartitioned disks",
@@ -28628,6 +28752,9 @@ const docTemplate = `{
 				"apiType": {
 					"type": "string"
 				},
+				"authMode": {
+					"type": "string"
+				},
 				"baseURL": {
 					"type": "string"
 				},
@@ -28648,6 +28775,9 @@ const docTemplate = `{
 				},
 				"rememberApiKey": {
 					"type": "boolean"
+				},
+				"verifyModel": {
+					"type": "string"
 				}
 			},
 			"required": [
@@ -28675,6 +28805,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"apiType": {
+					"type": "string"
+				},
+				"authMode": {
 					"type": "string"
 				},
 				"baseUrl": {
@@ -28712,32 +28845,20 @@ const docTemplate = `{
 				},
 				"verified": {
 					"type": "boolean"
+				},
+				"verifyModel": {
+					"type": "string"
 				}
 			},
 			"type": "object"
 		},
 		"dto.AgentAccountModel": {
 			"properties": {
-				"contextWindow": {
-					"type": "integer"
-				},
 				"id": {
 					"type": "string"
 				},
-				"input": {
-					"items": {
-						"type": "string"
-					},
-					"type": "array"
-				},
-				"maxTokens": {
-					"type": "integer"
-				},
 				"name": {
 					"type": "string"
-				},
-				"reasoning": {
-					"type": "boolean"
 				},
 				"recordId": {
 					"type": "integer"
@@ -28772,6 +28893,29 @@ const docTemplate = `{
 			"required": [
 				"accountId",
 				"recordId"
+			],
+			"type": "object"
+		},
+		"dto.AgentAccountModelDiscoverReq": {
+			"properties": {
+				"apiKey": {
+					"type": "string"
+				},
+				"apiType": {
+					"type": "string"
+				},
+				"baseURL": {
+					"type": "string"
+				},
+				"provider": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"apiKey",
+				"apiType",
+				"baseURL",
+				"provider"
 			],
 			"type": "object"
 		},
@@ -28841,6 +28985,9 @@ const docTemplate = `{
 				"apiType": {
 					"type": "string"
 				},
+				"authMode": {
+					"type": "string"
+				},
 				"baseURL": {
 					"type": "string"
 				},
@@ -28858,6 +29005,9 @@ const docTemplate = `{
 				},
 				"syncAgents": {
 					"type": "boolean"
+				},
+				"verifyModel": {
+					"type": "string"
 				}
 			},
 			"required": [
@@ -28873,7 +29023,16 @@ const docTemplate = `{
 				"apiKey": {
 					"type": "string"
 				},
+				"apiType": {
+					"type": "string"
+				},
+				"authMode": {
+					"type": "string"
+				},
 				"baseURL": {
+					"type": "string"
+				},
+				"model": {
 					"type": "string"
 				},
 				"provider": {
@@ -28882,6 +29041,7 @@ const docTemplate = `{
 			},
 			"required": [
 				"apiKey",
+				"apiType",
 				"provider"
 			],
 			"type": "object"
@@ -29885,9 +30045,6 @@ const docTemplate = `{
 				"containerName": {
 					"type": "string"
 				},
-				"contextWindow": {
-					"type": "integer"
-				},
 				"createdAt": {
 					"type": "string"
 				},
@@ -29898,9 +30055,6 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"id": {
-					"type": "integer"
-				},
-				"maxTokens": {
 					"type": "integer"
 				},
 				"message": {
@@ -32623,11 +32777,38 @@ const docTemplate = `{
 		},
 		"dto.ContainerNetwork": {
 			"properties": {
+				"aliases": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"driverOpts": {
+					"additionalProperties": {
+						"type": "string"
+					},
+					"type": "object"
+				},
+				"gwPriority": {
+					"type": "integer"
+				},
 				"ipv4": {
 					"type": "string"
 				},
 				"ipv6": {
 					"type": "string"
+				},
+				"linkLocalIPs": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"links": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
 				},
 				"macAddr": {
 					"type": "string"
@@ -37171,9 +37352,41 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.ProviderAPIInfo": {
+			"properties": {
+				"apiType": {
+					"type": "string"
+				},
+				"authModes": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"baseUrl": {
+					"type": "string"
+				},
+				"defaultAuthMode": {
+					"type": "string"
+				},
+				"editableBaseUrl": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
 		"dto.ProviderInfo": {
 			"properties": {
+				"apiTypes": {
+					"items": {
+						"$ref": "#/definitions/dto.ProviderAPIInfo"
+					},
+					"type": "array"
+				},
 				"baseUrl": {
+					"type": "string"
+				},
+				"defaultApiType": {
 					"type": "string"
 				},
 				"displayName": {
@@ -37193,26 +37406,11 @@ const docTemplate = `{
 		},
 		"dto.ProviderModelInfo": {
 			"properties": {
-				"contextWindow": {
-					"type": "integer"
-				},
 				"id": {
 					"type": "string"
 				},
-				"input": {
-					"items": {
-						"type": "string"
-					},
-					"type": "array"
-				},
-				"maxTokens": {
-					"type": "integer"
-				},
 				"name": {
 					"type": "string"
-				},
-				"reasoning": {
-					"type": "boolean"
 				}
 			},
 			"type": "object"
@@ -37626,6 +37824,89 @@ const docTemplate = `{
 					"type": "integer"
 				}
 			},
+			"type": "object"
+		},
+		"dto.RuntimeDiagnosticsSummary": {
+			"properties": {
+				"goroutines": {
+					"type": "integer"
+				},
+				"heapAlloc": {
+					"type": "integer"
+				},
+				"heapObjects": {
+					"type": "integer"
+				},
+				"rss": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.RuntimeGoroutineGroup": {
+			"properties": {
+				"count": {
+					"type": "integer"
+				},
+				"stack": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"state": {
+					"type": "string"
+				},
+				"top": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.RuntimeGoroutineSnapshot": {
+			"properties": {
+				"capturedAt": {
+					"type": "string"
+				},
+				"goroutines": {
+					"items": {
+						"$ref": "#/definitions/dto.RuntimeGoroutineGroup"
+					},
+					"type": "array"
+				},
+				"groupCount": {
+					"type": "integer"
+				},
+				"total": {
+					"type": "integer"
+				},
+				"truncated": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.RuntimeProfileCreate": {
+			"properties": {
+				"duration": {
+					"maximum": 30,
+					"minimum": 5,
+					"type": "integer"
+				},
+				"type": {
+					"enum": [
+						"cpu",
+						"heap",
+						"goroutine",
+						"mutex",
+						"block"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"type"
+			],
 			"type": "object"
 		},
 		"dto.SSHConfUpdate": {

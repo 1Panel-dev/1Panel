@@ -156,6 +156,11 @@ export namespace Container {
         ipv4: string;
         ipv6: string;
         macAddr: string;
+        links?: Array<string>;
+        aliases?: Array<string>;
+        driverOpts?: Record<string, string>;
+        gwPriority?: number;
+        linkLocalIPs?: Array<string>;
     }
     export interface ContainerItemStats {
         sizeRw: number;
