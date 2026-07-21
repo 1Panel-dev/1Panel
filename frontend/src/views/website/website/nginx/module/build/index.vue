@@ -25,11 +25,25 @@
                 <el-checkbox-group v-model="build.modules">
                     <el-checkbox v-for="item in moduleOptions" :key="item.name" :value="item.name">
                         {{ item.name }}
+                        <el-tag type="primary" effect="plain" size="small" class="!ml-2">
+                            {{ $t('nginx.buildModeDynamic') }}
+                        </el-tag>
                     </el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
             <el-form-item v-if="!dynamicSupported">
                 <el-text type="warning">{{ $t('nginx.dynamicUnsupported') }}</el-text>
+            </el-form-item>
+            <el-form-item v-if="staticModules.length > 0" :label="$t('nginx.staticModules')">
+                <div>
+                    <div v-for="item in staticModules" :key="item.name" class="!mb-1">
+                        <el-text>{{ item.name }}</el-text>
+                        <el-tag type="warning" effect="plain" size="small" class="!ml-2">
+                            {{ $t('nginx.buildModeStatic') }}
+                        </el-tag>
+                    </div>
+                    <el-text type="info" size="small">{{ $t('nginx.staticModulesHelper') }}</el-text>
+                </div>
             </el-form-item>
             <el-form-item :label="$t('nginx.forceBuild')">
                 <el-switch v-model="build.force" />
@@ -63,6 +77,7 @@ const build = ref({
     force: false,
 });
 const moduleOptions = ref<Nginx.NginxModule[]>([]);
+const staticModules = ref<Nginx.NginxModule[]>([]);
 const dynamicSupported = ref(true);
 const rules = {
     mirror: [Rules.requiredSelect],
@@ -81,8 +96,9 @@ const getModules = async () => {
         build.value.mirror = res.data.mirror;
         dynamicSupported.value = res.data.dynamicSupported;
         moduleOptions.value = res.data.dynamicSupported
-            ? res.data.modules.filter((item) => item.enable && item.buildMode !== 'static')
+            ? res.data.modules.filter((item) => item.enable && item.buildMode === 'dynamic')
             : [];
+        staticModules.value = res.data.modules.filter((item) => item.enable && item.buildMode === 'static');
         build.value.modules = moduleOptions.value.map((item) => item.name);
     } catch (error) {}
 };

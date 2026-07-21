@@ -12,13 +12,19 @@
             </el-form-item>
             <el-form-item :label="$t('nginx.buildMode')" prop="buildMode">
                 <el-radio-group v-model="module.buildMode">
-                    <el-radio-button value="dynamic" :disabled="!dynamicSupported">
+                    <el-radio-button
+                        value="dynamic"
+                        :disabled="!dynamicSupported || module.dynamicSupport === 'unsupported'"
+                    >
                         {{ $t('nginx.buildModeDynamic') }}
                     </el-radio-button>
                     <el-radio-button value="static">{{ $t('nginx.buildModeStatic') }}</el-radio-button>
                 </el-radio-group>
                 <el-text v-if="!dynamicSupported" type="warning" class="!ml-2">
                     {{ $t('nginx.dynamicUnsupported') }}
+                </el-text>
+                <el-text v-else-if="module.dynamicSupport === 'unsupported'" type="warning" class="!ml-2">
+                    {{ $t('nginx.moduleDynamicUnsupported') }}
                 </el-text>
             </el-form-item>
             <el-form-item :label="$t('nginx.params')" prop="params">
