@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -221,83 +220,5 @@ func TestMergeOpenrestyModuleVolumesKeepsExisting(t *testing.T) {
 	}
 	if merged[2] != "./conf/modules-enabled:/usr/local/openresty/nginx/conf/modules-enabled:ro" {
 		t.Fatalf("missing module mount was not appended, got %#v", merged)
-	}
-}
-
-func TestNginxModuleBuildFailedError(t *testing.T) {
-	inner := fmt.Errorf("build dynamic module %s: %w", "brotli", errors.New("compiler exited"))
-	err := error(&nginxModuleBuildFailedError{Module: "brotli", Err: inner})
-	if err.Error() != inner.Error() {
-		t.Fatalf("error text must stay identical, got %q", err.Error())
-	}
-	if !strings.Contains(err.Error(), "build dynamic module brotli: compiler exited") {
-		t.Fatalf("unexpected error text: %q", err.Error())
-	}
-	var buildFailed *nginxModuleBuildFailedError
-	if !errors.As(err, &buildFailed) || buildFailed.Module != "brotli" {
-		t.Fatalf("errors.As should locate the failed module, got %#v", buildFailed)
-	}
-	if errors.As(errors.New("compiler exited"), &buildFailed) {
-		t.Fatal("plain errors must not carry a failed module")
-	}
-
-	sentinel := error(&nginxModuleBuildFailedError{
-		Module: "waf",
-		Err:    fmt.Errorf("%w: %v", errNginxModuleBuilderMissing, errors.New("stat failed")),
-	})
-	if !errors.Is(sentinel, errNginxModuleBuilderMissing) {
-		t.Fatal("Unwrap should keep the wrapped sentinel reachable")
-	}
-}
-
-func TestShouldFallbackNginxModuleToStatic(t *testing.T) {
-	if !shouldFallbackNginxModuleToStatic(dto.NginxModule{Name: "auto", BuildMode: nginxModuleBuildAuto}) {
-		t.Fatal("auto module should fall back to static")
-	}
-	if shouldFallbackNginxModuleToStatic(dto.NginxModule{Name: "dyn", BuildMode: nginxModuleBuildDynamic}) {
-		t.Fatal("explicit dynamic module should keep the failure semantics")
-	}
-	if shouldFallbackNginxModuleToStatic(dto.NginxModule{Name: "static", BuildMode: nginxModuleBuildStatic}) {
-		t.Fatal("static module has nothing to fall back to")
-	}
-	if shouldFallbackNginxModuleToStatic(dto.NginxModule{Name: "legacy"}) {
-		t.Fatal("legacy module without a build mode normalizes to static and must not fall back")
-	}
-}
-
-func TestFallbackNginxModuleToStatic(t *testing.T) {
-	buildErr := func(module string) *nginxModuleBuildFailedError {
-		return &nginxModuleBuildFailedError{
-			Module: module,
-			Err:    fmt.Errorf("build dynamic module %s: %w", module, errors.New("compiler exited")),
-		}
-	}
-
-	modules := []dto.NginxModule{
-		{Name: "auto-mod", Enable: true, BuildMode: nginxModuleBuildAuto},
-		{Name: "dyn-mod", Enable: true, BuildMode: nginxModuleBuildDynamic},
-	}
-	if !fallbackNginxModuleToStatic(modules, buildErr("auto-mod")) {
-		t.Fatal("auto module should be flipped to static")
-	}
-	if modules[0].BuildMode != nginxModuleBuildStatic {
-		t.Fatalf("expected static build mode, got %s", modules[0].BuildMode)
-	}
-	if !strings.Contains(modules[0].LastError, "compiler exited") ||
-		!strings.Contains(modules[0].LastError, "switched to static build") {
-		t.Fatalf("LastError should record the dynamic failure and the switch, got %q", modules[0].LastError)
-	}
-	if modules[1].BuildMode != nginxModuleBuildDynamic || modules[1].LastError != "" {
-		t.Fatalf("unrelated module must stay untouched, got %#v", modules[1])
-	}
-
-	if fallbackNginxModuleToStatic(modules, buildErr("dyn-mod")) {
-		t.Fatal("explicit dynamic module must not fall back")
-	}
-	if modules[1].BuildMode != nginxModuleBuildDynamic {
-		t.Fatal("explicit dynamic module build mode must stay dynamic")
-	}
-	if fallbackNginxModuleToStatic(modules, buildErr("missing")) {
-		t.Fatal("unknown module must not fall back")
 	}
 }

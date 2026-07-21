@@ -681,7 +681,7 @@ func mergeOpenrestyModuleVolumes(serviceValue, oldServiceValue map[string]interf
 		if !ok {
 			continue
 		}
-		if !strings.Contains(containerPath, "modules-enabled") && !strings.Contains(containerPath, "nginx/modules/1panel") {
+		if !strings.Contains(containerPath, nginxModuleEnabledConfDir) && !strings.Contains(containerPath, "nginx/modules/1panel") {
 			continue
 		}
 		if _, ok = existing[containerPath]; ok {
@@ -740,7 +740,7 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 
 func buildNginx(parentTask *task.Task, nginxInstall model.AppInstall) error {
 	fileOp := files.NewFileOp()
-	buildPath := path.Join(nginxInstall.GetPath(), "build")
+	buildPath := path.Join(nginxInstall.GetPath(), nginxModuleBuildDir)
 	if !fileOp.Stat(buildPath) {
 		return buserr.New("ErrBuildDirNotFound")
 	}
@@ -866,29 +866,29 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 		_ = copyAppDetailMissing(fileOp, detailDir, install.GetPath())
 		if install.App.Key == constant.AppOpenresty {
-			installBuildDir := path.Join(install.GetPath(), "build")
-			detailBuildDir := path.Join(detailDir, "build")
+			installBuildDir := path.Join(install.GetPath(), nginxModuleBuildDir)
+			detailBuildDir := path.Join(detailDir, nginxModuleBuildDir)
 			if !fileOp.Stat(installBuildDir) {
 				if err := fileOp.CreateDir(installBuildDir, constant.DirPerm); err != nil {
 					return err
 				}
 			}
-			if err := fileOp.DeleteDir(path.Join(installBuildDir, "tmp")); err != nil {
+			if err := fileOp.DeleteDir(path.Join(installBuildDir, nginxModuleTmpDir)); err != nil {
 				return err
 			}
-			if err := fileOp.CopyDir(path.Join(detailBuildDir, "tmp"), installBuildDir); err != nil {
+			if err := fileOp.CopyDir(path.Join(detailBuildDir, nginxModuleTmpDir), installBuildDir); err != nil {
 				return err
 			}
 			if err := fileOp.CopyFile(path.Join(detailBuildDir, "Dockerfile"), installBuildDir); err != nil {
 				return err
 			}
-			if fileOp.Stat(path.Join(detailBuildDir, "Dockerfile.modules")) {
-				if err := fileOp.CopyFile(path.Join(detailBuildDir, "Dockerfile.modules"), installBuildDir); err != nil {
+			if fileOp.Stat(path.Join(detailBuildDir, nginxModuleBuilderFile)) {
+				if err := fileOp.CopyFile(path.Join(detailBuildDir, nginxModuleBuilderFile), installBuildDir); err != nil {
 					return err
 				}
 			}
-			if fileOp.Stat(path.Join(detailBuildDir, "module.catalog.json")) {
-				if err := fileOp.CopyFile(path.Join(detailBuildDir, "module.catalog.json"), installBuildDir); err != nil {
+			if fileOp.Stat(path.Join(detailBuildDir, nginxModuleCatalogFile)) {
+				if err := fileOp.CopyFile(path.Join(detailBuildDir, nginxModuleCatalogFile), installBuildDir); err != nil {
 					return err
 				}
 			}
@@ -980,14 +980,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 				previousModules := cloneNginxModules(modules)
 				modules, moduleErr = buildDynamicNginxModules(install, modules, nil, false, t)
 				if moduleErr != nil {
-					var buildFailed *nginxModuleBuildFailedError
-					if !errors.As(moduleErr, &buildFailed) || !fallbackNginxModuleToStatic(modules, buildFailed) {
-						return moduleErr
-					}
-					// The flipped module makes buildNginx below take the static
-					// chain; if that fails the upgrade fails with it, so unlike
-					// the UI build entry there is no restore-to-auto step here.
-					t.Logf("WARNING: dynamic build of module %s failed: %v; falling back to static build", buildFailed.Module, buildFailed.Err)
+					return moduleErr
 				}
 				if moduleErr = saveNginxModules(install, modules); moduleErr != nil {
 					removeNginxModuleOutputsNotReferenced(install, modules, previousModules)
@@ -2330,7 +2323,7 @@ func handleOpenrestyFile(appInstall *model.AppInstall) error {
 
 func handleDefaultServer(appInstall *model.AppInstall) error {
 	installDir := appInstall.GetPath()
-	defaultConfigPath := path.Join(installDir, "conf", "default", "00.default.conf")
+	defaultConfigPath := path.Join(installDir, nginxModuleConfDir, "default", "00.default.conf")
 	fileOp := files.NewFileOp()
 	content, err := fileOp.GetContent(defaultConfigPath)
 	if err != nil {
@@ -2344,7 +2337,7 @@ func handleDefaultServer(appInstall *model.AppInstall) error {
 }
 
 func handleSSLConfig(appInstall *model.AppInstall, hasDefaultWebsite bool, sslRejectHandshake bool) error {
-	sslDir := path.Join(appInstall.GetPath(), "conf", "ssl")
+	sslDir := path.Join(appInstall.GetPath(), nginxModuleConfDir, "ssl")
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(sslDir) {
 		return errors.New("ssl dir not found")
@@ -2374,7 +2367,7 @@ func handleSSLConfig(appInstall *model.AppInstall, hasDefaultWebsite bool, sslRe
 			_ = NewIWebsiteSSLService().Delete([]uint{websiteSSL.ID})
 		}()
 	}
-	defaultConfigPath := path.Join(appInstall.GetPath(), "conf", "default", "00.default.conf")
+	defaultConfigPath := path.Join(appInstall.GetPath(), nginxModuleConfDir, "default", "00.default.conf")
 	content, err := os.ReadFile(defaultConfigPath)
 	if err != nil {
 		return err

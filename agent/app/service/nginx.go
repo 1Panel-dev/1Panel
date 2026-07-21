@@ -54,7 +54,7 @@ func (n NginxService) GetNginxConfig() (*response.NginxFile, error) {
 	if err != nil {
 		return nil, err
 	}
-	configPath := path.Join(global.Dir.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "nginx.conf")
+	configPath := path.Join(global.Dir.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, nginxModuleConfDir, "nginx.conf")
 	byteContent, err := files.NewFileOp().GetContent(configPath)
 	if err != nil {
 		return nil, err
@@ -135,7 +135,7 @@ func (n NginxService) UpdateConfigFile(req request.NginxConfigFileUpdate) error 
 	if err != nil {
 		return err
 	}
-	filePath := path.Join(global.Dir.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "nginx.conf")
+	filePath := path.Join(global.Dir.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, nginxModuleConfDir, "nginx.conf")
 	if req.Backup {
 		backupPath := path.Join(path.Dir(filePath), "bak")
 		if !fileOp.Stat(backupPath) {
@@ -181,7 +181,7 @@ func (n NginxService) Build(req request.NginxBuildReq) error {
 	if err = task.CheckScopeTaskIsExecuting(task.TaskScopeApp, nginxInstall.ID); err != nil {
 		return err
 	}
-	buildPath := path.Join(nginxInstall.GetPath(), "build")
+	buildPath := path.Join(nginxInstall.GetPath(), nginxModuleBuildDir)
 	if !files.NewFileOp().Stat(buildPath) {
 		return buserr.New("ErrBuildDirNotFound")
 	}
@@ -219,14 +219,14 @@ func (n NginxService) GetModules() (*response.NginxBuildConfig, error) {
 			continue
 		}
 		buildStatus := nginxModuleStatusPending
-		loadStatus := "disabled"
+		loadStatus := nginxModuleLoadDisabled
 		compatibility := "unknown"
 		var artifacts []dto.NginxModuleArtifact
 		if module.BuildMode == nginxModuleBuildStatic {
 			buildStatus = nginxModuleStatusReady
 			compatibility = "static"
 			if module.Enable {
-				loadStatus = "enabled"
+				loadStatus = nginxModuleLoadEnabled
 			}
 		} else if targetErr == nil {
 			if build := findCurrentNginxModuleBuild(module, target); build != nil {
@@ -235,14 +235,14 @@ func (n NginxService) GetModules() (*response.NginxBuildConfig, error) {
 				if build.Status == nginxModuleStatusReady {
 					compatibility = "compatible"
 					if module.Enable {
-						loadStatus = "enabled"
+						loadStatus = nginxModuleLoadEnabled
 					}
 				}
 			} else if latestBuild := findLatestNginxModuleBuild(module, target); latestBuild != nil {
 				compatibility = "stale"
 				artifacts = latestBuild.Artifacts
 				if module.Enable {
-					loadStatus = "enabled"
+					loadStatus = nginxModuleLoadEnabled
 				}
 			}
 		}
@@ -272,8 +272,9 @@ func (n NginxService) GetModules() (*response.NginxBuildConfig, error) {
 	}
 
 	return &response.NginxBuildConfig{
-		Mirror:  envs["CONTAINER_PACKAGE_URL"],
-		Modules: resList,
+		Mirror:           envs["CONTAINER_PACKAGE_URL"],
+		DynamicSupported: nginxModuleDynamicSupported(nginxInstall),
+		Modules:          resList,
 	}, nil
 }
 
@@ -293,7 +294,7 @@ func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
 	var deletedModule *dto.NginxModule
 
 	switch req.Operate {
-	case "create":
+	case nginxModuleOperateCreate:
 		recreated := false
 		for i, module := range modules {
 			if module.Name == req.Name {
@@ -321,7 +322,7 @@ func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
 				LoadOrder: req.LoadOrder,
 			})
 		}
-	case "update":
+	case nginxModuleOperateUpdate:
 		found := false
 		for i, module := range modules {
 			if module.Name == req.Name {
@@ -339,7 +340,7 @@ func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
 		if !found {
 			return fmt.Errorf("OpenResty module %s not found", req.Name)
 		}
-	case "delete":
+	case nginxModuleOperateDelete:
 		found := false
 		for i, module := range modules {
 			if module.Name == req.Name {
@@ -382,7 +383,7 @@ func (n NginxService) OperateDefaultHTTPs(req request.NginxDefaultHTTPSUpdate) e
 			break
 		}
 	}
-	defaultConfigPath := path.Join(appInstall.GetPath(), "conf", "default", "00.default.conf")
+	defaultConfigPath := path.Join(appInstall.GetPath(), nginxModuleConfDir, "default", "00.default.conf")
 	content, err := os.ReadFile(defaultConfigPath)
 	if err != nil {
 		return err
@@ -422,7 +423,7 @@ func (n NginxService) GetDefaultHttpsStatus() (*response.NginxConfigRes, error) 
 	if err != nil {
 		return nil, err
 	}
-	defaultConfigPath := path.Join(appInstall.GetPath(), "conf", "default", "00.default.conf")
+	defaultConfigPath := path.Join(appInstall.GetPath(), nginxModuleConfDir, "default", "00.default.conf")
 	content, err := os.ReadFile(defaultConfigPath)
 	if err != nil {
 		return nil, err

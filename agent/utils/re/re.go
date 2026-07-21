@@ -48,6 +48,9 @@ const (
 	SyslogRFC3164Pattern               = `^([A-Z][a-z]{2}\s{1,2}\d{1,2}\s\d{2}:\d{2}:\d{2})\s+(.*)$`
 	SyslogRFC3339Pattern               = `^(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?)\s+(.*)$`
 	SyslogServicePattern               = `^(?:\S+\s+)?([[:alnum:]_.@/-]+)(?:\[\d+\])?:\s*(.*)$`
+	NginxModulePackagePattern          = `^[a-zA-Z0-9][a-zA-Z0-9+.-]*$`
+	NginxModuleArtifactPattern         = `^[a-zA-Z0-9_./+-]+\.so$`
+	NginxModuleChecksumPattern         = `^[a-fA-F0-9]{64}$`
 )
 
 var regexMap = make(map[string]*regexp.Regexp)
@@ -96,6 +99,9 @@ func Init() {
 		SyslogRFC3164Pattern,
 		SyslogRFC3339Pattern,
 		SyslogServicePattern,
+		NginxModulePackagePattern,
+		NginxModuleArtifactPattern,
+		NginxModuleChecksumPattern,
 	}
 
 	for _, pattern := range patterns {
@@ -117,4 +123,16 @@ func RegisterRegex(pattern string) {
 
 func StripAnsiControlSeq(value string) string {
 	return GetRegex(AnsiControlSeqPattern).ReplaceAllString(value, "")
+}
+
+func IsValidNginxModulePackage(value string) bool {
+	return GetRegex(NginxModulePackagePattern).MatchString(value)
+}
+
+func IsValidNginxModuleArtifact(value string) bool {
+	return GetRegex(NginxModuleArtifactPattern).MatchString(value)
+}
+
+func IsValidNginxModuleChecksum(value string) bool {
+	return GetRegex(NginxModuleChecksumPattern).MatchString(value)
 }

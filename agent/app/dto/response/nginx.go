@@ -86,8 +86,9 @@ type NginxModule struct {
 }
 
 type NginxBuildConfig struct {
-	Mirror  string        `json:"mirror"`
-	Modules []NginxModule `json:"modules"`
+	Mirror           string        `json:"mirror"`
+	DynamicSupported bool          `json:"dynamicSupported"`
+	Modules          []NginxModule `json:"modules"`
 }
 
 type NginxConfigRes struct {
