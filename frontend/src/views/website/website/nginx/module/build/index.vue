@@ -28,6 +28,9 @@
                     </el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
+            <el-form-item v-if="!dynamicSupported">
+                <el-text type="warning">{{ $t('nginx.dynamicUnsupported') }}</el-text>
+            </el-form-item>
             <el-form-item :label="$t('nginx.forceBuild')">
                 <el-switch v-model="build.force" />
             </el-form-item>
@@ -60,6 +63,7 @@ const build = ref({
     force: false,
 });
 const moduleOptions = ref<Nginx.NginxModule[]>([]);
+const dynamicSupported = ref(true);
 const rules = {
     mirror: [Rules.requiredSelect],
     modules: [Rules.requiredSelect],
@@ -75,7 +79,10 @@ const getModules = async () => {
     try {
         const res = await getNginxModules();
         build.value.mirror = res.data.mirror;
-        moduleOptions.value = res.data.modules.filter((item) => item.enable && item.buildMode !== 'static');
+        dynamicSupported.value = res.data.dynamicSupported;
+        moduleOptions.value = res.data.dynamicSupported
+            ? res.data.modules.filter((item) => item.enable && item.buildMode !== 'static')
+            : [];
         build.value.modules = moduleOptions.value.map((item) => item.name);
     } catch (error) {}
 };

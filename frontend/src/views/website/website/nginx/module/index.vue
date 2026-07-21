@@ -82,6 +82,7 @@ const buttons = [
 const operateRef = ref();
 const deleteRef = ref();
 const buildRef = ref();
+const dynamicSupported = ref(true);
 
 const buildNginx = async () => {
     buildRef.value.acceptParams();
@@ -92,6 +93,7 @@ const search = () => {
     getNginxModules()
         .then((res) => {
             data.value = res.data.modules;
+            dynamicSupported.value = res.data.dynamicSupported;
         })
         .finally(() => {
             loading.value = false;
@@ -99,11 +101,11 @@ const search = () => {
 };
 
 const openOperate = () => {
-    operateRef.value.acceptParams('create');
+    operateRef.value.acceptParams('create', undefined, dynamicSupported.value);
 };
 
 const openEdit = (row: Nginx.NginxModule) => {
-    operateRef.value.acceptParams('update', row);
+    operateRef.value.acceptParams('update', row, dynamicSupported.value);
 };
 
 const updateModule = (row: Nginx.NginxModule) => {

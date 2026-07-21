@@ -12,10 +12,14 @@
             </el-form-item>
             <el-form-item :label="$t('nginx.buildMode')" prop="buildMode">
                 <el-radio-group v-model="module.buildMode">
-                    <el-radio-button value="auto">{{ $t('nginx.buildModeAuto') }}</el-radio-button>
-                    <el-radio-button value="dynamic">{{ $t('nginx.buildModeDynamic') }}</el-radio-button>
+                    <el-radio-button value="dynamic" :disabled="!dynamicSupported">
+                        {{ $t('nginx.buildModeDynamic') }}
+                    </el-radio-button>
                     <el-radio-button value="static">{{ $t('nginx.buildModeStatic') }}</el-radio-button>
                 </el-radio-group>
+                <el-text v-if="!dynamicSupported" type="warning" class="!ml-2">
+                    {{ $t('nginx.dynamicUnsupported') }}
+                </el-text>
             </el-form-item>
             <el-form-item :label="$t('nginx.params')" prop="params">
                 <el-input v-model.trim="module.params" :placeholder="$t('nginx.paramsHelper')"></el-input>
@@ -67,6 +71,7 @@ const open = ref(false);
 const em = defineEmits(['close']);
 const mode = ref('create');
 const loading = ref(false);
+const dynamicSupported = ref(true);
 type ModuleForm = {
     name: string;
     operate: string;
@@ -87,7 +92,7 @@ const defaultModule = (): ModuleForm => ({
     enable: true,
     params: '',
     packages: '',
-    buildMode: 'auto',
+    buildMode: 'dynamic',
     provider: 'local',
     dynamicSupport: 'unknown',
     loadOrder: 50,
@@ -105,8 +110,9 @@ const handleClose = () => {
     em('close', false);
 };
 
-const acceptParams = async (operate: string, editModule?: Nginx.NginxModule) => {
+const acceptParams = async (operate: string, editModule?: Nginx.NginxModule, supported?: boolean) => {
     mode.value = operate;
+    dynamicSupported.value = supported ?? true;
     module.value = defaultModule();
     if (operate === 'update' && editModule) {
         module.value = {
@@ -115,7 +121,7 @@ const acceptParams = async (operate: string, editModule?: Nginx.NginxModule) => 
             enable: editModule.enable,
             params: editModule.params,
             packages: editModule.packages || '',
-            buildMode: editModule.buildMode,
+            buildMode: editModule.buildMode === 'auto' ? 'dynamic' : editModule.buildMode,
             provider: editModule.provider,
             dynamicSupport: editModule.dynamicSupport,
             loadOrder: editModule.loadOrder,

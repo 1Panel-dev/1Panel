@@ -62,6 +62,7 @@ export namespace Nginx {
     export interface NginxBuildConfig {
         mirror: string;
         modules: NginxModule[];
+        dynamicSupported: boolean;
     }
 
     export interface NginxModuleUpdate {
