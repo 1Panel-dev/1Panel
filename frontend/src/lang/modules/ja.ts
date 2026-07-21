@@ -3820,13 +3820,15 @@ const message = {
         build: 'ビルド',
         buildWarn:
             'ローカルでのモジュールビルドは CPU とメモリを使用します。静的モジュールは OpenResty の再ビルドと再起動も行います。続行しますか？',
+        buildPurposeHint:
+            '動的モジュールはビルド後にホットリロードで有効になります（コンテナは再起動しません）。静的モジュールが含まれる場合は、イメージが全量再ビルドされコンテナが再作成されます',
         buildMode: 'ビルド方式',
         buildModeDynamic: '動的',
         buildModeStatic: '静的',
         buildStatus: 'ビルドステータス',
         compatibility: '互換性',
         loadOrder: '読み込み順',
-        modulesToBuild: '動的モジュール（ホットリロード）',
+        modulesToBuild: '動的モジュール（ビルド後ホットリロード、コンテナ再起動なし）',
         staticModules: '静的モジュール',
         staticModulesHelper: 'ビルド時にすべてのモジュールが再ビルドされ、OpenResty が再起動します',
         forceBuild: 'キャッシュを使わず再ビルド',

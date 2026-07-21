@@ -3862,13 +3862,15 @@ const message = {
         build: 'Oluştur',
         buildWarn:
             'Yerel modül derlemeleri CPU ve bellek kullanır. Statik modüller OpenResty’yi yeniden derleyip yeniden başlatır. Devam edilsin mi?',
+        buildPurposeHint:
+            'Dinamik modüller derleme sonrası sıcak yeniden yükleme ile etkinleşir (konteyner yeniden başlatılmaz); statik modül varsa imaj tamamen yeniden derlenir ve konteyner yeniden oluşturulur',
         buildMode: 'Derleme modu',
         buildModeDynamic: 'Dinamik',
         buildModeStatic: 'Statik',
         buildStatus: 'Derleme durumu',
         compatibility: 'Uyumluluk',
         loadOrder: 'Yükleme sırası',
-        modulesToBuild: 'Dinamik modüller (sıcak yeniden yükleme)',
+        modulesToBuild: 'Dinamik modüller (derleme sonrası sıcak yeniden yükleme, konteyner yeniden başlatılmaz)',
         staticModules: 'Statik modüller',
         staticModulesHelper: 'Derleme sırasında tüm modüller yeniden derlenir ve OpenResty yeniden başlatılır',
         forceBuild: 'Önbelleksiz yeniden derle',

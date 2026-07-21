@@ -3802,13 +3802,15 @@ const message = {
         build: 'Build',
         buildWarn:
             'Local module builds use CPU and memory. Static modules also rebuild and restart OpenResty. Continue?',
+        buildPurposeHint:
+            'Dynamic modules take effect via hot reload after building (no container restart); including static modules triggers a full image rebuild and container recreation',
         buildMode: 'Build mode',
         buildModeDynamic: 'Dynamic',
         buildModeStatic: 'Static',
         buildStatus: 'Build status',
         compatibility: 'Compatibility',
         loadOrder: 'Load order',
-        modulesToBuild: 'Dynamic modules (hot-reload)',
+        modulesToBuild: 'Dynamic modules (hot-reload after build, no container restart)',
         staticModules: 'Static modules',
         staticModulesHelper: 'Building will rebuild all modules and restart OpenResty',
         forceBuild: 'Rebuild without cache',

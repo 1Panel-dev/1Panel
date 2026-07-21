@@ -1,6 +1,9 @@
 <template>
     <DrawerPro v-model="open" :header="$t('nginx.build')" size="normal" @close="handleClose">
         <el-form ref="buildForm" label-position="top" :model="build" :rules="rules">
+            <el-form-item>
+                <el-text type="info">{{ $t('nginx.buildPurposeHint') }}</el-text>
+            </el-form-item>
             <el-form-item :label="$t('nginx.mirrorUrl')" prop="mirror">
                 <el-select v-model="build.mirror">
                     <el-option
@@ -25,9 +28,6 @@
                 <el-checkbox-group v-model="build.modules">
                     <el-checkbox v-for="item in moduleOptions" :key="item.name" :value="item.name">
                         {{ item.name }}
-                        <el-tag type="primary" effect="plain" size="small" class="!ml-2">
-                            {{ $t('nginx.buildModeDynamic') }}
-                        </el-tag>
                     </el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
@@ -38,9 +38,6 @@
                 <div>
                     <div v-for="item in staticModules" :key="item.name" class="!mb-1">
                         <el-text>{{ item.name }}</el-text>
-                        <el-tag type="warning" effect="plain" size="small" class="!ml-2">
-                            {{ $t('nginx.buildModeStatic') }}
-                        </el-tag>
                     </div>
                     <el-text type="info" size="small">{{ $t('nginx.staticModulesHelper') }}</el-text>
                 </div>
@@ -59,7 +56,7 @@
     <TaskLog ref="taskLogRef" />
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { getNginxModules, buildNginx } from '@/api/modules/nginx';
 import i18n from '@/lang';
@@ -79,10 +76,10 @@ const build = ref({
 const moduleOptions = ref<Nginx.NginxModule[]>([]);
 const staticModules = ref<Nginx.NginxModule[]>([]);
 const dynamicSupported = ref(true);
-const rules = {
+const rules = computed(() => ({
     mirror: [Rules.requiredSelect],
-    modules: [Rules.requiredSelect],
-};
+    modules: staticModules.value.length === 0 ? [Rules.requiredSelect] : [],
+}));
 const taskLogRef = ref();
 
 const acceptParams = async () => {

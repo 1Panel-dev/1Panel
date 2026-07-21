@@ -3876,13 +3876,15 @@ const message = {
         build: 'Bina',
         buildWarn:
             'Binaan modul setempat menggunakan CPU dan memori. Modul statik turut membina semula dan memulakan semula OpenResty. Teruskan?',
+        buildPurposeHint:
+            'Modul dinamik berkuat kuasa melalui muatan semula panas selepas dibina (kontena tidak dimulakan semula); jika modul statik disertakan, imej akan dibina semula sepenuhnya dan kontena dicipta semula',
         buildMode: 'Mod binaan',
         buildModeDynamic: 'Dinamik',
         buildModeStatic: 'Statik',
         buildStatus: 'Status binaan',
         compatibility: 'Keserasian',
         loadOrder: 'Turutan muatan',
-        modulesToBuild: 'Modul dinamik (muatan semula panas)',
+        modulesToBuild: 'Modul dinamik (muatan semula panas selepas binaan, kontena tidak dimulakan semula)',
         staticModules: 'Modul statik',
         staticModulesHelper: 'Semasa membina, semua modul akan dibina semula dan OpenResty akan dimulakan semula',
         forceBuild: 'Bina semula tanpa cache',

@@ -4012,13 +4012,15 @@ const message = {
         build: 'Construir',
         buildWarn:
             'A compilação local de módulos consome CPU e memória. Módulos estáticos também recompilam e reiniciam o OpenResty. Continuar?',
+        buildPurposeHint:
+            'Os módulos dinâmicos entram em vigor via hot reload após a compilação (sem reiniciar o contêiner); se houver módulos estáticos, a imagem será totalmente reconstruída e o contêiner recriado',
         buildMode: 'Modo de compilação',
         buildModeDynamic: 'Dinâmico',
         buildModeStatic: 'Estático',
         buildStatus: 'Status da compilação',
         compatibility: 'Compatibilidade',
         loadOrder: 'Ordem de carregamento',
-        modulesToBuild: 'Módulos dinâmicos (hot reload)',
+        modulesToBuild: 'Módulos dinâmicos (hot reload após a compilação, sem reiniciar o contêiner)',
         staticModules: 'Módulos estáticos',
         staticModulesHelper: 'A compilação reconstruirá todos os módulos e reiniciará o OpenResty',
         forceBuild: 'Recompilar sem cache',
