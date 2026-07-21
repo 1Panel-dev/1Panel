@@ -27,7 +27,7 @@ require (
 	github.com/jinzhu/copier v0.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.19.0
-	github.com/mattn/go-shellwords v1.0.13
+	github.com/mattn/go-shellwords v1.0.14
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
 	github.com/miekg/dns v1.1.72
 	github.com/minio/minio-go/v7 v7.2.1
