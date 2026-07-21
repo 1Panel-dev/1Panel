@@ -19,6 +19,7 @@ type IDatabaseUserRepo interface {
 	Update(vars map[string]interface{}, opts ...DBOption) error
 	WithByDatabase(database string) DBOption
 	WithByUser(username, host string) DBOption
+	WithByUserList(users [][2]string) DBOption
 }
 
 func NewIDatabaseUserRepo() IDatabaseUserRepo {
@@ -97,5 +98,18 @@ func (u *DatabaseUserRepo) WithByDatabase(database string) DBOption {
 func (u *DatabaseUserRepo) WithByUser(username, host string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("username = ? AND host = ?", username, host)
+	}
+}
+
+func (u *DatabaseUserRepo) WithByUserList(users [][2]string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(users) == 0 {
+			return g.Where("1 = 0")
+		}
+		values := make([][]interface{}, 0, len(users))
+		for _, user := range users {
+			values = append(values, []interface{}{user[0], user[1]})
+		}
+		return g.Where("(username, host) IN ?", values)
 	}
 }

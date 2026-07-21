@@ -71,6 +71,7 @@ type MysqlUser struct {
 	Host        string `json:"host"`
 	Password    string `json:"password"`
 	Description string `json:"description"`
+	IsDelete    bool   `json:"isDelete"`
 }
 
 type MysqlGrant struct {

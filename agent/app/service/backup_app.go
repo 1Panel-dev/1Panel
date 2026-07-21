@@ -280,7 +280,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 				if err != nil {
 					return err
 				}
-				newDB, err := reCreateDB(db.ID, database, backupEnvMap)
+				newDB, err := reCreateDB(db.ID, database, backupEnvMap, install.Name)
 				if err != nil {
 					return err
 				}
@@ -408,10 +408,16 @@ func doAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir, fi
 	return nil
 }
 
-func reCreateDB(dbID uint, database model.Database, envMap map[string]interface{}) (*model.DatabaseMysql, error) {
+func reCreateDB(dbID uint, database model.Database, envMap map[string]interface{}, appInstallName string) (*model.DatabaseMysql, error) {
 	mysqlService := NewIMysqlService()
 	ctx := context.Background()
-	_ = mysqlService.Delete(ctx, dto.MysqlDBDelete{ID: dbID, Database: database.Name, Type: database.Type, DeleteBackup: false, ForceDelete: true})
+	if err := deleteMysqlDatabaseForResourceOwner(
+		ctx,
+		dto.MysqlDBDelete{ID: dbID, Database: database.Name, Type: database.Type, DeleteBackup: false, ForceDelete: true},
+		dto.DBResource{Type: constant.TypeApp, Name: appInstallName},
+	); err != nil {
+		return nil, err
+	}
 
 	dbInfo := getDBCreateInfoFromEnv(envMap, "utf8mb4")
 	createDB, err := mysqlService.Create(context.Background(), dto.MysqlDBCreate{
@@ -442,7 +448,7 @@ func ensureMysqlDBUser(mysqlService IMysqlService, database model.Database, dbIn
 	var oldUser dto.MysqlUser
 	exists := false
 	for _, user := range users {
-		if user.Username == dbInfo.User && user.Host == host {
+		if user.Username == dbInfo.User && user.Host == host && !user.IsDelete {
 			oldUser = user
 			exists = true
 			break

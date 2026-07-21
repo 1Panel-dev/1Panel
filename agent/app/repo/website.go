@@ -22,6 +22,7 @@ type IWebsiteRepo interface {
 	WithParentID(websiteID uint) DBOption
 	WithType(websiteType string) DBOption
 	WithDBType(dbType string) DBOption
+	WithDBTypes(dbTypes []string) DBOption
 	WithDBID(dbID uint) DBOption
 
 	Page(page, size int, opts ...DBOption) (int64, []model.Website, error)
@@ -129,6 +130,12 @@ func (w *WebsiteRepo) WithType(websiteType string) DBOption {
 func (w *WebsiteRepo) WithDBType(dbType string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("db_type = ?", dbType)
+	}
+}
+
+func (w *WebsiteRepo) WithDBTypes(dbTypes []string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("db_type IN ?", dbTypes)
 	}
 }
 

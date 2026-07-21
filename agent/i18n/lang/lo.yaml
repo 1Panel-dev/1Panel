@@ -95,6 +95,7 @@ ErrAppLimit: 'ຮອດຂີດຈຳກັດການຕິດຕັ້ງແ
 ErrNotInstall: 'ແອັບພລິເຄຊັນຍັງບໍ່ໄດ້ຕິດຕັ້ງ'
 ErrPortInOtherApp: 'ພອດ {{ .port }} ຖືກໃຊ້ງານແລ້ວໂດຍແອັບພລິເຄຊັນ {{ .apps }}!'
 ErrDbUserNotValid: 'ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານຖານຂໍ້ມູນບໍ່ຖືກຕ້ອງ'
+ErrMysqlUserUsedByApps: 'ຜູ້ໃຊ້ຖານຂໍ້ມູນນີ້ກຳລັງຖືກໃຊ້ໂດຍ [{{ .detail }}] ແລະບໍ່ສາມາດປ່ຽນ Host, ລຶບ ຫຼືຖອນການອະນຸຍາດໄດ້'
 ErrUpdateBuWebsite: 'ອັບເດດແອັບແລ້ວ, ແຕ່ການອັບເດດການຕັ້ງຄ່າເວັບໄຊລົ້ມເຫຼວ'
 Err1PanelNetworkFailed: 'ການສ້າງເຄືອຂ່າຍຄອນເທນເນີເລີ່ມຕົ້ນລົ້ມເຫຼວ! {{ .detail }}'
 ErrFileParse: 'ການວິເຄາະໄຟລ໌ docker-compose ຂອງແອັບລົ້ມເຫຼວ'

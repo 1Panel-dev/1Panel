@@ -23,8 +23,9 @@ export namespace Database {
         username: string;
         password: string;
         permission: string;
-        isDelete: string;
+        isDelete: boolean;
         description: string;
+        authorizedUsers?: MysqlUser[];
     }
     export interface BaseInfo {
         name: string;
@@ -56,6 +57,7 @@ export namespace Database {
         host: string;
         password: string;
         description: string;
+        isDelete: boolean;
     }
 
     export interface MysqlGrant {

@@ -20,12 +20,12 @@
                 </el-select>
                 <span class="input-help">{{ $t('database.collationHelper', [form.format]) }}</span>
             </el-form-item>
-            <el-form-item :label="$t('database.userBind')" prop="userMode">
+            <el-form-item :label="$t('database.userAuthorization')" prop="userMode">
                 <el-radio-group v-model="form.userMode" @change="changeUserMode">
                     <el-radio-button value="none">
-                        {{ $t('database.noUserBind') }}
+                        {{ $t('database.noUserAuthorization') }}
                     </el-radio-button>
-                    <el-radio-button value="select" :disabled="!users.length">
+                    <el-radio-button value="select" :disabled="!activeUsers.length">
                         {{ $t('commons.button.select') }}
                     </el-radio-button>
                     <el-radio-button value="create">
@@ -41,7 +41,7 @@
                     @change="syncUser"
                 >
                     <el-option
-                        v-for="item in users"
+                        v-for="item in activeUsers"
                         :key="item.username + '@' + item.host"
                         class="user-select-option"
                         :label="item.username + ' - ' + permissionLabel(item.host)"
@@ -64,7 +64,7 @@
                             >
                                 <template #reference>
                                     <el-button class="user-bound-button" size="small" @click.stop>
-                                        {{ $t('commons.status.bound') }} {{ userDatabases(item).length }}
+                                        {{ $t('database.authorizedDatabaseCount', [userDatabases(item).length]) }}
                                     </el-button>
                                 </template>
                                 <div class="user-bound-list">
@@ -131,7 +131,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
@@ -151,6 +151,7 @@ const formatOptions = ref();
 const collationOptions = ref();
 const users = ref<Database.MysqlUser[]>([]);
 const grants = ref<Database.MysqlGrant[]>([]);
+const activeUsers = computed(() => users.value.filter((item) => !item.isDelete));
 const form = reactive({
     name: '',
     from: 'local',
@@ -188,6 +189,9 @@ interface DialogProps {
     database: string;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
+    if (!params.database) {
+        return;
+    }
     form.name = '';
     form.from = params.from;
     form.type = params.type;
@@ -205,9 +209,9 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     random();
     loadOptions();
     await Promise.all([loadUsers(), loadGrants()]);
-    if (users.value.length) {
+    if (activeUsers.value.length) {
         form.userMode = 'select';
-        const user = users.value[0];
+        const user = activeUsers.value[0];
         form.userKey = `${user.username}@${user.host}`;
         syncUser();
     }
@@ -254,7 +258,7 @@ const userDatabases = (user: Database.MysqlUser) => {
 };
 
 const syncUser = () => {
-    const item = users.value.find((item) => `${item.username}@${item.host}` === form.userKey);
+    const item = activeUsers.value.find((item) => `${item.username}@${item.host}` === form.userKey);
     if (!item) return;
     form.username = item.username;
     form.host = item.host;
@@ -268,7 +272,7 @@ const changeUserMode = () => {
         return;
     }
     if (form.userMode === 'select') {
-        const user = users.value?.[0];
+        const user = activeUsers.value?.[0];
         form.userKey = user ? `${user.username}@${user.host}` : '';
         syncUser();
         return;

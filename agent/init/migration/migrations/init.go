@@ -51,6 +51,7 @@ var AddTable = &gormigrate.Migration{
 			&model.Database{},
 			&model.DatabaseMysql{},
 			&model.DatabaseUser{},
+			&model.DatabaseUserGrant{},
 			&model.DatabaseMongodb{},
 			&model.DatabasePostgresql{},
 			&model.Favorite{},
@@ -1570,50 +1571,49 @@ func isDatabaseSystemUserForMigration(username string) bool {
 	}
 }
 
-func migrateDatabaseUsers(tx *gorm.DB) error {
-	var mysqls []model.DatabaseMysql
-	if err := tx.Find(&mysqls).Error; err != nil {
-		return err
-	}
-	for _, item := range mysqls {
-		if len(item.Username) == 0 || len(item.Password) == 0 || isDatabaseSystemUserForMigration(item.Username) {
-			continue
-		}
-		for _, dbType := range loadDatabaseUserTypesForMigration(tx, item.MysqlName) {
-			if len(dbType) == 0 {
-				continue
-			}
-			for _, host := range normalizeDatabaseUserHostsForMigration(item.Permission) {
-				var old model.DatabaseUser
-				err := tx.Where("`type` = ? AND database = ? AND username = ? AND host = ?", dbType, item.MysqlName, item.Username, host).First(&old).Error
-				if err == nil {
-					continue
-				}
-				if !errors.Is(err, gorm.ErrRecordNotFound) {
-					return err
-				}
-				if err := tx.Create(&model.DatabaseUser{
-					Type:     dbType,
-					Database: item.MysqlName,
-					Username: item.Username,
-					Host:     host,
-					Password: item.Password,
-				}).Error; err != nil {
-					return err
-				}
-			}
-		}
-	}
-	return nil
-}
-
 var AddDatabaseUserTable = &gormigrate.Migration{
 	ID: "20260703-add-database-user-table",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.DatabaseUser{}); err != nil {
+		if err := tx.AutoMigrate(&model.DatabaseUser{}, &model.DatabaseUserGrant{}); err != nil {
 			return err
 		}
-		return migrateDatabaseUsers(tx)
+		var mysqls []model.DatabaseMysql
+		if err := tx.Find(&mysqls).Error; err != nil {
+			return err
+		}
+		for _, item := range mysqls {
+			if len(item.Username) == 0 || isDatabaseSystemUserForMigration(item.Username) {
+				continue
+			}
+			for _, dbType := range loadDatabaseUserTypesForMigration(tx, item.MysqlName) {
+				if len(dbType) == 0 {
+					continue
+				}
+				for _, host := range normalizeDatabaseUserHostsForMigration(item.Permission) {
+					user := model.DatabaseUser{
+						Type:     dbType,
+						Database: item.MysqlName,
+						Username: item.Username,
+						Host:     host,
+						Password: item.Password,
+					}
+					if err := tx.Where("`type` = ? AND database = ? AND username = ? AND host = ?", dbType, item.MysqlName, item.Username, host).FirstOrCreate(&user).Error; err != nil {
+						return err
+					}
+					grant := model.DatabaseUserGrant{
+						Type:     dbType,
+						Database: item.MysqlName,
+						DBName:   item.Name,
+						Username: item.Username,
+						Host:     host,
+					}
+					if err := tx.Where("`type` = ? AND database = ? AND db_name = ? AND username = ? AND host = ?", dbType, item.MysqlName, item.Name, item.Username, host).FirstOrCreate(&grant).Error; err != nil {
+						return err
+					}
+				}
+			}
+		}
+		return nil
 	},
 }
 

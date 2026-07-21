@@ -15,6 +15,7 @@ type IAppInstallResourceRpo interface {
 	WithAppInstallId(appInstallId uint) DBOption
 	WithLinkId(linkId uint) DBOption
 	WithResourceId(resourceId uint) DBOption
+	WithResourceIds(resourceIds []uint) DBOption
 	GetBy(opts ...DBOption) ([]model.AppInstallResource, error)
 	GetFirst(opts ...DBOption) (model.AppInstallResource, error)
 	Create(ctx context.Context, resource *model.AppInstallResource) error
@@ -41,6 +42,12 @@ func (a AppInstallResourceRpo) WithLinkId(linkId uint) DBOption {
 func (a AppInstallResourceRpo) WithResourceId(resourceId uint) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("resource_id = ?", resourceId)
+	}
+}
+
+func (a AppInstallResourceRpo) WithResourceIds(resourceIds []uint) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("resource_id IN ?", resourceIds)
 	}
 }
 

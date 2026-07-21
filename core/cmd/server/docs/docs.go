@@ -15252,6 +15252,52 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/databases/users/password/save": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.MysqlUserPassword"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Save mysql user password locally",
+				"tags": [
+					"Database Mysql"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"database",
+						"username",
+						"host"
+					],
+					"formatEN": "save mysql database [database] user [username]@[host] password locally",
+					"formatZH": "补充 mysql 数据库 [database] 用户 [username]@[host] 密码",
+					"paramKeys": []
+				}
+			}
+		},
 		"/databases/users/search": {
 			"post": {
 				"consumes": [
@@ -35247,6 +35293,9 @@ const docTemplate = `{
 				"ko": {
 					"type": "string"
 				},
+				"lo": {
+					"type": "string"
+				},
 				"ms": {
 					"type": "string"
 				},
@@ -35299,7 +35348,8 @@ const docTemplate = `{
 						"pt-BR",
 						"tr",
 						"es-ES",
-						"fa"
+						"fa",
+						"lo"
 					],
 					"type": "string"
 				},
@@ -36207,6 +36257,9 @@ const docTemplate = `{
 				},
 				"host": {
 					"type": "string"
+				},
+				"isDelete": {
+					"type": "boolean"
 				},
 				"password": {
 					"type": "string"

@@ -1,5 +1,41 @@
 <template>
-    <DialogPro v-model="dialogVisible" :title="$t('database.userBind')" size="small">
+    <DialogPro v-model="dialogVisible" :title="$t('database.authorizationManagement')" size="small">
+        <div v-loading="loading">
+            <div class="authorization-toolbar">
+                <el-button type="primary" @click="openAddDialog">
+                    {{ $t('database.addUserAuthorization') }}
+                </el-button>
+            </div>
+            <el-table :data="authorizedUsers" :empty-text="$t('commons.msg.noneData')">
+                <el-table-column :label="$t('commons.login.username')" min-width="140">
+                    <template #default="{ row }">{{ row.username }}@{{ row.host }}</template>
+                </el-table-column>
+                <el-table-column :label="$t('database.permission')" min-width="110">
+                    <template #default="{ row }">{{ permissionLabel(row.host) }}</template>
+                </el-table-column>
+                <el-table-column
+                    :label="$t('commons.table.description')"
+                    prop="description"
+                    show-overflow-tooltip
+                    min-width="120"
+                />
+                <el-table-column :label="$t('commons.table.operate')" width="100" fixed="right">
+                    <template #default="{ row }">
+                        <el-button link type="primary" @click="revokeAuthorization(row)">
+                            {{ $t('database.revokeAuthorization') }}
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+        <template #footer>
+            <el-button @click="dialogVisible = false" :disabled="loading">
+                {{ $t('commons.button.close') }}
+            </el-button>
+        </template>
+    </DialogPro>
+
+    <DialogPro v-model="addDialogVisible" :title="$t('database.addUserAuthorization')" size="small">
         <el-form ref="formRef" :model="form" :rules="rules" label-position="top" v-loading="loading">
             <el-form-item :label="$t('commons.table.type')" prop="mode">
                 <el-radio-group v-model="form.mode" @change="changeMode">
@@ -19,7 +55,7 @@
                     @change="syncUser"
                 >
                     <el-option
-                        v-for="item in users"
+                        v-for="item in availableUsers"
                         :key="item.username + '@' + item.host"
                         class="user-select-option"
                         :label="item.username + ' - ' + permissionLabel(item.host)"
@@ -42,7 +78,7 @@
                             >
                                 <template #reference>
                                     <el-button class="user-bound-button" size="small" @click.stop>
-                                        {{ $t('commons.status.bound') }} {{ userDatabases(item).length }}
+                                        {{ $t('database.authorizedDatabaseCount', [userDatabases(item).length]) }}
                                     </el-button>
                                 </template>
                                 <div class="user-bound-list">
@@ -82,10 +118,10 @@
             </template>
         </el-form>
         <template #footer>
-            <el-button @click="dialogVisible = false" :disabled="loading">
+            <el-button @click="addDialogVisible = false" :disabled="loading">
                 {{ $t('commons.button.cancel') }}
             </el-button>
-            <el-button type="primary" @click="submit()" :disabled="loading">
+            <el-button type="primary" @click="submit" :disabled="loading">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -93,16 +129,24 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
+import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import { Database } from '@/api/interface/database';
-import { createMysqlUser, grantMysqlUser, searchMysqlGrants, searchMysqlUsers } from '@/api/modules/database';
+import {
+    createMysqlUser,
+    grantMysqlUser,
+    revokeMysqlGrant,
+    searchMysqlGrants,
+    searchMysqlUsers,
+} from '@/api/modules/database';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const dialogVisible = ref(false);
+const addDialogVisible = ref(false);
 const loading = ref(false);
 const users = ref<Database.MysqlUser[]>([]);
 const grants = ref<Database.MysqlGrant[]>([]);
@@ -131,14 +175,29 @@ interface DialogProps {
     db: string;
 }
 
-const loadUsers = async () => {
-    const res = await searchMysqlUsers({ database: form.database });
-    users.value = res.data || [];
-};
+const grantKeys = computed(
+    () =>
+        new Set(
+            grants.value.filter((item) => item.database === form.db).map((item) => `${item.username}@${item.host}`),
+        ),
+);
+const authorizedUsers = computed(() =>
+    users.value.filter((item) => !item.isDelete && grantKeys.value.has(`${item.username}@${item.host}`)),
+);
+const availableUsers = computed(() =>
+    users.value.filter((item) => !item.isDelete && !grantKeys.value.has(`${item.username}@${item.host}`)),
+);
 
-const loadGrants = async () => {
-    const res = await searchMysqlGrants({ database: form.database });
-    grants.value = res.data || [];
+const loadContext = async () => {
+    if (!form.database) {
+        return;
+    }
+    const [userRes, grantRes] = await Promise.all([
+        searchMysqlUsers({ database: form.database }),
+        searchMysqlGrants({ database: form.database }),
+    ]);
+    users.value = userRes.data || [];
+    grants.value = grantRes.data || [];
 };
 
 const permissionLabel = (host: string) => {
@@ -163,32 +222,43 @@ const changePermission = () => {
 
 const changeMode = () => {
     if (form.mode === 'create') {
+        form.username = '';
         form.host = '%';
         form.permission = '%';
         form.password = '';
         form.description = '';
         return;
     }
+    const user = availableUsers.value[0];
+    form.userKey = user ? `${user.username}@${user.host}` : '';
     syncUser();
 };
 
-const acceptParams = async (params: DialogProps) => {
-    form.database = params.database;
-    form.db = params.db;
+const openAddDialog = () => {
+    form.mode = availableUsers.value.length ? 'select' : 'create';
     form.password = '';
     form.description = '';
-    await Promise.all([loadUsers(), loadGrants()]);
-    form.mode = users.value.length ? 'select' : 'create';
-    const user = users.value?.[0];
-    form.userKey = user ? `${user.username}@${user.host}` : '';
-    form.username = user?.username || '';
-    form.host = user?.host || '%';
-    form.permission = form.mode === 'create' || form.host === '%' ? '%' : 'ip';
+    changeMode();
+    addDialogVisible.value = true;
+};
+
+const acceptParams = async (params: DialogProps) => {
+    if (!params.database || !params.db) {
+        return;
+    }
+    form.database = params.database;
+    form.db = params.db;
     dialogVisible.value = true;
+    loading.value = true;
+    try {
+        await loadContext();
+    } finally {
+        loading.value = false;
+    }
 };
 
 const syncUser = () => {
-    const item = users.value.find((item) => `${item.username}@${item.host}` === form.userKey);
+    const item = availableUsers.value.find((item) => `${item.username}@${item.host}` === form.userKey);
     if (item) {
         form.username = item.username;
         form.host = item.host;
@@ -216,8 +286,36 @@ const submit = async () => {
                 username: form.username,
                 host: form.host,
             });
+            await loadContext();
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            dialogVisible.value = false;
+            addDialogVisible.value = false;
+            emit('search');
+        } finally {
+            loading.value = false;
+        }
+    });
+};
+
+const revokeAuthorization = (user: Database.MysqlUser) => {
+    ElMessageBox.confirm(
+        i18n.global.t('database.revokeAuthorizationHelper', [`${user.username}@${user.host}`, form.db]),
+        i18n.global.t('commons.msg.infoTitle'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'warning',
+        },
+    ).then(async () => {
+        loading.value = true;
+        try {
+            await revokeMysqlGrant({
+                database: form.database,
+                db: form.db,
+                username: user.username,
+                host: user.host,
+            });
+            await loadContext();
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             emit('search');
         } finally {
             loading.value = false;
@@ -231,6 +329,10 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
+.authorization-toolbar {
+    display: flex;
+    margin-bottom: 12px;
+}
 :deep(.user-select-option) {
     height: auto;
     min-height: 48px;

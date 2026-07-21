@@ -3120,6 +3120,17 @@
 		"formatZH": "更新 mysql 数据库 [database] 用户 [username]@[host] 密码",
 		"formatEN": "update mysql database [database] user [username]@[host] password"
 	},
+	"/databases/users/password/save": {
+		"bodyKeys": [
+			"database",
+			"username",
+			"host"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "补充 mysql 数据库 [database] 用户 [username]@[host] 密码",
+		"formatEN": "save mysql database [database] user [username]@[host] password locally"
+	},
 	"/databases/users/update": {
 		"bodyKeys": [
 			"database",

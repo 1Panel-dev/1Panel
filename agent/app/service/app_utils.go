@@ -529,7 +529,7 @@ func ensureAppMysqlDBUser(database model.Database, dbConfig dto.AppDatabase) err
 	userExists := false
 	passwordValid := false
 	for _, user := range users {
-		if user.Username != dbConfig.DbUser || user.Host != host {
+		if user.Username != dbConfig.DbUser || user.Host != host || user.IsDelete {
 			continue
 		}
 		userExists = true
@@ -566,19 +566,20 @@ func deleteLink(del dto.DelAppLink) error {
 	for _, re := range resources {
 		switch re.Key {
 		case constant.AppMysql, constant.AppMariaDB:
-			mysqlService := NewIMysqlService()
 			database, _ := mysqlRepo.Get(repo.WithByID(re.ResourceId))
 			if reflect.DeepEqual(database, model.DatabaseMysql{}) {
 				continue
 			}
-			if err := mysqlService.Delete(del.Ctx, dto.MysqlDBDelete{
+			if err := deleteMysqlDatabaseForResourceOwner(del.Ctx, dto.MysqlDBDelete{
 				ID:           database.ID,
 				ForceDelete:  del.ForceDelete,
 				DeleteBackup: true,
 				Type:         re.Key,
 				Database:     database.MysqlName,
-			}); err != nil && !del.ForceDelete {
-				return err
+			}, dto.DBResource{Type: constant.TypeApp, Name: install.Name}); err != nil {
+				if isMysqlDatabaseResourceInUseError(err) || !del.ForceDelete {
+					return err
+				}
 			}
 		case constant.AppPostgresql:
 			pgsqlService := NewIPostgresqlService()
