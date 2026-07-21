@@ -36,8 +36,9 @@ const (
 
 	nginxModuleProviderLocal = "local"
 
-	nginxModuleSupportUnknown   = "unknown"
-	nginxModuleSupportSupported = "supported"
+	nginxModuleSupportUnknown     = "unknown"
+	nginxModuleSupportSupported   = "supported"
+	nginxModuleSupportUnsupported = "unsupported"
 
 	nginxModuleStatusPending = "pending"
 	nginxModuleStatusReady   = "ready"
@@ -746,7 +747,27 @@ func loadNginxModules(install model.AppInstall) ([]dto.NginxModule, error) {
 	for i := range modules {
 		normalizeNginxModule(&modules[i])
 	}
+	probeNginxModuleDynamicSupport(install, modules)
 	return modules, nil
+}
+
+// probeNginxModuleDynamicSupport marks the dynamic build capability of each
+// dynamic module from its configure params. It only runs when the installed
+// version supports dynamic builds; otherwise the marker stays "unknown".
+func probeNginxModuleDynamicSupport(install model.AppInstall, modules []dto.NginxModule) {
+	if !nginxModuleDynamicSupported(install) {
+		return
+	}
+	for i := range modules {
+		if modules[i].Deleted || modules[i].BuildMode == nginxModuleBuildStatic {
+			continue
+		}
+		if _, err := normalizeDynamicModuleParams(modules[i].Params); err != nil {
+			modules[i].DynamicSupport = nginxModuleSupportUnsupported
+		} else {
+			modules[i].DynamicSupport = nginxModuleSupportSupported
+		}
+	}
 }
 
 func readNginxModuleFile(filePath string) ([]dto.NginxModule, error) {
@@ -790,6 +811,10 @@ func normalizeNginxModule(module *dto.NginxModule) {
 	if module.BuildMode == "" {
 		// Entries created before the dynamic-module schema must preserve their old behavior.
 		module.BuildMode = nginxModuleBuildStatic
+	}
+	if module.BuildMode == nginxModuleBuildAuto {
+		// auto is a legacy alias for the dynamic build mode.
+		module.BuildMode = nginxModuleBuildDynamic
 	}
 	if module.Provider == "" {
 		module.Provider = nginxModuleProviderLocal

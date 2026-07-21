@@ -1,7 +1,10 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
+	"os"
+	"path"
 	"strings"
 	"testing"
 	"time"
@@ -220,5 +223,96 @@ func TestMergeOpenrestyModuleVolumesKeepsExisting(t *testing.T) {
 	}
 	if merged[2] != "./conf/modules-enabled:/usr/local/openresty/nginx/conf/modules-enabled:ro" {
 		t.Fatalf("missing module mount was not appended, got %#v", merged)
+	}
+}
+
+func TestNormalizeNginxModuleFoldsAutoIntoDynamic(t *testing.T) {
+	module := dto.NginxModule{Name: "legacy-auto", BuildMode: nginxModuleBuildAuto}
+
+	normalizeNginxModule(&module)
+
+	if module.BuildMode != nginxModuleBuildDynamic {
+		t.Fatalf("auto should normalize to dynamic, got %s", module.BuildMode)
+	}
+}
+
+func writeNginxModuleFixture(t *testing.T, install model.AppInstall, withBuilder bool, modules []dto.NginxModule) {
+	t.Helper()
+	buildDir := path.Join(install.GetPath(), nginxModuleBuildDir)
+	if err := os.MkdirAll(buildDir, constant.DirPerm); err != nil {
+		t.Fatal(err)
+	}
+	if withBuilder {
+		if err := os.WriteFile(path.Join(buildDir, nginxModuleBuilderFile), []byte("FROM scratch\n"), constant.FilePerm); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path.Join(buildDir, nginxModuleCatalogFile), []byte("[]"), constant.FilePerm); err != nil {
+			t.Fatal(err)
+		}
+	}
+	content, err := json.Marshal(modules)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = os.WriteFile(path.Join(buildDir, nginxModuleStoreFile), content, constant.FilePerm); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestLoadNginxModulesProbesDynamicSupport(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.27.1.2"}
+	install.App.Key = constant.AppOpenresty
+	writeNginxModuleFixture(t, install, true, []dto.NginxModule{
+		{Name: "good", Enable: true, BuildMode: nginxModuleBuildDynamic, Params: "--add-module=/tmp/good"},
+		{Name: "bad", Enable: true, BuildMode: nginxModuleBuildDynamic, Params: "--with-nothing"},
+		{Name: "meta", Enable: true, BuildMode: nginxModuleBuildDynamic, Params: "--add-module=/tmp/x;touch /tmp/y"},
+		{Name: "static-mod", Enable: true, BuildMode: nginxModuleBuildStatic},
+		{Name: "deleted", Deleted: true, BuildMode: nginxModuleBuildDynamic, Params: "--with-nothing"},
+	})
+
+	loaded, err := loadNginxModules(install)
+	if err != nil {
+		t.Fatal(err)
+	}
+	support := make(map[string]string, len(loaded))
+	for _, module := range loaded {
+		support[module.Name] = module.DynamicSupport
+	}
+	if support["good"] != nginxModuleSupportSupported {
+		t.Fatalf("valid dynamic params should probe supported, got %q", support["good"])
+	}
+	if support["bad"] != nginxModuleSupportUnsupported {
+		t.Fatalf("params without a dynamic option should probe unsupported, got %q", support["bad"])
+	}
+	if support["meta"] != nginxModuleSupportUnsupported {
+		t.Fatalf("params with shell metacharacters should probe unsupported, got %q", support["meta"])
+	}
+	if support["static-mod"] != nginxModuleSupportUnknown {
+		t.Fatalf("static module must not be probed, got %q", support["static-mod"])
+	}
+	if support["deleted"] != nginxModuleSupportUnknown {
+		t.Fatalf("deleted module must not be probed, got %q", support["deleted"])
+	}
+}
+
+func TestLoadNginxModulesWithoutBuilderKeepsUnknownSupport(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.27.1.2"}
+	install.App.Key = constant.AppOpenresty
+	writeNginxModuleFixture(t, install, false, []dto.NginxModule{
+		{Name: "good", Enable: true, BuildMode: nginxModuleBuildDynamic, Params: "--add-module=/tmp/good"},
+	})
+
+	loaded, err := loadNginxModules(install)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(loaded) != 1 || loaded[0].DynamicSupport != nginxModuleSupportUnknown {
+		t.Fatalf("without the builder the support marker must stay unknown, got %#v", loaded)
 	}
 }
