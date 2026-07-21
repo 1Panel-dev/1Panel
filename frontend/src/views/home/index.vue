@@ -165,7 +165,7 @@
                     </template>
                 </CardWithHeader>
             </el-col>
-            <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+            <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8" class="dashboard-right">
                 <el-carousel
                     class="my-carousel"
                     :class="{ 'no-indicator': carouselItemCount <= 1 }"
@@ -426,7 +426,7 @@
                     </el-carousel-item>
                 </el-carousel>
 
-                <AppLauncher ref="appRef" class="card-interval" />
+                <AppLauncher ref="appRef" class="card-interval dashboard-app" />
             </el-col>
         </el-row>
 
@@ -1155,6 +1155,19 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
+@media only screen and (min-width: 992px) {
+    .dashboard-right {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .dashboard-app {
+        flex: 1;
+        min-height: 0;
+    }
+}
+
 .h-overview {
     text-align: center;
 

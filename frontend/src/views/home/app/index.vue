@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <CardWithHeader :header="$t('app.app')" class="card-interval" v-loading="loading">
+    <div class="app-launcher">
+        <CardWithHeader :header="$t('app.app')" class="card-interval" v-loading="loading" fill>
             <template #header-r>
                 <el-popover placement="left" :width="226" trigger="click">
                     <el-input size="small" v-model="filter" clearable @input="loadOption()" />
@@ -28,7 +28,7 @@
                 </el-popover>
             </template>
             <template #body>
-                <el-scrollbar height="536px" class="moz-height">
+                <el-scrollbar class="app-scrollbar moz-height">
                     <div class="h-app-card" v-for="(app, index) in apps" :key="index">
                         <el-row :gutter="5">
                             <el-col :span="5" class="h-app-media-col">
@@ -244,6 +244,26 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
+.app-launcher {
+    min-height: 0;
+}
+
+.app-scrollbar {
+    height: 536px;
+}
+
+@media only screen and (min-width: 992px) {
+    .app-launcher {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .app-scrollbar {
+        height: 100%;
+        min-height: 0;
+    }
+}
+
 .h-app-card {
     padding: 8px 10px;
     margin: 0 4px 3px 0;
@@ -407,8 +427,10 @@ defineExpose({
 
 /* FOR MOZILLA */
 @-moz-document url-prefix() {
-    .moz-height {
-        height: 524px;
+    @media only screen and (max-width: 991px) {
+        .moz-height {
+            height: 524px;
+        }
     }
 }
 </style>
