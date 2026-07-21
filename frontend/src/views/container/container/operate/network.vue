@@ -54,7 +54,7 @@
 import { Container } from '@/api/interface/container';
 import { listNetwork } from '@/api/modules/container';
 import { ref, onMounted } from 'vue';
-const tmpNetworks = ref([]);
+const tmpNetworks = ref<Array<Container.ContainerNetwork>>([]);
 const networkOptions = ref();
 const props = defineProps({
     networks: { type: Array<Container.ContainerNetwork>, default: [] },
@@ -77,24 +77,33 @@ const loadNetworkOptions = async () => {
     networkOptions.value = res.data;
 };
 const handleNetworksAdd = () => {
-    let item = {
+    const item: Container.ContainerNetwork = {
         network: 'bridge',
         ipv4: '',
         ipv6: '',
         macAddr: '',
+        links: [],
+        aliases: [],
+        driverOpts: {},
+        gwPriority: 0,
+        linkLocalIPs: [],
     };
     tmpNetworks.value.push(item);
 };
 const handleNetworksDelete = (index: number) => {
     tmpNetworks.value.splice(index, 1);
 };
-const changeNetwork = (row: any) => {
-    if (row.network === 'none' || row.network === 'host') {
-        row.ipv4 = '';
-        row.ipv6 = '';
-    }
+const changeNetwork = (row: Container.ContainerNetwork) => {
+    row.ipv4 = '';
+    row.ipv6 = '';
+    row.macAddr = '';
+    row.links = [];
+    row.aliases = [];
+    row.driverOpts = {};
+    row.gwPriority = 0;
+    row.linkLocalIPs = [];
 };
-const isIpDisabled = (row: any) => {
+const isIpDisabled = (row: Container.ContainerNetwork) => {
     return row.network === 'none' || row.network === 'host' || row.network === 'bridge';
 };
 

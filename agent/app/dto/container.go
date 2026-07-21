@@ -134,10 +134,15 @@ type ExtraHost struct {
 	IP       string `json:"ip"`
 }
 type ContainerNetwork struct {
-	Network string `json:"network"`
-	Ipv4    string `json:"ipv4"`
-	Ipv6    string `json:"ipv6"`
-	MacAddr string `json:"macAddr"`
+	Network      string            `json:"network"`
+	Ipv4         string            `json:"ipv4"`
+	Ipv6         string            `json:"ipv6"`
+	MacAddr      string            `json:"macAddr"`
+	Links        []string          `json:"links"`
+	Aliases      []string          `json:"aliases"`
+	DriverOpts   map[string]string `json:"driverOpts"`
+	GwPriority   int               `json:"gwPriority"`
+	LinkLocalIPs []string          `json:"linkLocalIPs"`
 }
 
 type ContainerCreateByCommand struct {
