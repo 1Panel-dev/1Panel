@@ -904,6 +904,8 @@ const message = {
             from_remote: 'このモデルは1Panelを介してダウンロードされておらず、関連するプルログはありません。',
             no_logs: 'このモデルのプルログは削除されており、関連するログを表示できません。',
             vllmVersionHelper: 'FusionXpark GB 10 サーバーでは -cu130 バージョンを選択してください。',
+            vllmCommandPortHelper:
+                '起動コマンドではポート {0} を使用する必要があります。使用しない場合、サービスにアクセスできません。',
             syncModelAccount: 'モデルアカウントに同期',
             modelAccountAddressHelper:
                 'コンテナアドレスはエージェントコンテナ向けです。127.0.0.1、システム IP、カスタムアドレスは AI Gateway または外部サービス向けです。',
@@ -4878,6 +4880,7 @@ const message = {
             dirFilter: 'ディレクトリフィルター',
             sqlInject: 'SQLインジェクション',
             xss: 'XSS',
+            webshell: 'WebShell',
             phpExec: 'PHPスクリプト実行',
             oneWordTrojan: 'ワンワードトロイの木馬',
             appFilter: '危険なディレクトリフィルタリング',

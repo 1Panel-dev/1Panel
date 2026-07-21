@@ -889,6 +889,7 @@ const message = {
             from_remote: '이 모델은 1Panel을 통해 다운로드되지 않았으며 관련 풀 로그가 없습니다.',
             no_logs: '이 모델의 풀 로그가 삭제되어 관련 로그를 볼 수 없습니다.',
             vllmVersionHelper: 'FusionXpark GB 10 서버는 -cu130 버전을 선택하세요.',
+            vllmCommandPortHelper: '시작 명령은 {0} 포트를 사용해야 하며, 그렇지 않으면 서비스에 접근할 수 없습니다.',
             syncModelAccount: '모델 계정에 동기화',
             modelAccountAddressHelper:
                 '컨테이너 주소는 에이전트 컨테이너 호출에 적합합니다. 127.0.0.1, 시스템 IP 또는 사용자 지정 주소는 AI Gateway 또는 외부 서비스 호출에 적합합니다.',
@@ -4782,6 +4783,7 @@ const message = {
             dirFilter: '디렉터리 필터',
             sqlInject: 'SQL 인젝션',
             xss: 'XSS',
+            webshell: 'WebShell',
             phpExec: 'PHP 스크립트 실행',
             oneWordTrojan: '단어 트로이',
             appFilter: '위험한 디렉터리 필터링',

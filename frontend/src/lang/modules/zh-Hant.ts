@@ -853,6 +853,7 @@ const message = {
             from_remote: '該模型並非透過 1Panel 下載，無相關拉取日誌。',
             no_logs: '該模型的拉取日誌已被刪除，無法檢視相關日誌。',
             vllmVersionHelper: 'FusionXpark GB 10 伺服器請選擇 -cu130 版本',
+            vllmCommandPortHelper: '啟動命令必須使用 {0} 連接埠，否則服務將無法存取。',
             syncModelAccount: '同步到模型帳號',
             modelAccountAddressHelper:
                 '容器地址適合智能體容器呼叫；127.0.0.1、本機 IP 或自訂地址適合 AI 閘道或外部服務呼叫。',
@@ -4527,6 +4528,7 @@ const message = {
             dirFilter: '目錄過濾',
             sqlInject: 'SQL 注入',
             xss: 'XSS',
+            webshell: 'WebShell',
             phpExec: 'PHP 腳本執行',
             oneWordTrojan: '一句話木馬',
             appFilter: '套用危險目錄過濾',

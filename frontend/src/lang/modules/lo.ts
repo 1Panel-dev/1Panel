@@ -901,6 +901,7 @@ const message = {
             from_remote: 'ໂມເດວນີ້ບໍ່ໄດ້ດາວໂຫຼດຜ່ານ 1Panel, ບໍ່ມີລັອກການດຶງຂໍ້ມູນທີ່ກ່ຽວຂ້ອງ.',
             no_logs: 'ລັອກການດຶງຂໍ້ມູນຂອງໂມເດວນີ້ຖືກລຶບແລ້ວ ແລະ ບໍ່ສາມາດເບິ່ງໄດ້.',
             vllmVersionHelper: 'ສຳລັບເຊີເວີ FusionXpark GB 10, ກະລຸນາເລືອກເວີຊັນ -cu130.',
+            vllmCommandPortHelper: 'ຄຳສັ່ງເລີ່ມຕົ້ນຕ້ອງໃຊ້ພອດ {0}; ບໍ່ດັ່ງນັ້ນຈະບໍ່ສາມາດເຂົ້າເຖິງບໍລິການໄດ້.',
             syncModelAccount: 'ຊິ້ງຄ໌ໄປຍັງບັນຊີໂມເດວ',
             modelAccountAddressHelper:
                 'ທີ່ຢູ່ຄອນເທນເນີແມ່ນສຳລັບຄອນເທນເນີຕົວແທນ; 127.0.0.1, IP ລະບົບ, ຫຼື ທີ່ຢູ່ກຳນົດເອງແມ່ນສຳລັບ AI Gateway ຫຼື ບໍລິການພາຍນອກ.',
@@ -4746,6 +4747,7 @@ const message = {
             dirFilter: 'ກອງໄດເຣັກທໍຣີ',
             sqlInject: 'SQL Injection',
             xss: 'XSS',
+            webshell: 'WebShell',
             phpExec: 'ການທຳງານຂອງສະຄຣິບ PHP',
             oneWordTrojan: 'One word Trojan',
             appFilter: 'ການກອງໄດເຣັກທໍຣີທີ່ເປັນອັນຕະລາຍ',
