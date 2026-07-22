@@ -73,7 +73,7 @@
         "eslint": "^10.6.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.5",
-        "eslint-plugin-vue": "^10.9.2",
+        "eslint-plugin-vue": "^10.10.0",
         "lint-staged": "^17.0.7",
         "postcss": "^8.5.14",
         "postcss-html": "^1.8.1",
