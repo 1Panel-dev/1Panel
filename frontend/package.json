@@ -57,7 +57,7 @@
         "vue-codemirror": "^6.1.1",
         "vue-demi": "^0.14.6",
         "vue-i18n": "^11.4.4",
-        "vue-router": "^5.1.0"
+        "vue-router": "^5.2.0"
     },
     "devDependencies": {
         "@tailwindcss/postcss": "^4.3.3",
