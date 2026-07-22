@@ -42,7 +42,7 @@
         "js-base64": "^3.7.7",
         "jsencrypt": "^3.3.2",
         "lodash-es": "^4.18.1",
-        "md-editor-v3": "^6.4.2",
+        "md-editor-v3": "^6.5.4",
         "monaco-editor": "^0.53.0",
         "nprogress": "^0.2.0",
         "pinia": "^3.0.4",
