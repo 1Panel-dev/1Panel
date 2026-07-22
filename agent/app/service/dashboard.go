@@ -229,13 +229,12 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 
 	if ioOption == "all" {
 		diskInfo, _ := disk.IOCounters()
-		for _, state := range diskInfo {
-			currentInfo.IOReadBytes += state.ReadBytes
-			currentInfo.IOWriteBytes += state.WriteBytes
-			currentInfo.IOCount += (state.ReadCount + state.WriteCount)
-			currentInfo.IOReadTime += state.ReadTime
-			currentInfo.IOWriteTime += state.WriteTime
-		}
+		state := sumDiskIOCounters(diskInfo)
+		currentInfo.IOReadBytes = state.ReadBytes
+		currentInfo.IOWriteBytes = state.WriteBytes
+		currentInfo.IOCount = state.ReadCount + state.WriteCount
+		currentInfo.IOReadTime = state.ReadTime
+		currentInfo.IOWriteTime = state.WriteTime
 	} else {
 		diskInfo, _ := disk.IOCounters(ioOption)
 		for _, state := range diskInfo {
