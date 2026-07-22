@@ -39,7 +39,7 @@
         "dompurify": "^3.4.11",
         "echarts": "^6.1.0",
         "element-plus": "2.14.0",
-        "js-base64": "^3.7.7",
+        "js-base64": "^3.9.1",
         "jsencrypt": "^3.3.2",
         "lodash-es": "^4.18.1",
         "md-editor-v3": "^6.4.2",
