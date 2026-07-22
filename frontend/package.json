@@ -39,10 +39,10 @@
         "dompurify": "^3.4.11",
         "echarts": "^6.1.0",
         "element-plus": "2.14.0",
-        "js-base64": "^3.7.7",
+        "js-base64": "^3.9.1",
         "jsencrypt": "^3.3.2",
         "lodash-es": "^4.18.1",
-        "md-editor-v3": "^6.4.2",
+        "md-editor-v3": "^6.5.4",
         "monaco-editor": "^0.53.0",
         "nprogress": "^0.2.0",
         "pinia": "^3.0.4",
@@ -57,7 +57,7 @@
         "vue-codemirror": "^6.1.1",
         "vue-demi": "^0.14.6",
         "vue-i18n": "^11.4.4",
-        "vue-router": "^5.1.0"
+        "vue-router": "^5.2.0"
     },
     "devDependencies": {
         "@tailwindcss/postcss": "^4.3.3",
@@ -73,7 +73,7 @@
         "eslint": "^10.6.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.5",
-        "eslint-plugin-vue": "^10.9.2",
+        "eslint-plugin-vue": "^10.10.0",
         "lint-staged": "^17.0.7",
         "postcss": "^8.5.14",
         "postcss-html": "^1.8.1",
