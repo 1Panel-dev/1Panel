@@ -4,9 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -34,7 +37,12 @@ type MonitorService struct {
 	NetIO  chan ([]net.IOCountersStat)
 }
 
-var monitorCancel context.CancelFunc
+var (
+	monitorCancel context.CancelFunc
+	hostSysPath   = loadHostSysPath()
+
+	blockDevicePartitionCache sync.Map
+)
 
 type IMonitorService interface {
 	Run()
@@ -341,18 +349,10 @@ func (m *MonitorService) Run() {
 func (m *MonitorService) loadDiskIO() {
 	ioStat, _ := disk.IOCounters()
 	var diskIOList []disk.IOCountersStat
-	var ioStatAll disk.IOCountersStat
 	for _, io := range ioStat {
-		ioStatAll.Name = "all"
-		ioStatAll.ReadBytes += io.ReadBytes
-		ioStatAll.WriteBytes += io.WriteBytes
-		ioStatAll.ReadTime += io.ReadTime
-		ioStatAll.WriteTime += io.WriteTime
-		ioStatAll.WriteCount += io.WriteCount
-		ioStatAll.ReadCount += io.ReadCount
 		diskIOList = append(diskIOList, io)
 	}
-	diskIOList = append(diskIOList, ioStatAll)
+	diskIOList = append(diskIOList, sumDiskIOCounters(ioStat))
 	m.DiskIO <- diskIOList
 }
 
@@ -679,4 +679,46 @@ func loadGPUInfoFloat(val string) float64 {
 	val = strings.TrimSpace(val)
 	data, _ := strconv.ParseFloat(val, 64)
 	return data
+}
+
+func sumDiskIOCounters(ioStats map[string]disk.IOCountersStat) disk.IOCountersStat {
+	total := disk.IOCountersStat{Name: "all"}
+	for name, stat := range ioStats {
+		if isBlockDevicePartition(name) {
+			continue
+		}
+
+		total.ReadCount += stat.ReadCount
+		total.MergedReadCount += stat.MergedReadCount
+		total.WriteCount += stat.WriteCount
+		total.MergedWriteCount += stat.MergedWriteCount
+		total.ReadBytes += stat.ReadBytes
+		total.WriteBytes += stat.WriteBytes
+		total.ReadTime += stat.ReadTime
+		total.WriteTime += stat.WriteTime
+		total.IopsInProgress += stat.IopsInProgress
+		total.IoTime += stat.IoTime
+		total.WeightedIO += stat.WeightedIO
+	}
+	return total
+}
+
+func isBlockDevicePartition(name string) bool {
+	deviceName := filepath.Base(name)
+	if cached, ok := blockDevicePartitionCache.Load(deviceName); ok {
+		return cached.(bool)
+	}
+
+	_, err := os.Stat(filepath.Join(hostSysPath, "class", "block", deviceName, "partition"))
+	isPartition := err == nil
+	actual, _ := blockDevicePartitionCache.LoadOrStore(deviceName, isPartition)
+	return actual.(bool)
+}
+
+func loadHostSysPath() string {
+	hostSys := os.Getenv("HOST_SYS")
+	if hostSys == "" {
+		return "/sys"
+	}
+	return hostSys
 }
