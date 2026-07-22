@@ -316,3 +316,32 @@ func TestLoadNginxModulesWithoutBuilderKeepsUnknownSupport(t *testing.T) {
 		t.Fatalf("without the builder the support marker must stay unknown, got %#v", loaded)
 	}
 }
+
+func TestResolveNginxModuleBuildMirror(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.27.1.2"}
+	install.App.Key = constant.AppOpenresty
+	if err := os.MkdirAll(install.GetPath(), constant.DirPerm); err != nil {
+		t.Fatal(err)
+	}
+
+	if got := resolveNginxModuleBuildMirror(install, "https://mirror.example.com"); got != "https://mirror.example.com" {
+		t.Fatalf("request mirror should win, got %q", got)
+	}
+	if got := resolveNginxModuleBuildMirror(install, ""); got != "" {
+		t.Fatalf("missing env file should yield an empty mirror, got %q", got)
+	}
+
+	envContent := "CONTAINER_PACKAGE_URL=https://apt.example.com\nOTHER=value\n"
+	if err := os.WriteFile(install.GetEnvPath(), []byte(envContent), constant.FilePerm); err != nil {
+		t.Fatal(err)
+	}
+	if got := resolveNginxModuleBuildMirror(install, ""); got != "https://apt.example.com" {
+		t.Fatalf("env CONTAINER_PACKAGE_URL should be the fallback, got %q", got)
+	}
+	if got := resolveNginxModuleBuildMirror(install, "https://mirror.example.com"); got != "https://mirror.example.com" {
+		t.Fatalf("request mirror should still win over the env value, got %q", got)
+	}
+}

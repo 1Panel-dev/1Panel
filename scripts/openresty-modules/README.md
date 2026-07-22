@@ -71,6 +71,9 @@ The builder test performs these phases for every selected version:
 
 Use `--strict-individual` when every selected module is expected to load alone.
 
+Use `--mirror URL` (environment variable `MIRROR`) to pass an apt mirror as
+`CONTAINER_PACKAGE_URL` to module builds, matching the 1Panel module build.
+
 Results are written to:
 
 ```text

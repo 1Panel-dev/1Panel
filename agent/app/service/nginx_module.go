@@ -80,6 +80,7 @@ type nginxModuleBuildSpec struct {
 	Target    dto.NginxModuleTarget
 	BuildPath string
 	Force     bool
+	Mirror    string
 	Task      *task.Task
 }
 
@@ -140,7 +141,21 @@ func nginxModuleDynamicSupported(install model.AppInstall) bool {
 		fileOp.Stat(path.Join(buildPath, nginxModuleCatalogFile))
 }
 
-func buildDynamicNginxModules(install model.AppInstall, modules []dto.NginxModule, selected []string, force bool, parentTask *task.Task) ([]dto.NginxModule, error) {
+// resolveNginxModuleBuildMirror picks the apt mirror for module builds: the
+// explicit request value wins, otherwise the install's saved
+// CONTAINER_PACKAGE_URL.
+func resolveNginxModuleBuildMirror(install model.AppInstall, mirror string) string {
+	if mirror != "" {
+		return mirror
+	}
+	envs, err := gotenv.Read(install.GetEnvPath())
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(envs["CONTAINER_PACKAGE_URL"])
+}
+
+func buildDynamicNginxModules(install model.AppInstall, modules []dto.NginxModule, selected []string, force bool, mirror string, parentTask *task.Task) ([]dto.NginxModule, error) {
 	// Skip target resolution entirely when nothing needs a dynamic build, so
 	// installs without dynamic modules do not require Dockerfile.modules.
 	if !hasDynamicNginxModuleBuildTask(modules, selected) {
@@ -178,6 +193,7 @@ func buildDynamicNginxModules(install model.AppInstall, modules []dto.NginxModul
 		selectedNames[name] = struct{}{}
 	}
 	buildPath := path.Join(install.GetPath(), nginxModuleBuildDir)
+	buildMirror := resolveNginxModuleBuildMirror(install, mirror)
 	for i := range modules {
 		module := &modules[i]
 		normalizeNginxModule(module)
@@ -190,7 +206,7 @@ func buildDynamicNginxModules(install model.AppInstall, modules []dto.NginxModul
 		}
 		previousBuild := findCurrentNginxModuleBuild(*module, target)
 		build, buildErr := provider.Resolve(nginxModuleBuildSpec{
-			Install: install, Module: *module, Target: target, BuildPath: buildPath, Force: force, Task: parentTask,
+			Install: install, Module: *module, Target: target, BuildPath: buildPath, Force: force, Mirror: buildMirror, Task: parentTask,
 		})
 		if buildErr != nil {
 			build.Provider = provider.Name()
@@ -295,8 +311,11 @@ func (localNginxModuleProvider) Resolve(spec nginxModuleBuildSpec) (dto.NginxMod
 		"-t", tempImage,
 		"--build-arg", "PANEL_OPENRESTY_VERSION=" + spec.Install.Version,
 		"--build-arg", "RESTY_ADD_PACKAGE_BUILDDEPS=" + strings.Join(spec.Module.Packages, " "),
-		spec.BuildPath,
 	}
+	if spec.Mirror != "" {
+		buildArgs = append(buildArgs, "--build-arg", "CONTAINER_PACKAGE_URL="+spec.Mirror)
+	}
+	buildArgs = append(buildArgs, spec.BuildPath)
 	if err = commandMgr.Run("docker", buildArgs...); err != nil {
 		return result, err
 	}
@@ -669,7 +688,7 @@ func executeStaticNginxModuleBuild(install model.AppInstall, modules []dto.Nginx
 	previousModules := cloneNginxModules(modules)
 	// A rebuilt runtime changes the target ABI, so every enabled dynamic module
 	// must be rebuilt even when the user selected only one module.
-	modules, err := buildDynamicNginxModules(install, modules, nil, force, parentTask)
+	modules, err := buildDynamicNginxModules(install, modules, nil, force, mirror, parentTask)
 	if err != nil {
 		return err
 	}
@@ -697,7 +716,7 @@ func executeNginxModuleBuild(install model.AppInstall, reqModules []string, forc
 		return executeStaticNginxModuleBuild(install, modules, mirror, force, parentTask)
 	}
 	previousModules := cloneNginxModules(modules)
-	modules, err = buildDynamicNginxModules(install, modules, reqModules, force, parentTask)
+	modules, err = buildDynamicNginxModules(install, modules, reqModules, force, mirror, parentTask)
 	if err != nil {
 		return err
 	}

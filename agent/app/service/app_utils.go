@@ -762,7 +762,7 @@ func buildNginx(parentTask *task.Task, nginxInstall model.AppInstall) error {
 		}
 		parentTask.LogSuccess(logStr)
 	}
-	modules, err = buildDynamicNginxModules(nginxInstall, modules, nil, false, parentTask)
+	modules, err = buildDynamicNginxModules(nginxInstall, modules, nil, false, "", parentTask)
 	if err != nil {
 		return err
 	}
@@ -978,7 +978,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			// current container. Static modules retain the full rebuild path.
 			if !hasEnabledStaticNginxModules(modules) {
 				previousModules := cloneNginxModules(modules)
-				modules, moduleErr = buildDynamicNginxModules(install, modules, nil, false, t)
+				modules, moduleErr = buildDynamicNginxModules(install, modules, nil, false, "", t)
 				if moduleErr != nil {
 					return moduleErr
 				}

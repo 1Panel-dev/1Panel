@@ -12,6 +12,7 @@ APPSTORE_ROOT="${APPSTORE_ROOT:-${DEFAULT_APPSTORE_ROOT}}"
 VERSIONS_CSV="1.27.1.2-5-1-focal,1.29.2.5-0-noble,1.31.1.1-0-noble"
 MODULES_CSV=""
 OUTPUT_DIR="${OUTPUT_DIR:-${PWD}/openresty-module-test-results/${RUN_ID}}"
+MIRROR="${MIRROR:-}"
 SKIP_PULL=0
 NO_CACHE=0
 KEEP_DOCKER=0
@@ -36,6 +37,7 @@ Options:
   --versions CSV        App versions to test
   --modules CSV         Module names to test (default: every catalog module)
   --output PATH         Persistent result directory
+  --mirror URL          apt mirror for module build packages (CONTAINER_PACKAGE_URL)
   --skip-pull           Use local runtime images without pulling
   --no-cache            Pass --no-cache to every module Docker build
   --strict-individual   Fail when a module cannot load by itself
@@ -44,7 +46,7 @@ Options:
   --keep-context        Keep copied Docker build contexts
   -h, --help            Show this help
 
-Environment equivalents: APPSTORE_ROOT, OUTPUT_DIR, DOCKER_BUILDKIT.
+Environment equivalents: APPSTORE_ROOT, OUTPUT_DIR, MIRROR, DOCKER_BUILDKIT.
 EOF
 }
 
@@ -163,6 +165,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --output)
             OUTPUT_DIR="$2"
+            shift 2
+            ;;
+        --mirror)
+            MIRROR="$2"
             shift 2
             ;;
         --skip-pull)
@@ -353,6 +359,7 @@ build_module() {
         --build-arg "RESTY_ADD_PACKAGE_BUILDDEPS=${packages}"
     )
     [[ "${NO_CACHE}" -eq 0 ]] || build_args+=(--no-cache)
+    [[ -z "${MIRROR}" ]] || build_args+=(--build-arg "CONTAINER_PACKAGE_URL=${MIRROR}")
     build_args+=("${context}")
 
     run_logged "${build_log}" docker "${build_args[@]}"
