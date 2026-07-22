@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :class="{ 'fill-height': fill }">
         <el-card :style="{ height: height }" class="home-card">
             <div class="header">
                 <div class="header-left flex flex-wrap gap-3">
@@ -22,10 +22,38 @@ defineOptions({ name: 'CardWithHeader' });
 defineProps({
     header: String,
     height: String,
+    fill: Boolean,
 });
 </script>
 
 <style scoped lang="scss">
+.fill-height {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+
+    .home-card {
+        flex: 1;
+        min-height: 0;
+
+        :deep(.el-card__body) {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .header {
+            flex-shrink: 0;
+        }
+
+        .body-content {
+            flex: 1;
+            min-height: 0;
+        }
+    }
+}
+
 .home-card {
     .header {
         display: flex;
