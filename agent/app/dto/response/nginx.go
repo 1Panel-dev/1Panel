@@ -69,16 +69,26 @@ type NginxProxyCache struct {
 }
 
 type NginxModule struct {
-	Name     string `json:"name"`
-	Script   string `json:"script"`
-	Packages string `json:"packages"`
-	Params   string `json:"params"`
-	Enable   bool   `json:"enable"`
+	Name           string                    `json:"name"`
+	Script         string                    `json:"script"`
+	Packages       string                    `json:"packages"`
+	Params         string                    `json:"params"`
+	Enable         bool                      `json:"enable"`
+	BuildMode      string                    `json:"buildMode"`
+	Provider       string                    `json:"provider"`
+	DynamicSupport string                    `json:"dynamicSupport"`
+	LoadOrder      int                       `json:"loadOrder"`
+	BuildStatus    string                    `json:"buildStatus"`
+	LoadStatus     string                    `json:"loadStatus"`
+	Compatibility  string                    `json:"compatibility"`
+	Artifacts      []dto.NginxModuleArtifact `json:"artifacts"`
+	LastError      string                    `json:"lastError"`
 }
 
 type NginxBuildConfig struct {
-	Mirror  string        `json:"mirror"`
-	Modules []NginxModule `json:"modules"`
+	Mirror           string        `json:"mirror"`
+	DynamicSupported bool          `json:"dynamicSupported"`
+	Modules          []NginxModule `json:"modules"`
 }
 
 type NginxConfigRes struct {

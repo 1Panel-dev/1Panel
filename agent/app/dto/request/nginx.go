@@ -114,17 +114,22 @@ type NginxRedirectUpdate struct {
 }
 
 type NginxBuildReq struct {
-	TaskID string `json:"taskID" validate:"required"`
-	Mirror string `json:"mirror"  validate:"required"`
+	TaskID  string   `json:"taskID" validate:"required"`
+	Mirror  string   `json:"mirror" validate:"required"`
+	Modules []string `json:"modules"`
+	Force   bool     `json:"force"`
 }
 
 type NginxModuleUpdate struct {
-	Operate  string `json:"operate" validate:"required,oneof=create delete update"`
-	Name     string `json:"name" validate:"required"`
-	Script   string `json:"script"`
-	Packages string `json:"packages"`
-	Enable   bool   `json:"enable"`
-	Params   string `json:"params"`
+	Operate   string `json:"operate" validate:"required,oneof=create delete update"`
+	Name      string `json:"name" validate:"required"`
+	Script    string `json:"script"`
+	Packages  string `json:"packages"`
+	Enable    bool   `json:"enable"`
+	Params    string `json:"params"`
+	BuildMode string `json:"buildMode" validate:"omitempty,oneof=auto dynamic static"`
+	Provider  string `json:"provider" validate:"omitempty,oneof=local prebuilt"`
+	LoadOrder int    `json:"loadOrder" validate:"omitempty,min=0,max=9999"`
 }
 
 type NginxOperateReq struct {
