@@ -31,24 +31,24 @@ type FilterClient interface {
 }
 
 func NewFirewallClient() (FilterClient, error) {
-	firewalld := cmd.Which("firewalld")
-	ufw := cmd.Which("ufw")
-
-	if firewalld && ufw {
-		return nil, errors.New("It is detected that the system has both firewalld and ufw services. To avoid conflicts, please uninstall and try again!")
+	provider, err := DetectProvider()
+	if err != nil {
+		return nil, err
 	}
-	if firewalld {
+	return newClientByName(provider)
+}
+
+func newClientByName(name string) (FilterClient, error) {
+	switch name {
+	case "firewalld":
 		return client.NewFirewalld()
-	}
-	if ufw {
+	case "ufw":
 		return client.NewUfw()
-	}
-
-	iptables := cmd.Which("iptables")
-	if iptables {
+	case "iptables":
 		return client.NewIptables()
+	default:
+		return nil, errors.New("unsupported firewall provider: " + name)
 	}
-	return nil, errors.New("No system firewall service detected (firewalld/ufw/iptables), please check and try again!")
 }
 
 func LoadPingStatus() string {

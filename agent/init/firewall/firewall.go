@@ -19,17 +19,16 @@ func Init() {
 	}
 	InitPingStatus()
 	global.LOG.Info("initializing firewall settings...")
-	client, err := firewall.NewFirewallClient()
+	provider, err := firewall.DetectProvider()
 	if err != nil {
 		return
 	}
-	clientName := client.Name()
 	if err := service.NewIForwardingService().Replay(); err != nil {
 		global.LOG.Errorf("replay forwarding rules failed, err: %v", err)
 		return
 	}
 
-	if clientName != "iptables" {
+	if provider != "iptables" {
 		return
 	}
 	settingRepo := repo.NewISettingRepo()

@@ -37,11 +37,11 @@ func NewIForwardingService() IForwardingService {
 }
 
 func newForwardingAdapter() (forwardClient.Adapter, error) {
-	client, err := firewall.NewFirewallClient()
+	provider, err := firewall.DetectProvider()
 	if err != nil {
 		return nil, err
 	}
-	return forwardClient.NewAdapter(client.Name())
+	return forwardClient.NewAdapter(provider)
 }
 
 func (s *ForwardingService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
