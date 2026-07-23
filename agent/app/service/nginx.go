@@ -213,33 +213,39 @@ func (n NginxService) GetModules() (*response.NginxBuildConfig, error) {
 	if targetWarning != "" {
 		global.LOG.Warn(targetWarning)
 	}
+	runtimeTarget := target
+	runtimeTarget.BuilderDigest = ""
+	setNginxModuleTargetKey(&runtimeTarget)
+	runtimeTargetErr := targetErr
+	if runtimeTarget.OpenRestyVersion != "" {
+		runtimeTargetErr = nil
+	}
 	var resList []response.NginxModule
 	for _, module := range modules {
-		if module.Deleted {
-			continue
-		}
 		buildStatus := nginxModuleStatusPending
 		loadStatus := nginxModuleLoadDisabled
-		compatibility := "unknown"
 		var artifacts []dto.NginxModuleArtifact
-		if module.BuildMode == nginxModuleBuildStatic {
-			buildStatus = nginxModuleStatusReady
-			compatibility = "static"
-			if module.Enable {
-				loadStatus = nginxModuleLoadEnabled
+		if module.BuildMode == nginxModuleBuildStatic && runtimeTargetErr == nil {
+			if build := findCurrentNginxModuleBuild(module, runtimeTarget); build != nil && build.Status == nginxModuleStatusReady {
+				buildStatus = nginxModuleStatusReady
+				if module.Enable {
+					loadStatus = nginxModuleLoadEnabled
+				}
+			} else if findLatestNginxModuleBuild(module, runtimeTarget) != nil {
+				if module.Enable {
+					loadStatus = nginxModuleLoadEnabled
+				}
 			}
 		} else if targetErr == nil {
 			if build := findCurrentNginxModuleBuild(module, target); build != nil {
 				buildStatus = build.Status
 				artifacts = build.Artifacts
 				if build.Status == nginxModuleStatusReady {
-					compatibility = "compatible"
 					if module.Enable {
 						loadStatus = nginxModuleLoadEnabled
 					}
 				}
 			} else if latestBuild := findLatestNginxModuleBuild(module, target); latestBuild != nil {
-				compatibility = "stale"
 				artifacts = latestBuild.Artifacts
 				if module.Enable {
 					loadStatus = nginxModuleLoadEnabled
@@ -250,20 +256,19 @@ func (n NginxService) GetModules() (*response.NginxBuildConfig, error) {
 			buildStatus = nginxModuleStatusFailed
 		}
 		resList = append(resList, response.NginxModule{
-			Name:           module.Name,
-			Script:         module.Script,
-			Packages:       strings.Join(module.Packages, ","),
-			Params:         module.Params,
-			Enable:         module.Enable,
-			BuildMode:      module.BuildMode,
-			Provider:       module.Provider,
-			DynamicSupport: module.DynamicSupport,
-			LoadOrder:      module.LoadOrder,
-			BuildStatus:    buildStatus,
-			LoadStatus:     loadStatus,
-			Compatibility:  compatibility,
-			Artifacts:      artifacts,
-			LastError:      module.LastError,
+			Name:        module.Name,
+			Custom:      module.Custom,
+			Script:      module.Script,
+			Packages:    strings.Join(module.Packages, ","),
+			Params:      module.Params,
+			Enable:      module.Enable,
+			BuildMode:   module.BuildMode,
+			Provider:    module.Provider,
+			LoadOrder:   module.LoadOrder,
+			BuildStatus: buildStatus,
+			LoadStatus:  loadStatus,
+			Artifacts:   artifacts,
+			LastError:   module.LastError,
 		})
 	}
 	envs, err := gotenv.Read(nginxInstall.GetEnvPath())
@@ -276,6 +281,70 @@ func (n NginxService) GetModules() (*response.NginxBuildConfig, error) {
 		DynamicSupported: nginxModuleDynamicSupported(nginxInstall),
 		Modules:          resList,
 	}, nil
+}
+
+func applyNginxModuleUpdate(modules []dto.NginxModule, req request.NginxModuleUpdate) ([]dto.NginxModule, *dto.NginxModule, error) {
+	switch req.Operate {
+	case nginxModuleOperateCreate:
+		if err := validateNginxModuleBuildMode(dto.NginxModule{Name: req.Name, BuildMode: req.BuildMode}); err != nil {
+			return nil, nil, err
+		}
+		for _, module := range modules {
+			if module.Name == req.Name {
+				return nil, nil, buserr.New("ErrNameIsExist")
+			}
+		}
+		modules = append(modules, dto.NginxModule{
+			Name:      req.Name,
+			Custom:    true,
+			Script:    req.Script,
+			Packages:  strings.Split(req.Packages, ","),
+			Params:    req.Params,
+			Enable:    req.Enable,
+			BuildMode: req.BuildMode,
+			Provider:  req.Provider,
+			LoadOrder: req.LoadOrder,
+		})
+	case nginxModuleOperateUpdate:
+		for i := range modules {
+			if modules[i].Name != req.Name {
+				continue
+			}
+			if modules[i].Custom {
+				if err := validateNginxModuleBuildMode(dto.NginxModule{Name: req.Name, BuildMode: req.BuildMode}); err != nil {
+					return nil, nil, err
+				}
+			} else {
+				modules[i].Enable = req.Enable
+				return modules, nil, nil
+			}
+			modules[i].Enable = req.Enable
+			modules[i].Script = req.Script
+			modules[i].Packages = strings.Split(req.Packages, ",")
+			modules[i].Params = req.Params
+			modules[i].BuildMode = req.BuildMode
+			modules[i].Provider = req.Provider
+			modules[i].LoadOrder = req.LoadOrder
+			return modules, nil, nil
+		}
+		return nil, nil, fmt.Errorf("OpenResty module %s not found", req.Name)
+	case nginxModuleOperateDelete:
+		for i := range modules {
+			if modules[i].Name != req.Name {
+				continue
+			}
+			if !modules[i].Custom {
+				return nil, nil, fmt.Errorf("built-in OpenResty module %s cannot be deleted", req.Name)
+			}
+			deleted := modules[i]
+			modules = append(modules[:i], modules[i+1:]...)
+			return modules, &deleted, nil
+		}
+		return nil, nil, fmt.Errorf("OpenResty module %s not found", req.Name)
+	default:
+		return nil, nil, fmt.Errorf("unsupported OpenResty module operation %q", req.Operate)
+	}
+	return modules, nil, nil
 }
 
 func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
@@ -291,70 +360,9 @@ func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
 		return err
 	}
 	oldModules := cloneNginxModules(modules)
-	var deletedModule *dto.NginxModule
-
-	switch req.Operate {
-	case nginxModuleOperateCreate:
-		recreated := false
-		for i, module := range modules {
-			if module.Name == req.Name {
-				if module.Deleted {
-					modules[i] = dto.NginxModule{
-						Name: req.Name, Script: req.Script, Packages: strings.Split(req.Packages, ","),
-						Params: req.Params,
-						Enable: req.Enable, BuildMode: req.BuildMode, Provider: req.Provider, LoadOrder: req.LoadOrder,
-					}
-					recreated = true
-					break
-				}
-				return buserr.New("ErrNameIsExist")
-			}
-		}
-		if !recreated {
-			modules = append(modules, dto.NginxModule{
-				Name:      req.Name,
-				Script:    req.Script,
-				Packages:  strings.Split(req.Packages, ","),
-				Params:    req.Params,
-				Enable:    req.Enable,
-				BuildMode: req.BuildMode,
-				Provider:  req.Provider,
-				LoadOrder: req.LoadOrder,
-			})
-		}
-	case nginxModuleOperateUpdate:
-		found := false
-		for i, module := range modules {
-			if module.Name == req.Name {
-				found = true
-				modules[i].Script = req.Script
-				modules[i].Packages = strings.Split(req.Packages, ",")
-				modules[i].Params = req.Params
-				modules[i].Enable = req.Enable
-				modules[i].BuildMode = req.BuildMode
-				modules[i].Provider = req.Provider
-				modules[i].LoadOrder = req.LoadOrder
-				break
-			}
-		}
-		if !found {
-			return fmt.Errorf("OpenResty module %s not found", req.Name)
-		}
-	case nginxModuleOperateDelete:
-		found := false
-		for i, module := range modules {
-			if module.Name == req.Name {
-				found = true
-				moduleCopy := module
-				deletedModule = &moduleCopy
-				modules[i].Deleted = true
-				modules[i].Enable = false
-				break
-			}
-		}
-		if !found {
-			return fmt.Errorf("OpenResty module %s not found", req.Name)
-		}
+	modules, deletedModule, err := applyNginxModuleUpdate(modules, req)
+	if err != nil {
+		return err
 	}
 	if err = saveNginxModules(nginxInstall, modules); err != nil {
 		return err

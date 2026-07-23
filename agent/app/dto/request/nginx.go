@@ -127,7 +127,7 @@ type NginxModuleUpdate struct {
 	Packages  string `json:"packages"`
 	Enable    bool   `json:"enable"`
 	Params    string `json:"params"`
-	BuildMode string `json:"buildMode" validate:"omitempty,oneof=auto dynamic static"`
+	BuildMode string `json:"buildMode" validate:"omitempty,oneof=dynamic static"`
 	Provider  string `json:"provider" validate:"omitempty,oneof=local prebuilt"`
 	LoadOrder int    `json:"loadOrder" validate:"omitempty,min=0,max=9999"`
 }

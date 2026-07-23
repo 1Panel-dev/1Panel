@@ -10,15 +10,15 @@
                 </el-button>
                 <el-text type="warning" class="!ml-2">{{ $t('nginx.buildHelper') }}</el-text>
             </template>
-            <el-table-column prop="name" :label="$t('commons.table.name')" />
-            <el-table-column :label="$t('nginx.buildMode')" width="150">
+            <el-table-column prop="name" :label="$t('commons.table.name')" min-width="320" />
+            <el-table-column :label="$t('nginx.buildMode')" min-width="160" align="center">
                 <template #default="{ row }">
                     <el-tag effect="plain" :type="row.buildMode === 'static' ? 'warning' : 'primary'">
-                        {{ $t('nginx.buildMode' + capitalize(displayBuildMode(row.buildMode))) }}
+                        {{ $t('nginx.buildMode' + capitalize(row.buildMode)) }}
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('nginx.buildStatus')" width="120">
+            <el-table-column :label="$t('nginx.buildStatus')" min-width="160" align="center">
                 <template #default="{ row }">
                     <el-tooltip v-if="row.lastError" :content="row.lastError" placement="top">
                         <el-tag :type="statusType(row.buildStatus)">{{ $t('nginx.' + row.buildStatus) }}</el-tag>
@@ -26,21 +26,15 @@
                     <el-tag v-else :type="statusType(row.buildStatus)">{{ $t('nginx.' + row.buildStatus) }}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('nginx.compatibility')" width="130">
-                <template #default="{ row }">
-                    <el-tag effect="plain" :type="compatibilityType(row.compatibility)">
-                        {{ $t('nginx.' + row.compatibility) }}
-                    </el-tag>
-                </template>
-            </el-table-column>
-            <el-table-column :label="$t('commons.table.status')" fix>
+            <el-table-column :label="$t('commons.table.status')" min-width="160" align="center" fix>
                 <template #default="{ row }">
                     <el-switch v-permission v-model="row.enable" @change="updateModule(row)" />
                 </template>
             </el-table-column>
             <fu-table-operations
                 :ellipsis="2"
-                width="200px"
+                width="auto"
+                min-width="160"
                 :buttons="buttons"
                 :label="$t('commons.table.operate')"
                 fixed="right"
@@ -65,8 +59,17 @@ const data = ref<Nginx.NginxModule[]>([]);
 const loading = ref(false);
 const buttons = [
     {
+        label: i18n.global.t('commons.button.view'),
+        permission: true,
+        show: (row: Nginx.NginxModule) => !row.custom,
+        click: function (row: Nginx.NginxModule) {
+            openView(row);
+        },
+    },
+    {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
+        show: (row: Nginx.NginxModule) => row.custom,
         click: function (row: Nginx.NginxModule) {
             openEdit(row);
         },
@@ -74,6 +77,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
+        show: (row: Nginx.NginxModule) => row.custom,
         click: function (row: Nginx.NginxModule) {
             deleteModule(row);
         },
@@ -108,6 +112,10 @@ const openEdit = (row: Nginx.NginxModule) => {
     operateRef.value.acceptParams('update', row, dynamicSupported.value);
 };
 
+const openView = (row: Nginx.NginxModule) => {
+    operateRef.value.acceptParams('view', row, dynamicSupported.value);
+};
+
 const updateModule = (row: Nginx.NginxModule) => {
     loading.value = true;
     const data = {
@@ -129,18 +137,9 @@ const updateModule = (row: Nginx.NginxModule) => {
 
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
-const displayBuildMode = (mode: string) => (mode === 'auto' ? 'dynamic' : mode);
-
 const statusType = (status: string) => {
     if (status === 'ready') return 'success';
     if (status === 'failed') return 'danger';
-    return 'info';
-};
-
-const compatibilityType = (status: string) => {
-    if (status === 'compatible') return 'success';
-    if (status === 'stale') return 'warning';
-    if (status === 'static') return 'info';
     return 'info';
 };
 

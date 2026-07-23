@@ -8,7 +8,15 @@
         :trigger="trigger"
         :dropdown-style="dropdownStyle"
     />
-    <el-table-column v-else v-bind="$attrs" :label="label" :width="resolvedWidth" :align="align" :fixed="resolvedFixed">
+    <el-table-column
+        v-else
+        v-bind="$attrs"
+        :label="label"
+        :width="resolvedWidth"
+        :min-width="resolvedMinWidth"
+        :align="align"
+        :fixed="resolvedFixed"
+    >
         <template #default="{ row }">
             <FuTableOperationActions
                 :buttons="buttons"
@@ -137,7 +145,14 @@ const estimatedWidth = computed(() => {
 });
 
 const resolvedWidth = computed(() => {
+    if (props.width === 'auto') {
+        return undefined;
+    }
     return normalizeWidth(props.width) ?? estimatedWidth.value;
+});
+
+const resolvedMinWidth = computed(() => {
+    return props.width === 'auto' ? normalizeWidth(props.minWidth) : undefined;
 });
 
 const dropdownStyle = computed(() => {
