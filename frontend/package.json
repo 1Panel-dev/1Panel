@@ -78,7 +78,7 @@
         "postcss": "^8.5.14",
         "postcss-html": "^1.8.1",
         "prettier": "^3.9.6",
-        "rollup-plugin-visualizer": "^5.5.4",
+        "rollup-plugin-visualizer": "^7.0.1",
         "sass": "^1.101.3",
         "standard-version": "^9.5.0",
         "tailwindcss": "^4.3.3",
