@@ -129,25 +129,14 @@ func (f *Ufw) ListAddress() ([]FireInfo, error) {
 }
 
 func (f *Ufw) Port(port FireInfo, operation string) error {
-	switch port.Strategy {
-	case "accept":
-		port.Strategy = "allow"
-	case "drop":
-		port.Strategy = "deny"
-	default:
-		return fmt.Errorf("unsupported strategy %s", port.Strategy)
+	args, err := buildUfwPortArgs(port, operation)
+	if err != nil {
+		return err
 	}
 	if cmd.CheckIllegal(port.Protocol, port.Port) {
 		return buserr.New("ErrCmdIllegal")
 	}
 
-	args := []string{port.Strategy, port.Port}
-	if operation == "remove" {
-		args = []string{"delete", port.Strategy, port.Port}
-	}
-	if len(port.Protocol) != 0 {
-		args[len(args)-1] += "/" + port.Protocol
-	}
 	if err := f.run(args...); err != nil {
 		return fmt.Errorf("%s (%s) failed, %v", operation, strings.Join(args, " "), err)
 	}
@@ -155,36 +144,18 @@ func (f *Ufw) Port(port FireInfo, operation string) error {
 }
 
 func (f *Ufw) RichRules(rule FireInfo, operation string) error {
-	switch rule.Strategy {
-	case "accept":
-		rule.Strategy = "allow"
-	case "drop":
-		rule.Strategy = "deny"
-	default:
-		return fmt.Errorf("unsupported strategy %s", rule.Strategy)
+	strategy, err := normalizeUfwStrategy(rule.Strategy)
+	if err != nil {
+		return err
 	}
+	rule.Strategy = strategy
 
 	if cmd.CheckIllegal(operation, rule.Protocol, rule.Address, rule.Port) {
 		return buserr.New("ErrCmdIllegal")
 	}
 
 	insertNum := f.loadInsertNum(rule, operation)
-	args := []string{"insert", strconv.Itoa(insertNum), rule.Strategy}
-	if operation == "remove" {
-		args = []string{"delete", rule.Strategy}
-	}
-	if len(rule.Protocol) != 0 {
-		args = append(args, "proto", rule.Protocol)
-	}
-	if strings.Contains(rule.Address, "-") {
-		parts := strings.Split(rule.Address, "-")
-		args = append(args, "from", parts[0], "to", parts[1])
-	} else {
-		args = append(args, "from", rule.Address)
-	}
-	if len(rule.Port) != 0 {
-		args = append(args, "to", "any", "port", rule.Port)
-	}
+	args := buildUfwRichRuleArgs(rule, operation, insertNum)
 
 	stdout, err := f.runWithStdout(args...)
 	if err != nil {
@@ -201,6 +172,71 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 		return fmt.Errorf("%s rich rules (%s), failed, %v", operation, strings.Join(args, " "), err)
 	}
 	return nil
+}
+
+func (f *Ufw) ExpandPortRule(rule FireInfo) []PortUnit {
+	return expandUfwPortRule(rule)
+}
+
+func (f *Ufw) ApplyPortUnit(unit PortUnit, operation string) error {
+	if ufwNeedsRichRule(unit.Apply) {
+		return f.RichRules(unit.Apply, operation)
+	}
+	return f.Port(unit.Apply, operation)
+}
+
+func (f *Ufw) ExpandAddressRule(rule FireInfo) []AddressUnit {
+	return expandAddressRule(rule, "")
+}
+
+func (f *Ufw) ApplyAddressUnit(unit AddressUnit, operation string) error {
+	return f.RichRules(unit.Apply, operation)
+}
+
+func normalizeUfwStrategy(strategy string) (string, error) {
+	switch strategy {
+	case "accept":
+		return "allow", nil
+	case "drop":
+		return "deny", nil
+	default:
+		return "", fmt.Errorf("unsupported strategy %s", strategy)
+	}
+}
+
+func buildUfwPortArgs(port FireInfo, operation string) ([]string, error) {
+	strategy, err := normalizeUfwStrategy(port.Strategy)
+	if err != nil {
+		return nil, err
+	}
+	args := []string{strategy, port.Port}
+	if operation == "remove" {
+		args = []string{"delete", strategy, port.Port}
+	}
+	if len(port.Protocol) != 0 {
+		args[len(args)-1] += "/" + port.Protocol
+	}
+	return args, nil
+}
+
+func buildUfwRichRuleArgs(rule FireInfo, operation string, insertNum int) []string {
+	args := []string{"insert", strconv.Itoa(insertNum), rule.Strategy}
+	if operation == "remove" {
+		args = []string{"delete", rule.Strategy}
+	}
+	if len(rule.Protocol) != 0 {
+		args = append(args, "proto", rule.Protocol)
+	}
+	if strings.Contains(rule.Address, "-") {
+		parts := strings.Split(rule.Address, "-")
+		args = append(args, "from", parts[0], "to", parts[1])
+	} else {
+		args = append(args, "from", rule.Address)
+	}
+	if len(rule.Port) != 0 {
+		args = append(args, "to", "any", "port", rule.Port)
+	}
+	return args
 }
 
 func (f *Ufw) loadInfo(line string, fireType string) FireInfo {

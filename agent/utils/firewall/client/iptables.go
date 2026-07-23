@@ -118,22 +118,10 @@ func (i *Iptables) Port(port FireInfo, operation string) error {
 		port.Chain = iptables.Chain1PanelBasic
 	}
 
-	portSpec, err := normalizePortSpec(port.Port)
+	ruleArgs, err := buildIptablesPortRuleArgs(port)
 	if err != nil {
 		return err
 	}
-
-	protocol := port.Protocol
-	if protocol == "" {
-		protocol = "tcp"
-	}
-
-	action := "ACCEPT"
-	if port.Strategy == "drop" {
-		action = "DROP"
-	}
-
-	ruleArgs := []string{"-p", protocol, "--dport", portSpec, "-j", action}
 	if operation == "add" {
 		if err := iptables.AddRule(iptables.FilterTab, port.Chain, ruleArgs...); err != nil {
 			return err
@@ -162,42 +150,10 @@ func (i *Iptables) RichRules(rule FireInfo, operation string) error {
 		rule.Chain = iptables.Chain1PanelBasic
 	}
 
-	address := strings.TrimSpace(rule.Address)
-	if strings.EqualFold(address, "Anywhere") {
-		address = ""
+	ruleArgs, err := buildIptablesRichRuleArgs(rule)
+	if err != nil {
+		return err
 	}
-
-	action := "ACCEPT"
-	if rule.Strategy == "drop" {
-		action = "DROP"
-	}
-
-	var ruleArgs []string
-	if address != "" {
-		ruleArgs = append(ruleArgs, "-s", address)
-	}
-
-	protocol := strings.TrimSpace(rule.Protocol)
-	if rule.Port != "" && protocol == "" {
-		protocol = "tcp"
-	}
-
-	if protocol != "" {
-		ruleArgs = append(ruleArgs, "-p", protocol)
-	}
-
-	if rule.Port != "" {
-		portSegment, err := normalizePortSpec(rule.Port)
-		if err != nil {
-			return err
-		}
-		if protocol == "" {
-			return fmt.Errorf("protocol is required when specifying a port")
-		}
-		ruleArgs = append(ruleArgs, "--dport", portSegment)
-	}
-
-	ruleArgs = append(ruleArgs, "-j", action)
 	if operation == "add" {
 		if err := iptables.AddRule(iptables.FilterTab, rule.Chain, ruleArgs...); err != nil {
 			return err
@@ -216,6 +172,83 @@ func (i *Iptables) RichRules(rule FireInfo, operation string) error {
 		global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
 	}
 	return nil
+}
+
+func (i *Iptables) ExpandPortRule(rule FireInfo) []PortUnit {
+	chain := rule.Chain
+	if len(chain) == 0 {
+		chain = iptables.Chain1PanelBasic
+	}
+	return expandPortRule(rule, chain)
+}
+
+func (i *Iptables) ApplyPortUnit(unit PortUnit, operation string) error {
+	apply := unit.Apply
+	apply.Chain = unit.Chain
+	if needsRichRule(apply) {
+		return i.RichRules(apply, operation)
+	}
+	return i.Port(apply, operation)
+}
+
+func (i *Iptables) ExpandAddressRule(rule FireInfo) []AddressUnit {
+	return expandAddressRule(rule, iptables.Chain1PanelBasic)
+}
+
+func (i *Iptables) ApplyAddressUnit(unit AddressUnit, operation string) error {
+	apply := unit.Apply
+	apply.Chain = unit.Chain
+	return i.RichRules(apply, operation)
+}
+
+func buildIptablesPortRuleArgs(port FireInfo) ([]string, error) {
+	portSpec, err := normalizePortSpec(port.Port)
+	if err != nil {
+		return nil, err
+	}
+	protocol := port.Protocol
+	if protocol == "" {
+		protocol = "tcp"
+	}
+	action := "ACCEPT"
+	if port.Strategy == "drop" {
+		action = "DROP"
+	}
+	return []string{"-p", protocol, "--dport", portSpec, "-j", action}, nil
+}
+
+func buildIptablesRichRuleArgs(rule FireInfo) ([]string, error) {
+	address := strings.TrimSpace(rule.Address)
+	if strings.EqualFold(address, "Anywhere") {
+		address = ""
+	}
+	action := "ACCEPT"
+	if rule.Strategy == "drop" {
+		action = "DROP"
+	}
+	var ruleArgs []string
+	if address != "" {
+		ruleArgs = append(ruleArgs, "-s", address)
+	}
+	protocol := strings.TrimSpace(rule.Protocol)
+	if rule.Port != "" && protocol == "" {
+		protocol = "tcp"
+	}
+	if protocol != "" {
+		ruleArgs = append(ruleArgs, "-p", protocol)
+	}
+	if rule.Port != "" {
+		portSegment, err := normalizePortSpec(rule.Port)
+		if err != nil {
+			return nil, err
+		}
+		if protocol == "" {
+			return nil, fmt.Errorf("protocol is required when specifying a port")
+		}
+		ruleArgs = append(ruleArgs, "--dport", portSegment)
+	}
+	ruleArgs = append(ruleArgs, "-j", action)
+	return ruleArgs, nil
 }
 
 func parsePort(portStr string) (int, error) {
