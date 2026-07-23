@@ -524,7 +524,7 @@ const message = {
         hostSelect: '서버 선택',
         selectHelper: '백업 파일 {0}을(를) 가져오시겠습니까?',
         remoteAccess: '원격 접근',
-        remoteHelper: '여러 IP 를 쉼표로 구분하여 입력, 예: 172.16.10.111, 172.16.10.112',
+        remoteHelper: '여러 IP 를 쉼표로 구분하여 입력, 예: 172.16.10.111,172.16.10.112',
         remoteConnHelper:
             'MySQL 의 root 사용자로 원격 접속은 보안 위험을 초래할 수 있습니다. 따라서 이 작업은 신중히 수행해야 합니다.',
         changePassword: '비밀번호',
@@ -547,10 +547,8 @@ const message = {
         addUserAuthorization: '사용자 권한 추가',
         revokeAuthorization: '권한 취소',
         revokeAuthorizationHelper: '사용자 {0}의 데이터베이스 {1} 접근 권한을 취소하시겠습니까?',
-        passwordPendingSupplement: '입력 필요',
         supplementPassword: '비밀번호 추가',
         supplementPasswordHelper: '기존 비밀번호를 1Panel에만 저장하며 MySQL 비밀번호는 변경하지 않습니다.',
-        deleteUserRecordHelper: '이 사용자는 MySQL에서 이미 삭제되었습니다. 1Panel의 로컬 기록만 삭제합니다.',
         pgBindHelper:
             '이 작업은 새 사용자를 생성하여 대상 데이터베이스에 바인딩하는 데 사용됩니다. 현재 데이터베이스에 이미 존재하는 사용자 선택은 지원되지 않습니다.',
         pgSuperUser: '슈퍼 사용자',

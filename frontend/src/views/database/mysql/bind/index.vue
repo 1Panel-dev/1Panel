@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="dialogVisible" :title="$t('database.authorizationManagement')" size="small">
+    <DialogPro v-model="dialogVisible" :title="$t('database.authorizationManagement')" size="large">
         <div v-loading="loading">
             <div class="authorization-toolbar">
                 <el-button type="primary" @click="openAddDialog">
@@ -8,7 +8,31 @@
             </div>
             <el-table :data="authorizedUsers" :empty-text="$t('commons.msg.noneData')">
                 <el-table-column :label="$t('commons.login.username')" min-width="140">
-                    <template #default="{ row }">{{ row.username }}@{{ row.host }}</template>
+                    <template #default="{ row }">{{ row.username }}</template>
+                </el-table-column>
+                <el-table-column :label="$t('commons.login.password')" prop="password" min-width="180">
+                    <template #default="{ row }">
+                        <span v-if="!row.password">-</span>
+                        <div v-else class="password-cell">
+                            <span v-if="!row.showPassword" class="password-text">**********</span>
+                            <span v-else class="password-text">{{ row.password }}</span>
+                            <el-button
+                                v-if="!row.showPassword"
+                                link
+                                @click="row.showPassword = true"
+                                icon="View"
+                                class="password-action"
+                            />
+                            <el-button
+                                v-else
+                                link
+                                @click="row.showPassword = false"
+                                icon="Hide"
+                                class="password-action"
+                            />
+                            <CopyButton class="password-copy" :content="row.password" />
+                        </div>
+                    </template>
                 </el-table-column>
                 <el-table-column :label="$t('database.permission')" min-width="110">
                     <template #default="{ row }">{{ permissionLabel(row.host) }}</template>
@@ -162,11 +186,19 @@ const form = reactive({
     password: '',
     description: '',
 });
+const checkMysqlHosts = (_rule: unknown, value: string, callback: (error?: Error) => void) => {
+    const hosts = value.split(',').map((item) => item.trim());
+    if (hosts.length === 0 || hosts.some((item) => !item)) {
+        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+        return;
+    }
+    callback();
+};
 const rules = reactive({
     userKey: [Rules.requiredSelect],
     username: [Rules.requiredInput, Rules.name],
     permission: [Rules.requiredSelect],
-    host: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    host: [Rules.requiredInput, Rules.noSpace, Rules.illegal, { validator: checkMysqlHosts, trigger: 'blur' }],
     password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
 });
 
@@ -189,13 +221,13 @@ const availableUsers = computed(() =>
 );
 
 const loadContext = async () => {
-    if (!form.database) {
+    const database = form.database;
+    if (!database) {
+        users.value = [];
+        grants.value = [];
         return;
     }
-    const [userRes, grantRes] = await Promise.all([
-        searchMysqlUsers({ database: form.database }),
-        searchMysqlGrants({ database: form.database }),
-    ]);
+    const [userRes, grantRes] = await Promise.all([searchMysqlUsers({ database }), searchMysqlGrants({ database })]);
     users.value = userRes.data || [];
     grants.value = grantRes.data || [];
 };
@@ -332,6 +364,25 @@ defineExpose({
 .authorization-toolbar {
     display: flex;
     margin-bottom: 12px;
+}
+.password-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+}
+.password-text {
+    overflow: hidden;
+    max-width: 96px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.password-action {
+    min-height: 20px;
+    padding: 0;
+}
+.password-copy {
+    margin-left: -2px;
 }
 :deep(.user-select-option) {
     height: auto;

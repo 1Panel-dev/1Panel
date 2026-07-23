@@ -8,7 +8,7 @@
         <ComplexTable :data="users" :heightDiff="260">
             <el-table-column :label="$t('commons.login.username')" prop="username" min-width="150">
                 <template #default="{ row }">
-                    <span>{{ row.username }}@{{ row.host }}</span>
+                    <span>{{ row.username }}</span>
                     <el-tag v-if="row.isDelete" round type="info" class="ml-1" size="small">
                         {{ $t('database.isDelete') }}
                     </el-tag>
@@ -18,7 +18,6 @@
                 <template #default="{ row }">
                     <span v-if="row.isDelete">-</span>
                     <div v-else-if="!row.password" class="password-cell">
-                        <el-tag type="warning" size="small">{{ $t('database.passwordPendingSupplement') }}</el-tag>
                         <el-button link type="primary" @click="openSupplementPasswordDialog(row)">
                             {{ $t('database.supplementPassword') }}
                         </el-button>
@@ -44,7 +43,7 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('database.permission')" prop="host" min-width="120">
+            <el-table-column :label="$t('database.permission')" show-overflow-tooltip prop="host" min-width="120">
                 <template #default="{ row }">
                     {{ permissionLabel(row.host) }}
                 </template>
@@ -88,8 +87,11 @@
             </el-form-item>
             <el-form-item v-if="userForm.permission === 'ip'" prop="host">
                 <el-input v-model.trim="userForm.host" />
+                <span v-if="userDialogMode === 'create'" class="input-help">
+                    {{ $t('database.remoteHelper') }}
+                </span>
             </el-form-item>
-            <el-form-item :label="$t('commons.login.password')" prop="password">
+            <el-form-item :label="$t('commons.login.password')" prop="password" :required="userDialogMode === 'create'">
                 <el-input type="password" clearable show-password v-model.trim="userForm.password" />
                 <span v-if="userDialogMode === 'edit'" class="input-help">
                     {{ $t('setting.passwordEmptyTip') }}
@@ -140,14 +142,13 @@
         </template>
     </DialogPro>
 
-    <DialogPro v-model="deleteDialogVisible" :title="$t('commons.button.delete')" size="small">
+    <DialogPro
+        v-model="deleteDialogVisible"
+        :title="$t('commons.button.delete') + ' - ' + deleteUserIdentity"
+        size="small"
+    >
         <div v-loading="loading">
-            <div class="delete-user-title">
-                <template v-if="deleteUserDbs.length > 0">
-                    {{ deleteUser.username }} {{ $t('database.userBoundDatabases') }}
-                </template>
-                <template v-else>{{ deleteUser.username }}</template>
-            </div>
+            <div class="delete-user-title">{{ deleteUserIdentity }} {{ $t('database.userBoundDatabases') }}</div>
             <div class="delete-user-section">
                 <div v-if="deleteUserDbs.length === 0" class="delete-user-empty">-</div>
                 <div v-else class="bind-db-list delete-user-dbs">
@@ -158,18 +159,13 @@
             </div>
             <div class="delete-user-section">
                 <div>
-                    <template v-if="deleteUser.isDelete">
-                        <span style="font-size: 12px">{{ $t('database.deleteUserRecordHelper') }}</span>
-                    </template>
-                    <template v-else>
-                        <span style="font-size: 12px">{{ $t('database.delete') }}</span>
-                        <span style="font-size: 12px; color: red; font-weight: 500">
-                            {{ deleteUser.username }}
-                        </span>
-                        <span style="font-size: 12px">{{ $t('database.deleteUserHelper') }}</span>
-                    </template>
+                    <span style="font-size: 12px">{{ $t('database.delete') }}</span>
+                    <span style="font-size: 12px; color: red; font-weight: 500">
+                        {{ deleteUserIdentity }}
+                    </span>
+                    <span style="font-size: 12px">{{ $t('database.deleteUserHelper') }}</span>
                 </div>
-                <el-input v-model="deleteConfirmInput" :placeholder="deleteUser.username" />
+                <el-input v-model="deleteConfirmInput" :placeholder="deleteUserIdentity" />
             </div>
         </div>
         <template #footer>
@@ -179,7 +175,7 @@
             <el-button
                 type="primary"
                 @click="submitDeleteUser()"
-                :disabled="deleteConfirmInput !== deleteUser.username || loading"
+                :disabled="deleteConfirmInput !== deleteUserIdentity || loading"
             >
                 {{ $t('commons.button.confirm') }}
             </el-button>
@@ -239,6 +235,7 @@ const deleteUser = reactive({
     host: '',
     isDelete: false,
 });
+const deleteUserIdentity = computed(() => `${deleteUser.username}@${deleteUser.host}`);
 const deleteUserDbs = ref<string[]>([]);
 const supplementDialogVisible = ref(false);
 const supplementFormRef = ref();
@@ -269,10 +266,22 @@ const checkPassword = (_rule: unknown, value: string, callback: (error?: Error) 
     }
     callback();
 };
+const checkUserHosts = (_rule: unknown, value: string, callback: (error?: Error) => void) => {
+    const hosts = value.split(',').map((item) => item.trim());
+    if (hosts.length === 0 || hosts.some((item) => !item)) {
+        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+        return;
+    }
+    if (userDialogMode.value === 'edit' && hosts.length > 1) {
+        callback(new Error(i18n.global.t('commons.rule.illegalInput')));
+        return;
+    }
+    callback();
+};
 const userRules = reactive({
     username: [Rules.requiredInput, Rules.name],
     permission: [Rules.requiredSelect],
-    host: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    host: [Rules.requiredInput, Rules.noSpace, Rules.illegal, { validator: checkUserHosts, trigger: 'blur' }],
     password: [{ validator: checkPassword, trigger: 'blur' }],
 });
 
@@ -290,12 +299,22 @@ const acceptParams = async (params: DialogProps) => {
 };
 
 const loadUsers = async () => {
-    const res = await searchMysqlUsers({ database: database.value });
+    const databaseName = database.value;
+    if (!databaseName) {
+        users.value = [];
+        return;
+    }
+    const res = await searchMysqlUsers({ database: databaseName });
     users.value = res.data || [];
 };
 
 const loadGrants = async () => {
-    const res = await searchMysqlGrants({ database: database.value });
+    const databaseName = database.value;
+    if (!databaseName) {
+        grants.value = [];
+        return;
+    }
+    const res = await searchMysqlGrants({ database: databaseName });
     grants.value = res.data || [];
 };
 
@@ -416,15 +435,7 @@ const submitUser = async () => {
                 const selectedDbs = userForm.dbs || [];
                 const addDbs = selectedDbs.filter((item) => !originalDbs.value.includes(item));
                 const removeDbs = originalDbs.value.filter((item) => !selectedDbs.includes(item));
-                if (userForm.host !== originalHost.value) {
-                    await updateMysqlUser({
-                        database: database.value,
-                        username: userForm.username,
-                        host: originalHost.value,
-                        newHost: userForm.host,
-                        description: userForm.description,
-                    });
-                } else if (userForm.description !== originalDescription.value) {
+                if (userForm.host !== originalHost.value || userForm.description !== originalDescription.value) {
                     await updateMysqlUser({
                         database: database.value,
                         username: userForm.username,

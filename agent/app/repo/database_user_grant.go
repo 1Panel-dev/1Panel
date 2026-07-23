@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"context"
+
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"gorm.io/gorm"
@@ -14,6 +16,7 @@ type IDatabaseUserGrantRepo interface {
 	Save(grant *model.DatabaseUserGrant) error
 	Replace(dbType, database string, grants []model.DatabaseUserGrant) error
 	Delete(opts ...DBOption) error
+	DeleteBy(ctx context.Context, opts ...DBOption) error
 	Update(vars map[string]interface{}, opts ...DBOption) error
 	WithByDatabase(database string) DBOption
 	WithByDBName(dbName string) DBOption
@@ -67,6 +70,10 @@ func (u *DatabaseUserGrantRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.DatabaseUserGrant{}).Error
+}
+
+func (u *DatabaseUserGrantRepo) DeleteBy(ctx context.Context, opts ...DBOption) error {
+	return getTx(ctx, opts...).Delete(&model.DatabaseUserGrant{}).Error
 }
 
 func (u *DatabaseUserGrantRepo) Update(vars map[string]interface{}, opts ...DBOption) error {
