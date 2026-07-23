@@ -442,7 +442,7 @@ const openUserDrawer = async () => {
 };
 
 const openAuthorizationManagement = (row: Database.MysqlDBInfo) => {
-    if (!currentDB.value) {
+    if (!currentDB.value?.database) {
         return;
     }
     bindRef.value!.acceptParams({

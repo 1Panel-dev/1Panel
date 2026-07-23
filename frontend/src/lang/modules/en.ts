@@ -558,10 +558,8 @@ const message = {
         addUserAuthorization: 'Add user authorization',
         revokeAuthorization: 'Revoke authorization',
         revokeAuthorizationHelper: "Revoke user {0}'s access to database {1}?",
-        passwordPendingSupplement: 'Pending',
         supplementPassword: 'Add password',
         supplementPasswordHelper: 'This only saves the existing password to 1Panel and does not change it in MySQL.',
-        deleteUserRecordHelper: 'This user has been deleted from MySQL. This only removes the local 1Panel record.',
         noUserBind: 'No binding',
         pgBindHelper:
             'This operation is used to create a new user and bind it to the target database. Currently, selecting users already existing in the database is not supported.',

@@ -528,7 +528,7 @@ const message = {
         hostSelect: 'Seleção de Servidor',
         selectHelper: 'Tem certeza de que deseja importar o arquivo de backup {0}?',
         remoteAccess: 'Acesso remoto',
-        remoteHelper: 'Vários IPs separados por vírgula, exemplo: 172.16.10.111, 172.16.10.112',
+        remoteHelper: 'Vários IPs separados por vírgula, exemplo: 172.16.10.111,172.16.10.112',
         remoteConnHelper:
             'Conectar-se ao MySQL como usuário root pode representar riscos de segurança. Realize esta operação com cautela.',
         changePassword: 'Senha',
@@ -552,11 +552,8 @@ const message = {
         addUserAuthorization: 'Adicionar autorização de usuário',
         revokeAuthorization: 'Revogar autorização',
         revokeAuthorizationHelper: 'Revogar o acesso do usuário {0} ao banco de dados {1}?',
-        passwordPendingSupplement: 'Pendente',
         supplementPassword: 'Adicionar senha',
         supplementPasswordHelper: 'Apenas salva a senha existente no 1Panel; não altera a senha no MySQL.',
-        deleteUserRecordHelper:
-            'O usuário já foi excluído do MySQL. Esta ação remove apenas o registro local do 1Panel.',
         pgBindHelper:
             'Esta operação cria um novo usuário e o vincula ao banco de dados alvo. A seleção de usuários já existentes no banco de dados não é suportada.',
         pgSuperUser: 'Superusuário',

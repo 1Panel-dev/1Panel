@@ -529,7 +529,7 @@ const message = {
         hostSelect: 'サーバー選択',
         selectHelper: 'バックアップファイル {0} をインポートしてもよろしいですか？',
         remoteAccess: 'リモートアクセス',
-        remoteHelper: '複数のIP Comma delimited、例:172.16.10.111、172.16.10.112',
+        remoteHelper: '複数のIP Comma delimited、例:172.16.10.111,172.16.10.112',
         remoteConnHelper:
             'ユーザールートとしてのMySQLへのリモート接続には、セキュリティリスクがある場合があります。したがって、この操作を慎重に実行します。',
         changePassword: 'パスワード',
@@ -553,10 +553,8 @@ const message = {
         addUserAuthorization: 'ユーザー権限を追加',
         revokeAuthorization: '権限を取り消す',
         revokeAuthorizationHelper: 'ユーザー {0} のデータベース {1} へのアクセス権を取り消しますか？',
-        passwordPendingSupplement: '未登録',
         supplementPassword: 'パスワードを登録',
         supplementPasswordHelper: '既存のパスワードを 1Panel に保存するだけで、MySQL のパスワードは変更しません。',
-        deleteUserRecordHelper: 'このユーザーは MySQL から削除済みです。1Panel のローカル記録のみ削除します。',
         pgBindHelper:
             'この操作は、新しいユーザーを作成し、ターゲットデータベースにバインドするために使用されます。現在、データベースに既存のユーザーを選択することはサポートされていません。',
         pgSuperUser: 'スーパーユーザー',

@@ -169,6 +169,14 @@ const form = reactive({
     permissionIPs: '',
     description: '',
 });
+const checkMysqlHosts = (_rule: unknown, value: string, callback: (error?: Error) => void) => {
+    const hosts = value.split(',').map((item) => item.trim());
+    if (hosts.length === 0 || hosts.some((item) => !item)) {
+        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+        return;
+    }
+    callback();
+};
 const rules = reactive({
     name: [Rules.requiredInput, Rules.dbName],
     format: [Rules.requiredSelect],
@@ -177,7 +185,7 @@ const rules = reactive({
     username: [Rules.requiredInput, Rules.name],
     password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
     permission: [Rules.requiredSelect],
-    permissionIPs: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    permissionIPs: [Rules.requiredInput, Rules.noSpace, Rules.illegal, { validator: checkMysqlHosts, trigger: 'blur' }],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -234,12 +242,22 @@ const loadCollations = async () => {
 };
 
 const loadUsers = async () => {
-    const res = await searchMysqlUsers({ database: form.database });
+    const database = form.database;
+    if (!database) {
+        users.value = [];
+        return;
+    }
+    const res = await searchMysqlUsers({ database });
     users.value = res.data || [];
 };
 
 const loadGrants = async () => {
-    const res = await searchMysqlGrants({ database: form.database });
+    const database = form.database;
+    if (!database) {
+        grants.value = [];
+        return;
+    }
+    const res = await searchMysqlGrants({ database });
     grants.value = res.data || [];
 };
 

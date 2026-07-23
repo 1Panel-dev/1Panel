@@ -534,7 +534,7 @@ const message = {
         hostSelect: 'Pemilihan Pelayan',
         selectHelper: 'Adakah anda pasti ingin mengimport fail sandaran {0}?',
         remoteAccess: 'Akses jauh',
-        remoteHelper: 'Berbilang IP dipisahkan dengan koma, contoh: 172.16.10.111, 172.16.10.112',
+        remoteHelper: 'Berbilang IP dipisahkan dengan koma, contoh: 172.16.10.111,172.16.10.112',
         remoteConnHelper:
             'Sambungan jauh ke MySQL sebagai pengguna root mungkin mempunyai risiko keselamatan. Oleh itu, lakukan operasi ini dengan berhati-hati.',
         changePassword: 'Kata laluan',
@@ -558,11 +558,8 @@ const message = {
         addUserAuthorization: 'Tambah kebenaran pengguna',
         revokeAuthorization: 'Tarik balik kebenaran',
         revokeAuthorizationHelper: 'Tarik balik akses pengguna {0} kepada pangkalan data {1}?',
-        passwordPendingSupplement: 'Belum dilengkapkan',
         supplementPassword: 'Tambah kata laluan',
         supplementPasswordHelper: 'Hanya menyimpan kata laluan sedia ada ke 1Panel dan tidak mengubahnya dalam MySQL.',
-        deleteUserRecordHelper:
-            'Pengguna ini telah dipadam daripada MySQL. Tindakan ini hanya memadam rekod setempat 1Panel.',
         pgBindHelper:
             'Operasi ini digunakan untuk mencipta pengguna baharu dan mengaitkannya dengan pangkalan data sasaran. Pada masa ini, memilih pengguna yang sudah wujud dalam pangkalan data tidak disokong.',
         pgSuperUser: 'Pengguna Super',

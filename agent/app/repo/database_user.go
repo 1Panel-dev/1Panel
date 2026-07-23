@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -16,6 +17,7 @@ type IDatabaseUserRepo interface {
 	List(opts ...DBOption) ([]model.DatabaseUser, error)
 	Save(user *model.DatabaseUser) error
 	Delete(opts ...DBOption) error
+	DeleteBy(ctx context.Context, opts ...DBOption) error
 	Update(vars map[string]interface{}, opts ...DBOption) error
 	WithByDatabase(database string) DBOption
 	WithByUser(username, host string) DBOption
@@ -79,6 +81,10 @@ func (u *DatabaseUserRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.DatabaseUser{}).Error
+}
+
+func (u *DatabaseUserRepo) DeleteBy(ctx context.Context, opts ...DBOption) error {
+	return getTx(ctx, opts...).Delete(&model.DatabaseUser{}).Error
 }
 
 func (u *DatabaseUserRepo) Update(vars map[string]interface{}, opts ...DBOption) error {

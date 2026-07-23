@@ -89,17 +89,30 @@ func databaseUserKey(username, host string) string {
 func splitMysqlHosts(permission string) []string {
 	hosts := strings.Split(permission, ",")
 	res := make([]string, 0, len(hosts))
+	seen := make(map[string]struct{}, len(hosts))
 	for _, host := range hosts {
 		host = strings.TrimSpace(host)
 		if len(host) == 0 {
 			continue
 		}
+		if _, ok := seen[host]; ok {
+			continue
+		}
+		seen[host] = struct{}{}
 		res = append(res, host)
 	}
-	if len(res) == 0 {
-		return []string{"%"}
-	}
 	return res
+}
+
+func parseMysqlHosts(permission string, allowMultiple bool) ([]string, error) {
+	hosts := splitMysqlHosts(permission)
+	if len(hosts) == 0 {
+		return nil, errors.New("mysql user host is required")
+	}
+	if !allowMultiple && len(hosts) > 1 {
+		return nil, errors.New("multiple mysql user hosts are not supported for this operation")
+	}
+	return hosts, nil
 }
 
 func checkMysqlNormalUser(username string) error {
@@ -109,14 +122,16 @@ func checkMysqlNormalUser(username string) error {
 	return nil
 }
 
-// isMysqlSystemUser identifies built-in accounts which must only be managed by
-// MySQL itself. The root account is managed through the dedicated root API.
+// isMysqlSystemUser identifies internal accounts which must only be managed by
+// MySQL or its container runtime. The root account is managed through the
+// dedicated root API.
 func isMysqlSystemUser(username string) bool {
 	switch strings.ToLower(username) {
 	case "root",
 		"mysql.session", "mysql.sys", "mysql.infoschema", "mysqlxsys",
 		"mariadb.sys", "mariadb-sys",
-		"debian-sys-maint":
+		"debian-sys-maint",
+		"healthcheck":
 		return true
 	default:
 		return false
@@ -424,6 +439,15 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 	if len(req.Username) != 0 && len(req.Password) == 0 {
 		return nil, errors.New("password is required when creating mysql user")
 	}
+	permissionHosts := make([]string, 0)
+	if len(req.Username) != 0 {
+		var err error
+		permissionHosts, err = parseMysqlHosts(req.Permission, true)
+		if err != nil {
+			return nil, err
+		}
+		req.Permission = strings.Join(permissionHosts, ",")
+	}
 	dbType, err := resolveDatabaseUserType(req.Database)
 	if err != nil {
 		return nil, err
@@ -468,7 +492,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		if err := saveDatabaseUserCredentials(dbType, req.Database, req.Username, req.Permission, req.Password, req.Description); err != nil {
 			return nil, err
 		}
-		for _, host := range splitMysqlHosts(req.Permission) {
+		for _, host := range permissionHosts {
 			if err := saveDatabaseUserGrant(dbType, req.Database, req.Name, req.Username, host); err != nil {
 				return nil, err
 			}
@@ -597,19 +621,53 @@ func (u *MysqlService) CreateUser(req dto.MysqlUserCreate) error {
 	if err := checkMysqlNormalUser(req.Username); err != nil {
 		return err
 	}
+	hosts, err := parseMysqlHosts(req.Host, true)
+	if err != nil {
+		return err
+	}
 	dbType, err := resolveDatabaseUserType(req.Database)
 	if err != nil {
 		return err
 	}
-	cli, _, err := LoadMysqlClientByFrom(req.Database)
+	cli, version, err := LoadMysqlClientByFrom(req.Database)
 	if err != nil {
 		return err
 	}
 	defer cli.Close()
-	if err := cli.CreateUserOnly(client.UserInfo{Username: req.Username, Host: req.Host}, req.Password, 300); err != nil {
-		return err
+	createdHosts := make([]string, 0, len(hosts))
+	rollbackCreatedHosts := func() {
+		for i := len(createdHosts) - 1; i >= 0; i-- {
+			host := createdHosts[i]
+			if rollbackErr := cli.DeleteUser(client.UserInfo{Username: req.Username, Host: host}, version, 300); rollbackErr != nil {
+				global.LOG.Errorf("rollback mysql user %s@%s failed, err: %v", req.Username, host, rollbackErr)
+			}
+		}
 	}
-	return saveDatabaseUserCredential(dbType, req.Database, req.Username, req.Host, req.Password, req.Description)
+	for _, host := range hosts {
+		if err := cli.CreateUserOnly(client.UserInfo{Username: req.Username, Host: host}, req.Password, 300); err != nil {
+			rollbackCreatedHosts()
+			return err
+		}
+		createdHosts = append(createdHosts, host)
+	}
+	savedHosts := make([]string, 0, len(hosts))
+	for _, host := range hosts {
+		if err := saveDatabaseUserCredential(dbType, req.Database, req.Username, host, req.Password, req.Description); err != nil {
+			for _, savedHost := range savedHosts {
+				if rollbackErr := databaseUserRepo.Delete(
+					repo.WithByType(dbType),
+					databaseUserRepo.WithByDatabase(req.Database),
+					databaseUserRepo.WithByUser(req.Username, savedHost),
+				); rollbackErr != nil {
+					global.LOG.Errorf("rollback mysql user record %s@%s failed, err: %v", req.Username, savedHost, rollbackErr)
+				}
+			}
+			rollbackCreatedHosts()
+			return err
+		}
+		savedHosts = append(savedHosts, host)
+	}
+	return nil
 }
 
 func (u *MysqlService) UpdateUser(req dto.MysqlUserUpdate) error {
@@ -619,10 +677,20 @@ func (u *MysqlService) UpdateUser(req dto.MysqlUserUpdate) error {
 	if err := checkMysqlNormalUser(req.Username); err != nil {
 		return err
 	}
+	oldHosts, err := parseMysqlHosts(req.Host, false)
+	if err != nil {
+		return err
+	}
+	newHosts, err := parseMysqlHosts(req.NewHost, false)
+	if err != nil {
+		return err
+	}
 	dbType, err := resolveDatabaseUserType(req.Database)
 	if err != nil {
 		return err
 	}
+	req.Host = oldHosts[0]
+	req.NewHost = newHosts[0]
 	if req.Host != req.NewHost {
 		targetUser, _ := databaseUserRepo.Get(repo.WithByType(dbType), databaseUserRepo.WithByDatabase(req.Database), databaseUserRepo.WithByUser(req.Username, req.NewHost))
 		if targetUser.ID != 0 {
@@ -687,6 +755,11 @@ func (u *MysqlService) ChangeUserPassword(req dto.MysqlUserPassword) error {
 	if err := checkMysqlNormalUser(req.Username); err != nil {
 		return err
 	}
+	hosts, err := parseMysqlHosts(req.Host, false)
+	if err != nil {
+		return err
+	}
+	req.Host = hosts[0]
 	dbType, err := resolveDatabaseUserType(req.Database)
 	if err != nil {
 		return err
@@ -722,18 +795,7 @@ func (u *MysqlService) ChangeUserPassword(req dto.MysqlUserPassword) error {
 	}); err != nil {
 		return err
 	}
-	user, err := databaseUserRepo.Get(repo.WithByType(dbType), databaseUserRepo.WithByDatabase(req.Database), databaseUserRepo.WithByUser(req.Username, req.Host))
-	if err != nil {
-		user = model.DatabaseUser{
-			Type:     dbType,
-			Database: req.Database,
-			Username: req.Username,
-			Host:     req.Host,
-		}
-	}
-	user.Password = req.Password
-	user.IsDelete = false
-	if err := databaseUserRepo.Save(&user); err != nil {
+	if err := saveDatabaseUserCredential(dbType, req.Database, req.Username, req.Host, req.Password, ""); err != nil {
 		return err
 	}
 	return updateMysqlPasswordAppTargets(appTargets, req.Password)
@@ -746,6 +808,11 @@ func (u *MysqlService) SaveUserPassword(req dto.MysqlUserPassword) error {
 	if err := checkMysqlNormalUser(req.Username); err != nil {
 		return err
 	}
+	hosts, err := parseMysqlHosts(req.Host, false)
+	if err != nil {
+		return err
+	}
+	req.Host = hosts[0]
 	dbType, err := resolveDatabaseUserType(req.Database)
 	if err != nil {
 		return err
@@ -768,6 +835,11 @@ func (u *MysqlService) DeleteUser(req dto.MysqlUserDelete) error {
 	if err := checkMysqlNormalUser(req.Username); err != nil {
 		return err
 	}
+	hosts, err := parseMysqlHosts(req.Host, false)
+	if err != nil {
+		return err
+	}
+	req.Host = hosts[0]
 	dbType, err := resolveDatabaseUserType(req.Database)
 	if err != nil {
 		return err
@@ -805,6 +877,10 @@ func (u *MysqlService) GrantUser(req dto.MysqlGrantCreate) error {
 	if err := checkMysqlNormalUser(req.Username); err != nil {
 		return err
 	}
+	hosts, err := parseMysqlHosts(req.Host, true)
+	if err != nil {
+		return err
+	}
 	dbType, err := resolveDatabaseUserType(req.Database)
 	if err != nil {
 		return err
@@ -814,10 +890,15 @@ func (u *MysqlService) GrantUser(req dto.MysqlGrantCreate) error {
 		return err
 	}
 	defer cli.Close()
-	if err := cli.GrantUser(client.GrantInfo{Database: req.DB, Username: req.Username, Host: req.Host}, 300); err != nil {
-		return err
+	for _, host := range hosts {
+		if err := cli.GrantUser(client.GrantInfo{Database: req.DB, Username: req.Username, Host: host}, 300); err != nil {
+			return err
+		}
+		if err := saveDatabaseUserGrant(dbType, req.Database, req.DB, req.Username, host); err != nil {
+			return err
+		}
 	}
-	return saveDatabaseUserGrant(dbType, req.Database, req.DB, req.Username, req.Host)
+	return nil
 }
 
 func (u *MysqlService) RevokeGrant(req dto.MysqlGrantDelete) error {
@@ -830,6 +911,11 @@ func (u *MysqlService) RevokeGrant(req dto.MysqlGrantDelete) error {
 	if err := checkMysqlNormalUser(req.Username); err != nil {
 		return err
 	}
+	hosts, err := parseMysqlHosts(req.Host, false)
+	if err != nil {
+		return err
+	}
+	req.Host = hosts[0]
 	dbType, err := resolveDatabaseUserType(req.Database)
 	if err != nil {
 		return err

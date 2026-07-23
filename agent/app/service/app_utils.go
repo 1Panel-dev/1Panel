@@ -412,6 +412,20 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 
 		switch install.App.Key {
 		case constant.AppMysql, constant.AppMariaDB, constant.AppMysqlCluster:
+			if err = databaseUserGrantRepo.DeleteBy(
+				ctx,
+				repo.WithByType(install.App.Key),
+				databaseUserGrantRepo.WithByDatabase(install.Name),
+			); err != nil {
+				return err
+			}
+			if err = databaseUserRepo.DeleteBy(
+				ctx,
+				repo.WithByType(install.App.Key),
+				databaseUserRepo.WithByDatabase(install.Name),
+			); err != nil {
+				return err
+			}
 			_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
 		case constant.AppMongodb:
 			_ = mongodbRepo.Delete(ctx, mongodbRepo.WithByMongodbName(install.Name))

@@ -529,7 +529,7 @@ const message = {
         hostSelect: 'Sunucu Seçimi',
         selectHelper: '{0} yedek dosyasını içe aktarmak istediğinizden emin misiniz?',
         remoteAccess: 'Uzaktan erişim',
-        remoteHelper: 'Birden fazla IP virgülle ayrılır, örnek: 172.16.10.111, 172.16.10.112',
+        remoteHelper: 'Birden fazla IP virgülle ayrılır, örnek: 172.16.10.111,172.16.10.112',
         remoteConnHelper:
             'Root kullanıcısı olarak MySQLe uzaktan bağlantı güvenlik riski oluşturabilir. Bu nedenle bu işlemi dikkatli yapın.',
         changePassword: 'Şifre değiştir',
@@ -553,10 +553,8 @@ const message = {
         addUserAuthorization: 'Kullanıcı yetkisi ekle',
         revokeAuthorization: 'Yetkiyi kaldır',
         revokeAuthorizationHelper: '{0} kullanıcısının {1} veritabanına erişimi kaldırılsın mı?',
-        passwordPendingSupplement: 'Bekliyor',
         supplementPassword: 'Parola ekle',
         supplementPasswordHelper: 'Yalnızca mevcut parolayı 1Panel içine kaydeder; MySQL parolasını değiştirmez.',
-        deleteUserRecordHelper: 'Bu kullanıcı MySQL üzerinden silinmiş. Bu işlem yalnızca yerel 1Panel kaydını siler.',
         pgBindHelper:
             'Bu işlem yeni bir kullanıcı oluşturmak ve hedef veritabanına bağlamak için kullanılır. Şu anda veritabanında mevcut olan kullanıcıları seçmek desteklenmiyor.',
         pgSuperUser: 'Süper Kullanıcı',

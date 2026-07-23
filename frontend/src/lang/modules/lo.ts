@@ -554,10 +554,8 @@ const message = {
         addUserAuthorization: 'ເພີ່ມສິດຜູ້ໃຊ້',
         revokeAuthorization: 'ຖອນສິດ',
         revokeAuthorizationHelper: 'ຖອນສິດຜູ້ໃຊ້ {0} ໃນຖານຂໍ້ມູນ {1} ຫຼືບໍ່?',
-        passwordPendingSupplement: 'ລໍຖ້າເພີ່ມ',
         supplementPassword: 'ເພີ່ມລະຫັດຜ່ານ',
         supplementPasswordHelper: 'ບັນທຶກລະຫັດຜ່ານປັດຈຸບັນໄວ້ໃນ 1Panel ເທົ່ານັ້ນ ແລະບໍ່ປ່ຽນລະຫັດ MySQL.',
-        deleteUserRecordHelper: 'ຜູ້ໃຊ້ນີ້ຖືກລຶບຈາກ MySQL ແລ້ວ. ຈະລຶບສະເພາະຂໍ້ມູນທ້ອງຖິ່ນໃນ 1Panel.',
         noUserBind: 'ບໍ່ມີການຜູກມັດ',
         pgBindHelper:
             'ການດຳເນີນການນີ້ໃຊ້ເພື່ອສ້າງຜູ້ໃຊ້ໃໝ່ ແລະ ຜູກມັດກັບຖານຂໍ້ມູນເປົ້າໝາຍ. ໃນປັດຈຸບັນ, ຍັງບໍ່ຮອງຮັບການເລືອກຜູ້ໃຊ້ທີ່ມີຢູ່ແລ້ວໃນຖານຂໍ້ມູນ.',
