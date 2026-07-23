@@ -83,7 +83,7 @@
                         placement: 'bottom-start',
                     }"
                 >
-                    <el-table-column type="selection" width="30" />
+                    <el-table-column type="selection" width="32" />
                     <el-table-column
                         :label="$t('commons.table.name')"
                         fix
@@ -275,9 +275,16 @@
                         fix
                         card-type="button"
                     />
-                    <template #footerLeft>
-                        <div class="footer-left-button">
+                    <template #footerLeft="{ selected, toggleSelection }">
+                        <div class="footer-left-button" v-permission>
                             <el-select class="p-w-200" v-model="batchReq.operate">
+                                <template #prefix>
+                                    <el-checkbox
+                                        :model-value="selected"
+                                        @click.stop
+                                        @change="toggleSelection"
+                                    ></el-checkbox>
+                                </template>
                                 <el-option
                                     :label="$t('commons.button.start') + $t('menu.website')"
                                     value="start"
@@ -300,9 +307,7 @@
                                 ></el-option>
                             </el-select>
                             <el-button
-                                class="ml-2"
                                 type="primary"
-                                v-permission
                                 :disabled="selects.length == 0 || batchReq.operate == ''"
                                 @click="batchOp"
                             >
