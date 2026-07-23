@@ -4,6 +4,8 @@ go 1.25.10
 
 replace github.com/moby/go-archive => github.com/moby/go-archive v0.1.0
 
+replace github.com/go-acme/lego/v5 => github.com/1Panel-dev/lego/v5 v5.3.1
+
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/compose-spec/compose-go/v2 v2.13.0
@@ -117,7 +119,6 @@ require (
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-acme/alidns-20150109/v5 v5.5.0 // indirect
 	github.com/go-acme/esa-20240910/v3 v3.4.0 // indirect
-	github.com/go-acme/tencentclouddnspod v1.3.24 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -188,6 +189,7 @@ require (
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.3.133 // indirect
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dnspod v1.3.131 // indirect
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/tinylib/msgp v1.6.4 // indirect
 	github.com/tjfoc/gmsm v1.4.1 // indirect
