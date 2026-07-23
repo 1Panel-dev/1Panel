@@ -31,37 +31,6 @@
                 <el-button v-permission type="primary" plain @click="onClean()">
                     {{ $t('container.containerPrune') }}
                 </el-button>
-                <el-button-group class="button-group">
-                    <el-button v-permission :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
-                        {{ $t('commons.operate.start') }}
-                    </el-button>
-                    <el-button v-permission :disabled="checkStatus('stop', null)" @click="onOperate('stop', null)">
-                        {{ $t('commons.operate.stop') }}
-                    </el-button>
-                    <el-button
-                        v-permission
-                        :disabled="checkStatus('restart', null)"
-                        @click="onOperate('restart', null)"
-                    >
-                        {{ $t('commons.button.restart') }}
-                    </el-button>
-                    <el-button v-permission :disabled="checkStatus('kill', null)" @click="onOperate('kill', null)">
-                        {{ $t('container.kill') }}
-                    </el-button>
-                    <el-button v-permission :disabled="checkStatus('pause', null)" @click="onOperate('pause', null)">
-                        {{ $t('container.pause') }}
-                    </el-button>
-                    <el-button
-                        v-permission
-                        :disabled="checkStatus('unpause', null)"
-                        @click="onOperate('unpause', null)"
-                    >
-                        {{ $t('container.unpause') }}
-                    </el-button>
-                    <el-button v-permission :disabled="checkStatus('remove', null)" @click="onOperate('remove', null)">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </el-button-group>
             </template>
             <template #rightToolBar>
                 <TableViewSwitch v-model="viewMode" storage-key="container" />
@@ -395,6 +364,59 @@
                         :fixed="isMobile ? false : 'right'"
                         prop="operate"
                     />
+                    <template #footerLeft>
+                        <div class="footer-left-button">
+                            <el-select class="p-w-200" v-model="batchOperation">
+                                <el-option
+                                    :label="$t('container.start')"
+                                    value="start"
+                                    :disabled="checkStatus('start', null)"
+                                />
+                                <el-option
+                                    :label="$t('container.stop')"
+                                    value="stop"
+                                    :disabled="checkStatus('stop', null)"
+                                />
+                                <el-option
+                                    :label="$t('container.restart')"
+                                    value="restart"
+                                    :disabled="checkStatus('restart', null)"
+                                />
+                                <el-option
+                                    :label="$t('container.kill')"
+                                    value="kill"
+                                    :disabled="checkStatus('kill', null)"
+                                />
+                                <el-option
+                                    :label="$t('container.pause')"
+                                    value="pause"
+                                    :disabled="checkStatus('pause', null)"
+                                />
+                                <el-option
+                                    :label="$t('container.unpause')"
+                                    value="unpause"
+                                    :disabled="checkStatus('unpause', null)"
+                                />
+                                <el-option
+                                    :label="$t('container.remove')"
+                                    value="remove"
+                                    :disabled="checkStatus('remove', null)"
+                                />
+                            </el-select>
+                            <el-button
+                                class="ml-2"
+                                type="primary"
+                                v-permission
+                                :disabled="
+                                    selects.length === 0 || batchOperation === '' || checkStatus(batchOperation, null)
+                                "
+                                @click="onOperate(batchOperation, null)"
+                            >
+                                {{ $t('website.batchOperate') }}
+                                <span class="ml-1" v-if="selects.length > 0">({{ selects.length }})</span>
+                            </el-button>
+                        </div>
+                    </template>
                 </ComplexTable>
             </template>
 
@@ -517,6 +539,7 @@ const columns = ref([]);
 
 const batchNames = ref();
 const batchOp = ref();
+const batchOperation = ref('');
 const taskLogRef = ref();
 
 const tags = ref([]);
@@ -1078,11 +1101,6 @@ onMounted(() => {
     margin-top: -3px;
     font-size: 6px;
     cursor: pointer;
-}
-.button-group .el-button {
-    margin-left: -1px !important;
-    position: relative !important;
-    z-index: 1 !important;
 }
 .tag-button {
     margin-top: -5px;
