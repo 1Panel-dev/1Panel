@@ -919,9 +919,9 @@ var AddIptablesFilterRuleTable = &gormigrate.Migration{
 		_ = tx.Where("1 = 1").Find(&firewalls).Error
 
 		firewallType := ""
-		client, err := firewall.NewFirewallClient()
+		provider, err := firewall.DetectProvider()
 		if err == nil {
-			firewallType = client.Name()
+			firewallType = provider
 		}
 		for _, item := range firewalls {
 			if err := tx.Model(&model.Firewall{}).
