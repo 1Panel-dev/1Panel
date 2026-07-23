@@ -90,11 +90,12 @@ type MysqlUserSearch struct {
 }
 
 type MysqlUserCreate struct {
-	Database    string `json:"database" validate:"required"`
-	Username    string `json:"username" validate:"required"`
-	Password    string `json:"password" validate:"required"`
-	Host        string `json:"host" validate:"required"`
-	Description string `json:"description"`
+	Database    string   `json:"database" validate:"required"`
+	Username    string   `json:"username" validate:"required"`
+	Password    string   `json:"password" validate:"required"`
+	Host        string   `json:"host" validate:"required"`
+	Description string   `json:"description"`
+	DBs         []string `json:"dbs"`
 }
 
 type MysqlUserDelete struct {

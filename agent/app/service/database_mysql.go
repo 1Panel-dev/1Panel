@@ -618,6 +618,24 @@ func (u *MysqlService) CreateUser(req dto.MysqlUserCreate) error {
 	if cmd.CheckIllegal(req.Username, req.Password, req.Host) {
 		return buserr.New("ErrCmdIllegal")
 	}
+	dbs := make([]string, 0, len(req.DBs))
+	dbSet := make(map[string]struct{}, len(req.DBs))
+	for _, db := range req.DBs {
+		if db == "" {
+			continue
+		}
+		if cmd.CheckIllegal(db) {
+			return buserr.New("ErrCmdIllegal")
+		}
+		if db == "*" {
+			return errors.New("global mysql privileges must be managed outside 1Panel")
+		}
+		if _, ok := dbSet[db]; ok {
+			continue
+		}
+		dbSet[db] = struct{}{}
+		dbs = append(dbs, db)
+	}
 	if err := checkMysqlNormalUser(req.Username); err != nil {
 		return err
 	}
@@ -643,6 +661,53 @@ func (u *MysqlService) CreateUser(req dto.MysqlUserCreate) error {
 			}
 		}
 	}
+	savedHosts := make([]string, 0, len(hosts))
+	rollbackSavedHosts := func() {
+		for i := len(savedHosts) - 1; i >= 0; i-- {
+			host := savedHosts[i]
+			if rollbackErr := databaseUserRepo.Delete(
+				repo.WithByType(dbType),
+				databaseUserRepo.WithByDatabase(req.Database),
+				databaseUserRepo.WithByUser(req.Username, host),
+			); rollbackErr != nil {
+				global.LOG.Errorf("rollback mysql user record %s@%s failed, err: %v", req.Username, host, rollbackErr)
+			}
+		}
+	}
+	grantedItems := make([]client.GrantInfo, 0, len(dbs)*len(hosts))
+	rollbackGrantedItems := func() {
+		for i := len(grantedItems) - 1; i >= 0; i-- {
+			item := grantedItems[i]
+			if rollbackErr := cli.RevokeGrant(item, 300); rollbackErr != nil {
+				global.LOG.Errorf(
+					"rollback mysql grant %s to %s@%s failed, err: %v",
+					item.Database,
+					item.Username,
+					item.Host,
+					rollbackErr,
+				)
+			}
+			if rollbackErr := databaseUserGrantRepo.Delete(
+				repo.WithByType(dbType),
+				databaseUserGrantRepo.WithByDatabase(req.Database),
+				databaseUserGrantRepo.WithByDBName(item.Database),
+				databaseUserGrantRepo.WithByUser(item.Username, item.Host),
+			); rollbackErr != nil {
+				global.LOG.Errorf(
+					"rollback mysql grant record %s to %s@%s failed, err: %v",
+					item.Database,
+					item.Username,
+					item.Host,
+					rollbackErr,
+				)
+			}
+		}
+	}
+	rollbackAll := func() {
+		rollbackGrantedItems()
+		rollbackSavedHosts()
+		rollbackCreatedHosts()
+	}
 	for _, host := range hosts {
 		if err := cli.CreateUserOnly(client.UserInfo{Username: req.Username, Host: host}, req.Password, 300); err != nil {
 			rollbackCreatedHosts()
@@ -650,22 +715,26 @@ func (u *MysqlService) CreateUser(req dto.MysqlUserCreate) error {
 		}
 		createdHosts = append(createdHosts, host)
 	}
-	savedHosts := make([]string, 0, len(hosts))
 	for _, host := range hosts {
 		if err := saveDatabaseUserCredential(dbType, req.Database, req.Username, host, req.Password, req.Description); err != nil {
-			for _, savedHost := range savedHosts {
-				if rollbackErr := databaseUserRepo.Delete(
-					repo.WithByType(dbType),
-					databaseUserRepo.WithByDatabase(req.Database),
-					databaseUserRepo.WithByUser(req.Username, savedHost),
-				); rollbackErr != nil {
-					global.LOG.Errorf("rollback mysql user record %s@%s failed, err: %v", req.Username, savedHost, rollbackErr)
-				}
-			}
-			rollbackCreatedHosts()
+			rollbackAll()
 			return err
 		}
 		savedHosts = append(savedHosts, host)
+	}
+	for _, db := range dbs {
+		for _, host := range hosts {
+			item := client.GrantInfo{Database: db, Username: req.Username, Host: host}
+			if err := cli.GrantUser(item, 300); err != nil {
+				rollbackAll()
+				return err
+			}
+			grantedItems = append(grantedItems, item)
+			if err := saveDatabaseUserGrant(dbType, req.Database, db, req.Username, host); err != nil {
+				rollbackAll()
+				return err
+			}
+		}
 	}
 	return nil
 }

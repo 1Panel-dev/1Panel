@@ -81,6 +81,7 @@ export namespace Database {
         password: string;
         host: string;
         description: string;
+        dbs?: string[];
     }
 
     export interface MysqlUserDelete {

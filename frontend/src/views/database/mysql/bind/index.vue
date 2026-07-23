@@ -1,21 +1,25 @@
 <template>
-    <DialogPro v-model="dialogVisible" :title="$t('database.authorizationManagement')" size="large">
+    <DialogPro
+        v-model="dialogVisible"
+        :title="$t(props.viewOnly ? 'database.authorizedUsers' : 'database.authorizationManagement')"
+        size="large"
+    >
         <div v-loading="loading">
-            <div class="authorization-toolbar">
+            <div v-if="!props.viewOnly" class="authorization-toolbar">
                 <el-button type="primary" @click="openAddDialog">
                     {{ $t('database.addUserAuthorization') }}
                 </el-button>
             </div>
             <el-table :data="authorizedUsers" :empty-text="$t('commons.msg.noneData')">
-                <el-table-column :label="$t('commons.login.username')" min-width="140">
-                    <template #default="{ row }">{{ row.username }}</template>
+                <el-table-column :label="$t('commons.table.user')" show-overflow-tooltip min-width="180">
+                    <template #default="{ row }">{{ row.username }}@{{ row.host }}</template>
                 </el-table-column>
                 <el-table-column :label="$t('commons.login.password')" prop="password" min-width="180">
                     <template #default="{ row }">
                         <span v-if="!row.password">-</span>
                         <div v-else class="password-cell">
                             <span v-if="!row.showPassword" class="password-text">**********</span>
-                            <span v-else class="password-text">{{ row.password }}</span>
+                            <Tooltip v-else class="password-text" :islink="false" :text="row.password" />
                             <el-button
                                 v-if="!row.showPassword"
                                 link
@@ -34,16 +38,13 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('database.permission')" min-width="110">
-                    <template #default="{ row }">{{ permissionLabel(row.host) }}</template>
-                </el-table-column>
                 <el-table-column
                     :label="$t('commons.table.description')"
                     prop="description"
                     show-overflow-tooltip
                     min-width="120"
                 />
-                <el-table-column :label="$t('commons.table.operate')" width="100" fixed="right">
+                <el-table-column v-if="!props.viewOnly" :label="$t('commons.table.operate')" width="100" fixed="right">
                     <template #default="{ row }">
                         <el-button link type="primary" @click="revokeAuthorization(row)">
                             {{ $t('database.revokeAuthorization') }}
@@ -59,7 +60,12 @@
         </template>
     </DialogPro>
 
-    <DialogPro v-model="addDialogVisible" :title="$t('database.addUserAuthorization')" size="small">
+    <DialogPro
+        v-if="!props.viewOnly"
+        v-model="addDialogVisible"
+        :title="$t('database.addUserAuthorization')"
+        size="small"
+    >
         <el-form ref="formRef" :model="form" :rules="rules" label-position="top" v-loading="loading">
             <el-form-item :label="$t('commons.table.type')" prop="mode">
                 <el-radio-group v-model="form.mode" @change="changeMode">
@@ -155,6 +161,7 @@
 <script lang="ts" setup>
 import { computed, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
+import Tooltip from '@/components/tooltip/index.vue';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
@@ -168,6 +175,14 @@ import {
 } from '@/api/modules/database';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
+const props = withDefaults(
+    defineProps<{
+        viewOnly?: boolean;
+    }>(),
+    {
+        viewOnly: false,
+    },
+);
 
 const dialogVisible = ref(false);
 const addDialogVisible = ref(false);
