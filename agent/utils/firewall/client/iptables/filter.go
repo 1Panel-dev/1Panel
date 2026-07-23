@@ -89,7 +89,7 @@ func ReadFilterRulesByChain(chain string) ([]FilterRules, error) {
 		}
 		itemRule := FilterRules{
 			Chain:    chain,
-			Protocol: loadProtocol(fields[1]),
+			Protocol: LoadProtocol(fields[1]),
 			SrcPort:  loadPort("src", fields),
 			DstPort:  loadPort("dst", fields),
 			SrcIP:    loadIP(fields[3]),
@@ -150,7 +150,7 @@ func LoadInitStatus(clientName, tab string) (bool, bool) {
 			fmt.Sprintf("-A %s -j %s", ChainInput, Chain1PanelBasic),
 			fmt.Sprintf("-A %s -j %s", ChainInput, Chain1PanelBasicAfter),
 		}
-		return checkWithInitAndBind(initRules, bindRules, lines)
+		return CheckWithInitAndBind(initRules, bindRules, lines)
 	case "advance":
 		filterRules, err := RunWithStd(FilterTab, "-S")
 		if err != nil {
@@ -165,13 +165,15 @@ func LoadInitStatus(clientName, tab string) (bool, bool) {
 			fmt.Sprintf("-A %s -j %s", ChainInput, Chain1PanelInput),
 			fmt.Sprintf("-A %s -j %s", ChainOutput, Chain1PanelOutput),
 		}
-		return checkWithInitAndBind(initRules, bindRules, lines)
+		return CheckWithInitAndBind(initRules, bindRules, lines)
 	default:
 		return false, false
 	}
 }
 
-func checkWithInitAndBind(initRules, bindRules []string, lines []string) (bool, bool) {
+// CheckWithInitAndBind reports whether every init rule and every bind rule is
+// present in the `iptables -S` output lines.
+func CheckWithInitAndBind(initRules, bindRules []string, lines []string) (bool, bool) {
 	for _, rule := range initRules {
 		found := false
 		for _, line := range lines {
@@ -230,7 +232,8 @@ func loadIP(ipStr string) string {
 	return ipStr
 }
 
-func loadProtocol(protocol string) string {
+// LoadProtocol maps an iptables numeric protocol to its name.
+func LoadProtocol(protocol string) string {
 	switch protocol {
 	case "0":
 		return "all"

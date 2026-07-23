@@ -202,11 +202,8 @@ func (i *Iptables) ApplyAddressUnit(unit AddressUnit, operation string) error {
 }
 
 func (i *Iptables) AddPortWhiteList(list PortWhiteList) error {
-	if isInit, _ := iptables.LoadInitStatus("iptables", "base"); !isInit {
-		return nil
-	}
 	list.Previous = nil
-	return SyncIptablesPortWhiteList(list, true)
+	return i.SyncPortWhiteList(list)
 }
 
 func (i *Iptables) SyncPortWhiteList(list PortWhiteList) error {

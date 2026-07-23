@@ -209,7 +209,7 @@ func (l *legacyNATAdapter) InitStatus() (bool, bool) {
 	if err != nil {
 		return false, false
 	}
-	natInit, natBind := checkInitAndBind(
+	natInit, natBind := iptables.CheckWithInitAndBind(
 		[]string{"-N " + ChainPreRouting, "-N " + ChainPostRouting},
 		[]string{"-A PREROUTING -j " + ChainPreRouting, "-A POSTROUTING -j " + ChainPostRouting},
 		strings.Split(natRules, "\n"),
@@ -221,35 +221,12 @@ func (l *legacyNATAdapter) InitStatus() (bool, bool) {
 	if err != nil {
 		return false, false
 	}
-	filterInit, filterBind := checkInitAndBind(
+	filterInit, filterBind := iptables.CheckWithInitAndBind(
 		[]string{"-N " + ChainForward},
 		[]string{"-A FORWARD -j " + ChainForward},
 		strings.Split(filterRules, "\n"),
 	)
 	return natInit && filterInit, natBind && filterBind
-}
-
-func checkInitAndBind(initRules, bindRules, lines []string) (bool, bool) {
-	for _, rule := range initRules {
-		if !containsExactRule(lines, rule) {
-			return false, false
-		}
-	}
-	for _, rule := range bindRules {
-		if !containsExactRule(lines, rule) {
-			return true, false
-		}
-	}
-	return true, true
-}
-
-func containsExactRule(lines []string, rule string) bool {
-	for _, line := range lines {
-		if strings.TrimSpace(line) == strings.TrimSpace(rule) {
-			return true
-		}
-	}
-	return false
 }
 
 func (l *legacyNATAdapter) Replay() error {
@@ -278,7 +255,7 @@ func parseLegacyRules(stdout string) []Rule {
 		}
 		rule := Rule{
 			Num:       fields[0],
-			Protocol:  loadProtocol(fields[4]),
+			Protocol:  iptables.LoadProtocol(fields[4]),
 			Interface: fields[6],
 			Port:      loadSourcePort(fields[11]),
 		}
@@ -299,21 +276,6 @@ func parseLegacyRules(stdout string) []Rule {
 		rules = append(rules, rule)
 	}
 	return rules
-}
-
-func loadProtocol(protocol string) string {
-	switch protocol {
-	case "0":
-		return "all"
-	case "1":
-		return "icmp"
-	case "6":
-		return "tcp"
-	case "17":
-		return "udp"
-	default:
-		return protocol
-	}
 }
 
 func loadSourcePort(value string) string {

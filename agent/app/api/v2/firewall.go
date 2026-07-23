@@ -57,12 +57,7 @@ func (b *BaseApi) SearchFirewallRule(c *gin.Context) {
 		err   error
 	)
 	if req.Type == "forward" {
-		total, list, err = forwardingService.SearchWithPage(dto.ForwardRuleSearch{
-			PageInfo: req.PageInfo,
-			Info:     req.Info,
-			Status:   req.Status,
-			Strategy: req.Strategy,
-		})
+		total, list, err = forwardingService.SearchWithPage(req)
 	} else {
 		total, list, err = firewallService.SearchWithPage(req)
 	}
