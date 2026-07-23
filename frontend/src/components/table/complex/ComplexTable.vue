@@ -123,7 +123,7 @@
         <div class="table-footer-container">
             <div class="footer-left" v-if="slots.footerLeft">
                 <el-checkbox v-model="leftSelect" border @change="toggleSelection"></el-checkbox>
-                <div class="ml-2">
+                <div>
                     <slot name="footerLeft"></slot>
                 </div>
             </div>
