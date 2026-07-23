@@ -151,7 +151,9 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 		}
 	}
 
-	go u.cleanUnUsedData(client)
+	if req.Type == "port" || req.Type == "address" {
+		go u.cleanUnUsedData(client)
+	}
 
 	return int64(total), backDatas, nil
 }
@@ -224,88 +226,28 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 	if err != nil {
 		return err
 	}
-	if len(req.Chain) == 0 && client.Name() == "iptables" {
-		req.Chain = iptables.Chain1PanelBasic
-	}
-	protos := strings.Split(req.Protocol, "/")
-	itemAddress := splitFirewallRuleAddresses(req.Address)
+	return u.operatePortRuleWithClient(client, req, reload)
+}
 
-	if client.Name() == "ufw" {
-		if strings.Contains(req.Port, ",") || strings.Contains(req.Port, "-") {
-			for _, proto := range protos {
-				for _, addr := range itemAddress {
-					if len(addr) == 0 {
-						addr = "Anywhere"
-					}
-					req.Address = addr
-					req.Port = strings.ReplaceAll(req.Port, "-", ":")
-					req.Protocol = proto
-					if err := u.operatePort(client, req); err != nil {
-						return err
-					}
-					req.Port = strings.ReplaceAll(req.Port, ":", "-")
-					if err := u.addPortRecord(req); err != nil {
-						return err
-					}
-				}
-			}
-			return nil
-		}
-		for _, addr := range itemAddress {
-			if len(addr) == 0 {
-				addr = "Anywhere"
-			}
-			if req.Protocol == "tcp/udp" {
-				req.Protocol = ""
-			}
-			req.Address = addr
-			if err := u.operatePort(client, req); err != nil {
-				return err
-			}
-			if len(req.Protocol) == 0 {
-				req.Protocol = "tcp/udp"
-			}
-			if err := u.addPortRecord(req); err != nil {
-				return err
-			}
-		}
-		return nil
+func (u *FirewallService) operatePortRuleWithClient(client firewall.FilterClient, req dto.PortRuleOperate, reload bool) error {
+	var rule fireClient.FireInfo
+	if err := copier.Copy(&rule, &req); err != nil {
+		return err
 	}
-
-	itemPorts := req.Port
-	for _, proto := range protos {
-		if strings.Contains(req.Port, "-") {
-			for _, addr := range itemAddress {
-				req.Protocol = proto
-				req.Address = addr
-				if err := u.operatePort(client, req); err != nil {
-					return err
-				}
-				if err := u.addPortRecord(req); err != nil {
-					return err
-				}
-			}
-		} else {
-			ports := strings.Split(itemPorts, ",")
-			for _, port := range ports {
-				if len(port) == 0 {
-					continue
-				}
-				for _, addr := range itemAddress {
-					req.Address = addr
-					req.Port = port
-					req.Protocol = proto
-					if err := u.operatePort(client, req); err != nil {
-						return err
-					}
-					if err := u.addPortRecord(req); err != nil {
-						return err
-					}
-				}
-			}
+	for _, unit := range client.ExpandPortRule(rule) {
+		if err := client.ApplyPortUnit(unit, req.Operation); err != nil {
+			return err
+		}
+		record := req
+		record.Chain = unit.Chain
+		record.Address = unit.Record.Address
+		record.Port = unit.Record.Port
+		record.Protocol = unit.Record.Protocol
+		record.Strategy = unit.Record.Strategy
+		if err := u.addPortRecord(record); err != nil {
+			return err
 		}
 	}
-
 	if reload {
 		return client.Reload()
 	}
@@ -317,26 +259,21 @@ func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload boo
 	if err != nil {
 		return err
 	}
-	chain := ""
-	if client.Name() == "iptables" {
-		chain = iptables.Chain1PanelBasic
-	}
-	var fireInfo fireClient.FireInfo
-	if err := copier.Copy(&fireInfo, &req); err != nil {
+	return u.operateAddressRuleWithClient(client, req, reload)
+}
+
+func (u *FirewallService) operateAddressRuleWithClient(client firewall.FilterClient, req dto.AddrRuleOperate, reload bool) error {
+	var rule fireClient.FireInfo
+	if err := copier.Copy(&rule, &req); err != nil {
 		return err
 	}
-
-	addressList := strings.Split(req.Address, ",")
-	for i := 0; i < len(addressList); i++ {
-		if len(addressList[i]) == 0 {
-			continue
-		}
-		fireInfo.Address = addressList[i]
-		if err := client.RichRules(fireInfo, req.Operation); err != nil {
+	for _, unit := range client.ExpandAddressRule(rule) {
+		if err := client.ApplyAddressUnit(unit, req.Operation); err != nil {
 			return err
 		}
-		req.Address = addressList[i]
-		if err := u.addAddressRecord(chain, req); err != nil {
+		record := req
+		record.Address = unit.Apply.Address
+		if err := u.addAddressRecord(unit.Chain, record); err != nil {
 			return err
 		}
 	}
@@ -413,6 +350,10 @@ func OperateFirewallPort(oldPorts, newPorts []int) error {
 	if err != nil {
 		return err
 	}
+	return operateFirewallPorts(client, oldPorts, newPorts)
+}
+
+func operateFirewallPorts(client firewall.FilterClient, oldPorts, newPorts []int) error {
 	for _, port := range newPorts {
 		if err := client.Port(fireClient.FireInfo{Port: strconv.Itoa(port), Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
 			return err
@@ -424,46 +365,6 @@ func OperateFirewallPort(oldPorts, newPorts []int) error {
 		}
 	}
 	return client.Reload()
-}
-
-func (u *FirewallService) operatePort(client firewall.FilterClient, req dto.PortRuleOperate) error {
-	var fireInfo fireClient.FireInfo
-	if err := copier.Copy(&fireInfo, &req); err != nil {
-		return err
-	}
-	fireInfo.Address = normalizeFirewallRuleAddress(fireInfo.Address)
-
-	if client.Name() == "ufw" {
-		if len(fireInfo.Address) != 0 && !strings.EqualFold(fireInfo.Address, "Anywhere") {
-			return client.RichRules(fireInfo, req.Operation)
-		}
-		return client.Port(fireInfo, req.Operation)
-	}
-
-	if len(fireInfo.Address) != 0 || fireInfo.Strategy == "drop" {
-		return client.RichRules(fireInfo, req.Operation)
-	}
-	return client.Port(fireInfo, req.Operation)
-}
-
-func splitFirewallRuleAddresses(address string) []string {
-	parts := strings.Split(strings.TrimSuffix(address, ","), ",")
-	addresses := make([]string, 0, len(parts))
-	for _, part := range parts {
-		addresses = append(addresses, normalizeFirewallRuleAddress(part))
-	}
-	if len(addresses) == 0 {
-		return []string{""}
-	}
-	return addresses
-}
-
-func normalizeFirewallRuleAddress(address string) string {
-	address = strings.TrimSpace(address)
-	if strings.EqualFold(address, "Anywhere") {
-		return ""
-	}
-	return address
 }
 
 type portOfApp struct {

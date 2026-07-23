@@ -131,7 +131,7 @@ func (f *Firewall) Port(port FireInfo, operation string) error {
 		return buserr.New("ErrCmdIllegal")
 	}
 
-	if err := cmd.NewCommandMgr().Run("firewall-cmd", "--zone=public", "--"+operation+"-port="+port.Port+"/"+port.Protocol, "--permanent"); err != nil {
+	if err := cmd.NewCommandMgr().Run("firewall-cmd", buildFirewalldPortArgs(port, operation)...); err != nil {
 		return fmt.Errorf("%s (port: %s/%s strategy: %s) failed, %v", operation, port.Port, port.Protocol, port.Strategy, err)
 	}
 	return nil
@@ -141,6 +141,38 @@ func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 	if cmd.CheckIllegal(operation, rule.Address, rule.Protocol, rule.Port, rule.Strategy) {
 		return buserr.New("ErrCmdIllegal")
 	}
+	for _, ruleStr := range buildFirewalldRichRuleStrings(rule) {
+		if err := cmd.NewCommandMgr().Run("firewall-cmd", buildFirewalldRichRuleArgs(ruleStr, operation)...); err != nil {
+			return fmt.Errorf("%s rich rules (%s) failed, %v", operation, ruleStr, err)
+		}
+	}
+	return nil
+}
+
+func (f *Firewall) ExpandPortRule(rule FireInfo) []PortUnit {
+	return expandPortRule(rule, rule.Chain)
+}
+
+func (f *Firewall) ApplyPortUnit(unit PortUnit, operation string) error {
+	if needsRichRule(unit.Apply) {
+		return f.RichRules(unit.Apply, operation)
+	}
+	return f.Port(unit.Apply, operation)
+}
+
+func (f *Firewall) ExpandAddressRule(rule FireInfo) []AddressUnit {
+	return expandAddressRule(rule, "")
+}
+
+func (f *Firewall) ApplyAddressUnit(unit AddressUnit, operation string) error {
+	return f.RichRules(unit.Apply, operation)
+}
+
+func buildFirewalldPortArgs(port FireInfo, operation string) []string {
+	return []string{"--zone=public", "--" + operation + "-port=" + port.Port + "/" + port.Protocol, "--permanent"}
+}
+
+func buildFirewalldRichRuleString(rule FireInfo) string {
 	ruleStr := "rule family=ipv4 "
 	if strings.Contains(rule.Address, ":") {
 		ruleStr = "rule family=ipv6 "
@@ -154,17 +186,20 @@ func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 	if len(rule.Protocol) != 0 {
 		ruleStr += fmt.Sprintf("protocol=%s ", rule.Protocol)
 	}
-	ruleStr += rule.Strategy
-	if err := cmd.NewCommandMgr().Run("firewall-cmd", "--zone=public", "--"+operation+"-rich-rule", ruleStr, "--permanent"); err != nil {
-		return fmt.Errorf("%s rich rules (%s) failed, %v", operation, ruleStr, err)
-	}
+	return ruleStr + rule.Strategy
+}
+
+func buildFirewalldRichRuleStrings(rule FireInfo) []string {
+	ruleStr := buildFirewalldRichRuleString(rule)
+	rules := []string{ruleStr}
 	if len(rule.Address) == 0 {
-		ipv6Rule := strings.ReplaceAll(ruleStr, "family=ipv4 ", "family=ipv6 ")
-		if err := cmd.NewCommandMgr().Run("firewall-cmd", "--zone=public", "--"+operation+"-rich-rule", ipv6Rule, "--permanent"); err != nil {
-			return fmt.Errorf("%s rich rules (%s) failed, %v", operation, ipv6Rule, err)
-		}
+		rules = append(rules, strings.ReplaceAll(ruleStr, "family=ipv4 ", "family=ipv6 "))
 	}
-	return nil
+	return rules
+}
+
+func buildFirewalldRichRuleArgs(ruleStr, operation string) []string {
+	return []string{"--zone=public", "--" + operation + "-rich-rule", ruleStr, "--permanent"}
 }
 
 func (f *Firewall) loadInfo(line string) FireInfo {

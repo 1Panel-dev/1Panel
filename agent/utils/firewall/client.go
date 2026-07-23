@@ -12,8 +12,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
 )
 
-// FilterClient is the filter capability surface; port forwarding lives in its
-// own adapter and is no longer reachable from here.
+// FilterClient is the filter capability surface. Rule expansion lives behind
+// Expand*/Apply* so that callers never build provider native commands themselves.
 type FilterClient interface {
 	Name() string // ufw firewalld iptables
 	Start() error
@@ -27,7 +27,13 @@ type FilterClient interface {
 	ListAddress() ([]client.FireInfo, error)
 
 	Port(port client.FireInfo, operation string) error
-	RichRules(rule client.FireInfo, operation string) error
+
+	// ExpandPortRule turns one logical rule into the ordered native operations
+	// this provider needs. It runs no command.
+	ExpandPortRule(rule client.FireInfo) []client.PortUnit
+	ApplyPortUnit(unit client.PortUnit, operation string) error
+	ExpandAddressRule(rule client.FireInfo) []client.AddressUnit
+	ApplyAddressUnit(unit client.AddressUnit, operation string) error
 }
 
 func NewFirewallClient() (FilterClient, error) {
