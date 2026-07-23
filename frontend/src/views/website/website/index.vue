@@ -83,7 +83,7 @@
                         placement: 'bottom-start',
                     }"
                 >
-                    <el-table-column type="selection" width="30" />
+                    <el-table-column type="selection" width="32" />
                     <el-table-column
                         :label="$t('commons.table.name')"
                         fix

@@ -71,7 +71,7 @@
                     localKey="containerColumn"
                     :heightDiff="300"
                 >
-                    <el-table-column type="selection" />
+                    <el-table-column type="selection" width="32" />
                     <el-table-column
                         :label="$t('commons.table.name')"
                         min-width="250"

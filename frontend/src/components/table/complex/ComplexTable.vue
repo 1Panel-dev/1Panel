@@ -122,8 +122,8 @@
         </div>
         <div class="table-footer-container">
             <div class="footer-left" v-if="slots.footerLeft">
-                <el-checkbox v-model="leftSelect" @change="toggleSelection"></el-checkbox>
-                <div class="ml-4">
+                <el-checkbox v-model="leftSelect" border @change="toggleSelection"></el-checkbox>
+                <div class="ml-2">
                     <slot name="footerLeft"></slot>
                 </div>
             </div>
@@ -680,9 +680,15 @@ onBeforeUnmount(() => {
 
     .footer-left {
         flex-shrink: 0;
-        margin-right: 16px;
-        margin-left: 12px;
         display: flex;
+        align-items: center;
+
+        > .el-checkbox.is-bordered {
+            width: 32px;
+            margin: 0;
+            padding: 0;
+            justify-content: center;
+        }
 
         .footer-left-button {
             margin-left: 17px;
