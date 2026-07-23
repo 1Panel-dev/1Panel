@@ -788,6 +788,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	if err != nil {
 		return err
 	}
+	originalInstall := install
 	oldVersion := install.Version
 	detail, err := appDetailRepo.GetFirst(repo.WithByID(req.DetailID))
 	if err != nil {
@@ -807,8 +808,9 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	install.Status = constant.StatusUpgrading
 
 	var (
-		upErr      error
-		backupFile string
+		upErr                error
+		backupFile           string
+		nginxUpgradeSnapshot *openrestyUpgradeSnapshot
 	)
 	backUpApp := func(t *task.Task) error {
 		backupService := NewIBackupService()
@@ -865,6 +867,12 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		oldEnvContent := append([]byte(nil), content...)
 		oldDockerCompose := install.DockerCompose
 		targetNginxCatalogPath := ""
+		if install.App.Key == constant.AppOpenresty {
+			nginxUpgradeSnapshot, err = createOpenrestyUpgradeSnapshot(install.GetPath())
+			if err != nil {
+				return err
+			}
+		}
 		if install.App.Key == vllmAppKeyForUpgrade {
 			envs := make(map[string]interface{})
 			if err = json.Unmarshal([]byte(install.Env), &envs); err != nil {
@@ -897,10 +905,8 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			if err := fileOp.CopyFile(path.Join(detailBuildDir, "Dockerfile"), installBuildDir); err != nil {
 				return err
 			}
-			if fileOp.Stat(path.Join(detailBuildDir, nginxModuleBuilderFile)) {
-				if err := fileOp.CopyFile(path.Join(detailBuildDir, nginxModuleBuilderFile), installBuildDir); err != nil {
-					return err
-				}
+			if err := syncNginxModuleBuilder(detailBuildDir, installBuildDir); err != nil {
+				return err
 			}
 			targetCatalogSource := path.Join(detailBuildDir, nginxModuleCatalogFile)
 			if !fileOp.Stat(targetCatalogSource) {
@@ -1058,6 +1064,9 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		t.LogSuccess(logStr)
 		install.Status = constant.StatusRunning
 		if install.App.Key == constant.AppOpenresty {
+			if err = commitStaticNginxModuleBuilds(install, targetNginxCatalogPath, t); err != nil {
+				return err
+			}
 			activeCatalogPath := path.Join(install.GetPath(), nginxModuleBuildDir, nginxModuleCatalogFile)
 			if err = activateNginxModuleCatalogAndCommit(targetNginxCatalogPath, activeCatalogPath, func() error {
 				return appInstallRepo.Save(context.Background(), &install)
@@ -1068,6 +1077,10 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			if err = appInstallRepo.Save(context.Background(), &install); err != nil {
 				return err
 			}
+		}
+		if nginxUpgradeSnapshot != nil {
+			nginxUpgradeSnapshot.Cleanup()
+			nginxUpgradeSnapshot = nil
 		}
 		if req.DeleteImage {
 			newEnvContent, err := fileOp.GetContent(install.GetEnvPath())
@@ -1096,30 +1109,88 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	rollBackApp := func(t *task.Task) {
 		if req.Backup {
 			t.Log(i18n.GetWithName("AppRecover", install.Name))
-			if err := NewIBackupService().AppRecover(dto.CommonRecover{Name: install.App.Key, DetailName: install.Name, Type: "app", DownloadAccountID: 1, File: backupFile}); err != nil {
-				t.LogFailedWithErr(i18n.GetWithName("AppRecover", install.Name), err)
+			recoverErr := NewIBackupService().AppRecover(dto.CommonRecover{
+				Name: install.App.Key, DetailName: install.Name, Type: "app", DownloadAccountID: 1, File: backupFile,
+			})
+			if recoverErr == nil {
+				if nginxUpgradeSnapshot != nil {
+					nginxUpgradeSnapshot.Cleanup()
+					nginxUpgradeSnapshot = nil
+				}
+				t.LogSuccess(i18n.GetWithName("AppRecover", install.Name))
 				return
 			}
+			t.LogFailedWithErr(i18n.GetWithName("AppRecover", install.Name), recoverErr)
+			if install.App.Key != constant.AppOpenresty {
+				return
+			}
+		}
+		if install.App.Key == constant.AppOpenresty && nginxUpgradeSnapshot != nil {
+			if out, rollbackErr := compose.Down(install.GetComposePath()); rollbackErr != nil {
+				if out != "" {
+					rollbackErr = fmt.Errorf("%s: %w", out, rollbackErr)
+				}
+				t.LogFailedWithErr(i18n.GetWithName("AppRecover", install.Name), rollbackErr)
+			}
+			if rollbackErr := nginxUpgradeSnapshot.Restore(); rollbackErr != nil {
+				t.LogFailedWithErr(i18n.GetWithName("AppRecover", install.Name), rollbackErr)
+				return
+			}
+			nginxUpgradeSnapshot.Cleanup()
+			nginxUpgradeSnapshot = nil
+			if out, rollbackErr := compose.Up(originalInstall.GetComposePath()); rollbackErr != nil {
+				if out != "" {
+					rollbackErr = fmt.Errorf("%s: %w", out, rollbackErr)
+				}
+				t.LogFailedWithErr(i18n.GetWithName("AppRecover", install.Name), rollbackErr)
+				return
+			}
+			originalInstall.Status = constant.StatusRunning
+			originalInstall.Message = ""
+			if rollbackErr := appInstallRepo.Save(context.Background(), &originalInstall); rollbackErr != nil {
+				t.LogFailedWithErr(i18n.GetWithName("AppRecover", install.Name), rollbackErr)
+				return
+			}
+			install = originalInstall
 			t.LogSuccess(i18n.GetWithName("AppRecover", install.Name))
 			return
 		}
+		if install.App.Key == constant.AppOpenresty {
+			if rollbackErr := appInstallRepo.Save(context.Background(), &originalInstall); rollbackErr != nil {
+				t.LogFailedWithErr(i18n.GetWithName("AppRecover", install.Name), rollbackErr)
+				return
+			}
+			install = originalInstall
+			t.LogSuccess(i18n.GetWithName("AppRecover", install.Name))
+		}
 	}
 
-	upgradeTask.AddSubTaskWithOps(task.GetTaskName(install.Name, task.TaskUpgrade, task.TaskScopeApp), upgradeApp, rollBackApp, 0, 1*time.Hour)
+	upgradeTimeout := 1 * time.Hour
+	if install.App.Key == constant.AppOpenresty {
+		// Dynamic modules are built serially and each Docker build has its own
+		// timeout. An outer deadline would start rollback while upgradeApp is
+		// still mutating the installation because SubTask does not stop its
+		// action goroutine on timeout.
+		upgradeTimeout = 0
+	}
+	upgradeTask.AddSubTaskWithOps(task.GetTaskName(install.Name, task.TaskUpgrade, task.TaskScopeApp), upgradeApp, rollBackApp, 0, upgradeTimeout)
 
+	upgradingInstall := install
+	if err = appInstallRepo.Save(context.Background(), &upgradingInstall); err != nil {
+		return err
+	}
 	go func() {
-		err = upgradeTask.Execute()
-		if err != nil {
+		if taskErr := upgradeTask.Execute(); taskErr != nil {
 			existInstall, _ := appInstallRepo.GetFirst(repo.WithByID(req.InstallID))
 			if existInstall.ID > 0 && existInstall.Status != constant.StatusRunning {
 				existInstall.Status = constant.StatusUpgradeErr
-				existInstall.Message = err.Error()
+				existInstall.Message = taskErr.Error()
 				_ = appInstallRepo.Save(context.Background(), &existInstall)
 			}
 		}
 	}()
 
-	return appInstallRepo.Save(context.Background(), &install)
+	return nil
 }
 
 func skipCheckStatus(service types.ServiceConfig) bool {

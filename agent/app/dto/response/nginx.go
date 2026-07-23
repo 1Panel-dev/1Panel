@@ -69,20 +69,19 @@ type NginxProxyCache struct {
 }
 
 type NginxModule struct {
-	Name          string                    `json:"name"`
-	Custom        bool                      `json:"custom"`
-	Script        string                    `json:"script"`
-	Packages      string                    `json:"packages"`
-	Params        string                    `json:"params"`
-	Enable        bool                      `json:"enable"`
-	BuildMode     string                    `json:"buildMode"`
-	Provider      string                    `json:"provider"`
-	LoadOrder     int                       `json:"loadOrder"`
-	BuildStatus   string                    `json:"buildStatus"`
-	LoadStatus    string                    `json:"loadStatus"`
-	Compatibility string                    `json:"compatibility"`
-	Artifacts     []dto.NginxModuleArtifact `json:"artifacts"`
-	LastError     string                    `json:"lastError"`
+	Name        string                    `json:"name"`
+	Custom      bool                      `json:"custom"`
+	Script      string                    `json:"script"`
+	Packages    string                    `json:"packages"`
+	Params      string                    `json:"params"`
+	Enable      bool                      `json:"enable"`
+	BuildMode   string                    `json:"buildMode"`
+	Provider    string                    `json:"provider"`
+	LoadOrder   int                       `json:"loadOrder"`
+	BuildStatus string                    `json:"buildStatus"`
+	LoadStatus  string                    `json:"loadStatus"`
+	Artifacts   []dto.NginxModuleArtifact `json:"artifacts"`
+	LastError   string                    `json:"lastError"`
 }
 
 type NginxBuildConfig struct {

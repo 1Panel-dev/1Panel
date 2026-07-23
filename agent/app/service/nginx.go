@@ -213,30 +213,39 @@ func (n NginxService) GetModules() (*response.NginxBuildConfig, error) {
 	if targetWarning != "" {
 		global.LOG.Warn(targetWarning)
 	}
+	runtimeTarget := target
+	runtimeTarget.BuilderDigest = ""
+	setNginxModuleTargetKey(&runtimeTarget)
+	runtimeTargetErr := targetErr
+	if runtimeTarget.OpenRestyVersion != "" {
+		runtimeTargetErr = nil
+	}
 	var resList []response.NginxModule
 	for _, module := range modules {
 		buildStatus := nginxModuleStatusPending
 		loadStatus := nginxModuleLoadDisabled
-		compatibility := "unknown"
 		var artifacts []dto.NginxModuleArtifact
-		if module.BuildMode == nginxModuleBuildStatic {
-			buildStatus = nginxModuleStatusReady
-			compatibility = "static"
-			if module.Enable {
-				loadStatus = nginxModuleLoadEnabled
+		if module.BuildMode == nginxModuleBuildStatic && runtimeTargetErr == nil {
+			if build := findCurrentNginxModuleBuild(module, runtimeTarget); build != nil && build.Status == nginxModuleStatusReady {
+				buildStatus = nginxModuleStatusReady
+				if module.Enable {
+					loadStatus = nginxModuleLoadEnabled
+				}
+			} else if findLatestNginxModuleBuild(module, runtimeTarget) != nil {
+				if module.Enable {
+					loadStatus = nginxModuleLoadEnabled
+				}
 			}
 		} else if targetErr == nil {
 			if build := findCurrentNginxModuleBuild(module, target); build != nil {
 				buildStatus = build.Status
 				artifacts = build.Artifacts
 				if build.Status == nginxModuleStatusReady {
-					compatibility = "compatible"
 					if module.Enable {
 						loadStatus = nginxModuleLoadEnabled
 					}
 				}
 			} else if latestBuild := findLatestNginxModuleBuild(module, target); latestBuild != nil {
-				compatibility = "stale"
 				artifacts = latestBuild.Artifacts
 				if module.Enable {
 					loadStatus = nginxModuleLoadEnabled
@@ -247,20 +256,19 @@ func (n NginxService) GetModules() (*response.NginxBuildConfig, error) {
 			buildStatus = nginxModuleStatusFailed
 		}
 		resList = append(resList, response.NginxModule{
-			Name:          module.Name,
-			Custom:        module.Custom,
-			Script:        module.Script,
-			Packages:      strings.Join(module.Packages, ","),
-			Params:        module.Params,
-			Enable:        module.Enable,
-			BuildMode:     module.BuildMode,
-			Provider:      module.Provider,
-			LoadOrder:     module.LoadOrder,
-			BuildStatus:   buildStatus,
-			LoadStatus:    loadStatus,
-			Compatibility: compatibility,
-			Artifacts:     artifacts,
-			LastError:     module.LastError,
+			Name:        module.Name,
+			Custom:      module.Custom,
+			Script:      module.Script,
+			Packages:    strings.Join(module.Packages, ","),
+			Params:      module.Params,
+			Enable:      module.Enable,
+			BuildMode:   module.BuildMode,
+			Provider:    module.Provider,
+			LoadOrder:   module.LoadOrder,
+			BuildStatus: buildStatus,
+			LoadStatus:  loadStatus,
+			Artifacts:   artifacts,
+			LastError:   module.LastError,
 		})
 	}
 	envs, err := gotenv.Read(nginxInstall.GetEnvPath())

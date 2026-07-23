@@ -104,6 +104,7 @@ type NginxModule struct {
 
 type NginxModuleBuild struct {
 	Provider  string                `json:"provider"`
+	BuildMode string                `json:"buildMode"`
 	Status    string                `json:"status"`
 	Hash      string                `json:"hash"`
 	Target    NginxModuleTarget     `json:"target"`

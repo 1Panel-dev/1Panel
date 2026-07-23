@@ -108,16 +108,25 @@ func (localNginxModuleProvider) Name() string {
 }
 
 func resolveNginxModuleTarget(install model.AppInstall) (dto.NginxModuleTarget, string, error) {
+	target, warning, err := resolveNginxRuntimeTarget(install)
+	if err != nil {
+		return target, warning, err
+	}
 	builderPath := path.Join(install.GetPath(), nginxModuleBuildDir, nginxModuleBuilderFile)
 	builderContent, err := os.ReadFile(builderPath)
 	if err != nil {
-		return dto.NginxModuleTarget{}, "", fmt.Errorf("%w: %v", errNginxModuleBuilderMissing, err)
+		return target, warning, fmt.Errorf("%w: %v", errNginxModuleBuilderMissing, err)
 	}
 	builderSum := sha256.Sum256(builderContent)
+	target.BuilderDigest = hex.EncodeToString(builderSum[:])
+	setNginxModuleTargetKey(&target)
+	return target, warning, nil
+}
+
+func resolveNginxRuntimeTarget(install model.AppInstall) (dto.NginxModuleTarget, string, error) {
 	target := dto.NginxModuleTarget{
 		OpenRestyVersion: install.Version,
 		Architecture:     runtime.GOARCH,
-		BuilderDigest:    hex.EncodeToString(builderSum[:]),
 	}
 	envContent, _ := os.ReadFile(install.GetEnvPath())
 	images, imageErr := dockerUtils.GetImagesFromDockerCompose(envContent, []byte(install.DockerCompose))
@@ -136,10 +145,14 @@ func resolveNginxModuleTarget(install model.AppInstall) (dto.NginxModuleTarget, 
 			target.Architecture = fields[1]
 		}
 	}
+	setNginxModuleTargetKey(&target)
+	return target, warning, nil
+}
+
+func setNginxModuleTargetKey(target *dto.NginxModuleTarget) {
 	keyInput := strings.Join([]string{target.OpenRestyVersion, target.Architecture, target.ImageDigest, target.BuilderDigest}, "\x00")
 	keySum := sha256.Sum256([]byte(keyInput))
 	target.Key = fmt.Sprintf("%s-%s-%s", sanitizeModulePathPart(target.OpenRestyVersion), target.Architecture, hex.EncodeToString(keySum[:6]))
-	return target, warning, nil
 }
 
 // nginxModuleDynamicSupported reports whether the installed version ships both
@@ -149,6 +162,21 @@ func nginxModuleDynamicSupported(install model.AppInstall) bool {
 	buildPath := path.Join(install.GetPath(), nginxModuleBuildDir)
 	return fileOp.Stat(path.Join(buildPath, nginxModuleBuilderFile)) &&
 		fileOp.Stat(path.Join(buildPath, nginxModuleCatalogFile))
+}
+
+func syncNginxModuleBuilder(detailBuildDir, installBuildDir string) error {
+	sourcePath := path.Join(detailBuildDir, nginxModuleBuilderFile)
+	targetPath := path.Join(installBuildDir, nginxModuleBuilderFile)
+	if _, err := os.Stat(sourcePath); err != nil {
+		if os.IsNotExist(err) {
+			if removeErr := os.Remove(targetPath); removeErr != nil && !os.IsNotExist(removeErr) {
+				return removeErr
+			}
+			return nil
+		}
+		return err
+	}
+	return files.NewFileOp().CopyFile(sourcePath, installBuildDir)
 }
 
 // resolveNginxModuleBuildMirror picks the apt mirror for module builds: the
@@ -247,10 +275,11 @@ func (localNginxModuleProvider) Resolve(spec nginxModuleBuildSpec) (dto.NginxMod
 		return dto.NginxModuleBuild{}, err
 	}
 	result := dto.NginxModuleBuild{
-		Provider: nginxModuleProviderLocal,
-		Status:   nginxModuleStatusPending,
-		Hash:     buildHash,
-		Target:   spec.Target,
+		Provider:  nginxModuleProviderLocal,
+		BuildMode: nginxModuleBuildDynamic,
+		Status:    nginxModuleStatusPending,
+		Hash:      buildHash,
+		Target:    spec.Target,
 	}
 	modulesRoot := path.Join(spec.Install.GetPath(), nginxModuleModulesDir)
 	if !spec.Force {
@@ -478,20 +507,101 @@ func validateNginxModuleLoadConfig(install model.AppInstall, target dto.NginxMod
 
 type nginxModuleConfigSnapshot map[string][]byte
 
-func reconcileDynamicNginxModuleConfig(install model.AppInstall, modules []dto.NginxModule, reload bool) error {
-	target, targetWarning, err := resolveNginxModuleTarget(install)
+type openrestyUpgradeSnapshot struct {
+	installPath string
+	backupPath  string
+	existing    map[string]bool
+}
+
+var openrestyUpgradeSnapshotPaths = []string{
+	nginxModuleBuildDir,
+	"scripts",
+	path.Join(nginxModuleConfDir, nginxModuleEnabledConfDir),
+	path.Join(nginxModuleConfDir, "nginx.conf"),
+	"docker-compose.yml",
+	".env",
+}
+
+func createOpenrestyUpgradeSnapshot(installPath string) (*openrestyUpgradeSnapshot, error) {
+	backupPath, err := os.MkdirTemp("", "1panel-openresty-upgrade-*")
 	if err != nil {
-		if !errors.Is(err, errNginxModuleBuilderMissing) {
+		return nil, err
+	}
+	snapshot := &openrestyUpgradeSnapshot{
+		installPath: installPath,
+		backupPath:  backupPath,
+		existing:    make(map[string]bool, len(openrestyUpgradeSnapshotPaths)),
+	}
+	for _, relativePath := range openrestyUpgradeSnapshotPaths {
+		sourcePath := path.Join(installPath, relativePath)
+		if _, err = os.Stat(sourcePath); err != nil {
+			if os.IsNotExist(err) {
+				continue
+			}
+			snapshot.Cleanup()
+			return nil, err
+		}
+		snapshot.existing[relativePath] = true
+		if err = copyOpenrestyUpgradeSnapshotEntry(sourcePath, path.Join(backupPath, relativePath)); err != nil {
+			snapshot.Cleanup()
+			return nil, err
+		}
+	}
+	return snapshot, nil
+}
+
+func copyOpenrestyUpgradeSnapshotEntry(sourcePath, targetPath string) error {
+	if err := os.MkdirAll(path.Dir(targetPath), constant.DirPerm); err != nil {
+		return err
+	}
+	info, err := os.Stat(sourcePath)
+	if err != nil {
+		return err
+	}
+	fileOp := files.NewFileOp()
+	if info.IsDir() {
+		return fileOp.CopyDir(sourcePath, path.Dir(targetPath))
+	}
+	return fileOp.CopyFile(sourcePath, path.Dir(targetPath))
+}
+
+func (s *openrestyUpgradeSnapshot) Restore() error {
+	for _, relativePath := range openrestyUpgradeSnapshotPaths {
+		targetPath := path.Join(s.installPath, relativePath)
+		if err := os.RemoveAll(targetPath); err != nil {
 			return err
 		}
-		// Without the builder every dynamic module stays inactive: reconcile
-		// towards an empty desired state instead of failing the caller.
-		global.LOG.Warn(err.Error())
-	} else if targetWarning != "" {
-		global.LOG.Warn(targetWarning)
+		if !s.existing[relativePath] {
+			continue
+		}
+		if err := copyOpenrestyUpgradeSnapshotEntry(path.Join(s.backupPath, relativePath), targetPath); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *openrestyUpgradeSnapshot) Cleanup() {
+	if s != nil && s.backupPath != "" {
+		_ = os.RemoveAll(s.backupPath)
+	}
+}
+
+func reconcileDynamicNginxModuleConfig(install model.AppInstall, modules []dto.NginxModule, reload bool) error {
+	var target dto.NginxModuleTarget
+	if hasDynamicNginxModuleBuildTask(modules, nil) {
+		var targetWarning string
+		var err error
+		target, targetWarning, err = resolveNginxModuleTarget(install)
+		if err != nil {
+			return err
+		}
+		if targetWarning != "" {
+			global.LOG.Warn(targetWarning)
+		}
 	}
 	configDir := path.Join(install.GetPath(), nginxModuleConfDir, nginxModuleEnabledConfDir)
-	if err = os.MkdirAll(configDir, constant.DirPerm); err != nil {
+	if err := os.MkdirAll(configDir, constant.DirPerm); err != nil {
 		return err
 	}
 	snapshot, err := snapshotManagedNginxModuleConfigs(configDir)
@@ -685,8 +795,10 @@ func executeStaticNginxModuleBuild(install model.AppInstall, modules []dto.Nginx
 	if err = commitNginxModuleBuilds(install, previousModules, modules, false, ""); err != nil {
 		return err
 	}
-	_, err = compose.DownAndUp(install.GetComposePath())
-	return err
+	if _, err = compose.DownAndUp(install.GetComposePath()); err != nil {
+		return err
+	}
+	return commitStaticNginxModuleBuilds(install, "", parentTask)
 }
 
 func executeNginxModuleBuild(install model.AppInstall, reqModules []string, force bool, mirror string, parentTask *task.Task, reload bool) error {
@@ -987,7 +1099,9 @@ func hasDynamicNginxModuleBuildTask(modules []dto.NginxModule, selected []string
 func findLatestNginxModuleBuild(module dto.NginxModule, target dto.NginxModuleTarget) *dto.NginxModuleBuild {
 	var latest *dto.NginxModuleBuild
 	for i := range module.Builds {
-		if module.Builds[i].Target.Key != target.Key || module.Builds[i].Status != nginxModuleStatusReady {
+		if module.Builds[i].BuildMode != module.BuildMode ||
+			module.Builds[i].Target.Key != target.Key ||
+			module.Builds[i].Status != nginxModuleStatusReady {
 			continue
 		}
 		if latest == nil || module.Builds[i].BuiltAt.After(latest.BuiltAt) {
@@ -998,7 +1112,7 @@ func findLatestNginxModuleBuild(module dto.NginxModule, target dto.NginxModuleTa
 }
 
 func findCurrentNginxModuleBuild(module dto.NginxModule, target dto.NginxModuleTarget) *dto.NginxModuleBuild {
-	params, err := normalizeDynamicModuleParams(module.Params)
+	params, err := nginxModuleBuildParams(module)
 	if err != nil {
 		return nil
 	}
@@ -1007,11 +1121,81 @@ func findCurrentNginxModuleBuild(module dto.NginxModule, target dto.NginxModuleT
 		return nil
 	}
 	for i := range module.Builds {
-		if module.Builds[i].Target.Key == target.Key && module.Builds[i].Hash == buildHash {
+		if module.Builds[i].BuildMode == module.BuildMode &&
+			module.Builds[i].Target.Key == target.Key &&
+			module.Builds[i].Hash == buildHash {
 			return &module.Builds[i]
 		}
 	}
 	return nil
+}
+
+func nginxModuleBuildParams(module dto.NginxModule) (string, error) {
+	if module.BuildMode == nginxModuleBuildStatic {
+		params := strings.TrimSpace(module.Params)
+		if params == "" {
+			return "", errors.New("static module parameters are empty")
+		}
+		return params, nil
+	}
+	return normalizeDynamicModuleParams(module.Params)
+}
+
+func recordStaticNginxModuleBuilds(modules []dto.NginxModule, target dto.NginxModuleTarget) ([]dto.NginxModule, error) {
+	for i := range modules {
+		module := &modules[i]
+		normalizeNginxModule(module)
+		if !module.Enable || module.BuildMode != nginxModuleBuildStatic {
+			continue
+		}
+		params, err := nginxModuleBuildParams(*module)
+		if err != nil {
+			return modules, err
+		}
+		buildHash, err := nginxModuleBuildHash(*module, target, params)
+		if err != nil {
+			return modules, err
+		}
+		upsertNginxModuleBuild(module, dto.NginxModuleBuild{
+			Provider:  nginxModuleProviderLocal,
+			BuildMode: nginxModuleBuildStatic,
+			Status:    nginxModuleStatusReady,
+			Hash:      buildHash,
+			Target:    target,
+			BuiltAt:   time.Now(),
+		})
+		module.LastError = ""
+	}
+	return modules, nil
+}
+
+func commitStaticNginxModuleBuilds(install model.AppInstall, catalogPath string, parentTask *task.Task) error {
+	modules, err := loadNginxModulesWithCatalog(install, catalogPath)
+	if err != nil || !hasEnabledStaticNginxModules(modules) {
+		return err
+	}
+	status, err := checkContainerStatus(install.ContainerName)
+	if err != nil {
+		return err
+	}
+	if status != "running" {
+		return fmt.Errorf("OpenResty container %s is not running after static module build", install.ContainerName)
+	}
+	if err = opNginx(install.ContainerName, constant.NginxCheck); err != nil {
+		return err
+	}
+	target, targetWarning, err := resolveNginxRuntimeTarget(install)
+	if err != nil {
+		return err
+	}
+	if targetWarning != "" && parentTask != nil {
+		parentTask.Logf("WARNING: %s", targetWarning)
+	}
+	modules, err = recordStaticNginxModuleBuilds(modules, target)
+	if err != nil {
+		return err
+	}
+	return saveNginxModulesWithCatalog(install, modules, catalogPath)
 }
 
 func upsertNginxModuleBuild(module *dto.NginxModule, build dto.NginxModuleBuild) {
@@ -1123,9 +1307,10 @@ func nginxModuleBuildHash(module dto.NginxModule, target dto.NginxModuleTarget, 
 		Script    string
 		Packages  []string
 		Params    string
+		BuildMode string
 		TargetKey string
 		Provider  string
-	}{module.Name, module.Script, module.Packages, params, target.Key, module.Provider}
+	}{module.Name, module.Script, module.Packages, params, module.BuildMode, target.Key, module.Provider}
 	content, err := json.Marshal(payload)
 	if err != nil {
 		return "", err

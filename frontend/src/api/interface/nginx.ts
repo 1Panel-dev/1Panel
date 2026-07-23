@@ -54,7 +54,6 @@ export namespace Nginx {
         loadOrder: number;
         buildStatus: 'pending' | 'ready' | 'failed';
         loadStatus: 'enabled' | 'disabled';
-        compatibility: 'unknown' | 'compatible' | 'stale' | 'static';
         artifacts?: NginxModuleArtifact[];
         lastError?: string;
     }

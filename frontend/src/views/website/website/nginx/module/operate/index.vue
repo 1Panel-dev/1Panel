@@ -1,12 +1,12 @@
 <template>
     <DrawerPro
         v-model="open"
-        :header="$t('nginx.' + mode)"
+        :header="mode === 'view' ? $t('commons.button.view') : $t('nginx.' + mode)"
         size="large"
-        :resource="mode === 'update' ? module.name : ''"
+        :resource="mode === 'create' ? '' : module.name"
         @close="handleClose"
     >
-        <el-form ref="moduleForm" label-position="top" :model="module" :rules="rules">
+        <el-form ref="moduleForm" label-position="top" :model="module" :rules="rules" :disabled="mode === 'view'">
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input v-model.trim="module.name" :disabled="mode === 'update'"></el-input>
             </el-form-item>
@@ -49,8 +49,16 @@
             />
         </el-form>
         <template #footer>
-            <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button v-permission type="primary" @click="submit(moduleForm)" :disabled="loading">
+            <el-button @click="handleClose" :disabled="loading">
+                {{ $t(mode === 'view' ? 'commons.button.close' : 'commons.button.cancel') }}
+            </el-button>
+            <el-button
+                v-if="mode !== 'view'"
+                v-permission
+                type="primary"
+                @click="submit(moduleForm)"
+                :disabled="loading"
+            >
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -112,7 +120,7 @@ const acceptParams = async (operate: string, editModule?: Nginx.NginxModule, sup
     mode.value = operate;
     dynamicSupported.value = supported ?? true;
     module.value = defaultModule();
-    if (operate === 'update' && editModule) {
+    if ((operate === 'update' || operate === 'view') && editModule) {
         module.value = {
             name: editModule.name,
             script: editModule.script || '',
@@ -123,7 +131,7 @@ const acceptParams = async (operate: string, editModule?: Nginx.NginxModule, sup
             provider: editModule.provider,
             loadOrder: editModule.loadOrder,
             lastError: editModule.lastError || '',
-            operate: 'update',
+            operate,
         };
     }
     open.value = true;
