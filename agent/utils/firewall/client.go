@@ -12,8 +12,10 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
 )
 
-type FirewallClient interface {
-	Name() string // ufw firewalld
+// FilterClient is the filter capability surface; port forwarding lives in its
+// own adapter and is no longer reachable from here.
+type FilterClient interface {
+	Name() string // ufw firewalld iptables
 	Start() error
 	Stop() error
 	Restart() error
@@ -22,17 +24,13 @@ type FirewallClient interface {
 	Version() (string, error)
 
 	ListPort() ([]client.FireInfo, error)
-	ListForward() ([]client.FireInfo, error)
 	ListAddress() ([]client.FireInfo, error)
 
 	Port(port client.FireInfo, operation string) error
 	RichRules(rule client.FireInfo, operation string) error
-	PortForward(info client.Forward, operation string) error
-
-	EnableForward() error
 }
 
-func NewFirewallClient() (FirewallClient, error) {
+func NewFirewallClient() (FilterClient, error) {
 	firewalld := cmd.Which("firewalld")
 	ufw := cmd.Which("ufw")
 

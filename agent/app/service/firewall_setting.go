@@ -138,7 +138,7 @@ func syncFirewallPortWhiteListAfterUpdate(oldValue string) error {
 	return syncFirewallClientPortWhiteList(client, oldPortWhiteList, portWhiteList)
 }
 
-func syncFirewallClientPortWhiteList(client firewall.FirewallClient, oldPortWhiteList, portWhiteList []firewallPortWhitelist) error {
+func syncFirewallClientPortWhiteList(client firewall.FilterClient, oldPortWhiteList, portWhiteList []firewallPortWhitelist) error {
 	oldPorts := firewallPortWhiteListMap(oldPortWhiteList)
 	newPorts := firewallPortWhiteListMap(portWhiteList)
 	for _, item := range oldPortWhiteList {

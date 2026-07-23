@@ -35,19 +35,6 @@ type PortRuleOperate struct {
 	Description string `json:"description"`
 }
 
-type ForwardRuleOperate struct {
-	ForceDelete bool `json:"forceDelete"`
-	Rules       []struct {
-		Operation  string `json:"operation" validate:"required,oneof=add remove"`
-		Num        string `json:"num"`
-		Protocol   string `json:"protocol" validate:"required,oneof=tcp udp tcp/udp"`
-		Interface  string `json:"interface"`
-		Port       string `json:"port" validate:"required"`
-		TargetIP   string `json:"targetIP"`
-		TargetPort string `json:"targetPort" validate:"required"`
-	} `json:"rules"`
-}
-
 type UpdateFirewallDescription struct {
 	Type     string `json:"type"`
 	Chain    string `json:"chain"`
@@ -86,7 +73,7 @@ type BatchRuleOperate struct {
 }
 
 type IptablesOp struct {
-	Name    string `json:"name" validate:"required,oneof=1PANEL_INPUT 1PANEL_OUTPUT 1PANEL_BASIC"`
+	Name    string `json:"name" validate:"required,oneof=1PANEL_INPUT 1PANEL_OUTPUT 1PANEL_BASIC 1PANEL_FORWARD"`
 	Operate string `json:"operate" validate:"required,oneof=init-base init-forward init-advance bind-base unbind-base bind unbind"`
 }
 

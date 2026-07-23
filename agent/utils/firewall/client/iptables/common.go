@@ -11,9 +11,6 @@ import (
 )
 
 const (
-	Chain1PanelPreRouting  = "1PANEL_PREROUTING"
-	Chain1PanelPostRouting = "1PANEL_POSTROUTING"
-	Chain1PanelForward     = "1PANEL_FORWARD"
 	ChainInput             = "INPUT"
 	ChainOutput            = "OUTPUT"
 	Chain1PanelInput       = "1PANEL_INPUT"

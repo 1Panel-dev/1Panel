@@ -203,18 +203,6 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 	return nil
 }
 
-func (f *Ufw) PortForward(info Forward, operation string) error {
-	return iptablesPortForward(info, operation)
-}
-
-func (f *Ufw) EnableForward() error {
-	return EnableIptablesForward()
-}
-
-func (f *Ufw) ListForward() ([]FireInfo, error) {
-	return iptablesListForward()
-}
-
 func (f *Ufw) loadInfo(line string, fireType string) FireInfo {
 	fields := strings.Fields(line)
 	var itemInfo FireInfo
