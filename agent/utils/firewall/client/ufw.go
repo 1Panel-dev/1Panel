@@ -193,6 +193,14 @@ func (f *Ufw) ApplyAddressUnit(unit AddressUnit, operation string) error {
 	return f.RichRules(unit.Apply, operation)
 }
 
+func (f *Ufw) AddPortWhiteList(list PortWhiteList) error {
+	return addNativePortWhiteList(f, list)
+}
+
+func (f *Ufw) SyncPortWhiteList(list PortWhiteList) error {
+	return syncNativePortWhiteList(f, list)
+}
+
 func normalizeUfwStrategy(strategy string) (string, error) {
 	switch strategy {
 	case "accept":

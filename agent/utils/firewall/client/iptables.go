@@ -201,6 +201,21 @@ func (i *Iptables) ApplyAddressUnit(unit AddressUnit, operation string) error {
 	return i.RichRules(apply, operation)
 }
 
+func (i *Iptables) AddPortWhiteList(list PortWhiteList) error {
+	if isInit, _ := iptables.LoadInitStatus("iptables", "base"); !isInit {
+		return nil
+	}
+	list.Previous = nil
+	return SyncIptablesPortWhiteList(list, true)
+}
+
+func (i *Iptables) SyncPortWhiteList(list PortWhiteList) error {
+	if isInit, _ := iptables.LoadInitStatus("iptables", "base"); !isInit {
+		return nil
+	}
+	return SyncIptablesPortWhiteList(list, true)
+}
+
 func buildIptablesPortRuleArgs(port FireInfo) ([]string, error) {
 	portSpec, err := normalizePortSpec(port.Port)
 	if err != nil {

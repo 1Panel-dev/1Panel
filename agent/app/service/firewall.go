@@ -441,24 +441,11 @@ func (u *FirewallService) cleanUnUsedData(client firewall.FilterClient) {
 }
 
 func (u *FirewallService) addPortsBeforeStart(client firewall.FilterClient) error {
-	if client.Name() == "iptables" {
-		isInit, _ := iptables.LoadInitStatus("iptables", "base")
-		if !isInit {
-			return nil
-		}
-		return syncIptablesFirewallPortWhiteList(true)
-	}
-	portWhiteList, err := loadFirewallPortWhiteList()
+	list, err := loadFirewallPortWhiteList("")
 	if err != nil {
 		return err
 	}
-	for _, item := range portWhiteList {
-		if err := client.Port(fireClient.FireInfo{Port: item.Port, Protocol: item.Protocol, Strategy: "accept"}, "add"); err != nil {
-			return err
-		}
-	}
-
-	return client.Reload()
+	return client.AddPortWhiteList(list)
 }
 
 func (u *FirewallService) addPortRecord(req dto.PortRuleOperate) error {

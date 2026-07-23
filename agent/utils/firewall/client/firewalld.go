@@ -168,6 +168,14 @@ func (f *Firewall) ApplyAddressUnit(unit AddressUnit, operation string) error {
 	return f.RichRules(unit.Apply, operation)
 }
 
+func (f *Firewall) AddPortWhiteList(list PortWhiteList) error {
+	return addNativePortWhiteList(f, list)
+}
+
+func (f *Firewall) SyncPortWhiteList(list PortWhiteList) error {
+	return syncNativePortWhiteList(f, list)
+}
+
 func buildFirewalldPortArgs(port FireInfo, operation string) []string {
 	return []string{"--zone=public", "--" + operation + "-port=" + port.Port + "/" + port.Protocol, "--permanent"}
 }
