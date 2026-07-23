@@ -1,20 +1,20 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('commons.table.user')" size="70%">
+    <DrawerPro v-model="drawerVisible" :header="$t('commons.table.user')" size="60%">
         <div class="drawer-toolbar">
             <el-button type="primary" @click="openUserDialog()">
                 {{ $t('commons.button.create') }}
             </el-button>
         </div>
         <ComplexTable :data="users" :heightDiff="260">
-            <el-table-column :label="$t('commons.login.username')" prop="username" min-width="150">
+            <el-table-column :label="$t('commons.table.user')" show-overflow-tooltip prop="username" min-width="180">
                 <template #default="{ row }">
-                    <span>{{ row.username }}</span>
+                    <span>{{ row.username }}@{{ row.host }}</span>
                     <el-tag v-if="row.isDelete" round type="info" class="ml-1" size="small">
                         {{ $t('database.isDelete') }}
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('commons.login.password')" prop="password" min-width="180">
+            <el-table-column :label="$t('commons.login.password')" prop="password" min-width="120">
                 <template #default="{ row }">
                     <span v-if="row.isDelete">-</span>
                     <div v-else-if="!row.password" class="password-cell">
@@ -24,7 +24,7 @@
                     </div>
                     <div class="password-cell" v-else>
                         <span v-if="!row.showPassword" class="password-text">**********</span>
-                        <span v-else class="password-text">{{ row.password }}</span>
+                        <Tooltip v-else class="password-text" :islink="false" :text="row.password" />
                         <el-button
                             v-if="!row.showPassword"
                             link
@@ -43,18 +43,35 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('database.permission')" show-overflow-tooltip prop="host" min-width="120">
-                <template #default="{ row }">
-                    {{ permissionLabel(row.host) }}
-                </template>
-            </el-table-column>
-            <el-table-column :label="$t('menu.database')" min-width="180">
+            <el-table-column :label="$t('menu.database')" min-width="160">
                 <template #default="{ row }">
                     <span v-if="userDatabases(row).length === 0">-</span>
                     <div v-else class="bind-db-list">
-                        <el-tag v-for="item in userDatabases(row)" :key="row.username + row.host + item" size="small">
-                            {{ item }}
-                        </el-tag>
+                        <el-tooltip
+                            v-for="item in userDatabases(row).slice(0, 1)"
+                            :key="row.username + '@' + row.host + item"
+                            :content="item"
+                            placement="top"
+                        >
+                            <el-tag size="small">{{ item }}</el-tag>
+                        </el-tooltip>
+                        <el-popover v-if="userDatabases(row).length > 1" placement="right" trigger="click" :width="260">
+                            <template #reference>
+                                <el-tag class="cursor-pointer" type="info" size="small">
+                                    +{{ userDatabases(row).length - 1 }}
+                                </el-tag>
+                            </template>
+                            <div class="bind-db-popover">
+                                <el-tooltip
+                                    v-for="item in userDatabases(row)"
+                                    :key="row.username + '@' + row.host + item"
+                                    :content="item"
+                                    placement="top"
+                                >
+                                    <el-tag size="small">{{ item }}</el-tag>
+                                </el-tooltip>
+                            </div>
+                        </el-popover>
                     </div>
                 </template>
             </el-table-column>
@@ -62,10 +79,10 @@
                 :label="$t('commons.table.description')"
                 prop="description"
                 show-overflow-tooltip
-                min-width="160"
+                min-width="120"
             />
             <fu-table-operations
-                :min-width="100"
+                :width="120"
                 :buttons="userButtons"
                 :label="$t('commons.table.operate')"
                 fixed="right"
@@ -100,7 +117,7 @@
             <el-form-item :label="$t('commons.table.description')" prop="description">
                 <el-input type="textarea" clearable v-model="userForm.description" />
             </el-form-item>
-            <el-form-item v-if="userDialogMode === 'edit'" :label="$t('menu.database')" prop="dbs">
+            <el-form-item :label="$t('menu.database')" prop="dbs">
                 <el-select v-model="userForm.dbs" filterable multiple collapse-tags-tooltip>
                     <el-option v-for="item in databases" :key="item.name" :label="item.name" :value="item.name" />
                 </el-select>
@@ -185,6 +202,7 @@
 
 <script lang="ts" setup>
 import { computed, reactive, ref } from 'vue';
+import Tooltip from '@/components/tooltip/index.vue';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
@@ -337,18 +355,27 @@ const loadContext = async () => {
     await Promise.all([loadUsers(), loadGrants(), loadDatabases()]);
 };
 
-const userDatabases = (row: Database.MysqlUser) => {
-    return Array.from(
-        new Set(
-            grants.value
-                .filter((item) => item.username === row.username && item.host === row.host)
-                .map((item) => item.database),
-        ),
-    );
-};
+const userDatabaseMap = computed(() => {
+    const databaseSets = new Map<string, Set<string>>();
+    for (const grant of grants.value) {
+        const key = `${grant.username}@${grant.host}`;
+        let databases = databaseSets.get(key);
+        if (!databases) {
+            databases = new Set<string>();
+            databaseSets.set(key, databases);
+        }
+        databases.add(grant.database);
+    }
 
-const permissionLabel = (host: string) => {
-    return host === '%' ? i18n.global.t('database.permissionAll') : host;
+    const result = new Map<string, string[]>();
+    for (const [key, databases] of databaseSets) {
+        result.set(key, Array.from(databases));
+    }
+    return result;
+});
+
+const userDatabases = (row: Database.MysqlUser) => {
+    return userDatabaseMap.value.get(`${row.username}@${row.host}`) || [];
 };
 
 const changePermission = () => {
@@ -477,21 +504,22 @@ const submitUser = async () => {
             }
             return;
         }
-        await createMysqlUser({
-            database: database.value,
-            username: userForm.username,
-            host: userForm.host,
-            password: userForm.password,
-            description: userForm.description,
-        })
-            .then(() => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                userDialogVisible.value = false;
-                loadUsers();
-            })
-            .finally(() => {
-                loading.value = false;
+        try {
+            await createMysqlUser({
+                database: database.value,
+                username: userForm.username,
+                host: userForm.host,
+                password: userForm.password,
+                description: userForm.description,
+                dbs: userForm.dbs,
             });
+            await loadContext();
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            userDialogVisible.value = false;
+            emit('search');
+        } finally {
+            loading.value = false;
+        }
     });
 };
 
@@ -565,6 +593,19 @@ defineExpose({
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+}
+.bind-db-popover {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+
+    :deep(.el-tag) {
+        width: 100%;
+        justify-content: flex-start;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 .delete-user-title {
     margin-bottom: 12px;
