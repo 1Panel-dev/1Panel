@@ -122,10 +122,7 @@
         </div>
         <div class="table-footer-container">
             <div class="footer-left" v-if="slots.footerLeft">
-                <el-checkbox v-model="leftSelect" @change="toggleSelection"></el-checkbox>
-                <div class="ml-4">
-                    <slot name="footerLeft"></slot>
-                </div>
+                <slot name="footerLeft" :selected="leftSelect" :toggle-selection="toggleSelection"></slot>
             </div>
 
             <div
@@ -680,13 +677,36 @@ onBeforeUnmount(() => {
 
     .footer-left {
         flex-shrink: 0;
-        margin-right: 16px;
-        margin-left: 12px;
         display: flex;
+        align-items: center;
 
-        .footer-left-button {
-            margin-left: 17px;
+        :deep(.footer-left-button) {
             display: flex;
+            align-items: stretch;
+            height: 32px;
+        }
+
+        :deep(.footer-left-button .el-select) {
+            height: 32px;
+        }
+
+        :deep(.footer-left-button .el-select__wrapper) {
+            height: 32px;
+            min-height: 32px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        :deep(.footer-left-button .el-checkbox) {
+            --el-checkbox-height: 24px;
+            margin-right: 0;
+        }
+
+        :deep(.footer-left-button > .el-button) {
+            height: 32px;
+            margin-left: -1px;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
         }
     }
 }
