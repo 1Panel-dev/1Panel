@@ -19441,6 +19441,34 @@
 				]
 			}
 		},
+		"/hosts/ssh/log/clean": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Clean host SSH logs",
+				"tags": [
+					"SSH"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "clean SSH login logs",
+					"formatZH": "清空 SSH 登录日志",
+					"paramKeys": []
+				}
+			}
+		},
 		"/hosts/ssh/log/export": {
 			"post": {
 				"consumes": [

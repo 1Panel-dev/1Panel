@@ -3609,6 +3609,13 @@
 		"formatZH": "修改 SSH 配置文件 [key]",
 		"formatEN": "update SSH conf [key]"
 	},
+	"/hosts/ssh/log/clean": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "清空 SSH 登录日志",
+		"formatEN": "clean SSH login logs"
+	},
 	"/hosts/ssh/operate": {
 		"bodyKeys": [
 			"operation"

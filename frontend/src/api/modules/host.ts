@@ -200,6 +200,9 @@ export const loadSSHLogs = (params: Host.searchSSHLog, currentNode?: string) => 
 export const exportSSHLogs = (params: Host.searchSSHLog) => {
     return http.post<string>(`/hosts/ssh/log/export`, params, TimeoutEnum.T_40S);
 };
+export const cleanSSHLogs = () => {
+    return http.post(`/hosts/ssh/log/clean`, {});
+};
 
 export const listDisks = () => {
     return http.get<Host.CompleteDiskInfo>(`/hosts/disks`);

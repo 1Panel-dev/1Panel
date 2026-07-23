@@ -52,6 +52,7 @@ type ISSHService interface {
 
 	LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []dto.SSHHistory, error)
 	ExportLog(ctx *gin.Context, req dto.SearchSSHLog) (string, error)
+	CleanLog() error
 
 	SyncRootCert() error
 	CreateRootCert(req dto.RootCertOperate) error
@@ -658,6 +659,15 @@ type sshFileItem struct {
 	Year int
 }
 
+func isSSHLogFileName(name string) bool {
+	for _, baseName := range []string{"auth.log", "secure"} {
+		if name == baseName || strings.HasPrefix(name, baseName+".") || strings.HasPrefix(name, baseName+"-") {
+			return true
+		}
+	}
+	return false
+}
+
 func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []dto.SSHHistory, error) {
 	var fileList []sshFileItem
 	var data []dto.SSHHistory
@@ -667,10 +677,16 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []d
 		return 0, data, err
 	}
 	for _, item := range fileItems {
-		if item.IsDir() || (!strings.HasPrefix(item.Name(), "secure") && !strings.HasPrefix(item.Name(), "auth.log")) {
+		if item.IsDir() || !isSSHLogFileName(item.Name()) {
 			continue
 		}
-		info, _ := item.Info()
+		info, err := item.Info()
+		if err != nil {
+			return 0, data, err
+		}
+		if !info.Mode().IsRegular() {
+			continue
+		}
 		itemPath := path.Join(baseDir, info.Name())
 		if strings.HasSuffix(itemPath, ".gz") {
 			if _, err := os.Stat(strings.TrimSuffix(itemPath, ".gz")); err == nil {
@@ -723,6 +739,41 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []d
 		total = itemTotal - itemFailed
 	}
 	return int64(total), data, nil
+}
+
+func (u *SSHService) CleanLog() error {
+	return cleanSSHLogFiles("/var/log")
+}
+
+func cleanSSHLogFiles(baseDir string) error {
+	fileItems, err := os.ReadDir(baseDir)
+	if err != nil {
+		return err
+	}
+	for _, item := range fileItems {
+		if item.IsDir() || !isSSHLogFileName(item.Name()) {
+			continue
+		}
+		info, err := item.Info()
+		if err != nil {
+			return err
+		}
+		if !info.Mode().IsRegular() {
+			continue
+		}
+
+		itemPath := path.Join(baseDir, item.Name())
+		if item.Name() == "auth.log" || item.Name() == "secure" {
+			if err := os.Truncate(itemPath, 0); err != nil {
+				return err
+			}
+			continue
+		}
+		if err := os.Remove(itemPath); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (u *SSHService) ExportLog(ctx *gin.Context, req dto.SearchSSHLog) (string, error) {
