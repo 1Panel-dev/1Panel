@@ -2,7 +2,6 @@ package client
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -217,96 +216,6 @@ func (i *Iptables) RichRules(rule FireInfo, operation string) error {
 		global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelBasic, err)
 	}
 	return nil
-}
-
-func (i *Iptables) PortForward(info Forward, operation string) error {
-	return iptablesPortForward(info, operation)
-}
-
-func (i *Iptables) EnableForward() error {
-	return EnableIptablesForward()
-}
-
-func (i *Iptables) ListForward() ([]FireInfo, error) {
-	return iptablesListForward()
-}
-
-func EnableIptablesForward() error {
-	if err := cmd.WriteFileWithOptionalSudo("/proc/sys/net/ipv4/ip_forward", []byte("1"), 0644); err != nil {
-		return fmt.Errorf("failed to enable IP forwarding: %w", err)
-	}
-	if data, err := os.ReadFile("/etc/sysctl.conf"); err == nil {
-		if !strings.Contains(string(data), "net.ipv4.ip_forward") {
-			content := strings.TrimRight(string(data), "\n") + "\nnet.ipv4.ip_forward = 1\n"
-			_ = cmd.WriteFileWithOptionalSudo("/etc/sysctl.conf", []byte(content), 0644)
-		}
-	}
-	_ = cmd.NewCommandMgr().RunWithOptionalSudo("sysctl", "-p")
-
-	if err := iptables.AddChainWithAppend(iptables.NatTab, "PREROUTING", iptables.Chain1PanelPreRouting); err != nil {
-		return err
-	}
-	if err := iptables.AddChainWithAppend(iptables.NatTab, "POSTROUTING", iptables.Chain1PanelPostRouting); err != nil {
-		return err
-	}
-	if err := iptables.AddChainWithAppend(iptables.FilterTab, "FORWARD", iptables.Chain1PanelForward); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func iptablesPortForward(info Forward, operation string) error {
-	if operation != "add" && operation != "remove" {
-		return buserr.New("ErrCmdIllegal")
-	}
-	if info.Protocol == "" || info.Port == "" || info.TargetPort == "" {
-		return fmt.Errorf("protocol, port, and target port are required")
-	}
-	if operation == "add" {
-		if err := iptables.AddForward(info.Protocol, info.Port, info.TargetIP, info.TargetPort, info.Interface, true); err != nil {
-			return err
-		}
-	} else {
-		if err := iptables.DeleteForward(info.Num, info.Protocol, info.Port, info.TargetIP, info.TargetPort, info.Interface); err != nil {
-			return err
-		}
-	}
-	forwardPersistence()
-	return nil
-}
-
-func forwardPersistence() {
-	if err := iptables.SaveRulesToFile(iptables.FilterTab, iptables.Chain1PanelForward, iptables.ForwardFileName); err != nil {
-		global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelForward, err)
-	}
-	if err := iptables.SaveRulesToFile(iptables.NatTab, iptables.Chain1PanelPreRouting, iptables.ForwardFileName1); err != nil {
-		global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelPreRouting, err)
-	}
-	if err := iptables.SaveRulesToFile(iptables.NatTab, iptables.Chain1PanelPostRouting, iptables.ForwardFileName2); err != nil {
-		global.LOG.Errorf("persistence for %s failed, err: %v", iptables.Chain1PanelPostRouting, err)
-	}
-}
-
-func iptablesListForward() ([]FireInfo, error) {
-	natList, err := iptables.ListForward(iptables.Chain1PanelPreRouting)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list NAT rules: %w", err)
-	}
-
-	var datas []FireInfo
-	for _, nat := range natList {
-		datas = append(datas, FireInfo{
-			Num:        nat.Num,
-			Protocol:   nat.Protocol,
-			Port:       strings.TrimPrefix(nat.SrcPort, ":"),
-			TargetIP:   nat.Destination,
-			TargetPort: strings.TrimPrefix(nat.DestPort, ":"),
-			Interface:  nat.InIface,
-		})
-	}
-
-	return datas, nil
 }
 
 func parsePort(portStr string) (int, error) {

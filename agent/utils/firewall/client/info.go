@@ -17,12 +17,3 @@ type FireInfo struct {
 	UsedStatus  string `json:"usedStatus"`
 	Description string `json:"description"`
 }
-
-type Forward struct {
-	Num        string `json:"num"`
-	Protocol   string `json:"protocol"`
-	Port       string `json:"port"`
-	TargetIP   string `json:"targetIP"`
-	TargetPort string `json:"targetPort"`
-	Interface  string `json:"interface"`
-}

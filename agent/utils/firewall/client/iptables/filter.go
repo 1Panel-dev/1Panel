@@ -2,7 +2,6 @@ package iptables
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -127,7 +126,7 @@ func LoadInitStatus(clientName, tab string) (bool, bool) {
 	if clientName == "firewalld" {
 		return true, true
 	}
-	if clientName == "ufw" && tab != "forward" {
+	if clientName == "ufw" {
 		return true, true
 	}
 	switch tab {
@@ -167,41 +166,6 @@ func LoadInitStatus(clientName, tab string) (bool, bool) {
 			fmt.Sprintf("-A %s -j %s", ChainOutput, Chain1PanelOutput),
 		}
 		return checkWithInitAndBind(initRules, bindRules, lines)
-	case "forward":
-		data, err := os.ReadFile("/proc/sys/net/ipv4/ip_forward")
-		if err != nil {
-			global.LOG.Errorf("check /proc/sys/net/ipv4/ip_forward failed, err: %v", err)
-			return false, false
-		}
-		if strings.TrimSpace(string(data)) == "0" {
-			return false, false
-		}
-		natRules, err := RunWithStd(NatTab, "-S")
-		if err != nil {
-			return false, false
-		}
-		lines := strings.Split(natRules, "\n")
-		initRules := []string{
-			"-N " + Chain1PanelPreRouting,
-			"-N " + Chain1PanelPostRouting,
-		}
-		bindRules := []string{
-			fmt.Sprintf("-A PREROUTING -j %s", Chain1PanelPreRouting),
-			fmt.Sprintf("-A POSTROUTING -j %s", Chain1PanelPostRouting),
-		}
-		isNatInit, isNatBind := checkWithInitAndBind(initRules, bindRules, lines)
-		if !isNatInit {
-			return false, false
-		}
-		filterRules, err := RunWithStd(FilterTab, "-S")
-		if err != nil {
-			return false, false
-		}
-		filterLines := strings.Split(filterRules, "\n")
-		filterInitRules := []string{"-N " + Chain1PanelForward}
-		filterBindRules := []string{fmt.Sprintf("-A FORWARD -j %s", Chain1PanelForward)}
-		isFilterInit, isFilterBind := checkWithInitAndBind(filterInitRules, filterBindRules, filterLines)
-		return isNatInit && isFilterInit, isNatBind && isFilterBind
 	default:
 		return false, false
 	}

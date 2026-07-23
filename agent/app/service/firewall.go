@@ -3,14 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
@@ -29,7 +27,6 @@ type IFirewallService interface {
 	SearchWithPage(search dto.RuleSearch) (int64, interface{}, error)
 	OperateFirewall(req dto.FirewallOperation) error
 	OperatePortRule(req dto.PortRuleOperate, reload bool) error
-	OperateForwardRule(req dto.ForwardRuleOperate) error
 	OperateAddressRule(req dto.AddrRuleOperate, reload bool) error
 	UpdatePortRule(req dto.PortRuleUpdate) error
 	UpdateAddrRule(req dto.AddrRuleUpdate) error
@@ -85,8 +82,6 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 	switch req.Type {
 	case "port":
 		rules, err = client.ListPort()
-	case "forward":
-		rules, err = client.ListForward()
 	case "address":
 		rules, err = client.ListAddress()
 	}
@@ -338,96 +333,6 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 	return nil
 }
 
-func (u *FirewallService) OperateForwardRule(req dto.ForwardRuleOperate) error {
-	client, err := firewall.NewFirewallClient()
-	if err != nil {
-		return err
-	}
-
-	rules, _ := client.ListForward()
-	i := 0
-	for _, rule := range rules {
-		shouldKeep := true
-		for i := range req.Rules {
-			reqRule := &req.Rules[i]
-			if reqRule.TargetIP == "" {
-				reqRule.TargetIP = "127.0.0.1"
-			}
-
-			if reqRule.Operation == "remove" {
-				for _, proto := range strings.Split(reqRule.Protocol, "/") {
-					if reqRule.Port == rule.Port &&
-						reqRule.TargetPort == rule.TargetPort &&
-						reqRule.TargetIP == rule.TargetIP &&
-						proto == rule.Protocol &&
-						reqRule.Interface == rule.Interface {
-						shouldKeep = false
-						break
-					}
-				}
-			}
-		}
-		if shouldKeep {
-			rules[i] = rule
-			i++
-		}
-	}
-	rules = rules[:i]
-
-	for _, rule := range rules {
-		for _, reqRule := range req.Rules {
-			if reqRule.Operation == "remove" {
-				continue
-			}
-
-			for _, proto := range strings.Split(reqRule.Protocol, "/") {
-				if reqRule.Port == rule.Port &&
-					reqRule.TargetPort == rule.TargetPort &&
-					reqRule.TargetIP == rule.TargetIP &&
-					proto == rule.Protocol &&
-					reqRule.Interface == rule.Interface {
-					return buserr.New("ErrRecordExist")
-				}
-			}
-		}
-	}
-
-	sort.SliceStable(req.Rules, func(i, j int) bool {
-		if req.Rules[i].Operation == "remove" && req.Rules[j].Operation != "remove" {
-			return true
-		}
-		if req.Rules[i].Operation != "remove" && req.Rules[j].Operation == "remove" {
-			return false
-		}
-		n1, _ := strconv.Atoi(req.Rules[i].Num)
-		n2, _ := strconv.Atoi(req.Rules[j].Num)
-		return n1 > n2
-	})
-
-	for _, r := range req.Rules {
-		for _, p := range strings.Split(r.Protocol, "/") {
-			if r.TargetIP == "" {
-				r.TargetIP = "127.0.0.1"
-			}
-			if err = client.PortForward(fireClient.Forward{
-				Num:        r.Num,
-				Protocol:   p,
-				Port:       r.Port,
-				TargetIP:   r.TargetIP,
-				TargetPort: r.TargetPort,
-				Interface:  r.Interface,
-			}, r.Operation); err != nil {
-				if req.ForceDelete {
-					global.LOG.Error(err)
-					continue
-				}
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload bool) error {
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
@@ -542,7 +447,7 @@ func OperateFirewallPort(oldPorts, newPorts []int) error {
 	return client.Reload()
 }
 
-func (u *FirewallService) operatePort(client firewall.FirewallClient, req dto.PortRuleOperate) error {
+func (u *FirewallService) operatePort(client firewall.FilterClient, req dto.PortRuleOperate) error {
 	var fireInfo fireClient.FireInfo
 	if err := copier.Copy(&fireInfo, &req); err != nil {
 		return err
@@ -610,7 +515,7 @@ func (u *FirewallService) loadPortByApp() []portOfApp {
 	return datas
 }
 
-func (u *FirewallService) cleanUnUsedData(client firewall.FirewallClient) {
+func (u *FirewallService) cleanUnUsedData(client firewall.FilterClient) {
 	list, _ := client.ListPort()
 	addressList, _ := client.ListAddress()
 	list = append(list, addressList...)
@@ -634,7 +539,7 @@ func (u *FirewallService) cleanUnUsedData(client firewall.FirewallClient) {
 	}
 }
 
-func (u *FirewallService) addPortsBeforeStart(client firewall.FirewallClient) error {
+func (u *FirewallService) addPortsBeforeStart(client firewall.FilterClient) error {
 	if client.Name() == "iptables" {
 		isInit, _ := iptables.LoadInitStatus("iptables", "base")
 		if !isInit {

@@ -20,7 +20,15 @@ func (b *BaseApi) LoadFirewallBaseInfo(c *gin.Context) {
 		return
 	}
 
-	data, err := firewallService.LoadBaseInfo(req.Name)
+	var (
+		data dto.FirewallBaseInfo
+		err  error
+	)
+	if req.Name == "forward" {
+		data, err = forwardingService.LoadBaseInfo()
+	} else {
+		data, err = firewallService.LoadBaseInfo(req.Name)
+	}
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -43,7 +51,21 @@ func (b *BaseApi) SearchFirewallRule(c *gin.Context) {
 		return
 	}
 
-	total, list, err := firewallService.SearchWithPage(req)
+	var (
+		total int64
+		list  interface{}
+		err   error
+	)
+	if req.Type == "forward" {
+		total, list, err = forwardingService.SearchWithPage(dto.ForwardRuleSearch{
+			PageInfo: req.PageInfo,
+			Info:     req.Info,
+			Status:   req.Status,
+			Strategy: req.Strategy,
+		})
+	} else {
+		total, list, err = firewallService.SearchWithPage(req)
+	}
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -116,7 +138,7 @@ func (b *BaseApi) OperateForwardRule(c *gin.Context) {
 		return
 	}
 
-	if err := firewallService.OperateForwardRule(req); err != nil {
+	if err := forwardingService.Operate(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -313,7 +335,13 @@ func (b *BaseApi) OperateFilterChain(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := iptablesService.Operate(req); err != nil {
+	var err error
+	if req.Operate == "init-forward" {
+		err = forwardingService.Enable()
+	} else {
+		err = iptablesService.Operate(req)
+	}
+	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

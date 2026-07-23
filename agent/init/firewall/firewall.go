@@ -10,7 +10,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
-	firewallClient "github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client/iptables"
 )
 
@@ -25,35 +24,15 @@ func Init() {
 		return
 	}
 	clientName := client.Name()
-
-	settingRepo := repo.NewISettingRepo()
-	if clientName == "ufw" || clientName == "iptables" {
-		if err := iptables.LoadRulesFromFile(iptables.FilterTab, iptables.Chain1PanelForward, iptables.ForwardFileName); err != nil {
-			global.LOG.Errorf("load forward rules from file failed, err: %v", err)
-			return
-		}
-		if err := iptables.LoadRulesFromFile(iptables.NatTab, iptables.Chain1PanelPreRouting, iptables.ForwardFileName1); err != nil {
-			global.LOG.Errorf("load prerouting rules from file failed, err: %v", err)
-			return
-		}
-		if err := iptables.LoadRulesFromFile(iptables.NatTab, iptables.Chain1PanelPostRouting, iptables.ForwardFileName2); err != nil {
-			global.LOG.Errorf("load postrouting rules from file failed, err: %v", err)
-			return
-		}
-		global.LOG.Infof("loaded iptables rules for forward from file successfully")
-
-		iptablesForwardStatus, _ := settingRepo.GetValueByKey("IptablesForwardStatus")
-		if iptablesForwardStatus == constant.StatusEnable {
-			if err := firewallClient.EnableIptablesForward(); err != nil {
-				global.LOG.Errorf("enable iptables forward failed, err: %v", err)
-				return
-			}
-		}
+	if err := service.NewIForwardingService().Replay(); err != nil {
+		global.LOG.Errorf("replay forwarding rules failed, err: %v", err)
+		return
 	}
 
 	if clientName != "iptables" {
 		return
 	}
+	settingRepo := repo.NewISettingRepo()
 	if err := iptables.LoadRulesFromFile(iptables.FilterTab, iptables.Chain1PanelBasicBefore, iptables.BasicBeforeFileName); err != nil {
 		global.LOG.Errorf("load basic before rules from file failed, err: %v", err)
 		return
