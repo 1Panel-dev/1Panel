@@ -36,6 +36,7 @@ type SystemLogRes struct {
 
 type SystemLogItem struct {
 	Timestamp int64  `json:"-"`
+	Cursor    string `json:"-"`
 	Time      string `json:"time"`
 	Priority  string `json:"priority"`
 	Service   string `json:"service"`

@@ -33,8 +33,9 @@ var (
 )
 
 type systemLogCursor struct {
-	EndTime int64 `json:"endTime"`
-	Skipped int   `json:"skipped"`
+	EndTime       int64  `json:"endTime"`
+	Skipped       int    `json:"skipped"`
+	JournalCursor string `json:"journalCursor,omitempty"`
 }
 
 type ILogService interface {
@@ -61,32 +62,14 @@ func (u *LogService) ReadSystemLog(req dto.SystemLogReq) (dto.SystemLogRes, erro
 	if err != nil {
 		return dto.SystemLogRes{}, err
 	}
-	if cursor != nil {
+	if cursor != nil && cursor.JournalCursor == "" {
 		endTime = time.Unix(0, cursor.EndTime*int64(time.Microsecond))
 	}
 	journalctl, err := exec.LookPath("journalctl")
 	if err != nil {
 		return u.readFileSystemLog(req, startTime, endTime, pageSize, cursor)
 	}
-	args := []string{
-		"--no-pager", "--reverse", "--output=json",
-		"--since", formatJournalQueryTime(startTime),
-		"--until", formatJournalQueryTime(endTime),
-	}
-	if service := strings.TrimSpace(req.Service); service != "" {
-		args = append(args, "-u", service)
-	}
-	if priority := strings.TrimSpace(req.Priority); priority != "" {
-		args = append(args, "--priority", priority)
-	}
-	if keyword := strings.TrimSpace(req.Keyword); keyword != "" {
-		args = append(args, "--grep", keyword)
-	}
-	queryLines := pageSize + 1
-	if cursor != nil {
-		queryLines += cursor.Skipped
-	}
-	queryArgs := append(args, "--lines="+strconv.Itoa(queryLines))
+	queryArgs := buildJournalQueryArgs(req, startTime, endTime, pageSize, cursor)
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	output, err := exec.CommandContext(ctx, journalctl, queryArgs...).CombinedOutput()
 	cancel()
@@ -98,13 +81,39 @@ func (u *LogService) ReadSystemLog(req dto.SystemLogReq) (dto.SystemLogRes, erro
 		return dto.SystemLogRes{Source: "journalctl", Items: []dto.SystemLogItem{}}, nil
 	}
 	items := parseJournalLogItems(content)
-	if cursor != nil {
+	if cursor != nil && cursor.JournalCursor == "" {
 		items, err = skipSystemLogCursorItems(items, *cursor)
 		if err != nil {
 			return dto.SystemLogRes{}, err
 		}
 	}
 	return buildSystemLogResponse("journalctl", items, pageSize, cursor)
+}
+
+func buildJournalQueryArgs(req dto.SystemLogReq, startTime, endTime time.Time, pageSize int, cursor *systemLogCursor) []string {
+	args := []string{
+		"--no-pager", "--reverse", "--output=json",
+		"--since", formatJournalQueryTime(startTime),
+	}
+	if cursor != nil && cursor.JournalCursor != "" {
+		args = append(args, "--after-cursor="+cursor.JournalCursor)
+	} else {
+		args = append(args, "--until", formatJournalQueryTime(endTime))
+	}
+	if service := strings.TrimSpace(req.Service); service != "" {
+		args = append(args, "-u", service)
+	}
+	if priority := strings.TrimSpace(req.Priority); priority != "" {
+		args = append(args, "--priority", priority)
+	}
+	if keyword := strings.TrimSpace(req.Keyword); keyword != "" {
+		args = append(args, "--grep", keyword)
+	}
+	queryLines := pageSize + 1
+	if cursor != nil && cursor.JournalCursor == "" {
+		queryLines += cursor.Skipped
+	}
+	return append(args, "--lines="+strconv.Itoa(queryLines))
 }
 
 func (u *LogService) readFileSystemLog(req dto.SystemLogReq, startTime, endTime time.Time, pageSize int, cursor *systemLogCursor) (dto.SystemLogRes, error) {
@@ -156,11 +165,16 @@ func buildSystemLogResponse(source string, items []dto.SystemLogItem, pageSize i
 		return res, nil
 	}
 	lastItem := items[len(items)-1]
-	skipped := countSystemLogTimestamp(items, lastItem.Timestamp)
-	if cursor != nil && cursor.EndTime == lastItem.Timestamp {
-		skipped += cursor.Skipped
+	next := systemLogCursor{EndTime: lastItem.Timestamp}
+	if lastItem.Cursor != "" {
+		next.JournalCursor = lastItem.Cursor
+	} else {
+		next.Skipped = countSystemLogTimestamp(items, lastItem.Timestamp)
+		if cursor != nil && cursor.EndTime == lastItem.Timestamp {
+			next.Skipped += cursor.Skipped
+		}
 	}
-	nextCursor, err := encodeSystemLogCursor(systemLogCursor{EndTime: lastItem.Timestamp, Skipped: skipped})
+	nextCursor, err := encodeSystemLogCursor(next)
 	if err != nil {
 		return dto.SystemLogRes{}, err
 	}
@@ -215,7 +229,8 @@ func countSystemLogTimestamp(items []dto.SystemLogItem, timestamp int64) int {
 }
 
 func formatJournalQueryTime(value time.Time) string {
-	return value.In(time.Local).Format("2006-01-02 15:04:05.000000")
+	// Fractional seconds are rejected by some journalctl versions.
+	return value.In(time.Local).Format("2006-01-02 15:04:05")
 }
 
 func parseFileSystemLogItem(line string) (dto.SystemLogItem, bool) {
@@ -358,6 +373,7 @@ func parseJournalLogItems(content string) []dto.SystemLogItem {
 		}
 		items = append(items, dto.SystemLogItem{
 			Timestamp: journalFieldMicroseconds(fields),
+			Cursor:    journalFieldString(fields, "__CURSOR"),
 			Time:      formatJournalTimestamp(journalFieldString(fields, "__REALTIME_TIMESTAMP")),
 			Priority:  journalFieldString(fields, "PRIORITY"),
 			Service:   journalFieldString(fields, "_SYSTEMD_UNIT"),

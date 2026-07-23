@@ -225,6 +225,21 @@ func (b *BaseApi) ExportSSHLogs(c *gin.Context) {
 }
 
 // @Tags SSH
+// @Summary Clean host SSH logs
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/ssh/log/clean [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空 SSH 登录日志","formatEN":"clean SSH login logs"}
+func (b *BaseApi) CleanSSHLogs(c *gin.Context) {
+	if err := sshService.CleanLog(); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags SSH
 // @Summary Load host SSH conf
 // @Accept json
 // @Param request body dto.OperationWithName true "request"
