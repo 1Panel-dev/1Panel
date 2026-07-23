@@ -34,6 +34,11 @@ type FilterClient interface {
 	ApplyPortUnit(unit client.PortUnit, operation string) error
 	ExpandAddressRule(rule client.FireInfo) []client.AddressUnit
 	ApplyAddressUnit(unit client.AddressUnit, operation string) error
+
+	// AddPortWhiteList re-adds the whole whitelist after the provider has been
+	// started, SyncPortWhiteList applies the difference against PortWhiteList.Previous.
+	AddPortWhiteList(list client.PortWhiteList) error
+	SyncPortWhiteList(list client.PortWhiteList) error
 }
 
 func NewFirewallClient() (FilterClient, error) {

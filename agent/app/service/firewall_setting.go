@@ -8,15 +8,9 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	fireClient "github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client/iptables"
 )
 
-type firewallPortWhitelist struct {
-	Port     string
-	Protocol string
-}
-
-func loadConfiguredFirewallPortWhiteList() ([]firewallPortWhitelist, error) {
+func loadConfiguredFirewallPortWhiteList() ([]fireClient.PortWhiteListEntry, error) {
 	value, err := settingRepo.GetValueByKey(constant.FirewallPortWhiteList)
 	if err != nil {
 		value = constant.FirewallPortWhiteListValue
@@ -27,34 +21,42 @@ func loadConfiguredFirewallPortWhiteList() ([]firewallPortWhitelist, error) {
 	return parseFirewallPortWhiteList(value)
 }
 
-func loadFirewallPortWhiteList() ([]firewallPortWhitelist, error) {
-	portWhiteList, err := loadConfiguredFirewallPortWhiteList()
-	if err != nil {
-		return nil, err
-	}
-	requiredPorts, err := loadRequiredFirewallPortWhiteList()
-	if err != nil {
-		return nil, err
-	}
-	return normalizeFirewallPortWhiteList(append(portWhiteList, requiredPorts...)), nil
-}
-
-func loadRequiredFirewallPortWhiteList() ([]firewallPortWhitelist, error) {
+func loadRequiredFirewallPortWhiteList() ([]fireClient.PortWhiteListEntry, error) {
 	panelPort := LoadPanelPort()
 	if panelPort == "" {
 		return nil, fmt.Errorf("find 1panel service port failed")
 	}
-	return normalizeFirewallPortWhiteList([]firewallPortWhitelist{
+	return []fireClient.PortWhiteListEntry{
 		{Port: panelPort, Protocol: "tcp"},
 		{Port: loadSSHPort(), Protocol: "tcp"},
-	}), nil
+	}, nil
 }
 
-func parseFirewallPortWhiteList(value string) ([]firewallPortWhitelist, error) {
+// loadFirewallPortWhiteList resolves the whitelist state for a provider. oldValue
+// is the raw setting value replaced by this change, empty when nothing is replaced.
+func loadFirewallPortWhiteList(oldValue string) (fireClient.PortWhiteList, error) {
+	var list fireClient.PortWhiteList
+	configured, err := loadConfiguredFirewallPortWhiteList()
+	if err != nil {
+		return list, err
+	}
+	required, err := loadRequiredFirewallPortWhiteList()
+	if err != nil {
+		return list, err
+	}
+	previous, err := parseFirewallPortWhiteList(oldValue)
+	if err != nil {
+		return list, err
+	}
+	list.Configured, list.Required, list.Previous = configured, required, previous
+	return list, nil
+}
+
+func parseFirewallPortWhiteList(value string) ([]fireClient.PortWhiteListEntry, error) {
 	items := strings.FieldsFunc(value, func(r rune) bool {
 		return r == ',' || r == '\n' || r == ';' || r == ' '
 	})
-	ports := make([]firewallPortWhitelist, 0, len(items))
+	ports := make([]fireClient.PortWhiteListEntry, 0, len(items))
 	exists := make(map[string]struct{})
 	for _, item := range items {
 		item = strings.TrimSpace(item)
@@ -79,26 +81,9 @@ func parseFirewallPortWhiteList(value string) ([]firewallPortWhitelist, error) {
 			continue
 		}
 		exists[key] = struct{}{}
-		ports = append(ports, firewallPortWhitelist{Port: strconv.Itoa(portNum), Protocol: protocol})
+		ports = append(ports, fireClient.PortWhiteListEntry{Port: strconv.Itoa(portNum), Protocol: protocol})
 	}
 	return ports, nil
-}
-
-func normalizeFirewallPortWhiteList(portWhiteList []firewallPortWhitelist) []firewallPortWhitelist {
-	ports := make([]firewallPortWhitelist, 0, len(portWhiteList))
-	exists := make(map[string]struct{})
-	for _, item := range portWhiteList {
-		if item.Port == "" {
-			continue
-		}
-		key := fmt.Sprintf("%s/%s", item.Port, item.Protocol)
-		if _, ok := exists[key]; ok {
-			continue
-		}
-		exists[key] = struct{}{}
-		ports = append(ports, item)
-	}
-	return ports
 }
 
 func syncFirewallPortWhiteListAfterUpdate(oldValue string) error {
@@ -106,70 +91,13 @@ func syncFirewallPortWhiteListAfterUpdate(oldValue string) error {
 	if err != nil {
 		return err
 	}
-	if client.Name() == "iptables" {
-		isInit, _ := iptables.LoadInitStatus("iptables", "base")
-		if !isInit {
-			return nil
-		}
-		oldPortWhiteList, err := parseFirewallPortWhiteList(oldValue)
-		if err != nil {
-			return err
-		}
-		return syncIptablesFirewallPortWhiteList(true, oldPortWhiteList)
-	}
+	return syncFirewallPortWhiteListAfterUpdateWithClient(client, oldValue)
+}
 
-	isActive, _ := client.Status()
-	if !isActive {
-		return nil
-	}
-	portWhiteList, err := loadFirewallPortWhiteList()
+func syncFirewallPortWhiteListAfterUpdateWithClient(client firewall.FilterClient, oldValue string) error {
+	list, err := loadFirewallPortWhiteList(oldValue)
 	if err != nil {
 		return err
 	}
-	oldPortWhiteList, err := parseFirewallPortWhiteList(oldValue)
-	if err != nil {
-		return err
-	}
-	requiredPorts, err := loadRequiredFirewallPortWhiteList()
-	if err != nil {
-		return err
-	}
-	oldPortWhiteList = normalizeFirewallPortWhiteList(append(oldPortWhiteList, requiredPorts...))
-	return syncFirewallClientPortWhiteList(client, oldPortWhiteList, portWhiteList)
-}
-
-func syncFirewallClientPortWhiteList(client firewall.FilterClient, oldPortWhiteList, portWhiteList []firewallPortWhitelist) error {
-	oldPorts := firewallPortWhiteListMap(oldPortWhiteList)
-	newPorts := firewallPortWhiteListMap(portWhiteList)
-	for _, item := range oldPortWhiteList {
-		key := firewallPortWhiteListKey(item)
-		if _, ok := newPorts[key]; ok {
-			continue
-		}
-		if err := client.Port(fireClient.FireInfo{Port: item.Port, Protocol: item.Protocol, Strategy: "accept"}, "remove"); err != nil {
-			return err
-		}
-	}
-	for _, item := range portWhiteList {
-		key := firewallPortWhiteListKey(item)
-		if _, ok := oldPorts[key]; ok {
-			continue
-		}
-		if err := client.Port(fireClient.FireInfo{Port: item.Port, Protocol: item.Protocol, Strategy: "accept"}, "add"); err != nil {
-			return err
-		}
-	}
-	return client.Reload()
-}
-
-func firewallPortWhiteListMap(portWhiteList []firewallPortWhitelist) map[string]struct{} {
-	ports := make(map[string]struct{})
-	for _, item := range portWhiteList {
-		ports[firewallPortWhiteListKey(item)] = struct{}{}
-	}
-	return ports
-}
-
-func firewallPortWhiteListKey(item firewallPortWhitelist) string {
-	return item.Port + "/" + item.Protocol
+	return client.SyncPortWhiteList(list)
 }
