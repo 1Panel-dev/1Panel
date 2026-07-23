@@ -89,18 +89,17 @@ var LBAlgorithms = map[string]struct{}{"ip_hash": {}, "least_conn": {}}
 var RealIPKeys = map[string]struct{}{"X-Forwarded-For": {}, "X-Real-IP": {}, "CF-Connecting-IP": {}}
 
 type NginxModule struct {
-	Name           string             `json:"name"`
-	Script         string             `json:"script"`
-	Packages       []string           `json:"packages"`
-	Params         string             `json:"params"`
-	Enable         bool               `json:"enable"`
-	Deleted        bool               `json:"deleted,omitempty"`
-	BuildMode      string             `json:"buildMode,omitempty"`
-	Provider       string             `json:"provider,omitempty"`
-	DynamicSupport string             `json:"dynamicSupport,omitempty"`
-	LoadOrder      int                `json:"loadOrder,omitempty"`
-	Builds         []NginxModuleBuild `json:"builds,omitempty"`
-	LastError      string             `json:"lastError,omitempty"`
+	Name      string             `json:"name"`
+	Custom    bool               `json:"custom,omitempty"`
+	Script    string             `json:"script"`
+	Packages  []string           `json:"packages"`
+	Params    string             `json:"params"`
+	Enable    bool               `json:"enable"`
+	BuildMode string             `json:"buildMode,omitempty"`
+	Provider  string             `json:"provider,omitempty"`
+	LoadOrder int                `json:"loadOrder,omitempty"`
+	Builds    []NginxModuleBuild `json:"builds,omitempty"`
+	LastError string             `json:"lastError,omitempty"`
 }
 
 type NginxModuleBuild struct {

@@ -752,13 +752,13 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 	return string(composeByte), nil
 }
 
-func buildNginx(parentTask *task.Task, nginxInstall model.AppInstall) error {
+func buildNginx(parentTask *task.Task, nginxInstall model.AppInstall, catalogPath string) error {
 	fileOp := files.NewFileOp()
 	buildPath := path.Join(nginxInstall.GetPath(), nginxModuleBuildDir)
 	if !fileOp.Stat(buildPath) {
 		return buserr.New("ErrBuildDirNotFound")
 	}
-	modules, err := loadNginxModules(nginxInstall)
+	modules, err := loadNginxModulesWithCatalog(nginxInstall, catalogPath)
 	if err != nil {
 		return err
 	}
@@ -776,11 +776,11 @@ func buildNginx(parentTask *task.Task, nginxInstall model.AppInstall) error {
 		}
 		parentTask.LogSuccess(logStr)
 	}
-	modules, err = buildDynamicNginxModules(nginxInstall, modules, nil, false, "", parentTask)
+	modules, err = buildDynamicNginxModules(nginxInstall, modules, nil, false, "", catalogPath, parentTask)
 	if err != nil {
 		return err
 	}
-	return commitNginxModuleBuilds(nginxInstall, previousModules, modules, false)
+	return commitNginxModuleBuilds(nginxInstall, previousModules, modules, false, catalogPath)
 }
 
 func upgradeInstall(req request.AppInstallUpgrade) error {
@@ -864,6 +864,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 		oldEnvContent := append([]byte(nil), content...)
 		oldDockerCompose := install.DockerCompose
+		targetNginxCatalogPath := ""
 		if install.App.Key == vllmAppKeyForUpgrade {
 			envs := make(map[string]interface{})
 			if err = json.Unmarshal([]byte(install.Env), &envs); err != nil {
@@ -901,10 +902,13 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 					return err
 				}
 			}
-			if fileOp.Stat(path.Join(detailBuildDir, nginxModuleCatalogFile)) {
-				if err := fileOp.CopyFile(path.Join(detailBuildDir, nginxModuleCatalogFile), installBuildDir); err != nil {
-					return err
-				}
+			targetCatalogSource := path.Join(detailBuildDir, nginxModuleCatalogFile)
+			if !fileOp.Stat(targetCatalogSource) {
+				return fmt.Errorf("target OpenResty module catalog not found: %s", targetCatalogSource)
+			}
+			targetNginxCatalogPath = path.Join(installBuildDir, nginxModuleCatalogPendingFile)
+			if err := stageNginxModuleCatalog(targetCatalogSource, targetNginxCatalogPath); err != nil {
+				return err
 			}
 			if err := fileOp.CopyFile(path.Join(detailBuildDir, "nginx.conf"), installBuildDir); err != nil {
 				return err
@@ -984,7 +988,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 
 		if install.App.Key == constant.AppOpenresty {
-			modules, moduleErr := loadNginxModules(install)
+			modules, moduleErr := loadNginxModulesWithCatalog(install, targetNginxCatalogPath)
 			if moduleErr != nil {
 				return moduleErr
 			}
@@ -992,11 +996,11 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			// current container. Static modules retain the full rebuild path.
 			if !hasEnabledStaticNginxModules(modules) {
 				previousModules := cloneNginxModules(modules)
-				modules, moduleErr = buildDynamicNginxModules(install, modules, nil, false, "", t)
+				modules, moduleErr = buildDynamicNginxModules(install, modules, nil, false, "", targetNginxCatalogPath, t)
 				if moduleErr != nil {
 					return moduleErr
 				}
-				if moduleErr = saveNginxModules(install, modules); moduleErr != nil {
+				if moduleErr = saveNginxModulesWithCatalog(install, modules, targetNginxCatalogPath); moduleErr != nil {
 					removeNginxModuleOutputsNotReferenced(install, modules, previousModules)
 					return moduleErr
 				}
@@ -1037,7 +1041,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 
 		if install.App.Key == constant.AppOpenresty {
-			if err = buildNginx(t, install); err != nil {
+			if err = buildNginx(t, install, targetNginxCatalogPath); err != nil {
 				t.Log(err.Error())
 				return err
 			}
@@ -1053,8 +1057,17 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 		t.LogSuccess(logStr)
 		install.Status = constant.StatusRunning
-		if err = appInstallRepo.Save(context.Background(), &install); err != nil {
-			return err
+		if install.App.Key == constant.AppOpenresty {
+			activeCatalogPath := path.Join(install.GetPath(), nginxModuleBuildDir, nginxModuleCatalogFile)
+			if err = activateNginxModuleCatalogAndCommit(targetNginxCatalogPath, activeCatalogPath, func() error {
+				return appInstallRepo.Save(context.Background(), &install)
+			}); err != nil {
+				return err
+			}
+		} else {
+			if err = appInstallRepo.Save(context.Background(), &install); err != nil {
+				return err
+			}
 		}
 		if req.DeleteImage {
 			newEnvContent, err := fileOp.GetContent(install.GetEnvPath())

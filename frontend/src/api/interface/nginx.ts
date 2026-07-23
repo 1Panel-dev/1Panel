@@ -44,13 +44,13 @@ export namespace Nginx {
 
     export interface NginxModule {
         name: string;
+        custom: boolean;
         script?: string;
         packages?: string;
         enable: boolean;
         params: string;
-        buildMode: 'auto' | 'dynamic' | 'static';
+        buildMode: 'dynamic' | 'static';
         provider: 'local' | 'prebuilt';
-        dynamicSupport: 'unknown' | 'supported' | 'unsupported';
         loadOrder: number;
         buildStatus: 'pending' | 'ready' | 'failed';
         loadStatus: 'enabled' | 'disabled';
@@ -72,7 +72,7 @@ export namespace Nginx {
         packages?: string;
         enable?: boolean;
         params?: string;
-        buildMode?: 'auto' | 'dynamic' | 'static';
+        buildMode?: 'dynamic' | 'static';
         provider?: 'local' | 'prebuilt';
         loadOrder?: number;
     }

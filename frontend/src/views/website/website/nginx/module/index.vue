@@ -14,7 +14,7 @@
             <el-table-column :label="$t('nginx.buildMode')" width="150">
                 <template #default="{ row }">
                     <el-tag effect="plain" :type="row.buildMode === 'static' ? 'warning' : 'primary'">
-                        {{ $t('nginx.buildMode' + capitalize(displayBuildMode(row.buildMode))) }}
+                        {{ $t('nginx.buildMode' + capitalize(row.buildMode)) }}
                     </el-tag>
                 </template>
             </el-table-column>
@@ -67,6 +67,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
+        show: (row: Nginx.NginxModule) => row.custom,
         click: function (row: Nginx.NginxModule) {
             openEdit(row);
         },
@@ -74,6 +75,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
+        show: (row: Nginx.NginxModule) => row.custom,
         click: function (row: Nginx.NginxModule) {
             deleteModule(row);
         },
@@ -128,8 +130,6 @@ const updateModule = (row: Nginx.NginxModule) => {
 };
 
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
-
-const displayBuildMode = (mode: string) => (mode === 'auto' ? 'dynamic' : mode);
 
 const statusType = (status: string) => {
     if (status === 'ready') return 'success';

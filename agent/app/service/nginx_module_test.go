@@ -10,12 +10,13 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
-func TestNormalizeNginxModulePreservesLegacyStaticMode(t *testing.T) {
+func TestNormalizeNginxModuleDoesNotInferBuildMode(t *testing.T) {
 	module := dto.NginxModule{
 		Name:     "legacy",
 		Packages: []string{"git", "", "git", " curl "},
@@ -23,8 +24,8 @@ func TestNormalizeNginxModulePreservesLegacyStaticMode(t *testing.T) {
 
 	normalizeNginxModule(&module)
 
-	if module.BuildMode != nginxModuleBuildStatic {
-		t.Fatalf("expected legacy module to remain static, got %s", module.BuildMode)
+	if module.BuildMode != "" {
+		t.Fatalf("build mode must be explicit, got %s", module.BuildMode)
 	}
 	if module.Provider != nginxModuleProviderLocal {
 		t.Fatalf("expected local provider, got %s", module.Provider)
@@ -105,19 +106,19 @@ func TestRecordNginxModuleBuildFailureKeepsPreviousReadyBuild(t *testing.T) {
 		Hash: "ready", Status: nginxModuleStatusReady, Target: target, BuiltAt: time.Now().Add(-time.Hour),
 	}
 	original := []dto.NginxModule{{
-		Name: "example", BuildMode: nginxModuleBuildDynamic, DynamicSupport: nginxModuleSupportUnknown,
+		Name: "example", BuildMode: nginxModuleBuildDynamic,
 		Builds: []dto.NginxModuleBuild{ready},
 	}}
 	failed := dto.NginxModuleBuild{
 		Hash: "candidate", Status: nginxModuleStatusFailed, Target: target, Error: "load failed", BuiltAt: time.Now(),
 	}
 
-	result := recordNginxModuleBuildFailure(original, "example", failed, &ready, true)
+	result := recordNginxModuleBuildFailure(original, "example", failed, &ready)
 
 	if len(result[0].Builds) != 1 || result[0].Builds[0].Hash != "ready" {
 		t.Fatalf("previous ready build was replaced: %#v", result[0].Builds)
 	}
-	if result[0].LastError != failed.Error || result[0].DynamicSupport != nginxModuleSupportSupported {
+	if result[0].LastError != failed.Error {
 		t.Fatalf("failure metadata was not retained: %#v", result[0])
 	}
 	result[0].Builds[0].Hash = "mutated"
@@ -129,7 +130,6 @@ func TestRecordNginxModuleBuildFailureKeepsPreviousReadyBuild(t *testing.T) {
 func TestHasDynamicNginxModuleBuildTask(t *testing.T) {
 	dynamicEnabled := dto.NginxModule{Name: "brotli", Enable: true, BuildMode: nginxModuleBuildDynamic}
 	staticEnabled := dto.NginxModule{Name: "pagespeed", Enable: true, BuildMode: nginxModuleBuildStatic}
-	deletedDynamic := dto.NginxModule{Name: "geoip", Enable: true, BuildMode: nginxModuleBuildDynamic, Deleted: true}
 	disabledDynamic := dto.NginxModule{Name: "waf", Enable: false, BuildMode: nginxModuleBuildDynamic}
 
 	if hasDynamicNginxModuleBuildTask(nil, nil) {
@@ -137,9 +137,6 @@ func TestHasDynamicNginxModuleBuildTask(t *testing.T) {
 	}
 	if hasDynamicNginxModuleBuildTask([]dto.NginxModule{staticEnabled}, nil) {
 		t.Fatal("static-only modules should not require a dynamic build")
-	}
-	if hasDynamicNginxModuleBuildTask([]dto.NginxModule{deletedDynamic}, nil) {
-		t.Fatal("deleted modules should not require a dynamic build")
 	}
 	if hasDynamicNginxModuleBuildTask([]dto.NginxModule{dynamicEnabled}, []string{"other"}) {
 		t.Fatal("enabled module outside the selection should not require a dynamic build")
@@ -160,6 +157,15 @@ func TestHasDynamicNginxModuleBuildTask(t *testing.T) {
 	}
 }
 
+func TestNginxModuleStaticBuildErrorHintOnlyForCustomModules(t *testing.T) {
+	if hint := nginxModuleStaticBuildErrorHint(dto.NginxModule{Name: "builtin"}); hint != "" {
+		t.Fatalf("built-in module cannot switch build mode, got hint %q", hint)
+	}
+	if hint := nginxModuleStaticBuildErrorHint(dto.NginxModule{Name: "custom", Custom: true}); hint == "" {
+		t.Fatal("custom module should receive the static-build alternative")
+	}
+}
+
 func TestResolveNginxModuleTargetWithoutBuilder(t *testing.T) {
 	oldDir := global.Dir.AppInstallDir
 	global.Dir.AppInstallDir = t.TempDir()
@@ -173,6 +179,22 @@ func TestResolveNginxModuleTargetWithoutBuilder(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "dynamic module builder not found") {
 		t.Fatalf("unexpected error message: %v", err)
+	}
+}
+
+func TestBuildDynamicNginxModulesFailsWithoutBuilder(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.31.1.1"}
+	install.App.Key = constant.AppOpenresty
+	modules := []dto.NginxModule{{
+		Name: "rtmp", Enable: true, BuildMode: nginxModuleBuildDynamic,
+	}}
+
+	_, err := buildDynamicNginxModules(install, modules, nil, false, "", "", nil)
+	if !errors.Is(err, errNginxModuleBuilderMissing) {
+		t.Fatalf("missing target builder must fail the dynamic build, got %v", err)
 	}
 }
 
@@ -226,97 +248,6 @@ func TestMergeOpenrestyModuleVolumesKeepsExisting(t *testing.T) {
 	}
 }
 
-func TestNormalizeNginxModuleFoldsAutoIntoDynamic(t *testing.T) {
-	module := dto.NginxModule{Name: "legacy-auto", BuildMode: nginxModuleBuildAuto}
-
-	normalizeNginxModule(&module)
-
-	if module.BuildMode != nginxModuleBuildDynamic {
-		t.Fatalf("auto should normalize to dynamic, got %s", module.BuildMode)
-	}
-}
-
-func writeNginxModuleFixture(t *testing.T, install model.AppInstall, withBuilder bool, modules []dto.NginxModule) {
-	t.Helper()
-	buildDir := path.Join(install.GetPath(), nginxModuleBuildDir)
-	if err := os.MkdirAll(buildDir, constant.DirPerm); err != nil {
-		t.Fatal(err)
-	}
-	if withBuilder {
-		if err := os.WriteFile(path.Join(buildDir, nginxModuleBuilderFile), []byte("FROM scratch\n"), constant.FilePerm); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(path.Join(buildDir, nginxModuleCatalogFile), []byte("[]"), constant.FilePerm); err != nil {
-			t.Fatal(err)
-		}
-	}
-	content, err := json.Marshal(modules)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err = os.WriteFile(path.Join(buildDir, nginxModuleStoreFile), content, constant.FilePerm); err != nil {
-		t.Fatal(err)
-	}
-}
-
-func TestLoadNginxModulesProbesDynamicSupport(t *testing.T) {
-	oldDir := global.Dir.AppInstallDir
-	global.Dir.AppInstallDir = t.TempDir()
-	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
-	install := model.AppInstall{Name: "openresty", Version: "1.27.1.2"}
-	install.App.Key = constant.AppOpenresty
-	writeNginxModuleFixture(t, install, true, []dto.NginxModule{
-		{Name: "good", Enable: true, BuildMode: nginxModuleBuildDynamic, Params: "--add-module=/tmp/good"},
-		{Name: "bad", Enable: true, BuildMode: nginxModuleBuildDynamic, Params: "--with-nothing"},
-		{Name: "meta", Enable: true, BuildMode: nginxModuleBuildDynamic, Params: "--add-module=/tmp/x;touch /tmp/y"},
-		{Name: "static-mod", Enable: true, BuildMode: nginxModuleBuildStatic},
-		{Name: "deleted", Deleted: true, BuildMode: nginxModuleBuildDynamic, Params: "--with-nothing"},
-	})
-
-	loaded, err := loadNginxModules(install)
-	if err != nil {
-		t.Fatal(err)
-	}
-	support := make(map[string]string, len(loaded))
-	for _, module := range loaded {
-		support[module.Name] = module.DynamicSupport
-	}
-	if support["good"] != nginxModuleSupportSupported {
-		t.Fatalf("valid dynamic params should probe supported, got %q", support["good"])
-	}
-	if support["bad"] != nginxModuleSupportUnsupported {
-		t.Fatalf("params without a dynamic option should probe unsupported, got %q", support["bad"])
-	}
-	if support["meta"] != nginxModuleSupportUnsupported {
-		t.Fatalf("params with shell metacharacters should probe unsupported, got %q", support["meta"])
-	}
-	if support["static-mod"] != nginxModuleSupportUnknown {
-		t.Fatalf("static module must not be probed, got %q", support["static-mod"])
-	}
-	if support["deleted"] != nginxModuleSupportUnknown {
-		t.Fatalf("deleted module must not be probed, got %q", support["deleted"])
-	}
-}
-
-func TestLoadNginxModulesWithoutBuilderKeepsUnknownSupport(t *testing.T) {
-	oldDir := global.Dir.AppInstallDir
-	global.Dir.AppInstallDir = t.TempDir()
-	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
-	install := model.AppInstall{Name: "openresty", Version: "1.27.1.2"}
-	install.App.Key = constant.AppOpenresty
-	writeNginxModuleFixture(t, install, false, []dto.NginxModule{
-		{Name: "good", Enable: true, BuildMode: nginxModuleBuildDynamic, Params: "--add-module=/tmp/good"},
-	})
-
-	loaded, err := loadNginxModules(install)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(loaded) != 1 || loaded[0].DynamicSupport != nginxModuleSupportUnknown {
-		t.Fatalf("without the builder the support marker must stay unknown, got %#v", loaded)
-	}
-}
-
 func TestResolveNginxModuleBuildMirror(t *testing.T) {
 	oldDir := global.Dir.AppInstallDir
 	global.Dir.AppInstallDir = t.TempDir()
@@ -343,5 +274,403 @@ func TestResolveNginxModuleBuildMirror(t *testing.T) {
 	}
 	if got := resolveNginxModuleBuildMirror(install, "https://mirror.example.com"); got != "https://mirror.example.com" {
 		t.Fatalf("request mirror should still win over the env value, got %q", got)
+	}
+}
+
+func writeNginxModuleCatalogStateFixture(t *testing.T, install model.AppInstall, catalog []dto.NginxModule, state string) {
+	t.Helper()
+	buildDir := path.Join(install.GetPath(), nginxModuleBuildDir)
+	if err := os.MkdirAll(buildDir, constant.DirPerm); err != nil {
+		t.Fatal(err)
+	}
+	catalogContent, err := json.Marshal(catalog)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = os.WriteFile(path.Join(buildDir, nginxModuleCatalogFile), catalogContent, constant.FilePerm); err != nil {
+		t.Fatal(err)
+	}
+	if state != "" {
+		if err = os.WriteFile(path.Join(buildDir, nginxModuleStoreFile), []byte(state), constant.FilePerm); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestLoadNginxModulesBuiltinStateCannotOverrideCatalogDefinition(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.31.1.1"}
+	install.App.Key = constant.AppOpenresty
+
+	catalog := []dto.NginxModule{{
+		Name: "rtmp", Script: "catalog-script", Packages: []string{"unzip"}, Params: "--add-module=/tmp/rtmp",
+		BuildMode: nginxModuleBuildDynamic, Provider: nginxModuleProviderLocal, LoadOrder: 20,
+	}}
+	state := `[{"name":"rtmp","enable":true,"script":"user-script","params":"--with-user","buildMode":"static","loadOrder":99,"lastError":"failed"}]`
+	writeNginxModuleCatalogStateFixture(t, install, catalog, state)
+
+	modules, err := loadNginxModules(install)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(modules) != 1 {
+		t.Fatalf("expected one merged module, got %#v", modules)
+	}
+	module := modules[0]
+	if !module.Enable || module.LastError != "failed" {
+		t.Fatalf("builtin state was not applied: %#v", module)
+	}
+	if module.Script != "catalog-script" || module.Params != "--add-module=/tmp/rtmp" ||
+		module.BuildMode != nginxModuleBuildDynamic || module.LoadOrder != 20 {
+		t.Fatalf("builtin definition must come from catalog: %#v", module)
+	}
+}
+
+func TestLoadNginxModulesWithoutStateShowsDisabledCatalogModules(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.31.1.1"}
+	install.App.Key = constant.AppOpenresty
+
+	catalog := []dto.NginxModule{
+		{Name: "rtmp", Enable: true, BuildMode: nginxModuleBuildDynamic},
+		{Name: "geoip2", BuildMode: nginxModuleBuildDynamic},
+	}
+	writeNginxModuleCatalogStateFixture(t, install, catalog, "")
+
+	modules, err := loadNginxModules(install)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(modules) != len(catalog) {
+		t.Fatalf("expected all catalog modules, got %#v", modules)
+	}
+	for _, module := range modules {
+		if module.Enable || module.Custom {
+			t.Fatalf("catalog modules must default to disabled built-ins: %#v", module)
+		}
+	}
+}
+
+func TestSaveNginxModulesPersistsOnlyBuiltinState(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.31.1.1"}
+	install.App.Key = constant.AppOpenresty
+
+	catalog := []dto.NginxModule{{
+		Name: "rtmp", Script: "catalog-script", Params: "--add-module=/tmp/rtmp",
+		BuildMode: nginxModuleBuildDynamic, Provider: nginxModuleProviderLocal, LoadOrder: 20,
+	}}
+	writeNginxModuleCatalogStateFixture(t, install, catalog, "")
+	modules, err := loadNginxModules(install)
+	if err != nil {
+		t.Fatal(err)
+	}
+	modules[0].Enable = true
+	modules[0].LastError = "failed"
+
+	if err = saveNginxModules(install, modules); err != nil {
+		t.Fatal(err)
+	}
+	content, err := os.ReadFile(path.Join(install.GetPath(), nginxModuleBuildDir, nginxModuleStoreFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var states []map[string]any
+	if err = json.Unmarshal(content, &states); err != nil {
+		t.Fatal(err)
+	}
+	if len(states) != 1 || states[0]["name"] != "rtmp" || states[0]["enable"] != true || states[0]["lastError"] != "failed" {
+		t.Fatalf("unexpected builtin state: %s", content)
+	}
+	for _, key := range []string{"script", "packages", "params", "buildMode", "provider", "loadOrder"} {
+		if _, exists := states[0][key]; exists {
+			t.Fatalf("builtin definition field %q leaked into module state: %s", key, content)
+		}
+	}
+}
+
+func TestSaveNginxModulesOmitsPristineBuiltinState(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.31.1.1"}
+	install.App.Key = constant.AppOpenresty
+	catalog := []dto.NginxModule{{Name: "rtmp", BuildMode: nginxModuleBuildDynamic}}
+	writeNginxModuleCatalogStateFixture(t, install, catalog, "")
+
+	modules, err := loadNginxModules(install)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = saveNginxModules(install, modules); err != nil {
+		t.Fatal(err)
+	}
+	content, err := os.ReadFile(path.Join(install.GetPath(), nginxModuleBuildDir, nginxModuleStoreFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.TrimSpace(string(content)) != "[]" {
+		t.Fatalf("pristine built-in state should not be persisted: %s", content)
+	}
+}
+
+func TestLoadAndSaveNginxCustomModule(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.31.1.1"}
+	install.App.Key = constant.AppOpenresty
+
+	state := `[{"name":"custom","custom":true,"script":"prepare","packages":["git"],"params":"--add-module=/tmp/custom","enable":true,"buildMode":"static","provider":"local","loadOrder":100}]`
+	writeNginxModuleCatalogStateFixture(t, install, nil, state)
+
+	modules, err := loadNginxModules(install)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(modules) != 1 || !modules[0].Custom {
+		t.Fatalf("custom module source was not restored: %#v", modules)
+	}
+	if modules[0].Script != "prepare" || modules[0].BuildMode != nginxModuleBuildStatic || modules[0].LoadOrder != 100 {
+		t.Fatalf("custom module definition was not restored: %#v", modules[0])
+	}
+
+	if err = saveNginxModules(install, modules); err != nil {
+		t.Fatal(err)
+	}
+	content, err := os.ReadFile(path.Join(install.GetPath(), nginxModuleBuildDir, nginxModuleStoreFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(content), `"custom": true`) || !strings.Contains(string(content), `"buildMode": "static"`) {
+		t.Fatalf("custom module definition was not persisted: %s", content)
+	}
+}
+
+func TestActivateNginxModuleCatalogReplacesCatalogAtomically(t *testing.T) {
+	buildDir := t.TempDir()
+	activePath := path.Join(buildDir, nginxModuleCatalogFile)
+	pendingPath := path.Join(buildDir, nginxModuleCatalogPendingFile)
+	sourcePath := path.Join(buildDir, "target.catalog.json")
+	if err := os.WriteFile(activePath, []byte(`[{"name":"old"}]`), constant.FilePerm); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(sourcePath, []byte(`[{"name":"new"}]`), constant.FilePerm); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := stageNginxModuleCatalog(sourcePath, pendingPath); err != nil {
+		t.Fatal(err)
+	}
+	content, err := os.ReadFile(activePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(content) != `[{"name":"old"}]` {
+		t.Fatalf("staging target catalog changed the active catalog: %s", content)
+	}
+	if err := activateNginxModuleCatalog(pendingPath, activePath); err != nil {
+		t.Fatal(err)
+	}
+	content, err = os.ReadFile(activePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(content) != `[{"name":"new"}]` {
+		t.Fatalf("active catalog was not replaced: %s", content)
+	}
+	if _, err = os.Stat(pendingPath); !os.IsNotExist(err) {
+		t.Fatalf("pending catalog should be consumed, got %v", err)
+	}
+}
+
+func TestActivateNginxModuleCatalogRestoresCatalogWhenCommitFails(t *testing.T) {
+	buildDir := t.TempDir()
+	activePath := path.Join(buildDir, nginxModuleCatalogFile)
+	pendingPath := path.Join(buildDir, nginxModuleCatalogPendingFile)
+	if err := os.WriteFile(activePath, []byte(`[{"name":"old"}]`), constant.FilePerm); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(pendingPath, []byte(`[{"name":"new"}]`), constant.FilePerm); err != nil {
+		t.Fatal(err)
+	}
+	commitErr := errors.New("save install failed")
+
+	err := activateNginxModuleCatalogAndCommit(pendingPath, activePath, func() error {
+		return commitErr
+	})
+	if !errors.Is(err, commitErr) {
+		t.Fatalf("expected commit error, got %v", err)
+	}
+	content, readErr := os.ReadFile(activePath)
+	if readErr != nil {
+		t.Fatal(readErr)
+	}
+	if string(content) != `[{"name":"old"}]` {
+		t.Fatalf("failed upgrade must restore the old catalog: %s", content)
+	}
+}
+
+func TestLoadNginxModulesRejectsDuplicateCatalogNames(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.31.1.1"}
+	install.App.Key = constant.AppOpenresty
+
+	catalog := []dto.NginxModule{
+		{Name: "rtmp", Params: "--add-module=/tmp/one", BuildMode: nginxModuleBuildDynamic},
+		{Name: "rtmp", Params: "--add-module=/tmp/two", BuildMode: nginxModuleBuildDynamic},
+	}
+	writeNginxModuleCatalogStateFixture(t, install, catalog, "")
+
+	if _, err := loadNginxModules(install); err == nil || !strings.Contains(err.Error(), "duplicate") {
+		t.Fatalf("expected duplicate catalog name error, got %v", err)
+	}
+}
+
+func TestLoadNginxModulesRejectsDuplicateStateNames(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.31.1.1"}
+	install.App.Key = constant.AppOpenresty
+
+	catalog := []dto.NginxModule{{Name: "rtmp", Params: "--add-module=/tmp/rtmp", BuildMode: nginxModuleBuildDynamic}}
+	writeNginxModuleCatalogStateFixture(t, install, catalog, `[{"name":"rtmp","enable":true},{"name":"rtmp","enable":false}]`)
+
+	if _, err := loadNginxModules(install); err == nil || !strings.Contains(err.Error(), "duplicate") {
+		t.Fatalf("expected duplicate state name error, got %v", err)
+	}
+}
+
+func TestLoadNginxModulesRejectsOrphanBuiltinState(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.31.1.1"}
+	install.App.Key = constant.AppOpenresty
+
+	writeNginxModuleCatalogStateFixture(t, install, nil, `[{"name":"removed","enable":true}]`)
+
+	if _, err := loadNginxModules(install); err == nil || !strings.Contains(err.Error(), "missing from the module catalog") {
+		t.Fatalf("expected orphan builtin state error, got %v", err)
+	}
+}
+
+func TestLoadNginxModulesRejectsCustomCatalogNameConflict(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.31.1.1"}
+	install.App.Key = constant.AppOpenresty
+
+	catalog := []dto.NginxModule{{Name: "rtmp", BuildMode: nginxModuleBuildDynamic}}
+	writeNginxModuleCatalogStateFixture(t, install, catalog, `[{"name":"rtmp","custom":true,"enable":true}]`)
+
+	if _, err := loadNginxModules(install); err == nil || !strings.Contains(err.Error(), "conflicts") {
+		t.Fatalf("expected custom/catalog conflict error, got %v", err)
+	}
+}
+
+func TestLoadNginxModulesRejectsInvalidBuildModes(t *testing.T) {
+	oldDir := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = t.TempDir()
+	t.Cleanup(func() { global.Dir.AppInstallDir = oldDir })
+	install := model.AppInstall{Name: "openresty", Version: "1.31.1.1"}
+	install.App.Key = constant.AppOpenresty
+
+	writeNginxModuleCatalogStateFixture(t, install, []dto.NginxModule{{
+		Name: "rtmp", BuildMode: "auto",
+	}}, "")
+	if _, err := loadNginxModules(install); err == nil || !strings.Contains(err.Error(), "invalid build mode") {
+		t.Fatalf("expected invalid catalog build mode error, got %v", err)
+	}
+
+	writeNginxModuleCatalogStateFixture(t, install, nil, `[{"name":"custom","custom":true,"buildMode":"auto"}]`)
+	if _, err := loadNginxModules(install); err == nil || !strings.Contains(err.Error(), "invalid build mode") {
+		t.Fatalf("expected invalid custom build mode error, got %v", err)
+	}
+}
+
+func TestApplyNginxModuleUpdateKeepsBuiltinDefinitionImmutable(t *testing.T) {
+	modules := []dto.NginxModule{{
+		Name: "rtmp", Script: "catalog-script", Params: "--add-module=/tmp/rtmp",
+		BuildMode: nginxModuleBuildDynamic, Provider: nginxModuleProviderLocal, LoadOrder: 20,
+	}}
+	req := request.NginxModuleUpdate{
+		Operate: nginxModuleOperateUpdate, Name: "rtmp", Enable: true, Script: "user-script",
+		Params: "--with-user", BuildMode: nginxModuleBuildStatic, Provider: "prebuilt", LoadOrder: 99,
+	}
+
+	updated, _, err := applyNginxModuleUpdate(modules, req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !updated[0].Enable {
+		t.Fatal("builtin enable state was not updated")
+	}
+	if updated[0].Script != "catalog-script" || updated[0].Params != "--add-module=/tmp/rtmp" ||
+		updated[0].BuildMode != nginxModuleBuildDynamic || updated[0].Provider != nginxModuleProviderLocal ||
+		updated[0].LoadOrder != 20 {
+		t.Fatalf("builtin definition was modified: %#v", updated[0])
+	}
+}
+
+func TestApplyNginxModuleUpdateRejectsBuiltinDelete(t *testing.T) {
+	modules := []dto.NginxModule{{Name: "rtmp", BuildMode: nginxModuleBuildDynamic}}
+
+	_, _, err := applyNginxModuleUpdate(modules, request.NginxModuleUpdate{
+		Operate: nginxModuleOperateDelete, Name: "rtmp",
+	})
+	if err == nil || !strings.Contains(err.Error(), "cannot be deleted") {
+		t.Fatalf("expected builtin delete error, got %v", err)
+	}
+}
+
+func TestApplyNginxModuleUpdateCreatesAndDeletesCustomModule(t *testing.T) {
+	if _, _, err := applyNginxModuleUpdate(nil, request.NginxModuleUpdate{
+		Operate: nginxModuleOperateCreate, Name: "invalid", BuildMode: "auto",
+	}); err == nil || !strings.Contains(err.Error(), "invalid build mode") {
+		t.Fatalf("expected invalid custom build mode error, got %v", err)
+	}
+
+	created, _, err := applyNginxModuleUpdate(nil, request.NginxModuleUpdate{
+		Operate: nginxModuleOperateCreate, Name: "custom", Script: "prepare", Packages: "git,curl",
+		Params: "--add-module=/tmp/custom", Enable: true, BuildMode: nginxModuleBuildStatic,
+		Provider: nginxModuleProviderLocal, LoadOrder: 100,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(created) != 1 || !created[0].Custom || created[0].BuildMode != nginxModuleBuildStatic {
+		t.Fatalf("custom module was not created correctly: %#v", created)
+	}
+	updated, _, err := applyNginxModuleUpdate(created, request.NginxModuleUpdate{
+		Operate: nginxModuleOperateUpdate, Name: "custom", Script: "updated",
+		Params: "--add-module=/tmp/custom-v2", Enable: false, BuildMode: nginxModuleBuildDynamic,
+		Provider: nginxModuleProviderLocal, LoadOrder: 75,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if updated[0].Script != "updated" || updated[0].BuildMode != nginxModuleBuildDynamic || updated[0].LoadOrder != 75 {
+		t.Fatalf("custom module was not updated correctly: %#v", updated[0])
+	}
+
+	remaining, deleted, err := applyNginxModuleUpdate(updated, request.NginxModuleUpdate{
+		Operate: nginxModuleOperateDelete, Name: "custom",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(remaining) != 0 || deleted == nil || deleted.Name != "custom" {
+		t.Fatalf("custom module was not removed: remaining=%#v deleted=%#v", remaining, deleted)
 	}
 }
