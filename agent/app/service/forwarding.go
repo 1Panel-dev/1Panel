@@ -17,7 +17,7 @@ import (
 
 type IForwardingService interface {
 	LoadBaseInfo() (dto.FirewallBaseInfo, error)
-	SearchWithPage(search dto.ForwardRuleSearch) (int64, interface{}, error)
+	SearchWithPage(search dto.RuleSearch) (int64, interface{}, error)
 	Operate(req dto.ForwardRuleOperate) error
 	Enable() error
 	Replay() error
@@ -75,7 +75,10 @@ func (s *ForwardingService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	return baseInfo, nil
 }
 
-func (s *ForwardingService) SearchWithPage(req dto.ForwardRuleSearch) (int64, interface{}, error) {
+func (s *ForwardingService) SearchWithPage(req dto.RuleSearch) (int64, interface{}, error) {
+	if req.Strategy != "" {
+		return 0, make([]dto.ForwardRule, 0), nil
+	}
 	adapter, err := s.adapterFactory()
 	if err != nil {
 		return 0, nil, err
@@ -83,9 +86,6 @@ func (s *ForwardingService) SearchWithPage(req dto.ForwardRuleSearch) (int64, in
 	rules, err := adapter.List()
 	if err != nil {
 		return 0, nil, err
-	}
-	if req.Strategy != "" {
-		return 0, nil, nil
 	}
 
 	var filtered []forwardClient.Rule
@@ -105,10 +105,7 @@ func (s *ForwardingService) SearchWithPage(req dto.ForwardRuleSearch) (int64, in
 		end = total
 	}
 	pageRules := filtered[start:end]
-	var items []dto.ForwardRule
-	if pageRules != nil {
-		items = make([]dto.ForwardRule, 0, len(pageRules))
-	}
+	items := make([]dto.ForwardRule, 0, len(pageRules))
 	for _, rule := range pageRules {
 		items = append(items, dto.ForwardRule{
 			Num:        rule.Num,

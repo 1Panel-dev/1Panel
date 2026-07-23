@@ -1,12 +1,5 @@
 package dto
 
-type ForwardRuleSearch struct {
-	PageInfo
-	Info     string `json:"info"`
-	Status   string `json:"status"`
-	Strategy string `json:"strategy"`
-}
-
 // ForwardRule preserves the existing firewall search response shape while
 // keeping forwarding data separate from the filter client model.
 type ForwardRule struct {

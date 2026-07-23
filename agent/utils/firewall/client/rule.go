@@ -125,7 +125,8 @@ func needsRichRule(rule FireInfo) bool {
 }
 
 // ufwNeedsRichRule is the ufw variant: ufw denies a port through the port
-// shortcut as well, only a source forces the longer form.
+// shortcut as well, only a source forces the longer form. Expansion has already
+// normalized "Anywhere" to an empty address.
 func ufwNeedsRichRule(rule FireInfo) bool {
-	return len(rule.Address) != 0 && !strings.EqualFold(rule.Address, "Anywhere")
+	return len(rule.Address) != 0
 }

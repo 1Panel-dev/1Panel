@@ -80,7 +80,7 @@ func TestForwardingSearchPreservesAPIShapeAndPagination(t *testing.T) {
 		{Num: "2", Protocol: "udp", Port: "5353", TargetIP: "127.0.0.1", TargetPort: "53"},
 	}}
 	service := forwardingServiceWithAdapter(adapter)
-	total, value, err := service.SearchWithPage(dto.ForwardRuleSearch{PageInfo: dto.PageInfo{Page: 1, PageSize: 10}, Info: "10.0.0.2"})
+	total, value, err := service.SearchWithPage(dto.RuleSearch{PageInfo: dto.PageInfo{Page: 1, PageSize: 10}, Info: "10.0.0.2"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -146,7 +146,7 @@ func TestForwardingOperatePreservesDuplicateAndOrderingContracts(t *testing.T) {
 func TestForwardingSearchReturnsAdapterError(t *testing.T) {
 	wantErr := errors.New("list failed")
 	service := forwardingServiceWithAdapter(&fakeForwardingAdapter{name: "firewalld", listErr: wantErr})
-	_, _, err := service.SearchWithPage(dto.ForwardRuleSearch{PageInfo: dto.PageInfo{Page: 1, PageSize: 20}})
+	_, _, err := service.SearchWithPage(dto.RuleSearch{PageInfo: dto.PageInfo{Page: 1, PageSize: 20}})
 	if !errors.Is(err, wantErr) {
 		t.Fatalf("got %v want %v", err, wantErr)
 	}
