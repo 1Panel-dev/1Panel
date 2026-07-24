@@ -74,7 +74,7 @@ func HandleRequestWithClient(client *http.Client, url, method string, timeout in
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return 0, nil, errors.New(resp.Status)
+		return resp.StatusCode, nil, errors.New(resp.Status)
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {

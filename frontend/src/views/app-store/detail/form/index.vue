@@ -282,8 +282,20 @@ const handleVersionChange = async (version: string) => {
 };
 
 const getVersionDetail = async (version: string) => {
+    formData.value.appDetailId = 0;
+    formData.value.dockerCompose = '';
+    formData.value.params = {};
+    formRules.value.params = [];
+    showParams.value = false;
+    isHostMode.value = false;
+    memoryRequired.value = 0;
+    gpuSupport.value = false;
+
     try {
         const res = await getAppDetail(currentApp.value.id, version, 'app', operateNode.value);
+        if (formData.value.version !== version) {
+            return;
+        }
         formData.value.appDetailId = res.data.id;
         formData.value.dockerCompose = res.data.dockerCompose;
         isHostMode.value = res.data.hostMode;
