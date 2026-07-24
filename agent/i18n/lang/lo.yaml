@@ -121,6 +121,7 @@ ErrAppNameExist: 'ຊື່ແອັບພລິເຄຊັນມີຢູ່�
 ErrAppInstallNameExist: 'ຊື່ການຕິດຕັ້ງແອັບ {{ .name }} ມີຢູ່ໃນລະບົບແລ້ວ'
 AppStoreIsSyncing: 'App Store ກຳລັງຊິງຄ໌ຂໍ້ມູນ; ກະລຸນາລອງໃໝ່ພາຍຫຼັງ'
 ErrGetCompose: 'ອ່ານໄຟລ໌ docker-compose.yml ລົ້ມເຫຼວ: {{ .detail }}'
+ErrAppVersionUnavailable: 'ເວີຊັນແອັບນີ້ຖືກລຶບອອກຈາກບໍລິການທາງໄກແລ້ວ ກະລຸນາເລືອກເວີຊັນອື່ນແລ້ວລອງໃໝ່'
 ErrAppWarn: 'ສະຖານະແອັບຜິດປົກກະຕິ; ກະລຸນາກວດສອບບັນທຶກ'
 ErrAppParamKey: 'ພາຣາມິເຕີຂອງແອັບບໍ່ຖືກຕ້ອງ: {{ .name }}'
 ErrAppUpgrade: 'ອັບເກຣດແອັບລົ້ມເຫຼວ: {{ .name }} {{ .err }}'

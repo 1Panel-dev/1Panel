@@ -303,6 +303,9 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 		filename := filepath.Base(appDetailDTO.DownloadUrl)
 		dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(appDetailDTO.DownloadUrl, filename), "docker-compose.yml")
 		statusCode, composeRes, err := req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
+		if statusCode == http.StatusNotFound {
+			return appDetailDTO, buserr.New("ErrAppVersionUnavailable")
+		}
 		if err != nil {
 			return appDetailDTO, buserr.WithDetail("ErrGetCompose", err.Error(), err)
 		}
@@ -426,7 +429,12 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 	} else {
 		if appDetail.DockerCompose == "" {
 			dockerComposeUrl := fmt.Sprintf("%s/%s/1panel/%s/%s/docker-compose.yml", global.AppRepoURL(), global.CONF.Base.Mode, app.Key, appDetail.Version)
-			_, composeRes, err = req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
+			var statusCode int
+			statusCode, composeRes, err = req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
+			if statusCode == http.StatusNotFound {
+				err = buserr.New("ErrAppVersionUnavailable")
+				return
+			}
 			if err != nil {
 				return
 			}

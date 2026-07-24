@@ -601,6 +601,9 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 				filename := filepath.Base(detail.DownloadUrl)
 				dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(detail.DownloadUrl, filename), "docker-compose.yml")
 				statusCode, composeRes, err := req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
+				if statusCode == http.StatusNotFound {
+					return versions, buserr.New("ErrAppVersionUnavailable")
+				}
 				if err != nil {
 					return versions, err
 				}

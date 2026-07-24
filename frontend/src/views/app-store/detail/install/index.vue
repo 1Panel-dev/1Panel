@@ -11,7 +11,7 @@
                 <el-button @click="handleClose" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" @click="handleSubmit" :disabled="loading">
+                <el-button type="primary" @click="handleSubmit" :disabled="loading || !formData.appDetailId">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -71,6 +71,8 @@ const handleClose = () => {
 };
 
 const handleSubmit = async () => {
+    if (!formData.value.appDetailId) return;
+
     const isValid = await installFormRef.value?.validate();
     if (!isValid) return;
 

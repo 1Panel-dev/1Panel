@@ -131,6 +131,7 @@ ErrAppNameExist: '应用名称已存在'
 ErrAppInstallNameExist: '应用安装名称 {{ .name }} 已存在'
 AppStoreIsSyncing: '应用商店同步中，请稍后重试'
 ErrGetCompose: "docker-compose.yml 文件获取失败！{{ .detail }}"
+ErrAppVersionUnavailable: "当前应用版本已从远程服务下架，请选择其他版本后重试"
 ErrAppWarn: "状态异常，请查看日志"
 ErrAppParamKey: "参数 {{ .name }} 字段异常"
 ErrAppUpgrade: "应用 {{ .name }} 升级失败 {{ .err }}"
