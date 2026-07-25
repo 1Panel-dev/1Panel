@@ -1,3 +1,5 @@
+[![MCP Toplist](https://mcptoplist.com/badge/mcp.so%2F1Panel%2F1Panel-dev.svg)](https://mcptoplist.com/server/mcp.so%2F1Panel%2F1Panel-dev)
+
 <p align="center"><a href="https://1panel.pro"><img src="https://resource.1panel.pro/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
 
 <h3 align="center">The open-source VPS control panel with native AI agent support</h3>
