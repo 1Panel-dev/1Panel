@@ -198,6 +198,23 @@ SubTask: "وظیفه فرعی"
 Skip: "نادیده گرفتن خطاها و ادامه"
 Success: "موفق"
 
+# وظایف مسیریابی هوشمند دروازه AI
+AIProxySmartRouteCreateTask: "ایجاد نمونه‌های مسیریابی هوشمند دروازه AI"
+AIProxySmartRouteCreateSubTask: "ایجاد نمونه‌ها و تولید بردارها"
+AIProxySmartRouteCreateStart: "شروع ایجاد نمونه‌ها، در مجموع {{ .total }}"
+AIProxySmartRouteCreateFailed: "[{{ .current }}/{{ .total }}] ایجاد ناموفق بود: type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteCreateSuccess: "[{{ .current }}/{{ .total }}] ایجاد شد: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteCreateComplete: "ایجاد کامل شد: {{ .success }} موفق، {{ .failed }} ناموفق"
+AIProxySmartRouteCreateError: "ایجاد نمونه‌ها ناموفق بود: {{ .failed }} ناموفق، آخرین خطا"
+AIProxySmartRouteRebuildTask: "بازسازی بردارهای نمونه مسیریابی هوشمند دروازه AI"
+AIProxySmartRouteRebuildSubTask: "بازسازی بردارهای نمونه"
+AIProxySmartRouteEmbeddingRequired: "آدرس و مدل Embedding الزامی است"
+AIProxySmartRouteRebuildStart: "شروع بازسازی بردارهای نمونه، در مجموع {{ .total }}"
+AIProxySmartRouteRebuildFailed: "[{{ .current }}/{{ .total }}] بازسازی ناموفق بود: sampleID={{ .id }} type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteRebuildSuccess: "[{{ .current }}/{{ .total }}] بازسازی شد: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteRebuildComplete: "بازسازی کامل شد: {{ .success }} موفق، {{ .failed }} ناموفق"
+AIProxySmartRouteRebuildError: "بازسازی بردارهای نمونه ناموفق بود: {{ .failed }} ناموفق، آخرین خطا"
+
 # وظیفه دسته‌ای عامل
 BatchInstallAgent: "نصب دسته‌ای عامل"
 DispatchAgentInstallTasks: "ارسال وظایف نصب عامل"

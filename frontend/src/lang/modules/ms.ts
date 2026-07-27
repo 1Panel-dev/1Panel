@@ -744,6 +744,7 @@ const message = {
             discoverModelsHelper:
                 'Dapatkan model daripada API /v1/models penyedia dan tambahkan semuanya ke katalog model',
             discoverModelsFailedFallback: 'Gagal mendapatkan model. Konfigurasikan model secara manual.',
+            discoverModelsFailedUseDefaults: 'Gagal mendapatkan model. Model lalai sedang digunakan.',
             accountModelsDuplicate: 'Terdapat model pendua dalam katalog',
             modelPool: 'Katalog model',
             fallbackModels: 'Model fallback',
@@ -898,8 +899,13 @@ const message = {
                 'Menyimpan nama pengguna atau kata laluan akan membina semula bekas secara automatik supaya perubahan berkuat kuasa.',
             channelDeleteConfirm: 'Padam konfigurasi saluran {0}?',
             apiTypeBaseURLHelper: 'Jenis ini menghantar permintaan ke {0}. Base URL yang disyorkan: {1}',
+            customImageURLHelper:
+                'Masukkan URL titik akhir penjanaan imej yang lengkap untuk akaun Custom. Laluan tidak ditambah secara automatik. Contoh: {0}',
             apiTypeBaseURLMismatch:
                 'Base URL semasa kelihatan seperti laluan {0}, tetapi {1} dipilih. URL yang disyorkan: {2}',
+            validateAvailability: 'Sahkan ketersediaan akaun',
+            validateAvailabilityHelper: 'Hantar mesej minimum sebelum menyimpan untuk mengesahkan API',
+            validateImageAvailabilityHelper: 'Menjana satu imej minimum sebelum menyimpan dan mungkin dikenakan caj',
         },
         model: {
             model: 'Model',
@@ -960,6 +966,7 @@ const message = {
         },
         aiProxy: {
             title: 'Gateway AI',
+            apiReference: 'Rujukan API',
             notInstalled: 'Belum dipasang',
             usage: 'Penggunaan',
             accountPool: 'Kolam Akaun',
@@ -1083,13 +1090,20 @@ const message = {
             validationModelMapEmpty: 'Nama model dalam pemetaan model tidak boleh kosong',
             validationModelMapDuplicate: 'Model permintaan {0} berulang',
             modelGroup: 'Kumpulan Model',
+            modelCapability: 'Keupayaan Model',
+            textGeneration: 'Penjanaan Teks',
+            imageGeneration: 'Penjanaan Imej',
+            textModels: 'Model Teks',
+            textToImageModels: 'Model Teks-ke-Imej',
+            unauthorized: 'Tidak dibenarkan',
+            imageCount: 'Bilangan Imej',
             availableModels: 'Model Tersedia',
             modelGroupModels: 'Model Permintaan',
             modelGroupModelsPlaceholder: 'Pilih atau masukkan nama model permintaan',
             modelGroupModelsHelper:
-                'Masukkan model upstream sebenar sahaja; penghalaan pintar mencuba model mengikut susunan dan tidak mengimbang beban antara model.',
+                'Masukkan nama model permintaan yang digunakan klien untuk memanggil AI Gateway; penghalaan pintar mencuba model mengikut susunan dan tidak mengimbang beban antara model.',
             modelGroupGuide:
-                'Kumpulan model hanya mengandungi model upstream sebenar. auto ialah nama model maya yang digunakan klien semasa meminta AI Gateway.',
+                'Kumpulan model mengandungi nama model permintaan yang didedahkan oleh AI Gateway. Konfigurasikan model upstream dalam pemetaan model kumpulan akaun. auto ialah nama model maya dan tidak perlu ditambah pada kumpulan model.',
             modelGroupModelCount: '{0} model',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',

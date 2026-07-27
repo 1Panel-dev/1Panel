@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -54,11 +55,20 @@ func buildModelDiscoveryURL(baseURL string) string {
 		base = normalizeEndpointPath(apiType, base)
 	}
 	switch {
-	case strings.HasSuffix(base, "/v1/models"):
+	case strings.HasSuffix(base, "/models"):
 		return base
-	case strings.HasSuffix(base, "/v1"):
+	case hasAPIVersionSuffix(base):
 		return base + "/models"
 	default:
 		return base + "/v1/models"
 	}
+}
+
+func hasAPIVersionSuffix(value string) bool {
+	segment := value[strings.LastIndex(value, "/")+1:]
+	if len(segment) < 2 || segment[0] != 'v' {
+		return false
+	}
+	_, err := strconv.Atoi(segment[1:])
+	return err == nil
 }

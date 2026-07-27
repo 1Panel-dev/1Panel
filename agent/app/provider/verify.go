@@ -64,7 +64,10 @@ func VerifyAccount(provider, apiType, authMode, baseURL, apiKey, model string) e
 }
 
 func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model string) VerifyRequest {
-	baseURL = strings.TrimRight(strings.TrimSpace(baseURL), "/")
+	baseURL = strings.TrimSpace(baseURL)
+	if provider != "custom" || !IsImageAPIType(apiType) {
+		baseURL = strings.TrimRight(baseURL, "/")
+	}
 	headers := map[string]string{"Content-Type": "application/json"}
 	request := VerifyRequest{Method: http.MethodPost, Headers: headers}
 
@@ -78,6 +81,28 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 	}
 
 	switch apiType {
+	case "openai-images":
+		request.URL = imageVerifyURL(provider, baseURL, "/images/generations")
+		headers["Authorization"] = "Bearer " + apiKey
+		request.Body = mustJSON(map[string]interface{}{"model": model, "prompt": "test", "n": 1, "response_format": "url"})
+	case "dashscope-images":
+		request.URL = imageVerifyURL(provider, baseURL, "/api/v1/services/aigc/multimodal-generation/generation")
+		headers["Authorization"] = "Bearer " + apiKey
+		request.Body = mustJSON(map[string]interface{}{
+			"model": model,
+			"input": map[string]interface{}{"messages": []map[string]interface{}{
+				{"role": "user", "content": []map[string]string{{"text": "test"}}},
+			}},
+			"parameters": map[string]interface{}{"n": 1},
+		})
+	case "minimax-images":
+		request.URL = imageVerifyURL(provider, baseURL, "/v1/image_generation")
+		headers["Authorization"] = "Bearer " + apiKey
+		request.Body = mustJSON(map[string]interface{}{"model": model, "prompt": "test", "n": 1, "response_format": "url"})
+	case "openrouter-images":
+		request.URL = imageVerifyURL(provider, baseURL, "/api/v1/images")
+		headers["Authorization"] = "Bearer " + apiKey
+		request.Body = mustJSON(map[string]interface{}{"model": model, "prompt": "test", "n": 1, "response_format": "url"})
 	case "anthropic-messages":
 		request.URL = baseURL + "/v1/messages"
 		if authMode == AuthModeBearer {
@@ -104,6 +129,13 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 		})
 	}
 	return request
+}
+
+func imageVerifyURL(provider, baseURL, endpoint string) string {
+	if provider == "custom" || strings.HasSuffix(strings.ToLower(baseURL), endpoint) {
+		return baseURL
+	}
+	return baseURL + endpoint
 }
 
 func verifyHTTPError(statusCode int, body []byte) string {

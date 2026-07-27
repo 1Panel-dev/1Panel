@@ -198,6 +198,23 @@ SubTask: "Alt görev"
 Skip: "Hataları atla ve devam et..."
 Success: "Başarılı"
 
+# AI ağ geçidi akıllı yönlendirme görevleri
+AIProxySmartRouteCreateTask: "AI ağ geçidi akıllı yönlendirme örnekleri oluştur"
+AIProxySmartRouteCreateSubTask: "Örnekler oluştur ve vektörleri üret"
+AIProxySmartRouteCreateStart: "Örnek oluşturma başlatılıyor, toplam {{ .total }}"
+AIProxySmartRouteCreateFailed: "[{{ .current }}/{{ .total }}] Oluşturma başarısız: type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteCreateSuccess: "[{{ .current }}/{{ .total }}] Oluşturuldu: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteCreateComplete: "Oluşturma tamamlandı: {{ .success }} başarılı, {{ .failed }} başarısız"
+AIProxySmartRouteCreateError: "Örnek oluşturma başarısız: {{ .failed }} başarısız, son hata"
+AIProxySmartRouteRebuildTask: "AI ağ geçidi akıllı yönlendirme örnek vektörlerini yeniden oluştur"
+AIProxySmartRouteRebuildSubTask: "Örnek vektörlerini yeniden oluştur"
+AIProxySmartRouteEmbeddingRequired: "Embedding endpoint ve modeli gereklidir"
+AIProxySmartRouteRebuildStart: "Örnek vektörleri yeniden oluşturuluyor, toplam {{ .total }}"
+AIProxySmartRouteRebuildFailed: "[{{ .current }}/{{ .total }}] Yeniden oluşturma başarısız: sampleID={{ .id }} type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteRebuildSuccess: "[{{ .current }}/{{ .total }}] Yeniden oluşturuldu: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteRebuildComplete: "Yeniden oluşturma tamamlandı: {{ .success }} başarılı, {{ .failed }} başarısız"
+AIProxySmartRouteRebuildError: "Örnek vektörlerini yeniden oluşturma başarısız: {{ .failed }} başarısız, son hata"
+
 # ajan toplu görevi
 BatchInstallAgent: "Aracıları toplu kur"
 DispatchAgentInstallTasks: "Aracı kurulum görevlerini gönder"

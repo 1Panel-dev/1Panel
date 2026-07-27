@@ -168,6 +168,7 @@ const loadAccounts = async () => {
         page: 1,
         pageSize: 200,
         provider: '',
+        textOnly: true,
         name: '',
     });
     const items = res.data.items || [];

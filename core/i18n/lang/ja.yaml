@@ -198,6 +198,23 @@ SubTask: "サブタスク"
 Skip: "エラーを無視して続行..."
 Success: "成功"
 
+# AI ゲートウェイスマートルーティングタスク
+AIProxySmartRouteCreateTask: "AI ゲートウェイのスマートルーティングサンプルを作成"
+AIProxySmartRouteCreateSubTask: "サンプルを作成してベクトルを生成"
+AIProxySmartRouteCreateStart: "サンプルの作成を開始します。合計 {{ .total }} 件"
+AIProxySmartRouteCreateFailed: "[{{ .current }}/{{ .total }}] 作成失敗：type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteCreateSuccess: "[{{ .current }}/{{ .total }}] 作成成功：sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteCreateComplete: "作成完了：成功 {{ .success }} 件、失敗 {{ .failed }} 件"
+AIProxySmartRouteCreateError: "サンプルの作成に失敗しました：{{ .failed }} 件失敗、最後のエラー"
+AIProxySmartRouteRebuildTask: "AI ゲートウェイのスマートルーティングサンプルベクトルを再構築"
+AIProxySmartRouteRebuildSubTask: "サンプルベクトルを再構築"
+AIProxySmartRouteEmbeddingRequired: "Embedding エンドポイントとモデルは必須です"
+AIProxySmartRouteRebuildStart: "サンプルベクトルの再構築を開始します。合計 {{ .total }} 件"
+AIProxySmartRouteRebuildFailed: "[{{ .current }}/{{ .total }}] 再構築失敗：sampleID={{ .id }} type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteRebuildSuccess: "[{{ .current }}/{{ .total }}] 再構築成功：sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteRebuildComplete: "再構築完了：成功 {{ .success }} 件、失敗 {{ .failed }} 件"
+AIProxySmartRouteRebuildError: "サンプルベクトルの再構築に失敗しました：{{ .failed }} 件失敗、最後のエラー"
+
 # エージェント一括タスク
 BatchInstallAgent: "エージェントの一括インストール"
 DispatchAgentInstallTasks: "エージェントインストールタスクを配信"

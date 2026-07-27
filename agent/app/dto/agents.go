@@ -322,29 +322,31 @@ type AgentAccountModelDeleteReq struct {
 }
 
 type AgentAccountCreateReq struct {
-	Provider       string              `json:"provider" validate:"required"`
-	Name           string              `json:"name" validate:"required"`
-	APIKey         string              `json:"apiKey" validate:"required"`
-	RememberAPIKey bool                `json:"rememberApiKey"`
-	BaseURL        string              `json:"baseURL"`
-	Models         []AgentAccountModel `json:"models"`
-	APIType        string              `json:"apiType" validate:"required"`
-	AuthMode       string              `json:"authMode"`
-	VerifyModel    string              `json:"verifyModel"`
-	Remark         string              `json:"remark"`
+	Provider             string              `json:"provider" validate:"required"`
+	Name                 string              `json:"name" validate:"required"`
+	APIKey               string              `json:"apiKey" validate:"required"`
+	RememberAPIKey       bool                `json:"rememberApiKey"`
+	BaseURL              string              `json:"baseURL"`
+	Models               []AgentAccountModel `json:"models"`
+	APIType              string              `json:"apiType" validate:"required"`
+	AuthMode             string              `json:"authMode"`
+	VerifyModel          string              `json:"verifyModel"`
+	ValidateAvailability *bool               `json:"validateAvailability"`
+	Remark               string              `json:"remark"`
 }
 
 type AgentAccountUpdateReq struct {
-	ID             uint   `json:"id" validate:"required"`
-	Name           string `json:"name" validate:"required"`
-	APIKey         string `json:"apiKey" validate:"required"`
-	RememberAPIKey bool   `json:"rememberApiKey"`
-	BaseURL        string `json:"baseURL"`
-	APIType        string `json:"apiType" validate:"required"`
-	AuthMode       string `json:"authMode"`
-	VerifyModel    string `json:"verifyModel"`
-	Remark         string `json:"remark"`
-	SyncAgents     bool   `json:"syncAgents"`
+	ID                   uint   `json:"id" validate:"required"`
+	Name                 string `json:"name" validate:"required"`
+	APIKey               string `json:"apiKey" validate:"required"`
+	RememberAPIKey       bool   `json:"rememberApiKey"`
+	BaseURL              string `json:"baseURL"`
+	APIType              string `json:"apiType" validate:"required"`
+	AuthMode             string `json:"authMode"`
+	VerifyModel          string `json:"verifyModel"`
+	ValidateAvailability *bool  `json:"validateAvailability"`
+	Remark               string `json:"remark"`
+	SyncAgents           bool   `json:"syncAgents"`
 }
 
 type AgentAccountVerifyReq struct {
@@ -363,6 +365,8 @@ type AgentAccountDeleteReq struct {
 type AgentAccountSearch struct {
 	PageInfo
 	Provider string `json:"provider"`
+	APIType  string `json:"apiType"`
+	TextOnly bool   `json:"textOnly"`
 	Name     string `json:"name"`
 }
 
@@ -394,11 +398,13 @@ type ProviderModelInfo struct {
 }
 
 type ProviderAPIInfo struct {
-	APIType         string   `json:"apiType"`
-	BaseURL         string   `json:"baseUrl"`
-	EditableBaseURL bool     `json:"editableBaseUrl"`
-	DefaultAuthMode string   `json:"defaultAuthMode"`
-	AuthModes       []string `json:"authModes"`
+	APIType                string              `json:"apiType"`
+	BaseURL                string              `json:"baseUrl"`
+	EditableBaseURL        bool                `json:"editableBaseUrl"`
+	SupportsModelDiscovery bool                `json:"supportsModelDiscovery"`
+	DefaultAuthMode        string              `json:"defaultAuthMode"`
+	AuthModes              []string            `json:"authModes"`
+	Models                 []ProviderModelInfo `json:"models"`
 }
 
 type ProviderInfo struct {

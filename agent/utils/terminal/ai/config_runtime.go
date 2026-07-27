@@ -50,6 +50,10 @@ func ResolveGeneratorConfig(accountID uint) (GeneratorConfig, time.Duration, err
 	if provider == "" {
 		return GeneratorConfig{}, 0, fmt.Errorf("agent account provider is required")
 	}
+	apiType := strings.TrimSpace(account.APIType)
+	if providercatalog.IsImageAPIType(apiType) {
+		return GeneratorConfig{}, 0, fmt.Errorf("api type %s does not support text generation", apiType)
+	}
 	model, err := resolveAccountModelConfig(account.ID, provider)
 	if err != nil {
 		return GeneratorConfig{}, 0, err
@@ -72,7 +76,7 @@ func ResolveGeneratorConfig(accountID uint) (GeneratorConfig, time.Duration, err
 		BaseURL:   baseURL,
 		APIKey:    strings.TrimSpace(apiKey),
 		Model:     model,
-		APIType:   strings.TrimSpace(account.APIType),
+		APIType:   apiType,
 		AuthMode:  strings.TrimSpace(account.AuthMode),
 		MaxTokens: defaultTerminalTokens,
 	}, 30 * time.Second, nil

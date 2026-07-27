@@ -730,6 +730,7 @@ const message = {
             discoverModelsHelper:
                 'مدل‌ها را از API ‏/v1/models ارائه‌دهنده دریافت و همه را به مجموعه مدل‌ها اضافه کنید',
             discoverModelsFailedFallback: 'دریافت مدل‌ها ناموفق بود. مدل را به‌صورت دستی پیکربندی کنید.',
+            discoverModelsFailedUseDefaults: 'دریافت مدل‌ها ناموفق بود. از مدل‌های پیش‌فرض استفاده می‌شود.',
             accountModelsDuplicate: 'مدل‌های تکراری در کاتالوگ یافت شد',
             modelPool: 'مجموعه مدل‌ها',
             fallbackModels: 'مدل‌های جایگزین',
@@ -878,6 +879,13 @@ const message = {
                 'برای شروع کار ورود با QR کلیک کنید. کد QR در لاگ وظیفه ظاهر می‌شود و پس از اسکان موفق، کانتینر به طور خودکار مجدداً راه‌اندازی می‌شود.',
             channelAutoRestartHelper: 'ذخیره به طور خودکار کانتینر را مجدداً راه‌اندازی می‌کند تا تغییرات اعمال شوند.',
             channelDeleteConfirm: 'پیکربندی کانال {0} حذف شود؟',
+            apiTypeBaseURLHelper: 'این نوع درخواست‌ها را به {0} ارسال می‌کند. Base URL پیشنهادی: {1}',
+            apiTypeBaseURLMismatch: 'Base URL فعلی شبیه مسیر {0} است، اما {1} انتخاب شده است. URL پیشنهادی: {2}',
+            customImageURLHelper:
+                'برای حساب Custom، URL کامل رابط تولید تصویر را وارد کنید. مسیر به‌صورت خودکار افزوده نمی‌شود. نمونه: {0}',
+            validateAvailability: 'اعتبارسنجی دسترس‌پذیری حساب',
+            validateAvailabilityHelper: 'پیش از ذخیره یک پیام حداقلی برای بررسی API ارسال می‌شود',
+            validateImageAvailabilityHelper: 'پیش از ذخیره یک تصویر حداقلی تولید می‌شود و ممکن است هزینه داشته باشد',
         },
         model: {
             model: 'مدل‌ها',
@@ -937,6 +945,7 @@ const message = {
         },
         aiProxy: {
             title: 'دروازه AI',
+            apiReference: 'راهنمای API',
             notInstalled: 'نصب نشده',
             usage: 'استفاده',
             accountPool: 'مجموعه حساب‌ها',
@@ -1058,13 +1067,20 @@ const message = {
             validationModelMapEmpty: 'نام‌های نگاشت مدل نمی‌توانند خالی باشند',
             validationModelMapDuplicate: 'مدل درخواست {0} تکراری است',
             modelGroup: 'گروه مدل',
+            modelCapability: 'قابلیت مدل',
+            textGeneration: 'تولید متن',
+            imageGeneration: 'تولید تصویر',
+            textModels: 'مدل‌های متنی',
+            textToImageModels: 'مدل‌های متن به تصویر',
+            unauthorized: 'بدون مجوز',
+            imageCount: 'تعداد تصاویر',
             availableModels: 'مدل‌های موجود',
             modelGroupModels: 'مدل‌های درخواست',
             modelGroupModelsPlaceholder: 'نام‌های مدل درخواست را انتخاب یا وارد کنید',
             modelGroupModelsHelper:
-                'فقط مدل‌های upstream واقعی را وارد کنید؛ مسیریابی هوشمند مدل‌ها را به‌ترتیب امتحان می‌کند و بین مدل‌ها توازن بار انجام نمی‌دهد.',
+                'نام مدل‌های درخواستی را که کلاینت برای فراخوانی دروازه AI استفاده می‌کند وارد کنید؛ مسیریابی هوشمند مدل‌ها را به‌ترتیب امتحان می‌کند و بین مدل‌ها توازن بار انجام نمی‌دهد.',
             modelGroupGuide:
-                'گروه‌های مدل فقط شامل مدل‌های upstream واقعی هستند. auto نام مدل مجازی است که کلاینت هنگام درخواست به دروازه AI استفاده می‌کند.',
+                'گروه‌های مدل شامل نام مدل‌های درخواستی ارائه‌شده توسط دروازه AI هستند. مدل‌های upstream را در نگاشت مدل استخر حساب‌ها تنظیم کنید. auto نام مدل مجازی است و نباید به گروه مدل اضافه شود.',
             modelGroupModelCount: '{0} مدل',
             contentCompliance: 'انطباق محتوا',
             contentAction: 'اقدام',

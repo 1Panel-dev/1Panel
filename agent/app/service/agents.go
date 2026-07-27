@@ -984,19 +984,28 @@ func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
 		}
 		apiTypes := make([]dto.ProviderAPIInfo, 0, len(def.APIConfigs))
 		for _, item := range def.APIConfigs {
+			apiModels := make([]dto.ProviderModelInfo, 0, len(item.Models))
+			for _, model := range item.Models {
+				apiModels = append(apiModels, dto.ProviderModelInfo{
+					ID:   model.ID,
+					Name: model.Name,
+				})
+			}
 			apiTypes = append(apiTypes, dto.ProviderAPIInfo{
-				APIType:         item.APIType,
-				BaseURL:         item.BaseURL,
-				EditableBaseURL: item.EditableBaseURL,
-				DefaultAuthMode: item.DefaultAuthMode,
-				AuthModes:       item.AuthModes,
+				APIType:                item.APIType,
+				BaseURL:                item.BaseURL,
+				EditableBaseURL:        item.EditableBaseURL,
+				SupportsModelDiscovery: item.DiscoverModels,
+				DefaultAuthMode:        item.DefaultAuthMode,
+				AuthModes:              item.AuthModes,
+				Models:                 apiModels,
 			})
 		}
 		baseURL, _ := providercatalog.DefaultBaseURL(key)
 		providers = append(providers, dto.ProviderInfo{
 			Sort:           def.Sort,
 			Provider:       key,
-			DisplayName:    def.DisplayName,
+			DisplayName:    localizedAgentProviderName(key),
 			BaseURL:        baseURL,
 			DefaultAPIType: def.DefaultAPIType,
 			APITypes:       apiTypes,
@@ -1016,7 +1025,7 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	if err := ensureAgentAccountNameAvailable(provider, req.Name, 0); err != nil {
 		return err
 	}
-	initialModels, err := buildInitialAgentAccountModels(&model.AgentAccount{Provider: provider}, req.Models)
+	initialModels, err := buildInitialAgentAccountModels(&model.AgentAccount{Provider: provider, APIType: req.APIType}, req.Models)
 	if err != nil {
 		return err
 	}
@@ -1024,7 +1033,8 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	if err != nil {
 		return err
 	}
-	resolvedInput, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel)
+	validateAvailability := req.ValidateAvailability == nil || *req.ValidateAvailability
+	resolvedInput, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel, validateAvailability)
 	if err != nil {
 		return err
 	}
@@ -1062,6 +1072,9 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	if err != nil {
 		return err
 	}
+	if req.APIType != account.APIType {
+		return buserr.WithDetail("ErrInvalidParams", "API type cannot be changed", nil)
+	}
 	provider := account.Provider
 	if err := ensureAgentAccountNameAvailable(provider, req.Name, account.ID); err != nil {
 		return err
@@ -1078,7 +1091,8 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	if err != nil {
 		return err
 	}
-	resolvedInput, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel)
+	validateAvailability := req.ValidateAvailability == nil || *req.ValidateAvailability
+	resolvedInput, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel, validateAvailability)
 	if err != nil {
 		return err
 	}
@@ -1110,6 +1124,12 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 	if strings.TrimSpace(req.Provider) != "" {
 		opts = append(opts, repo.WithByProvider(req.Provider))
 	}
+	if apiType := strings.TrimSpace(req.APIType); apiType != "" {
+		opts = append(opts, repo.WithByAPIType(apiType))
+	}
+	if req.TextOnly {
+		opts = append(opts, repo.WithTextAPIType())
+	}
 	if strings.TrimSpace(req.Name) != "" {
 		opts = append(opts, repo.WithByLikeName(req.Name))
 	}
@@ -1127,7 +1147,7 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 			ID:              item.ID,
 			MasterAccountID: item.MasterAccountID,
 			Provider:        item.Provider,
-			ProviderName:    providercatalog.DisplayName(item.Provider),
+			ProviderName:    localizedAgentProviderName(item.Provider),
 			Name:            item.Name,
 			APIKey:          apiKey,
 			RememberAPIKey:  item.RememberAPIKey,
@@ -1166,7 +1186,7 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 }
 
 func (a AgentService) CountAccountsByProviders(req dto.AgentAccountProviderCountReq) (map[string]int64, error) {
-	return agentAccountRepo.CountByProviders(req.Providers)
+	return agentAccountRepo.CountTextByProviders(req.Providers)
 }
 
 func (a AgentService) GetAccountModels(req dto.AgentAccountModelReq) ([]dto.AgentAccountModel, error) {
@@ -1178,7 +1198,8 @@ func (a AgentService) GetAccountModels(req dto.AgentAccountModelReq) ([]dto.Agen
 }
 
 func (a AgentService) DiscoverAccountModels(req dto.AgentAccountModelDiscoverReq) ([]dto.AgentAccountModel, error) {
-	if req.APIType != "openai-completions" && req.APIType != "openai-responses" {
+	config, ok := providercatalog.FindAPIConfig(req.Provider, req.APIType)
+	if !ok || !config.DiscoverModels {
 		return nil, buserr.New("ErrAgentAccountModelsRequired")
 	}
 	baseURL, err := providercatalog.ResolveBaseURL(req.Provider, req.APIType, req.BaseURL)
@@ -1320,7 +1341,7 @@ func (a AgentService) SyncAgentsByAccount(account *model.AgentAccount) error {
 }
 
 func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
-	_, err := resolveAgentAccountInput(req.Provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, req.Model)
+	_, err := resolveAgentAccountInput(req.Provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, req.Model, true)
 	return err
 }
 

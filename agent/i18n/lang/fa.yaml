@@ -649,3 +649,7 @@ ErrAIProxyModelMapEmpty: 'نگاشت مدل نمی‌تواند خالی باش�
 ErrAIProxyModelMapEmptyExternalModel: 'نگاشت مدل شامل یک مدل درخواست خالی است'
 ErrAIProxyModelMapEmptyUpstreamModel: 'مدل بالادست برای {{ .model }} نمی‌تواند خالی باشد'
 AIProxyUserFallback: 'کاربر حذف شده (شناسه: {{ .id }})'
+AIProviderBailian: 'Alibaba Cloud Model Studio'
+AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
+AIProviderArk: 'Volcengine Ark'
+AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'

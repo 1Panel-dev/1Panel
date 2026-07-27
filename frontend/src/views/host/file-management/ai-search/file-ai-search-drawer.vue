@@ -657,7 +657,7 @@ const loadFileAiManageSettings = async () => {
 };
 
 const loadFileAiAgentAccounts = async () => {
-    const res = await pageAgentAccounts({ page: 1, pageSize: 1000, provider: '', name: '' });
+    const res = await pageAgentAccounts({ page: 1, pageSize: 1000, provider: '', textOnly: true, name: '' });
     fileAiAgentAccountOptions.value = res.data?.items || [];
 };
 

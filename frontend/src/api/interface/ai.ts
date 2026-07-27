@@ -556,8 +556,10 @@ export namespace AI {
         apiType: string;
         baseUrl: string;
         editableBaseUrl: boolean;
+        supportsModelDiscovery: boolean;
         defaultAuthMode: string;
         authModes: string[];
+        models: ProviderModelInfo[];
     }
 
     export interface ProviderInfo {
@@ -579,6 +581,7 @@ export namespace AI {
         authMode: string;
         models?: AgentAccountModel[];
         verifyModel: string;
+        validateAvailability: boolean;
         remark: string;
     }
 
@@ -591,6 +594,7 @@ export namespace AI {
         apiType: string;
         authMode: string;
         verifyModel: string;
+        validateAvailability: boolean;
         remark: string;
         syncAgents: boolean;
     }
@@ -599,6 +603,8 @@ export namespace AI {
         page: number;
         pageSize: number;
         provider: string;
+        apiType?: string;
+        textOnly?: boolean;
         name: string;
     }
 

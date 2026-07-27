@@ -198,6 +198,23 @@ SubTask: "Tugas Sub"
 Skip: "Abaikan ralat dan teruskan..."
 Success: "Berjaya"
 
+# tugas penghalaan pintar get laluan AI
+AIProxySmartRouteCreateTask: "Cipta sampel penghalaan pintar get laluan AI"
+AIProxySmartRouteCreateSubTask: "Cipta sampel dan jana vektor"
+AIProxySmartRouteCreateStart: "Memulakan penciptaan sampel, jumlah {{ .total }}"
+AIProxySmartRouteCreateFailed: "[{{ .current }}/{{ .total }}] Penciptaan gagal: type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteCreateSuccess: "[{{ .current }}/{{ .total }}] Berjaya dicipta: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteCreateComplete: "Penciptaan selesai: {{ .success }} berjaya, {{ .failed }} gagal"
+AIProxySmartRouteCreateError: "Penciptaan sampel gagal: {{ .failed }} gagal, ralat terakhir"
+AIProxySmartRouteRebuildTask: "Bina semula vektor sampel penghalaan pintar get laluan AI"
+AIProxySmartRouteRebuildSubTask: "Bina semula vektor sampel"
+AIProxySmartRouteEmbeddingRequired: "Endpoint dan model Embedding diperlukan"
+AIProxySmartRouteRebuildStart: "Memulakan pembinaan semula vektor sampel, jumlah {{ .total }}"
+AIProxySmartRouteRebuildFailed: "[{{ .current }}/{{ .total }}] Pembinaan semula gagal: sampleID={{ .id }} type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteRebuildSuccess: "[{{ .current }}/{{ .total }}] Berjaya dibina semula: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteRebuildComplete: "Pembinaan semula selesai: {{ .success }} berjaya, {{ .failed }} gagal"
+AIProxySmartRouteRebuildError: "Pembinaan semula vektor sampel gagal: {{ .failed }} gagal, ralat terakhir"
+
 # tugas kelompok ejen
 BatchInstallAgent: "Pasang ejen secara pukal"
 DispatchAgentInstallTasks: "Hantar tugas pemasangan ejen"

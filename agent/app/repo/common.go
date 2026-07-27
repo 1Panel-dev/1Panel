@@ -94,6 +94,18 @@ func WithByProvider(provider string) DBOption {
 	}
 }
 
+func WithByAPIType(apiType string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("api_type = ?", apiType)
+	}
+}
+
+func WithTextAPIType() DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("api_type NOT LIKE ?", "%-images")
+	}
+}
+
 func WithByModel(model string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		if len(model) == 0 {
