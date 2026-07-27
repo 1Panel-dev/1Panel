@@ -1112,7 +1112,7 @@ const search = async () => {
                 form.retryTimes = res.data.retryTimes;
 
                 form.timeout = res.data.timeout || 3600;
-                let item = splitTimeFromSecond(form.timeout);
+                const item = splitTimeFromSecond(form.timeout);
                 form.timeoutItem = item.timeItem;
                 form.timeoutUnit = item.timeUnit;
 

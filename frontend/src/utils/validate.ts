@@ -153,9 +153,13 @@ export function transTimeUnit(val: string): any {
 }
 
 export function splitTimeFromSecond(item: number): any {
-    if (item < 60) return { timeItem: item, timeUnit: 's' };
-    if (item < 3600) return { timeItem: item / 60, timeUnit: 'm' };
-    return { timeItem: item / 3600, timeUnit: 'h' };
+    if (item >= 3600 && item % 3600 === 0) {
+        return { timeItem: item / 3600, timeUnit: 'h' };
+    }
+    if (item >= 60 && item % 60 === 0) {
+        return { timeItem: item / 60, timeUnit: 'm' };
+    }
+    return { timeItem: item, timeUnit: 's' };
 }
 
 export function splitHttp(url: string) {
