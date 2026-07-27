@@ -18,7 +18,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	fireClient "github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client/iptables"
-	"github.com/1Panel-dev/1Panel/agent/utils/toolbox"
 	"github.com/jinzhu/copier"
 )
 
@@ -167,9 +166,11 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 	if err != nil {
 		return err
 	}
-	var bannedIPs []string
-	if req.Operation == "start" || req.Operation == "restart" {
-		bannedIPs = loadFail2BanBannedIPs()
+	fail2BanState := newFirewallFail2BanState()
+	if client.Name() == "firewalld" && req.Operation == "stop" {
+		if err := fail2BanState.rememberBeforeFirewallStop(); err != nil {
+			return err
+		}
 	}
 	needRestartDocker := false
 	switch req.Operation {
@@ -215,34 +216,12 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 			return fmt.Errorf("failed to restart Docker: %v", err)
 		}
 	}
-	if len(bannedIPs) != 0 {
-		fail2Ban, err := toolbox.NewFail2Ban()
-		if err != nil {
-			return fmt.Errorf("load Fail2Ban failed: %v", err)
-		}
-		if err := fail2Ban.ReBanIPs(bannedIPs); err != nil {
-			return fmt.Errorf("restore Fail2Ban banned IPs failed: %v", err)
+	if client.Name() == "firewalld" && req.Operation == "start" {
+		if err := fail2BanState.restoreAfterFirewallStart(); err != nil {
+			return err
 		}
 	}
 	return nil
-}
-
-func loadFail2BanBannedIPs() []string {
-	fail2Ban, err := toolbox.NewFail2Ban()
-	if err != nil {
-		global.LOG.Errorf("load Fail2Ban failed, err: %v", err)
-		return nil
-	}
-	_, isActive, isExist := fail2Ban.Status()
-	if !isExist || !isActive {
-		return nil
-	}
-	bannedIPs, err := fail2Ban.ListBanned()
-	if err != nil {
-		global.LOG.Errorf("load Fail2Ban banned IPs failed, err: %v", err)
-		return nil
-	}
-	return bannedIPs
 }
 
 func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) error {
