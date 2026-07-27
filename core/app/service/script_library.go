@@ -191,8 +191,35 @@ func StartSync() {
 		global.ScriptSyncJobID = id
 	}
 }
+
+func SyncScriptLibraryOnStartup() {
+	if global.CONF.Base.IsOffline {
+		return
+	}
+	scriptSync, err := repo.NewISettingRepo().GetValueByKey("ScriptSync")
+	if err != nil {
+		global.LOG.Errorf("load script library sync setting failed, err: %v", err)
+		return
+	}
+	if scriptSync != constant.StatusEnable {
+		return
+	}
+	go NewIScriptService().Run()
+}
+
 func (u *ScriptService) Run() {
-	if err := u.Sync(dto.OperateByTaskID{}); err != nil {
+	if global.CONF.Base.IsOffline {
+		return
+	}
+	versionRes, isLatest, err := loadRemoteScriptVersion()
+	if err != nil {
+		global.LOG.Errorf("sync scripts from remote failed, err: %v", err)
+		return
+	}
+	if isLatest {
+		return
+	}
+	if err := u.sync(dto.OperateByTaskID{}, versionRes); err != nil {
 		global.LOG.Errorf("sync scripts from remote failed, err: %v", err)
 	}
 }
@@ -205,6 +232,10 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 	if global.CONF.Base.IsOffline {
 		return nil
 	}
+	return u.sync(req, nil)
+}
+
+func (u *ScriptService) sync(req dto.OperateByTaskID, versionRes []byte) error {
 	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("RemoteScriptLibrary"), task.TaskSync, task.TaskScopeScript, req.TaskID, 0)
 	if err != nil {
 		global.LOG.Errorf("create sync task failed %v", err)
@@ -212,19 +243,16 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 	}
 
 	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("RemoteScriptLibrary"), task.TaskSync, task.TaskScopeScript), func(t *task.Task) (err error) {
-		versionUrl := fmt.Sprintf("%s/scripts/version.txt", global.ResourceURL())
-		_, versionRes, err := req_helper.HandleRequestWithProxy(versionUrl, http.MethodGet, constant.TimeOut20s)
-		if err != nil {
-			return fmt.Errorf("load scripts version from remote failed, err: %v", err)
-		}
-		var scriptSetting model.Setting
-		_ = global.DB.Where("key = ?", "ScriptVersion").First(&scriptSetting).Error
-		localVersion := strings.ReplaceAll(string(versionRes), "\n", "")
-		remoteVersion := strings.ReplaceAll(scriptSetting.Value, "\n", "")
-
-		if localVersion == remoteVersion {
-			syncTask.Log(i18n.GetMsgByKey("ScriptSyncSkip"))
-			return nil
+		if versionRes == nil {
+			var isLatest bool
+			versionRes, isLatest, err = loadRemoteScriptVersion()
+			if err != nil {
+				return err
+			}
+			if isLatest {
+				syncTask.Log(i18n.GetMsgByKey("ScriptSyncSkip"))
+				return nil
+			}
 		}
 
 		dataUrl := fmt.Sprintf("%s/scripts/data.yaml", global.ResourceURL())
@@ -273,7 +301,7 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 			return fmt.Errorf("sync script with db failed, err: %v", err)
 		}
 		_ = os.RemoveAll(tmpDir)
-		if err := global.DB.Model(&model.Setting{}).Where("key = ?", "ScriptVersion").Updates(map[string]interface{}{"value": string(versionRes)}).Error; err != nil {
+		if err := settingRepo.Update("ScriptVersion", string(versionRes)); err != nil {
 			return fmt.Errorf("update script version in db failed, err: %v", err)
 		}
 		if err := xpack.MultiNodeProvider.Sync(constant.SyncScripts); err != nil {
@@ -286,6 +314,20 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 		return fmt.Errorf("sync scripts from remote failed, err: %v", err)
 	}
 	return nil
+}
+
+func loadRemoteScriptVersion() ([]byte, bool, error) {
+	versionURL := fmt.Sprintf("%s/scripts/version.txt", global.ResourceURL())
+	_, remoteVersion, err := req_helper.HandleRequestWithProxy(versionURL, http.MethodGet, constant.TimeOut20s)
+	if err != nil {
+		return nil, false, fmt.Errorf("load scripts version from remote failed, err: %v", err)
+	}
+	localVersion, err := settingRepo.GetValueByKey("ScriptVersion")
+	if err != nil {
+		return nil, false, fmt.Errorf("load local scripts version failed, err: %v", err)
+	}
+	isLatest := strings.TrimSpace(localVersion) == strings.TrimSpace(string(remoteVersion))
+	return remoteVersion, isLatest, nil
 }
 
 type Scripts struct {
