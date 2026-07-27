@@ -12,6 +12,7 @@ MonitorLogExport: 'Web sitesi izleme günlüğü dışa aktarma'
 LogExportNoData: 'Seçilen filtrelerle eşleşen günlük yok'
 LogExportDiskSpace: 'Kullanılabilir alan 1 GiB altında; dışa aktarma durduruldu'
 LogExportRetentionInvalid: 'Dışa aktarma kayıtları 1 ile 30 gün arasında saklanmalıdır'
+ErrSystemLogKeywordFilterUnsupported: 'Mevcut sistem sürümü sistem günlüklerinde anahtar kelime filtrelemeyi desteklemiyor (systemd 237 veya üzeri gerekir)'
 ErrStructTransform: 'Dönüşüm hatası: {{ .err }}'
 ErrNotSupportType: 'Bu tür desteklenmiyor: {{ .name }}'
 

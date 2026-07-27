@@ -12,6 +12,7 @@ MonitorLogExport: '웹사이트 모니터링 로그 내보내기'
 LogExportNoData: '선택한 조건과 일치하는 로그가 없습니다'
 LogExportDiskSpace: '사용 가능한 공간이 1 GiB 미만이어서 내보내기를 중지했습니다'
 LogExportRetentionInvalid: '내보내기 기록 보관 기간은 1일에서 30일 사이여야 합니다'
+ErrSystemLogKeywordFilterUnsupported: '현재 시스템 버전은 시스템 로그 키워드 필터링을 지원하지 않습니다(systemd 237 이상 필요)'
 ErrStructTransform: '형 변환 실패: {{ .err }}'
 ErrNotSupportType: '지원하지 않는 타입: {{ .name }}'
 

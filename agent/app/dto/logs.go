@@ -34,6 +34,13 @@ type SystemLogRes struct {
 	NextCursor string          `json:"nextCursor"`
 }
 
+type SystemLogStatus struct {
+	Source                 string `json:"source"`
+	Version                string `json:"version"`
+	KeywordFilterSupported bool   `json:"keywordFilterSupported"`
+	Message                string `json:"message"`
+}
+
 type SystemLogItem struct {
 	Timestamp int64  `json:"-"`
 	Cursor    string `json:"-"`

@@ -12,6 +12,7 @@ MonitorLogExport: 'خروجی لاگ پایش وب‌سایت'
 LogExportNoData: 'هیچ لاگی با فیلترهای انتخاب‌شده مطابقت ندارد'
 LogExportDiskSpace: 'فضای آزاد کمتر از ۱ گیگابایت است؛ خروجی متوقف شد'
 LogExportRetentionInvalid: 'مدت نگهداری سوابق خروجی باید بین ۱ تا ۳۰ روز باشد'
+ErrSystemLogKeywordFilterUnsupported: 'نسخه فعلی سیستم از فیلتر کلیدواژه در گزارش‌های سیستم پشتیبانی نمی‌کند (به systemd 237 یا جدیدتر نیاز است)'
 ErrStructTransform: 'تبدیل نوع ناموفق بود: {{ .err }}'
 ErrNotSupportType: 'نوع پشتیبانی نمی‌شود: {{ .name }}'
 

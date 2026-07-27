@@ -12,6 +12,7 @@ MonitorLogExport: 'Eksport log pemantauan laman web'
 LogExportNoData: 'Tiada log yang sepadan dengan penapis dipilih'
 LogExportDiskSpace: 'Ruang tersedia kurang daripada 1 GiB; eksport dihentikan'
 LogExportRetentionInvalid: 'Tempoh simpanan rekod eksport mestilah antara 1 hingga 30 hari'
+ErrSystemLogKeywordFilterUnsupported: 'Versi sistem semasa tidak menyokong penapisan kata kunci log sistem (memerlukan systemd 237 atau lebih baharu)'
 ErrStructTransform: 'Ralat penukaran: {{ .err }}'
 ErrNotSupportType: 'Jenis tidak disokong: {{ .name }}'
 
