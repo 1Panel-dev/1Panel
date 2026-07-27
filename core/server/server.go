@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/init/auth"
 	"github.com/1Panel-dev/1Panel/core/init/db"
 	"github.com/1Panel-dev/1Panel/core/init/geo"
@@ -49,6 +50,7 @@ func Start() {
 	InitOthersBeforeHook()
 	hook.Init()
 	InitOthersAfterHook()
+	service.SyncScriptLibraryOnStartup()
 
 	proxy.Init()
 
