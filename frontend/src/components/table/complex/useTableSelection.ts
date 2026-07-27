@@ -21,7 +21,6 @@ export const useTableSelection = (
         const selection = window.getSelection?.();
         return !!selection && !selection.isCollapsed && selection.toString().trim().length > 0;
     };
-    const isShiftSelecting = () => shiftPressed.value || !!(window.event as MouseEvent | undefined)?.shiftKey;
     const setSelectedRows = (rows: any[]) => {
         selectedRows.value = rows;
         onSelectionChange(rows);
@@ -84,7 +83,7 @@ export const useTableSelection = (
         }
     };
     const handleSelect = (selection: any[], row: any) => {
-        if (isShiftSelecting() && applyRangeSelection(row)) {
+        if (shiftPressed.value && applyRangeSelection(row)) {
             skipNextSelectionChange = true;
             clearTextSelection();
             return;
