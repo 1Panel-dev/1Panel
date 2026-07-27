@@ -12,6 +12,7 @@ MonitorLogExport: '網站監控日誌匯出'
 LogExportNoData: '沒有符合條件的日誌'
 LogExportDiskSpace: '可用磁碟空間不足 1 GiB，匯出任務已停止'
 LogExportRetentionInvalid: '匯出記錄保留天數必須介於 1 到 30 天之間'
+ErrSystemLogKeywordFilterUnsupported: '目前系統版本不支援系統日誌關鍵字篩選（需要 systemd 237 或更高版本）'
 ErrStructTransform: '型別轉換失敗: {{ .err }}'
 ErrNotSupportType: '系統暫不支援目前類型: {{ .name }}'
 

@@ -13,7 +13,9 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
@@ -40,6 +42,7 @@ type systemLogCursor struct {
 
 type ILogService interface {
 	ListSystemLogFile() ([]string, error)
+	GetSystemLogStatus() (dto.SystemLogStatus, error)
 	ReadSystemLog(req dto.SystemLogReq) (dto.SystemLogRes, error)
 	ListRunningServices() ([]string, error)
 }
@@ -74,6 +77,9 @@ func (u *LogService) ReadSystemLog(req dto.SystemLogReq) (dto.SystemLogRes, erro
 	output, err := exec.CommandContext(ctx, journalctl, queryArgs...).CombinedOutput()
 	cancel()
 	if err != nil {
+		if journalctlGrepUnsupported(req.Keyword, string(output)) {
+			return dto.SystemLogRes{}, buserr.New("ErrSystemLogKeywordFilterUnsupported")
+		}
 		return dto.SystemLogRes{}, fmt.Errorf("read host system logs failed: %s", strings.TrimSpace(string(output)))
 	}
 	content := strings.TrimSpace(string(output))
@@ -90,6 +96,62 @@ func (u *LogService) ReadSystemLog(req dto.SystemLogReq) (dto.SystemLogRes, erro
 	return buildSystemLogResponse("journalctl", items, pageSize, cursor)
 }
 
+func (u *LogService) GetSystemLogStatus() (dto.SystemLogStatus, error) {
+	journalctl, err := exec.LookPath("journalctl")
+	if err != nil {
+		return dto.SystemLogStatus{
+			Source:                 "file",
+			KeywordFilterSupported: true,
+		}, nil
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	versionOutput, err := exec.CommandContext(ctx, journalctl, "--version").CombinedOutput()
+	cancel()
+	if err != nil {
+		return dto.SystemLogStatus{}, fmt.Errorf("read journalctl version failed: %s", strings.TrimSpace(string(versionOutput)))
+	}
+
+	ctx, cancel = context.WithTimeout(context.Background(), 3*time.Second)
+	helpOutput, err := exec.CommandContext(ctx, journalctl, "--help").CombinedOutput()
+	cancel()
+	if err != nil {
+		return dto.SystemLogStatus{}, fmt.Errorf("read journalctl capabilities failed: %s", strings.TrimSpace(string(helpOutput)))
+	}
+	supported := journalctlHelpSupportsGrep(string(helpOutput))
+	status := dto.SystemLogStatus{
+		Source:                 "journalctl",
+		Version:                firstOutputLine(string(versionOutput)),
+		KeywordFilterSupported: supported,
+	}
+	if !supported {
+		status.Message = i18n.Get("ErrSystemLogKeywordFilterUnsupported")
+	}
+	return status, nil
+}
+
+func journalctlHelpSupportsGrep(help string) bool {
+	return strings.Contains(help, "--grep=")
+}
+
+func journalctlGrepUnsupported(keyword, output string) bool {
+	if strings.TrimSpace(keyword) == "" {
+		return false
+	}
+	output = strings.ToLower(output)
+	return strings.Contains(output, "grep") &&
+		(strings.Contains(output, "unrecognized option") || strings.Contains(output, "unknown option"))
+}
+
+func firstOutputLine(output string) string {
+	for _, line := range strings.Split(output, "\n") {
+		if line = strings.TrimSpace(line); line != "" {
+			return line
+		}
+	}
+	return ""
+}
+
 func buildJournalQueryArgs(req dto.SystemLogReq, startTime, endTime time.Time, pageSize int, cursor *systemLogCursor) []string {
 	args := []string{
 		"--no-pager", "--reverse", "--output=json",
@@ -104,7 +166,7 @@ func buildJournalQueryArgs(req dto.SystemLogReq, startTime, endTime time.Time, p
 		args = append(args, "-u", service)
 	}
 	if priority := strings.TrimSpace(req.Priority); priority != "" {
-		args = append(args, "--priority", priority)
+		args = append(args, "--priority", priority+".."+priority)
 	}
 	if keyword := strings.TrimSpace(req.Keyword); keyword != "" {
 		args = append(args, "--grep", keyword)

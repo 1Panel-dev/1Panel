@@ -12,6 +12,7 @@ MonitorLogExport: 'Exportação de logs de monitoramento de sites'
 LogExportNoData: 'Nenhum log corresponde aos filtros selecionados'
 LogExportDiskSpace: 'Há menos de 1 GiB disponível; a exportação foi interrompida'
 LogExportRetentionInvalid: 'A retenção dos registros de exportação deve ser de 1 a 30 dias'
+ErrSystemLogKeywordFilterUnsupported: 'A versão atual do sistema não oferece suporte à filtragem de logs do sistema por palavra-chave (requer systemd 237 ou posterior)'
 ErrStructTransform: 'Erro de conversão: {{ .err }}'
 ErrNotSupportType: 'Tipo não suportado: {{ .name }}'
 

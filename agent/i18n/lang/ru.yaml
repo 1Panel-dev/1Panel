@@ -12,6 +12,7 @@ MonitorLogExport: 'Экспорт журналов мониторинга веб
 LogExportNoData: 'Нет журналов, соответствующих выбранным фильтрам'
 LogExportDiskSpace: 'Доступно менее 1 GiB; экспорт остановлен'
 LogExportRetentionInvalid: 'Срок хранения истории экспорта должен быть от 1 до 30 дней'
+ErrSystemLogKeywordFilterUnsupported: 'Текущая версия системы не поддерживает фильтрацию системных журналов по ключевым словам (требуется systemd 237 или новее)'
 ErrStructTransform: 'Ошибка преобразования: {{ .err }}'
 ErrNotSupportType: 'Тип не поддерживается: {{ .name }}'
 

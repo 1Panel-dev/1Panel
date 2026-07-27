@@ -20388,6 +20388,33 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/logs/system/status": {
+			"get": {
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.SystemLogStatus"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get host system log status",
+				"tags": [
+					"Logs"
+				]
+			}
+		},
 		"/logs/tasks/executing/count": {
 			"get": {
 				"responses": {
@@ -38941,6 +38968,23 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"source": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.SystemLogStatus": {
+			"properties": {
+				"keywordFilterSupported": {
+					"type": "boolean"
+				},
+				"message": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				},
+				"version": {
 					"type": "string"
 				}
 			},

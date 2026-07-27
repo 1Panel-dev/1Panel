@@ -17,6 +17,7 @@ MonitorLogExport: 'ສົ່ງອອກລັອກການຕິດຕາມ�
 LogExportNoData: 'ບໍ່ມີລັອກທີ່ກົງກັບເງື່ອນໄຂການກັ່ນຕອງ'
 LogExportDiskSpace: 'ພື້ນທີ່ດິສກ໌ທີ່ໃຊ້ໄດ້ໜ້ອຍກວ່າ 1 GiB; ການສົ່ງອອກຖືກຢຸດແລ້ວ'
 LogExportRetentionInvalid: 'ໄລຍະເກັບບັນທຶກການສົ່ງອອກຕ້ອງຢູ່ລະຫວ່າງ 1 ຫາ 30 ມື້'
+ErrSystemLogKeywordFilterUnsupported: 'ເວີຊັນລະບົບປັດຈຸບັນບໍ່ຮອງຮັບການກັ່ນຕອງຄຳສຳຄັນຂອງບັນທຶກລະບົບ (ຕ້ອງການ systemd 237 ຫຼືໃໝ່ກວ່າ)'
 ErrStructTransform: 'ການແປງປະເພດຂໍ້ມູນລົ້ມເຫຼວ: {{ .err }}'
 ErrNotLogin: 'ຍັງບໍ່ໄດ້ເຂົ້າສູ່ລະບົບ: {{ .detail }}'
 ErrPasswordExpired: 'ລະຫັດຜ່ານໝົດອາຍຸ: {{ .detail }}'

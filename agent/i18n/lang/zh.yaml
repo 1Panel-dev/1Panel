@@ -12,6 +12,7 @@ MonitorLogExport: "网站监控日志导出"
 LogExportNoData: "没有符合条件的日志"
 LogExportDiskSpace: "可用磁盘空间不足 1 GiB，导出任务已停止"
 LogExportRetentionInvalid: "导出记录保留天数必须在 1 到 30 天之间"
+ErrSystemLogKeywordFilterUnsupported: "当前系统版本不支持系统日志关键词过滤（需要 systemd 237 或更高版本）"
 ErrStructTransform: "类型转换失败: {{ .err }}"
 ErrNotSupportType: "不支持当前类型: {{ .name }}"
 

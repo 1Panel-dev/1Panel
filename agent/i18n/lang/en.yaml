@@ -12,6 +12,7 @@ MonitorLogExport: 'Website monitoring log export'
 LogExportNoData: 'No logs match the selected filters'
 LogExportDiskSpace: 'Less than 1 GiB of disk space is available; the export was stopped'
 LogExportRetentionInvalid: 'Export record retention must be between 1 and 30 days'
+ErrSystemLogKeywordFilterUnsupported: 'The current system version does not support system log keyword filtering (requires systemd 237 or later)'
 ErrStructTransform: 'Type conversion failed: {{ .err }}'
 ErrNotSupportType: 'Unsupported type: {{ .name }}'
 

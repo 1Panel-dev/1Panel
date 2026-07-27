@@ -1,7 +1,33 @@
 <template>
+    <div v-if="systemLogStatus" class="app-status card-interval">
+        <el-card>
+            <div class="flex w-full flex-col gap-4 md:flex-row">
+                <div class="flex flex-wrap gap-4 ml-3">
+                    <el-tag effect="dark" type="success">{{ systemLogStatus.source }}</el-tag>
+                    <el-tag v-if="systemLogStatus.version">
+                        {{ $t('app.version') }}: {{ systemLogStatus.version }}
+                    </el-tag>
+                </div>
+            </div>
+        </el-card>
+    </div>
     <LayoutContent v-loading="loading" :title="$t('logs.hostSystem')">
+        <template #prompt>
+            <el-alert
+                v-if="systemLogStatus && !systemLogStatus.keywordFilterSupported"
+                type="info"
+                :title="systemLogStatus.message"
+                :closable="false"
+            />
+        </template>
         <template #rightToolBar>
-            <el-input v-model="keyword" class="p-w-200" clearable :placeholder="$t('logs.filter')" />
+            <el-input
+                v-model="keyword"
+                class="p-w-200"
+                clearable
+                :disabled="systemLogStatusLoading || !systemLogStatus?.keywordFilterSupported"
+                :placeholder="$t('logs.filter')"
+            />
             <el-date-picker
                 v-model="timeRange"
                 class="p-w-360"
@@ -75,7 +101,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { Log } from '@/api/interface/log';
-import { listRunningServices, readSystemLogs } from '@/api/modules/log';
+import { getSystemLogStatus, listRunningServices, readSystemLogs } from '@/api/modules/log';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 import { shortcuts } from '@/utils/shortcuts';
@@ -88,6 +114,8 @@ const keyword = ref('');
 const priority = ref('');
 const service = ref('');
 const services = ref<string[]>([]);
+const systemLogStatus = ref<Log.SystemLogStatus>();
+const systemLogStatusLoading = ref(true);
 const detailOpen = ref(false);
 const selectedLog = ref<Log.SystemLogItem>();
 const timeRange = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
@@ -175,6 +203,17 @@ const loadServices = async () => {
     }
 };
 
+const loadSystemLogStatus = async () => {
+    try {
+        const res = await getSystemLogStatus(currentNode.value);
+        systemLogStatus.value = res.data;
+    } catch {
+        systemLogStatus.value = undefined;
+    } finally {
+        systemLogStatusLoading.value = false;
+    }
+};
+
 const scheduleWatch = () => {
     timer = setTimeout(async () => {
         if (!watching.value) return;
@@ -219,11 +258,12 @@ const priorityType = (value: string) => {
     return 'info';
 };
 
-onMounted(() => {
+onMounted(async () => {
     const cachedPageSize = Number(localStorage.getItem(paginationConfig.cacheSizeKey));
     if (pageSizes.includes(cachedPageSize)) {
         paginationConfig.pageSize = cachedPageSize;
     }
+    await loadSystemLogStatus();
     resetAndLoadLogs();
     loadServices();
 });

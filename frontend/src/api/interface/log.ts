@@ -50,6 +50,13 @@ export namespace Log {
         nextCursor: string;
     }
 
+    export interface SystemLogStatus {
+        source: 'journalctl' | 'file';
+        version: string;
+        keywordFilterSupported: boolean;
+        message: string;
+    }
+
     export interface SystemLogSearch {
         pageSize: number;
         cursor?: string;

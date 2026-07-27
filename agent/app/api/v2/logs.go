@@ -23,6 +23,22 @@ func (b *BaseApi) GetSystemFiles(c *gin.Context) {
 }
 
 // @Tags Logs
+// @Summary Get host system log status
+// @Produce json
+// @Success 200 {object} dto.SystemLogStatus
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /logs/system/status [get]
+func (b *BaseApi) GetSystemLogStatus(c *gin.Context) {
+	data, err := logService.GetSystemLogStatus()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Logs
 // @Summary Read host logs
 // @Accept json
 // @Param request body dto.SystemLogReq true "request"
