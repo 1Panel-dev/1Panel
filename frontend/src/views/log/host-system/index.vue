@@ -66,7 +66,9 @@
                         </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="service" :label="$t('logs.service')" width="220" show-overflow-tooltip />
+                <el-table-column prop="service" :label="$t('logs.service')" width="220" show-overflow-tooltip>
+                    <template #default="{ row }">{{ row.service || '-' }}</template>
+                </el-table-column>
                 <el-table-column prop="message" :label="$t('logs.message')" min-width="360" show-overflow-tooltip />
                 <template #pagination>
                     <div class="flex items-center gap-2">
