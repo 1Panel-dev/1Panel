@@ -1,4 +1,4 @@
-import { ref, type Ref } from 'vue';
+import { shallowRef, ref, type Ref } from 'vue';
 
 type TableRef = { refElTable?: any } | undefined;
 
@@ -8,11 +8,12 @@ export const useTableSelection = (
     onSelectionChange: (rows: any[]) => void,
     isRowSelectable: (row: any) => boolean = () => true,
 ) => {
-    const selectedRows = ref<any[]>([]);
+    const selectedRows = shallowRef<any[]>([]);
     const shiftPressed = ref(false);
-    const lastSelectedRow = ref<any | null>(null);
-    const rangeBaseRows = ref<any[]>([]);
+    const lastSelectedRow = shallowRef<any | null>(null);
+    const rangeBaseRows = shallowRef<any[]>([]);
     let isSyncingTableSelection = false;
+    let skipNextSelectionChange = false;
 
     const getTable = () => tableRef.value?.refElTable;
     const clearTextSelection = () => window.getSelection?.()?.removeAllRanges();
@@ -70,6 +71,11 @@ export const useTableSelection = (
         if (isSyncingTableSelection) {
             return;
         }
+        if (skipNextSelectionChange) {
+            skipNextSelectionChange = false;
+            syncTableSelection();
+            return;
+        }
         setSelectedRows(rows);
         if (rows.length === 0) {
             lastSelectedRow.value = null;
@@ -78,6 +84,7 @@ export const useTableSelection = (
     };
     const handleSelect = (selection: any[], row: any) => {
         if (shiftPressed.value && applyRangeSelection(row)) {
+            skipNextSelectionChange = true;
             clearTextSelection();
             return;
         }
