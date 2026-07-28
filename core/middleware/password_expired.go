@@ -76,7 +76,7 @@ func PasswordExpired() gin.HandlerFunc {
 		}
 		shouldCheck, err := xpack.AuthProvider.ShouldCheckPasswordExpiration(c)
 		if err != nil {
-			helper.BadAuth(c, "ErrNotLogin", err)
+			helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPasswordExpired", err)
 			return
 		}
 		if !shouldCheck {

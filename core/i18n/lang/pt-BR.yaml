@@ -422,8 +422,8 @@ ErrInvalidToken: 'Token inválido, por favor, reinicie e escaneie novamente.'
 ErrExpiredToken: 'O token expirou, por favor, reinicie e escaneie novamente.'
 
 # exportação de comandos
-Name: "Название"
-Command: "Команда"
+Name: "Nome"
+Command: "Comando"
 
 # LDAP
 ErrLDAPConnectionTest: "Falha no teste de conexão LDAP. Verifique o endereço do servidor, a conta de vinculação e as configurações de rede."

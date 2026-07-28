@@ -407,7 +407,6 @@ import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 
 const props = defineProps<{ currentUser?: Login.AuthInfo }>();
 const emit = defineEmits<{ (e: 'search'): void }>();
-type AuthInfoWithSource = Login.AuthInfo & { authSource?: string };
 
 const complexityVerification = ref(false);
 const { globalStore, docsUrl, entrance, isFxplay } = useGlobalStore();
@@ -458,9 +457,7 @@ const mfaForm = reactive({
 const passkeyForm = reactive({
     name: '',
 });
-const isLDAPUser = computed(
-    () => ((props.currentUser as AuthInfoWithSource | undefined)?.authSource || '').toLowerCase() === 'ldap',
-);
+const isLDAPUser = computed(() => (props.currentUser?.authSource || '').toLowerCase() === 'ldap');
 
 const passkeyPrereqBindDomain = computed(() => hasBindDomain.value);
 const passkeyPrereqHttps = computed(() => window.isSecureContext);
