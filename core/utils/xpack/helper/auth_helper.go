@@ -76,6 +76,9 @@ func (a *authHelper) UpdateApiConfig(c *gin.Context, req baseDto.ApiInterfaceCon
 func (a *authHelper) GetCurrentUserInfo(_ *gin.Context) (*baseDto.CurrentUserInfo, error) {
 	return auth.GetCurrentUserInfo()
 }
+func (a *authHelper) ShouldCheckPasswordExpiration(_ *gin.Context) (bool, error) {
+	return true, nil
+}
 func (a *authHelper) LoadPasswordExpirationTime(c *gin.Context) (string, error) {
 	return auth.LoadPasswordExpirationTime(c)
 }

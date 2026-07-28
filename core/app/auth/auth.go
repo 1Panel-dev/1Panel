@@ -167,11 +167,7 @@ func CheckEntrance(entrance string) error {
 }
 
 func CheckPassword(priKey, password, passwordFromDB string) error {
-	privateKey, err := encrypt.ParseRSAPrivateKey(priKey)
-	if err != nil {
-		return err
-	}
-	loginPassword, err := encrypt.DecryptPassword(password, privateKey)
+	loginPassword, err := DecryptLoginPassword(priKey, password)
 	if err != nil {
 		return err
 	}
@@ -183,6 +179,18 @@ func CheckPassword(priKey, password, passwordFromDB string) error {
 		return buserr.New("ErrAuth")
 	}
 	return nil
+}
+
+func DecryptLoginPassword(priKey, password string) (string, error) {
+	privateKey, err := encrypt.ParseRSAPrivateKey(priKey)
+	if err != nil {
+		return "", err
+	}
+	loginPassword, err := encrypt.DecryptPassword(password, privateKey)
+	if err != nil {
+		return "", err
+	}
+	return loginPassword, nil
 }
 
 func LoadMFA(req dto.MfaRequest) (mfa.Otp, error) {
@@ -248,6 +256,8 @@ func GetCurrentUserInfo() (*dto.CurrentUserInfo, error) {
 	info.MFAInterval, _ = strconv.Atoi(settingMap["MFAInterval"])
 	info.ApiKeyValidityTime, _ = strconv.Atoi(settingMap["ApiKeyValidityTime"])
 	info.Name = settingMap["UserName"]
+	info.AuthSource = "local"
+	info.AuthSourceStatus = "active"
 	info.Role = "ADMIN"
 	info.Permissions = []string{}
 	info.NodeRoles = []dto.CurrentUserNodeRole{}

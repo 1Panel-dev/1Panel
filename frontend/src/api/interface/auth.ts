@@ -55,6 +55,8 @@ export namespace Login {
         permissions: string[];
         masterOnlyPermissions?: string[];
         nodeRoles: Array<{ nodeId: number; nodeName: string; roleId: number; roleName: string }>;
+        authSource: string;
+        authSourceStatus: string;
 
         apiInterfaceStatus: string;
         apiKey: string;
