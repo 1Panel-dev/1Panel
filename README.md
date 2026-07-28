@@ -16,6 +16,7 @@
   <a href="https://discord.gg/bUpUqWqdRr"><img src="https://img.shields.io/discord/1318846410149335080?logo=discord&labelColor=%20%235462eb&logoColor=%20%23f5f5f5&color=%20%235462eb" alt="Discord"></a>
   <a href="https://github.com/1Panel-dev/1Panel/releases"><img src="https://img.shields.io/github/v/release/1Panel-dev/1Panel" alt="GitHub release"></a>
   <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="Stars"></a>
+  <a href="https://mcptoplist.com/server/mcp.so%2F1Panel%2F1Panel-dev"><img src="https://mcptoplist.com/badge/mcp.so%2F1Panel%2F1Panel-dev.svg" alt="MCP Toplist"></a>
 </p>
 
 <p align="center">
