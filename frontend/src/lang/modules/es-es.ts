@@ -2160,6 +2160,8 @@ const message = {
         ftp: {
             ftp: 'Cuenta FTP | Cuentas FTP',
             notStart: 'El servicio FTP no está iniciado, ¡inícielo primero!',
+            initHelper:
+                'La identidad de usuario FTP no está inicializada. Haz clic en Inicializar en la barra de estado superior.',
             operation: 'Se realizará la operación "{0}" en el servicio FTP. ¿Desea continuar?',
             noPasswdMsg: 'No se pudo obtener la contraseña actual de la cuenta FTP, ¡asigne una y vuelva a intentar!',
             enableHelper: 'Habilitar la cuenta FTP restaurará los permisos de acceso. ¿Desea continuar?',

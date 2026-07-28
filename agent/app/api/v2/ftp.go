@@ -25,6 +25,21 @@ func (b *BaseApi) LoadFtpBaseInfo(c *gin.Context) {
 }
 
 // @Tags FTP
+// @Summary Initialize FTP identity
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /toolbox/ftp/init [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"初始化 FTP 用户身份","formatEN":"initialize FTP user identity"}
+func (b *BaseApi) InitFtp(c *gin.Context) {
+	if err := ftpService.Init(); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags FTP
 // @Summary Load FTP operation log
 // @Accept json
 // @Param request body dto.FtpLogSearch true "request"

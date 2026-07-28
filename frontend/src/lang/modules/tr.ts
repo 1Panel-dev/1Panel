@@ -2142,6 +2142,7 @@ const message = {
         ftp: {
             ftp: 'FTP hesabı | FTP hesapları',
             notStart: 'FTP servisi şu anda çalışmıyor, lütfen önce başlatın!',
+            initHelper: 'FTP kullanıcı kimliği başlatılmadı. Önce üst durum çubuğundaki Başlat düğmesine tıklayın.',
             operation: 'Bu FTP servisi üzerinde "{0}" işlemi gerçekleştirecektir. Devam etmek istiyor musunuz?',
             noPasswdMsg: 'Mevcut FTP hesap şifresi alınamıyor, lütfen şifreyi ayarlayın ve tekrar deneyin! ',
             enableHelper:

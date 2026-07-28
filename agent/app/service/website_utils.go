@@ -1221,7 +1221,8 @@ func checkIsLinkApp(website model.Website) bool {
 
 func chownRootDir(path string) error {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
-	if err := cmdMgr.Run("chown", "-R", "1000:1000", path); err != nil {
+	owner := fmt.Sprintf("%d:%d", constant.FTPUid, constant.FTPGid)
+	if err := cmdMgr.Run("chown", "-R", owner, path); err != nil {
 		return err
 	}
 	return nil

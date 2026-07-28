@@ -2121,6 +2121,7 @@ const message = {
         ftp: {
             ftp: 'FTP account | FTP accounts',
             notStart: 'FTP service is currently not running, start it first!',
+            initHelper: 'The FTP user identity is not initialized. Click Initialize in the top status bar first.',
             operation: 'This will perform "{0}" operation on FTP service. Continue?',
             noPasswdMsg: 'Cannot get the current FTP account password. Set the password and try again.',
             enableHelper: 'Enabling the selected FTP account will restore its access permissions. Continue?',

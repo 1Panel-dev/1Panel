@@ -2082,6 +2082,7 @@ const message = {
         ftp: {
             ftp: 'FTP 계정 | FTP 계정들',
             notStart: 'FTP 서비스가 현재 실행 중이 아닙니다. 먼저 시작하세요!',
+            initHelper: 'FTP 사용자 ID가 초기화되지 않았습니다. 먼저 상단 상태 표시줄에서 초기화를 클릭하세요.',
             operation: 'FTP 서비스에서 "{0}" 작업을 수행합니다. 계속하시겠습니까?',
             noPasswdMsg: '현재 FTP 계정의 비밀번호를 가져올 수 없습니다. 비밀번호를 설정한 후 다시 시도하세요!',
             enableHelper: '선택한 FTP 계정을 활성화하면 접근 권한이 복원됩니다. 계속하시겠습니까?',

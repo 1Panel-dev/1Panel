@@ -1983,6 +1983,7 @@ const message = {
         ftp: {
             ftp: 'FTP 帳戶',
             notStart: '尚未啟用 FTP 服務，請先啟用',
+            initHelper: 'FTP 使用者身分尚未初始化，請先點選頂部狀態列的初始化按鈕！',
             operation: '對 FTP 服務進行 [{0}] 操作，是否繼續？',
             noPasswdMsg: '無法取得目前 FTP 帳號密碼，請先設定密碼後重試',
             enableHelper: '啟用選取的 FTP 帳號後，該 FTP 帳號將復原存取權限，是否繼續？',
