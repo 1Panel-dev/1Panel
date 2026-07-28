@@ -65,6 +65,8 @@ type CurrentUserInfo struct {
 	MFAStatus         string `json:"mfaStatus"`
 	MFAInterval       int    `json:"mfaInterval"`
 	ComplexitySetting string `json:"complexitySetting"`
+	AuthSource        string `json:"authSource"`
+	AuthSourceStatus  string `json:"authSourceStatus"`
 
 	ApiInterfaceStatus string `json:"apiInterfaceStatus"`
 	ApiKey             string `json:"apiKey"`

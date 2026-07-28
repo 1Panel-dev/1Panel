@@ -1,6 +1,14 @@
 <template>
     <DrawerPro v-model="open" :header="$t('xpack.user.userInfo')">
         <div v-loading="loading">
+            <el-alert
+                v-if="isLDAPUser"
+                class="mb-4"
+                :title="$t('xpack.ldap.localCredentialsManaged')"
+                type="info"
+                :closable="false"
+                show-icon
+            />
             <el-form ref="userRef" label-position="top" :model="form" :rules="userRules">
                 <input
                     class="hidden-autofill-field"
@@ -17,7 +25,13 @@
                     tabindex="-1"
                 />
                 <el-form-item :label="$t('commons.login.username')" prop="name">
-                    <el-input type="primary" v-model="form.name" name="profile-name" autocomplete="off" />
+                    <el-input
+                        type="primary"
+                        v-model="form.name"
+                        name="profile-name"
+                        autocomplete="off"
+                        :disabled="isLDAPUser"
+                    />
                 </el-form-item>
                 <el-form-item :label="$t('commons.login.password')" prop="password">
                     <el-input
@@ -27,10 +41,11 @@
                         v-model.trim="form.password"
                         name="profile-new-password"
                         autocomplete="new-password"
+                        :disabled="isLDAPUser"
                     />
-                    <span class="input-help">{{ $t('setting.passwordEmptyTip') }}</span>
+                    <span v-if="!isLDAPUser" class="input-help">{{ $t('setting.passwordEmptyTip') }}</span>
                 </el-form-item>
-                <el-form-item v-if="form.password" :label="$t('setting.oldPassword')" prop="oldPassword">
+                <el-form-item v-if="form.password && !isLDAPUser" :label="$t('setting.oldPassword')" prop="oldPassword">
                     <el-input
                         type="password"
                         show-password
@@ -147,7 +162,7 @@
             <el-button :disabled="loading" @click="open = false">
                 {{ $t('commons.button.cancel') }}
             </el-button>
-            <el-button :disabled="loading" type="primary" @click="onSubmit(userRef)">
+            <el-button :disabled="loading || isLDAPUser" type="primary" @click="onSubmit(userRef)">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -392,6 +407,7 @@ import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 
 const props = defineProps<{ currentUser?: Login.AuthInfo }>();
 const emit = defineEmits<{ (e: 'search'): void }>();
+type AuthInfoWithSource = Login.AuthInfo & { authSource?: string };
 
 const complexityVerification = ref(false);
 const { globalStore, docsUrl, entrance, isFxplay } = useGlobalStore();
@@ -442,6 +458,9 @@ const mfaForm = reactive({
 const passkeyForm = reactive({
     name: '',
 });
+const isLDAPUser = computed(
+    () => ((props.currentUser as AuthInfoWithSource | undefined)?.authSource || '').toLowerCase() === 'ldap',
+);
 
 const passkeyPrereqBindDomain = computed(() => hasBindDomain.value);
 const passkeyPrereqHttps = computed(() => window.isSecureContext);
@@ -812,6 +831,7 @@ const buildPasskeyAttestation = (credential: PublicKeyCredential) => {
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
+    if (isLDAPUser.value) return;
     const valid = await formEl.validateField(getUserFormFields(), () => {});
     if (!valid) return;
     const needReLogin = form.name !== props.currentUser?.name || !!form.password;
