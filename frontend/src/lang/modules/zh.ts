@@ -2010,6 +2010,7 @@ const message = {
         ftp: {
             ftp: 'FTP 账户',
             notStart: '当前未开启 FTP 服务，请先开启！',
+            initHelper: 'FTP 用户身份尚未初始化，请先点击顶部状态栏的初始化按钮！',
             operation: '对 FTP 服务进行 [{0}] 操作，是否继续？',
             noPasswdMsg: '无法获取当前 FTP 账号密码，请先设置密码后重试！',
             enableHelper: '启用选中的 FTP 账号后，该 FTP 账号恢复访问权限，是否继续操作？',

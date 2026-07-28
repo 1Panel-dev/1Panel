@@ -19,6 +19,7 @@ type FtpService struct{}
 
 type IFtpService interface {
 	LoadBaseInfo() (dto.FtpBaseInfo, error)
+	Init() error
 	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
 	Operate(operation string) error
 	Create(req dto.FtpCreate) (uint, error)
@@ -34,12 +35,17 @@ func NewIFtpService() IFtpService {
 
 func (f *FtpService) LoadBaseInfo() (dto.FtpBaseInfo, error) {
 	var baseInfo dto.FtpBaseInfo
-	client, err := toolbox.NewFtpClient()
+	isInit, err := toolbox.IsFtpInitialized()
 	if err != nil {
 		return baseInfo, err
 	}
-	baseInfo.IsActive, baseInfo.IsExist = client.Status()
+	baseInfo.IsInit = isInit
+	baseInfo.IsActive, baseInfo.IsExist = toolbox.FtpStatus()
 	return baseInfo, nil
+}
+
+func (f *FtpService) Init() error {
+	return toolbox.InitFtp()
 }
 
 func (f *FtpService) LoadLog(req dto.FtpLogSearch) (int64, interface{}, error) {
@@ -76,6 +82,9 @@ func (u *FtpService) Operate(operation string) error {
 }
 
 func (f *FtpService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
+	if _, err := toolbox.NewFtpClient(); err != nil {
+		return 0, nil, err
+	}
 	total, lists, err := ftpRepo.Page(req.Page, req.PageSize, ftpRepo.WithLikeUser(req.Info), repo.WithOrderDesc("created_at"))
 	if err != nil {
 		return 0, nil, err
@@ -133,6 +142,13 @@ func (f *FtpService) Sync() error {
 }
 
 func (f *FtpService) Create(req dto.FtpCreate) (uint, error) {
+	if err := toolbox.ValidateFtpRootPath(req.Path); err != nil {
+		return 0, err
+	}
+	client, err := toolbox.NewFtpClient()
+	if err != nil {
+		return 0, err
+	}
 	if _, err := os.Stat(req.Path); err != nil {
 		if os.IsNotExist(err) {
 			if err := os.MkdirAll(req.Path, os.ModePerm); err != nil {
@@ -149,10 +165,6 @@ func (f *FtpService) Create(req dto.FtpCreate) (uint, error) {
 	userInDB, _ := ftpRepo.Get(ftpRepo.WithByUser(req.User))
 	if userInDB.ID != 0 {
 		return 0, buserr.New("ErrRecordExist")
-	}
-	client, err := toolbox.NewFtpClient()
-	if err != nil {
-		return 0, err
 	}
 	if err := client.UserAdd(req.User, req.Password, req.Path); err != nil {
 		return 0, err
@@ -186,6 +198,13 @@ func (f *FtpService) Delete(req dto.BatchDeleteReq) error {
 }
 
 func (f *FtpService) Update(req dto.FtpUpdate) error {
+	if err := toolbox.ValidateFtpRootPath(req.Path); err != nil {
+		return err
+	}
+	client, err := toolbox.NewFtpClient()
+	if err != nil {
+		return err
+	}
 	if _, err := os.Stat(req.Path); err != nil {
 		if os.IsNotExist(err) {
 			if err := os.MkdirAll(req.Path, os.ModePerm); err != nil {
@@ -209,10 +228,6 @@ func (f *FtpService) Update(req dto.FtpUpdate) error {
 		return err
 	}
 
-	client, err := toolbox.NewFtpClient()
-	if err != nil {
-		return err
-	}
 	needReload := false
 	updates := make(map[string]interface{})
 	if req.Password != passItem {

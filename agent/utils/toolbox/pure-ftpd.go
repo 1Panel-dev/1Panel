@@ -2,11 +2,15 @@ package toolbox
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"os/user"
 	"path"
+	"path/filepath"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -17,10 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/toolbox/helper"
 )
 
-type Ftp struct {
-	DefaultUser  string
-	DefaultGroup string
-}
+type Ftp struct{}
 
 type FtpList struct {
 	User   string
@@ -48,43 +49,159 @@ type FtpClient interface {
 	LoadLogs() ([]FtpLog, error)
 }
 
-func NewFtpClient() (*Ftp, error) {
-	userItem, err := user.LookupId("1000")
-	if err == nil {
-		groupItem, err := user.LookupGroupId(userItem.Gid)
-		if err != nil {
-			return nil, err
-		}
-		return &Ftp{DefaultUser: userItem.Username, DefaultGroup: groupItem.Name}, err
-	}
-	if err.Error() != user.UnknownUserIdError(1000).Error() {
-		return nil, err
-	}
+var ErrFtpNotInitialized = fmt.Errorf(
+	"FTP identity %d:%d is not initialized",
+	constant.FTPUid,
+	constant.FTPGid,
+)
 
-	groupItem, err := user.LookupGroupId("1000")
-	if err == nil {
-		if err := cmd.NewCommandMgr().Run("useradd", "-u", "1000", "-g", groupItem.Name, "1panel"); err != nil {
-			return nil, err
-		}
-		return &Ftp{DefaultUser: "1panel", DefaultGroup: groupItem.Name}, nil
-	}
-	if err.Error() != user.UnknownGroupIdError("1000").Error() {
-		return nil, err
-	}
-	if err := cmd.NewCommandMgr().Run("groupadd", "-g", "1000", "1panel"); err != nil {
-		return nil, err
-	}
-	if err := cmd.NewCommandMgr().Run("useradd", "-u", "1000", "-g", "1panel", "1panel"); err != nil {
-		return nil, err
-	}
-	return &Ftp{DefaultUser: "1panel", DefaultGroup: "1panel"}, nil
+var ErrFtpUnsafePath = errors.New("FTP root path is unsafe")
+
+var ftpUnsafeRootPaths = map[string]struct{}{
+	"/":              {},
+	"/bin":           {},
+	"/sbin":          {},
+	"/usr/bin":       {},
+	"/usr/sbin":      {},
+	"/usr/local/bin": {},
+	"/etc":           {},
+	"/lib":           {},
+	"/lib64":         {},
+	"/usr/lib":       {},
+	"/home":          {},
+	"/tmp":           {},
+	"/var":           {},
+	"/dev":           {},
+	"/proc":          {},
+	"/sys":           {},
 }
 
-func (f *Ftp) Status() (bool, bool) {
+var ftpInitMu sync.Mutex
+
+func IsFtpInitialized() (bool, error) {
+	userExists, groupExists, err := loadFtpIdentityStatus()
+	if err != nil {
+		return false, err
+	}
+	return userExists && groupExists, nil
+}
+
+func InitFtp() error {
+	ftpInitMu.Lock()
+	defer ftpInitMu.Unlock()
+
+	uid := strconv.Itoa(constant.FTPUid)
+	gid := strconv.Itoa(constant.FTPGid)
+	userExists, groupExists, err := loadFtpIdentityStatus()
+	if err != nil {
+		return err
+	}
+
+	if !userExists {
+		userItem, err := user.Lookup(constant.FTPUser)
+		if err == nil {
+			if userItem.Uid != uid {
+				return fmt.Errorf("user %s already exists with UID %s", constant.FTPUser, userItem.Uid)
+			}
+			userExists = true
+		} else {
+			var unknownUser user.UnknownUserError
+			if !errors.As(err, &unknownUser) {
+				return err
+			}
+		}
+	}
+	if !groupExists {
+		groupItem, err := user.LookupGroup(constant.FTPUser)
+		if err == nil {
+			if groupItem.Gid != gid {
+				return fmt.Errorf("group %s already exists with GID %s", constant.FTPUser, groupItem.Gid)
+			}
+			groupExists = true
+		} else {
+			var unknownGroup user.UnknownGroupError
+			if !errors.As(err, &unknownGroup) {
+				return err
+			}
+		}
+	}
+
+	cmdMgr := cmd.NewCommandMgr()
+	if !groupExists {
+		if err := cmdMgr.Run("groupadd", "-g", gid, constant.FTPUser); err != nil {
+			return err
+		}
+	}
+	if !userExists {
+		noLoginShell := "/bin/false"
+		for _, item := range []string{"/usr/sbin/nologin", "/sbin/nologin"} {
+			if _, err := os.Stat(item); err == nil {
+				noLoginShell = item
+				break
+			}
+		}
+		if err := cmdMgr.Run(
+			"useradd",
+			"-u", uid,
+			"-g", gid,
+			"-M",
+			"-s", noLoginShell,
+			constant.FTPUser,
+		); err != nil {
+			return err
+		}
+	}
+	isInitialized, err := IsFtpInitialized()
+	if err != nil {
+		return err
+	}
+	if !isInitialized {
+		return ErrFtpNotInitialized
+	}
+	return nil
+}
+
+func loadFtpIdentityStatus() (bool, bool, error) {
+	uid := strconv.Itoa(constant.FTPUid)
+	_, userErr := user.LookupId(uid)
+	if userErr != nil {
+		var unknownUser user.UnknownUserIdError
+		if !errors.As(userErr, &unknownUser) {
+			return false, false, userErr
+		}
+	}
+
+	gid := strconv.Itoa(constant.FTPGid)
+	_, groupErr := user.LookupGroupId(gid)
+	if groupErr != nil {
+		var unknownGroup user.UnknownGroupIdError
+		if !errors.As(groupErr, &unknownGroup) {
+			return false, false, groupErr
+		}
+	}
+	return userErr == nil, groupErr == nil, nil
+}
+
+func NewFtpClient() (*Ftp, error) {
+	isInitialized, err := IsFtpInitialized()
+	if err != nil {
+		return nil, err
+	}
+	if !isInitialized {
+		return nil, ErrFtpNotInitialized
+	}
+	return &Ftp{}, nil
+}
+
+func FtpStatus() (bool, bool) {
 	isActive, _ := controller.CheckActive("pure-ftpd.service")
 	isExist, _ := controller.CheckExist("pure-ftpd.service")
 
 	return isActive, isExist
+}
+
+func (f *Ftp) Status() (bool, bool) {
+	return FtpStatus()
 }
 
 func (f *Ftp) Operate(operate string) error {
@@ -103,6 +220,9 @@ func (f *Ftp) UserAdd(username, passwd, path string) error {
 	if cmd.CheckIllegal(username, path) {
 		return buserr.New("ErrCmdIllegal")
 	}
+	if err := ValidateFtpRootPath(path); err != nil {
+		return err
+	}
 	entry, err := generatePureFtpEntrySimple(username, passwd, path)
 	if err != nil {
 		return fmt.Errorf("generate pure-ftpd entry failed, err: %v", err)
@@ -118,7 +238,8 @@ func (f *Ftp) UserAdd(username, passwd, path string) error {
 		return err
 	}
 	_ = f.Reload()
-	if err := cmd.NewCommandMgr().Run("chown", "-R", f.DefaultUser+":"+f.DefaultGroup, path); err != nil {
+	owner := fmt.Sprintf("%d:%d", constant.FTPUid, constant.FTPGid)
+	if err := cmd.NewCommandMgr().Run("chown", "-R", owner, "--", path); err != nil {
 		return err
 	}
 	return nil
@@ -189,13 +310,43 @@ func (f *Ftp) SetPath(username, path string) error {
 	if cmd.CheckIllegal(username, path) {
 		return buserr.New("ErrCmdIllegal")
 	}
+	if err := ValidateFtpRootPath(path); err != nil {
+		return err
+	}
 	if err := cmd.NewCommandMgr().Run("pure-pw", "usermod", username, "-d", path); err != nil {
 		return err
 	}
-	if err := cmd.NewCommandMgr().Run("chown", "-R", f.DefaultUser+":"+f.DefaultGroup, path); err != nil {
+	owner := fmt.Sprintf("%d:%d", constant.FTPUid, constant.FTPGid)
+	if err := cmd.NewCommandMgr().Run("chown", "-R", owner, "--", path); err != nil {
 		return err
 	}
 	return nil
+}
+
+func ValidateFtpRootPath(rootPath string) error {
+	if strings.TrimSpace(rootPath) == "" {
+		return fmt.Errorf("%w: path is required", ErrFtpUnsafePath)
+	}
+	if !filepath.IsAbs(rootPath) {
+		return fmt.Errorf("%w: path must be absolute", ErrFtpUnsafePath)
+	}
+
+	cleanedPath := filepath.Clean(rootPath)
+	if isUnsafeFtpRootPath(cleanedPath) {
+		return fmt.Errorf("%w: %s", ErrFtpUnsafePath, cleanedPath)
+	}
+	if realPath, err := filepath.EvalSymlinks(cleanedPath); err == nil {
+		cleanedPath = filepath.Clean(realPath)
+	}
+	if isUnsafeFtpRootPath(cleanedPath) {
+		return fmt.Errorf("%w: %s", ErrFtpUnsafePath, cleanedPath)
+	}
+	return nil
+}
+
+func isUnsafeFtpRootPath(rootPath string) bool {
+	_, unsafe := ftpUnsafeRootPaths[rootPath]
+	return unsafe
 }
 
 func (f *Ftp) SetStatus(username, status string) error {
@@ -362,5 +513,12 @@ func generatePureFtpEntrySimple(username, password, path string) (string, error)
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s:%s:1000:1000::%s/./::::::::::::", username, passwdAfterSha512, path), nil
+	return fmt.Sprintf(
+		"%s:%s:%d:%d::%s/./::::::::::::",
+		username,
+		passwdAfterSha512,
+		constant.FTPUid,
+		constant.FTPGid,
+		path,
+	), nil
 }

@@ -2174,6 +2174,8 @@ const message = {
         ftp: {
             ftp: 'Akaun FTP | Akaun FTP',
             notStart: 'Perkhidmatan FTP tidak berjalan pada masa ini, sila mulakan dahulu!',
+            initHelper:
+                'Identiti pengguna FTP belum dimulakan. Klik Mulakan pada bar status di bahagian atas terlebih dahulu.',
             operation: 'Ini akan melaksanakan operasi "{0}" pada perkhidmatan FTP. Adakah anda mahu meneruskan?',
             noPasswdMsg:
                 'Tidak dapat mendapatkan kata laluan akaun FTP semasa, sila tetapkan kata laluan dan cuba lagi!',

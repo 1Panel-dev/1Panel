@@ -4166,6 +4166,13 @@
 		"formatZH": "删除 FTP 账户 [users]",
 		"formatEN": "delete FTP users [users]"
 	},
+	"/toolbox/ftp/init": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "初始化 FTP 用户身份",
+		"formatEN": "initialize FTP user identity"
+	},
 	"/toolbox/ftp/operate": {
 		"bodyKeys": [
 			"operation"

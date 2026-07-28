@@ -24361,6 +24361,34 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/toolbox/ftp/init": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Initialize FTP identity",
+				"tags": [
+					"FTP"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "initialize FTP user identity",
+					"formatZH": "初始化 FTP 用户身份",
+					"paramKeys": []
+				}
+			}
+		},
 		"/toolbox/ftp/log/search": {
 			"post": {
 				"consumes": [
@@ -28877,6 +28905,9 @@ const docTemplate = `{
 				"rememberApiKey": {
 					"type": "boolean"
 				},
+				"validateAvailability": {
+					"type": "boolean"
+				},
 				"verifyModel": {
 					"type": "string"
 				}
@@ -29059,6 +29090,9 @@ const docTemplate = `{
 		},
 		"dto.AgentAccountSearch": {
 			"properties": {
+				"apiType": {
+					"type": "string"
+				},
 				"name": {
 					"type": "string"
 				},
@@ -29070,6 +29104,9 @@ const docTemplate = `{
 				},
 				"provider": {
 					"type": "string"
+				},
+				"textOnly": {
+					"type": "boolean"
 				}
 			},
 			"required": [
@@ -29105,6 +29142,9 @@ const docTemplate = `{
 					"type": "boolean"
 				},
 				"syncAgents": {
+					"type": "boolean"
+				},
+				"validateAvailability": {
 					"type": "boolean"
 				},
 				"verifyModel": {
@@ -34669,6 +34709,9 @@ const docTemplate = `{
 				},
 				"isExist": {
 					"type": "boolean"
+				},
+				"isInit": {
+					"type": "boolean"
 				}
 			},
 			"type": "object"
@@ -36330,6 +36373,12 @@ const docTemplate = `{
 				"database": {
 					"type": "string"
 				},
+				"dbs": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"description": {
 					"type": "string"
 				},
@@ -36616,6 +36665,20 @@ const docTemplate = `{
 				"HttpPer",
 				"ProxyCache"
 			]
+		},
+		"dto.NginxModuleArtifact": {
+			"properties": {
+				"checksum": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				}
+			},
+			"type": "object"
 		},
 		"dto.NginxUpstream": {
 			"properties": {
@@ -37478,6 +37541,15 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"editableBaseUrl": {
+					"type": "boolean"
+				},
+				"models": {
+					"items": {
+						"$ref": "#/definitions/dto.ProviderModelInfo"
+					},
+					"type": "array"
+				},
+				"supportsModelDiscovery": {
 					"type": "boolean"
 				}
 			},
@@ -41954,8 +42026,17 @@ const docTemplate = `{
 		},
 		"request.NginxBuildReq": {
 			"properties": {
+				"force": {
+					"type": "boolean"
+				},
 				"mirror": {
 					"type": "string"
+				},
+				"modules": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
 				},
 				"taskID": {
 					"type": "string"
@@ -42035,8 +42116,20 @@ const docTemplate = `{
 		},
 		"request.NginxModuleUpdate": {
 			"properties": {
+				"buildMode": {
+					"enum": [
+						"dynamic",
+						"static"
+					],
+					"type": "string"
+				},
 				"enable": {
 					"type": "boolean"
+				},
+				"loadOrder": {
+					"maximum": 9999,
+					"minimum": 0,
+					"type": "integer"
 				},
 				"name": {
 					"type": "string"
@@ -42053,6 +42146,13 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"params": {
+					"type": "string"
+				},
+				"provider": {
+					"enum": [
+						"local",
+						"prebuilt"
+					],
 					"type": "string"
 				},
 				"script": {
@@ -45582,6 +45682,9 @@ const docTemplate = `{
 		},
 		"response.NginxBuildConfig": {
 			"properties": {
+				"dynamicSupported": {
+					"type": "boolean"
+				},
 				"mirror": {
 					"type": "string"
 				},
@@ -45615,8 +45718,32 @@ const docTemplate = `{
 		},
 		"response.NginxModule": {
 			"properties": {
+				"artifacts": {
+					"items": {
+						"$ref": "#/definitions/dto.NginxModuleArtifact"
+					},
+					"type": "array"
+				},
+				"buildMode": {
+					"type": "string"
+				},
+				"buildStatus": {
+					"type": "string"
+				},
+				"custom": {
+					"type": "boolean"
+				},
 				"enable": {
 					"type": "boolean"
+				},
+				"lastError": {
+					"type": "string"
+				},
+				"loadOrder": {
+					"type": "integer"
+				},
+				"loadStatus": {
+					"type": "string"
 				},
 				"name": {
 					"type": "string"
@@ -45625,6 +45752,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"params": {
+					"type": "string"
+				},
+				"provider": {
 					"type": "string"
 				},
 				"script": {
