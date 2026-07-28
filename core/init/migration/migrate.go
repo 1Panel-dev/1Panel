@@ -52,6 +52,7 @@ func Init() {
 		migrations.AddAlertAuditUser,
 		migrations.AddMenuAccordionSetting,
 		migrations.AddAPITrustedProxiesSetting,
+		migrations.AddWebsiteTemplateMenu,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

@@ -488,6 +488,21 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		if err = configDefaultNginx(website, domains, appInstall, runtime, create.StreamConfig); err != nil {
 			return err
 		}
+		if create.Type == constant.Static && create.TemplateOutputID > 0 {
+			templateOutput, err := websiteTemplateOutputRepo.GetFirst(repo.WithByID(create.TemplateOutputID))
+			if err != nil {
+				return err
+			}
+			if templateOutput.OutputPath == "" {
+				return buserr.New("ErrFileNotFound")
+			}
+			if _, err := os.Stat(templateOutput.OutputPath); err != nil {
+				return buserr.New("ErrFileNotFound")
+			}
+			if err := copyDir(templateOutput.OutputPath, GetSitePath(*website, SiteIndexDir)); err != nil {
+				return err
+			}
+		}
 		if website.Type != constant.Stream {
 			if err = createWafConfig(website, domains); err != nil {
 				return err
