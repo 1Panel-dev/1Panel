@@ -34,6 +34,8 @@ type WebsiteCreate struct {
 
 	SiteDir string `json:"siteDir"`
 
+	TemplateOutputID uint `json:"templateOutputID"`
+
 	RuntimeConfig
 	FtpConfig
 	DataBaseConfig

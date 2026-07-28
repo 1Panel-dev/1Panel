@@ -51,6 +51,7 @@ func Init() {
 		migrations.AddLoginLogUser,
 		migrations.AddAlertAuditUser,
 		migrations.AddMenuAccordionSetting,
+		migrations.AddWebsiteTemplateMenu,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

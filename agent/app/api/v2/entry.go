@@ -60,6 +60,7 @@ var (
 	websiteDnsAccountService  = service.NewIWebsiteDnsAccountService()
 	websiteSSLService         = service.NewIWebsiteSSLService()
 	websiteAcmeAccountService = service.NewIWebsiteAcmeAccountService()
+	websiteTemplateService    = service.NewIWebsiteTemplateService()
 
 	nginxService = service.NewINginxService()
 

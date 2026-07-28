@@ -271,6 +271,20 @@
                         </el-form-item>
                     </div>
                 </div>
+                <el-form-item
+                    :label="$t('template.importButton')"
+                    prop="templateOutputID"
+                    v-if="website.type === 'static'"
+                >
+                    <el-select v-model="website.templateOutputID" clearable class="p-w-200">
+                        <el-option
+                            v-for="output in templateOutputs"
+                            :key="output.id"
+                            :label="output.name + ' (' + output.templateName + ')'"
+                            :value="output.id"
+                        />
+                    </el-select>
+                </el-form-item>
                 <el-form-item prop="enableFtp" v-if="website.type === 'static' || website.type === 'runtime'">
                     <el-checkbox
                         @change="random"
@@ -443,6 +457,7 @@ import {
     preCheck,
     searchAcmeAccount,
     getDirConfig,
+    searchTemplateOutputs,
 } from '@/api/modules/website';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -524,6 +539,7 @@ const initData = () => ({
     domains: [],
     parentWebsiteID: undefined,
     siteDir: '',
+    templateOutputID: undefined,
 
     streamPorts: '',
     udp: false,
@@ -575,6 +591,7 @@ const appReq = reactive({
 const apps = ref<App.AppItem[]>([]);
 const preCheckRef = ref();
 const staticPath = ref('');
+const templateOutputs = ref<Website.TemplateOutputDTO[]>([]);
 const runtimeResource = ref('appstore');
 const initRuntimeReq = () => ({
     page: 1,
@@ -791,6 +808,7 @@ const acceptParams = async (openrestyVersion: string) => {
     runtimeResource.value = 'appstore';
     runtimeReq.value = initRuntimeReq();
     listAcmeAccount();
+    listTemplateOutputs();
 
     steamConfig.value = initLbForm();
 
@@ -812,6 +830,12 @@ const openTaskLog = (taskID: string) => {
 const listAcmeAccount = () => {
     searchAcmeAccount({ page: 1, pageSize: 100 }).then((res) => {
         acmeAccounts.value = res.data.items || [];
+    });
+};
+
+const listTemplateOutputs = () => {
+    searchTemplateOutputs({ page: 1, pageSize: 1000, templateID: 0 }).then((res) => {
+        templateOutputs.value = res.data.items || [];
     });
 };
 
@@ -1028,6 +1052,9 @@ const submit = async (formEl: FormInstance | undefined) => {
                     website.value.name = steamConfig.value.name;
                     website.value.algorithm = steamConfig.value.algorithm;
                     website.value.servers = steamConfig.value.servers;
+                }
+                if (website.value.type !== 'static' || !website.value.templateOutputID) {
+                    website.value.templateOutputID = undefined;
                 }
                 const taskID = uuidv4();
                 website.value.taskID = taskID;

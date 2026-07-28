@@ -73,6 +73,8 @@ var AddTable = &gormigrate.Migration{
 			&model.Website{},
 			&model.WebsiteAcmeAccount{},
 			&model.WebsiteCA{},
+			&model.WebsiteTemplate{},
+			&model.WebsiteTemplateOutput{},
 			&model.WebsiteDnsAccount{},
 			&model.WebsiteDomain{},
 			&model.WebsiteSSL{},
@@ -1674,5 +1676,15 @@ var AddMcpServerGatewayArgs = &gormigrate.Migration{
 	ID: "20260714-add-mcp-server-gateway-args",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.McpServer{})
+	},
+}
+
+var AddWebsiteTemplateTable = &gormigrate.Migration{
+	ID: "20260728-add-website-template-table",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.WebsiteTemplate{},
+			&model.WebsiteTemplateOutput{},
+		)
 	},
 }

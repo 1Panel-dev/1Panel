@@ -44,6 +44,27 @@ const webSiteRouter = {
             },
         },
         {
+            path: '/websites/templates',
+            name: 'WebsiteTemplate',
+            component: () => import('@/views/website/template/index.vue'),
+            meta: {
+                icon: 'p-file-html',
+                title: 'menu.template',
+                permission: 'website_view',
+            },
+        },
+        {
+            path: '/websites/templates/output',
+            name: 'WebsiteTemplateOutput',
+            component: () => import('@/views/website/template/output/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/websites/templates',
+                title: 'menu.templateOutput',
+                permission: 'website_view',
+            },
+        },
+        {
             path: '/websites/runtimes/php',
             name: 'PHP',
             component: () => import('@/views/website/runtime/php/index.vue'),

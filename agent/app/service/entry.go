@@ -40,12 +40,14 @@ var (
 	settingRepo = repo.NewISettingRepo()
 	backupRepo  = repo.NewIBackupRepo()
 
-	websiteRepo       = repo.NewIWebsiteRepo()
-	websiteDomainRepo = repo.NewIWebsiteDomainRepo()
-	websiteDnsRepo    = repo.NewIWebsiteDnsAccountRepo()
-	websiteSSLRepo    = repo.NewISSLRepo()
-	websiteAcmeRepo   = repo.NewIAcmeAccountRepo()
-	websiteCARepo     = repo.NewIWebsiteCARepo()
+	websiteRepo               = repo.NewIWebsiteRepo()
+	websiteDomainRepo         = repo.NewIWebsiteDomainRepo()
+	websiteDnsRepo            = repo.NewIWebsiteDnsAccountRepo()
+	websiteSSLRepo            = repo.NewISSLRepo()
+	websiteAcmeRepo           = repo.NewIAcmeAccountRepo()
+	websiteCARepo             = repo.NewIWebsiteCARepo()
+	websiteTemplateRepo       = repo.NewIWebsiteTemplateRepo()
+	websiteTemplateOutputRepo = repo.NewIWebsiteTemplateOutputRepo()
 
 	snapshotRepo = repo.NewISnapshotRepo()
 
