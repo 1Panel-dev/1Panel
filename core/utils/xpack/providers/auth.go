@@ -29,6 +29,7 @@ type AuthProvider interface {
 	ClearPasskeys() error
 
 	GetCurrentUserInfo(c *gin.Context) (*dto.CurrentUserInfo, error)
+	ShouldCheckPasswordExpiration(c *gin.Context) (bool, error)
 	LoadPasswordExpirationTime(c *gin.Context) (string, error)
 	SyncPasswordExpirationTime(expirationDays string) error
 	UpdateCurrentUserInfo(c *gin.Context, req dto.CurrentUserUpdate) error
