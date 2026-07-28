@@ -54,17 +54,6 @@ const webSiteRouter = {
             },
         },
         {
-            path: '/websites/templates/output',
-            name: 'WebsiteTemplateOutput',
-            component: () => import('@/views/website/template/output/index.vue'),
-            hidden: true,
-            meta: {
-                activeMenu: '/websites/templates',
-                title: 'menu.templateOutput',
-                permission: 'website_view',
-            },
-        },
-        {
             path: '/websites/runtimes/php',
             name: 'PHP',
             component: () => import('@/views/website/runtime/php/index.vue'),

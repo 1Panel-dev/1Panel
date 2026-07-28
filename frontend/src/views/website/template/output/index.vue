@@ -1,77 +1,43 @@
 <template>
-    <div>
-        <BackButton name="WebsiteTemplate" :header="$t('template.outputList')" />
-        <LayoutContent :title="$t('template.outputList')">
-            <template #leftToolBar>
-                <el-button v-permission type="primary" @click="openCreate()">
-                    {{ $t('template.outputCreate') }}
-                </el-button>
-            </template>
-            <template #rightToolBar>
-                <TableRefresh @search="search()" />
-            </template>
-            <template #main>
-                <ComplexTable
-                    :data="data"
-                    :pagination-config="paginationConfig"
-                    @search="search()"
-                    v-loading="loading"
-                >
-                    <el-table-column
-                        :label="$t('template.outputName')"
-                        prop="name"
-                        min-width="120px"
-                        show-overflow-tooltip
-                    />
-                    <el-table-column
-                        :label="$t('template.name')"
-                        prop="templateName"
-                        min-width="120px"
-                        show-overflow-tooltip
-                    />
-                    <el-table-column :label="$t('template.type')" width="150px">
-                        <template #default="{ row }">
-                            <el-tag>
-                                {{ row.templateType === 'single' ? $t('template.single') : $t('template.multi') }}
-                            </el-tag>
-                        </template>
-                    </el-table-column>
-                    <el-table-column
-                        :label="$t('template.filePath')"
-                        prop="outputPath"
-                        min-width="200px"
-                        show-overflow-tooltip
-                    />
-                    <el-table-column
-                        prop="createdAt"
-                        :label="$t('commons.table.date')"
-                        :formatter="dateFormat"
-                        width="180px"
-                    />
-                    <fu-table-operations
-                        :ellipsis="1"
-                        :buttons="buttons"
-                        :label="$t('commons.table.operate')"
-                        fixed="right"
-                        fix
-                    />
-                </ComplexTable>
-            </template>
-        </LayoutContent>
+    <DrawerPro v-model="open" :header="$t('template.outputList')" size="60%" @close="handleClose">
+        <template #buttons>
+            <el-button type="primary" plain @click="openCreate()">
+                {{ $t('template.outputCreate') }}
+            </el-button>
+        </template>
+        <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
+            <el-table-column :label="$t('template.outputName')" prop="name" min-width="100px" show-overflow-tooltip />
+            <el-table-column :label="$t('template.name')" prop="templateName" min-width="100px" show-overflow-tooltip />
+            <el-table-column :label="$t('template.type')" width="110px">
+                <template #default="{ row }">
+                    <el-tag>
+                        {{ row.templateType === 'single' ? $t('template.single') : $t('template.multi') }}
+                    </el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column
+                :label="$t('template.filePath')"
+                prop="outputPath"
+                min-width="160px"
+                show-overflow-tooltip
+            />
+            <el-table-column prop="createdAt" :label="$t('commons.table.date')" :formatter="dateFormat" width="165px" />
+            <fu-table-operations :ellipsis="1" :buttons="buttons" :label="$t('commons.table.operate')" fixed="right" fix />
+        </ComplexTable>
         <OpDialog ref="opRef" @search="search" />
         <OutputCreate ref="outputCreateRef" @search="search" />
-    </div>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
 import { deleteTemplateOutput, searchTemplateOutputs } from '@/api/modules/website';
 import OutputCreate from '@/views/website/template/output/create.vue';
-import BackButton from '@/components/back-button/index.vue';
 import { dateFormat } from '@/utils/date';
 import i18n from '@/lang';
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref } from 'vue';
 
+const open = ref(false);
 const loading = ref(false);
 const data = ref<Website.TemplateOutputDTO[]>([]);
 const opRef = ref();
@@ -118,7 +84,16 @@ const openCreate = () => {
     outputCreateRef.value.acceptParams();
 };
 
-onMounted(() => {
+const handleClose = () => {
+    open.value = false;
+};
+
+const acceptParams = () => {
+    open.value = true;
     search();
+};
+
+defineExpose({
+    acceptParams,
 });
 </script>

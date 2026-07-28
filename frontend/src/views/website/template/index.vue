@@ -58,6 +58,7 @@
         <OpDialog ref="opRef" @search="search" />
         <TemplateOperate ref="operateRef" @search="search" />
         <OutputCreate ref="outputCreateRef" @search="search" />
+        <OutputList ref="outputListRef" />
     </div>
 </template>
 
@@ -66,18 +67,18 @@ import { Website } from '@/api/interface/website';
 import { deleteTemplate, searchTemplates } from '@/api/modules/website';
 import TemplateOperate from '@/views/website/template/operate/index.vue';
 import OutputCreate from '@/views/website/template/output/create.vue';
+import OutputList from '@/views/website/template/output/index.vue';
 import { dateFormat } from '@/utils/date';
 import i18n from '@/lang';
 import { reactive, ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 
-const router = useRouter();
 const loading = ref(false);
 const data = ref<Website.Template[]>([]);
 const searchName = ref('');
 const opRef = ref();
 const operateRef = ref();
 const outputCreateRef = ref();
+const outputListRef = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'website-template-page-size',
@@ -137,7 +138,7 @@ const openCreate = () => {
 };
 
 const openOutputList = () => {
-    router.push({ name: 'WebsiteTemplateOutput' });
+    outputListRef.value.acceptParams();
 };
 
 const deleteTemplateRow = (row: Website.Template) => {
