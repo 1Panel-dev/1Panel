@@ -1118,6 +1118,9 @@ func buildOpenclawAccountModelConfig(account *model.AgentAccount, model dto.Agen
 
 var openclawVisionModelPattern = regexp.MustCompile(`(?i)(\b(gpt-4o|gpt-4\.1|gpt-[5-9]|o[134])\b|\bclaude-(3|4|sonnet|opus|haiku)\b|\bgemini\b|\b(qwen[\w.-]*-?vl|qwen-vl|qwen3\.[5-9]-plus)\b|\b(kimi-k2\.(5|6)|kimi-k2\.7-code|minimax-m3)\b|\b(vision|llava|pixtral|internvl|mllama|minicpm-v|glm-4v|omni)\b|(^|[-_/])vl([-_/]|$))`)
 
+// openclawVideoInputModelPattern matches vision models that additionally accept video input.
+var openclawVideoInputModelPattern = regexp.MustCompile(`(?i)\bminimax-m3\b`)
+
 func buildOpenclawModelEntry(modelID string, model dto.AgentAccountModel) modelEntry {
 	name := strings.TrimSpace(model.Name)
 	if name == "" {
@@ -1126,6 +1129,9 @@ func buildOpenclawModelEntry(modelID string, model dto.AgentAccountModel) modelE
 	entry := modelEntry{ID: strings.TrimSpace(modelID), Name: name}
 	if openclawVisionModelPattern.MatchString(modelID) {
 		entry.Input = []string{"text", "image"}
+		if openclawVideoInputModelPattern.MatchString(modelID) {
+			entry.Input = []string{"text", "image", "video"}
+		}
 	}
 	return entry
 }
