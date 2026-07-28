@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
@@ -73,20 +73,22 @@ func (u *LogService) ReadSystemLog(req dto.SystemLogReq) (dto.SystemLogRes, erro
 		return u.readFileSystemLog(req, startTime, endTime, pageSize, cursor)
 	}
 	queryArgs := buildJournalQueryArgs(req, startTime, endTime, pageSize, cursor)
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	output, err := exec.CommandContext(ctx, journalctl, queryArgs...).CombinedOutput()
-	cancel()
+	output, err := executeJournalQuery(journalctl, queryArgs)
 	if err != nil {
-		if journalctlGrepUnsupported(req.Keyword, string(output)) {
-			return dto.SystemLogRes{}, buserr.New("ErrSystemLogKeywordFilterUnsupported")
-		}
-		return dto.SystemLogRes{}, fmt.Errorf("read host system logs failed: %s", strings.TrimSpace(string(output)))
+		return handleJournalQueryError(req, output, err, func() ([]byte, error) {
+			probeReq := req
+			probeReq.Keyword = ""
+			probeReq.Priority = ""
+			probeReq.Service = ""
+			probeArgs := buildJournalQueryArgs(probeReq, startTime, endTime, 1, cursor)
+			return executeJournalQuery(journalctl, probeArgs)
+		})
 	}
 	content := strings.TrimSpace(string(output))
 	if content == "" || strings.HasPrefix(content, "-- No entries --") {
 		return dto.SystemLogRes{Source: "journalctl", Items: []dto.SystemLogItem{}}, nil
 	}
-	items := parseJournalLogItems(content)
+	items := trimJournalLogItemsToStartTime(parseJournalLogItems(content), startTime)
 	if cursor != nil && cursor.JournalCursor == "" {
 		items, err = skipSystemLogCursorItems(items, *cursor)
 		if err != nil {
@@ -94,6 +96,12 @@ func (u *LogService) ReadSystemLog(req dto.SystemLogReq) (dto.SystemLogRes, erro
 		}
 	}
 	return buildSystemLogResponse("journalctl", items, pageSize, cursor)
+}
+
+func executeJournalQuery(journalctl string, queryArgs []string) ([]byte, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	return exec.CommandContext(ctx, journalctl, queryArgs...).CombinedOutput()
 }
 
 func (u *LogService) GetSystemLogStatus() (dto.SystemLogStatus, error) {
@@ -134,13 +142,44 @@ func journalctlHelpSupportsGrep(help string) bool {
 	return strings.Contains(help, "--grep=")
 }
 
-func journalctlGrepUnsupported(keyword, output string) bool {
-	if strings.TrimSpace(keyword) == "" {
-		return false
+func handleJournalQueryError(
+	req dto.SystemLogReq,
+	output []byte,
+	queryErr error,
+	probe func() ([]byte, error),
+) (dto.SystemLogRes, error) {
+	if hasSystemLogFilter(req) && probe != nil {
+		probeOutput, probeErr := probe()
+		if probeErr == nil {
+			return dto.SystemLogRes{Source: "journalctl", Items: []dto.SystemLogItem{}}, nil
+		}
+		return dto.SystemLogRes{}, newJournalQueryError(probeOutput, probeErr)
 	}
-	output = strings.ToLower(output)
-	return strings.Contains(output, "grep") &&
-		(strings.Contains(output, "unrecognized option") || strings.Contains(output, "unknown option"))
+	return dto.SystemLogRes{}, newJournalQueryError(output, queryErr)
+}
+
+func newJournalQueryError(output []byte, queryErr error) error {
+	message := strings.TrimSpace(string(output))
+	if message == "" && queryErr != nil {
+		message = queryErr.Error()
+	}
+	return fmt.Errorf("read host system logs failed: %s", message)
+}
+
+func trimJournalLogItemsToStartTime(items []dto.SystemLogItem, startTime time.Time) []dto.SystemLogItem {
+	startTimestamp := startTime.UnixMicro()
+	for i, item := range items {
+		if item.Timestamp < startTimestamp {
+			return items[:i]
+		}
+	}
+	return items
+}
+
+func hasSystemLogFilter(req dto.SystemLogReq) bool {
+	return strings.TrimSpace(req.Keyword) != "" ||
+		strings.TrimSpace(req.Priority) != "" ||
+		strings.TrimSpace(req.Service) != ""
 }
 
 func firstOutputLine(output string) string {
@@ -155,12 +194,14 @@ func firstOutputLine(output string) string {
 func buildJournalQueryArgs(req dto.SystemLogReq, startTime, endTime time.Time, pageSize int, cursor *systemLogCursor) []string {
 	args := []string{
 		"--no-pager", "--reverse", "--output=json",
-		"--since", formatJournalQueryTime(startTime),
 	}
 	if cursor != nil && cursor.JournalCursor != "" {
 		args = append(args, "--after-cursor="+cursor.JournalCursor)
 	} else {
-		args = append(args, "--until", formatJournalQueryTime(endTime))
+		args = append(args,
+			"--since", formatJournalQueryTime(startTime),
+			"--until", formatJournalQueryTime(endTime),
+		)
 	}
 	if service := strings.TrimSpace(req.Service); service != "" {
 		args = append(args, "-u", service)
@@ -169,7 +210,7 @@ func buildJournalQueryArgs(req dto.SystemLogReq, startTime, endTime time.Time, p
 		args = append(args, "--priority", priority+".."+priority)
 	}
 	if keyword := strings.TrimSpace(req.Keyword); keyword != "" {
-		args = append(args, "--grep", keyword)
+		args = append(args, "--grep", regexp.QuoteMeta(keyword), "--case-sensitive=no")
 	}
 	queryLines := pageSize + 1
 	if cursor != nil && cursor.JournalCursor == "" {

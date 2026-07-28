@@ -57,7 +57,7 @@
             <TableRefresh @search="resetAndLoadLogs" />
         </template>
         <template #main>
-            <ComplexTable :data="logs" :pagination-config="paginationConfig" @row-click="openDetail">
+            <ComplexTable :data="logs" :pagination-config="paginationConfig" @row-click="openDetail" :heightDiff="370">
                 <el-table-column prop="time" :label="$t('commons.table.date')" width="220" show-overflow-tooltip />
                 <el-table-column :label="$t('logs.priority')" width="120">
                     <template #default="{ row }">
@@ -265,9 +265,7 @@ onMounted(async () => {
     if (pageSizes.includes(cachedPageSize)) {
         paginationConfig.pageSize = cachedPageSize;
     }
-    await loadSystemLogStatus();
-    resetAndLoadLogs();
-    loadServices();
+    await Promise.allSettled([loadSystemLogStatus(), resetAndLoadLogs(), loadServices()]);
 });
 onUnmounted(() => {
     if (timer) clearTimeout(timer);
