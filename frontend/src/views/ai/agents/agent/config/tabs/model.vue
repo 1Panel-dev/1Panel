@@ -187,6 +187,7 @@ const load = async (params: AgentModelLoadParams) => {
                 page: 1,
                 pageSize: 200,
                 provider: '',
+                textOnly: true,
                 name: '',
             }),
             getAgentModelConfig({ agentId: params.agentId }),

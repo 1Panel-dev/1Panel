@@ -198,6 +198,23 @@ SubTask: "子任務"
 Skip: "忽略錯誤並繼續..."
 Success: "成功"
 
+# AI 閘道智慧路由任務
+AIProxySmartRouteCreateTask: "建立 AI 閘道智慧路由樣本"
+AIProxySmartRouteCreateSubTask: "建立樣本並產生向量"
+AIProxySmartRouteCreateStart: "開始建立樣本，共 {{ .total }} 條"
+AIProxySmartRouteCreateFailed: "[{{ .current }}/{{ .total }}] 建立失敗：type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteCreateSuccess: "[{{ .current }}/{{ .total }}] 建立成功：sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteCreateComplete: "建立完成：成功 {{ .success }} 條，失敗 {{ .failed }} 條"
+AIProxySmartRouteCreateError: "建立樣本失敗：失敗 {{ .failed }} 條，最後錯誤"
+AIProxySmartRouteRebuildTask: "重建 AI 閘道智慧路由樣本向量"
+AIProxySmartRouteRebuildSubTask: "重建樣本向量"
+AIProxySmartRouteEmbeddingRequired: "Embedding 位址和模型不能為空"
+AIProxySmartRouteRebuildStart: "開始重建樣本向量，共 {{ .total }} 條"
+AIProxySmartRouteRebuildFailed: "[{{ .current }}/{{ .total }}] 重建失敗：sampleID={{ .id }} type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteRebuildSuccess: "[{{ .current }}/{{ .total }}] 重建成功：sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteRebuildComplete: "重建完成：成功 {{ .success }} 條，失敗 {{ .failed }} 條"
+AIProxySmartRouteRebuildError: "重建樣本向量失敗：失敗 {{ .failed }} 條，最後錯誤"
+
 # 智慧體批次任務
 BatchInstallAgent: "批量安裝智能體"
 DispatchAgentInstallTasks: "下發智能體安裝任務"

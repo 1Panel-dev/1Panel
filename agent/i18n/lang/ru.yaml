@@ -649,3 +649,7 @@ ErrAIProxyModelMapEmpty: 'Сопоставление моделей не мож�
 ErrAIProxyModelMapEmptyExternalModel: 'Сопоставление моделей содержит пустую запрошенную модель'
 ErrAIProxyModelMapEmptyUpstreamModel: 'Upstream-модель для {{ .model }} не может быть пустой'
 AIProxyUserFallback: 'Удаленный пользователь (ID: {{ .id }})'
+AIProviderBailian: 'Alibaba Cloud Model Studio'
+AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
+AIProviderArk: 'Volcengine Ark'
+AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'

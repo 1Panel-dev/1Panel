@@ -738,6 +738,7 @@ const message = {
             discoverModelsHelper:
                 'Obtenha os modelos pela API /v1/models do provedor e adicione todos ao catálogo de modelos',
             discoverModelsFailedFallback: 'Não foi possível obter os modelos. Configure um modelo manualmente.',
+            discoverModelsFailedUseDefaults: 'Não foi possível obter os modelos. Os modelos padrão estão em uso.',
             accountModelsDuplicate: 'Há modelos duplicados no catálogo',
             modelPool: 'Catálogo de modelos',
             fallbackModels: 'Modelos de fallback',
@@ -894,8 +895,13 @@ const message = {
                 'Ao salvar o usuário ou a senha, o contêiner será reconstruído automaticamente para que as alterações entrem em vigor.',
             channelDeleteConfirm: 'Excluir a configuração do canal {0}?',
             apiTypeBaseURLHelper: 'Este tipo envia requisições para {0}. Base URL recomendada: {1}',
+            customImageURLHelper:
+                'Informe a URL completa do endpoint de geração de imagens para contas Custom. O caminho não é adicionado automaticamente. Exemplo: {0}',
             apiTypeBaseURLMismatch:
                 'A Base URL atual parece um caminho {0}, mas {1} está selecionado. URL recomendada: {2}',
+            validateAvailability: 'Validar disponibilidade da conta',
+            validateAvailabilityHelper: 'Envia uma mensagem mínima antes de salvar para validar a API',
+            validateImageAvailabilityHelper: 'Gera uma imagem mínima antes de salvar e pode gerar custos',
         },
         model: {
             model: 'Modelo',
@@ -956,6 +962,7 @@ const message = {
         },
         aiProxy: {
             title: 'Gateway de IA',
+            apiReference: 'Referência da API',
             notInstalled: 'Não instalado',
             usage: 'Uso',
             accountPool: 'Pool de contas',
@@ -1079,13 +1086,20 @@ const message = {
             validationModelMapEmpty: 'Os nomes no mapeamento de modelos não podem ficar vazios',
             validationModelMapDuplicate: 'O modelo solicitado {0} está duplicado',
             modelGroup: 'Grupo de modelos',
+            modelCapability: 'Capacidade do modelo',
+            textGeneration: 'Geração de texto',
+            imageGeneration: 'Geração de imagens',
+            textModels: 'Modelos de texto',
+            textToImageModels: 'Modelos de texto para imagem',
+            unauthorized: 'Não autorizado',
+            imageCount: 'Quantidade de imagens',
             availableModels: 'Modelos disponíveis',
             modelGroupModels: 'Modelos solicitados',
             modelGroupModelsPlaceholder: 'Selecione ou informe nomes de modelos solicitados',
             modelGroupModelsHelper:
-                'Informe apenas modelos upstream reais; o roteamento inteligente tenta os modelos em ordem e não faz balanceamento entre modelos.',
+                'Informe os nomes de modelo usados pelos clientes ao chamar o gateway de IA; o roteamento inteligente tenta os modelos em ordem e não faz balanceamento entre modelos.',
             modelGroupGuide:
-                'Grupos de modelos contêm apenas modelos upstream reais. auto é um nome de modelo virtual usado pelos clientes ao chamar o gateway de IA.',
+                'Grupos de modelos contêm os nomes de modelo expostos pelo gateway de IA. Configure os modelos upstream no mapeamento de modelos do pool de contas. auto é um nome de modelo virtual e não deve ser adicionado ao grupo.',
             modelGroupModelCount: '{0} modelos',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',

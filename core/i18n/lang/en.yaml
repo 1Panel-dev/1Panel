@@ -198,6 +198,23 @@ SubTask: "Subtask"
 Skip: "Ignore errors and continue"
 Success: "Success"
 
+# AI gateway smart routing tasks
+AIProxySmartRouteCreateTask: "Create AI gateway smart routing samples"
+AIProxySmartRouteCreateSubTask: "Create samples and generate vectors"
+AIProxySmartRouteCreateStart: "Starting sample creation, {{ .total }} in total"
+AIProxySmartRouteCreateFailed: "[{{ .current }}/{{ .total }}] Creation failed: type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteCreateSuccess: "[{{ .current }}/{{ .total }}] Created: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteCreateComplete: "Creation completed: {{ .success }} succeeded, {{ .failed }} failed"
+AIProxySmartRouteCreateError: "Sample creation failed: {{ .failed }} failed, last error"
+AIProxySmartRouteRebuildTask: "Rebuild AI gateway smart routing sample vectors"
+AIProxySmartRouteRebuildSubTask: "Rebuild sample vectors"
+AIProxySmartRouteEmbeddingRequired: "Embedding endpoint and model are required"
+AIProxySmartRouteRebuildStart: "Starting sample vector rebuild, {{ .total }} in total"
+AIProxySmartRouteRebuildFailed: "[{{ .current }}/{{ .total }}] Rebuild failed: sampleID={{ .id }} type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteRebuildSuccess: "[{{ .current }}/{{ .total }}] Rebuilt: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteRebuildComplete: "Rebuild completed: {{ .success }} succeeded, {{ .failed }} failed"
+AIProxySmartRouteRebuildError: "Sample vector rebuild failed: {{ .failed }} failed, last error"
+
 # agent batch task
 BatchInstallAgent: "Batch install agent"
 DispatchAgentInstallTasks: "Dispatch agent install tasks"

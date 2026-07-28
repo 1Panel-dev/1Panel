@@ -7,6 +7,18 @@
                 </el-button>
             </template>
             <template #rightToolBar>
+                <el-select
+                    v-model="apiType"
+                    clearable
+                    filterable
+                    class="api-type-filter"
+                    :placeholder="'API ' + $t('commons.table.type')"
+                    @change="handleAPITypeChange"
+                >
+                    <el-option v-for="item in apiTypeOptions" :key="item" :label="item" :value="item">
+                        <ApiTypeTag :api-type="item" />
+                    </el-option>
+                </el-select>
                 <TableSearch v-model:searchName="searchName" @search="search" />
                 <TableRefresh @search="search" />
             </template>
@@ -15,13 +27,12 @@
                     <el-table-column :label="$t('commons.table.name')" prop="name" min-width="200" />
                     <el-table-column :label="$t('aiTools.agents.provider')" prop="provider" width="200">
                         <template #default="{ row }">
-                            <div class="provider-cell">
-                                <ProviderLogo
-                                    :provider="row.provider"
-                                    :display-name="getAgentProviderDisplayName(row.provider, row.providerName)"
-                                />
-                                <span>{{ getAgentProviderDisplayName(row.provider, row.providerName) }}</span>
-                            </div>
+                            <ProviderLabel :provider="row.provider" :display-name="row.providerName" />
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="'API ' + $t('commons.table.type')" prop="apiType" min-width="170">
+                        <template #default="{ row }">
+                            <ApiTypeTag :api-type="row.apiType" />
                         </template>
                     </el-table-column>
                     <el-table-column label="Base URL" prop="baseUrl" min-width="200" />
@@ -59,20 +70,23 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
-import { deleteAgentAccount, pageAgentAccounts } from '@/api/modules/ai';
+import { deleteAgentAccount, getAgentProviders, pageAgentAccounts } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import AddDialog from '@/views/ai/agents/model/add/index.vue';
 import ModelPoolDialog from '@/views/ai/agents/model/pool/index.vue';
-import ProviderLogo from '@/components/agent-provider-logo/index.vue';
+import ProviderLabel from '@/components/agent-provider-label/index.vue';
+import ApiTypeTag from '@/components/api-type-tag/index.vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { dateFormat } from '@/utils/date';
-import { getAgentProviderDisplayName, isAgentAccountVerificationSkipped } from '@/utils/agent';
+import { isAgentAccountVerificationSkipped } from '@/utils/agent';
 
 const items = ref<AI.AgentAccountItem[]>([]);
 const addRef = ref();
 const modelPoolRef = ref();
 const searchName = ref('');
+const apiType = ref('');
+const apiTypeOptions = ref<string[]>([]);
 
 const buttons = [
     {
@@ -102,11 +116,24 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         provider: '',
+        apiType: apiType.value,
         name: searchName.value || '',
     };
     const res = await pageAgentAccounts(req);
     items.value = res.data.items || [];
     paginationConfig.total = res.data.total || 0;
+};
+
+const handleAPITypeChange = () => {
+    paginationConfig.currentPage = 1;
+    search();
+};
+
+const loadAPITypes = async () => {
+    const res = await getAgentProviders();
+    apiTypeOptions.value = Array.from(
+        new Set((res.data || []).flatMap((provider) => provider.apiTypes.map((item) => item.apiType))),
+    ).sort();
 };
 
 const openCreate = () => {
@@ -177,22 +204,12 @@ const onDelete = async (row: AI.AgentAccountItem) => {
 };
 
 onMounted(async () => {
-    await search();
+    await Promise.all([search(), loadAPITypes()]);
 });
 </script>
 
-<style scoped lang="scss">
-.provider-cell {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-    white-space: nowrap;
-
-    span {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+<style scoped>
+.api-type-filter {
+    width: 220px;
 }
 </style>

@@ -145,6 +145,7 @@ const loadAgentAccounts = async () => {
         page: 1,
         pageSize: 1000,
         provider: '',
+        textOnly: true,
         name: '',
     }).then((res) => {
         agentAccountOptions.value = res.data?.items || [];

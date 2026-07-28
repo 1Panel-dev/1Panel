@@ -198,6 +198,23 @@ SubTask: "ວຽກຍ່ອຍ"
 Skip: "ບໍ່ສົນໃຈຂໍ້ຜິດພາດ ແລະ ສືບຕໍ່"
 Success: "ສຳເລັດ"
 
+# ວຽກ Smart Route ຂອງ AI Gateway
+AIProxySmartRouteCreateTask: "ສ້າງຕົວຢ່າງ Smart Route ຂອງ AI Gateway"
+AIProxySmartRouteCreateSubTask: "ສ້າງຕົວຢ່າງ ແລະ ສ້າງ Vector"
+AIProxySmartRouteCreateStart: "ເລີ່ມສ້າງຕົວຢ່າງ, ທັງໝົດ {{ .total }}"
+AIProxySmartRouteCreateFailed: "[{{ .current }}/{{ .total }}] ສ້າງບໍ່ສຳເລັດ: type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteCreateSuccess: "[{{ .current }}/{{ .total }}] ສ້າງສຳເລັດ: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteCreateComplete: "ສ້າງສຳເລັດ: {{ .success }} ສຳເລັດ, {{ .failed }} ບໍ່ສຳເລັດ"
+AIProxySmartRouteCreateError: "ສ້າງຕົວຢ່າງບໍ່ສຳເລັດ: {{ .failed }} ລາຍການ, ຂໍ້ຜິດພາດຫຼ້າສຸດ"
+AIProxySmartRouteRebuildTask: "ສ້າງ Vector ຕົວຢ່າງ Smart Route ຂອງ AI Gateway ຄືນໃໝ່"
+AIProxySmartRouteRebuildSubTask: "ສ້າງ Vector ຕົວຢ່າງຄືນໃໝ່"
+AIProxySmartRouteEmbeddingRequired: "ຕ້ອງລະບຸ Endpoint ແລະ Model ຂອງ Embedding"
+AIProxySmartRouteRebuildStart: "ເລີ່ມສ້າງ Vector ຕົວຢ່າງຄືນໃໝ່, ທັງໝົດ {{ .total }}"
+AIProxySmartRouteRebuildFailed: "[{{ .current }}/{{ .total }}] ສ້າງຄືນໃໝ່ບໍ່ສຳເລັດ: sampleID={{ .id }} type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteRebuildSuccess: "[{{ .current }}/{{ .total }}] ສ້າງຄືນໃໝ່ສຳເລັດ: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteRebuildComplete: "ສ້າງຄືນໃໝ່ສຳເລັດ: {{ .success }} ສຳເລັດ, {{ .failed }} ບໍ່ສຳເລັດ"
+AIProxySmartRouteRebuildError: "ສ້າງ Vector ຕົວຢ່າງຄືນໃໝ່ບໍ່ສຳເລັດ: {{ .failed }} ລາຍການ, ຂໍ້ຜິດພາດຫຼ້າສຸດ"
+
 # agent batch task
 BatchInstallAgent: "ຕິດຕັ້ງເອເຈນແບບກຸ່ມ"
 DispatchAgentInstallTasks: "ຈັດສົ່ງວຽກຕິດຕັ້ງເອເຈນ"
