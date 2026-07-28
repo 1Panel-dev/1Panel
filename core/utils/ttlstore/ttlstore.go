@@ -63,6 +63,25 @@ func (s *Store[T]) Get(itemID string) (T, bool) {
 	return item.Value, true
 }
 
+// Take atomically returns and removes an item. It is intended for one-time
+// credentials such as authentication state and handoff tickets.
+func (s *Store[T]) Take(itemID string) (T, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	item, ok := s.items[itemID]
+	if !ok {
+		var zero T
+		return zero, false
+	}
+	delete(s.items, itemID)
+	if s.now().After(item.ExpiresAt) {
+		var zero T
+		return zero, false
+	}
+	return item.Value, true
+}
+
 func (s *Store[T]) Update(itemID string, fn func(*T) bool) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()

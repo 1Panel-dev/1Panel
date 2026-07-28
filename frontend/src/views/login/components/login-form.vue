@@ -76,6 +76,19 @@
                             {{ $t('commons.login.passkey') }}
                         </el-button>
                     </el-form-item>
+                    <el-form-item v-if="oidcEnabled">
+                        <el-button
+                            class="w-full oidc-login-button"
+                            size="default"
+                            native-type="button"
+                            :loading="oidcStarting"
+                            @click="beginOIDCLogin"
+                            @keydown.enter.stop.prevent="beginOIDCLogin"
+                        >
+                            <el-icon class="mr-2"><Connection /></el-icon>
+                            {{ $t('xpack.user.auth.oidc.loginWith', { provider: oidcDisplayName }) }}
+                        </el-button>
+                    </el-form-item>
                     <el-form-item>
                         <el-link type="primary" :underline="false" @click="switchToPasswordLogin">
                             {{ $t('commons.login.passkeyToPassword') }}
@@ -194,6 +207,19 @@
                                 {{ $t('commons.button.login') }}
                             </el-button>
                         </el-form-item>
+                        <el-form-item v-if="oidcEnabled">
+                            <el-button
+                                class="w-full oidc-login-button"
+                                size="default"
+                                native-type="button"
+                                :loading="oidcStarting"
+                                @click="beginOIDCLogin"
+                                @keydown.enter.stop.prevent="beginOIDCLogin"
+                            >
+                                <el-icon class="mr-2"><Connection /></el-icon>
+                                {{ $t('xpack.user.auth.oidc.loginWith', { provider: oidcDisplayName }) }}
+                            </el-button>
+                        </el-form-item>
                         <el-text v-if="isDemo" type="danger" class="demo">
                             {{ $t('commons.login.username') }}:demo {{ $t('commons.login.password') }}:1panel
                         </el-text>
@@ -242,7 +268,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, nextTick } from 'vue';
+import { ref, reactive, onMounted, onBeforeUnmount, computed, nextTick } from 'vue';
 import type { ElForm } from 'element-plus';
 import {
     loginApi,
@@ -251,14 +277,18 @@ import {
     getLoginSetting,
     passkeyBeginApi,
     passkeyFinishApi,
+    oidcStatusApi,
+    oidcBeginApi,
+    oidcFinishApi,
 } from '@/api/modules/auth';
+import type { Login as LoginModel } from '@/api/interface/auth';
 import { MenuStore, TabsStore } from '@/store';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { encryptPassword, base64UrlToBuffer, bufferToBase64Url } from '@/utils/auth';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 import { routerToName } from '@/utils/router';
-import { Key } from '@element-plus/icons-vue';
+import { Connection, Key } from '@element-plus/icons-vue';
 import { changeToLocal } from '@/utils/node';
 import { syncAuthInfo } from '@/utils/rbac';
 import { adjustColorToRGBA } from '@/utils/color';
@@ -290,11 +320,31 @@ const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
 const passkeySetting = ref(false);
 const passkeySupported = ref(false);
+const oidcEnabled = ref(false);
+const oidcDisplayName = ref('OIDC');
+const oidcStarting = ref(false);
 const autoPasskeyEnabledKey = '1panel-passkey-auto-enabled';
 const showPasswordLogin = ref(false);
 const isDemo = ref(false);
 const open = ref(false);
 const loginBtnLinkColor = ref<string | null>(null);
+let loginViewActive = true;
+
+const takeOIDCTicketFromURL = () => {
+    const url = new URL(window.location.href);
+    const fragmentParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash);
+    const ticket = fragmentParams.get('oidc_ticket') || url.searchParams.get('oidc_ticket') || '';
+    if (!ticket) return '';
+    fragmentParams.delete('oidc_ticket');
+    url.searchParams.delete('oidc_ticket');
+    const sanitizedFragment = fragmentParams.toString();
+    url.hash = sanitizedFragment ? `#${sanitizedFragment}` : '';
+    const sanitizedURL = `${url.pathname}${url.search}${url.hash}`;
+    window.history.replaceState(window.history.state, '', sanitizedURL);
+    return ticket;
+};
+const pendingOIDCTicket = takeOIDCTicketFromURL();
+const hasPendingOIDCTicket = Boolean(pendingOIDCTicket);
 
 type FormInstance = InstanceType<typeof ElForm>;
 const _isMobile = () => {
@@ -421,6 +471,36 @@ const switchToPasswordLogin = () => {
     });
 };
 
+const completeLogin = async (result: LoginModel.ResLogin) => {
+    isLogin.value = true;
+    agreeLicense.value = true;
+    menuStore.setMenuList([]);
+    tabsStore.removeAllTabs();
+    isAdmin.value = result.role === 'ADMIN';
+    await changeToLocal();
+    await syncAuthInfo(currentNode.value);
+    MsgSuccess(i18n.t('commons.msg.loginSuccess'));
+    localStorage.removeItem('dashboardCache');
+    localStorage.removeItem('upgradeChecked');
+    routerToName('home');
+    clearLoginKeydownHandler();
+};
+
+const handleLoginResult = async (result: LoginModel.ResLogin) => {
+    if (result.mfaStatus === 'Enable') {
+        mfaLoginForm.sessionId = result.mfaSession || '';
+        mfaLoginForm.code = '';
+        mfaShow.value = true;
+        errMfaInfo.value = false;
+        errCaptcha.value = false;
+        nextTick(() => {
+            mfaLoginRef.value?.focus();
+        });
+        return;
+    }
+    await completeLogin(result);
+};
+
 const login = (formEl: FormInstance | undefined) => {
     if (!formEl || isLoggingIn) return;
     errAuthInfo.value = false;
@@ -454,29 +534,7 @@ const login = (formEl: FormInstance | undefined) => {
             loading.value = true;
             const res = await loginApi(requestLoginForm);
             ignoreCaptcha.value = true;
-            if (res.data.mfaStatus === 'Enable') {
-                mfaLoginForm.sessionId = res.data.mfaSession || '';
-                mfaLoginForm.code = '';
-                mfaShow.value = true;
-                errMfaInfo.value = false;
-                errCaptcha.value = false;
-                nextTick(() => {
-                    mfaLoginRef.value?.focus();
-                });
-                return;
-            }
-            isLogin.value = true;
-            agreeLicense.value = true;
-            menuStore.setMenuList([]);
-            tabsStore.removeAllTabs();
-            isAdmin.value = res.data.role === 'ADMIN';
-            await changeToLocal();
-            await syncAuthInfo(currentNode.value);
-            MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            localStorage.removeItem('dashboardCache');
-            localStorage.removeItem('upgradeChecked');
-            routerToName('home');
-            document.onkeydown = null;
+            await handleLoginResult(res.data);
         } catch (res) {
             if (res.code === 401) {
                 if (res.message === 'ErrCaptchaCode') {
@@ -511,17 +569,7 @@ const mfaLogin = async (auto: boolean) => {
         try {
             errMfaInfo.value = false;
             const res = await mfaLoginApi(mfaLoginForm);
-            isLogin.value = true;
-            menuStore.setMenuList([]);
-            tabsStore.removeAllTabs();
-            MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            isAdmin.value = res.data.role === 'ADMIN';
-            await changeToLocal();
-            await syncAuthInfo(currentNode.value);
-            localStorage.removeItem('dashboardCache');
-            localStorage.removeItem('upgradeChecked');
-            routerToName('home');
-            document.onkeydown = null;
+            await completeLogin(res.data);
         } catch (res) {
             if (res.code === 401) {
                 if (res.message === 'ErrCaptchaCode') {
@@ -578,23 +626,57 @@ const passkeyLogin = async () => {
         const loginRes = await passkeyFinishApi(payload, res.data.sessionId);
         enableAutoPasskey();
         ignoreCaptcha.value = true;
-        isLogin.value = true;
-        agreeLicense.value = true;
-        menuStore.setMenuList([]);
-        tabsStore.removeAllTabs();
-        isAdmin.value = loginRes.data.role === 'ADMIN';
-        await changeToLocal();
-        await syncAuthInfo(currentNode.value);
-        MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-        localStorage.removeItem('dashboardCache');
-        localStorage.removeItem('upgradeChecked');
-        routerToName('home');
-        document.onkeydown = null;
+        await handleLoginResult(loginRes.data);
     } catch (res: any) {
         disableAutoPasskey();
         if (res?.message) {
             MsgError(i18n.t('commons.login.passkeyFailed'));
         }
+    } finally {
+        isLoggingIn = false;
+        loading.value = false;
+    }
+};
+
+const loadOIDCStatus = async () => {
+    oidcEnabled.value = false;
+    if (!isEnterprise.value) return;
+    try {
+        const res = await oidcStatusApi();
+        oidcEnabled.value = Boolean(res.data.enabled && res.data.authorizationCode);
+        oidcDisplayName.value = res.data.displayName?.trim() || 'OIDC';
+    } catch {
+        // OIDC is optional. A status failure must not affect local password or Passkey login.
+        oidcEnabled.value = false;
+    }
+};
+
+const beginOIDCLogin = async () => {
+    if (isLoggingIn || !oidcEnabled.value) return;
+    try {
+        isLoggingIn = true;
+        oidcStarting.value = true;
+        const res = await oidcBeginApi();
+        if (!res.data.authorizationURL) return;
+        window.location.assign(res.data.authorizationURL);
+    } catch {
+        // The request layer displays the backend-localized error.
+    } finally {
+        isLoggingIn = false;
+        oidcStarting.value = false;
+    }
+};
+
+const finishOIDCLogin = async (ticket: string) => {
+    if (!ticket) return;
+    try {
+        isLoggingIn = true;
+        loading.value = true;
+        const res = await oidcFinishApi({ ticket });
+        ignoreCaptcha.value = true;
+        await handleLoginResult(res.data);
+    } catch {
+        // The ticket was already removed from the URL; the request layer displays the localized failure.
     } finally {
         isLoggingIn = false;
         loading.value = false;
@@ -665,7 +747,7 @@ const getSetting = async () => {
         if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {
             loginForm.agreeLicense = true;
         }
-        if (passkeySetting.value && passkeySupported.value && isAutoPasskeyEnabled()) {
+        if (passkeySetting.value && passkeySupported.value && isAutoPasskeyEnabled() && !hasPendingOIDCTicket) {
             passkeyLogin();
         }
     } catch (error) {}
@@ -684,16 +766,46 @@ const applyLoginButtonTheme = () => {
     );
 };
 
+function loginKeydownHandler(e: KeyboardEvent) {
+    const event = (window.event || e) as KeyboardEvent;
+    if (event.defaultPrevented || (event.target as HTMLElement | null)?.closest('.oidc-login-button')) return;
+    if (event.key === 'Enter' || event.keyCode === 13) {
+        if (!mfaShow.value) {
+            if (!loginButtonFocused.value) {
+                login(loginFormRef.value);
+            }
+        }
+        if (mfaShow.value && !mfaButtonFocused.value) {
+            mfaLogin(false);
+        }
+    }
+}
+
+function clearLoginKeydownHandler() {
+    if (document.onkeydown === loginKeydownHandler) {
+        document.onkeydown = null;
+    }
+}
+
 onMounted(async () => {
     isOnRestart.value = false;
     passkeySupported.value = !!window.PublicKeyCredential && window.isSecureContext;
     applyLoginButtonTheme();
     await getSetting();
+    if (!loginViewActive) return;
+    if (pendingOIDCTicket) {
+        await finishOIDCLogin(pendingOIDCTicket);
+    }
+    if (!loginViewActive || isLogin.value) return;
+    if (!isLogin.value && !mfaShow.value) {
+        await loadOIDCStatus();
+    }
     try {
         await getXpackSettingForTheme();
     } catch (error) {
         // 即使获取失败也不影响登录，默认为之前的主题配置
     }
+    if (!loginViewActive) return;
     applyLoginButtonTheme();
     if (!ignoreCaptcha.value) {
         loginVerify();
@@ -703,19 +815,12 @@ onMounted(async () => {
         userNameRef.value?.focus();
     });
     loginForm.agreeLicense = agreeLicense.value;
-    document.onkeydown = (e: any) => {
-        e = window.event || e;
-        if (e.keyCode === 13) {
-            if (!mfaShow.value) {
-                if (!loginButtonFocused.value) {
-                    login(loginFormRef.value);
-                }
-            }
-            if (mfaShow.value && !mfaButtonFocused.value) {
-                mfaLogin(false);
-            }
-        }
-    };
+    document.onkeydown = loginKeydownHandler;
+});
+
+onBeforeUnmount(() => {
+    loginViewActive = false;
+    clearLoginKeydownHandler();
 });
 </script>
 <style scoped lang="scss">
@@ -750,6 +855,19 @@ onMounted(async () => {
             background-color: var(--login-btn-link-hover-color) !important;
             border-color: var(--login-btn-link-hover-color) !important;
             outline: none !important;
+        }
+    }
+
+    .oidc-login-button {
+        border-color: var(--login-btn-link-color);
+        background: transparent;
+        color: var(--login-btn-link-color);
+
+        &:hover,
+        &:focus-visible {
+            border-color: var(--login-btn-link-hover-color) !important;
+            background: var(--login-loading-mask-color) !important;
+            color: var(--login-btn-link-hover-color) !important;
         }
     }
 

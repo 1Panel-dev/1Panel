@@ -90,6 +90,24 @@ func BeginMFALogin(c *gin.Context, name, entrance, mfaStatus string) *dto.UserLo
 	return &dto.UserLoginInfo{Name: name, MfaStatus: mfaStatus, MfaSession: mfaSession}
 }
 
+func BeginAuthSourceMFALogin(
+	c *gin.Context,
+	name, entrance, mfaStatus, authSource string,
+	authSourceID uint,
+	authSourceConfigVersion uint64,
+) *dto.UserLoginInfo {
+	ip := common.GetRealClientIP(c)
+	mfaSession := initauth.GetMFASessionStore().SetWithAuthSource(
+		name,
+		entrance,
+		ip,
+		authSource,
+		authSourceID,
+		authSourceConfigVersion,
+	)
+	return &dto.UserLoginInfo{Name: name, MfaStatus: mfaStatus, MfaSession: mfaSession}
+}
+
 func VerifyMFALogin(c *gin.Context, sessionID, code, entrance string) (string, string, error) {
 	settingRepo := repo.NewISettingRepo()
 	mfaSessions := initauth.GetMFASessionStore()

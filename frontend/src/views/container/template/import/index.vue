@@ -136,14 +136,14 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
             const parsed = JSON.parse(content);
 
             if (!Array.isArray(parsed)) {
-                MsgError(i18n.global.t('commons.msg.errJsonImportFormat'));
+                MsgError(i18n.global.t('commons.msg.errImportFormat'));
                 loading.value = false;
                 return;
             }
 
             for (const item of parsed) {
                 if (!checkDataFormat(item)) {
-                    MsgError(i18n.global.t('commons.msg.errJsonImportFormat'));
+                    MsgError(i18n.global.t('commons.msg.errImportFormat'));
                     loading.value = false;
                     return;
                 }

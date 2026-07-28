@@ -3,7 +3,7 @@
         <el-card v-if="showStopped" class="mask-prompt">
             <span>{{ $t('tool.supervisor.notStartWarn') }}</span>
         </el-card>
-        <LayoutContent :title="$t(' tool.supervisor.list', 2)" v-loading="loading">
+        <LayoutContent :title="$t('tool.supervisor.list', 2)" v-loading="loading">
             <template #prompt v-if="!isFxplay">
                 <el-alert type="info" :closable="false">
                     <template #title>

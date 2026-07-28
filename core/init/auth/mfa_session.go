@@ -21,11 +21,14 @@ func GetMFASessionStore() *mfaSessionStore {
 }
 
 type mfaSession struct {
-	Name      string
-	Entrance  string
-	IP        string
-	Failures  int
-	ExpiresAt time.Time
+	Name                    string
+	Entrance                string
+	IP                      string
+	AuthSource              string
+	AuthSourceID            uint
+	AuthSourceConfigVersion uint64
+	Failures                int
+	ExpiresAt               time.Time
 }
 
 type mfaSessionStore struct {
@@ -43,6 +46,21 @@ func (s *mfaSessionStore) Set(name, entrance, ip string) string {
 		Name:     name,
 		Entrance: entrance,
 		IP:       ip,
+	})
+}
+
+func (s *mfaSessionStore) SetWithAuthSource(
+	name, entrance, ip, authSource string,
+	authSourceID uint,
+	authSourceConfigVersion uint64,
+) string {
+	return s.store.Set(mfaSession{
+		Name:                    name,
+		Entrance:                entrance,
+		IP:                      ip,
+		AuthSource:              authSource,
+		AuthSourceID:            authSourceID,
+		AuthSourceConfigVersion: authSourceConfigVersion,
 	})
 }
 

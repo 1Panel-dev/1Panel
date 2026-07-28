@@ -49,7 +49,9 @@ class RequestHttp {
                     config.url === '/core/auth/login' ||
                     config.url === '/core/auth/mfalogin' ||
                     config.url === '/core/auth/passkey/begin' ||
-                    config.url === '/core/auth/passkey/finish'
+                    config.url === '/core/auth/passkey/finish' ||
+                    config.url === '/core/auth/oidc/begin' ||
+                    config.url === '/core/auth/oidc/finish'
                 ) {
                     config.headers.EntranceCode = encodeBase64(globalStore.entrance);
                 }

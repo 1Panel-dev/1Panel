@@ -72,7 +72,7 @@
                         <CopyButton :content="getEnvValue(env)" />
                     </el-collapse-item>
                 </el-collapse>
-                <el-empty v-if="!inspectData?.Config?.Env?.length" :description="$t('commons.msg.noData')" />
+                <el-empty v-if="!inspectData?.Config?.Env?.length" :description="$t('commons.msg.noneData')" />
             </el-tab-pane>
 
             <el-tab-pane :label="$t('container.network')" name="network">

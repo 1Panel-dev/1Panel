@@ -113,7 +113,7 @@ ErrPortInOtherApp: '{{ .port }} 포트는 이미 {{ .apps }} 애플리케이션�
 ErrDbUserNotValid: '기존 데이터베이스, 사용자 이름 및 비밀번호가 일치하지 않습니다'
 ErrMysqlUserUsedByApps: '이 데이터베이스 사용자는 [{{ .detail }}]에서 사용 중이므로 호스트 변경, 삭제 또는 권한 해제를 할 수 없습니다'
 ErrUpdateBuWebsite: '응용 프로그램이 성공적으로 업데이트되었지만, 웹사이트 구성 파일 수정에 실패했습니다. 구성을 확인하세요'
-Err1PanelNetworkFailed: '기본 컨테이너 네트워크 생성에 실패했습니다 {{ .세부 사항 }}'
+Err1PanelNetworkFailed: '기본 컨테이너 네트워크 생성에 실패했습니다 {{ .detail }}'
 ErrFileParse: '응용 프로그램 docker-compose 파일 구문 분석에 실패했습니다'
 ErrInstallDirNotFound: '설치 디렉토리가 존재하지 않습니다. 제거를 원하실 경우 강제 제거 를 선택해주세요.'
 AppStoreIsUpToDate: '앱 스토어가 이미 최신 버전입니다'

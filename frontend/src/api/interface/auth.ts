@@ -22,6 +22,17 @@ export namespace Login {
         sessionId: string;
         publicKey: Record<string, any>;
     }
+    export interface OIDCStatus {
+        enabled: boolean;
+        displayName: string;
+        authorizationCode: boolean;
+    }
+    export interface OIDCBeginResponse {
+        authorizationURL: string;
+    }
+    export interface OIDCFinishRequest {
+        ticket: string;
+    }
     export interface ResCaptcha {
         imagePath: string;
         captchaID: string;

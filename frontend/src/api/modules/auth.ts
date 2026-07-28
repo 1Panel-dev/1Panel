@@ -19,6 +19,18 @@ export const passkeyFinishApi = (params: Record<string, any>, sessionId: string)
     return http.post<Login.ResLogin>(`/core/auth/passkey/finish`, params, undefined, { 'Passkey-Session': sessionId });
 };
 
+export const oidcStatusApi = () => {
+    return http.get<Login.OIDCStatus>(`/core/auth/oidc/status`, undefined, { skipErrorMessage: true });
+};
+
+export const oidcBeginApi = () => {
+    return http.post<Login.OIDCBeginResponse>(`/core/auth/oidc/begin`);
+};
+
+export const oidcFinishApi = (params: Login.OIDCFinishRequest) => {
+    return http.post<Login.ResLogin>(`/core/auth/oidc/finish`, params);
+};
+
 export const getCaptcha = () => {
     return http.get<Login.ResCaptcha>(`/core/auth/captcha`);
 };

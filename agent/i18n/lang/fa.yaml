@@ -436,7 +436,7 @@ allow: 'مجاز'
 deny: 'ممنوع'
 OpenrestyNotFound: 'OpenResty نصب نشده است'
 remoteIpIsNull: "لیست IP خالی است"
-OpenrestyVersionErr: 'نسخه OpenResty بسیار پایین است؛ به ۱.۲۷.۱.۲-۲-۲-focal ارتقاء دهید'
+OpenrestyVersionErr: 'نسخه OpenResty بسیار پایین است؛ به 1.27.1.2-2-2-focal ارتقاء دهید'
 ErrFileTooLarge: 'فایل بزرگتر از ۱ مگابایت است و قابل بارگذاری نیست'
 
 # وظیفه

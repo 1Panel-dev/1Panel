@@ -268,7 +268,7 @@ const formatMethod = (row: Alert.AlertLog) => {
             case 'sms':
                 return t('xpack.alert.sms');
             case 'webhook':
-                return t('xpack.alert.webhook');
+                return t('xpack.alert.webhookItem');
             case 'bark':
                 return t('xpack.alert.bark');
             default:
