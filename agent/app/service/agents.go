@@ -105,6 +105,10 @@ type IAgentService interface {
 	UpgradePlugin(req dto.AgentPluginUpgradeReq) error
 	UninstallPlugin(req dto.AgentPluginUninstallReq) error
 	CheckPlugin(req dto.AgentPluginCheckReq) (*dto.AgentPluginStatus, error)
+	ListPlugins(req dto.AgentPluginsReq) ([]dto.AgentPluginItem, error)
+	SearchPlugins(req dto.AgentPluginSearchReq) ([]dto.AgentPluginSearchItem, error)
+	InstallMarketPlugin(req dto.AgentPluginMarketInstallReq) error
+	OperatePlugin(req dto.AgentPluginOperateReq) error
 	ApproveChannelPairing(req dto.AgentChannelPairingApproveReq) error
 }
 
