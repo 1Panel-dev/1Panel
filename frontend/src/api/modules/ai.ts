@@ -330,6 +330,22 @@ export const checkAgentPlugin = (req: AI.AgentPluginCheckReq) => {
     return http.post<AI.AgentPluginStatus>(`/ai/agents/plugin/check`, req);
 };
 
+export const listAgentPlugins = (req: AI.AgentPluginsReq) => {
+    return http.post<AI.AgentPluginItem[]>(`/ai/agents/plugins/list`, req);
+};
+
+export const searchAgentPlugins = (req: AI.AgentPluginSearchReq) => {
+    return http.post<AI.AgentPluginSearchItem[]>(`/ai/agents/plugins/search`, req);
+};
+
+export const installAgentMarketPlugin = (req: AI.AgentPluginMarketInstallReq) => {
+    return http.post(`/ai/agents/plugins/install`, req);
+};
+
+export const operateAgentPlugin = (req: AI.AgentPluginOperateReq) => {
+    return http.post(`/ai/agents/plugins/operate`, req);
+};
+
 export const getAgentSecurityConfig = (req: AI.AgentSecurityConfigReq) => {
     return http.post<AI.AgentSecurityConfig>(`/ai/agents/security/get`, req);
 };
