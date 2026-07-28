@@ -744,6 +744,7 @@ const message = {
             manualModelConfiguration: 'Manual setup',
             discoverModelsHelper: 'Get models from the provider /v1/models API and add all of them to the model pool',
             discoverModelsFailedFallback: 'Failed to get models. Configure a model manually.',
+            discoverModelsFailedUseDefaults: 'Failed to get models. Default models are being used.',
             accountModelsDuplicate: 'Duplicate models were found in the catalog',
             modelPool: 'Model Pool',
             fallbackModels: 'Fallback Models',
@@ -896,8 +897,13 @@ const message = {
                 'Saving the username or password will automatically rebuild the container so the changes take effect.',
             channelDeleteConfirm: 'Delete the {0} channel configuration?',
             apiTypeBaseURLHelper: 'This type sends requests to {0}. Recommended Base URL: {1}',
+            customImageURLHelper:
+                'Enter the complete image generation endpoint for Custom accounts. The path is not appended automatically. Example: {0}',
             apiTypeBaseURLMismatch:
                 'The current Base URL looks like a {0} path, but {1} is selected. Recommended URL: {2}',
+            validateAvailability: 'Validate account availability',
+            validateAvailabilityHelper: 'Send a minimal message before saving to validate the API',
+            validateImageAvailabilityHelper: 'Generates one minimal image before saving and may incur charges',
         },
         model: {
             model: 'Models',
@@ -957,6 +963,7 @@ const message = {
         },
         aiProxy: {
             title: 'AI Gateway',
+            apiReference: 'API Reference',
             notInstalled: 'Not installed',
             usage: 'Usage',
             accountPool: 'Account Pool',
@@ -1078,13 +1085,20 @@ const message = {
             validationModelMapEmpty: 'Model mapping names cannot be empty',
             validationModelMapDuplicate: 'Request model {0} is duplicated',
             modelGroup: 'Model Group',
+            modelCapability: 'Model Capability',
+            textGeneration: 'Text Generation',
+            imageGeneration: 'Image Generation',
+            textModels: 'Text Models',
+            textToImageModels: 'Text-to-Image Models',
+            unauthorized: 'Unauthorized',
+            imageCount: 'Image Count',
             availableModels: 'Available Models',
             modelGroupModels: 'Request Models',
             modelGroupModelsPlaceholder: 'Select or enter request model names',
             modelGroupModelsHelper:
-                'Only enter real upstream models; smart routing tries models in order and does not load balance between models.',
+                'Enter the request model names used by clients to call the AI Gateway; smart routing tries models in order and does not load balance between models.',
             modelGroupGuide:
-                'Model groups only contain real upstream models. auto is a virtual model name used by clients when requesting the AI Gateway.',
+                'Model groups contain request model names exposed by the AI Gateway. Configure upstream models in the account pool model mapping. auto is a virtual model name and does not belong in a model group.',
             modelGroupModelCount: '{0} models',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',

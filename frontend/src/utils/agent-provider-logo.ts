@@ -9,6 +9,24 @@ export interface AgentProviderLogo {
 
 const asset = (name: string) => new URL(`../assets/images/ai-providers/${name}`, import.meta.url).href;
 
+const aliyunLogo: AgentProviderLogo = {
+    src: asset('aliyun.webp'),
+    mark: 'QW',
+    background: '#ffffff',
+    color: '#ff6a00',
+    borderColor: '#dcdfe6',
+    source: 'https://www.alibabacloud.com/',
+};
+
+const volcengineLogo: AgentProviderLogo = {
+    src: asset('volcengine.png'),
+    mark: 'AR',
+    background: '#ffffff',
+    color: '#1664ff',
+    borderColor: '#dcdfe6',
+    source: 'https://www.volcengine.com/',
+};
+
 const providerLogos: Record<string, AgentProviderLogo> = {
     ollama: {
         src: asset('ollama.webp'),
@@ -34,22 +52,10 @@ const providerLogos: Record<string, AgentProviderLogo> = {
         borderColor: '#dcdfe6',
         source: 'https://cdn.deepseek.com/logo.png',
     },
-    'bailian-coding-plan': {
-        src: asset('aliyun.webp'),
-        mark: 'QW',
-        background: '#ffffff',
-        color: '#ff6a00',
-        borderColor: '#dcdfe6',
-        source: 'https://www.alibabacloud.com/',
-    },
-    'ark-coding-plan': {
-        src: asset('volcengine.png'),
-        mark: 'AR',
-        background: '#ffffff',
-        color: '#1664ff',
-        borderColor: '#dcdfe6',
-        source: 'https://www.volcengine.com/',
-    },
+    bailian: aliyunLogo,
+    'bailian-coding-plan': aliyunLogo,
+    ark: volcengineLogo,
+    'ark-coding-plan': volcengineLogo,
     zai: {
         src: asset('zai.webp'),
         mark: 'Z',

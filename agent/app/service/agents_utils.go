@@ -21,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	agentenv "github.com/1Panel-dev/1Panel/agent/utils/env"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
@@ -96,7 +97,7 @@ func ensureContainerRunning(containerName string) error {
 	return nil
 }
 
-func resolveAgentAccountInput(provider, apiType, authMode, apiKey, baseURL, modelID string) (resolvedAgentAccountInput, error) {
+func resolveAgentAccountInput(provider, apiType, authMode, apiKey, baseURL, modelID string, validateAvailability bool) (resolvedAgentAccountInput, error) {
 	resolvedAPIKey := strings.TrimSpace(apiKey)
 	resolvedAPIType := strings.TrimSpace(apiType)
 	resolvedAuthMode, err := providercatalog.ResolveAuthMode(provider, resolvedAPIType, authMode)
@@ -114,7 +115,8 @@ func resolveAgentAccountInput(provider, apiType, authMode, apiKey, baseURL, mode
 	if modelID == "" {
 		return resolvedAgentAccountInput{}, buserr.New("ErrAgentAccountModelsRequired")
 	}
-	if !providercatalog.SkipVerification(provider) {
+	imageAPI := providercatalog.IsImageAPIType(resolvedAPIType)
+	if validateAvailability && (imageAPI || !providercatalog.SkipVerification(provider)) {
 		if err := providercatalog.VerifyAccount(provider, resolvedAPIType, resolvedAuthMode, resolvedBaseURL, resolvedAPIKey, modelID); err != nil {
 			return resolvedAgentAccountInput{}, err
 		}
@@ -386,7 +388,7 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		Remark:       agent.Remark,
 		AgentType:    agentType,
 		Provider:     agent.Provider,
-		ProviderName: providercatalog.DisplayName(agent.Provider),
+		ProviderName: localizedAgentProviderName(agent.Provider),
 		Model:        agent.Model,
 		APIType:      agent.APIType,
 		BaseURL:      agent.BaseURL,
@@ -427,6 +429,15 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		}
 	}
 	return item
+}
+
+func localizedAgentProviderName(provider string) string {
+	if key := providercatalog.DisplayNameKey(provider); key != "" {
+		if name := strings.TrimSpace(i18n.GetMsgByKey(key)); name != "" {
+			return name
+		}
+	}
+	return providercatalog.DisplayName(provider)
 }
 
 func isAgentAppKey(appKey string) bool {
@@ -1159,15 +1170,15 @@ func buildInitialAgentAccountModels(account *model.AgentAccount, requested []dto
 	if len(requested) > 0 {
 		return normalizeAgentAccountModels(account, requested)
 	}
-	meta, ok := providercatalog.Get(account.Provider)
-	if !ok || len(meta.Models) == 0 {
+	defaultModels := providercatalog.DefaultModels(account.Provider, account.APIType)
+	if len(defaultModels) == 0 {
 		if requiresInitialAgentAccountModels(account.Provider) {
 			return nil, buserr.New("ErrAgentAccountModelsRequired")
 		}
 		return nil, nil
 	}
-	requested = make([]dto.AgentAccountModel, 0, len(meta.Models))
-	for _, item := range meta.Models {
+	requested = make([]dto.AgentAccountModel, 0, len(defaultModels))
+	for _, item := range defaultModels {
 		requested = append(requested, dto.AgentAccountModel{
 			ID:   item.ID,
 			Name: item.Name,

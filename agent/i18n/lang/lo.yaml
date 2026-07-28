@@ -640,3 +640,7 @@ ErrAIProxyModelMapEmpty: 'ການຈັບຄູ່ໂມເດລບໍ່ສ
 ErrAIProxyModelMapEmptyExternalModel: 'ການຈັບຄູ່ໂມເດລມີໂມເດລຄຳຮ້ອງຂໍທີ່ຫວ່າງເປົ່າ'
 ErrAIProxyModelMapEmptyUpstreamModel: 'ໂມເດລ Upstream ສຳລັບ {{ .model }} ບໍ່ສາມາດຫວ່າງເປົ່າໄດ້'
 AIProxyUserFallback: 'ຜູ້ໃຊ້ທີ່ຖືກລຶບ (ID: {{ .id }})'
+AIProviderBailian: 'Alibaba Cloud Model Studio'
+AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
+AIProviderArk: 'Volcengine Ark'
+AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'

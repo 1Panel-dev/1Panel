@@ -734,6 +734,7 @@ const message = {
             manualModelConfiguration: 'Настроить вручную',
             discoverModelsHelper: 'Получить модели через API /v1/models поставщика и добавить их все в каталог моделей',
             discoverModelsFailedFallback: 'Не удалось получить модели. Настройте модель вручную.',
+            discoverModelsFailedUseDefaults: 'Не удалось получить модели. Используются модели по умолчанию.',
             accountModelsDuplicate: 'В каталоге обнаружены повторяющиеся модели',
             modelPool: 'Каталог моделей',
             fallbackModels: 'Резервные модели',
@@ -888,7 +889,13 @@ const message = {
                 'После сохранения имени пользователя или пароля контейнер будет автоматически пересобран, чтобы изменения вступили в силу.',
             channelDeleteConfirm: 'Удалить конфигурацию канала {0}?',
             apiTypeBaseURLHelper: 'Этот тип отправляет запросы в {0}. Рекомендуемый Base URL: {1}',
+            customImageURLHelper:
+                'Для аккаунта Custom укажите полный URL интерфейса генерации изображений. Путь не добавляется автоматически. Пример: {0}',
             apiTypeBaseURLMismatch: 'Текущий Base URL похож на путь {0}, но выбран {1}. Рекомендуемый URL: {2}',
+            validateAvailability: 'Проверять доступность аккаунта',
+            validateAvailabilityHelper: 'Перед сохранением отправляется минимальное сообщение для проверки API',
+            validateImageAvailabilityHelper:
+                'Перед сохранением создаётся одно минимальное изображение; возможна оплата',
         },
         model: {
             model: 'Модель',
@@ -948,6 +955,7 @@ const message = {
         },
         aiProxy: {
             title: 'AI-шлюз',
+            apiReference: 'Справочник API',
             notInstalled: 'Не установлен',
             usage: 'Использование',
             accountPool: 'Пул аккаунтов',
@@ -1071,13 +1079,20 @@ const message = {
             validationModelMapEmpty: 'Имена моделей в сопоставлении не могут быть пустыми',
             validationModelMapDuplicate: 'Запрошенная модель {0} дублируется',
             modelGroup: 'Группа моделей',
+            modelCapability: 'Возможность модели',
+            textGeneration: 'Генерация текста',
+            imageGeneration: 'Генерация изображений',
+            textModels: 'Текстовые модели',
+            textToImageModels: 'Модели генерации изображений по тексту',
+            unauthorized: 'Нет доступа',
+            imageCount: 'Количество изображений',
             availableModels: 'Доступные модели',
             modelGroupModels: 'Запрошенные модели',
             modelGroupModelsPlaceholder: 'Выберите или введите имена запрошенных моделей',
             modelGroupModelsHelper:
-                'Указывайте только реальные upstream-модели; умная маршрутизация пробует модели по порядку и не балансирует нагрузку между моделями.',
+                'Указывайте имена моделей, которые клиенты используют при обращении к AI-шлюзу; умная маршрутизация пробует модели по порядку и не балансирует нагрузку между моделями.',
             modelGroupGuide:
-                'Группы моделей содержат только реальные upstream-модели. auto — виртуальное имя модели, которое клиент использует при запросе к AI-шлюзу.',
+                'Группы моделей содержат имена моделей, доступные клиентам AI-шлюза. Upstream-модели настраиваются в сопоставлении моделей пула аккаунтов. auto — виртуальное имя и не добавляется в группу моделей.',
             modelGroupModelCount: '{0} моделей',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',

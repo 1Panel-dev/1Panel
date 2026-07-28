@@ -742,6 +742,8 @@ const message = {
             discoverModelsHelper:
                 'Obtenga los modelos mediante la API /v1/models del proveedor y añádalos todos al conjunto de modelos',
             discoverModelsFailedFallback: 'No se pudieron obtener los modelos. Configure un modelo manualmente.',
+            discoverModelsFailedUseDefaults:
+                'No se pudieron obtener los modelos. Se usarán los modelos predeterminados.',
             accountModelsDuplicate: 'Existen modelos duplicados en el catálogo',
             modelPool: 'Pool de modelos',
             fallbackModels: 'Modelos de respaldo',
@@ -899,8 +901,13 @@ const message = {
                 'Al guardar el usuario o la contraseña, el contenedor se reconstruirá automáticamente para que los cambios surtan efecto.',
             channelDeleteConfirm: '¿Eliminar la configuración del canal {0}?',
             apiTypeBaseURLHelper: 'Este tipo envía solicitudes a {0}. Base URL recomendada: {1}',
+            customImageURLHelper:
+                'Introduce la URL completa del endpoint de generación de imágenes para cuentas Custom. La ruta no se añade automáticamente. Ejemplo: {0}',
             apiTypeBaseURLMismatch:
                 'La Base URL actual parece una ruta {0}, pero está seleccionado {1}. URL recomendada: {2}',
+            validateAvailability: 'Validar disponibilidad de la cuenta',
+            validateAvailabilityHelper: 'Envía un mensaje mínimo antes de guardar para validar la API',
+            validateImageAvailabilityHelper: 'Genera una imagen mínima antes de guardar y puede generar costes',
         },
         model: {
             model: 'Modelo',
@@ -962,6 +969,7 @@ const message = {
         },
         aiProxy: {
             title: 'Gateway de IA',
+            apiReference: 'Referencia de API',
             notInstalled: 'No instalado',
             usage: 'Uso',
             accountPool: 'Grupo de cuentas',
@@ -1085,13 +1093,20 @@ const message = {
             validationModelMapEmpty: 'Los nombres del mapeo de modelos no pueden estar vacíos',
             validationModelMapDuplicate: 'El modelo solicitado {0} está duplicado',
             modelGroup: 'Grupo de modelos',
+            modelCapability: 'Capacidad del modelo',
+            textGeneration: 'Generación de texto',
+            imageGeneration: 'Generación de imágenes',
+            textModels: 'Modelos de texto',
+            textToImageModels: 'Modelos de texto a imagen',
+            unauthorized: 'Sin autorización',
+            imageCount: 'Cantidad de imágenes',
             availableModels: 'Modelos disponibles',
             modelGroupModels: 'Modelos solicitados',
             modelGroupModelsPlaceholder: 'Seleccione o ingrese nombres de modelos solicitados',
             modelGroupModelsHelper:
-                'Ingrese solo modelos upstream reales; el enrutamiento inteligente prueba los modelos en orden y no balancea carga entre modelos.',
+                'Ingrese los nombres de modelo que usan los clientes al llamar al gateway de IA; el enrutamiento inteligente prueba los modelos en orden y no balancea carga entre modelos.',
             modelGroupGuide:
-                'Los grupos de modelos solo contienen modelos upstream reales. auto es un nombre de modelo virtual usado por los clientes al llamar al gateway de IA.',
+                'Los grupos de modelos contienen los nombres de modelo expuestos por el gateway de IA. Configure los modelos upstream en el mapeo de modelos del pool de cuentas. auto es un nombre de modelo virtual y no debe añadirse al grupo.',
             modelGroupModelCount: '{0} modelos',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',

@@ -198,6 +198,23 @@ SubTask: "Subtarefa"
 Skip: "Ignorar erros e continuar..."
 Success: "Sucesso"
 
+# tarefas de roteamento inteligente do gateway de IA
+AIProxySmartRouteCreateTask: "Criar amostras de roteamento inteligente do gateway de IA"
+AIProxySmartRouteCreateSubTask: "Criar amostras e gerar vetores"
+AIProxySmartRouteCreateStart: "Iniciando a criação de amostras, {{ .total }} no total"
+AIProxySmartRouteCreateFailed: "[{{ .current }}/{{ .total }}] Falha na criação: type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteCreateSuccess: "[{{ .current }}/{{ .total }}] Criada: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteCreateComplete: "Criação concluída: {{ .success }} com sucesso, {{ .failed }} com falha"
+AIProxySmartRouteCreateError: "Falha ao criar amostras: {{ .failed }} com falha, último erro"
+AIProxySmartRouteRebuildTask: "Reconstruir vetores de amostras de roteamento inteligente do gateway de IA"
+AIProxySmartRouteRebuildSubTask: "Reconstruir vetores de amostras"
+AIProxySmartRouteEmbeddingRequired: "O endpoint e o modelo de Embedding são obrigatórios"
+AIProxySmartRouteRebuildStart: "Iniciando a reconstrução dos vetores, {{ .total }} no total"
+AIProxySmartRouteRebuildFailed: "[{{ .current }}/{{ .total }}] Falha na reconstrução: sampleID={{ .id }} type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteRebuildSuccess: "[{{ .current }}/{{ .total }}] Reconstruída: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteRebuildComplete: "Reconstrução concluída: {{ .success }} com sucesso, {{ .failed }} com falha"
+AIProxySmartRouteRebuildError: "Falha ao reconstruir vetores de amostras: {{ .failed }} com falha, último erro"
+
 # tarefa em lote do agente
 BatchInstallAgent: "Instalar agentes em lote"
 DispatchAgentInstallTasks: "Distribuir tarefas de instalação de agentes"

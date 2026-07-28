@@ -20,7 +20,11 @@
                 </el-select>
             </el-form-item>
             <el-form-item :label="'API ' + $t('commons.table.type')" prop="apiType">
-                <el-select v-model="form.apiType" :disabled="apiTypeOptions.length === 1" @change="handleAPITypeChange">
+                <el-select
+                    v-model="form.apiType"
+                    :disabled="form.id > 0 || apiTypeOptions.length === 1"
+                    @change="handleAPITypeChange"
+                >
                     <el-option v-for="item in apiTypeOptions" :key="item" :label="item" :value="item" />
                 </el-select>
             </el-form-item>
@@ -66,20 +70,37 @@
             <el-form-item>
                 <el-checkbox v-model="form.rememberApiKey">{{ $t('terminal.rememberPassword') }}</el-checkbox>
             </el-form-item>
+            <el-form-item>
+                <el-switch v-model="form.validateAvailability" />
+                <span class="ml-2">{{ $t('aiTools.agents.validateAvailability') }}</span>
+                <span class="input-help">
+                    {{
+                        isImageAPIType
+                            ? $t('aiTools.agents.validateImageAvailabilityHelper')
+                            : $t('aiTools.agents.validateAvailabilityHelper')
+                    }}
+                </span>
+            </el-form-item>
             <template v-if="showModelDiscovery">
                 <el-divider content-position="left">{{ $t('aiTools.agents.modelPool') }}</el-divider>
                 <div class="model-discovery">
                     <div class="model-discovery__header">
                         <el-radio-group v-model="modelConfigMode" size="small" @change="handleModelConfigModeChange">
                             <el-radio-button value="discover">
-                                {{ $t('aiTools.agents.automaticModelDiscovery') }}
+                                {{
+                                    $t(
+                                        supportsModelDiscovery
+                                            ? 'aiTools.agents.automaticModelDiscovery'
+                                            : 'aiTools.agents.defaultModel',
+                                    )
+                                }}
                             </el-radio-button>
                             <el-radio-button value="manual">
                                 {{ $t('aiTools.agents.manualModelConfiguration') }}
                             </el-radio-button>
                         </el-radio-group>
                         <el-button
-                            v-if="modelConfigMode === 'discover'"
+                            v-if="supportsModelDiscovery && modelConfigMode === 'discover'"
                             type="primary"
                             plain
                             :loading="discovering"
@@ -88,10 +109,16 @@
                             {{ $t('aiTools.agents.discoverModels') }}
                         </el-button>
                     </div>
-                    <div v-if="modelConfigMode === 'discover'" class="input-help model-discovery__help">
+                    <div
+                        v-if="supportsModelDiscovery && modelConfigMode === 'discover'"
+                        class="input-help model-discovery__help"
+                    >
                         {{ $t('aiTools.agents.discoverModelsHelper') }}
                     </div>
-                    <div v-if="discoveredModels.length" class="input-help model-discovery__help">
+                    <div
+                        v-if="requiresVerifyModel && modelConfigMode === 'discover' && discoveredModels.length"
+                        class="input-help model-discovery__help"
+                    >
                         {{ $t('aiTools.agents.verifyModelHelper') }}
                     </div>
                     <el-alert
@@ -99,7 +126,13 @@
                         type="warning"
                         :closable="false"
                         show-icon
-                        :title="$t('aiTools.agents.discoverModelsFailedFallback')"
+                        :title="
+                            $t(
+                                defaultModels.length
+                                    ? 'aiTools.agents.discoverModelsFailedUseDefaults'
+                                    : 'aiTools.agents.discoverModelsFailedFallback',
+                            )
+                        "
                     />
                     <el-table
                         v-if="modelConfigMode === 'discover' && discoveredModels.length"
@@ -107,7 +140,12 @@
                         border
                         max-height="320"
                     >
-                        <el-table-column :label="$t('aiTools.agents.verifyModel')" width="110" align="center">
+                        <el-table-column
+                            v-if="requiresVerifyModel"
+                            :label="$t('aiTools.agents.verifyModel')"
+                            width="110"
+                            align="center"
+                        >
                             <template #default="{ row }">
                                 <el-radio v-model="form.verifyModel" :value="row.id" />
                             </template>
@@ -115,6 +153,45 @@
                         <el-table-column :label="$t('aiTools.model.model')" prop="id" min-width="220" />
                         <el-table-column :label="$t('commons.table.name')" prop="name" min-width="180" />
                     </el-table>
+                    <template v-if="modelConfigMode === 'manual'">
+                        <el-table :data="manualModels" border max-height="320">
+                            <el-table-column
+                                v-if="requiresVerifyModel"
+                                :label="$t('aiTools.agents.verifyModel')"
+                                width="110"
+                                align="center"
+                            >
+                                <template #default="{ row, $index }">
+                                    <el-radio v-model="manualVerifyIndex" :value="$index" :disabled="!row.id.trim()" />
+                                </template>
+                            </el-table-column>
+                            <el-table-column :label="$t('aiTools.model.model')" min-width="220">
+                                <template #default="{ row }">
+                                    <el-input v-model="row.id" />
+                                </template>
+                            </el-table-column>
+                            <el-table-column :label="$t('commons.table.name')" min-width="180">
+                                <template #default="{ row }">
+                                    <el-input v-model="row.name" />
+                                </template>
+                            </el-table-column>
+                            <el-table-column :label="$t('commons.table.operate')" width="90" align="center">
+                                <template #default="{ $index }">
+                                    <el-button
+                                        type="primary"
+                                        link
+                                        :disabled="manualModels.length === 1"
+                                        @click="removeManualModel($index)"
+                                    >
+                                        {{ $t('commons.button.delete') }}
+                                    </el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <el-button class="model-discovery__add" type="primary" plain @click="addManualModel">
+                            {{ $t('commons.button.add') }}
+                        </el-button>
+                    </template>
                 </div>
             </template>
             <template v-if="showInitialModel">
@@ -189,6 +266,8 @@ const providers = ref<Record<string, AI.ProviderInfo>>({});
 const loading = ref(false);
 const discovering = ref(false);
 const discoveredModels = ref<AI.AgentAccountModel[]>([]);
+const manualModels = ref<AI.AgentAccountModel[]>([]);
+const manualVerifyIndex = ref(-1);
 const editModels = ref<AI.AgentAccountModel[]>([]);
 const modelConfigMode = ref<'discover' | 'manual'>('discover');
 const modelDiscoveryFailed = ref(false);
@@ -205,6 +284,7 @@ const form = reactive({
     apiKey: '',
     rememberApiKey: false,
     verifyModel: '',
+    validateAvailability: true,
     initialModel: {} as AI.AgentAccountModel,
     remark: '',
     syncAgents: false,
@@ -218,22 +298,28 @@ const selectedProvider = computed(() => providers.value[form.provider]);
 const selectedAPIConfig = computed(() =>
     selectedProvider.value?.apiTypes.find((item) => item.apiType === form.apiType),
 );
-const showModelDiscovery = computed(
-    () =>
-        !form.id &&
-        form.provider === 'custom' &&
-        (form.apiType === 'openai-completions' || form.apiType === 'openai-responses'),
-);
+const isImageAPIType = computed(() => form.apiType.endsWith('-images'));
+const supportsModelDiscovery = computed(() => !form.id && Boolean(selectedAPIConfig.value?.supportsModelDiscovery));
+const defaultModels = computed(() => {
+    if (selectedAPIConfig.value?.models.length) {
+        return selectedAPIConfig.value.models;
+    }
+    return isImageAPIType.value ? [] : selectedProvider.value?.models || [];
+});
+const showModelDiscovery = computed(() => !form.id && (supportsModelDiscovery.value || defaultModels.value.length > 0));
 const showInitialModel = computed(
     () =>
         !form.id &&
-        initialModelProviders.includes(form.provider) &&
-        (!showModelDiscovery.value || modelConfigMode.value === 'manual'),
+        (initialModelProviders.includes(form.provider) || (isImageAPIType.value && defaultModels.value.length === 0)) &&
+        !showModelDiscovery.value,
 );
-const verifyModelOptions = computed(() => (form.id ? editModels.value : selectedProvider.value?.models || []));
+const requiresVerifyModel = computed(
+    () => form.validateAvailability && !isAgentAccountVerificationSkipped(form.provider),
+);
+const verifyModelOptions = computed(() => (form.id ? editModels.value : defaultModels.value));
 const showVerifyModelSelect = computed(
     () =>
-        !isAgentAccountVerificationSkipped(form.provider) &&
+        requiresVerifyModel.value &&
         verifyModelOptions.value.length > 0 &&
         (Boolean(form.id) || (!showModelDiscovery.value && !showInitialModel.value)),
 );
@@ -255,12 +341,37 @@ const apiTypeURLHints: Record<string, { requestPath: string; example: string; en
         example: 'http://127.0.0.1:8000',
         endpointSuffixes: ['/v1/messages', '/messages'],
     },
+    'openai-images': {
+        requestPath: '/images/generations',
+        example: 'http://127.0.0.1:8000/v1',
+        endpointSuffixes: ['/v1/images/generations', '/images/generations'],
+    },
+    'dashscope-images': {
+        requestPath: '/api/v1/services/aigc/multimodal-generation/generation',
+        example: 'https://dashscope.aliyuncs.com',
+        endpointSuffixes: ['/api/v1/services/aigc/multimodal-generation/generation'],
+    },
+    'minimax-images': {
+        requestPath: '/v1/image_generation',
+        example: 'https://api.minimaxi.com',
+        endpointSuffixes: ['/v1/image_generation'],
+    },
+    'openrouter-images': {
+        requestPath: '/api/v1/images',
+        example: 'https://openrouter.ai',
+        endpointSuffixes: ['/api/v1/images'],
+    },
 };
 const showAPITypeBaseURLTips = computed(() => Boolean(selectedAPIConfig.value?.editableBaseUrl));
 const apiTypeBaseURLHelper = computed(() => {
     const hint = apiTypeURLHints[form.apiType];
     if (!showAPITypeBaseURLTips.value || !hint) {
         return '';
+    }
+    if (form.provider === 'custom' && isImageAPIType.value) {
+        return i18n.global.t('aiTools.agents.customImageURLHelper', [
+            `${hint.example.replace(/\/+$/, '')}${hint.requestPath}`,
+        ]);
     }
     return i18n.global.t('aiTools.agents.apiTypeBaseURLHelper', [hint.requestPath, hint.example]);
 });
@@ -330,23 +441,74 @@ const normalizeInitialModel = () => {
 };
 
 const resetInitialModel = () => {
-    form.initialModel = isInitialModelProvider(form.provider) ? buildInitialModel() : ({} as AI.AgentAccountModel);
+    form.initialModel =
+        isInitialModelProvider(form.provider) || isImageAPIType.value
+            ? buildInitialModel()
+            : ({} as AI.AgentAccountModel);
+};
+
+const resetManualModels = () => {
+    manualModels.value = [buildInitialModel()];
+    manualVerifyIndex.value = -1;
+};
+
+const loadDefaultModels = () => {
+    discoveredModels.value = defaultModels.value.map((item) => ({
+        recordId: 0,
+        id: item.id,
+        name: item.name,
+    }));
+    modelDiscoveryFailed.value = false;
+    form.verifyModel = '';
 };
 
 const resetModelDiscovery = () => {
     discovering.value = false;
-    discoveredModels.value = [];
     modelConfigMode.value = 'discover';
-    modelDiscoveryFailed.value = false;
-    form.verifyModel = '';
+    resetManualModels();
+    loadDefaultModels();
 };
 
 const handleModelConfigModeChange = () => {
     modelDiscoveryFailed.value = false;
     form.verifyModel = '';
-    if (modelConfigMode.value === 'manual') {
-        discoveredModels.value = [];
+};
+
+const addManualModel = () => {
+    manualModels.value.push(buildInitialModel());
+};
+
+const removeManualModel = (index: number) => {
+    if (manualModels.value.length === 1) {
+        return;
     }
+    manualModels.value.splice(index, 1);
+    if (manualVerifyIndex.value === index) {
+        manualVerifyIndex.value = -1;
+    } else if (manualVerifyIndex.value > index) {
+        manualVerifyIndex.value -= 1;
+    }
+};
+
+const normalizeManualModels = () => {
+    const models = manualModels.value.map((item) => ({
+        recordId: 0,
+        id: String(item.id || '').trim(),
+        name: String(item.name || '').trim(),
+    }));
+    if (models.some((item) => !item.id)) {
+        MsgError(i18n.global.t('aiTools.agents.accountModelsRequired'));
+        return null;
+    }
+    if (models.some((item) => item.id.includes(' '))) {
+        MsgError(i18n.global.t('setting.noSpace'));
+        return null;
+    }
+    if (new Set(models.map((item) => item.id)).size !== models.length) {
+        MsgError(i18n.global.t('aiTools.agents.accountModelsDuplicate'));
+        return null;
+    }
+    return models;
 };
 
 const discoverModels = async () => {
@@ -369,14 +531,23 @@ const discoverModels = async () => {
         discoveredModels.value = res.data || [];
         form.verifyModel = '';
         if (discoveredModels.value.length === 0) {
-            modelConfigMode.value = 'manual';
+            if (defaultModels.value.length > 0) {
+                loadDefaultModels();
+            } else {
+                modelConfigMode.value = 'manual';
+            }
             modelDiscoveryFailed.value = true;
         } else {
             modelDiscoveryFailed.value = false;
         }
     } catch (error: any) {
-        discoveredModels.value = [];
-        modelConfigMode.value = 'manual';
+        if (defaultModels.value.length > 0) {
+            loadDefaultModels();
+            modelDiscoveryFailed.value = true;
+        } else {
+            discoveredModels.value = [];
+            modelConfigMode.value = 'manual';
+        }
         modelDiscoveryFailed.value = true;
         MsgError(String(error?.message || i18n.global.t('commons.res.commonError')));
     } finally {
@@ -394,12 +565,32 @@ const submit = async () => {
         MsgError(i18n.global.t('aiTools.agents.accountModelsRequired'));
         return;
     }
-    if (showModelDiscovery.value && modelConfigMode.value === 'discover' && discoveredModels.value.length === 0) {
-        MsgError(i18n.global.t('aiTools.agents.accountModelsRequired'));
-        return;
+    let accountModels = initialModel ? [initialModel] : [];
+    if (!form.id) {
+        if (showModelDiscovery.value && modelConfigMode.value === 'manual') {
+            const models = normalizeManualModels();
+            if (!models) {
+                return;
+            }
+            accountModels = models;
+        } else if (showModelDiscovery.value) {
+            accountModels = discoveredModels.value;
+        }
+        if (accountModels.length === 0) {
+            MsgError(i18n.global.t('aiTools.agents.accountModelsRequired'));
+            return;
+        }
     }
-    const verifyModel = showInitialModel.value ? initialModel?.id || '' : form.verifyModel;
-    if (!isAgentAccountVerificationSkipped(form.provider) && !verifyModel) {
+    let verifyModel = '';
+    if (requiresVerifyModel.value) {
+        verifyModel = form.verifyModel;
+        if (modelConfigMode.value === 'manual' && showModelDiscovery.value) {
+            verifyModel = accountModels[manualVerifyIndex.value]?.id || '';
+        } else if (showInitialModel.value) {
+            verifyModel = initialModel?.id || '';
+        }
+    }
+    if (requiresVerifyModel.value && !verifyModel) {
         MsgError(i18n.global.t('aiTools.agents.verifyModelRequired'));
         return;
     }
@@ -415,6 +606,7 @@ const submit = async () => {
                 apiType: form.apiType,
                 authMode: form.authMode,
                 verifyModel,
+                validateAvailability: form.validateAvailability,
                 remark: form.remark,
                 syncAgents: form.syncAgents,
             });
@@ -428,7 +620,8 @@ const submit = async () => {
                 apiType: form.apiType,
                 authMode: form.authMode,
                 verifyModel,
-                models: discoveredModels.value.length ? discoveredModels.value : initialModel ? [initialModel] : [],
+                validateAvailability: form.validateAvailability,
+                models: accountModels,
                 remark: form.remark,
             });
         }
@@ -452,6 +645,7 @@ const handleClose = () => {
     form.authMode = '';
     form.apiKey = '';
     form.rememberApiKey = false;
+    form.validateAvailability = true;
     form.verifyModel = '';
     form.initialModel = {} as AI.AgentAccountModel;
     editModels.value = [];
@@ -487,6 +681,7 @@ const openDrawer = async (params?: OpenParams) => {
         form.baseURL = params.baseURL || '';
         form.apiKey = params.apiKey || '';
         form.rememberApiKey = params.rememberApiKey || false;
+        form.validateAvailability = true;
         editModels.value = params.models || [];
         const provider = providers.value[form.provider];
         form.apiType = provider?.apiTypes.some((item) => item.apiType === params.apiType)
@@ -503,6 +698,7 @@ const openDrawer = async (params?: OpenParams) => {
     form.baseURL = '';
     form.apiKey = '';
     form.rememberApiKey = false;
+    form.validateAvailability = true;
     form.verifyModel = '';
     editModels.value = [];
     form.apiType = 'openai-completions';
@@ -536,7 +732,6 @@ const loadProviders = async () => {
 };
 
 const handleProviderChange = () => {
-    resetModelDiscovery();
     const provider = selectedProvider.value;
     form.apiType = provider?.defaultApiType || '';
     const config = provider?.apiTypes.find((item) => item.apiType === form.apiType);
@@ -545,10 +740,10 @@ const handleProviderChange = () => {
     if (!form.id) {
         resetInitialModel();
     }
+    resetModelDiscovery();
 };
 
 const handleAPITypeChange = () => {
-    resetModelDiscovery();
     const config = selectedAPIConfig.value;
     if (!config) {
         return;
@@ -559,12 +754,12 @@ const handleAPITypeChange = () => {
         form.baseURL = config.baseUrl || '';
     }
     resetInitialModel();
+    resetModelDiscovery();
 };
 
 watch([() => form.apiKey, () => form.baseURL], () => {
     if (showModelDiscovery.value) {
-        discoveredModels.value = [];
-        modelDiscoveryFailed.value = false;
+        loadDefaultModels();
     }
 });
 
@@ -614,5 +809,9 @@ defineExpose({
 
 .model-discovery .el-alert {
     margin-bottom: 12px;
+}
+
+.model-discovery__add {
+    margin-top: 12px;
 }
 </style>

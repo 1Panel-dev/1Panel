@@ -23,6 +23,9 @@ func BuildOpenClawProviderPatch(provider, modelName, apiType, authMode, baseURL,
 	if _, ok := FindAPIConfig(provider, resolvedAPIType); !ok {
 		resolvedAPIType = DefaultAPIType(provider)
 	}
+	if IsImageAPIType(resolvedAPIType) {
+		return nil, fmt.Errorf("api type %s does not support text generation", resolvedAPIType)
+	}
 	resolvedAuthMode, err := ResolveAuthMode(provider, resolvedAPIType, authMode)
 	if err != nil {
 		return nil, err

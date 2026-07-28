@@ -198,6 +198,23 @@ SubTask: "서브 작업"
 Skip: "오류 무시하고 계속..."
 Success: "성공"
 
+# AI 게이트웨이 스마트 라우팅 작업
+AIProxySmartRouteCreateTask: "AI 게이트웨이 스마트 라우팅 샘플 생성"
+AIProxySmartRouteCreateSubTask: "샘플 생성 및 벡터 생성"
+AIProxySmartRouteCreateStart: "샘플 생성을 시작합니다. 총 {{ .total }}개"
+AIProxySmartRouteCreateFailed: "[{{ .current }}/{{ .total }}] 생성 실패: type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteCreateSuccess: "[{{ .current }}/{{ .total }}] 생성 성공: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteCreateComplete: "생성 완료: 성공 {{ .success }}개, 실패 {{ .failed }}개"
+AIProxySmartRouteCreateError: "샘플 생성 실패: {{ .failed }}개 실패, 마지막 오류"
+AIProxySmartRouteRebuildTask: "AI 게이트웨이 스마트 라우팅 샘플 벡터 재구성"
+AIProxySmartRouteRebuildSubTask: "샘플 벡터 재구성"
+AIProxySmartRouteEmbeddingRequired: "Embedding 엔드포인트와 모델은 필수입니다"
+AIProxySmartRouteRebuildStart: "샘플 벡터 재구성을 시작합니다. 총 {{ .total }}개"
+AIProxySmartRouteRebuildFailed: "[{{ .current }}/{{ .total }}] 재구성 실패: sampleID={{ .id }} type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteRebuildSuccess: "[{{ .current }}/{{ .total }}] 재구성 성공: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteRebuildComplete: "재구성 완료: 성공 {{ .success }}개, 실패 {{ .failed }}개"
+AIProxySmartRouteRebuildError: "샘플 벡터 재구성 실패: {{ .failed }}개 실패, 마지막 오류"
+
 # 에이전트 일괄 작업
 BatchInstallAgent: "에이전트 일괄 설치"
 DispatchAgentInstallTasks: "에이전트 설치 작업 배포"

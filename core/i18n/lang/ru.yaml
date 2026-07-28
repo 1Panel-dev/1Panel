@@ -198,6 +198,23 @@ SubTask: "Подзадача"
 Skip: "Пропустить ошибки и продолжить..."
 Success: "Успешно"
 
+# задачи умной маршрутизации AI-шлюза
+AIProxySmartRouteCreateTask: "Создание образцов умной маршрутизации AI-шлюза"
+AIProxySmartRouteCreateSubTask: "Создание образцов и генерация векторов"
+AIProxySmartRouteCreateStart: "Начато создание образцов, всего: {{ .total }}"
+AIProxySmartRouteCreateFailed: "[{{ .current }}/{{ .total }}] Ошибка создания: type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteCreateSuccess: "[{{ .current }}/{{ .total }}] Создано: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteCreateComplete: "Создание завершено: успешно {{ .success }}, с ошибкой {{ .failed }}"
+AIProxySmartRouteCreateError: "Не удалось создать образцы: ошибок {{ .failed }}, последняя ошибка"
+AIProxySmartRouteRebuildTask: "Перестроение векторов образцов умной маршрутизации AI-шлюза"
+AIProxySmartRouteRebuildSubTask: "Перестроение векторов образцов"
+AIProxySmartRouteEmbeddingRequired: "Требуются endpoint и модель Embedding"
+AIProxySmartRouteRebuildStart: "Начато перестроение векторов образцов, всего: {{ .total }}"
+AIProxySmartRouteRebuildFailed: "[{{ .current }}/{{ .total }}] Ошибка перестроения: sampleID={{ .id }} type={{ .type }} label={{ .label }} error={{ .err }}"
+AIProxySmartRouteRebuildSuccess: "[{{ .current }}/{{ .total }}] Перестроено: sampleID={{ .id }} type={{ .type }} label={{ .label }}"
+AIProxySmartRouteRebuildComplete: "Перестроение завершено: успешно {{ .success }}, с ошибкой {{ .failed }}"
+AIProxySmartRouteRebuildError: "Не удалось перестроить векторы образцов: ошибок {{ .failed }}, последняя ошибка"
+
 # пакетная задача агента
 BatchInstallAgent: "Пакетная установка агентов"
 DispatchAgentInstallTasks: "Отправить задачи установки агентов"

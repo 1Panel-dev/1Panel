@@ -17,7 +17,7 @@ type IAgentAccountRepo interface {
 	Save(account *model.AgentAccount) error
 	DeleteByID(id uint) error
 	List(opts ...DBOption) ([]model.AgentAccount, error)
-	CountByProviders(providers []string) (map[string]int64, error)
+	CountTextByProviders(providers []string) (map[string]int64, error)
 }
 
 func NewIAgentAccountRepo() IAgentAccountRepo {
@@ -67,7 +67,7 @@ func (a AgentAccountRepo) List(opts ...DBOption) ([]model.AgentAccount, error) {
 	return accounts, nil
 }
 
-func (a AgentAccountRepo) CountByProviders(providers []string) (map[string]int64, error) {
+func (a AgentAccountRepo) CountTextByProviders(providers []string) (map[string]int64, error) {
 	normalizedProviders := normalizeProviders(providers)
 	counts := make(map[string]int64, len(normalizedProviders))
 	for _, provider := range normalizedProviders {
@@ -86,6 +86,7 @@ func (a AgentAccountRepo) CountByProviders(providers []string) (map[string]int64
 		Model(&model.AgentAccount{}).
 		Select("provider, COUNT(*) as count").
 		Where("provider IN ?", normalizedProviders).
+		Where("api_type NOT LIKE ?", "%-images").
 		Group("provider").
 		Scan(&rows).Error; err != nil {
 		return nil, err

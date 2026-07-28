@@ -740,6 +740,7 @@ const message = {
             discoverModelsHelper:
                 'Sağlayıcının /v1/models API’sinden modelleri alın ve tümünü model kataloğuna ekleyin',
             discoverModelsFailedFallback: 'Modeller alınamadı. Bir modeli elle yapılandırın.',
+            discoverModelsFailedUseDefaults: 'Modeller alınamadı. Varsayılan modeller kullanılıyor.',
             accountModelsDuplicate: 'Katalogda yinelenen modeller bulundu',
             modelPool: 'Model kataloğu',
             fallbackModels: 'Yedek modeller',
@@ -897,8 +898,13 @@ const message = {
                 'Kullanıcı adı veya parola kaydedildiğinde değişikliklerin etkili olması için konteyner otomatik olarak yeniden oluşturulur.',
             channelDeleteConfirm: '{0} kanal yapılandırması silinsin mi?',
             apiTypeBaseURLHelper: 'Bu tür istekleri {0} yoluna gönderir. Önerilen Base URL: {1}',
+            customImageURLHelper:
+                'Custom hesaplar için tam görsel oluşturma uç noktası URL’sini girin. Yol otomatik eklenmez. Örnek: {0}',
             apiTypeBaseURLMismatch:
                 'Geçerli Base URL bir {0} yolu gibi görünüyor, ancak {1} seçildi. Önerilen URL: {2}',
+            validateAvailability: 'Hesap kullanılabilirliğini doğrula',
+            validateAvailabilityHelper: 'Kaydetmeden önce API’yi doğrulamak için en küçük iletiyi gönderir',
+            validateImageAvailabilityHelper: 'Kaydetmeden önce bir küçük görsel üretir ve ücret doğurabilir',
         },
         model: {
             model: 'Model',
@@ -959,6 +965,7 @@ const message = {
         },
         aiProxy: {
             title: 'AI Ağ Geçidi',
+            apiReference: 'API Referansı',
             notInstalled: 'Kurulu değil',
             usage: 'Kullanım',
             accountPool: 'Hesap Havuzu',
@@ -1082,13 +1089,20 @@ const message = {
             validationModelMapEmpty: 'Model eşlemesindeki model adları boş olamaz',
             validationModelMapDuplicate: 'İstek modeli {0} yineleniyor',
             modelGroup: 'Model Grubu',
+            modelCapability: 'Model Yeteneği',
+            textGeneration: 'Metin Üretimi',
+            imageGeneration: 'Görsel Üretimi',
+            textModels: 'Metin Modelleri',
+            textToImageModels: 'Metinden Görsele Modeller',
+            unauthorized: 'Yetkisiz',
+            imageCount: 'Görsel Sayısı',
             availableModels: 'Kullanılabilir Modeller',
             modelGroupModels: 'İstek Modelleri',
             modelGroupModelsPlaceholder: 'İstek modeli adlarını seçin veya girin',
             modelGroupModelsHelper:
-                'Yalnızca gerçek üst modelleri girin; akıllı yönlendirme modelleri sırayla dener ve modeller arasında yük dengelemez.',
+                'İstemcilerin AI Ağ Geçidini çağırırken kullandığı istek modeli adlarını girin; akıllı yönlendirme modelleri sırayla dener ve modeller arasında yük dengelemez.',
             modelGroupGuide:
-                'Model grupları yalnızca gerçek üst modelleri içerir. auto, istemcilerin AI Ağ Geçidi isteğinde kullandığı sanal model adıdır.',
+                'Model grupları AI Ağ Geçidinin sunduğu istek modeli adlarını içerir. Üst modelleri hesap havuzundaki model eşlemesinde yapılandırın. auto sanal bir model adıdır ve model grubuna eklenmez.',
             modelGroupModelCount: '{0} model',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',
