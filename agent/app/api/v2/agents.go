@@ -1379,6 +1379,88 @@ func (b *BaseApi) UninstallAgentSkill(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary List OpenClaw plugins
+// @Accept json
+// @Param request body dto.AgentPluginsReq true "request"
+// @Success 200 {array} dto.AgentPluginItem
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/plugins/list [post]
+func (b *BaseApi) ListAgentPlugins(c *gin.Context) {
+	var req dto.AgentPluginsReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.ListPlugins(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Search OpenClaw plugins
+// @Accept json
+// @Param request body dto.AgentPluginSearchReq true "request"
+// @Success 200 {array} dto.AgentPluginSearchItem
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/plugins/search [post]
+func (b *BaseApi) SearchAgentPlugins(c *gin.Context) {
+	var req dto.AgentPluginSearchReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := agentService.SearchPlugins(req)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags AI
+// @Summary Install an OpenClaw marketplace plugin
+// @Accept json
+// @Param request body dto.AgentPluginMarketInstallReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/plugins/install [post]
+func (b *BaseApi) InstallAgentMarketPlugin(c *gin.Context) {
+	var req dto.AgentPluginMarketInstallReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.InstallMarketPlugin(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
+// @Summary Operate an OpenClaw plugin
+// @Accept json
+// @Param request body dto.AgentPluginOperateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/plugins/operate [post]
+func (b *BaseApi) OperateAgentPlugin(c *gin.Context) {
+	var req dto.AgentPluginOperateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.OperatePlugin(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Login Agent Weixin channel
 // @Accept json
 // @Param request body dto.AgentWeixinLoginReq true "request"

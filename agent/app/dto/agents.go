@@ -604,6 +604,52 @@ type AgentPluginStatus struct {
 	Upgradable     bool   `json:"upgradable"`
 }
 
+type AgentPluginsReq struct {
+	AgentID uint `json:"agentId" validate:"required"`
+}
+
+type AgentPluginSearchReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	Keyword string `json:"keyword" validate:"required,max=100"`
+	Limit   int    `json:"limit" validate:"omitempty,min=1,max=100"`
+}
+
+type AgentPluginMarketInstallReq struct {
+	AgentID uint   `json:"agentId" validate:"required"`
+	Package string `json:"package" validate:"required,max=200"`
+	Version string `json:"version" validate:"required,max=100"`
+	TaskID  string `json:"taskID" validate:"required"`
+}
+
+type AgentPluginOperateReq struct {
+	AgentID  uint   `json:"agentId" validate:"required"`
+	PluginID string `json:"pluginId" validate:"required,max=200"`
+	Operate  string `json:"operate" validate:"required,oneof=enable disable update uninstall"`
+	TaskID   string `json:"taskID" validate:"required"`
+}
+
+type AgentPluginItem struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Version string `json:"version"`
+	Origin  string `json:"origin"`
+	Enabled bool   `json:"enabled"`
+}
+
+type AgentPluginSearchItem struct {
+	Package          string   `json:"package"`
+	PluginID         string   `json:"pluginId"`
+	Name             string   `json:"name"`
+	Description      string   `json:"description"`
+	Version          string   `json:"version"`
+	Channel          string   `json:"channel"`
+	VerificationTier string   `json:"verificationTier"`
+	Categories       []string `json:"categories"`
+	Official         bool     `json:"official"`
+	Downloads        int64    `json:"downloads"`
+	Score            float64  `json:"score"`
+}
+
 type AgentDiscordConfigUpdateReq struct {
 	AgentID        uint              `json:"agentId" validate:"required"`
 	Enabled        bool              `json:"enabled"`

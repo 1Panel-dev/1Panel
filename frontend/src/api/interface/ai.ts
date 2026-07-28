@@ -853,6 +853,52 @@ export namespace AI {
         upgradable: boolean;
     }
 
+    export interface AgentPluginsReq {
+        agentId: number;
+    }
+
+    export interface AgentPluginSearchReq {
+        agentId: number;
+        keyword: string;
+        limit?: number;
+    }
+
+    export interface AgentPluginMarketInstallReq {
+        agentId: number;
+        package: string;
+        version: string;
+        taskID: string;
+    }
+
+    export interface AgentPluginOperateReq {
+        agentId: number;
+        pluginId: string;
+        operate: 'enable' | 'disable' | 'update' | 'uninstall';
+        taskID: string;
+    }
+
+    export interface AgentPluginItem {
+        id: string;
+        name: string;
+        version: string;
+        origin: string;
+        enabled: boolean;
+    }
+
+    export interface AgentPluginSearchItem {
+        package: string;
+        pluginId: string;
+        name: string;
+        description: string;
+        version: string;
+        channel: string;
+        verificationTier: string;
+        categories: string[];
+        official: boolean;
+        downloads: number;
+        score: number;
+    }
+
     export interface AgentDiscordConfigReq {
         agentId: number;
     }

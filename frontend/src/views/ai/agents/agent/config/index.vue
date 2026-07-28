@@ -22,6 +22,9 @@
                 >
                     <SkillsTab ref="skillsRef" :app-version="appVersion" :agent-type="agentType" />
                 </el-tab-pane>
+                <el-tab-pane v-if="agentType === 'openclaw'" :label="t('aiTools.agents.pluginsTab')" name="plugins">
+                    <PluginsTab ref="pluginsRef" />
+                </el-tab-pane>
                 <el-tab-pane
                     v-if="agentType === 'openclaw' || agentType === 'hermes-agent'"
                     :label="t('file.setting')"
@@ -43,6 +46,7 @@ import ChannelsTab from './tabs/channels.vue';
 import ModelTab from './tabs/model.vue';
 import AgentTab from './tabs/agents/index.vue';
 import SkillsTab from './tabs/skills.vue';
+import PluginsTab from './tabs/plugins.vue';
 import SettingsTab from './tabs/settings.vue';
 
 const { t } = useI18n();
@@ -60,6 +64,7 @@ const channelsRef = ref();
 const modelRef = ref();
 const agentRef = ref();
 const skillsRef = ref();
+const pluginsRef = ref();
 const settingsRef = ref();
 
 const loadSettings = async () => {
@@ -115,6 +120,14 @@ const loadSkills = async () => {
     await skillsRef.value?.load(agentId.value);
 };
 
+const loadPlugins = async () => {
+    if (agentId.value <= 0) {
+        return;
+    }
+    await nextTick();
+    await pluginsRef.value?.load(agentId.value);
+};
+
 const handleClose = () => {
     activeTab.value = 'channels';
 };
@@ -128,6 +141,9 @@ const handleTabClick = async (pane: TabsPaneContext) => {
     }
     if (pane.paneName === 'skills') {
         await loadSkills();
+    }
+    if (pane.paneName === 'plugins') {
+        await loadPlugins();
     }
     if (pane.paneName === 'agent') {
         await loadAgent();
