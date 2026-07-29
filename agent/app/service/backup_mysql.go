@@ -263,7 +263,11 @@ func encodeBackupArgs(args []string) string {
 	if len(items) == 0 {
 		return ""
 	}
-	data, _ := json.Marshal(items)
+	data, err := json.Marshal(items)
+	if err != nil {
+		global.LOG.Warnf("marshal backup args failed: %v", err)
+		return ""
+	}
 	return string(data)
 }
 
