@@ -2801,6 +2801,9 @@ const message = {
         ipWhiteList: 'Senarai putih IP',
         ipWhiteListEgs: 'Satu per baris. Contoh,\n172.161.10.111\n172.161.10.0/24',
         ipWhiteListHelper: 'IP dalam senarai putih boleh mengakses API, 0.0.0.0/0 (semua IPv4), ::/0 (semua IPv6)',
+        apiTrustedProxies: 'Proksi dipercayai API',
+        apiTrustedProxiesHelper:
+            'Apabila menggunakan proksi songsang, masukkan IP atau rangkaian pelayan proksi untuk mendapatkan IP klien dengan betul. Jika tidak digunakan, biarkan kosong. 0.0.0.0/0 dan ::/0 tidak disokong.',
         apiKeyValidityTime: 'Tempoh sah kunci antara muka',
         apiKeyValidityTimeEgs: 'Tempoh sah kunci antara muka (dalam minit)',
         apiKeyValidityTimeHelper:

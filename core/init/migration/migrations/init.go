@@ -183,6 +183,9 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "IpWhiteList", Value: ""}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "ApiTrustedProxies", Value: ""}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.Setting{Key: "ApiKeyValidityTime", Value: "120"}).Error; err != nil {
 			return err
 		}
@@ -1278,6 +1281,20 @@ var AddMenuAccordionSetting = &gormigrate.Migration{
 		}
 		if setting.Value == "" {
 			return tx.Model(&model.Setting{}).Where("key = ?", "MenuAccordion").Update("value", constant.StatusDisable).Error
+		}
+		return nil
+	},
+}
+
+var AddAPITrustedProxiesSetting = &gormigrate.Migration{
+	ID: "20260729-add-api-trusted-proxies-setting",
+	Migrate: func(tx *gorm.DB) error {
+		var setting model.Setting
+		if err := tx.Where("key = ?", "ApiTrustedProxies").First(&setting).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return tx.Create(&model.Setting{Key: "ApiTrustedProxies", Value: ""}).Error
+			}
+			return err
 		}
 		return nil
 	},

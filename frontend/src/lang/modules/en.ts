@@ -2756,6 +2756,9 @@ const message = {
         ipWhiteList: 'IP allowlist',
         ipWhiteListEgs: 'One per line. For example,\n172.161.10.111\n172.161.10.0/24',
         ipWhiteListHelper: 'IPs within the allowlist can access the API,0.0.0.0/0 (all IPv4), ::/0 (all IPv6)',
+        apiTrustedProxies: 'API trusted proxies',
+        apiTrustedProxiesHelper:
+            'When using a reverse proxy, enter the IP address or network of the proxy server to correctly obtain the client IP. Otherwise, leave this blank. 0.0.0.0/0 and ::/0 are not supported.',
         apiKeyValidityTime: 'Validity period of interface key',
         apiKeyValidityTimeEgs: 'Validity period of interface key (in minutes)',
         apiKeyValidityTimeHelper:

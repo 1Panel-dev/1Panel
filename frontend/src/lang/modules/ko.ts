@@ -2705,6 +2705,9 @@ const message = {
         ipWhiteList: 'IP 허용 목록',
         ipWhiteListEgs: '한 줄에 하나씩 입력하십시오. 예:\n172.161.10.111\n172.161.10.0/24',
         ipWhiteListHelper: '허용 목록에 있는 IP만 API 에 접근할 수 있습니다. 0.0.0.0/0(모든 IPv4), ::/0(모든 IPv6)',
+        apiTrustedProxies: 'API 신뢰 프록시',
+        apiTrustedProxiesHelper:
+            '리버스 프록시를 사용하는 경우 클라이언트 IP를 올바르게 가져오려면 프록시 서버의 IP 또는 네트워크를 입력하세요. 사용하지 않는 경우 비워 두세요. 0.0.0.0/0 및 ::/0은 지원되지 않습니다.',
         apiKeyValidityTime: '인터페이스 키 유효 기간',
         apiKeyValidityTimeEgs: '인터페이스 키 유효 기간 (분 단위)',
         apiKeyValidityTimeHelper:

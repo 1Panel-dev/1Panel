@@ -2805,6 +2805,9 @@ const message = {
         ipWhiteListEgs: 'Una por línea. Por ejemplo,\n172.161.10.111\n172.161.10.0/24',
         ipWhiteListHelper:
             'Las IP en la lista blanca pueden acceder a la API, 0.0.0.0/0 (todas IPv4), ::/0 (todas IPv6)',
+        apiTrustedProxies: 'Proxies de confianza de la API',
+        apiTrustedProxiesHelper:
+            'Al usar un proxy inverso, introduce la IP o la red del servidor proxy para obtener correctamente la IP del cliente. Si no lo usas, deja este campo vacío. No se admiten 0.0.0.0/0 ni ::/0.',
         apiKeyValidityTime: 'Periodo de validez de la clave de interfaz',
         apiKeyValidityTimeEgs: 'Periodo de validez de la clave de interfaz (en minutos)',
         apiKeyValidityTimeHelper:
