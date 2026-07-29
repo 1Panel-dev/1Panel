@@ -8,4 +8,6 @@ type Ftp struct {
 	Status      string `gorm:"not null" json:"status"`
 	Path        string `gorm:"not null" json:"path"`
 	Description string `gorm:"not null" json:"description"`
+	UID         uint   `gorm:"column:uid;not null;default:1000" json:"-"`
+	GID         uint   `gorm:"column:gid;not null;default:1000" json:"-"`
 }

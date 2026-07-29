@@ -1683,3 +1683,18 @@ var AddBackupRecordArgs = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.BackupRecord{})
 	},
 }
+
+var AddFtpIdentity = &gormigrate.Migration{
+	ID: "20260729-add-ftp-identity",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Ftp{}); err != nil {
+			return err
+		}
+		return tx.Model(&model.Ftp{}).
+			Where("1 = 1").
+			Updates(map[string]interface{}{
+				"uid": constant.WebsiteUID,
+				"gid": constant.WebsiteGID,
+			}).Error
+	},
+}

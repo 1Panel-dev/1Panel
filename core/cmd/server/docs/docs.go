@@ -24361,34 +24361,6 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/toolbox/ftp/init": {
-			"post": {
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Initialize FTP identity",
-				"tags": [
-					"FTP"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [],
-					"formatEN": "initialize FTP user identity",
-					"formatZH": "初始化 FTP 用户身份",
-					"paramKeys": []
-				}
-			}
-		},
 		"/toolbox/ftp/log/search": {
 			"post": {
 				"consumes": [
@@ -34708,9 +34680,6 @@ const docTemplate = `{
 					"type": "boolean"
 				},
 				"isExist": {
-					"type": "boolean"
-				},
-				"isInit": {
 					"type": "boolean"
 				}
 			},

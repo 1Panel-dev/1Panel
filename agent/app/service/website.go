@@ -561,7 +561,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	if len(create.FtpUser) != 0 && len(create.FtpPassword) != 0 {
 		createFtpUser := func(t *task.Task) error {
 			indexDir := GetSitePath(*website, SiteIndexDir)
-			itemID, err := NewIFtpService().Create(dto.FtpCreate{User: create.FtpUser, Password: create.FtpPassword, Path: indexDir})
+			itemID, err := NewIFtpService().CreateWebsite(dto.FtpCreate{User: create.FtpUser, Password: create.FtpPassword, Path: indexDir})
 			if err != nil {
 				return err
 			}

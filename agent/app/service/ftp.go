@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"sort"
 
@@ -19,10 +21,10 @@ type FtpService struct{}
 
 type IFtpService interface {
 	LoadBaseInfo() (dto.FtpBaseInfo, error)
-	Init() error
 	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
 	Operate(operation string) error
 	Create(req dto.FtpCreate) (uint, error)
+	CreateWebsite(req dto.FtpCreate) (uint, error)
 	Delete(req dto.BatchDeleteReq) error
 	Update(req dto.FtpUpdate) error
 	Sync() error
@@ -35,17 +37,8 @@ func NewIFtpService() IFtpService {
 
 func (f *FtpService) LoadBaseInfo() (dto.FtpBaseInfo, error) {
 	var baseInfo dto.FtpBaseInfo
-	isInit, err := toolbox.IsFtpInitialized()
-	if err != nil {
-		return baseInfo, err
-	}
-	baseInfo.IsInit = isInit
 	baseInfo.IsActive, baseInfo.IsExist = toolbox.FtpStatus()
 	return baseInfo, nil
-}
-
-func (f *FtpService) Init() error {
-	return toolbox.InitFtp()
 }
 
 func (f *FtpService) LoadLog(req dto.FtpLogSearch) (int64, interface{}, error) {
@@ -82,9 +75,6 @@ func (u *FtpService) Operate(operation string) error {
 }
 
 func (f *FtpService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
-	if _, err := toolbox.NewFtpClient(); err != nil {
-		return 0, nil, err
-	}
 	total, lists, err := ftpRepo.Page(req.Page, req.PageSize, ftpRepo.WithLikeUser(req.Info), repo.WithOrderDesc("created_at"))
 	if err != nil {
 		return 0, nil, err
@@ -108,7 +98,7 @@ func (f *FtpService) Sync() error {
 	}
 	lists, err := client.LoadList()
 	if err != nil {
-		return nil
+		return err
 	}
 	listsInDB, err := ftpRepo.GetList()
 	if err != nil {
@@ -122,13 +112,24 @@ func (f *FtpService) Sync() error {
 	for _, item := range lists {
 		if itemInDB, ok := currentData[item.User]; ok {
 			sameData[item.User] = struct{}{}
-			if item.Path != itemInDB.Path || item.Status != itemInDB.Status {
-				if err := ftpRepo.Update(itemInDB.ID, map[string]interface{}{"path": item.Path, "status": item.Status}); err != nil {
+			if item.Path != itemInDB.Path || item.Status != itemInDB.Status || item.UID != itemInDB.UID || item.GID != itemInDB.GID {
+				if err := ftpRepo.Update(itemInDB.ID, map[string]interface{}{
+					"path":   item.Path,
+					"status": item.Status,
+					"uid":    item.UID,
+					"gid":    item.GID,
+				}); err != nil {
 					return err
 				}
 			}
 		} else {
-			if err := ftpRepo.Create(&model.Ftp{User: item.User, Path: item.Path, Status: item.Status}); err != nil {
+			if err := ftpRepo.Create(&model.Ftp{
+				User:   item.User,
+				Path:   item.Path,
+				Status: item.Status,
+				UID:    item.UID,
+				GID:    item.GID,
+			}); err != nil {
 				return err
 			}
 		}
@@ -142,6 +143,14 @@ func (f *FtpService) Sync() error {
 }
 
 func (f *FtpService) Create(req dto.FtpCreate) (uint, error) {
+	return f.create(req, false)
+}
+
+func (f *FtpService) CreateWebsite(req dto.FtpCreate) (uint, error) {
+	return f.create(req, true)
+}
+
+func (f *FtpService) create(req dto.FtpCreate, website bool) (uint, error) {
 	if err := toolbox.ValidateFtpRootPath(req.Path); err != nil {
 		return 0, err
 	}
@@ -166,16 +175,28 @@ func (f *FtpService) Create(req dto.FtpCreate) (uint, error) {
 	if userInDB.ID != 0 {
 		return 0, buserr.New("ErrRecordExist")
 	}
-	if err := client.UserAdd(req.User, req.Password, req.Path); err != nil {
-		return 0, err
-	}
 	var ftp model.Ftp
 	if err := copier.Copy(&ftp, &req); err != nil {
 		return 0, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
+	uid, gid := uint(constant.WebsiteUID), uint(constant.WebsiteGID)
+	if !website {
+		uid, gid, err = toolbox.EnsureStandaloneFtpIdentity()
+		if err != nil {
+			return 0, err
+		}
+	}
+	if err := client.UserAdd(req.User, req.Password, req.Path, uid, gid); err != nil {
+		return 0, err
+	}
 	ftp.Status = constant.StatusEnable
 	ftp.Password = pass
+	ftp.UID = uid
+	ftp.GID = gid
 	if err := ftpRepo.Create(&ftp); err != nil {
+		if rollbackErr := client.UserDel(req.User); rollbackErr != nil {
+			return 0, errors.Join(err, fmt.Errorf("rollback FTP user %s failed: %w", req.User, rollbackErr))
+		}
 		return 0, err
 	}
 	return ftp.ID, nil
@@ -245,7 +266,11 @@ func (f *FtpService) Update(req dto.FtpUpdate) error {
 		needReload = true
 	}
 	if req.Path != ftpItem.Path {
-		if err := client.SetPath(ftpItem.User, req.Path); err != nil {
+		uid, gid := ftpItem.UID, ftpItem.GID
+		if uid == 0 || gid == 0 {
+			uid, gid = uint(constant.WebsiteUID), uint(constant.WebsiteGID)
+		}
+		if err := client.SetPath(ftpItem.User, req.Path, uid, gid); err != nil {
 			return err
 		}
 		updates["path"] = req.Path

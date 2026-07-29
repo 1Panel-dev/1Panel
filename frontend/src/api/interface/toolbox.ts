@@ -85,7 +85,6 @@ export namespace Toolbox {
     export interface FtpBaseInfo {
         isActive: boolean;
         isExist: boolean;
-        isInit: boolean;
     }
     export interface FtpInfo {
         id: number;

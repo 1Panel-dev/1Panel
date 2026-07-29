@@ -18,7 +18,6 @@ type FtpInfo struct {
 type FtpBaseInfo struct {
 	IsActive bool `json:"isActive"`
 	IsExist  bool `json:"isExist"`
-	IsInit   bool `json:"isInit"`
 }
 
 type FtpLogSearch struct {
