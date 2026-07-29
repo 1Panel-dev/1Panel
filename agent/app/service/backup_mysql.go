@@ -277,6 +277,7 @@ func decodeBackupArgs(value string) []string {
 	}
 	var args []string
 	if err := json.Unmarshal([]byte(value), &args); err != nil {
+		global.LOG.Warnf("unmarshal backup args failed: %v", err)
 		return nil
 	}
 	return args
