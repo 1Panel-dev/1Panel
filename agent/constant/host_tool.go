@@ -6,7 +6,8 @@ const (
 	SupervisorConfigPath  = "SupervisorConfigPath"
 	SupervisorServiceName = "SupervisorServiceName"
 
-	FTPUser = "1panel"
-	FTPUid  = 1000
-	FTPGid  = 1000
+	WebsiteUID = 1000
+	WebsiteGID = 1000
+
+	FTPUser = "1panel-ftp"
 )

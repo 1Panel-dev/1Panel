@@ -94,6 +94,7 @@ func InitAgentDB() {
 		migrations.InitFirewallPortWhiteList,
 		migrations.AddDatabaseUserTable,
 		migrations.AddBackupRecordArgs,
+		migrations.AddFtpIdentity,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
