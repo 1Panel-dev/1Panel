@@ -191,11 +191,23 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 		currentInfo.ShotTime = shotTime
 		return &currentInfo
 	}
-	if now := shotTime.Unix(); now > 0 && hostInfo.BootTime < uint64(now) {
-		currentInfo.Uptime = uint64(now) - hostInfo.BootTime
+
+	uptime := hostInfo.Uptime
+	var bootTime uint64
+	if now := shotTime.Unix(); now > 0 {
+		nowUnix := uint64(now)
+		if hostInfo.BootTime > 0 && hostInfo.BootTime <= nowUnix {
+			bootTime = hostInfo.BootTime
+			uptime = nowUnix - bootTime
+		} else if uptime <= nowUnix {
+			bootTime = nowUnix - uptime
+		}
 	}
-	currentInfo.TimeSinceUptime = time.Unix(int64(hostInfo.BootTime), 0).Format(constant.DateTimeLayout)
-	currentInfo.RunningTime = loadRunningTime(currentInfo.Uptime)
+	currentInfo.Uptime = uptime
+	currentInfo.RunningTime = loadRunningTime(uptime)
+	if bootTime > 0 {
+		currentInfo.TimeSinceUptime = time.Unix(int64(bootTime), 0).Format(constant.DateTimeLayout)
+	}
 	currentInfo.Procs = hostInfo.Procs
 	currentInfo.CPUTotal, _ = psutil.CPUInfo.GetLogicalCores(false)
 
