@@ -154,6 +154,11 @@ ErrAppVersionDeprecated: '{{ .name }} uygulaması mevcut 1Panel sürümü ile uy
 ErrDockerFailed: 'Docker durumu anormal, lütfen servis durumunu kontrol edin'
 ErrDockerComposeCmdNotFound: 'Docker Compose komutu mevcut değil, lütfen önce bu komutu host makinesine yükleyin'
 UseExistImage: 'Görüntü zaten mevcut, mevcut görüntü kullanılıyor'
+UpgradePrepare: 'Uygulama yükseltmesini hazırla'
+UpgradeStop: 'Özgün uygulamayı durdur'
+UpgradeWaitReady: 'Uygulamanın hazır olmasını bekle'
+UpgradeBackupDisabled: 'Yükseltme yedeği devre dışı; yükseltme betiklerinin veri değişiklikleri tamamen geri alınamaz'
+UpgradeRollbackFailed: 'Geri alma başarısız'
 ErrDatabaseNotFound: '{{ .name }} veritabanı mevcut değil'
 
 # SSH

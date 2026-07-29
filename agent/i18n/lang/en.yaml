@@ -154,6 +154,11 @@ ErrAppVersionDeprecated: "The {{ .name }} application is not compatible with the
 ErrDockerFailed: 'Docker is abnormal; check service status'
 ErrDockerComposeCmdNotFound: 'Docker Compose not found on host'
 UseExistImage: 'Image exists; using existing image'
+UpgradePrepare: 'Prepare application upgrade'
+UpgradeStop: 'Stop original application'
+UpgradeWaitReady: 'Wait for application readiness'
+UpgradeBackupDisabled: 'Upgrade backup is disabled; data changes made by upgrade scripts cannot be fully rolled back'
+UpgradeRollbackFailed: 'Rollback failed'
 ErrDatabaseNotFound: 'Database not found: {{ .name }}'
 
 # SSH

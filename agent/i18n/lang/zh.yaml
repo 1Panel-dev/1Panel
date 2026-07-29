@@ -154,6 +154,11 @@ ErrAppVersionDeprecated: "{{ .name }} 应用不适配当前 1Panel 版本，跳�
 ErrDockerFailed: "Docker 状态异常，请检查服务状态"
 ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，请先在宿主机安装"
 UseExistImage: "镜像已存在，使用存量镜像"
+UpgradePrepare: "准备应用升级"
+UpgradeStop: "停止原应用"
+UpgradeWaitReady: "等待应用就绪"
+UpgradeBackupDisabled: "未启用升级备份，升级脚本产生的数据变更无法完整回滚"
+UpgradeRollbackFailed: "回滚失败"
 ErrDatabaseNotFound: "数据库 {{ .name }} 不存在"
 
 # SSH

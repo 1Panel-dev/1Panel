@@ -154,6 +154,11 @@ ErrAppVersionDeprecated: '{{ .name }} アプリケーションは現在の 1Pane
 ErrDockerFailed: 'Docker の状態が異常です。サービス状態を確認してください'
 ErrDockerComposeCmdNotFound: 'Docker Compose コマンドは存在しません。ホストマシンにこのコマンドを先にインストールしてください'
 UseExistImage: 'イメージは既に存在します。既存のイメージを使用します'
+UpgradePrepare: 'アプリケーションのアップグレードを準備'
+UpgradeStop: '元のアプリケーションを停止'
+UpgradeWaitReady: 'アプリケーションの準備完了を待機'
+UpgradeBackupDisabled: 'アップグレードバックアップが無効なため、アップグレードスクリプトによるデータ変更を完全にはロールバックできません'
+UpgradeRollbackFailed: 'ロールバックに失敗しました'
 ErrDatabaseNotFound: 'データベース {{ .name }} は存在しません'
 
 # SSH

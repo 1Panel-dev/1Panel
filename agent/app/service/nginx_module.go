@@ -515,6 +515,7 @@ type openrestyUpgradeSnapshot struct {
 
 var openrestyUpgradeSnapshotPaths = []string{
 	nginxModuleBuildDir,
+	nginxModuleModulesDir,
 	"scripts",
 	path.Join(nginxModuleConfDir, nginxModuleEnabledConfDir),
 	path.Join(nginxModuleConfDir, "nginx.conf"),

@@ -144,6 +144,11 @@ ErrAppVersionDeprecated: "ແອັບພລິເຄຊັນ {{ .name }} ບ�
 ErrDockerFailed: 'Docker ຜິດປົກກະຕິ; ກະລຸນາກວດສອບສະຖານະການບໍລິການ'
 ErrDockerComposeCmdNotFound: 'ບໍ່ພົບຄຳສັ່ງ Docker Compose ໃນເຄື່ອງ'
 UseExistImage: 'ມີຮູບພາບຢູ່ແລ້ວ; ກຳລັງໃຊ້ຮູບພາບທີ່ມີຢູ່'
+UpgradePrepare: 'ກະກຽມອັບເກຣດແອັບ'
+UpgradeStop: 'ຢຸດແອັບເດີມ'
+UpgradeWaitReady: 'ລໍຖ້າແອັບພ້ອມ'
+UpgradeBackupDisabled: 'ປິດການສຳຮອງກ່ອນອັບເກຣດ; ການປ່ຽນແປງຂໍ້ມູນຈາກສະຄຣິບບໍ່ສາມາດຍ້ອນກັບໄດ້ທັງໝົດ'
+UpgradeRollbackFailed: 'ຍ້ອນກັບລົ້ມເຫຼວ'
 ErrDatabaseNotFound: 'ບໍ່ພົບຖານຂໍ້ມູນ: {{ .name }}'
 
 #ssh
