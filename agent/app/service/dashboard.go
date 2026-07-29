@@ -184,10 +184,30 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 
 func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent {
 	var currentInfo dto.DashboardCurrent
-	hostInfo, _ := psutil.HOST.GetHostInfo(false)
-	currentInfo.Uptime = hostInfo.Uptime
-	currentInfo.TimeSinceUptime = time.Unix(int64(hostInfo.BootTime), 0).Format(constant.DateTimeLayout)
-	currentInfo.RunningTime = loadRunningTime(hostInfo.Uptime)
+	shotTime := time.Now()
+	hostInfo, err := psutil.HOST.GetHostInfo(false)
+	if err != nil {
+		global.LOG.Errorf("load host info failed: %v", err)
+		currentInfo.ShotTime = shotTime
+		return &currentInfo
+	}
+
+	uptime := hostInfo.Uptime
+	var bootTime uint64
+	if now := shotTime.Unix(); now > 0 {
+		nowUnix := uint64(now)
+		if hostInfo.BootTime > 0 && hostInfo.BootTime <= nowUnix {
+			bootTime = hostInfo.BootTime
+			uptime = nowUnix - bootTime
+		} else if uptime <= nowUnix {
+			bootTime = nowUnix - uptime
+		}
+	}
+	currentInfo.Uptime = uptime
+	currentInfo.RunningTime = loadRunningTime(uptime)
+	if bootTime > 0 {
+		currentInfo.TimeSinceUptime = time.Unix(int64(bootTime), 0).Format(constant.DateTimeLayout)
+	}
 	currentInfo.Procs = hostInfo.Procs
 	currentInfo.CPUTotal, _ = psutil.CPUInfo.GetLogicalCores(false)
 
@@ -263,7 +283,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 		}
 	}
 
-	currentInfo.ShotTime = time.Now()
+	currentInfo.ShotTime = shotTime
 	return &currentInfo
 }
 
