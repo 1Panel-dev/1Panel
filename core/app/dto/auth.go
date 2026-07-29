@@ -57,6 +57,7 @@ type ApiInterfaceConfig struct {
 	ApiInterfaceStatus string `json:"apiInterfaceStatus"`
 	ApiKey             string `json:"apiKey"`
 	IpWhiteList        string `json:"ipWhiteList"`
+	ApiTrustedProxies  string `json:"apiTrustedProxies"`
 	ApiKeyValidityTime int    `json:"apiKeyValidityTime"`
 }
 
@@ -71,6 +72,7 @@ type CurrentUserInfo struct {
 	ApiInterfaceStatus string `json:"apiInterfaceStatus"`
 	ApiKey             string `json:"apiKey"`
 	IpWhiteList        string `json:"ipWhiteList"`
+	ApiTrustedProxies  string `json:"apiTrustedProxies"`
 	ApiKeyValidityTime int    `json:"apiKeyValidityTime"`
 
 	Role        string                `json:"role"`

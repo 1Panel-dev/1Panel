@@ -816,12 +816,13 @@
 	},
 	"/core/auth/api/update": {
 		"bodyKeys": [
-			"ipWhiteList"
+			"ipWhiteList",
+			"apiTrustedProxies"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新 API 接口配置 =\u003e IP 白名单: [ipWhiteList]",
-		"formatEN": "update api config =\u003e IP White List: [ipWhiteList]"
+		"formatZH": "更新 API 接口配置 =\u003e IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]",
+		"formatEN": "update api config =\u003e IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"
 	},
 	"/core/auth/expired/reset": {
 		"bodyKeys": [],
@@ -1577,7 +1578,8 @@
 	"/core/enterprise/users/api/update": {
 		"bodyKeys": [
 			"id",
-			"ipWhiteList"
+			"ipWhiteList",
+			"apiTrustedProxies"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [
@@ -1590,8 +1592,8 @@
 				"output_value": "name"
 			}
 		],
-		"formatZH": "更新用户 [name] API 接口配置 =\u003e IP 白名单: [ipWhiteList]",
-		"formatEN": "update user [name] api config =\u003e IP White List: [ipWhiteList]"
+		"formatZH": "更新用户 [name] API 接口配置 =\u003e IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]",
+		"formatEN": "update user [name] api config =\u003e IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"
 	},
 	"/core/enterprise/users/del": {
 		"bodyKeys": [

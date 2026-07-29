@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
+	appauth "github.com/1Panel-dev/1Panel/core/app/auth"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/buserr"
@@ -435,7 +436,7 @@ func (b *BaseApi) GenerateApiKey(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/auth/api/update [post]
-// @x-panel-log {"bodyKeys":["ipWhiteList"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 API 接口配置 => IP 白名单: [ipWhiteList]","formatEN":"update api config => IP White List: [ipWhiteList]"}
+// @x-panel-log {"bodyKeys":["ipWhiteList","apiTrustedProxies"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 API 接口配置 => IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]","formatEN":"update api config => IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"}
 func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
 	panelToken := c.GetHeader("1Panel-Token")
 	if panelToken != "" {
@@ -446,6 +447,12 @@ func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	trustedProxies, err := appauth.NormalizeAPITrustedProxies(req.ApiTrustedProxies)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	req.ApiTrustedProxies = trustedProxies
 
 	if err := xpack.AuthProvider.UpdateApiConfig(c, req); err != nil {
 		helper.InternalServer(c, err)

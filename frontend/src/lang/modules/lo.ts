@@ -2696,6 +2696,9 @@ const message = {
         ipWhiteList: 'IP allowlist',
         ipWhiteListEgs: 'ໜຶ່ງລາຍການຕໍ່ແຖວ. ຕົວຢ່າງ:\n172.161.10.111\n172.161.10.0/24',
         ipWhiteListHelper: 'IP ໃນ allowlist ສາມາດເຂົ້າເຖິງ API ໄດ້, 0.0.0.0/0 (ທຸກ IPv4), ::/0 (ທຸກ IPv6)',
+        apiTrustedProxies: 'ພຣັອກຊີ API ທີ່ເຊື່ອຖື',
+        apiTrustedProxiesHelper:
+            'ເມື່ອໃຊ້ reverse proxy, ໃຫ້ໃສ່ IP ຫຼືເຄືອຂ່າຍຂອງ proxy server ເພື່ອໃຫ້ໄດ້ client IP ຢ່າງຖືກຕ້ອງ. ຖ້າບໍ່ໃຊ້ໃຫ້ປ່ອຍຫວ່າງ. ບໍ່ຮອງຮັບ 0.0.0.0/0 ແລະ ::/0.',
         apiKeyValidityTime: 'ໄລຍະເວລາທີ່ API key ໃຊ້ງານໄດ້',
         apiKeyValidityTimeEgs: 'ໄລຍະເວລາທີ່ API key ໃຊ້ງານໄດ້ (ນາທີ)',
         apiKeyValidityTimeHelper:

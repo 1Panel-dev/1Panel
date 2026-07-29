@@ -2733,6 +2733,9 @@ const message = {
         ipWhiteListEgs: 'هر خط یک IP. مثلاً،\n172.161.10.111\n172.161.10.0/24',
         ipWhiteListHelper:
             'IP‌های موجود در لیست سفید می‌توانند به API دسترسی داشته باشند، 0.0.0.0/0 (همه IPv4)، ::/0 (همه IPv6)',
+        apiTrustedProxies: 'پروکسی‌های قابل اعتماد API',
+        apiTrustedProxiesHelper:
+            'هنگام استفاده از پروکسی معکوس، IP یا شبکه سرور پروکسی را وارد کنید تا IP کلاینت به‌درستی دریافت شود. در صورت عدم استفاده، این بخش را خالی بگذارید. 0.0.0.0/0 و ::/0 پشتیبانی نمی‌شوند.',
         apiKeyValidityTime: 'مدت اعتبار کلید رابط',
         apiKeyValidityTimeEgs: 'مدت اعتبار کلید رابط (به دقیقه)',
         apiKeyValidityTimeHelper:

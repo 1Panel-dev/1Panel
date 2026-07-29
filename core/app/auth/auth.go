@@ -311,6 +311,10 @@ func GenerateApiKey() (string, error) {
 }
 func UpdateApiConfig(req dto.ApiInterfaceConfig) error {
 	settingRepo := repo.NewISettingRepo()
+	trustedProxies, err := NormalizeAPITrustedProxies(req.ApiTrustedProxies)
+	if err != nil {
+		return err
+	}
 	if err := settingRepo.UpdateOrCreate("ApiInterfaceStatus", req.ApiInterfaceStatus); err != nil {
 		return err
 	}
@@ -318,6 +322,9 @@ func UpdateApiConfig(req dto.ApiInterfaceConfig) error {
 		return err
 	}
 	if err := settingRepo.UpdateOrCreate("IpWhiteList", req.IpWhiteList); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate("ApiTrustedProxies", trustedProxies); err != nil {
 		return err
 	}
 	if err := settingRepo.UpdateOrCreate("ApiKeyValidityTime", strconv.Itoa(req.ApiKeyValidityTime)); err != nil {

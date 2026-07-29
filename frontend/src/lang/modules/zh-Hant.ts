@@ -2587,6 +2587,9 @@ const message = {
         ipWhiteListEgs: '當存在多個 IP 時，需要換行顯示，例：\n172.16.10.111 \n172.16.10.0/24',
         ipWhiteListHelper:
             '必需在 IP 白名單清單中的 IP 才能存取面板 API 介面，0.0.0.0/0（所有 IPv4），::/0（所有 IPv6）',
+        apiTrustedProxies: 'API 可信代理',
+        apiTrustedProxiesHelper:
+            '使用反向代理時，請填寫代理伺服器的 IP 或網段，以便正確取得用戶端 IP；不使用時請留空。不支援 0.0.0.0/0 和 ::/0。',
         apiKeyValidityTime: '介面金鑰有效期',
         apiKeyValidityTimeEgs: '介面金鑰有效期（組織分）',
         apiKeyValidityTimeHelper: '介面時間戳記到請求時的目前時間戳之間有效（組織分），設定為0時，不做時間戳記校驗',

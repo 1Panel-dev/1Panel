@@ -2582,6 +2582,9 @@ const message = {
         ipWhiteListEgs: '当存在多个 IP 时，需要换行显示，例： \n172.16.10.111 \n172.16.10.0/24',
         ipWhiteListHelper:
             '必需在 IP 白名单列表中的 IP 才能访问面板 API 接口，0.0.0.0/0（所有 IPv4），::/0（所有 IPv6）',
+        apiTrustedProxies: 'API 可信代理',
+        apiTrustedProxiesHelper:
+            '使用反向代理时，请填写代理服务器的 IP 或网段，以便正确获取客户端 IP；不使用时请留空。不支持 0.0.0.0/0 和 ::/0。',
         apiKeyValidityTime: '接口密钥有效期',
         apiKeyValidityTimeEgs: '接口密钥有效期（单位分）',
         apiKeyValidityTimeHelper: '接口时间戳到请求时的当前时间戳之间有效（单位分），设置为 0 时，不做时间戳校验',

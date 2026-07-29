@@ -2755,6 +2755,9 @@ const message = {
         ipWhiteList: 'IP AllowList',
         ipWhiteListEgs: '1行に1つ。たとえば、 n172.161.10.111  n172.161.10.0/24',
         ipWhiteListHelper: 'AllowList内のIPSはAPIにアクセスできます、0.0.0.0/0（すべての IPv4）、::/0（すべての IPv6）',
+        apiTrustedProxies: 'API信頼済みプロキシ',
+        apiTrustedProxiesHelper:
+            'リバースプロキシを使用する場合は、クライアントIPを正しく取得するために、プロキシサーバーのIPまたはネットワークを入力してください。使用しない場合は空欄にしてください。0.0.0.0/0と::/0は指定できません。',
         apiKeyReset: 'インターフェイスキーリセット',
         apiKeyResetHelper: '関連するキーサービスは無効になります。サービスに新しいキーを追加してください',
         confDockerProxy: 'Dockerプロキシを構成します',

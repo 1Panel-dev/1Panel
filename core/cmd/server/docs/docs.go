@@ -2120,6 +2120,158 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/agents/plugins/install": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginMarketInstallReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Install an OpenClaw marketplace plugin",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/plugins/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginsReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentPluginItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List OpenClaw plugins",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/plugins/operate": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginOperateReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Operate an OpenClaw plugin",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/agents/plugins/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentPluginSearchReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.AgentPluginSearchItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Search OpenClaw plugins",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/agents/remark": {
 			"post": {
 				"consumes": [
@@ -9257,10 +9409,11 @@ const docTemplate = `{
 				"x-panel-log": {
 					"BeforeFunctions": [],
 					"bodyKeys": [
-						"ipWhiteList"
+						"ipWhiteList",
+						"apiTrustedProxies"
 					],
-					"formatEN": "update api config =\u003e IP White List: [ipWhiteList]",
-					"formatZH": "更新 API 接口配置 =\u003e IP 白名单: [ipWhiteList]",
+					"formatEN": "update api config =\u003e IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]",
+					"formatZH": "更新 API 接口配置 =\u003e IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]",
 					"paramKeys": []
 				}
 			}
@@ -30404,6 +30557,143 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.AgentPluginItem": {
+			"properties": {
+				"enabled": {
+					"type": "boolean"
+				},
+				"id": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"origin": {
+					"type": "string"
+				},
+				"version": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentPluginMarketInstallReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"package": {
+					"maxLength": 200,
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"version": {
+					"maxLength": 100,
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"package",
+				"taskID",
+				"version"
+			],
+			"type": "object"
+		},
+		"dto.AgentPluginOperateReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"operate": {
+					"enum": [
+						"enable",
+						"disable",
+						"update",
+						"uninstall"
+					],
+					"type": "string"
+				},
+				"pluginId": {
+					"maxLength": 200,
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"operate",
+				"pluginId",
+				"taskID"
+			],
+			"type": "object"
+		},
+		"dto.AgentPluginSearchItem": {
+			"properties": {
+				"categories": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"channel": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"downloads": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"official": {
+					"type": "boolean"
+				},
+				"package": {
+					"type": "string"
+				},
+				"pluginId": {
+					"type": "string"
+				},
+				"score": {
+					"type": "number"
+				},
+				"verificationTier": {
+					"type": "string"
+				},
+				"version": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.AgentPluginSearchReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"keyword": {
+					"maxLength": 100,
+					"type": "string"
+				},
+				"limit": {
+					"maximum": 100,
+					"minimum": 1,
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId",
+				"keyword"
+			],
+			"type": "object"
+		},
 		"dto.AgentPluginStatus": {
 			"properties": {
 				"currentVersion": {
@@ -30470,6 +30760,17 @@ const docTemplate = `{
 				"agentId",
 				"taskID",
 				"type"
+			],
+			"type": "object"
+		},
+		"dto.AgentPluginsReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"agentId"
 			],
 			"type": "object"
 		},
@@ -31517,6 +31818,9 @@ const docTemplate = `{
 				},
 				"apiKeyValidityTime": {
 					"type": "integer"
+				},
+				"apiTrustedProxies": {
+					"type": "string"
 				},
 				"ipWhiteList": {
 					"type": "string"
@@ -33559,6 +33863,15 @@ const docTemplate = `{
 				},
 				"apiKeyValidityTime": {
 					"type": "integer"
+				},
+				"apiTrustedProxies": {
+					"type": "string"
+				},
+				"authSource": {
+					"type": "string"
+				},
+				"authSourceStatus": {
+					"type": "string"
 				},
 				"complexitySetting": {
 					"type": "string"

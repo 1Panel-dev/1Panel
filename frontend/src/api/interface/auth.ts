@@ -61,6 +61,7 @@ export namespace Login {
         apiInterfaceStatus: string;
         apiKey: string;
         ipWhiteList: string;
+        apiTrustedProxies: string;
         apiKeyValidityTime: number;
     }
     export interface AuthInfoUpdate {
@@ -86,6 +87,7 @@ export namespace Login {
         apiInterfaceStatus: string;
         apiKey: string;
         ipWhiteList: string;
+        apiTrustedProxies: string;
         apiKeyValidityTime: number;
     }
     export interface PasswordUpdate {

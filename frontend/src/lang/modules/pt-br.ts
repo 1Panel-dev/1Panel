@@ -2919,6 +2919,9 @@ const message = {
         ipWhiteListEgs: 'Um por linha. Exemplo: \n172.161.10.111\n172.161.10.0/24',
         ipWhiteListHelper:
             'IPs na lista de permitidos podem acessar a API, 0.0.0.0/0 (todos os IPv4), ::/0 (todos os IPv6)',
+        apiTrustedProxies: 'Proxies confiáveis da API',
+        apiTrustedProxiesHelper:
+            'Ao usar um proxy reverso, insira o IP ou a rede do servidor proxy para obter corretamente o IP do cliente. Caso contrário, deixe este campo em branco. 0.0.0.0/0 e ::/0 não são suportados.',
         apiKeyReset: 'Redefinir chave da interface',
         apiKeyResetHelper:
             'O serviço associado à chave se tornará inválido. Por favor, adicione uma nova chave ao serviço',

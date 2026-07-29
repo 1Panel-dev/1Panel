@@ -356,6 +356,15 @@
                 />
                 <span class="input-help">{{ $t('setting.ipWhiteListHelper') }}</span>
             </el-form-item>
+            <el-form-item :label="$t('setting.apiTrustedProxies')" prop="apiTrustedProxies">
+                <el-input
+                    type="textarea"
+                    :placeholder="$t('setting.allowIPEgs')"
+                    :rows="3"
+                    v-model="form.apiTrustedProxies"
+                />
+                <span class="input-help">{{ $t('setting.apiTrustedProxiesHelper') }}</span>
+            </el-form-item>
             <el-form-item :label="$t('setting.apiKeyValidityTime')" prop="apiKeyValidityTime">
                 <el-input :placeholder="$t('setting.apiKeyValidityTimeEgs')" v-model.number="form.apiKeyValidityTime">
                     <template #append>{{ $t('commons.units.minute') }}</template>
@@ -446,6 +455,7 @@ const form = reactive({
     apiInterfaceStatus: 'Disable',
     apiKey: '',
     ipWhiteList: '',
+    apiTrustedProxies: '',
     apiKeyValidityTime: 120,
 });
 const mfaForm = reactive({
@@ -512,6 +522,7 @@ const mfaRules = reactive({
 });
 const apiRules = reactive({
     ipWhiteList: [Rules.requiredInput, { validator: checkIPs, trigger: 'blur' }],
+    apiTrustedProxies: [{ validator: checkIPs, trigger: 'blur' }],
     apiKey: [Rules.requiredInput],
     apiKeyValidityTime: [Rules.requiredInput, Rules.integerNumberWith0],
 });
@@ -523,7 +534,7 @@ const getUserFormFields = () => {
     }
     return fields;
 };
-const apiFormFields = ['apiKey', 'ipWhiteList', 'apiKeyValidityTime'];
+const apiFormFields = ['apiKey', 'ipWhiteList', 'apiTrustedProxies', 'apiKeyValidityTime'];
 
 const openDrawer = async () => {
     if (!props.currentUser) {
@@ -538,6 +549,7 @@ const syncApiConfig = (currentUser: Login.AuthInfo) => {
     form.apiInterfaceStatus = currentUser.apiInterfaceStatus || 'Disable';
     form.apiKey = currentUser.apiKey;
     form.ipWhiteList = currentUser.ipWhiteList;
+    form.apiTrustedProxies = currentUser.apiTrustedProxies || '';
     form.apiKeyValidityTime = currentUser.apiKeyValidityTime;
     savedApiStatus.value = form.apiInterfaceStatus;
 };
@@ -586,9 +598,10 @@ const resetApiKey = async () => {
 };
 
 function checkIPs(rule: any, value: any, callback: any) {
-    if (form.ipWhiteList !== '') {
-        let addr = form.ipWhiteList.split('\n');
-        for (const item of addr) {
+    if (value !== '') {
+        let addr = value.split('\n');
+        for (const rawItem of addr) {
+            const item = rawItem.trim();
             if (item === '') {
                 continue;
             }
@@ -898,6 +911,7 @@ const onSaveApi = async (formEl: FormInstance | undefined) => {
     const param = {
         apiKey: form.apiKey,
         ipWhiteList: form.ipWhiteList,
+        apiTrustedProxies: form.apiTrustedProxies,
         apiInterfaceStatus: form.apiInterfaceStatus,
         apiKeyValidityTime: form.apiKeyValidityTime,
     };
@@ -972,6 +986,7 @@ const handleApi = async () => {
             let param = {
                 apiKey: form.apiKey,
                 ipWhiteList: form.ipWhiteList,
+                apiTrustedProxies: form.apiTrustedProxies,
                 apiInterfaceStatus: form.apiInterfaceStatus,
                 apiKeyValidityTime: form.apiKeyValidityTime,
             };
