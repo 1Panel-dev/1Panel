@@ -177,14 +177,8 @@
                                                 v-if="currentRecord?.status === 'Waiting' && !currentRecord?.interval"
                                                 :loading="true"
                                             />
-                                            <span v-else>
-                                                <span class="status-count" v-if="currentRecord?.interval! <= 1000">
-                                                    {{ currentRecord?.interval === 0 ? '-' : currentRecord?.interval }}
-                                                    ms
-                                                </span>
-                                                <span class="status-count" v-if="currentRecord?.interval! > 1000">
-                                                    {{ currentRecord?.interval! / 1000 }} s
-                                                </span>
+                                            <span v-else class="status-count">
+                                                {{ formatInterval(currentRecord?.interval) }}
                                             </span>
                                         </el-form-item>
                                         <el-form-item class="description">
@@ -290,6 +284,26 @@ const open = ref();
 const delLoading = ref();
 const cleanData = ref();
 const cleanRemoteData = ref();
+
+const formatInterval = (interval?: number) => {
+    if (!interval || interval < 0) {
+        return '-';
+    }
+
+    const totalMilliseconds = Math.floor(interval);
+    const hours = Math.floor(totalMilliseconds / 3600000);
+    const minutes = Math.floor((totalMilliseconds % 3600000) / 60000);
+    const seconds = Math.floor((totalMilliseconds % 60000) / 1000);
+    const milliseconds = totalMilliseconds % 1000;
+    return [
+        hours ? `${hours}h` : '',
+        minutes ? `${minutes}min` : '',
+        seconds ? `${seconds}s` : '',
+        milliseconds ? `${milliseconds}ms` : '',
+    ]
+        .filter(Boolean)
+        .join(' ');
+};
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     let itemSize = Number(localStorage.getItem(searchInfo.cacheSizeKey));
