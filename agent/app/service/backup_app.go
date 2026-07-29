@@ -90,6 +90,34 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 	return record, nil
 }
 
+func backupAppWithParentTask(install *model.AppInstall, parentTask *task.Task, fileName string) (*model.BackupRecord, error) {
+	itemDir := fmt.Sprintf("app/%s/%s", install.App.Key, install.Name)
+	backupDir := path.Join(global.Dir.LocalBackupDir, itemDir)
+	record := &model.BackupRecord{
+		Type:              "app",
+		Name:              install.App.Key,
+		DetailName:        install.Name,
+		SourceAccountIDs:  "1",
+		DownloadAccountID: 1,
+		FileDir:           itemDir,
+		FileName:          fileName,
+		TaskID:            parentTask.TaskID,
+		Status:            constant.StatusWaiting,
+	}
+	if err := backupRepo.CreateRecord(record); err != nil {
+		return nil, err
+	}
+	if err := handleAppBackup(install, parentTask, record.ID, backupDir, fileName, "", "", parentTask.TaskID); err != nil {
+		markBackupFailed(record.ID, err)
+		record.Status = constant.StatusFailed
+		record.Message = err.Error()
+		return record, err
+	}
+	backupRepo.UpdateRecordByMap(record.ID, map[string]interface{}{"status": constant.StatusSuccess})
+	record.Status = constant.StatusSuccess
+	return record, nil
+}
+
 func (u *BackupService) AppRecover(req dto.CommonRecover) error {
 	app, err := appRepo.GetFirst(appRepo.WithKey(req.Name))
 	if err != nil {
@@ -203,7 +231,11 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 			return err
 		}
 		defer func() {
-			_, _ = compose.Up(install.GetComposePath())
+			if isRollback {
+				_, _ = compose.UpWithoutPull(install.GetComposePath())
+			} else {
+				_, _ = compose.Up(install.GetComposePath())
+			}
 			_ = os.RemoveAll(strings.ReplaceAll(recoverFile, ".tar.gz", ""))
 		}()
 

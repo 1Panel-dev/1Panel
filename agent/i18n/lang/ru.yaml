@@ -154,6 +154,11 @@ ErrAppVersionDeprecated: 'Приложение {{ .name }} несовмести�
 ErrDockerFailed: 'Состояние Docker аномально, проверьте состояние сервиса'
 ErrDockerComposeCmdNotFound: 'Команда Docker Compose отсутствует, пожалуйста, установите эту команду на хост-машине сначала'
 UseExistImage: 'Образ уже существует, используется существующий образ'
+UpgradePrepare: 'Подготовка обновления приложения'
+UpgradeStop: 'Остановка исходного приложения'
+UpgradeWaitReady: 'Ожидание готовности приложения'
+UpgradeBackupDisabled: 'Резервная копия обновления отключена; изменения данных из сценариев обновления нельзя полностью откатить'
+UpgradeRollbackFailed: 'Ошибка отката'
 ErrDatabaseNotFound: 'База данных {{ .name }} не существует'
 
 # SSH

@@ -154,6 +154,11 @@ ErrAppVersionDeprecated: 'La aplicación {{ .name }} no es compatible con la ver
 ErrDockerFailed: 'El estado de Docker es anómalo, revise el servicio'
 ErrDockerComposeCmdNotFound: 'El comando Docker Compose no existe instálelo primero en el host'
 UseExistImage: 'La imagen ya existe, usando imagen existente'
+UpgradePrepare: 'Preparar actualización de la aplicación'
+UpgradeStop: 'Detener la aplicación original'
+UpgradeWaitReady: 'Esperar a que la aplicación esté lista'
+UpgradeBackupDisabled: 'La copia de actualización está desactivada; los cambios de datos de los scripts no se pueden revertir por completo'
+UpgradeRollbackFailed: 'Error al revertir'
 ErrDatabaseNotFound: 'La base de datos {{ .name }} no existe'
 
 # SSH

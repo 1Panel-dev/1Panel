@@ -43,9 +43,26 @@ func Up(filePath string) (string, error) {
 		return "", err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, loadFiles(filePath)...)
-	args = append(args, "up", "-d")
+	args := append(extra, upArgs(filePath, false)...)
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
+}
+
+func UpWithoutPull(filePath string) (string, error) {
+	if err := checkCmd(); err != nil {
+		return "", err
+	}
+	base, extra := getComposeBaseCmd()
+	args := append(extra, upArgs(filePath, true)...)
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
+}
+
+func upArgs(filePath string, withoutPull bool) []string {
+	args := loadFiles(filePath)
+	args = append(args, "up", "-d")
+	if withoutPull {
+		args = append(args, "--pull", "never", "--no-build")
+	}
+	return args
 }
 
 func UpWithTask(filePath string, task *task.Task, forcePull bool) error {
@@ -53,9 +70,22 @@ func UpWithTask(filePath string, task *task.Task, forcePull bool) error {
 		return err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, loadFiles(filePath)...)
-	args = append(args, "up", "-d")
+	args := append(extra, upArgs(filePath, false)...)
 	return cmd.NewCommandMgr(cmd.WithTask(*task), cmd.WithTimeout(20*time.Minute)).Run(base, args...)
+}
+
+func BuildWithTask(filePath, projectName string, task *task.Task) error {
+	if err := checkCmd(); err != nil {
+		return err
+	}
+	base, extra := getComposeBaseCmd()
+	args := append([]string(nil), extra...)
+	if projectName != "" {
+		args = append(args, "--project-name", projectName)
+	}
+	args = append(args, loadFiles(filePath)...)
+	args = append(args, "build")
+	return cmd.NewCommandMgr(cmd.WithTask(*task), cmd.WithTimeout(120*time.Minute)).Run(base, args...)
 }
 
 func PullComposeImages(filePath string, forcePull bool, task *task.Task) error {

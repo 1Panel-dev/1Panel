@@ -170,6 +170,10 @@ type containerSwitchClient interface {
 	NetworkDisconnect(context.Context, string, string, bool) error
 }
 
+type containerInspectClient interface {
+	ContainerInspect(context.Context, string) (container.InspectResponse, error)
+}
+
 type containerOperationMutex struct {
 	mutex sync.Mutex
 	locks map[string]*containerOperationLockEntry
@@ -335,7 +339,7 @@ const (
 	containerHealthCheckMaxWait = 10 * time.Minute
 )
 
-func waitContainerReady(ctx context.Context, cli containerSwitchClient, containerID string) error {
+func waitContainerReady(ctx context.Context, cli containerInspectClient, containerID string) error {
 	info, err := cli.ContainerInspect(ctx, containerID)
 	if err != nil {
 		return err
@@ -347,14 +351,15 @@ func waitContainerReady(ctx context.Context, cli containerSwitchClient, containe
 		return waitContainerStable(ctx, cli, containerID, info)
 	}
 
+	initialRestartCount := info.RestartCount
 	timeout := containerHealthCheckTimeout(info.Config)
 	deadline := time.NewTimer(timeout)
 	ticker := time.NewTicker(time.Second)
 	defer deadline.Stop()
 	defer ticker.Stop()
 	for {
-		if info.State.Restarting || info.RestartCount != 0 {
-			return fmt.Errorf("container restarted %d times during startup", info.RestartCount)
+		if info.State.Restarting || info.RestartCount != initialRestartCount {
+			return fmt.Errorf("container restart count changed from %d to %d during startup", initialRestartCount, info.RestartCount)
 		}
 		if info.State.Health == nil {
 			return fmt.Errorf("container health status is unavailable")
@@ -382,9 +387,10 @@ func waitContainerReady(ctx context.Context, cli containerSwitchClient, containe
 	}
 }
 
-func waitContainerStable(ctx context.Context, cli containerSwitchClient, containerID string, initial container.InspectResponse) error {
+func waitContainerStable(ctx context.Context, cli containerInspectClient, containerID string, initial container.InspectResponse) error {
 	startedAt := initial.State.StartedAt
-	if err := checkContainerStableState(initial, startedAt); err != nil {
+	restartCount := initial.RestartCount
+	if err := checkContainerStableState(initial, startedAt, restartCount); err != nil {
 		return err
 	}
 	deadline := time.NewTimer(containerStartStabilization)
@@ -400,25 +406,25 @@ func waitContainerStable(ctx context.Context, cli containerSwitchClient, contain
 			if err != nil {
 				return err
 			}
-			return checkContainerStableState(info, startedAt)
+			return checkContainerStableState(info, startedAt, restartCount)
 		case <-ticker.C:
 			info, err := cli.ContainerInspect(ctx, containerID)
 			if err != nil {
 				return err
 			}
-			if err := checkContainerStableState(info, startedAt); err != nil {
+			if err := checkContainerStableState(info, startedAt, restartCount); err != nil {
 				return err
 			}
 		}
 	}
 }
 
-func checkContainerStableState(info container.InspectResponse, startedAt string) error {
+func checkContainerStableState(info container.InspectResponse, startedAt string, restartCount int) error {
 	if err := checkContainerRunningState(info); err != nil {
 		return err
 	}
-	if info.State.Restarting || info.RestartCount != 0 {
-		return fmt.Errorf("container restarted %d times during startup", info.RestartCount)
+	if info.State.Restarting || info.RestartCount != restartCount {
+		return fmt.Errorf("container restart count changed from %d to %d during startup", restartCount, info.RestartCount)
 	}
 	if startedAt != "" && info.State.StartedAt != startedAt {
 		return fmt.Errorf("container start time changed during startup")

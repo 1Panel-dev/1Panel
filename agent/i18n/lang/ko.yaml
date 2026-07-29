@@ -154,6 +154,11 @@ ErrAppVersionDeprecated: '{{ .name }} 응용 프로그램은 현재 1Panel 버�
 ErrDockerFailed: 'Docker의 상태가 비정상입니다. 서비스 상태를 확인하세요'
 ErrDockerComposeCmdNotFound: 'Docker Compose 명령이 없습니다. 호스트 머신에 먼저 이 명령을 설치하세요'
 UseExistImage: '이미지가 이미 존재하여 기존 이미지를 사용합니다'
+UpgradePrepare: '애플리케이션 업그레이드 준비'
+UpgradeStop: '기존 애플리케이션 중지'
+UpgradeWaitReady: '애플리케이션 준비 상태 대기'
+UpgradeBackupDisabled: '업그레이드 백업이 비활성화되어 업그레이드 스크립트의 데이터 변경을 완전히 롤백할 수 없습니다'
+UpgradeRollbackFailed: '롤백 실패'
 ErrDatabaseNotFound: '데이터베이스 {{ .name }} 이(가) 존재하지 않습니다'
 
 # SSH

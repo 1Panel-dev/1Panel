@@ -154,6 +154,11 @@ ErrAppVersionDeprecated: "برنامه {{ .name }} با نسخه فعلی 1Panel
 ErrDockerFailed: 'Docker غیرعادی است؛ وضعیت سرویس را بررسی کنید'
 ErrDockerComposeCmdNotFound: 'Docker Compose روی میزبان یافت نشد'
 UseExistImage: 'تصویر وجود دارد؛ استفاده از تصویر موجود'
+UpgradePrepare: 'آماده‌سازی ارتقاء برنامه'
+UpgradeStop: 'توقف برنامه اصلی'
+UpgradeWaitReady: 'انتظار برای آماده شدن برنامه'
+UpgradeBackupDisabled: 'پشتیبان ارتقاء غیرفعال است؛ تغییرات داده اسکریپت‌های ارتقاء کاملاً قابل بازگشت نیست'
+UpgradeRollbackFailed: 'بازگشت ناموفق بود'
 ErrDatabaseNotFound: 'پایگاه داده یافت نشد: {{ .name }}'
 
 # SSH

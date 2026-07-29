@@ -154,6 +154,11 @@ ErrAppVersionDeprecated: 'Aplikasi {{ .name }} tidak sesuai dengan versi 1Panel 
 ErrDockerFailed: 'Keadaan Docker tidak normal, sila periksa status perkhidmatan'
 ErrDockerComposeCmdNotFound: 'Perintah Docker Compose tidak wujud, sila pasang perintah ini di mesin tuan terlebih dahulu'
 UseExistImage: 'Imej sudah wujud, menggunakan imej sedia ada'
+UpgradePrepare: 'Sediakan naik taraf aplikasi'
+UpgradeStop: 'Hentikan aplikasi asal'
+UpgradeWaitReady: 'Tunggu aplikasi sedia'
+UpgradeBackupDisabled: 'Sandaran naik taraf dilumpuhkan; perubahan data oleh skrip naik taraf tidak dapat diundur sepenuhnya'
+UpgradeRollbackFailed: 'Undur gagal'
 ErrDatabaseNotFound: 'Pangkalan data {{ .name }} tidak wujud'
 
 # SSH
