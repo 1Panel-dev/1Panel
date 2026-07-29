@@ -1821,6 +1821,8 @@ const message = {
         singleTransaction: 'Backup InnoDB tables using a single transaction, suitable for large-volume data backups',
         quick: 'Read data row by row instead of loading the entire table into memory, suitable for large-volume data and low-memory machine backups',
         skipLockTables: 'Backup without locking all tables, suitable for highly concurrent databases',
+        setGtidPurgedOff:
+            'Do not export GTID information, suitable for database recovery in Group Replication environments',
         missBackupAccount: 'The backup account could not be found',
         syncDate: 'Synchronization time ',
         clean: 'Cache clean',

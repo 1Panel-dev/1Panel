@@ -1791,6 +1791,7 @@ const message = {
         singleTransaction: '단일 트랜잭션을 사용하여 InnoDB 테이블을 백업하며, 대용량 데이터 백업에 적합합니다',
         quick: '전체 테이블을 메모리에 로드하는 대신 데이터를 행별로 읽습니다. 대용량 데이터 및 저메모리 시스템 백업에 적합합니다',
         skipLockTables: '모든 테이블을 잠그지 않고 백업합니다. 높은 동시성 데이터베이스에 적합합니다',
+        setGtidPurgedOff: '백업 시 GTID 정보를 내보내지 않으며 그룹 복제 환경에서 데이터베이스를 복구할 때 적합합니다',
         missBackupAccount: '백업 계정을 찾을 수 없습니다',
         syncDate: '동기화 시간',
         clean: '캐시 정리',

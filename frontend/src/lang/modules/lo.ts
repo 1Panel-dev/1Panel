@@ -1789,6 +1789,7 @@ const message = {
         singleTransaction: 'ສຳຮອງຕາຕະລາງ InnoDB ໂດຍໃຊ້ single transaction, ເໝາະສຳລັບຂໍ້ມູນຂະໜາດໃຫຍ່',
         quick: 'ອ່ານຂໍ້ມູນເທື່ອລະແຖວແທນການໂຫຼດທັງໝົດລົງ memory, ເໝາະສຳລັບຂໍ້ມູນໃຫຍ່ ແລະ ເຄື່ອງທີ່ມີ memory ຕ່ຳ',
         skipLockTables: 'ສຳຮອງໂດຍບໍ່ລັອກຕາຕະລາງ, ເໝາະສຳລັບຖານຂໍ້ມູນທີ່ມີການໃຊ້ງານສູງ',
+        setGtidPurgedOff: 'ບໍ່ສົ່ງອອກຂໍ້ມູນ GTID, ເໝາະສຳລັບການກູ້ຄືນຖານຂໍ້ມູນໃນສະພາບແວດລ້ອມ Group Replication',
         missBackupAccount: 'ກວດບໍ່ພບບັນຊີສຳຮອງຂໍ້ມູນ',
         syncDate: 'ເວລາຊິງໂຄໄນ ',
         clean: 'ລ້າງ Cache',

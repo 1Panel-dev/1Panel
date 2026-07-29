@@ -1713,6 +1713,7 @@ const message = {
         singleTransaction: '使用單一事務備份 InnoDB 表，適用於大資料量的備份',
         quick: '逐行讀取資料，而不是將整個表載入到記憶體中，適用於大資料量和低記憶體機器的備份',
         skipLockTables: '不鎖定所有表進行備份，適用於高併發的資料庫',
+        setGtidPurgedOff: '備份時不匯出 GTID 資訊，適用於群組複寫環境中的資料庫還原',
         missBackupAccount: '未能找到備份帳號',
         syncDate: '同步時間 ',
         clean: '快取清理',

@@ -1838,6 +1838,8 @@ const message = {
             'Sandaran jadual InnoDB menggunakan transaksi tunggal, sesuai untuk sandaran data isipadu besar',
         quick: 'Baca data baris demi baris daripada memuatkan keseluruhan jadual ke dalam ingatan, sesuai untuk sandaran data isipadu besar dan mesin ingatan rendah',
         skipLockTables: 'Sandaran tanpa mengunci semua jadual, sesuai untuk pangkalan data konkuren tinggi',
+        setGtidPurgedOff:
+            'Jangan eksport maklumat GTID, sesuai untuk pemulihan pangkalan data dalam persekitaran Group Replication',
         missBackupAccount: 'Akaun sandaran tidak dijumpai',
         syncDate: 'Waktu penyelarasan',
         clean: 'Bersihkan cache',

@@ -1676,3 +1676,10 @@ var AddMcpServerGatewayArgs = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.McpServer{})
 	},
 }
+
+var AddBackupRecordArgs = &gormigrate.Migration{
+	ID: "20260729-add-backup-record-args",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.BackupRecord{})
+	},
+}

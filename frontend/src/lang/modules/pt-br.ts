@@ -1840,6 +1840,8 @@ const message = {
             'Faz backup de tabelas InnoDB usando uma única transação, adequado para backups de dados de grande volume',
         quick: 'Lê dados linha por linha em vez de carregar toda a tabela na memória, adequado para backups de dados de grande volume e máquinas com pouca memória',
         skipLockTables: 'Backup sem bloquear todas as tabelas, adequado para bancos de dados altamente concorrentes',
+        setGtidPurgedOff:
+            'Não exportar informações de GTID, adequado para restaurar bancos de dados em ambientes de Group Replication',
         missBackupAccount: 'A conta de backup não foi encontrada',
         syncDate: 'Data de sincronização',
         clean: 'Limpeza de cache',

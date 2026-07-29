@@ -129,9 +129,9 @@
                 </el-checkbox>
                 <span class="input-help">{{ $t('database.mongodbRecoverDropAllCollectionsHelper') }}</span>
             </el-form-item>
-            <el-form-item v-if="supportMysqlBackupArgs()" :label="$t('cronjob.backupArgs')">
+            <el-form-item v-if="isBackup && supportMysqlBackupArgs()" :label="$t('cronjob.backupArgs')">
                 <el-select v-model="args" filterable allow-create multiple>
-                    <el-option v-for="item in mysqlArgs" :key="item.arg" :value="item.arg" :label="item.arg">
+                    <el-option v-for="item in loadMysqlArgs(type)" :key="item.arg" :value="item.arg" :label="item.arg">
                         {{ item.arg }}
                         <span class="ml-2">{{ item.description }}</span>
                     </el-option>
@@ -199,7 +199,7 @@ import { MsgSuccess } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
 import { routerToFileWithPath } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { mysqlArgs } from '@/views/cronjob/cronjob/helper';
+import { loadMysqlArgs } from '@/views/cronjob/cronjob/helper';
 const { currentNode } = useGlobalStore();
 
 const emit = defineEmits(['close']);
