@@ -163,6 +163,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 			record.Name = dbInfo.Database
 			record.DetailName = dbInfo.Name
 			record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
+			record.Args = encodeBackupArgs(dbInfo.Args)
 
 			backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("tmp/database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
 			switch dbInfo.DBType {

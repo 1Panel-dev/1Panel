@@ -31,4 +31,5 @@ type BackupRecord struct {
 	Status      string `json:"status"`
 	Message     string `json:"message"`
 	Description string `json:"description"`
+	Args        string `gorm:"not null;default:''" json:"args"`
 }

@@ -1723,6 +1723,7 @@ const message = {
         singleTransaction: '使用单一事务备份 InnoDB 表，适用于大数据量的备份',
         quick: '逐行读取数据，而不是将整个表加载到内存中，适用于大数据量和低内存机器的备份',
         skipLockTables: '不锁定所有表进行备份，适用于高并发的数据库',
+        setGtidPurgedOff: '备份时不导出 GTID 信息，适用于组复制环境中的数据库恢复',
         missBackupAccount: '未能找到备份账号',
         syncDate: '同步时间 ',
         clean: '缓存清理',

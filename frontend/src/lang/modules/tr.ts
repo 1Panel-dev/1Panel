@@ -1839,6 +1839,8 @@ const message = {
             'InnoDB tablolarını tek bir işlem kullanarak yedekler, büyük hacimli veri yedeklemeleri için uygundur',
         quick: 'Tüm tabloyu belleğe yüklemek yerine verileri satır satır okur, büyük hacimli veri ve düşük bellekli makine yedeklemeleri için uygundur',
         skipLockTables: 'Tüm tabloları kilitlemeden yedekleme, yüksek eşzamanlılığa sahip veritabanları için uygundur',
+        setGtidPurgedOff:
+            'GTID bilgilerini dışa aktarmayın; Group Replication ortamlarında veritabanı kurtarma için uygundur',
         missBackupAccount: 'Yedekleme hesabı bulunamadı',
         syncDate: 'Senkronizasyon zamanı ',
         clean: 'Önbellek temizleme',

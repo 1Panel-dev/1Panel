@@ -356,7 +356,7 @@
                                     <el-form-item :label="$t('cronjob.backupArgs')">
                                         <el-select v-model="form.argItems" filterable allow-create multiple>
                                             <el-option
-                                                v-for="item in mysqlArgs"
+                                                v-for="item in loadMysqlArgs(form.dbType)"
                                                 :key="item.arg"
                                                 :value="item.arg"
                                                 :label="item.arg"
@@ -860,7 +860,7 @@ import {
     transSpecToObj,
     weekOptions,
     cronjobTypes,
-    mysqlArgs,
+    loadMysqlArgs,
 } from '../helper';
 import { loadUsers } from '@/api/modules/toolbox';
 import { loadContainerUsers } from '@/api/modules/container';

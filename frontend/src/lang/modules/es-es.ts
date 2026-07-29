@@ -1855,6 +1855,8 @@ const message = {
         quick: 'Lee datos fila por fila en lugar de cargar la tabla completa en memoria, adecuado para copias de seguridad de datos de gran volumen y máquinas con poca memoria',
         skipLockTables:
             'Copia de seguridad sin bloquear todas las tablas, adecuada para bases de datos altamente concurrentes',
+        setGtidPurgedOff:
+            'No exportar información GTID, adecuado para restaurar bases de datos en entornos de Group Replication',
         missBackupAccount: 'No se pudo encontrar la cuenta de respaldo',
         syncDate: 'Hora de sincronización',
         clean: 'Limpiar caché',

@@ -93,6 +93,7 @@ func InitAgentDB() {
 		migrations.AddMcpServerGatewayArgs,
 		migrations.InitFirewallPortWhiteList,
 		migrations.AddDatabaseUserTable,
+		migrations.AddBackupRecordArgs,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
