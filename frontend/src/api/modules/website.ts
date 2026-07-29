@@ -447,7 +447,3 @@ export const deleteTemplateOutput = (params: { id: number }) => {
 export const getTemplateOutput = (id: number) => {
     return http.post<Website.TemplateOutputDTO>(`/websites/templates/outputs/get`, { id });
 };
-
-export const importTemplateOutput = (req: Website.TemplateImportReq) => {
-    return http.post<any>(`/websites/templates/outputs/import`, req);
-};

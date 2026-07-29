@@ -36,7 +36,6 @@ type IWebsiteTemplateService interface {
 	DeleteOutput(id uint) error
 	GetOutput(id uint) (*response.WebsiteTemplateOutputDTO, error)
 	Preview(req request.WebsitePreviewReq) (*response.WebsitePreviewDTO, error)
-	ImportToSite(req request.WebsiteTemplateImportReq) error
 }
 
 func NewIWebsiteTemplateService() IWebsiteTemplateService {
@@ -101,6 +100,9 @@ func (w WebsiteTemplateService) UpdateTemplate(req request.WebsiteTemplateUpdate
 	template.Name = req.Name
 	template.Type = req.Type
 	template.Content = req.Content
+	if req.FilePath != template.FilePath && template.FilePath != "" && strings.HasPrefix(template.FilePath, templateBaseDir()) {
+		_ = os.Remove(template.FilePath)
+	}
 	template.FilePath = req.FilePath
 	template.Variables = req.Variables
 	template.Remark = req.Remark
@@ -108,11 +110,18 @@ func (w WebsiteTemplateService) UpdateTemplate(req request.WebsiteTemplateUpdate
 }
 
 func (w WebsiteTemplateService) DeleteTemplate(id uint) error {
+	template, err := websiteTemplateRepo.GetFirst(repo.WithByID(id))
+	if err != nil {
+		return err
+	}
 	outputs, _ := websiteTemplateOutputRepo.List(websiteTemplateOutputRepo.WithByTemplateID(id))
 	for _, output := range outputs {
 		if output.OutputPath != "" && strings.HasPrefix(output.OutputPath, templateBaseDir()) {
 			_ = os.RemoveAll(output.OutputPath)
 		}
+	}
+	if template.FilePath != "" && strings.HasPrefix(template.FilePath, templateBaseDir()) {
+		_ = os.Remove(template.FilePath)
 	}
 	if err := websiteTemplateOutputRepo.DeleteBy(websiteTemplateOutputRepo.WithByTemplateID(id)); err != nil {
 		return err
@@ -260,20 +269,6 @@ func (w WebsiteTemplateService) Preview(req request.WebsitePreviewReq) (*respons
 		}
 	}
 	return &response.WebsitePreviewDTO{HTML: html}, nil
-}
-
-func (w WebsiteTemplateService) ImportToSite(req request.WebsiteTemplateImportReq) error {
-	output, err := websiteTemplateOutputRepo.GetFirst(repo.WithByID(req.OutputID))
-	if err != nil {
-		return err
-	}
-	if output.OutputPath == "" {
-		return buserr.New("ErrFileNotFound")
-	}
-	if _, err := os.Stat(output.OutputPath); err != nil {
-		return buserr.New("ErrFileNotFound")
-	}
-	return copyDir(output.OutputPath, req.SiteDir)
 }
 
 var templateVarRegex = regexp.MustCompile(`\{\{(\w+)\}\}`)

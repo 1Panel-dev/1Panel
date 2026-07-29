@@ -44,8 +44,3 @@ type WebsitePreviewReq struct {
 	TemplateID     uint              `json:"templateID" validate:"required"`
 	VariableValues map[string]string `json:"variableValues"`
 }
-
-type WebsiteTemplateImportReq struct {
-	OutputID uint   `json:"outputID" validate:"required"`
-	SiteDir  string `json:"siteDir" validate:"required"`
-}

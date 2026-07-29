@@ -257,24 +257,3 @@ func (b *BaseApi) GetWebsiteTemplateOutput(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, output)
 }
-
-// @Tags Website Template
-// @Summary Import website template output to site dir
-// @Accept json
-// @Param request body request.WebsiteTemplateImportReq true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /websites/templates/outputs/import [post]
-// @x-panel-log {"bodyKeys":["outputID"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"导入模板产物 [outputID]","formatEN":"Import template output [outputID]"}
-func (b *BaseApi) ImportTemplateOutput(c *gin.Context) {
-	var req request.WebsiteTemplateImportReq
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-	if err := websiteTemplateService.ImportToSite(req); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.Success(c)
-}

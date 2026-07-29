@@ -24,6 +24,5 @@ func (a *WebsiteTemplateRouter) InitRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/outputs", baseApi.CreateWebsiteTemplateOutput)
 		groupRouter.POST("/outputs/del", baseApi.DeleteWebsiteTemplateOutput)
 		groupRouter.POST("/outputs/get", baseApi.GetWebsiteTemplateOutput)
-		groupRouter.POST("/outputs/import", baseApi.ImportTemplateOutput)
 	}
 }

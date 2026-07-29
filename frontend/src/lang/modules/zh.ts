@@ -392,7 +392,6 @@ const message = {
         msgCenter: '任务中心',
         disk: '磁盘管理',
         template: '模板',
-        templateOutput: '模板产物',
     },
     home: {
         dir: '目录',
@@ -5960,8 +5959,6 @@ const message = {
         outputName: '产物名称',
         outputList: '产物列表',
         outputCreate: '生成产物',
-        importToSite: '导入到站点',
-        import: '导入',
         confirmDelete: '确定删除此模板吗？关联的产物也将被删除',
         confirmDeleteOutput: '确定删除此产物吗？',
         variableKey: '变量名',
@@ -5985,7 +5982,6 @@ const message = {
         fillVariables: '填写变量',
         noVariables: '此模板没有定义变量',
         outputSuccess: '产物生成成功',
-        importSuccess: '导入成功',
         importButton: '从模板导入',
     },
 };

@@ -845,9 +845,4 @@ export namespace Website {
     export interface PreviewDTO {
         html: string;
     }
-
-    export interface TemplateImportReq {
-        outputID: number;
-        siteDir: string;
-    }
 }

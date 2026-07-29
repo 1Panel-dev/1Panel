@@ -425,7 +425,6 @@ const message = {
         msgCenter: 'Tasks',
         disk: 'Disk',
         template: 'Template',
-        templateOutput: 'Template Output',
     },
     home: {
         recommend: 'Recommended',
@@ -6409,8 +6408,6 @@ const message = {
         outputName: 'Output Name',
         outputList: 'Output List',
         outputCreate: 'Generate Output',
-        importToSite: 'Import to Site',
-        import: 'Import',
         confirmDelete: 'Are you sure you want to delete this template? Associated outputs will also be deleted.',
         confirmDeleteOutput: 'Are you sure you want to delete this output?',
         variableKey: 'Variable Key',
@@ -6434,7 +6431,6 @@ const message = {
         fillVariables: 'Fill Variables',
         noVariables: 'No variables defined in this template',
         outputSuccess: 'Output generated successfully',
-        importSuccess: 'Imported successfully',
         importButton: 'Import from Template',
     },
 };
