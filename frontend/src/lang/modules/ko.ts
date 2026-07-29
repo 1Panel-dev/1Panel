@@ -142,6 +142,8 @@ const message = {
             manageGroup: '그룹 관리',
             backToList: '목록으로 돌아가기',
             keepEdit: '계속 편집',
+            pin: '상단 고정',
+            unpin: '고정 해제',
             default: '기본값',
             noRefresh: '자동 새로고침 안 함',
             creator: '생성자',
@@ -3691,8 +3693,6 @@ const message = {
         cacheWarn: '먼저 리버스 프록시의 캐시 스위치를 끄십시오',
         loadBalanceHelper:
             '로드 밸런싱을 생성한 후, "리버스 프록시"로 이동하여 프록시를 추가하고 백엔드 주소를 다음으로 설정하세요: http://<로드 밸런싱 이름>.',
-        favorite: '즐겨찾기',
-        cancelFavorite: '즐겨찾기 취소',
         useProxy: '프록시 사용',
         useProxyHelper: '패널 설정의 프록시 서버 주소 사용',
         westCN: '서부 디지털',

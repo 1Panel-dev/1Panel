@@ -300,6 +300,7 @@ type ComposeInfo struct {
 	ConfigFile        string             `json:"configFile"`
 	Workdir           string             `json:"workdir"`
 	ComposeFileExists bool               `json:"composeFileExists"`
+	IsPinned          bool               `json:"isPinned"`
 	Path              string             `json:"path"`
 	Containers        []ComposeContainer `json:"containers"`
 	Env               string             `json:"env"`
@@ -336,6 +337,10 @@ type ComposeUpdate struct {
 	Content    string `json:"content" validate:"required"`
 	Env        string `json:"env"`
 	ForcePull  bool   `json:"forcePull"`
+}
+type ComposePin struct {
+	Name     string `json:"name" validate:"required"`
+	IsPinned bool   `json:"isPinned"`
 }
 type ComposeLogClean struct {
 	Name       string `json:"name" validate:"required"`

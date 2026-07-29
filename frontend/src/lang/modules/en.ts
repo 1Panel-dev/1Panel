@@ -150,6 +150,8 @@ const message = {
             manageGroup: 'Manage Groups',
             backToList: 'Back to List',
             keepEdit: 'Continue Editing',
+            pin: 'Pin to top',
+            unpin: 'Unpin',
         },
         loadingText: {
             Upgrading: 'Upgrading system, please wait...',
@@ -3758,8 +3760,6 @@ const message = {
         cacheWarn: 'Please turn off the cache switch in the reverse proxy first',
         loadBalanceHelper:
             'After creating the load balancing, go to "Reverse Proxy", add a proxy and set the backend address to: http://<load balancing name>',
-        favorite: 'Favorite',
-        cancelFavorite: 'Cancel Favorite',
         useProxy: 'Use Proxy',
         useProxyHelper: 'Use the proxy server address in the panel settings',
         westCN: 'West Digital',

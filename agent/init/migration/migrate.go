@@ -95,6 +95,7 @@ func InitAgentDB() {
 		migrations.AddDatabaseUserTable,
 		migrations.AddBackupRecordArgs,
 		migrations.AddFtpIdentity,
+		migrations.AddComposePinned,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

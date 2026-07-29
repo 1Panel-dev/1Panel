@@ -36,30 +36,30 @@
                     :pagination-config="paginationConfig"
                     :data="data"
                     @sort-change="search"
-                    @cell-mouse-enter="showFavorite"
-                    @cell-mouse-leave="hideFavorite"
                     :columns="columns"
                     @search="search"
                     :heightDiff="300"
                 >
                     <el-table-column label="ID" prop="id" width="180">
-                        <template #default="{ row, $index }">
+                        <template #default="{ row }">
                             <el-text type="primary" class="cursor-pointer" @click="onInspect(row.id)">
                                 {{ row.id.replaceAll('sha256:', '').substring(0, 12) }}
                             </el-text>
                             <div class="float-right">
                                 <el-tooltip
-                                    :content="row.isPinned ? $t('website.cancelFavorite') : $t('website.favorite')"
-                                    v-if="row.isPinned || hoveredRowIndex === $index"
+                                    :content="row.isPinned ? $t('commons.table.unpin') : $t('commons.table.pin')"
                                 >
                                     <el-button
+                                        class="image-pin-button"
+                                        :class="{ 'is-pinned': row.isPinned }"
                                         link
                                         size="large"
-                                        :icon="row.isPinned ? 'StarFilled' : 'Star'"
-                                        type="warning"
+                                        :type="row.isPinned ? 'warning' : 'info'"
                                         v-permission
                                         @click="changePinned(row, true)"
-                                    />
+                                    >
+                                        <svg-icon iconName="p-pushpin" className="image-pin-icon" />
+                                    </el-button>
                                 </el-tooltip>
                             </div>
                         </template>
@@ -204,8 +204,6 @@ const columns = ref([]);
 const isActive = ref(false);
 const isExist = ref(false);
 
-const hoveredRowIndex = ref(-1);
-
 const myDetail = ref();
 const dialogPullRef = ref();
 const dialogTagRef = ref();
@@ -282,12 +280,6 @@ const onSubmitDelete = async () => {
         });
 };
 
-const showFavorite = (row: any) => {
-    hoveredRowIndex.value = data.value.findIndex((item) => item === row);
-};
-const hideFavorite = () => {
-    hoveredRowIndex.value = -1;
-};
 const changePinned = (row: any, isPinned: boolean) => {
     let params = {
         id: row.id.replaceAll('sha256:', ''),
@@ -493,3 +485,23 @@ const buttons = [
     },
 ];
 </script>
+
+<style scoped lang="scss">
+.image-pin-button {
+    opacity: 0.72;
+    transition: opacity 0.2s;
+
+    &:hover,
+    &:focus-visible,
+    &.is-pinned {
+        opacity: 1;
+    }
+
+    :deep(.image-pin-icon) {
+        width: 1em;
+        height: 1em;
+        padding: 0;
+        vertical-align: middle;
+    }
+}
+</style>

@@ -1698,3 +1698,10 @@ var AddFtpIdentity = &gormigrate.Migration{
 			}).Error
 	},
 }
+
+var AddComposePinned = &gormigrate.Migration{
+	ID: "20260729-add-compose-pinned",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Compose{})
+	},
+}

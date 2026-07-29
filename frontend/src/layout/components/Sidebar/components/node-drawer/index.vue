@@ -21,9 +21,7 @@
                             <div v-for="row in group.items" :key="row.name" class="node-table__row">
                                 <div class="node-table__cell node-table__cell--node">
                                     <el-tooltip
-                                        :content="
-                                            row.isFavorite ? $t('website.cancelFavorite') : $t('website.favorite')
-                                        "
+                                        :content="row.isFavorite ? $t('commons.table.unpin') : $t('commons.table.pin')"
                                         placement="left"
                                     >
                                         <el-button
@@ -31,10 +29,11 @@
                                             link
                                             v-if="isAdmin"
                                             :type="row.isFavorite ? 'warning' : 'info'"
-                                            :icon="row.isFavorite ? 'StarFilled' : 'Star'"
                                             :loading="favoriteLoadingIDs.includes(row.id)"
                                             @click.stop="toggleFavorite(row)"
-                                        />
+                                        >
+                                            <SvgIcon iconName="p-pushpin" className="node-pin-icon" />
+                                        </el-button>
                                     </el-tooltip>
                                     <div class="node-name-cell">
                                         <SvgIcon class="icon" iconName="p-zhuji" />
@@ -309,6 +308,13 @@ watch(
     height: 20px;
     min-height: 20px;
     padding: 0;
+
+    :deep(.node-pin-icon) {
+        width: 1em;
+        height: 1em;
+        padding: 0;
+        vertical-align: middle;
+    }
 }
 
 .node-name-cell {
