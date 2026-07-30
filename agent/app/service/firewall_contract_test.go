@@ -5,9 +5,31 @@ import (
 	"testing"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	fireClient "github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
 )
+
+type firewallSettingRepoStub struct {
+	repo.ISettingRepo
+	value string
+}
+
+func (r *firewallSettingRepoStub) GetValueByKey(string) (string, error) {
+	return r.value, nil
+}
+
+type whitelistFilterClient struct {
+	firewall.FilterClient
+	list fireClient.PortWhiteList
+}
+
+func (c *whitelistFilterClient) SyncPortWhiteList(list fireClient.PortWhiteList) error {
+	c.list = list
+	return nil
+}
 
 func TestParseFirewallPortWhiteListContract(t *testing.T) {
 	tests := []struct {
@@ -67,6 +89,32 @@ func TestParseFirewallPortWhiteListContract(t *testing.T) {
 				t.Fatalf("got %#v want %#v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestSyncFirewallPortWhiteListBuildsProviderState(t *testing.T) {
+	originalRepo, originalConf, originalMaster := settingRepo, global.CONF, global.IsMaster
+	settingRepo = &firewallSettingRepoStub{value: "443/tcp"}
+	global.IsMaster = false
+	global.CONF.Base.Port = "9999"
+	t.Cleanup(func() {
+		settingRepo = originalRepo
+		global.CONF = originalConf
+		global.IsMaster = originalMaster
+	})
+
+	client := &whitelistFilterClient{}
+	if err := syncFirewallPortWhiteListAfterUpdateWithClient(client, "80/tcp"); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(client.list.Configured, []fireClient.PortWhiteListEntry{{Port: "443", Protocol: "tcp"}}) {
+		t.Fatalf("unexpected configured list: %#v", client.list.Configured)
+	}
+	if !reflect.DeepEqual(client.list.Previous, []fireClient.PortWhiteListEntry{{Port: "80", Protocol: "tcp"}}) {
+		t.Fatalf("unexpected previous list: %#v", client.list.Previous)
+	}
+	if len(client.list.Required) != 2 || client.list.Required[0] != (fireClient.PortWhiteListEntry{Port: "9999", Protocol: "tcp"}) {
+		t.Fatalf("unexpected required list: %#v", client.list.Required)
 	}
 }
 
