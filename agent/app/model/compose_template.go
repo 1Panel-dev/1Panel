@@ -11,6 +11,7 @@ type ComposeTemplate struct {
 type Compose struct {
 	BaseModel
 
-	Name string `json:"name"`
-	Path string `json:"path"`
+	Name     string `json:"name"`
+	Path     string `json:"path"`
+	IsPinned bool   `json:"isPinned"`
 }

@@ -52,7 +52,15 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 		return 0, nil, err
 	}
 
-	composeCreatedByLocal, _ := composeRepo.ListRecord()
+	composeRecords, _ := composeRepo.ListRecord()
+	pinnedByName := make(map[string]bool, len(composeRecords))
+	composeCreatedByLocal := make([]model.Compose, 0, len(composeRecords))
+	for _, record := range composeRecords {
+		pinnedByName[record.Name] = record.IsPinned
+		if len(record.Path) != 0 {
+			composeCreatedByLocal = append(composeCreatedByLocal, record)
+		}
+	}
 	composeLocalMap := make(map[string]dto.ComposeInfo)
 	for _, localItem := range composeCreatedByLocal {
 		composeItemLocal := dto.ComposeInfo{
@@ -136,6 +144,7 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	for key, value := range mergedMap {
 		value.Name = key
 		value.ComposeFileExists = composeFileExists(value.Workdir, value.ConfigFile)
+		value.IsPinned = pinnedByName[key]
 		records = append(records, value)
 	}
 	if len(req.Info) != 0 {
@@ -150,6 +159,9 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 		}
 	}
 	sort.Slice(records, func(i, j int) bool {
+		if records[i].IsPinned != records[j].IsPinned {
+			return records[i].IsPinned
+		}
 		return records[i].CreatedAt > records[j].CreatedAt
 	})
 	total, start, end := len(records), (req.Page-1)*req.PageSize, req.Page*req.PageSize
@@ -193,7 +205,7 @@ func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 		return false, buserr.New("ErrCmdIllegal")
 	}
 	composeItem, _ := composeRepo.GetRecord(repo.WithByName(req.Name))
-	if composeItem.ID != 0 {
+	if composeItem.ID != 0 && len(composeItem.Path) != 0 {
 		return false, buserr.New("ErrRecordExist")
 	}
 	if err := u.loadPath(&req); err != nil {
@@ -235,7 +247,13 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 				_, _ = compose.Down(req.Path)
 				return err
 			}
-			_ = composeRepo.CreateRecord(&model.Compose{Name: strings.ToLower(req.Name), Path: req.Path})
+			recordName := strings.ToLower(req.Name)
+			record, _ := composeRepo.GetRecord(repo.WithByName(recordName))
+			if record.ID == 0 {
+				_ = composeRepo.CreateRecord(&model.Compose{Name: recordName, Path: req.Path})
+			} else {
+				_ = composeRepo.UpdateRecord(recordName, map[string]interface{}{"path": req.Path})
+			}
 			return nil
 		}, nil)
 		_ = taskItem.Execute()
@@ -325,6 +343,20 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	}()
 
 	return nil
+}
+
+func (u *ContainerService) ComposePin(req dto.ComposePin) error {
+	record, _ := composeRepo.GetRecord(repo.WithByName(req.Name))
+	if record.ID == 0 {
+		if !req.IsPinned {
+			return nil
+		}
+		return composeRepo.CreateRecord(&model.Compose{Name: req.Name, IsPinned: true})
+	}
+	if !req.IsPinned && len(record.Path) == 0 {
+		return composeRepo.DeleteRecord(repo.WithByName(req.Name))
+	}
+	return composeRepo.UpdateRecord(req.Name, map[string]interface{}{"is_pinned": req.IsPinned})
 }
 
 func (u *ContainerService) ComposeLogClean(req dto.ComposeLogClean) error {

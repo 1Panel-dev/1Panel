@@ -63,24 +63,22 @@
             <el-button v-permission link icon="edit" class="ml-2.5" @click="startEdit" v-if="!isEditing"></el-button>
         </div>
         <div v-if="showFavorite">
-            <el-tooltip effect="dark" :content="$t('website.cancelFavorite')" placement="top-start" v-if="row.favorite">
-                <el-button
-                    v-permission
-                    link
-                    :size="hideName ? 'default' : 'large'"
-                    icon="StarFilled"
-                    type="warning"
-                    @click="favoriteWebsite(row)"
-                ></el-button>
-            </el-tooltip>
-
             <el-tooltip
                 effect="dark"
-                :content="$t('website.favorite')"
+                :content="row.favorite ? $t('commons.table.unpin') : $t('commons.table.pin')"
                 placement="top-start"
-                v-if="!row.favorite && isHovered"
             >
-                <el-button v-permission link icon="Star" type="info" @click="favoriteWebsite(row)"></el-button>
+                <el-button
+                    v-permission
+                    class="website-pin-button"
+                    :class="{ 'is-pinned': row.favorite }"
+                    link
+                    :size="hideName ? 'default' : 'large'"
+                    :type="row.favorite ? 'warning' : 'info'"
+                    @click="favoriteWebsite(row)"
+                >
+                    <svg-icon iconName="p-pushpin" className="website-pin-icon" />
+                </el-button>
             </el-tooltip>
         </div>
     </div>
@@ -95,7 +93,6 @@ import { Rules } from '@/global/form-rules';
 import { GetPunyCodeDomain, isPunycoded } from '@/utils/misc';
 interface Props {
     row: Website.Website;
-    isHovered: boolean;
     defaultHttpPort: number;
     defaultHttpsPort: number;
     hideName?: boolean;
@@ -286,5 +283,23 @@ const shouldShowDomainTooltip = (domain: string) => {
     white-space: normal;
     word-break: break-all;
     line-height: 1.5;
+}
+
+.website-pin-button {
+    opacity: 0.72;
+    transition: opacity 0.2s;
+}
+
+.website-pin-button:hover,
+.website-pin-button:focus-visible,
+.website-pin-button.is-pinned {
+    opacity: 1;
+}
+
+.website-pin-button :deep(.website-pin-icon) {
+    width: 1em;
+    height: 1em;
+    padding: 0;
+    vertical-align: middle;
 }
 </style>

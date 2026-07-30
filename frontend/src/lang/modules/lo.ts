@@ -150,6 +150,8 @@ const message = {
             manageGroup: 'ຈັດການກຸ່ມ',
             backToList: 'ກັບຄືນໄປລາຍການ',
             keepEdit: 'ແກ້ໄຂຕໍ່',
+            pin: 'ປັກໝຸດໄວ້ເທິງ',
+            unpin: 'ຍົກເລີກການປັກໝຸດ',
         },
         loadingText: {
             Upgrading: 'ກຳລັງອັບເກຣດລະບົບ, ກະລຸນາຖ້າ...',
@@ -3672,8 +3674,6 @@ const message = {
         cacheWarn: 'ກະລຸນາປິດແຄຊໃນ reverse proxy ກ່ອນ',
         loadBalanceHelper:
             'ຫຼັງຈາກສ້າງການກະຈາຍພາລະແລ້ວ, ໃຫ້ໄປທີ່ "Reverse Proxy", ເພີ່ມ proxy ແລະ ຕັ້ງທີ່ຢູ່ເບື້ອງຫຼັງເປັນ: http://<ຊື່ load balancing>',
-        favorite: 'ເພີ່ມໃນລາຍການທີ່ມັກ',
-        cancelFavorite: 'ຍົກເລີກລາຍການທີ່ມັກ',
         useProxy: 'ໃຊ້ Proxy',
         useProxyHelper: 'ໃຊ້ທີ່ຢູ່ເຊີບເວີ proxy ໃນການຕັ້ງຄ່າແຜງຄວບຄຸມ',
         westCN: 'West Digital',
