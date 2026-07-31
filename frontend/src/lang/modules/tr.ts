@@ -5055,22 +5055,25 @@ const message = {
                         'Yeni tarayıcı penceresinde oturum açma işlemini tamamlayın. Bu sayfa otomatik olarak güncellenecektir.',
                     callbackCopied: 'OIDC geri arama URL kopyalandı.',
                     callbackURL: 'Geri arama URL',
-                    callbackURLHelper: "Tam olarak bu URL'i Provider izin verilenler listesine ekleyin.",
+                    callbackURLHelper:
+                        "Bu URL'yi kimlik sağlayıcıdaki istemcinin izin verilen geri çağırma URL'lerine ekleyin.",
                     cancelClearSecret: 'Temizlemeyi iptal et',
                     clearSecret: 'Sırrı temizle',
                     clearSecretConfirm: 'Client Secret yalnızca kaydettikten sonra kaldırılacaktır. Devam etmek?',
                     clientAuthMethod: 'İstemci kimlik doğrulama yöntemi',
-                    clientAuthMethodHelper: 'Provider Token Endpoint tarafından desteklenen bir yöntemle eşleşmelidir.',
+                    clientAuthMethodHelper:
+                        'Kimlik sağlayıcıda bu istemci için yapılandırılan kimlik doğrulama yöntemini seçin.',
                     clientAuthMethodRequired: 'Bir istemci kimlik doğrulama yöntemi seçin.',
                     clientID: 'Client ID',
                     clientIDRequired: "Client ID'i girin.",
                     clientSecret: 'Client Secret',
-                    clockSkew: 'Saat çarpıklığı toleransı',
-                    clockSkewRequired: 'Saat çarpıklık toleransını girin.',
-                    compatibilityMode: 'Uyumluluk modu (manuel uç noktalar ve güvenlik seçenekleri)',
+                    clockSkew: 'Token zaman toleransı',
+                    clockSkewHelper:
+                        'Kimlik sağlayıcı ile 1Panel arasındaki küçük zaman farklarına izin verir. Varsayılan 60 saniyeyi koruyun.',
+                    clockSkewRequired: 'Token zaman toleransını girin.',
+                    compatibilityMode: 'Uyumluluk modu',
                     compatibilityModeHelper:
                         'Yalnızca eksik Discovery veya yeniden yazılmış uç noktalar için kullanın. Temel OIDC doğrulaması etkin kalır.',
-                    compatibilityModeShort: 'Uyumluluk modu',
                     configurationFailedHelper:
                         'Test başarısız oldu. Sayfa yalnızca yerelleştirilmiş arka uç hatasını görüntüler.',
                     configurationFailedTag: 'Test başarısız oldu',
@@ -5081,8 +5084,7 @@ const message = {
                     configurationNotTestedTag: 'Test edilmedi',
                     configurationPassed: 'Mevcut yapılandırma güvenlik ve yetenek kontrollerini geçti.',
                     configurationPassedTag: 'Test geçti',
-                    configurationStaleHelper:
-                        'Kimlik doğrulamaya duyarlı ayarlar değiştirildi. Mevcut taslağı tekrar test edin.',
+                    configurationStaleHelper: 'Yapılandırma değiştirildi. Kaydetmeden önce yeniden test edin.',
                     configurationStaleTag: 'Sonucun süresi doldu',
                     configurationTestMeta:
                         'Test zamanı: {time}; {duration} ms içinde tamamlandı. Ham Provider yanıtları saklanmaz.',
@@ -5109,8 +5111,7 @@ const message = {
                     connectionSecurityDesc:
                         'TLS politikası Discovery, Token, JWKS ve UserInfo istekleri için geçerlidir.',
                     connectionTest: 'Bağlantı ve konfigürasyon testi',
-                    connectionTestCompatibilityDesc:
-                        'Manuel olarak yapılandırılan uç noktaları ve protokol ilkesini doğrulayın.',
+                    connectionTestCompatibilityDesc: 'Özel uç noktaları ve protokol güvenlik ilkesini doğrulayın.',
                     connectionTestStandardDesc: "Uç noktalar ve yetenekler Issuer'ten otomatik olarak keşfedilir.",
                     connectionTestTab: 'Bağlantı testi',
                     customCA: 'Özel CA',
@@ -5119,7 +5120,7 @@ const message = {
                     customCARequired: 'Özel CA sertifikasını sağlayın.',
                     defaultRole: 'Varsayılan rol',
                     defaultRoleHelper:
-                        'Yalnızca bir kullanıcı ilk oluşturulduğunda atanır; mevcut roller ve izinler korunur.',
+                        'Yalnızca kullanıcı ilk oluşturulduğunda atanır; sonraki oturum açmalar rolü değiştirmez.',
                     defaultRolePlaceholder: 'Bir rol seçin',
                     defaultRoleRequired: 'Geçerli bir varsayılan rol seçin.',
                     disableAfterSave: 'Kaydettikten sonra OIDC devre dışı bırakılacak.',
@@ -5137,6 +5138,7 @@ const message = {
                     endSessionEndpointHelper:
                         'Gelecekte kullanılmak üzere kaydedildi; Provider tarafından başlatılan oturum kapatma bu sürüme dahil değildir.',
                     endSessionEndpointInvalid: 'Geçerli bir End Session Endpoint girin.',
+                    endpointDiscoveryPlaceholder: 'Bağlantı testinden sonra gösterilir',
                     firstLogin: 'İlk giriş',
                     firstLoginPolicy:
                         'Yerel bir kurumsal kullanıcı oluşturun ve yapılandırılmış varsayılan rolü atayın.',
@@ -5173,24 +5175,21 @@ const message = {
                     localUserFields: 'Yerel kullanıcı alanları',
                     localUserFieldsDesc: "İlk sürüm yalnızca User.Name'i eşler ve bir JSON eşleme ifadesi kullanmaz.",
                     loginWith: '{provider} ile giriş yap',
-                    manualEndpoints: 'Manuel uç noktalar',
+                    manualEndpoints: 'Özel uç noktalar',
                     manualEndpointsDesc:
                         'Yalnızca Discovery eksik olduğunda veya bir yukarı akış ağ geçidi uç noktaları yeniden yazdığında kullanın.',
-                    manualEndpointsSecurity:
-                        'Manuel uç noktalar Issuer, Audience, imza, state, nonce veya zaman doğrulamayı devre dışı bırakmaz.',
                     mappingResult: 'Eşleme sonucu',
                     mode: 'Bağlantı modu',
                     modeRequired: 'Bir bağlantı modu seçin.',
                     nameClaim: "Kullanıcı adı Claim'i",
-                    nameClaimHelper:
-                        "Önce doğrulanmış ID Token'ten okuyun; UserInfo yalnızca eksik olan üst düzey Claim'i doldurur.",
+                    nameClaimHelper: 'Kullanıcı adını içeren alanı girin (ör. preferred_username).',
                     nameClaimRequired: "Kullanıcı adı Claim'ini girin.",
                     nameConflict: 'Ad çakışması politikası',
                     panelURL: '1Panel halka açık URL',
                     panelURLHTTPWarning:
                         'HTTP yetkilendirme yanıtını korumaz. Bunu yalnızca Provider tarafından kabul edilen yalıtılmış bir özel ortamda kullanın.',
                     panelURLHelper:
-                        "Özellikle ters proxy'nin arkasına, yalnızca tarayıcı tarafından görülebilen kaynağı (şema, ana bilgisayar ve isteğe bağlı bağlantı noktası) girin.",
+                        "Kullanıcıların 1Panel'e eriştiği adresi girin. Geri çağırma URL'sini oluşturmak için kullanılır.",
                     panelURLInvalid:
                         'Yalnızca şema, ana bilgisayar ve isteğe bağlı bağlantı noktasını içeren bir kaynak girin.',
                     panelURLRequired: "1Panel genel URL'i girin.",
@@ -5216,7 +5215,7 @@ const message = {
                     replaceSecret: 'Sırrı değiştir',
                     requestAndClaims: 'İstekler ve özellikler',
                     requestAndClaimsDesc:
-                        'Kapsamları, UserInfo geri dönüşünü ve sınırlı arka uç istek toleransını yapılandırın.',
+                        'Yetkilendirme kapsamlarını, kullanıcı bilgisi tamamlamayı ve istek parametrelerini yapılandırın.',
                     requestTimeout: 'İstek zaman aşımı',
                     requestTimeoutRequired: 'İstek zaman aşımını girin.',
                     restore: 'Geri yükle',
@@ -5225,7 +5224,8 @@ const message = {
                     rolesLoadFailed: 'Roller yüklenemedi. Varsayılan rolü seçmeden önce yeniden deneyin.',
                     roleHandling: 'Rol yönetimi',
                     scenario: 'Senaryo',
-                    scopesHelper: 'openid gereklidir. E-posta ve offline_access varsayılan olarak istenmez.',
+                    scopes: 'Yetkilendirme kapsamları',
+                    scopesHelper: 'openid içermelidir. Birden fazla kapsamı boşluklarla ayırın.',
                     scopesRequired: "Scopes, openid'i içermelidir.",
                     seconds: 'saniye',
                     secretClearHelper:
@@ -5237,8 +5237,7 @@ const message = {
                         "Kaydettiğinizde yeni gizli anahtar mevcut değerin yerini alır. OIDC Provider'daki Client Secret değerini de güncelleyin.",
                     secretRequiredHelper: "OIDC'i etkinleştirmeden önce bir Client Secret'i yapılandırın.",
                     secretRequiredToEnable: "OIDC'i etkinleştirmeden önce bir Client Secret'i yapılandırın.",
-                    secretSavedHelper:
-                        'Sır şifrelenir ve asla görüntülenmez. Değiştirmeden bırakmak kaydedilen değeri korur.',
+                    secretSavedHelper: 'Şifrelenmiş olarak saklanır. Mevcut sırrı korumak için boş bırakın.',
                     secretWaiting: 'Giriş bekleniyor',
                     secretWillClear: 'Temizlenecek',
                     secretWillReplace: 'Değiştirilecek',
@@ -5254,7 +5253,7 @@ const message = {
                     signingKeyStatic: 'Statik JWK veya PEM açık anahtarı',
                     standardDiscovery: 'Standart OIDC Discovery',
                     standardDiscoveryDesc: '1Panel uç noktaları ve yetenekleri keşfeder ve ham belgeyi saklamaz.',
-                    standardMode: 'Standart OIDC Discovery (önerilir)',
+                    standardMode: 'Standart mod',
                     standardModeHelper: "Issuer'in uç noktalarını, imzalama yeteneklerini ve PKCE desteğini keşfedin.",
                     standardProtocolPolicy: 'Standart protokol politikası',
                     standardProtocolPolicyDesc:
@@ -5274,8 +5273,7 @@ const message = {
                         "subject ile bağlamayı bulun ve yalnızca yeni ad kullanılabilir olduğunda User.Name'i güncelleyin.",
                     testBeforeBrowserTest:
                         'Tarayıcı oturum açma testine başlamadan önce mevcut yapılandırmayı test edin.',
-                    testBeforeEnable:
-                        'Hassas değişiklikleri etkinleştirmeden veya kaydetmeden önce mevcut yapılandırmayı test edin.',
+                    testBeforeEnable: 'Yapılandırma değişikliklerini kaydetmeden önce mevcut yapılandırmayı test edin.',
                     testConfiguration: 'Yapılandırmayı test et',
                     testDiscovery: 'Discovery testi',
                     tlsCustomCA: 'HTTPS · Özel CA sertifikası',
@@ -5283,8 +5281,6 @@ const message = {
                     tlsPrivateHTTPWarning:
                         'HTTP aktarım şifrelemesi sağlamaz ve açıkça izin verilen özel hedeflerle sınırlıdır.',
                     tlsSkipVerify: 'HTTPS · Sertifika doğrulamasını atla (tehlikeli)',
-                    tlsSkipVerifyWarning:
-                        'Sertifika doğrulaması yalnızca bu kaynak için devre dışı bırakıldı ve yüksek riskli olarak denetlenecek.',
                     tlsSystem: 'HTTPS · Sistem sertifikası doğrulaması (önerilir)',
                     tokenEndpoint: 'Token Endpoint',
                     tokenEndpointInvalid: 'Geçerli bir Token Endpoint girin.',
@@ -5293,15 +5289,12 @@ const message = {
                         "HTTPS'i tercih edin. Özel HTTP ayrıca açık private-network erişimi gerektirir.",
                     unsavedChanges: 'Kaydedilmemiş OIDC değişiklikleri var.',
                     usedClaim: 'Claim kullanılmış',
-                    userInfoDisabledHelper: "Yalnızca doğrulanmış ID Token'ten Claims'i kullanın.",
-                    userInfoEnabledHelper:
-                        "UserInfo'yu yalnızca eksik bir kullanıcı adı Claim'ini tamamlamak için kullanın; subject yine eşleşmelidir.",
                     userInfoEndpoint: 'UserInfo Endpoint',
-                    userInfoEndpointHelper: 'Yalnızca UserInfo geri dönüşü etkinleştirildiğinde kullanılır.',
-                    userInfoEndpointInvalid: 'UserInfo etkinleştirildiğinde geçerli bir UserInfo Endpoint girin.',
-                    userMapping: 'Kullanıcı eşleme',
-                    userMappingDesc:
-                        'subject kimliği bağlar; yapılandırılmış Claim yalnızca 1Panel User.Name ile eşleşir.',
+                    userInfoEndpointHelper:
+                        'Kullanıcı adı alanı eksikse sistem bu endpoint üzerinden tamamlar. Tamamlama istemiyorsanız boş bırakın.',
+                    userInfoEndpointInvalid: 'Geçerli bir UserInfo Endpoint girin.',
+                    userMapping: 'Kullanıcı ayarları',
+                    userMappingDesc: 'OIDC kullanıcı adını ve ilk oturum açma için varsayılan rolü ayarlayın.',
                 },
                 ldap: {
                     enable: 'Etkinleştir',

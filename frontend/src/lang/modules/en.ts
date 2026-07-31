@@ -4976,22 +4976,24 @@ const message = {
                         'Complete sign-in in the new browser window. This page will update automatically.',
                     callbackCopied: 'OIDC callback URL copied.',
                     callbackURL: 'Callback URL',
-                    callbackURLHelper: 'Add this exact URL to the Provider allowlist.',
+                    callbackURLHelper: "Add this URL to the client's allowed callback URLs in the identity provider.",
                     cancelClearSecret: 'Cancel clearing',
                     clearSecret: 'Clear secret',
                     clearSecretConfirm: 'The Client Secret will be removed only after you save. Continue?',
                     clientAuthMethod: 'Client authentication method',
-                    clientAuthMethodHelper: 'It must match a method supported by the Provider Token Endpoint.',
+                    clientAuthMethodHelper:
+                        'Select the authentication method configured for this client in the identity provider.',
                     clientAuthMethodRequired: 'Select a client authentication method.',
                     clientID: 'Client ID',
                     clientIDRequired: 'Enter the Client ID.',
                     clientSecret: 'Client Secret',
-                    clockSkew: 'Clock skew tolerance',
-                    clockSkewRequired: 'Enter the clock skew tolerance.',
-                    compatibilityMode: 'Compatibility mode (manual endpoints and security options)',
+                    clockSkew: 'Token time tolerance',
+                    clockSkewHelper:
+                        'Allows a small time difference between the identity provider and 1Panel. Keep the default 60 seconds.',
+                    clockSkewRequired: 'Enter the token time tolerance.',
+                    compatibilityMode: 'Compatibility mode',
                     compatibilityModeHelper:
                         'Use only for incomplete Discovery or rewritten endpoints. Core OIDC validation remains enabled.',
-                    compatibilityModeShort: 'Compatibility mode',
                     configurationFailedHelper: 'The test failed. The page only displays the localized backend error.',
                     configurationFailedTag: 'Test failed',
                     configurationHighRiskPassed:
@@ -5001,8 +5003,7 @@ const message = {
                     configurationNotTestedTag: 'Not tested',
                     configurationPassed: 'The current configuration passed the security and capability checks.',
                     configurationPassedTag: 'Test passed',
-                    configurationStaleHelper:
-                        'Authentication-sensitive settings changed. Test the current draft again.',
+                    configurationStaleHelper: 'Configuration changed. Test it again before saving.',
                     configurationStaleTag: 'Result expired',
                     configurationTestMeta:
                         'Tested at {time}; completed in {duration} ms. Raw Provider responses are not stored.',
@@ -5028,7 +5029,7 @@ const message = {
                     connectionSecurityDesc:
                         'Certificates are verified by default; private IdP addresses are detected automatically.',
                     connectionTest: 'Connection and configuration test',
-                    connectionTestCompatibilityDesc: 'Validate the manually configured endpoints and protocol policy.',
+                    connectionTestCompatibilityDesc: 'Validate custom endpoints and the protocol security policy.',
                     connectionTestStandardDesc:
                         'Endpoints and capabilities are discovered automatically from the Issuer.',
                     connectionTestTab: 'Connection test',
@@ -5037,7 +5038,7 @@ const message = {
                     customCARequired: 'Provide the custom CA certificate.',
                     defaultRole: 'Default role',
                     defaultRoleHelper:
-                        'Assigned only when a user is first created; existing roles and permissions are preserved.',
+                        'Assigned only when the user is first created; later sign-ins do not change the role.',
                     defaultRolePlaceholder: 'Select a role',
                     defaultRoleRequired: 'Select a valid default role.',
                     disableAfterSave: 'OIDC will be disabled after saving.',
@@ -5054,6 +5055,7 @@ const message = {
                     endSessionEndpointHelper:
                         'Saved for future use; Provider-initiated logout is not included in this release.',
                     endSessionEndpointInvalid: 'Enter a valid End Session Endpoint.',
+                    endpointDiscoveryPlaceholder: 'Shown after connection test',
                     firstLogin: 'First login',
                     firstLoginPolicy: 'Create a local enterprise user and assign the configured default role.',
                     fixedAuthorizationCode: 'Authorization Code Flow',
@@ -5089,24 +5091,21 @@ const message = {
                     localUserFieldsDesc:
                         'The first release maps only User.Name and does not use a JSON mapping expression.',
                     loginWith: 'Sign in with {provider}',
-                    manualEndpoints: 'Manual endpoints',
+                    manualEndpoints: 'Custom endpoints',
                     manualEndpointsDesc:
                         'Use only when Discovery is incomplete or an upstream gateway rewrites endpoints.',
-                    manualEndpointsSecurity:
-                        'Manual endpoints do not disable Issuer, Audience, signature, state, nonce, or time validation.',
                     mappingResult: 'Mapping result',
                     mode: 'Connection mode',
                     modeRequired: 'Select a connection mode.',
                     nameClaim: 'Username Claim',
-                    nameClaimHelper:
-                        'Read from the verified ID Token first; UserInfo only fills a missing top-level Claim.',
+                    nameClaimHelper: 'Enter the field containing the username, such as preferred_username.',
                     nameClaimRequired: 'Enter the Username Claim.',
                     nameConflict: 'Name conflict policy',
                     panelURL: '1Panel public URL',
                     panelURLHTTPWarning:
                         'HTTP does not protect the authorization response. Use it only in an isolated private environment accepted by the Provider.',
                     panelURLHelper:
-                        'Enter the browser-visible origin only (scheme, host, and optional port), especially behind a reverse proxy.',
+                        'Enter the address users use to access 1Panel. It is used to generate the callback URL.',
                     panelURLInvalid: 'Enter an origin containing only scheme, host, and optional port.',
                     panelURLRequired: 'Enter the 1Panel public URL.',
                     pkceDisabled: 'Disabled (compatibility only)',
@@ -5129,7 +5128,7 @@ const message = {
                     rejectPlain: 'plain rejected',
                     replaceSecret: 'Replace secret',
                     requestAndClaims: 'Requests and attributes',
-                    requestAndClaimsDesc: 'Configure scopes, UserInfo fallback, and bounded backend request tolerance.',
+                    requestAndClaimsDesc: 'Configure authorization scopes, UserInfo fallback, and request parameters.',
                     requestTimeout: 'Request timeout',
                     requestTimeoutRequired: 'Enter the request timeout.',
                     restore: 'Restore',
@@ -5138,7 +5137,8 @@ const message = {
                     rolesLoadFailed: 'Roles could not be loaded. Retry before selecting the default role.',
                     roleHandling: 'Role handling',
                     scenario: 'Scenario',
-                    scopesHelper: 'openid is required. Email and offline_access are not requested by default.',
+                    scopes: 'Authorization scopes',
+                    scopesHelper: 'Must include openid. Separate multiple scopes with spaces.',
                     scopesRequired: 'Scopes must include openid.',
                     seconds: 'seconds',
                     secretClearHelper:
@@ -5150,8 +5150,7 @@ const message = {
                         'The new secret replaces the saved value when you save. Update the Client Secret in the OIDC Provider as well.',
                     secretRequiredHelper: 'Configure a Client Secret before enabling OIDC.',
                     secretRequiredToEnable: 'Configure a Client Secret before enabling OIDC.',
-                    secretSavedHelper:
-                        'The secret is encrypted and never displayed. Leaving it unchanged preserves the saved value.',
+                    secretSavedHelper: 'Stored encrypted. Leave blank to keep the current client secret.',
                     secretWaiting: 'Waiting for input',
                     secretWillClear: 'Will be cleared',
                     secretWillReplace: 'Will be replaced',
@@ -5166,7 +5165,7 @@ const message = {
                     standardDiscovery: 'Standard OIDC Discovery',
                     standardDiscoveryDesc:
                         '1Panel discovers endpoints and capabilities and does not store the raw document.',
-                    standardMode: 'Standard OIDC Discovery (recommended)',
+                    standardMode: 'Standard mode',
                     standardModeHelper: 'Discover endpoints, signing capabilities, and PKCE support from the Issuer.',
                     standardProtocolPolicy: 'Standard protocol policy',
                     standardProtocolPolicyDesc:
@@ -5185,7 +5184,7 @@ const message = {
                     subsequentLoginPolicy:
                         'Find the binding by subject and update only User.Name when the new name is available.',
                     testBeforeBrowserTest: 'Test the current configuration before starting a browser login test.',
-                    testBeforeEnable: 'Test the current configuration before enabling or saving sensitive changes.',
+                    testBeforeEnable: 'Test the current configuration before saving configuration changes.',
                     testConfiguration: 'Test configuration',
                     testDiscovery: 'Test Discovery',
                     tlsCustomCA: 'HTTPS · Custom CA certificate',
@@ -5193,8 +5192,6 @@ const message = {
                     tlsPrivateHTTPWarning:
                         'HTTP provides no transport encryption and is restricted to explicitly allowed private targets.',
                     tlsSkipVerify: 'Ignore SSL certificate verification',
-                    tlsSkipVerifyWarning:
-                        'Certificate verification is disabled only for this source and will be audited as high risk.',
                     tlsSystem: 'HTTPS · System certificate verification (recommended)',
                     tokenEndpoint: 'Token Endpoint',
                     tokenEndpointInvalid: 'Enter a valid Token Endpoint.',
@@ -5203,14 +5200,12 @@ const message = {
                         'Prefer HTTPS. Private HTTP also requires explicit private-network access.',
                     unsavedChanges: 'There are unsaved OIDC setting changes.',
                     usedClaim: 'Claim used',
-                    userInfoDisabledHelper: 'Use only Claims from the verified ID Token.',
-                    userInfoEnabledHelper:
-                        'Use UserInfo only to fill a missing Username Claim; subject must still match.',
                     userInfoEndpoint: 'UserInfo Endpoint',
-                    userInfoEndpointHelper: 'Used only when UserInfo fallback is enabled.',
-                    userInfoEndpointInvalid: 'Enter a valid UserInfo Endpoint when UserInfo is enabled.',
-                    userMapping: 'User mapping',
-                    userMappingDesc: 'subject binds the identity; the configured Claim only maps to 1Panel User.Name.',
+                    userInfoEndpointHelper:
+                        'When the username field is missing, the system retrieves it from this endpoint. Leave blank to skip fallback.',
+                    userInfoEndpointInvalid: 'Enter a valid UserInfo Endpoint.',
+                    userMapping: 'User settings',
+                    userMappingDesc: 'Set the OIDC username and the default role for first sign-in.',
                 },
                 ldap: {
                     enable: 'Enable',

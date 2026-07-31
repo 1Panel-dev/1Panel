@@ -5050,23 +5050,25 @@ const message = {
                         'Lengkapkan log masuk dalam tetingkap penyemak imbas baharu. Halaman ini akan dikemas kini secara automatik.',
                     callbackCopied: 'OIDC panggil balik URL disalin.',
                     callbackURL: 'Panggil balik URL',
-                    callbackURLHelper: 'Tambahkan URL tepat ini pada senarai dibenarkan Provider.',
+                    callbackURLHelper:
+                        'Tambahkan URL ini pada senarai URL panggil balik yang dibenarkan untuk klien dalam penyedia identiti.',
                     cancelClearSecret: 'Batalkan pembersihan',
                     clearSecret: 'Kosongkan Client Secret',
                     clearSecretConfirm: 'Client Secret akan dialih keluar hanya selepas anda menyimpan. teruskan?',
                     clientAuthMethod: 'Kaedah pengesahan pelanggan',
                     clientAuthMethodHelper:
-                        'Ia mesti sepadan dengan kaedah yang disokong oleh Provider Token Endpoint.',
+                        'Pilih kaedah pengesahan yang dikonfigurasi untuk klien ini dalam penyedia identiti.',
                     clientAuthMethodRequired: 'Pilih kaedah pengesahan pelanggan.',
                     clientID: 'Client ID',
                     clientIDRequired: 'Masukkan Client ID.',
                     clientSecret: 'Client Secret',
-                    clockSkew: 'Toleransi condong jam',
-                    clockSkewRequired: 'Masukkan toleransi condong jam.',
-                    compatibilityMode: 'Mod keserasian (titik akhir manual dan pilihan keselamatan)',
+                    clockSkew: 'Toleransi masa token',
+                    clockSkewHelper:
+                        'Membenarkan sedikit perbezaan masa antara penyedia identiti dan 1Panel. Kekalkan nilai lalai 60 saat.',
+                    clockSkewRequired: 'Masukkan toleransi masa token.',
+                    compatibilityMode: 'Mod keserasian',
                     compatibilityModeHelper:
                         'Gunakan hanya untuk Discovery yang tidak lengkap atau titik akhir yang ditulis semula. Pengesahan teras OIDC kekal didayakan.',
-                    compatibilityModeShort: 'Mod keserasian',
                     configurationFailedHelper:
                         'Ujian itu gagal. Halaman hanya memaparkan ralat backend yang telah diterjemahkan.',
                     configurationFailedTag: 'Ujian gagal',
@@ -5077,7 +5079,7 @@ const message = {
                     configurationNotTestedTag: 'Tidak diuji',
                     configurationPassed: 'Konfigurasi semasa melepasi semakan keselamatan dan keupayaan.',
                     configurationPassedTag: 'Ujian lulus',
-                    configurationStaleHelper: 'Tetapan sensitif pengesahan ditukar. Uji draf semasa sekali lagi.',
+                    configurationStaleHelper: 'Konfigurasi telah diubah. Uji semula sebelum menyimpan.',
                     configurationStaleTag: 'Keputusan tamat tempoh',
                     configurationTestMeta:
                         'Diuji pada {time}; selesai dalam {duration} ms. Respons mentah Provider tidak disimpan.',
@@ -5104,8 +5106,7 @@ const message = {
                     connectionSecurity: 'Keselamatan sambungan',
                     connectionSecurityDesc: 'Dasar TLS digunakan untuk permintaan Discovery, Token, JWKS dan UserInfo.',
                     connectionTest: 'Ujian sambungan dan konfigurasi',
-                    connectionTestCompatibilityDesc:
-                        'Sahkan titik akhir dan dasar protokol yang dikonfigurasikan secara manual.',
+                    connectionTestCompatibilityDesc: 'Sahkan titik akhir tersuai dan dasar keselamatan protokol.',
                     connectionTestStandardDesc: 'Titik akhir dan keupayaan ditemui secara automatik daripada Issuer.',
                     connectionTestTab: 'Ujian sambungan',
                     customCA: 'CA tersuai',
@@ -5113,7 +5114,7 @@ const message = {
                     customCARequired: 'Sediakan sijil tersuai CA.',
                     defaultRole: 'Peranan lalai',
                     defaultRoleHelper:
-                        'Ditugaskan hanya apabila pengguna pertama kali dibuat; peranan dan kebenaran sedia ada dikekalkan.',
+                        'Ditugaskan hanya apabila pengguna pertama kali dicipta; log masuk seterusnya tidak mengubah peranan.',
                     defaultRolePlaceholder: 'Pilih peranan',
                     defaultRoleRequired: 'Pilih peranan lalai yang sah.',
                     disableAfterSave: 'OIDC akan dilumpuhkan selepas disimpan.',
@@ -5131,6 +5132,7 @@ const message = {
                     endSessionEndpointHelper:
                         'Disimpan untuk kegunaan masa hadapan; Log keluar yang dimulakan Provider tidak disertakan dalam keluaran ini.',
                     endSessionEndpointInvalid: 'Masukkan End Session Endpoint yang sah.',
+                    endpointDiscoveryPlaceholder: 'Dipaparkan selepas ujian sambungan',
                     firstLogin: 'Log masuk pertama',
                     firstLoginPolicy:
                         'Buat pengguna perusahaan tempatan dan tetapkan peranan lalai yang dikonfigurasikan.',
@@ -5169,24 +5171,21 @@ const message = {
                     localUserFieldsDesc:
                         'Keluaran pertama hanya memetakan User.Name dan tidak menggunakan ungkapan pemetaan JSON.',
                     loginWith: 'Log masuk dengan {provider}',
-                    manualEndpoints: 'Titik akhir manual',
+                    manualEndpoints: 'Titik akhir tersuai',
                     manualEndpointsDesc:
                         'Gunakan hanya apabila Discovery tidak lengkap atau get laluan huluan menulis semula titik akhir.',
-                    manualEndpointsSecurity:
-                        'Titik akhir manual tidak melumpuhkan Issuer, Audience, tandatangan, state, nonce atau pengesahan masa.',
                     mappingResult: 'Hasil pemetaan',
                     mode: 'Mod sambungan',
                     modeRequired: 'Pilih mod sambungan.',
                     nameClaim: 'Claim nama pengguna',
-                    nameClaimHelper:
-                        'Baca daripada ID Token yang disahkan terlebih dahulu; UserInfo hanya mengisi Claim peringkat teratas yang tiada.',
+                    nameClaimHelper: 'Masukkan medan yang mengandungi nama pengguna, seperti preferred_username.',
                     nameClaimRequired: 'Masukkan Claim nama pengguna.',
                     nameConflict: 'Nama dasar konflik',
                     panelURL: '1Panel awam URL',
                     panelURLHTTPWarning:
                         'HTTP tidak melindungi respons kebenaran. Gunakannya hanya dalam persekitaran peribadi terpencil yang diterima oleh Provider.',
                     panelURLHelper:
-                        'Masukkan asal yang boleh dilihat pelayar sahaja (skim, hos dan port pilihan), terutamanya di belakang proksi terbalik.',
+                        'Masukkan alamat yang digunakan untuk mengakses 1Panel. Alamat ini digunakan untuk menjana URL panggil balik.',
                     panelURLInvalid: 'Masukkan asal yang mengandungi hanya skema, hos dan port pilihan.',
                     panelURLRequired: 'Masukkan 1Panel awam URL.',
                     pkceDisabled: 'Dilumpuhkan (keserasian sahaja)',
@@ -5211,7 +5210,7 @@ const message = {
                     replaceSecret: 'Gantikan rahsia',
                     requestAndClaims: 'Permintaan dan sifat',
                     requestAndClaimsDesc:
-                        'Konfigurasikan skop, sandaran UserInfo dan toleransi permintaan hujung belakang terhad.',
+                        'Konfigurasikan skop kebenaran, pelengkap maklumat pengguna dan parameter permintaan.',
                     requestTimeout: 'Tamat masa permintaan',
                     requestTimeoutRequired: 'Masukkan tamat masa permintaan.',
                     restore: 'Pulihkan',
@@ -5220,7 +5219,8 @@ const message = {
                     rolesLoadFailed: 'Peranan tidak dapat dimuatkan. Cuba semula sebelum memilih peranan lalai.',
                     roleHandling: 'Pengendalian peranan',
                     scenario: 'Senario',
-                    scopesHelper: 'openid diperlukan. E-mel dan offline_access tidak diminta secara lalai.',
+                    scopes: 'Skop kebenaran',
+                    scopesHelper: 'Mesti mengandungi openid. Pisahkan berbilang skop dengan ruang.',
                     scopesRequired: 'Scopes mesti termasuk openid.',
                     seconds: 'detik',
                     secretClearHelper:
@@ -5233,7 +5233,7 @@ const message = {
                     secretRequiredHelper: 'Konfigurasikan Client Secret sebelum mendayakan OIDC.',
                     secretRequiredToEnable: 'Konfigurasikan Client Secret sebelum mendayakan OIDC.',
                     secretSavedHelper:
-                        'Rahsia itu disulitkan dan tidak pernah dipaparkan. Membiarkannya tidak berubah mengekalkan nilai yang disimpan.',
+                        'Disimpan dalam bentuk disulitkan. Biarkan kosong untuk mengekalkan rahsia klien semasa.',
                     secretWaiting: 'Menunggu input',
                     secretWillClear: 'Akan dibersihkan',
                     secretWillReplace: 'Akan diganti',
@@ -5248,7 +5248,7 @@ const message = {
                     standardDiscovery: 'Discovery OIDC standard',
                     standardDiscoveryDesc:
                         '1Panel menemui titik akhir dan keupayaan dan tidak menyimpan dokumen mentah.',
-                    standardMode: 'Standard OIDC Discovery (disyorkan)',
+                    standardMode: 'Mod standard',
                     standardModeHelper:
                         'Temui titik akhir, keupayaan menandatangani dan sokongan PKCE daripada Issuer.',
                     standardProtocolPolicy: 'Dasar protokol standard',
@@ -5268,7 +5268,7 @@ const message = {
                     subsequentLoginPolicy:
                         'Cari pengikatan dengan subject dan kemas kini hanya User.Name apabila nama baharu tersedia.',
                     testBeforeBrowserTest: 'Uji konfigurasi semasa sebelum memulakan ujian log masuk penyemak imbas.',
-                    testBeforeEnable: 'Uji konfigurasi semasa sebelum mendayakan atau menyimpan perubahan sensitif.',
+                    testBeforeEnable: 'Uji konfigurasi semasa sebelum menyimpan perubahan konfigurasi.',
                     testConfiguration: 'Uji konfigurasi',
                     testDiscovery: 'Uji Discovery',
                     tlsCustomCA: 'HTTPS · Sijil CA tersuai',
@@ -5276,8 +5276,6 @@ const message = {
                     tlsPrivateHTTPWarning:
                         'HTTP tidak menyediakan penyulitan pengangkutan dan terhad kepada sasaran peribadi yang dibenarkan secara eksplisit.',
                     tlsSkipVerify: 'HTTPS · Langkau pengesahan sijil (berbahaya)',
-                    tlsSkipVerifyWarning:
-                        'Pengesahan sijil dilumpuhkan hanya untuk sumber ini dan akan diaudit sebagai berisiko tinggi.',
                     tlsSystem: 'HTTPS · Pengesahan sijil sistem (disyorkan)',
                     tokenEndpoint: 'Token Endpoint',
                     tokenEndpointInvalid: 'Masukkan Token Endpoint yang sah.',
@@ -5286,15 +5284,12 @@ const message = {
                         'Lebih suka HTTPS. HTTP persendirian juga memerlukan akses private-network yang jelas.',
                     unsavedChanges: 'Terdapat perubahan OIDC yang belum disimpan.',
                     usedClaim: 'Claim digunakan',
-                    userInfoDisabledHelper: 'Gunakan hanya Claims daripada ID Token yang disahkan.',
-                    userInfoEnabledHelper:
-                        'Gunakan UserInfo hanya untuk melengkapkan Claim nama pengguna yang tiada; subject mesti tetap sepadan.',
                     userInfoEndpoint: 'UserInfo Endpoint',
-                    userInfoEndpointHelper: 'Digunakan hanya apabila UserInfo sandaran didayakan.',
-                    userInfoEndpointInvalid: 'Masukkan UserInfo Endpoint yang sah apabila UserInfo didayakan.',
-                    userMapping: 'Pemetaan pengguna',
-                    userMappingDesc:
-                        'subject mengikat identiti; Claim yang dikonfigurasikan hanya memetakan kepada 1Panel User.Name.',
+                    userInfoEndpointHelper:
+                        'Apabila medan nama pengguna tiada, sistem melengkapkannya daripada endpoint ini. Biarkan kosong untuk tidak melengkapkannya.',
+                    userInfoEndpointInvalid: 'Masukkan UserInfo Endpoint yang sah.',
+                    userMapping: 'Tetapan pengguna',
+                    userMappingDesc: 'Tetapkan nama pengguna OIDC dan peranan lalai untuk log masuk pertama.',
                 },
                 ldap: {
                     enable: 'Dayakan',

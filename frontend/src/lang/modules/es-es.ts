@@ -5043,23 +5043,25 @@ const message = {
                         'Inicio de sesión completo en la nueva ventana del navegador. Esta página se actualizará automáticamente.',
                     callbackCopied: 'URL de devolución de llamada OIDC copiada.',
                     callbackURL: 'URL de devolución de llamada',
-                    callbackURLHelper: 'Añada exactamente esta URL a la lista permitida del proveedor.',
+                    callbackURLHelper:
+                        'Añada esta URL a las URL de retorno permitidas del cliente en el proveedor de identidad.',
                     cancelClearSecret: 'Cancelar limpieza',
                     clearSecret: 'Borrar secreto',
                     clearSecretConfirm: 'El Client Secret se eliminará solo después de guardar. ¿Continuar?',
                     clientAuthMethod: 'Método de autenticación del cliente',
                     clientAuthMethodHelper:
-                        'Debe coincidir con un método admitido por el Token Endpoint del proveedor.',
+                        'Seleccione el método de autenticación configurado para este cliente en el proveedor de identidad.',
                     clientAuthMethodRequired: 'Seleccione un método de autenticación del cliente.',
                     clientID: 'Client ID',
                     clientIDRequired: 'Ingrese el Client ID.',
                     clientSecret: 'Client Secret',
-                    clockSkew: 'Tolerancia de desviación horaria',
-                    clockSkewRequired: 'Ingrese la tolerancia de desviación del reloj.',
-                    compatibilityMode: 'Modo de compatibilidad (puntos finales manuales y opciones de seguridad)',
+                    clockSkew: 'Tolerancia de tiempo del token',
+                    clockSkewHelper:
+                        'Permite una pequeña diferencia horaria entre el proveedor de identidad y 1Panel. Mantenga el valor predeterminado de 60 segundos.',
+                    clockSkewRequired: 'Ingrese la tolerancia de tiempo del token.',
+                    compatibilityMode: 'Modo de compatibilidad',
                     compatibilityModeHelper:
                         'Úselo solo para Discovery incompleto o puntos finales reescritos. La validación principal de OIDC permanece habilitada.',
-                    compatibilityModeShort: 'Modo de compatibilidad',
                     configurationFailedHelper:
                         'La prueba falló. La página solo muestra el error de backend localizado.',
                     configurationFailedTag: 'Prueba fallida',
@@ -5070,8 +5072,7 @@ const message = {
                     configurationNotTestedTag: 'No probado',
                     configurationPassed: 'La configuración actual pasó las comprobaciones de seguridad y capacidad.',
                     configurationPassedTag: 'Prueba aprobada',
-                    configurationStaleHelper:
-                        'Se cambiaron las configuraciones sensibles a la autenticación. Pruebe el borrador actual nuevamente.',
+                    configurationStaleHelper: 'La configuración se modificó. Vuelva a probarla antes de guardar.',
                     configurationStaleTag: 'Resultado caducado',
                     configurationTestMeta:
                         'Probado el {time}; completado en {duration} ms. Las respuestas sin procesar del proveedor no se almacenan.',
@@ -5101,7 +5102,7 @@ const message = {
                         'La política TLS se aplica a las solicitudes Discovery, Token, JWKS y UserInfo.',
                     connectionTest: 'Prueba de conexión y configuración',
                     connectionTestCompatibilityDesc:
-                        'Validar los endpoints configurados manualmente y la política de protocolo.',
+                        'Valide los endpoints personalizados y la política de seguridad del protocolo.',
                     connectionTestStandardDesc:
                         'Los puntos finales y las capacidades se descubren automáticamente desde el Issuer.',
                     connectionTestTab: 'Prueba de conexión',
@@ -5111,7 +5112,7 @@ const message = {
                     customCARequired: 'Proporcione el certificado de la CA personalizada.',
                     defaultRole: 'Rol predeterminado',
                     defaultRoleHelper:
-                        'Se asigna solo cuando se crea un usuario por primera vez; se conservan los roles y permisos existentes.',
+                        'Se asigna solo al crear el usuario por primera vez; los siguientes inicios de sesión no cambian el rol.',
                     defaultRolePlaceholder: 'Seleccione un rol',
                     defaultRoleRequired: 'Seleccione un rol predeterminado válido.',
                     disableAfterSave: 'OIDC se deshabilitará después de guardar.',
@@ -5129,6 +5130,7 @@ const message = {
                     endSessionEndpointHelper:
                         'Se guarda para uso futuro; el cierre de sesión iniciado por el proveedor no está incluido en esta versión.',
                     endSessionEndpointInvalid: 'Ingrese un End Session Endpoint válido.',
+                    endpointDiscoveryPlaceholder: 'Se muestra después de probar la conexión',
                     firstLogin: 'Primer inicio de sesión',
                     firstLoginPolicy: 'Cree un usuario empresarial local y asigne el rol predeterminado configurado.',
                     fixedAuthorizationCode: 'Authorization Code Flow',
@@ -5165,24 +5167,21 @@ const message = {
                     localUserFieldsDesc:
                         'La primera versión asigna solo User.Name y no utiliza una expresión de asignación JSON.',
                     loginWith: 'Iniciar sesión con {provider}',
-                    manualEndpoints: 'Endpoints manuales',
+                    manualEndpoints: 'Endpoints personalizados',
                     manualEndpointsDesc:
                         'Úselo solo cuando Discovery esté incompleto o una puerta de enlace ascendente reescriba los endpoints.',
-                    manualEndpointsSecurity:
-                        'Los endpoints manuales no desactivan Issuer, Audience, firma, state, nonce ni la validación de tiempo.',
                     mappingResult: 'Resultado de la asignación',
                     mode: 'Modo de conexión',
                     modeRequired: 'Seleccione un modo de conexión.',
                     nameClaim: 'Claim de nombre de usuario',
-                    nameClaimHelper:
-                        'Se lee primero del ID Token verificado; UserInfo solo completa un Claim de nivel superior ausente.',
+                    nameClaimHelper: 'Introduzca el campo que contiene el nombre de usuario, como preferred_username.',
                     nameClaimRequired: 'Introduzca el Claim del nombre de usuario.',
                     nameConflict: 'Política de conflicto de nombres',
                     panelURL: 'URL pública de 1Panel',
                     panelURLHTTPWarning:
                         'HTTP no protege la respuesta de autorización. Úselo solo en un entorno privado aislado aceptado por el proveedor.',
                     panelURLHelper:
-                        'Ingrese solo el origen visible del navegador (esquema, host y puerto opcional), especialmente detrás de un proxy inverso.',
+                        'Introduzca la dirección que usan los usuarios para acceder a 1Panel. Se utiliza para generar la URL de retorno.',
                     panelURLInvalid: 'Ingrese un origen que contenga solo esquema, host y puerto opcional.',
                     panelURLRequired: 'Introduzca la URL pública de 1Panel.',
                     pkceDisabled: 'Deshabilitado (solo compatibilidad)',
@@ -5208,7 +5207,7 @@ const message = {
                     replaceSecret: 'Reemplazar secreto',
                     requestAndClaims: 'Solicitudes y atributos',
                     requestAndClaimsDesc:
-                        'Configure los scopes, el respaldo mediante UserInfo y una tolerancia limitada para las solicitudes del backend.',
+                        'Configure los alcances de autorización, la información de usuario complementaria y los parámetros de solicitud.',
                     requestTimeout: 'Tiempo de espera de solicitud',
                     requestTimeoutRequired: 'Ingrese el tiempo de espera de solicitud.',
                     restore: 'Restaurar',
@@ -5218,8 +5217,8 @@ const message = {
                         'No se pudieron cargar los roles. Vuelva a intentarlo antes de seleccionar el rol predeterminado.',
                     roleHandling: 'Gestión de roles',
                     scenario: 'Escenario',
-                    scopesHelper:
-                        'openid es obligatorio. El correo electrónico y offline_access no se solicitan de forma predeterminada.',
+                    scopes: 'Alcances de autorización',
+                    scopesHelper: 'Debe incluir openid. Separe varios alcances con espacios.',
                     scopesRequired: 'Scopes debe incluir openid.',
                     seconds: 'segundos',
                     secretClearHelper:
@@ -5231,8 +5230,7 @@ const message = {
                         'El nuevo secreto sustituirá el valor guardado al guardar. Actualice también el Client Secret en el Provider OIDC.',
                     secretRequiredHelper: 'Configure un Client Secret antes de habilitar OIDC.',
                     secretRequiredToEnable: 'Configure un Client Secret antes de habilitar OIDC.',
-                    secretSavedHelper:
-                        'El secreto está cifrado y nunca se muestra. Si lo deja sin cambios se conserva el valor guardado.',
+                    secretSavedHelper: 'Se almacena cifrado. Deje el campo vacío para conservar el secreto actual.',
                     secretWaiting: 'Esperando entrada',
                     secretWillClear: 'Se borrará',
                     secretWillReplace: 'Será reemplazado',
@@ -5248,7 +5246,7 @@ const message = {
                     standardDiscovery: 'OIDC Discovery estándar',
                     standardDiscoveryDesc:
                         '1Panel descubre los endpoints y las capacidades, pero no almacena el documento sin procesar.',
-                    standardMode: 'OIDC Discovery estándar (recomendado)',
+                    standardMode: 'Modo estándar',
                     standardModeHelper:
                         'Descubra puntos finales, capacidades de firma y compatibilidad con PKCE del Issuer.',
                     standardProtocolPolicy: 'Política de protocolo estándar',
@@ -5269,7 +5267,7 @@ const message = {
                         'Busque el vínculo por subject y actualice User.Name solo cuando el nombre nuevo esté disponible.',
                     testBeforeBrowserTest:
                         'Pruebe la configuración actual antes de iniciar la prueba de inicio de sesión en el navegador.',
-                    testBeforeEnable: 'Prueba la configuración actual antes de habilitar o guardar cambios sensibles.',
+                    testBeforeEnable: 'Prueba la configuración actual antes de guardar los cambios de configuración.',
                     testConfiguration: 'Probar configuración',
                     testDiscovery: 'Probar Discovery',
                     tlsCustomCA: 'HTTPS · Certificado CA personalizado',
@@ -5277,8 +5275,6 @@ const message = {
                     tlsPrivateHTTPWarning:
                         'HTTP no proporciona cifrado de transporte y está restringido a objetivos privados permitidos explícitamente.',
                     tlsSkipVerify: 'HTTPS · Omitir verificación de certificado (peligroso)',
-                    tlsSkipVerifyWarning:
-                        'La verificación de certificado está deshabilitada solo para esta fuente y será auditada como de alto riesgo.',
                     tlsSystem: 'HTTPS · Verificación del certificado del sistema (recomendado)',
                     tokenEndpoint: 'Token Endpoint',
                     tokenEndpointInvalid: 'Ingrese un Token Endpoint válido.',
@@ -5287,15 +5283,13 @@ const message = {
                         'Se recomienda HTTPS. El HTTP privado también requiere permitir explícitamente el acceso a la red privada.',
                     unsavedChanges: 'Hay cambios de OIDC sin guardar.',
                     usedClaim: 'Claim usado',
-                    userInfoDisabledHelper: 'Utilice solo Claims del ID Token verificado.',
-                    userInfoEnabledHelper:
-                        'Utilice UserInfo solo para completar un Claim de nombre ausente; el subject debe seguir coincidiendo.',
                     userInfoEndpoint: 'UserInfo Endpoint',
-                    userInfoEndpointHelper: 'Se usa solo cuando el respaldo de UserInfo está habilitado.',
-                    userInfoEndpointInvalid: 'Ingrese un UserInfo Endpoint válido cuando UserInfo está habilitado.',
-                    userMapping: 'Mapeo de usuarios',
+                    userInfoEndpointHelper:
+                        'Si falta el campo de nombre de usuario, el sistema lo obtiene de este endpoint. Déjelo vacío para omitir el complemento.',
+                    userInfoEndpointInvalid: 'Ingrese un UserInfo Endpoint válido.',
+                    userMapping: 'Configuración de usuarios',
                     userMappingDesc:
-                        'subject vincula la identidad; el Claim configurado solo se asigna a User.Name de 1Panel.',
+                        'Configure el nombre de usuario OIDC y el rol predeterminado para el primer inicio de sesión.',
                 },
                 ldap: {
                     enable: 'Habilitar',

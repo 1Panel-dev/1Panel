@@ -5040,23 +5040,25 @@ const message = {
                         'Завершите вход в новом окне браузера. Эта страница будет обновляться автоматически.',
                     callbackCopied: 'Обратный вызов OIDC URL скопирован.',
                     callbackURL: 'Обратный звонок URL',
-                    callbackURLHelper: 'Добавьте именно этот URL в белый список Provider.',
+                    callbackURLHelper:
+                        'Добавьте этот URL в список разрешенных URL обратного вызова клиента у поставщика удостоверений.',
                     cancelClearSecret: 'Отменить очистку',
                     clearSecret: 'Очистить секрет',
                     clearSecretConfirm: 'Client Secret будет удален только после сохранения. Продолжать?',
                     clientAuthMethod: 'Метод аутентификации клиента',
                     clientAuthMethodHelper:
-                        'Он должен соответствовать методу, поддерживаемому Provider Token Endpoint.',
+                        'Выберите метод аутентификации, настроенный для этого клиента у поставщика удостоверений.',
                     clientAuthMethodRequired: 'Выберите метод аутентификации клиента.',
                     clientID: 'Client ID',
                     clientIDRequired: 'Введите Client ID.',
                     clientSecret: 'Client Secret',
-                    clockSkew: 'Допуск перекоса часов',
-                    clockSkewRequired: 'Введите допуск отклонения тактового сигнала.',
-                    compatibilityMode: 'Режим совместимости (конечные точки вручную и параметры безопасности)',
+                    clockSkew: 'Допуск времени токена',
+                    clockSkewHelper:
+                        'Допускает небольшую разницу времени между поставщиком удостоверений и 1Panel. Оставьте значение по умолчанию 60 секунд.',
+                    clockSkewRequired: 'Укажите допуск времени токена.',
+                    compatibilityMode: 'Режим совместимости',
                     compatibilityModeHelper:
                         'Используйте только для неполных Discovery или переписанных конечных точек. Проверка ядра OIDC остается включенной.',
-                    compatibilityModeShort: 'Режим совместимости',
                     configurationFailedHelper:
                         'Тест провалился. На странице отображается только локализованная серверная ошибка.',
                     configurationFailedTag: 'Тест не пройден',
@@ -5067,7 +5069,7 @@ const message = {
                     configurationNotTestedTag: 'Не проверено',
                     configurationPassed: 'Текущая конфигурация прошла проверку безопасности и возможностей.',
                     configurationPassedTag: 'Тест пройден',
-                    configurationStaleHelper: 'Изменены настройки аутентификации. Проверьте текущий проект еще раз.',
+                    configurationStaleHelper: 'Конфигурация изменена. Повторите проверку перед сохранением.',
                     configurationStaleTag: 'Срок действия результата истек',
                     configurationTestMeta:
                         'Протестировано на {time}; завершено за {duration} мс. Необработанные ответы Provider не ​​сохраняются.',
@@ -5096,7 +5098,7 @@ const message = {
                     connectionSecurityDesc: 'Политика TLS применяется к запросам Discovery, Token, JWKS и UserInfo.',
                     connectionTest: 'Проверка подключения и конфигурации',
                     connectionTestCompatibilityDesc:
-                        'Проверьте настроенные вручную конечные точки и политику протокола.',
+                        'Проверьте пользовательские конечные точки и политику безопасности протокола.',
                     connectionTestStandardDesc: 'Конечные точки и возможности автоматически обнаруживаются из Issuer.',
                     connectionTestTab: 'Проверка подключения',
                     customCA: 'Пользовательский CA',
@@ -5105,7 +5107,7 @@ const message = {
                     customCARequired: 'Предоставьте собственный сертификат CA.',
                     defaultRole: 'Роль по умолчанию',
                     defaultRoleHelper:
-                        'Назначается только при первом создании пользователя; существующие роли и разрешения сохраняются.',
+                        'Назначается только при первом создании пользователя; последующие входы не изменяют роль.',
                     defaultRolePlaceholder: 'Выберите роль',
                     defaultRoleRequired: 'Выберите допустимую роль по умолчанию.',
                     disableAfterSave: 'OIDC будет отключен после сохранения.',
@@ -5123,6 +5125,7 @@ const message = {
                     endSessionEndpointHelper:
                         'Сохранено для будущего использования; Выход из системы, инициированный Provider, не включен в эту версию.',
                     endSessionEndpointInvalid: 'Введите действительный End Session Endpoint.',
+                    endpointDiscoveryPlaceholder: 'Отображается после проверки подключения',
                     firstLogin: 'Первый вход',
                     firstLoginPolicy:
                         'Создайте локального корпоративного пользователя и назначьте настроенную роль по умолчанию.',
@@ -5161,24 +5164,21 @@ const message = {
                     localUserFieldsDesc:
                         'Первый выпуск отображает только User.Name и не использует выражение сопоставления JSON.',
                     loginWith: 'Войти через {provider}',
-                    manualEndpoints: 'Конечные точки вручную',
+                    manualEndpoints: 'Пользовательские конечные точки',
                     manualEndpointsDesc:
                         'Используйте только в том случае, если Discovery неполный или вышестоящий шлюз перезаписывает конечные точки.',
-                    manualEndpointsSecurity:
-                        'Конечные точки вручную не отключают Issuer, Audience, подпись, state, nonce или проверку времени.',
                     mappingResult: 'Результат сопоставления',
                     mode: 'Режим подключения',
                     modeRequired: 'Выберите режим подключения.',
                     nameClaim: 'Claim имени пользователя',
-                    nameClaimHelper:
-                        'Сначала прочтите проверенный ID Token; UserInfo только заполняет отсутствующий Claim верхнего уровня.',
+                    nameClaimHelper: 'Укажите поле с именем пользователя, например preferred_username.',
                     nameClaimRequired: 'Введите Claim имени пользователя.',
                     nameConflict: 'Политика конфликта имен',
                     panelURL: '1Panel общедоступный URL',
                     panelURLHTTPWarning:
                         'HTTP не ​​защищает ответ авторизации. Используйте его только в изолированной частной среде, разрешенной Provider.',
                     panelURLHelper:
-                        'Введите только видимый браузеру источник (схему, хост и дополнительный порт), особенно за обратным прокси-сервером.',
+                        'Укажите адрес, по которому пользователи открывают 1Panel. Он используется для формирования URL обратного вызова.',
                     panelURLInvalid: 'Введите источник, содержащий только схему, хост и дополнительный порт.',
                     panelURLRequired: 'Введите общедоступный 1Panel URL.',
                     pkceDisabled: 'Отключено (только совместимость)',
@@ -5202,7 +5202,7 @@ const message = {
                     replaceSecret: 'Заменить секрет',
                     requestAndClaims: 'Запросы и атрибуты',
                     requestAndClaimsDesc:
-                        'Настройте области, резервный вариант UserInfo и ограниченную устойчивость запросов к серверу.',
+                        'Настройте области авторизации, дополнение сведений о пользователе и параметры запросов.',
                     requestTimeout: 'Тайм-аут запроса',
                     requestTimeoutRequired: 'Введите тайм-аут запроса.',
                     restore: 'Восстановить',
@@ -5212,7 +5212,8 @@ const message = {
                         'Не удалось загрузить роли. Повторите попытку, прежде чем выбирать роль по умолчанию.',
                     roleHandling: 'Обработка ролей',
                     scenario: 'Сценарий',
-                    scopesHelper: 'Требуется openid. Электронная почта и offline_access по умолчанию не запрашиваются.',
+                    scopes: 'Области авторизации',
+                    scopesHelper: 'Необходимо включить openid. Разделяйте несколько областей пробелами.',
                     scopesRequired: 'Scopes должен включать openid.',
                     seconds: 'секунды',
                     secretClearHelper:
@@ -5225,7 +5226,7 @@ const message = {
                     secretRequiredHelper: 'Настройте Client Secret перед включением OIDC.',
                     secretRequiredToEnable: 'Настройте Client Secret перед включением OIDC.',
                     secretSavedHelper:
-                        'Секрет зашифрован и никогда не отображается. Если оставить его без изменений, сохраненное значение сохраняется.',
+                        'Хранится в зашифрованном виде. Оставьте поле пустым, чтобы сохранить текущий секрет.',
                     secretWaiting: 'Ожидание ввода',
                     secretWillClear: 'Будет очищено',
                     secretWillReplace: 'Будет заменен',
@@ -5241,7 +5242,7 @@ const message = {
                     standardDiscovery: 'Стандартный OIDC Discovery',
                     standardDiscoveryDesc:
                         '1Panel обнаруживает конечные точки и возможности и не сохраняет необработанный документ.',
-                    standardMode: 'Стандартный OIDC Discovery (рекомендуется)',
+                    standardMode: 'Стандартный режим',
                     standardModeHelper:
                         'Откройте для себя конечные точки, возможности подписи и поддержку PKCE с помощью Issuer.',
                     standardProtocolPolicy: 'Стандартная политика протокола',
@@ -5261,8 +5262,7 @@ const message = {
                     subsequentLoginPolicy:
                         'Найдите привязку по subject и обновляйте только User.Name, когда новое имя будет доступно.',
                     testBeforeBrowserTest: 'Проверьте текущую конфигурацию перед запуском проверки входа в браузер.',
-                    testBeforeEnable:
-                        'Проверьте текущую конфигурацию, прежде чем включать или сохранять важные изменения.',
+                    testBeforeEnable: 'Перед сохранением изменений конфигурации проверьте текущую конфигурацию.',
                     testConfiguration: 'Проверить конфигурацию',
                     testDiscovery: 'Проверить Discovery',
                     tlsCustomCA: 'HTTPS · Пользовательский сертификат CA',
@@ -5270,8 +5270,6 @@ const message = {
                     tlsPrivateHTTPWarning:
                         'HTTP не ​​обеспечивает транспортного шифрования и ограничен явно разрешенными частными целями.',
                     tlsSkipVerify: 'HTTPS · Пропустить проверку сертификата (опасно)',
-                    tlsSkipVerifyWarning:
-                        'Проверка сертификата отключена только для этого источника и будет проверяться как высокий риск.',
                     tlsSystem: 'HTTPS · Проверка сертификата системы (рекомендуется)',
                     tokenEndpoint: 'Token Endpoint',
                     tokenEndpointInvalid: 'Введите действительный Token Endpoint.',
@@ -5280,15 +5278,12 @@ const message = {
                         'Предпочитаю HTTPS. Частный HTTP также требует явного доступа к private-network.',
                     unsavedChanges: 'Есть несохраненные изменения OIDC.',
                     usedClaim: 'Claim б/у',
-                    userInfoDisabledHelper: 'Используйте только Claims из проверенного ID Token.',
-                    userInfoEnabledHelper:
-                        'Используйте UserInfo только для заполнения отсутствующего Claim имени пользователя; subject должен по-прежнему совпадать.',
                     userInfoEndpoint: 'UserInfo Endpoint',
-                    userInfoEndpointHelper: 'Используется только тогда, когда включен резервный вариант UserInfo.',
-                    userInfoEndpointInvalid: 'Введите действительный UserInfo Endpoint, если UserInfo включен.',
-                    userMapping: 'Сопоставление пользователей',
-                    userMappingDesc:
-                        'subject связывает личность; настроенный Claim сопоставляется только с 1Panel User.Name.',
+                    userInfoEndpointHelper:
+                        'Если поле имени пользователя отсутствует, система дополнит его через эту конечную точку. Оставьте поле пустым, чтобы не использовать дополнение.',
+                    userInfoEndpointInvalid: 'Введите допустимый UserInfo Endpoint.',
+                    userMapping: 'Настройки пользователя',
+                    userMappingDesc: 'Настройте имя пользователя OIDC и роль по умолчанию для первого входа.',
                 },
                 ldap: {
                     enable: 'Включить',

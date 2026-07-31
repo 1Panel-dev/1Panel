@@ -4945,23 +4945,25 @@ const message = {
                         'ورود به سیستم را در پنجره مرورگر جدید کامل کنید. این صفحه به طور خودکار به روز می شود.',
                     callbackCopied: 'URL بازگشت OIDC کپی شد.',
                     callbackURL: 'URL بازگشت',
-                    callbackURLHelper: 'این URL را دقیقاً به فهرست مجاز ارائه‌دهنده اضافه کنید.',
+                    callbackURLHelper:
+                        'این نشانی را به فهرست نشانی‌های بازگشت مجاز کلاینت در ارائه‌دهنده هویت اضافه کنید.',
                     cancelClearSecret: 'لغو پاکسازی',
                     clearSecret: 'پاک کردن Client Secret',
                     clearSecretConfirm: 'Client Secret فقط پس از ذخیره حذف خواهد شد. ادامه دهید؟',
                     clientAuthMethod: 'روش احراز هویت مشتری',
                     clientAuthMethodHelper:
-                        'باید با روش پشتیبانی‌شده توسط Token Endpoint ارائه‌دهنده مطابقت داشته باشد.',
+                        'روش احراز هویت پیکربندی‌شده برای این کلاینت در ارائه‌دهنده هویت را انتخاب کنید.',
                     clientAuthMethodRequired: 'یک روش احراز هویت مشتری را انتخاب کنید.',
                     clientID: 'Client ID',
                     clientIDRequired: 'Client ID را وارد کنید.',
                     clientSecret: 'Client Secret',
-                    clockSkew: 'تحمل انحراف ساعت',
-                    clockSkewRequired: 'تحمل انحراف ساعت را وارد کنید.',
-                    compatibilityMode: 'حالت سازگاری (نقاط پایانی دستی و گزینه های امنیتی)',
+                    clockSkew: 'تحمل اختلاف زمانی توکن',
+                    clockSkewHelper:
+                        'اختلاف زمانی اندکی میان ارائه‌دهنده هویت و 1Panel را مجاز می‌کند. مقدار پیش‌فرض 60 ثانیه را حفظ کنید.',
+                    clockSkewRequired: 'تحمل اختلاف زمانی توکن را وارد کنید.',
+                    compatibilityMode: 'حالت سازگاری',
                     compatibilityModeHelper:
                         'فقط برای Discovery ناقص یا نقاط پایانی بازنویسی شده استفاده کنید. اعتبار سنجی Core OIDC همچنان فعال است.',
-                    compatibilityModeShort: 'حالت سازگاری',
                     configurationFailedHelper:
                         'آزمایش ناموفق بود. صفحه فقط خطای بومی‌سازی‌شده بازگشتی از بک‌اند را نمایش می‌دهد.',
                     configurationFailedTag: 'تست ناموفق بود',
@@ -4971,7 +4973,7 @@ const message = {
                     configurationNotTestedTag: 'تست نشده',
                     configurationPassed: 'پیکربندی فعلی بررسی‌های امنیتی و قابلیت را پشت سر گذاشت.',
                     configurationPassedTag: 'آزمون قبول شد',
-                    configurationStaleHelper: 'تنظیمات حساس به احراز هویت تغییر کرد. دوباره پیش نویس فعلی را تست کنید.',
+                    configurationStaleHelper: 'پیکربندی تغییر کرده است. پیش از ذخیره دوباره آن را آزمایش کنید.',
                     configurationStaleTag: 'نتیجه منقضی شده است',
                     configurationTestMeta:
                         'در {time} آزمایش شد و در {duration} میلی‌ثانیه تکمیل شد. پاسخ خام ارائه‌دهنده ذخیره نمی‌شود.',
@@ -4998,8 +5000,7 @@ const message = {
                     connectionSecurityDesc:
                         'خط‌مشی TLS برای درخواست‌های Discovery، Token، JWKS، و UserInfo اعمال می‌شود.',
                     connectionTest: 'تست اتصال و پیکربندی',
-                    connectionTestCompatibilityDesc:
-                        'خط‌مشی پروتکل و نقاط پایانی پیکربندی شده دستی را اعتبارسنجی کنید.',
+                    connectionTestCompatibilityDesc: 'نقاط پایانی سفارشی و خط‌مشی امنیتی پروتکل را اعتبارسنجی کنید.',
                     connectionTestStandardDesc: 'نقاط پایانی و قابلیت ها به طور خودکار از Issuer کشف می شوند.',
                     connectionTestTab: 'آزمون اتصال',
                     customCA: 'CA سفارشی',
@@ -5007,7 +5008,7 @@ const message = {
                     customCARequired: 'گواهی سفارشی CA را ارائه دهید.',
                     defaultRole: 'نقش پیش فرض',
                     defaultRoleHelper:
-                        'اختصاص داده شده تنها زمانی که یک کاربر برای اولین بار ایجاد می شود. نقش ها و مجوزهای موجود حفظ می شوند.',
+                        'فقط هنگام ایجاد کاربر برای نخستین بار اختصاص می‌یابد؛ ورودهای بعدی نقش را تغییر نمی‌دهند.',
                     defaultRolePlaceholder: 'یک نقش را انتخاب کنید',
                     defaultRoleRequired: 'یک نقش پیش فرض معتبر انتخاب کنید.',
                     disableAfterSave: 'OIDC پس از ذخیره غیرفعال می شود.',
@@ -5024,6 +5025,7 @@ const message = {
                     endSessionEndpointHelper:
                         'برای استفاده در آینده ذخیره می‌شود؛ خروج از سیستم آغازشده توسط ارائه‌دهنده در این نسخه گنجانده نشده است.',
                     endSessionEndpointInvalid: 'یک End Session Endpoint معتبر وارد کنید.',
+                    endpointDiscoveryPlaceholder: 'پس از آزمایش اتصال نمایش داده می‌شود',
                     firstLogin: 'ابتدا وارد شوید',
                     firstLoginPolicy: 'یک کاربر سازمانی محلی ایجاد کنید و نقش پیش فرض پیکربندی شده را تعیین کنید.',
                     fixedAuthorizationCode: 'Authorization Code Flow',
@@ -5059,24 +5061,21 @@ const message = {
                     localUserFieldsDesc:
                         'اولین نسخه فقط User.Name را نقشه برداری می کند و از عبارت نقشه برداری JSON استفاده نمی کند.',
                     loginWith: 'ورود با {provider}',
-                    manualEndpoints: 'نقاط پایانی دستی',
+                    manualEndpoints: 'نقاط پایانی سفارشی',
                     manualEndpointsDesc:
                         'فقط زمانی استفاده کنید که Discovery ناقص باشد یا یک دروازه بالادست نقاط انتهایی را بازنویسی کند.',
-                    manualEndpointsSecurity:
-                        'نقاط پایانی دستی Issuer، Audience، امضا، state، nonce یا اعتبارسنجی زمانی را غیرفعال نمی‌کنند.',
                     mappingResult: 'نتیجه نقشه برداری',
                     mode: 'حالت اتصال',
                     modeRequired: 'یک حالت اتصال را انتخاب کنید.',
                     nameClaim: 'Claim نام کاربری',
-                    nameClaimHelper:
-                        'ابتدا از ID Token تأیید شده بخوانید. UserInfo فقط یک Claim سطح بالای گم شده را پر می کند.',
+                    nameClaimHelper: 'فیلد حاوی نام کاربری، مانند preferred_username، را وارد کنید.',
                     nameClaimRequired: 'Claim نام کاربری را وارد کنید.',
                     nameConflict: 'خط مشی تضاد نام',
                     panelURL: 'URL عمومی 1Panel',
                     panelURLHTTPWarning:
                         'HTTP از پاسخ مجوز محافظت نمی‌کند. فقط در محیط خصوصی ایزوله‌ای که ارائه‌دهنده می‌پذیرد از آن استفاده کنید.',
                     panelURLHelper:
-                        'فقط مبدأ قابل مشاهده مرورگر (طرح، میزبان و درگاه اختیاری) را وارد کنید، به خصوص در پشت پراکسی معکوس.',
+                        'نشانی دسترسی کاربران به 1Panel را وارد کنید. این نشانی برای ایجاد نشانی بازگشت استفاده می‌شود.',
                     panelURLInvalid: 'مبدایی را وارد کنید که فقط شامل طرح، میزبان و پورت اختیاری است.',
                     panelURLRequired: 'URL عمومی 1Panel را وارد کنید.',
                     pkceDisabled: 'غیرفعال (فقط سازگاری)',
@@ -5099,8 +5098,7 @@ const message = {
                     rejectPlain: 'plain رد شد',
                     replaceSecret: 'راز را جایگزین کنید',
                     requestAndClaims: 'درخواست ها و صفات',
-                    requestAndClaimsDesc:
-                        'دامنه‌ها، تکمیل اطلاعات از طریق UserInfo و تحمل محدود درخواست‌های بک‌اند را پیکربندی کنید.',
+                    requestAndClaimsDesc: 'دامنه‌های مجوز، تکمیل اطلاعات کاربر و پارامترهای درخواست را پیکربندی کنید.',
                     requestTimeout: 'مهلت زمانی درخواست',
                     requestTimeoutRequired: 'زمان درخواست را وارد کنید.',
                     restore: 'بازیابی',
@@ -5109,7 +5107,8 @@ const message = {
                     rolesLoadFailed: 'نقش ها بارگیری نشدند. قبل از انتخاب نقش پیش فرض، دوباره امتحان کنید.',
                     roleHandling: 'رسیدگی به نقش',
                     scenario: 'سناریو',
-                    scopesHelper: 'openid مورد نیاز است. ایمیل و offline_access به طور پیش فرض درخواست نمی شوند.',
+                    scopes: 'دامنه‌های مجوز',
+                    scopesHelper: 'باید شامل openid باشد. دامنه‌های متعدد را با فاصله جدا کنید.',
                     scopesRequired: 'Scopes باید شامل openid باشد.',
                     seconds: 'ثانیه',
                     secretClearHelper:
@@ -5121,8 +5120,7 @@ const message = {
                         'مقدار جدید هنگام ذخیره جایگزین مقدار قبلی می‌شود. Client Secret را در Provider OIDC نیز به‌روزرسانی کنید.',
                     secretRequiredHelper: 'قبل از فعال کردن OIDC یک Client Secret را پیکربندی کنید.',
                     secretRequiredToEnable: 'قبل از فعال کردن OIDC یک Client Secret را پیکربندی کنید.',
-                    secretSavedHelper:
-                        'راز رمزگذاری شده است و هرگز نمایش داده نمی شود. بدون تغییر باقی گذاشتن آن، مقدار ذخیره شده را حفظ می کند.',
+                    secretSavedHelper: 'به‌صورت رمزگذاری‌شده ذخیره می‌شود. برای حفظ رمز فعلی، فیلد را خالی بگذارید.',
                     secretWaiting: 'در انتظار ورودی',
                     secretWillClear: 'پاک خواهد شد',
                     secretWillReplace: 'جایگزین خواهد شد',
@@ -5136,7 +5134,7 @@ const message = {
                     signingKeyStatic: 'کلید عمومی ثابت JWK یا PEM',
                     standardDiscovery: 'استاندارد OIDC Discovery',
                     standardDiscoveryDesc: '1Panel نقاط پایانی و قابلیت‌ها را کشف می‌کند و سند خام را ذخیره نمی‌کند.',
-                    standardMode: 'استاندارد OIDC Discovery (توصیه می شود)',
+                    standardMode: 'حالت استاندارد',
                     standardModeHelper: 'نقاط پایانی، قابلیت‌های امضا و پشتیبانی PKCE را از Issuer کشف کنید.',
                     standardProtocolPolicy: 'خط مشی پروتکل استاندارد',
                     standardProtocolPolicyDesc:
@@ -5155,7 +5153,7 @@ const message = {
                     subsequentLoginPolicy:
                         'اتصال را با subject پیدا کنید و فقط زمانی که نام کاربری جدید در دسترس است User.Name را به‌روزرسانی کنید.',
                     testBeforeBrowserTest: 'قبل از شروع تست ورود به مرورگر، پیکربندی فعلی را آزمایش کنید.',
-                    testBeforeEnable: 'قبل از فعال کردن یا ذخیره تغییرات حساس، پیکربندی فعلی را آزمایش کنید.',
+                    testBeforeEnable: 'پیش از ذخیره تغییرات پیکربندی، پیکربندی فعلی را آزمایش کنید.',
                     testConfiguration: 'آزمون پیکربندی',
                     testDiscovery: 'آزمون Discovery',
                     tlsCustomCA: 'HTTPS · گواهی سفارشی CA',
@@ -5163,7 +5161,6 @@ const message = {
                     tlsPrivateHTTPWarning:
                         'HTTP هیچ رمزگذاری حمل و نقلی ارائه نمی دهد و محدود به اهداف خصوصی مجاز است.',
                     tlsSkipVerify: 'HTTPS · رد شدن از تأیید گواهی (خطرناک)',
-                    tlsSkipVerifyWarning: 'تأیید گواهی فقط برای این منبع غیرفعال است و به عنوان پرخطر بررسی می شود.',
                     tlsSystem: 'HTTPS · تأیید گواهی سیستم (توصیه می شود)',
                     tokenEndpoint: 'Token Endpoint',
                     tokenEndpointInvalid: 'یک Token Endpoint معتبر وارد کنید.',
@@ -5172,15 +5169,12 @@ const message = {
                         'HTTPS را ترجیح دهید. HTTP خصوصی همچنین به دسترسی صریح private-network نیاز دارد.',
                     unsavedChanges: 'تغییرات ذخیره‌نشده OIDC وجود دارد.',
                     usedClaim: 'Claim استفاده شده است',
-                    userInfoDisabledHelper: 'فقط از Claims موجود در ID Token تأییدشده استفاده کنید.',
-                    userInfoEnabledHelper:
-                        'از UserInfo فقط برای تکمیل Claim نام کاربریِ مفقود استفاده کنید؛ subject همچنان باید مطابقت داشته باشد.',
                     userInfoEndpoint: 'UserInfo Endpoint',
-                    userInfoEndpointHelper: 'فقط زمانی استفاده می شود که بازگشت مجدد UserInfo فعال باشد.',
-                    userInfoEndpointInvalid: 'وقتی UserInfo فعال است، یک UserInfo Endpoint معتبر وارد کنید.',
-                    userMapping: 'نگاشت کاربر',
-                    userMappingDesc:
-                        'subject هویت را متصل می کند. Claim پیکربندی شده فقط به 1Panel User.Name نگاشت می شود.',
+                    userInfoEndpointHelper:
+                        'اگر فیلد نام کاربری موجود نباشد، سیستم آن را از این نقطه پایانی دریافت می‌کند؛ برای عدم تکمیل، خالی بگذارید.',
+                    userInfoEndpointInvalid: 'یک UserInfo Endpoint معتبر وارد کنید.',
+                    userMapping: 'تنظیمات کاربر',
+                    userMappingDesc: 'نام کاربری OIDC و نقش پیش‌فرض نخستین ورود را تنظیم کنید.',
                 },
                 ldap: {
                     enable: 'فعال کردن',

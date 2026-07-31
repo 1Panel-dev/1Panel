@@ -4973,22 +4973,24 @@ const message = {
                         '新しいブラウザウィンドウでログインを完了してください。このページは自動的に更新されます。',
                     callbackCopied: 'OIDC コールバック URL がコピーされました。',
                     callbackURL: 'コールバック URL',
-                    callbackURLHelper: 'この URL をプロバイダーの許可リストに正確に追加してください。',
+                    callbackURLHelper:
+                        'この URL を ID プロバイダーのクライアントで許可するコールバック URL に追加してください。',
                     cancelClearSecret: 'クリアをキャンセル',
                     clearSecret: 'シークレットのクリア',
                     clearSecretConfirm: 'Client Secret は保存後にのみ削除されます。続行しますか?',
                     clientAuthMethod: 'クライアント認証方法',
-                    clientAuthMethodHelper: 'プロバイダーの Token Endpoint がサポートする方法と一致させてください。',
+                    clientAuthMethodHelper: 'ID プロバイダーでこのクライアントに設定した認証方式を選択してください。',
                     clientAuthMethodRequired: 'クライアント認証方法を選択してください。',
                     clientID: 'Client ID',
                     clientIDRequired: 'Client ID を入力します。',
                     clientSecret: 'Client Secret',
-                    clockSkew: 'クロック スキュー許容値',
-                    clockSkewRequired: 'クロック スキュー許容値を入力します。',
-                    compatibilityMode: '互換モード（手動エンドポイントとセキュリティオプション）',
+                    clockSkew: 'トークン時刻の許容差',
+                    clockSkewHelper:
+                        'ID プロバイダーと 1Panel のわずかな時刻差を許容します。通常は 60 秒のままにしてください。',
+                    clockSkewRequired: 'トークン時刻の許容差を入力してください。',
+                    compatibilityMode: '互換モード',
                     compatibilityModeHelper:
                         '不完全な Discovery または書き換えられたエンドポイントにのみ使用します。コア OIDC 検証は有効なままです。',
-                    compatibilityModeShort: '互換モード',
                     configurationFailedHelper:
                         'テストは失敗しました。このページには、ローカライズされたバックエンド エラーのみが表示されます。',
                     configurationFailedTag: 'テストに失敗しました',
@@ -4998,7 +5000,7 @@ const message = {
                     configurationNotTestedTag: '未テスト',
                     configurationPassed: '現在の構成はセキュリティと機能のチェックに合格しました。',
                     configurationPassedTag: 'テストに合格しました',
-                    configurationStaleHelper: '認証に依存する設定が変更されました。現在のドラフトを再度テストします。',
+                    configurationStaleHelper: '設定が変更されました。保存する前に再度テストしてください。',
                     configurationStaleTag: '結果の有効期限が切れました',
                     configurationTestMeta:
                         '{time} にテストし、{duration} ミリ秒で完了しました。プロバイダーの未加工レスポンスは保存されません。',
@@ -5027,15 +5029,14 @@ const message = {
                         'TLS ポリシーは、Discovery、Token、JWKS、および UserInfo リクエストに適用されます。',
                     connectionTest: '接続と構成のテスト',
                     connectionTestCompatibilityDesc:
-                        '手動で構成されたエンドポイントとプロトコル ポリシーを検証します。',
+                        'カスタムエンドポイントとプロトコルのセキュリティポリシーを検証します。',
                     connectionTestStandardDesc: 'エンドポイントと機能は、Issuer から自動的に検出されます。',
                     connectionTestTab: '接続テスト',
                     customCA: 'カスタム CA',
                     customCAHelper: 'この認証ソースにのみ適用され、ログには書き込まれません。',
                     customCARequired: 'カスタム CA 証明書を指定してください。',
                     defaultRole: 'デフォルトの役割',
-                    defaultRoleHelper:
-                        'ユーザーが最初に作成されたときにのみ割り当てられます。既存のロールと権限は保持されます。',
+                    defaultRoleHelper: 'ユーザーの初回作成時だけ割り当て、以降のログインではロールを変更しません。',
                     defaultRolePlaceholder: 'ロールを選択してください。',
                     defaultRoleRequired: '有効なデフォルトのロールを選択してください。',
                     disableAfterSave: 'OIDC は保存後に無効になります。',
@@ -5053,6 +5054,7 @@ const message = {
                     endSessionEndpointHelper:
                         '将来の使用のために保存されます。プロバイダー起点のログアウトは、このリリースには含まれていません。',
                     endSessionEndpointInvalid: '有効な End Session Endpoint を入力してください。',
+                    endpointDiscoveryPlaceholder: '接続テスト後に表示されます',
                     firstLogin: '初回ログイン',
                     firstLoginPolicy:
                         'ローカル エンタープライズ ユーザーを作成し、設定されたデフォルトのロールを割り当てます。',
@@ -5089,24 +5091,21 @@ const message = {
                     localUserFieldsDesc:
                         '最初のリリースでは User.Name のみがマッピングされ、JSON マッピング式は使用されません。',
                     loginWith: '{provider} でログイン',
-                    manualEndpoints: '手動エンドポイント',
+                    manualEndpoints: 'カスタムエンドポイント',
                     manualEndpointsDesc:
                         'Discovery が不完全な場合、またはアップストリーム ゲートウェイがエンドポイントを書き換える場合にのみ使用します。',
-                    manualEndpointsSecurity:
-                        '手動エンドポイントでは、Issuer、Audience、署名、state、nonce、または時間検証は無効になりません。',
                     mappingResult: 'マッピング結果',
                     mode: '接続モード',
                     modeRequired: '接続モードを選択します。',
                     nameClaim: 'ユーザー名 Claim',
-                    nameClaimHelper:
-                        '最初に検証済みの ID Token から読み取ります。 UserInfo は、欠落している最上位の Claim のみを埋めます。',
+                    nameClaimHelper: 'ユーザー名を含むフィールド名を入力してください（例：preferred_username）。',
                     nameClaimRequired: 'ユーザー名 Claim を入力してください。',
                     nameConflict: '名前の競合ポリシー',
                     panelURL: '1Panel 公開 URL',
                     panelURLHTTPWarning:
                         'HTTP は認可応答を保護しません。プロバイダーが許可した隔離されたプライベート環境でのみ使用してください。',
                     panelURLHelper:
-                        'ブラウザに表示されるオリジン (スキーム、ホスト、およびオプションのポート) のみを入力します。特にリバース プロキシの背後にあります。',
+                        'ユーザーが 1Panel へアクセスするアドレスを入力してください。コールバック URL の生成に使用します。',
                     panelURLInvalid: 'スキーム、ホスト、およびオプションのポートのみを含むオリジンを入力します。',
                     panelURLRequired: '1Panel の公開 URL を入力してください。',
                     pkceDisabled: '無効（互換性のみ）',
@@ -5129,8 +5128,7 @@ const message = {
                     rejectPlain: 'plain 拒否されました',
                     replaceSecret: 'シークレットの置換',
                     requestAndClaims: 'リクエストと属性',
-                    requestAndClaimsDesc:
-                        'スコープ、UserInfo フォールバック、制限付きバックエンド リクエスト許容範囲を構成します。',
+                    requestAndClaimsDesc: '認可スコープ、ユーザー情報の補完、リクエストパラメーターを設定します。',
                     requestTimeout: 'リクエスト タイムアウト',
                     requestTimeoutRequired: 'リクエスト タイムアウトを入力します。',
                     restore: '復元',
@@ -5140,7 +5138,8 @@ const message = {
                         'ロールをロードできませんでした。デフォルトのロールを選択する前に再試行してください。',
                     roleHandling: 'ロール処理',
                     scenario: 'シナリオ',
-                    scopesHelper: 'openid が必要です。デフォルトでは、電子メールと offline_access は要求されません。',
+                    scopes: '認可スコープ',
+                    scopesHelper: 'openid を含める必要があります。複数のスコープはスペースで区切ってください。',
                     scopesRequired: 'Scopes には openid が含まれている必要があります。',
                     seconds: '秒',
                     secretClearHelper: 'クリア後、OIDC を再度有効にする前に、新しい Client Secret が必要です。',
@@ -5151,8 +5150,7 @@ const message = {
                         '保存すると新しいシークレットで置き換えられます。OIDC Provider 側の Client Secret も更新してください。',
                     secretRequiredHelper: 'OIDC を有効にする前に、Client Secret を設定してください。',
                     secretRequiredToEnable: 'OIDC を有効にする前に、Client Secret を設定してください。',
-                    secretSavedHelper:
-                        'シークレットは暗号化され、表示されません。変更しないままにすると、保存された値が保持されます。',
+                    secretSavedHelper: '暗号化して保存されています。空欄にすると現在のシークレットを保持します。',
                     secretWaiting: '入力待ち',
                     secretWillClear: 'クリアされます',
                     secretWillReplace: '置き換えられます',
@@ -5166,7 +5164,7 @@ const message = {
                     signingKeyStatic: '静的 JWK または PEM 公開キー',
                     standardDiscovery: '標準 OIDC Discovery',
                     standardDiscoveryDesc: '1Panel はエンドポイントと機能を検出し、生のドキュメントは保存しません。',
-                    standardMode: '標準 OIDC Discovery (推奨)',
+                    standardMode: '標準モード',
                     standardModeHelper: 'エンドポイント、署名機能、Issuer の PKCE サポートを確認します。',
                     standardProtocolPolicy: '標準プロトコル ポリシー',
                     standardProtocolPolicyDesc:
@@ -5185,7 +5183,7 @@ const message = {
                     subsequentLoginPolicy:
                         'subject によるバインディングを検索し、新しいユーザー名が利用可能な場合のみ User.Name を更新します。',
                     testBeforeBrowserTest: 'ブラウザのログイン テストを開始する前に、現在の設定をテストします。',
-                    testBeforeEnable: '機密変更を有効にするか保存する前に、現在の設定をテストしてください。',
+                    testBeforeEnable: '設定変更を保存する前に、現在の設定をテストしてください。',
                     testConfiguration: '設定をテスト',
                     testDiscovery: 'Discovery をテスト',
                     tlsCustomCA: 'HTTPS · カスタム CA 証明書',
@@ -5193,8 +5191,6 @@ const message = {
                     tlsPrivateHTTPWarning:
                         'HTTP はトランスポート暗号化を提供せず、明示的に許可されたプライベート ネットワークに制限されます。',
                     tlsSkipVerify: 'HTTPS · 証明書検証をスキップ (危険)',
-                    tlsSkipVerifyWarning:
-                        '証明書検証はこのソースに対してのみ無効になっており、高リスクとして監査されます。',
                     tlsSystem: 'HTTPS · システム証明書検証 (推奨)',
                     tokenEndpoint: 'Token Endpoint',
                     tokenEndpointInvalid: '有効な Token Endpoint を入力してください。',
@@ -5203,15 +5199,12 @@ const message = {
                         'HTTPS を推奨します。プライベート HTTP を使用するには、プライベートネットワークへのアクセスも明示的に許可する必要があります。',
                     unsavedChanges: '保存されていない OIDC 設定があります。',
                     usedClaim: 'Claim を使用',
-                    userInfoDisabledHelper: '検証済みの ID Token の Claims のみを使用します。',
-                    userInfoEnabledHelper:
-                        '不足しているユーザー名 Claim の補完にのみ UserInfo を使用し、subject は必ず一致させます。',
                     userInfoEndpoint: 'UserInfo Endpoint',
-                    userInfoEndpointHelper: 'UserInfo フォールバックが有効な場合にのみ使用されます。',
-                    userInfoEndpointInvalid: 'UserInfo が有効な場合は、有効な UserInfo Endpoint を入力します。',
-                    userMapping: 'ユーザーマッピング',
-                    userMappingDesc:
-                        'subject は ID をバインドします。設定された Claim は、1Panel User.Name にのみマッピングされます。',
+                    userInfoEndpointHelper:
+                        'ユーザー名フィールドがない場合、このエンドポイントから補完します。補完しない場合は空欄にします。',
+                    userInfoEndpointInvalid: '有効な UserInfo Endpoint を入力してください。',
+                    userMapping: 'ユーザー設定',
+                    userMappingDesc: 'OIDC のユーザー名と初回ログイン時のデフォルトロールを設定します。',
                 },
                 ldap: {
                     enable: '有効にする',
