@@ -1708,6 +1708,9 @@ var AddWebsiteTemplateTable = &gormigrate.Migration{
 			&model.WebsiteTemplate{},
 			&model.WebsiteTemplateOutput{},
 		)
+	},
+}
+
 var AddComposePinned = &gormigrate.Migration{
 	ID: "20260729-add-compose-pinned",
 	Migrate: func(tx *gorm.DB) error {

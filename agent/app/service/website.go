@@ -165,7 +165,12 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		websiteDTOs []response.WebsiteRes
 		opts        []repo.DBOption
 	)
-	opts = append(opts, repo.WithOrderRuleBy(req.OrderBy, req.Order), repo.WithOrderRuleBy("updated_at", "descending"))
+	opts = append(
+		opts,
+		repo.WithOrderRuleBy(req.OrderBy, req.Order),
+		repo.WithOrderRuleBy("created_at", "descending"),
+		repo.WithOrderRuleBy("id", "descending"),
+	)
 	if req.Name != "" {
 		domains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomainLike(req.Name))
 		var websiteIds []uint

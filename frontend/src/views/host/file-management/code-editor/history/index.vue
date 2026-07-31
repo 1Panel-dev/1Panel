@@ -237,7 +237,7 @@ import { Languages } from '@/global/mimetype';
 import i18n from '@/lang';
 import ComplexTable from '@/components/table/complex/ComplexTable.vue';
 
-type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
+type MonacoEditorApi = typeof import('monaco-editor/editor');
 
 interface HistoryDrawerProps {
     path: string;
@@ -414,10 +414,7 @@ const ensureMonaco = async () => {
         return monacoApi;
     }
     setupMonacoEnvironment();
-    const [monacoModule] = await Promise.all([
-        import('monaco-editor/esm/vs/editor/editor.api'),
-        loadMonacoLanguageSupport(),
-    ]);
+    const [monacoModule] = await Promise.all([import('monaco-editor/editor'), loadMonacoLanguageSupport()]);
     monacoApi = monacoModule;
     return monacoApi;
 };

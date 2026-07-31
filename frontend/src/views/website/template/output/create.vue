@@ -39,10 +39,7 @@
                     >
                         <el-option v-for="opt in getOptions(variable)" :key="opt" :value="opt" :label="opt" />
                     </el-select>
-                    <el-color-picker
-                        v-else-if="variable.type === 'color'"
-                        v-model="variableValues[variable.key]"
-                    />
+                    <el-color-picker v-else-if="variable.type === 'color'" v-model="variableValues[variable.key]" />
                     <el-input v-else v-model="variableValues[variable.key]" />
                 </el-form-item>
                 <el-divider content-position="left">

@@ -22,7 +22,13 @@
                 show-overflow-tooltip
             />
             <el-table-column prop="createdAt" :label="$t('commons.table.date')" :formatter="dateFormat" width="165px" />
-            <fu-table-operations :ellipsis="1" :buttons="buttons" :label="$t('commons.table.operate')" fixed="right" fix />
+            <fu-table-operations
+                :ellipsis="1"
+                :buttons="buttons"
+                :label="$t('commons.table.operate')"
+                fixed="right"
+                fix
+            />
         </ComplexTable>
         <OpDialog ref="opRef" @search="search" />
         <OutputCreate ref="outputCreateRef" @search="search" />

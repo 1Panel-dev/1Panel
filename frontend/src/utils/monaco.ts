@@ -1,16 +1,20 @@
-import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
-import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import type { languages } from 'monaco-editor/editor';
+import jsonWorker from 'monaco-editor/languages/features/json/json.worker?worker';
+import cssWorker from 'monaco-editor/languages/features/css/css.worker?worker';
+import htmlWorker from 'monaco-editor/languages/features/html/html.worker?worker';
+import tsWorker from 'monaco-editor/languages/features/typescript/ts.worker?worker';
+import EditorWorker from 'monaco-editor/editor/editor.worker?worker';
 
 let initialized = false;
 let languageSupportPromise: Promise<void> | null = null;
 
-type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
-type PythonLanguageModule = typeof import('monaco-editor/esm/vs/basic-languages/python/python.js');
+type MonacoEditorApi = typeof import('monaco-editor/editor');
+type PythonLanguageModule = {
+    conf: languages.LanguageConfiguration;
+    language: languages.IMonarchLanguage;
+};
 
-export const buildPatchedPythonLanguage = (language: PythonLanguageModule['language']) => ({
+export const buildPatchedPythonLanguage = (language: PythonLanguageModule['language']): languages.IMonarchLanguage => ({
     ...language,
     tokenizer: {
         ...language.tokenizer,
@@ -40,8 +44,8 @@ export const buildPatchedPythonLanguage = (language: PythonLanguageModule['langu
 
 const patchPythonLanguageSupport = async () => {
     const [monaco, python] = await Promise.all([
-        import('monaco-editor/esm/vs/editor/editor.api'),
-        import('monaco-editor/esm/vs/basic-languages/python/python.js'),
+        import('monaco-editor/editor'),
+        import('monaco-editor/languages/definitions/python/python.js'),
     ]);
     const monacoApi = monaco as MonacoEditorApi;
     const pythonModule = python as PythonLanguageModule;
@@ -88,20 +92,20 @@ export function setupMonacoEnvironment() {
 export async function loadMonacoLanguageSupport() {
     if (!languageSupportPromise) {
         languageSupportPromise = Promise.all([
-            import('monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles.js'),
-            import('monaco-editor/esm/vs/editor/contrib/folding/browser/folding.js'),
-            import('monaco-editor/esm/vs/editor/contrib/contextmenu/browser/contextmenu.js'),
-            import('monaco-editor/esm/vs/editor/contrib/clipboard/browser/clipboard.js'),
-            import('monaco-editor/esm/vs/editor/contrib/comment/browser/comment.js'),
-            import('monaco-editor/esm/vs/editor/contrib/dropOrPasteInto/browser/copyPasteContribution.js'),
-            import('monaco-editor/esm/vs/editor/contrib/find/browser/findController.js'),
-            import('monaco-editor/esm/vs/editor/contrib/multicursor/browser/multicursor.js'),
-            import('monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneCommandsQuickAccess.js'),
-            import('monaco-editor/esm/vs/basic-languages/monaco.contribution'),
-            import('monaco-editor/esm/vs/language/json/monaco.contribution'),
-            import('monaco-editor/esm/vs/language/css/monaco.contribution'),
-            import('monaco-editor/esm/vs/language/html/monaco.contribution'),
-            import('monaco-editor/esm/vs/language/typescript/monaco.contribution'),
+            import('monaco-editor/features/codicon/register'),
+            import('monaco-editor/features/folding/register'),
+            import('monaco-editor/features/contextmenu/register'),
+            import('monaco-editor/features/clipboard/register'),
+            import('monaco-editor/features/comment/register'),
+            import('monaco-editor/features/dropOrPasteInto/register'),
+            import('monaco-editor/features/find/register'),
+            import('monaco-editor/features/multicursor/register'),
+            import('monaco-editor/features/quickCommand/register'),
+            import('monaco-editor/languages/definitions/register.all'),
+            import('monaco-editor/languages/features/json/register'),
+            import('monaco-editor/languages/features/css/register'),
+            import('monaco-editor/languages/features/html/register'),
+            import('monaco-editor/languages/features/typescript/register'),
         ])
             .then(() => patchPythonLanguageSupportSafely())
             .then(() => undefined);
