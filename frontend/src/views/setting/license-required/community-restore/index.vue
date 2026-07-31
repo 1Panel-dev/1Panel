@@ -158,15 +158,4 @@ defineExpose({
     flex-direction: column;
     gap: 16px;
 }
-
-.restore-mode-group {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-
-    :deep(.el-radio) {
-        width: 100%;
-        margin-right: 0;
-    }
-}
 </style>
