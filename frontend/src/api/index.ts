@@ -51,7 +51,9 @@ class RequestHttp {
                     config.url === '/core/auth/passkey/begin' ||
                     config.url === '/core/auth/passkey/finish' ||
                     config.url === '/core/auth/oidc/begin' ||
-                    config.url === '/core/auth/oidc/finish'
+                    config.url === '/core/auth/oidc/finish' ||
+                    config.url === '/core/auth/saml2/begin' ||
+                    config.url === '/core/auth/saml2/finish'
                 ) {
                     config.headers.EntranceCode = encodeBase64(globalStore.entrance);
                 }

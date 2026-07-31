@@ -9,6 +9,7 @@ import (
 type AuthProvider interface {
 	Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, string, error)
 	MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, string, error)
+	PrepareLogout(c *gin.Context) (*dto.LogoutResult, error)
 
 	ResetSuperAdminUser(name, password string) error
 

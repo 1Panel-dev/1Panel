@@ -210,6 +210,7 @@ const message = {
             username: 'Usuario',
             password: 'Contraseña',
             passkey: 'Inicio de sesión con Passkey',
+            otherLoginMethods: 'Otros métodos de inicio de sesión',
             welcome: 'Bienvenido de nuevo. Inicia sesión con tu usuario y contraseña.',
             errorAuthInfo: 'Usuario o contraseña incorrectos, inténtalo nuevamente.',
             errorMfaInfo: 'Información de autenticación inválida, inténtalo nuevamente.',
@@ -5148,7 +5149,7 @@ const message = {
                         'HS256 utiliza un secreto simétrico compartido para las firmas ID Token. Úselo solo cuando el proveedor no pueda usar un algoritmo asimétrico.',
                     identityBindingPolicy:
                         'La identidad se fija en AuthSourceID + issuer + subject. La coincidencia por nombre de usuario nunca reclama otra cuenta.',
-                    identityMissing: 'La fuente de identidad OIDC ha cambiado; esta identidad ya no está activa.',
+                    identityMissing: 'Identidad inactiva',
                     issuer: 'Issuer URL',
                     issuerHelper:
                         'El valor iss de ID Token y Discovery issuer deben coincidir exactamente con este valor.',
@@ -5291,7 +5292,129 @@ const message = {
                     userMappingDesc:
                         'Configure el nombre de usuario OIDC y el rol predeterminado para el primer inicio de sesión.',
                 },
+                saml2: {
+                    actionCreate: 'Crear usuario',
+                    actionPending: 'Esperando resultado',
+                    actionReject: 'Rechazar inicio de sesión',
+                    actionReuse: 'Usar usuario vinculado',
+                    assignDefaultRole: 'Asignar rol predeterminado: {role}',
+                    basic: 'Configuración básica',
+                    basicDesc:
+                        'Configure las opciones comunes requeridas por la mayoría de los proveedores SAML2 estándar.',
+                    browserTest: 'Probar inicio de sesión',
+                    browserTestConflict: 'Identidad verificada, pero el nombre de usuario está en conflicto',
+                    browserTestConflictHelper:
+                        'El nombre de usuario asignado pertenece a otra identidad y no se vinculará.',
+                    browserTestExpired: 'La prueba del navegador expiró',
+                    browserTestExpiredHelper:
+                        'Inicie una nueva prueba del navegador y complete la autorización antes de que caduque.',
+                    browserTestFailed: 'La prueba del navegador falló',
+                    browserTestFailedHelper:
+                        'No se pudo completar la vista previa de la identidad. Revise el error de backend localizado.',
+                    browserTestIsolation:
+                        'Esto realiza un flujo de autorización real de ida y vuelta, pero no crea ni actualiza usuarios, no asigna roles ni crea una sesión de autenticación real.',
+                    browserTestPopupBlocked:
+                        'Permite ventanas emergentes para este sitio, luego inicia la prueba del navegador nuevamente.',
+                    browserTestPopupClosed: 'La ventana de autorización se cerró antes de completar la prueba.',
+                    browserTestSuccess: 'Verificación del proveedor correcta',
+                    browserTestSuccessHelper:
+                        'Se obtuvo una vista previa de la asignación de identidad sin cambiar usuarios o sesiones.',
+                    browserTestTitle: 'Inicio de sesión de prueba del navegador SAML2',
+                    browserTestWaiting: 'Esperando la autorización del proveedor',
+                    browserTestWaitingHelper:
+                        'Inicio de sesión completo en la nueva ventana del navegador. Esta página se actualizará automáticamente.',
+                    certificateFileInvalid: 'Seleccione un archivo de certificado PEM, CRT o CER válido.',
+                    configured: 'Configurado',
+                    configurationFailedHelper:
+                        'La prueba falló. La página solo muestra el error de backend localizado.',
+                    configurationNotTested: 'La configuración actual no se ha probado.',
+                    configurationPassed: 'La configuración actual pasó las comprobaciones de seguridad y capacidad.',
+                    configurationStaleHelper:
+                        'Se cambiaron las configuraciones sensibles a la autenticación. Pruebe el borrador actual nuevamente.',
+                    configurationTestSuccess: 'La prueba de configuración del SAML2 fue exitosa.',
+                    configurationTesting: 'Probando la configuración actual del SAML2…',
+                    conflictLDAP: 'Usuario LDAP',
+                    conflictLocal: 'Usuario local',
+                    conflictNone: 'Sin conflicto',
+                    conflictOIDC: 'Otra identidad OIDC',
+                    conflictSAML2: 'Otra identidad SAML2',
+                    conflictType: 'Tipo de conflicto',
+                    credentialFileReadFailed: 'No se pudo leer el archivo de credenciales.',
+                    credentialFileTooLarge: 'Los archivos de credenciales no deben superar los 256 KiB.',
+                    credentialsRequired: 'Configure la clave privada y el certificado del SP.',
+                    defaultRole: 'Rol del nuevo usuario',
+                    defaultRoleHelper:
+                        'Se asigna solo en la primera creación; los inicios posteriores conservan roles, MFA y permisos locales.',
+                    defaultRolePlaceholder: 'Seleccione un rol',
+                    defaultRoleRequired: 'Seleccione un rol predeterminado válido.',
+                    disableConfirm:
+                        'Desactivar SAML2 rechaza inmediatamente los nuevos inicios de sesión e invalida sus sesiones de usuario. ¿Continuar?',
+                    disableDiscardConfirm:
+                        'Desactivar SAML2 descarta otros cambios no guardados de esta página e invalida de inmediato sus sesiones de usuario. ¿Continuar?',
+                    disableTitle: 'Desactivar SAML2',
+                    disabled: 'Desactivado',
+                    enable: 'Activar',
+                    enabled: 'Activado',
+                    idpMetadata: 'Metadatos del IdP',
+                    idpMetadataDesc: 'Introduzca una URL o pegue el XML. Si existen ambos, la URL tiene prioridad.',
+                    keepExistingRole: 'Mantener los roles y permisos locales existentes',
+                    loginWith: 'Iniciar sesión con {provider}',
+                    mappingResult: 'Resultado de la asignación',
+                    metadataRequired: 'Introduzca la URL o el XML de metadatos del IdP.',
+                    metadataURLHelper: 'El backend descarga y valida los metadatos durante la prueba y el guardado.',
+                    metadataURLInvalid: 'Introduzca una URL HTTPS de metadatos válida, sin credenciales ni fragmento.',
+                    metadataURLRecommended: 'URL de metadatos (recomendada)',
+                    metadataXML: 'XML de metadatos',
+                    metadataXMLHelper: 'Úselo cuando el IdP no exponga una URL de metadatos accesible.',
+                    metadataXMLInvalid: 'Introduzca un XML de metadatos EntityDescriptor válido.',
+                    metadataXMLPlaceholder: 'Pegue <EntityDescriptor>...</EntityDescriptor>',
+                    nameAttribute: 'Atributo de nombre de usuario',
+                    nameAttributeHelper:
+                        'Lee este atributo de la aserción SAML verificada y lo asigna al nombre de usuario de 1Panel.',
+                    nameAttributePlaceholder: 'Por ejemplo: uid, username o account',
+                    nameAttributeRequired: 'Introduzca el atributo de nombre de usuario.',
+                    notConfigured: 'Sin configurar',
+                    or: 'o',
+                    pageDesc:
+                        'Conecte el SSO empresarial mediante metadatos del IdP con las opciones comunes en una sola página.',
+                    plannedHandling: 'Manejo planificado',
+                    privateKeyFileInvalid: 'Seleccione un archivo de clave privada PEM válido.',
+                    recentTestSuccess: 'Última prueba correcta: {0}',
+                    restore: 'Restaurar',
+                    restored: 'Se restauró la última configuración de SAML2 guardada.',
+                    roleHandling: 'Gestión de roles',
+                    rolesLoadFailed:
+                        'No se pudieron cargar los roles. Vuelva a intentarlo antes de seleccionar el rol predeterminado.',
+                    selectFile: 'Seleccionar archivo',
+                    serviceStatus: 'Estado del servicio',
+                    serviceStatusDesc: 'La configuración actual debe superar una prueba antes de activar SAML2.',
+                    settingLoadFailed: 'La configuración del SAML2 no se pudo cargar',
+                    settingLoadFailedHelper:
+                        'El formulario está bloqueado para evitar guardar una configuración predeterminada vacía sobre la configuración actual. Vuelva a intentarlo después de que se recupere la conexión.',
+                    spCertificate: 'Certificado del SP',
+                    spCertificateHelper:
+                        'Se publica en los metadatos del SP para que el IdP pueda verificar las solicitudes de inicio y cierre de sesión.',
+                    spCredentials: 'Clave privada y certificado del SP',
+                    spCredentialsDesc:
+                        'Se usan para firmar mensajes de inicio y cierre de sesión. El backend fija la política de firma y validación.',
+                    spPrivateKey: 'Clave privada del SP',
+                    spPrivateKeyHelper:
+                        'Se usa para firmar AuthnRequest y mensajes de cierre de sesión. Se cifra en reposo y nunca se muestra.',
+                    syncLogout: 'Cierre de sesión sincronizado',
+                    syncLogoutHelper:
+                        'Cerrar sesión en 1Panel o en el proveedor de identidad también cierra la sesión del otro lado.',
+                    testBeforeBrowserTest:
+                        'Pruebe la configuración actual antes de iniciar la prueba de inicio de sesión en el navegador.',
+                    testBeforeEnable: 'Prueba la configuración actual antes de habilitar o guardar cambios sensibles.',
+                    testConfiguration: 'Probar configuración',
+                    unsavedChanges: 'Hay cambios de SAML2 sin guardar.',
+                    usedAttribute: 'Atributo de nombre de usuario utilizado',
+                    usersAndRoles: 'Usuarios y roles',
+                    usersAndRolesDesc:
+                        'Solo se asigna un nombre de usuario. El usuario de 1Panel se crea automáticamente en el primer inicio de sesión correcto.',
+                },
                 ldap: {
+                    basic: 'Configuración básica',
                     enable: 'Habilitar',
                     enabled: 'Habilitado',
                     disabled: 'Deshabilitado',

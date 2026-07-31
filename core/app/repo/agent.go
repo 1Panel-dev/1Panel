@@ -10,6 +10,13 @@ type AgentRepo struct{}
 type IAgentRepo interface {
 	GetWebsiteSSL(opts ...global.DBOption) (model.WebsiteSSL, error)
 	GetCA(opts ...global.DBOption) (model.WebsiteCA, error)
+	GetSettingValue(key string) (string, error)
+}
+
+func (a *AgentRepo) GetSettingValue(key string) (string, error) {
+	var setting model.Setting
+	err := global.AgentDB.Model(&model.Setting{}).Where("key = ?", key).First(&setting).Error
+	return setting.Value, err
 }
 
 func NewIAgentRepo() IAgentRepo {

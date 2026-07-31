@@ -33,6 +33,30 @@ export namespace Login {
     export interface OIDCFinishRequest {
         ticket: string;
     }
+    export interface SAML2Status {
+        enabled: boolean;
+        displayName: string;
+        syncLogout: boolean;
+    }
+    export interface SAML2RedirectNavigation {
+        binding: 'redirect';
+        redirectURL: string;
+    }
+    export interface SAML2PostNavigation {
+        binding: 'post';
+        postURL: string;
+        fields: Record<string, string>;
+    }
+    export type SAML2Navigation = SAML2RedirectNavigation | SAML2PostNavigation;
+    export interface SAML2BeginResponse {
+        navigation: SAML2Navigation;
+    }
+    export interface SAML2FinishRequest {
+        ticket: string;
+    }
+    export interface LogOutResponse {
+        saml2Navigation?: SAML2Navigation;
+    }
     export interface ResCaptcha {
         imagePath: string;
         captchaID: string;

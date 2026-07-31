@@ -21,14 +21,20 @@ func GetMFASessionStore() *mfaSessionStore {
 }
 
 type mfaSession struct {
-	Name                    string
-	Entrance                string
-	IP                      string
-	AuthSource              string
-	AuthSourceID            uint
-	AuthSourceConfigVersion uint64
-	Failures                int
-	ExpiresAt               time.Time
+	Name                     string
+	Entrance                 string
+	IP                       string
+	AuthSource               string
+	AuthSourceID             uint
+	AuthSourceConfigVersion  uint64
+	ExternalIssuer           string
+	ExternalNameID           string
+	ExternalNameIDFormat     string
+	ExternalSessionIndex     string
+	ExternalSessionExpiresAt time.Time
+	ExternalSessionRequired  bool
+	Failures                 int
+	ExpiresAt                time.Time
 }
 
 type mfaSessionStore struct {
@@ -61,6 +67,26 @@ func (s *mfaSessionStore) SetWithAuthSource(
 		AuthSource:              authSource,
 		AuthSourceID:            authSourceID,
 		AuthSourceConfigVersion: authSourceConfigVersion,
+	})
+}
+
+func (s *mfaSessionStore) SetWithAuthSourceSession(
+	name, entrance, ip, authSource string,
+	authSourceID uint,
+	authSourceConfigVersion uint64,
+	externalIssuer, externalNameID, externalNameIDFormat, externalSessionIndex string,
+	externalSessionExpiresAt time.Time,
+	externalSessionRequired bool,
+) string {
+	return s.store.Set(mfaSession{
+		Name: name, Entrance: entrance, IP: ip,
+		AuthSource: authSource, AuthSourceID: authSourceID,
+		AuthSourceConfigVersion: authSourceConfigVersion,
+		ExternalIssuer:          externalIssuer, ExternalNameID: externalNameID,
+		ExternalNameIDFormat:     externalNameIDFormat,
+		ExternalSessionIndex:     externalSessionIndex,
+		ExternalSessionExpiresAt: externalSessionExpiresAt,
+		ExternalSessionRequired:  externalSessionRequired,
 	})
 }
 

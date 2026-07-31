@@ -13,6 +13,20 @@ type UserLoginInfo struct {
 	MfaSession string `json:"mfaSession"`
 }
 
+// AuthNavigation describes a browser handoff to an external identity provider.
+// RedirectURL is used for HTTP-Redirect binding; PostURL and Fields are used
+// for an auto-submitted HTTP-POST form.
+type AuthNavigation struct {
+	Binding     string            `json:"binding"`
+	RedirectURL string            `json:"redirectURL,omitempty"`
+	PostURL     string            `json:"postURL,omitempty"`
+	Fields      map[string]string `json:"fields,omitempty"`
+}
+
+type LogoutResult struct {
+	SAML2Navigation *AuthNavigation `json:"saml2Navigation,omitempty"`
+}
+
 type PasskeyBeginResponse struct {
 	SessionID string      `json:"sessionId"`
 	PublicKey interface{} `json:"publicKey"`

@@ -101,6 +101,7 @@ import { getAgentSettingInfo } from '@/api/modules/setting';
 import { computed, onMounted, ref } from 'vue';
 import bus from '@/global/bus';
 import { logOutApi } from '@/api/modules/auth';
+import { submitSAML2Navigation } from '@/utils/saml2';
 import router from '@/routers';
 import { loadProductProFromDB } from '@/utils/xpack';
 import { routerToNameWithQuery } from '@/utils/router';
@@ -277,9 +278,18 @@ const logout = () => {
         type: 'warning',
     })
         .then(async () => {
-            await logOutApi();
+            const res = await logOutApi();
             globalStore.setLogStatus(false);
             globalStore.clearAuthInfo();
+            if (res.data?.saml2Navigation) {
+                try {
+                    submitSAML2Navigation(res.data.saml2Navigation);
+                    return;
+                } catch {
+                    // The backend has already invalidated the local session.
+                    // Fall back to the login page if the IdP handoff is unusable.
+                }
+            }
             router.push({ name: 'entrance', params: { code: entrance.value } });
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })

@@ -76,19 +76,40 @@
                             {{ $t('commons.login.passkey') }}
                         </el-button>
                     </el-form-item>
-                    <el-form-item v-if="oidcEnabled">
-                        <el-button
-                            class="w-full oidc-login-button"
-                            size="default"
-                            native-type="button"
-                            :loading="oidcStarting"
-                            @click="beginOIDCLogin"
-                            @keydown.enter.stop.prevent="beginOIDCLogin"
-                        >
-                            <el-icon class="mr-2"><Connection /></el-icon>
-                            {{ $t('xpack.user.auth.oidc.loginWith', { provider: oidcDisplayName }) }}
-                        </el-button>
-                    </el-form-item>
+                    <div v-if="oidcEnabled || saml2Enabled" class="external-login-section">
+                        <div class="external-login-divider">
+                            <span>{{ $t('commons.login.otherLoginMethods') }}</span>
+                        </div>
+                        <div class="external-login-methods">
+                            <el-button
+                                v-if="oidcEnabled"
+                                class="external-login-button oidc-login-button"
+                                link
+                                native-type="button"
+                                :aria-label="$t('xpack.user.auth.oidc.loginWith', { provider: oidcDisplayName })"
+                                :loading="oidcStarting"
+                                @click="beginOIDCLogin"
+                            >
+                                <span>{{ oidcDisplayName }}</span>
+                            </el-button>
+                            <span
+                                v-if="oidcEnabled && saml2Enabled"
+                                class="external-login-separator"
+                                aria-hidden="true"
+                            ></span>
+                            <el-button
+                                v-if="saml2Enabled"
+                                class="external-login-button saml2-login-button"
+                                link
+                                native-type="button"
+                                :aria-label="$t('xpack.user.auth.saml2.loginWith', { provider: saml2DisplayName })"
+                                :loading="saml2Starting"
+                                @click="beginSAML2Login"
+                            >
+                                <span>{{ saml2DisplayName }}</span>
+                            </el-button>
+                        </div>
+                    </div>
                     <el-form-item>
                         <el-link type="primary" :underline="false" @click="switchToPasswordLogin">
                             {{ $t('commons.login.passkeyToPassword') }}
@@ -207,19 +228,40 @@
                                 {{ $t('commons.button.login') }}
                             </el-button>
                         </el-form-item>
-                        <el-form-item v-if="oidcEnabled">
-                            <el-button
-                                class="w-full oidc-login-button"
-                                size="default"
-                                native-type="button"
-                                :loading="oidcStarting"
-                                @click="beginOIDCLogin"
-                                @keydown.enter.stop.prevent="beginOIDCLogin"
-                            >
-                                <el-icon class="mr-2"><Connection /></el-icon>
-                                {{ $t('xpack.user.auth.oidc.loginWith', { provider: oidcDisplayName }) }}
-                            </el-button>
-                        </el-form-item>
+                        <div v-if="oidcEnabled || saml2Enabled" class="external-login-section">
+                            <div class="external-login-divider">
+                                <span>{{ $t('commons.login.otherLoginMethods') }}</span>
+                            </div>
+                            <div class="external-login-methods">
+                                <el-button
+                                    v-if="oidcEnabled"
+                                    class="external-login-button oidc-login-button"
+                                    link
+                                    native-type="button"
+                                    :aria-label="$t('xpack.user.auth.oidc.loginWith', { provider: oidcDisplayName })"
+                                    :loading="oidcStarting"
+                                    @click="beginOIDCLogin"
+                                >
+                                    <span>{{ oidcDisplayName }}</span>
+                                </el-button>
+                                <span
+                                    v-if="oidcEnabled && saml2Enabled"
+                                    class="external-login-separator"
+                                    aria-hidden="true"
+                                ></span>
+                                <el-button
+                                    v-if="saml2Enabled"
+                                    class="external-login-button saml2-login-button"
+                                    link
+                                    native-type="button"
+                                    :aria-label="$t('xpack.user.auth.saml2.loginWith', { provider: saml2DisplayName })"
+                                    :loading="saml2Starting"
+                                    @click="beginSAML2Login"
+                                >
+                                    <span>{{ saml2DisplayName }}</span>
+                                </el-button>
+                            </div>
+                        </div>
                         <el-text v-if="isDemo" type="danger" class="demo">
                             {{ $t('commons.login.username') }}:demo {{ $t('commons.login.password') }}:1panel
                         </el-text>
@@ -280,6 +322,9 @@ import {
     oidcStatusApi,
     oidcBeginApi,
     oidcFinishApi,
+    saml2StatusApi,
+    saml2BeginApi,
+    saml2FinishApi,
 } from '@/api/modules/auth';
 import type { Login as LoginModel } from '@/api/interface/auth';
 import { MenuStore, TabsStore } from '@/store';
@@ -288,11 +333,12 @@ import { useI18n } from 'vue-i18n';
 import { encryptPassword, base64UrlToBuffer, bufferToBase64Url } from '@/utils/auth';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 import { routerToName } from '@/utils/router';
-import { Connection, Key } from '@element-plus/icons-vue';
+import { Key } from '@element-plus/icons-vue';
 import { changeToLocal } from '@/utils/node';
 import { syncAuthInfo } from '@/utils/rbac';
 import { adjustColorToRGBA } from '@/utils/color';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { submitSAML2Navigation } from '@/utils/saml2';
 
 const i18n = useI18n();
 const {
@@ -323,6 +369,9 @@ const passkeySupported = ref(false);
 const oidcEnabled = ref(false);
 const oidcDisplayName = ref('OIDC');
 const oidcStarting = ref(false);
+const saml2Enabled = ref(false);
+const saml2DisplayName = ref('SAML2');
+const saml2Starting = ref(false);
 const autoPasskeyEnabledKey = '1panel-passkey-auto-enabled';
 const showPasswordLogin = ref(false);
 const isDemo = ref(false);
@@ -330,21 +379,26 @@ const open = ref(false);
 const loginBtnLinkColor = ref<string | null>(null);
 let loginViewActive = true;
 
-const takeOIDCTicketFromURL = () => {
+const takeExternalTicketsFromURL = () => {
     const url = new URL(window.location.href);
     const fragmentParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash);
-    const ticket = fragmentParams.get('oidc_ticket') || url.searchParams.get('oidc_ticket') || '';
-    if (!ticket) return '';
+    const oidcTicket = fragmentParams.get('oidc_ticket') || url.searchParams.get('oidc_ticket') || '';
+    const saml2Ticket = fragmentParams.get('saml2_ticket') || url.searchParams.get('saml2_ticket') || '';
+    if (!oidcTicket && !saml2Ticket) return { oidcTicket: '', saml2Ticket: '' };
     fragmentParams.delete('oidc_ticket');
+    fragmentParams.delete('saml2_ticket');
     url.searchParams.delete('oidc_ticket');
+    url.searchParams.delete('saml2_ticket');
     const sanitizedFragment = fragmentParams.toString();
     url.hash = sanitizedFragment ? `#${sanitizedFragment}` : '';
     const sanitizedURL = `${url.pathname}${url.search}${url.hash}`;
     window.history.replaceState(window.history.state, '', sanitizedURL);
-    return ticket;
+    return { oidcTicket, saml2Ticket };
 };
-const pendingOIDCTicket = takeOIDCTicketFromURL();
-const hasPendingOIDCTicket = Boolean(pendingOIDCTicket);
+const pendingExternalTickets = takeExternalTicketsFromURL();
+const pendingOIDCTicket = pendingExternalTickets.oidcTicket;
+const pendingSAML2Ticket = pendingOIDCTicket ? '' : pendingExternalTickets.saml2Ticket;
+const hasPendingExternalTicket = Boolean(pendingOIDCTicket || pendingSAML2Ticket);
 
 type FormInstance = InstanceType<typeof ElForm>;
 const _isMobile = () => {
@@ -683,6 +737,54 @@ const finishOIDCLogin = async (ticket: string) => {
     }
 };
 
+const loadSAML2Status = async () => {
+    saml2Enabled.value = false;
+    if (!isEnterprise.value) return;
+    try {
+        const res = await saml2StatusApi();
+        saml2Enabled.value = Boolean(res.data.enabled);
+        saml2DisplayName.value = res.data.displayName?.trim() || 'SAML2';
+    } catch {
+        // SAML2 is optional. A status failure must not affect any other login method.
+        saml2Enabled.value = false;
+    }
+};
+
+const beginSAML2Login = async () => {
+    if (isLoggingIn || !saml2Enabled.value) return;
+    try {
+        isLoggingIn = true;
+        saml2Starting.value = true;
+        const res = await saml2BeginApi();
+        try {
+            submitSAML2Navigation(res.data.navigation);
+        } catch {
+            MsgError(i18n.t('commons.msg.operationFailed'));
+        }
+    } catch {
+        // The request layer displays the backend-localized error.
+    } finally {
+        isLoggingIn = false;
+        saml2Starting.value = false;
+    }
+};
+
+const finishSAML2Login = async (ticket: string) => {
+    if (!ticket) return;
+    try {
+        isLoggingIn = true;
+        loading.value = true;
+        const res = await saml2FinishApi({ ticket });
+        ignoreCaptcha.value = true;
+        await handleLoginResult(res.data);
+    } catch {
+        // The ticket was already removed from the URL; the request layer displays the localized failure.
+    } finally {
+        isLoggingIn = false;
+        loading.value = false;
+    }
+};
+
 const normalizePasskeyRequest = (publicKey: Record<string, any>): PublicKeyCredentialRequestOptions => {
     const request = { ...publicKey };
     request.challenge = base64UrlToBuffer(request.challenge);
@@ -747,7 +849,7 @@ const getSetting = async () => {
         if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {
             loginForm.agreeLicense = true;
         }
-        if (passkeySetting.value && passkeySupported.value && isAutoPasskeyEnabled() && !hasPendingOIDCTicket) {
+        if (passkeySetting.value && passkeySupported.value && isAutoPasskeyEnabled() && !hasPendingExternalTicket) {
             passkeyLogin();
         }
     } catch (error) {}
@@ -767,8 +869,8 @@ const applyLoginButtonTheme = () => {
 };
 
 function loginKeydownHandler(e: KeyboardEvent) {
-    const event = (window.event || e) as KeyboardEvent;
-    if (event.defaultPrevented || (event.target as HTMLElement | null)?.closest('.oidc-login-button')) return;
+    const event = e;
+    if (event.defaultPrevented || (event.target as HTMLElement | null)?.closest('.external-login-button')) return;
     if (event.key === 'Enter' || event.keyCode === 13) {
         if (!mfaShow.value) {
             if (!loginButtonFocused.value) {
@@ -795,10 +897,12 @@ onMounted(async () => {
     if (!loginViewActive) return;
     if (pendingOIDCTicket) {
         await finishOIDCLogin(pendingOIDCTicket);
+    } else if (pendingSAML2Ticket) {
+        await finishSAML2Login(pendingSAML2Ticket);
     }
     if (!loginViewActive || isLogin.value) return;
     if (!isLogin.value && !mfaShow.value) {
-        await loadOIDCStatus();
+        await Promise.all([loadOIDCStatus(), loadSAML2Status()]);
     }
     try {
         await getXpackSettingForTheme();
@@ -858,16 +962,59 @@ onBeforeUnmount(() => {
         }
     }
 
-    .oidc-login-button {
-        border-color: var(--login-btn-link-color);
-        background: transparent;
-        color: var(--login-btn-link-color);
+    .external-login-section {
+        width: 100%;
+        padding-top: 2px;
+    }
 
-        &:hover,
-        &:focus-visible {
-            border-color: var(--login-btn-link-hover-color) !important;
-            background: var(--login-loading-mask-color) !important;
+    .external-login-divider {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: var(--el-text-color-secondary);
+        font-size: 13px;
+        white-space: nowrap;
+
+        &::before,
+        &::after {
+            width: 100%;
+            border-top: 1px dashed var(--el-border-color-light);
+            content: '';
+        }
+    }
+
+    .external-login-methods {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 10px 12px;
+        margin-top: 12px;
+    }
+
+    .external-login-separator {
+        width: 1px;
+        height: 14px;
+        background-color: var(--el-border-color);
+    }
+
+    .external-login-button {
+        height: auto;
+        margin: 0 !important;
+        padding: 5px 2px;
+        border: 0;
+        background: transparent !important;
+        color: var(--login-btn-link-color);
+        font-size: 14px;
+
+        &:hover {
             color: var(--login-btn-link-hover-color) !important;
+        }
+
+        &:focus-visible {
+            border-radius: 3px;
+            outline: 2px solid var(--login-btn-link-color) !important;
+            outline-offset: 2px;
         }
     }
 
