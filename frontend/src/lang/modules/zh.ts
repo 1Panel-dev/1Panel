@@ -138,6 +138,8 @@ const message = {
             manageGroup: '管理分组',
             backToList: '返回列表',
             keepEdit: '继续编辑',
+            pin: '置顶',
+            unpin: '取消置顶',
         },
         loadingText: {
             Upgrading: '系统升级中，请稍候...',
@@ -3492,8 +3494,6 @@ const message = {
         runtimePortWarn: '当前运行环境没有端口，无法代理',
         cacheWarn: '请先关闭反代中的缓存开关',
         loadBalanceHelper: '创建负载均衡后，请前往‘反向代理’，添加代理并将后端地址设置为：http://<负载均衡名称>。',
-        favorite: '收藏',
-        cancelFavorite: '取消收藏',
         useProxy: '使用代理',
         useProxyHelper: '使用面板设置中的代理服务器地址',
         westCN: '西部数码',

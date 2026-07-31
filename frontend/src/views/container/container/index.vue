@@ -63,8 +63,6 @@
                     row-key="containerID"
                     @sort-change="search"
                     @search="search"
-                    @cell-mouse-enter="showFavorite"
-                    @cell-mouse-leave="hideFavorite"
                     :row-style="{ height: '65px' }"
                     style="width: 100%"
                     :columns="columns"
@@ -82,24 +80,26 @@
                         :fixed="isMobile ? false : 'left'"
                         show-overflow-tooltip
                     >
-                        <template #default="{ row, $index }">
+                        <template #default="{ row }">
                             <el-text type="primary" class="cursor-pointer" @click="onInspect(row)">
                                 {{ row.name }}
                             </el-text>
 
                             <div class="float-right">
                                 <el-tooltip
-                                    :content="row.isPinned ? $t('website.cancelFavorite') : $t('website.favorite')"
-                                    v-if="row.isPinned || hoveredRowIndex === $index"
+                                    :content="row.isPinned ? $t('commons.table.unpin') : $t('commons.table.pin')"
                                 >
                                     <el-button
+                                        class="container-pin-button"
+                                        :class="{ 'is-pinned': row.isPinned }"
                                         link
                                         size="large"
-                                        :icon="row.isPinned ? 'StarFilled' : 'Star'"
-                                        type="warning"
+                                        :type="row.isPinned ? 'warning' : 'info'"
                                         v-permission
                                         @click="changePinned(row, true)"
-                                    />
+                                    >
+                                        <svg-icon iconName="p-pushpin" className="container-pin-icon" />
+                                    </el-button>
                                 </el-tooltip>
                             </div>
                         </template>
@@ -183,7 +183,7 @@
                                 </div>
                                 <el-popover placement="right" width="500px" class="float-right">
                                     <template #reference>
-                                        <svg-icon iconName="p-xiangqing" class="svg-icon"></svg-icon>
+                                        <svg-icon iconName="p-xiangqing" className="resource-detail-icon"></svg-icon>
                                     </template>
                                     <template #default>
                                         <el-descriptions direction="vertical" border :column="3" size="small">
@@ -550,7 +550,6 @@ const taskLogRef = ref();
 const tags = ref([]);
 const activeTag = ref('all');
 
-const hoveredRowIndex = ref(-1);
 const activeDropdownContainerId = ref('');
 const statFields = [
     'cpuTotalUsage',
@@ -753,12 +752,6 @@ const searchWithAppShow = (item: any) => {
     search();
 };
 
-const showFavorite = (row: any) => {
-    hoveredRowIndex.value = data.value.findIndex((item) => item === row);
-};
-const hideFavorite = () => {
-    hoveredRowIndex.value = -1;
-};
 const changePinned = (row: any, isPinned: boolean) => {
     let params = {
         id: row.containerID,
@@ -1102,7 +1095,7 @@ onMounted(() => {
 .source-font {
     font-size: 12px;
 }
-.svg-icon {
+.resource-detail-icon {
     margin-top: -3px;
     font-size: 6px;
     cursor: pointer;
@@ -1121,5 +1114,25 @@ onMounted(() => {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+.container-pin-button {
+    opacity: 0.72;
+    transition: opacity 0.2s;
+
+    &:hover,
+    &:focus-visible {
+        opacity: 1;
+    }
+
+    &.is-pinned {
+        opacity: 1;
+    }
+
+    :deep(.container-pin-icon) {
+        width: 1em;
+        height: 1em;
+        padding: 0;
+        vertical-align: middle;
+    }
 }
 </style>

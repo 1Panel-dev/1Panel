@@ -142,6 +142,8 @@ const message = {
             manageGroup: 'グループ管理',
             backToList: 'リストに戻る',
             keepEdit: '編集を続ける',
+            pin: '上部に固定',
+            unpin: '固定を解除',
             default: 'デフォルト',
             noRefresh: '自動更新なし',
             creator: '作成者',
@@ -3773,8 +3775,6 @@ const message = {
         cacheWarn: 'まずリバースプロキシのキャッシュスイッチをオフにしてください',
         loadBalanceHelper:
             '負荷分散を作成した後、「リバースプロキシ」に移動し、プロキシを追加してバックエンドアドレスを次のように設定してください：http://<負荷分散名>。',
-        favorite: 'お気に入り',
-        cancelFavorite: 'お気に入りを解除',
         useProxy: 'プロキシを使用',
         useProxyHelper: 'パネル設定のプロキシサーバーアドレスを使用',
         westCN: '西部デジタル',

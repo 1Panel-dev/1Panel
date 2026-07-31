@@ -83,29 +83,21 @@
                 <span class="ml-1" v-if="mode === 'installed'">
                     <el-tooltip
                         effect="dark"
-                        :content="$t('website.cancelFavorite')"
+                        :content="installed.favorite ? $t('commons.table.unpin') : $t('commons.table.pin')"
                         placement="top-start"
-                        v-if="installed.favorite"
                     >
                         <el-button
                             v-permission
                             link
                             size="large"
-                            icon="StarFilled"
-                            type="warning"
+                            :type="installed.favorite ? 'warning' : 'info'"
                             :disabled="sortMode"
                             @click="$emit('favoriteInstall')"
-                        ></el-button>
-                    </el-tooltip>
-                    <el-tooltip effect="dark" :content="$t('website.favorite')" placement="top-start" v-else>
-                        <el-button
-                            v-permission
-                            link
-                            icon="Star"
-                            type="info"
-                            :disabled="sortMode"
-                            @click="$emit('favoriteInstall')"
-                        ></el-button>
+                        >
+                            <el-icon>
+                                <SvgIcon iconName="p-pushpin" />
+                            </el-icon>
+                        </el-button>
                     </el-tooltip>
                 </span>
             </div>

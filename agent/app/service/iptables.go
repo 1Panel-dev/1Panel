@@ -11,7 +11,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client/iptables"
 )
 
@@ -194,12 +193,6 @@ func (s *IptablesService) Operate(req dto.IptablesOp) error {
 			return err
 		}
 		_ = settingRepo.Update("IptablesStatus", constant.StatusEnable)
-		return nil
-	case "init-forward":
-		if err := client.EnableIptablesForward(); err != nil {
-			return err
-		}
-		_ = settingRepo.Update("IptablesForwardStatus", constant.StatusEnable)
 		return nil
 	case "init-advance":
 		if err := iptables.AddChain(iptables.FilterTab, iptables.Chain1PanelInput); err != nil {

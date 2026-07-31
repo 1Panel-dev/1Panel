@@ -75,8 +75,6 @@
                     :class="{ mask: disabledConfig }"
                     :heightDiff="310"
                     :columns="columns"
-                    @cell-mouse-enter="showFavorite"
-                    @cell-mouse-leave="hideFavorite"
                     localKey="websiteColumn"
                     v-model:selects="selects"
                     :tooltip-options="{
@@ -92,7 +90,7 @@
                         sortable
                         card-type="name"
                     >
-                        <template #default="{ row, $index, viewMode: columnViewMode }">
+                        <template #default="{ row, viewMode: columnViewMode }">
                             <div v-if="columnViewMode === 'card'" class="website-card-domain">
                                 <el-text
                                     type="primary"
@@ -104,7 +102,6 @@
                                 <Domain
                                     class="website-card-domain__actions"
                                     :row="row"
-                                    :is-hovered="true"
                                     :defaultHttpPort="appStatusRef?.getHttpPort?.() || 0"
                                     :defaultHttpsPort="appStatusRef?.getHttpsPort?.() || 0"
                                     :hide-name="true"
@@ -116,7 +113,6 @@
                             <Domain
                                 v-else
                                 :row="row"
-                                :is-hovered="hoveredRowIndex === $index"
                                 :defaultHttpPort="appStatusRef?.getHttpPort?.() || 0"
                                 :defaultHttpsPort="appStatusRef?.getHttpsPort?.() || 0"
                                 @favorite-change="favoriteWebsite"
@@ -415,7 +411,6 @@ const data = ref();
 let groups = ref<Group.GroupInfo[]>([]);
 const dataRef = ref();
 const columns = ref([]);
-const hoveredRowIndex = ref(-1);
 const websiteDir = ref();
 const selects = ref([]);
 const batchReq = reactive({
@@ -457,14 +452,6 @@ const tableSort = pageState.tableSort;
 
 const goRouter = async (key: string) => {
     routerToNameWithQuery('AppAll', { install: key });
-};
-
-const showFavorite = (row: any) => {
-    hoveredRowIndex.value = data.value.findIndex((item) => item === row);
-};
-
-const hideFavorite = () => {
-    hoveredRowIndex.value = -1;
 };
 
 const favoriteWebsite = (row: Website.Website) => {

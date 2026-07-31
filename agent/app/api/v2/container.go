@@ -882,6 +882,26 @@ func (b *BaseApi) ComposeUpdate(c *gin.Context) {
 }
 
 // @Tags Container Compose
+// @Summary Pin compose
+// @Accept json
+// @Param request body dto.ComposePin true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /containers/compose/pin [post]
+func (b *BaseApi) ComposePin(c *gin.Context) {
+	var req dto.ComposePin
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := containerService.ComposePin(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Container Compose
 // @Summary Load compose environment variables
 // @Accept json
 // @Param request body dto.FilePath true "request"

@@ -142,6 +142,8 @@ const message = {
             manageGroup: 'Gerenciar Grupos',
             backToList: 'Voltar à Lista',
             keepEdit: 'Continuar Editando',
+            pin: 'Fixar no topo',
+            unpin: 'Desafixar',
             default: 'Padrão',
             noRefresh: 'Sem atualização',
             creator: 'Criador',
@@ -3962,8 +3964,6 @@ const message = {
         cacheWarn: 'Por favor, desligue o interruptor de cache no proxy reverso primeiro',
         loadBalanceHelper:
             'Após criar o balanceamento de carga, vá para "Proxy Reverso", adicione um proxy e configure o endereço de backend para: http://<nome do balanceamento de carga>.',
-        favorite: 'Favorito',
-        cancelFavorite: 'Cancelar Favorito',
         useProxy: 'Usar Proxy',
         useProxyHelper: 'Usar o endereço do servidor proxy nas configurações do painel',
         westCN: 'West Digital',

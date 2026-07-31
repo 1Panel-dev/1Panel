@@ -147,6 +147,8 @@ const message = {
             manageGroup: 'Grupları Yönet',
             backToList: 'Listeye Dön',
             keepEdit: 'Düzenlemeye Devam Et',
+            pin: 'Üste sabitle',
+            unpin: 'Sabitlemeyi kaldır',
             creator: 'Oluşturan',
             updater: 'Güncelleyen',
         },
@@ -3817,8 +3819,6 @@ const message = {
         cacheWarn: 'Lütfen önce ters vekildeki önbellek anahtarını kapatın',
         loadBalanceHelper:
             'Bu bölüm yalnızca yük dengeleme kuralları oluşturur, kuralları kullanmak için lütfen http(s)://<yük dengeleme adı> adresine ters vekil yapın',
-        favorite: 'Favori',
-        cancelFavorite: 'Favoriyi İptal Et',
         useProxy: 'Vekil Kullan',
         useProxyHelper: 'Panel ayarlarındaki vekil sunucu adresini kullan',
         westCN: 'Batı Dijital',

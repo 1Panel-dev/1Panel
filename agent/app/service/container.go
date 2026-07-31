@@ -71,6 +71,7 @@ type IContainerService interface {
 	ComposeOperation(req dto.ComposeOperation) error
 	TestCompose(req dto.ComposeCreate) (bool, error)
 	ComposeUpdate(req dto.ComposeUpdate) error
+	ComposePin(req dto.ComposePin) error
 	ComposeLogClean(req dto.ComposeLogClean) error
 
 	ContainerCreate(req dto.ContainerOperate, inThread bool) error
@@ -2025,6 +2026,9 @@ func loadComposeCount(client *client.Client) int {
 		}
 	}
 	for _, compose := range composeCreatedByLocal {
+		if len(compose.Path) == 0 {
+			continue
+		}
 		if _, has := composeMap[compose.Name]; !has {
 			composeMap[compose.Name] = struct{}{}
 		}

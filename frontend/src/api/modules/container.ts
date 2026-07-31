@@ -240,6 +240,9 @@ export const composeOperate = (params: Container.ComposeOperation) => {
 export const composeUpdate = (params: Container.ComposeUpdate) => {
     return http.post(`/containers/compose/update`, params, TimeoutEnum.T_10M);
 };
+export const composePin = (params: Container.ComposePin) => {
+    return http.post(`/containers/compose/pin`, params);
+};
 
 // docker
 export const dockerOperate = (operation: string) => {

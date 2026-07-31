@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "4766969",
+      "name": "pushpin",
+      "font_class": "pushpin",
+      "unicode": "e7e3",
+      "unicode_decimal": 59363
+    },
+    {
       "icon_id": "14679640",
       "name": "qrcode",
       "font_class": "qrcode",

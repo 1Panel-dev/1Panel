@@ -38,13 +38,31 @@
                                             :class="{ 'is-active': currentCompose?.name === row.name && !isOnCreate }"
                                         >
                                             <div class="font-medium text-base compose-title">
-                                                {{ row.name }}
+                                                <span class="compose-title__name">{{ row.name }}</span>
                                                 <el-tooltip
                                                     v-if="!row.composeFileExists"
                                                     :content="$t('container.composeFileMissing')"
                                                 >
                                                     <el-button link icon="WarningFilled" @click.stop>
                                                         <WarningFilled />
+                                                    </el-button>
+                                                </el-tooltip>
+                                                <el-tooltip
+                                                    :content="
+                                                        row.isPinned
+                                                            ? $t('commons.table.unpin')
+                                                            : $t('commons.table.pin')
+                                                    "
+                                                >
+                                                    <el-button
+                                                        class="compose-pin-button"
+                                                        :class="{ 'is-pinned': row.isPinned }"
+                                                        link
+                                                        :type="row.isPinned ? 'warning' : 'info'"
+                                                        v-permission
+                                                        @click.stop="changePinned(row)"
+                                                    >
+                                                        <svg-icon iconName="p-pushpin" className="compose-pin-icon" />
                                                     </el-button>
                                                 </el-tooltip>
                                             </div>
@@ -222,7 +240,10 @@
                                             </div>
                                             <el-popover placement="right" width="500px" class="float-right">
                                                 <template #reference>
-                                                    <svg-icon iconName="p-xiangqing" class="svg-icon"></svg-icon>
+                                                    <svg-icon
+                                                        iconName="p-xiangqing"
+                                                        className="resource-detail-icon"
+                                                    ></svg-icon>
                                                 </template>
                                                 <template #default>
                                                     <el-descriptions
@@ -494,6 +515,7 @@ import Backups from '@/components/backup/index.vue';
 import Uploads from '@/components/upload/index.vue';
 import {
     composeOperate,
+    composePin,
     composeUpdate,
     containerItemStats,
     containerListStats,
@@ -651,6 +673,15 @@ const search = async (withRefreshDetail?: boolean) => {
         .finally(() => {
             loading.value = false;
         });
+};
+
+const changePinned = async (row: Container.ComposeInfo) => {
+    await composePin({
+        name: row.name,
+        isPinned: !row.isPinned,
+    });
+    await search(true);
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const loadDetail = async (row: Container.ComposeInfo, withRefresh: boolean) => {
@@ -958,7 +989,37 @@ const onOpenLog = (row: any) => {
 }
 
 .compose-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     transition: color 0.15s;
+}
+
+.compose-title__name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.compose-pin-button {
+    flex-shrink: 0;
+    margin-left: auto;
+    opacity: 0.72;
+    transition: opacity 0.2s;
+
+    &:hover,
+    &:focus-visible,
+    &.is-pinned {
+        opacity: 1;
+    }
+
+    :deep(.compose-pin-icon) {
+        width: 1em;
+        height: 1em;
+        padding: 0;
+        vertical-align: middle;
+    }
 }
 
 .compose-item.is-active .compose-title {
@@ -980,7 +1041,7 @@ const onOpenLog = (row: any) => {
     max-height: 40px;
 }
 
-.svg-icon {
+.resource-detail-icon {
     margin-top: -3px;
     font-size: 6px;
     cursor: pointer;

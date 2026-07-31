@@ -18,9 +18,6 @@ const (
 	BasicAfterFileName  = "1panel_basic_after.rules"
 	InputFileName       = "1panel_input.rules"
 	OutputFileName      = "1panel_out.rules"
-	ForwardFileName     = "1panel_forward.rules"
-	ForwardFileName1    = "1panel_forward_pre.rules"
-	ForwardFileName2    = "1panel_forward_post.rules"
 )
 
 func SaveRulesToFile(tab, chain, fileName string) error {

@@ -142,6 +142,8 @@ const message = {
             manageGroup: 'Urus Kumpulan',
             backToList: 'Kembali ke Senarai',
             keepEdit: 'Teruskan Mengedit',
+            pin: 'Semat ke atas',
+            unpin: 'Nyahsemat',
             default: 'Lalai',
             noRefresh: 'Tiada segar semula auto',
             creator: 'Pencipta',
@@ -3826,8 +3828,6 @@ const message = {
         cacheWarn: 'Sila matikan suis cache dalam pembalikan proksi terlebih dahulu',
         loadBalanceHelper:
             'Setelah mencipta pengimbang beban, sila pergi ke "Reverse Proxy", tambahkan proksi dan tetapkan alamat backend ke: http://<nama pengimbang beban>.',
-        favorite: 'Kegemaran',
-        cancelFavorite: 'Batalkan Kegemaran',
         useProxy: 'Gunakan Proksi',
         useProxyHelper: 'Gunakan alamat pelayan proksi dalam tetapan panel',
         westCN: 'West Digital',

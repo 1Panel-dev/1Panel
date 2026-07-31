@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 )
@@ -108,34 +107,6 @@ func (f *Firewall) ListPort() ([]FireInfo, error) {
 	return datas, nil
 }
 
-func (f *Firewall) ListForward() ([]FireInfo, error) {
-	if err := f.EnableForward(); err != nil {
-		global.LOG.Errorf("init port forward failed, err: %v", err)
-	}
-	stdout, err := cmd.NewCommandMgr().RunWithStdout("firewall-cmd", "--zone=public", "--list-forward-ports")
-	if err != nil {
-		return nil, err
-	}
-	var datas []FireInfo
-	for _, line := range strings.Split(stdout, "\n") {
-		line = strings.TrimSpace(line)
-		parts := strings.Split(line, ":")
-		if len(parts) < 4 {
-			continue
-		}
-		if parts[3] == "toaddr=" {
-			parts[3] = "127.0.0.1"
-		}
-		datas = append(datas, FireInfo{
-			Port:       strings.TrimPrefix(parts[0], "port="),
-			Protocol:   strings.TrimPrefix(parts[1], "proto="),
-			TargetIP:   strings.TrimPrefix(parts[3], "toaddr="),
-			TargetPort: strings.TrimPrefix(parts[2], "toport="),
-		})
-	}
-	return datas, nil
-}
-
 func (f *Firewall) ListAddress() ([]FireInfo, error) {
 	stdout, err := cmd.NewCommandMgr().RunWithStdout("firewall-cmd", "--zone=public", "--list-rich-rules")
 	if err != nil {
@@ -196,24 +167,6 @@ func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 	return nil
 }
 
-func (f *Firewall) PortForward(info Forward, operation string) error {
-	if cmd.CheckIllegal(operation, info.Port, info.Protocol, info.TargetIP, info.TargetPort) {
-		return buserr.New("ErrCmdIllegal")
-	}
-	forwardRule := fmt.Sprintf("--%s-forward-port=port=%s:proto=%s:toport=%s", operation, info.Port, info.Protocol, info.TargetPort)
-	if info.TargetIP != "" && info.TargetIP != "127.0.0.1" && info.TargetIP != "localhost" {
-		forwardRule = fmt.Sprintf("--%s-forward-port=port=%s:proto=%s:toaddr=%s:toport=%s", operation, info.Port, info.Protocol, info.TargetIP, info.TargetPort)
-	}
-
-	if err := cmd.NewCommandMgr().Run("firewall-cmd", "--zone=public", forwardRule, "--permanent"); err != nil {
-		return fmt.Errorf("%s port forward failed, %s", operation, err)
-	}
-	if err := f.Reload(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (f *Firewall) loadInfo(line string) FireInfo {
 	var itemRule FireInfo
 	ruleInfo := strings.Split(strings.ReplaceAll(line, "\"", ""), " ")
@@ -234,19 +187,4 @@ func (f *Firewall) loadInfo(line string) FireInfo {
 		}
 	}
 	return itemRule
-}
-
-func (f *Firewall) EnableForward() error {
-	stdout, err := cmd.NewCommandMgr().RunWithStdout("firewall-cmd", "--zone=public", "--query-masquerade")
-	if err != nil {
-		if strings.HasSuffix(strings.TrimSpace(stdout), "no") {
-			if err := cmd.NewCommandMgr().Run("firewall-cmd", "--zone=public", "--add-masquerade", "--permanent"); err != nil {
-				return err
-			}
-			return f.Reload()
-		}
-		return err
-	}
-
-	return nil
 }
