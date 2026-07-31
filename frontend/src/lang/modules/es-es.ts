@@ -3239,6 +3239,21 @@ const message = {
             'Primero copie el ID del dispositivo para obtener una licencia. Podrá iniciar sesión después de importarla.',
         licenseRequiredUserTip:
             'La licencia Enterprise Edition no está vinculada. Contacte con un superadministrador para importar la licencia.',
+        restoreCommunity: 'Restaurar Community Edition',
+        restoreCommunityOnline: 'Restauración en línea',
+        restoreCommunityOffline: 'Restauración sin conexión',
+        restoreCommunityPackageFound:
+            'Se detectó un paquete sin conexión de Community Edition válido. La restauración sin conexión está disponible.',
+        restoreCommunityPackageMissing:
+            'No se detectó ningún paquete sin conexión de Community Edition válido. La restauración sin conexión no está disponible actualmente.',
+        restoreCommunityOnlineHelper:
+            'Se descargará automáticamente el paquete Community Edition de la versión actual y se limpiarán los datos exclusivos de Enterprise.',
+        restoreCommunityOfflineHelper:
+            'Coloque en {path} un paquete oficial cuya versión no sea anterior a la versión Enterprise actual. El cambio se habilitará al detectar un paquete utilizable.',
+        restoreCommunityConfirm:
+            'Después del cambio, podrá iniciar sesión en Community Edition con la cuenta actual de superadministrador de Enterprise. Las bases de datos exclusivas de Enterprise se eliminarán durante el cambio.',
+        restoreCommunityStarting:
+            'Preparando Community Edition. El panel se reiniciará automáticamente cuando termine.',
         levelUpPro: 'Actualizar a la edición comercial',
         licenseSync: 'Sincronizar licencia',
         knowMorePro: 'Ver más',

@@ -3112,6 +3112,20 @@ const message = {
         licenseRequiredShortTip: '먼저 장치 ID를 복사해 라이선스를 받은 뒤, 라이선스를 가져오면 로그인할 수 있습니다.',
         licenseRequiredUserTip:
             'Enterprise Edition 라이선스가 바인딩되지 않았습니다. 슈퍼 관리자에게 라이선스 가져오기를 요청하세요.',
+        restoreCommunity: '커뮤니티 버전 복원',
+        restoreCommunityOnline: '온라인 복원',
+        restoreCommunityOffline: '오프라인 복원',
+        restoreCommunityPackageFound:
+            '사용 가능한 Community Edition 오프라인 설치 패키지가 감지되었습니다. 오프라인 복원을 실행할 수 있습니다.',
+        restoreCommunityPackageMissing:
+            '사용 가능한 Community Edition 오프라인 설치 패키지가 감지되지 않아 현재 오프라인 복원을 실행할 수 없습니다.',
+        restoreCommunityOnlineHelper:
+            '현재 버전의 커뮤니티 버전 패키지를 자동으로 다운로드하고 Enterprise 전용 데이터를 정리합니다.',
+        restoreCommunityOfflineHelper:
+            '현재 Enterprise 버전 이상인 공식 패키지를 {path}에 저장하세요. 사용 가능한 패키지가 감지되면 전환이 활성화됩니다.',
+        restoreCommunityConfirm:
+            '전환 후 현재 Enterprise 슈퍼 관리자 계정으로 커뮤니티 버전에 로그인할 수 있습니다. 전환 과정에서 Enterprise 전용 데이터베이스가 삭제됩니다.',
+        restoreCommunityStarting: '커뮤니티 버전을 준비 중입니다. 완료되면 패널이 자동으로 다시 시작됩니다.',
         technicalAdvice: '기술 상담',
         advice: '상담',
         levelUpPro: '상용 버전으로 업그레이드',

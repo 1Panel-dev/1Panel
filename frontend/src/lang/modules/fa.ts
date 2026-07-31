@@ -3147,6 +3147,21 @@ const message = {
         licenseRequiredShortTip:
             'لطفاً ابتدا شناسه دستگاه را کپی کنید تا مجوز دریافت کنید. پس از وارد کردن مجوز می‌توانید وارد شوید.',
         licenseRequiredUserTip: 'مجوز نسخه سازمانی متصل نیست. برای وارد کردن مجوز با ابرمدیر تماس بگیرید.',
+        restoreCommunity: 'بازیابی نسخه Community',
+        restoreCommunityOnline: 'بازیابی آنلاین',
+        restoreCommunityOffline: 'بازیابی آفلاین',
+        restoreCommunityPackageFound:
+            'یک بسته آفلاین قابل استفاده Community Edition شناسایی شد. بازیابی آفلاین در دسترس است.',
+        restoreCommunityPackageMissing:
+            'هیچ بسته آفلاین قابل استفاده Community Edition شناسایی نشد. بازیابی آفلاین در حال حاضر در دسترس نیست.',
+        restoreCommunityOnlineHelper:
+            'بسته نسخه Community برای نسخه فعلی به‌طور خودکار دانلود و داده‌های ویژه Enterprise پاک‌سازی می‌شوند.',
+        restoreCommunityOfflineHelper:
+            'یک بسته رسمی با نسخه‌ای قدیمی‌تر نبودن از نسخه فعلی Enterprise را در {path} قرار دهید. پس از شناسایی بسته قابل استفاده، تغییر نسخه فعال می‌شود.',
+        restoreCommunityConfirm:
+            'پس از تغییر، می‌توانید با حساب ابرمدیر فعلی Enterprise وارد نسخه Community شوید. پایگاه‌های داده ویژه Enterprise در طول تغییر حذف می‌شوند.',
+        restoreCommunityStarting:
+            'نسخه Community در حال آماده‌سازی است. پس از تکمیل، پنل به‌طور خودکار راه‌اندازی مجدد می‌شود.',
         levelUpPro: 'ارتقاء به نسخه تجاری',
         licenseSync: 'همگام‌سازی مجوز',
         knowMorePro: 'بیشتر بدانید',

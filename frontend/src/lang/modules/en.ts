@@ -3175,6 +3175,20 @@ const message = {
             'Please copy the device ID first to obtain a license. You can log in after importing the license.',
         licenseRequiredUserTip:
             'The Enterprise Edition license is not bound. Contact a super administrator to import the license.',
+        restoreCommunity: 'Restore Community Edition',
+        restoreCommunityOnline: 'Online restore',
+        restoreCommunityOffline: 'Offline restore',
+        restoreCommunityPackageFound:
+            'A usable offline Community Edition package was detected. Offline restore is available.',
+        restoreCommunityPackageMissing:
+            'No usable offline Community Edition package was detected. Offline restore is currently unavailable.',
+        restoreCommunityOnlineHelper:
+            'The Community Edition package for the current version will be downloaded automatically, and Enterprise-only data will be cleaned up.',
+        restoreCommunityOfflineHelper:
+            'Place an official package no older than the current Enterprise version in {path}. Switching is enabled after a usable package is detected.',
+        restoreCommunityConfirm:
+            'After switching, you can sign in to Community Edition with the current Enterprise super administrator account. Enterprise-only databases will be deleted during the switch.',
+        restoreCommunityStarting: 'Preparing Community Edition. The panel will restart automatically when ready.',
         levelUpPro: 'Upgrade to Commercial Edition',
         licenseSync: 'License Sync',
         knowMorePro: 'Learn More',
