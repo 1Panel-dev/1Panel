@@ -18,6 +18,15 @@
             </template>
             <template #rightToolBar>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
+                <el-tooltip
+                    :content="includeAppStore ? $t('container.includeAppstore') : $t('container.excludeAppstore')"
+                >
+                    <el-button
+                        :type="includeAppStore ? '' : 'primary'"
+                        @click="searchWithAppShow(!includeAppStore)"
+                        :icon="includeAppStore ? 'View' : 'Hide'"
+                    />
+                </el-tooltip>
                 <TableRefresh @search="search()" />
                 <TableSetting title="container-refresh" @search="refresh()" />
             </template>
@@ -502,7 +511,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, h, ref } from 'vue';
+import { computed, h, onMounted, ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import ContainerLog from '@/components/log/container/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
@@ -556,6 +565,7 @@ const dialogBackupRef = ref();
 const uploadRef = ref();
 
 const searchName = ref('');
+const includeAppStore = ref(true);
 const showType = ref('compose');
 const containerStats = ref<any[]>([]);
 const env = ref();
@@ -646,6 +656,7 @@ const refresh = async () => {
         info: searchName.value,
         page: 1,
         pageSize: 100,
+        excludeAppStore: !includeAppStore.value,
     };
     await searchCompose(params).then((res) => {
         data.value = res.data.items || [];
@@ -656,10 +667,12 @@ const search = async (withRefreshDetail?: boolean) => {
     if (!isActive.value || !isExist.value) {
         return;
     }
+    localStorage.setItem('includeAppStore', includeAppStore.value ? 'true' : 'false');
     let params = {
         info: searchName.value,
         page: 1,
         pageSize: 100,
+        excludeAppStore: !includeAppStore.value,
     };
     loading.value = true;
     await searchCompose(params)
@@ -673,6 +686,11 @@ const search = async (withRefreshDetail?: boolean) => {
         .finally(() => {
             loading.value = false;
         });
+};
+
+const searchWithAppShow = (item: boolean) => {
+    includeAppStore.value = item;
+    search();
 };
 
 const changePinned = async (row: Container.ComposeInfo) => {
@@ -981,6 +999,11 @@ const onOpenTerminal = (row: any) => {
 const onOpenLog = (row: any) => {
     containerLogDialogRef.value?.acceptParams({ container: row.name });
 };
+
+onMounted(() => {
+    const includeItem = localStorage.getItem('includeAppStore');
+    includeAppStore.value = !includeItem || includeItem === 'true';
+});
 </script>
 
 <style scoped lang="scss">
