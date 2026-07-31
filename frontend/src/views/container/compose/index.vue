@@ -511,7 +511,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, h, onMounted, ref } from 'vue';
+import { computed, h, ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import ContainerLog from '@/components/log/container/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
@@ -565,7 +565,7 @@ const dialogBackupRef = ref();
 const uploadRef = ref();
 
 const searchName = ref('');
-const includeAppStore = ref(true);
+const includeAppStore = ref(localStorage.getItem('includeAppStore') !== 'false');
 const showType = ref('compose');
 const containerStats = ref<any[]>([]);
 const env = ref();
@@ -999,11 +999,6 @@ const onOpenTerminal = (row: any) => {
 const onOpenLog = (row: any) => {
     containerLogDialogRef.value?.acceptParams({ container: row.name });
 };
-
-onMounted(() => {
-    const includeItem = localStorage.getItem('includeAppStore');
-    includeAppStore.value = !includeItem || includeItem === 'true';
-});
 </script>
 
 <style scoped lang="scss">
