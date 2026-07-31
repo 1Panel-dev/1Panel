@@ -22,6 +22,7 @@ export interface SearchWithPage {
     info: string;
     page: number;
     pageSize: number;
+    excludeAppStore?: boolean;
     orderBy?: string;
     order?: string;
     name?: string;
