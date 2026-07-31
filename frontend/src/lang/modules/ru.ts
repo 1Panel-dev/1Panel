@@ -3230,6 +3230,21 @@ const message = {
             'Сначала скопируйте ID устройства, чтобы получить лицензию. После импорта лицензии вы сможете войти.',
         licenseRequiredUserTip:
             'Лицензия Enterprise Edition не привязана. Обратитесь к суперадминистратору для импорта лицензии.',
+        restoreCommunity: 'Восстановить Community Edition',
+        restoreCommunityOnline: 'Онлайн-восстановление',
+        restoreCommunityOffline: 'Офлайн-восстановление',
+        restoreCommunityPackageFound:
+            'Обнаружен подходящий офлайн-пакет Community Edition. Офлайн-восстановление доступно.',
+        restoreCommunityPackageMissing:
+            'Подходящий офлайн-пакет Community Edition не обнаружен. Офлайн-восстановление сейчас недоступно.',
+        restoreCommunityOnlineHelper:
+            'Пакет Community Edition текущей версии будет загружен автоматически, а данные, предназначенные только для Enterprise, будут очищены.',
+        restoreCommunityOfflineHelper:
+            'Поместите официальный пакет версии не ниже текущей Enterprise в {path}. Переключение станет доступно после обнаружения подходящего пакета.',
+        restoreCommunityConfirm:
+            'После переключения можно войти в Community Edition с текущей учётной записью суперадминистратора Enterprise. Базы данных Enterprise будут удалены во время переключения.',
+        restoreCommunityStarting:
+            'Подготавливается Community Edition. После завершения панель автоматически перезапустится.',
         technicalAdvice: 'Техническая консультация',
         advice: 'Консультация',
         levelUpPro: 'Обновить до коммерческой версии',

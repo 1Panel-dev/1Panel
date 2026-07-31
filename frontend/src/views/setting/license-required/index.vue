@@ -1,11 +1,26 @@
 <template>
-    <div class="flex items-center justify-center min-h-screen relative bg-gray-100">
+    <div
+        class="flex items-center justify-center min-h-screen relative bg-gray-100"
+        v-loading="restoring"
+        :element-loading-text="$t('license.restoreCommunityStarting')"
+        fullscreen
+    >
         <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" :style="backgroundStyle"></div>
         <div
             :style="{ width: containerWidth, height: containerHeight }"
             class="bg-white shadow-lg relative z-10 border border-gray-200 flex overflow-hidden"
             id="login-container"
         >
+            <el-button
+                class="community-restore-link"
+                type="primary"
+                link
+                :loading="restoring"
+                :disabled="restoring"
+                @click="communityRestoreRef?.acceptParams()"
+            >
+                {{ $t('license.restoreCommunity') }}
+            </el-button>
             <div class="grid grid-cols-1 md:grid-cols-2 items-stretch w-full">
                 <div v-if="showLogo" class="flex justify-center" :style="{ height: containerHeight }">
                     <img
@@ -85,6 +100,8 @@
                 </div>
             </div>
         </div>
+
+        <CommunityRestoreDialog ref="communityRestoreRef" @started="handleCommunityRestoreStarted" />
     </div>
 </template>
 
@@ -93,37 +110,43 @@ import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 import { genFileId } from 'element-plus';
-import { getEnterpriseLicense, uploadEnterpriseLicense } from '@/api/modules/setting';
+import { getCommunityRestoreStatus, getEnterpriseLicense, uploadEnterpriseLicense } from '@/api/modules/setting';
 import { getLoginSetting } from '@/api/modules/auth';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { preloadImage } from '@/utils/browser';
 import { adjustColorToRGBA } from '@/utils/color';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 import { copyText } from '@/utils/clipboard';
 import i18n from '@/lang';
+import CommunityRestoreDialog from './community-restore/index.vue';
 
 const router = useRouter();
 const {
+    globalStore,
     entrance,
     isEnterprise,
     isEnterpriseLicenseLoaded,
     isEnterpriseLicensed,
     isFxplay,
     isIntl,
+    isLoading: restoring,
     isLogin,
     isMasterProductPro,
     isOffline,
+    isOnRestart,
     menuAccordion,
     openMenuTabs,
     themeConfig,
 } = useGlobalStore();
 const loading = ref(false);
+const communityRestoreRef = ref<InstanceType<typeof CommunityRestoreDialog>>();
 const uploadRef = ref<UploadInstance>();
 const uploaderFiles = ref<UploadFiles>([]);
 const licenseInfo = reactive({
     deviceID: '',
 });
+let restoreTimer: number | undefined;
 const defaultLoginImage = new URL('@/assets/images/1panel-login-enterprise.png', import.meta.url).href;
 const defaultLoginBgImage = new URL('@/assets/images/1panel-login-bg.jpg', import.meta.url).href;
 const loadedLoginImage = ref<string | null>(null);
@@ -133,6 +156,7 @@ const imgLoaded = ref(false);
 
 const FIXED_WIDTH = 1000;
 const FIXED_HEIGHT = 415;
+const RESTORE_POLL_INTERVAL = 10_000;
 const containerWidth = computed(() => `${FIXED_WIDTH}px`);
 const containerHeight = computed(() => `${FIXED_HEIGHT}px`);
 const width = ref(window.innerWidth);
@@ -183,7 +207,7 @@ const applyLoginThemeColor = () => {
     );
     document.documentElement.style.setProperty(
         '--login-loading-mask-color',
-        adjustColorToRGBA(loginBtnLinkColor, 30, 15),
+        adjustColorToRGBA(loginBtnLinkColor, 0, 60),
     );
 };
 
@@ -259,6 +283,72 @@ const loadLicenseInfo = async () => {
     isEnterpriseLicensed.value = false;
 };
 
+const loadRestoreInfo = async () => {
+    const res = await getCommunityRestoreStatus();
+    restoring.value = res.data.state === 'Running';
+    isOnRestart.value = restoring.value;
+};
+
+const scheduleRestorePoll = () => {
+    window.clearTimeout(restoreTimer);
+    restoreTimer = window.setTimeout(pollRestoreStatus, RESTORE_POLL_INTERVAL);
+};
+
+const redirectToCommunityLogin = () => {
+    restoring.value = false;
+    isOnRestart.value = false;
+    globalStore.setLogStatus(false);
+    globalStore.clearAuthInfo();
+    isEnterprise.value = false;
+    isEnterpriseLicensed.value = false;
+    isEnterpriseLicenseLoaded.value = true;
+    window.location.replace(entrance.value ? `/${entrance.value}` : '/');
+};
+
+const waitForCommunityService = async () => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/core/auth/setting`, {
+            credentials: 'include',
+            cache: 'no-store',
+        });
+        if (response.ok) {
+            const result = await response.json();
+            if (result?.data?.isEnterprise === false) {
+                redirectToCommunityLogin();
+                return;
+            }
+        }
+    } catch {
+        // The core service is expected to be temporarily unavailable while binaries are switched.
+    }
+    scheduleRestorePoll();
+};
+
+const pollRestoreStatus = async () => {
+    try {
+        const res = await getCommunityRestoreStatus();
+        if (res.data.state === 'Failed') {
+            restoring.value = false;
+            isOnRestart.value = false;
+            MsgError(res.data.message);
+            return;
+        }
+        restoring.value = res.data.state === 'Running';
+        isOnRestart.value = restoring.value;
+        if (restoring.value) {
+            scheduleRestorePoll();
+        }
+    } catch {
+        await waitForCommunityService();
+    }
+};
+
+const handleCommunityRestoreStarted = () => {
+    restoring.value = true;
+    isOnRestart.value = true;
+    scheduleRestorePoll();
+};
+
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     uploaderFiles.value = uploadFiles;
 };
@@ -317,6 +407,12 @@ onMounted(async () => {
         await loadXpackLoginTheme();
         await loadBackground();
         await loadLicenseInfo();
+        if (!isEnterpriseLicensed.value) {
+            await loadRestoreInfo();
+            if (restoring.value) {
+                scheduleRestorePoll();
+            }
+        }
     } finally {
         loading.value = false;
     }
@@ -324,12 +420,25 @@ onMounted(async () => {
 
 onUnmounted(() => {
     window.removeEventListener('resize', updateSize);
+    window.clearTimeout(restoreTimer);
 });
 </script>
 
 <style lang="scss" scoped>
 #login-container {
     border-radius: 0;
+}
+
+.community-restore-link {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    z-index: 1;
+    color: var(--login-btn-link-color, #005eeb);
+
+    &:hover {
+        color: var(--login-btn-link-hover-color, #0054d3);
+    }
 }
 
 .login-form {
@@ -449,7 +558,11 @@ onUnmounted(() => {
     background-color: var(--login-loading-mask-color) !important;
 
     .el-loading-spinner .path {
-        stroke: var(--login-btn-link-color);
+        stroke: #ffffff;
+    }
+
+    .el-loading-text {
+        color: #ffffff;
     }
 }
 </style>

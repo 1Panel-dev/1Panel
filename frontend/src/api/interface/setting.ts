@@ -307,6 +307,13 @@ export namespace Setting {
         status: string;
         message: string;
     }
+    export interface CommunityRestoreStatus {
+        state: 'Ready' | 'Running' | 'Failed';
+        message: string;
+        packageExist: boolean;
+        packageDirectory: string;
+    }
+    export type CommunityRestoreMode = 'online' | 'offline';
     export interface NodeItem {
         id: number;
         groupID?: number;

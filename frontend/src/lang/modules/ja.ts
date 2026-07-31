@@ -3196,6 +3196,20 @@ const message = {
             'まずデバイス ID をコピーしてライセンスを取得し、ライセンスをインポートするとログインできます。',
         licenseRequiredUserTip:
             'Enterprise Edition のライセンスがバインドされていません。スーパー管理者に連絡してライセンスをインポートしてください。',
+        restoreCommunity: 'コミュニティ版に戻す',
+        restoreCommunityOnline: 'オンライン復元',
+        restoreCommunityOffline: 'オフライン復元',
+        restoreCommunityPackageFound:
+            '使用可能なコミュニティ版オフラインパッケージが検出されました。オフライン復元を実行できます。',
+        restoreCommunityPackageMissing:
+            '使用可能なコミュニティ版オフラインパッケージが検出されていないため、現在オフライン復元を実行できません。',
+        restoreCommunityOnlineHelper:
+            '現在のバージョンのコミュニティ版パッケージを自動的にダウンロードし、Enterprise 専用データを削除します。',
+        restoreCommunityOfflineHelper:
+            '現在の Enterprise バージョン以上の公式パッケージを {path} に配置してください。使用可能なパッケージが検出されると切り替えが有効になります。',
+        restoreCommunityConfirm:
+            '切り替え後は、現在の Enterprise スーパー管理者アカウントでコミュニティ版にログインできます。切り替え中に Enterprise 専用データベースが削除されます。',
+        restoreCommunityStarting: 'コミュニティ版を準備しています。完了後、パネルは自動的に再起動します。',
         technicalAdvice: '技術的な相談',
         advice: '相談',
         levelUpPro: '商用版にアップグレード',

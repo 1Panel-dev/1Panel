@@ -3116,6 +3116,20 @@ const message = {
         licenseRequiredShortTip:
             'ກະລຸນາຄັດລອກ ID ອຸປະກອນກ່ອນເພື່ອຮັບລິຂະສິດ. ທ່ານສາມາດເຂົ້າລະບົບໄດ້ຫຼັງຈາກນຳເຂົ້າລິຂະສິດແລ້ວ.',
         licenseRequiredUserTip: 'ລິຂະສິດເວີຊັນ Enterprise ບໍ່ໄດ້ຖືກຜູກ. ຕິດຕໍ່ຜູ້ດູແລລະບົບສູງສຸດເພື່ອນຳເຂົ້າລິຂະສິດ.',
+        restoreCommunity: 'ກູ້ຄືນ Community Edition',
+        restoreCommunityOnline: 'ກູ້ຄືນອອນລາຍ',
+        restoreCommunityOffline: 'ກູ້ຄືນອອບລາຍ',
+        restoreCommunityPackageFound:
+            'ກວດພົບແພັກເກດ Community Edition ອອບລາຍທີ່ໃຊ້ໄດ້ ແລະສາມາດດຳເນີນການກູ້ຄືນອອບລາຍໄດ້.',
+        restoreCommunityPackageMissing:
+            'ບໍ່ພົບແພັກເກດ Community Edition ອອບລາຍທີ່ໃຊ້ໄດ້ ຈຶ່ງຍັງບໍ່ສາມາດກູ້ຄືນອອບລາຍໄດ້.',
+        restoreCommunityOnlineHelper:
+            'ລະບົບຈະດາວໂຫຼດແພັກເກດ Community Edition ສຳລັບເວີຊັນປັດຈຸບັນອັດຕະໂນມັດ ແລະ ລ້າງຂໍ້ມູນສະເພາະ Enterprise.',
+        restoreCommunityOfflineHelper:
+            'ວາງແພັກເກດທາງການທີ່ມີເວີຊັນບໍ່ຕ່ຳກວ່າ Enterprise ປັດຈຸບັນໄວ້ໃນ {path}. ການສະຫຼັບຈະເປີດໃຊ້ເມື່ອກວດພົບແພັກເກດທີ່ໃຊ້ໄດ້.',
+        restoreCommunityConfirm:
+            'ຫຼັງຈາກສະຫຼັບ ສາມາດໃຊ້ບັນຊີຜູ້ດູແລສູງສຸດ Enterprise ປັດຈຸບັນເຂົ້າ Community Edition. ຖານຂໍ້ມູນສະເພາະ Enterprise ຈະຖືກລຶບໃນລະຫວ່າງການສະຫຼັບ.',
+        restoreCommunityStarting: 'ກຳລັງກະກຽມ Community Edition. ແຜງຄວບຄຸມຈະເລີ່ມໃໝ່ອັດຕະໂນມັດເມື່ອສຳເລັດ.',
         levelUpPro: 'ອັບເກຣດເປັນເວີຊັນ Commercial',
         licenseSync: 'ຊິງຄ໌ລິຂະສິດ',
         knowMorePro: 'ຮຽນຮູ້ເພີ່ມເຕີມ',
