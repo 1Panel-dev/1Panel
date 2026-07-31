@@ -425,7 +425,11 @@ export const getTemplate = (id: number) => {
 export const uploadTemplateZip = (file: globalThis.File) => {
     const formData = new FormData();
     formData.append('file', file);
-    return http.post<{ filePath: string; variables: string[] }>(`/websites/templates/upload`, formData, TimeoutEnum.T_5M);
+    return http.post<{ filePath: string; variables: string[] }>(
+        `/websites/templates/upload`,
+        formData,
+        TimeoutEnum.T_5M,
+    );
 };
 
 export const previewTemplate = (req: Website.PreviewReq) => {

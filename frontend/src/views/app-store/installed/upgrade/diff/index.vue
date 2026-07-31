@@ -22,7 +22,7 @@
 import { nextTick, ref } from 'vue';
 import { loadMonacoLanguageSupport, setupMonacoEnvironment } from '@/utils/monaco';
 
-type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
+type MonacoEditorApi = typeof import('monaco-editor/editor');
 
 const open = ref(false);
 const newContent = ref('');
@@ -30,9 +30,9 @@ const oldContent = ref('');
 const em = defineEmits(['confirm']);
 
 let monaco: MonacoEditorApi | null = null;
-let originalModel: MonacoEditorApi['editor']['ITextModel'] | null = null;
-let modifiedModel: MonacoEditorApi['editor']['ITextModel'] | null = null;
-let editor: MonacoEditorApi['editor']['IStandaloneDiffEditor'] | null = null;
+let originalModel: ReturnType<MonacoEditorApi['editor']['createModel']> | null = null;
+let modifiedModel: ReturnType<MonacoEditorApi['editor']['createModel']> | null = null;
+let editor: ReturnType<MonacoEditorApi['editor']['createDiffEditor']> | null = null;
 
 const container = ref();
 
@@ -41,10 +41,7 @@ const ensureMonaco = async () => {
         return monaco;
     }
     setupMonacoEnvironment();
-    const [monacoModule] = await Promise.all([
-        import('monaco-editor/esm/vs/editor/editor.api'),
-        loadMonacoLanguageSupport(),
-    ]);
+    const [monacoModule] = await Promise.all([import('monaco-editor/editor'), loadMonacoLanguageSupport()]);
     monaco = monacoModule;
     return monaco;
 };

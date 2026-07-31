@@ -254,11 +254,13 @@ function initChart() {
             ...itemSelect,
             right: grid.right || 10,
             itemWidth: 8,
+            icon: 'circle',
+            ...props.option.legend,
             textStyle: {
                 ...itemSelect?.textStyle,
+                ...props.option.legend?.textStyle,
                 color: regularTextColor,
             },
-            icon: 'circle',
         },
         xAxis: {
             ...props.option.xAxis,

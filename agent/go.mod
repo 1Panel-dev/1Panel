@@ -12,7 +12,7 @@ require (
 	github.com/creack/pty v1.1.24
 	github.com/docker/cli v29.6.2+incompatible
 	github.com/docker/docker v28.5.2+incompatible
-	github.com/docker/go-connections v0.7.0
+	github.com/docker/go-connections v0.8.1
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/gin-gonic/gin v1.12.0
 	github.com/glebarez/sqlite v1.11.0
@@ -39,7 +39,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/sftp v1.13.11
-	github.com/qiniu/go-sdk/v7 v7.26.17
+	github.com/qiniu/go-sdk/v7 v7.27.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil/v4 v4.26.6
 	github.com/sirupsen/logrus v1.9.4
@@ -48,7 +48,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/subosito/gotenv v1.6.0
-	github.com/tencentyun/cos-go-sdk-v5 v0.7.74
+	github.com/tencentyun/cos-go-sdk-v5 v0.7.75
 	github.com/tomasen/fcgi_client v0.0.0-20180423082037-2bb3d819fd19
 	github.com/upyun/go-sdk v2.1.0+incompatible
 	go.mongodb.org/mongo-driver/v2 v2.8.0

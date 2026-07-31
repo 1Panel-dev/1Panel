@@ -16,7 +16,13 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item v-if="form.type === 'single'" :label="$t('template.content')" prop="content">
-                <el-input v-model="form.content" type="textarea" :rows="12" :placeholder="contentPlaceholder" />
+                <el-input
+                    v-model="form.content"
+                    type="textarea"
+                    :rows="12"
+                    :placeholder="contentPlaceholder"
+                    @change="detectContentVariables"
+                />
                 <span class="input-help">{{ $t('template.autoDetectHelper') }}</span>
             </el-form-item>
             <el-form-item v-if="form.type === 'multi'" :label="$t('template.upload')">
@@ -104,7 +110,7 @@ import { Website } from '@/api/interface/website';
 import { createTemplate, getTemplate, updateTemplate, uploadTemplateZip } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref } from 'vue';
 
 const open = ref(false);
 const loading = ref(false);
@@ -157,19 +163,16 @@ const mergeDetectedKeys = (keys: string[]) => {
     }
 };
 
-watch(
-    () => form.content,
-    (content) => {
-        if (form.type !== 'single' || !content) return;
-        const keys: string[] = [];
-        for (const match of content.matchAll(/\{\{(\w+)\}\}/g)) {
-            if (!keys.includes(match[1])) {
-                keys.push(match[1]);
-            }
+const detectContentVariables = () => {
+    if (form.type !== 'single' || !form.content) return;
+    const keys: string[] = [];
+    for (const match of form.content.matchAll(/\{\{(\w+)\}\}/g)) {
+        if (!keys.includes(match[1])) {
+            keys.push(match[1]);
         }
-        mergeDetectedKeys(keys);
-    },
-);
+    }
+    mergeDetectedKeys(keys);
+};
 
 const handleUpload = async (file: globalThis.File) => {
     try {
@@ -182,6 +185,7 @@ const handleUpload = async (file: globalThis.File) => {
 };
 
 const onSubmit = async () => {
+    detectContentVariables();
     await formRef.value.validate();
     form.variables = JSON.stringify(variables.value.filter((v) => v.key));
     loading.value = true;

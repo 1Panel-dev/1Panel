@@ -481,7 +481,7 @@ import {
 
 const { isDarkTheme, isMobile } = useGlobalStore();
 
-type MonacoEditorApi = typeof import('monaco-editor/esm/vs/editor/editor.api');
+type MonacoEditorApi = typeof import('monaco-editor/editor');
 
 let monacoApi: MonacoEditorApi | null = null;
 let monacoThemeInitialized = false;
@@ -496,10 +496,7 @@ const ensureMonaco = async () => {
     }
 
     setupMonacoEnvironment();
-    const [monacoModule] = await Promise.all([
-        import('monaco-editor/esm/vs/editor/editor.api'),
-        loadMonacoLanguageSupport(),
-    ]);
+    const [monacoModule] = await Promise.all([import('monaco-editor/editor'), loadMonacoLanguageSupport()]);
     monacoApi = monacoModule;
     eolLf.value = monacoApi.editor.EndOfLineSequence.LF;
     eolCrlf.value = monacoApi.editor.EndOfLineSequence.CRLF;
