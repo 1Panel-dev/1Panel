@@ -1299,3 +1299,18 @@ var AddAPITrustedProxiesSetting = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddWebsiteTemplateMenu = &gormigrate.Migration{
+	ID: "20260728-add-website-template-menu",
+	Migrate: func(tx *gorm.DB) error {
+		return helper.UpsertChildMenuByLabel(tx, "Website-Menu", dto.ShowMenu{
+			ID:       "34",
+			Disabled: false,
+			Title:    "menu.template",
+			IsShow:   true,
+			Label:    "WebsiteTemplate",
+			Path:     "/websites/templates",
+			Sort:     250,
+		}, "SSL")
+	},
+}

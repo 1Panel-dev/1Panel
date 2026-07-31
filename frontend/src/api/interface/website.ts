@@ -96,6 +96,7 @@ export namespace Website {
         ftpUser: string;
         ftpPassword: string;
         taskID: string;
+        templateOutputID?: number;
         SSLID?: number;
         enableSSL: boolean;
         createDB?: boolean;
@@ -770,5 +771,78 @@ export namespace Website {
     export interface BatchSetGroup {
         ids: number[];
         groupID: number;
+    }
+
+    export interface TemplateVariable {
+        key: string;
+        label: string;
+        type: 'text' | 'textarea' | 'number' | 'select' | 'color';
+        default: string;
+        options: string;
+        required: boolean;
+    }
+
+    export interface Template extends CommonModel {
+        name: string;
+        type: string;
+        content: string;
+        filePath: string;
+        variables: string;
+        remark: string;
+    }
+
+    export interface TemplateSearch extends ReqPage {
+        name: string;
+        type: string;
+    }
+
+    export interface TemplateCreate {
+        name: string;
+        type: string;
+        content: string;
+        filePath: string;
+        variables: string;
+        remark: string;
+    }
+
+    export interface TemplateUpdate {
+        id: number;
+        name: string;
+        type: string;
+        content: string;
+        filePath: string;
+        variables: string;
+        remark: string;
+    }
+
+    export interface TemplateOutput extends CommonModel {
+        name: string;
+        templateID: number;
+        templateType: string;
+        variableValues: string;
+        outputPath: string;
+    }
+
+    export interface TemplateOutputDTO extends TemplateOutput {
+        templateName: string;
+    }
+
+    export interface TemplateOutputSearch extends ReqPage {
+        templateID: number;
+    }
+
+    export interface TemplateOutputCreate {
+        templateID: number;
+        name: string;
+        variableValues: Record<string, string>;
+    }
+
+    export interface PreviewReq {
+        templateID: number;
+        variableValues: Record<string, string>;
+    }
+
+    export interface PreviewDTO {
+        html: string;
     }
 }

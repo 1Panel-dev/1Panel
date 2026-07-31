@@ -401,3 +401,49 @@ export const updateWebsiteStream = (req: Website.WebsiteStreamUpdate) => {
 export const batchSetHttps = (req: Website.BatchSetHttps) => {
     return http.post(`/websites/batch/ssl`, req);
 };
+
+export const searchTemplates = (req: Website.TemplateSearch) => {
+    return http.post<ResPage<Website.Template>>(`/websites/templates/search`, req);
+};
+
+export const createTemplate = (req: Website.TemplateCreate) => {
+    return http.post<any>(`/websites/templates`, req);
+};
+
+export const updateTemplate = (req: Website.TemplateUpdate) => {
+    return http.post<any>(`/websites/templates/update`, req);
+};
+
+export const deleteTemplate = (params: { id: number }) => {
+    return http.post<any>(`/websites/templates/del`, params);
+};
+
+export const getTemplate = (id: number) => {
+    return http.post<Website.Template>(`/websites/templates/get`, { id });
+};
+
+export const uploadTemplateZip = (file: globalThis.File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return http.post<{ filePath: string; variables: string[] }>(`/websites/templates/upload`, formData, TimeoutEnum.T_5M);
+};
+
+export const previewTemplate = (req: Website.PreviewReq) => {
+    return http.post<Website.PreviewDTO>(`/websites/templates/preview`, req);
+};
+
+export const searchTemplateOutputs = (req: Website.TemplateOutputSearch) => {
+    return http.post<ResPage<Website.TemplateOutputDTO>>(`/websites/templates/outputs/search`, req);
+};
+
+export const createTemplateOutput = (req: Website.TemplateOutputCreate) => {
+    return http.post<any>(`/websites/templates/outputs`, req);
+};
+
+export const deleteTemplateOutput = (params: { id: number }) => {
+    return http.post<any>(`/websites/templates/outputs/del`, params);
+};
+
+export const getTemplateOutput = (id: number) => {
+    return http.post<Website.TemplateOutputDTO>(`/websites/templates/outputs/get`, { id });
+};
