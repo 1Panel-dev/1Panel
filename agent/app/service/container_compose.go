@@ -158,6 +158,17 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 			}
 		}
 	}
+	if req.ExcludeAppStore {
+		length, count := len(records), 0
+		for count < length {
+			if records[count].CreatedBy == "Apps" {
+				records = append(records[:count], records[(count+1):]...)
+				length--
+			} else {
+				count++
+			}
+		}
+	}
 	sort.Slice(records, func(i, j int) bool {
 		if records[i].IsPinned != records[j].IsPinned {
 			return records[i].IsPinned

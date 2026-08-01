@@ -2,7 +2,8 @@ package dto
 
 type SearchWithPage struct {
 	PageInfo
-	Info string `json:"info"`
+	Info            string `json:"info"`
+	ExcludeAppStore bool   `json:"excludeAppStore"`
 }
 
 type SearchPageWithType struct {

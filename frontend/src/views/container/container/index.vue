@@ -488,7 +488,7 @@ import Uploads from '@/components/upload/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import Status from '@/components/status/index.vue';
-import { computed, reactive, onMounted, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import {
     containerItemStats,
     containerListStats,
@@ -539,7 +539,7 @@ const dialogCommitRef = ref();
 const dialogPortJumpRef = ref();
 const dialogBackupRef = ref();
 const opRef = ref();
-const includeAppStore = ref(true);
+const includeAppStore = ref(localStorage.getItem('includeAppStore') !== 'false');
 const columns = ref([]);
 
 const batchNames = ref();
@@ -1019,11 +1019,6 @@ const buttons = [
         },
     },
 ];
-
-onMounted(() => {
-    let includeItem = localStorage.getItem('includeAppStore');
-    includeAppStore.value = !includeItem || includeItem === 'true';
-});
 </script>
 
 <style scoped lang="scss">

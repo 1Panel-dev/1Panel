@@ -3252,6 +3252,21 @@ const message = {
             'Sila salin ID peranti terlebih dahulu untuk mendapatkan lesen. Anda boleh log masuk selepas mengimport lesen.',
         licenseRequiredUserTip:
             'Lesen Enterprise Edition belum diikat. Hubungi pentadbir super untuk mengimport lesen.',
+        restoreCommunity: 'Pulihkan Community Edition',
+        restoreCommunityOnline: 'Pemulihan dalam talian',
+        restoreCommunityOffline: 'Pemulihan luar talian',
+        restoreCommunityPackageFound:
+            'Pakej luar talian Community Edition yang boleh digunakan telah dikesan. Pemulihan luar talian tersedia.',
+        restoreCommunityPackageMissing:
+            'Tiada pakej luar talian Community Edition yang boleh digunakan dikesan. Pemulihan luar talian tidak tersedia pada masa ini.',
+        restoreCommunityOnlineHelper:
+            'Pakej Community Edition untuk versi semasa akan dimuat turun secara automatik dan data khusus Enterprise akan dibersihkan.',
+        restoreCommunityOfflineHelper:
+            'Letakkan pakej rasmi yang tidak lebih lama daripada versi Enterprise semasa dalam {path}. Pertukaran akan didayakan selepas pakej yang boleh digunakan dikesan.',
+        restoreCommunityConfirm:
+            'Selepas pertukaran, anda boleh log masuk ke Community Edition menggunakan akaun pentadbir super Enterprise semasa. Pangkalan data khusus Enterprise akan dipadamkan semasa pertukaran.',
+        restoreCommunityStarting:
+            'Community Edition sedang disediakan. Panel akan dimulakan semula secara automatik apabila selesai.',
         technicalAdvice: 'Konsultasi Teknikal',
         advice: 'Konsultasi',
         levelUpPro: 'Naik taraf ke Edisi Komersial',

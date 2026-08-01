@@ -3234,6 +3234,21 @@ const message = {
             'Lütfen önce cihaz kimliğini kopyalayarak lisansı alın. Lisansı içe aktardıktan sonra giriş yapabilirsiniz.',
         licenseRequiredUserTip:
             'Enterprise Edition lisansı bağlı değil. Lisansı içe aktarması için süper yöneticiyle iletişime geçin.',
+        restoreCommunity: 'Community Edition sürümünü geri yükle',
+        restoreCommunityOnline: 'Çevrimiçi geri yükleme',
+        restoreCommunityOffline: 'Çevrimdışı geri yükleme',
+        restoreCommunityPackageFound:
+            'Kullanılabilir bir çevrimdışı Community Edition paketi algılandı. Çevrimdışı geri yükleme kullanılabilir.',
+        restoreCommunityPackageMissing:
+            'Kullanılabilir bir çevrimdışı Community Edition paketi algılanmadı. Çevrimdışı geri yükleme şu anda kullanılamıyor.',
+        restoreCommunityOnlineHelper:
+            'Geçerli sürümün Community Edition paketi otomatik olarak indirilecek ve Enterprise sürümüne özel veriler temizlenecektir.',
+        restoreCommunityOfflineHelper:
+            'Geçerli Enterprise sürümünden eski olmayan resmi bir paketi {path} dizinine yerleştirin. Kullanılabilir bir paket algılandığında geçiş etkinleştirilir.',
+        restoreCommunityConfirm:
+            'Geçişten sonra mevcut Enterprise süper yönetici hesabıyla Community Edition sürümüne giriş yapabilirsiniz. Enterprise sürümüne özel veritabanları geçiş sırasında silinecektir.',
+        restoreCommunityStarting:
+            'Community Edition hazırlanıyor. Hazır olduğunda panel otomatik olarak yeniden başlatılacaktır.',
         levelUpPro: 'Ticari sürüme yükselt',
         licenseSync: 'Lisans Senkronizasyonu',
         knowMorePro: 'Daha Fazla Bilgi Edinin',

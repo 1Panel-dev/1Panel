@@ -28,10 +28,11 @@ import (
 )
 
 const (
-	rollbackPath = "1panel/tmp"
-	upgradePath  = "1panel/tmp/upgrade"
-	uploadPath   = "1panel/uploads"
-	downloadPath = "1panel/download"
+	rollbackPath         = "1panel/tmp"
+	communityRestorePath = "1panel/tmp/community-restore"
+	upgradePath          = "1panel/tmp/upgrade"
+	uploadPath           = "1panel/uploads"
+	downloadPath         = "1panel/download"
 )
 
 func (u *DeviceService) Scan() dto.CleanData {
@@ -113,12 +114,15 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 			dropFileOrDir(path.Join(global.Dir.BaseDir, rollbackPath, "app"))
 			dropFileOrDir(path.Join(global.Dir.BaseDir, rollbackPath, "database"))
 			dropFileOrDir(path.Join(global.Dir.BaseDir, rollbackPath, "website"))
+			dropFileOrDir(path.Join(global.Dir.BaseDir, communityRestorePath))
 		case "rollback_app":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, rollbackPath, "app", item.Name))
 		case "rollback_database":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, rollbackPath, "database", item.Name))
 		case "rollback_website":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, rollbackPath, "website", item.Name))
+		case "rollback_community_restore":
+			dropFileOrDir(path.Join(global.Dir.BaseDir, communityRestorePath, item.Name))
 
 		case "upload":
 			dropFileOrDir(path.Join(global.Dir.BaseDir, uploadPath, item.Name))
@@ -214,6 +218,7 @@ func doSystemClean(taskItem *task.Task) func(t *task.Task) error {
 		dropWithTask(path.Join(global.Dir.BaseDir, rollbackPath, "app"), taskItem, &size, &fileCount)
 		dropWithTask(path.Join(global.Dir.BaseDir, rollbackPath, "website"), taskItem, &size, &fileCount)
 		dropWithTask(path.Join(global.Dir.BaseDir, rollbackPath, "database"), taskItem, &size, &fileCount)
+		dropWithTask(path.Join(global.Dir.BaseDir, communityRestorePath), taskItem, &size, &fileCount)
 
 		upgrades := path.Join(global.Dir.BaseDir, upgradePath)
 		oldUpgradeFiles, _ := os.ReadDir(upgrades)
@@ -611,6 +616,7 @@ func loadRollBackTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, rollbackPath, "app"), "rollback_app", fileOp)
 	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, rollbackPath, "website"), "rollback_website", fileOp)
 	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, rollbackPath, "database"), "rollback_database", fileOp)
+	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, communityRestorePath), "rollback_community_restore", fileOp)
 
 	return treeData
 }

@@ -493,6 +493,7 @@ const DASHBOARD_CACHE_TTL = {
     ioOptions: 60 * 60 * 1000,
 };
 const monitorChartGrid = { left: 65, right: 65, bottom: '20%' };
+const monitorChartLegend = { top: 0, bottom: 'auto' };
 const monitorTagsStyle = {
     left: `${monitorChartGrid.left}px`,
     right: `${monitorChartGrid.right}px`,
@@ -515,6 +516,7 @@ const loadIOChartOption = () => ({
         },
     ],
     grid: monitorChartGrid,
+    legend: monitorChartLegend,
     formatStr: 'MB',
 });
 const loadNetworkChartOption = () => ({
@@ -530,6 +532,7 @@ const loadNetworkChartOption = () => ({
         },
     ],
     grid: monitorChartGrid,
+    legend: monitorChartLegend,
     formatStr: 'KB/s',
 });
 
@@ -1157,6 +1160,7 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 @media only screen and (min-width: 992px) {
     .dashboard-right {
+        contain: size;
         display: flex;
         flex-direction: column;
         min-height: 0;
