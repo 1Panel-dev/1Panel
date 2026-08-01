@@ -1,6 +1,5 @@
 import { resolve } from 'path';
 import { wrapperEnv } from './src/utils/get-env';
-import { visualizer } from 'rollup-plugin-visualizer';
 import viteCompression from 'vite-plugin-compression';
 import eslintPlugin from 'vite-plugin-eslint2';
 import vueJsx from '@vitejs/plugin-vue-jsx';
@@ -52,10 +51,11 @@ const __APP_INFO__ = {
     lastBuildTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
 };
 
-export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
+export default defineConfig(async ({ mode }: ConfigEnv): Promise<UserConfig> => {
     const env = loadEnv(mode, process.cwd());
     const viteEnv = wrapperEnv(env);
     const isProduction = mode === 'production';
+    const reportPlugin = viteEnv.VITE_REPORT ? (await import('rollup-plugin-visualizer')).visualizer() : false;
 
     return {
         resolve: {
@@ -99,7 +99,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                 exclude: ['**/*.js'],
             }),
             vueJsx(),
-            viteEnv.VITE_REPORT && visualizer(),
+            reportPlugin,
             viteEnv.VITE_BUILD_GZIP &&
                 viteCompression({
                     verbose: true,
