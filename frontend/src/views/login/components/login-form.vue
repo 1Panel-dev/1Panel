@@ -952,9 +952,9 @@ const applyLoginButtonTheme = () => {
     );
 };
 
-function loginKeydownHandler(e: KeyboardEvent) {
-    const event = e;
-    if (event.defaultPrevented || (event.target as HTMLElement | null)?.closest('.external-login-button')) return;
+function loginKeydownHandler(event: KeyboardEvent) {
+    const target = event.target;
+    if (event.defaultPrevented || (target instanceof Element && target.closest('.external-login-button'))) return;
     if (event.key === 'Enter' || event.keyCode === 13) {
         if (!mfaShow.value) {
             if (!loginButtonFocused.value) {
