@@ -1215,6 +1215,7 @@ const message = {
             source: 'Источник',
             sourceHeuristic: 'Правила',
             sourceEmbedding: 'Совпадение образцов',
+            sourceContext: 'Наследование контекста',
             latency: 'Задержка',
             decisionLogs: 'Логи решений',
             requestID: 'ID запроса',

@@ -1156,6 +1156,7 @@ const message = {
             source: '來源',
             sourceHeuristic: '規則判斷',
             sourceEmbedding: '樣本匹配',
+            sourceContext: '上下文繼承',
             latency: '耗時',
             decisionLogs: '決策日誌',
             requestID: '請求 ID',

@@ -110,9 +110,10 @@ var catalog = map[string]Meta{
 		Key: "xiaomi", DisplayName: "Xiaomi", Sort: 46, DefaultAPIType: "openai-completions", EnvKey: "XIAOMI_API_KEY",
 		APIConfigs: []APIConfig{
 			{APIType: "openai-completions", BaseURL: "https://api.xiaomimimo.com/v1"},
+			{APIType: "openai-responses", BaseURL: "https://api.xiaomimimo.com/v1"},
 			anthropicAPIConfig("https://api.xiaomimimo.com/anthropic", AuthModeBearer),
 		},
-		Models: []Model{{ID: "mimo-v2-flash", Name: "Xiaomi MiMo V2 Flash"}, {ID: "mimo-v2-pro", Name: "Xiaomi MiMo V2 Pro"}, {ID: "mimo-v2-omni", Name: "Xiaomi MiMo V2 Omni"}},
+		Models: []Model{{ID: "mimo-v2.5", Name: "Xiaomi MiMo V2.5"}, {ID: "mimo-v2.5-pro", Name: "Xiaomi MiMo V2.5 Pro"}},
 	},
 	"kimi": {
 		Key: "kimi", DisplayName: "Kimi (CN)", Sort: 50, DefaultAPIType: "openai-completions", EnvKey: "KIMI_API_KEY",

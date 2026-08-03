@@ -1195,6 +1195,7 @@ const message = {
             source: '소스',
             sourceHeuristic: '규칙 판단',
             sourceEmbedding: '샘플 매칭',
+            sourceContext: '컨텍스트 상속',
             latency: '지연 시간',
             decisionLogs: '결정 로그',
             requestID: '요청 ID',

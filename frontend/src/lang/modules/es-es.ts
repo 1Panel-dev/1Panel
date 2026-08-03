@@ -1220,6 +1220,7 @@ const message = {
             source: 'Fuente',
             sourceHeuristic: 'Reglas',
             sourceEmbedding: 'Coincidencia de muestras',
+            sourceContext: 'Herencia de contexto',
             latency: 'Latencia',
             decisionLogs: 'Registros de decisión',
             requestID: 'ID de solicitud',

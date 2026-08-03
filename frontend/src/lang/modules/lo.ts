@@ -1194,6 +1194,7 @@ const message = {
             source: 'ແຫຼ່ງທີ່ມາ',
             sourceHeuristic: 'ອີງຕາມກົດເກນ',
             sourceEmbedding: 'ການຈັບຄູ່ຕົວຢ່າງ',
+            sourceContext: 'ສືບທອດບໍລິບົດ',
             latency: 'ຄວາມຫຼ້າຊ້າ',
             decisionLogs: 'ລັອກການຕັດສິນໃຈ',
             requestID: 'Request ID',
