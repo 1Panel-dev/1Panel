@@ -2321,6 +2321,7 @@ const message = {
             users: 'Pengurusan pengguna',
             roles: 'Peranan',
             auth: 'Pengesahan log masuk',
+            auth_sources: 'Tetapan Pengesahan',
             alert: 'Pemberitahuan amaran',
             sync: 'Penyegerakan Sumber',
             exchange: 'Penyegerakan Sumber',
@@ -5405,6 +5406,11 @@ const message = {
                     spCredentials: 'Kunci peribadi dan sijil SP',
                     spCredentialsDesc:
                         'Digunakan untuk menandatangani mesej log masuk dan log keluar. Dasar tandatangan dan pengesahan ditetapkan oleh bahagian belakang.',
+                    spEntityID: 'SP Entity ID',
+                    spEntityIDHelper:
+                        'Pengecam unik SP. Ia mesti sepadan dengan ID Entiti atau audiens yang dikonfigurasikan dalam IdP dan juga merupakan URL Metadata SP.',
+                    acsURL: 'ACS URL',
+                    sloURL: 'SLO URL',
                     spPrivateKey: 'Kunci peribadi SP',
                     spPrivateKeyHelper:
                         'Digunakan untuk menandatangani AuthnRequest dan mesej log keluar. Ia disulitkan semasa disimpan dan tidak pernah dipaparkan.',
@@ -5453,13 +5459,11 @@ const message = {
                     advancedDesc: 'Konfigurasikan halaman pertanyaan TLS dan LDAP.',
                     strictSync: 'Penyegerakan yang ketat',
                     strictSyncTooltip:
-                        'Selepas import penuh lengkap, pengguna yang tiada daripada sumber LDAP ini dilumpuhkan tetapi tidak dipadamkan.',
+                        'Selepas pemprosesan penuh selesai, status pengesahan pengguna yang tiada dalam sumber LDAP ini ditandakan sebagai Tidak ditemui dalam LDAP, tetapi pengguna tidak dipadamkan.',
                     strictSyncHelper:
-                        'Hanya digunakan untuk import penuh yang lengkap. Mengimport pengguna terpilih tidak sekali-kali melumpuhkan pengguna lain.',
+                        'Hanya digunakan untuk pemprosesan penuh yang berjaya. Mengimport pengguna terpilih tidak mengubah status pengesahan pengguna lain.',
                     skipTLSVerify: 'Langkau pengesahan TLS',
                     skipTLSVerifyTooltip: 'Lumpuhkan pengesahan sijil untuk sambungan LDAPS.',
-                    skipTLSVerifyHelper:
-                        'Gunakan hanya dengan sijil yang ditandatangani sendiri yang dipercayai. Tetapan ini bebas daripada penyegerakan yang ketat.',
                     connectTimeout: 'Tamat masa sambungan (saat)',
                     searchPageSize: 'LDAP saiz halaman pertanyaan',
                     restore: 'Pulihkan',
@@ -5510,10 +5514,7 @@ const message = {
                         defaultRoleHelper: 'Hanya terpakai kepada pengguna yang dibuat melalui penyegerakan berjadual.',
                         defaultRoleRequired: 'Pilih peranan untuk pengguna LDAP baharu.',
                         strictSyncHelper:
-                            'Pengguna yang tiada daripada pertanyaan penuh lengkap dilumpuhkan dan sesi mereka dikosongkan; pengguna, peranan dan kebenaran tidak dipadamkan.',
-                        safetyTitle: 'Pengguna yang hilang diproses hanya selepas pertanyaan penuh LDAP lengkap',
-                        safetyDescription:
-                            'Pertanyaan yang gagal, tamat masa atau hasil halaman yang tidak lengkap tidak pernah mengubah status pengguna. Skop penyegerakan mengikut Base DN Pengguna, penapis dan pemetaan atribut.',
+                            'Selepas penyegerakan lengkap, pengguna yang tiada dalam LDAP ditandai sebagai Tidak ditemui dalam LDAP dan sesinya dikosongkan tanpa memadam pengguna, peranan atau kebenaran.',
                         runNow: 'Segerakkan sekarang',
                         lastRunSuccess: 'Penyegerakan terakhir berjaya: {0}',
                         lastRunFailed: 'Penyegerakan terakhir gagal: {0}',
@@ -5523,7 +5524,7 @@ const message = {
                         saveBeforeRun: 'Simpan tetapan penyegerakan sebelum menjalankan tugas.',
                         runConfirmTitle: 'Jalankan penyegerakan yang ketat',
                         runConfirmDescription:
-                            'Pengguna LDAP yang hilang daripada pertanyaan penuh yang lengkap akan dilumpuhkan dan sesi aktif mereka dikosongkan. teruskan?',
+                            'Status pengesahan pengguna yang tiada daripada pertanyaan LDAP penuh akan ditandakan sebagai Tidak ditemui dalam LDAP dan sesi aktif mereka dikosongkan. Teruskan?',
                         runSuccess: 'Penyegerakan LDAP selesai.',
                         weekdays: {
                             0: 'Ahad',

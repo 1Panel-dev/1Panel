@@ -2239,6 +2239,7 @@ const message = {
             users: '사용자 관리',
             roles: '역할',
             auth: '로그인 인증',
+            auth_sources: '인증 설정',
             alert: '경고 알림',
             sync: '리소스 동기화',
             exchange: '리소스 동기화',
@@ -5212,6 +5213,11 @@ const message = {
                     spCredentials: 'SP 개인 키 및 인증서',
                     spCredentialsDesc:
                         '로그인 및 로그아웃 메시지 서명에 사용됩니다. 서명 및 검증 정책은 백엔드에서 고정됩니다.',
+                    spEntityID: 'SP Entity ID',
+                    spEntityIDHelper:
+                        'SP의 고유 식별자입니다. IdP에 설정된 엔터티 ID 또는 대상(Audience)과 일치해야 하며 SP 메타데이터 URL로도 사용됩니다.',
+                    acsURL: 'ACS URL',
+                    sloURL: 'SLO URL',
                     spPrivateKey: 'SP 개인 키',
                     spPrivateKeyHelper:
                         'AuthnRequest 및 로그아웃 메시지 서명에 사용됩니다. 저장 시 암호화되며 표시되지 않습니다.',
@@ -5257,13 +5263,11 @@ const message = {
                     advancedDesc: 'TLS 및 LDAP 쿼리 페이징을 구성합니다.',
                     strictSync: '엄격한 동기화',
                     strictSyncTooltip:
-                        '전체 가져오기가 완료된 후 이 LDAP 소스에서 누락된 사용자는 비활성화되지만 삭제되지는 않습니다.',
+                        "완전한 전체 처리 후 이 LDAP 소스에서 누락된 사용자의 인증 상태가 'LDAP에 없음'으로 표시되지만 사용자는 삭제되지 않습니다.",
                     strictSyncHelper:
-                        '완전한 전체 가져오기에만 적용됩니다. 선택한 사용자를 가져와도 다른 사용자는 비활성화되지 않습니다.',
+                        '완전히 성공한 전체 처리에만 적용됩니다. 선택한 사용자를 가져와도 다른 사용자의 인증 상태는 변경되지 않습니다.',
                     skipTLSVerify: 'TLS 확인 건너뛰기',
                     skipTLSVerifyTooltip: 'LDAPS 연결에 대한 인증서 확인을 비활성화합니다.',
-                    skipTLSVerifyHelper:
-                        '신뢰할 수 있는 자체 서명된 인증서에만 사용하세요. 이 설정은 엄격한 동기화와 무관합니다.',
                     connectTimeout: '연결 시간 초과(초)',
                     searchPageSize: 'LDAP 쿼리 페이지 크기',
                     restore: '복원',
@@ -5312,10 +5316,7 @@ const message = {
                         defaultRoleHelper: '예약된 동기화로 생성된 사용자에게만 적용됩니다.',
                         defaultRoleRequired: '새로운 LDAP 사용자의 역할을 선택합니다.',
                         strictSyncHelper:
-                            '완전한 전체 쿼리에서 누락된 사용자는 비활성화되고 해당 세션이 지워집니다. 사용자, 역할 및 권한은 삭제되지 않습니다.',
-                        safetyTitle: '누락된 사용자는 완전한 LDAP 전체 쿼리 후에만 처리됩니다.',
-                        safetyDescription:
-                            '실패한 쿼리, 시간 초과 또는 불완전한 페이징 결과는 사용자 상태를 변경하지 않습니다. 동기화 범위는 사용자 Base DN, 필터 및 특성 매핑을 따릅니다.',
+                            "전체 동기화가 완료되면 LDAP에서 누락된 사용자를 'LDAP에 없음'으로 표시하고 세션을 종료하며 사용자, 역할 또는 권한은 삭제하지 않습니다.",
                         runNow: '지금 동기화',
                         lastRunSuccess: '마지막 동기화 성공: {0}',
                         lastRunFailed: '마지막 동기화 실패: {0}',
@@ -5325,7 +5326,7 @@ const message = {
                         saveBeforeRun: '작업을 실행하기 전에 동기화 설정을 저장하십시오.',
                         runConfirmTitle: '엄격한 동기화 실행',
                         runConfirmDescription:
-                            '완전한 전체 쿼리에서 누락된 LDAP 사용자를 비활성화하고 활성 세션을 종료합니다. 계속하시겠습니까?',
+                            "완전한 전체 쿼리에서 누락된 LDAP 사용자의 인증 상태를 'LDAP에 없음'으로 표시하고 활성 세션을 종료합니다. 계속하시겠습니까?",
                         runSuccess: 'LDAP 동기화가 완료되었습니다.',
                         weekdays: {
                             0: '일요일',

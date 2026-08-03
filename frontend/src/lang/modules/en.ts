@@ -2286,6 +2286,7 @@ const message = {
             users: 'User Management',
             roles: 'Role',
             auth: 'Login Authentication',
+            auth_sources: 'Authentication Settings',
             alert: 'Alert Notifications',
             sync: 'Resource Sync',
             exchange: 'Resource Sync',
@@ -5316,6 +5317,11 @@ const message = {
                     spCredentials: 'SP private key and certificate',
                     spCredentialsDesc:
                         'Used to sign sign-in and logout messages. Signature and validation policy is fixed by the backend.',
+                    spEntityID: 'SP Entity ID',
+                    spEntityIDHelper:
+                        'Unique SP identifier. It must match the Entity ID or audience configured in the IdP and also serves as the SP Metadata URL.',
+                    acsURL: 'ACS URL',
+                    sloURL: 'SLO URL',
                     spPrivateKey: 'SP private key',
                     spPrivateKeyHelper:
                         'Used to sign AuthnRequest and logout messages. It is encrypted at rest and never displayed.',
@@ -5363,13 +5369,11 @@ const message = {
                     advancedDesc: 'Configure TLS and LDAP query paging.',
                     strictSync: 'Strict synchronization',
                     strictSyncTooltip:
-                        'After a complete full import, users missing from this LDAP source are disabled but not deleted.',
+                        'After a complete full import, users missing from this LDAP source have their authentication status set to Not found in LDAP, but are not deleted.',
                     strictSyncHelper:
-                        'Only applies to a complete full import. Importing selected users never disables other users.',
+                        "Only applies to a complete full import. Importing selected users does not change other users' authentication status.",
                     skipTLSVerify: 'Skip TLS verification',
                     skipTLSVerifyTooltip: 'Disable certificate verification for LDAPS connections.',
-                    skipTLSVerifyHelper:
-                        'Use only with a trusted self-signed certificate. This setting is independent of strict synchronization.',
                     connectTimeout: 'Connection timeout (seconds)',
                     searchPageSize: 'LDAP query page size',
                     restore: 'Restore',
@@ -5420,10 +5424,7 @@ const message = {
                         defaultRoleHelper: 'Only applies to users created by scheduled synchronization.',
                         defaultRoleRequired: 'Select a role for new LDAP users.',
                         strictSyncHelper:
-                            'Users missing from a complete full query are disabled and their sessions are cleared; users, roles, and permissions are not deleted.',
-                        safetyTitle: 'Missing users are processed only after a complete LDAP full query',
-                        safetyDescription:
-                            'A failed query, timeout, or incomplete paged result never changes user status. The synchronization scope follows the User Base DN, filter, and attribute mapping.',
+                            'After a complete sync, users missing from LDAP are marked as Not found in LDAP and their sessions are cleared without deleting users, roles, or permissions.',
                         runNow: 'Sync now',
                         lastRunSuccess: 'Last sync succeeded: {0}',
                         lastRunFailed: 'Last sync failed: {0}',
@@ -5433,7 +5434,7 @@ const message = {
                         saveBeforeRun: 'Save the synchronization settings before running the task.',
                         runConfirmTitle: 'Run strict synchronization',
                         runConfirmDescription:
-                            'LDAP users missing from a complete full query will be disabled and their active sessions cleared. Continue?',
+                            'LDAP users missing from a complete full query will have their authentication status set to Not found in LDAP and their active sessions cleared. Continue?',
                         runSuccess: 'LDAP synchronization completed.',
                         weekdays: {
                             0: 'Sunday',

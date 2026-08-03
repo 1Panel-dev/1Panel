@@ -1024,6 +1024,13 @@
 		"formatZH": "删除 AI 网关 API Key",
 		"formatEN": "delete AI proxy API key"
 	},
+	"/core/enterprise/ai-proxy/api-keys/reactivate": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "重新激活 AI 网关 API Key",
+		"formatEN": "reactivate AI proxy API key"
+	},
 	"/core/enterprise/ai-proxy/api-keys/reveal": {
 		"bodyKeys": [],
 		"paramKeys": [],
@@ -1341,6 +1348,99 @@
 		"beforeFunctions": [],
 		"formatZH": "更新 AI 网关智能路由样本 [id] [type] [label]",
 		"formatEN": "update AI proxy smart route sample [id] [type] [label]"
+	},
+	"/core/enterprise/auth-sources/ldap/setting": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 LDAP 认证设置",
+		"formatEN": "update LDAP authentication settings"
+	},
+	"/core/enterprise/auth-sources/ldap/sync/run": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "手动同步 LDAP 用户",
+		"formatEN": "manually synchronize LDAP users"
+	},
+	"/core/enterprise/auth-sources/ldap/sync/setting": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 LDAP 同步设置",
+		"formatEN": "update LDAP synchronization settings"
+	},
+	"/core/enterprise/auth-sources/ldap/test-connection": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "测试 LDAP 连接",
+		"formatEN": "test LDAP connection"
+	},
+	"/core/enterprise/auth-sources/ldap/test-login": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "测试 LDAP 用户登录",
+		"formatEN": "test LDAP user login"
+	},
+	"/core/enterprise/auth-sources/ldap/users/import": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "导入 LDAP 用户",
+		"formatEN": "import LDAP users"
+	},
+	"/core/enterprise/auth-sources/oidc/setting": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 OIDC 认证设置",
+		"formatEN": "update OIDC authentication settings"
+	},
+	"/core/enterprise/auth-sources/oidc/test-configuration": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "测试 OIDC 连接",
+		"formatEN": "test OIDC connection"
+	},
+	"/core/enterprise/auth-sources/oidc/test-login/begin": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "发起 OIDC 测试登录",
+		"formatEN": "start OIDC test login"
+	},
+	"/core/enterprise/auth-sources/saml2/setting": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新 SAML2 认证设置",
+		"formatEN": "update SAML2 authentication settings"
+	},
+	"/core/enterprise/auth-sources/saml2/test-configuration": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "测试 SAML2 连接",
+		"formatEN": "test SAML2 connection"
+	},
+	"/core/enterprise/auth-sources/saml2/test-login/begin": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "发起 SAML2 测试登录",
+		"formatEN": "start SAML2 test login"
+	},
+	"/core/enterprise/licenses/community-restore": {
+		"bodyKeys": [
+			"mode"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "恢复为社区版",
+		"formatEN": "restore Community Edition"
 	},
 	"/core/enterprise/licenses/upload": {
 		"bodyKeys": [],
@@ -4901,6 +5001,69 @@
 		"beforeFunctions": [],
 		"formatZH": "上传 ssl 文件 [type]",
 		"formatEN": "Upload ssl file [type]"
+	},
+	"/websites/templates": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建网站模板 [name]",
+		"formatEN": "Create website template [name]"
+	},
+	"/websites/templates/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "website_templates",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除网站模板 [name]",
+		"formatEN": "Delete website template [name]"
+	},
+	"/websites/templates/outputs": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "生成模板产物 [name]",
+		"formatEN": "Generate template output [name]"
+	},
+	"/websites/templates/outputs/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "website_template_outputs",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除模板产物 [name]",
+		"formatEN": "Delete template output [name]"
+	},
+	"/websites/templates/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新网站模板 [name]",
+		"formatEN": "Update website template [name]"
 	},
 	"/websites/update": {
 		"bodyKeys": [

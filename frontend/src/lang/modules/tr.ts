@@ -2313,6 +2313,7 @@ const message = {
             users: 'Kullanıcı yönetimi',
             roles: 'Rol',
             auth: 'Giriş kimlik doğrulaması',
+            auth_sources: 'Kimlik Doğrulama Ayarları',
             alert: 'Uyarı bildirimleri',
             sync: 'Kaynak Senkronizasyonu',
             exchange: 'Kaynak Senkronizasyonu',
@@ -5411,6 +5412,11 @@ const message = {
                     spCredentials: 'SP özel anahtarı ve sertifikası',
                     spCredentialsDesc:
                         'Oturum açma ve kapatma mesajlarını imzalamak için kullanılır. İmza ve doğrulama ilkesi arka uç tarafından sabitlenir.',
+                    spEntityID: 'SP Entity ID',
+                    spEntityIDHelper:
+                        "SP'nin benzersiz tanımlayıcısıdır. IdP'de yapılandırılan Entity ID veya Audience ile eşleşmeli ve aynı zamanda SP Metadata URL'si olarak kullanılmalıdır.",
+                    acsURL: 'ACS URL',
+                    sloURL: 'SLO URL',
                     spPrivateKey: 'SP özel anahtarı',
                     spPrivateKeyHelper:
                         'AuthnRequest ve oturum kapatma mesajlarını imzalamak için kullanılır. Saklanırken şifrelenir ve hiçbir zaman gösterilmez.',
@@ -5461,13 +5467,11 @@ const message = {
                     advancedDesc: 'TLS ve LDAP sorgu sayfalamayı yapılandırın.',
                     strictSync: 'Sıkı senkronizasyon',
                     strictSyncTooltip:
-                        'Tam bir içe aktarma işleminin ardından, bu LDAP kaynağında eksik olan kullanıcılar devre dışı bırakılır ancak silinmez.',
+                        'Tam işleme tamamlandıktan sonra, bu LDAP kaynağında bulunmayan kullanıcıların kimlik doğrulama durumu “LDAP’te bulunamadı” olarak işaretlenir; kullanıcılar silinmez.',
                     strictSyncHelper:
-                        'Yalnızca tam bir tam içe aktarma için geçerlidir. Seçilen kullanıcıları içe aktarmak hiçbir zaman diğer kullanıcıları devre dışı bırakmaz.',
+                        'Yalnızca başarıyla tamamlanan tam işleme için geçerlidir. Seçilen kullanıcıları içe aktarmak diğer kullanıcıların kimlik doğrulama durumunu değiştirmez.',
                     skipTLSVerify: 'TLS doğrulamasını atla',
                     skipTLSVerifyTooltip: 'LDAPS bağlantıları için sertifika doğrulamayı devre dışı bırakın.',
-                    skipTLSVerifyHelper:
-                        'Yalnızca güvenilir, kendinden imzalı bir sertifikayla kullanın. Bu ayar katı senkronizasyondan bağımsızdır.',
                     connectTimeout: 'Bağlantı zaman aşımı (saniye)',
                     searchPageSize: 'LDAP sorgu sayfası boyutu',
                     restore: 'Geri yükle',
@@ -5520,10 +5524,7 @@ const message = {
                             'Yalnızca zamanlanmış senkronizasyonla oluşturulan kullanıcılar için geçerlidir.',
                         defaultRoleRequired: 'Yeni LDAP kullanıcıları için bir rol seçin.',
                         strictSyncHelper:
-                            'Tam sorguda eksik olan kullanıcılar devre dışı bırakılır ve oturumları temizlenir; kullanıcılar, roller ve izinler silinmez.',
-                        safetyTitle: 'Eksik kullanıcılar yalnızca LDAP tam sorgusunun tamamlanmasından sonra işlenir',
-                        safetyDescription:
-                            'Başarısız bir sorgu, zaman aşımı veya tamamlanmamış sayfalanmış sonuç, kullanıcı durumunu hiçbir zaman değiştirmez. Senkronizasyon kapsamı Kullanıcı Base DN, filtre ve öznitelik eşlemesini takip eder.',
+                            "Tam senkronizasyondan sonra LDAP'te bulunmayan kullanıcılar “LDAP'te bulunamadı” olarak işaretlenir ve kullanıcılar, roller veya izinler silinmeden oturumları temizlenir.",
                         runNow: 'Şimdi senkronize et',
                         lastRunSuccess: 'Son senkronizasyon başarılı oldu: {0}',
                         lastRunFailed: 'Son senkronizasyon başarısız oldu: {0}',
@@ -5533,7 +5534,7 @@ const message = {
                         saveBeforeRun: 'Görevi çalıştırmadan önce senkronizasyon ayarlarını kaydedin.',
                         runConfirmTitle: 'Kesin senkronizasyonu çalıştır',
                         runConfirmDescription:
-                            'Tam sorguda bulunmayan LDAP kullanıcıları devre dışı bırakılacak ve etkin oturumları kapatılacaktır. Devam edilsin mi?',
+                            'Tam LDAP sorgusunda bulunmayan kullanıcıların kimlik doğrulama durumu “LDAP’te bulunamadı” olarak işaretlenecek ve etkin oturumları kapatılacaktır. Devam edilsin mi?',
                         runSuccess: 'LDAP senkronizasyonu tamamlandı.',
                         weekdays: {
                             0: 'Pazar',

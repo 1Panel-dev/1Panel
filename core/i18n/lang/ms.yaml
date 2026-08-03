@@ -450,6 +450,7 @@ Command: "Arahan"
 
 # LDAP
 ErrLDAPConnectionTest: "Ujian sambungan LDAP gagal. Semak alamat pelayan, akaun pengikatan dan tetapan rangkaian."
+ErrLDAPLoginTest: "Ujian log masuk LDAP gagal. Semak nama pengguna dan kata laluan."
 LDAPConnectionTestSuccess: "Ujian sambungan LDAP berjaya."
 ErrLDAPDirectorySearch: "Gagal membaca pengguna LDAP. Semak tetapan sambungan dan carian."
 ErrLDAPConfigLoad: "Gagal memuatkan konfigurasi LDAP."

@@ -450,6 +450,7 @@ Command: "Command"
 
 # LDAP
 ErrLDAPConnectionTest: "LDAP connection test failed. Check the server address, bind account, and network settings."
+ErrLDAPLoginTest: "LDAP login test failed. Check the username and password."
 LDAPConnectionTestSuccess: "LDAP connection test succeeded."
 ErrLDAPDirectorySearch: "Failed to read LDAP users. Check the connection and search settings."
 ErrLDAPConfigLoad: "Failed to load the LDAP configuration."

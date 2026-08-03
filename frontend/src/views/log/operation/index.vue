@@ -40,6 +40,7 @@
                     <el-option :label="$t('logs.detail.backups')" value="backups" />
                     <el-option :label="$t('logs.detail.groups')" value="groups" />
                     <el-option :label="$t('logs.detail.roles')" value="roles" />
+                    <el-option :label="$t('logs.detail.auth_sources')" value="auth-sources" />
                     <el-option :label="$t('logs.detail.commands')" value="commands" />
                 </el-select>
                 <el-select v-model="searchStatus" @change="search()" clearable class="p-w-200">
