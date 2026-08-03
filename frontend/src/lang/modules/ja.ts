@@ -1206,6 +1206,7 @@ const message = {
             source: 'ソース',
             sourceHeuristic: 'ルール判定',
             sourceEmbedding: 'サンプル一致',
+            sourceContext: 'コンテキスト継承',
             latency: 'レイテンシ',
             decisionLogs: '判断ログ',
             requestID: 'リクエスト ID',

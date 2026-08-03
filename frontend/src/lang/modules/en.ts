@@ -1216,6 +1216,7 @@ const message = {
             source: 'Source',
             sourceHeuristic: 'Rule-based',
             sourceEmbedding: 'Sample Match',
+            sourceContext: 'Context Inheritance',
             latency: 'Latency',
             decisionLogs: 'Decision Logs',
             requestID: 'Request ID',

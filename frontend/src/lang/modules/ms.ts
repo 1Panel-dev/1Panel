@@ -1227,6 +1227,7 @@ const message = {
             source: 'Sumber',
             sourceHeuristic: 'Berdasarkan peraturan',
             sourceEmbedding: 'Padanan sampel',
+            sourceContext: 'Pewarisan konteks',
             latency: 'Latensi',
             decisionLogs: 'Log Keputusan',
             requestID: 'ID Permintaan',

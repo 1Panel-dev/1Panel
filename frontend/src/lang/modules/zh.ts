@@ -1170,6 +1170,7 @@ const message = {
             source: '来源',
             sourceHeuristic: '规则判断',
             sourceEmbedding: '样本匹配',
+            sourceContext: '上下文继承',
             latency: '耗时',
             decisionLogs: '决策日志',
             requestID: '请求 ID',

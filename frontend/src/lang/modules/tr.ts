@@ -1225,6 +1225,7 @@ const message = {
             source: 'Kaynak',
             sourceHeuristic: 'Kural tabanlı',
             sourceEmbedding: 'Örnek eşleşmesi',
+            sourceContext: 'Bağlam devralma',
             latency: 'Gecikme',
             decisionLogs: 'Karar Logları',
             requestID: 'İstek ID',

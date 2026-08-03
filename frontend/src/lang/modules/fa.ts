@@ -1203,6 +1203,7 @@ const message = {
             source: 'منبع',
             sourceHeuristic: 'قضاوت بر اساس قانون',
             sourceEmbedding: 'تطبیق نمونه',
+            sourceContext: 'وراثت زمینه',
             latency: 'تاخیر',
             decisionLogs: 'گزارش تصمیم‌ها',
             requestID: 'شناسه درخواست',

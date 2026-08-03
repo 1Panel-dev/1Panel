@@ -1223,6 +1223,7 @@ const message = {
             source: 'Fonte',
             sourceHeuristic: 'Regras',
             sourceEmbedding: 'Correspondência de amostras',
+            sourceContext: 'Herança de contexto',
             latency: 'Latência',
             decisionLogs: 'Logs de decisão',
             requestID: 'ID da solicitação',
