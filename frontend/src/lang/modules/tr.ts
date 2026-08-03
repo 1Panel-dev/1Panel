@@ -2816,6 +2816,8 @@ const message = {
         ipWhiteListEgs: 'Her satıra bir tane. Örneğin,\n172.161.10.111\n172.161.10.0/24',
         ipWhiteListHelper: 'İzin listesindeki IP’ler API’ye erişebilir, 0.0.0.0/0 (tüm IPv4), ::/0 (tüm IPv6)',
         apiTrustedProxies: 'API güvenilir proxyleri',
+        apiTrustedProxiesEgs:
+            'Her satıra bir proxy sunucusu IP’si veya CIDR girin. Örneğin,\n172.16.10.111\n172.16.10.0/24',
         apiTrustedProxiesHelper:
             'Ters proxy kullanırken istemci IP adresini doğru şekilde almak için proxy sunucusunun IP adresini veya ağını girin. Kullanmıyorsanız boş bırakın. 0.0.0.0/0 ve ::/0 desteklenmez.',
         apiKeyValidityTime: 'Arayüz anahtarının geçerlilik süresi',

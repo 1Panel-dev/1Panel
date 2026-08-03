@@ -2828,6 +2828,7 @@ const message = {
         ipWhiteListHelper:
             'IPs na lista de permitidos podem acessar a API, 0.0.0.0/0 (todos os IPv4), ::/0 (todos os IPv6)',
         apiTrustedProxies: 'Proxies confiáveis da API',
+        apiTrustedProxiesEgs: 'Um IP ou CIDR do servidor proxy por linha. Exemplo:\n172.16.10.111\n172.16.10.0/24',
         apiTrustedProxiesHelper:
             'Ao usar um proxy reverso, insira o IP ou a rede do servidor proxy para obter corretamente o IP do cliente. Caso contrário, deixe este campo em branco. 0.0.0.0/0 e ::/0 não são suportados.',
         apiKeyReset: 'Redefinir chave da interface',

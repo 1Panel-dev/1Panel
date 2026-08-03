@@ -2764,6 +2764,7 @@ const message = {
         ipWhiteListEgs: '1行に1つ入力します。例：\n172.161.10.111\n172.161.10.0/24',
         ipWhiteListHelper: 'AllowList内のIPSはAPIにアクセスできます、0.0.0.0/0（すべての IPv4）、::/0（すべての IPv6）',
         apiTrustedProxies: 'API信頼済みプロキシ',
+        apiTrustedProxiesEgs: 'プロキシサーバーのIPまたはCIDRを1行に1つ入力します。例：\n172.16.10.111\n172.16.10.0/24',
         apiTrustedProxiesHelper:
             'リバースプロキシを使用する場合は、クライアントIPを正しく取得するために、プロキシサーバーのIPまたはネットワークを入力してください。使用しない場合は空欄にしてください。0.0.0.0/0と::/0は指定できません。',
         apiKeyReset: 'インターフェイスキーリセット',

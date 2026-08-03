@@ -359,7 +359,7 @@
             <el-form-item :label="$t('setting.apiTrustedProxies')" prop="apiTrustedProxies">
                 <el-input
                     type="textarea"
-                    :placeholder="$t('setting.allowIPEgs')"
+                    :placeholder="$t('setting.apiTrustedProxiesEgs')"
                     :rows="3"
                     v-model="form.apiTrustedProxies"
                 />
