@@ -33,11 +33,12 @@ type PasskeyBeginResponse struct {
 }
 
 type Login struct {
-	Name      string `json:"name" validate:"required"`
-	Password  string `json:"password" validate:"required"`
-	Captcha   string `json:"captcha"`
-	CaptchaID string `json:"captchaID"`
-	Language  string `json:"language" validate:"required,oneof=zh en 'zh-Hant' ko ja ru ms 'pt-BR' tr 'es-ES' fa lo"`
+	Name       string `json:"name" validate:"required"`
+	Password   string `json:"password" validate:"required"`
+	Captcha    string `json:"captcha"`
+	CaptchaID  string `json:"captchaID"`
+	Language   string `json:"language" validate:"required,oneof=zh en 'zh-Hant' ko ja ru ms 'pt-BR' tr 'es-ES' fa lo"`
+	AuthSource string `json:"authSource,omitempty"`
 }
 
 type SystemSetting struct {

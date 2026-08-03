@@ -221,9 +221,6 @@ func (p *PSession) DeleteByID(id string) error {
 	return nil
 }
 
-// DeleteByHash removes exactly one session identified by the SHA-256 digest
-// of its cookie value. This lets external logout protocols correlate a stored
-// session without persisting the raw session credential.
 func (p *PSession) DeleteByHash(sessionHash string) error {
 	if sessionHash == "" {
 		return nil

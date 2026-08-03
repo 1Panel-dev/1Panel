@@ -4982,6 +4982,14 @@ const message = {
             authManage: 'Pengurusan pengesahan',
             auth: {
                 providerNavigation: 'Pembekal pengesahan',
+                defaultNode: 'Nod lalai',
+                defaultNodePlaceholder: 'Pilih nod',
+                defaultNodeHelper: 'Untuk pengguna baharu sahaja.',
+                defaultNodeRequired: 'Pilih nod lalai yang sah.',
+                nodesLoadFailed: 'Gagal memuatkan nod. Cuba lagi sebelum memilih nod lalai.',
+                nodeHandling: 'Pengendalian nod',
+                assignDefaultNode: 'Tetapkan nod lalai: {node}',
+                keepExistingNode: 'Kekalkan kebenaran nod sedia ada',
                 providers: {
                     ldap: 'AD/LDAP',
                     passkey: 'Passkey',
@@ -5290,7 +5298,8 @@ const message = {
                         'Apabila medan nama pengguna tiada, sistem melengkapkannya daripada endpoint ini. Biarkan kosong untuk tidak melengkapkannya.',
                     userInfoEndpointInvalid: 'Masukkan UserInfo Endpoint yang sah.',
                     userMapping: 'Tetapan pengguna',
-                    userMappingDesc: 'Tetapkan nama pengguna OIDC dan peranan lalai untuk log masuk pertama.',
+                    userMappingDesc:
+                        'Konfigurasikan pemetaan nama pengguna OIDC serta nod dan peranan lalai untuk mencipta pengguna pada log masuk pertama.',
                 },
                 saml2: {
                     actionCreate: 'Buat pengguna',
@@ -5403,13 +5412,16 @@ const message = {
                     testBeforeEnable: 'Uji konfigurasi semasa sebelum mendayakan atau menyimpan perubahan sensitif.',
                     testConfiguration: 'Uji konfigurasi',
                     unsavedChanges: 'Terdapat perubahan SAML2 yang belum disimpan.',
-                    usedAttribute: 'Atribut nama pengguna yang digunakan',
+                    usedAttribute: 'Pemetaan nama pengguna',
                     usersAndRoles: 'Pengguna dan peranan',
                     usersAndRolesDesc:
-                        'Hanya nama pengguna dipetakan. Pengguna 1Panel dicipta secara automatik pada log masuk berjaya yang pertama.',
+                        'Konfigurasikan pemetaan nama pengguna panel serta nod dan peranan lalai untuk mencipta pengguna pada log masuk pertama.',
                 },
                 ldap: {
                     basic: 'Tetapan asas',
+                    loginTitle: 'Log masuk LDAP',
+                    loginWith: 'Log masuk dengan LDAP',
+                    backToLocalLogin: 'Kembali ke log masuk panel',
                     enable: 'Dayakan',
                     enabled: 'Didayakan',
                     disabled: 'Dilumpuhkan',
@@ -6952,7 +6964,8 @@ const message = {
         varTypeSelectHelper: 'Pilih daripada pilihan pratetap, pilihan perlu diisi',
         varTypeColor: 'Warna',
         varTypeColorHelper: 'Pemilih warna',
-        autoDetectHelper: 'Pemboleh ubah dalam kurungan kerinting berganda dikesan secara automatik dan ditambah ke jadual',
+        autoDetectHelper:
+            'Pemboleh ubah dalam kurungan kerinting berganda dikesan secara automatik dan ditambah ke jadual',
         selectTemplate: 'Pilih Templat',
         fillVariables: 'Isi Pemboleh Ubah',
         noVariables: 'Tiada pemboleh ubah ditakrifkan dalam templat ini',

@@ -10,9 +10,6 @@ export type SAML2Navigation =
       };
 
 const validateNavigationURL = (value: string) => {
-    // A freshly opened popup has an opaque `about:blank` origin after its
-    // opener is detached. Resolve relative URLs against the 1Panel page
-    // instead of that popup, otherwise `new URL()` receives "null" as base.
     const url = new URL(value, window.location.origin);
     if (!['http:', 'https:'].includes(url.protocol)) {
         throw new Error('Unsupported SAML2 navigation protocol');
@@ -20,10 +17,6 @@ const validateNavigationURL = (value: string) => {
     return url.toString();
 };
 
-/**
- * Continue a backend-created SAML2 flow without interpreting or rewriting the
- * protocol payload in the browser.
- */
 export const submitSAML2Navigation = (navigation: SAML2Navigation, targetWindow: Window = window) => {
     if (navigation.binding === 'redirect' && navigation.redirectURL) {
         targetWindow.location.assign(validateNavigationURL(navigation.redirectURL));

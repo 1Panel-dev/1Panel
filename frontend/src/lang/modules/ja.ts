@@ -4904,6 +4904,14 @@ const message = {
             authManage: '認証管理',
             auth: {
                 providerNavigation: '認証プロバイダー',
+                defaultNode: 'デフォルトノード',
+                defaultNodePlaceholder: 'ノードを選択してください',
+                defaultNodeHelper: '新規ユーザーにのみ使用します。',
+                defaultNodeRequired: '有効なデフォルトノードを選択してください。',
+                nodesLoadFailed: 'ノードの読み込みに失敗しました。デフォルトノードを選択する前に再試行してください。',
+                nodeHandling: 'ノードの処理',
+                assignDefaultNode: 'デフォルトノードを割り当て: {node}',
+                keepExistingNode: '既存のノード権限を保持',
                 providers: {
                     ldap: 'AD/LDAP',
                     passkey: 'Passkey',
@@ -5205,7 +5213,8 @@ const message = {
                         'ユーザー名フィールドがない場合、このエンドポイントから補完します。補完しない場合は空欄にします。',
                     userInfoEndpointInvalid: '有効な UserInfo Endpoint を入力してください。',
                     userMapping: 'ユーザー設定',
-                    userMappingDesc: 'OIDC のユーザー名と初回ログイン時のデフォルトロールを設定します。',
+                    userMappingDesc:
+                        'OIDC ユーザー名のマッピングと、初回ログイン時のユーザー作成に使用するデフォルトノードおよびロールを設定します。',
                 },
                 saml2: {
                     actionCreate: 'ユーザーの作成',
@@ -5318,13 +5327,16 @@ const message = {
                     testBeforeEnable: '機密変更を有効にするか保存する前に、現在の設定をテストしてください。',
                     testConfiguration: '設定をテスト',
                     unsavedChanges: '保存されていない SAML2 設定があります。',
-                    usedAttribute: '使用したユーザー名属性',
+                    usedAttribute: 'ユーザー名マッピング',
                     usersAndRoles: 'ユーザーとロール',
                     usersAndRolesDesc:
-                        'マッピングされるのはユーザー名のみです。初回ログイン成功時に 1Panel ユーザーが自動作成されます。',
+                        'パネルユーザー名のマッピングと、初回ログイン時のユーザー作成に使用するデフォルトノードおよびロールを設定します。',
                 },
                 ldap: {
                     basic: '基本設定',
+                    loginTitle: 'LDAP ログイン',
+                    loginWith: 'LDAP でログイン',
+                    backToLocalLogin: 'パネルログインに戻る',
                     enable: '有効にする',
                     enabled: '有効',
                     disabled: '無効',

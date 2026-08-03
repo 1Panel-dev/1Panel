@@ -4972,6 +4972,15 @@ const message = {
             authManage: 'Gestión de autenticación',
             auth: {
                 providerNavigation: 'Proveedores de autenticación',
+                defaultNode: 'Nodo predeterminado',
+                defaultNodePlaceholder: 'Selecciona un nodo',
+                defaultNodeHelper: 'Solo para usuarios nuevos.',
+                defaultNodeRequired: 'Selecciona un nodo predeterminado válido.',
+                nodesLoadFailed:
+                    'No se pudieron cargar los nodos. Reinténtalo antes de seleccionar el nodo predeterminado.',
+                nodeHandling: 'Gestión del nodo',
+                assignDefaultNode: 'Asignar nodo predeterminado: {node}',
+                keepExistingNode: 'Mantener los permisos de nodo existentes',
                 providers: {
                     ldap: 'AD/LDAP',
                     passkey: 'Passkey',
@@ -5290,7 +5299,7 @@ const message = {
                     userInfoEndpointInvalid: 'Ingrese un UserInfo Endpoint válido.',
                     userMapping: 'Configuración de usuarios',
                     userMappingDesc:
-                        'Configure el nombre de usuario OIDC y el rol predeterminado para el primer inicio de sesión.',
+                        'Configure la asignación del nombre de usuario OIDC y el nodo y rol predeterminados usados al crear un usuario en el primer inicio de sesión.',
                 },
                 saml2: {
                     actionCreate: 'Crear usuario',
@@ -5408,13 +5417,16 @@ const message = {
                     testBeforeEnable: 'Prueba la configuración actual antes de habilitar o guardar cambios sensibles.',
                     testConfiguration: 'Probar configuración',
                     unsavedChanges: 'Hay cambios de SAML2 sin guardar.',
-                    usedAttribute: 'Atributo de nombre de usuario utilizado',
+                    usedAttribute: 'Mapeo de nombre de usuario',
                     usersAndRoles: 'Usuarios y roles',
                     usersAndRolesDesc:
-                        'Solo se asigna un nombre de usuario. El usuario de 1Panel se crea automáticamente en el primer inicio de sesión correcto.',
+                        'Configure la asignación del nombre de usuario del panel y el nodo y rol predeterminados usados al crear un usuario en el primer inicio de sesión.',
                 },
                 ldap: {
                     basic: 'Configuración básica',
+                    loginTitle: 'Inicio de sesión LDAP',
+                    loginWith: 'Iniciar sesión con LDAP',
+                    backToLocalLogin: 'Volver al inicio de sesión del panel',
                     enable: 'Habilitar',
                     enabled: 'Habilitado',
                     disabled: 'Deshabilitado',

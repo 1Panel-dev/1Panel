@@ -285,10 +285,7 @@ const logout = () => {
                 try {
                     submitSAML2Navigation(res.data.saml2Navigation);
                     return;
-                } catch {
-                    // The backend has already invalidated the local session.
-                    // Fall back to the login page if the IdP handoff is unusable.
-                }
+                } catch {}
             }
             router.push({ name: 'entrance', params: { code: entrance.value } });
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

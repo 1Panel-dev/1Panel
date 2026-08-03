@@ -76,11 +76,26 @@
                             {{ $t('commons.login.passkey') }}
                         </el-button>
                     </el-form-item>
-                    <div v-if="oidcEnabled || saml2Enabled" class="external-login-section">
+                    <div v-if="hasExternalLoginMethods" class="external-login-section">
                         <div class="external-login-divider">
                             <span>{{ $t('commons.login.otherLoginMethods') }}</span>
                         </div>
                         <div class="external-login-methods">
+                            <el-button
+                                v-if="ldapEnabled"
+                                class="external-login-button ldap-login-button"
+                                link
+                                native-type="button"
+                                :aria-label="$t('xpack.user.auth.ldap.loginWith')"
+                                @click="switchToLDAPLogin"
+                            >
+                                <span>LDAP</span>
+                            </el-button>
+                            <span
+                                v-if="ldapEnabled && (oidcEnabled || saml2Enabled)"
+                                class="external-login-separator"
+                                aria-hidden="true"
+                            ></span>
                             <el-button
                                 v-if="oidcEnabled"
                                 class="external-login-button oidc-login-button"
@@ -135,7 +150,24 @@
             </div>
             <div v-else>
                 <div class="flex justify-between items-center mb-6">
-                    <div class="text-2xl font-medium text-gray-900">{{ $t('commons.button.login') }}</div>
+                    <div>
+                        <div class="text-2xl font-medium text-gray-900">
+                            {{
+                                loginSource === 'ldap'
+                                    ? $t('xpack.user.auth.ldap.loginTitle')
+                                    : $t('commons.button.login')
+                            }}
+                        </div>
+                        <el-link
+                            v-if="loginSource === 'ldap'"
+                            class="local-login-link"
+                            type="primary"
+                            :underline="false"
+                            @click="switchToLocalLogin"
+                        >
+                            {{ $t('xpack.user.auth.ldap.backToLocalLogin') }}
+                        </el-link>
+                    </div>
                     <div class="cursor-pointer">
                         <el-dropdown @command="handleCommand">
                             <span class="flex items-center space-x-1">
@@ -228,11 +260,26 @@
                                 {{ $t('commons.button.login') }}
                             </el-button>
                         </el-form-item>
-                        <div v-if="oidcEnabled || saml2Enabled" class="external-login-section">
+                        <div v-if="loginSource === 'local' && hasExternalLoginMethods" class="external-login-section">
                             <div class="external-login-divider">
                                 <span>{{ $t('commons.login.otherLoginMethods') }}</span>
                             </div>
                             <div class="external-login-methods">
+                                <el-button
+                                    v-if="ldapEnabled"
+                                    class="external-login-button ldap-login-button"
+                                    link
+                                    native-type="button"
+                                    :aria-label="$t('xpack.user.auth.ldap.loginWith')"
+                                    @click="switchToLDAPLogin"
+                                >
+                                    <span>LDAP</span>
+                                </el-button>
+                                <span
+                                    v-if="ldapEnabled && (oidcEnabled || saml2Enabled)"
+                                    class="external-login-separator"
+                                    aria-hidden="true"
+                                ></span>
                                 <el-button
                                     v-if="oidcEnabled"
                                     class="external-login-button oidc-login-button"
@@ -319,6 +366,7 @@ import {
     getLoginSetting,
     passkeyBeginApi,
     passkeyFinishApi,
+    ldapStatusApi,
     oidcStatusApi,
     oidcBeginApi,
     oidcFinishApi,
@@ -366,6 +414,7 @@ const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
 const passkeySetting = ref(false);
 const passkeySupported = ref(false);
+const ldapEnabled = ref(false);
 const oidcEnabled = ref(false);
 const oidcDisplayName = ref('OIDC');
 const oidcStarting = ref(false);
@@ -374,6 +423,7 @@ const saml2DisplayName = ref('SAML2');
 const saml2Starting = ref(false);
 const autoPasskeyEnabledKey = '1panel-passkey-auto-enabled';
 const showPasswordLogin = ref(false);
+const loginSource = ref<'local' | 'ldap'>('local');
 const isDemo = ref(false);
 const open = ref(false);
 const loginBtnLinkColor = ref<string | null>(null);
@@ -517,9 +567,30 @@ const agreeWithLogin = () => {
 const showPasskeyOnly = computed(() => {
     return passkeySetting.value && passkeySupported.value && !showPasswordLogin.value;
 });
+const hasExternalLoginMethods = computed(() => ldapEnabled.value || oidcEnabled.value || saml2Enabled.value);
 
 const switchToPasswordLogin = () => {
+    loginSource.value = 'local';
     showPasswordLogin.value = true;
+    nextTick(() => {
+        userNameRef.value?.focus();
+    });
+};
+
+const switchToLDAPLogin = () => {
+    loginSource.value = 'ldap';
+    showPasswordLogin.value = true;
+    errAuthInfo.value = false;
+    errCaptcha.value = false;
+    nextTick(() => {
+        userNameRef.value?.focus();
+    });
+};
+
+const switchToLocalLogin = () => {
+    loginSource.value = 'local';
+    errAuthInfo.value = false;
+    errCaptcha.value = false;
     nextTick(() => {
         userNameRef.value?.focus();
     });
@@ -577,6 +648,7 @@ const login = (formEl: FormInstance | undefined) => {
             captcha: loginForm.captcha,
             captchaID: captcha.captchaID,
             authMethod: 'session',
+            authSource: loginSource.value,
             language: loginForm.language,
         };
         if (!ignoreCaptcha.value && requestLoginForm.captcha == '') {
@@ -689,6 +761,18 @@ const passkeyLogin = async () => {
     } finally {
         isLoggingIn = false;
         loading.value = false;
+    }
+};
+
+const loadLDAPStatus = async () => {
+    ldapEnabled.value = false;
+    if (!isEnterprise.value) return;
+    try {
+        const res = await ldapStatusApi();
+        ldapEnabled.value = Boolean(res.data.enabled);
+    } catch {
+        // LDAP is optional. A status failure must not affect local or any other login method.
+        ldapEnabled.value = false;
     }
 };
 
@@ -902,7 +986,7 @@ onMounted(async () => {
     }
     if (!loginViewActive || isLogin.value) return;
     if (!isLogin.value && !mfaShow.value) {
-        await Promise.all([loadOIDCStatus(), loadSAML2Status()]);
+        await Promise.all([loadLDAPStatus(), loadOIDCStatus(), loadSAML2Status()]);
     }
     try {
         await getXpackSettingForTheme();
@@ -965,6 +1049,12 @@ onBeforeUnmount(() => {
     .external-login-section {
         width: 100%;
         padding-top: 2px;
+    }
+
+    .local-login-link {
+        height: auto;
+        margin-top: 6px;
+        font-size: 13px;
     }
 
     .external-login-divider {

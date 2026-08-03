@@ -4876,6 +4876,14 @@ const message = {
             authManage: 'مدیریت احراز هویت',
             auth: {
                 providerNavigation: 'ارائه دهندگان احراز هویت',
+                defaultNode: 'گره پیش فرض',
+                defaultNodePlaceholder: 'یک گره انتخاب کنید',
+                defaultNodeHelper: 'فقط برای کاربران جدید.',
+                defaultNodeRequired: 'یک گره پیش فرض معتبر انتخاب کنید.',
+                nodesLoadFailed: 'بارگیری گره ها ناموفق بود. پیش از انتخاب گره پیش فرض دوباره تلاش کنید.',
+                nodeHandling: 'مدیریت گره',
+                assignDefaultNode: 'اختصاص گره پیش فرض: {node}',
+                keepExistingNode: 'حفظ مجوزهای گره موجود',
                 providers: {
                     ldap: 'AD/LDAP',
                     passkey: 'Passkey',
@@ -5175,7 +5183,8 @@ const message = {
                         'اگر فیلد نام کاربری موجود نباشد، سیستم آن را از این نقطه پایانی دریافت می‌کند؛ برای عدم تکمیل، خالی بگذارید.',
                     userInfoEndpointInvalid: 'یک UserInfo Endpoint معتبر وارد کنید.',
                     userMapping: 'تنظیمات کاربر',
-                    userMappingDesc: 'نام کاربری OIDC و نقش پیش‌فرض نخستین ورود را تنظیم کنید.',
+                    userMappingDesc:
+                        'نگاشت نام کاربری OIDC و گره و نقش پیش‌فرض مورد استفاده برای ایجاد کاربر در نخستین ورود را تنظیم کنید.',
                 },
                 saml2: {
                     actionCreate: 'کاربر ایجاد کنید',
@@ -5285,13 +5294,16 @@ const message = {
                     testBeforeEnable: 'قبل از فعال کردن یا ذخیره تغییرات حساس، پیکربندی فعلی را آزمایش کنید.',
                     testConfiguration: 'آزمایش پیکربندی',
                     unsavedChanges: 'تغییرات ذخیره‌نشده SAML2 وجود دارد.',
-                    usedAttribute: 'ویژگی نام کاربری استفاده‌شده',
+                    usedAttribute: 'نگاشت نام کاربری',
                     usersAndRoles: 'کاربران و نقش‌ها',
                     usersAndRolesDesc:
-                        'فقط نام کاربری نگاشت می‌شود. کاربر 1Panel در نخستین ورود موفق به‌طور خودکار ایجاد می‌شود.',
+                        'نگاشت نام کاربری پنل و گره و نقش پیش‌فرض مورد استفاده برای ایجاد کاربر در نخستین ورود را تنظیم کنید.',
                 },
                 ldap: {
                     basic: 'تنظیمات پایه',
+                    loginTitle: 'ورود LDAP',
+                    loginWith: 'ورود با LDAP',
+                    backToLocalLogin: 'بازگشت به ورود پنل',
                     enable: 'فعال کردن',
                     enabled: 'فعال شد',
                     disabled: 'غیرفعال',

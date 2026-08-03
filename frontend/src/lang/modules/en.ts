@@ -4911,6 +4911,14 @@ const message = {
             authManage: 'Authentication',
             auth: {
                 providerNavigation: 'Authentication providers',
+                defaultNode: 'Default node',
+                defaultNodePlaceholder: 'Select a node',
+                defaultNodeHelper: 'Only for new users.',
+                defaultNodeRequired: 'Select a valid default node.',
+                nodesLoadFailed: 'Failed to load nodes. Retry before selecting the default node.',
+                nodeHandling: 'Node handling',
+                assignDefaultNode: 'Assign default node: {node}',
+                keepExistingNode: 'Keep the existing node permissions',
                 providers: {
                     ldap: 'AD/LDAP',
                     passkey: 'Passkey',
@@ -5206,7 +5214,8 @@ const message = {
                         'When the username field is missing, the system retrieves it from this endpoint. Leave blank to skip fallback.',
                     userInfoEndpointInvalid: 'Enter a valid UserInfo Endpoint.',
                     userMapping: 'User settings',
-                    userMappingDesc: 'Set the OIDC username and the default role for first sign-in.',
+                    userMappingDesc:
+                        'Configure OIDC username mapping and the default node and role used to create a user on first sign-in.',
                 },
                 saml2: {
                     actionCreate: 'Create user',
@@ -5316,13 +5325,16 @@ const message = {
                         'Test the current configuration before enabling SAML2 or saving authentication-sensitive changes.',
                     testConfiguration: 'Test configuration',
                     unsavedChanges: 'The SAML2 configuration has unsaved changes.',
-                    usedAttribute: 'Username Attribute used',
+                    usedAttribute: 'Username mapping',
                     usersAndRoles: 'Users and roles',
                     usersAndRolesDesc:
-                        'Only a username is mapped. A 1Panel user is created automatically on the first successful sign-in.',
+                        'Configure panel username mapping and the default node and role used to create a user on first sign-in.',
                 },
                 ldap: {
                     basic: 'Basic settings',
+                    loginTitle: 'LDAP sign-in',
+                    loginWith: 'Sign in with LDAP',
+                    backToLocalLogin: 'Back to panel sign-in',
                     enable: 'Enable',
                     enabled: 'Enabled',
                     disabled: 'Disabled',

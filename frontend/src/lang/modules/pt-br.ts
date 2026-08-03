@@ -5005,6 +5005,14 @@ const message = {
             authManage: 'Gerenciamento de autenticação',
             auth: {
                 providerNavigation: 'Provedores de autenticação',
+                defaultNode: 'Nó padrão',
+                defaultNodePlaceholder: 'Selecione um nó',
+                defaultNodeHelper: 'Somente para novos usuários.',
+                defaultNodeRequired: 'Selecione um nó padrão válido.',
+                nodesLoadFailed: 'Falha ao carregar os nós. Tente novamente antes de selecionar o nó padrão.',
+                nodeHandling: 'Tratamento do nó',
+                assignDefaultNode: 'Atribuir nó padrão: {node}',
+                keepExistingNode: 'Manter as permissões de nó existentes',
                 providers: {
                     ldap: 'AD/LDAP',
                     passkey: 'Passkey',
@@ -5314,7 +5322,8 @@ const message = {
                         'Quando o campo de nome de usuário estiver ausente, o sistema o preencherá a partir deste endpoint. Deixe em branco para não preencher.',
                     userInfoEndpointInvalid: 'Insira um UserInfo Endpoint válido.',
                     userMapping: 'Configurações do usuário',
-                    userMappingDesc: 'Configure o nome de usuário OIDC e a função padrão do primeiro acesso.',
+                    userMappingDesc:
+                        'Configure o mapeamento do nome de usuário OIDC e o nó e a função padrão usados ao criar um usuário no primeiro acesso.',
                 },
                 saml2: {
                     actionCreate: 'Criar usuário',
@@ -5428,13 +5437,16 @@ const message = {
                     testBeforeEnable: 'Teste a configuração atual antes de ativar ou salvar alterações confidenciais.',
                     testConfiguration: 'Testar configuração',
                     unsavedChanges: 'Há alterações de SAML2 não salvas.',
-                    usedAttribute: 'Atributo de nome de usuário utilizado',
+                    usedAttribute: 'Mapeamento de nome de usuário',
                     usersAndRoles: 'Usuários e funções',
                     usersAndRolesDesc:
-                        'Somente o nome de usuário é mapeado. Um usuário do 1Panel é criado automaticamente no primeiro login bem-sucedido.',
+                        'Configure o mapeamento do nome de usuário do painel e o nó e a função padrão usados ao criar um usuário no primeiro acesso.',
                 },
                 ldap: {
                     basic: 'Configurações básicas',
+                    loginTitle: 'Login LDAP',
+                    loginWith: 'Entrar com LDAP',
+                    backToLocalLogin: 'Voltar ao login do painel',
                     enable: 'Habilitar',
                     enabled: 'Habilitado',
                     disabled: 'Desativado',

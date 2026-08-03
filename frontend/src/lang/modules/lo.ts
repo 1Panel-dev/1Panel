@@ -4783,6 +4783,14 @@ const message = {
             authManage: 'ການຢືນຢັນ',
             auth: {
                 providerNavigation: 'ຜູ້ໃຫ້ບໍລິການຢັ້ງຢືນ',
+                defaultNode: 'ໂນດເລີ່ມຕົ້ນ',
+                defaultNodePlaceholder: 'ເລືອກໂນດ',
+                defaultNodeHelper: 'ໃຊ້ສຳລັບຜູ້ໃຊ້ໃໝ່ເທົ່ານັ້ນ.',
+                defaultNodeRequired: 'ເລືອກໂນດເລີ່ມຕົ້ນທີ່ຖືກຕ້ອງ.',
+                nodesLoadFailed: 'ໂຫຼດໂນດບໍ່ສຳເລັດ. ລອງໃໝ່ກ່ອນເລືອກໂນດເລີ່ມຕົ້ນ.',
+                nodeHandling: 'ການຈັດການໂນດ',
+                assignDefaultNode: 'ກຳນົດໂນດເລີ່ມຕົ້ນ: {node}',
+                keepExistingNode: 'ຮັກສາສິດໂນດເດີມ',
                 providers: {
                     ldap: 'AD/LDAP',
                     passkey: 'Passkey',
@@ -5071,7 +5079,8 @@ const message = {
                         'ເມື່ອບໍ່ມີຟິວຊື່ຜູ້ໃຊ້ ລະບົບຈະເຕີມຈາກ endpoint ນີ້; ປ່ອຍຫວ່າງເພື່ອບໍ່ເຕີມ.',
                     userInfoEndpointInvalid: 'ໃສ່ UserInfo Endpoint ທີ່ຖືກຕ້ອງ.',
                     userMapping: 'ການຕັ້ງຄ່າຜູ້ໃຊ້',
-                    userMappingDesc: 'ກຳນົດຊື່ຜູ້ໃຊ້ OIDC ແລະບົດບາດເລີ່ມຕົ້ນສຳລັບການເຂົ້າລະບົບຄັ້ງທຳອິດ.',
+                    userMappingDesc:
+                        'ກຳນົດການຈັບຄູ່ຊື່ຜູ້ໃຊ້ OIDC ແລະໂນດກັບບົດບາດເລີ່ມຕົ້ນທີ່ໃຊ້ສ້າງຜູ້ໃຊ້ໃນການເຂົ້າລະບົບຄັ້ງທຳອິດ.',
                 },
                 saml2: {
                     actionCreate: 'ສ້າງຜູ້ໃຊ້',
@@ -5181,13 +5190,16 @@ const message = {
                     testBeforeEnable: 'ທົດສອບການຕັ້ງຄ່າປັດຈຸບັນກ່ອນທີ່ຈະເປີດ ຫຼືບັນທຶກການປ່ຽນແປງທີ່ລະອຽດອ່ອນ.',
                     testConfiguration: 'ທົດສອບການຕັ້ງຄ່າ',
                     unsavedChanges: 'ມີການປ່ຽນແປງ SAML2 ທີ່ຍັງບໍ່ໄດ້ບັນທຶກ.',
-                    usedAttribute: 'Attribute ຊື່ຜູ້ໃຊ້ທີ່ໃຊ້',
+                    usedAttribute: 'ການຈັບຄູ່ຊື່ຜູ້ໃຊ້',
                     usersAndRoles: 'ຜູ້ໃຊ້ ແລະບົດບາດ',
                     usersAndRolesDesc:
-                        'ຈັບຄູ່ສະເພາະຊື່ຜູ້ໃຊ້. ຜູ້ໃຊ້ 1Panel ຈະຖືກສ້າງອັດຕະໂນມັດເມື່ອເຂົ້າລະບົບສຳເລັດຄັ້ງທຳອິດ.',
+                        'ກຳນົດການຈັບຄູ່ຊື່ຜູ້ໃຊ້ແຜງ ແລະໂນດກັບບົດບາດເລີ່ມຕົ້ນທີ່ໃຊ້ສ້າງຜູ້ໃຊ້ໃນການເຂົ້າລະບົບຄັ້ງທຳອິດ.',
                 },
                 ldap: {
                     basic: 'ການຕັ້ງຄ່າພື້ນຖານ',
+                    loginTitle: 'ເຂົ້າລະບົບ LDAP',
+                    loginWith: 'ເຂົ້າລະບົບດ້ວຍ LDAP',
+                    backToLocalLogin: 'ກັບໄປການເຂົ້າລະບົບແຜງ',
                     enable: 'ເປີດໃຊ້',
                     enabled: 'ເປີດໃຊ້ແລ້ວ',
                     disabled: 'ປິດໃຊ້ງານ',

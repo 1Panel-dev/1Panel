@@ -19,6 +19,10 @@ export const passkeyFinishApi = (params: Record<string, any>, sessionId: string)
     return http.post<Login.ResLogin>(`/core/auth/passkey/finish`, params, undefined, { 'Passkey-Session': sessionId });
 };
 
+export const ldapStatusApi = () => {
+    return http.get<Login.LDAPStatus>(`/core/auth/ldap/status`, undefined, { skipErrorMessage: true });
+};
+
 export const oidcStatusApi = () => {
     return http.get<Login.OIDCStatus>(`/core/auth/oidc/status`, undefined, { skipErrorMessage: true });
 };

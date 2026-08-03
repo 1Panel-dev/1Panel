@@ -4985,6 +4985,14 @@ const message = {
             authManage: 'Kimlik doğrulama yönetimi',
             auth: {
                 providerNavigation: 'Kimlik doğrulama sağlayıcıları',
+                defaultNode: 'Varsayılan düğüm',
+                defaultNodePlaceholder: 'Bir düğüm seçin',
+                defaultNodeHelper: 'Yalnızca yeni kullanıcılar için.',
+                defaultNodeRequired: 'Geçerli bir varsayılan düğüm seçin.',
+                nodesLoadFailed: 'Düğümler yüklenemedi. Varsayılan düğümü seçmeden önce yeniden deneyin.',
+                nodeHandling: 'Düğüm işlemi',
+                assignDefaultNode: 'Varsayılan düğümü ata: {node}',
+                keepExistingNode: 'Mevcut düğüm izinlerini koru',
                 providers: {
                     ldap: 'AD/LDAP',
                     passkey: 'Passkey',
@@ -5295,7 +5303,8 @@ const message = {
                         'Kullanıcı adı alanı eksikse sistem bu endpoint üzerinden tamamlar. Tamamlama istemiyorsanız boş bırakın.',
                     userInfoEndpointInvalid: 'Geçerli bir UserInfo Endpoint girin.',
                     userMapping: 'Kullanıcı ayarları',
-                    userMappingDesc: 'OIDC kullanıcı adını ve ilk oturum açma için varsayılan rolü ayarlayın.',
+                    userMappingDesc:
+                        'OIDC kullanıcı adı eşlemesini ve ilk oturum açmada kullanıcı oluşturmak için kullanılacak varsayılan düğüm ile rolü ayarlayın.',
                 },
                 saml2: {
                     actionCreate: 'Kullanıcı oluştur',
@@ -5411,13 +5420,16 @@ const message = {
                         'Hassas değişiklikleri etkinleştirmeden veya kaydetmeden önce mevcut yapılandırmayı test edin.',
                     testConfiguration: 'Yapılandırmayı test et',
                     unsavedChanges: 'Kaydedilmemiş SAML2 değişiklikleri var.',
-                    usedAttribute: 'Kullanılan kullanıcı adı özniteliği',
+                    usedAttribute: 'Kullanıcı adı eşlemesi',
                     usersAndRoles: 'Kullanıcılar ve roller',
                     usersAndRolesDesc:
-                        'Yalnızca kullanıcı adı eşlenir. İlk başarılı oturum açmada bir 1Panel kullanıcısı otomatik olarak oluşturulur.',
+                        'Panel kullanıcı adı eşlemesini ve ilk oturum açmada kullanıcı oluşturmak için kullanılacak varsayılan düğüm ile rolü ayarlayın.',
                 },
                 ldap: {
                     basic: 'Temel ayarlar',
+                    loginTitle: 'LDAP ile giriş',
+                    loginWith: 'LDAP ile giriş yap',
+                    backToLocalLogin: 'Panel girişine dön',
                     enable: 'Etkinleştir',
                     enabled: 'Etkin',
                     disabled: 'Devre dışı',

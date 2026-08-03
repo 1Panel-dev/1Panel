@@ -4818,6 +4818,14 @@ const message = {
             authManage: '인증 관리',
             auth: {
                 providerNavigation: '인증 공급자',
+                defaultNode: '기본 노드',
+                defaultNodePlaceholder: '노드를 선택하세요',
+                defaultNodeHelper: '새 사용자에게만 사용됩니다.',
+                defaultNodeRequired: '유효한 기본 노드를 선택하세요.',
+                nodesLoadFailed: '노드를 불러오지 못했습니다. 기본 노드를 선택하기 전에 다시 시도하세요.',
+                nodeHandling: '노드 처리',
+                assignDefaultNode: '기본 노드 할당: {node}',
+                keepExistingNode: '기존 노드 권한 유지',
                 providers: {
                     ldap: 'AD/LDAP',
                     passkey: 'Passkey',
@@ -5105,7 +5113,8 @@ const message = {
                         '사용자 이름 필드가 없으면 이 엔드포인트에서 보완합니다. 보완하지 않으려면 비워 두세요.',
                     userInfoEndpointInvalid: '유효한 UserInfo Endpoint를 입력하세요.',
                     userMapping: '사용자 설정',
-                    userMappingDesc: 'OIDC 사용자 이름과 첫 로그인 시의 기본 역할을 설정합니다.',
+                    userMappingDesc:
+                        'OIDC 사용자 이름 매핑과 첫 로그인 시 사용자 생성에 사용할 기본 노드 및 역할을 설정합니다.',
                 },
                 saml2: {
                     actionCreate: '사용자 만들기',
@@ -5209,13 +5218,16 @@ const message = {
                     testBeforeEnable: '민감한 변경 사항을 활성화하거나 저장하기 전에 현재 구성을 테스트하세요.',
                     testConfiguration: '구성 테스트',
                     unsavedChanges: '저장되지 않은 SAML2 설정이 있습니다.',
-                    usedAttribute: '사용된 사용자 이름 속성',
+                    usedAttribute: '사용자 이름 매핑',
                     usersAndRoles: '사용자 및 역할',
                     usersAndRolesDesc:
-                        '사용자 이름만 매핑됩니다. 첫 로그인 성공 시 1Panel 사용자가 자동으로 생성됩니다.',
+                        '패널 사용자 이름 매핑과 첫 로그인 시 사용자 생성에 사용할 기본 노드 및 역할을 설정합니다.',
                 },
                 ldap: {
                     basic: '기본 설정',
+                    loginTitle: 'LDAP 로그인',
+                    loginWith: 'LDAP로 로그인',
+                    backToLocalLogin: '패널 로그인으로 돌아가기',
                     enable: '활성화',
                     enabled: '활성화됨',
                     disabled: '비활성화됨',

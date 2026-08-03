@@ -5,6 +5,7 @@ export namespace Login {
         captcha: string;
         captchaID: string;
         authMethod: string;
+        authSource: 'local' | 'ldap';
     }
     export interface MFALoginForm {
         sessionId: string;
@@ -26,6 +27,9 @@ export namespace Login {
         enabled: boolean;
         displayName: string;
         authorizationCode: boolean;
+    }
+    export interface LDAPStatus {
+        enabled: boolean;
     }
     export interface OIDCBeginResponse {
         authorizationURL: string;
