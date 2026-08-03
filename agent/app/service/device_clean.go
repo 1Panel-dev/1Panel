@@ -822,7 +822,7 @@ func loadContainerTree() []dto.CleanTree {
 
 func loadTreeWithCheck(treeData []dto.CleanTree, pathItem, treeType string) []dto.CleanTree {
 	list, size := loadTreeWithFileSize(true, pathItem, treeType, pathItem)
-	if len(list) == 0 {
+	if len(list) == 0 || size == 0 {
 		return treeData
 	}
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: treeType, Size: size, IsCheck: size > 0, Children: list, Type: treeType, IsRecommend: true, CanDelete: false})
@@ -863,6 +863,9 @@ func loadTreeWithFileSize(isCheck bool, originalPath, treeType, pathItem string)
 				continue
 			}
 			item.Size = uint64(info.Size())
+		}
+		if item.Size == 0 {
+			continue
 		}
 		total += item.Size
 		lists = append(lists, item)
