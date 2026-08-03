@@ -2828,6 +2828,7 @@ const message = {
         ipWhiteListHelper:
             'Las IP en la lista blanca pueden acceder a la API, 0.0.0.0/0 (todas IPv4), ::/0 (todas IPv6)',
         apiTrustedProxies: 'Proxies de confianza de la API',
+        apiTrustedProxiesEgs: 'Una IP o CIDR del servidor proxy por línea. Por ejemplo,\n172.16.10.111\n172.16.10.0/24',
         apiTrustedProxiesHelper:
             'Al usar un proxy inverso, introduce la IP o la red del servidor proxy para obtener correctamente la IP del cliente. Si no lo usas, deja este campo vacío. No se admiten 0.0.0.0/0 ni ::/0.',
         apiKeyValidityTime: 'Periodo de validez de la clave de interfaz',

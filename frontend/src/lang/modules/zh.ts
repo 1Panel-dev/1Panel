@@ -2651,6 +2651,7 @@ const message = {
         ipWhiteListHelper:
             '必需在 IP 白名单列表中的 IP 才能访问面板 API 接口，0.0.0.0/0（所有 IPv4），::/0（所有 IPv6）',
         apiTrustedProxies: 'API 可信代理',
+        apiTrustedProxiesEgs: '每行填写一个代理服务器 IP 或 CIDR，例如：\n172.16.10.111\n172.16.10.0/24',
         apiTrustedProxiesHelper:
             '使用反向代理时，请填写代理服务器的 IP 或网段，以便正确获取客户端 IP；不使用时请留空。不支持 0.0.0.0/0 和 ::/0。',
         apiKeyValidityTime: '接口密钥有效期',

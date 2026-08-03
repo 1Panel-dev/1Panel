@@ -2620,6 +2620,7 @@ const message = {
         ipWhiteListHelper:
             '必需在 IP 白名單清單中的 IP 才能存取面板 API 介面，0.0.0.0/0（所有 IPv4），::/0（所有 IPv6）',
         apiTrustedProxies: 'API 可信代理',
+        apiTrustedProxiesEgs: '每行填寫一個代理伺服器 IP 或 CIDR，例如：\n172.16.10.111\n172.16.10.0/24',
         apiTrustedProxiesHelper:
             '使用反向代理時，請填寫代理伺服器的 IP 或網段，以便正確取得用戶端 IP；不使用時請留空。不支援 0.0.0.0/0 和 ::/0。',
         apiKeyValidityTime: '介面金鑰有效期',
