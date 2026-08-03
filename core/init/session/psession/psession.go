@@ -2,6 +2,7 @@ package psession
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"net/http"
@@ -215,6 +216,22 @@ func (p *PSession) DeleteByID(id string) error {
 	for sessionID, item := range p.sessions {
 		if item.User.ID == id {
 			delete(p.sessions, sessionID)
+		}
+	}
+	return nil
+}
+
+func (p *PSession) DeleteByHash(sessionHash string) error {
+	if sessionHash == "" {
+		return nil
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	for sessionID := range p.sessions {
+		sum := sha256.Sum256([]byte(sessionID))
+		if hex.EncodeToString(sum[:]) == sessionHash {
+			delete(p.sessions, sessionID)
+			return nil
 		}
 	}
 	return nil

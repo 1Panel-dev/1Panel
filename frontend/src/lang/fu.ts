@@ -61,7 +61,7 @@ const fuLocales: Record<string, FuLocaleMessage> = {
         fu: {
             table: {
                 more: 'ເບິ່ງຕື່ມ',
-                custom_table_rows: 'ກຳນົດແຖວຕາຕະລາງເອງ',
+                custom_table_rows: 'ຖັນກຳນົດເອງ',
             },
             steps: {
                 cancel: 'ຍົກເລີກ',

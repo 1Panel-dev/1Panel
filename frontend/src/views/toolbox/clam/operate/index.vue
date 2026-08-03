@@ -386,7 +386,7 @@ const verifySpec = (rule: any, value: any, callback: any) => {
         !Number.isInteger(item.second) ||
         !Number.isInteger(item.week)
     ) {
-        callback(new Error(i18n.global.t('cronjob.specErr')));
+        callback(new Error(i18n.global.t('toolbox.clam.specErr')));
         return;
     }
     switch (item.specType) {
@@ -399,7 +399,7 @@ const verifySpec = (rule: any, value: any, callback: any) => {
                 item.minute < 0 ||
                 item.minute > 59
             ) {
-                callback(new Error(i18n.global.t('cronjob.specErr')));
+                callback(new Error(i18n.global.t('toolbox.clam.specErr')));
                 return;
             }
             break;
@@ -412,7 +412,7 @@ const verifySpec = (rule: any, value: any, callback: any) => {
                 item.minute < 0 ||
                 item.minute > 59
             ) {
-                callback(new Error(i18n.global.t('cronjob.specErr')));
+                callback(new Error(i18n.global.t('toolbox.clam.specErr')));
                 return;
             }
             break;
@@ -425,36 +425,36 @@ const verifySpec = (rule: any, value: any, callback: any) => {
                 item.minute < 0 ||
                 item.minute > 59
             ) {
-                callback(new Error(i18n.global.t('cronjob.specErr')));
+                callback(new Error(i18n.global.t('toolbox.clam.specErr')));
                 return;
             }
             break;
         case 'perDay':
             if (item.hour < 0 || item.hour > 23 || item.minute < 0 || item.minute > 59) {
-                callback(new Error(i18n.global.t('cronjob.specErr')));
+                callback(new Error(i18n.global.t('toolbox.clam.specErr')));
                 return;
             }
             break;
         case 'perNHour':
             if (item.hour < 0 || item.hour > 8784 || item.minute < 0 || item.minute > 59) {
-                callback(new Error(i18n.global.t('cronjob.specErr')));
+                callback(new Error(i18n.global.t('toolbox.clam.specErr')));
                 return;
             }
             break;
         case 'perHour':
             if (item.minute < 0 || item.minute > 59) {
-                callback(new Error(i18n.global.t('cronjob.specErr')));
+                callback(new Error(i18n.global.t('toolbox.clam.specErr')));
                 return;
             }
         case 'perNMinute':
             if (item.minute < 0 || item.minute > 527040) {
-                callback(new Error(i18n.global.t('cronjob.specErr')));
+                callback(new Error(i18n.global.t('toolbox.clam.specErr')));
                 return;
             }
             break;
         case 'perNSecond':
             if (item.second < 0 || item.second > 31622400) {
-                callback(new Error(i18n.global.t('cronjob.specErr')));
+                callback(new Error(i18n.global.t('toolbox.clam.specErr')));
                 return;
             }
             break;

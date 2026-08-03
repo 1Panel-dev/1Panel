@@ -19,12 +19,40 @@ export const passkeyFinishApi = (params: Record<string, any>, sessionId: string)
     return http.post<Login.ResLogin>(`/core/auth/passkey/finish`, params, undefined, { 'Passkey-Session': sessionId });
 };
 
+export const ldapStatusApi = () => {
+    return http.get<Login.LDAPStatus>(`/core/auth/ldap/status`, undefined, { skipErrorMessage: true });
+};
+
+export const oidcStatusApi = () => {
+    return http.get<Login.OIDCStatus>(`/core/auth/oidc/status`, undefined, { skipErrorMessage: true });
+};
+
+export const oidcBeginApi = () => {
+    return http.post<Login.OIDCBeginResponse>(`/core/auth/oidc/begin`);
+};
+
+export const oidcFinishApi = (params: Login.OIDCFinishRequest) => {
+    return http.post<Login.ResLogin>(`/core/auth/oidc/finish`, params);
+};
+
+export const saml2StatusApi = () => {
+    return http.get<Login.SAML2Status>(`/core/auth/saml2/status`, undefined, { skipErrorMessage: true });
+};
+
+export const saml2BeginApi = () => {
+    return http.post<Login.SAML2BeginResponse>(`/core/auth/saml2/begin`);
+};
+
+export const saml2FinishApi = (params: Login.SAML2FinishRequest) => {
+    return http.post<Login.ResLogin>(`/core/auth/saml2/finish`, params);
+};
+
 export const getCaptcha = () => {
     return http.get<Login.ResCaptcha>(`/core/auth/captcha`);
 };
 
 export const logOutApi = () => {
-    return http.post<any>(`/core/auth/logout`);
+    return http.post<Login.LogOutResponse>(`/core/auth/logout`);
 };
 
 export const getLoginSetting = () => {

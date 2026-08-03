@@ -76,6 +76,55 @@
                             {{ $t('commons.login.passkey') }}
                         </el-button>
                     </el-form-item>
+                    <div v-if="hasExternalLoginMethods" class="external-login-section">
+                        <div class="external-login-divider">
+                            <span>{{ $t('commons.login.otherLoginMethods') }}</span>
+                        </div>
+                        <div class="external-login-methods">
+                            <el-button
+                                v-if="ldapEnabled"
+                                class="external-login-button ldap-login-button"
+                                link
+                                native-type="button"
+                                :aria-label="$t('xpack.user.auth.ldap.loginWith')"
+                                @click="switchToLDAPLogin"
+                            >
+                                <span>LDAP</span>
+                            </el-button>
+                            <span
+                                v-if="ldapEnabled && (oidcEnabled || saml2Enabled)"
+                                class="external-login-separator"
+                                aria-hidden="true"
+                            ></span>
+                            <el-button
+                                v-if="oidcEnabled"
+                                class="external-login-button oidc-login-button"
+                                link
+                                native-type="button"
+                                :aria-label="$t('xpack.user.auth.oidc.loginWith', { provider: oidcDisplayName })"
+                                :loading="oidcStarting"
+                                @click="beginOIDCLogin"
+                            >
+                                <span>{{ oidcDisplayName }}</span>
+                            </el-button>
+                            <span
+                                v-if="oidcEnabled && saml2Enabled"
+                                class="external-login-separator"
+                                aria-hidden="true"
+                            ></span>
+                            <el-button
+                                v-if="saml2Enabled"
+                                class="external-login-button saml2-login-button"
+                                link
+                                native-type="button"
+                                :aria-label="$t('xpack.user.auth.saml2.loginWith', { provider: saml2DisplayName })"
+                                :loading="saml2Starting"
+                                @click="beginSAML2Login"
+                            >
+                                <span>{{ saml2DisplayName }}</span>
+                            </el-button>
+                        </div>
+                    </div>
                     <el-form-item>
                         <el-link type="primary" :underline="false" @click="switchToPasswordLogin">
                             {{ $t('commons.login.passkeyToPassword') }}
@@ -101,7 +150,24 @@
             </div>
             <div v-else>
                 <div class="flex justify-between items-center mb-6">
-                    <div class="text-2xl font-medium text-gray-900">{{ $t('commons.button.login') }}</div>
+                    <div>
+                        <div class="text-2xl font-medium text-gray-900">
+                            {{
+                                loginSource === 'ldap'
+                                    ? $t('xpack.user.auth.ldap.loginTitle')
+                                    : $t('commons.button.login')
+                            }}
+                        </div>
+                        <el-link
+                            v-if="loginSource === 'ldap'"
+                            class="local-login-link"
+                            type="primary"
+                            :underline="false"
+                            @click="switchToLocalLogin"
+                        >
+                            {{ $t('xpack.user.auth.ldap.backToLocalLogin') }}
+                        </el-link>
+                    </div>
                     <div class="cursor-pointer">
                         <el-dropdown @command="handleCommand">
                             <span class="flex items-center space-x-1">
@@ -194,6 +260,55 @@
                                 {{ $t('commons.button.login') }}
                             </el-button>
                         </el-form-item>
+                        <div v-if="loginSource === 'local' && hasExternalLoginMethods" class="external-login-section">
+                            <div class="external-login-divider">
+                                <span>{{ $t('commons.login.otherLoginMethods') }}</span>
+                            </div>
+                            <div class="external-login-methods">
+                                <el-button
+                                    v-if="ldapEnabled"
+                                    class="external-login-button ldap-login-button"
+                                    link
+                                    native-type="button"
+                                    :aria-label="$t('xpack.user.auth.ldap.loginWith')"
+                                    @click="switchToLDAPLogin"
+                                >
+                                    <span>LDAP</span>
+                                </el-button>
+                                <span
+                                    v-if="ldapEnabled && (oidcEnabled || saml2Enabled)"
+                                    class="external-login-separator"
+                                    aria-hidden="true"
+                                ></span>
+                                <el-button
+                                    v-if="oidcEnabled"
+                                    class="external-login-button oidc-login-button"
+                                    link
+                                    native-type="button"
+                                    :aria-label="$t('xpack.user.auth.oidc.loginWith', { provider: oidcDisplayName })"
+                                    :loading="oidcStarting"
+                                    @click="beginOIDCLogin"
+                                >
+                                    <span>{{ oidcDisplayName }}</span>
+                                </el-button>
+                                <span
+                                    v-if="oidcEnabled && saml2Enabled"
+                                    class="external-login-separator"
+                                    aria-hidden="true"
+                                ></span>
+                                <el-button
+                                    v-if="saml2Enabled"
+                                    class="external-login-button saml2-login-button"
+                                    link
+                                    native-type="button"
+                                    :aria-label="$t('xpack.user.auth.saml2.loginWith', { provider: saml2DisplayName })"
+                                    :loading="saml2Starting"
+                                    @click="beginSAML2Login"
+                                >
+                                    <span>{{ saml2DisplayName }}</span>
+                                </el-button>
+                            </div>
+                        </div>
                         <el-text v-if="isDemo" type="danger" class="demo">
                             {{ $t('commons.login.username') }}:demo {{ $t('commons.login.password') }}:1panel
                         </el-text>
@@ -242,7 +357,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, nextTick } from 'vue';
+import { ref, reactive, onMounted, onBeforeUnmount, computed, nextTick } from 'vue';
 import type { ElForm } from 'element-plus';
 import {
     loginApi,
@@ -251,7 +366,15 @@ import {
     getLoginSetting,
     passkeyBeginApi,
     passkeyFinishApi,
+    ldapStatusApi,
+    oidcStatusApi,
+    oidcBeginApi,
+    oidcFinishApi,
+    saml2StatusApi,
+    saml2BeginApi,
+    saml2FinishApi,
 } from '@/api/modules/auth';
+import type { Login as LoginModel } from '@/api/interface/auth';
 import { MenuStore, TabsStore } from '@/store';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
@@ -263,6 +386,7 @@ import { changeToLocal } from '@/utils/node';
 import { syncAuthInfo } from '@/utils/rbac';
 import { adjustColorToRGBA } from '@/utils/color';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { submitSAML2Navigation } from '@/utils/saml2';
 
 const i18n = useI18n();
 const {
@@ -290,11 +414,41 @@ const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
 const passkeySetting = ref(false);
 const passkeySupported = ref(false);
+const ldapEnabled = ref(false);
+const oidcEnabled = ref(false);
+const oidcDisplayName = ref('OIDC');
+const oidcStarting = ref(false);
+const saml2Enabled = ref(false);
+const saml2DisplayName = ref('SAML2');
+const saml2Starting = ref(false);
 const autoPasskeyEnabledKey = '1panel-passkey-auto-enabled';
 const showPasswordLogin = ref(false);
+const loginSource = ref<'local' | 'ldap'>('local');
 const isDemo = ref(false);
 const open = ref(false);
 const loginBtnLinkColor = ref<string | null>(null);
+let loginViewActive = true;
+
+const takeExternalTicketsFromURL = () => {
+    const url = new URL(window.location.href);
+    const fragmentParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash);
+    const oidcTicket = fragmentParams.get('oidc_ticket') || url.searchParams.get('oidc_ticket') || '';
+    const saml2Ticket = fragmentParams.get('saml2_ticket') || url.searchParams.get('saml2_ticket') || '';
+    if (!oidcTicket && !saml2Ticket) return { oidcTicket: '', saml2Ticket: '' };
+    fragmentParams.delete('oidc_ticket');
+    fragmentParams.delete('saml2_ticket');
+    url.searchParams.delete('oidc_ticket');
+    url.searchParams.delete('saml2_ticket');
+    const sanitizedFragment = fragmentParams.toString();
+    url.hash = sanitizedFragment ? `#${sanitizedFragment}` : '';
+    const sanitizedURL = `${url.pathname}${url.search}${url.hash}`;
+    window.history.replaceState(window.history.state, '', sanitizedURL);
+    return { oidcTicket, saml2Ticket };
+};
+const pendingExternalTickets = takeExternalTicketsFromURL();
+const pendingOIDCTicket = pendingExternalTickets.oidcTicket;
+const pendingSAML2Ticket = pendingOIDCTicket ? '' : pendingExternalTickets.saml2Ticket;
+const hasPendingExternalTicket = Boolean(pendingOIDCTicket || pendingSAML2Ticket);
 
 type FormInstance = InstanceType<typeof ElForm>;
 const _isMobile = () => {
@@ -413,12 +567,63 @@ const agreeWithLogin = () => {
 const showPasskeyOnly = computed(() => {
     return passkeySetting.value && passkeySupported.value && !showPasswordLogin.value;
 });
+const hasExternalLoginMethods = computed(() => ldapEnabled.value || oidcEnabled.value || saml2Enabled.value);
 
 const switchToPasswordLogin = () => {
+    loginSource.value = 'local';
     showPasswordLogin.value = true;
     nextTick(() => {
         userNameRef.value?.focus();
     });
+};
+
+const switchToLDAPLogin = () => {
+    loginSource.value = 'ldap';
+    showPasswordLogin.value = true;
+    errAuthInfo.value = false;
+    errCaptcha.value = false;
+    nextTick(() => {
+        userNameRef.value?.focus();
+    });
+};
+
+const switchToLocalLogin = () => {
+    loginSource.value = 'local';
+    errAuthInfo.value = false;
+    errCaptcha.value = false;
+    nextTick(() => {
+        userNameRef.value?.focus();
+    });
+};
+
+const completeLogin = async (result: LoginModel.ResLogin) => {
+    isLogin.value = true;
+    agreeLicense.value = true;
+    menuStore.setMenuList([]);
+    tabsStore.removeAllTabs();
+    isAdmin.value = result.role === 'ADMIN';
+    await changeToLocal();
+    await syncAuthInfo(currentNode.value);
+    MsgSuccess(i18n.t('commons.msg.loginSuccess'));
+    localStorage.removeItem('dashboardCache');
+    localStorage.removeItem('upgradeChecked');
+    routerToName('home');
+    clearLoginKeydownHandler();
+};
+
+const handleLoginResult = async (result: LoginModel.ResLogin) => {
+    if (result.mfaStatus === 'Enable') {
+        mfaLoginForm.sessionId = result.mfaSession || '';
+        mfaLoginForm.code = '';
+        mfaShow.value = true;
+        errMfaInfo.value = false;
+        errCaptcha.value = false;
+        nextTick(() => {
+            mfaLoginRef.value?.focus();
+        });
+        return;
+    }
+    await completeLogin(result);
 };
 
 const login = (formEl: FormInstance | undefined) => {
@@ -443,6 +648,7 @@ const login = (formEl: FormInstance | undefined) => {
             captcha: loginForm.captcha,
             captchaID: captcha.captchaID,
             authMethod: 'session',
+            authSource: loginSource.value,
             language: loginForm.language,
         };
         if (!ignoreCaptcha.value && requestLoginForm.captcha == '') {
@@ -454,29 +660,7 @@ const login = (formEl: FormInstance | undefined) => {
             loading.value = true;
             const res = await loginApi(requestLoginForm);
             ignoreCaptcha.value = true;
-            if (res.data.mfaStatus === 'Enable') {
-                mfaLoginForm.sessionId = res.data.mfaSession || '';
-                mfaLoginForm.code = '';
-                mfaShow.value = true;
-                errMfaInfo.value = false;
-                errCaptcha.value = false;
-                nextTick(() => {
-                    mfaLoginRef.value?.focus();
-                });
-                return;
-            }
-            isLogin.value = true;
-            agreeLicense.value = true;
-            menuStore.setMenuList([]);
-            tabsStore.removeAllTabs();
-            isAdmin.value = res.data.role === 'ADMIN';
-            await changeToLocal();
-            await syncAuthInfo(currentNode.value);
-            MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            localStorage.removeItem('dashboardCache');
-            localStorage.removeItem('upgradeChecked');
-            routerToName('home');
-            document.onkeydown = null;
+            await handleLoginResult(res.data);
         } catch (res) {
             if (res.code === 401) {
                 if (res.message === 'ErrCaptchaCode') {
@@ -511,17 +695,7 @@ const mfaLogin = async (auto: boolean) => {
         try {
             errMfaInfo.value = false;
             const res = await mfaLoginApi(mfaLoginForm);
-            isLogin.value = true;
-            menuStore.setMenuList([]);
-            tabsStore.removeAllTabs();
-            MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            isAdmin.value = res.data.role === 'ADMIN';
-            await changeToLocal();
-            await syncAuthInfo(currentNode.value);
-            localStorage.removeItem('dashboardCache');
-            localStorage.removeItem('upgradeChecked');
-            routerToName('home');
-            document.onkeydown = null;
+            await completeLogin(res.data);
         } catch (res) {
             if (res.code === 401) {
                 if (res.message === 'ErrCaptchaCode') {
@@ -578,23 +752,117 @@ const passkeyLogin = async () => {
         const loginRes = await passkeyFinishApi(payload, res.data.sessionId);
         enableAutoPasskey();
         ignoreCaptcha.value = true;
-        isLogin.value = true;
-        agreeLicense.value = true;
-        menuStore.setMenuList([]);
-        tabsStore.removeAllTabs();
-        isAdmin.value = loginRes.data.role === 'ADMIN';
-        await changeToLocal();
-        await syncAuthInfo(currentNode.value);
-        MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-        localStorage.removeItem('dashboardCache');
-        localStorage.removeItem('upgradeChecked');
-        routerToName('home');
-        document.onkeydown = null;
+        await handleLoginResult(loginRes.data);
     } catch (res: any) {
         disableAutoPasskey();
         if (res?.message) {
             MsgError(i18n.t('commons.login.passkeyFailed'));
         }
+    } finally {
+        isLoggingIn = false;
+        loading.value = false;
+    }
+};
+
+const loadLDAPStatus = async () => {
+    ldapEnabled.value = false;
+    if (!isEnterprise.value) return;
+    try {
+        const res = await ldapStatusApi();
+        ldapEnabled.value = Boolean(res.data.enabled);
+    } catch {
+        // LDAP is optional. A status failure must not affect local or any other login method.
+        ldapEnabled.value = false;
+    }
+};
+
+const loadOIDCStatus = async () => {
+    oidcEnabled.value = false;
+    if (!isEnterprise.value) return;
+    try {
+        const res = await oidcStatusApi();
+        oidcEnabled.value = Boolean(res.data.enabled && res.data.authorizationCode);
+        oidcDisplayName.value = res.data.displayName?.trim() || 'OIDC';
+    } catch {
+        // OIDC is optional. A status failure must not affect local password or Passkey login.
+        oidcEnabled.value = false;
+    }
+};
+
+const beginOIDCLogin = async () => {
+    if (isLoggingIn || !oidcEnabled.value) return;
+    try {
+        isLoggingIn = true;
+        oidcStarting.value = true;
+        const res = await oidcBeginApi();
+        if (!res.data.authorizationURL) return;
+        window.location.assign(res.data.authorizationURL);
+    } catch {
+        // The request layer displays the backend-localized error.
+    } finally {
+        isLoggingIn = false;
+        oidcStarting.value = false;
+    }
+};
+
+const finishOIDCLogin = async (ticket: string) => {
+    if (!ticket) return;
+    try {
+        isLoggingIn = true;
+        loading.value = true;
+        const res = await oidcFinishApi({ ticket });
+        ignoreCaptcha.value = true;
+        await handleLoginResult(res.data);
+    } catch {
+        // The ticket was already removed from the URL; the request layer displays the localized failure.
+    } finally {
+        isLoggingIn = false;
+        loading.value = false;
+    }
+};
+
+const loadSAML2Status = async () => {
+    saml2Enabled.value = false;
+    if (!isEnterprise.value) return;
+    try {
+        const res = await saml2StatusApi();
+        saml2Enabled.value = Boolean(res.data.enabled);
+        saml2DisplayName.value = res.data.displayName?.trim() || 'SAML2';
+    } catch {
+        // SAML2 is optional. A status failure must not affect any other login method.
+        saml2Enabled.value = false;
+    }
+};
+
+const beginSAML2Login = async () => {
+    if (isLoggingIn || !saml2Enabled.value) return;
+    try {
+        isLoggingIn = true;
+        saml2Starting.value = true;
+        const res = await saml2BeginApi();
+        try {
+            submitSAML2Navigation(res.data.navigation);
+        } catch {
+            MsgError(i18n.t('commons.msg.operationFailed'));
+        }
+    } catch {
+        // The request layer displays the backend-localized error.
+    } finally {
+        isLoggingIn = false;
+        saml2Starting.value = false;
+    }
+};
+
+const finishSAML2Login = async (ticket: string) => {
+    if (!ticket) return;
+    try {
+        isLoggingIn = true;
+        loading.value = true;
+        const res = await saml2FinishApi({ ticket });
+        ignoreCaptcha.value = true;
+        await handleLoginResult(res.data);
+    } catch {
+        // The ticket was already removed from the URL; the request layer displays the localized failure.
     } finally {
         isLoggingIn = false;
         loading.value = false;
@@ -665,7 +933,7 @@ const getSetting = async () => {
         if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {
             loginForm.agreeLicense = true;
         }
-        if (passkeySetting.value && passkeySupported.value && isAutoPasskeyEnabled()) {
+        if (passkeySetting.value && passkeySupported.value && isAutoPasskeyEnabled() && !hasPendingExternalTicket) {
             passkeyLogin();
         }
     } catch (error) {}
@@ -684,16 +952,48 @@ const applyLoginButtonTheme = () => {
     );
 };
 
+function loginKeydownHandler(event: KeyboardEvent) {
+    const target = event.target;
+    if (event.defaultPrevented || (target instanceof Element && target.closest('.external-login-button'))) return;
+    if (event.key === 'Enter' || event.keyCode === 13) {
+        if (!mfaShow.value) {
+            if (!loginButtonFocused.value) {
+                login(loginFormRef.value);
+            }
+        }
+        if (mfaShow.value && !mfaButtonFocused.value) {
+            mfaLogin(false);
+        }
+    }
+}
+
+function clearLoginKeydownHandler() {
+    if (document.onkeydown === loginKeydownHandler) {
+        document.onkeydown = null;
+    }
+}
+
 onMounted(async () => {
     isOnRestart.value = false;
     passkeySupported.value = !!window.PublicKeyCredential && window.isSecureContext;
     applyLoginButtonTheme();
     await getSetting();
+    if (!loginViewActive) return;
+    if (pendingOIDCTicket) {
+        await finishOIDCLogin(pendingOIDCTicket);
+    } else if (pendingSAML2Ticket) {
+        await finishSAML2Login(pendingSAML2Ticket);
+    }
+    if (!loginViewActive || isLogin.value) return;
+    if (!isLogin.value && !mfaShow.value) {
+        await Promise.all([loadLDAPStatus(), loadOIDCStatus(), loadSAML2Status()]);
+    }
     try {
         await getXpackSettingForTheme();
     } catch (error) {
         // 即使获取失败也不影响登录，默认为之前的主题配置
     }
+    if (!loginViewActive) return;
     applyLoginButtonTheme();
     if (!ignoreCaptcha.value) {
         loginVerify();
@@ -703,19 +1003,12 @@ onMounted(async () => {
         userNameRef.value?.focus();
     });
     loginForm.agreeLicense = agreeLicense.value;
-    document.onkeydown = (e: any) => {
-        e = window.event || e;
-        if (e.keyCode === 13) {
-            if (!mfaShow.value) {
-                if (!loginButtonFocused.value) {
-                    login(loginFormRef.value);
-                }
-            }
-            if (mfaShow.value && !mfaButtonFocused.value) {
-                mfaLogin(false);
-            }
-        }
-    };
+    document.onkeydown = loginKeydownHandler;
+});
+
+onBeforeUnmount(() => {
+    loginViewActive = false;
+    clearLoginKeydownHandler();
 });
 </script>
 <style scoped lang="scss">
@@ -750,6 +1043,68 @@ onMounted(async () => {
             background-color: var(--login-btn-link-hover-color) !important;
             border-color: var(--login-btn-link-hover-color) !important;
             outline: none !important;
+        }
+    }
+
+    .external-login-section {
+        width: 100%;
+        padding-top: 2px;
+    }
+
+    .local-login-link {
+        height: auto;
+        margin-top: 6px;
+        font-size: 13px;
+    }
+
+    .external-login-divider {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: var(--el-text-color-secondary);
+        font-size: 13px;
+        white-space: nowrap;
+
+        &::before,
+        &::after {
+            width: 100%;
+            border-top: 1px dashed var(--el-border-color-light);
+            content: '';
+        }
+    }
+
+    .external-login-methods {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 10px 12px;
+        margin-top: 12px;
+    }
+
+    .external-login-separator {
+        width: 1px;
+        height: 14px;
+        background-color: var(--el-border-color);
+    }
+
+    .external-login-button {
+        height: auto;
+        margin: 0 !important;
+        padding: 5px 2px;
+        border: 0;
+        background: transparent !important;
+        color: var(--login-btn-link-color);
+        font-size: 14px;
+
+        &:hover {
+            color: var(--login-btn-link-hover-color) !important;
+        }
+
+        &:focus-visible {
+            border-radius: 3px;
+            outline: 2px solid var(--login-btn-link-color) !important;
+            outline-offset: 2px;
         }
     }
 

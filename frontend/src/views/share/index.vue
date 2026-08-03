@@ -54,7 +54,7 @@ const initializing = ref(true);
 const errorMessage = ref('');
 const shareInfo = ref<File.FileSharePublicInfo | null>(null);
 const shareLocale = ref('en');
-const supportedLocales = ['zh', 'zh-Hant', 'en', 'pt-BR', 'ja', 'ru', 'ms', 'ko', 'tr', 'es-ES', 'lo'];
+const supportedLocales = ['zh', 'zh-Hant', 'en', 'pt-BR', 'ja', 'ru', 'ms', 'ko', 'tr', 'es-ES', 'fa', 'lo'];
 
 const code = computed(() => String(route.params.code || '').trim());
 const currentNode = computed(() => String(route.query.operateNode || 'local'));

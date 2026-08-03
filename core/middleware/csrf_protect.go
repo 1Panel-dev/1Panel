@@ -50,7 +50,14 @@ func requiresCSRFTokenCheck(c *gin.Context) bool {
 	case "/api/v2/core/auth/login",
 		"/api/v2/core/auth/mfalogin",
 		"/api/v2/core/auth/passkey/begin",
-		"/api/v2/core/auth/passkey/finish":
+		"/api/v2/core/auth/passkey/finish",
+		"/api/v2/core/auth/oidc/begin",
+		"/api/v2/core/auth/oidc/finish":
+		return false
+	case "/api/v2/core/auth/saml2/begin",
+		"/api/v2/core/auth/saml2/acs",
+		"/api/v2/core/auth/saml2/finish",
+		"/api/v2/core/auth/saml2/logout":
 		return false
 	}
 	if c.GetBool("API_AUTH") {

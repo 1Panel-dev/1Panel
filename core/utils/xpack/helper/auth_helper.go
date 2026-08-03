@@ -22,6 +22,10 @@ func (a *authHelper) MFALogin(c *gin.Context, info baseDto.MFALogin, entrance st
 	return auth.MFALogin(c, info, entrance)
 }
 
+func (a *authHelper) PrepareLogout(_ *gin.Context) (*baseDto.LogoutResult, error) {
+	return &baseDto.LogoutResult{}, nil
+}
+
 func (a *authHelper) PasskeyBeginLogin(c *gin.Context, entrance string) (*baseDto.PasskeyBeginResponse, string, error) {
 	return auth.PasskeyBeginLogin(c, entrance)
 }

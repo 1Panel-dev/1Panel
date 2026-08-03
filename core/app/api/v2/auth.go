@@ -196,11 +196,19 @@ func (b *BaseApi) PasskeyFinishLogin(c *gin.Context) {
 // @Security Timestamp
 // @Router /core/auth/logout [post]
 func (b *BaseApi) LogOut(c *gin.Context) {
+	result, prepareErr := xpack.AuthProvider.PrepareLogout(c)
 	if err := authService.LogOut(c); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.Success(c)
+	if prepareErr != nil {
+		global.LOG.Warnf("prepare external logout failed: %v", prepareErr)
+		result = &dto.LogoutResult{}
+	}
+	if result == nil {
+		result = &dto.LogoutResult{}
+	}
+	helper.SuccessWithData(c, result)
 }
 
 // @Tags Auth

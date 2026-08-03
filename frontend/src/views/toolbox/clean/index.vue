@@ -578,7 +578,7 @@ function load18n(label: string) {
         case 'CustomAppstore':
             return i18n.global.t('xpack.customApp.name');
         case 'NodeFile':
-            return i18n.global.t('xpack.exchange.exchange');
+            return i18n.global.t('xpack.sync.file');
         case 'RuntimeExtension':
             return i18n.global.t('website.runtime');
         case 'Image':

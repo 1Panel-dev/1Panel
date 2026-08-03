@@ -26,7 +26,7 @@
                 />
                 <el-form-item :label="$t('commons.login.username')" prop="name">
                     <el-input
-                        type="primary"
+                        type="text"
                         v-model="form.name"
                         name="profile-name"
                         autocomplete="off"

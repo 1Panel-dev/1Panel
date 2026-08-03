@@ -164,7 +164,7 @@ ErrDatabaseNotFound: '{{ .name }} veritabanı mevcut değil'
 # SSH
 ExportIP: 'Giriş IP'
 ExportArea: 'Konum'
-ExportPort: 'Port'
+ExportPort: 'Bağlantı noktası'
 ExportAuthMode: 'Giriş Yöntemi'
 ExportUser: 'Kullanıcı'
 ExportStatus: 'Giriş Durumu'
