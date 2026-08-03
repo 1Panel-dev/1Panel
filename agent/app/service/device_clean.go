@@ -59,7 +59,7 @@ func (u *DeviceService) Scan() dto.CleanData {
 
 	SystemClean.BackupClean = loadBackupTree(fileOp)
 
-	rollBackTree := loadRollBackTree(fileOp)
+	rollBackTree := loadRollBackTree()
 	rollbackSize := uint64(0)
 	for _, rollback := range rollBackTree {
 		rollbackSize += rollback.Size
@@ -611,21 +611,21 @@ func isExactPathMatch(path string, excludePaths []string) bool {
 	return false
 }
 
-func loadRollBackTree(fileOp fileUtils.FileOp) []dto.CleanTree {
+func loadRollBackTree() []dto.CleanTree {
 	var treeData []dto.CleanTree
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, rollbackPath, "app"), "rollback_app", fileOp)
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, rollbackPath, "website"), "rollback_website", fileOp)
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, rollbackPath, "database"), "rollback_database", fileOp)
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, communityRestorePath), "rollback_community_restore", fileOp)
+	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, rollbackPath, "app"), "rollback_app")
+	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, rollbackPath, "website"), "rollback_website")
+	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, rollbackPath, "database"), "rollback_database")
+	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, communityRestorePath), "rollback_community_restore")
 
 	return treeData
 }
 
 func loadUploadTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	var treeData []dto.CleanTree
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, uploadPath, "app"), "upload_app", fileOp)
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, uploadPath, "website"), "upload_website", fileOp)
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, uploadPath, "database"), "upload_database", fileOp)
+	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, uploadPath, "app"), "upload_app")
+	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, uploadPath, "website"), "upload_website")
+	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, uploadPath, "database"), "upload_database")
 
 	path5 := path.Join(global.Dir.BaseDir, uploadPath)
 	uploadTreeData := loadTreeWithAllFile(true, path5, "upload", path5, fileOp)
@@ -636,9 +636,9 @@ func loadUploadTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 
 func loadDownloadTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	var treeData []dto.CleanTree
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, downloadPath, "app"), "download_app", fileOp)
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, downloadPath, "website"), "download_website", fileOp)
-	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, downloadPath, "database"), "download_database", fileOp)
+	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, downloadPath, "app"), "download_app")
+	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, downloadPath, "website"), "download_website")
+	treeData = loadTreeWithCheck(treeData, path.Join(global.Dir.BaseDir, downloadPath, "database"), "download_database")
 
 	path5 := path.Join(global.Dir.BaseDir, downloadPath)
 	uploadTreeData := loadTreeWithAllFile(true, path5, "download", path5, fileOp)
@@ -820,14 +820,57 @@ func loadContainerTree() []dto.CleanTree {
 	return treeData
 }
 
-func loadTreeWithCheck(treeData []dto.CleanTree, pathItem, treeType string, fileOp fileUtils.FileOp) []dto.CleanTree {
-	size, _ := fileOp.GetDirSize(pathItem)
-	if size == 0 {
+func loadTreeWithCheck(treeData []dto.CleanTree, pathItem, treeType string) []dto.CleanTree {
+	list, size := loadTreeWithFileSize(true, pathItem, treeType, pathItem)
+	if len(list) == 0 || size == 0 {
 		return treeData
 	}
-	list := loadTreeWithAllFile(true, pathItem, treeType, pathItem, fileOp)
-	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: treeType, Size: uint64(size), IsCheck: size > 0, Children: list, Type: treeType, IsRecommend: true, CanDelete: false})
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: treeType, Size: size, IsCheck: size > 0, Children: list, Type: treeType, IsRecommend: true, CanDelete: false})
 	return treeData
+}
+
+func loadTreeWithFileSize(isCheck bool, originalPath, treeType, pathItem string) ([]dto.CleanTree, uint64) {
+	var (
+		lists []dto.CleanTree
+		total uint64
+	)
+
+	entries, err := os.ReadDir(pathItem)
+	if err != nil {
+		return lists, total
+	}
+	for _, entry := range entries {
+		item := dto.CleanTree{
+			ID:          uuid.NewString(),
+			Label:       entry.Name(),
+			Type:        treeType,
+			Name:        strings.TrimPrefix(path.Join(pathItem, entry.Name()), originalPath+"/"),
+			IsCheck:     isCheck,
+			IsRecommend: isCheck,
+			CanDelete:   true,
+		}
+		entryPath := path.Join(pathItem, entry.Name())
+		if entry.IsDir() {
+			children, size := loadTreeWithFileSize(isCheck, originalPath, treeType, entryPath)
+			if len(children) == 0 {
+				continue
+			}
+			item.Children = children
+			item.Size = size
+		} else {
+			info, err := entry.Info()
+			if err != nil {
+				continue
+			}
+			item.Size = uint64(info.Size())
+		}
+		if item.Size == 0 {
+			continue
+		}
+		total += item.Size
+		lists = append(lists, item)
+	}
+	return lists, total
 }
 
 func loadTreeWithDir(isCheck bool, treeType, pathItem string, fileOp fileUtils.FileOp) []dto.CleanTree {
