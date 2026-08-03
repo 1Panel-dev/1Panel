@@ -61,6 +61,7 @@ import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
 import FileList from '@/components/file-list/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { getFilenameFromUrl } from '@/utils/file';
 
 interface WgetProps {
     path: string;
@@ -143,8 +144,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 };
 
 const getFileName = (url: string) => {
-    const paths = url.split('/');
-    addForm.name = paths[paths.length - 1];
+    addForm.name = getFilenameFromUrl(url);
 };
 
 const acceptParams = (props: WgetProps) => {

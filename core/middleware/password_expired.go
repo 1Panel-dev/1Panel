@@ -27,6 +27,10 @@ func PasswordExpired() gin.HandlerFunc {
 			c.Next()
 			return
 		}
+		if IsPublicFileShareAPI(c.Request.URL.Path) {
+			c.Next()
+			return
+		}
 		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core/auth") ||
 			c.Request.URL.Path == "/api/v2/core/settings/search" ||
 			c.Request.URL.Path == "/api/v2/core/settings/search/base" ||
