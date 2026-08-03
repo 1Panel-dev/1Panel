@@ -1560,7 +1560,7 @@ func GetSitePath(website model.Website, confType string) string {
 
 func GetConfDir(website model.Website) string {
 	if website.Type != constant.Stream {
-		return GetOpenrestyDir(SiteConf)
+		return GetOpenrestyDir(SiteConfDir)
 	}
 	return GetOpenrestyDir(StreamDir)
 }
