@@ -1041,6 +1041,20 @@ const message = {
                 'Permite conversão direta compatível entre Chat Completions, Responses e Anthropic Messages. Protocolos nativos sempre têm prioridade.',
             protocolConversionRisk:
                 'A conversão de protocolo não é sem perdas. Campos específicos, chamadas de ferramentas, raciocínio ou conteúdo multimodal podem ser degradados ou perdidos. Use após avaliar os riscos.',
+            visionEnhancement: 'Aprimoramento visual',
+            visionEnhancementRisk:
+                'O aprimoramento visual pode enviar imagens a um provedor de modelo visual separado.',
+            visionModelGroup: 'Grupo de modelos visuais',
+            visionModelGroupDesc:
+                'Selecione neste grupo de geração de texto um modelo que compreenda imagens. Todas as imagens da solicitação usam o mesmo modelo.',
+            visionTargetModelGroup: 'Grupo de modelos de destino',
+            visionTargetModelGroupDesc:
+                'Ativa o aprimoramento apenas para modelos deste grupo, sem alterar o modelo final da solicitação.',
+            visionEnhancementDesc:
+                'As imagens são convertidas em evidências de texto e podem perder detalhes, aumentando latência e custo. O gateway não detecta suporte visual nativo. Salvar reinicia o gateway; use após avaliar os riscos.',
+            visionPreprocess: 'Pré-processamento visual',
+            cacheHit: 'Cache encontrado',
+            apiType: 'Tipo de API',
             lbPolicyRoundRobin: 'Round Robin',
             lbPolicyRoundRobinDesc:
                 'Seleciona contas de modelo disponíveis em ordem. Use quando os backends tiverem capacidade semelhante.',

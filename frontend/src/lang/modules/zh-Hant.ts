@@ -983,6 +983,17 @@ const message = {
                 '啟用後，文字請求可在 Chat Completions、Responses 和 Anthropic Messages 的支援協議間直接轉換，原生協議始終優先。',
             protocolConversionRisk:
                 '協議轉換無法保證無損，協議專屬欄位、工具呼叫、思考內容或多模態內容可能被降級或遺失，請權衡後使用。',
+            visionEnhancement: '視覺增強',
+            visionEnhancementRisk: '視覺增強可能會將圖片傳送給獨立的視覺模型供應商。',
+            visionModelGroup: '視覺模型組',
+            visionModelGroupDesc: '從此文字生成模型組選擇支援圖片理解的模型，同一請求中的圖片共用該模型。',
+            visionTargetModelGroup: '目標模型組',
+            visionTargetModelGroupDesc: '僅此文字生成模型組中的請求模型啟用視覺增強，不會改變最終請求模型。',
+            visionEnhancementDesc:
+                '圖片會先轉換為文字證據，可能遺失細節，並增加延遲與模型費用。網關不會偵測目標模型是否原生支援圖片；儲存後會重新啟動網關，請權衡後使用。',
+            visionPreprocess: '視覺預處理',
+            cacheHit: '快取命中',
+            apiType: 'API 類型',
             lbPolicyRoundRobin: '輪詢',
             lbPolicyRoundRobinDesc: '按順序依次選擇可用模型帳號，適合後端能力接近的場景。',
             lbPolicyWeightedRoundRobin: '加權輪詢',

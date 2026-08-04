@@ -1043,6 +1043,19 @@ const message = {
                 'Chat Completions, Responses ve Anthropic Messages arasında desteklenen doğrudan dönüşüme izin verir. Yerel protokol her zaman önceliklidir.',
             protocolConversionRisk:
                 'Protokol dönüşümü kayıpsız değildir. Protokole özgü alanlar, araç çağrıları, akıl yürütme veya çok modlu içerik azaltılabilir ya da kaybolabilir. Riskleri değerlendirdikten sonra kullanın.',
+            visionEnhancement: 'Görsel geliştirme',
+            visionEnhancementRisk: 'Görseller ayrı bir görsel model sağlayıcısına gönderilebilir.',
+            visionModelGroup: 'Görsel model grubu',
+            visionModelGroupDesc:
+                'Bu metin üretim grubundan görsel anlayabilen bir model seçin. Aynı istekteki tüm görseller aynı modeli kullanır.',
+            visionTargetModelGroup: 'Hedef model grubu',
+            visionTargetModelGroupDesc:
+                'Son istek modelini değiştirmeden yalnızca bu gruptaki modellere görsel geliştirme uygular.',
+            visionEnhancementDesc:
+                'Görseller metin kanıtına dönüştürülür ve ayrıntı kaybedebilir; gecikme ve maliyet artar. Ağ geçidi hedef modelin yerel görsel desteğini algılamaz. Kaydetmek ağ geçidini yeniden başlatır; riskleri değerlendirdikten sonra kullanın.',
+            visionPreprocess: 'Görsel ön işleme',
+            cacheHit: 'Önbellek isabeti',
+            apiType: 'API türü',
             lbPolicyRoundRobin: 'Round Robin',
             lbPolicyRoundRobinDesc:
                 'Kullanılabilir model hesaplarını sırayla seçer. Backend kapasiteleri benzer olduğunda kullanın.',

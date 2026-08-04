@@ -1024,6 +1024,19 @@ const message = {
                 'Chat Completions、Responses、Anthropic Messages 間でサポートされる直接変換を有効にします。ネイティブプロトコルが常に優先されます。',
             protocolConversionRisk:
                 'プロトコル変換は完全に可逆ではありません。プロトコル固有のフィールド、ツール呼び出し、推論、マルチモーダルコンテンツが劣化または失われる可能性があります。リスクを考慮したうえで使用してください。',
+            visionEnhancement: '視覚強化',
+            visionEnhancementRisk: '視覚強化では、画像が別の視覚モデルプロバイダーへ送信される場合があります。',
+            visionModelGroup: '視覚モデルグループ',
+            visionModelGroupDesc:
+                'このテキスト生成グループから画像理解対応モデルを選択します。同一リクエストの画像は同じモデルを使用します。',
+            visionTargetModelGroup: '対象モデルグループ',
+            visionTargetModelGroupDesc:
+                'このグループ内のリクエストモデルだけを強化し、最終リクエストモデルは変更しません。',
+            visionEnhancementDesc:
+                '画像はテキスト証拠へ変換され、詳細が失われる可能性があり、遅延と費用も増加します。対象モデルの画像対応は自動検出しません。保存するとゲートウェイが再起動するため、リスクを考慮して使用してください。',
+            visionPreprocess: '視覚前処理',
+            cacheHit: 'キャッシュヒット',
+            apiType: 'API タイプ',
             lbPolicyRoundRobin: 'ラウンドロビン',
             lbPolicyRoundRobinDesc:
                 '利用可能なモデルアカウントを順番に選択します。バックエンドの性能が近い場合に適しています。',
