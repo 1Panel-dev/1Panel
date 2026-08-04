@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"path"
 	"sort"
@@ -255,7 +256,7 @@ func (u *appUpgradeContext) prepare(t *task.Task) error {
 		return buserr.WithName("ErrFileNotFound", "docker-compose.yml")
 	}
 
-	u.envContent, err = renderUpgradeEnv(u.candidate, u.oldEnvContent)
+	u.envContent, err = renderUpgradeEnv(&u.candidate, u.oldEnvContent)
 	if err != nil {
 		return err
 	}
@@ -699,18 +700,40 @@ func verifyUpgradeImages(images []string) error {
 	return nil
 }
 
-func renderUpgradeEnv(install model.AppInstall, original []byte) ([]byte, error) {
+func renderUpgradeEnv(install *model.AppInstall, original []byte) ([]byte, error) {
+	originalEnv, err := gotenv.Unmarshal(string(original))
+	if err != nil {
+		return nil, err
+	}
+	params := maps.Clone(originalEnv)
 	envs := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(install.Env), &envs); err != nil {
 		return nil, err
 	}
-	params := make(map[string]string, len(envs))
 	handleMap(envs, params)
 	if install.App.Key == constant.AppOpenresty {
-		originalEnv, _ := gotenv.Unmarshal(string(original))
 		for _, key := range []string{"CONTAINER_PACKAGE_URL", "RESTY_ADD_PACKAGE_BUILDDEPS", "RESTY_CONFIG_OPTIONS_MORE"} {
-			params[key] = originalEnv[key]
+			if value, ok := originalEnv[key]; ok {
+				params[key] = value
+			}
 		}
+		if websiteDir := strings.TrimSpace(originalEnv["WEBSITE_DIR"]); websiteDir != "" {
+			params["WEBSITE_DIR"] = websiteDir
+		}
+		websiteDir := strings.TrimSpace(params["WEBSITE_DIR"])
+		if websiteDir == "" {
+			websiteDir = NewISettingService().GetWebsiteDir()
+		}
+		if !path.IsAbs(websiteDir) {
+			websiteDir = path.Join(global.Dir.DataDir, websiteDir)
+		}
+		params["WEBSITE_DIR"] = websiteDir
+		envs["WEBSITE_DIR"] = websiteDir
+		content, marshalErr := json.Marshal(envs)
+		if marshalErr != nil {
+			return nil, marshalErr
+		}
+		install.Env = string(content)
 	}
 	content, err := gotenv.Marshal(params)
 	if err != nil {
@@ -847,7 +870,7 @@ func waitAppContainersReady(ctx context.Context, install model.AppInstall) ([]st
 func waitAppContainersReadyWithClient(ctx context.Context, client appContainerReadinessClient, install model.AppInstall) ([]string, error) {
 	envContent, err := os.ReadFile(install.GetEnvPath())
 	if err != nil {
-		envContent, err = renderUpgradeEnv(install, nil)
+		envContent, err = renderUpgradeEnv(&install, nil)
 		if err != nil {
 			return nil, err
 		}
