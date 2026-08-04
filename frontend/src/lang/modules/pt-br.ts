@@ -6299,14 +6299,17 @@ const message = {
             nodeUpgradeOfflinePackageHelper:
                 'Em ambientes offline, nós com arquiteturas diferentes devem enviar o pacote de atualização correspondente antes de atualizar.',
             healthCheck: 'Verificação de Integridade',
-            healthCheckFrequency: 'Frequência da Verificação',
+            healthCheckFrequency: 'Frequência da Verificação Automática',
             healthCheckFrequencyHelper:
-                'Verifica periodicamente a integridade dos nós de backend. Digite 0 para desativar as verificações.',
+                'Verifica automaticamente a integridade dos nós na frequência configurada. Digite 0 para desativar as verificações automáticas.',
             healthCheckFrequencyLimit:
                 'A frequência da verificação não pode exceder um dia e deve ser um número inteiro não negativo.',
-            loadFailedNodeResources: 'Carregar recursos de nós com falha',
+            autoCheckFailedNodes: 'Verificar automaticamente nós com falha',
+            autoCheckFailedNodesHelper:
+                'Durante as verificações automáticas, também verifica nós com status de falha ou anormal. Só se aplica quando a frequência não é 0.',
+            loadFailedNodeResources: 'Atualizar recursos de nós com falha',
             loadFailedNodeResourcesHelper:
-                'Ao abrir a lista de nós, carregue também as informações de recursos dos nós com falha.',
+                'Ao atualizar a lista de nós, também consulta os recursos de nós com status de falha ou anormal.',
             nodeUnhealthy: 'Estado do nó anormal',
             deletedNode: 'O nó excluído {0} não suporta atualmente operações de atualização!',
             nodeUnhealthyHelper:

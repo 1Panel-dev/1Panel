@@ -6264,13 +6264,16 @@ const message = {
             nodeUpgradeOfflinePackageHelper:
                 'En entornos sin conexión, los nodos con arquitecturas diferentes deben subir primero el paquete de actualización correspondiente.',
             healthCheck: 'Comprobación de estado',
-            healthCheckFrequency: 'Frecuencia de comprobación',
+            healthCheckFrequency: 'Frecuencia de comprobación automática',
             healthCheckFrequencyHelper:
-                'Comprueba periódicamente el estado de los nodos backend. Introduzca 0 para deshabilitar las comprobaciones.',
+                'Comprueba automáticamente el estado de los nodos con la frecuencia configurada. Introduzca 0 para desactivar las comprobaciones automáticas.',
             healthCheckFrequencyLimit: 'La frecuencia no puede superar un día y debe ser un número entero no negativo.',
-            loadFailedNodeResources: 'Cargar recursos de nodos con error',
+            autoCheckFailedNodes: 'Comprobar automáticamente los nodos con error',
+            autoCheckFailedNodesHelper:
+                'Durante las comprobaciones automáticas, también comprueba los nodos con estado fallido o anómalo. Solo se aplica cuando la frecuencia no es 0.',
+            loadFailedNodeResources: 'Actualizar recursos de nodos con error',
             loadFailedNodeResourcesHelper:
-                'Al abrir la lista de nodos, carga también la información de recursos de los nodos con error.',
+                'Al actualizar la lista de nodos, también consulta los recursos de los nodos con estado fallido o anómalo.',
             nodeUnhealthy: 'Estado del nodo anómalo',
             deletedNode: 'El nodo eliminado {0} no soporta operaciones de actualización.',
             nodeUnhealthyHelper:

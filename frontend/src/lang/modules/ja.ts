@@ -6170,12 +6170,16 @@ const message = {
             nodeUpgradeOfflinePackageHelper:
                 'オフライン環境では、異なるアーキテクチャのノードは対応する更新パッケージを先にアップロードしてから更新してください。',
             healthCheck: 'ヘルスチェック',
-            healthCheckFrequency: 'チェック頻度',
+            healthCheckFrequency: '自動チェック頻度',
             healthCheckFrequencyHelper:
-                'バックエンドノードの状態を定期的にチェックします。チェックを無効にするには 0 を入力してください。',
+                '設定した頻度でノードの状態を自動的にチェックします。自動チェックを無効にするには 0 を入力してください。',
             healthCheckFrequencyLimit: 'チェック頻度は 1 日以内の負でない整数にしてください。',
-            loadFailedNodeResources: '障害ノードのリソースを読み込む',
-            loadFailedNodeResourcesHelper: 'ノード一覧を開くときに、障害ノードのリソース情報も読み込みます。',
+            autoCheckFailedNodes: '障害ノードを自動チェックする',
+            autoCheckFailedNodesHelper:
+                '自動チェック時に、失敗または異常状態のノードもチェックします。チェック頻度が 0 以外の場合のみ有効です。',
+            loadFailedNodeResources: '障害ノードのリソースを更新する',
+            loadFailedNodeResourcesHelper:
+                'ノード一覧の更新時に、失敗または異常状態のノードのリソース情報も照会します。',
             nodeUnhealthy: 'ノード状態異常',
             deletedNode: '削除済みノード {0} は現在アップグレード操作をサポートしていません！',
             nodeUnhealthyHelper: 'ノード状態異常を検出しました。[ノード管理]で確認してから再試行してください！',

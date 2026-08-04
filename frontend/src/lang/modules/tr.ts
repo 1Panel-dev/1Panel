@@ -6276,13 +6276,16 @@ const message = {
             nodeUpgradeOfflinePackageHelper:
                 'Çevrimdışı ortamlarda, farklı mimarideki düğümler güncellenmeden önce eşleşen güncelleme paketi yüklenmelidir.',
             healthCheck: 'Sağlık Kontrolü',
-            healthCheckFrequency: 'Kontrol Sıklığı',
+            healthCheckFrequency: 'Otomatik Kontrol Sıklığı',
             healthCheckFrequencyHelper:
-                'Arka uç düğümlerinin sağlığını düzenli olarak kontrol eder. Kontrolü kapatmak için 0 girin.',
+                'Düğüm sağlığını ayarlanan sıklıkta otomatik olarak kontrol eder. Otomatik kontrolü kapatmak için 0 girin.',
             healthCheckFrequencyLimit: 'Kontrol sıklığı bir günü aşamaz ve negatif olmayan bir tam sayı olmalıdır.',
-            loadFailedNodeResources: 'Başarısız düğüm kaynaklarını sorgula',
+            autoCheckFailedNodes: 'Başarısız düğümleri otomatik kontrol et',
+            autoCheckFailedNodesHelper:
+                'Otomatik kontrol sırasında başarısız veya sağlıksız durumdaki düğümleri de kontrol eder. Yalnızca kontrol sıklığı 0 değilken geçerlidir.',
+            loadFailedNodeResources: 'Başarısız düğüm kaynaklarını yenile',
             loadFailedNodeResourcesHelper:
-                'Düğüm listesi açıldığında başarısız düğümlerin kaynak bilgilerini de sorgular.',
+                'Düğüm listesi yenilenirken başarısız veya sağlıksız durumdaki düğümlerin kaynak bilgilerini de sorgular.',
             nodeUnhealthy: 'Düğüm durumu anormal',
             deletedNode: 'Silinmiş düğüm {0} şu anda yükseltme işlemlerini desteklemiyor!',
             nodeUnhealthyHelper:

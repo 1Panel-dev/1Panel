@@ -6173,12 +6173,16 @@ const message = {
             nodeUpgradeOfflinePackageHelper:
                 'In offline environments, nodes with different architectures must upload the matching update package before updating.',
             healthCheck: 'Health Check',
-            healthCheckFrequency: 'Check Frequency',
-            healthCheckFrequencyHelper: 'Periodically checks backend node health. Enter 0 to disable checks.',
+            healthCheckFrequency: 'Automatic Check Frequency',
+            healthCheckFrequencyHelper:
+                'Automatically checks node health at the configured frequency. Enter 0 to disable automatic checks.',
             healthCheckFrequencyLimit: 'The check frequency cannot exceed one day and must be a non-negative integer.',
-            loadFailedNodeResources: 'Load failed node resources',
+            autoCheckFailedNodes: 'Automatically check failed nodes',
+            autoCheckFailedNodesHelper:
+                'During automatic checks, also check nodes with a failed or unhealthy status. This only applies when the check frequency is not 0.',
+            loadFailedNodeResources: 'Refresh failed node resources',
             loadFailedNodeResourcesHelper:
-                'When opening the node list, also load resource information for failed nodes.',
+                'When refreshing the node list, also query resource information for nodes with a failed or unhealthy status.',
             nodeUnhealthy: 'Node status abnormal',
             deletedNode: 'Deleted node {0} does not currently support upgrade operations!',
             nodeUnhealthyHelper: 'Abnormal node status detected. Please check in [Node Management] and try again!',

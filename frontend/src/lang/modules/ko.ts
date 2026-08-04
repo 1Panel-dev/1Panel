@@ -6040,12 +6040,16 @@ const message = {
             nodeUpgradeOfflinePackageHelper:
                 '오프라인 환경에서는 다른 아키텍처의 노드를 업데이트하기 전에 해당 업데이트 패키지를 먼저 업로드해야 합니다.',
             healthCheck: '상태 확인',
-            healthCheckFrequency: '확인 주기',
+            healthCheckFrequency: '자동 확인 주기',
             healthCheckFrequencyHelper:
-                '백엔드 노드 상태를 주기적으로 확인합니다. 확인을 비활성화하려면 0을 입력하세요.',
+                '설정된 주기로 노드 상태를 자동 확인합니다. 자동 확인을 비활성화하려면 0을 입력하세요.',
             healthCheckFrequencyLimit: '확인 주기는 하루를 초과할 수 없으며 음수가 아닌 정수여야 합니다.',
-            loadFailedNodeResources: '오류 노드 리소스 불러오기',
-            loadFailedNodeResourcesHelper: '노드 목록을 열 때 오류 노드의 리소스 정보도 함께 불러옵니다.',
+            autoCheckFailedNodes: '실패 노드 자동 확인',
+            autoCheckFailedNodesHelper:
+                '자동 확인 시 실패 또는 비정상 상태의 노드도 확인합니다. 확인 주기가 0이 아닐 때만 적용됩니다.',
+            loadFailedNodeResources: '실패 노드 리소스 새로 고침',
+            loadFailedNodeResourcesHelper:
+                '노드 목록을 새로 고칠 때 실패 또는 비정상 상태의 노드 리소스 정보도 조회합니다.',
             nodeUnhealthy: '노드 상태 이상',
             deletedNode: '삭제된 노드 {0}은(는) 현재 업그레이드 작업을 지원하지 않습니다!',
             nodeUnhealthyHelper: '노드 상태 이상이 감지되었습니다. [노드 관리]에서 확인 후 다시 시도하세요!',
