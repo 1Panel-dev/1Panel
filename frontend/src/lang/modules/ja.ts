@@ -2276,6 +2276,7 @@ const message = {
             users: 'ユーザー管理',
             roles: 'ロール',
             auth: 'ログイン認証',
+            auth_sources: '認証設定',
             alert: 'アラート通知',
             sync: 'リソース同期',
             exchange: 'リソース同期',
@@ -5320,6 +5321,11 @@ const message = {
                     spCredentials: 'SP 秘密鍵と証明書',
                     spCredentialsDesc:
                         'ログインおよびログアウトメッセージの署名に使用します。署名と検証のポリシーはバックエンドで固定されています。',
+                    spEntityID: 'SP Entity ID',
+                    spEntityIDHelper:
+                        'SP の一意の識別子です。IdP に設定したエンティティ ID または Audience と一致させる必要があり、SP メタデータ URL としても使用されます。',
+                    acsURL: 'ACS URL',
+                    sloURL: 'SLO URL',
                     spPrivateKey: 'SP 秘密鍵',
                     spPrivateKeyHelper:
                         'AuthnRequest とログアウトメッセージの署名に使用します。保存時に暗号化され、表示されることはありません。',
@@ -5366,13 +5372,11 @@ const message = {
                     advancedDesc: 'TLS および LDAP クエリ ページングを構成します。',
                     strictSync: '厳密な同期',
                     strictSyncTooltip:
-                        '完全なインポートが完了すると、この LDAP ソースから欠落しているユーザーは無効になりますが、削除されません。',
+                        '完全な全件処理後、この LDAP ソースで見つからないユーザーの認証状態は「LDAP に存在しない」に設定されますが、ユーザーは削除されません。',
                     strictSyncHelper:
-                        '完全な全件インポートにのみ適用されます。選択したユーザーのインポートでは、他のユーザーは無効化されません。',
+                        '完全に成功した全件処理にのみ適用されます。選択したユーザーのインポートでは、他のユーザーの認証状態は変更されません。',
                     skipTLSVerify: 'TLS検証をスキップする',
                     skipTLSVerifyTooltip: 'LDAPS 接続の証明書検証を無効にします。',
-                    skipTLSVerifyHelper:
-                        '信頼できる自己署名証明書のみを使用してください。この設定は厳密な同期とは独立しています。',
                     connectTimeout: '接続タイムアウト (秒)',
                     searchPageSize: 'LDAP クエリ ページ サイズ',
                     restore: '復元',
@@ -5422,10 +5426,7 @@ const message = {
                         defaultRoleHelper: 'スケジュールされた同期によって作成されたユーザーにのみ適用されます。',
                         defaultRoleRequired: '新しい LDAP ユーザーのロールを選択します。',
                         strictSyncHelper:
-                            '完全な全件クエリで見つからないユーザーは無効化され、セッションが終了します。ユーザー、ロール、権限は削除されません。',
-                        safetyTitle: 'LDAP の全件クエリが正常に完了した場合のみ、欠落ユーザーを処理します。',
-                        safetyDescription:
-                            'クエリの失敗、タイムアウト、または不完全なページング結果によっても、ユーザーのステータスは変更されません。同期スコープは、ユーザー Base DN、フィルター、および属性マッピングに従います。',
+                            '完全な同期後、LDAP に存在しないユーザーを「LDAP に存在しない」としてマークし、ユーザー、ロール、権限を削除せずにセッションを終了します。',
                         runNow: '今すぐ同期する',
                         lastRunSuccess: '最後に成功した同期: {0}',
                         lastRunFailed: '前回の同期失敗: {0}',
@@ -5435,7 +5436,7 @@ const message = {
                         saveBeforeRun: 'タスクを実行する前に同期設定を保存します。',
                         runConfirmTitle: '厳密な同期を実行する',
                         runConfirmDescription:
-                            'LDAP の全件クエリで見つからないユーザーを無効化し、アクティブなセッションを終了します。続行しますか？',
+                            'LDAP の全件クエリで見つからないユーザーの認証状態を「LDAP に存在しない」に設定し、アクティブなセッションを終了します。続行しますか？',
                         runSuccess: 'LDAP の同期が完了しました。',
                         weekdays: {
                             0: '日曜日',

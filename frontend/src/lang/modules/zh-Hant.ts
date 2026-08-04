@@ -2153,6 +2153,7 @@ const message = {
             users: '使用者管理',
             roles: '角色',
             auth: '登入認證',
+            auth_sources: '認證設定',
             alert: '告警通知',
             sync: '資源同步',
             exchange: '資源同步',
@@ -4958,6 +4959,11 @@ const message = {
                     spCertificateHelper: '透過 SP 元資料提供給身分提供者（IdP），用於驗證登入和登出請求。',
                     spCredentials: 'SP 私鑰與憑證',
                     spCredentialsDesc: '用於簽署登入和登出訊息；簽署與安全驗證策略由後端固定處理。',
+                    spEntityID: 'SP 實體 ID',
+                    spEntityIDHelper:
+                        'SP 唯一識別碼，需與身分提供者中設定的實體 ID 或受眾識別碼一致，同時也是 SP 中繼資料位址。',
+                    acsURL: 'ACS 位址',
+                    sloURL: 'SLO 位址',
                     spPrivateKey: 'SP 私鑰',
                     spPrivateKeyHelper: '用於簽署 SAML 登入請求和登出訊息，加密儲存且不會回顯。',
                     syncLogout: '同步登出',
@@ -4998,11 +5004,11 @@ const message = {
                     advanced: '進階設定',
                     advancedDesc: '設定 TLS 和 LDAP 查詢分頁。',
                     strictSync: '嚴格同步',
-                    strictSyncTooltip: '完整全量處理後，LDAP 中不存在的同源使用者將被停用但不會刪除。',
-                    strictSyncHelper: '僅作用於完整成功的全量處理；匯入選中使用者時不會停用其他使用者。',
+                    strictSyncTooltip:
+                        '完整全量處理後，LDAP 中不存在的同源使用者，其驗證狀態將標記為「LDAP 中不存在」，但不會刪除。',
+                    strictSyncHelper: '僅作用於完整成功的全量處理；匯入選中使用者時不會變更其他使用者的驗證狀態。',
                     skipTLSVerify: '略過 TLS 憑證驗證',
                     skipTLSVerifyTooltip: '連線 LDAPS 時不驗證伺服器端憑證。',
-                    skipTLSVerifyHelper: '僅用於可信任的自簽憑證；此設定與嚴格同步互相獨立。',
                     connectTimeout: '連線逾時（秒）',
                     searchPageSize: 'LDAP 查詢分頁大小',
                     restore: '還原',
@@ -5050,10 +5056,7 @@ const message = {
                         defaultRoleHelper: '僅用於定時同步中新建立的使用者，後續可在使用者管理中調整。',
                         defaultRoleRequired: '請選擇新 LDAP 使用者的角色。',
                         strictSyncHelper:
-                            '全量查詢中缺失的同源 LDAP 使用者將被停用並清理工作階段，但不會刪除使用者、角色和權限。',
-                        safetyTitle: '僅在 LDAP 全量查詢完整成功後處理缺失使用者',
-                        safetyDescription:
-                            '查詢失敗、逾時或分頁結果不完整時，本次工作不會變更使用者狀態。同步範圍沿用使用者搜尋中的 Base DN、篩選器和屬性對應。',
+                            '全量同步成功後，將 LDAP 中缺失的使用者標記為「LDAP 中不存在」並清理工作階段，不會刪除使用者、角色或權限。',
                         runNow: '立即同步',
                         lastRunSuccess: '最近同步成功：{0}',
                         lastRunFailed: '最近同步失敗：{0}',
@@ -5062,7 +5065,8 @@ const message = {
                         cronRequired: '請輸入 Cron 運算式。',
                         saveBeforeRun: '請先儲存同步設定，再執行同步。',
                         runConfirmTitle: '執行嚴格同步',
-                        runConfirmDescription: '完整全量查詢中缺失的 LDAP 使用者將被停用並清理活動工作階段，是否繼續？',
+                        runConfirmDescription:
+                            '完整全量查詢中缺失的 LDAP 使用者，其驗證狀態將標記為「LDAP 中不存在」並清理活動工作階段，是否繼續？',
                         runSuccess: 'LDAP 同步完成。',
                         weekdays: {
                             0: '週日',

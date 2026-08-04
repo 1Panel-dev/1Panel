@@ -450,6 +450,7 @@ Command: "دستور"
 
 # LDAP
 ErrLDAPConnectionTest: "آزمایش اتصال LDAP ناموفق بود. نشانی سرور، حساب اتصال و تنظیمات شبکه را بررسی کنید."
+ErrLDAPLoginTest: "آزمایش ورود LDAP ناموفق بود. نام کاربری و رمز عبور را بررسی کنید."
 LDAPConnectionTestSuccess: "آزمایش اتصال LDAP با موفقیت انجام شد."
 ErrLDAPDirectorySearch: "خواندن کاربران LDAP ناموفق بود. تنظیمات اتصال و جستجو را بررسی کنید."
 ErrLDAPConfigLoad: "بارگذاری پیکربندی LDAP ناموفق بود."

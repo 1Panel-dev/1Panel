@@ -2320,6 +2320,7 @@ const message = {
             users: 'Gestión de usuarios',
             roles: 'Rol',
             auth: 'Autenticación de inicio de sesión',
+            auth_sources: 'Configuración de autenticación',
             alert: 'Notificaciones de alerta',
             sync: 'Sincronización de Recursos',
             exchange: 'Sincronización de Recursos',
@@ -5408,6 +5409,11 @@ const message = {
                     spCredentials: 'Clave privada y certificado del SP',
                     spCredentialsDesc:
                         'Se usan para firmar mensajes de inicio y cierre de sesión. El backend fija la política de firma y validación.',
+                    spEntityID: 'SP Entity ID',
+                    spEntityIDHelper:
+                        'Identificador único del SP. Debe coincidir con el ID de entidad o la audiencia configurada en el IdP; también es la URL de metadatos del SP.',
+                    acsURL: 'ACS URL',
+                    sloURL: 'SLO URL',
                     spPrivateKey: 'Clave privada del SP',
                     spPrivateKeyHelper:
                         'Se usa para firmar AuthnRequest y mensajes de cierre de sesión. Se cifra en reposo y nunca se muestra.',
@@ -5458,13 +5464,11 @@ const message = {
                     advancedDesc: 'Configure la paginación de consultas TLS y LDAP.',
                     strictSync: 'Sincronización estricta',
                     strictSyncTooltip:
-                        'Después de una importación completa, los usuarios que faltan en esta fuente LDAP se deshabilitan pero no se eliminan.',
+                        'Después de un procesamiento completo, el estado de autenticación de los usuarios que faltan en esta fuente LDAP se marca como No encontrado en LDAP, pero los usuarios no se eliminan.',
                     strictSyncHelper:
-                        'Solo se aplica a una importación completa. Importar usuarios seleccionados nunca deshabilita a otros usuarios.',
+                        'Solo se aplica a un procesamiento completo correcto. Importar usuarios seleccionados no cambia el estado de autenticación de otros usuarios.',
                     skipTLSVerify: 'Saltar la verificación TLS',
                     skipTLSVerifyTooltip: 'Deshabilite la verificación de certificados para conexiones LDAPS.',
-                    skipTLSVerifyHelper:
-                        'Úselo únicamente con un certificado autofirmado confiable. Esta configuración es independiente de la sincronización estricta.',
                     connectTimeout: 'Tiempo de espera de conexión (segundos)',
                     searchPageSize: 'Tamaño de página de consulta LDAP',
                     restore: 'Restaurar',
@@ -5516,10 +5520,7 @@ const message = {
                         defaultRoleHelper: 'Solo se aplica a usuarios creados mediante sincronización programada.',
                         defaultRoleRequired: 'Seleccione un rol para los nuevos usuarios de LDAP.',
                         strictSyncHelper:
-                            'Los usuarios que faltan en una consulta completa se deshabilitan y sus sesiones se borran; Los usuarios, roles y permisos no se eliminan.',
-                        safetyTitle: 'Los usuarios faltantes se procesan solo después de una consulta completa LDAP',
-                        safetyDescription:
-                            'Una consulta fallida, un tiempo de espera o un resultado paginado incompleto nunca cambian el estado del usuario. El alcance de la sincronización sigue el usuario Base DN, el filtro y la asignación de atributos.',
+                            'Tras una sincronización completa, marca a los usuarios ausentes en LDAP como No encontrado en LDAP y borra sus sesiones sin eliminar usuarios, roles ni permisos.',
                         runNow: 'Sincronizar ahora',
                         lastRunSuccess: 'Última sincronización exitosa: {0}',
                         lastRunFailed: 'La última sincronización falló: {0}',
@@ -5529,7 +5530,7 @@ const message = {
                         saveBeforeRun: 'Guarde la configuración de sincronización antes de ejecutar la tarea.',
                         runConfirmTitle: 'Ejecutar sincronización estricta',
                         runConfirmDescription:
-                            'Los usuarios de LDAP que falten en una consulta completa serán deshabilitados y sus sesiones activas se borrarán. ¿Continuar?',
+                            'El estado de autenticación de los usuarios que falten en una consulta LDAP completa se marcará como No encontrado en LDAP y sus sesiones activas se borrarán. ¿Continuar?',
                         runSuccess: 'Sincronización LDAP completada.',
                         weekdays: {
                             0: 'domingo',

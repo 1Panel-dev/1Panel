@@ -450,6 +450,7 @@ Command: "명령어"
 
 # LDAP
 ErrLDAPConnectionTest: "LDAP 연결 테스트에 실패했습니다. 서버 주소, 바인드 계정 및 네트워크 설정을 확인하세요."
+ErrLDAPLoginTest: "LDAP 로그인 테스트에 실패했습니다. 사용자 이름과 비밀번호를 확인하세요."
 LDAPConnectionTestSuccess: "LDAP 연결 테스트에 성공했습니다."
 ErrLDAPDirectorySearch: "LDAP 사용자를 읽지 못했습니다. 연결 및 검색 설정을 확인하세요."
 ErrLDAPConfigLoad: "LDAP 설정을 불러오지 못했습니다."

@@ -2321,6 +2321,7 @@ const message = {
             users: 'Gerenciamento de usuários',
             roles: 'Função',
             auth: 'Autenticação de login',
+            auth_sources: 'Configurações de autenticação',
             alert: 'Notificações de alerta',
             sync: 'Sincronização de Recursos',
             exchange: 'Sincronização de Recursos',
@@ -5428,6 +5429,11 @@ const message = {
                     spCredentials: 'Chave privada e certificado do SP',
                     spCredentialsDesc:
                         'Usados para assinar mensagens de login e logout. A política de assinatura e validação é definida pelo backend.',
+                    spEntityID: 'SP Entity ID',
+                    spEntityIDHelper:
+                        'Identificador único do SP. Deve corresponder ao ID da entidade ou ao público-alvo configurado no IdP; também é a URL de metadados do SP.',
+                    acsURL: 'ACS URL',
+                    sloURL: 'SLO URL',
                     spPrivateKey: 'Chave privada do SP',
                     spPrivateKeyHelper:
                         'Usada para assinar AuthnRequest e mensagens de logout. É criptografada em repouso e nunca exibida.',
@@ -5477,13 +5483,11 @@ const message = {
                     advancedDesc: 'Configure a paginação de consulta TLS e LDAP.',
                     strictSync: 'Sincronização estrita',
                     strictSyncTooltip:
-                        'Após uma importação completa, os usuários ausentes nesta origem LDAP serão desativados, mas não excluídos.',
+                        'Após um processamento completo, o status de autenticação dos usuários ausentes nesta origem LDAP é marcado como Não encontrado no LDAP, mas os usuários não são excluídos.',
                     strictSyncHelper:
-                        'Aplica-se apenas a uma importação completa. A importação de usuários selecionados nunca desabilita outros usuários.',
+                        'Aplica-se apenas a um processamento completo bem-sucedido. A importação de usuários selecionados não altera o status de autenticação de outros usuários.',
                     skipTLSVerify: 'Ignorar verificação TLS',
                     skipTLSVerifyTooltip: 'Desative a verificação de certificado para conexões LDAPS.',
-                    skipTLSVerifyHelper:
-                        'Use somente com um certificado autoassinado confiável. Esta configuração é independente da sincronização estrita.',
                     connectTimeout: 'Tempo limite de conexão (segundos)',
                     searchPageSize: 'Tamanho da página de consulta LDAP',
                     restore: 'Restaurar',
@@ -5535,10 +5539,7 @@ const message = {
                         defaultRoleHelper: 'Aplica-se apenas a usuários criados por sincronização agendada.',
                         defaultRoleRequired: 'Selecione uma função para novos usuários LDAP.',
                         strictSyncHelper:
-                            'Os usuários ausentes em uma consulta completa são desabilitados e suas sessões são apagadas; usuários, funções e permissões não são excluídos.',
-                        safetyTitle: 'Usuários ausentes são processados somente após uma consulta completa LDAP',
-                        safetyDescription:
-                            'Uma consulta com falha, tempo limite ou resultado paginado incompleto nunca altera o status do usuário. O escopo de sincronização segue o usuário Base DN, filtro e mapeamento de atributos.',
+                            'Após uma sincronização completa, usuários ausentes no LDAP são marcados como Não encontrado no LDAP e suas sessões são encerradas sem excluir usuários, funções ou permissões.',
                         runNow: 'Sincronize agora',
                         lastRunSuccess: 'Última sincronização bem-sucedida: {0}',
                         lastRunFailed: 'Falha na última sincronização: {0}',
@@ -5548,7 +5549,7 @@ const message = {
                         saveBeforeRun: 'Salve as configurações de sincronização antes de executar a tarefa.',
                         runConfirmTitle: 'Execute a sincronização estrita',
                         runConfirmDescription:
-                            'Os usuários LDAP ausentes em uma consulta completa serão desabilitados e suas sessões ativas serão apagadas. Continuar?',
+                            'O status de autenticação dos usuários ausentes em uma consulta LDAP completa será marcado como Não encontrado no LDAP e suas sessões ativas serão apagadas. Continuar?',
                         runSuccess: 'Sincronização LDAP concluída.',
                         weekdays: {
                             0: 'Domingo',

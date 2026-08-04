@@ -450,6 +450,7 @@ Command: "Komut"
 
 # LDAP
 ErrLDAPConnectionTest: "LDAP bağlantı testi başarısız oldu. Sunucu adresini, bağlama hesabını ve ağ ayarlarını kontrol edin."
+ErrLDAPLoginTest: "LDAP oturum açma testi başarısız oldu. Kullanıcı adını ve parolayı kontrol edin."
 LDAPConnectionTestSuccess: "LDAP bağlantı testi başarılı oldu."
 ErrLDAPDirectorySearch: "LDAP kullanıcıları okunamadı. Bağlantı ve arama ayarlarını kontrol edin."
 ErrLDAPConfigLoad: "LDAP yapılandırması yüklenemedi."
