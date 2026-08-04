@@ -27,7 +27,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
-	"github.com/subosito/gotenv"
+	"github.com/joho/godotenv"
 )
 
 type appUpgradePhase int
@@ -701,11 +701,16 @@ func verifyUpgradeImages(images []string) error {
 }
 
 func renderUpgradeEnv(install *model.AppInstall, original []byte) ([]byte, error) {
-	originalEnv, err := gotenv.Unmarshal(string(original))
-	if err != nil {
-		return nil, err
+	originalEnv := make(map[string]string)
+	if len(original) > 0 {
+		var err error
+		originalEnv, err = godotenv.UnmarshalBytes(original)
+		if err != nil {
+			return nil, err
+		}
 	}
-	params := maps.Clone(originalEnv)
+	params := make(map[string]string, len(originalEnv))
+	maps.Copy(params, originalEnv)
 	envs := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(install.Env), &envs); err != nil {
 		return nil, err
@@ -735,7 +740,7 @@ func renderUpgradeEnv(install *model.AppInstall, original []byte) ([]byte, error
 		}
 		install.Env = string(content)
 	}
-	content, err := gotenv.Marshal(params)
+	content, err := godotenv.Marshal(params)
 	if err != nil {
 		return nil, err
 	}
