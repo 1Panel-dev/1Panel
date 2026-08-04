@@ -137,7 +137,7 @@
                         v-model:current-page="paginationConfig.currentPage"
                         v-model:page-size="paginationConfig.pageSize"
                         :total="paginationConfig.total"
-                        :page-sizes="[5, 10, 20, 50, 100, 200, 500]"
+                        :page-sizes="props.pageSizes"
                         @size-change="sizeChange"
                         @current-change="currentChange"
                         :pager-count="responsivePagerCount"
@@ -187,6 +187,10 @@ const props = defineProps({
     paginationConfig: {
         type: Object,
         required: false,
+    },
+    pageSizes: {
+        type: Array as PropType<number[]>,
+        default: () => [5, 10, 20, 50, 100, 200, 500],
     },
     heightDiff: {
         type: Number,
