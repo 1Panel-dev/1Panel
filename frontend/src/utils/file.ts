@@ -200,3 +200,74 @@ export const resolveEditorLanguage = (path: string, extension = '', name = '') =
 
     return 'yaml';
 };
+
+const normalizeUrlFilename = (value: string) => {
+    let decoded = value.trim().replace(/^['"]|['"]$/g, '');
+    try {
+        decoded = decodeURIComponent(decoded);
+    } catch {
+        // Keep the original value when it contains an incomplete escape sequence.
+    }
+    return (
+        decoded
+            .replace(/[\u0000-\u001f\u007f]/g, '')
+            .split(/[\\/]/)
+            .pop()
+            ?.trim() || ''
+    );
+};
+
+const getFilenameFromContentDisposition = (contentDisposition: string) => {
+    const extendedMatch = contentDisposition.match(/(?:^|;)\s*filename\*\s*=\s*(?:"([^"]*)"|([^;]*))/i);
+    const extendedValue = extendedMatch?.[1] || extendedMatch?.[2]?.trim();
+    if (extendedValue) {
+        const encodedValue = extendedValue.match(/^[^']*'[^']*'(.*)$/)?.[1] || extendedValue;
+        return normalizeUrlFilename(encodedValue);
+    }
+
+    const filenameMatch = contentDisposition.match(/(?:^|;)\s*filename\s*=\s*(?:"([^"]*)"|([^;]*))/i);
+    return normalizeUrlFilename(filenameMatch?.[1] || filenameMatch?.[2] || '');
+};
+
+export const getFilenameFromUrl = (value: string) => {
+    const normalizedValue = value.trim();
+    try {
+        const url = new URL(normalizedValue);
+        const dispositionKeys = ['response-content-disposition', 'rscd', 'content-disposition'];
+        for (const key of dispositionKeys) {
+            const disposition = Array.from(url.searchParams.entries()).find(
+                ([paramKey]) => paramKey.toLowerCase() === key,
+            )?.[1];
+            if (disposition) {
+                const filename = getFilenameFromContentDisposition(disposition);
+                if (filename) {
+                    return filename;
+                }
+            }
+        }
+        return normalizeUrlFilename(url.pathname.slice(url.pathname.lastIndexOf('/') + 1));
+    } catch {
+        const urlWithoutParams = normalizedValue.replace(/[?#].*$/, '');
+        return normalizeUrlFilename(urlWithoutParams.slice(urlWithoutParams.lastIndexOf('/') + 1));
+    }
+};
+
+const FILE_SHARE_PASSWORD_KEY = 'k';
+
+export const withFileSharePassword = (value: string, password: string) => {
+    const shareUrl = new URL(value);
+    const hashParams = new URLSearchParams(shareUrl.hash.slice(1));
+    const normalizedPassword = password.trim();
+    if (normalizedPassword) {
+        hashParams.set(FILE_SHARE_PASSWORD_KEY, normalizedPassword);
+    } else {
+        hashParams.delete(FILE_SHARE_PASSWORD_KEY);
+    }
+    shareUrl.hash = hashParams.toString();
+    return shareUrl.toString();
+};
+
+export const getFileSharePasswordFromHash = (hash: string) => {
+    const hashParams = new URLSearchParams(hash.replace(/^#/, ''));
+    return hashParams.get(FILE_SHARE_PASSWORD_KEY)?.trim() || '';
+};

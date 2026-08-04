@@ -100,7 +100,7 @@ import { File } from '@/api/interface/file';
 import { CopyDocument, Download, Picture } from '@element-plus/icons-vue';
 import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { buildFileSharePageUrl, buildFileShareQrCodeUrl } from '@/utils/file';
+import { buildFileSharePageUrl, buildFileShareQrCodeUrl, withFileSharePassword } from '@/utils/file';
 import { copyText } from '@/utils/clipboard';
 import { dateFormat as formatDateTime } from '@/utils/date';
 import type { FormInstance, FormRules } from 'element-plus';
@@ -266,13 +266,7 @@ const cancelShare = async () => {
 
 const copyLink = () => {
     if (shareUrl.value) {
-        const password = form.sharePassword.trim();
-        const content = password
-            ? `${i18n.global.t('file.shareLinkLabel')}：${shareUrl.value}，${i18n.global.t(
-                  'file.sharePassword',
-              )}：${password}`
-            : `${i18n.global.t('file.shareLinkLabel')}：${shareUrl.value}`;
-        copyText(content);
+        copyText(withFileSharePassword(shareUrl.value, form.sharePassword));
     }
 };
 

@@ -42,7 +42,7 @@
 import { checkFileShare, getPublicFileShareInfo } from '@/api/modules/files';
 import { File } from '@/api/interface/file';
 import i18n, { loadLocaleMessages } from '@/lang';
-import { buildFileShareDownloadUrl } from '@/utils/file';
+import { buildFileShareDownloadUrl, getFileSharePasswordFromHash } from '@/utils/file';
 import { dateFormat } from '@/utils/date';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -78,6 +78,15 @@ const getPasswordRequiredText = () => {
 
 const triggerDownload = (pwd = '') => {
     window.location.href = buildFileShareDownloadUrl(code.value, currentNode.value, pwd);
+};
+
+const applySharedPassword = () => {
+    const sharedPassword = getFileSharePasswordFromHash(window.location.hash);
+    if (!sharedPassword) {
+        return;
+    }
+    password.value = sharedPassword;
+    window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}`);
 };
 
 const resolveBrowserLocale = () => {
@@ -151,6 +160,7 @@ const downloadWithPassword = async () => {
 
 onMounted(async () => {
     try {
+        applySharedPassword();
         await applyPublicLocale();
         await loadShareInfo();
         if (shareInfo.value && !shareInfo.value.hasPassword) {
