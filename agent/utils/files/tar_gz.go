@@ -21,14 +21,18 @@ func NewTarGzArchiver() ShellArchiver {
 }
 
 func (t TarGzArchiver) Extract(ctx context.Context, filePath, dstDir string, secret string) error {
+	return t.ExtractWithOptions(ctx, filePath, dstDir, secret, false)
+}
+
+func (t TarGzArchiver) ExtractWithOptions(ctx context.Context, filePath, dstDir, secret string, preserveOwner bool) error {
 	if err := os.MkdirAll(dstDir, 0755); err != nil {
 		return fmt.Errorf("failed to create destination dir: %w", err)
 	}
-	cmdMgr := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithIgnoreExist1())
+	cmdMgr := cmd.NewCommandMgr(cmd.WithContext(ctx))
 	if len(secret) != 0 {
-		return runTarGzDecryptToDir(cmdMgr, filePath, dstDir, secret, false)
+		return runTarGzDecryptToDirWithOptions(cmdMgr, filePath, dstDir, secret, false, preserveOwner)
 	}
-	return runTarGzExtractToDir(cmdMgr, filePath, dstDir)
+	return runTarGzExtractToDirWithOptions(cmdMgr, filePath, dstDir, preserveOwner)
 }
 
 func (t TarGzArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, secret string) error {
@@ -79,18 +83,34 @@ func runTarGzEncryptToFile(cmdMgr *cmd.CommandHelper, dst, secret string, tarArg
 }
 
 func runTarGzExtractToDir(cmdMgr *cmd.CommandHelper, src, dst string) error {
-	return cmdMgr.Run("tar", "-zxvf", src, "-C", dst)
+	return runTarGzExtractToDirWithOptions(cmdMgr, src, dst, false)
+}
+
+func runTarGzExtractToDirWithOptions(cmdMgr *cmd.CommandHelper, src, dst string, preserveOwner bool) error {
+	args := []string{"-zxvf", src, "-C", dst}
+	if preserveOwner {
+		args = append([]string{"--same-owner", "--same-permissions"}, args...)
+	}
+	return cmdMgr.Run("tar", args...)
 }
 
 func runTarGzDecryptToDir(cmdMgr *cmd.CommandHelper, src, dst, secret string, withSalt bool) error {
+	return runTarGzDecryptToDirWithOptions(cmdMgr, src, dst, secret, withSalt, false)
+}
+
+func runTarGzDecryptToDirWithOptions(cmdMgr *cmd.CommandHelper, src, dst, secret string, withSalt, preserveOwner bool) error {
 	opensslArgs := []string{"enc", "-d", "-aes-256-cbc"}
 	if withSalt {
 		opensslArgs = append(opensslArgs, "-salt")
 	}
 	opensslArgs = append(opensslArgs, "-pass", "env:BACKUP_SECRET", "-in", src)
+	tarArgs := []string{"-zxf", "-", "-C", dst}
+	if preserveOwner {
+		tarArgs = append([]string{"--same-owner", "--same-permissions"}, tarArgs...)
+	}
 	_, err := cmdMgr.RunPipe(
 		cmd.PipeCommand{Name: "openssl", Args: opensslArgs, Env: []string{"BACKUP_SECRET=" + secret}},
-		cmd.PipeCommand{Name: "tar", Args: []string{"-zxf", "-", "-C", dst}},
+		cmd.PipeCommand{Name: "tar", Args: tarArgs},
 	)
 	return err
 }

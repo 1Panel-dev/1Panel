@@ -42,7 +42,7 @@
 import { checkFileShare, getPublicFileShareInfo } from '@/api/modules/files';
 import { File } from '@/api/interface/file';
 import i18n, { loadLocaleMessages } from '@/lang';
-import { buildFileShareDownloadUrl, getFileSharePasswordFromHash } from '@/utils/file';
+import { buildFileShareDownloadUrl, getFileSharePasswordFromHash, removeFileSharePasswordFromHash } from '@/utils/file';
 import { dateFormat } from '@/utils/date';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -86,7 +86,12 @@ const applySharedPassword = () => {
         return;
     }
     password.value = sharedPassword;
-    window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}`);
+    const remainingHash = removeFileSharePasswordFromHash(window.location.hash);
+    window.history.replaceState(
+        window.history.state,
+        '',
+        `${window.location.pathname}${window.location.search}${remainingHash}`,
+    );
 };
 
 const resolveBrowserLocale = () => {

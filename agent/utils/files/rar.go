@@ -20,10 +20,19 @@ func NewRarArchiver() ShellArchiver {
 }
 
 func (z RarArchiver) Extract(ctx context.Context, filePath, dstDir string, _ string) error {
+	return z.ExtractWithOptions(ctx, filePath, dstDir, "", false)
+}
+
+func (z RarArchiver) ExtractWithOptions(ctx context.Context, filePath, dstDir, _ string, preserveOwner bool) error {
 	if err := checkCmdAvailability("unrar"); err != nil {
 		return err
 	}
-	return cmd.NewCommandMgr(cmd.WithContext(ctx)).Run("unrar", "x", "-y", "-o+", filePath, dstDir)
+	args := []string{"x", "-y", "-o+"}
+	if preserveOwner {
+		args = append(args, "-oh", "-ol", "-ow")
+	}
+	args = append(args, filePath, dstDir)
+	return cmd.NewCommandMgr(cmd.WithContext(ctx)).Run("unrar", args...)
 }
 
 func (z RarArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, _ string) (err error) {
@@ -45,7 +54,7 @@ func (z RarArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile
 		relativePaths[i] = path.Base(sp)
 	}
 
-	cmdArgs := append([]string{"a", "-r", tmpFile}, relativePaths...)
+	cmdArgs := append([]string{"a", "-r", "-oh", "-ol", "-ow", tmpFile}, relativePaths...)
 	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(baseDir), cmd.WithContext(ctx))
 	if err = cmdMgr.Run("rar", cmdArgs...); err != nil {
 		return err

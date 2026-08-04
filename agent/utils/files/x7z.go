@@ -45,7 +45,7 @@ func (z X7zArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile
 		relativePaths[i] = path.Base(sp)
 	}
 
-	cmdArgs := append([]string{"a", "-r", tmpFile}, relativePaths...)
+	cmdArgs := append([]string{"a", "-snh", "-snl", tmpFile}, relativePaths...)
 	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(baseDir), cmd.WithContext(ctx))
 	if err = cmdMgr.Run("7z", cmdArgs...); err != nil {
 		return err
