@@ -38,21 +38,23 @@ func getComposeBaseCmd() (string, []string) {
 	return parts[0], parts[1:]
 }
 
-func Up(filePath string) (string, error) {
+func Up(filePath string, projectName ...string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, upArgs(filePath, false)...)
+	args := appendProjectName(append([]string(nil), extra...), projectName)
+	args = append(args, upArgs(filePath, false)...)
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
-func UpWithoutPull(filePath string) (string, error) {
+func UpWithoutPull(filePath string, projectName ...string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, upArgs(filePath, true)...)
+	args := appendProjectName(append([]string(nil), extra...), projectName)
+	args = append(args, upArgs(filePath, true)...)
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
@@ -65,12 +67,13 @@ func upArgs(filePath string, withoutPull bool) []string {
 	return args
 }
 
-func UpWithTask(filePath string, task *task.Task, forcePull bool) error {
-	if err := PullComposeImages(filePath, forcePull, task); err != nil {
+func UpWithTask(filePath string, task *task.Task, forcePull bool, projectName ...string) error {
+	if err := PullComposeImages(filePath, forcePull, task, projectName...); err != nil {
 		return err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, upArgs(filePath, false)...)
+	args := appendProjectName(append([]string(nil), extra...), projectName)
+	args = append(args, upArgs(filePath, false)...)
 	return cmd.NewCommandMgr(cmd.WithTask(*task), cmd.WithTimeout(20*time.Minute)).Run(base, args...)
 }
 
@@ -88,12 +91,12 @@ func BuildWithTask(filePath, projectName string, task *task.Task) error {
 	return cmd.NewCommandMgr(cmd.WithTask(*task), cmd.WithTimeout(120*time.Minute)).Run(base, args...)
 }
 
-func PullComposeImages(filePath string, forcePull bool, task *task.Task) error {
-	return pullComposeImages(filePath, forcePull, task)
+func PullComposeImages(filePath string, forcePull bool, task *task.Task, projectName ...string) error {
+	return pullComposeImages(filePath, forcePull, task, projectName...)
 }
 
-func pullComposeImages(filePath string, forcePull bool, task *task.Task) error {
-	images, err := GetComposeImages(filePath)
+func pullComposeImages(filePath string, forcePull bool, task *task.Task, projectName ...string) error {
+	images, err := GetComposeImages(filePath, projectName...)
 	if err != nil {
 		return err
 	}
@@ -150,8 +153,8 @@ func pullComposeImages(filePath string, forcePull bool, task *task.Task) error {
 	return nil
 }
 
-func GetComposeImages(filePath string) ([]string, error) {
-	images, err := getComposeImagesByCommand(filePath)
+func GetComposeImages(filePath string, projectName ...string) ([]string, error) {
+	images, err := getComposeImagesByCommand(filePath, projectName...)
 	if err == nil {
 		return images, nil
 	}
@@ -168,12 +171,13 @@ func GetComposeImages(filePath string) ([]string, error) {
 	return images, nil
 }
 
-func getComposeImagesByCommand(filePath string) ([]string, error) {
+func getComposeImagesByCommand(filePath string, projectName ...string) ([]string, error) {
 	if err := checkCmd(); err != nil {
 		return nil, err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, loadFiles(filePath)...)
+	args := appendProjectName(append([]string(nil), extra...), projectName)
+	args = append(args, loadFiles(filePath)...)
 	args = append(args, "config", "--format", "json", "--no-normalize")
 	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(5*time.Minute)).
 		RunWithStdout(base, args...)
@@ -209,62 +213,75 @@ func getComposeImagesByCommand(filePath string) ([]string, error) {
 	return images, nil
 }
 
-func Down(filePath string) (string, error) {
+func Down(filePath string, projectName ...string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, loadFiles(filePath)...)
+	args := appendProjectName(append([]string(nil), extra...), projectName)
+	args = append(args, loadFiles(filePath)...)
 	args = append(args, "down", "--remove-orphans")
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
-func Stop(filePath string) (string, error) {
+func Stop(filePath string, projectName ...string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, loadFiles(filePath)...)
+	args := appendProjectName(append([]string(nil), extra...), projectName)
+	args = append(args, loadFiles(filePath)...)
 	args = append(args, "stop")
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
-func Restart(filePath string) (string, error) {
+func Restart(filePath string, projectName ...string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, loadFiles(filePath)...)
+	args := appendProjectName(append([]string(nil), extra...), projectName)
+	args = append(args, loadFiles(filePath)...)
 	args = append(args, "restart")
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
-func Operate(filePath, operation string) (string, error) {
+func Operate(filePath, operation string, projectName ...string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
 	base, extra := getComposeBaseCmd()
-	args := append(extra, loadFiles(filePath)...)
+	args := appendProjectName(append([]string(nil), extra...), projectName)
+	args = append(args, loadFiles(filePath)...)
 	args = append(args, operation)
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
-func DownAndUp(filePath string) (string, error) {
+func DownAndUp(filePath string, projectName ...string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Minute))
 	base, extra := getComposeBaseCmd()
-	argsDown := append(extra, loadFiles(filePath)...)
+	argsDown := appendProjectName(append([]string(nil), extra...), projectName)
+	argsDown = append(argsDown, loadFiles(filePath)...)
 	argsDown = append(argsDown, "down")
 	stdout, err := cmdMgr.RunWithStdout(base, argsDown...)
 	if err != nil {
 		return stdout, err
 	}
-	argsUp := append(extra, loadFiles(filePath)...)
+	argsUp := appendProjectName(append([]string(nil), extra...), projectName)
+	argsUp = append(argsUp, loadFiles(filePath)...)
 	argsUp = append(argsUp, "up", "-d")
 	stdout, err = cmdMgr.RunWithStdout(base, argsUp...)
 	return stdout, err
+}
+
+func appendProjectName(args []string, projectName []string) []string {
+	if len(projectName) > 0 && strings.TrimSpace(projectName[0]) != "" {
+		args = append(args, "--project-name", projectName[0])
+	}
+	return args
 }
 
 func loadFiles(filePath string) []string {

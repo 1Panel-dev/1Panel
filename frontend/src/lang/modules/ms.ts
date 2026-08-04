@@ -1762,6 +1762,8 @@ const message = {
         composeFile: 'Fail Susunan',
         fromChangeHelper: 'Menukar sumber akan membersihkan kandungan yang sedang diedit. Adakah anda mahu meneruskan?',
         composePathHelper: 'Laluan simpan fail konfigurasi: {0}',
+        composeNamePriorityHelper:
+            'Keutamaan nama projek: nama dalam konfigurasi Docker Compose > direktori induk fail > nama yang dimasukkan di sini.',
         composeHelper:
             'Komposisi yang dicipta melalui editor atau templat 1Panel akan disimpan dalam direktori {0}/docker/compose.',
         deleteFile: 'Padam fail',

@@ -1763,6 +1763,8 @@ const message = {
         fromChangeHelper:
             'Kaynağın değiştirilmesi mevcut düzenlenen içeriği temizleyecektir. Devam etmek istiyor musunuz?',
         composePathHelper: 'Yapılandırma dosyası kaydetme yolu: {0}',
+        composeNamePriorityHelper:
+            'Proje adı önceliği: Docker Compose yapılandırmasında belirtilen ad > dosyanın üst dizini > buraya girilen ad.',
         composeHelper:
             '1Panel editörü veya şablonu aracılığıyla oluşturulan kompozisyon {0}/docker/compose dizinine kaydedilecektir.',
         deleteFile: 'Dosyayı sil',

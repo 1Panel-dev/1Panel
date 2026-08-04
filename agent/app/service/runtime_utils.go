@@ -166,21 +166,21 @@ func reCreateRuntime(runtime *model.Runtime) {
 	}
 }
 
-func getComposeCmd(composePath, operate string) *exec.Cmd {
+func getComposeCmd(composePath, operate string, projectName ...string) *exec.Cmd {
 	dockerCommand := global.CONF.DockerConfig.Command
+	args := make([]string, 0, 7)
+	if len(projectName) > 0 && strings.TrimSpace(projectName[0]) != "" {
+		args = append(args, "--project-name", projectName[0])
+	}
+	args = append(args, "-f", composePath, operate)
+	if operate == "up" {
+		args = append(args, "-d")
+	}
 	var cmd *exec.Cmd
 	if dockerCommand == "docker-compose" {
-		if operate == "up" {
-			cmd = exec.Command("docker-compose", "-f", composePath, operate, "-d")
-		} else {
-			cmd = exec.Command("docker-compose", "-f", composePath, operate)
-		}
+		cmd = exec.Command("docker-compose", args...)
 	} else {
-		if operate == "up" {
-			cmd = exec.Command("docker", "compose", "-f", composePath, operate, "-d")
-		} else {
-			cmd = exec.Command("docker", "compose", "-f", composePath, operate)
-		}
+		cmd = exec.Command("docker", append([]string{"compose"}, args...)...)
 	}
 	return cmd
 }

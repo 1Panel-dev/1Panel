@@ -1705,6 +1705,8 @@ const message = {
         composeFile: 'ໄຟລ໌ Compose',
         fromChangeHelper: 'ການປ່ຽນແຫຼ່ງທີ່ມາຈະລ້າງເນື້ອຫາທີ່ແກ້ໄຂໄວ້. ຕ້ອງການຕໍ່ຫຼືບໍ່?',
         composePathHelper: 'ເສັ້ນທາງບັນທຶກໄຟລ໌ກຳນົດຄ່າ: {0}',
+        composeNamePriorityHelper:
+            'ລຳດັບຊື່ໂຄງການ: ຊື່ທີ່ລະບຸໃນການຕັ້ງຄ່າ Docker Compose > ໂຟນເດີແມ່ຂອງໄຟລ໌ > ຊື່ທີ່ປ້ອນຢູ່ນີ້.',
         composeHelper: 'Compose ທີ່ສ້າງຜ່ານ 1Panel editor ຫຼື template ຈະຖືກບັນທຶກໄວ້ໃນໂຟນເດີ {0}/docker/compose.',
         deleteFile: 'ລຶບໄຟລ໌',
         deleteComposeHelper:

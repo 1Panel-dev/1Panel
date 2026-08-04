@@ -1656,6 +1656,8 @@ const message = {
         composeFile: '編排檔案',
         fromChangeHelper: '切換來源將清空當前已編輯內容，是否繼續？',
         composePathHelper: '設定檔儲存路徑: {0}',
+        composeNamePriorityHelper:
+            '專案名稱優先順序：Docker Compose 設定中指定的名稱 > 檔案父目錄名稱 > 此處填寫的名稱。',
         composeHelper: '通過 1Panel 編輯或範本建立的編排，將儲存在 {0}/docker/compose 路徑下',
         deleteFile: '刪除檔案',
         deleteComposeHelper: '刪除容器編排的所有檔案，包括設定檔和持久化檔案，請謹慎操作',

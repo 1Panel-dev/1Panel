@@ -1680,6 +1680,8 @@ const message = {
         composeFile: '编排文件',
         fromChangeHelper: '切换来源将清空当前已编辑内容，是否继续？',
         composePathHelper: '配置文件保存路径: {0}',
+        composeNamePriorityHelper:
+            '项目名称优先级：Docker Compose 配置中指定的名称 > 文件父目录名称 > 此处填写的名称。',
         composeHelper: '通过 1Panel 编辑或模版创建的编排，将保存在 {0}/docker/compose 路径下',
         deleteFile: '删除文件',
         deleteComposeHelper: '删除容器编排的所有文件，包括配置文件和持久化文件，请谨慎操作！',

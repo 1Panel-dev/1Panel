@@ -246,7 +246,7 @@ const checkComposeName: RuleValidator = (_rule, value, callback) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.composeName')));
     } else {
-        const reg = /^[a-z0-9]{1}[a-z0-9_-]{0,256}$/;
+        const reg = /^[a-z0-9]{1}[a-z0-9_-]{0,255}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.composeName')));
         } else {
