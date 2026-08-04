@@ -1251,6 +1251,7 @@ func (f FileOp) extractArchiveWithSDK(ctx context.Context, input io.Reader, dst 
 	var dirs []dirEntry
 	var hardlinks []hardlinkEntry
 	extractionStarted := false
+	root := filepath.Clean(dst)
 
 	handler := func(ctx context.Context, archFile archiver.File) error {
 		info := archFile.FileInfo
@@ -1275,10 +1276,11 @@ func (f FileOp) extractArchiveWithSDK(ctx context.Context, input io.Reader, dst 
 		}
 		extractionStarted = true
 		if archFile.FileInfo.IsDir() {
-			if filePath != filepath.Clean(dst) {
-				if err := ensureArchiveParent(dst, filePath); err != nil {
-					return err
-				}
+			if filePath == root {
+				return ensureArchiveDirectory(root, constant.DirPerm)
+			}
+			if err := ensureArchiveParent(dst, filePath); err != nil {
+				return err
 			}
 			if err := ensureArchiveDirectory(filePath, info.Mode()); err != nil {
 				return err
