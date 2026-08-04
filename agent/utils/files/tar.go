@@ -2,6 +2,7 @@ package files
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -35,6 +36,9 @@ func (t TarArchiver) ExtractWithOptions(ctx context.Context, filePath, dstDir, _
 }
 
 func (t TarArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, _ string) error {
+	if len(sourcePaths) == 0 {
+		return fmt.Errorf("source paths cannot be empty")
+	}
 	if err := checkCmdAvailability(t.Cmd); err != nil {
 		return err
 	}

@@ -41,8 +41,9 @@ import (
 )
 
 const (
-	cmdDefaultTimeout   = 10 * time.Second
-	cmdRecursiveTimeout = 5 * time.Minute
+	cmdDefaultTimeout           = 10 * time.Second
+	cmdRecursiveTimeout         = 5 * time.Minute
+	maxArchiveSymlinkTargetSize = 4 * 1024
 )
 
 var protectedPaths = []string{
@@ -1322,7 +1323,7 @@ func (f FileOp) extractArchiveWithSDK(ctx context.Context, input io.Reader, dst 
 				if err != nil {
 					return err
 				}
-				data, readErr := io.ReadAll(fr)
+				data, readErr := io.ReadAll(io.LimitReader(fr, maxArchiveSymlinkTargetSize+1))
 				closeErr := fr.Close()
 				if readErr != nil {
 					return readErr
@@ -1331,6 +1332,9 @@ func (f FileOp) extractArchiveWithSDK(ctx context.Context, input io.Reader, dst 
 					return closeErr
 				}
 				target = string(data)
+			}
+			if len(target) > maxArchiveSymlinkTargetSize {
+				return fmt.Errorf("archive symlink target for %s exceeds %d bytes", fileName, maxArchiveSymlinkTargetSize)
 			}
 			if target == "" {
 				return fmt.Errorf("archive symlink %s has no target", fileName)
@@ -1522,7 +1526,9 @@ func (f FileOp) decompressSevenZipWithFallbackUsing(
 	if err != nil {
 		return err
 	}
-	global.LOG.Warnf("7z SDK decompression failed, falling back to CLI: %v", sdkErr)
+	if global.LOG != nil {
+		global.LOG.Warnf("7z SDK decompression failed, falling back to CLI: %v", sdkErr)
+	}
 	if err := shellArchiver.Extract(ctx, srcFile, dst, secret); err != nil {
 		return fmt.Errorf("7z SDK decompression failed: %v; CLI fallback failed: %w", sdkErr, err)
 	}
@@ -1572,6 +1578,8 @@ func (f FileOp) DecompressWithOptions(ctx context.Context, srcFile string, dst s
 					return nil
 				} else if strings.Contains(retryErr.Error(), "bad decrypt") {
 					return buserr.New("ErrBadDecrypt")
+				} else {
+					shellErr = retryErr
 				}
 			}
 		} else {
