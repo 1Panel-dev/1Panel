@@ -132,6 +132,9 @@ ErrAppNameExist: '应用名称已存在'
 ErrAppInstallNameExist: '应用安装名称 {{ .name }} 已存在'
 AppStoreIsSyncing: '应用商店同步中，请稍后重试'
 ErrGetCompose: "docker-compose.yml 文件获取失败！{{ .detail }}"
+ErrComposeProjectNameParse: "解析 Docker Compose 配置输出中的项目名称失败：{{ .detail }}"
+ErrComposeProjectNameEmpty: "无法从 Docker Compose 配置或文件父目录中推导出项目名称，请填写名称后重试"
+ErrComposeNameInvalid: "Compose 项目名称格式错误：必须以小写字母或数字开头，仅支持小写字母、数字、- 和 _，长度为 1-256 个字符"
 ErrAppVersionUnavailable: "当前应用版本已从远程服务下架，请选择其他版本后重试"
 ErrAppWarn: "状态异常，请查看日志"
 ErrAppParamKey: "参数 {{ .name }} 字段异常"

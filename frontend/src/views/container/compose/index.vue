@@ -455,14 +455,24 @@
                                         />
                                     </el-select>
                                 </el-form-item>
-                                <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="name">
-                                    <el-input @input="changePath" @change="onEdit('')" v-model.trim="form.name">
+                                <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="dirName">
+                                    <el-input @input="changePath" @change="onEdit('')" v-model.trim="form.dirName">
                                         <template #prefix>
                                             <span style="margin-right: 8px">{{ $t('file.dir') }}</span>
                                         </template>
                                     </el-input>
                                     <span class="input-help">
                                         {{ $t('container.composePathHelper', [composeFile]) }}
+                                    </span>
+                                </el-form-item>
+                                <el-form-item prop="name">
+                                    <el-input v-model.trim="form.name">
+                                        <template #prefix>
+                                            <span style="margin-right: 8px">{{ $t('commons.table.name') }}</span>
+                                        </template>
+                                    </el-input>
+                                    <span class="input-help">
+                                        {{ $t('container.composeNamePriorityHelper') }}
                                     </span>
                                 </el-form-item>
                                 <el-form-item>
@@ -582,6 +592,7 @@ const formRef = ref<FormInstance>();
 const form = reactive({
     taskID: '',
     name: '',
+    dirName: '',
     from: 'edit',
     path: '',
     file: '',
@@ -589,11 +600,22 @@ const form = reactive({
     env: '',
     forcePull: false,
 });
-const rules = reactive({
-    name: [Rules.requiredInput, Rules.composeName],
+const optionalComposeNameRule = {
+    validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
+        if (!value || /^[a-z0-9][a-z0-9_-]{0,255}$/.test(value)) {
+            callback();
+            return;
+        }
+        callback(new Error(i18n.global.t('commons.rule.composeName')));
+    },
+    trigger: 'blur',
+};
+const rules = computed(() => ({
+    name: [optionalComposeNameRule],
+    dirName: [Rules.requiredInput, Rules.composeName],
     path: [Rules.requiredInput],
     template: [Rules.requiredSelect],
-});
+}));
 
 const isActive = ref(false);
 const isExist = ref(false);
@@ -747,6 +769,7 @@ const onOpenDialog = async () => {
     isOnCreate.value = true;
     loadTemplates();
     form.name = '';
+    form.dirName = '';
     form.from = 'edit';
     form.path = '';
     form.file = '';
@@ -806,7 +829,7 @@ const loadPath = async () => {
     changePath();
 };
 const changePath = async () => {
-    composeFile.value = baseDir.value + '/docker/compose/' + form.name;
+    composeFile.value = baseDir.value + '/docker/compose/' + form.dirName;
 };
 const loadDir = async (path: string) => {
     form.path = path;

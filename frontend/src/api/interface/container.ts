@@ -352,6 +352,7 @@ export namespace Container {
     export interface ComposeCreate {
         taskID: string;
         name: string;
+        dirName: string;
         from: string;
         file: string;
         path: string;

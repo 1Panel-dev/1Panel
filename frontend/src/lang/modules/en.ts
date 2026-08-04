@@ -1731,6 +1731,8 @@ const message = {
         composeFile: 'Compose File',
         fromChangeHelper: 'Switching the source will clean the current edited content. Continue?',
         composePathHelper: 'Configuration file save path: {0}',
+        composeNamePriorityHelper:
+            'Project name priority: name specified in Docker Compose config > file parent directory > name entered here.',
         composeHelper:
             'The composition created through 1Panel editor or template will be saved in the {0}/docker/compose directory.',
         deleteFile: 'Delete file',

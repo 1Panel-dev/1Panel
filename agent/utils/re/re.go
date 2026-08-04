@@ -8,6 +8,7 @@ import (
 const (
 	NumberAlphaPattern                 = `(\d+)([A-Za-z]+)`
 	ComposeDisallowedCharsPattern      = `[^a-z0-9_-]+`
+	ComposeNamePattern                 = `^[a-z0-9][a-z0-9_-]{0,255}$`
 	ComposeEnvVarPattern               = `\$\{([^}]+)\}`
 	DiskKeyValuePattern                = `([A-Za-z0-9_]+)=("([^"\\]|\\.)*"|[^ \t]+)`
 	ValidatorNamePattern               = `^[a-zA-Z\p{Han}]{1}[a-zA-Z0-9_\p{Han}]{0,30}$`
@@ -59,6 +60,7 @@ func Init() {
 	patterns := []string{
 		NumberAlphaPattern,
 		ComposeDisallowedCharsPattern,
+		ComposeNamePattern,
 		ComposeEnvVarPattern,
 		DiskKeyValuePattern,
 		ValidatorNamePattern,

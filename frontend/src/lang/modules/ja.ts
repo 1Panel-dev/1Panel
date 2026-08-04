@@ -1721,6 +1721,8 @@ const message = {
         composeFile: 'オーケストレーションファイル',
         fromChangeHelper: 'ソースを切り替えると、現在の編集されたコンテンツがきれいになります。続けたいですか？',
         composePathHelper: '構成ファイル保存パス:{0}',
+        composeNamePriorityHelper:
+            'プロジェクト名の優先順位：Docker Compose 設定で指定された名前 > ファイルの親ディレクトリ名 > ここで入力した名前。',
         composeHelper:
             '1パネルの編集者またはテンプレートを介して作成された構成は、{0}/docker/composeディレクトリに保存されます。',
         deleteFile: 'ファイルを削除します',

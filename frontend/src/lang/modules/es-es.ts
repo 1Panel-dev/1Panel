@@ -1757,6 +1757,8 @@ const message = {
         composeFile: 'Archivo de Orquestación',
         fromChangeHelper: 'Cambiar la fuente limpiará el contenido actualmente editado. ¿Desea continuar?',
         composePathHelper: 'Ruta de guardado del archivo de configuración: {0}',
+        composeNamePriorityHelper:
+            'Prioridad del nombre del proyecto: nombre especificado en la configuración de Docker Compose > directorio padre del archivo > nombre indicado aquí.',
         composeHelper:
             'La composición creada mediante el editor o plantilla de 1Panel se guardará en el directorio {0}/docker/compose.',
         deleteFile: 'Eliminar archivo',

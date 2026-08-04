@@ -1749,6 +1749,8 @@ const message = {
         composeFile: 'Arquivo de Orquestração',
         fromChangeHelper: 'Trocar a origem limpará o conteúdo editado atual. Deseja continuar?',
         composePathHelper: 'Caminho de salvamento do arquivo de configuração: {0}',
+        composeNamePriorityHelper:
+            'Prioridade do nome do projeto: nome definido na configuração do Docker Compose > diretório pai do arquivo > nome informado aqui.',
         composeHelper:
             'A composição criada através do editor ou template do 1Panel será salva no diretório {0}/docker/compose.',
         deleteFile: 'Excluir arquivo',
