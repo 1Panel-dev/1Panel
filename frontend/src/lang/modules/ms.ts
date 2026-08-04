@@ -6266,14 +6266,17 @@ const message = {
             nodeUpgradeOfflinePackageHelper:
                 'Dalam persekitaran luar talian, nod berbeza seni bina perlu memuat naik pakej kemas kini yang sepadan sebelum dikemas kini.',
             healthCheck: 'Pemeriksaan Kesihatan',
-            healthCheckFrequency: 'Kekerapan Pemeriksaan',
+            healthCheckFrequency: 'Kekerapan Pemeriksaan Automatik',
             healthCheckFrequencyHelper:
-                'Periksa kesihatan nod backend secara berkala. Masukkan 0 untuk melumpuhkan pemeriksaan.',
+                'Periksa kesihatan nod secara automatik mengikut kekerapan yang ditetapkan. Masukkan 0 untuk melumpuhkan pemeriksaan automatik.',
             healthCheckFrequencyLimit:
                 'Kekerapan pemeriksaan tidak boleh melebihi satu hari dan mesti berupa integer bukan negatif.',
-            loadFailedNodeResources: 'Muat sumber nod yang gagal',
+            autoCheckFailedNodes: 'Periksa nod gagal secara automatik',
+            autoCheckFailedNodesHelper:
+                'Semasa pemeriksaan automatik, periksa juga nod yang berstatus gagal atau tidak sihat. Hanya terpakai apabila kekerapan pemeriksaan bukan 0.',
+            loadFailedNodeResources: 'Segar semula sumber nod gagal',
             loadFailedNodeResourcesHelper:
-                'Apabila membuka senarai nod, turut muat maklumat sumber untuk nod yang gagal.',
+                'Apabila menyegar semula senarai nod, turut dapatkan maklumat sumber untuk nod berstatus gagal atau tidak sihat.',
             nodeUnhealthy: 'Status nod tidak normal',
             deletedNode: 'Nod {0} yang telah dipadam tidak menyokong operasi naik taraf buat masa ini!',
             nodeUnhealthyHelper: 'Status nod tidak normal dikesan. Sila semak dalam [Pengurusan Nod] dan cuba lagi!',
