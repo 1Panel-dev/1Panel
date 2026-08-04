@@ -387,7 +387,6 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Check, Close, QuestionFilled } from '@element-plus/icons-vue';
 import DrawerPro from '@/components/drawer-pro/index.vue';
@@ -411,6 +410,7 @@ import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { base64UrlToBuffer, bufferToBase64Url } from '@/utils/auth';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 
@@ -419,7 +419,6 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 
 const complexityVerification = ref(false);
 const { globalStore, docsUrl, entrance, isFxplay } = useGlobalStore();
-const router = useRouter();
 const open = ref(false);
 const loading = ref(false);
 const userRef = ref<FormInstance>();
@@ -700,7 +699,7 @@ const handlePasskeyConfigureDomain = () => {
     passkeyPrereqDialogOpen.value = false;
     passkeyDialogOpen.value = false;
     open.value = false;
-    router.push({ name: 'Safe' });
+    routerToNameWithQuery('Safe', { uncached: 'true' });
 };
 
 const handlePasskeyPrereqDialogClose = () => {
@@ -870,7 +869,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             if (needReLogin) {
                 globalStore.setLogStatus(false);
                 globalStore.clearAuthInfo();
-                router.push({ name: 'entrance', params: { code: entrance.value } });
+                routerToNameWithParams('entrance', { code: entrance.value });
                 return;
             }
             emit('search');
