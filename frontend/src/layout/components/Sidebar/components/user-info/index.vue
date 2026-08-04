@@ -407,10 +407,11 @@ import {
 import { Setting } from '@/api/interface/setting';
 import { getSettingBaseInfo, getSettingInfo, updateSetting } from '@/api/modules/setting';
 import i18n from '@/lang';
+import router from '@/routers';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { base64UrlToBuffer, bufferToBase64Url } from '@/utils/auth';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { routerToNameWithParams, routerToNameWithQuery } from '@/utils/router';
+import { routerToNameWithQuery } from '@/utils/router';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 
@@ -869,7 +870,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             if (needReLogin) {
                 globalStore.setLogStatus(false);
                 globalStore.clearAuthInfo();
-                routerToNameWithParams('entrance', { code: entrance.value });
+                router.push({ name: 'entrance', params: { code: entrance.value } });
                 return;
             }
             emit('search');
