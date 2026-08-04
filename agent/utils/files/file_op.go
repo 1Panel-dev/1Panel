@@ -1,11 +1,13 @@
 package files
 
 import (
+	"archive/tar"
 	"archive/zip"
 	"bufio"
 	"compress/gzip"
 	"context"
 	"crypto/tls"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -20,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -953,6 +956,12 @@ func (f FileOp) Compress(ctx context.Context, srcRiles []string, dst string, nam
 		}
 		_ = f.DeleteFile(dstFile)
 		return NewZipArchiver().Compress(ctx, srcRiles, dstFile, "")
+	case Tar, Gz, Bz2, TarBz2, Tgz, Xz, TarXz:
+		err = NewTarArchiver(cType).Compress(ctx, srcRiles, dstFile, secret)
+		if err != nil {
+			_ = f.DeleteFile(dstFile)
+			return err
+		}
 	case TarGz:
 		err = NewTarGzArchiver().Compress(ctx, srcRiles, dstFile, secret)
 		if err != nil {
@@ -1031,20 +1040,216 @@ func decodeGBK(input string) (string, error) {
 	return decoded, nil
 }
 
-func (f FileOp) decompressWithSDK(ctx context.Context, srcFile string, dst string, cType CompressType) error {
-	format := getFormat(cType)
-	if cType == Gz {
-		if err := f.tryDecompressTarGz(ctx, srcFile, dst, format); err == nil {
-			return nil
-		}
-		return f.DecompressGzFile(ctx, srcFile, dst)
-	}
+type DecompressOptions struct {
+	PreserveOwner     bool
+	AllowCLIReextract bool
+}
 
+type archiveOwnership struct {
+	uid int
+	gid int
+}
+
+func getArchiveOwnership(file archiver.File) (archiveOwnership, bool) {
+	header, ok := getArchiveTarHeader(file)
+	if ok && header.Uid >= 0 && header.Gid >= 0 {
+		return archiveOwnership{uid: header.Uid, gid: header.Gid}, true
+	}
+	return getArchiveZipOwnership(file)
+}
+
+const zipUnixOwnershipExtraID = 0x7875
+
+func getArchiveZipOwnership(file archiver.File) (archiveOwnership, bool) {
+	var extra []byte
+	switch header := file.Header.(type) {
+	case *zip.FileHeader:
+		if header != nil {
+			extra = header.Extra
+		}
+	case zip.FileHeader:
+		extra = header.Extra
+	case *cZip.FileHeader:
+		if header != nil {
+			extra = header.Extra
+		}
+	case cZip.FileHeader:
+		extra = header.Extra
+	default:
+		return archiveOwnership{}, false
+	}
+	for len(extra) >= 4 {
+		fieldID := binary.LittleEndian.Uint16(extra[:2])
+		fieldSize := int(binary.LittleEndian.Uint16(extra[2:4]))
+		extra = extra[4:]
+		if fieldSize > len(extra) {
+			return archiveOwnership{}, false
+		}
+		field := extra[:fieldSize]
+		extra = extra[fieldSize:]
+		if fieldID != zipUnixOwnershipExtraID || len(field) < 4 || field[0] != 1 {
+			continue
+		}
+		uidSize := int(field[1])
+		if uidSize == 0 || uidSize > 4 || len(field) < 2+uidSize+1 {
+			return archiveOwnership{}, false
+		}
+		uid := decodeZipOwnershipID(field[2 : 2+uidSize])
+		gidSizeOffset := 2 + uidSize
+		gidSize := int(field[gidSizeOffset])
+		if gidSize == 0 || gidSize > 4 || len(field) < gidSizeOffset+1+gidSize {
+			return archiveOwnership{}, false
+		}
+		gid := decodeZipOwnershipID(field[gidSizeOffset+1 : gidSizeOffset+1+gidSize])
+		return archiveOwnership{uid: int(uid), gid: int(gid)}, true
+	}
+	return archiveOwnership{}, false
+}
+
+func decodeZipOwnershipID(value []byte) uint32 {
+	var result uint32
+	for i := len(value) - 1; i >= 0; i-- {
+		result = result<<8 | uint32(value[i])
+	}
+	return result
+}
+
+func appendZipOwnershipExtra(extra []byte, ownership archiveOwnership) []byte {
+	const fieldSize = 11
+	field := make([]byte, 4+fieldSize)
+	binary.LittleEndian.PutUint16(field[:2], zipUnixOwnershipExtraID)
+	binary.LittleEndian.PutUint16(field[2:4], fieldSize)
+	field[4] = 1
+	field[5] = 4
+	binary.LittleEndian.PutUint32(field[6:10], uint32(ownership.uid))
+	field[10] = 4
+	binary.LittleEndian.PutUint32(field[11:15], uint32(ownership.gid))
+	return append(extra, field...)
+}
+
+func getFileOwnership(info fs.FileInfo) (archiveOwnership, bool) {
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		return archiveOwnership{}, false
+	}
+	return archiveOwnership{uid: int(stat.Uid), gid: int(stat.Gid)}, true
+}
+
+func getArchiveTarHeader(file archiver.File) (tar.Header, bool) {
+	switch header := file.Header.(type) {
+	case *tar.Header:
+		if header == nil {
+			return tar.Header{}, false
+		}
+		return *header, true
+	case tar.Header:
+		return header, true
+	default:
+		return tar.Header{}, false
+	}
+}
+
+func applyArchiveOwnership(filePath string, mode fs.FileMode, ownership archiveOwnership) error {
+	if mode&fs.ModeSymlink != 0 {
+		return os.Lchown(filePath, ownership.uid, ownership.gid)
+	}
+	return os.Chown(filePath, ownership.uid, ownership.gid)
+}
+
+func archiveDestinationPath(dst, name string) (string, error) {
+	cleaned := filepath.Clean(filepath.FromSlash(name))
+	if cleaned == "." {
+		return dst, nil
+	}
+	if filepath.IsAbs(cleaned) || cleaned == ".." || strings.HasPrefix(cleaned, ".."+string(os.PathSeparator)) {
+		return "", fmt.Errorf("invalid archive path: %s", name)
+	}
+	return filepath.Join(dst, cleaned), nil
+}
+
+func ensureArchiveDirectory(dirPath string, mode fs.FileMode) error {
+	info, err := os.Lstat(dirPath)
+	if err == nil {
+		if info.Mode()&fs.ModeSymlink != 0 || !info.IsDir() {
+			return fmt.Errorf("archive directory path is not a directory: %s", dirPath)
+		}
+		return nil
+	}
+	if !os.IsNotExist(err) {
+		return err
+	}
+	return os.Mkdir(dirPath, mode.Perm())
+}
+
+func ensureArchiveParent(dst, filePath string) error {
+	root := filepath.Clean(dst)
+	parent := filepath.Dir(filePath)
+	rel, err := filepath.Rel(root, parent)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
+		return fmt.Errorf("archive parent escapes destination: %s", parent)
+	}
+	if err := ensureArchiveDirectory(root, constant.DirPerm); err != nil {
+		return err
+	}
+	if rel == "." {
+		return nil
+	}
+	current := root
+	for _, part := range strings.Split(rel, string(os.PathSeparator)) {
+		current = filepath.Join(current, part)
+		if err := ensureArchiveDirectory(current, constant.DirPerm); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validateArchiveHardlinkTarget(dst, targetPath string) error {
+	root := filepath.Clean(dst)
+	rel, err := filepath.Rel(root, targetPath)
+	if err != nil || rel == "." || rel == ".." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
+		return fmt.Errorf("archive hardlink target escapes destination: %s", targetPath)
+	}
+	current := root
+	parts := strings.Split(rel, string(os.PathSeparator))
+	for i, part := range parts {
+		current = filepath.Join(current, part)
+		info, err := os.Lstat(current)
+		if err != nil {
+			return fmt.Errorf("archive hardlink target is unavailable: %s: %w", targetPath, err)
+		}
+		if info.Mode()&fs.ModeSymlink != 0 {
+			return fmt.Errorf("archive hardlink target contains a symlink: %s", current)
+		}
+		if i < len(parts)-1 && !info.IsDir() {
+			return fmt.Errorf("archive hardlink target parent is not a directory: %s", current)
+		}
+		if i == len(parts)-1 && !info.Mode().IsRegular() {
+			return fmt.Errorf("archive hardlink target is not a regular file: %s", current)
+		}
+	}
+	return nil
+}
+
+func (f FileOp) extractArchiveWithSDK(ctx context.Context, input io.Reader, dst string, extractor archiver.Extractor, options DecompressOptions) (bool, error) {
 	type dirEntry struct {
-		path    string
-		modTime time.Time
+		path         string
+		mode         fs.FileMode
+		modTime      time.Time
+		ownership    archiveOwnership
+		hasOwnership bool
+	}
+	type hardlinkEntry struct {
+		path         string
+		target       string
+		mode         fs.FileMode
+		modTime      time.Time
+		ownership    archiveOwnership
+		hasOwnership bool
 	}
 	var dirs []dirEntry
+	var hardlinks []hardlinkEntry
+	extractionStarted := false
 
 	handler := func(ctx context.Context, archFile archiver.File) error {
 		info := archFile.FileInfo
@@ -1061,66 +1266,311 @@ func (f FileOp) decompressWithSDK(ctx context.Context, srcFile string, dst strin
 				}
 			}
 		}
-		filePath := filepath.Join(dst, fileName)
+		header, hasTarHeader := getArchiveTarHeader(archFile)
+		ownership, hasOwnership := getArchiveOwnership(archFile)
+		filePath, err := archiveDestinationPath(dst, fileName)
+		if err != nil {
+			return err
+		}
+		extractionStarted = true
 		if archFile.FileInfo.IsDir() {
-			if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {
-				return err
-			}
-			dirs = append(dirs, dirEntry{path: filePath, modTime: info.ModTime()})
-			return nil
-		} else {
-			parentDir := path.Dir(filePath)
-			if !f.Stat(parentDir) {
-				if err := f.Fs.MkdirAll(parentDir, constant.DirPerm); err != nil {
+			if filePath != filepath.Clean(dst) {
+				if err := ensureArchiveParent(dst, filePath); err != nil {
 					return err
 				}
 			}
+			if err := ensureArchiveDirectory(filePath, info.Mode()); err != nil {
+				return err
+			}
+			dirs = append(dirs, dirEntry{
+				path:         filePath,
+				mode:         info.Mode(),
+				modTime:      info.ModTime(),
+				ownership:    ownership,
+				hasOwnership: hasOwnership,
+			})
+			return nil
 		}
+
+		if hasTarHeader && header.Typeflag == tar.TypeLink {
+			target, err := archiveDestinationPath(dst, header.Linkname)
+			if err != nil {
+				return err
+			}
+			hardlinks = append(hardlinks, hardlinkEntry{
+				path:         filePath,
+				target:       target,
+				mode:         info.Mode(),
+				modTime:      info.ModTime(),
+				ownership:    ownership,
+				hasOwnership: hasOwnership,
+			})
+			return nil
+		}
+
+		if err := ensureArchiveParent(dst, filePath); err != nil {
+			return err
+		}
+
+		if info.Mode()&fs.ModeSymlink != 0 || hasTarHeader && header.Typeflag == tar.TypeSymlink {
+			target := archFile.LinkTarget
+			if target == "" && hasTarHeader {
+				target = header.Linkname
+			}
+			if target == "" && archFile.Open != nil {
+				fr, err := archFile.Open()
+				if err != nil {
+					return err
+				}
+				data, readErr := io.ReadAll(fr)
+				closeErr := fr.Close()
+				if readErr != nil {
+					return readErr
+				}
+				if closeErr != nil {
+					return closeErr
+				}
+				target = string(data)
+			}
+			if target == "" {
+				return fmt.Errorf("archive symlink %s has no target", fileName)
+			}
+			if err := os.RemoveAll(filePath); err != nil {
+				return err
+			}
+			if err := os.Symlink(target, filePath); err != nil {
+				return err
+			}
+			if options.PreserveOwner && hasOwnership {
+				if err := applyArchiveOwnership(filePath, info.Mode(), ownership); err != nil {
+					return fmt.Errorf("restore archive ownership for %s: %w", fileName, err)
+				}
+			}
+			return nil
+		}
+		if existing, err := os.Lstat(filePath); err == nil {
+			if existing.IsDir() {
+				return fmt.Errorf("archive file path is a directory: %s", fileName)
+			}
+			if err := os.Remove(filePath); err != nil {
+				return err
+			}
+		} else if !os.IsNotExist(err) {
+			return err
+		}
+
 		fr, err := archFile.Open()
 		if err != nil {
 			return err
 		}
-		defer fr.Close()
-		fw, err := f.Fs.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, info.Mode())
+		fw, err := f.Fs.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, info.Mode().Perm())
 		if err != nil {
+			_ = fr.Close()
 			return err
 		}
-		defer fw.Close()
-		if _, err := io.Copy(fw, fr); err != nil {
-			return err
+		_, copyErr := io.Copy(fw, fr)
+		closeReadErr := fr.Close()
+		closeWriteErr := fw.Close()
+		if copyErr != nil {
+			return copyErr
+		}
+		if closeReadErr != nil {
+			return closeReadErr
+		}
+		if closeWriteErr != nil {
+			return closeWriteErr
+		}
+		if options.PreserveOwner && hasOwnership {
+			if err := applyArchiveOwnership(filePath, info.Mode(), ownership); err != nil {
+				return fmt.Errorf("restore archive ownership for %s: %w", fileName, err)
+			}
+		}
+		if err := f.Fs.Chmod(filePath, info.Mode().Perm()); err != nil {
+			return fmt.Errorf("restore archive mode for %s: %w", fileName, err)
 		}
 		_ = os.Chtimes(filePath, info.ModTime(), info.ModTime())
 		return nil
 	}
+	if err := extractor.Extract(ctx, input, nil, handler); err != nil {
+		return extractionStarted, err
+	}
+	for _, link := range hardlinks {
+		if err := ensureArchiveParent(dst, link.path); err != nil {
+			return extractionStarted, err
+		}
+		if err := validateArchiveHardlinkTarget(dst, link.target); err != nil {
+			return extractionStarted, err
+		}
+		if err := os.RemoveAll(link.path); err != nil {
+			return extractionStarted, err
+		}
+		if err := os.Link(link.target, link.path); err != nil {
+			return extractionStarted, fmt.Errorf("restore archive hardlink %s: %w", link.path, err)
+		}
+		if options.PreserveOwner && link.hasOwnership {
+			if err := applyArchiveOwnership(link.path, link.mode, link.ownership); err != nil {
+				return extractionStarted, fmt.Errorf("restore archive ownership for %s: %w", link.path, err)
+			}
+		}
+		if err := f.Fs.Chmod(link.path, link.mode.Perm()); err != nil {
+			return extractionStarted, fmt.Errorf("restore archive mode for %s: %w", link.path, err)
+		}
+		_ = os.Chtimes(link.path, link.modTime, link.modTime)
+	}
+	for i := len(dirs) - 1; i >= 0; i-- {
+		if options.PreserveOwner && dirs[i].hasOwnership {
+			if err := applyArchiveOwnership(dirs[i].path, dirs[i].mode, dirs[i].ownership); err != nil {
+				return extractionStarted, fmt.Errorf("restore archive ownership for %s: %w", dirs[i].path, err)
+			}
+		}
+		if err := f.Fs.Chmod(dirs[i].path, dirs[i].mode.Perm()); err != nil {
+			return extractionStarted, fmt.Errorf("restore archive mode for %s: %w", dirs[i].path, err)
+		}
+		_ = os.Chtimes(dirs[i].path, dirs[i].modTime, dirs[i].modTime)
+	}
+	return extractionStarted, nil
+}
+
+func (f FileOp) decompressWithSDKState(ctx context.Context, srcFile string, dst string, cType CompressType, secret string, options DecompressOptions) (bool, error) {
 	input, err := f.Fs.Open(srcFile)
+	if err != nil {
+		return false, err
+	}
+	var extractor archiver.Extractor = getFormat(cType)
+	if cType == X7z {
+		extractor = archiver.SevenZip{Password: secret}
+	}
+	extractionStarted, extractErr := f.extractArchiveWithSDK(ctx, input, dst, extractor, options)
+	closeErr := input.Close()
+	if cType == Gz {
+		if extractErr == nil && extractionStarted {
+			return true, closeErr
+		}
+		if extractionStarted {
+			return true, extractErr
+		}
+		return false, f.DecompressGzFile(ctx, srcFile, dst)
+	}
+	if extractErr != nil {
+		return extractionStarted, extractErr
+	}
+	if closeErr != nil {
+		return extractionStarted, closeErr
+	}
+	return extractionStarted, nil
+}
+
+func (f FileOp) decompressWithSDK(ctx context.Context, srcFile string, dst string, cType CompressType, secret string, options DecompressOptions) error {
+	_, err := f.decompressWithSDKState(ctx, srcFile, dst, cType, secret, options)
+	return err
+}
+
+func resetArchiveFallbackDestination(dst string) error {
+	info, err := os.Lstat(dst)
+	if os.IsNotExist(err) {
+		return os.MkdirAll(dst, constant.DirPerm)
+	}
 	if err != nil {
 		return err
 	}
-	defer input.Close()
-	if err := format.Extract(ctx, input, nil, handler); err != nil {
+	if info.Mode()&fs.ModeSymlink != 0 || !info.IsDir() {
+		return fmt.Errorf("archive fallback destination is not a directory: %s", dst)
+	}
+	mode := info.Mode().Perm()
+	ownership, hasOwnership := getFileOwnership(info)
+	if err := os.RemoveAll(dst); err != nil {
 		return err
 	}
-	for i := len(dirs) - 1; i >= 0; i-- {
-		_ = os.Chtimes(dirs[i].path, dirs[i].modTime, dirs[i].modTime)
+	if err := os.MkdirAll(dst, mode); err != nil {
+		return err
+	}
+	if hasOwnership {
+		if err := os.Chown(dst, ownership.uid, ownership.gid); err != nil {
+			return err
+		}
+	}
+	return os.Chmod(dst, mode)
+}
+
+func (f FileOp) decompressSevenZipWithFallback(ctx context.Context, srcFile, dst, secret string, options DecompressOptions) error {
+	return f.decompressSevenZipWithFallbackUsing(ctx, srcFile, dst, secret, options, f.decompressWithSDKState)
+}
+
+func (f FileOp) decompressSevenZipWithFallbackUsing(
+	ctx context.Context,
+	srcFile, dst, secret string,
+	options DecompressOptions,
+	sdkExtract func(context.Context, string, string, CompressType, string, DecompressOptions) (bool, error),
+) error {
+	extractionStarted, sdkErr := sdkExtract(ctx, srcFile, dst, X7z, secret, options)
+	if sdkErr == nil {
+		return nil
+	}
+	if secret != "" {
+		return sdkErr
+	}
+	if extractionStarted && !options.AllowCLIReextract {
+		return sdkErr
+	}
+	if extractionStarted {
+		if err := resetArchiveFallbackDestination(dst); err != nil {
+			return fmt.Errorf("reset 7z CLI fallback destination: %w", err)
+		}
+	}
+
+	shellArchiver, err := NewExtractShellArchiver(X7z)
+	if err != nil {
+		return err
+	}
+	global.LOG.Warnf("7z SDK decompression failed, falling back to CLI: %v", sdkErr)
+	if err := shellArchiver.Extract(ctx, srcFile, dst, secret); err != nil {
+		return fmt.Errorf("7z SDK decompression failed: %v; CLI fallback failed: %w", sdkErr, err)
 	}
 	return nil
 }
 
+type ownershipPreservingShellExtractor interface {
+	ExtractWithOptions(ctx context.Context, filePath, dstDir, secret string, preserveOwner bool) error
+}
+
+func extractWithShellOptions(ctx context.Context, shellArchiver ShellArchiver, srcFile, dst, secret string, options DecompressOptions) error {
+	if options.PreserveOwner {
+		if extractor, ok := shellArchiver.(ownershipPreservingShellExtractor); ok {
+			return extractor.ExtractWithOptions(ctx, srcFile, dst, secret, true)
+		}
+	}
+	return shellArchiver.Extract(ctx, srcFile, dst, secret)
+}
+
 func (f FileOp) Decompress(ctx context.Context, srcFile string, dst string, cType CompressType, secret string) error {
-	if cType == Tar || cType == Zip || cType == TarGz || cType == Rar || cType == X7z {
+	return f.DecompressWithOptions(ctx, srcFile, dst, cType, secret, DecompressOptions{})
+}
+
+func (f FileOp) DecompressWithOptions(ctx context.Context, srcFile string, dst string, cType CompressType, secret string, options DecompressOptions) error {
+	if cType == X7z && options.PreserveOwner {
+		return f.decompressSevenZipWithFallback(ctx, srcFile, dst, secret, options)
+	}
+
+	var shellErr error
+	useShell := cType == Rar || cType == Zip || cType == Tar || cType == TarGz ||
+		!options.PreserveOwner && cType == X7z
+	if useShell {
 		shellArchiver, err := NewExtractShellArchiver(cType)
 		if !f.Stat(dst) {
 			_ = f.CreateDir(dst, 0755)
 		}
 		if err == nil {
-			if err = shellArchiver.Extract(ctx, srcFile, dst, secret); err == nil {
+			if err = extractWithShellOptions(ctx, shellArchiver, srcFile, dst, secret, options); err == nil {
 				return nil
 			}
+			shellErr = err
 			if cType == TarGz {
 				if strings.Contains(err.Error(), "bad decrypt") {
 					return buserr.New("ErrBadDecrypt")
 				}
-				if err := shellArchiver.Extract(ctx, srcFile, dst, "-"); strings.Contains(err.Error(), "bad decrypt") {
+				if retryErr := extractWithShellOptions(ctx, shellArchiver, srcFile, dst, "-", options); retryErr == nil {
+					return nil
+				} else if strings.Contains(retryErr.Error(), "bad decrypt") {
 					return buserr.New("ErrBadDecrypt")
 				}
 			}
@@ -1130,7 +1580,15 @@ func (f FileOp) Decompress(ctx context.Context, srcFile string, dst string, cTyp
 			}
 		}
 	}
-	return f.decompressWithSDK(ctx, srcFile, dst, cType)
+	if shellErr != nil && global.LOG != nil {
+		global.LOG.Warnf("shell decompression for %s failed, falling back to SDK: %v", cType, shellErr)
+	}
+	if shellErr != nil && options.AllowCLIReextract {
+		if err := resetArchiveFallbackDestination(dst); err != nil {
+			return fmt.Errorf("reset %s SDK fallback destination: %w", cType, err)
+		}
+	}
+	return f.decompressWithSDK(ctx, srcFile, dst, cType, secret, options)
 }
 
 func ZipFile(ctx context.Context, files []archiver.File, dst afero.File, progress func(current, total int, message string)) error {
@@ -1152,6 +1610,9 @@ func ZipFile(ctx context.Context, files []archiver.File, dst afero.File, progres
 		}
 		hdr.Method = zip.Deflate
 		hdr.Name = file.NameInArchive
+		if ownership, ok := getFileOwnership(file.FileInfo); ok {
+			hdr.Extra = appendZipOwnershipExtra(hdr.Extra, ownership)
+		}
 		if file.IsDir() {
 			if !strings.HasSuffix(hdr.Name, "/") {
 				hdr.Name += "/"
@@ -1207,69 +1668,6 @@ func (r *contextReader) Read(p []byte) (int, error) {
 	default:
 		return r.r.Read(p)
 	}
-}
-
-func (f FileOp) tryDecompressTarGz(ctx context.Context, srcFile string, dst string, format archiver.CompressedArchive) error {
-	input, err := f.Fs.Open(srcFile)
-	if err != nil {
-		return err
-	}
-	defer input.Close()
-
-	type dirEntry struct {
-		path    string
-		modTime time.Time
-	}
-	var dirs []dirEntry
-	extracted := false
-
-	handler := func(ctx context.Context, archFile archiver.File) error {
-		info := archFile.FileInfo
-		if isIgnoreFile(archFile.Name()) {
-			return nil
-		}
-		filePath := filepath.Join(dst, archFile.NameInArchive)
-		if info.IsDir() {
-			if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {
-				return err
-			}
-			dirs = append(dirs, dirEntry{path: filePath, modTime: info.ModTime()})
-		} else {
-			parentDir := filepath.Dir(filePath)
-			if !f.Stat(parentDir) {
-				if err := f.Fs.MkdirAll(parentDir, constant.DirPerm); err != nil {
-					return err
-				}
-			}
-			fr, err := archFile.Open()
-			if err != nil {
-				return err
-			}
-			defer fr.Close()
-			fw, err := f.Fs.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, info.Mode())
-			if err != nil {
-				return err
-			}
-			defer fw.Close()
-			if _, err := io.Copy(fw, fr); err != nil {
-				return err
-			}
-			_ = os.Chtimes(filePath, info.ModTime(), info.ModTime())
-		}
-		extracted = true
-		return nil
-	}
-
-	if err := format.Extract(ctx, input, nil, handler); err != nil {
-		return err
-	}
-	if !extracted {
-		return fmt.Errorf("no files extracted as tar.gz")
-	}
-	for i := len(dirs) - 1; i >= 0; i-- {
-		_ = os.Chtimes(dirs[i].path, dirs[i].modTime, dirs[i].modTime)
-	}
-	return nil
 }
 
 func (f FileOp) DecompressGzFile(ctx context.Context, srcFile, dst string) error {

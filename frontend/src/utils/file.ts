@@ -271,3 +271,10 @@ export const getFileSharePasswordFromHash = (hash: string) => {
     const hashParams = new URLSearchParams(hash.replace(/^#/, ''));
     return hashParams.get(FILE_SHARE_PASSWORD_KEY)?.trim() || '';
 };
+
+export const removeFileSharePasswordFromHash = (hash: string) => {
+    const hashParams = new URLSearchParams(hash.replace(/^#/, ''));
+    hashParams.delete(FILE_SHARE_PASSWORD_KEY);
+    const remainingHash = hashParams.toString();
+    return remainingHash ? `#${remainingHash}` : '';
+};

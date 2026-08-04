@@ -20,10 +20,19 @@ func NewZipArchiver() ShellArchiver {
 }
 
 func (z ZipArchiver) Extract(ctx context.Context, filePath, dstDir string, secret string) error {
+	return z.ExtractWithOptions(ctx, filePath, dstDir, secret, false)
+}
+
+func (z ZipArchiver) ExtractWithOptions(ctx context.Context, filePath, dstDir, _ string, preserveOwner bool) error {
 	if err := checkCmdAvailability("unzip"); err != nil {
 		return err
 	}
-	return cmd.NewCommandMgr(cmd.WithContext(ctx)).Run("unzip", "-qo", filePath, "-d", dstDir)
+	args := []string{"-qo"}
+	if preserveOwner {
+		args = append(args, "-X")
+	}
+	args = append(args, filePath, "-d", dstDir)
+	return cmd.NewCommandMgr(cmd.WithContext(ctx)).Run("unzip", args...)
 }
 
 func (z ZipArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile string, _ string) error {

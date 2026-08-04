@@ -14,7 +14,7 @@ type ShellArchiver interface {
 
 func NewShellArchiver(compressType CompressType) (ShellArchiver, error) {
 	switch compressType {
-	case Tar:
+	case Tar, Gz, Bz2, TarBz2, Tgz, Xz, TarXz:
 		if err := checkCmdAvailability("tar"); err != nil {
 			return nil, err
 		}
@@ -46,7 +46,7 @@ func NewShellArchiver(compressType CompressType) (ShellArchiver, error) {
 
 func NewExtractShellArchiver(compressType CompressType) (ShellArchiver, error) {
 	switch compressType {
-	case Tar:
+	case Tar, Gz, Bz2, TarBz2, Tgz, Xz, TarXz:
 		if err := checkCmdAvailability("tar"); err != nil {
 			return nil, err
 		}

@@ -16,6 +16,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 	"unicode/utf8"
 
@@ -466,7 +467,7 @@ func (f *FileService) Compress(c request.FileCompress) error {
 
 func preflightCompressTool(compressType files.CompressType) error {
 	switch compressType {
-	case files.TarGz, files.Rar, files.X7z:
+	case files.Tar, files.Gz, files.Bz2, files.TarBz2, files.Tgz, files.TarGz, files.Xz, files.TarXz, files.Rar, files.X7z:
 		_, err := files.NewShellArchiver(compressType)
 		return err
 	default:
@@ -476,7 +477,7 @@ func preflightCompressTool(compressType files.CompressType) error {
 
 func preflightDecompressTool(decompressType files.CompressType) error {
 	switch decompressType {
-	case files.Rar, files.X7z:
+	case files.Rar:
 		_, err := files.NewExtractShellArchiver(decompressType)
 		return err
 	default:
@@ -533,7 +534,10 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 					_ = os.RemoveAll(c.Dst)
 				}
 			}()
-			if err := fo.Decompress(t.TaskCtx, c.Path, tempDst, files.CompressType(c.Type), c.Secret); err != nil {
+			if err := fo.DecompressWithOptions(t.TaskCtx, c.Path, tempDst, files.CompressType(c.Type), c.Secret, files.DecompressOptions{
+				PreserveOwner:     true,
+				AllowCLIReextract: true,
+			}); err != nil {
 				return err
 			}
 			if err := fo.CreateDir(c.Dst, constant.DirPerm); err != nil {
@@ -551,19 +555,42 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 }
 
 func copyDecompressTree(ctx context.Context, srcDir, dstDir string) error {
+	state := decompressCopyState{hardlinks: make(map[decompressFileIdentity]string)}
 	entries, err := os.ReadDir(srcDir)
 	if err != nil {
 		return err
 	}
 	for _, entry := range entries {
-		if err := copyDecompressEntry(ctx, filepath.Join(srcDir, entry.Name()), filepath.Join(dstDir, entry.Name())); err != nil {
+		if err := copyDecompressEntryWithState(ctx, filepath.Join(srcDir, entry.Name()), filepath.Join(dstDir, entry.Name()), &state); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
+type decompressFileIdentity struct {
+	device uint64
+	inode  uint64
+}
+
+type decompressCopyState struct {
+	hardlinks map[decompressFileIdentity]string
+}
+
+func decompressHardlinkIdentity(info os.FileInfo) (decompressFileIdentity, bool) {
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok || stat.Nlink < 2 {
+		return decompressFileIdentity{}, false
+	}
+	return decompressFileIdentity{device: uint64(stat.Dev), inode: uint64(stat.Ino)}, true
+}
+
 func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) (retErr error) {
+	state := decompressCopyState{hardlinks: make(map[decompressFileIdentity]string)}
+	return copyDecompressEntryWithState(ctx, srcPath, dstPath, &state)
+}
+
+func copyDecompressEntryWithState(ctx context.Context, srcPath, dstPath string, state *decompressCopyState) (retErr error) {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
@@ -605,13 +632,16 @@ func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) (retErr e
 			if err := applyDecompressOwnership(srcPath, dstPath); err != nil {
 				return err
 			}
+			if err := os.Chmod(dstPath, info.Mode().Perm()); err != nil {
+				return err
+			}
 		}
 		entries, err := os.ReadDir(srcPath)
 		if err != nil {
 			return err
 		}
 		for _, entry := range entries {
-			if err := copyDecompressEntry(ctx, filepath.Join(srcPath, entry.Name()), filepath.Join(dstPath, entry.Name())); err != nil {
+			if err := copyDecompressEntryWithState(ctx, filepath.Join(srcPath, entry.Name()), filepath.Join(dstPath, entry.Name()), state); err != nil {
 				return err
 			}
 		}
@@ -633,6 +663,15 @@ func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) (retErr e
 	}
 	if err := os.MkdirAll(filepath.Dir(dstPath), constant.DirPerm); err != nil {
 		return err
+	}
+	identity, isHardlink := decompressHardlinkIdentity(info)
+	if !keepExistingFile && isHardlink {
+		if existingPath, ok := state.hardlinks[identity]; ok {
+			if err := os.Link(existingPath, dstPath); err != nil {
+				return err
+			}
+			return os.Chtimes(dstPath, info.ModTime(), info.ModTime())
+		}
 	}
 
 	srcFile, err := os.Open(srcPath)
@@ -658,6 +697,12 @@ func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) (retErr e
 		if err := applyDecompressOwnership(srcPath, dstPath); err != nil {
 			return err
 		}
+		if err := os.Chmod(dstPath, info.Mode().Perm()); err != nil {
+			return err
+		}
+		if isHardlink {
+			state.hardlinks[identity] = dstPath
+		}
 	}
 	return os.Chtimes(dstPath, info.ModTime(), info.ModTime())
 }
@@ -667,7 +712,7 @@ func applyDecompressOwnership(srcPath, dstPath string) error {
 	if err != nil {
 		return err
 	}
-	stat, ok := info.Sys().(*unix.Stat_t)
+	stat, ok := info.Sys().(*syscall.Stat_t)
 	if !ok {
 		return nil
 	}
