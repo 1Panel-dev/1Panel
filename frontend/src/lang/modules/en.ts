@@ -1034,6 +1034,19 @@ const message = {
                 'Allow supported direct conversion between Chat Completions, Responses, and Anthropic Messages. Native protocols always take priority.',
             protocolConversionRisk:
                 'Protocol conversion is not lossless. Protocol-specific fields, tool calls, reasoning, or multimodal content may be degraded or lost. Use it after weighing the trade-offs.',
+            visionEnhancement: 'Vision Enhancement',
+            visionEnhancementRisk: 'Vision enhancement may send images to a separate vision model provider.',
+            visionModelGroup: 'Vision Model Group',
+            visionModelGroupDesc:
+                'Select an image-capable model from this text generation group. All images in one request use the same model.',
+            visionTargetModelGroup: 'Target Model Group',
+            visionTargetModelGroupDesc:
+                'Enable enhancement only for request models in this text generation group without changing the final request model.',
+            visionEnhancementDesc:
+                'Images are converted to text evidence and may lose detail, adding latency and model cost. The gateway does not detect native image support on target models. Saving restarts the gateway; use it after weighing the trade-offs.',
+            visionPreprocess: 'Vision Preprocessing',
+            cacheHit: 'Cache Hit',
+            apiType: 'API Type',
             lbPolicyRoundRobin: 'Round Robin',
             lbPolicyRoundRobinDesc:
                 'Select available model accounts in order. Use this when backends have similar capacity.',

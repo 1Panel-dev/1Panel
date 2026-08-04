@@ -997,6 +997,17 @@ const message = {
                 '开启后，文本请求可在 Chat Completions、Responses 和 Anthropic Messages 的受支持协议间直接转换，原生协议始终优先。',
             protocolConversionRisk:
                 '协议转换无法保证无损，协议专属字段、工具调用、思考内容或多模态内容可能被降级或丢失，请权衡之后使用。',
+            visionEnhancement: '视觉增强',
+            visionEnhancementRisk: '视觉增强可能会将图片发送给独立的视觉模型供应商。',
+            visionModelGroup: '视觉模型组',
+            visionModelGroupDesc: '从该文本生成模型组中选择一个支持图片理解的模型，同一请求中的图片共用该模型。',
+            visionTargetModelGroup: '目标模型组',
+            visionTargetModelGroupDesc: '仅该文本生成模型组中的请求模型启用视觉增强，不会改变最终请求模型。',
+            visionEnhancementDesc:
+                '图片会先转换为文本证据，可能丢失细节，并增加延迟和模型费用。网关不会检测目标模型是否原生支持图片；保存后会重启网关，请权衡之后使用。',
+            visionPreprocess: '视觉预处理',
+            cacheHit: '缓存命中',
+            apiType: 'API 类型',
             lbPolicyRoundRobin: '轮询',
             lbPolicyRoundRobinDesc: '按顺序依次选择可用模型账号，适合后端能力接近的场景。',
             lbPolicyWeightedRoundRobin: '加权轮询',

@@ -1045,6 +1045,20 @@ const message = {
                 'Benarkan penukaran terus yang disokong antara Chat Completions, Responses dan Anthropic Messages. Protokol asli sentiasa diutamakan.',
             protocolConversionRisk:
                 'Penukaran protokol tidak menjamin tanpa kehilangan. Medan khusus protokol, panggilan alat, penaakulan atau kandungan multimodal mungkin diturunkan atau hilang. Gunakan selepas mempertimbangkan risikonya.',
+            visionEnhancement: 'Peningkatan visual',
+            visionEnhancementRisk:
+                'Peningkatan visual mungkin menghantar imej kepada penyedia model visual yang berasingan.',
+            visionModelGroup: 'Kumpulan model visual',
+            visionModelGroupDesc:
+                'Pilih model yang memahami imej daripada kumpulan penjanaan teks ini. Semua imej dalam satu permintaan menggunakan model yang sama.',
+            visionTargetModelGroup: 'Kumpulan model sasaran',
+            visionTargetModelGroupDesc:
+                'Aktifkan peningkatan hanya untuk model dalam kumpulan ini tanpa mengubah model permintaan akhir.',
+            visionEnhancementDesc:
+                'Imej ditukar kepada bukti teks dan mungkin kehilangan butiran, serta menambah latensi dan kos. Gerbang tidak mengesan sokongan imej asli. Menyimpan akan memulakan semula gerbang; gunakan selepas mempertimbangkan risikonya.',
+            visionPreprocess: 'Prapemprosesan visual',
+            cacheHit: 'Cache ditemui',
+            apiType: 'Jenis API',
             lbPolicyRoundRobin: 'Round Robin',
             lbPolicyRoundRobinDesc:
                 'Pilih akaun model tersedia mengikut turutan. Sesuai apabila kapasiti backend hampir sama.',

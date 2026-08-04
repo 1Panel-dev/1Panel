@@ -1013,6 +1013,19 @@ const message = {
                 'Chat Completions, Responses 및 Anthropic Messages 간에 지원되는 직접 변환을 허용합니다. 네이티브 프로토콜이 항상 우선합니다.',
             protocolConversionRisk:
                 '프로토콜 변환은 무손실을 보장하지 않습니다. 프로토콜 전용 필드, 도구 호출, 추론 또는 멀티모달 콘텐츠가 축소되거나 손실될 수 있으므로 위험을 고려한 후 사용하세요.',
+            visionEnhancement: '비전 강화',
+            visionEnhancementRisk: '비전 강화 시 이미지가 별도의 비전 모델 제공자에게 전송될 수 있습니다.',
+            visionModelGroup: '비전 모델 그룹',
+            visionModelGroupDesc:
+                '이 텍스트 생성 그룹에서 이미지 이해 모델을 선택합니다. 한 요청의 모든 이미지는 같은 모델을 사용합니다.',
+            visionTargetModelGroup: '대상 모델 그룹',
+            visionTargetModelGroupDesc:
+                '최종 요청 모델을 변경하지 않고 이 그룹의 요청 모델에만 비전 강화를 적용합니다.',
+            visionEnhancementDesc:
+                '이미지는 텍스트 증거로 변환되어 세부 정보가 손실될 수 있으며 지연과 비용이 증가합니다. 게이트웨이는 대상 모델의 기본 이미지 지원을 감지하지 않습니다. 저장하면 게이트웨이가 재시작되므로 위험을 고려한 후 사용하세요.',
+            visionPreprocess: '비전 전처리',
+            cacheHit: '캐시 적중',
+            apiType: 'API 유형',
             lbPolicyRoundRobin: '라운드 로빈',
             lbPolicyRoundRobinDesc:
                 '사용 가능한 모델 계정을 순서대로 선택합니다. 백엔드 성능이 비슷한 경우에 적합합니다.',
