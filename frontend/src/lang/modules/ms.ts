@@ -933,6 +933,8 @@ const message = {
                 'Menyimpan akan memulakan semula bekas secara automatik supaya konfigurasi berkuat kuasa.',
             dashboardAuthAutoRebuildHelper:
                 'Menyimpan nama pengguna atau kata laluan akan membina semula bekas secara automatik supaya perubahan berkuat kuasa.',
+            dashboardAuthImmediateHelper:
+                'Apabila disimpan, kelayakan log masuk QwenPaw dikemas kini serta-merta tanpa memulakan semula bekas.',
             channelDeleteConfirm: 'Padam konfigurasi saluran {0}?',
             apiTypeBaseURLHelper: 'Jenis ini menghantar permintaan ke {0}. Base URL yang disyorkan: {1}',
             customImageURLHelper:

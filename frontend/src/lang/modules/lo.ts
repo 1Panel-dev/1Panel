@@ -904,6 +904,8 @@ const message = {
             channelAutoRestartHelper: 'ການບັນທຶກຈະຣີສະຕາດຄອນເທນເນີອັດຕະໂນມັດເພື່ອໃຫ້ການປ່ຽນແປງມີຜົນ.',
             dashboardAuthAutoRebuildHelper:
                 'ການບັນທຶກຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານ Dashboard ຈະສ້າງຄອນເທນເນີໃໝ່ອັດຕະໂນມັດເພື່ອໃຫ້ການປ່ຽນແປງມີຜົນ.',
+            dashboardAuthImmediateHelper:
+                'ເມື່ອບັນທຶກ ຂໍ້ມູນເຂົ້າລະບົບ QwenPaw ຈະຖືກອັບເດດທັນທີໂດຍບໍ່ຕ້ອງຣີສະຕາດຄອນເທນເນີ.',
             channelDeleteConfirm: 'ລຶບການຕັ້ງຄ່າຊ່ອງທາງ {0}?',
             apiTypeBaseURLHelper: 'ປະເພດນີ້ຈະສົ່ງການຮ້ອງຂໍໄປທີ່ {0}. Base URL ທີ່ແນະນຳ: {1}',
             customImageURLHelper:

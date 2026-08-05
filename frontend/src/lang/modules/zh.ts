@@ -890,6 +890,7 @@ const message = {
             scanConnectHelper: '点击后将在任务日志中显示二维码，扫码确认成功后将自动重启容器。',
             channelAutoRestartHelper: '保存后将自动重启容器以使配置生效。',
             dashboardAuthAutoRebuildHelper: '保存用户名密码后将自动重建容器以使配置生效。',
+            dashboardAuthImmediateHelper: '保存后将立即更新 QwenPaw 登录凭据，无需重启容器。',
             channelDeleteConfirm: '确认删除 {0} 频道配置？',
             apiTypeBaseURLHelper: '当前类型最终请求 {0}，Base URL 建议填写 {1}',
             customImageURLHelper: 'Custom 图片账号请填写完整的图片生成接口 URL，系统不会自动补全路径，例如：{0}',

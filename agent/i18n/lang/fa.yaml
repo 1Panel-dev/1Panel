@@ -93,6 +93,9 @@ ErrAgentWebsiteBound: 'این عامل قبلاً به یک وب‌سایت مت
 ErrAgentWebsiteTypeUnsupported: 'فقط وب‌سایت‌های پراکسی یا استاتیک قابل اتصال هستند'
 ErrAgentWebsiteInUse: 'این وب‌سایت قبلاً به عامل دیگری متصل است'
 ErrAgentWebsiteUnbindUnsupported: 'وب‌سایت‌های استقرار یافته را نمی‌توان به صورت دستی قطع اتصال کرد'
+ErrQwenPawAuthRequest: 'به‌روزرسانی اطلاعات ورود QwenPaw ناموفق بود: {{ .err }}'
+ErrQwenPawAuthOutOfSync: 'اطلاعات ورود فعلی QwenPaw با رکورد 1Panel مطابقت ندارد. گذرواژه QwenPaw را بازنشانی کنید یا اطلاعات ورود فایل .env برنامه را بازیابی کنید'
+ErrQwenPawAuthDisabled: 'احراز هویت ورود در QwenPaw فعال نشده است'
 ErrHermesPairingCodeUnavailable: 'کد جفت‌سازی به طور موقت در هرمس در دسترس نیست، احتمالاً به دلیل مشکلات شبکه. لطفاً بعداً دوباره تلاش کنید.'
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'وقتی خط مشی گروه فیشو لیست سفید باشد، خط مشی DM نمی‌تواند کد جفت‌سازی باشد.'
 

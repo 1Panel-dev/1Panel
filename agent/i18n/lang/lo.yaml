@@ -78,6 +78,9 @@ ErrAgentWebsiteBound: 'ຕົວແທນນີ້ຖືກຜູກມັດກ
 ErrAgentWebsiteTypeUnsupported: 'ສາມາດຜູກມັດໄດ້ສະເພາະເວັບໄຊປະເພດ Proxy ຫຼື Static ເທົ່ານັ້ນ'
 ErrAgentWebsiteInUse: 'ເວັບໄຊນີ້ຖືກຜູກມັດກັບຕົວແທນອື່ນແລ້ວ'
 ErrAgentWebsiteUnbindUnsupported: 'ເວັບໄຊທີ່ຕິດຕັ້ງແລ້ວບໍ່ສາມາດຍົກເລີກການຜູກມັດດ້ວຍຕົນເອງໄດ້'
+ErrQwenPawAuthRequest: 'ອັບເດດຂໍ້ມູນຢືນຢັນ QwenPaw ບໍ່ສຳເລັດ: {{ .err }}'
+ErrQwenPawAuthOutOfSync: 'ຂໍ້ມູນຢືນຢັນ QwenPaw ປັດຈຸບັນບໍ່ກົງກັບບັນທຶກຂອງ 1Panel. ກະລຸນາຣີເຊັດລະຫັດຜ່ານ QwenPaw ຫຼືກູ້ຄືນຂໍ້ມູນໃນໄຟລ໌ .env ຂອງແອັບ'
+ErrQwenPawAuthDisabled: 'QwenPaw ຍັງບໍ່ໄດ້ເປີດໃຊ້ການຢືນຢັນການເຂົ້າລະບົບ'
 ErrHermesPairingCodeUnavailable: 'ລະຫັດການຈັບຄູ່ໃນ Hermes ບໍ່ສາມາດໃຊ້ງານໄດ້ຊົ່ວຄາວ, ອາດຈະເກີດຈາກບັນຫາເຄືອຂ່າຍ. ກະລຸນາລອງໃໝ່ພາຍຫຼັງ.'
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'ເມື່ອນະໂຍບາຍກຸ່ມ Feishu ແມ່ນ Allowlist, ນະໂຍບາຍ DM ບໍ່ສາມາດເປັນ Pairing Code ໄດ້.'
 

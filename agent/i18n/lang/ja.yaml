@@ -93,6 +93,9 @@ ErrAgentWebsiteBound: 'このエージェントはすでにサイトに関連付
 ErrAgentWebsiteTypeUnsupported: '関連付けできるのはプロキシサイトまたは静的サイトのみです'
 ErrAgentWebsiteInUse: 'このサイトはすでに別のエージェントに関連付けられています'
 ErrAgentWebsiteUnbindUnsupported: 'ワンクリックデプロイのサイトは手動で関連解除できません'
+ErrQwenPawAuthRequest: 'QwenPaw 認証情報の更新に失敗しました: {{ .err }}'
+ErrQwenPawAuthOutOfSync: '現在の QwenPaw 認証情報が 1Panel の記録と一致しません。QwenPaw のパスワードをリセットするか、アプリケーションの .env にある認証情報を復元してください'
+ErrQwenPawAuthDisabled: 'QwenPaw でログイン認証が有効になっていません'
 ErrHermesPairingCodeUnavailable: 'Hermes でペアリングコードが一時的に見つかりません。ネットワーク要因の可能性があるため、しばらくしてから再試行してください。'
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'Feishu のグループポリシーが許可リストの場合、DM ポリシーをペアリングコードにはできません。'
 

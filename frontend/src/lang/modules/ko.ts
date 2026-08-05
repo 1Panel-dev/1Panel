@@ -904,6 +904,8 @@ const message = {
             channelAutoRestartHelper: '저장하면 설정 적용을 위해 컨테이너가 자동으로 재시작됩니다.',
             dashboardAuthAutoRebuildHelper:
                 '사용자 이름 또는 비밀번호를 저장하면 변경 사항 적용을 위해 컨테이너가 자동으로 재생성됩니다.',
+            dashboardAuthImmediateHelper:
+                '저장하면 컨테이너를 다시 시작하지 않고 QwenPaw 로그인 자격 증명이 즉시 업데이트됩니다.',
             channelDeleteConfirm: '{0} 채널 구성을 삭제하시겠습니까?',
             apiTypeBaseURLHelper: '이 유형은 최종적으로 {0}에 요청합니다. 권장 Base URL: {1}',
             customImageURLHelper:

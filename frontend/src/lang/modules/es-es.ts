@@ -925,6 +925,8 @@ const message = {
                 'Al guardar, el contenedor se reiniciará automáticamente para que la configuración surta efecto.',
             dashboardAuthAutoRebuildHelper:
                 'Al guardar el usuario o la contraseña, el contenedor se reconstruirá automáticamente para que los cambios surtan efecto.',
+            dashboardAuthImmediateHelper:
+                'Al guardar, las credenciales de QwenPaw se actualizan de inmediato sin reiniciar el contenedor.',
             channelDeleteConfirm: '¿Eliminar la configuración del canal {0}?',
             apiTypeBaseURLHelper: 'Este tipo envía solicitudes a {0}. Base URL recomendada: {1}',
             customImageURLHelper:

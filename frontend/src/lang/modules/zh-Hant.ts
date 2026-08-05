@@ -877,6 +877,7 @@ const message = {
             scanConnectHelper: '點擊後將在任務日誌中顯示 QR Code，掃碼確認成功後將自動重新啟動容器。',
             channelAutoRestartHelper: '保存後將自動重新啟動容器以使設定生效。',
             dashboardAuthAutoRebuildHelper: '保存使用者名稱或密碼後將自動重建容器以使設定生效。',
+            dashboardAuthImmediateHelper: '保存後將立即更新 QwenPaw 登入憑據，無需重新啟動容器。',
             channelDeleteConfirm: '確認刪除 {0} 頻道設定？',
             apiTypeBaseURLHelper: '目前類型最終請求 {0}，Base URL 建議填寫 {1}',
             customImageURLHelper: 'Custom 圖片帳號請填寫完整的圖片產生介面 URL，系統不會自動補全路徑，例如：{0}',

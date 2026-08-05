@@ -929,6 +929,8 @@ const message = {
                 'Ao salvar, o contêiner será reiniciado automaticamente para que a configuração entre em vigor.',
             dashboardAuthAutoRebuildHelper:
                 'Ao salvar o usuário ou a senha, o contêiner será reconstruído automaticamente para que as alterações entrem em vigor.',
+            dashboardAuthImmediateHelper:
+                'Ao salvar, as credenciais do QwenPaw são atualizadas imediatamente, sem reiniciar o contêiner.',
             channelDeleteConfirm: 'Excluir a configuração do canal {0}?',
             apiTypeBaseURLHelper: 'Este tipo envia requisições para {0}. Base URL recomendada: {1}',
             customImageURLHelper:

@@ -914,6 +914,8 @@ const message = {
             channelAutoRestartHelper: '保存後、設定を反映するためにコンテナが自動で再起動されます。',
             dashboardAuthAutoRebuildHelper:
                 'ユーザー名またはパスワードを保存すると、変更を反映するためにコンテナが自動で再作成されます。',
+            dashboardAuthImmediateHelper:
+                '保存すると QwenPaw のログイン認証情報がすぐに更新され、コンテナの再起動は不要です。',
             channelDeleteConfirm: '{0} チャンネルの設定を削除しますか？',
             apiTypeBaseURLHelper: 'このタイプは最終的に {0} にリクエストします。推奨 Base URL: {1}',
             customImageURLHelper:

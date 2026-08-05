@@ -181,7 +181,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	var allowedOrigins []string
 	var account *model.AgentAccount
 	var installHooks *appInstallHooks
-	var hermesAuth hermesDashboardAuth
+	var dashboardAuth agentDashboardAuth
 
 	if agentType == constant.AppOpenclaw || agentType == constant.AppHermesAgent {
 		if req.AccountID == 0 {
@@ -226,15 +226,17 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 			},
 		}
 	} else if agentType == constant.AppHermesAgent {
-		hermesAuth = normalizeHermesDashboardAuth(req.DashboardUsername, req.DashboardPassword)
+		dashboardAuth = normalizeAgentDashboardAuth(req.DashboardUsername, req.DashboardPassword)
 		installHooks = &appInstallHooks{
 			AfterCopyData: func(appInstall *model.AppInstall) error {
 				if err := prepareHermesInstallFiles(appInstall, account, storedModel); err != nil {
 					return err
 				}
-				return writeHermesDashboardAuthEnv(path.Join(appInstall.GetPath(), ".env"), hermesAuth, false)
+				return writeAgentDashboardAuthEnv(appInstall.GetEnvPath(), agentType, dashboardAuth, false)
 			},
 		}
+	} else if agentType == constant.AppCopaw {
+		dashboardAuth = normalizeAgentDashboardAuth(req.DashboardUsername, req.DashboardPassword)
 	}
 
 	params := map[string]interface{}{
@@ -254,9 +256,12 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		params["API_KEY"] = apiKey
 		params["OPENCLAW_GATEWAY_TOKEN"] = token
 	}
-	if agentType == constant.AppHermesAgent {
-		params[hermesDashboardUsernameEnvKey] = hermesAuth.Username
-		params[hermesDashboardPasswordEnvKey] = hermesAuth.Password
+	if usernameKey, passwordKey, ok := agentDashboardAuthEnvKeys(agentType); ok {
+		params[usernameKey] = dashboardAuth.Username
+		params[passwordKey] = dashboardAuth.Password
+		if agentType == constant.AppCopaw {
+			params[qwenPawAuthEnabledEnvKey] = "true"
+		}
 	}
 
 	if req.EditCompose && strings.TrimSpace(req.DockerCompose) == "" {
@@ -1435,11 +1440,18 @@ func (a AgentService) GetOtherConfig(req dto.AgentIDReq) (*dto.AgentOtherConfig,
 		if err != nil {
 			return nil, err
 		}
-		auth := readHermesDashboardAuthFromInstall(install)
+		auth := readAgentDashboardAuthFromInstall(install, agent.AgentType)
 		return &dto.AgentOtherConfig{
 			UserTimezone:      cfg.Timezone,
 			BrowserEnabled:    true,
 			NPMRegistry:       "https://registry.npmjs.org/",
+			DashboardUsername: auth.Username,
+			DashboardPassword: auth.Password,
+		}, nil
+	}
+	if agent.AgentType == constant.AppCopaw {
+		auth := readAgentDashboardAuthFromInstall(install, agent.AgentType)
+		return &dto.AgentOtherConfig{
 			DashboardUsername: auth.Username,
 			DashboardPassword: auth.Password,
 		}, nil
@@ -1462,16 +1474,19 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 		return err
 	}
 	if agent.AgentType == constant.AppHermesAgent {
+		if strings.TrimSpace(req.UserTimezone) == "" {
+			return buserr.New("ErrInvalidParams")
+		}
 		account, err := agentAccountRepo.GetFirst(repo.WithByID(agent.AccountID))
 		if err != nil {
 			return err
 		}
-		previousAuth := readHermesDashboardAuthFromInstall(install)
-		nextAuth := normalizeHermesDashboardAuth(req.DashboardUsername, req.DashboardPassword)
+		previousAuth := readAgentDashboardAuthFromInstall(install, agent.AgentType)
+		nextAuth := normalizeAgentDashboardAuth(req.DashboardUsername, req.DashboardPassword)
 		if err := writeHermesConfig(path.Dir(agent.ConfigPath), account, agent.Model, strings.TrimSpace(req.UserTimezone)); err != nil {
 			return err
 		}
-		if err := writeHermesDashboardAuthEnv(path.Join(install.GetPath(), ".env"), nextAuth, true); err != nil {
+		if err := writeAgentDashboardAuthEnv(install.GetEnvPath(), agent.AgentType, nextAuth, true); err != nil {
 			return err
 		}
 		operate := constant.Restart
@@ -1482,6 +1497,12 @@ func (a AgentService) UpdateOtherConfig(req dto.AgentOtherConfigUpdateReq) error
 			InstallId: install.ID,
 			Operate:   operate,
 		})
+	}
+	if agent.AgentType == constant.AppCopaw {
+		return updateQwenPawDashboardAuth(install, normalizeAgentDashboardAuth(req.DashboardUsername, req.DashboardPassword))
+	}
+	if strings.TrimSpace(req.UserTimezone) == "" || strings.TrimSpace(req.NPMRegistry) == "" {
+		return buserr.New("ErrInvalidParams")
 	}
 	if err := ensureContainerRunning(install.ContainerName); err != nil {
 		return err

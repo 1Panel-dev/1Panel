@@ -910,6 +910,8 @@ const message = {
             channelAutoRestartHelper: 'ذخیره به طور خودکار کانتینر را مجدداً راه‌اندازی می‌کند تا تغییرات اعمال شوند.',
             dashboardAuthAutoRebuildHelper:
                 'ذخیره نام کاربری یا رمز عبور، کانتینر را به‌طور خودکار بازسازی می‌کند تا تغییرات اعمال شوند.',
+            dashboardAuthImmediateHelper:
+                'با ذخیره‌سازی، اطلاعات ورود QwenPaw بدون راه‌اندازی مجدد کانتینر فوراً به‌روزرسانی می‌شود.',
             channelDeleteConfirm: 'پیکربندی کانال {0} حذف شود؟',
             apiTypeBaseURLHelper: 'این نوع درخواست‌ها را به {0} ارسال می‌کند. Base URL پیشنهادی: {1}',
             apiTypeBaseURLMismatch: 'Base URL فعلی شبیه مسیر {0} است، اما {1} انتخاب شده است. URL پیشنهادی: {2}',
