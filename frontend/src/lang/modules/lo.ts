@@ -2188,7 +2188,7 @@ const message = {
         hostSystem: 'ລັອກຂອງ Host',
         previousPage: 'ໜ້າກ່ອນ',
         nextPage: 'ໜ້າຖັດໄປ',
-        filter: 'ກັ່ນຕອງ',
+        filter: 'ກັ່ນຕອງຂໍ້ຄວາມ',
         service: 'ບໍລິການ',
         priority: 'ລະດັບຄວາມສຳຄັນ',
         priorityEmergency: 'ສຸກເສີນ',
@@ -3135,7 +3135,7 @@ const message = {
         restoreCommunityOfflineHelper:
             'ວາງແພັກເກດທາງການທີ່ມີເວີຊັນບໍ່ຕ່ຳກວ່າ Enterprise ປັດຈຸບັນໄວ້ໃນ {path}. ການສະຫຼັບຈະເປີດໃຊ້ເມື່ອກວດພົບແພັກເກດທີ່ໃຊ້ໄດ້.',
         restoreCommunityConfirm:
-            'ຫຼັງຈາກສະຫຼັບ ສາມາດໃຊ້ບັນຊີຜູ້ດູແລສູງສຸດ Enterprise ປັດຈຸບັນເຂົ້າ Community Edition. ຖານຂໍ້ມູນສະເພາະ Enterprise ຈະຖືກລຶບໃນລະຫວ່າງການສະຫຼັບ.',
+            'ຫຼັງຈາກສະຫຼັບເວີຊັນ ສາມາດໃຊ້ບັນຊີຜູ້ດູແລສູງສຸດ Enterprise ປັດຈຸບັນເຂົ້າ Community Edition. ຂໍ້ມູນສະເພາະ Enterprise ຈະຖືກລຶບໃນລະຫວ່າງການສະຫຼັບ. ກະລຸນາດຳເນີນການດ້ວຍຄວາມລະມັດລະວັງ.',
         restoreCommunityStarting: 'ກຳລັງກະກຽມ Community Edition. ແຜງຄວບຄຸມຈະເລີ່ມໃໝ່ອັດຕະໂນມັດເມື່ອສຳເລັດ.',
         levelUpPro: 'ອັບເກຣດເປັນເວີຊັນ Commercial',
         licenseSync: 'ຊິງຄ໌ລິຂະສິດ',

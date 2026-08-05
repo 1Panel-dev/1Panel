@@ -2231,7 +2231,7 @@ const message = {
         hostSystem: 'لاگ‌های میزبان',
         previousPage: 'صفحه قبل',
         nextPage: 'صفحه بعد',
-        filter: 'فیلتر',
+        filter: 'فیلتر پیام‌ها',
         service: 'سرویس',
         priority: 'اولویت',
         priorityEmergency: 'اضطراری',
@@ -3192,7 +3192,7 @@ const message = {
         restoreCommunityOfflineHelper:
             'یک بسته رسمی با نسخه‌ای قدیمی‌تر نبودن از نسخه فعلی Enterprise را در {path} قرار دهید. پس از شناسایی بسته قابل استفاده، تغییر نسخه فعال می‌شود.',
         restoreCommunityConfirm:
-            'پس از تغییر، می‌توانید با حساب ابرمدیر فعلی Enterprise وارد نسخه Community شوید. پایگاه‌های داده ویژه Enterprise در طول تغییر حذف می‌شوند.',
+            'پس از تغییر نسخه، می‌توانید با حساب ابرمدیر فعلی Enterprise وارد نسخه Community شوید. داده‌های مختص Enterprise در طول تغییر حذف می‌شوند. لطفاً با احتیاط ادامه دهید.',
         restoreCommunityStarting:
             'نسخه Community در حال آماده‌سازی است. پس از تکمیل، پنل به‌طور خودکار راه‌اندازی مجدد می‌شود.',
         levelUpPro: 'ارتقاء به نسخه تجاری',

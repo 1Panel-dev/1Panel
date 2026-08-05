@@ -2207,7 +2207,7 @@ const message = {
         hostSystem: '호스트 로그',
         previousPage: '이전 페이지',
         nextPage: '다음 페이지',
-        filter: '필터',
+        filter: '메시지 필터',
         service: '서비스',
         priority: '우선순위',
         priorityEmergency: '긴급',
@@ -3150,7 +3150,7 @@ const message = {
         restoreCommunityOfflineHelper:
             '현재 Enterprise 버전 이상인 공식 패키지를 {path}에 저장하세요. 사용 가능한 패키지가 감지되면 전환이 활성화됩니다.',
         restoreCommunityConfirm:
-            '전환 후 현재 Enterprise 슈퍼 관리자 계정으로 커뮤니티 버전에 로그인할 수 있습니다. 전환 과정에서 Enterprise 전용 데이터베이스가 삭제됩니다.',
+            '버전 전환 후 현재 Enterprise 슈퍼 관리자 계정으로 커뮤니티 버전에 로그인할 수 있습니다. 전환 과정에서 Enterprise 전용 데이터가 삭제되므로 신중하게 진행하세요.',
         restoreCommunityStarting: '커뮤니티 버전을 준비 중입니다. 완료되면 패널이 자동으로 다시 시작됩니다.',
         technicalAdvice: '기술 상담',
         advice: '상담',

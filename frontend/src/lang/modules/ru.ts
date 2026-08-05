@@ -2272,7 +2272,7 @@ const message = {
         hostSystem: 'Журналы хоста',
         previousPage: 'Предыдущая страница',
         nextPage: 'Следующая страница',
-        filter: 'Фильтр',
+        filter: 'Фильтр сообщений',
         service: 'Сервис',
         priority: 'Приоритет',
         priorityEmergency: 'Авария',
@@ -3257,7 +3257,7 @@ const message = {
         restoreCommunityOfflineHelper:
             'Поместите официальный пакет версии не ниже текущей Enterprise в {path}. Переключение станет доступно после обнаружения подходящего пакета.',
         restoreCommunityConfirm:
-            'После переключения можно войти в Community Edition с текущей учётной записью суперадминистратора Enterprise. Базы данных Enterprise будут удалены во время переключения.',
+            'После смены версии можно войти в Community Edition с текущей учётной записью суперадминистратора Enterprise. Во время переключения данные, доступные только в Enterprise, будут удалены. Будьте осторожны.',
         restoreCommunityStarting:
             'Подготавливается Community Edition. После завершения панель автоматически перезапустится.',
         technicalAdvice: 'Техническая консультация',

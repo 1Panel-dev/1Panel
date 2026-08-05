@@ -2290,7 +2290,7 @@ const message = {
         hostSystem: 'Log hos',
         previousPage: 'Halaman sebelumnya',
         nextPage: 'Halaman seterusnya',
-        filter: 'Tapis',
+        filter: 'Tapis mesej',
         service: 'Perkhidmatan',
         priority: 'Keutamaan',
         priorityEmergency: 'Kecemasan',
@@ -3280,7 +3280,7 @@ const message = {
         restoreCommunityOfflineHelper:
             'Letakkan pakej rasmi yang tidak lebih lama daripada versi Enterprise semasa dalam {path}. Pertukaran akan didayakan selepas pakej yang boleh digunakan dikesan.',
         restoreCommunityConfirm:
-            'Selepas pertukaran, anda boleh log masuk ke Community Edition menggunakan akaun pentadbir super Enterprise semasa. Pangkalan data khusus Enterprise akan dipadamkan semasa pertukaran.',
+            'Selepas menukar versi, anda boleh log masuk ke Community Edition menggunakan akaun pentadbir super Enterprise semasa. Data khusus Enterprise akan dipadamkan semasa pertukaran. Sila teruskan dengan berhati-hati.',
         restoreCommunityStarting:
             'Community Edition sedang disediakan. Panel akan dimulakan semula secara automatik apabila selesai.',
         technicalAdvice: 'Konsultasi Teknikal',

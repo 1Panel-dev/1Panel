@@ -2244,7 +2244,7 @@ const message = {
         hostSystem: 'ホストログ',
         previousPage: '前のページ',
         nextPage: '次のページ',
-        filter: 'フィルター',
+        filter: 'メッセージフィルター',
         service: 'サービス',
         priority: '優先度',
         priorityEmergency: '緊急',
@@ -3209,7 +3209,7 @@ const message = {
         restoreCommunityOfflineHelper:
             '現在の Enterprise バージョン以上の公式パッケージを {path} に配置してください。使用可能なパッケージが検出されると切り替えが有効になります。',
         restoreCommunityConfirm:
-            '切り替え後は、現在の Enterprise スーパー管理者アカウントでコミュニティ版にログインできます。切り替え中に Enterprise 専用データベースが削除されます。',
+            'バージョン切り替え後は、現在の Enterprise スーパー管理者アカウントでコミュニティ版にログインできます。切り替え中に Enterprise 専用データが消去されるため、慎重に操作してください。',
         restoreCommunityStarting: 'コミュニティ版を準備しています。完了後、パネルは自動的に再起動します。',
         technicalAdvice: '技術的な相談',
         advice: '相談',
