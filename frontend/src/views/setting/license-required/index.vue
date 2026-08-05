@@ -156,6 +156,8 @@ const licenseInfo = reactive({
     deviceID: '',
 });
 let restoreTimer: number | undefined;
+let pageInitialized = false;
+let pageInitialization: Promise<void> | undefined;
 const defaultLoginImage = new URL('@/assets/images/1panel-login-enterprise.png', import.meta.url).href;
 const defaultLoginBgImage = new URL('@/assets/images/1panel-login-bg.jpg', import.meta.url).href;
 const loadedLoginImage = ref<string | null>(null);
@@ -288,6 +290,40 @@ const loadLicenseInfo = async () => {
     isEnterpriseLicensed.value = false;
 };
 
+const initializePage = () => {
+    if (pageInitialized) {
+        return Promise.resolve();
+    }
+    if (pageInitialization) {
+        return pageInitialization;
+    }
+
+    loading.value = true;
+    pageInitialization = (async () => {
+        const shouldLoadLicense = await loadLoginTheme();
+        if (!shouldLoadLicense) {
+            pageInitialized = true;
+            return;
+        }
+        await loadXpackLoginTheme();
+        await loadBackground();
+        await loadLicenseInfo();
+        pageInitialized = true;
+    })().finally(() => {
+        loading.value = false;
+        pageInitialization = undefined;
+    });
+    return pageInitialization;
+};
+
+const resumePageInitialization = async () => {
+    try {
+        await initializePage();
+    } catch {
+        // Request errors are already presented by the shared API interceptor.
+    }
+};
+
 const loadRestoreInfo = async () => {
     const res = await getCommunityRestoreStatus();
     restoring.value = res.data.state === 'Running';
@@ -336,13 +372,16 @@ const pollRestoreStatus = async () => {
             restoring.value = false;
             isOnRestart.value = false;
             MsgError(res.data.message);
+            await resumePageInitialization();
             return;
         }
         restoring.value = res.data.state === 'Running';
         isOnRestart.value = restoring.value;
         if (restoring.value) {
             scheduleRestorePoll();
+            return;
         }
+        await resumePageInitialization();
     } catch {
         await waitForCommunityService();
     }
@@ -417,17 +456,10 @@ onMounted(async () => {
             scheduleRestorePoll();
             return;
         }
-
-        const shouldLoadLicense = await loadLoginTheme();
-        if (!shouldLoadLicense) {
-            return;
-        }
-        await loadXpackLoginTheme();
-        await loadBackground();
-        await loadLicenseInfo();
     } finally {
         loading.value = false;
     }
+    await initializePage();
 });
 
 onUnmounted(() => {
