@@ -13,7 +13,7 @@
                 </el-button>
             </template>
             <template #rightToolBar>
-                <el-select v-model="group" @change="search()" clearable class="p-w-200 mr-5">
+                <el-select v-model="group" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('commons.table.group') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <div v-for="item in groupList" :key="item.id">
@@ -26,6 +26,7 @@
                     </div>
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="info" />
+                <TableRefresh @search="search()" />
             </template>
             <template #main>
                 <ComplexTable
@@ -40,7 +41,7 @@
                     <el-table-column :label="$t('commons.table.port')" prop="port" />
                     <el-table-column
                         :label="$t('commons.table.group')"
-                        prop="description"
+                        prop="group"
                         min-width="80"
                         show-overflow-tooltip
                     >
