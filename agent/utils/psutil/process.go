@@ -49,8 +49,9 @@ func NewProcessCreateTimeResolver() *ProcessCreateTimeResolver {
 // time in the future. In that case, reading btime and starttime from /proc keeps
 // both values on the same clock base, matching the calculation used by ps.
 func (r *ProcessCreateTimeResolver) CreateTime(proc *process.Process) (int64, error) {
+	now := time.Now()
 	createTime, createTimeErr := proc.CreateTime()
-	if createTimeErr == nil && isValidProcessCreateTime(createTime, time.Now()) {
+	if createTimeErr == nil && isValidProcessCreateTime(createTime, now) {
 		return createTime, nil
 	}
 
@@ -59,11 +60,17 @@ func (r *ProcessCreateTimeResolver) CreateTime(proc *process.Process) (int64, er
 		if content, err := os.ReadFile(statPath); err == nil {
 			if startTicks, err := parseProcessStartTicks(string(content)); err == nil {
 				startMillis := startTicks * 1000 / r.clockTicks
-				return r.bootTime*1000 + int64(startMillis), nil
+				fallbackTime := r.bootTime*1000 + int64(startMillis)
+				if isValidProcessCreateTime(fallbackTime, now) {
+					return fallbackTime, nil
+				}
 			}
 		}
 	}
-	return createTime, createTimeErr
+	if createTimeErr != nil {
+		return 0, fmt.Errorf("resolve process create time: %w", createTimeErr)
+	}
+	return 0, fmt.Errorf("invalid process create time: %d", createTime)
 }
 
 func isValidProcessCreateTime(createTime int64, now time.Time) bool {
