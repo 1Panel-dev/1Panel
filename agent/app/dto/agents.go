@@ -730,9 +730,9 @@ type AgentSecurityConfig struct {
 
 type AgentOtherConfigUpdateReq struct {
 	AgentID           uint   `json:"agentId" validate:"required"`
-	UserTimezone      string `json:"userTimezone" validate:"required"`
+	UserTimezone      string `json:"userTimezone"`
 	BrowserEnabled    bool   `json:"browserEnabled"`
-	NPMRegistry       string `json:"npmRegistry" validate:"required"`
+	NPMRegistry       string `json:"npmRegistry"`
 	DashboardUsername string `json:"dashboardUsername"`
 	DashboardPassword string `json:"dashboardPassword"`
 }

@@ -969,9 +969,9 @@ export namespace AI {
 
     export interface AgentOtherConfigUpdateReq {
         agentId: number;
-        userTimezone: string;
+        userTimezone?: string;
         browserEnabled: boolean;
-        npmRegistry: string;
+        npmRegistry?: string;
         dashboardUsername?: string;
         dashboardPassword?: string;
     }

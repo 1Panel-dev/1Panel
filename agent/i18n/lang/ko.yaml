@@ -93,6 +93,9 @@ ErrAgentWebsiteBound: '이 에이전트는 이미 웹사이트에 연결되어 �
 ErrAgentWebsiteTypeUnsupported: '프록시 또는 정적 웹사이트만 연결할 수 있습니다'
 ErrAgentWebsiteInUse: '이 웹사이트는 이미 다른 에이전트에 연결되어 있습니다'
 ErrAgentWebsiteUnbindUnsupported: '원클릭 배포 웹사이트는 수동으로 연결 해제할 수 없습니다'
+ErrQwenPawAuthRequest: 'QwenPaw 인증 정보 업데이트에 실패했습니다: {{ .err }}'
+ErrQwenPawAuthOutOfSync: '현재 QwenPaw 자격 증명이 1Panel 기록과 일치하지 않습니다. QwenPaw 비밀번호를 재설정하거나 애플리케이션 .env의 자격 증명을 복원하세요'
+ErrQwenPawAuthDisabled: 'QwenPaw에서 로그인 인증이 활성화되어 있지 않습니다'
 ErrHermesPairingCodeUnavailable: 'Hermes에서 페어링 코드가 일시적으로 존재하지 않습니다. 네트워크 문제일 수 있으니 잠시 후 다시 시도해 주세요.'
 ErrHermesFeishuGroupAllowlistRequiresAllowlist: 'Feishu 그룹 정책이 허용 목록이면 DM 정책을 페어링 코드로 설정할 수 없습니다.'
 

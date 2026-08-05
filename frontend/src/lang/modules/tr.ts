@@ -931,6 +931,8 @@ const message = {
                 'Kaydettiğinizde ayarların etkili olması için konteyner otomatik olarak yeniden başlatılır.',
             dashboardAuthAutoRebuildHelper:
                 'Kullanıcı adı veya parola kaydedildiğinde değişikliklerin etkili olması için konteyner otomatik olarak yeniden oluşturulur.',
+            dashboardAuthImmediateHelper:
+                'Kaydedildiğinde QwenPaw oturum açma bilgileri konteyner yeniden başlatılmadan hemen güncellenir.',
             channelDeleteConfirm: '{0} kanal yapılandırması silinsin mi?',
             apiTypeBaseURLHelper: 'Bu tür istekleri {0} yoluna gönderir. Önerilen Base URL: {1}',
             customImageURLHelper:

@@ -26,6 +26,10 @@ export const supportsAgentToken = (agentType: string): boolean => {
     return agentType === 'openclaw';
 };
 
+export const supportsAgentDashboardAuth = (agentType: string): boolean => {
+    return agentType === 'hermes-agent' || agentType === 'copaw';
+};
+
 export const isOpenclawHTTPSWindowVersion = (version: string): boolean => {
     return compareVersion(version, openclawHTTPSVersion) && !compareVersion(version, openclawHTTPVersion);
 };

@@ -922,6 +922,8 @@ const message = {
             channelAutoRestartHelper: 'Saving will automatically restart the container so the changes take effect.',
             dashboardAuthAutoRebuildHelper:
                 'Saving the username or password will automatically rebuild the container so the changes take effect.',
+            dashboardAuthImmediateHelper:
+                'Saving updates the QwenPaw login credentials immediately without restarting the container.',
             channelDeleteConfirm: 'Delete the {0} channel configuration?',
             apiTypeBaseURLHelper: 'This type sends requests to {0}. Recommended Base URL: {1}',
             customImageURLHelper:

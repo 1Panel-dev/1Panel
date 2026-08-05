@@ -19,13 +19,6 @@ import (
 
 const hermesWorkspaceDir = "/opt/data/workspace"
 const hermesExecutablePath = "/opt/hermes/.venv/bin/hermes"
-const hermesDashboardUsernameEnvKey = "HERMES_DASHBOARD_USERNAME"
-const hermesDashboardPasswordEnvKey = "HERMES_DASHBOARD_PASSWORD"
-
-type hermesDashboardAuth struct {
-	Username string
-	Password string
-}
 
 type hermesConfig struct {
 	Model    hermesModelConfig    `yaml:"model"`
@@ -115,52 +108,6 @@ func prepareHermesInstallFiles(appInstall *model.AppInstall, account *model.Agen
 		return err
 	}
 	return files.NewFileOp().ChownR(dataDir, "1000", "1000", true)
-}
-
-func normalizeHermesDashboardAuth(username, password string) hermesDashboardAuth {
-	auth := hermesDashboardAuth{
-		Username: strings.TrimSpace(username),
-		Password: strings.TrimSpace(password),
-	}
-	if auth.Username == "" {
-		auth.Username = "admin"
-	}
-	if auth.Password == "" {
-		auth.Password = common.RandStr(8)
-	}
-	return auth
-}
-
-func writeHermesDashboardAuthEnv(envPath string, auth hermesDashboardAuth, overwrite bool) error {
-	return upsertAgentEnv(envPath, map[string]string{
-		hermesDashboardUsernameEnvKey: auth.Username,
-		hermesDashboardPasswordEnvKey: auth.Password,
-	}, []string{
-		hermesDashboardUsernameEnvKey,
-		hermesDashboardPasswordEnvKey,
-	}, overwrite)
-}
-
-func readHermesDashboardAuthEnv(envPath string) (hermesDashboardAuth, error) {
-	envMap, err := readAgentEnvMap(envPath)
-	if err != nil {
-		return hermesDashboardAuth{}, err
-	}
-	return hermesDashboardAuth{
-		Username: strings.TrimSpace(envMap[hermesDashboardUsernameEnvKey]),
-		Password: strings.TrimSpace(envMap[hermesDashboardPasswordEnvKey]),
-	}, nil
-}
-
-func readHermesDashboardAuthFromInstall(appInstall *model.AppInstall) hermesDashboardAuth {
-	if appInstall == nil || appInstall.ID == 0 {
-		return hermesDashboardAuth{}
-	}
-	auth, err := readHermesDashboardAuthEnv(path.Join(appInstall.GetPath(), ".env"))
-	if err != nil {
-		return hermesDashboardAuth{}
-	}
-	return auth
 }
 
 func readHermesConfig(configPath string) (*hermesConfig, error) {

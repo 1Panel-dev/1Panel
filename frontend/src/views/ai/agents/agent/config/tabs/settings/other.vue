@@ -9,10 +9,10 @@
             </el-select>
             <span class="input-help">{{ t('aiTools.agents.npmRegistryHelper') }}</span>
         </el-form-item>
-        <el-form-item :label="t('aiTools.agents.timeZone')" prop="userTimezone">
+        <el-form-item v-if="agentType !== 'copaw'" :label="t('aiTools.agents.timeZone')" prop="userTimezone">
             <el-input v-model="form.userTimezone" />
         </el-form-item>
-        <template v-if="agentType === 'hermes-agent'">
+        <template v-if="supportsAgentDashboardAuth(agentType)">
             <el-form-item :label="t('commons.login.username')" prop="dashboardUsername">
                 <el-input v-model="form.dashboardUsername" />
             </el-form-item>
@@ -33,7 +33,9 @@
             {{
                 agentType === 'hermes-agent'
                     ? t('aiTools.agents.dashboardAuthAutoRebuildHelper')
-                    : t('aiTools.agents.channelAutoRestartHelper')
+                    : agentType === 'copaw'
+                      ? t('aiTools.agents.dashboardAuthImmediateHelper')
+                      : t('aiTools.agents.channelAutoRestartHelper')
             }}
         </span>
     </el-form>
@@ -47,6 +49,7 @@ import { Rules } from '@/global/form-rules';
 import { AI } from '@/api/interface/ai';
 import { getAgentOtherConfig, updateAgentOtherConfig } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
+import { supportsAgentDashboardAuth } from '@/utils/agent';
 
 const { t } = useI18n();
 const loading = ref(false);
@@ -71,6 +74,16 @@ const npmRegistryOptions = [
     'https://repo.huaweicloud.com/repository/npm/',
 ];
 
+const resetForm = () => {
+    Object.assign(form, {
+        userTimezone: '',
+        browserEnabled: true,
+        npmRegistry: defaultNPMRegistry,
+        dashboardUsername: 'admin',
+        dashboardPassword: '',
+    });
+};
+
 const validateNPMRegistry = (_rule: any, value: string, callback: (error?: Error) => void) => {
     if (!value) {
         callback(new Error(t('commons.rule.requiredInput')));
@@ -93,11 +106,12 @@ const rules = reactive({
 const load = async (params: { agentId: number; agentType: AI.AgentType }) => {
     agentId.value = params.agentId;
     agentType.value = params.agentType;
+    resetForm();
     loading.value = true;
     try {
         const res = await getAgentOtherConfig({ agentId: params.agentId });
         Object.assign(form, res.data || {});
-        if (params.agentType === 'hermes-agent' && !form.dashboardUsername) {
+        if (supportsAgentDashboardAuth(params.agentType) && !form.dashboardUsername) {
             form.dashboardUsername = 'admin';
         }
     } finally {
@@ -114,11 +128,11 @@ const saveConfig = async () => {
     try {
         await updateAgentOtherConfig({
             agentId: agentId.value,
-            userTimezone: form.userTimezone,
+            userTimezone: agentType.value === 'copaw' ? undefined : form.userTimezone,
             browserEnabled: form.browserEnabled,
             npmRegistry: agentType.value === 'openclaw' ? form.npmRegistry : defaultNPMRegistry,
-            dashboardUsername: agentType.value === 'hermes-agent' ? form.dashboardUsername : undefined,
-            dashboardPassword: agentType.value === 'hermes-agent' ? form.dashboardPassword : undefined,
+            dashboardUsername: supportsAgentDashboardAuth(agentType.value) ? form.dashboardUsername : undefined,
+            dashboardPassword: supportsAgentDashboardAuth(agentType.value) ? form.dashboardPassword : undefined,
         });
         MsgSuccess(t('aiTools.agents.saveSuccess'));
     } finally {

@@ -23,7 +23,7 @@
                 <el-form-item :label="$t('aiTools.agents.webuiPort')" prop="webUIPort">
                     <el-input-number v-model="form.webUIPort" :min="1" :max="65535" />
                 </el-form-item>
-                <template v-if="form.agentType === 'hermes-agent'">
+                <template v-if="supportsAgentDashboardAuth(form.agentType)">
                     <el-form-item :label="$t('commons.login.username')" prop="dashboardUsername">
                         <el-input v-model="form.dashboardUsername" />
                     </el-form-item>
@@ -131,6 +131,7 @@ import {
     buildDefaultAllowedOrigin,
     getAgentProviderDisplayName,
     parseAllowedOriginsInput,
+    supportsAgentDashboardAuth,
     validateAllowedOriginsInput,
 } from '@/utils/agent';
 import { App } from '@/api/interface/app';
@@ -187,8 +188,8 @@ const generateDashboardPassword = () => {
     form.dashboardPassword = getRandomStr(8);
 };
 
-const ensureHermesDashboardAuth = () => {
-    if (form.agentType !== 'hermes-agent') {
+const ensureDashboardAuth = () => {
+    if (!supportsAgentDashboardAuth(form.agentType)) {
         return;
     }
     if (!form.dashboardUsername) {
@@ -411,7 +412,7 @@ const handleAgentTypeChange = async () => {
     form.provider = '';
     form.accountId = undefined as unknown as number;
     form.baseURL = '';
-    ensureHermesDashboardAuth();
+    ensureDashboardAuth();
     if (form.agentType === 'openclaw') {
         await loadSystemIP();
         allowedOriginsAutoFilled.value = true;
@@ -487,8 +488,8 @@ const submit = async () => {
             model: showModelConfig.value ? form.model : undefined,
             accountId: showModelConfig.value ? form.accountId : undefined,
             token: form.agentType === 'openclaw' ? form.token : undefined,
-            dashboardUsername: form.agentType === 'hermes-agent' ? form.dashboardUsername : undefined,
-            dashboardPassword: form.agentType === 'hermes-agent' ? form.dashboardPassword : undefined,
+            dashboardUsername: supportsAgentDashboardAuth(form.agentType) ? form.dashboardUsername : undefined,
+            dashboardPassword: supportsAgentDashboardAuth(form.agentType) ? form.dashboardPassword : undefined,
             taskID: taskID,
             advanced: form.advanced,
             containerName: form.containerName,
@@ -536,7 +537,7 @@ const openDrawer = async (agentType?: AI.AgentType) => {
     form.agentType = targetType;
     setDefaultWebUIPort();
     form.token = getRandomStr(32).toLowerCase();
-    ensureHermesDashboardAuth();
+    ensureDashboardAuth();
     if (form.agentType === 'copaw') {
         form.allowedOrigins = '';
         lastAutoAllowedOrigins.value = '';

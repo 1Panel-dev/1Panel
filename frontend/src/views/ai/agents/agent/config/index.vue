@@ -9,7 +9,7 @@
                 >
                     <ChannelsTab ref="channelsRef" :app-version="appVersion" :agent-type="agentType" />
                 </el-tab-pane>
-                <el-tab-pane :label="t('aiTools.model.model')" name="model">
+                <el-tab-pane v-if="supportsAgentModelConfig(agentType)" :label="t('aiTools.model.model')" name="model">
                     <ModelTab ref="modelRef" @updated="handleModelUpdated" />
                 </el-tab-pane>
                 <el-tab-pane v-if="agentType === 'openclaw'" :label="t('aiTools.agents.agentRoleTab')" name="agent">
@@ -26,7 +26,7 @@
                     <PluginsTab ref="pluginsRef" />
                 </el-tab-pane>
                 <el-tab-pane
-                    v-if="agentType === 'openclaw' || agentType === 'hermes-agent'"
+                    v-if="agentType === 'openclaw' || agentType === 'hermes-agent' || agentType === 'copaw'"
                     :label="t('file.setting')"
                     name="settings"
                 >
@@ -48,6 +48,7 @@ import AgentTab from './tabs/agents/index.vue';
 import SkillsTab from './tabs/skills.vue';
 import PluginsTab from './tabs/plugins.vue';
 import SettingsTab from './tabs/settings.vue';
+import { supportsAgentModelConfig } from '@/utils/agent';
 
 const { t } = useI18n();
 const emit = defineEmits(['updated']);
@@ -165,13 +166,13 @@ const openDrawer = async (agent: AI.AgentItem) => {
     configPath.value = agent.configPath;
     agentType.value = agent.agentType;
     header.value = `${agent.name} - ${t('menu.config')}`;
-    activeTab.value = agent.agentType === 'openclaw' || agent.agentType === 'hermes-agent' ? 'channels' : 'model';
+    activeTab.value = agent.agentType === 'copaw' ? 'settings' : 'channels';
     open.value = true;
     if (agent.agentType === 'openclaw' || agent.agentType === 'hermes-agent') {
         await loadChannels();
         return;
     }
-    await loadModel();
+    await loadSettings();
 };
 
 defineExpose({

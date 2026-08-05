@@ -173,7 +173,7 @@
                                 </el-button>
                             </el-space>
                             <el-space
-                                v-else-if="row.agentType === 'hermes-agent'"
+                                v-else-if="supportsAgentDashboardAuth(row.agentType)"
                                 direction="vertical"
                                 alignment="start"
                                 :size="2"
@@ -303,6 +303,7 @@ import {
     getOpenclawAccessScheme,
     supportsAgentModelConfig,
     supportsAgentToken,
+    supportsAgentDashboardAuth,
 } from '@/utils/agent';
 import { routerToFileWithPath } from '@/utils/router';
 import { listDomains } from '@/api/modules/website';
@@ -356,7 +357,8 @@ const buttons = [
     {
         label: i18n.global.t('menu.config'),
         click: (row: AI.AgentItem) => openConfig(row),
-        show: (row: AI.AgentItem) => supportsAgentModelConfig(row.agentType),
+        show: (row: AI.AgentItem) =>
+            supportsAgentModelConfig(row.agentType) || supportsAgentDashboardAuth(row.agentType),
         disabled: (row: AI.AgentItem) => row.status !== 'Running',
     },
     {

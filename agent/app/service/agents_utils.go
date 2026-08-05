@@ -422,8 +422,8 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 				item.BridgePort = toInt(bridge)
 			}
 		}
-		if agentType == constant.AppHermesAgent {
-			auth := readHermesDashboardAuthFromInstall(appInstall)
+		if _, _, ok := agentDashboardAuthEnvKeys(agentType); ok {
+			auth := readAgentDashboardAuthFromInstall(appInstall, agentType)
 			item.DashboardUsername = auth.Username
 			item.DashboardPassword = auth.Password
 		}
@@ -1461,6 +1461,87 @@ func readInstallEnv(envStr string) map[string]interface{} {
 		return nil
 	}
 	return data
+}
+
+const (
+	hermesDashboardUsernameEnvKey = "HERMES_DASHBOARD_USERNAME"
+	hermesDashboardPasswordEnvKey = "HERMES_DASHBOARD_PASSWORD"
+	qwenPawAuthEnabledEnvKey      = "QWENPAW_AUTH_ENABLED"
+	qwenPawAuthUsernameEnvKey     = "QWENPAW_AUTH_USERNAME"
+	qwenPawAuthPasswordEnvKey     = "QWENPAW_AUTH_PASSWORD"
+)
+
+type agentDashboardAuth struct {
+	Username string
+	Password string
+}
+
+func normalizeAgentDashboardAuth(username, password string) agentDashboardAuth {
+	auth := agentDashboardAuth{
+		Username: strings.TrimSpace(username),
+		Password: strings.TrimSpace(password),
+	}
+	if auth.Username == "" {
+		auth.Username = "admin"
+	}
+	if auth.Password == "" {
+		auth.Password = common.RandStr(8)
+	}
+	return auth
+}
+
+func agentDashboardAuthEnvKeys(agentType string) (string, string, bool) {
+	switch agentType {
+	case constant.AppHermesAgent:
+		return hermesDashboardUsernameEnvKey, hermesDashboardPasswordEnvKey, true
+	case constant.AppCopaw:
+		return qwenPawAuthUsernameEnvKey, qwenPawAuthPasswordEnvKey, true
+	default:
+		return "", "", false
+	}
+}
+
+func writeAgentDashboardAuthEnv(envPath, agentType string, auth agentDashboardAuth, overwrite bool) error {
+	usernameKey, passwordKey, ok := agentDashboardAuthEnvKeys(agentType)
+	if !ok {
+		return fmt.Errorf("dashboard auth is not supported for %s", agentType)
+	}
+	values := map[string]string{
+		usernameKey: auth.Username,
+		passwordKey: auth.Password,
+	}
+	order := []string{usernameKey, passwordKey}
+	if agentType == constant.AppCopaw {
+		values[qwenPawAuthEnabledEnvKey] = "true"
+		order = append([]string{qwenPawAuthEnabledEnvKey}, order...)
+	}
+	return upsertAgentEnv(envPath, values, order, overwrite)
+}
+
+func readAgentDashboardAuthEnv(envPath, agentType string) (agentDashboardAuth, error) {
+	usernameKey, passwordKey, ok := agentDashboardAuthEnvKeys(agentType)
+	if !ok {
+		return agentDashboardAuth{}, fmt.Errorf("dashboard auth is not supported for %s", agentType)
+	}
+	envMap, err := readAgentEnvMap(envPath)
+	if err != nil {
+		return agentDashboardAuth{}, err
+	}
+	return agentDashboardAuth{
+		Username: strings.TrimSpace(envMap[usernameKey]),
+		Password: strings.TrimSpace(envMap[passwordKey]),
+	}, nil
+}
+
+func readAgentDashboardAuthFromInstall(appInstall *model.AppInstall, agentType string) agentDashboardAuth {
+	if appInstall == nil || appInstall.ID == 0 {
+		return agentDashboardAuth{}
+	}
+	auth, err := readAgentDashboardAuthEnv(appInstall.GetEnvPath(), agentType)
+	if err != nil {
+		return agentDashboardAuth{}
+	}
+	return auth
 }
 
 func readAgentEnvMap(envPath string) (map[string]string, error) {
