@@ -196,6 +196,7 @@ ErrAIProxyModelGroupInUse: "ກຸ່ມໂມເດວກຳລັງຖືກ�
 ErrAIProxyModelGroupExists: "ມີຊື່ກຸ່ມໂມເດວນີ້ຢູ່ແລ້ວ."
 ErrAIProxySensitiveGroupInUse: "ກຸ່ມຄຳທີ່ລະອຽດອ່ອນກຳລັງຖືກໃຊ້ງານ ແລະ ບໍ່ສາມາດລຶບໄດ້."
 ErrAIProxySensitiveGroupExists: "ມີຊື່ກຸ່ມຄຳທີ່ລະອຽດອ່ອນນີ້ຢູ່ແລ້ວ."
+AIProxyContentPolicyViolation: "ຂໍອະໄພ, ບໍ່ສາມາດປະມວນຜົນຄຳຂໍນີ້ໄດ້ ເນື່ອງຈາກເນື້ອຫາອາດບໍ່ສອດຄ່ອງກັບນະໂຍບາຍເນື້ອຫາ. ກະລຸນາແກ້ໄຂແລ້ວລອງໃໝ່."
 AIBenchmarkRun: "ດຳເນີນການທົດສອບປະສິດທິພາບ AI"
 
 # task

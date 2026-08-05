@@ -196,6 +196,7 @@ ErrAIProxyModelGroupInUse: "Группа моделей используется
 ErrAIProxyModelGroupExists: "Имя группы моделей уже существует."
 ErrAIProxySensitiveGroupInUse: "Группа чувствительных слов используется и не может быть удалена."
 ErrAIProxySensitiveGroupExists: "Имя группы чувствительных слов уже существует."
+AIProxyContentPolicyViolation: "К сожалению, я не могу обработать этот запрос: его содержимое может не соответствовать политике в отношении контента. Измените запрос и повторите попытку."
 AIBenchmarkRun: "Выполнить тест производительности AI"
 
 # задача

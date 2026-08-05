@@ -196,6 +196,7 @@ ErrAIProxyModelGroupInUse: "Kumpulan model sedang digunakan dan tidak boleh dipa
 ErrAIProxyModelGroupExists: "Nama kumpulan model sudah wujud."
 ErrAIProxySensitiveGroupInUse: "Kumpulan kata sensitif sedang digunakan dan tidak boleh dipadam."
 ErrAIProxySensitiveGroupExists: "Nama kumpulan kata sensitif sudah wujud."
+AIProxyContentPolicyViolation: "Maaf, saya tidak dapat memproses permintaan ini kerana kandungannya mungkin tidak mematuhi dasar kandungan. Sila ubah kandungan dan cuba lagi."
 AIBenchmarkRun: "Jalankan penanda aras AI"
 
 # tugas

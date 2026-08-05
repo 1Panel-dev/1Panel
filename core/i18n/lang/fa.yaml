@@ -196,6 +196,7 @@ ErrAIProxyModelGroupInUse: "گروه مدل در حال استفاده است و
 ErrAIProxyModelGroupExists: "نام گروه مدل از قبل وجود دارد."
 ErrAIProxySensitiveGroupInUse: "گروه کلمات حساس در حال استفاده است و قابل حذف نیست."
 ErrAIProxySensitiveGroupExists: "نام گروه کلمات حساس از قبل وجود دارد."
+AIProxyContentPolicyViolation: "متأسفم، نمی‌توانم این درخواست را پردازش کنم زیرا ممکن است محتوا با خط‌مشی محتوا مطابقت نداشته باشد. لطفاً آن را اصلاح کرده و دوباره تلاش کنید."
 AIBenchmarkRun: "اجرای معیار سنجش هوش مصنوعی"
 
 # وظیفه

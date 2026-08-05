@@ -53,7 +53,7 @@ var catalog = map[string]Meta{
 	"deepseek": {
 		Key: "deepseek", DisplayName: "DeepSeek", Sort: 25, DefaultAPIType: "openai-completions", EnvKey: "DEEPSEEK_API_KEY",
 		APIConfigs: []APIConfig{
-			{APIType: "openai-completions", BaseURL: "https://api.deepseek.com/v1"},
+			{APIType: "openai-completions", BaseURL: "https://api.deepseek.com"},
 			anthropicAPIConfig("https://api.deepseek.com/anthropic", AuthModeXAPIKey),
 		},
 		Models: []Model{{ID: "deepseek-v4-flash", Name: "deepseek-v4-flash"}, {ID: "deepseek-v4-pro", Name: "deepseek-v4-pro"}},

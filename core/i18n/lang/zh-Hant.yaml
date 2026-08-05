@@ -196,6 +196,7 @@ ErrAIProxyModelGroupInUse: "模型組正在使用，無法刪除"
 ErrAIProxyModelGroupExists: "模型組名稱已存在"
 ErrAIProxySensitiveGroupInUse: "敏感詞分組正在使用，無法刪除。"
 ErrAIProxySensitiveGroupExists: "敏感詞分組名稱已存在"
+AIProxyContentPolicyViolation: "抱歉，我無法處理此請求。請求內容可能不符合內容合規要求，請調整後重試。"
 AIBenchmarkRun: "執行 AI 基準測試"
 
 # 任務
