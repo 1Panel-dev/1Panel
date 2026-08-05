@@ -196,6 +196,7 @@ ErrAIProxyModelGroupInUse: "The model group is in use and cannot be deleted."
 ErrAIProxyModelGroupExists: "The model group name already exists."
 ErrAIProxySensitiveGroupInUse: "The sensitive word group is in use and cannot be deleted."
 ErrAIProxySensitiveGroupExists: "The sensitive word group name already exists."
+AIProxyContentPolicyViolation: "Sorry, I cannot process this request because the content may not meet the content policy. Please revise it and try again."
 AIBenchmarkRun: "Run AI benchmark"
 
 # task

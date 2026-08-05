@@ -196,6 +196,7 @@ ErrAIProxyModelGroupInUse: "모델 그룹이 사용 중이므로 삭제할 수 �
 ErrAIProxyModelGroupExists: "모델 그룹 이름이 이미 존재합니다."
 ErrAIProxySensitiveGroupInUse: "민감 단어 그룹이 사용 중이므로 삭제할 수 없습니다."
 ErrAIProxySensitiveGroupExists: "민감 단어 그룹 이름이 이미 존재합니다."
+AIProxyContentPolicyViolation: "죄송하지만 이 요청은 처리할 수 없습니다. 콘텐츠 정책을 준수하지 않을 수 있으므로 내용을 수정한 후 다시 시도해 주세요."
 AIBenchmarkRun: "AI 벤치마크 실행"
 
 # 작업

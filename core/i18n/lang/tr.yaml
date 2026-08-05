@@ -196,6 +196,7 @@ ErrAIProxyModelGroupInUse: "Model grubu kullanımda ve silinemez."
 ErrAIProxyModelGroupExists: "Model grubu adı zaten mevcut."
 ErrAIProxySensitiveGroupInUse: "Hassas kelime grubu kullanımda ve silinemez."
 ErrAIProxySensitiveGroupExists: "Hassas kelime grubu adı zaten mevcut."
+AIProxyContentPolicyViolation: "Üzgünüm, içerik politikasına uymayabileceği için bu isteği işleyemiyorum. Lütfen içeriği düzenleyip tekrar deneyin."
 AIBenchmarkRun: "AI kıyaslama testini çalıştır"
 
 # görev
