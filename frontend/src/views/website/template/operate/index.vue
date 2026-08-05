@@ -25,7 +25,7 @@
                 />
                 <span class="input-help">{{ $t('template.autoDetectHelper') }}</span>
             </el-form-item>
-            <el-form-item v-if="form.type === 'multi'" :label="$t('template.upload')">
+            <el-form-item v-if="form.type === 'multi'" :label="$t('template.upload')" prop="filePath">
                 <el-upload :show-file-list="false" :before-upload="handleUpload" accept=".zip" action="#">
                     <el-button type="primary" plain>{{ $t('template.upload') }}</el-button>
                 </el-upload>
@@ -140,6 +140,18 @@ const form = reactive(initForm());
 const rules = {
     name: [{ required: true, message: i18n.global.t('commons.rule.requiredInput'), trigger: 'blur' }],
     type: [{ required: true, message: i18n.global.t('commons.rule.requiredSelect'), trigger: 'change' }],
+    filePath: [
+        {
+            validator: (_rule, value, callback) => {
+                if (form.type === 'multi' && !value) {
+                    callback(new Error(i18n.global.t('commons.rule.requiredSelect')));
+                    return;
+                }
+                callback();
+            },
+            trigger: 'change',
+        },
+    ],
 };
 
 const variables = ref<Website.TemplateVariable[]>([]);
@@ -178,6 +190,7 @@ const handleUpload = async (file: globalThis.File) => {
     try {
         const res = await uploadTemplateZip(file);
         form.filePath = res.data.filePath;
+        formRef.value?.clearValidate('filePath');
         mergeDetectedKeys(res.data.variables || []);
         MsgSuccess(i18n.global.t('commons.msg.uploadSuccess'));
     } catch {}

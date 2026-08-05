@@ -151,6 +151,7 @@ var WebUrlMap = map[string]struct{}{
 	"/toolbox/clean":        {},
 
 	"/websites":                 {},
+	"/websites/templates":       {},
 	"/websites/ssl":             {},
 	"/websites/runtimes/php":    {},
 	"/websites/runtimes/node":   {},
