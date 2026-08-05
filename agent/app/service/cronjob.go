@@ -538,10 +538,13 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 		return err
 	}
 	for _, del := range delRecords {
+		if del.Status == constant.StatusWaiting || del.Status == constant.StatusRunning {
+			continue
+		}
 		_ = os.RemoveAll(del.Records)
-	}
-	if err := cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(req.CronjobID))); err != nil {
-		return err
+		if err := cronjobRepo.DeleteRecord(repo.WithByID(del.ID)); err != nil {
+			return err
+		}
 	}
 	return nil
 }

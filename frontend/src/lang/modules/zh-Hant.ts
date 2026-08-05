@@ -2119,7 +2119,7 @@ const message = {
         hostSystem: '主機日誌',
         previousPage: '上一頁',
         nextPage: '下一頁',
-        filter: '篩選',
+        filter: '訊息篩選',
         service: '服務',
         priority: '優先級',
         priorityEmergency: '緊急 Emergency',
@@ -3011,7 +3011,8 @@ const message = {
         restoreCommunityOnlineHelper: '切換後將自動下載目前版本的社群版安裝包，並清理企業版專屬資料。',
         restoreCommunityOfflineHelper:
             '請先將版本不低於目前企業版的官方安裝包放入 {path}，偵測到可用安裝包後即可執行切換。',
-        restoreCommunityConfirm: '切換後可使用目前企業版超級管理員帳號登入社群版，切換過程中將刪除企業版專屬資料庫。',
+        restoreCommunityConfirm:
+            '版本切換後，可以使用目前企業版超級管理員帳號登入社群版。切換過程中將清除企業版專屬資料，請謹慎操作。',
         restoreCommunityStarting: '正在準備社群版，完成後面板將自動重新啟動。',
         levelUpPro: '升級商業版',
         licenseSync: '許可證同步',

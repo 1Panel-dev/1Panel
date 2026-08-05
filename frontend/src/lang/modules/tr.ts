@@ -2281,7 +2281,7 @@ const message = {
         hostSystem: 'Ana makine günlükleri',
         previousPage: 'Önceki sayfa',
         nextPage: 'Sonraki sayfa',
-        filter: 'Filtrele',
+        filter: 'Mesajları filtrele',
         service: 'Servis',
         priority: 'Öncelik',
         priorityEmergency: 'Acil',
@@ -3272,7 +3272,7 @@ const message = {
         restoreCommunityOfflineHelper:
             'Geçerli Enterprise sürümünden eski olmayan resmi bir paketi {path} dizinine yerleştirin. Kullanılabilir bir paket algılandığında geçiş etkinleştirilir.',
         restoreCommunityConfirm:
-            'Geçişten sonra mevcut Enterprise süper yönetici hesabıyla Community Edition sürümüne giriş yapabilirsiniz. Enterprise sürümüne özel veritabanları geçiş sırasında silinecektir.',
+            'Sürüm değişikliğinden sonra mevcut Enterprise süper yönetici hesabıyla Community Edition sürümüne giriş yapabilirsiniz. Enterprise sürümüne özel veriler geçiş sırasında silinecektir. Lütfen dikkatli ilerleyin.',
         restoreCommunityStarting:
             'Community Edition hazırlanıyor. Hazır olduğunda panel otomatik olarak yeniden başlatılacaktır.',
         levelUpPro: 'Ticari sürüme yükselt',

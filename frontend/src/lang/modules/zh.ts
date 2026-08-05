@@ -2150,7 +2150,7 @@ const message = {
         hostSystem: '主机日志',
         previousPage: '上一页',
         nextPage: '下一页',
-        filter: '过滤',
+        filter: '消息过滤',
         service: '服务',
         priority: '优先级',
         priorityEmergency: '紧急 Emergency',
@@ -3046,7 +3046,8 @@ const message = {
         restoreCommunityPackageMissing: '未检测到可用的社区版离线安装包，暂时无法执行离线恢复。',
         restoreCommunityOnlineHelper: '将自动下载当前版本的社区版安装包，完成切换。',
         restoreCommunityOfflineHelper: '请先将版本不低于当前企业版的官方安装包放入 {path} 后执行切换。',
-        restoreCommunityConfirm: '切换后可使用当前企业版超级管理员账号登录社区版，切换过程中将删除企业版专属数据库。',
+        restoreCommunityConfirm:
+            '版本切换后，可以使用当前企业版超级管理员账号登录社区版。切换过程中将清除企业版专属数据，请谨慎操作。',
         restoreCommunityStarting: '正在准备社区版，完成后面板将自动重启。',
         levelUpPro: '升级商业版',
         licenseSync: '许可证同步',

@@ -2254,7 +2254,7 @@ const message = {
         hostSystem: 'Host logs',
         previousPage: 'Previous page',
         nextPage: 'Next page',
-        filter: 'Filter',
+        filter: 'Message filter',
         service: 'Service',
         priority: 'Priority',
         priorityEmergency: 'Emergency',
@@ -3223,7 +3223,7 @@ const message = {
         restoreCommunityOfflineHelper:
             'Place an official package no older than the current Enterprise version in {path}. Switching is enabled after a usable package is detected.',
         restoreCommunityConfirm:
-            'After switching, you can sign in to Community Edition with the current Enterprise super administrator account. Enterprise-only databases will be deleted during the switch.',
+            'After switching versions, you can sign in to Community Edition with the current Enterprise super administrator account. Enterprise-only data will be removed during the switch. Proceed with caution.',
         restoreCommunityStarting: 'Preparing Community Edition. The panel will restart automatically when ready.',
         levelUpPro: 'Upgrade to Commercial Edition',
         licenseSync: 'License Sync',

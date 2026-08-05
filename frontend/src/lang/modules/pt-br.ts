@@ -2290,7 +2290,7 @@ const message = {
         hostSystem: 'Logs do host',
         previousPage: 'Página anterior',
         nextPage: 'Próxima página',
-        filter: 'Filtrar',
+        filter: 'Filtrar mensagens',
         service: 'Serviço',
         priority: 'Prioridade',
         priorityEmergency: 'Emergência',
@@ -3286,7 +3286,7 @@ const message = {
         restoreCommunityOfflineHelper:
             'Coloque em {path} um pacote oficial cuja versão não seja anterior à versão Enterprise atual. A troca será habilitada quando um pacote utilizável for detectado.',
         restoreCommunityConfirm:
-            'Após a troca, você poderá entrar na Community Edition com a conta atual de superadministrador da Enterprise. Os bancos de dados exclusivos da Enterprise serão excluídos durante a troca.',
+            'Após trocar de versão, você poderá entrar na Community Edition com a conta atual de superadministrador da Enterprise. Os dados exclusivos da Enterprise serão removidos durante a troca. Prossiga com cuidado.',
         restoreCommunityStarting:
             'Preparando a Community Edition. O painel será reiniciado automaticamente quando estiver pronto.',
         technicalAdvice: 'Consultoria técnica',
