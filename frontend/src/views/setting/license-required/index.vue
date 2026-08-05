@@ -1,10 +1,5 @@
 <template>
-    <div
-        class="flex items-center justify-center min-h-screen relative bg-gray-100"
-        v-loading="restoring"
-        :element-loading-text="$t('license.restoreCommunityStarting')"
-        fullscreen
-    >
+    <div class="license-required-page flex items-center justify-center min-h-screen relative bg-gray-100">
         <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" :style="backgroundStyle"></div>
         <div
             :style="{ width: containerWidth, height: containerHeight }"
@@ -102,6 +97,20 @@
         </div>
 
         <CommunityRestoreDialog ref="communityRestoreRef" @started="handleCommunityRestoreStarted" />
+
+        <Transition name="restore-mask">
+            <div v-if="restoring" class="restore-mask" role="status" aria-live="polite" aria-busy="true">
+                <div class="restore-status-card">
+                    <div class="restore-spinner" aria-hidden="true">
+                        <span></span>
+                    </div>
+                    <div class="restore-status-title">{{ $t('license.restoreCommunity') }}</div>
+                    <div class="restore-status-description">
+                        {{ $t('license.restoreCommunityStarting') }}
+                    </div>
+                </div>
+            </div>
+        </Transition>
     </div>
 </template>
 
@@ -130,7 +139,6 @@ const {
     isEnterpriseLicensed,
     isFxplay,
     isIntl,
-    isLoading: restoring,
     isLogin,
     isMasterProductPro,
     isOffline,
@@ -140,6 +148,7 @@ const {
     themeConfig,
 } = useGlobalStore();
 const loading = ref(false);
+const restoring = ref(isOnRestart.value);
 const communityRestoreRef = ref<InstanceType<typeof CommunityRestoreDialog>>();
 const uploadRef = ref<UploadInstance>();
 const uploaderFiles = ref<UploadFiles>([]);
@@ -204,10 +213,6 @@ const applyLoginThemeColor = () => {
     document.documentElement.style.setProperty(
         '--login-btn-link-hover-color',
         adjustColorToRGBA(loginBtnLinkColor, -10, 80),
-    );
-    document.documentElement.style.setProperty(
-        '--login-loading-mask-color',
-        adjustColorToRGBA(loginBtnLinkColor, 0, 60),
     );
 };
 
@@ -400,6 +405,19 @@ onMounted(async () => {
     window.addEventListener('resize', updateSize);
     loading.value = true;
     try {
+        try {
+            await loadRestoreInfo();
+        } catch {
+            if (restoring.value) {
+                await waitForCommunityService();
+                return;
+            }
+        }
+        if (restoring.value) {
+            scheduleRestorePoll();
+            return;
+        }
+
         const shouldLoadLicense = await loadLoginTheme();
         if (!shouldLoadLicense) {
             return;
@@ -407,12 +425,6 @@ onMounted(async () => {
         await loadXpackLoginTheme();
         await loadBackground();
         await loadLicenseInfo();
-        if (!isEnterpriseLicensed.value) {
-            await loadRestoreInfo();
-            if (restoring.value) {
-                scheduleRestorePoll();
-            }
-        }
     } finally {
         loading.value = false;
     }
@@ -427,6 +439,10 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 #login-container {
     border-radius: 0;
+}
+
+.license-required-page {
+    isolation: isolate;
 }
 
 .community-restore-link {
@@ -554,15 +570,125 @@ onUnmounted(() => {
     line-height: 20px;
 }
 
-:deep(.el-loading-mask) {
-    background-color: var(--login-loading-mask-color) !important;
+.restore-mask {
+    position: fixed;
+    z-index: 2000;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgb(15 23 42 / 48%);
+    backdrop-filter: blur(8px) saturate(90%);
+}
 
-    .el-loading-spinner .path {
-        stroke: #ffffff;
+.restore-status-card {
+    display: flex;
+    width: min(400px, 100%);
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 36px;
+    border: 1px solid rgb(255 255 255 / 70%);
+    border-radius: 16px;
+    background: rgb(255 255 255 / 96%);
+    box-shadow:
+        0 24px 64px rgb(15 23 42 / 24%),
+        0 4px 16px rgb(15 23 42 / 10%);
+    text-align: center;
+}
+
+.restore-spinner {
+    position: relative;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 22px;
+
+    &::before,
+    &::after {
+        position: absolute;
+        inset: 0;
+        border: 3px solid rgb(148 163 184 / 22%);
+        border-radius: 50%;
+        content: '';
     }
 
-    .el-loading-text {
-        color: #ffffff;
+    &::after {
+        border-color: var(--login-btn-link-color, #005eeb) transparent transparent;
+        animation: restore-spin 0.9s linear infinite;
+    }
+
+    span {
+        position: absolute;
+        inset: 19px;
+        border-radius: 50%;
+        background: var(--login-btn-link-color, #005eeb);
+        box-shadow: 0 0 0 6px color-mix(in srgb, var(--login-btn-link-color, #005eeb) 10%, transparent);
+        animation: restore-pulse 1.5s ease-in-out infinite;
+    }
+}
+
+.restore-status-title {
+    color: var(--el-text-color-primary, #1f2937);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 26px;
+}
+
+.restore-status-description {
+    max-width: 320px;
+    margin-top: 8px;
+    color: var(--el-text-color-secondary, #64748b);
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.restore-mask-enter-active,
+.restore-mask-leave-active {
+    transition: opacity 0.22s ease;
+
+    .restore-status-card {
+        transition:
+            opacity 0.22s ease,
+            transform 0.22s ease;
+    }
+}
+
+.restore-mask-enter-from,
+.restore-mask-leave-to {
+    opacity: 0;
+
+    .restore-status-card {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+}
+
+@keyframes restore-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes restore-pulse {
+    0%,
+    100% {
+        opacity: 0.75;
+        transform: scale(0.9);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .restore-spinner::after {
+        animation-duration: 1.8s;
+    }
+
+    .restore-spinner span {
+        animation: none;
     }
 }
 </style>
