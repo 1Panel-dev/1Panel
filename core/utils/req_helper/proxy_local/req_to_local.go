@@ -19,22 +19,48 @@ import (
 )
 
 func NewLocalClient(reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (interface{}, error) {
-	sockPath := "/etc/1panel/agent.sock"
-	if _, err := os.Stat(sockPath); err != nil {
-		return nil, fmt.Errorf("no such agent.sock find in localhost, err: %v", err)
-	}
+	client := NewReusableClient()
+	defer client.CloseIdleConnections()
+	return client.Request(reqUrl, reqMethod, body, ctx)
+}
+
+type ReusableClient struct {
+	client   *http.Client
+	sockPath string
+}
+
+func NewReusableClient() *ReusableClient {
+	return newReusableClient("/etc/1panel/agent.sock")
+}
+
+func newReusableClient(sockPath string) *ReusableClient {
 	dialUnix := func() (conn net.Conn, err error) {
 		return net.Dial("unix", sockPath)
 	}
 	transport := &http.Transport{
+		MaxIdleConns:        12,
+		MaxIdleConnsPerHost: 6,
 		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 			return dialUnix()
 		},
 	}
-	client := &http.Client{
-		Transport: transport,
+	return &ReusableClient{client: &http.Client{Transport: transport}, sockPath: sockPath}
+}
+
+func (c *ReusableClient) CloseIdleConnections() {
+	if c == nil || c.client == nil {
+		return
 	}
-	defer client.CloseIdleConnections()
+	c.client.CloseIdleConnections()
+}
+
+func (c *ReusableClient) Request(reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (interface{}, error) {
+	if c == nil || c.client == nil {
+		return nil, errors.New("local agent client is not initialized")
+	}
+	if _, err := os.Stat(c.sockPath); err != nil {
+		return nil, fmt.Errorf("no such agent.sock find in localhost, err: %v", err)
+	}
 	parsedURL, err := url.Parse("http://unix")
 	if err != nil {
 		return nil, fmt.Errorf("handle url Parse failed, err: %v \n", err)
@@ -57,7 +83,7 @@ func NewLocalClient(reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) 
 		}
 	}
 
-	resp, err := client.Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("client do request failed, err: %v", err)
 	}

@@ -384,6 +384,9 @@ func (a AlertService) PageAlertLogs(search dto.AlertLogSearch) (int64, []dto.Ale
 	if search.Count != 0 {
 		opts = append(opts, alertRepo.WithByCount(search.Count))
 	}
+	if !search.StartTime.IsZero() && !search.EndTime.IsZero() {
+		opts = append(opts, repo.WithByCreatedAt(search.StartTime, search.EndTime))
+	}
 	opts = append(opts, repo.WithOrderDesc("created_at"))
 
 	total, alerts, err := alertRepo.PageLog(search.Page, search.PageSize, opts...)

@@ -55,11 +55,6 @@ var baseSettingKeys = map[string]struct{}{
 	"AppStoreLastModified":       {},
 	"ScriptSync":                 {},
 	"HideMenu":                   {},
-	"OpsReportExportFormat":      {},
-	"OpsReportSchedule":          {},
-	"OpsReportSavePath":          {},
-	"OpsReportThreshold":         {},
-	"OpsReportAutoExport":        {},
 }
 
 func checkNamePattern(fl validator.FieldLevel) bool {

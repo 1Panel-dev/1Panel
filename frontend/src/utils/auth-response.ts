@@ -19,8 +19,9 @@ interface AuthResponseOptions {
 const forbiddenMessage = () => i18n.global.t('commons.res.forbidden');
 
 export const redirectToEntrance = () => {
-    const { entrance, isLogin } = useGlobalStore();
-    isLogin.value = false;
+    const { entrance, globalStore } = useGlobalStore();
+    globalStore.setLogStatus(false);
+    globalStore.clearAuthInfo();
     router.push({
         name: 'entrance',
         params: { code: entrance.value },
