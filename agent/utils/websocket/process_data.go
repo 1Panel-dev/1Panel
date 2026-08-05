@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	agentPsutil "github.com/1Panel-dev/1Panel/agent/utils/psutil"
 	"github.com/shirou/gopsutil/v4/host"
 	"github.com/shirou/gopsutil/v4/net"
 	"github.com/shirou/gopsutil/v4/process"
@@ -159,7 +160,7 @@ func getDownloadProcess(progress DownloadProgress) (res []byte, err error) {
 	return
 }
 
-func handleProcessData(proc *process.Process, processConfig *PsProcessConfig, pidConnections map[int32][]net.ConnectionStat) *PsProcessData {
+func handleProcessData(proc *process.Process, processConfig *PsProcessConfig, pidConnections map[int32][]net.ConnectionStat, createTimeResolver *agentPsutil.ProcessCreateTimeResolver) *PsProcessData {
 	if processConfig.Pid > 0 && processConfig.Pid != proc.Pid {
 		return nil
 	}
@@ -185,10 +186,10 @@ func handleProcessData(proc *process.Process, processConfig *PsProcessConfig, pi
 	if len(statusArray) > 0 {
 		procData.Status = strings.Join(statusArray, ",")
 	}
-	createTime, procErr := proc.CreateTime()
+	createTime, procErr := createTimeResolver.CreateTime(proc)
 	if procErr == nil {
 		t := time.Unix(createTime/1000, 0)
-		procData.StartTime = t.Format("2006-1-2 15:04:05")
+		procData.StartTime = t.Format("2006-01-02 15:04:05")
 	}
 	procData.NumThreads, _ = proc.NumThreads()
 	procData.CpuValue, _ = proc.CPUPercent()
@@ -231,9 +232,10 @@ func getProcessData(processConfig PsProcessConfig) (res []byte, err error) {
 	}
 
 	result := make([]PsProcessData, 0, len(processes))
+	createTimeResolver := agentPsutil.NewProcessCreateTimeResolver()
 
 	for _, proc := range processes {
-		procData := handleProcessData(proc, &processConfig, pidConnections)
+		procData := handleProcessData(proc, &processConfig, pidConnections, createTimeResolver)
 		if procData != nil {
 			result = append(result, *procData)
 		}
