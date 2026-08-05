@@ -72,7 +72,7 @@
             </el-form-item>
             <el-form-item>
                 <el-switch v-model="form.validateAvailability" />
-                <span class="ml-2">{{ $t('aiTools.agents.validateAvailability') }}</span>
+                <el-text class="ml-2">{{ $t('aiTools.agents.validateAvailability') }}</el-text>
                 <span class="input-help">
                     {{
                         isImageAPIType

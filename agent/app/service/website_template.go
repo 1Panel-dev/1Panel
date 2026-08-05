@@ -75,6 +75,9 @@ func (w WebsiteTemplateService) PageTemplate(req request.WebsiteTemplateSearch) 
 }
 
 func (w WebsiteTemplateService) CreateTemplate(req request.WebsiteTemplateCreate) error {
+	if err := validateWebsiteTemplateFile(req.Type, req.FilePath); err != nil {
+		return err
+	}
 	if exist, _ := websiteTemplateRepo.GetFirst(repo.WithByName(req.Name)); exist != nil {
 		return buserr.New("ErrNameIsExist")
 	}
@@ -94,6 +97,9 @@ func (w WebsiteTemplateService) UpdateTemplate(req request.WebsiteTemplateUpdate
 	if err != nil {
 		return err
 	}
+	if err := validateWebsiteTemplateFile(req.Type, req.FilePath); err != nil {
+		return err
+	}
 	if exist, _ := websiteTemplateRepo.GetFirst(repo.WithByName(req.Name), repo.WithByNOTID(req.ID)); exist != nil {
 		return buserr.New("ErrNameIsExist")
 	}
@@ -107,6 +113,22 @@ func (w WebsiteTemplateService) UpdateTemplate(req request.WebsiteTemplateUpdate
 	template.Variables = req.Variables
 	template.Remark = req.Remark
 	return websiteTemplateRepo.Save(template)
+}
+
+func validateWebsiteTemplateFile(templateType, filePath string) error {
+	if templateType != "multi" {
+		return nil
+	}
+	if filePath == "" {
+		return buserr.WithName("ErrFileNotFound", "ZIP")
+	}
+	if _, err := os.Stat(filePath); err != nil {
+		if os.IsNotExist(err) {
+			return buserr.WithName("ErrFileNotFound", "ZIP")
+		}
+		return err
+	}
+	return nil
 }
 
 func (w WebsiteTemplateService) DeleteTemplate(id uint) error {
@@ -297,7 +319,7 @@ func renderToDir(template *model.WebsiteTemplate, values map[string]string, outp
 
 func unzipAndRender(zipPath, outputDir string, values map[string]string) error {
 	if zipPath == "" {
-		return buserr.New("ErrFileNotFound")
+		return buserr.WithName("ErrFileNotFound", "ZIP")
 	}
 	reader, err := zip.OpenReader(zipPath)
 	if err != nil {
@@ -348,7 +370,7 @@ func isTextFile(name string) bool {
 
 func renderMainHTMLFromZip(zipPath string, values map[string]string) (string, error) {
 	if zipPath == "" {
-		return "", buserr.New("ErrFileNotFound")
+		return "", buserr.WithName("ErrFileNotFound", "ZIP")
 	}
 	reader, err := zip.OpenReader(zipPath)
 	if err != nil {
@@ -368,7 +390,7 @@ func renderMainHTMLFromZip(zipPath string, values map[string]string) (string, er
 		}
 	}
 	if mainFile == nil {
-		return "", buserr.New("ErrFileNotFound")
+		return "", buserr.WithName("ErrFileNotFound", "index.html")
 	}
 	rc, err := mainFile.Open()
 	if err != nil {
@@ -416,4 +438,3 @@ func copyFile(src, dst string) error {
 	_, err = io.Copy(dstFile, srcFile)
 	return err
 }
-
