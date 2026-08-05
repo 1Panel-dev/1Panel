@@ -12,6 +12,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	agentPsutil "github.com/1Panel-dev/1Panel/agent/utils/psutil"
 	"github.com/1Panel-dev/1Panel/agent/utils/websocket"
 	"github.com/shirou/gopsutil/v4/net"
 	"github.com/shirou/gopsutil/v4/process"
@@ -128,7 +129,7 @@ func (ps *ProcessService) GetProcessInfoByPID(pid int32) (*websocket.PsProcessDa
 		}
 	}
 
-	if createTime, err := p.CreateTime(); err == nil {
+	if createTime, err := agentPsutil.NewProcessCreateTimeResolver().CreateTime(p); err == nil {
 		data.StartTime = time.Unix(createTime/1000, 0).Format("2006-01-02 15:04:05")
 	}
 
