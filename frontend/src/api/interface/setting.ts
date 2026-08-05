@@ -71,11 +71,6 @@ export namespace Setting {
         proxyUser: string;
         proxyPasswd: string;
         proxyPasswdKeep: string;
-
-        opsReportExportFormat: string;
-        opsReportSchedule: string;
-        opsReportSavePath: string;
-        opsReportThreshold: string;
     }
     export interface SettingBaseInfo {
         systemVersion: string;

@@ -113,8 +113,10 @@ type DiskDTO struct {
 
 type AlertLogSearch struct {
 	PageInfo
-	Count  uint   `json:"count"`
-	Status string `json:"status"`
+	Count     uint      `json:"count"`
+	Status    string    `json:"status"`
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
 }
 
 type AlertLogDTO struct {
