@@ -4490,7 +4490,7 @@ const message = {
                 scoreWebsiteStopped: 'Estado anormal de {0}',
                 scoreWebsiteMonitorUnavailable: 'El monitoreo web detectó un sitio no disponible',
                 scoreWebsiteMonitorAvailability:
-                    'La disponibilidad del monitoreo web ({0}%) está por debajo del umbral',
+                    'La disponibilidad de solicitudes del monitoreo web ({0}%) está por debajo del umbral',
                 scoreWebsiteMonitorStatusAbnormal:
                     'El monitoreo web está habilitado, pero no se inicializó o está en un estado anormal',
                 scoreWafDisabled: 'WAF deshabilitado, los sitios web no están protegidos',
@@ -4800,7 +4800,7 @@ const message = {
                 websiteProtection: 'WAF y monitoreo web',
                 websiteMonitor: 'Monitoreo web',
                 waf: 'WAF',
-                siteAvailability: 'Disponibilidad del sitio',
+                siteAvailability: 'Disponibilidad de las solicitudes',
                 monitoredSites: 'Sitios monitoreados',
                 requestCount: 'Solicitudes',
                 abnormalSites: 'Sitios anómalos',
