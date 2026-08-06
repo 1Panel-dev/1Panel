@@ -72,7 +72,7 @@
             </el-form-item>
             <el-form-item>
                 <el-switch v-model="form.validateAvailability" />
-                <el-text class="ml-2">{{ $t('aiTools.agents.validateAvailability') }}</el-text>
+                <el-text class="validate-availability-label">{{ $t('aiTools.agents.validateAvailability') }}</el-text>
                 <span class="input-help">
                     {{
                         isImageAPIType
@@ -681,7 +681,7 @@ const openDrawer = async (params?: OpenParams) => {
         form.baseURL = params.baseURL || '';
         form.apiKey = params.apiKey || '';
         form.rememberApiKey = params.rememberApiKey || false;
-        form.validateAvailability = true;
+        form.validateAvailability = false;
         editModels.value = params.models || [];
         const provider = providers.value[form.provider];
         form.apiType = provider?.apiTypes.some((item) => item.apiType === params.apiType)
@@ -789,6 +789,10 @@ defineExpose({
 
 .base-url-warning {
     margin-top: 8px;
+}
+
+.validate-availability-label {
+    margin-left: 12px;
 }
 
 .model-discovery {
