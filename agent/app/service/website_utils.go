@@ -613,10 +613,6 @@ func delWafConfig(website model.Website, force bool) error {
 	if !fileOp.Stat(wafDataPath) {
 		return nil
 	}
-	monitorDir := path.Join(wafDataPath, "db", "sites", website.Alias)
-	if fileOp.Stat(monitorDir) {
-		_ = fileOp.DeleteDir(monitorDir)
-	}
 	websitesConfigPath := path.Join(wafDataPath, "conf", "sites.json")
 	content, err := fileOp.GetContent(websitesConfigPath)
 	if err != nil {
@@ -642,7 +638,13 @@ func delWafConfig(website model.Website, force bool) error {
 		return err
 	}
 
-	_ = fileOp.DeleteDir(path.Join(wafDataPath, "sites", website.Alias))
+	for _, websiteDataDir := range []string{
+		path.Join(wafDataPath, "sites", website.Alias),
+		path.Join(wafDataPath, "db", "monitor", website.Alias),
+		path.Join(wafDataPath, "db", "sites", website.Alias),
+	} {
+		_ = fileOp.DeleteDir(websiteDataDir)
+	}
 
 	if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
 		if force {
