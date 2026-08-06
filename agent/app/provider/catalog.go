@@ -40,7 +40,7 @@ type Meta struct {
 var catalog = map[string]Meta{
 	"custom": {
 		Key: "custom", DisplayName: "Custom", Sort: 10, DefaultAPIType: "openai-completions", EnvKey: "CUSTOM_API_KEY",
-		APIConfigs: editableAPIConfigs(true, "openai-completions", "openai-responses", "anthropic-messages", "openai-images", "dashscope-images", "minimax-images", "openrouter-images"),
+		APIConfigs: editableAPIConfigs(true, "openai-completions", "openai-responses", "anthropic-messages", "openai-images"),
 	},
 	"ollama": {
 		Key: "ollama", DisplayName: "Ollama", Sort: 15, DefaultAPIType: "openai-responses",
