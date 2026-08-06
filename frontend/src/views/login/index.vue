@@ -37,6 +37,7 @@ import LoginForm from './components/login-form.vue';
 import { ref, onMounted } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { preloadImage } from '@/utils/browser';
+import { hasExternalLoginTicket } from '@/utils/external-login';
 defineOptions({ name: 'Login' });
 const { entrance, isEnterprise, themeConfig } = useGlobalStore();
 const backgroundOpacity = ref(1);
@@ -49,16 +50,6 @@ const backgroundStyle = ref<{ backgroundImage?: string; backgroundColor?: string
 const imgLoaded = ref(false);
 const currentDefaultLoginImage = computed(() => (isEnterprise.value ? defaultEnterpriseLoginImage : defaultLoginImage));
 
-const hasExternalLoginTicket = () => {
-    const url = new URL(window.location.href);
-    const fragmentParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash);
-    return Boolean(
-        fragmentParams.get('oidc_ticket') ||
-        fragmentParams.get('saml2_ticket') ||
-        url.searchParams.get('oidc_ticket') ||
-        url.searchParams.get('saml2_ticket'),
-    );
-};
 const externalLoginPending = ref(hasExternalLoginTicket());
 
 function onImgLoad() {
