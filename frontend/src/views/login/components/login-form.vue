@@ -379,6 +379,7 @@ import { MenuStore, TabsStore } from '@/store';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { encryptPassword, base64UrlToBuffer, bufferToBase64Url } from '@/utils/auth';
+import { takeExternalTicketsFromURL } from '@/utils/external-login';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 import { routerToName } from '@/utils/router';
 import { Key } from '@element-plus/icons-vue';
@@ -388,6 +389,9 @@ import { adjustColorToRGBA } from '@/utils/color';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { submitSAML2Navigation } from '@/utils/saml2';
 
+const emit = defineEmits<{
+    (e: 'external-login-ready'): void;
+}>();
 const i18n = useI18n();
 const {
     globalStore,
@@ -429,22 +433,6 @@ const open = ref(false);
 const loginBtnLinkColor = ref<string | null>(null);
 let loginViewActive = true;
 
-const takeExternalTicketsFromURL = () => {
-    const url = new URL(window.location.href);
-    const fragmentParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash);
-    const oidcTicket = fragmentParams.get('oidc_ticket') || url.searchParams.get('oidc_ticket') || '';
-    const saml2Ticket = fragmentParams.get('saml2_ticket') || url.searchParams.get('saml2_ticket') || '';
-    if (!oidcTicket && !saml2Ticket) return { oidcTicket: '', saml2Ticket: '' };
-    fragmentParams.delete('oidc_ticket');
-    fragmentParams.delete('saml2_ticket');
-    url.searchParams.delete('oidc_ticket');
-    url.searchParams.delete('saml2_ticket');
-    const sanitizedFragment = fragmentParams.toString();
-    url.hash = sanitizedFragment ? `#${sanitizedFragment}` : '';
-    const sanitizedURL = `${url.pathname}${url.search}${url.hash}`;
-    window.history.replaceState(window.history.state, '', sanitizedURL);
-    return { oidcTicket, saml2Ticket };
-};
 const pendingExternalTickets = takeExternalTicketsFromURL();
 const pendingOIDCTicket = pendingExternalTickets.oidcTicket;
 const pendingSAML2Ticket = pendingOIDCTicket ? '' : pendingExternalTickets.saml2Ticket;
@@ -596,6 +584,16 @@ const switchToLocalLogin = () => {
     });
 };
 
+const navigateAfterLogin = async () => {
+    try {
+        await routerToName('home');
+    } catch {
+        if (hasPendingExternalTicket) {
+            emit('external-login-ready');
+        }
+    }
+};
+
 const completeLogin = async (result: LoginModel.ResLogin) => {
     isLogin.value = true;
     agreeLicense.value = true;
@@ -607,8 +605,8 @@ const completeLogin = async (result: LoginModel.ResLogin) => {
     MsgSuccess(i18n.t('commons.msg.loginSuccess'));
     localStorage.removeItem('dashboardCache');
     localStorage.removeItem('upgradeChecked');
-    routerToName('home');
     clearLoginKeydownHandler();
+    await navigateAfterLogin();
 };
 
 const handleLoginResult = async (result: LoginModel.ResLogin) => {
@@ -983,6 +981,9 @@ onMounted(async () => {
         await finishOIDCLogin(pendingOIDCTicket);
     } else if (pendingSAML2Ticket) {
         await finishSAML2Login(pendingSAML2Ticket);
+    }
+    if (hasPendingExternalTicket && !isLogin.value) {
+        emit('external-login-ready');
     }
     if (!loginViewActive || isLogin.value) return;
     if (!isLogin.value && !mfaShow.value) {
