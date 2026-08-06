@@ -388,6 +388,9 @@ import { adjustColorToRGBA } from '@/utils/color';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { submitSAML2Navigation } from '@/utils/saml2';
 
+const emit = defineEmits<{
+    (e: 'external-login-ready'): void;
+}>();
 const i18n = useI18n();
 const {
     globalStore,
@@ -607,8 +610,8 @@ const completeLogin = async (result: LoginModel.ResLogin) => {
     MsgSuccess(i18n.t('commons.msg.loginSuccess'));
     localStorage.removeItem('dashboardCache');
     localStorage.removeItem('upgradeChecked');
-    routerToName('home');
     clearLoginKeydownHandler();
+    await routerToName('home');
 };
 
 const handleLoginResult = async (result: LoginModel.ResLogin) => {
@@ -983,6 +986,9 @@ onMounted(async () => {
         await finishOIDCLogin(pendingOIDCTicket);
     } else if (pendingSAML2Ticket) {
         await finishSAML2Login(pendingSAML2Ticket);
+    }
+    if (hasPendingExternalTicket && !isLogin.value) {
+        emit('external-login-ready');
     }
     if (!loginViewActive || isLogin.value) return;
     if (!isLogin.value && !mfaShow.value) {

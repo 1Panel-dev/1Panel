@@ -2,6 +2,13 @@
     <div class="flex items-center justify-center min-h-screen relative bg-gray-100">
         <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" :style="backgroundStyle"></div>
         <div
+            v-if="externalLoginPending"
+            v-loading="true"
+            class="absolute inset-0 z-20 bg-gray-100"
+            aria-busy="true"
+        ></div>
+        <div
+            v-show="!externalLoginPending"
             :style="{ opacity: backgroundOpacity, width: containerWidth, height: containerHeight }"
             class="bg-white shadow-lg relative z-10 border border-gray-200 flex overflow-hidden"
             id="login-container"
@@ -18,7 +25,7 @@
                     />
                 </div>
                 <div :class="loginFormClass">
-                    <LoginForm ref="loginRef"></LoginForm>
+                    <LoginForm ref="loginRef" @external-login-ready="externalLoginPending = false"></LoginForm>
                 </div>
             </div>
         </div>
@@ -41,6 +48,18 @@ const loadedBackgroundImage = ref<string | null>(null);
 const backgroundStyle = ref<{ backgroundImage?: string; backgroundColor?: string }>({});
 const imgLoaded = ref(false);
 const currentDefaultLoginImage = computed(() => (isEnterprise.value ? defaultEnterpriseLoginImage : defaultLoginImage));
+
+const hasExternalLoginTicket = () => {
+    const url = new URL(window.location.href);
+    const fragmentParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash);
+    return Boolean(
+        fragmentParams.get('oidc_ticket') ||
+        fragmentParams.get('saml2_ticket') ||
+        url.searchParams.get('oidc_ticket') ||
+        url.searchParams.get('saml2_ticket'),
+    );
+};
+const externalLoginPending = ref(hasExternalLoginTicket());
 
 function onImgLoad() {
     imgLoaded.value = true;
