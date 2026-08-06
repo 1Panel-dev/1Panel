@@ -4494,7 +4494,7 @@ const message = {
                 scoreWebsiteHTTP: '{0} — HTTPS не включён',
                 scoreWebsiteStopped: '{0} — аномальный статус',
                 scoreWebsiteMonitorUnavailable: 'Мониторинг сайтов обнаружил недоступный сайт',
-                scoreWebsiteMonitorAvailability: 'Доступность мониторинга сайтов {0}% ниже порога',
+                scoreWebsiteMonitorAvailability: 'Доступность запросов мониторинга сайтов {0}% ниже порога',
                 scoreWebsiteMonitorStatusAbnormal:
                     'Мониторинг сайтов включён, но не инициализирован или находится в ненормальном состоянии',
                 scoreWafDisabled: 'WAF отключён, сайты не защищены',
@@ -4800,7 +4800,7 @@ const message = {
                 websiteProtection: 'WAF и мониторинг сайтов',
                 websiteMonitor: 'Мониторинг сайтов',
                 waf: 'WAF',
-                siteAvailability: 'Доступность сайтов',
+                siteAvailability: 'Доступность запросов',
                 monitoredSites: 'Отслеживаемые сайты',
                 requestCount: 'Количество запросов',
                 abnormalSites: 'Аномальные сайты',

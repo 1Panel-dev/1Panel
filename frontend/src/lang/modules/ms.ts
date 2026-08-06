@@ -4508,7 +4508,7 @@ const message = {
                 scoreWebsiteHTTP: '{0} tidak menggunakan HTTPS',
                 scoreWebsiteStopped: 'Status {0} tidak normal',
                 scoreWebsiteMonitorUnavailable: 'Pemantauan laman web mengesan tapak tidak tersedia',
-                scoreWebsiteMonitorAvailability: 'Ketersediaan pemantauan laman web {0}% di bawah ambang',
+                scoreWebsiteMonitorAvailability: 'Ketersediaan permintaan pemantauan laman web {0}% di bawah ambang',
                 scoreWebsiteMonitorStatusAbnormal:
                     'Pemantauan laman web didayakan tetapi belum dimulakan atau dalam keadaan tidak normal',
                 scoreWafDisabled: 'WAF dilumpuhkan dan laman web tidak dilindungi',
@@ -4815,7 +4815,7 @@ const message = {
                 websiteProtection: 'WAF dan Pemantauan Laman Web',
                 websiteMonitor: 'Pemantauan Laman Web',
                 waf: 'WAF',
-                siteAvailability: 'Ketersediaan Tapak',
+                siteAvailability: 'Ketersediaan Permintaan',
                 monitoredSites: 'Tapak Dipantau',
                 requestCount: 'Jumlah Permintaan',
                 abnormalSites: 'Tapak Tidak Normal',

@@ -4349,7 +4349,7 @@ const message = {
                 scoreWebsiteHTTP: '{0} HTTPS 미사용',
                 scoreWebsiteStopped: '{0} 상태 비정상',
                 scoreWebsiteMonitorUnavailable: '웹사이트 모니터링에서 사용 불가 사이트 감지',
-                scoreWebsiteMonitorAvailability: '웹사이트 모니터링 가용률 {0}%가 임계값 미달',
+                scoreWebsiteMonitorAvailability: '웹사이트 모니터링 요청 가용률 {0}%가 임계값 미달',
                 scoreWebsiteMonitorStatusAbnormal:
                     '웹사이트 모니터링이 활성화되었지만 초기화되지 않았거나 비정상 상태입니다',
                 scoreWafDisabled: 'WAF 미활성화, 웹사이트 보호 미적용',
@@ -4651,7 +4651,7 @@ const message = {
                 websiteProtection: 'WAF 및 웹사이트 모니터링',
                 websiteMonitor: '웹사이트 모니터링',
                 waf: 'WAF',
-                siteAvailability: '사이트 가용률',
+                siteAvailability: '요청 가용률',
                 monitoredSites: '모니터링 사이트',
                 requestCount: '요청 수',
                 abnormalSites: '비정상 사이트',
