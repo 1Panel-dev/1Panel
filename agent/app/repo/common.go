@@ -49,6 +49,12 @@ func WithByName(name string) DBOption {
 	}
 }
 
+func WithByPath(path string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("path = ?", path)
+	}
+}
+
 func WithByAddr(addr string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("addr = ?", addr)

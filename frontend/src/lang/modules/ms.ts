@@ -1763,7 +1763,8 @@ const message = {
         compose: 'Compose | Compose-compose',
         composeFile: 'Fail Susunan',
         fromChangeHelper: 'Menukar sumber akan membersihkan kandungan yang sedang diedit. Adakah anda mahu meneruskan?',
-        composePathHelper: 'Laluan simpan fail konfigurasi: {0}',
+        composePathHelper:
+            'Laluan simpan fail Compose: {0}; jika nama projek ditentukan dalam Docker Compose, nama tersebut akan diutamakan; jika tidak, {1} akan digunakan.',
         composeNamePriorityHelper:
             'Keutamaan nama projek: nama dalam konfigurasi Docker Compose > direktori induk fail > nama yang dimasukkan di sini.',
         composeHelper:

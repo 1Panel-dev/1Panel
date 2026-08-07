@@ -1764,7 +1764,8 @@ const message = {
         composeFile: 'Düzenleme Dosyası',
         fromChangeHelper:
             'Kaynağın değiştirilmesi mevcut düzenlenen içeriği temizleyecektir. Devam etmek istiyor musunuz?',
-        composePathHelper: 'Yapılandırma dosyası kaydetme yolu: {0}',
+        composePathHelper:
+            'Compose dosyası kaydetme yolu: {0}; Docker Compose içinde bir proje adı belirtilmişse bu ad önceliklidir; aksi halde {1} kullanılır.',
         composeNamePriorityHelper:
             'Proje adı önceliği: Docker Compose yapılandırmasında belirtilen ad > dosyanın üst dizini > buraya girilen ad.',
         composeHelper:

@@ -1732,7 +1732,8 @@ const message = {
         compose: 'Compose | Compose‌ها',
         composeFile: 'فایل Compose',
         fromChangeHelper: 'تغییر منبع محتوای ویرایش شده فعلی را پاک می‌کند. ادامه می‌دهید؟',
-        composePathHelper: 'مسیر ذخیره فایل پیکربندی: {0}',
+        composePathHelper:
+            'مسیر ذخیره فایل Compose: {0}؛ اگر نام پروژه‌ای در Docker Compose مشخص شده باشد، در اولویت است؛ در غیر این صورت از {1} استفاده می‌شود.',
         composeNamePriorityHelper:
             'اولویت نام پروژه: نام مشخص‌شده در پیکربندی Docker Compose > پوشه والد فایل > نام واردشده در اینجا.',
         composeHelper: 'ترکیب ایجاد شده از طریق ویرایشگر یا قالب 1Panel در دایرکتوری {0}/docker/compose ذخیره می‌شود.',

@@ -218,25 +218,14 @@ func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 	if err := validateComposeCreateName(req); err != nil {
 		return false, err
 	}
-	if cmd.CheckIllegal(req.Name, req.DirName, req.Path) {
+	if hasIllegalComposeCreateInput(req) {
 		return false, buserr.New("ErrCmdIllegal")
 	}
-	if req.From != "path" {
-		if err := checkComposeRecordName(composeCreateDirName(req)); err != nil {
-			return false, err
-		}
-	}
-	if err := u.loadPath(&req); err != nil {
-		return false, err
-	}
-	if err := newComposeEnv(req.Path, req.Env); err != nil {
-		return false, err
-	}
-	projectName, err := resolveComposeProjectName(req.Path, req.Name)
+	projectName, err := resolveComposeCreateProjectName(req)
 	if err != nil {
 		return false, err
 	}
-	if err := checkComposeRecordName(projectName); err != nil {
+	if err := checkComposeCreateDuplicate(req, projectName); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -246,13 +235,15 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 	if err := validateComposeCreateName(req); err != nil {
 		return err
 	}
-	if cmd.CheckIllegal(req.Name, req.DirName, req.Path) {
+	if hasIllegalComposeCreateInput(req) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	if req.From != "path" {
-		if err := checkComposeRecordName(composeCreateDirName(req)); err != nil {
-			return err
-		}
+	projectName, err := resolveComposeCreateProjectName(req)
+	if err != nil {
+		return err
+	}
+	if err := checkComposeCreateDuplicate(req, projectName); err != nil {
+		return err
 	}
 	if err := u.loadPath(&req); err != nil {
 		return err
@@ -260,14 +251,7 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 	if err := newComposeEnv(req.Path, req.Env); err != nil {
 		return err
 	}
-	projectName, err := resolveComposeProjectName(req.Path, req.Name)
-	if err != nil {
-		return err
-	}
 	req.Name = projectName
-	if err := checkComposeRecordName(req.Name); err != nil {
-		return err
-	}
 	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeCompose, req.TaskID, 1)
 	if err != nil {
 		return fmt.Errorf("new task for image build failed, err: %v", err)
@@ -303,15 +287,39 @@ func checkComposeRecordName(name string) error {
 	return nil
 }
 
-func validateComposeCreateName(req dto.ComposeCreate) error {
-	name := strings.TrimSpace(req.Name)
-	if name != "" && !re.GetRegex(re.ComposeNamePattern).MatchString(name) {
-		return buserr.New("ErrComposeNameInvalid")
+func checkComposeCreateDuplicate(req dto.ComposeCreate, projectName string) error {
+	if err := checkComposeRecordName(projectName); err != nil {
+		return err
 	}
-	if req.From != "path" && !re.GetRegex(re.ComposeNamePattern).MatchString(composeCreateDirName(req)) {
+	if req.From == "path" {
+		return nil
+	}
+	composeItem, _ := composeRepo.GetRecord(repo.WithByPath(composeCreatePath(req)))
+	if composeItem.ID != 0 && composeItem.Path != "" {
+		return buserr.New("ErrRecordExist")
+	}
+	return nil
+}
+
+func validateComposeCreateName(req dto.ComposeCreate) error {
+	if req.From == "path" {
+		name := strings.TrimSpace(req.Name)
+		if name != "" && !re.GetRegex(re.ComposeNamePattern).MatchString(name) {
+			return buserr.New("ErrComposeNameInvalid")
+		}
+		return nil
+	}
+	if !re.GetRegex(re.ComposeNamePattern).MatchString(composeCreateDirName(req)) {
 		return buserr.New("ErrComposeNameInvalid")
 	}
 	return nil
+}
+
+func hasIllegalComposeCreateInput(req dto.ComposeCreate) bool {
+	if req.From == "path" {
+		return cmd.CheckIllegal(req.Name, req.Path)
+	}
+	return cmd.CheckIllegal(composeCreateDirName(req))
 }
 
 func composeCreateDirName(req dto.ComposeCreate) string {
@@ -324,12 +332,89 @@ func composeCreateDirName(req dto.ComposeCreate) string {
 	return dirName
 }
 
-func resolveComposeProjectName(composePath, fallbackName string) (string, error) {
+func composeCreatePath(req dto.ComposeCreate) string {
+	return filepath.Join(global.Dir.DataDir, "docker", "compose", composeCreateDirName(req), "docker-compose.yml")
+}
+
+func resolveComposeCreateProjectName(req dto.ComposeCreate) (string, error) {
+	if req.From == "path" {
+		envPath, err := createComposeTempFile(
+			filepath.Dir(primaryComposePath(req.Path)),
+			".1panel-compose-*.env",
+			req.Env,
+		)
+		if err != nil {
+			return "", err
+		}
+		defer os.Remove(envPath)
+		return resolveComposeProjectName(req.Path, req.Name, envPath)
+	}
+
+	dir := filepath.Dir(composeCreatePath(req))
+	cleanupDir, err := prepareComposeStagingDir(dir)
+	if err != nil {
+		return "", err
+	}
+	defer cleanupDir()
+
+	composePath, err := createComposeTempFile(dir, ".1panel-compose-*.yml", req.File)
+	if err != nil {
+		return "", err
+	}
+	defer os.Remove(composePath)
+
+	envPath, err := createComposeTempFile(dir, ".1panel-compose-*.env", req.Env)
+	if err != nil {
+		return "", err
+	}
+	defer os.Remove(envPath)
+
+	return resolveComposeProjectName(composePath, "", envPath)
+}
+
+func createComposeTempFile(dir, pattern, content string) (string, error) {
+	file, err := os.CreateTemp(dir, pattern)
+	if err != nil {
+		return "", err
+	}
+	filePath := file.Name()
+	if _, err := file.WriteString(content); err != nil {
+		_ = file.Close()
+		_ = os.Remove(filePath)
+		return "", err
+	}
+	if err := file.Close(); err != nil {
+		_ = os.Remove(filePath)
+		return "", err
+	}
+	return filePath, nil
+}
+
+func prepareComposeStagingDir(dir string) (func(), error) {
+	if err := os.MkdirAll(filepath.Dir(dir), os.ModePerm); err != nil {
+		return nil, err
+	}
+	created := false
+	if err := os.Mkdir(dir, os.ModePerm); err != nil {
+		if !errors.Is(err, os.ErrExist) {
+			return nil, err
+		}
+	} else {
+		created = true
+	}
+	return func() {
+		if created {
+			_ = os.Remove(dir)
+		}
+	}, nil
+}
+
+func resolveComposeProjectName(composePath, fallbackName, envFile string) (string, error) {
 	// Preserve the name resolved by Compose (including a top-level name) so the
 	// container label and the local record always use the same project identity.
 	parentName := normalizeComposeProjectName(path.Base(path.Dir(primaryComposePath(composePath))))
 	fallbackName = strings.TrimSpace(fallbackName)
-	stdout, err := runComposeConfig(composePath, "")
+	stdout, err := runComposeConfig(composePath, "", envFile)
 	if err == nil {
 		projectName, parseErr := loadComposeProjectName(stdout)
 		if parseErr != nil {
@@ -345,7 +430,7 @@ func resolveComposeProjectName(composePath, fallbackName string) (string, error)
 			return parentName, nil
 		}
 		if fallbackName != "" {
-			if _, fallbackErr := runComposeConfig(composePath, fallbackName); fallbackErr != nil {
+			if _, fallbackErr := runComposeConfig(composePath, fallbackName, envFile); fallbackErr != nil {
 				return "", fallbackErr
 			}
 			return fallbackName, nil
@@ -358,7 +443,7 @@ func resolveComposeProjectName(composePath, fallbackName string) (string, error)
 
 	resolveErr := err
 	if parentName != "" {
-		if _, parentErr := runComposeConfig(composePath, parentName); parentErr == nil {
+		if _, parentErr := runComposeConfig(composePath, parentName, envFile); parentErr == nil {
 			return parentName, nil
 		} else {
 			resolveErr = parentErr
@@ -366,7 +451,7 @@ func resolveComposeProjectName(composePath, fallbackName string) (string, error)
 	}
 
 	if fallbackName != "" && fallbackName != parentName {
-		if _, fallbackErr := runComposeConfig(composePath, fallbackName); fallbackErr == nil {
+		if _, fallbackErr := runComposeConfig(composePath, fallbackName, envFile); fallbackErr == nil {
 			return fallbackName, nil
 		} else {
 			return "", fallbackErr
@@ -378,8 +463,8 @@ func resolveComposeProjectName(composePath, fallbackName string) (string, error)
 	return "", resolveErr
 }
 
-func runComposeConfig(composePath, projectName string) ([]byte, error) {
-	configCmd := getComposeCmd(composePath, "config", projectName)
+func runComposeConfig(composePath, projectName, envFile string) ([]byte, error) {
+	configCmd := getComposeCmdWithEnv(composePath, "config", envFile, projectName)
 	stdout, err := configCmd.Output()
 	if err != nil {
 		var stderr []byte
@@ -590,15 +675,15 @@ func (u *ContainerService) LoadComposeEnv(name string) (string, error) {
 
 func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
 	if req.From == "template" || req.From == "edit" {
-		dir := fmt.Sprintf("%s/docker/compose/%s", global.Dir.DataDir, composeCreateDirName(*req))
+		composePath := composeCreatePath(*req)
+		dir := filepath.Dir(composePath)
 		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 				return err
 			}
 		}
 
-		path := fmt.Sprintf("%s/docker-compose.yml", dir)
-		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
+		file, err := os.OpenFile(composePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
 		if err != nil {
 			return err
 		}
@@ -606,7 +691,7 @@ func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
 		write := bufio.NewWriter(file)
 		_, _ = write.WriteString(string(req.File))
 		write.Flush()
-		req.Path = path
+		req.Path = composePath
 	}
 	return nil
 }

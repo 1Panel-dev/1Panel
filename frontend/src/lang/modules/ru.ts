@@ -1753,7 +1753,8 @@ const message = {
         compose: 'Compose | Composes',
         composeFile: 'Файл Оркестрации',
         fromChangeHelper: 'Переключение источника очистит текущее отредактированное содержимое. Хотите продолжить?',
-        composePathHelper: 'Путь сохранения файла конфигурации: {0}',
+        composePathHelper:
+            'Путь сохранения файла Compose: {0}; если имя проекта указано в Docker Compose, оно имеет приоритет; иначе используется {1}.',
         composeNamePriorityHelper:
             'Приоритет имени проекта: имя из конфигурации Docker Compose > родительский каталог файла > имя, введённое здесь.',
         composeHelper:

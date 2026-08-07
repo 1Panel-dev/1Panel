@@ -1772,7 +1772,8 @@ const message = {
         compose: 'Compose | Composes',
         composeFile: 'Archivo de Orquestación',
         fromChangeHelper: 'Cambiar la fuente limpiará el contenido actualmente editado. ¿Desea continuar?',
-        composePathHelper: 'Ruta de guardado del archivo de configuración: {0}',
+        composePathHelper:
+            'Ruta de guardado del archivo Compose: {0}; si se especifica un nombre de proyecto en Docker Compose, tendrá prioridad; de lo contrario, se usará {1}.',
         composeNamePriorityHelper:
             'Prioridad del nombre del proyecto: nombre especificado en la configuración de Docker Compose > directorio padre del archivo > nombre indicado aquí.',
         composeHelper:
