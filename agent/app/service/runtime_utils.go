@@ -167,8 +167,15 @@ func reCreateRuntime(runtime *model.Runtime) {
 }
 
 func getComposeCmd(composePath, operate string, projectName ...string) *exec.Cmd {
+	return getComposeCmdWithEnv(composePath, operate, "", projectName...)
+}
+
+func getComposeCmdWithEnv(composePath, operate, envFile string, projectName ...string) *exec.Cmd {
 	dockerCommand := global.CONF.DockerConfig.Command
-	args := make([]string, 0, 7)
+	args := make([]string, 0, 9)
+	if envFile != "" {
+		args = append(args, "--env-file", envFile)
+	}
 	if len(projectName) > 0 && strings.TrimSpace(projectName[0]) != "" {
 		args = append(args, "--project-name", projectName[0])
 	}

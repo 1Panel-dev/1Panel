@@ -1764,7 +1764,8 @@ const message = {
         compose: 'Compose | Composições',
         composeFile: 'Arquivo de Orquestração',
         fromChangeHelper: 'Trocar a origem limpará o conteúdo editado atual. Deseja continuar?',
-        composePathHelper: 'Caminho de salvamento do arquivo de configuração: {0}',
+        composePathHelper:
+            'Caminho de salvamento do arquivo Compose: {0}; se um nome de projeto for definido no Docker Compose, ele terá prioridade; caso contrário, será usado {1}.',
         composeNamePriorityHelper:
             'Prioridade do nome do projeto: nome definido na configuração do Docker Compose > diretório pai do arquivo > nome informado aqui.',
         composeHelper:

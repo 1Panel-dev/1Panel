@@ -458,14 +458,14 @@
                                 <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="dirName">
                                     <el-input @input="changePath" @change="onEdit('')" v-model.trim="form.dirName">
                                         <template #prefix>
-                                            <span style="margin-right: 8px">{{ $t('file.dir') }}</span>
+                                            <span style="margin-right: 8px">{{ $t('commons.table.name') }}</span>
                                         </template>
                                     </el-input>
                                     <span class="input-help">
-                                        {{ $t('container.composePathHelper', [composeFile]) }}
+                                        {{ $t('container.composePathHelper', [composeFile, form.dirName]) }}
                                     </span>
                                 </el-form-item>
-                                <el-form-item prop="name">
+                                <el-form-item v-if="form.from === 'path'" prop="name">
                                     <el-input v-model.trim="form.name">
                                         <template #prefix>
                                             <span style="margin-right: 8px">{{ $t('commons.table.name') }}</span>

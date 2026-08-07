@@ -1680,7 +1680,8 @@ const message = {
         compose: '编排',
         composeFile: '编排文件',
         fromChangeHelper: '切换来源将清空当前已编辑内容，是否继续？',
-        composePathHelper: '配置文件保存路径: {0}',
+        composePathHelper:
+            '编排文件保存路径：{0}；若 Docker Compose 中指定了项目名称，则优先使用该名称，否则使用 {1}。',
         composeNamePriorityHelper:
             '项目名称优先级：Docker Compose 配置中指定的名称 > 文件父目录名称 > 此处填写的名称。',
         composeHelper: '通过 1Panel 编辑或模版创建的编排，将保存在 {0}/docker/compose 路径下',

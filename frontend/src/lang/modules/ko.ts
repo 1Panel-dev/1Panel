@@ -1716,7 +1716,8 @@ const message = {
         compose: '컴포즈 | 컴포즈들',
         composeFile: '컴포즈 파일',
         fromChangeHelper: '소스를 변경하면 현재 편집한 내용이 삭제됩니다. 계속 하시겠습니까?',
-        composePathHelper: '구성 파일 저장 경로: {0}',
+        composePathHelper:
+            'Compose 파일 저장 경로: {0}. Docker Compose에 프로젝트 이름이 지정되어 있으면 해당 이름을 우선 사용하고, 지정되어 있지 않으면 {1}을(를) 사용합니다.',
         composeNamePriorityHelper:
             '프로젝트 이름 우선순위: Docker Compose 구성에 지정된 이름 > 파일의 상위 디렉터리 이름 > 여기에 입력한 이름.',
         composeHelper: '1Panel 에디터나 템플릿을 통해 생성된 컴포지션은 {0}/docker/compose 디렉토리에 저장됩니다.',

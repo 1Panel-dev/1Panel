@@ -1745,7 +1745,8 @@ const message = {
         compose: 'Compose | Composes',
         composeFile: 'Compose File',
         fromChangeHelper: 'Switching the source will clean the current edited content. Continue?',
-        composePathHelper: 'Configuration file save path: {0}',
+        composePathHelper:
+            'Compose file save path: {0}; if a project name is specified in Docker Compose, it takes precedence; otherwise, {1} is used.',
         composeNamePriorityHelper:
             'Project name priority: name specified in Docker Compose config > file parent directory > name entered here.',
         composeHelper:
