@@ -24,15 +24,20 @@
         <div class="mt-3" v-if="showExpiresAt && expiresAlertVisible && productProExpires && productProExpires !== 0">
             <el-alert type="warning" @close="handleExpiresAlertClose">
                 <template #title>
-                    <div class="text-xs">
+                    <div>
                         <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
                             <span>
                                 {{ $t(expiresAlertKey, [expiresInfo]) }}
                             </span>
-                            <span @click="goXpack" class="flex items-center justify-center gap-0.5 jump">
-                                <el-icon><Position /></el-icon>
+                            <el-link
+                                class="cursor-pointer"
+                                style="font-size: 12px"
+                                icon="Position"
+                                type="primary"
+                                @click="goXpack"
+                            >
                                 {{ $t('firewall.quickJump') }}
-                            </span>
+                            </el-link>
                         </div>
                     </div>
                 </template>
