@@ -1,7 +1,4 @@
 <p align="center"><a href="https://1panel.pro"><img src="https://resource.1panel.pro/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
-
-<h3 align="center">The open-source VPS control panel with native AI agent support</h3>
-
 <p align="center">
   Trusted by <strong>2,000,000+</strong> self-hosters worldwide
 </p>
@@ -41,29 +38,24 @@
 
 ## What is 1Panel?
 
-1Panel is a modern, open-source VPS control panel — and the only one with **native AI agent support**. Run Ollama models, deploy OpenClaw agents, and manage your entire server stack from one clean web interface. No CLI memorization required.
-
-👉 Watch the [2-minute introduction](https://www.youtube.com/watch?v=Jl_wqp-XA08)
+1Panel is a modern, open-source Linux server management panel and a lightweight AI management platform. Through an intuitive web interface, it provides users with comprehensive, one-stop server management capabilities:
+- **Full-Stack AI Management**: Offers a unified management platform from bare metal to agents (Metal-to-Agent). It integrates an AI portal, AI gateway, and Skills Hub, while supporting centralized management of agents and models.
+- **Efficient Visual Operations**: Easily manage Linux servers through a web-based GUI, streamlining tasks such as host monitoring, file management, database management, and container management.
+- **Rapid Website Deployment**: Deeply integrates with popular website builders like WordPress and . It enables one-click domain binding and SSL certificate configuration, significantly lowering the barrier to website creation.
+- **Curated App Store**: Features a built-in store of high-quality open-source applications, providing one-click installation and upgrade services to effortlessly extend server capabilities.
+- **Enterprise-Grade Security**: Deploys applications based on container technology to effectively minimize vulnerability exposure. It also provides security features such as firewalls and log auditing to ensure comprehensive server protection.
+One-Click Data Backup: Supports one-click backup and restoration, and integrates with various cloud storage solutions to ensure data security and prevent loss.
 
 ## Why 1Panel?
 
 | | 1Panel | cPanel / Plesk | aaPanel | Webmin |
 |--|--------|----------------|---------|--------|
 | Free & open source | ✅ | ❌ | Partial | ✅ |
-| Native AI agent runtime | ✅ | ❌ | ❌ | ❌ |
+| AI management | ✅ | ❌ | ❌ | ❌ |
 | One-click app marketplace | ✅ 165+ apps | ❌ | ✅ | ❌ |
 | Modern UI (post-2020) | ✅ | ❌ | Partial | ❌ |
 | Docker / container management | ✅ | ❌ | ❌ | ❌ |
 | Active development | ✅ | ✅ | ✅ | Slow |
-
-## Key Features
-
-- **AI Agent Runtime**: Deploy Ollama LLMs, spin up OpenClaw personal agents, and monitor GPU utilization — all from the dashboard. No separate AI stack to manage.
-- **One-Click Website Deployment**: Launch production-ready websites with automatic domain binding, SSL provisioning, and Nginx config — zero manual setup.
-- **App Marketplace**: 165+ trusted open-source apps (Nextcloud, Bitwarden, Umami, NocoBase, and more) installed and updated with a single click.
-- **Docker & Container Management**: Create, start, stop, and inspect containers, images, networks, and volumes through a visual UI — no CLI juggling.
-- **Security Out of the Box**: Firewall rules, fail2ban, container isolation, WAF, and audit logs — configured and running from day one.
-- **Backup & Restore**: Schedule automated backups to AWS S3, Cloudflare R2, or local storage. Restore any snapshot in one click.
 
 ## Quick Start
 
@@ -83,24 +75,22 @@ Run `1pctl user-info` via SSH if you need to retrieve your access credentials.
 
 ## Pro Edition
 
-1Panel OSS is free forever. Pro adds features built for teams and production workloads:
+1Panel OSS is free forever. 1Panel Pro and Ent adds features built for teams and production workloads:
 
-| Feature | OSS | Pro |
-|---------|:---:|:---:|
-| One-click app installs | ✅ | ✅ |
-| AI agents (OpenClaw) | 1 agent | Unlimited |
-| WAF & advanced security | Basic | ✅ |
-| Website tamper protection | ❌ | ✅ |
-| Website uptime monitoring | ❌ | ✅ |
-| Multi-node management | ❌ | ✅ |
-| Custom logo & theme | ❌ | ✅ |
-| Priority support | ❌ | ✅ |
+| Feature | OSS | Pro | Ent |
+|---------|:---:|:---:|:---:|
+| One-click app installs | ✅ | ✅ | ✅ |
+| AI agents (OpenClaw) | 1 agent | Unlimited | ✅ |
+| WAF & advanced security | Basic | ✅ | ✅ |
+| Website tamper protection | ❌ | ✅ | ✅ |
+| Website uptime monitoring | ❌ | ✅ | ✅ |
+| Multi-node management | ❌ | ✅ | ✅ |
+| Custom logo & theme | ❌ | ✅ | ✅ |
+| KVM Web UI | ❌ | ❌ | ✅ |
+| AI Gateway | ❌ | ❌ | ✅ |
+| Priority support | ❌ | ❌ | ✅ |
 
 **From $80/year.** [Compare plans & start 30-day free trial →](https://1panel.pro/pricing)
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)
 
 ## Community & Support
 
