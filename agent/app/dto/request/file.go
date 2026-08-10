@@ -131,6 +131,11 @@ type FileMove struct {
 	Name       string   `json:"name"`
 	Cover      bool     `json:"cover"`
 	CoverPaths []string `json:"coverPaths"`
+	TaskID     string   `json:"taskID"`
+}
+
+type FileMoveStopReq struct {
+	TaskID string `json:"taskID" validate:"required"`
 }
 
 type FileDownload struct {

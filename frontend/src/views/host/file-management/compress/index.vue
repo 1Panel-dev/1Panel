@@ -143,6 +143,7 @@ const currentTaskID = ref('');
 const taskInfo = ref<Log.Task | null>(null);
 let taskTimer: ReturnType<typeof setInterval> | null = null;
 const compressTaskKey = 'file-management-compress-task';
+const compressTypePreferenceKey = 'file-management-compress-type';
 
 const em = defineEmits<{
     (e: 'close', value: boolean): void;
@@ -159,7 +160,9 @@ const extension = computed(() => {
     return CompressExtension[form.value.type];
 });
 
-const isTaskExecuting = computed(() => taskInfo.value?.status === 'Executing');
+const isTaskExecuting = computed(() => {
+    return !!currentTaskID.value && (!taskInfo.value || taskInfo.value.status === 'Executing');
+});
 const showTaskStatus = computed(() =>
     Boolean(currentTaskID.value || loading.value || canceling.value || stopping.value),
 );
@@ -201,17 +204,19 @@ const loadTaskInfo = async () => {
             },
             currentNode.value,
         );
-        taskInfo.value = res.data.items?.[0] || null;
+        const item = res.data.items?.[0];
+        if (!item) {
+            return;
+        }
+        taskInfo.value = item;
         emitTaskChange();
-        if (!taskInfo.value || taskInfo.value.status !== 'Executing') {
+        if (taskInfo.value.status !== 'Executing') {
             stopTaskPolling();
             resetDrawerState();
             em('close', false);
         }
     } catch (error) {
-        stopTaskPolling();
-        resetDrawerState();
-        em('close', false);
+        console.error(error);
     }
 };
 
@@ -239,7 +244,6 @@ const resetDrawerState = () => {
 
 const closeDrawer = () => {
     if (currentTaskID.value && isTaskExecuting.value) {
-        stopTaskPolling();
         open.value = false;
         em('close', false);
         return;
@@ -298,6 +302,17 @@ const getLinkPath = (path: string) => {
     form.value.dst = path;
 };
 
+const restoreCompressTypePreference = () => {
+    const preferredType = localStorage.getItem(compressTypePreferenceKey);
+    if (preferredType && Object.values(CompressType).includes(preferredType as CompressType)) {
+        form.value.type = preferredType;
+    }
+};
+
+const saveCompressTypePreference = () => {
+    localStorage.setItem(compressTypePreferenceKey, form.value.type);
+};
+
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate((valid) => {
@@ -316,6 +331,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             signal: abortController.value?.signal,
         })
             .then(() => {
+                saveCompressTypePreference();
                 currentTaskID.value = taskID;
                 loading.value = false;
                 taskInfo.value = null;
@@ -345,14 +361,17 @@ const submit = async (formEl: FormInstance | undefined) => {
     });
 };
 
-const acceptParams = (props: CompressProps) => {
+const acceptParams = async (props: CompressProps) => {
     if (currentTaskID.value) {
-        open.value = true;
-        if (!taskTimer) {
-            startTaskPolling();
+        await loadTaskInfo();
+        if (currentTaskID.value) {
+            open.value = true;
+            if (!taskTimer) {
+                startTaskPolling();
+            }
+            emitTaskChange();
+            return;
         }
-        emitTaskChange();
-        return;
     }
 
     form.value.files = props.files;
@@ -393,9 +412,7 @@ const restoreRunningTask = () => {
             return;
         }
         currentTaskID.value = task.taskID;
-        if (task.status === 'Executing') {
-            emitTaskChange();
-        } else {
+        if (task.status !== 'Executing') {
             localStorage.removeItem(compressTaskKey);
         }
     } catch {
@@ -404,14 +421,16 @@ const restoreRunningTask = () => {
 };
 
 onMounted(() => {
+    restoreCompressTypePreference();
     restoreRunningTask();
+    if (currentTaskID.value) {
+        startTaskPolling();
+    }
 });
 
 watch(open, (val) => {
-    if (val && currentTaskID.value) {
+    if (val && currentTaskID.value && !taskTimer) {
         startTaskPolling();
-    } else {
-        stopTaskPolling();
     }
 });
 

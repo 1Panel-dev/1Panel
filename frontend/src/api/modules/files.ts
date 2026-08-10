@@ -146,7 +146,16 @@ export const stopWgetFile = (key: string) => {
 };
 
 export const moveFile = (params: File.FileMove) => {
-    return http.post<File.File>('files/move', params, TimeoutEnum.T_5M);
+    return http.post<File.File>('files/move', params);
+};
+
+export const stopMoveFile = (taskID: string, currentNode?: string) => {
+    return http.post(
+        'files/move/stop',
+        { taskID } as File.FileMoveStopReq,
+        undefined,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 
 export const downloadFile = (params: File.FileDownload) => {

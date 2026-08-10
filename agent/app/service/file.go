@@ -52,6 +52,8 @@ type FileService struct {
 
 const fileHistorySnapshotMaxSize = 10 * 1024 * 1024
 
+var fileTransferLocks = newFileTransferLocks()
+
 type IFileService interface {
 	GetFileList(op request.FileOption) (response.FileInfo, error)
 	SearchUploadWithPage(req request.SearchUploadWithPage) (int64, interface{}, error)
@@ -72,6 +74,7 @@ type IFileService interface {
 	ChangeName(req request.FileRename) error
 	Wget(w request.FileWget) (string, error)
 	MvFile(m request.FileMove) error
+	StopMvFile(taskID string) error
 	ChangeOwner(req request.FileRoleUpdate) error
 	ChangeMode(op request.FileCreate) error
 	BatchChangeModeAndOwner(op request.FileRoleReq) error
@@ -908,17 +911,62 @@ func (f *FileService) Wget(w request.FileWget) (string, error) {
 
 func (f *FileService) MvFile(m request.FileMove) error {
 	fo := files.NewFileOp()
+	if err := validateFileMove(fo, m); err != nil {
+		return err
+	}
+	if m.TaskID == "" {
+		m.TaskID = common.GetUuid()
+	}
+	if !fileTransferLocks.Acquire(m.TaskID, getFileTransferPaths(m)) {
+		return buserr.New("TaskIsExecuting")
+	}
+	taskItem, err := task.NewTask(m.NewPath, task.TaskExec, task.TaskScopeTask, m.TaskID, 1)
+	if err != nil {
+		fileTransferLocks.Release(m.TaskID)
+		return err
+	}
+	go func() {
+		defer fileTransferLocks.Release(m.TaskID)
+		taskItem.AddSubTaskWithOps(m.NewPath, func(t *task.Task) error {
+			t.LogStart(m.NewPath)
+			err := f.moveFileWithContext(t.TaskCtx, m)
+			if err != nil && t.TaskCtx.Err() != nil {
+				return t.TaskCtx.Err()
+			}
+			return err
+		}, nil, 0, 0)
+		_ = taskItem.Execute()
+	}()
+	return nil
+}
+
+func (f *FileService) StopMvFile(taskID string) error {
+	if cancel, ok := global.LoadTaskCancel(taskID); ok {
+		cancel()
+		return nil
+	}
+	return buserr.New("TaskNotFound")
+}
+
+func validateFileMove(fo files.FileOp, m request.FileMove) error {
 	if !fo.Stat(m.NewPath) {
 		return buserr.New("ErrPathNotFound")
 	}
-	for _, oldPath := range m.OldPaths {
+	for _, oldPath := range append(append([]string{}, m.OldPaths...), m.CoverPaths...) {
 		if !fo.Stat(oldPath) {
 			return buserr.WithName("ErrFileNotFound", oldPath)
 		}
-		if oldPath == m.NewPath || strings.Contains(m.NewPath, filepath.Clean(oldPath)+"/") {
+		oldPath = filepath.Clean(oldPath)
+		newPath := filepath.Clean(m.NewPath)
+		if oldPath == newPath || strings.HasPrefix(newPath, oldPath+string(filepath.Separator)) {
 			return buserr.New("ErrMovePathFailed")
 		}
 	}
+	return nil
+}
+
+func (f *FileService) moveFileWithContext(ctx context.Context, m request.FileMove) error {
+	fo := files.NewFileOp()
 	type moveSnapshot struct {
 		path    string
 		content []byte
@@ -934,13 +982,25 @@ func (f *FileService) MvFile(m request.FileMove) error {
 		}
 		if len(m.CoverPaths) > 0 {
 			for _, src := range m.CoverPaths {
-				if err := fo.CopyAndReName(src, m.NewPath, "", true); err != nil {
+				if err := ctx.Err(); err != nil {
+					return err
+				}
+				if err := fo.CopyAndReNameWithContext(ctx, src, m.NewPath, "", true); err != nil {
 					errs = append(errs, err)
 					global.LOG.Errorf("cut copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
+					continue
+				}
+				if err := ctx.Err(); err != nil {
+					return err
+				}
+				if err := fo.DeleteDir(src); err != nil {
+					removeErr := fmt.Errorf("remove merged source [%s] failed: %w", src, err)
+					errs = append(errs, removeErr)
+					global.LOG.Errorf("%s", removeErr.Error())
 				}
 			}
 		}
-		if err := fo.Cut(m.OldPaths, m.NewPath, m.Name, m.Cover); err != nil {
+		if err := fo.CutWithContext(ctx, m.OldPaths, m.NewPath, m.Name, m.Cover); err != nil {
 			return err
 		}
 		for _, snapshot := range snapshots {
@@ -951,18 +1011,18 @@ func (f *FileService) MvFile(m request.FileMove) error {
 				}
 			}
 		}
-		return nil
+		return aggregateFileMoveErrors(errs)
 	}
 	if m.Type == "copy" {
 		for _, src := range m.OldPaths {
-			if err := fo.CopyAndReName(src, m.NewPath, m.Name, m.Cover); err != nil {
+			if err := fo.CopyAndReNameWithContext(ctx, src, m.NewPath, m.Name, m.Cover); err != nil {
 				errs = append(errs, err)
 				global.LOG.Errorf("copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
 			}
 		}
 		if len(m.CoverPaths) > 0 {
 			for _, src := range m.CoverPaths {
-				if err := fo.CopyAndReName(src, m.NewPath, "", true); err != nil {
+				if err := fo.CopyAndReNameWithContext(ctx, src, m.NewPath, "", true); err != nil {
 					errs = append(errs, err)
 					global.LOG.Errorf("copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
 				}
@@ -970,14 +1030,7 @@ func (f *FileService) MvFile(m request.FileMove) error {
 		}
 	}
 
-	var errString string
-	for _, err := range errs {
-		errString += err.Error() + "\n"
-	}
-	if errString != "" {
-		return errors.New(errString)
-	}
-	return nil
+	return aggregateFileMoveErrors(errs)
 }
 
 func readEditableFileHistoryContent(filePath string) ([]byte, os.FileMode, bool) {
