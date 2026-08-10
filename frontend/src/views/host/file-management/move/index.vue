@@ -1,81 +1,132 @@
 <template>
     <DrawerPro v-model="open" :header="title" @close="handleClose" size="690">
-        <el-form
-            @submit.prevent
-            ref="fileForm"
-            label-position="top"
-            :model="addForm"
-            :rules="rules"
-            v-loading="loading"
-        >
-            <el-alert
-                v-if="type == 'cut' && existFiles?.length == 0 && addForm.cover && changeName"
-                show-icon
-                type="warning"
-                :closable="false"
+        <div class="space-y-4">
+            <div
+                v-if="showTaskStatus"
+                class="rounded-lg border border-[var(--el-border-color-light)] bg-[var(--el-fill-color-light)] px-4 py-3"
             >
-                <template #title>
-                    <span class="whitespace-break-spaces">{{ $t('file.coverDirHelper') }}</span>
-                </template>
-            </el-alert>
-            <el-form-item :label="$t('file.path')" prop="newPath">
-                <el-input v-model="addForm.newPath">
-                    <template #prepend>
-                        <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
-                    </template>
-                </el-input>
-            </el-form-item>
-            <div v-if="changeName">
-                <el-form-item :label="$t('commons.table.name')" prop="name">
-                    <el-input v-model="addForm.name" :disabled="addForm.cover"></el-input>
-                </el-form-item>
-                <el-radio-group v-model="addForm.cover" @change="changeType">
-                    <el-radio :value="true" size="large">{{ $t('file.replace') }}</el-radio>
-                    <el-radio :value="false" size="large">{{ $t('file.rename') }}</el-radio>
-                </el-radio-group>
-            </div>
-            <div v-if="existFiles.length > 0 && !changeName" class="text-center">
-                <el-alert show-icon type="warning" :closable="false">
-                    <template #title>
-                        <span class="whitespace-break-spaces">
-                            {{ $t('file.existFileDirHelper') + $t('file.coverDirHelper') }}
-                        </span>
-                    </template>
-                </el-alert>
-                <el-transfer
-                    v-model="skipFiles"
-                    class="text-left inline-block mt-4"
-                    :titles="[$t('commons.button.cover'), $t('commons.button.skip')]"
-                    :format="{
-                        noChecked: '${total}',
-                        hasChecked: '${checked}/${total}',
-                    }"
-                    :data="transferData"
+                <div class="flex items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <div class="text-sm font-medium text-[var(--el-text-color-secondary)]">
+                            {{ $t('commons.status.executing') }}
+                        </div>
+                        <div class="text-xs text-[var(--el-text-color-secondary)]">
+                            {{ taskInfo?.name || title }}
+                        </div>
+                    </div>
+                    <el-button link type="primary" @click="openTaskLog" :disabled="!currentTaskID">
+                        {{ $t('commons.button.log') }}
+                    </el-button>
+                </div>
+                <el-progress
+                    class="mt-3"
+                    :percentage="100"
+                    :indeterminate="true"
+                    :duration="1"
+                    :stroke-width="8"
+                    :show-text="false"
                 />
             </div>
-        </el-form>
+
+            <el-form
+                v-if="!currentTaskID"
+                @submit.prevent
+                ref="fileForm"
+                label-position="top"
+                :model="addForm"
+                :rules="rules"
+                v-loading="loading"
+            >
+                <el-alert
+                    v-if="type == 'cut' && existFiles?.length == 0 && addForm.cover && changeName"
+                    show-icon
+                    type="warning"
+                    :closable="false"
+                >
+                    <template #title>
+                        <span class="whitespace-break-spaces">{{ $t('file.coverDirHelper') }}</span>
+                    </template>
+                </el-alert>
+                <el-form-item :label="$t('file.path')" prop="newPath">
+                    <el-input v-model="addForm.newPath">
+                        <template #prepend>
+                            <el-button icon="Folder" @click="fileRef.acceptParams({ dir: true })" />
+                        </template>
+                    </el-input>
+                </el-form-item>
+                <div v-if="changeName">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
+                        <el-input v-model="addForm.name" :disabled="addForm.cover"></el-input>
+                    </el-form-item>
+                    <el-radio-group v-model="addForm.cover" @change="changeType">
+                        <el-radio :value="true" size="large">{{ $t('file.replace') }}</el-radio>
+                        <el-radio :value="false" size="large">{{ $t('file.rename') }}</el-radio>
+                    </el-radio-group>
+                </div>
+                <div v-if="existFiles.length > 0 && !changeName" class="text-center">
+                    <el-alert show-icon type="warning" :closable="false">
+                        <template #title>
+                            <span class="whitespace-break-spaces">
+                                {{ $t('file.existFileDirHelper') + $t('file.coverDirHelper') }}
+                            </span>
+                        </template>
+                    </el-alert>
+                    <el-transfer
+                        v-model="skipFiles"
+                        class="text-left inline-block mt-4"
+                        :titles="[$t('commons.button.cover'), $t('commons.button.skip')]"
+                        :format="{
+                            noChecked: '${total}',
+                            hasChecked: '${checked}/${total}',
+                        }"
+                        :data="transferData"
+                    />
+                </div>
+            </el-form>
+        </div>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="handleClose(false)" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(fileForm)" :disabled="loading">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
+                <template v-if="!currentTaskID">
+                    <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button type="primary" @click="submit(fileForm)" :disabled="loading">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </template>
+                <template v-else>
+                    <el-button
+                        v-if="isTaskExecuting || loading"
+                        type="danger"
+                        :loading="stopping"
+                        @click="stopCurrentTask"
+                    >
+                        {{ $t('commons.button.cancel') }}
+                    </el-button>
+                    <el-button @click="openTaskLog">{{ $t('commons.button.log') }}</el-button>
+                    <el-button type="default" @click="closeDrawer">{{ $t('commons.button.close') }}</el-button>
+                </template>
             </span>
         </template>
     </DrawerPro>
     <FileList ref="fileRef" @choose="getPath" />
+    <TaskLog ref="taskLogRef" />
 </template>
 
 <script lang="ts" setup>
-import { batchCheckFiles, checkFile, moveFile } from '@/api/modules/files';
+import { batchCheckFiles, checkFile, moveFile, stopMoveFile } from '@/api/modules/files';
+import { File } from '@/api/interface/file';
+import { Log } from '@/api/interface/log';
+import { searchTasks } from '@/api/modules/log';
+import TaskLog from '@/components/log/task/index.vue';
+import FileList from '@/components/file-list/index.vue';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance, FormRules } from 'element-plus';
-import { ref, reactive, computed, ComputedRef } from 'vue';
-import FileList from '@/components/file-list/index.vue';
-import { MsgSuccess } from '@/utils/message';
+import { ref, reactive, computed, ComputedRef, onMounted, onUnmounted } from 'vue';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { getDateStr } from '@/utils/date';
-import { File } from '@/api/interface/file';
+import { getErrorMessage } from '@/utils/misc';
+import { newUUID } from '@/utils/id';
 
 interface MoveProps {
     oldPaths: Array<string>;
@@ -96,6 +147,17 @@ const existFiles = ref<File.ExistFileInfo[]>([]);
 const skipFiles = ref([]);
 const transferData = ref([]);
 const fileRef = ref();
+const taskLogRef = ref<InstanceType<typeof TaskLog> | null>(null);
+const currentTaskID = ref('');
+const currentTaskNode = ref('');
+const taskInfo = ref<Log.Task | null>(null);
+const stopping = ref(false);
+const canceling = ref(false);
+let taskTimer: ReturnType<typeof setInterval> | null = null;
+const moveTaskKey = 'file-management-move-task';
+const { currentNode } = useGlobalStore();
+
+const getMoveTaskKey = (node: string) => `${moveTaskKey}:${node}`;
 
 const title = computed(() => {
     if (type.value === 'cut') {
@@ -123,12 +185,168 @@ const rules = reactive<FormRules>({
 
 const em = defineEmits(['close', 'loading']);
 
-const handleClose = (search: boolean) => {
-    open.value = false;
+const isTaskExecuting = computed(() => {
+    return !!currentTaskID.value && (!taskInfo.value || taskInfo.value.status === 'Executing');
+});
+
+const showTaskStatus = computed(() => {
+    return !!currentTaskID.value && (loading.value || isTaskExecuting.value);
+});
+
+const syncTaskStorage = () => {
+    const status = taskInfo.value?.status || (currentTaskID.value || loading.value ? 'Executing' : '');
+    const node = currentTaskNode.value || currentNode.value;
+    const storageKey = getMoveTaskKey(node);
+    if (currentTaskID.value && status === 'Executing') {
+        localStorage.setItem(
+            storageKey,
+            JSON.stringify({ taskID: currentTaskID.value, status, type: type.value, node }),
+        );
+        return;
+    }
+    localStorage.removeItem(storageKey);
+};
+
+const stopTaskPolling = () => {
+    if (taskTimer) {
+        clearInterval(taskTimer);
+        taskTimer = null;
+    }
+};
+
+const clearCurrentTask = () => {
+    stopTaskPolling();
+    localStorage.removeItem(getMoveTaskKey(currentTaskNode.value || currentNode.value));
+    currentTaskID.value = '';
+    currentTaskNode.value = '';
+    taskInfo.value = null;
+    loading.value = false;
+    stopping.value = false;
+    canceling.value = false;
+};
+
+const resetDrawerState = () => {
     if (fileForm.value) {
         fileForm.value.resetFields();
     }
-    em('close', search);
+    changeName.value = false;
+    oldName.value = '';
+    existFiles.value = [];
+    skipFiles.value = [];
+    transferData.value = [];
+    addForm.oldPaths = [];
+    addForm.newPath = '';
+    addForm.type = '';
+    addForm.name = '';
+    addForm.allNames = [];
+    addForm.isDir = false;
+    addForm.cover = false;
+    addForm.coverPaths = [];
+    clearCurrentTask();
+    open.value = false;
+};
+
+const closeDrawer = () => {
+    if (isTaskExecuting.value) {
+        open.value = false;
+        return;
+    }
+    resetDrawerState();
+    em('close', false);
+};
+
+const handleClose = () => {
+    if (loading.value) {
+        void stopCurrentTask();
+        return;
+    }
+    closeDrawer();
+};
+
+const loadTaskInfo = async () => {
+    if (!currentTaskID.value) {
+        return;
+    }
+    const taskID = currentTaskID.value;
+    const taskNode = currentTaskNode.value || currentNode.value;
+    try {
+        const res = await searchTasks(
+            {
+                taskID,
+                type: '',
+                status: '',
+                page: 1,
+                pageSize: 1,
+            },
+            taskNode,
+        );
+        if (currentTaskID.value !== taskID || currentTaskNode.value !== taskNode) {
+            return;
+        }
+        const item = res.data.items?.[0];
+        if (!item) {
+            return;
+        }
+        taskInfo.value = item;
+        syncTaskStorage();
+        if (item.status === 'Executing') {
+            return;
+        }
+        stopTaskPolling();
+        if (item.status === 'Success') {
+            if (type.value === 'cut') {
+                MsgSuccess(i18n.global.t('file.moveSuccess'));
+            } else {
+                MsgSuccess(i18n.global.t('file.copySuccess'));
+            }
+            resetDrawerState();
+            em('close', true);
+            return;
+        }
+        if (item.status === 'Canceled') {
+            resetDrawerState();
+            em('close', true);
+            return;
+        }
+        const errorMessage = item.errorMsg || i18n.global.t('commons.msg.operationFailed');
+        clearCurrentTask();
+        MsgError(errorMessage);
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const startTaskPolling = () => {
+    stopTaskPolling();
+    void loadTaskInfo();
+    taskTimer = setInterval(() => {
+        void loadTaskInfo();
+    }, 1500);
+};
+
+const openTaskLog = () => {
+    if (!currentTaskID.value) {
+        return;
+    }
+    taskLogRef.value?.openWithTaskID(currentTaskID.value, true, currentTaskNode.value || currentNode.value);
+};
+
+const stopCurrentTask = async () => {
+    if (!currentTaskID.value || stopping.value) {
+        return;
+    }
+    if (loading.value) {
+        canceling.value = true;
+        return;
+    }
+    stopping.value = true;
+    try {
+        await stopMoveFile(currentTaskID.value, currentTaskNode.value || currentNode.value);
+    } catch (error) {
+        MsgError(getErrorMessage(error));
+    } finally {
+        stopping.value = false;
+    }
 };
 
 const getFileName = (filePath: string) => {
@@ -169,16 +387,32 @@ const changeType = () => {
 };
 
 const mvFile = () => {
+    const taskID = newUUID();
+    currentTaskID.value = taskID;
+    currentTaskNode.value = currentNode.value;
+    taskInfo.value = null;
+    open.value = true;
     loading.value = true;
     em('loading', true);
-    moveFile(addForm)
-        .then(() => {
-            if (type.value === 'cut') {
-                MsgSuccess(i18n.global.t('file.moveSuccess'));
-            } else {
-                MsgSuccess(i18n.global.t('file.copySuccess'));
+    syncTaskStorage();
+    moveFile({ ...addForm, taskID })
+        .then(async () => {
+            loading.value = false;
+            if (canceling.value) {
+                stopping.value = true;
+                try {
+                    await stopMoveFile(taskID, currentTaskNode.value || currentNode.value);
+                } catch (error) {
+                    MsgError(getErrorMessage(error));
+                } finally {
+                    stopping.value = false;
+                }
             }
-            handleClose(true);
+            startTaskPolling();
+        })
+        .catch((error) => {
+            clearCurrentTask();
+            MsgError(getErrorMessage(error));
         })
         .finally(() => {
             loading.value = false;
@@ -192,7 +426,6 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (!valid) {
             return;
         }
-        loading.value = true;
         addForm.coverPaths = coverFiles.value;
         addForm.oldPaths = mvFiles.value;
         mvFile();
@@ -245,6 +478,16 @@ const handleFilePaths = async (fileNames: string[], newPath: string) => {
 };
 
 const acceptParams = async (props: MoveProps) => {
+    if (currentTaskID.value) {
+        if (isTaskExecuting.value) {
+            open.value = true;
+            if (!taskTimer) {
+                startTaskPolling();
+            }
+            return;
+        }
+        resetDrawerState();
+    }
     changeName.value = false;
     addForm.oldPaths = props.oldPaths;
     addForm.type = props.type;
@@ -278,6 +521,39 @@ const acceptParams = async (props: MoveProps) => {
         mvFile();
     }
 };
+
+const restoreTask = () => {
+    const node = currentNode.value;
+    const storageKey = getMoveTaskKey(node);
+    const taskText = localStorage.getItem(storageKey);
+    if (!taskText) {
+        return;
+    }
+    try {
+        const task = JSON.parse(taskText) as { taskID?: string; status?: string; type?: string; node?: string };
+        if (!task.taskID || task.status !== 'Executing' || task.node !== node) {
+            localStorage.removeItem(storageKey);
+            return;
+        }
+        currentTaskID.value = task.taskID;
+        currentTaskNode.value = node;
+        if (task.type === 'copy' || task.type === 'cut') {
+            type.value = task.type;
+        }
+        taskInfo.value = null;
+        startTaskPolling();
+    } catch {
+        localStorage.removeItem(storageKey);
+    }
+};
+
+onMounted(() => {
+    restoreTask();
+});
+
+onUnmounted(() => {
+    stopTaskPolling();
+});
 
 defineExpose({ acceptParams });
 </script>

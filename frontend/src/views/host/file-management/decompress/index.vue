@@ -141,7 +141,9 @@ const em = defineEmits<{
     ): void;
 }>();
 
-const isTaskExecuting = computed(() => taskInfo.value?.status === 'Executing');
+const isTaskExecuting = computed(() => {
+    return !!currentTaskID.value && (!taskInfo.value || taskInfo.value.status === 'Executing');
+});
 const showTaskStatus = computed(() =>
     Boolean(currentTaskID.value || loading.value || canceling.value || stopping.value),
 );
@@ -183,17 +185,19 @@ const loadTaskInfo = async () => {
             },
             currentNode.value,
         );
-        taskInfo.value = res.data.items?.[0] || null;
+        const item = res.data.items?.[0];
+        if (!item) {
+            return;
+        }
+        taskInfo.value = item;
         emitTaskChange();
-        if (!taskInfo.value || taskInfo.value.status !== 'Executing') {
+        if (taskInfo.value.status !== 'Executing') {
             stopTaskPolling();
             resetDrawerState();
             em('close', false);
         }
-    } catch {
-        stopTaskPolling();
-        resetDrawerState();
-        em('close', false);
+    } catch (error) {
+        console.error(error);
     }
 };
 
@@ -221,7 +225,6 @@ const resetDrawerState = () => {
 
 const closeDrawer = () => {
     if (currentTaskID.value && isTaskExecuting.value) {
-        stopTaskPolling();
         open.value = false;
         em('close', false);
         return;
@@ -323,14 +326,17 @@ const submit = async (formEl: FormInstance | undefined) => {
     });
 };
 
-const acceptParams = (props: DecompressProps) => {
+const acceptParams = async (props: DecompressProps) => {
     if (currentTaskID.value) {
-        open.value = true;
-        if (!taskTimer) {
-            startTaskPolling();
+        await loadTaskInfo();
+        if (currentTaskID.value) {
+            open.value = true;
+            if (!taskTimer) {
+                startTaskPolling();
+            }
+            emitTaskChange();
+            return;
         }
-        emitTaskChange();
-        return;
     }
 
     form.value.type = props.type;
@@ -365,9 +371,7 @@ const restoreRunningTask = () => {
             return;
         }
         currentTaskID.value = task.taskID;
-        if (task.status === 'Executing') {
-            emitTaskChange();
-        } else {
+        if (task.status !== 'Executing') {
             localStorage.removeItem(decompressTaskKey);
         }
     } catch {
@@ -377,13 +381,14 @@ const restoreRunningTask = () => {
 
 onMounted(() => {
     restoreRunningTask();
+    if (currentTaskID.value) {
+        startTaskPolling();
+    }
 });
 
 watch(open, (val) => {
-    if (val && currentTaskID.value) {
+    if (val && currentTaskID.value && !taskTimer) {
         startTaskPolling();
-    } else {
-        stopTaskPolling();
     }
 });
 

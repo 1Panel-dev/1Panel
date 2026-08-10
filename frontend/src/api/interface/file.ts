@@ -233,6 +233,11 @@ export namespace File {
         name?: string;
         cover?: boolean;
         coverPaths?: string[];
+        taskID?: string;
+    }
+
+    export interface FileMoveStopReq {
+        taskID: string;
     }
 
     export interface FileDownload {

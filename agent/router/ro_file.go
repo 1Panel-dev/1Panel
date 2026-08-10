@@ -44,6 +44,7 @@ func (f *FileRouter) InitRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/wget", baseApi.WgetFile)
 		fileRouter.POST("/wget/stop", baseApi.StopWget)
 		fileRouter.POST("/move", baseApi.MoveFile)
+		fileRouter.POST("/move/stop", baseApi.StopMoveFile)
 		fileRouter.GET("/download", baseApi.Download)
 		fileRouter.POST("/share/search", baseApi.SearchFileShare)
 		fileRouter.POST("/share/detail", baseApi.GetFileShareDetail)

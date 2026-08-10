@@ -594,6 +594,12 @@ func (f FileOp) DownloadFile(url, dst string) error {
 }
 
 func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), cmdRecursiveTimeout)
+	defer cancel()
+	return f.CutWithContext(ctx, oldPaths, dst, name, cover)
+}
+
+func (f FileOp) CutWithContext(ctx context.Context, oldPaths []string, dst, name string, cover bool) error {
 	if len(oldPaths) == 0 {
 		return nil
 	}
@@ -617,7 +623,7 @@ func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
 	}
 	args = append(args, oldPaths...)
 	args = append(args, dstPath)
-	if err := cmd.NewCommandMgr(cmd.WithTimeout(cmdRecursiveTimeout)).Run("mv", args...); err != nil {
+	if err := cmd.NewCommandMgr(cmd.WithContext(ctx)).Run("mv", args...); err != nil {
 		return err
 	}
 	return nil

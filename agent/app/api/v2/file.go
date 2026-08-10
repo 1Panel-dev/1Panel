@@ -639,6 +639,26 @@ func (b *BaseApi) MoveFile(c *gin.Context) {
 }
 
 // @Tags File
+// @Summary Stop file move task
+// @Accept json
+// @Param request body request.FileMoveStopReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/move/stop [post]
+func (b *BaseApi) StopMoveFile(c *gin.Context) {
+	var req request.FileMoveStopReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := fileService.StopMvFile(req.TaskID); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags File
 // @Summary Download file
 // @Accept json
 // @Success 200
