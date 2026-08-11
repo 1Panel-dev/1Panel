@@ -41,12 +41,13 @@ const (
 type NativeKind string
 
 const (
-	NativeKindRule        NativeKind = "rule"
-	NativeKindZonePort    NativeKind = "zone_port"
-	NativeKindRichRule    NativeKind = "rich_rule"
-	NativeKindUFWRule     NativeKind = "ufw_rule"
-	NativeKindOpaque      NativeKind = "opaque"
-	NativeKindZoneService NativeKind = "zone_service"
+	NativeKindRule           NativeKind = "rule"
+	NativeKindZonePort       NativeKind = "zone_port"
+	NativeKindRichRule       NativeKind = "rich_rule"
+	NativeKindUFWRule        NativeKind = "ufw_rule"
+	NativeKindUFWApplication NativeKind = "ufw_application"
+	NativeKindOpaque         NativeKind = "opaque"
+	NativeKindZoneService    NativeKind = "zone_service"
 )
 
 const (

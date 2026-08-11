@@ -6,6 +6,10 @@ export const searchFirewallRules = (request: Firewall.InventoryRequest) => {
     return http.post<Firewall.Inventory>('/hosts/firewall/rules/search', request, TimeoutEnum.T_40S);
 };
 
+export const loadFirewallNativeDetail = (request: Firewall.NativeDetailRequest) => {
+    return http.post<string>('/hosts/firewall/rules/native/detail', request, TimeoutEnum.T_40S);
+};
+
 export const checkFirewallRule = (request: Firewall.CheckRequest) => {
     return http.post<Firewall.RuleCheckResult>('/hosts/firewall/rules/check', request, TimeoutEnum.T_40S);
 };

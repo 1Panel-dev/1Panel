@@ -77,6 +77,32 @@ func TestFirewallRuleServiceCheckCreateInventoryWorkflow(t *testing.T) {
 	}
 }
 
+func TestFirewallRuleServiceLoadsNativeDetailOnDemand(t *testing.T) {
+	scope := filter.Scope{
+		Provider: filter.ProviderFirewalld, Family: filter.FamilyInet,
+		Zone: filter.FirewalldInputZone, Direction: filter.DirectionInput,
+	}
+	adapter := newFakeFilterAdapter(t, scope, nil)
+	adapter.nativeDetail = "ssh\n  ports: 22/tcp\n  protocols:\n  source-ports:\n  helpers:\n  destination:"
+	service := &FirewallService{
+		adapters: firewallRuleRuntimeRegistry{filter.ProviderFirewalld: newFirewallRuleRuntime(adapter, nil)},
+		selectedProvider: func(context.Context) (filter.Provider, error) {
+			return filter.ProviderFirewalld, nil
+		},
+	}
+
+	info, err := service.LoadFirewallNativeDetail(context.Background(), dto.FirewallNativeDetail{
+		Provider: filter.ProviderFirewalld, NativeKind: filter.NativeKindZoneService,
+		Name: "ssh", Permanent: true,
+	})
+	if err != nil {
+		t.Fatalf("load service info: %v", err)
+	}
+	if info != adapter.nativeDetail || adapter.nativeDetailName != "ssh" || !adapter.nativeDetailPermanent {
+		t.Fatalf("service info request was not passed through: info=%q adapter=%#v", info, adapter)
+	}
+}
+
 func TestFirewallRuleServiceCreateRequiresCheck(t *testing.T) {
 	rule := executorTestRule("8080")
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
@@ -924,12 +950,15 @@ func createExecutorRule(executor *FirewallService, adapter *fakeFilterAdapter, r
 }
 
 type fakeFilterAdapter struct {
-	snapshot         filter.Snapshot
-	rollbackSnapshot filter.Snapshot
-	applyCount       int
-	rollbackCount    int
-	verifyMatched    bool
-	capabilities     filter.Capabilities
+	snapshot              filter.Snapshot
+	rollbackSnapshot      filter.Snapshot
+	applyCount            int
+	rollbackCount         int
+	verifyMatched         bool
+	capabilities          filter.Capabilities
+	nativeDetail          string
+	nativeDetailName      string
+	nativeDetailPermanent bool
 }
 
 type failingFirewallRuleRepo struct {
@@ -1056,6 +1085,12 @@ func (f *fakeFilterAdapter) Rollback(context.Context, filter.BackendPlan) error 
 	f.rollbackCount++
 	f.snapshot = f.rollbackSnapshot
 	return nil
+}
+
+func (f *fakeFilterAdapter) NativeDetail(_ context.Context, name string, permanent bool) (string, error) {
+	f.nativeDetailName = name
+	f.nativeDetailPermanent = permanent
+	return f.nativeDetail, nil
 }
 
 func executorTestRule(port string) filter.FirewallRule {

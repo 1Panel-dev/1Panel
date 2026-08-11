@@ -4148,6 +4148,13 @@ const message = {
         protected: 'Protegida pelo sistema',
         protectedHelper:
             'Regra crítica do sistema que não pode ser editada ou excluída para evitar interrupções de acesso.',
+        stateShort: {
+            managed: 'Painel',
+            adopted: 'Gerenciada',
+            external: 'Externa',
+            protected: 'Protegida',
+            drifted: 'Divergente',
+        },
         ruleTargetRequired: 'Informe pelo menos um endereço IP ou uma porta',
         batchRuleLimit: 'É possível criar no máximo {0} regras por vez',
         resolution_create: 'Criar regra',

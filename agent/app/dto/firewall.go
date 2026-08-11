@@ -48,6 +48,13 @@ type FirewallRuleInventory struct {
 	Scope filter.Scope `json:"scope" validate:"required"`
 }
 
+type FirewallNativeDetail struct {
+	Provider   filter.Provider   `json:"provider" validate:"required,oneof=firewalld ufw"`
+	NativeKind filter.NativeKind `json:"nativeKind" validate:"required,oneof=zone_service ufw_application"`
+	Name       string            `json:"name" validate:"required"`
+	Permanent  bool              `json:"permanent"`
+}
+
 type FirewallRuleCheck struct {
 	UUID string              `json:"uuid"`
 	Rule filter.FirewallRule `json:"rule" validate:"required"`

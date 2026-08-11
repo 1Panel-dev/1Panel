@@ -3,7 +3,8 @@ export namespace Firewall {
     export type Family = 'ipv4' | 'ipv6' | 'inet';
     export type Direction = 'input';
     export type Action = 'accept' | 'drop' | 'reject';
-    export type NativeKind = 'rule' | 'zone_port' | 'rich_rule' | 'ufw_rule' | 'opaque' | 'zone_service';
+    export type NativeKind =
+        'rule' | 'zone_port' | 'rich_rule' | 'ufw_rule' | 'ufw_application' | 'opaque' | 'zone_service';
     export type ParseStatus = 'supported' | 'opaque';
     export type PersistenceStatus = 'converged' | 'runtime_only' | 'permanent_only';
 
@@ -119,6 +120,13 @@ export namespace Firewall {
 
     export interface InventoryRequest {
         scope: Scope;
+    }
+
+    export interface NativeDetailRequest {
+        provider: 'firewalld' | 'ufw';
+        nativeKind: 'zone_service' | 'ufw_application';
+        name: string;
+        permanent: boolean;
     }
 
     export interface CheckRequest {

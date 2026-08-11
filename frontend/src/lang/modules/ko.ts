@@ -3979,6 +3979,7 @@ const message = {
         drifted: '불일치',
         protected: '시스템 보호',
         protectedHelper: '접속 장애를 방지하기 위해 편집하거나 삭제할 수 없는 중요한 시스템 규칙입니다.',
+        stateShort: { managed: '패널', adopted: '관리', external: '외부', protected: '보호', drifted: '불일치' },
         ruleTargetRequired: 'IP 주소 또는 포트를 하나 이상 입력하세요',
         batchRuleLimit: '한 번에 최대 {0}개의 규칙을 생성할 수 있습니다',
         resolution_create: '규칙 생성',

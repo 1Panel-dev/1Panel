@@ -78,6 +78,26 @@ func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snaps
 	return snapshot, nil
 }
 
+// NativeDetail loads a UFW application profile only when its detail is opened.
+func (a *Adapter) NativeDetail(ctx context.Context, profile string, _ bool) (string, error) {
+	profile = strings.TrimSpace(profile)
+	if !validApplicationProfileName(profile) {
+		return "", fmt.Errorf("%w: invalid UFW application profile name", filter.ErrInvalidRule)
+	}
+	if a.reader == nil {
+		return "", errors.New("ufw reader is required")
+	}
+	info, err := a.reader.Read(ctx, "app", "info", profile)
+	if err != nil {
+		return "", fmt.Errorf("read UFW application profile %q: %w", profile, err)
+	}
+	info = strings.TrimSpace(info)
+	if info == "" {
+		return "", fmt.Errorf("read UFW application profile %q: empty output", profile)
+	}
+	return info, nil
+}
+
 func (a *Adapter) Compile(snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.BackendPlan, error) {
 	if snapshot.Revision == "" {
 		return filter.BackendPlan{}, filter.ErrRuleStale
@@ -594,10 +614,6 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 		return opaque()
 	}
 
-	destinationAddress, destinationPort, protocol, iface, ok := parseDestination(destination)
-	if !ok {
-		return opaque()
-	}
 	sourceAddress, ok := parseSource(source)
 	if !ok {
 		return opaque()
@@ -611,6 +627,22 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 		return opaque()
 	}
 	order := int64(position)
+	destinationAddress, destinationPort, protocol, iface, ok := parseDestination(destination)
+	if !ok {
+		profile, profileInterface, profileOK := applicationProfile(destination)
+		if !profileOK {
+			return opaque()
+		}
+		return filter.ObservedRule{
+			Rule: filter.FirewallRule{
+				Scope: scope, NativeKind: filter.NativeKindUFWApplication, Protocol: "",
+				SourceAddress: sourceAddress, Interface: profileInterface, Action: ruleAction,
+				OrderIndex: &order, Description: profile,
+			},
+			Locator: locator, ParseStatus: filter.ParseStatusOpaque, Raw: raw,
+			Persistence: filter.PersistenceStatusConverged,
+		}
+	}
 	rule := filter.FirewallRule{
 		Scope: scope, NativeKind: filter.NativeKindUFWRule, Protocol: protocol,
 		SourceAddress: sourceAddress, DestinationAddress: destinationAddress, DestinationPort: destinationPort,
@@ -631,6 +663,32 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 		Rule: normalized, Locator: locator, Marker: marker, ParseStatus: filter.ParseStatusSupported,
 		Raw: raw, Persistence: filter.PersistenceStatusConverged,
 	}
+}
+
+func applicationProfile(value string) (string, string, bool) {
+	profile, iface, ok := splitInterface(value)
+	profile = strings.TrimSpace(profile)
+	if !ok || !validApplicationProfileName(profile) {
+		return "", "", false
+	}
+	return profile, iface, true
+}
+
+func validApplicationProfileName(profile string) bool {
+	profile = strings.TrimSpace(profile)
+	if profile == "" || len(profile) > 255 || strings.ContainsAny(profile, "/\\\r\n\x00") {
+		return false
+	}
+	hasLetter := false
+	for _, char := range profile {
+		if char < 0x20 || char == 0x7f {
+			return false
+		}
+		if (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') {
+			hasLetter = true
+		}
+	}
+	return hasLetter
 }
 
 func familyForNumberedRule(destination, source string) filter.Family {

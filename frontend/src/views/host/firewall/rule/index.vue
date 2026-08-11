@@ -82,11 +82,33 @@
                             </el-checkbox-group>
                         </el-popover>
                         <div class="firewall-filter-bar">
-                            <el-select v-model="selectedFamily" class="p-w-200" @change="resetPagination">
-                                <template #prefix>IP</template>
-                                <el-option :label="$t('commons.table.all')" value="all" />
-                                <el-option label="IPv4" value="ipv4" />
-                                <el-option label="IPv6" value="ipv6" />
+                            <el-select
+                                v-model="selectedRuleFilters"
+                                class="firewall-rule-filter"
+                                :placeholder="$t('menu.filter')"
+                                multiple
+                                clearable
+                                collapse-tags
+                                collapse-tags-tooltip
+                                :max-collapse-tags="4"
+                                popper-class="firewall-rule-filter-popper"
+                                @change="changeRuleFilter"
+                            >
+                                <el-option-group label="IP">
+                                    <el-option label="IPv4" value="family:ipv4" />
+                                    <el-option label="IPv6" value="family:ipv6" />
+                                </el-option-group>
+                                <el-option-group :label="$t('firewall.action')">
+                                    <el-option :label="$t('firewall.accept')" value="action:accept" />
+                                    <el-option :label="$t('firewall.drop')" value="action:deny" />
+                                </el-option-group>
+                                <el-option-group :label="$t('commons.table.status')">
+                                    <el-option :label="$t('firewall.managed')" value="state:managed" />
+                                    <el-option :label="$t('firewall.adopted')" value="state:adopted" />
+                                    <el-option :label="$t('firewall.external')" value="state:external" />
+                                    <el-option :label="$t('firewall.protected')" value="state:protected" />
+                                    <el-option :label="$t('firewall.drifted')" value="state:drifted" />
+                                </el-option-group>
                             </el-select>
                         </div>
                         <TableSearch v-model:searchName="searchName" @search="resetPagination" />
@@ -123,35 +145,27 @@
                                         {{ displayRulePriority(row) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="$t('commons.table.status')" width="95" align="center">
+                                <el-table-column :label="$t('commons.table.status')" width="100" align="center">
                                     <template #default="{ row }">
-                                        <el-tooltip v-if="stateIcon(row.state)" placement="right">
-                                            <template #content>
-                                                <div>
-                                                    <div>
-                                                        {{ $t(`firewall.${row.state}`) }}
-                                                    </div>
-                                                    <div>{{ $t(`firewall.${row.state}Helper`) }}</div>
-                                                </div>
-                                            </template>
-                                            <el-icon>
-                                                <component :is="stateIcon(row.state)" />
-                                            </el-icon>
-                                        </el-tooltip>
-                                        <el-tag v-else :type="stateTagType(row.state)" effect="plain">
-                                            {{ $t(`firewall.${row.state}`) }}
+                                        <el-tag
+                                            class="firewall-state-tag"
+                                            :type="stateTagType(row.state)"
+                                            effect="plain"
+                                            size="small"
+                                        >
+                                            {{ $t(`firewall.stateShort.${row.state}`) }}
                                         </el-tag>
                                     </template>
                                 </el-table-column>
                                 <el-table-column :label="$t('commons.table.protocol')" width="85">
                                     <template #default="{ row }">
-                                        {{ row.rule.protocol?.toUpperCase() || '-' }}
+                                        {{ displayProtocol(row) }}
                                     </template>
                                 </el-table-column>
                                 <el-table-column label="IP" min-width="200" show-overflow-tooltip>
                                     <template #default="{ row }">
                                         <span>
-                                            {{ displayAddress(row.rule, row.rule.sourceAddress) }}
+                                            {{ displayAddress(row) }}
                                         </span>
                                     </template>
                                 </el-table-column>
@@ -162,13 +176,14 @@
                                 >
                                     <template #default="{ row }">
                                         <span>
-                                            {{ displayPort(row.rule.destinationPort) }}
+                                            {{ displayPort(row) }}
                                         </span>
                                     </template>
                                 </el-table-column>
                                 <el-table-column :label="$t('firewall.used')" min-width="220">
                                     <template #default="{ row }">
-                                        <el-tag v-if="ruleUsageEntries(row).length === 0" type="info" size="small">
+                                        <span v-if="isOpaqueRule(row)">-</span>
+                                        <el-tag v-else-if="ruleUsageEntries(row).length === 0" type="info" size="small">
                                             {{ $t('firewall.unUsed') }}
                                         </el-tag>
                                         <div v-else class="firewall-used-cell">
@@ -266,7 +281,13 @@
 <script lang="ts" setup>
 import { Firewall } from '@/api/interface/firewall';
 import { Process } from '@/api/interface/process';
-import { checkFirewallRule, createFirewallRule, deleteFirewallRule, searchFirewallRules } from '@/api/modules/firewall';
+import {
+    checkFirewallRule,
+    createFirewallRule,
+    deleteFirewallRule,
+    loadFirewallNativeDetail,
+    searchFirewallRules,
+} from '@/api/modules/firewall';
 import { getListeningProcess } from '@/api/modules/process';
 import i18n from '@/lang';
 import { getCurrentDateFormatted } from '@/utils/date';
@@ -279,7 +300,7 @@ import FireStatus from '@/views/host/firewall/status/index.vue';
 import ProcessDetail from '@/views/host/process/process/detail/index.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { ElMessageBox } from 'element-plus';
-import { CirclePlus, Expand, Filter, Link, Lock } from '@element-plus/icons-vue';
+import { Expand, Filter } from '@element-plus/icons-vue';
 
 interface RuleRow extends Firewall.InventoryItem {
     rowKey: string;
@@ -302,6 +323,8 @@ interface PriorityPositionRange {
     max: number;
 }
 
+type RuleFilter = 'family:ipv4' | 'family:ipv6' | 'action:accept' | 'action:deny' | `state:${Firewall.InventoryState}`;
+
 const fireStatusRef = ref<InstanceType<typeof FireStatus>>();
 const ruleOperateRef = ref<InstanceType<typeof RuleOperate>>();
 const ruleImportRef = ref<InstanceType<typeof RuleImport>>();
@@ -311,7 +334,7 @@ const maskShow = ref(true);
 const isActive = ref(false);
 const isBind = ref(false);
 const provider = ref('');
-const selectedFamily = ref<'all' | 'ipv4' | 'ipv6'>('all');
+const selectedRuleFilters = ref<RuleFilter[]>([]);
 const iptablesChains = ['1PANEL_BASIC_BEFORE', '1PANEL_BASIC', '1PANEL_BASIC_AFTER'] as const;
 const visibleIptablesChains = ref<string[]>(['1PANEL_BASIC']);
 const searchName = ref('');
@@ -394,12 +417,67 @@ const wildcardAddress = (family: Firewall.Family) => {
     return '0.0.0.0/0';
 };
 
-const displayAddress = (rule: Firewall.Rule, address?: string) => {
-    const wildcard = wildcardAddress(rule.scope.family);
+const isOpaqueRule = (row: Firewall.InventoryItem) => row.observed?.parseStatus === 'opaque';
+const rowProvider = (row: Firewall.InventoryItem) => row.rule.scope.provider || row.observed?.locator.provider;
+const rowNativeKind = (row: Firewall.InventoryItem) => row.rule.nativeKind || row.observed?.rule.nativeKind;
+const isFirewalldService = (row: Firewall.InventoryItem) => {
+    const canonical = row.observed?.locator.canonical || row.observed?.locator.nativeId || '';
+    return (
+        rowProvider(row) === 'firewalld' && (rowNativeKind(row) === 'zone_service' || canonical.startsWith('service:'))
+    );
+};
+const isUFWApplication = (row: Firewall.InventoryItem) =>
+    rowProvider(row) === 'ufw' && rowNativeKind(row) === 'ufw_application';
+
+const firewalldServiceName = (row: Firewall.InventoryItem) => {
+    const description = row.rule.description?.trim() || row.observed?.rule.description?.trim();
+    if (description) return description;
+    const canonical = row.observed?.locator.canonical || row.observed?.locator.nativeId || '';
+    if (canonical.startsWith('service:')) return canonical.slice('service:'.length).trim();
+    return row.observed?.raw?.trim().split(/\r?\n/, 1)[0]?.trim() || '';
+};
+
+const ufwApplicationName = (row: Firewall.InventoryItem) => {
+    const description = row.rule.description?.trim() || row.observed?.rule.description?.trim();
+    if (description) return description;
+    const raw = row.observed?.raw || '';
+    return raw.match(/^\s*\[\s*\d+\]\s+(.+?)\s+(?:ALLOW|DENY|REJECT)(?:\s+(?:IN|OUT|FWD))?\s+/)?.[1]?.trim() || '';
+};
+
+const nativeDetailTarget = (row: Firewall.InventoryItem): Firewall.NativeDetailRequest | undefined => {
+    if (isFirewalldService(row)) {
+        const name = firewalldServiceName(row);
+        if (!name) return undefined;
+        return {
+            provider: 'firewalld',
+            nativeKind: 'zone_service',
+            name,
+            permanent: row.observed?.persistence === 'permanent_only',
+        };
+    }
+    if (isUFWApplication(row)) {
+        const name = ufwApplicationName(row);
+        if (!name) return undefined;
+        return { provider: 'ufw', nativeKind: 'ufw_application', name, permanent: false };
+    }
+};
+const displayProtocol = (row: Firewall.InventoryItem) => {
+    if (isFirewalldService(row)) return 'SERVICE';
+    if (isUFWApplication(row)) return 'APP';
+    if (isOpaqueRule(row)) return '-';
+    return row.rule.protocol?.toUpperCase() || '-';
+};
+const displayAddress = (row: Firewall.InventoryItem) => {
+    if (isOpaqueRule(row)) return '-';
+    const wildcard = wildcardAddress(row.rule.scope.family);
+    const address = row.rule.sourceAddress;
     if (address && address !== wildcard) return address;
     return `${wildcard}（${i18n.global.t('firewall.anyWhere')}）`;
 };
-const displayPort = (port?: string) => port || '*';
+const displayPort = (row: Firewall.InventoryItem) => {
+    if (isOpaqueRule(row)) return '-';
+    return row.rule.destinationPort || '*';
+};
 const extractListeningPorts = (portMap: Process.ListeningProcess['Port']) =>
     Object.keys(portMap || {})
         .map(Number)
@@ -438,7 +516,7 @@ const loadListeningProcesses = async () => {
     }
 };
 const ruleUsageEntries = (row: RuleRow): UsageEntry[] => {
-    if (row.rule.scope.direction !== 'input') return [];
+    if (row.rule.scope.direction !== 'input' || isOpaqueRule(row)) return [];
     const protocols = listeningProtocolNumbers(row.rule.protocol);
     return listeningProcesses.value.flatMap((process) => {
         if (!protocols.includes(process.Protocol)) return [];
@@ -521,13 +599,35 @@ const allRows = computed<RuleRow[]>(() =>
     }),
 );
 
-const matchesFamilyFilter = (rule: Firewall.Rule) => {
-    if (selectedFamily.value === 'all') return true;
-    if (rule.scope.family !== 'inet') return rule.scope.family === selectedFamily.value;
+const matchesRuleFamily = (rule: Firewall.Rule, family: Firewall.Family) => {
+    if (rule.scope.family !== 'inet') return rule.scope.family === family;
 
     const address = rule.sourceAddress;
     if (!address) return true;
-    return selectedFamily.value === 'ipv6' ? address.includes(':') : !address.includes(':');
+    return family === 'ipv6' ? address.includes(':') : !address.includes(':');
+};
+
+const matchesRuleFilters = (item: Firewall.InventoryItem) => {
+    const familyFilters = selectedRuleFilters.value.filter((filter) => filter.startsWith('family:'));
+    if (
+        familyFilters.length > 0 &&
+        !familyFilters.some((filter) => matchesRuleFamily(item.rule, filter.slice('family:'.length) as Firewall.Family))
+    ) {
+        return false;
+    }
+
+    const actionFilters = selectedRuleFilters.value.filter((filter) => filter.startsWith('action:'));
+    if (
+        actionFilters.length > 0 &&
+        !actionFilters.some((filter) =>
+            filter === 'action:accept' ? item.rule.action === 'accept' : item.rule.action !== 'accept',
+        )
+    ) {
+        return false;
+    }
+
+    const stateFilters = selectedRuleFilters.value.filter((filter) => filter.startsWith('state:'));
+    return stateFilters.length === 0 || stateFilters.some((filter) => item.state === filter.slice('state:'.length));
 };
 
 const filteredItems = computed<RuleRow[]>(() => {
@@ -539,18 +639,19 @@ const filteredItems = computed<RuleRow[]>(() => {
         ) {
             return false;
         }
-        if (!matchesFamilyFilter(item.rule)) {
+        if (!matchesRuleFilters(item)) {
             return false;
         }
         if (!keyword) return true;
         return [
-            item.rule.protocol,
-            displayAddress(item.rule, item.rule.sourceAddress),
-            displayPort(item.rule.destinationPort),
+            displayProtocol(item),
+            displayAddress(item),
+            displayPort(item),
             item.rule.sourceAddress,
             item.rule.sourcePort,
             item.rule.destinationAddress,
             item.rule.description,
+            item.observed?.raw,
             item.rule.action,
             item.state,
         ].some((value) => value?.toLowerCase().includes(keyword));
@@ -567,6 +668,11 @@ const resetPagination = () => {
 };
 
 const changeIptablesChainFilter = () => {
+    selects.value = [];
+    resetPagination();
+};
+
+const changeRuleFilter = () => {
     selects.value = [];
     resetPagination();
 };
@@ -623,20 +729,10 @@ const actionLabel = (action: Firewall.Action) => {
 };
 
 const stateTagType = (state: Firewall.InventoryState) => {
-    if (state === 'managed' || state === 'adopted') {
-        return 'success';
-    }
-    if (state === 'drifted' || state === 'protected') {
-        return 'danger';
-    }
+    if (state === 'managed' || state === 'adopted') return 'primary';
+    if (state === 'protected') return 'warning';
+    if (state === 'drifted') return 'danger';
     return 'info';
-};
-
-const stateIcon = (state: Firewall.InventoryState) => {
-    if (state === 'managed') return CirclePlus;
-    if (state === 'adopted') return Link;
-    if (state === 'protected') return Lock;
-    return undefined;
 };
 
 const openCreate = async () => {
@@ -722,7 +818,12 @@ const removeSelectedRules = async () => {
 };
 
 const viewRawRule = async (row: RuleRow) => {
-    const raw = row.observed?.raw?.trim();
+    let raw = row.observed?.raw?.trim();
+    const target = nativeDetailTarget(row);
+    if (target) {
+        const response = await loadFirewallNativeDetail(target);
+        raw = response.data.trim();
+    }
     if (!raw) return;
     try {
         await ElMessageBox.alert(raw, i18n.global.t('commons.button.view'), {
@@ -871,6 +972,10 @@ onMounted(() => {
     gap: 8px;
 }
 
+.firewall-rule-filter {
+    width: 480px;
+}
+
 .firewall-chain-filter-title {
     margin-bottom: 8px;
     font-weight: 500;
@@ -903,6 +1008,11 @@ onMounted(() => {
     flex: none;
     font-size: 14px;
     line-height: 1;
+}
+
+.firewall-state-tag {
+    min-width: 58px;
+    justify-content: center;
 }
 
 .firewall-used-cell {
@@ -980,5 +1090,30 @@ onMounted(() => {
     font-family: monospace;
     white-space: pre-wrap;
     word-break: break-all;
+}
+
+:global(.firewall-rule-filter-popper .el-select-group__wrap) {
+    padding: 6px 8px 8px;
+}
+
+:global(.firewall-rule-filter-popper .el-select-group__wrap:not(:last-of-type)) {
+    padding-bottom: 10px;
+}
+
+:global(.firewall-rule-filter-popper .el-select-group__wrap:not(:last-of-type)::after) {
+    display: none;
+}
+
+:global(.firewall-rule-filter-popper .el-select-group__title) {
+    height: 30px;
+    margin-bottom: 4px;
+    padding: 0 10px;
+    border-left: 3px solid var(--el-color-primary);
+    border-radius: 4px;
+    background: var(--el-fill-color-light);
+    color: var(--el-text-color-primary);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 30px;
 }
 </style>

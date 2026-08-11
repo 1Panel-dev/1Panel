@@ -4107,6 +4107,13 @@ const message = {
         protected: 'Protegida por el sistema',
         protectedHelper:
             'Regla crítica del sistema que no se puede editar ni eliminar para evitar interrumpir el acceso.',
+        stateShort: {
+            managed: 'Panel',
+            adopted: 'Gestionada',
+            external: 'Externa',
+            protected: 'Protegida',
+            drifted: 'Desviada',
+        },
         ruleTargetRequired: 'Introduce al menos una dirección IP o un puerto',
         batchRuleLimit: 'Se pueden crear como máximo {0} reglas a la vez',
         resolution_create: 'Crear regla',

@@ -3951,6 +3951,7 @@ const message = {
         drifted: 'ບໍ່ກົງກັນ',
         protected: 'ລະບົບປົກປ້ອງ',
         protectedHelper: 'ກົດສຳຄັນຂອງລະບົບທີ່ບໍ່ສາມາດແກ້ໄຂ ຫຼື ລຶບໄດ້ ເພື່ອຫຼີກລ້ຽງການຂັດຂວາງການເຂົ້າເຖິງ.',
+        stateShort: { managed: 'ແຜງ', adopted: 'ຈັດການ', external: 'ພາຍນອກ', protected: 'ປົກປ້ອງ', drifted: 'ບໍ່ກົງ' },
         ruleTargetRequired: 'ກະລຸນາປ້ອນ IP ຫຼື ພອດຢ່າງໜ້ອຍໜຶ່ງລາຍການ',
         batchRuleLimit: 'ສາມາດສ້າງກົດໄດ້ສູງສຸດ {0} ລາຍການຕໍ່ຄັ້ງ',
         resolution_create: 'ສ້າງກົດ',

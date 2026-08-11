@@ -4128,6 +4128,13 @@ const message = {
         protected: 'Dilindungi sistem',
         protectedHelper:
             'Peraturan sistem kritikal yang tidak boleh diedit atau dipadam untuk mengelakkan gangguan akses.',
+        stateShort: {
+            managed: 'Panel',
+            adopted: 'Terurus',
+            external: 'Luaran',
+            protected: 'Dilindungi',
+            drifted: 'Berbeza',
+        },
         ruleTargetRequired: 'Masukkan sekurang-kurangnya satu alamat IP atau port',
         batchRuleLimit: 'Maksimum {0} peraturan boleh dibuat pada satu masa',
         resolution_create: 'Cipta peraturan',

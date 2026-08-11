@@ -68,6 +68,12 @@ type RulePreparer interface {
 	PrepareRule(FirewallRule) (FirewallRule, error)
 }
 
+// NativeDetailReader loads provider-specific details for an opaque named
+// object, such as a firewalld service or UFW application profile.
+type NativeDetailReader interface {
+	NativeDetail(context.Context, string, bool) (string, error)
+}
+
 // PlanRollbacker reverses a backend plan that was applied completely but
 // could not be committed, for example after verification or DB persistence
 // fails. Apply implementations remain responsible for compensating partially

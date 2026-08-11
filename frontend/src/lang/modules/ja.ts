@@ -4055,6 +4055,7 @@ const message = {
         drifted: '不整合',
         protected: 'システム保護',
         protectedHelper: 'アクセスへの影響を防ぐため、編集や削除ができない重要なシステムルールです。',
+        stateShort: { managed: 'パネル', adopted: '管理済', external: '外部', protected: '保護', drifted: '差異' },
         ruleTargetRequired: 'IP アドレスまたはポートを1つ以上入力してください',
         batchRuleLimit: '一度に作成できるルールは最大 {0} 件です',
         resolution_create: 'ルールを作成',

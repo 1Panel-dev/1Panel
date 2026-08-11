@@ -46,6 +46,7 @@ type IFirewallService interface {
 	OperateFirewall(req dto.FirewallOperation) error
 	OperateFilterChain(req dto.IptablesOp) error
 	Inventory(context.Context, dto.FirewallRuleInventory) (dto.FirewallRuleInventoryResponse, error)
+	LoadFirewallNativeDetail(context.Context, dto.FirewallNativeDetail) (string, error)
 	Check(context.Context, string, dto.FirewallRuleCheck) (dto.FirewallRuleCheckResponse, error)
 	CheckBatch(context.Context, string, dto.FirewallRuleBatchCheck) (dto.FirewallRuleBatchCheckResponse, error)
 	Create(context.Context, dto.FirewallRuleCreate) error
@@ -163,6 +164,35 @@ func (s *FirewallService) Inventory(ctx context.Context, request dto.FirewallRul
 		return dto.FirewallRuleInventoryResponse{}, err
 	}
 	return dto.FirewallRuleInventoryResponse{Items: items, Notices: snapshot.Notices}, nil
+}
+
+func (s *FirewallService) LoadFirewallNativeDetail(ctx context.Context, request dto.FirewallNativeDetail) (string, error) {
+	provider := filter.Provider(strings.ToLower(strings.TrimSpace(string(request.Provider))))
+	nativeKind := filter.NativeKind(strings.ToLower(strings.TrimSpace(string(request.NativeKind))))
+	switch provider {
+	case filter.ProviderFirewalld:
+		if nativeKind != filter.NativeKindZoneService {
+			return "", fmt.Errorf("%w: firewalld detail kind %q", filter.ErrInvalidRule, nativeKind)
+		}
+	case filter.ProviderUFW:
+		if nativeKind != filter.NativeKindUFWApplication {
+			return "", fmt.Errorf("%w: UFW detail kind %q", filter.ErrInvalidRule, nativeKind)
+		}
+	default:
+		return "", fmt.Errorf("%w: native details for %s", filter.ErrUnsupportedScope, provider)
+	}
+	if err := s.checkSelectedProvider(ctx, provider); err != nil {
+		return "", err
+	}
+	runtime, err := s.adapters.Resolve(provider)
+	if err != nil {
+		return "", err
+	}
+	informer, ok := runtime.adapter.(filter.NativeDetailReader)
+	if !ok {
+		return "", fmt.Errorf("%w: native details for %s", filter.ErrAdapterUnavailable, provider)
+	}
+	return informer.NativeDetail(ctx, request.Name, request.Permanent)
 }
 
 func (s *FirewallService) Check(ctx context.Context, clientIP string, request dto.FirewallRuleCheck) (dto.FirewallRuleCheckResponse, error) {

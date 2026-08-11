@@ -98,6 +98,11 @@ func TestObserveNumberedIncomingIPv4PreservesGlobalPositions(t *testing.T) {
 	if second.ParseStatus != filter.ParseStatusSupported || second.Rule.SourceAddress != "172.16.10.111/32" || second.Rule.Action != filter.ActionDrop {
 		t.Fatalf("unexpected source deny: %#v", second)
 	}
+	application := snapshot.Rules[2]
+	if application.ParseStatus != filter.ParseStatusOpaque || application.Rule.NativeKind != filter.NativeKindUFWApplication ||
+		application.Rule.Description != "OpenSSH" || application.Rule.Protocol != "" || application.Rule.Action != filter.ActionAccept {
+		t.Fatalf("UFW application profile was not identified: %#v", application)
+	}
 	eighth := snapshot.Rules[4]
 	if eighth.ParseStatus != filter.ParseStatusSupported || eighth.Rule.DestinationPort != "6000-6010" || eighth.Rule.Interface != "eth1" {
 		t.Fatalf("unexpected range rule: %#v", eighth)
@@ -107,11 +112,35 @@ func TestObserveNumberedIncomingIPv4PreservesGlobalPositions(t *testing.T) {
 			t.Fatalf("expected rule at slice index %d to be opaque: %#v", index, snapshot.Rules[index])
 		}
 	}
+	longApplication := snapshot.Rules[7]
+	if longApplication.Rule.NativeKind != filter.NativeKindUFWApplication ||
+		longApplication.Rule.Description != "a-very-long-application-profile-name" {
+		t.Fatalf("long UFW application profile was not preserved: %#v", longApplication)
+	}
 	if !hasNotice(snapshot.Notices, filter.ScopeNoticeDefaultPolicy) {
 		t.Fatalf("expected default policy notice: %#v", snapshot.Notices)
 	}
 	if !reflect.DeepEqual(reader.calls, [][]string{{"status", "numbered"}, {"status", "verbose"}}) {
 		t.Fatalf("unexpected commands: %#v", reader.calls)
+	}
+}
+
+func TestNativeDetailRunsUFWAppInfoWithCompleteProfileName(t *testing.T) {
+	info := "Profile: Nginx Full\nTitle: Web Server (Nginx, HTTP + HTTPS)\nDescription: Small, but very powerful and efficient web server\n\nPorts:\n  80,443/tcp"
+	reader := &fakeReader{outputs: map[string]string{"app info Nginx Full": info}}
+
+	got, err := NewAdapterWithReader(reader).NativeDetail(context.Background(), "Nginx Full", false)
+	if err != nil {
+		t.Fatalf("load UFW application detail: %v", err)
+	}
+	if got != info || !reflect.DeepEqual(reader.calls, [][]string{{"app", "info", "Nginx Full"}}) {
+		t.Fatalf("unexpected UFW application detail: output=%q calls=%#v", got, reader.calls)
+	}
+}
+
+func TestNativeDetailRejectsInvalidUFWProfileName(t *testing.T) {
+	if _, err := NewAdapterWithReader(&fakeReader{}).NativeDetail(context.Background(), "../OpenSSH", false); !errors.Is(err, filter.ErrInvalidRule) {
+		t.Fatalf("expected invalid UFW profile rejection, got %v", err)
 	}
 }
 

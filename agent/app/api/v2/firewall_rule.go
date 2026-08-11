@@ -35,6 +35,28 @@ func (b *BaseApi) SearchFirewallRules(c *gin.Context) {
 }
 
 // @Tags Firewall
+// @Summary Load one provider-native firewall object definition
+// @Accept json
+// @Param request body dto.FirewallNativeDetail true "request"
+// @Success 200 {string} string
+// @Failure 400 {object} dto.Response
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/rules/native/detail [post]
+func (b *BaseApi) LoadFirewallNativeDetail(c *gin.Context) {
+	var request dto.FirewallNativeDetail
+	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
+	}
+	info, err := firewallService.LoadFirewallNativeDetail(c.Request.Context(), request)
+	if err != nil {
+		handleFirewallRuleError(c, err)
+		return
+	}
+	helper.SuccessWithData(c, info)
+}
+
+// @Tags Firewall
 // @Summary Check a unified firewall v2 rule for duplicates and conflicts
 // @Accept json
 // @Param request body dto.FirewallRuleCheck true "request"

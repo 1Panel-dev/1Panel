@@ -4029,6 +4029,7 @@ const message = {
         drifted: 'ناهمگام',
         protected: 'محافظت‌شده توسط سیستم',
         protectedHelper: 'قانون حیاتی سیستم که برای جلوگیری از اختلال در دسترسی قابل ویرایش یا حذف نیست.',
+        stateShort: { managed: 'پنل', adopted: 'مدیریت', external: 'خارجی', protected: 'محافظت', drifted: 'ناهمگام' },
         ruleTargetRequired: 'حداقل یک نشانی IP یا درگاه وارد کنید',
         batchRuleLimit: 'در هر بار حداکثر می‌توان {0} قانون ایجاد کرد',
         resolution_create: 'ایجاد قانون',

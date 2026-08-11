@@ -28,6 +28,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/firewall/forward/operate", baseApi.OperateForwardRule)
 		hostRouter.POST("/firewall/forward/enable", baseApi.EnableForwarding)
 		hostRouter.POST("/firewall/rules/search", baseApi.SearchFirewallRules)
+		hostRouter.POST("/firewall/rules/native/detail", baseApi.LoadFirewallNativeDetail)
 		hostRouter.POST("/firewall/rules/check", baseApi.CheckFirewallRule)
 		hostRouter.POST("/firewall/rules/check/batch", baseApi.CheckFirewallRulesBatch)
 		hostRouter.POST("/firewall/rules", baseApi.CreateFirewallRule)

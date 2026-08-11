@@ -4065,6 +4065,13 @@ const message = {
         drifted: 'Drifted',
         protected: 'System-protected',
         protectedHelper: 'A critical system rule that cannot be edited or deleted to avoid disrupting access.',
+        stateShort: {
+            managed: 'Panel',
+            adopted: 'Adopted',
+            external: 'External',
+            protected: 'Protected',
+            drifted: 'Drifted',
+        },
         ruleTargetRequired: 'Enter at least one IP address or port',
         batchRuleLimit: 'A maximum of {0} rules can be created at a time',
         resolution_create: 'Create rule',

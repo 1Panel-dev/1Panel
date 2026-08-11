@@ -256,8 +256,14 @@ func TestObservePublicInetMergesNativeObjectsAndReportsScopeNotices(t *testing.T
 		t.Fatalf("family-neutral rich rule was not normalized: %#v", rich)
 	}
 	service := findObserved(snapshot.Rules, "service:ssh")
-	if service == nil || service.ParseStatus != filter.ParseStatusOpaque || service.Rule.NativeKind != filter.NativeKindZoneService {
+	if service == nil || service.ParseStatus != filter.ParseStatusOpaque || service.Rule.NativeKind != filter.NativeKindZoneService ||
+		service.Rule.Protocol != "" || service.Rule.DestinationPort != "" || service.Rule.Description != "ssh" || service.Raw != "ssh" {
 		t.Fatalf("service object was not preserved as opaque: %#v", service)
+	}
+	dhcpv6Client := findObserved(snapshot.Rules, "service:dhcpv6-client")
+	if dhcpv6Client == nil || dhcpv6Client.Rule.Protocol != "" || dhcpv6Client.Rule.DestinationPort != "" ||
+		dhcpv6Client.Rule.Description != "dhcpv6-client" || dhcpv6Client.Raw != "dhcpv6-client" {
+		t.Fatalf("dhcpv6 service was exposed as an allow-all rule: %#v", dhcpv6Client)
 	}
 	if !hasNotice(snapshot.Notices, filter.ScopeNoticeDefaultScopeMismatch, "work") ||
 		!hasNotice(snapshot.Notices, filter.ScopeNoticeUnmanagedActiveScopes, "docker") ||
@@ -303,6 +309,33 @@ func TestObservePublicPipelineKeepsRuleFamiliesInOneZoneScope(t *testing.T) {
 	ipv6 := findObserved(snapshot.Rules, `rich:rule family="ipv6" source address="2001:db8::1/128" accept`)
 	if ipv6 == nil || ipv6.Rule.Scope.Family != filter.FamilyIPv6 {
 		t.Fatalf("IPv6 rich rule was not retained in the public execution scope: %#v", ipv6)
+	}
+}
+
+func TestNativeDetailRunsDedicatedFirewalldCommand(t *testing.T) {
+	reader := newFakeCommandReader()
+	info := "ssh\n  ports: 22/tcp\n  protocols:\n  source-ports:\n  helpers:\n  destination:"
+	reader.setServiceInfo(false, "ssh", info)
+	reader.setServiceInfo(true, "ssh", info)
+	adapter := NewAdapterWithReader(reader)
+
+	runtimeInfo, err := adapter.NativeDetail(context.Background(), "ssh", false)
+	if err != nil {
+		t.Fatalf("read runtime service info: %v", err)
+	}
+	permanentInfo, err := adapter.NativeDetail(context.Background(), "ssh", true)
+	if err != nil {
+		t.Fatalf("read permanent service info: %v", err)
+	}
+	if runtimeInfo != info || permanentInfo != info {
+		t.Fatalf("service info output was not preserved: runtime=%q permanent=%q", runtimeInfo, permanentInfo)
+	}
+}
+
+func TestNativeDetailRejectsInvalidServiceName(t *testing.T) {
+	adapter := NewAdapterWithReader(newFakeCommandReader())
+	if _, err := adapter.NativeDetail(context.Background(), "../ssh", false); !errors.Is(err, filter.ErrInvalidRule) {
+		t.Fatalf("expected invalid service rejection, got %v", err)
 	}
 }
 
@@ -356,6 +389,15 @@ func (f *fakeCommandReader) set(permanent bool, option, output string) {
 		args = append(args, "--permanent")
 	}
 	args = append(args, "--zone=public", option)
+	f.outputs[strings.Join(args, "\x00")] = output
+}
+
+func (f *fakeCommandReader) setServiceInfo(permanent bool, service, output string) {
+	args := make([]string, 0, 2)
+	if permanent {
+		args = append(args, "--permanent")
+	}
+	args = append(args, "--info-service="+service)
 	f.outputs[strings.Join(args, "\x00")] = output
 }
 

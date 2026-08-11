@@ -504,6 +504,50 @@ func (a *Adapter) readScope(ctx context.Context, scope filter.Scope, permanent b
 	return zoneOutput{ports: ports, rich: rich, services: services}, nil
 }
 
+// NativeDetail reads one firewalld service definition on demand. Inventory only
+// lists enabled service names so a failed detail lookup cannot be hidden behind
+// a name-only fallback.
+func (a *Adapter) NativeDetail(ctx context.Context, service string, permanent bool) (string, error) {
+	service = strings.TrimSpace(service)
+	if !validServiceName(service) {
+		return "", fmt.Errorf("%w: invalid firewalld service name", filter.ErrInvalidRule)
+	}
+	if a.reader == nil {
+		return "", errors.New("firewalld reader is required")
+	}
+	args := make([]string, 0, 3)
+	if permanent {
+		args = append(args, "--permanent")
+	}
+	args = append(args, "--info-service="+service)
+	info, err := a.reader.Read(ctx, args...)
+	if err != nil {
+		return "", fmt.Errorf("read firewalld service %q: %w", service, err)
+	}
+	info = strings.TrimSpace(info)
+	if info == "" {
+		return "", fmt.Errorf("read firewalld service %q: empty output", service)
+	}
+	return info, nil
+}
+
+func validServiceName(service string) bool {
+	if service == "" {
+		return false
+	}
+	for _, char := range service {
+		switch {
+		case char >= 'a' && char <= 'z':
+		case char >= 'A' && char <= 'Z':
+		case char >= '0' && char <= '9':
+		case char == '-', char == '_', char == '.':
+		default:
+			return false
+		}
+	}
+	return true
+}
+
 type mergedObject struct {
 	rule      filter.ObservedRule
 	runtime   bool
@@ -788,7 +832,13 @@ func opaqueRichRule(scope filter.Scope, raw string) filter.ObservedRule {
 }
 
 func opaqueZoneService(scope filter.Scope, service string) filter.ObservedRule {
-	return opaqueZoneObject(scope, filter.NativeKindZoneService, "service:"+service, service)
+	rule := opaqueZoneObject(scope, filter.NativeKindZoneService, "service:"+service, service)
+	// A firewalld service expands to its own ports, protocols and destinations.
+	// Do not expose the opaque service as an allow-all rule while its definition
+	// is intentionally left unresolved.
+	rule.Rule.Protocol = ""
+	rule.Rule.Description = service
+	return rule
 }
 
 func opaqueZoneObject(scope filter.Scope, kind filter.NativeKind, canonical, raw string) filter.ObservedRule {

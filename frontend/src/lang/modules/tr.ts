@@ -4132,6 +4132,13 @@ const message = {
         protected: 'Sistem korumalı',
         protectedHelper:
             'Erişimin kesilmesini önlemek için düzenlenemeyen veya silinemeyen kritik bir sistem kuralıdır.',
+        stateShort: {
+            managed: 'Panel',
+            adopted: 'Yönetilen',
+            external: 'Harici',
+            protected: 'Korumalı',
+            drifted: 'Farklı',
+        },
         ruleTargetRequired: 'En az bir IP adresi veya port girin',
         batchRuleLimit: 'Bir seferde en fazla {0} kural oluşturulabilir',
         resolution_create: 'Kural oluştur',

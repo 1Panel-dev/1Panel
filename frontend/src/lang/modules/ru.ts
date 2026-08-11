@@ -4116,6 +4116,13 @@ const message = {
         protected: 'Защищено системой',
         protectedHelper:
             'Критически важное системное правило, которое нельзя изменить или удалить во избежание потери доступа.',
+        stateShort: {
+            managed: 'Панель',
+            adopted: 'Принято',
+            external: 'Внешнее',
+            protected: 'Защита',
+            drifted: 'Различие',
+        },
         ruleTargetRequired: 'Укажите хотя бы один IP-адрес или порт',
         batchRuleLimit: 'За один раз можно создать не более {0} правил',
         resolution_create: 'Создать правило',
