@@ -1,6 +1,6 @@
 <p align="center"><a href="https://1panel.pro"><img src="https://resource.1panel.pro/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
 <p align="center">
-  Trusted by <strong>2,000,000+</strong> self-hosters worldwide
+  Loved by a global community of <strong>2.5M+</strong> self-hosters.
 </p>
 
 <p align="center">
@@ -9,7 +9,6 @@
 
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/1Panel-dev/1Panel?color=%231890FF" alt="License: GPL v3"></a>
-  <a href="https://app.codacy.com/gh/1Panel-dev/1Panel"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
   <a href="https://discord.gg/bUpUqWqdRr"><img src="https://img.shields.io/discord/1318846410149335080?logo=discord&labelColor=%20%235462eb&logoColor=%20%23f5f5f5&color=%20%235462eb" alt="Discord"></a>
   <a href="https://github.com/1Panel-dev/1Panel/releases"><img src="https://img.shields.io/github/v/release/1Panel-dev/1Panel" alt="GitHub release"></a>
   <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="Stars"></a>
@@ -39,7 +38,7 @@
 ## What is 1Panel?
 
 1Panel is a modern, open-source Linux server management panel and a lightweight AI management platform. Through an intuitive web interface, it provides users with comprehensive, one-stop server management capabilities:
-- **Full-Stack AI Management**: Offers a unified management platform from bare metal to agents (Metal-to-Agent). It integrates an AI gateway, and Skills Hub, while supporting centralized management of agents and models.
+- **AI Management**: Offers a unified management platform from bare metal to agents (Metal-to-Agent). It integrates an AI gateway, and Skills Hub, while supporting centralized management of agents and models.
 - **Efficient Visual Operations**: Easily manage Linux servers through a web-based GUI, streamlining tasks such as host monitoring, file management, database management, and container management.
 - **Rapid Website Deployment**: Deeply integrates with popular website builders like WordPress and . It enables one-click domain binding and SSL certificate configuration, significantly lowering the barrier to website creation.
 - **Curated App Store**: Features a built-in store of high-quality open-source applications, providing one-click installation and upgrade services to effortlessly extend server capabilities.
@@ -59,8 +58,7 @@
 
 ## Quick Start
 
-> **Requirements:** Linux VPS (Debian / Ubuntu / CentOS / Rocky), 1 GB RAM, internet access.  
-> Takes ~60 seconds.
+Prepare your Linux server and run the following script:
 
 ```bash
 bash -c "$(curl -sSL https://resource.1panel.pro/v2/quick_start.sh)"
@@ -80,7 +78,7 @@ Run `1pctl user-info` via SSH if you need to retrieve your access credentials.
 | Feature | OSS | Pro | Ent |
 |---------|:---:|:---:|:---:|
 | One-click app installs | ✅ | ✅ | ✅ |
-| AI agents (OpenClaw) | 1 agent | Unlimited | ✅ |
+| AI agents (OpenClaw) | 5 agent | Unlimited | ✅ |
 | WAF & advanced security | Basic | ✅ | ✅ |
 | Website tamper protection | ❌ | ✅ | ✅ |
 | Website uptime monitoring | ❌ | ✅ | ✅ |
@@ -89,8 +87,6 @@ Run `1pctl user-info` via SSH if you need to retrieve your access credentials.
 | KVM Web UI | ❌ | ❌ | ✅ |
 | AI Gateway | ❌ | ❌ | ✅ |
 | Priority support | ❌ | ❌ | ✅ |
-
-**From $80/year.** [Compare plans & start 30-day free trial →](https://1panel.pro/pricing)
 
 ## Community & Support
 
