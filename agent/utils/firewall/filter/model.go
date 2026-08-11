@@ -300,6 +300,7 @@ type Capabilities struct {
 	AtomicApply           bool
 	TransactionalRollback bool
 	OwnedChains           bool
+	ExplicitPosition      bool
 	ExplicitPriority      bool
 	NativePort            bool
 }

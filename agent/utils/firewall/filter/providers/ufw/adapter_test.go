@@ -174,6 +174,7 @@ func TestCapabilitiesOnlyAdvertiseAtomicIncomingFamilies(t *testing.T) {
 	}
 	if !capabilities.Marker || !capabilities.SupportsScope(ufwScope(filter.FamilyIPv4)) ||
 		!capabilities.SupportsScope(ufwScope(filter.FamilyIPv6)) ||
+		!capabilities.ExplicitPosition ||
 		capabilities.SupportsScope(filter.Scope{Provider: filter.ProviderUFW, Family: filter.FamilyIPv4, Chain: "outgoing", Direction: filter.Direction("output")}) {
 		t.Fatalf("unexpected capabilities: %#v", capabilities)
 	}
@@ -274,7 +275,29 @@ func TestCompileUpdateAndDeleteRequireOwnedNumberedRule(t *testing.T) {
 	}
 }
 
-func TestCompileRejectsInactiveProtectedAndReorder(t *testing.T) {
+func TestCompileUpdateUsesRequestedGlobalPosition(t *testing.T) {
+	scope := ufwScope(filter.FamilyIPv4)
+	observed := parseNumberedRules(scope, "Status: active\n[ 3] 80/tcp ALLOW IN Anywhere # 1panel-rule:managed\n")
+	snapshot := mustSnapshot(t, scope, observed)
+	locator := observed[0].Locator
+	updated := writableRule(filter.FamilyIPv4, "managed", "443")
+	target := int64(1)
+	updated.OrderIndex = &target
+	plan, err := NewAdapterWithReader(&fakeReader{}).Compile(snapshot, []filter.DesiredChange{{
+		Operation: filter.ChangeUpdate, Before: &observed[0].Rule, After: &updated, Locator: &locator,
+	}})
+	if err != nil {
+		t.Fatalf("compile positioned update: %v", err)
+	}
+	rulePlan := plan.Rules[0]
+	if len(rulePlan.Commands) != 2 || !reflect.DeepEqual(rulePlan.Commands[0].Args, []string{"--force", "delete", "3"}) ||
+		!reflect.DeepEqual(rulePlan.Commands[1].Args[:2], []string{"insert", "1"}) ||
+		rulePlan.Expected.Locator.Position == nil || *rulePlan.Expected.Locator.Position != 1 {
+		t.Fatalf("unexpected positioned update: %#v", rulePlan)
+	}
+}
+
+func TestCompileRejectsInactiveAndProtected(t *testing.T) {
 	scope := ufwScope(filter.FamilyIPv4)
 	rule := writableRule(filter.FamilyIPv4, "rule", "8080")
 	inactive := mustSnapshot(t, scope, nil)
@@ -295,7 +318,7 @@ func TestCompileRejectsInactiveProtectedAndReorder(t *testing.T) {
 	}
 	_, err = NewAdapterWithReader(&fakeReader{}).Compile(mustSnapshot(t, scope, nil), []filter.DesiredChange{{Operation: filter.ChangeReorder, After: &rule}})
 	if !errors.Is(err, filter.ErrUnsupportedScope) {
-		t.Fatalf("expected unsupported reorder error, got %v", err)
+		t.Fatalf("expected unsupported standalone reorder error, got %v", err)
 	}
 	broadDeny := filter.FirewallRule{
 		UUID: "deny-all", Scope: scope, NativeKind: filter.NativeKindUFWRule, Protocol: "all", Action: filter.ActionDrop,

@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "1137427",
+      "name": "允许",
+      "font_class": "yunxu1",
+      "unicode": "e648",
+      "unicode_decimal": 58952
+    },
+    {
+      "icon_id": "38661825",
+      "name": "我拒绝",
+      "font_class": "a-44tubiao-226",
+      "unicode": "e6a3",
+      "unicode_decimal": 59043
+    },
+    {
       "icon_id": "4766969",
       "name": "pushpin",
       "font_class": "pushpin",

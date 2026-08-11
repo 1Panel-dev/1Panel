@@ -20,6 +20,8 @@ const message = {
             enable: 'Aktifkan',
             disable: 'Nyahaktifkan',
             confirm: 'Sahkan',
+            check: 'Semak',
+            submit: 'Hantar',
             cancel: 'Batal',
             reset: 'Tetapkan semula',
             restart: 'Mulakan semula',
@@ -4140,6 +4142,19 @@ const message = {
         plan_requested_rule_is_covered:
             'Peraturan sedia ada sudah meliputi konfigurasi ini. Meneruskan akan mencipta peraturan bertindih.',
         plan_equivalent_managed_rule: 'Peraturan yang sama sudah diurus oleh 1Panel. Pendua tidak diperlukan.',
+        allRulesAlreadyExist: 'Kesemua {0} peraturan yang diperiksa sudah wujud. Tiada peraturan baharu untuk dicipta.',
+        ruleCheckResult: 'Keputusan semakan peraturan',
+        ruleCheckStatus_creatable: 'Boleh dicipta',
+        ruleCheckStatus_existing: 'Sudah wujud',
+        ruleCheckStatus_warning: 'Amaran',
+        ruleCheckStatus_error: 'Ralat',
+        ruleCheckExistingHelper: 'Peraturan yang sama sudah wujud dan akan dilangkau.',
+        ruleCheckReadyHelper: 'Semakan lulus. Peraturan ini boleh dicipta.',
+        ruleCheckExternalExists: 'Peraturan luaran yang sama sudah wujud dan akan dilangkau secara automatik.',
+        ruleCheckSummary: '{0} peraturan diperiksa: {1} boleh dicipta, {2} sudah wujud, {3} amaran dan {4} ralat.',
+        ruleCheckBlockedHelper: 'Peraturan yang mempunyai ralat tidak boleh dihantar. Kembali, edit dan semak semula.',
+        ruleCheckWarningHelper: 'Semakan selesai. Amaran tidak menghalang penghantaran; anda boleh meneruskan.',
+        ruleCheckPassedHelper: 'Semakan lulus. Anda boleh menghantar peraturan.',
         plan_managed_rule_drifted:
             'Peraturan terurus tidak sepadan dengan tembok api aktif. Selesaikan perbezaan dahulu.',
         plan_opaque_rule_in_target_scope:

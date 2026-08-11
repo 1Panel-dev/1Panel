@@ -166,6 +166,9 @@ func (s *FirewallService) Inventory(ctx context.Context, request dto.FirewallRul
 }
 
 func (s *FirewallService) Check(ctx context.Context, clientIP string, request dto.FirewallRuleCheck) (dto.FirewallRuleCheckResponse, error) {
+	if strings.TrimSpace(request.UUID) != "" {
+		return s.checkUpdate(ctx, clientIP, strings.TrimSpace(request.UUID), request.Rule)
+	}
 	rule, err := filter.NormalizeRule(request.Rule)
 	if err != nil {
 		return dto.FirewallRuleCheckResponse{}, err
@@ -212,6 +215,67 @@ func (s *FirewallService) Check(ctx context.Context, clientIP string, request dt
 		RequestedRule: result.RequestedRule, RequestedRuleKey: result.RequestedRuleKey,
 		ExistingRuleUUID: result.ExistingRuleUUID, Candidates: result.Candidates,
 		AllowedActions: result.AllowedActions, CheckFlag: checkFlag,
+	}, nil
+}
+
+func (s *FirewallService) checkUpdate(
+	ctx context.Context,
+	clientIP string,
+	ruleUUID string,
+	requestedRule filter.FirewallRule,
+) (dto.FirewallRuleCheckResponse, error) {
+	stored, before, snapshot, observed, runtime, err := s.loadManagedMutation(ctx, ruleUUID)
+	if err != nil {
+		return dto.FirewallRuleCheckResponse{}, err
+	}
+	after, err := filter.NormalizeRule(requestedRule)
+	if err != nil {
+		return dto.FirewallRuleCheckResponse{}, err
+	}
+	after.UUID = stored.UUID
+	after, err = runtime.Prepare(after)
+	if err != nil {
+		return dto.FirewallRuleCheckResponse{}, err
+	}
+	if after.Scope.Key() != before.Rule.Scope.Key() {
+		return dto.FirewallRuleCheckResponse{}, fmt.Errorf("%w: managed rule scope cannot be changed", filter.ErrUnsupportedScope)
+	}
+	if after.NativeKind != before.Rule.NativeKind {
+		return dto.FirewallRuleCheckResponse{}, fmt.Errorf("%w: native rule conversion requires an explicit workflow", filter.ErrUnsupportedScope)
+	}
+	capabilities, err := runtime.Capabilities(ctx)
+	if err != nil {
+		return dto.FirewallRuleCheckResponse{}, err
+	}
+	if capabilities.ExplicitPosition || capabilities.OwnedChains {
+		if observed.Locator.Position == nil {
+			return dto.FirewallRuleCheckResponse{}, fmt.Errorf("%w: managed rule has no positional locator", filter.ErrInvalidRule)
+		}
+		currentPosition := int64(*observed.Locator.Position)
+		if after.OrderIndex == nil {
+			after.OrderIndex = &currentPosition
+		} else if *after.OrderIndex != currentPosition {
+			if err := validatePositionTarget(ctx, runtime, snapshot, before.Rule, *after.OrderIndex); err != nil {
+				return dto.FirewallRuleCheckResponse{}, err
+			}
+		}
+	}
+	if err := filter.GuardMutation(snapshot, observed, after, clientIP); err != nil {
+		return dto.FirewallRuleCheckResponse{}, err
+	}
+	semantic, err := firewallRuleSemanticModel(after)
+	if err != nil {
+		return dto.FirewallRuleCheckResponse{}, err
+	}
+	if err := s.ensureFirewallRuleIdentityAvailable(ctx, semantic.ScopeKey, semantic.RuleKey, "", stored.UUID); err != nil {
+		return dto.FirewallRuleCheckResponse{}, err
+	}
+	return dto.FirewallRuleCheckResponse{
+		Decision:         filter.CheckDecisionReady,
+		Classification:   filter.CheckClassificationNone,
+		Reason:           "update_ready",
+		RequestedRule:    after,
+		RequestedRuleKey: semantic.RuleKey,
 	}, nil
 }
 
@@ -698,6 +762,15 @@ func (s *FirewallService) createRule(
 	authorization firewallRuleCreateAuthorization,
 ) error {
 	domainRule := request.Rule
+	if authorization.Operation == filter.ChangeCreate && domainRule.OrderIndex != nil {
+		maxPosition, err := maxPositionForRule(ctx, runtime, snapshot, domainRule)
+		if err != nil {
+			return err
+		}
+		if *domainRule.OrderIndex < 1 || *domainRule.OrderIndex > maxPosition+1 {
+			return fmt.Errorf("%w: create target position %d is out of range 1-%d", filter.ErrInvalidRule, *domainRule.OrderIndex, maxPosition+1)
+		}
+	}
 	origin := constant.FirewallRuleOriginCreated
 	change := filter.DesiredChange{Operation: authorization.Operation, After: &domainRule, Locator: authorization.Locator}
 	if authorization.Operation == filter.ChangeAdopt {
@@ -705,6 +778,9 @@ func (s *FirewallService) createRule(
 	}
 	ruleRecord, err := firewallRuleModelForCreate(domainRule, request, origin)
 	if err != nil {
+		return err
+	}
+	if err := s.ensureFirewallRuleIdentityAvailable(ctx, ruleRecord.ScopeKey, ruleRecord.RuleKey, "", ""); err != nil {
 		return err
 	}
 	if err := s.rules.Create(ctx, &ruleRecord); err != nil {
@@ -725,6 +801,10 @@ func (s *FirewallService) createRule(
 	}
 	updates, err := appliedFirewallRuleUpdates(observed)
 	if err != nil {
+		return s.cleanupAppliedCreate(ctx, runtime, backendPlan, ruleRecord, err)
+	}
+	matchKey, _ := updates["match_key"].(string)
+	if err := s.ensureFirewallRuleIdentityAvailable(ctx, ruleRecord.ScopeKey, "", matchKey, ruleRecord.UUID); err != nil {
 		return s.cleanupAppliedCreate(ctx, runtime, backendPlan, ruleRecord, err)
 	}
 	if err := s.rules.UpdateWithRevision(ctx, ruleRecord.UUID, ruleRecord.Revision, updates); err != nil {
@@ -805,6 +885,23 @@ func (s *FirewallService) updateRule(ctx context.Context, clientIP, ruleUUID str
 	if after.NativeKind != before.Rule.NativeKind {
 		return fmt.Errorf("%w: native rule conversion requires an explicit workflow", filter.ErrUnsupportedScope)
 	}
+	capabilities, err := runtime.Capabilities(ctx)
+	if err != nil {
+		return err
+	}
+	if capabilities.ExplicitPosition || capabilities.OwnedChains {
+		if observed.Locator.Position == nil {
+			return fmt.Errorf("%w: managed rule has no positional locator", filter.ErrInvalidRule)
+		}
+		currentPosition := int64(*observed.Locator.Position)
+		if after.OrderIndex == nil {
+			after.OrderIndex = &currentPosition
+		} else if *after.OrderIndex != currentPosition {
+			if err := validatePositionTarget(ctx, runtime, snapshot, before.Rule, *after.OrderIndex); err != nil {
+				return err
+			}
+		}
+	}
 	if err := filter.GuardMutation(snapshot, observed, after, clientIP); err != nil {
 		return err
 	}
@@ -833,6 +930,9 @@ func (s *FirewallService) reorderRule(ctx context.Context, clientIP, ruleUUID st
 		if targetPosition == nil || *targetPosition < 1 {
 			return fmt.Errorf("%w: target position is required", filter.ErrInvalidRule)
 		}
+		if err := validatePositionTarget(ctx, runtime, snapshot, before.Rule, *targetPosition); err != nil {
+			return err
+		}
 		after.OrderIndex = targetPosition
 	case capabilities.ExplicitPriority:
 		if priority == nil {
@@ -857,6 +957,58 @@ func (s *FirewallService) reorderRule(ctx context.Context, clientIP, ruleUUID st
 		Stored: stored, Before: before.Rule, After: after, Snapshot: snapshot, Locator: observed.Locator,
 		AdapterOperation: adapterOperation, Runtime: runtime,
 	})
+}
+
+func validatePositionTarget(
+	ctx context.Context,
+	runtime *firewallRuleRuntime,
+	snapshot filter.Snapshot,
+	rule filter.FirewallRule,
+	targetPosition int64,
+) error {
+	maxPosition, err := maxPositionForRule(ctx, runtime, snapshot, rule)
+	if err != nil {
+		return err
+	}
+	if targetPosition > maxPosition {
+		return fmt.Errorf("%w: target position %d is out of range 1-%d", filter.ErrInvalidRule, targetPosition, maxPosition)
+	}
+	return nil
+}
+
+func maxPositionForRule(
+	ctx context.Context,
+	runtime *firewallRuleRuntime,
+	snapshot filter.Snapshot,
+	rule filter.FirewallRule,
+) (int64, error) {
+	maxPosition := snapshotMaxPosition(snapshot)
+	if rule.Scope.Provider == filter.ProviderUFW {
+		relatedScope := rule.Scope
+		if relatedScope.Family == filter.FamilyIPv4 {
+			relatedScope.Family = filter.FamilyIPv6
+		} else {
+			relatedScope.Family = filter.FamilyIPv4
+		}
+		relatedSnapshot, err := runtime.ObserveMutation(ctx, relatedScope)
+		if err != nil {
+			return 0, err
+		}
+		if relatedMax := snapshotMaxPosition(relatedSnapshot); relatedMax > maxPosition {
+			maxPosition = relatedMax
+		}
+	}
+	return maxPosition, nil
+}
+
+func snapshotMaxPosition(snapshot filter.Snapshot) int64 {
+	var maxPosition int64
+	for _, observed := range snapshot.Rules {
+		if observed.Locator.Position != nil && int64(*observed.Locator.Position) > maxPosition {
+			maxPosition = int64(*observed.Locator.Position)
+		}
+	}
+	return maxPosition
 }
 
 type managedMutationRequest struct {
@@ -902,6 +1054,15 @@ func (s *FirewallService) loadManagedMutation(
 
 func (s *FirewallService) executeManagedMutation(ctx context.Context, request managedMutationRequest) error {
 	before, after := request.Before, request.After
+	semantic, err := firewallRuleSemanticModel(after)
+	if err != nil {
+		return err
+	}
+	if err := s.ensureFirewallRuleIdentityAvailable(
+		ctx, semantic.ScopeKey, semantic.RuleKey, "", request.Stored.UUID,
+	); err != nil {
+		return err
+	}
 	backendPlan, verification, err := request.Runtime.Execute(ctx, request.Snapshot, []filter.DesiredChange{{
 		Operation: request.AdapterOperation,
 		Before:    &before,
@@ -929,8 +1090,39 @@ func (s *FirewallService) executeManagedMutation(ctx context.Context, request ma
 	for key, value := range applied {
 		updates[key] = value
 	}
+	matchKey, _ := updates["match_key"].(string)
+	if err := s.ensureFirewallRuleIdentityAvailable(
+		ctx, semantic.ScopeKey, "", matchKey, request.Stored.UUID,
+	); err != nil {
+		return rollbackFirewallPlan(ctx, request.Runtime, backendPlan, err)
+	}
 	if err := s.rules.UpdateWithRevision(ctx, request.Stored.UUID, request.Stored.Revision, updates); err != nil {
 		return rollbackFirewallPlan(ctx, request.Runtime, backendPlan, err)
+	}
+	return nil
+}
+
+func (s *FirewallService) ensureFirewallRuleIdentityAvailable(
+	ctx context.Context,
+	scopeKey string,
+	ruleKey string,
+	matchKey string,
+	excludedUUID string,
+) error {
+	stored, err := s.rules.List(ctx, repo.WithFirewallRuleScope(scopeKey))
+	if err != nil {
+		return err
+	}
+	for _, candidate := range stored {
+		if candidate.UUID == excludedUUID {
+			continue
+		}
+		if ruleKey != "" && candidate.RuleKey == ruleKey {
+			return fmt.Errorf("%w: equivalent managed rule already exists", filter.ErrRuleOperation)
+		}
+		if matchKey != "" && candidate.MatchKey == matchKey {
+			return fmt.Errorf("%w: firewall rule instance is already managed", filter.ErrRuleOperation)
+		}
 	}
 	return nil
 }
@@ -1482,11 +1674,18 @@ func firewallRuleSemanticModel(rule filter.FirewallRule) (model.FirewallRule, er
 		ConnectionStates:   strings.Join(normalized.ConnectionStates, ","),
 		Action:             string(normalized.Action),
 		Priority:           normalized.Priority,
-		OrderIndex:         normalized.OrderIndex,
+		OrderIndex:         persistedFirewallOrderIndex(normalized),
 		OrderBucket:        normalized.OrderBucket,
 		Description:        normalized.Description,
 		RuleKey:            ruleKey,
 	}, nil
+}
+
+func persistedFirewallOrderIndex(rule filter.FirewallRule) *int64 {
+	if rule.Scope.Provider == filter.ProviderIptables || rule.Scope.Provider == filter.ProviderUFW {
+		return nil
+	}
+	return rule.OrderIndex
 }
 
 func firewallRuleLocation(scope filter.Scope) string {

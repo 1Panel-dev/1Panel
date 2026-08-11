@@ -128,6 +128,43 @@ func TestFirewallRuleServiceBatchCheckAndCreateSameScope(t *testing.T) {
 	}
 }
 
+func TestFirewallRuleServiceBatchCreateRejectsDuplicateManagedRule(t *testing.T) {
+	rule := executorTestRule("8080")
+	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
+	db := newFirewallRuleTestDB(t)
+	ruleRepo := repo.NewFirewallRuleRepo(db)
+	service := &FirewallService{
+		rules:            ruleRepo,
+		adapters:         firewallRuleRuntimeRegistry{filter.ProviderIptables: newFirewallRuleRuntime(adapter, nil)},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil },
+	}
+	ctx := context.Background()
+
+	checked, err := service.CheckBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: []filter.FirewallRule{rule, rule}})
+	if err != nil || len(checked.Items) != 2 {
+		t.Fatalf("batch check duplicate rules: result=%#v err=%v", checked, err)
+	}
+	request := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, 2)}
+	for _, item := range checked.Items {
+		request.Items = append(request.Items, dto.FirewallRuleCreate{
+			Rule: item.RequestedRule, CheckFlag: item.CheckFlag, Action: filter.CheckActionCreate,
+			SourceKind: constant.FirewallRuleSourceUser,
+		})
+	}
+
+	created, err := service.CreateBatch(ctx, request)
+	if err != nil || created.Succeeded != 1 || created.Failed != 1 {
+		t.Fatalf("batch duplicate create: result=%#v err=%v", created, err)
+	}
+	stored, listErr := ruleRepo.List(ctx)
+	if listErr != nil || len(stored) != 1 || len(adapter.snapshot.Rules) != 1 || adapter.applyCount != 1 {
+		t.Fatalf(
+			"duplicate managed rule was persisted: stored=%#v snapshot=%#v applies=%d err=%v",
+			stored, adapter.snapshot, adapter.applyCount, listErr,
+		)
+	}
+}
+
 func TestFirewallRuleServiceCreateRejectsChangedFirewallState(t *testing.T) {
 	rule := executorTestRule("8080")
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
@@ -374,6 +411,8 @@ func TestSyncSystemPortsAdoptsAndDeletesLegacyAcceptedPort(t *testing.T) {
 }
 func TestFirewallExecutorCreatesAndVerifiesRule(t *testing.T) {
 	rule := executorTestRule("8080")
+	position := int64(1)
+	rule.OrderIndex = &position
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
 	request := dto.FirewallRuleCreate{
@@ -387,7 +426,8 @@ func TestFirewallExecutorCreatesAndVerifiesRule(t *testing.T) {
 		t.Fatalf("unexpected apply count: %d", adapter.applyCount)
 	}
 	rules, _ := ruleRepo.List(context.Background())
-	if len(rules) != 1 || rules[0].MatchKey != firewallRuleMarkerMatchPrefix+adapter.snapshot.Rules[0].Marker {
+	if len(rules) != 1 || rules[0].MatchKey != firewallRuleMarkerMatchPrefix+adapter.snapshot.Rules[0].Marker ||
+		rules[0].OrderIndex != nil {
 		t.Fatalf("rule was not verified and bound: %#v", rules)
 	}
 }
@@ -586,6 +626,73 @@ func TestFirewallExecutorUpdatesManagedRule(t *testing.T) {
 	}
 }
 
+func TestFirewallRuleServiceChecksManagedUpdateWithoutApplying(t *testing.T) {
+	rule := executorTestRule("8080")
+	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
+	service, ruleRepo := newTestFirewallExecutor(t, adapter)
+	if err := createExecutorRule(service, adapter, dto.FirewallRuleCreate{
+		Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
+	}); err != nil {
+		t.Fatalf("create managed rule: %v", err)
+	}
+	stored, err := ruleRepo.List(context.Background())
+	if err != nil || len(stored) != 1 {
+		t.Fatalf("load managed rule: rules=%#v err=%v", stored, err)
+	}
+	updated := rule
+	updated.DestinationPort = "8443"
+	result, err := service.Check(context.Background(), "", dto.FirewallRuleCheck{
+		UUID: stored[0].UUID,
+		Rule: updated,
+	})
+	if err != nil {
+		t.Fatalf("check managed update: %v", err)
+	}
+	if result.Decision != filter.CheckDecisionReady || result.Reason != "update_ready" || result.RequestedRule.DestinationPort != "8443" {
+		t.Fatalf("unexpected managed update check: %#v", result)
+	}
+	if adapter.applyCount != 1 {
+		t.Fatalf("update check changed the firewall: applyCount=%d", adapter.applyCount)
+	}
+}
+
+func TestFirewallExecutorUpdatesManagedRuleAndPositionTogether(t *testing.T) {
+	first := executorTestRule("8080")
+	first.UUID = "first"
+	second := executorTestRule("8081")
+	second.UUID = "second"
+	adapter := newFakeFilterAdapter(t, first.Scope, []filter.ObservedRule{
+		executorObservedRule(first, "1panel-rule:first", 1),
+		executorObservedRule(second, "1panel-rule:second", 2),
+	})
+	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
+	for _, rule := range []filter.FirewallRule{first, second} {
+		record, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreate{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
+		if err != nil {
+			t.Fatalf("build managed rule: %v", err)
+		}
+		record.UUID = rule.UUID
+		record.MatchKey = firewallRuleMatchKey("1panel-rule:"+rule.UUID, "")
+		if err := ruleRepo.Create(context.Background(), &record); err != nil {
+			t.Fatalf("create managed record: %v", err)
+		}
+	}
+	target := int64(2)
+	updated := first
+	updated.DestinationPort = "8443"
+	updated.OrderIndex = &target
+	if err := executor.updateRule(context.Background(), "", first.UUID, updated); err != nil {
+		t.Fatalf("positioned update: %v", err)
+	}
+	if adapter.snapshot.Rules[1].Marker != "1panel-rule:first" || adapter.snapshot.Rules[1].Rule.DestinationPort != "8443" {
+		t.Fatalf("rule content and position were not updated together: %#v", adapter.snapshot.Rules)
+	}
+	stored, err := ruleRepo.GetByUUID(context.Background(), first.UUID)
+	if err != nil || stored.OrderIndex != nil {
+		t.Fatalf("request-only position was persisted: stored=%#v err=%v", stored, err)
+	}
+}
+
 func TestFirewallExecutorReordersManagedRule(t *testing.T) {
 	scope := executorTestRule("8080").Scope
 	first := executorTestRule("8080")
@@ -617,6 +724,50 @@ func TestFirewallExecutorReordersManagedRule(t *testing.T) {
 	}
 	if adapter.snapshot.Rules[1].Marker != "1panel-rule:first" {
 		t.Fatalf("rule was not reordered: snapshot=%#v", adapter.snapshot)
+	}
+	applyCount := adapter.applyCount
+	outOfRange := int64(3)
+	if err := executor.reorderRule(context.Background(), "", first.UUID, &outOfRange, nil); !errors.Is(err, filter.ErrInvalidRule) {
+		t.Fatalf("expected out-of-range reorder rejection, got %v", err)
+	}
+	if adapter.applyCount != applyCount {
+		t.Fatalf("out-of-range reorder reached adapter: applyCount=%d", adapter.applyCount)
+	}
+}
+
+func TestFirewallExecutorUsesExplicitPositionDuringUpdate(t *testing.T) {
+	first := executorTestRule("8080")
+	first.UUID = "first"
+	second := executorTestRule("8081")
+	second.UUID = "second"
+	adapter := newFakeFilterAdapter(t, first.Scope, []filter.ObservedRule{
+		executorObservedRule(first, "1panel-rule:first", 1),
+		executorObservedRule(second, "1panel-rule:second", 2),
+	})
+	adapter.capabilities = filter.Capabilities{
+		Scopes: filter.MVPScopePatterns(), Marker: true, ExplicitPosition: true,
+	}
+	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
+	for _, rule := range []filter.FirewallRule{first, second} {
+		record, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreate{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
+		if err != nil {
+			t.Fatalf("build managed rule: %v", err)
+		}
+		record.UUID = rule.UUID
+		record.MatchKey = firewallRuleMatchKey("1panel-rule:"+rule.UUID, "")
+		if err := ruleRepo.Create(context.Background(), &record); err != nil {
+			t.Fatalf("create managed record: %v", err)
+		}
+	}
+	target := int64(2)
+	updated := first
+	updated.DestinationPort = "8443"
+	updated.OrderIndex = &target
+	if err := executor.updateRule(context.Background(), "", first.UUID, updated); err != nil {
+		t.Fatalf("explicit-position update: %v", err)
+	}
+	if adapter.snapshot.Rules[1].Marker != "1panel-rule:first" || adapter.snapshot.Rules[1].Rule.DestinationPort != "8443" {
+		t.Fatalf("rule was not updated at requested position: snapshot=%#v", adapter.snapshot)
 	}
 }
 
@@ -833,7 +984,7 @@ func (f *fakeFilterAdapter) Compile(snapshot filter.Snapshot, changes []filter.D
 	if change.Locator != nil && change.Locator.Position != nil {
 		position = *change.Locator.Position
 	}
-	if change.Operation == filter.ChangeReorder && rule.OrderIndex != nil {
+	if (change.Operation == filter.ChangeReorder || change.Operation == filter.ChangeUpdate) && rule.OrderIndex != nil {
 		position = int(*rule.OrderIndex)
 	}
 	expected := executorObservedRule(*rule, marker, position)
@@ -845,7 +996,7 @@ func (f *fakeFilterAdapter) Compile(snapshot filter.Snapshot, changes []filter.D
 func (f *fakeFilterAdapter) Apply(_ context.Context, plan filter.BackendPlan) (filter.ApplyResult, error) {
 	f.applyCount++
 	expected := plan.Rules[0].Expected
-	if plan.Rules[0].Operation == filter.ChangeReorder {
+	if plan.Rules[0].Operation == filter.ChangeReorder || plan.Rules[0].Operation == filter.ChangeUpdate {
 		current := -1
 		for index, observed := range f.snapshot.Rules {
 			if observed.Marker == expected.Marker {

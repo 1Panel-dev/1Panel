@@ -23,6 +23,8 @@ const message = {
             enable: 'Habilitar',
             disable: 'Deshabilitar',
             confirm: 'Confirmar',
+            check: 'Comprobar',
+            submit: 'Enviar',
             cancel: 'Cancelar',
             reset: 'Restablecer',
             setDefault: 'Restaurar valores predeterminados',
@@ -4118,6 +4120,21 @@ const message = {
         plan_requested_rule_is_covered:
             'Una regla existente ya cubre esta configuración. Continuar creará una regla superpuesta.',
         plan_equivalent_managed_rule: '1Panel ya gestiona una regla idéntica. No es necesario duplicarla.',
+        allRulesAlreadyExist: 'Las {0} reglas comprobadas ya existen. No hay reglas nuevas que crear.',
+        ruleCheckResult: 'Resultados de la comprobación de reglas',
+        ruleCheckStatus_creatable: 'Se puede crear',
+        ruleCheckStatus_existing: 'Ya existe',
+        ruleCheckStatus_warning: 'Advertencia',
+        ruleCheckStatus_error: 'Error',
+        ruleCheckExistingHelper: 'Ya existe una regla idéntica y se omitirá.',
+        ruleCheckReadyHelper: 'La comprobación se superó. Esta regla se puede crear.',
+        ruleCheckExternalExists: 'Ya existe una regla externa idéntica y se omitirá automáticamente.',
+        ruleCheckSummary:
+            'Se comprobaron {0} reglas: {1} se pueden crear, {2} ya existen, {3} advertencias y {4} errores.',
+        ruleCheckBlockedHelper:
+            'Las reglas con errores no se pueden enviar. Vuelve, modifícalas y compruébalas de nuevo.',
+        ruleCheckWarningHelper: 'Comprobación finalizada. Las advertencias no impiden el envío; puedes continuar.',
+        ruleCheckPassedHelper: 'La comprobación se superó. Puedes enviar las reglas.',
         plan_managed_rule_drifted:
             'La regla gestionada no coincide con el firewall activo. Resuelve primero la diferencia.',
         plan_opaque_rule_in_target_scope:

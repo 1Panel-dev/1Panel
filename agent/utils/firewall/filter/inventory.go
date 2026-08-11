@@ -142,6 +142,8 @@ func MergeInventory(input InventoryMergeInput) ([]InventoryItem, error) {
 		if desiredIndex, exists := desiredMatches[index]; exists {
 			desired := normalizedDesired[desiredIndex]
 			observed := candidate.rule
+			displayRule := observed.Rule
+			displayRule.Description = desired.Rule.Description
 			match := desiredMatchStates[desiredIndex]
 			state := inventoryStateForDesired(desired, match)
 			if observed.Protected {
@@ -150,7 +152,7 @@ func MergeInventory(input InventoryMergeInput) ([]InventoryItem, error) {
 				state = InventoryStateDrifted
 			}
 			items = append(items, InventoryItem{
-				Rule:     observed.Rule,
+				Rule:     displayRule,
 				Observed: &observed,
 				Desired:  &desired,
 				State:    state,

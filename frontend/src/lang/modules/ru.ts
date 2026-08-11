@@ -20,6 +20,8 @@ const message = {
             enable: 'Включить',
             disable: 'Отключить',
             confirm: 'Подтвердить',
+            check: 'Проверить',
+            submit: 'Отправить',
             cancel: 'Отмена',
             reset: 'Сбросить',
             restart: 'Перезапустить',
@@ -4128,6 +4130,20 @@ const message = {
         plan_requested_rule_is_covered:
             'Существующее правило уже покрывает эту настройку. Продолжение создаст пересекающееся правило.',
         plan_equivalent_managed_rule: 'Такое правило уже управляется 1Panel. Дубликат не требуется.',
+        allRulesAlreadyExist: 'Все проверенные правила ({0}) уже существуют. Новых правил для создания нет.',
+        ruleCheckResult: 'Результаты проверки правил',
+        ruleCheckStatus_creatable: 'Можно создать',
+        ruleCheckStatus_existing: 'Уже существует',
+        ruleCheckStatus_warning: 'Предупреждение',
+        ruleCheckStatus_error: 'Ошибка',
+        ruleCheckExistingHelper: 'Такое же правило уже существует и будет пропущено.',
+        ruleCheckReadyHelper: 'Проверка пройдена. Это правило можно создать.',
+        ruleCheckExternalExists: 'Идентичное внешнее правило уже существует и будет автоматически пропущено.',
+        ruleCheckSummary:
+            'Проверено правил: {0}. Можно создать: {1}, уже существует: {2}, предупреждений: {3}, ошибок: {4}.',
+        ruleCheckBlockedHelper: 'Правила с ошибками нельзя отправить. Вернитесь, исправьте их и повторите проверку.',
+        ruleCheckWarningHelper: 'Проверка завершена. Предупреждения не блокируют отправку, можно продолжить.',
+        ruleCheckPassedHelper: 'Проверка пройдена. Правила можно отправить.',
         plan_managed_rule_drifted:
             'Управляемое правило не совпадает с активным межсетевым экраном. Сначала устраните расхождение.',
         plan_opaque_rule_in_target_scope:

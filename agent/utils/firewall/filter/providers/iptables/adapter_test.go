@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"reflect"
+	"slices"
 	"testing"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
@@ -144,6 +145,25 @@ func TestCompileInsertsAllowBeforeTerminalDrop(t *testing.T) {
 	}
 }
 
+func TestCompileCreateUsesRequestedPosition(t *testing.T) {
+	scope := testScope("1PANEL_BASIC")
+	first := filter.FirewallRule{Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp", DestinationPort: "80", Action: filter.ActionAccept}
+	second := filter.FirewallRule{Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp", DestinationPort: "81", Action: filter.ActionAccept}
+	snapshot, _ := filter.NewSnapshot(scope, []filter.ObservedRule{executorObserved(first, 1), executorObserved(second, 2)})
+	position := int64(2)
+	rule := filter.FirewallRule{
+		UUID: "inserted", Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp",
+		DestinationPort: "443", Action: filter.ActionAccept, OrderIndex: &position,
+	}
+	plan, err := NewAdapterWithReader(&fakeRuleReader{}).Compile(snapshot, []filter.DesiredChange{{Operation: filter.ChangeCreate, After: &rule}})
+	if err != nil {
+		t.Fatalf("compile positioned create: %v", err)
+	}
+	if got := plan.Rules[0].Commands[0].Args[5]; got != "2" {
+		t.Fatalf("create ignored requested position: %#v", plan.Rules[0].Commands[0])
+	}
+}
+
 func TestCompileReordersManagedRuleWithinChain(t *testing.T) {
 	scope := testScope("1PANEL_BASIC")
 	first := filter.FirewallRule{UUID: "first", Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp", DestinationPort: "80", Action: filter.ActionAccept}
@@ -168,6 +188,34 @@ func TestCompileReordersManagedRuleWithinChain(t *testing.T) {
 		rulePlan.Commands[1].Args[3] != "-I" || rulePlan.Commands[1].Args[5] != "3" ||
 		rulePlan.Expected.Locator.Position == nil || *rulePlan.Expected.Locator.Position != 3 {
 		t.Fatalf("unexpected reorder plan: %#v", rulePlan)
+	}
+}
+
+func TestCompileUpdateMovesAndChangesManagedRule(t *testing.T) {
+	scope := testScope("1PANEL_BASIC")
+	first := filter.FirewallRule{UUID: "first", Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp", DestinationPort: "80", Action: filter.ActionAccept}
+	second := filter.FirewallRule{UUID: "second", Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp", DestinationPort: "81", Action: filter.ActionAccept}
+	third := filter.FirewallRule{UUID: "third", Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp", DestinationPort: "82", Action: filter.ActionAccept}
+	rules := []filter.ObservedRule{executorObserved(first, 1), executorObserved(second, 2), executorObserved(third, 3)}
+	for index := range rules {
+		rules[index].Marker = "1panel-rule:" + rules[index].Rule.UUID
+	}
+	snapshot, _ := filter.NewSnapshot(scope, rules)
+	target := int64(3)
+	after := first
+	after.DestinationPort = "443"
+	after.OrderIndex = &target
+	plan, err := NewAdapterWithReader(&fakeRuleReader{}).Compile(snapshot, []filter.DesiredChange{{
+		Operation: filter.ChangeUpdate, Before: &first, After: &after, Locator: &rules[0].Locator,
+	}})
+	if err != nil {
+		t.Fatalf("compile positioned update: %v", err)
+	}
+	rulePlan := plan.Rules[0]
+	if len(rulePlan.Commands) != 2 || rulePlan.Commands[0].Args[3] != "-D" || rulePlan.Commands[1].Args[5] != "3" ||
+		!slices.Contains(rulePlan.Commands[1].Args, "443") || rulePlan.Expected.Locator.Position == nil ||
+		*rulePlan.Expected.Locator.Position != 3 {
+		t.Fatalf("unexpected positioned update plan: %#v", rulePlan)
 	}
 }
 

@@ -20,6 +20,8 @@ const message = {
             enable: 'Ativar',
             disable: 'Desativar',
             confirm: 'Confirmar',
+            check: 'Verificar',
+            submit: 'Enviar',
             cancel: 'Cancelar',
             reset: 'Redefinir',
             restart: 'Reiniciar',
@@ -4160,6 +4162,19 @@ const message = {
         plan_requested_rule_is_covered:
             'Uma regra existente já cobre esta configuração. Continuar criará uma regra sobreposta.',
         plan_equivalent_managed_rule: 'Uma regra idêntica já é gerenciada pelo 1Panel. Não é necessário duplicá-la.',
+        allRulesAlreadyExist: 'Todas as {0} regras verificadas já existem. Não há novas regras para criar.',
+        ruleCheckResult: 'Resultados da verificação de regras',
+        ruleCheckStatus_creatable: 'Pode ser criada',
+        ruleCheckStatus_existing: 'Já existe',
+        ruleCheckStatus_warning: 'Aviso',
+        ruleCheckStatus_error: 'Erro',
+        ruleCheckExistingHelper: 'Uma regra idêntica já existe e será ignorada.',
+        ruleCheckReadyHelper: 'A verificação foi aprovada. Esta regra pode ser criada.',
+        ruleCheckExternalExists: 'Uma regra externa idêntica já existe e será ignorada automaticamente.',
+        ruleCheckSummary: '{0} regras verificadas: {1} podem ser criadas, {2} já existem, {3} avisos e {4} erros.',
+        ruleCheckBlockedHelper: 'Regras com erros não podem ser enviadas. Volte, edite-as e verifique novamente.',
+        ruleCheckWarningHelper: 'Verificação concluída. Os avisos não impedem o envio; você pode continuar.',
+        ruleCheckPassedHelper: 'A verificação foi aprovada. Você pode enviar as regras.',
         plan_managed_rule_drifted:
             'A regra gerenciada não corresponde ao firewall ativo. Resolva a divergência primeiro.',
         plan_opaque_rule_in_target_scope:

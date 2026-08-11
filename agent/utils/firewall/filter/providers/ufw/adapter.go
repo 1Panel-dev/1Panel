@@ -48,7 +48,7 @@ func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 			Provider: filter.ProviderUFW, Families: []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6},
 			Chains: []string{filter.UFWInputChain}, Directions: []filter.Direction{filter.DirectionInput},
 		}},
-		Marker: true,
+		Marker: true, ExplicitPosition: true,
 	}, nil
 }
 
@@ -210,6 +210,9 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 
 	switch change.Operation {
 	case filter.ChangeCreate:
+		if normalized.OrderIndex != nil && *normalized.OrderIndex < 1 {
+			return filter.NativeRulePlan{}, fmt.Errorf("%w: create target is out of range", filter.ErrInvalidRule)
+		}
 		plan.Commands = []filter.NativeCommand{insertCommand(position, normalized, marker)}
 		plan.RollbackCommands = []filter.NativeCommand{deleteRuleCommand(normalized, marker)}
 	case filter.ChangeAdopt:
@@ -228,9 +231,16 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 			return filter.NativeRulePlan{}, targetErr
 		}
 		position = *target.Locator.Position
+		targetPosition := position
+		if normalized.OrderIndex != nil {
+			if *normalized.OrderIndex < 1 {
+				return filter.NativeRulePlan{}, fmt.Errorf("%w: update target is out of range", filter.ErrInvalidRule)
+			}
+			targetPosition = int(*normalized.OrderIndex)
+		}
 		plan.Previous = &target
-		plan.Expected = observedForRule(normalized, marker, position)
-		plan.Commands = []filter.NativeCommand{deletePositionCommand(position), insertCommand(position, normalized, marker)}
+		plan.Expected = observedForRule(normalized, marker, targetPosition)
+		plan.Commands = []filter.NativeCommand{deletePositionCommand(position), insertCommand(targetPosition, normalized, marker)}
 		plan.RollbackCommands = []filter.NativeCommand{insertCommand(position, target.Rule, observedComment(target)), deleteRuleCommand(normalized, marker)}
 	case filter.ChangeDelete:
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, marker, true)
@@ -324,6 +334,9 @@ func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChang
 }
 
 func insertionPosition(snapshot filter.Snapshot, rule filter.FirewallRule) int {
+	if rule.OrderIndex != nil && *rule.OrderIndex > 0 {
+		return int(*rule.OrderIndex)
+	}
 	maxPosition := 0
 	for _, observed := range snapshot.Rules {
 		if observed.Locator.Position != nil && *observed.Locator.Position > maxPosition {
@@ -331,9 +344,6 @@ func insertionPosition(snapshot filter.Snapshot, rule filter.FirewallRule) int {
 		}
 	}
 	position := maxPosition + 1
-	if rule.OrderIndex != nil && *rule.OrderIndex > 0 && *rule.OrderIndex <= int64(position) {
-		position = int(*rule.OrderIndex)
-	}
 	return position
 }
 

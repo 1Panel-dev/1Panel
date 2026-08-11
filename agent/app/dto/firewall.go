@@ -49,6 +49,7 @@ type FirewallRuleInventory struct {
 }
 
 type FirewallRuleCheck struct {
+	UUID string              `json:"uuid"`
 	Rule filter.FirewallRule `json:"rule" validate:"required"`
 }
 

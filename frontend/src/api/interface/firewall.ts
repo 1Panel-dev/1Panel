@@ -122,6 +122,7 @@ export namespace Firewall {
     }
 
     export interface CheckRequest {
+        uuid?: string;
         rule: Rule;
     }
 

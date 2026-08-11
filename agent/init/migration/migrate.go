@@ -54,7 +54,6 @@ func InitAgentDB() {
 		migrations.AddMonitorProcess,
 		migrations.UpdateCronJob,
 		migrations.UpdateTensorrtLLM,
-		migrations.AddIptablesFilterRuleTable,
 		migrations.AddCommonDescription,
 		migrations.UpdateDatabase,
 		migrations.AddGPUMonitor,
@@ -98,7 +97,6 @@ func InitAgentDB() {
 		migrations.AddWebsiteTemplateTable,
 		migrations.AddComposePinned,
 		migrations.AddFirewallRuleTable,
-		migrations.RemoveFirewallLegacyInfluence,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

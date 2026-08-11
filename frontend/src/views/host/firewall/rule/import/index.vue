@@ -60,10 +60,10 @@ const uploadRef = ref();
 const uploaderFiles = ref<UploadFile[]>([]);
 
 const displayAddress = (rule: Firewall.Rule, address?: string) => {
-    if (address) return address;
-    if (rule.scope.family === 'ipv6') return '::/0';
-    if (rule.scope.family === 'inet') return '0.0.0.0/0, ::/0';
-    return '0.0.0.0/0';
+    const wildcard =
+        rule.scope.family === 'ipv6' ? '::/0' : rule.scope.family === 'inet' ? '0.0.0.0/0, ::/0' : '0.0.0.0/0';
+    if (address && address !== wildcard) return address;
+    return `${wildcard}（${i18n.global.t('firewall.anyWhere')}）`;
 };
 
 const isRule = (value: unknown): value is Firewall.Rule => {

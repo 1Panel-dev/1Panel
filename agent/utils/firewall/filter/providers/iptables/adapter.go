@@ -48,7 +48,7 @@ func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 			Provider: filter.ProviderIptables, Families: []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}, Table: "filter",
 			Chains:     []string{native.Chain1PanelBasicBefore, native.Chain1PanelBasic, native.Chain1PanelBasicAfter},
 			Directions: []filter.Direction{filter.DirectionInput},
-		}}, Marker: true, OwnedChains: true,
+		}}, Marker: true, OwnedChains: true, ExplicitPosition: true,
 		AtomicApply: false, TransactionalRollback: false,
 	}, nil
 }
@@ -153,8 +153,10 @@ func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.V
 				}
 			}
 		}
+		requiresPositionMatch := expected.Operation == filter.ChangeReorder ||
+			(expected.Operation == filter.ChangeUpdate && expected.Expected.Rule.OrderIndex != nil)
 		positionMatches := true
-		if expected.Operation == filter.ChangeReorder {
+		if requiresPositionMatch {
 			positionMatches = false
 			for _, observed := range snapshot.Rules {
 				if observed.Marker == expected.Expected.Marker && observed.Locator.Position != nil &&
@@ -165,7 +167,7 @@ func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.V
 			}
 		}
 		if (expected.Operation == filter.ChangeDelete && markerMatches != 0) ||
-			(expected.Operation == filter.ChangeReorder && !positionMatches) ||
+			(requiresPositionMatch && !positionMatches) ||
 			(expected.Operation != filter.ChangeDelete && (markerMatches != 1 || semanticMatches != 1)) {
 			return filter.VerifyResult{Snapshot: snapshot, Matched: false}, nil
 		}
@@ -265,11 +267,33 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 	var target filter.ObservedRule
 	switch change.Operation {
 	case filter.ChangeCreate:
+		if normalized.OrderIndex != nil && (*normalized.OrderIndex < 1 || *normalized.OrderIndex > int64(len(snapshot.Rules)+1)) {
+			return filter.NativeRulePlan{}, fmt.Errorf("%w: create target is out of range", filter.ErrInvalidRule)
+		}
 		position = insertionPosition(snapshot, normalized)
-	case filter.ChangeAdopt, filter.ChangeUpdate:
+	case filter.ChangeAdopt:
 		position, target, err = validateMutationTarget(snapshot, change, normalized, marker)
 		if err != nil {
 			return filter.NativeRulePlan{}, err
+		}
+		verb = "-R"
+	case filter.ChangeUpdate:
+		position, target, err = validateMutationTarget(snapshot, change, normalized, marker)
+		if err != nil {
+			return filter.NativeRulePlan{}, err
+		}
+		targetPosition := position
+		if normalized.OrderIndex != nil {
+			if *normalized.OrderIndex < 1 || *normalized.OrderIndex > int64(len(snapshot.Rules)) {
+				return filter.NativeRulePlan{}, fmt.Errorf("%w: update target is out of range", filter.ErrInvalidRule)
+			}
+			targetPosition = int(*normalized.OrderIndex)
+		}
+		if err := validateReorderPath(snapshot, position, targetPosition); err != nil {
+			return filter.NativeRulePlan{}, err
+		}
+		if position != targetPosition {
+			return positionalMutationPlan(snapshot, normalized, target, marker, position, targetPosition, change.Operation), nil
 		}
 		verb = "-R"
 	case filter.ChangeDelete:
@@ -290,32 +314,7 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		if err := validateReorderPath(snapshot, position, targetPosition); err != nil {
 			return filter.NativeRulePlan{}, err
 		}
-		expected := filter.ObservedRule{
-			Rule: normalized, Marker: marker, ParseStatus: filter.ParseStatusSupported,
-			Locator: filter.Locator{Provider: filter.ProviderIptables, ScopeKey: snapshot.Scope.Key(), Position: &targetPosition},
-		}
-		if position == targetPosition {
-			return filter.NativeRulePlan{RuleUUID: normalized.UUID, Operation: change.Operation, Previous: &target, Expected: expected}, nil
-		}
-		executable := executableForFamily(snapshot.Scope.Family)
-		deleteArgs := []string{"-w", "-t", snapshot.Scope.Table, "-D", snapshot.Scope.Chain, strconv.Itoa(position)}
-		insertArgs := []string{"-w", "-t", snapshot.Scope.Table, "-I", snapshot.Scope.Chain, strconv.Itoa(targetPosition)}
-		insertArgs = append(insertArgs, compileRuleArgs(normalized, marker)...)
-		restoreArgs := []string{"-w", "-t", snapshot.Scope.Table, "-I", snapshot.Scope.Chain, strconv.Itoa(position)}
-		restoreArgs = append(restoreArgs, compileObservedRuleArgs(target)...)
-		deleteInsertedArgs := []string{"-w", "-t", snapshot.Scope.Table, "-D", snapshot.Scope.Chain}
-		deleteInsertedArgs = append(deleteInsertedArgs, compileRuleArgs(normalized, marker)...)
-		return filter.NativeRulePlan{
-			RuleUUID: normalized.UUID, Operation: change.Operation, Previous: &target, Expected: expected,
-			Commands: []filter.NativeCommand{
-				{Executable: executable, Args: deleteArgs},
-				{Executable: executable, Args: insertArgs},
-			},
-			RollbackCommands: []filter.NativeCommand{
-				{Executable: executable, Args: restoreArgs},
-				{Executable: executable, Args: deleteInsertedArgs},
-			},
-		}, nil
+		return positionalMutationPlan(snapshot, normalized, target, marker, position, targetPosition, change.Operation), nil
 	default:
 		return filter.NativeRulePlan{}, fmt.Errorf("%w: unsupported operation %s", filter.ErrInvalidRule, change.Operation)
 	}
@@ -346,6 +345,44 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		Previous:         pointerToObserved(target, change.Operation != filter.ChangeCreate),
 		Expected:         expected,
 	}, nil
+}
+
+func positionalMutationPlan(
+	snapshot filter.Snapshot,
+	rule filter.FirewallRule,
+	previous filter.ObservedRule,
+	marker string,
+	position int,
+	targetPosition int,
+	operation filter.ChangeOperation,
+) filter.NativeRulePlan {
+	expected := filter.ObservedRule{
+		Rule: rule, Marker: marker, ParseStatus: filter.ParseStatusSupported,
+		Locator: filter.Locator{Provider: filter.ProviderIptables, ScopeKey: snapshot.Scope.Key(), Position: &targetPosition},
+	}
+	plan := filter.NativeRulePlan{
+		RuleUUID: rule.UUID, Operation: operation, Previous: &previous, Expected: expected,
+	}
+	if position == targetPosition {
+		return plan
+	}
+	executable := executableForFamily(snapshot.Scope.Family)
+	deleteArgs := []string{"-w", "-t", snapshot.Scope.Table, "-D", snapshot.Scope.Chain, strconv.Itoa(position)}
+	insertArgs := []string{"-w", "-t", snapshot.Scope.Table, "-I", snapshot.Scope.Chain, strconv.Itoa(targetPosition)}
+	insertArgs = append(insertArgs, compileRuleArgs(rule, marker)...)
+	restoreArgs := []string{"-w", "-t", snapshot.Scope.Table, "-I", snapshot.Scope.Chain, strconv.Itoa(position)}
+	restoreArgs = append(restoreArgs, compileObservedRuleArgs(previous)...)
+	deleteInsertedArgs := []string{"-w", "-t", snapshot.Scope.Table, "-D", snapshot.Scope.Chain}
+	deleteInsertedArgs = append(deleteInsertedArgs, compileRuleArgs(rule, marker)...)
+	plan.Commands = []filter.NativeCommand{
+		{Executable: executable, Args: deleteArgs},
+		{Executable: executable, Args: insertArgs},
+	}
+	plan.RollbackCommands = []filter.NativeCommand{
+		{Executable: executable, Args: restoreArgs},
+		{Executable: executable, Args: deleteInsertedArgs},
+	}
+	return plan
 }
 
 func pointerToObserved(rule filter.ObservedRule, include bool) *filter.ObservedRule {
@@ -461,6 +498,9 @@ func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChang
 }
 
 func insertionPosition(snapshot filter.Snapshot, rule filter.FirewallRule) int {
+	if rule.OrderIndex != nil {
+		return int(*rule.OrderIndex)
+	}
 	if snapshot.Scope.Chain == native.Chain1PanelBasicAfter && rule.Action == filter.ActionAccept {
 		for index, observed := range snapshot.Rules {
 			if observed.ParseStatus == filter.ParseStatusSupported && observed.Rule.Action == filter.ActionDrop &&

@@ -35,6 +35,29 @@ func TestMergeInventoryPreservesObservedOrderAndOwnership(t *testing.T) {
 	}
 }
 
+func TestMergeInventoryUsesDesiredDescriptionForManagedRule(t *testing.T) {
+	rule := inventoryTestRule("8080")
+	desired := rule
+	desired.Description = "user description"
+	observed := inventoryObservedRule(t, rule, "1panel-rule:web", 1)
+
+	items, err := MergeInventory(InventoryMergeInput{
+		Observed: []ObservedRule{observed},
+		Desired: []DesiredRule{{
+			UUID: "web", Rule: desired, Origin: RuleOriginCreated, Marker: observed.Marker,
+		}},
+	})
+	if err != nil {
+		t.Fatalf("merge inventory: %v", err)
+	}
+	if len(items) != 1 || items[0].Rule.Description != desired.Description {
+		t.Fatalf("managed description was not taken from desired state: %#v", items)
+	}
+	if items[0].Observed == nil || items[0].Observed.Rule.Description != "" {
+		t.Fatalf("observed runtime rule was modified: %#v", items[0].Observed)
+	}
+}
+
 func TestMergeInventoryUsesInstanceBeforeSemanticIdentity(t *testing.T) {
 	rule := inventoryTestRule("22")
 	first := inventoryObservedRule(t, rule, "", 1)

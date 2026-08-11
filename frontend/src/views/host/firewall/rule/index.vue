@@ -28,13 +28,6 @@
                 >
                     <template #prompt>
                         <el-alert
-                            v-if="provider === 'ufw'"
-                            class="mb-2"
-                            type="info"
-                            :closable="false"
-                            :title="$t('firewall.ufwReorderUnsupported')"
-                        />
-                        <el-alert
                             v-for="notice in notices"
                             :key="notice.key"
                             class="mb-2"
@@ -67,6 +60,27 @@
                         </el-button-group>
                     </template>
                     <template #rightToolBar>
+                        <el-popover v-if="provider === 'iptables'" placement="bottom" trigger="click" :width="230">
+                            <template #reference>
+                                <el-button
+                                    :type="iptablesChainFilterActive ? 'primary' : 'default'"
+                                    :icon="Filter"
+                                    :title="$t('menu.filter')"
+                                    plain
+                                />
+                            </template>
+                            <div class="firewall-chain-filter-title">{{ $t('firewall.chain') }}</div>
+                            <el-checkbox-group
+                                v-model="visibleIptablesChains"
+                                class="firewall-chain-filter-options"
+                                :min="1"
+                                @change="changeIptablesChainFilter"
+                            >
+                                <el-checkbox v-for="chain in iptablesChains" :key="chain" :value="chain">
+                                    {{ chain }}
+                                </el-checkbox>
+                            </el-checkbox-group>
+                        </el-popover>
                         <div class="firewall-filter-bar">
                             <el-select v-model="selectedFamily" class="p-w-200" @change="resetPagination">
                                 <template #prefix>IP</template>
@@ -80,7 +94,7 @@
                         <TableSetting title="firewall-rule-refresh" @search="search" />
                     </template>
                     <template #main>
-                        <div ref="tableContainerRef">
+                        <div>
                             <ComplexTable
                                 v-model:selects="selects"
                                 :pagination-config="paginationConfig"
@@ -91,27 +105,22 @@
                                 <el-table-column type="selection" :selectable="isEditableManagedRule" width="48" fix />
                                 <el-table-column :label="$t('firewall.action')" width="80">
                                     <template #default="{ row }">
-                                        <el-tag :type="actionTagType(row.rule.action)">
+                                        <span
+                                            class="firewall-action"
+                                            :class="row.rule.action === 'accept' ? 'is-accept' : 'is-drop'"
+                                        >
+                                            <i
+                                                class="iconfont firewall-action-icon"
+                                                :class="row.rule.action === 'accept' ? 'p-yunxu1' : 'p-a-44tubiao-226'"
+                                                aria-hidden="true"
+                                            />
                                             {{ actionLabel(row.rule.action) }}
-                                        </el-tag>
+                                        </span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="排序" align="center" width="80">
+                                <el-table-column :label="$t('firewall.priority')" align="center" width="100">
                                     <template #default="{ row }">
-                                        <el-tooltip
-                                            v-if="provider === 'iptables'"
-                                            :content="
-                                                $t(canDragRule(row) ? 'firewall.reorderTip' : 'firewall.reorderBlocked')
-                                            "
-                                            placement="top"
-                                        >
-                                            <el-icon
-                                                class="firewall-sort-handle"
-                                                :class="{ 'is-enabled': canDragRule(row) }"
-                                            >
-                                                <Rank />
-                                            </el-icon>
-                                        </el-tooltip>
+                                        {{ displayRulePriority(row) }}
                                     </template>
                                 </el-table-column>
                                 <el-table-column :label="$t('commons.table.status')" width="95" align="center">
@@ -139,26 +148,23 @@
                                         {{ row.rule.protocol?.toUpperCase() || '-' }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="accessSourceLabel" min-width="240" show-overflow-tooltip>
+                                <el-table-column label="IP" min-width="200" show-overflow-tooltip>
                                     <template #default="{ row }">
                                         <span>
                                             {{ displayAddress(row.rule, row.rule.sourceAddress) }}
                                         </span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="destinationPortLabel" min-width="140" show-overflow-tooltip>
+                                <el-table-column
+                                    :label="$t('commons.table.port')"
+                                    min-width="140"
+                                    show-overflow-tooltip
+                                >
                                     <template #default="{ row }">
                                         <span>
                                             {{ displayPort(row.rule.destinationPort) }}
                                         </span>
                                     </template>
-                                </el-table-column>
-                                <el-table-column
-                                    v-if="provider === 'firewalld'"
-                                    :label="$t('firewall.priority')"
-                                    width="80"
-                                >
-                                    <template #default="{ row }">{{ row.rule.priority ?? '-' }}</template>
                                 </el-table-column>
                                 <el-table-column :label="$t('firewall.used')" min-width="220">
                                     <template #default="{ row }">
@@ -251,22 +257,16 @@
                 </LayoutContent>
             </div>
         </div>
+        <RuleOperate ref="ruleOperateRef" @search="search" />
+        <RuleImport ref="ruleImportRef" @search="search" />
+        <ProcessDetail ref="processDetailRef" />
     </div>
-    <RuleOperate ref="ruleOperateRef" @search="search" />
-    <RuleImport ref="ruleImportRef" @search="search" />
-    <ProcessDetail ref="processDetailRef" />
 </template>
 
 <script lang="ts" setup>
 import { Firewall } from '@/api/interface/firewall';
 import { Process } from '@/api/interface/process';
-import {
-    checkFirewallRule,
-    createFirewallRule,
-    deleteFirewallRule,
-    reorderFirewallRule,
-    searchFirewallRules,
-} from '@/api/modules/firewall';
+import { checkFirewallRule, createFirewallRule, deleteFirewallRule, searchFirewallRules } from '@/api/modules/firewall';
 import { getListeningProcess } from '@/api/modules/process';
 import i18n from '@/lang';
 import { getCurrentDateFormatted } from '@/utils/date';
@@ -277,10 +277,9 @@ import RuleOperate from '@/views/host/firewall/rule/operate/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import ProcessDetail from '@/views/host/process/process/detail/index.vue';
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { ElMessageBox } from 'element-plus';
-import { CirclePlus, Expand, Link, Lock, Rank } from '@element-plus/icons-vue';
-import Sortable from 'sortablejs';
+import { CirclePlus, Expand, Filter, Link, Lock } from '@element-plus/icons-vue';
 
 interface RuleRow extends Firewall.InventoryItem {
     rowKey: string;
@@ -298,6 +297,11 @@ interface DisplayNotice {
     text: string;
 }
 
+interface PriorityPositionRange {
+    min: number;
+    max: number;
+}
+
 const fireStatusRef = ref<InstanceType<typeof FireStatus>>();
 const ruleOperateRef = ref<InstanceType<typeof RuleOperate>>();
 const ruleImportRef = ref<InstanceType<typeof RuleImport>>();
@@ -308,18 +312,15 @@ const isActive = ref(false);
 const isBind = ref(false);
 const provider = ref('');
 const selectedFamily = ref<'all' | 'ipv4' | 'ipv6'>('all');
+const iptablesChains = ['1PANEL_BASIC_BEFORE', '1PANEL_BASIC', '1PANEL_BASIC_AFTER'] as const;
+const visibleIptablesChains = ref<string[]>(['1PANEL_BASIC']);
 const searchName = ref('');
 const inventoryItems = ref<Firewall.InventoryItem[]>([]);
 const listeningProcesses = ref<Process.ListeningProcess[]>([]);
 const selects = ref<RuleRow[]>([]);
 const scopeNotices = ref<Firewall.ScopeNotice[]>([]);
-const tableContainerRef = ref<HTMLElement>();
-let tableSortable: Sortable | undefined;
 
-const accessSourceLabel = computed(() => i18n.global.t('firewall.accessSource'));
-const destinationPortLabel = computed(
-    () => `${i18n.global.t('firewall.destPort')} (${i18n.global.t('commons.table.local')})`,
-);
+const iptablesChainFilterActive = computed(() => visibleIptablesChains.value.length < iptablesChains.length);
 
 const paginationConfig = reactive({
     cacheSizeKey: 'firewall-rule-page-size',
@@ -393,7 +394,11 @@ const wildcardAddress = (family: Firewall.Family) => {
     return '0.0.0.0/0';
 };
 
-const displayAddress = (rule: Firewall.Rule, address?: string) => address || wildcardAddress(rule.scope.family);
+const displayAddress = (rule: Firewall.Rule, address?: string) => {
+    const wildcard = wildcardAddress(rule.scope.family);
+    if (address && address !== wildcard) return address;
+    return `${wildcard}（${i18n.global.t('firewall.anyWhere')}）`;
+};
 const displayPort = (port?: string) => port || '*';
 const extractListeningPorts = (portMap: Process.ListeningProcess['Port']) =>
     Object.keys(portMap || {})
@@ -456,6 +461,52 @@ const usageEntryLabel = (entry: UsageEntry) => `${entry.owner} (${usageEntryPort
 const openUsageDetail = (entry: UsageEntry) => processDetailRef.value?.acceptParams(entry.pid);
 const scopeIdentity = (rule: Firewall.Rule) => JSON.stringify(rule.scope);
 
+const priorityPositionRanges = (
+    item?: Firewall.InventoryItem,
+): Partial<Record<Firewall.Family, PriorityPositionRange>> => {
+    if (provider.value === 'firewalld') return {};
+    const extraPosition = item ? 0 : 1;
+    if (provider.value === 'ufw') {
+        const maxPosition = inventoryItems.value.reduce(
+            (max, row) => Math.max(max, row.observed?.locator.position || 0),
+            0,
+        );
+        const limit = Math.max(1, maxPosition + extraPosition);
+        return { ipv4: { min: 1, max: limit }, ipv6: { min: 1, max: limit } };
+    }
+    const chain = item?.rule.scope.chain || '1PANEL_BASIC';
+    return Object.fromEntries(
+        (['ipv4', 'ipv6'] as Firewall.Family[]).map((family) => {
+            const scopeRows = inventoryItems.value
+                .filter((row) => row.rule.scope.family === family && row.rule.scope.chain === chain)
+                .sort(
+                    (left, right) => (left.observed?.locator.position || 0) - (right.observed?.locator.position || 0),
+                );
+            const maxPosition = scopeRows.reduce((max, row) => Math.max(max, row.observed?.locator.position || 0), 0);
+            if (!item || item.rule.scope.family !== family) {
+                return [family, { min: 1, max: Math.max(1, maxPosition + extraPosition) }];
+            }
+            const currentPosition = item.observed?.locator.position || 1;
+            const currentIndex = scopeRows.findIndex(
+                (row) => row.observed?.locator.position === item.observed?.locator.position,
+            );
+            let min = currentPosition;
+            let max = currentPosition;
+            for (let index = currentIndex - 1; index >= 0 && isEditableManagedRule(scopeRows[index]); index--) {
+                min = scopeRows[index].observed?.locator.position || min;
+            }
+            for (
+                let index = currentIndex + 1;
+                index < scopeRows.length && isEditableManagedRule(scopeRows[index]);
+                index++
+            ) {
+                max = scopeRows[index].observed?.locator.position || max;
+            }
+            return [family, { min, max }];
+        }),
+    );
+};
+
 const allRows = computed<RuleRow[]>(() =>
     inventoryItems.value.map((item, index) => {
         const nativeGroup = item.rule.orderBucket || item.rule.nativeKind || 'default';
@@ -482,6 +533,12 @@ const matchesFamilyFilter = (rule: Firewall.Rule) => {
 const filteredItems = computed<RuleRow[]>(() => {
     const keyword = searchName.value.trim().toLowerCase();
     return allRows.value.filter((item) => {
+        if (
+            item.rule.scope.provider === 'iptables' &&
+            !visibleIptablesChains.value.includes(item.rule.scope.chain || '')
+        ) {
+            return false;
+        }
         if (!matchesFamilyFilter(item.rule)) {
             return false;
         }
@@ -507,6 +564,11 @@ const pagedItems = computed(() => {
 
 const resetPagination = () => {
     paginationConfig.currentPage = 1;
+};
+
+const changeIptablesChainFilter = () => {
+    selects.value = [];
+    resetPagination();
 };
 
 watch(
@@ -560,8 +622,6 @@ const actionLabel = (action: Firewall.Action) => {
     return i18n.global.t('firewall.drop');
 };
 
-const actionTagType = (action: Firewall.Action) => (action === 'accept' ? 'success' : 'danger');
-
 const stateTagType = (state: Firewall.InventoryState) => {
     if (state === 'managed' || state === 'adopted') {
         return 'success';
@@ -594,7 +654,7 @@ const openCreate = async () => {
             return;
         }
     }
-    ruleOperateRef.value?.acceptParams(provider.value as Firewall.Provider);
+    ruleOperateRef.value?.acceptParams(provider.value as Firewall.Provider, undefined, priorityPositionRanges());
 };
 
 const openImport = () => {
@@ -755,108 +815,15 @@ const isEditableManagedRule = (row: Firewall.InventoryItem) =>
     row.state !== 'drifted' &&
     row.state !== 'protected';
 
-const canDragRule = (row: Firewall.InventoryItem) =>
-    provider.value === 'iptables' &&
-    row.rule.scope.provider === 'iptables' &&
-    Boolean(row.observed?.locator.position) &&
-    isEditableManagedRule(row);
+const displayRulePriority = (row: Firewall.InventoryItem) => {
+    if (row.rule.scope.provider === 'firewalld') return row.rule.priority ?? '-';
+    if (row.rule.scope.provider === 'iptables' && row.rule.scope.chain !== '1PANEL_BASIC') return '-';
+    return row.observed?.locator.position ?? '-';
+};
 
 const openEdit = (row: RuleRow) => {
     if (!isEditableManagedRule(row)) return;
-    ruleOperateRef.value?.acceptParams(provider.value as Firewall.Provider, row);
-};
-
-interface FirewallSortEvent {
-    oldIndex?: number;
-    newIndex?: number;
-}
-
-const handleTableDrag = async (event: FirewallSortEvent) => {
-    const oldIndex = event.oldIndex;
-    const newIndex = event.newIndex;
-    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
-    const moving = pagedItems.value[oldIndex];
-    const target = pagedItems.value[newIndex];
-    const movingPosition = moving?.observed?.locator.position;
-    const targetPosition = target?.observed?.locator.position;
-    const scopeKey = moving ? scopeIdentity(moving.rule) : '';
-    const firstPosition = Math.min(movingPosition || 0, targetPosition || 0);
-    const lastPosition = Math.max(movingPosition || 0, targetPosition || 0);
-    const crossedRules = inventoryItems.value.filter((row) => {
-        const position = row.observed?.locator.position;
-        return (
-            position !== undefined &&
-            scopeIdentity(row.rule) === scopeKey &&
-            position >= firstPosition &&
-            position <= lastPosition
-        );
-    });
-    if (
-        !moving?.desired?.uuid ||
-        !movingPosition ||
-        !targetPosition ||
-        scopeIdentity(moving.rule) !== scopeIdentity(target.rule) ||
-        crossedRules.some((row) => !canDragRule(row))
-    ) {
-        MsgError(i18n.global.t('firewall.reorderBlocked'));
-        await search();
-        return;
-    }
-    loading.value = true;
-    try {
-        await reorderFirewallRule(moving.desired.uuid, {
-            targetPosition,
-        });
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    } catch {
-        // The shared HTTP interceptor displays the provider error.
-    } finally {
-        await search();
-        loading.value = false;
-    }
-};
-
-const destroyTableSortable = () => {
-    tableSortable?.destroy();
-    tableSortable = undefined;
-};
-
-const rebuildTableSortable = async () => {
-    destroyTableSortable();
-    if (provider.value !== 'iptables') return;
-    await nextTick();
-    const body = tableContainerRef.value?.querySelector<HTMLElement>('.el-table__body-wrapper tbody');
-    if (!body) return;
-    tableSortable = Sortable.create(body, {
-        handle: '.firewall-sort-handle.is-enabled',
-        draggable: 'tr',
-        animation: 150,
-        ghostClass: 'firewall-sort-ghost',
-        onEnd: (event: FirewallSortEvent) => void handleTableDrag(event),
-    });
-};
-
-const setRulePriority = async (row: RuleRow) => {
-    if (!row.desired?.uuid) return;
-    let value: string;
-    try {
-        const result = await ElMessageBox.prompt('', i18n.global.t('firewall.priority'), {
-            inputValue: String(row.rule.priority ?? 0),
-            inputPattern: /^-?\d+$/,
-            inputErrorMessage: i18n.global.t('commons.msg.inputOrSelect'),
-        });
-        value = result.value;
-    } catch {
-        return;
-    }
-    loading.value = true;
-    try {
-        await reorderFirewallRule(row.desired.uuid, { priority: Number(value) });
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        await search();
-    } finally {
-        loading.value = false;
-    }
+    ruleOperateRef.value?.acceptParams(provider.value as Firewall.Provider, row, priorityPositionRanges(row));
 };
 
 const operationButtons = [
@@ -882,17 +849,6 @@ const operationButtons = [
         click: openEdit,
     },
     {
-        label: i18n.global.t('firewall.priority'),
-        permission: true,
-        nodeAdmin: true,
-        show: (row: RuleRow) =>
-            row.rule.scope.provider === 'firewalld' &&
-            row.rule.nativeKind === 'rich_rule' &&
-            row.rule.priority !== undefined &&
-            isEditableManagedRule(row),
-        click: setRulePriority,
-    },
-    {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
         nodeAdmin: true,
@@ -905,11 +861,6 @@ onMounted(() => {
     loading.value = true;
     fireStatusRef.value?.acceptParams();
 });
-
-watch([pagedItems, searchName, selectedFamily, provider], () => void rebuildTableSortable(), {
-    flush: 'post',
-});
-onBeforeUnmount(destroyTableSortable);
 </script>
 
 <style lang="scss" scoped>
@@ -918,6 +869,40 @@ onBeforeUnmount(destroyTableSortable);
     flex: none;
     flex-wrap: nowrap;
     gap: 8px;
+}
+
+.firewall-chain-filter-title {
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.firewall-chain-filter-options {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.firewall-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--el-text-color-regular);
+    font-size: 12px;
+    line-height: 18px;
+
+    &.is-accept .firewall-action-icon {
+        color: var(--el-color-primary);
+    }
+
+    &.is-drop .firewall-action-icon {
+        color: var(--el-color-info);
+    }
+}
+
+.firewall-action-icon {
+    flex: none;
+    font-size: 14px;
+    line-height: 1;
 }
 
 .firewall-used-cell {
@@ -989,24 +974,6 @@ onBeforeUnmount(destroyTableSortable);
         min-width: 0;
         max-width: 100%;
     }
-}
-
-.firewall-sort-handle {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-.firewall-sort-handle.is-enabled {
-    opacity: 1;
-    cursor: grab;
-}
-
-.firewall-sort-handle.is-enabled:active {
-    cursor: grabbing;
-}
-
-:deep(.firewall-sort-ghost) {
-    opacity: 0.45;
 }
 
 :global(.firewall-raw-rule-message .el-message-box__message) {
