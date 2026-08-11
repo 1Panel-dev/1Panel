@@ -76,7 +76,7 @@ import { ref } from 'vue';
 import { genFileId, UploadFile, UploadFiles, UploadProps, UploadRawFile } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
-import { operateForwardRule, searchFireRule, getNetworkOptions } from '@/api/modules/host';
+import { operateForwardRule, searchForwardRule, getNetworkOptions } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -107,8 +107,7 @@ const acceptParams = async (fireName: string): Promise<void> => {
 };
 
 const loadCurrentData = async (fireName: string) => {
-    const res = await searchFireRule({
-        type: 'forward',
+    const res = await searchForwardRule({
         strategy: '',
         info: '',
         page: 1,

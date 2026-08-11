@@ -43,7 +43,6 @@ var (
 	sshService                = service.NewISSHService()
 	firewallService           = service.NewIFirewallService()
 	forwardingService         = service.NewIForwardingService()
-	iptablesService           = service.NewIIptablesService()
 	monitorService            = service.NewIMonitorService()
 	systemService             = service.NewISystemService()
 	runtimeDiagnosticsService = service.NewIRuntimeDiagnosticsService()

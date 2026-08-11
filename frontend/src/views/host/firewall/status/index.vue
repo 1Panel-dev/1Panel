@@ -121,7 +121,13 @@
 
 <script lang="ts" setup>
 import { Host } from '@/api/interface/host';
-import { loadFireBaseInfo, operateFilterChain, operateFire } from '@/api/modules/host';
+import {
+    enableForwarding,
+    loadFireBaseInfo,
+    loadForwardBaseInfo,
+    operateFilterChain,
+    operateFire,
+} from '@/api/modules/host';
 import i18n from '@/lang';
 import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
@@ -166,7 +172,8 @@ const emit = defineEmits([
 ]);
 
 const loadBaseInfo = async (search: boolean) => {
-    await loadFireBaseInfo(props.currentTab)
+    const loader = props.currentTab === 'forward' ? loadForwardBaseInfo() : loadFireBaseInfo(props.currentTab);
+    await loader
         .then(async (res) => {
             baseInfo.value = res.data;
             onPing.value = baseInfo.value.pingStatus;
@@ -207,8 +214,6 @@ const loadInitMsg = () => {
             return i18n.global.t('firewall.initHelper', [i18n.global.t('firewall.baseIptables')]);
         case 'forward':
             return i18n.global.t('firewall.initHelper', [i18n.global.t('firewall.forwardIptables')]);
-        case 'advance':
-            return i18n.global.t('firewall.initHelper', [i18n.global.t('firewall.advanceIptables')]);
     }
 };
 
@@ -219,18 +224,23 @@ const onInit = async () => {
         case 'base':
             chainName = '1PANEL_BASIC';
             msg = i18n.global.t('firewall.initMsg', [i18n.global.t('firewall.baseIptables')]);
+            break;
         case 'forward':
             chainName = '1PANEL_FORWARD';
             msg = i18n.global.t('firewall.initMsg', [i18n.global.t('firewall.forwardIptables')]);
-        case 'advance':
-            chainName = '1PANEL_INPUT';
-            msg = i18n.global.t('firewall.initMsg', [i18n.global.t('firewall.advanceIptables')]);
+            break;
+        default:
+            return;
     }
     ElMessageBox.confirm(msg, i18n.global.t('commons.button.init'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
     }).then(async () => {
-        await operateFilterChain(chainName, 'init-' + props.currentTab).then(() => {
+        const initializer =
+            props.currentTab === 'forward'
+                ? enableForwarding()
+                : operateFilterChain(chainName, 'init-' + props.currentTab);
+        await initializer.then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             loadBaseInfo(true);
         });

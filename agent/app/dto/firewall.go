@@ -1,5 +1,7 @@
 package dto
 
+import "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
+
 type FirewallBaseInfo struct {
 	Name       string `json:"name"`
 	IsExist    bool   `json:"isExist"`
@@ -10,91 +12,83 @@ type FirewallBaseInfo struct {
 	PingStatus string `json:"pingStatus"`
 }
 
-type RuleSearch struct {
-	PageInfo
-	Info     string `json:"info"`
-	Status   string `json:"status"`
-	Strategy string `json:"strategy"`
-	Type     string `json:"type" validate:"required"`
-}
-
 type FirewallOperation struct {
 	Operation         string `json:"operation" validate:"required,oneof=start stop restart disableBanPing enableBanPing"`
 	WithDockerRestart bool   `json:"withDockerRestart"`
 }
 
-type PortRuleOperate struct {
-	ID        uint   `json:"id"`
-	Operation string `json:"operation" validate:"required,oneof=add remove"`
-	Chain     string `json:"chain"`
-	Address   string `json:"address"`
-	Port      string `json:"port" validate:"required"`
-	Protocol  string `json:"protocol" validate:"required,oneof=tcp udp tcp/udp"`
-	Strategy  string `json:"strategy" validate:"required,oneof=accept drop"`
-
-	Description string `json:"description"`
-}
-
-type UpdateFirewallDescription struct {
-	Type     string `json:"type"`
-	Chain    string `json:"chain"`
-	SrcIP    string `json:"srcIP"`
-	DstIP    string `json:"dstIP"`
-	SrcPort  string `json:"srcPort"`
-	DstPort  string `json:"dstPort"`
-	Protocol string `json:"protocol"`
-	Strategy string `json:"strategy" validate:"required,oneof=accept drop"`
-
-	Description string `json:"description"`
-}
-
-type AddrRuleOperate struct {
-	ID        uint   `json:"id"`
-	Operation string `json:"operation" validate:"required,oneof=add remove"`
-	Address   string `json:"address"  validate:"required"`
-	Strategy  string `json:"strategy" validate:"required,oneof=accept drop"`
-
-	Description string `json:"description"`
-}
-
-type PortRuleUpdate struct {
-	OldRule PortRuleOperate `json:"oldRule"`
-	NewRule PortRuleOperate `json:"newRule"`
-}
-
-type AddrRuleUpdate struct {
-	OldRule AddrRuleOperate `json:"oldRule"`
-	NewRule AddrRuleOperate `json:"newRule"`
-}
-
-type BatchRuleOperate struct {
-	Type  string            `json:"type" validate:"required"`
-	Rules []PortRuleOperate `json:"rules"`
-}
-
 type IptablesOp struct {
-	Name    string `json:"name" validate:"required,oneof=1PANEL_INPUT 1PANEL_OUTPUT 1PANEL_BASIC 1PANEL_FORWARD"`
-	Operate string `json:"operate" validate:"required,oneof=init-base init-forward init-advance bind-base unbind-base bind unbind"`
+	Name    string `json:"name" validate:"required,eq=1PANEL_BASIC"`
+	Operate string `json:"operate" validate:"required,oneof=init-base bind-base unbind-base"`
 }
 
-type IptablesRuleOp struct {
-	Operation   string `json:"operation" validate:"required,oneof=add remove"`
-	ID          uint   `json:"id"`
-	Chain       string `json:"chain" validate:"required,oneof=1PANEL_BASIC 1PANEL_BASIC_BEFORE 1PANEL_INPUT 1PANEL_OUTPUT"`
-	Protocol    string `json:"protocol"`
-	SrcIP       string `json:"srcIP"`
-	SrcPort     uint   `json:"srcPort"`
-	DstIP       string `json:"dstIP"`
-	DstPort     uint   `json:"dstPort"`
-	Strategy    string `json:"strategy" validate:"required,oneof=accept drop reject"`
-	Description string `json:"description"`
+type FirewallSystemPort struct {
+	Port     string
+	Protocol string
 }
 
-type IptablesBatchOperate struct {
-	Rules []IptablesRuleOp `json:"rules"`
+type FirewallRuleInventoryResponse struct {
+	Items   []filter.InventoryItem `json:"items"`
+	Notices []filter.ScopeNotice   `json:"notices,omitempty"`
 }
 
-type IptablesChainStatus struct {
-	IsBind          bool   `json:"isBind"`
-	DefaultStrategy string `json:"defaultStrategy"`
+type FirewallRuleCheckResponse struct {
+	Decision         filter.CheckDecision       `json:"decision"`
+	Classification   filter.CheckClassification `json:"classification"`
+	Reason           string                     `json:"reason"`
+	RequestedRule    filter.FirewallRule        `json:"requestedRule"`
+	RequestedRuleKey string                     `json:"requestedRuleKey"`
+	ExistingRuleUUID string                     `json:"existingRuleUUID,omitempty"`
+	Candidates       []filter.ObservedRule      `json:"candidates,omitempty"`
+	AllowedActions   []filter.CheckAction       `json:"allowedActions,omitempty"`
+	CheckFlag        string                     `json:"checkFlag"`
+}
+
+type FirewallRuleInventory struct {
+	Scope filter.Scope `json:"scope" validate:"required"`
+}
+
+type FirewallRuleCheck struct {
+	Rule filter.FirewallRule `json:"rule" validate:"required"`
+}
+
+type FirewallRuleBatchCheck struct {
+	Rules []filter.FirewallRule `json:"rules" validate:"required,min=1,max=256,dive"`
+}
+
+type FirewallRuleBatchCheckResponse struct {
+	Items []FirewallRuleCheckResponse `json:"items"`
+}
+
+type FirewallRuleCreate struct {
+	Rule             filter.FirewallRule `json:"rule" validate:"required"`
+	CheckFlag        string              `json:"checkFlag"`
+	Action           filter.CheckAction  `json:"action"`
+	AdoptInstanceKey string              `json:"adoptInstanceKey"`
+	SourceKind       string              `json:"sourceKind" validate:"omitempty,oneof=user imported"`
+	SourceID         string              `json:"sourceID"`
+}
+
+type FirewallRuleBatchCreate struct {
+	Items []FirewallRuleCreate `json:"items" validate:"required,min=1,max=256,dive"`
+}
+
+type FirewallRuleBatchCreateResponse struct {
+	Succeeded int `json:"succeeded"`
+	Failed    int `json:"failed"`
+}
+
+type FirewallRuleDelete struct {
+	UUID string `json:"uuid" validate:"required"`
+}
+
+type FirewallRuleUpdate struct {
+	UUID string              `json:"uuid"`
+	Rule filter.FirewallRule `json:"rule" validate:"required"`
+}
+
+type FirewallRuleReorder struct {
+	UUID           string `json:"uuid"`
+	TargetPosition *int64 `json:"targetPosition"`
+	Priority       *int   `json:"priority"`
 }

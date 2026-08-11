@@ -73,10 +73,9 @@ export namespace Host {
         version: string;
         pingStatus: string;
     }
-    export interface RuleSearch extends ReqPage {
+    export interface ForwardRuleSearch extends ReqPage {
         strategy: string;
         info: string;
-        type: string;
     }
     export interface RuleInfo extends ReqPage {
         family: string;
@@ -93,26 +92,6 @@ export namespace Host {
 
         [key: string]: any;
     }
-    export interface UpdateDescription {
-        type: string;
-        chain: string;
-        srcIP: string;
-        dstIP: string;
-        srcPort: string;
-        dstPort: string;
-        protocol: string;
-        strategy: string;
-        description: string;
-    }
-    export interface RulePort {
-        operation: string;
-        address: string;
-        port: string;
-        source: string;
-        protocol: string;
-        strategy: string;
-        description: string;
-    }
     export interface RuleForward {
         operation: string;
         protocol: string;
@@ -121,25 +100,6 @@ export namespace Host {
         targetPort: string;
         interface: string;
     }
-    export interface RuleIP {
-        operation: string;
-        address: string;
-        strategy: string;
-        description: string;
-    }
-    export interface UpdatePortRule {
-        oldRule: RulePort;
-        newRule: RulePort;
-    }
-    export interface UpdateAddrRule {
-        oldRule: RuleIP;
-        newRule: RuleIP;
-    }
-    export interface BatchRule {
-        type: string;
-        rules: Array<RulePort>;
-    }
-
     export interface MonitorSetting {
         defaultNetwork: string;
         defaultIO: string;
@@ -293,42 +253,5 @@ export namespace Host {
         version: string;
         path: string;
         error: string;
-    }
-
-    // Iptables Filter
-    export interface IptablesFilterRuleSearch extends ReqPage {
-        info: string;
-        type: string;
-    }
-    export interface IptablesData {
-        items: IptablesRules[];
-        total: number;
-        defaultStrategy: string;
-    }
-    export interface IptablesRules {
-        id: number;
-        protocol: string;
-        srcPort: string;
-        dstPort: string;
-        srcIP: string;
-        dstIP: string;
-        strategy: string;
-        description: string;
-    }
-    export interface ChainStatus {
-        isBind: boolean;
-        defaultStrategy: string;
-    }
-    export interface IptablesFilterRuleOp {
-        operation: string;
-        id?: number;
-        chain: string;
-        protocol: string;
-        srcIP?: string;
-        srcPort?: number;
-        dstIP?: string;
-        dstPort?: number;
-        strategy: string;
-        description?: string;
     }
 }

@@ -97,6 +97,8 @@ func InitAgentDB() {
 		migrations.AddFtpIdentity,
 		migrations.AddWebsiteTemplateTable,
 		migrations.AddComposePinned,
+		migrations.AddFirewallRuleTable,
+		migrations.RemoveFirewallLegacyInfluence,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

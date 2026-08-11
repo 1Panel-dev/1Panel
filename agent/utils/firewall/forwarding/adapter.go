@@ -1,9 +1,5 @@
 package forwarding
 
-import (
-	"errors"
-)
-
 const (
 	ChainPreRouting  = "1PANEL_PREROUTING"
 	ChainPostRouting = "1PANEL_POSTROUTING"
@@ -23,24 +19,18 @@ type Rule struct {
 	Interface  string
 }
 
-// Adapter is the complete provider-specific forwarding surface. Filter
-// clients intentionally do not implement any of these methods.
+type OperationType string
+
+const (
+	OperationAdd    OperationType = "add"
+	OperationRemove OperationType = "remove"
+)
+
 type Adapter interface {
 	Name() string
 	List() ([]Rule, error)
-	Operate(rule Rule, operation string) error
+	Operate(rule Rule, operation OperationType) error
 	Enable() error
-	InitStatus() (bool, bool)
+	InitStatus() (bool, bool, error)
 	Replay() error
-}
-
-func NewAdapter(provider string) (Adapter, error) {
-	switch provider {
-	case "firewalld":
-		return newFirewalldAdapter(), nil
-	case "ufw", "iptables":
-		return newLegacyNATAdapter(provider), nil
-	default:
-		return nil, errors.New("unsupported forwarding provider: " + provider)
-	}
 }

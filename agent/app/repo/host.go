@@ -22,11 +22,6 @@ type IHostRepo interface {
 	WithByPort(port uint) DBOption
 	WithByUser(user string) DBOption
 
-	GetFirewallRecord(opts ...DBOption) (model.Firewall, error)
-	ListFirewallRecord(opts ...DBOption) ([]model.Firewall, error)
-	SaveFirewallRecord(firewall *model.Firewall) error
-	DeleteFirewallRecordByID(id uint) error
-
 	SyncCert(data []model.RootCert) error
 	GetCert(opts ...DBOption) (model.RootCert, error)
 	PageCert(limit, offset int, opts ...DBOption) (int64, []model.RootCert, error)
@@ -34,8 +29,6 @@ type IHostRepo interface {
 	SaveCert(cert *model.RootCert) error
 	UpdateCert(id uint, vars map[string]interface{}) error
 	DeleteCert(opts ...DBOption) error
-
-	WithByChain(chain string) DBOption
 }
 
 func NewIHostRepo() IHostRepo {
@@ -116,65 +109,6 @@ func (h *HostRepo) Delete(opts ...DBOption) error {
 	return db.Delete(&model.Host{}).Error
 }
 
-func (h *HostRepo) GetFirewallRecord(opts ...DBOption) (model.Firewall, error) {
-	var firewall model.Firewall
-	db := global.DB
-	for _, opt := range opts {
-		db = opt(db)
-	}
-	err := db.First(&firewall).Error
-	return firewall, err
-}
-
-func (h *HostRepo) ListFirewallRecord(opts ...DBOption) ([]model.Firewall, error) {
-	var firewalls []model.Firewall
-	db := global.DB
-	for _, opt := range opts {
-		db = opt(db)
-	}
-	if err := global.DB.Find(&firewalls).Error; err != nil {
-		return firewalls, nil
-	}
-	return firewalls, nil
-}
-
-func (h *HostRepo) SaveFirewallRecord(firewall *model.Firewall) error {
-	if firewall.ID != 0 {
-		return global.DB.Save(firewall).Error
-	}
-	var data model.Firewall
-	switch firewall.Type {
-	case "port":
-		_ = global.DB.Where("type = ? AND dst_port = ? AND protocol = ? AND src_ip = ? AND strategy = ?", "port",
-			firewall.DstPort,
-			firewall.Protocol,
-			firewall.SrcIP,
-			firewall.Strategy,
-		).First(&data).Error
-	case "ip":
-		_ = global.DB.Where("type = ? AND src_ip = ? AND strategy = ?", "address", firewall.SrcIP, firewall.Strategy).First(&data)
-	default:
-		_ = global.DB.Where("type = ? AND chain = ? AND src_port = ? AND dst_port = ? AND protocol = ? AND src_ip = ? AND dst_ip = ? AND strategy = ?",
-			firewall.Type,
-			firewall.Chain,
-			firewall.SrcPort,
-			firewall.DstPort,
-			firewall.Protocol,
-			firewall.SrcIP,
-			firewall.DstIP,
-			firewall.Strategy,
-		).First(&data).Error
-	}
-	if data.ID != 0 {
-		firewall.ID = data.ID
-	}
-	return global.DB.Save(firewall).Error
-}
-
-func (h *HostRepo) DeleteFirewallRecordByID(id uint) error {
-	return global.DB.Where("id = ?", id).Delete(&model.Firewall{}).Error
-}
-
 func (u *HostRepo) GetCert(opts ...DBOption) (model.RootCert, error) {
 	var cert model.RootCert
 	db := global.DB
@@ -252,10 +186,4 @@ func (u *HostRepo) SyncCert(data []model.RootCert) error {
 	}
 	tx.Commit()
 	return nil
-}
-
-func (u *HostRepo) WithByChain(chain string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("chain = ?", chain)
-	}
 }

@@ -102,19 +102,18 @@
 </template>
 
 <script lang="ts" setup>
-import FireRouter from '@/views/host/firewall/index.vue';
 import OperateDialog from './operate/index.vue';
 import ImportDialog from './import/index.vue';
+import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { operateForwardRule, searchFireRule } from '@/api/modules/host';
+import { operateForwardRule, searchForwardRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { downloadWithContent } from '@/utils/file';
 import { getCurrentDateFormatted } from '@/utils/date';
 const loading = ref();
-const activeTag = ref('forward');
 const selects = ref<any>([]);
 const searchName = ref();
 const searchStrategy = ref('');
@@ -145,14 +144,13 @@ const search = async () => {
         return;
     }
     let params = {
-        type: activeTag.value,
         strategy: searchStrategy.value,
         info: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
     loading.value = true;
-    await searchFireRule(params)
+    await searchForwardRule(params)
         .then((res) => {
             loading.value = false;
             data.value =

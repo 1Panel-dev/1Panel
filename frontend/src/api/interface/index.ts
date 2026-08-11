@@ -1,10 +1,12 @@
 export interface Result {
     code: number;
+    errorCode?: string;
     message: string;
 }
 
 export interface ResultData<T> {
     code: number;
+    errorCode?: string;
     message: string;
     data: T;
 }
