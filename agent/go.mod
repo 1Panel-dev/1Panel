@@ -10,7 +10,7 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/compose-spec/compose-go/v2 v2.14.0
 	github.com/creack/pty v1.1.24
-	github.com/docker/cli v29.7.1+incompatible
+	github.com/docker/cli v29.7.2+incompatible
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/docker/go-connections v0.8.1
 	github.com/fsnotify/fsnotify v1.10.1
@@ -28,7 +28,7 @@ require (
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/jinzhu/copier v0.4.0
 	github.com/joho/godotenv v1.5.1
-	github.com/klauspost/compress v1.19.1
+	github.com/klauspost/compress v1.19.2
 	github.com/mattn/go-shellwords v1.0.14
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
 	github.com/miekg/dns v1.1.72

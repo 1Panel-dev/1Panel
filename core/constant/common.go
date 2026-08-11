@@ -59,6 +59,7 @@ var WebUrlMap = map[string]struct{}{
 
 	"/ai":                       {},
 	"/ai/ai-proxy":              {},
+	"/ai/ai-proxy/overview":     {},
 	"/ai/ai-proxy/model-pool":   {},
 	"/ai/ai-proxy/api-keys":     {},
 	"/ai/ai-proxy/groups":       {},

@@ -513,7 +513,6 @@ func (u *appUpgradeContext) applyStagedFiles() error {
 			nginxModuleBuildDir,
 			nginxModuleModulesDir,
 			path.Join(nginxModuleConfDir, nginxModuleEnabledConfDir),
-			path.Join(nginxModuleConfDir, "nginx.conf"),
 		} {
 			if err := replaceUpgradePath(u.stageDir, u.original.GetPath(), relativePath); err != nil {
 				return err
