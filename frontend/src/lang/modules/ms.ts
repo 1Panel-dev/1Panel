@@ -4124,6 +4124,8 @@ const message = {
         adoptedHelper: 'Peraturan sistem sedia ada yang kini diselenggara oleh 1Panel.',
         legacy: 'Diurus oleh versi lama',
         external: 'Peraturan luaran',
+        externalHelper:
+            'Peraturan sistem sedia ada yang belum diurus oleh 1Panel. Ia boleh diambil alih apabila diperlukan.',
         drifted: 'Tidak segerak',
         protected: 'Dilindungi sistem',
         protectedHelper:

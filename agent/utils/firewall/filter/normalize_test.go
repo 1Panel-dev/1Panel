@@ -63,6 +63,72 @@ func TestNormalizeRuleRejectsCompositeAndFamilyMismatch(t *testing.T) {
 	}
 }
 
+func TestNormalizeNativeDestinationPortSets(t *testing.T) {
+	for _, provider := range []Provider{ProviderIptables, ProviderUFW} {
+		scope := Scope{Provider: provider, Family: FamilyIPv4, Direction: DirectionInput}
+		if provider == ProviderIptables {
+			scope.Table = "filter"
+			scope.Chain = IptablesInputChain
+		}
+		rule, err := NormalizeRule(FirewallRule{
+			Scope: scope, Protocol: "tcp", DestinationPort: "080,443,8080:8090,443", Action: ActionAccept,
+		})
+		if err != nil {
+			t.Fatalf("normalize %s port set: %v", provider, err)
+		}
+		if rule.DestinationPort != "80,443,8080-8090" {
+			t.Fatalf("unexpected %s port set: %q", provider, rule.DestinationPort)
+		}
+	}
+
+	_, err := NormalizeRule(FirewallRule{
+		Scope:    Scope{Provider: ProviderFirewalld, Family: FamilyInet, Zone: FirewalldInputZone, Direction: DirectionInput},
+		Protocol: "tcp", DestinationPort: "80,443", Action: ActionAccept,
+	})
+	if !errors.Is(err, ErrCompositeRule) {
+		t.Fatalf("expected firewalld port set expansion, got %v", err)
+	}
+
+	tooMany := "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16"
+	_, err = NormalizeRule(FirewallRule{
+		Scope:    Scope{Provider: ProviderUFW, Family: FamilyIPv4, Direction: DirectionInput},
+		Protocol: "tcp", DestinationPort: tooMany, Action: ActionAccept,
+	})
+	if !errors.Is(err, ErrInvalidRule) {
+		t.Fatalf("expected native port-set limit error, got %v", err)
+	}
+}
+
+func TestNormalizeUFWAllowsAllProtocolsForDestinationPort(t *testing.T) {
+	rule, err := NormalizeRule(FirewallRule{
+		Scope:    Scope{Provider: ProviderUFW, Family: FamilyIPv4, Direction: DirectionInput},
+		Protocol: "all", DestinationPort: "53", Action: ActionAccept,
+	})
+	if err != nil {
+		t.Fatalf("normalize UFW all-protocol port rule: %v", err)
+	}
+	if rule.Protocol != "all" || rule.DestinationPort != "53" {
+		t.Fatalf("unexpected normalized rule: %#v", rule)
+	}
+
+	for _, provider := range []Provider{ProviderIptables, ProviderFirewalld} {
+		testRule := rule
+		testRule.Scope.Provider = provider
+		switch provider {
+		case ProviderIptables:
+			testRule.Scope.Table = "filter"
+			testRule.Scope.Chain = IptablesInputChain
+		case ProviderFirewalld:
+			testRule.Scope.Family = FamilyInet
+			testRule.Scope.Zone = FirewalldInputZone
+			testRule.Scope.Chain = ""
+		}
+		if _, err = NormalizeRule(testRule); !errors.Is(err, ErrInvalidRule) {
+			t.Fatalf("expected %s all-protocol port rejection, got %v", provider, err)
+		}
+	}
+}
+
 func TestExpandAtomicRules(t *testing.T) {
 	rules, err := ExpandAtomicRules(FirewallRule{
 		Scope:           Scope{Provider: ProviderIptables, Family: FamilyIPv4, Table: "filter", Chain: "1PANEL_BASIC", Direction: DirectionInput},
@@ -74,13 +140,30 @@ func TestExpandAtomicRules(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expand atomic rules: %v", err)
 	}
-	if len(rules) != 8 {
-		t.Fatalf("expected 8 atomic rules, got %d", len(rules))
+	if len(rules) != 4 {
+		t.Fatalf("expected 4 rules with native iptables port sets, got %d", len(rules))
 	}
 	for _, rule := range rules {
-		if rule.Protocol == "tcp/udp" || rule.SourceAddress == "" || rule.DestinationPort == "" {
-			t.Fatalf("rule was not atomic: %#v", rule)
+		if rule.Protocol == "tcp/udp" || rule.SourceAddress == "" || rule.DestinationPort != "80,443" {
+			t.Fatalf("rule was not expanded correctly: %#v", rule)
 		}
+	}
+}
+
+func TestExpandAtomicRulesKeepsNativePortSetsAndSplitsFirewalld(t *testing.T) {
+	iptablesRules, err := ExpandAtomicRules(FirewallRule{
+		Scope:    Scope{Provider: ProviderIptables, Family: FamilyIPv4, Table: "filter", Chain: IptablesInputChain, Direction: DirectionInput},
+		Protocol: "tcp", DestinationPort: "80,443", Action: ActionAccept,
+	})
+	if err != nil || len(iptablesRules) != 1 || iptablesRules[0].DestinationPort != "80,443" {
+		t.Fatalf("iptables port set was expanded: rules=%#v err=%v", iptablesRules, err)
+	}
+	firewalldRules, err := ExpandAtomicRules(FirewallRule{
+		Scope:    Scope{Provider: ProviderFirewalld, Family: FamilyInet, Zone: FirewalldInputZone, Direction: DirectionInput},
+		Protocol: "tcp", DestinationPort: "80,443", Action: ActionDrop,
+	})
+	if err != nil || len(firewalldRules) != 2 || firewalldRules[0].DestinationPort != "80" || firewalldRules[1].DestinationPort != "443" {
+		t.Fatalf("firewalld port set was not expanded: rules=%#v err=%v", firewalldRules, err)
 	}
 }
 

@@ -3,6 +3,7 @@ package filter
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 var ErrVerificationFailed = errors.New("firewall rule verification failed")
@@ -24,7 +25,22 @@ func ProtectSnapshot(snapshot Snapshot, ports []ProtectedPort) (Snapshot, error)
 			rule.SourceAddress != "" || rule.SourcePort != "" || rule.DestinationAddress != "" || rule.Interface != "" {
 			continue
 		}
-		if _, protected := protectedPorts[rule.DestinationPort+"/"+rule.Protocol]; protected {
+		protected := false
+		for protectedKey := range protectedPorts {
+			separator := strings.LastIndex(protectedKey, "/")
+			if separator < 1 {
+				continue
+			}
+			protectedPort, protectedProtocol := protectedKey[:separator], protectedKey[separator+1:]
+			if rule.Protocol != "all" && rule.Protocol != protectedProtocol {
+				continue
+			}
+			if portCovers(rule.DestinationPort, protectedPort) {
+				protected = true
+				break
+			}
+		}
+		if protected {
 			rules[index].Protected = true
 		}
 	}

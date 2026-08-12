@@ -64,17 +64,13 @@ func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snaps
 	if err != nil {
 		return filter.Snapshot{}, err
 	}
-	verbose, err := a.reader.Read(ctx, "status", "verbose")
-	if err != nil {
-		return filter.Snapshot{}, err
-	}
 
 	rules := parseNumberedRules(scope, numbered)
 	snapshot, err := filter.NewSnapshot(scope, rules)
 	if err != nil {
 		return filter.Snapshot{}, err
 	}
-	snapshot.Notices = statusNotices(numbered, verbose)
+	snapshot.Notices = statusNotices(numbered)
 	return snapshot, nil
 }
 
@@ -136,13 +132,19 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 	executed := 0
 	for index, command := range plan.Rules[0].Commands {
 		if err := a.writer.Run(ctx, command); err != nil {
-			return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, err)
+			// UFW can update its native rules and still return a non-zero exit
+			// status. Re-read the marker to distinguish that case from a command
+			// that had no effect before choosing the rollback boundary.
+			if a.failedCommandApplied(ctx, plan.Rules[0], index) {
+				executed = index + 1
+			}
+			return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, fmt.Errorf("execute UFW rule: %w", err))
 		}
 		executed = index + 1
 	}
 	verification, err := a.verify(ctx, plan)
 	if err != nil {
-		return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, err)
+		return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, fmt.Errorf("verify UFW rule: %w", err))
 	}
 	if !verification.Matched {
 		return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, errors.New("ufw write verification failed"))
@@ -151,6 +153,29 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 		Applied:      []filter.ObservedRule{plan.Rules[0].Expected},
 		Verification: &verification,
 	}, nil
+}
+
+func (a *Adapter) failedCommandApplied(ctx context.Context, plan filter.NativeRulePlan, commandIndex int) bool {
+	snapshot, err := a.Observe(ctx, plan.Expected.Rule.Scope)
+	if err != nil {
+		// If state cannot be read, prefer removing a possibly-applied rule over
+		// leaving an untracked allow/deny rule behind.
+		return true
+	}
+	markerCount := countMarker(snapshot, plan.Expected.Marker)
+	switch plan.Operation {
+	case filter.ChangeCreate, filter.ChangeAdopt:
+		return markerCount > 0
+	case filter.ChangeUpdate:
+		if commandIndex == 0 {
+			return markerCount == 0
+		}
+		return markerCount > 0
+	case filter.ChangeDelete:
+		return markerCount == 0
+	default:
+		return true
+	}
 }
 
 func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.VerifyResult, error) {
@@ -233,7 +258,11 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		if normalized.OrderIndex != nil && *normalized.OrderIndex < 1 {
 			return filter.NativeRulePlan{}, fmt.Errorf("%w: create target is out of range", filter.ErrInvalidRule)
 		}
-		plan.Commands = []filter.NativeCommand{insertCommand(position, normalized, marker)}
+		command := insertCommand(position, normalized, marker)
+		if change.Append {
+			command = commentCommand(normalized, marker)
+		}
+		plan.Commands = []filter.NativeCommand{command}
 		plan.RollbackCommands = []filter.NativeCommand{deleteRuleCommand(normalized, marker)}
 	case filter.ChangeAdopt:
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, marker, false)
@@ -260,8 +289,14 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		}
 		plan.Previous = &target
 		plan.Expected = observedForRule(normalized, marker, targetPosition)
-		plan.Commands = []filter.NativeCommand{deletePositionCommand(position), insertCommand(targetPosition, normalized, marker)}
-		plan.RollbackCommands = []filter.NativeCommand{insertCommand(position, target.Rule, observedComment(target)), deleteRuleCommand(normalized, marker)}
+		plan.Commands = []filter.NativeCommand{
+			deletePositionCommand(position),
+			positionedCommand(targetPosition, normalized, marker, change.Append),
+		}
+		plan.RollbackCommands = []filter.NativeCommand{
+			positionedCommand(position, target.Rule, observedComment(target), change.RestoreAtEnd),
+			deleteRuleCommand(normalized, marker),
+		}
 	case filter.ChangeDelete:
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, marker, true)
 		if targetErr != nil {
@@ -271,7 +306,9 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		plan.Previous = &target
 		plan.Expected = target
 		plan.Commands = []filter.NativeCommand{deletePositionCommand(position)}
-		plan.RollbackCommands = []filter.NativeCommand{insertCommand(position, target.Rule, observedComment(target))}
+		plan.RollbackCommands = []filter.NativeCommand{
+			positionedCommand(position, target.Rule, observedComment(target), change.RestoreAtEnd),
+		}
 	case filter.ChangeReorder:
 		return filter.NativeRulePlan{}, fmt.Errorf("%w: ufw reorder is not supported", filter.ErrUnsupportedScope)
 	default:
@@ -384,6 +421,13 @@ func insertCommand(position int, rule filter.FirewallRule, comment string) filte
 	args := []string{"insert", strconv.Itoa(position)}
 	args = append(args, compileRuleArgs(rule, comment)...)
 	return filter.NativeCommand{Executable: "ufw", Args: args}
+}
+
+func positionedCommand(position int, rule filter.FirewallRule, comment string, appendAtEnd bool) filter.NativeCommand {
+	if appendAtEnd {
+		return commentCommand(rule, comment)
+	}
+	return insertCommand(position, rule, comment)
 }
 
 func commentCommand(rule filter.FirewallRule, comment string) filter.NativeCommand {
@@ -594,21 +638,35 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 		Provider: filter.ProviderUFW, ScopeKey: scope.Key(), NativeID: strconv.Itoa(position),
 		Canonical: normalizedDisplay(raw), Position: &positionCopy,
 	}
+	ruleAction := map[string]filter.Action{
+		"ALLOW":  filter.ActionAccept,
+		"DENY":   filter.ActionDrop,
+		"REJECT": filter.ActionReject,
+		"LIMIT":  filter.ActionAccept,
+	}[action]
+	partialRule := filter.FirewallRule{
+		Scope: scope, NativeKind: filter.NativeKindUFWRule, Action: ruleAction,
+	}
 	opaque := func() filter.ObservedRule {
 		return filter.ObservedRule{
-			Rule: filter.FirewallRule{
-				Scope: scope, NativeKind: filter.NativeKindUFWRule, Protocol: "all", Action: filter.ActionAccept,
-			},
+			Rule:    partialRule,
 			Locator: locator, ParseStatus: filter.ParseStatusOpaque, Raw: raw, Persistence: filter.PersistenceStatusConverged,
 		}
 	}
+	partial := func() filter.ObservedRule {
+		return filter.ObservedRule{
+			Rule: partialRule, Locator: locator, ParseStatus: filter.ParseStatusPartial, Raw: raw,
+			Persistence: filter.PersistenceStatusConverged,
+		}
+	}
 
-	if action == "LIMIT" || direction == "FWD" || direction == "OUT" || strings.Contains(source, "(out)") {
+	if direction == "FWD" || direction == "OUT" || strings.Contains(source, "(out)") {
 		return opaque()
 	}
 	source = strings.ReplaceAll(source, "(out)", "")
 	destination, destinationV6 := stripV6Marker(destination)
 	source, sourceV6 := stripV6Marker(source)
+	source, hasUnsupportedAnnotation := stripRuleAnnotations(source)
 	observedV6 := destinationV6 || sourceV6 || containsIPv6Address(destination) || containsIPv6Address(source)
 	if (scope.Family == filter.FamilyIPv6) != observedV6 {
 		return opaque()
@@ -618,16 +676,12 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 	if !ok {
 		return opaque()
 	}
-	ruleAction := map[string]filter.Action{
-		"ALLOW":  filter.ActionAccept,
-		"DENY":   filter.ActionDrop,
-		"REJECT": filter.ActionReject,
-	}[action]
+	partialRule.SourceAddress = sourceAddress
 	if ruleAction == "" {
 		return opaque()
 	}
 	order := int64(position)
-	destinationAddress, destinationPort, protocol, iface, ok := parseDestination(destination)
+	destinationAddress, destinationPort, protocol, iface, destinationAnnotation, ok := parseDestination(destination)
 	if !ok {
 		profile, profileInterface, profileOK := applicationProfile(destination)
 		if !profileOK {
@@ -643,6 +697,22 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 			Persistence: filter.PersistenceStatusConverged,
 		}
 	}
+	partialRule.Protocol = protocol
+	partialRule.DestinationAddress = destinationAddress
+	partialRule.DestinationPort = destinationPort
+	partialRule.Interface = iface
+	partialRule.Description = comment
+	if partialRule.Description == "" {
+		partialRule.Description = destinationAnnotation
+	}
+	if destinationAnnotation != "" && validApplicationProfileName(destinationAnnotation) {
+		partialRule.NativeKind = filter.NativeKindUFWApplication
+		partialRule.Description = destinationAnnotation
+		return partial()
+	}
+	if action == "LIMIT" || hasUnsupportedAnnotation {
+		return partial()
+	}
 	rule := filter.FirewallRule{
 		Scope: scope, NativeKind: filter.NativeKindUFWRule, Protocol: protocol,
 		SourceAddress: sourceAddress, DestinationAddress: destinationAddress, DestinationPort: destinationPort,
@@ -653,6 +723,9 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 		marker = comment
 	} else {
 		rule.Description = comment
+		if rule.Description == "" {
+			rule.Description = destinationAnnotation
+		}
 	}
 	normalized, err := filter.NormalizeRule(rule)
 	if err != nil {
@@ -663,6 +736,21 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 		Rule: normalized, Locator: locator, Marker: marker, ParseStatus: filter.ParseStatusSupported,
 		Raw: raw, Persistence: filter.PersistenceStatusConverged,
 	}
+}
+
+func stripRuleAnnotations(value string) (string, bool) {
+	tokens := strings.Fields(value)
+	filtered := tokens[:0]
+	found := false
+	for _, token := range tokens {
+		switch strings.ToLower(token) {
+		case "(log)", "(log-all)":
+			found = true
+		default:
+			filtered = append(filtered, token)
+		}
+	}
+	return strings.Join(filtered, " "), found
 }
 
 func applicationProfile(value string) (string, string, bool) {
@@ -732,7 +820,7 @@ func parseUnrecognizedNumberedRule(scope filter.Scope, raw string) (filter.Obser
 		!strings.Contains(strings.ToLower(familyInput), "(out)")
 	return filter.ObservedRule{
 		Rule: filter.FirewallRule{
-			Scope: scope, NativeKind: filter.NativeKindUFWRule, Protocol: "all", Action: filter.ActionAccept,
+			Scope: scope, NativeKind: filter.NativeKindUFWRule, Action: filter.ActionAccept,
 		},
 		Locator: filter.Locator{
 			Provider: filter.ProviderUFW, ScopeKey: scope.Key(), NativeID: strconv.Itoa(position),
@@ -751,44 +839,69 @@ func splitComment(source string) (string, string) {
 }
 
 func stripV6Marker(value string) (string, bool) {
-	tokens := strings.Fields(value)
-	filtered := tokens[:0]
 	found := false
-	for _, token := range tokens {
-		if token == "(v6)" {
-			found = true
-			continue
+	for {
+		index := strings.Index(strings.ToLower(value), "(v6)")
+		if index < 0 {
+			break
 		}
-		filtered = append(filtered, token)
+		value = value[:index] + value[index+len("(v6)"):]
+		found = true
 	}
-	return strings.Join(filtered, " "), found
+	return strings.Join(strings.Fields(value), " "), found
 }
 
-func parseDestination(value string) (address, port, protocol, iface string, ok bool) {
+func parseDestination(value string) (address, port, protocol, iface, annotation string, ok bool) {
 	value, iface, ok = splitInterface(value)
 	if !ok {
-		return "", "", "", "", false
+		return "", "", "", "", "", false
 	}
+	value, annotation = splitDestinationAnnotation(value)
 	tokens := strings.Fields(value)
 	switch len(tokens) {
 	case 1:
 		if isAnywhere(tokens[0]) {
-			return "", "", "all", iface, true
+			return "", "", "all", iface, annotation, true
 		}
 		if parsedPort, parsedProtocol, portOK := parsePortProtocol(tokens[0]); portOK {
-			return "", parsedPort, parsedProtocol, iface, true
+			return "", parsedPort, parsedProtocol, iface, annotation, true
 		}
 		if parsedAddress, addressOK := parseAddress(tokens[0]); addressOK {
-			return parsedAddress, "", "all", iface, true
+			return parsedAddress, "", "all", iface, annotation, true
 		}
 	case 2:
 		parsedAddress, addressOK := parseAddress(tokens[0])
 		parsedPort, parsedProtocol, portOK := parsePortProtocol(tokens[1])
 		if addressOK && portOK {
-			return parsedAddress, parsedPort, parsedProtocol, iface, true
+			return parsedAddress, parsedPort, parsedProtocol, iface, annotation, true
 		}
 	}
-	return "", "", "", "", false
+	return "", "", "", "", "", false
+}
+
+func splitDestinationAnnotation(value string) (string, string) {
+	value = strings.TrimSpace(value)
+	if !strings.HasSuffix(value, ")") {
+		return value, ""
+	}
+	depth := 0
+	for index := len(value) - 1; index >= 0; index-- {
+		switch value[index] {
+		case ')':
+			depth++
+		case '(':
+			depth--
+			if depth == 0 {
+				endpoint := strings.TrimSpace(value[:index])
+				annotation := strings.TrimSpace(value[index+1 : len(value)-1])
+				if endpoint != "" && annotation != "" {
+					return endpoint, annotation
+				}
+				return value, ""
+			}
+		}
+	}
+	return value, ""
 }
 
 func parseSource(value string) (string, bool) {
@@ -820,15 +933,42 @@ func splitInterface(value string) (endpoint, iface string, ok bool) {
 }
 
 func parsePortProtocol(value string) (string, string, bool) {
-	if strings.Contains(value, ",") {
-		return "", "", false
-	}
 	parts := strings.Split(value, "/")
-	if len(parts) != 2 || (parts[1] != "tcp" && parts[1] != "udp") {
+	protocol := "all"
+	portValue := parts[0]
+	if len(parts) == 2 {
+		protocol = strings.ToLower(parts[1])
+		if protocol != "tcp" && protocol != "udp" {
+			return "", "", false
+		}
+	} else if len(parts) != 1 {
 		return "", "", false
 	}
-	port := strings.ReplaceAll(parts[0], ":", "-")
-	return port, parts[1], true
+	ports := strings.Split(portValue, ",")
+	normalized := make([]string, 0, len(ports))
+	for _, port := range ports {
+		port = strings.TrimSpace(port)
+		bounds := strings.Split(port, ":")
+		if len(bounds) > 2 {
+			return "", "", false
+		}
+		for _, bound := range bounds {
+			value, err := strconv.Atoi(bound)
+			if err != nil || value < 1 || value > 65535 {
+				return "", "", false
+			}
+		}
+		if len(bounds) == 2 {
+			start, _ := strconv.Atoi(bounds[0])
+			end, _ := strconv.Atoi(bounds[1])
+			if start > end {
+				return "", "", false
+			}
+			port = bounds[0] + "-" + bounds[1]
+		}
+		normalized = append(normalized, port)
+	}
+	return strings.Join(normalized, ","), protocol, len(normalized) > 0
 }
 
 func parseAddress(value string) (string, bool) {
@@ -859,21 +999,10 @@ func normalizedDisplay(raw string) string {
 	return strings.Join(strings.Fields(raw), " ")
 }
 
-func statusNotices(numbered, verbose string) []filter.ScopeNotice {
-	notices := make([]filter.ScopeNotice, 0, 2)
+func statusNotices(numbered string) []filter.ScopeNotice {
+	notices := make([]filter.ScopeNotice, 0, 1)
 	if !statusActive(numbered) {
 		notices = append(notices, filter.ScopeNotice{Code: filter.ScopeNoticeManagedScopeInactive})
-	}
-	for _, line := range strings.Split(verbose, "\n") {
-		line = strings.TrimSpace(line)
-		if !strings.HasPrefix(strings.ToLower(line), "default:") {
-			continue
-		}
-		value := strings.TrimSpace(line[len("Default:"):])
-		if value != "" {
-			notices = append(notices, filter.ScopeNotice{Code: filter.ScopeNoticeDefaultPolicy, Values: []string{value}})
-		}
-		break
 	}
 	return notices
 }

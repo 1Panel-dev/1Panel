@@ -82,8 +82,17 @@ type FirewallRuleBatchCreate struct {
 }
 
 type FirewallRuleBatchCreateResponse struct {
-	Succeeded int `json:"succeeded"`
-	Failed    int `json:"failed"`
+	Succeeded int                              `json:"succeeded"`
+	Failed    int                              `json:"failed"`
+	Skipped   int                              `json:"skipped"`
+	Errors    []FirewallRuleBatchCreateFailure `json:"errors,omitempty"`
+}
+
+type FirewallRuleBatchCreateFailure struct {
+	Index  int                 `json:"index"`
+	Status string              `json:"status"`
+	Rule   filter.FirewallRule `json:"rule"`
+	Error  string              `json:"error,omitempty"`
 }
 
 type FirewallRuleDelete struct {

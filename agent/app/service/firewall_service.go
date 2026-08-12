@@ -13,8 +13,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"syscall"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -35,7 +33,6 @@ type FirewallService struct {
 	rules            repo.IFirewallRuleRepo
 	adapters         firewallRuleRuntimeRegistry
 	selectedProvider func(context.Context) (filter.Provider, error)
-	runtimeUsage     func(context.Context) map[string]filter.RuntimeUsage
 	iptablesHelper   *iptables_helper.IptablesManager
 }
 
@@ -65,7 +62,6 @@ func newFirewallService() *FirewallService {
 		rules:            repo.NewIFirewallRuleRepo(),
 		adapters:         newFirewallRuleRuntimeRegistry(firewallRuleSnapshotPolicy),
 		selectedProvider: firewallRuleSelectedProvider,
-		runtimeUsage:     loadFirewallRuntimeUsage,
 		iptablesHelper:   newIptablesHelperManager(),
 	}
 }
@@ -155,11 +151,7 @@ func (s *FirewallService) Inventory(ctx context.Context, request dto.FirewallRul
 	if err != nil {
 		return dto.FirewallRuleInventoryResponse{}, err
 	}
-	var usage map[string]filter.RuntimeUsage
-	if s.runtimeUsage != nil {
-		usage = s.runtimeUsage(ctx)
-	}
-	items, err := mergeFirewallInventory(snapshot.Rules, stored, nil, usage)
+	items, err := mergeFirewallInventory(snapshot.Rules, stored, nil, nil)
 	if err != nil {
 		return dto.FirewallRuleInventoryResponse{}, err
 	}
@@ -214,6 +206,9 @@ func (s *FirewallService) Check(ctx context.Context, clientIP string, request dt
 	if err != nil {
 		return dto.FirewallRuleCheckResponse{}, err
 	}
+	if err := runtime.CheckRule(ctx, rule); err != nil {
+		return dto.FirewallRuleCheckResponse{}, err
+	}
 	snapshot, err := runtime.ObserveMutation(ctx, rule.Scope)
 	if err != nil {
 		return dto.FirewallRuleCheckResponse{}, err
@@ -265,6 +260,9 @@ func (s *FirewallService) checkUpdate(
 	after.UUID = stored.UUID
 	after, err = runtime.Prepare(after)
 	if err != nil {
+		return dto.FirewallRuleCheckResponse{}, err
+	}
+	if err := runtime.CheckRule(ctx, after); err != nil {
 		return dto.FirewallRuleCheckResponse{}, err
 	}
 	if after.Scope.Key() != before.Rule.Scope.Key() {
@@ -361,6 +359,9 @@ func (s *FirewallService) prepareCreate(ctx context.Context, request dto.Firewal
 	if err != nil {
 		return preparedFirewallRuleCreate{}, err
 	}
+	if err := runtime.CheckRule(ctx, rule); err != nil {
+		return preparedFirewallRuleCreate{}, err
+	}
 	snapshot, err := runtime.ObserveMutation(ctx, rule.Scope)
 	if err != nil {
 		return preparedFirewallRuleCreate{}, err
@@ -400,10 +401,10 @@ func (s *FirewallService) CreateBatch(
 	defer firewallRuleMutationMu.Unlock()
 
 	prepared := make([]preparedFirewallRuleCreate, 0, len(request.Items))
-	for _, item := range request.Items {
+	for index, item := range request.Items {
 		entry, err := s.prepareCreate(ctx, item)
 		if err != nil {
-			return dto.FirewallRuleBatchCreateResponse{}, err
+			return firewallBatchPrepareFailure(request.Items, index, err), nil
 		}
 		prepared = append(prepared, entry)
 	}
@@ -418,15 +419,62 @@ func (s *FirewallService) CreateBatch(
 			err = s.createRule(ctx, entry.runtime, snapshot, entry.request, entry.authorization)
 		}
 		if err != nil {
-			result.Failed += len(prepared) - index
+			failed := firewallBatchExecutionFailure(request.Items, index, err)
+			result.Failed += failed.Failed
+			result.Skipped += failed.Skipped
+			result.Errors = append(result.Errors, failed.Errors...)
 			if global.LOG != nil {
-				global.LOG.Errorf("batch create firewall rule failed: %v", err)
+				global.LOG.Errorf("batch create firewall rule item %d failed: %v", index+1, err)
 			}
 			break
 		}
 		result.Succeeded++
 	}
 	return result, nil
+}
+
+func firewallBatchPrepareFailure(
+	items []dto.FirewallRuleCreate,
+	failedIndex int,
+	cause error,
+) dto.FirewallRuleBatchCreateResponse {
+	result := dto.FirewallRuleBatchCreateResponse{
+		Failed: 1, Skipped: len(items) - 1,
+		Errors: make([]dto.FirewallRuleBatchCreateFailure, 0, len(items)),
+	}
+	for index := range items {
+		failure := dto.FirewallRuleBatchCreateFailure{
+			Index: index, Status: "skipped", Rule: items[index].Rule,
+		}
+		if index == failedIndex {
+			failure.Status = "failed"
+			failure.Error = cause.Error()
+		}
+		result.Errors = append(result.Errors, failure)
+	}
+	return result
+}
+
+func firewallBatchExecutionFailure(
+	items []dto.FirewallRuleCreate,
+	failedIndex int,
+	cause error,
+) dto.FirewallRuleBatchCreateResponse {
+	result := dto.FirewallRuleBatchCreateResponse{
+		Failed: 1, Skipped: len(items) - failedIndex - 1,
+		Errors: make([]dto.FirewallRuleBatchCreateFailure, 0, len(items)-failedIndex),
+	}
+	for index := failedIndex; index < len(items); index++ {
+		failure := dto.FirewallRuleBatchCreateFailure{
+			Index: index, Status: "skipped", Rule: items[index].Rule,
+		}
+		if index == failedIndex {
+			failure.Status = "failed"
+			failure.Error = cause.Error()
+		}
+		result.Errors = append(result.Errors, failure)
+	}
+	return result
 }
 
 func (s *FirewallService) Delete(ctx context.Context, request dto.FirewallRuleDelete) error {
@@ -626,76 +674,6 @@ func syncFirewallPortWhiteListAfterUpdate(oldValue string) error {
 	return syncManagedAcceptedPorts(oldPorts, ports)
 }
 
-var firewallRuntimeUsageCache struct {
-	sync.Mutex
-	values    map[string]filter.RuntimeUsage
-	expiresAt time.Time
-}
-
-func loadFirewallRuntimeUsage(ctx context.Context) map[string]filter.RuntimeUsage {
-	firewallRuntimeUsageCache.Lock()
-	defer firewallRuntimeUsageCache.Unlock()
-	if time.Now().Before(firewallRuntimeUsageCache.expiresAt) {
-		return firewallRuntimeUsageCache.values
-	}
-	usage := collectFirewallRuntimeUsage(ctx)
-	firewallRuntimeUsageCache.values = usage
-	firewallRuntimeUsageCache.expiresAt = time.Now().Add(5 * time.Second)
-	return usage
-}
-
-func collectFirewallRuntimeUsage(ctx context.Context) map[string]filter.RuntimeUsage {
-	usage := make(map[string]filter.RuntimeUsage)
-	if installs, err := appInstallRepo.ListBy(ctx); err == nil {
-		for _, install := range installs {
-			owner := strings.TrimSpace(install.App.Key)
-			if owner == "" {
-				owner = strings.TrimSpace(install.Name)
-			}
-			addFirewallRuntimeUsage(usage, "tcp", install.HttpPort, owner, "application")
-			addFirewallRuntimeUsage(usage, "tcp", install.HttpsPort, owner, "application")
-		}
-	}
-	if setting, err := settingRepo.Get(settingRepo.WithByKey("ServerPort")); err == nil {
-		if port, parseErr := strconv.Atoi(strings.TrimSpace(setting.Value)); parseErr == nil {
-			addFirewallRuntimeUsage(usage, "tcp", port, "1panel", "application")
-		}
-	}
-	if processes, err := NewIProcessService().GetListeningProcess(ctx); err == nil {
-		for _, process := range processes {
-			protocol := ""
-			switch process.Protocol {
-			case syscall.SOCK_STREAM:
-				protocol = "tcp"
-			case syscall.SOCK_DGRAM:
-				protocol = "udp"
-			}
-			for port := range process.Port {
-				addFirewallRuntimeUsage(usage, protocol, int(port), process.Name, "listener")
-			}
-		}
-	}
-	return usage
-}
-
-func addFirewallRuntimeUsage(usage map[string]filter.RuntimeUsage, protocol string, port int, owner, reason string) {
-	if port <= 0 || port > 65535 || (protocol != "tcp" && protocol != "udp") {
-		return
-	}
-	key := protocol + "\x00" + strconv.Itoa(port)
-	value := usage[key]
-	value.Used = true
-	if strings.TrimSpace(owner) != "" {
-		value.UsedBy = append(value.UsedBy, owner)
-	}
-	if value.Reason == "" {
-		value.Reason = reason
-	} else if value.Reason != reason {
-		value.Reason = "application_and_listener"
-	}
-	usage[key] = value
-}
-
 func newIptablesHelperManager() *iptables_helper.IptablesManager {
 	return &iptables_helper.IptablesManager{
 		UpdateSetting:     settingRepo.Update,
@@ -792,7 +770,15 @@ func (s *FirewallService) createRule(
 	authorization firewallRuleCreateAuthorization,
 ) error {
 	domainRule := request.Rule
-	if authorization.Operation == filter.ChangeCreate && domainRule.OrderIndex != nil {
+	appendRule := false
+	if authorization.Operation == filter.ChangeCreate && domainRule.Scope.Provider == filter.ProviderUFW {
+		appendPosition, err := ufwAppendPosition(ctx, runtime, snapshot, domainRule)
+		if err != nil {
+			return err
+		}
+		domainRule.OrderIndex = &appendPosition
+		appendRule = true
+	} else if authorization.Operation == filter.ChangeCreate && domainRule.OrderIndex != nil {
 		maxPosition, err := maxPositionForRule(ctx, runtime, snapshot, domainRule)
 		if err != nil {
 			return err
@@ -800,9 +786,15 @@ func (s *FirewallService) createRule(
 		if *domainRule.OrderIndex < 1 || *domainRule.OrderIndex > maxPosition+1 {
 			return fmt.Errorf("%w: create target position %d is out of range 1-%d", filter.ErrInvalidRule, *domainRule.OrderIndex, maxPosition+1)
 		}
+		appendRule = domainRule.Scope.Provider == filter.ProviderUFW && *domainRule.OrderIndex == maxPosition+1
 	}
 	origin := constant.FirewallRuleOriginCreated
-	change := filter.DesiredChange{Operation: authorization.Operation, After: &domainRule, Locator: authorization.Locator}
+	change := filter.DesiredChange{
+		Operation: authorization.Operation,
+		After:     &domainRule,
+		Locator:   authorization.Locator,
+		Append:    appendRule,
+	}
 	if authorization.Operation == filter.ChangeAdopt {
 		origin = constant.FirewallRuleOriginAdopted
 	}
@@ -873,12 +865,21 @@ func (s *FirewallService) deleteRule(ctx context.Context, ruleUUID string) error
 	if err != nil {
 		return err
 	}
+	restoreAtEnd := false
+	if desired.Rule.Scope.Provider == filter.ProviderUFW && observed.Locator.Position != nil {
+		maxPosition, maxErr := maxPositionForRule(ctx, runtime, snapshot, desired.Rule)
+		if maxErr != nil {
+			return maxErr
+		}
+		restoreAtEnd = int64(*observed.Locator.Position) == maxPosition
+	}
 	locator := observed.Locator
 	before := desired.Rule
 	backendPlan, verification, err := runtime.Execute(ctx, snapshot, []filter.DesiredChange{{
-		Operation: filter.ChangeDelete,
-		Before:    &before,
-		Locator:   &locator,
+		Operation:    filter.ChangeDelete,
+		Before:       &before,
+		Locator:      &locator,
+		RestoreAtEnd: restoreAtEnd,
 	}})
 	if err != nil {
 		return err
@@ -907,6 +908,9 @@ func (s *FirewallService) updateRule(ctx context.Context, clientIP, ruleUUID str
 	after.UUID = stored.UUID
 	after, err = runtime.Prepare(after)
 	if err != nil {
+		return err
+	}
+	if err := runtime.CheckRule(ctx, after); err != nil {
 		return err
 	}
 	if after.Scope.Key() != before.Rule.Scope.Key() {
@@ -996,6 +1000,16 @@ func validatePositionTarget(
 	rule filter.FirewallRule,
 	targetPosition int64,
 ) error {
+	if rule.Scope.Provider == filter.ProviderUFW {
+		minPosition, maxPosition := snapshotPositionBounds(snapshot)
+		if targetPosition < minPosition || targetPosition > maxPosition {
+			return fmt.Errorf(
+				"%w: target position %d is outside the %s range %d-%d",
+				filter.ErrInvalidRule, targetPosition, rule.Scope.Family, minPosition, maxPosition,
+			)
+		}
+		return nil
+	}
 	maxPosition, err := maxPositionForRule(ctx, runtime, snapshot, rule)
 	if err != nil {
 		return err
@@ -1004,6 +1018,39 @@ func validatePositionTarget(
 		return fmt.Errorf("%w: target position %d is out of range 1-%d", filter.ErrInvalidRule, targetPosition, maxPosition)
 	}
 	return nil
+}
+
+func ufwAppendPosition(
+	ctx context.Context,
+	runtime *firewallRuleRuntime,
+	snapshot filter.Snapshot,
+	rule filter.FirewallRule,
+) (int64, error) {
+	if rule.Scope.Family == filter.FamilyIPv4 {
+		return snapshotMaxPosition(snapshot) + 1, nil
+	}
+	maxPosition, err := maxPositionForRule(ctx, runtime, snapshot, rule)
+	if err != nil {
+		return 0, err
+	}
+	return maxPosition + 1, nil
+}
+
+func snapshotPositionBounds(snapshot filter.Snapshot) (int64, int64) {
+	minPosition, maxPosition := int64(0), int64(0)
+	for _, observed := range snapshot.Rules {
+		if observed.Locator.Position == nil {
+			continue
+		}
+		position := int64(*observed.Locator.Position)
+		if minPosition == 0 || position < minPosition {
+			minPosition = position
+		}
+		if position > maxPosition {
+			maxPosition = position
+		}
+	}
+	return minPosition, maxPosition
 }
 
 func maxPositionForRule(
@@ -1093,11 +1140,22 @@ func (s *FirewallService) executeManagedMutation(ctx context.Context, request ma
 	); err != nil {
 		return err
 	}
+	appendRule, restoreAtEnd := false, false
+	if after.Scope.Provider == filter.ProviderUFW && request.AdapterOperation == filter.ChangeUpdate {
+		maxPosition, maxErr := maxPositionForRule(ctx, request.Runtime, request.Snapshot, after)
+		if maxErr != nil {
+			return maxErr
+		}
+		appendRule = after.OrderIndex != nil && *after.OrderIndex == maxPosition
+		restoreAtEnd = request.Locator.Position != nil && int64(*request.Locator.Position) == maxPosition
+	}
 	backendPlan, verification, err := request.Runtime.Execute(ctx, request.Snapshot, []filter.DesiredChange{{
-		Operation: request.AdapterOperation,
-		Before:    &before,
-		After:     &after,
-		Locator:   &request.Locator,
+		Operation:    request.AdapterOperation,
+		Before:       &before,
+		After:        &after,
+		Locator:      &request.Locator,
+		Append:       appendRule,
+		RestoreAtEnd: restoreAtEnd,
 	}})
 	if err != nil {
 		return err
@@ -1410,6 +1468,14 @@ func (r *firewallRuleRuntime) Prepare(rule filter.FirewallRule) (filter.Firewall
 		return rule, nil
 	}
 	return preparer.PrepareRule(rule)
+}
+
+func (r *firewallRuleRuntime) CheckRule(ctx context.Context, rule filter.FirewallRule) error {
+	checker, ok := r.adapter.(filter.RuleChecker)
+	if !ok {
+		return nil
+	}
+	return checker.CheckRule(ctx, rule)
 }
 
 func (r *firewallRuleRuntime) Capabilities(ctx context.Context) (filter.Capabilities, error) {

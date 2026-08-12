@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -22,25 +23,65 @@ type RuleWriter interface {
 	Save(context.Context, filter.Scope) error
 }
 
+type MultiportChecker interface {
+	CheckMultiport(context.Context, filter.Family) error
+}
+
 type Adapter struct {
-	reader RuleReader
-	writer RuleWriter
+	reader      RuleReader
+	writer      RuleWriter
+	checker     MultiportChecker
+	multiportMu sync.Mutex
+	multiportOK map[filter.Family]bool
 }
 
 func NewAdapter() *Adapter {
 	backend := systemBackend{}
-	return &Adapter{reader: backend, writer: backend}
+	return &Adapter{reader: backend, writer: backend, checker: backend}
 }
 
 func NewAdapterWithReader(reader RuleReader) *Adapter {
-	return &Adapter{reader: reader}
+	adapter := &Adapter{reader: reader}
+	adapter.checker, _ = reader.(MultiportChecker)
+	return adapter
 }
 
 func NewAdapterWithBackend(reader RuleReader, writer RuleWriter) *Adapter {
-	return &Adapter{reader: reader, writer: writer}
+	adapter := &Adapter{reader: reader, writer: writer}
+	if checker, ok := reader.(MultiportChecker); ok {
+		adapter.checker = checker
+	} else if checker, ok := writer.(MultiportChecker); ok {
+		adapter.checker = checker
+	}
+	return adapter
 }
 
 func (a *Adapter) Provider() filter.Provider { return filter.ProviderIptables }
+
+func (a *Adapter) CheckRule(ctx context.Context, rule filter.FirewallRule) error {
+	if !strings.Contains(rule.DestinationPort, ",") && !strings.Contains(rule.SourcePort, ",") {
+		return nil
+	}
+	if rule.Protocol != "tcp" && rule.Protocol != "udp" {
+		return fmt.Errorf("%w: iptables multiport requires tcp or udp", filter.ErrInvalidRule)
+	}
+	if a.checker == nil {
+		return nil
+	}
+	a.multiportMu.Lock()
+	defer a.multiportMu.Unlock()
+	if a.multiportOK[rule.Scope.Family] {
+		return nil
+	}
+	if err := a.checker.CheckMultiport(ctx, rule.Scope.Family); err != nil {
+		return fmt.Errorf("%w: iptables multiport is unavailable for %s: %v", filter.ErrUnsupportedScope, rule.Scope.Family, err)
+	}
+	if a.multiportOK == nil {
+		a.multiportOK = make(map[filter.Family]bool, 2)
+	}
+	a.multiportOK[rule.Scope.Family] = true
+	return nil
+}
 
 func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 	return filter.Capabilities{
@@ -431,10 +472,18 @@ func compileRuleArgs(rule filter.FirewallRule, marker string) []string {
 		args = append(args, "-d", rule.DestinationAddress)
 	}
 	if rule.SourcePort != "" {
-		args = append(args, "--sport", nativePort(rule.SourcePort))
+		if strings.Contains(rule.SourcePort, ",") {
+			args = append(args, "-m", "multiport", "--sports", nativePort(rule.SourcePort))
+		} else {
+			args = append(args, "--sport", nativePort(rule.SourcePort))
+		}
 	}
 	if rule.DestinationPort != "" {
-		args = append(args, "--dport", nativePort(rule.DestinationPort))
+		if strings.Contains(rule.DestinationPort, ",") {
+			args = append(args, "-m", "multiport", "--dports", nativePort(rule.DestinationPort))
+		} else {
+			args = append(args, "--dport", nativePort(rule.DestinationPort))
+		}
 	}
 	if len(rule.ConnectionStates) != 0 {
 		args = append(args, "-m", "conntrack", "--ctstate", strings.ToUpper(strings.Join(rule.ConnectionStates, ",")))
@@ -520,6 +569,11 @@ func isBroadDeny(rule filter.FirewallRule) bool {
 }
 
 type systemBackend struct{}
+
+func (systemBackend) CheckMultiport(_ context.Context, family filter.Family) error {
+	executable := executableForFamily(family)
+	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithOptionalSudo(executable, "-m", "multiport", "--help")
+}
 
 func (systemBackend) ListChain(_ context.Context, scope filter.Scope) (string, error) {
 	if scope.Family == filter.FamilyIPv6 {
@@ -624,13 +678,21 @@ func parseRule(scope filter.Scope, raw string, position int) filter.ObservedRule
 			if !takeValue(args, &index, &rule.DestinationPort) {
 				return opaque()
 			}
+		case "--sports", "--source-ports":
+			if !takeValue(args, &index, &rule.SourcePort) {
+				return opaque()
+			}
+		case "--dports", "--destination-ports":
+			if !takeValue(args, &index, &rule.DestinationPort) {
+				return opaque()
+			}
 		case "-i", "--in-interface":
 			if !takeValue(args, &index, &rule.Interface) {
 				return opaque()
 			}
 		case "-m", "--match":
 			var module string
-			if !takeValue(args, &index, &module) || (module != "tcp" && module != "udp" && module != "comment" && module != "conntrack") {
+			if !takeValue(args, &index, &module) || (module != "tcp" && module != "udp" && module != "comment" && module != "conntrack" && module != "multiport") {
 				return opaque()
 			}
 		case "--ctstate":

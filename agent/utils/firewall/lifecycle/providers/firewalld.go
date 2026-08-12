@@ -21,9 +21,20 @@ func (f *Firewalld) Name() string {
 func (f *Firewalld) Status() (bool, error) {
 	stdout, err := cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en")).RunWithStdout("firewall-cmd", "--state")
 	if err != nil {
+		if firewalldStopped(stdout, err) {
+			return false, nil
+		}
 		return false, fmt.Errorf("load firewall status failed: %w", err)
 	}
 	return strings.TrimSpace(stdout) == "running", nil
+}
+
+func firewalldStopped(stdout string, err error) bool {
+	message := strings.ToLower(strings.TrimSpace(stdout))
+	if err != nil {
+		message += " " + strings.ToLower(err.Error())
+	}
+	return strings.Contains(message, "not running")
 }
 
 func (f *Firewalld) Version() (string, error) {

@@ -108,7 +108,7 @@ func CheckCreate(snapshot Snapshot, requested FirewallRule, desired []DesiredRul
 	covered := make([]ObservedRule, 0)
 	conflicts := make([]ObservedRule, 0)
 	for _, observed := range snapshot.Rules {
-		if observed.ParseStatus == ParseStatusOpaque {
+		if observed.ParseStatus != ParseStatusSupported {
 			if observed.Rule.Scope.Provider == ProviderFirewalld && observed.Rule.NativeKind == NativeKindZoneService {
 				continue
 			}
@@ -364,21 +364,59 @@ func portCovers(existing, requested string) bool {
 	if requested == "" {
 		return false
 	}
-	existingStart, existingEnd, err := portInterval(existing)
+	existingIntervals, err := portIntervals(existing)
 	if err != nil {
 		return false
 	}
-	requestedStart, requestedEnd, err := portInterval(requested)
-	return err == nil && existingStart <= requestedStart && existingEnd >= requestedEnd
+	requestedIntervals, err := portIntervals(requested)
+	if err != nil {
+		return false
+	}
+	for _, requestedInterval := range requestedIntervals {
+		covered := false
+		for _, existingInterval := range existingIntervals {
+			if existingInterval[0] <= requestedInterval[0] && existingInterval[1] >= requestedInterval[1] {
+				covered = true
+				break
+			}
+		}
+		if !covered {
+			return false
+		}
+	}
+	return true
 }
 
 func portsOverlap(left, right string) bool {
 	if left == "" || right == "" {
 		return true
 	}
-	leftStart, leftEnd, leftErr := portInterval(left)
-	rightStart, rightEnd, rightErr := portInterval(right)
-	return leftErr == nil && rightErr == nil && leftStart <= rightEnd && rightStart <= leftEnd
+	leftIntervals, leftErr := portIntervals(left)
+	rightIntervals, rightErr := portIntervals(right)
+	if leftErr != nil || rightErr != nil {
+		return false
+	}
+	for _, leftInterval := range leftIntervals {
+		for _, rightInterval := range rightIntervals {
+			if leftInterval[0] <= rightInterval[1] && rightInterval[0] <= leftInterval[1] {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func portIntervals(value string) ([][2]int, error) {
+	parts := strings.Split(value, ",")
+	intervals := make([][2]int, 0, len(parts))
+	for _, part := range parts {
+		start, end, err := portInterval(strings.TrimSpace(part))
+		if err != nil {
+			return nil, err
+		}
+		intervals = append(intervals, [2]int{start, end})
+	}
+	return intervals, nil
 }
 
 func portInterval(value string) (int, int, error) {

@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"reflect"
+	"sort"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
@@ -31,6 +33,74 @@ func TestPrepareRuleChoosesNativePortOrRichRule(t *testing.T) {
 	}
 	if rich.NativeKind != filter.NativeKindRichRule || rich.OrderBucket != filter.OrderBucketRichPre || rich.SourceAddress != "172.16.10.111/32" {
 		t.Fatalf("address deny did not become a rich rule: %#v", rich)
+	}
+}
+
+func TestLegacyFirewalldRejectsOnlyExplicitRichRulePriority(t *testing.T) {
+	reader := newFakeCommandReader()
+	reader.outputs["--version"] = "0.6.3\n"
+	adapter := NewAdapterWithReader(reader)
+	priority := -100
+	rule := filter.FirewallRule{
+		Scope: testScope(filter.FamilyIPv4), NativeKind: filter.NativeKindRichRule,
+		Protocol: "tcp", DestinationPort: "443", Action: filter.ActionDrop, Priority: &priority,
+	}
+	if err := adapter.CheckRule(context.Background(), rule); !errors.Is(err, filter.ErrUnsupportedScope) {
+		t.Fatalf("legacy firewalld accepted explicit priority: %v", err)
+	}
+	priority = 0
+	if err := adapter.CheckRule(context.Background(), rule); err != nil {
+		t.Fatalf("legacy firewalld rejected priority-zero compatibility rule: %v", err)
+	}
+	rule.UUID = "legacy-rich-rule"
+	snapshot, err := filter.NewSnapshot(testScope(filter.FamilyIPv4), nil)
+	if err != nil {
+		t.Fatalf("build legacy snapshot: %v", err)
+	}
+	plan, err := adapter.Compile(snapshot, []filter.DesiredChange{{Operation: filter.ChangeCreate, After: &rule}})
+	if err != nil {
+		t.Fatalf("compile legacy compatibility rule: %v", err)
+	}
+	if option := plan.Rules[0].Commands[0].Args[1]; strings.Contains(option, "priority=") {
+		t.Fatalf("legacy compatibility command included priority: %s", option)
+	}
+	capabilities, err := adapter.Capabilities(context.Background())
+	if err != nil || capabilities.ExplicitPriority {
+		t.Fatalf("legacy firewalld exposed explicit priority: %#v err=%v", capabilities, err)
+	}
+}
+
+func TestModernFirewalldSupportsExplicitRichRulePriority(t *testing.T) {
+	reader := newFakeCommandReader()
+	reader.outputs["--version"] = "1.3.4\n"
+	adapter := NewAdapterWithReader(reader)
+	priority := 100
+	rule := filter.FirewallRule{
+		Scope: testScope(filter.FamilyIPv4), NativeKind: filter.NativeKindRichRule,
+		Protocol: "tcp", DestinationPort: "443", Action: filter.ActionAccept, Priority: &priority,
+	}
+	if err := adapter.CheckRule(context.Background(), rule); err != nil {
+		t.Fatalf("modern firewalld rejected explicit priority: %v", err)
+	}
+	capabilities, err := adapter.Capabilities(context.Background())
+	if err != nil || !capabilities.ExplicitPriority {
+		t.Fatalf("modern firewalld hid explicit priority: %#v err=%v", capabilities, err)
+	}
+}
+
+func TestParseFirewalldVersion(t *testing.T) {
+	for _, test := range []struct {
+		version      string
+		major, minor int
+	}{
+		{version: "0.6.3", major: 0, minor: 6},
+		{version: "0.7.0-1.el7", major: 0, minor: 7},
+		{version: "2.1.0", major: 2, minor: 1},
+	} {
+		major, minor, err := parseFirewalldVersion(test.version)
+		if err != nil || major != test.major || minor != test.minor {
+			t.Fatalf("parse %q: got %d.%d err=%v", test.version, major, minor, err)
+		}
 	}
 }
 
@@ -76,8 +146,6 @@ func TestCompileAdoptsCanonicalExternalRuleWithoutSystemMutation(t *testing.T) {
 	reader := newFakeCommandReader()
 	reader.set(false, "--list-ports", "8080/tcp\n")
 	reader.set(true, "--list-ports", "8080/tcp\n")
-	reader.outputs["--get-default-zone"] = "public\n"
-	reader.outputs["--get-active-zones"] = "public\n  interfaces: eth0\n"
 	adapter := NewAdapterWithReader(reader)
 	snapshot, err := adapter.Observe(context.Background(), testScope(filter.FamilyInet))
 	if err != nil {
@@ -102,8 +170,6 @@ func TestCompileUpdateAndDeleteValidateManagedCanonicalTarget(t *testing.T) {
 	reader := newFakeCommandReader()
 	reader.set(false, "--list-ports", "8080/tcp\n")
 	reader.set(true, "--list-ports", "8080/tcp\n")
-	reader.outputs["--get-default-zone"] = "public\n"
-	reader.outputs["--get-active-zones"] = "public\n  interfaces: eth0\n"
 	adapter := NewAdapterWithReader(reader)
 	snapshot, _ := adapter.Observe(context.Background(), testScope(filter.FamilyInet))
 	before := snapshot.Rules[0].Rule
@@ -150,8 +216,6 @@ func TestCompileUpdateAndDeleteValidateManagedCanonicalTarget(t *testing.T) {
 
 func TestApplyCompensatesOnlySuccessfulFirewalldSteps(t *testing.T) {
 	reader := newFakeCommandReader()
-	reader.outputs["--get-default-zone"] = "public\n"
-	reader.outputs["--get-active-zones"] = "public\n  interfaces: eth0\n"
 	writer := &fakeCommandWriter{failAt: 2, err: errors.New("permanent write failed")}
 	adapter := NewAdapterWithBackend(reader, writer)
 	snapshot, _ := adapter.Observe(context.Background(), testScope(filter.FamilyInet))
@@ -168,8 +232,6 @@ func TestApplyCompensatesOnlySuccessfulFirewalldSteps(t *testing.T) {
 
 func TestRollbackReversesFullyAppliedFirewalldPlan(t *testing.T) {
 	reader := newFakeCommandReader()
-	reader.outputs["--get-default-zone"] = "public\n"
-	reader.outputs["--get-active-zones"] = "public\n  interfaces: eth0\n"
 	writer := &fakeCommandWriter{}
 	adapter := NewAdapterWithBackend(reader, writer)
 	snapshot, _ := adapter.Observe(context.Background(), testScope(filter.FamilyInet))
@@ -189,8 +251,6 @@ func TestRollbackReversesFullyAppliedFirewalldPlan(t *testing.T) {
 
 func TestVerifyRequiresConvergedCanonicalRule(t *testing.T) {
 	reader := newFakeCommandReader()
-	reader.outputs["--get-default-zone"] = "public\n"
-	reader.outputs["--get-active-zones"] = "public\n  interfaces: eth0\n"
 	adapter := NewAdapterWithReader(reader)
 	snapshot, _ := adapter.Observe(context.Background(), testScope(filter.FamilyInet))
 	rule := filter.FirewallRule{UUID: "dns", Scope: testScope(filter.FamilyInet), Protocol: "udp", DestinationPort: "53", Action: filter.ActionAccept}
@@ -234,9 +294,6 @@ func TestObservePublicInetMergesNativeObjectsAndReportsScopeNotices(t *testing.T
 	reader.set(true, "--list-rich-rules", `rule port port="8080" protocol="tcp" accept`+"\n")
 	reader.set(false, "--list-services", "ssh dhcpv6-client\n")
 	reader.set(true, "--list-services", "dhcpv6-client ssh\n")
-	reader.outputs["--get-default-zone"] = "work\n"
-	reader.outputs["--get-active-zones"] = "public\n  interfaces: eth0\ndocker\n  interfaces: docker0\n"
-
 	snapshot, err := NewAdapterWithReader(reader).Observe(context.Background(), testScope(filter.FamilyInet))
 	if err != nil {
 		t.Fatalf("observe public inet: %v", err)
@@ -265,10 +322,57 @@ func TestObservePublicInetMergesNativeObjectsAndReportsScopeNotices(t *testing.T
 		dhcpv6Client.Rule.Description != "dhcpv6-client" || dhcpv6Client.Raw != "dhcpv6-client" {
 		t.Fatalf("dhcpv6 service was exposed as an allow-all rule: %#v", dhcpv6Client)
 	}
-	if !hasNotice(snapshot.Notices, filter.ScopeNoticeDefaultScopeMismatch, "work") ||
-		!hasNotice(snapshot.Notices, filter.ScopeNoticeUnmanagedActiveScopes, "docker") ||
-		!hasNotice(snapshot.Notices, filter.ScopeNoticeRuntimePermanentMismatch, "ports") {
+	if !hasNotice(snapshot.Notices, filter.ScopeNoticeRuntimePermanentMismatch, "ports") {
 		t.Fatalf("scope notices missing: %#v", snapshot.Notices)
+	}
+}
+
+func TestObserveReadsRuntimeAndPermanentWithListAll(t *testing.T) {
+	reader := newFakeCommandReader()
+	reader.set(false, "--list-ports", "22/tcp\n")
+	reader.set(true, "--list-ports", "22/tcp 80/tcp\n")
+	if _, err := NewAdapterWithReader(reader).Observe(context.Background(), testScope(filter.FamilyInet)); err != nil {
+		t.Fatalf("observe public zone: %v", err)
+	}
+	want := []string{
+		"--zone=public\x00--list-all",
+		"--permanent\x00--zone=public\x00--list-all",
+	}
+	got := reader.readCalls()
+	sort.Strings(got)
+	sort.Strings(want)
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("unexpected firewall-cmd reads: got %#v, want %#v", got, want)
+	}
+}
+
+func TestParseZoneOutput(t *testing.T) {
+	output := `public (active)
+  target: default
+  interfaces: eth0
+  services: cockpit ssh
+  ports: 22/tcp 53/udp
+  protocols:
+  forward: yes
+  masquerade: no
+  forward-ports:
+  source-ports:
+  icmp-blocks:
+  rich rules:
+	rule family="ipv4" source address="10.0.0.1" accept
+	rule port port="8080" protocol="tcp" accept`
+	got := parseZoneOutput(output)
+	want := zoneOutput{
+		ports:    "22/tcp 53/udp",
+		services: "cockpit ssh",
+		active:   true,
+		rich: strings.Join([]string{
+			`rule family="ipv4" source address="10.0.0.1" accept`,
+			`rule port port="8080" protocol="tcp" accept`,
+		}, "\n"),
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("unexpected parsed zone output: got %#v, want %#v", got, want)
 	}
 }
 
@@ -283,9 +387,6 @@ func TestObservePublicPipelineKeepsRuleFamiliesInOneZoneScope(t *testing.T) {
 	}, "\n") + "\n"
 	reader.set(false, "--list-rich-rules", rich)
 	reader.set(true, "--list-rich-rules", rich)
-	reader.outputs["--get-default-zone"] = "public\n"
-	reader.outputs["--get-active-zones"] = "public\n  interfaces: eth0\n"
-
 	snapshot, err := NewAdapterWithReader(reader).Observe(context.Background(), testScope(filter.FamilyIPv4))
 	if err != nil {
 		t.Fatalf("observe public IPv4: %v", err)
@@ -349,15 +450,18 @@ func TestObserveRejectsZoneOutsidePublic(t *testing.T) {
 }
 
 func TestZoneNoticesReportInactivePublic(t *testing.T) {
-	notices := zoneNotices("public", []string{"docker"}, zoneOutput{}, zoneOutput{})
-	if !hasNotice(notices, filter.ScopeNoticeManagedScopeInactive, "") || !hasNotice(notices, filter.ScopeNoticeUnmanagedActiveScopes, "docker") {
+	notices := publicZoneNotices(zoneOutput{}, zoneOutput{})
+	if !hasNotice(notices, filter.ScopeNoticeManagedScopeInactive, "") {
 		t.Fatalf("inactive public notices missing: %#v", notices)
 	}
 }
 
 type fakeCommandReader struct {
+	mu      sync.Mutex
 	outputs map[string]string
 	errors  map[string]error
+	calls   []string
+	zones   map[bool]zoneOutput
 }
 
 type fakeCommandWriter struct {
@@ -375,21 +479,22 @@ func (f *fakeCommandWriter) Run(_ context.Context, command filter.NativeCommand)
 }
 
 func newFakeCommandReader() *fakeCommandReader {
-	reader := &fakeCommandReader{outputs: make(map[string]string), errors: make(map[string]error)}
-	for _, option := range []string{"--list-ports", "--list-rich-rules", "--list-services"} {
-		reader.set(false, option, "")
-		reader.set(true, option, "")
+	return &fakeCommandReader{
+		outputs: make(map[string]string), errors: make(map[string]error), zones: map[bool]zoneOutput{false: {active: true}},
 	}
-	return reader
 }
 
 func (f *fakeCommandReader) set(permanent bool, option, output string) {
-	args := make([]string, 0, 3)
-	if permanent {
-		args = append(args, "--permanent")
+	zone := f.zones[permanent]
+	switch option {
+	case "--list-ports":
+		zone.ports = strings.TrimSpace(output)
+	case "--list-rich-rules":
+		zone.rich = strings.TrimSpace(output)
+	case "--list-services":
+		zone.services = strings.TrimSpace(output)
 	}
-	args = append(args, "--zone=public", option)
-	f.outputs[strings.Join(args, "\x00")] = output
+	f.zones[permanent] = zone
 }
 
 func (f *fakeCommandReader) setServiceInfo(permanent bool, service, output string) {
@@ -403,14 +508,36 @@ func (f *fakeCommandReader) setServiceInfo(permanent bool, service, output strin
 
 func (f *fakeCommandReader) Read(_ context.Context, args ...string) (string, error) {
 	key := strings.Join(args, "\x00")
+	f.mu.Lock()
+	f.calls = append(f.calls, key)
+	f.mu.Unlock()
 	if err := f.errors[key]; err != nil {
 		return "", err
+	}
+	if len(args) >= 2 && args[len(args)-2] == "--zone=public" && args[len(args)-1] == "--list-all" {
+		permanent := args[0] == "--permanent"
+		zone := f.zones[permanent]
+		header := "public"
+		if zone.active {
+			header += " (active)"
+		}
+		output := header + "\n  services: " + zone.services + "\n  ports: " + zone.ports + "\n  rich rules:"
+		if zone.rich != "" {
+			output += "\n    " + strings.ReplaceAll(zone.rich, "\n", "\n    ")
+		}
+		return output + "\n", nil
 	}
 	output, exists := f.outputs[key]
 	if !exists {
 		return "", errors.New("unexpected firewall-cmd call: " + strings.Join(args, " "))
 	}
 	return output, nil
+}
+
+func (f *fakeCommandReader) readCalls() []string {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return append([]string(nil), f.calls...)
 }
 
 func testScope(family filter.Family) filter.Scope {

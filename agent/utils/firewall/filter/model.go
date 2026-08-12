@@ -62,6 +62,7 @@ type ParseStatus string
 
 const (
 	ParseStatusSupported ParseStatus = "supported"
+	ParseStatusPartial   ParseStatus = "partial"
 	ParseStatusOpaque    ParseStatus = "opaque"
 )
 
@@ -80,7 +81,6 @@ const (
 	ScopeNoticeManagedScopeInactive     ScopeNoticeCode = "managed_scope_inactive"
 	ScopeNoticeUnmanagedActiveScopes    ScopeNoticeCode = "unmanaged_active_scopes"
 	ScopeNoticeRuntimePermanentMismatch ScopeNoticeCode = "runtime_permanent_mismatch"
-	ScopeNoticeDefaultPolicy            ScopeNoticeCode = "default_policy"
 	ScopeNoticeManagedScopeMissing      ScopeNoticeCode = "managed_scope_missing"
 )
 

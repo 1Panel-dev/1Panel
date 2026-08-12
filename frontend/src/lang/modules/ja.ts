@@ -4052,6 +4052,8 @@ const message = {
         adoptedHelper: 'システムに既に存在し、現在は 1Panel が管理しているルールです。',
         legacy: '旧方式で管理',
         external: '外部ルール',
+        externalHelper:
+            'システムに存在しますが、まだ 1Panel の管理対象ではありません。必要に応じて管理対象にできます。',
         drifted: '不整合',
         protected: 'システム保護',
         protectedHelper: 'アクセスへの影響を防ぐため、編集や削除ができない重要なシステムルールです。',

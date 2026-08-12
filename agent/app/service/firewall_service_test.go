@@ -121,6 +121,152 @@ func TestFirewallRuleServiceCreateRequiresCheck(t *testing.T) {
 	}
 }
 
+func TestFirewallRuleServiceAlwaysAppendsUFWCreateWithinFamily(t *testing.T) {
+	scope := filter.Scope{
+		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,
+		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
+	}
+	existingRule := filter.FirewallRule{
+		Scope: scope, NativeKind: filter.NativeKindUFWRule,
+		Protocol: "tcp", DestinationPort: "80", Action: filter.ActionAccept,
+	}
+	existing := executorObservedRule(existingRule, "", 4)
+	adapter := newFakeFilterAdapter(t, scope, []filter.ObservedRule{existing})
+	service, _ := newTestFirewallExecutor(t, adapter)
+	order := int64(9)
+	rule := filter.FirewallRule{
+		Scope: scope, NativeKind: filter.NativeKindUFWRule,
+		Protocol: "tcp", DestinationPort: "8080", Action: filter.ActionAccept, OrderIndex: &order,
+	}
+
+	if err := createExecutorRule(service, adapter, dto.FirewallRuleCreate{
+		Rule: rule, Action: filter.CheckActionCreate, SourceKind: constant.FirewallRuleSourceUser,
+	}); err != nil {
+		t.Fatalf("create UFW rule at next position: %v", err)
+	}
+	if !adapter.lastChange.Append || adapter.lastChange.After == nil || adapter.lastChange.After.OrderIndex == nil ||
+		*adapter.lastChange.After.OrderIndex != 5 {
+		t.Fatalf("UFW client position was not replaced with the IPv4 append position: %#v", adapter.lastChange)
+	}
+}
+
+func TestValidateUFWPositionWithinFamilyBounds(t *testing.T) {
+	ipv4Scope := filter.Scope{
+		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,
+		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
+	}
+	ipv4Rule := filter.FirewallRule{
+		Scope: ipv4Scope, NativeKind: filter.NativeKindUFWRule,
+		Protocol: "tcp", DestinationPort: "80", Action: filter.ActionAccept,
+	}
+	ipv4Snapshot, err := filter.NewSnapshot(ipv4Scope, []filter.ObservedRule{
+		executorObservedRule(ipv4Rule, "", 1),
+		executorObservedRule(ipv4Rule, "", 4),
+	})
+	if err != nil {
+		t.Fatalf("create IPv4 snapshot: %v", err)
+	}
+	if err = validatePositionTarget(context.Background(), nil, ipv4Snapshot, ipv4Rule, 4); err != nil {
+		t.Fatalf("valid IPv4 position was rejected: %v", err)
+	}
+	if err = validatePositionTarget(context.Background(), nil, ipv4Snapshot, ipv4Rule, 5); !errors.Is(err, filter.ErrInvalidRule) {
+		t.Fatalf("IPv6 position was accepted for IPv4 rule: %v", err)
+	}
+
+	ipv6Scope := ipv4Scope
+	ipv6Scope.Family = filter.FamilyIPv6
+	ipv6Rule := ipv4Rule
+	ipv6Rule.Scope = ipv6Scope
+	ipv6Snapshot, err := filter.NewSnapshot(ipv6Scope, []filter.ObservedRule{
+		executorObservedRule(ipv6Rule, "", 5),
+		executorObservedRule(ipv6Rule, "", 8),
+	})
+	if err != nil {
+		t.Fatalf("create IPv6 snapshot: %v", err)
+	}
+	if err = validatePositionTarget(context.Background(), nil, ipv6Snapshot, ipv6Rule, 4); !errors.Is(err, filter.ErrInvalidRule) {
+		t.Fatalf("IPv4 position was accepted for IPv6 rule: %v", err)
+	}
+}
+
+func TestUFWAppendPositionUsesFamilyBoundary(t *testing.T) {
+	ipv4Scope := filter.Scope{
+		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,
+		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
+	}
+	ipv4Rule := filter.FirewallRule{
+		Scope: ipv4Scope, NativeKind: filter.NativeKindUFWRule,
+		Protocol: "tcp", DestinationPort: "80", Action: filter.ActionAccept,
+	}
+	ipv4Snapshot, err := filter.NewSnapshot(ipv4Scope, []filter.ObservedRule{
+		executorObservedRule(ipv4Rule, "", 1),
+		executorObservedRule(ipv4Rule, "", 4),
+	})
+	if err != nil {
+		t.Fatalf("create IPv4 snapshot: %v", err)
+	}
+	if position, positionErr := ufwAppendPosition(context.Background(), nil, ipv4Snapshot, ipv4Rule); positionErr != nil || position != 5 {
+		t.Fatalf("unexpected IPv4 append position: position=%d err=%v", position, positionErr)
+	}
+
+	ipv6Scope := ipv4Scope
+	ipv6Scope.Family = filter.FamilyIPv6
+	ipv6Rule := ipv4Rule
+	ipv6Rule.Scope = ipv6Scope
+	ipv6Snapshot, err := filter.NewSnapshot(ipv6Scope, []filter.ObservedRule{
+		executorObservedRule(ipv6Rule, "", 5),
+		executorObservedRule(ipv6Rule, "", 8),
+	})
+	if err != nil {
+		t.Fatalf("create IPv6 snapshot: %v", err)
+	}
+	ipv4Adapter := newFakeFilterAdapter(t, ipv4Scope, ipv4Snapshot.Rules)
+	runtime := newFirewallRuleRuntime(ipv4Adapter, nil)
+	if position, positionErr := ufwAppendPosition(context.Background(), runtime, ipv6Snapshot, ipv6Rule); positionErr != nil || position != 9 {
+		t.Fatalf("unexpected IPv6 append position: position=%d err=%v", position, positionErr)
+	}
+}
+
+func TestUFWGlobalEndPositionIncludesOtherFamily(t *testing.T) {
+	ipv4Scope := filter.Scope{
+		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,
+		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
+	}
+	ipv4Rule := filter.FirewallRule{
+		Scope: ipv4Scope, NativeKind: filter.NativeKindUFWRule,
+		Protocol: "tcp", DestinationPort: "4422,8088", Action: filter.ActionAccept,
+	}
+	ipv4Snapshot, err := filter.NewSnapshot(ipv4Scope, []filter.ObservedRule{
+		executorObservedRule(ipv4Rule, "1panel-rule:managed", 4),
+	})
+	if err != nil {
+		t.Fatalf("create IPv4 snapshot: %v", err)
+	}
+
+	ipv6Scope := ipv4Scope
+	ipv6Scope.Family = filter.FamilyIPv6
+	ipv6Rule := ipv4Rule
+	ipv6Rule.Scope = ipv6Scope
+	ipv6Snapshot, err := filter.NewSnapshot(ipv6Scope, []filter.ObservedRule{
+		executorObservedRule(ipv6Rule, "", 5),
+		executorObservedRule(ipv6Rule, "", 8),
+	})
+	if err != nil {
+		t.Fatalf("create IPv6 snapshot: %v", err)
+	}
+	runtime := newFirewallRuleRuntime(newFakeFilterAdapter(t, ipv6Scope, ipv6Snapshot.Rules), nil)
+	maxPosition, err := maxPositionForRule(context.Background(), runtime, ipv4Snapshot, ipv4Rule)
+	if err != nil {
+		t.Fatalf("load UFW global maximum position: %v", err)
+	}
+	if maxPosition != 8 {
+		t.Fatalf("IPv4 family boundary was mistaken for the global end: %d", maxPosition)
+	}
+	if int64(*ipv4Snapshot.Rules[0].Locator.Position) == maxPosition {
+		t.Fatal("last IPv4 rule was incorrectly classified as the global last UFW rule")
+	}
+}
+
 func TestFirewallRuleServiceBatchCheckAndCreateSameScope(t *testing.T) {
 	rules := []filter.FirewallRule{executorTestRule("8080"), executorTestRule("8081")}
 	adapter := newFakeFilterAdapter(t, rules[0].Scope, nil)
@@ -156,6 +302,7 @@ func TestFirewallRuleServiceBatchCheckAndCreateSameScope(t *testing.T) {
 
 func TestFirewallRuleServiceBatchCreateRejectsDuplicateManagedRule(t *testing.T) {
 	rule := executorTestRule("8080")
+	trailingRule := executorTestRule("8081")
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
 	db := newFirewallRuleTestDB(t)
 	ruleRepo := repo.NewFirewallRuleRepo(db)
@@ -166,11 +313,11 @@ func TestFirewallRuleServiceBatchCreateRejectsDuplicateManagedRule(t *testing.T)
 	}
 	ctx := context.Background()
 
-	checked, err := service.CheckBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: []filter.FirewallRule{rule, rule}})
-	if err != nil || len(checked.Items) != 2 {
+	checked, err := service.CheckBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: []filter.FirewallRule{rule, rule, trailingRule}})
+	if err != nil || len(checked.Items) != 3 {
 		t.Fatalf("batch check duplicate rules: result=%#v err=%v", checked, err)
 	}
-	request := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, 2)}
+	request := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, 3)}
 	for _, item := range checked.Items {
 		request.Items = append(request.Items, dto.FirewallRuleCreate{
 			Rule: item.RequestedRule, CheckFlag: item.CheckFlag, Action: filter.CheckActionCreate,
@@ -179,8 +326,14 @@ func TestFirewallRuleServiceBatchCreateRejectsDuplicateManagedRule(t *testing.T)
 	}
 
 	created, err := service.CreateBatch(ctx, request)
-	if err != nil || created.Succeeded != 1 || created.Failed != 1 {
+	if err != nil || created.Succeeded != 1 || created.Failed != 1 || created.Skipped != 1 {
 		t.Fatalf("batch duplicate create: result=%#v err=%v", created, err)
+	}
+	if len(created.Errors) != 2 || created.Errors[0].Index != 1 || created.Errors[0].Status != "failed" ||
+		created.Errors[0].Error == "" || created.Errors[0].Rule.DestinationPort != "8080" ||
+		created.Errors[1].Index != 2 || created.Errors[1].Status != "skipped" || created.Errors[1].Error != "" ||
+		created.Errors[1].Rule.DestinationPort != "8081" {
+		t.Fatalf("batch failure details missing: %#v", created.Errors)
 	}
 	stored, listErr := ruleRepo.List(ctx)
 	if listErr != nil || len(stored) != 1 || len(adapter.snapshot.Rules) != 1 || adapter.applyCount != 1 {
@@ -307,17 +460,6 @@ func TestNormalizeFirewallRuleScopeDefaultsIptablesChains(t *testing.T) {
 	input := filter.Scope{Provider: filter.ProviderIptables, Family: filter.FamilyIPv4, Table: "filter", Direction: filter.DirectionInput}.Normalize()
 	if input.Chain != filter.IptablesInputChain {
 		t.Fatalf("unexpected input chain: %#v", input)
-	}
-}
-
-func TestAddFirewallRuntimeUsageMergesOwnersAndReasons(t *testing.T) {
-	usage := make(map[string]filter.RuntimeUsage)
-	addFirewallRuntimeUsage(usage, "tcp", 8080, "demo", "application")
-	addFirewallRuntimeUsage(usage, "tcp", 8080, "server", "listener")
-	addFirewallRuntimeUsage(usage, "icmp", 8080, "ignored", "listener")
-	value := usage["tcp\x008080"]
-	if !value.Used || len(value.UsedBy) != 2 || value.Reason != "application_and_listener" || len(usage) != 1 {
-		t.Fatalf("unexpected runtime usage: %#v", usage)
 	}
 }
 
@@ -952,6 +1094,7 @@ func createExecutorRule(executor *FirewallService, adapter *fakeFilterAdapter, r
 type fakeFilterAdapter struct {
 	snapshot              filter.Snapshot
 	rollbackSnapshot      filter.Snapshot
+	lastChange            filter.DesiredChange
 	applyCount            int
 	rollbackCount         int
 	verifyMatched         bool
@@ -1004,6 +1147,7 @@ func (f *fakeFilterAdapter) Compile(snapshot filter.Snapshot, changes []filter.D
 	f.rollbackSnapshot = snapshot
 	f.rollbackSnapshot.Rules = append([]filter.ObservedRule(nil), snapshot.Rules...)
 	change := changes[0]
+	f.lastChange = change
 	rule := change.After
 	if change.Operation == filter.ChangeDelete {
 		rule = change.Before
@@ -1013,7 +1157,7 @@ func (f *fakeFilterAdapter) Compile(snapshot filter.Snapshot, changes []filter.D
 	if change.Locator != nil && change.Locator.Position != nil {
 		position = *change.Locator.Position
 	}
-	if (change.Operation == filter.ChangeReorder || change.Operation == filter.ChangeUpdate) && rule.OrderIndex != nil {
+	if rule.OrderIndex != nil && (change.Operation == filter.ChangeCreate || change.Operation == filter.ChangeReorder || change.Operation == filter.ChangeUpdate) {
 		position = int(*rule.OrderIndex)
 	}
 	expected := executorObservedRule(*rule, marker, position)

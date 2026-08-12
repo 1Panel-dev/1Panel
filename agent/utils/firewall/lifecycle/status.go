@@ -5,6 +5,8 @@ import (
 	"sync"
 )
 
+import ()
+
 type State struct {
 	Name     string
 	IsActive bool
@@ -24,18 +26,27 @@ func LoadState(client Client) (State, error) {
 
 func LoadStatus(client Client) (Status, error) {
 	status := Status{Version: "-"}
-	var versionErr error
-	var stateErr error
+	var state State
+	var version string
+	var stateErr, versionErr error
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		status.Version, versionErr = client.Version()
+		state, stateErr = LoadState(client)
 	}()
 	go func() {
 		defer wg.Done()
-		status.State, stateErr = LoadState(client)
+		version, versionErr = client.Version()
 	}()
 	wg.Wait()
-	return status, errors.Join(versionErr, stateErr)
+	status.State = state
+	if stateErr != nil {
+		return status, errors.Join(stateErr, versionErr)
+	}
+	if !status.IsActive {
+		return status, nil
+	}
+	status.Version = version
+	return status, versionErr
 }

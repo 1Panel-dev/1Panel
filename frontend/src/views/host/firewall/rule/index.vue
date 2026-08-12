@@ -10,6 +10,7 @@
                 v-model:is-active="isActive"
                 v-model:is-bind="isBind"
                 v-model:name="provider"
+                v-model:version="firewallVersion"
                 current-tab="base"
                 @search="search"
             />
@@ -103,11 +104,46 @@
                                     <el-option :label="$t('firewall.drop')" value="action:deny" />
                                 </el-option-group>
                                 <el-option-group :label="$t('commons.table.status')">
-                                    <el-option :label="$t('firewall.managed')" value="state:managed" />
-                                    <el-option :label="$t('firewall.adopted')" value="state:adopted" />
-                                    <el-option :label="$t('firewall.external')" value="state:external" />
-                                    <el-option :label="$t('firewall.protected')" value="state:protected" />
-                                    <el-option :label="$t('firewall.drifted')" value="state:drifted" />
+                                    <el-option :label="$t('firewall.stateShort.managed')" value="state:managed">
+                                        <div class="firewall-state-filter-option">
+                                            <span>{{ $t('firewall.stateShort.managed') }}</span>
+                                            <span class="firewall-state-filter-description">
+                                                {{ $t('firewall.managedHelper') }}
+                                            </span>
+                                        </div>
+                                    </el-option>
+                                    <el-option :label="$t('firewall.stateShort.adopted')" value="state:adopted">
+                                        <div class="firewall-state-filter-option">
+                                            <span>{{ $t('firewall.stateShort.adopted') }}</span>
+                                            <span class="firewall-state-filter-description">
+                                                {{ $t('firewall.adoptedHelper') }}
+                                            </span>
+                                        </div>
+                                    </el-option>
+                                    <el-option :label="$t('firewall.stateShort.external')" value="state:external">
+                                        <div class="firewall-state-filter-option">
+                                            <span>{{ $t('firewall.stateShort.external') }}</span>
+                                            <span class="firewall-state-filter-description">
+                                                {{ $t('firewall.externalHelper') }}
+                                            </span>
+                                        </div>
+                                    </el-option>
+                                    <el-option :label="$t('firewall.stateShort.protected')" value="state:protected">
+                                        <div class="firewall-state-filter-option">
+                                            <span>{{ $t('firewall.stateShort.protected') }}</span>
+                                            <span class="firewall-state-filter-description">
+                                                {{ $t('firewall.protectedHelper') }}
+                                            </span>
+                                        </div>
+                                    </el-option>
+                                    <el-option :label="$t('firewall.stateShort.drifted')" value="state:drifted">
+                                        <div class="firewall-state-filter-option">
+                                            <span>{{ $t('firewall.stateShort.drifted') }}</span>
+                                            <span class="firewall-state-filter-description">
+                                                {{ $t('firewall.plan_managed_rule_drifted') }}
+                                            </span>
+                                        </div>
+                                    </el-option>
                                 </el-option-group>
                             </el-select>
                         </div>
@@ -125,7 +161,7 @@
                                 row-key="rowKey"
                             >
                                 <el-table-column type="selection" :selectable="isEditableManagedRule" width="48" fix />
-                                <el-table-column :label="$t('firewall.action')" width="80">
+                                <el-table-column :label="$t('firewall.action')" width="76">
                                     <template #default="{ row }">
                                         <span
                                             class="firewall-action"
@@ -140,29 +176,59 @@
                                         </span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="$t('firewall.priority')" align="center" width="100">
+                                <el-table-column :label="$t('firewall.priority')" width="90">
                                     <template #default="{ row }">
                                         {{ displayRulePriority(row) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="$t('commons.table.status')" width="100" align="center">
+                                <el-table-column :label="$t('commons.table.status')" width="64">
                                     <template #default="{ row }">
-                                        <el-tag
-                                            class="firewall-state-tag"
-                                            :type="stateTagType(row.state)"
-                                            effect="plain"
-                                            size="small"
-                                        >
-                                            {{ $t(`firewall.stateShort.${row.state}`) }}
-                                        </el-tag>
+                                        <el-tooltip :content="ruleStateTooltip(row)" placement="top" :show-after="200">
+                                            <span
+                                                class="firewall-rule-state"
+                                                :aria-label="`${ruleStateTitle(row)}：${ruleStateDetail(row)}`"
+                                                tabindex="0"
+                                            >
+                                                <el-icon
+                                                    v-if="row.state === 'drifted'"
+                                                    class="firewall-rule-state-warning"
+                                                >
+                                                    <WarningFilled />
+                                                </el-icon>
+                                                <i
+                                                    v-if="row.state === 'adopted'"
+                                                    class="iconfont firewall-rule-source-icon"
+                                                    :class="'p-yinaguan'"
+                                                    aria-hidden="true"
+                                                />
+                                                <i
+                                                    v-if="row.state === 'managed'"
+                                                    class="iconfont firewall-rule-source-icon"
+                                                    :class="'p-shuju'"
+                                                    aria-hidden="true"
+                                                />
+                                                <el-icon
+                                                    v-if="row.state === 'external'"
+                                                    class="firewall-rule-source-icon"
+                                                >
+                                                    <Link />
+                                                </el-icon>
+                                                <el-icon
+                                                    v-if="row.state === 'protected'"
+                                                    class="firewall-rule-source-icon"
+                                                >
+                                                    <Lock />
+                                                </el-icon>
+                                            </span>
+                                        </el-tooltip>
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="$t('commons.table.protocol')" width="85">
+                                <el-table-column :label="$t('commons.table.protocol')" width="110">
                                     <template #default="{ row }">
                                         {{ displayProtocol(row) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="IP" min-width="200" show-overflow-tooltip>
+                                <el-table-column label="IP" min-width="240" show-overflow-tooltip>
                                     <template #default="{ row }">
                                         <span>
                                             {{ displayAddress(row) }}
@@ -171,7 +237,7 @@
                                 </el-table-column>
                                 <el-table-column
                                     :label="$t('commons.table.port')"
-                                    min-width="140"
+                                    min-width="180"
                                     show-overflow-tooltip
                                 >
                                     <template #default="{ row }">
@@ -180,9 +246,9 @@
                                         </span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column :label="$t('firewall.used')" min-width="220">
+                                <el-table-column :label="$t('firewall.used')" min-width="200">
                                     <template #default="{ row }">
-                                        <span v-if="isOpaqueRule(row)">-</span>
+                                        <span v-if="isReadOnlyNativeRule(row)">-</span>
                                         <el-tag v-else-if="ruleUsageEntries(row).length === 0" type="info" size="small">
                                             {{ $t('firewall.unUsed') }}
                                         </el-tag>
@@ -256,12 +322,12 @@
                                 </el-table-column>
                                 <el-table-column
                                     :label="$t('commons.table.description')"
-                                    min-width="180"
+                                    min-width="160"
                                     prop="rule.description"
                                     show-overflow-tooltip
                                 />
                                 <fu-table-operations
-                                    width="220px"
+                                    width="160px"
                                     :buttons="operationButtons"
                                     :label="$t('commons.table.operate')"
                                     fix
@@ -300,7 +366,7 @@ import FireStatus from '@/views/host/firewall/status/index.vue';
 import ProcessDetail from '@/views/host/process/process/detail/index.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { ElMessageBox } from 'element-plus';
-import { Expand, Filter } from '@element-plus/icons-vue';
+import { Expand, Filter, Lock, WarningFilled } from '@element-plus/icons-vue';
 
 interface RuleRow extends Firewall.InventoryItem {
     rowKey: string;
@@ -334,6 +400,7 @@ const maskShow = ref(true);
 const isActive = ref(false);
 const isBind = ref(false);
 const provider = ref('');
+const firewallVersion = ref('');
 const selectedRuleFilters = ref<RuleFilter[]>([]);
 const iptablesChains = ['1PANEL_BASIC_BEFORE', '1PANEL_BASIC', '1PANEL_BASIC_AFTER'] as const;
 const visibleIptablesChains = ref<string[]>(['1PANEL_BASIC']);
@@ -344,6 +411,14 @@ const selects = ref<RuleRow[]>([]);
 const scopeNotices = ref<Firewall.ScopeNotice[]>([]);
 
 const iptablesChainFilterActive = computed(() => visibleIptablesChains.value.length < iptablesChains.length);
+const supportsFirewalldPriority = computed(() => {
+    if (provider.value !== 'firewalld') return true;
+    const match = firewallVersion.value.trim().match(/^(\d+)\.(\d+)/);
+    if (!match) return false;
+    const major = Number(match[1]);
+    const minor = Number(match[2]);
+    return major > 0 || minor >= 7;
+});
 
 const paginationConfig = reactive({
     cacheSizeKey: 'firewall-rule-page-size',
@@ -418,6 +493,8 @@ const wildcardAddress = (family: Firewall.Family) => {
 };
 
 const isOpaqueRule = (row: Firewall.InventoryItem) => row.observed?.parseStatus === 'opaque';
+const isReadOnlyNativeRule = (row: Firewall.InventoryItem) =>
+    Boolean(row.observed) && row.observed?.parseStatus !== 'supported';
 const rowProvider = (row: Firewall.InventoryItem) => row.rule.scope.provider || row.observed?.locator.provider;
 const rowNativeKind = (row: Firewall.InventoryItem) => row.rule.nativeKind || row.observed?.rule.nativeKind;
 const isFirewalldService = (row: Firewall.InventoryItem) => {
@@ -428,6 +505,7 @@ const isFirewalldService = (row: Firewall.InventoryItem) => {
 };
 const isUFWApplication = (row: Firewall.InventoryItem) =>
     rowProvider(row) === 'ufw' && rowNativeKind(row) === 'ufw_application';
+const hasParsedUFWFields = (row: Firewall.InventoryItem) => rowProvider(row) === 'ufw' && Boolean(row.rule.protocol);
 
 const firewalldServiceName = (row: Firewall.InventoryItem) => {
     const description = row.rule.description?.trim() || row.observed?.rule.description?.trim();
@@ -463,19 +541,20 @@ const nativeDetailTarget = (row: Firewall.InventoryItem): Firewall.NativeDetailR
 };
 const displayProtocol = (row: Firewall.InventoryItem) => {
     if (isFirewalldService(row)) return 'SERVICE';
-    if (isUFWApplication(row)) return 'APP';
-    if (isOpaqueRule(row)) return '-';
+    if (isUFWApplication(row) && !row.rule.protocol) return 'APP';
+    if (isOpaqueRule(row) && !hasParsedUFWFields(row)) return '-';
+    if (rowProvider(row) === 'ufw' && row.rule.protocol === 'all' && row.rule.destinationPort) return 'TCP/UDP';
     return row.rule.protocol?.toUpperCase() || '-';
 };
 const displayAddress = (row: Firewall.InventoryItem) => {
-    if (isOpaqueRule(row)) return '-';
+    if (isOpaqueRule(row) && !hasParsedUFWFields(row)) return '-';
     const wildcard = wildcardAddress(row.rule.scope.family);
     const address = row.rule.sourceAddress;
     if (address && address !== wildcard) return address;
     return `${wildcard}（${i18n.global.t('firewall.anyWhere')}）`;
 };
 const displayPort = (row: Firewall.InventoryItem) => {
-    if (isOpaqueRule(row)) return '-';
+    if (isOpaqueRule(row) && !hasParsedUFWFields(row)) return '-';
     return row.rule.destinationPort || '*';
 };
 const extractListeningPorts = (portMap: Process.ListeningProcess['Port']) =>
@@ -516,7 +595,7 @@ const loadListeningProcesses = async () => {
     }
 };
 const ruleUsageEntries = (row: RuleRow): UsageEntry[] => {
-    if (row.rule.scope.direction !== 'input' || isOpaqueRule(row)) return [];
+    if (row.rule.scope.direction !== 'input' || isReadOnlyNativeRule(row)) return [];
     const protocols = listeningProtocolNumbers(row.rule.protocol);
     return listeningProcesses.value.flatMap((process) => {
         if (!protocols.includes(process.Protocol)) return [];
@@ -538,6 +617,12 @@ const usageEntryPortText = (entry: UsageEntry) => entry.ports.join(', ') || '-';
 const usageEntryLabel = (entry: UsageEntry) => `${entry.owner} (${usageEntryPortText(entry)})`;
 const openUsageDetail = (entry: UsageEntry) => processDetailRef.value?.acceptParams(entry.pid);
 const scopeIdentity = (rule: Firewall.Rule) => JSON.stringify(rule.scope);
+const sameIptablesPositionScope = (rule: Firewall.Rule, family: Firewall.Family, chain: string) =>
+    rule.scope.provider === 'iptables' &&
+    rule.scope.family === family &&
+    rule.scope.table === 'filter' &&
+    rule.scope.chain === chain &&
+    rule.scope.direction === 'input';
 
 const priorityPositionRanges = (
     item?: Firewall.InventoryItem,
@@ -545,18 +630,24 @@ const priorityPositionRanges = (
     if (provider.value === 'firewalld') return {};
     const extraPosition = item ? 0 : 1;
     if (provider.value === 'ufw') {
-        const maxPosition = inventoryItems.value.reduce(
-            (max, row) => Math.max(max, row.observed?.locator.position || 0),
-            0,
-        );
-        const limit = Math.max(1, maxPosition + extraPosition);
-        return { ipv4: { min: 1, max: limit }, ipv6: { min: 1, max: limit } };
+        if (!item) return {};
+        const family = item.rule.scope.family;
+        const positions = inventoryItems.value
+            .filter((row) => row.rule.scope.family === family && row.observed?.locator.position)
+            .map((row) => row.observed!.locator.position!);
+        const currentPosition = item.observed?.locator.position || 1;
+        return {
+            [family]: {
+                min: positions.length > 0 ? Math.min(...positions) : currentPosition,
+                max: positions.length > 0 ? Math.max(...positions) : currentPosition,
+            },
+        };
     }
     const chain = item?.rule.scope.chain || '1PANEL_BASIC';
     return Object.fromEntries(
         (['ipv4', 'ipv6'] as Firewall.Family[]).map((family) => {
             const scopeRows = inventoryItems.value
-                .filter((row) => row.rule.scope.family === family && row.rule.scope.chain === chain)
+                .filter((row) => sameIptablesPositionScope(row.rule, family, chain))
                 .sort(
                     (left, right) => (left.observed?.locator.position || 0) - (right.observed?.locator.position || 0),
                 );
@@ -651,6 +742,8 @@ const filteredItems = computed<RuleRow[]>(() => {
             item.rule.sourcePort,
             item.rule.destinationAddress,
             item.rule.description,
+            item.observed?.rule.description,
+            item.desired?.rule.description,
             item.observed?.raw,
             item.rule.action,
             item.state,
@@ -713,8 +806,6 @@ const scopeNoticeText = (notice: Firewall.ScopeNotice) => {
             return i18n.global.t('firewall.scopeUnmanagedActive', [value]);
         case 'runtime_permanent_mismatch':
             return i18n.global.t('firewall.scopeRuntimeMismatch', [value]);
-        case 'default_policy':
-            return i18n.global.t('firewall.scopeDefaultPolicy', [value]);
     }
 };
 
@@ -728,11 +819,40 @@ const actionLabel = (action: Firewall.Action) => {
     return i18n.global.t('firewall.drop');
 };
 
-const stateTagType = (state: Firewall.InventoryState) => {
-    if (state === 'managed' || state === 'adopted') return 'primary';
-    if (state === 'protected') return 'warning';
-    if (state === 'drifted') return 'danger';
-    return 'info';
+const ruleSourceLabel = (row: Firewall.InventoryItem) => {
+    if (row.state === 'protected') return i18n.global.t('firewall.protected');
+    if (row.state === 'external') return i18n.global.t('firewall.external');
+    if (row.state === 'adopted' || row.desired?.origin === 'adopted') {
+        return i18n.global.t('firewall.adopted');
+    }
+    return i18n.global.t('firewall.managed');
+};
+
+const ruleSourceDetail = (row: Firewall.InventoryItem) => {
+    if (row.state === 'protected') return i18n.global.t('firewall.protectedHelper');
+    if (row.state === 'external') return i18n.global.t('firewall.externalHelper');
+    if (row.state === 'adopted' || row.desired?.origin === 'adopted') {
+        return i18n.global.t('firewall.adoptedHelper');
+    }
+    return i18n.global.t('firewall.managedHelper');
+};
+
+const ruleStateTitle = (row: Firewall.InventoryItem) =>
+    row.state === 'drifted' ? i18n.global.t('firewall.stateShort.drifted') : ruleSourceLabel(row);
+
+const ruleStateDetail = (row: Firewall.InventoryItem) =>
+    row.state === 'drifted' ? ruleIssueText(row) : ruleSourceDetail(row);
+
+const ruleStateTooltip = (row: Firewall.InventoryItem) => `${ruleStateTitle(row)}：${ruleStateDetail(row)}`;
+
+const ruleIssueText = (row: Firewall.InventoryItem) => {
+    if (row.observed?.persistence && row.observed.persistence !== 'converged') {
+        return i18n.global.t('firewall.plan_runtime_permanent_mismatch');
+    }
+    if (row.match === 'opaque') {
+        return i18n.global.t('firewall.plan_opaque_rule_in_target_scope');
+    }
+    return i18n.global.t('firewall.plan_managed_rule_drifted');
 };
 
 const openCreate = async () => {
@@ -750,7 +870,12 @@ const openCreate = async () => {
             return;
         }
     }
-    ruleOperateRef.value?.acceptParams(provider.value as Firewall.Provider, undefined, priorityPositionRanges());
+    ruleOperateRef.value?.acceptParams(
+        provider.value as Firewall.Provider,
+        undefined,
+        priorityPositionRanges(),
+        supportsFirewalldPriority.value,
+    );
 };
 
 const openImport = () => {
@@ -783,7 +908,7 @@ const removeSelectedRules = async () => {
     const selected = selects.value.filter((row) => isEditableManagedRule(row));
     if (selected.length === 0) return;
     const usedBy = selected.flatMap((row) =>
-        row.rule.action === 'accept' && row.usage?.used ? row.usage.usedBy || [] : [],
+        row.rule.action === 'accept' ? ruleUsageEntries(row).map((entry) => entry.owner) : [],
     );
     const message = usedBy.length
         ? `${i18n.global.t('firewall.deleteRuleConfirm', [selected.length])}\n${i18n.global.t(
@@ -885,8 +1010,10 @@ const adoptRule = async (row: RuleRow) => {
 const removeRule = async (row: RuleRow) => {
     if (!row.desired?.uuid) return;
     const usedBy =
-        row.rule.action === 'accept' && row.usage?.used
-            ? row.usage.usedBy?.join(', ') || i18n.global.t('firewall.used')
+        row.rule.action === 'accept'
+            ? ruleUsageEntries(row)
+                  .map((entry) => entry.owner)
+                  .join(', ')
             : '';
     const message = usedBy
         ? `${i18n.global.t('firewall.deleteRuleConfirm', [1])}\n${i18n.global.t('firewall.deleteUsedRuleConfirm', [usedBy])}`
@@ -924,7 +1051,12 @@ const displayRulePriority = (row: Firewall.InventoryItem) => {
 
 const openEdit = (row: RuleRow) => {
     if (!isEditableManagedRule(row)) return;
-    ruleOperateRef.value?.acceptParams(provider.value as Firewall.Provider, row, priorityPositionRanges(row));
+    ruleOperateRef.value?.acceptParams(
+        provider.value as Firewall.Provider,
+        row,
+        priorityPositionRanges(row),
+        supportsFirewalldPriority.value,
+    );
 };
 
 const operationButtons = [
@@ -932,7 +1064,7 @@ const operationButtons = [
         label: i18n.global.t('commons.button.view'),
         permission: true,
         nodeAdmin: true,
-        show: (row: RuleRow) => row.observed?.parseStatus === 'opaque' && Boolean(row.observed.raw),
+        show: (row: RuleRow) => isReadOnlyNativeRule(row) && Boolean(row.observed?.raw),
         click: viewRawRule,
     },
     {
@@ -1010,9 +1142,24 @@ onMounted(() => {
     line-height: 1;
 }
 
-.firewall-state-tag {
-    min-width: 58px;
-    justify-content: center;
+.firewall-rule-state {
+    display: inline-flex;
+    align-items: center;
+    color: var(--el-text-color-regular);
+}
+
+.firewall-rule-state-warning {
+    flex: none;
+    color: var(--el-color-warning);
+    cursor: help;
+    font-size: 15px;
+}
+
+.firewall-rule-source-icon {
+    flex: none;
+    color: var(--el-text-color-secondary);
+    font-size: 15px;
+    line-height: 1;
 }
 
 .firewall-used-cell {
@@ -1115,5 +1262,21 @@ onMounted(() => {
     font-size: 13px;
     font-weight: 600;
     line-height: 30px;
+}
+
+:global(.firewall-rule-filter-popper .firewall-state-filter-option) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+}
+
+:global(.firewall-rule-filter-popper .firewall-state-filter-description) {
+    overflow: hidden;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>

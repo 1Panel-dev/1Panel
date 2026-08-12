@@ -4128,6 +4128,8 @@ const message = {
         adoptedHelper: 'Önceden sistemde bulunan ve artık 1Panel tarafından yönetilen bir kuraldır.',
         legacy: 'Eski sürüm tarafından yönetilen',
         external: 'Harici kural',
+        externalHelper:
+            'Sistemde bulunan ancak henüz 1Panel tarafından yönetilmeyen bir kuraldır. Gerektiğinde yönetime alınabilir.',
         drifted: 'Eşleşmiyor',
         protected: 'Sistem korumalı',
         protectedHelper:

@@ -4103,6 +4103,8 @@ const message = {
         adoptedHelper: 'Una regla existente del sistema que ahora mantiene 1Panel.',
         legacy: 'Gestionada por la versión anterior',
         external: 'Regla externa',
+        externalHelper:
+            'Regla existente del sistema que aún no gestiona 1Panel. Se puede adoptar cuando sea necesario.',
         drifted: 'Desincronizada',
         protected: 'Protegida por el sistema',
         protectedHelper:

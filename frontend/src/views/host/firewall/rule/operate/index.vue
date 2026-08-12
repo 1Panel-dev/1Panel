@@ -26,7 +26,7 @@
             </el-form-item>
             <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
                 <el-select v-model="form.protocol" class="w-full" @change="changeProtocol">
-                    <el-option label="ALL" value="all" />
+                    <el-option v-if="mode === 'create' || provider === 'ufw'" label="TCP/UDP" value="tcp/udp" />
                     <el-option label="TCP" value="tcp" />
                     <el-option label="UDP" value="udp" />
                     <el-option v-if="provider !== 'ufw'" label="ICMP" value="icmp" />
@@ -67,7 +67,7 @@
                         class="destination-port-input"
                         clearable
                         :disabled="!portProtocol"
-                        placeholder="80 或 8080-8089"
+                        placeholder="80、80,443 或 8080-8089"
                         @keyup.enter.prevent="addDestinationPortOnEnter(index)"
                     />
                     <el-button
@@ -118,7 +118,7 @@
                             <div class="rule-check-item-main">
                                 <div class="rule-check-rule-summary">
                                     <span class="rule-check-protocol">
-                                        {{ previewRule(item).protocol.toUpperCase() }}
+                                        {{ previewProtocol(previewRule(item)) }}
                                     </span>
                                     <span class="rule-check-separator">·</span>
                                     <span class="rule-check-address">{{ previewAddress(previewRule(item)) }}</span>
@@ -178,6 +178,7 @@
             </el-button>
         </template>
     </DrawerPro>
+    <ErrDialog ref="errDialogRef" @close="backToForm" />
 </template>
 
 <script lang="ts" setup>
@@ -193,6 +194,7 @@ import i18n from '@/lang';
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
+import ErrDialog from './err-message.vue';
 
 const provider = ref<Firewall.Provider>('iptables');
 const mode = ref<'create' | 'edit'>('create');
@@ -203,6 +205,7 @@ const loading = ref(false);
 const formRef = ref<FormInstance>();
 const sourceAddressRefs = ref<Array<{ focus: () => void }>>([]);
 const destinationPortRefs = ref<Array<{ focus: () => void }>>([]);
+const errDialogRef = ref<InstanceType<typeof ErrDialog>>();
 const previewRules = ref<Firewall.Rule[]>([]);
 const previewVisible = ref(false);
 const checkCompleted = ref(false);
@@ -213,6 +216,7 @@ interface PriorityPositionRange {
 }
 
 const positionRanges = ref<Partial<Record<Firewall.Family, PriorityPositionRange>>>({});
+const firewalldPrioritySupported = ref(true);
 
 interface BatchPlanItem {
     rule: Firewall.Rule;
@@ -246,7 +250,7 @@ const rules = reactive<FormRules>({
     action: [Rules.requiredSelect],
 });
 
-const portProtocol = computed(() => form.protocol === 'tcp' || form.protocol === 'udp');
+const portProtocol = computed(() => ['tcp', 'udp', 'tcp/udp'].includes(form.protocol));
 const sourceAddressPlaceholder = (family: Firewall.Family) => {
     if (family === 'ipv6') return '2001:db8::1 或 2001:db8::/64';
     if (family === 'inet') return '0.0.0.0/0 或 ::/0';
@@ -265,9 +269,12 @@ const isWildcardAddress = (family: Firewall.Family, address?: string) => {
 };
 
 const priorityFieldLabel = computed(() => i18n.global.t('firewall.priority'));
-const showPriorityField = computed(
-    () => provider.value !== 'firewalld' || mode.value === 'create' || editingRule.value?.nativeKind === 'rich_rule',
-);
+const showPriorityField = computed(() => {
+    if (provider.value !== 'firewalld') return mode.value === 'edit';
+    return (
+        firewalldPrioritySupported.value && (mode.value === 'create' || editingRule.value?.nativeKind === 'rich_rule')
+    );
+});
 const selectedPositionRanges = computed(() => {
     const families = [...new Set(form.sourceAddresses.map((item) => item.family))];
     if (families.length === 0) return [{ min: 1, max: 1 }];
@@ -380,8 +387,23 @@ const normalizeSourceAddresses = () => {
               : [{ ...fallback, address: anywhereSourceValue }];
 };
 const normalizeDestinationPorts = (values = form.destinationPorts) => {
-    const normalized = splitTagValues(values);
+    const splitPortList = provider.value === 'firewalld' || (provider.value === 'ufw' && form.protocol === 'tcp/udp');
+    const splitPattern = splitPortList ? /[,，;；\s]+/ : /[;；\s]+/;
+    const normalized = [
+        ...new Set(
+            values
+                .map((value) => (splitPortList ? value : value.replace(/\s*[,，]\s*/g, ',')))
+                .flatMap((value) => value.split(splitPattern))
+                .map((value) => value.trim().replaceAll('，', ','))
+                .filter(Boolean),
+        ),
+    ];
+    if (mode.value === 'edit' && normalized.length > 1) {
+        MsgError(i18n.global.t('commons.msg.notSupportOperation'));
+        return false;
+    }
     form.destinationPorts = mode.value === 'edit' ? [normalized[0] || ''] : normalized.length > 0 ? normalized : [''];
+    return true;
 };
 const addSourceAddress = () => {
     const family = form.sourceAddresses.at(-1)?.family || 'ipv4';
@@ -425,7 +447,7 @@ const resetForm = () => {
     form.destinationAddress = '';
     form.destinationPorts = [''];
     form.action = 'accept';
-    form.priority = provider.value === 'firewalld' ? undefined : positionalPriorityMax.value;
+    form.priority = provider.value === 'firewalld' || mode.value === 'create' ? undefined : positionalPriorityMax.value;
     form.description = '';
     editingUUID.value = '';
     editingRule.value = undefined;
@@ -437,8 +459,10 @@ const acceptParams = (
     value: Firewall.Provider,
     item?: Firewall.InventoryItem,
     ranges: Partial<Record<Firewall.Family, PriorityPositionRange>> = {},
+    supportsExplicitPriority = true,
 ) => {
     provider.value = value;
+    firewalldPrioritySupported.value = supportsExplicitPriority;
     positionRanges.value = ranges;
     mode.value = item?.desired?.uuid ? 'edit' : 'create';
     resetForm();
@@ -451,7 +475,8 @@ const acceptParams = (
             scope: { ...rule.scope },
             orderIndex: provider.value === 'firewalld' ? undefined : currentPosition,
         };
-        form.protocol = rule.protocol;
+        form.protocol =
+            provider.value === 'ufw' && rule.protocol === 'all' && rule.destinationPort ? 'tcp/udp' : rule.protocol;
         form.sourceAddresses = [
             {
                 family: rule.scope.family,
@@ -462,7 +487,7 @@ const acceptParams = (
         ];
         form.sourcePort = rule.sourcePort || '';
         form.destinationAddress = rule.destinationAddress || '';
-        form.destinationPorts = splitTagValues([rule.destinationPort || '']);
+        form.destinationPorts = [rule.destinationPort || ''];
         if (form.destinationPorts.length === 0) form.destinationPorts = [''];
         form.action = rule.action === 'reject' ? 'drop' : rule.action;
         form.priority = provider.value === 'firewalld' ? rule.priority : currentPosition || positionalPriorityMax.value;
@@ -513,6 +538,7 @@ const changeProtocol = () => {
 const buildRule = (
     source: SourceAddressItem = form.sourceAddresses[0] || { family: 'ipv4', address: anywhereSourceValue },
     destinationPort = form.destinationPorts[0] || '',
+    protocol = form.protocol,
 ): Firewall.Rule => {
     const action =
         mode.value === 'edit' && editingRule.value?.action === 'reject' && form.action === 'drop'
@@ -542,14 +568,14 @@ const buildRule = (
                         chain: 'incoming',
                         direction: 'input',
                     },
-        protocol: form.protocol,
+        protocol,
         sourceAddress: isWildcardAddress(source.family, source.address) ? '' : source.address,
         sourcePort: form.sourcePort,
         destinationAddress: form.destinationAddress,
         destinationPort,
         action,
-        priority: provider.value === 'firewalld' ? form.priority : undefined,
-        orderIndex: provider.value === 'firewalld' ? undefined : form.priority,
+        priority: provider.value === 'firewalld' && firewalldPrioritySupported.value ? form.priority : undefined,
+        orderIndex: provider.value === 'firewalld' || mode.value === 'create' ? undefined : form.priority,
         description: form.description,
     };
 };
@@ -578,24 +604,35 @@ const previewAddress = (rule: Firewall.Rule) => {
     if (rule.sourceAddress && !isWildcardAddress(rule.scope.family, rule.sourceAddress)) return rule.sourceAddress;
     return wildcardAddressLabel(rule.scope.family);
 };
+const previewProtocol = (rule: Firewall.Rule) =>
+    rule.scope.provider === 'ufw' && rule.protocol === 'all' && rule.destinationPort
+        ? 'TCP/UDP'
+        : rule.protocol.toUpperCase();
 
 const buildPreviewRules = () => {
     normalizeSourceAddresses();
-    normalizeDestinationPorts();
+    if (!normalizeDestinationPorts()) return false;
     const addresses =
         form.sourceAddresses.length > 0 ? form.sourceAddresses : [{ family: 'ipv4' as const, address: '' }];
     const ports = form.destinationPorts.length > 0 ? form.destinationPorts : [''];
     const orderOffsets = new Map<string, number>();
     const rules = addresses.flatMap((address) =>
-        ports.map((port) => {
-            const rule = buildRule(address, port);
-            if (provider.value === 'firewalld' || rule.orderIndex === undefined) return rule;
-            const scopeKey = provider.value === 'ufw' ? 'ufw' : JSON.stringify(rule.scope);
-            const offset = orderOffsets.get(scopeKey) || 0;
-            orderOffsets.set(scopeKey, offset + 1);
-            rule.orderIndex += offset;
-            return rule;
-        }),
+        ports.flatMap((port) =>
+            (form.protocol === 'tcp/udp'
+                ? provider.value === 'ufw' && port && !port.includes(',')
+                    ? ['all']
+                    : ['tcp', 'udp']
+                : [form.protocol]
+            ).map((protocol) => {
+                const rule = buildRule(address, port, protocol);
+                if (provider.value === 'firewalld' || rule.orderIndex === undefined) return rule;
+                const scopeKey = provider.value === 'ufw' ? 'ufw' : JSON.stringify(rule.scope);
+                const offset = orderOffsets.get(scopeKey) || 0;
+                orderOffsets.set(scopeKey, offset + 1);
+                rule.orderIndex += offset;
+                return rule;
+            }),
+        ),
     );
     if (rules.length > 256) {
         MsgError(i18n.global.t('firewall.batchRuleLimit', [256]));
@@ -662,9 +699,8 @@ const executeBatchPlans = async () => {
     }
     const result = (await createFirewallRulesBatch({ items })).data;
     if (result.succeeded > 0) emit('search');
-    if (result.failed > 0) {
-        MsgError(`${i18n.global.t('commons.msg.operationFailed')} (${result.failed}/${items.length})`);
-        backToForm();
+    if (result.failed > 0 || (result.skipped || 0) > 0) {
+        errDialogRef.value?.acceptParams(result);
         return;
     }
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -674,7 +710,7 @@ const executeBatchPlans = async () => {
 const prepareRulesFromForm = async () => {
     if (!formRef.value) return previewRules.value.length > 0;
     normalizeSourceAddresses();
-    normalizeDestinationPorts();
+    if (!normalizeDestinationPorts()) return false;
     if (
         splitTagValues(form.sourceAddresses.map((item) => item.address)).length === 0 &&
         !form.destinationAddress &&

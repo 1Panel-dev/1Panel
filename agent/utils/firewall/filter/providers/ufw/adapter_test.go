@@ -107,20 +107,36 @@ func TestObserveNumberedIncomingIPv4PreservesGlobalPositions(t *testing.T) {
 	if eighth.ParseStatus != filter.ParseStatusSupported || eighth.Rule.DestinationPort != "6000-6010" || eighth.Rule.Interface != "eth1" {
 		t.Fatalf("unexpected range rule: %#v", eighth)
 	}
-	for _, index := range []int{2, 3, 5, 6, 7, 8} {
+	barePort := snapshot.Rules[3]
+	if barePort.ParseStatus != filter.ParseStatusSupported || barePort.Rule.Protocol != "all" || barePort.Rule.DestinationPort != "53" {
+		t.Fatalf("unexpected bare-port rule: %#v", barePort)
+	}
+	for _, index := range []int{2, 7} {
 		if snapshot.Rules[index].ParseStatus != filter.ParseStatusOpaque {
 			t.Fatalf("expected rule at slice index %d to be opaque: %#v", index, snapshot.Rules[index])
 		}
+	}
+	multiPort := snapshot.Rules[5]
+	if multiPort.ParseStatus != filter.ParseStatusSupported || multiPort.Rule.Protocol != "tcp" || multiPort.Rule.DestinationPort != "22,80,443" {
+		t.Fatalf("multi-port display fields were not preserved: %#v", multiPort)
+	}
+	limited := snapshot.Rules[6]
+	if limited.ParseStatus != filter.ParseStatusPartial || limited.Rule.Protocol != "tcp" || limited.Rule.DestinationPort != "2222" || limited.Rule.Action != filter.ActionAccept {
+		t.Fatalf("limited rule display fields were not preserved: %#v", limited)
+	}
+	logged := snapshot.Rules[8]
+	if logged.ParseStatus != filter.ParseStatusPartial || logged.Rule.Protocol != "all" || logged.Rule.Interface != "eth0" {
+		t.Fatalf("logged rule display fields were not preserved: %#v", logged)
 	}
 	longApplication := snapshot.Rules[7]
 	if longApplication.Rule.NativeKind != filter.NativeKindUFWApplication ||
 		longApplication.Rule.Description != "a-very-long-application-profile-name" {
 		t.Fatalf("long UFW application profile was not preserved: %#v", longApplication)
 	}
-	if !hasNotice(snapshot.Notices, filter.ScopeNoticeDefaultPolicy) {
-		t.Fatalf("expected default policy notice: %#v", snapshot.Notices)
+	if len(snapshot.Notices) != 0 {
+		t.Fatalf("active UFW default policy should not create a notice: %#v", snapshot.Notices)
 	}
-	if !reflect.DeepEqual(reader.calls, [][]string{{"status", "numbered"}, {"status", "verbose"}}) {
+	if !reflect.DeepEqual(reader.calls, [][]string{{"status", "numbered"}}) {
 		t.Fatalf("unexpected commands: %#v", reader.calls)
 	}
 }
@@ -172,6 +188,30 @@ func TestObserveNumberedIncomingIPv6KeepsFamilyGap(t *testing.T) {
 	}
 }
 
+func TestObserveBarePortRulesAreSupportedForBothFamilies(t *testing.T) {
+	output := `Status: active
+[ 1] 22                         ALLOW IN    Anywhere
+[ 2] 22 (v6)                    ALLOW IN    Anywhere (v6)
+`
+	for _, test := range []struct {
+		family   filter.Family
+		position int
+	}{
+		{family: filter.FamilyIPv4, position: 1},
+		{family: filter.FamilyIPv6, position: 2},
+	} {
+		rules := parseNumberedRules(ufwScope(test.family), output)
+		if len(rules) != 1 {
+			t.Fatalf("expected one %s bare-port rule, got %#v", test.family, rules)
+		}
+		rule := rules[0]
+		if rule.ParseStatus != filter.ParseStatusSupported || rule.Rule.Protocol != "all" ||
+			rule.Rule.DestinationPort != "22" || rule.Locator.Position == nil || *rule.Locator.Position != test.position {
+			t.Fatalf("unexpected %s bare-port rule: %#v", test.family, rule)
+		}
+	}
+}
+
 func TestObserveInactiveUFWReturnsNoticeAndEmptyInventory(t *testing.T) {
 	reader := &fakeReader{outputs: map[string]string{
 		"status numbered": "Status: inactive\n",
@@ -183,6 +223,44 @@ func TestObserveInactiveUFWReturnsNoticeAndEmptyInventory(t *testing.T) {
 	}
 	if len(snapshot.Rules) != 0 || !hasNotice(snapshot.Notices, filter.ScopeNoticeManagedScopeInactive) {
 		t.Fatalf("unexpected inactive snapshot: %#v", snapshot)
+	}
+}
+
+func TestParseAnnotatedMultiPortRulesForBothFamilies(t *testing.T) {
+	output := `Status: active
+[ 1] 80,443/tcp                 ALLOW IN    Anywhere
+[ 2] 137,138/udp (Samba)        ALLOW IN    Anywhere
+[ 3] 80,443/tcp (v6)            ALLOW IN    Anywhere (v6)
+[ 4] 137,138/udp (Samba (v6))   ALLOW IN    Anywhere (v6)`
+	tests := []struct {
+		family    filter.Family
+		positions []int
+	}{
+		{family: filter.FamilyIPv4, positions: []int{1, 2}},
+		{family: filter.FamilyIPv6, positions: []int{3, 4}},
+	}
+	for _, test := range tests {
+		t.Run(string(test.family), func(t *testing.T) {
+			rules := parseNumberedRules(ufwScope(test.family), output)
+			if len(rules) != 2 {
+				t.Fatalf("expected two %s rules, got %#v", test.family, rules)
+			}
+			for index, observed := range rules {
+				if observed.Locator.Position == nil || *observed.Locator.Position != test.positions[index] {
+					t.Fatalf("unexpected %s rule %d: %#v", test.family, index, observed)
+				}
+			}
+			if rules[0].ParseStatus != filter.ParseStatusSupported || rules[0].Rule.NativeKind != filter.NativeKindUFWRule ||
+				rules[0].Rule.Protocol != "tcp" || rules[0].Rule.DestinationPort != "80,443" ||
+				rules[0].Rule.Description != "" {
+				t.Fatalf("plain multi-port fields were not preserved: %#v", rules[0])
+			}
+			if rules[1].ParseStatus != filter.ParseStatusPartial || rules[1].Rule.NativeKind != filter.NativeKindUFWApplication ||
+				rules[1].Rule.Protocol != "udp" || rules[1].Rule.DestinationPort != "137,138" ||
+				rules[1].Rule.Description != "Samba" {
+				t.Fatalf("annotated application fields were not preserved: %#v", rules[1])
+			}
+		})
 	}
 }
 
@@ -222,11 +300,13 @@ func TestCompileCreateUsesFamilyExplicitFullSyntax(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			snapshot := mustSnapshot(t, ufwScope(test.family), nil)
 			rule := writableRule(test.family, "new-rule", "8080")
-			plan, err := NewAdapterWithReader(&fakeReader{}).Compile(snapshot, []filter.DesiredChange{{Operation: filter.ChangeCreate, After: &rule}})
+			plan, err := NewAdapterWithReader(&fakeReader{}).Compile(snapshot, []filter.DesiredChange{{
+				Operation: filter.ChangeCreate, After: &rule, Append: true,
+			}})
 			if err != nil {
 				t.Fatalf("compile: %v", err)
 			}
-			want := []string{"insert", "1", "allow", "in", "proto", "tcp", "from", test.address, "to", test.address, "port", "8080", "comment", "1panel-rule:new-rule"}
+			want := []string{"allow", "in", "proto", "tcp", "from", test.address, "to", test.address, "port", "8080", "comment", "1panel-rule:new-rule"}
 			if !reflect.DeepEqual(plan.Rules[0].Commands[0].Args, want) {
 				t.Fatalf("unexpected command:\nwant: %#v\n got: %#v", want, plan.Rules[0].Commands[0].Args)
 			}
@@ -234,6 +314,125 @@ func TestCompileCreateUsesFamilyExplicitFullSyntax(t *testing.T) {
 				t.Fatalf("unexpected rollback prefix: %#v", got)
 			}
 		})
+	}
+}
+
+func TestCompileCreateBarePortUsesFamilyExplicitSyntaxWithoutProtocol(t *testing.T) {
+	tests := []struct {
+		family  filter.Family
+		address string
+	}{
+		{family: filter.FamilyIPv4, address: "0.0.0.0/0"},
+		{family: filter.FamilyIPv6, address: "::/0"},
+	}
+	for _, test := range tests {
+		t.Run(string(test.family), func(t *testing.T) {
+			snapshot := mustSnapshot(t, ufwScope(test.family), nil)
+			rule := filter.FirewallRule{
+				UUID: "dns", Scope: ufwScope(test.family), NativeKind: filter.NativeKindUFWRule,
+				Protocol: "all", DestinationPort: "53", Action: filter.ActionAccept,
+			}
+			plan, err := NewAdapterWithReader(&fakeReader{}).Compile(snapshot, []filter.DesiredChange{{
+				Operation: filter.ChangeCreate, After: &rule, Append: true,
+			}})
+			if err != nil {
+				t.Fatalf("compile bare-port create: %v", err)
+			}
+			want := []string{
+				"allow", "in", "from", test.address, "to", test.address,
+				"port", "53", "comment", "1panel-rule:dns",
+			}
+			if !reflect.DeepEqual(plan.Rules[0].Commands[0].Args, want) {
+				t.Fatalf("unexpected bare-port command:\nwant: %#v\n got: %#v", want, plan.Rules[0].Commands[0].Args)
+			}
+		})
+	}
+}
+
+func TestCompileCreateMultiportUsesNativeUFWPortSet(t *testing.T) {
+	snapshot := mustSnapshot(t, ufwScope(filter.FamilyIPv4), nil)
+	rule := writableRule(filter.FamilyIPv4, "web", "80,443,8080-8090")
+	plan, err := NewAdapterWithReader(&fakeReader{}).Compile(snapshot, []filter.DesiredChange{{
+		Operation: filter.ChangeCreate, After: &rule, Append: true,
+	}})
+	if err != nil {
+		t.Fatalf("compile multiport create: %v", err)
+	}
+	wantPort := []string{"port", "80,443,8080:8090"}
+	args := plan.Rules[0].Commands[0].Args
+	found := false
+	for index := 0; index+1 < len(args); index++ {
+		if reflect.DeepEqual(args[index:index+2], wantPort) {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("UFW port set was not preserved: %#v", args)
+	}
+}
+
+func TestCompileCreateAppendsWithoutInvalidNextPosition(t *testing.T) {
+	scope := ufwScope(filter.FamilyIPv4)
+	existing := parseNumberedRules(scope, "Status: active\n[ 8] 80/tcp ALLOW IN Anywhere\n")
+	snapshot := mustSnapshot(t, scope, existing)
+	order := int64(9)
+	rule := writableRule(filter.FamilyIPv4, "appended", "8080")
+	rule.OrderIndex = &order
+
+	plan, err := NewAdapterWithReader(&fakeReader{}).Compile(snapshot, []filter.DesiredChange{{
+		Operation: filter.ChangeCreate,
+		After:     &rule,
+		Append:    true,
+	}})
+	if err != nil {
+		t.Fatalf("compile append: %v", err)
+	}
+	command := plan.Rules[0].Commands[0]
+	if len(command.Args) == 0 || command.Args[0] != "allow" {
+		t.Fatalf("append must not use invalid insert 9: %#v", command.Args)
+	}
+	if plan.Rules[0].Expected.Locator.Position == nil || *plan.Rules[0].Expected.Locator.Position != 9 {
+		t.Fatalf("append verification position was not preserved: %#v", plan.Rules[0].Expected.Locator)
+	}
+}
+
+func TestCompileLastRuleMutationUsesAppendForWriteAndRestore(t *testing.T) {
+	scope := ufwScope(filter.FamilyIPv4)
+	observed := parseNumberedRules(scope, "Status: active\n[ 8] 80/tcp ALLOW IN Anywhere # 1panel-rule:managed\n")
+	snapshot := mustSnapshot(t, scope, observed)
+	locator := observed[0].Locator
+	order := int64(8)
+	updated := writableRule(filter.FamilyIPv4, "managed", "443")
+	updated.OrderIndex = &order
+
+	updatePlan, err := NewAdapterWithReader(&fakeReader{}).Compile(snapshot, []filter.DesiredChange{{
+		Operation:    filter.ChangeUpdate,
+		After:        &updated,
+		Locator:      &locator,
+		Append:       true,
+		RestoreAtEnd: true,
+	}})
+	if err != nil {
+		t.Fatalf("compile last-rule update: %v", err)
+	}
+	if got := updatePlan.Rules[0]; got.Commands[1].Args[0] != "allow" || got.RollbackCommands[0].Args[0] != "allow" {
+		t.Fatalf("last-rule update must append both new and restored rules: %#v", got)
+	}
+
+	before := observed[0].Rule
+	before.UUID = "managed"
+	deletePlan, err := NewAdapterWithReader(&fakeReader{}).Compile(snapshot, []filter.DesiredChange{{
+		Operation:    filter.ChangeDelete,
+		Before:       &before,
+		Locator:      &locator,
+		RestoreAtEnd: true,
+	}})
+	if err != nil {
+		t.Fatalf("compile last-rule delete: %v", err)
+	}
+	if got := deletePlan.Rules[0].RollbackCommands[0].Args; len(got) == 0 || got[0] != "allow" {
+		t.Fatalf("last-rule delete rollback must append: %#v", got)
 	}
 }
 
@@ -379,6 +578,36 @@ func TestApplyVerifiesMarkerAcrossBothFamilies(t *testing.T) {
 	}
 }
 
+func TestApplyVerifiesMultiportUpdate(t *testing.T) {
+	scope := ufwScope(filter.FamilyIPv4)
+	beforeOutput := "Status: active\n[ 4] 4422,8088/tcp ALLOW IN Anywhere # 1panel-rule:managed\n"
+	observed := parseNumberedRules(scope, beforeOutput)
+	if len(observed) != 1 || observed[0].ParseStatus != filter.ParseStatusSupported {
+		t.Fatalf("unexpected existing multiport rule: %#v", observed)
+	}
+	snapshot := mustSnapshot(t, scope, observed)
+	updated := writableRule(filter.FamilyIPv4, "managed", "4422,8088,7944")
+	order := int64(4)
+	updated.OrderIndex = &order
+	backend := &scriptedBackend{numbered: []string{
+		"Status: active\n[ 4] 4422,8088,7944/tcp ALLOW IN Anywhere # 1panel-rule:managed\n",
+		"Status: active\n",
+	}}
+	adapter := NewAdapterWithBackend(backend, backend)
+	plan, err := adapter.Compile(snapshot, []filter.DesiredChange{{
+		Operation: filter.ChangeUpdate, After: &updated, Locator: &observed[0].Locator,
+	}})
+	if err != nil {
+		t.Fatalf("compile multiport update: %v", err)
+	}
+	if _, err = adapter.Apply(context.Background(), plan); err != nil {
+		t.Fatalf("verify multiport update: %v", err)
+	}
+	if len(backend.writes) != 2 || backend.writes[1].Args[0] != "insert" || backend.writes[1].Args[1] != "4" {
+		t.Fatalf("unexpected multiport update writes: %#v", backend.writes)
+	}
+}
+
 func TestApplyCompensatesFamilyExpansion(t *testing.T) {
 	scope := ufwScope(filter.FamilyIPv4)
 	snapshot := mustSnapshot(t, scope, nil)
@@ -425,7 +654,9 @@ func TestApplyCompensatesFailedUpdate(t *testing.T) {
 	snapshot := mustSnapshot(t, scope, observed)
 	locator := observed[0].Locator
 	updated := writableRule(filter.FamilyIPv4, "managed", "443")
-	backend := &scriptedBackend{numbered: []string{beforeOutput, "Status: active\n"}, failAt: 2}
+	backend := &scriptedBackend{numbered: []string{
+		"Status: active\n[ 3] 443/tcp ALLOW IN Anywhere # 1panel-rule:managed\n",
+	}, failAt: 2}
 	adapter := NewAdapterWithBackend(backend, backend)
 	plan, err := adapter.Compile(snapshot, []filter.DesiredChange{{Operation: filter.ChangeUpdate, After: &updated, Locator: &locator}})
 	if err != nil {
@@ -434,8 +665,32 @@ func TestApplyCompensatesFailedUpdate(t *testing.T) {
 	if _, err = adapter.Apply(context.Background(), plan); err == nil || !strings.Contains(err.Error(), "write failed") {
 		t.Fatalf("expected write failure, got %v", err)
 	}
+	if len(backend.writes) != 4 ||
+		!reflect.DeepEqual(backend.writes[2].Args[:3], []string{"--force", "delete", "allow"}) ||
+		!reflect.DeepEqual(backend.writes[3].Args[:2], []string{"insert", "3"}) {
+		t.Fatalf("expected possibly-applied new rule removal and old rule restore after failed update: %#v", backend.writes)
+	}
+}
+
+func TestApplyDoesNotCompensateFailedUpdateCommandWithoutSideEffect(t *testing.T) {
+	scope := ufwScope(filter.FamilyIPv4)
+	beforeOutput := "Status: active\n[ 3] 80/tcp ALLOW IN Anywhere # 1panel-rule:managed\n"
+	observed := parseNumberedRules(scope, beforeOutput)
+	snapshot := mustSnapshot(t, scope, observed)
+	updated := writableRule(filter.FamilyIPv4, "managed", "443")
+	backend := &scriptedBackend{numbered: []string{"Status: active\n"}, failAt: 2}
+	adapter := NewAdapterWithBackend(backend, backend)
+	plan, err := adapter.Compile(snapshot, []filter.DesiredChange{{
+		Operation: filter.ChangeUpdate, After: &updated, Locator: &observed[0].Locator,
+	}})
+	if err != nil {
+		t.Fatalf("compile: %v", err)
+	}
+	if _, err = adapter.Apply(context.Background(), plan); err == nil || !strings.Contains(err.Error(), "write failed") {
+		t.Fatalf("expected write failure, got %v", err)
+	}
 	if len(backend.writes) != 3 || !reflect.DeepEqual(backend.writes[2].Args[:2], []string{"insert", "3"}) {
-		t.Fatalf("expected old rule restore after failed update: %#v", backend.writes)
+		t.Fatalf("expected only the successfully deleted old rule to be restored: %#v", backend.writes)
 	}
 }
 

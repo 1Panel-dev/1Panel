@@ -84,7 +84,7 @@ func MergeInventory(input InventoryMergeInput) ([]InventoryItem, error) {
 	byMarker := make(map[string][]int)
 	for index, observed := range input.Observed {
 		candidate := observedInventoryCandidate{rule: observed}
-		if observed.ParseStatus != ParseStatusOpaque {
+		if observed.ParseStatus == ParseStatusSupported {
 			normalized, err := NormalizeRule(observed.Rule)
 			if err != nil {
 				return nil, fmt.Errorf("normalize observed firewall rule %d: %w", index, err)
@@ -169,7 +169,7 @@ func MergeInventory(input InventoryMergeInput) ([]InventoryItem, error) {
 			state = InventoryStateProtected
 		}
 		match := InventoryMatchNone
-		if observed.ParseStatus == ParseStatusOpaque {
+		if observed.ParseStatus != ParseStatusSupported {
 			match = InventoryMatchOpaque
 		}
 		items = append(items, InventoryItem{Rule: observed.Rule, Observed: &observed, State: state, Match: match})
@@ -275,13 +275,8 @@ func runtimeUsageForRule(rule FirewallRule, usage map[string]RuntimeUsage) (Runt
 	if value, exists := usage[key]; exists {
 		return value, true
 	}
-	parts := strings.Split(rule.DestinationPort, "-")
-	if len(parts) != 2 {
-		return RuntimeUsage{}, false
-	}
-	start, startErr := strconv.Atoi(parts[0])
-	end, endErr := strconv.Atoi(parts[1])
-	if startErr != nil || endErr != nil {
+	intervals, err := portIntervals(rule.DestinationPort)
+	if err != nil {
 		return RuntimeUsage{}, false
 	}
 	protocolPrefix := strings.ToLower(strings.TrimSpace(rule.Protocol)) + "\x00"
@@ -292,7 +287,7 @@ func runtimeUsageForRule(rule FirewallRule, usage map[string]RuntimeUsage) (Runt
 			continue
 		}
 		port, err := strconv.Atoi(strings.TrimPrefix(usageKey, protocolPrefix))
-		if err != nil || port < start || port > end {
+		if err != nil || !portInIntervals(port, intervals) {
 			continue
 		}
 		found = true
@@ -305,6 +300,15 @@ func runtimeUsageForRule(rule FirewallRule, usage map[string]RuntimeUsage) (Runt
 		}
 	}
 	return combined, found
+}
+
+func portInIntervals(port int, intervals [][2]int) bool {
+	for _, interval := range intervals {
+		if port >= interval[0] && port <= interval[1] {
+			return true
+		}
+	}
+	return false
 }
 
 func normalizedUsageOwners(owners []string) []string {

@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -23,8 +24,10 @@ type CommandWriter interface {
 }
 
 type Adapter struct {
-	reader CommandReader
-	writer CommandWriter
+	reader                    CommandReader
+	writer                    CommandWriter
+	prioritySupportMu         sync.Mutex
+	richRulePrioritySupported *bool
 }
 
 func NewAdapter() *Adapter {
@@ -42,15 +45,77 @@ func NewAdapterWithBackend(reader CommandReader, writer CommandWriter) *Adapter 
 
 func (a *Adapter) Provider() filter.Provider { return filter.ProviderFirewalld }
 
-func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
+func (a *Adapter) Capabilities(ctx context.Context) (filter.Capabilities, error) {
+	explicitPriority, err := a.supportsRichRulePriority(ctx)
+	if err != nil {
+		return filter.Capabilities{}, err
+	}
 	return filter.Capabilities{
 		Scopes: []filter.ScopePattern{{
 			Provider: filter.ProviderFirewalld, Families: []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6, filter.FamilyInet},
 			Zone: filter.FirewalldInputZone, Directions: []filter.Direction{filter.DirectionInput},
 		}},
-		ExplicitPriority: true,
+		ExplicitPriority: explicitPriority,
 		NativePort:       true,
 	}, nil
+}
+
+func (a *Adapter) CheckRule(ctx context.Context, rule filter.FirewallRule) error {
+	if rule.Priority == nil || *rule.Priority == 0 {
+		return nil
+	}
+	supported, err := a.supportsRichRulePriority(ctx)
+	if err != nil {
+		return err
+	}
+	if !supported {
+		return fmt.Errorf("%w: firewalld versions before 0.7.0 do not support rich rule priority", filter.ErrUnsupportedScope)
+	}
+	return nil
+}
+
+func (a *Adapter) supportsRichRulePriority(ctx context.Context) (bool, error) {
+	a.prioritySupportMu.Lock()
+	defer a.prioritySupportMu.Unlock()
+	if a.richRulePrioritySupported != nil {
+		return *a.richRulePrioritySupported, nil
+	}
+	if a.reader == nil {
+		return false, errors.New("firewalld reader is required")
+	}
+	output, err := a.reader.Read(ctx, "--version")
+	if err != nil {
+		return false, fmt.Errorf("load firewalld version: %w", err)
+	}
+	major, minor, err := parseFirewalldVersion(output)
+	if err != nil {
+		return false, err
+	}
+	supported := major > 0 || minor >= 7
+	a.richRulePrioritySupported = &supported
+	return supported, nil
+}
+
+func parseFirewalldVersion(output string) (int, int, error) {
+	version := strings.TrimSpace(output)
+	parts := strings.Split(version, ".")
+	if len(parts) < 2 {
+		return 0, 0, fmt.Errorf("invalid firewalld version %q", version)
+	}
+	major, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return 0, 0, fmt.Errorf("invalid firewalld version %q", version)
+	}
+	minorDigits := strings.TrimLeftFunc(parts[1], func(r rune) bool { return r < '0' || r > '9' })
+	minorEnd := strings.IndexFunc(minorDigits, func(r rune) bool { return r < '0' || r > '9' })
+	if minorEnd >= 0 {
+		minorDigits = minorDigits[:minorEnd]
+	}
+	minor, err := strconv.Atoi(minorDigits)
+	if err != nil {
+		return 0, 0, fmt.Errorf("invalid firewalld version %q", version)
+	}
+	return major, minor, nil
 }
 
 func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snapshot, error) {
@@ -66,12 +131,20 @@ func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snaps
 		return filter.Snapshot{}, errors.New("firewalld reader is required")
 	}
 
-	runtime, err := a.readScope(ctx, scope, false)
-	if err != nil {
-		return filter.Snapshot{}, err
-	}
-	permanent, err := a.readScope(ctx, scope, true)
-	if err != nil {
+	var runtime, permanent zoneOutput
+	var runtimeErr, permanentErr error
+	var reads sync.WaitGroup
+	reads.Add(2)
+	go func() {
+		defer reads.Done()
+		runtime, runtimeErr = a.readScope(ctx, scope, false)
+	}()
+	go func() {
+		defer reads.Done()
+		permanent, permanentErr = a.readScope(ctx, scope, true)
+	}()
+	reads.Wait()
+	if err := errors.Join(runtimeErr, permanentErr); err != nil {
 		return filter.Snapshot{}, err
 	}
 	rules, err := mergeZoneObjects(scope, runtime, permanent)
@@ -82,15 +155,7 @@ func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snaps
 	if err != nil {
 		return filter.Snapshot{}, err
 	}
-	defaultZone, readErr := a.reader.Read(ctx, "--get-default-zone")
-	if readErr != nil {
-		return filter.Snapshot{}, readErr
-	}
-	activeZones, readErr := a.reader.Read(ctx, "--get-active-zones")
-	if readErr != nil {
-		return filter.Snapshot{}, readErr
-	}
-	snapshot.Notices = zoneNotices(strings.TrimSpace(defaultZone), parseActiveZones(activeZones), runtime, permanent)
+	snapshot.Notices = publicZoneNotices(runtime, permanent)
 	return snapshot, nil
 }
 
@@ -478,30 +543,70 @@ type zoneOutput struct {
 	ports    string
 	rich     string
 	services string
+	active   bool
 }
 
 func (a *Adapter) readScope(ctx context.Context, scope filter.Scope, permanent bool) (zoneOutput, error) {
-	read := func(option string) (string, error) {
-		args := make([]string, 0, 3)
-		if permanent {
-			args = append(args, "--permanent")
+	args := make([]string, 0, 3)
+	if permanent {
+		args = append(args, "--permanent")
+	}
+	args = append(args, scopeSelector(scope), "--list-all")
+	output, err := a.reader.Read(ctx, args...)
+	if err != nil {
+		return zoneOutput{}, err
+	}
+	return parseZoneOutput(output), nil
+}
+
+func parseZoneOutput(output string) zoneOutput {
+	var parsed zoneOutput
+	richRules := make([]string, 0)
+	inRichRules := false
+	for _, line := range strings.Split(output, "\n") {
+		line = strings.TrimSpace(line)
+		switch {
+		case line == filter.FirewalldInputZone+" (active)":
+			parsed.active = true
+			inRichRules = false
+		case strings.HasPrefix(line, "ports:"):
+			parsed.ports = strings.TrimSpace(strings.TrimPrefix(line, "ports:"))
+			inRichRules = false
+		case strings.HasPrefix(line, "services:"):
+			parsed.services = strings.TrimSpace(strings.TrimPrefix(line, "services:"))
+			inRichRules = false
+		case strings.HasPrefix(line, "rich rules:"):
+			inRichRules = true
+			if value := strings.TrimSpace(strings.TrimPrefix(line, "rich rules:")); value != "" {
+				richRules = append(richRules, value)
+			}
+		case inRichRules && line != "":
+			richRules = append(richRules, line)
 		}
-		args = append(args, scopeSelector(scope), option)
-		return a.reader.Read(ctx, args...)
 	}
-	ports, err := read("--list-ports")
-	if err != nil {
-		return zoneOutput{}, err
+	parsed.rich = strings.Join(richRules, "\n")
+	return parsed
+}
+
+func publicZoneNotices(runtime, permanent zoneOutput) []filter.ScopeNotice {
+	notices := make([]filter.ScopeNotice, 0, 2)
+	if !runtime.active {
+		notices = append(notices, filter.ScopeNotice{Code: filter.ScopeNoticeManagedScopeInactive})
 	}
-	rich, err := read("--list-rich-rules")
-	if err != nil {
-		return zoneOutput{}, err
+	mismatched := make([]string, 0, 3)
+	if !sameFields(runtime.ports, permanent.ports) {
+		mismatched = append(mismatched, "ports")
 	}
-	services, err := read("--list-services")
-	if err != nil {
-		return zoneOutput{}, err
+	if !sameLines(runtime.rich, permanent.rich) {
+		mismatched = append(mismatched, "rich_rules")
 	}
-	return zoneOutput{ports: ports, rich: rich, services: services}, nil
+	if !sameFields(runtime.services, permanent.services) {
+		mismatched = append(mismatched, "services")
+	}
+	if len(mismatched) != 0 {
+		notices = append(notices, filter.ScopeNotice{Code: filter.ScopeNoticeRuntimePermanentMismatch, Values: mismatched})
+	}
+	return notices
 }
 
 // NativeDetail reads one firewalld service definition on demand. Inventory only
@@ -853,54 +958,6 @@ func opaqueZoneObject(scope filter.Scope, kind filter.NativeKind, canonical, raw
 
 func firewalldLocator(scope filter.Scope, canonical string) filter.Locator {
 	return filter.Locator{Provider: filter.ProviderFirewalld, ScopeKey: scope.Key(), NativeID: canonical, Canonical: canonical}
-}
-
-func zoneNotices(defaultZone string, active []string, runtime, permanent zoneOutput) []filter.ScopeNotice {
-	notices := make([]filter.ScopeNotice, 0, 4)
-	if defaultZone != "public" {
-		notices = append(notices, filter.ScopeNotice{Code: filter.ScopeNoticeDefaultScopeMismatch, Values: []string{defaultZone}})
-	}
-	publicActive := false
-	unmanaged := make([]string, 0)
-	for _, zone := range active {
-		if zone == "public" {
-			publicActive = true
-		} else {
-			unmanaged = append(unmanaged, zone)
-		}
-	}
-	if !publicActive {
-		notices = append(notices, filter.ScopeNotice{Code: filter.ScopeNoticeManagedScopeInactive})
-	}
-	if len(unmanaged) != 0 {
-		sort.Strings(unmanaged)
-		notices = append(notices, filter.ScopeNotice{Code: filter.ScopeNoticeUnmanagedActiveScopes, Values: unmanaged})
-	}
-	mismatched := make([]string, 0, 3)
-	if !sameFields(runtime.ports, permanent.ports) {
-		mismatched = append(mismatched, "ports")
-	}
-	if !sameLines(runtime.rich, permanent.rich) {
-		mismatched = append(mismatched, "rich_rules")
-	}
-	if !sameFields(runtime.services, permanent.services) {
-		mismatched = append(mismatched, "services")
-	}
-	if len(mismatched) != 0 {
-		notices = append(notices, filter.ScopeNotice{Code: filter.ScopeNoticeRuntimePermanentMismatch, Values: mismatched})
-	}
-	return notices
-}
-
-func parseActiveZones(output string) []string {
-	zones := make([]string, 0)
-	for _, line := range strings.Split(output, "\n") {
-		if strings.TrimSpace(line) == "" || len(line) != len(strings.TrimLeft(line, " \t")) {
-			continue
-		}
-		zones = append(zones, strings.TrimSpace(line))
-	}
-	return zones
 }
 
 func nonEmptyLines(output string) []string {

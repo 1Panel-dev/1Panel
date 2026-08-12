@@ -3976,6 +3976,8 @@ const message = {
         adoptedHelper: '기존 시스템 규칙을 현재 1Panel에서 관리하고 있습니다.',
         legacy: '레거시 관리',
         external: '외부 규칙',
+        externalHelper:
+            '시스템에 존재하지만 아직 1Panel에서 관리하지 않는 규칙이며 필요할 때 관리 대상으로 전환할 수 있습니다.',
         drifted: '불일치',
         protected: '시스템 보호',
         protectedHelper: '접속 장애를 방지하기 위해 편집하거나 삭제할 수 없는 중요한 시스템 규칙입니다.',

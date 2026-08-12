@@ -5,7 +5,7 @@ export namespace Firewall {
     export type Action = 'accept' | 'drop' | 'reject';
     export type NativeKind =
         'rule' | 'zone_port' | 'rich_rule' | 'ufw_rule' | 'ufw_application' | 'opaque' | 'zone_service';
-    export type ParseStatus = 'supported' | 'opaque';
+    export type ParseStatus = 'supported' | 'partial' | 'opaque';
     export type PersistenceStatus = 'converged' | 'runtime_only' | 'permanent_only';
 
     export interface Scope {
@@ -158,6 +158,15 @@ export namespace Firewall {
     export interface BatchCreateResponse {
         succeeded: number;
         failed: number;
+        skipped: number;
+        errors?: BatchCreateFailure[];
+    }
+
+    export interface BatchCreateFailure {
+        index: number;
+        status: 'failed' | 'skipped';
+        rule: Rule;
+        error?: string;
     }
 
     export interface UpdateRequest {

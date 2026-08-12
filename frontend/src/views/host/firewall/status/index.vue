@@ -169,6 +169,7 @@ const emit = defineEmits([
     'update:loading',
     'update:maskShow',
     'update:name',
+    'update:version',
 ]);
 
 const loadBaseInfo = async (search: boolean) => {
@@ -185,6 +186,7 @@ const loadBaseInfo = async (search: boolean) => {
             }
             emit('update:is-active', baseInfo.value.isActive);
             emit('update:is-bind', baseInfo.value.isBind);
+            emit('update:version', baseInfo.value.version);
 
             if (search) {
                 emit('search');
@@ -196,6 +198,7 @@ const loadBaseInfo = async (search: boolean) => {
             emit('update:loading', false);
             emit('update:maskShow', true);
             emit('update:name', '-');
+            emit('update:version', '');
         });
 };
 

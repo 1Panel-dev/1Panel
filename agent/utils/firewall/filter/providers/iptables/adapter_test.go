@@ -164,6 +164,64 @@ func TestCompileCreateUsesRequestedPosition(t *testing.T) {
 	}
 }
 
+func TestMultiportCheckCompileAndObserve(t *testing.T) {
+	scope := testScope("1PANEL_BASIC")
+	reader := &fakeRuleReader{}
+	adapter := NewAdapterWithReader(reader)
+	rule := filter.FirewallRule{
+		UUID: "web", Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp",
+		DestinationPort: "80,443,8080-8090", Action: filter.ActionAccept,
+	}
+	if err := adapter.CheckRule(context.Background(), rule); err != nil {
+		t.Fatalf("check multiport: %v", err)
+	}
+	if !reflect.DeepEqual(reader.checks, []filter.Family{filter.FamilyIPv4}) {
+		t.Fatalf("unexpected multiport checks: %#v", reader.checks)
+	}
+	if err := adapter.CheckRule(context.Background(), rule); err != nil || len(reader.checks) != 1 {
+		t.Fatalf("successful multiport capability was not cached: checks=%#v err=%v", reader.checks, err)
+	}
+	snapshot, _ := filter.NewSnapshot(scope, nil)
+	plan, err := adapter.Compile(snapshot, []filter.DesiredChange{{Operation: filter.ChangeCreate, After: &rule}})
+	if err != nil {
+		t.Fatalf("compile multiport: %v", err)
+	}
+	args := plan.Rules[0].Commands[0].Args
+	if !slices.Contains(args, "multiport") || !slices.Contains(args, "--dports") || !slices.Contains(args, "80,443,8080:8090") {
+		t.Fatalf("unexpected multiport command: %#v", args)
+	}
+
+	reader.output = `-A 1PANEL_BASIC -p tcp -m multiport --dports 80,443,8080:8090 -j ACCEPT -m comment --comment "web"`
+	observed, err := adapter.Observe(context.Background(), scope)
+	if err != nil || len(observed.Rules) != 1 || observed.Rules[0].ParseStatus != filter.ParseStatusSupported ||
+		observed.Rules[0].Rule.DestinationPort != "80,443,8080-8090" {
+		t.Fatalf("multiport was not observed: snapshot=%#v err=%v", observed, err)
+	}
+
+	failingReader := &fakeRuleReader{multiportErr: errors.New("extension missing")}
+	if err := NewAdapterWithReader(failingReader).CheckRule(context.Background(), rule); !errors.Is(err, filter.ErrUnsupportedScope) {
+		t.Fatalf("expected unavailable multiport error, got %v", err)
+	}
+}
+
+func TestCompileRejectsPositionFromOtherFamilySnapshot(t *testing.T) {
+	snapshotScope := testScopeFamily("1PANEL_BASIC", filter.FamilyIPv4)
+	snapshot, _ := filter.NewSnapshot(snapshotScope, nil)
+	position := int64(1)
+	rule := filter.FirewallRule{
+		UUID:  "ipv6-rule",
+		Scope: testScopeFamily("1PANEL_BASIC", filter.FamilyIPv6), NativeKind: filter.NativeKindRule,
+		Protocol: "tcp", DestinationPort: "443", Action: filter.ActionAccept, OrderIndex: &position,
+	}
+	_, err := NewAdapterWithReader(&fakeRuleReader{}).Compile(snapshot, []filter.DesiredChange{{
+		Operation: filter.ChangeCreate,
+		After:     &rule,
+	}})
+	if !errors.Is(err, filter.ErrUnsupportedScope) {
+		t.Fatalf("expected cross-family position to be rejected, got %v", err)
+	}
+}
+
 func TestCompileReordersManagedRuleWithinChain(t *testing.T) {
 	scope := testScope("1PANEL_BASIC")
 	first := filter.FirewallRule{UUID: "first", Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp", DestinationPort: "80", Action: filter.ActionAccept}
@@ -424,7 +482,8 @@ func TestObserveKeepsUnsupportedRulesOpaque(t *testing.T) {
 	if err != nil {
 		t.Fatalf("observe opaque rules: %v", err)
 	}
-	if len(snapshot.Rules) != 2 || snapshot.Rules[0].ParseStatus != filter.ParseStatusOpaque || snapshot.Rules[1].ParseStatus != filter.ParseStatusOpaque {
+	if len(snapshot.Rules) != 2 || snapshot.Rules[0].ParseStatus != filter.ParseStatusOpaque || snapshot.Rules[1].ParseStatus != filter.ParseStatusSupported ||
+		snapshot.Rules[1].Rule.DestinationPort != "80,443" {
 		t.Fatalf("unsupported rules were guessed: %#v", snapshot.Rules)
 	}
 	if snapshot.Rules[0].Raw == "" || snapshot.Rules[0].Locator.Canonical == "" {
@@ -488,8 +547,10 @@ func TestObserveRejectsScopeOutsideOwnedChains(t *testing.T) {
 }
 
 type fakeRuleReader struct {
-	output string
-	err    error
+	output       string
+	err          error
+	multiportErr error
+	checks       []filter.Family
 }
 
 type fakeRuleWriter struct {
@@ -526,6 +587,11 @@ func executorObserved(rule filter.FirewallRule, position int) filter.ObservedRul
 
 func (f *fakeRuleReader) ListChain(context.Context, filter.Scope) (string, error) {
 	return f.output, f.err
+}
+
+func (f *fakeRuleReader) CheckMultiport(_ context.Context, family filter.Family) error {
+	f.checks = append(f.checks, family)
+	return f.multiportErr
 }
 
 func testScope(chain string) filter.Scope {

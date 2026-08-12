@@ -18,10 +18,12 @@ const (
 )
 
 type DesiredChange struct {
-	Operation ChangeOperation `json:"operation"`
-	Before    *FirewallRule   `json:"before,omitempty"`
-	After     *FirewallRule   `json:"after,omitempty"`
-	Locator   *Locator        `json:"locator,omitempty"`
+	Operation    ChangeOperation `json:"operation"`
+	Before       *FirewallRule   `json:"before,omitempty"`
+	After        *FirewallRule   `json:"after,omitempty"`
+	Locator      *Locator        `json:"locator,omitempty"`
+	Append       bool            `json:"append,omitempty"`
+	RestoreAtEnd bool            `json:"restoreAtEnd,omitempty"`
 }
 
 type NativeCommand struct {
@@ -66,6 +68,12 @@ type Adapter interface {
 
 type RulePreparer interface {
 	PrepareRule(FirewallRule) (FirewallRule, error)
+}
+
+// RuleChecker validates provider capabilities that can only be determined at
+// runtime, before a checked rule is authorized or applied.
+type RuleChecker interface {
+	CheckRule(context.Context, FirewallRule) error
 }
 
 // NativeDetailReader loads provider-specific details for an opaque named

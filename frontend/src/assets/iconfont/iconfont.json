@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "12903469",
+      "name": "本地数据",
+      "font_class": "shuju",
+      "unicode": "e634",
+      "unicode_decimal": 58932
+    },
+    {
+      "icon_id": "45981805",
+      "name": "已纳管",
+      "font_class": "yinaguan",
+      "unicode": "e632",
+      "unicode_decimal": 58930
+    },
+    {
       "icon_id": "1137427",
       "name": "允许",
       "font_class": "yunxu1",

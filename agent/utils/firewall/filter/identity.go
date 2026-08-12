@@ -60,7 +60,7 @@ func RuleKey(rule FirewallRule) (string, error) {
 }
 
 func InstanceKey(rule ObservedRule) (string, error) {
-	if rule.ParseStatus == ParseStatusOpaque {
+	if rule.ParseStatus != ParseStatusSupported {
 		locator, err := validatedLocator(rule.Locator, rule.Rule.Scope)
 		if err != nil {
 			return "", err
@@ -106,7 +106,7 @@ func SnapshotRevision(scope Scope, rules []ObservedRule) (string, error) {
 		if rule.Rule.Scope.Normalize().Key() != scope.Key() {
 			return "", fmt.Errorf("%w: observed rule scope %q does not match snapshot scope %q", ErrInvalidRule, rule.Rule.Scope.Key(), scope.Key())
 		}
-		if rule.ParseStatus == ParseStatusOpaque {
+		if rule.ParseStatus != ParseStatusSupported {
 			locator, err := validatedLocator(rule.Locator, scope)
 			if err != nil {
 				return "", err
