@@ -29,7 +29,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/sftp v1.13.11
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/russellhaering/goxmldsig v1.6.0
+	github.com/russellhaering/goxmldsig v1.6.1
 	github.com/shirou/gopsutil/v4 v4.26.7
 	github.com/sirupsen/logrus v1.9.4
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
