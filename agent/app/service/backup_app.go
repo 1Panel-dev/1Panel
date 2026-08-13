@@ -232,7 +232,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		}
 		defer func() {
 			if isRollback {
-				_, _ = compose.UpWithoutPull(install.GetComposePath())
+				_, _ = compose.UpWithoutBuild(install.GetComposePath())
 			} else {
 				_, _ = compose.Up(install.GetComposePath())
 			}

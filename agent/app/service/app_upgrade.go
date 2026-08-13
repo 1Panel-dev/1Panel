@@ -426,7 +426,7 @@ func (u *appUpgradeContext) cutover(t *task.Task) error {
 
 	logStr := fmt.Sprintf("%s %s", i18n.GetMsgByKey("Run"), i18n.GetMsgByKey("App"))
 	t.LogStart(logStr)
-	if out, upErr := compose.UpWithoutPull(u.original.GetComposePath()); upErr != nil {
+	if out, upErr := compose.UpWithoutBuild(u.original.GetComposePath()); upErr != nil {
 		if out != "" {
 			upErr = fmt.Errorf("%s: %w", out, upErr)
 		}
@@ -545,7 +545,7 @@ func (u *appUpgradeContext) rollback(t *task.Task) (rollbackErr error) {
 		return u.finishRollback()
 	}
 	if u.phase < appUpgradeMutated {
-		if out, err := compose.UpWithoutPull(u.original.GetComposePath()); err != nil {
+		if out, err := compose.UpWithoutBuild(u.original.GetComposePath()); err != nil {
 			if out != "" {
 				err = fmt.Errorf("%s: %w", out, err)
 			}
@@ -563,14 +563,14 @@ func (u *appUpgradeContext) rollback(t *task.Task) (rollbackErr error) {
 	if u.backupFile != "" {
 		_ = u.restoreManagedFiles()
 		if err := handleAppRecover(&u.original, t, u.backupFile, true, "", ""); err != nil {
-			_, _ = compose.UpWithoutPull(u.original.GetComposePath())
+			_, _ = compose.UpWithoutBuild(u.original.GetComposePath())
 			return errors.Join(rollbackErr, err)
 		}
 	} else {
 		if err := u.restoreManagedFiles(); err != nil {
 			return errors.Join(rollbackErr, err)
 		}
-		if out, err := compose.UpWithoutPull(u.original.GetComposePath()); err != nil {
+		if out, err := compose.UpWithoutBuild(u.original.GetComposePath()); err != nil {
 			if out != "" {
 				err = fmt.Errorf("%s: %w", out, err)
 			}
