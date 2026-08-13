@@ -4139,6 +4139,50 @@ const message = {
         allIP: 'すべてのIP',
         portRule: 'ルール|ルール',
         forwardRule: 'ポートフォワードルール|ポートフォワードルール',
+        dockerGuard: 'コンテナポート保護',
+        dockerGuardHelper:
+            'Docker コンテナがホストに公開するポートのアクセス制限を設定します。未保護のポートは Docker のデフォルトのアクセス動作を維持します。',
+        dockerInputNotProtected:
+            'ホストの INPUT ルールでは、この Docker 公開ポートを直接保護できません。クリックしてコンテナポート保護を開きます。',
+        notInitialized: '未初期化',
+        dockerGuardUnbindConfirm:
+            'バインドを解除すると、すべてのコンテナポートは一時的に Docker のデフォルト動作に戻ります。既存の保護設定は保持されます。続行しますか？',
+        deleteDockerGuardPolicyConfirm: 'このエンドポイントは Docker のデフォルト動作に戻ります。続行しますか？',
+        clearDockerGuardPoliciesConfirm: '選択したエンドポイントは Docker のデフォルト動作に戻ります。続行しますか？',
+        protection: '保護',
+        portDetails: 'ポート詳細',
+        orphanEndpoints: '未関連付けエンドポイント',
+        exposure: '公開状態',
+        externallyExposed: '外部アクセスを許可（0.0.0.0 / ::）',
+        restrictedBinding: '外部アクセスを拒否（127.0.0.1 / ::1）',
+        composeOrApp: 'Compose / アプリ',
+        deniedSources: '拒否する送信元',
+        allowedSources: '許可する送信元',
+        dockerGuardPolicy: 'コンテナポート保護ポリシー',
+        protectionMode: '保護モード',
+        denySources: '指定した送信元を拒否',
+        allowSources: '指定した送信元のみ許可',
+        denyAll: 'すべてのアクセスを拒否',
+        sourcesHelper:
+            '1 行につき 1 つの IPv4/IPv6 アドレスまたは CIDR を入力してください。許可リストが空の場合はすべて拒否します',
+        effective: '有効',
+        notEnabled: '未有効化',
+        notEffective: '未反映',
+        dockerGuardStatusEffective: '{0} コンテナポート保護は正常に動作しています',
+        dockerGuardStatusReason: {
+            command_missing:
+                '{0} ファイアウォールコンポーネントが利用できないため、対応する保護を有効にできません。システムファイアウォールを確認してください',
+            docker_chain_missing:
+                'Docker の {0} コンテナネットワークが無効なため、対応する保護は不要です。必要な場合は Docker で {0} を有効にしてください',
+            guard_chain_missing: '{0} ポート保護の初期化が完了していません。再度初期化してください',
+            jump_missing: '{0} ポート保護がバインドされていないため無効です。再度バインドしてください',
+            jump_not_first:
+                '{0} ポート保護の設定に異常があり、完全に機能しない可能性があります。バインドを解除して再度バインドしてください',
+            jump_duplicate: '{0} ポート保護に重複した設定があります。バインドを解除して再度バインドしてください',
+            inspect_failed:
+                '{0} ポート保護の状態を取得できません。更新するか、システムファイアウォールを確認してください',
+        },
+        dockerGuardUnprotected: '未保護',
         ipRule: 'IPルール|IPルール',
         userAgent: 'ユーザーエージェントフィルター',
         sourcePort: 'ソースポート',

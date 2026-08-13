@@ -56,6 +56,18 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/firewall/docker',
+            name: 'FirewallDockerGuard',
+            component: () => import('@/views/host/firewall/docker/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/hosts/firewall/rules',
+                parent: 'menu.firewall',
+                title: 'firewall.dockerGuard',
+                permission: 'host_firewall_view',
+            },
+        },
+        {
             path: '/hosts/firewall/forward',
             name: 'FirewallForward',
             component: () => import('@/views/host/firewall/forward/index.vue'),

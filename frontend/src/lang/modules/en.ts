@@ -4156,6 +4156,50 @@ const message = {
         allIP: 'All IP',
         portRule: 'Port Rule | Port Rules',
         forwardRule: 'Port-Forward rule | Port-Forward rules',
+        dockerGuard: 'Container Port Guard',
+        dockerGuardHelper:
+            'Set access restrictions for ports published from Docker containers to the host. Unprotected ports retain Docker default access behavior.',
+        dockerInputNotProtected:
+            'Host INPUT rules do not directly protect this Docker published port. Click to open Container Port Guard.',
+        notInitialized: 'Not initialized',
+        dockerGuardUnbindConfirm:
+            'After unbinding, all container ports temporarily return to Docker default access behavior. Existing protection settings are retained. Continue?',
+        deleteDockerGuardPolicyConfirm: 'This endpoint will return to Docker default access behavior. Continue?',
+        clearDockerGuardPoliciesConfirm:
+            'The selected endpoints will return to Docker default access behavior. Continue?',
+        protection: 'Protection',
+        portDetails: 'Port details',
+        orphanEndpoints: 'Unassociated endpoints',
+        exposure: 'Exposure',
+        externallyExposed: 'Allow external access (0.0.0.0 / ::)',
+        restrictedBinding: 'Deny external access (127.0.0.1 / ::1)',
+        composeOrApp: 'Compose / App',
+        deniedSources: 'Denied sources',
+        allowedSources: 'Allowed sources',
+        dockerGuardPolicy: 'Container port guard policy',
+        protectionMode: 'Protection mode',
+        denySources: 'Deny specified sources',
+        allowSources: 'Allow specified sources only',
+        denyAll: 'Deny all access',
+        sourcesHelper: 'Enter one IPv4/IPv6 address or CIDR per line; an empty allowlist denies all access',
+        effective: 'Effective',
+        notEnabled: 'Not enabled',
+        notEffective: 'Not effective',
+        dockerGuardStatusEffective: '{0} container port protection is working normally',
+        dockerGuardStatusReason: {
+            command_missing:
+                'The {0} firewall component is unavailable, so the corresponding container port protection cannot be enabled. Check the system firewall environment',
+            docker_chain_missing:
+                'Docker container networking for {0} is not enabled, so no corresponding port protection is required. Enable {0} in Docker first if needed',
+            guard_chain_missing: '{0} container port protection has not been fully initialized. Initialize it again',
+            jump_missing: '{0} container port protection is not bound and is currently inactive. Bind it again',
+            jump_not_first:
+                '{0} container port protection is configured incorrectly and may not fully work. Unbind and bind it again',
+            jump_duplicate: '{0} container port protection has duplicate configuration. Unbind and bind it again',
+            inspect_failed:
+                'Unable to retrieve the {0} container port protection status. Refresh or check the system firewall',
+        },
+        dockerGuardUnprotected: 'Unprotected',
         ipRule: 'IP rule | IP rules',
         userAgent: 'User-Agent filter',
         destination: 'Destination',

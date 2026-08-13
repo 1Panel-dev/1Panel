@@ -1,6 +1,7 @@
 package firewall
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -16,6 +17,9 @@ import (
 )
 
 func Init() {
+	defer func() {
+		service.ReconcileDockerPortGuardBestEffort(context.Background())
+	}()
 	if !needInit() {
 		if err := initIPv6BaseIfEnabled(); err != nil {
 			global.LOG.Errorf("initialize IPv6 iptables rules failed, err: %v", err)

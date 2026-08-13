@@ -1690,3 +1690,10 @@ var AddFirewallRuleTable = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.FirewallRule{})
 	},
 }
+
+var AddDockerPortGuard = &gormigrate.Migration{
+	ID: "20260812-add-docker-port-guard",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.DockerPortGuardPolicy{})
+	},
+}

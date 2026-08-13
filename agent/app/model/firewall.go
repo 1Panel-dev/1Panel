@@ -2,6 +2,19 @@ package model
 
 import "strings"
 
+type DockerPortGuardPolicy struct {
+	BaseModel
+
+	UUID        string `gorm:"size:64;not null;uniqueIndex" json:"uuid"`
+	Family      string `gorm:"size:16;not null;uniqueIndex:idx_docker_port_guard_endpoint" json:"family"`
+	HostIP      string `gorm:"size:64;not null;uniqueIndex:idx_docker_port_guard_endpoint" json:"hostIP"`
+	HostPort    uint16 `gorm:"not null;uniqueIndex:idx_docker_port_guard_endpoint" json:"hostPort"`
+	Protocol    string `gorm:"size:8;not null;uniqueIndex:idx_docker_port_guard_endpoint" json:"protocol"`
+	Mode        string `gorm:"size:32;not null" json:"mode"`
+	Sources     string `gorm:"type:text" json:"-"`
+	Description string `gorm:"type:text" json:"description"`
+}
+
 type FirewallRule struct {
 	UUID     string `gorm:"size:64;primaryKey" json:"uuid"`
 	ScopeKey string `gorm:"size:255;not null;index" json:"scopeKey"`

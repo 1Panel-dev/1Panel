@@ -4201,6 +4201,54 @@ const message = {
         allIP: 'Todas las IP',
         portRule: 'Regla | Reglas',
         forwardRule: 'Regla de redirección de puertos | Reglas de redirección de puertos',
+        dockerGuard: 'Protección de puertos de contenedores',
+        dockerGuardHelper:
+            'Configura restricciones de acceso para los puertos que los contenedores Docker publican en el host. Los puertos sin protección mantienen el comportamiento de acceso predeterminado de Docker.',
+        dockerInputNotProtected:
+            'Las reglas INPUT del host no protegen directamente este puerto publicado por Docker. Haz clic para abrir la protección de puertos de contenedores.',
+        notInitialized: 'No inicializado',
+        dockerGuardUnbindConfirm:
+            'Después de desvincular, todos los puertos de contenedores volverán temporalmente al acceso predeterminado de Docker. Se conservarán los ajustes de protección existentes. ¿Continuar?',
+        deleteDockerGuardPolicyConfirm:
+            'Este punto de conexión volverá al acceso predeterminado de Docker. ¿Continuar?',
+        clearDockerGuardPoliciesConfirm:
+            'Los puntos de conexión seleccionados volverán al acceso predeterminado de Docker. ¿Continuar?',
+        protection: 'Protección',
+        portDetails: 'Detalles del puerto',
+        orphanEndpoints: 'Puntos de conexión sin asociar',
+        exposure: 'Exposición',
+        externallyExposed: 'Permitir acceso externo (0.0.0.0 / ::)',
+        restrictedBinding: 'Denegar acceso externo (127.0.0.1 / ::1)',
+        composeOrApp: 'Compose / Aplicación',
+        deniedSources: 'Orígenes denegados',
+        allowedSources: 'Orígenes permitidos',
+        dockerGuardPolicy: 'Política de protección de puertos de contenedores',
+        protectionMode: 'Modo de protección',
+        denySources: 'Denegar orígenes especificados',
+        allowSources: 'Permitir solo los orígenes especificados',
+        denyAll: 'Denegar todo acceso',
+        sourcesHelper:
+            'Introduce una dirección IPv4/IPv6 o CIDR por línea; una lista de permitidos vacía deniega todo acceso',
+        effective: 'En vigor',
+        notEnabled: 'No habilitado',
+        notEffective: 'Sin efecto',
+        dockerGuardStatusEffective: 'La protección de puertos de contenedores {0} funciona correctamente',
+        dockerGuardStatusReason: {
+            command_missing:
+                'El componente de firewall {0} no está disponible y no se puede habilitar la protección correspondiente. Comprueba el firewall del sistema',
+            docker_chain_missing:
+                'La red de contenedores Docker para {0} no está habilitada, por lo que no se requiere protección. Si la necesitas, habilita primero {0} en Docker',
+            guard_chain_missing:
+                'La protección de puertos {0} no se ha inicializado por completo. Vuelve a inicializarla',
+            jump_missing: 'La protección de puertos {0} no está vinculada y está inactiva. Vuelve a vincularla',
+            jump_not_first:
+                'La protección de puertos {0} está configurada incorrectamente y podría no funcionar por completo. Desvincúlala y vuelve a vincularla',
+            jump_duplicate:
+                'La protección de puertos {0} tiene una configuración duplicada. Desvincúlala y vuelve a vincularla',
+            inspect_failed:
+                'No se puede obtener el estado de protección de puertos {0}. Actualiza o comprueba el firewall del sistema',
+        },
+        dockerGuardUnprotected: 'Sin protección',
         ipRule: 'Regla IP | Reglas IP',
         userAgent: 'Filtro User-Agent',
         sourcePort: 'Puerto de origen',

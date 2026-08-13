@@ -107,7 +107,13 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 	if err != nil {
 		return err
 	}
-	return lifecycle.NewOperator(client).Operate(lifecycle.Operation(req.Operation), req.WithDockerRestart, u.addPortsBeforeStart)
+	if err := lifecycle.NewOperator(client).Operate(lifecycle.Operation(req.Operation), req.WithDockerRestart, u.addPortsBeforeStart); err != nil {
+		return err
+	}
+	if req.Operation == "start" || req.Operation == "restart" {
+		ReconcileDockerPortGuardBestEffort(context.Background())
+	}
+	return nil
 }
 
 func (u *FirewallService) OperateFilterChain(req dto.IptablesOp) error {

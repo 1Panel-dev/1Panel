@@ -55,6 +55,83 @@ type FirewallNativeDetail struct {
 	Permanent  bool              `json:"permanent"`
 }
 
+type DockerPortGuardBase struct {
+	Initialized bool                        `json:"initialized"`
+	Bound       bool                        `json:"bound"`
+	IPv4        DockerPortGuardFamilyStatus `json:"ipv4"`
+	IPv6        DockerPortGuardFamilyStatus `json:"ipv6"`
+	Backend     string                      `json:"backend"`
+	Message     string                      `json:"message,omitempty"`
+}
+
+type DockerPortGuardFamilyStatus struct {
+	State       string `json:"state"`
+	Reason      string `json:"reason,omitempty"`
+	Initialized bool   `json:"initialized"`
+	Bound       bool   `json:"bound"`
+	Effective   bool   `json:"effective"`
+}
+
+type DockerPortGuardEndpoint struct {
+	Family        string   `json:"family"`
+	HostIP        string   `json:"hostIP"`
+	HostPort      uint16   `json:"hostPort"`
+	Protocol      string   `json:"protocol"`
+	ContainerID   string   `json:"containerID"`
+	ContainerName string   `json:"containerName"`
+	ContainerPort uint16   `json:"containerPort"`
+	Compose       string   `json:"compose,omitempty"`
+	Application   string   `json:"application,omitempty"`
+	PolicyUUID    string   `json:"policyUUID,omitempty"`
+	Mode          string   `json:"mode,omitempty"`
+	Sources       []string `json:"sources"`
+	Effective     bool     `json:"effective"`
+	Description   string   `json:"description,omitempty"`
+}
+
+type DockerPortGuardPortGroup struct {
+	Key       string                    `json:"key"`
+	Label     string                    `json:"label"`
+	Endpoint  DockerPortGuardEndpoint   `json:"endpoint"`
+	Endpoints []DockerPortGuardEndpoint `json:"endpoints"`
+}
+
+type DockerPortGuardContainer struct {
+	Key         string                     `json:"key"`
+	Name        string                     `json:"name"`
+	Compose     string                     `json:"compose,omitempty"`
+	Application string                     `json:"application,omitempty"`
+	Endpoints   []DockerPortGuardEndpoint  `json:"endpoints"`
+	PortGroups  []DockerPortGuardPortGroup `json:"portGroups"`
+}
+
+type DockerPortGuardList struct {
+	Base       DockerPortGuardBase        `json:"base"`
+	Containers []DockerPortGuardContainer `json:"containers"`
+}
+
+type DockerPortGuardEndpointIdentity struct {
+	Family   string `json:"family" validate:"required,oneof=ipv4 ipv6"`
+	HostIP   string `json:"hostIP" validate:"required"`
+	HostPort uint16 `json:"hostPort" validate:"required,min=1"`
+	Protocol string `json:"protocol" validate:"required,oneof=tcp udp"`
+}
+
+type DockerPortGuardPolicyBatch struct {
+	Endpoints   []DockerPortGuardEndpointIdentity `json:"endpoints" validate:"required,min=1,max=256,dive"`
+	Mode        string                            `json:"mode" validate:"required,oneof=deny_sources allow_sources deny_all"`
+	Sources     []string                          `json:"sources"`
+	Description string                            `json:"description"`
+}
+
+type DockerPortGuardPolicyBatchDelete struct {
+	UUIDs []string `json:"uuids" validate:"required,min=1,max=256,dive,required"`
+}
+
+type DockerPortGuardOperation struct {
+	Operation string `json:"operation" validate:"required,oneof=initialize bind unbind"`
+}
+
 type FirewallRuleCheck struct {
 	UUID string              `json:"uuid"`
 	Rule filter.FirewallRule `json:"rule" validate:"required"`

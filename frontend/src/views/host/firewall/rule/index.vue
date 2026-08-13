@@ -351,6 +351,7 @@ import {
     checkFirewallRule,
     createFirewallRule,
     deleteFirewallRule,
+    loadDockerPortGuard,
     loadFirewallNativeDetail,
     searchFirewallRules,
 } from '@/api/modules/firewall';
@@ -376,7 +377,8 @@ interface UsageEntry {
     key: string;
     ports: number[];
     owner: string;
-    pid: number;
+    pid?: number;
+    docker?: boolean;
 }
 
 interface DisplayNotice {
@@ -407,6 +409,7 @@ const visibleIptablesChains = ref<string[]>(['1PANEL_BASIC']);
 const searchName = ref('');
 const inventoryItems = ref<Firewall.InventoryItem[]>([]);
 const listeningProcesses = ref<Process.ListeningProcess[]>([]);
+const dockerEndpoints = ref<Firewall.DockerGuardEndpoint[]>([]);
 const selects = ref<RuleRow[]>([]);
 const scopeNotices = ref<Firewall.ScopeNotice[]>([]);
 
@@ -474,6 +477,7 @@ const search = async () => {
         const [responses] = await Promise.all([
             Promise.all(scopes.map((scope) => searchFirewallRules({ scope }))),
             loadListeningProcesses(),
+            loadDockerEndpoints(),
         ]);
         inventoryItems.value = responses.flatMap((response) => response.data.items || []);
         scopeNotices.value = responses.flatMap((response) => response.data.notices || []);
@@ -594,10 +598,19 @@ const loadListeningProcesses = async () => {
         listeningProcesses.value = [];
     }
 };
+const loadDockerEndpoints = async () => {
+    try {
+        dockerEndpoints.value = (await loadDockerPortGuard()).data.containers.flatMap(
+            (container) => container.endpoints || [],
+        );
+    } catch {
+        dockerEndpoints.value = [];
+    }
+};
 const ruleUsageEntries = (row: RuleRow): UsageEntry[] => {
     if (row.rule.scope.direction !== 'input' || isReadOnlyNativeRule(row)) return [];
     const protocols = listeningProtocolNumbers(row.rule.protocol);
-    return listeningProcesses.value.flatMap((process) => {
+    const processes = listeningProcesses.value.flatMap((process) => {
         if (!protocols.includes(process.Protocol)) return [];
         const ports = extractListeningPorts(process.Port)
             .filter((port) => isPortInRule(row.rule.destinationPort, port))
@@ -612,10 +625,29 @@ const ruleUsageEntries = (row: RuleRow): UsageEntry[] => {
             },
         ];
     });
+    const docker = dockerEndpoints.value
+        .filter((endpoint) => protocols.includes(endpoint.protocol === 'tcp' ? 1 : 2))
+        .filter((endpoint) => isPortInRule(row.rule.destinationPort, endpoint.hostPort))
+        .map((endpoint) => ({
+            key: `docker:${endpoint.family}:${endpoint.hostIP}:${endpoint.hostPort}:${endpoint.protocol}`,
+            ports: [endpoint.hostPort],
+            owner: `Docker: ${endpoint.containerName || endpoint.containerID?.slice(0, 12) || '-'}`,
+            docker: true,
+        }));
+    return [...processes, ...docker];
 };
 const usageEntryPortText = (entry: UsageEntry) => entry.ports.join(', ') || '-';
-const usageEntryLabel = (entry: UsageEntry) => `${entry.owner} (${usageEntryPortText(entry)})`;
-const openUsageDetail = (entry: UsageEntry) => processDetailRef.value?.acceptParams(entry.pid);
+const usageEntryLabel = (entry: UsageEntry) =>
+    entry.docker
+        ? `${entry.owner} (${usageEntryPortText(entry)}) — ${i18n.global.t('firewall.dockerInputNotProtected')}`
+        : `${entry.owner} (${usageEntryPortText(entry)})`;
+const openUsageDetail = (entry: UsageEntry) => {
+    if (entry.docker) {
+        window.location.href = '/hosts/firewall/docker';
+        return;
+    }
+    if (entry.pid !== undefined) processDetailRef.value?.acceptParams(entry.pid);
+};
 const scopeIdentity = (rule: Firewall.Rule) => JSON.stringify(rule.scope);
 const sameIptablesPositionScope = (rule: Firewall.Rule, family: Firewall.Family, chain: string) =>
     rule.scope.provider === 'iptables' &&

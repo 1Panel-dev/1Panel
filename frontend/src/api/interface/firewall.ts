@@ -177,4 +177,77 @@ export namespace Firewall {
         targetPosition?: number;
         priority?: number;
     }
+
+    // Docker bridge published-port protection (DOCKER-USER).
+    export interface DockerGuardBase {
+        initialized: boolean;
+        bound: boolean;
+        ipv4: DockerGuardFamilyStatus;
+        ipv6: DockerGuardFamilyStatus;
+        backend: string;
+        message?: string;
+    }
+    export interface DockerGuardFamilyStatus {
+        state: 'effective' | 'disabled' | 'not_effective';
+        reason?:
+            | 'command_missing'
+            | 'docker_chain_missing'
+            | 'guard_chain_missing'
+            | 'jump_missing'
+            | 'jump_not_first'
+            | 'jump_duplicate'
+            | 'inspect_failed';
+        initialized: boolean;
+        bound: boolean;
+        effective: boolean;
+    }
+    export interface DockerGuardEndpoint {
+        family: 'ipv4' | 'ipv6';
+        hostIP: string;
+        hostPort: number;
+        protocol: 'tcp' | 'udp';
+        containerID?: string;
+        containerName?: string;
+        containerPort?: number;
+        compose?: string;
+        application?: string;
+        policyUUID?: string;
+        mode?: 'deny_sources' | 'allow_sources' | 'deny_all';
+        sources: string[];
+        effective: boolean;
+        description?: string;
+    }
+    export interface DockerGuardPortGroup {
+        key: string;
+        label: string;
+        endpoint: DockerGuardEndpoint;
+        endpoints: DockerGuardEndpoint[];
+    }
+    export interface DockerGuardContainer {
+        key: string;
+        name: string;
+        compose?: string;
+        application?: string;
+        endpoints: DockerGuardEndpoint[];
+        portGroups: DockerGuardPortGroup[];
+    }
+    export interface DockerGuardList {
+        base: DockerGuardBase;
+        containers: DockerGuardContainer[];
+    }
+    export interface DockerGuardEndpointIdentity {
+        family: 'ipv4' | 'ipv6';
+        hostIP: string;
+        hostPort: number;
+        protocol: 'tcp' | 'udp';
+    }
+    export interface DockerGuardPolicyBatch {
+        endpoints: DockerGuardEndpointIdentity[];
+        mode: 'deny_sources' | 'allow_sources' | 'deny_all';
+        sources: string[];
+        description: string;
+    }
+    export interface DockerGuardPolicyBatchDelete {
+        uuids: string[];
+    }
 }

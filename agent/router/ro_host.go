@@ -38,6 +38,11 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/firewall/rules/:uuid/reorder", baseApi.ReorderFirewallRule)
 
 		hostRouter.POST("/firewall/filter/operate", baseApi.OperateFilterChain)
+		hostRouter.GET("/firewall/docker/ports", baseApi.ListDockerPortGuard)
+		hostRouter.POST("/firewall/docker/sync", baseApi.SyncDockerPortGuard)
+		hostRouter.POST("/firewall/docker/operate", baseApi.OperateDockerPortGuard)
+		hostRouter.POST("/firewall/docker/policies/batch", baseApi.UpsertDockerPortGuardPolicies)
+		hostRouter.POST("/firewall/docker/policies/delete/batch", baseApi.DeleteDockerPortGuardPolicies)
 
 		hostRouter.POST("/monitor/search", baseApi.LoadMonitor)
 		hostRouter.POST("/monitor/clean", baseApi.CleanMonitor)

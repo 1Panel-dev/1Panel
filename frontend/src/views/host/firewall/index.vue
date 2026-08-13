@@ -11,6 +11,10 @@ const buttons = [
         path: '/hosts/firewall/rules',
     },
     {
+        label: i18n.global.t('firewall.dockerGuard'),
+        path: '/hosts/firewall/docker',
+    },
+    {
         label: i18n.global.t('firewall.forwardRule', 2),
         path: '/hosts/firewall/forward',
     },

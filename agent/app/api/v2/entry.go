@@ -43,6 +43,7 @@ var (
 	sshService                = service.NewISSHService()
 	firewallService           = service.NewIFirewallService()
 	forwardingService         = service.NewIForwardingService()
+	dockerPortGuardService    = service.NewIDockerPortGuardService()
 	monitorService            = service.NewIMonitorService()
 	systemService             = service.NewISystemService()
 	runtimeDiagnosticsService = service.NewIRuntimeDiagnosticsService()

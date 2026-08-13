@@ -4241,6 +4241,50 @@ const message = {
         allIP: 'Todos os IPs',
         portRule: 'Regra | Regras',
         forwardRule: 'Regra de redirecionamento de porta | Regras de redirecionamento de porta',
+        dockerGuard: 'Proteção de portas de contêineres',
+        dockerGuardHelper:
+            'Configure restrições de acesso para as portas publicadas pelos contêineres Docker no host. Portas sem proteção mantêm o acesso padrão do Docker.',
+        dockerInputNotProtected:
+            'As regras INPUT do host não protegem diretamente esta porta publicada pelo Docker. Clique para abrir a proteção de portas de contêineres.',
+        notInitialized: 'Não inicializado',
+        dockerGuardUnbindConfirm:
+            'Após desvincular, todas as portas de contêineres retornarão temporariamente ao acesso padrão do Docker. As configurações de proteção existentes serão mantidas. Continuar?',
+        deleteDockerGuardPolicyConfirm: 'Este endpoint retornará ao acesso padrão do Docker. Continuar?',
+        clearDockerGuardPoliciesConfirm: 'Os endpoints selecionados retornarão ao acesso padrão do Docker. Continuar?',
+        protection: 'Proteção',
+        portDetails: 'Detalhes da porta',
+        orphanEndpoints: 'Endpoints não associados',
+        exposure: 'Exposição',
+        externallyExposed: 'Permitir acesso externo (0.0.0.0 / ::)',
+        restrictedBinding: 'Negar acesso externo (127.0.0.1 / ::1)',
+        composeOrApp: 'Compose / Aplicativo',
+        deniedSources: 'Origens negadas',
+        allowedSources: 'Origens permitidas',
+        dockerGuardPolicy: 'Política de proteção de portas de contêineres',
+        protectionMode: 'Modo de proteção',
+        denySources: 'Negar origens especificadas',
+        allowSources: 'Permitir somente origens especificadas',
+        denyAll: 'Negar todo o acesso',
+        sourcesHelper:
+            'Insira um endereço IPv4/IPv6 ou CIDR por linha; uma lista de permissões vazia nega todo o acesso',
+        effective: 'Em vigor',
+        notEnabled: 'Não habilitado',
+        notEffective: 'Sem efeito',
+        dockerGuardStatusEffective: 'A proteção de portas de contêineres {0} está funcionando normalmente',
+        dockerGuardStatusReason: {
+            command_missing:
+                'O componente de firewall {0} não está disponível e a proteção correspondente não pode ser habilitada. Verifique o firewall do sistema',
+            docker_chain_missing:
+                'A rede de contêineres Docker para {0} não está habilitada, portanto nenhuma proteção é necessária. Se necessário, habilite primeiro {0} no Docker',
+            guard_chain_missing: 'A proteção de portas {0} não foi totalmente inicializada. Inicialize-a novamente',
+            jump_missing: 'A proteção de portas {0} não está vinculada e está inativa. Vincule-a novamente',
+            jump_not_first:
+                'A proteção de portas {0} está configurada incorretamente e pode não funcionar por completo. Desvincule-a e vincule-a novamente',
+            jump_duplicate: 'A proteção de portas {0} tem configuração duplicada. Desvincule-a e vincule-a novamente',
+            inspect_failed:
+                'Não foi possível obter o estado da proteção de portas {0}. Atualize ou verifique o firewall do sistema',
+        },
+        dockerGuardUnprotected: 'Sem proteção',
         ipRule: 'Regra de IP | Regras de IP',
         userAgent: 'Filtro User-Agent',
         sourcePort: 'Porta de origem',

@@ -100,9 +100,10 @@ func (s *ForwardingService) Operate(req dto.ForwardRuleOperate) error {
 	}
 	if err := manager.Operate(operations, req.ForceDelete); errors.Is(err, forwardClient.ErrRuleExists) {
 		return buserr.New("ErrRecordExist")
-	} else {
+	} else if err != nil {
 		return err
 	}
+	return nil
 }
 
 func (s *ForwardingService) Enable() error {
