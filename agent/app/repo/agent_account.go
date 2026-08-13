@@ -86,7 +86,7 @@ func (a AgentAccountRepo) CountTextByProviders(providers []string) (map[string]i
 		Model(&model.AgentAccount{}).
 		Select("provider, COUNT(*) as count").
 		Where("provider IN ?", normalizedProviders).
-		Where("api_type NOT LIKE ?", "%-images").
+		Scopes(WithTextAPIType()).
 		Group("provider").
 		Scan(&rows).Error; err != nil {
 		return nil, err
