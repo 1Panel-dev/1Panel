@@ -81,6 +81,10 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 	}
 
 	switch apiType {
+	case "openai-embeddings":
+		request.URL = embeddingVerifyURL(baseURL)
+		headers["Authorization"] = "Bearer " + apiKey
+		request.Body = mustJSON(map[string]interface{}{"model": model, "input": "ping"})
 	case "openai-images":
 		request.URL = imageVerifyURL(provider, baseURL, "/images/generations")
 		headers["Authorization"] = "Bearer " + apiKey
@@ -129,6 +133,17 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 		})
 	}
 	return request
+}
+
+func embeddingVerifyURL(baseURL string) string {
+	lowerBaseURL := strings.ToLower(baseURL)
+	if strings.HasSuffix(lowerBaseURL, "/embeddings") {
+		return baseURL
+	}
+	if strings.HasSuffix(lowerBaseURL, "/v1") {
+		return baseURL + "/embeddings"
+	}
+	return baseURL + "/v1/embeddings"
 }
 
 func imageVerifyURL(provider, baseURL, endpoint string) string {

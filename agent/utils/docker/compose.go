@@ -1,14 +1,15 @@
 package docker
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"fmt"
 	"path"
 	"strings"
 
+	"github.com/compose-spec/compose-go/v2/dotenv"
 	"github.com/compose-spec/compose-go/v2/loader"
+	"github.com/compose-spec/compose-go/v2/template"
 	"github.com/compose-spec/compose-go/v2/types"
 	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v3"
@@ -91,7 +92,7 @@ func (e *Environment) UnmarshalYAML(value *yaml.Node) error {
 }
 
 func GetImagesFromDockerCompose(env, yml []byte) ([]string, error) {
-	envVars, err := loadEnvFile(env)
+	envVars, err := dotenv.Parse(bytes.NewReader(env))
 	if err != nil {
 		return nil, fmt.Errorf("load env failed: %v", err)
 	}
@@ -104,43 +105,16 @@ func GetImagesFromDockerCompose(env, yml []byte) ([]string, error) {
 	var images []string
 	for _, service := range compose.Services {
 		if service.Image != "" {
-			resolvedImage := replaceEnvVars(service.Image, envVars)
+			resolvedImage, err := template.Substitute(service.Image, func(key string) (string, bool) {
+				value, ok := envVars[key]
+				return value, ok
+			})
+			if err != nil {
+				return nil, fmt.Errorf("resolve image failed: %v", err)
+			}
 			images = append(images, resolvedImage)
 		}
 	}
 
 	return images, nil
-}
-
-func loadEnvFile(env []byte) (map[string]string, error) {
-	envVars := make(map[string]string)
-
-	scanner := bufio.NewScanner(bytes.NewReader(env))
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-
-		parts := strings.SplitN(line, "=", 2)
-		if len(parts) == 2 {
-			key := strings.TrimSpace(parts[0])
-			value := strings.TrimSpace(parts[1])
-			value = strings.Trim(value, `"'`)
-			envVars[key] = value
-		}
-	}
-
-	return envVars, scanner.Err()
-}
-
-func replaceEnvVars(input string, envVars map[string]string) string {
-	return re.GetRegex(re.ComposeEnvVarPattern).ReplaceAllStringFunc(input, func(match string) string {
-		varName := match[2 : len(match)-1]
-		if value, exists := envVars[varName]; exists {
-			return value
-		}
-		return match
-	})
 }
