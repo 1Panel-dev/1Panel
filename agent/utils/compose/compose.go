@@ -48,7 +48,7 @@ func Up(filePath string, projectName ...string) (string, error) {
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
-func UpWithoutPull(filePath string, projectName ...string) (string, error) {
+func UpWithoutBuild(filePath string, projectName ...string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
@@ -58,11 +58,11 @@ func UpWithoutPull(filePath string, projectName ...string) (string, error) {
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Minute)).RunWithStdout(base, args...)
 }
 
-func upArgs(filePath string, withoutPull bool) []string {
+func upArgs(filePath string, withoutBuild bool) []string {
 	args := loadFiles(filePath)
 	args = append(args, "up", "-d")
-	if withoutPull {
-		args = append(args, "--pull", "never", "--no-build")
+	if withoutBuild {
+		args = append(args, "--no-build")
 	}
 	return args
 }

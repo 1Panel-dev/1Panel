@@ -40,20 +40,21 @@ type Meta struct {
 var catalog = map[string]Meta{
 	"custom": {
 		Key: "custom", DisplayName: "Custom", Sort: 10, DefaultAPIType: "openai-completions", EnvKey: "CUSTOM_API_KEY",
-		APIConfigs: editableAPIConfigs(true, "openai-completions", "openai-responses", "anthropic-messages", "openai-images"),
+		APIConfigs: editableAPIConfigs(true, "openai-completions", "openai-responses", "anthropic-messages", "openai-images", "openai-embeddings"),
 	},
 	"ollama": {
 		Key: "ollama", DisplayName: "Ollama", Sort: 15, DefaultAPIType: "openai-responses",
-		APIConfigs: editableAPIConfigs(false, "openai-responses", "openai-completions"),
+		APIConfigs: editableAPIConfigs(false, "openai-responses", "openai-completions", "openai-embeddings"),
 	},
 	"vllm": {
 		Key: "vllm", DisplayName: "vLLM", Sort: 20, DefaultAPIType: "openai-completions", EnvKey: "VLLM_API_KEY",
-		APIConfigs: editableAPIConfigs(false, "openai-completions", "openai-responses", "anthropic-messages", "openai-images"),
+		APIConfigs: editableAPIConfigs(false, "openai-completions", "openai-responses", "anthropic-messages", "openai-images", "openai-embeddings"),
 	},
 	"deepseek": {
 		Key: "deepseek", DisplayName: "DeepSeek", Sort: 25, DefaultAPIType: "openai-completions", EnvKey: "DEEPSEEK_API_KEY",
 		APIConfigs: []APIConfig{
 			{APIType: "openai-completions", BaseURL: "https://api.deepseek.com"},
+			{APIType: "openai-responses", BaseURL: "https://api.deepseek.com"},
 			anthropicAPIConfig("https://api.deepseek.com/anthropic", AuthModeXAPIKey),
 		},
 		Models: []Model{{ID: "deepseek-v4-flash", Name: "deepseek-v4-flash"}, {ID: "deepseek-v4-pro", Name: "deepseek-v4-pro"}},
@@ -131,6 +132,10 @@ var catalog = map[string]Meta{
 			{APIType: "openai-responses", BaseURL: "https://api.openai.com/v1"},
 			{APIType: "openai-completions", BaseURL: "https://api.openai.com/v1"},
 			{APIType: "openai-images", BaseURL: "https://api.openai.com/v1"},
+			{APIType: "openai-embeddings", BaseURL: "https://api.openai.com/v1", Models: []Model{
+				{ID: "text-embedding-3-small", Name: "text-embedding-3-small"},
+				{ID: "text-embedding-3-large", Name: "text-embedding-3-large"},
+			}},
 		},
 		Models: []Model{{ID: "gpt-5.4", Name: "gpt-5.4"}, {ID: "gpt-5.4-pro", Name: "gpt-5.4-pro"}, {ID: "gpt-5.4-mini", Name: "gpt-5.4-mini"}, {ID: "gpt-5.4-nano", Name: "gpt-5.4-nano"}},
 	},
@@ -296,7 +301,7 @@ func DefaultModels(key, apiType string) []Model {
 		if len(config.Models) > 0 {
 			return append([]Model(nil), config.Models...)
 		}
-		if IsImageAPIType(config.APIType) {
+		if IsImageAPIType(config.APIType) || IsEmbeddingAPIType(config.APIType) {
 			return nil
 		}
 		break
@@ -359,7 +364,7 @@ func ResolveBaseURL(key, apiType, requested string) (string, error) {
 	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
 		return "", fmt.Errorf("invalid base url")
 	}
-	if key == "custom" && IsImageAPIType(config.APIType) {
+	if key == "custom" && (IsImageAPIType(config.APIType) || IsEmbeddingAPIType(config.APIType)) {
 		return baseURL, nil
 	}
 	parsed.Path = normalizeEndpointPath(config.APIType, parsed.Path)
@@ -381,6 +386,8 @@ func normalizeEndpointPath(apiType, value string) string {
 		suffixes = []string{"/responses"}
 	case "anthropic-messages":
 		suffixes = []string{"/v1/messages", "/messages"}
+	case "openai-embeddings":
+		suffixes = []string{"/v1/embeddings", "/embeddings"}
 	}
 	for _, suffix := range suffixes {
 		if strings.HasSuffix(strings.ToLower(path), suffix) {
@@ -388,6 +395,10 @@ func normalizeEndpointPath(apiType, value string) string {
 		}
 	}
 	return path
+}
+
+func IsEmbeddingAPIType(apiType string) bool {
+	return apiType == "openai-embeddings"
 }
 
 func IsImageAPIType(apiType string) bool {

@@ -108,7 +108,7 @@ func WithByAPIType(apiType string) DBOption {
 
 func WithTextAPIType() DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("api_type NOT LIKE ?", "%-images")
+		return g.Where("api_type NOT LIKE ? AND api_type <> ?", "%-images", "openai-embeddings")
 	}
 }
 

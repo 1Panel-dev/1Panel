@@ -299,6 +299,7 @@ const selectedAPIConfig = computed(() =>
     selectedProvider.value?.apiTypes.find((item) => item.apiType === form.apiType),
 );
 const isImageAPIType = computed(() => form.apiType.endsWith('-images'));
+const isEmbeddingAPIType = computed(() => form.apiType === 'openai-embeddings');
 const supportsModelDiscovery = computed(() => !form.id && Boolean(selectedAPIConfig.value?.supportsModelDiscovery));
 const defaultModels = computed(() => {
     if (selectedAPIConfig.value?.models.length) {
@@ -314,7 +315,7 @@ const showInitialModel = computed(
         !showModelDiscovery.value,
 );
 const requiresVerifyModel = computed(
-    () => form.validateAvailability && !isAgentAccountVerificationSkipped(form.provider),
+    () => form.validateAvailability && (isEmbeddingAPIType.value || !isAgentAccountVerificationSkipped(form.provider)),
 );
 const verifyModelOptions = computed(() => (form.id ? editModels.value : defaultModels.value));
 const showVerifyModelSelect = computed(
@@ -360,6 +361,11 @@ const apiTypeURLHints: Record<string, { requestPath: string; example: string; en
         requestPath: '/api/v1/images',
         example: 'https://openrouter.ai',
         endpointSuffixes: ['/api/v1/images'],
+    },
+    'openai-embeddings': {
+        requestPath: '/v1/embeddings',
+        example: 'http://127.0.0.1:8000/v1',
+        endpointSuffixes: ['/v1/embeddings', '/embeddings'],
     },
 };
 const showAPITypeBaseURLTips = computed(() => Boolean(selectedAPIConfig.value?.editableBaseUrl));

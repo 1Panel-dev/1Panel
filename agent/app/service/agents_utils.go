@@ -116,7 +116,7 @@ func resolveAgentAccountInput(provider, apiType, authMode, apiKey, baseURL, mode
 		return resolvedAgentAccountInput{}, buserr.New("ErrAgentAccountModelsRequired")
 	}
 	imageAPI := providercatalog.IsImageAPIType(resolvedAPIType)
-	if validateAvailability && (imageAPI || !providercatalog.SkipVerification(provider)) {
+	if validateAvailability && (imageAPI || providercatalog.IsEmbeddingAPIType(resolvedAPIType) || !providercatalog.SkipVerification(provider)) {
 		if err := providercatalog.VerifyAccount(provider, resolvedAPIType, resolvedAuthMode, resolvedBaseURL, resolvedAPIKey, modelID); err != nil {
 			return resolvedAgentAccountInput{}, err
 		}
