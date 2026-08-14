@@ -277,7 +277,7 @@ const message = {
             paramComplexity:
                 'This field mustn\'t start and end with special characters and must consist of English, numbers, "{0}" characters with a length of 6-128.',
             paramUrlAndPort: 'This field must be in the format of "http(s)://(domain name/ip):(port)".',
-            nginxDoc: 'This field must consist of English, numbers and "." characters.',
+            nginxDoc: 'This field must consist of English letters, numbers and ".", "_", "-" characters.',
             appName:
                 'This field musnt\'t start and end with "-" and "_" characters and must consist of English, numbers, "-", and "_" characters with a length of 2-30.',
             containerName: 'Supports letters, numbers, -, _ and .; cannot start with - _ or .; length: 2-128',

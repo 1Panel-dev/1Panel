@@ -275,7 +275,7 @@ const message = {
             paramComplexity:
                 'Este campo não deve começar ou terminar com caracteres especiais e deve conter letras, números e "{0}" com comprimento de 6-128.',
             paramUrlAndPort: 'Este campo deve estar no formato "http(s)://(nome do domínio/IP):(porta)".',
-            nginxDoc: 'Este campo deve conter letras, números e ".".',
+            nginxDoc: 'Este campo deve conter letras, números, ".", "_" e "-".',
             appName:
                 'Este campo não deve começar ou terminar com "-" ou "_" e deve conter letras, números, "-", e "_" com comprimento de 2-30.',
             containerName:

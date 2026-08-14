@@ -277,7 +277,7 @@ const message = {
             paramComplexity:
                 'Bu alan özel karakterlerle başlayıp bitmemeli ve İngilizce, rakam, "{0}" karakterlerinden oluşmalı, uzunluk 6-128 olmalıdır.',
             paramUrlAndPort: 'Bu alan "http(s)://(alan adı/ip):(port)" formatında olmalıdır.',
-            nginxDoc: 'Bu alan İngilizce, rakam ve "." karakterlerinden oluşmalıdır.',
+            nginxDoc: 'Bu alan İngilizce harfler, rakamlar, ".", "_" ve "-" karakterlerinden oluşmalıdır.',
             appName:
                 'Bu alan "-" ve "_" karakterleriyle başlayıp bitmemeli ve İngilizce, rakam, "-", ve "_" karakterlerinden oluşmalı, uzunluk 2-30 olmalıdır.',
             containerName: 'Harf, rakam, -, _ ve . destekler; - _ veya . ile başlayamaz; uzunluk: 2-128',
