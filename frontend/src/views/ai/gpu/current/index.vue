@@ -1,7 +1,7 @@
 <template>
     <div>
         <RouterMenu />
-        <div v-if="gpuType == 'nvidia'">
+        <div v-if="gpuType !== 'xpu'">
             <LayoutContent
                 v-loading="loading"
                 :title="$t('aiTools.gpu.gpu')"
@@ -14,15 +14,27 @@
                 </template>
                 <template #main>
                     <el-descriptions direction="vertical" :column="14" border>
-                        <el-descriptions-item :label="$t('aiTools.gpu.driverVersion')" width="50%" :span="7">
+                        <el-descriptions-item
+                            :label="$t('aiTools.gpu.driverVersion')"
+                            width="50%"
+                            :span="gpuInfo.cudaVersion ? 7 : 14"
+                        >
                             {{ gpuInfo.driverVersion }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('aiTools.gpu.cudaVersion')" :span="7">
+                        <el-descriptions-item
+                            v-if="gpuInfo.cudaVersion"
+                            :label="$t('aiTools.gpu.cudaVersion')"
+                            :span="7"
+                        >
                             {{ gpuInfo.cudaVersion }}
                         </el-descriptions-item>
                     </el-descriptions>
                     <el-collapse v-model="activeNames" class="card-interval">
-                        <el-collapse-item v-for="item in gpuInfo.gpu" :key="item.index" :name="item.index">
+                        <el-collapse-item
+                            v-for="item in gpuInfo.gpu"
+                            :key="item.type + '-' + item.index"
+                            :name="item.type + '-' + item.index"
+                        >
                             <template #title>
                                 <span class="name-class">{{ item.index + '. ' + item.productName }}</span>
                             </template>
@@ -45,8 +57,13 @@
                                 <el-descriptions-item>
                                     <template #label>
                                         <div class="cell-item">
-                                            {{ $t('aiTools.gpu.performanceState') }}
+                                            {{
+                                                item.type === 'ascend'
+                                                    ? $t('commons.table.status')
+                                                    : $t('aiTools.gpu.performanceState')
+                                            }}
                                             <el-tooltip
+                                                v-if="item.type === 'nvidia'"
                                                 placement="top"
                                                 :content="$t('aiTools.gpu.performanceStateHelper')"
                                             >
@@ -57,19 +74,20 @@
                                     {{ item.performanceState }}
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('aiTools.gpu.powerUsage')">
-                                    {{ item.powerDraw }} / {{ item.maxPowerLimit }}
+                                    {{ item.powerDraw }}
+                                    <template v-if="item.maxPowerLimit !== 'N/A'">/ {{ item.maxPowerLimit }}</template>
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('aiTools.gpu.memoryUsage')">
                                     {{ item.memUsed }} / {{ item.memTotal }}
                                 </el-descriptions-item>
-                                <el-descriptions-item :label="$t('aiTools.gpu.fanSpeed')">
+                                <el-descriptions-item v-if="item.type === 'nvidia'" :label="$t('aiTools.gpu.fanSpeed')">
                                     {{ item.fanSpeed }}
                                 </el-descriptions-item>
 
                                 <el-descriptions-item :label="$t('aiTools.gpu.busID')">
                                     {{ item.busID }}
                                 </el-descriptions-item>
-                                <el-descriptions-item>
+                                <el-descriptions-item v-if="item.type === 'nvidia'">
                                     <template #label>
                                         <div class="cell-item">
                                             {{ $t('aiTools.gpu.persistenceMode') }}
@@ -83,14 +101,17 @@
                                     </template>
                                     {{ $t('aiTools.gpu.' + item.persistenceMode.toLowerCase()) }}
                                 </el-descriptions-item>
-                                <el-descriptions-item :label="$t('aiTools.gpu.displayActive')">
+                                <el-descriptions-item
+                                    v-if="item.type === 'nvidia'"
+                                    :label="$t('aiTools.gpu.displayActive')"
+                                >
                                     {{
                                         lowerCase(item.displayActive) === 'disabled'
                                             ? $t('aiTools.gpu.displayActiveF')
                                             : $t('aiTools.gpu.displayActiveT')
                                     }}
                                 </el-descriptions-item>
-                                <el-descriptions-item>
+                                <el-descriptions-item v-if="item.type === 'nvidia'">
                                     <template #label>
                                         <div class="cell-item">
                                             Uncorr. ECC
@@ -101,7 +122,10 @@
                                     </template>
                                     {{ loadEcc(item.ecc) }}
                                 </el-descriptions-item>
-                                <el-descriptions-item :label="$t('aiTools.gpu.computeMode')">
+                                <el-descriptions-item
+                                    v-if="item.type === 'nvidia'"
+                                    :label="$t('aiTools.gpu.computeMode')"
+                                >
                                     <template #label>
                                         <div class="cell-item">
                                             {{ $t('aiTools.gpu.computeMode') }}
@@ -121,7 +145,7 @@
                                     </template>
                                     {{ loadComputeMode(item.computeMode) }}
                                 </el-descriptions-item>
-                                <el-descriptions-item label="MIG.M">
+                                <el-descriptions-item v-if="item.type === 'nvidia'" label="MIG.M">
                                     <template #label>
                                         <div class="cell-item">
                                             MIG M.
@@ -268,7 +292,7 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             gpuType.value = res.data.type;
-            if (res.data.type == 'nvidia') {
+            if (res.data.type !== 'xpu') {
                 gpuInfo.value = res.data;
             } else {
                 xpuInfo.value = res.data;
@@ -281,7 +305,12 @@ const search = async () => {
 
 const refresh = async () => {
     const res = await loadGPUInfo();
-    gpuInfo.value = res.data;
+    gpuType.value = res.data.type;
+    if (res.data.type !== 'xpu') {
+        gpuInfo.value = res.data;
+    } else {
+        xpuInfo.value = res.data;
+    }
 };
 
 const lowerCase = (val: string) => {

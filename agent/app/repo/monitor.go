@@ -73,6 +73,9 @@ func (u *MonitorRepo) CreateMonitorBase(model model.MonitorBase) error {
 	return global.MonitorDB.Create(&model).Error
 }
 func (s *MonitorRepo) BatchCreateMonitorGPU(list []model.MonitorGPU) error {
+	if len(list) == 0 {
+		return nil
+	}
 	return global.GPUMonitorDB.CreateInBatches(&list, len(list)).Error
 }
 func (u *MonitorRepo) BatchCreateMonitorIO(ioList []model.MonitorIO) error {

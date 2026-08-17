@@ -49,6 +49,7 @@ type GPUChartHide struct {
 	GPU         bool   `json:"gpu"`
 	Memory      bool   `json:"memory"`
 	Power       bool   `json:"power"`
+	PowerLimit  bool   `json:"powerLimit"`
 	Temperature bool   `json:"temperature"`
 	Speed       bool   `json:"speed"`
 }

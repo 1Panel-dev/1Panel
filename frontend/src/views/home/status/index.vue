@@ -513,7 +513,9 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo):
         currentInfo.value.gpuData = currentInfo.value.gpuData || [];
         for (let i = 0; i < currentInfo.value.gpuData.length; i++) {
             chartsOption.value['gpu' + i] = {
-                title: 'GPU-' + currentInfo.value.gpuData[i].index,
+                title:
+                    (currentInfo.value.gpuData[i].type === 'ascend' ? 'NPU-' : 'GPU-') +
+                    currentInfo.value.gpuData[i].index,
                 data: formatNumber(Number(currentInfo.value.gpuData[i].gpuUtil.replaceAll(' %', ''))),
             };
         }
