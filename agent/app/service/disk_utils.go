@@ -61,18 +61,21 @@ func parseDevice(dev LsblkDevice) []response.DiskBasicInfo {
 
 	var used, avail, totalSize string
 	var usePercent int
-	isMounted := mountPoint != ""
+	isMounted := mountPoint != "" && mountPoint != "-"
 	isSystem := false
 
 	if dev.Fstype == "LVM2_member" && len(dev.Children) > 0 {
 		for _, child := range dev.Children {
-			if child.Type == "lvm" && child.Mountpoint != "" {
-				devicePath := "/dev/mapper/" + child.Name
-				totalSize, used, avail, usePercent, _ := getDiskUsageInfo(devicePath)
+			if child.Type == "lvm" && child.Mountpoint != "" && child.Mountpoint != "-" {
+				totalSize, used, avail, usePercent, _ := getDiskUsageInfo(child.Mountpoint)
+				childSize := child.Size
+				if totalSize != "" {
+					childSize = totalSize
+				}
 
 				childInfo := response.DiskBasicInfo{
 					Device:      dev.Name,
-					Size:        totalSize,
+					Size:        childSize,
 					Model:       dev.Model,
 					DiskType:    diskType,
 					Filesystem:  child.Fstype,
@@ -91,8 +94,7 @@ func parseDevice(dev LsblkDevice) []response.DiskBasicInfo {
 		return list
 	} else if isMounted {
 		isSystem = isSystemDisk(mountPoint)
-		devicePath := "/dev/" + dev.Name
-		totalSize, used, avail, usePercent, _ = getDiskUsageInfo(devicePath)
+		totalSize, used, avail, usePercent, _ = getDiskUsageInfo(mountPoint)
 		if totalSize != "" {
 			size = totalSize
 		}
@@ -229,9 +231,14 @@ func parseLsblkOutput(output string) ([]response.DiskBasicInfo, error) {
 		size := fields["SIZE"]
 
 		if diskType == "lvm" {
-			total, used, avail, usePercent, _ := getDiskUsageInfo("/dev/mapper/" + name)
-			if total != "" && fsType != "" {
-				size = total
+			var total, used, avail string
+			var usePercent int
+			isMounted := mountPoint != "" && mountPoint != "-"
+			if isMounted {
+				total, used, avail, usePercent, _ = getDiskUsageInfo(mountPoint)
+				if total != "" && fsType != "" {
+					size = total
+				}
 			}
 
 			lvmInfo := response.DiskBasicInfo{
@@ -246,7 +253,7 @@ func parseLsblkOutput(output string) ([]response.DiskBasicInfo, error) {
 				Avail:       avail,
 				UsePercent:  usePercent,
 				MountPoint:  mountPoint,
-				IsMounted:   mountPoint != "" && mountPoint != "-",
+				IsMounted:   isMounted,
 				Serial:      fields["SERIAL"],
 			}
 			lvmMap[name] = lvmInfo
@@ -269,8 +276,8 @@ func parseLsblkOutput(output string) ([]response.DiskBasicInfo, error) {
 			used, avail, totalSize string
 			usePercent             int
 		)
-		if mountPoint != "" {
-			totalSize, used, avail, usePercent, _ = getDiskUsageInfo("/dev/" + name)
+		if mountPoint != "" && mountPoint != "-" {
+			totalSize, used, avail, usePercent, _ = getDiskUsageInfo(mountPoint)
 			if totalSize != "" {
 				size = totalSize
 			}
@@ -387,26 +394,39 @@ func getParentDevice(device string) string {
 	return device
 }
 
-func getDiskUsageInfo(device string) (size, used, avail string, usePercent int, err error) {
-	output, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("df", "-h", device)
+func getDiskUsageInfo(mountPoint string) (size, used, avail string, usePercent int, err error) {
+	// Query by mount point instead of a reconstructed device path. The mount table may record
+	// a different device alias such as /dev/root.
+	output, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("df", "-h", "-P", mountPoint)
 	if err != nil {
 		return "", "", "", 0, nil
 	}
+	return parseDiskUsageOutput(output)
+}
+
+func parseDiskUsageOutput(output string) (size, used, avail string, usePercent int, err error) {
 	lines := strings.Split(strings.TrimSpace(output), "\n")
-	if len(lines) > 1 {
-		output = lines[len(lines)-1]
+	for i := len(lines) - 1; i >= 0; i-- {
+		fields := strings.Fields(lines[i])
+		for index, field := range fields {
+			if index < 3 || !strings.HasSuffix(field, "%") {
+				continue
+			}
+			percent, parseErr := strconv.Atoi(strings.TrimSuffix(field, "%"))
+			if parseErr != nil {
+				continue
+			}
+			return fields[index-3], fields[index-2], fields[index-1], percent, nil
+		}
+		for index, field := range fields {
+			if index < 3 || index+1 >= len(fields) || field != "-" || !strings.HasPrefix(fields[index+1], "/") {
+				continue
+			}
+			return fields[index-3], fields[index-2], fields[index-1], 0, nil
+		}
 	}
 
-	fields := strings.Fields(output)
-	if len(fields) >= 5 {
-		size = fields[1]
-		used = fields[2]
-		avail = fields[3]
-		usePercentStr := strings.TrimSuffix(fields[4], "%")
-		usePercent, _ = strconv.Atoi(usePercentStr)
-	}
-
-	return size, used, avail, usePercent, nil
+	return "", "", "", 0, nil
 }
 
 func formatDisk(req dto.DiskFormatRequest) error {
