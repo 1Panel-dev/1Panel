@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+const maxIDGenerationAttempts = 32
+
 type Item[T any] struct {
 	Value     T
 	ExpiresAt time.Time
@@ -30,15 +32,41 @@ func New[T any](ttl time.Duration, maxEntries int, newID func() string) *Store[T
 }
 
 func (s *Store[T]) Set(value T) string {
+	return s.set(value, true)
+}
+
+func (s *Store[T]) TrySet(value T) string {
+	return s.set(value, false)
+}
+
+func (s *Store[T]) set(value T, evictOldest bool) string {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	s.cleanupExpiredLocked()
+	itemID := ""
+	for range maxIDGenerationAttempts {
+		candidate := s.newID()
+		if candidate == "" {
+			continue
+		}
+		if _, exists := s.items[candidate]; exists {
+			continue
+		}
+		itemID = candidate
+		break
+	}
+	if itemID == "" {
+		return ""
+	}
+
 	if len(s.items) >= s.maxEntries {
+		if !evictOldest {
+			return ""
+		}
 		s.removeOldestLocked()
 	}
 
-	itemID := s.newID()
 	s.items[itemID] = Item[T]{
 		Value:     value,
 		ExpiresAt: s.now().Add(s.ttl),

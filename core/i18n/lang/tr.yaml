@@ -443,7 +443,7 @@ UpdatePortFirewallReload: "Güvenlik duvarını yeniden yükleme başarısız, {
 # mobil uygulama
 ErrVerifyToken: 'Token doğrulama hatası, lütfen sıfırlayın ve tekrar tarayın.'
 ErrInvalidToken: 'Geçersiz token, lütfen sıfırlayın ve tekrar tarayın.'
-ErrExpiredToken: 'Token süresi dolmuş, lütfen sıfırlayın ve tekrar tarayın.'
+ErrExpiredToken: 'QR kodu artık geçerli değil. Yeni bir kod oluşturup tekrar tarayın.'
 
 # komut dışa aktarma
 Name: "Ad"

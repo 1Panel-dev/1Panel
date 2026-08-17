@@ -443,7 +443,7 @@ UpdatePortFirewallReload: "ファイアウォールのリロードに失敗し�
 # モバイルアプリ
 ErrVerifyToken: 'トークンの検証エラーです。リセット後、再度QRコードをスキャンしてください。'
 ErrInvalidToken: '無効なトークンです。リセット後、再度QRコードをスキャンしてください。'
-ErrExpiredToken: 'トークンの有効期限が切れました。リセット後、再度QRコードをスキャンしてください。'
+ErrExpiredToken: 'QRコードが無効になりました。再生成してからもう一度スキャンしてください。'
 
 # コマンドエクスポート
 Name: "名前"

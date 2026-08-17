@@ -443,7 +443,7 @@ UpdatePortFirewallReload: "防火墙重载失败，{{ .err }}，请您手动重�
 # 移动端
 ErrVerifyToken: '令牌验证错误，请重置后再次扫码'
 ErrInvalidToken: '无效的令牌，请重置后再次扫码'
-ErrExpiredToken: '令牌过期，请重置后再次扫码'
+ErrExpiredToken: '二维码已失效，请重新生成后再次扫码'
 
 # 命令导出
 Name: "名称"

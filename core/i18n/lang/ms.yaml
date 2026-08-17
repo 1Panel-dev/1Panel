@@ -443,7 +443,7 @@ UpdatePortFirewallReload: "Gagal memuat semula firewall, {{ .err }}, sila muat s
 # aplikasi mudah alih
 ErrVerifyToken: "Ralat pengesahan token, sila tetapkan semula dan imbas semula"
 ErrInvalidToken: "Token tidak sah, sila tetapkan semula dan imbas semula"
-ErrExpiredToken: "Token telah tamat tempoh, sila tetapkan semula dan imbas semula"
+ErrExpiredToken: 'Kod QR tidak lagi sah. Jana kod baharu dan imbas semula.'
 
 # eksport perintah
 Name: "Nama"

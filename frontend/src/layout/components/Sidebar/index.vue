@@ -194,7 +194,10 @@ function buildVisibleMenu(menu: RouteRecordRaw, showSet: Set<string>): RouteReco
 
     const visibleChildren = children
         .map((item) => {
-            if ((item.name === 'Upage' || item.name === 'XApp') && (isIntl.value || (isEE.value && !isAdmin.value))) {
+            if (item.name === 'Upage' && (isIntl.value || (isEE.value && !isAdmin.value))) {
+                return null;
+            }
+            if (item.name === 'XApp' && isIntl.value) {
                 return null;
             }
             return buildVisibleMenu(item, showSet);
