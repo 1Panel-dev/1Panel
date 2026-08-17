@@ -73,12 +73,6 @@
                                     </el-option>
                                 </el-select>
                                 <span class="input-help">{{ item.helper }}</span>
-                                <span
-                                    v-if="item.subsystem === 'docker' && item.group.selected === 'nftables'"
-                                    class="input-help"
-                                >
-                                    {{ $t('firewall.dockerNftGuardUnsupported') }}
-                                </span>
                             </el-form-item>
 
                             <el-form-item :label="$t('firewall.noPing')">
@@ -151,16 +145,16 @@ const groups = computed(() => {
             group: settings.value.system,
         },
         {
-            subsystem: 'forwarding' as const,
-            label: i18n.global.t('firewall.forwardBackend'),
-            helper: i18n.global.t('firewall.forwardingHelper'),
-            group: settings.value.forwarding,
-        },
-        {
             subsystem: 'docker' as const,
-            label: i18n.global.t('firewall.dockerBackend'),
+            label: i18n.global.t('firewall.dockerGuard'),
             helper: i18n.global.t('firewall.dockerFirewallHelper'),
             group: settings.value.docker,
+        },
+        {
+            subsystem: 'forwarding' as const,
+            label: i18n.global.t('firewall.forwardRule', 2),
+            helper: i18n.global.t('firewall.forwardingHelper'),
+            group: settings.value.forwarding,
         },
     ];
 });

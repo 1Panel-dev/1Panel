@@ -61,7 +61,7 @@ type IDockerPortGuardService interface {
 }
 
 func NewIDockerPortGuardService() IDockerPortGuardService {
-	return &DockerPortGuardService{policies: repo.NewIDockerPortGuardRepo(), runtime: docker_guard.NewManager(), client: docker.NewDockerClient}
+	return &DockerPortGuardService{policies: repo.NewIDockerPortGuardRepo(), client: docker.NewDockerClient}
 }
 
 func ReconcileDockerPortGuard(ctx context.Context) error {
@@ -78,7 +78,7 @@ func ReconcileDockerPortGuardBestEffort(ctx context.Context) {
 }
 
 func (s *DockerPortGuardService) List(ctx context.Context) (dto.DockerPortGuardList, error) {
-	base := s.runtimeStatus()
+	base := s.runtimeStatus(s.guardRuntime("iptables"), "iptables")
 	policies, err := s.policies.List(ctx)
 	if err != nil {
 		return dto.DockerPortGuardList{}, err
@@ -95,7 +95,7 @@ func (s *DockerPortGuardService) List(ctx context.Context) (dto.DockerPortGuardL
 		return dto.DockerPortGuardList{Base: base, Containers: groupDockerGuardContainers(dockerGuardPolicyEndpoints(policies))}, nil
 	}
 	base.Backend = dockerFirewallBackend(info)
-	base.Name = dockerFirewallDisplayName(base.Backend)
+	base = s.runtimeStatus(s.guardRuntime(base.Backend), base.Backend)
 	if reconcileErr := lastDockerPortGuardReconcileError(); reconcileErr != nil {
 		base.Message = reconcileErr.Error()
 		markDockerGuardReconcileFailure(&base, reconcileErr)
@@ -131,26 +131,31 @@ func (s *DockerPortGuardService) Operate(ctx context.Context, request dto.Docker
 	defer dockerPortGuardServiceMu.Unlock()
 	switch request.Operation {
 	case "initialize":
-		if err := s.checkBackend(ctx); err != nil {
+		runtime, _, err := s.runtimeForDocker(ctx)
+		if err != nil {
 			return err
 		}
 		policies, err := s.runtimePolicies(ctx)
 		if err != nil {
 			return err
 		}
-		if err := s.runtime.Initialize(policies); err != nil {
+		if err := runtime.Initialize(policies); err != nil {
 			recordDockerPortGuardReconcileError(err)
 			return err
 		}
 		recordDockerPortGuardReconcileError(nil)
 		return nil
 	case "bind":
-		if err := s.checkBackend(ctx); err != nil {
+		runtime, _, err := s.runtimeForDocker(ctx)
+		if err != nil {
 			return err
 		}
-		return s.runtime.Bind()
+		return runtime.Bind()
 	case "unbind":
-		return s.runtime.Unbind()
+		if s.runtime != nil {
+			return s.runtime.Unbind()
+		}
+		return errors.Join(docker_guard.NewManager().Unbind(), docker_guard.NewNftablesManager().Unbind())
 	default:
 		return fmt.Errorf("unsupported Docker port guard operation: %s", request.Operation)
 	}
@@ -225,21 +230,42 @@ func (s *DockerPortGuardService) Reconcile(ctx context.Context) error {
 
 func (s *DockerPortGuardService) reconcileLocked(ctx context.Context) (err error) {
 	defer func() { recordDockerPortGuardReconcileError(err) }()
-	initialized, err := s.runtime.Initialized(docker_guard.FamilyIPv4)
+	initialized, err := s.anyRuntimeInitialized()
 	if err != nil {
 		return &docker_guard.FamilyError{Family: docker_guard.FamilyIPv4, Err: fmt.Errorf("inspect initialization: %w", err)}
 	}
 	if !initialized {
 		return nil
 	}
-	if err := s.checkBackend(ctx); err != nil {
+	runtime, _, err := s.runtimeForDocker(ctx)
+	if err != nil {
 		return err
+	}
+	initialized, err = runtime.Initialized(docker_guard.FamilyIPv4)
+	if err != nil {
+		return &docker_guard.FamilyError{Family: docker_guard.FamilyIPv4, Err: fmt.Errorf("inspect initialization: %w", err)}
+	}
+	if !initialized {
+		return nil
 	}
 	policies, err := s.runtimePolicies(ctx)
 	if err != nil {
 		return err
 	}
-	return s.runtime.Reconcile(policies)
+	return runtime.Reconcile(policies)
+}
+
+func (s *DockerPortGuardService) anyRuntimeInitialized() (bool, error) {
+	if s.runtime != nil {
+		return s.runtime.Initialized(docker_guard.FamilyIPv4)
+	}
+	for _, runtime := range []dockerGuardRuntime{docker_guard.NewManager(), docker_guard.NewNftablesManager()} {
+		initialized, err := runtime.Initialized(docker_guard.FamilyIPv4)
+		if err != nil || initialized {
+			return initialized, err
+		}
+	}
+	return false, nil
 }
 
 func recordDockerPortGuardReconcileError(err error) {
@@ -299,12 +325,12 @@ func (s *DockerPortGuardService) runtimePolicies(ctx context.Context) ([]docker_
 	return policies, nil
 }
 
-func (s *DockerPortGuardService) runtimeStatus() dto.DockerPortGuardBase {
-	ipv4 := s.runtime.Status(docker_guard.FamilyIPv4)
-	ipv6 := s.runtime.Status(docker_guard.FamilyIPv6)
+func (s *DockerPortGuardService) runtimeStatus(runtime dockerGuardRuntime, backend string) dto.DockerPortGuardBase {
+	ipv4 := runtime.Status(docker_guard.FamilyIPv4)
+	ipv6 := runtime.Status(docker_guard.FamilyIPv6)
 	return dto.DockerPortGuardBase{
-		Name:        dockerFirewallDisplayName("iptables"),
-		Backend:     "iptables",
+		Name:        dockerFirewallDisplayName(backend),
+		Backend:     backend,
 		Initialized: ipv4.Initialized,
 		Bound:       ipv4.Bound,
 		IPv4:        dto.DockerPortGuardFamilyStatus{State: ipv4.State, Reason: ipv4.Reason, Initialized: ipv4.Initialized, Bound: ipv4.Bound, Effective: ipv4.Effective},
@@ -312,21 +338,31 @@ func (s *DockerPortGuardService) runtimeStatus() dto.DockerPortGuardBase {
 	}
 }
 
-func (s *DockerPortGuardService) checkBackend(ctx context.Context) error {
+func (s *DockerPortGuardService) guardRuntime(backend string) dockerGuardRuntime {
+	if s.runtime != nil {
+		return s.runtime
+	}
+	if backend == "nftables" {
+		return docker_guard.NewNftablesManager()
+	}
+	return docker_guard.NewManager()
+}
+
+func (s *DockerPortGuardService) runtimeForDocker(ctx context.Context) (dockerGuardRuntime, string, error) {
 	cli, err := s.client()
 	if err != nil {
-		return fmt.Errorf("Docker is not running: %w", err)
+		return nil, "", fmt.Errorf("Docker is not running: %w", err)
 	}
 	defer cli.Close()
 	info, err := cli.Info(ctx)
 	if err != nil {
-		return fmt.Errorf("Docker is not running: %w", err)
+		return nil, "", fmt.Errorf("Docker is not running: %w", err)
 	}
 	backend := dockerFirewallBackend(info)
-	if backend == "nftables" {
-		return errors.New("Docker native nftables backend is not supported")
+	if backend != "iptables" && backend != "nftables" {
+		return nil, backend, fmt.Errorf("Docker firewall backend %q is not supported", backend)
 	}
-	return nil
+	return s.guardRuntime(backend), backend, nil
 }
 
 func dockerFirewallBackend(info system.Info) string {

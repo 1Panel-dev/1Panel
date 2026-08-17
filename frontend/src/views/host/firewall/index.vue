@@ -7,7 +7,7 @@ import i18n from '@/lang';
 
 const buttons = [
     {
-        label: `${i18n.global.t('firewall.portRule', 2)} / ${i18n.global.t('firewall.ipRule', 2)}`,
+        label: i18n.global.t('firewall.systemFirewall'),
         path: '/hosts/firewall/rules',
     },
     {

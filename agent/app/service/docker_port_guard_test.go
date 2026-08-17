@@ -146,3 +146,13 @@ func TestDockerFirewallDisplayName(t *testing.T) {
 		}
 	}
 }
+
+func TestDockerGuardRuntimeMatchesDockerBackend(t *testing.T) {
+	service := &DockerPortGuardService{}
+	if _, ok := service.guardRuntime("iptables").(*docker_guard.Manager); !ok {
+		t.Fatal("iptables backend did not select the iptables Docker guard runtime")
+	}
+	if _, ok := service.guardRuntime("nftables").(*docker_guard.NftablesManager); !ok {
+		t.Fatal("nftables backend did not select the nftables Docker guard runtime")
+	}
+}

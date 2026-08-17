@@ -140,16 +140,17 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 	if result.Docker.Selected == "" {
 		result.Docker.Selected = currentDocker
 	}
-	guard := docker_guard.NewManager()
 	for _, name := range []string{"iptables", "nftables"} {
 		option := dto.FirewallBackendOption{Name: name, Installed: dockerInstalled, Supported: true, Active: dockerInstalled && currentDocker == name}
-		if name == "iptables" {
-			ipv4, ipv6 := guard.Status(docker_guard.FamilyIPv4), guard.Status(docker_guard.FamilyIPv6)
-			option.Initialized = ipv4.Initialized || ipv6.Initialized
-			option.Bound = ipv4.Bound || ipv6.Bound
-			option.IPv4.Initialized, option.IPv4.Bound = ipv4.Initialized, ipv4.Bound
-			option.IPv6.Initialized, option.IPv6.Bound = ipv6.Initialized, ipv6.Bound
+		var guard dockerGuardRuntime = docker_guard.NewManager()
+		if name == "nftables" {
+			guard = docker_guard.NewNftablesManager()
 		}
+		ipv4, ipv6 := guard.Status(docker_guard.FamilyIPv4), guard.Status(docker_guard.FamilyIPv6)
+		option.Initialized = ipv4.Initialized || ipv6.Initialized
+		option.Bound = ipv4.Bound || ipv6.Bound
+		option.IPv4.Initialized, option.IPv4.Bound = ipv4.Initialized, ipv4.Bound
+		option.IPv6.Initialized, option.IPv6.Bound = ipv6.Initialized, ipv6.Bound
 		result.Docker.Options = append(result.Docker.Options, option)
 	}
 	return result, nil
@@ -256,14 +257,14 @@ func (s *FirewallSettingService) operateForwarding(request dto.FirewallBackendOp
 }
 
 func (s *FirewallSettingService) operateDocker(_ context.Context, request dto.FirewallBackendOperation) error {
-	guard := docker_guard.NewManager()
-	if request.Operation == "cleanup" {
-		if request.Backend == "iptables" {
-			return guard.Cleanup()
-		}
-		return nil
+	var guard dockerGuardRuntime = docker_guard.NewManager()
+	if request.Backend == "nftables" {
+		guard = docker_guard.NewNftablesManager()
 	}
-	if request.Operation == "initialize" && request.Backend == "iptables" {
+	if request.Operation == "cleanup" {
+		return guard.Cleanup()
+	}
+	if request.Operation == "initialize" {
 		return NewIDockerPortGuardService().Operate(context.Background(), dto.DockerPortGuardOperation{Operation: "initialize"})
 	}
 	if err := updateDockerFirewallBackend(request.Backend, request.RestartDocker); err != nil {

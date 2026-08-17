@@ -4081,19 +4081,6 @@ const message = {
     firewall: {
         create: 'Crear regla',
         edit: 'Editar regla',
-        ccDeny: 'Protección CC',
-        ipWhiteList: 'Lista blanca de IP',
-        ipBlockList: 'Lista negra de IP',
-        fileExtBlockList: 'Lista negra de extensiones de archivo',
-        urlWhiteList: 'Lista blanca de URL',
-        urlBlockList: 'Lista negra de URL',
-        argsCheck: 'Verificación de parámetros GET',
-        postCheck: 'Verificación de parámetros POST',
-        cookieBlockList: 'Lista negra de cookies',
-        dockerHelper:
-            'El firewall actual no puede deshabilitar el mapeo de puertos de contenedores. Las aplicaciones instaladas pueden ir a la página [Instaladas] para editar los parámetros de la aplicación y configurar reglas de liberación de puertos.',
-        iptablesHelper:
-            'Se detectó que el sistema está usando el firewall {0}. Para cambiar a iptables, ¡desinstálelo manualmente primero!',
         quickJump: 'Acceso rápido',
         used: 'En uso',
         unUsed: 'No usado',
@@ -4101,11 +4088,9 @@ const message = {
         managedHelper: 'Creada y mantenida por 1Panel. Se puede editar o eliminar.',
         adopted: 'Externa gestionada',
         adoptedHelper: 'Una regla existente del sistema que ahora mantiene 1Panel.',
-        legacy: 'Gestionada por la versión anterior',
         external: 'Regla externa',
         externalHelper:
             'Regla existente del sistema que aún no gestiona 1Panel. Se puede adoptar cuando sea necesario.',
-        drifted: 'Desincronizada',
         protected: 'Protegida por el sistema',
         protectedHelper:
             'Regla crítica del sistema que no se puede editar ni eliminar para evitar interrumpir el acceso.',
@@ -4118,10 +4103,7 @@ const message = {
         },
         ruleTargetRequired: 'Introduce al menos una dirección IP o un puerto',
         batchRuleLimit: 'Se pueden crear como máximo {0} reglas a la vez',
-        resolution_create: 'Crear regla',
-        resolution_create_anyway: 'Crear de todos modos',
         resolution_adopt: 'Asumir la gestión',
-        resolution_select_adopt: 'Seleccionar y gestionar',
         adoptRuleConfirm: 'Después de asumirla, 1Panel podrá mantener y eliminar esta regla existente. ¿Continuar?',
         plan_equivalent_external_rule: 'Ya existe una regla externa idéntica. Puedes asumir su gestión sin duplicarla.',
         plan_multiple_equivalent_external_rules:
@@ -4138,12 +4120,9 @@ const message = {
         ruleCheckExistingHelper: 'Ya existe una regla idéntica y se omitirá.',
         ruleCheckReadyHelper: 'La comprobación se superó. Esta regla se puede crear.',
         ruleCheckExternalExists: 'Ya existe una regla externa idéntica y se omitirá automáticamente.',
-        ruleCheckSummary:
-            'Se comprobaron {0} reglas: {1} se pueden crear, {2} ya existen, {3} advertencias y {4} errores.',
         ruleCheckBlockedHelper:
             'Las reglas con errores no se pueden enviar. Vuelve, modifícalas y compruébalas de nuevo.',
         ruleCheckWarningHelper: 'Comprobación finalizada. Las advertencias no impiden el envío; puedes continuar.',
-        ruleCheckPassedHelper: 'La comprobación se superó. Puedes enviar las reglas.',
         plan_managed_rule_drifted:
             'La regla gestionada no coincide con el firewall activo. Resuelve primero la diferencia.',
         plan_opaque_rule_in_target_scope:
@@ -4158,7 +4137,6 @@ const message = {
         scopeMissing: 'Falta el ámbito gestionado {0}; se creará de forma segura al aplicar la primera regla.',
         scopeUnmanagedActive: 'Se detectaron otros ámbitos activos: {0}. 1Panel no modificará sus reglas.',
         scopeRuntimeMismatch: 'Las configuraciones activa y permanente difieren en: {0}.',
-        scopeDefaultPolicy: 'Política predeterminada actual: {0}',
         dockerRestart: 'Las operaciones del firewall requieren reiniciar el servicio de Docker',
         firewallHelper: 'Firewall del sistema {0}',
         firewallNotStart: 'El firewall del sistema no está habilitado actualmente. Actívalo primero.',
@@ -4169,42 +4147,17 @@ const message = {
         noPing: 'Deshabilitar ping',
         enableBanPing: 'Bloquear Ping',
         disableBanPing: 'Desbloquear Ping',
-        noPingTitle: 'Deshabilitar ping',
-        noPingHelper: 'Esto deshabilitará el ping, y el servidor no responderá con eco ICMP. ¿Deseas continuar?',
-        onPingHelper: 'Esto habilitará el ping, y los atacantes podrían descubrir tu servidor. ¿Deseas continuar?',
-        changeStrategy: 'Cambiar la estrategia de {0}',
-        changeStrategyIPHelper1:
-            'Cambiar la estrategia de dirección IP a [denegar]. Después de establecerla, se prohibirá el acceso al servidor. ¿Deseas continuar?',
-        changeStrategyIPHelper2:
-            'Cambiar la estrategia de dirección IP a [permitir]. Después de establecerla, se restaurará el acceso normal. ¿Deseas continuar?',
-        changeStrategyPortHelper1:
-            'Cambiar la política de puerto a [rechazar]. Después de establecerla, se denegará el acceso externo. ¿Deseas continuar?',
-        changeStrategyPortHelper2:
-            'Cambiar la política de puerto a [aceptar]. Después de establecerla, se restaurará el acceso normal. ¿Deseas continuar?',
         stop: 'Detener',
         portFormatError: 'Este campo debe ser un puerto válido.',
-        portHelper1: 'Puertos múltiples, ej. 8080 y 8081',
-        portHelper2: 'Rango de puertos, ej. 8080-8089',
-        changeStrategyHelper:
-            'Cambiar estrategia de {0} [{1}] a [{2}]. Después de configurarla, {0} tendrá acceso externo como {2}. ¿Deseas continuar?',
-        strategy: 'Estrategia',
         accept: 'Aceptar',
         drop: 'Rechazar',
         anyWhere: 'Cualquiera',
-        address: 'IPs especificadas',
-        addressHelper: 'Admite dirección IP o segmento de red',
         allow: 'Permitir',
         deny: 'Denegar',
         addressFormatError: 'Este campo debe ser una dirección IP válida.',
-        addressHelper1: 'Admite dirección IP o rango de IP. Ejemplo: "172.16.10.11" o "172.16.10.0/24".',
-        addressHelper2: 'Para múltiples direcciones IP, sepáralas con comas. Ejemplo: "172.16.10.11, 172.16.0.0/24".',
-        allIP: 'Todas las IP',
-        portRule: 'Regla | Reglas',
         forwardRule: 'Regla de redirección de puertos | Reglas de redirección de puertos',
         dockerGuard: 'Protección de puertos de contenedores',
-        systemFirewall: 'Firewall del sistema',
-        forwardBackend: 'Reenvío de puertos',
-        dockerBackend: 'Firewall de Docker',
+        systemFirewall: 'Firewall del host',
         firewallSettingHelper:
             'El firewall del sistema, el reenvío de puertos y el firewall de Docker se seleccionan de forma independiente. Migre las reglas manualmente mediante exportación e importación.',
         systemFirewallHelper: 'Controla el acceso a los puertos del host y las reglas de entrada.',
@@ -4220,22 +4173,13 @@ const message = {
         configuredRules: '{0} reglas configuradas',
         addressFamily: 'Versión de IP',
         portOrRange: 'Puerto / rango',
-        dockerNftGuardUnsupported:
-            'El nftables nativo de Docker aún no admite la protección de puertos de contenedores.',
-        backendIndependentHelper: 'Elige por separado los backends del firewall del sistema, del reenvío y de Docker.',
-        currentBackend: 'Backend actual',
-        applyBackend: 'Aplicar selección',
-        cleanupManagedRules: 'Eliminar reglas de 1Panel',
         exportAllRules: 'Exportar todas las reglas',
         clearAllRules: 'Borrar todas las reglas',
         importBackendHelper:
             'Las reglas importadas se convierten para el backend actual {0}. Las reglas de origen no se modifican.',
         clearAllRulesHelper:
             '¿Eliminar las {0} reglas administrables del backend actual? Esta acción no se puede deshacer.',
-        cleanupManagedRulesHelper: 'Se eliminarán de {0} las reglas creadas por 1Panel. ¿Continuar?',
         switchBackendHelper: '¿Cambiar a {0}? Las reglas existentes no se migrarán ni eliminarán.',
-        securitySettings: 'Ajustes de seguridad',
-        installedStatus: 'Instalado',
         uninstalledStatus: 'No instalado',
         initializedStatus: 'Inicializado',
         partiallyInitialized: 'Parcialmente inicializado',
@@ -4287,8 +4231,6 @@ const message = {
                 'No se puede obtener el estado de protección de puertos {0}. Actualiza o comprueba el firewall del sistema',
         },
         dockerGuardUnprotected: 'Sin protección',
-        ipRule: 'Regla IP | Reglas IP',
-        userAgent: 'Filtro User-Agent',
         sourcePort: 'Puerto de origen',
         targetIP: 'IP de destino',
         targetPort: 'Puerto de destino',
@@ -4299,7 +4241,6 @@ const message = {
         exportHelper: 'A punto de exportar {0} reglas de firewall. ¿Continuar?',
         importSuccess: 'Se importaron correctamente {0} reglas',
         importPartialSuccess: 'Importación completada: {0} correctas, {1} fallidas',
-        ipv4Limit: 'La operación actual solo admite direcciones IPv4',
         basicStatus: 'La cadena actual {0} no está vinculada, ¡vincule primero!',
         baseIptables: 'Servicio iptables',
         forwardIptables: 'Servicio de Reenvío de Puertos iptables',
@@ -4310,43 +4251,23 @@ const message = {
             'Vincular: las reglas de firewall solo surtirán efecto cuando el estado esté vinculado. ¿Confirmar?',
         unbindHelper:
             'Desvincular: al desvincular, todas las reglas de firewall agregadas se volverán inválidas. Proceda con precaución. ¿Confirmar?',
-        whiteList: 'Lista blanca',
         portWhiteList: 'Lista blanca de puertos',
         portWhiteListAlter:
             'Los puertos de la lista blanca se abrirán automáticamente al inicializar o iniciar el firewall.',
         portWhiteListHelper: 'Admite IPv4/IPv6, TCP/UDP, puertos individuales y rangos como 8000-8100.',
-        defaultStrategy: 'La política predeterminada para la cadena actual {0} es {1}',
-        defaultStrategy2:
-            'La política predeterminada para la cadena actual {0} es {1}, el estado actual es no vinculado. ¡Las reglas de firewall agregadas surtirán efecto después de la vinculación!',
-        filterRule: 'Regla de Filtro',
-        filterHelper:
-            'Las reglas de filtro le permiten controlar el tráfico de red entrante a nivel INPUT. Configure con cuidado para evitar bloquear el sistema.',
         chain: 'Cadena',
-        targetChain: 'Cadena de Destino',
         sourceIP: 'IP de Origen',
         destIP: 'IP de Destino',
-        accessSource: 'Origen de acceso',
-        accessDestination: 'Destino de acceso',
-        direction: 'Dirección',
         destPort: 'Puerto de Destino',
         action: 'Acción',
         priority: 'Prioridad',
         reject: 'Rechazar',
-        sourceIPHelper: 'Formato CIDR, ej. 192.168.1.0/24. Dejar vacío para todas las direcciones',
-        destIPHelper: 'Formato CIDR, ej. 10.0.0.0/8. Dejar vacío para todas las direcciones',
-        portHelper: '0 significa cualquier puerto',
         allPorts: 'Todos los Puertos',
         deleteRuleConfirm: 'Se eliminarán {0} reglas. ¿Continuar?',
         deleteUsedRuleConfirm:
             'Este puerto está siendo utilizado por {0}. Eliminar la regla de acceso puede dejar el servicio inaccesible. ¿Continuar?',
         editRuleConfirm:
             'Se modificarán los siguientes campos: {0}. La regla se aplicará y verificará inmediatamente. ¿Continuar?',
-        reorderTip: 'Arrastra para reordenar las reglas gestionadas de este grupo',
-        ufwReorderUnsupported:
-            'Las reglas UFW se muestran en su orden numerado real de IPv4/IPv6. No se admite la reordenación manual.',
-        reorderBlocked:
-            'Las reglas solo pueden moverse dentro del mismo grupo y no pueden cruzar reglas externas, protegidas o no reconocidas.',
-        destination: 'Destino',
     },
     runtime: {
         runtime: 'Runtime',

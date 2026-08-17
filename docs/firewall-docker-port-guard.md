@@ -2,9 +2,9 @@
 
 ## 1. 目标
 
-在 Docker 使用 `iptables` 或 `iptables-nft` 作为防火墙后端时，为 Docker bridge 网络发布到宿主机的端口提供来源地址拒绝控制。
+在 Docker 使用 `iptables`、`iptables-nft` 或原生 `nftables` 作为防火墙后端时，为 Docker bridge 网络发布到宿主机的端口提供来源地址拒绝控制。
 
-该功能统一使用 Docker 提供的 `DOCKER-USER` 入口，不区分宿主机当前使用的是 firewalld、UFW 还是 iptables。
+iptables 后端使用 Docker 提供的 `DOCKER-USER` 入口；原生 nftables 后端使用 1Panel 独立表中的 `forward` base chain，不修改 Docker 自有的 `docker-bridges` 表。
 
 Docker 发布端点默认保持开放。用户可以禁止所有来源、禁止指定的 IPv4/IPv6 地址或 CIDR，或者仅允许指定来源访问；未配置策略的端点继续交给 Docker。
 
@@ -32,17 +32,17 @@ Docker 发布端点默认保持开放。用户可以禁止所有来源、禁止�
 
 - Docker Engine 的 iptables backend。
 - Docker Engine 的 iptables-nft backend。
-- firewalld、UFW、iptables 三种宿主机防火墙 provider。
+- Docker Engine 的原生 nftables backend。
+- firewalld、UFW、iptables、nftables 四种宿主机防火墙 provider。
 - Docker bridge 网络通过 `ports` 或 `-p` 发布的 TCP、UDP 端口。
 - 单个宿主机端口和 Docker 展开的端口范围。
-- IPv4；Docker 已启用 IPv6 且存在对应 `ip6tables`/`DOCKER-USER` 链时支持 IPv6。
+- IPv4；Docker 已启用 IPv6 且存在对应 IPv6 `DOCKER-USER` 链或 `ip6 docker-bridges` 表时支持 IPv6。
 - 按来源 IP 或 CIDR 设置黑名单或白名单。
 - 新增、修改和删除防护策略。
 - 展示当前发布端口所属的容器，以及 Compose/应用信息（能够获取时）。
 
 ## 4. 不在第一版支持
 
-- Docker 原生 nftables backend。
 - Swarm ingress/overlay 发布端口。
 - macvlan、ipvlan 网络的直接访问控制。
 - Kubernetes 或其他容器运行时。
@@ -101,7 +101,7 @@ HostIP + HostPort + Protocol + IP Family
 
 ## 6. 底层规则边界
 
-1Panel 创建并只管理自己的链：
+iptables/iptables-nft 后端中，1Panel 创建并只管理自己的链：
 
 ```text
 FORWARD
@@ -118,6 +118,19 @@ FORWARD
 - 解绑时只移除 `DOCKER-USER` 跳转并保留 1Panel 自有链，不影响其他规则。
 - IPv4 和 IPv6 使用各自规则空间中的同名链。
 
+原生 nftables 后端没有 `DOCKER-USER` 链。1Panel 分别在 `ip`、`ip6` family 中创建自有表和链：
+
+```text
+table nft_1panel_docker
+├── NFT_1PANEL_DOCKER_FORWARD  // type filter hook forward priority filter - 1
+└── NFT_1PANEL_DOCKER
+```
+
+- `NFT_1PANEL_DOCKER_FORWARD` 只保留到 `NFT_1PANEL_DOCKER` 的入口跳转。
+- 入口链优先级为 `filter - 1`，保证规则先于 Docker priority `filter` 的 forward 链执行。
+- 只通过 `ip docker-bridges`、`ip6 docker-bridges` 判断 Docker 对应 family 是否可用，不向其中写入规则。
+- 初始化、绑定、解绑和清理只修改 `nft_1panel_docker` 表。
+
 链内逻辑保持简单：
 
 ```text
@@ -131,13 +144,13 @@ ESTABLISHED,RELATED                         -> RETURN
 
 1Panel 自有链中不生成 `ACCEPT` 规则。未被拒绝的流量使用 `RETURN`，返回后仍由 Docker 判断端口是否真实发布以及是否允许转发，避免绕过 Docker 自己的网络隔离规则。
 
-进入 `DOCKER-USER` 时 DNAT 已经完成。匹配宿主机发布端口时使用 conntrack 原始目标信息，而不是直接用当前数据包的目标端口：
+进入自有 forward 入口链时 DNAT 已经完成。匹配宿主机发布端口时使用 conntrack 原始目标信息，而不是直接用当前数据包的目标端口：
 
 - 原始目标地址用于区分绑定到不同宿主机 IP 的相同端口。
 - 原始目标端口对应用户看到的宿主机发布端口。
 - 当前目标端口通常已经是容器端口。
 
-第一版不自动推断流量属于公网还是内网。“禁止指定来源”只拒绝用户填写的 IP/CIDR；“仅允许指定来源”拒绝未填写的其他来源；“禁止所有访问”和空白白名单拒绝所有经过 `DOCKER-USER` 且命中该发布端点的新连接。
+第一版不自动推断流量属于公网还是内网。“禁止指定来源”只拒绝用户填写的 IP/CIDR；“仅允许指定来源”拒绝未填写的其他来源；“禁止所有访问”和空白白名单拒绝所有经过自有链且命中该发布端点的新连接。
 
 ## 7. 最小数据模型
 
@@ -164,7 +177,7 @@ UpdatedAt
 
 ## 8. 状态与生命周期
 
-数据库中的策略是期望状态，iptables 中的规则是运行状态。
+数据库中的策略是期望状态，iptables 或 nftables 中的规则是运行状态。
 
 ### 8.1 初始化
 
@@ -173,25 +186,26 @@ UpdatedAt
 初始化前置条件：
 
 - Docker 正在运行。
-- Docker 使用 iptables 或 iptables-nft backend。
-- IPv4 的 `iptables` 和 `DOCKER-USER` 链可用。
+- Docker 使用 iptables、iptables-nft 或原生 nftables backend。
+- iptables 后端要求 IPv4 的 `iptables` 和 `DOCKER-USER` 链可用。
+- nftables 后端要求 `nft` 命令和 `ip docker-bridges` 表可用。
 
 初始化执行：
 
-1. 创建 IPv4 `1PANEL_DOCKER` 链；已存在时直接复用。
-2. 确保 `DOCKER-USER` 第一条存在到 `1PANEL_DOCKER` 的唯一跳转。
+1. 按当前 Docker backend 创建 IPv4 `1PANEL_DOCKER` 链，或 `nft_1panel_docker` 表及其两个链；已存在时直接复用。
+2. 确保 `DOCKER-USER` 或 nftables base chain 第一条存在到自有规则链的唯一跳转。
 3. 在链末尾保留 `RETURN`。
-4. Docker IPv6 可用且存在 IPv6 `DOCKER-USER` 时，同步初始化 IPv6 链；IPv6 不可用不阻止 IPv4 初始化。
-5. 初始化及绑定状态直接通过 `1PANEL_DOCKER` 链和 `DOCKER-USER` 跳转判断，不保存额外状态。
+4. Docker IPv6 可用且存在 IPv6 `DOCKER-USER` 或 `ip6 docker-bridges` 表时，同步初始化 IPv6 链；IPv6 不可用不阻止 IPv4 初始化。
+5. 初始化及绑定状态直接通过当前 backend 的自有链和入口跳转判断，不保存额外状态。
 
 初始化本身不创建 `DROP` 规则，因此不会改变当前容器端口的访问状态。只有用户保存具体防护策略后，才向 `1PANEL_DOCKER` 写入拒绝规则。
 
-未初始化时可以保存策略，策略显示为未生效；初始化后自动下发。Docker 未运行、backend 不受支持或 `DOCKER-USER` 不存在时，初始化失败并直接提示原因，不尝试接管 `FORWARD` 链。
+未初始化时可以保存策略，策略显示为未生效；初始化后自动下发。Docker 未运行、backend 不受支持或当前 backend 的 Docker 规则入口不存在时，初始化失败并直接提示原因，不尝试接管其他 `FORWARD` 规则。
 
 解绑容器端口防护时：
 
-1. 删除 `DOCKER-USER` 中指向 `1PANEL_DOCKER` 的跳转。
-2. 保留 `1PANEL_DOCKER` 链和数据库中的策略，并显示为未生效。
+1. 删除 `DOCKER-USER` 或 nftables base chain 中指向自有规则链的跳转。
+2. 保留自有规则链和数据库中的策略，并显示为未生效。
 3. 再次绑定后恢复已有策略。
 
 ### 8.2 恢复与同步
@@ -206,12 +220,12 @@ UpdatedAt
 
 reconcile 只需要：
 
-1. 检查 `DOCKER-USER` 是否存在。
-2. `1PANEL_DOCKER` 不存在时不自动初始化。
-3. 按已有策略重建已存在的 1Panel 自有链，不自动绑定。
-4. 回读自有链及 `DOCKER-USER` 跳转并返回初始化、绑定和生效状态。
+1. 检查当前 backend 的 Docker 规则入口是否存在。
+2. 1Panel 对应的自有链不存在时不自动初始化。
+3. 按已有策略通过 `iptables-restore --noflush` 或单次 `nft -f -` 事务重建已存在的 1Panel 自有链，不自动绑定。
+4. 回读自有链及对应入口跳转并返回初始化、绑定和生效状态。
 
-Docker 未运行或 `DOCKER-USER` 不存在时保留期望状态，页面显示“未生效”，不创建替代的 `FORWARD` 接管逻辑。
+Docker 未运行或当前 backend 的 Docker 规则入口不存在时保留期望状态，页面显示“未生效”，不创建替代的 `FORWARD` 接管逻辑。
 
 第一版不监听所有 Docker 事件。由于策略绑定的是发布端点而不是容器 ID，容器重建不要求同步修改策略；页面刷新时重新关联容器信息即可。
 
@@ -229,7 +243,7 @@ Docker 未运行或 `DOCKER-USER` 不存在时保留期望状态，页面显示�
 
 不增加复杂的网络可达性判断、网段归属推断或冲突预测。
 
-规则修改串行执行。下发失败时返回错误并保留数据库期望状态，页面显示运行状态与期望状态不一致，后续可再次 reconcile。第一版不要求跨数据库和 iptables 的完整分布式事务。
+规则修改串行执行。下发失败时返回错误并保留数据库期望状态，页面显示运行状态与期望状态不一致，后续可再次 reconcile。第一版不要求跨数据库和防火墙运行时的完整分布式事务。
 
 ## 10. 与现有页面的联动
 
@@ -244,7 +258,7 @@ Docker 占用是运行态信息，不给宿主机防火墙规则增加永久的 
 
 ## 11. 第一版验收条件
 
-- 在 firewalld、UFW、iptables 三种 provider 下，只要 Docker 使用 iptables 或 iptables-nft backend，防护行为一致。
+- 在 firewalld、UFW、iptables、nftables provider 下，只要 Docker 使用受支持的 iptables、iptables-nft 或 nftables backend，防护行为一致。
 - 可以独立初始化和关闭容器端口防护链，初始化本身不影响现有端口访问。
 - 能发现并展示 Docker bridge 发布端口。
 - 能为单个发布端点配置禁止所有访问、禁止指定来源或仅允许指定来源。
