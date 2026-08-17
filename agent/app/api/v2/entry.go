@@ -42,6 +42,7 @@ var (
 	fileShareService          = service.NewIFileShareService()
 	sshService                = service.NewISSHService()
 	firewallService           = service.NewIFirewallService()
+	firewallSettingService    = service.NewIFirewallSettingService()
 	forwardingService         = service.NewIForwardingService()
 	dockerPortGuardService    = service.NewIDockerPortGuardService()
 	monitorService            = service.NewIMonitorService()

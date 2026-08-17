@@ -4242,6 +4242,43 @@ const message = {
         portRule: 'Regra | Regras',
         forwardRule: 'Regra de redirecionamento de porta | Regras de redirecionamento de porta',
         dockerGuard: 'Proteção de portas de contêineres',
+        systemFirewall: 'Firewall do sistema',
+        forwardBackend: 'Encaminhamento de portas',
+        dockerBackend: 'Firewall do Docker',
+        firewallSettingHelper:
+            'O firewall do sistema, o encaminhamento de portas e o firewall do Docker são selecionados separadamente. Migre regras manualmente por exportação e importação.',
+        systemFirewallHelper: 'Controla o acesso às portas do host e as regras de entrada.',
+        forwardingHelper:
+            'Controla regras de encaminhamento de portas e pode ser selecionado separadamente do firewall do sistema.',
+        dockerFirewallHelper: 'Controla regras de rede do Docker. A troca reinicia o Docker.',
+        iptablesSuggestionTag: 'Mais compatível',
+        nftablesSuggestionTag: 'Ambientes novos',
+        iptablesSuggestion:
+            'Recomendado para regras iptables existentes, cargas do Docker ou ambientes que priorizam compatibilidade.',
+        nftablesSuggestion:
+            'Recomendado para sistemas Linux recentes e novas instalações. Confirme o suporte das ferramentas antes de trocar.',
+        configuredRules: '{0} regras configuradas',
+        addressFamily: 'Versão do IP',
+        portOrRange: 'Porta / intervalo',
+        dockerNftGuardUnsupported: 'O nftables nativo do Docker ainda não oferece proteção de portas de contêineres.',
+        backendIndependentHelper:
+            'Escolha separadamente os backends do firewall do sistema, do encaminhamento e do Docker.',
+        currentBackend: 'Backend atual',
+        applyBackend: 'Aplicar seleção',
+        cleanupManagedRules: 'Remover regras do 1Panel',
+        exportAllRules: 'Exportar todas as regras',
+        clearAllRules: 'Limpar todas as regras',
+        importBackendHelper:
+            'As regras importadas são convertidas para o backend atual {0}. As regras de origem não são alteradas.',
+        clearAllRulesHelper: 'Excluir as {0} regras gerenciáveis do backend atual? Esta ação não pode ser desfeita.',
+        cleanupManagedRulesHelper: 'As regras criadas pelo 1Panel serão removidas de {0}. Continuar?',
+        switchBackendHelper: 'Mudar para {0}? As regras existentes não serão migradas nem removidas.',
+        securitySettings: 'Configurações de segurança',
+        installedStatus: 'Instalado',
+        uninstalledStatus: 'Não instalado',
+        initializedStatus: 'Inicializado',
+        partiallyInitialized: 'Parcialmente inicializado',
+        currentUse: 'Em uso',
         dockerGuardHelper:
             'Configure restrições de acesso para as portas publicadas pelos contêineres Docker no host. Portas sem proteção mantêm o acesso padrão do Docker.',
         dockerInputNotProtected:
@@ -4313,8 +4350,7 @@ const message = {
         portWhiteList: 'Lista branca de portas',
         portWhiteListAlter:
             'As portas na lista branca serão abertas automaticamente ao inicializar ou iniciar o firewall.',
-        portWhiteListHelper:
-            'O protocolo pode ser especificado, por exemplo 80/tcp ou 443/udp. Se omitido, o padrão é tcp.',
+        portWhiteListHelper: 'Suporta IPv4/IPv6, TCP/UDP, portas únicas e intervalos como 8000-8100.',
         defaultStrategy: 'A política padrão para a cadeia atual {0} é {1}',
         defaultStrategy2:
             'A política padrão para a cadeia atual {0} é {1}, o status atual é não vinculado. As regras de firewall adicionadas entrarão em vigor após a vinculação!',

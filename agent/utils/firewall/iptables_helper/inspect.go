@@ -55,9 +55,24 @@ func ReadFilterRulesByChain(chain string) ([]FilterRules, error) {
 }
 
 func LoadInitStatus(tab string) (bool, bool, error) {
+	return loadInitStatus(tab, RunWithStd)
+}
+
+func LoadFamilyInitStatus(family, tab string) (bool, bool, error) {
+	switch family {
+	case "ipv4":
+		return loadInitStatus(tab, RunWithStd)
+	case "ipv6":
+		return loadInitStatus(tab, RunIPv6WithStd)
+	default:
+		return false, false, fmt.Errorf("unsupported iptables family %q", family)
+	}
+}
+
+func loadInitStatus(tab string, runner func(string, ...string) (string, error)) (bool, bool, error) {
 	switch tab {
 	case "base":
-		filterRules, err := RunWithStd(FilterTab, "-S")
+		filterRules, err := runner(FilterTab, "-S")
 		if err != nil {
 			return false, false, fmt.Errorf("load iptables initialization status: %w", err)
 		}

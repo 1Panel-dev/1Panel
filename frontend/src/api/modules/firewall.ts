@@ -55,3 +55,8 @@ export const upsertDockerPortGuardPolicies = (request: Firewall.DockerGuardPolic
 
 export const deleteDockerPortGuardPolicies = (request: Firewall.DockerGuardPolicyBatchDelete) =>
     http.post('/hosts/firewall/docker/policies/delete/batch', request, TimeoutEnum.T_60S);
+
+export const loadFirewallSettings = () => http.get<Firewall.Settings>('/hosts/firewall/settings');
+
+export const operateFirewallBackend = (request: Firewall.BackendOperateRequest) =>
+    http.post('/hosts/firewall/settings/operate', request, TimeoutEnum.T_10M);

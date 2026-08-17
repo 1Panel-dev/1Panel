@@ -1,9 +1,13 @@
 package iptables_helper
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
@@ -12,6 +16,49 @@ type Manager struct {
 	UpdateSetting     func(key, value string) error
 	PanelPort         func() string
 	LoadRequiredPorts func() ([]firewall.PortWhitelist, error)
+}
+
+func (m *Manager) Cleanup() error {
+	if err := m.disableBase(); err != nil {
+		return err
+	}
+	for _, chain := range []string{BasicAfterChain, BasicChain, BasicBeforeChain} {
+		exists, err := CheckChainExist(FilterTab, chain)
+		if err != nil {
+			return err
+		}
+		if exists {
+			if err := Run(FilterTab, "-F", chain); err != nil {
+				return err
+			}
+			if err := Run(FilterTab, "-X", chain); err != nil {
+				return err
+			}
+		}
+	}
+	if commands, err := lifecycle.ResolveIptablesCommands(); err == nil && commands.IPv6Available() {
+		for _, chain := range []string{BasicAfterChain, BasicChain, BasicBeforeChain} {
+			exists, err := CheckIPv6ChainExist(FilterTab, chain)
+			if err != nil {
+				return err
+			}
+			if exists {
+				if err := RunIPv6(FilterTab, "-F", chain); err != nil {
+					return err
+				}
+				if err := RunIPv6(FilterTab, "-X", chain); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	for _, file := range []string{BasicBeforeFileName, BasicFileName, BasicAfterFileName,
+		IPv6FileName(BasicBeforeFileName), IPv6FileName(BasicFileName), IPv6FileName(BasicAfterFileName)} {
+		if err := os.Remove(filepath.Join(global.Dir.FirewallDir, file)); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return err
+		}
+	}
+	return nil
 }
 
 func (m *Manager) Operate(operation firewall.BaseOperation) error {

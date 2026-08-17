@@ -2,6 +2,8 @@ package service
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -24,6 +26,13 @@ type ForwardingService struct {
 	managerFactory func() (*forwardClient.Manager, error)
 }
 
+type forwardingCandidate struct {
+	adapter forwardClient.Adapter
+	runtime forwardClient.RuntimeClient
+}
+
+var errForwardingBackendConflict = errors.New("iptables and nftables forwarding backends are both initialized; remove one before continuing")
+
 func NewIForwardingService() IForwardingService {
 	return &ForwardingService{
 		managerFactory: newForwardingManager,
@@ -31,7 +40,7 @@ func NewIForwardingService() IForwardingService {
 }
 
 func (s *ForwardingService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
-	baseInfo := dto.FirewallBaseInfo{Version: "-", Name: "-"}
+	baseInfo := dto.FirewallBaseInfo{Version: "-", Name: "-", Backend: "-"}
 	manager, err := s.manager()
 	if err != nil {
 		return baseInfo, err
@@ -41,10 +50,20 @@ func (s *ForwardingService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 		return baseInfo, err
 	}
 	baseInfo.IsExist = true
-	baseInfo.Name, baseInfo.Version = status.Name, status.Version
+	baseInfo.Name, baseInfo.Backend = forwardingDisplayName(status.Name), status.Name
+	baseInfo.Version = status.Version
 	baseInfo.PingStatus = ping.LoadStatus()
 	baseInfo.IsActive, baseInfo.IsInit, baseInfo.IsBind = status.IsActive, status.IsInit, status.IsBind
 	return baseInfo, nil
+}
+
+func forwardingDisplayName(backend string) string {
+	switch backend {
+	case "iptables", "nftables":
+		return backend + "-forward"
+	default:
+		return backend
+	}
 }
 
 func (s *ForwardingService) SearchWithPage(req dto.ForwardRuleSearch) (int64, interface{}, error) {
@@ -75,6 +94,7 @@ func (s *ForwardingService) SearchWithPage(req dto.ForwardRuleSearch) (int64, in
 	for _, rule := range pageRules {
 		items = append(items, dto.ForwardRule{
 			Num:        rule.Num,
+			Family:     rule.Family,
 			Protocol:   rule.Protocol,
 			Port:       rule.Port,
 			TargetIP:   rule.TargetIP,
@@ -94,7 +114,7 @@ func (s *ForwardingService) Operate(req dto.ForwardRuleOperate) error {
 	operations := make([]forwardClient.Operation, 0, len(req.Rules))
 	for _, rule := range req.Rules {
 		operations = append(operations, forwardClient.Operation{Rule: forwardClient.Rule{
-			Num: rule.Num, Protocol: rule.Protocol, Port: rule.Port, TargetIP: rule.TargetIP,
+			Num: rule.Num, Family: rule.Family, Protocol: rule.Protocol, Port: rule.Port, TargetIP: rule.TargetIP,
 			TargetPort: rule.TargetPort, Interface: rule.Interface,
 		}, Operation: forwardClient.OperationType(rule.Operation)})
 	}
@@ -114,10 +134,7 @@ func (s *ForwardingService) Enable() error {
 	if err := manager.Enable(); err != nil {
 		return err
 	}
-	if manager.Name() != "firewalld" {
-		return settingRepo.Update("IptablesForwardStatus", constant.StatusEnable)
-	}
-	return nil
+	return settingRepo.Update("IptablesForwardStatus", constant.StatusEnable)
 }
 
 func (s *ForwardingService) Replay() error {
@@ -127,9 +144,6 @@ func (s *ForwardingService) Replay() error {
 	}
 	if err := manager.Replay(); err != nil {
 		return err
-	}
-	if manager.Name() == "firewalld" {
-		return nil
 	}
 	status, err := settingRepo.GetValueByKey("IptablesForwardStatus")
 	if err != nil {
@@ -146,13 +160,60 @@ func (s *ForwardingService) manager() (*forwardClient.Manager, error) {
 }
 
 func newForwardingManager() (*forwardClient.Manager, error) {
-	client, err := lifecycle.NewClient()
+	selected, _ := settingRepo.GetValueByKey(settingForwardingBackend)
+	return newForwardingManagerFor(strings.TrimSpace(selected))
+}
+
+func newForwardingManagerFor(backend string) (*forwardClient.Manager, error) {
+	clients, err := lifecycle.NewNetfilterClients()
 	if err != nil {
 		return nil, err
 	}
-	adapter, err := forwardProviders.New(client.Name())
-	if err != nil {
-		return nil, err
+	candidates := make([]forwardingCandidate, 0, len(clients))
+	for _, client := range clients {
+		adapter, err := forwardProviders.New(client.Name())
+		if err != nil {
+			return nil, err
+		}
+		candidates = append(candidates, forwardingCandidate{adapter: adapter, runtime: client})
 	}
-	return forwardClient.NewManager(adapter, client), nil
+	if backend != "" {
+		for _, candidate := range candidates {
+			if candidate.adapter.Name() == backend {
+				return forwardClient.NewManager(candidate.adapter, candidate.runtime), nil
+			}
+		}
+		return nil, fmt.Errorf("selected forwarding backend %s is not installed", backend)
+	}
+	return selectForwardingManager(candidates)
+}
+
+func selectForwardingManager(candidates []forwardingCandidate) (*forwardClient.Manager, error) {
+	if len(candidates) == 0 {
+		return nil, errors.New("no supported forwarding backend detected")
+	}
+	selected := -1
+	for index, candidate := range candidates {
+		ipv4Initialized, _, err := candidate.adapter.FamilyStatus(forwardClient.FamilyIPv4)
+		if err != nil {
+			return nil, err
+		}
+		ipv6Initialized, _, err := candidate.adapter.FamilyStatus(forwardClient.FamilyIPv6)
+		if err != nil {
+			return nil, err
+		}
+		initialized := ipv4Initialized || ipv6Initialized
+		if !initialized {
+			continue
+		}
+		if selected >= 0 {
+			return nil, errForwardingBackendConflict
+		}
+		selected = index
+	}
+	if selected < 0 {
+		selected = 0
+	}
+	candidate := candidates[selected]
+	return forwardClient.NewManager(candidate.adapter, candidate.runtime), nil
 }

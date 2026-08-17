@@ -1,5 +1,6 @@
 <template>
     <DialogPro v-model="visible" :title="$t('commons.button.import')" size="large">
+        <el-alert class="mb-3" type="info" :closable="false" :title="$t('firewall.importBackendHelper', [provider])" />
         <el-upload
             ref="uploadRef"
             v-model:file-list="uploaderFiles"
@@ -71,10 +72,41 @@ const isRule = (value: unknown): value is Firewall.Rule => {
     const rule = value as Partial<Firewall.Rule>;
     return (
         Boolean(rule.scope) &&
-        rule.scope?.provider === provider.value &&
+        ['iptables', 'nftables', 'firewalld', 'ufw'].includes(String(rule.scope?.provider)) &&
         typeof rule.protocol === 'string' &&
         ['accept', 'drop', 'reject'].includes(String(rule.action))
     );
+};
+
+const targetScope = (family: Firewall.Family): Firewall.Scope => {
+    if (provider.value === 'iptables' || provider.value === 'nftables') {
+        return { provider: provider.value, family, table: 'filter', chain: '1PANEL_BASIC', direction: 'input' };
+    }
+    if (provider.value === 'firewalld') {
+        return { provider: provider.value, family, zone: 'public', direction: 'input' };
+    }
+    return { provider: 'ufw', family, chain: 'incoming', direction: 'input' };
+};
+
+const normalizeImportedRule = (rule: Firewall.Rule): Firewall.Rule[] => {
+    const splitInet = rule.scope.family === 'inet' && provider.value !== 'firewalld';
+    const addresses = [rule.sourceAddress, rule.destinationAddress].filter((value): value is string => Boolean(value));
+    const families: Firewall.Family[] = !splitInet
+        ? [rule.scope.family]
+        : addresses.length === 0
+          ? ['ipv4', 'ipv6']
+          : addresses.some((address) => address.includes(':'))
+            ? ['ipv6']
+            : ['ipv4'];
+    return families.map((family) => ({
+        ...rule,
+        uuid: undefined,
+        nativeKind: undefined,
+        priority: undefined,
+        orderIndex: undefined,
+        orderBucket: undefined,
+        scope: targetScope(family),
+    }));
 };
 
 const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
@@ -89,7 +121,7 @@ const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
                 MsgError(i18n.global.t('commons.msg.errImportFormat'));
                 return;
             }
-            rules.value = parsed.map((rule) => ({ ...rule, scope: { ...rule.scope }, uuid: undefined }));
+            rules.value = parsed.flatMap(normalizeImportedRule);
             selects.value = [...rules.value];
         } catch (error) {
             MsgError(i18n.global.t('commons.msg.errImport') + String(error));

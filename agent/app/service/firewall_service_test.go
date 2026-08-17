@@ -464,6 +464,34 @@ func TestNormalizeFirewallRuleScopeDefaultsIptablesChains(t *testing.T) {
 	}
 }
 
+func TestNormalizeSystemPortsKeepsFamilyAndRange(t *testing.T) {
+	ports, err := normalizeSystemPorts([]dto.FirewallSystemPort{
+		{Family: "ipv4", Protocol: "tcp", Port: "80"},
+		{Family: "ipv6", Protocol: "udp", Port: "8000:8100"},
+	})
+	if err != nil {
+		t.Fatalf("normalize system ports: %v", err)
+	}
+	if _, ok := ports["ipv4/tcp/80"]; !ok {
+		t.Fatalf("missing IPv4 port: %#v", ports)
+	}
+	if port, ok := ports["ipv6/udp/8000-8100"]; !ok || port.Family != "ipv6" || port.Port != "8000-8100" {
+		t.Fatalf("missing normalized IPv6 range: %#v", ports)
+	}
+}
+
+func TestSystemPortRuleUsesRequestedFamily(t *testing.T) {
+	port := dto.FirewallSystemPort{Family: "ipv6", Protocol: "tcp", Port: "443"}
+	for _, provider := range []filter.Provider{
+		filter.ProviderIptables, filter.ProviderNftables, filter.ProviderFirewalld, filter.ProviderUFW,
+	} {
+		rule := systemPortRule(provider, port)
+		if rule.Scope.Family != filter.FamilyIPv6 {
+			t.Fatalf("provider %s used family %s", provider, rule.Scope.Family)
+		}
+	}
+}
+
 func TestSyncSystemPortsCreatesTracksAndDeletesAcceptedPort(t *testing.T) {
 	scope := filter.Scope{
 		Provider: filter.ProviderIptables, Family: filter.FamilyIPv4, Table: "filter",

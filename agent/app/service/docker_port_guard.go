@@ -27,6 +27,7 @@ type dockerGuardRuntime interface {
 	Bind() error
 	Reconcile([]docker_guard.Policy) error
 	Unbind() error
+	Cleanup() error
 	Initialized(string) (bool, error)
 	Status(string) docker_guard.FamilyStatus
 }
@@ -94,6 +95,7 @@ func (s *DockerPortGuardService) List(ctx context.Context) (dto.DockerPortGuardL
 		return dto.DockerPortGuardList{Base: base, Containers: groupDockerGuardContainers(dockerGuardPolicyEndpoints(policies))}, nil
 	}
 	base.Backend = dockerFirewallBackend(info)
+	base.Name = dockerFirewallDisplayName(base.Backend)
 	if reconcileErr := lastDockerPortGuardReconcileError(); reconcileErr != nil {
 		base.Message = reconcileErr.Error()
 		markDockerGuardReconcileFailure(&base, reconcileErr)
@@ -301,6 +303,8 @@ func (s *DockerPortGuardService) runtimeStatus() dto.DockerPortGuardBase {
 	ipv4 := s.runtime.Status(docker_guard.FamilyIPv4)
 	ipv6 := s.runtime.Status(docker_guard.FamilyIPv6)
 	return dto.DockerPortGuardBase{
+		Name:        dockerFirewallDisplayName("iptables"),
+		Backend:     "iptables",
 		Initialized: ipv4.Initialized,
 		Bound:       ipv4.Bound,
 		IPv4:        dto.DockerPortGuardFamilyStatus{State: ipv4.State, Reason: ipv4.Reason, Initialized: ipv4.Initialized, Bound: ipv4.Bound, Effective: ipv4.Effective},
@@ -330,6 +334,15 @@ func dockerFirewallBackend(info system.Info) string {
 		return "iptables"
 	}
 	return strings.ToLower(info.FirewallBackend.Driver)
+}
+
+func dockerFirewallDisplayName(backend string) string {
+	switch strings.ToLower(strings.TrimSpace(backend)) {
+	case "nftables":
+		return "nftables-docker"
+	default:
+		return "iptables-docker"
+	}
 }
 
 func discoverDockerEndpoints(ctx context.Context, cli *client.Client) ([]dto.DockerPortGuardEndpoint, error) {

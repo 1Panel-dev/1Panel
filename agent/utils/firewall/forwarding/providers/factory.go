@@ -8,9 +8,7 @@ import (
 
 func New(provider string) (forwarding.Adapter, error) {
 	switch provider {
-	case "firewalld":
-		return newFirewalldAdapter(), nil
-	case "ufw", "iptables":
+	case "iptables":
 		return newIptablesNATAdapter(provider), nil
 	case "nftables":
 		return newNftablesAdapter(), nil

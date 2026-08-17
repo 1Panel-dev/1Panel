@@ -9,7 +9,7 @@
                         <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
-                        <template v-if="baseInfo.name !== 'iptables' && baseInfo.name !== 'nftables'">
+                        <template v-if="backendName !== 'iptables' && backendName !== 'nftables'">
                             <el-button
                                 v-permission
                                 v-node-admin
@@ -43,7 +43,7 @@
                         </template>
                         <template
                             v-if="
-                                (baseInfo.name === 'iptables' || baseInfo.name === 'nftables') &&
+                                (backendName === 'iptables' || backendName === 'nftables') &&
                                 baseInfo.isInit &&
                                 props.currentTab == 'base'
                             "
@@ -70,33 +70,18 @@
                                 {{ $t('commons.button.bind') }}
                             </el-button>
                         </template>
-
-                        <template v-if="props.currentTab == 'base'">
-                            <el-divider direction="vertical" />
-                            <el-button link type="primary" v-permission v-node-admin @click="onOpenWhiteList" plain>
-                                {{ $t('firewall.portWhiteList') }}
-                            </el-button>
-                        </template>
-
-                        <span v-if="onPing !== 'None'">
-                            <el-divider direction="vertical" />
-                            <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
-                            <el-switch
-                                v-permission
-                                v-node-admin
-                                size="small"
-                                class="ml-2"
-                                inactive-value="Disable"
-                                active-value="Enable"
-                                @change="onPingOperate"
-                                v-model="onPing"
-                            />
-                        </span>
                     </div>
                 </div>
             </el-card>
         </div>
-        <NoSuchService v-else name="Firewalld / Ufw / iptables / iptables-nft / nftables" />
+        <NoSuchService
+            v-else
+            :name="
+                props.currentTab === 'forward'
+                    ? 'iptables / iptables-nft / nftables'
+                    : 'Firewalld / Ufw / iptables / iptables-nft / nftables'
+            "
+        />
 
         <LayoutContent :divider="true" v-if="baseInfo.isExist && baseInfo.isActive && !baseInfo.isInit">
             <template #main>
@@ -121,7 +106,6 @@
                 <span>{{ $t('firewall.' + operation + 'FirewallHelper') }}</span>
             </template>
         </DockerRestart>
-        <WhiteList ref="whiteListRef" @search="search" />
     </div>
 </template>
 
@@ -137,10 +121,9 @@ import {
 import i18n from '@/lang';
 import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
-import WhiteList from '@/views/host/firewall/status/white-list/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { loadDockerStatus } from '@/api/modules/container';
 
 const props = defineProps({
@@ -153,16 +136,15 @@ const baseInfo = ref<Host.FirewallBase>({
     isInit: false,
     isBind: false,
     name: '',
+    backend: '',
     version: '',
     pingStatus: '',
 });
-const onPing = ref('Disable');
-const oldStatus = ref();
 const dockerRef = ref();
-const whiteListRef = ref();
 const operation = ref('restart');
 const dockerStatus = ref();
 const withDockerRestart = ref(false);
+const backendName = computed(() => baseInfo.value.backend || baseInfo.value.name);
 
 const acceptParams = (): void => {
     loadBaseInfo(true);
@@ -183,10 +165,8 @@ const loadBaseInfo = async (search: boolean) => {
     await loader
         .then(async (res) => {
             baseInfo.value = res.data;
-            onPing.value = baseInfo.value.pingStatus;
-            oldStatus.value = onPing.value;
             if (baseInfo.value.isInit) {
-                emit('update:name', baseInfo.value.name);
+                emit('update:name', backendName.value);
             } else {
                 emit('update:name', '-');
             }
@@ -211,10 +191,6 @@ const loadBaseInfo = async (search: boolean) => {
 const loadDocker = async () => {
     const res = await loadDockerStatus();
     dockerStatus.value = res.data.isExist;
-};
-
-const onOpenWhiteList = () => {
-    whiteListRef.value.acceptParams();
 };
 
 const loadInitMsg = () => {
@@ -281,7 +257,7 @@ const onUnBind = async () => {
 
 const onOperate = async (op: string) => {
     operation.value = op;
-    if (baseInfo.value.name === 'iptables' || baseInfo.value.name === 'nftables' || !dockerStatus.value) {
+    if (backendName.value === 'iptables' || backendName.value === 'nftables' || !dockerStatus.value) {
         emit('update:loading', true);
         emit('update:maskShow', true);
         await operateFire(operation.value, false)
@@ -308,37 +284,6 @@ const onSubmit = async () => {
         .catch(() => {
             loadBaseInfo(true);
         });
-};
-
-const onPingOperate = async (operation: string) => {
-    emit('update:maskShow', false);
-    let operationHelper =
-        operation === 'Enable' ? i18n.global.t('firewall.noPingHelper') : i18n.global.t('firewall.onPingHelper');
-    ElMessageBox.confirm(operationHelper, i18n.global.t('firewall.noPingTitle'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    })
-        .then(async () => {
-            emit('update:loading', true);
-            operation = operation === 'Disable' ? 'disableBanPing' : 'enableBanPing';
-            emit('update:maskShow', true);
-            await operateFire(operation, false)
-                .then(() => {
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    loadBaseInfo(false);
-                })
-                .catch(() => {
-                    loadBaseInfo(false);
-                });
-        })
-        .catch(() => {
-            emit('update:maskShow', true);
-            onPing.value = oldStatus.value;
-        });
-};
-
-const search = () => {
-    emit('search');
 };
 
 defineExpose({

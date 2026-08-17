@@ -134,3 +134,15 @@ func TestDockerGuardReconcileErrorState(t *testing.T) {
 		t.Fatalf("last reconcile error = %v, want nil", got)
 	}
 }
+
+func TestDockerFirewallDisplayName(t *testing.T) {
+	for backend, want := range map[string]string{
+		"iptables": "iptables-docker",
+		"nftables": "nftables-docker",
+		"":         "iptables-docker",
+	} {
+		if got := dockerFirewallDisplayName(backend); got != want {
+			t.Fatalf("dockerFirewallDisplayName(%q) = %q, want %q", backend, got, want)
+		}
+	}
+}

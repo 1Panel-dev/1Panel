@@ -4,6 +4,7 @@ import "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 
 type FirewallBaseInfo struct {
 	Name       string `json:"name"`
+	Backend    string `json:"backend"`
 	IsExist    bool   `json:"isExist"`
 	IsActive   bool   `json:"isActive"`
 	IsInit     bool   `json:"isInit"`
@@ -17,12 +18,52 @@ type FirewallOperation struct {
 	WithDockerRestart bool   `json:"withDockerRestart"`
 }
 
+type FirewallBackendOption struct {
+	Name           string                      `json:"name"`
+	Installed      bool                        `json:"installed"`
+	Active         bool                        `json:"active"`
+	Initialized    bool                        `json:"initialized"`
+	Bound          bool                        `json:"bound"`
+	Supported      bool                        `json:"supported"`
+	Implementation string                      `json:"implementation,omitempty"`
+	Message        string                      `json:"message,omitempty"`
+	IPv4           FirewallBackendFamilyStatus `json:"ipv4"`
+	IPv6           FirewallBackendFamilyStatus `json:"ipv6"`
+}
+
+type FirewallBackendFamilyStatus struct {
+	Initialized bool `json:"initialized"`
+	Bound       bool `json:"bound"`
+}
+
+type FirewallBackendGroup struct {
+	Selected string                  `json:"selected"`
+	Current  string                  `json:"current,omitempty"`
+	Options  []FirewallBackendOption `json:"options"`
+}
+
+type FirewallSettings struct {
+	System        FirewallBackendGroup `json:"system"`
+	Forwarding    FirewallBackendGroup `json:"forwarding"`
+	Docker        FirewallBackendGroup `json:"docker"`
+	PingStatus    string               `json:"pingStatus"`
+	PortWhiteList string               `json:"portWhiteList"`
+}
+
+type FirewallBackendOperation struct {
+	Subsystem     string `json:"subsystem" validate:"required,oneof=system forwarding docker"`
+	Backend       string `json:"backend" validate:"required,oneof=firewalld ufw iptables nftables"`
+	Operation     string `json:"operation" validate:"required,oneof=select initialize cleanup"`
+	RestartDocker bool   `json:"restartDocker"`
+}
+
 type IptablesOp struct {
 	Name    string `json:"name" validate:"required,eq=1PANEL_BASIC"`
 	Operate string `json:"operate" validate:"required,oneof=init-base bind-base unbind-base"`
 }
 
 type FirewallSystemPort struct {
+	Family   string
 	Port     string
 	Protocol string
 }
@@ -56,6 +97,7 @@ type FirewallNativeDetail struct {
 }
 
 type DockerPortGuardBase struct {
+	Name        string                      `json:"name"`
 	Initialized bool                        `json:"initialized"`
 	Bound       bool                        `json:"bound"`
 	IPv4        DockerPortGuardFamilyStatus `json:"ipv4"`

@@ -4225,6 +4225,43 @@ const message = {
         portRule: 'Peraturan | Peraturan',
         forwardRule: 'Peraturan Pemajuan Port | Peraturan Pemajuan Port',
         dockerGuard: 'Perlindungan port bekas',
+        systemFirewall: 'Tembok api sistem',
+        forwardBackend: 'Pemajuan port',
+        dockerBackend: 'Tembok api Docker',
+        firewallSettingHelper:
+            'Tembok api sistem, pemajuan port dan tembok api Docker dipilih secara berasingan. Pindahkan peraturan secara manual melalui eksport dan import.',
+        systemFirewallHelper: 'Mengawal akses port hos dan peraturan masuk.',
+        forwardingHelper:
+            'Mengawal peraturan pemajuan port dan boleh dipilih secara berasingan daripada tembok api sistem.',
+        dockerFirewallHelper: 'Mengawal peraturan rangkaian Docker. Penukaran akan memulakan semula Docker.',
+        iptablesSuggestionTag: 'Utamakan keserasian',
+        nftablesSuggestionTag: 'Persekitaran baharu',
+        iptablesSuggestion:
+            'Disyorkan untuk peraturan iptables sedia ada, beban Docker atau persekitaran yang mengutamakan keserasian.',
+        nftablesSuggestion:
+            'Disyorkan untuk sistem Linux baharu dan pemasangan baharu. Sahkan sokongan alat sebelum menukar.',
+        configuredRules: '{0} peraturan dikonfigurasi',
+        addressFamily: 'Versi IP',
+        portOrRange: 'Port / julat',
+        dockerNftGuardUnsupported: 'nftables asli Docker belum menyokong perlindungan port bekas.',
+        backendIndependentHelper: 'Pilih bahagian belakang tembok api sistem, pemajuan dan Docker secara berasingan.',
+        currentBackend: 'Bahagian belakang semasa',
+        applyBackend: 'Gunakan pilihan',
+        cleanupManagedRules: 'Buang peraturan 1Panel',
+        exportAllRules: 'Eksport semua peraturan',
+        clearAllRules: 'Kosongkan semua peraturan',
+        importBackendHelper:
+            'Peraturan yang diimport ditukar untuk bahagian belakang semasa {0}. Peraturan sumber tidak diubah.',
+        clearAllRulesHelper:
+            'Padam semua {0} peraturan yang boleh diurus daripada bahagian belakang semasa? Tindakan ini tidak boleh dibuat asal.',
+        cleanupManagedRulesHelper: 'Peraturan yang dibuat oleh 1Panel akan dibuang daripada {0}. Teruskan?',
+        switchBackendHelper: 'Tukar kepada {0}? Peraturan sedia ada tidak akan dipindah atau dipadam.',
+        securitySettings: 'Tetapan keselamatan',
+        installedStatus: 'Dipasang',
+        uninstalledStatus: 'Belum dipasang',
+        initializedStatus: 'Dimulakan',
+        partiallyInitialized: 'Dimulakan sebahagian',
+        currentUse: 'Sedang digunakan',
         dockerGuardHelper:
             'Tetapkan sekatan akses untuk port yang diterbitkan oleh bekas Docker pada hos. Port tanpa perlindungan mengekalkan tingkah laku akses lalai Docker.',
         dockerInputNotProtected:
@@ -4292,8 +4329,7 @@ const message = {
         portWhiteList: 'Senarai putih port',
         portWhiteListAlter:
             'Port dalam senarai putih akan dibuka secara automatik apabila firewall dimulakan atau dihidupkan.',
-        portWhiteListHelper:
-            'Protokol boleh ditentukan, contohnya 80/tcp atau 443/udp. Jika diabaikan, tcp digunakan secara lalai.',
+        portWhiteListHelper: 'Menyokong IPv4/IPv6, TCP/UDP, port tunggal dan julat seperti 8000-8100.',
         defaultStrategy: 'Dasar lalai untuk rantaian semasa {0} adalah {1}',
         defaultStrategy2:
             'Dasar lalai untuk rantaian semasa {0} adalah {1}, status semasa adalah tidak terikat. Peraturan firewall yang ditambah akan berkuat kuasa selepas pengikatan!',

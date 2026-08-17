@@ -97,6 +97,7 @@ const searchName = ref('');
 const selectedFilters = ref<string[]>([]);
 const data = reactive<Firewall.DockerGuardList>({
     base: {
+        name: 'iptables-docker',
         initialized: false,
         bound: false,
         ipv4: { state: 'disabled', initialized: false, bound: false, effective: false },

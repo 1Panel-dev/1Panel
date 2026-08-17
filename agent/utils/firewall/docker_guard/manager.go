@@ -176,6 +176,33 @@ func (m *Manager) Unbind() error {
 	return nil
 }
 
+func (m *Manager) Cleanup() error {
+	mutationMu.Lock()
+	defer mutationMu.Unlock()
+	for _, executable := range []string{"iptables", "ip6tables"} {
+		if !m.runner.Exists(executable) {
+			continue
+		}
+		if err := m.unbindFamily(executable); err != nil {
+			return err
+		}
+		exists, err := m.chainExists(executable, Chain)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			continue
+		}
+		if _, err := m.run(executable, "-F", Chain); err != nil {
+			return err
+		}
+		if _, err := m.run(executable, "-X", Chain); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (m *Manager) Initialized(family string) (bool, error) {
 	executable := executableForFamily(family)
 	if executable == "" || !m.runner.Exists(executable) {

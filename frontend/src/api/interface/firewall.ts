@@ -1,5 +1,41 @@
 export namespace Firewall {
     export type Provider = 'iptables' | 'nftables' | 'firewalld' | 'ufw';
+    export type BackendSubsystem = 'system' | 'forwarding' | 'docker';
+    export type BackendOperation = 'select' | 'initialize' | 'cleanup';
+    export interface BackendOption {
+        name: Provider;
+        installed: boolean;
+        active: boolean;
+        initialized: boolean;
+        bound: boolean;
+        supported: boolean;
+        implementation?: string;
+        message?: string;
+        ipv4: BackendFamilyStatus;
+        ipv6: BackendFamilyStatus;
+    }
+    export interface BackendFamilyStatus {
+        initialized: boolean;
+        bound: boolean;
+    }
+    export interface BackendGroup {
+        selected: string;
+        current?: string;
+        options: BackendOption[];
+    }
+    export interface Settings {
+        system: BackendGroup;
+        forwarding: BackendGroup;
+        docker: BackendGroup;
+        pingStatus: string;
+        portWhiteList: string;
+    }
+    export interface BackendOperateRequest {
+        subsystem: BackendSubsystem;
+        backend: Provider;
+        operation: BackendOperation;
+        restartDocker: boolean;
+    }
     export type Family = 'ipv4' | 'ipv6' | 'inet';
     export type Direction = 'input';
     export type Action = 'accept' | 'drop' | 'reject';
@@ -180,6 +216,7 @@ export namespace Firewall {
 
     // Docker bridge published-port protection (DOCKER-USER).
     export interface DockerGuardBase {
+        name: string;
         initialized: boolean;
         bound: boolean;
         ipv4: DockerGuardFamilyStatus;

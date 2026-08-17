@@ -4,11 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
@@ -19,6 +22,23 @@ const requiredPortComment = "1Panel Port Whitelist"
 type Manager struct {
 	UpdateSetting     func(key, value string) error
 	LoadRequiredPorts func() ([]firewall.PortWhitelist, error)
+}
+
+func (m *Manager) Cleanup() error {
+	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
+		tableFamily := TableFamily(family)
+		if _, err := run("list", "table", tableFamily, TableName); err != nil {
+			continue
+		}
+		if _, err := run("delete", "table", tableFamily, TableName); err != nil {
+			return err
+		}
+	}
+	file := filepath.Join(global.Dir.FirewallDir, RulesFile)
+	if err := os.Remove(file); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	return m.updateSetting("IptablesStatus", constant.StatusDisable)
 }
 
 func (m *Manager) Operate(operation firewall.BaseOperation) error {

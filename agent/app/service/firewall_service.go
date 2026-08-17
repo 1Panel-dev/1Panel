@@ -73,7 +73,8 @@ func (u *FirewallService) LoadBaseInfo(tab string) (dto.FirewallBaseInfo, error)
 	var baseInfo dto.FirewallBaseInfo
 	baseInfo.Version = "-"
 	baseInfo.Name = "-"
-	client, err := lifecycle.NewClient()
+	baseInfo.Backend = "-"
+	client, err := selectedSystemFirewallClient()
 	if err != nil {
 		global.LOG.Errorf("load firewall failed, err: %v", err)
 		baseInfo.IsExist = false
@@ -88,7 +89,8 @@ func (u *FirewallService) LoadBaseInfo(tab string) (dto.FirewallBaseInfo, error)
 	if err != nil {
 		return baseInfo, err
 	}
-	baseInfo.Name, baseInfo.Version, baseInfo.PingStatus = status.Name, status.Version, ping.LoadStatus()
+	baseInfo.Name, baseInfo.Backend = status.Name, status.Name
+	baseInfo.Version, baseInfo.PingStatus = status.Version, ping.LoadStatus()
 	baseInfo.IsActive, baseInfo.IsInit, baseInfo.IsBind = status.IsActive, isInit, isBind
 	return baseInfo, nil
 }
@@ -106,7 +108,7 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 		}
 		return settingRepo.Update("BanPing", constant.StatusEnable)
 	}
-	client, err := lifecycle.NewClient()
+	client, err := selectedSystemFirewallClient()
 	if err != nil {
 		return err
 	}
@@ -120,7 +122,7 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 }
 
 func (u *FirewallService) OperateFilterChain(req dto.IptablesOp) error {
-	provider, err := lifecycle.DetectProvider()
+	provider, err := selectedSystemFirewallProvider()
 	if err != nil {
 		return err
 	}
@@ -514,7 +516,7 @@ func (s *FirewallService) Reorder(ctx context.Context, clientIP string, request 
 }
 
 func OperateFirewallPort(oldPorts, newPorts []int) error {
-	client, err := lifecycle.NewClient()
+	client, err := selectedSystemFirewallClient()
 	if err != nil {
 		return err
 	}
@@ -544,11 +546,10 @@ func OperateFirewallPort(oldPorts, newPorts []int) error {
 	if err != nil {
 		return err
 	}
-	currentSet := firewall.PortWhitelistMap(current)
 	previous := make([]firewall.PortWhitelist, 0, len(oldPorts))
 	for _, port := range oldPorts {
 		item := firewall.PortWhitelist{Port: strconv.Itoa(port), Protocol: "tcp"}
-		if _, stillRequired := currentSet[firewall.PortWhitelistKey(item)]; !stillRequired {
+		if !containsFirewallPort(current, item) {
 			previous = append(previous, item)
 		}
 	}
@@ -564,6 +565,16 @@ func OperateFirewallPort(oldPorts, newPorts []int) error {
 		added = excludeFirewallPorts(added, required)
 	}
 	return syncManagedAcceptedPorts(previous, added)
+}
+
+func containsFirewallPort(ports []firewall.PortWhitelist, target firewall.PortWhitelist) bool {
+	for _, item := range ports {
+		familyMatches := item.Family == "" || target.Family == "" || item.Family == target.Family
+		if familyMatches && item.Port == target.Port && item.Protocol == target.Protocol {
+			return true
+		}
+	}
+	return false
 }
 
 func LoadPanelPort() string {
@@ -649,7 +660,7 @@ func loadRequiredFirewallPortWhiteList() ([]firewall.PortWhitelist, error) {
 }
 
 func syncFirewallPortWhiteListAfterUpdate(oldValue string) error {
-	client, err := lifecycle.NewClient()
+	client, err := selectedSystemFirewallClient()
 	if err != nil {
 		return err
 	}
@@ -763,16 +774,23 @@ func syncManagedAcceptedPorts(previous, current []firewall.PortWhitelist) error 
 func systemPorts(ports []firewall.PortWhitelist) []dto.FirewallSystemPort {
 	result := make([]dto.FirewallSystemPort, 0, len(ports))
 	for _, port := range ports {
-		result = append(result, dto.FirewallSystemPort{Port: port.Port, Protocol: port.Protocol})
+		result = append(result, dto.FirewallSystemPort{Family: port.Family, Port: port.Port, Protocol: port.Protocol})
 	}
 	return result
 }
 
 func excludeFirewallPorts(ports, excluded []firewall.PortWhitelist) []firewall.PortWhitelist {
-	excludedSet := firewall.PortWhitelistMap(excluded)
 	result := make([]firewall.PortWhitelist, 0, len(ports))
 	for _, port := range ports {
-		if _, exists := excludedSet[firewall.PortWhitelistKey(port)]; !exists {
+		exists := false
+		for _, item := range excluded {
+			familyMatches := item.Family == "" || port.Family == "" || item.Family == port.Family
+			if familyMatches && item.Port == port.Port && item.Protocol == port.Protocol {
+				exists = true
+				break
+			}
+		}
+		if !exists {
 			result = append(result, port)
 		}
 	}
@@ -1378,11 +1396,26 @@ func (s *FirewallService) systemPortRecords(ctx context.Context, port dto.Firewa
 	if err != nil {
 		return nil, err
 	}
-	records, err := s.rules.List(ctx,
-		repo.WithFirewallRuleSource(constant.FirewallRuleSourceSecurity, constant.FirewallSystemAcceptedPortSourcePrefix+systemPortKey(port)),
-	)
-	if err != nil {
-		return nil, err
+	records := make([]model.FirewallRule, 0)
+	sourceIDs := []string{constant.FirewallSystemAcceptedPortSourcePrefix + systemPortKey(port)}
+	if port.Family == "ipv4" {
+		sourceIDs = append(sourceIDs, constant.FirewallSystemAcceptedPortSourcePrefix+legacySystemPortKey(port))
+	}
+	seen := make(map[string]struct{})
+	for _, sourceID := range sourceIDs {
+		items, listErr := s.rules.List(ctx,
+			repo.WithFirewallRuleSource(constant.FirewallRuleSourceSecurity, sourceID),
+		)
+		if listErr != nil {
+			return nil, listErr
+		}
+		for _, item := range items {
+			if _, exists := seen[item.UUID]; exists {
+				continue
+			}
+			seen[item.UUID] = struct{}{}
+			records = append(records, item)
+		}
 	}
 	filtered := make([]model.FirewallRule, 0, len(records))
 	for _, record := range records {
@@ -1425,15 +1458,25 @@ func (s *FirewallService) adoptExternalSystemPort(ctx context.Context, port dto.
 
 func systemPortRule(provider filter.Provider, port dto.FirewallSystemPort) filter.FirewallRule {
 	scope := filter.Scope{Provider: provider, Direction: filter.DirectionInput}
+	family := filter.Family(strings.ToLower(strings.TrimSpace(port.Family)))
 	switch provider {
 	case filter.ProviderIptables, filter.ProviderNftables:
-		scope.Family = filter.FamilyIPv4
+		if family != filter.FamilyIPv6 {
+			family = filter.FamilyIPv4
+		}
+		scope.Family = family
 		scope.Table = "filter"
 	case filter.ProviderFirewalld:
-		scope.Family = filter.FamilyInet
+		if family != filter.FamilyIPv4 && family != filter.FamilyIPv6 {
+			family = filter.FamilyInet
+		}
+		scope.Family = family
 		scope.Zone = filter.FirewalldInputZone
 	case filter.ProviderUFW:
-		scope.Family = filter.FamilyIPv4
+		if family != filter.FamilyIPv6 {
+			family = filter.FamilyIPv4
+		}
+		scope.Family = family
 	}
 	return filter.FirewallRule{
 		Scope: scope, Protocol: port.Protocol, DestinationPort: port.Port,
@@ -1448,13 +1491,27 @@ func normalizeSystemPorts(ports []dto.FirewallSystemPort) (map[string]dto.Firewa
 		if err != nil {
 			return nil, err
 		}
-		item := dto.FirewallSystemPort{Port: normalized.DestinationPort, Protocol: normalized.Protocol}
+		family := strings.ToLower(strings.TrimSpace(port.Family))
+		if family != "" {
+			family = string(normalized.Scope.Family)
+		}
+		item := dto.FirewallSystemPort{
+			Family: family, Port: normalized.DestinationPort, Protocol: normalized.Protocol,
+		}
 		result[systemPortKey(item)] = item
 	}
 	return result, nil
 }
 
 func systemPortKey(port dto.FirewallSystemPort) string {
+	key := legacySystemPortKey(port)
+	if family := strings.ToLower(strings.TrimSpace(port.Family)); family != "" {
+		return family + "/" + key
+	}
+	return key
+}
+
+func legacySystemPortKey(port dto.FirewallSystemPort) string {
 	return strings.ToLower(strings.TrimSpace(port.Protocol)) + "/" + strings.TrimSpace(port.Port)
 }
 
@@ -1579,7 +1636,7 @@ func (r *firewallRuleRuntime) Rollback(ctx context.Context, plan filter.BackendP
 }
 
 func selectedRuleProvider() (filter.Provider, error) {
-	provider, err := lifecycle.DetectProvider()
+	provider, err := selectedSystemFirewallProvider()
 	if err != nil {
 		return "", fmt.Errorf("%w: %v", filter.ErrProviderUnavailable, err)
 	}

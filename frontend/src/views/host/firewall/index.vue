@@ -18,5 +18,9 @@ const buttons = [
         label: i18n.global.t('firewall.forwardRule', 2),
         path: '/hosts/firewall/forward',
     },
+    {
+        label: i18n.global.t('commons.button.set'),
+        path: '/hosts/firewall/setting',
+    },
 ];
 </script>

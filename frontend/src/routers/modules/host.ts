@@ -80,6 +80,18 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/firewall/setting',
+            name: 'FirewallSetting',
+            component: () => import('@/views/host/firewall/setting/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/hosts/firewall/rules',
+                parent: 'menu.firewall',
+                title: 'commons.button.set',
+                permission: 'host_firewall_view',
+            },
+        },
+        {
             path: '/hosts/disk',
             name: 'Disk',
             props: true,

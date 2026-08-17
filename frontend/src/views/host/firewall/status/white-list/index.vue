@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('firewall.portWhiteList')" @close="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('firewall.portWhiteList')" @close="handleClose" size="large">
         <template #content>
             <el-alert type="info" :closable="false" :title="$t('firewall.portWhiteListAlter')" />
 
@@ -7,10 +7,28 @@
                 {{ $t('commons.button.add') }}
             </el-button>
             <ComplexTable :data="data" v-loading="loading">
-                <el-table-column :label="$t('commons.table.port')" prop="port">
+                <el-table-column :label="$t('firewall.addressFamily')" width="120">
+                    <template #default="{ row }">
+                        <span v-if="!row.edit">{{ row.family.toUpperCase() }}</span>
+                        <el-select v-else v-model="row.family">
+                            <el-option value="ipv4" label="IPv4" />
+                            <el-option value="ipv6" label="IPv6" />
+                        </el-select>
+                    </template>
+                </el-table-column>
+                <el-table-column :label="$t('commons.table.protocol')" width="120">
+                    <template #default="{ row }">
+                        <span v-if="!row.edit">{{ row.protocol.toUpperCase() }}</span>
+                        <el-select v-else v-model="row.protocol">
+                            <el-option value="tcp" label="TCP" />
+                            <el-option value="udp" label="UDP" />
+                        </el-select>
+                    </template>
+                </el-table-column>
+                <el-table-column :label="$t('firewall.portOrRange')" prop="port">
                     <template #default="{ row }">
                         <span v-if="!row.edit">{{ row.port }}</span>
-                        <el-input v-else v-model.trim="row.port" placeholder="80/tcp" clearable />
+                        <el-input v-else v-model.trim="row.port" placeholder="80 / 8000-8100" clearable />
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('commons.table.operate')" width="160">
@@ -46,11 +64,18 @@ import { ref } from 'vue';
 import { getAgentSettingInfo, updateAgentSetting } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { checkPort } from '@/utils/validate';
+import {
+    normalizeWhiteListRule,
+    parseWhiteList,
+    serializeWhiteList,
+    WhiteListFamily,
+    WhiteListProtocol,
+    WhiteListRule,
+    whiteListRulesOverlap,
+} from './model';
 
-interface WhiteListItem {
-    port: string;
-    oldPort: string;
+interface WhiteListItem extends WhiteListRule {
+    oldRule: WhiteListRule;
     edit: boolean;
     isNew: boolean;
 }
@@ -66,23 +91,16 @@ const acceptParams = async (): Promise<void> => {
     loading.value = true;
     await getAgentSettingInfo()
         .then((res) => {
-            data.value = parseWhiteList(res.data.firewallPortWhiteList ?? defaultWhiteList);
+            data.value = parseWhiteList(res.data.firewallPortWhiteList ?? defaultWhiteList).map((rule) => ({
+                ...rule,
+                oldRule: { ...rule },
+                edit: false,
+                isNew: false,
+            }));
         })
         .finally(() => {
             loading.value = false;
         });
-};
-
-const parseWhiteList = (value: string): WhiteListItem[] => {
-    return value
-        .split(/[\s,;]+/)
-        .filter((item) => item !== '')
-        .map((item) => ({
-            port: item,
-            oldPort: item,
-            edit: false,
-            isNew: false,
-        }));
 };
 
 const openCreate = () => {
@@ -92,29 +110,29 @@ const openCreate = () => {
         }
     }
     data.value.unshift({
+        family: 'ipv4',
+        protocol: 'tcp',
         port: '',
-        oldPort: '',
+        oldRule: { family: 'ipv4', protocol: 'tcp', port: '' },
         edit: true,
         isNew: true,
     });
 };
 
 const editRow = (row: WhiteListItem) => {
-    row.oldPort = row.port;
+    row.oldRule = { family: row.family, protocol: row.protocol, port: row.port };
     row.edit = true;
 };
 
 const saveRow = (row: WhiteListItem) => {
-    if (!validatePort(row.port)) {
-        return;
-    }
-    const port = normalizePort(row.port);
-    if (hasDuplicatePort(port, row)) {
+    const rule = validateRule(row);
+    if (!rule) return;
+    if (hasOverlap(rule, row)) {
         MsgError(i18n.global.t('commons.rule.duplicate'));
         return;
     }
-    row.port = port;
-    row.oldPort = row.port;
+    Object.assign(row, rule);
+    row.oldRule = { ...rule };
     row.edit = false;
     row.isNew = false;
 };
@@ -124,7 +142,7 @@ const cancelEdit = (row: WhiteListItem, index: number) => {
         data.value.splice(index, 1);
         return;
     }
-    row.port = row.oldPort;
+    Object.assign(row, row.oldRule);
     row.edit = false;
 };
 
@@ -132,66 +150,45 @@ const removeRow = (index: number) => {
     data.value.splice(index, 1);
 };
 
-const normalizePort = (value: string): string => {
-    const segments = value.split('/');
-    const port = segments[0];
-    const protocol = segments[1] ? segments[1].toLowerCase() : '';
-    return protocol ? `${port}/${protocol}` : port;
-};
-
-const normalizePortKey = (value: string): string => {
-    const segments = value.split('/');
-    const port = segments[0];
-    const protocol = segments[1] ? segments[1].toLowerCase() : 'tcp';
-    return `${port}/${protocol}`;
-};
-
-const validatePort = (value: string): boolean => {
-    if (value === '') {
+const validateRule = (row: Pick<WhiteListItem, 'family' | 'protocol' | 'port'>): WhiteListRule | undefined => {
+    try {
+        return normalizeWhiteListRule({
+            family: row.family as WhiteListFamily,
+            protocol: row.protocol as WhiteListProtocol,
+            port: row.port,
+        });
+    } catch {
         MsgError(i18n.global.t('firewall.portFormatError'));
-        return false;
+        return undefined;
     }
-    const segments = value.split('/');
-    const [port, protocol = 'tcp'] = segments;
-    if (checkPort(port) || !['tcp', 'udp'].includes(protocol.toLowerCase()) || segments.length > 2) {
-        MsgError(i18n.global.t('firewall.portFormatError'));
-        return false;
-    }
-    return true;
 };
 
-const hasDuplicatePort = (port: string, row?: WhiteListItem): boolean => {
-    const portKey = normalizePortKey(port);
-    return data.value.some((item) => item !== row && item.port !== '' && normalizePortKey(item.port) === portKey);
+const hasOverlap = (rule: WhiteListRule, row?: WhiteListItem): boolean => {
+    return data.value.some((item) => item !== row && item.port !== '' && whiteListRulesOverlap(rule, item));
 };
 
-const hasDuplicatePorts = (ports: string[]): boolean => {
-    const portSet = new Set<string>();
-    for (const port of ports) {
-        const portKey = normalizePortKey(port);
-        if (portSet.has(portKey)) {
-            return true;
+const validateRules = (): WhiteListRule[] | undefined => {
+    const rules: WhiteListRule[] = [];
+    for (const item of data.value) {
+        if (!item.port) continue;
+        const rule = validateRule(item);
+        if (!rule) return undefined;
+        if (rules.some((existing) => whiteListRulesOverlap(existing, rule))) {
+            MsgError(i18n.global.t('commons.rule.duplicate'));
+            return undefined;
         }
-        portSet.add(portKey);
+        rules.push(rule);
     }
-    return false;
+    return rules;
 };
 
 const onSubmit = async () => {
-    const ports = data.value.map((item) => item.port).filter((item) => item !== '');
-    for (const port of ports) {
-        if (!validatePort(port)) {
-            return;
-        }
-    }
-    if (hasDuplicatePorts(ports)) {
-        MsgError(i18n.global.t('commons.rule.duplicate'));
-        return;
-    }
+    const rules = validateRules();
+    if (!rules) return;
     loading.value = true;
     await updateAgentSetting({
         key: 'FirewallPortWhiteList',
-        value: ports.map((item) => normalizePort(item)).join('\n'),
+        value: serializeWhiteList(rules),
     })
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

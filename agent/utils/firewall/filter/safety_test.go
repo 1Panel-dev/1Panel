@@ -70,6 +70,23 @@ func TestProtectSnapshotMatchesPortSetsAndRanges(t *testing.T) {
 	}
 }
 
+func TestProtectSnapshotRespectsConfiguredFamily(t *testing.T) {
+	for _, family := range []Family{FamilyIPv4, FamilyIPv6} {
+		scope := Scope{Provider: ProviderIptables, Family: family, Table: "filter", Chain: IptablesInputChain, Direction: DirectionInput}
+		snapshot, err := NewSnapshot(scope, []ObservedRule{protectedPortTestRule(scope, "tcp", "443", 1)})
+		if err != nil {
+			t.Fatalf("create %s snapshot: %v", family, err)
+		}
+		protected, err := ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Family: "ipv6", Port: "443", Protocol: "tcp"}})
+		if err != nil {
+			t.Fatalf("protect %s snapshot: %v", family, err)
+		}
+		if protected.Rules[0].Protected != (family == FamilyIPv6) {
+			t.Fatalf("unexpected %s protection state: %#v", family, protected.Rules[0])
+		}
+	}
+}
+
 func protectedPortTestRule(scope Scope, protocol, port string, position int) ObservedRule {
 	return ObservedRule{
 		Rule: FirewallRule{

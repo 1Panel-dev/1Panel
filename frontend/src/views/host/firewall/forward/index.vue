@@ -31,12 +31,30 @@
                         >
                             {{ $t('commons.button.delete') }}
                         </el-button>
+                        <el-button
+                            v-permission
+                            v-node-admin
+                            type="danger"
+                            plain
+                            :disabled="paginationConfig.total === 0"
+                            @click="onClearAll"
+                        >
+                            {{ $t('firewall.clearAllRules') }}
+                        </el-button>
                         <el-button-group>
                             <el-button v-permission v-node-admin @click="onImport">
                                 {{ $t('commons.button.import') }}
                             </el-button>
                             <el-button v-permission v-node-admin :disabled="selects.length === 0" @click="onExport">
                                 {{ $t('commons.button.export') }}
+                            </el-button>
+                            <el-button
+                                v-permission
+                                v-node-admin
+                                :disabled="paginationConfig.total === 0"
+                                @click="onExportAll"
+                            >
+                                {{ $t('firewall.exportAllRules') }}
                             </el-button>
                         </el-button-group>
                     </template>
@@ -54,11 +72,16 @@
                             :heightDiff="370"
                         >
                             <el-table-column type="selection" fix />
+                            <el-table-column label="IP" :min-width="60" prop="family">
+                                <template #default="{ row }">
+                                    {{ row.family === 'ipv6' ? 'IPv6' : 'IPv4' }}
+                                </template>
+                            </el-table-column>
                             <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
                             <el-table-column :label="$t('firewall.sourcePort')" :min-width="70" prop="port" />
                             <el-table-column :min-width="80" :label="$t('firewall.targetIP')" prop="targetIP" />
                             <el-table-column :label="$t('firewall.targetPort')" :min-width="70" prop="targetPort" />
-                            <template v-if="fireName === 'ufw'">
+                            <template v-if="fireName === 'iptables' || fireName === 'nftables'">
                                 <el-table-column
                                     :label="$t('firewall.forwardInboundInterface')"
                                     :min-width="70"
@@ -171,6 +194,7 @@ const dialogRef = ref();
 const onOpenDialog = async (
     title: string,
     rowData: Partial<Host.RuleForward> = {
+        family: 'ipv4',
         protocol: 'tcp',
         port: '8080',
         targetIP: '',
@@ -181,7 +205,6 @@ const onOpenDialog = async (
     let params = {
         title,
         rowData: { ...rowData },
-        fireName: fireName.value,
     };
     dialogRef.value!.acceptParams(params);
 };
@@ -232,26 +255,65 @@ const onImport = () => {
     dialogImportRef.value.acceptParams(fireName.value);
 };
 
-const onExport = () => {
-    ElMessageBox.confirm(
-        i18n.global.t('firewall.exportHelper', [selects.value.length]),
+const loadAllRules = async (): Promise<Host.RuleForward[]> => {
+    if (paginationConfig.total === 0) return [];
+    const response = await searchForwardRule({
+        strategy: '',
+        info: '',
+        page: 1,
+        pageSize: Math.max(1, paginationConfig.total),
+    });
+    return (response.data.items || []).map((item) => ({
+        operation: '',
+        family: item.family === 'ipv6' ? 'ipv6' : 'ipv4',
+        protocol: item.protocol,
+        port: item.port,
+        targetIP: item.targetIP,
+        targetPort: item.targetPort,
+        interface: item.interface || '',
+    }));
+};
+
+const exportRules = async (rules: Host.RuleForward[]) => {
+    if (rules.length === 0) return;
+    await ElMessageBox.confirm(
+        i18n.global.t('firewall.exportHelper', [rules.length]),
         i18n.global.t('commons.button.export'),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
         },
-    ).then(async () => {
-        const exportData = selects.value.map((item: Host.RuleInfo) => ({
-            family: item.family,
-            protocol: item.protocol,
-            port: item.port,
-            targetIP: item.targetIP,
-            targetPort: item.targetPort,
-            interface: item.interface,
-        }));
-        const content = JSON.stringify(exportData, null, 2);
-        const fileName = `1panel-firewall-forward-${getCurrentDateFormatted()}.json`;
-        downloadWithContent(content, fileName);
+    );
+    const exportData = rules.map((item) => ({
+        family: item.family,
+        protocol: item.protocol,
+        port: item.port,
+        targetIP: item.targetIP,
+        targetPort: item.targetPort,
+        interface: item.interface,
+    }));
+    downloadWithContent(
+        JSON.stringify(exportData, null, 2),
+        `1panel-firewall-forward-${getCurrentDateFormatted()}.json`,
+    );
+};
+
+const onExport = () => {
+    exportRules(selects.value);
+};
+
+const onExportAll = async () => exportRules(await loadAllRules());
+
+const onClearAll = async () => {
+    const rules = await loadAllRules();
+    if (rules.length === 0) return;
+    operateRules.value = rules.map((rule) => ({ ...rule, operation: 'remove' }));
+    opRef.value.acceptParams({
+        title: i18n.global.t('firewall.clearAllRules'),
+        names: [],
+        msg: i18n.global.t('firewall.clearAllRulesHelper', [rules.length]),
+        api: null,
+        params: null,
     });
 };
 

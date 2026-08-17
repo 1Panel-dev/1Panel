@@ -4222,6 +4222,43 @@ const message = {
         portRule: 'Kural | Kurallar',
         forwardRule: 'Port-Yönlendirme kuralı | Port-Yönlendirme kuralları',
         dockerGuard: 'Konteyner portu koruması',
+        systemFirewall: 'Sistem güvenlik duvarı',
+        forwardBackend: 'Port yönlendirme',
+        dockerBackend: 'Docker güvenlik duvarı',
+        firewallSettingHelper:
+            'Sistem güvenlik duvarı, port yönlendirme ve Docker güvenlik duvarı ayrı ayrı seçilir. Kuralları dışa ve içe aktararak elle taşıyın.',
+        systemFirewallHelper: 'Ana makine port erişimini ve gelen kuralları yönetir.',
+        forwardingHelper: 'Port yönlendirme kurallarını yönetir ve sistem güvenlik duvarından ayrı seçilebilir.',
+        dockerFirewallHelper: 'Docker ağ kurallarını yönetir. Değişiklik Docker hizmetini yeniden başlatır.',
+        iptablesSuggestionTag: 'Uyumluluk öncelikli',
+        nftablesSuggestionTag: 'Yeni ortamlar',
+        iptablesSuggestion:
+            'Mevcut iptables kuralları, Docker iş yükleri veya uyumluluğun önemli olduğu ortamlar için önerilir.',
+        nftablesSuggestion:
+            'Yeni Linux sistemleri ve yeni kurulumlar için önerilir. Geçişten önce araç desteğini doğrulayın.',
+        configuredRules: '{0} kural yapılandırıldı',
+        addressFamily: 'IP sürümü',
+        portOrRange: 'Port / aralık',
+        dockerNftGuardUnsupported: 'Docker yerel nftables henüz konteyner portu korumasını desteklemiyor.',
+        backendIndependentHelper:
+            'Sistem, yönlendirme ve Docker güvenlik duvarı arka uçlarını birbirinden bağımsız seçin.',
+        currentBackend: 'Geçerli arka uç',
+        applyBackend: 'Seçimi uygula',
+        cleanupManagedRules: '1Panel kurallarını kaldır',
+        exportAllRules: 'Tüm kuralları dışa aktar',
+        clearAllRules: 'Tüm kuralları temizle',
+        importBackendHelper:
+            'İçe aktarılan kurallar geçerli {0} arka ucu için dönüştürülür. Kaynak kurallar değiştirilmez.',
+        clearAllRulesHelper: 'Geçerli arka uçtaki yönetilebilir {0} kural silinsin mi? Bu işlem geri alınamaz.',
+        cleanupManagedRulesHelper:
+            '1Panel tarafından oluşturulan kurallar {0} üzerinden kaldırılacak. Devam edilsin mi?',
+        switchBackendHelper: '{0} seçeneğine geçilsin mi? Mevcut kurallar taşınmayacak veya silinmeyecek.',
+        securitySettings: 'Güvenlik ayarları',
+        installedStatus: 'Yüklü',
+        uninstalledStatus: 'Yüklü değil',
+        initializedStatus: 'Başlatıldı',
+        partiallyInitialized: 'Kısmen başlatıldı',
+        currentUse: 'Kullanımda',
         dockerGuardHelper:
             'Docker konteynerlerinin ana makinede yayımladığı portlar için erişim kısıtlamaları ayarlayın. Korunmayan portlar Docker varsayılan erişim davranışını korur.',
         dockerInputNotProtected:
@@ -4290,8 +4327,7 @@ const message = {
         portWhiteList: 'Port beyaz listesi',
         portWhiteListAlter:
             'Beyaz listedeki portlar, güvenlik duvarı başlatılırken veya çalıştırılırken otomatik olarak açılır.',
-        portWhiteListHelper:
-            'Protokol belirtilebilir, örn. 80/tcp veya 443/udp. Belirtilmezse varsayılan tcp kullanılır.',
+        portWhiteListHelper: 'IPv4/IPv6, TCP/UDP, tek portlar ve 8000-8100 gibi port aralıklarını destekler.',
         defaultStrategy: 'Mevcut zincir {0} için varsayılan politika {1}',
         defaultStrategy2:
             'Mevcut zincir {0} için varsayılan politika {1}, mevcut durum bağlı değil. Eklenen güvenlik duvarı kuralları bağlandıktan sonra etkili olacak!',

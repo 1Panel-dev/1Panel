@@ -322,6 +322,27 @@ func AddChainWithAppend(tab, parentChain, chain string) error {
 	}
 	return nil
 }
+
+func AddIPv6ChainWithAppend(tab, parentChain, chain string) error {
+	exists, err := CheckIPv6ChainExist(tab, chain)
+	if err != nil {
+		return fmt.Errorf("failed to check IPv6 chain %s: %w", chain, err)
+	}
+	if !exists {
+		if err := AddIPv6Chain(tab, chain); err != nil {
+			return fmt.Errorf("failed to create IPv6 chain %s: %w", chain, err)
+		}
+	}
+	bound, err := CheckIPv6ChainBind(tab, parentChain, chain)
+	if err != nil {
+		return fmt.Errorf("failed to check IPv6 chain %s binding to %s: %w", chain, parentChain, err)
+	}
+	if bound {
+		return nil
+	}
+	return RunIPv6(tab, "-A", parentChain, "-j", chain)
+}
+
 func AppendChain(tab string, parentChain, chain string) error {
 	return Run(tab, "-A", parentChain, "-j", chain)
 }

@@ -33,7 +33,7 @@ func Init() {
 		global.LOG.Errorf("replay forwarding rules failed, err: %v", err)
 		return
 	}
-	client, err := lifecycle.NewClient()
+	client, err := service.NewSelectedSystemFirewallClient()
 	if err != nil {
 		return
 	}
@@ -81,7 +81,7 @@ func initIPv6BaseIfEnabled() error {
 	if err != nil || !commands.IPv6Available() {
 		return nil
 	}
-	client, err := lifecycle.NewClient()
+	client, err := service.NewSelectedSystemFirewallClient()
 	if err != nil || client.Name() != "iptables" {
 		return err
 	}

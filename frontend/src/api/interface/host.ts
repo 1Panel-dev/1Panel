@@ -66,6 +66,7 @@ export namespace Host {
 
     export interface FirewallBase {
         name: string;
+        backend: string;
         isExist: boolean;
         isActive: boolean;
         isInit: boolean;
@@ -94,6 +95,7 @@ export namespace Host {
     }
     export interface RuleForward {
         operation: string;
+        family: 'ipv4' | 'ipv6';
         protocol: string;
         port: string;
         targetIP: string;

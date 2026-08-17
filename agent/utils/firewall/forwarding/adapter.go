@@ -1,6 +1,9 @@
 package forwarding
 
 const (
+	FamilyIPv4 = "ipv4"
+	FamilyIPv6 = "ipv6"
+
 	ChainPreRouting  = "1PANEL_PREROUTING"
 	ChainPostRouting = "1PANEL_POSTROUTING"
 	ChainForward     = "1PANEL_FORWARD"
@@ -12,6 +15,7 @@ const (
 
 type Rule struct {
 	Num        string
+	Family     string
 	Protocol   string
 	Port       string
 	TargetIP   string
@@ -31,6 +35,8 @@ type Adapter interface {
 	List() ([]Rule, error)
 	Operate(rule Rule, operation OperationType) error
 	Enable() error
+	Cleanup() error
 	InitStatus() (bool, bool, error)
+	FamilyStatus(family string) (bool, bool, error)
 	Replay() error
 }

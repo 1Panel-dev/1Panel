@@ -16,29 +16,12 @@ type commandCall struct {
 	args []string
 }
 
-type fakeFirewalldRunner struct {
-	calls  []commandCall
-	stdout map[string]string
-	errors map[string]error
-}
-
-func (f *fakeFirewalldRunner) Run(name string, args ...string) error {
-	f.calls = append(f.calls, commandCall{name: name, args: append([]string(nil), args...)})
-	return f.errors[commandKey(name, args...)]
-}
-
-func (f *fakeFirewalldRunner) RunWithStdout(name string, args ...string) (string, error) {
-	f.calls = append(f.calls, commandCall{name: name, args: append([]string(nil), args...)})
-	key := commandKey(name, args...)
-	return f.stdout[key], f.errors[key]
-}
-
 func commandKey(name string, args ...string) string {
 	return strings.Join(append([]string{name}, args...), " ")
 }
 
 func TestForwardingAdapterFactoryContract(t *testing.T) {
-	for _, name := range []string{"firewalld", "ufw", "iptables", "nftables"} {
+	for _, name := range []string{"iptables", "nftables"} {
 		adapter, err := New(name)
 		if err != nil {
 			t.Fatalf("%s: %v", name, err)
@@ -46,11 +29,7 @@ func TestForwardingAdapterFactoryContract(t *testing.T) {
 		if adapter.Name() != name {
 			t.Fatalf("got adapter %q want %q", adapter.Name(), name)
 		}
-		if name == "firewalld" {
-			if _, ok := adapter.(*firewalldAdapter); !ok {
-				t.Fatalf("firewalld must use its native forwarding adapter, got %T", adapter)
-			}
-		} else if name == "nftables" {
+		if name == "nftables" {
 			if _, ok := adapter.(*nftablesAdapter); !ok {
 				t.Fatalf("nftables must use its native forwarding adapter, got %T", adapter)
 			}
@@ -58,61 +37,10 @@ func TestForwardingAdapterFactoryContract(t *testing.T) {
 			t.Fatalf("%s must use the iptables forwarding adapter, got %T", name, adapter)
 		}
 	}
-	if _, err := New("unknown"); err == nil {
-		t.Fatal("unknown forwarding provider must be rejected")
-	}
-}
-
-func TestFirewalldForwardingContract(t *testing.T) {
-	runner := &fakeFirewalldRunner{stdout: map[string]string{
-		"firewall-cmd --zone=public --query-masquerade":   "yes\n",
-		"firewall-cmd --zone=public --list-forward-ports": "port=8080:proto=tcp:toport=80:toaddr=10.0.0.2\nport=8443:proto=tcp:toport=443:toaddr=\ninvalid\n",
-	}, errors: map[string]error{}}
-	adapter := &firewalldAdapter{runner: runner}
-	rules, err := adapter.List()
-	if err != nil {
-		t.Fatal(err)
-	}
-	wantRules := []forwarding.Rule{
-		{Port: "8080", Protocol: "tcp", TargetIP: "10.0.0.2", TargetPort: "80"},
-		{Port: "8443", Protocol: "tcp", TargetIP: "127.0.0.1", TargetPort: "443"},
-	}
-	if !reflect.DeepEqual(rules, wantRules) {
-		t.Fatalf("got %#v want %#v", rules, wantRules)
-	}
-
-	remote := forwarding.Rule{Port: "8080", Protocol: "tcp", TargetIP: "10.0.0.2", TargetPort: "80"}
-	if err := adapter.Operate(remote, "add"); err != nil {
-		t.Fatal(err)
-	}
-	wantArgs := []string{"--zone=public", "--add-forward-port=port=8080:proto=tcp:toaddr=10.0.0.2:toport=80", "--permanent"}
-	assertArgs(t, runner.calls[2], "firewall-cmd", wantArgs)
-	assertArgs(t, runner.calls[3], "firewall-cmd", []string{"--reload"})
-
-	localArgs := buildFirewalldForwardArgs(forwarding.Rule{Port: "8443", Protocol: "tcp", TargetIP: "127.0.0.1", TargetPort: "443"}, "remove")
-	wantLocal := []string{"--zone=public", "--remove-forward-port=port=8443:proto=tcp:toport=443", "--permanent"}
-	if !reflect.DeepEqual(localArgs, wantLocal) {
-		t.Fatalf("got %#v want %#v", localArgs, wantLocal)
-	}
-}
-
-func TestFirewalldEnableMasqueradeContract(t *testing.T) {
-	query := "firewall-cmd --zone=public --query-masquerade"
-	runner := &fakeFirewalldRunner{
-		stdout: map[string]string{query: "no\n"},
-		errors: map[string]error{query: errors.New("exit status 1")},
-	}
-	adapter := &firewalldAdapter{runner: runner}
-	if err := adapter.Enable(); err != nil {
-		t.Fatal(err)
-	}
-	want := []commandCall{
-		{name: "firewall-cmd", args: []string{"--zone=public", "--query-masquerade"}},
-		{name: "firewall-cmd", args: []string{"--zone=public", "--add-masquerade", "--permanent"}},
-		{name: "firewall-cmd", args: []string{"--reload"}},
-	}
-	if !reflect.DeepEqual(runner.calls, want) {
-		t.Fatalf("got %#v want %#v", runner.calls, want)
+	for _, name := range []string{"firewalld", "ufw", "unknown"} {
+		if _, err := New(name); err == nil {
+			t.Fatalf("unsupported forwarding provider %q must be rejected", name)
+		}
 	}
 }
 
@@ -127,7 +55,10 @@ type fakeIptablesBackend struct {
 	stdout  map[string]string
 	err     error
 	saveErr error
+	ipv6    bool
 }
+
+func (f *fakeIptablesBackend) IPv6Available() bool { return f.ipv6 }
 
 func (f *fakeIptablesBackend) Run(table string, args ...string) error {
 	f.calls = append(f.calls, backendCall{method: "run", table: table, args: append([]string(nil), args...)})
@@ -139,8 +70,23 @@ func (f *fakeIptablesBackend) RunWithStd(table string, args ...string) (string, 
 	return f.stdout[commandKey(table, args...)], f.err
 }
 
+func (f *fakeIptablesBackend) RunIPv6(table string, args ...string) error {
+	f.calls = append(f.calls, backendCall{method: "run6", table: table, args: append([]string(nil), args...)})
+	return f.err
+}
+
+func (f *fakeIptablesBackend) RunIPv6WithStd(table string, args ...string) (string, error) {
+	f.calls = append(f.calls, backendCall{method: "stdout6", table: table, args: append([]string(nil), args...)})
+	return f.stdout["ipv6 "+commandKey(table, args...)], f.err
+}
+
 func (f *fakeIptablesBackend) AddChainWithAppend(table, parentChain, chain string) error {
 	f.calls = append(f.calls, backendCall{method: "add-chain", table: table, args: []string{parentChain, chain}})
+	return f.err
+}
+
+func (f *fakeIptablesBackend) AddIPv6ChainWithAppend(table, parentChain, chain string) error {
+	f.calls = append(f.calls, backendCall{method: "add-chain6", table: table, args: []string{parentChain, chain}})
 	return f.err
 }
 
@@ -152,8 +98,21 @@ func (f *fakeIptablesBackend) SaveRulesToFile(table, chain, fileName string) err
 	return f.err
 }
 
+func (f *fakeIptablesBackend) SaveIPv6RulesToFile(table, chain, fileName string) error {
+	f.calls = append(f.calls, backendCall{method: "save6", table: table, args: []string{chain, fileName}})
+	if f.saveErr != nil {
+		return f.saveErr
+	}
+	return f.err
+}
+
 func (f *fakeIptablesBackend) LoadRulesFromFile(table, chain, fileName string) error {
 	f.calls = append(f.calls, backendCall{method: "load", table: table, args: []string{chain, fileName}})
+	return f.err
+}
+
+func (f *fakeIptablesBackend) LoadIPv6RulesFromFile(table, chain, fileName string) error {
+	f.calls = append(f.calls, backendCall{method: "load6", table: table, args: []string{chain, fileName}})
 	return f.err
 }
 
@@ -198,7 +157,7 @@ func (f *fakeForwardingSystem) RunWithOptionalSudo(name string, args ...string) 
 
 func TestIptablesNATAddDeleteAndPersistenceContract(t *testing.T) {
 	backend := &fakeIptablesBackend{stdout: map[string]string{}}
-	adapter := &iptablesNATAdapter{provider: "ufw", backend: backend, system: &fakeForwardingSystem{}}
+	adapter := &iptablesNATAdapter{provider: "iptables", backend: backend, system: &fakeForwardingSystem{}}
 	rule := forwarding.Rule{Num: "3", Protocol: "tcp", Port: "8080-8081", TargetIP: "10.0.0.2", TargetPort: "80-81", Interface: "eth0"}
 	if err := adapter.Operate(rule, "add"); err != nil {
 		t.Fatal(err)
@@ -267,6 +226,14 @@ func TestIptablesNATEnableReplayAndStatusContract(t *testing.T) {
 	if !init || !bind {
 		t.Fatalf("expected initialized and bound, got %v %v", init, bind)
 	}
+	system.reads["/proc/sys/net/ipv4/ip_forward"] = []byte("0\n")
+	init, bind, err = adapter.InitStatus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !init || bind {
+		t.Fatalf("disabled IP forwarding must preserve initialization without reporting a binding, got %v %v", init, bind)
+	}
 	backend.calls = nil
 	if err := adapter.Replay(); err != nil {
 		t.Fatal(err)
@@ -286,13 +253,37 @@ func TestIptablesListParsingContract(t *testing.T) {
 		"1 0 0 DNAT tcp -- eth0 * 0.0.0.0/0 0.0.0.0/0 tcp dpt:8080 to:10.0.0.2:80",
 		"2 0 0 REDIRECT udp -- * * 0.0.0.0/0 0.0.0.0/0 udp dpts:9000:9001 redir ports 53",
 	}, "\n")
-	rules := parseIptablesRules(stdout)
+	rules := parseIptablesRules(stdout, forwarding.FamilyIPv4)
 	want := []forwarding.Rule{
-		{Num: "1", Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80", Interface: "eth0"},
-		{Num: "2", Protocol: "udp", Port: "9000-9001", TargetIP: "127.0.0.1", TargetPort: "53", Interface: "*"},
+		{Num: "1", Family: forwarding.FamilyIPv4, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80", Interface: "eth0"},
+		{Num: "2", Family: forwarding.FamilyIPv4, Protocol: "udp", Port: "9000-9001", TargetIP: "127.0.0.1", TargetPort: "53", Interface: "*"},
 	}
 	if !reflect.DeepEqual(rules, want) {
 		t.Fatalf("got %#v want %#v", rules, want)
+	}
+}
+
+func TestIptablesIPv6NATContract(t *testing.T) {
+	backend := &fakeIptablesBackend{stdout: map[string]string{}, ipv6: true}
+	adapter := &iptablesNATAdapter{provider: "iptables", backend: backend, system: &fakeForwardingSystem{}}
+	rule := forwarding.Rule{Family: forwarding.FamilyIPv6, Num: "2", Protocol: "tcp", Port: "8443", TargetIP: "2001:db8::20", TargetPort: "443", Interface: "eth0"}
+	if err := adapter.Operate(rule, forwarding.OperationAdd); err != nil {
+		t.Fatal(err)
+	}
+	wantPrefix := []backendCall{
+		{method: "run6", table: iptables_helper.NatTab, args: []string{"-A", forwarding.ChainPreRouting, "-i", "eth0", "-p", "tcp", "--dport", "8443", "-j", "DNAT", "--to-destination", "[2001:db8::20]:443"}},
+		{method: "run6", table: iptables_helper.NatTab, args: []string{"-A", forwarding.ChainPostRouting, "-d", "2001:db8::20", "-p", "tcp", "--dport", "443", "-j", "MASQUERADE"}},
+		{method: "run6", table: iptables_helper.FilterTab, args: []string{"-A", forwarding.ChainForward, "-d", "2001:db8::20", "-p", "tcp", "--dport", "443", "-j", "ACCEPT"}},
+		{method: "run6", table: iptables_helper.FilterTab, args: []string{"-A", forwarding.ChainForward, "-s", "2001:db8::20", "-p", "tcp", "--sport", "443", "-j", "ACCEPT"}},
+	}
+	if !reflect.DeepEqual(backend.calls[:4], wantPrefix) {
+		t.Fatalf("IPv6 add transcript changed\ngot  %#v\nwant %#v", backend.calls[:4], wantPrefix)
+	}
+
+	stdout := "1 0 0 DNAT tcp -- eth0 * ::/0 ::/0 tcp dpt:8443 to:[2001:db8::20]:443"
+	rules := parseIptablesRules(stdout, forwarding.FamilyIPv6)
+	if len(rules) != 1 || rules[0].Family != forwarding.FamilyIPv6 || rules[0].TargetIP != "2001:db8::20" || rules[0].TargetPort != "443" {
+		t.Fatalf("unexpected parsed IPv6 rules: %#v", rules)
 	}
 }
 
@@ -309,6 +300,14 @@ func TestEnableIPv4ForwardingReplacesDisabledSetting(t *testing.T) {
 		"",
 	}, "\n")
 	if got := enableIPv4Forwarding(content); got != want {
+		t.Fatalf("got %q want %q", got, want)
+	}
+}
+
+func TestEnableForwardingSysctlsAddsIPv6(t *testing.T) {
+	content := "net.ipv4.ip_forward = 0\nnet.ipv6.conf.all.forwarding=0\n"
+	want := "net.ipv4.ip_forward = 1\nnet.ipv6.conf.all.forwarding = 1\n"
+	if got := enableForwardingSysctls(content, true); got != want {
 		t.Fatalf("got %q want %q", got, want)
 	}
 }

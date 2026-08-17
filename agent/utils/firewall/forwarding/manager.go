@@ -92,8 +92,11 @@ func (m *Manager) Operate(operations []Operation, forceDelete bool) error {
 		shouldKeep := true
 		for index := range operations {
 			operation := &operations[index]
+			if operation.Family == "" {
+				operation.Family = FamilyIPv4
+			}
 			if operation.TargetIP == "" {
-				operation.TargetIP = "127.0.0.1"
+				operation.TargetIP = loopbackAddress(operation.Family)
 			}
 			if operation.Operation == OperationRemove && matches(*operation, rule) {
 				shouldKeep = false
@@ -124,12 +127,15 @@ func (m *Manager) Operate(operations []Operation, forceDelete bool) error {
 		return left > right
 	})
 	for _, operation := range operations {
+		if operation.Family == "" {
+			operation.Family = FamilyIPv4
+		}
+		if operation.TargetIP == "" {
+			operation.TargetIP = loopbackAddress(operation.Family)
+		}
 		for _, protocol := range strings.Split(operation.Protocol, "/") {
 			rule := operation.Rule
 			rule.Protocol = protocol
-			if rule.TargetIP == "" {
-				rule.TargetIP = "127.0.0.1"
-			}
 			if err := m.adapter.Operate(rule, operation.Operation); err != nil {
 				if forceDelete && operation.Operation == OperationRemove {
 					if global.LOG != nil {
@@ -146,16 +152,41 @@ func (m *Manager) Operate(operations []Operation, forceDelete bool) error {
 
 func (m *Manager) Enable() error { return m.adapter.Enable() }
 
+func (m *Manager) Cleanup() error { return m.adapter.Cleanup() }
+
+func (m *Manager) FamilyStatus(family string) (bool, bool, error) {
+	return m.adapter.FamilyStatus(family)
+}
+
 func (m *Manager) Replay() error { return m.adapter.Replay() }
 
 func (m *Manager) Name() string { return m.adapter.Name() }
 
 func matches(operation Operation, rule Rule) bool {
+	if operation.Family == "" {
+		operation.Family = FamilyIPv4
+	}
+	if rule.Family == "" {
+		rule.Family = FamilyIPv4
+	}
+	if operation.TargetIP == "" {
+		operation.TargetIP = loopbackAddress(operation.Family)
+	}
+	if rule.TargetIP == "" {
+		rule.TargetIP = loopbackAddress(rule.Family)
+	}
 	for _, protocol := range strings.Split(operation.Protocol, "/") {
 		if operation.Port == rule.Port && operation.TargetPort == rule.TargetPort && operation.TargetIP == rule.TargetIP &&
-			protocol == rule.Protocol && operation.Interface == rule.Interface {
+			operation.Family == rule.Family && protocol == rule.Protocol && operation.Interface == rule.Interface {
 			return true
 		}
 	}
 	return false
+}
+
+func loopbackAddress(family string) string {
+	if family == FamilyIPv6 {
+		return "::1"
+	}
+	return "127.0.0.1"
 }

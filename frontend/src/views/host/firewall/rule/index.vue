@@ -54,12 +54,24 @@
                         >
                             {{ $t('commons.button.delete') }}
                         </el-button>
+                        <el-button
+                            v-permission
+                            v-node-admin
+                            plain
+                            :disabled="allManagedRules.length === 0"
+                            @click="clearAllRules"
+                        >
+                            {{ $t('firewall.clearAllRules') }}
+                        </el-button>
                         <el-button-group>
                             <el-button v-permission v-node-admin @click="openImport">
                                 {{ $t('commons.button.import') }}
                             </el-button>
                             <el-button v-permission :disabled="selects.length === 0" @click="exportSelectedRules">
                                 {{ $t('commons.button.export') }}
+                            </el-button>
+                            <el-button v-permission :disabled="allManagedRules.length === 0" @click="exportAllRules">
+                                {{ $t('firewall.exportAllRules') }}
                             </el-button>
                         </el-button-group>
                     </template>
@@ -731,6 +743,8 @@ const allRows = computed<RuleRow[]>(() =>
     }),
 );
 
+const allManagedRules = computed(() => allRows.value.filter((row) => isEditableManagedRule(row)));
+
 const matchesRuleFamily = (rule: Firewall.Rule, family: Firewall.Family) => {
     if (rule.scope.family !== 'inet') return rule.scope.family === family;
 
@@ -923,11 +937,11 @@ const openImport = () => {
     ruleImportRef.value?.acceptParams(provider.value as Firewall.Provider);
 };
 
-const exportSelectedRules = async () => {
-    if (selects.value.length === 0) return;
+const exportRules = async (rows: RuleRow[]) => {
+    if (rows.length === 0) return;
     try {
         await ElMessageBox.confirm(
-            i18n.global.t('firewall.exportHelper', [selects.value.length]),
+            i18n.global.t('firewall.exportHelper', [rows.length]),
             i18n.global.t('commons.button.export'),
             {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -937,7 +951,7 @@ const exportSelectedRules = async () => {
     } catch {
         return;
     }
-    const exported = selects.value.map(({ rule }) => ({
+    const exported = rows.map(({ rule }) => ({
         ...rule,
         uuid: undefined,
         scope: { ...rule.scope },
@@ -945,18 +959,21 @@ const exportSelectedRules = async () => {
     downloadWithContent(JSON.stringify(exported, null, 2), `1panel-firewall-rules-${getCurrentDateFormatted()}.json`);
 };
 
-const removeSelectedRules = async () => {
-    const selected = selects.value.filter((row) => isEditableManagedRule(row));
+const exportSelectedRules = () => exportRules(selects.value.filter((row) => isEditableManagedRule(row)));
+
+const exportAllRules = () => exportRules(allManagedRules.value);
+
+const removeRules = async (selected: RuleRow[], clearAll = false) => {
     if (selected.length === 0) return;
     const usedBy = selected.flatMap((row) =>
         row.rule.action === 'accept' ? ruleUsageEntries(row).map((entry) => entry.owner) : [],
     );
-    const message = usedBy.length
-        ? `${i18n.global.t('firewall.deleteRuleConfirm', [selected.length])}\n${i18n.global.t(
-              'firewall.deleteUsedRuleConfirm',
-              [usedBy.join(', ')],
-          )}`
+    const baseMessage = clearAll
+        ? i18n.global.t('firewall.clearAllRulesHelper', [selected.length])
         : i18n.global.t('firewall.deleteRuleConfirm', [selected.length]);
+    const message = usedBy.length
+        ? `${baseMessage}\n${i18n.global.t('firewall.deleteUsedRuleConfirm', [usedBy.join(', ')])}`
+        : baseMessage;
     try {
         await ElMessageBox.confirm(message, i18n.global.t('commons.button.delete'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -982,6 +999,10 @@ const removeSelectedRules = async () => {
     await search();
     loading.value = false;
 };
+
+const removeSelectedRules = () => removeRules(selects.value.filter((row) => isEditableManagedRule(row)));
+
+const clearAllRules = () => removeRules(allManagedRules.value, true);
 
 const viewRawRule = async (row: RuleRow) => {
     let raw = row.observed?.raw?.trim();

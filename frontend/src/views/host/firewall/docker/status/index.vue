@@ -3,15 +3,15 @@
         <el-card>
             <div class="flex w-full flex-col gap-4 md:flex-row">
                 <div class="flex flex-wrap gap-4 ml-3">
-                    <el-tag effect="dark" type="success">iptables-docker</el-tag>
+                    <el-tag effect="dark" type="success">{{ base.name }}</el-tag>
                     <Status class="mt-0.5" :status="base.bound ? 'enable' : 'disable'" />
                     <el-tag v-if="!base.initialized" type="info">
                         {{ $t('firewall.notInitialized') }}
                     </el-tag>
-                    <el-tooltip :content="familyStatusDescription('IPv4', base.ipv4)" placement="top">
+                    <el-tooltip :content="familyStatusDescription('IPv4', base.ipv4)" placement="bottom">
                         <el-tag :type="familyStatusType(base.ipv4)">IPv4: {{ familyStatusLabel(base.ipv4) }}</el-tag>
                     </el-tooltip>
-                    <el-tooltip :content="familyStatusDescription('IPv6', base.ipv6)" placement="top">
+                    <el-tooltip :content="familyStatusDescription('IPv6', base.ipv6)" placement="bottom">
                         <el-tag :type="familyStatusType(base.ipv6)">IPv6: {{ familyStatusLabel(base.ipv6) }}</el-tag>
                     </el-tooltip>
                 </div>

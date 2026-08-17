@@ -30,6 +30,11 @@
                     :height="440"
                 >
                     <el-table-column type="selection" fix />
+                    <el-table-column label="IP" :min-width="60" prop="family">
+                        <template #default="{ row }">
+                            {{ row.family === 'ipv6' ? 'IPv6' : 'IPv4' }}
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" :min-width="80">
                         <template #default="{ row }">
                             <Status :status="row.status" />
@@ -40,7 +45,7 @@
                     <el-table-column :label="$t('firewall.targetIP')" :min-width="100" prop="targetIP" />
                     <el-table-column :label="$t('firewall.targetPort')" :min-width="70" prop="targetPort" />
                     <el-table-column
-                        v-if="currentFireName === 'ufw'"
+                        v-if="currentFireName === 'iptables' || currentFireName === 'nftables'"
                         :label="$t('firewall.forwardInboundInterface')"
                         :min-width="100"
                         prop="interface"
@@ -78,6 +83,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { operateForwardRule, searchForwardRule, getNetworkOptions } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
+import { checkIp, checkIpV6 } from '@/utils/validate';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -114,7 +120,7 @@ const loadCurrentData = async (fireName: string) => {
         pageSize: 10000,
     });
     currentRules.value = res.data.items || [];
-    if (fireName === 'ufw') {
+    if (fireName === 'iptables' || fireName === 'nftables') {
         const networkRes = await getNetworkOptions();
         availableInterfaces.value = networkRes.data || [];
     }
@@ -169,14 +175,20 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 };
 
 const checkDataFormat = (item: any): boolean => {
-    if (!item.protocol || !item.port || !item.targetIP || !item.targetPort) {
+    if (!item.family || !item.protocol || !item.targetIP || !item.port || !item.targetPort) {
         return false;
     }
+    if (!['ipv4', 'ipv6'].includes(item.family)) return false;
+    if (item.family === 'ipv6' ? checkIpV6(item.targetIP) : checkIp(item.targetIP)) return false;
     if (!['tcp', 'udp', 'tcp/udp'].includes(item.protocol)) {
         return false;
     }
 
-    if (currentFireName.value === 'ufw' && item.interface !== undefined && item.interface !== null) {
+    if (
+        (currentFireName.value === 'iptables' || currentFireName.value === 'nftables') &&
+        item.interface !== undefined &&
+        item.interface !== null
+    ) {
         const interfaceValue = item.interface;
         if (interfaceValue !== '' && interfaceValue !== 'all') {
             if (!availableInterfaces.value.includes(interfaceValue)) {
@@ -194,10 +206,10 @@ const compareRules = (importedRules: any[]) => {
     const duplicateRules: any[] = [];
 
     for (const importedRule of importedRules) {
-        const key = `${importedRule.protocol}:${importedRule.port}:${importedRule.targetIP}:${importedRule.targetPort}`;
+        const key = `${importedRule.family}:${importedRule.protocol}:${importedRule.port}:${importedRule.targetIP}:${importedRule.targetPort}:${importedRule.interface || ''}`;
 
         const existingRule = currentRules.value.find((rule) => {
-            const existingKey = `${rule.protocol}:${rule.port}:${rule.targetIP}:${rule.targetPort}`;
+            const existingKey = `${rule.family}:${rule.protocol}:${rule.port}:${rule.targetIP}:${rule.targetPort}:${rule.interface || ''}`;
             return existingKey === key;
         });
 
@@ -219,6 +231,7 @@ const onImport = async () => {
     for (const rule of selects.value) {
         rules.push({
             operation: 'add',
+            family: rule.family,
             protocol: rule.protocol,
             port: rule.port,
             targetIP: rule.targetIP,

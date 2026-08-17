@@ -11,10 +11,6 @@ import (
 var ErrVerificationFailed = errors.New("firewall rule verification failed")
 
 func ProtectSnapshot(snapshot Snapshot, ports []firewall.PortWhitelist) (Snapshot, error) {
-	protectedPorts := make(map[string]struct{}, len(ports))
-	for _, port := range ports {
-		protectedPorts[port.Port+"/"+port.Protocol] = struct{}{}
-	}
 	rules := append([]ObservedRule(nil), snapshot.Rules...)
 	for index := range rules {
 		rule := rules[index].Rule
@@ -23,16 +19,15 @@ func ProtectSnapshot(snapshot Snapshot, ports []firewall.PortWhitelist) (Snapsho
 			continue
 		}
 		protected := false
-		for protectedKey := range protectedPorts {
-			separator := strings.LastIndex(protectedKey, "/")
-			if separator < 1 {
+		for _, protectedPort := range ports {
+			family := strings.ToLower(strings.TrimSpace(protectedPort.Family))
+			if family != "" && rule.Scope.Family != FamilyInet && string(rule.Scope.Family) != family {
 				continue
 			}
-			protectedPort, protectedProtocol := protectedKey[:separator], protectedKey[separator+1:]
-			if rule.Protocol != "all" && rule.Protocol != protectedProtocol {
+			if rule.Protocol != "all" && rule.Protocol != protectedPort.Protocol {
 				continue
 			}
-			if portCovers(rule.DestinationPort, protectedPort) {
+			if portCovers(rule.DestinationPort, protectedPort.Port) {
 				protected = true
 				break
 			}
