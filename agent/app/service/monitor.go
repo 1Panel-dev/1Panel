@@ -155,6 +155,7 @@ func (m *MonitorService) LoadGPUOptions() dto.MonitorGPUOptions {
 			if (item.MaxPowerLimit == "" || item.MaxPowerLimit == "N/A") && (item.PowerDraw == "" || item.PowerDraw == "N/A") {
 				chartHide.Power = true
 			}
+			chartHide.PowerLimit = item.MaxPowerLimit == "" || item.MaxPowerLimit == "N/A"
 			chartHide.Temperature = item.Temperature == "" || item.Temperature == "N/A"
 			chartHide.Speed = item.FanSpeed == "" || item.FanSpeed == "N/A"
 			data.ChartHide = append(data.ChartHide, chartHide)
@@ -174,6 +175,7 @@ func (m *MonitorService) LoadGPUOptions() dto.MonitorGPUOptions {
 			var chartHide dto.GPUChartHide
 			chartHide.GPU = true
 			chartHide.Speed = true
+			chartHide.PowerLimit = true
 			chartHide.ProductName = fmt.Sprintf("%d - %s", item.Basic.DeviceID, item.Basic.DeviceName)
 			if (item.Stats.MemoryUsed == "" || item.Stats.MemoryUsed == "N/A") && (item.Basic.Memory == "" || item.Basic.FreeMemory == "N/A") {
 				chartHide.Memory = true
@@ -344,6 +346,7 @@ func (m *MonitorService) Run() {
 	_ = monitorRepo.DelMonitorBase(timeForDelete)
 	_ = monitorRepo.DelMonitorIO(timeForDelete)
 	_ = monitorRepo.DelMonitorNet(timeForDelete)
+	_ = monitorRepo.DelMonitorGPU(timeForDelete)
 }
 
 func (m *MonitorService) loadDiskIO() {
@@ -599,6 +602,7 @@ func saveGPUDataToDB() {
 	}
 	gpuInfo, err := client.LoadGpuInfo()
 	if err != nil {
+		global.LOG.Errorf("load gpu monitor data failed, err: %v", err)
 		return
 	}
 	var list []model.MonitorGPU
@@ -631,6 +635,7 @@ func saveXPUDataToDB() {
 	}
 	xpuInfo, err := client.LoadGpuInfo()
 	if err != nil {
+		global.LOG.Errorf("load xpu monitor data failed, err: %v", err)
 		return
 	}
 	var list []model.MonitorGPU

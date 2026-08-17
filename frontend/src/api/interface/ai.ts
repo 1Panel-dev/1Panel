@@ -28,6 +28,7 @@ export namespace AI {
         gpu: GPU[];
     }
     export interface GPU {
+        type: string;
         index: number;
         productName: string;
         persistenceMode: string;
@@ -63,6 +64,7 @@ export namespace AI {
         gpu: boolean;
         memory: boolean;
         power: boolean;
+        powerLimit: boolean;
         temperature: boolean;
         speed: boolean;
     }

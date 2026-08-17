@@ -144,6 +144,7 @@ export namespace Dashboard {
         inodesUsedPercent: number;
     }
     export interface GPUInfo {
+        type: string;
         index: number;
         productName: string;
         gpuUtil: string;

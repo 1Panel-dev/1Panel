@@ -9,6 +9,7 @@ type GpuInfo struct {
 }
 
 type GPU struct {
+	Type            string `json:"type"`
 	Index           uint   `json:"index"`
 	ProductName     string `json:"productName"`
 	PersistenceMode string `json:"persistenceMode"`

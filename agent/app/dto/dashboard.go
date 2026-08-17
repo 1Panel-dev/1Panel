@@ -156,6 +156,7 @@ type DiskInfo struct {
 }
 
 type GPUInfo struct {
+	Type             string `json:"type"`
 	Index            uint   `json:"index"`
 	ProductName      string `json:"productName"`
 	GPUUtil          string `json:"gpuUtil"`

@@ -23,6 +23,7 @@ func Parse(buf []byte, version string) (*common.GpuInfo, error) {
 	}
 	for i := 0; i < len(s.Gpu); i++ {
 		var gpuItem common.GPU
+		gpuItem.Type = "nvidia"
 		gpuItem.Index = uint(i)
 		gpuItem.ProductName = s.Gpu[i].ProductName
 		gpuItem.PersistenceMode = s.Gpu[i].PersistenceMode

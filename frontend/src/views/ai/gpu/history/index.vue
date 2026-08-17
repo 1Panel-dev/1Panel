@@ -319,13 +319,15 @@ function initMemoryCharts(baseDate: any, data: any) {
 }
 
 function initPowerCharts(baseDate: any, data: any) {
-    chartsOption.value['loadPowerChart'] = {
-        xData: baseDate,
-        yData: [
-            {
-                name: i18n.global.t('aiTools.gpu.powerCurrent'),
-                data: data.powerUsed,
-            },
+    const yData: any[] = [
+        {
+            name: i18n.global.t('aiTools.gpu.powerCurrent'),
+            data: data.powerUsed,
+        },
+    ];
+    const yAxis: any[] = [{ type: 'value', name: i18n.global.t('aiTools.gpu.power') }];
+    if (!currentHide.value?.powerLimit) {
+        yData.push(
             {
                 name: i18n.global.t('aiTools.gpu.powerLimit'),
                 data: data.powerTotal,
@@ -335,16 +337,18 @@ function initPowerCharts(baseDate: any, data: any) {
                 data: data.powerPercent,
                 yAxisIndex: 1,
             },
-        ],
-        yAxis: [
-            { type: 'value', name: i18n.global.t('aiTools.gpu.power') },
-            {
-                type: 'value',
-                name: i18n.global.t('aiTools.gpu.percent') + ' ( % )',
-                position: 'right',
-                alignTicks: true,
-            },
-        ],
+        );
+        yAxis.push({
+            type: 'value',
+            name: i18n.global.t('aiTools.gpu.percent') + ' ( % )',
+            position: 'right',
+            alignTicks: true,
+        });
+    }
+    chartsOption.value['loadPowerChart'] = {
+        xData: baseDate,
+        yData,
+        yAxis,
         grid: isMobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
         tooltip: {
             trigger: 'axis',
@@ -363,7 +367,7 @@ function initPowerCharts(baseDate: any, data: any) {
                 return res;
             },
         },
-        formatStr: '%',
+        formatStr: currentHide.value?.powerLimit ? 'W' : '%',
     };
 }
 
