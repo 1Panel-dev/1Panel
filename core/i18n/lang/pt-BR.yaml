@@ -443,7 +443,7 @@ UpdatePortFirewallReload: "Falha ao recarregar o firewall, {{ .err }}, por favor
 # aplicativo móvel
 ErrVerifyToken: 'Erro de verificação do token, por favor, reinicie e escaneie novamente.'
 ErrInvalidToken: 'Token inválido, por favor, reinicie e escaneie novamente.'
-ErrExpiredToken: 'O token expirou, por favor, reinicie e escaneie novamente.'
+ErrExpiredToken: 'O código QR não é mais válido. Gere um novo e escaneie novamente.'
 
 # exportação de comandos
 Name: "Nome"

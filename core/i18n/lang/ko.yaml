@@ -443,7 +443,7 @@ UpdatePortFirewallReload: "방화벽 다시 로드 실패 {{ .err }}, 방화벽�
 # 모바일 앱
 ErrVerifyToken: '토큰 검증 오류가 발생했습니다. 재설정 후 다시 스캔해 주세요.'
 ErrInvalidToken: '유효하지 않은 토큰입니다. 재설정 후 다시 스캔해 주세요.'
-ErrExpiredToken: '토큰이 만료되었습니다. 재설정 후 다시 스캔해 주세요.'
+ErrExpiredToken: 'QR 코드가 더 이상 유효하지 않습니다. 새로 생성한 후 다시 스캔해 주세요.'
 
 # 명령 내보내기
 Name: "이름"

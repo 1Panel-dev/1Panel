@@ -443,7 +443,7 @@ UpdatePortFirewallReload: "Failed to reload the firewall, {{ .err }}, manually r
 # mobile app
 ErrVerifyToken: 'Token verification failed. Reset and scan again.'
 ErrInvalidToken: 'Invalid token. Reset and scan again.'
-ErrExpiredToken: 'Token expired. Reset and scan again.'
+ErrExpiredToken: 'QR code is no longer valid. Generate a new one and scan again.'
 
 # command export
 Name: "Name"
