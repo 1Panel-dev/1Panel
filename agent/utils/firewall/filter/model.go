@@ -12,6 +12,7 @@ type Provider string
 
 const (
 	ProviderIptables  Provider = "iptables"
+	ProviderNftables  Provider = "nftables"
 	ProviderFirewalld Provider = "firewalld"
 	ProviderUFW       Provider = "ufw"
 )
@@ -122,7 +123,7 @@ func (s Scope) Normalize() Scope {
 	s.Chain = strings.TrimSpace(s.Chain)
 	s.Direction = Direction(strings.ToLower(strings.TrimSpace(string(s.Direction))))
 
-	if s.Provider == ProviderIptables {
+	if s.Provider == ProviderIptables || s.Provider == ProviderNftables {
 		s.Chain = strings.ToUpper(s.Chain)
 		if s.Chain == "" {
 			s.Chain = IptablesInputChain
@@ -138,6 +139,8 @@ func (s Scope) Key() string {
 	s = s.Normalize()
 	switch s.Provider {
 	case ProviderIptables:
+		fallthrough
+	case ProviderNftables:
 		return strings.Join([]string{string(s.Provider), string(s.Family), s.Table, s.Chain, string(s.Direction)}, ":")
 	case ProviderFirewalld:
 		return strings.Join([]string{string(s.Provider), s.Zone, string(s.Direction)}, ":")
@@ -162,6 +165,13 @@ func (s Scope) ValidateMVP() error {
 		if s.Table != "filter" || s.Zone != "" || s.Direction != DirectionInput || !isBasicChain(s.Chain) {
 			return fmt.Errorf("%w: %s", ErrUnsupportedScope, s.Key())
 		}
+	case ProviderNftables:
+		if s.Family != FamilyIPv4 && s.Family != FamilyIPv6 {
+			return fmt.Errorf("%w: nftables family %q", ErrUnsupportedScope, s.Family)
+		}
+		if s.Table != "filter" || s.Zone != "" || s.Direction != DirectionInput || !isBasicChain(s.Chain) {
+			return fmt.Errorf("%w: %s", ErrUnsupportedScope, s.Key())
+		}
 	case ProviderFirewalld:
 		if s.Table != "" || s.Chain != "" || s.Direction != DirectionInput || s.Zone != FirewalldInputZone {
 			return fmt.Errorf("%w: %s", ErrUnsupportedScope, s.Key())
@@ -179,7 +189,7 @@ func (s Scope) ValidateMVP() error {
 
 func (p Provider) valid() bool {
 	switch p {
-	case ProviderIptables, ProviderFirewalld, ProviderUFW:
+	case ProviderIptables, ProviderNftables, ProviderFirewalld, ProviderUFW:
 		return true
 	default:
 		return false
@@ -231,6 +241,13 @@ func MVPScopePatterns() []ScopePattern {
 	return []ScopePattern{
 		{
 			Provider:   ProviderIptables,
+			Families:   []Family{FamilyIPv4, FamilyIPv6},
+			Table:      "filter",
+			Chains:     []string{"1PANEL_BASIC_BEFORE", "1PANEL_BASIC", "1PANEL_BASIC_AFTER"},
+			Directions: []Direction{DirectionInput},
+		},
+		{
+			Provider:   ProviderNftables,
 			Families:   []Family{FamilyIPv4, FamilyIPv6},
 			Table:      "filter",
 			Chains:     []string{"1PANEL_BASIC_BEFORE", "1PANEL_BASIC", "1PANEL_BASIC_AFTER"},

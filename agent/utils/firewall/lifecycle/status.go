@@ -5,8 +5,6 @@ import (
 	"sync"
 )
 
-import ()
-
 type State struct {
 	Name     string
 	IsActive bool

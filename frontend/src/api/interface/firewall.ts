@@ -1,5 +1,5 @@
 export namespace Firewall {
-    export type Provider = 'iptables' | 'firewalld' | 'ufw';
+    export type Provider = 'iptables' | 'nftables' | 'firewalld' | 'ufw';
     export type Family = 'ipv4' | 'ipv6' | 'inet';
     export type Direction = 'input';
     export type Action = 'accept' | 'drop' | 'reject';

@@ -8,10 +8,13 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
-type Iptables struct{}
+type Iptables struct{ executable string }
 
-func NewIptables() (*Iptables, error) {
-	return &Iptables{}, nil
+func NewIptables(executable string) (*Iptables, error) {
+	if executable == "" {
+		executable = "iptables"
+	}
+	return &Iptables{executable: executable}, nil
 }
 
 func (i *Iptables) Name() string {
@@ -19,7 +22,7 @@ func (i *Iptables) Name() string {
 }
 
 func (i *Iptables) Status() (bool, error) {
-	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("iptables", "-L", "-n")
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout(i.executable, "-L", "-n")
 	if err != nil {
 		return false, err
 	}
@@ -40,7 +43,7 @@ func (i *Iptables) Restart() error {
 }
 
 func (i *Iptables) Version() (string, error) {
-	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("iptables", "--version")
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout(i.executable, "--version")
 	if err != nil {
 		return "", fmt.Errorf("failed to get iptables version: %w", err)
 	}

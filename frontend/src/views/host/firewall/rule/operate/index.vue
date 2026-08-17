@@ -547,7 +547,7 @@ const buildRule = (
     return {
         ...(editingRule.value || {}),
         scope:
-            provider.value === 'iptables'
+            provider.value === 'iptables' || provider.value === 'nftables'
                 ? {
                       provider: provider.value,
                       family: source.family,

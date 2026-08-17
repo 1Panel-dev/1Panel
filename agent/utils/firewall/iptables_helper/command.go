@@ -8,14 +8,19 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
 const (
-	ChainInput             = "INPUT"
-	Chain1PanelBasicBefore = "1PANEL_BASIC_BEFORE"
-	Chain1PanelBasic       = "1PANEL_BASIC"
-	Chain1PanelBasicAfter  = "1PANEL_BASIC_AFTER"
+	InputChain       = "INPUT"
+	BasicBeforeChain = "1PANEL_BASIC_BEFORE"
+	BasicChain       = "1PANEL_BASIC"
+	BasicAfterChain  = "1PANEL_BASIC_AFTER"
 )
+
+func BasicChains() []string {
+	return []string{BasicBeforeChain, BasicChain, BasicAfterChain}
+}
 
 const (
 	EstablishedRule = "-m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT -m comment --comment \"ESTABLISHED Whitelist\""
@@ -52,7 +57,11 @@ func runTables(executable, tab string, ignoreExist1, withWait bool, ruleArgs ...
 }
 
 func runIptables(tab string, ignoreExist1, withWait bool, ruleArgs ...string) (string, error) {
-	return runTables("iptables", tab, ignoreExist1, withWait, ruleArgs...)
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil {
+		return "", err
+	}
+	return runTables(commands.IPv4, tab, ignoreExist1, withWait, ruleArgs...)
 }
 
 func RunWithStd(tab string, args ...string) (string, error) {
@@ -65,7 +74,14 @@ func RunWithStd(tab string, args ...string) (string, error) {
 }
 
 func RunIPv6WithStd(tab string, args ...string) (string, error) {
-	stdout, err := runTables("ip6tables", tab, true, true, args...)
+	commands, executableErr := lifecycle.ResolveIptablesCommands()
+	if executableErr != nil {
+		return "", executableErr
+	}
+	if !commands.IPv6Available() {
+		return "", fmt.Errorf("ip6tables command family is unavailable")
+	}
+	stdout, err := runTables(commands.IPv6, tab, true, true, args...)
 	if err != nil {
 		global.LOG.Errorf("ip6tables command failed [table=%s, args=%s]: %v", tab, strings.Join(args, " "), err)
 		return stdout, err
@@ -139,7 +155,11 @@ func UnbindIPv6Chain(tab, parentChain, chain string) error {
 
 func CheckIPv6RuleExist(tab, chain string, ruleArgs ...string) bool {
 	args := append([]string{"-C", chain}, ruleArgs...)
-	_, err := runTables("ip6tables", tab, false, false, args...)
+	commands, executableErr := lifecycle.ResolveIptablesCommands()
+	if executableErr != nil || !commands.IPv6Available() {
+		return false
+	}
+	_, err := runTables(commands.IPv6, tab, false, false, args...)
 	return err == nil
 }
 
@@ -253,7 +273,11 @@ func UnbindChain(tab, targetChain, chain string) error {
 
 func FindChainNum(tab, targetChain, chain string) (int, error) {
 	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(60*time.Second))
-	commandName, commandArgs := cmd.WrapWithOptionalSudo("iptables", "-w", "-t", tab, "-L", targetChain, "--line-numbers", "-n")
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil {
+		return 0, err
+	}
+	commandName, commandArgs := cmd.WrapWithOptionalSudo(commands.IPv4, "-w", "-t", tab, "-L", targetChain, "--line-numbers", "-n")
 	stdout, err := cmdMgr.RunPipe(
 		cmd.PipeCommand{Name: commandName, Args: commandArgs},
 		cmd.PipeCommand{Name: "grep", Args: []string{"-w", chain}},

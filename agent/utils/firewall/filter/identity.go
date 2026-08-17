@@ -161,7 +161,7 @@ func validatedLocator(locator Locator, scope Scope) (Locator, error) {
 	if locator.Provider != scope.Provider || locator.ScopeKey != scope.Key() {
 		return Locator{}, fmt.Errorf("%w: locator does not belong to scope %q", ErrInvalidRule, scope.Key())
 	}
-	if (scope.Provider == ProviderIptables || scope.Provider == ProviderUFW) && locator.Position == nil {
+	if (scope.Provider == ProviderIptables || scope.Provider == ProviderNftables || scope.Provider == ProviderUFW) && locator.Position == nil {
 		return Locator{}, fmt.Errorf("%w: ordered scope %q requires locator position", ErrInvalidRule, scope.Key())
 	}
 	return locator, nil

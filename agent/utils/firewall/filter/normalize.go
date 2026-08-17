@@ -84,7 +84,10 @@ func NormalizeRule(rule FirewallRule) (FirewallRule, error) {
 		}
 	}
 	rule.Interface = strings.TrimSpace(rule.Interface)
-	rule.ConnectionStates = normalizeSet(rule.ConnectionStates, true)
+	rule.ConnectionStates, err = normalizeConnectionStates(rule.ConnectionStates, rule.Scope.Provider)
+	if err != nil {
+		return FirewallRule{}, err
+	}
 	rule.OrderBucket = strings.ToLower(strings.TrimSpace(rule.OrderBucket))
 	rule.Description = strings.TrimSpace(rule.Description)
 	return rule, nil
@@ -361,6 +364,26 @@ func normalizeSet(values []string, lower bool) []string {
 	}
 	sort.Strings(result)
 	return result
+}
+
+func normalizeConnectionStates(values []string, provider Provider) ([]string, error) {
+	states := normalizeSet(values, true)
+	if len(states) == 0 {
+		return nil, nil
+	}
+	allowed := map[string]struct{}{
+		"new": {}, "established": {}, "related": {}, "invalid": {}, "untracked": {},
+	}
+	if provider == ProviderIptables {
+		allowed["snat"] = struct{}{}
+		allowed["dnat"] = struct{}{}
+	}
+	for _, state := range states {
+		if _, ok := allowed[state]; !ok {
+			return nil, fmt.Errorf("%w: unsupported connection state %q", ErrInvalidRule, state)
+		}
+	}
+	return states, nil
 }
 
 func hasCompositeValue(value string) bool {

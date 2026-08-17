@@ -1,4 +1,4 @@
-package iptables_helper
+package firewall
 
 import (
 	"fmt"

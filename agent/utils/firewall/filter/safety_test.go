@@ -1,6 +1,10 @@
 package filter
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
+)
 
 func TestProtectSnapshotTreatsAllProtocolAsCoveringProtectedTransport(t *testing.T) {
 	scope := Scope{Provider: ProviderUFW, Family: FamilyIPv4, Chain: UFWInputChain, Direction: DirectionInput}
@@ -14,7 +18,7 @@ func TestProtectSnapshotTreatsAllProtocolAsCoveringProtectedTransport(t *testing
 		t.Fatalf("create snapshot: %v", err)
 	}
 
-	protected, err := ProtectSnapshot(snapshot, []ProtectedPort{{Port: "22", Protocol: "tcp"}})
+	protected, err := ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Port: "22", Protocol: "tcp"}})
 	if err != nil {
 		t.Fatalf("protect snapshot: %v", err)
 	}
@@ -36,7 +40,7 @@ func TestProtectSnapshotMarksBareUFWPortForBothFamilies(t *testing.T) {
 		if err != nil {
 			t.Fatalf("create %s snapshot: %v", family, err)
 		}
-		protected, err := ProtectSnapshot(snapshot, []ProtectedPort{{Port: "22", Protocol: "tcp"}})
+		protected, err := ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Port: "22", Protocol: "tcp"}})
 		if err != nil {
 			t.Fatalf("protect %s snapshot: %v", family, err)
 		}
@@ -57,7 +61,7 @@ func TestProtectSnapshotMatchesPortSetsAndRanges(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create snapshot: %v", err)
 	}
-	protected, err := ProtectSnapshot(snapshot, []ProtectedPort{{Port: "22", Protocol: "tcp"}, {Port: "8080", Protocol: "tcp"}})
+	protected, err := ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Port: "22", Protocol: "tcp"}, {Port: "8080", Protocol: "tcp"}})
 	if err != nil {
 		t.Fatalf("protect snapshot: %v", err)
 	}

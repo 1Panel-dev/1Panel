@@ -38,7 +38,7 @@ func commandKey(name string, args ...string) string {
 }
 
 func TestForwardingAdapterFactoryContract(t *testing.T) {
-	for _, name := range []string{"firewalld", "ufw", "iptables"} {
+	for _, name := range []string{"firewalld", "ufw", "iptables", "nftables"} {
 		adapter, err := New(name)
 		if err != nil {
 			t.Fatalf("%s: %v", name, err)
@@ -49,6 +49,10 @@ func TestForwardingAdapterFactoryContract(t *testing.T) {
 		if name == "firewalld" {
 			if _, ok := adapter.(*firewalldAdapter); !ok {
 				t.Fatalf("firewalld must use its native forwarding adapter, got %T", adapter)
+			}
+		} else if name == "nftables" {
+			if _, ok := adapter.(*nftablesAdapter); !ok {
+				t.Fatalf("nftables must use its native forwarding adapter, got %T", adapter)
 			}
 		} else if _, ok := adapter.(*iptablesNATAdapter); !ok {
 			t.Fatalf("%s must use the iptables forwarding adapter, got %T", name, adapter)

@@ -11,6 +11,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
 const (
@@ -20,11 +21,22 @@ const (
 )
 
 func SaveRulesToFile(tab, chain, fileName string) error {
-	return saveRulesToFile("iptables", tab, chain, fileName)
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil {
+		return err
+	}
+	return saveRulesToFile(commands.IPv4, tab, chain, fileName)
 }
 
 func SaveIPv6RulesToFile(tab, chain, fileName string) error {
-	return saveRulesToFile("ip6tables", tab, chain, fileName)
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil {
+		return err
+	}
+	if !commands.IPv6Available() {
+		return fmt.Errorf("ip6tables command family is unavailable")
+	}
+	return saveRulesToFile(commands.IPv6, tab, chain, fileName)
 }
 
 func IPv6FileName(fileName string) string {
@@ -36,7 +48,7 @@ func saveRulesToFile(executable, tab, chain, fileName string) error {
 
 	var stdout string
 	var err error
-	if executable == "ip6tables" {
+	if strings.HasPrefix(path.Base(executable), "ip6tables") {
 		stdout, err = RunIPv6WithStd(tab, "-S", chain)
 	} else {
 		stdout, err = RunWithStd(tab, "-S", chain)
@@ -100,16 +112,27 @@ func saveRulesToFile(executable, tab, chain, fileName string) error {
 }
 
 func LoadRulesFromFile(tab, chain, fileName string) error {
-	return loadRulesFromFile("iptables", "iptables-restore", tab, chain, fileName)
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil {
+		return err
+	}
+	return loadRulesFromFile(commands.IPv4, commands.Restore4, tab, chain, fileName)
 }
 
 func LoadIPv6RulesFromFile(tab, chain, fileName string) error {
-	return loadRulesFromFile("ip6tables", "ip6tables-restore", tab, chain, fileName)
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil {
+		return err
+	}
+	if !commands.IPv6Available() {
+		return fmt.Errorf("ip6tables command family is unavailable")
+	}
+	return loadRulesFromFile(commands.IPv6, commands.Restore6, tab, chain, fileName)
 }
 
 func loadRulesFromFile(executable, restoreExecutable, tab, chain, fileName string) error {
 	var err error
-	if executable == "ip6tables" {
+	if strings.HasPrefix(path.Base(executable), "ip6tables") {
 		err = AddIPv6Chain(tab, chain)
 	} else {
 		err = AddChain(tab, chain)
@@ -128,7 +151,7 @@ func loadRulesFromFile(executable, restoreExecutable, tab, chain, fileName strin
 		return err
 	}
 	rules := strings.Split(string(data), "\n")
-	if executable == "ip6tables" {
+	if strings.HasPrefix(path.Base(executable), "ip6tables") {
 		err = RunIPv6(tab, "-F", chain)
 	} else {
 		err = ClearChain(tab, chain)

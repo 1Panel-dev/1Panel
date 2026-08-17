@@ -3,11 +3,12 @@ package iptables_helper
 import (
 	"fmt"
 
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
 func EnsureIPv6BaseChains(panelPort string) error {
-	if !cmd.Which("ip6tables") || !cmd.Which("ip6tables-restore") {
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil || !commands.IPv6Available() {
 		return fmt.Errorf("ip6tables and ip6tables-restore are required")
 	}
 	if panelPort == "" {
@@ -17,9 +18,9 @@ func EnsureIPv6BaseChains(panelPort string) error {
 		name string
 		file string
 	}{
-		{name: Chain1PanelBasicBefore, file: IPv6FileName(BasicBeforeFileName)},
-		{name: Chain1PanelBasic, file: IPv6FileName(BasicFileName)},
-		{name: Chain1PanelBasicAfter, file: IPv6FileName(BasicAfterFileName)},
+		{name: BasicBeforeChain, file: IPv6FileName(BasicBeforeFileName)},
+		{name: BasicChain, file: IPv6FileName(BasicFileName)},
+		{name: BasicAfterChain, file: IPv6FileName(BasicAfterFileName)},
 	}
 	for _, chain := range chains {
 		exists, err := CheckIPv6ChainExist(FilterTab, chain.name)
@@ -38,12 +39,12 @@ func EnsureIPv6BaseChains(panelPort string) error {
 		{"-p", "tcp", "-m", "tcp", "--dport", panelPort, "-j", "ACCEPT", "-m", "comment", "--comment", "1Panel Port Whitelist"},
 	}
 	for _, rule := range protectedRules {
-		if err := AddIPv6Rule(FilterTab, Chain1PanelBasicBefore, rule...); err != nil {
+		if err := AddIPv6Rule(FilterTab, BasicBeforeChain, rule...); err != nil {
 			return err
 		}
 	}
 	for index, chain := range chains {
-		if err := BindIPv6Chain(FilterTab, ChainInput, chain.name, index+1); err != nil {
+		if err := BindIPv6Chain(FilterTab, InputChain, chain.name, index+1); err != nil {
 			return err
 		}
 		if err := SaveIPv6RulesToFile(FilterTab, chain.name, chain.file); err != nil {
@@ -54,11 +55,12 @@ func EnsureIPv6BaseChains(panelPort string) error {
 }
 
 func UnbindIPv6BaseChains() error {
-	if !cmd.Which("ip6tables") {
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil || !commands.IPv6Available() {
 		return nil
 	}
-	for _, chain := range []string{Chain1PanelBasicAfter, Chain1PanelBasic, Chain1PanelBasicBefore} {
-		if err := UnbindIPv6Chain(FilterTab, ChainInput, chain); err != nil {
+	for _, chain := range []string{BasicAfterChain, BasicChain, BasicBeforeChain} {
+		if err := UnbindIPv6Chain(FilterTab, InputChain, chain); err != nil {
 			return err
 		}
 	}

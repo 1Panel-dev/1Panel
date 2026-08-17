@@ -19,12 +19,15 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	filterfirewalld "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/providers/firewalld"
 	filteriptables "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/providers/iptables"
+	filternftables "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/providers/nftables"
 	filterufw "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/providers/ufw"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/ping"
 	"gorm.io/gorm"
 )
@@ -33,7 +36,7 @@ type FirewallService struct {
 	rules            repo.IFirewallRuleRepo
 	adapters         firewallRuleRuntimeRegistry
 	selectedProvider func(context.Context) (filter.Provider, error)
-	iptablesHelper   *iptables_helper.IptablesManager
+	iptablesHelper   *iptables_helper.Manager
 }
 
 var firewallRuleMutationMu sync.Mutex
@@ -81,7 +84,7 @@ func (u *FirewallService) LoadBaseInfo(tab string) (dto.FirewallBaseInfo, error)
 	if err != nil {
 		return baseInfo, err
 	}
-	isInit, isBind, err := iptables_helper.LoadInitStatus(status.Name, tab)
+	isInit, isBind, err := loadFirewallInitStatus(status.Name, tab)
 	if err != nil {
 		return baseInfo, err
 	}
@@ -117,11 +120,18 @@ func (u *FirewallService) OperateFirewall(req dto.FirewallOperation) error {
 }
 
 func (u *FirewallService) OperateFilterChain(req dto.IptablesOp) error {
-	operation := iptables_helper.BaseOperation(req.Operate)
-	if err := u.iptablesHelper.Operate(operation); err != nil {
+	provider, err := lifecycle.DetectProvider()
+	if err != nil {
 		return err
 	}
-	if operation != iptables_helper.BaseOperationInit && operation != iptables_helper.BaseOperationBind {
+	if provider == "nftables" {
+		if err := newNftablesHelperManager().Operate(firewall.BaseOperation(req.Operate)); err != nil {
+			return err
+		}
+	} else if err := u.iptablesHelper.Operate(firewall.BaseOperation(req.Operate)); err != nil {
+		return err
+	}
+	if req.Operate != string(firewall.BaseOperationInit) && req.Operate != string(firewall.BaseOperationBind) {
 		return nil
 	}
 	ports, err := loadConfiguredFirewallPortWhiteList()
@@ -512,15 +522,19 @@ func OperateFirewallPort(oldPorts, newPorts []int) error {
 	if err != nil {
 		return err
 	}
-	if state.Name == "iptables" {
-		isInit, _, err := iptables_helper.LoadInitStatus(state.Name, "base")
+	if state.Name == "iptables" || state.Name == "nftables" {
+		isInit, _, err := loadDirectFirewallInitStatus(state.Name)
 		if err != nil {
 			return err
 		}
 		if !isInit {
 			return nil
 		}
-		if err := newIptablesHelperManager().SyncRequiredPorts(true); err != nil {
+		if state.Name == "iptables" {
+			if err := newIptablesHelperManager().SyncRequiredPorts(true); err != nil {
+				return err
+			}
+		} else if err := newNftablesHelperManager().SyncRequiredPorts(); err != nil {
 			return err
 		}
 	} else if !state.IsActive {
@@ -530,19 +544,19 @@ func OperateFirewallPort(oldPorts, newPorts []int) error {
 	if err != nil {
 		return err
 	}
-	currentSet := iptables_helper.PortWhitelistMap(current)
-	previous := make([]iptables_helper.PortWhitelist, 0, len(oldPorts))
+	currentSet := firewall.PortWhitelistMap(current)
+	previous := make([]firewall.PortWhitelist, 0, len(oldPorts))
 	for _, port := range oldPorts {
-		item := iptables_helper.PortWhitelist{Port: strconv.Itoa(port), Protocol: "tcp"}
-		if _, stillRequired := currentSet[iptables_helper.PortWhitelistKey(item)]; !stillRequired {
+		item := firewall.PortWhitelist{Port: strconv.Itoa(port), Protocol: "tcp"}
+		if _, stillRequired := currentSet[firewall.PortWhitelistKey(item)]; !stillRequired {
 			previous = append(previous, item)
 		}
 	}
-	added := make([]iptables_helper.PortWhitelist, 0, len(newPorts))
+	added := make([]firewall.PortWhitelist, 0, len(newPorts))
 	for _, port := range newPorts {
-		added = append(added, iptables_helper.PortWhitelist{Port: strconv.Itoa(port), Protocol: "tcp"})
+		added = append(added, firewall.PortWhitelist{Port: strconv.Itoa(port), Protocol: "tcp"})
 	}
-	if state.Name == "iptables" {
+	if state.Name == "iptables" || state.Name == "nftables" {
 		required, err := loadRequiredFirewallPortWhiteList()
 		if err != nil {
 			return err
@@ -597,14 +611,10 @@ func firewallRuleSnapshotPolicy(_ context.Context, snapshot filter.Snapshot) (fi
 	if err != nil {
 		return filter.Snapshot{}, err
 	}
-	protectedPorts := make([]filter.ProtectedPort, 0, len(ports))
-	for _, port := range ports {
-		protectedPorts = append(protectedPorts, filter.ProtectedPort{Port: port.Port, Protocol: port.Protocol})
-	}
-	return filter.ProtectSnapshot(snapshot, protectedPorts)
+	return filter.ProtectSnapshot(snapshot, ports)
 }
 
-func loadConfiguredFirewallPortWhiteList() ([]iptables_helper.PortWhitelist, error) {
+func loadConfiguredFirewallPortWhiteList() ([]firewall.PortWhitelist, error) {
 	value, err := settingRepo.GetValueByKey(constant.FirewallPortWhiteList)
 	if err != nil {
 		value = constant.FirewallPortWhiteListValue
@@ -612,10 +622,10 @@ func loadConfiguredFirewallPortWhiteList() ([]iptables_helper.PortWhitelist, err
 			return nil, err
 		}
 	}
-	return iptables_helper.ParsePortWhitelist(value)
+	return firewall.ParsePortWhitelist(value)
 }
 
-func loadFirewallPortWhiteList() ([]iptables_helper.PortWhitelist, error) {
+func loadFirewallPortWhiteList() ([]firewall.PortWhitelist, error) {
 	configured, err := loadConfiguredFirewallPortWhiteList()
 	if err != nil {
 		return nil, err
@@ -624,15 +634,15 @@ func loadFirewallPortWhiteList() ([]iptables_helper.PortWhitelist, error) {
 	if err != nil {
 		return nil, err
 	}
-	return iptables_helper.NormalizePortWhitelist(append(configured, required...)), nil
+	return firewall.NormalizePortWhitelist(append(configured, required...)), nil
 }
 
-func loadRequiredFirewallPortWhiteList() ([]iptables_helper.PortWhitelist, error) {
+func loadRequiredFirewallPortWhiteList() ([]firewall.PortWhitelist, error) {
 	panelPort := LoadPanelPort()
 	if panelPort == "" {
 		return nil, fmt.Errorf("find 1panel service port failed")
 	}
-	return iptables_helper.NormalizePortWhitelist([]iptables_helper.PortWhitelist{
+	return firewall.NormalizePortWhitelist([]firewall.PortWhitelist{
 		{Port: panelPort, Protocol: "tcp"},
 		{Port: loadSSHPort(), Protocol: "tcp"},
 	}), nil
@@ -647,8 +657,8 @@ func syncFirewallPortWhiteListAfterUpdate(oldValue string) error {
 	if err != nil {
 		return err
 	}
-	if state.Name == "iptables" {
-		isInit, _, err := iptables_helper.LoadInitStatus(state.Name, "base")
+	if state.Name == "iptables" || state.Name == "nftables" {
+		isInit, _, err := loadDirectFirewallInitStatus(state.Name)
 		if err != nil {
 			return err
 		}
@@ -662,7 +672,7 @@ func syncFirewallPortWhiteListAfterUpdate(oldValue string) error {
 	if err != nil {
 		return err
 	}
-	oldPorts, err := iptables_helper.ParsePortWhitelist(oldValue)
+	oldPorts, err := firewall.ParsePortWhitelist(oldValue)
 	if err != nil {
 		return err
 	}
@@ -670,34 +680,62 @@ func syncFirewallPortWhiteListAfterUpdate(oldValue string) error {
 	if err != nil {
 		return err
 	}
-	if state.Name == "iptables" {
+	if state.Name == "iptables" || state.Name == "nftables" {
 		ports = excludeFirewallPorts(ports, required)
 		oldPorts = excludeFirewallPorts(oldPorts, required)
 	} else {
-		ports = iptables_helper.NormalizePortWhitelist(append(ports, required...))
-		oldPorts = iptables_helper.NormalizePortWhitelist(append(oldPorts, required...))
+		ports = firewall.NormalizePortWhitelist(append(ports, required...))
+		oldPorts = firewall.NormalizePortWhitelist(append(oldPorts, required...))
 	}
 	return syncManagedAcceptedPorts(oldPorts, ports)
 }
 
-func newIptablesHelperManager() *iptables_helper.IptablesManager {
-	return &iptables_helper.IptablesManager{
+func newIptablesHelperManager() *iptables_helper.Manager {
+	return &iptables_helper.Manager{
 		UpdateSetting:     settingRepo.Update,
 		PanelPort:         LoadPanelPort,
 		LoadRequiredPorts: loadRequiredFirewallPortWhiteList,
 	}
 }
 
+func newNftablesHelperManager() *nftables_helper.Manager {
+	return &nftables_helper.Manager{
+		UpdateSetting:     settingRepo.Update,
+		LoadRequiredPorts: loadRequiredFirewallPortWhiteList,
+	}
+}
+
+func loadDirectFirewallInitStatus(provider string) (bool, bool, error) {
+	return loadFirewallInitStatus(provider, "base")
+}
+
+func loadFirewallInitStatus(provider, tab string) (bool, bool, error) {
+	switch provider {
+	case "firewalld", "ufw":
+		return true, true, nil
+	case "nftables":
+		return nftables_helper.LoadInitStatus(tab)
+	case "iptables":
+		return iptables_helper.LoadInitStatus(tab)
+	default:
+		return false, false, fmt.Errorf("unsupported firewall provider: %s", provider)
+	}
+}
+
 func (u *FirewallService) addPortsBeforeStart(client lifecycle.Client) error {
-	if client.Name() == "iptables" {
-		isInit, _, err := iptables_helper.LoadInitStatus(client.Name(), "base")
+	if client.Name() == "iptables" || client.Name() == "nftables" {
+		isInit, _, err := loadDirectFirewallInitStatus(client.Name())
 		if err != nil {
 			return err
 		}
 		if !isInit {
 			return nil
 		}
-		if err := newIptablesHelperManager().SyncRequiredPorts(true); err != nil {
+		if client.Name() == "iptables" {
+			if err := newIptablesHelperManager().SyncRequiredPorts(true); err != nil {
+				return err
+			}
+		} else if err := newNftablesHelperManager().SyncRequiredPorts(); err != nil {
 			return err
 		}
 		configured, err := loadConfiguredFirewallPortWhiteList()
@@ -717,12 +755,12 @@ func (u *FirewallService) addPortsBeforeStart(client lifecycle.Client) error {
 	return u.SyncSystemPorts(context.Background(), nil, systemPorts(portWhiteList))
 }
 
-func syncManagedAcceptedPorts(previous, current []iptables_helper.PortWhitelist) error {
+func syncManagedAcceptedPorts(previous, current []firewall.PortWhitelist) error {
 	return newFirewallService().
 		SyncSystemPorts(context.Background(), systemPorts(previous), systemPorts(current))
 }
 
-func systemPorts(ports []iptables_helper.PortWhitelist) []dto.FirewallSystemPort {
+func systemPorts(ports []firewall.PortWhitelist) []dto.FirewallSystemPort {
 	result := make([]dto.FirewallSystemPort, 0, len(ports))
 	for _, port := range ports {
 		result = append(result, dto.FirewallSystemPort{Port: port.Port, Protocol: port.Protocol})
@@ -730,11 +768,11 @@ func systemPorts(ports []iptables_helper.PortWhitelist) []dto.FirewallSystemPort
 	return result
 }
 
-func excludeFirewallPorts(ports, excluded []iptables_helper.PortWhitelist) []iptables_helper.PortWhitelist {
-	excludedSet := iptables_helper.PortWhitelistMap(excluded)
-	result := make([]iptables_helper.PortWhitelist, 0, len(ports))
+func excludeFirewallPorts(ports, excluded []firewall.PortWhitelist) []firewall.PortWhitelist {
+	excludedSet := firewall.PortWhitelistMap(excluded)
+	result := make([]firewall.PortWhitelist, 0, len(ports))
 	for _, port := range ports {
-		if _, exists := excludedSet[iptables_helper.PortWhitelistKey(port)]; !exists {
+		if _, exists := excludedSet[firewall.PortWhitelistKey(port)]; !exists {
 			result = append(result, port)
 		}
 	}
@@ -1336,9 +1374,23 @@ func (s *FirewallService) deleteSystemPort(ctx context.Context, port dto.Firewal
 }
 
 func (s *FirewallService) systemPortRecords(ctx context.Context, port dto.FirewallSystemPort) ([]model.FirewallRule, error) {
-	return s.rules.List(ctx,
+	provider, err := s.selectedProvider(ctx)
+	if err != nil {
+		return nil, err
+	}
+	records, err := s.rules.List(ctx,
 		repo.WithFirewallRuleSource(constant.FirewallRuleSourceSecurity, constant.FirewallSystemAcceptedPortSourcePrefix+systemPortKey(port)),
 	)
+	if err != nil {
+		return nil, err
+	}
+	filtered := make([]model.FirewallRule, 0, len(records))
+	for _, record := range records {
+		if filter.Provider(record.Provider) == provider {
+			filtered = append(filtered, record)
+		}
+	}
+	return filtered, nil
 }
 
 func (s *FirewallService) adoptExternalSystemPort(ctx context.Context, port dto.FirewallSystemPort) (bool, error) {
@@ -1374,7 +1426,7 @@ func (s *FirewallService) adoptExternalSystemPort(ctx context.Context, port dto.
 func systemPortRule(provider filter.Provider, port dto.FirewallSystemPort) filter.FirewallRule {
 	scope := filter.Scope{Provider: provider, Direction: filter.DirectionInput}
 	switch provider {
-	case filter.ProviderIptables:
+	case filter.ProviderIptables, filter.ProviderNftables:
 		scope.Family = filter.FamilyIPv4
 		scope.Table = "filter"
 	case filter.ProviderFirewalld:
@@ -1427,6 +1479,7 @@ type firewallRuleRuntimeRegistry map[filter.Provider]*firewallRuleRuntime
 func newFirewallRuleRuntimeRegistry(policy firewallSnapshotPolicy) firewallRuleRuntimeRegistry {
 	return firewallRuleRuntimeRegistry{
 		filter.ProviderIptables:  newFirewallRuleRuntime(filteriptables.NewAdapter(), policy),
+		filter.ProviderNftables:  newFirewallRuleRuntime(filternftables.NewAdapter(), policy),
 		filter.ProviderFirewalld: newFirewallRuleRuntime(filterfirewalld.NewAdapter(), policy),
 		filter.ProviderUFW:       newFirewallRuleRuntime(filterufw.NewAdapter(), policy),
 	}
@@ -1784,7 +1837,7 @@ func firewallRuleSemanticModel(rule filter.FirewallRule) (model.FirewallRule, er
 }
 
 func persistedFirewallOrderIndex(rule filter.FirewallRule) *int64 {
-	if rule.Scope.Provider == filter.ProviderIptables || rule.Scope.Provider == filter.ProviderUFW {
+	if rule.Scope.Provider == filter.ProviderIptables || rule.Scope.Provider == filter.ProviderNftables || rule.Scope.Provider == filter.ProviderUFW {
 		return nil
 	}
 	return rule.OrderIndex
@@ -1794,7 +1847,7 @@ func firewallRuleLocation(scope filter.Scope) string {
 	switch scope.Provider {
 	case filter.ProviderFirewalld:
 		return scope.Zone
-	case filter.ProviderIptables, filter.ProviderUFW:
+	case filter.ProviderIptables, filter.ProviderNftables, filter.ProviderUFW:
 		return scope.Chain
 	default:
 		return ""
@@ -1888,7 +1941,7 @@ func desiredFirewallRuleFromModel(stored model.FirewallRule) (filter.DesiredRule
 		Provider: filter.Provider(stored.Provider), Family: filter.Family(stored.Family), Direction: filter.DirectionInput,
 	}
 	switch scope.Provider {
-	case filter.ProviderIptables:
+	case filter.ProviderIptables, filter.ProviderNftables:
 		scope.Table = "filter"
 		scope.Chain = stored.Location
 	case filter.ProviderFirewalld:

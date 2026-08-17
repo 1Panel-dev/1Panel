@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
 const (
@@ -70,16 +71,40 @@ type Runner interface {
 type commandRunner struct{}
 
 func (commandRunner) Run(executable string, args ...string) (string, error) {
+	executable = dockerGuardExecutable(executable)
 	manager := cmd.NewCommandMgr(cmd.WithTimeout(60 * time.Second))
 	return manager.RunWithOptionalSudoAndStdout(executable, args...)
 }
 
 func (commandRunner) RunInput(executable, input string, args ...string) (string, error) {
+	executable = dockerGuardExecutable(executable)
 	manager := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second), cmd.WithStdin(strings.NewReader(input)))
 	return manager.RunWithOptionalSudoAndStdout(executable, args...)
 }
 
-func (commandRunner) Exists(executable string) bool { return cmd.Which(executable) }
+func (commandRunner) Exists(executable string) bool {
+	resolved := dockerGuardExecutable(executable)
+	return resolved != "" && cmd.Which(resolved)
+}
+
+func dockerGuardExecutable(logical string) string {
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil {
+		return logical
+	}
+	switch logical {
+	case "iptables":
+		return commands.IPv4
+	case "iptables-restore":
+		return commands.Restore4
+	case "ip6tables":
+		return commands.IPv6
+	case "ip6tables-restore":
+		return commands.Restore6
+	default:
+		return logical
+	}
+}
 
 type Manager struct {
 	runner Runner

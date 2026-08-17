@@ -63,6 +63,20 @@ func TestNormalizeRuleRejectsCompositeAndFamilyMismatch(t *testing.T) {
 	}
 }
 
+func TestNormalizeRuleRejectsInvalidConnectionState(t *testing.T) {
+	rule := FirewallRule{
+		Scope: Scope{
+			Provider: ProviderNftables, Family: FamilyIPv4, Table: "filter",
+			Chain: IptablesInputChain, Direction: DirectionInput,
+		},
+		Protocol: "tcp", Action: ActionAccept,
+		ConnectionStates: []string{"established } accept\nflush ruleset"},
+	}
+	if _, err := NormalizeRule(rule); !errors.Is(err, ErrInvalidRule) {
+		t.Fatalf("expected invalid connection state error, got %v", err)
+	}
+}
+
 func TestNormalizeNativeDestinationPortSets(t *testing.T) {
 	for _, provider := range []Provider{ProviderIptables, ProviderUFW} {
 		scope := Scope{Provider: provider, Family: FamilyIPv4, Direction: DirectionInput}

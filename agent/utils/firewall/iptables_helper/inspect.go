@@ -54,13 +54,7 @@ func ReadFilterRulesByChain(chain string) ([]FilterRules, error) {
 	return rules, nil
 }
 
-func LoadInitStatus(clientName, tab string) (bool, bool, error) {
-	if clientName == "firewalld" {
-		return true, true, nil
-	}
-	if clientName == "ufw" {
-		return true, true, nil
-	}
+func LoadInitStatus(tab string) (bool, bool, error) {
 	switch tab {
 	case "base":
 		filterRules, err := RunWithStd(FilterTab, "-S")
@@ -69,18 +63,18 @@ func LoadInitStatus(clientName, tab string) (bool, bool, error) {
 		}
 		lines := strings.Split(filterRules, "\n")
 		initRules := []string{
-			"-N " + Chain1PanelBasicBefore,
-			"-N " + Chain1PanelBasic,
-			"-N " + Chain1PanelBasicAfter,
-			fmt.Sprintf("-A %s %s -j ACCEPT", Chain1PanelBasicBefore, strings.ReplaceAll(strings.ReplaceAll(IoRuleIn, "'", "\""), " -j ACCEPT", "")),
-			fmt.Sprintf("-A %s %s -j ACCEPT", Chain1PanelBasicBefore, strings.ReplaceAll(strings.ReplaceAll(EstablishedRule, "'", "\""), " -j ACCEPT", "")),
-			fmt.Sprintf("-A %s %s", Chain1PanelBasicAfter, DropAllTcp),
-			fmt.Sprintf("-A %s %s", Chain1PanelBasicAfter, DropAllUdp),
+			"-N " + BasicBeforeChain,
+			"-N " + BasicChain,
+			"-N " + BasicAfterChain,
+			fmt.Sprintf("-A %s %s -j ACCEPT", BasicBeforeChain, strings.ReplaceAll(strings.ReplaceAll(IoRuleIn, "'", "\""), " -j ACCEPT", "")),
+			fmt.Sprintf("-A %s %s -j ACCEPT", BasicBeforeChain, strings.ReplaceAll(strings.ReplaceAll(EstablishedRule, "'", "\""), " -j ACCEPT", "")),
+			fmt.Sprintf("-A %s %s", BasicAfterChain, DropAllTcp),
+			fmt.Sprintf("-A %s %s", BasicAfterChain, DropAllUdp),
 		}
 		bindRules := []string{
-			fmt.Sprintf("-A %s -j %s", ChainInput, Chain1PanelBasicBefore),
-			fmt.Sprintf("-A %s -j %s", ChainInput, Chain1PanelBasic),
-			fmt.Sprintf("-A %s -j %s", ChainInput, Chain1PanelBasicAfter),
+			fmt.Sprintf("-A %s -j %s", InputChain, BasicBeforeChain),
+			fmt.Sprintf("-A %s -j %s", InputChain, BasicChain),
+			fmt.Sprintf("-A %s -j %s", InputChain, BasicAfterChain),
 		}
 		isInit, isBind := checkWithInitAndBind(initRules, bindRules, lines)
 		return isInit, isBind, nil

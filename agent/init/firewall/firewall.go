@@ -10,9 +10,10 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/ping"
 )
 
@@ -37,6 +38,18 @@ func Init() {
 		return
 	}
 	clientName := client.Name()
+	if clientName == "nftables" {
+		if err := nftables_helper.Restore(); err != nil {
+			global.LOG.Errorf("restore nftables rules failed, err: %v", err)
+		}
+		status, _ := repo.NewISettingRepo().GetValueByKey("IptablesStatus")
+		if status == constant.StatusEnable {
+			if err := nftables_helper.Bind(); err != nil {
+				global.LOG.Errorf("bind nftables base chains failed, err: %v", err)
+			}
+		}
+		return
+	}
 
 	if clientName != "iptables" {
 		return
@@ -55,7 +68,7 @@ func Init() {
 	firewallService := service.NewIFirewallService()
 	iptablesStatus, _ := settingRepo.GetValueByKey("IptablesStatus")
 	if iptablesStatus == constant.StatusEnable {
-		if err := firewallService.OperateFilterChain(dto.IptablesOp{Operate: "bind-base-without-init"}); err != nil {
+		if err := firewallService.OperateFilterChain(dto.IptablesOp{Operate: string(firewall.BaseOperationBindWithoutInit)}); err != nil {
 			global.LOG.Errorf("bind base chains failed, err: %v", err)
 			return
 		}
@@ -64,7 +77,8 @@ func Init() {
 }
 
 func initIPv6BaseIfEnabled() error {
-	if !cmd.Which("ip6tables") || !cmd.Which("ip6tables-restore") {
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil || !commands.IPv6Available() {
 		return nil
 	}
 	client, err := lifecycle.NewClient()

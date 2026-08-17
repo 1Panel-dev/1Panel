@@ -9,7 +9,7 @@
                         <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
-                        <template v-if="baseInfo.name !== 'iptables'">
+                        <template v-if="baseInfo.name !== 'iptables' && baseInfo.name !== 'nftables'">
                             <el-button
                                 v-permission
                                 v-node-admin
@@ -41,7 +41,13 @@
                                 {{ $t('commons.button.init') }}
                             </el-button>
                         </template>
-                        <template v-if="baseInfo.name === 'iptables' && baseInfo.isInit && props.currentTab == 'base'">
+                        <template
+                            v-if="
+                                (baseInfo.name === 'iptables' || baseInfo.name === 'nftables') &&
+                                baseInfo.isInit &&
+                                props.currentTab == 'base'
+                            "
+                        >
                             <el-divider direction="vertical" />
                             <el-button
                                 v-if="baseInfo.isBind"
@@ -90,7 +96,7 @@
                 </div>
             </el-card>
         </div>
-        <NoSuchService v-else name="Firewalld / Ufw / iptables" />
+        <NoSuchService v-else name="Firewalld / Ufw / iptables / iptables-nft / nftables" />
 
         <LayoutContent :divider="true" v-if="baseInfo.isExist && baseInfo.isActive && !baseInfo.isInit">
             <template #main>
@@ -275,7 +281,7 @@ const onUnBind = async () => {
 
 const onOperate = async (op: string) => {
     operation.value = op;
-    if (baseInfo.value.name === 'iptables' || !dockerStatus.value) {
+    if (baseInfo.value.name === 'iptables' || baseInfo.value.name === 'nftables' || !dockerStatus.value) {
         emit('update:loading', true);
         emit('update:maskShow', true);
         await operateFire(operation.value, false)

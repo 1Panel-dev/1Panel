@@ -4,16 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 )
 
 var ErrVerificationFailed = errors.New("firewall rule verification failed")
 
-type ProtectedPort struct {
-	Port     string
-	Protocol string
-}
-
-func ProtectSnapshot(snapshot Snapshot, ports []ProtectedPort) (Snapshot, error) {
+func ProtectSnapshot(snapshot Snapshot, ports []firewall.PortWhitelist) (Snapshot, error) {
 	protectedPorts := make(map[string]struct{}, len(ports))
 	for _, port := range ports {
 		protectedPorts[port.Port+"/"+port.Protocol] = struct{}{}

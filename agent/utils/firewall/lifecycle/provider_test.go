@@ -14,9 +14,11 @@ func TestDetectProvider(t *testing.T) {
 		wantErr     bool
 	}{
 		{name: "none", wantErr: true},
-		{name: "iptables", executables: []string{"iptables"}, want: "iptables"},
-		{name: "ufw", executables: []string{"iptables", "ufw"}, want: "ufw"},
-		{name: "firewalld", executables: []string{"iptables", "firewalld"}, want: "firewalld"},
+		{name: "iptables", executables: []string{"iptables", "iptables-restore"}, want: "iptables"},
+		{name: "iptables-nft", executables: []string{"iptables-nft", "iptables-nft-restore"}, want: "iptables"},
+		{name: "nftables", executables: []string{"nft"}, want: "nftables"},
+		{name: "ufw", executables: []string{"iptables", "iptables-restore", "ufw"}, want: "ufw"},
+		{name: "firewalld", executables: []string{"iptables", "iptables-restore", "firewalld"}, want: "firewalld"},
 		{name: "conflict", executables: []string{"firewalld", "ufw"}, wantErr: true},
 	}
 	for _, test := range tests {

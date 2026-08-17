@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	native "github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/mattn/go-shellwords"
 )
 
@@ -87,7 +88,7 @@ func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 	return filter.Capabilities{
 		Scopes: []filter.ScopePattern{{
 			Provider: filter.ProviderIptables, Families: []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}, Table: "filter",
-			Chains:     []string{native.Chain1PanelBasicBefore, native.Chain1PanelBasic, native.Chain1PanelBasicAfter},
+			Chains:     native.BasicChains(),
 			Directions: []filter.Direction{filter.DirectionInput},
 		}}, Marker: true, OwnedChains: true, ExplicitPosition: true,
 		AtomicApply: false, TransactionalRollback: false,
@@ -550,7 +551,7 @@ func insertionPosition(snapshot filter.Snapshot, rule filter.FirewallRule) int {
 	if rule.OrderIndex != nil {
 		return int(*rule.OrderIndex)
 	}
-	if snapshot.Scope.Chain == native.Chain1PanelBasicAfter && rule.Action == filter.ActionAccept {
+	if snapshot.Scope.Chain == native.BasicAfterChain && rule.Action == filter.ActionAccept {
 		for index, observed := range snapshot.Rules {
 			if observed.ParseStatus == filter.ParseStatusSupported && observed.Rule.Action == filter.ActionDrop &&
 				observed.Rule.SourceAddress == "" && observed.Rule.DestinationAddress == "" &&
@@ -571,7 +572,10 @@ func isBroadDeny(rule filter.FirewallRule) bool {
 type systemBackend struct{}
 
 func (systemBackend) CheckMultiport(_ context.Context, family filter.Family) error {
-	executable := executableForFamily(family)
+	executable, err := runtimeExecutableForFamily(family)
+	if err != nil {
+		return err
+	}
 	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithOptionalSudo(executable, "-m", "multiport", "--help")
 }
 
@@ -586,14 +590,18 @@ func (systemBackend) Run(_ context.Context, command filter.NativeCommand) error 
 	if command.Executable != "iptables" && command.Executable != "ip6tables" {
 		return fmt.Errorf("unexpected iptables executable %q", command.Executable)
 	}
-	return cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudo(command.Executable, command.Args...)
+	executable, err := runtimeExecutable(command.Executable)
+	if err != nil {
+		return err
+	}
+	return cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudo(executable, command.Args...)
 }
 
 func (systemBackend) Save(_ context.Context, scope filter.Scope) error {
 	fileName := map[string]string{
-		native.Chain1PanelBasicBefore: native.BasicBeforeFileName,
-		native.Chain1PanelBasic:       native.BasicFileName,
-		native.Chain1PanelBasicAfter:  native.BasicAfterFileName,
+		native.BasicBeforeChain: native.BasicBeforeFileName,
+		native.BasicChain:       native.BasicFileName,
+		native.BasicAfterChain:  native.BasicAfterFileName,
 	}[scope.Chain]
 	if fileName == "" {
 		return fmt.Errorf("unsupported persistence chain %q", scope.Chain)
@@ -610,6 +618,24 @@ func executableForFamily(family filter.Family) string {
 		return "ip6tables"
 	}
 	return "iptables"
+}
+
+func runtimeExecutableForFamily(family filter.Family) (string, error) {
+	return runtimeExecutable(executableForFamily(family))
+}
+
+func runtimeExecutable(logical string) (string, error) {
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil {
+		return "", err
+	}
+	if logical == "ip6tables" {
+		if !commands.IPv6Available() {
+			return "", fmt.Errorf("ip6tables command family is unavailable")
+		}
+		return commands.IPv6, nil
+	}
+	return commands.IPv4, nil
 }
 
 func validateNativeCommand(scope filter.Scope, command filter.NativeCommand) error {
@@ -749,7 +775,7 @@ func isDefaultRejectWith(family filter.Family, value string) bool {
 }
 
 func isProtectedRule(scope filter.Scope, rule filter.FirewallRule, comment string) bool {
-	if scope.Chain == native.Chain1PanelBasicBefore || scope.Chain == native.Chain1PanelBasicAfter {
+	if scope.Chain == native.BasicBeforeChain || scope.Chain == native.BasicAfterChain {
 		return true
 	}
 	if rule.Action == filter.ActionAccept && rule.Interface == "lo" {
@@ -764,7 +790,7 @@ func isProtectedRule(scope filter.Scope, rule filter.FirewallRule, comment strin
 			return true
 		}
 	}
-	if scope.Chain == native.Chain1PanelBasicAfter && rule.Action == filter.ActionDrop &&
+	if scope.Chain == native.BasicAfterChain && rule.Action == filter.ActionDrop &&
 		rule.SourceAddress == "" && rule.DestinationAddress == "" && rule.SourcePort == "" && rule.DestinationPort == "" {
 		return true
 	}

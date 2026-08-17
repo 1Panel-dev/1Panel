@@ -12,6 +12,8 @@ func New(provider string) (forwarding.Adapter, error) {
 		return newFirewalldAdapter(), nil
 	case "ufw", "iptables":
 		return newIptablesNATAdapter(provider), nil
+	case "nftables":
+		return newNftablesAdapter(), nil
 	default:
 		return nil, errors.New("unsupported forwarding provider: " + provider)
 	}

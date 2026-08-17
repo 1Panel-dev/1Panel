@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	filterfirewalld "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/providers/firewalld"
 	"github.com/glebarez/sqlite"
@@ -1049,7 +1050,7 @@ func TestProtectFirewallSnapshotMarksConfiguredAndRequiredPorts(t *testing.T) {
 	}
 	snapshot.Notices = []filter.ScopeNotice{{Code: filter.ScopeNoticeManagedScopeInactive}}
 
-	protected, err := filter.ProtectSnapshot(snapshot, []filter.ProtectedPort{{Port: "22", Protocol: "tcp"}})
+	protected, err := filter.ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Port: "22", Protocol: "tcp"}})
 	if err != nil {
 		t.Fatalf("protect snapshot: %v", err)
 	}

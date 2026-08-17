@@ -4,41 +4,33 @@ import (
 	"fmt"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
-type IptablesManager struct {
+type Manager struct {
 	UpdateSetting     func(key, value string) error
 	PanelPort         func() string
-	LoadRequiredPorts func() ([]PortWhitelist, error)
+	LoadRequiredPorts func() ([]firewall.PortWhitelist, error)
 }
 
-type BaseOperation string
-
-const (
-	BaseOperationInit            BaseOperation = "init-base"
-	BaseOperationBind            BaseOperation = "bind-base"
-	BaseOperationBindWithoutInit BaseOperation = "bind-base-without-init"
-	BaseOperationUnbind          BaseOperation = "unbind-base"
-)
-
-func (m *IptablesManager) Operate(operation BaseOperation) error {
+func (m *Manager) Operate(operation firewall.BaseOperation) error {
 	switch operation {
-	case BaseOperationInit, BaseOperationBind:
-		if !cmd.Which("iptables") {
+	case firewall.BaseOperationInit, firewall.BaseOperationBind:
+		if _, err := lifecycle.ResolveIptablesCommands(); err != nil {
 			return fmt.Errorf("failed to find iptables")
 		}
 		return m.enableBase(true)
-	case BaseOperationBindWithoutInit:
+	case firewall.BaseOperationBindWithoutInit:
 		return m.enableBase(false)
-	case BaseOperationUnbind:
+	case firewall.BaseOperationUnbind:
 		return m.disableBase()
 	default:
 		return fmt.Errorf("unsupported iptables base operation %q", operation)
 	}
 }
 
-func (m *IptablesManager) enableBase(prepare bool) error {
+func (m *Manager) enableBase(prepare bool) error {
 	if prepare {
 		if err := ensureBaseChains(); err != nil {
 			return err
@@ -59,11 +51,11 @@ func (m *IptablesManager) enableBase(prepare bool) error {
 	return m.updateSetting("IptablesStatus", constant.StatusEnable)
 }
 
-func (m *IptablesManager) disableBase() error {
+func (m *Manager) disableBase() error {
 	for _, item := range []struct{ parent, chain string }{
-		{ChainInput, Chain1PanelBasicAfter},
-		{ChainInput, Chain1PanelBasicBefore},
-		{ChainInput, Chain1PanelBasic},
+		{InputChain, BasicAfterChain},
+		{InputChain, BasicBeforeChain},
+		{InputChain, BasicChain},
 	} {
 		if err := UnbindChain(FilterTab, item.parent, item.chain); err != nil {
 			return err
@@ -76,11 +68,7 @@ func (m *IptablesManager) disableBase() error {
 }
 
 func ensureBaseChains() error {
-	for _, chain := range []string{
-		Chain1PanelBasicBefore,
-		Chain1PanelBasic,
-		Chain1PanelBasicAfter,
-	} {
+	for _, chain := range BasicChains() {
 		if err := AddChain(FilterTab, chain); err != nil {
 			return err
 		}
@@ -93,9 +81,9 @@ func bindBaseChains() error {
 		parent, chain string
 		position      int
 	}{
-		{ChainInput, Chain1PanelBasicBefore, 1},
-		{ChainInput, Chain1PanelBasic, 2},
-		{ChainInput, Chain1PanelBasicAfter, 3},
+		{InputChain, BasicBeforeChain, 1},
+		{InputChain, BasicChain, 2},
+		{InputChain, BasicAfterChain, 3},
 	} {
 		if err := BindChain(FilterTab, item.parent, item.chain, item.position); err != nil {
 			return err
@@ -106,9 +94,9 @@ func bindBaseChains() error {
 
 func saveBaseChains() error {
 	for _, item := range []struct{ chain, file string }{
-		{Chain1PanelBasicBefore, BasicBeforeFileName},
-		{Chain1PanelBasic, BasicFileName},
-		{Chain1PanelBasicAfter, BasicAfterFileName},
+		{BasicBeforeChain, BasicBeforeFileName},
+		{BasicChain, BasicFileName},
+		{BasicAfterChain, BasicAfterFileName},
 	} {
 		if err := SaveRulesToFile(FilterTab, item.chain, item.file); err != nil {
 			return err
@@ -122,9 +110,9 @@ func RestoreIPv4BaseChains(panelPort string) error {
 		return fmt.Errorf("panel port is required")
 	}
 	for _, item := range []struct{ chain, file string }{
-		{Chain1PanelBasicBefore, BasicBeforeFileName},
-		{Chain1PanelBasic, BasicFileName},
-		{Chain1PanelBasicAfter, BasicAfterFileName},
+		{BasicBeforeChain, BasicBeforeFileName},
+		{BasicChain, BasicFileName},
+		{BasicAfterChain, BasicAfterFileName},
 	} {
 		if err := LoadRulesFromFile(FilterTab, item.chain, item.file); err != nil {
 			return err
@@ -132,38 +120,39 @@ func RestoreIPv4BaseChains(panelPort string) error {
 	}
 	return AddRule(
 		FilterTab,
-		Chain1PanelBasicBefore,
+		BasicBeforeChain,
 		"-p", "tcp", "-m", "tcp", "--dport", panelPort, "-j", "ACCEPT",
 	)
 }
 
-func (m *IptablesManager) initPreRules() error {
-	if err := AddRule(FilterTab, Chain1PanelBasicBefore, "-i", "lo", "-j", "ACCEPT", "-m", "comment", "--comment", "Loopback Whitelist"); err != nil {
+func (m *Manager) initPreRules() error {
+	if err := AddRule(FilterTab, BasicBeforeChain, "-i", "lo", "-j", "ACCEPT", "-m", "comment", "--comment", "Loopback Whitelist"); err != nil {
 		return err
 	}
-	if err := AddRule(FilterTab, Chain1PanelBasicBefore, "-m", "conntrack", "--ctstate", "RELATED,ESTABLISHED", "-j", "ACCEPT", "-m", "comment", "--comment", "ESTABLISHED Whitelist"); err != nil {
+	if err := AddRule(FilterTab, BasicBeforeChain, "-m", "conntrack", "--ctstate", "RELATED,ESTABLISHED", "-j", "ACCEPT", "-m", "comment", "--comment", "ESTABLISHED Whitelist"); err != nil {
 		return err
 	}
 	if err := m.SyncRequiredPorts(false); err != nil {
 		return err
 	}
-	if err := AddRule(FilterTab, Chain1PanelBasicAfter, "-p", "tcp", "-j", "DROP"); err != nil {
+	if err := AddRule(FilterTab, BasicAfterChain, "-p", "tcp", "-j", "DROP"); err != nil {
 		return err
 	}
-	if err := AddRule(FilterTab, Chain1PanelBasicAfter, "-p", "udp", "-j", "DROP"); err != nil {
+	if err := AddRule(FilterTab, BasicAfterChain, "-p", "udp", "-j", "DROP"); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *IptablesManager) ensureIPv6BaseChains() error {
-	if !cmd.Which("ip6tables") || !cmd.Which("ip6tables-restore") {
+func (m *Manager) ensureIPv6BaseChains() error {
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil || !commands.IPv6Available() {
 		return nil
 	}
 	return EnsureIPv6BaseChains(m.panelPort())
 }
 
-func (m *IptablesManager) SyncRequiredPorts(withSave bool) error {
+func (m *Manager) SyncRequiredPorts(withSave bool) error {
 	requiredPorts, err := m.loadRequiredPorts()
 	if err != nil {
 		return err
@@ -171,25 +160,25 @@ func (m *IptablesManager) SyncRequiredPorts(withSave bool) error {
 	return applyRequiredFirewallPortWhiteListRules(requiredPorts, withSave)
 }
 
-func applyRequiredFirewallPortWhiteListRules(portWhiteList []PortWhitelist, withSave bool) error {
+func applyRequiredFirewallPortWhiteListRules(portWhiteList []firewall.PortWhitelist, withSave bool) error {
 	if err := syncRequiredFirewallPortWhiteListRules(portWhiteList); err != nil {
 		return err
 	}
 	for _, item := range portWhiteList {
-		if err := AddRule(FilterTab, Chain1PanelBasicBefore, "-p", item.Protocol, "-m", item.Protocol, "--dport", item.Port, "-j", "ACCEPT"); err != nil {
+		if err := AddRule(FilterTab, BasicBeforeChain, "-p", item.Protocol, "-m", item.Protocol, "--dport", item.Port, "-j", "ACCEPT"); err != nil {
 			return err
 		}
 	}
 	if !withSave {
 		return nil
 	}
-	if err := SaveRulesToFile(FilterTab, Chain1PanelBasicBefore, BasicBeforeFileName); err != nil {
+	if err := SaveRulesToFile(FilterTab, BasicBeforeChain, BasicBeforeFileName); err != nil {
 		return err
 	}
-	return SaveRulesToFile(FilterTab, Chain1PanelBasicAfter, BasicAfterFileName)
+	return SaveRulesToFile(FilterTab, BasicAfterChain, BasicAfterFileName)
 }
 
-func syncRequiredFirewallPortWhiteListRules(portWhiteList []PortWhitelist) error {
+func syncRequiredFirewallPortWhiteListRules(portWhiteList []firewall.PortWhitelist) error {
 	tcpWhitelist := make(map[string]struct{})
 	udpWhitelist := make(map[string]struct{})
 	for _, item := range portWhiteList {
@@ -200,13 +189,13 @@ func syncRequiredFirewallPortWhiteListRules(portWhiteList []PortWhitelist) error
 		tcpWhitelist[item.Port] = struct{}{}
 	}
 
-	if err := cleanExtraFirewallPortRules(Chain1PanelBasicBefore, "tcp", tcpWhitelist); err != nil {
+	if err := cleanExtraFirewallPortRules(BasicBeforeChain, "tcp", tcpWhitelist); err != nil {
 		return err
 	}
-	if err := cleanExtraFirewallPortRules(Chain1PanelBasicBefore, "udp", udpWhitelist); err != nil {
+	if err := cleanExtraFirewallPortRules(BasicBeforeChain, "udp", udpWhitelist); err != nil {
 		return err
 	}
-	return cleanExtraFirewallPortRules(Chain1PanelBasicAfter, "udp", map[string]struct{}{})
+	return cleanExtraFirewallPortRules(BasicAfterChain, "udp", map[string]struct{}{})
 }
 
 func cleanExtraFirewallPortRules(chain, protocol string, whitelist map[string]struct{}) error {
@@ -232,21 +221,21 @@ func cleanExtraFirewallPortRules(chain, protocol string, whitelist map[string]st
 	return nil
 }
 
-func (m *IptablesManager) updateSetting(key, value string) error {
+func (m *Manager) updateSetting(key, value string) error {
 	if m != nil && m.UpdateSetting != nil {
 		return m.UpdateSetting(key, value)
 	}
 	return nil
 }
 
-func (m *IptablesManager) panelPort() string {
+func (m *Manager) panelPort() string {
 	if m != nil && m.PanelPort != nil {
 		return m.PanelPort()
 	}
 	return ""
 }
 
-func (m *IptablesManager) loadRequiredPorts() ([]PortWhitelist, error) {
+func (m *Manager) loadRequiredPorts() ([]firewall.PortWhitelist, error) {
 	if m != nil && m.LoadRequiredPorts != nil {
 		return m.LoadRequiredPorts()
 	}

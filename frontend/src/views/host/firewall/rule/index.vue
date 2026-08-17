@@ -19,13 +19,16 @@
                 <el-card v-if="!isActive && maskShow" class="mask-prompt">
                     <span>{{ $t('firewall.firewallNotStart') }}</span>
                 </el-card>
-                <el-card v-if="provider === 'iptables' && !isBind && maskShow" class="mask-prompt">
+                <el-card
+                    v-if="(provider === 'iptables' || provider === 'nftables') && !isBind && maskShow"
+                    class="mask-prompt"
+                >
                     <span>{{ $t('firewall.basicStatus', ['1PANEL_BASIC']) }}</span>
                 </el-card>
 
                 <LayoutContent
                     :title="$t('menu.firewall')"
-                    :class="{ mask: !isActive || (provider === 'iptables' && !isBind) }"
+                    :class="{ mask: !isActive || ((provider === 'iptables' || provider === 'nftables') && !isBind) }"
                 >
                     <template #prompt>
                         <el-alert
@@ -61,7 +64,12 @@
                         </el-button-group>
                     </template>
                     <template #rightToolBar>
-                        <el-popover v-if="provider === 'iptables'" placement="bottom" trigger="click" :width="230">
+                        <el-popover
+                            v-if="provider === 'iptables' || provider === 'nftables'"
+                            placement="bottom"
+                            trigger="click"
+                            :width="230"
+                        >
                             <template #reference>
                                 <el-button
                                     :type="iptablesChainFilterActive ? 'primary' : 'default'"
@@ -431,10 +439,10 @@ const paginationConfig = reactive({
 });
 
 const providerScopes = (): Firewall.Scope[] => {
-    if (provider.value === 'iptables') {
+    if (provider.value === 'iptables' || provider.value === 'nftables') {
         return (['ipv4', 'ipv6'] as Firewall.Family[]).flatMap((family) =>
             ['1PANEL_BASIC_BEFORE', '1PANEL_BASIC', '1PANEL_BASIC_AFTER'].map((chain) => ({
-                provider: 'iptables' as const,
+                provider: provider.value as 'iptables' | 'nftables',
                 family,
                 table: 'filter',
                 chain,
@@ -488,7 +496,8 @@ const search = async () => {
 };
 
 const isIptablesSystemPresetScope = (scope: Firewall.Scope) =>
-    scope.provider === 'iptables' && (scope.chain === '1PANEL_BASIC_BEFORE' || scope.chain === '1PANEL_BASIC_AFTER');
+    (scope.provider === 'iptables' || scope.provider === 'nftables') &&
+    (scope.chain === '1PANEL_BASIC_BEFORE' || scope.chain === '1PANEL_BASIC_AFTER');
 
 const wildcardAddress = (family: Firewall.Family) => {
     if (family === 'ipv6') return '::/0';
@@ -650,7 +659,7 @@ const openUsageDetail = (entry: UsageEntry) => {
 };
 const scopeIdentity = (rule: Firewall.Rule) => JSON.stringify(rule.scope);
 const sameIptablesPositionScope = (rule: Firewall.Rule, family: Firewall.Family, chain: string) =>
-    rule.scope.provider === 'iptables' &&
+    (rule.scope.provider === 'iptables' || rule.scope.provider === 'nftables') &&
     rule.scope.family === family &&
     rule.scope.table === 'filter' &&
     rule.scope.chain === chain &&
@@ -757,7 +766,7 @@ const filteredItems = computed<RuleRow[]>(() => {
     const keyword = searchName.value.trim().toLowerCase();
     return allRows.value.filter((item) => {
         if (
-            item.rule.scope.provider === 'iptables' &&
+            (item.rule.scope.provider === 'iptables' || item.rule.scope.provider === 'nftables') &&
             !visibleIptablesChains.value.includes(item.rule.scope.chain || '')
         ) {
             return false;
@@ -1077,7 +1086,11 @@ const isEditableManagedRule = (row: Firewall.InventoryItem) =>
 
 const displayRulePriority = (row: Firewall.InventoryItem) => {
     if (row.rule.scope.provider === 'firewalld') return row.rule.priority ?? '-';
-    if (row.rule.scope.provider === 'iptables' && row.rule.scope.chain !== '1PANEL_BASIC') return '-';
+    if (
+        (row.rule.scope.provider === 'iptables' || row.rule.scope.provider === 'nftables') &&
+        row.rule.scope.chain !== '1PANEL_BASIC'
+    )
+        return '-';
     return row.observed?.locator.position ?? '-';
 };
 
