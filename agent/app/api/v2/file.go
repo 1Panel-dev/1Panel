@@ -35,6 +35,81 @@ var cancelledChunkUploads = struct {
 	ids map[string]struct{}
 }{ids: make(map[string]struct{})}
 
+type chunkUploadLock struct {
+	mutex sync.Mutex
+	refs  int
+}
+
+var chunkUploadLocks = struct {
+	sync.Mutex
+	items map[string]*chunkUploadLock
+}{items: make(map[string]*chunkUploadLock)}
+
+type completedChunkUpload struct {
+	dstDir   string
+	filename string
+	fileSize int64
+}
+
+var completedChunkUploads = struct {
+	sync.RWMutex
+	items map[string]completedChunkUpload
+}{items: make(map[string]completedChunkUpload)}
+
+var activeChunkUploadTTL = 24 * time.Hour
+
+var (
+	errChunkUploadCancelled = errors.New("upload cancelled")
+	errInvalidChunkUpload   = errors.New("invalid chunk upload")
+)
+
+type activeChunkUpload struct {
+	upload    completedChunkUpload
+	expiresAt time.Time
+	timer     *time.Timer
+}
+
+var activeChunkUploads = struct {
+	sync.RWMutex
+	items map[string]activeChunkUpload
+}{items: make(map[string]activeChunkUpload)}
+
+type resumableUploadChunk struct {
+	UploadID   string
+	Filename   string
+	DstDir     string
+	ChunkIndex int
+	ChunkCount int
+	Offset     int64
+	FileSize   int64
+	Overwrite  bool
+}
+
+func invalidChunkUploadError(message string) error {
+	return fmt.Errorf("%w: %s", errInvalidChunkUpload, message)
+}
+
+func isRetryableChunkUploadError(err error) bool {
+	if err == nil {
+		return false
+	}
+	if errors.Is(err, errChunkUploadCancelled) ||
+		errors.Is(err, errInvalidChunkUpload) ||
+		errors.Is(err, os.ErrExist) ||
+		errors.Is(err, os.ErrPermission) ||
+		errors.Is(err, os.ErrInvalid) ||
+		errors.Is(err, syscall.ENOSPC) ||
+		errors.Is(err, syscall.EDQUOT) ||
+		errors.Is(err, syscall.EROFS) ||
+		errors.Is(err, syscall.EFBIG) ||
+		errors.Is(err, syscall.ENAMETOOLONG) ||
+		errors.Is(err, syscall.ENOTDIR) ||
+		errors.Is(err, syscall.EISDIR) {
+		return false
+	}
+	return true
+}
+
 // @Tags File
 // @Summary List files
 // @Accept json
@@ -474,11 +549,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 			continue
 		}
 		dstInfo, statErr := os.Stat(dstFilename)
-		if overwrite {
-			_ = os.Remove(dstFilename)
-		}
-
-		err = os.Rename(tmpFilename, dstFilename)
+		err = finalizeUploadedFile(tmpFilename, dstFilename, overwrite)
 		if err != nil {
 			_ = os.Remove(tmpFilename)
 			e := fmt.Errorf("upload [%s] file failed, err: %v", file.Filename, err)
@@ -812,6 +883,289 @@ func (b *BaseApi) DepthDirSize(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
+func lockChunkUpload(uploadID string) func() {
+	chunkUploadLocks.Lock()
+	lock, ok := chunkUploadLocks.items[uploadID]
+	if !ok {
+		lock = &chunkUploadLock{}
+		chunkUploadLocks.items[uploadID] = lock
+	}
+	lock.refs++
+	chunkUploadLocks.Unlock()
+
+	lock.mutex.Lock()
+	return func() {
+		lock.mutex.Unlock()
+		chunkUploadLocks.Lock()
+		lock.refs--
+		if lock.refs == 0 {
+			delete(chunkUploadLocks.items, uploadID)
+		}
+		chunkUploadLocks.Unlock()
+	}
+}
+
+func resumableUploadPartPath(dstDir, uploadID string) string {
+	return filepath.Join(dstDir, fmt.Sprintf(".1panel-upload-%s.part", uploadID))
+}
+
+func finalizeUploadedFile(tmpFile, dstFile string, overwrite bool) error {
+	if overwrite {
+		return os.Rename(tmpFile, dstFile)
+	}
+	if err := os.Link(tmpFile, dstFile); err != nil {
+		return err
+	}
+	if err := os.Remove(tmpFile); err != nil {
+		if rollbackErr := os.Remove(dstFile); rollbackErr != nil {
+			return fmt.Errorf("remove upload temporary file failed: %v, rollback destination failed: %w", err, rollbackErr)
+		}
+		return err
+	}
+	return nil
+}
+
+func registerActiveChunkUpload(uploadID string, upload completedChunkUpload) error {
+	activeChunkUploads.Lock()
+	defer activeChunkUploads.Unlock()
+	if active, ok := activeChunkUploads.items[uploadID]; ok {
+		if active.upload != upload {
+			return invalidChunkUploadError("upload ID is already used by another file")
+		}
+		active.timer.Stop()
+	}
+	expiresAt := time.Now().Add(activeChunkUploadTTL)
+	timer := time.AfterFunc(activeChunkUploadTTL, func() {
+		expireActiveChunkUpload(uploadID, expiresAt)
+	})
+	activeChunkUploads.items[uploadID] = activeChunkUpload{
+		upload:    upload,
+		expiresAt: expiresAt,
+		timer:     timer,
+	}
+	return nil
+}
+
+func loadActiveChunkUpload(uploadID string) (completedChunkUpload, bool) {
+	activeChunkUploads.RLock()
+	active, ok := activeChunkUploads.items[uploadID]
+	activeChunkUploads.RUnlock()
+	return active.upload, ok
+}
+
+func deleteActiveChunkUpload(uploadID string) {
+	activeChunkUploads.Lock()
+	if active, ok := activeChunkUploads.items[uploadID]; ok {
+		active.timer.Stop()
+	}
+	delete(activeChunkUploads.items, uploadID)
+	activeChunkUploads.Unlock()
+}
+
+func discardActiveChunkUpload(uploadID, partFile string) error {
+	deleteActiveChunkUpload(uploadID)
+	if err := os.Remove(partFile); err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("remove upload temporary file failed: %w", err)
+	}
+	return nil
+}
+
+func finalizeActiveChunkUpload(uploadID, partFile, dstFile string, overwrite bool) error {
+	if err := finalizeUploadedFile(partFile, dstFile, overwrite); err != nil {
+		if removeErr := discardActiveChunkUpload(uploadID, partFile); removeErr != nil {
+			return errors.Join(err, removeErr)
+		}
+		return err
+	}
+	return nil
+}
+
+func expireActiveChunkUpload(uploadID string, expiresAt time.Time) {
+	unlock := lockChunkUpload(uploadID)
+	defer unlock()
+	activeChunkUploads.Lock()
+	active, ok := activeChunkUploads.items[uploadID]
+	if !ok || !active.expiresAt.Equal(expiresAt) {
+		activeChunkUploads.Unlock()
+		return
+	}
+	delete(activeChunkUploads.items, uploadID)
+	activeChunkUploads.Unlock()
+	partFile := resumableUploadPartPath(active.upload.dstDir, uploadID)
+	if err := os.Remove(partFile); err != nil && !os.IsNotExist(err) {
+		global.LOG.Warnf("remove inactive upload part [%s] failed: %v", partFile, err)
+	}
+}
+
+func removeActiveResumableUploadPart(uploadID string) error {
+	unlock := lockChunkUpload(uploadID)
+	defer unlock()
+	upload, ok := loadActiveChunkUpload(uploadID)
+	if !ok {
+		return nil
+	}
+	err := os.Remove(resumableUploadPartPath(upload.dstDir, uploadID))
+	if err == nil || os.IsNotExist(err) {
+		deleteActiveChunkUpload(uploadID)
+		return nil
+	}
+	return err
+}
+
+func loadCompletedChunkUpload(uploadID string) (completedChunkUpload, bool) {
+	completedChunkUploads.RLock()
+	completed, ok := completedChunkUploads.items[uploadID]
+	completedChunkUploads.RUnlock()
+	return completed, ok
+}
+
+func markChunkUploadCompleted(uploadID string, completed completedChunkUpload) {
+	completedChunkUploads.Lock()
+	completedChunkUploads.items[uploadID] = completed
+	completedChunkUploads.Unlock()
+	time.AfterFunc(10*time.Minute, func() {
+		completedChunkUploads.Lock()
+		delete(completedChunkUploads.items, uploadID)
+		completedChunkUploads.Unlock()
+	})
+}
+
+func writeResumableUploadChunk(chunk resumableUploadChunk, chunkData []byte) error {
+	unlock := lockChunkUpload(chunk.UploadID)
+	defer unlock()
+	if chunkUploadCancelled(chunk.UploadID) {
+		return errChunkUploadCancelled
+	}
+	if chunk.UploadID == "" || filepath.Base(chunk.UploadID) != chunk.UploadID || strings.ContainsAny(chunk.UploadID, `/\`) {
+		return invalidChunkUploadError("invalid upload ID")
+	}
+	if chunk.Filename == "" || filepath.Base(chunk.Filename) != chunk.Filename || strings.ContainsAny(chunk.Filename, `/\`) {
+		return invalidChunkUploadError("invalid filename")
+	}
+	if strings.TrimSpace(chunk.DstDir) == "" {
+		return invalidChunkUploadError("upload destination is required")
+	}
+	dstDir := filepath.Clean(strings.TrimSpace(chunk.DstDir))
+
+	if chunk.ChunkCount <= 0 || chunk.ChunkIndex < 0 || chunk.ChunkIndex >= chunk.ChunkCount {
+		return invalidChunkUploadError("invalid chunk index")
+	}
+	if chunk.FileSize <= 0 || chunk.Offset < 0 || chunk.Offset > chunk.FileSize {
+		return invalidChunkUploadError("invalid upload offset")
+	}
+	chunkEnd := chunk.Offset + int64(len(chunkData))
+	if chunkEnd > chunk.FileSize {
+		return invalidChunkUploadError("chunk exceeds file size")
+	}
+	if chunk.ChunkIndex+1 == chunk.ChunkCount {
+		if chunkEnd != chunk.FileSize {
+			return invalidChunkUploadError("final chunk does not match file size")
+		}
+	} else if chunkEnd >= chunk.FileSize {
+		return invalidChunkUploadError("non-final chunk reaches file size")
+	}
+	if completed, ok := loadCompletedChunkUpload(chunk.UploadID); ok {
+		if completed.dstDir == dstDir && completed.filename == chunk.Filename && completed.fileSize == chunk.FileSize {
+			return nil
+		}
+		return invalidChunkUploadError("upload ID has already completed another file")
+	}
+	upload := completedChunkUpload{dstDir: dstDir, filename: chunk.Filename, fileSize: chunk.FileSize}
+	if err := registerActiveChunkUpload(chunk.UploadID, upload); err != nil {
+		return err
+	}
+
+	mode, err := files.GetParentMode(dstDir)
+	if err != nil {
+		return err
+	}
+	if err = os.MkdirAll(dstDir, mode); err != nil {
+		return err
+	}
+	dstDirInfo, err := os.Stat(dstDir)
+	if err != nil {
+		return err
+	}
+	if !dstDirInfo.IsDir() {
+		return invalidChunkUploadError(fmt.Sprintf("upload destination [%s] is not a directory", dstDir))
+	}
+
+	dstFile := filepath.Join(dstDir, chunk.Filename)
+	partFile := resumableUploadPartPath(dstDir, chunk.UploadID)
+	if dstFile == partFile {
+		return invalidChunkUploadError("filename conflicts with upload temporary file")
+	}
+	fileMode := dstDirInfo.Mode().Perm()
+	ownerInfo := dstDirInfo
+	if dstInfo, statErr := os.Stat(dstFile); statErr == nil {
+		if !chunk.Overwrite {
+			if err := discardActiveChunkUpload(chunk.UploadID, partFile); err != nil {
+				return errors.Join(os.ErrExist, err)
+			}
+			return os.ErrExist
+		}
+		fileMode = dstInfo.Mode().Perm()
+		ownerInfo = dstInfo
+	} else if !os.IsNotExist(statErr) {
+		return statErr
+	}
+
+	part, err := os.OpenFile(partFile, os.O_CREATE|os.O_RDWR, fileMode)
+	if err != nil {
+		return err
+	}
+	partClosed := false
+	defer func() {
+		if !partClosed {
+			_ = part.Close()
+		}
+	}()
+	if stat, statErr := part.Stat(); statErr != nil {
+		return statErr
+	} else if chunk.Offset > stat.Size() {
+		return invalidChunkUploadError(fmt.Sprintf("unexpected upload offset %d, current size is %d", chunk.Offset, stat.Size()))
+	} else if chunk.Offset < stat.Size() && chunkEnd > stat.Size() {
+		if err = part.Truncate(chunk.Offset); err != nil {
+			return err
+		}
+	}
+	if _, err = part.WriteAt(chunkData, chunk.Offset); err != nil {
+		return err
+	}
+
+	if chunk.ChunkIndex+1 != chunk.ChunkCount {
+		return nil
+	}
+	partInfo, err := part.Stat()
+	if err != nil {
+		return err
+	}
+	if partInfo.Size() != chunk.FileSize {
+		return invalidChunkUploadError(fmt.Sprintf("uploaded file size mismatch: expected %d, got %d", chunk.FileSize, partInfo.Size()))
+	}
+	if err = part.Close(); err != nil {
+		return err
+	}
+	partClosed = true
+	if err = os.Chmod(partFile, fileMode); err != nil {
+		return err
+	}
+	if stat, ok := ownerInfo.Sys().(*syscall.Stat_t); ok {
+		if err = os.Chown(partFile, int(stat.Uid), int(stat.Gid)); err != nil {
+			return err
+		}
+	}
+	if chunkUploadCancelled(chunk.UploadID) {
+		return errChunkUploadCancelled
+	}
+	if err = finalizeActiveChunkUpload(chunk.UploadID, partFile, dstFile, chunk.Overwrite); err != nil {
+		return err
+	}
+	markChunkUploadCompleted(chunk.UploadID, upload)
+	deleteActiveChunkUpload(chunk.UploadID)
+	return nil
+}
+
 func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int, overwrite bool) error {
 	defer func() {
 		_ = os.RemoveAll(fileDir)
@@ -891,6 +1245,10 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
+	if chunkCount <= 0 || chunkIndex < 0 || chunkIndex >= chunkCount {
+		helper.BadRequest(c, errors.New("invalid chunk index"))
+		return
+	}
 	fileOp := files.NewFileOp()
 	tmpDir := path.Join(global.Dir.TmpDir, "upload")
 	if !fileOp.Stat(tmpDir) {
@@ -905,9 +1263,14 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		return
 	}
 	uploadID := strings.TrimSpace(c.PostForm("uploadID"))
+	resumable := c.PostForm("fileSize") != "" || c.PostForm("offset") != ""
 	cancellable := uploadID != ""
 	if cancellable && (filepath.Base(uploadID) != uploadID || strings.ContainsAny(uploadID, `/\\`)) {
 		helper.BadRequest(c, errors.New("invalid upload ID"))
+		return
+	}
+	if resumable && !cancellable {
+		helper.BadRequest(c, errors.New("upload ID is required"))
 		return
 	}
 	if !cancellable {
@@ -915,10 +1278,10 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	}
 	fileDir := filepath.Join(tmpDir, uploadID)
 	if cancellable && chunkUploadCancelled(uploadID) {
-		helper.BadRequest(c, errors.New("upload cancelled"))
+		helper.BadRequest(c, errChunkUploadCancelled)
 		return
 	}
-	if chunkIndex == 0 {
+	if !resumable && chunkIndex == 0 {
 		if fileOp.Stat(fileDir) {
 			_ = fileOp.DeleteDir(fileDir)
 		}
@@ -927,32 +1290,67 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	filePath := filepath.Join(fileDir, filename)
 
 	defer func() {
-		if err != nil {
+		if !resumable && err != nil {
 			_ = os.RemoveAll(fileDir)
 		}
 	}()
-	var (
-		emptyFile *os.File
-		chunkData []byte
-	)
-
-	emptyFile, err = os.Create(filePath)
-	if err != nil {
-		helper.BadRequest(c, err)
-		return
-	}
-	defer emptyFile.Close()
-
-	chunkData, err = io.ReadAll(uploadFile)
+	chunkData, err := io.ReadAll(uploadFile)
 	if err != nil {
 		helper.InternalServer(c, buserr.WithMap("ErrFileUpload", map[string]interface{}{"name": filename, "detail": err.Error()}, err))
 		return
 	}
 	if cancellable && chunkUploadCancelled(uploadID) {
-		err = errors.New("upload cancelled")
+		err = errChunkUploadCancelled
 		helper.BadRequest(c, err)
 		return
 	}
+	if resumable {
+		offset, parseErr := strconv.ParseInt(c.PostForm("offset"), 10, 64)
+		if parseErr != nil {
+			helper.BadRequest(c, parseErr)
+			return
+		}
+		fileSize, parseErr := strconv.ParseInt(c.PostForm("fileSize"), 10, 64)
+		if parseErr != nil {
+			helper.BadRequest(c, parseErr)
+			return
+		}
+		overwrite := true
+		if ow := c.PostForm("overwrite"); ow != "" {
+			overwrite, _ = strconv.ParseBool(ow)
+		}
+		err = writeResumableUploadChunk(resumableUploadChunk{
+			UploadID:   uploadID,
+			Filename:   filename,
+			DstDir:     c.PostForm("path"),
+			ChunkIndex: chunkIndex,
+			ChunkCount: chunkCount,
+			Offset:     offset,
+			FileSize:   fileSize,
+			Overwrite:  overwrite,
+		}, chunkData)
+		if err != nil {
+			uploadErr := buserr.WithMap("ErrFileUpload", map[string]interface{}{"name": filename, "detail": err.Error()}, err)
+			helper.ErrorWithDetailAndData(c, http.StatusInternalServerError, "ErrInternalServer", uploadErr, gin.H{
+				"retryable": isRetryableChunkUploadError(err),
+			})
+			return
+		}
+		if chunkIndex+1 == chunkCount {
+			cancelledChunkUploads.Lock()
+			delete(cancelledChunkUploads.ids, uploadID)
+			cancelledChunkUploads.Unlock()
+		}
+		helper.SuccessWithData(c, true)
+		return
+	}
+
+	emptyFile, err := os.Create(filePath)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	defer emptyFile.Close()
 
 	chunkPath := filepath.Join(fileDir, fmt.Sprintf("%s.%d", filename, chunkIndex))
 	err = os.WriteFile(chunkPath, chunkData, constant.DirPerm)
@@ -1002,6 +1400,10 @@ func (b *BaseApi) StopChunkUpload(c *gin.Context) {
 		cancelledChunkUploads.Unlock()
 	})
 	if err := os.RemoveAll(filepath.Join(global.Dir.TmpDir, "upload", uploadID)); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	if err := removeActiveResumableUploadPart(uploadID); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

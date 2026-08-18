@@ -30,6 +30,16 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 	ctx.Abort()
 }
 
+func ErrorWithDetailAndData(ctx *gin.Context, code int, msgKey string, err error, data interface{}) {
+	res := dto.Response{
+		Code: code,
+		Data: data,
+	}
+	res.Message = i18n.GetMsgWithDetail(msgKey, err.Error())
+	ctx.JSON(http.StatusOK, res)
+	ctx.Abort()
+}
+
 func InternalServer(ctx *gin.Context, err error) {
 	ErrorWithDetail(ctx, http.StatusInternalServerError, "ErrInternalServer", err)
 }

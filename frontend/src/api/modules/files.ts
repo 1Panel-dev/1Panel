@@ -6,6 +6,10 @@ import { TimeoutEnum } from '@/enums/http-enum';
 import { ReqPage } from '@/api/interface';
 import { Dashboard } from '@/api/interface/dashboard';
 
+export type FileUploadRequestConfig = AxiosRequestConfig & {
+    skipErrorMessage?: boolean;
+};
+
 export const getFilesList = (params: File.ReqFile) => {
     return http.post<File.File>('files/search', params, TimeoutEnum.T_5M);
 };
@@ -105,7 +109,7 @@ export const checkFile = (path: string, withInit: boolean) => {
     return http.post<boolean>('files/check', { path: path, withInit: withInit });
 };
 
-export const uploadFileData = (params: FormData, config: AxiosRequestConfig) => {
+export const uploadFileData = (params: FormData, config: FileUploadRequestConfig) => {
     return http.upload<File.File>('files/upload', params, config);
 };
 
@@ -121,12 +125,17 @@ export const setFileRemark = (params: File.FileRemarkUpdate) => {
     return http.post('files/remark', params);
 };
 
-export const chunkUploadFileData = (params: FormData, config: AxiosRequestConfig) => {
+export const chunkUploadFileData = (params: FormData, config: FileUploadRequestConfig) => {
     return http.upload<File.File>('files/chunkupload', params, config);
 };
 
-export const stopChunkUpload = (key: string) => {
-    return http.post('files/chunkupload/stop', { key });
+export const stopChunkUpload = (key: string, currentNode?: string) => {
+    return http.post(
+        'files/chunkupload/stop',
+        { key },
+        undefined,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 
 export const renameRile = (params: File.FileRename) => {
