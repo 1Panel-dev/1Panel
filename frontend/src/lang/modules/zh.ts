@@ -1126,7 +1126,7 @@ const message = {
             modelGroupModelsHelper:
                 '填写客户端请求 AI 网关时使用的请求模型名；智能路由会按顺序优先选择靠前模型，不做模型间负载均衡。',
             modelGroupGuide:
-                '模型组配置客户端请求 AI 网关时使用的请求模型名；上游模型在账号池的模型映射中配置。auto 是虚拟模型名，不需要放进模型组。',
+                '模型组配置客户端请求 AI 网关时使用的请求模型名；上游模型在账号池的模型映射中配置。智能路由模型名是虚拟名称，不需要放进模型组。',
             modelGroupModelCount: '{0} 个模型',
             contentCompliance: '内容合规',
             contentAction: '处理动作',
@@ -1146,12 +1146,14 @@ const message = {
             importResult: '导入成功 {0} 条，重复 {1} 条，无效 {2} 条',
             auditLogs: '审计日志',
             smartRoute: '智能路由',
-            smartRouteGuideTitle: '客户端使用 model=auto 进入智能路由',
+            autoModelName: '智能路由模型名',
+            autoModelNameHelper: '客户端请求该模型名时进入智能路由，请避免与真实模型名重复。',
+            smartRouteGuideTitle: '客户端使用 model={0} 进入智能路由',
             smartRouteGuideReady:
-                'model=auto 会按请求复杂度在简单模型组和复杂模型组中选择模型；model 不是 auto 时仍按普通 AI 网关转发。',
+                'model={0} 会按请求复杂度在简单模型组和复杂模型组中选择模型；其他模型仍按普通 AI 网关转发。',
             smartRouteGuideNotReady:
-                '请先在设置中开启智能路由并配置简单/复杂模型组；配置完成后客户端使用 model=auto 进入智能路由。',
-            copyAutoModel: '复制 auto',
+                '请先在设置中开启智能路由并配置简单/复杂模型组；配置完成后客户端使用 model={0} 进入智能路由。',
+            copyAutoModel: '复制模型名',
             goSmartRouteSetting: '去设置',
             smartRoutePolicy: '路由策略',
             routeConfig: '路由配置',
@@ -1205,7 +1207,7 @@ const message = {
             sampleLabelBlock: '阻断',
             latencyMs: '耗时(ms)',
             smartRouteSettingGuide:
-                '开启后只有 model=auto 的请求才触发智能路由；简单模型组用于低成本任务，复杂模型组用于代码分析、架构设计、故障排查等任务。',
+                '开启后只有 model={0} 的请求才触发智能路由；简单模型组用于低成本任务，复杂模型组用于代码分析、架构设计、故障排查等任务。',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: '每行一个样本',
         },

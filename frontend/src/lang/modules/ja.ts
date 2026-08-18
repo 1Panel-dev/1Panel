@@ -1158,7 +1158,7 @@ const message = {
             modelGroupModelsHelper:
                 'クライアントが AI ゲートウェイを呼び出す際に使用するリクエストモデル名を入力してください。スマートルーティングは順番にモデルを試し、モデル間の負荷分散は行いません。',
             modelGroupGuide:
-                'モデルグループには AI ゲートウェイが公開するリクエストモデル名を設定します。上流モデルはアカウントプールのモデルマッピングで設定してください。auto は仮想モデル名のため、モデルグループには追加しません。',
+                'モデルグループには AI ゲートウェイが公開するリクエストモデル名を設定します。上流モデルはアカウントプールで設定してください。スマートルーティングモデル名は仮想名のため、モデルグループには追加しません。',
             modelGroupModelCount: '{0} モデル',
             contentCompliance: 'コンテンツコンプライアンス',
             contentAction: '処理',
@@ -1178,12 +1178,15 @@ const message = {
             importResult: 'インポート {0} 件、重複 {1} 件、無効 {2} 件',
             auditLogs: '監査ログ',
             smartRoute: 'スマートルーティング',
-            smartRouteGuideTitle: 'クライアントで model=auto を使用してスマートルーティングに入ります',
+            autoModelName: 'スマートルーティングモデル名',
+            autoModelNameHelper:
+                'このモデル名のリクエストはスマートルーティングに入ります。実在するモデル名との重複を避けてください。',
+            smartRouteGuideTitle: 'クライアントで model={0} を使用してスマートルーティングに入ります',
             smartRouteGuideReady:
-                'model=auto はリクエストの複雑度に応じて簡単/複雑モデルグループから選択します。それ以外の model は通常通り転送されます。',
+                'model={0} はリクエストの複雑度に応じて簡単/複雑モデルグループから選択します。それ以外の model は通常通り転送されます。',
             smartRouteGuideNotReady:
-                '先に設定でスマートルーティングを有効化し、簡単/複雑モデルグループを設定してください。その後クライアントで model=auto を使用します。',
-            copyAutoModel: 'auto をコピー',
+                '先に設定でスマートルーティングを有効化し、簡単/複雑モデルグループを設定してください。その後クライアントで model={0} を使用します。',
+            copyAutoModel: 'モデル名をコピー',
             goSmartRouteSetting: '設定へ移動',
             smartRoutePolicy: 'ルーティングポリシー',
             routeConfig: 'ルーティング設定',
@@ -1242,7 +1245,7 @@ const message = {
             sampleLabelBlock: 'ブロック',
             latencyMs: 'レイテンシ(ms)',
             smartRouteSettingGuide:
-                '有効化後、model=auto のリクエストだけがスマートルーティングを使用します。簡単モデルグループは低コストタスク、複雑モデルグループはコード分析、設計、障害調査などに使います。',
+                '有効化後、model={0} のリクエストだけがスマートルーティングを使用します。簡単モデルグループは低コストタスク、複雑モデルグループはコード分析、設計、障害調査などに使います。',
             sampleLabelPlaceholder: '簡単 / 複雑 / 高',
             sampleImportPlaceholder: '1行に1つのサンプル',
             apiKeyCount: 'API キー数',

@@ -1177,7 +1177,7 @@ const message = {
             modelGroupModelsHelper:
                 'Informe os nomes de modelo usados pelos clientes ao chamar o gateway de IA; o roteamento inteligente tenta os modelos em ordem e não faz balanceamento entre modelos.',
             modelGroupGuide:
-                'Grupos de modelos contêm os nomes de modelo expostos pelo gateway de IA. Configure os modelos upstream no mapeamento de modelos do pool de contas. auto é um nome de modelo virtual e não deve ser adicionado ao grupo.',
+                'Grupos de modelos contêm os nomes expostos pelo gateway de IA. Configure os modelos upstream no pool de contas. O nome do modelo de roteamento é virtual e não deve ser adicionado ao grupo.',
             modelGroupModelCount: '{0} modelos',
             contentCompliance: 'Conformidade de Conteúdo',
             contentAction: 'Ação',
@@ -1197,12 +1197,15 @@ const message = {
             importResult: 'Importados {0}, duplicados {1}, inválidos {2}',
             auditLogs: 'Logs de Auditoria',
             smartRoute: 'Roteamento inteligente',
-            smartRouteGuideTitle: 'Use model=auto no cliente para entrar no roteamento inteligente',
+            autoModelName: 'Nome do modelo de roteamento',
+            autoModelNameHelper:
+                'Solicitações com este nome de modelo entram no roteamento inteligente. Evite nomes de modelos reais.',
+            smartRouteGuideTitle: 'Use model={0} no cliente para entrar no roteamento inteligente',
             smartRouteGuideReady:
-                'model=auto escolhe o grupo de modelos simples ou complexos conforme a complexidade da solicitação. Outros modelos são encaminhados normalmente.',
+                'model={0} escolhe o grupo de modelos simples ou complexos conforme a complexidade da solicitação. Outros modelos são encaminhados normalmente.',
             smartRouteGuideNotReady:
-                'Ative o roteamento inteligente e configure os grupos simples/complexos primeiro. Depois use model=auto no cliente.',
-            copyAutoModel: 'Copiar auto',
+                'Ative o roteamento inteligente e configure os grupos simples/complexos primeiro. Depois use model={0} no cliente.',
+            copyAutoModel: 'Copiar nome do modelo',
             goSmartRouteSetting: 'Ir para configurações',
             smartRoutePolicy: 'Política de roteamento',
             routeConfig: 'Configuração de roteamento',
@@ -1261,7 +1264,7 @@ const message = {
             sampleLabelBlock: 'Bloquear',
             latencyMs: 'Latência(ms)',
             smartRouteSettingGuide:
-                'Depois de ativado, apenas solicitações com model=auto usam o roteamento inteligente. O grupo simples é para tarefas de baixo custo; o complexo para análise de código, arquitetura e diagnóstico.',
+                'Depois de ativado, apenas solicitações com model={0} usam o roteamento inteligente. O grupo simples é para tarefas de baixo custo; o complexo para análise de código, arquitetura e diagnóstico.',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: 'Uma amostra por linha',
             apiKeyCount: 'Quantidade',

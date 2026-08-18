@@ -1148,7 +1148,7 @@ const message = {
             modelGroupModelsHelper:
                 'ປ້ອນຊື່ໂມເດວຄຳຂໍທີ່ Client ໃຊ້ເອີ້ນ AI Gateway; Smart Route ຈະລອງໂມເດວຕາມລຳດັບ ແລະ ບໍ່ເຮັດ Load Balance ລະຫວ່າງໂມເດວ.',
             modelGroupGuide:
-                'ກຸ່ມໂມເດວຈະມີຊື່ໂມເດວຄຳຂໍທີ່ AI Gateway ເປີດໃຫ້ໃຊ້. ຕັ້ງຄ່າໂມເດວຕົ້ນທາງໃນການຈັບຄູ່ໂມເດວຂອງກຸ່ມບັນຊີ. auto ແມ່ນຊື່ໂມເດວສະເໝືອນ ແລະ ບໍ່ຕ້ອງເພີ່ມໃນກຸ່ມໂມເດວ.',
+                'ກຸ່ມໂມເດວຈະມີຊື່ໂມເດວຄຳຂໍທີ່ AI Gateway ເປີດໃຫ້ໃຊ້. ຕັ້ງຄ່າໂມເດວຕົ້ນທາງໃນກຸ່ມບັນຊີ. ຊື່ໂມເດວ Smart Route ແມ່ນຊື່ສະເໝືອນ ແລະ ບໍ່ຕ້ອງເພີ່ມໃນກຸ່ມໂມເດວ.',
             modelGroupModelCount: '{0} ໂມເດວ',
             contentCompliance: 'ການປະຕິບັດຕາມເນື້ອຫາ',
             contentAction: 'ການດຳເນີນການ',
@@ -1168,12 +1168,14 @@ const message = {
             importResult: 'ນຳເຂົ້າແລ້ວ {0}, ຊ້ຳກັນ {1}, ບໍ່ຖືກຕ້ອງ {2}',
             auditLogs: 'ບັນທຶກການກວດສອບ',
             smartRoute: 'ການຈັດເສັ້ນທາງອັດສະລິຍະ',
-            smartRouteGuideTitle: 'ໃຊ້ model=auto ຢູ່ Client ເພື່ອເຂົ້າ Smart Route',
+            autoModelName: 'ຊື່ໂມເດວ Smart Route',
+            autoModelNameHelper: 'ຄຳຮ້ອງຂໍທີ່ໃຊ້ຊື່ໂມເດວນີ້ຈະເຂົ້າ Smart Route. ຫຼີກລ້ຽງຊື່ທີ່ຊ້ຳກັບໂມເດວຈິງ.',
+            smartRouteGuideTitle: 'ໃຊ້ model={0} ຢູ່ Client ເພື່ອເຂົ້າ Smart Route',
             smartRouteGuideReady:
-                'model=auto ຈະເລືອກຈາກກຸ່ມໂມເດວແບບງ່າຍ ຫຼື ຊັບຊ້ອນຕາມຄວາມຊັບຊ້ອນຂອງຄຳຮ້ອງຂໍ. ໂມເດວອື່ນຈະຖືກສົ່ງຕໍ່ຕາມປົກກະຕິ.',
+                'model={0} ຈະເລືອກຈາກກຸ່ມໂມເດວແບບງ່າຍ ຫຼື ຊັບຊ້ອນຕາມຄວາມຊັບຊ້ອນຂອງຄຳຮ້ອງຂໍ. ໂມເດວອື່ນຈະຖືກສົ່ງຕໍ່ຕາມປົກກະຕິ.',
             smartRouteGuideNotReady:
-                'ເປີດ Smart Route ແລະ ຕັ້ງຄ່າກຸ່ມໂມເດວແບບງ່າຍ/ຊັບຊ້ອນກ່ອນ, ຈາກນັ້ນໃຊ້ model=auto ຢູ່ Client.',
-            copyAutoModel: 'ຄັດລອກ auto',
+                'ເປີດ Smart Route ແລະ ຕັ້ງຄ່າກຸ່ມໂມເດວແບບງ່າຍ/ຊັບຊ້ອນກ່ອນ, ຈາກນັ້ນໃຊ້ model={0} ຢູ່ Client.',
+            copyAutoModel: 'ຄັດລອກຊື່ໂມເດວ',
             goSmartRouteSetting: 'ໄປທີ່ການຕັ້ງຄ່າ',
             smartRoutePolicy: 'ນະໂຍບາຍການກຳນົດເສັ້ນທາງ',
             routeConfig: 'ການຕັ້ງຄ່າເສັ້ນທາງ',
@@ -1230,7 +1232,7 @@ const message = {
             sampleLabelBlock: 'ບລັອກ',
             latencyMs: 'ຄວາມຫຼ້າຊ້າ (ms)',
             smartRouteSettingGuide:
-                'ຫຼັງຈາກເປີດໃຊ້ ມີພຽງຄຳຮ້ອງຂໍທີ່ໃຊ້ model=auto ເທົ່ານັ້ນທີ່ຈະເປີດ Smart Route. ກຸ່ມແບບງ່າຍໃຊ້ສຳລັບວຽກຕົ້ນທຶນຕ່ຳ; ກຸ່ມແບບຊັບຊ້ອນໃຊ້ສຳລັບວິເຄາະໂຄດ, ອອກແບບສະຖາປັດຕະຍະກຳ, ແກ້ໄຂບັນຫາ ແລະ ວຽກຄ້າຍຄືກັນ.',
+                'ຫຼັງຈາກເປີດໃຊ້ ມີພຽງຄຳຮ້ອງຂໍທີ່ໃຊ້ model={0} ເທົ່ານັ້ນທີ່ຈະເປີດ Smart Route. ກຸ່ມແບບງ່າຍໃຊ້ສຳລັບວຽກຕົ້ນທຶນຕ່ຳ; ກຸ່ມແບບຊັບຊ້ອນໃຊ້ສຳລັບວິເຄາະໂຄດ, ອອກແບບສະຖາປັດຕະຍະກຳ, ແກ້ໄຂບັນຫາ ແລະ ວຽກຄ້າຍຄືກັນ.',
             sampleLabelPlaceholder: 'ງ່າຍ / ຊັບຊ້ອນ / ສູງ',
             sampleImportPlaceholder: 'ໜຶ່ງຕົວຢ່າງຕໍ່ແຖວ',
         },

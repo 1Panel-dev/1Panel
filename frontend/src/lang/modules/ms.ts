@@ -1180,7 +1180,7 @@ const message = {
             modelGroupModelsHelper:
                 'Masukkan nama model permintaan yang digunakan klien untuk memanggil AI Gateway; penghalaan pintar mencuba model mengikut susunan dan tidak mengimbang beban antara model.',
             modelGroupGuide:
-                'Kumpulan model mengandungi nama model permintaan yang didedahkan oleh AI Gateway. Konfigurasikan model upstream dalam pemetaan model kumpulan akaun. auto ialah nama model maya dan tidak perlu ditambah pada kumpulan model.',
+                'Kumpulan model mengandungi nama model permintaan yang didedahkan oleh AI Gateway. Konfigurasikan model upstream dalam kumpulan akaun. Nama model penghalaan pintar ialah nama maya dan tidak perlu ditambah pada kumpulan model.',
             modelGroupModelCount: '{0} model',
             contentCompliance: 'Pematuhan Kandungan',
             contentAction: 'Tindakan',
@@ -1200,12 +1200,15 @@ const message = {
             importResult: 'Diimport {0}, pendua {1}, tidak sah {2}',
             auditLogs: 'Log Audit',
             smartRoute: 'Penghalaan Pintar',
-            smartRouteGuideTitle: 'Gunakan model=auto pada klien untuk memasuki penghalaan pintar',
+            autoModelName: 'Nama Model Penghalaan Pintar',
+            autoModelNameHelper:
+                'Permintaan dengan nama model ini menggunakan penghalaan pintar. Elakkan nama model sebenar.',
+            smartRouteGuideTitle: 'Gunakan model={0} pada klien untuk memasuki penghalaan pintar',
             smartRouteGuideReady:
-                'model=auto memilih kumpulan model ringkas atau kompleks mengikut kerumitan permintaan. Model lain dihantar seperti biasa.',
+                'model={0} memilih kumpulan model ringkas atau kompleks mengikut kerumitan permintaan. Model lain dihantar seperti biasa.',
             smartRouteGuideNotReady:
-                'Aktifkan penghalaan pintar dan konfigurasikan kumpulan ringkas/kompleks dahulu. Kemudian gunakan model=auto pada klien.',
-            copyAutoModel: 'Salin auto',
+                'Aktifkan penghalaan pintar dan konfigurasikan kumpulan ringkas/kompleks dahulu. Kemudian gunakan model={0} pada klien.',
+            copyAutoModel: 'Salin nama model',
             goSmartRouteSetting: 'Pergi ke tetapan',
             smartRoutePolicy: 'Polisi Penghalaan',
             routeConfig: 'Konfigurasi Penghalaan',
@@ -1264,7 +1267,7 @@ const message = {
             sampleLabelBlock: 'Sekat',
             latencyMs: 'Latensi(ms)',
             smartRouteSettingGuide:
-                'Selepas diaktifkan, hanya permintaan model=auto mencetuskan penghalaan pintar. Kumpulan ringkas untuk tugas kos rendah; kumpulan kompleks untuk analisis kod, reka bentuk seni bina dan penyelesaian masalah.',
+                'Selepas diaktifkan, hanya permintaan model={0} mencetuskan penghalaan pintar. Kumpulan ringkas untuk tugas kos rendah; kumpulan kompleks untuk analisis kod, reka bentuk seni bina dan penyelesaian masalah.',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: 'Satu sampel setiap baris',
             apiKeyCount: 'Kuantiti',
