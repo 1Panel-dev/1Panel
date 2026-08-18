@@ -1177,7 +1177,7 @@ const message = {
             modelGroupModelsHelper:
                 'İstemcilerin AI Ağ Geçidini çağırırken kullandığı istek modeli adlarını girin; akıllı yönlendirme modelleri sırayla dener ve modeller arasında yük dengelemez.',
             modelGroupGuide:
-                'Model grupları AI Ağ Geçidinin sunduğu istek modeli adlarını içerir. Üst modelleri hesap havuzundaki model eşlemesinde yapılandırın. auto sanal bir model adıdır ve model grubuna eklenmez.',
+                'Model grupları AI Ağ Geçidinin sunduğu istek modeli adlarını içerir. Üst modelleri hesap havuzunda yapılandırın. Akıllı yönlendirme model adı sanaldır ve model grubuna eklenmez.',
             modelGroupModelCount: '{0} model',
             contentCompliance: 'İçerik Uyumluluğu',
             contentAction: 'Eylem',
@@ -1197,12 +1197,15 @@ const message = {
             importResult: 'İçe aktarılan {0}, yinelenen {1}, geçersiz {2}',
             auditLogs: 'Denetim Günlükleri',
             smartRoute: 'Akıllı Yönlendirme',
-            smartRouteGuideTitle: 'Akıllı yönlendirme için istemcide model=auto kullanın',
+            autoModelName: 'Akıllı Yönlendirme Model Adı',
+            autoModelNameHelper:
+                'Bu model adını kullanan istekler akıllı yönlendirmeye girer. Gerçek model adlarıyla çakışmayın.',
+            smartRouteGuideTitle: 'Akıllı yönlendirme için istemcide model={0} kullanın',
             smartRouteGuideReady:
-                'model=auto isteğin karmaşıklığına göre basit veya karmaşık model grubundan seçim yapar. Diğer model değerleri normal şekilde iletilir.',
+                'model={0} isteğin karmaşıklığına göre basit veya karmaşık model grubundan seçim yapar. Diğer model değerleri normal şekilde iletilir.',
             smartRouteGuideNotReady:
-                'Önce ayarlardan akıllı yönlendirmeyi etkinleştirip basit/karmaşık model gruplarını yapılandırın. Sonra istemcide model=auto kullanın.',
-            copyAutoModel: 'auto kopyala',
+                'Önce ayarlardan akıllı yönlendirmeyi etkinleştirip basit/karmaşık model gruplarını yapılandırın. Sonra istemcide model={0} kullanın.',
+            copyAutoModel: 'Model adını kopyala',
             goSmartRouteSetting: 'Ayarlara git',
             smartRoutePolicy: 'Yönlendirme Politikası',
             routeConfig: 'Yönlendirme Yapılandırması',
@@ -1261,7 +1264,7 @@ const message = {
             sampleLabelBlock: 'Engelle',
             latencyMs: 'Gecikme(ms)',
             smartRouteSettingGuide:
-                'Etkinleştirildikten sonra yalnızca model=auto istekleri akıllı yönlendirmeyi tetikler. Basit grup düşük maliyetli işler, karmaşık grup kod analizi, mimari tasarım ve sorun giderme için kullanılır.',
+                'Etkinleştirildikten sonra yalnızca model={0} istekleri akıllı yönlendirmeyi tetikler. Basit grup düşük maliyetli işler, karmaşık grup kod analizi, mimari tasarım ve sorun giderme için kullanılır.',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: 'Her satıra bir örnek',
             apiKeyCount: 'Miktar',

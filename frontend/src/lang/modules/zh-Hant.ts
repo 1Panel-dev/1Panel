@@ -1112,7 +1112,7 @@ const message = {
             modelGroupModelsHelper:
                 '填寫用戶端請求 AI 網關時使用的請求模型名稱；智慧路由會按順序優先選擇靠前模型，不做模型間負載均衡。',
             modelGroupGuide:
-                '模型組配置用戶端請求 AI 網關時使用的請求模型名稱；上游模型在帳號池的模型映射中配置。auto 是虛擬模型名稱，不需要放進模型組。',
+                '模型組配置用戶端請求 AI 網關時使用的請求模型名稱；上游模型在帳號池的模型映射中配置。智慧路由模型名稱是虛擬名稱，不需要放進模型組。',
             modelGroupModelCount: '{0} 個模型',
             contentCompliance: '內容合規',
             contentAction: '處理動作',
@@ -1132,12 +1132,14 @@ const message = {
             importResult: '匯入成功 {0} 條，重複 {1} 條，無效 {2} 條',
             auditLogs: '審計日誌',
             smartRoute: '智慧路由',
-            smartRouteGuideTitle: '用戶端使用 model=auto 進入智慧路由',
+            autoModelName: '智慧路由模型名稱',
+            autoModelNameHelper: '用戶端請求此模型名稱時進入智慧路由，請避免與真實模型名稱重複。',
+            smartRouteGuideTitle: '用戶端使用 model={0} 進入智慧路由',
             smartRouteGuideReady:
-                'model=auto 會依請求複雜度在簡單模型組和複雜模型組中選擇模型；model 不是 auto 時仍按普通 AI 網關轉發。',
+                'model={0} 會依請求複雜度在簡單模型組和複雜模型組中選擇模型；其他模型仍按普通 AI 網關轉發。',
             smartRouteGuideNotReady:
-                '請先在設定中開啟智慧路由並配置簡單/複雜模型組；配置完成後用戶端使用 model=auto 進入智慧路由。',
-            copyAutoModel: '複製 auto',
+                '請先在設定中開啟智慧路由並配置簡單/複雜模型組；配置完成後用戶端使用 model={0} 進入智慧路由。',
+            copyAutoModel: '複製模型名稱',
             goSmartRouteSetting: '去設定',
             smartRoutePolicy: '路由策略',
             routeConfig: '路由配置',
@@ -1191,7 +1193,7 @@ const message = {
             sampleLabelBlock: '阻斷',
             latencyMs: '耗時(ms)',
             smartRouteSettingGuide:
-                '開啟後只有 model=auto 的請求才觸發智慧路由；簡單模型組用於低成本任務，複雜模型組用於程式碼分析、架構設計、故障排查等任務。',
+                '開啟後只有 model={0} 的請求才觸發智慧路由；簡單模型組用於低成本任務，複雜模型組用於程式碼分析、架構設計、故障排查等任務。',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: '每行一個樣本',
             apiKeyCount: '數量',

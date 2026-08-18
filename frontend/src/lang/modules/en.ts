@@ -1169,7 +1169,7 @@ const message = {
             modelGroupModelsHelper:
                 'Enter the request model names used by clients to call the AI Gateway; smart routing tries models in order and does not load balance between models.',
             modelGroupGuide:
-                'Model groups contain request model names exposed by the AI Gateway. Configure upstream models in the account pool model mapping. auto is a virtual model name and does not belong in a model group.',
+                'Model groups contain request model names exposed by the AI Gateway. Configure upstream models in the account pool model mapping. The smart route model name is virtual and does not belong in a model group.',
             modelGroupModelCount: '{0} models',
             contentCompliance: 'Content Compliance',
             contentAction: 'Action',
@@ -1189,12 +1189,15 @@ const message = {
             importResult: 'Imported {0}, duplicated {1}, invalid {2}',
             auditLogs: 'Audit Logs',
             smartRoute: 'Smart Route',
-            smartRouteGuideTitle: 'Use model=auto on the client to enter smart routing',
+            autoModelName: 'Smart Route Model Name',
+            autoModelNameHelper:
+                'Requests using this model name enter smart routing. Avoid using the name of a real model.',
+            smartRouteGuideTitle: 'Use model={0} on the client to enter smart routing',
             smartRouteGuideReady:
-                'model=auto chooses from the simple or complex model group by request complexity. Any other model is forwarded normally.',
+                'model={0} chooses from the simple or complex model group by request complexity. Any other model is forwarded normally.',
             smartRouteGuideNotReady:
-                'Enable smart routing and configure simple/complex model groups first. Then use model=auto on the client.',
-            copyAutoModel: 'Copy auto',
+                'Enable smart routing and configure simple/complex model groups first. Then use model={0} on the client.',
+            copyAutoModel: 'Copy Model Name',
             goSmartRouteSetting: 'Go to Settings',
             smartRoutePolicy: 'Route Policy',
             routeConfig: 'Route Config',
@@ -1253,7 +1256,7 @@ const message = {
             sampleLabelBlock: 'Block',
             latencyMs: 'Latency(ms)',
             smartRouteSettingGuide:
-                'After enabled, only requests with model=auto trigger smart routing. The simple group is for low-cost tasks; the complex group is for code analysis, architecture design, troubleshooting, and similar work.',
+                'After enabled, only requests with model={0} trigger smart routing. The simple group is for low-cost tasks; the complex group is for code analysis, architecture design, troubleshooting, and similar work.',
             sampleLabelPlaceholder: 'simple / complex / high',
             sampleImportPlaceholder: 'One sample per line',
         },

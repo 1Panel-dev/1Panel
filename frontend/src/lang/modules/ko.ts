@@ -1147,7 +1147,7 @@ const message = {
             modelGroupModelsHelper:
                 '클라이언트가 AI 게이트웨이를 호출할 때 사용하는 요청 모델 이름을 입력하세요. 스마트 라우팅은 순서대로 모델을 우선 선택하며 모델 간 부하 분산은 하지 않습니다.',
             modelGroupGuide:
-                '모델 그룹에는 AI 게이트웨이가 노출하는 요청 모델 이름을 설정합니다. 업스트림 모델은 계정 풀의 모델 매핑에서 설정하세요. auto는 가상 모델 이름이므로 모델 그룹에 추가하지 않습니다.',
+                '모델 그룹에는 AI 게이트웨이가 노출하는 요청 모델 이름을 설정합니다. 업스트림 모델은 계정 풀에서 설정하세요. 스마트 라우팅 모델 이름은 가상 이름이므로 모델 그룹에 추가하지 않습니다.',
             modelGroupModelCount: '{0}개 모델',
             contentCompliance: '콘텐츠 규정 준수',
             contentAction: '작업',
@@ -1167,12 +1167,15 @@ const message = {
             importResult: '가져오기 {0}건, 중복 {1}건, 유효하지 않음 {2}건',
             auditLogs: '감사 로그',
             smartRoute: '스마트 라우팅',
-            smartRouteGuideTitle: '클라이언트에서 model=auto를 사용해 스마트 라우팅에 진입합니다',
+            autoModelName: '스마트 라우팅 모델 이름',
+            autoModelNameHelper:
+                '이 모델 이름을 사용하는 요청은 스마트 라우팅으로 처리됩니다. 실제 모델 이름과 중복되지 않게 하세요.',
+            smartRouteGuideTitle: '클라이언트에서 model={0}를 사용해 스마트 라우팅에 진입합니다',
             smartRouteGuideReady:
-                'model=auto는 요청 복잡도에 따라 간단/복잡 모델 그룹에서 모델을 선택합니다. 다른 model은 일반 AI 게이트웨이로 전달됩니다.',
+                'model={0}는 요청 복잡도에 따라 간단/복잡 모델 그룹에서 모델을 선택합니다. 다른 model은 일반 AI 게이트웨이로 전달됩니다.',
             smartRouteGuideNotReady:
-                '먼저 설정에서 스마트 라우팅을 켜고 간단/복잡 모델 그룹을 설정하세요. 이후 클라이언트에서 model=auto를 사용합니다.',
-            copyAutoModel: 'auto 복사',
+                '먼저 설정에서 스마트 라우팅을 켜고 간단/복잡 모델 그룹을 설정하세요. 이후 클라이언트에서 model={0}를 사용합니다.',
+            copyAutoModel: '모델 이름 복사',
             goSmartRouteSetting: '설정으로 이동',
             smartRoutePolicy: '라우팅 정책',
             routeConfig: '라우팅 설정',
@@ -1231,7 +1234,7 @@ const message = {
             sampleLabelBlock: '차단',
             latencyMs: '지연 시간(ms)',
             smartRouteSettingGuide:
-                '활성화 후 model=auto 요청만 스마트 라우팅을 사용합니다. 간단 모델 그룹은 저비용 작업, 복잡 모델 그룹은 코드 분석, 아키텍처 설계, 장애 조사 등에 사용됩니다.',
+                '활성화 후 model={0} 요청만 스마트 라우팅을 사용합니다. 간단 모델 그룹은 저비용 작업, 복잡 모델 그룹은 코드 분석, 아키텍처 설계, 장애 조사 등에 사용됩니다.',
             sampleLabelPlaceholder: '단순 / 복잡 / 높음',
             sampleImportPlaceholder: '한 줄에 샘플 하나',
             apiKeyCount: 'API 키 수',

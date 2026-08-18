@@ -51,8 +51,8 @@ const tabLabels: Record<LocalTab, string> = {
 
 const buttons = computed<Array<{ label: string; value: LocalTab }>>(() => {
     const items: Array<{ label: string; value: LocalTab }> = [
-        { label: tabLabels.ollama, value: 'ollama' },
         { label: tabLabels.vllm, value: 'vllm' },
+        { label: tabLabels.ollama, value: 'ollama' },
     ];
     if (isFxplay.value) {
         items.push({ label: tabLabels.tensorrt, value: 'tensorrt' });

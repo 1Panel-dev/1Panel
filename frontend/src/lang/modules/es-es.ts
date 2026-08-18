@@ -1175,7 +1175,7 @@ const message = {
             modelGroupModelsHelper:
                 'Ingrese los nombres de modelo que usan los clientes al llamar al gateway de IA; el enrutamiento inteligente prueba los modelos en orden y no balancea carga entre modelos.',
             modelGroupGuide:
-                'Los grupos de modelos contienen los nombres de modelo expuestos por el gateway de IA. Configure los modelos upstream en el mapeo de modelos del pool de cuentas. auto es un nombre de modelo virtual y no debe añadirse al grupo.',
+                'Los grupos de modelos contienen los nombres expuestos por el gateway de IA. Configure los modelos upstream en el pool de cuentas. El nombre del modelo de enrutamiento es virtual y no debe añadirse al grupo.',
             modelGroupModelCount: '{0} modelos',
             contentCompliance: 'Cumplimiento de contenido',
             contentAction: 'Acción',
@@ -1195,12 +1195,15 @@ const message = {
             importResult: 'Importadas {0}, duplicadas {1}, no válidas {2}',
             auditLogs: 'Registros de auditoría',
             smartRoute: 'Enrutamiento inteligente',
-            smartRouteGuideTitle: 'Use model=auto en el cliente para entrar al enrutamiento inteligente',
+            autoModelName: 'Nombre del modelo de enrutamiento',
+            autoModelNameHelper:
+                'Las solicitudes con este nombre de modelo usan el enrutamiento inteligente. Evite nombres de modelos reales.',
+            smartRouteGuideTitle: 'Use model={0} en el cliente para entrar al enrutamiento inteligente',
             smartRouteGuideReady:
-                'model=auto elige entre el grupo simple o complejo según la complejidad de la solicitud. Cualquier otro modelo se reenvía normalmente.',
+                'model={0} elige entre el grupo simple o complejo según la complejidad de la solicitud. Cualquier otro modelo se reenvía normalmente.',
             smartRouteGuideNotReady:
-                'Primero active el enrutamiento inteligente y configure los grupos simple/complejo. Luego use model=auto en el cliente.',
-            copyAutoModel: 'Copiar auto',
+                'Primero active el enrutamiento inteligente y configure los grupos simple/complejo. Luego use model={0} en el cliente.',
+            copyAutoModel: 'Copiar nombre del modelo',
             goSmartRouteSetting: 'Ir a configuración',
             smartRoutePolicy: 'Política de enrutamiento',
             routeConfig: 'Configuración de enrutamiento',
@@ -1259,7 +1262,7 @@ const message = {
             sampleLabelBlock: 'Bloquear',
             latencyMs: 'Latencia(ms)',
             smartRouteSettingGuide:
-                'Después de activarlo, solo las solicitudes con model=auto usan enrutamiento inteligente. El grupo simple es para tareas de bajo costo; el complejo para análisis de código, arquitectura y diagnóstico.',
+                'Después de activarlo, solo las solicitudes con model={0} usan enrutamiento inteligente. El grupo simple es para tareas de bajo costo; el complejo para análisis de código, arquitectura y diagnóstico.',
             sampleLabelPlaceholder: 'simple / complejo / alto',
             sampleImportPlaceholder: 'Una muestra por línea',
             apiKeyCount: 'Cantidad',
