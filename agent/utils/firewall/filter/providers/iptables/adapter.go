@@ -118,21 +118,14 @@ func (a *Adapter) Compile(snapshot filter.Snapshot, changes []filter.DesiredChan
 	if snapshot.Revision == "" {
 		return filter.BackendPlan{}, filter.ErrRuleStale
 	}
+	snapshot.Scope = snapshot.Scope.Normalize()
 	if err := validateAdapterScope(snapshot.Scope); err != nil {
 		return filter.BackendPlan{}, err
 	}
-	if len(changes) != 1 {
-		return filter.BackendPlan{}, fmt.Errorf("%w: iptables plans currently require exactly one change", filter.ErrInvalidRule)
+	if len(changes) == 0 {
+		return filter.BackendPlan{}, fmt.Errorf("%w: iptables plan requires at least one change", filter.ErrInvalidRule)
 	}
-	plan := filter.BackendPlan{Provider: filter.ProviderIptables, Scope: snapshot.Scope, SnapshotRevision: snapshot.Revision}
-	for _, change := range changes {
-		rulePlan, err := compileChange(snapshot, change)
-		if err != nil {
-			return filter.BackendPlan{}, err
-		}
-		plan.Rules = append(plan.Rules, rulePlan)
-	}
-	return plan, nil
+	return compileBatch(snapshot, changes)
 }
 
 func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.ApplyResult, error) {
@@ -145,8 +138,8 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 	if err := validateAdapterScope(plan.Scope); err != nil {
 		return filter.ApplyResult{}, err
 	}
-	if len(plan.Rules) != 1 {
-		return filter.ApplyResult{}, fmt.Errorf("%w: iptables plans currently require exactly one rule", filter.ErrInvalidRule)
+	if len(plan.Rules) == 0 {
+		return filter.ApplyResult{}, fmt.Errorf("%w: iptables plan requires at least one rule", filter.ErrInvalidRule)
 	}
 	for _, rulePlan := range plan.Rules {
 		for _, command := range rulePlan.Commands {
@@ -172,6 +165,136 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 		applied = append(applied, rulePlan.Expected)
 	}
 	return filter.ApplyResult{Applied: applied}, nil
+}
+
+func compileBatch(snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.BackendPlan, error) {
+	plan := filter.BackendPlan{
+		Provider: filter.ProviderIptables, Scope: snapshot.Scope, SnapshotRevision: snapshot.Revision,
+		Rules: make([]filter.NativeRulePlan, 0, len(changes)),
+	}
+	current := snapshot
+	for _, change := range changes {
+		rulePlan, err := compileChange(current, change)
+		if err != nil {
+			return filter.BackendPlan{}, err
+		}
+		rulePlan.Commands = nil
+		rulePlan.RollbackCommands = nil
+		plan.Rules = append(plan.Rules, rulePlan)
+		current, err = applyRestoreRulePlan(current, rulePlan)
+		if err != nil {
+			return filter.BackendPlan{}, err
+		}
+	}
+
+	applyScript, err := buildRestoreScript(snapshot.Scope, current.Rules)
+	if err != nil {
+		return filter.BackendPlan{}, err
+	}
+	rollbackScript, err := buildRestoreScript(snapshot.Scope, snapshot.Rules)
+	if err != nil {
+		return filter.BackendPlan{}, err
+	}
+	plan.Rules[0].Commands = []filter.NativeCommand{{
+		Executable: restoreExecutableForFamily(snapshot.Scope.Family), Args: []string{"--noflush", "--wait"}, Stdin: applyScript,
+	}}
+	plan.Rules[0].RollbackCommands = []filter.NativeCommand{{
+		Executable: restoreExecutableForFamily(snapshot.Scope.Family), Args: []string{"--noflush", "--wait"}, Stdin: rollbackScript,
+	}}
+	return plan, nil
+}
+
+func applyRestoreRulePlan(snapshot filter.Snapshot, plan filter.NativeRulePlan) (filter.Snapshot, error) {
+	position := plan.Expected.Locator.Position
+	if plan.Operation == filter.ChangeDelete && plan.Previous != nil {
+		position = plan.Previous.Locator.Position
+	}
+	if position == nil {
+		return filter.Snapshot{}, fmt.Errorf("%w: batch rule has no target position", filter.ErrInvalidRule)
+	}
+	nativePosition := *position
+	rules := append([]filter.ObservedRule(nil), snapshot.Rules...)
+	switch plan.Operation {
+	case filter.ChangeCreate:
+		if nativePosition < 1 || nativePosition > len(rules)+1 {
+			return filter.Snapshot{}, fmt.Errorf("%w: batch target position %d is out of range", filter.ErrInvalidRule, nativePosition)
+		}
+		expected := plan.Expected
+		expected.Raw = ""
+		rules = append(rules, filter.ObservedRule{})
+		copy(rules[nativePosition:], rules[nativePosition-1:])
+		rules[nativePosition-1] = expected
+	case filter.ChangeDelete:
+		if nativePosition < 1 || nativePosition > len(rules) {
+			return filter.Snapshot{}, fmt.Errorf("%w: batch target position %d is out of range", filter.ErrRuleStale, nativePosition)
+		}
+		rules = append(rules[:nativePosition-1], rules[nativePosition:]...)
+	case filter.ChangeAdopt, filter.ChangeUpdate, filter.ChangeReorder:
+		if plan.Previous == nil || plan.Previous.Locator.Position == nil {
+			return filter.Snapshot{}, fmt.Errorf("%w: mutation has no previous position", filter.ErrInvalidRule)
+		}
+		previousPosition := *plan.Previous.Locator.Position
+		if previousPosition < 1 || previousPosition > len(rules) || nativePosition < 1 || nativePosition > len(rules) {
+			return filter.Snapshot{}, fmt.Errorf("%w: mutation position is out of range", filter.ErrRuleStale)
+		}
+		expected := plan.Expected
+		expected.Raw = ""
+		if previousPosition == nativePosition {
+			rules[previousPosition-1] = expected
+			break
+		}
+		rules = append(rules[:previousPosition-1], rules[previousPosition:]...)
+		rules = append(rules, filter.ObservedRule{})
+		copy(rules[nativePosition:], rules[nativePosition-1:])
+		rules[nativePosition-1] = expected
+	default:
+		return filter.Snapshot{}, fmt.Errorf("%w: unsupported batch operation %s", filter.ErrInvalidRule, plan.Operation)
+	}
+	for index := range rules {
+		position := index + 1
+		rules[index].Locator.Position = &position
+	}
+	return filter.NewSnapshot(snapshot.Scope, rules)
+}
+
+func buildRestoreScript(scope filter.Scope, rules []filter.ObservedRule) (string, error) {
+	var script strings.Builder
+	script.WriteByte('*')
+	script.WriteString(scope.Table)
+	script.WriteByte('\n')
+	script.WriteString("-F ")
+	script.WriteString(scope.Chain)
+	script.WriteByte('\n')
+	for _, observed := range rules {
+		line, err := restoreRuleLine(scope, observed)
+		if err != nil {
+			return "", err
+		}
+		script.WriteString(line)
+		script.WriteByte('\n')
+	}
+	script.WriteString("COMMIT\n")
+	return script.String(), nil
+}
+
+func restoreRuleLine(scope filter.Scope, observed filter.ObservedRule) (string, error) {
+	if observed.Raw != "" {
+		if strings.ContainsAny(observed.Raw, "\r\n") {
+			return "", fmt.Errorf("%w: invalid newline in native iptables rule", filter.ErrInvalidRule)
+		}
+		args, err := shellwords.Parse(observed.Raw)
+		if err != nil || len(args) < 3 || args[0] != "-A" || args[1] != scope.Chain {
+			return "", fmt.Errorf("%w: invalid native iptables rule", filter.ErrInvalidRule)
+		}
+		return observed.Raw, nil
+	}
+	tokens := append([]string{"-A", scope.Chain}, compileRuleArgs(observed.Rule, observed.Marker)...)
+	for _, token := range tokens {
+		if token == "" || strings.ContainsAny(token, " \t\r\n\\\"'") {
+			return "", fmt.Errorf("%w: invalid iptables-restore token %q", filter.ErrInvalidRule, token)
+		}
+	}
+	return strings.Join(tokens, " "), nil
 }
 
 func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.VerifyResult, error) {
@@ -571,33 +694,38 @@ func isBroadDeny(rule filter.FirewallRule) bool {
 
 type systemBackend struct{}
 
-func (systemBackend) CheckMultiport(_ context.Context, family filter.Family) error {
+func (systemBackend) CheckMultiport(ctx context.Context, family filter.Family) error {
 	executable, err := runtimeExecutableForFamily(family)
 	if err != nil {
 		return err
 	}
-	return cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithOptionalSudo(executable, "-m", "multiport", "--help")
+	return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(20*time.Second)).RunWithOptionalSudo(executable, "-m", "multiport", "--help")
 }
 
-func (systemBackend) ListChain(_ context.Context, scope filter.Scope) (string, error) {
+func (systemBackend) ListChain(ctx context.Context, scope filter.Scope) (string, error) {
 	if scope.Family == filter.FamilyIPv6 {
-		return native.RunIPv6WithStd(scope.Table, "-S", scope.Chain)
+		return native.RunIPv6WithStdContext(ctx, scope.Table, "-S", scope.Chain)
 	}
-	return native.RunWithStd(scope.Table, "-S", scope.Chain)
+	return native.RunWithStdContext(ctx, scope.Table, "-S", scope.Chain)
 }
 
-func (systemBackend) Run(_ context.Context, command filter.NativeCommand) error {
-	if command.Executable != "iptables" && command.Executable != "ip6tables" {
+func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) error {
+	if command.Executable != "iptables" && command.Executable != "ip6tables" &&
+		command.Executable != "iptables-restore" && command.Executable != "ip6tables-restore" {
 		return fmt.Errorf("unexpected iptables executable %q", command.Executable)
 	}
 	executable, err := runtimeExecutable(command.Executable)
 	if err != nil {
 		return err
 	}
-	return cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudo(executable, command.Args...)
+	options := []cmd.Option{cmd.WithContext(ctx), cmd.WithTimeout(60 * time.Second)}
+	if command.Stdin != "" {
+		options = append(options, cmd.WithStdin(strings.NewReader(command.Stdin)))
+	}
+	return cmd.NewCommandMgr(options...).RunWithOptionalSudo(executable, command.Args...)
 }
 
-func (systemBackend) Save(_ context.Context, scope filter.Scope) error {
+func (systemBackend) Save(ctx context.Context, scope filter.Scope) error {
 	fileName := map[string]string{
 		native.BasicBeforeChain: native.BasicBeforeFileName,
 		native.BasicChain:       native.BasicFileName,
@@ -608,9 +736,9 @@ func (systemBackend) Save(_ context.Context, scope filter.Scope) error {
 	}
 	if scope.Family == filter.FamilyIPv6 {
 		fileName = native.IPv6FileName(fileName)
-		return native.SaveIPv6RulesToFile(scope.Table, scope.Chain, fileName)
+		return native.SaveIPv6RulesToFileContext(ctx, scope.Table, scope.Chain, fileName)
 	}
-	return native.SaveRulesToFile(scope.Table, scope.Chain, fileName)
+	return native.SaveRulesToFileContext(ctx, scope.Table, scope.Chain, fileName)
 }
 
 func executableForFamily(family filter.Family) string {
@@ -618,6 +746,13 @@ func executableForFamily(family filter.Family) string {
 		return "ip6tables"
 	}
 	return "iptables"
+}
+
+func restoreExecutableForFamily(family filter.Family) string {
+	if family == filter.FamilyIPv6 {
+		return "ip6tables-restore"
+	}
+	return "iptables-restore"
 }
 
 func runtimeExecutableForFamily(family filter.Family) (string, error) {
@@ -629,19 +764,33 @@ func runtimeExecutable(logical string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if logical == "ip6tables" {
+	switch logical {
+	case "ip6tables":
 		if !commands.IPv6Available() {
 			return "", fmt.Errorf("ip6tables command family is unavailable")
 		}
 		return commands.IPv6, nil
+	case "iptables-restore":
+		return commands.Restore4, nil
+	case "ip6tables-restore":
+		if commands.Restore6 == "" {
+			return "", fmt.Errorf("ip6tables-restore command family is unavailable")
+		}
+		return commands.Restore6, nil
 	}
 	return commands.IPv4, nil
 }
 
 func validateNativeCommand(scope filter.Scope, command filter.NativeCommand) error {
 	expected := executableForFamily(scope.Family)
+	if command.Stdin != "" {
+		expected = restoreExecutableForFamily(scope.Family)
+	}
 	if command.Executable != expected {
 		return fmt.Errorf("%w: %s scope requires %s, got %s", filter.ErrInvalidRule, scope.Family, expected, command.Executable)
+	}
+	if strings.HasSuffix(command.Executable, "-restore") && command.Stdin == "" {
+		return fmt.Errorf("%w: iptables restore command requires input", filter.ErrInvalidRule)
 	}
 	return nil
 }

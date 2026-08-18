@@ -2,15 +2,12 @@ package service
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/utils/controller"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
@@ -27,19 +24,14 @@ type IFirewallSettingService interface {
 
 type FirewallSettingService struct{}
 
-var (
-	validateDockerFirewallConfig = validateDockerConfig
-	restartDockerFirewall        = controller.HandleRestart
-)
-
 func NewIFirewallSettingService() IFirewallSettingService { return &FirewallSettingService{} }
 
 func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings, error) {
 	result := dto.FirewallSettings{PingStatus: ping.LoadStatus()}
 	if ports, err := settingRepo.GetValueByKey(constant.FirewallPortWhiteList); err == nil {
-		result.PortWhiteList = ports
+		result.PortWhitelist = ports
 	} else {
-		result.PortWhiteList = constant.FirewallPortWhiteListValue
+		result.PortWhitelist = constant.FirewallPortWhiteListValue
 	}
 
 	installed := make(map[string]bool)
@@ -122,26 +114,23 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 		}
 	}
 
-	dockerInstalled := NewIDockerService().LoadDockerStatus().IsExist
-	currentDocker := ""
+	dockerInstalled := cmd.Which("docker")
+	detectedDockerBackend := ""
 	if dockerInstalled {
 		if client, err := docker.NewDockerClient(); err == nil {
 			defer client.Close()
 			if info, err := client.Info(ctx); err == nil {
-				currentDocker = dockerFirewallBackend(info)
+				detectedDockerBackend = dockerFirewallBackend(info)
 			}
 		}
 	}
-	result.Docker.Current = currentDocker
-	result.Docker.Selected, _ = settingRepo.GetValueByKey(settingDockerFirewallBackend)
-	if result.Docker.Selected != "iptables" && result.Docker.Selected != "nftables" {
-		result.Docker.Selected = ""
-	}
-	if result.Docker.Selected == "" {
-		result.Docker.Selected = currentDocker
-	}
+	result.Docker.Selected = selectedDockerFirewallBackend(detectedDockerBackend)
+	result.Docker.Current = result.Docker.Selected
 	for _, name := range []string{"iptables", "nftables"} {
-		option := dto.FirewallBackendOption{Name: name, Installed: dockerInstalled, Supported: true, Active: dockerInstalled && currentDocker == name}
+		option := dto.FirewallBackendOption{
+			Name: name, Installed: dockerInstalled && installed[name], Supported: true,
+			Active: dockerInstalled && result.Docker.Selected == name,
+		}
 		var guard dockerGuardRuntime = docker_guard.NewManager()
 		if name == "nftables" {
 			guard = docker_guard.NewNftablesManager()
@@ -153,6 +142,7 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 		option.IPv6.Initialized, option.IPv6.Bound = ipv6.Initialized, ipv6.Bound
 		result.Docker.Options = append(result.Docker.Options, option)
 	}
+
 	return result, nil
 }
 
@@ -185,6 +175,30 @@ func (s *FirewallSettingService) Operate(ctx context.Context, request dto.Firewa
 	}
 }
 
+func (s *FirewallSettingService) operateDocker(ctx context.Context, request dto.FirewallBackendOperation) error {
+	var guard dockerGuardRuntime = docker_guard.NewManager()
+	if request.Backend == "nftables" {
+		guard = docker_guard.NewNftablesManager()
+	}
+	if request.Operation == "cleanup" {
+		if err := guard.Cleanup(); err != nil {
+			return err
+		}
+		return settingRepo.UpdateOrCreate(settingDockerPortGuardStatus, constant.StatusDisable)
+	}
+	previous, _ := settingRepo.GetValueByKey(settingDockerFirewallBackend)
+	if err := settingRepo.UpdateOrCreate(settingDockerFirewallBackend, request.Backend); err != nil {
+		return err
+	}
+	if request.Operation == "initialize" {
+		if err := NewIDockerPortGuardService().Operate(ctx, dto.DockerPortGuardOperation{Operation: "initialize"}); err != nil {
+			_ = settingRepo.UpdateOrCreate(settingDockerFirewallBackend, previous)
+			return err
+		}
+	}
+	return nil
+}
+
 func (s *FirewallSettingService) operateSystem(request dto.FirewallBackendOperation) error {
 	if _, err := lifecycle.NewClientFor(request.Backend); err != nil {
 		return err
@@ -213,15 +227,15 @@ func (s *FirewallSettingService) operateSystem(request dto.FirewallBackendOperat
 	}
 	var initErr error
 	if request.Backend == "iptables" || request.Backend == "nftables" {
-		initErr = newFirewallService().OperateFilterChain(dto.IptablesOp{Name: "1PANEL_BASIC", Operate: "init-base"})
+		initErr = newFirewallService().OperateFilterChain(dto.FilterChainOperation{Name: "1PANEL_BASIC", Operate: "init-base"})
 	} else {
-		initErr = newFirewallService().OperateFirewall(dto.FirewallOperation{Operation: "start"})
+		initErr = newFirewallService().OperateFirewall(dto.FirewallLifecycleOperation{Operation: "start"})
 	}
 	if initErr != nil {
 		return rollback(initErr)
 	}
 	if request.Backend == "iptables" || request.Backend == "nftables" {
-		return settingRepo.UpdateOrCreate("IptablesStatus", constant.StatusEnable)
+		return settingRepo.UpdateOrCreate(settingFilterInitialized, constant.StatusEnable)
 	}
 	return nil
 }
@@ -243,75 +257,16 @@ func (s *FirewallSettingService) operateForwarding(request dto.FirewallBackendOp
 		return err
 	}
 	if request.Operation == "cleanup" {
-		return manager.Cleanup()
-	}
-	if request.Operation == "initialize" {
-		if err := manager.Enable(); err != nil {
+		if err := manager.Cleanup(); err != nil {
 			return err
 		}
+		return settingRepo.UpdateOrCreate(settingForwardingInitialized, constant.StatusDisable)
 	}
 	if err := settingRepo.UpdateOrCreate(settingForwardingBackend, request.Backend); err != nil {
 		return err
 	}
-	return nil
-}
-
-func (s *FirewallSettingService) operateDocker(_ context.Context, request dto.FirewallBackendOperation) error {
-	var guard dockerGuardRuntime = docker_guard.NewManager()
-	if request.Backend == "nftables" {
-		guard = docker_guard.NewNftablesManager()
-	}
-	if request.Operation == "cleanup" {
-		return guard.Cleanup()
-	}
 	if request.Operation == "initialize" {
-		return NewIDockerPortGuardService().Operate(context.Background(), dto.DockerPortGuardOperation{Operation: "initialize"})
-	}
-	if err := updateDockerFirewallBackend(request.Backend, request.RestartDocker); err != nil {
-		return err
-	}
-	return settingRepo.UpdateOrCreate(settingDockerFirewallBackend, request.Backend)
-}
-
-func updateDockerFirewallBackend(backend string, restart bool) error {
-	if backend != "iptables" && backend != "nftables" {
-		return fmt.Errorf("unsupported Docker firewall backend %q", backend)
-	}
-	if err := createIfNotExistDaemonJsonFile(); err != nil {
-		return err
-	}
-	original, err := os.ReadFile(constant.DaemonJsonPath)
-	if err != nil {
-		return err
-	}
-	config := make(map[string]interface{})
-	if len(strings.TrimSpace(string(original))) > 0 {
-		if err := json.Unmarshal(original, &config); err != nil {
-			return err
-		}
-	}
-	config["firewall-backend"] = backend
-	updated, err := json.MarshalIndent(config, "", "\t")
-	if err != nil {
-		return err
-	}
-	if err := os.WriteFile(constant.DaemonJsonPath, updated, 0640); err != nil {
-		return err
-	}
-	if err := validateDockerFirewallConfig(); err != nil {
-		if restoreErr := os.WriteFile(constant.DaemonJsonPath, original, 0640); restoreErr != nil {
-			return errors.Join(err, fmt.Errorf("restore Docker configuration: %w", restoreErr))
-		}
-		return err
-	}
-	if restart {
-		if err := restartDockerFirewall("docker"); err != nil {
-			restoreErr := os.WriteFile(constant.DaemonJsonPath, original, 0640)
-			if restoreErr == nil {
-				restoreErr = restartDockerFirewall("docker")
-			}
-			return errors.Join(fmt.Errorf("failed to restart Docker: %w", err), restoreErr)
-		}
+		return NewIForwardingService().Enable()
 	}
 	return nil
 }

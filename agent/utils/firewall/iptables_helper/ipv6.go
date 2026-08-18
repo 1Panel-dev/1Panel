@@ -2,7 +2,9 @@ package iptables_helper
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
@@ -14,39 +16,33 @@ func EnsureIPv6BaseChains(panelPort string) error {
 	if panelPort == "" {
 		return fmt.Errorf("panel port is required")
 	}
-	chains := []struct {
-		name string
-		file string
-	}{
-		{name: BasicBeforeChain, file: IPv6FileName(BasicBeforeFileName)},
-		{name: BasicChain, file: IPv6FileName(BasicFileName)},
-		{name: BasicAfterChain, file: IPv6FileName(BasicAfterFileName)},
+	if err := ensureBaseChainsFamily(true); err != nil {
+		return err
 	}
-	for _, chain := range chains {
-		exists, err := CheckIPv6ChainExist(FilterTab, chain.name)
-		if err != nil {
-			return err
-		}
-		if !exists {
-			if err := LoadIPv6RulesFromFile(FilterTab, chain.name, chain.file); err != nil {
-				return err
-			}
-		}
+	script, err := buildBaseChainsRestoreScript(global.Dir.FirewallDir, panelPort, true)
+	if err != nil {
+		return err
 	}
-	protectedRules := [][]string{
-		{"-i", "lo", "-j", "ACCEPT", "-m", "comment", "--comment", "Loopback Whitelist"},
-		{"-m", "conntrack", "--ctstate", "RELATED,ESTABLISHED", "-j", "ACCEPT", "-m", "comment", "--comment", "ESTABLISHED Whitelist"},
-		{"-p", "tcp", "-m", "tcp", "--dport", panelPort, "-j", "ACCEPT", "-m", "comment", "--comment", "1Panel Port Whitelist"},
+	protectedRules := []string{
+		"-A " + BasicBeforeChain + " " + IoRuleIn,
+		"-A " + BasicBeforeChain + " " + EstablishedRule,
 	}
 	for _, rule := range protectedRules {
-		if err := AddIPv6Rule(FilterTab, BasicBeforeChain, rule...); err != nil {
-			return err
+		if !containsIptablesRule(script, rule) {
+			script = strings.Replace(script, "COMMIT\n", rule+"\nCOMMIT\n", 1)
 		}
 	}
-	for index, chain := range chains {
-		if err := BindIPv6Chain(FilterTab, InputChain, chain.name, index+1); err != nil {
-			return err
-		}
+	if err := restoreRules(commands.Restore6, script); err != nil {
+		return fmt.Errorf("batch initialize IPv6 base chains: %w", err)
+	}
+	if err := setBaseChainBindings(true, true); err != nil {
+		return err
+	}
+	for _, chain := range []struct{ name, file string }{
+		{BasicBeforeChain, IPv6FileName(BasicBeforeFileName)},
+		{BasicChain, IPv6FileName(BasicFileName)},
+		{BasicAfterChain, IPv6FileName(BasicAfterFileName)},
+	} {
 		if err := SaveIPv6RulesToFile(FilterTab, chain.name, chain.file); err != nil {
 			return err
 		}
@@ -59,10 +55,13 @@ func UnbindIPv6BaseChains() error {
 	if err != nil || !commands.IPv6Available() {
 		return nil
 	}
-	for _, chain := range []string{BasicAfterChain, BasicChain, BasicBeforeChain} {
-		if err := UnbindIPv6Chain(FilterTab, InputChain, chain); err != nil {
-			return err
-		}
+	return setBaseChainBindings(true, false)
+}
+
+func BindIPv6BaseChains() error {
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil || !commands.IPv6Available() {
+		return nil
 	}
-	return nil
+	return setBaseChainBindings(true, true)
 }

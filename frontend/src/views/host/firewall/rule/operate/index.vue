@@ -29,31 +29,30 @@
                     <el-option v-if="mode === 'create' || provider === 'ufw'" label="TCP/UDP" value="tcp/udp" />
                     <el-option label="TCP" value="tcp" />
                     <el-option label="UDP" value="udp" />
+                    <el-option label="ALL" value="all">
+                        <div class="protocol-option">
+                            <span>ALL</span>
+                            <span class="protocol-option-description">{{ $t('firewall.allProtocolHelper') }}</span>
+                        </div>
+                    </el-option>
                     <el-option v-if="provider !== 'ufw'" label="ICMP" value="icmp" />
                     <el-option v-if="provider !== 'ufw'" label="ICMPV6" value="icmpv6" />
                 </el-select>
             </el-form-item>
             <el-form-item label="IP" prop="sourceAddresses">
                 <div v-for="(item, index) of form.sourceAddresses" :key="index" class="source-address-row mt-2">
-                    <el-select v-model="item.family" class="ip-family-select" :disabled="mode === 'edit'">
-                        <el-option label="IPv4" value="ipv4" />
-                        <el-option label="IPv6" value="ipv6" />
-                        <el-option v-if="provider === 'firewalld'" label="INET" value="inet" />
-                    </el-select>
-                    <el-select
+                    <el-input
                         ref="sourceAddressRefs"
-                        v-model="item.address"
+                        v-model.trim="item.address"
                         class="source-address-select"
                         clearable
-                        filterable
-                        allow-create
-                        default-first-option
-                        :placeholder="sourceAddressPlaceholder(item.family)"
+                        placeholder="172.16.10.11、172.16.0.0/24、2001:db8::1 或 2001:db8::/64"
                         @keyup.enter.prevent="addSourceAddressOnEnter(index)"
                     >
-                        <el-option :label="wildcardAddressLabel(item.family)" :value="anywhereSourceValue" />
-                    </el-select>
-                    <el-button v-if="mode === 'create'" link icon="Delete" @click="removeSourceAddress(index)" />
+                        <template #append>
+                            <el-button v-if="mode === 'create'" icon="Delete" @click="removeSourceAddress(index)" />
+                        </template>
+                    </el-input>
                 </div>
                 <el-button v-if="mode === 'create'" class="mt-2" @click="addSourceAddress">
                     {{ $t('commons.button.add') }}
@@ -69,14 +68,16 @@
                         :disabled="!portProtocol"
                         placeholder="80、80,443 或 8080-8089"
                         @keyup.enter.prevent="addDestinationPortOnEnter(index)"
-                    />
-                    <el-button
-                        v-if="mode === 'create'"
-                        link
-                        icon="Delete"
-                        :disabled="!portProtocol"
-                        @click="removeRuleRow(index)"
-                    />
+                    >
+                        <template #append>
+                            <el-button
+                                v-if="mode === 'create'"
+                                icon="Delete"
+                                :disabled="!portProtocol"
+                                @click="removeRuleRow(index)"
+                            />
+                        </template>
+                    </el-input>
                 </div>
                 <el-button v-if="mode === 'create'" class="mt-2" :disabled="!portProtocol" @click="addRuleRow">
                     {{ $t('commons.button.add') }}
@@ -230,11 +231,10 @@ interface SourceAddressItem {
 }
 
 const batchPlans = ref<BatchPlanItem[]>([]);
-const anywhereSourceValue = '__1panel_anywhere__';
 
 const form = reactive({
     protocol: 'tcp',
-    sourceAddresses: [{ family: 'ipv4', address: anywhereSourceValue }] as SourceAddressItem[],
+    sourceAddresses: [{ family: 'ipv4', address: '' }] as SourceAddressItem[],
     sourcePort: '',
     destinationAddress: '',
     destinationPorts: [''] as string[],
@@ -243,7 +243,7 @@ const form = reactive({
     description: '',
 });
 
-const defaultFamily = (): Firewall.Family => (provider.value === 'firewalld' ? 'inet' : 'ipv4');
+const defaultFamily = (): Firewall.Family => 'ipv4';
 
 const rules = reactive<FormRules>({
     protocol: [Rules.requiredSelect],
@@ -251,11 +251,6 @@ const rules = reactive<FormRules>({
 });
 
 const portProtocol = computed(() => ['tcp', 'udp', 'tcp/udp'].includes(form.protocol));
-const sourceAddressPlaceholder = (family: Firewall.Family) => {
-    if (family === 'ipv6') return '2001:db8::1 或 2001:db8::/64';
-    if (family === 'inet') return '0.0.0.0/0 或 ::/0';
-    return '172.16.10.11 或 172.16.0.0/24';
-};
 const wildcardAddress = (family: Firewall.Family) => {
     if (family === 'ipv6') return '::/0';
     if (family === 'inet') return '0.0.0.0/0, ::/0';
@@ -263,10 +258,8 @@ const wildcardAddress = (family: Firewall.Family) => {
 };
 const wildcardAddressLabel = (family: Firewall.Family) =>
     `${wildcardAddress(family)}（${i18n.global.t('firewall.anyWhere')}）`;
-const isWildcardAddress = (family: Firewall.Family, address?: string) => {
-    const value = address?.trim();
-    return !value || value === anywhereSourceValue || value === wildcardAddress(family);
-};
+const isWildcardAddress = (_family: Firewall.Family, address?: string) => !address?.trim();
+const inferAddressFamily = (address: string): Firewall.Family => (address.includes(':') ? 'ipv6' : 'ipv4');
 
 const priorityFieldLabel = computed(() => i18n.global.t('firewall.priority'));
 const showPriorityField = computed(() => {
@@ -296,6 +289,7 @@ const supportedPlanReasons = new Set([
     'runtime_permanent_mismatch',
     'protected_rule',
     'overlapping_rule_with_different_action',
+    'partially_overlapping_rule_with_different_action',
 ]);
 
 const planReasonMessage = (reason: string) =>
@@ -368,23 +362,27 @@ const splitTagValues = (values: string[]) => [
 ];
 const normalizeSourceAddresses = () => {
     const seen = new Set<string>();
-    const normalized = form.sourceAddresses.flatMap((item) =>
-        (isWildcardAddress(item.family, item.address) ? [anywhereSourceValue] : splitTagValues([item.address])).flatMap(
-            (address) => {
-                const key = `${item.family}:${address}`;
-                if (seen.has(key)) return [];
-                seen.add(key);
-                return [{ family: item.family, address }];
-            },
-        ),
-    );
-    const fallback = form.sourceAddresses[0] || { family: 'ipv4', address: anywhereSourceValue };
+    let normalized = form.sourceAddresses.flatMap((item) => {
+        const addresses = splitTagValues([item.address]);
+        if (addresses.length === 0) return [{ family: item.family, address: '' }];
+        return addresses.flatMap((address) => {
+            const family = inferAddressFamily(address);
+            const key = `${family}:${address}`;
+            if (seen.has(key)) return [];
+            seen.add(key);
+            return [{ family, address }];
+        });
+    });
+    if (normalized.some((item) => item.address)) {
+        normalized = normalized.filter((item) => item.address);
+    }
+    const fallback = form.sourceAddresses[0] || { family: 'ipv4', address: '' };
     form.sourceAddresses =
         mode.value === 'edit'
-            ? [normalized[0] || { ...fallback, address: anywhereSourceValue }]
+            ? [normalized[0] || { ...fallback, address: '' }]
             : normalized.length > 0
               ? normalized
-              : [{ ...fallback, address: anywhereSourceValue }];
+              : [{ ...fallback, address: '' }];
 };
 const normalizeDestinationPorts = (values = form.destinationPorts) => {
     const splitPortList = provider.value === 'firewalld' || (provider.value === 'ufw' && form.protocol === 'tcp/udp');
@@ -407,7 +405,7 @@ const normalizeDestinationPorts = (values = form.destinationPorts) => {
 };
 const addSourceAddress = () => {
     const family = form.sourceAddresses.at(-1)?.family || 'ipv4';
-    form.sourceAddresses.push({ family, address: anywhereSourceValue });
+    form.sourceAddresses.push({ family, address: '' });
 };
 const addSourceAddressOnEnter = async (index: number) => {
     await nextTick();
@@ -442,7 +440,7 @@ const removeRuleRow = (index: number) => {
 
 const resetForm = () => {
     form.protocol = 'tcp';
-    form.sourceAddresses = [{ family: defaultFamily(), address: anywhereSourceValue }];
+    form.sourceAddresses = [{ family: defaultFamily(), address: '' }];
     form.sourcePort = '';
     form.destinationAddress = '';
     form.destinationPorts = [''];
@@ -480,9 +478,7 @@ const acceptParams = (
         form.sourceAddresses = [
             {
                 family: rule.scope.family,
-                address: isWildcardAddress(rule.scope.family, rule.sourceAddress)
-                    ? anywhereSourceValue
-                    : rule.sourceAddress || anywhereSourceValue,
+                address: rule.sourceAddress || '',
             },
         ];
         form.sourcePort = rule.sourcePort || '';
@@ -536,10 +532,19 @@ const changeProtocol = () => {
 };
 
 const buildRule = (
-    source: SourceAddressItem = form.sourceAddresses[0] || { family: 'ipv4', address: anywhereSourceValue },
+    source: SourceAddressItem = form.sourceAddresses[0] || { family: 'ipv4', address: '' },
     destinationPort = form.destinationPorts[0] || '',
     protocol = form.protocol,
 ): Firewall.Rule => {
+    const family = source.address
+        ? source.family
+        : protocol === 'icmpv6'
+          ? 'ipv6'
+          : protocol === 'icmp'
+            ? 'ipv4'
+            : provider.value === 'firewalld'
+              ? 'inet'
+              : source.family;
     const action =
         mode.value === 'edit' && editingRule.value?.action === 'reject' && form.action === 'drop'
             ? 'reject'
@@ -550,7 +555,7 @@ const buildRule = (
             provider.value === 'iptables' || provider.value === 'nftables'
                 ? {
                       provider: provider.value,
-                      family: source.family,
+                      family,
                       table: 'filter',
                       chain: mode.value === 'edit' ? editingRule.value?.scope.chain || '1PANEL_BASIC' : '1PANEL_BASIC',
                       direction: 'input',
@@ -558,13 +563,13 @@ const buildRule = (
                 : provider.value === 'firewalld'
                   ? {
                         provider: provider.value,
-                        family: source.family,
+                        family,
                         zone: 'public',
                         direction: 'input',
                     }
                   : {
                         provider: provider.value,
-                        family: source.family,
+                        family,
                         chain: 'incoming',
                         direction: 'input',
                     },
@@ -797,9 +802,16 @@ defineExpose({ acceptParams });
 </script>
 
 <style lang="scss" scoped>
-.ip-family-select {
-    width: 100px;
-    flex: none;
+.protocol-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.protocol-option-description {
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
 }
 
 .source-address-row,

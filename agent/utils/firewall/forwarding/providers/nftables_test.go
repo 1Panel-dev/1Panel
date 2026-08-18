@@ -66,6 +66,29 @@ func TestRebuildNftForwardCommandsUseArguments(t *testing.T) {
 	}
 }
 
+func TestNftForwardCommandsBuildSingleBatchScript(t *testing.T) {
+	commands, err := rebuildNftForwardCommands([]forwarding.Rule{{
+		Protocol: "tcp", Port: "8080", TargetIP: "127.0.0.1", TargetPort: "80",
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	script, err := nftCommandsScript(commands)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if lines := strings.Count(script, "\n"); lines != len(commands) {
+		t.Fatalf("batch script has %d lines, want %d:\n%s", lines, len(commands), script)
+	}
+	if !strings.Contains(script, "flush chain ip nft_1panel_forward NFT_1PANEL_PREROUTING\n") ||
+		!strings.Contains(script, "add rule ip nft_1panel_forward NFT_1PANEL_PREROUTING meta l4proto tcp tcp dport 8080 redirect to :80") {
+		t.Fatalf("unexpected nftables batch script:\n%s", script)
+	}
+	if _, err := nftCommandsScript([][]string{{"add", "rule\nflush ruleset"}}); err == nil {
+		t.Fatal("batch script accepted a newline token")
+	}
+}
+
 func TestRebuildNftIPv6ForwardCommands(t *testing.T) {
 	commands, err := rebuildNftForwardCommands([]forwarding.Rule{{
 		Family: forwarding.FamilyIPv6, Protocol: "tcp", Port: "8443", TargetIP: "2001:db8::20", TargetPort: "443", Interface: "eth0",

@@ -1,6 +1,10 @@
 package filter
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
+)
 
 func TestCheckCreateRequestsAdoptionForEquivalentExternalRule(t *testing.T) {
 	rule := checkAddressRule("172.16.10.111", ActionDrop)
@@ -180,6 +184,51 @@ func TestCheckCreateClassifiesCoverageAndConflict(t *testing.T) {
 	}
 }
 
+func TestCheckCreateAllowsPartialOverlapWithOppositeActionAfterConfirmation(t *testing.T) {
+	scope := Scope{Provider: ProviderFirewalld, Family: FamilyInet, Zone: FirewalldInputZone, Direction: DirectionInput}
+	existingRule := FirewallRule{
+		Scope:      Scope{Provider: ProviderFirewalld, Family: FamilyIPv4, Zone: FirewalldInputZone, Direction: DirectionInput},
+		NativeKind: NativeKindRichRule, Protocol: "all", SourceAddress: "1.1.1.1", Action: ActionDrop,
+	}
+	requested := FirewallRule{
+		Scope: scope, NativeKind: NativeKindZonePort, Protocol: "tcp", DestinationPort: "8080", Action: ActionAccept,
+	}
+	snapshot := checkSnapshot(t, existingRule)
+	plan, err := CheckCreate(snapshot, requested, nil, "")
+	if err != nil {
+		t.Fatalf("plan partially overlapping rule: %v", err)
+	}
+	if plan.Decision != CheckDecisionConfirmationRequired || plan.Classification != CheckClassificationConflict ||
+		plan.Reason != "partially_overlapping_rule_with_different_action" ||
+		len(plan.AllowedActions) == 0 || plan.AllowedActions[0] != CheckActionCreateAnyway {
+		t.Fatalf("partial overlap was not confirmable: %#v", plan)
+	}
+}
+
+func TestRuleCoverageAndOverlapRespectAddressFamilies(t *testing.T) {
+	base := Scope{Provider: ProviderFirewalld, Zone: FirewalldInputZone, Direction: DirectionInput}
+	ipv4 := FirewallRule{
+		Scope:      Scope{Provider: ProviderFirewalld, Family: FamilyIPv4, Zone: base.Zone, Direction: base.Direction},
+		NativeKind: NativeKindRichRule, Protocol: "all", SourceAddress: "1.1.1.1", Action: ActionDrop,
+	}
+	ipv6 := FirewallRule{
+		Scope:      Scope{Provider: ProviderFirewalld, Family: FamilyIPv6, Zone: base.Zone, Direction: base.Direction},
+		NativeKind: NativeKindRichRule, Protocol: "tcp", DestinationPort: "8080", Action: ActionAccept,
+	}
+	if RulesOverlap(ipv4, ipv6) || RuleCovers(ipv4, ipv6) {
+		t.Fatal("disjoint IPv4 and IPv6 rules must not overlap")
+	}
+	inet := ipv6
+	inet.Scope.Family = FamilyInet
+	inet.SourceAddress = ""
+	if !RulesOverlap(ipv4, inet) {
+		t.Fatal("inet rule should overlap an IPv4 rule")
+	}
+	if RuleCovers(ipv4, inet) {
+		t.Fatal("IPv4 rule must not cover a dual-stack inet rule")
+	}
+}
+
 func TestCheckCreateAllowsOrderedFirewalldDenyBeforeNativePort(t *testing.T) {
 	scope := Scope{Provider: ProviderFirewalld, Family: FamilyIPv4, Zone: "public", Direction: DirectionInput}
 	existingRule := FirewallRule{
@@ -241,6 +290,41 @@ func TestCheckCreateBlocksRuleTargetingCurrentManagementClient(t *testing.T) {
 	}
 	if plan.Decision != CheckDecisionBlocked || plan.Classification != CheckClassificationProtected || plan.Reason != "current_management_connection" {
 		t.Fatalf("unexpected current connection decision: %#v", plan)
+	}
+}
+
+func TestCheckCreateBlocksProtectedManagementPortWithoutObservedAllowRule(t *testing.T) {
+	rule := checkPortRule("22", ActionDrop)
+	snapshot, err := NewSnapshot(rule.Scope, nil)
+	if err != nil {
+		t.Fatalf("snapshot: %v", err)
+	}
+	plan, err := CheckCreate(snapshot, rule, nil, "203.0.113.9", firewall.PortWhitelist{
+		Family: "ipv4", Port: "22", Protocol: "tcp",
+	})
+	if err != nil {
+		t.Fatalf("plan create: %v", err)
+	}
+	if plan.Decision != CheckDecisionBlocked || plan.Classification != CheckClassificationProtected || plan.Reason != "current_management_connection" {
+		t.Fatalf("protected management port was not blocked: %#v", plan)
+	}
+}
+
+func TestCheckCreateAllowsProtectedPortDenyForUnrelatedSource(t *testing.T) {
+	rule := checkPortRule("22", ActionDrop)
+	rule.SourceAddress = "198.51.100.8/32"
+	snapshot, err := NewSnapshot(rule.Scope, nil)
+	if err != nil {
+		t.Fatalf("snapshot: %v", err)
+	}
+	plan, err := CheckCreate(snapshot, rule, nil, "203.0.113.9", firewall.PortWhitelist{
+		Family: "ipv4", Port: "22", Protocol: "tcp",
+	})
+	if err != nil {
+		t.Fatalf("plan create: %v", err)
+	}
+	if plan.Decision != CheckDecisionReady {
+		t.Fatalf("unrelated source was incorrectly blocked: %#v", plan)
 	}
 }
 

@@ -78,6 +78,25 @@ func TestFirewallRuleServiceCheckCreateInventoryWorkflow(t *testing.T) {
 	}
 }
 
+func TestFirewallRuleServiceCheckBlocksConfiguredProtectedPort(t *testing.T) {
+	rule := executorTestRule("8443")
+	rule.Action = filter.ActionDrop
+	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
+	service, _ := newTestFirewallExecutor(t, adapter)
+	service.selectedProvider = func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil }
+	service.protectedPorts = func() ([]firewall.PortWhitelist, error) {
+		return []firewall.PortWhitelist{{Family: "ipv4", Port: "8443", Protocol: "tcp"}}, nil
+	}
+
+	result, err := service.Check(context.Background(), "203.0.113.9", dto.FirewallRuleCheck{Rule: rule})
+	if err != nil {
+		t.Fatalf("check protected port: %v", err)
+	}
+	if result.Decision != filter.CheckDecisionBlocked || result.Reason != "current_management_connection" {
+		t.Fatalf("configured protected port was not blocked: %#v", result)
+	}
+}
+
 func TestFirewallRuleServiceLoadsNativeDetailOnDemand(t *testing.T) {
 	scope := filter.Scope{
 		Provider: filter.ProviderFirewalld, Family: filter.FamilyInet,
@@ -280,9 +299,12 @@ func TestFirewallRuleServiceBatchCheckAndCreateSameScope(t *testing.T) {
 	}
 	ctx := context.Background()
 
-	checked, err := service.CheckBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: rules})
+	checked, err := service.CheckRulesBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: rules})
 	if err != nil || len(checked.Items) != len(rules) {
 		t.Fatalf("batch check: result=%#v err=%v", checked, err)
+	}
+	if adapter.observeCount != 1 {
+		t.Fatalf("same-scope batch check observed the chain %d times", adapter.observeCount)
 	}
 	request := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, len(rules))}
 	for _, item := range checked.Items {
@@ -291,13 +313,143 @@ func TestFirewallRuleServiceBatchCheckAndCreateSameScope(t *testing.T) {
 			SourceKind: constant.FirewallRuleSourceUser,
 		})
 	}
-	created, err := service.CreateBatch(ctx, request)
+	created, err := service.CreateRulesBatch(ctx, request)
 	if err != nil || created.Succeeded != 2 || created.Failed != 0 {
 		t.Fatalf("batch create: result=%#v err=%v", created, err)
 	}
 	stored, _ := ruleRepo.List(ctx)
-	if len(stored) != 2 || len(adapter.snapshot.Rules) != 2 || adapter.applyCount != 2 {
+	if len(stored) != 2 || len(adapter.snapshot.Rules) != 2 || adapter.applyCount != 1 {
 		t.Fatalf("same-scope batch did not commit all rules: stored=%#v snapshot=%#v applies=%d", stored, adapter.snapshot, adapter.applyCount)
+	}
+	if adapter.observeCount != 3 {
+		t.Fatalf("same-scope batch create used repeated snapshots: observes=%d", adapter.observeCount)
+	}
+}
+
+func TestFirewallRuleServiceBatchDeleteSameIptablesScope(t *testing.T) {
+	rules := []filter.FirewallRule{executorTestRule("8080"), executorTestRule("8081")}
+	adapter := newFakeFilterAdapter(t, rules[0].Scope, nil)
+	db := newFirewallRuleTestDB(t)
+	ruleRepo := repo.NewFirewallRuleRepo(db)
+	service := &FirewallService{
+		rules:            ruleRepo,
+		adapters:         firewallRuleRuntimeRegistry{filter.ProviderIptables: newFirewallRuleRuntime(adapter, nil)},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil },
+	}
+	ctx := context.Background()
+	checked, err := service.CheckRulesBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: rules})
+	if err != nil {
+		t.Fatalf("batch check: %v", err)
+	}
+	createRequest := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, len(rules))}
+	for _, item := range checked.Items {
+		createRequest.Items = append(createRequest.Items, dto.FirewallRuleCreate{
+			Rule: item.RequestedRule, CheckFlag: item.CheckFlag, Action: filter.CheckActionCreate,
+		})
+	}
+	created, err := service.CreateRulesBatch(ctx, createRequest)
+	if err != nil || created.Succeeded != 2 {
+		t.Fatalf("batch create: result=%#v err=%v", created, err)
+	}
+	stored, err := ruleRepo.List(ctx)
+	if err != nil || len(stored) != 2 {
+		t.Fatalf("list created rules: %#v err=%v", stored, err)
+	}
+	deleted, err := service.DeleteRulesBatch(ctx, dto.FirewallRuleBatchDelete{UUIDs: []string{stored[0].UUID, stored[1].UUID}})
+	if err != nil || deleted.Succeeded != 2 || deleted.Failed != 0 {
+		t.Fatalf("batch delete: result=%#v err=%v", deleted, err)
+	}
+	remaining, listErr := ruleRepo.List(ctx)
+	if listErr != nil || len(remaining) != 0 || len(adapter.snapshot.Rules) != 0 || adapter.applyCount != 2 {
+		t.Fatalf(
+			"same-scope delete did not use one backend apply: remaining=%#v snapshot=%#v applies=%d err=%v",
+			remaining, adapter.snapshot, adapter.applyCount, listErr,
+		)
+	}
+}
+
+func TestFirewallRuleServiceBatchCreateAndDeleteSameNftablesScope(t *testing.T) {
+	rules := []filter.FirewallRule{executorTestRule("8080"), executorTestRule("8081")}
+	for index := range rules {
+		rules[index].Scope.Provider = filter.ProviderNftables
+	}
+	adapter := newFakeFilterAdapter(t, rules[0].Scope, nil)
+	db := newFirewallRuleTestDB(t)
+	ruleRepo := repo.NewFirewallRuleRepo(db)
+	service := &FirewallService{
+		rules:            ruleRepo,
+		adapters:         firewallRuleRuntimeRegistry{filter.ProviderNftables: newFirewallRuleRuntime(adapter, nil)},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderNftables, nil },
+	}
+	ctx := context.Background()
+	checked, err := service.CheckRulesBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: rules})
+	if err != nil {
+		t.Fatalf("batch check: %v", err)
+	}
+	createRequest := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, len(rules))}
+	for _, item := range checked.Items {
+		createRequest.Items = append(createRequest.Items, dto.FirewallRuleCreate{
+			Rule: item.RequestedRule, CheckFlag: item.CheckFlag, Action: filter.CheckActionCreate,
+		})
+	}
+	created, err := service.CreateRulesBatch(ctx, createRequest)
+	if err != nil || created.Succeeded != 2 || adapter.applyCount != 1 {
+		t.Fatalf("nftables batch create: result=%#v applies=%d err=%v", created, adapter.applyCount, err)
+	}
+	stored, err := ruleRepo.List(ctx)
+	if err != nil || len(stored) != 2 {
+		t.Fatalf("list nftables rules: %#v err=%v", stored, err)
+	}
+	deleted, err := service.DeleteRulesBatch(ctx, dto.FirewallRuleBatchDelete{UUIDs: []string{stored[0].UUID, stored[1].UUID}})
+	if err != nil || deleted.Succeeded != 2 || deleted.Failed != 0 || adapter.applyCount != 2 {
+		t.Fatalf("nftables batch delete: result=%#v applies=%d err=%v", deleted, adapter.applyCount, err)
+	}
+	remaining, err := ruleRepo.List(ctx)
+	if err != nil || len(remaining) != 0 || len(adapter.snapshot.Rules) != 0 {
+		t.Fatalf("nftables batch delete did not clear rules: stored=%#v snapshot=%#v err=%v", remaining, adapter.snapshot, err)
+	}
+}
+
+func TestFirewallRuleServiceBatchDeleteRollsBackOnMetadataFailure(t *testing.T) {
+	rules := []filter.FirewallRule{executorTestRule("8080"), executorTestRule("8081")}
+	adapter := newFakeFilterAdapter(t, rules[0].Scope, nil)
+	db := newFirewallRuleTestDB(t)
+	ruleRepo := repo.NewFirewallRuleRepo(db)
+	failingRepo := &failingFirewallRuleRepo{IFirewallRuleRepo: ruleRepo, deleteErr: errors.New("metadata delete failed")}
+	service := &FirewallService{
+		rules:            failingRepo,
+		adapters:         firewallRuleRuntimeRegistry{filter.ProviderIptables: newFirewallRuleRuntime(adapter, nil)},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil },
+	}
+	ctx := context.Background()
+	checked, err := service.CheckRulesBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: rules})
+	if err != nil {
+		t.Fatalf("batch check: %v", err)
+	}
+	createRequest := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, len(rules))}
+	for _, item := range checked.Items {
+		createRequest.Items = append(createRequest.Items, dto.FirewallRuleCreate{
+			Rule: item.RequestedRule, CheckFlag: item.CheckFlag, Action: filter.CheckActionCreate,
+		})
+	}
+	created, err := service.CreateRulesBatch(ctx, createRequest)
+	if err != nil || created.Succeeded != 2 {
+		t.Fatalf("batch create: result=%#v err=%v", created, err)
+	}
+	stored, err := ruleRepo.List(ctx)
+	if err != nil || len(stored) != 2 {
+		t.Fatalf("list created rules: %#v err=%v", stored, err)
+	}
+	deleted, err := service.DeleteRulesBatch(ctx, dto.FirewallRuleBatchDelete{UUIDs: []string{stored[0].UUID, stored[1].UUID}})
+	if err != nil || deleted.Succeeded != 0 || deleted.Failed != 2 {
+		t.Fatalf("batch delete failure: result=%#v err=%v", deleted, err)
+	}
+	remaining, listErr := ruleRepo.List(ctx)
+	if listErr != nil || len(remaining) != 2 || len(adapter.snapshot.Rules) != 2 || adapter.applyCount != 2 || adapter.rollbackCount != 1 {
+		t.Fatalf(
+			"failed delete batch was not rolled back: remaining=%#v snapshot=%#v applies=%d rollbacks=%d err=%v",
+			remaining, adapter.snapshot, adapter.applyCount, adapter.rollbackCount, listErr,
+		)
 	}
 }
 
@@ -314,7 +466,7 @@ func TestFirewallRuleServiceBatchCreateRejectsDuplicateManagedRule(t *testing.T)
 	}
 	ctx := context.Background()
 
-	checked, err := service.CheckBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: []filter.FirewallRule{rule, rule, trailingRule}})
+	checked, err := service.CheckRulesBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: []filter.FirewallRule{rule, rule, trailingRule}})
 	if err != nil || len(checked.Items) != 3 {
 		t.Fatalf("batch check duplicate rules: result=%#v err=%v", checked, err)
 	}
@@ -326,7 +478,7 @@ func TestFirewallRuleServiceBatchCreateRejectsDuplicateManagedRule(t *testing.T)
 		})
 	}
 
-	created, err := service.CreateBatch(ctx, request)
+	created, err := service.CreateRulesBatch(ctx, request)
 	if err != nil || created.Succeeded != 1 || created.Failed != 1 || created.Skipped != 1 {
 		t.Fatalf("batch duplicate create: result=%#v err=%v", created, err)
 	}
@@ -341,6 +493,44 @@ func TestFirewallRuleServiceBatchCreateRejectsDuplicateManagedRule(t *testing.T)
 		t.Fatalf(
 			"duplicate managed rule was persisted: stored=%#v snapshot=%#v applies=%d err=%v",
 			stored, adapter.snapshot, adapter.applyCount, listErr,
+		)
+	}
+}
+
+func TestFirewallRuleServiceIptablesBatchRollsBackOnMetadataFailure(t *testing.T) {
+	rules := []filter.FirewallRule{executorTestRule("8080"), executorTestRule("8081")}
+	adapter := newFakeFilterAdapter(t, rules[0].Scope, nil)
+	db := newFirewallRuleTestDB(t)
+	ruleRepo := repo.NewFirewallRuleRepo(db)
+	service := &FirewallService{
+		rules: &failingFirewallRuleRepo{
+			IFirewallRuleRepo: ruleRepo,
+			updateErr:         errors.New("metadata write failed"),
+		},
+		adapters:         firewallRuleRuntimeRegistry{filter.ProviderIptables: newFirewallRuleRuntime(adapter, nil)},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil },
+	}
+	ctx := context.Background()
+	checked, err := service.CheckRulesBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: rules})
+	if err != nil {
+		t.Fatalf("batch check: %v", err)
+	}
+	request := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, len(rules))}
+	for _, item := range checked.Items {
+		request.Items = append(request.Items, dto.FirewallRuleCreate{
+			Rule: item.RequestedRule, CheckFlag: item.CheckFlag, Action: filter.CheckActionCreate,
+			SourceKind: constant.FirewallRuleSourceUser,
+		})
+	}
+	created, err := service.CreateRulesBatch(ctx, request)
+	if err != nil || created.Succeeded != 0 || created.Failed != 1 || created.Skipped != 1 {
+		t.Fatalf("batch failure result: %#v err=%v", created, err)
+	}
+	stored, listErr := ruleRepo.List(ctx)
+	if listErr != nil || len(stored) != 0 || len(adapter.snapshot.Rules) != 0 || adapter.applyCount != 1 || adapter.rollbackCount != 1 {
+		t.Fatalf(
+			"failed batch was not rolled back: stored=%#v snapshot=%#v applies=%d rollbacks=%d err=%v",
+			stored, adapter.snapshot, adapter.applyCount, adapter.rollbackCount, listErr,
 		)
 	}
 }
@@ -532,6 +722,40 @@ func TestSyncSystemPortsCreatesTracksAndDeletesAcceptedPort(t *testing.T) {
 	)
 	if err != nil || len(present) != 0 {
 		t.Fatalf("accepted port ownership remained present: rules=%#v err=%v", present, err)
+	}
+}
+
+func TestSyncSystemPortsBatchesNativeAcceptedPortsByScope(t *testing.T) {
+	scope := filter.Scope{
+		Provider: filter.ProviderIptables, Family: filter.FamilyIPv4, Table: "filter",
+		Chain: filter.IptablesInputChain, Direction: filter.DirectionInput,
+	}
+	adapter := newFakeFilterAdapter(t, scope, nil)
+	ruleRepo := repo.NewFirewallRuleRepo(newFirewallRuleTestDB(t))
+	engine := &FirewallService{
+		rules: ruleRepo,
+		adapters: firewallRuleRuntimeRegistry{
+			filter.ProviderIptables: newFirewallRuleRuntime(adapter, nil),
+		},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil },
+	}
+	ports := []dto.FirewallSystemPort{
+		{Family: "ipv4", Port: "8080", Protocol: "tcp"},
+		{Family: "ipv4", Port: "8443", Protocol: "tcp"},
+		{Family: "ipv4", Port: "5353", Protocol: "udp"},
+	}
+
+	if err := engine.SyncSystemPorts(context.Background(), nil, ports); err != nil {
+		t.Fatalf("batch create accepted ports: %v", err)
+	}
+	if adapter.applyCount != 1 || len(adapter.snapshot.Rules) != len(ports) {
+		t.Fatalf("accepted ports were not created in one native apply: applies=%d rules=%d", adapter.applyCount, len(adapter.snapshot.Rules))
+	}
+	if err := engine.SyncSystemPorts(context.Background(), ports, nil); err != nil {
+		t.Fatalf("batch delete accepted ports: %v", err)
+	}
+	if adapter.applyCount != 2 || len(adapter.snapshot.Rules) != 0 {
+		t.Fatalf("accepted ports were not deleted in one native apply: applies=%d rules=%d", adapter.applyCount, len(adapter.snapshot.Rules))
 	}
 }
 
@@ -1125,6 +1349,7 @@ type fakeFilterAdapter struct {
 	rollbackSnapshot      filter.Snapshot
 	lastChange            filter.DesiredChange
 	applyCount            int
+	observeCount          int
 	rollbackCount         int
 	verifyMatched         bool
 	capabilities          filter.Capabilities
@@ -1170,11 +1395,42 @@ func (f *fakeFilterAdapter) Capabilities(context.Context) (filter.Capabilities, 
 	return filter.Capabilities{Scopes: filter.MVPScopePatterns(), Marker: true, OwnedChains: true}, nil
 }
 func (f *fakeFilterAdapter) Observe(context.Context, filter.Scope) (filter.Snapshot, error) {
+	f.observeCount++
 	return f.snapshot, nil
 }
 func (f *fakeFilterAdapter) Compile(snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.BackendPlan, error) {
 	f.rollbackSnapshot = snapshot
 	f.rollbackSnapshot.Rules = append([]filter.ObservedRule(nil), snapshot.Rules...)
+	if len(changes) > 1 {
+		plan := filter.BackendPlan{
+			Provider: f.Provider(), Scope: snapshot.Scope, SnapshotRevision: snapshot.Revision,
+			Rules: make([]filter.NativeRulePlan, 0, len(changes)),
+		}
+		position := len(snapshot.Rules)
+		for _, change := range changes {
+			if change.Operation != filter.ChangeCreate && change.Operation != filter.ChangeDelete {
+				return filter.BackendPlan{}, filter.ErrInvalidRule
+			}
+			rule := change.After
+			if change.Operation == filter.ChangeDelete {
+				rule = change.Before
+			}
+			if rule == nil {
+				return filter.BackendPlan{}, filter.ErrInvalidRule
+			}
+			position++
+			if change.Locator != nil && change.Locator.Position != nil {
+				position = *change.Locator.Position
+			}
+			marker := "1panel-rule:" + rule.UUID
+			expected := executorObservedRule(*rule, marker, position)
+			plan.Rules = append(plan.Rules, filter.NativeRulePlan{
+				RuleUUID: rule.UUID, Operation: change.Operation, Expected: expected,
+			})
+		}
+		f.lastChange = changes[len(changes)-1]
+		return plan, nil
+	}
 	change := changes[0]
 	f.lastChange = change
 	rule := change.After
@@ -1197,6 +1453,33 @@ func (f *fakeFilterAdapter) Compile(snapshot filter.Snapshot, changes []filter.D
 }
 func (f *fakeFilterAdapter) Apply(_ context.Context, plan filter.BackendPlan) (filter.ApplyResult, error) {
 	f.applyCount++
+	if len(plan.Rules) > 1 {
+		applied := make([]filter.ObservedRule, 0, len(plan.Rules))
+		rules := append([]filter.ObservedRule(nil), f.snapshot.Rules...)
+		if plan.Rules[0].Operation == filter.ChangeDelete {
+			deleted := make(map[string]struct{}, len(plan.Rules))
+			for _, rulePlan := range plan.Rules {
+				deleted[rulePlan.Expected.Marker] = struct{}{}
+			}
+			remaining := make([]filter.ObservedRule, 0, len(rules)-len(deleted))
+			for _, observed := range rules {
+				if _, exists := deleted[observed.Marker]; !exists {
+					remaining = append(remaining, observed)
+				}
+			}
+			f.snapshot, _ = filter.NewSnapshot(f.snapshot.Scope, remaining)
+			return filter.ApplyResult{}, nil
+		}
+		for _, rulePlan := range plan.Rules {
+			if rulePlan.Operation != filter.ChangeCreate {
+				return filter.ApplyResult{}, filter.ErrInvalidRule
+			}
+			rules = append(rules, rulePlan.Expected)
+			applied = append(applied, rulePlan.Expected)
+		}
+		f.snapshot, _ = filter.NewSnapshot(f.snapshot.Scope, rules)
+		return filter.ApplyResult{Applied: applied}, nil
+	}
 	expected := plan.Rules[0].Expected
 	if plan.Rules[0].Operation == filter.ChangeReorder || plan.Rules[0].Operation == filter.ChangeUpdate {
 		current := -1

@@ -15,6 +15,17 @@ type DockerPortGuardPolicy struct {
 	Description string `gorm:"type:text" json:"description"`
 }
 
+type ForwardingRule struct {
+	BaseModel
+
+	Family     string `gorm:"size:16;not null;uniqueIndex:idx_forwarding_rule_identity" json:"family"`
+	Protocol   string `gorm:"size:8;not null;uniqueIndex:idx_forwarding_rule_identity" json:"protocol"`
+	Port       string `gorm:"size:32;not null;uniqueIndex:idx_forwarding_rule_identity" json:"port"`
+	TargetIP   string `gorm:"size:64;not null;uniqueIndex:idx_forwarding_rule_identity" json:"targetIP"`
+	TargetPort string `gorm:"size:32;not null;uniqueIndex:idx_forwarding_rule_identity" json:"targetPort"`
+	Interface  string `gorm:"size:32;not null;default:'';uniqueIndex:idx_forwarding_rule_identity" json:"interface"`
+}
+
 type FirewallRule struct {
 	UUID     string `gorm:"size:64;primaryKey" json:"uuid"`
 	ScopeKey string `gorm:"size:255;not null;index" json:"scopeKey"`

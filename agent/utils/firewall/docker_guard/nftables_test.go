@@ -54,6 +54,18 @@ func (r *nftRecordingRunner) Run(executable string, args ...string) (string, err
 
 func (r *nftRecordingRunner) RunInput(executable, input string, args ...string) (string, error) {
 	r.inputCalls = append(r.inputCalls, restoreCall{executable: executable, input: input, args: args})
+	for _, line := range strings.Split(input, "\n") {
+		fields := strings.Fields(line)
+		if len(fields) >= 4 && fields[0] == "add" && fields[1] == "table" {
+			r.objects["table|"+fields[2]+"|"+fields[3]] = true
+		}
+		if len(fields) >= 5 && fields[0] == "add" && fields[1] == "chain" {
+			r.objects["chain|"+fields[2]+"|"+fields[3]+"|"+fields[4]] = true
+		}
+		if len(fields) >= 7 && fields[0] == "insert" && fields[1] == "rule" {
+			r.baseRules[fields[2]] = "jump " + NftChain + " # handle 1\n"
+		}
+	}
 	return "", nil
 }
 
@@ -102,23 +114,22 @@ func TestNftInitializeCreatesOwnedChainsBeforeDockerForwardRules(t *testing.T) {
 	if err := manager.Initialize(nil); err != nil {
 		t.Fatal(err)
 	}
-	joined := make([]string, 0, len(runner.runCalls))
-	for _, call := range runner.runCalls {
-		joined = append(joined, strings.Join(call, " "))
+	if len(runner.inputCalls) != 2 {
+		t.Fatalf("batch calls = %d, want lifecycle plus rule restore", len(runner.inputCalls))
 	}
-	all := strings.Join(joined, "\n")
+	all := runner.inputCalls[0].input
 	for _, want := range []string{
-		"nft add table ip " + NftTable,
-		"nft add chain ip " + NftTable + " " + NftBaseChain + " { type filter hook forward priority filter - 1 ; policy accept ; }",
-		"nft add chain ip " + NftTable + " " + NftChain,
-		"nft insert rule ip " + NftTable + " " + NftBaseChain + " jump " + NftChain,
+		"add table ip " + NftTable,
+		"add chain ip " + NftTable + " " + NftBaseChain + " { type filter hook forward priority filter - 1 ; policy accept ; }",
+		"add chain ip " + NftTable + " " + NftChain,
+		"insert rule ip " + NftTable + " " + NftBaseChain + " jump " + NftChain,
 	} {
 		if !strings.Contains(all, want) {
-			t.Fatalf("nft calls do not contain %q:\n%s", want, all)
+			t.Fatalf("nft lifecycle batch does not contain %q:\n%s", want, all)
 		}
 	}
-	if len(runner.inputCalls) != 1 {
-		t.Fatalf("restore calls = %d, want IPv4 only", len(runner.inputCalls))
+	if !strings.Contains(runner.inputCalls[1].input, "flush chain ip "+NftTable+" "+NftChain) {
+		t.Fatalf("policy restore batch was not executed:\n%s", runner.inputCalls[1].input)
 	}
 }
 

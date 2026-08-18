@@ -6,6 +6,8 @@ import (
 	"net/netip"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 )
 
 var (
@@ -56,7 +58,13 @@ type RuleCheckResult struct {
 	AllowedActions   []CheckAction       `json:"allowedActions,omitempty"`
 }
 
-func CheckCreate(snapshot Snapshot, requested FirewallRule, desired []DesiredRule, clientIP string) (RuleCheckResult, error) {
+func CheckCreate(
+	snapshot Snapshot,
+	requested FirewallRule,
+	desired []DesiredRule,
+	clientIP string,
+	protectedPorts ...firewall.PortWhitelist,
+) (RuleCheckResult, error) {
 	normalized, err := NormalizeRule(requested)
 	if err != nil {
 		return RuleCheckResult{}, err
@@ -75,7 +83,7 @@ func CheckCreate(snapshot Snapshot, requested FirewallRule, desired []DesiredRul
 		RequestedRule:    normalized,
 		RequestedRuleKey: ruleKey,
 	}
-	if RuleBlocksManagementConnection(normalized, clientIP) {
+	if RuleBlocksManagementConnection(normalized, clientIP, protectedPorts...) {
 		result.Decision = CheckDecisionBlocked
 		result.Classification = CheckClassificationProtected
 		result.Reason = "current_management_connection"
@@ -107,6 +115,7 @@ func CheckCreate(snapshot Snapshot, requested FirewallRule, desired []DesiredRul
 	exact := make([]ObservedRule, 0)
 	covered := make([]ObservedRule, 0)
 	conflicts := make([]ObservedRule, 0)
+	partialConflicts := make([]ObservedRule, 0)
 	for _, observed := range snapshot.Rules {
 		if observed.ParseStatus != ParseStatusSupported {
 			if observed.Rule.Scope.Provider == ProviderFirewalld && observed.Rule.NativeKind == NativeKindZoneService {
@@ -139,7 +148,11 @@ func CheckCreate(snapshot Snapshot, requested FirewallRule, desired []DesiredRul
 			if allowsOrderedFirewalldException(observed, normalized) {
 				continue
 			}
-			conflicts = append(conflicts, observed)
+			if RuleCovers(observedRule, normalized) {
+				conflicts = append(conflicts, observed)
+			} else {
+				partialConflicts = append(partialConflicts, observed)
+			}
 		}
 	}
 
@@ -172,6 +185,12 @@ func CheckCreate(snapshot Snapshot, requested FirewallRule, desired []DesiredRul
 		result.Reason = "overlapping_rule_with_different_action"
 		result.Candidates = conflicts
 	case result.Classification == CheckClassificationUnsupported:
+	case len(partialConflicts) > 0:
+		result.Decision = CheckDecisionConfirmationRequired
+		result.Classification = CheckClassificationConflict
+		result.Reason = "partially_overlapping_rule_with_different_action"
+		result.Candidates = partialConflicts
+		result.AllowedActions = []CheckAction{CheckActionCreateAnyway, CheckActionCancel}
 	case len(covered) > 0:
 		result.Decision = CheckDecisionConfirmationRequired
 		result.Classification = CheckClassificationCovered
@@ -223,28 +242,50 @@ func containsProtectedRule(rules []ObservedRule) bool {
 	return false
 }
 
-func RuleBlocksManagementConnection(rule FirewallRule, clientIP string) bool {
-	if rule.Action == ActionAccept || rule.DestinationPort != "" {
-		return false
-	}
-	client, err := netip.ParseAddr(strings.TrimSpace(clientIP))
-	if err != nil {
-		return false
-	}
-	if rule.Scope.Family == FamilyIPv4 {
-		client = client.Unmap()
-		if !client.Is4() {
-			return false
-		}
-	} else if rule.Scope.Family == FamilyIPv6 && (!client.Is6() || client.Is4In6()) {
+func RuleBlocksManagementConnection(
+	rule FirewallRule,
+	clientIP string,
+	protectedPorts ...firewall.PortWhitelist,
+) bool {
+	if rule.Action == ActionAccept {
 		return false
 	}
 	targetAddress := rule.SourceAddress
-	if targetAddress == "" {
+	if targetAddress != "" {
+		client, err := netip.ParseAddr(strings.TrimSpace(clientIP))
+		if err != nil {
+			return false
+		}
+		if rule.Scope.Family == FamilyIPv4 {
+			client = client.Unmap()
+			if !client.Is4() {
+				return false
+			}
+		} else if rule.Scope.Family == FamilyIPv6 && (!client.Is6() || client.Is4In6()) {
+			return false
+		}
+		prefix, err := netip.ParsePrefix(targetAddress)
+		if err != nil || !prefix.Contains(client) {
+			return false
+		}
+	}
+	if rule.DestinationPort == "" {
 		return true
 	}
-	prefix, err := netip.ParsePrefix(targetAddress)
-	return err == nil && prefix.Contains(client)
+	for _, protected := range protectedPorts {
+		family := strings.ToLower(strings.TrimSpace(protected.Family))
+		if family != "" && rule.Scope.Family != FamilyInet && string(rule.Scope.Family) != family {
+			continue
+		}
+		protocol := strings.ToLower(strings.TrimSpace(protected.Protocol))
+		if rule.Protocol != "all" && rule.Protocol != protocol {
+			continue
+		}
+		if portsOverlap(rule.DestinationPort, protected.Port) {
+			return true
+		}
+	}
+	return false
 }
 
 func FindCandidate(candidates []ObservedRule, selected string) (ObservedRule, error) {
@@ -297,7 +338,8 @@ func RuleCovers(existing, requested FirewallRule) bool {
 	if existingErr != nil || requestedErr != nil || existing.Scope.Key() != requested.Scope.Key() {
 		return false
 	}
-	return protocolCovers(existing.Protocol, requested.Protocol) &&
+	return familyCovers(existing.Scope.Family, requested.Scope.Family) &&
+		protocolCovers(existing.Protocol, requested.Protocol) &&
 		addressCovers(existing.SourceAddress, requested.SourceAddress) &&
 		addressCovers(existing.DestinationAddress, requested.DestinationAddress) &&
 		portCovers(existing.SourcePort, requested.SourcePort) &&
@@ -311,12 +353,21 @@ func RulesOverlap(left, right FirewallRule) bool {
 	if leftErr != nil || rightErr != nil || left.Scope.Key() != right.Scope.Key() {
 		return false
 	}
-	return protocolsOverlap(left.Protocol, right.Protocol) &&
+	return familiesOverlap(left.Scope.Family, right.Scope.Family) &&
+		protocolsOverlap(left.Protocol, right.Protocol) &&
 		addressesOverlap(left.SourceAddress, right.SourceAddress) &&
 		addressesOverlap(left.DestinationAddress, right.DestinationAddress) &&
 		portsOverlap(left.SourcePort, right.SourcePort) &&
 		portsOverlap(left.DestinationPort, right.DestinationPort) &&
 		(left.Interface == "" || right.Interface == "" || left.Interface == right.Interface)
+}
+
+func familyCovers(existing, requested Family) bool {
+	return existing == FamilyInet || existing == requested
+}
+
+func familiesOverlap(left, right Family) bool {
+	return left == FamilyInet || right == FamilyInet || left == right
 }
 
 func protocolCovers(existing, requested string) bool {

@@ -183,20 +183,15 @@ func (m *Manager) Cleanup() error {
 		if !m.runner.Exists(executable) {
 			continue
 		}
-		if err := m.unbindFamily(executable); err != nil {
-			return err
-		}
-		exists, err := m.chainExists(executable, Chain)
+		output, err := m.run(executable, "-S")
 		if err != nil {
 			return err
 		}
-		if !exists {
+		rules := dockerGuardLifecycleRules(output, false, chainDeclared(output, Chain))
+		if len(rules) == 0 {
 			continue
 		}
-		if _, err := m.run(executable, "-F", Chain); err != nil {
-			return err
-		}
-		if _, err := m.run(executable, "-X", Chain); err != nil {
+		if err := m.restoreLifecycle(executable, rules); err != nil {
 			return err
 		}
 	}
@@ -258,27 +253,23 @@ func (m *Manager) bindExistingFamily(executable string, required bool) error {
 		}
 		return nil
 	}
-	dockerChain, err := m.chainExists(executable, DockerChain)
+	output, err := m.run(executable, "-S")
 	if err != nil {
 		return err
 	}
-	if !dockerChain {
+	if !chainDeclared(output, DockerChain) {
 		if required {
 			return fmt.Errorf("%w for %s", ErrDockerChainUnavailable, executable)
 		}
 		return nil
 	}
-	owned, err := m.chainExists(executable, Chain)
-	if err != nil {
-		return err
-	}
-	if !owned {
+	if !chainDeclared(output, Chain) {
 		if required {
 			return fmt.Errorf("%s chain is not initialized for %s", Chain, executable)
 		}
 		return nil
 	}
-	return m.ensureJump(executable)
+	return m.restoreLifecycle(executable, dockerGuardLifecycleRules(output, true, false))
 }
 
 func (m *Manager) ensureFamily(executable string, required bool) error {
@@ -288,40 +279,51 @@ func (m *Manager) ensureFamily(executable string, required bool) error {
 		}
 		return nil
 	}
-	dockerChain, err := m.chainExists(executable, DockerChain)
+	output, err := m.run(executable, "-S")
 	if err != nil {
 		return err
 	}
-	if !dockerChain {
+	if !chainDeclared(output, DockerChain) {
 		if required {
 			return fmt.Errorf("%w for %s", ErrDockerChainUnavailable, executable)
 		}
 		return nil
 	}
-	owned, err := m.chainExists(executable, Chain)
-	if err != nil {
-		return err
-	}
-	if !owned {
-		if _, err := m.run(executable, "-N", Chain); err != nil {
-			return err
-		}
-	}
-	return m.ensureJump(executable)
+	return m.restoreLifecycle(executable, dockerGuardLifecycleRules(output, true, !chainDeclared(output, Chain)))
 }
 
-func (m *Manager) ensureJump(executable string) error {
-	output, err := m.run(executable, "-S", DockerChain)
+func dockerGuardLifecycleRules(output string, bind, createOwned bool) [][]string {
+	rules := make([][]string, 0, countJumps(output)+3)
+	if createOwned {
+		rules = append(rules, []string{"-N", Chain})
+	}
+	for i := 0; i < countJumps(output); i++ {
+		rules = append(rules, []string{"-D", DockerChain, "-j", Chain})
+	}
+	if bind {
+		rules = append(rules, []string{"-I", DockerChain, "1", "-j", Chain})
+	} else if chainDeclared(output, Chain) {
+		rules = append(rules, []string{"-F", Chain}, []string{"-X", Chain})
+	}
+	return rules
+}
+
+func (m *Manager) restoreLifecycle(executable string, rules [][]string) error {
+	if len(rules) == 0 {
+		return nil
+	}
+	restoreExecutable := executable + "-restore"
+	if !m.runner.Exists(restoreExecutable) {
+		return fmt.Errorf("%s is not installed", restoreExecutable)
+	}
+	script, err := buildRestoreScript(rules)
 	if err != nil {
 		return err
 	}
-	for i := 0; i < countJumps(output); i++ {
-		if _, err := m.run(executable, "-D", DockerChain, "-j", Chain); err != nil {
-			return err
-		}
+	if _, err := m.runner.RunInput(restoreExecutable, script, "--noflush", "--wait"); err != nil {
+		return fmt.Errorf("batch update Docker guard lifecycle: %w", err)
 	}
-	_, err = m.run(executable, "-I", DockerChain, "1", "-j", Chain)
-	return err
+	return nil
 }
 
 func (m *Manager) rebuildLocked(policies []Policy) error {
@@ -412,11 +414,11 @@ func (m *Manager) unbindFamily(executable string) error {
 		return nil
 	}
 	if output, err := m.run(executable, "-S", DockerChain); err == nil {
+		rules := make([][]string, 0, countJumps(output))
 		for i := 0; i < countJumps(output); i++ {
-			if _, err := m.run(executable, "-D", DockerChain, "-j", Chain); err != nil {
-				return err
-			}
+			rules = append(rules, []string{"-D", DockerChain, "-j", Chain})
 		}
+		return m.restoreLifecycle(executable, rules)
 	}
 	return nil
 }

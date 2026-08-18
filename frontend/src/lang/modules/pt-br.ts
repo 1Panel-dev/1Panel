@@ -4172,6 +4172,8 @@ const message = {
         plan_protected_rule: 'Esta regra está protegida e não pode ser assumida, alterada ou excluída.',
         plan_overlapping_rule_with_different_action:
             'Existe uma regra sobreposta com ação oposta. A operação foi interrompida.',
+        plan_partially_overlapping_rule_with_different_action:
+            'A regra se sobrepõe parcialmente a uma regra com ação oposta. O resultado depende da ordem das regras.',
         plan_blocked: 'A regra não pode ser aplicada com segurança. Atualize a lista e tente novamente.',
         scopeDefaultMismatch: 'A zona padrão do sistema é {0}; esta página gerencia apenas a zona public.',
         scopeInactive: 'O escopo gerenciado está inativo. Novas regras podem não afetar o tráfego atual.',
@@ -4199,18 +4201,10 @@ const message = {
         forwardRule: 'Regra de redirecionamento de porta | Regras de redirecionamento de porta',
         dockerGuard: 'Proteção de portas de contêineres',
         systemFirewall: 'Firewall do host',
-        firewallSettingHelper:
-            'O firewall do sistema, o encaminhamento de portas e o firewall do Docker são selecionados separadamente. Migre regras manualmente por exportação e importação.',
         systemFirewallHelper: 'Controla o acesso às portas do host e as regras de entrada.',
-        forwardingHelper:
-            'Controla regras de encaminhamento de portas e pode ser selecionado separadamente do firewall do sistema.',
-        dockerFirewallHelper: 'Controla regras de rede do Docker. A troca reinicia o Docker.',
-        iptablesSuggestionTag: 'Mais compatível',
-        nftablesSuggestionTag: 'Ambientes novos',
-        iptablesSuggestion:
-            'Recomendado para regras iptables existentes, cargas do Docker ou ambientes que priorizam compatibilidade.',
-        nftablesSuggestion:
-            'Recomendado para sistemas Linux recentes e novas instalações. Confirme o suporte das ferramentas antes de trocar.',
+        forwardingHelper: 'Gerencia regras de encaminhamento de portas.',
+        dockerFirewallHelper: 'Seleciona como o 1Panel gerencia a proteção de portas de contêineres.',
+        backendRecommendation: 'Recomenda-se usar iptables ou nftables.',
         configuredRules: '{0} regras configuradas',
         addressFamily: 'Versão do IP',
         portOrRange: 'Porta / intervalo',
@@ -4219,11 +4213,13 @@ const message = {
         importBackendHelper:
             'As regras importadas são convertidas para o backend atual {0}. As regras de origem não são alteradas.',
         clearAllRulesHelper: 'Excluir as {0} regras gerenciáveis do backend atual? Esta ação não pode ser desfeita.',
-        switchBackendHelper: 'Mudar para {0}? As regras existentes não serão migradas nem removidas.',
+        switchBackendHelper:
+            'Esta operação altera apenas o backend de firewall que o 1Panel gerenciará daqui em diante. O backend original não será migrado, interrompido nem limpo. Exporte primeiro as regras atuais. Após a troca, inicialize o backend de destino e importe ou verifique manualmente as regras. Regras externas e nativas do sistema não são exportadas. Continuar a troca para {0}?',
+        switchBackendSuccessHelper:
+            'O 1Panel agora gerencia {0}. O backend original {1} não foi interrompido nem limpo e ainda pode estar em execução e em vigor. Inicialize o backend de destino, importe ou verifique as regras e trate manualmente o backend original somente após confirmar que o acesso funciona normalmente.',
         uninstalledStatus: 'Não instalado',
         initializedStatus: 'Inicializado',
         partiallyInitialized: 'Parcialmente inicializado',
-        currentUse: 'Em uso',
         dockerGuardHelper:
             'Configure restrições de acesso para as portas publicadas pelos contêineres Docker no host. Portas sem proteção mantêm o acesso padrão do Docker.',
         dockerInputNotProtected:
@@ -4300,6 +4296,7 @@ const message = {
         priority: 'Prioridade',
         reject: 'Rejeitar',
         allPorts: 'Todas as Portas',
+        allProtocolHelper: 'Todos os protocolos e portas',
         deleteRuleConfirm: 'Excluirá {0} regras. Continuar?',
         deleteUsedRuleConfirm:
             'Esta porta está sendo usada por {0}. Excluir a regra de liberação pode tornar o serviço inacessível. Continuar?',

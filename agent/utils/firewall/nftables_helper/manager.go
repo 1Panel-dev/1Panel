@@ -25,14 +25,16 @@ type Manager struct {
 }
 
 func (m *Manager) Cleanup() error {
+	commands := make([][]string, 0, 2)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
 		if _, err := run("list", "table", tableFamily, TableName); err != nil {
 			continue
 		}
-		if _, err := run("delete", "table", tableFamily, TableName); err != nil {
-			return err
-		}
+		commands = append(commands, []string{"delete", "table", tableFamily, TableName})
+	}
+	if err := runBatch(commands...); err != nil {
+		return err
 	}
 	file := filepath.Join(global.Dir.FirewallDir, RulesFile)
 	if err := os.Remove(file); err != nil && !errors.Is(err, os.ErrNotExist) {
@@ -89,31 +91,46 @@ func (m *Manager) ensureBaseChains() error {
 			return err
 		}
 	}
+	commands := make([][]string, 0, 10)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
+		tableExists := true
 		if _, err := run("list", "table", tableFamily, TableName); err != nil {
-			if _, createErr := run("add", "table", tableFamily, TableName); createErr != nil {
-				return fmt.Errorf("create 1Panel nftables %s table: %w", tableFamily, createErr)
-			}
+			tableExists = false
+			commands = append(commands, []string{"add", "table", tableFamily, TableName})
 		}
-		if _, err := run("list", "chain", tableFamily, TableName, InputChain); err != nil {
-			if err := runCommand(
+		if !tableExists {
+			commands = append(commands, []string{
 				"add", "chain", tableFamily, TableName, InputChain,
 				"{", "type", "filter", "hook", "input", "priority", "filter", ";", "policy", "accept", ";", "}",
-			); err != nil {
-				return fmt.Errorf("create 1Panel nftables %s input chain: %w", tableFamily, err)
-			}
+			})
+		} else if _, err := run("list", "chain", tableFamily, TableName, InputChain); err != nil {
+			commands = append(commands, []string{
+				"add", "chain", tableFamily, TableName, InputChain,
+				"{", "type", "filter", "hook", "input", "priority", "filter", ";", "policy", "accept", ";", "}",
+			})
 		}
 		for _, nativeChain := range BasicChains() {
-			if _, err := run("list", "chain", tableFamily, TableName, nativeChain); err == nil {
-				continue
+			if tableExists {
+				if _, err := run("list", "chain", tableFamily, TableName, nativeChain); err == nil {
+					continue
+				}
 			}
-			if _, err := run("add", "chain", tableFamily, TableName, nativeChain); err != nil {
-				return fmt.Errorf("create nftables %s chain %s: %w", tableFamily, nativeChain, err)
-			}
+			commands = append(commands, []string{"add", "chain", tableFamily, TableName, nativeChain})
 		}
 	}
+	if err := runBatch(commands...); err != nil {
+		return fmt.Errorf("batch create 1Panel nftables base chains: %w", err)
+	}
 	return nil
+}
+
+func requiredPortCommand(tableFamily string, port firewall.PortWhitelist) []string {
+	return []string{
+		"add", "rule", tableFamily, TableName, BasicBeforeChain,
+		"meta", "l4proto", port.Protocol, port.Protocol, "dport", port.Port,
+		"accept", "comment", `"` + requiredPortComment + `"`,
+	}
 }
 
 func rejectLegacyOnePanelChains() error {
@@ -168,33 +185,24 @@ func (m *Manager) initPreRules() error {
 	if err != nil {
 		return err
 	}
+	commands := make([][]string, 0, 12+len(ports)*2)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
-		if err := runCommand("flush", "chain", tableFamily, TableName, BasicBeforeChain); err != nil {
-			return err
-		}
-		if err := runCommand("add", "rule", tableFamily, TableName, BasicBeforeChain, "iifname", `"lo"`, "accept", "comment", `"Loopback Whitelist"`); err != nil {
-			return err
-		}
-		if err := runCommand("add", "rule", tableFamily, TableName, BasicBeforeChain, "ct", "state", "{", "established,related", "}", "accept", "comment", `"ESTABLISHED Whitelist"`); err != nil {
-			return err
-		}
+		commands = append(commands,
+			[]string{"flush", "chain", tableFamily, TableName, BasicBeforeChain},
+			[]string{"add", "rule", tableFamily, TableName, BasicBeforeChain, "iifname", `"lo"`, "accept", "comment", `"Loopback Whitelist"`},
+			[]string{"add", "rule", tableFamily, TableName, BasicBeforeChain, "ct", "state", "{", "established,related", "}", "accept", "comment", `"ESTABLISHED Whitelist"`},
+		)
 		for _, port := range ports {
-			if err := addRequiredPortRule(tableFamily, port); err != nil {
-				return err
-			}
+			commands = append(commands, requiredPortCommand(tableFamily, port))
 		}
-		if err := runCommand("flush", "chain", tableFamily, TableName, BasicAfterChain); err != nil {
-			return err
-		}
-		if err := runCommand("add", "rule", tableFamily, TableName, BasicAfterChain, "meta", "l4proto", "tcp", "drop"); err != nil {
-			return err
-		}
-		if err := runCommand("add", "rule", tableFamily, TableName, BasicAfterChain, "meta", "l4proto", "udp", "drop"); err != nil {
-			return err
-		}
+		commands = append(commands,
+			[]string{"flush", "chain", tableFamily, TableName, BasicAfterChain},
+			[]string{"add", "rule", tableFamily, TableName, BasicAfterChain, "meta", "l4proto", "tcp", "drop"},
+			[]string{"add", "rule", tableFamily, TableName, BasicAfterChain, "meta", "l4proto", "udp", "drop"},
+		)
 	}
-	return nil
+	return runBatch(commands...)
 }
 
 func (m *Manager) SyncRequiredPorts() error {
@@ -206,6 +214,7 @@ func (m *Manager) SyncRequiredPorts() error {
 	if err != nil {
 		return err
 	}
+	commands := make([][]string, 0)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
 		stdout, err := run("-n", "-a", "list", "chain", tableFamily, TableName, BasicBeforeChain)
@@ -215,28 +224,19 @@ func (m *Manager) SyncRequiredPorts() error {
 		existing := requiredPortRules(stdout)
 		missing, staleHandles := requiredPortChanges(existing, ports)
 		for _, port := range missing {
-			if err := addRequiredPortRule(tableFamily, port); err != nil {
-				return err
-			}
+			commands = append(commands, requiredPortCommand(tableFamily, port))
 		}
 		for _, handle := range staleHandles {
-			if err := runCommand("delete", "rule", tableFamily, TableName, BasicBeforeChain, "handle", handle); err != nil {
-				return err
-			}
+			commands = append(commands, []string{"delete", "rule", tableFamily, TableName, BasicBeforeChain, "handle", handle})
 		}
+	}
+	if err := runBatch(commands...); err != nil {
+		return err
 	}
 	if err := PersistRuleset(context.Background()); err != nil {
 		return err
 	}
 	return nil
-}
-
-func addRequiredPortRule(tableFamily string, port firewall.PortWhitelist) error {
-	return runCommand(
-		"add", "rule", tableFamily, TableName, BasicBeforeChain,
-		"meta", "l4proto", port.Protocol, port.Protocol, "dport", port.Port,
-		"accept", "comment", `"`+requiredPortComment+`"`,
-	)
 }
 
 func validateRequiredPorts(ports []firewall.PortWhitelist) ([]firewall.PortWhitelist, error) {
@@ -342,17 +342,17 @@ func Bind() error {
 			return fmt.Errorf("1Panel nftables %s input chain is not initialized: %w", tableFamily, err)
 		}
 	}
-	if err := flushInputChains(); err != nil {
-		return err
-	}
+	commands := make([][]string, 0, 8)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
+		commands = append(commands, []string{"flush", "chain", tableFamily, TableName, InputChain})
 		for _, chain := range BasicChains() {
-			if err := runCommand("add", "rule", tableFamily, TableName, InputChain, "jump", chain); err != nil {
-				cleanupErr := flushInputChains()
-				return errors.Join(err, cleanupErr)
-			}
+			commands = append(commands, []string{"add", "rule", tableFamily, TableName, InputChain, "jump", chain})
 		}
+	}
+	if err := runBatch(commands...); err != nil {
+		cleanupErr := flushInputChains()
+		return errors.Join(err, cleanupErr)
 	}
 	return PersistRuleset(context.Background())
 }
@@ -365,10 +365,9 @@ func Unbind() error {
 }
 
 func flushInputChains() error {
+	commands := make([][]string, 0, 2)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
-		if err := runCommand("flush", "chain", TableFamily(family), TableName, InputChain); err != nil {
-			return err
-		}
+		commands = append(commands, []string{"flush", "chain", TableFamily(family), TableName, InputChain})
 	}
-	return nil
+	return runBatch(commands...)
 }

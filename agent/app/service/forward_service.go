@@ -1,46 +1,59 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
-	forwardClient "github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
-	forwardProviders "github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding/providers"
+	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
+	forwardingproviders "github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding/providers"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/ping"
 )
 
 type IForwardingService interface {
-	LoadBaseInfo() (dto.FirewallBaseInfo, error)
-	SearchWithPage(search dto.ForwardRuleSearch) (int64, interface{}, error)
-	Operate(req dto.ForwardRuleOperate) error
+	LoadBaseInfo() (dto.FirewallSubsystemStatus, error)
+	SearchRules(request dto.ForwardRuleSearch) (int64, interface{}, error)
+	OperateRules(request dto.ForwardRuleOperate) error
 	Enable() error
-	Replay() error
+	Restore(context.Context) error
 }
 
 type ForwardingService struct {
-	managerFactory func() (*forwardClient.Manager, error)
+	managerFactory func() (*forwarding.Manager, error)
+	rules          repo.IForwardingRuleRepo
+	enabled        func() (bool, error)
+	persistBackend func(string) error
 }
 
 type forwardingCandidate struct {
-	adapter forwardClient.Adapter
-	runtime forwardClient.RuntimeClient
+	adapter forwarding.Adapter
+	runtime forwarding.RuntimeClient
 }
 
 var errForwardingBackendConflict = errors.New("iptables and nftables forwarding backends are both initialized; remove one before continuing")
+var forwardingMutationMu sync.Mutex
 
 func NewIForwardingService() IForwardingService {
 	return &ForwardingService{
 		managerFactory: newForwardingManager,
+		rules:          repo.NewIForwardingRuleRepo(),
+		enabled:        forwardingPersistedEnabled,
+		persistBackend: func(backend string) error { return settingRepo.UpdateOrCreate(settingForwardingBackend, backend) },
 	}
 }
 
-func (s *ForwardingService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
-	baseInfo := dto.FirewallBaseInfo{Version: "-", Name: "-", Backend: "-"}
+func (s *ForwardingService) LoadBaseInfo() (dto.FirewallSubsystemStatus, error) {
+	baseInfo := dto.FirewallSubsystemStatus{Version: "-", Name: "-", Backend: "-"}
 	manager, err := s.manager()
 	if err != nil {
 		return baseInfo, err
@@ -66,34 +79,38 @@ func forwardingDisplayName(backend string) string {
 	}
 }
 
-func (s *ForwardingService) SearchWithPage(req dto.ForwardRuleSearch) (int64, interface{}, error) {
-	manager, err := s.manager()
-	if err != nil {
-		return 0, nil, err
-	}
-	if req.Strategy != "" {
+func (s *ForwardingService) SearchRules(request dto.ForwardRuleSearch) (int64, interface{}, error) {
+	if request.Strategy != "" {
 		return 0, nil, nil
 	}
-	rules, err := manager.List(req.Info, req.Strategy)
+	stored, err := s.rules.List(context.Background())
 	if err != nil {
 		return 0, nil, err
 	}
-	total := len(rules)
-	start, end := (req.Page-1)*req.PageSize, req.Page*req.PageSize
+	filtered := stored[:0]
+	for _, rule := range stored {
+		if request.Info == "" || strings.Contains(rule.Port, request.Info) || strings.Contains(rule.TargetPort, request.Info) || strings.Contains(rule.TargetIP, request.Info) {
+			filtered = append(filtered, rule)
+		}
+	}
+	stored = filtered
+	total := len(stored)
+	start, end := (request.Page-1)*request.PageSize, request.Page*request.PageSize
 	if start > total {
 		return int64(total), make([]dto.ForwardRule, 0), nil
 	}
 	if end > total {
 		end = total
 	}
-	pageRules := rules[start:end]
+	pageRules := stored[start:end]
 	var items []dto.ForwardRule
 	if pageRules != nil {
 		items = make([]dto.ForwardRule, 0, len(pageRules))
 	}
-	for _, rule := range pageRules {
+	for index, rule := range pageRules {
 		items = append(items, dto.ForwardRule{
-			Num:        rule.Num,
+			ID:         rule.ID,
+			Num:        strconv.Itoa(start + index + 1),
 			Family:     rule.Family,
 			Protocol:   rule.Protocol,
 			Port:       rule.Port,
@@ -105,73 +122,219 @@ func (s *ForwardingService) SearchWithPage(req dto.ForwardRuleSearch) (int64, in
 	return int64(total), items, nil
 }
 
-func (s *ForwardingService) Operate(req dto.ForwardRuleOperate) error {
-	manager, err := s.manager()
+func (s *ForwardingService) OperateRules(request dto.ForwardRuleOperate) error {
+	forwardingMutationMu.Lock()
+	defer forwardingMutationMu.Unlock()
+	ctx := context.Background()
+	stored, err := s.rules.List(ctx)
 	if err != nil {
 		return err
 	}
-
-	operations := make([]forwardClient.Operation, 0, len(req.Rules))
-	for _, rule := range req.Rules {
-		operations = append(operations, forwardClient.Operation{Rule: forwardClient.Rule{
-			Num: rule.Num, Family: rule.Family, Protocol: rule.Protocol, Port: rule.Port, TargetIP: rule.TargetIP,
-			TargetPort: rule.TargetPort, Interface: rule.Interface,
-		}, Operation: forwardClient.OperationType(rule.Operation)})
-	}
-	if err := manager.Operate(operations, req.ForceDelete); errors.Is(err, forwardClient.ErrRuleExists) {
+	desired, err := applyForwardingOperations(forwardingRulesFromModels(stored), request.Rules)
+	if errors.Is(err, forwarding.ErrRuleExists) {
 		return buserr.New("ErrRecordExist")
 	} else if err != nil {
+		return err
+	}
+	if err := s.rules.ReplaceAll(ctx, forwardingRuleModels(desired)); err != nil {
+		return err
+	}
+	if err := s.reconcile(desired); err != nil {
+		if request.ForceDelete && forwardingOperationsOnlyRemove(request.Rules) {
+			if global.LOG != nil {
+				global.LOG.Error(err)
+			}
+			return nil
+		}
 		return err
 	}
 	return nil
 }
 
 func (s *ForwardingService) Enable() error {
+	forwardingMutationMu.Lock()
+	defer forwardingMutationMu.Unlock()
 	manager, err := s.manager()
 	if err != nil {
 		return err
 	}
-	if err := manager.Enable(); err != nil {
+	if err := settingRepo.UpdateOrCreate(settingForwardingInitialized, constant.StatusEnable); err != nil {
 		return err
 	}
-	return settingRepo.Update("IptablesForwardStatus", constant.StatusEnable)
+	if err := s.activateManager(manager); err != nil {
+		return err
+	}
+	rules, err := s.rules.List(context.Background())
+	if err != nil {
+		return err
+	}
+	return manager.Reconcile(forwardingRulesFromModels(rules))
 }
 
-func (s *ForwardingService) Replay() error {
+func (s *ForwardingService) Restore(ctx context.Context) error {
+	forwardingMutationMu.Lock()
+	defer forwardingMutationMu.Unlock()
+	enabled, err := s.forwardingEnabled()
+	if err != nil || !enabled {
+		return err
+	}
 	manager, err := s.manager()
 	if err != nil {
 		return err
 	}
-	if err := manager.Replay(); err != nil {
-		return err
-	}
-	status, err := settingRepo.GetValueByKey("IptablesForwardStatus")
+	stored, err := s.rules.List(ctx)
 	if err != nil {
 		return err
 	}
-	if status == constant.StatusEnable {
-		return manager.Enable()
+	if err := s.activateManager(manager); err != nil {
+		return err
 	}
-	return nil
+	return manager.Reconcile(forwardingRulesFromModels(stored))
 }
 
-func (s *ForwardingService) manager() (*forwardClient.Manager, error) {
+func (s *ForwardingService) reconcile(rules []forwarding.Rule) error {
+	manager, err := s.manager()
+	if err != nil {
+		return err
+	}
+	return s.reconcileWithManager(manager, rules)
+}
+
+func (s *ForwardingService) reconcileWithManager(manager *forwarding.Manager, rules []forwarding.Rule) error {
+	enabled, err := s.forwardingEnabled()
+	if err != nil || !enabled {
+		return err
+	}
+	if err := s.activateManager(manager); err != nil {
+		return err
+	}
+	return manager.Reconcile(rules)
+}
+
+func (s *ForwardingService) activateManager(manager *forwarding.Manager) error {
+	if err := s.saveForwardingBackend(manager.Name()); err != nil {
+		return err
+	}
+	return manager.Enable()
+}
+
+func (s *ForwardingService) forwardingEnabled() (bool, error) {
+	if s.enabled != nil {
+		return s.enabled()
+	}
+	return forwardingPersistedEnabled()
+}
+
+func (s *ForwardingService) saveForwardingBackend(backend string) error {
+	if s.persistBackend != nil {
+		return s.persistBackend(backend)
+	}
+	return settingRepo.UpdateOrCreate(settingForwardingBackend, backend)
+}
+
+func forwardingPersistedEnabled() (bool, error) {
+	status, err := settingRepo.GetValueByKey(settingForwardingInitialized)
+	return status == constant.StatusEnable, err
+}
+
+func forwardingRulesFromModels(stored []model.ForwardingRule) []forwarding.Rule {
+	rules := make([]forwarding.Rule, 0, len(stored))
+	for _, rule := range stored {
+		rules = append(rules, forwarding.Rule{
+			Family: rule.Family, Protocol: rule.Protocol, Port: rule.Port, TargetIP: rule.TargetIP,
+			TargetPort: rule.TargetPort, Interface: rule.Interface,
+		})
+	}
+	return rules
+}
+
+func forwardingRuleModels(rules []forwarding.Rule) []model.ForwardingRule {
+	stored := make([]model.ForwardingRule, 0, len(rules))
+	for _, rule := range rules {
+		stored = append(stored, model.ForwardingRule{
+			Family: rule.Family, Protocol: rule.Protocol, Port: rule.Port, TargetIP: rule.TargetIP,
+			TargetPort: rule.TargetPort, Interface: rule.Interface,
+		})
+	}
+	return stored
+}
+
+func applyForwardingOperations(current []forwarding.Rule, requested []dto.ForwardRuleOperation) ([]forwarding.Rule, error) {
+	desired := make([]forwarding.Rule, 0, len(current)+len(requested))
+	for _, rule := range current {
+		normalized, err := forwardingproviders.NormalizeRule(rule)
+		if err != nil {
+			return nil, fmt.Errorf("normalize persisted forwarding rule: %w", err)
+		}
+		desired = append(desired, normalized)
+	}
+	for _, operation := range requested {
+		for _, protocol := range strings.Split(operation.Protocol, "/") {
+			rule, err := forwardingproviders.NormalizeRule(forwarding.Rule{
+				Family: operation.Family, Protocol: protocol, Port: operation.Port, TargetIP: operation.TargetIP,
+				TargetPort: operation.TargetPort, Interface: operation.Interface,
+			})
+			if err != nil {
+				return nil, err
+			}
+			index := forwardingRuleIndex(desired, rule)
+			switch forwarding.OperationType(operation.Operation) {
+			case forwarding.OperationAdd:
+				if index >= 0 {
+					return nil, forwarding.ErrRuleExists
+				}
+				desired = append(desired, rule)
+			case forwarding.OperationRemove:
+				if index >= 0 {
+					desired = append(desired[:index], desired[index+1:]...)
+				}
+			default:
+				return nil, fmt.Errorf("unsupported forwarding operation %q", operation.Operation)
+			}
+		}
+	}
+	return desired, nil
+}
+
+func forwardingRuleIndex(rules []forwarding.Rule, wanted forwarding.Rule) int {
+	for index, rule := range rules {
+		if rule.Family == wanted.Family && rule.Protocol == wanted.Protocol && rule.Port == wanted.Port &&
+			rule.TargetIP == wanted.TargetIP && rule.TargetPort == wanted.TargetPort && rule.Interface == wanted.Interface {
+			return index
+		}
+	}
+	return -1
+}
+
+func forwardingOperationsOnlyRemove(operations []dto.ForwardRuleOperation) bool {
+	if len(operations) == 0 {
+		return false
+	}
+	for _, operation := range operations {
+		if operation.Operation != string(forwarding.OperationRemove) {
+			return false
+		}
+	}
+	return true
+}
+
+func (s *ForwardingService) manager() (*forwarding.Manager, error) {
 	return s.managerFactory()
 }
 
-func newForwardingManager() (*forwardClient.Manager, error) {
+func newForwardingManager() (*forwarding.Manager, error) {
 	selected, _ := settingRepo.GetValueByKey(settingForwardingBackend)
 	return newForwardingManagerFor(strings.TrimSpace(selected))
 }
 
-func newForwardingManagerFor(backend string) (*forwardClient.Manager, error) {
+func newForwardingManagerFor(backend string) (*forwarding.Manager, error) {
 	clients, err := lifecycle.NewNetfilterClients()
 	if err != nil {
 		return nil, err
 	}
 	candidates := make([]forwardingCandidate, 0, len(clients))
 	for _, client := range clients {
-		adapter, err := forwardProviders.New(client.Name())
+		adapter, err := forwardingproviders.New(client.Name())
 		if err != nil {
 			return nil, err
 		}
@@ -180,7 +343,7 @@ func newForwardingManagerFor(backend string) (*forwardClient.Manager, error) {
 	if backend != "" {
 		for _, candidate := range candidates {
 			if candidate.adapter.Name() == backend {
-				return forwardClient.NewManager(candidate.adapter, candidate.runtime), nil
+				return forwarding.NewManager(candidate.adapter, candidate.runtime), nil
 			}
 		}
 		return nil, fmt.Errorf("selected forwarding backend %s is not installed", backend)
@@ -188,17 +351,17 @@ func newForwardingManagerFor(backend string) (*forwardClient.Manager, error) {
 	return selectForwardingManager(candidates)
 }
 
-func selectForwardingManager(candidates []forwardingCandidate) (*forwardClient.Manager, error) {
+func selectForwardingManager(candidates []forwardingCandidate) (*forwarding.Manager, error) {
 	if len(candidates) == 0 {
 		return nil, errors.New("no supported forwarding backend detected")
 	}
 	selected := -1
 	for index, candidate := range candidates {
-		ipv4Initialized, _, err := candidate.adapter.FamilyStatus(forwardClient.FamilyIPv4)
+		ipv4Initialized, _, err := candidate.adapter.FamilyStatus(forwarding.FamilyIPv4)
 		if err != nil {
 			return nil, err
 		}
-		ipv6Initialized, _, err := candidate.adapter.FamilyStatus(forwardClient.FamilyIPv6)
+		ipv6Initialized, _, err := candidate.adapter.FamilyStatus(forwarding.FamilyIPv6)
 		if err != nil {
 			return nil, err
 		}
@@ -215,5 +378,5 @@ func selectForwardingManager(candidates []forwardingCandidate) (*forwardClient.M
 		selected = 0
 	}
 	candidate := candidates[selected]
-	return forwardClient.NewManager(candidate.adapter, candidate.runtime), nil
+	return forwarding.NewManager(candidate.adapter, candidate.runtime), nil
 }

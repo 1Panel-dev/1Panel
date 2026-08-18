@@ -11,6 +11,17 @@
                 <el-button v-if="data.base.initialized" v-permission v-node-admin type="primary" @click="sync">
                     {{ $t('commons.button.sync') }}
                 </el-button>
+                <el-button v-permission v-node-admin plain :disabled="policies.length === 0" @click="clearAll">
+                    {{ $t('commons.button.clean') }}
+                </el-button>
+                <el-button-group>
+                    <el-button v-permission v-node-admin @click="openImport">
+                        {{ $t('commons.button.import') }}
+                    </el-button>
+                    <el-button v-permission v-node-admin :disabled="policies.length === 0" @click="exportAll">
+                        {{ $t('commons.button.export') }}
+                    </el-button>
+                </el-button-group>
             </template>
             <template #rightToolBar>
                 <div class="firewall-filter-bar">
@@ -77,6 +88,7 @@
         </LayoutContent>
 
         <DockerGuardDetail ref="detailRef" :containers="containerRows" @search="search" />
+        <DockerGuardImport ref="importRef" @search="search" />
     </div>
 </template>
 
@@ -85,14 +97,23 @@ import { computed, reactive, ref } from 'vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import DockerGuardStatus from '@/views/host/firewall/docker/status/index.vue';
 import DockerGuardDetail from '@/views/host/firewall/docker/detail/index.vue';
+import DockerGuardImport from '@/views/host/firewall/docker/import/index.vue';
 import { Firewall } from '@/api/interface/firewall';
-import { loadDockerPortGuard, operateDockerPortGuard, syncDockerPortGuard } from '@/api/modules/firewall';
+import {
+    deleteDockerPortGuardPolicies,
+    loadDockerPortGuard,
+    operateDockerPortGuard,
+    syncDockerPortGuard,
+} from '@/api/modules/firewall';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
+import { downloadWithContent } from '@/utils/file';
+import { getCurrentDateFormatted } from '@/utils/date';
 
 const loading = ref(false);
 const detailRef = ref<InstanceType<typeof DockerGuardDetail>>();
+const importRef = ref<InstanceType<typeof DockerGuardImport>>();
 const searchName = ref('');
 const selectedFilters = ref<string[]>([]);
 const data = reactive<Firewall.DockerGuardList>({
@@ -152,6 +173,34 @@ const containerRows = computed(() => {
         .filter((container) => container.portGroups.length > 0);
 });
 
+const policies = computed<Firewall.DockerGuardPolicy[]>(() => {
+    const result = new Map<string, Firewall.DockerGuardPolicy>();
+    for (const container of data.containers) {
+        for (const endpoint of container.endpoints) {
+            if (!endpoint.policyUUID || !endpoint.mode) continue;
+            const key = `${endpoint.family}|${endpoint.hostIP}|${endpoint.hostPort}|${endpoint.protocol}`;
+            result.set(key, {
+                family: endpoint.family,
+                hostIP: endpoint.hostIP,
+                hostPort: endpoint.hostPort,
+                protocol: endpoint.protocol,
+                mode: endpoint.mode,
+                sources: endpoint.sources || [],
+                description: endpoint.description || '',
+            });
+        }
+    }
+    return [...result.values()];
+});
+
+const policyUUIDs = computed(() => [
+    ...new Set(
+        data.containers.flatMap(
+            (container) => container.endpoints.map((endpoint) => endpoint.policyUUID).filter(Boolean) as string[],
+        ),
+    ),
+]);
+
 const isExternallyExposed = (endpoint: Firewall.DockerGuardEndpoint) =>
     (endpoint.family === 'ipv4' && (!endpoint.hostIP || endpoint.hostIP === '0.0.0.0')) ||
     (endpoint.family === 'ipv6' && (!endpoint.hostIP || endpoint.hostIP === '::'));
@@ -187,6 +236,43 @@ const operate = async (operation: 'initialize' | 'bind' | 'unbind') => {
 const sync = async () => {
     try {
         await syncDockerPortGuard();
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    } finally {
+        await search();
+    }
+};
+const openImport = () => {
+    importRef.value?.acceptParams();
+};
+const exportAll = async () => {
+    if (!policies.value.length) return;
+    try {
+        await ElMessageBox.confirm(
+            i18n.global.t('firewall.exportHelper', [policies.value.length]),
+            i18n.global.t('commons.button.export'),
+        );
+    } catch {
+        return;
+    }
+    downloadWithContent(
+        JSON.stringify(policies.value, null, 2),
+        `1panel-docker-port-guard-${getCurrentDateFormatted()}.json`,
+    );
+};
+const clearAll = async () => {
+    if (!policyUUIDs.value.length) return;
+    try {
+        await ElMessageBox.confirm(
+            i18n.global.t('firewall.clearAllRulesHelper', [policyUUIDs.value.length]),
+            i18n.global.t('commons.button.clean'),
+            { type: 'warning' },
+        );
+    } catch {
+        return;
+    }
+    loading.value = true;
+    try {
+        await deleteDockerPortGuardPolicies({ uuids: policyUUIDs.value });
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     } finally {
         await search();

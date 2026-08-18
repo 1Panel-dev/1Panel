@@ -49,10 +49,12 @@ const wildcardAddress = (family: Firewall.Family) => {
     return '0.0.0.0/0';
 };
 
+const familyLabel = (family: Firewall.Family) => (family === 'inet' ? 'IPv4/IPv6' : family.toUpperCase());
+
 const ruleSummary = (failure: Firewall.BatchCreateFailure) => {
     const rule = failure.rule;
     const address = rule.sourceAddress || wildcardAddress(rule.scope.family);
-    return `#${failure.index + 1} · ${rule.scope.family.toUpperCase()} · ${rule.protocol.toUpperCase()} · ${address} → ${rule.destinationPort || '*'}`;
+    return `#${failure.index + 1} · ${familyLabel(rule.scope.family)} · ${rule.protocol.toUpperCase()} · ${address} → ${rule.destinationPort || '*'}`;
 };
 
 const failureReason = (error?: string) =>

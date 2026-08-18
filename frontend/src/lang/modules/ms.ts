@@ -4152,6 +4152,8 @@ const message = {
         plan_protected_rule: 'Peraturan ini dilindungi dan tidak boleh diambil alih, diubah atau dipadam.',
         plan_overlapping_rule_with_different_action:
             'Terdapat peraturan bertindih dengan tindakan bertentangan. Operasi dihentikan.',
+        plan_partially_overlapping_rule_with_different_action:
+            'Peraturan ini bertindih sebahagian dengan peraturan bertentangan. Hasil bergantung pada susunan peraturan.',
         plan_blocked: 'Peraturan ini tidak dapat digunakan dengan selamat. Muat semula senarai dan cuba lagi.',
         scopeDefaultMismatch: 'Zon lalai sistem ialah {0}; halaman ini hanya mengurus zon public.',
         scopeInactive: 'Skop terurus tidak aktif. Peraturan baharu mungkin tidak mempengaruhi trafik semasa.',
@@ -4180,18 +4182,10 @@ const message = {
         forwardRule: 'Peraturan Pemajuan Port | Peraturan Pemajuan Port',
         dockerGuard: 'Perlindungan port bekas',
         systemFirewall: 'Tembok api hos',
-        firewallSettingHelper:
-            'Tembok api sistem, pemajuan port dan tembok api Docker dipilih secara berasingan. Pindahkan peraturan secara manual melalui eksport dan import.',
         systemFirewallHelper: 'Mengawal akses port hos dan peraturan masuk.',
-        forwardingHelper:
-            'Mengawal peraturan pemajuan port dan boleh dipilih secara berasingan daripada tembok api sistem.',
-        dockerFirewallHelper: 'Mengawal peraturan rangkaian Docker. Penukaran akan memulakan semula Docker.',
-        iptablesSuggestionTag: 'Utamakan keserasian',
-        nftablesSuggestionTag: 'Persekitaran baharu',
-        iptablesSuggestion:
-            'Disyorkan untuk peraturan iptables sedia ada, beban Docker atau persekitaran yang mengutamakan keserasian.',
-        nftablesSuggestion:
-            'Disyorkan untuk sistem Linux baharu dan pemasangan baharu. Sahkan sokongan alat sebelum menukar.',
+        forwardingHelper: 'Mengurus peraturan pemajuan port.',
+        dockerFirewallHelper: 'Memilih cara 1Panel mengurus perlindungan port bekas.',
+        backendRecommendation: 'Disyorkan untuk menggunakan iptables atau nftables.',
         configuredRules: '{0} peraturan dikonfigurasi',
         addressFamily: 'Versi IP',
         portOrRange: 'Port / julat',
@@ -4201,11 +4195,13 @@ const message = {
             'Peraturan yang diimport ditukar untuk bahagian belakang semasa {0}. Peraturan sumber tidak diubah.',
         clearAllRulesHelper:
             'Padam semua {0} peraturan yang boleh diurus daripada bahagian belakang semasa? Tindakan ini tidak boleh dibuat asal.',
-        switchBackendHelper: 'Tukar kepada {0}? Peraturan sedia ada tidak akan dipindah atau dipadam.',
+        switchBackendHelper:
+            'Operasi ini hanya menukar bahagian belakang tembok api yang akan diurus oleh 1Panel selepas ini. Bahagian belakang asal tidak akan dipindahkan, dihentikan atau dibersihkan. Eksport peraturan semasa terlebih dahulu. Selepas bertukar, mulakan bahagian belakang sasaran dan import atau semak peraturan secara manual. Peraturan luaran dan asli sistem tidak dieksport. Teruskan pertukaran kepada {0}?',
+        switchBackendSuccessHelper:
+            '1Panel kini mengurus {0}. Bahagian belakang asal {1} tidak dihentikan atau dibersihkan dan mungkin masih berjalan serta berkuat kuasa. Mulakan bahagian belakang sasaran, import atau semak peraturan, dan urus bahagian belakang asal secara manual hanya selepas mengesahkan akses berfungsi seperti biasa.',
         uninstalledStatus: 'Belum dipasang',
         initializedStatus: 'Dimulakan',
         partiallyInitialized: 'Dimulakan sebahagian',
-        currentUse: 'Sedang digunakan',
         dockerGuardHelper:
             'Tetapkan sekatan akses untuk port yang diterbitkan oleh bekas Docker pada hos. Port tanpa perlindungan mengekalkan tingkah laku akses lalai Docker.',
         dockerInputNotProtected:
@@ -4278,6 +4274,7 @@ const message = {
         priority: 'Keutamaan',
         reject: 'Tolak',
         allPorts: 'Semua Port',
+        allProtocolHelper: 'Semua protokol dan port',
         deleteRuleConfirm: 'Akan memadam {0} peraturan. Teruskan?',
         deleteUsedRuleConfirm:
             'Port ini sedang digunakan oleh {0}. Memadam peraturan benarkan mungkin menyebabkan perkhidmatan tidak dapat dicapai. Teruskan?',

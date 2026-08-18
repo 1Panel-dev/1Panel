@@ -4151,6 +4151,8 @@ const message = {
         plan_runtime_permanent_mismatch: 'Etkin ve kalıcı güvenlik duvarı yapılandırmaları farklı. Önce eşitleyin.',
         plan_protected_rule: 'Bu kural korumalıdır; yönetimi devralınamaz, değiştirilemez veya silinemez.',
         plan_overlapping_rule_with_different_action: 'Karşıt eylemli örtüşen bir kural var. İşlem durduruldu.',
+        plan_partially_overlapping_rule_with_different_action:
+            'Kural, karşıt eylemli bir kuralla kısmen örtüşüyor. Sonuç kural sırasına bağlıdır.',
         plan_blocked: 'Bu kural güvenle uygulanamıyor. Listeyi yenileyip tekrar deneyin.',
         scopeDefaultMismatch: 'Sistemin varsayılan zone değeri {0}; bu sayfa yalnızca public zone alanını yönetir.',
         scopeInactive: 'Yönetilen kapsam etkin değil. Yeni kurallar mevcut trafiği etkilemeyebilir.',
@@ -4178,17 +4180,10 @@ const message = {
         forwardRule: 'Port-Yönlendirme kuralı | Port-Yönlendirme kuralları',
         dockerGuard: 'Konteyner portu koruması',
         systemFirewall: 'Ana makine güvenlik duvarı',
-        firewallSettingHelper:
-            'Sistem güvenlik duvarı, port yönlendirme ve Docker güvenlik duvarı ayrı ayrı seçilir. Kuralları dışa ve içe aktararak elle taşıyın.',
         systemFirewallHelper: 'Ana makine port erişimini ve gelen kuralları yönetir.',
-        forwardingHelper: 'Port yönlendirme kurallarını yönetir ve sistem güvenlik duvarından ayrı seçilebilir.',
-        dockerFirewallHelper: 'Docker ağ kurallarını yönetir. Değişiklik Docker hizmetini yeniden başlatır.',
-        iptablesSuggestionTag: 'Uyumluluk öncelikli',
-        nftablesSuggestionTag: 'Yeni ortamlar',
-        iptablesSuggestion:
-            'Mevcut iptables kuralları, Docker iş yükleri veya uyumluluğun önemli olduğu ortamlar için önerilir.',
-        nftablesSuggestion:
-            'Yeni Linux sistemleri ve yeni kurulumlar için önerilir. Geçişten önce araç desteğini doğrulayın.',
+        forwardingHelper: 'Port yönlendirme kurallarını yönetir.',
+        dockerFirewallHelper: '1Panel konteyner portu korumasının nasıl yönetileceğini seçer.',
+        backendRecommendation: 'iptables veya nftables kullanılması önerilir.',
         configuredRules: '{0} kural yapılandırıldı',
         addressFamily: 'IP sürümü',
         portOrRange: 'Port / aralık',
@@ -4197,11 +4192,13 @@ const message = {
         importBackendHelper:
             'İçe aktarılan kurallar geçerli {0} arka ucu için dönüştürülür. Kaynak kurallar değiştirilmez.',
         clearAllRulesHelper: 'Geçerli arka uçtaki yönetilebilir {0} kural silinsin mi? Bu işlem geri alınamaz.',
-        switchBackendHelper: '{0} seçeneğine geçilsin mi? Mevcut kurallar taşınmayacak veya silinmeyecek.',
+        switchBackendHelper:
+            'Bu işlem yalnızca 1Panel tarafından bundan sonra yönetilecek güvenlik duvarı arka ucunu değiştirir. Eski arka uç taşınmaz, durdurulmaz veya temizlenmez. Önce mevcut kuralları dışa aktarın. Geçişten sonra hedef arka ucu başlatın ve kuralları elle içe aktarın veya doğrulayın. Harici ve sisteme özgü kurallar dışa aktarılmaz. {0} arka ucuna geçilsin mi?',
+        switchBackendSuccessHelper:
+            '1Panel artık {0} arka ucunu yönetiyor. Eski {1} arka ucu durdurulmadı veya temizlenmedi ve hâlâ çalışıyor olabilir. Hedef arka ucu başlatın, kuralları içe aktarın veya doğrulayın ve erişimin normal olduğunu doğruladıktan sonra eski arka ucu elle yönetin.',
         uninstalledStatus: 'Yüklü değil',
         initializedStatus: 'Başlatıldı',
         partiallyInitialized: 'Kısmen başlatıldı',
-        currentUse: 'Kullanımda',
         dockerGuardHelper:
             'Docker konteynerlerinin ana makinede yayımladığı portlar için erişim kısıtlamaları ayarlayın. Korunmayan portlar Docker varsayılan erişim davranışını korur.',
         dockerInputNotProtected:
@@ -4275,6 +4272,7 @@ const message = {
         priority: 'Öncelik',
         reject: 'Reddet',
         allPorts: 'Tüm Portlar',
+        allProtocolHelper: 'Tüm protokoller ve portlar',
         deleteRuleConfirm: '{0} kural silinecek. Devam etmek istiyor musunuz?',
         deleteUsedRuleConfirm:
             'Bu port {0} tarafından kullanılıyor. İzin kuralını silmek hizmeti erişilemez hale getirebilir. Devam edilsin mi?',

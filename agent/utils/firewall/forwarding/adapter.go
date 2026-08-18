@@ -33,7 +33,7 @@ const (
 type Adapter interface {
 	Name() string
 	List() ([]Rule, error)
-	Operate(rule Rule, operation OperationType) error
+	Reconcile(rules []Rule) error
 	Enable() error
 	Cleanup() error
 	InitStatus() (bool, bool, error)

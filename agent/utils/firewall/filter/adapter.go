@@ -29,6 +29,7 @@ type DesiredChange struct {
 type NativeCommand struct {
 	Executable string   `json:"executable"`
 	Args       []string `json:"args"`
+	Stdin      string   `json:"stdin,omitempty"`
 }
 
 type NativeRulePlan struct {

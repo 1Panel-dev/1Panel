@@ -2,12 +2,12 @@ package iptables_helper
 
 import (
 	"bufio"
-	"bytes"
-	"errors"
+	"context"
 	"fmt"
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -21,14 +21,22 @@ const (
 )
 
 func SaveRulesToFile(tab, chain, fileName string) error {
+	return SaveRulesToFileContext(context.Background(), tab, chain, fileName)
+}
+
+func SaveRulesToFileContext(ctx context.Context, tab, chain, fileName string) error {
 	commands, err := lifecycle.ResolveIptablesCommands()
 	if err != nil {
 		return err
 	}
-	return saveRulesToFile(commands.IPv4, tab, chain, fileName)
+	return saveRulesToFile(ctx, commands.IPv4, tab, chain, fileName)
 }
 
 func SaveIPv6RulesToFile(tab, chain, fileName string) error {
+	return SaveIPv6RulesToFileContext(context.Background(), tab, chain, fileName)
+}
+
+func SaveIPv6RulesToFileContext(ctx context.Context, tab, chain, fileName string) error {
 	commands, err := lifecycle.ResolveIptablesCommands()
 	if err != nil {
 		return err
@@ -36,22 +44,22 @@ func SaveIPv6RulesToFile(tab, chain, fileName string) error {
 	if !commands.IPv6Available() {
 		return fmt.Errorf("ip6tables command family is unavailable")
 	}
-	return saveRulesToFile(commands.IPv6, tab, chain, fileName)
+	return saveRulesToFile(ctx, commands.IPv6, tab, chain, fileName)
 }
 
 func IPv6FileName(fileName string) string {
 	return "ipv6_" + fileName
 }
 
-func saveRulesToFile(executable, tab, chain, fileName string) error {
+func saveRulesToFile(ctx context.Context, executable, tab, chain, fileName string) error {
 	rulesFile := path.Join(global.Dir.FirewallDir, fileName)
 
 	var stdout string
 	var err error
 	if strings.HasPrefix(path.Base(executable), "ip6tables") {
-		stdout, err = RunIPv6WithStd(tab, "-S", chain)
+		stdout, err = RunIPv6WithStdContext(ctx, tab, "-S", chain)
 	} else {
-		stdout, err = RunWithStd(tab, "-S", chain)
+		stdout, err = RunWithStdContext(ctx, tab, "-S", chain)
 	}
 	if err != nil {
 		return fmt.Errorf("failed to list %s rules: %w", chain, err)
@@ -131,19 +139,23 @@ func LoadIPv6RulesFromFile(tab, chain, fileName string) error {
 }
 
 func loadRulesFromFile(executable, restoreExecutable, tab, chain, fileName string) error {
+	var exists bool
 	var err error
 	if strings.HasPrefix(path.Base(executable), "ip6tables") {
-		err = AddIPv6Chain(tab, chain)
+		exists, err = CheckIPv6ChainExist(tab, chain)
 	} else {
-		err = AddChain(tab, chain)
+		exists, err = CheckChainExist(tab, chain)
 	}
 	if err != nil {
-		global.LOG.Errorf("create chain %s failed: %v", chain, err)
+		global.LOG.Errorf("inspect chain %s failed: %v", chain, err)
 		return err
 	}
 	rulesFile := path.Join(global.Dir.FirewallDir, fileName)
 	if _, err := os.Stat(rulesFile); os.IsNotExist(err) {
-		return nil
+		if exists {
+			return nil
+		}
+		return restoreRules(restoreExecutable, fmt.Sprintf("*%s\n-N %s\nCOMMIT\n", tab, chain))
 	}
 	data, err := os.ReadFile(rulesFile)
 	if err != nil {
@@ -151,34 +163,32 @@ func loadRulesFromFile(executable, restoreExecutable, tab, chain, fileName strin
 		return err
 	}
 	rules := strings.Split(string(data), "\n")
-	if strings.HasPrefix(path.Base(executable), "ip6tables") {
-		err = RunIPv6(tab, "-F", chain)
-	} else {
-		err = ClearChain(tab, chain)
+	var restoreInput strings.Builder
+	restoreInput.WriteByte('*')
+	restoreInput.WriteString(tab)
+	restoreInput.WriteByte('\n')
+	if !exists {
+		restoreInput.WriteString("-N ")
+		restoreInput.WriteString(chain)
+		restoreInput.WriteByte('\n')
 	}
-	if err != nil {
-		return fmt.Errorf("clear existing rules from %s: %w", chain, err)
-	}
-
-	var restoreErrors []error
+	restoreInput.WriteString("-F ")
+	restoreInput.WriteString(chain)
+	restoreInput.WriteByte('\n')
 	for _, rule := range rules {
 		if strings.HasPrefix(rule, fmt.Sprintf("-A %s", chain)) {
-			if err := restoreRule(restoreExecutable, tab, rule); err != nil {
-				restoreErrors = append(restoreErrors, fmt.Errorf("apply rule %q: %w", rule, err))
-			}
+			restoreInput.WriteString(rule)
+			restoreInput.WriteByte('\n')
 		}
 	}
-
-	return errors.Join(restoreErrors...)
+	restoreInput.WriteString("COMMIT\n")
+	if err := restoreRules(restoreExecutable, restoreInput.String()); err != nil {
+		return fmt.Errorf("batch restore rules for %s: %w", chain, err)
+	}
+	return nil
 }
 
-func restoreRule(executable, tab, rule string) error {
-	restoreInput := fmt.Sprintf("*%s\n%s\nCOMMIT\n", tab, rule)
-	commandName, commandArgs := cmd.WrapWithOptionalSudo(executable, "-n")
-	_, err := cmd.NewCommandMgr().RunPipe(cmd.PipeCommand{
-		Name:  commandName,
-		Args:  commandArgs,
-		Stdin: bytes.NewReader([]byte(restoreInput)),
-	})
-	return err
+func restoreRules(executable, input string) error {
+	manager := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second), cmd.WithStdin(strings.NewReader(input)))
+	return manager.RunWithOptionalSudo(executable, "--noflush", "--wait")
 }

@@ -1,85 +1,77 @@
 package service
 
 import (
-	"errors"
+	"context"
+	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
-	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
+	"github.com/glebarez/sqlite"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-func withDockerFirewallTestHooks(t *testing.T, initial string) string {
-	t.Helper()
-	originalPath := constant.DaemonJsonPath
-	originalValidate := validateDockerFirewallConfig
-	originalRestart := restartDockerFirewall
-	path := filepath.Join(t.TempDir(), "daemon.json")
-	if err := os.WriteFile(path, []byte(initial), 0640); err != nil {
-		t.Fatal(err)
-	}
-	constant.DaemonJsonPath = path
-	validateDockerFirewallConfig = func() error { return nil }
-	restartDockerFirewall = func(string) error { return nil }
-	t.Cleanup(func() {
-		constant.DaemonJsonPath = originalPath
-		validateDockerFirewallConfig = originalValidate
-		restartDockerFirewall = originalRestart
-	})
-	return path
-}
-
-func TestUpdateDockerFirewallBackendPreservesDaemonConfiguration(t *testing.T) {
-	path := withDockerFirewallTestHooks(t, `{"live-restore":true}`)
-	if err := updateDockerFirewallBackend("nftables", false); err != nil {
-		t.Fatal(err)
-	}
-	data, err := os.ReadFile(path)
+func TestFirewallSettingServiceDockerOptionsRequireBackendCommands(t *testing.T) {
+	previousDB := global.DB
+	dsn := fmt.Sprintf("file:%s?mode=memory&cache=shared", uuid.NewString())
+	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("open settings database: %v", err)
 	}
-	content := string(data)
-	if !strings.Contains(content, `"live-restore": true`) || !strings.Contains(content, `"firewall-backend": "nftables"`) {
-		t.Fatalf("daemon configuration was not preserved: %s", content)
+	if err := db.AutoMigrate(&model.Setting{}); err != nil {
+		t.Fatalf("migrate settings database: %v", err)
 	}
-}
+	global.DB = db
+	t.Cleanup(func() { global.DB = previousDB })
 
-func TestUpdateDockerFirewallBackendRestoresInvalidConfiguration(t *testing.T) {
-	original := `{"live-restore":true}`
-	path := withDockerFirewallTestHooks(t, original)
-	validateDockerFirewallConfig = func() error { return errors.New("invalid Docker configuration") }
-	if err := updateDockerFirewallBackend("nftables", false); err == nil {
-		t.Fatal("expected validation failure")
+	binDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(binDir, "docker"), []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
+		t.Fatalf("create fake Docker executable: %v", err)
 	}
-	data, err := os.ReadFile(path)
+	t.Setenv("PATH", binDir)
+
+	settings, err := (&FirewallSettingService{}).Load(context.Background())
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("load firewall settings: %v", err)
 	}
-	if string(data) != original {
-		t.Fatalf("daemon configuration was not restored: %s", data)
-	}
-}
-
-func TestUpdateDockerFirewallBackendRestoresAfterRestartFailure(t *testing.T) {
-	original := `{"iptables":true}`
-	path := withDockerFirewallTestHooks(t, original)
-	restarts := 0
-	restartDockerFirewall = func(string) error {
-		restarts++
-		if restarts == 1 {
-			return errors.New("restart failed")
+	for _, option := range settings.Docker.Options {
+		if option.Installed {
+			t.Fatalf("Docker backend %q reported installed without its firewall commands", option.Name)
 		}
-		return nil
 	}
-	if err := updateDockerFirewallBackend("nftables", true); err == nil {
-		t.Fatal("expected restart failure")
-	}
-	data, err := os.ReadFile(path)
+}
+
+func TestFirewallSettingServiceSelectsGuardBackendWithoutDockerRestart(t *testing.T) {
+	previousDB := global.DB
+	dsn := fmt.Sprintf("file:%s?mode=memory&cache=shared", uuid.NewString())
+	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("open settings database: %v", err)
 	}
-	if string(data) != original || restarts != 2 {
-		t.Fatalf("restart rollback failed: config=%s restarts=%d", data, restarts)
+	if err := db.AutoMigrate(&model.Setting{}); err != nil {
+		t.Fatalf("migrate settings database: %v", err)
+	}
+	global.DB = db
+	t.Cleanup(func() { global.DB = previousDB })
+
+	err = (&FirewallSettingService{}).Operate(context.Background(), dto.FirewallBackendOperation{
+		Subsystem: "docker",
+		Backend:   "nftables",
+		Operation: "select",
+	})
+	if err != nil {
+		t.Fatalf("select Docker guard backend: %v", err)
+	}
+	if got := selectedDockerFirewallBackend("iptables"); got != "nftables" {
+		t.Fatalf("selected Docker guard backend = %q, want nftables", got)
+	}
+	if _, ok := (&DockerPortGuardService{}).guardRuntime(selectedDockerFirewallBackend("iptables")).(*docker_guard.NftablesManager); !ok {
+		t.Fatal("Docker port guard did not use the selected nftables runtime")
 	}
 }

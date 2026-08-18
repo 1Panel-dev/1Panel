@@ -78,16 +78,15 @@ func (m *NftablesManager) Cleanup() error {
 	if !m.runner.Exists("nft") {
 		return nil
 	}
+	commands := make([][]string, 0, 2)
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		tableFamily := nftTableFamily(family)
 		if !m.objectExists("table", tableFamily, NftTable) {
 			continue
 		}
-		if _, err := m.run("delete", "table", tableFamily, NftTable); err != nil {
-			return &FamilyError{Family: family, Err: err}
-		}
+		commands = append(commands, []string{"delete", "table", tableFamily, NftTable})
 	}
-	return nil
+	return m.runBatch(commands)
 }
 
 func (m *NftablesManager) Initialized(family string) (bool, error) {
@@ -149,25 +148,32 @@ func (m *NftablesManager) ensureFamily(family string, required bool) error {
 		}
 		return nil
 	}
-	if !m.objectExists("table", tableFamily, NftTable) {
-		if _, err := m.run("add", "table", tableFamily, NftTable); err != nil {
-			return fmt.Errorf("create 1Panel Docker guard table: %w", err)
-		}
+	commands := make([][]string, 0, 6)
+	tableExists := m.objectExists("table", tableFamily, NftTable)
+	if !tableExists {
+		commands = append(commands, []string{"add", "table", tableFamily, NftTable})
 	}
-	if !m.objectExists("chain", tableFamily, NftTable, NftBaseChain) {
-		if _, err := m.run(
+	baseExists := tableExists && m.objectExists("chain", tableFamily, NftTable, NftBaseChain)
+	if !baseExists {
+		commands = append(commands, []string{
 			"add", "chain", tableFamily, NftTable, NftBaseChain,
 			"{", "type", "filter", "hook", "forward", "priority", "filter", "-", "1", ";", "policy", "accept", ";", "}",
-		); err != nil {
-			return fmt.Errorf("create 1Panel Docker guard base chain: %w", err)
+		})
+	}
+	if !tableExists || !m.objectExists("chain", tableFamily, NftTable, NftChain) {
+		commands = append(commands, []string{"add", "chain", tableFamily, NftTable, NftChain})
+	}
+	if baseExists {
+		output, err := m.run("-a", "list", "chain", tableFamily, NftTable, NftBaseChain)
+		if err != nil {
+			return err
+		}
+		for _, handle := range nftJumpHandles(output) {
+			commands = append(commands, []string{"delete", "rule", tableFamily, NftTable, NftBaseChain, "handle", handle})
 		}
 	}
-	if !m.objectExists("chain", tableFamily, NftTable, NftChain) {
-		if _, err := m.run("add", "chain", tableFamily, NftTable, NftChain); err != nil {
-			return fmt.Errorf("create 1Panel Docker guard chain: %w", err)
-		}
-	}
-	return m.ensureJump(family)
+	commands = append(commands, []string{"insert", "rule", tableFamily, NftTable, NftBaseChain, "jump", NftChain})
+	return m.runBatch(commands)
 }
 
 func (m *NftablesManager) bindExistingFamily(family string, required bool) error {
@@ -200,13 +206,12 @@ func (m *NftablesManager) ensureJump(family string) error {
 	if err != nil {
 		return err
 	}
+	commands := make([][]string, 0, len(nftJumpHandles(output))+1)
 	for _, handle := range nftJumpHandles(output) {
-		if _, err := m.run("delete", "rule", tableFamily, NftTable, NftBaseChain, "handle", handle); err != nil {
-			return err
-		}
+		commands = append(commands, []string{"delete", "rule", tableFamily, NftTable, NftBaseChain, "handle", handle})
 	}
-	_, err = m.run("insert", "rule", tableFamily, NftTable, NftBaseChain, "jump", NftChain)
-	return err
+	commands = append(commands, []string{"insert", "rule", tableFamily, NftTable, NftBaseChain, "jump", NftChain})
+	return m.runBatch(commands)
 }
 
 func (m *NftablesManager) rebuildLocked(policies []Policy) error {
@@ -307,10 +312,23 @@ func (m *NftablesManager) unbindFamily(family string) error {
 	if err != nil {
 		return err
 	}
+	commands := make([][]string, 0, len(nftJumpHandles(output)))
 	for _, handle := range nftJumpHandles(output) {
-		if _, err := m.run("delete", "rule", tableFamily, NftTable, NftBaseChain, "handle", handle); err != nil {
-			return err
-		}
+		commands = append(commands, []string{"delete", "rule", tableFamily, NftTable, NftBaseChain, "handle", handle})
+	}
+	return m.runBatch(commands)
+}
+
+func (m *NftablesManager) runBatch(commands [][]string) error {
+	if len(commands) == 0 {
+		return nil
+	}
+	script, err := buildNftScript(commands)
+	if err != nil {
+		return err
+	}
+	if _, err := m.runner.RunInput("nft", script, "-f", "-"); err != nil {
+		return fmt.Errorf("batch update Docker guard lifecycle: %w", err)
 	}
 	return nil
 }

@@ -45,7 +45,7 @@
 
 <script lang="ts" setup>
 import { Firewall } from '@/api/interface/firewall';
-import { checkFirewallRule, createFirewallRule } from '@/api/modules/firewall';
+import { checkFirewallRulesBatch, createFirewallRulesBatch } from '@/api/modules/firewall';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
@@ -139,8 +139,7 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
     uploadRef.value?.handleStart(file);
 };
 
-const commitImportedRule = async (rule: Firewall.Rule) => {
-    const plan = (await checkFirewallRule({ rule })).data;
+const importedCreateRequest = (plan: Firewall.RuleCheckResult): Firewall.CreateRequest | undefined => {
     if (plan.decision === 'no_change') return;
     if (plan.decision === 'blocked') throw new Error(plan.reason);
     const allowed = (plan.allowedActions || []).filter(
@@ -154,28 +153,50 @@ const commitImportedRule = async (rule: Firewall.Rule) => {
         resolution = 'create_anyway';
     }
     if (!resolution || resolution === 'select_adopt') throw new Error(plan.reason);
-    await createFirewallRule({
+    return {
         checkFlag: plan.checkFlag,
         action: resolution,
         adoptInstanceKey: resolution === 'adopt' ? plan.candidates?.[0]?.instanceKey : undefined,
         rule: plan.requestedRule,
         sourceKind: 'imported',
-    });
+    };
 };
 
 const onImport = async () => {
     loading.value = true;
     let success = 0;
     let failed = 0;
-    for (const rule of selects.value) {
-        try {
-            await commitImportedRule(rule);
-            success++;
-        } catch {
-            failed++;
+    try {
+        const plans: Firewall.RuleCheckResult[] = [];
+        for (let offset = 0; offset < selects.value.length; offset += 256) {
+            const batch = selects.value.slice(offset, offset + 256);
+            plans.push(...(await checkFirewallRulesBatch({ rules: batch })).data.items);
         }
+        const items: Firewall.CreateRequest[] = [];
+        for (const plan of plans) {
+            try {
+                const item = importedCreateRequest(plan);
+                if (item) {
+                    items.push(item);
+                } else {
+                    success++;
+                }
+            } catch {
+                failed++;
+            }
+        }
+        items.sort((left, right) => JSON.stringify(left.rule.scope).localeCompare(JSON.stringify(right.rule.scope)));
+        for (let offset = 0; offset < items.length; offset += 256) {
+            const batch = items.slice(offset, offset + 256);
+            const result = (await createFirewallRulesBatch({ items: batch })).data;
+            success += result.succeeded;
+            failed += result.failed + result.skipped;
+        }
+    } catch {
+        failed += selects.value.length - success - failed;
+    } finally {
+        loading.value = false;
     }
-    loading.value = false;
     if (failed === 0) {
         MsgSuccess(i18n.global.t('firewall.importSuccess', [success]));
         visible.value = false;

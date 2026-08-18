@@ -2,9 +2,6 @@
     <div v-loading="loading">
         <FireRouter />
         <LayoutContent :title="$t('commons.button.set')" :divider="true">
-            <template #prompt>
-                <el-alert class="mb-4" type="info" :closable="false" :title="$t('firewall.firewallSettingHelper')" />
-            </template>
             <template #main>
                 <el-form :label-position="isMobile ? 'top' : 'left'" label-width="150px">
                     <el-row>
@@ -21,54 +18,38 @@
                                     <el-option
                                         v-for="option in sortedOptions(item.group)"
                                         :key="option.name"
-                                        :label="optionLabel(option)"
+                                        :label="option.name"
                                         :value="option.name"
                                         :disabled="!option.installed || !option.supported"
                                     >
-                                        <div class="option-row" :title="option.message">
-                                            <div class="option-name">
-                                                <span>{{ optionLabel(option) }}</span>
-                                                <el-tooltip
-                                                    v-if="option.name === 'iptables' || option.name === 'nftables'"
-                                                    placement="right"
-                                                    :content="optionSuggestion(option.name)"
-                                                >
-                                                    <span class="option-suggestion">
-                                                        {{ optionSuggestionTag(option.name) }}
-                                                        <el-icon><InfoFilled /></el-icon>
-                                                    </span>
-                                                </el-tooltip>
-                                            </div>
-                                            <el-tag v-if="!option.installed" size="small" type="info">
-                                                {{ $t('firewall.uninstalledStatus') }}
-                                            </el-tag>
-                                            <el-tag
-                                                v-else-if="
-                                                    item.subsystem === 'docker' && item.group.current === option.name
-                                                "
-                                                size="small"
-                                                type="success"
-                                            >
-                                                {{ $t('firewall.currentUse') }}
-                                            </el-tag>
-                                            <el-tooltip
-                                                v-else-if="
-                                                    item.subsystem !== 'docker' && initState(option) === 'partial'
-                                                "
-                                                placement="right"
-                                                :content="familyStatusText(option)"
-                                            >
-                                                <el-tag size="small" type="warning">
-                                                    {{ $t('firewall.partiallyInitialized') }}
+                                        <div class="option-row">
+                                            <span>{{ option.name }}</span>
+                                            <div class="option-status">
+                                                <el-tag v-if="!option.installed" size="small" type="info">
+                                                    {{ $t('firewall.uninstalledStatus') }}
                                                 </el-tag>
-                                            </el-tooltip>
-                                            <el-tag
-                                                v-else-if="item.subsystem !== 'docker'"
-                                                size="small"
-                                                :type="initState(option) === 'initialized' ? 'success' : 'info'"
-                                            >
-                                                {{ initStateText(option) }}
-                                            </el-tag>
+                                                <template v-else>
+                                                    <el-tag v-if="option.active" size="small" type="success">
+                                                        {{ $t('commons.status.running') }}
+                                                    </el-tag>
+                                                    <el-tag
+                                                        v-for="family in backendFamilies"
+                                                        :key="family.key"
+                                                        size="small"
+                                                        :type="option[family.key].initialized ? 'success' : 'info'"
+                                                        effect="plain"
+                                                    >
+                                                        {{ family.label }}
+                                                        {{
+                                                            $t(
+                                                                option[family.key].initialized
+                                                                    ? 'firewall.initializedStatus'
+                                                                    : 'firewall.notInitialized',
+                                                            )
+                                                        }}
+                                                    </el-tag>
+                                                </template>
+                                            </div>
                                         </div>
                                     </el-option>
                                 </el-select>
@@ -115,13 +96,12 @@ import { Firewall } from '@/api/interface/firewall';
 import { loadFirewallSettings, operateFirewallBackend } from '@/api/modules/firewall';
 import { operateFire } from '@/api/modules/host';
 import FireRouter from '@/views/host/firewall/index.vue';
-import WhiteList from '@/views/host/firewall/status/white-list/index.vue';
-import { whiteListRuleCount } from '@/views/host/firewall/status/white-list/model';
+import WhiteList from '@/views/host/firewall/setting/white-list/index.vue';
+import { whiteListRuleCount } from '@/views/host/firewall/setting/white-list/model';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
-import { InfoFilled } from '@element-plus/icons-vue';
 
 const { isMobile } = useGlobalStore();
 const loading = ref(false);
@@ -135,13 +115,27 @@ const pingStatus = ref('Disable');
 const oldPingStatus = ref('Disable');
 const whiteListRef = ref();
 
+const backendFamilies = [
+    { key: 'ipv4', label: 'IPv4' },
+    { key: 'ipv6', label: 'IPv6' },
+] as const;
+
+const providerOrder: Record<Firewall.Provider, number> = {
+    iptables: 0,
+    nftables: 1,
+    firewalld: 2,
+    ufw: 3,
+};
+
 const groups = computed(() => {
     if (!settings.value) return [];
     return [
         {
             subsystem: 'system' as const,
             label: i18n.global.t('firewall.systemFirewall'),
-            helper: i18n.global.t('firewall.systemFirewallHelper'),
+            helper: `${i18n.global.t('firewall.systemFirewallHelper')} ${i18n.global.t(
+                'firewall.backendRecommendation',
+            )}`,
             group: settings.value.system,
         },
         {
@@ -161,6 +155,10 @@ const groups = computed(() => {
 
 const whiteListCount = computed(() => whiteListRuleCount(settings.value?.portWhiteList || ''));
 
+const sortedOptions = (group: Firewall.BackendGroup) => {
+    return [...group.options].sort((left, right) => providerOrder[left.name] - providerOrder[right.name]);
+};
+
 const load = async () => {
     loading.value = true;
     try {
@@ -178,52 +176,9 @@ const load = async () => {
     }
 };
 
-const optionLabel = (option: Firewall.BackendOption) => {
-    return option.name;
-};
-
-const optionSuggestionTag = (provider: Firewall.Provider) => {
-    return i18n.global.t(provider === 'iptables' ? 'firewall.iptablesSuggestionTag' : 'firewall.nftablesSuggestionTag');
-};
-
-const optionSuggestion = (provider: Firewall.Provider) => {
-    return i18n.global.t(provider === 'iptables' ? 'firewall.iptablesSuggestion' : 'firewall.nftablesSuggestion');
-};
-
-type InitState = 'initialized' | 'partial' | 'uninitialized';
-
-const initState = (option: Firewall.BackendOption): InitState => {
-    const ipv4 = option.ipv4.initialized;
-    const ipv6 = option.ipv6.initialized;
-    if (ipv4 && ipv6) return 'initialized';
-    if (ipv4 || ipv6) return 'partial';
-    return option.initialized ? 'initialized' : 'uninitialized';
-};
-
-const initStateText = (option: Firewall.BackendOption) => {
-    return i18n.global.t(
-        initState(option) === 'initialized' ? 'firewall.initializedStatus' : 'firewall.notInitialized',
-    );
-};
-
-const familyStatusText = (option: Firewall.BackendOption) => {
-    const status = (initialized: boolean) =>
-        i18n.global.t(initialized ? 'firewall.initializedStatus' : 'firewall.notInitialized');
-    return `IPv4: ${status(option.ipv4.initialized)} / IPv6: ${status(option.ipv6.initialized)}`;
-};
-
-const sortedOptions = (group: Firewall.BackendGroup) => {
-    const order: Record<Firewall.Provider, number> = {
-        iptables: 0,
-        nftables: 1,
-        firewalld: 2,
-        ufw: 3,
-    };
-    return [...group.options].sort((left, right) => order[left.name] - order[right.name]);
-};
-
 const changeBackend = async (subsystem: Firewall.BackendSubsystem, group: Firewall.BackendGroup) => {
     const backend = group.selected;
+    const previousBackend = savedBackends.value[subsystem];
     try {
         await ElMessageBox.confirm(
             i18n.global.t('firewall.switchBackendHelper', [backend]),
@@ -239,12 +194,20 @@ const changeBackend = async (subsystem: Firewall.BackendSubsystem, group: Firewa
             subsystem,
             backend: backend as Firewall.Provider,
             operation: 'select',
-            restartDocker: subsystem === 'docker',
         });
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         await load();
+        await ElMessageBox.alert(
+            i18n.global.t('firewall.switchBackendSuccessHelper', [backend, previousBackend]),
+            i18n.global.t('commons.msg.operationSuccess'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                type: 'info',
+            },
+        );
     } catch {
-        group.selected = savedBackends.value[subsystem];
+        if (savedBackends.value[subsystem] !== backend) {
+            group.selected = savedBackends.value[subsystem];
+        }
     } finally {
         loading.value = false;
     }
@@ -272,19 +235,12 @@ load();
     gap: 16px;
 }
 
-.option-name,
-.option-suggestion {
+.option-status {
     display: inline-flex;
     align-items: center;
-}
-
-.option-name {
-    gap: 8px;
-}
-
-.option-suggestion {
-    gap: 3px;
-    color: var(--el-text-color-secondary);
+    justify-content: flex-end;
+    gap: 5px;
+    white-space: nowrap;
     font-size: 12px;
 }
 </style>

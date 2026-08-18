@@ -1,7 +1,6 @@
 package providers
 
 import (
-	"errors"
 	"os"
 	"reflect"
 	"strings"
@@ -51,11 +50,10 @@ type backendCall struct {
 }
 
 type fakeIptablesBackend struct {
-	calls   []backendCall
-	stdout  map[string]string
-	err     error
-	saveErr error
-	ipv6    bool
+	calls  []backendCall
+	stdout map[string]string
+	err    error
+	ipv6   bool
 }
 
 func (f *fakeIptablesBackend) IPv6Available() bool { return f.ipv6 }
@@ -90,19 +88,8 @@ func (f *fakeIptablesBackend) AddIPv6ChainWithAppend(table, parentChain, chain s
 	return f.err
 }
 
-func (f *fakeIptablesBackend) SaveRulesToFile(table, chain, fileName string) error {
-	f.calls = append(f.calls, backendCall{method: "save", table: table, args: []string{chain, fileName}})
-	if f.saveErr != nil {
-		return f.saveErr
-	}
-	return f.err
-}
-
-func (f *fakeIptablesBackend) SaveIPv6RulesToFile(table, chain, fileName string) error {
-	f.calls = append(f.calls, backendCall{method: "save6", table: table, args: []string{chain, fileName}})
-	if f.saveErr != nil {
-		return f.saveErr
-	}
+func (f *fakeIptablesBackend) Restore(family, input string) error {
+	f.calls = append(f.calls, backendCall{method: "restore", table: family, args: []string{input}})
 	return f.err
 }
 
@@ -116,13 +103,78 @@ func (f *fakeIptablesBackend) LoadIPv6RulesFromFile(table, chain, fileName strin
 	return f.err
 }
 
-func TestIptablesOperateReturnsPersistenceError(t *testing.T) {
-	wantErr := errors.New("save failed")
-	backend := &fakeIptablesBackend{stdout: map[string]string{}, saveErr: wantErr}
+func TestIptablesReconcileRebuildsOwnedChains(t *testing.T) {
+	backend := &fakeIptablesBackend{stdout: map[string]string{}}
 	adapter := &iptablesNATAdapter{provider: "iptables", backend: backend, system: &fakeForwardingSystem{}}
-	err := adapter.Operate(forwarding.Rule{Protocol: "tcp", Port: "8080", TargetPort: "80"}, forwarding.OperationAdd)
-	if !errors.Is(err, wantErr) {
-		t.Fatalf("got %v want %v", err, wantErr)
+	if err := adapter.Reconcile([]forwarding.Rule{{
+		Protocol: "tcp", Port: "8080", TargetIP: "127.0.0.1", TargetPort: "80",
+	}}); err != nil {
+		t.Fatal(err)
+	}
+	wantScript := "*nat\n" +
+		"-F " + forwarding.ChainPreRouting + "\n" +
+		"-F " + forwarding.ChainPostRouting + "\n" +
+		"-A " + forwarding.ChainPreRouting + " -p tcp --dport 8080 -j REDIRECT --to-port 80\n" +
+		"COMMIT\n" +
+		"*filter\n" +
+		"-F " + forwarding.ChainForward + "\n" +
+		"COMMIT\n"
+	want := []backendCall{{method: "restore", table: forwarding.FamilyIPv4, args: []string{wantScript}}}
+	if !reflect.DeepEqual(backend.calls, want) {
+		t.Fatalf("reconcile transcript changed\ngot  %#v\nwant %#v", backend.calls, want)
+	}
+}
+
+func TestIptablesReconcileBatchesIPv4AndIPv6Separately(t *testing.T) {
+	backend := &fakeIptablesBackend{stdout: map[string]string{}, ipv6: true}
+	adapter := &iptablesNATAdapter{provider: "iptables", backend: backend, system: &fakeForwardingSystem{}}
+	if err := adapter.Reconcile([]forwarding.Rule{{
+		Family: forwarding.FamilyIPv6, Protocol: "tcp", Port: "8443", TargetIP: "2001:db8::20", TargetPort: "443",
+	}}); err != nil {
+		t.Fatal(err)
+	}
+	if len(backend.calls) != 2 || backend.calls[0].method != "restore" || backend.calls[0].table != forwarding.FamilyIPv4 ||
+		backend.calls[1].method != "restore" || backend.calls[1].table != forwarding.FamilyIPv6 {
+		t.Fatalf("expected one restore call per family, got %#v", backend.calls)
+	}
+	if !strings.Contains(backend.calls[1].args[0], "--to-destination [2001:db8::20]:443") {
+		t.Fatalf("unexpected IPv6 restore script:\n%s", backend.calls[1].args[0])
+	}
+}
+
+func TestIptablesForwardLifecycleUsesSingleRestoreScript(t *testing.T) {
+	script := buildIptablesForwardLifecycleScript(map[string]string{
+		iptables_helper.NatTab:    "-N " + forwarding.ChainPreRouting + "\n-A PREROUTING -j " + forwarding.ChainPreRouting,
+		iptables_helper.FilterTab: "",
+	}, true)
+	if strings.Count(script, "*nat\n") != 1 || strings.Count(script, "*filter\n") != 1 || strings.Count(script, "COMMIT\n") != 2 {
+		t.Fatalf("unexpected lifecycle restore transaction:\n%s", script)
+	}
+	if strings.Contains(script, "-N "+forwarding.ChainPreRouting+"\n") ||
+		!strings.Contains(script, "-N "+forwarding.ChainPostRouting+"\n") ||
+		!strings.Contains(script, "-A FORWARD -j "+forwarding.ChainForward+"\n") {
+		t.Fatalf("lifecycle restore did not preserve/create the expected chains:\n%s", script)
+	}
+}
+
+func TestIptablesForwardCleanupUsesSingleRestoreScript(t *testing.T) {
+	script := buildIptablesForwardLifecycleScript(map[string]string{
+		iptables_helper.NatTab: strings.Join([]string{
+			"-N " + forwarding.ChainPreRouting,
+			"-A PREROUTING -j " + forwarding.ChainPreRouting,
+			"-N " + forwarding.ChainPostRouting,
+			"-A POSTROUTING -j " + forwarding.ChainPostRouting,
+		}, "\n"),
+		iptables_helper.FilterTab: "-N " + forwarding.ChainForward + "\n-A FORWARD -j " + forwarding.ChainForward,
+	}, false)
+	for _, line := range []string{
+		"-D PREROUTING -j " + forwarding.ChainPreRouting,
+		"-F " + forwarding.ChainPostRouting,
+		"-X " + forwarding.ChainForward,
+	} {
+		if !strings.Contains(script, line+"\n") {
+			t.Fatalf("cleanup restore is missing %q:\n%s", line, script)
+		}
 	}
 }
 
@@ -153,41 +205,6 @@ func (f *fakeForwardingSystem) WriteFile(name string, data []byte, _ os.FileMode
 func (f *fakeForwardingSystem) RunWithOptionalSudo(name string, args ...string) error {
 	f.runs = append(f.runs, commandCall{name: name, args: append([]string(nil), args...)})
 	return nil
-}
-
-func TestIptablesNATAddDeleteAndPersistenceContract(t *testing.T) {
-	backend := &fakeIptablesBackend{stdout: map[string]string{}}
-	adapter := &iptablesNATAdapter{provider: "iptables", backend: backend, system: &fakeForwardingSystem{}}
-	rule := forwarding.Rule{Num: "3", Protocol: "tcp", Port: "8080-8081", TargetIP: "10.0.0.2", TargetPort: "80-81", Interface: "eth0"}
-	if err := adapter.Operate(rule, "add"); err != nil {
-		t.Fatal(err)
-	}
-	wantAdd := []backendCall{
-		{method: "run", table: iptables_helper.NatTab, args: []string{"-A", forwarding.ChainPreRouting, "-i", "eth0", "-p", "tcp", "--dport", "8080:8081", "-j", "DNAT", "--to-destination", "10.0.0.2:80-81"}},
-		{method: "run", table: iptables_helper.NatTab, args: []string{"-A", forwarding.ChainPostRouting, "-d", "10.0.0.2", "-p", "tcp", "--dport", "80:81", "-j", "MASQUERADE"}},
-		{method: "run", table: iptables_helper.FilterTab, args: []string{"-A", forwarding.ChainForward, "-d", "10.0.0.2", "-p", "tcp", "--dport", "80:81", "-j", "ACCEPT"}},
-		{method: "run", table: iptables_helper.FilterTab, args: []string{"-A", forwarding.ChainForward, "-s", "10.0.0.2", "-p", "tcp", "--sport", "80:81", "-j", "ACCEPT"}},
-		{method: "save", table: iptables_helper.FilterTab, args: []string{forwarding.ChainForward, forwarding.ForwardFile}},
-		{method: "save", table: iptables_helper.NatTab, args: []string{forwarding.ChainPreRouting, forwarding.PreRoutingFile}},
-		{method: "save", table: iptables_helper.NatTab, args: []string{forwarding.ChainPostRouting, forwarding.PostRoutingFile}},
-	}
-	if !reflect.DeepEqual(backend.calls, wantAdd) {
-		t.Fatalf("add transcript changed\ngot  %#v\nwant %#v", backend.calls, wantAdd)
-	}
-
-	backend.calls = nil
-	if err := adapter.Operate(rule, "remove"); err != nil {
-		t.Fatal(err)
-	}
-	wantRemovePrefix := []backendCall{
-		{method: "run", table: iptables_helper.NatTab, args: []string{"-D", forwarding.ChainPreRouting, "3"}},
-		{method: "run", table: iptables_helper.NatTab, args: []string{"-D", forwarding.ChainPostRouting, "-d", "10.0.0.2", "-p", "tcp", "--dport", "80:81", "-j", "MASQUERADE"}},
-		{method: "run", table: iptables_helper.FilterTab, args: []string{"-D", forwarding.ChainForward, "-d", "10.0.0.2", "-p", "tcp", "--dport", "80:81", "-j", "ACCEPT"}},
-		{method: "run", table: iptables_helper.FilterTab, args: []string{"-D", forwarding.ChainForward, "-s", "10.0.0.2", "-p", "tcp", "--sport", "80:81", "-j", "ACCEPT"}},
-	}
-	if !reflect.DeepEqual(backend.calls[:4], wantRemovePrefix) {
-		t.Fatalf("remove transcript changed\ngot  %#v\nwant %#v", backend.calls[:4], wantRemovePrefix)
-	}
 }
 
 func TestIptablesNATEnableReplayAndStatusContract(t *testing.T) {
@@ -264,22 +281,6 @@ func TestIptablesListParsingContract(t *testing.T) {
 }
 
 func TestIptablesIPv6NATContract(t *testing.T) {
-	backend := &fakeIptablesBackend{stdout: map[string]string{}, ipv6: true}
-	adapter := &iptablesNATAdapter{provider: "iptables", backend: backend, system: &fakeForwardingSystem{}}
-	rule := forwarding.Rule{Family: forwarding.FamilyIPv6, Num: "2", Protocol: "tcp", Port: "8443", TargetIP: "2001:db8::20", TargetPort: "443", Interface: "eth0"}
-	if err := adapter.Operate(rule, forwarding.OperationAdd); err != nil {
-		t.Fatal(err)
-	}
-	wantPrefix := []backendCall{
-		{method: "run6", table: iptables_helper.NatTab, args: []string{"-A", forwarding.ChainPreRouting, "-i", "eth0", "-p", "tcp", "--dport", "8443", "-j", "DNAT", "--to-destination", "[2001:db8::20]:443"}},
-		{method: "run6", table: iptables_helper.NatTab, args: []string{"-A", forwarding.ChainPostRouting, "-d", "2001:db8::20", "-p", "tcp", "--dport", "443", "-j", "MASQUERADE"}},
-		{method: "run6", table: iptables_helper.FilterTab, args: []string{"-A", forwarding.ChainForward, "-d", "2001:db8::20", "-p", "tcp", "--dport", "443", "-j", "ACCEPT"}},
-		{method: "run6", table: iptables_helper.FilterTab, args: []string{"-A", forwarding.ChainForward, "-s", "2001:db8::20", "-p", "tcp", "--sport", "443", "-j", "ACCEPT"}},
-	}
-	if !reflect.DeepEqual(backend.calls[:4], wantPrefix) {
-		t.Fatalf("IPv6 add transcript changed\ngot  %#v\nwant %#v", backend.calls[:4], wantPrefix)
-	}
-
 	stdout := "1 0 0 DNAT tcp -- eth0 * ::/0 ::/0 tcp dpt:8443 to:[2001:db8::20]:443"
 	rules := parseIptablesRules(stdout, forwarding.FamilyIPv6)
 	if len(rules) != 1 || rules[0].Family != forwarding.FamilyIPv6 || rules[0].TargetIP != "2001:db8::20" || rules[0].TargetPort != "443" {
@@ -309,12 +310,5 @@ func TestEnableForwardingSysctlsAddsIPv6(t *testing.T) {
 	want := "net.ipv4.ip_forward = 1\nnet.ipv6.conf.all.forwarding = 1\n"
 	if got := enableForwardingSysctls(content, true); got != want {
 		t.Fatalf("got %q want %q", got, want)
-	}
-}
-
-func assertArgs(t *testing.T, call commandCall, name string, args []string) {
-	t.Helper()
-	if call.name != name || !reflect.DeepEqual(call.args, args) {
-		t.Fatalf("got %#v want %s %#v", call, name, args)
 	}
 }

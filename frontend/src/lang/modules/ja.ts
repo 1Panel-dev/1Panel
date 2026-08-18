@@ -4070,6 +4070,8 @@ const message = {
         plan_runtime_permanent_mismatch: '実行中と永続設定のファイアウォール構成が異なります。先に同期してください。',
         plan_protected_rule: 'このルールは保護されており、管理対象化、変更、削除はできません。',
         plan_overlapping_rule_with_different_action: '反対の動作を持つ重複ルールがあります。操作を停止しました。',
+        plan_partially_overlapping_rule_with_different_action:
+            '反対の動作を持つルールと一部重複しています。実際の動作はルールの順序によって決まります。',
         plan_blocked: 'このルールは安全に適用できません。ルールを更新して再試行してください。',
         scopeDefaultMismatch: 'システムの既定 zone は {0} です。このページでは public zone のみ管理します。',
         scopeInactive: '管理対象の範囲が有効ではありません。新しいルールが現在の通信に適用されない場合があります。',
@@ -4097,16 +4099,10 @@ const message = {
         forwardRule: 'ポートフォワードルール|ポートフォワードルール',
         dockerGuard: 'コンテナポート保護',
         systemFirewall: 'ホストファイアウォール',
-        firewallSettingHelper:
-            'システムファイアウォール、ポート転送、Docker ファイアウォールは個別に選択します。ルールはエクスポートとインポートで手動移行します。',
         systemFirewallHelper: 'ホストのポートアクセスと受信ルールを管理します。',
-        forwardingHelper: 'ポート転送ルールを管理し、システムファイアウォールとは個別に選択できます。',
-        dockerFirewallHelper: 'Docker ネットワークルールを管理します。切り替えると Docker が再起動します。',
-        iptablesSuggestionTag: '互換性重視',
-        nftablesSuggestionTag: '新規環境向け',
-        iptablesSuggestion: '既存の iptables ルール、Docker 利用環境、互換性を優先する場合に推奨します。',
-        nftablesSuggestion:
-            '新しい Linux システムや新規構築環境に推奨します。切り替え前に既存ツールの対応を確認してください。',
+        forwardingHelper: 'ポート転送ルールを管理します。',
+        dockerFirewallHelper: '1Panel のコンテナポート保護の管理方法を選択します。',
+        backendRecommendation: 'iptables または nftables の使用を推奨します。',
         configuredRules: '{0} 件設定済み',
         addressFamily: 'IP バージョン',
         portOrRange: 'ポート / 範囲',
@@ -4116,11 +4112,13 @@ const message = {
             'インポートしたルールは現在の {0} バックエンド向けに変換されます。移行元のルールは変更されません。',
         clearAllRulesHelper:
             '現在のバックエンドにある管理可能な {0} 件のルールを削除します。この操作は元に戻せません。続行しますか？',
-        switchBackendHelper: '{0} に切り替えます。既存のルールは移行も削除もされません。続行しますか？',
+        switchBackendHelper:
+            'この操作は 1Panel が今後管理するファイアウォールバックエンドのみを切り替えます。元のバックエンドの移行、停止、クリーンアップは行いません。先に現在のルールをエクスポートしてください。切り替え後、対象バックエンドを初期化し、ルールを手動でインポートまたは確認してください。外部ルールとシステム固有ルールはエクスポートされません。{0} への切り替えを続行しますか？',
+        switchBackendSuccessHelper:
+            '1Panel は {0} を管理するように切り替わりました。元の {1} バックエンドは停止またはクリーンアップされておらず、依然として動作し、有効な場合があります。対象バックエンドを初期化し、ルールをインポートまたは確認し、アクセスが正常であることを確認してから元のバックエンドを手動で処理してください。',
         uninstalledStatus: '未インストール',
         initializedStatus: '初期化済み',
         partiallyInitialized: '一部初期化済み',
-        currentUse: '使用中',
         dockerGuardHelper:
             'Docker コンテナがホストに公開するポートのアクセス制限を設定します。未保護のポートは Docker のデフォルトのアクセス動作を維持します。',
         dockerInputNotProtected:
@@ -4194,6 +4192,7 @@ const message = {
         priority: '優先度',
         reject: '拒否',
         allPorts: 'すべてのポート',
+        allProtocolHelper: 'すべてのプロトコルとポート',
         deleteRuleConfirm: '{0} 個のルールを削除します。続行しますか？',
         deleteUsedRuleConfirm:
             'このポートは {0} が使用中です。許可ルールを削除するとサービスにアクセスできなくなる可能性があります。続行しますか？',

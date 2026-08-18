@@ -34,27 +34,23 @@
                         <el-button
                             v-permission
                             v-node-admin
-                            type="danger"
                             plain
                             :disabled="paginationConfig.total === 0"
                             @click="onClearAll"
                         >
-                            {{ $t('firewall.clearAllRules') }}
+                            {{ $t('commons.button.clean') }}
                         </el-button>
                         <el-button-group>
                             <el-button v-permission v-node-admin @click="onImport">
                                 {{ $t('commons.button.import') }}
                             </el-button>
-                            <el-button v-permission v-node-admin :disabled="selects.length === 0" @click="onExport">
-                                {{ $t('commons.button.export') }}
-                            </el-button>
                             <el-button
                                 v-permission
                                 v-node-admin
                                 :disabled="paginationConfig.total === 0"
-                                @click="onExportAll"
+                                @click="onExport"
                             >
-                                {{ $t('firewall.exportAllRules') }}
+                                {{ $t('commons.button.export') }}
                             </el-button>
                         </el-button-group>
                     </template>
@@ -298,18 +294,14 @@ const exportRules = async (rules: Host.RuleForward[]) => {
     );
 };
 
-const onExport = () => {
-    exportRules(selects.value);
-};
-
-const onExportAll = async () => exportRules(await loadAllRules());
+const onExport = async () => exportRules(selects.value.length > 0 ? selects.value : await loadAllRules());
 
 const onClearAll = async () => {
     const rules = await loadAllRules();
     if (rules.length === 0) return;
     operateRules.value = rules.map((rule) => ({ ...rule, operation: 'remove' }));
     opRef.value.acceptParams({
-        title: i18n.global.t('firewall.clearAllRules'),
+        title: i18n.global.t('commons.button.clean'),
         names: [],
         msg: i18n.global.t('firewall.clearAllRulesHelper', [rules.length]),
         api: null,

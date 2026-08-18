@@ -2,7 +2,7 @@ package dto
 
 import "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 
-type FirewallBaseInfo struct {
+type FirewallSubsystemStatus struct {
 	Name       string `json:"name"`
 	Backend    string `json:"backend"`
 	IsExist    bool   `json:"isExist"`
@@ -13,7 +13,7 @@ type FirewallBaseInfo struct {
 	PingStatus string `json:"pingStatus"`
 }
 
-type FirewallOperation struct {
+type FirewallLifecycleOperation struct {
 	Operation         string `json:"operation" validate:"required,oneof=start stop restart disableBanPing enableBanPing"`
 	WithDockerRestart bool   `json:"withDockerRestart"`
 }
@@ -47,17 +47,16 @@ type FirewallSettings struct {
 	Forwarding    FirewallBackendGroup `json:"forwarding"`
 	Docker        FirewallBackendGroup `json:"docker"`
 	PingStatus    string               `json:"pingStatus"`
-	PortWhiteList string               `json:"portWhiteList"`
+	PortWhitelist string               `json:"portWhiteList"`
 }
 
 type FirewallBackendOperation struct {
-	Subsystem     string `json:"subsystem" validate:"required,oneof=system forwarding docker"`
-	Backend       string `json:"backend" validate:"required,oneof=firewalld ufw iptables nftables"`
-	Operation     string `json:"operation" validate:"required,oneof=select initialize cleanup"`
-	RestartDocker bool   `json:"restartDocker"`
+	Subsystem string `json:"subsystem" validate:"required,oneof=system forwarding docker"`
+	Backend   string `json:"backend" validate:"required,oneof=firewalld ufw iptables nftables"`
+	Operation string `json:"operation" validate:"required,oneof=select initialize cleanup"`
 }
 
-type IptablesOp struct {
+type FilterChainOperation struct {
 	Name    string `json:"name" validate:"required,eq=1PANEL_BASIC"`
 	Operate string `json:"operate" validate:"required,oneof=init-base bind-base unbind-base"`
 }
@@ -154,7 +153,7 @@ type DockerPortGuardList struct {
 
 type DockerPortGuardEndpointIdentity struct {
 	Family   string `json:"family" validate:"required,oneof=ipv4 ipv6"`
-	HostIP   string `json:"hostIP" validate:"required"`
+	HostIP   string `json:"hostIP" validate:"required,max=45"`
 	HostPort uint16 `json:"hostPort" validate:"required,min=1"`
 	Protocol string `json:"protocol" validate:"required,oneof=tcp udp"`
 }
@@ -162,12 +161,12 @@ type DockerPortGuardEndpointIdentity struct {
 type DockerPortGuardPolicyBatch struct {
 	Endpoints   []DockerPortGuardEndpointIdentity `json:"endpoints" validate:"required,min=1,max=256,dive"`
 	Mode        string                            `json:"mode" validate:"required,oneof=deny_sources allow_sources deny_all"`
-	Sources     []string                          `json:"sources"`
-	Description string                            `json:"description"`
+	Sources     []string                          `json:"sources" validate:"max=256,dive,required,max=64"`
+	Description string                            `json:"description" validate:"max=256"`
 }
 
 type DockerPortGuardPolicyBatchDelete struct {
-	UUIDs []string `json:"uuids" validate:"required,min=1,max=256,dive,required"`
+	UUIDs []string `json:"uuids" validate:"required,min=1,max=256,dive,required,max=64"`
 }
 
 type DockerPortGuardOperation struct {
@@ -216,6 +215,22 @@ type FirewallRuleBatchCreateFailure struct {
 
 type FirewallRuleDelete struct {
 	UUID string `json:"uuid" validate:"required"`
+}
+
+type FirewallRuleBatchDelete struct {
+	UUIDs []string `json:"uuids" validate:"required,min=1,max=256,dive,required,max=64"`
+}
+
+type FirewallRuleBatchDeleteResponse struct {
+	Succeeded int                              `json:"succeeded"`
+	Failed    int                              `json:"failed"`
+	Errors    []FirewallRuleBatchDeleteFailure `json:"errors,omitempty"`
+}
+
+type FirewallRuleBatchDeleteFailure struct {
+	Index int    `json:"index"`
+	UUID  string `json:"uuid"`
+	Error string `json:"error"`
 }
 
 type FirewallRuleUpdate struct {

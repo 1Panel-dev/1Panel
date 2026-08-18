@@ -1031,15 +1031,19 @@ func richOrderBucket(priority int, action filter.Action) string {
 
 type systemBackend struct{}
 
-func (systemBackend) Read(_ context.Context, args ...string) (string, error) {
-	return cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en")).RunWithStdout("firewall-cmd", args...)
+func (systemBackend) Read(ctx context.Context, args ...string) (string, error) {
+	return cmd.NewCommandMgr(
+		cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second), cmd.WithEnv("LANGUAGE=en_US:en"),
+	).RunWithStdout("firewall-cmd", args...)
 }
 
-func (systemBackend) Run(_ context.Context, command filter.NativeCommand) error {
+func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) error {
 	if err := validateSystemCommand(command); err != nil {
 		return err
 	}
-	return cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second), cmd.WithEnv("LANGUAGE=en_US:en")).RunWithOptionalSudo(command.Executable, command.Args...)
+	return cmd.NewCommandMgr(
+		cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second), cmd.WithEnv("LANGUAGE=en_US:en"),
+	).RunWithOptionalSudo(command.Executable, command.Args...)
 }
 
 func validateSystemCommand(command filter.NativeCommand) error {

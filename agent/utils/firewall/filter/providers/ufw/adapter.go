@@ -1018,17 +1018,17 @@ func statusActive(output string) bool {
 
 type systemBackend struct{}
 
-func (systemBackend) Read(_ context.Context, args ...string) (string, error) {
+func (systemBackend) Read(ctx context.Context, args ...string) (string, error) {
 	return cmd.NewCommandMgr(
-		cmd.WithTimeout(60*time.Second), cmd.WithEnv("LANGUAGE=en_US:en"),
+		cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second), cmd.WithEnv("LANGUAGE=en_US:en"),
 	).RunWithOptionalSudoAndStdout("ufw", args...)
 }
 
-func (systemBackend) Run(_ context.Context, command filter.NativeCommand) error {
+func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) error {
 	if err := validateCommand(command); err != nil {
 		return err
 	}
 	return cmd.NewCommandMgr(
-		cmd.WithTimeout(60*time.Second), cmd.WithEnv("LANGUAGE=en_US:en"),
+		cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second), cmd.WithEnv("LANGUAGE=en_US:en"),
 	).RunWithOptionalSudo(command.Executable, command.Args...)
 }

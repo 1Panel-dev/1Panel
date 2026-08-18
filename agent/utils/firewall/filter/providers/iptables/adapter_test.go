@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"reflect"
-	"slices"
+	"strings"
 	"testing"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
@@ -25,8 +25,10 @@ func TestCompileCreateAndAdoptCommands(t *testing.T) {
 	if err != nil {
 		t.Fatalf("compile create: %v", err)
 	}
-	want := []string{"-w", "-t", "filter", "-I", "1PANEL_BASIC", "1", "-p", "tcp", "-s", "10.0.0.0/8", "--dport", "443", "-m", "comment", "--comment", "1panel-rule:rule-1", "-j", "ACCEPT"}
-	if len(plan.Rules) != 1 || !reflect.DeepEqual(plan.Rules[0].Commands[0].Args, want) || plan.Rules[0].Expected.Marker != "1panel-rule:rule-1" {
+	command := plan.Rules[0].Commands[0]
+	if len(plan.Rules) != 1 || command.Executable != "iptables-restore" ||
+		!strings.Contains(command.Stdin, "-A 1PANEL_BASIC -p tcp -s 10.0.0.0/8 --dport 443 -m comment --comment 1panel-rule:rule-1 -j ACCEPT") ||
+		plan.Rules[0].Expected.Marker != "1panel-rule:rule-1" {
 		t.Fatalf("unexpected create plan: %#v", plan)
 	}
 
@@ -36,7 +38,8 @@ func TestCompileCreateAndAdoptCommands(t *testing.T) {
 	if err != nil {
 		t.Fatalf("compile adopt: %v", err)
 	}
-	if plan.Rules[0].Commands[0].Args[3] != "-R" || plan.Rules[0].Commands[0].Args[5] != "1" {
+	if plan.Rules[0].Commands[0].Executable != "iptables-restore" ||
+		!strings.Contains(plan.Rules[0].Commands[0].Stdin, "1panel-rule:rule-1") {
 		t.Fatalf("adoption did not replace the selected position: %#v", plan.Rules[0])
 	}
 }
@@ -63,7 +66,7 @@ func TestIPv6ObserveCompileAndCapabilities(t *testing.T) {
 		t.Fatalf("compile IPv6 rule: %v", err)
 	}
 	command := plan.Rules[0].Commands[0]
-	if command.Executable != "ip6tables" || !reflect.DeepEqual(command.Args[6:10], []string{"-p", "ipv6-icmp", "-s", "2001:db8::/64"}) {
+	if command.Executable != "ip6tables-restore" || !strings.Contains(command.Stdin, "-p ipv6-icmp -s 2001:db8::/64") {
 		t.Fatalf("unexpected IPv6 command: %#v", command)
 	}
 	capabilities, err := adapter.Capabilities(context.Background())
@@ -140,7 +143,8 @@ func TestCompileInsertsAllowBeforeTerminalDrop(t *testing.T) {
 	if err != nil {
 		t.Fatalf("compile terminal insert: %v", err)
 	}
-	if plan.Rules[0].Commands[0].Args[5] != "1" {
+	script := plan.Rules[0].Commands[0].Stdin
+	if strings.Index(script, "1panel-rule:dns") > strings.Index(script, "-p tcp -j DROP") {
 		t.Fatalf("allow rule was inserted after terminal drop: %#v", plan.Rules[0].Commands[0])
 	}
 }
@@ -159,7 +163,9 @@ func TestCompileCreateUsesRequestedPosition(t *testing.T) {
 	if err != nil {
 		t.Fatalf("compile positioned create: %v", err)
 	}
-	if got := plan.Rules[0].Commands[0].Args[5]; got != "2" {
+	script := plan.Rules[0].Commands[0].Stdin
+	if strings.Index(script, "1panel-rule:inserted") < strings.Index(script, "--dport 80") ||
+		strings.Index(script, "1panel-rule:inserted") > strings.Index(script, "--dport 81") {
 		t.Fatalf("create ignored requested position: %#v", plan.Rules[0].Commands[0])
 	}
 }
@@ -186,9 +192,9 @@ func TestMultiportCheckCompileAndObserve(t *testing.T) {
 	if err != nil {
 		t.Fatalf("compile multiport: %v", err)
 	}
-	args := plan.Rules[0].Commands[0].Args
-	if !slices.Contains(args, "multiport") || !slices.Contains(args, "--dports") || !slices.Contains(args, "80,443,8080:8090") {
-		t.Fatalf("unexpected multiport command: %#v", args)
+	script := plan.Rules[0].Commands[0].Stdin
+	if !strings.Contains(script, "-m multiport --dports 80,443,8080:8090") {
+		t.Fatalf("unexpected multiport command: %s", script)
 	}
 
 	reader.output = `-A 1PANEL_BASIC -p tcp -m multiport --dports 80,443,8080:8090 -j ACCEPT -m comment --comment "web"`
@@ -242,8 +248,8 @@ func TestCompileReordersManagedRuleWithinChain(t *testing.T) {
 		t.Fatalf("compile reorder: %v", err)
 	}
 	rulePlan := plan.Rules[0]
-	if len(rulePlan.Commands) != 2 || rulePlan.Commands[0].Args[3] != "-D" || rulePlan.Commands[0].Args[5] != "1" ||
-		rulePlan.Commands[1].Args[3] != "-I" || rulePlan.Commands[1].Args[5] != "3" ||
+	if len(rulePlan.Commands) != 1 || rulePlan.Commands[0].Executable != "iptables-restore" ||
+		strings.Index(rulePlan.Commands[0].Stdin, "1panel-rule:first") < strings.Index(rulePlan.Commands[0].Stdin, "1panel-rule:third") ||
 		rulePlan.Expected.Locator.Position == nil || *rulePlan.Expected.Locator.Position != 3 {
 		t.Fatalf("unexpected reorder plan: %#v", rulePlan)
 	}
@@ -270,8 +276,8 @@ func TestCompileUpdateMovesAndChangesManagedRule(t *testing.T) {
 		t.Fatalf("compile positioned update: %v", err)
 	}
 	rulePlan := plan.Rules[0]
-	if len(rulePlan.Commands) != 2 || rulePlan.Commands[0].Args[3] != "-D" || rulePlan.Commands[1].Args[5] != "3" ||
-		!slices.Contains(rulePlan.Commands[1].Args, "443") || rulePlan.Expected.Locator.Position == nil ||
+	if len(rulePlan.Commands) != 1 || rulePlan.Commands[0].Executable != "iptables-restore" ||
+		!strings.Contains(rulePlan.Commands[0].Stdin, "--dport 443") || rulePlan.Expected.Locator.Position == nil ||
 		*rulePlan.Expected.Locator.Position != 3 {
 		t.Fatalf("unexpected positioned update plan: %#v", rulePlan)
 	}
@@ -322,6 +328,120 @@ func TestApplyUsesCompiledSnapshotWithoutSecondRead(t *testing.T) {
 	}
 }
 
+func TestBatchCreateUsesSingleRestoreForOwnedChain(t *testing.T) {
+	scope := testScope("1PANEL_BASIC")
+	reader := &fakeRuleReader{output: `-A 1PANEL_BASIC -p tcp --dport 22 -m comment --comment external-ssh -j ACCEPT`}
+	adapter := NewAdapterWithReader(reader)
+	snapshot, err := adapter.Observe(context.Background(), scope)
+	if err != nil {
+		t.Fatalf("observe initial chain: %v", err)
+	}
+	first := filter.FirewallRule{
+		UUID: "web", Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp",
+		DestinationPort: "80", Action: filter.ActionAccept,
+	}
+	second := filter.FirewallRule{
+		UUID: "tls", Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp",
+		DestinationPort: "443", Action: filter.ActionAccept,
+	}
+	plan, err := adapter.Compile(snapshot, []filter.DesiredChange{
+		{Operation: filter.ChangeCreate, After: &first},
+		{Operation: filter.ChangeCreate, After: &second},
+	})
+	if err != nil {
+		t.Fatalf("compile batch: %v", err)
+	}
+	if len(plan.Rules) != 2 || len(plan.Rules[0].Commands) != 1 || len(plan.Rules[1].Commands) != 0 {
+		t.Fatalf("batch did not compile to one restore command: %#v", plan)
+	}
+	command := plan.Rules[0].Commands[0]
+	if command.Executable != "iptables-restore" || !reflect.DeepEqual(command.Args, []string{"--noflush", "--wait"}) {
+		t.Fatalf("unexpected restore command: %#v", command)
+	}
+	for _, want := range []string{
+		"*filter\n-F 1PANEL_BASIC\n",
+		"-A 1PANEL_BASIC -p tcp --dport 22 -m comment --comment external-ssh -j ACCEPT\n",
+		"--dport 80 -m comment --comment 1panel-rule:web -j ACCEPT\n",
+		"--dport 443 -m comment --comment 1panel-rule:tls -j ACCEPT\n",
+		"COMMIT\n",
+	} {
+		if !strings.Contains(command.Stdin, want) {
+			t.Fatalf("restore input does not contain %q:\n%s", want, command.Stdin)
+		}
+	}
+	if strings.Contains(command.Stdin, "-F INPUT") {
+		t.Fatalf("restore input flushes an unmanaged chain:\n%s", command.Stdin)
+	}
+
+	writer := &fakeRuleWriter{}
+	adapter = NewAdapterWithBackend(reader, writer)
+	if _, err = adapter.Apply(context.Background(), plan); err != nil {
+		t.Fatalf("apply batch: %v", err)
+	}
+	if len(writer.commands) != 1 || writer.saveCalls != 1 {
+		t.Fatalf("batch was not restored and persisted once: %#v", writer)
+	}
+	if err = adapter.Rollback(context.Background(), plan); err != nil {
+		t.Fatalf("rollback batch: %v", err)
+	}
+	if len(writer.commands) != 2 || !strings.Contains(writer.commands[1].Stdin, "external-ssh") ||
+		strings.Contains(writer.commands[1].Stdin, "1panel-rule:web") || writer.saveCalls != 2 {
+		t.Fatalf("rollback did not restore the original chain: %#v", writer)
+	}
+}
+
+func TestIPv6BatchCreateUsesIPv6Restore(t *testing.T) {
+	scope := testScopeFamily("1PANEL_BASIC", filter.FamilyIPv6)
+	snapshot, _ := filter.NewSnapshot(scope, nil)
+	first := filter.FirewallRule{UUID: "one", Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp", DestinationPort: "80", Action: filter.ActionAccept}
+	second := filter.FirewallRule{UUID: "two", Scope: scope, NativeKind: filter.NativeKindRule, Protocol: "tcp", DestinationPort: "443", Action: filter.ActionAccept}
+	plan, err := NewAdapterWithReader(&fakeRuleReader{}).Compile(snapshot, []filter.DesiredChange{
+		{Operation: filter.ChangeCreate, After: &first},
+		{Operation: filter.ChangeCreate, After: &second},
+	})
+	if err != nil {
+		t.Fatalf("compile IPv6 batch: %v", err)
+	}
+	if got := plan.Rules[0].Commands[0].Executable; got != "ip6tables-restore" {
+		t.Fatalf("IPv6 batch executable = %q", got)
+	}
+}
+
+func TestBatchDeleteUsesSingleRestoreAndPreservesExternalRules(t *testing.T) {
+	scope := testScope("1PANEL_BASIC")
+	reader := &fakeRuleReader{output: strings.Join([]string{
+		`-A 1PANEL_BASIC -p tcp --dport 80 -m comment --comment 1panel-rule:web -j ACCEPT`,
+		`-A 1PANEL_BASIC -p tcp --dport 22 -m comment --comment external-ssh -j ACCEPT`,
+		`-A 1PANEL_BASIC -p tcp --dport 443 -m comment --comment 1panel-rule:tls -j ACCEPT`,
+	}, "\n")}
+	adapter := NewAdapterWithReader(reader)
+	snapshot, err := adapter.Observe(context.Background(), scope)
+	if err != nil {
+		t.Fatalf("observe initial chain: %v", err)
+	}
+	web := snapshot.Rules[0].Rule
+	web.UUID = "web"
+	tls := snapshot.Rules[2].Rule
+	tls.UUID = "tls"
+	plan, err := adapter.Compile(snapshot, []filter.DesiredChange{
+		{Operation: filter.ChangeDelete, Before: &tls, Locator: &snapshot.Rules[2].Locator},
+		{Operation: filter.ChangeDelete, Before: &web, Locator: &snapshot.Rules[0].Locator},
+	})
+	if err != nil {
+		t.Fatalf("compile batch delete: %v", err)
+	}
+	command := plan.Rules[0].Commands[0]
+	if command.Executable != "iptables-restore" || strings.Contains(command.Stdin, "1panel-rule:web") ||
+		strings.Contains(command.Stdin, "1panel-rule:tls") || !strings.Contains(command.Stdin, "external-ssh") {
+		t.Fatalf("unexpected batch delete restore input:\n%s", command.Stdin)
+	}
+	rollback := plan.Rules[0].RollbackCommands[0].Stdin
+	if !strings.Contains(rollback, "1panel-rule:web") || !strings.Contains(rollback, "1panel-rule:tls") ||
+		!strings.Contains(rollback, "external-ssh") {
+		t.Fatalf("batch delete rollback does not contain the original chain:\n%s", rollback)
+	}
+}
+
 func TestApplyAndVerifyMarker(t *testing.T) {
 	scope := testScope("1PANEL_BASIC")
 	reader := &fakeRuleReader{}
@@ -355,7 +475,10 @@ func TestApplyCompensatesWhenPersistenceFails(t *testing.T) {
 	if _, err := adapter.Apply(context.Background(), plan); err == nil || err.Error() != "disk full" {
 		t.Fatalf("expected original persistence error, got %v", err)
 	}
-	if len(writer.commands) != 2 || writer.commands[0].Args[3] != "-I" || writer.commands[1].Args[3] != "-D" || writer.saveCalls != 2 {
+	if len(writer.commands) != 2 || writer.commands[0].Executable != "iptables-restore" ||
+		writer.commands[1].Executable != "iptables-restore" ||
+		!strings.Contains(writer.commands[0].Stdin, "1panel-rule:ssh") ||
+		strings.Contains(writer.commands[1].Stdin, "1panel-rule:ssh") || writer.saveCalls != 2 {
 		t.Fatalf("failed write was not compensated and persisted: %#v", writer)
 	}
 }
@@ -373,12 +496,13 @@ func TestRollbackReversesFullyAppliedIptablesPlan(t *testing.T) {
 	if err := adapter.Rollback(context.Background(), plan); err != nil {
 		t.Fatalf("rollback applied plan: %v", err)
 	}
-	if len(writer.commands) != 1 || writer.commands[0].Args[3] != "-D" || writer.saveCalls != 1 {
+	if len(writer.commands) != 1 || writer.commands[0].Executable != "iptables-restore" ||
+		strings.Contains(writer.commands[0].Stdin, "1panel-rule:rollback") || writer.saveCalls != 1 {
 		t.Fatalf("unexpected rollback writes: %#v", writer)
 	}
 }
 
-func TestApplyCompensatesPartiallyExecutedReorder(t *testing.T) {
+func TestApplyCompensatesFailedBatchReorder(t *testing.T) {
 	scope := testScope("1PANEL_BASIC")
 	reader := &fakeRuleReader{output: "-A 1PANEL_BASIC -p tcp --dport 80 -m comment --comment 1panel-rule:first -j ACCEPT\n" +
 		"-A 1PANEL_BASIC -p tcp --dport 81 -m comment --comment 1panel-rule:second -j ACCEPT"}
@@ -397,13 +521,13 @@ func TestApplyCompensatesPartiallyExecutedReorder(t *testing.T) {
 	if err != nil {
 		t.Fatalf("compile reorder: %v", err)
 	}
-	writer := &fakeRuleWriter{runErrors: []error{nil, errors.New("insert failed"), nil}}
+	writer := &fakeRuleWriter{runErrors: []error{errors.New("restore failed"), nil}}
 	adapter := NewAdapterWithBackend(reader, writer)
-	if _, err := adapter.Apply(context.Background(), plan); err == nil || err.Error() != "insert failed" {
-		t.Fatalf("expected reorder insert failure, got %v", err)
+	if _, err := adapter.Apply(context.Background(), plan); err == nil || err.Error() != "restore failed" {
+		t.Fatalf("expected reorder restore failure, got %v", err)
 	}
-	if len(writer.commands) != 3 || writer.commands[0].Args[3] != "-D" || writer.commands[2].Args[3] != "-I" || writer.saveCalls != 1 {
-		t.Fatalf("partial reorder was not restored: %#v", writer)
+	if len(writer.commands) != 1 || writer.commands[0].Executable != "iptables-restore" || writer.saveCalls != 1 {
+		t.Fatalf("failed batch reorder issued partial commands: %#v", writer)
 	}
 }
 

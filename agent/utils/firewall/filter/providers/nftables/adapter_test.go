@@ -50,24 +50,24 @@ func TestObserveNativeNftablesRules(t *testing.T) {
 	}
 }
 
-func TestApplyCompensatesPartialParameterizedCommands(t *testing.T) {
+func TestApplyCompensatesFailedRulesetTransaction(t *testing.T) {
 	scope := testScope(filter.FamilyIPv4, "1PANEL_BASIC")
 	snapshot, err := filter.NewSnapshot(scope, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	rule := filter.FirewallRule{UUID: "web", Scope: scope, Protocol: "tcp", DestinationPort: "443", Action: filter.ActionAccept}
-	backend := &fakeBackend{failAt: 2}
+	backend := &fakeBackend{failAt: 1}
 	adapter := NewAdapterWithBackend(backend)
 	plan, err := adapter.Compile(snapshot, []filter.DesiredChange{{Operation: filter.ChangeCreate, After: &rule}})
 	if err != nil {
 		t.Fatalf("compile: %v", err)
 	}
 	if _, err := adapter.Apply(context.Background(), plan); err == nil {
-		t.Fatal("expected parameterized command failure")
+		t.Fatal("expected ruleset transaction failure")
 	}
-	if len(backend.commands) != 3 {
-		t.Fatalf("expected flush, failed add, and rollback flush; got %#v", backend.commands)
+	if len(backend.commands) != 2 {
+		t.Fatalf("expected failed transaction and rollback transaction; got %#v", backend.commands)
 	}
 	if backend.saves != 1 {
 		t.Fatalf("rollback was not persisted: saves=%d", backend.saves)
@@ -88,10 +88,10 @@ func TestCompileApplyAndRollbackRebuildOwnedChain(t *testing.T) {
 		t.Fatalf("compile: %v", err)
 	}
 	commands := plan.Rules[0].Commands
-	if len(commands) != 2 {
+	if len(commands) != 1 || commands[0].Executable != "nft" || strings.Join(commands[0].Args, " ") != "-f -" {
 		t.Fatalf("unexpected commands: %#v", commands)
 	}
-	joined := strings.Join(commands[1].Args, " ")
+	joined := commands[0].Stdin
 	for _, want := range []string{"add rule ip6 nft_1panel_filter NFT_1PANEL_BASIC", "udp dport 53", `comment "1panel-rule:dns6"`} {
 		if !strings.Contains(joined, want) {
 			t.Fatalf("command %q does not contain %q", joined, want)
@@ -100,14 +100,114 @@ func TestCompileApplyAndRollbackRebuildOwnedChain(t *testing.T) {
 	if _, err := adapter.Apply(context.Background(), plan); err != nil {
 		t.Fatalf("apply: %v", err)
 	}
-	if len(backend.commands) != 2 || backend.saves != 1 {
+	if len(backend.commands) != 1 || backend.saves != 1 {
 		t.Fatalf("unexpected apply calls: commands=%#v saves=%d", backend.commands, backend.saves)
 	}
 	if err := adapter.Rollback(context.Background(), plan); err != nil {
 		t.Fatalf("rollback: %v", err)
 	}
-	if len(backend.commands) != 3 || strings.Join(backend.commands[2].Args, " ") != "flush chain ip6 nft_1panel_filter NFT_1PANEL_BASIC" || backend.saves != 2 {
+	if len(backend.commands) != 2 || backend.commands[1].Stdin != "flush chain ip6 nft_1panel_filter NFT_1PANEL_BASIC\n" || backend.saves != 2 {
 		t.Fatalf("unexpected rollback calls: commands=%#v saves=%d", backend.commands, backend.saves)
+	}
+}
+
+func TestCompileAndApplyBatchCreateUsesOneRulesetTransaction(t *testing.T) {
+	scope := testScope(filter.FamilyIPv4, "1PANEL_BASIC")
+	snapshot, err := filter.NewSnapshot(scope, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	web := filter.FirewallRule{UUID: "web", Scope: scope, Protocol: "tcp", DestinationPort: "80", Action: filter.ActionAccept}
+	tls := filter.FirewallRule{UUID: "tls", Scope: scope, Protocol: "tcp", DestinationPort: "443", Action: filter.ActionAccept}
+	backend := &fakeBackend{}
+	adapter := NewAdapterWithBackend(backend)
+	plan, err := adapter.Compile(snapshot, []filter.DesiredChange{
+		{Operation: filter.ChangeCreate, After: &web},
+		{Operation: filter.ChangeCreate, After: &tls},
+	})
+	if err != nil {
+		t.Fatalf("compile batch create: %v", err)
+	}
+	if len(plan.Rules) != 2 || len(plan.Rules[0].Commands) != 1 || len(plan.Rules[1].Commands) != 0 {
+		t.Fatalf("batch was not compiled into one transaction: %#v", plan.Rules)
+	}
+	script := plan.Rules[0].Commands[0].Stdin
+	if strings.Count(script, "flush chain ") != 1 || strings.Count(script, "add rule ") != 2 ||
+		!strings.Contains(script, "1panel-rule:web") || !strings.Contains(script, "1panel-rule:tls") {
+		t.Fatalf("unexpected batch ruleset:\n%s", script)
+	}
+	result, err := adapter.Apply(context.Background(), plan)
+	if err != nil {
+		t.Fatalf("apply batch create: %v", err)
+	}
+	if len(result.Applied) != 2 || len(backend.commands) != 1 || backend.saves != 1 {
+		t.Fatalf("batch create was not applied once: result=%#v commands=%#v saves=%d", result, backend.commands, backend.saves)
+	}
+}
+
+func TestCompileBatchDeletePreservesExternalRules(t *testing.T) {
+	scope := testScope(filter.FamilyIPv4, "1PANEL_BASIC")
+	positionOne, positionTwo, positionThree := 1, 2, 3
+	web := filter.FirewallRule{UUID: "web", Scope: scope, Protocol: "tcp", DestinationPort: "80", Action: filter.ActionAccept}
+	tls := filter.FirewallRule{UUID: "tls", Scope: scope, Protocol: "tcp", DestinationPort: "443", Action: filter.ActionAccept}
+	external := filter.ObservedRule{
+		Rule: filter.FirewallRule{Scope: scope, NativeKind: filter.NativeKindOpaque}, Raw: "fib saddr . iif oif missing drop",
+		ParseStatus: filter.ParseStatusOpaque, Locator: filter.Locator{Provider: filter.ProviderNftables, ScopeKey: scope.Key(), Position: &positionOne},
+	}
+	webObserved := observedRule(web, "1panel-rule:web", positionTwo, "")
+	tlsObserved := observedRule(tls, "1panel-rule:tls", positionThree, "")
+	snapshot, err := filter.NewSnapshot(scope, []filter.ObservedRule{external, webObserved, tlsObserved})
+	if err != nil {
+		t.Fatal(err)
+	}
+	adapter := NewAdapterWithBackend(&fakeBackend{})
+	plan, err := adapter.Compile(snapshot, []filter.DesiredChange{
+		{Operation: filter.ChangeDelete, Before: &tls, Locator: &tlsObserved.Locator},
+		{Operation: filter.ChangeDelete, Before: &web, Locator: &webObserved.Locator},
+	})
+	if err != nil {
+		t.Fatalf("compile batch delete: %v", err)
+	}
+	applyScript := plan.Rules[0].Commands[0].Stdin
+	if strings.Count(applyScript, "flush chain ") != 1 || strings.Count(applyScript, "add rule ") != 1 ||
+		!strings.Contains(applyScript, external.Raw) || strings.Contains(applyScript, "1panel-rule:web") || strings.Contains(applyScript, "1panel-rule:tls") {
+		t.Fatalf("unexpected batch delete ruleset:\n%s", applyScript)
+	}
+	rollbackScript := plan.Rules[0].RollbackCommands[0].Stdin
+	if !strings.Contains(rollbackScript, "1panel-rule:web") || !strings.Contains(rollbackScript, "1panel-rule:tls") ||
+		!strings.Contains(rollbackScript, external.Raw) {
+		t.Fatalf("rollback does not restore the original ruleset:\n%s", rollbackScript)
+	}
+}
+
+func TestVerifyBatchCreateChecksEveryRule(t *testing.T) {
+	scope := testScope(filter.FamilyIPv4, "1PANEL_BASIC")
+	snapshot, err := filter.NewSnapshot(scope, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	web := filter.FirewallRule{UUID: "web", Scope: scope, Protocol: "tcp", DestinationPort: "80", Action: filter.ActionAccept}
+	tls := filter.FirewallRule{UUID: "tls", Scope: scope, Protocol: "tcp", DestinationPort: "443", Action: filter.ActionAccept}
+	backend := &fakeBackend{output: strings.Join([]string{
+		`meta l4proto tcp tcp dport 80 accept comment "1panel-rule:web" # handle 10`,
+		`meta l4proto tcp tcp dport 443 accept comment "1panel-rule:tls" # handle 11`,
+	}, "\n")}
+	adapter := NewAdapterWithBackend(backend)
+	plan, err := adapter.Compile(snapshot, []filter.DesiredChange{
+		{Operation: filter.ChangeCreate, After: &web},
+		{Operation: filter.ChangeCreate, After: &tls},
+	})
+	if err != nil {
+		t.Fatalf("compile batch create: %v", err)
+	}
+	verified, err := adapter.Verify(context.Background(), plan)
+	if err != nil || !verified.Matched {
+		t.Fatalf("verify complete batch: result=%#v err=%v", verified, err)
+	}
+	backend.output = `meta l4proto tcp tcp dport 80 accept comment "1panel-rule:web" # handle 10`
+	verified, err = adapter.Verify(context.Background(), plan)
+	if err != nil || verified.Matched {
+		t.Fatalf("missing batch member passed verification: result=%#v err=%v", verified, err)
 	}
 }
 

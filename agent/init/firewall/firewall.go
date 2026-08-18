@@ -4,40 +4,46 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	migrationutils "github.com/1Panel-dev/1Panel/agent/init/migration/migrations/utils"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/ping"
 )
 
 func Init() {
-	defer func() {
-		service.ReconcileDockerPortGuardBestEffort(context.Background())
-	}()
-	if !needInit() {
-		if err := initIPv6BaseIfEnabled(); err != nil {
-			global.LOG.Errorf("initialize IPv6 iptables rules failed, err: %v", err)
-		}
-		return
-	}
-	InitPingStatus()
-	global.LOG.Info("initializing firewall settings...")
-	if err := service.NewIForwardingService().Replay(); err != nil {
-		global.LOG.Errorf("replay forwarding rules failed, err: %v", err)
-		return
-	}
+	ctx := context.Background()
 	client, err := service.NewSelectedSystemFirewallClient()
 	if err != nil {
+		global.LOG.Errorf("select system firewall provider failed, err: %v", err)
 		return
 	}
 	clientName := client.Name()
+	if err := migrationutils.TransferHostFirewall(ctx, clientName); err != nil {
+		global.LOG.Errorf("transfer legacy host firewall records failed, err: %v", err)
+		return
+	}
+	if err := migrationutils.TransferFirewallForwarding(ctx); err != nil {
+		global.LOG.Errorf("transfer legacy forwarding rules failed, err: %v", err)
+		return
+	}
+	if !needInit() {
+		return
+	}
+	defer initDockerPortGuard(ctx)
+	InitPingStatus()
+	global.LOG.Info("initializing firewall settings...")
+	if err := initForwardingRules(ctx); err != nil {
+		global.LOG.Errorf("restore forwarding rules failed, err: %v", err)
+		return
+	}
 	if clientName == "nftables" {
 		if err := nftables_helper.Restore(); err != nil {
 			global.LOG.Errorf("restore nftables rules failed, err: %v", err)
@@ -60,7 +66,7 @@ func Init() {
 		global.LOG.Errorf("find 1panel service port failed")
 		return
 	}
-	if err := iptables_helper.RestoreIPv4BaseChains(panelPort); err != nil {
+	if err := iptables_helper.RestoreBaseChains(panelPort); err != nil {
 		global.LOG.Errorf("restore iptables base chains failed, err: %v", err)
 		return
 	}
@@ -68,7 +74,7 @@ func Init() {
 	firewallService := service.NewIFirewallService()
 	iptablesStatus, _ := settingRepo.GetValueByKey("IptablesStatus")
 	if iptablesStatus == constant.StatusEnable {
-		if err := firewallService.OperateFilterChain(dto.IptablesOp{Operate: string(firewall.BaseOperationBindWithoutInit)}); err != nil {
+		if err := firewallService.OperateFilterChain(dto.FilterChainOperation{Operate: string(firewall.BaseOperationBindWithoutInit)}); err != nil {
 			global.LOG.Errorf("bind base chains failed, err: %v", err)
 			return
 		}
@@ -76,24 +82,30 @@ func Init() {
 
 }
 
-func initIPv6BaseIfEnabled() error {
-	commands, err := lifecycle.ResolveIptablesCommands()
-	if err != nil || !commands.IPv6Available() {
-		return nil
+func initDockerPortGuard(ctx context.Context) {
+	const (
+		attempts = 12
+		delay    = 5 * time.Second
+	)
+	var restoreErr error
+	for attempt := 1; attempt <= attempts; attempt++ {
+		restoreErr = service.ReconcileDockerPortGuard(ctx)
+		if restoreErr == nil {
+			return
+		}
+		if attempt == attempts {
+			break
+		}
+		timer := time.NewTimer(delay)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			global.LOG.Warnf("restore Docker port guard on startup canceled, err: %v", ctx.Err())
+			return
+		case <-timer.C:
+		}
 	}
-	client, err := service.NewSelectedSystemFirewallClient()
-	if err != nil || client.Name() != "iptables" {
-		return err
-	}
-	status, err := repo.NewISettingRepo().GetValueByKey("IptablesStatus")
-	if err != nil || status != constant.StatusEnable {
-		return err
-	}
-	panelPort := service.LoadPanelPort()
-	if panelPort == "" {
-		return fmt.Errorf("find 1panel service port failed")
-	}
-	return iptables_helper.EnsureIPv6BaseChains(panelPort)
+	global.LOG.Warnf("restore Docker port guard on startup failed after %d attempts, err: %v", attempts, restoreErr)
 }
 
 func needInit() bool {
@@ -125,4 +137,8 @@ func InitPingStatus() {
 	if err := ping.UpdateStatus(enable); err != nil {
 		global.LOG.Errorf("initialize ping status failed: %v", err)
 	}
+}
+
+func initForwardingRules(ctx context.Context) error {
+	return service.NewIForwardingService().Restore(ctx)
 }

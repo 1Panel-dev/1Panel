@@ -4088,6 +4088,8 @@ const message = {
         plan_protected_rule: 'This rule is protected and cannot be taken over, changed, or deleted.',
         plan_overlapping_rule_with_different_action:
             'An overlapping rule has the opposite action. The operation was stopped.',
+        plan_partially_overlapping_rule_with_different_action:
+            'This rule partially overlaps a rule with the opposite action. The effective result depends on rule order.',
         plan_blocked: 'This rule cannot be applied safely. Refresh the rules and try again.',
         scopeDefaultMismatch: 'The system default zone is {0}; this page manages only the public zone.',
         scopeInactive: 'The managed scope is inactive. New rules may not affect current traffic.',
@@ -4114,17 +4116,10 @@ const message = {
         forwardRule: 'Port-Forward rule | Port-Forward rules',
         dockerGuard: 'Container Port Guard',
         systemFirewall: 'Host firewall',
-        firewallSettingHelper:
-            'System firewall, port forwarding, and Docker firewall are selected independently. Migrate rules manually by exporting and importing them.',
         systemFirewallHelper: 'Controls host port access and inbound firewall rules.',
-        forwardingHelper: 'Controls port-forwarding rules and can be selected independently from the system firewall.',
-        dockerFirewallHelper: 'Controls Docker network rules. Switching this option restarts Docker.',
-        iptablesSuggestionTag: 'Compatibility first',
-        nftablesSuggestionTag: 'New environments',
-        iptablesSuggestion:
-            'Recommended for environments with existing iptables rules, Docker workloads, or compatibility requirements.',
-        nftablesSuggestion:
-            'Recommended for newer Linux systems and new deployments. Confirm that existing tools support nftables before switching.',
+        forwardingHelper: 'Manages port-forwarding rules.',
+        dockerFirewallHelper: 'Selects how 1Panel manages container port protection.',
+        backendRecommendation: 'Using iptables or nftables is recommended.',
         configuredRules: '{0} rules configured',
         addressFamily: 'IP version',
         portOrRange: 'Port / range',
@@ -4132,11 +4127,13 @@ const message = {
         clearAllRules: 'Clear all rules',
         importBackendHelper: 'Imported rules are converted for the current {0} backend. Source rules are not changed.',
         clearAllRulesHelper: 'Delete all {0} manageable rules from the current backend? This cannot be undone.',
-        switchBackendHelper: 'Switch to {0}? Existing rules will not be migrated or removed.',
+        switchBackendHelper:
+            'This only changes the firewall backend managed by 1Panel. The original backend will not be migrated, stopped, or cleaned up. Export the current rules first. After switching, initialize the target backend and manually import or verify its rules. External and system-native rules are not exported. Continue switching to {0}?',
+        switchBackendSuccessHelper:
+            '1Panel now manages {0}. The original {1} backend was not stopped or cleaned up and may still be running and effective. Initialize the target backend, import or verify its rules, and manually handle the original backend only after confirming access works normally.',
         uninstalledStatus: 'Not installed',
         initializedStatus: 'Initialized',
         partiallyInitialized: 'Partially initialized',
-        currentUse: 'In use',
         dockerGuardHelper:
             'Set access restrictions for ports published from Docker containers to the host. Unprotected ports retain Docker default access behavior.',
         dockerInputNotProtected:
@@ -4211,6 +4208,7 @@ const message = {
         priority: 'Priority',
         reject: 'Reject',
         allPorts: 'All Ports',
+        allProtocolHelper: 'All protocols and ports',
         deleteRuleConfirm: 'Will delete {0} rules. Continue?',
         deleteUsedRuleConfirm:
             'This port is used by {0}. Deleting its allow rule may make the service unreachable. Continue?',

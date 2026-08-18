@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
@@ -20,6 +21,12 @@ import (
 	"github.com/docker/docker/api/types/system"
 	"github.com/docker/docker/client"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+const (
+	dockerGuardComposeProjectLabel = "com.docker.compose.project"
+	dockerGuardComposeCreatedBy    = "createdBy"
 )
 
 type dockerGuardRuntime interface {
@@ -50,13 +57,14 @@ var (
 	dockerPortGuardServiceMu sync.Mutex
 	dockerPortGuardSyncMu    sync.RWMutex
 	dockerPortGuardSyncErr   error
+	ErrDockerGuardInvalid    = errors.New("invalid Docker port guard request")
 )
 
 type IDockerPortGuardService interface {
-	List(context.Context) (dto.DockerPortGuardList, error)
+	LoadOverview(context.Context) (dto.DockerPortGuardList, error)
 	Operate(context.Context, dto.DockerPortGuardOperation) error
-	DeleteBatch(context.Context, dto.DockerPortGuardPolicyBatchDelete) error
-	UpsertBatch(context.Context, dto.DockerPortGuardPolicyBatch) error
+	DeletePolicies(context.Context, dto.DockerPortGuardPolicyBatchDelete) error
+	UpsertPolicies(context.Context, dto.DockerPortGuardPolicyBatch) error
 	Reconcile(context.Context) error
 }
 
@@ -77,8 +85,9 @@ func ReconcileDockerPortGuardBestEffort(ctx context.Context) {
 	}
 }
 
-func (s *DockerPortGuardService) List(ctx context.Context) (dto.DockerPortGuardList, error) {
-	base := s.runtimeStatus(s.guardRuntime("iptables"), "iptables")
+func (s *DockerPortGuardService) LoadOverview(ctx context.Context) (dto.DockerPortGuardList, error) {
+	selectedBackend := selectedDockerFirewallBackend("")
+	base := s.runtimeStatus(s.guardRuntime(selectedBackend), selectedBackend)
 	policies, err := s.policies.List(ctx)
 	if err != nil {
 		return dto.DockerPortGuardList{}, err
@@ -94,7 +103,7 @@ func (s *DockerPortGuardService) List(ctx context.Context) (dto.DockerPortGuardL
 		base.Message = err.Error()
 		return dto.DockerPortGuardList{Base: base, Containers: groupDockerGuardContainers(dockerGuardPolicyEndpoints(policies))}, nil
 	}
-	base.Backend = dockerFirewallBackend(info)
+	base.Backend = selectedDockerFirewallBackend(dockerFirewallBackend(info))
 	base = s.runtimeStatus(s.guardRuntime(base.Backend), base.Backend)
 	if reconcileErr := lastDockerPortGuardReconcileError(); reconcileErr != nil {
 		base.Message = reconcileErr.Error()
@@ -131,7 +140,7 @@ func (s *DockerPortGuardService) Operate(ctx context.Context, request dto.Docker
 	defer dockerPortGuardServiceMu.Unlock()
 	switch request.Operation {
 	case "initialize":
-		runtime, _, err := s.runtimeForDocker(ctx)
+		runtime, backend, err := s.runtimeForDocker(ctx)
 		if err != nil {
 			return err
 		}
@@ -143,6 +152,12 @@ func (s *DockerPortGuardService) Operate(ctx context.Context, request dto.Docker
 			recordDockerPortGuardReconcileError(err)
 			return err
 		}
+		if err := settingRepo.UpdateOrCreate(settingDockerFirewallBackend, backend); err != nil {
+			return err
+		}
+		if err := settingRepo.UpdateOrCreate(settingDockerPortGuardStatus, constant.StatusEnable); err != nil {
+			return err
+		}
 		recordDockerPortGuardReconcileError(nil)
 		return nil
 	case "bind":
@@ -150,18 +165,27 @@ func (s *DockerPortGuardService) Operate(ctx context.Context, request dto.Docker
 		if err != nil {
 			return err
 		}
-		return runtime.Bind()
-	case "unbind":
-		if s.runtime != nil {
-			return s.runtime.Unbind()
+		if err := runtime.Bind(); err != nil {
+			return err
 		}
-		return errors.Join(docker_guard.NewManager().Unbind(), docker_guard.NewNftablesManager().Unbind())
+		return settingRepo.UpdateOrCreate(settingDockerPortGuardStatus, constant.StatusEnable)
+	case "unbind":
+		var err error
+		if s.runtime != nil {
+			err = s.runtime.Unbind()
+		} else {
+			err = errors.Join(docker_guard.NewManager().Unbind(), docker_guard.NewNftablesManager().Unbind())
+		}
+		if err != nil {
+			return err
+		}
+		return settingRepo.UpdateOrCreate(settingDockerPortGuardStatus, constant.StatusDisable)
 	default:
 		return fmt.Errorf("unsupported Docker port guard operation: %s", request.Operation)
 	}
 }
 
-func (s *DockerPortGuardService) DeleteBatch(ctx context.Context, request dto.DockerPortGuardPolicyBatchDelete) error {
+func (s *DockerPortGuardService) DeletePolicies(ctx context.Context, request dto.DockerPortGuardPolicyBatchDelete) error {
 	dockerPortGuardServiceMu.Lock()
 	defer dockerPortGuardServiceMu.Unlock()
 	uuids, err := normalizeDockerGuardPolicyUUIDs(request.UUIDs)
@@ -180,7 +204,7 @@ func normalizeDockerGuardPolicyUUIDs(values []string) ([]string, error) {
 	for _, policyUUID := range values {
 		policyUUID = strings.TrimSpace(policyUUID)
 		if policyUUID == "" {
-			return nil, errors.New("Docker port guard policy UUID cannot be empty")
+			return nil, fmt.Errorf("%w: policy UUID cannot be empty", ErrDockerGuardInvalid)
 		}
 		if _, exists := seen[policyUUID]; exists {
 			continue
@@ -189,12 +213,12 @@ func normalizeDockerGuardPolicyUUIDs(values []string) ([]string, error) {
 		uuids = append(uuids, policyUUID)
 	}
 	if len(uuids) == 0 {
-		return nil, errors.New("Docker port guard policy UUIDs cannot be empty")
+		return nil, fmt.Errorf("%w: policy UUIDs cannot be empty", ErrDockerGuardInvalid)
 	}
 	return uuids, nil
 }
 
-func (s *DockerPortGuardService) UpsertBatch(ctx context.Context, request dto.DockerPortGuardPolicyBatch) error {
+func (s *DockerPortGuardService) UpsertPolicies(ctx context.Context, request dto.DockerPortGuardPolicyBatch) error {
 	dockerPortGuardServiceMu.Lock()
 	defer dockerPortGuardServiceMu.Unlock()
 	policies := make([]model.DockerPortGuardPolicy, 0, len(request.Endpoints))
@@ -230,11 +254,15 @@ func (s *DockerPortGuardService) Reconcile(ctx context.Context) error {
 
 func (s *DockerPortGuardService) reconcileLocked(ctx context.Context) (err error) {
 	defer func() { recordDockerPortGuardReconcileError(err) }()
+	persistedEnabled, err := dockerPortGuardPersistedEnabled()
+	if err != nil {
+		return fmt.Errorf("load Docker port guard persisted status: %w", err)
+	}
 	initialized, err := s.anyRuntimeInitialized()
 	if err != nil {
 		return &docker_guard.FamilyError{Family: docker_guard.FamilyIPv4, Err: fmt.Errorf("inspect initialization: %w", err)}
 	}
-	if !initialized {
+	if !initialized && !persistedEnabled {
 		return nil
 	}
 	runtime, _, err := s.runtimeForDocker(ctx)
@@ -245,14 +273,25 @@ func (s *DockerPortGuardService) reconcileLocked(ctx context.Context) (err error
 	if err != nil {
 		return &docker_guard.FamilyError{Family: docker_guard.FamilyIPv4, Err: fmt.Errorf("inspect initialization: %w", err)}
 	}
-	if !initialized {
+	if !initialized && !persistedEnabled {
 		return nil
 	}
 	policies, err := s.runtimePolicies(ctx)
 	if err != nil {
 		return err
 	}
+	if !initialized {
+		return runtime.Initialize(policies)
+	}
 	return runtime.Reconcile(policies)
+}
+
+func dockerPortGuardPersistedEnabled() (bool, error) {
+	status, err := settingRepo.GetValueByKey(settingDockerPortGuardStatus)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return false, nil
+	}
+	return status == constant.StatusEnable, err
 }
 
 func (s *DockerPortGuardService) anyRuntimeInitialized() (bool, error) {
@@ -349,6 +388,9 @@ func (s *DockerPortGuardService) guardRuntime(backend string) dockerGuardRuntime
 }
 
 func (s *DockerPortGuardService) runtimeForDocker(ctx context.Context) (dockerGuardRuntime, string, error) {
+	if s.runtime != nil {
+		return s.runtime, selectedDockerFirewallBackend("iptables"), nil
+	}
 	cli, err := s.client()
 	if err != nil {
 		return nil, "", fmt.Errorf("Docker is not running: %w", err)
@@ -358,7 +400,7 @@ func (s *DockerPortGuardService) runtimeForDocker(ctx context.Context) (dockerGu
 	if err != nil {
 		return nil, "", fmt.Errorf("Docker is not running: %w", err)
 	}
-	backend := dockerFirewallBackend(info)
+	backend := selectedDockerFirewallBackend(dockerFirewallBackend(info))
 	if backend != "iptables" && backend != "nftables" {
 		return nil, backend, fmt.Errorf("Docker firewall backend %q is not supported", backend)
 	}
@@ -389,9 +431,9 @@ func discoverDockerEndpoints(ctx context.Context, cli *client.Client) ([]dto.Doc
 	endpoints := make([]dto.DockerPortGuardEndpoint, 0)
 	for _, item := range containers {
 		name := strings.TrimPrefix(firstGuardString(item.Names), "/")
-		compose := item.Labels[composeProjectLabel]
+		compose := item.Labels[dockerGuardComposeProjectLabel]
 		application := ""
-		if created, ok := item.Labels[composeCreatedBy]; ok && created == "Apps" {
+		if created, ok := item.Labels[dockerGuardComposeCreatedBy]; ok && created == "Apps" {
 			application = compose
 		}
 		for _, port := range item.Ports {
@@ -414,11 +456,11 @@ func discoverDockerEndpoints(ctx context.Context, cli *client.Client) ([]dto.Doc
 func normalizeGuardPolicy(family, hostIP string, hostPort uint16, protocol, mode string, sources []string) (normalizedDockerGuardPolicy, []string, error) {
 	family, hostIP, protocol, mode = strings.ToLower(strings.TrimSpace(family)), strings.TrimSpace(hostIP), strings.ToLower(strings.TrimSpace(protocol)), strings.ToLower(strings.TrimSpace(mode))
 	if hostPort == 0 || (protocol != "tcp" && protocol != "udp") || (family != docker_guard.FamilyIPv4 && family != docker_guard.FamilyIPv6) || (mode != docker_guard.ModeAll && mode != docker_guard.ModeSources && mode != docker_guard.ModeAllow) {
-		return normalizedDockerGuardPolicy{}, nil, errors.New("invalid Docker port guard policy")
+		return normalizedDockerGuardPolicy{}, nil, fmt.Errorf("%w: invalid policy fields", ErrDockerGuardInvalid)
 	}
 	addr, err := netip.ParseAddr(hostIP)
 	if err != nil || (family == docker_guard.FamilyIPv4) != addr.Is4() {
-		return normalizedDockerGuardPolicy{}, nil, errors.New("host IP does not match address family")
+		return normalizedDockerGuardPolicy{}, nil, fmt.Errorf("%w: host IP does not match address family", ErrDockerGuardInvalid)
 	}
 	normalizedSources := make([]string, 0, len(sources))
 	seen := map[string]struct{}{}
@@ -436,11 +478,11 @@ func normalizeGuardPolicy(family, hostIP string, hostPort uint16, protocol, mode
 				}
 				prefix = netip.PrefixFrom(sourceAddr, bits)
 			} else {
-				return normalizedDockerGuardPolicy{}, nil, fmt.Errorf("invalid source address %q", source)
+				return normalizedDockerGuardPolicy{}, nil, fmt.Errorf("%w: invalid source address %q", ErrDockerGuardInvalid, source)
 			}
 		}
 		if (family == docker_guard.FamilyIPv4) != prefix.Addr().Is4() {
-			return normalizedDockerGuardPolicy{}, nil, fmt.Errorf("source %q does not match address family", source)
+			return normalizedDockerGuardPolicy{}, nil, fmt.Errorf("%w: source %q does not match address family", ErrDockerGuardInvalid, source)
 		}
 		canonical := prefix.Masked().String()
 		if _, ok := seen[canonical]; !ok {
@@ -449,7 +491,7 @@ func normalizeGuardPolicy(family, hostIP string, hostPort uint16, protocol, mode
 		}
 	}
 	if mode == docker_guard.ModeSources && len(normalizedSources) == 0 {
-		return normalizedDockerGuardPolicy{}, nil, errors.New("deny_sources requires at least one source")
+		return normalizedDockerGuardPolicy{}, nil, fmt.Errorf("%w: deny_sources requires at least one source", ErrDockerGuardInvalid)
 	}
 	if mode == docker_guard.ModeAll {
 		normalizedSources = []string{}

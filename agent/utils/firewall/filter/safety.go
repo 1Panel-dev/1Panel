@@ -44,8 +44,14 @@ func ProtectSnapshot(snapshot Snapshot, ports []firewall.PortWhitelist) (Snapsho
 	return protected, nil
 }
 
-func GuardMutation(snapshot Snapshot, target ObservedRule, after FirewallRule, clientIP string) error {
-	if RuleBlocksManagementConnection(after, clientIP) {
+func GuardMutation(
+	snapshot Snapshot,
+	target ObservedRule,
+	after FirewallRule,
+	clientIP string,
+	protectedPorts ...firewall.PortWhitelist,
+) error {
+	if RuleBlocksManagementConnection(after, clientIP, protectedPorts...) {
 		return ErrLockoutRisk
 	}
 	for _, observed := range snapshot.Rules {

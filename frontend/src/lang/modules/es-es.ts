@@ -4131,6 +4131,8 @@ const message = {
         plan_protected_rule: 'Esta regla está protegida y no se puede asumir, modificar ni eliminar.',
         plan_overlapping_rule_with_different_action:
             'Existe una regla superpuesta con la acción opuesta. La operación se detuvo.',
+        plan_partially_overlapping_rule_with_different_action:
+            'La regla se superpone parcialmente con otra de acción opuesta. El resultado depende del orden de las reglas.',
         plan_blocked: 'La regla no puede aplicarse de forma segura. Actualiza la lista e inténtalo de nuevo.',
         scopeDefaultMismatch: 'La zona predeterminada es {0}; esta página solo gestiona la zona public.',
         scopeInactive: 'El ámbito gestionado está inactivo. Las reglas nuevas podrían no afectar al tráfico actual.',
@@ -4158,18 +4160,10 @@ const message = {
         forwardRule: 'Regla de redirección de puertos | Reglas de redirección de puertos',
         dockerGuard: 'Protección de puertos de contenedores',
         systemFirewall: 'Firewall del host',
-        firewallSettingHelper:
-            'El firewall del sistema, el reenvío de puertos y el firewall de Docker se seleccionan de forma independiente. Migre las reglas manualmente mediante exportación e importación.',
         systemFirewallHelper: 'Controla el acceso a los puertos del host y las reglas de entrada.',
-        forwardingHelper:
-            'Controla las reglas de reenvío de puertos y se selecciona independientemente del firewall del sistema.',
-        dockerFirewallHelper: 'Controla las reglas de red de Docker. Al cambiar esta opción se reinicia Docker.',
-        iptablesSuggestionTag: 'Mayor compatibilidad',
-        nftablesSuggestionTag: 'Entornos nuevos',
-        iptablesSuggestion:
-            'Recomendado para reglas iptables existentes, cargas de Docker o cuando se prioriza la compatibilidad.',
-        nftablesSuggestion:
-            'Recomendado para sistemas Linux recientes y nuevas instalaciones. Confirme la compatibilidad antes de cambiar.',
+        forwardingHelper: 'Gestiona las reglas de reenvío de puertos.',
+        dockerFirewallHelper: 'Selecciona cómo gestiona 1Panel la protección de puertos de contenedores.',
+        backendRecommendation: 'Se recomienda usar iptables o nftables.',
         configuredRules: '{0} reglas configuradas',
         addressFamily: 'Versión de IP',
         portOrRange: 'Puerto / rango',
@@ -4179,11 +4173,13 @@ const message = {
             'Las reglas importadas se convierten para el backend actual {0}. Las reglas de origen no se modifican.',
         clearAllRulesHelper:
             '¿Eliminar las {0} reglas administrables del backend actual? Esta acción no se puede deshacer.',
-        switchBackendHelper: '¿Cambiar a {0}? Las reglas existentes no se migrarán ni eliminarán.',
+        switchBackendHelper:
+            'Esto solo cambia el backend de firewall administrado por 1Panel. El backend original no se migrará, detendrá ni limpiará. Exporte primero las reglas actuales. Después del cambio, inicialice el backend de destino e importe o verifique manualmente sus reglas. Las reglas externas y nativas del sistema no se exportan. ¿Continuar con el cambio a {0}?',
+        switchBackendSuccessHelper:
+            '1Panel ahora administra {0}. El backend original {1} no se detuvo ni limpió y aún puede estar activo. Inicialice el backend de destino, importe o verifique sus reglas y gestione manualmente el backend original solo después de confirmar que el acceso funciona correctamente.',
         uninstalledStatus: 'No instalado',
         initializedStatus: 'Inicializado',
         partiallyInitialized: 'Parcialmente inicializado',
-        currentUse: 'En uso',
         dockerGuardHelper:
             'Configura restricciones de acceso para los puertos que los contenedores Docker publican en el host. Los puertos sin protección mantienen el comportamiento de acceso predeterminado de Docker.',
         dockerInputNotProtected:
@@ -4263,6 +4259,7 @@ const message = {
         priority: 'Prioridad',
         reject: 'Rechazar',
         allPorts: 'Todos los Puertos',
+        allProtocolHelper: 'Todos los protocolos y puertos',
         deleteRuleConfirm: 'Se eliminarán {0} reglas. ¿Continuar?',
         deleteUsedRuleConfirm:
             'Este puerto está siendo utilizado por {0}. Eliminar la regla de acceso puede dejar el servicio inaccesible. ¿Continuar?',

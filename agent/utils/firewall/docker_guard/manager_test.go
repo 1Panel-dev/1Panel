@@ -143,6 +143,31 @@ func TestReconcileUsesSingleAtomicRestorePerFamily(t *testing.T) {
 	}
 }
 
+func TestDockerGuardLifecycleRulesBatchCreateAndRebind(t *testing.T) {
+	output := strings.Join([]string{
+		"-N " + DockerChain,
+		"-A " + DockerChain + " -j " + Chain,
+		"-A " + DockerChain + " -j " + Chain,
+	}, "\n")
+	rules := dockerGuardLifecycleRules(output, true, true)
+	script, err := buildRestoreScript(rules)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, line := range []string{
+		"-N " + Chain,
+		"-D " + DockerChain + " -j " + Chain,
+		"-I " + DockerChain + " 1 -j " + Chain,
+	} {
+		if !strings.Contains(script, line+"\n") {
+			t.Fatalf("lifecycle restore is missing %q:\n%s", line, script)
+		}
+	}
+	if strings.Count(script, "-D "+DockerChain+" -j "+Chain+"\n") != 2 || strings.Count(script, "COMMIT\n") != 1 {
+		t.Fatalf("duplicate jumps were not removed in one transaction:\n%s", script)
+	}
+}
+
 func TestReconcileReturnsChainInspectionError(t *testing.T) {
 	manager := NewManagerWithRunner(&recordingRunner{runErr: errors.New("inspect failed")})
 	err := manager.Reconcile(nil)

@@ -1,21 +1,18 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"reflect"
 	"testing"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	forwardClient "github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/go-playground/validator/v10"
 )
-
-type forwardingCall struct {
-	rule      forwardClient.Rule
-	operation forwardClient.OperationType
-}
 
 type fakeForwardingAdapter struct {
 	name       string
@@ -25,7 +22,7 @@ type fakeForwardingAdapter struct {
 	init       bool
 	initErr    error
 	familyInit map[string]bool
-	calls      []forwardingCall
+	reconciled []forwardClient.Rule
 }
 
 func (f *fakeForwardingAdapter) Name() string { return f.name }
@@ -34,8 +31,11 @@ func (f *fakeForwardingAdapter) List() ([]forwardClient.Rule, error) {
 	return append([]forwardClient.Rule(nil), f.rules...), f.listErr
 }
 
-func (f *fakeForwardingAdapter) Operate(rule forwardClient.Rule, operation forwardClient.OperationType) error {
-	f.calls = append(f.calls, forwardingCall{rule: rule, operation: operation})
+func (f *fakeForwardingAdapter) Reconcile(rules []forwardClient.Rule) error {
+	f.reconciled = append([]forwardClient.Rule(nil), rules...)
+	if f.operateErr == nil {
+		f.rules = append([]forwardClient.Rule(nil), rules...)
+	}
 	return f.operateErr
 }
 
@@ -53,11 +53,29 @@ func (f *fakeForwardingAdapter) InitStatus() (bool, bool, error) {
 }
 func (f *fakeForwardingAdapter) Replay() error { return nil }
 
+type fakeForwardingRuleRepo struct {
+	rules   []model.ForwardingRule
+	listErr error
+}
+
+func (r *fakeForwardingRuleRepo) List(context.Context) ([]model.ForwardingRule, error) {
+	return append([]model.ForwardingRule(nil), r.rules...), r.listErr
+}
+
+func (r *fakeForwardingRuleRepo) ReplaceAll(_ context.Context, rules []model.ForwardingRule) error {
+	r.rules = append([]model.ForwardingRule(nil), rules...)
+	return nil
+}
+
 func forwardingServiceWithAdapter(adapter forwardClient.Adapter) *ForwardingService {
+	rules, listErr := adapter.List()
 	return &ForwardingService{
 		managerFactory: func() (*forwardClient.Manager, error) {
 			return forwardClient.NewManager(adapter, nil), nil
 		},
+		rules:          &fakeForwardingRuleRepo{rules: forwardingRuleModels(rules), listErr: listErr},
+		enabled:        func() (bool, error) { return true, nil },
+		persistBackend: func(string) error { return nil },
 	}
 }
 
@@ -73,7 +91,7 @@ func TestForwardingAndFilterInterfacesAreSeparated(t *testing.T) {
 		t.Fatal("firewall service still owns forwarding writes")
 	}
 	forwardingServiceType := reflect.TypeOf((*IForwardingService)(nil)).Elem()
-	for _, method := range []string{"LoadBaseInfo", "SearchWithPage", "Operate", "Enable", "Replay"} {
+	for _, method := range []string{"LoadBaseInfo", "SearchRules", "OperateRules", "Enable", "Restore"} {
 		if _, ok := forwardingServiceType.MethodByName(method); !ok {
 			t.Fatalf("forwarding service missing %s", method)
 		}
@@ -81,9 +99,31 @@ func TestForwardingAndFilterInterfacesAreSeparated(t *testing.T) {
 }
 
 func TestForwardingInitNoLongerUsesFilterRequest(t *testing.T) {
-	req := dto.IptablesOp{Name: "1PANEL_FORWARD", Operate: "init-forward"}
-	if err := validator.New().Struct(req); err == nil {
+	request := dto.FilterChainOperation{Name: "1PANEL_FORWARD", Operate: "init-forward"}
+	if err := validator.New().Struct(request); err == nil {
 		t.Fatal("forwarding initialization must use the dedicated forwarding endpoint")
+	}
+}
+
+func TestForwardingRestoreHonorsPersistedState(t *testing.T) {
+	adapter := &fakeForwardingAdapter{name: "iptables", rules: []forwardClient.Rule{{
+		Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8080", TargetIP: "127.0.0.1", TargetPort: "80",
+	}}}
+	service := forwardingServiceWithAdapter(adapter)
+	service.enabled = func() (bool, error) { return false, nil }
+	if err := service.Restore(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if adapter.reconciled != nil {
+		t.Fatalf("disabled forwarding was restored: %#v", adapter.reconciled)
+	}
+
+	service.enabled = func() (bool, error) { return true, nil }
+	if err := service.Restore(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if len(adapter.reconciled) != 1 || adapter.reconciled[0].Port != "8080" {
+		t.Fatalf("unexpected restored rules: %#v", adapter.reconciled)
 	}
 }
 
@@ -148,7 +188,8 @@ func TestForwardingSearchPreservesAPIShapeAndPagination(t *testing.T) {
 		{Num: "2", Protocol: "udp", Port: "5353", TargetIP: "127.0.0.1", TargetPort: "53"},
 	}}
 	service := forwardingServiceWithAdapter(adapter)
-	total, value, err := service.SearchWithPage(dto.ForwardRuleSearch{PageInfo: dto.PageInfo{Page: 1, PageSize: 10}, Info: "2001:db8"})
+	service.rules.(*fakeForwardingRuleRepo).rules[0].ID = 42
+	total, value, err := service.SearchRules(dto.ForwardRuleSearch{PageInfo: dto.PageInfo{Page: 1, PageSize: 10}, Info: "2001:db8"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -156,7 +197,7 @@ func TestForwardingSearchPreservesAPIShapeAndPagination(t *testing.T) {
 		t.Fatalf("got total %d want 1", total)
 	}
 	items, ok := value.([]dto.ForwardRule)
-	if !ok || len(items) != 1 || items[0].Port != "8080" || items[0].Family != forwardClient.FamilyIPv6 {
+	if !ok || len(items) != 1 || items[0].ID != 42 || items[0].Port != "8080" || items[0].Family != forwardClient.FamilyIPv6 {
 		t.Fatalf("unexpected items: %#v", value)
 	}
 	data, err := json.Marshal(items[0])
@@ -180,14 +221,14 @@ func TestForwardingDuplicateIdentityIncludesAddressFamily(t *testing.T) {
 		Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80",
 	}}}
 	service := forwardingServiceWithAdapter(adapter)
-	err := service.Operate(dto.ForwardRuleOperate{Rules: []dto.ForwardRuleOperation{{
+	err := service.OperateRules(dto.ForwardRuleOperate{Rules: []dto.ForwardRuleOperation{{
 		Operation: "add", Family: forwardClient.FamilyIPv6, Protocol: "tcp", Port: "8080", TargetIP: "2001:db8::2", TargetPort: "80",
 	}}})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(adapter.calls) != 1 || adapter.calls[0].rule.Family != forwardClient.FamilyIPv6 {
-		t.Fatalf("unexpected calls: %#v", adapter.calls)
+	if len(adapter.reconciled) != 2 || adapter.reconciled[1].Family != forwardClient.FamilyIPv6 {
+		t.Fatalf("unexpected reconciled rules: %#v", adapter.reconciled)
 	}
 }
 
@@ -196,19 +237,15 @@ func TestForwardingOperatePreservesDuplicateAndOrderingContracts(t *testing.T) {
 		{Protocol: "tcp", Port: "8080", TargetIP: "127.0.0.1", TargetPort: "80"},
 	}}
 	service := forwardingServiceWithAdapter(existing)
-	err := service.Operate(dto.ForwardRuleOperate{Rules: []dto.ForwardRuleOperation{{
+	err := service.OperateRules(dto.ForwardRuleOperate{Rules: []dto.ForwardRuleOperation{{
 		Operation: "add", Protocol: "tcp", Port: "8080", TargetPort: "80",
 	}}})
 	if err == nil {
 		t.Fatal("duplicate forwarding rule must be rejected")
 	}
-	if len(existing.calls) != 0 {
-		t.Fatalf("duplicate check wrote forwarding state: %#v", existing.calls)
-	}
-
 	adapter := &fakeForwardingAdapter{name: "iptables"}
 	service = forwardingServiceWithAdapter(adapter)
-	err = service.Operate(dto.ForwardRuleOperate{Rules: []dto.ForwardRuleOperation{
+	err = service.OperateRules(dto.ForwardRuleOperate{Rules: []dto.ForwardRuleOperation{
 		{Operation: "add", Protocol: "tcp/udp", Port: "9000", TargetIP: "10.0.0.2", TargetPort: "90"},
 		{Operation: "remove", Num: "1", Protocol: "tcp", Port: "8001", TargetIP: "10.0.0.2", TargetPort: "81"},
 		{Operation: "remove", Num: "3", Protocol: "tcp", Port: "8003", TargetIP: "10.0.0.2", TargetPort: "83"},
@@ -216,21 +253,19 @@ func TestForwardingOperatePreservesDuplicateAndOrderingContracts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := []forwardingCall{
-		{operation: "remove", rule: forwardClient.Rule{Num: "3", Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8003", TargetIP: "10.0.0.2", TargetPort: "83"}},
-		{operation: "remove", rule: forwardClient.Rule{Num: "1", Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8001", TargetIP: "10.0.0.2", TargetPort: "81"}},
-		{operation: "add", rule: forwardClient.Rule{Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "9000", TargetIP: "10.0.0.2", TargetPort: "90"}},
-		{operation: "add", rule: forwardClient.Rule{Family: forwardClient.FamilyIPv4, Protocol: "udp", Port: "9000", TargetIP: "10.0.0.2", TargetPort: "90"}},
+	want := []forwardClient.Rule{
+		{Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "9000", TargetIP: "10.0.0.2", TargetPort: "90"},
+		{Family: forwardClient.FamilyIPv4, Protocol: "udp", Port: "9000", TargetIP: "10.0.0.2", TargetPort: "90"},
 	}
-	if !reflect.DeepEqual(adapter.calls, want) {
-		t.Fatalf("operation order changed\ngot  %#v\nwant %#v", adapter.calls, want)
+	if !reflect.DeepEqual(adapter.reconciled, want) {
+		t.Fatalf("desired forwarding rules changed\ngot  %#v\nwant %#v", adapter.reconciled, want)
 	}
 }
 
 func TestForwardingSearchReturnsAdapterError(t *testing.T) {
 	wantErr := errors.New("list failed")
 	service := forwardingServiceWithAdapter(&fakeForwardingAdapter{name: "nftables", listErr: wantErr})
-	_, _, err := service.SearchWithPage(dto.ForwardRuleSearch{PageInfo: dto.PageInfo{Page: 1, PageSize: 20}})
+	_, _, err := service.SearchRules(dto.ForwardRuleSearch{PageInfo: dto.PageInfo{Page: 1, PageSize: 20}})
 	if !errors.Is(err, wantErr) {
 		t.Fatalf("got %v want %v", err, wantErr)
 	}
@@ -239,7 +274,7 @@ func TestForwardingSearchReturnsAdapterError(t *testing.T) {
 func TestForwardingOperateReturnsAdapterListError(t *testing.T) {
 	wantErr := errors.New("list failed")
 	service := forwardingServiceWithAdapter(&fakeForwardingAdapter{name: "iptables", listErr: wantErr})
-	err := service.Operate(dto.ForwardRuleOperate{Rules: []dto.ForwardRuleOperation{{
+	err := service.OperateRules(dto.ForwardRuleOperate{Rules: []dto.ForwardRuleOperation{{
 		Operation: "remove", Protocol: "tcp", Port: "8080", TargetPort: "80",
 	}}})
 	if !errors.Is(err, wantErr) {
@@ -251,7 +286,7 @@ func TestForwardingForceDeleteOnlySuppressesRemoveErrors(t *testing.T) {
 	wantErr := errors.New("operate failed")
 	removeAdapter := &fakeForwardingAdapter{name: "iptables", operateErr: wantErr}
 	removeService := forwardingServiceWithAdapter(removeAdapter)
-	err := removeService.Operate(dto.ForwardRuleOperate{ForceDelete: true, Rules: []dto.ForwardRuleOperation{{
+	err := removeService.OperateRules(dto.ForwardRuleOperate{ForceDelete: true, Rules: []dto.ForwardRuleOperation{{
 		Operation: "remove", Protocol: "tcp", Port: "8080", TargetPort: "80",
 	}}})
 	if err != nil {
@@ -260,10 +295,29 @@ func TestForwardingForceDeleteOnlySuppressesRemoveErrors(t *testing.T) {
 
 	addAdapter := &fakeForwardingAdapter{name: "iptables", operateErr: wantErr}
 	addService := forwardingServiceWithAdapter(addAdapter)
-	err = addService.Operate(dto.ForwardRuleOperate{ForceDelete: true, Rules: []dto.ForwardRuleOperation{{
+	err = addService.OperateRules(dto.ForwardRuleOperate{ForceDelete: true, Rules: []dto.ForwardRuleOperation{{
 		Operation: "add", Protocol: "tcp", Port: "8080", TargetPort: "80",
 	}}})
 	if !errors.Is(err, wantErr) {
 		t.Fatalf("got %v want %v", err, wantErr)
 	}
+}
+
+func TestForwardingOperateKeepsDesiredStateWhenRuntimeReconcileFails(t *testing.T) {
+	wantErr := errors.New("runtime reconcile failed")
+	adapter := &fakeForwardingAdapter{name: "iptables", operateErr: wantErr}
+	rules := &fakeForwardingRuleRepo{}
+	service := forwardingServiceWithAdapter(adapter)
+	service.rules = rules
+
+	err := service.OperateRules(dto.ForwardRuleOperate{Rules: []dto.ForwardRuleOperation{{
+		Operation: "add", Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80",
+	}}})
+	if !errors.Is(err, wantErr) {
+		t.Fatalf("got %v want %v", err, wantErr)
+	}
+	if len(rules.rules) != 1 || rules.rules[0].Port != "8080" {
+		t.Fatalf("database desired state was lost after runtime failure: %#v", rules.rules)
+	}
+
 }

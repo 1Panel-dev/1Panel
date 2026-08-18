@@ -3993,6 +3993,8 @@ const message = {
         plan_runtime_permanent_mismatch: '실행 중 구성과 영구 방화벽 구성이 다릅니다. 먼저 동기화하세요.',
         plan_protected_rule: '이 규칙은 보호되어 관리 전환, 변경 또는 삭제할 수 없습니다.',
         plan_overlapping_rule_with_different_action: '반대 동작을 가진 겹치는 규칙이 있어 작업을 중지했습니다.',
+        plan_partially_overlapping_rule_with_different_action:
+            '반대 동작을 가진 규칙과 일부 겹칩니다. 실제 동작은 규칙 순서에 따라 결정됩니다.',
         plan_blocked: '이 규칙을 안전하게 적용할 수 없습니다. 목록을 새로 고친 후 다시 시도하세요.',
         scopeDefaultMismatch: '시스템 기본 zone은 {0}이며 이 페이지는 public zone만 관리합니다.',
         scopeInactive: '관리 범위가 비활성 상태입니다. 새 규칙이 현재 트래픽에 적용되지 않을 수 있습니다.',
@@ -4019,16 +4021,10 @@ const message = {
         forwardRule: '포트 전달 규칙 | 포트 전달 규칙들',
         dockerGuard: '컨테이너 포트 보호',
         systemFirewall: '호스트 방화벽',
-        firewallSettingHelper:
-            '시스템 방화벽, 포트 포워딩 및 Docker 방화벽은 독립적으로 선택합니다. 규칙은 내보내기와 가져오기로 수동 이전합니다.',
         systemFirewallHelper: '호스트 포트 접근과 인바운드 규칙을 관리합니다.',
-        forwardingHelper: '포트 포워딩 규칙을 관리하며 시스템 방화벽과 별도로 선택할 수 있습니다.',
-        dockerFirewallHelper: 'Docker 네트워크 규칙을 관리합니다. 전환하면 Docker가 다시 시작됩니다.',
-        iptablesSuggestionTag: '호환성 우선',
-        nftablesSuggestionTag: '새 환경 권장',
-        iptablesSuggestion: '기존 iptables 규칙, Docker 워크로드 또는 호환성이 중요한 환경에 권장합니다.',
-        nftablesSuggestion:
-            '최신 Linux 시스템과 신규 구축 환경에 권장합니다. 전환 전에 기존 도구의 지원 여부를 확인하세요.',
+        forwardingHelper: '포트 포워딩 규칙을 관리합니다.',
+        dockerFirewallHelper: '1Panel 컨테이너 포트 보호 관리 방식을 선택합니다.',
+        backendRecommendation: 'iptables 또는 nftables 사용을 권장합니다.',
         configuredRules: '{0}개 규칙 설정됨',
         addressFamily: 'IP 버전',
         portOrRange: '포트 / 범위',
@@ -4037,11 +4033,13 @@ const message = {
         importBackendHelper: '가져온 규칙은 현재 {0} 백엔드에 맞게 변환됩니다. 원본 백엔드의 규칙은 변경되지 않습니다.',
         clearAllRulesHelper:
             '현재 백엔드의 관리 가능한 규칙 {0}개를 삭제합니다. 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?',
-        switchBackendHelper: '{0}(으)로 전환합니다. 기존 규칙은 이전되거나 삭제되지 않습니다. 계속하시겠습니까?',
+        switchBackendHelper:
+            '이 작업은 1Panel이 이후 관리할 방화벽 백엔드만 변경합니다. 기존 백엔드는 이전·중지·정리되지 않습니다. 먼저 현재 규칙을 내보내십시오. 전환 후 대상 백엔드를 초기화하고 규칙을 수동으로 가져오거나 확인하십시오. 외부 규칙과 시스템 기본 규칙은 내보내지지 않습니다. {0}(으)로 계속 전환하시겠습니까?',
+        switchBackendSuccessHelper:
+            '1Panel이 이제 {0}을(를) 관리합니다. 기존 {1} 백엔드는 중지되거나 정리되지 않아 여전히 실행 및 적용될 수 있습니다. 대상 백엔드를 초기화하고 규칙을 가져오거나 확인한 뒤, 접속이 정상인지 확인한 후에만 기존 백엔드를 수동으로 처리하십시오.',
         uninstalledStatus: '설치되지 않음',
         initializedStatus: '초기화됨',
         partiallyInitialized: '일부 초기화됨',
-        currentUse: '사용 중',
         dockerGuardHelper:
             'Docker 컨테이너가 호스트에 게시한 포트의 접근 제한을 설정합니다. 보호되지 않은 포트는 Docker 기본 접근 방식을 유지합니다.',
         dockerInputNotProtected:
@@ -4113,6 +4111,7 @@ const message = {
         priority: '우선순위',
         reject: '거부',
         allPorts: '모든 포트',
+        allProtocolHelper: '모든 프로토콜 및 포트',
         deleteRuleConfirm: '{0}개의 규칙을 삭제합니다. 계속하시겠습니까?',
         deleteUsedRuleConfirm:
             '이 포트는 {0}에서 사용 중입니다. 허용 규칙을 삭제하면 서비스에 접근하지 못할 수 있습니다. 계속하시겠습니까?',

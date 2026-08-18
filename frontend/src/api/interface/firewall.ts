@@ -34,7 +34,6 @@ export namespace Firewall {
         subsystem: BackendSubsystem;
         backend: Provider;
         operation: BackendOperation;
-        restartDocker: boolean;
     }
     export type Family = 'ipv4' | 'ipv6' | 'inet';
     export type Direction = 'input';
@@ -205,6 +204,22 @@ export namespace Firewall {
         error?: string;
     }
 
+    export interface BatchDeleteRequest {
+        uuids: string[];
+    }
+
+    export interface BatchDeleteResponse {
+        succeeded: number;
+        failed: number;
+        errors?: BatchDeleteFailure[];
+    }
+
+    export interface BatchDeleteFailure {
+        index: number;
+        uuid: string;
+        error: string;
+    }
+
     export interface UpdateRequest {
         rule: Rule;
     }
@@ -277,6 +292,11 @@ export namespace Firewall {
         hostIP: string;
         hostPort: number;
         protocol: 'tcp' | 'udp';
+    }
+    export interface DockerGuardPolicy extends DockerGuardEndpointIdentity {
+        mode: 'deny_sources' | 'allow_sources' | 'deny_all';
+        sources: string[];
+        description: string;
     }
     export interface DockerGuardPolicyBatch {
         endpoints: DockerGuardEndpointIdentity[];

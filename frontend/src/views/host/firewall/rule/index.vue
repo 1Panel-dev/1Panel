@@ -61,17 +61,18 @@
                             :disabled="allManagedRules.length === 0"
                             @click="clearAllRules"
                         >
-                            {{ $t('firewall.clearAllRules') }}
+                            {{ $t('commons.button.clean') }}
                         </el-button>
                         <el-button-group>
                             <el-button v-permission v-node-admin @click="openImport">
                                 {{ $t('commons.button.import') }}
                             </el-button>
-                            <el-button v-permission :disabled="selects.length === 0" @click="exportSelectedRules">
+                            <el-button
+                                v-permission
+                                :disabled="allManagedRules.length === 0"
+                                @click="exportRulesBySelection"
+                            >
                                 {{ $t('commons.button.export') }}
-                            </el-button>
-                            <el-button v-permission :disabled="allManagedRules.length === 0" @click="exportAllRules">
-                                {{ $t('firewall.exportAllRules') }}
                             </el-button>
                         </el-button-group>
                     </template>
@@ -371,6 +372,7 @@ import {
     checkFirewallRule,
     createFirewallRule,
     deleteFirewallRule,
+    deleteFirewallRulesBatch,
     loadDockerPortGuard,
     loadFirewallNativeDetail,
     searchFirewallRules,
@@ -959,9 +961,10 @@ const exportRules = async (rows: RuleRow[]) => {
     downloadWithContent(JSON.stringify(exported, null, 2), `1panel-firewall-rules-${getCurrentDateFormatted()}.json`);
 };
 
-const exportSelectedRules = () => exportRules(selects.value.filter((row) => isEditableManagedRule(row)));
-
-const exportAllRules = () => exportRules(allManagedRules.value);
+const exportRulesBySelection = () => {
+    const selected = selects.value.filter((row) => isEditableManagedRule(row));
+    return exportRules(selected.length > 0 ? selected : allManagedRules.value);
+};
 
 const removeRules = async (selected: RuleRow[], clearAll = false) => {
     if (selected.length === 0) return;
@@ -975,29 +978,41 @@ const removeRules = async (selected: RuleRow[], clearAll = false) => {
         ? `${baseMessage}\n${i18n.global.t('firewall.deleteUsedRuleConfirm', [usedBy.join(', ')])}`
         : baseMessage;
     try {
-        await ElMessageBox.confirm(message, i18n.global.t('commons.button.delete'), {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        });
+        await ElMessageBox.confirm(
+            message,
+            i18n.global.t(clearAll ? 'commons.button.clean' : 'commons.button.delete'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            },
+        );
     } catch {
         return;
     }
     loading.value = true;
-    let success = 0;
-    for (const row of selected) {
-        if (!row.desired?.uuid) continue;
+    const uuids = selected.flatMap((row) => (row.desired?.uuid ? [row.desired.uuid] : []));
+    try {
+        let succeeded = 0;
+        let failed = 0;
+        for (let offset = 0; offset < uuids.length; offset += 256) {
+            const batch = uuids.slice(offset, offset + 256);
+            const result = (await deleteFirewallRulesBatch({ uuids: batch })).data;
+            succeeded += result.succeeded;
+            failed += result.failed;
+        }
+        if (succeeded > 0) {
+            MsgSuccess(`${i18n.global.t('commons.msg.operationSuccess')} (${succeeded}/${uuids.length})`);
+        }
+        if (failed > 0) {
+            MsgError(`${i18n.global.t('commons.msg.operationFailed')} (${failed}/${uuids.length})`);
+        }
+    } finally {
         try {
-            await deleteFirewallRule(row.desired.uuid);
-            success++;
-        } catch {
-            // The shared interceptor reports the failed rule and the remaining rules continue.
+            await search();
+        } finally {
+            loading.value = false;
         }
     }
-    if (success > 0) {
-        MsgSuccess(`${i18n.global.t('commons.msg.operationSuccess')} (${success}/${selected.length})`);
-    }
-    await search();
-    loading.value = false;
 };
 
 const removeSelectedRules = () => removeRules(selects.value.filter((row) => isEditableManagedRule(row)));

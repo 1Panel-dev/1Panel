@@ -97,7 +97,7 @@ func InitAgentDB() {
 		migrations.AddWebsiteTemplateTable,
 		migrations.AddComposePinned,
 		migrations.AddFirewallRuleTable,
-		migrations.AddDockerPortGuard,
+		migrations.InitDockerPortGuardStatus,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

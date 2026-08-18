@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -47,60 +46,15 @@ func (n *nftablesAdapter) List() ([]forwarding.Rule, error) {
 	return rules, nil
 }
 
-func (n *nftablesAdapter) Operate(rule forwarding.Rule, operation forwarding.OperationType) error {
-	if operation != forwarding.OperationAdd && operation != forwarding.OperationRemove {
-		return buserr.New("ErrCmdIllegal")
-	}
-	normalized, err := normalizeNftForwardRule(rule)
-	if err != nil {
-		return err
-	}
-	rule = normalized
+func (n *nftablesAdapter) Reconcile(rules []forwarding.Rule) error {
 	if err := ensureNftForwardTables(); err != nil {
 		return fmt.Errorf("initialize nftables forwarding table: %w", err)
-	}
-	rules, err := n.List()
-	if err != nil {
-		return err
-	}
-	previous := append([]forwarding.Rule(nil), rules...)
-	if operation == forwarding.OperationAdd {
-		rules = append(rules, rule)
-	} else {
-		filtered := rules[:0]
-		for _, candidate := range rules {
-			if (candidate.Family == rule.Family && candidate.Num == rule.Num) || nftForwardRuleMatches(candidate, rule) {
-				continue
-			}
-			filtered = append(filtered, candidate)
-		}
-		rules = filtered
 	}
 	commands, err := rebuildNftForwardCommands(rules)
 	if err != nil {
 		return err
 	}
-	rollbackCommands, err := rebuildNftForwardCommands(previous)
-	if err != nil {
-		return err
-	}
-	if err := nftRunCommands(commands); err != nil {
-		return n.compensate(rollbackCommands, err)
-	}
-	if err := n.persist(); err != nil {
-		return n.compensate(rollbackCommands, err)
-	}
-	return nil
-}
-
-func (n *nftablesAdapter) compensate(rollbackCommands [][]string, cause error) error {
-	if err := nftRunCommands(rollbackCommands); err != nil {
-		return errors.Join(cause, fmt.Errorf("restore previous nftables forwarding rules: %w", err))
-	}
-	if err := n.persist(); err != nil {
-		return errors.Join(cause, fmt.Errorf("persist restored nftables forwarding rules: %w", err))
-	}
-	return cause
+	return nftRunCommands(commands)
 }
 
 func (n *nftablesAdapter) Enable() error {
@@ -123,16 +77,20 @@ func (n *nftablesAdapter) Enable() error {
 	if err := ensureNftForwardTables(); err != nil {
 		return fmt.Errorf("initialize nftables forwarding table: %w", err)
 	}
-	return n.persist()
+	return nil
 }
 
 func (n *nftablesAdapter) Cleanup() error {
+	commands := make([][]string, 0, 2)
 	for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
 		tableFamily := nftTableFamily(family)
 		if _, err := nftRun("list", "table", tableFamily, nftForwardTable); err != nil {
 			continue
 		}
-		if err := nftRunCommand("delete", "table", tableFamily, nftForwardTable); err != nil {
+		commands = append(commands, []string{"delete", "table", tableFamily, nftForwardTable})
+	}
+	if len(commands) > 0 {
+		if err := nftRunCommands(commands); err != nil {
 			return err
 		}
 	}
@@ -189,79 +147,38 @@ func (n *nftablesAdapter) Replay() error {
 	return nftRunCommand("-f", file)
 }
 
-func (n *nftablesAdapter) persist() error {
-	var outputs []string
-	for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
-		stdout, err := nftRun("list", "table", nftTableFamily(family), nftForwardTable)
-		if err != nil {
-			return err
-		}
-		outputs = append(outputs, stdout)
-	}
-	target := filepath.Join(global.Dir.FirewallDir, nftForwardFile)
-	temporary, err := os.CreateTemp(global.Dir.FirewallDir, ".1panel-forward-nft-*")
-	if err != nil {
-		return err
-	}
-	name := temporary.Name()
-	committed := false
-	defer func() {
-		_ = temporary.Close()
-		if !committed {
-			_ = os.Remove(name)
-		}
-	}()
-	if _, err := temporary.WriteString(strings.Join(outputs, "\n")); err != nil {
-		return err
-	}
-	if err := temporary.Sync(); err != nil {
-		return err
-	}
-	if err := temporary.Close(); err != nil {
-		return err
-	}
-	if err := os.Rename(name, target); err != nil {
-		return err
-	}
-	committed = true
-	return nil
-}
-
 func ensureNftForwardTables() error {
+	commands := make([][]string, 0, 8)
 	for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
-		if err := ensureNftForwardTable(family); err != nil {
-			return err
+		tableFamily := nftTableFamily(family)
+		tableExists := true
+		if _, err := nftRun("list", "table", tableFamily, nftForwardTable); err != nil {
+			tableExists = false
+			commands = append(commands, []string{"add", "table", tableFamily, nftForwardTable})
+		}
+		chains := []struct {
+			name, chainType, hook, priority string
+		}{
+			{nftForwardChain(forwarding.ChainPreRouting), "nat", "prerouting", "dstnat"},
+			{nftForwardChain(forwarding.ChainPostRouting), "nat", "postrouting", "srcnat"},
+			{nftForwardChain(forwarding.ChainForward), "filter", "forward", "filter"},
+		}
+		for _, chain := range chains {
+			if tableExists {
+				if _, err := nftRun("list", "chain", tableFamily, nftForwardTable, chain.name); err == nil {
+					continue
+				}
+			}
+			commands = append(commands, []string{
+				"add", "chain", tableFamily, nftForwardTable, chain.name,
+				"{", "type", chain.chainType, "hook", chain.hook, "priority", chain.priority, ";", "policy", "accept", ";", "}",
+			})
 		}
 	}
-	return nil
-}
-
-func ensureNftForwardTable(family string) error {
-	tableFamily := nftTableFamily(family)
-	if _, err := nftRun("list", "table", tableFamily, nftForwardTable); err != nil {
-		if err := nftRunCommand("add", "table", tableFamily, nftForwardTable); err != nil {
-			return err
-		}
+	if len(commands) == 0 {
+		return nil
 	}
-	chains := []struct {
-		name, chainType, hook, priority string
-	}{
-		{nftForwardChain(forwarding.ChainPreRouting), "nat", "prerouting", "dstnat"},
-		{nftForwardChain(forwarding.ChainPostRouting), "nat", "postrouting", "srcnat"},
-		{nftForwardChain(forwarding.ChainForward), "filter", "forward", "filter"},
-	}
-	for _, chain := range chains {
-		if _, err := nftRun("list", "chain", tableFamily, nftForwardTable, chain.name); err == nil {
-			continue
-		}
-		if err := nftRunCommand(
-			"add", "chain", tableFamily, nftForwardTable, chain.name,
-			"{", "type", chain.chainType, "hook", chain.hook, "priority", chain.priority, ";", "policy", "accept", ";", "}",
-		); err != nil {
-			return err
-		}
-	}
-	return nil
+	return nftRunCommands(commands)
 }
 
 func rebuildNftForwardCommands(rules []forwarding.Rule) ([][]string, error) {
@@ -319,10 +236,10 @@ func nftAddressKeyword(family string) string {
 }
 
 func normalizeNftForwardRule(rule forwarding.Rule) (forwarding.Rule, error) {
-	return normalizeForwardRule(rule)
+	return NormalizeRule(rule)
 }
 
-func normalizeForwardRule(rule forwarding.Rule) (forwarding.Rule, error) {
+func NormalizeRule(rule forwarding.Rule) (forwarding.Rule, error) {
 	rule.Family = strings.ToLower(strings.TrimSpace(rule.Family))
 	if rule.Family == "" {
 		rule.Family = forwarding.FamilyIPv4
@@ -365,6 +282,10 @@ func normalizeForwardRule(rule forwarding.Rule) (forwarding.Rule, error) {
 		return forwarding.Rule{}, fmt.Errorf("invalid forwarding interface %q", rule.Interface)
 	}
 	return rule, nil
+}
+
+func normalizeForwardRule(rule forwarding.Rule) (forwarding.Rule, error) {
+	return NormalizeRule(rule)
 }
 
 func normalizeForwardPort(value string) (string, error) {
@@ -443,11 +364,6 @@ func nftForwardChain(logical string) string {
 	return "NFT_" + logical
 }
 
-func nftForwardRuleMatches(left, right forwarding.Rule) bool {
-	return left.Family == right.Family && left.Protocol == right.Protocol && left.Port == right.Port && left.TargetIP == right.TargetIP &&
-		left.TargetPort == right.TargetPort && left.Interface == right.Interface
-}
-
 func nftRun(args ...string) (string, error) {
 	return cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout("nft", args...)
 }
@@ -457,10 +373,27 @@ func nftRunCommand(args ...string) error {
 }
 
 func nftRunCommands(commands [][]string) error {
-	for _, args := range commands {
-		if err := nftRunCommand(args...); err != nil {
-			return err
-		}
+	script, err := nftCommandsScript(commands)
+	if err != nil {
+		return err
 	}
-	return nil
+	manager := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second), cmd.WithStdin(strings.NewReader(script)))
+	return manager.RunWithOptionalSudo("nft", "-f", "-")
+}
+
+func nftCommandsScript(commands [][]string) (string, error) {
+	var script strings.Builder
+	for _, args := range commands {
+		if len(args) == 0 {
+			return "", fmt.Errorf("empty nftables command")
+		}
+		for _, token := range args {
+			if strings.ContainsAny(token, "\r\n") {
+				return "", fmt.Errorf("invalid newline in nftables command token")
+			}
+		}
+		script.WriteString(strings.Join(args, " "))
+		script.WriteByte('\n')
+	}
+	return script.String(), nil
 }

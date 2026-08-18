@@ -32,7 +32,7 @@ func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 		Scopes: []filter.ScopePattern{{
 			Provider: filter.ProviderNftables, Families: []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}, Table: "filter",
 			Chains: []string{"1PANEL_BASIC_BEFORE", "1PANEL_BASIC", "1PANEL_BASIC_AFTER"}, Directions: []filter.Direction{filter.DirectionInput},
-		}}, Marker: true, AtomicApply: false, TransactionalRollback: true, OwnedChains: true, ExplicitPosition: true,
+		}}, Marker: true, AtomicApply: true, TransactionalRollback: true, OwnedChains: true, ExplicitPosition: true,
 	}, nil
 }
 
@@ -58,22 +58,45 @@ func (a *Adapter) Compile(snapshot filter.Snapshot, changes []filter.DesiredChan
 	if err := validateScope(snapshot.Scope); err != nil {
 		return filter.BackendPlan{}, err
 	}
-	if len(changes) != 1 {
-		return filter.BackendPlan{}, fmt.Errorf("%w: nftables plans currently require exactly one change", filter.ErrInvalidRule)
+	if len(changes) == 0 {
+		return filter.BackendPlan{}, fmt.Errorf("%w: nftables plan requires at least one change", filter.ErrInvalidRule)
 	}
-	rules, expected, previous, err := applyChange(snapshot, changes[0])
+	if len(changes) > 1 && changes[0].Operation != filter.ChangeCreate && changes[0].Operation != filter.ChangeDelete {
+		return filter.BackendPlan{}, fmt.Errorf("%w: nftables batch plans only support create or delete operations", filter.ErrInvalidRule)
+	}
+
+	operation := changes[0].Operation
+	current := snapshot
+	plan := filter.BackendPlan{
+		Provider: filter.ProviderNftables, Scope: snapshot.Scope, SnapshotRevision: snapshot.Revision,
+		Rules: make([]filter.NativeRulePlan, 0, len(changes)),
+	}
+	for _, change := range changes {
+		if len(changes) > 1 && change.Operation != operation {
+			return filter.BackendPlan{}, fmt.Errorf("%w: nftables batch plan operations must be homogeneous", filter.ErrInvalidRule)
+		}
+		rules, expected, previous, err := applyChange(current, change)
+		if err != nil {
+			return filter.BackendPlan{}, err
+		}
+		plan.Rules = append(plan.Rules, filter.NativeRulePlan{
+			RuleUUID: ruleUUID(change), Operation: change.Operation, Previous: previous, Expected: expected,
+		})
+		current, err = filter.NewSnapshot(snapshot.Scope, rules)
+		if err != nil {
+			return filter.BackendPlan{}, err
+		}
+	}
+	applyCommand, err := rebuildCommand(snapshot.Scope, current.Rules)
 	if err != nil {
 		return filter.BackendPlan{}, err
 	}
-	chain := nativeChainName(snapshot.Scope)
-	commands := rebuildCommands(snapshot.Scope, chain, rules)
-	rollbackCommands := rebuildCommands(snapshot.Scope, chain, snapshot.Rules)
-	plan := filter.BackendPlan{Provider: filter.ProviderNftables, Scope: snapshot.Scope, SnapshotRevision: snapshot.Revision}
-	plan.Rules = []filter.NativeRulePlan{{
-		RuleUUID: ruleUUID(changes[0]), Operation: changes[0].Operation, Previous: previous, Expected: expected,
-		Commands:         commands,
-		RollbackCommands: rollbackCommands,
-	}}
+	rollbackCommand, err := rebuildCommand(snapshot.Scope, snapshot.Rules)
+	if err != nil {
+		return filter.BackendPlan{}, err
+	}
+	plan.Rules[0].Commands = []filter.NativeCommand{applyCommand}
+	plan.Rules[0].RollbackCommands = []filter.NativeCommand{rollbackCommand}
 	return plan, nil
 }
 
@@ -81,20 +104,28 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 	if err := validatePlan(plan); err != nil {
 		return filter.ApplyResult{}, err
 	}
-	for _, command := range plan.Rules[0].Commands {
-		if err := validateNativeCommand(command); err != nil {
-			return filter.ApplyResult{}, err
+	for _, rulePlan := range plan.Rules {
+		for _, command := range rulePlan.Commands {
+			if err := validateNativeCommand(command); err != nil {
+				return filter.ApplyResult{}, err
+			}
 		}
 	}
-	for _, command := range plan.Rules[0].Commands {
-		if err := a.backend.Run(ctx, command); err != nil {
-			return filter.ApplyResult{}, a.compensate(ctx, plan, err)
+	for _, rulePlan := range plan.Rules {
+		for _, command := range rulePlan.Commands {
+			if err := a.backend.Run(ctx, command); err != nil {
+				return filter.ApplyResult{}, a.compensate(ctx, plan, err)
+			}
 		}
 	}
 	if err := a.backend.Save(ctx); err != nil {
 		return filter.ApplyResult{}, a.compensate(ctx, plan, err)
 	}
-	return filter.ApplyResult{Applied: []filter.ObservedRule{plan.Rules[0].Expected}}, nil
+	applied := make([]filter.ObservedRule, 0, len(plan.Rules))
+	for _, rulePlan := range plan.Rules {
+		applied = append(applied, rulePlan.Expected)
+	}
+	return filter.ApplyResult{Applied: applied}, nil
 }
 
 func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.VerifyResult, error) {
@@ -105,40 +136,45 @@ func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.V
 	if err != nil {
 		return filter.VerifyResult{}, err
 	}
-	expected := plan.Rules[0]
-	matches := 0
-	for _, observed := range snapshot.Rules {
-		if observed.Marker == expected.Expected.Marker {
-			if expected.Operation == filter.ChangeDelete {
-				matches++
-				continue
-			}
-			want, wantErr := filter.RuleKey(expected.Expected.Rule)
-			got, gotErr := filter.RuleKey(observed.Rule)
-			if wantErr == nil && gotErr == nil && want == got {
-				matches++
+	for _, expected := range plan.Rules {
+		matches := 0
+		for _, observed := range snapshot.Rules {
+			if observed.Marker == expected.Expected.Marker {
+				if expected.Operation == filter.ChangeDelete {
+					matches++
+					continue
+				}
+				want, wantErr := filter.RuleKey(expected.Expected.Rule)
+				got, gotErr := filter.RuleKey(observed.Rule)
+				if wantErr == nil && gotErr == nil && want == got {
+					matches++
+				}
 			}
 		}
+		if (expected.Operation == filter.ChangeDelete && matches != 0) ||
+			(expected.Operation != filter.ChangeDelete && matches != 1) {
+			return filter.VerifyResult{Snapshot: snapshot, Matched: false}, nil
+		}
 	}
-	matched := matches == 1
-	if expected.Operation == filter.ChangeDelete {
-		matched = matches == 0
-	}
-	return filter.VerifyResult{Snapshot: snapshot, Matched: matched}, nil
+	return filter.VerifyResult{Snapshot: snapshot, Matched: true}, nil
 }
 
 func (a *Adapter) Rollback(ctx context.Context, plan filter.BackendPlan) error {
 	if err := validatePlan(plan); err != nil {
 		return err
 	}
-	for _, command := range plan.Rules[0].RollbackCommands {
-		if err := validateNativeCommand(command); err != nil {
-			return err
+	for _, rulePlan := range plan.Rules {
+		for _, command := range rulePlan.RollbackCommands {
+			if err := validateNativeCommand(command); err != nil {
+				return err
+			}
 		}
 	}
-	for _, command := range plan.Rules[0].RollbackCommands {
-		if err := a.backend.Run(ctx, command); err != nil {
-			return err
+	for _, rulePlan := range plan.Rules {
+		for _, command := range rulePlan.RollbackCommands {
+			if err := a.backend.Run(ctx, command); err != nil {
+				return err
+			}
 		}
 	}
 	return a.backend.Save(ctx)
@@ -176,14 +212,14 @@ func nativeChainName(scope filter.Scope) string {
 }
 
 func validatePlan(plan filter.BackendPlan) error {
-	if plan.Provider != filter.ProviderNftables || len(plan.Rules) != 1 {
+	if plan.Provider != filter.ProviderNftables || len(plan.Rules) == 0 {
 		return fmt.Errorf("%w: invalid nftables plan", filter.ErrInvalidRule)
 	}
 	return validateScope(plan.Scope)
 }
 
 func validateNativeCommand(command filter.NativeCommand) error {
-	if command.Executable != "nft" || len(command.Args) == 0 {
+	if command.Executable != "nft" || len(command.Args) != 2 || command.Args[0] != "-f" || command.Args[1] != "-" || command.Stdin == "" {
 		return fmt.Errorf("%w: invalid nftables native command", filter.ErrInvalidRule)
 	}
 	return nil
@@ -288,26 +324,37 @@ func broadDeny(rule filter.FirewallRule) bool {
 		rule.DestinationAddress == "" && rule.SourcePort == "" && rule.DestinationPort == ""
 }
 
-func rebuildCommands(scope filter.Scope, chain string, rules []filter.ObservedRule) []filter.NativeCommand {
+func rebuildCommand(scope filter.Scope, rules []filter.ObservedRule) (filter.NativeCommand, error) {
 	tableFamily := nftables_helper.TableFamily(scope.Family)
-	commands := []filter.NativeCommand{{
-		Executable: "nft", Args: []string{"flush", "chain", tableFamily, nftables_helper.TableName, chain},
-	}}
+	chain := nativeChainName(scope)
+	var script strings.Builder
+	script.WriteString("flush chain ")
+	script.WriteString(tableFamily)
+	script.WriteByte(' ')
+	script.WriteString(nftables_helper.TableName)
+	script.WriteByte(' ')
+	script.WriteString(chain)
+	script.WriteByte('\n')
 	for _, rule := range rules {
 		raw := strings.TrimSpace(rule.Raw)
 		if rule.ParseStatus == filter.ParseStatusSupported && rule.Marker != "" {
-			args := []string{"add", "rule", tableFamily, nftables_helper.TableName, chain}
-			args = append(args, compileExpressionArgs(rule.Rule, rule.Marker)...)
-			commands = append(commands, filter.NativeCommand{Executable: "nft", Args: args})
+			script.WriteString(strings.Join([]string{"add", "rule", tableFamily, nftables_helper.TableName, chain}, " "))
+			script.WriteByte(' ')
+			script.WriteString(strings.Join(compileExpressionArgs(rule.Rule, rule.Marker), " "))
+			script.WriteByte('\n')
 			continue
 		}
 		if raw != "" {
-			commands = append(commands, filter.NativeCommand{
-				Executable: "nft", Args: []string{"add", "rule", tableFamily, nftables_helper.TableName, chain, raw},
-			})
+			if strings.ContainsAny(raw, "\r\n") {
+				return filter.NativeCommand{}, fmt.Errorf("%w: invalid newline in native nftables rule", filter.ErrInvalidRule)
+			}
+			script.WriteString(strings.Join([]string{"add", "rule", tableFamily, nftables_helper.TableName, chain}, " "))
+			script.WriteByte(' ')
+			script.WriteString(raw)
+			script.WriteByte('\n')
 		}
 	}
-	return commands
+	return filter.NativeCommand{Executable: "nft", Args: []string{"-f", "-"}, Stdin: script.String()}, nil
 }
 
 func compileExpressionArgs(rule filter.FirewallRule, marker string) []string {
@@ -498,7 +545,11 @@ func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) erro
 	if command.Executable != "nft" {
 		return fmt.Errorf("unexpected nftables executable %q", command.Executable)
 	}
-	return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second)).RunWithOptionalSudo(command.Executable, command.Args...)
+	options := []cmd.Option{cmd.WithContext(ctx), cmd.WithTimeout(60 * time.Second)}
+	if command.Stdin != "" {
+		options = append(options, cmd.WithStdin(strings.NewReader(command.Stdin)))
+	}
+	return cmd.NewCommandMgr(options...).RunWithOptionalSudo(command.Executable, command.Args...)
 }
 
 func (systemBackend) Save(ctx context.Context) error {

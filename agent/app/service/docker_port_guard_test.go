@@ -1,13 +1,90 @@
 package service
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
+	"github.com/glebarez/sqlite"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
+
+type persistentDockerGuardRuntime struct {
+	initialized bool
+	initialize  int
+	bind        int
+	unbind      int
+	policies    []docker_guard.Policy
+}
+
+func (r *persistentDockerGuardRuntime) Initialize(policies []docker_guard.Policy) error {
+	r.initialize++
+	r.initialized = true
+	r.policies = append([]docker_guard.Policy(nil), policies...)
+	return nil
+}
+
+func (r *persistentDockerGuardRuntime) Bind() error {
+	r.bind++
+	r.initialized = true
+	return nil
+}
+
+func (r *persistentDockerGuardRuntime) Reconcile(policies []docker_guard.Policy) error {
+	r.policies = append([]docker_guard.Policy(nil), policies...)
+	return nil
+}
+
+func (r *persistentDockerGuardRuntime) Unbind() error {
+	r.unbind++
+	return nil
+}
+
+func (r *persistentDockerGuardRuntime) Cleanup() error { return nil }
+
+func (r *persistentDockerGuardRuntime) Initialized(string) (bool, error) {
+	return r.initialized, nil
+}
+
+func (r *persistentDockerGuardRuntime) Status(string) docker_guard.FamilyStatus {
+	return docker_guard.FamilyStatus{Initialized: r.initialized, Bound: r.initialized, Effective: r.initialized}
+}
+
+type persistentDockerGuardPolicies struct{ items []model.DockerPortGuardPolicy }
+
+func (r *persistentDockerGuardPolicies) List(context.Context) ([]model.DockerPortGuardPolicy, error) {
+	return append([]model.DockerPortGuardPolicy(nil), r.items...), nil
+}
+
+func (r *persistentDockerGuardPolicies) DeleteBatch(context.Context, []string) error { return nil }
+
+func (r *persistentDockerGuardPolicies) UpsertBatch(context.Context, []model.DockerPortGuardPolicy) error {
+	return nil
+}
+
+func setupDockerGuardSettingsDB(t *testing.T) {
+	t.Helper()
+	previousDB := global.DB
+	dsn := fmt.Sprintf("file:%s?mode=memory&cache=shared", uuid.NewString())
+	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
+	if err != nil {
+		t.Fatalf("open settings database: %v", err)
+	}
+	if err := db.AutoMigrate(&model.Setting{}); err != nil {
+		t.Fatalf("migrate settings database: %v", err)
+	}
+	global.DB = db
+	t.Cleanup(func() { global.DB = previousDB })
+}
 
 func TestNormalizeDockerPortGuardPolicy(t *testing.T) {
 	policy, sources, err := normalizeGuardPolicy("ipv4", "0.0.0.0", 8080, "TCP", "deny_sources", []string{"203.0.113.10", "192.0.2.7/24", "203.0.113.10/32"})
@@ -36,8 +113,8 @@ func TestNormalizeDockerPortGuardPolicyRejectsInvalidSources(t *testing.T) {
 		{name: "mixed host family", family: "ipv6", hostIP: "0.0.0.0", mode: "deny_all"},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			if _, _, err := normalizeGuardPolicy(test.family, test.hostIP, 80, "tcp", test.mode, test.sources); err == nil {
-				t.Fatal("expected validation error")
+			if _, _, err := normalizeGuardPolicy(test.family, test.hostIP, 80, "tcp", test.mode, test.sources); !errors.Is(err, ErrDockerGuardInvalid) {
+				t.Fatalf("expected typed validation error, got %v", err)
 			}
 		})
 	}
@@ -154,5 +231,71 @@ func TestDockerGuardRuntimeMatchesDockerBackend(t *testing.T) {
 	}
 	if _, ok := service.guardRuntime("nftables").(*docker_guard.NftablesManager); !ok {
 		t.Fatal("nftables backend did not select the nftables Docker guard runtime")
+	}
+}
+
+func TestDockerGuardInitializeAndUnbindPersistStatus(t *testing.T) {
+	setupDockerGuardSettingsDB(t)
+	runtime := &persistentDockerGuardRuntime{}
+	service := &DockerPortGuardService{
+		policies: &persistentDockerGuardPolicies{},
+		runtime:  runtime,
+	}
+	if err := service.Operate(context.Background(), dto.DockerPortGuardOperation{Operation: "initialize"}); err != nil {
+		t.Fatalf("initialize Docker port guard: %v", err)
+	}
+	status, err := settingRepo.GetValueByKey(settingDockerPortGuardStatus)
+	if err != nil || status != constant.StatusEnable {
+		t.Fatalf("persisted status = %q, %v; want %q", status, err, constant.StatusEnable)
+	}
+	if runtime.initialize != 1 {
+		t.Fatalf("initialize calls = %d, want 1", runtime.initialize)
+	}
+
+	if err := service.Operate(context.Background(), dto.DockerPortGuardOperation{Operation: "unbind"}); err != nil {
+		t.Fatalf("unbind Docker port guard: %v", err)
+	}
+	status, err = settingRepo.GetValueByKey(settingDockerPortGuardStatus)
+	if err != nil || status != constant.StatusDisable {
+		t.Fatalf("persisted status = %q, %v; want %q", status, err, constant.StatusDisable)
+	}
+}
+
+func TestDockerGuardReconcileRestoresPersistedInitialization(t *testing.T) {
+	setupDockerGuardSettingsDB(t)
+	if err := settingRepo.UpdateOrCreate(settingDockerPortGuardStatus, constant.StatusEnable); err != nil {
+		t.Fatal(err)
+	}
+	runtime := &persistentDockerGuardRuntime{}
+	service := &DockerPortGuardService{
+		policies: &persistentDockerGuardPolicies{items: []model.DockerPortGuardPolicy{{
+			UUID: "policy-1", Family: docker_guard.FamilyIPv4, HostIP: "0.0.0.0",
+			HostPort: 8080, Protocol: "tcp", Mode: docker_guard.ModeAll, Sources: "[]",
+		}}},
+		runtime: runtime,
+	}
+	if err := service.Reconcile(context.Background()); err != nil {
+		t.Fatalf("restore Docker port guard: %v", err)
+	}
+	if runtime.initialize != 1 || !runtime.initialized {
+		t.Fatalf("runtime was not initialized: %#v", runtime)
+	}
+	if len(runtime.policies) != 1 || runtime.policies[0].UUID != "policy-1" {
+		t.Fatalf("restored policies = %#v", runtime.policies)
+	}
+}
+
+func TestDockerGuardReconcileLeavesDisabledGuardUninitialized(t *testing.T) {
+	setupDockerGuardSettingsDB(t)
+	if err := settingRepo.UpdateOrCreate(settingDockerPortGuardStatus, constant.StatusDisable); err != nil {
+		t.Fatal(err)
+	}
+	runtime := &persistentDockerGuardRuntime{}
+	service := &DockerPortGuardService{policies: &persistentDockerGuardPolicies{}, runtime: runtime}
+	if err := service.Reconcile(context.Background()); err != nil {
+		t.Fatalf("reconcile disabled Docker port guard: %v", err)
+	}
+	if runtime.initialize != 0 || runtime.initialized {
+		t.Fatalf("disabled guard was initialized: %#v", runtime)
 	}
 }

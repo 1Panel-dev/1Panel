@@ -32,6 +32,10 @@ export const deleteFirewallRule = (uuid: string) => {
     });
 };
 
+export const deleteFirewallRulesBatch = (request: Firewall.BatchDeleteRequest) => {
+    return http.post<Firewall.BatchDeleteResponse>('/hosts/firewall/rules/delete/batch', request, TimeoutEnum.T_10M);
+};
+
 export const updateFirewallRule = (uuid: string, request: Firewall.UpdateRequest) => {
     return http.put(`/hosts/firewall/rules/${encodeURIComponent(uuid)}`, request, {
         timeout: TimeoutEnum.T_60S,

@@ -1687,13 +1687,16 @@ var AddComposePinned = &gormigrate.Migration{
 var AddFirewallRuleTable = &gormigrate.Migration{
 	ID: "20260804-add-firewall-v2-tables",
 	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.FirewallRule{})
+		return tx.AutoMigrate(&model.FirewallRule{}, &model.DockerPortGuardPolicy{}, &model.ForwardingRule{})
 	},
 }
 
-var AddDockerPortGuard = &gormigrate.Migration{
-	ID: "20260812-add-docker-port-guard",
+var InitDockerPortGuardStatus = &gormigrate.Migration{
+	ID: "20260818-init-docker-port-guard-status",
 	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.DockerPortGuardPolicy{})
+		return tx.Where("key = ?", "DockerPortGuardStatus").FirstOrCreate(&model.Setting{
+			Key:   "DockerPortGuardStatus",
+			Value: constant.StatusDisable,
+		}).Error
 	},
 }

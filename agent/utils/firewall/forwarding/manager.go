@@ -2,20 +2,11 @@ package forwarding
 
 import (
 	"errors"
-	"sort"
-	"strconv"
 	"strings"
 	"sync"
-
-	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
 var ErrRuleExists = errors.New("forwarding rule already exists")
-
-type Operation struct {
-	Rule
-	Operation OperationType
-}
 
 type Status struct {
 	Name     string
@@ -82,75 +73,9 @@ func (m *Manager) List(info, strategy string) ([]Rule, error) {
 	return filtered, nil
 }
 
-func (m *Manager) Operate(operations []Operation, forceDelete bool) error {
-	rules, err := m.adapter.List()
-	if err != nil {
-		return err
-	}
-	kept := rules[:0]
-	for _, rule := range rules {
-		shouldKeep := true
-		for index := range operations {
-			operation := &operations[index]
-			if operation.Family == "" {
-				operation.Family = FamilyIPv4
-			}
-			if operation.TargetIP == "" {
-				operation.TargetIP = loopbackAddress(operation.Family)
-			}
-			if operation.Operation == OperationRemove && matches(*operation, rule) {
-				shouldKeep = false
-				break
-			}
-		}
-		if shouldKeep {
-			kept = append(kept, rule)
-		}
-	}
-	for _, rule := range kept {
-		for _, operation := range operations {
-			if operation.Operation != OperationRemove && matches(operation, rule) {
-				return ErrRuleExists
-			}
-		}
-	}
-
-	sort.SliceStable(operations, func(i, j int) bool {
-		if operations[i].Operation == OperationRemove && operations[j].Operation != OperationRemove {
-			return true
-		}
-		if operations[i].Operation != OperationRemove && operations[j].Operation == OperationRemove {
-			return false
-		}
-		left, _ := strconv.Atoi(operations[i].Num)
-		right, _ := strconv.Atoi(operations[j].Num)
-		return left > right
-	})
-	for _, operation := range operations {
-		if operation.Family == "" {
-			operation.Family = FamilyIPv4
-		}
-		if operation.TargetIP == "" {
-			operation.TargetIP = loopbackAddress(operation.Family)
-		}
-		for _, protocol := range strings.Split(operation.Protocol, "/") {
-			rule := operation.Rule
-			rule.Protocol = protocol
-			if err := m.adapter.Operate(rule, operation.Operation); err != nil {
-				if forceDelete && operation.Operation == OperationRemove {
-					if global.LOG != nil {
-						global.LOG.Error(err)
-					}
-					continue
-				}
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 func (m *Manager) Enable() error { return m.adapter.Enable() }
+
+func (m *Manager) Reconcile(rules []Rule) error { return m.adapter.Reconcile(rules) }
 
 func (m *Manager) Cleanup() error { return m.adapter.Cleanup() }
 
@@ -161,32 +86,3 @@ func (m *Manager) FamilyStatus(family string) (bool, bool, error) {
 func (m *Manager) Replay() error { return m.adapter.Replay() }
 
 func (m *Manager) Name() string { return m.adapter.Name() }
-
-func matches(operation Operation, rule Rule) bool {
-	if operation.Family == "" {
-		operation.Family = FamilyIPv4
-	}
-	if rule.Family == "" {
-		rule.Family = FamilyIPv4
-	}
-	if operation.TargetIP == "" {
-		operation.TargetIP = loopbackAddress(operation.Family)
-	}
-	if rule.TargetIP == "" {
-		rule.TargetIP = loopbackAddress(rule.Family)
-	}
-	for _, protocol := range strings.Split(operation.Protocol, "/") {
-		if operation.Port == rule.Port && operation.TargetPort == rule.TargetPort && operation.TargetIP == rule.TargetIP &&
-			operation.Family == rule.Family && protocol == rule.Protocol && operation.Interface == rule.Interface {
-			return true
-		}
-	}
-	return false
-}
-
-func loopbackAddress(family string) string {
-	if family == FamilyIPv6 {
-		return "::1"
-	}
-	return "127.0.0.1"
-}
