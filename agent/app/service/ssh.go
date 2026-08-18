@@ -1482,14 +1482,13 @@ func parseSSHLogHeader(line string) (sshLogHeader, bool) {
 }
 
 func loadSSHLogSessionKey(header sshLogHeader, data dto.SSHHistory, line string) string {
-	if header.Process == "sshd-session" && data.Address != "" && data.Port != "" {
+	// Authentication and disconnect logs can use different sshd PIDs. The client
+	// address and port keep events from the same SSH connection associated.
+	if data.Address != "" && data.Port != "" {
 		return data.Address + ":" + data.Port
 	}
 	if header.PID != "" {
 		return "pid:" + header.PID
-	}
-	if data.Address != "" && data.Port != "" {
-		return data.Address + ":" + data.Port
 	}
 	return line
 }
