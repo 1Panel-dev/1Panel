@@ -68,9 +68,6 @@ func InstalledProviders() []string {
 	return providers
 }
 
-// NewNetfilterClients resolves all forwarding backends independently of the
-// host firewall service. Native nftables is listed first as the default for an
-// uninitialized host; callers may still prefer an already initialized backend.
 func NewNetfilterClients() ([]Client, error) {
 	clients := make([]Client, 0, 2)
 	if which("nft") {

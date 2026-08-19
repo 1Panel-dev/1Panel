@@ -1,8 +1,10 @@
 package forwarding
 
+import "github.com/1Panel-dev/1Panel/agent/constant"
+
 const (
-	FamilyIPv4 = "ipv4"
-	FamilyIPv6 = "ipv6"
+	FamilyIPv4 = constant.FirewallFamilyIPv4
+	FamilyIPv6 = constant.FirewallFamilyIPv6
 
 	ChainPreRouting  = "1PANEL_PREROUTING"
 	ChainPostRouting = "1PANEL_POSTROUTING"

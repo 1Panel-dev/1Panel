@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
@@ -38,7 +39,12 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 	for _, name := range lifecycle.InstalledProviders() {
 		installed[name] = true
 	}
-	for _, name := range []string{"firewalld", "ufw", "iptables", "nftables"} {
+	for _, name := range []string{
+		constant.FirewallProviderFirewalld,
+		constant.FirewallProviderUFW,
+		constant.FirewallProviderIptables,
+		constant.FirewallProviderNftables,
+	} {
 		option := dto.FirewallBackendOption{Name: name, Installed: installed[name], Supported: true}
 		if option.Installed {
 			client, err := lifecycle.NewClientFor(name)
@@ -47,18 +53,18 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 			} else {
 				option.Active, _ = client.Status()
 				option.Initialized, option.Bound, _ = loadFirewallInitStatus(name, "base")
-				option.IPv4.Initialized, option.IPv4.Bound, _ = loadSystemFirewallFamilyStatus(name, "ipv4")
-				option.IPv6.Initialized, option.IPv6.Bound, _ = loadSystemFirewallFamilyStatus(name, "ipv6")
+				option.IPv4.Initialized, option.IPv4.Bound, _ = loadSystemFirewallFamilyStatus(name, constant.FirewallFamilyIPv4)
+				option.IPv6.Initialized, option.IPv6.Bound, _ = loadSystemFirewallFamilyStatus(name, constant.FirewallFamilyIPv6)
 			}
 		}
-		if name == "iptables" {
+		if name == constant.FirewallProviderIptables {
 			if commands, err := lifecycle.ResolveIptablesCommands(); err == nil {
 				option.Implementation = commands.IPv4
 			}
 		}
 		result.System.Options = append(result.System.Options, option)
 	}
-	result.System.Selected, _ = settingRepo.GetValueByKey(settingSystemFirewallBackend)
+	result.System.Selected, _ = settingRepo.GetValueByKey(constant.FirewallSystemBackendKey)
 	if !installed[result.System.Selected] {
 		result.System.Selected = ""
 	}
@@ -70,7 +76,7 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 	result.System.Current = result.System.Selected
 
 	initializedForwarding := make([]string, 0, 2)
-	for _, name := range []string{"iptables", "nftables"} {
+	for _, name := range []string{constant.FirewallProviderIptables, constant.FirewallProviderNftables} {
 		option := dto.FirewallBackendOption{Name: name, Installed: installed[name], Supported: true}
 		if option.Installed {
 			manager, err := newForwardingManagerFor(name)
@@ -80,14 +86,14 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 				option.Message = err.Error()
 			} else {
 				option.Active, option.Initialized, option.Bound = status.IsActive, status.IsInit, status.IsBind
-				option.IPv4.Initialized, option.IPv4.Bound, _ = manager.FamilyStatus("ipv4")
-				option.IPv6.Initialized, option.IPv6.Bound, _ = manager.FamilyStatus("ipv6")
+				option.IPv4.Initialized, option.IPv4.Bound, _ = manager.FamilyStatus(constant.FirewallFamilyIPv4)
+				option.IPv6.Initialized, option.IPv6.Bound, _ = manager.FamilyStatus(constant.FirewallFamilyIPv6)
 			}
 		}
 		if option.IPv4.Initialized || option.IPv6.Initialized {
 			initializedForwarding = append(initializedForwarding, name)
 		}
-		if name == "iptables" {
+		if name == constant.FirewallProviderIptables {
 			if commands, err := lifecycle.ResolveIptablesCommands(); err == nil {
 				option.Implementation = commands.IPv4
 			}
@@ -99,7 +105,7 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 	} else if len(initializedForwarding) > 1 {
 		result.Forwarding.Current = strings.Join(initializedForwarding, " + ")
 	}
-	result.Forwarding.Selected, _ = settingRepo.GetValueByKey(settingForwardingBackend)
+	result.Forwarding.Selected, _ = settingRepo.GetValueByKey(constant.FirewallForwardingBackendKey)
 	if !installed[result.Forwarding.Selected] {
 		result.Forwarding.Selected = ""
 	}
@@ -126,13 +132,13 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 	}
 	result.Docker.Selected = selectedDockerFirewallBackend(detectedDockerBackend)
 	result.Docker.Current = result.Docker.Selected
-	for _, name := range []string{"iptables", "nftables"} {
+	for _, name := range []string{constant.FirewallProviderIptables, constant.FirewallProviderNftables} {
 		option := dto.FirewallBackendOption{
 			Name: name, Installed: dockerInstalled && installed[name], Supported: true,
 			Active: dockerInstalled && result.Docker.Selected == name,
 		}
 		var guard dockerGuardRuntime = docker_guard.NewManager()
-		if name == "nftables" {
+		if name == constant.FirewallProviderNftables {
 			guard = docker_guard.NewNftablesManager()
 		}
 		ipv4, ipv6 := guard.Status(docker_guard.FamilyIPv4), guard.Status(docker_guard.FamilyIPv6)
@@ -148,11 +154,11 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 
 func loadSystemFirewallFamilyStatus(provider, family string) (bool, bool, error) {
 	switch provider {
-	case "firewalld", "ufw":
+	case constant.FirewallProviderFirewalld, constant.FirewallProviderUFW:
 		return true, true, nil
-	case "iptables":
+	case constant.FirewallProviderIptables:
 		return iptables_helper.LoadFamilyInitStatus(family, "base")
-	case "nftables":
+	case constant.FirewallProviderNftables:
 		return nftables_helper.LoadFamilyInitStatus(filter.Family(family), "base")
 	default:
 		return false, false, fmt.Errorf("unsupported firewall provider %q", provider)
@@ -160,7 +166,7 @@ func loadSystemFirewallFamilyStatus(provider, family string) (bool, bool, error)
 }
 
 func (s *FirewallSettingService) Operate(ctx context.Context, request dto.FirewallBackendOperation) error {
-	if request.Subsystem != "system" && request.Backend != "iptables" && request.Backend != "nftables" {
+	if request.Subsystem != "system" && request.Backend != constant.FirewallProviderIptables && request.Backend != constant.FirewallProviderNftables {
 		return fmt.Errorf("%s only supports iptables or nftables", request.Subsystem)
 	}
 	switch request.Subsystem {
@@ -177,22 +183,22 @@ func (s *FirewallSettingService) Operate(ctx context.Context, request dto.Firewa
 
 func (s *FirewallSettingService) operateDocker(ctx context.Context, request dto.FirewallBackendOperation) error {
 	var guard dockerGuardRuntime = docker_guard.NewManager()
-	if request.Backend == "nftables" {
+	if request.Backend == constant.FirewallProviderNftables {
 		guard = docker_guard.NewNftablesManager()
 	}
 	if request.Operation == "cleanup" {
 		if err := guard.Cleanup(); err != nil {
 			return err
 		}
-		return settingRepo.UpdateOrCreate(settingDockerPortGuardStatus, constant.StatusDisable)
+		return settingRepo.UpdateOrCreate(constant.FirewallDockerPortGuardStatusKey, constant.StatusDisable)
 	}
-	previous, _ := settingRepo.GetValueByKey(settingDockerFirewallBackend)
-	if err := settingRepo.UpdateOrCreate(settingDockerFirewallBackend, request.Backend); err != nil {
+	previous, _ := settingRepo.GetValueByKey(constant.FirewallDockerBackendKey)
+	if err := settingRepo.UpdateOrCreate(constant.FirewallDockerBackendKey, request.Backend); err != nil {
 		return err
 	}
 	if request.Operation == "initialize" {
 		if err := NewIDockerPortGuardService().Operate(ctx, dto.DockerPortGuardOperation{Operation: "initialize"}); err != nil {
-			_ = settingRepo.UpdateOrCreate(settingDockerFirewallBackend, previous)
+			_ = settingRepo.UpdateOrCreate(constant.FirewallDockerBackendKey, previous)
 			return err
 		}
 	}
@@ -206,45 +212,47 @@ func (s *FirewallSettingService) operateSystem(request dto.FirewallBackendOperat
 	if request.Operation == "cleanup" {
 		return cleanupSystemBackend(request.Backend)
 	}
-	previous, _ := settingRepo.GetValueByKey(settingSystemFirewallBackend)
+	previous, _ := settingRepo.GetValueByKey(constant.FirewallSystemBackendKey)
 	if previous == "" {
 		if client, err := lifecycle.NewClient(); err == nil {
 			previous = client.Name()
 		}
 	}
-	if err := settingRepo.UpdateOrCreate(settingSystemFirewallBackend, request.Backend); err != nil {
+	if err := settingRepo.UpdateOrCreate(constant.FirewallSystemBackendKey, request.Backend); err != nil {
 		return err
 	}
 	rollback := func(err error) error {
 		if err == nil {
 			return nil
 		}
-		_ = settingRepo.UpdateOrCreate(settingSystemFirewallBackend, previous)
+		_ = settingRepo.UpdateOrCreate(constant.FirewallSystemBackendKey, previous)
 		return err
 	}
 	if request.Operation == "select" {
 		return nil
 	}
 	var initErr error
-	if request.Backend == "iptables" || request.Backend == "nftables" {
-		initErr = newFirewallService().OperateFilterChain(dto.FilterChainOperation{Name: "1PANEL_BASIC", Operate: "init-base"})
+	if request.Backend == constant.FirewallProviderIptables || request.Backend == constant.FirewallProviderNftables {
+		initErr = newFirewallService().OperateFilterChain(dto.FilterChainOperation{
+			Name: constant.FirewallBasicChain, Operate: string(firewall.BaseOperationInit),
+		})
 	} else {
 		initErr = newFirewallService().OperateFirewall(dto.FirewallLifecycleOperation{Operation: "start"})
 	}
 	if initErr != nil {
 		return rollback(initErr)
 	}
-	if request.Backend == "iptables" || request.Backend == "nftables" {
-		return settingRepo.UpdateOrCreate(settingFilterInitialized, constant.StatusEnable)
+	if request.Backend == constant.FirewallProviderIptables || request.Backend == constant.FirewallProviderNftables {
+		return settingRepo.UpdateOrCreate(constant.FirewallFilterInitializedKey, constant.StatusEnable)
 	}
 	return nil
 }
 
 func cleanupSystemBackend(backend string) error {
 	switch backend {
-	case "iptables":
+	case constant.FirewallProviderIptables:
 		return newIptablesHelperManager().Cleanup()
-	case "nftables":
+	case constant.FirewallProviderNftables:
 		return newNftablesHelperManager().Cleanup()
 	default:
 		return fmt.Errorf("cleanup is only available for 1Panel-owned iptables and nftables resources")
@@ -260,13 +268,13 @@ func (s *FirewallSettingService) operateForwarding(request dto.FirewallBackendOp
 		if err := manager.Cleanup(); err != nil {
 			return err
 		}
-		if err := settingRepo.UpdateOrCreate(settingForwardingInitialized, constant.StatusDisable); err != nil {
+		if err := settingRepo.UpdateOrCreate(constant.FirewallForwardingInitializedKey, constant.StatusDisable); err != nil {
 			return err
 		}
 		recordForwardingSyncError(nil)
 		return nil
 	}
-	if err := settingRepo.UpdateOrCreate(settingForwardingBackend, request.Backend); err != nil {
+	if err := settingRepo.UpdateOrCreate(constant.FirewallForwardingBackendKey, request.Backend); err != nil {
 		return err
 	}
 	if request.Operation == "initialize" {

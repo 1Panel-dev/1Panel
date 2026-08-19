@@ -159,7 +159,9 @@ func rejectLegacyOnePanelChains() error {
 
 func activeLegacyChain(output string) string {
 	legacy := map[string]struct{}{
-		"1PANEL_BASIC_BEFORE": {}, "1PANEL_BASIC": {}, "1PANEL_BASIC_AFTER": {},
+		constant.FirewallBasicBeforeChain: {},
+		constant.FirewallBasicChain:       {},
+		constant.FirewallBasicAfterChain:  {},
 	}
 	for _, line := range strings.Split(output, "\n") {
 		fields := strings.Fields(line)

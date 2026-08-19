@@ -206,20 +206,20 @@ export namespace Firewall {
         permanent: boolean;
     }
 
-    export interface CheckRequest {
+    export interface CheckItem {
         uuid?: string;
         rule: Rule;
     }
 
-    export interface BatchCheckRequest {
-        rules: Rule[];
+    export interface CheckRequest {
+        items: CheckItem[];
     }
 
-    export interface BatchCheckResponse {
+    export interface CheckResponse {
         items: RuleCheckResult[];
     }
 
-    export interface CreateRequest {
+    export interface CreateItem {
         rule: Rule;
         checkFlag: string;
         action: ApplicableCheckAction;
@@ -228,35 +228,35 @@ export namespace Firewall {
         sourceID?: string;
     }
 
-    export interface BatchCreateRequest {
-        items: CreateRequest[];
+    export interface CreateRequest {
+        items: CreateItem[];
     }
 
-    export interface BatchCreateResponse {
+    export interface CreateResponse {
         succeeded: number;
         failed: number;
         skipped: number;
-        errors?: BatchCreateFailure[];
+        errors?: CreateFailure[];
     }
 
-    export interface BatchCreateFailure {
+    export interface CreateFailure {
         index: number;
         status: 'failed' | 'skipped';
         rule: Rule;
         error?: string;
     }
 
-    export interface BatchDeleteRequest {
+    export interface DeleteRequest {
         uuids: string[];
     }
 
-    export interface BatchDeleteResponse {
+    export interface DeleteResponse {
         succeeded: number;
         failed: number;
-        errors?: BatchDeleteFailure[];
+        errors?: DeleteFailure[];
     }
 
-    export interface BatchDeleteFailure {
+    export interface DeleteFailure {
         index: number;
         uuid: string;
         error: string;
@@ -271,7 +271,6 @@ export namespace Firewall {
         priority?: number;
     }
 
-    // Docker bridge published-port protection (DOCKER-USER).
     export interface DockerGuardBase {
         name: string;
         initialized: boolean;

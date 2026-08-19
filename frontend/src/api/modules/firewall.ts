@@ -31,28 +31,16 @@ export const loadFirewallNativeDetail = (request: Firewall.NativeDetailRequest) 
     return http.post<string>('/hosts/firewall/rules/native/detail', request, TimeoutEnum.T_40S);
 };
 
-export const checkFirewallRule = (request: Firewall.CheckRequest) => {
-    return http.post<Firewall.RuleCheckResult>('/hosts/firewall/rules/check', request, TimeoutEnum.T_40S);
+export const checkFirewallRules = (request: Firewall.CheckRequest) => {
+    return http.post<Firewall.CheckResponse>('/hosts/firewall/rules/check', request, TimeoutEnum.T_3M);
 };
 
-export const checkFirewallRulesBatch = (request: Firewall.BatchCheckRequest) => {
-    return http.post<Firewall.BatchCheckResponse>('/hosts/firewall/rules/check/batch', request, TimeoutEnum.T_3M);
+export const createFirewallRules = (request: Firewall.CreateRequest) => {
+    return http.post<Firewall.CreateResponse>('/hosts/firewall/rules', request, TimeoutEnum.T_10M);
 };
 
-export const createFirewallRule = (request: Firewall.CreateRequest) => {
-    return http.post('/hosts/firewall/rules', request, TimeoutEnum.T_60S);
-};
-
-export const createFirewallRulesBatch = (request: Firewall.BatchCreateRequest) => {
-    return http.post<Firewall.BatchCreateResponse>('/hosts/firewall/rules/batch', request, TimeoutEnum.T_10M);
-};
-
-export const deleteFirewallRule = (uuid: string) => {
-    return http.post('/hosts/firewall/rules/delete', { uuid }, TimeoutEnum.T_60S);
-};
-
-export const deleteFirewallRulesBatch = (request: Firewall.BatchDeleteRequest) => {
-    return http.post<Firewall.BatchDeleteResponse>('/hosts/firewall/rules/delete/batch', request, TimeoutEnum.T_10M);
+export const deleteFirewallRules = (request: Firewall.DeleteRequest) => {
+    return http.post<Firewall.DeleteResponse>('/hosts/firewall/rules/delete', request, TimeoutEnum.T_10M);
 };
 
 export const updateFirewallRule = (uuid: string, request: Firewall.UpdateRequest) => {

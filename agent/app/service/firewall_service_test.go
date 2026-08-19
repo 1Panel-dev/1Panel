@@ -44,7 +44,7 @@ func TestFirewallRuleServiceCheckCreateInventoryWorkflow(t *testing.T) {
 		t.Fatalf("scope notices were not returned: %#v", before.Notices)
 	}
 	adapter.snapshot.Notices = nil
-	check, err := service.Check(ctx, "", dto.FirewallRuleCheck{Rule: rule})
+	check, err := service.checkRule(ctx, "", dto.FirewallRuleCheckItem{Rule: rule})
 	if err != nil {
 		t.Fatalf("plan adoption: %v", err)
 	}
@@ -54,7 +54,7 @@ func TestFirewallRuleServiceCheckCreateInventoryWorkflow(t *testing.T) {
 	if check.CheckFlag == "" {
 		t.Fatal("check did not return a creation flag")
 	}
-	err = service.Create(ctx, dto.FirewallRuleCreate{
+	err = service.createFirewallRuleItem(ctx, dto.FirewallRuleCreateItem{
 		CheckFlag: check.CheckFlag, Action: filter.CheckActionAdopt,
 		AdoptInstanceKey: check.Candidates[0].InstanceKey, Rule: check.RequestedRule,
 	})
@@ -68,9 +68,9 @@ func TestFirewallRuleServiceCheckCreateInventoryWorkflow(t *testing.T) {
 	if len(after.Items) != 1 || after.Items[0].State != filter.InventoryStateAdopted || after.Items[0].Desired == nil {
 		t.Fatalf("adopted ownership missing from inventory: %#v", after)
 	}
-	err = service.Delete(ctx, dto.FirewallRuleDelete{UUID: after.Items[0].Desired.UUID})
-	if err != nil {
-		t.Fatalf("delete adopted rule: %v", err)
+	deleted, err := service.Delete(ctx, dto.FirewallRuleDelete{UUIDs: []string{after.Items[0].Desired.UUID}})
+	if err != nil || deleted.Failed > 0 {
+		t.Fatalf("delete adopted rule: result=%#v err=%v", deleted, err)
 	}
 	empty, err := service.Inventory(ctx, dto.FirewallRuleInventory{Scope: rule.Scope})
 	if err != nil || len(empty.Items) != 0 {
@@ -88,7 +88,7 @@ func TestFirewallRuleServiceCheckBlocksConfiguredProtectedPort(t *testing.T) {
 		return []firewall.PortWhitelist{{Family: "ipv4", Port: "8443", Protocol: "tcp"}}, nil
 	}
 
-	result, err := service.Check(context.Background(), "203.0.113.9", dto.FirewallRuleCheck{Rule: rule})
+	result, err := service.checkRule(context.Background(), "203.0.113.9", dto.FirewallRuleCheckItem{Rule: rule})
 	if err != nil {
 		t.Fatalf("check protected port: %v", err)
 	}
@@ -129,11 +129,12 @@ func TestFirewallRuleServiceCreateRequiresCheck(t *testing.T) {
 	service, ruleRepo := newTestFirewallExecutor(t, adapter)
 	service.selectedProvider = func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil }
 
-	err := service.Create(context.Background(), dto.FirewallRuleCreate{
+	result, err := service.Create(context.Background(), dto.FirewallRuleCreate{Items: []dto.FirewallRuleCreateItem{{
 		Rule: rule, Action: filter.CheckActionCreate,
-	})
-	if !errors.Is(err, filter.ErrRuleCheckRequired) {
-		t.Fatalf("expected check-required error, got %v", err)
+	}}})
+	if err != nil || result.Failed != 1 || len(result.Errors) != 1 ||
+		result.Errors[0].Error != filter.ErrRuleCheckRequired.Error() {
+		t.Fatalf("expected check-required failure, result=%#v err=%v", result, err)
 	}
 	rules, _ := ruleRepo.List(context.Background())
 	if adapter.applyCount != 0 || len(rules) != 0 {
@@ -159,7 +160,7 @@ func TestFirewallRuleServiceAlwaysAppendsUFWCreateWithinFamily(t *testing.T) {
 		Protocol: "tcp", DestinationPort: "8080", Action: filter.ActionAccept, OrderIndex: &order,
 	}
 
-	if err := createExecutorRule(service, adapter, dto.FirewallRuleCreate{
+	if err := createExecutorRule(service, adapter, dto.FirewallRuleCreateItem{
 		Rule: rule, Action: filter.CheckActionCreate, SourceKind: constant.FirewallRuleSourceUser,
 	}); err != nil {
 		t.Fatalf("create UFW rule at next position: %v", err)
@@ -299,21 +300,21 @@ func TestFirewallRuleServiceBatchCheckAndCreateSameScope(t *testing.T) {
 	}
 	ctx := context.Background()
 
-	checked, err := service.CheckRulesBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: rules})
+	checked, err := service.Check(ctx, "", dto.FirewallRuleCheck{Items: firewallRuleCheckItems(rules)})
 	if err != nil || len(checked.Items) != len(rules) {
 		t.Fatalf("batch check: result=%#v err=%v", checked, err)
 	}
 	if adapter.observeCount != 1 {
 		t.Fatalf("same-scope batch check observed the chain %d times", adapter.observeCount)
 	}
-	request := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, len(rules))}
+	request := dto.FirewallRuleCreate{Items: make([]dto.FirewallRuleCreateItem, 0, len(rules))}
 	for _, item := range checked.Items {
-		request.Items = append(request.Items, dto.FirewallRuleCreate{
+		request.Items = append(request.Items, dto.FirewallRuleCreateItem{
 			Rule: item.RequestedRule, CheckFlag: item.CheckFlag, Action: filter.CheckActionCreate,
 			SourceKind: constant.FirewallRuleSourceUser,
 		})
 	}
-	created, err := service.CreateRulesBatch(ctx, request)
+	created, err := service.Create(ctx, request)
 	if err != nil || created.Succeeded != 2 || created.Failed != 0 {
 		t.Fatalf("batch create: result=%#v err=%v", created, err)
 	}
@@ -337,17 +338,17 @@ func TestFirewallRuleServiceBatchDeleteSameIptablesScope(t *testing.T) {
 		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil },
 	}
 	ctx := context.Background()
-	checked, err := service.CheckRulesBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: rules})
+	checked, err := service.Check(ctx, "", dto.FirewallRuleCheck{Items: firewallRuleCheckItems(rules)})
 	if err != nil {
 		t.Fatalf("batch check: %v", err)
 	}
-	createRequest := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, len(rules))}
+	createRequest := dto.FirewallRuleCreate{Items: make([]dto.FirewallRuleCreateItem, 0, len(rules))}
 	for _, item := range checked.Items {
-		createRequest.Items = append(createRequest.Items, dto.FirewallRuleCreate{
+		createRequest.Items = append(createRequest.Items, dto.FirewallRuleCreateItem{
 			Rule: item.RequestedRule, CheckFlag: item.CheckFlag, Action: filter.CheckActionCreate,
 		})
 	}
-	created, err := service.CreateRulesBatch(ctx, createRequest)
+	created, err := service.Create(ctx, createRequest)
 	if err != nil || created.Succeeded != 2 {
 		t.Fatalf("batch create: result=%#v err=%v", created, err)
 	}
@@ -355,7 +356,7 @@ func TestFirewallRuleServiceBatchDeleteSameIptablesScope(t *testing.T) {
 	if err != nil || len(stored) != 2 {
 		t.Fatalf("list created rules: %#v err=%v", stored, err)
 	}
-	deleted, err := service.DeleteRulesBatch(ctx, dto.FirewallRuleBatchDelete{UUIDs: []string{stored[0].UUID, stored[1].UUID}})
+	deleted, err := service.Delete(ctx, dto.FirewallRuleDelete{UUIDs: []string{stored[0].UUID, stored[1].UUID}})
 	if err != nil || deleted.Succeeded != 2 || deleted.Failed != 0 {
 		t.Fatalf("batch delete: result=%#v err=%v", deleted, err)
 	}
@@ -382,17 +383,17 @@ func TestFirewallRuleServiceBatchCreateAndDeleteSameNftablesScope(t *testing.T) 
 		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderNftables, nil },
 	}
 	ctx := context.Background()
-	checked, err := service.CheckRulesBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: rules})
+	checked, err := service.Check(ctx, "", dto.FirewallRuleCheck{Items: firewallRuleCheckItems(rules)})
 	if err != nil {
 		t.Fatalf("batch check: %v", err)
 	}
-	createRequest := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, len(rules))}
+	createRequest := dto.FirewallRuleCreate{Items: make([]dto.FirewallRuleCreateItem, 0, len(rules))}
 	for _, item := range checked.Items {
-		createRequest.Items = append(createRequest.Items, dto.FirewallRuleCreate{
+		createRequest.Items = append(createRequest.Items, dto.FirewallRuleCreateItem{
 			Rule: item.RequestedRule, CheckFlag: item.CheckFlag, Action: filter.CheckActionCreate,
 		})
 	}
-	created, err := service.CreateRulesBatch(ctx, createRequest)
+	created, err := service.Create(ctx, createRequest)
 	if err != nil || created.Succeeded != 2 || adapter.applyCount != 1 {
 		t.Fatalf("nftables batch create: result=%#v applies=%d err=%v", created, adapter.applyCount, err)
 	}
@@ -400,7 +401,7 @@ func TestFirewallRuleServiceBatchCreateAndDeleteSameNftablesScope(t *testing.T) 
 	if err != nil || len(stored) != 2 {
 		t.Fatalf("list nftables rules: %#v err=%v", stored, err)
 	}
-	deleted, err := service.DeleteRulesBatch(ctx, dto.FirewallRuleBatchDelete{UUIDs: []string{stored[0].UUID, stored[1].UUID}})
+	deleted, err := service.Delete(ctx, dto.FirewallRuleDelete{UUIDs: []string{stored[0].UUID, stored[1].UUID}})
 	if err != nil || deleted.Succeeded != 2 || deleted.Failed != 0 || adapter.applyCount != 2 {
 		t.Fatalf("nftables batch delete: result=%#v applies=%d err=%v", deleted, adapter.applyCount, err)
 	}
@@ -422,17 +423,17 @@ func TestFirewallRuleServiceBatchDeleteRollsBackOnMetadataFailure(t *testing.T) 
 		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil },
 	}
 	ctx := context.Background()
-	checked, err := service.CheckRulesBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: rules})
+	checked, err := service.Check(ctx, "", dto.FirewallRuleCheck{Items: firewallRuleCheckItems(rules)})
 	if err != nil {
 		t.Fatalf("batch check: %v", err)
 	}
-	createRequest := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, len(rules))}
+	createRequest := dto.FirewallRuleCreate{Items: make([]dto.FirewallRuleCreateItem, 0, len(rules))}
 	for _, item := range checked.Items {
-		createRequest.Items = append(createRequest.Items, dto.FirewallRuleCreate{
+		createRequest.Items = append(createRequest.Items, dto.FirewallRuleCreateItem{
 			Rule: item.RequestedRule, CheckFlag: item.CheckFlag, Action: filter.CheckActionCreate,
 		})
 	}
-	created, err := service.CreateRulesBatch(ctx, createRequest)
+	created, err := service.Create(ctx, createRequest)
 	if err != nil || created.Succeeded != 2 {
 		t.Fatalf("batch create: result=%#v err=%v", created, err)
 	}
@@ -440,7 +441,7 @@ func TestFirewallRuleServiceBatchDeleteRollsBackOnMetadataFailure(t *testing.T) 
 	if err != nil || len(stored) != 2 {
 		t.Fatalf("list created rules: %#v err=%v", stored, err)
 	}
-	deleted, err := service.DeleteRulesBatch(ctx, dto.FirewallRuleBatchDelete{UUIDs: []string{stored[0].UUID, stored[1].UUID}})
+	deleted, err := service.Delete(ctx, dto.FirewallRuleDelete{UUIDs: []string{stored[0].UUID, stored[1].UUID}})
 	if err != nil || deleted.Succeeded != 0 || deleted.Failed != 2 {
 		t.Fatalf("batch delete failure: result=%#v err=%v", deleted, err)
 	}
@@ -466,19 +467,21 @@ func TestFirewallRuleServiceBatchCreateRejectsDuplicateManagedRule(t *testing.T)
 	}
 	ctx := context.Background()
 
-	checked, err := service.CheckRulesBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: []filter.FirewallRule{rule, rule, trailingRule}})
+	checked, err := service.Check(ctx, "", dto.FirewallRuleCheck{
+		Items: firewallRuleCheckItems([]filter.FirewallRule{rule, rule, trailingRule}),
+	})
 	if err != nil || len(checked.Items) != 3 {
 		t.Fatalf("batch check duplicate rules: result=%#v err=%v", checked, err)
 	}
-	request := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, 3)}
+	request := dto.FirewallRuleCreate{Items: make([]dto.FirewallRuleCreateItem, 0, 3)}
 	for _, item := range checked.Items {
-		request.Items = append(request.Items, dto.FirewallRuleCreate{
+		request.Items = append(request.Items, dto.FirewallRuleCreateItem{
 			Rule: item.RequestedRule, CheckFlag: item.CheckFlag, Action: filter.CheckActionCreate,
 			SourceKind: constant.FirewallRuleSourceUser,
 		})
 	}
 
-	created, err := service.CreateRulesBatch(ctx, request)
+	created, err := service.Create(ctx, request)
 	if err != nil || created.Succeeded != 1 || created.Failed != 1 || created.Skipped != 1 {
 		t.Fatalf("batch duplicate create: result=%#v err=%v", created, err)
 	}
@@ -511,18 +514,18 @@ func TestFirewallRuleServiceIptablesBatchRollsBackOnMetadataFailure(t *testing.T
 		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil },
 	}
 	ctx := context.Background()
-	checked, err := service.CheckRulesBatch(ctx, "", dto.FirewallRuleBatchCheck{Rules: rules})
+	checked, err := service.Check(ctx, "", dto.FirewallRuleCheck{Items: firewallRuleCheckItems(rules)})
 	if err != nil {
 		t.Fatalf("batch check: %v", err)
 	}
-	request := dto.FirewallRuleBatchCreate{Items: make([]dto.FirewallRuleCreate, 0, len(rules))}
+	request := dto.FirewallRuleCreate{Items: make([]dto.FirewallRuleCreateItem, 0, len(rules))}
 	for _, item := range checked.Items {
-		request.Items = append(request.Items, dto.FirewallRuleCreate{
+		request.Items = append(request.Items, dto.FirewallRuleCreateItem{
 			Rule: item.RequestedRule, CheckFlag: item.CheckFlag, Action: filter.CheckActionCreate,
 			SourceKind: constant.FirewallRuleSourceUser,
 		})
 	}
-	created, err := service.CreateRulesBatch(ctx, request)
+	created, err := service.Create(ctx, request)
 	if err != nil || created.Succeeded != 0 || created.Failed != 1 || created.Skipped != 1 {
 		t.Fatalf("batch failure result: %#v err=%v", created, err)
 	}
@@ -542,7 +545,7 @@ func TestFirewallRuleServiceCreateRejectsChangedFirewallState(t *testing.T) {
 	service.selectedProvider = func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil }
 	ctx := context.Background()
 
-	check, err := service.Check(ctx, "", dto.FirewallRuleCheck{Rule: rule})
+	check, err := service.checkRule(ctx, "", dto.FirewallRuleCheckItem{Rule: rule})
 	if err != nil {
 		t.Fatalf("check rule: %v", err)
 	}
@@ -551,7 +554,7 @@ func TestFirewallRuleServiceCreateRejectsChangedFirewallState(t *testing.T) {
 	if err != nil {
 		t.Fatalf("change firewall snapshot: %v", err)
 	}
-	err = service.Create(ctx, dto.FirewallRuleCreate{
+	err = service.createFirewallRuleItem(ctx, dto.FirewallRuleCreateItem{
 		Rule: check.RequestedRule, CheckFlag: check.CheckFlag, Action: filter.CheckActionCreate,
 	})
 	if !errors.Is(err, filter.ErrRuleCheckRequired) {
@@ -570,13 +573,13 @@ func TestFirewallRuleServiceCreateRejectsRuleChangedAfterCheck(t *testing.T) {
 	service.selectedProvider = func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil }
 	ctx := context.Background()
 
-	check, err := service.Check(ctx, "", dto.FirewallRuleCheck{Rule: rule})
+	check, err := service.checkRule(ctx, "", dto.FirewallRuleCheckItem{Rule: rule})
 	if err != nil {
 		t.Fatalf("check rule: %v", err)
 	}
 	changed := check.RequestedRule
 	changed.DestinationPort = "8081"
-	err = service.Create(ctx, dto.FirewallRuleCreate{
+	err = service.createFirewallRuleItem(ctx, dto.FirewallRuleCreateItem{
 		Rule: changed, CheckFlag: check.CheckFlag, Action: filter.CheckActionCreate,
 	})
 	if !errors.Is(err, filter.ErrRuleCheckRequired) {
@@ -595,19 +598,19 @@ func TestFirewallRuleServiceCreateRejectsChangedManagedState(t *testing.T) {
 	service.selectedProvider = func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil }
 	ctx := context.Background()
 
-	check, err := service.Check(ctx, "", dto.FirewallRuleCheck{Rule: rule})
+	check, err := service.checkRule(ctx, "", dto.FirewallRuleCheckItem{Rule: rule})
 	if err != nil {
 		t.Fatalf("check rule: %v", err)
 	}
 	other := executorTestRule("9090")
-	record, err := firewallRuleModelForCreate(other, dto.FirewallRuleCreate{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
+	record, err := firewallRuleModelForCreate(other, dto.FirewallRuleCreateItem{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
 	if err != nil {
 		t.Fatalf("build managed record: %v", err)
 	}
 	if err := ruleRepo.Create(ctx, &record); err != nil {
 		t.Fatalf("change managed state: %v", err)
 	}
-	err = service.Create(ctx, dto.FirewallRuleCreate{
+	err = service.createFirewallRuleItem(ctx, dto.FirewallRuleCreateItem{
 		Rule: check.RequestedRule, CheckFlag: check.CheckFlag, Action: filter.CheckActionCreate,
 	})
 	if !errors.Is(err, filter.ErrRuleCheckRequired) {
@@ -624,7 +627,7 @@ func TestFirewallRuleServiceRejectsUnavailableProductionAdapter(t *testing.T) {
 		rules: repo.NewFirewallRuleRepo(db), adapters: firewallRuleRuntimeRegistry{},
 		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderIptables, nil },
 	}
-	_, err := service.Check(context.Background(), "", dto.FirewallRuleCheck{Rule: executorTestRule("80")})
+	_, err := service.checkRule(context.Background(), "", dto.FirewallRuleCheckItem{Rule: executorTestRule("80")})
 	if !errors.Is(err, filter.ErrAdapterUnavailable) {
 		t.Fatalf("expected unavailable adapter error, got %v", err)
 	}
@@ -773,7 +776,7 @@ func TestSyncSystemPortsDoesNotTakeOverExistingManagedRule(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	userRecord, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreate{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
+	userRecord, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreateItem{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -836,7 +839,7 @@ func TestFirewallExecutorCreatesAndVerifiesRule(t *testing.T) {
 	rule.OrderIndex = &position
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
-	request := dto.FirewallRuleCreate{
+	request := dto.FirewallRuleCreateItem{
 		Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
 	}
 
@@ -859,7 +862,7 @@ func TestFirewallExecutorAdoptsWithoutAddingEquivalentRule(t *testing.T) {
 	adapter := newFakeFilterAdapter(t, rule.Scope, []filter.ObservedRule{external})
 	instanceKey, _ := filter.InstanceKey(external)
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
-	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreate{
+	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreateItem{
 		AdoptInstanceKey: instanceKey, Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
 	})
 	if err != nil {
@@ -880,7 +883,7 @@ func TestFirewallExecutorCleansUpVerificationFailure(t *testing.T) {
 	adapter.verifyMatched = false
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
 
-	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreate{
+	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreateItem{
 		Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
 	})
 	if !errors.Is(err, filter.ErrVerificationFailed) {
@@ -904,7 +907,7 @@ func TestFirewallExecutorRollsBackCreateWhenPersistenceCommitFails(t *testing.T)
 		updateErr:         errors.New("commit failed"),
 	}
 
-	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreate{
+	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreateItem{
 		Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
 	})
 	if err == nil || !strings.Contains(err.Error(), "commit failed") {
@@ -920,7 +923,7 @@ func TestFirewallExecutorRollsBackDeleteWhenPersistenceDeleteFails(t *testing.T)
 	rule := executorTestRule("9092")
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
-	if err := createExecutorRule(executor, adapter, dto.FirewallRuleCreate{
+	if err := createExecutorRule(executor, adapter, dto.FirewallRuleCreateItem{
 		Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
 	}); err != nil {
 		t.Fatalf("create managed rule: %v", err)
@@ -945,7 +948,7 @@ func TestFirewallExecutorRollsBackUpdateWhenPersistenceUpdateFails(t *testing.T)
 	rule := executorTestRule("9093")
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
-	if err := createExecutorRule(executor, adapter, dto.FirewallRuleCreate{
+	if err := createExecutorRule(executor, adapter, dto.FirewallRuleCreateItem{
 		Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
 	}); err != nil {
 		t.Fatalf("create managed rule: %v", err)
@@ -973,7 +976,7 @@ func TestFirewallExecutorDeletesOnlyVerifiedManagedRule(t *testing.T) {
 	rule := executorTestRule("8443")
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
-	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreate{
+	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreateItem{
 		Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
 	})
 	if err != nil {
@@ -999,7 +1002,7 @@ func TestFirewallExecutorRefusesDeleteAfterManagedRuleDrifts(t *testing.T) {
 	rule := executorTestRule("9443")
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
-	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreate{
+	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreateItem{
 		Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
 	})
 	if err != nil {
@@ -1021,7 +1024,7 @@ func TestFirewallExecutorUpdatesManagedRule(t *testing.T) {
 	rule := executorTestRule("8080")
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
-	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreate{
+	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreateItem{
 		Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
 	})
 	if err != nil {
@@ -1051,7 +1054,7 @@ func TestFirewallRuleServiceChecksManagedUpdateWithoutApplying(t *testing.T) {
 	rule := executorTestRule("8080")
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
 	service, ruleRepo := newTestFirewallExecutor(t, adapter)
-	if err := createExecutorRule(service, adapter, dto.FirewallRuleCreate{
+	if err := createExecutorRule(service, adapter, dto.FirewallRuleCreateItem{
 		Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
 	}); err != nil {
 		t.Fatalf("create managed rule: %v", err)
@@ -1062,7 +1065,7 @@ func TestFirewallRuleServiceChecksManagedUpdateWithoutApplying(t *testing.T) {
 	}
 	updated := rule
 	updated.DestinationPort = "8443"
-	result, err := service.Check(context.Background(), "", dto.FirewallRuleCheck{
+	result, err := service.checkRule(context.Background(), "", dto.FirewallRuleCheckItem{
 		UUID: stored[0].UUID,
 		Rule: updated,
 	})
@@ -1088,7 +1091,7 @@ func TestFirewallExecutorUpdatesManagedRuleAndPositionTogether(t *testing.T) {
 	})
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
 	for _, rule := range []filter.FirewallRule{first, second} {
-		record, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreate{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
+		record, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreateItem{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
 		if err != nil {
 			t.Fatalf("build managed rule: %v", err)
 		}
@@ -1127,7 +1130,7 @@ func TestFirewallExecutorReordersManagedRule(t *testing.T) {
 	adapter := newFakeFilterAdapter(t, scope, observed)
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
 	for _, rule := range []filter.FirewallRule{first, second} {
-		record, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreate{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
+		record, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreateItem{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
 		if err != nil {
 			t.Fatalf("build managed rule: %v", err)
 		}
@@ -1170,7 +1173,7 @@ func TestFirewallExecutorUsesExplicitPositionDuringUpdate(t *testing.T) {
 	}
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
 	for _, rule := range []filter.FirewallRule{first, second} {
-		record, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreate{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
+		record, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreateItem{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
 		if err != nil {
 			t.Fatalf("build managed rule: %v", err)
 		}
@@ -1200,7 +1203,7 @@ func TestFirewallExecutorRejectsPriorityReorderWithoutExplicitPriority(t *testin
 	adapter := newFakeFilterAdapter(t, rule.Scope, []filter.ObservedRule{executorObservedRule(rule, "1panel-rule:zone-port", 1)})
 	adapter.capabilities = filter.Capabilities{Scopes: filter.MVPScopePatterns(), Marker: true, ExplicitPriority: true}
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
-	record, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreate{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
+	record, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreateItem{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
 	if err != nil {
 		t.Fatalf("build zone port record: %v", err)
 	}
@@ -1329,7 +1332,7 @@ func newTestFirewallExecutor(t *testing.T, adapter *fakeFilterAdapter) (*Firewal
 	}, ruleRepo
 }
 
-func createExecutorRule(executor *FirewallService, adapter *fakeFilterAdapter, request dto.FirewallRuleCreate) error {
+func createExecutorRule(executor *FirewallService, adapter *fakeFilterAdapter, request dto.FirewallRuleCreateItem) error {
 	authorization := firewallRuleCreateAuthorization{Operation: filter.ChangeCreate}
 	if request.AdoptInstanceKey != "" {
 		candidate, err := filter.FindCandidate(adapter.snapshot.Rules, request.AdoptInstanceKey)
@@ -1547,6 +1550,14 @@ func (f *fakeFilterAdapter) NativeDetail(_ context.Context, name string, permane
 	f.nativeDetailName = name
 	f.nativeDetailPermanent = permanent
 	return f.nativeDetail, nil
+}
+
+func firewallRuleCheckItems(rules []filter.FirewallRule) []dto.FirewallRuleCheckItem {
+	items := make([]dto.FirewallRuleCheckItem, 0, len(rules))
+	for _, rule := range rules {
+		items = append(items, dto.FirewallRuleCheckItem{Rule: rule})
+	}
+	return items
 }
 
 func executorTestRule(port string) filter.FirewallRule {

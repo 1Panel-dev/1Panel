@@ -18986,63 +18986,9 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK"
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/dto.Response"
-						}
-					},
-					"409": {
-						"description": "Conflict",
-						"schema": {
-							"$ref": "#/definitions/dto.Response"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Create a unified firewall v2 rule",
-				"tags": [
-					"Firewall"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [],
-					"formatEN": "create firewall rule",
-					"formatZH": "添加防火墙规则",
-					"paramKeys": []
-				}
-			}
-		},
-		"/hosts/firewall/rules/batch": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.FirewallRuleBatchCreate"
-						}
-					}
-				],
-				"responses": {
-					"200": {
 						"description": "OK",
 						"schema": {
-							"$ref": "#/definitions/dto.FirewallRuleBatchCreateResponse"
+							"$ref": "#/definitions/dto.FirewallRuleCreateResponse"
 						}
 					},
 					"400": {
@@ -19066,15 +19012,15 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Create multiple unified firewall v2 rules",
+				"summary": "Create unified firewall v2 rules",
 				"tags": [
 					"Firewall"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
 					"bodyKeys": [],
-					"formatEN": "batch create firewall rules",
-					"formatZH": "批量添加防火墙规则",
+					"formatEN": "create firewall rules",
+					"formatZH": "添加防火墙规则",
 					"paramKeys": []
 				}
 			}
@@ -19117,51 +19063,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Check a unified firewall v2 rule for duplicates and conflicts",
-				"tags": [
-					"Firewall"
-				]
-			}
-		},
-		"/hosts/firewall/rules/check/batch": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.FirewallRuleBatchCheck"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.FirewallRuleBatchCheckResponse"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/dto.Response"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Check multiple unified firewall v2 rules",
+				"summary": "Check unified firewall v2 rules for duplicates and conflicts",
 				"tags": [
 					"Firewall"
 				]
@@ -19185,59 +19087,9 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK"
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/dto.Response"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Delete a managed unified firewall v2 rule",
-				"tags": [
-					"Firewall"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"uuid"
-					],
-					"formatEN": "delete firewall rule [uuid]",
-					"formatZH": "删除防火墙规则 [uuid]",
-					"paramKeys": []
-				}
-			}
-		},
-		"/hosts/firewall/rules/delete/batch": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.FirewallRuleBatchDelete"
-						}
-					}
-				],
-				"responses": {
-					"200": {
 						"description": "OK",
 						"schema": {
-							"$ref": "#/definitions/dto.FirewallRuleBatchDeleteResponse"
+							"$ref": "#/definitions/dto.FirewallRuleDeleteResponse"
 						}
 					},
 					"400": {
@@ -19255,15 +19107,15 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Delete multiple managed unified firewall v2 rules",
+				"summary": "Delete managed unified firewall v2 rules",
 				"tags": [
 					"Firewall"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
 					"bodyKeys": [],
-					"formatEN": "batch delete firewall rules",
-					"formatZH": "批量删除防火墙规则",
+					"formatEN": "delete firewall rules",
+					"formatZH": "删除防火墙规则",
 					"paramKeys": []
 				}
 			}
@@ -36177,15 +36029,11 @@ const docTemplate = `{
 					"type": "boolean"
 				},
 				"provider": {
-					"allOf": [
-						{
-							"$ref": "#/definitions/filter.Provider"
-						}
-					],
 					"enum": [
 						"firewalld",
 						"ufw"
-					]
+					],
+					"type": "string"
 				}
 			},
 			"required": [
@@ -36195,38 +36043,11 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.FirewallRuleBatchCheck": {
-			"properties": {
-				"rules": {
-					"items": {
-						"$ref": "#/definitions/filter.FirewallRule"
-					},
-					"maxItems": 256,
-					"minItems": 1,
-					"type": "array"
-				}
-			},
-			"required": [
-				"rules"
-			],
-			"type": "object"
-		},
-		"dto.FirewallRuleBatchCheckResponse": {
+		"dto.FirewallRuleCheck": {
 			"properties": {
 				"items": {
 					"items": {
-						"$ref": "#/definitions/dto.FirewallRuleCheckResponse"
-					},
-					"type": "array"
-				}
-			},
-			"type": "object"
-		},
-		"dto.FirewallRuleBatchCreate": {
-			"properties": {
-				"items": {
-					"items": {
-						"$ref": "#/definitions/dto.FirewallRuleCreate"
+						"$ref": "#/definitions/dto.FirewallRuleCheckItem"
 					},
 					"maxItems": 256,
 					"minItems": 1,
@@ -36238,91 +36059,7 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.FirewallRuleBatchCreateFailure": {
-			"properties": {
-				"error": {
-					"type": "string"
-				},
-				"index": {
-					"type": "integer"
-				},
-				"rule": {
-					"$ref": "#/definitions/filter.FirewallRule"
-				},
-				"status": {
-					"type": "string"
-				}
-			},
-			"type": "object"
-		},
-		"dto.FirewallRuleBatchCreateResponse": {
-			"properties": {
-				"errors": {
-					"items": {
-						"$ref": "#/definitions/dto.FirewallRuleBatchCreateFailure"
-					},
-					"type": "array"
-				},
-				"failed": {
-					"type": "integer"
-				},
-				"skipped": {
-					"type": "integer"
-				},
-				"succeeded": {
-					"type": "integer"
-				}
-			},
-			"type": "object"
-		},
-		"dto.FirewallRuleBatchDelete": {
-			"properties": {
-				"uuids": {
-					"items": {
-						"type": "string"
-					},
-					"maxItems": 256,
-					"minItems": 1,
-					"type": "array"
-				}
-			},
-			"required": [
-				"uuids"
-			],
-			"type": "object"
-		},
-		"dto.FirewallRuleBatchDeleteFailure": {
-			"properties": {
-				"error": {
-					"type": "string"
-				},
-				"index": {
-					"type": "integer"
-				},
-				"uuid": {
-					"type": "string"
-				}
-			},
-			"type": "object"
-		},
-		"dto.FirewallRuleBatchDeleteResponse": {
-			"properties": {
-				"errors": {
-					"items": {
-						"$ref": "#/definitions/dto.FirewallRuleBatchDeleteFailure"
-					},
-					"type": "array"
-				},
-				"failed": {
-					"type": "integer"
-				},
-				"succeeded": {
-					"type": "integer"
-				}
-			},
-			"type": "object"
-		},
-		"dto.FirewallRuleCheck": {
+		"dto.FirewallRuleCheckItem": {
 			"properties": {
 				"rule": {
 					"$ref": "#/definitions/filter.FirewallRule"
@@ -36337,6 +36074,17 @@ const docTemplate = `{
 			"type": "object"
 		},
 		"dto.FirewallRuleCheckResponse": {
+			"properties": {
+				"items": {
+					"items": {
+						"$ref": "#/definitions/dto.FirewallRuleCheckResult"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
+		"dto.FirewallRuleCheckResult": {
 			"properties": {
 				"allowedActions": {
 					"items": {
@@ -36376,6 +36124,39 @@ const docTemplate = `{
 		},
 		"dto.FirewallRuleCreate": {
 			"properties": {
+				"items": {
+					"items": {
+						"$ref": "#/definitions/dto.FirewallRuleCreateItem"
+					},
+					"maxItems": 256,
+					"minItems": 1,
+					"type": "array"
+				}
+			},
+			"required": [
+				"items"
+			],
+			"type": "object"
+		},
+		"dto.FirewallRuleCreateFailure": {
+			"properties": {
+				"error": {
+					"type": "string"
+				},
+				"index": {
+					"type": "integer"
+				},
+				"rule": {
+					"$ref": "#/definitions/filter.FirewallRule"
+				},
+				"status": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.FirewallRuleCreateItem": {
+			"properties": {
 				"action": {
 					"$ref": "#/definitions/filter.CheckAction"
 				},
@@ -36404,15 +36185,71 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.FirewallRuleCreateResponse": {
+			"properties": {
+				"errors": {
+					"items": {
+						"$ref": "#/definitions/dto.FirewallRuleCreateFailure"
+					},
+					"type": "array"
+				},
+				"failed": {
+					"type": "integer"
+				},
+				"skipped": {
+					"type": "integer"
+				},
+				"succeeded": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
 		"dto.FirewallRuleDelete": {
 			"properties": {
+				"uuids": {
+					"items": {
+						"type": "string"
+					},
+					"maxItems": 256,
+					"minItems": 1,
+					"type": "array"
+				}
+			},
+			"required": [
+				"uuids"
+			],
+			"type": "object"
+		},
+		"dto.FirewallRuleDeleteFailure": {
+			"properties": {
+				"error": {
+					"type": "string"
+				},
+				"index": {
+					"type": "integer"
+				},
 				"uuid": {
 					"type": "string"
 				}
 			},
-			"required": [
-				"uuid"
-			],
+			"type": "object"
+		},
+		"dto.FirewallRuleDeleteResponse": {
+			"properties": {
+				"errors": {
+					"items": {
+						"$ref": "#/definitions/dto.FirewallRuleDeleteFailure"
+					},
+					"type": "array"
+				},
+				"failed": {
+					"type": "integer"
+				},
+				"succeeded": {
+					"type": "integer"
+				}
+			},
 			"type": "object"
 		},
 		"dto.FirewallRuleInventory": {
@@ -41258,7 +41095,7 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"origin": {
-					"$ref": "#/definitions/filter.RuleOrigin"
+					"type": "string"
 				},
 				"rule": {
 					"$ref": "#/definitions/filter.FirewallRule"
@@ -41279,19 +41116,6 @@ const docTemplate = `{
 			"type": "string",
 			"x-enum-varnames": [
 				"DirectionInput"
-			]
-		},
-		"filter.Family": {
-			"enum": [
-				"ipv4",
-				"ipv6",
-				"inet"
-			],
-			"type": "string",
-			"x-enum-varnames": [
-				"FamilyIPv4",
-				"FamilyIPv6",
-				"FamilyInet"
 			]
 		},
 		"filter.FirewallRule": {
@@ -41418,7 +41242,7 @@ const docTemplate = `{
 					"type": "integer"
 				},
 				"provider": {
-					"$ref": "#/definitions/filter.Provider"
+					"type": "string"
 				},
 				"scopeKey": {
 					"type": "string"
@@ -41502,32 +41326,6 @@ const docTemplate = `{
 				"PersistenceStatusPermanentOnly"
 			]
 		},
-		"filter.Provider": {
-			"enum": [
-				"iptables",
-				"nftables",
-				"firewalld",
-				"ufw"
-			],
-			"type": "string",
-			"x-enum-varnames": [
-				"ProviderIptables",
-				"ProviderNftables",
-				"ProviderFirewalld",
-				"ProviderUFW"
-			]
-		},
-		"filter.RuleOrigin": {
-			"enum": [
-				"created",
-				"adopted"
-			],
-			"type": "string",
-			"x-enum-varnames": [
-				"RuleOriginCreated",
-				"RuleOriginAdopted"
-			]
-		},
 		"filter.RuntimeUsage": {
 			"properties": {
 				"reason": {
@@ -41554,10 +41352,10 @@ const docTemplate = `{
 					"$ref": "#/definitions/filter.Direction"
 				},
 				"family": {
-					"$ref": "#/definitions/filter.Family"
+					"type": "string"
 				},
 				"provider": {
-					"$ref": "#/definitions/filter.Provider"
+					"type": "string"
 				},
 				"table": {
 					"type": "string"

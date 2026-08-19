@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
@@ -60,9 +61,9 @@ func LoadInitStatus(tab string) (bool, bool, error) {
 
 func LoadFamilyInitStatus(family, tab string) (bool, bool, error) {
 	switch family {
-	case "ipv4":
+	case constant.FirewallFamilyIPv4:
 		return loadInitStatus(tab, RunWithStd)
-	case "ipv6":
+	case constant.FirewallFamilyIPv6:
 		return loadInitStatus(tab, RunIPv6WithStd)
 	default:
 		return false, false, fmt.Errorf("unsupported iptables family %q", family)

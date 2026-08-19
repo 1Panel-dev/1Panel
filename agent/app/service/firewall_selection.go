@@ -3,47 +3,36 @@ package service
 import (
 	"strings"
 
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
-)
-
-const (
-	settingSystemFirewallBackend = "FirewallProvider"
-	settingForwardingBackend     = "ForwardingBackend"
-	settingDockerFirewallBackend = "DockerFirewallBackend"
-	settingDockerPortGuardStatus = "DockerPortGuardStatus"
-	// These persisted keys predate native nftables support. Keep their values
-	// stable while using backend-neutral names inside the service.
-	settingFilterInitialized     = "IptablesStatus"
-	settingForwardingInitialized = "IptablesForwardStatus"
-	settingPingStatus            = "BanPing"
 )
 
 func selectedDockerFirewallBackend(fallback string) string {
 	selected := ""
 	if global.DB != nil {
-		selected, _ = settingRepo.GetValueByKey(settingDockerFirewallBackend)
+		selected, _ = settingRepo.GetValueByKey(constant.FirewallDockerBackendKey)
 	}
 	selected = strings.ToLower(strings.TrimSpace(selected))
-	if selected == "iptables" || selected == "nftables" {
+	if selected == constant.FirewallProviderIptables || selected == constant.FirewallProviderNftables {
 		return selected
 	}
 	fallback = strings.ToLower(strings.TrimSpace(fallback))
-	if fallback == "nftables" {
+	if fallback == constant.FirewallProviderNftables {
 		return fallback
 	}
-	return "iptables"
+	return constant.FirewallProviderIptables
 }
 
 func selectedSystemFirewallClient() (lifecycle.Client, error) {
-	if provider, _ := settingRepo.GetValueByKey(settingSystemFirewallBackend); strings.TrimSpace(provider) != "" {
+	if provider, _ := settingRepo.GetValueByKey(constant.FirewallSystemBackendKey); strings.TrimSpace(provider) != "" {
 		return lifecycle.NewClientFor(strings.TrimSpace(provider))
 	}
 	client, err := lifecycle.NewClient()
 	if err != nil {
 		return nil, err
 	}
-	_ = settingRepo.UpdateOrCreate(settingSystemFirewallBackend, client.Name())
+	_ = settingRepo.UpdateOrCreate(constant.FirewallSystemBackendKey, client.Name())
 	return client, nil
 }
 

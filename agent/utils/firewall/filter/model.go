@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/constant"
 )
 
 var ErrProviderUnavailable = errors.New("firewall provider is unavailable")
@@ -11,18 +13,18 @@ var ErrProviderUnavailable = errors.New("firewall provider is unavailable")
 type Provider string
 
 const (
-	ProviderIptables  Provider = "iptables"
-	ProviderNftables  Provider = "nftables"
-	ProviderFirewalld Provider = "firewalld"
-	ProviderUFW       Provider = "ufw"
+	ProviderIptables  Provider = constant.FirewallProviderIptables
+	ProviderNftables  Provider = constant.FirewallProviderNftables
+	ProviderFirewalld Provider = constant.FirewallProviderFirewalld
+	ProviderUFW       Provider = constant.FirewallProviderUFW
 )
 
 type Family string
 
 const (
-	FamilyIPv4 Family = "ipv4"
-	FamilyIPv6 Family = "ipv6"
-	FamilyInet Family = "inet"
+	FamilyIPv4 Family = constant.FirewallFamilyIPv4
+	FamilyIPv6 Family = constant.FirewallFamilyIPv6
+	FamilyInet Family = constant.FirewallFamilyInet
 )
 
 type Direction string
@@ -86,7 +88,9 @@ const (
 )
 
 const (
-	IptablesInputChain = "1PANEL_BASIC"
+	BasicBeforeChain   = constant.FirewallBasicBeforeChain
+	IptablesInputChain = constant.FirewallBasicChain
+	BasicAfterChain    = constant.FirewallBasicAfterChain
 	FirewalldInputZone = "public"
 	UFWInputChain      = "incoming"
 )
@@ -211,7 +215,7 @@ func (d Direction) valid() bool {
 
 func isBasicChain(chain string) bool {
 	switch chain {
-	case "1PANEL_BASIC_BEFORE", "1PANEL_BASIC", "1PANEL_BASIC_AFTER":
+	case BasicBeforeChain, IptablesInputChain, BasicAfterChain:
 		return true
 	default:
 		return false
@@ -243,14 +247,14 @@ func MVPScopePatterns() []ScopePattern {
 			Provider:   ProviderIptables,
 			Families:   []Family{FamilyIPv4, FamilyIPv6},
 			Table:      "filter",
-			Chains:     []string{"1PANEL_BASIC_BEFORE", "1PANEL_BASIC", "1PANEL_BASIC_AFTER"},
+			Chains:     []string{BasicBeforeChain, IptablesInputChain, BasicAfterChain},
 			Directions: []Direction{DirectionInput},
 		},
 		{
 			Provider:   ProviderNftables,
 			Families:   []Family{FamilyIPv4, FamilyIPv6},
 			Table:      "filter",
-			Chains:     []string{"1PANEL_BASIC_BEFORE", "1PANEL_BASIC", "1PANEL_BASIC_AFTER"},
+			Chains:     []string{BasicBeforeChain, IptablesInputChain, BasicAfterChain},
 			Directions: []Direction{DirectionInput},
 		},
 		{

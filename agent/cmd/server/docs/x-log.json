@@ -3674,30 +3674,14 @@
 		"paramKeys": [],
 		"beforeFunctions": [],
 		"formatZH": "添加防火墙规则",
-		"formatEN": "create firewall rule"
-	},
-	"/hosts/firewall/rules/batch": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "批量添加防火墙规则",
-		"formatEN": "batch create firewall rules"
+		"formatEN": "create firewall rules"
 	},
 	"/hosts/firewall/rules/delete": {
-		"bodyKeys": [
-			"uuid"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "删除防火墙规则 [uuid]",
-		"formatEN": "delete firewall rule [uuid]"
-	},
-	"/hosts/firewall/rules/delete/batch": {
 		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "批量删除防火墙规则",
-		"formatEN": "batch delete firewall rules"
+		"formatZH": "删除防火墙规则",
+		"formatEN": "delete firewall rules"
 	},
 	"/hosts/firewall/rules/reorder": {
 		"bodyKeys": [

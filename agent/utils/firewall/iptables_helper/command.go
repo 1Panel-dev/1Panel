@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
@@ -13,9 +14,9 @@ import (
 
 const (
 	InputChain       = "INPUT"
-	BasicBeforeChain = "1PANEL_BASIC_BEFORE"
-	BasicChain       = "1PANEL_BASIC"
-	BasicAfterChain  = "1PANEL_BASIC_AFTER"
+	BasicBeforeChain = constant.FirewallBasicBeforeChain
+	BasicChain       = constant.FirewallBasicChain
+	BasicAfterChain  = constant.FirewallBasicAfterChain
 )
 
 func BasicChains() []string {

@@ -28,7 +28,7 @@ func NewOperator(client Client) *Operator {
 }
 
 func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareStart func(Client) error) error {
-	if o.client.Name() == "firewalld" && operation == OperationStop {
+	if o.client.Name() == ProviderFirewalld && operation == OperationStop {
 		if err := rememberFail2BanBeforeFirewallStop(); err != nil {
 			return err
 		}
@@ -66,7 +66,7 @@ func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareS
 			return fmt.Errorf("failed to restart Docker: %v", err)
 		}
 	}
-	if o.client.Name() == "firewalld" && operation == OperationStart {
+	if o.client.Name() == ProviderFirewalld && operation == OperationStart {
 		return restoreFail2BanAfterFirewallStart()
 	}
 	return nil

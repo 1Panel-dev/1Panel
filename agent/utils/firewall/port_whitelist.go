@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/constant"
 )
 
 type PortWhitelist struct {
@@ -36,7 +38,7 @@ func ParsePortWhitelist(value string) ([]PortWhitelist, error) {
 			continue
 		}
 		parts := strings.Split(item, "/")
-		rule := PortWhitelist{Family: "ipv4", Protocol: "tcp"}
+		rule := PortWhitelist{Family: constant.FirewallFamilyIPv4, Protocol: "tcp"}
 		switch len(parts) {
 		case 1:
 			rule.Port = parts[0]
@@ -58,9 +60,9 @@ func validatePortWhitelist(rules []PortWhitelist) ([]PortWhitelist, error) {
 	for _, rule := range rules {
 		rule.Family = strings.ToLower(strings.TrimSpace(rule.Family))
 		if rule.Family == "" {
-			rule.Family = "ipv4"
+			rule.Family = constant.FirewallFamilyIPv4
 		}
-		if rule.Family != "ipv4" && rule.Family != "ipv6" {
+		if rule.Family != constant.FirewallFamilyIPv4 && rule.Family != constant.FirewallFamilyIPv6 {
 			return nil, fmt.Errorf("invalid firewall port whitelist family: %s", rule.Family)
 		}
 		rule.Protocol = strings.ToLower(strings.TrimSpace(rule.Protocol))

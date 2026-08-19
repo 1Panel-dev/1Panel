@@ -73,7 +73,7 @@ type FirewallRuleInventoryResponse struct {
 	Notices []filter.ScopeNotice   `json:"notices,omitempty"`
 }
 
-type FirewallRuleCheckResponse struct {
+type FirewallRuleCheckResult struct {
 	Decision         filter.CheckDecision       `json:"decision"`
 	Classification   filter.CheckClassification `json:"classification"`
 	Reason           string                     `json:"reason"`
@@ -174,20 +174,20 @@ type DockerPortGuardOperation struct {
 	Operation string `json:"operation" validate:"required,oneof=initialize bind unbind"`
 }
 
-type FirewallRuleCheck struct {
+type FirewallRuleCheckItem struct {
 	UUID string              `json:"uuid"`
 	Rule filter.FirewallRule `json:"rule" validate:"required"`
 }
 
-type FirewallRuleBatchCheck struct {
-	Rules []filter.FirewallRule `json:"rules" validate:"required,min=1,max=256,dive"`
+type FirewallRuleCheck struct {
+	Items []FirewallRuleCheckItem `json:"items" validate:"required,min=1,max=256,dive"`
 }
 
-type FirewallRuleBatchCheckResponse struct {
-	Items []FirewallRuleCheckResponse `json:"items"`
+type FirewallRuleCheckResponse struct {
+	Items []FirewallRuleCheckResult `json:"items"`
 }
 
-type FirewallRuleCreate struct {
+type FirewallRuleCreateItem struct {
 	Rule             filter.FirewallRule `json:"rule" validate:"required"`
 	CheckFlag        string              `json:"checkFlag"`
 	Action           filter.CheckAction  `json:"action"`
@@ -196,18 +196,18 @@ type FirewallRuleCreate struct {
 	SourceID         string              `json:"sourceID"`
 }
 
-type FirewallRuleBatchCreate struct {
-	Items []FirewallRuleCreate `json:"items" validate:"required,min=1,max=256,dive"`
+type FirewallRuleCreate struct {
+	Items []FirewallRuleCreateItem `json:"items" validate:"required,min=1,max=256,dive"`
 }
 
-type FirewallRuleBatchCreateResponse struct {
-	Succeeded int                              `json:"succeeded"`
-	Failed    int                              `json:"failed"`
-	Skipped   int                              `json:"skipped"`
-	Errors    []FirewallRuleBatchCreateFailure `json:"errors,omitempty"`
+type FirewallRuleCreateResponse struct {
+	Succeeded int                         `json:"succeeded"`
+	Failed    int                         `json:"failed"`
+	Skipped   int                         `json:"skipped"`
+	Errors    []FirewallRuleCreateFailure `json:"errors,omitempty"`
 }
 
-type FirewallRuleBatchCreateFailure struct {
+type FirewallRuleCreateFailure struct {
 	Index  int                 `json:"index"`
 	Status string              `json:"status"`
 	Rule   filter.FirewallRule `json:"rule"`
@@ -215,20 +215,16 @@ type FirewallRuleBatchCreateFailure struct {
 }
 
 type FirewallRuleDelete struct {
-	UUID string `json:"uuid" validate:"required"`
-}
-
-type FirewallRuleBatchDelete struct {
 	UUIDs []string `json:"uuids" validate:"required,min=1,max=256,dive,required,max=64"`
 }
 
-type FirewallRuleBatchDeleteResponse struct {
-	Succeeded int                              `json:"succeeded"`
-	Failed    int                              `json:"failed"`
-	Errors    []FirewallRuleBatchDeleteFailure `json:"errors,omitempty"`
+type FirewallRuleDeleteResponse struct {
+	Succeeded int                         `json:"succeeded"`
+	Failed    int                         `json:"failed"`
+	Errors    []FirewallRuleDeleteFailure `json:"errors,omitempty"`
 }
 
-type FirewallRuleBatchDeleteFailure struct {
+type FirewallRuleDeleteFailure struct {
 	Index int    `json:"index"`
 	UUID  string `json:"uuid"`
 	Error string `json:"error"`

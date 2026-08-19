@@ -15,9 +15,6 @@ const (
 	dockerNftTable = "docker-bridges"
 )
 
-// NftablesManager manages a separate nftables table that runs immediately
-// before Docker's filter/forward base chain. Docker owns docker-bridges, so the
-// guard only uses that table to detect whether a family is available.
 type NftablesManager struct {
 	runner Runner
 }

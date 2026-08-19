@@ -609,9 +609,6 @@ func publicZoneNotices(runtime, permanent zoneOutput) []filter.ScopeNotice {
 	return notices
 }
 
-// NativeDetail reads one firewalld service definition on demand. Inventory only
-// lists enabled service names so a failed detail lookup cannot be hidden behind
-// a name-only fallback.
 func (a *Adapter) NativeDetail(ctx context.Context, service string, permanent bool) (string, error) {
 	service = strings.TrimSpace(service)
 	if !validServiceName(service) {
@@ -938,9 +935,6 @@ func opaqueRichRule(scope filter.Scope, raw string) filter.ObservedRule {
 
 func opaqueZoneService(scope filter.Scope, service string) filter.ObservedRule {
 	rule := opaqueZoneObject(scope, filter.NativeKindZoneService, "service:"+service, service)
-	// A firewalld service expands to its own ports, protocols and destinations.
-	// Do not expose the opaque service as an allow-all rule while its definition
-	// is intentionally left unresolved.
 	rule.Rule.Protocol = ""
 	rule.Rule.Description = service
 	return rule

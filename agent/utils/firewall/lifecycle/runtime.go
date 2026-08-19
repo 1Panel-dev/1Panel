@@ -4,14 +4,15 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
 const (
-	ProviderFirewalld = "firewalld"
-	ProviderUFW       = "ufw"
-	ProviderIptables  = "iptables"
-	ProviderNftables  = "nftables"
+	ProviderFirewalld = constant.FirewallProviderFirewalld
+	ProviderUFW       = constant.FirewallProviderUFW
+	ProviderIptables  = constant.FirewallProviderIptables
+	ProviderNftables  = constant.FirewallProviderNftables
 )
 
 type IptablesCommands struct {
@@ -32,9 +33,6 @@ type Runtime struct {
 
 var which = cmd.Which
 
-// DetectRuntime follows the host-firewall priority used by 1Panel. The default
-// xtables command family wins over explicitly named xtables-nft tools; native
-// nftables is selected only when neither xtables command family is usable.
 func DetectRuntime() (Runtime, error) {
 	hasFirewalld := which("firewalld")
 	hasUFW := which("ufw")

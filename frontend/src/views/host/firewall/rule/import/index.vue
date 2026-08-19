@@ -45,7 +45,7 @@
 
 <script lang="ts" setup>
 import { Firewall } from '@/api/interface/firewall';
-import { checkFirewallRulesBatch, createFirewallRulesBatch } from '@/api/modules/firewall';
+import { checkFirewallRules, createFirewallRules } from '@/api/modules/firewall';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
@@ -139,7 +139,7 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
     uploadRef.value?.handleStart(file);
 };
 
-const importedCreateRequest = (plan: Firewall.RuleCheckResult): Firewall.CreateRequest | undefined => {
+const importedCreateRequest = (plan: Firewall.RuleCheckResult): Firewall.CreateItem | undefined => {
     if (plan.decision === 'no_change') return;
     if (plan.decision === 'blocked') throw new Error(plan.reason);
     const allowed = (plan.allowedActions || []).filter(
@@ -170,9 +170,9 @@ const onImport = async () => {
         const plans: Firewall.RuleCheckResult[] = [];
         for (let offset = 0; offset < selects.value.length; offset += 256) {
             const batch = selects.value.slice(offset, offset + 256);
-            plans.push(...(await checkFirewallRulesBatch({ rules: batch })).data.items);
+            plans.push(...(await checkFirewallRules({ items: batch.map((rule) => ({ rule })) })).data.items);
         }
-        const items: Firewall.CreateRequest[] = [];
+        const items: Firewall.CreateItem[] = [];
         for (const plan of plans) {
             try {
                 const item = importedCreateRequest(plan);
@@ -188,7 +188,7 @@ const onImport = async () => {
         items.sort((left, right) => JSON.stringify(left.rule.scope).localeCompare(JSON.stringify(right.rule.scope)));
         for (let offset = 0; offset < items.length; offset += 256) {
             const batch = items.slice(offset, offset + 256);
-            const result = (await createFirewallRulesBatch({ items: batch })).data;
+            const result = (await createFirewallRules({ items: batch })).data;
             success += result.succeeded;
             failed += result.failed + result.skipped;
         }

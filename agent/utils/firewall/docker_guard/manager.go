@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
@@ -15,8 +16,8 @@ import (
 const (
 	Chain       = "1PANEL_DOCKER"
 	DockerChain = "DOCKER-USER"
-	FamilyIPv4  = "ipv4"
-	FamilyIPv6  = "ipv6"
+	FamilyIPv4  = constant.FirewallFamilyIPv4
+	FamilyIPv6  = constant.FirewallFamilyIPv6
 	ModeSources = "deny_sources"
 	ModeAllow   = "allow_sources"
 	ModeAll     = "deny_all"

@@ -244,7 +244,7 @@ func TestDockerGuardInitializeAndUnbindPersistStatus(t *testing.T) {
 	if err := service.Operate(context.Background(), dto.DockerPortGuardOperation{Operation: "initialize"}); err != nil {
 		t.Fatalf("initialize Docker port guard: %v", err)
 	}
-	status, err := settingRepo.GetValueByKey(settingDockerPortGuardStatus)
+	status, err := settingRepo.GetValueByKey(constant.FirewallDockerPortGuardStatusKey)
 	if err != nil || status != constant.StatusEnable {
 		t.Fatalf("persisted status = %q, %v; want %q", status, err, constant.StatusEnable)
 	}
@@ -255,7 +255,7 @@ func TestDockerGuardInitializeAndUnbindPersistStatus(t *testing.T) {
 	if err := service.Operate(context.Background(), dto.DockerPortGuardOperation{Operation: "unbind"}); err != nil {
 		t.Fatalf("unbind Docker port guard: %v", err)
 	}
-	status, err = settingRepo.GetValueByKey(settingDockerPortGuardStatus)
+	status, err = settingRepo.GetValueByKey(constant.FirewallDockerPortGuardStatusKey)
 	if err != nil || status != constant.StatusDisable {
 		t.Fatalf("persisted status = %q, %v; want %q", status, err, constant.StatusDisable)
 	}
@@ -263,7 +263,7 @@ func TestDockerGuardInitializeAndUnbindPersistStatus(t *testing.T) {
 
 func TestDockerGuardReconcileRestoresPersistedInitialization(t *testing.T) {
 	setupDockerGuardSettingsDB(t)
-	if err := settingRepo.UpdateOrCreate(settingDockerPortGuardStatus, constant.StatusEnable); err != nil {
+	if err := settingRepo.UpdateOrCreate(constant.FirewallDockerPortGuardStatusKey, constant.StatusEnable); err != nil {
 		t.Fatal(err)
 	}
 	runtime := &persistentDockerGuardRuntime{}
@@ -287,7 +287,7 @@ func TestDockerGuardReconcileRestoresPersistedInitialization(t *testing.T) {
 
 func TestDockerGuardReconcileLeavesDisabledGuardUninitialized(t *testing.T) {
 	setupDockerGuardSettingsDB(t)
-	if err := settingRepo.UpdateOrCreate(settingDockerPortGuardStatus, constant.StatusDisable); err != nil {
+	if err := settingRepo.UpdateOrCreate(constant.FirewallDockerPortGuardStatusKey, constant.StatusDisable); err != nil {
 		t.Fatal(err)
 	}
 	runtime := &persistentDockerGuardRuntime{}

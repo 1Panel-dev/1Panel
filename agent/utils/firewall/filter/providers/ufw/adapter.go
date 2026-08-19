@@ -74,7 +74,6 @@ func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snaps
 	return snapshot, nil
 }
 
-// NativeDetail loads a UFW application profile only when its detail is opened.
 func (a *Adapter) NativeDetail(ctx context.Context, profile string, _ bool) (string, error) {
 	profile = strings.TrimSpace(profile)
 	if !validApplicationProfileName(profile) {
@@ -132,9 +131,6 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 	executed := 0
 	for index, command := range plan.Rules[0].Commands {
 		if err := a.writer.Run(ctx, command); err != nil {
-			// UFW can update its native rules and still return a non-zero exit
-			// status. Re-read the marker to distinguish that case from a command
-			// that had no effect before choosing the rollback boundary.
 			if a.failedCommandApplied(ctx, plan.Rules[0], index) {
 				executed = index + 1
 			}
@@ -158,8 +154,6 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 func (a *Adapter) failedCommandApplied(ctx context.Context, plan filter.NativeRulePlan, commandIndex int) bool {
 	snapshot, err := a.Observe(ctx, plan.Expected.Rule.Scope)
 	if err != nil {
-		// If state cannot be read, prefer removing a possibly-applied rule over
-		// leaving an untracked allow/deny rule behind.
 		return true
 	}
 	markerCount := countMarker(snapshot, plan.Expected.Marker)

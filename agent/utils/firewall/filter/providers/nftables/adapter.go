@@ -31,7 +31,7 @@ func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 	return filter.Capabilities{
 		Scopes: []filter.ScopePattern{{
 			Provider: filter.ProviderNftables, Families: []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}, Table: "filter",
-			Chains: []string{"1PANEL_BASIC_BEFORE", "1PANEL_BASIC", "1PANEL_BASIC_AFTER"}, Directions: []filter.Direction{filter.DirectionInput},
+			Chains: []string{filter.BasicBeforeChain, filter.IptablesInputChain, filter.BasicAfterChain}, Directions: []filter.Direction{filter.DirectionInput},
 		}}, Marker: true, AtomicApply: true, TransactionalRollback: true, OwnedChains: true, ExplicitPosition: true,
 	}, nil
 }
@@ -200,11 +200,11 @@ func validateScope(scope filter.Scope) error {
 
 func nativeChainName(scope filter.Scope) string {
 	switch scope.Normalize().Chain {
-	case "1PANEL_BASIC_BEFORE":
+	case filter.BasicBeforeChain:
 		return nftables_helper.BasicBeforeChain
-	case "1PANEL_BASIC":
+	case filter.IptablesInputChain:
 		return nftables_helper.BasicChain
-	case "1PANEL_BASIC_AFTER":
+	case filter.BasicAfterChain:
 		return nftables_helper.BasicAfterChain
 	default:
 		return ""
@@ -426,9 +426,9 @@ func parseRule(scope filter.Scope, raw, handle string, position int) filter.Obse
 				return opaque()
 			}
 			if tokens[index+1] == "nfproto" {
-				want := "ipv4"
+				want := string(filter.FamilyIPv4)
 				if scope.Family == filter.FamilyIPv6 {
-					want = "ipv6"
+					want = string(filter.FamilyIPv6)
 				}
 				if tokens[index+2] != want {
 					return opaque()
@@ -530,7 +530,7 @@ func parseRule(scope filter.Scope, raw, handle string, position int) filter.Obse
 	if err != nil {
 		return opaque()
 	}
-	return filter.ObservedRule{Rule: normalized, Locator: locator, Marker: marker, ParseStatus: filter.ParseStatusSupported, Raw: raw, Protected: scope.Chain != "1PANEL_BASIC"}
+	return filter.ObservedRule{Rule: normalized, Locator: locator, Marker: marker, ParseStatus: filter.ParseStatusSupported, Raw: raw, Protected: scope.Chain != filter.IptablesInputChain}
 }
 
 type systemBackend struct{}

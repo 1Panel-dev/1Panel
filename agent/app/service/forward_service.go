@@ -59,7 +59,9 @@ func NewIForwardingService() IForwardingService {
 		managerFactory: newForwardingManager,
 		rules:          repo.NewIForwardingRuleRepo(),
 		enabled:        forwardingPersistedEnabled,
-		persistBackend: func(backend string) error { return settingRepo.UpdateOrCreate(settingForwardingBackend, backend) },
+		persistBackend: func(backend string) error {
+			return settingRepo.UpdateOrCreate(constant.FirewallForwardingBackendKey, backend)
+		},
 	}
 }
 
@@ -85,7 +87,7 @@ func (s *ForwardingService) LoadBaseInfo() (dto.FirewallSubsystemStatus, error) 
 
 func forwardingDisplayName(backend string) string {
 	switch backend {
-	case "iptables", "nftables":
+	case constant.FirewallProviderIptables, constant.FirewallProviderNftables:
 		return backend + "-forward"
 	default:
 		return backend
@@ -190,7 +192,7 @@ func (s *ForwardingService) Enable() error {
 		recordForwardingSyncError(err)
 		return err
 	}
-	if err := settingRepo.UpdateOrCreate(settingForwardingInitialized, constant.StatusEnable); err != nil {
+	if err := settingRepo.UpdateOrCreate(constant.FirewallForwardingInitializedKey, constant.StatusEnable); err != nil {
 		recordForwardingSyncError(err)
 		return err
 	}
@@ -274,11 +276,11 @@ func (s *ForwardingService) saveForwardingBackend(backend string) error {
 	if s.persistBackend != nil {
 		return s.persistBackend(backend)
 	}
-	return settingRepo.UpdateOrCreate(settingForwardingBackend, backend)
+	return settingRepo.UpdateOrCreate(constant.FirewallForwardingBackendKey, backend)
 }
 
 func forwardingPersistedEnabled() (bool, error) {
-	status, err := settingRepo.GetValueByKey(settingForwardingInitialized)
+	status, err := settingRepo.GetValueByKey(constant.FirewallForwardingInitializedKey)
 	return status == constant.StatusEnable, err
 }
 
@@ -441,7 +443,7 @@ func (s *ForwardingService) manager() (*forwarding.Manager, error) {
 }
 
 func newForwardingManager() (*forwarding.Manager, error) {
-	selected, _ := settingRepo.GetValueByKey(settingForwardingBackend)
+	selected, _ := settingRepo.GetValueByKey(constant.FirewallForwardingBackendKey)
 	return newForwardingManagerFor(strings.TrimSpace(selected))
 }
 

@@ -369,10 +369,9 @@
 import { Firewall } from '@/api/interface/firewall';
 import { Process } from '@/api/interface/process';
 import {
-    checkFirewallRule,
-    createFirewallRule,
-    deleteFirewallRule,
-    deleteFirewallRulesBatch,
+    checkFirewallRules,
+    createFirewallRules,
+    deleteFirewallRules,
     loadDockerPortGuard,
     loadFirewallNativeDetail,
     searchFirewallRules,
@@ -996,7 +995,7 @@ const removeRules = async (selected: RuleRow[], clearAll = false) => {
         let failed = 0;
         for (let offset = 0; offset < uuids.length; offset += 256) {
             const batch = uuids.slice(offset, offset + 256);
-            const result = (await deleteFirewallRulesBatch({ uuids: batch })).data;
+            const result = (await deleteFirewallRules({ uuids: batch })).data;
             succeeded += result.succeeded;
             failed += result.failed;
         }
@@ -1033,7 +1032,7 @@ const viewRawRule = async (row: RuleRow) => {
             customClass: 'firewall-raw-rule-message',
         });
     } catch {
-        // Closing the read-only dialog does not require follow-up.
+        return;
     }
 };
 
@@ -1053,7 +1052,7 @@ const adoptRule = async (row: RuleRow) => {
     }
     loading.value = true;
     try {
-        const plan = (await checkFirewallRule({ rule: row.rule })).data;
+        const plan = (await checkFirewallRules({ items: [{ rule: row.rule }] })).data.items[0];
         if (plan.decision !== 'confirmation_required' || plan.classification !== 'exact_external') {
             MsgError(i18n.global.t('firewall.plan_blocked'));
             return;
@@ -1069,14 +1068,24 @@ const adoptRule = async (row: RuleRow) => {
             MsgError(i18n.global.t('firewall.plan_blocked'));
             return;
         }
-        await createFirewallRule({
-            checkFlag: plan.checkFlag,
-            action: resolution,
-            adoptInstanceKey:
-                resolution === 'select_adopt' ? candidate?.instanceKey : plan.candidates?.[0]?.instanceKey,
-            rule: plan.requestedRule,
-            sourceKind: 'user',
-        });
+        const result = (
+            await createFirewallRules({
+                items: [
+                    {
+                        checkFlag: plan.checkFlag,
+                        action: resolution,
+                        adoptInstanceKey:
+                            resolution === 'select_adopt' ? candidate?.instanceKey : plan.candidates?.[0]?.instanceKey,
+                        rule: plan.requestedRule,
+                        sourceKind: 'user',
+                    },
+                ],
+            })
+        ).data;
+        if (result.failed > 0 || result.skipped > 0) {
+            MsgError(result.errors?.[0]?.error || i18n.global.t('commons.msg.operationFailed'));
+            return;
+        }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         await search();
     } finally {
@@ -1084,34 +1093,7 @@ const adoptRule = async (row: RuleRow) => {
     }
 };
 
-const removeRule = async (row: RuleRow) => {
-    if (!row.desired?.uuid) return;
-    const usedBy =
-        row.rule.action === 'accept'
-            ? ruleUsageEntries(row)
-                  .map((entry) => entry.owner)
-                  .join(', ')
-            : '';
-    const message = usedBy
-        ? `${i18n.global.t('firewall.deleteRuleConfirm', [1])}\n${i18n.global.t('firewall.deleteUsedRuleConfirm', [usedBy])}`
-        : i18n.global.t('firewall.deleteRuleConfirm', [1]);
-    try {
-        await ElMessageBox.confirm(message, i18n.global.t('commons.button.delete'), {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        });
-    } catch {
-        return;
-    }
-    loading.value = true;
-    try {
-        await deleteFirewallRule(row.desired.uuid);
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        await search();
-    } finally {
-        loading.value = false;
-    }
-};
+const removeRule = (row: RuleRow) => removeRules([row]);
 
 const isEditableManagedRule = (row: Firewall.InventoryItem) =>
     Boolean(row.desired?.uuid) &&

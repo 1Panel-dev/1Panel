@@ -201,7 +201,7 @@ func (b *BaseApi) LoadFirewallNativeDetail(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Check a unified firewall v2 rule for duplicates and conflicts
+// @Summary Check unified firewall v2 rules for duplicates and conflicts
 // @Accept json
 // @Param request body dto.FirewallRuleCheck true "request"
 // @Success 200 {object} dto.FirewallRuleCheckResponse
@@ -209,7 +209,7 @@ func (b *BaseApi) LoadFirewallNativeDetail(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/rules/check [post]
-func (b *BaseApi) CheckFirewallRule(c *gin.Context) {
+func (b *BaseApi) CheckFirewallRules(c *gin.Context) {
 	var request dto.FirewallRuleCheck
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
@@ -223,67 +223,22 @@ func (b *BaseApi) CheckFirewallRule(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Check multiple unified firewall v2 rules
-// @Accept json
-// @Param request body dto.FirewallRuleBatchCheck true "request"
-// @Success 200 {object} dto.FirewallRuleBatchCheckResponse
-// @Failure 400 {object} dto.Response
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /hosts/firewall/rules/check/batch [post]
-func (b *BaseApi) CheckFirewallRulesBatch(c *gin.Context) {
-	var request dto.FirewallRuleBatchCheck
-	if err := helper.CheckBindAndValidate(&request, c); err != nil {
-		return
-	}
-	result, err := firewallService.CheckRulesBatch(c.Request.Context(), c.ClientIP(), request)
-	if err != nil {
-		handleFirewallRuleError(c, err)
-		return
-	}
-	helper.SuccessWithData(c, result)
-}
-
-// @Tags Firewall
-// @Summary Create a unified firewall v2 rule
+// @Summary Create unified firewall v2 rules
 // @Accept json
 // @Param request body dto.FirewallRuleCreate true "request"
-// @Success 200
+// @Success 200 {object} dto.FirewallRuleCreateResponse
 // @Failure 400 {object} dto.Response
 // @Failure 409 {object} dto.Response
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/rules [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"添加防火墙规则","formatEN":"create firewall rule"}
-func (b *BaseApi) CreateFirewallRule(c *gin.Context) {
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"添加防火墙规则","formatEN":"create firewall rules"}
+func (b *BaseApi) CreateFirewallRules(c *gin.Context) {
 	var request dto.FirewallRuleCreate
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	if err := firewallService.Create(c.Request.Context(), request); err != nil {
-		handleFirewallRuleError(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags Firewall
-// @Summary Create multiple unified firewall v2 rules
-// @Accept json
-// @Param request body dto.FirewallRuleBatchCreate true "request"
-// @Success 200 {object} dto.FirewallRuleBatchCreateResponse
-// @Failure 400 {object} dto.Response
-// @Failure 409 {object} dto.Response
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /hosts/firewall/rules/batch [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"批量添加防火墙规则","formatEN":"batch create firewall rules"}
-func (b *BaseApi) CreateFirewallRulesBatch(c *gin.Context) {
-	var request dto.FirewallRuleBatchCreate
-	if err := helper.CheckBindAndValidate(&request, c); err != nil {
-		return
-	}
-	result, err := firewallService.CreateRulesBatch(c.Request.Context(), request)
+	result, err := firewallService.Create(c.Request.Context(), request)
 	if err != nil {
 		handleFirewallRuleError(c, err)
 		return
@@ -292,48 +247,21 @@ func (b *BaseApi) CreateFirewallRulesBatch(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Delete a managed unified firewall v2 rule
+// @Summary Delete managed unified firewall v2 rules
 // @Accept json
 // @Param request body dto.FirewallRuleDelete true "request"
-// @Success 200
+// @Success 200 {object} dto.FirewallRuleDeleteResponse
 // @Failure 400 {object} dto.Response
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/rules/delete [post]
-// @x-panel-log {"bodyKeys":["uuid"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除防火墙规则 [uuid]","formatEN":"delete firewall rule [uuid]"}
-func (b *BaseApi) DeleteFirewallRule(c *gin.Context) {
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除防火墙规则","formatEN":"delete firewall rules"}
+func (b *BaseApi) DeleteFirewallRules(c *gin.Context) {
 	var request dto.FirewallRuleDelete
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	request.UUID = strings.TrimSpace(request.UUID)
-	if request.UUID == "" {
-		helper.BadRequest(c, repo.ErrFirewallPersistenceInvalid)
-		return
-	}
-	if err := firewallService.Delete(c.Request.Context(), request); err != nil {
-		handleFirewallRuleError(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags Firewall
-// @Summary Delete multiple managed unified firewall v2 rules
-// @Accept json
-// @Param request body dto.FirewallRuleBatchDelete true "request"
-// @Success 200 {object} dto.FirewallRuleBatchDeleteResponse
-// @Failure 400 {object} dto.Response
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /hosts/firewall/rules/delete/batch [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"批量删除防火墙规则","formatEN":"batch delete firewall rules"}
-func (b *BaseApi) DeleteFirewallRulesBatch(c *gin.Context) {
-	var request dto.FirewallRuleBatchDelete
-	if err := helper.CheckBindAndValidate(&request, c); err != nil {
-		return
-	}
-	result, err := firewallService.DeleteRulesBatch(c.Request.Context(), request)
+	result, err := firewallService.Delete(c.Request.Context(), request)
 	if err != nil {
 		handleFirewallRuleError(c, err)
 		return

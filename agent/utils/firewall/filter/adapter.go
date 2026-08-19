@@ -71,22 +71,14 @@ type RulePreparer interface {
 	PrepareRule(FirewallRule) (FirewallRule, error)
 }
 
-// RuleChecker validates provider capabilities that can only be determined at
-// runtime, before a checked rule is authorized or applied.
 type RuleChecker interface {
 	CheckRule(context.Context, FirewallRule) error
 }
 
-// NativeDetailReader loads provider-specific details for an opaque named
-// object, such as a firewalld service or UFW application profile.
 type NativeDetailReader interface {
 	NativeDetail(context.Context, string, bool) (string, error)
 }
 
-// PlanRollbacker reverses a backend plan that was applied completely but
-// could not be committed, for example after verification or DB persistence
-// fails. Apply implementations remain responsible for compensating partially
-// executed plans.
 type PlanRollbacker interface {
 	Rollback(context.Context, BackendPlan) error
 }

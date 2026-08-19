@@ -49,8 +49,6 @@ func Restore() error {
 	if len(existing) == 2 {
 		return nil
 	}
-	// The persisted file contains both family tables. If only one table survived,
-	// remove that owned table before replaying the complete snapshot.
 	for _, tableFamily := range existing {
 		if _, err := run("delete", "table", tableFamily, TableName); err != nil {
 			return fmt.Errorf("remove partial nftables %s table before restore: %w", tableFamily, err)

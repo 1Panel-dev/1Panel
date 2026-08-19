@@ -36,7 +36,7 @@ import { reactive, ref } from 'vue';
 const emit = defineEmits<{ (event: 'close'): void }>();
 
 const visible = ref(false);
-const result = reactive<Firewall.BatchCreateResponse>({
+const result = reactive<Firewall.CreateResponse>({
     succeeded: 0,
     failed: 0,
     skipped: 0,
@@ -51,7 +51,7 @@ const wildcardAddress = (family: Firewall.Family) => {
 
 const familyLabel = (family: Firewall.Family) => (family === 'inet' ? 'IPv4/IPv6' : family.toUpperCase());
 
-const ruleSummary = (failure: Firewall.BatchCreateFailure) => {
+const ruleSummary = (failure: Firewall.CreateFailure) => {
     const rule = failure.rule;
     const address = rule.sourceAddress || wildcardAddress(rule.scope.family);
     return `#${failure.index + 1} · ${familyLabel(rule.scope.family)} · ${rule.protocol.toUpperCase()} · ${address} → ${rule.destinationPort || '*'}`;
@@ -64,7 +64,7 @@ const failureReason = (error?: string) =>
         .replace(/\s*,\s*err:\s*exit status \d+\s*$/i, '')
         .trim();
 
-const acceptParams = (data: Firewall.BatchCreateResponse) => {
+const acceptParams = (data: Firewall.CreateResponse) => {
     Object.assign(result, data);
     result.errors = data.errors || [];
     visible.value = true;

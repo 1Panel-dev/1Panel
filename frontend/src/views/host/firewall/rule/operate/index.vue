@@ -184,12 +184,7 @@
 
 <script lang="ts" setup>
 import { Firewall } from '@/api/interface/firewall';
-import {
-    checkFirewallRule,
-    checkFirewallRulesBatch,
-    createFirewallRulesBatch,
-    updateFirewallRule,
-} from '@/api/modules/firewall';
+import { checkFirewallRules, createFirewallRules, updateFirewallRule } from '@/api/modules/firewall';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
@@ -650,7 +645,7 @@ const buildPreviewRules = () => {
 const prepareBatchPlans = async () => {
     checkCompleted.value = false;
     batchPlans.value = [];
-    const results = (await checkFirewallRulesBatch({ rules: previewRules.value })).data.items || [];
+    const results = (await checkFirewallRules({ items: previewRules.value.map((rule) => ({ rule })) })).data.items;
     if (results.length !== previewRules.value.length) {
         MsgError(i18n.global.t('commons.msg.operationFailed'));
         return;
@@ -678,7 +673,7 @@ const executeBatchPlans = async () => {
         MsgError(i18n.global.t('firewall.ruleCheckBlockedHelper'));
         return;
     }
-    const items: Firewall.CreateRequest[] = [];
+    const items: Firewall.CreateItem[] = [];
     for (const item of batchPlans.value) {
         if (ruleCheckStatus(item.plan) === 'existing') continue;
         const available = availableResolutions(item.plan);
@@ -702,7 +697,7 @@ const executeBatchPlans = async () => {
         drawerVisible.value = false;
         return;
     }
-    const result = (await createFirewallRulesBatch({ items })).data;
+    const result = (await createFirewallRules({ items })).data;
     if (result.succeeded > 0) emit('search');
     if (result.failed > 0 || (result.skipped || 0) > 0) {
         errDialogRef.value?.acceptParams(result);
@@ -733,7 +728,11 @@ const prepareRulesFromForm = async () => {
 const checkRules = async () => {
     if (!(await prepareRulesFromForm())) return;
     if (mode.value === 'edit' && editingUUID.value) {
-        const result = (await checkFirewallRule({ uuid: editingUUID.value, rule: previewRules.value[0] })).data;
+        const result = (
+            await checkFirewallRules({
+                items: [{ uuid: editingUUID.value, rule: previewRules.value[0] }],
+            })
+        ).data.items[0];
         previewRules.value = [result.requestedRule];
         batchPlans.value = [{ rule: result.requestedRule, plan: result }];
         checkCompleted.value = true;

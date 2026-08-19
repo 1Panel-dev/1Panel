@@ -5,13 +5,15 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/constant"
 )
 
 type RuleOrigin string
 
 const (
-	RuleOriginCreated RuleOrigin = "created"
-	RuleOriginAdopted RuleOrigin = "adopted"
+	RuleOriginCreated RuleOrigin = constant.FirewallRuleOriginCreated
+	RuleOriginAdopted RuleOrigin = constant.FirewallRuleOriginAdopted
 )
 
 type InventoryState string
