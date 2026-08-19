@@ -35,7 +35,7 @@ const composeConfigLabel = "com.docker.compose.project.config_files"
 const composeWorkdirLabel = "com.docker.compose.project.working_dir"
 const composeCreatedBy = "createdBy"
 
-func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface{}, error) {
+func (u *ContainerService) PageCompose(req dto.SearchWithPage, readOnly ...bool) (int64, interface{}, error) {
 	var (
 		records   []dto.ComposeInfo
 		BackDatas []dto.ComposeInfo
@@ -187,7 +187,10 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 		}
 		BackDatas = records[start:end]
 	}
-	listItem := loadEnv(BackDatas)
+	listItem := BackDatas
+	if !isDemoReadOnly(readOnly...) {
+		listItem = loadEnv(BackDatas)
+	}
 	return int64(total), listItem, nil
 }
 

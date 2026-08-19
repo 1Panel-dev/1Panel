@@ -50,6 +50,7 @@ func Proxy() gin.HandlerFunc {
 		if userName := middleware.LoadOperationUser(c); userName != "" {
 			c.Request.Header.Set("X-Panel-User", url.QueryEscape(userName))
 		}
+		c.Request.Header.Set(constant.DemoModeHeader, strconv.FormatBool(global.CONF.Base.IsDemo))
 
 		if reqPath == "/api/v2/hosts/terminal/local" && (currentNode == "local" || len(currentNode) == 0) {
 			proxyLocalAgent(c)

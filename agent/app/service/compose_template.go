@@ -11,8 +11,8 @@ import (
 type ComposeTemplateService struct{}
 
 type IComposeTemplateService interface {
-	List() ([]dto.ComposeTemplateInfo, error)
-	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
+	List(readOnly ...bool) ([]dto.ComposeTemplateInfo, error)
+	SearchWithPage(search dto.SearchWithPage, readOnly ...bool) (int64, interface{}, error)
 	Create(req dto.ComposeTemplateCreate) error
 	Update(id uint, upMap map[string]interface{}) error
 	Batch(req dto.ComposeTemplateBatch) error
@@ -23,7 +23,7 @@ func NewIComposeTemplateService() IComposeTemplateService {
 	return &ComposeTemplateService{}
 }
 
-func (u *ComposeTemplateService) List() ([]dto.ComposeTemplateInfo, error) {
+func (u *ComposeTemplateService) List(readOnly ...bool) ([]dto.ComposeTemplateInfo, error) {
 	composes, err := composeRepo.List()
 	if err != nil {
 		return nil, buserr.New("ErrRecordNotFound")
@@ -34,18 +34,24 @@ func (u *ComposeTemplateService) List() ([]dto.ComposeTemplateInfo, error) {
 		if err := copier.Copy(&item, &compose); err != nil {
 			return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
+		if isDemoReadOnly(readOnly...) {
+			item.Content = ""
+		}
 		dtoLists = append(dtoLists, item)
 	}
 	return dtoLists, err
 }
 
-func (u *ComposeTemplateService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
+func (u *ComposeTemplateService) SearchWithPage(req dto.SearchWithPage, readOnly ...bool) (int64, interface{}, error) {
 	total, composes, err := composeRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info))
 	var dtoComposeTemplates []dto.ComposeTemplateInfo
 	for _, compose := range composes {
 		var item dto.ComposeTemplateInfo
 		if err := copier.Copy(&item, &compose); err != nil {
 			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
+		}
+		if isDemoReadOnly(readOnly...) {
+			item.Content = ""
 		}
 		dtoComposeTemplates = append(dtoComposeTemplates, item)
 	}

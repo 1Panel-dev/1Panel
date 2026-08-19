@@ -24,7 +24,7 @@ import (
 type ImageRepoService struct{}
 
 type IImageRepoService interface {
-	Page(search dto.SearchWithPage) (int64, interface{}, error)
+	Page(search dto.SearchWithPage, readOnly ...bool) (int64, interface{}, error)
 	List() ([]dto.ImageRepoOption, error)
 	Login(req dto.OperateByID) error
 	Create(req dto.ImageRepoCreate) error
@@ -36,10 +36,13 @@ func NewIImageRepoService() IImageRepoService {
 	return &ImageRepoService{}
 }
 
-func (u *ImageRepoService) Page(req dto.SearchWithPage) (int64, interface{}, error) {
+func (u *ImageRepoService) Page(req dto.SearchWithPage, readOnly ...bool) (int64, interface{}, error) {
 	total, ops, err := imageRepoRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info), repo.WithOrderDesc("created_at"))
 	var dtoOps []dto.ImageRepoInfo
 	for _, op := range ops {
+		if isDemoReadOnly(readOnly...) {
+			op.Password = ""
+		}
 		var item dto.ImageRepoInfo
 		if err := copier.Copy(&item, &op); err != nil {
 			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)

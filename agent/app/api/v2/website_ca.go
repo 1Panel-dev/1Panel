@@ -24,7 +24,7 @@ func (b *BaseApi) PageWebsiteCA(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	total, cas, err := websiteCAService.Page(req)
+	total, cas, err := websiteCAService.Page(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -70,7 +70,7 @@ func (b *BaseApi) GetWebsiteCA(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	res, err := websiteCAService.GetCA(id)
+	res, err := websiteCAService.GetCA(id, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

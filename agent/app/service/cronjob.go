@@ -25,7 +25,7 @@ import (
 type CronjobService struct{}
 
 type ICronjobService interface {
-	SearchWithPage(search dto.PageCronjob) (int64, interface{}, error)
+	SearchWithPage(search dto.PageCronjob, readOnly ...bool) (int64, interface{}, error)
 	SearchRecords(search dto.SearchRecord) (int64, interface{}, error)
 	Create(cronjobDto dto.CronjobOperate, operator string) error
 	LoadNextHandle(spec string) ([]string, error)
@@ -50,7 +50,7 @@ func NewICronjobService() ICronjobService {
 	return &CronjobService{}
 }
 
-func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interface{}, error) {
+func (u *CronjobService) SearchWithPage(search dto.PageCronjob, readOnly ...bool) (int64, interface{}, error) {
 	total, cronjobs, err := cronjobRepo.Page(search.Page,
 		search.PageSize,
 		repo.WithByGroups(search.GroupIDs),
@@ -82,6 +82,9 @@ func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interfac
 		}
 		if cronjob.Type == "snapshot" && len(cronjob.SnapshotRule) != 0 {
 			_ = json.Unmarshal([]byte(cronjob.SnapshotRule), &item.SnapshotRule)
+		}
+		if isDemoReadOnly(readOnly...) {
+			item.Secret = ""
 		}
 		dtoCronjobs = append(dtoCronjobs, item)
 	}

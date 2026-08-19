@@ -6,9 +6,10 @@ import (
 
 type RuntimeSearch struct {
 	dto.PageInfo
-	Type   string `json:"type"`
-	Name   string `json:"name"`
-	Status string `json:"status"`
+	Type     string `json:"type"`
+	Name     string `json:"name"`
+	Status   string `json:"status"`
+	ReadOnly bool   `json:"-"`
 }
 
 type RuntimeCreate struct {

@@ -144,7 +144,7 @@ func (b *BaseApi) SearchRootCert(c *gin.Context) {
 		return
 	}
 
-	total, data, err := sshService.SearchRootCerts(req)
+	total, data, err := sshService.SearchRootCerts(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

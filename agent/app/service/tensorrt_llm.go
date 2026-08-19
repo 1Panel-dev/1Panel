@@ -28,7 +28,7 @@ import (
 type TensorRTLLMService struct{}
 
 type ITensorRTLLMService interface {
-	Page(req request.TensorRTLLMSearch) response.TensorRTLLMsRes
+	Page(req request.TensorRTLLMSearch, readOnly bool) response.TensorRTLLMsRes
 	Create(create request.TensorRTLLMCreate) error
 	Update(req request.TensorRTLLMUpdate) error
 	Delete(id uint) error
@@ -39,17 +39,22 @@ func NewITensorRTLLMService() ITensorRTLLMService {
 	return &TensorRTLLMService{}
 }
 
-func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorRTLLMsRes {
+func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch, readOnly bool) response.TensorRTLLMsRes {
 	var (
 		res   response.TensorRTLLMsRes
 		items []response.TensorRTLLMDTO
 	)
 
+	readOnlyMode := isDemoReadOnly(readOnly)
 	total, data, _ := tensorrtLLMRepo.Page(req.PageInfo.Page, req.PageInfo.PageSize)
 	for _, item := range data {
-		_ = syncTensorRTLLMContainerStatus(&item)
+		_ = syncTensorRTLLMContainerStatus(&item, readOnlyMode)
 		serverDTO := response.TensorRTLLMDTO{
 			TensorRTLLM: item,
+		}
+		if readOnlyMode {
+			serverDTO.DockerCompose = ""
+			serverDTO.Env = ""
 		}
 		envs, _ := gotenv.Unmarshal(item.Env)
 		serverDTO.Version = envs["VERSION"]
@@ -63,6 +68,9 @@ func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorR
 		composeByte, err := files.NewFileOp().GetContent(path.Join(global.Dir.TensorRTLLMDir, item.Name, "docker-compose.yml"))
 		if err == nil {
 			serverDTO.Environments, _ = getDockerComposeEnvironments(composeByte)
+			if readOnlyMode {
+				redactSensitiveEnvironments(serverDTO.Environments)
+			}
 		}
 		volumes, err := getDockerComposeVolumes(composeByte)
 		if err == nil {
@@ -323,10 +331,10 @@ func startTensorRTLLM(tensorrtLLM *model.TensorRTLLM) {
 		tensorrtLLM.Status = constant.StatusRunning
 		tensorrtLLM.Message = ""
 	}
-	_ = syncTensorRTLLMContainerStatus(tensorrtLLM)
+	_ = syncTensorRTLLMContainerStatus(tensorrtLLM, false)
 }
 
-func syncTensorRTLLMContainerStatus(tensorrtLLM *model.TensorRTLLM) error {
+func syncTensorRTLLMContainerStatus(tensorrtLLM *model.TensorRTLLM, readOnly bool) error {
 	containerNames := []string{tensorrtLLM.ContainerName}
 	cli, err := docker.NewClient()
 	if err != nil {
@@ -342,6 +350,9 @@ func syncTensorRTLLMContainerStatus(tensorrtLLM *model.TensorRTLLM) error {
 			return nil
 		}
 		tensorrtLLM.Status = constant.StatusStopped
+		if readOnly || global.CONF.Base.IsDemo {
+			return nil
+		}
 		return tensorrtLLMRepo.Save(tensorrtLLM)
 	}
 	container := containers[0]
@@ -358,6 +369,9 @@ func syncTensorRTLLMContainerStatus(tensorrtLLM *model.TensorRTLLM) error {
 		if tensorrtLLM.Status != constant.StatusStarting {
 			tensorrtLLM.Status = constant.StatusStopped
 		}
+	}
+	if readOnly || global.CONF.Base.IsDemo {
+		return nil
 	}
 	return tensorrtLLMRepo.Save(tensorrtLLM)
 }

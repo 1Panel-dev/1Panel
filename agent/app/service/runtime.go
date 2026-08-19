@@ -48,7 +48,7 @@ type IRuntimeService interface {
 	Create(create request.RuntimeCreate) (*model.Runtime, error)
 	Delete(delete request.RuntimeDelete) error
 	Update(req request.RuntimeUpdate) error
-	Get(id uint) (res *response.RuntimeDTO, err error)
+	Get(id uint, readOnly ...bool) (res *response.RuntimeDTO, err error)
 	GetNodePackageRunScript(req request.NodePackageReq) ([]response.PackageScripts, error)
 	OperateRuntime(req request.RuntimeOperate) error
 	GetNodeModules(req request.NodeModuleReq) ([]response.NodeModule, error)
@@ -70,7 +70,7 @@ type IRuntimeService interface {
 	GetFPMConfig(id uint) (*request.FPMConfig, error)
 
 	UpdatePHPContainer(req request.PHPContainerConfig) error
-	GetPHPContainerConfig(id uint) (*request.PHPContainerConfig, error)
+	GetPHPContainerConfig(id uint, readOnly ...bool) (*request.PHPContainerConfig, error)
 
 	GetSupervisorProcess(id uint) ([]response.SupervisorProcessConfig, error)
 	OperateSupervisorProcess(req request.PHPSupervisorProcessConfig) error
@@ -332,8 +332,11 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 	if len(runtimes) == 0 {
 		return 0, res, nil
 	}
-	if err = SyncRuntimesStatus(runtimes); err != nil {
-		return 0, nil, err
+	readOnlyMode := isDemoReadOnly(req.ReadOnly)
+	if !readOnlyMode {
+		if err = SyncRuntimesStatus(runtimes); err != nil {
+			return 0, nil, err
+		}
 	}
 	for _, runtime := range runtimes {
 		if runtime.Resource == constant.ResourceLocal {
@@ -347,7 +350,7 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 		}
 		detail, _ := appDetailRepo.GetFirst(repo.WithByID(runtime.AppDetailID))
 		if detail.AppId == 0 {
-			appID, appDetailID := handleRuntimeDetailID(runtime)
+			appID, appDetailID := handleRuntimeDetailID(runtime, !readOnlyMode)
 			runtimeDTO.AppDetailID = appDetailID
 			runtimeDTO.AppID = appID
 		} else {
@@ -357,6 +360,9 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 			if !isComposePortEnvKey(k) {
 				runtimeDTO.Params[k] = v
 			}
+		}
+		if readOnlyMode {
+			redactSensitiveValues(runtimeDTO.Params)
 		}
 		runtimeDTO.ExposedPorts, _ = loadComposeExposedPortsFromEnv(envs, "", false)
 		res = append(res, runtimeDTO)
@@ -538,7 +544,7 @@ func deleteRuntimeImages(runtime *model.Runtime, taskItem *task.Task) {
 	}
 }
 
-func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
+func (r *RuntimeService) Get(id uint, readOnly ...bool) (*response.RuntimeDTO, error) {
 	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(id))
 	if err != nil {
 		return nil, err
@@ -626,6 +632,11 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 		if err := handleRuntimeDTO(&res, *runtime); err != nil {
 			return nil, err
 		}
+	}
+	if isDemoReadOnly(readOnly...) {
+		redactSensitiveValues(res.Params)
+		redactSensitiveAppParams(res.AppParams)
+		redactSensitiveEnvironments(res.Environments)
 	}
 
 	return &res, nil
@@ -1348,7 +1359,7 @@ func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) erro
 	return nil
 }
 
-func (r *RuntimeService) GetPHPContainerConfig(id uint) (*request.PHPContainerConfig, error) {
+func (r *RuntimeService) GetPHPContainerConfig(id uint, readOnly ...bool) (*request.PHPContainerConfig, error) {
 	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(id))
 	if err != nil {
 		return nil, err
@@ -1364,6 +1375,9 @@ func (r *RuntimeService) GetPHPContainerConfig(id uint) (*request.PHPContainerCo
 		Environments:  runtimeDTO.Environments,
 		Volumes:       runtimeDTO.Volumes,
 		ExtraHosts:    runtimeDTO.ExtraHosts,
+	}
+	if isDemoReadOnly(readOnly...) {
+		redactSensitiveEnvironments(res.Environments)
 	}
 	return res, nil
 }

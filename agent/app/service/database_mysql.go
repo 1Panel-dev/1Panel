@@ -46,7 +46,7 @@ type IMysqlService interface {
 	DeleteCheck(req dto.MysqlDBDeleteCheck) ([]dto.DBResource, error)
 	Delete(ctx context.Context, req dto.MysqlDBDelete) error
 
-	ListUsers(req dto.MysqlUserSearch) ([]dto.MysqlUser, error)
+	ListUsers(req dto.MysqlUserSearch, readOnly ...bool) ([]dto.MysqlUser, error)
 	ListGrants(req dto.MysqlUserSearch) ([]dto.MysqlGrant, error)
 	ListGrantSummary(req dto.MysqlGrantSummarySearch) (map[string][]dto.MysqlUser, error)
 	CreateUser(req dto.MysqlUserCreate) error
@@ -506,7 +506,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 	return &createItem, nil
 }
 
-func (u *MysqlService) ListUsers(req dto.MysqlUserSearch) ([]dto.MysqlUser, error) {
+func (u *MysqlService) ListUsers(req dto.MysqlUserSearch, readOnly ...bool) ([]dto.MysqlUser, error) {
 	dbType, err := resolveDatabaseUserType(req.Database)
 	if err != nil {
 		return nil, err
@@ -520,10 +520,14 @@ func (u *MysqlService) ListUsers(req dto.MysqlUserSearch) ([]dto.MysqlUser, erro
 		if isMysqlSystemUser(user.Username) {
 			continue
 		}
+		password := user.Password
+		if isDemoReadOnly(readOnly...) {
+			password = ""
+		}
 		res = append(res, dto.MysqlUser{
 			Username:    user.Username,
 			Host:        user.Host,
-			Password:    user.Password,
+			Password:    password,
 			Description: user.Description,
 			IsDelete:    user.IsDelete,
 		})

@@ -255,7 +255,7 @@ func (b *BaseApi) GetHTTPSConfig(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	res, err := websiteService.GetWebsiteHTTPS(id)
+	res, err := websiteService.GetWebsiteHTTPS(id, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -1080,7 +1080,7 @@ func (b *BaseApi) GetWebsiteResource(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	res, err := websiteService.GetWebsiteResource(id)
+	res, err := websiteService.GetWebsiteResource(id, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

@@ -87,7 +87,7 @@ type IFileService interface {
 	ConvertLog(req dto.PageInfo) (int64, []response.FileConvertLog, error)
 	BatchGetRemarks(req request.FileRemarkBatch) map[string]string
 	SetRemark(req request.FileRemarkUpdate) error
-	AISearch(req request.FileAISearch) (*response.FileAISearchResult, error)
+	AISearch(req request.FileAISearch, readOnly ...bool) (*response.FileAISearchResult, error)
 }
 
 const (
@@ -1560,7 +1560,7 @@ func (f *FileService) ConvertLog(req dto.PageInfo) (total int64, data []response
 	return total, data, nil
 }
 
-func (f *FileService) AISearch(req request.FileAISearch) (*response.FileAISearchResult, error) {
+func (f *FileService) AISearch(req request.FileAISearch, readOnly ...bool) (*response.FileAISearchResult, error) {
 	root := filepath.Clean(strings.TrimSpace(req.Path))
 	if root == "" {
 		return nil, buserr.WithDetail("ErrInvalidParams", "path is required", nil)
@@ -1613,10 +1613,15 @@ func (f *FileService) AISearch(req request.FileAISearch) (*response.FileAISearch
 		return nil, buserr.WithDetail("ErrFileAISearchBadPattern", err.Error(), nil)
 	}
 
-	cfg, timeout, err := terminalai.LoadFileAIRuntimeConfig()
-	aiEnabled := err == nil
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return nil, err
+	var cfg terminalai.GeneratorConfig
+	var timeout time.Duration
+	aiEnabled := false
+	if !isDemoReadOnly(readOnly...) {
+		cfg, timeout, err = terminalai.LoadFileAIRuntimeConfig()
+		aiEnabled = err == nil
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
+			return nil, err
+		}
 	}
 
 	items, truncated, err := files.CollectDirInventory(root, containSub, maxItems)

@@ -245,7 +245,9 @@ func SyncRuntimesStatus(runtimes []model.Runtime) error {
 			case "restarting":
 				runtimes[index].Status = constant.StatusRestarting
 			}
-			_ = runtimeRepo.Save(&runtimes[index])
+			if !global.CONF.Base.IsDemo {
+				_ = runtimeRepo.Save(&runtimes[index])
+			}
 			delete(runtimeContainer, contain.Names[0])
 		}
 	}
@@ -295,6 +297,9 @@ func SyncRuntimeContainerStatus(runtime *model.Runtime) error {
 		}
 	}
 
+	if global.CONF.Base.IsDemo {
+		return nil
+	}
 	return runtimeRepo.Save(runtime)
 }
 
@@ -1148,7 +1153,7 @@ func getOperation(operate, pkgManager string) string {
 	return ops[1]
 }
 
-func handleRuntimeDetailID(runtime model.Runtime) (uint, uint) {
+func handleRuntimeDetailID(runtime model.Runtime, persist bool) (uint, uint) {
 	app, _ := appRepo.GetFirst(appRepo.WithKey(runtime.Type))
 	if app.ID == 0 {
 		return 0, 0
@@ -1158,6 +1163,8 @@ func handleRuntimeDetailID(runtime model.Runtime) (uint, uint) {
 		return 0, 0
 	}
 	runtime.AppDetailID = appDetail.ID
-	_ = runtimeRepo.Save(&runtime)
+	if persist && !global.CONF.Base.IsDemo {
+		_ = runtimeRepo.Save(&runtime)
+	}
 	return app.ID, appDetail.ID
 }

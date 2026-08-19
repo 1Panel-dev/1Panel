@@ -144,7 +144,7 @@ func (b *BaseApi) SearchCronjob(c *gin.Context) {
 		return
 	}
 
-	total, list, err := cronjobService.SearchWithPage(req)
+	total, list, err := cronjobService.SearchWithPage(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

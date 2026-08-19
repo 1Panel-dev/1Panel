@@ -273,7 +273,7 @@ func (b *BaseApi) SearchCompose(c *gin.Context) {
 		return
 	}
 
-	total, list, err := containerService.PageCompose(req)
+	total, list, err := containerService.PageCompose(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -387,7 +387,7 @@ func (b *BaseApi) ContainerInfo(c *gin.Context) {
 		return
 	}
 
-	data, err := containerService.ContainerInfo(req)
+	data, err := containerService.ContainerInfo(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

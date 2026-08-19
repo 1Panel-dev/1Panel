@@ -37,9 +37,9 @@ type WebsiteCAService struct {
 }
 
 type IWebsiteCAService interface {
-	Page(search request.WebsiteCASearch) (int64, []response.WebsiteCADTO, error)
+	Page(search request.WebsiteCASearch, readOnly ...bool) (int64, []response.WebsiteCADTO, error)
 	Create(create request.WebsiteCACreate) (*request.WebsiteCACreate, error)
-	GetCA(id uint) (*response.WebsiteCADTO, error)
+	GetCA(id uint, readOnly ...bool) (*response.WebsiteCADTO, error)
 	Delete(id uint) error
 	ObtainSSL(req request.WebsiteCAObtain) (*model.WebsiteSSL, error)
 	DownloadFile(id uint) (*os.File, error)
@@ -49,13 +49,16 @@ func NewIWebsiteCAService() IWebsiteCAService {
 	return &WebsiteCAService{}
 }
 
-func (w WebsiteCAService) Page(search request.WebsiteCASearch) (int64, []response.WebsiteCADTO, error) {
+func (w WebsiteCAService) Page(search request.WebsiteCASearch, readOnly ...bool) (int64, []response.WebsiteCADTO, error) {
 	total, cas, err := websiteCARepo.Page(search.Page, search.PageSize, repo.WithOrderDesc("created_at"))
 	if err != nil {
 		return 0, nil, err
 	}
 	var caDTOs []response.WebsiteCADTO
 	for _, ca := range cas {
+		if isDemoReadOnly(readOnly...) {
+			ca.PrivateKey = ""
+		}
 		caDTOs = append(caDTOs, response.WebsiteCADTO{
 			WebsiteCA: ca,
 		})
@@ -125,11 +128,14 @@ func (w WebsiteCAService) Create(create request.WebsiteCACreate) (*request.Websi
 	return &create, nil
 }
 
-func (w WebsiteCAService) GetCA(id uint) (*response.WebsiteCADTO, error) {
+func (w WebsiteCAService) GetCA(id uint, readOnly ...bool) (*response.WebsiteCADTO, error) {
 	res := &response.WebsiteCADTO{}
 	ca, err := websiteCARepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return nil, err
+	}
+	if isDemoReadOnly(readOnly...) {
+		ca.PrivateKey = ""
 	}
 	res.WebsiteCA = ca
 	certBlock, _ := pem.Decode([]byte(ca.CSR))

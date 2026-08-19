@@ -36,7 +36,7 @@ func OperationLog() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Request.Header.Del(headerNeedOperationResolve)
 
-		if strings.Contains(c.Request.URL.Path, "search") || c.Request.Method == http.MethodGet {
+		if c.GetBool(demoReadOnlyContextKey) || strings.Contains(c.Request.URL.Path, "search") || c.Request.Method == http.MethodGet {
 			c.Next()
 			return
 		}

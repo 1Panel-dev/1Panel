@@ -22,6 +22,7 @@ const (
 	TypeComposeCreate = "compose-create"
 
 	InterruptedMsg = "the task was interrupted due to the restart of the 1panel service"
+	DemoModeHeader = "X-Panel-Demo-Mode"
 )
 
 const (

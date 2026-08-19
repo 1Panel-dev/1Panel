@@ -48,6 +48,10 @@ func BadRequest(ctx *gin.Context, err error) {
 	ErrorWithDetail(ctx, http.StatusBadRequest, "ErrInvalidParams", err)
 }
 
+func IsDemoRequest(ctx *gin.Context) bool {
+	return global.CONF.Base.IsDemo || ctx.GetHeader(constant.DemoModeHeader) == strconv.FormatBool(true)
+}
+
 func SuccessWithData(ctx *gin.Context, data interface{}) {
 	if data == nil {
 		data = gin.H{}

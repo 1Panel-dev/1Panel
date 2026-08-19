@@ -19,7 +19,7 @@ func (b *BaseApi) PageTensorRTLLMs(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	list := tensorrtLLMService.Page(req)
+	list := tensorrtLLMService.Page(req, helper.IsDemoRequest(c))
 	helper.SuccessWithData(c, list)
 }
 

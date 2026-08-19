@@ -23,7 +23,7 @@ import (
 type MongodbService struct{}
 
 type IMongodbService interface {
-	SearchWithPage(search dto.MongodbDBSearch) (int64, interface{}, error)
+	SearchWithPage(search dto.MongodbDBSearch, readOnly ...bool) (int64, interface{}, error)
 	Create(ctx context.Context, req dto.MongodbDBCreate) (*model.DatabaseMongodb, error)
 	LoadFromRemote(req dto.MongodbLoadDB) error
 	UpdateDescription(req dto.UpdateDescription) error
@@ -40,7 +40,7 @@ func NewIMongodbService() IMongodbService {
 	return &MongodbService{}
 }
 
-func (u *MongodbService) SearchWithPage(search dto.MongodbDBSearch) (int64, interface{}, error) {
+func (u *MongodbService) SearchWithPage(search dto.MongodbDBSearch, readOnly ...bool) (int64, interface{}, error) {
 	total, mongodbs, err := mongodbRepo.Page(
 		search.Page,
 		search.PageSize,
@@ -53,6 +53,9 @@ func (u *MongodbService) SearchWithPage(search dto.MongodbDBSearch) (int64, inte
 		var item dto.MongodbDBInfo
 		if err := copier.Copy(&item, &mongodb); err != nil {
 			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
+		}
+		if isDemoReadOnly(readOnly...) {
+			item.Password = ""
 		}
 		dtoMongodbs = append(dtoMongodbs, item)
 	}

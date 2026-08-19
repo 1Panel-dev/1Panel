@@ -106,7 +106,7 @@ func (b *BaseApi) SearchClam(c *gin.Context) {
 // @Security Timestamp
 // @Router /toolbox/clam/base [post]
 func (b *BaseApi) LoadClamBaseInfo(c *gin.Context) {
-	info, err := clamService.LoadBaseInfo()
+	info, err := clamService.LoadBaseInfo(helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

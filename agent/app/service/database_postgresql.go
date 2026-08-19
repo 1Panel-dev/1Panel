@@ -26,7 +26,7 @@ import (
 type PostgresqlService struct{}
 
 type IPostgresqlService interface {
-	SearchWithPage(search dto.PostgresqlDBSearch) (int64, interface{}, error)
+	SearchWithPage(search dto.PostgresqlDBSearch, readOnly ...bool) (int64, interface{}, error)
 	ListDBOption() ([]dto.PostgresqlOption, error)
 	BindUser(req dto.PostgresqlBindUser) error
 	Create(ctx context.Context, req dto.PostgresqlDBCreate) (*model.DatabasePostgresql, error)
@@ -42,7 +42,7 @@ func NewIPostgresqlService() IPostgresqlService {
 	return &PostgresqlService{}
 }
 
-func (u *PostgresqlService) SearchWithPage(search dto.PostgresqlDBSearch) (int64, interface{}, error) {
+func (u *PostgresqlService) SearchWithPage(search dto.PostgresqlDBSearch, readOnly ...bool) (int64, interface{}, error) {
 	total, postgresqls, err := postgresqlRepo.Page(search.Page, search.PageSize,
 		postgresqlRepo.WithByPostgresqlName(search.Database),
 		repo.WithByLikeName(search.Info),
@@ -53,6 +53,9 @@ func (u *PostgresqlService) SearchWithPage(search dto.PostgresqlDBSearch) (int64
 		var item dto.PostgresqlDBInfo
 		if err := copier.Copy(&item, &pg); err != nil {
 			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
+		}
+		if isDemoReadOnly(readOnly...) {
+			item.Password = ""
 		}
 		dtoPostgresqls = append(dtoPostgresqls, item)
 	}

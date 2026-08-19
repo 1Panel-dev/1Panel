@@ -38,7 +38,7 @@ type IAgentService interface {
 	BatchUpgrade(req dto.AgentBatchUpgradeReq) ([]dto.AgentBatchUpgradeResult, error)
 	BatchInstallSkill(req dto.AgentBatchSkillInstallReq) ([]dto.AgentBatchSkillInstallResult, error)
 	BatchOperate(req dto.AgentBatchOperateReq) ([]dto.AgentBatchOperateResult, error)
-	Page(req dto.SearchWithPage) (int64, []dto.AgentItem, error)
+	Page(req dto.SearchWithPage, readOnly bool) (int64, []dto.AgentItem, error)
 	DeleteCheck(req dto.AgentIDReq) ([]dto.AppResource, error)
 	Delete(req dto.AgentDeleteReq) error
 	ResetToken(req dto.AgentTokenResetReq) error
@@ -76,7 +76,7 @@ type IAgentService interface {
 	CreateAccount(req dto.AgentAccountCreateReq) error
 	UpdateAccount(req dto.AgentAccountUpdateReq) error
 	SyncAgentsByAccount(account *model.AgentAccount) error
-	PageAccounts(req dto.AgentAccountSearch) (int64, []dto.AgentAccountInfo, error)
+	PageAccounts(req dto.AgentAccountSearch, readOnly ...bool) (int64, []dto.AgentAccountInfo, error)
 	CountAccountsByProviders(req dto.AgentAccountProviderCountReq) (map[string]int64, error)
 	GetAccountModels(req dto.AgentAccountModelReq) ([]dto.AgentAccountModel, error)
 	DiscoverAccountModels(req dto.AgentAccountModelDiscoverReq) ([]dto.AgentAccountModel, error)
@@ -745,7 +745,7 @@ func setAgentWebUIParams(params map[string]interface{}, agentType, appVersion st
 	params["PANEL_APP_PORT_HTTP"] = webUIPort
 }
 
-func (a AgentService) Page(req dto.SearchWithPage) (int64, []dto.AgentItem, error) {
+func (a AgentService) Page(req dto.SearchWithPage, readOnly bool) (int64, []dto.AgentItem, error) {
 	var opts []repo.DBOption
 	if strings.TrimSpace(req.Info) != "" {
 		opts = append(opts, repo.WithByLikeName(req.Info))
@@ -760,11 +760,19 @@ func (a AgentService) Page(req dto.SearchWithPage) (int64, []dto.AgentItem, erro
 		appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(item.AppInstallID))
 		appInstalls = append(appInstalls, appInstall)
 	}
-	syncAgentAppInstalls(appInstalls)
+	readOnlyMode := isDemoReadOnly(readOnly)
+	if !readOnlyMode {
+		syncAgentAppInstalls(appInstalls)
+	}
 	for index, item := range list {
 		appInstall := appInstalls[index]
 		envMap := readInstallEnv(appInstall.Env)
 		agentItem := buildAgentItem(&item, &appInstall, envMap)
+		if readOnlyMode {
+			agentItem.Token = ""
+			agentItem.APIKey = ""
+			agentItem.DashboardPassword = ""
+		}
 		agentItem.Upgradable = checkAgentUpgradable(appInstall)
 		items = append(items, agentItem)
 	}
@@ -1128,7 +1136,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	return nil
 }
 
-func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.AgentAccountInfo, error) {
+func (a AgentService) PageAccounts(req dto.AgentAccountSearch, readOnly ...bool) (int64, []dto.AgentAccountInfo, error) {
 	var opts []repo.DBOption
 	if strings.TrimSpace(req.Provider) != "" {
 		opts = append(opts, repo.WithByProvider(req.Provider))
@@ -1149,7 +1157,7 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 	items := make([]dto.AgentAccountInfo, 0, len(list))
 	for _, item := range list {
 		apiKey := ""
-		if item.RememberAPIKey {
+		if item.RememberAPIKey && !isDemoReadOnly(readOnly...) {
 			apiKey = item.APIKey
 		}
 		items = append(items, dto.AgentAccountInfo{

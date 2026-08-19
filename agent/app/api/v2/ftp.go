@@ -87,7 +87,7 @@ func (b *BaseApi) SearchFtp(c *gin.Context) {
 		return
 	}
 
-	total, list, err := ftpService.SearchWithPage(req)
+	total, list, err := ftpService.SearchWithPage(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

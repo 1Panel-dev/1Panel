@@ -16,7 +16,7 @@ type WebsiteDnsAccountService struct {
 }
 
 type IWebsiteDnsAccountService interface {
-	Page(search dto.PageInfo) (int64, []response.WebsiteDnsAccountDTO, error)
+	Page(search dto.PageInfo, readOnly ...bool) (int64, []response.WebsiteDnsAccountDTO, error)
 	Create(create request.WebsiteDnsAccountCreate) (request.WebsiteDnsAccountCreate, error)
 	Update(update request.WebsiteDnsAccountUpdate) (request.WebsiteDnsAccountUpdate, error)
 	Delete(id uint) error
@@ -26,12 +26,14 @@ func NewIWebsiteDnsAccountService() IWebsiteDnsAccountService {
 	return &WebsiteDnsAccountService{}
 }
 
-func (w WebsiteDnsAccountService) Page(search dto.PageInfo) (int64, []response.WebsiteDnsAccountDTO, error) {
+func (w WebsiteDnsAccountService) Page(search dto.PageInfo, readOnly ...bool) (int64, []response.WebsiteDnsAccountDTO, error) {
 	total, accounts, err := websiteDnsRepo.Page(search.Page, search.PageSize, repo.WithOrderDesc("created_at"))
 	var accountDTOs []response.WebsiteDnsAccountDTO
 	for _, account := range accounts {
 		auth := make(map[string]string)
-		_ = json.Unmarshal([]byte(account.Authorization), &auth)
+		if !isDemoReadOnly(readOnly...) {
+			_ = json.Unmarshal([]byte(account.Authorization), &auth)
+		}
 		accountDTOs = append(accountDTOs, response.WebsiteDnsAccountDTO{
 			WebsiteDnsAccount: account,
 			Authorization:     auth,

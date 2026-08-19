@@ -24,8 +24,8 @@ import (
 type DatabaseService struct{}
 
 type IDatabaseService interface {
-	Get(name string) (dto.DatabaseInfo, error)
-	SearchWithPage(search dto.DatabaseSearch) (int64, interface{}, error)
+	Get(name string, readOnly ...bool) (dto.DatabaseInfo, error)
+	SearchWithPage(search dto.DatabaseSearch, readOnly ...bool) (int64, interface{}, error)
 	CheckDatabase(req dto.DatabaseCreate) bool
 	Create(req dto.DatabaseCreate) error
 	Update(req dto.DatabaseUpdate) error
@@ -39,7 +39,7 @@ func NewIDatabaseService() IDatabaseService {
 	return &DatabaseService{}
 }
 
-func (u *DatabaseService) SearchWithPage(search dto.DatabaseSearch) (int64, interface{}, error) {
+func (u *DatabaseService) SearchWithPage(search dto.DatabaseSearch, readOnly ...bool) (int64, interface{}, error) {
 	total, dbs, err := databaseRepo.Page(search.Page, search.PageSize,
 		databaseRepo.WithTypeList(search.Type),
 		repo.WithByLikeName(search.Info),
@@ -52,12 +52,16 @@ func (u *DatabaseService) SearchWithPage(search dto.DatabaseSearch) (int64, inte
 		if err := copier.Copy(&item, &db); err != nil {
 			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
+		if isDemoReadOnly(readOnly...) {
+			item.Password = ""
+			item.ClientKey = ""
+		}
 		datas = append(datas, item)
 	}
 	return total, datas, err
 }
 
-func (u *DatabaseService) Get(name string) (dto.DatabaseInfo, error) {
+func (u *DatabaseService) Get(name string, readOnly ...bool) (dto.DatabaseInfo, error) {
 	var data dto.DatabaseInfo
 	remote, err := databaseRepo.Get(repo.WithByName(name))
 	if err != nil {
@@ -65,6 +69,10 @@ func (u *DatabaseService) Get(name string) (dto.DatabaseInfo, error) {
 	}
 	if err := copier.Copy(&data, &remote); err != nil {
 		return data, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
+	}
+	if isDemoReadOnly(readOnly...) {
+		data.Password = ""
+		data.ClientKey = ""
 	}
 	return data, nil
 }

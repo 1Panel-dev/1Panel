@@ -33,7 +33,7 @@ type ClamService struct {
 }
 
 type IClamService interface {
-	LoadBaseInfo() (dto.ClamBaseInfo, error)
+	LoadBaseInfo(readOnly bool) (dto.ClamBaseInfo, error)
 	Operate(operate string) error
 	SearchWithPage(search dto.SearchClamWithPage) (int64, interface{}, error)
 	Create(req dto.ClamCreate, operator string) error
@@ -53,7 +53,7 @@ func NewIClamService() IClamService {
 	return &ClamService{}
 }
 
-func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
+func (c *ClamService) LoadBaseInfo(readOnly bool) (dto.ClamBaseInfo, error) {
 	var baseInfo dto.ClamBaseInfo
 	baseInfo.Version = "-"
 	baseInfo.FreshVersion = "-"
@@ -96,7 +96,7 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 				baseInfo.Version = strings.TrimPrefix(version, "ClamAV ")
 			}
 		}
-	} else {
+	} else if !readOnly && !global.CONF.Base.IsDemo {
 		_ = clam.CheckWithStopAll(false, clamRepo)
 	}
 	if baseInfo.FreshIsActive {

@@ -51,7 +51,7 @@ type IAlertService interface {
 	GetCronJobs(req dto.CronJobReq) ([]dto.CronJobDTO, error)
 
 	GetAlertConfig(req dto.AlertConfigQuery) ([]model.AlertConfig, error)
-	PageAlertConfig(req dto.AlertConfigPageReq) (int64, []model.AlertConfig, error)
+	PageAlertConfig(req dto.AlertConfigPageReq, readOnly ...bool) (int64, []model.AlertConfig, error)
 	UpdateAlertConfig(req dto.AlertConfigUpdate, operator string) error
 	DeleteAlertConfig(id uint) error
 	TestAlertConfig(req dto.AlertConfigTest) (bool, error)
@@ -497,7 +497,7 @@ func (a AlertService) GetAlertConfig(req dto.AlertConfigQuery) ([]model.AlertCon
 	return configs, err
 }
 
-func (a AlertService) PageAlertConfig(req dto.AlertConfigPageReq) (int64, []model.AlertConfig, error) {
+func (a AlertService) PageAlertConfig(req dto.AlertConfigPageReq, readOnly ...bool) (int64, []model.AlertConfig, error) {
 	opts := []repo.DBOption{
 		alertRepo.WithByTypeNotIn([]string{"common"}),
 		repo.WithOrderDesc("created_at"),
@@ -505,7 +505,25 @@ func (a AlertService) PageAlertConfig(req dto.AlertConfigPageReq) (int64, []mode
 	if len(req.ExcludeTypes) > 0 {
 		opts = append(opts, alertRepo.WithByTypeNotIn(req.ExcludeTypes))
 	}
-	return alertRepo.PageAlertConfig(req.Page, req.PageSize, opts...)
+	total, configs, err := alertRepo.PageAlertConfig(req.Page, req.PageSize, opts...)
+	if err != nil || !isDemoReadOnly(readOnly...) {
+		return total, configs, err
+	}
+	for i := range configs {
+		var value interface{}
+		if err := json.Unmarshal([]byte(configs[i].Config), &value); err != nil {
+			configs[i].Config = ""
+			continue
+		}
+		redactSensitiveData(value)
+		data, err := json.Marshal(value)
+		if err != nil {
+			configs[i].Config = ""
+			continue
+		}
+		configs[i].Config = string(data)
+	}
+	return total, configs, nil
 }
 
 func (a AlertService) UpdateAlertConfig(req dto.AlertConfigUpdate, operator string) error {

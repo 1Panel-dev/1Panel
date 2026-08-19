@@ -42,21 +42,21 @@ type IAppInstallService interface {
 	Page(req request.AppInstalledSearch) (int64, []response.AppInstallDTO, error)
 	CheckExist(req request.AppInstalledInfo) (*response.AppInstalledCheck, error)
 	LoadPort(req dto.OperationWithNameAndType) (int64, error)
-	LoadConnInfo(req dto.OperationWithNameAndType) (response.DatabaseConn, error)
+	LoadConnInfo(req dto.OperationWithNameAndType, readOnly ...bool) (response.DatabaseConn, error)
 	SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstallDTO, error)
 	Operate(req request.AppInstalledOperate) error
 	Update(req request.AppInstalledUpdate) error
 	SyncAll(systemInit bool) error
 	GetServices(key string) ([]response.AppService, error)
 	GetUpdateVersions(req request.AppUpdateVersion) ([]dto.AppVersion, error)
-	GetParams(id uint) (*response.AppConfig, error)
+	GetParams(id uint, readOnly ...bool) (*response.AppConfig, error)
 	ChangeAppPort(req request.PortUpdate) error
 	GetDefaultConfigByKey(key, name string) (string, error)
-	DeleteCheck(installId uint) ([]dto.AppResource, error)
+	DeleteCheck(installId uint, readOnly ...bool) ([]dto.AppResource, error)
 
 	UpdateAppConfig(req request.AppConfigUpdate) error
 	GetInstallList() ([]dto.AppInstallInfo, error)
-	GetAppInstallInfo(appInstallID uint) (*response.AppInstallInfo, error)
+	GetAppInstallInfo(appInstallID uint, readOnly ...bool) (*response.AppInstallInfo, error)
 	UpdateSort(req request.AppInstallSort) error
 }
 
@@ -123,7 +123,7 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 		}
 	}
 
-	installDTOs, _ := handleInstalled(installs, req.Update, req.Sync, req.CheckUpdate)
+	installDTOs, _ := handleInstalled(installs, req.Update, req.Sync && !req.ReadOnly, req.CheckUpdate, req.ReadOnly)
 	if req.Update {
 		total = int64(len(installDTOs))
 	}
@@ -151,8 +151,10 @@ func (a *AppInstallService) CheckExist(req request.AppInstalledInfo) (*response.
 	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
 		return res, nil
 	}
-	if err = syncAppInstallStatus(&appInstall, false); err != nil {
-		return nil, err
+	if !req.ReadOnly {
+		if err = syncAppInstallStatus(&appInstall, false); err != nil {
+			return nil, err
+		}
 	}
 
 	res.ContainerName = appInstall.ContainerName
@@ -182,7 +184,7 @@ func (a *AppInstallService) LoadPort(req dto.OperationWithNameAndType) (int64, e
 	return app.Port, nil
 }
 
-func (a *AppInstallService) LoadConnInfo(req dto.OperationWithNameAndType) (response.DatabaseConn, error) {
+func (a *AppInstallService) LoadConnInfo(req dto.OperationWithNameAndType, readOnly ...bool) (response.DatabaseConn, error) {
 	var data response.DatabaseConn
 	app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
@@ -191,6 +193,9 @@ func (a *AppInstallService) LoadConnInfo(req dto.OperationWithNameAndType) (resp
 	data.Status = app.Status
 	data.Username = app.UserName
 	data.Password = app.Password
+	if isDemoReadOnly(readOnly...) {
+		data.Password = ""
+	}
 	data.ServiceName = app.ServiceName
 	data.Port = app.Port
 	data.ContainerName = app.ContainerName
@@ -240,7 +245,7 @@ func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]
 		}
 	}
 
-	return handleInstalled(installs, false, true, false)
+	return handleInstalled(installs, false, !req.ReadOnly, false, req.ReadOnly)
 }
 
 func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
@@ -664,7 +669,7 @@ func (a *AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 	return nil
 }
 
-func (a *AppInstallService) DeleteCheck(installID uint) ([]dto.AppResource, error) {
+func (a *AppInstallService) DeleteCheck(installID uint, readOnly ...bool) ([]dto.AppResource, error) {
 	var res []dto.AppResource
 	appInstall, err := appInstallRepo.GetFirst(repo.WithByID(installID))
 	if err != nil {
@@ -685,7 +690,7 @@ func (a *AppInstallService) DeleteCheck(installID uint) ([]dto.AppResource, erro
 				Type: "app",
 				Name: linkInstall.Name,
 			})
-		} else {
+		} else if !isDemoReadOnly(readOnly...) {
 			_ = appInstallResourceRepo.DeleteBy(context.Background(), appInstallResourceRepo.WithAppInstallId(resource.AppInstallId))
 		}
 	}
@@ -723,7 +728,7 @@ func (a *AppInstallService) GetDefaultConfigByKey(key, name string) (string, err
 	return string(contentByte), nil
 }
 
-func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
+func (a *AppInstallService) GetParams(id uint, readOnly ...bool) (*response.AppConfig, error) {
 	var (
 		params  []response.AppParam
 		appForm dto.AppForm
@@ -818,8 +823,14 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 		}
 	}
 
+	readOnlyMode := isDemoReadOnly(readOnly...)
+	if readOnlyMode {
+		redactSensitiveAppParams(params)
+	}
 	config := getAppCommonConfig(envs)
-	config.DockerCompose = install.DockerCompose
+	if !readOnlyMode {
+		config.DockerCompose = install.DockerCompose
+	}
 	res.Params = params
 	if config.ContainerName == "" {
 		config.ContainerName = install.ContainerName
@@ -829,8 +840,10 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	res.RestartPolicy = getRestartPolicy(install.DockerCompose)
 	res.WebUI = install.WebUI
 	res.Type = install.App.Type
-	if rawCompose, err := getUpgradeCompose(install, detail); err == nil {
-		res.RawCompose = rawCompose
+	if !readOnlyMode {
+		if rawCompose, err := getUpgradeCompose(install, detail); err == nil {
+			res.RawCompose = rawCompose
+		}
 	}
 	return &res, nil
 }
@@ -958,19 +971,24 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 	return nil
 }
 
-func (a *AppInstallService) GetAppInstallInfo(installID uint) (*response.AppInstallInfo, error) {
+func (a *AppInstallService) GetAppInstallInfo(installID uint, readOnly ...bool) (*response.AppInstallInfo, error) {
 	appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(installID))
 	if appInstall.ID == 0 {
 		return &response.AppInstallInfo{
 			Status: constant.StatusDeleted,
 		}, nil
 	}
-	_ = syncAppInstallStatus(&appInstall, false)
+	if !isDemoReadOnly(readOnly...) {
+		_ = syncAppInstallStatus(&appInstall, false)
+	}
 	appInstall, _ = appInstallRepo.GetFirst(repo.WithByID(installID))
 	var envMap map[string]interface{}
 	err := json.Unmarshal([]byte(appInstall.Env), &envMap)
 	if err != nil {
 		return nil, err
+	}
+	if isDemoReadOnly(readOnly...) {
+		redactSensitiveValues(envMap)
 	}
 	res := &response.AppInstallInfo{
 		ID:          appInstall.ID,

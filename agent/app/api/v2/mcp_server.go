@@ -19,7 +19,7 @@ func (b *BaseApi) PageMcpServers(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	list := mcpServerService.Page(req)
+	list := mcpServerService.Page(req, helper.IsDemoRequest(c))
 	helper.SuccessWithData(c, list)
 }
 

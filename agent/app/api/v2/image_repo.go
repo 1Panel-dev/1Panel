@@ -21,7 +21,7 @@ func (b *BaseApi) SearchRepo(c *gin.Context) {
 		return
 	}
 
-	total, list, err := imageRepoService.Page(req)
+	total, list, err := imageRepoService.Page(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

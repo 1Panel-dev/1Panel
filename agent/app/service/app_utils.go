@@ -53,6 +53,62 @@ var (
 	Delete DatabaseOp = "delete"
 )
 
+func isDemoReadOnly(readOnly ...bool) bool {
+	return global.CONF.Base.IsDemo || len(readOnly) > 0 && readOnly[0]
+}
+
+func normalizeConfigKey(key string) string {
+	return strings.ToLower(strings.NewReplacer("_", "", "-", "", ".", "", " ", "").Replace(key))
+}
+
+func isSensitiveConfigKey(key string) bool {
+	normalized := normalizeConfigKey(key)
+	for _, marker := range []string{"password", "passwd", "passphrase", "secret", "token", "credential", "privatekey", "authorization"} {
+		if strings.Contains(normalized, marker) {
+			return true
+		}
+	}
+	return normalized == "key" || strings.HasSuffix(normalized, "key")
+}
+
+func redactSensitiveValues(values map[string]interface{}) {
+	redactSensitiveData(values)
+}
+
+func redactSensitiveData(value interface{}) {
+	switch data := value.(type) {
+	case map[string]interface{}:
+		for key, item := range data {
+			if isSensitiveConfigKey(key) {
+				data[key] = ""
+			} else {
+				redactSensitiveData(item)
+			}
+		}
+	case []interface{}:
+		for _, item := range data {
+			redactSensitiveData(item)
+		}
+	}
+}
+
+func redactSensitiveAppParams(params []response.AppParam) {
+	for i := range params {
+		if strings.EqualFold(params[i].Type, "password") || isSensitiveConfigKey(params[i].Key) {
+			params[i].Value = ""
+			params[i].ShowValue = ""
+		}
+	}
+}
+
+func redactSensitiveEnvironments(environments []request.Environment) {
+	for i := range environments {
+		if isSensitiveConfigKey(environments[i].Key) {
+			environments[i].Value = ""
+		}
+	}
+}
+
 func checkPort(key string, params map[string]interface{}) (int, error) {
 	port, ok := params[key]
 	if ok {
@@ -1387,7 +1443,9 @@ func synAppInstall(containers map[string]container.Summary, appInstall *model.Ap
 		}
 		appInstall.Status = constant.StatusError
 		appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(containerNames, ",")).Error()
-		_ = appInstallRepo.Save(context.Background(), appInstall)
+		if !global.CONF.Base.IsDemo {
+			_ = appInstallRepo.Save(context.Background(), appInstall)
+		}
 		return
 	}
 	notFoundNames := make([]string, 0)
@@ -1446,10 +1504,12 @@ func synAppInstall(containers map[string]container.Summary, appInstall *model.Ap
 		appInstall.Message = msg
 		appInstall.Status = constant.StatusUnHealthy
 	}
-	_ = appInstallRepo.Save(context.Background(), appInstall)
+	if !global.CONF.Base.IsDemo {
+		_ = appInstallRepo.Save(context.Background(), appInstall)
+	}
 }
 
-func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpdate bool) ([]response.AppInstallDTO, error) {
+func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpdate, readOnly bool) ([]response.AppInstallDTO, error) {
 	var (
 		res           []response.AppInstallDTO
 		containersMap map[string]container.Summary
@@ -1480,6 +1540,9 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 		resourceKeys := getAppInstallResourceKeys(installed.ID)
 		envMap := make(map[string]interface{})
 		_ = json.Unmarshal([]byte(installed.Env), &envMap)
+		if isDemoReadOnly(readOnly) {
+			redactSensitiveValues(envMap)
+		}
 		installDTO := response.AppInstallDTO{
 			ID:          installed.ID,
 			Name:        installed.Name,
@@ -1524,7 +1587,9 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 			continue
 		}
 
-		installDTO.DockerCompose = installed.DockerCompose
+		if !isDemoReadOnly(readOnly) {
+			installDTO.DockerCompose = installed.DockerCompose
+		}
 		installDTO.IsEdit = isEditCompose(installed)
 
 		details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(installed.App.ID))

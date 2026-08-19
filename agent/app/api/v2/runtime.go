@@ -20,6 +20,7 @@ func (b *BaseApi) SearchRuntimes(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	req.ReadOnly = helper.IsDemoRequest(c)
 	total, items, err := runtimeService.Page(req)
 	if err != nil {
 		helper.InternalServer(c, err)
@@ -132,7 +133,7 @@ func (b *BaseApi) GetRuntime(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	res, err := runtimeService.Get(id)
+	res, err := runtimeService.Get(id, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -529,7 +530,7 @@ func (b *BaseApi) GetPHPContainerConfig(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	data, err := runtimeService.GetPHPContainerConfig(id)
+	data, err := runtimeService.GetPHPContainerConfig(id, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

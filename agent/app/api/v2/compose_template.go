@@ -65,7 +65,7 @@ func (b *BaseApi) SearchComposeTemplate(c *gin.Context) {
 		return
 	}
 
-	total, list, err := composeTemplateService.SearchWithPage(req)
+	total, list, err := composeTemplateService.SearchWithPage(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -85,7 +85,7 @@ func (b *BaseApi) SearchComposeTemplate(c *gin.Context) {
 // @Security Timestamp
 // @Router /containers/template [get]
 func (b *BaseApi) ListComposeTemplate(c *gin.Context) {
-	list, err := composeTemplateService.List()
+	list, err := composeTemplateService.List(helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

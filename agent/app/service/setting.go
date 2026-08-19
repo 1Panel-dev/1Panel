@@ -40,7 +40,7 @@ type ISettingService interface {
 	SaveConnInfo(req dto.SSHConnData) error
 	SetDefaultIsConn(req dto.SSHDefaultConn) error
 	GetSystemProxy() (*dto.SystemProxy, error)
-	GetLocalConn() dto.SSHConnData
+	GetLocalConn(readOnly ...bool) dto.SSHConnData
 	GetLocalConnForSSH() (dto.SSHConnData, error)
 
 	SaveDescription(req dto.CommonDescription) error
@@ -311,8 +311,14 @@ func (u *SettingService) loadLocalConn() dto.SSHConnData {
 	return data
 }
 
-func (u *SettingService) GetLocalConn() dto.SSHConnData {
+func (u *SettingService) GetLocalConn(readOnly ...bool) dto.SSHConnData {
 	data := u.loadLocalConn()
+	if isDemoReadOnly(readOnly...) {
+		data.Password = ""
+		data.PrivateKey = ""
+		data.PassPhrase = ""
+		return data
+	}
 	if len(data.Password) != 0 {
 		data.Password = base64.StdEncoding.EncodeToString([]byte(data.Password))
 	}

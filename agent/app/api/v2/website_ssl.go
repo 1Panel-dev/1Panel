@@ -28,7 +28,7 @@ func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	total, accounts, err := websiteSSLService.Page(req)
+	total, accounts, err := websiteSSLService.Page(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -159,7 +159,7 @@ func (b *BaseApi) GetWebsiteSSLByWebsiteId(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	websiteSSL, err := websiteSSLService.GetWebsiteSSL(websiteId)
+	websiteSSL, err := websiteSSLService.GetWebsiteSSL(websiteId, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -181,7 +181,7 @@ func (b *BaseApi) GetWebsiteSSLById(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	websiteSSL, err := websiteSSLService.GetSSL(id)
+	websiteSSL, err := websiteSSLService.GetSSL(id, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

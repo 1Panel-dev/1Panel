@@ -21,7 +21,7 @@ type IHostService interface {
 	TestByInfo(req dto.HostConnTest) bool
 	GetHostByID(id uint) (*dto.HostInfo, error)
 	SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error)
-	SearchWithPage(search dto.SearchPageWithGroup) (int64, interface{}, error)
+	SearchWithPage(search dto.SearchPageWithGroup, readOnly ...bool) (int64, interface{}, error)
 	Create(req dto.HostOperate) (*dto.HostInfo, error)
 	Update(id uint, upMap map[string]interface{}) (*dto.HostInfo, error)
 	Delete(id []uint) error
@@ -111,7 +111,7 @@ func (u *HostService) TestLocalConn(id uint) bool {
 	return true
 }
 
-func (u *HostService) SearchWithPage(req dto.SearchPageWithGroup) (int64, interface{}, error) {
+func (u *HostService) SearchWithPage(req dto.SearchPageWithGroup, readOnly ...bool) (int64, interface{}, error) {
 	var options []repo.DBOption
 	if len(req.Info) != 0 {
 		options = append(options, hostRepo.WithByInfo(req.Info))
@@ -154,6 +154,11 @@ func (u *HostService) SearchWithPage(req dto.SearchPageWithGroup) (int64, interf
 					return 0, nil, err
 				}
 			}
+		}
+		if isDemoReadOnly(readOnly...) {
+			item.Password = ""
+			item.PrivateKey = ""
+			item.PassPhrase = ""
 		}
 		dtoHosts = append(dtoHosts, item)
 	}

@@ -209,7 +209,7 @@ func (b *BaseApi) SearchBackup(c *gin.Context) {
 		return
 	}
 
-	total, list, err := backupService.SearchWithPage(req)
+	total, list, err := backupService.SearchWithPage(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

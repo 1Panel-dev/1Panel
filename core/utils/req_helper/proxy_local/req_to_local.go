@@ -10,11 +10,14 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 )
 
@@ -82,6 +85,7 @@ func (c *ReusableClient) Request(reqUrl, reqMethod string, body io.Reader, ctx *
 			}
 		}
 	}
+	req.Header.Set(constant.DemoModeHeader, strconv.FormatBool(global.CONF.Base.IsDemo))
 
 	resp, err := c.client.Do(req)
 	if err != nil {

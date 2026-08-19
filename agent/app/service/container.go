@@ -65,7 +65,7 @@ type IContainerService interface {
 	PageVolume(req dto.SearchWithPage) (int64, interface{}, error)
 	ListVolume() ([]dto.Options, error)
 
-	PageCompose(req dto.SearchWithPage) (int64, interface{}, error)
+	PageCompose(req dto.SearchWithPage, readOnly ...bool) (int64, interface{}, error)
 	LoadComposeEnv(name string) (string, error)
 	CreateCompose(req dto.ComposeCreate) error
 	ComposeOperation(req dto.ComposeOperation) error
@@ -77,7 +77,7 @@ type IContainerService interface {
 	ContainerCreate(req dto.ContainerOperate, inThread bool) error
 	ContainerUpdate(req dto.ContainerOperate) error
 	ContainerUpgrade(req dto.ContainerUpgrade) error
-	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
+	ContainerInfo(req dto.OperationWithName, readOnly ...bool) (*dto.ContainerOperate, error)
 	ContainerListStats() ([]dto.ContainerListStats, error)
 	ContainerItemStats(req dto.OperationWithName) (dto.ContainerItemStats, error)
 	LoadResourceLimit() (*dto.ResourceLimit, error)
@@ -568,7 +568,7 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate, inThread bo
 	return taskItem.Execute()
 }
 
-func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error) {
+func (u *ContainerService) ContainerInfo(req dto.OperationWithName, readOnly ...bool) (*dto.ContainerOperate, error) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return nil, err
@@ -612,6 +612,9 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	data.Tty = oldContainer.Config.Tty
 	data.Entrypoint = oldContainer.Config.Entrypoint
 	data.Env = oldContainer.Config.Env
+	if isDemoReadOnly(readOnly...) {
+		data.Env = nil
+	}
 	data.CPUShares = oldContainer.HostConfig.CPUShares
 	for key, val := range oldContainer.Config.Labels {
 		data.Labels = append(data.Labels, fmt.Sprintf("%s=%s", key, val))

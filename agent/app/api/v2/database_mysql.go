@@ -53,7 +53,7 @@ func (b *BaseApi) ListMysqlUsers(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	data, err := mysqlService.ListUsers(req)
+	data, err := mysqlService.ListUsers(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

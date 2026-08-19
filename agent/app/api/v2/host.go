@@ -100,7 +100,7 @@ func (b *BaseApi) SearchHost(c *gin.Context) {
 		return
 	}
 
-	total, list, err := hostService.SearchWithPage(req)
+	total, list, err := hostService.SearchWithPage(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

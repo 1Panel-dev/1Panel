@@ -268,7 +268,7 @@ func (b *BaseApi) PageAlertConfig(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	total, configs, err := alertService.PageAlertConfig(req)
+	total, configs, err := alertService.PageAlertConfig(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

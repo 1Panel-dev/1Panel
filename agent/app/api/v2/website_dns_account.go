@@ -20,7 +20,7 @@ func (b *BaseApi) PageWebsiteDnsAccount(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	total, accounts, err := websiteDnsAccountService.Page(req)
+	total, accounts, err := websiteDnsAccountService.Page(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

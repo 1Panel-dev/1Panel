@@ -21,6 +21,7 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	req.ReadOnly = helper.IsDemoRequest(c)
 	if req.All {
 		list, err := appInstallService.SearchForWebsite(req)
 		if err != nil {
@@ -73,6 +74,7 @@ func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	req.ReadOnly = helper.IsDemoRequest(c)
 	checkData, err := appInstallService.CheckExist(req)
 	if err != nil {
 		helper.InternalServer(c, err)
@@ -115,7 +117,7 @@ func (b *BaseApi) LoadConnInfo(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	conn, err := appInstallService.LoadConnInfo(req)
+	conn, err := appInstallService.LoadConnInfo(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -137,7 +139,7 @@ func (b *BaseApi) DeleteCheck(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	checkData, err := appInstallService.DeleteCheck(appInstallId)
+	checkData, err := appInstallService.DeleteCheck(appInstallId, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -277,7 +279,7 @@ func (b *BaseApi) GetParams(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	content, err := appInstallService.GetParams(appInstallId)
+	content, err := appInstallService.GetParams(appInstallId, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -341,7 +343,7 @@ func (b *BaseApi) GetAppInstallInfo(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	info, err := appInstallService.GetAppInstallInfo(appInstallId)
+	info, err := appInstallService.GetAppInstallInfo(appInstallId, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

@@ -95,12 +95,12 @@ func newWebsiteSSLLegoClient(ctx context.Context, acmeAccount *model.WebsiteAcme
 }
 
 type IWebsiteSSLService interface {
-	Page(search request.WebsiteSSLSearch) (int64, []response.WebsiteSSLDTO, error)
-	GetSSL(id uint) (*response.WebsiteSSLDTO, error)
+	Page(search request.WebsiteSSLSearch, readOnly ...bool) (int64, []response.WebsiteSSLDTO, error)
+	GetSSL(id uint, readOnly ...bool) (*response.WebsiteSSLDTO, error)
 	Search(req request.WebsiteSSLListReq) ([]response.WebsiteSSLDTO, error)
 	Create(create request.WebsiteSSLCreate) (request.WebsiteSSLCreate, error)
 	GetDNSResolve(req request.WebsiteDNSReq) ([]response.WebsiteDNSRes, error)
-	GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO, error)
+	GetWebsiteSSL(websiteId uint, readOnly ...bool) (response.WebsiteSSLDTO, error)
 	Delete(ids []uint) error
 	Update(update request.WebsiteSSLUpdate) error
 	Upload(req request.WebsiteSSLUpload) error
@@ -116,7 +116,7 @@ func NewIWebsiteSSLService() IWebsiteSSLService {
 	return &WebsiteSSLService{}
 }
 
-func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []response.WebsiteSSLDTO, error) {
+func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch, readOnly ...bool) (int64, []response.WebsiteSSLDTO, error) {
 	var (
 		result []response.WebsiteSSLDTO
 		opts   []repo.DBOption
@@ -134,6 +134,10 @@ func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []respo
 		return 0, nil, err
 	}
 	for _, model := range sslList {
+		if isDemoReadOnly(readOnly...) {
+			model.PrivateKey = ""
+			model.AcmeAccount.EabHmacKey = ""
+		}
 		result = append(result, response.WebsiteSSLDTO{
 			WebsiteSSL: model,
 			LogPath:    path.Join(global.Dir.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", model.PrimaryDomain, model.ID)),
@@ -142,11 +146,15 @@ func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []respo
 	return total, result, err
 }
 
-func (w WebsiteSSLService) GetSSL(id uint) (*response.WebsiteSSLDTO, error) {
+func (w WebsiteSSLService) GetSSL(id uint, readOnly ...bool) (*response.WebsiteSSLDTO, error) {
 	var res response.WebsiteSSLDTO
 	websiteSSL, err := websiteSSLRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return nil, err
+	}
+	if isDemoReadOnly(readOnly...) {
+		websiteSSL.PrivateKey = ""
+		websiteSSL.AcmeAccount.EabHmacKey = ""
 	}
 	res.WebsiteSSL = *websiteSSL
 	return &res, nil
@@ -682,7 +690,7 @@ func (w WebsiteSSLService) GetDNSResolve(req request.WebsiteDNSReq) ([]response.
 	return res, nil
 }
 
-func (w WebsiteSSLService) GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO, error) {
+func (w WebsiteSSLService) GetWebsiteSSL(websiteId uint, readOnly ...bool) (response.WebsiteSSLDTO, error) {
 	var res response.WebsiteSSLDTO
 	website, err := websiteRepo.GetFirst(repo.WithByID(websiteId))
 	if err != nil {
@@ -691,6 +699,10 @@ func (w WebsiteSSLService) GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO
 	websiteSSL, err := websiteSSLRepo.GetFirst(repo.WithByID(website.WebsiteSSLID))
 	if err != nil {
 		return res, err
+	}
+	if isDemoReadOnly(readOnly...) {
+		websiteSSL.PrivateKey = ""
+		websiteSSL.AcmeAccount.EabHmacKey = ""
 	}
 	res.WebsiteSSL = *websiteSSL
 	return res, nil

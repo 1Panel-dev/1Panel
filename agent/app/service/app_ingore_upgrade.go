@@ -13,7 +13,7 @@ type AppIgnoreUpgradeService struct {
 }
 
 type IAppIgnoreUpgradeService interface {
-	List() ([]response.AppIgnoreUpgradeDTO, error)
+	List(readOnly ...bool) ([]response.AppIgnoreUpgradeDTO, error)
 	CreateAppIgnore(req request.AppIgnoreUpgradeReq) error
 	Delete(req request.ReqWithID) error
 }
@@ -22,7 +22,7 @@ func NewIAppIgnoreUpgradeService() IAppIgnoreUpgradeService {
 	return AppIgnoreUpgradeService{}
 }
 
-func (a AppIgnoreUpgradeService) List() ([]response.AppIgnoreUpgradeDTO, error) {
+func (a AppIgnoreUpgradeService) List(readOnly ...bool) ([]response.AppIgnoreUpgradeDTO, error) {
 	var res []response.AppIgnoreUpgradeDTO
 	ignores, err := appIgnoreUpgradeRepo.List()
 	if err != nil {
@@ -37,14 +37,18 @@ func (a AppIgnoreUpgradeService) List() ([]response.AppIgnoreUpgradeDTO, error) 
 		}
 		app, err := appRepo.GetFirst(repo.WithByID(ignore.AppID))
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			_ = appIgnoreUpgradeRepo.Delete(repo.WithByID(ignore.ID))
+			if !isDemoReadOnly(readOnly...) {
+				_ = appIgnoreUpgradeRepo.Delete(repo.WithByID(ignore.ID))
+			}
 			continue
 		}
 		dto.Name = app.Name
 		if ignore.Scope == "version" {
 			appDetail, err := appDetailRepo.GetFirst(repo.WithByID(ignore.AppDetailID))
 			if errors.Is(err, gorm.ErrRecordNotFound) {
-				_ = appIgnoreUpgradeRepo.Delete(repo.WithByID(ignore.ID))
+				if !isDemoReadOnly(readOnly...) {
+					_ = appIgnoreUpgradeRepo.Delete(repo.WithByID(ignore.ID))
+				}
 				continue
 			}
 			dto.Version = appDetail.Version

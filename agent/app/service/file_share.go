@@ -37,14 +37,14 @@ var fileShareCodeRegexp = regexp.MustCompile(`^[A-Za-z0-9]{10,16}$`)
 
 type IFileShareService interface {
 	Create(req request.FileShareCreate) (*response.FileShareInfo, error)
-	Page(req dto.PageInfo) (int64, []response.FileShareInfo, error)
-	GetByPath(path string) (*response.FileShareInfo, error)
-	GetByCode(code string) (*response.FileShareInfo, error)
-	GetPublicByCode(code string) (*response.FileSharePublicInfo, error)
+	Page(req dto.PageInfo, readOnly ...bool) (int64, []response.FileShareInfo, error)
+	GetByPath(path string, readOnly ...bool) (*response.FileShareInfo, error)
+	GetByCode(code string, readOnly ...bool) (*response.FileShareInfo, error)
+	GetPublicByCode(code string, readOnly ...bool) (*response.FileSharePublicInfo, error)
 	DeleteByPath(path string) error
 	SharePathCodeMap() (map[string]string, error)
-	Check(code, password string) error
-	PrepareDownload(code, password string) (filePath, fileName string, err error)
+	Check(code, password string, readOnly ...bool) error
+	PrepareDownload(code, password string, readOnly ...bool) (filePath, fileName string, err error)
 }
 
 func NewIFileShareService() IFileShareService {
@@ -212,14 +212,14 @@ func (s *FileShareService) Create(req request.FileShareCreate) (*response.FileSh
 	return &res, nil
 }
 
-func (s *FileShareService) Page(req dto.PageInfo) (int64, []response.FileShareInfo, error) {
+func (s *FileShareService) Page(req dto.PageInfo, readOnly ...bool) (int64, []response.FileShareInfo, error) {
 	items, err := fileShareRepo.All()
 	if err != nil {
 		return 0, nil, err
 	}
 	result := make([]response.FileShareInfo, 0, len(items))
 	for _, item := range items {
-		if err := s.pruneInvalidShare(item); err != nil {
+		if err := s.pruneInvalidShare(item, readOnly...); err != nil {
 			return 0, nil, err
 		}
 		if item.ExpiresUnix > 0 && time.Now().Unix() > item.ExpiresUnix {
@@ -239,7 +239,7 @@ func (s *FileShareService) Page(req dto.PageInfo) (int64, []response.FileShareIn
 	return int64(total), result[start:end], nil
 }
 
-func (s *FileShareService) GetByPath(path string) (*response.FileShareInfo, error) {
+func (s *FileShareService) GetByPath(path string, readOnly ...bool) (*response.FileShareInfo, error) {
 	item, err := fileShareRepo.GetFirst(fileShareRepo.WithByPath(strings.TrimSpace(path)))
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -247,7 +247,7 @@ func (s *FileShareService) GetByPath(path string) (*response.FileShareInfo, erro
 		}
 		return nil, err
 	}
-	if err := s.pruneInvalidShare(item); err != nil {
+	if err := s.pruneInvalidShare(item, readOnly...); err != nil {
 		return nil, err
 	}
 	if item.ExpiresUnix > 0 && time.Now().Unix() > item.ExpiresUnix {
@@ -258,7 +258,7 @@ func (s *FileShareService) GetByPath(path string) (*response.FileShareInfo, erro
 	return &info, nil
 }
 
-func (s *FileShareService) GetByCode(code string) (*response.FileShareInfo, error) {
+func (s *FileShareService) GetByCode(code string, readOnly ...bool) (*response.FileShareInfo, error) {
 	item, err := fileShareRepo.GetFirst(fileShareRepo.WithByCode(strings.TrimSpace(code)))
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -266,7 +266,7 @@ func (s *FileShareService) GetByCode(code string) (*response.FileShareInfo, erro
 		}
 		return nil, err
 	}
-	if err := s.pruneInvalidShare(item); err != nil {
+	if err := s.pruneInvalidShare(item, readOnly...); err != nil {
 		return nil, err
 	}
 	if item.ExpiresUnix > 0 && time.Now().Unix() > item.ExpiresUnix {
@@ -276,7 +276,7 @@ func (s *FileShareService) GetByCode(code string) (*response.FileShareInfo, erro
 	return &info, nil
 }
 
-func (s *FileShareService) GetPublicByCode(code string) (*response.FileSharePublicInfo, error) {
+func (s *FileShareService) GetPublicByCode(code string, readOnly ...bool) (*response.FileSharePublicInfo, error) {
 	item, err := fileShareRepo.GetFirst(fileShareRepo.WithByCode(strings.TrimSpace(code)))
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -284,7 +284,7 @@ func (s *FileShareService) GetPublicByCode(code string) (*response.FileSharePubl
 		}
 		return nil, err
 	}
-	if err := s.pruneInvalidShare(item); err != nil {
+	if err := s.pruneInvalidShare(item, readOnly...); err != nil {
 		return nil, err
 	}
 	if item.ExpiresUnix > 0 && time.Now().Unix() > item.ExpiresUnix {
@@ -324,32 +324,38 @@ func (s *FileShareService) SharePathCodeMap() (map[string]string, error) {
 	return result, nil
 }
 
-func (s *FileShareService) Check(code, password string) error {
-	_, err := s.check(code, password)
+func (s *FileShareService) Check(code, password string, readOnly ...bool) error {
+	_, err := s.check(code, password, readOnly...)
 	return err
 }
 
-func (s *FileShareService) PrepareDownload(code, password string) (string, string, error) {
-	item, err := s.check(code, password)
+func (s *FileShareService) PrepareDownload(code, password string, readOnly ...bool) (string, string, error) {
+	item, err := s.check(code, password, readOnly...)
 	if err != nil {
 		return "", "", err
 	}
 	return item.Path, item.FileName, nil
 }
 
-func (s *FileShareService) pruneInvalidShare(item model.FileShare) error {
+func (s *FileShareService) pruneInvalidShare(item model.FileShare, readOnly ...bool) error {
 	now := time.Now().Unix()
 	if item.ExpiresUnix > 0 && now > item.ExpiresUnix {
+		if isDemoReadOnly(readOnly...) {
+			return nil
+		}
 		return fileShareRepo.Delete(repo.WithByID(item.ID))
 	}
 	info, err := os.Stat(item.Path)
 	if err != nil || info.IsDir() {
+		if isDemoReadOnly(readOnly...) {
+			return nil
+		}
 		return fileShareRepo.Delete(repo.WithByID(item.ID))
 	}
 	return nil
 }
 
-func (s *FileShareService) check(code, password string) (*model.FileShare, error) {
+func (s *FileShareService) check(code, password string, readOnly ...bool) (*model.FileShare, error) {
 	code = strings.TrimSpace(code)
 	password = strings.TrimSpace(password)
 	if code == "" {
@@ -366,7 +372,9 @@ func (s *FileShareService) check(code, password string) (*model.FileShare, error
 
 	now := time.Now().Unix()
 	if item.ExpiresUnix > 0 && now > item.ExpiresUnix {
-		_ = fileShareRepo.Delete(repo.WithByID(item.ID))
+		if !isDemoReadOnly(readOnly...) {
+			_ = fileShareRepo.Delete(repo.WithByID(item.ID))
+		}
 		return nil, buserr.New("ErrFileShareExpired")
 	}
 	if item.PasswordHash != "" {
@@ -377,7 +385,9 @@ func (s *FileShareService) check(code, password string) (*model.FileShare, error
 
 	info, err := os.Stat(item.Path)
 	if err != nil || info.IsDir() {
-		_ = fileShareRepo.Delete(repo.WithByID(item.ID))
+		if !isDemoReadOnly(readOnly...) {
+			_ = fileShareRepo.Delete(repo.WithByID(item.ID))
+		}
 		return nil, buserr.New("ErrFileSharePath")
 	}
 

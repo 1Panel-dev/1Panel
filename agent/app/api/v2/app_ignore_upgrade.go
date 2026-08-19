@@ -14,7 +14,7 @@ import (
 // @Security Timestamp
 // @Router /apps/ignored/detail [get]
 func (b *BaseApi) ListAppIgnored(c *gin.Context) {
-	res, err := appIgnoreUpgradeService.List()
+	res, err := appIgnoreUpgradeService.List(helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

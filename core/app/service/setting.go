@@ -99,13 +99,17 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	}
 	if info.Edition == "" {
 		info.Edition = "cn"
-		_ = settingRepo.UpdateOrCreate("Edition", info.Edition)
+		if !global.CONF.Base.IsDemo {
+			_ = settingRepo.UpdateOrCreate("Edition", info.Edition)
+		}
 	}
 	if info.MenuAccordion == "" {
 		info.MenuAccordion = constant.StatusDisable
-		_ = settingRepo.UpdateOrCreate("MenuAccordion", info.MenuAccordion)
+		if !global.CONF.Base.IsDemo {
+			_ = settingRepo.UpdateOrCreate("MenuAccordion", info.MenuAccordion)
+		}
 	}
-	if info.ProxyPasswdKeep != constant.StatusEnable {
+	if global.CONF.Base.IsDemo || info.ProxyPasswdKeep != constant.StatusEnable {
 		info.ProxyPasswd = ""
 	} else {
 		info.ProxyPasswd, _ = encrypt.StringDecrypt(info.ProxyPasswd)
@@ -142,11 +146,15 @@ func (u *SettingService) GetSettingBaseInfo() (*dto.SettingBaseInfo, error) {
 	}
 	if info.Edition == "" {
 		info.Edition = "cn"
-		_ = settingRepo.UpdateOrCreate("Edition", info.Edition)
+		if !global.CONF.Base.IsDemo {
+			_ = settingRepo.UpdateOrCreate("Edition", info.Edition)
+		}
 	}
 	if info.MenuAccordion == "" {
 		info.MenuAccordion = constant.StatusDisable
-		_ = settingRepo.UpdateOrCreate("MenuAccordion", info.MenuAccordion)
+		if !global.CONF.Base.IsDemo {
+			_ = settingRepo.UpdateOrCreate("MenuAccordion", info.MenuAccordion)
+		}
 	}
 
 	return &info, err
@@ -515,6 +523,9 @@ func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
 		data.Domain = ssl.PrimaryDomain
 		data.SSLID = uint(id)
 		data.Timeout = ssl.ExpireDate.Format(constant.DateTimeLayout)
+	}
+	if global.CONF.Base.IsDemo {
+		data.Key = ""
 	}
 	return &data, nil
 }

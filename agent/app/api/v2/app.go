@@ -120,7 +120,7 @@ func (b *BaseApi) GetAppDetail(c *gin.Context) {
 	}
 	version := c.Param("version")
 	appType := c.Param("type")
-	appDetailDTO, err := appService.GetAppDetail(appID, version, appType)
+	appDetailDTO, err := appService.GetAppDetail(appID, version, appType, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

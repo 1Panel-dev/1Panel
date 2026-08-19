@@ -48,7 +48,7 @@ type IAppService interface {
 	PageApp(ctx *gin.Context, req request.AppSearch) (*response.AppRes, error)
 	GetAppTags(ctx *gin.Context) ([]response.TagDTO, error)
 	GetApp(ctx *gin.Context, key string) (*response.AppDTO, error)
-	GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error)
+	GetAppDetail(appId uint, version, appType string, readOnly ...bool) (response.AppDetailDTO, error)
 	Install(req request.AppInstallCreate, executeScript bool) (*model.AppInstall, error)
 	SyncAppListFromRemote(taskID string) error
 	GetAppUpdate() (*response.AppUpdateRes, error)
@@ -231,7 +231,7 @@ func (a AppService) GetAppDetailByKey(appKey, version string) (response.AppDetai
 	return appDetailDTO, nil
 }
 
-func (a AppService) GetAppDetail(appID uint, version, appType string) (response.AppDetailDTO, error) {
+func (a AppService) GetAppDetail(appID uint, version, appType string, readOnly ...bool) (response.AppDetailDTO, error) {
 	var (
 		appDetailDTO response.AppDetailDTO
 		opts         []repo.DBOption
@@ -243,6 +243,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 	}
 	appDetailDTO.AppDetail = detail
 	appDetailDTO.Enable = true
+	readOnlyMode := isDemoReadOnly(readOnly...)
 
 	if appType == "runtime" {
 		app, err := appRepo.GetFirst(repo.WithByID(appID))
@@ -252,42 +253,46 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 		fileOp := files.NewFileOp()
 
 		versionPath := filepath.Join(app.GetAppResourcePath(), detail.Version)
-		if !fileOp.Stat(versionPath) || detail.Update {
+		versionExists := fileOp.Stat(versionPath)
+		if (!versionExists || detail.Update) && !readOnlyMode {
 			if err = downloadApp(app, detail, nil, nil); err != nil && !fileOp.Stat(versionPath) {
 				return appDetailDTO, err
 			}
+			versionExists = fileOp.Stat(versionPath)
 		}
-		switch app.Type {
-		case constant.RuntimePHP:
-			paramsPath := filepath.Join(versionPath, "data.yml")
-			if !fileOp.Stat(paramsPath) {
-				return appDetailDTO, buserr.WithDetail("ErrFileNotExist", paramsPath, nil)
-			}
-			param, err := fileOp.GetContent(paramsPath)
-			if err != nil {
-				return appDetailDTO, err
-			}
-			paramMap := make(map[string]interface{})
-			if err = yaml.Unmarshal(param, &paramMap); err != nil {
-				return appDetailDTO, err
-			}
-			appDetailDTO.Params = paramMap["additionalProperties"]
-			composePath := filepath.Join(versionPath, "docker-compose.yml")
-			if !fileOp.Stat(composePath) {
-				return appDetailDTO, buserr.WithDetail("ErrFileNotExist", composePath, nil)
-			}
-			compose, err := fileOp.GetContent(composePath)
-			if err != nil {
-				return appDetailDTO, err
-			}
-			composeMap := make(map[string]interface{})
-			if err := yaml.Unmarshal(compose, &composeMap); err != nil {
-				return appDetailDTO, err
-			}
-			if service, ok := composeMap["services"]; ok {
-				servicesMap := service.(map[string]interface{})
-				for k := range servicesMap {
-					appDetailDTO.Image = k
+		if versionExists {
+			switch app.Type {
+			case constant.RuntimePHP:
+				paramsPath := filepath.Join(versionPath, "data.yml")
+				if !fileOp.Stat(paramsPath) {
+					return appDetailDTO, buserr.WithDetail("ErrFileNotExist", paramsPath, nil)
+				}
+				param, err := fileOp.GetContent(paramsPath)
+				if err != nil {
+					return appDetailDTO, err
+				}
+				paramMap := make(map[string]interface{})
+				if err = yaml.Unmarshal(param, &paramMap); err != nil {
+					return appDetailDTO, err
+				}
+				appDetailDTO.Params = paramMap["additionalProperties"]
+				composePath := filepath.Join(versionPath, "docker-compose.yml")
+				if !fileOp.Stat(composePath) {
+					return appDetailDTO, buserr.WithDetail("ErrFileNotExist", composePath, nil)
+				}
+				compose, err := fileOp.GetContent(composePath)
+				if err != nil {
+					return appDetailDTO, err
+				}
+				composeMap := make(map[string]interface{})
+				if err := yaml.Unmarshal(compose, &composeMap); err != nil {
+					return appDetailDTO, err
+				}
+				if service, ok := composeMap["services"]; ok {
+					servicesMap := service.(map[string]interface{})
+					for k := range servicesMap {
+						appDetailDTO.Image = k
+					}
 				}
 			}
 		}
@@ -299,7 +304,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 		appDetailDTO.Params = paramMap
 	}
 
-	if appDetailDTO.DockerCompose == "" {
+	if appDetailDTO.DockerCompose == "" && !readOnlyMode {
 		filename := filepath.Base(appDetailDTO.DownloadUrl)
 		dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(appDetailDTO.DownloadUrl, filename), "docker-compose.yml")
 		statusCode, composeRes, err := req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)

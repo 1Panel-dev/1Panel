@@ -148,7 +148,7 @@ func (b *BaseApi) FileAISearch(c *gin.Context) {
 	if strings.TrimSpace(req.ResponseLanguage) == "" {
 		req.ResponseLanguage = strings.TrimSpace(c.GetHeader("Accept-Language"))
 	}
-	res, err := fileService.AISearch(req)
+	res, err := fileService.AISearch(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -1633,7 +1633,7 @@ func (b *BaseApi) SearchFileShare(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	total, list, err := fileShareService.Page(req)
+	total, list, err := fileShareService.Page(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -1657,7 +1657,7 @@ func (b *BaseApi) GetFileShareDetail(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	info, err := fileShareService.GetByPath(req.Path)
+	info, err := fileShareService.GetByPath(req.Path, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -1676,7 +1676,7 @@ func (b *BaseApi) GetPublicFileShareInfo(c *gin.Context) {
 		helper.BadRequest(c, errors.New("code is required"))
 		return
 	}
-	info, err := fileShareService.GetPublicByCode(code)
+	info, err := fileShareService.GetPublicByCode(code, helper.IsDemoRequest(c))
 	if err != nil {
 		if be, ok := err.(buserr.BusinessError); ok {
 			helper.ErrorWithDetail(c, http.StatusBadRequest, be.Msg, be)
@@ -1729,7 +1729,7 @@ func (b *BaseApi) GetFileShareQRCode(c *gin.Context) {
 		helper.BadRequest(c, errors.New("code is required"))
 		return
 	}
-	if _, err := fileShareService.GetByCode(code); err != nil {
+	if _, err := fileShareService.GetByCode(code, helper.IsDemoRequest(c)); err != nil {
 		if be, ok := err.(buserr.BusinessError); ok {
 			helper.ErrorWithDetail(c, http.StatusBadRequest, be.Msg, be)
 			return
@@ -1811,7 +1811,7 @@ func (b *BaseApi) CheckFileShare(c *gin.Context) {
 		helper.BadRequest(c, errors.New("code is required"))
 		return
 	}
-	if err := fileShareService.Check(code, password); err != nil {
+	if err := fileShareService.Check(code, password, helper.IsDemoRequest(c)); err != nil {
 		if be, ok := err.(buserr.BusinessError); ok {
 			helper.ErrorWithDetail(c, http.StatusBadRequest, be.Msg, be)
 			return
@@ -1836,7 +1836,7 @@ func (b *BaseApi) DownloadFileShare(c *gin.Context) {
 		helper.BadRequest(c, errors.New("code is required"))
 		return
 	}
-	filePath, displayName, err := fileShareService.PrepareDownload(code, password)
+	filePath, displayName, err := fileShareService.PrepareDownload(code, password, helper.IsDemoRequest(c))
 	if err != nil {
 		if be, ok := err.(buserr.BusinessError); ok {
 			helper.ErrorWithDetail(c, http.StatusBadRequest, be.Msg, be)

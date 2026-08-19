@@ -78,7 +78,7 @@ func (b *BaseApi) SearchDatabase(c *gin.Context) {
 		return
 	}
 
-	total, list, err := databaseService.SearchWithPage(req)
+	total, list, err := databaseService.SearchWithPage(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -147,7 +147,7 @@ func (b *BaseApi) GetDatabase(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	data, err := databaseService.Get(name)
+	data, err := databaseService.Get(name, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

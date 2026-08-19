@@ -49,8 +49,10 @@ func Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo,
 	if err != nil {
 		return nil, "", err
 	}
-	if err = settingRepo.Update("Language", info.Language); err != nil {
-		return nil, "", err
+	if !global.CONF.Base.IsDemo {
+		if err = settingRepo.Update("Language", info.Language); err != nil {
+			return nil, "", err
+		}
 	}
 	if mfaSetting.Value == constant.StatusEnable {
 		return BeginMFALogin(c, nameSetting.Value, entrance, mfaSetting.Value), "", nil

@@ -151,7 +151,7 @@ func (b *BaseApi) SearchPostgresql(c *gin.Context) {
 		return
 	}
 
-	total, list, err := postgresqlService.SearchWithPage(req)
+	total, list, err := postgresqlService.SearchWithPage(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

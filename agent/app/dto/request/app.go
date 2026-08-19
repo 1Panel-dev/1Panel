@@ -62,11 +62,13 @@ type AppInstalledSearch struct {
 	All         bool     `json:"all"`
 	Sync        bool     `json:"sync"`
 	CheckUpdate bool     `json:"checkUpdate"`
+	ReadOnly    bool     `json:"-"`
 }
 
 type AppInstalledInfo struct {
-	Key  string `json:"key" validate:"required"`
-	Name string `json:"name"`
+	Key      string `json:"key" validate:"required"`
+	Name     string `json:"name"`
+	ReadOnly bool   `json:"-"`
 }
 
 type AppBackupSearch struct {

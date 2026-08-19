@@ -33,7 +33,7 @@ type IBackupService interface {
 	CheckUsed(name string, isPublic bool) error
 
 	LoadBackupOptions() ([]dto.BackupOption, error)
-	SearchWithPage(search dto.SearchPageWithType) (int64, interface{}, error)
+	SearchWithPage(search dto.SearchPageWithType, readOnly ...bool) (int64, interface{}, error)
 	Create(backupDto dto.BackupOperate) error
 	CheckConn(req dto.BackupOperate) dto.BackupCheckRes
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
@@ -80,7 +80,7 @@ func (u *BackupService) GetLocalDir() (string, error) {
 	return account.BackupPath, nil
 }
 
-func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, interface{}, error) {
+func (u *BackupService) SearchWithPage(req dto.SearchPageWithType, readOnly ...bool) (int64, interface{}, error) {
 	options := []repo.DBOption{repo.WithOrderDesc("created_at")}
 	if len(req.Type) != 0 {
 		options = append(options, repo.WithByType(req.Type))
@@ -128,9 +128,34 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 			itemVars, _ := json.Marshal(varMap)
 			item.Vars = string(itemVars)
 		}
+		if isDemoReadOnly(readOnly...) {
+			item.AccessKey = ""
+			item.Credential = ""
+			item.Vars = sanitizeBackupVars(item.Vars)
+		}
 		data = append(data, item)
 	}
 	return count, data, nil
+}
+
+func sanitizeBackupVars(vars string) string {
+	if vars == "" {
+		return vars
+	}
+	var values map[string]interface{}
+	if err := json.Unmarshal([]byte(vars), &values); err != nil {
+		return ""
+	}
+	for key := range values {
+		if isSensitiveConfigKey(key) || normalizeConfigKey(key) == "code" {
+			delete(values, key)
+		}
+	}
+	data, err := json.Marshal(values)
+	if err != nil {
+		return ""
+	}
+	return string(data)
 }
 
 func (u *BackupService) CheckConn(req dto.BackupOperate) dto.BackupCheckRes {

@@ -20,7 +20,7 @@ func (b *BaseApi) PageWebsiteAcmeAccount(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	total, accounts, err := websiteAcmeAccountService.Page(req)
+	total, accounts, err := websiteAcmeAccountService.Page(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

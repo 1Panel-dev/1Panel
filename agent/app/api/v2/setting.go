@@ -191,7 +191,7 @@ func (b *BaseApi) LoadBaseDir(c *gin.Context) {
 // @Security Timestamp
 // @Router /settings/ssh/conn [get]
 func (b *BaseApi) LoadLocalConn(c *gin.Context) {
-	helper.SuccessWithData(c, settingService.GetLocalConn())
+	helper.SuccessWithData(c, settingService.GetLocalConn(helper.IsDemoRequest(c)))
 }
 
 // @Tags System Setting

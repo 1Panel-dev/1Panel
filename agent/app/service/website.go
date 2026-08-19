@@ -94,7 +94,7 @@ type IWebsiteService interface {
 	GetWebsiteNginxConfig(websiteId uint, configType string) (*response.FileInfo, error)
 	UpdateNginxConfigFile(req request.WebsiteNginxUpdate) error
 
-	GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error)
+	GetWebsiteHTTPS(websiteId uint, readOnly ...bool) (response.WebsiteHTTPS, error)
 	OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (*response.WebsiteHTTPS, error)
 
 	LoadWebsiteDirConfig(req request.WebsiteCommonReq) (*response.WebsiteDirConfig, error)
@@ -117,7 +117,7 @@ type IWebsiteService interface {
 	SetRealIPConfig(req request.WebsiteRealIP) error
 	GetRealIPConfig(websiteID uint) (*response.WebsiteRealIP, error)
 
-	GetWebsiteResource(websiteID uint) ([]response.Resource, error)
+	GetWebsiteResource(websiteID uint, readOnly ...bool) ([]response.Resource, error)
 	ListDatabases() ([]response.Database, error)
 	ChangeDatabase(req request.ChangeDatabase) error
 
@@ -914,7 +914,7 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteID uint, configType string)
 	return &response.FileInfo{FileInfo: *info}, nil
 }
 
-func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error) {
+func (w WebsiteService) GetWebsiteHTTPS(websiteId uint, readOnly ...bool) (response.WebsiteHTTPS, error) {
 	website, err := websiteRepo.GetFirst(repo.WithByID(websiteId))
 	if err != nil {
 		return response.WebsiteHTTPS{}, err
@@ -938,6 +938,10 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 		return response.WebsiteHTTPS{}, err
 	}
 	res.SSL = *websiteSSL
+	if isDemoReadOnly(readOnly...) {
+		res.SSL.PrivateKey = ""
+		res.SSL.AcmeAccount.EabHmacKey = ""
+	}
 	res.Enable = true
 	if website.HttpConfig != "" {
 		res.HttpConfig = website.HttpConfig
@@ -2238,7 +2242,7 @@ func (w WebsiteService) GetRealIPConfig(websiteID uint) (*response.WebsiteRealIP
 	return res, err
 }
 
-func (w WebsiteService) GetWebsiteResource(websiteID uint) ([]response.Resource, error) {
+func (w WebsiteService) GetWebsiteResource(websiteID uint, readOnly ...bool) ([]response.Resource, error) {
 	website, err := websiteRepo.GetFirst(repo.WithByID(websiteID))
 	if err != nil {
 		return nil, err
@@ -2305,6 +2309,11 @@ func (w WebsiteService) GetWebsiteResource(websiteID uint) ([]response.Resource,
 					Detail:     db,
 				})
 			}
+		}
+	}
+	if isDemoReadOnly(readOnly...) {
+		for i := range res {
+			res[i].Detail = nil
 		}
 	}
 

@@ -14,7 +14,7 @@ type WebsiteAcmeAccountService struct {
 }
 
 type IWebsiteAcmeAccountService interface {
-	Page(search dto.PageInfo) (int64, []response.WebsiteAcmeAccountDTO, error)
+	Page(search dto.PageInfo, readOnly ...bool) (int64, []response.WebsiteAcmeAccountDTO, error)
 	Create(create request.WebsiteAcmeAccountCreate) (*response.WebsiteAcmeAccountDTO, error)
 	Delete(id uint) error
 	Update(update request.WebsiteAcmeAccountUpdate) (*response.WebsiteAcmeAccountDTO, error)
@@ -24,10 +24,13 @@ func NewIWebsiteAcmeAccountService() IWebsiteAcmeAccountService {
 	return &WebsiteAcmeAccountService{}
 }
 
-func (w WebsiteAcmeAccountService) Page(search dto.PageInfo) (int64, []response.WebsiteAcmeAccountDTO, error) {
+func (w WebsiteAcmeAccountService) Page(search dto.PageInfo, readOnly ...bool) (int64, []response.WebsiteAcmeAccountDTO, error) {
 	total, accounts, err := websiteAcmeRepo.Page(search.Page, search.PageSize, repo.WithOrderDesc("created_at"))
 	var accountDTOs []response.WebsiteAcmeAccountDTO
 	for _, account := range accounts {
+		if isDemoReadOnly(readOnly...) {
+			account.EabHmacKey = ""
+		}
 		accountDTOs = append(accountDTOs, response.WebsiteAcmeAccountDTO{
 			WebsiteAcmeAccount: account,
 		})

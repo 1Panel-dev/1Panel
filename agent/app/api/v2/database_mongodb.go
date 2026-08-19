@@ -54,7 +54,7 @@ func (b *BaseApi) SearchMongodb(c *gin.Context) {
 		return
 	}
 
-	total, list, err := mongodbService.SearchWithPage(req)
+	total, list, err := mongodbService.SearchWithPage(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

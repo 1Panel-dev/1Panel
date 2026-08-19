@@ -124,7 +124,7 @@ func (b *BaseApi) PageAgents(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	total, list, err := agentService.Page(req)
+	total, list, err := agentService.Page(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.BadRequest(c, err)
 		return
@@ -447,7 +447,7 @@ func (b *BaseApi) PageAgentAccounts(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	total, list, err := agentService.PageAccounts(req)
+	total, list, err := agentService.PageAccounts(req, helper.IsDemoRequest(c))
 	if err != nil {
 		helper.BadRequest(c, err)
 		return

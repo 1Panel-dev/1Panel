@@ -21,7 +21,7 @@ type FtpService struct{}
 
 type IFtpService interface {
 	LoadBaseInfo() (dto.FtpBaseInfo, error)
-	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
+	SearchWithPage(search dto.SearchWithPage, readOnly ...bool) (int64, interface{}, error)
 	Operate(operation string) error
 	Create(req dto.FtpCreate) (uint, error)
 	CreateWebsite(req dto.FtpCreate) (uint, error)
@@ -74,7 +74,7 @@ func (u *FtpService) Operate(operation string) error {
 	return client.Operate(operation)
 }
 
-func (f *FtpService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
+func (f *FtpService) SearchWithPage(req dto.SearchWithPage, readOnly ...bool) (int64, interface{}, error) {
 	total, lists, err := ftpRepo.Page(req.Page, req.PageSize, ftpRepo.WithLikeUser(req.Info), repo.WithOrderDesc("created_at"))
 	if err != nil {
 		return 0, nil, err
@@ -85,7 +85,11 @@ func (f *FtpService) SearchWithPage(req dto.SearchWithPage) (int64, interface{},
 		if err := copier.Copy(&item, &user); err != nil {
 			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
-		item.Password, _ = encrypt.StringDecrypt(item.Password)
+		if isDemoReadOnly(readOnly...) {
+			item.Password = ""
+		} else {
+			item.Password, _ = encrypt.StringDecrypt(item.Password)
+		}
 		users = append(users, item)
 	}
 	return total, users, err

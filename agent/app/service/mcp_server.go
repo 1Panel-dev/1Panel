@@ -48,7 +48,7 @@ const (
 )
 
 type IMcpServerService interface {
-	Page(req request.McpServerSearch) response.McpServersRes
+	Page(req request.McpServerSearch, readOnly ...bool) response.McpServersRes
 	Detail(req request.McpServerDetail) (response.McpServerDTO, error)
 	Create(create request.McpServerCreate) error
 	Update(req request.McpServerUpdate) error
@@ -65,7 +65,7 @@ func NewIMcpServerService() IMcpServerService {
 	return &McpServerService{}
 }
 
-func (m McpServerService) Page(req request.McpServerSearch) response.McpServersRes {
+func (m McpServerService) Page(req request.McpServerSearch, readOnly ...bool) response.McpServersRes {
 	var (
 		res   response.McpServersRes
 		items []response.McpServerDTO
@@ -74,6 +74,10 @@ func (m McpServerService) Page(req request.McpServerSearch) response.McpServersR
 	total, data, _ := mcpServerRepo.Page(req.PageInfo.Page, req.PageInfo.PageSize)
 	for _, item := range data {
 		normalizeMcpServerGateway(&item)
+		if isDemoReadOnly(readOnly...) {
+			item.DockerCompose = ""
+			item.Env = ""
+		}
 		items = append(items, response.McpServerDTO{
 			McpServer:    item,
 			Environments: make([]request.Environment, 0),

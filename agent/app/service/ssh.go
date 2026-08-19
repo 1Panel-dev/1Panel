@@ -57,7 +57,7 @@ type ISSHService interface {
 	SyncRootCert() error
 	CreateRootCert(req dto.RootCertOperate) error
 	EditRootCert(req dto.RootCertOperate) error
-	SearchRootCerts(req dto.SearchWithPage) (int64, interface{}, error)
+	SearchRootCerts(req dto.SearchWithPage, readOnly ...bool) (int64, interface{}, error)
 	DeleteRootCerts(req dto.ForceDelete) error
 }
 
@@ -585,7 +585,7 @@ func (u *SSHService) EditRootCert(req dto.RootCertOperate) error {
 	return hostRepo.SaveCert(&cert)
 }
 
-func (u *SSHService) SearchRootCerts(req dto.SearchWithPage) (int64, interface{}, error) {
+func (u *SSHService) SearchRootCerts(req dto.SearchWithPage, readOnly ...bool) (int64, interface{}, error) {
 	total, records, err := hostRepo.PageCert(req.Page, req.PageSize)
 	if err != nil {
 		return 0, nil, err
@@ -597,12 +597,15 @@ func (u *SSHService) SearchRootCerts(req dto.SearchWithPage) (int64, interface{}
 		if err == nil && len(publicItem) != 0 {
 			publicBase64 = base64.StdEncoding.EncodeToString(publicItem)
 		}
-		privateItem, _ := os.ReadFile(records[i].PrivateKeyPath)
 		var privateBase64 string
-		if err == nil && len(publicItem) != 0 {
-			privateBase64 = base64.StdEncoding.EncodeToString(privateItem)
+		var passPhrase string
+		if !isDemoReadOnly(readOnly...) {
+			privateItem, _ := os.ReadFile(records[i].PrivateKeyPath)
+			if len(privateItem) != 0 {
+				privateBase64 = base64.StdEncoding.EncodeToString(privateItem)
+			}
+			passPhrase, _ = encrypt.StringDecryptWithBase64(records[i].PassPhrase)
 		}
-		passPhrase, _ := encrypt.StringDecryptWithBase64(records[i].PassPhrase)
 		datas = append(datas, dto.RootCert{
 			ID:             records[i].ID,
 			CreatedAt:      records[i].CreatedAt,

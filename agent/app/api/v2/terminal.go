@@ -98,7 +98,7 @@ func prepareTerminalSession(c *gin.Context) (*websocket.Conn, int, int, bool) {
 		return nil, 0, 0, false
 	}
 
-	if global.CONF.Base.IsDemo {
+	if helper.IsDemoRequest(c) {
 		if wshandleError(wsConn, errors.New("   demo server, prohibit this operation!")) {
 			return nil, 0, 0, false
 		}
