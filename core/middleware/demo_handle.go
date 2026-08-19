@@ -18,6 +18,7 @@ var demoAllowedRoutes = map[demoRoute]struct{}{
 	{http.MethodPost, "/api/v2/dashboard/app/launcher/option"}: {},
 	{http.MethodPost, "/api/v2/websites/config"}:               {},
 	{http.MethodPost, "/api/v2/files/size"}:                    {},
+	{http.MethodPost, "/api/v2/files/ai-search"}:               {},
 	{http.MethodPost, "/api/v2/runtimes/sync"}:                 {},
 	{http.MethodPost, "/api/v2/toolbox/device/base"}:           {},
 	{http.MethodPost, "/api/v2/files/user/group"}:              {},
