@@ -9,6 +9,7 @@ type GlobalGetterKey =
     | 'isNodeAdmin'
     | 'isAdminOrNodeAdmin'
     | 'docsUrl'
+    | 'docsHomeUrl'
     | 'isMaster'
     | 'isMobile'
     | 'isXpackOrEE'

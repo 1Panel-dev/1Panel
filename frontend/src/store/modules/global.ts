@@ -9,6 +9,7 @@ import { clearPageStateCache } from '@/utils/page-state-cache';
 
 const CN_DOCS_URL = 'https://1panel.cn/docs/v2';
 const INTL_DOCS_URL = 'https://docs.1panel.pro/v2';
+const INTL_DOCS_HOME_URL = 'https://1panel.pro/docs';
 
 const GlobalStore = defineStore('GlobalState', {
     state: (): GlobalState => ({
@@ -92,6 +93,14 @@ const GlobalStore = defineStore('GlobalState', {
             const lang = state.language.toLowerCase();
             const isChinese = lang === 'zh';
             return isChinese ? CN_DOCS_URL : INTL_DOCS_URL;
+        },
+        docsHomeUrl: (state) => {
+            if (state.docWithRegion) {
+                return state.isIntl ? INTL_DOCS_HOME_URL : CN_DOCS_URL;
+            }
+            const lang = state.language.toLowerCase();
+            const isChinese = lang === 'zh';
+            return isChinese ? CN_DOCS_URL : INTL_DOCS_HOME_URL;
         },
         isMaster: (state) => state.currentNode === 'local',
         isMobile: (state) => state.device === DeviceType.Mobile,

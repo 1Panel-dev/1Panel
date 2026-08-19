@@ -47,12 +47,12 @@ import { onMounted, ref } from 'vue';
 import SystemUpgrade from '@/components/system-upgrade/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import PrimaryLogo from '@/assets/images/1panel-logo.svg?component';
-const { docsUrl, themeConfig } = useGlobalStore();
+const { docsHomeUrl, themeConfig } = useGlobalStore();
 const loading = ref();
 const logoLoadFailed = ref(false);
 
 const toDoc = () => {
-    window.open(docsUrl.value, '_blank', 'noopener,noreferrer');
+    window.open(docsHomeUrl.value, '_blank', 'noopener,noreferrer');
 };
 const toGithub = () => {
     window.open('https://github.com/1Panel-dev/1Panel', '_blank', 'noopener,noreferrer');

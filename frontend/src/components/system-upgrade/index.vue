@@ -65,7 +65,7 @@ import { MsgSuccess } from '@/utils/message';
 import { onMounted, ref } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { docsUrl, isOffline, isFxplay, isMasterPro, isEE, isIntl, isAdmin, hasNewVersion } = useGlobalStore();
+const { docsHomeUrl, isOffline, isFxplay, isMasterPro, isEE, isIntl, isAdmin, hasNewVersion } = useGlobalStore();
 const upgradeRef = ref();
 const releasesRef = ref();
 
@@ -106,7 +106,7 @@ const to1Panel = () => {
 };
 
 const toDoc = () => {
-    window.open(docsUrl.value, '_blank', 'noopener,noreferrer');
+    window.open(docsHomeUrl.value, '_blank', 'noopener,noreferrer');
 };
 
 const toEdition = () => {
