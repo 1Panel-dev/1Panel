@@ -4160,6 +4160,7 @@ const message = {
         denyAll: 'Deny all access',
         sourcesHelper: 'Enter one IPv4/IPv6 address or CIDR per line; an empty allowlist denies all access',
         effective: 'Effective',
+        forwardUnsynced: 'Unsynced',
         notEnabled: 'Not enabled',
         notEffective: 'Not effective',
         dockerGuardStatusEffective: '{0} container port protection is working normally',

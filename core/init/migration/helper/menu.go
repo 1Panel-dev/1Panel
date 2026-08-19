@@ -116,7 +116,7 @@ func LoadMenus() string {
 			Children: []dto.ShowMenu{
 				{ID: "71", Disabled: false, Title: "menu.files", IsShow: true, Label: "File", Path: "/hosts/files", Sort: 100},
 				{ID: "72", Disabled: false, Title: "menu.monitor", IsShow: true, Label: "Monitorx", Path: "/hosts/monitor/monitor", Sort: 200},
-				{ID: "74", Disabled: false, Title: "menu.firewall", IsShow: true, Label: "FirewallPort", Path: "/hosts/firewall/port", Sort: 300},
+				{ID: "74", Disabled: false, Title: "menu.firewall", IsShow: true, Label: "FirewallPort", Path: "/hosts/firewall/rules", Sort: 300},
 				{ID: "75", Disabled: false, Title: "menu.processManage", IsShow: true, Label: "Process", Path: "/hosts/process/process", Sort: 400},
 				{ID: "76", Disabled: false, Title: "menu.ssh", IsShow: true, Label: "SSH", Path: "/hosts/ssh/ssh", Sort: 500},
 				{ID: "77", Disabled: false, Title: "menu.disk", IsShow: true, Label: "Disk", Path: "/hosts/disk", Sort: 600},

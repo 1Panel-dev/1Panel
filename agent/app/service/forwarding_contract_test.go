@@ -197,7 +197,9 @@ func TestForwardingSearchPreservesAPIShapeAndPagination(t *testing.T) {
 		t.Fatalf("got total %d want 1", total)
 	}
 	items, ok := value.([]dto.ForwardRule)
-	if !ok || len(items) != 1 || items[0].ID != 42 || items[0].Port != "8080" || items[0].Family != forwardClient.FamilyIPv6 {
+	if !ok || len(items) != 1 || items[0].ID != 42 || items[0].Port != "8080" ||
+		items[0].Family != forwardClient.FamilyIPv6 || !items[0].IsDesired || !items[0].IsRuntime ||
+		items[0].SyncStatus != forwardingSyncConverged {
 		t.Fatalf("unexpected items: %#v", value)
 	}
 	data, err := json.Marshal(items[0])
@@ -208,11 +210,38 @@ func TestForwardingSearchPreservesAPIShapeAndPagination(t *testing.T) {
 	if err := json.Unmarshal(data, &fields); err != nil {
 		t.Fatal(err)
 	}
-	wantFields := []string{"id", "chain", "family", "address", "port", "protocol", "strategy", "num", "targetIP", "targetPort", "interface", "usedStatus", "description"}
+	wantFields := []string{"id", "chain", "family", "address", "port", "protocol", "strategy", "num", "targetIP", "targetPort", "interface", "usedStatus", "description", "isDesired", "isRuntime", "syncStatus"}
 	for _, field := range wantFields {
 		if _, ok := fields[field]; !ok {
 			t.Fatalf("forward response dropped compatibility field %q: %s", field, data)
 		}
+	}
+}
+
+func TestForwardingSearchMergesDesiredAndRuntimeState(t *testing.T) {
+	desired := forwardClient.Rule{
+		Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80",
+	}
+	runtimeOnly := forwardClient.Rule{
+		Family: forwardClient.FamilyIPv6, Protocol: "udp", Port: "5353", TargetIP: "2001:db8::2", TargetPort: "53",
+	}
+	adapter := &fakeForwardingAdapter{name: "iptables", rules: []forwardClient.Rule{runtimeOnly}}
+	service := forwardingServiceWithAdapter(adapter)
+	service.rules = &fakeForwardingRuleRepo{rules: forwardingRuleModels([]forwardClient.Rule{desired})}
+
+	total, value, err := service.SearchRules(dto.ForwardRuleSearch{PageInfo: dto.PageInfo{Page: 1, PageSize: 10}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	items, ok := value.([]dto.ForwardRule)
+	if !ok || total != 2 || len(items) != 2 {
+		t.Fatalf("unexpected forwarding inventory: %#v", value)
+	}
+	if !items[0].IsDesired || items[0].IsRuntime || items[0].SyncStatus != forwardingSyncMissing {
+		t.Fatalf("unexpected missing desired rule: %#v", items[0])
+	}
+	if items[1].IsDesired || !items[1].IsRuntime || items[1].SyncStatus != forwardingSyncRuntimeOnly {
+		t.Fatalf("unexpected runtime-only rule: %#v", items[1])
 	}
 }
 
@@ -300,6 +329,41 @@ func TestForwardingForceDeleteOnlySuppressesRemoveErrors(t *testing.T) {
 	}}})
 	if !errors.Is(err, wantErr) {
 		t.Fatalf("got %v want %v", err, wantErr)
+	}
+}
+
+func TestForwardingForceDeleteExposesRuntimeOnlyRuleAndSyncError(t *testing.T) {
+	recordForwardingSyncError(nil)
+	t.Cleanup(func() { recordForwardingSyncError(nil) })
+	wantErr := errors.New("runtime reconcile failed")
+	rule := forwardClient.Rule{
+		Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80",
+	}
+	adapter := &fakeForwardingAdapter{name: "iptables", rules: []forwardClient.Rule{rule}}
+	service := forwardingServiceWithAdapter(adapter)
+	adapter.operateErr = wantErr
+
+	err := service.OperateRules(dto.ForwardRuleOperate{ForceDelete: true, Rules: []dto.ForwardRuleOperation{{
+		Operation: "remove", Family: rule.Family, Protocol: rule.Protocol, Port: rule.Port,
+		TargetIP: rule.TargetIP, TargetPort: rule.TargetPort,
+	}}})
+	if err != nil {
+		t.Fatalf("forced remove returned %v", err)
+	}
+	base, err := service.LoadBaseInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if base.SyncError != wantErr.Error() {
+		t.Fatalf("sync error = %q, want %q", base.SyncError, wantErr)
+	}
+	_, value, err := service.SearchRules(dto.ForwardRuleSearch{PageInfo: dto.PageInfo{Page: 1, PageSize: 10}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	items := value.([]dto.ForwardRule)
+	if len(items) != 1 || items[0].IsDesired || !items[0].IsRuntime || items[0].SyncStatus != forwardingSyncRuntimeOnly {
+		t.Fatalf("unexpected runtime-only inventory after forced delete: %#v", items)
 	}
 }
 

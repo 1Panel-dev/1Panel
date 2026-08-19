@@ -3883,6 +3883,7 @@ const message = {
         denyAll: '禁止所有存取',
         sourcesHelper: '每行輸入一個 IPv4/IPv6 位址或 CIDR；允許清單為空時禁止所有存取',
         effective: '已生效',
+        forwardUnsynced: '未同步',
         notEnabled: '未啟用',
         notEffective: '未生效',
         dockerGuardStatusEffective: '{0} 容器連接埠防護運作正常',

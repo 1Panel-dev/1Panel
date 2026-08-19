@@ -5,37 +5,6 @@ import { TimeoutEnum } from '@/enums/http-enum';
 import { deepCopy } from '@/utils/misc';
 import { encodeBase64Fields } from '@/utils/base64';
 
-// firewall
-export const loadFireBaseInfo = (tab: string) => {
-    return http.post<Host.FirewallBase>(`/hosts/firewall/base`, { name: tab }, TimeoutEnum.T_40S);
-};
-export const loadForwardBaseInfo = () => {
-    return http.post<Host.FirewallBase>(`/hosts/firewall/forward/base`, {}, TimeoutEnum.T_40S);
-};
-export const searchForwardRule = (params: Host.ForwardRuleSearch) => {
-    return http.post<ResPage<Host.RuleInfo>>(`/hosts/firewall/forward/search`, params, TimeoutEnum.T_40S);
-};
-export const operateFire = (operation: string, withDockerRestart: boolean) => {
-    return http.post(
-        `/hosts/firewall/operate`,
-        {
-            operation: operation,
-            withDockerRestart: withDockerRestart,
-        },
-        TimeoutEnum.T_60S,
-    );
-};
-export const operateForwardRule = (params: { rules: Host.RuleForward[]; forceDelete?: boolean }) => {
-    return http.post(`/hosts/firewall/forward/operate`, params, TimeoutEnum.T_40S);
-};
-export const enableForwarding = () => {
-    return http.post(`/hosts/firewall/forward/enable`, {}, TimeoutEnum.T_60S);
-};
-
-export const operateFilterChain = (name: string, op: string) => {
-    return http.post(`/hosts/firewall/filter/operate`, { name: name, operate: op }, TimeoutEnum.T_60S);
-};
-
 // monitors
 export const loadMonitor = (param: Host.MonitorSearch, currentNode?: string) => {
     return http.post<Array<Host.MonitorData>>(

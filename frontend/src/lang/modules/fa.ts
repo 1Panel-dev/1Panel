@@ -4114,6 +4114,7 @@ const message = {
         denyAll: 'رد همه دسترسی‌ها',
         sourcesHelper: 'در هر خط یک آدرس IPv4/IPv6 یا CIDR وارد کنید؛ فهرست مجاز خالی همه دسترسی‌ها را رد می‌کند',
         effective: 'فعال',
+        forwardUnsynced: 'همگام‌نشده',
         notEnabled: 'فعال نشده',
         notEffective: 'بی‌اثر',
         dockerGuardStatusEffective: 'محافظت از پورت کانتینر {0} به‌درستی کار می‌کند',

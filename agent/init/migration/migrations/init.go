@@ -1685,7 +1685,7 @@ var AddComposePinned = &gormigrate.Migration{
 }
 
 var AddFirewallRuleTable = &gormigrate.Migration{
-	ID: "20260804-add-firewall-v2-tables",
+	ID: "20260819-add-firewall-v2-tables",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.FirewallRule{}, &model.DockerPortGuardPolicy{}, &model.ForwardingRule{})
 	},

@@ -74,6 +74,13 @@
                                 </template>
                             </el-table-column>
                             <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
+                            <el-table-column :label="$t('commons.table.status')" :min-width="90" prop="syncStatus">
+                                <template #default="{ row }">
+                                    <el-tag :type="syncStatusType(row.syncStatus)">
+                                        {{ syncStatusLabel(row.syncStatus) }}
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
                             <el-table-column :label="$t('firewall.sourcePort')" :min-width="70" prop="port" />
                             <el-table-column :min-width="80" :label="$t('firewall.targetIP')" prop="targetIP" />
                             <el-table-column :label="$t('firewall.targetPort')" :min-width="70" prop="targetPort" />
@@ -126,8 +133,8 @@ import ImportDialog from './import/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { operateForwardRule, searchForwardRule } from '@/api/modules/host';
-import { Host } from '@/api/interface/host';
+import { operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
+import { Firewall } from '@/api/interface/firewall';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { downloadWithContent } from '@/utils/file';
@@ -141,6 +148,16 @@ const maskShow = ref(true);
 const isActive = ref(false);
 const fireName = ref();
 const fireStatusRef = ref();
+
+const syncStatusLabel = (status?: Firewall.RuleForward['syncStatus']) => {
+    if (status === 'converged') return i18n.global.t('firewall.effective');
+    if (status === 'runtime_only') return i18n.global.t('firewall.forwardUnsynced');
+    return i18n.global.t('firewall.notEffective');
+};
+const syncStatusType = (status?: Firewall.RuleForward['syncStatus']) => {
+    if (status === 'converged') return 'success';
+    return status === 'runtime_only' ? 'warning' : 'danger';
+};
 
 const opRef = ref();
 const dialogImportRef = ref();
@@ -156,7 +173,7 @@ const paginationConfig = reactive({
 });
 
 const search = async () => {
-    if (!isActive.value) {
+    if (!isActive.value || fireName.value === '-') {
         loading.value = false;
         data.value = [];
         paginationConfig.total = 0;
@@ -189,7 +206,7 @@ const search = async () => {
 const dialogRef = ref();
 const onOpenDialog = async (
     title: string,
-    rowData: Partial<Host.RuleForward> = {
+    rowData: Partial<Firewall.RuleForward> = {
         family: 'ipv4',
         protocol: 'tcp',
         port: '8080',
@@ -204,7 +221,7 @@ const onOpenDialog = async (
     };
     dialogRef.value!.acceptParams(params);
 };
-const onDelete = async (row: Host.RuleForward | null) => {
+const onDelete = async (row: Firewall.RuleForward | null) => {
     let names = [];
     let rules = [];
     if (row) {
@@ -251,7 +268,7 @@ const onImport = () => {
     dialogImportRef.value.acceptParams(fireName.value);
 };
 
-const loadAllRules = async (): Promise<Host.RuleForward[]> => {
+const loadAllRules = async (): Promise<Firewall.RuleForward[]> => {
     if (paginationConfig.total === 0) return [];
     const response = await searchForwardRule({
         strategy: '',
@@ -270,7 +287,7 @@ const loadAllRules = async (): Promise<Host.RuleForward[]> => {
     }));
 };
 
-const exportRules = async (rules: Host.RuleForward[]) => {
+const exportRules = async (rules: Firewall.RuleForward[]) => {
     if (rules.length === 0) return;
     await ElMessageBox.confirm(
         i18n.global.t('firewall.exportHelper', [rules.length]),
@@ -314,7 +331,7 @@ const buttons = [
         label: i18n.global.t('commons.button.edit'),
         permission: true,
         nodeAdmin: true,
-        click: (row: Host.RuleForward) => {
+        click: (row: Firewall.RuleForward) => {
             onOpenDialog('edit', row);
         },
     },
@@ -322,7 +339,7 @@ const buttons = [
         label: i18n.global.t('commons.button.delete'),
         permission: true,
         nodeAdmin: true,
-        click: (row: Host.RuleForward) => {
+        click: (row: Firewall.RuleForward) => {
             onDelete(row);
         },
     },

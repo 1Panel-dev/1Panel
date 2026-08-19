@@ -4066,6 +4066,7 @@ const message = {
         sourcesHelper:
             '한 줄에 하나의 IPv4/IPv6 주소 또는 CIDR을 입력하세요. 허용 목록이 비어 있으면 모든 접근을 거부합니다',
         effective: '적용됨',
+        forwardUnsynced: '미동기화',
         notEnabled: '활성화되지 않음',
         notEffective: '적용되지 않음',
         dockerGuardStatusEffective: '{0} 컨테이너 포트 보호가 정상적으로 작동 중입니다',

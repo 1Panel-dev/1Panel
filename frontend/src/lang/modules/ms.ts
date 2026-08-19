@@ -4227,6 +4227,7 @@ const message = {
         denyAll: 'Tolak semua akses',
         sourcesHelper: 'Masukkan satu alamat IPv4/IPv6 atau CIDR setiap baris; senarai izin kosong menolak semua akses',
         effective: 'Berkuat kuasa',
+        forwardUnsynced: 'Belum disegerak',
         notEnabled: 'Tidak didayakan',
         notEffective: 'Tidak berkuat kuasa',
         dockerGuardStatusEffective: 'Perlindungan port bekas {0} berfungsi seperti biasa',

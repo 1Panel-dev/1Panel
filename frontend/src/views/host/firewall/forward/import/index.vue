@@ -81,8 +81,9 @@ import { ref } from 'vue';
 import { genFileId, UploadFile, UploadFiles, UploadProps, UploadRawFile } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
-import { operateForwardRule, searchForwardRule, getNetworkOptions } from '@/api/modules/host';
-import { Host } from '@/api/interface/host';
+import { getNetworkOptions } from '@/api/modules/host';
+import { operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
+import { Firewall } from '@/api/interface/firewall';
 import { checkIp, checkIpV6 } from '@/utils/validate';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -91,7 +92,7 @@ const visible = ref(false);
 const loading = ref(false);
 const selects = ref<any>([]);
 const displayData = ref<any>([]);
-const currentRules = ref<Host.RuleInfo[]>([]);
+const currentRules = ref<Firewall.RuleInfo[]>([]);
 const currentFireName = ref('');
 const availableInterfaces = ref<string[]>([]);
 
@@ -227,7 +228,7 @@ const compareRules = (importedRules: any[]) => {
 
 const onImport = async () => {
     loading.value = true;
-    const rules: Host.RuleForward[] = [];
+    const rules: Firewall.RuleForward[] = [];
     for (const rule of selects.value) {
         rules.push({
             operation: 'add',

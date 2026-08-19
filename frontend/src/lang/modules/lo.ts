@@ -4034,6 +4034,7 @@ const message = {
         denyAll: 'ປະຕິເສດການເຂົ້າເຖິງທັງໝົດ',
         sourcesHelper: 'ໃສ່ທີ່ຢູ່ IPv4/IPv6 ຫຼື CIDR ໜຶ່ງລາຍການຕໍ່ແຖວ; ລາຍການອະນຸຍາດຫວ່າງຈະປະຕິເສດທຸກການເຂົ້າເຖິງ',
         effective: 'ມີຜົນແລ້ວ',
+        forwardUnsynced: 'ຍັງບໍ່ຊິງຄ໌',
         notEnabled: 'ບໍ່ໄດ້ເປີດໃຊ້',
         notEffective: 'ບໍ່ມີຜົນ',
         dockerGuardStatusEffective: 'ການປ້ອງກັນພອດຄອນເທນເນີ {0} ເຮັດວຽກປົກກະຕິ',

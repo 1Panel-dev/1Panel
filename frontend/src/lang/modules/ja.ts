@@ -4145,6 +4145,7 @@ const message = {
         sourcesHelper:
             '1 行につき 1 つの IPv4/IPv6 アドレスまたは CIDR を入力してください。許可リストが空の場合はすべて拒否します',
         effective: '有効',
+        forwardUnsynced: '未同期',
         notEnabled: '未有効化',
         notEffective: '未反映',
         dockerGuardStatusEffective: '{0} コンテナポート保護は正常に動作しています',

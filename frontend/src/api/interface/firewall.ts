@@ -1,3 +1,5 @@
+import { ReqPage } from '.';
+
 export namespace Firewall {
     export type Provider = 'iptables' | 'nftables' | 'firewalld' | 'ufw';
     export type BackendSubsystem = 'system' | 'forwarding' | 'docker';
@@ -34,6 +36,46 @@ export namespace Firewall {
         subsystem: BackendSubsystem;
         backend: Provider;
         operation: BackendOperation;
+    }
+    export interface FirewallBase {
+        name: string;
+        backend: string;
+        isExist: boolean;
+        isActive: boolean;
+        isInit: boolean;
+        isBind: boolean;
+        version: string;
+        pingStatus: string;
+        syncError?: string;
+    }
+    export interface ForwardRuleSearch extends ReqPage {
+        strategy: string;
+        info: string;
+    }
+    export interface RuleInfo extends ReqPage {
+        family: string;
+        address: string;
+        destination: string;
+        port: string;
+        srcPort: string;
+        destPort: string;
+        protocol: string;
+        strategy: string;
+        usedStatus: string;
+        description: string;
+        [key: string]: any;
+    }
+    export interface RuleForward {
+        operation: string;
+        family: 'ipv4' | 'ipv6';
+        protocol: string;
+        port: string;
+        targetIP: string;
+        targetPort: string;
+        interface: string;
+        isDesired?: boolean;
+        isRuntime?: boolean;
+        syncStatus?: 'converged' | 'missing' | 'runtime_only';
     }
     export type Family = 'ipv4' | 'ipv6' | 'inet';
     export type Direction = 'input';

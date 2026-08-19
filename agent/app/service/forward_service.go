@@ -43,6 +43,17 @@ type forwardingCandidate struct {
 var errForwardingBackendConflict = errors.New("iptables and nftables forwarding backends are both initialized; remove one before continuing")
 var forwardingMutationMu sync.Mutex
 
+const (
+	forwardingSyncConverged   = "converged"
+	forwardingSyncMissing     = "missing"
+	forwardingSyncRuntimeOnly = "runtime_only"
+)
+
+var (
+	forwardingSyncStateMu sync.RWMutex
+	forwardingLastSyncErr error
+)
+
 func NewIForwardingService() IForwardingService {
 	return &ForwardingService{
 		managerFactory: newForwardingManager,
@@ -53,7 +64,9 @@ func NewIForwardingService() IForwardingService {
 }
 
 func (s *ForwardingService) LoadBaseInfo() (dto.FirewallSubsystemStatus, error) {
-	baseInfo := dto.FirewallSubsystemStatus{Version: "-", Name: "-", Backend: "-"}
+	baseInfo := dto.FirewallSubsystemStatus{
+		Version: "-", Name: "-", Backend: "-", SyncError: lastForwardingSyncError(),
+	}
 	manager, err := s.manager()
 	if err != nil {
 		return baseInfo, err
@@ -87,14 +100,27 @@ func (s *ForwardingService) SearchRules(request dto.ForwardRuleSearch) (int64, i
 	if err != nil {
 		return 0, nil, err
 	}
-	filtered := stored[:0]
-	for _, rule := range stored {
-		if request.Info == "" || strings.Contains(rule.Port, request.Info) || strings.Contains(rule.TargetPort, request.Info) || strings.Contains(rule.TargetIP, request.Info) {
-			filtered = append(filtered, rule)
+	manager, err := s.manager()
+	if err != nil {
+		return 0, nil, err
+	}
+	runtime, err := manager.List("", "")
+	if err != nil {
+		return 0, nil, err
+	}
+	inventory, err := mergeForwardingInventory(stored, runtime)
+	if err != nil {
+		return 0, nil, err
+	}
+	filtered := inventory[:0]
+	for _, item := range inventory {
+		if request.Info == "" || strings.Contains(item.Rule.Port, request.Info) ||
+			strings.Contains(item.Rule.TargetPort, request.Info) || strings.Contains(item.Rule.TargetIP, request.Info) {
+			filtered = append(filtered, item)
 		}
 	}
-	stored = filtered
-	total := len(stored)
+	inventory = filtered
+	total := len(inventory)
 	start, end := (request.Page-1)*request.PageSize, request.Page*request.PageSize
 	if start > total {
 		return int64(total), make([]dto.ForwardRule, 0), nil
@@ -102,21 +128,24 @@ func (s *ForwardingService) SearchRules(request dto.ForwardRuleSearch) (int64, i
 	if end > total {
 		end = total
 	}
-	pageRules := stored[start:end]
+	pageRules := inventory[start:end]
 	var items []dto.ForwardRule
 	if pageRules != nil {
 		items = make([]dto.ForwardRule, 0, len(pageRules))
 	}
-	for index, rule := range pageRules {
+	for index, item := range pageRules {
 		items = append(items, dto.ForwardRule{
-			ID:         rule.ID,
+			ID:         item.ID,
 			Num:        strconv.Itoa(start + index + 1),
-			Family:     rule.Family,
-			Protocol:   rule.Protocol,
-			Port:       rule.Port,
-			TargetIP:   rule.TargetIP,
-			TargetPort: rule.TargetPort,
-			Interface:  rule.Interface,
+			Family:     item.Rule.Family,
+			Protocol:   item.Rule.Protocol,
+			Port:       item.Rule.Port,
+			TargetIP:   item.Rule.TargetIP,
+			TargetPort: item.Rule.TargetPort,
+			Interface:  item.Rule.Interface,
+			IsDesired:  item.IsDesired,
+			IsRuntime:  item.IsRuntime,
+			SyncStatus: item.SyncStatus(),
 		})
 	}
 	return int64(total), items, nil
@@ -140,6 +169,7 @@ func (s *ForwardingService) OperateRules(request dto.ForwardRuleOperate) error {
 		return err
 	}
 	if err := s.reconcile(desired); err != nil {
+		recordForwardingSyncError(err)
 		if request.ForceDelete && forwardingOperationsOnlyRemove(request.Rules) {
 			if global.LOG != nil {
 				global.LOG.Error(err)
@@ -148,6 +178,7 @@ func (s *ForwardingService) OperateRules(request dto.ForwardRuleOperate) error {
 		}
 		return err
 	}
+	recordForwardingSyncError(nil)
 	return nil
 }
 
@@ -156,19 +187,25 @@ func (s *ForwardingService) Enable() error {
 	defer forwardingMutationMu.Unlock()
 	manager, err := s.manager()
 	if err != nil {
+		recordForwardingSyncError(err)
 		return err
 	}
 	if err := settingRepo.UpdateOrCreate(settingForwardingInitialized, constant.StatusEnable); err != nil {
+		recordForwardingSyncError(err)
 		return err
 	}
 	if err := s.activateManager(manager); err != nil {
+		recordForwardingSyncError(err)
 		return err
 	}
 	rules, err := s.rules.List(context.Background())
 	if err != nil {
+		recordForwardingSyncError(err)
 		return err
 	}
-	return manager.Reconcile(forwardingRulesFromModels(rules))
+	err = manager.Reconcile(forwardingRulesFromModels(rules))
+	recordForwardingSyncError(err)
+	return err
 }
 
 func (s *ForwardingService) Restore(ctx context.Context) error {
@@ -176,20 +213,28 @@ func (s *ForwardingService) Restore(ctx context.Context) error {
 	defer forwardingMutationMu.Unlock()
 	enabled, err := s.forwardingEnabled()
 	if err != nil || !enabled {
+		if err != nil {
+			recordForwardingSyncError(err)
+		}
 		return err
 	}
 	manager, err := s.manager()
 	if err != nil {
+		recordForwardingSyncError(err)
 		return err
 	}
 	stored, err := s.rules.List(ctx)
 	if err != nil {
+		recordForwardingSyncError(err)
 		return err
 	}
 	if err := s.activateManager(manager); err != nil {
+		recordForwardingSyncError(err)
 		return err
 	}
-	return manager.Reconcile(forwardingRulesFromModels(stored))
+	err = manager.Reconcile(forwardingRulesFromModels(stored))
+	recordForwardingSyncError(err)
+	return err
 }
 
 func (s *ForwardingService) reconcile(rules []forwarding.Rule) error {
@@ -257,6 +302,79 @@ func forwardingRuleModels(rules []forwarding.Rule) []model.ForwardingRule {
 		})
 	}
 	return stored
+}
+
+type forwardingInventoryItem struct {
+	ID        uint
+	Rule      forwarding.Rule
+	IsDesired bool
+	IsRuntime bool
+}
+
+func (i forwardingInventoryItem) SyncStatus() string {
+	switch {
+	case i.IsDesired && i.IsRuntime:
+		return forwardingSyncConverged
+	case i.IsDesired:
+		return forwardingSyncMissing
+	default:
+		return forwardingSyncRuntimeOnly
+	}
+}
+
+func mergeForwardingInventory(
+	stored []model.ForwardingRule,
+	runtime []forwarding.Rule,
+) ([]forwardingInventoryItem, error) {
+	items := make([]forwardingInventoryItem, 0, len(stored)+len(runtime))
+	byIdentity := make(map[string]int, len(stored)+len(runtime))
+	for _, record := range stored {
+		rule, err := forwardingproviders.NormalizeRule(forwarding.Rule{
+			Family: record.Family, Protocol: record.Protocol, Port: record.Port, TargetIP: record.TargetIP,
+			TargetPort: record.TargetPort, Interface: record.Interface,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("normalize desired forwarding rule: %w", err)
+		}
+		key := forwardingRuleIdentity(rule)
+		byIdentity[key] = len(items)
+		items = append(items, forwardingInventoryItem{ID: record.ID, Rule: rule, IsDesired: true})
+	}
+	for _, observed := range runtime {
+		rule, err := forwardingproviders.NormalizeRule(observed)
+		if err != nil {
+			return nil, fmt.Errorf("normalize runtime forwarding rule: %w", err)
+		}
+		key := forwardingRuleIdentity(rule)
+		if index, exists := byIdentity[key]; exists {
+			items[index].IsRuntime = true
+			continue
+		}
+		byIdentity[key] = len(items)
+		items = append(items, forwardingInventoryItem{Rule: rule, IsRuntime: true})
+	}
+	return items, nil
+}
+
+func forwardingRuleIdentity(rule forwarding.Rule) string {
+	return strings.Join([]string{
+		rule.Family, rule.Protocol, rule.Port, rule.TargetIP, rule.TargetPort, rule.Interface,
+	}, "\x00")
+}
+
+func recordForwardingSyncError(err error) {
+	forwardingSyncStateMu.Lock()
+	forwardingLastSyncErr = err
+	forwardingSyncStateMu.Unlock()
+}
+
+func lastForwardingSyncError() string {
+	forwardingSyncStateMu.RLock()
+	defer forwardingSyncStateMu.RUnlock()
+	if forwardingLastSyncErr == nil {
+		return ""
+	}
+	return forwardingLastSyncErr.Error()
 }
 
 func applyForwardingOperations(current []forwarding.Rule, requested []dto.ForwardRuleOperation) ([]forwarding.Rule, error) {

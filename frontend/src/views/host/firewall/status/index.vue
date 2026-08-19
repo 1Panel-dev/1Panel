@@ -73,6 +73,14 @@
                     </div>
                 </div>
             </el-card>
+            <el-alert
+                v-if="props.currentTab === 'forward' && baseInfo.syncError"
+                class="mt-3"
+                type="warning"
+                show-icon
+                :closable="false"
+                :title="baseInfo.syncError"
+            />
         </div>
         <NoSuchService
             v-else
@@ -110,14 +118,14 @@
 </template>
 
 <script lang="ts" setup>
-import { Host } from '@/api/interface/host';
+import { Firewall } from '@/api/interface/firewall';
 import {
     enableForwarding,
     loadFireBaseInfo,
     loadForwardBaseInfo,
     operateFilterChain,
     operateFire,
-} from '@/api/modules/host';
+} from '@/api/modules/firewall';
 import i18n from '@/lang';
 import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
@@ -130,7 +138,7 @@ const props = defineProps({
     currentTab: String,
 });
 
-const baseInfo = ref<Host.FirewallBase>({
+const baseInfo = ref<Firewall.FirewallBase>({
     isActive: false,
     isExist: true,
     isInit: false,
@@ -139,6 +147,7 @@ const baseInfo = ref<Host.FirewallBase>({
     backend: '',
     version: '',
     pingStatus: '',
+    syncError: '',
 });
 const dockerRef = ref();
 const operation = ref('restart');

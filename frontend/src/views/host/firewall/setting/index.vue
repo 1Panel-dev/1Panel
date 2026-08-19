@@ -93,8 +93,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import { Firewall } from '@/api/interface/firewall';
-import { loadFirewallSettings, operateFirewallBackend } from '@/api/modules/firewall';
-import { operateFire } from '@/api/modules/host';
+import { loadFirewallSettings, operateFire, operateFirewallBackend } from '@/api/modules/firewall';
 import FireRouter from '@/views/host/firewall/index.vue';
 import WhiteList from '@/views/host/firewall/setting/white-list/index.vue';
 import { whiteListRuleCount } from '@/views/host/firewall/setting/white-list/model';

@@ -60,18 +60,19 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
-import { Host } from '@/api/interface/host';
-import { operateForwardRule, getNetworkOptions } from '@/api/modules/host';
+import { Firewall } from '@/api/interface/firewall';
+import { getNetworkOptions } from '@/api/modules/host';
+import { operateForwardRule } from '@/api/modules/firewall';
 import { checkIp, checkIpV6, checkPort } from '@/utils/validate';
 import { deepCopy } from '@/utils/misc';
 const loading = ref();
-const oldRule = ref<Host.RuleForward>();
+const oldRule = ref<Firewall.RuleForward>();
 
 const interfaceOptions = ref<Array<{ label: string; value: string }>>([]);
 
 interface DialogProps {
     title: string;
-    rowData?: Host.RuleForward;
+    rowData?: Firewall.RuleForward;
     getTableList?: () => Promise<any>;
 }
 const title = ref<string>('');

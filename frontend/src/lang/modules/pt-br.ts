@@ -4246,6 +4246,7 @@ const message = {
         sourcesHelper:
             'Insira um endereço IPv4/IPv6 ou CIDR por linha; uma lista de permissões vazia nega todo o acesso',
         effective: 'Em vigor',
+        forwardUnsynced: 'Não sincronizado',
         notEnabled: 'Não habilitado',
         notEffective: 'Sem efeito',
         dockerGuardStatusEffective: 'A proteção de portas de contêineres {0} está funcionando normalmente',

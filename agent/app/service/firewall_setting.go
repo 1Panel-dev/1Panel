@@ -260,7 +260,11 @@ func (s *FirewallSettingService) operateForwarding(request dto.FirewallBackendOp
 		if err := manager.Cleanup(); err != nil {
 			return err
 		}
-		return settingRepo.UpdateOrCreate(settingForwardingInitialized, constant.StatusDisable)
+		if err := settingRepo.UpdateOrCreate(settingForwardingInitialized, constant.StatusDisable); err != nil {
+			return err
+		}
+		recordForwardingSyncError(nil)
+		return nil
 	}
 	if err := settingRepo.UpdateOrCreate(settingForwardingBackend, request.Backend); err != nil {
 		return err
@@ -268,5 +272,6 @@ func (s *FirewallSettingService) operateForwarding(request dto.FirewallBackendOp
 	if request.Operation == "initialize" {
 		return NewIForwardingService().Enable()
 	}
+	recordForwardingSyncError(nil)
 	return nil
 }

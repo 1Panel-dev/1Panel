@@ -4225,6 +4225,7 @@ const message = {
         denyAll: 'Tüm erişimi reddet',
         sourcesHelper: 'Her satıra bir IPv4/IPv6 adresi veya CIDR girin; boş izin listesi tüm erişimi reddeder',
         effective: 'Etkin',
+        forwardUnsynced: 'Senkronize değil',
         notEnabled: 'Etkin değil',
         notEffective: 'Uygulanmıyor',
         dockerGuardStatusEffective: '{0} konteyner portu koruması normal çalışıyor',

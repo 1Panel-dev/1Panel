@@ -55,6 +55,7 @@ func Init() {
 		migrations.AddAllowIPTrustedProxiesSetting,
 		migrations.AddWebsiteTemplateMenu,
 		migrations.RepairXpackAppMenus,
+		migrations.UpdateFirewallMenuPath,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

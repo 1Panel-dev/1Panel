@@ -11,6 +11,7 @@ type FirewallSubsystemStatus struct {
 	IsBind     bool   `json:"isBind"`
 	Version    string `json:"version"`
 	PingStatus string `json:"pingStatus"`
+	SyncError  string `json:"syncError,omitempty"`
 }
 
 type FirewallLifecycleOperation struct {

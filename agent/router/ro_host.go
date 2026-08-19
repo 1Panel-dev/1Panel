@@ -35,10 +35,10 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/firewall/rules/check/batch", baseApi.CheckFirewallRulesBatch)
 		hostRouter.POST("/firewall/rules", baseApi.CreateFirewallRule)
 		hostRouter.POST("/firewall/rules/batch", baseApi.CreateFirewallRulesBatch)
+		hostRouter.POST("/firewall/rules/update", baseApi.UpdateFirewallRule)
+		hostRouter.POST("/firewall/rules/delete", baseApi.DeleteFirewallRule)
 		hostRouter.POST("/firewall/rules/delete/batch", baseApi.DeleteFirewallRulesBatch)
-		hostRouter.PUT("/firewall/rules/:uuid", baseApi.UpdateFirewallRule)
-		hostRouter.DELETE("/firewall/rules/:uuid", baseApi.DeleteFirewallRule)
-		hostRouter.POST("/firewall/rules/:uuid/reorder", baseApi.ReorderFirewallRule)
+		hostRouter.POST("/firewall/rules/reorder", baseApi.ReorderFirewallRule)
 
 		hostRouter.POST("/firewall/filter/operate", baseApi.OperateFilterChain)
 		hostRouter.GET("/firewall/docker/ports", baseApi.ListDockerPortGuard)

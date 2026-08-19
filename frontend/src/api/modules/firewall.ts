@@ -1,6 +1,27 @@
 import http from '@/api';
+import { ResPage } from '@/api/interface';
 import { Firewall } from '@/api/interface/firewall';
 import { TimeoutEnum } from '@/enums/http-enum';
+
+export const loadFireBaseInfo = (tab: string) =>
+    http.post<Firewall.FirewallBase>('/hosts/firewall/base', { name: tab }, TimeoutEnum.T_40S);
+
+export const loadForwardBaseInfo = () =>
+    http.post<Firewall.FirewallBase>('/hosts/firewall/forward/base', {}, TimeoutEnum.T_40S);
+
+export const searchForwardRule = (request: Firewall.ForwardRuleSearch) =>
+    http.post<ResPage<Firewall.RuleInfo>>('/hosts/firewall/forward/search', request, TimeoutEnum.T_40S);
+
+export const operateFire = (operation: string, withDockerRestart: boolean) =>
+    http.post('/hosts/firewall/operate', { operation, withDockerRestart }, TimeoutEnum.T_60S);
+
+export const operateForwardRule = (request: { rules: Firewall.RuleForward[]; forceDelete?: boolean }) =>
+    http.post('/hosts/firewall/forward/operate', request, TimeoutEnum.T_40S);
+
+export const enableForwarding = () => http.post('/hosts/firewall/forward/enable', {}, TimeoutEnum.T_60S);
+
+export const operateFilterChain = (name: string, operate: string) =>
+    http.post('/hosts/firewall/filter/operate', { name, operate }, TimeoutEnum.T_60S);
 
 export const searchFirewallRules = (request: Firewall.InventoryRequest) => {
     return http.post<Firewall.Inventory>('/hosts/firewall/rules/search', request, TimeoutEnum.T_40S);
@@ -27,9 +48,7 @@ export const createFirewallRulesBatch = (request: Firewall.BatchCreateRequest) =
 };
 
 export const deleteFirewallRule = (uuid: string) => {
-    return http.delete(`/hosts/firewall/rules/${encodeURIComponent(uuid)}`, undefined, {
-        timeout: TimeoutEnum.T_60S,
-    });
+    return http.post('/hosts/firewall/rules/delete', { uuid }, TimeoutEnum.T_60S);
 };
 
 export const deleteFirewallRulesBatch = (request: Firewall.BatchDeleteRequest) => {
@@ -37,13 +56,11 @@ export const deleteFirewallRulesBatch = (request: Firewall.BatchDeleteRequest) =
 };
 
 export const updateFirewallRule = (uuid: string, request: Firewall.UpdateRequest) => {
-    return http.put(`/hosts/firewall/rules/${encodeURIComponent(uuid)}`, request, {
-        timeout: TimeoutEnum.T_60S,
-    });
+    return http.post('/hosts/firewall/rules/update', { ...request, uuid }, TimeoutEnum.T_60S);
 };
 
 export const reorderFirewallRule = (uuid: string, request: Firewall.ReorderRequest) => {
-    return http.post(`/hosts/firewall/rules/${encodeURIComponent(uuid)}/reorder`, request, TimeoutEnum.T_60S);
+    return http.post('/hosts/firewall/rules/reorder', { ...request, uuid }, TimeoutEnum.T_60S);
 };
 
 export const loadDockerPortGuard = () =>

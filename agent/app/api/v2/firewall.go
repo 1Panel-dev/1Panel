@@ -125,6 +125,7 @@ func (b *BaseApi) OperateForwardingRules(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/forward/enable [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"初始化并启用端口转发","formatEN":"initialize and enable port forwarding"}
 func (b *BaseApi) EnableForwarding(c *gin.Context) {
 	if err := forwardingService.Enable(); err != nil {
 		helper.InternalServer(c, err)
@@ -292,17 +293,20 @@ func (b *BaseApi) CreateFirewallRulesBatch(c *gin.Context) {
 
 // @Tags Firewall
 // @Summary Delete a managed unified firewall v2 rule
-// @Param uuid path string true "managed rule UUID"
+// @Accept json
+// @Param request body dto.FirewallRuleDelete true "request"
 // @Success 200
 // @Failure 400 {object} dto.Response
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/firewall/rules/{uuid} [delete]
-// @x-panel-log {"bodyKeys":[],"paramKeys":["uuid"],"BeforeFunctions":[],"formatZH":"删除防火墙规则 [uuid]","formatEN":"delete firewall rule [uuid]"}
+// @Router /hosts/firewall/rules/delete [post]
+// @x-panel-log {"bodyKeys":["uuid"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除防火墙规则 [uuid]","formatEN":"delete firewall rule [uuid]"}
 func (b *BaseApi) DeleteFirewallRule(c *gin.Context) {
-	request := dto.FirewallRuleDelete{
-		UUID: strings.TrimSpace(c.Param("uuid")),
+	var request dto.FirewallRuleDelete
+	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
 	}
+	request.UUID = strings.TrimSpace(request.UUID)
 	if request.UUID == "" {
 		helper.BadRequest(c, repo.ErrFirewallPersistenceInvalid)
 		return
@@ -340,20 +344,19 @@ func (b *BaseApi) DeleteFirewallRulesBatch(c *gin.Context) {
 // @Tags Firewall
 // @Summary Update a managed unified firewall v2 rule
 // @Accept json
-// @Param uuid path string true "managed rule UUID"
 // @Param request body dto.FirewallRuleUpdate true "request"
 // @Success 200
 // @Failure 400 {object} dto.Response
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/firewall/rules/{uuid} [put]
-// @x-panel-log {"bodyKeys":[],"paramKeys":["uuid"],"BeforeFunctions":[],"formatZH":"更新防火墙规则 [uuid]","formatEN":"update firewall rule [uuid]"}
+// @Router /hosts/firewall/rules/update [post]
+// @x-panel-log {"bodyKeys":["uuid"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新防火墙规则 [uuid]","formatEN":"update firewall rule [uuid]"}
 func (b *BaseApi) UpdateFirewallRule(c *gin.Context) {
 	var request dto.FirewallRuleUpdate
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	request.UUID = strings.TrimSpace(c.Param("uuid"))
+	request.UUID = strings.TrimSpace(request.UUID)
 	if request.UUID == "" {
 		helper.BadRequest(c, repo.ErrFirewallPersistenceInvalid)
 		return
@@ -368,20 +371,19 @@ func (b *BaseApi) UpdateFirewallRule(c *gin.Context) {
 // @Tags Firewall
 // @Summary Reorder a managed unified firewall v2 rule
 // @Accept json
-// @Param uuid path string true "managed rule UUID"
 // @Param request body dto.FirewallRuleReorder true "request"
 // @Success 200
 // @Failure 400 {object} dto.Response
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/firewall/rules/{uuid}/reorder [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":["uuid"],"BeforeFunctions":[],"formatZH":"调整防火墙规则顺序 [uuid]","formatEN":"reorder firewall rule [uuid]"}
+// @Router /hosts/firewall/rules/reorder [post]
+// @x-panel-log {"bodyKeys":["uuid"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"调整防火墙规则顺序 [uuid]","formatEN":"reorder firewall rule [uuid]"}
 func (b *BaseApi) ReorderFirewallRule(c *gin.Context) {
 	var request dto.FirewallRuleReorder
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	request.UUID = strings.TrimSpace(c.Param("uuid"))
+	request.UUID = strings.TrimSpace(request.UUID)
 	if request.UUID == "" {
 		helper.BadRequest(c, repo.ErrFirewallPersistenceInvalid)
 		return
@@ -416,6 +418,12 @@ func handleFirewallRuleError(c *gin.Context, err error) {
 	}
 }
 
+// @Tags Firewall
+// @Summary Load firewall settings
+// @Success 200 {object} dto.FirewallSettings
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/settings [get]
 func (b *BaseApi) LoadFirewallSettings(c *gin.Context) {
 	data, err := firewallSettingService.Load(c.Request.Context())
 	if err != nil {
@@ -425,6 +433,15 @@ func (b *BaseApi) LoadFirewallSettings(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// @Tags Firewall
+// @Summary Operate firewall backend
+// @Accept json
+// @Param request body dto.FirewallBackendOperation true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/settings/operate [post]
+// @x-panel-log {"bodyKeys":["subsystem","backend","operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"防火墙子系统 [subsystem] 后端 [operation] [backend]","formatEN":"[operation] firewall [subsystem] backend [backend]"}
 func (b *BaseApi) OperateFirewallBackend(c *gin.Context) {
 	var request dto.FirewallBackendOperation
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
@@ -437,6 +454,12 @@ func (b *BaseApi) OperateFirewallBackend(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Firewall
+// @Summary List Docker port guard status and policies
+// @Success 200 {object} dto.DockerPortGuardList
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/docker/ports [get]
 func (b *BaseApi) ListDockerPortGuard(c *gin.Context) {
 	data, err := dockerPortGuardService.LoadOverview(c.Request.Context())
 	if err != nil {
@@ -446,6 +469,13 @@ func (b *BaseApi) ListDockerPortGuard(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// @Tags Firewall
+// @Summary Sync Docker port guard rules
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/docker/sync [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步 Docker 端口防护规则","formatEN":"sync Docker port guard rules"}
 func (b *BaseApi) SyncDockerPortGuard(c *gin.Context) {
 	if err := dockerPortGuardService.Reconcile(c.Request.Context()); err != nil {
 		handleDockerPortGuardError(c, err)
@@ -454,6 +484,15 @@ func (b *BaseApi) SyncDockerPortGuard(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Firewall
+// @Summary Operate Docker port guard
+// @Accept json
+// @Param request body dto.DockerPortGuardOperation true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/docker/operate [post]
+// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operation] Docker 端口防护","formatEN":"[operation] Docker port guard"}
 func (b *BaseApi) OperateDockerPortGuard(c *gin.Context) {
 	var request dto.DockerPortGuardOperation
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
@@ -466,6 +505,15 @@ func (b *BaseApi) OperateDockerPortGuard(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Firewall
+// @Summary Delete Docker port guard policies
+// @Accept json
+// @Param request body dto.DockerPortGuardPolicyBatchDelete true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/docker/policies/delete/batch [post]
+// @x-panel-log {"bodyKeys":["uuids"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除 Docker 端口防护策略 [uuids]","formatEN":"delete Docker port guard policies [uuids]"}
 func (b *BaseApi) DeleteDockerPortGuardPolicies(c *gin.Context) {
 	var request dto.DockerPortGuardPolicyBatchDelete
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
@@ -478,6 +526,15 @@ func (b *BaseApi) DeleteDockerPortGuardPolicies(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Firewall
+// @Summary Batch upsert Docker port guard policies
+// @Accept json
+// @Param request body dto.DockerPortGuardPolicyBatch true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/docker/policies/batch [post]
+// @x-panel-log {"bodyKeys":["mode"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"批量更新 Docker 端口防护策略 [mode]","formatEN":"batch update Docker port guard policies [mode]"}
 func (b *BaseApi) UpsertDockerPortGuardPolicies(c *gin.Context) {
 	var request dto.DockerPortGuardPolicyBatch
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {

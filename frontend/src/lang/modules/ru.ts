@@ -4215,6 +4215,7 @@ const message = {
         sourcesHelper:
             'Введите по одному адресу IPv4/IPv6 или CIDR в строке; пустой список разрешений запрещает любой доступ',
         effective: 'Действует',
+        forwardUnsynced: 'Не синхронизировано',
         notEnabled: 'Не включено',
         notEffective: 'Не действует',
         dockerGuardStatusEffective: 'Защита портов контейнеров {0} работает нормально',

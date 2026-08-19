@@ -3928,6 +3928,7 @@ const message = {
         denyAll: '禁止所有访问',
         sourcesHelper: '每行输入一个 IPv4/IPv6 地址或 CIDR；白名单为空时禁止所有访问',
         effective: '已生效',
+        forwardUnsynced: '未同步',
         notEnabled: '未启用',
         notEffective: '未生效',
         dockerGuardStatusEffective: '{0} 容器端口防护运行正常',

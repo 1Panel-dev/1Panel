@@ -64,44 +64,6 @@ export namespace Host {
         info?: string;
     }
 
-    export interface FirewallBase {
-        name: string;
-        backend: string;
-        isExist: boolean;
-        isActive: boolean;
-        isInit: boolean;
-        isBind: boolean;
-        version: string;
-        pingStatus: string;
-    }
-    export interface ForwardRuleSearch extends ReqPage {
-        strategy: string;
-        info: string;
-    }
-    export interface RuleInfo extends ReqPage {
-        family: string;
-        address: string;
-        destination: string;
-        port: string;
-        srcPort: string;
-        destPort: string;
-        protocol: string;
-        strategy: string;
-
-        usedStatus: string;
-        description: string;
-
-        [key: string]: any;
-    }
-    export interface RuleForward {
-        operation: string;
-        family: 'ipv4' | 'ipv6';
-        protocol: string;
-        port: string;
-        targetIP: string;
-        targetPort: string;
-        interface: string;
-    }
     export interface MonitorSetting {
         defaultNetwork: string;
         defaultIO: string;
