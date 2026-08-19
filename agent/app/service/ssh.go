@@ -1328,6 +1328,8 @@ func collectSSHLogItems(lines []string, filter, status string) []sshParsedLog {
 	var items []sshParsedLog
 	auxiliaryIndex := make(map[string]int)
 	sessionHasAuthEvent := make(map[string]bool)
+	authenticatedEndpoints := make(map[string]bool)
+	matchedTerminalSessions := make(map[string]bool)
 	for lineIndex, line := range lines {
 		if !shouldParseSSHLogLine(line, status, filter) {
 			continue
@@ -1338,11 +1340,32 @@ func collectSSHLogItems(lines []string, filter, status string) []sshParsedLog {
 		}
 		item.Index = lineIndex
 		item.Search = line
+		endpointKey := loadSSHLogEndpointKey(item.History)
 		if isSSHAuthEvent(item) && item.SessionKey != "" {
 			sessionHasAuthEvent[item.SessionKey] = true
+			delete(matchedTerminalSessions, item.SessionKey)
+			if endpointKey != "" {
+				if item.History.Status == constant.StatusSuccess {
+					authenticatedEndpoints[endpointKey] = true
+				} else {
+					delete(authenticatedEndpoints, endpointKey)
+				}
+			}
 			items = append(items, item)
 			continue
 		}
+		if endpointKey != "" && isSSHTerminalEvent(item) && authenticatedEndpoints[endpointKey] {
+			// A successful authentication and its terminal log can be emitted by
+			// different sshd processes. Associate only this active connection by
+			// endpoint, then clear it so a reused client port starts a new session.
+			delete(authenticatedEndpoints, endpointKey)
+			matchedTerminalSessions[item.SessionKey] = true
+			continue
+		}
+		if isSSHTerminalEvent(item) && matchedTerminalSessions[item.SessionKey] {
+			continue
+		}
+		delete(matchedTerminalSessions, item.SessionKey)
 		if index, ok := auxiliaryIndex[item.SessionKey]; ok {
 			items[index].Search += "\n" + line
 			continue
@@ -1379,6 +1402,13 @@ func filterRedundantSSHSessionItems(items []sshParsedLog, sessionHasAuthEvent ma
 
 func isSSHAuthEvent(item sshParsedLog) bool {
 	return item.History.Status == constant.StatusSuccess || item.History.AuthMode != ""
+}
+
+func isSSHTerminalEvent(item sshParsedLog) bool {
+	message := item.History.Message
+	return strings.HasPrefix(message, "Connection closed by ") ||
+		strings.HasPrefix(message, "Disconnected from ") ||
+		strings.HasPrefix(message, "Received disconnect from ")
 }
 
 func shouldParseSSHLogLine(line, status, filter string) bool {
@@ -1482,15 +1512,25 @@ func parseSSHLogHeader(line string) (sshLogHeader, bool) {
 }
 
 func loadSSHLogSessionKey(header sshLogHeader, data dto.SSHHistory, line string) string {
-	// Authentication and disconnect logs can use different sshd PIDs. The client
-	// address and port keep events from the same SSH connection associated.
-	if data.Address != "" && data.Port != "" {
-		return data.Address + ":" + data.Port
+	if header.Process == "sshd-session" {
+		if endpointKey := loadSSHLogEndpointKey(data); endpointKey != "" {
+			return endpointKey
+		}
 	}
 	if header.PID != "" {
 		return "pid:" + header.PID
 	}
+	if endpointKey := loadSSHLogEndpointKey(data); endpointKey != "" {
+		return endpointKey
+	}
 	return line
+}
+
+func loadSSHLogEndpointKey(data dto.SSHHistory) string {
+	if data.Address == "" || data.Port == "" {
+		return ""
+	}
+	return net.JoinHostPort(data.Address, data.Port)
 }
 
 func normalizeSSHLogDate(dateStr string) string {
