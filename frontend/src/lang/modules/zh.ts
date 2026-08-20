@@ -1396,6 +1396,8 @@ const message = {
             memory: '显存',
             memoryUsed: '显存使用',
             memoryTotal: '显存总计',
+            frequency: '频率',
+            freeMemory: '可用显存',
             percent: '使用率',
 
             base: '基础信息',
@@ -1404,6 +1406,8 @@ const message = {
             processMemoryUsage: '显存使用',
             performanceStateHelper: '从 P0 (最大性能) 到 P12 (最小性能)',
             busID: '总线地址',
+            runtimeInfo: '运行信息',
+            deviceInfo: '设备信息',
             persistenceMode: '持续模式',
             enabled: '开启',
             disabled: '关闭',

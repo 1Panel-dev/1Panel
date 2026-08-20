@@ -26,9 +26,12 @@ export namespace AI {
         driverVersion: string;
         type: string;
         gpu: GPU[];
+        npu: NPU[];
+        xpuDriverVersion: string;
+        xpu: XpuInfo['xpu'];
     }
     export interface GPU {
-        type: string;
+        type: 'nvidia' | 'amd';
         index: number;
         productName: string;
         persistenceMode: string;
@@ -48,6 +51,27 @@ export namespace AI {
         migMode: string;
         processes: Process[];
     }
+    export interface NPU {
+        type: 'ascend';
+        index: number;
+        npuIndex: number;
+        chipIndex: number;
+        productName: string;
+        busID: string;
+        health: string;
+        temperature: string;
+        powerDraw: string;
+        aiCore: string;
+        memUsed: string;
+        memTotal: string;
+        memoryUsed: string;
+        memoryTotal: string;
+        hbmUsed: string;
+        hbmTotal: string;
+        hugepagesUsed: string;
+        hugepagesTotal: string;
+        processes: NPUProcess[];
+    }
     export interface MonitorGPUSearch {
         productName: string;
         startTime: Date;
@@ -60,6 +84,7 @@ export namespace AI {
     }
     export interface ChartHide {
         productName: string;
+        type?: 'gpu' | 'xpu';
         process: boolean;
         gpu: boolean;
         memory: boolean;
@@ -79,6 +104,7 @@ export namespace AI {
         memoryUsed: Array<number>;
         memoryPercent: Array<number>;
         speedValue: Array<number>;
+        processCount: Array<number>;
         gpuProcesses: Array<Array<GPUProcess>>;
     }
     export interface GPUProcess {
@@ -90,6 +116,11 @@ export namespace AI {
     export interface Process {
         pid: string;
         type: string;
+        processName: string;
+        usedMemory: string;
+    }
+    export interface NPUProcess {
+        pid: string;
         processName: string;
         usedMemory: string;
     }
@@ -118,6 +149,7 @@ export namespace AI {
 
     interface Stats {
         power: string;
+        gpuUtil: string;
         frequency: string;
         temperature: string;
         memoryUsed: string;

@@ -12,7 +12,7 @@ type DeviceUtilByProcList struct {
 	DeviceUtilByProcList []DeviceUtilByProc `json:"device_util_by_proc_list"`
 }
 
-type Device struct {
+type discoveryDevice struct {
 	DeviceFunctionType string `json:"device_function_type"`
 	DeviceID           int    `json:"device_id"`
 	DeviceName         string `json:"device_name"`
@@ -28,8 +28,8 @@ type Device struct {
 	DriverVersion          string `json:"driver_version"`
 }
 
-type DeviceInfo struct {
-	DeviceList []Device `json:"device_list"`
+type discoveryInfo struct {
+	DeviceList []discoveryDevice `json:"device_list"`
 }
 
 type DeviceLevelMetric struct {
@@ -40,4 +40,43 @@ type DeviceLevelMetric struct {
 type DeviceStats struct {
 	DeviceID    int                 `json:"device_id"`
 	DeviceLevel []DeviceLevelMetric `json:"device_level"`
+}
+
+type Info struct {
+	Type          string `json:"type"`
+	DriverVersion string `json:"driverVersion"`
+
+	Devices []Device `json:"xpu"`
+}
+
+type Device struct {
+	Basic     Basic     `json:"basic"`
+	Stats     Stats     `json:"stats"`
+	Processes []Process `json:"processes"`
+}
+
+type Basic struct {
+	DeviceID      int    `json:"deviceID"`
+	DeviceName    string `json:"deviceName"`
+	VendorName    string `json:"vendorName"`
+	DriverVersion string `json:"driverVersion"`
+	Memory        string `json:"memory"`
+	FreeMemory    string `json:"freeMemory"`
+	PciBdfAddress string `json:"pciBdfAddress"`
+}
+
+type Stats struct {
+	Power       string `json:"power"`
+	GPUUtil     string `json:"gpuUtil"`
+	Frequency   string `json:"frequency"`
+	Temperature string `json:"temperature"`
+	MemoryUsed  string `json:"memoryUsed"`
+	MemoryUtil  string `json:"memoryUtil"`
+}
+
+type Process struct {
+	PID     int    `json:"pid"`
+	Command string `json:"command"`
+	SHR     string `json:"shr"`
+	Memory  string `json:"memory"`
 }

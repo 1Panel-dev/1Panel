@@ -18,8 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
-	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/xpu"
+	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/accelerator"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
@@ -244,8 +243,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.SwapMemoryUsedPercent = swapInfo.UsedPercent
 
 	currentInfo.DiskData = loadDiskInfo()
-	currentInfo.GPUData = loadGPUInfo()
-	currentInfo.XPUData = loadXpuInfo()
+	currentInfo.GPUData, currentInfo.NPUData, currentInfo.XPUData = loadAcceleratorInfo()
 
 	if ioOption == "all" {
 		diskInfo, _ := disk.IOCounters()
@@ -569,32 +567,64 @@ func loadDiskInfo() []dto.DiskInfo {
 	return datas
 }
 
-func loadGPUInfo() []dto.GPUInfo {
-	ok, client := gpu.New()
-	var list []interface{}
-	if ok {
-		info, err := client.LoadGpuInfo()
-		if err != nil || len(info.GPUs) == 0 {
-			return nil
-		}
-		for _, item := range info.GPUs {
-			list = append(list, item)
+func loadAcceleratorInfo() ([]dto.GPUInfo, []dto.NPUInfo, []dto.XPUInfo) {
+	ok, client := accelerator.New()
+	if !ok {
+		return nil, nil, nil
+	}
+	snapshot, err := client.Collect(context.Background())
+	if err != nil || len(snapshot.Devices) == 0 {
+		return nil, nil, nil
+	}
+	if warning := snapshot.Warning(); warning != nil {
+		global.LOG.Warnf("load accelerator dashboard data partially failed, err: %v", warning)
+	}
+
+	var (
+		gpuData []dto.GPUInfo
+		npuData []dto.NPUInfo
+		xpuData []dto.XPUInfo
+	)
+	for _, device := range snapshot.Devices {
+		switch device.Kind {
+		case accelerator.KindGPU:
+			if device.GPU == nil {
+				continue
+			}
+			var dataItem dto.GPUInfo
+			if err := copier.Copy(&dataItem, device.GPU); err != nil {
+				continue
+			}
+			dataItem.PowerUsage = dataItem.PowerDraw + " / " + dataItem.MaxPowerLimit
+			dataItem.MemoryUsage = dataItem.MemUsed + " / " + dataItem.MemTotal
+			gpuData = append(gpuData, dataItem)
+		case accelerator.KindNPU:
+			if device.NPU == nil {
+				continue
+			}
+			var dataItem dto.NPUInfo
+			if err := copier.Copy(&dataItem, device.NPU); err != nil {
+				continue
+			}
+			npuData = append(npuData, dataItem)
+		case accelerator.KindXPU:
+			if device.XPU == nil {
+				continue
+			}
+			xpuData = append(xpuData, dto.XPUInfo{
+				DeviceID:      device.Index,
+				DeviceName:    device.Name,
+				PciBdfAddress: device.BusID,
+				Memory:        device.XPU.Basic.Memory,
+				Temperature:   device.Metrics.Temperature.Display,
+				GPUUtil:       device.Metrics.Utilization.Display,
+				MemoryUsed:    device.Metrics.MemoryUsed.Display,
+				Power:         device.Metrics.Power.Display,
+				MemoryUtil:    device.Metrics.MemoryUtil.Display,
+			})
 		}
 	}
-	if len(list) == 0 {
-		return nil
-	}
-	var data []dto.GPUInfo
-	for _, gpu := range list {
-		var dataItem dto.GPUInfo
-		if err := copier.Copy(&dataItem, &gpu); err != nil {
-			continue
-		}
-		dataItem.PowerUsage = dataItem.PowerDraw + " / " + dataItem.MaxPowerLimit
-		dataItem.MemoryUsage = dataItem.MemUsed + " / " + dataItem.MemTotal
-		data = append(data, dataItem)
-	}
-	return data
+	return gpuData, npuData, xpuData
 }
 
 type AppLauncher struct {
@@ -608,32 +638,6 @@ func ArryContains(arr []string, element string) bool {
 		}
 	}
 	return false
-}
-
-func loadXpuInfo() []dto.XPUInfo {
-	var list []interface{}
-	ok, xpuClient := xpu.New()
-	if ok {
-		xpus, err := xpuClient.LoadDashData()
-		if err != nil || len(xpus) == 0 {
-			return nil
-		}
-		for _, item := range xpus {
-			list = append(list, item)
-		}
-	}
-	if len(list) == 0 {
-		return nil
-	}
-	var data []dto.XPUInfo
-	for _, gpu := range list {
-		var dataItem dto.XPUInfo
-		if err := copier.Copy(&dataItem, &gpu); err != nil {
-			continue
-		}
-		data = append(data, dataItem)
-	}
-	return data
 }
 
 func loadOutboundIP() string {

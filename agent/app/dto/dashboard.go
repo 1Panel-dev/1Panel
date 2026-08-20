@@ -121,6 +121,7 @@ type DashboardCurrent struct {
 	NetBytesRecv uint64 `json:"netBytesRecv"`
 
 	GPUData []GPUInfo `json:"gpuData"`
+	NPUData []NPUInfo `json:"npuData"`
 	XPUData []XPUInfo `json:"xpuData"`
 
 	TopCPUItems []Process `json:"topCPUItems"`
@@ -158,7 +159,10 @@ type DiskInfo struct {
 type GPUInfo struct {
 	Type             string `json:"type"`
 	Index            uint   `json:"index"`
+	NPUIndex         uint   `json:"npuIndex"`
+	ChipIndex        uint   `json:"chipIndex"`
 	ProductName      string `json:"productName"`
+	BusID            string `json:"busID"`
 	GPUUtil          string `json:"gpuUtil"`
 	Temperature      string `json:"temperature"`
 	PerformanceState string `json:"performanceState"`
@@ -169,6 +173,27 @@ type GPUInfo struct {
 	MemUsed          string `json:"memUsed"`
 	MemTotal         string `json:"memTotal"`
 	FanSpeed         string `json:"fanSpeed"`
+}
+
+type NPUInfo struct {
+	Type           string `json:"type"`
+	Index          uint   `json:"index"`
+	NPUIndex       uint   `json:"npuIndex"`
+	ChipIndex      uint   `json:"chipIndex"`
+	ProductName    string `json:"productName"`
+	BusID          string `json:"busID"`
+	Health         string `json:"health"`
+	Temperature    string `json:"temperature"`
+	PowerDraw      string `json:"powerDraw"`
+	AICore         string `json:"aiCore"`
+	MemUsed        string `json:"memUsed"`
+	MemTotal       string `json:"memTotal"`
+	MemoryUsed     string `json:"memoryUsed"`
+	MemoryTotal    string `json:"memoryTotal"`
+	HBMUsed        string `json:"hbmUsed"`
+	HBMTotal       string `json:"hbmTotal"`
+	HugepagesUsed  string `json:"hugepagesUsed"`
+	HugepagesTotal string `json:"hugepagesTotal"`
 }
 
 type AppLauncher struct {
@@ -203,11 +228,13 @@ type LauncherOption struct {
 }
 
 type XPUInfo struct {
-	DeviceID    int    `json:"deviceID"`
-	DeviceName  string `json:"deviceName"`
-	Memory      string `json:"memory"`
-	Temperature string `json:"temperature"`
-	MemoryUsed  string `json:"memoryUsed"`
-	Power       string `json:"power"`
-	MemoryUtil  string `json:"memoryUtil"`
+	DeviceID      int    `json:"deviceID"`
+	DeviceName    string `json:"deviceName"`
+	PciBdfAddress string `json:"pciBdfAddress"`
+	Memory        string `json:"memory"`
+	Temperature   string `json:"temperature"`
+	GPUUtil       string `json:"gpuUtil"`
+	MemoryUsed    string `json:"memoryUsed"`
+	Power         string `json:"power"`
+	MemoryUtil    string `json:"memoryUtil"`
 }
