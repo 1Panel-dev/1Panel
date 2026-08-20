@@ -28,6 +28,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"gopkg.in/yaml.v3"
+	"gorm.io/gorm"
 )
 
 const composeProjectLabel = "com.docker.compose.project"
@@ -252,6 +253,10 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 		return err
 	}
 	req.Name = projectName
+	recordName := strings.ToLower(req.Name)
+	if err := saveComposeRecord(recordName, req.Path); err != nil {
+		return fmt.Errorf("save compose record failed, err: %v", err)
+	}
 	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeCompose, req.TaskID, 1)
 	if err != nil {
 		return fmt.Errorf("new task for image build failed, err: %v", err)
@@ -260,23 +265,23 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 		taskItem.AddSubTask(i18n.GetMsgByKey("ComposeCreate"), func(t *task.Task) error {
 			err := compose.UpWithTask(req.Path, t, req.ForcePull, req.Name)
 			t.LogWithStatus(i18n.GetMsgByKey("ComposeCreate"), err)
-			if err != nil {
-				_, _ = compose.Down(req.Path, req.Name)
-				return err
-			}
-			recordName := strings.ToLower(req.Name)
-			record, _ := composeRepo.GetRecord(repo.WithByName(recordName))
-			if record.ID == 0 {
-				_ = composeRepo.CreateRecord(&model.Compose{Name: recordName, Path: req.Path})
-			} else {
-				_ = composeRepo.UpdateRecord(recordName, map[string]interface{}{"path": req.Path})
-			}
-			return nil
+			return err
 		}, nil)
 		_ = taskItem.Execute()
 	}()
 
 	return nil
+}
+
+func saveComposeRecord(name, composePath string) error {
+	record, err := composeRepo.GetRecord(repo.WithByName(name))
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+	if record.ID == 0 {
+		return composeRepo.CreateRecord(&model.Compose{Name: name, Path: composePath})
+	}
+	return composeRepo.UpdateRecord(name, map[string]interface{}{"path": composePath})
 }
 
 func checkComposeRecordName(name string) error {
