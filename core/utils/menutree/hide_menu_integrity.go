@@ -7,9 +7,6 @@ const (
 	xpackMenuLabel = "Xpack-Menu"
 )
 
-// PreserveMissingMenus protects a HideMenu tree by restoring entries omitted
-// by the caller from fallback. Existing entries keep the caller's values and
-// order; restored entries retain their previous visibility and sort settings.
 func PreserveMissingMenus(menus, fallback []dto.ShowMenu) ([]dto.ShowMenu, bool) {
 	updated := cloneMenus(menus)
 	changed := preserveMissingMenus(&updated, &updated, fallback)
@@ -35,10 +32,6 @@ func preserveMissingMenus(root, current *[]dto.ShowMenu, fallback []dto.ShowMenu
 	return changed
 }
 
-// EnsureXpackAppMenus returns a copy of menus containing the canonical XApp and
-// Upage entries. Existing visibility and sort preferences are preserved. When
-// an entry is absent from menus, the corresponding fallback entry is preferred
-// over the canonical default so callers can retain previously saved choices.
 func EnsureXpackAppMenus(menus, fallback []dto.ShowMenu) ([]dto.ShowMenu, bool) {
 	updated := cloneMenus(menus)
 	parentIndex := findXpackMenu(updated)
