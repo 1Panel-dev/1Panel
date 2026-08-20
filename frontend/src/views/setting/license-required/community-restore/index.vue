@@ -3,6 +3,7 @@
         v-model="open"
         :title="$t('license.restoreCommunity')"
         size="large"
+        align-center
         append-to-body
         destroy-on-close
         @closed="handleClosed"
