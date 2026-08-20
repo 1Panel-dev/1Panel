@@ -2855,7 +2855,7 @@ const message = {
         apiTrustedProxiesEgs:
             'Her satıra bir proxy sunucusu IP’si veya CIDR girin. Örneğin,\n172.16.10.111\n172.16.10.0/24',
         apiTrustedProxiesHelper:
-            'Ters proxy kullanırken istemci IP adresini doğru şekilde almak için proxy sunucusunun IP adresini veya ağını girin. Kullanmıyorsanız boş bırakın. 0.0.0.0/0 ve ::/0 desteklenmez.',
+            'Ters proxy kullanırken IP adresini veya ağını girin. Alan boşsa hiçbir proxy güvenilir sayılmaz ve doğrudan kaynak IP kullanılır. 0.0.0.0/0 ve ::/0 desteklenmez.',
         apiKeyValidityTime: 'Arayüz anahtarının geçerlilik süresi',
         apiKeyValidityTimeEgs: 'Arayüz anahtarının geçerlilik süresi (dakika cinsinden)',
         apiKeyValidityTimeHelper:
@@ -3064,6 +3064,8 @@ const message = {
         allowIPsWarning:
             'Yetkili IP adres listesini ayarladıktan sonra, yalnızca listedeki IP adresi panel servisine erişebilir. Devam etmek istiyor musunuz?',
         allowIPsHelper1: 'IP adresi kısıtlamasını devre dışı bırakmak için boş bırakın.',
+        allowIPsPrivateHelper:
+            'Özel ağ adresleri de kısıtlanır. Yerel erişim için 127.0.0.1 veya ::1 ekleyin; ters proxy için güvenilir proxyleri yapılandırın.',
         allowIPEgs: 'Her satıra bir tane. Örneğin,\n172.16.10.111\n172.16.10.0/24',
         mfa: 'İki Aşamalı Doğrulama',
         mfaClose: 'MFA’yı devre dışı bırakmak servisin güvenliğini azaltabilir. Devam etmek istiyor musunuz?',

@@ -210,6 +210,7 @@ const form = reactive({
     expirationDays: 0,
     complexityVerification: 'Disable',
     allowIPs: '',
+    allowIPTrustedProxies: '',
     bindDomain: '',
     noAuthSetting: '200 - ' + i18n.global.t('setting.help200'),
     noAuthSettingValue: '200',
@@ -233,6 +234,7 @@ const search = async () => {
     form.expirationDays = Number(res.data.expirationDays);
     form.complexityVerification = res.data.complexityVerification;
     form.allowIPs = res.data.allowIPs.replaceAll(',', '\n');
+    form.allowIPTrustedProxies = res.data.allowIPTrustedProxies || '';
     form.bindDomain = res.data.bindDomain;
     form.noAuthSettingValue = res.data.noAuthSetting;
     if (res.data.noAuthSetting !== '200') {
@@ -275,7 +277,10 @@ const onChangeBindDomain = () => {
     domainRef.value.acceptParams({ bindDomain: form.bindDomain });
 };
 const onChangeAllowIPs = () => {
-    allowIPsRef.value.acceptParams({ allowIPs: form.allowIPs });
+    allowIPsRef.value.acceptParams({
+        allowIPs: form.allowIPs,
+        allowIPTrustedProxies: form.allowIPTrustedProxies,
+    });
 };
 const onChangeExpirationDays = async () => {
     expirationRef.value.acceptParams({ expirationDays: form.expirationDays });

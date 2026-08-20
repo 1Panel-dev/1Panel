@@ -2746,7 +2746,7 @@ const message = {
         apiTrustedProxies: 'ພຣັອກຊີ API ທີ່ເຊື່ອຖື',
         apiTrustedProxiesEgs: 'ໜຶ່ງ IP ຫຼື CIDR ຂອງ proxy server ຕໍ່ແຖວ. ຕົວຢ່າງ:\n172.16.10.111\n172.16.10.0/24',
         apiTrustedProxiesHelper:
-            'ເມື່ອໃຊ້ reverse proxy, ໃຫ້ໃສ່ IP ຫຼືເຄືອຂ່າຍຂອງ proxy server ເພື່ອໃຫ້ໄດ້ client IP ຢ່າງຖືກຕ້ອງ. ຖ້າບໍ່ໃຊ້ໃຫ້ປ່ອຍຫວ່າງ. ບໍ່ຮອງຮັບ 0.0.0.0/0 ແລະ ::/0.',
+            'ເມື່ອໃຊ້ reverse proxy ໃຫ້ໃສ່ IP ຫຼືເຄືອຂ່າຍຂອງມັນ. ຖ້າປ່ອຍຫວ່າງ ຈະບໍ່ເຊື່ອຖື proxy ໃດ ແລະໃຊ້ IP ຕົ້ນທາງໂດຍກົງ. ບໍ່ຮອງຮັບ 0.0.0.0/0 ແລະ ::/0.',
         apiKeyValidityTime: 'ໄລຍະເວລາທີ່ API key ໃຊ້ງານໄດ້',
         apiKeyValidityTimeEgs: 'ໄລຍະເວລາທີ່ API key ໃຊ້ງານໄດ້ (ນາທີ)',
         apiKeyValidityTimeHelper:
@@ -2940,6 +2940,8 @@ const message = {
         allowIPsWarning:
             'ຫຼັງຈາກຕັ້ງລາຍຊື່ IP ທີ່ໄດ້ຮັບອະນຸຍາດ, ຈະມີພຽງ IP ໃນລາຍຊື່ເທົ່ານັ້ນທີ່ສາມາດເຂົ້າເຖິງພາເນລໄດ້. ຕ້ອງການເຮັດຕໍ່ບໍ?',
         allowIPsHelper1: 'ປະຫວ່າງໄວ້ເພື່ອປິດການຈຳກັດ IP.',
+        allowIPsPrivateHelper:
+            'ທີ່ຢູ່ເຄືອຂ່າຍສ່ວນຕົວກໍຖືກຈຳກັດ. ສຳລັບການເຂົ້າເຖິງພາຍໃນ ໃຫ້ເພີ່ມ 127.0.0.1 ຫຼື ::1; ສຳລັບ reverse proxy ໃຫ້ຕັ້ງຄ່າ proxy ທີ່ເຊື່ອຖື.',
         allowIPEgs: 'ໜຶ່ງລາຍການຕໍ່ແຖວ. ຕົວຢ່າງ:\n172.16.10.111\n172.16.10.0/24',
         mfa: 'ການຢືນຢັນຕົວຕົນສອງຊັ້ນ (MFA)',
         mfaClose: 'ການປິດ MFA ຈະຫຼຸດຄວາມປອດໄພຂອງບໍລິການ. ຕ້ອງການເຮັດຕໍ່ບໍ?',

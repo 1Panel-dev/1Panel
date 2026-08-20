@@ -27,6 +27,7 @@ type SettingInfo struct {
 	BindDomain                 string `json:"bindDomain"`
 	PasskeyTrustedProxies      string `json:"passkeyTrustedProxies"`
 	AllowIPs                   string `json:"allowIPs"`
+	AllowIPTrustedProxies      string `json:"allowIPTrustedProxies"`
 	SecurityEntrance           string `json:"securityEntrance"`
 	DashboardMemoVisible       string `json:"dashboardMemoVisible"`
 	DashboardSimpleNodeVisible string `json:"dashboardSimpleNodeVisible"`
