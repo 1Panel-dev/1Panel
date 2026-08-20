@@ -280,6 +280,21 @@ func TestIptablesListParsingContract(t *testing.T) {
 	}
 }
 
+func TestIptablesListParsingAllowsExtraIPv6MatchColumns(t *testing.T) {
+	stdout := strings.Join([]string{
+		"3 0 0 REDIRECT tcp -- * * ::/0 ::/0 tcp dpt:55204 ctstate NEW redir ports 80",
+		"4 0 0 REDIRECT tcp -- * * ::/0 ::/0 tcp dpt:55205 redir ports",
+	}, "\n")
+	rules := parseIptablesRules(stdout, forwarding.FamilyIPv6)
+	want := []forwarding.Rule{{
+		Num: "3", Family: forwarding.FamilyIPv6, Protocol: "tcp", Port: "55204",
+		TargetIP: "::1", TargetPort: "80", Interface: "*",
+	}}
+	if !reflect.DeepEqual(rules, want) {
+		t.Fatalf("got %#v want %#v", rules, want)
+	}
+}
+
 func TestIptablesIPv6NATContract(t *testing.T) {
 	stdout := "1 0 0 DNAT tcp -- eth0 * ::/0 ::/0 tcp dpt:8443 to:[2001:db8::20]:443"
 	rules := parseIptablesRules(stdout, forwarding.FamilyIPv6)

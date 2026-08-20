@@ -218,6 +218,24 @@ func TestForwardingSearchPreservesAPIShapeAndPagination(t *testing.T) {
 	}
 }
 
+func TestForwardingSearchTrimsAndMatchesAllDisplayedFields(t *testing.T) {
+	adapter := &fakeForwardingAdapter{name: "iptables", rules: []forwardClient.Rule{
+		{Family: forwardClient.FamilyIPv4, Protocol: "udp", Port: "5353", TargetIP: "127.0.0.1", TargetPort: "53", Interface: "eth0"},
+	}}
+	service := forwardingServiceWithAdapter(adapter)
+	for _, keyword := range []string{" UDP ", "ipv4", "ETH0", "converged"} {
+		total, value, err := service.SearchRules(dto.ForwardRuleSearch{
+			PageInfo: dto.PageInfo{Page: 1, PageSize: 10}, Info: keyword,
+		})
+		if err != nil {
+			t.Fatalf("search %q: %v", keyword, err)
+		}
+		if items := value.([]dto.ForwardRule); total != 1 || len(items) != 1 {
+			t.Fatalf("search %q returned total=%d items=%#v", keyword, total, items)
+		}
+	}
+}
+
 func TestForwardingSearchMergesDesiredAndRuntimeState(t *testing.T) {
 	desired := forwardClient.Rule{
 		Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80",

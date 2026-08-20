@@ -131,7 +131,7 @@ import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { loadDockerStatus } from '@/api/modules/container';
 
 const props = defineProps({
@@ -184,6 +184,7 @@ const loadBaseInfo = async (search: boolean) => {
             emit('update:version', baseInfo.value.version);
 
             if (search) {
+                await nextTick();
                 emit('search');
             } else {
                 emit('update:loading', false);
@@ -205,9 +206,9 @@ const loadDocker = async () => {
 const loadInitMsg = () => {
     switch (props.currentTab) {
         case 'base':
-            return i18n.global.t('firewall.initHelper', [i18n.global.t('firewall.baseIptables')]);
+            return i18n.global.t('firewall.initHelper', [baseInfo.value.name || backendName.value]);
         case 'forward':
-            return i18n.global.t('firewall.initHelper', [i18n.global.t('firewall.forwardIptables')]);
+            return i18n.global.t('firewall.initHelper', [baseInfo.value.name || backendName.value]);
     }
 };
 
@@ -217,11 +218,11 @@ const onInit = async () => {
     switch (props.currentTab) {
         case 'base':
             chainName = '1PANEL_BASIC';
-            msg = i18n.global.t('firewall.initMsg', [i18n.global.t('firewall.baseIptables')]);
+            msg = i18n.global.t('firewall.initMsg', [baseInfo.value.name || backendName.value]);
             break;
         case 'forward':
             chainName = '1PANEL_FORWARD';
-            msg = i18n.global.t('firewall.initMsg', [i18n.global.t('firewall.forwardIptables')]);
+            msg = i18n.global.t('firewall.initMsg', [baseInfo.value.name || backendName.value]);
             break;
         default:
             return;

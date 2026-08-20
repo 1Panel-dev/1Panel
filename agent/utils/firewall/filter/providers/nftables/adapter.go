@@ -401,6 +401,11 @@ func parseChain(scope filter.Scope, output string) []filter.ObservedRule {
 			continue
 		}
 		raw := strings.TrimSpace(line[:handleIndex])
+		// `nft -a list chain` includes a handle on the chain declaration itself.
+		// It is metadata for the chain, not a rule in the chain.
+		if strings.HasPrefix(raw, "chain ") {
+			continue
+		}
 		handle := strings.TrimSpace(line[handleIndex+len("# handle "):])
 		position := len(rules) + 1
 		rules = append(rules, parseRule(scope, raw, handle, position))

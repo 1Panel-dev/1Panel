@@ -171,6 +171,26 @@ func TestFirewallRuleServiceAlwaysAppendsUFWCreateWithinFamily(t *testing.T) {
 	}
 }
 
+func TestFirewallRuleServiceDefaultsMissingUFWRequestScope(t *testing.T) {
+	scope := filter.Scope{
+		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,
+		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
+	}
+	adapter := newFakeFilterAdapter(t, scope, nil)
+	service, _ := newTestFirewallExecutor(t, adapter)
+	service.selectedProvider = func(context.Context) (filter.Provider, error) { return filter.ProviderUFW, nil }
+
+	checked, err := service.Check(context.Background(), "", dto.FirewallRuleCheck{Items: []dto.FirewallRuleCheckItem{{
+		Rule: filter.FirewallRule{Protocol: "tcp", DestinationPort: "55101", Action: filter.ActionAccept},
+	}}})
+	if err != nil {
+		t.Fatalf("check UFW rule with omitted scope: %v", err)
+	}
+	if len(checked.Items) != 1 || checked.Items[0].RequestedRule.Scope.Normalize() != scope.Normalize() {
+		t.Fatalf("unexpected defaulted UFW scope: %#v", checked.Items)
+	}
+}
+
 func TestValidateUFWPositionWithinFamilyBounds(t *testing.T) {
 	ipv4Scope := filter.Scope{
 		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,

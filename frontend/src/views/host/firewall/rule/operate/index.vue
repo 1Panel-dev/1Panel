@@ -380,14 +380,11 @@ const normalizeSourceAddresses = () => {
               : [{ ...fallback, address: '' }];
 };
 const normalizeDestinationPorts = (values = form.destinationPorts) => {
-    const splitPortList = provider.value === 'firewalld' || (provider.value === 'ufw' && form.protocol === 'tcp/udp');
-    const splitPattern = splitPortList ? /[,，;；\s]+/ : /[;；\s]+/;
     const normalized = [
         ...new Set(
             values
-                .map((value) => (splitPortList ? value : value.replace(/\s*[,，]\s*/g, ',')))
-                .flatMap((value) => value.split(splitPattern))
-                .map((value) => value.trim().replaceAll('，', ','))
+                .flatMap((value) => value.split(/[,，;；\s]+/))
+                .map((value) => value.trim())
                 .filter(Boolean),
         ),
     ];

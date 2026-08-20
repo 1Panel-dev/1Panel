@@ -314,6 +314,7 @@ func (s *FirewallService) Check(
 			}
 			createStateLoaded = true
 		}
+		item.Rule = applySelectedProviderScopeDefaults(item.Rule, selectedProvider)
 		rule, err := filter.NormalizeRule(item.Rule)
 		if err != nil {
 			return dto.FirewallRuleCheckResponse{}, err
@@ -374,6 +375,52 @@ func (s *FirewallService) Check(
 		response.Items = append(response.Items, result)
 	}
 	return response, nil
+}
+
+func applySelectedProviderScopeDefaults(rule filter.FirewallRule, selected filter.Provider) filter.FirewallRule {
+	scope := rule.Scope
+	if scope.Provider == "" {
+		scope.Provider = selected
+	}
+	if scope.Provider != selected {
+		return rule
+	}
+	if scope.Direction == "" {
+		scope.Direction = filter.DirectionInput
+	}
+	if scope.Family == "" {
+		scope.Family = defaultFirewallRuleFamily(rule, selected)
+	}
+	switch selected {
+	case filter.ProviderIptables, filter.ProviderNftables:
+		if scope.Table == "" {
+			scope.Table = "filter"
+		}
+		if scope.Chain == "" {
+			scope.Chain = filter.IptablesInputChain
+		}
+	case filter.ProviderFirewalld:
+		if scope.Zone == "" {
+			scope.Zone = filter.FirewalldInputZone
+		}
+	case filter.ProviderUFW:
+		if scope.Chain == "" {
+			scope.Chain = filter.UFWInputChain
+		}
+	}
+	rule.Scope = scope
+	return rule
+}
+
+func defaultFirewallRuleFamily(rule filter.FirewallRule, provider filter.Provider) filter.Family {
+	if strings.EqualFold(strings.TrimSpace(rule.Protocol), "icmpv6") ||
+		strings.Contains(rule.SourceAddress, ":") || strings.Contains(rule.DestinationAddress, ":") {
+		return filter.FamilyIPv6
+	}
+	if provider == filter.ProviderFirewalld {
+		return filter.FamilyInet
+	}
+	return filter.FamilyIPv4
 }
 
 func (s *FirewallService) checkRule(

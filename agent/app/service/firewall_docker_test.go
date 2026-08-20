@@ -11,7 +11,9 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	agenti18n "github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
+	"github.com/docker/docker/client"
 	"github.com/glebarez/sqlite"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -69,6 +71,24 @@ func (r *persistentDockerGuardPolicies) DeleteBatch(context.Context, []string) e
 
 func (r *persistentDockerGuardPolicies) UpsertBatch(context.Context, []model.DockerPortGuardPolicy) error {
 	return nil
+}
+
+func TestDockerGuardOverviewLocalizesUnavailableDocker(t *testing.T) {
+	agenti18n.Init()
+	service := &DockerPortGuardService{
+		policies: &persistentDockerGuardPolicies{},
+		runtime:  &persistentDockerGuardRuntime{},
+		client: func() (*client.Client, error) {
+			return nil, errors.New("Cannot connect to the Docker daemon at unix:///var/run/docker.sock")
+		},
+	}
+	overview, err := service.LoadOverview(context.Background())
+	if err != nil {
+		t.Fatalf("load overview: %v", err)
+	}
+	if overview.Base.Message != agenti18n.Get("ErrDockerFailed") {
+		t.Fatalf("message = %q, want localized Docker failure", overview.Base.Message)
+	}
 }
 
 func setupDockerGuardSettingsDB(t *testing.T) {

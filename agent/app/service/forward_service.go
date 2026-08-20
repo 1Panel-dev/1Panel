@@ -114,10 +114,10 @@ func (s *ForwardingService) SearchRules(request dto.ForwardRuleSearch) (int64, i
 	if err != nil {
 		return 0, nil, err
 	}
+	keyword := strings.ToLower(strings.TrimSpace(request.Info))
 	filtered := inventory[:0]
 	for _, item := range inventory {
-		if request.Info == "" || strings.Contains(item.Rule.Port, request.Info) ||
-			strings.Contains(item.Rule.TargetPort, request.Info) || strings.Contains(item.Rule.TargetIP, request.Info) {
+		if keyword == "" || forwardingRuleMatchesKeyword(item, keyword) {
 			filtered = append(filtered, item)
 		}
 	}
@@ -151,6 +151,19 @@ func (s *ForwardingService) SearchRules(request dto.ForwardRuleSearch) (int64, i
 		})
 	}
 	return int64(total), items, nil
+}
+
+func forwardingRuleMatchesKeyword(item forwardingInventoryItem, keyword string) bool {
+	values := []string{
+		item.Rule.Family, item.Rule.Protocol, item.Rule.Port, item.Rule.TargetIP,
+		item.Rule.TargetPort, item.Rule.Interface, item.SyncStatus(),
+	}
+	for _, value := range values {
+		if strings.Contains(strings.ToLower(value), keyword) {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *ForwardingService) OperateRules(request dto.ForwardRuleOperate) error {

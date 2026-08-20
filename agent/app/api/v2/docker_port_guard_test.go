@@ -28,3 +28,22 @@ func TestHandleDockerPortGuardErrorReturnsStableBusinessCode(t *testing.T) {
 		t.Fatalf("unexpected Docker guard error response: %#v", response)
 	}
 }
+
+func TestHandleDockerPortGuardErrorLocalizesDockerUnavailable(t *testing.T) {
+	agenti18n.Init()
+	gin.SetMode(gin.TestMode)
+	recorder := httptest.NewRecorder()
+	context, _ := gin.CreateTestContext(recorder)
+	handleDockerPortGuardError(context, fmt.Errorf("inspect Docker: %w", service.ErrDockerUnavailable))
+
+	var response dto.Response
+	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if response.Code != http.StatusServiceUnavailable || response.ErrorCode != "FW_DOCKER_UNAVAILABLE" {
+		t.Fatalf("unexpected Docker unavailable response: %#v", response)
+	}
+	if response.Message != agenti18n.Get("ErrDockerFailed") {
+		t.Fatalf("message = %q, want localized Docker failure", response.Message)
+	}
+}

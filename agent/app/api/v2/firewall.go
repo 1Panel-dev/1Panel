@@ -480,5 +480,9 @@ func handleDockerPortGuardError(c *gin.Context, err error) {
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_DOCKER_GUARD_INVALID", "ErrInvalidParams", err)
 		return
 	}
+	if errors.Is(err, service.ErrDockerUnavailable) {
+		helper.ErrorWithBusinessCode(c, http.StatusServiceUnavailable, "FW_DOCKER_UNAVAILABLE", "ErrDockerFailed", err)
+		return
+	}
 	helper.ErrorWithBusinessCode(c, http.StatusInternalServerError, "FW_DOCKER_GUARD_FAILED", "ErrInternalServer", err)
 }

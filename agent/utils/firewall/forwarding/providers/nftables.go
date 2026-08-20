@@ -275,7 +275,7 @@ func NormalizeRule(rule forwarding.Rule) (forwarding.Rule, error) {
 	}
 	rule.TargetIP = address.String()
 	rule.Interface = strings.TrimSpace(rule.Interface)
-	if rule.Interface == "all" {
+	if rule.Interface == "all" || rule.Interface == "*" {
 		rule.Interface = ""
 	}
 	if rule.Interface != "" && !nftInterfacePattern.MatchString(rule.Interface) {

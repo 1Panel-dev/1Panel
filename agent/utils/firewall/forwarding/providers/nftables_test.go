@@ -48,6 +48,18 @@ func TestNormalizeNftForwardRuleRejectsScriptTokens(t *testing.T) {
 	}
 }
 
+func TestNormalizeForwardRuleTreatsWildcardInterfaceAsAll(t *testing.T) {
+	rule, err := NormalizeRule(forwarding.Rule{
+		Protocol: "udp", Port: "9000-9001", TargetPort: "53", Interface: "*",
+	})
+	if err != nil {
+		t.Fatalf("normalize wildcard forwarding interface: %v", err)
+	}
+	if rule.Interface != "" {
+		t.Fatalf("wildcard forwarding interface normalized to %q, want empty", rule.Interface)
+	}
+}
+
 func TestRebuildNftForwardCommandsUseArguments(t *testing.T) {
 	commands, err := rebuildNftForwardCommands([]forwarding.Rule{{
 		Protocol: "tcp", Port: "08080", TargetIP: "10.0.0.2", TargetPort: "080", Interface: "eth0",

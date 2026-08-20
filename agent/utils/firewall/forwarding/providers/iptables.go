@@ -506,7 +506,7 @@ func parseIptablesRules(stdout, family string) []forwarding.Rule {
 	var rules []forwarding.Rule
 	for _, line := range strings.Split(stdout, "\n") {
 		fields := strings.Fields(line)
-		if len(fields) < 13 {
+		if len(fields) < 11 {
 			continue
 		}
 		rule := forwarding.Rule{
@@ -514,13 +514,21 @@ func parseIptablesRules(stdout, family string) []forwarding.Rule {
 			Family:    family,
 			Protocol:  loadProtocol(fields[4]),
 			Interface: fields[6],
-			Port:      loadSourcePort(fields[11]),
 		}
-		if len(fields) == 15 && fields[13] == "ports" {
-			rule.TargetPort = fields[14]
+		for index := 10; index < len(fields); index++ {
+			field := fields[index]
+			if strings.HasPrefix(field, "dpt:") || strings.HasPrefix(field, "dpts:") {
+				rule.Port = loadSourcePort(field)
+			}
+			if strings.HasPrefix(field, "to:") {
+				rule.TargetIP, rule.TargetPort = parseIptablesTarget(strings.TrimPrefix(field, "to:"))
+			}
+			if field == "redir" && index+2 < len(fields) && fields[index+1] == "ports" {
+				rule.TargetPort = fields[index+2]
+			}
 		}
-		if len(fields) == 13 && strings.HasPrefix(fields[12], "to:") {
-			rule.TargetIP, rule.TargetPort = parseIptablesTarget(strings.TrimPrefix(fields[12], "to:"))
+		if rule.Protocol == "" || rule.Port == "" || rule.TargetPort == "" {
+			continue
 		}
 		if rule.TargetIP == "" {
 			if family == forwarding.FamilyIPv6 {

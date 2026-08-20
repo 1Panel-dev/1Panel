@@ -50,6 +50,21 @@ func TestObserveNativeNftablesRules(t *testing.T) {
 	}
 }
 
+func TestObserveIgnoresChainDeclarationHandle(t *testing.T) {
+	scope := testScope(filter.FamilyIPv4, "1PANEL_BASIC")
+	backend := &fakeBackend{output: `table ip nft_1panel_filter {
+ chain NFT_1PANEL_BASIC { # handle 3
+ }
+}`}
+	snapshot, err := NewAdapterWithBackend(backend).Observe(context.Background(), scope)
+	if err != nil {
+		t.Fatalf("observe empty chain: %v", err)
+	}
+	if len(snapshot.Rules) != 0 {
+		t.Fatalf("chain declaration was parsed as a rule: %#v", snapshot.Rules)
+	}
+}
+
 func TestApplyCompensatesFailedRulesetTransaction(t *testing.T) {
 	scope := testScope(filter.FamilyIPv4, "1PANEL_BASIC")
 	snapshot, err := filter.NewSnapshot(scope, nil)

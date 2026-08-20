@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	agenti18n "github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
 	containertypes "github.com/docker/docker/api/types/container"
@@ -58,6 +59,7 @@ var (
 	dockerPortGuardSyncMu    sync.RWMutex
 	dockerPortGuardSyncErr   error
 	ErrDockerGuardInvalid    = errors.New("invalid Docker port guard request")
+	ErrDockerUnavailable     = errors.New("Docker is unavailable")
 )
 
 type IDockerPortGuardService interface {
@@ -94,13 +96,13 @@ func (s *DockerPortGuardService) LoadOverview(ctx context.Context) (dto.DockerPo
 	}
 	cli, err := s.client()
 	if err != nil {
-		base.Message = err.Error()
+		base.Message = agenti18n.Get("ErrDockerFailed")
 		return dto.DockerPortGuardList{Base: base, Containers: groupDockerGuardContainers(dockerGuardPolicyEndpoints(policies))}, nil
 	}
 	defer cli.Close()
 	info, err := cli.Info(ctx)
 	if err != nil {
-		base.Message = err.Error()
+		base.Message = agenti18n.Get("ErrDockerFailed")
 		return dto.DockerPortGuardList{Base: base, Containers: groupDockerGuardContainers(dockerGuardPolicyEndpoints(policies))}, nil
 	}
 	base.Backend = selectedDockerFirewallBackend(dockerFirewallBackend(info))
@@ -390,12 +392,12 @@ func (s *DockerPortGuardService) runtimeForDocker(ctx context.Context) (dockerGu
 	}
 	cli, err := s.client()
 	if err != nil {
-		return nil, "", fmt.Errorf("Docker is not running: %w", err)
+		return nil, "", fmt.Errorf("%w: %v", ErrDockerUnavailable, err)
 	}
 	defer cli.Close()
 	info, err := cli.Info(ctx)
 	if err != nil {
-		return nil, "", fmt.Errorf("Docker is not running: %w", err)
+		return nil, "", fmt.Errorf("%w: %v", ErrDockerUnavailable, err)
 	}
 	backend := selectedDockerFirewallBackend(dockerFirewallBackend(info))
 	if backend != constant.FirewallProviderIptables && backend != constant.FirewallProviderNftables {
