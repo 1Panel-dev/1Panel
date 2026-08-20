@@ -16,12 +16,18 @@ import (
 
 func Init() {
 	settingRepo := repo.NewISettingRepo()
+	storedVersion, _ := settingRepo.GetValueByKey("SystemVersion")
+	if storedVersion != global.CONF.Base.Version {
+		if err := settingRepo.Update("SystemVersion", global.CONF.Base.Version); err != nil {
+			global.LOG.Fatalf("sync system version before start failed, err: %v", err)
+		}
+		global.LOG.Infof("sync system version from installed package: %s -> %s", storedVersion, global.CONF.Base.Version)
+	}
 	global.CONF.Conn.Port, _ = settingRepo.GetValueByKey("ServerPort")
 	global.CONF.Conn.Ipv6, _ = settingRepo.GetValueByKey("Ipv6")
 	global.CONF.Base.Edition, _ = settingRepo.GetValueByKey("Edition")
 	global.CONF.Conn.BindAddress, _ = settingRepo.GetValueByKey("BindAddress")
 	global.CONF.Conn.SSL, _ = settingRepo.GetValueByKey("SSL")
-	global.CONF.Base.Version, _ = settingRepo.GetValueByKey("SystemVersion")
 	if err := settingRepo.Update("SystemStatus", "Free"); err != nil {
 		global.LOG.Fatalf("init service before start failed, err: %v", err)
 	}
