@@ -1,6 +1,7 @@
 package xpu
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -12,125 +13,29 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
-type XpuSMI struct{}
+const xpuSMICommand = "xpu-smi"
 
-func New() (bool, XpuSMI) {
-	return cmd.Which("xpu-smi"), XpuSMI{}
+type Client struct{}
+
+func New() (bool, Client) {
+	return cmd.Which(xpuSMICommand), Client{}
 }
 
-func (x XpuSMI) loadDeviceData(device Device, wg *sync.WaitGroup, res *[]XPUSimpleInfo, mu *sync.Mutex) {
-	defer wg.Done()
-
-	var xpu XPUSimpleInfo
-	xpu.DeviceID = device.DeviceID
-	xpu.DeviceName = device.DeviceName
-
-	var xpuData, statsData string
-	var xpuErr, statsErr error
-
-	var wgCmd sync.WaitGroup
-	wgCmd.Add(2)
-
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
-	go func() {
-		defer wgCmd.Done()
-		xpuData, xpuErr = cmdMgr.RunWithStdout("xpu-smi", "discovery", "-d", strconv.Itoa(device.DeviceID), "-j")
-	}()
-
-	go func() {
-		defer wgCmd.Done()
-		statsData, statsErr = cmdMgr.RunWithStdout("xpu-smi", "stats", "-d", strconv.Itoa(device.DeviceID), "-j")
-	}()
-
-	wgCmd.Wait()
-
-	if xpuErr != nil {
-		global.LOG.Errorf("calling xpu-smi discovery failed for device %d, %v", device.DeviceID, xpuErr)
-		return
-	}
-
-	var info Device
-	if err := json.Unmarshal([]byte(xpuData), &info); err != nil {
-		global.LOG.Errorf("xpuData json unmarshal failed for device %d, err: %v", device.DeviceID, err)
-		return
-	}
-
-	bytes, err := strconv.ParseInt(info.MemoryPhysicalSizeByte, 10, 64)
-	if err != nil {
-		global.LOG.Errorf("Error parsing memory size for device %d, err: %v", device.DeviceID, err)
-		return
-	}
-	xpu.Memory = fmt.Sprintf("%.1f MB", float64(bytes)/(1024*1024))
-
-	if statsErr != nil {
-		global.LOG.Errorf("calling xpu-smi stats failed for device %d, err: %v", device.DeviceID, statsErr)
-		return
-	}
-
-	var stats DeviceStats
-	if err := json.Unmarshal([]byte(statsData), &stats); err != nil {
-		global.LOG.Errorf("statsData json unmarshal failed for device %d, err: %v", device.DeviceID, err)
-		return
-	}
-
-	for _, stat := range stats.DeviceLevel {
-		switch stat.MetricsType {
-		case "XPUM_STATS_POWER":
-			xpu.Power = fmt.Sprintf("%.1fW", stat.Value)
-		case "XPUM_STATS_GPU_CORE_TEMPERATURE":
-			xpu.Temperature = fmt.Sprintf("%.1f°C", stat.Value)
-		case "XPUM_STATS_MEMORY_USED":
-			xpu.MemoryUsed = fmt.Sprintf("%.1fMB", stat.Value)
-		case "XPUM_STATS_MEMORY_UTILIZATION":
-			xpu.MemoryUtil = fmt.Sprintf("%.1f%%", stat.Value)
-		}
-	}
-
-	mu.Lock()
-	*res = append(*res, xpu)
-	mu.Unlock()
+func (c Client) LoadInfo() (*Info, error) {
+	return c.LoadInfoContext(context.Background())
 }
 
-func (x XpuSMI) LoadDashData() ([]XPUSimpleInfo, error) {
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
-	data, err := cmdMgr.RunWithStdout("xpu-smi", "discovery", "-j")
+func (c Client) LoadInfoContext(ctx context.Context) (*Info, error) {
+	cmdMgr := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(5*time.Second))
+	data, err := cmdMgr.RunWithStdout(xpuSMICommand, "discovery", "-j")
 	if err != nil {
-		return nil, fmt.Errorf("calling xpu-smi failed, %v", err)
+		return nil, fmt.Errorf("calling %s failed: %w", xpuSMICommand, err)
 	}
-
-	var deviceInfo DeviceInfo
+	var deviceInfo discoveryInfo
 	if err := json.Unmarshal([]byte(data), &deviceInfo); err != nil {
 		return nil, fmt.Errorf("deviceInfo json unmarshal failed, err: %w", err)
 	}
-
-	var res []XPUSimpleInfo
-	var wg sync.WaitGroup
-	var mu sync.Mutex
-
-	for _, device := range deviceInfo.DeviceList {
-		wg.Add(1)
-		go x.loadDeviceData(device, &wg, &res, &mu)
-	}
-
-	wg.Wait()
-
-	sort.Slice(res, func(i, j int) bool {
-		return res[i].DeviceID < res[j].DeviceID
-	})
-	return res, nil
-}
-
-func (x XpuSMI) LoadGpuInfo() (*XpuInfo, error) {
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
-	data, err := cmdMgr.RunWithStdout("xpu-smi", "discovery", "-j")
-	if err != nil {
-		return nil, fmt.Errorf("calling xpu-smi  failed, %v", err)
-	}
-	var deviceInfo DeviceInfo
-	if err := json.Unmarshal([]byte(data), &deviceInfo); err != nil {
-		return nil, fmt.Errorf("deviceInfo json unmarshal failed, err: %w", err)
-	}
-	res := &XpuInfo{
+	res := &Info{
 		Type: "xpu",
 	}
 
@@ -139,44 +44,49 @@ func (x XpuSMI) LoadGpuInfo() (*XpuInfo, error) {
 
 	for _, device := range deviceInfo.DeviceList {
 		wg.Add(1)
-		go x.loadDeviceInfo(device, &wg, res, &mu)
+		go c.loadDeviceInfo(ctx, device, &wg, res, &mu)
 	}
 
 	wg.Wait()
 
-	processData, err := cmdMgr.RunWithStdout("xpu-smi", "ps", "-j")
+	processData, err := cmdMgr.RunWithStdout(xpuSMICommand, "ps", "-j")
 	if err != nil {
-		return nil, fmt.Errorf("calling xpu-smi ps failed, %s", err)
-	}
-	var psList DeviceUtilByProcList
-	if err := json.Unmarshal([]byte(processData), &psList); err != nil {
-		return nil, fmt.Errorf("processData json unmarshal failed, err: %w", err)
-	}
-	for _, ps := range psList.DeviceUtilByProcList {
-		process := Process{
-			PID:     ps.ProcessID,
-			Command: ps.ProcessName,
-		}
-		if ps.SharedMemSize > 0 {
-			process.SHR = fmt.Sprintf("%.1f MB", ps.SharedMemSize/1024)
-		}
-		if ps.MemSize > 0 {
-			process.Memory = fmt.Sprintf("%.1f MB", ps.MemSize/1024)
-		}
-		for index, xpu := range res.Xpu {
-			if xpu.Basic.DeviceID == ps.DeviceID {
-				res.Xpu[index].Processes = append(res.Xpu[index].Processes, process)
+		global.LOG.Warnf("calling xpu-smi ps failed, process information will be omitted: %v", err)
+	} else {
+		var psList DeviceUtilByProcList
+		if err := json.Unmarshal([]byte(processData), &psList); err != nil {
+			global.LOG.Warnf("processData json unmarshal failed, process information will be omitted: %v", err)
+		} else {
+			for _, ps := range psList.DeviceUtilByProcList {
+				process := Process{
+					PID:     ps.ProcessID,
+					Command: ps.ProcessName,
+				}
+				if ps.SharedMemSize > 0 {
+					process.SHR = fmt.Sprintf("%.1f MiB", ps.SharedMemSize/1024)
+				}
+				if ps.MemSize > 0 {
+					process.Memory = fmt.Sprintf("%.1f MiB", ps.MemSize/1024)
+				}
+				for index, xpu := range res.Devices {
+					if xpu.Basic.DeviceID == ps.DeviceID {
+						res.Devices[index].Processes = append(res.Devices[index].Processes, process)
+					}
+				}
 			}
 		}
 	}
+	sort.Slice(res.Devices, func(i, j int) bool {
+		return res.Devices[i].Basic.DeviceID < res.Devices[j].Basic.DeviceID
+	})
 
 	return res, nil
 }
 
-func (x XpuSMI) loadDeviceInfo(device Device, wg *sync.WaitGroup, res *XpuInfo, mu *sync.Mutex) {
+func (c Client) loadDeviceInfo(ctx context.Context, device discoveryDevice, wg *sync.WaitGroup, res *Info, mu *sync.Mutex) {
 	defer wg.Done()
 
-	xpu := Xpu{
+	xpu := Device{
 		Basic: Basic{
 			DeviceID:      device.DeviceID,
 			DeviceName:    device.DeviceName,
@@ -191,15 +101,15 @@ func (x XpuSMI) loadDeviceInfo(device Device, wg *sync.WaitGroup, res *XpuInfo, 
 	var wgCmd sync.WaitGroup
 	wgCmd.Add(2)
 
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
+	cmdMgr := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(5*time.Second))
 	go func() {
 		defer wgCmd.Done()
-		xpuData, xpuErr = cmdMgr.RunWithStdout("xpu-smi", "discovery", "-d", strconv.Itoa(device.DeviceID), "-j")
+		xpuData, xpuErr = cmdMgr.RunWithStdout(xpuSMICommand, "discovery", "-d", strconv.Itoa(device.DeviceID), "-j")
 	}()
 
 	go func() {
 		defer wgCmd.Done()
-		statsData, statsErr = cmdMgr.RunWithStdout("xpu-smi", "stats", "-d", strconv.Itoa(device.DeviceID), "-j")
+		statsData, statsErr = cmdMgr.RunWithStdout(xpuSMICommand, "stats", "-d", strconv.Itoa(device.DeviceID), "-j")
 	}()
 
 	wgCmd.Wait()
@@ -209,50 +119,66 @@ func (x XpuSMI) loadDeviceInfo(device Device, wg *sync.WaitGroup, res *XpuInfo, 
 		return
 	}
 
-	var info Device
+	var info discoveryDevice
 	if err := json.Unmarshal([]byte(xpuData), &info); err != nil {
 		global.LOG.Errorf("xpuData json unmarshal failed for device %d, err: %v", device.DeviceID, err)
 		return
 	}
 
-	res.DriverVersion = info.DriverVersion
 	xpu.Basic.DriverVersion = info.DriverVersion
 
 	bytes, err := strconv.ParseInt(info.MemoryPhysicalSizeByte, 10, 64)
 	if err != nil {
-		global.LOG.Errorf("Error parsing memory size for device %d, err: %v", device.DeviceID, err)
-		return
+		global.LOG.Warnf("Error parsing memory size for device %d, err: %v", device.DeviceID, err)
+		xpu.Basic.Memory = info.MemoryPhysicalSizeByte
+	} else {
+		xpu.Basic.Memory = formatMemoryBytes(bytes)
 	}
-	xpu.Basic.Memory = fmt.Sprintf("%.1f MB", float64(bytes)/(1024*1024))
-	xpu.Basic.FreeMemory = info.MemoryFreeSizeByte
+	freeBytes, err := strconv.ParseInt(info.MemoryFreeSizeByte, 10, 64)
+	if err != nil {
+		xpu.Basic.FreeMemory = info.MemoryFreeSizeByte
+	} else {
+		xpu.Basic.FreeMemory = formatMemoryBytes(freeBytes)
+	}
 
 	if statsErr != nil {
-		global.LOG.Errorf("calling xpu-smi stats failed for device %d, err: %v", device.DeviceID, statsErr)
-		return
-	}
-
-	var stats DeviceStats
-	if err := json.Unmarshal([]byte(statsData), &stats); err != nil {
-		global.LOG.Errorf("statsData json unmarshal failed for device %d, err: %v", device.DeviceID, err)
-		return
-	}
-
-	for _, stat := range stats.DeviceLevel {
-		switch stat.MetricsType {
-		case "XPUM_STATS_POWER":
-			xpu.Stats.Power = fmt.Sprintf("%.1fW", stat.Value)
-		case "XPUM_STATS_GPU_FREQUENCY":
-			xpu.Stats.Frequency = fmt.Sprintf("%.1fMHz", stat.Value)
-		case "XPUM_STATS_GPU_CORE_TEMPERATURE":
-			xpu.Stats.Temperature = fmt.Sprintf("%.1f°C", stat.Value)
-		case "XPUM_STATS_MEMORY_USED":
-			xpu.Stats.MemoryUsed = fmt.Sprintf("%.1fMB", stat.Value)
-		case "XPUM_STATS_MEMORY_UTILIZATION":
-			xpu.Stats.MemoryUtil = fmt.Sprintf("%.1f%%", stat.Value)
+		global.LOG.Warnf("calling xpu-smi stats failed for device %d, metrics will be omitted: %v", device.DeviceID, statsErr)
+	} else {
+		var stats DeviceStats
+		if err := json.Unmarshal([]byte(statsData), &stats); err != nil {
+			global.LOG.Warnf("statsData json unmarshal failed for device %d, metrics will be omitted: %v", device.DeviceID, err)
+		} else {
+			loadStats(&xpu.Stats, stats.DeviceLevel)
 		}
 	}
 
 	mu.Lock()
-	res.Xpu = append(res.Xpu, xpu)
+	if res.DriverVersion == "" {
+		res.DriverVersion = info.DriverVersion
+	}
+	res.Devices = append(res.Devices, xpu)
 	mu.Unlock()
+}
+
+func loadStats(stats *Stats, metrics []DeviceLevelMetric) {
+	for _, stat := range metrics {
+		switch stat.MetricsType {
+		case "XPUM_STATS_POWER":
+			stats.Power = fmt.Sprintf("%.1fW", stat.Value)
+		case "XPUM_STATS_GPU_UTILIZATION":
+			stats.GPUUtil = fmt.Sprintf("%.1f%%", stat.Value)
+		case "XPUM_STATS_GPU_FREQUENCY":
+			stats.Frequency = fmt.Sprintf("%.1fMHz", stat.Value)
+		case "XPUM_STATS_GPU_CORE_TEMPERATURE":
+			stats.Temperature = fmt.Sprintf("%.1f°C", stat.Value)
+		case "XPUM_STATS_MEMORY_USED":
+			stats.MemoryUsed = fmt.Sprintf("%.1f MiB", stat.Value)
+		case "XPUM_STATS_MEMORY_UTILIZATION", "XPUM_STATS_MEMORY_BANDWIDTH", "XPUM_STATS_MEMORY_BANDWIDTH_UTILIZATION":
+			stats.MemoryUtil = fmt.Sprintf("%.1f%%", stat.Value)
+		}
+	}
+}
+
+func formatMemoryBytes(bytes int64) string {
+	return fmt.Sprintf("%.1f MiB", float64(bytes)/(1024*1024))
 }

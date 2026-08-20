@@ -1,14 +1,14 @@
-package common
+package gpu
 
-type GpuInfo struct {
+type Info struct {
 	CudaVersion   string `json:"cudaVersion"`
 	DriverVersion string `json:"driverVersion"`
 	Type          string `json:"type"`
 
-	GPUs []GPU `json:"gpu"`
+	Devices []Device `json:"gpu"`
 }
 
-type GPU struct {
+type Device struct {
 	Type            string `json:"type"`
 	Index           uint   `json:"index"`
 	ProductName     string `json:"productName"`
@@ -31,7 +31,7 @@ type GPU struct {
 }
 
 type Process struct {
-	Pid         string `json:"pid"`
+	PID         string `json:"pid"`
 	Type        string `json:"type"`
 	ProcessName string `json:"processName"`
 	UsedMemory  string `json:"usedMemory"`

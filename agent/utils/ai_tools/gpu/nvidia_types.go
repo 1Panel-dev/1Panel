@@ -1,6 +1,6 @@
-package schema
+package gpu
 
-type smi struct {
+type nvidiaSMIResponse struct {
 	AttachedGpus  string `xml:"attached_gpus"`
 	CudaVersion   string `xml:"cuda_version"`
 	DriverVersion string `xml:"driver_version"`

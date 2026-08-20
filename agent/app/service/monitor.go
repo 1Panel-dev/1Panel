@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -19,8 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
-	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/xpu"
+	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/accelerator"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/psutil"
 	"github.com/robfig/cron/v3"
@@ -130,65 +128,75 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 
 func (m *MonitorService) LoadGPUOptions() dto.MonitorGPUOptions {
 	var data dto.MonitorGPUOptions
-	gpuExist, gpuClient := gpu.New()
-	xpuExist, xpuClient := xpu.New()
-	if !gpuExist && !xpuExist {
+	exist, client := accelerator.New()
+	if !exist {
 		return data
 	}
-	if gpuExist {
-		data.GPUType = "gpu"
-		gpuInfo, err := gpuClient.LoadGpuInfo()
-		if err != nil || len(gpuInfo.GPUs) == 0 {
-			global.LOG.Error("Load GPU info failed or no GPU found, err: ", err)
-			return data
-		}
-		sort.Slice(gpuInfo.GPUs, func(i, j int) bool {
-			return gpuInfo.GPUs[i].Index < gpuInfo.GPUs[j].Index
-		})
-		for _, item := range gpuInfo.GPUs {
-			var chartHide dto.GPUChartHide
-			chartHide.ProductName = fmt.Sprintf("%d - %s", item.Index, item.ProductName)
-			chartHide.GPU = item.GPUUtil == "" || item.GPUUtil == "N/A"
-			if (item.MemTotal == "" || item.MemTotal == "N/A") && (item.MemUsed == "" || item.MemUsed == "N/A") {
-				chartHide.Memory = true
-			}
-			if (item.MaxPowerLimit == "" || item.MaxPowerLimit == "N/A") && (item.PowerDraw == "" || item.PowerDraw == "N/A") {
-				chartHide.Power = true
-			}
-			chartHide.PowerLimit = item.MaxPowerLimit == "" || item.MaxPowerLimit == "N/A"
-			chartHide.Temperature = item.Temperature == "" || item.Temperature == "N/A"
-			chartHide.Speed = item.FanSpeed == "" || item.FanSpeed == "N/A"
-			data.ChartHide = append(data.ChartHide, chartHide)
-			data.Options = append(data.Options, fmt.Sprintf("%d - %s", item.Index, item.ProductName))
-		}
+	snapshot, err := client.Collect(context.Background())
+	if err != nil {
+		global.LOG.Errorf("Load accelerator info failed, err: %v", err)
 		return data
-	} else {
+	}
+	if warning := snapshot.Warning(); warning != nil {
+		global.LOG.Warnf("Load accelerator info partially failed, err: %v", warning)
+	}
+	return loadGPUOptions(snapshot)
+}
+
+func loadGPUOptions(snapshot *accelerator.Snapshot) dto.MonitorGPUOptions {
+	var data dto.MonitorGPUOptions
+	hasGPUOrNPU := false
+	hasXPU := false
+	for _, item := range snapshot.Devices {
+		if item.Kind == accelerator.KindXPU {
+			hasXPU = true
+		} else {
+			hasGPUOrNPU = true
+		}
+	}
+	switch {
+	case hasGPUOrNPU && hasXPU:
+		data.GPUType = "mixed"
+	case hasXPU:
 		data.GPUType = "xpu"
-		xpu, err := xpuClient.LoadGpuInfo()
-		if err != nil || len(xpu.Xpu) == 0 {
-			global.LOG.Error("Load XPU info failed or no XPU found, err: ", err)
-		}
-		sort.Slice(xpu.Xpu, func(i, j int) bool {
-			return xpu.Xpu[i].Basic.DeviceID < xpu.Xpu[j].Basic.DeviceID
-		})
-		for _, item := range xpu.Xpu {
-			var chartHide dto.GPUChartHide
-			chartHide.GPU = true
-			chartHide.Speed = true
-			chartHide.PowerLimit = true
-			chartHide.ProductName = fmt.Sprintf("%d - %s", item.Basic.DeviceID, item.Basic.DeviceName)
-			if (item.Stats.MemoryUsed == "" || item.Stats.MemoryUsed == "N/A") && (item.Basic.Memory == "" || item.Basic.FreeMemory == "N/A") {
-				chartHide.Memory = true
-			}
-			if item.Stats.Power == "" || item.Stats.Power == "N/A" {
-				chartHide.Power = true
-			}
-			chartHide.Temperature = item.Stats.Temperature == "" || item.Stats.Temperature == "N/A"
-			data.ChartHide = append(data.ChartHide, chartHide)
-			data.Options = append(data.Options, fmt.Sprintf("%d - %s", item.Basic.DeviceID, item.Basic.DeviceName))
-		}
-		return data
+	case hasGPUOrNPU:
+		data.GPUType = "gpu"
 	}
+
+	sort.Slice(snapshot.Devices, func(i, j int) bool {
+		if snapshot.Devices[i].Kind != snapshot.Devices[j].Kind {
+			return snapshot.Devices[i].Kind < snapshot.Devices[j].Kind
+		}
+		if snapshot.Devices[i].Vendor != snapshot.Devices[j].Vendor {
+			return snapshot.Devices[i].Vendor < snapshot.Devices[j].Vendor
+		}
+		if snapshot.Devices[i].NPUIndex != snapshot.Devices[j].NPUIndex {
+			return snapshot.Devices[i].NPUIndex < snapshot.Devices[j].NPUIndex
+		}
+		if snapshot.Devices[i].ChipIndex != snapshot.Devices[j].ChipIndex {
+			return snapshot.Devices[i].ChipIndex < snapshot.Devices[j].ChipIndex
+		}
+		return snapshot.Devices[i].Index < snapshot.Devices[j].Index
+	})
+	for _, item := range snapshot.Devices {
+		optionType := "gpu"
+		if item.Kind == accelerator.KindXPU {
+			optionType = "xpu"
+		}
+		chartHide := dto.GPUChartHide{
+			ProductName: item.Label,
+			Type:        optionType,
+			GPU:         !item.Capabilities.Utilization,
+			Memory:      !item.Capabilities.Memory,
+			Power:       !item.Capabilities.Power,
+			PowerLimit:  !item.Capabilities.PowerLimit,
+			Temperature: !item.Capabilities.Temperature,
+			Speed:       !item.Capabilities.FanSpeed,
+		}
+		data.ChartHide = append(data.ChartHide, chartHide)
+		data.Options = append(data.Options, chartHide.ProductName)
+	}
+	return data
 }
 
 func (m *MonitorService) LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.MonitorGPUData, error) {
@@ -299,8 +307,7 @@ func (m *MonitorService) CleanData() error {
 }
 
 func (m *MonitorService) Run() {
-	saveGPUDataToDB()
-	saveXPUDataToDB()
+	saveAcceleratorDataToDB()
 	var itemModel model.MonitorBase
 	totalPercent, _ := cpu.Percent(3*time.Second, false)
 	if len(totalPercent) == 1 {
@@ -595,95 +602,56 @@ func StartMonitor(removeBefore bool, interval string) error {
 	return nil
 }
 
-func saveGPUDataToDB() {
-	exist, client := gpu.New()
+func saveAcceleratorDataToDB() {
+	exist, client := accelerator.New()
 	if !exist {
 		return
 	}
-	gpuInfo, err := client.LoadGpuInfo()
+	snapshot, err := client.Collect(context.Background())
 	if err != nil {
-		global.LOG.Errorf("load gpu monitor data failed, err: %v", err)
+		global.LOG.Errorf("load accelerator monitor data failed, err: %v", err)
 		return
 	}
-	var list []model.MonitorGPU
-	for _, gpuItem := range gpuInfo.GPUs {
-		item := model.MonitorGPU{
-			ProductName:   fmt.Sprintf("%d - %s", gpuItem.Index, gpuItem.ProductName),
-			GPUUtil:       loadGPUInfoFloat(gpuItem.GPUUtil),
-			Temperature:   loadGPUInfoFloat(gpuItem.Temperature),
-			PowerDraw:     loadGPUInfoFloat(gpuItem.PowerDraw),
-			MaxPowerLimit: loadGPUInfoFloat(gpuItem.MaxPowerLimit),
-			MemUsed:       loadGPUInfoFloat(gpuItem.MemUsed),
-			MemTotal:      loadGPUInfoFloat(gpuItem.MemTotal),
-			FanSpeed:      loadGPUInfoInt(gpuItem.FanSpeed),
-		}
-		process, _ := json.Marshal(gpuItem.Processes)
-		if len(process) != 0 {
-			item.Processes = string(process)
-		}
-		list = append(list, item)
+	if warning := snapshot.Warning(); warning != nil {
+		global.LOG.Warnf("load accelerator monitor data partially failed, err: %v", warning)
+	}
+	list := make([]model.MonitorGPU, 0, len(snapshot.Devices))
+	for _, device := range snapshot.Devices {
+		list = append(list, newMonitorGPU(device))
 	}
 	if err := repo.NewIMonitorRepo().BatchCreateMonitorGPU(list); err != nil {
-		global.LOG.Errorf("batch create gpu monitor data failed, err: %v", err)
-		return
+		global.LOG.Errorf("batch create accelerator monitor data failed, err: %v", err)
 	}
 }
-func saveXPUDataToDB() {
-	exist, client := xpu.New()
-	if !exist {
-		return
+
+func newMonitorGPU(device accelerator.Device) model.MonitorGPU {
+	item := model.MonitorGPU{
+		ProductName:   device.Label,
+		GPUUtil:       device.Metrics.Utilization.ValueOrZero(),
+		Temperature:   device.Metrics.Temperature.ValueOrZero(),
+		PowerDraw:     device.Metrics.Power.ValueOrZero(),
+		MaxPowerLimit: device.Metrics.PowerLimit.ValueOrZero(),
+		MemUsed:       device.Metrics.MemoryUsed.ValueOrZero(),
+		MemTotal:      device.Metrics.MemoryTotal.ValueOrZero(),
+		FanSpeed:      int(device.Metrics.FanSpeed.ValueOrZero()),
 	}
-	xpuInfo, err := client.LoadGpuInfo()
-	if err != nil {
-		global.LOG.Errorf("load xpu monitor data failed, err: %v", err)
-		return
+	if len(device.Processes) == 0 {
+		return item
 	}
-	var list []model.MonitorGPU
-	for _, xpuItem := range xpuInfo.Xpu {
-		item := model.MonitorGPU{
-			ProductName: fmt.Sprintf("%d - %s", xpuItem.Basic.DeviceID, xpuItem.Basic.DeviceName),
-			Temperature: loadGPUInfoFloat(xpuItem.Stats.Temperature),
-			PowerDraw:   loadGPUInfoFloat(xpuItem.Stats.Power),
-			MemUsed:     loadGPUInfoFloat(xpuItem.Stats.MemoryUsed),
-			MemTotal:    loadGPUInfoFloat(xpuItem.Basic.Memory),
-		}
-		if len(xpuItem.Processes) != 0 {
-			var processItem []dto.GPUProcess
-			for _, ps := range xpuItem.Processes {
-				processItem = append(processItem, dto.GPUProcess{
-					Pid:         fmt.Sprintf("%v", ps.PID),
-					Type:        ps.SHR,
-					ProcessName: ps.Command,
-					UsedMemory:  ps.Memory,
-				})
-			}
-			process, _ := json.Marshal(processItem)
-			if len(process) != 0 {
-				item.Processes = string(process)
-			}
-		}
-		list = append(list, item)
+	processes := make([]dto.GPUProcess, 0, len(device.Processes))
+	for _, process := range device.Processes {
+		processes = append(processes, dto.GPUProcess{
+			Pid:         process.PID,
+			Type:        process.Type,
+			ProcessName: process.Name,
+			UsedMemory:  process.Memory,
+		})
 	}
-	if err := repo.NewIMonitorRepo().BatchCreateMonitorGPU(list); err != nil {
-		global.LOG.Errorf("batch create gpu monitor data failed, err: %v", err)
-		return
+	processData, err := json.Marshal(processes)
+	if err == nil {
+		item.Processes = string(processData)
 	}
-}
-func loadGPUInfoInt(val string) int {
-	val = strings.TrimSuffix(val, "%")
-	val = strings.TrimSpace(val)
-	data, _ := strconv.Atoi(val)
-	return data
-}
-func loadGPUInfoFloat(val string) float64 {
-	val = strings.TrimSpace(val)
-	suffixes := []string{"W", "MB", "MiB", "°C", "C", "%"}
-	for _, suffix := range suffixes {
-		val = strings.TrimSuffix(val, suffix)
-	}
-	val = strings.TrimSpace(val)
-	data, _ := strconv.ParseFloat(val, 64)
-	return data
+	return item
 }
 
 func sumDiskIOCounters(ioStats map[string]disk.IOCountersStat) disk.IOCountersStat {

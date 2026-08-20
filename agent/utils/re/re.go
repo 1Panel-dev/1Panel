@@ -52,6 +52,9 @@ const (
 	NginxModulePackagePattern          = `^[a-zA-Z0-9][a-zA-Z0-9+.-]*$`
 	NginxModuleArtifactPattern         = `^[a-zA-Z0-9_./+-]+\.so$`
 	NginxModuleChecksumPattern         = `^[a-fA-F0-9]{64}$`
+	AcceleratorMetricValuePattern      = `^\s*([+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+))\s*(.*?)\s*$`
+	AscendVersionPattern               = `(?i)\bVersion:\s*([^\s|]+)`
+	AscendMemoryPattern                = `([0-9]+(?:\.[0-9]+)?)\s*/\s*([0-9]+(?:\.[0-9]+)?)`
 )
 
 var regexMap = make(map[string]*regexp.Regexp)
@@ -104,6 +107,9 @@ func Init() {
 		NginxModulePackagePattern,
 		NginxModuleArtifactPattern,
 		NginxModuleChecksumPattern,
+		AcceleratorMetricValuePattern,
+		AscendVersionPattern,
+		AscendMemoryPattern,
 	}
 
 	for _, pattern := range patterns {

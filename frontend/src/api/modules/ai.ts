@@ -39,7 +39,7 @@ export const updateBindDomain = (req: AI.BindDomain) => {
 };
 
 export const loadGPUInfo = () => {
-    return http.get<any>(`/ai/gpu/load`);
+    return http.get<AI.Info>(`/ai/gpu/load`);
 };
 export const getGPUOptions = () => {
     return http.get<AI.MonitorGPUOptions>(`/ai/gpu/options`);

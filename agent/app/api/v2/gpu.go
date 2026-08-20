@@ -3,9 +3,8 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
-	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/xpu"
+	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/accelerator"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,27 +16,20 @@ import (
 // @Security Timestamp
 // @Router /ai/gpu/load [get]
 func (b *BaseApi) LoadGpuInfo(c *gin.Context) {
-	ok, client := gpu.New()
+	ok, client := accelerator.New()
 	if ok {
-		info, err := client.LoadGpuInfo()
+		snapshot, err := client.Collect(c.Request.Context())
 		if err != nil {
 			helper.BadRequest(c, err)
 			return
 		}
-		helper.SuccessWithData(c, info)
-		return
-	}
-	xpuOK, xpuClient := xpu.New()
-	if xpuOK {
-		info, err := xpuClient.LoadGpuInfo()
-		if err != nil {
-			helper.BadRequest(c, err)
-			return
+		if warning := snapshot.Warning(); warning != nil {
+			global.LOG.Warnf("load realtime accelerator data partially failed, err: %v", warning)
 		}
-		helper.SuccessWithData(c, info)
+		helper.SuccessWithData(c, &snapshot.Info)
 		return
 	}
-	helper.SuccessWithData(c, &common.GpuInfo{})
+	helper.SuccessWithData(c, &accelerator.Info{})
 }
 
 // @Tags AI
