@@ -24,6 +24,7 @@ type ISettingRepo interface {
 	GetValueByKey(key string) (string, error)
 	Create(key, value string) error
 	Update(key, value string) error
+	UpdateIfMatch(key, oldValue, value string) (bool, error)
 	UpdateOrCreate(key, value string) error
 	DefaultMenu() error
 }
@@ -87,6 +88,20 @@ func (u *SettingRepo) Update(key, value string) error {
 	}
 	settingCache.Set(key, value, settingTTL)
 	return nil
+}
+
+func (u *SettingRepo) UpdateIfMatch(key, oldValue, value string) (bool, error) {
+	result := global.DB.Model(&model.Setting{}).
+		Where("key = ? AND value = ?", key, oldValue).
+		Updates(map[string]interface{}{"value": value})
+	if result.Error != nil {
+		return false, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return false, nil
+	}
+	settingCache.Set(key, value, settingTTL)
+	return true, nil
 }
 
 func (u *SettingRepo) UpdateOrCreate(key, value string) error {

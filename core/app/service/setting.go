@@ -32,6 +32,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/controller"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/firewall"
+	"github.com/1Panel-dev/1Panel/core/utils/menutree"
 	"github.com/1Panel-dev/1Panel/core/utils/passkey"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
@@ -80,15 +81,7 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	for _, set := range setting {
 		settingMap[set.Key] = set.Value
 	}
-	if hideMenu, ok := settingMap["HideMenu"]; ok && len(hideMenu) > 0 {
-		var menus []dto.ShowMenu
-		if err := json.Unmarshal([]byte(hideMenu), &menus); err == nil {
-			sortShowMenus(menus)
-			if sortedBytes, err := json.Marshal(menus); err == nil {
-				settingMap["HideMenu"] = string(sortedBytes)
-			}
-		}
-	}
+	repairAndSortHideMenu(settingMap)
 	var info dto.SettingInfo
 	arr, err := json.Marshal(settingMap)
 	if err != nil {
@@ -123,15 +116,7 @@ func (u *SettingService) GetSettingBaseInfo() (*dto.SettingBaseInfo, error) {
 	for _, set := range setting {
 		settingMap[set.Key] = set.Value
 	}
-	if hideMenu, ok := settingMap["HideMenu"]; ok && len(hideMenu) > 0 {
-		var menus []dto.ShowMenu
-		if err := json.Unmarshal([]byte(hideMenu), &menus); err == nil {
-			sortShowMenus(menus)
-			if sortedBytes, err := json.Marshal(menus); err == nil {
-				settingMap["HideMenu"] = string(sortedBytes)
-			}
-		}
-	}
+	repairAndSortHideMenu(settingMap)
 	var info dto.SettingBaseInfo
 	arr, err := json.Marshal(settingMap)
 	if err != nil {
@@ -150,6 +135,36 @@ func (u *SettingService) GetSettingBaseInfo() (*dto.SettingBaseInfo, error) {
 	}
 
 	return &info, err
+}
+
+func repairAndSortHideMenu(settingMap map[string]string) {
+	hideMenu, ok := settingMap["HideMenu"]
+	if !ok || strings.TrimSpace(hideMenu) == "" {
+		return
+	}
+	var menus []dto.ShowMenu
+	if err := json.Unmarshal([]byte(hideMenu), &menus); err != nil || len(menus) == 0 {
+		return
+	}
+
+	menus, changed := menutree.EnsureXpackAppMenus(menus, nil)
+	if changed {
+		repairedBytes, err := json.Marshal(menus)
+		if err != nil {
+			global.LOG.Warnf("marshal repaired HideMenu failed, err: %v", err)
+		} else {
+			updated, err := settingRepo.UpdateIfMatch("HideMenu", hideMenu, string(repairedBytes))
+			if err != nil {
+				global.LOG.Warnf("persist repaired HideMenu failed, err: %v", err)
+			} else if !updated {
+				global.LOG.Debug("skip persisting repaired HideMenu because the setting changed concurrently")
+			}
+		}
+	}
+	sortShowMenus(menus)
+	if sortedBytes, err := json.Marshal(menus); err == nil {
+		settingMap["HideMenu"] = string(sortedBytes)
+	}
 }
 
 func sortShowMenus(menus []dto.ShowMenu) {
@@ -171,7 +186,7 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 	if err != nil {
 		return err
 	}
-	if oldVal.Value == value {
+	if oldVal.Value == value && key != "HideMenu" {
 		return nil
 	}
 	sessionLifeTime := 0
@@ -192,6 +207,13 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 		if err := json.Unmarshal([]byte(value), &menus); err != nil {
 			return err
 		}
+		var previousMenus []dto.ShowMenu
+		_ = json.Unmarshal([]byte(oldVal.Value), &previousMenus)
+		menus, _ = menutree.PreserveMissingMenus(menus, previousMenus)
+		if len(menus) == 0 {
+			return fmt.Errorf("hide menu cannot be empty")
+		}
+		menus, _ = menutree.EnsureXpackAppMenus(menus, previousMenus)
 		for i := 0; i < len(menus); i++ {
 			if menus[i].Label == "Home-Menu" || menus[i].Label == "App-Menu" || menus[i].Label == "Setting-Menu" {
 				menus[i].IsShow = true
@@ -202,6 +224,9 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 			return err
 		}
 		value = string(menuItem)
+	}
+	if oldVal.Value == value {
+		return nil
 	}
 
 	if err := settingRepo.Update(key, value); err != nil {
