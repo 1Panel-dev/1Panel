@@ -104,3 +104,19 @@ const onDropdownVisibleChange = (visible: boolean, currentPath: string) => {
     }
 };
 </script>
+
+<style scoped>
+.el-dropdown-link {
+    display: block;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 599px) {
+    .el-dropdown-link {
+        max-width: 112px;
+    }
+}
+</style>
