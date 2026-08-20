@@ -8,7 +8,7 @@ import { isMasterOnlyPermissionCode, setMasterOnlyPermissionCodes, toManageCode 
 import { clearPageStateCache } from '@/utils/page-state-cache';
 
 const CN_DOCS_URL = 'https://1panel.cn/docs/v2';
-const INTL_DOCS_URL = 'https://docs.1panel.pro/v2';
+const INTL_DOCS_URL = 'https://1panel.pro/docs/v2';
 
 const GlobalStore = defineStore('GlobalState', {
     state: (): GlobalState => ({
