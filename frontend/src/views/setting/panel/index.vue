@@ -213,6 +213,7 @@ import { codeEditorThemeStorageKey } from '@/utils/code-editor-theme';
 import i18n from '@/lang';
 
 const {
+    docWithRegion,
     globalStore,
     isEnterprise,
     isIntl,
@@ -310,6 +311,8 @@ const search = async () => {
     form.sessionTimeout = Number(res.data.sessionTimeout || 0);
     form.docSource = res.data.docSource || 'withByRegion';
     form.edition = res.data.edition;
+    docWithRegion.value = form.docSource === 'withByRegion';
+    isIntl.value = form.edition === 'intl';
 
     form.proxyUrl = res.data.proxyUrl;
     form.proxyType = res.data.proxyType;

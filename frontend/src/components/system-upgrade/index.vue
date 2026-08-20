@@ -106,7 +106,7 @@ const to1Panel = () => {
 };
 
 const toDoc = () => {
-    window.open(docsUrl.value, '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value.endsWith('/') ? docsUrl.value : `${docsUrl.value}/`, '_blank', 'noopener,noreferrer');
 };
 
 const toEdition = () => {
