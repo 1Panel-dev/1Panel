@@ -18,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/ctl_conf"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/core/utils/menutree"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 )
@@ -1312,5 +1313,41 @@ var AddWebsiteTemplateMenu = &gormigrate.Migration{
 			Path:     "/websites/templates",
 			Sort:     250,
 		}, "SSL")
+	},
+}
+
+var RepairXpackAppMenus = &gormigrate.Migration{
+	ID: "20260818-repair-xapp-upage-hide-menu",
+	Migrate: func(tx *gorm.DB) error {
+		var setting model.Setting
+		if err := tx.Where("key = ?", "HideMenu").First(&setting).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return tx.Create(&model.Setting{Key: "HideMenu", Value: helper.LoadMenus()}).Error
+			}
+			return err
+		}
+
+		updateValue := func(value string) error {
+			return tx.Model(&setting).Update("value", value).Error
+		}
+
+		if strings.TrimSpace(setting.Value) == "" {
+			return updateValue(helper.LoadMenus())
+		}
+
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(setting.Value), &menus); err != nil || len(menus) == 0 {
+			return updateValue(helper.LoadMenus())
+		}
+
+		updatedMenus, changed := menutree.EnsureXpackAppMenus(menus, nil)
+		if !changed {
+			return nil
+		}
+		updatedJSON, err := json.Marshal(updatedMenus)
+		if err != nil {
+			return err
+		}
+		return updateValue(string(updatedJSON))
 	},
 }

@@ -53,6 +53,7 @@ func Init() {
 		migrations.AddMenuAccordionSetting,
 		migrations.AddAPITrustedProxiesSetting,
 		migrations.AddWebsiteTemplateMenu,
+		migrations.RepairXpackAppMenus,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
