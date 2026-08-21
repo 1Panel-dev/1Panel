@@ -19,7 +19,7 @@ import (
 )
 
 func AddScanTask(taskItem *task.Task, clam model.Clam, timeNow string) {
-	taskItem.AddSubTask(i18n.GetWithName("Clamscan", clam.Path), func(t *task.Task) error {
+	taskItem.AddSubTaskWithOps(i18n.GetWithName("Clamscan", clam.Path), func(t *task.Task) error {
 		strategy := ""
 		switch clam.InfectedStrategy {
 		case "remove":
@@ -43,7 +43,7 @@ func AddScanTask(taskItem *task.Task, clam model.Clam, timeNow string) {
 			return fmt.Errorf("clamdscan failed, %v", err)
 		}
 		return nil
-	}, nil)
+	}, nil, 0, time.Duration(clam.Timeout)*time.Second)
 }
 
 func AnalysisFromLog(pathItem string, record *model.ClamRecord) {
