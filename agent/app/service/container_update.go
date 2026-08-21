@@ -1,9 +1,11 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"sort"
 	"strings"
 	"sync"
@@ -18,6 +20,7 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
@@ -70,7 +73,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 				return createContainerWithDynamicIPFallback(func() (container.CreateResponse, error) {
 					return client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
 				}, networkConf.EndpointsConfig, oldContainer.NetworkSettings)
-			}, newContainerSwitchTaskLogger(t))
+			}, config.Tty, t)
 			if err != nil {
 				return fmt.Errorf("update container failed, err: %v", err)
 			}
@@ -137,7 +140,7 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 				preserveContainerVolumeMounts(hostConf, oldContainer.Mounts)
 				cleanupErr, err := switchContainer(ctx, client, item, oldContainer, func() (container.CreateResponse, error) {
 					return createContainerWithOldNetworks(ctx, client, config, hostConf, oldContainer.NetworkSettings, item)
-				}, newContainerSwitchTaskLogger(t))
+				}, config.Tty, t)
 				if err != nil {
 					upgradeErr := fmt.Errorf("upgrade container %s failed: %w", item, err)
 					upgradeErrors = append(upgradeErrors, upgradeErr)
@@ -166,6 +169,7 @@ type containerSwitchClient interface {
 	ContainerStart(context.Context, string, container.StartOptions) error
 	ContainerRemove(context.Context, string, container.RemoveOptions) error
 	ContainerInspect(context.Context, string) (container.InspectResponse, error)
+	ContainerLogs(context.Context, string, container.LogsOptions) (io.ReadCloser, error)
 	NetworkConnect(context.Context, string, string, *network.EndpointSettings) error
 	NetworkDisconnect(context.Context, string, string, bool) error
 }
@@ -243,17 +247,14 @@ type containerNetworkAttachment struct {
 	isDynamic bool
 }
 
-type containerSwitchLogFunc func(messageKey, containerName string, err error)
-
-func newContainerSwitchTaskLogger(t *task.Task) containerSwitchLogFunc {
-	return func(messageKey, containerName string, err error) {
-		t.LogWithStatus(i18n.GetWithName(messageKey, containerName), err)
-	}
+type containerSwitchLogger interface {
+	LogWithStatus(string, error)
+	Log(string)
 }
 
-func logContainerSwitchStep(logger containerSwitchLogFunc, messageKey, containerName string, err error) {
+func logContainerSwitchStep(logger containerSwitchLogger, messageKey, containerName string, err error) {
 	if logger != nil {
-		logger(messageKey, containerName, err)
+		logger.LogWithStatus(i18n.GetWithName(messageKey, containerName), err)
 	}
 }
 
@@ -264,7 +265,8 @@ func switchContainer(
 	name string,
 	oldContainer container.InspectResponse,
 	createNew func() (container.CreateResponse, error),
-	logger containerSwitchLogFunc,
+	tty bool,
+	logger containerSwitchLogger,
 ) (cleanupErr error, err error) {
 	if oldContainer.ID == "" {
 		return nil, fmt.Errorf("original container ID is empty")
@@ -314,6 +316,7 @@ func switchContainer(
 	}
 	if err := cli.ContainerStart(ctx, created.ID, container.StartOptions{}); err != nil {
 		logContainerSwitchStep(logger, "ContainerStartReplacement", name, err)
+		logContainerStartupLogs(ctx, cli, created.ID, name, tty, logger)
 		rollbackErr := restoreOriginalContainer(ctx, cli, oldContainer.ID, name, wasRunning, created.ID, disconnectedNetworks, logger)
 		return nil, errors.Join(fmt.Errorf("start new container failed: %w", err), rollbackErr)
 	}
@@ -321,6 +324,7 @@ func switchContainer(
 	if wasRunning {
 		if err := waitContainerReady(ctx, cli, created.ID); err != nil {
 			logContainerSwitchStep(logger, "ContainerWaitReplacement", name, err)
+			logContainerStartupLogs(ctx, cli, created.ID, name, tty, logger)
 			rollbackErr := restoreOriginalContainer(ctx, cli, oldContainer.ID, name, wasRunning, created.ID, disconnectedNetworks, logger)
 			return nil, errors.Join(fmt.Errorf("new container readiness check failed: %w", err), rollbackErr)
 		}
@@ -337,7 +341,47 @@ const (
 	containerStartPollInterval  = time.Second
 	containerHealthCheckMinWait = 30 * time.Second
 	containerHealthCheckMaxWait = 10 * time.Minute
+	containerDiagnosticLogTail  = "200"
 )
+
+func logContainerStartupLogs(ctx context.Context, cli containerSwitchClient, containerID, name string, tty bool, logger containerSwitchLogger) {
+	if logger == nil {
+		return
+	}
+	logger.Log(fmt.Sprintf("========== %s ==========", i18n.GetWithName("ContainerStartupDiagnostic", name)))
+	diagnosticCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	reader, err := cli.ContainerLogs(diagnosticCtx, containerID, container.LogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+		Timestamps: true,
+		Tail:       containerDiagnosticLogTail,
+	})
+	if err != nil {
+		logger.Log(i18n.GetWithNameAndErr("ContainerDiagnosticLogsFailed", name, err))
+		return
+	}
+	defer reader.Close()
+
+	var output bytes.Buffer
+	if tty {
+		_, err = io.Copy(&output, reader)
+	} else {
+		_, err = stdcopy.StdCopy(&output, &output, reader)
+	}
+	if err != nil {
+		logger.Log(i18n.GetWithNameAndErr("ContainerDiagnosticLogsFailed", name, err))
+		return
+	}
+	logs := strings.TrimSpace(output.String())
+	logger.Log(fmt.Sprintf("---------- %s ----------", i18n.GetMsgByKey("ContainerRecentLogs")))
+	if logs == "" {
+		logger.Log(i18n.GetMsgByKey("ContainerDiagnosticLogsEmpty"))
+		return
+	}
+	logger.Log(logs)
+}
 
 func waitContainerReady(ctx context.Context, cli containerInspectClient, containerID string) error {
 	info, err := cli.ContainerInspect(ctx, containerID)
@@ -583,7 +627,7 @@ func reconnectOriginalContainerNetworks(ctx context.Context, cli containerSwitch
 	return reconnectErr
 }
 
-func restoreOriginalContainer(ctx context.Context, cli containerSwitchClient, oldContainerID, originalName string, wasRunning bool, newContainer string, disconnectedNetworks []containerNetworkAttachment, logger containerSwitchLogFunc) error {
+func restoreOriginalContainer(ctx context.Context, cli containerSwitchClient, oldContainerID, originalName string, wasRunning bool, newContainer string, disconnectedNetworks []containerNetworkAttachment, logger containerSwitchLogger) error {
 	var rollbackErr error
 	backupName := containerSwitchBackupName(oldContainerID)
 	if newContainer != "" {
