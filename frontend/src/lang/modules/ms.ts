@@ -2867,7 +2867,7 @@ const message = {
         apiTrustedProxiesEgs:
             'Satu IP atau CIDR pelayan proksi bagi setiap baris. Contoh:\n172.16.10.111\n172.16.10.0/24',
         apiTrustedProxiesHelper:
-            'Apabila menggunakan proksi songsang, masukkan IP atau rangkaian pelayan proksi untuk mendapatkan IP klien dengan betul. Jika tidak digunakan, biarkan kosong. 0.0.0.0/0 dan ::/0 tidak disokong.',
+            'Apabila menggunakan proksi songsang, masukkan IP atau rangkaiannya. Jika kosong, tiada proksi dipercayai dan IP sumber langsung digunakan. 0.0.0.0/0 dan ::/0 tidak disokong.',
         apiKeyValidityTime: 'Tempoh sah kunci antara muka',
         apiKeyValidityTimeEgs: 'Tempoh sah kunci antara muka (dalam minit)',
         apiKeyValidityTimeHelper:
@@ -3060,6 +3060,8 @@ const message = {
         allowIPsWarning:
             'Selepas anda menetapkan senarai alamat IP yang dibenarkan, hanya alamat IP dalam senarai yang boleh mengakses perkhidmatan panel. Adakah anda mahu meneruskan?',
         allowIPsHelper1: 'Biarkan kosong untuk melumpuhkan sekatan alamat IP.',
+        allowIPsPrivateHelper:
+            'Alamat rangkaian peribadi juga disekat. Untuk akses setempat, tambahkan 127.0.0.1 atau ::1; untuk proksi songsang, tetapkan proksi dipercayai.',
         allowIPEgs: 'Satu per baris. Contoh,\n172.16.10.111\n172.16.10.0/24',
         mfa: 'Pengesahan Dua Faktor',
         mfaClose: 'Melumpuhkan MFA akan mengurangkan keselamatan perkhidmatan. Adakah anda mahu meneruskan?',

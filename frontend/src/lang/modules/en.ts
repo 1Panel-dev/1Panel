@@ -2823,7 +2823,7 @@ const message = {
         apiTrustedProxies: 'API trusted proxies',
         apiTrustedProxiesEgs: 'One proxy server IP or CIDR per line. For example,\n172.16.10.111\n172.16.10.0/24',
         apiTrustedProxiesHelper:
-            'When using a reverse proxy, enter the IP address or network of the proxy server to correctly obtain the client IP. Otherwise, leave this blank. 0.0.0.0/0 and ::/0 are not supported.',
+            'When using a reverse proxy, enter its IP address or network. When empty, no proxy is trusted and the direct source IP is used. 0.0.0.0/0 and ::/0 are not supported.',
         apiKeyValidityTime: 'Validity period of interface key',
         apiKeyValidityTimeEgs: 'Validity period of interface key (in minutes)',
         apiKeyValidityTimeHelper:
@@ -3025,6 +3025,8 @@ const message = {
         allowIPsWarning:
             'After you set the authorized IP address list, only the IP address in the list can access the panel service. Continue?',
         allowIPsHelper1: 'Leave it blank to disable the IP address restriction.',
+        allowIPsPrivateHelper:
+            'Private-network addresses are also restricted. For local access, add 127.0.0.1 or ::1; for reverse proxies, configure trusted proxies.',
         allowIPEgs: 'One per line. For example,\n172.16.10.111\n172.16.10.0/24',
         mfa: 'Two-Factor Auth',
         mfaClose: 'Disabling MFA will reduce the security of the service. Continue?',

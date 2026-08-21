@@ -2870,7 +2870,7 @@ const message = {
         apiTrustedProxies: 'Proxies de confianza de la API',
         apiTrustedProxiesEgs: 'Una IP o CIDR del servidor proxy por línea. Por ejemplo,\n172.16.10.111\n172.16.10.0/24',
         apiTrustedProxiesHelper:
-            'Al usar un proxy inverso, introduce la IP o la red del servidor proxy para obtener correctamente la IP del cliente. Si no lo usas, deja este campo vacío. No se admiten 0.0.0.0/0 ni ::/0.',
+            'Al usar un proxy inverso, introduce su IP o red. Si se deja vacío, no se confía en ningún proxy y se usa la IP de origen directa. No se admiten 0.0.0.0/0 ni ::/0.',
         apiKeyValidityTime: 'Periodo de validez de la clave de interfaz',
         apiKeyValidityTimeEgs: 'Periodo de validez de la clave de interfaz (en minutos)',
         apiKeyValidityTimeHelper:
@@ -3079,6 +3079,8 @@ const message = {
         allowIPsWarning:
             'Tras configurar la lista de IP autorizadas, solo las IP en la lista podrán acceder al panel. ¿Deseas continuar?',
         allowIPsHelper1: 'Déjalo en blanco para desactivar la restricción por IP.',
+        allowIPsPrivateHelper:
+            'Las direcciones de red privada también están restringidas. Para acceso local, añade 127.0.0.1 o ::1; para proxies inversos, configura proxies de confianza.',
         allowIPEgs: 'Una por línea. Por ejemplo,\n172.16.10.111\n172.16.10.0/24',
         mfa: 'Autenticación en Dos Pasos',
         mfaClose: 'Desactivar MFA reducirá la seguridad del servicio. ¿Deseas continuar?',

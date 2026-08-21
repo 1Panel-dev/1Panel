@@ -52,6 +52,7 @@ func Init() {
 		migrations.AddAlertAuditUser,
 		migrations.AddMenuAccordionSetting,
 		migrations.AddAPITrustedProxiesSetting,
+		migrations.AddAllowIPTrustedProxiesSetting,
 		migrations.AddWebsiteTemplateMenu,
 		migrations.RepairXpackAppMenus,
 	})

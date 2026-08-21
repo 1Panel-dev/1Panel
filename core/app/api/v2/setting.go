@@ -108,6 +108,14 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 		}
 		req.Value = value
 	}
+	if req.Key == "AllowIPTrustedProxies" {
+		value, err := common.NormalizeTrustedProxies(req.Value)
+		if err != nil {
+			helper.BadRequest(c, err)
+			return
+		}
+		req.Value = value
+	}
 
 	if err := settingService.Update(c, req.Key, req.Value); err != nil {
 		helper.InternalServer(c, err)

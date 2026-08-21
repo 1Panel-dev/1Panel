@@ -2688,7 +2688,7 @@ const message = {
         apiTrustedProxies: 'API 可信代理',
         apiTrustedProxiesEgs: '每行填写一个代理服务器 IP 或 CIDR，例如：\n172.16.10.111\n172.16.10.0/24',
         apiTrustedProxiesHelper:
-            '使用反向代理时，请填写代理服务器的 IP 或网段，以便正确获取客户端 IP；不使用时请留空。不支持 0.0.0.0/0 和 ::/0。',
+            '使用反向代理时，请填写代理服务器的 IP 或网段；留空时不信任任何代理，并使用请求的直接来源 IP。不支持 0.0.0.0/0 和 ::/0。',
         apiKeyValidityTime: '接口密钥有效期',
         apiKeyValidityTimeEgs: '接口密钥有效期（单位分）',
         apiKeyValidityTimeHelper: '接口时间戳到请求时的当前时间戳之间有效（单位分），设置为 0 时，不做时间戳校验',
@@ -2924,6 +2924,7 @@ const message = {
         allowIPsHelper: '设置授权 IP 后，仅有设置中的 IP 可以访问 1Panel 服务',
         allowIPsWarning: '设置授权 IP 后，仅有设置中的 IP 可以访问 1Panel 服务，是否继续？',
         allowIPsHelper1: '授权 IP 为空时，则取消授权 IP',
+        allowIPsPrivateHelper: '内网地址也受限制；本机直连请添加 127.0.0.1 或 ::1，反向代理请配置可信代理。',
         allowIPEgs: '当存在多个授权 IP 时，需要换行显示，例： \n172.16.10.111 \n172.16.10.0/24',
         mfa: '两步验证',
         mfaClose: '关闭两步验证将导致服务安全性降低，是否继续？',

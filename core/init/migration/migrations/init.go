@@ -172,6 +172,9 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "AllowIPs", Value: ""}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "AllowIPTrustedProxies", Value: ""}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.Setting{Key: "NoAuthSetting", Value: "200"}).Error; err != nil {
 			return err
 		}
@@ -1294,6 +1297,20 @@ var AddAPITrustedProxiesSetting = &gormigrate.Migration{
 		if err := tx.Where("key = ?", "ApiTrustedProxies").First(&setting).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return tx.Create(&model.Setting{Key: "ApiTrustedProxies", Value: ""}).Error
+			}
+			return err
+		}
+		return nil
+	},
+}
+
+var AddAllowIPTrustedProxiesSetting = &gormigrate.Migration{
+	ID: "20260820-add-allow-ip-trusted-proxies-setting",
+	Migrate: func(tx *gorm.DB) error {
+		var setting model.Setting
+		if err := tx.Where("key = ?", "AllowIPTrustedProxies").First(&setting).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return tx.Create(&model.Setting{Key: "AllowIPTrustedProxies", Value: ""}).Error
 			}
 			return err
 		}

@@ -14,18 +14,21 @@ import (
 func WhiteAllow() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("X-Panel-Local-Token")
-		clientIP := common.GetRealClientIP(c)
-		if isLocalSyncRequest(c.Request.URL.Path, clientIP, tokenString) {
+		remoteIP := common.GetRealClientIP(c)
+		if isLocalSyncRequest(c.Request.URL.Path, remoteIP, tokenString) {
 			c.Set("LOCAL_REQUEST", true)
-			c.Next()
-			return
-		}
-		if common.IsPrivateIP(clientIP) {
 			c.Next()
 			return
 		}
 
 		settingRepo := repo.NewISettingRepo()
+		trustedProxies, err := settingRepo.GetValueByKey("AllowIPTrustedProxies")
+		if err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+		clientIP := common.ResolveClientIP(c, trustedProxies)
+
 		allowIPs, err := settingRepo.GetValueByKey("AllowIPs")
 		if err != nil {
 			helper.InternalServer(c, err)

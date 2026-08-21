@@ -45,6 +45,7 @@ var baseSettingKeys = map[string]struct{}{
 	"SecurityEntrance":           {},
 	"BindDomain":                 {},
 	"AllowIPs":                   {},
+	"AllowIPTrustedProxies":      {},
 	"PasskeyTrustedProxies":      {},
 	"ComplexityVerification":     {},
 	"NoAuthSetting":              {},

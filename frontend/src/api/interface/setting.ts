@@ -50,6 +50,7 @@ export namespace Setting {
         ssl: string;
         sslType: string;
         allowIPs: string;
+        allowIPTrustedProxies: string;
         bindDomain: string;
         passkeyTrustedProxies: string;
         securityEntrance: string;
