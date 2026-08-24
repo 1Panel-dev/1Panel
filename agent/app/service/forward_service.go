@@ -351,7 +351,7 @@ func mergeForwardingInventory(
 		if err != nil {
 			return nil, fmt.Errorf("normalize desired forwarding rule: %w", err)
 		}
-		key := forwardingRuleIdentity(rule)
+		key := rule.Identity()
 		byIdentity[key] = len(items)
 		items = append(items, forwardingInventoryItem{ID: record.ID, Rule: rule, IsDesired: true})
 	}
@@ -360,7 +360,7 @@ func mergeForwardingInventory(
 		if err != nil {
 			return nil, fmt.Errorf("normalize runtime forwarding rule: %w", err)
 		}
-		key := forwardingRuleIdentity(rule)
+		key := rule.Identity()
 		if index, exists := byIdentity[key]; exists {
 			items[index].IsRuntime = true
 			continue
@@ -369,12 +369,6 @@ func mergeForwardingInventory(
 		items = append(items, forwardingInventoryItem{Rule: rule, IsRuntime: true})
 	}
 	return items, nil
-}
-
-func forwardingRuleIdentity(rule forwarding.Rule) string {
-	return strings.Join([]string{
-		rule.Family, rule.Protocol, rule.Port, rule.TargetIP, rule.TargetPort, rule.Interface,
-	}, "\x00")
 }
 
 func recordForwardingSyncError(err error) {
@@ -430,9 +424,9 @@ func applyForwardingOperations(current []forwarding.Rule, requested []dto.Forwar
 }
 
 func forwardingRuleIndex(rules []forwarding.Rule, wanted forwarding.Rule) int {
+	wantedIdentity := wanted.Identity()
 	for index, rule := range rules {
-		if rule.Family == wanted.Family && rule.Protocol == wanted.Protocol && rule.Port == wanted.Port &&
-			rule.TargetIP == wanted.TargetIP && rule.TargetPort == wanted.TargetPort && rule.Interface == wanted.Interface {
+		if rule.Identity() == wantedIdentity {
 			return index
 		}
 	}

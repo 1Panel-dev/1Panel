@@ -271,47 +271,15 @@ func legacyIPOrPrefix(value string) bool {
 }
 
 func hostFirewallRuleModel(rule filter.FirewallRule) (model.FirewallRule, error) {
-	normalized, err := filter.NormalizeRule(rule)
+	record, err := model.FirewallRuleFromDomain(rule)
 	if err != nil {
 		return model.FirewallRule{}, err
 	}
-	ruleKey, err := filter.RuleKey(normalized)
-	if err != nil {
-		return model.FirewallRule{}, err
-	}
-	return model.FirewallRule{
-		UUID:               uuid.NewString(),
-		ScopeKey:           normalized.Scope.Key(),
-		Provider:           string(normalized.Scope.Provider),
-		Family:             string(normalized.Scope.Family),
-		Location:           legacyHostFirewallLocation(normalized.Scope),
-		NativeKind:         string(normalized.NativeKind),
-		Protocol:           normalized.Protocol,
-		SourceAddress:      normalized.SourceAddress,
-		SourcePort:         normalized.SourcePort,
-		DestinationAddress: normalized.DestinationAddress,
-		DestinationPort:    normalized.DestinationPort,
-		Interface:          normalized.Interface,
-		ConnectionStates:   strings.Join(normalized.ConnectionStates, ","),
-		Action:             string(normalized.Action),
-		Priority:           normalized.Priority,
-		OrderIndex:         normalized.OrderIndex,
-		OrderBucket:        normalized.OrderBucket,
-		Description:        normalized.Description,
-		RuleKey:            ruleKey,
-		Origin:             constant.FirewallRuleOriginAdopted,
-		Owner:              constant.FirewallRuleSourceUser,
-		Revision:           1,
-	}, nil
-}
-
-func legacyHostFirewallLocation(scope filter.Scope) string {
-	switch scope.Provider {
-	case filter.ProviderFirewalld:
-		return scope.Zone
-	default:
-		return scope.Chain
-	}
+	record.UUID = uuid.NewString()
+	record.Origin = constant.FirewallRuleOriginAdopted
+	record.Owner = constant.FirewallRuleSourceUser
+	record.Revision = 1
+	return record, nil
 }
 
 func importLegacyHostFirewallRules(tx *gorm.DB, rules []model.FirewallRule) error {

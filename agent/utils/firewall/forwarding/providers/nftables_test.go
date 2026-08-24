@@ -41,7 +41,7 @@ func TestNormalizeNftForwardRuleRejectsScriptTokens(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			rule := base
 			test.mutate(&rule)
-			if _, err := normalizeNftForwardRule(rule); err == nil {
+			if _, err := NormalizeRule(rule); err == nil {
 				t.Fatal("expected invalid nftables forwarding rule")
 			}
 		})
@@ -123,14 +123,14 @@ func TestRebuildNftIPv6ForwardCommands(t *testing.T) {
 }
 
 func TestNormalizeForwardRuleEnforcesAddressFamily(t *testing.T) {
-	ipv6, err := normalizeForwardRule(forwarding.Rule{Family: forwarding.FamilyIPv6, Protocol: "tcp", Port: "8080", TargetIP: "2001:db8::2", TargetPort: "80"})
+	ipv6, err := NormalizeRule(forwarding.Rule{Family: forwarding.FamilyIPv6, Protocol: "tcp", Port: "8080", TargetIP: "2001:db8::2", TargetPort: "80"})
 	if err != nil || ipv6.TargetIP != "2001:db8::2" {
 		t.Fatalf("normalize IPv6 rule = %#v, %v", ipv6, err)
 	}
-	if _, err := normalizeForwardRule(forwarding.Rule{Family: forwarding.FamilyIPv6, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80"}); err == nil {
+	if _, err := NormalizeRule(forwarding.Rule{Family: forwarding.FamilyIPv6, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80"}); err == nil {
 		t.Fatal("expected an IPv4 target to be rejected for an IPv6 rule")
 	}
-	loopback, err := normalizeForwardRule(forwarding.Rule{Family: forwarding.FamilyIPv6, Protocol: "udp", Port: "5353", TargetPort: "53"})
+	loopback, err := NormalizeRule(forwarding.Rule{Family: forwarding.FamilyIPv6, Protocol: "udp", Port: "5353", TargetPort: "53"})
 	if err != nil || loopback.TargetIP != "::1" {
 		t.Fatalf("IPv6 loopback normalization = %#v, %v", loopback, err)
 	}

@@ -1,6 +1,10 @@
 package forwarding
 
-import "github.com/1Panel-dev/1Panel/agent/constant"
+import (
+	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/constant"
+)
 
 const (
 	FamilyIPv4 = constant.FirewallFamilyIPv4
@@ -23,6 +27,10 @@ type Rule struct {
 	TargetIP   string
 	TargetPort string
 	Interface  string
+}
+
+func (r Rule) Identity() string {
+	return strings.Join([]string{r.Family, r.Protocol, r.Port, r.TargetIP, r.TargetPort, r.Interface}, "\x00")
 }
 
 type OperationType string

@@ -3,6 +3,7 @@ package v2
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -39,4 +40,31 @@ func TestHandleFirewallRuleErrorReturnsStableBusinessCode(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestNormalizeFirewallRuleUUID(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	t.Run("trims valid UUID", func(t *testing.T) {
+		recorder := httptest.NewRecorder()
+		context, _ := gin.CreateTestContext(recorder)
+		value := "  managed-rule  "
+		if !normalizeFirewallRuleUUID(context, &value) || value != "managed-rule" {
+			t.Fatalf("normalized UUID = %q", value)
+		}
+	})
+	t.Run("rejects blank UUID", func(t *testing.T) {
+		recorder := httptest.NewRecorder()
+		context, _ := gin.CreateTestContext(recorder)
+		value := "   "
+		if normalizeFirewallRuleUUID(context, &value) {
+			t.Fatal("blank UUID was accepted")
+		}
+		var response dto.Response
+		if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
+			t.Fatalf("decode response: %v", err)
+		}
+		if recorder.Code != http.StatusOK || response.Code != http.StatusBadRequest {
+			t.Fatalf("transport status = %d, response = %#v", recorder.Code, response)
+		}
+	})
 }

@@ -1,3 +1,5 @@
+import { normalizePortRange } from '@/views/host/firewall/utils/validation';
+
 export type WhiteListFamily = 'ipv4' | 'ipv6';
 export type WhiteListProtocol = 'tcp' | 'udp';
 
@@ -7,27 +9,13 @@ export interface WhiteListRule {
     port: string;
 }
 
-const normalizePort = (value: string): string => {
-    const input = value.trim().replace(':', '-');
-    const parts = input.split('-');
-    if (parts.length > 2 || parts.some((part) => !/^\d+$/.test(part))) {
-        throw new Error('invalid port');
-    }
-    const start = Number(parts[0]);
-    const end = parts.length === 2 ? Number(parts[1]) : start;
-    if (start < 1 || start > 65535 || end < 1 || end > 65535 || start > end) {
-        throw new Error('invalid port');
-    }
-    return start === end ? String(start) : `${start}-${end}`;
-};
-
 export const normalizeWhiteListRule = (rule: WhiteListRule): WhiteListRule => {
     const family = rule.family?.toLowerCase() as WhiteListFamily;
     const protocol = rule.protocol?.toLowerCase() as WhiteListProtocol;
     if (!['ipv4', 'ipv6'].includes(family) || !['tcp', 'udp'].includes(protocol)) {
         throw new Error('invalid whitelist rule');
     }
-    return { family, protocol, port: normalizePort(rule.port) };
+    return { family, protocol, port: normalizePortRange(rule.port) };
 };
 
 export const whiteListRuleKey = (rule: WhiteListRule): string => {

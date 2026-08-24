@@ -191,6 +191,13 @@ import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import ErrDialog from './err-message.vue';
+import {
+    inferAddressFamily,
+    isValidIPOrCIDR,
+    isValidPortRange,
+    normalizePortRange,
+    splitTagValues,
+} from '@/views/host/firewall/utils/validation';
 
 const provider = ref<Firewall.Provider>('iptables');
 const mode = ref<'create' | 'edit'>('create');
@@ -239,61 +246,6 @@ const form = reactive({
 });
 
 const defaultFamily = (): Firewall.Family => 'ipv4';
-const splitTagValues = (values: string[]) => [
-    ...new Set(
-        values
-            .flatMap((value) => value.split(/[,，;；\s]+/))
-            .map((value) => value.trim())
-            .filter(Boolean),
-    ),
-];
-
-const isValidIPv4Address = (value: string) => {
-    const parts = value.split('.');
-    return (
-        parts.length === 4 &&
-        parts.every((part) => /^(0|[1-9]\d{0,2})$/.test(part) && Number(part) >= 0 && Number(part) <= 255)
-    );
-};
-
-const isValidIPv6Address = (value: string) => {
-    if (!value.includes(':') || value.includes(':::') || (value.match(/::/g) || []).length > 1) return false;
-
-    let normalized = value;
-    if (normalized.includes('.')) {
-        const separator = normalized.lastIndexOf(':');
-        if (separator < 0 || !isValidIPv4Address(normalized.slice(separator + 1))) return false;
-        normalized = `${normalized.slice(0, separator)}:0:0`;
-    }
-
-    const compressed = normalized.includes('::');
-    const [left = '', right = ''] = normalized.split('::');
-    const groups = [...(left ? left.split(':') : []), ...(right ? right.split(':') : [])];
-    if (groups.some((group) => !/^[\da-f]{1,4}$/i.test(group))) return false;
-    return compressed ? groups.length < 8 : groups.length === 8;
-};
-
-const isValidIPOrCIDR = (value: string) => {
-    const slash = value.indexOf('/');
-    if (slash !== value.lastIndexOf('/')) return false;
-    const address = slash === -1 ? value : value.slice(0, slash);
-    const prefix = slash === -1 ? undefined : value.slice(slash + 1);
-    const ipv6 = address.includes(':');
-    if (!(ipv6 ? isValidIPv6Address(address) : isValidIPv4Address(address))) return false;
-    if (prefix === undefined) return true;
-    if (!/^\d{1,3}$/.test(prefix)) return false;
-    const prefixNumber = Number(prefix);
-    return prefixNumber >= 0 && prefixNumber <= (ipv6 ? 128 : 32);
-};
-
-const isValidPort = (value: string) => {
-    const matched = value.match(/^(\d+)(?:-(\d+))?$/);
-    if (!matched) return false;
-    const start = Number(matched[1]);
-    const end = matched[2] === undefined ? start : Number(matched[2]);
-    return start >= 1 && start <= 65535 && end >= start && end <= 65535;
-};
-
 type ValidationCallback = (error?: Error) => void;
 const hasRuleTarget = () =>
     splitTagValues(form.sourceAddresses.map((item) => item.address)).length > 0 ||
@@ -322,7 +274,7 @@ const validateSourceAddresses = (_rule: unknown, value: SourceAddressItem[], cal
 
 const validateDestinationPorts = (_rule: unknown, value: string[], callback: ValidationCallback) => {
     const ports = splitTagValues(value || []);
-    if (ports.some((port) => !isValidPort(port))) {
+    if (ports.some((port) => !isValidPortRange(port))) {
         callback(new Error(i18n.global.t('commons.rule.port')));
         return;
     }
@@ -345,8 +297,6 @@ const wildcardAddress = (family: Firewall.Family) => {
 const wildcardAddressLabel = (family: Firewall.Family) =>
     `${wildcardAddress(family)}（${i18n.global.t('firewall.anyWhere')}）`;
 const isWildcardAddress = (_family: Firewall.Family, address?: string) => !address?.trim();
-const inferAddressFamily = (address: string): Firewall.Family => (address.includes(':') ? 'ipv6' : 'ipv4');
-
 const priorityFieldLabel = computed(() => i18n.global.t('firewall.priority'));
 const showPriorityField = computed(() => {
     if (provider.value !== 'firewalld') return mode.value === 'edit';
@@ -468,14 +418,7 @@ const normalizeSourceAddresses = () => {
     return true;
 };
 const normalizeDestinationPorts = (values = form.destinationPorts) => {
-    const normalized = [
-        ...new Set(
-            values
-                .flatMap((value) => value.split(/[,，;；\s]+/))
-                .map((value) => value.trim())
-                .filter(Boolean),
-        ),
-    ];
+    const normalized = splitTagValues(values).map(normalizePortRange);
     if (provider.value === 'ufw' || provider.value === 'iptables') {
         form.destinationPorts = [normalized.join(',')];
         return true;

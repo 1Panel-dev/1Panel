@@ -177,7 +177,7 @@ type DockerPortGuardOperation struct {
 }
 
 type FirewallRuleCheckItem struct {
-	UUID string              `json:"uuid"`
+	UUID string              `json:"uuid" validate:"omitempty,max=64"`
 	Rule filter.FirewallRule `json:"rule" validate:"required"`
 }
 
@@ -233,12 +233,12 @@ type FirewallRuleDeleteFailure struct {
 }
 
 type FirewallRuleUpdate struct {
-	UUID string              `json:"uuid"`
+	UUID string              `json:"uuid" validate:"required,max=64"`
 	Rule filter.FirewallRule `json:"rule" validate:"required"`
 }
 
 type FirewallRuleReorder struct {
-	UUID           string `json:"uuid"`
+	UUID           string `json:"uuid" validate:"required,max=64"`
 	TargetPosition *int64 `json:"targetPosition"`
 	Priority       *int   `json:"priority"`
 }

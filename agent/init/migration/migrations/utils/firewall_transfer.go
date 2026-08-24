@@ -113,10 +113,7 @@ func importLegacyForwardingRules(ctx context.Context, db *gorm.DB, rules []forwa
 		if err != nil {
 			return fmt.Errorf("normalize legacy forwarding rule: %w", err)
 		}
-		key := strings.Join([]string{
-			normalized.Family, normalized.Protocol, normalized.Port, normalized.TargetIP,
-			normalized.TargetPort, normalized.Interface,
-		}, "\x00")
+		key := normalized.Identity()
 		if _, exists := seen[key]; exists {
 			continue
 		}

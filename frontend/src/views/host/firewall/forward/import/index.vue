@@ -84,7 +84,7 @@ import i18n from '@/lang';
 import { getNetworkOptions } from '@/api/modules/host';
 import { operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
 import { Firewall } from '@/api/interface/firewall';
-import { checkIp, checkIpV6 } from '@/utils/validate';
+import { isValidAddressForFamily, isValidPortRange, normalizePortRange } from '@/views/host/firewall/utils/validation';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -156,6 +156,8 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
                     loading.value = false;
                     return;
                 }
+                item.port = normalizePortRange(item.port);
+                item.targetPort = normalizePortRange(item.targetPort);
             }
 
             compareRules(parsed);
@@ -180,10 +182,11 @@ const checkDataFormat = (item: any): boolean => {
         return false;
     }
     if (!['ipv4', 'ipv6'].includes(item.family)) return false;
-    if (item.family === 'ipv6' ? checkIpV6(item.targetIP) : checkIp(item.targetIP)) return false;
+    if (!isValidAddressForFamily(item.family, item.targetIP, false)) return false;
     if (!['tcp', 'udp', 'tcp/udp'].includes(item.protocol)) {
         return false;
     }
+    if (!isValidPortRange(item.port) || !isValidPortRange(item.targetPort)) return false;
 
     if (
         (currentFireName.value === 'iptables' || currentFireName.value === 'nftables') &&

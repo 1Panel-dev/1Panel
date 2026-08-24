@@ -1,6 +1,10 @@
 package model
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
+)
 
 type DockerPortGuardPolicy struct {
 	BaseModel
@@ -61,4 +65,55 @@ func FirewallRuleOwner(sourceKind, sourceID string) string {
 		return sourceKind
 	}
 	return sourceKind + ":" + sourceID
+}
+
+func FirewallRuleFromDomain(rule filter.FirewallRule) (FirewallRule, error) {
+	normalized, err := filter.NormalizeRule(rule)
+	if err != nil {
+		return FirewallRule{}, err
+	}
+	ruleKey, err := filter.RuleKey(normalized)
+	if err != nil {
+		return FirewallRule{}, err
+	}
+	return FirewallRule{
+		ScopeKey:           normalized.Scope.Key(),
+		Provider:           string(normalized.Scope.Provider),
+		Family:             string(normalized.Scope.Family),
+		Location:           firewallRuleLocation(normalized.Scope),
+		NativeKind:         string(normalized.NativeKind),
+		Protocol:           normalized.Protocol,
+		SourceAddress:      normalized.SourceAddress,
+		SourcePort:         normalized.SourcePort,
+		DestinationAddress: normalized.DestinationAddress,
+		DestinationPort:    normalized.DestinationPort,
+		Interface:          normalized.Interface,
+		ConnectionStates:   strings.Join(normalized.ConnectionStates, ","),
+		Action:             string(normalized.Action),
+		Priority:           normalized.Priority,
+		OrderIndex:         persistedFirewallOrderIndex(normalized),
+		OrderBucket:        normalized.OrderBucket,
+		Description:        normalized.Description,
+		RuleKey:            ruleKey,
+	}, nil
+}
+
+func persistedFirewallOrderIndex(rule filter.FirewallRule) *int64 {
+	switch rule.Scope.Provider {
+	case filter.ProviderIptables, filter.ProviderNftables, filter.ProviderUFW:
+		return nil
+	default:
+		return rule.OrderIndex
+	}
+}
+
+func firewallRuleLocation(scope filter.Scope) string {
+	switch scope.Provider {
+	case filter.ProviderFirewalld:
+		return scope.Zone
+	case filter.ProviderIptables, filter.ProviderNftables, filter.ProviderUFW:
+		return scope.Chain
+	default:
+		return ""
+	}
 }

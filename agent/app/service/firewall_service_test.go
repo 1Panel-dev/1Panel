@@ -1422,7 +1422,7 @@ func TestMergeFirewallInventoryMapsPersistenceOwnershipAndUsage(t *testing.T) {
 	}
 	position := 1
 	marker := "onepanel:created:ssh"
-	stored, err := firewallRuleSemanticModel(domainRule)
+	stored, err := model.FirewallRuleFromDomain(domainRule)
 	if err != nil {
 		t.Fatalf("build stored rule: %v", err)
 	}

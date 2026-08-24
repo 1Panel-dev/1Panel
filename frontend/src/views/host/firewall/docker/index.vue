@@ -110,6 +110,7 @@ import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { downloadWithContent } from '@/utils/file';
 import { getCurrentDateFormatted } from '@/utils/date';
+import { dockerGuardEndpointKey } from '@/views/host/firewall/docker/model';
 
 const loading = ref(false);
 const detailRef = ref<InstanceType<typeof DockerGuardDetail>>();
@@ -178,7 +179,7 @@ const policies = computed<Firewall.DockerGuardPolicy[]>(() => {
     for (const container of data.containers) {
         for (const endpoint of container.endpoints) {
             if (!endpoint.policyUUID || !endpoint.mode) continue;
-            const key = `${endpoint.family}|${endpoint.hostIP}|${endpoint.hostPort}|${endpoint.protocol}`;
+            const key = dockerGuardEndpointKey(endpoint);
             result.set(key, {
                 family: endpoint.family,
                 hostIP: endpoint.hostIP,

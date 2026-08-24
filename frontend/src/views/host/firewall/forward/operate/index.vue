@@ -63,8 +63,8 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { Firewall } from '@/api/interface/firewall';
 import { getNetworkOptions } from '@/api/modules/host';
 import { operateForwardRule } from '@/api/modules/firewall';
-import { checkIp, checkIpV6, checkPort } from '@/utils/validate';
 import { deepCopy } from '@/utils/misc';
+import { isValidAddressForFamily, isValidPortRange, normalizePortRange } from '@/views/host/firewall/utils/validation';
 const loading = ref();
 const oldRule = ref<Firewall.RuleForward>();
 
@@ -113,23 +113,12 @@ function checkPortRule(rule: any, value: string, callback: any) {
     callback();
 }
 
-function isValidPortRange(value: string) {
-    if (!value) return false;
-    if (value.indexOf('-') !== -1) {
-        const ports = value.split('-');
-        if (ports.length !== 2) return false;
-        if (checkPort(ports[0]) || checkPort(ports[1])) return false;
-        return Number(ports[0]) <= Number(ports[1]);
-    }
-    return !checkPort(value);
-}
 function checkAddress(rule: any, value: string, callback: any) {
     if (!value) {
         return callback();
     }
     const family = dialogData.value.rowData?.family || 'ipv4';
-    const invalid = family === 'ipv6' ? checkIpV6(value) : checkIp(value);
-    if (invalid) {
+    if (!isValidAddressForFamily(family, value, false)) {
         return callback(new Error(i18n.global.t('firewall.addressFormatError')));
     }
     callback();
@@ -150,6 +139,8 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         let rules = [];
+        rowData.port = normalizePortRange(rowData.port);
+        rowData.targetPort = normalizePortRange(rowData.targetPort);
         rowData.operation = 'add';
         if (rowData.targetIP === '') {
             rowData.targetIP = rowData.family === 'ipv6' ? '::1' : '127.0.0.1';

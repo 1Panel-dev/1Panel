@@ -284,9 +284,7 @@ func (b *BaseApi) UpdateFirewallRule(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	request.UUID = strings.TrimSpace(request.UUID)
-	if request.UUID == "" {
-		helper.BadRequest(c, repo.ErrFirewallPersistenceInvalid)
+	if !normalizeFirewallRuleUUID(c, &request.UUID) {
 		return
 	}
 	if err := firewallService.Update(c.Request.Context(), c.ClientIP(), request); err != nil {
@@ -311,9 +309,7 @@ func (b *BaseApi) ReorderFirewallRule(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	request.UUID = strings.TrimSpace(request.UUID)
-	if request.UUID == "" {
-		helper.BadRequest(c, repo.ErrFirewallPersistenceInvalid)
+	if !normalizeFirewallRuleUUID(c, &request.UUID) {
 		return
 	}
 	if err := firewallService.Reorder(c.Request.Context(), c.ClientIP(), request); err != nil {
@@ -321,6 +317,19 @@ func (b *BaseApi) ReorderFirewallRule(c *gin.Context) {
 		return
 	}
 	helper.Success(c)
+}
+
+func normalizeFirewallRuleUUID(c *gin.Context, value *string) bool {
+	if value == nil {
+		helper.BadRequest(c, repo.ErrFirewallPersistenceInvalid)
+		return false
+	}
+	*value = strings.TrimSpace(*value)
+	if *value == "" {
+		helper.BadRequest(c, repo.ErrFirewallPersistenceInvalid)
+		return false
+	}
+	return true
 }
 
 func handleFirewallRuleError(c *gin.Context, err error) {
