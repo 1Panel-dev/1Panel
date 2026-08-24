@@ -9,7 +9,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/toolbox"
 )
 
@@ -109,7 +108,7 @@ func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
 			if req.Value == "firewallcmd-ipset" {
 				itemName = "firewalld"
 			}
-			client, err := firewall.NewFirewallClient()
+			client, err := NewSelectedSystemFirewallClient()
 			if err != nil {
 				return err
 			}

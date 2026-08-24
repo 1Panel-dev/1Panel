@@ -1,10 +1,15 @@
 package forwarding
 
 import (
-	"errors"
+	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/constant"
 )
 
 const (
+	FamilyIPv4 = constant.FirewallFamilyIPv4
+	FamilyIPv6 = constant.FirewallFamilyIPv6
+
 	ChainPreRouting  = "1PANEL_PREROUTING"
 	ChainPostRouting = "1PANEL_POSTROUTING"
 	ChainForward     = "1PANEL_FORWARD"
@@ -16,6 +21,7 @@ const (
 
 type Rule struct {
 	Num        string
+	Family     string
 	Protocol   string
 	Port       string
 	TargetIP   string
@@ -23,24 +29,24 @@ type Rule struct {
 	Interface  string
 }
 
-// Adapter is the complete provider-specific forwarding surface. Filter
-// clients intentionally do not implement any of these methods.
+func (r Rule) Identity() string {
+	return strings.Join([]string{r.Family, r.Protocol, r.Port, r.TargetIP, r.TargetPort, r.Interface}, "\x00")
+}
+
+type OperationType string
+
+const (
+	OperationAdd    OperationType = "add"
+	OperationRemove OperationType = "remove"
+)
+
 type Adapter interface {
 	Name() string
 	List() ([]Rule, error)
-	Operate(rule Rule, operation string) error
+	Reconcile(rules []Rule) error
 	Enable() error
-	InitStatus() (bool, bool)
+	Cleanup() error
+	InitStatus() (bool, bool, error)
+	FamilyStatus(family string) (bool, bool, error)
 	Replay() error
-}
-
-func NewAdapter(provider string) (Adapter, error) {
-	switch provider {
-	case "firewalld":
-		return newFirewalldAdapter(), nil
-	case "ufw", "iptables":
-		return newLegacyNATAdapter(provider), nil
-	default:
-		return nil, errors.New("unsupported forwarding provider: " + provider)
-	}
 }

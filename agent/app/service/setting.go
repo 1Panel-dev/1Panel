@@ -18,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 	"github.com/jinzhu/copier"
@@ -126,7 +127,7 @@ func (u *SettingService) GetWebsiteDir() string {
 func (u *SettingService) Update(key, value string) error {
 	oldValue := constant.FirewallPortWhiteListValue
 	if key == constant.FirewallPortWhiteList {
-		if _, err := parseFirewallPortWhiteList(value); err != nil {
+		if _, err := firewall.ParsePortWhitelist(value); err != nil {
 			return err
 		}
 		if val, err := settingRepo.GetValueByKey(key); err == nil {
@@ -137,7 +138,7 @@ func (u *SettingService) Update(key, value string) error {
 		return err
 	}
 	if key == constant.FirewallPortWhiteList {
-		return syncFirewallPortWhiteListAfterUpdate(oldValue)
+		return SyncFirewallPortWhitelistAfterUpdate(oldValue)
 	}
 	return nil
 }

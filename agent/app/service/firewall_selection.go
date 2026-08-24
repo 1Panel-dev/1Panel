@@ -1,0 +1,49 @@
+package service
+
+import (
+	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
+)
+
+func selectedDockerFirewallBackend(fallback string) string {
+	selected := ""
+	if global.DB != nil {
+		selected, _ = settingRepo.GetValueByKey(constant.FirewallDockerBackendKey)
+	}
+	selected = strings.ToLower(strings.TrimSpace(selected))
+	if selected == constant.FirewallProviderIptables || selected == constant.FirewallProviderNftables {
+		return selected
+	}
+	fallback = strings.ToLower(strings.TrimSpace(fallback))
+	if fallback == constant.FirewallProviderNftables {
+		return fallback
+	}
+	return constant.FirewallProviderIptables
+}
+
+func selectedSystemFirewallClient() (lifecycle.Client, error) {
+	if provider, _ := settingRepo.GetValueByKey(constant.FirewallSystemBackendKey); strings.TrimSpace(provider) != "" {
+		return lifecycle.NewClientFor(strings.TrimSpace(provider))
+	}
+	client, err := lifecycle.NewClient()
+	if err != nil {
+		return nil, err
+	}
+	_ = settingRepo.UpdateOrCreate(constant.FirewallSystemBackendKey, client.Name())
+	return client, nil
+}
+
+func NewSelectedSystemFirewallClient() (lifecycle.Client, error) {
+	return selectedSystemFirewallClient()
+}
+
+func selectedSystemFirewallProvider() (string, error) {
+	client, err := selectedSystemFirewallClient()
+	if err != nil {
+		return "", err
+	}
+	return client.Name(), nil
+}

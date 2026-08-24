@@ -8,7 +8,16 @@ import (
 )
 
 func Init() {
-	m := gormigrate.New(global.DB, gormigrate.DefaultOptions, []*gormigrate.Migration{
+	m := gormigrate.New(global.DB, gormigrate.DefaultOptions, coreMigrations())
+	if err := m.Migrate(); err != nil {
+		global.LOG.Error(err)
+		panic(err)
+	}
+	global.LOG.Info("Migration run successfully")
+}
+
+func coreMigrations() []*gormigrate.Migration {
+	return []*gormigrate.Migration{
 		migrations.AddTable,
 		migrations.InitSetting,
 		migrations.InitOneDrive,
@@ -55,10 +64,6 @@ func Init() {
 		migrations.AddAllowIPTrustedProxiesSetting,
 		migrations.AddWebsiteTemplateMenu,
 		migrations.RepairXpackAppMenus,
-	})
-	if err := m.Migrate(); err != nil {
-		global.LOG.Error(err)
-		panic(err)
+		migrations.UpdateFirewallMenuPath,
 	}
-	global.LOG.Info("Migration run successfully")
 }

@@ -25,6 +25,10 @@ type ForwardRule struct {
 
 	UsedStatus  string `json:"usedStatus"`
 	Description string `json:"description"`
+
+	IsDesired  bool   `json:"isDesired"`
+	IsRuntime  bool   `json:"isRuntime"`
+	SyncStatus string `json:"syncStatus"`
 }
 
 type ForwardRuleOperate struct {
@@ -35,6 +39,7 @@ type ForwardRuleOperate struct {
 type ForwardRuleOperation struct {
 	Operation  string `json:"operation" validate:"required,oneof=add remove"`
 	Num        string `json:"num"`
+	Family     string `json:"family" validate:"omitempty,oneof=ipv4 ipv6"`
 	Protocol   string `json:"protocol" validate:"required,oneof=tcp udp tcp/udp"`
 	Interface  string `json:"interface"`
 	Port       string `json:"port" validate:"required"`

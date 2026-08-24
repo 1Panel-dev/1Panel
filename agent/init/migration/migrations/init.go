@@ -22,7 +22,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/ping"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
@@ -56,8 +56,8 @@ var AddTable = &gormigrate.Migration{
 			&model.DatabasePostgresql{},
 			&model.Favorite{},
 			&model.FileShare{},
-			&model.Firewall{},
 			&model.Host{},
+			&model.FirewallRule{},
 			&model.Ftp{},
 			&model.ImageRepo{},
 			&model.ScriptLibrary{},
@@ -911,31 +911,6 @@ var UpdateMonitorInterval = &gormigrate.Migration{
 	},
 }
 
-var AddIptablesFilterRuleTable = &gormigrate.Migration{
-	ID: "20251106-add-iptables-filter-rule-table",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.Firewall{}); err != nil {
-			return err
-		}
-		var firewalls []model.Firewall
-		_ = tx.Where("1 = 1").Find(&firewalls).Error
-
-		firewallType := ""
-		client, err := firewall.NewFirewallClient()
-		if err == nil {
-			firewallType = client.Name()
-		}
-		for _, item := range firewalls {
-			if err := tx.Model(&model.Firewall{}).
-				Where("id = ?", item.ID).
-				Updates(map[string]interface{}{"dst_port": item.Port, "src_ip": item.Address, "firewall_type": firewallType}); err != nil {
-				global.LOG.Errorf("update firewall failed, err: %v", err)
-			}
-		}
-		return nil
-	},
-}
-
 var AddMonitorProcess = &gormigrate.Migration{
 	ID: "20251030-add-monitor-process",
 	Migrate: func(tx *gorm.DB) error {
@@ -1024,15 +999,6 @@ var InitIptablesStatus = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "IptablesForwardStatus", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "IptablesInputStatus", Value: constant.StatusDisable}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.Setting{Key: "IptablesOutputStatus", Value: constant.StatusDisable}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.Setting{Key: constant.FirewallPortWhiteList, Value: constant.FirewallPortWhiteListValue}).Error; err != nil {
-			return err
-		}
 		return nil
 	},
 }
@@ -1068,7 +1034,7 @@ var AddisIPtoWebsiteSSL = &gormigrate.Migration{
 var InitPingStatus = &gormigrate.Migration{
 	ID: "20251201-init-ping-status",
 	Migrate: func(tx *gorm.DB) error {
-		status := firewall.LoadPingStatus()
+		status := ping.LoadStatus()
 		if err := tx.Create(&model.Setting{Key: "BanPing", Value: status}).Error; err != nil {
 			return err
 		}
@@ -1715,5 +1681,22 @@ var AddComposePinned = &gormigrate.Migration{
 	ID: "20260729-add-compose-pinned",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.Compose{})
+	},
+}
+
+var AddFirewallRuleTable = &gormigrate.Migration{
+	ID: "20260819-add-firewall-v2-tables",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.FirewallRule{}, &model.DockerPortGuardPolicy{}, &model.ForwardingRule{})
+	},
+}
+
+var InitDockerPortGuardStatus = &gormigrate.Migration{
+	ID: "20260818-init-docker-port-guard-status",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.Where("key = ?", "DockerPortGuardStatus").FirstOrCreate(&model.Setting{
+			Key:   "DockerPortGuardStatus",
+			Value: constant.StatusDisable,
+		}).Error
 	},
 }

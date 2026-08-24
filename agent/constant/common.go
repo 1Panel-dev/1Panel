@@ -7,9 +7,6 @@ const (
 
 	SystemRestart = "systemRestart"
 
-	FirewallPortWhiteList      = "FirewallPortWhiteList"
-	FirewallPortWhiteListValue = "80/tcp,443/tcp,443/udp"
-
 	TypeWebsite       = "website"
 	TypePhp           = "php"
 	TypeSSL           = "ssl"

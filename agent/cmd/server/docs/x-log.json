@@ -3603,41 +3603,62 @@
 		"formatZH": "卸载磁盘 [device] 从 [mountPoint]",
 		"formatEN": "Unmount disk [device] from [mountPoint]"
 	},
+	"/hosts/firewall/docker/operate": {
+		"bodyKeys": [
+			"operation"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "[operation] Docker 端口防护",
+		"formatEN": "[operation] Docker port guard"
+	},
+	"/hosts/firewall/docker/policies/batch": {
+		"bodyKeys": [
+			"mode"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "批量更新 Docker 端口防护策略 [mode]",
+		"formatEN": "batch update Docker port guard policies [mode]"
+	},
+	"/hosts/firewall/docker/policies/delete/batch": {
+		"bodyKeys": [
+			"uuids"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 Docker 端口防护策略 [uuids]",
+		"formatEN": "delete Docker port guard policies [uuids]"
+	},
+	"/hosts/firewall/docker/sync": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步 Docker 端口防护规则",
+		"formatEN": "sync Docker port guard rules"
+	},
 	"/hosts/firewall/filter/operate": {
 		"bodyKeys": [
 			"operate"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "[operate] iptables filter 防火墙",
-		"formatEN": "[operate] iptables filter firewall"
+		"formatZH": "[operate] 防火墙过滤链",
+		"formatEN": "[operate] firewall filter chain"
 	},
-	"/hosts/firewall/filter/rule/operate": {
-		"bodyKeys": [
-			"operation",
-			"chain"
-		],
+	"/hosts/firewall/forward/enable": {
+		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "[operation] filter规则到 [chain]",
-		"formatEN": "[operation] filter rule to [chain]"
+		"formatZH": "初始化并启用端口转发",
+		"formatEN": "initialize and enable port forwarding"
 	},
-	"/hosts/firewall/forward": {
+	"/hosts/firewall/forward/operate": {
 		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
 		"formatZH": "更新端口转发规则",
 		"formatEN": "update port forward rules"
-	},
-	"/hosts/firewall/ip": {
-		"bodyKeys": [
-			"strategy",
-			"address"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "添加 ip 规则 [strategy] [address]",
-		"formatEN": "create address rules [strategy][address]"
 	},
 	"/hosts/firewall/operate": {
 		"bodyKeys": [
@@ -3648,15 +3669,48 @@
 		"formatZH": "[operation] 防火墙",
 		"formatEN": "[operation] firewall"
 	},
-	"/hosts/firewall/port": {
+	"/hosts/firewall/rules": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "添加防火墙规则",
+		"formatEN": "create firewall rules"
+	},
+	"/hosts/firewall/rules/delete": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除防火墙规则",
+		"formatEN": "delete firewall rules"
+	},
+	"/hosts/firewall/rules/reorder": {
 		"bodyKeys": [
-			"port",
-			"strategy"
+			"uuid"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "添加端口规则 [strategy] [port]",
-		"formatEN": "create port rules [strategy][port]"
+		"formatZH": "调整防火墙规则顺序 [uuid]",
+		"formatEN": "reorder firewall rule [uuid]"
+	},
+	"/hosts/firewall/rules/update": {
+		"bodyKeys": [
+			"uuid"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新防火墙规则 [uuid]",
+		"formatEN": "update firewall rule [uuid]"
+	},
+	"/hosts/firewall/settings/operate": {
+		"bodyKeys": [
+			"subsystem",
+			"backend",
+			"operation"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "防火墙子系统 [subsystem] 后端 [operation] [backend]",
+		"formatEN": "[operation] firewall [subsystem] backend [backend]"
 	},
 	"/hosts/monitor/clean": {
 		"bodyKeys": [],

@@ -15,7 +15,15 @@ func Init() {
 }
 
 func InitAgentDB() {
-	m := gormigrate.New(global.DB, gormigrate.DefaultOptions, []*gormigrate.Migration{
+	m := gormigrate.New(global.DB, gormigrate.DefaultOptions, agentDBMigrations())
+	if err := m.Migrate(); err != nil {
+		global.LOG.Error(err)
+		panic(err)
+	}
+}
+
+func agentDBMigrations() []*gormigrate.Migration {
+	return []*gormigrate.Migration{
 		migrations.AddTable,
 		migrations.AddMonitorTable,
 		migrations.InitSetting,
@@ -54,7 +62,6 @@ func InitAgentDB() {
 		migrations.AddMonitorProcess,
 		migrations.UpdateCronJob,
 		migrations.UpdateTensorrtLLM,
-		migrations.AddIptablesFilterRuleTable,
 		migrations.AddCommonDescription,
 		migrations.UpdateDatabase,
 		migrations.AddGPUMonitor,
@@ -97,10 +104,8 @@ func InitAgentDB() {
 		migrations.AddFtpIdentity,
 		migrations.AddWebsiteTemplateTable,
 		migrations.AddComposePinned,
-	})
-	if err := m.Migrate(); err != nil {
-		global.LOG.Error(err)
-		panic(err)
+		migrations.AddFirewallRuleTable,
+		migrations.InitDockerPortGuardStatus,
 	}
 }
 
