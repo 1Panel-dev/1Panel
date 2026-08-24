@@ -35,8 +35,10 @@ type FirewallBackendOption struct {
 }
 
 type FirewallBackendFamilyStatus struct {
-	Initialized bool `json:"initialized"`
-	Bound       bool `json:"bound"`
+	Available   bool   `json:"available"`
+	Initialized bool   `json:"initialized"`
+	Bound       bool   `json:"bound"`
+	Reason      string `json:"reason,omitempty"`
 }
 
 type FirewallBackendGroup struct {
@@ -61,7 +63,7 @@ type FirewallBackendOperation struct {
 
 type FilterChainOperation struct {
 	Name    string `json:"name" validate:"required,eq=1PANEL_BASIC"`
-	Operate string `json:"operate" validate:"required,oneof=init-base init-ipv6-base bind-base unbind-base"`
+	Operate string `json:"operate" validate:"required,oneof=init-base bind-base unbind-base"`
 }
 
 type FirewallSystemPort struct {
@@ -100,6 +102,7 @@ type FirewallNativeDetail struct {
 
 type DockerPortGuardBase struct {
 	Name        string                      `json:"name"`
+	Version     string                      `json:"version"`
 	Initialized bool                        `json:"initialized"`
 	Bound       bool                        `json:"bound"`
 	IPv4        DockerPortGuardFamilyStatus `json:"ipv4"`

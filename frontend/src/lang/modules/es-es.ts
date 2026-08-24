@@ -950,6 +950,7 @@ const message = {
             from_remote: 'Este modelo no fue descargado vía 1Panel, no hay registros de descarga relacionados.',
             no_logs: 'Los registros de descarga de este modelo han sido eliminados y no se pueden consultar.',
             vllmVersionHelper: 'Para servidores FusionXpark GB 10, seleccione la versión -cu130.',
+            ascendVisibleDevices: 'Dispositivos Ascend visibles',
             vllmCommandPortHelper:
                 'El comando de inicio debe usar el puerto {0}; de lo contrario, no se podrá acceder al servicio.',
             syncModelAccount: 'Sincronizar con cuenta de modelo',
@@ -1140,6 +1141,7 @@ const message = {
             cachedToken: 'Tokens en caché',
             cacheHitRate: 'Tasa de acierto de caché',
             activeUsers: 'Usuarios activos',
+            activeStreamingRequests: 'Solicitudes de streaming activas',
             activeModels: 'Modelos activos',
             failedRequests: 'Solicitudes fallidas',
             averageTokenPerRequest: 'Tokens promedio/solicitud',
@@ -1444,7 +1446,8 @@ const message = {
         },
         gpu: {
             gpu: 'Monitoreo de GPU',
-            gpuHelper: 'El sistema no detectó comandos NVIDIA-SMI o XPU-SMI. ¡Compruebe e inténtelo de nuevo!',
+            gpuHelper:
+                'No se detectó ningún comando de administración de GPU/XPU/NPU compatible. ¡Compruebe e inténtelo de nuevo!',
             process: 'Información del Proceso',
             type: 'Tipo',
             typeG: 'Gráficos',
@@ -4173,10 +4176,9 @@ const message = {
             'Las reglas importadas se convierten para el backend actual {0}. Las reglas de origen no se modifican.',
         clearAllRulesHelper:
             '¿Eliminar las {0} reglas administrables del backend actual? Esta acción no se puede deshacer.',
-        switchBackendHelper:
-            'Esto solo cambia el backend de firewall administrado por 1Panel. El backend original no se migrará, detendrá ni limpiará. Exporte primero las reglas actuales. Después del cambio, inicialice el backend de destino e importe o verifique manualmente sus reglas. Las reglas externas y nativas del sistema no se exportan. ¿Continuar con el cambio a {0}?',
-        switchBackendSuccessHelper:
-            '1Panel ahora administra {0}. El backend original {1} no se detuvo ni limpió y aún puede estar activo. Inicialice el backend de destino, importe o verifique sus reglas y gestione manualmente el backend original solo después de confirmar que el acceso funciona correctamente.',
+        backendSwitchNotice:
+            'El cambio solo modifica el backend de firewall utilizado actualmente; no migra ni elimina las reglas existentes. Después del cambio, sincronice las reglas con el firewall de destino y confirme que estén activas antes de eliminar las reglas del firewall original.',
+        switchBackendHelper: '¿Cambiar a {0}?',
         uninstalledStatus: 'No instalado',
         initializedStatus: 'Inicializado',
         partiallyInitialized: 'Parcialmente inicializado',
@@ -4185,6 +4187,7 @@ const message = {
         dockerInputNotProtected:
             'Las reglas INPUT del host no protegen directamente este puerto publicado por Docker. Haz clic para abrir la protección de puertos de contenedores.',
         notInitialized: 'No inicializado',
+        familyUnsupported: 'El sistema no admite {0}',
         dockerGuardUnbindConfirm:
             'Después de desvincular, todos los puertos de contenedores volverán temporalmente al acceso predeterminado de Docker. Se conservarán los ajustes de protección existentes. ¿Continuar?',
         deleteDockerGuardPolicyConfirm:
@@ -4238,7 +4241,7 @@ const message = {
         exportHelper: 'A punto de exportar {0} reglas de firewall. ¿Continuar?',
         importSuccess: 'Se importaron correctamente {0} reglas',
         importPartialSuccess: 'Importación completada: {0} correctas, {1} fallidas',
-        basicStatus: 'La cadena actual {0} no está vinculada, ¡vincule primero!',
+        basicStatus: 'El firewall actual no está vinculado. Vincúlelo primero.',
         baseIptables: 'Servicio iptables',
         forwardIptables: 'Servicio de Reenvío de Puertos iptables',
         initMsg: 'A punto de inicializar {0}, ¿continuar?',
@@ -4261,6 +4264,8 @@ const message = {
         reject: 'Rechazar',
         allPorts: 'Todos los Puertos',
         allProtocolHelper: 'Todos los protocolos y puertos',
+        sourceAddressPlaceholder: 'p. ej. 172.16.10.11, 172.16.0.0/24, 2001:db8::1 o 2001:db8::/64',
+        destinationPortPlaceholder: 'p. ej. 80, 80,443 o 8080-8089',
         deleteRuleConfirm: 'Se eliminarán {0} reglas. ¿Continuar?',
         deleteUsedRuleConfirm:
             'Este puerto está siendo utilizado por {0}. Eliminar la regla de acceso puede dejar el servicio inaccesible. ¿Continuar?',
@@ -6941,9 +6946,17 @@ const message = {
                 partial_file: 'Archivo incompleto',
             },
             diskSize: 'Tamaño del disco',
+            isoHelper:
+                'La ISO se utiliza para iniciar la máquina virtual por primera vez e instalar un sistema operativo.',
+            osType: 'Tipo de sistema operativo',
+            osOther: 'Otro',
+            diskBus: 'Bus de disco',
             diskPath: 'Ruta del disco',
             isoPath: 'Ruta ISO',
             storagePool: 'Pool de almacenamiento',
+            networkHelper: 'La red proporciona conectividad de red a la máquina virtual.',
+            storagePoolHelper:
+                'El pool de almacenamiento guarda los discos de las máquinas virtuales y los archivos ISO.',
             network: 'Red',
             bridgeName: 'Nombre del bridge',
             natNetworkHelper:

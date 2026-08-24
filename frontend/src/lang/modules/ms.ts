@@ -958,6 +958,7 @@ const message = {
             from_remote: 'Model ini tidak dimuat turun melalui 1Panel; tiada log muat turun berkaitan.',
             no_logs: 'Log muat turun model ini telah dipadam dan tidak boleh dilihat.',
             vllmVersionHelper: 'Untuk pelayan FusionXpark GB 10, sila pilih versi -cu130.',
+            ascendVisibleDevices: 'Peranti Ascend yang kelihatan',
             vllmCommandPortHelper:
                 'Perintah permulaan mesti menggunakan port {0}; jika tidak, perkhidmatan tidak dapat diakses.',
             syncModelAccount: 'Segerakkan ke akaun model',
@@ -1145,6 +1146,7 @@ const message = {
             cachedToken: 'Token cache',
             cacheHitRate: 'Kadar hit cache',
             activeUsers: 'Pengguna aktif',
+            activeStreamingRequests: 'Permintaan penstriman aktif',
             activeModels: 'Model aktif',
             failedRequests: 'Permintaan gagal',
             averageTokenPerRequest: 'Purata Token/permintaan',
@@ -1447,7 +1449,7 @@ const message = {
         },
         gpu: {
             gpu: 'Pemantauan GPU',
-            gpuHelper: 'Sistem tidak mengesan arahan NVIDIA-SMI atau XPU-SMI. Sila periksa dan cuba lagi!',
+            gpuHelper: 'Tiada arahan pengurusan GPU/XPU/NPU yang disokong dikesan. Sila periksa dan cuba lagi!',
             process: 'Maklumat Proses',
             type: 'Jenis',
             typeG: 'Grafik',
@@ -4195,10 +4197,9 @@ const message = {
             'Peraturan yang diimport ditukar untuk bahagian belakang semasa {0}. Peraturan sumber tidak diubah.',
         clearAllRulesHelper:
             'Padam semua {0} peraturan yang boleh diurus daripada bahagian belakang semasa? Tindakan ini tidak boleh dibuat asal.',
-        switchBackendHelper:
-            'Operasi ini hanya menukar bahagian belakang tembok api yang akan diurus oleh 1Panel selepas ini. Bahagian belakang asal tidak akan dipindahkan, dihentikan atau dibersihkan. Eksport peraturan semasa terlebih dahulu. Selepas bertukar, mulakan bahagian belakang sasaran dan import atau semak peraturan secara manual. Peraturan luaran dan asli sistem tidak dieksport. Teruskan pertukaran kepada {0}?',
-        switchBackendSuccessHelper:
-            '1Panel kini mengurus {0}. Bahagian belakang asal {1} tidak dihentikan atau dibersihkan dan mungkin masih berjalan serta berkuat kuasa. Mulakan bahagian belakang sasaran, import atau semak peraturan, dan urus bahagian belakang asal secara manual hanya selepas mengesahkan akses berfungsi seperti biasa.',
+        backendSwitchNotice:
+            'Penukaran hanya mengubah bahagian belakang tembok api yang sedang digunakan; peraturan sedia ada tidak dipindahkan atau dibersihkan. Selepas menukar, segerakkan peraturan ke tembok api sasaran dan sahkan ia berkuat kuasa sebelum membersihkan peraturan tembok api asal.',
+        switchBackendHelper: 'Tukar kepada {0}?',
         uninstalledStatus: 'Belum dipasang',
         initializedStatus: 'Dimulakan',
         partiallyInitialized: 'Dimulakan sebahagian',
@@ -4207,6 +4208,7 @@ const message = {
         dockerInputNotProtected:
             'Peraturan INPUT hos tidak melindungi port terbitan Docker ini secara langsung. Klik untuk membuka perlindungan port bekas.',
         notInitialized: 'Belum dimulakan',
+        familyUnsupported: 'Sistem tidak menyokong {0}',
         dockerGuardUnbindConfirm:
             'Selepas dinyahikat, semua port bekas akan kembali sementara kepada akses lalai Docker. Tetapan perlindungan sedia ada dikekalkan. Teruskan?',
         deleteDockerGuardPolicyConfirm: 'Titik akhir ini akan kembali kepada akses lalai Docker. Teruskan?',
@@ -4255,7 +4257,7 @@ const message = {
         exportHelper: 'Akan mengeksport {0} peraturan firewall. Teruskan?',
         importSuccess: '{0} peraturan berjaya diimport',
         importPartialSuccess: 'Import selesai: {0} berjaya, {1} gagal',
-        basicStatus: 'Rantaian semasa {0} tidak terikat, sila ikat dahulu!',
+        basicStatus: 'Firewall semasa tidak terikat. Sila ikat dahulu.',
         baseIptables: 'Perkhidmatan iptables',
         forwardIptables: 'Perkhidmatan Penerusan Port iptables',
         initMsg: 'Akan memulakan {0}, teruskan?',
@@ -4276,6 +4278,8 @@ const message = {
         reject: 'Tolak',
         allPorts: 'Semua Port',
         allProtocolHelper: 'Semua protokol dan port',
+        sourceAddressPlaceholder: 'contoh: 172.16.10.11, 172.16.0.0/24, 2001:db8::1 atau 2001:db8::/64',
+        destinationPortPlaceholder: 'contoh: 80, 80,443 atau 8080-8089',
         deleteRuleConfirm: 'Akan memadam {0} peraturan. Teruskan?',
         deleteUsedRuleConfirm:
             'Port ini sedang digunakan oleh {0}. Memadam peraturan benarkan mungkin menyebabkan perkhidmatan tidak dapat dicapai. Teruskan?',
@@ -6938,9 +6942,15 @@ const message = {
                 partial_file: 'Fail tidak lengkap',
             },
             diskSize: 'Saiz Cakera',
+            isoHelper: 'ISO digunakan untuk memulakan mesin maya buat kali pertama dan memasang sistem pengendalian.',
+            osType: 'Jenis sistem pengendalian',
+            osOther: 'Lain-lain',
+            diskBus: 'Bas cakera',
             diskPath: 'Laluan Cakera',
             isoPath: 'Laluan ISO',
             storagePool: 'Kolam Storan',
+            networkHelper: 'Rangkaian menyediakan sambungan rangkaian untuk mesin maya.',
+            storagePoolHelper: 'Kolam storan menyimpan cakera mesin maya dan fail ISO.',
             network: 'Rangkaian',
             bridgeName: 'Nama Bridge',
             natNetworkHelper:

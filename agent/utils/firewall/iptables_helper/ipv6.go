@@ -13,10 +13,6 @@ func (m *Manager) EnsureIPv6BaseChains() error {
 	return EnsureIPv6BaseChains(m.panelPort())
 }
 
-func (m *Manager) RepairIPv6BaseChains() error {
-	return RepairIPv6BaseChains(m.panelPort())
-}
-
 func RepairIPv6BaseChains(panelPort string) error {
 	initialized, bound, err := LoadFamilyInitStatus(constant.FirewallFamilyIPv6, "base")
 	if err != nil {

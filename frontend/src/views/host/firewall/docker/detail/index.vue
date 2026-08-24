@@ -62,7 +62,7 @@
                                 size="small"
                                 @click.stop="remove(group.endpoints, false)"
                             >
-                                {{ $t('commons.button.clean') }}
+                                {{ $t('commons.button.delete') }}
                             </el-button>
                         </div>
                     </div>

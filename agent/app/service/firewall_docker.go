@@ -18,6 +18,7 @@ import (
 	agenti18n "github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	containertypes "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/system"
 	"github.com/docker/docker/client"
@@ -44,6 +45,7 @@ type DockerPortGuardService struct {
 	policies repo.IDockerPortGuardRepo
 	runtime  dockerGuardRuntime
 	client   func() (*client.Client, error)
+	version  func(string) string
 }
 
 type normalizedDockerGuardPolicy struct {
@@ -71,7 +73,11 @@ type IDockerPortGuardService interface {
 }
 
 func NewIDockerPortGuardService() IDockerPortGuardService {
-	return &DockerPortGuardService{policies: repo.NewIDockerPortGuardRepo(), client: docker.NewDockerClient}
+	return &DockerPortGuardService{
+		policies: repo.NewIDockerPortGuardRepo(),
+		client:   docker.NewDockerClient,
+		version:  dockerFirewallVersion,
+	}
 }
 
 func ReconcileDockerPortGuard(ctx context.Context) error {
@@ -90,6 +96,7 @@ func ReconcileDockerPortGuardBestEffort(ctx context.Context) {
 func (s *DockerPortGuardService) LoadOverview(ctx context.Context) (dto.DockerPortGuardList, error) {
 	selectedBackend := selectedDockerFirewallBackend("")
 	base := s.runtimeStatus(s.guardRuntime(selectedBackend), selectedBackend)
+	base.Version = s.loadFirewallVersion(selectedBackend)
 	policies, err := s.policies.List(ctx)
 	if err != nil {
 		return dto.DockerPortGuardList{}, err
@@ -107,6 +114,7 @@ func (s *DockerPortGuardService) LoadOverview(ctx context.Context) (dto.DockerPo
 	}
 	base.Backend = selectedDockerFirewallBackend(dockerFirewallBackend(info))
 	base = s.runtimeStatus(s.guardRuntime(base.Backend), base.Backend)
+	base.Version = s.loadFirewallVersion(base.Backend)
 	if reconcileErr := lastDockerPortGuardReconcileError(); reconcileErr != nil {
 		base.Message = reconcileErr.Error()
 		markDockerGuardReconcileFailure(&base, reconcileErr)
@@ -369,8 +377,8 @@ func (s *DockerPortGuardService) runtimeStatus(runtime dockerGuardRuntime, backe
 	return dto.DockerPortGuardBase{
 		Name:        dockerFirewallDisplayName(backend),
 		Backend:     backend,
-		Initialized: ipv4.Initialized,
-		Bound:       ipv4.Bound,
+		Initialized: ipv4.Initialized || ipv6.Initialized,
+		Bound:       ipv4.Bound || ipv6.Bound,
 		IPv4:        dto.DockerPortGuardFamilyStatus{State: ipv4.State, Reason: ipv4.Reason, Initialized: ipv4.Initialized, Bound: ipv4.Bound, Effective: ipv4.Effective},
 		IPv6:        dto.DockerPortGuardFamilyStatus{State: ipv6.State, Reason: ipv6.Reason, Initialized: ipv6.Initialized, Bound: ipv6.Bound, Effective: ipv6.Effective},
 	}
@@ -420,6 +428,25 @@ func dockerFirewallDisplayName(backend string) string {
 	default:
 		return "iptables-docker"
 	}
+}
+
+func (s *DockerPortGuardService) loadFirewallVersion(backend string) string {
+	if s.version == nil {
+		return "-"
+	}
+	return s.version(backend)
+}
+
+func dockerFirewallVersion(backend string) string {
+	client, err := lifecycle.NewClientFor(backend)
+	if err != nil {
+		return "-"
+	}
+	version, err := client.Version()
+	if err != nil || strings.TrimSpace(version) == "" {
+		return "-"
+	}
+	return version
 }
 
 func discoverDockerEndpoints(ctx context.Context, cli *client.Client) ([]dto.DockerPortGuardEndpoint, error) {

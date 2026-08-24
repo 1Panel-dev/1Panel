@@ -9,16 +9,13 @@ import (
 var ErrRuleExists = errors.New("forwarding rule already exists")
 
 type Status struct {
-	Name     string
-	Version  string
-	IsActive bool
-	IsInit   bool
-	IsBind   bool
+	Name    string
+	Version string
+	IsInit  bool
+	IsBind  bool
 }
 
 type RuntimeClient interface {
-	Name() string
-	Status() (bool, error)
 	Version() (string, error)
 }
 
@@ -33,25 +30,23 @@ func NewManager(adapter Adapter, runtime RuntimeClient) *Manager {
 
 func (m *Manager) Status() (Status, error) {
 	status := Status{Name: m.adapter.Name(), Version: "-"}
-	if m.runtime == nil {
-		return status, nil
-	}
 	var versionErr error
-	var statusErr error
 	var initErr error
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(1)
+	if m.runtime != nil {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			status.Version, versionErr = m.runtime.Version()
+		}()
+	}
 	go func() {
 		defer wg.Done()
-		status.Version, versionErr = m.runtime.Version()
-	}()
-	go func() {
-		defer wg.Done()
-		status.IsActive, statusErr = m.runtime.Status()
 		status.IsInit, status.IsBind, initErr = m.adapter.InitStatus()
 	}()
 	wg.Wait()
-	return status, errors.Join(versionErr, statusErr, initErr)
+	return status, errors.Join(versionErr, initErr)
 }
 
 func (m *Manager) List(info, strategy string) ([]Rule, error) {

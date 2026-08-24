@@ -81,8 +81,20 @@ func (s *ForwardingService) LoadBaseInfo() (dto.FirewallSubsystemStatus, error) 
 	baseInfo.Name, baseInfo.Backend = forwardingDisplayName(status.Name), status.Name
 	baseInfo.Version = status.Version
 	baseInfo.PingStatus = ping.LoadStatus()
-	baseInfo.IsActive, baseInfo.IsInit, baseInfo.IsBind = status.IsActive, status.IsInit, status.IsBind
+	baseInfo.IsInit, baseInfo.IsBind = status.IsInit, status.IsBind
+	baseInfo.IPv4 = loadForwardingFamilyInfo(manager, status.Name, constant.FirewallFamilyIPv4)
+	baseInfo.IPv6 = loadForwardingFamilyInfo(manager, status.Name, constant.FirewallFamilyIPv6)
 	return baseInfo, nil
+}
+
+func loadForwardingFamilyInfo(manager *forwarding.Manager, backend, family string) dto.FirewallBackendFamilyStatus {
+	initialized, bound, err := manager.FamilyStatus(family)
+	available := err == nil
+	if backend == constant.FirewallProviderIptables && family == constant.FirewallFamilyIPv6 {
+		commands, commandErr := lifecycle.ResolveIptablesCommands()
+		available = available && commandErr == nil && commands.IPv6Available()
+	}
+	return dto.FirewallBackendFamilyStatus{Available: available, Initialized: initialized, Bound: bound}
 }
 
 func forwardingDisplayName(backend string) string {

@@ -75,3 +75,18 @@ func TestFirewallSettingServiceSelectsGuardBackendWithoutDockerRestart(t *testin
 		t.Fatal("Docker port guard did not use the selected nftables runtime")
 	}
 }
+
+func TestFirewallSettingServiceRejectsServiceBackendInitialization(t *testing.T) {
+	for _, backend := range []string{"firewalld", "ufw"} {
+		for _, operation := range []string{"initialize", "cleanup"} {
+			err := (&FirewallSettingService{}).Operate(context.Background(), dto.FirewallBackendOperation{
+				Subsystem: "system",
+				Backend:   backend,
+				Operation: operation,
+			})
+			if err == nil {
+				t.Fatalf("%s %s unexpectedly succeeded", backend, operation)
+			}
+		}
+	}
+}
