@@ -1,6 +1,6 @@
 module github.com/1Panel-dev/1Panel/agent
 
-go 1.25.10
+go 1.26.1
 
 replace github.com/moby/go-archive => github.com/moby/go-archive v0.1.0
 
@@ -182,7 +182,7 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.26 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
-	github.com/quic-go/quic-go v0.59.0 // indirect
+	github.com/quic-go/quic-go v0.59.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
