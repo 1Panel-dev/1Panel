@@ -1,6 +1,10 @@
 package middleware
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/1Panel-dev/1Panel/core/utils/publicshare"
+)
 
 func ShouldProxyToAgent(reqPath string) bool {
 	if strings.HasPrefix(reqPath, "/1panel/swagger") || !strings.HasPrefix(reqPath, "/api/v2") {
@@ -13,12 +17,5 @@ func ShouldProxyToAgent(reqPath string) bool {
 }
 
 func IsPublicFileShareAPI(reqPath string) bool {
-	switch reqPath {
-	case "/api/v2/files/share/info",
-		"/api/v2/files/share/check",
-		"/api/v2/files/share/download":
-		return true
-	default:
-		return false
-	}
+	return publicshare.IsAPI(reqPath)
 }
