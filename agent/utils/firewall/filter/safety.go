@@ -14,7 +14,7 @@ func ProtectSnapshot(snapshot Snapshot, ports []firewall.PortWhitelist) (Snapsho
 	rules := append([]ObservedRule(nil), snapshot.Rules...)
 	for index := range rules {
 		rule := rules[index].Rule
-		if rules[index].ParseStatus != ParseStatusSupported || rule.Action != ActionAccept ||
+		if rules[index].Marker != "" || rules[index].ParseStatus != ParseStatusSupported || rule.Action != ActionAccept ||
 			rule.SourceAddress != "" || rule.SourcePort != "" || rule.DestinationAddress != "" || rule.Interface != "" {
 			continue
 		}

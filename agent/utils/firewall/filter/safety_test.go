@@ -87,6 +87,48 @@ func TestProtectSnapshotRespectsConfiguredFamily(t *testing.T) {
 	}
 }
 
+func TestProtectSnapshotDoesNotReclassifyManagedRule(t *testing.T) {
+	scope := Scope{Provider: ProviderIptables, Family: FamilyIPv4, Table: "filter", Chain: IptablesInputChain, Direction: DirectionInput}
+	managed := protectedPortTestRule(scope, "all", "", 1)
+	managed.Marker = "1panel-rule:managed-rule"
+	snapshot, err := NewSnapshot(scope, []ObservedRule{managed})
+	if err != nil {
+		t.Fatalf("create snapshot: %v", err)
+	}
+
+	protected, err := ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Port: "9999", Protocol: "tcp"}})
+	if err != nil {
+		t.Fatalf("protect snapshot: %v", err)
+	}
+	if protected.Rules[0].Protected {
+		t.Fatal("managed rule was reclassified as a protected system rule")
+	}
+}
+
+func TestManagedBroadAllowDoesNotBlockManagedRuleEdit(t *testing.T) {
+	scope := Scope{Provider: ProviderIptables, Family: FamilyIPv4, Table: "filter", Chain: IptablesInputChain, Direction: DirectionInput}
+	broadAllow := protectedPortTestRule(scope, "all", "", 1)
+	broadAllow.Marker = "1panel-rule:broad-allow"
+	target := protectedPortTestRule(scope, "tcp", "55101", 2)
+	target.Marker = "1panel-rule:edit-target"
+	snapshot, err := NewSnapshot(scope, []ObservedRule{broadAllow, target})
+	if err != nil {
+		t.Fatalf("create snapshot: %v", err)
+	}
+	snapshot, err = ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Port: "9999", Protocol: "tcp"}})
+	if err != nil {
+		t.Fatalf("protect snapshot: %v", err)
+	}
+	after := target.Rule
+	after.Protocol = "udp"
+	after.SourceAddress = "198.51.100.21/32"
+	after.DestinationPort = "55113"
+	after.Action = ActionDrop
+	if err := GuardMutation(snapshot, target, after, "", firewall.PortWhitelist{Port: "9999", Protocol: "tcp"}); err != nil {
+		t.Fatalf("managed rule edit was blocked by another managed allow rule: %v", err)
+	}
+}
+
 func protectedPortTestRule(scope Scope, protocol, port string, position int) ObservedRule {
 	return ObservedRule{
 		Rule: FirewallRule{

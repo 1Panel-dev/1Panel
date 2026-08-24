@@ -47,6 +47,8 @@ export namespace Firewall {
         version: string;
         pingStatus: string;
         syncError?: string;
+        ipv4: BackendFamilyStatus;
+        ipv6: BackendFamilyStatus;
     }
     export interface ForwardRuleSearch extends ReqPage {
         strategy: string;

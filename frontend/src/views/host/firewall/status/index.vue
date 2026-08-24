@@ -70,6 +70,15 @@
                                 {{ $t('commons.button.bind') }}
                             </el-button>
                         </template>
+                        <template v-if="showIPv6Recovery">
+                            <el-divider direction="vertical" />
+                            <el-tooltip :content="ipv6RecoveryHelper" placement="bottom">
+                                <el-button v-permission v-node-admin type="primary" link @click="onRecoverIPv6">
+                                    {{ $t(baseInfo.ipv6.initialized ? 'commons.button.bind' : 'commons.button.init') }}
+                                    IPv6
+                                </el-button>
+                            </el-tooltip>
+                        </template>
                     </div>
                 </div>
             </el-card>
@@ -148,12 +157,25 @@ const baseInfo = ref<Firewall.FirewallBase>({
     version: '',
     pingStatus: '',
     syncError: '',
+    ipv4: { initialized: false, bound: false },
+    ipv6: { initialized: false, bound: false },
 });
 const dockerRef = ref();
 const operation = ref('restart');
 const dockerStatus = ref();
 const withDockerRestart = ref(false);
 const backendName = computed(() => baseInfo.value.backend || baseInfo.value.name);
+const showIPv6Recovery = computed(
+    () =>
+        props.currentTab === 'base' &&
+        backendName.value === 'iptables' &&
+        baseInfo.value.isInit &&
+        (!baseInfo.value.ipv6.initialized || !baseInfo.value.ipv6.bound),
+);
+const ipv6RecoveryHelper = computed(
+    () =>
+        `IPv6: ${i18n.global.t(baseInfo.value.ipv6.initialized ? 'commons.status.unbind' : 'firewall.notInitialized')}`,
+);
 
 const acceptParams = (): void => {
     loadBaseInfo(true);
@@ -173,7 +195,11 @@ const loadBaseInfo = async (search: boolean) => {
     const loader = props.currentTab === 'forward' ? loadForwardBaseInfo() : loadFireBaseInfo(props.currentTab);
     await loader
         .then(async (res) => {
-            baseInfo.value = res.data;
+            baseInfo.value = {
+                ...res.data,
+                ipv4: res.data.ipv4 || { initialized: res.data.isInit, bound: res.data.isBind },
+                ipv6: res.data.ipv6 || { initialized: false, bound: false },
+            };
             if (baseInfo.value.isInit) {
                 emit('update:name', backendName.value);
             } else {
@@ -240,6 +266,25 @@ const onInit = async () => {
             loadBaseInfo(true);
         });
     });
+};
+
+const onRecoverIPv6 = async () => {
+    const initialized = baseInfo.value.ipv6.initialized;
+    const title = i18n.global.t(initialized ? 'commons.button.bind' : 'commons.button.init');
+    const message = initialized
+        ? i18n.global.t('firewall.bindHelper')
+        : i18n.global.t('firewall.initMsg', [`${baseInfo.value.name || backendName.value} IPv6`]);
+    try {
+        await ElMessageBox.confirm(message, title, {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        });
+    } catch {
+        return;
+    }
+    await operateFilterChain('1PANEL_BASIC', 'init-ipv6-base');
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    await loadBaseInfo(true);
 };
 
 const onBind = async () => {

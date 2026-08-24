@@ -2,6 +2,7 @@ package iptables
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -108,6 +109,16 @@ func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snaps
 	}
 	output, err := a.reader.ListChain(ctx, scope)
 	if err != nil {
+		if errors.Is(err, filter.ErrProviderUnavailable) {
+			snapshot, snapshotErr := filter.NewSnapshot(scope, nil)
+			if snapshotErr != nil {
+				return filter.Snapshot{}, snapshotErr
+			}
+			snapshot.Notices = []filter.ScopeNotice{{
+				Code: filter.ScopeNoticeManagedScopeMissing, Values: []string{string(scope.Family), scope.Chain},
+			}}
+			return snapshot, nil
+		}
 		return filter.Snapshot{}, err
 	}
 	rules := parseChainRules(scope, output)
@@ -703,10 +714,30 @@ func (systemBackend) CheckMultiport(ctx context.Context, family filter.Family) e
 }
 
 func (systemBackend) ListChain(ctx context.Context, scope filter.Scope) (string, error) {
+	var output string
+	var err error
 	if scope.Family == filter.FamilyIPv6 {
-		return native.RunIPv6WithStdContext(ctx, scope.Table, "-S", scope.Chain)
+		output, err = native.RunIPv6WithStdContext(ctx, scope.Table, "-S", scope.Chain)
+	} else {
+		output, err = native.RunWithStdContext(ctx, scope.Table, "-S", scope.Chain)
 	}
-	return native.RunWithStdContext(ctx, scope.Table, "-S", scope.Chain)
+	if err != nil {
+		return "", err
+	}
+	if !containsChainDeclaration(output, scope.Chain) {
+		return "", fmt.Errorf("%w: iptables %s chain %s is not initialized", filter.ErrProviderUnavailable, scope.Family, scope.Chain)
+	}
+	return output, nil
+}
+
+func containsChainDeclaration(output, chain string) bool {
+	declaration := "-N " + chain
+	for _, line := range strings.Split(output, "\n") {
+		if strings.TrimSpace(line) == declaration {
+			return true
+		}
+	}
+	return false
 }
 
 func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) error {

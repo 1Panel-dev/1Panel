@@ -56,21 +56,21 @@ func ReadFilterRulesByChain(chain string) ([]FilterRules, error) {
 }
 
 func LoadInitStatus(tab string) (bool, bool, error) {
-	return loadInitStatus(tab, RunWithStd)
+	return loadInitStatus(tab, RunWithStd, true)
 }
 
 func LoadFamilyInitStatus(family, tab string) (bool, bool, error) {
 	switch family {
 	case constant.FirewallFamilyIPv4:
-		return loadInitStatus(tab, RunWithStd)
+		return loadInitStatus(tab, RunWithStd, true)
 	case constant.FirewallFamilyIPv6:
-		return loadInitStatus(tab, RunIPv6WithStd)
+		return loadInitStatus(tab, RunIPv6WithStd, false)
 	default:
 		return false, false, fmt.Errorf("unsupported iptables family %q", family)
 	}
 }
 
-func loadInitStatus(tab string, runner func(string, ...string) (string, error)) (bool, bool, error) {
+func loadInitStatus(tab string, runner func(string, ...string) (string, error), requireTerminalRules bool) (bool, bool, error) {
 	switch tab {
 	case "base":
 		filterRules, err := runner(FilterTab, "-S")
@@ -84,8 +84,12 @@ func loadInitStatus(tab string, runner func(string, ...string) (string, error)) 
 			"-N " + BasicAfterChain,
 			fmt.Sprintf("-A %s %s -j ACCEPT", BasicBeforeChain, strings.ReplaceAll(strings.ReplaceAll(IoRuleIn, "'", "\""), " -j ACCEPT", "")),
 			fmt.Sprintf("-A %s %s -j ACCEPT", BasicBeforeChain, strings.ReplaceAll(strings.ReplaceAll(EstablishedRule, "'", "\""), " -j ACCEPT", "")),
-			fmt.Sprintf("-A %s %s", BasicAfterChain, DropAllTcp),
-			fmt.Sprintf("-A %s %s", BasicAfterChain, DropAllUdp),
+		}
+		if requireTerminalRules {
+			initRules = append(initRules,
+				fmt.Sprintf("-A %s %s", BasicAfterChain, DropAllTcp),
+				fmt.Sprintf("-A %s %s", BasicAfterChain, DropAllUdp),
+			)
 		}
 		bindRules := []string{
 			fmt.Sprintf("-A %s -j %s", InputChain, BasicBeforeChain),
@@ -109,7 +113,9 @@ func checkWithInitAndBind(initRules, bindRules []string, lines []string) (bool, 
 			}
 		}
 		if !found {
-			global.LOG.Debugf("not found init rule: %s", rule)
+			if global.LOG != nil {
+				global.LOG.Debugf("not found init rule: %s", rule)
+			}
 			return false, false
 		}
 	}
@@ -122,7 +128,9 @@ func checkWithInitAndBind(initRules, bindRules []string, lines []string) (bool, 
 			}
 		}
 		if !found {
-			global.LOG.Debugf("not found bind rule: %s", rule)
+			if global.LOG != nil {
+				global.LOG.Debugf("not found bind rule: %s", rule)
+			}
 			return true, false
 		}
 	}

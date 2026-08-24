@@ -188,6 +188,24 @@ func TestObserveNumberedIncomingIPv6KeepsFamilyGap(t *testing.T) {
 	}
 }
 
+func TestObserveScopesReadsNumberedRulesOnce(t *testing.T) {
+	reader := &fakeReader{outputs: map[string]string{"status numbered": numberedFixture}}
+	snapshots, err := NewAdapterWithReader(reader).ObserveScopes(context.Background(), []filter.Scope{
+		ufwScope(filter.FamilyIPv4),
+		ufwScope(filter.FamilyIPv6),
+	})
+	if err != nil {
+		t.Fatalf("observe UFW families: %v", err)
+	}
+	if !reflect.DeepEqual(reader.calls, [][]string{{"status", "numbered"}}) {
+		t.Fatalf("UFW numbered rules were not read exactly once: %#v", reader.calls)
+	}
+	if len(snapshots) != 2 || snapshots[0].Scope.Family != filter.FamilyIPv4 || len(snapshots[0].Rules) != 9 ||
+		snapshots[1].Scope.Family != filter.FamilyIPv6 || len(snapshots[1].Rules) != 3 {
+		t.Fatalf("unexpected multi-family snapshots: %#v", snapshots)
+	}
+}
+
 func TestObserveBarePortRulesAreSupportedForBothFamilies(t *testing.T) {
 	output := `Status: active
 [ 1] 22                         ALLOW IN    Anywhere

@@ -3,15 +3,17 @@ package dto
 import "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 
 type FirewallSubsystemStatus struct {
-	Name       string `json:"name"`
-	Backend    string `json:"backend"`
-	IsExist    bool   `json:"isExist"`
-	IsActive   bool   `json:"isActive"`
-	IsInit     bool   `json:"isInit"`
-	IsBind     bool   `json:"isBind"`
-	Version    string `json:"version"`
-	PingStatus string `json:"pingStatus"`
-	SyncError  string `json:"syncError,omitempty"`
+	Name       string                      `json:"name"`
+	Backend    string                      `json:"backend"`
+	IsExist    bool                        `json:"isExist"`
+	IsActive   bool                        `json:"isActive"`
+	IsInit     bool                        `json:"isInit"`
+	IsBind     bool                        `json:"isBind"`
+	Version    string                      `json:"version"`
+	PingStatus string                      `json:"pingStatus"`
+	SyncError  string                      `json:"syncError,omitempty"`
+	IPv4       FirewallBackendFamilyStatus `json:"ipv4"`
+	IPv6       FirewallBackendFamilyStatus `json:"ipv6"`
 }
 
 type FirewallLifecycleOperation struct {
@@ -59,7 +61,7 @@ type FirewallBackendOperation struct {
 
 type FilterChainOperation struct {
 	Name    string `json:"name" validate:"required,eq=1PANEL_BASIC"`
-	Operate string `json:"operate" validate:"required,oneof=init-base bind-base unbind-base"`
+	Operate string `json:"operate" validate:"required,oneof=init-base init-ipv6-base bind-base unbind-base"`
 }
 
 type FirewallSystemPort struct {

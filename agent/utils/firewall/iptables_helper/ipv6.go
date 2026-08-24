@@ -4,9 +4,38 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
+
+func (m *Manager) EnsureIPv6BaseChains() error {
+	return EnsureIPv6BaseChains(m.panelPort())
+}
+
+func (m *Manager) RepairIPv6BaseChains() error {
+	return RepairIPv6BaseChains(m.panelPort())
+}
+
+func RepairIPv6BaseChains(panelPort string) error {
+	initialized, bound, err := LoadFamilyInitStatus(constant.FirewallFamilyIPv6, "base")
+	if err != nil {
+		return err
+	}
+	return repairIPv6BaseChains(initialized, bound, BindIPv6BaseChains, func() error {
+		return EnsureIPv6BaseChains(panelPort)
+	})
+}
+
+func repairIPv6BaseChains(initialized, bound bool, bind, ensure func() error) error {
+	if initialized {
+		if bound {
+			return nil
+		}
+		return bind()
+	}
+	return ensure()
+}
 
 func EnsureIPv6BaseChains(panelPort string) error {
 	commands, err := lifecycle.ResolveIptablesCommands()

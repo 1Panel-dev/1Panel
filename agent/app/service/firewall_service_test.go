@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	filterfirewalld "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/providers/firewalld"
 	"github.com/glebarez/sqlite"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -75,6 +76,56 @@ func TestFirewallRuleServiceCheckCreateInventoryWorkflow(t *testing.T) {
 	empty, err := service.Inventory(ctx, dto.FirewallRuleInventory{Scope: rule.Scope})
 	if err != nil || len(empty.Items) != 0 {
 		t.Fatalf("deleted rule remained in inventory: inventory=%#v err=%v", empty, err)
+	}
+}
+
+func TestFirewallRuleServiceCombinedUFWInventory(t *testing.T) {
+	ipv4Scope := filter.Scope{
+		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,
+		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
+	}
+	ipv6Scope := ipv4Scope
+	ipv6Scope.Family = filter.FamilyIPv6
+	ipv4Rule := filter.FirewallRule{
+		Scope: ipv4Scope, NativeKind: filter.NativeKindUFWRule,
+		Protocol: "tcp", DestinationPort: "8080", Action: filter.ActionAccept,
+	}
+	ipv6Rule := filter.FirewallRule{
+		Scope: ipv6Scope, NativeKind: filter.NativeKindUFWRule,
+		Protocol: "udp", SourceAddress: "2001:db8::/64", DestinationPort: "5353", Action: filter.ActionDrop,
+	}
+	adapter := newFakeFilterAdapter(t, ipv4Scope, []filter.ObservedRule{executorObservedRule(ipv4Rule, "", 1)})
+	ipv6Snapshot, err := filter.NewSnapshot(ipv6Scope, []filter.ObservedRule{executorObservedRule(ipv6Rule, "", 2)})
+	if err != nil {
+		t.Fatalf("create IPv6 snapshot: %v", err)
+	}
+	adapter.multiSnapshots = []filter.Snapshot{adapter.snapshot, ipv6Snapshot}
+	adapter.multiSnapshots[0].Notices = []filter.ScopeNotice{{Code: filter.ScopeNoticeManagedScopeInactive}}
+	adapter.multiSnapshots[1].Notices = []filter.ScopeNotice{{Code: filter.ScopeNoticeManagedScopeInactive}}
+	service := &FirewallService{
+		rules: repo.NewFirewallRuleRepo(newFirewallRuleTestDB(t)),
+		adapters: firewallRuleRuntimeRegistry{
+			filter.ProviderUFW: newFirewallRuleRuntime(adapter, nil),
+		},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderUFW, nil },
+	}
+
+	result, err := service.Inventory(context.Background(), dto.FirewallRuleInventory{Scope: filter.Scope{
+		Provider: filter.ProviderUFW, Family: filter.FamilyInet,
+		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
+	}})
+	if err != nil {
+		t.Fatalf("load combined UFW inventory: %v", err)
+	}
+	if adapter.observeScopesCount != 1 || adapter.observeCount != 0 {
+		t.Fatalf("unexpected UFW observation counts: multi=%d single=%d", adapter.observeScopesCount, adapter.observeCount)
+	}
+	if len(result.Items) != 2 || result.Items[0].Rule.Scope.Family != filter.FamilyIPv4 ||
+		result.Items[1].Rule.Scope.Family != filter.FamilyIPv6 {
+		t.Fatalf("unexpected combined UFW inventory: %#v", result.Items)
+	}
+	if len(result.Notices) != 1 || result.Notices[0].Code != filter.ScopeNoticeManagedScopeInactive {
+		t.Fatalf("duplicate or missing combined UFW notices: %#v", result.Notices)
 	}
 }
 
@@ -1070,6 +1121,121 @@ func TestFirewallExecutorUpdatesManagedRule(t *testing.T) {
 	}
 }
 
+func TestFirewallExecutorUpdatesUFWDescriptionWithoutNativeMutation(t *testing.T) {
+	rule := executorTestRule("8080")
+	rule.Scope = filter.Scope{
+		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,
+		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
+	}
+	rule.NativeKind = filter.NativeKindUFWRule
+	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
+	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
+	if err := createExecutorRule(executor, adapter, dto.FirewallRuleCreateItem{
+		Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
+	}); err != nil {
+		t.Fatalf("create managed UFW rule: %v", err)
+	}
+	stored, _ := ruleRepo.List(context.Background())
+	updated := rule
+	updated.Description = "updated description"
+	if err := executor.updateRule(context.Background(), "", stored[0].UUID, updated); err != nil {
+		t.Fatalf("update managed UFW description: %v", err)
+	}
+	if adapter.applyCount != 1 {
+		t.Fatalf("description-only update changed UFW: applyCount=%d", adapter.applyCount)
+	}
+	after, err := ruleRepo.GetByUUID(context.Background(), stored[0].UUID)
+	if err != nil {
+		t.Fatalf("load updated UFW rule: %v", err)
+	}
+	if after.Description != "updated description" || after.DestinationPort != "8080" {
+		t.Fatalf("unexpected persisted UFW rule: %#v", after)
+	}
+}
+
+func TestIsUFWMetadataOnlyUpdate(t *testing.T) {
+	position := 3
+	order := int64(position)
+	before := executorTestRule("8080")
+	before.Scope = filter.Scope{
+		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,
+		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
+	}
+	before.NativeKind = filter.NativeKindUFWRule
+	before.OrderIndex = &order
+	after := before
+	after.Description = "new description"
+
+	metadataOnly, err := isUFWMetadataOnlyUpdate(before, after, filter.Locator{Position: &position})
+	if err != nil || !metadataOnly {
+		t.Fatalf("description-only UFW update = %v, err=%v", metadataOnly, err)
+	}
+
+	tests := []struct {
+		name    string
+		mutate  func(*filter.FirewallRule, *filter.Locator)
+		wantErr bool
+	}{
+		{name: "rule changed", mutate: func(rule *filter.FirewallRule, _ *filter.Locator) { rule.DestinationPort = "8081" }},
+		{name: "order changed", mutate: func(rule *filter.FirewallRule, _ *filter.Locator) { changed := int64(4); rule.OrderIndex = &changed }},
+		{name: "missing locator", mutate: func(_ *filter.FirewallRule, locator *filter.Locator) { locator.Position = nil }},
+		{name: "invalid rule", mutate: func(rule *filter.FirewallRule, _ *filter.Locator) { rule.DestinationPort = "invalid" }, wantErr: true},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			candidate := after
+			locator := filter.Locator{Position: &position}
+			test.mutate(&candidate, &locator)
+			got, err := isUFWMetadataOnlyUpdate(before, candidate, locator)
+			if test.wantErr {
+				if err == nil {
+					t.Fatal("invalid rule did not return an error")
+				}
+				return
+			}
+			if err != nil || got {
+				t.Fatalf("metadata-only update = %v, err=%v", got, err)
+			}
+		})
+	}
+}
+
+func TestFirewallRuntimeRejectsUnavailableManagedScopeForMutation(t *testing.T) {
+	rule := executorTestRule("8080")
+	for _, notice := range []filter.ScopeNoticeCode{
+		filter.ScopeNoticeManagedScopeInactive,
+		filter.ScopeNoticeManagedScopeMissing,
+	} {
+		t.Run(string(notice), func(t *testing.T) {
+			adapter := newFakeFilterAdapter(t, rule.Scope, nil)
+			adapter.snapshot.Notices = []filter.ScopeNotice{{Code: notice}}
+			runtime := newFirewallRuleRuntime(adapter, nil)
+			if _, err := runtime.ObserveMutation(context.Background(), rule.Scope); !errors.Is(err, filter.ErrProviderUnavailable) {
+				t.Fatalf("mutation observe error = %v", err)
+			}
+			if _, err := runtime.Observe(context.Background(), rule.Scope); err != nil {
+				t.Fatalf("read-only observe rejected unavailable scope: %v", err)
+			}
+		})
+	}
+}
+
+func TestFilterChainOperationValidationIncludesIPv6Repair(t *testing.T) {
+	validate := validator.New()
+	for _, operation := range []string{"init-base", "init-ipv6-base", "bind-base", "unbind-base"} {
+		request := dto.FilterChainOperation{Name: constant.FirewallBasicChain, Operate: operation}
+		if err := validate.Struct(request); err != nil {
+			t.Fatalf("operation %q rejected by API contract: %v", operation, err)
+		}
+	}
+	for _, operation := range []string{"", "init-forward", "repair-anything"} {
+		request := dto.FilterChainOperation{Name: constant.FirewallBasicChain, Operate: operation}
+		if err := validate.Struct(request); err == nil {
+			t.Fatalf("operation %q accepted by API contract", operation)
+		}
+	}
+}
+
 func TestFirewallRuleServiceChecksManagedUpdateWithoutApplying(t *testing.T) {
 	rule := executorTestRule("8080")
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
@@ -1369,10 +1535,12 @@ func createExecutorRule(executor *FirewallService, adapter *fakeFilterAdapter, r
 
 type fakeFilterAdapter struct {
 	snapshot              filter.Snapshot
+	multiSnapshots        []filter.Snapshot
 	rollbackSnapshot      filter.Snapshot
 	lastChange            filter.DesiredChange
 	applyCount            int
 	observeCount          int
+	observeScopesCount    int
 	rollbackCount         int
 	verifyMatched         bool
 	capabilities          filter.Capabilities
@@ -1420,6 +1588,10 @@ func (f *fakeFilterAdapter) Capabilities(context.Context) (filter.Capabilities, 
 func (f *fakeFilterAdapter) Observe(context.Context, filter.Scope) (filter.Snapshot, error) {
 	f.observeCount++
 	return f.snapshot, nil
+}
+func (f *fakeFilterAdapter) ObserveScopes(context.Context, []filter.Scope) ([]filter.Snapshot, error) {
+	f.observeScopesCount++
+	return append([]filter.Snapshot(nil), f.multiSnapshots...), nil
 }
 func (f *fakeFilterAdapter) Compile(snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.BackendPlan, error) {
 	f.rollbackSnapshot = snapshot

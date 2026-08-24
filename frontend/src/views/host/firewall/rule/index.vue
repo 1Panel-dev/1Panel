@@ -178,7 +178,7 @@
                                 v-model:selects="selects"
                                 :pagination-config="paginationConfig"
                                 :data="pagedItems"
-                                :heightDiff="420"
+                                :heightDiff="370"
                                 row-key="rowKey"
                             >
                                 <el-table-column type="selection" :selectable="isEditableManagedRule" width="48" fix />
@@ -467,12 +467,14 @@ const providerScopes = (): Firewall.Scope[] => {
         return [{ provider: 'firewalld', family: 'inet', zone: 'public', direction: 'input' }];
     }
     if (provider.value === 'ufw') {
-        return (['ipv4', 'ipv6'] as Firewall.Family[]).map((family) => ({
-            provider: 'ufw' as const,
-            family,
-            chain: 'incoming',
-            direction: 'input' as const,
-        }));
+        return [
+            {
+                provider: 'ufw' as const,
+                family: 'inet',
+                chain: 'incoming',
+                direction: 'input' as const,
+            },
+        ];
     }
     return [];
 };
@@ -912,16 +914,15 @@ const ruleIssueText = (row: Firewall.InventoryItem) => {
 };
 
 const openCreate = async () => {
-    if (scopeNotices.value.some((notice) => notice.code === 'managed_scope_inactive')) {
+    const unavailableScope = scopeNotices.value.find((notice) =>
+        ['managed_scope_inactive', 'managed_scope_missing'].includes(notice.code),
+    );
+    if (unavailableScope) {
         try {
-            await ElMessageBox.confirm(
-                i18n.global.t('firewall.scopeInactive'),
-                i18n.global.t('commons.msg.infoTitle'),
-                {
-                    confirmButtonText: i18n.global.t('commons.button.confirm'),
-                    cancelButtonText: i18n.global.t('commons.button.cancel'),
-                },
-            );
+            await ElMessageBox.confirm(scopeNoticeText(unavailableScope), i18n.global.t('commons.msg.infoTitle'), {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            });
         } catch {
             return;
         }

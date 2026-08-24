@@ -89,6 +89,8 @@ func (s *FirewallService) LoadBaseInfo(chainGroup string) (dto.FirewallSubsystem
 	status.Name, status.Backend = runtimeStatus.Name, runtimeStatus.Name
 	status.Version, status.PingStatus = runtimeStatus.Version, ping.LoadStatus()
 	status.IsActive, status.IsInit, status.IsBind = runtimeStatus.IsActive, initialized, bound
+	status.IPv4.Initialized, status.IPv4.Bound, _ = loadSystemFirewallFamilyStatus(status.Name, constant.FirewallFamilyIPv4)
+	status.IPv6.Initialized, status.IPv6.Bound, _ = loadSystemFirewallFamilyStatus(status.Name, constant.FirewallFamilyIPv6)
 	return status, nil
 }
 
@@ -123,6 +125,14 @@ func (s *FirewallService) OperateFilterChain(request dto.FilterChainOperation) e
 	if err != nil {
 		return err
 	}
+	if request.Operate == "init-ipv6-base" {
+		if provider != constant.FirewallProviderIptables {
+			return fmt.Errorf("IPv6 base-chain initialization is only supported for iptables")
+		}
+		firewallRuleMutationMu.Lock()
+		defer firewallRuleMutationMu.Unlock()
+		return s.iptablesHelper.RepairIPv6BaseChains()
+	}
 	if provider == constant.FirewallProviderNftables {
 		if err := newNftablesHelperManager().Operate(firewall.BaseOperation(request.Operate)); err != nil {
 			return err
@@ -154,6 +164,16 @@ func (s *FirewallService) loadProtectedPorts() ([]firewall.PortWhitelist, error)
 
 func (s *FirewallService) Inventory(ctx context.Context, request dto.FirewallRuleInventory) (dto.FirewallRuleInventoryResponse, error) {
 	scope := request.Scope.Normalize()
+	if isCombinedUFWInventoryScope(scope) {
+		if err := s.checkSelectedProvider(ctx, scope.Provider); err != nil {
+			return dto.FirewallRuleInventoryResponse{}, err
+		}
+		runtime, err := s.adapters.Resolve(scope.Provider)
+		if err != nil {
+			return dto.FirewallRuleInventoryResponse{}, err
+		}
+		return s.combinedUFWInventory(ctx, runtime, scope)
+	}
 	if err := scope.ValidateMVP(); err != nil {
 		return dto.FirewallRuleInventoryResponse{}, err
 	}
@@ -179,6 +199,55 @@ func (s *FirewallService) Inventory(ctx context.Context, request dto.FirewallRul
 		return dto.FirewallRuleInventoryResponse{}, err
 	}
 	return dto.FirewallRuleInventoryResponse{Items: items, Notices: snapshot.Notices}, nil
+}
+
+func isCombinedUFWInventoryScope(scope filter.Scope) bool {
+	scope = scope.Normalize()
+	return scope.Provider == filter.ProviderUFW && scope.Family == filter.FamilyInet && scope.Table == "" &&
+		scope.Zone == "" && scope.Chain == filter.UFWInputChain && scope.Direction == filter.DirectionInput
+}
+
+func (s *FirewallService) combinedUFWInventory(
+	ctx context.Context,
+	runtime *firewallRuleRuntime,
+	scope filter.Scope,
+) (dto.FirewallRuleInventoryResponse, error) {
+	scopes := []filter.Scope{scope, scope}
+	scopes[0].Family = filter.FamilyIPv4
+	scopes[1].Family = filter.FamilyIPv6
+	snapshots, err := runtime.ObserveScopes(ctx, scopes)
+	if err != nil {
+		return dto.FirewallRuleInventoryResponse{}, err
+	}
+	if len(snapshots) != len(scopes) {
+		return dto.FirewallRuleInventoryResponse{}, fmt.Errorf("%w: incomplete UFW multi-family inventory", filter.ErrAdapterUnavailable)
+	}
+
+	response := dto.FirewallRuleInventoryResponse{}
+	seenNotices := make(map[string]struct{})
+	for index, snapshot := range snapshots {
+		if snapshot.Scope.Key() != scopes[index].Key() {
+			return dto.FirewallRuleInventoryResponse{}, fmt.Errorf("%w: unexpected UFW inventory scope %q", filter.ErrInvalidScope, snapshot.Scope.Key())
+		}
+		stored, err := s.rules.List(ctx, repo.WithFirewallRuleScope(snapshot.Scope.Key()))
+		if err != nil {
+			return dto.FirewallRuleInventoryResponse{}, err
+		}
+		items, err := mergeFirewallInventory(snapshot.Rules, stored, nil, nil)
+		if err != nil {
+			return dto.FirewallRuleInventoryResponse{}, err
+		}
+		response.Items = append(response.Items, items...)
+		for _, notice := range snapshot.Notices {
+			key := string(notice.Code) + "\x00" + strings.Join(notice.Values, "\x00")
+			if _, exists := seenNotices[key]; exists {
+				continue
+			}
+			seenNotices[key] = struct{}{}
+			response.Notices = append(response.Notices, notice)
+		}
+	}
+	return response, nil
 }
 
 func (s *FirewallService) LoadFirewallNativeDetail(ctx context.Context, request dto.FirewallNativeDetail) (string, error) {
@@ -1169,10 +1238,37 @@ func (s *FirewallService) updateRule(ctx context.Context, clientIP, ruleUUID str
 	if err := filter.GuardMutation(snapshot, observed, after, clientIP, protectedPorts...); err != nil {
 		return err
 	}
+	metadataOnly, err := isUFWMetadataOnlyUpdate(before.Rule, after, observed.Locator)
+	if err != nil {
+		return err
+	}
+	if metadataOnly {
+		if after.Description == before.Rule.Description {
+			return nil
+		}
+		return s.rules.UpdateWithRevision(ctx, stored.UUID, stored.Revision, map[string]interface{}{
+			"description": after.Description,
+		})
+	}
 	return s.executeManagedMutation(ctx, managedMutationRequest{
 		Stored: stored, Before: before.Rule, After: after, Snapshot: snapshot, Locator: observed.Locator,
 		AdapterOperation: filter.ChangeUpdate, Runtime: runtime,
 	})
+}
+
+func isUFWMetadataOnlyUpdate(before, after filter.FirewallRule, locator filter.Locator) (bool, error) {
+	if after.Scope.Provider != filter.ProviderUFW || locator.Position == nil || after.OrderIndex == nil {
+		return false, nil
+	}
+	beforeKey, err := filter.RuleKey(before)
+	if err != nil {
+		return false, err
+	}
+	afterKey, err := filter.RuleKey(after)
+	if err != nil {
+		return false, err
+	}
+	return beforeKey == afterKey && *after.OrderIndex == int64(*locator.Position), nil
 }
 
 func (s *FirewallService) reorderRule(ctx context.Context, clientIP, ruleUUID string, targetPosition *int64, priority *int) error {
@@ -1970,14 +2066,35 @@ func (r *firewallRuleRuntime) Observe(ctx context.Context, scope filter.Scope) (
 	return r.policy(ctx, snapshot)
 }
 
+func (r *firewallRuleRuntime) ObserveScopes(ctx context.Context, scopes []filter.Scope) ([]filter.Snapshot, error) {
+	observer, ok := r.adapter.(filter.MultiScopeObserver)
+	if !ok {
+		return nil, fmt.Errorf("%w: %s multi-scope inventory", filter.ErrAdapterUnavailable, r.adapter.Provider())
+	}
+	snapshots, err := observer.ObserveScopes(ctx, scopes)
+	if err != nil {
+		return nil, err
+	}
+	if r.policy == nil {
+		return snapshots, nil
+	}
+	for index := range snapshots {
+		snapshots[index], err = r.policy(ctx, snapshots[index])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return snapshots, nil
+}
+
 func (r *firewallRuleRuntime) ObserveMutation(ctx context.Context, scope filter.Scope) (filter.Snapshot, error) {
 	snapshot, err := r.Observe(ctx, scope)
 	if err != nil {
 		return filter.Snapshot{}, err
 	}
 	for _, notice := range snapshot.Notices {
-		if notice.Code == filter.ScopeNoticeManagedScopeInactive {
-			return filter.Snapshot{}, fmt.Errorf("%w: managed firewall scope is inactive", filter.ErrProviderUnavailable)
+		if notice.Code == filter.ScopeNoticeManagedScopeInactive || notice.Code == filter.ScopeNoticeManagedScopeMissing {
+			return filter.Snapshot{}, fmt.Errorf("%w: managed firewall scope is unavailable", filter.ErrProviderUnavailable)
 		}
 	}
 	return snapshot, nil

@@ -67,6 +67,10 @@ type Adapter interface {
 	Verify(context.Context, BackendPlan) (VerifyResult, error)
 }
 
+type MultiScopeObserver interface {
+	ObserveScopes(context.Context, []Scope) ([]Snapshot, error)
+}
+
 type RulePreparer interface {
 	PrepareRule(FirewallRule) (FirewallRule, error)
 }

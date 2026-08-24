@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"errors"
+	"path/filepath"
 	"testing"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -10,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func TestFirewallTransferImportsCleansAndMarksCompletion(t *testing.T) {
@@ -109,6 +111,160 @@ func TestFirewallTransferFailureRemainsRetryable(t *testing.T) {
 	}
 }
 
+func TestFirewallTransferRetriesCleanupWithoutDuplicatingData(t *testing.T) {
+	db := newFirewallTransferTestDB(t)
+	cleanupCalls := 0
+	transfer := &firewallTransfer{
+		db: db,
+		load: func() (firewallTransferSource, error) {
+			legacy := legacyFirewalldForward{
+				rule: forwarding.Rule{Protocol: "tcp", Port: "8443", TargetIP: "10.0.0.8", TargetPort: "443"},
+				spec: "port=8443:proto=tcp:toport=443:toaddr=10.0.0.8",
+			}
+			return firewallTransferSource{
+				rules: []forwarding.Rule{legacy.rule}, firewalld: []legacyFirewalldForward{legacy}, provider: "iptables",
+				cleanupOld: func([]legacyFirewalldForward) error {
+					cleanupCalls++
+					if cleanupCalls == 1 {
+						return errors.New("temporary cleanup failure")
+					}
+					return nil
+				},
+			}, nil
+		},
+	}
+
+	if err := transfer.run(context.Background()); err == nil {
+		t.Fatal("first cleanup failure was ignored")
+	}
+	if err := transfer.run(context.Background()); err != nil {
+		t.Fatalf("retry firewall transfer: %v", err)
+	}
+	var count int64
+	if err := db.Model(&model.ForwardingRule{}).Count(&count).Error; err != nil {
+		t.Fatal(err)
+	}
+	if count != 1 || cleanupCalls != 2 {
+		t.Fatalf("retry result count=%d cleanupCalls=%d", count, cleanupCalls)
+	}
+	completed, err := firewallTransferCompleted(db)
+	if err != nil || !completed {
+		t.Fatalf("retry completion = %v, err=%v", completed, err)
+	}
+}
+
+func TestFirewallTransferEmptyInventoryMarksCompletionWithoutEnabling(t *testing.T) {
+	db := newFirewallTransferTestDB(t)
+	transfer := &firewallTransfer{
+		db: db,
+		load: func() (firewallTransferSource, error) {
+			return firewallTransferSource{}, nil
+		},
+	}
+	if err := transfer.run(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	completed, err := firewallTransferCompleted(db)
+	if err != nil || !completed {
+		t.Fatalf("empty transfer completion = %v, err=%v", completed, err)
+	}
+	var count int64
+	if err := db.Model(&model.Setting{}).Where("key IN ?", []string{"IptablesForwardStatus", "ForwardingBackend"}).Count(&count).Error; err != nil {
+		t.Fatal(err)
+	}
+	if count != 0 {
+		t.Fatalf("empty transfer created %d forwarding settings", count)
+	}
+}
+
+func TestFirewallTransferInvalidInventoryIsAtomicAndRetryable(t *testing.T) {
+	db := newFirewallTransferTestDB(t)
+	transfer := &firewallTransfer{
+		db: db,
+		load: func() (firewallTransferSource, error) {
+			return firewallTransferSource{rules: []forwarding.Rule{
+				{Protocol: "tcp", Port: "8080", TargetIP: "127.0.0.1", TargetPort: "80"},
+				{Protocol: "tcp", Port: "invalid", TargetIP: "127.0.0.1", TargetPort: "80"},
+			}}, nil
+		},
+	}
+	if err := transfer.run(context.Background()); err == nil {
+		t.Fatal("invalid legacy forwarding inventory was accepted")
+	}
+	completed, err := firewallTransferCompleted(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var count int64
+	if err := db.Model(&model.ForwardingRule{}).Count(&count).Error; err != nil {
+		t.Fatal(err)
+	}
+	if completed || count != 0 {
+		t.Fatalf("invalid transfer completed=%v imported=%d", completed, count)
+	}
+}
+
+func TestFirewallTransferUpdatesExistingSettings(t *testing.T) {
+	db := newFirewallTransferTestDB(t)
+	settings := []model.Setting{
+		{Key: "IptablesForwardStatus", Value: constant.StatusDisable},
+		{Key: "ForwardingBackend", Value: "nftables"},
+	}
+	if err := db.Create(&settings).Error; err != nil {
+		t.Fatal(err)
+	}
+	transfer := &firewallTransfer{
+		db: db,
+		load: func() (firewallTransferSource, error) {
+			return firewallTransferSource{
+				rules:    []forwarding.Rule{{Protocol: "udp", Port: "5353", TargetIP: "127.0.0.1", TargetPort: "53"}},
+				provider: "iptables",
+			}, nil
+		},
+	}
+	if err := transfer.run(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	for key, want := range map[string]string{
+		"IptablesForwardStatus": constant.StatusEnable,
+		"ForwardingBackend":     "iptables",
+	} {
+		var matches []model.Setting
+		if err := db.Where("key = ?", key).Find(&matches).Error; err != nil {
+			t.Fatal(err)
+		}
+		if len(matches) != 1 || matches[0].Value != want {
+			t.Fatalf("setting %s after transfer = %#v, want %q", key, matches, want)
+		}
+	}
+}
+
+func TestFirewallTransferValidatesDependencies(t *testing.T) {
+	if err := (&firewallTransfer{}).run(context.Background()); err == nil {
+		t.Fatal("nil transfer database was accepted")
+	}
+	db := newFirewallTransferTestDB(t)
+	if err := (&firewallTransfer{db: db}).run(context.Background()); err == nil {
+		t.Fatal("nil legacy loader was accepted")
+	}
+	transfer := &firewallTransfer{
+		db: db,
+		load: func() (firewallTransferSource, error) {
+			legacy := legacyFirewalldForward{rule: forwarding.Rule{
+				Protocol: "tcp", Port: "8080", TargetIP: "127.0.0.1", TargetPort: "80",
+			}}
+			return firewallTransferSource{rules: []forwarding.Rule{legacy.rule}, firewalld: []legacyFirewalldForward{legacy}}, nil
+		},
+	}
+	if err := transfer.run(context.Background()); err == nil {
+		t.Fatal("missing firewalld cleanup was accepted")
+	}
+	completed, err := firewallTransferCompleted(db)
+	if err != nil || completed {
+		t.Fatalf("dependency failure completion=%v err=%v", completed, err)
+	}
+}
+
 func TestParseLegacyFirewalldForwarding(t *testing.T) {
 	rules := parseLegacyFirewalldForwarding(
 		"port=8080:proto=tcp:toport=80:toaddr=10.0.0.2\n" +
@@ -144,7 +300,9 @@ func TestParseLegacyIptablesForwarding(t *testing.T) {
 
 func newFirewallTransferTestDB(t *testing.T) *gorm.DB {
 	t.Helper()
-	db, err := gorm.Open(sqlite.Open("file:"+t.Name()+"?mode=memory&cache=shared"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(filepath.Join(t.TempDir(), "migration.db")), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

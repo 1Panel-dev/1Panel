@@ -59,7 +59,7 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { Firewall } from '@/api/interface/firewall';
 import { getNetworkOptions } from '@/api/modules/host';
 import { operateForwardRule } from '@/api/modules/firewall';
@@ -107,26 +107,21 @@ const rules = reactive({
 });
 
 function checkPortRule(rule: any, value: string, callback: any) {
-    if (!value) {
+    if (!isValidPortRange(value)) {
         return callback(new Error(i18n.global.t('firewall.portFormatError')));
     }
+    callback();
+}
+
+function isValidPortRange(value: string) {
+    if (!value) return false;
     if (value.indexOf('-') !== -1) {
         const ports = value.split('-');
-        if (ports.length !== 2) {
-            return callback(new Error(i18n.global.t('firewall.portFormatError')));
-        }
-        if (checkPort(ports[0]) || checkPort(ports[1])) {
-            return callback(new Error(i18n.global.t('firewall.portFormatError')));
-        }
-        if (Number(ports[0]) > Number(ports[1])) {
-            return callback(new Error(i18n.global.t('firewall.portFormatError')));
-        }
-    } else {
-        if (checkPort(value)) {
-            return callback(new Error(i18n.global.t('firewall.portFormatError')));
-        }
+        if (ports.length !== 2) return false;
+        if (checkPort(ports[0]) || checkPort(ports[1])) return false;
+        return Number(ports[0]) <= Number(ports[1]);
     }
-    callback();
+    return !checkPort(value);
 }
 function checkAddress(rule: any, value: string, callback: any) {
     if (!value) {
@@ -145,11 +140,16 @@ const formRef = ref<FormInstance>();
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
+    const { rowData } = dialogData.value;
+    if (!rowData) return;
+    if (!isValidPortRange(rowData.port) || !isValidPortRange(rowData.targetPort)) {
+        await formEl.validateField(['port', 'targetPort']).catch(() => undefined);
+        MsgError(i18n.global.t('commons.rule.port'));
+        return;
+    }
     formEl.validate(async (valid) => {
         if (!valid) return;
-        const { rowData } = dialogData.value;
         let rules = [];
-        if (!rowData) return;
         rowData.operation = 'add';
         if (rowData.targetIP === '') {
             rowData.targetIP = rowData.family === 'ipv6' ? '::1' : '127.0.0.1';

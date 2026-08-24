@@ -239,10 +239,101 @@ const form = reactive({
 });
 
 const defaultFamily = (): Firewall.Family => 'ipv4';
+const splitTagValues = (values: string[]) => [
+    ...new Set(
+        values
+            .flatMap((value) => value.split(/[,，;；\s]+/))
+            .map((value) => value.trim())
+            .filter(Boolean),
+    ),
+];
+
+const isValidIPv4Address = (value: string) => {
+    const parts = value.split('.');
+    return (
+        parts.length === 4 &&
+        parts.every((part) => /^(0|[1-9]\d{0,2})$/.test(part) && Number(part) >= 0 && Number(part) <= 255)
+    );
+};
+
+const isValidIPv6Address = (value: string) => {
+    if (!value.includes(':') || value.includes(':::') || (value.match(/::/g) || []).length > 1) return false;
+
+    let normalized = value;
+    if (normalized.includes('.')) {
+        const separator = normalized.lastIndexOf(':');
+        if (separator < 0 || !isValidIPv4Address(normalized.slice(separator + 1))) return false;
+        normalized = `${normalized.slice(0, separator)}:0:0`;
+    }
+
+    const compressed = normalized.includes('::');
+    const [left = '', right = ''] = normalized.split('::');
+    const groups = [...(left ? left.split(':') : []), ...(right ? right.split(':') : [])];
+    if (groups.some((group) => !/^[\da-f]{1,4}$/i.test(group))) return false;
+    return compressed ? groups.length < 8 : groups.length === 8;
+};
+
+const isValidIPOrCIDR = (value: string) => {
+    const slash = value.indexOf('/');
+    if (slash !== value.lastIndexOf('/')) return false;
+    const address = slash === -1 ? value : value.slice(0, slash);
+    const prefix = slash === -1 ? undefined : value.slice(slash + 1);
+    const ipv6 = address.includes(':');
+    if (!(ipv6 ? isValidIPv6Address(address) : isValidIPv4Address(address))) return false;
+    if (prefix === undefined) return true;
+    if (!/^\d{1,3}$/.test(prefix)) return false;
+    const prefixNumber = Number(prefix);
+    return prefixNumber >= 0 && prefixNumber <= (ipv6 ? 128 : 32);
+};
+
+const isValidPort = (value: string) => {
+    const matched = value.match(/^(\d+)(?:-(\d+))?$/);
+    if (!matched) return false;
+    const start = Number(matched[1]);
+    const end = matched[2] === undefined ? start : Number(matched[2]);
+    return start >= 1 && start <= 65535 && end >= start && end <= 65535;
+};
+
+type ValidationCallback = (error?: Error) => void;
+const hasRuleTarget = () =>
+    splitTagValues(form.sourceAddresses.map((item) => item.address)).length > 0 ||
+    Boolean(form.destinationAddress) ||
+    Boolean(form.sourcePort) ||
+    splitTagValues(form.destinationPorts).length > 0;
+
+const validateSourceAddresses = (_rule: unknown, value: SourceAddressItem[], callback: ValidationCallback) => {
+    const addresses = splitTagValues((value || []).map((item) => item.address));
+    if (addresses.some((address) => !isValidIPOrCIDR(address))) {
+        callback(new Error(i18n.global.t('commons.rule.ip')));
+        return;
+    }
+    if (mode.value === 'edit' && addresses.length > 1) {
+        callback(
+            new Error(`${i18n.global.t('firewall.sourceIP')}: ${i18n.global.t('commons.msg.notSupportOperation')}`),
+        );
+        return;
+    }
+    if (!hasRuleTarget()) {
+        callback(new Error(i18n.global.t('firewall.ruleTargetRequired')));
+        return;
+    }
+    callback();
+};
+
+const validateDestinationPorts = (_rule: unknown, value: string[], callback: ValidationCallback) => {
+    const ports = splitTagValues(value || []);
+    if (ports.some((port) => !isValidPort(port))) {
+        callback(new Error(i18n.global.t('commons.rule.port')));
+        return;
+    }
+    callback();
+};
 
 const rules = reactive<FormRules>({
     protocol: [Rules.requiredSelect],
     action: [Rules.requiredSelect],
+    sourceAddresses: [{ validator: validateSourceAddresses, trigger: ['blur', 'change'] }],
+    destinationPorts: [{ validator: validateDestinationPorts, trigger: ['blur', 'change'] }],
 });
 
 const portProtocol = computed(() => ['tcp', 'udp', 'tcp/udp'].includes(form.protocol));
@@ -347,14 +438,6 @@ const ruleCheckItemKey = (item: BatchPlanItem) =>
 
 const hasBlockingRules = computed(() => ruleCheckCounts.value.error > 0);
 const existingRuleItems = computed(() => batchPlans.value.filter((item) => ruleCheckStatus(item.plan) === 'existing'));
-const splitTagValues = (values: string[]) => [
-    ...new Set(
-        values
-            .flatMap((value) => value.split(/[,，;；\s]+/))
-            .map((value) => value.trim())
-            .filter(Boolean),
-    ),
-];
 const normalizeSourceAddresses = () => {
     const seen = new Set<string>();
     let normalized = form.sourceAddresses.flatMap((item) => {
@@ -371,6 +454,10 @@ const normalizeSourceAddresses = () => {
     if (normalized.some((item) => item.address)) {
         normalized = normalized.filter((item) => item.address);
     }
+    if (mode.value === 'edit' && normalized.length > 1) {
+        MsgError(`${i18n.global.t('firewall.sourceIP')}: ${i18n.global.t('commons.msg.notSupportOperation')}`);
+        return false;
+    }
     const fallback = form.sourceAddresses[0] || { family: 'ipv4', address: '' };
     form.sourceAddresses =
         mode.value === 'edit'
@@ -378,6 +465,7 @@ const normalizeSourceAddresses = () => {
             : normalized.length > 0
               ? normalized
               : [{ ...fallback, address: '' }];
+    return true;
 };
 const normalizeDestinationPorts = (values = form.destinationPorts) => {
     const normalized = [
@@ -388,11 +476,15 @@ const normalizeDestinationPorts = (values = form.destinationPorts) => {
                 .filter(Boolean),
         ),
     ];
+    if (provider.value === 'ufw' || provider.value === 'iptables') {
+        form.destinationPorts = [normalized.join(',')];
+        return true;
+    }
     if (mode.value === 'edit' && normalized.length > 1) {
         MsgError(i18n.global.t('commons.msg.notSupportOperation'));
         return false;
     }
-    form.destinationPorts = mode.value === 'edit' ? [normalized[0] || ''] : normalized.length > 0 ? normalized : [''];
+    form.destinationPorts = normalized.length > 0 ? normalized : [''];
     return true;
 };
 const addSourceAddress = () => {
@@ -607,7 +699,7 @@ const previewProtocol = (rule: Firewall.Rule) =>
         : rule.protocol.toUpperCase();
 
 const buildPreviewRules = () => {
-    normalizeSourceAddresses();
+    if (!normalizeSourceAddresses()) return false;
     if (!normalizeDestinationPorts()) return false;
     const addresses =
         form.sourceAddresses.length > 0 ? form.sourceAddresses : [{ family: 'ipv4' as const, address: '' }];
@@ -631,6 +723,10 @@ const buildPreviewRules = () => {
             }),
         ),
     );
+    if (mode.value === 'edit' && rules.length !== 1) {
+        MsgError(i18n.global.t('commons.msg.notSupportOperation'));
+        return false;
+    }
     if (rules.length > 256) {
         MsgError(i18n.global.t('firewall.batchRuleLimit', [256]));
         return false;
@@ -706,19 +802,10 @@ const executeBatchPlans = async () => {
 
 const prepareRulesFromForm = async () => {
     if (!formRef.value) return previewRules.value.length > 0;
-    normalizeSourceAddresses();
-    if (!normalizeDestinationPorts()) return false;
-    if (
-        splitTagValues(form.sourceAddresses.map((item) => item.address)).length === 0 &&
-        !form.destinationAddress &&
-        !form.sourcePort &&
-        splitTagValues(form.destinationPorts).length === 0
-    ) {
-        MsgError(i18n.global.t('firewall.ruleTargetRequired'));
-        return false;
-    }
     const valid = await formRef.value.validate().catch(() => false);
     if (!valid) return false;
+    if (!normalizeSourceAddresses()) return false;
+    if (!normalizeDestinationPorts()) return false;
     return buildPreviewRules();
 };
 

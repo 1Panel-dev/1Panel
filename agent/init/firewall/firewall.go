@@ -35,6 +35,7 @@ func Init() {
 		return
 	}
 	if !needInit() {
+		repairIptablesIPv6BaseChains(clientName)
 		return
 	}
 	defer initDockerPortGuard(ctx)
@@ -80,6 +81,27 @@ func Init() {
 		}
 	}
 
+}
+
+func repairIptablesIPv6BaseChains(clientName string) {
+	if clientName != constant.FirewallProviderIptables {
+		return
+	}
+	settingRepo := repo.NewISettingRepo()
+	status, _ := settingRepo.GetValueByKey("IptablesStatus")
+	if status != constant.StatusEnable {
+		return
+	}
+	initialized, bound, err := iptables_helper.LoadFamilyInitStatus(constant.FirewallFamilyIPv6, "base")
+	if err == nil && initialized && bound {
+		return
+	}
+	panelPort := service.LoadPanelPort()
+	if err := iptables_helper.RepairIPv6BaseChains(panelPort); err != nil {
+		global.LOG.Warnf("repair IPv6 iptables base chains failed, err: %v", err)
+		return
+	}
+	global.LOG.Info("repaired IPv6 iptables base chains successfully")
 }
 
 func initDockerPortGuard(ctx context.Context) {

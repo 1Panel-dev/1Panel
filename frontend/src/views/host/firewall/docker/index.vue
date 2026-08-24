@@ -50,7 +50,7 @@
                 <TableRefresh @search="search" />
             </template>
             <template #main>
-                <ComplexTable :data="containerRows" :heightDiff="360">
+                <ComplexTable :data="containerRows" :heightDiff="370">
                     <el-table-column :label="$t('commons.table.name')" min-width="180">
                         <template #default="{ row }">{{ row.name }}</template>
                     </el-table-column>

@@ -3,6 +3,7 @@ package iptables
 import (
 	"context"
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -72,6 +73,29 @@ func TestIPv6ObserveCompileAndCapabilities(t *testing.T) {
 	capabilities, err := adapter.Capabilities(context.Background())
 	if err != nil || !capabilities.SupportsScope(scope) || !capabilities.SupportsScope(testScope("1PANEL_BASIC")) {
 		t.Fatalf("IPv4/IPv6 capabilities are incomplete: %#v err=%v", capabilities, err)
+	}
+}
+
+func TestContainsChainDeclarationRejectsMissingManagedChain(t *testing.T) {
+	if !containsChainDeclaration("-N 1PANEL_BASIC\n-A 1PANEL_BASIC -j ACCEPT\n", "1PANEL_BASIC") {
+		t.Fatal("managed chain declaration was not detected")
+	}
+	if containsChainDeclaration("", "1PANEL_BASIC") ||
+		containsChainDeclaration("-N 1PANEL_BASIC_OTHER\n", "1PANEL_BASIC") {
+		t.Fatal("missing managed chain was treated as initialized")
+	}
+}
+
+func TestObserveReportsMissingManagedChainWithoutHidingOtherFamilies(t *testing.T) {
+	scope := testScopeFamily("1PANEL_BASIC", filter.FamilyIPv6)
+	adapter := NewAdapterWithReader(&fakeRuleReader{err: fmt.Errorf("%w: IPv6 chain is missing", filter.ErrProviderUnavailable)})
+	snapshot, err := adapter.Observe(context.Background(), scope)
+	if err != nil {
+		t.Fatalf("observe missing managed chain: %v", err)
+	}
+	if len(snapshot.Rules) != 0 || len(snapshot.Notices) != 1 ||
+		snapshot.Notices[0].Code != filter.ScopeNoticeManagedScopeMissing {
+		t.Fatalf("unexpected missing-chain snapshot: %#v", snapshot)
 	}
 }
 

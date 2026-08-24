@@ -111,7 +111,8 @@ import { computed, reactive, ref } from 'vue';
 import { Firewall } from '@/api/interface/firewall';
 import { deleteDockerPortGuardPolicies, upsertDockerPortGuardPolicies } from '@/api/modules/firewall';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { checkCidr, checkCidrV6, checkIpV6 } from '@/utils/validate';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 
 const props = defineProps<{ containers: Firewall.DockerGuardContainer[] }>();
@@ -178,8 +179,24 @@ const openPolicy = (endpoints: Firewall.DockerGuardEndpoint[]) => {
     sourcesText.value = form.sources.join('\n');
     policyVisible.value = true;
 };
+const validSource = (family: Firewall.DockerGuardEndpoint['family'], value: string) => {
+    if (family === 'ipv6') return value.includes('/') ? !checkCidrV6(value) : !checkIpV6(value);
+    return !checkCidr(value);
+};
 const submitPolicy = async () => {
-    form.sources = sourcesText.value.split(/[\s,]+/).filter(Boolean);
+    const sources = [...new Set(sourcesText.value.split(/[\s,]+/).filter(Boolean))];
+    if (form.mode === 'deny_sources' && sources.length === 0) {
+        MsgError(i18n.global.t('commons.rule.requiredInput'));
+        return;
+    }
+    if (
+        form.mode !== 'deny_all' &&
+        sources.some((source) => policyEndpoints.value.some((endpoint) => !validSource(endpoint.family, source)))
+    ) {
+        MsgError(i18n.global.t('commons.rule.ip'));
+        return;
+    }
+    form.sources = form.mode === 'deny_all' ? [] : sources;
     await upsertDockerPortGuardPolicies({
         endpoints: policyEndpoints.value.map(({ family, hostIP, hostPort, protocol }) => ({
             family,

@@ -2,6 +2,8 @@ package utils
 
 import (
 	"context"
+	"errors"
+	"path/filepath"
 	"sort"
 	"testing"
 
@@ -10,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func TestTransferHostFirewallImportsIptablesRecords(t *testing.T) {
@@ -190,9 +193,127 @@ func TestTransferHostFirewallRestoresMissingDescription(t *testing.T) {
 	}
 }
 
+func TestTransferHostFirewallReadsDeprecatedColumnsOnDirectUpgrade(t *testing.T) {
+	db := newHostFirewallTransferTestDB(t, true)
+	records := []legacyHostFirewallRecord{
+		{Type: "port", Port: "8080", Address: "Anywhere", Protocol: "tcp", Strategy: "accept", Description: "legacy port"},
+		{Type: "address", Address: "192.0.2.25", Strategy: "drop", Description: "legacy address"},
+		{
+			Type: "port", Port: "9000", Address: "192.0.2.90", DstPort: "9001", SrcIP: "192.0.2.91",
+			Protocol: "udp", Strategy: "accept", Description: "new columns win",
+		},
+	}
+	if err := db.Table("firewalls").Create(&records).Error; err != nil {
+		t.Fatal(err)
+	}
+
+	if err := transferHostFirewall(context.Background(), db, filter.ProviderIptables); err != nil {
+		t.Fatal(err)
+	}
+	rules := loadTransferredHostFirewallRules(t, db)
+	if len(rules) != 3 {
+		t.Fatalf("transferred %d direct-upgrade rules, want 3", len(rules))
+	}
+	for _, rule := range rules {
+		switch rule.Description {
+		case "legacy port":
+			if rule.DestinationPort != "8080" || rule.SourceAddress != "" {
+				t.Fatalf("deprecated port columns were not migrated: %#v", rule)
+			}
+		case "legacy address":
+			if rule.SourceAddress != "192.0.2.25/32" || rule.Action != string(filter.ActionDrop) {
+				t.Fatalf("deprecated address column was not migrated: %#v", rule)
+			}
+		case "new columns win":
+			if rule.DestinationPort != "9001" || rule.SourceAddress != "192.0.2.91/32" {
+				t.Fatalf("deprecated columns overwrote normalized columns: %#v", rule)
+			}
+		}
+	}
+}
+
+func TestTransferHostFirewallCoalescesDuplicatesAndSkipsInvalidRows(t *testing.T) {
+	db := newHostFirewallTransferTestDB(t, true)
+	records := []legacyHostFirewallRecord{
+		{Type: "port", Protocol: "tcp", DstPort: "443", Strategy: "accept", Description: "first"},
+		{Type: "port", Protocol: "tcp", DstPort: "443", Strategy: "accept", Description: "latest"},
+		{Type: "port", Protocol: "tcp", DstPort: "invalid", Strategy: "accept", Description: "invalid"},
+	}
+	if err := db.Table("firewalls").Create(&records).Error; err != nil {
+		t.Fatal(err)
+	}
+
+	if err := transferHostFirewall(context.Background(), db, filter.ProviderIptables); err != nil {
+		t.Fatal(err)
+	}
+	rules := loadTransferredHostFirewallRules(t, db)
+	if len(rules) != 1 || rules[0].Description != "latest" || rules[0].DestinationPort != "443" {
+		t.Fatalf("unexpected duplicate/invalid migration result: %#v", rules)
+	}
+	assertHostFirewallTransferCompleted(t, db)
+}
+
+func TestTransferHostFirewallFailureDoesNotMarkCompletion(t *testing.T) {
+	t.Run("unsupported provider", func(t *testing.T) {
+		db := newHostFirewallTransferTestDB(t, true)
+		err := transferHostFirewall(context.Background(), db, filter.Provider("unknown"))
+		if err == nil {
+			t.Fatal("unsupported provider was accepted")
+		}
+		assertHostFirewallTransferNotCompleted(t, db)
+	})
+
+	t.Run("cancelled context", func(t *testing.T) {
+		db := newHostFirewallTransferTestDB(t, true)
+		record := legacyHostFirewallRecord{Type: "port", Protocol: "tcp", DstPort: "80", Strategy: "accept"}
+		if err := db.Table("firewalls").Create(&record).Error; err != nil {
+			t.Fatal(err)
+		}
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+		err := transferHostFirewall(ctx, db, filter.ProviderIptables)
+		if !errors.Is(err, context.Canceled) {
+			t.Fatalf("cancelled transfer error = %v", err)
+		}
+		assertHostFirewallTransferNotCompleted(t, db)
+	})
+}
+
+func TestTransferHostFirewallPreservesExistingDescription(t *testing.T) {
+	db := newHostFirewallTransferTestDB(t, true)
+	record := legacyHostFirewallRecord{
+		Type: "port", Protocol: "tcp", DstPort: "443", Strategy: "accept", Description: "legacy description",
+	}
+	if err := db.Table("firewalls").Create(&record).Error; err != nil {
+		t.Fatal(err)
+	}
+	domainRules, err := legacyHostFirewallRules(record, filter.ProviderIptables)
+	if err != nil {
+		t.Fatal(err)
+	}
+	existing, err := hostFirewallRuleModel(domainRules[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	existing.Description = "user description"
+	if err := db.Create(&existing).Error; err != nil {
+		t.Fatal(err)
+	}
+
+	if err := transferHostFirewall(context.Background(), db, filter.ProviderIptables); err != nil {
+		t.Fatal(err)
+	}
+	rules := loadTransferredHostFirewallRules(t, db)
+	if len(rules) != 1 || rules[0].Description != "user description" {
+		t.Fatalf("migration overwrote existing description: %#v", rules)
+	}
+}
+
 func newHostFirewallTransferTestDB(t *testing.T, withLegacyTable bool) *gorm.DB {
 	t.Helper()
-	db, err := gorm.Open(sqlite.Open("file:"+t.Name()+"?mode=memory&cache=shared"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(filepath.Join(t.TempDir(), "migration.db")), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -237,5 +358,16 @@ func assertHostFirewallTransferCompleted(t *testing.T, db *gorm.DB) {
 	}
 	if !completed {
 		t.Fatal("host firewall transfer was not marked complete")
+	}
+}
+
+func assertHostFirewallTransferNotCompleted(t *testing.T, db *gorm.DB) {
+	t.Helper()
+	completed, err := migrationRecordExists(db, hostFirewallTransferMigrationID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if completed {
+		t.Fatal("failed host firewall transfer was marked complete")
 	}
 }

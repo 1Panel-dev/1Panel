@@ -1,6 +1,7 @@
 package iptables_helper
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -118,5 +119,96 @@ func TestBuildBaseChainBindingsRestoreScriptRebindsInOneTransaction(t *testing.T
 	}
 	if strings.Contains(script, "external") || strings.Count(script, "COMMIT\n") != 1 {
 		t.Fatalf("binding batch modified an external rule or is not atomic:\n%s", script)
+	}
+}
+
+func TestLoadInitStatusUsesIPv6BaselineWithoutIPv4TerminalRules(t *testing.T) {
+	output := strings.Join([]string{
+		"-N " + BasicBeforeChain,
+		"-N " + BasicChain,
+		"-N " + BasicAfterChain,
+		"-A " + BasicBeforeChain + " -i lo -m comment --comment \"Loopback Whitelist\" -j ACCEPT",
+		"-A " + BasicBeforeChain + " -m conntrack --ctstate RELATED,ESTABLISHED -m comment --comment \"ESTABLISHED Whitelist\" -j ACCEPT",
+		"-A " + InputChain + " -j " + BasicBeforeChain,
+		"-A " + InputChain + " -j " + BasicChain,
+		"-A " + InputChain + " -j " + BasicAfterChain,
+	}, "\n")
+	runner := func(string, ...string) (string, error) { return output, nil }
+	initialized, bound, err := loadInitStatus("base", runner, false)
+	if err != nil || !initialized || !bound {
+		t.Fatalf("IPv6 baseline status = initialized:%v bound:%v err:%v", initialized, bound, err)
+	}
+	initialized, bound, err = loadInitStatus("base", runner, true)
+	if err != nil || initialized || bound {
+		t.Fatalf("IPv4 status ignored missing terminal rules: initialized:%v bound:%v err:%v", initialized, bound, err)
+	}
+}
+
+func TestRepairIPv6BaseChainsOnlyBindsInitializedChains(t *testing.T) {
+	bindCalls, ensureCalls := 0, 0
+	err := repairIPv6BaseChains(true, false, func() error {
+		bindCalls++
+		return nil
+	}, func() error {
+		ensureCalls++
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("repair initialized IPv6 base chains: %v", err)
+	}
+	if bindCalls != 1 || ensureCalls != 0 {
+		t.Fatalf("repair calls = bind:%d ensure:%d, want bind:1 ensure:0", bindCalls, ensureCalls)
+	}
+}
+
+func TestRepairIPv6BaseChainsRebuildsMissingChains(t *testing.T) {
+	bindCalls, ensureCalls := 0, 0
+	err := repairIPv6BaseChains(false, false, func() error {
+		bindCalls++
+		return nil
+	}, func() error {
+		ensureCalls++
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("repair missing IPv6 base chains: %v", err)
+	}
+	if bindCalls != 0 || ensureCalls != 1 {
+		t.Fatalf("repair calls = bind:%d ensure:%d, want bind:0 ensure:1", bindCalls, ensureCalls)
+	}
+}
+
+func TestRepairIPv6BaseChainsLeavesHealthyChainsUnchanged(t *testing.T) {
+	bindCalls, ensureCalls := 0, 0
+	err := repairIPv6BaseChains(true, true, func() error {
+		bindCalls++
+		return nil
+	}, func() error {
+		ensureCalls++
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("repair healthy IPv6 base chains: %v", err)
+	}
+	if bindCalls != 0 || ensureCalls != 0 {
+		t.Fatalf("repair calls = bind:%d ensure:%d, want no operation", bindCalls, ensureCalls)
+	}
+}
+
+func TestRepairIPv6BaseChainsPropagatesOperationErrors(t *testing.T) {
+	wantBindErr := errors.New("bind failed")
+	if err := repairIPv6BaseChains(true, false, func() error { return wantBindErr }, func() error { return nil }); !errors.Is(err, wantBindErr) {
+		t.Fatalf("bind error = %v, want %v", err, wantBindErr)
+	}
+	wantEnsureErr := errors.New("ensure failed")
+	if err := repairIPv6BaseChains(false, false, func() error { return nil }, func() error { return wantEnsureErr }); !errors.Is(err, wantEnsureErr) {
+		t.Fatalf("ensure error = %v, want %v", err, wantEnsureErr)
+	}
+}
+
+func TestLoadFamilyInitStatusRejectsUnknownFamily(t *testing.T) {
+	initialized, bound, err := LoadFamilyInitStatus("inet", "base")
+	if err == nil || initialized || bound {
+		t.Fatalf("unknown family status = initialized:%v bound:%v err:%v", initialized, bound, err)
 	}
 }

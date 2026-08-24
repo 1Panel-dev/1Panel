@@ -116,12 +116,20 @@ func convertLegacyHostFirewallRecords(records []legacyHostFirewallRecord, provid
 }
 
 func legacyHostFirewallRules(record legacyHostFirewallRecord, provider filter.Provider) ([]filter.FirewallRule, error) {
+	sourceAddress := record.SrcIP
+	if sourceAddress == "" {
+		sourceAddress = record.Address
+	}
+	destinationPort := record.DstPort
+	if destinationPort == "" {
+		destinationPort = record.Port
+	}
 	rule := filter.FirewallRule{
 		Protocol:           record.Protocol,
-		SourceAddress:      record.SrcIP,
+		SourceAddress:      sourceAddress,
 		SourcePort:         record.SrcPort,
 		DestinationAddress: record.DstIP,
-		DestinationPort:    record.DstPort,
+		DestinationPort:    destinationPort,
 		Action:             filter.Action(record.Strategy),
 		Description:        record.Description,
 	}
@@ -130,7 +138,7 @@ func legacyHostFirewallRules(record legacyHostFirewallRecord, provider filter.Pr
 	case "port":
 		rule.SourcePort = ""
 		rule.DestinationAddress = ""
-		rule.DestinationPort = record.DstPort
+		rule.DestinationPort = destinationPort
 	case "address", "ip":
 		rule.Protocol = "all"
 		rule.SourcePort = ""

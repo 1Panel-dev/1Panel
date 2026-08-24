@@ -53,25 +53,44 @@ func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 }
 
 func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snapshot, error) {
-	scope = scope.Normalize()
-	if err := validateScope(scope); err != nil {
+	snapshots, err := a.ObserveScopes(ctx, []filter.Scope{scope})
+	if err != nil {
 		return filter.Snapshot{}, err
 	}
+	return snapshots[0], nil
+}
+
+func (a *Adapter) ObserveScopes(ctx context.Context, scopes []filter.Scope) ([]filter.Snapshot, error) {
+	if len(scopes) == 0 {
+		return nil, fmt.Errorf("%w: UFW observation requires at least one scope", filter.ErrInvalidScope)
+	}
+	normalizedScopes := make([]filter.Scope, len(scopes))
+	for index, scope := range scopes {
+		scope = scope.Normalize()
+		if err := validateScope(scope); err != nil {
+			return nil, err
+		}
+		normalizedScopes[index] = scope
+	}
 	if a.reader == nil {
-		return filter.Snapshot{}, errors.New("ufw reader is required")
+		return nil, errors.New("ufw reader is required")
 	}
 	numbered, err := a.reader.Read(ctx, "status", "numbered")
 	if err != nil {
-		return filter.Snapshot{}, err
+		return nil, err
 	}
 
-	rules := parseNumberedRules(scope, numbered)
-	snapshot, err := filter.NewSnapshot(scope, rules)
-	if err != nil {
-		return filter.Snapshot{}, err
+	notices := statusNotices(numbered)
+	snapshots := make([]filter.Snapshot, 0, len(normalizedScopes))
+	for _, scope := range normalizedScopes {
+		snapshot, err := filter.NewSnapshot(scope, parseNumberedRules(scope, numbered))
+		if err != nil {
+			return nil, err
+		}
+		snapshot.Notices = append([]filter.ScopeNotice(nil), notices...)
+		snapshots = append(snapshots, snapshot)
 	}
-	snapshot.Notices = statusNotices(numbered)
-	return snapshot, nil
+	return snapshots, nil
 }
 
 func (a *Adapter) NativeDetail(ctx context.Context, profile string, _ bool) (string, error) {
