@@ -17,8 +17,10 @@ export namespace Firewall {
         ipv6: BackendFamilyStatus;
     }
     export interface BackendFamilyStatus {
+        available: boolean;
         initialized: boolean;
         bound: boolean;
+        reason?: string;
     }
     export interface BackendGroup {
         selected: string;
@@ -275,6 +277,7 @@ export namespace Firewall {
 
     export interface DockerGuardBase {
         name: string;
+        version: string;
         initialized: boolean;
         bound: boolean;
         ipv4: DockerGuardFamilyStatus;

@@ -946,6 +946,7 @@ const message = {
             from_remote: 'This model was not downloaded via 1Panel, no related pull logs.',
             no_logs: 'The pull logs for this model have been deleted and cannot be viewed.',
             vllmVersionHelper: 'For FusionXpark GB 10 servers, please select the -cu130 version.',
+            ascendVisibleDevices: 'Ascend Visible Devices',
             vllmCommandPortHelper:
                 'The startup command must use port {0}; otherwise, the service will be inaccessible.',
             syncModelAccount: 'Sync to model account',
@@ -1134,6 +1135,7 @@ const message = {
             cachedToken: 'Cached Tokens',
             cacheHitRate: 'Cache Hit Rate',
             activeUsers: 'Active Users',
+            activeStreamingRequests: 'Active Streaming Requests',
             activeModels: 'Active Models',
             failedRequests: 'Failed Requests',
             averageTokenPerRequest: 'Avg Tokens/Request',
@@ -1433,7 +1435,7 @@ const message = {
         },
         gpu: {
             gpu: 'GPU Monitoring',
-            gpuHelper: 'The system did not detect NVIDIA-SMI or XPU-SMI commands. Please check and try again!',
+            gpuHelper: 'No supported GPU/XPU/NPU management command was detected. Please check and try again!',
             process: 'Process Information',
             processCount: 'Process Count',
             type: 'Type',
@@ -4127,10 +4129,9 @@ const message = {
         clearAllRules: 'Clear all rules',
         importBackendHelper: 'Imported rules are converted for the current {0} backend. Source rules are not changed.',
         clearAllRulesHelper: 'Delete all {0} manageable rules from the current backend? This cannot be undone.',
-        switchBackendHelper:
-            'This only changes the firewall backend managed by 1Panel. The original backend will not be migrated, stopped, or cleaned up. Export the current rules first. After switching, initialize the target backend and manually import or verify its rules. External and system-native rules are not exported. Continue switching to {0}?',
-        switchBackendSuccessHelper:
-            '1Panel now manages {0}. The original {1} backend was not stopped or cleaned up and may still be running and effective. Initialize the target backend, import or verify its rules, and manually handle the original backend only after confirming access works normally.',
+        backendSwitchNotice:
+            'Switching only changes the firewall backend currently in use. Existing rules are not migrated or cleaned up. After switching, synchronize the rules to the target firewall and verify that they are effective before cleaning up the original firewall rules.',
+        switchBackendHelper: 'Switch to {0}?',
         uninstalledStatus: 'Not installed',
         initializedStatus: 'Initialized',
         partiallyInitialized: 'Partially initialized',
@@ -4139,6 +4140,7 @@ const message = {
         dockerInputNotProtected:
             'Host INPUT rules do not directly protect this Docker published port. Click to open Container Port Guard.',
         notInitialized: 'Not initialized',
+        familyUnsupported: 'The system does not support {0}',
         dockerGuardUnbindConfirm:
             'After unbinding, all container ports temporarily return to Docker default access behavior. Existing protection settings are retained. Continue?',
         deleteDockerGuardPolicyConfirm: 'This endpoint will return to Docker default access behavior. Continue?',
@@ -4188,7 +4190,7 @@ const message = {
         exportHelper: 'About to export {0} firewall rules. Continue?',
         importSuccess: 'Successfully imported {0} rules',
         importPartialSuccess: 'Import completed: {0} succeeded, {1} failed',
-        basicStatus: 'Current chain {0} is unbound, please bind first!',
+        basicStatus: 'The current firewall is unbound. Bind it first.',
         baseIptables: 'iptables Service',
         forwardIptables: 'iptables Port Forwarding Service',
         initMsg: 'About to initialize {0}, continue?',
@@ -4210,6 +4212,8 @@ const message = {
         reject: 'Reject',
         allPorts: 'All Ports',
         allProtocolHelper: 'All protocols and ports',
+        sourceAddressPlaceholder: 'e.g. 172.16.10.11, 172.16.0.0/24, 2001:db8::1, or 2001:db8::/64',
+        destinationPortPlaceholder: 'e.g. 80, 80,443, or 8080-8089',
         deleteRuleConfirm: 'Will delete {0} rules. Continue?',
         deleteUsedRuleConfirm:
             'This port is used by {0}. Deleting its allow rule may make the service unreachable. Continue?',
@@ -6831,9 +6835,15 @@ const message = {
                 partial_file: 'Incomplete File',
             },
             diskSize: 'Disk Size',
+            isoHelper: 'The ISO is used to boot the VM for the first time and install an operating system.',
+            osType: 'Operating System Type',
+            osOther: 'Other',
+            diskBus: 'Disk Bus',
             diskPath: 'Disk Path',
             isoPath: 'ISO Path',
             storagePool: 'Storage Pool',
+            networkHelper: 'The network provides network connectivity for the VM.',
+            storagePoolHelper: 'The storage pool stores VM disks and ISO files.',
             network: 'Network',
             bridgeName: 'Bridge Name',
             natNetworkHelper:

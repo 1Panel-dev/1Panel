@@ -46,7 +46,7 @@
                         v-model.trim="item.address"
                         class="source-address-select"
                         clearable
-                        placeholder="172.16.10.11、172.16.0.0/24、2001:db8::1 或 2001:db8::/64"
+                        :placeholder="$t('firewall.sourceAddressPlaceholder')"
                         @keyup.enter.prevent="addSourceAddressOnEnter(index)"
                     >
                         <template #append>
@@ -66,7 +66,7 @@
                         class="destination-port-input"
                         clearable
                         :disabled="!portProtocol"
-                        placeholder="80、80,443 或 8080-8089"
+                        :placeholder="$t('firewall.destinationPortPlaceholder')"
                         @keyup.enter.prevent="addDestinationPortOnEnter(index)"
                     >
                         <template #append>

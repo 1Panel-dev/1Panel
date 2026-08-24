@@ -6,8 +6,8 @@
             <FireStatus
                 ref="fireStatusRef"
                 v-model:loading="loading"
-                v-model:mask-show="maskShow"
                 v-model:is-active="isActive"
+                v-model:is-init="isInit"
                 v-model:is-bind="isBind"
                 v-model:name="provider"
                 v-model:version="firewallVersion"
@@ -16,20 +16,12 @@
             />
 
             <div v-if="provider !== '-'">
-                <el-card v-if="!isActive && maskShow" class="mask-prompt">
-                    <span>{{ $t('firewall.firewallNotStart') }}</span>
-                </el-card>
-                <el-card
-                    v-if="(provider === 'iptables' || provider === 'nftables') && !isBind && maskShow"
-                    class="mask-prompt"
-                >
-                    <span>{{ $t('firewall.basicStatus', ['1PANEL_BASIC']) }}</span>
+                <el-card v-if="isDirectBackend && (!isInit || !isBind)" class="mask-prompt">
+                    <span v-if="!isInit">{{ $t('firewall.initHelper', [provider]) }}</span>
+                    <span v-else>{{ $t('firewall.basicStatus') }}</span>
                 </el-card>
 
-                <LayoutContent
-                    :title="$t('menu.firewall')"
-                    :class="{ mask: !isActive || ((provider === 'iptables' || provider === 'nftables') && !isBind) }"
-                >
+                <LayoutContent :title="$t('menu.firewall')" :class="{ mask: !isFirewallReady }">
                     <template #prompt>
                         <el-alert
                             v-for="notice in notices"
@@ -419,10 +411,12 @@ const ruleOperateRef = ref<InstanceType<typeof RuleOperate>>();
 const ruleImportRef = ref<InstanceType<typeof RuleImport>>();
 const processDetailRef = ref<InstanceType<typeof ProcessDetail>>();
 const loading = ref(false);
-const maskShow = ref(true);
 const isActive = ref(false);
+const isInit = ref(false);
 const isBind = ref(false);
 const provider = ref('');
+const isDirectBackend = computed(() => provider.value === 'iptables' || provider.value === 'nftables');
+const isFirewallReady = computed(() => (isDirectBackend.value ? isInit.value && isBind.value : isActive.value));
 const firewallVersion = ref('');
 const selectedRuleFilters = ref<RuleFilter[]>([]);
 const iptablesChains = ['1PANEL_BASIC_BEFORE', '1PANEL_BASIC', '1PANEL_BASIC_AFTER'] as const;
@@ -480,7 +474,7 @@ const providerScopes = (): Firewall.Scope[] => {
 };
 
 const search = async () => {
-    if (!isActive.value) {
+    if (!isFirewallReady.value) {
         loading.value = false;
         inventoryItems.value = [];
         scopeNotices.value = [];
@@ -843,6 +837,7 @@ watch(
 const notices = computed<DisplayNotice[]>(() => {
     const unique = new Map<string, DisplayNotice>();
     scopeNotices.value.forEach((notice) => {
+        if (notice.code === 'managed_scope_missing') return;
         const key = `${notice.code}:${(notice.values || []).join(',')}`;
         if (!unique.has(key)) {
             unique.set(key, { key, text: scopeNoticeText(notice) });

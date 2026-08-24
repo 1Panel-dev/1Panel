@@ -937,6 +937,7 @@ const message = {
             from_remote: 'このモデルは1Panelを介してダウンロードされておらず、関連するプルログはありません。',
             no_logs: 'このモデルのプルログは削除されており、関連するログを表示できません。',
             vllmVersionHelper: 'FusionXpark GB 10 サーバーでは -cu130 バージョンを選択してください。',
+            ascendVisibleDevices: 'Ascend 可視デバイス',
             vllmCommandPortHelper:
                 '起動コマンドではポート {0} を使用する必要があります。使用しない場合、サービスにアクセスできません。',
             syncModelAccount: 'モデルアカウントに同期',
@@ -1123,6 +1124,7 @@ const message = {
             cachedToken: 'キャッシュ Token',
             cacheHitRate: 'キャッシュヒット率',
             activeUsers: 'アクティブユーザー',
+            activeStreamingRequests: 'アクティブなストリーミングリクエスト',
             activeModels: 'アクティブモデル',
             failedRequests: '失敗リクエスト',
             averageTokenPerRequest: '平均 Token/リクエスト',
@@ -1424,8 +1426,7 @@ const message = {
         },
         gpu: {
             gpu: 'GPU 監視',
-            gpuHelper:
-                'システムが NVIDIA-SMI または XPU-SMI コマンドを検出しませんでした。確認して再試行してください！',
+            gpuHelper: '対応する GPU/XPU/NPU 管理コマンドが検出されませんでした。確認して再試行してください！',
             process: 'プロセス情報',
             type: 'タイプ',
             typeG: 'グラフィックス',
@@ -4112,10 +4113,9 @@ const message = {
             'インポートしたルールは現在の {0} バックエンド向けに変換されます。移行元のルールは変更されません。',
         clearAllRulesHelper:
             '現在のバックエンドにある管理可能な {0} 件のルールを削除します。この操作は元に戻せません。続行しますか？',
-        switchBackendHelper:
-            'この操作は 1Panel が今後管理するファイアウォールバックエンドのみを切り替えます。元のバックエンドの移行、停止、クリーンアップは行いません。先に現在のルールをエクスポートしてください。切り替え後、対象バックエンドを初期化し、ルールを手動でインポートまたは確認してください。外部ルールとシステム固有ルールはエクスポートされません。{0} への切り替えを続行しますか？',
-        switchBackendSuccessHelper:
-            '1Panel は {0} を管理するように切り替わりました。元の {1} バックエンドは停止またはクリーンアップされておらず、依然として動作し、有効な場合があります。対象バックエンドを初期化し、ルールをインポートまたは確認し、アクセスが正常であることを確認してから元のバックエンドを手動で処理してください。',
+        backendSwitchNotice:
+            '切り替えでは現在使用するファイアウォールバックエンドのみが変更され、既存のルールは移行も削除もされません。切り替え後、対象ファイアウォールにルールを同期して有効であることを確認してから、元のファイアウォールルールを削除してください。',
+        switchBackendHelper: '{0} に切り替えますか？',
         uninstalledStatus: '未インストール',
         initializedStatus: '初期化済み',
         partiallyInitialized: '一部初期化済み',
@@ -4124,6 +4124,7 @@ const message = {
         dockerInputNotProtected:
             'ホストの INPUT ルールでは、この Docker 公開ポートを直接保護できません。クリックしてコンテナポート保護を開きます。',
         notInitialized: '未初期化',
+        familyUnsupported: 'システムは {0} をサポートしていません',
         dockerGuardUnbindConfirm:
             'バインドを解除すると、すべてのコンテナポートは一時的に Docker のデフォルト動作に戻ります。既存の保護設定は保持されます。続行しますか？',
         deleteDockerGuardPolicyConfirm: 'このエンドポイントは Docker のデフォルト動作に戻ります。続行しますか？',
@@ -4173,7 +4174,7 @@ const message = {
         exportHelper: '{0} 件のファイアウォールルールをエクスポートします。続行しますか？',
         importSuccess: '{0} 件のルールを正常にインポートしました',
         importPartialSuccess: 'インポート完了: {0} 件成功、{1} 件失敗',
-        basicStatus: '現在のチェーン {0} は未バインドです。まずバインドしてください！',
+        basicStatus: '現在のファイアウォールはバインドされていません。先にバインドしてください。',
         baseIptables: 'iptables サービス',
         forwardIptables: 'iptables ポート転送サービス',
         initMsg: '{0} を初期化します。続行しますか？',
@@ -4194,6 +4195,8 @@ const message = {
         reject: '拒否',
         allPorts: 'すべてのポート',
         allProtocolHelper: 'すべてのプロトコルとポート',
+        sourceAddressPlaceholder: '例: 172.16.10.11、172.16.0.0/24、2001:db8::1、2001:db8::/64',
+        destinationPortPlaceholder: '例: 80、80,443、8080-8089',
         deleteRuleConfirm: '{0} 個のルールを削除します。続行しますか？',
         deleteUsedRuleConfirm:
             'このポートは {0} が使用中です。許可ルールを削除するとサービスにアクセスできなくなる可能性があります。続行しますか？',
@@ -6820,9 +6823,15 @@ const message = {
                 partial_file: '未完了ファイル',
             },
             diskSize: 'ディスク容量',
+            isoHelper: 'ISO は仮想マシンの初回起動と OS のインストールに使用します。',
+            osType: 'OS タイプ',
+            osOther: 'その他',
+            diskBus: 'ディスクバス',
             diskPath: 'ディスクパス',
             isoPath: 'ISO パス',
             storagePool: 'ストレージプール',
+            networkHelper: 'ネットワークは仮想マシンにネットワーク接続を提供します。',
+            storagePoolHelper: 'ストレージプールは仮想マシンのディスクと ISO ファイルを保存します。',
             network: 'ネットワーク',
             bridgeName: 'ブリッジ名',
             natNetworkHelper:

@@ -182,6 +182,23 @@ func TestForwardingDisplayName(t *testing.T) {
 	}
 }
 
+func TestForwardingBaseInfoIncludesFamilyStatus(t *testing.T) {
+	adapter := &fakeForwardingAdapter{
+		name:       "nftables",
+		familyInit: map[string]bool{forwardClient.FamilyIPv4: true},
+	}
+	base, err := forwardingServiceWithAdapter(adapter).LoadBaseInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !base.IPv4.Available || !base.IPv4.Initialized || !base.IPv4.Bound {
+		t.Fatalf("unexpected IPv4 status: %#v", base.IPv4)
+	}
+	if !base.IPv6.Available || base.IPv6.Initialized || base.IPv6.Bound {
+		t.Fatalf("unexpected IPv6 status: %#v", base.IPv6)
+	}
+}
+
 func TestForwardingSearchPreservesAPIShapeAndPagination(t *testing.T) {
 	adapter := &fakeForwardingAdapter{name: "iptables", rules: []forwardClient.Rule{
 		{Num: "1", Family: forwardClient.FamilyIPv6, Protocol: "tcp", Port: "8080", TargetIP: "2001:db8::2", TargetPort: "80", Interface: "eth0"},

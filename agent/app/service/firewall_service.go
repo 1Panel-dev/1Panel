@@ -82,15 +82,18 @@ func (s *FirewallService) LoadBaseInfo(chainGroup string) (dto.FirewallSubsystem
 	if err != nil {
 		return status, err
 	}
-	initialized, bound, err := loadFirewallInitStatus(runtimeStatus.Name, chainGroup)
-	if err != nil {
-		return status, err
-	}
 	status.Name, status.Backend = runtimeStatus.Name, runtimeStatus.Name
 	status.Version, status.PingStatus = runtimeStatus.Version, ping.LoadStatus()
-	status.IsActive, status.IsInit, status.IsBind = runtimeStatus.IsActive, initialized, bound
-	status.IPv4.Initialized, status.IPv4.Bound, _ = loadSystemFirewallFamilyStatus(status.Name, constant.FirewallFamilyIPv4)
-	status.IPv6.Initialized, status.IPv6.Bound, _ = loadSystemFirewallFamilyStatus(status.Name, constant.FirewallFamilyIPv6)
+	status.IsActive = runtimeStatus.IsActive
+	if supportsManagedFilterChains(runtimeStatus.Name) {
+		initialized, bound, err := loadFirewallInitStatus(runtimeStatus.Name, chainGroup)
+		if err != nil {
+			return status, err
+		}
+		status.IsInit, status.IsBind = initialized, bound
+		status.IPv4 = loadSystemFirewallFamilyInfo(status.Name, constant.FirewallFamilyIPv4)
+		status.IPv6 = loadSystemFirewallFamilyInfo(status.Name, constant.FirewallFamilyIPv6)
+	}
 	return status, nil
 }
 
@@ -125,13 +128,8 @@ func (s *FirewallService) OperateFilterChain(request dto.FilterChainOperation) e
 	if err != nil {
 		return err
 	}
-	if request.Operate == "init-ipv6-base" {
-		if provider != constant.FirewallProviderIptables {
-			return fmt.Errorf("IPv6 base-chain initialization is only supported for iptables")
-		}
-		firewallRuleMutationMu.Lock()
-		defer firewallRuleMutationMu.Unlock()
-		return s.iptablesHelper.RepairIPv6BaseChains()
+	if !supportsManagedFilterChains(provider) {
+		return fmt.Errorf("filter chain operations are not supported for %s", provider)
 	}
 	if provider == constant.FirewallProviderNftables {
 		if err := newNftablesHelperManager().Operate(firewall.BaseOperation(request.Operate)); err != nil {
@@ -2573,8 +2571,6 @@ func loadDirectFirewallInitStatus(provider string) (bool, bool, error) {
 
 func loadFirewallInitStatus(provider, tab string) (bool, bool, error) {
 	switch provider {
-	case constant.FirewallProviderFirewalld, constant.FirewallProviderUFW:
-		return true, true, nil
 	case constant.FirewallProviderNftables:
 		return nftables_helper.LoadInitStatus(tab)
 	case constant.FirewallProviderIptables:
@@ -2582,6 +2578,10 @@ func loadFirewallInitStatus(provider, tab string) (bool, bool, error) {
 	default:
 		return false, false, fmt.Errorf("unsupported firewall provider: %s", provider)
 	}
+}
+
+func supportsManagedFilterChains(provider string) bool {
+	return provider == constant.FirewallProviderIptables || provider == constant.FirewallProviderNftables
 }
 
 func (s *FirewallService) addPortsBeforeStart(client lifecycle.Client) error {

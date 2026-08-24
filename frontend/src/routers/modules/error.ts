@@ -10,7 +10,7 @@ const errorRouter = {
             hidden: true,
             component: () => import('@/components/error-message/404.vue'),
             meta: {
-                title: '404页面',
+                title: 'commons.msg.notFound',
                 key: '404',
             },
         },

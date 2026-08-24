@@ -26,6 +26,7 @@ type persistentDockerGuardRuntime struct {
 	bind        int
 	unbind      int
 	policies    []docker_guard.Policy
+	statuses    map[string]docker_guard.FamilyStatus
 }
 
 func (r *persistentDockerGuardRuntime) Initialize(policies []docker_guard.Policy) error {
@@ -57,7 +58,10 @@ func (r *persistentDockerGuardRuntime) Initialized(string) (bool, error) {
 	return r.initialized, nil
 }
 
-func (r *persistentDockerGuardRuntime) Status(string) docker_guard.FamilyStatus {
+func (r *persistentDockerGuardRuntime) Status(family string) docker_guard.FamilyStatus {
+	if r.statuses != nil {
+		return r.statuses[family]
+	}
 	return docker_guard.FamilyStatus{Initialized: r.initialized, Bound: r.initialized, Effective: r.initialized}
 }
 
@@ -78,6 +82,7 @@ func TestDockerGuardOverviewLocalizesUnavailableDocker(t *testing.T) {
 	service := &DockerPortGuardService{
 		policies: &persistentDockerGuardPolicies{},
 		runtime:  &persistentDockerGuardRuntime{},
+		version:  func(string) string { return "1.8.10" },
 		client: func() (*client.Client, error) {
 			return nil, errors.New("Cannot connect to the Docker daemon at unix:///var/run/docker.sock")
 		},
@@ -88,6 +93,19 @@ func TestDockerGuardOverviewLocalizesUnavailableDocker(t *testing.T) {
 	}
 	if overview.Base.Message != agenti18n.Get("ErrDockerFailed") {
 		t.Fatalf("message = %q, want localized Docker failure", overview.Base.Message)
+	}
+	if overview.Base.Version != "1.8.10" {
+		t.Fatalf("version = %q, want 1.8.10", overview.Base.Version)
+	}
+}
+
+func TestDockerGuardRuntimeStatusAggregatesAvailableFamilies(t *testing.T) {
+	runtime := &persistentDockerGuardRuntime{statuses: map[string]docker_guard.FamilyStatus{
+		docker_guard.FamilyIPv6: {Initialized: true, Bound: true, Effective: true},
+	}}
+	base := (&DockerPortGuardService{}).runtimeStatus(runtime, constant.FirewallProviderNftables)
+	if !base.Initialized || !base.Bound || base.IPv4.Initialized || !base.IPv6.Initialized {
+		t.Fatalf("unexpected aggregate Docker guard status: %#v", base)
 	}
 }
 

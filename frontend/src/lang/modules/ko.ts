@@ -927,6 +927,7 @@ const message = {
             from_remote: '이 모델은 1Panel을 통해 다운로드되지 않았으며 관련 풀 로그가 없습니다.',
             no_logs: '이 모델의 풀 로그가 삭제되어 관련 로그를 볼 수 없습니다.',
             vllmVersionHelper: 'FusionXpark GB 10 서버는 -cu130 버전을 선택하세요.',
+            ascendVisibleDevices: 'Ascend 표시 장치',
             vllmCommandPortHelper: '시작 명령은 {0} 포트를 사용해야 하며, 그렇지 않으면 서비스에 접근할 수 없습니다.',
             syncModelAccount: '모델 계정에 동기화',
             modelAccountAddressHelper:
@@ -1112,6 +1113,7 @@ const message = {
             cachedToken: '캐시 Token',
             cacheHitRate: '캐시 적중률',
             activeUsers: '활성 사용자',
+            activeStreamingRequests: '활성 스트리밍 요청',
             activeModels: '활성 모델',
             failedRequests: '실패한 요청',
             averageTokenPerRequest: '평균 Token/요청',
@@ -1410,7 +1412,7 @@ const message = {
         },
         gpu: {
             gpu: 'GPU 모니터링',
-            gpuHelper: '시스템에서 NVIDIA-SMI 또는 XPU-SMI 명령을 감지하지 못했습니다. 확인하고 다시 시도하세요!',
+            gpuHelper: '지원되는 GPU/XPU/NPU 관리 명령을 감지하지 못했습니다. 확인하고 다시 시도하세요!',
             process: '프로세스 정보',
             type: '유형',
             typeG: '그래픽',
@@ -4033,10 +4035,9 @@ const message = {
         importBackendHelper: '가져온 규칙은 현재 {0} 백엔드에 맞게 변환됩니다. 원본 백엔드의 규칙은 변경되지 않습니다.',
         clearAllRulesHelper:
             '현재 백엔드의 관리 가능한 규칙 {0}개를 삭제합니다. 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?',
-        switchBackendHelper:
-            '이 작업은 1Panel이 이후 관리할 방화벽 백엔드만 변경합니다. 기존 백엔드는 이전·중지·정리되지 않습니다. 먼저 현재 규칙을 내보내십시오. 전환 후 대상 백엔드를 초기화하고 규칙을 수동으로 가져오거나 확인하십시오. 외부 규칙과 시스템 기본 규칙은 내보내지지 않습니다. {0}(으)로 계속 전환하시겠습니까?',
-        switchBackendSuccessHelper:
-            '1Panel이 이제 {0}을(를) 관리합니다. 기존 {1} 백엔드는 중지되거나 정리되지 않아 여전히 실행 및 적용될 수 있습니다. 대상 백엔드를 초기화하고 규칙을 가져오거나 확인한 뒤, 접속이 정상인지 확인한 후에만 기존 백엔드를 수동으로 처리하십시오.',
+        backendSwitchNotice:
+            '전환은 현재 사용하는 방화벽 백엔드만 변경하며 기존 규칙을 이전하거나 정리하지 않습니다. 전환 후 대상 방화벽에 규칙을 동기화하고 적용 여부를 확인한 다음 기존 방화벽 규칙을 정리하십시오.',
+        switchBackendHelper: '{0}(으)로 전환하시겠습니까?',
         uninstalledStatus: '설치되지 않음',
         initializedStatus: '초기화됨',
         partiallyInitialized: '일부 초기화됨',
@@ -4045,6 +4046,7 @@ const message = {
         dockerInputNotProtected:
             '호스트 INPUT 규칙은 이 Docker 게시 포트를 직접 보호하지 않습니다. 클릭하여 컨테이너 포트 보호를 여세요.',
         notInitialized: '초기화되지 않음',
+        familyUnsupported: '시스템에서 {0}을 지원하지 않습니다',
         dockerGuardUnbindConfirm:
             '바인딩을 해제하면 모든 컨테이너 포트가 일시적으로 Docker 기본 접근 방식으로 돌아갑니다. 기존 보호 설정은 유지됩니다. 계속하시겠습니까?',
         deleteDockerGuardPolicyConfirm: '이 엔드포인트가 Docker 기본 접근 방식으로 돌아갑니다. 계속하시겠습니까?',
@@ -4093,7 +4095,7 @@ const message = {
         exportHelper: '{0}개의 방화벽 규칙을 내보내려고 합니다. 계속하시겠습니까?',
         importSuccess: '{0}개의 규칙을 성공적으로 가져왔습니다',
         importPartialSuccess: '가져오기 완료: 성공 {0}건, 실패 {1}건',
-        basicStatus: '현재 체인 {0}이(가) 바인딩되지 않았습니다. 먼저 바인딩하세요!',
+        basicStatus: '현재 방화벽이 바인딩되지 않았습니다. 먼저 바인딩하세요!',
         baseIptables: 'iptables 서비스',
         forwardIptables: 'iptables 포트 포워딩 서비스',
         initMsg: '{0}을(를) 초기화하려고 합니다. 계속하시겠습니까?',
@@ -4113,6 +4115,8 @@ const message = {
         reject: '거부',
         allPorts: '모든 포트',
         allProtocolHelper: '모든 프로토콜 및 포트',
+        sourceAddressPlaceholder: '예: 172.16.10.11, 172.16.0.0/24, 2001:db8::1 또는 2001:db8::/64',
+        destinationPortPlaceholder: '예: 80, 80,443 또는 8080-8089',
         deleteRuleConfirm: '{0}개의 규칙을 삭제합니다. 계속하시겠습니까?',
         deleteUsedRuleConfirm:
             '이 포트는 {0}에서 사용 중입니다. 허용 규칙을 삭제하면 서비스에 접근하지 못할 수 있습니다. 계속하시겠습니까?',
@@ -6682,9 +6686,15 @@ const message = {
                 partial_file: '미완료 파일',
             },
             diskSize: '디스크 용량',
+            isoHelper: 'ISO는 가상 머신을 처음 부팅하고 운영 체제를 설치하는 데 사용됩니다.',
+            osType: '운영 체제 유형',
+            osOther: '기타',
+            diskBus: '디스크 버스',
             diskPath: '디스크 경로',
             isoPath: 'ISO 경로',
             storagePool: '스토리지 풀',
+            networkHelper: '네트워크는 가상 머신에 네트워크 연결을 제공합니다.',
+            storagePoolHelper: '스토리지 풀은 가상 머신 디스크와 ISO 파일을 저장합니다.',
             network: '네트워크',
             bridgeName: '브리지 이름',
             natNetworkHelper:

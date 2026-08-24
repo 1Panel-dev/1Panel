@@ -1220,18 +1220,40 @@ func TestFirewallRuntimeRejectsUnavailableManagedScopeForMutation(t *testing.T) 
 	}
 }
 
-func TestFilterChainOperationValidationIncludesIPv6Repair(t *testing.T) {
+func TestFilterChainOperationValidationAllowsOnlyUnifiedOperations(t *testing.T) {
 	validate := validator.New()
-	for _, operation := range []string{"init-base", "init-ipv6-base", "bind-base", "unbind-base"} {
+	for _, operation := range []string{"init-base", "bind-base", "unbind-base"} {
 		request := dto.FilterChainOperation{Name: constant.FirewallBasicChain, Operate: operation}
 		if err := validate.Struct(request); err != nil {
 			t.Fatalf("operation %q rejected by API contract: %v", operation, err)
 		}
 	}
-	for _, operation := range []string{"", "init-forward", "repair-anything"} {
+	for _, operation := range []string{"", "init-ipv6-base", "init-forward", "repair-anything"} {
 		request := dto.FilterChainOperation{Name: constant.FirewallBasicChain, Operate: operation}
 		if err := validate.Struct(request); err == nil {
 			t.Fatalf("operation %q accepted by API contract", operation)
+		}
+	}
+}
+
+func TestLoadSystemFirewallFamilyInfoExcludesServiceBackends(t *testing.T) {
+	for _, provider := range []string{constant.FirewallProviderFirewalld, constant.FirewallProviderUFW, "unsupported"} {
+		status := loadSystemFirewallFamilyInfo(provider, constant.FirewallFamilyIPv6)
+		if status.Available || status.Initialized || status.Bound {
+			t.Fatalf("%s IPv6 status = %#v, want unavailable", provider, status)
+		}
+	}
+}
+
+func TestSupportsManagedFilterChains(t *testing.T) {
+	for _, provider := range []string{constant.FirewallProviderIptables, constant.FirewallProviderNftables} {
+		if !supportsManagedFilterChains(provider) {
+			t.Fatalf("%s should support managed filter chains", provider)
+		}
+	}
+	for _, provider := range []string{constant.FirewallProviderFirewalld, constant.FirewallProviderUFW} {
+		if supportsManagedFilterChains(provider) {
+			t.Fatalf("%s should not support managed filter chains", provider)
 		}
 	}
 }

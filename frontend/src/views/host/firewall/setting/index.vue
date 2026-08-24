@@ -1,7 +1,10 @@
 <template>
     <div v-loading="loading">
         <FireRouter />
-        <LayoutContent :title="$t('commons.button.set')" :divider="true">
+        <LayoutContent :title="$t('commons.button.set')">
+            <template #prompt>
+                <el-alert type="warning" show-icon :closable="false" :title="$t('firewall.backendSwitchNotice')" />
+            </template>
             <template #main>
                 <el-form :label-position="isMobile ? 'top' : 'left'" label-width="150px">
                     <el-row>
@@ -28,25 +31,72 @@
                                                 <el-tag v-if="!option.installed" size="small" type="info">
                                                     {{ $t('firewall.uninstalledStatus') }}
                                                 </el-tag>
-                                                <template v-else>
-                                                    <el-tag v-if="option.active" size="small" type="success">
-                                                        {{ $t('commons.status.running') }}
-                                                    </el-tag>
-                                                    <el-tag
-                                                        v-for="family in backendFamilies"
-                                                        :key="family.key"
-                                                        size="small"
-                                                        :type="option[family.key].initialized ? 'success' : 'info'"
-                                                        effect="plain"
-                                                    >
-                                                        {{ family.label }}
+                                                <el-popover
+                                                    v-else-if="option.message"
+                                                    placement="right"
+                                                    trigger="hover"
+                                                    :width="220"
+                                                >
+                                                    <template #reference>
+                                                        <el-tag size="small" type="warning">
+                                                            <el-icon><WarningFilled /></el-icon>
+                                                            {{ $t('commons.status.exceptional') }}
+                                                        </el-tag>
+                                                    </template>
+                                                    <div class="backend-issue-list">
+                                                        <div class="backend-issue-item">{{ option.message }}</div>
+                                                    </div>
+                                                </el-popover>
+                                                <template v-else-if="isServiceBackend(option.name)">
+                                                    <el-tag size="small" :type="option.active ? 'success' : 'info'">
                                                         {{
                                                             $t(
-                                                                option[family.key].initialized
-                                                                    ? 'firewall.initializedStatus'
-                                                                    : 'firewall.notInitialized',
+                                                                option.active
+                                                                    ? 'commons.status.running'
+                                                                    : 'commons.status.stopped',
                                                             )
                                                         }}
+                                                    </el-tag>
+                                                </template>
+                                                <template v-else>
+                                                    <el-popover
+                                                        v-if="showBackendFamilyDetails(option)"
+                                                        placement="right"
+                                                        trigger="hover"
+                                                        :width="360"
+                                                    >
+                                                        <template #reference>
+                                                            <el-tag
+                                                                size="small"
+                                                                :type="backendDisplayState(option).type"
+                                                            >
+                                                                <el-icon v-if="backendDisplayState(option).exceptional">
+                                                                    <WarningFilled />
+                                                                </el-icon>
+                                                                {{ $t(backendDisplayState(option).label) }}
+                                                            </el-tag>
+                                                        </template>
+                                                        <div class="backend-issue-list">
+                                                            <div
+                                                                v-for="familyState in backendFamilyStates(option)"
+                                                                :key="familyState.family"
+                                                                class="backend-issue-item"
+                                                            >
+                                                                {{
+                                                                    backendFamilyStatusLabel(
+                                                                        familyState.family,
+                                                                        familyState.status,
+                                                                    )
+                                                                }}
+                                                            </div>
+                                                        </div>
+                                                    </el-popover>
+                                                    <el-tag
+                                                        v-else
+                                                        size="small"
+                                                        :type="backendDisplayState(option).type"
+                                                    >
+                                                        {{ $t(backendDisplayState(option).label) }}
                                                     </el-tag>
                                                 </template>
                                             </div>
@@ -101,6 +151,7 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
+import { WarningFilled } from '@element-plus/icons-vue';
 
 const { isMobile } = useGlobalStore();
 const loading = ref(false);
@@ -124,6 +175,60 @@ const providerOrder: Record<Firewall.Provider, number> = {
     nftables: 1,
     firewalld: 2,
     ufw: 3,
+};
+
+const isServiceBackend = (provider: Firewall.Provider) => {
+    return provider === 'firewalld' || provider === 'ufw';
+};
+
+type BackendTagType = 'success' | 'info' | 'warning';
+interface BackendDisplayState {
+    label: string;
+    type: BackendTagType;
+    exceptional: boolean;
+}
+
+const backendFamilyStates = (option: Firewall.BackendOption) =>
+    backendFamilies.map((family) => ({ family: family.label, status: option[family.key] }));
+
+const backendDisplayState = (option: Firewall.BackendOption): BackendDisplayState => {
+    if (option.message) {
+        return { label: 'commons.status.exceptional', type: 'warning', exceptional: true };
+    }
+    const families = backendFamilyStates(option);
+    if (families.every(({ status }) => !status.initialized && !status.bound)) {
+        return { label: 'firewall.notInitialized', type: 'info', exceptional: false };
+    }
+    if (families.every(({ status }) => status.available && status.initialized && status.bound && !status.reason)) {
+        return { label: 'commons.status.bound', type: 'success', exceptional: false };
+    }
+    if (families.every(({ status }) => status.available && status.initialized && !status.bound && !status.reason)) {
+        return { label: 'commons.status.unbind', type: 'info', exceptional: false };
+    }
+    return { label: 'commons.status.exceptional', type: 'warning', exceptional: true };
+};
+
+const showBackendFamilyDetails = (option: Firewall.BackendOption) =>
+    backendDisplayState(option).label !== 'commons.status.bound' ||
+    backendFamilyStates(option).some(({ status }) => !status.available || Boolean(status.reason));
+
+const dockerGuardReasons = new Set([
+    'docker_chain_missing',
+    'guard_chain_missing',
+    'jump_missing',
+    'jump_not_first',
+    'jump_duplicate',
+    'inspect_failed',
+]);
+
+const backendFamilyStatusLabel = (family: 'IPv4' | 'IPv6', status: Firewall.BackendFamilyStatus) => {
+    if (!status.available || status.reason === 'command_missing') {
+        return i18n.global.t('firewall.familyUnsupported', [family]);
+    }
+    if (status.reason && dockerGuardReasons.has(status.reason)) {
+        return i18n.global.t(`firewall.dockerGuardStatusReason.${status.reason}`, [family]);
+    }
+    return `${family} ${i18n.global.t(status.initialized ? (status.bound ? 'commons.status.bound' : 'commons.status.unbind') : 'firewall.notInitialized')}`;
 };
 
 const groups = computed(() => {
@@ -177,7 +282,6 @@ const load = async () => {
 
 const changeBackend = async (subsystem: Firewall.BackendSubsystem, group: Firewall.BackendGroup) => {
     const backend = group.selected;
-    const previousBackend = savedBackends.value[subsystem];
     try {
         await ElMessageBox.confirm(
             i18n.global.t('firewall.switchBackendHelper', [backend]),
@@ -195,14 +299,7 @@ const changeBackend = async (subsystem: Firewall.BackendSubsystem, group: Firewa
             operation: 'select',
         });
         await load();
-        await ElMessageBox.alert(
-            i18n.global.t('firewall.switchBackendSuccessHelper', [backend, previousBackend]),
-            i18n.global.t('commons.msg.operationSuccess'),
-            {
-                confirmButtonText: i18n.global.t('commons.button.confirm'),
-                type: 'info',
-            },
-        );
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     } catch {
         if (savedBackends.value[subsystem] !== backend) {
             group.selected = savedBackends.value[subsystem];
@@ -241,5 +338,17 @@ load();
     gap: 5px;
     white-space: nowrap;
     font-size: 12px;
+}
+
+.backend-issue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.backend-issue-item {
+    color: var(--el-text-color-regular);
+    font-size: 13px;
+    line-height: 20px;
 }
 </style>

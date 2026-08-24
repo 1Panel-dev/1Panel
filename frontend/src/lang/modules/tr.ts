@@ -956,6 +956,7 @@ const message = {
             from_remote: 'Bu model 1Panel aracılığıyla indirilmedi, ilgili çekme logları yok.',
             no_logs: 'Bu modelin çekme logları silindi ve görüntülenemiyor.',
             vllmVersionHelper: 'FusionXpark GB 10 sunucuları için lütfen -cu130 sürümünü seçin.',
+            ascendVisibleDevices: 'Görünür Ascend cihazları',
             vllmCommandPortHelper:
                 'Başlatma komutu {0} numaralı bağlantı noktasını kullanmalıdır; aksi halde hizmete erişilemez.',
             syncModelAccount: 'Model hesabına senkronize et',
@@ -1142,6 +1143,7 @@ const message = {
             cachedToken: 'Önbellek Token',
             cacheHitRate: 'Önbellek İsabet Oranı',
             activeUsers: 'Aktif kullanıcılar',
+            activeStreamingRequests: 'Etkin akış istekleri',
             activeModels: 'Aktif modeller',
             failedRequests: 'Başarısız istekler',
             averageTokenPerRequest: 'Ortalama Token/istek',
@@ -1442,7 +1444,7 @@ const message = {
         },
         gpu: {
             gpu: 'GPU İzleme',
-            gpuHelper: 'Sistem NVIDIA-SMI veya XPU-SMI komutlarını algılamadı. Lütfen kontrol edip tekrar deneyin!',
+            gpuHelper: 'Desteklenen bir GPU/XPU/NPU yönetim komutu algılanmadı. Lütfen kontrol edip tekrar deneyin!',
             process: 'İşlem Bilgisi',
             type: 'Tür',
             typeG: 'Grafik',
@@ -4192,10 +4194,9 @@ const message = {
         importBackendHelper:
             'İçe aktarılan kurallar geçerli {0} arka ucu için dönüştürülür. Kaynak kurallar değiştirilmez.',
         clearAllRulesHelper: 'Geçerli arka uçtaki yönetilebilir {0} kural silinsin mi? Bu işlem geri alınamaz.',
-        switchBackendHelper:
-            'Bu işlem yalnızca 1Panel tarafından bundan sonra yönetilecek güvenlik duvarı arka ucunu değiştirir. Eski arka uç taşınmaz, durdurulmaz veya temizlenmez. Önce mevcut kuralları dışa aktarın. Geçişten sonra hedef arka ucu başlatın ve kuralları elle içe aktarın veya doğrulayın. Harici ve sisteme özgü kurallar dışa aktarılmaz. {0} arka ucuna geçilsin mi?',
-        switchBackendSuccessHelper:
-            '1Panel artık {0} arka ucunu yönetiyor. Eski {1} arka ucu durdurulmadı veya temizlenmedi ve hâlâ çalışıyor olabilir. Hedef arka ucu başlatın, kuralları içe aktarın veya doğrulayın ve erişimin normal olduğunu doğruladıktan sonra eski arka ucu elle yönetin.',
+        backendSwitchNotice:
+            'Geçiş yalnızca kullanılmakta olan güvenlik duvarı arka ucunu değiştirir; mevcut kurallar taşınmaz veya temizlenmez. Geçişten sonra kuralları hedef güvenlik duvarıyla eşitleyin ve eski güvenlik duvarı kurallarını temizlemeden önce etkin olduklarını doğrulayın.',
+        switchBackendHelper: '{0} arka ucuna geçilsin mi?',
         uninstalledStatus: 'Yüklü değil',
         initializedStatus: 'Başlatıldı',
         partiallyInitialized: 'Kısmen başlatıldı',
@@ -4204,6 +4205,7 @@ const message = {
         dockerInputNotProtected:
             'Ana makine INPUT kuralları bu Docker yayımlanmış portunu doğrudan korumaz. Konteyner portu korumasını açmak için tıklayın.',
         notInitialized: 'Başlatılmadı',
+        familyUnsupported: 'Sistem {0} desteğini sunmuyor',
         dockerGuardUnbindConfirm:
             'Bağ kaldırıldıktan sonra tüm konteyner portları geçici olarak Docker varsayılan erişim davranışına döner. Mevcut koruma ayarları korunur. Devam edilsin mi?',
         deleteDockerGuardPolicyConfirm: 'Bu uç nokta Docker varsayılan erişim davranışına döner. Devam edilsin mi?',
@@ -4252,7 +4254,7 @@ const message = {
         exportHelper: '{0} güvenlik duvarı kuralını dışa aktarmak üzere. Devam etmek istiyor musunuz?',
         importSuccess: '{0} kural başarıyla içe aktarıldı',
         importPartialSuccess: 'İçe aktarma tamamlandı: {0} başarılı, {1} başarısız',
-        basicStatus: 'Mevcut zincir {0} bağlı değil, lütfen önce bağlayın!',
+        basicStatus: 'Mevcut güvenlik duvarı bağlı değil. Önce bağlayın.',
         baseIptables: 'iptables Servisi',
         forwardIptables: 'iptables Port Yönlendirme Servisi',
         initMsg: '{0} başlatılmak üzere, devam etmek istiyor musunuz?',
@@ -4274,6 +4276,8 @@ const message = {
         reject: 'Reddet',
         allPorts: 'Tüm Portlar',
         allProtocolHelper: 'Tüm protokoller ve portlar',
+        sourceAddressPlaceholder: 'örn. 172.16.10.11, 172.16.0.0/24, 2001:db8::1 veya 2001:db8::/64',
+        destinationPortPlaceholder: 'örn. 80, 80,443 veya 8080-8089',
         deleteRuleConfirm: '{0} kural silinecek. Devam etmek istiyor musunuz?',
         deleteUsedRuleConfirm:
             'Bu port {0} tarafından kullanılıyor. İzin kuralını silmek hizmeti erişilemez hale getirebilir. Devam edilsin mi?',
@@ -6935,9 +6939,15 @@ const message = {
                 partial_file: 'Tamamlanmamış dosya',
             },
             diskSize: 'Disk Boyutu',
+            isoHelper: 'ISO, sanal makineyi ilk kez başlatmak ve bir işletim sistemi kurmak için kullanılır.',
+            osType: 'İşletim sistemi türü',
+            osOther: 'Diğer',
+            diskBus: 'Disk veri yolu',
             diskPath: 'Disk Yolu',
             isoPath: 'ISO Yolu',
             storagePool: 'Depolama Havuzu',
+            networkHelper: 'Ağ, sanal makineye ağ bağlantısı sağlar.',
+            storagePoolHelper: 'Depolama havuzu, sanal makine disklerini ve ISO dosyalarını saklar.',
             network: 'Ağ',
             bridgeName: 'Bridge Adı',
             natNetworkHelper:
