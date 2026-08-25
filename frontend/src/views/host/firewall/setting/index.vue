@@ -282,6 +282,19 @@ const load = async () => {
 
 const changeBackend = async (subsystem: Firewall.BackendSubsystem, group: Firewall.BackendGroup) => {
     const backend = group.selected;
+    const previous = savedBackends.value[subsystem];
+    const previousOption = group.options.find((option) => option.name === previous);
+    const previousInitialized =
+        previousOption?.initialized || previousOption?.ipv4.initialized || previousOption?.ipv6.initialized;
+    if (subsystem !== 'system' && previous && previous !== backend && previousInitialized) {
+        group.selected = previous;
+        await ElMessageBox.alert(
+            i18n.global.t('firewall.cleanupBeforeBackendSwitch', [previous, backend]),
+            i18n.global.t('firewall.cleanupAction'),
+            { type: 'warning' },
+        );
+        return;
+    }
     try {
         await ElMessageBox.confirm(
             i18n.global.t('firewall.switchBackendHelper', [backend]),

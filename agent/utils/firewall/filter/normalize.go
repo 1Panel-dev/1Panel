@@ -84,6 +84,9 @@ func NormalizeRule(rule FirewallRule) (FirewallRule, error) {
 		}
 	}
 	rule.Interface = strings.TrimSpace(rule.Interface)
+	if rule.Interface == "*" || strings.EqualFold(rule.Interface, "all") || strings.EqualFold(rule.Interface, "any") {
+		rule.Interface = ""
+	}
 	rule.ConnectionStates, err = normalizeConnectionStates(rule.ConnectionStates, rule.Scope.Provider)
 	if err != nil {
 		return FirewallRule{}, err

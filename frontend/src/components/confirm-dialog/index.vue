@@ -1,7 +1,7 @@
 <template>
     <DialogPro v-model="submitVisible" :title="header" size="mini">
         <div>
-            <span v-if="operationInfo" style="font-size: 12px">{{ operationInfo }}</span>
+            <span v-if="operationInfo" class="operation-info">{{ operationInfo }}</span>
             <div :style="{ 'margin-top': operationInfo ? '10px' : '0px' }">
                 <span style="font-size: 12px">{{ $t('commons.msg.operateConfirm') }}</span>
                 <span style="font-size: 12px; color: red; font-weight: 500">'{{ submitInputInfo }}'</span>
@@ -60,3 +60,11 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped>
+.operation-info {
+    white-space: pre-line;
+    font-size: 12px;
+    line-height: 20px;
+}
+</style>

@@ -58,6 +58,13 @@ func (f *UFW) Stop() error {
 	return nil
 }
 
+func (f *UFW) Reset() error {
+	if err := f.run("--force", "reset"); err != nil {
+		return fmt.Errorf("reset the firewall failed, %v", err)
+	}
+	return nil
+}
+
 func (f *UFW) Restart() error {
 	if err := f.Stop(); err != nil {
 		return err

@@ -11,6 +11,41 @@
                             :status="baseInfo.isActive ? 'enable' : 'disable'"
                         />
                         <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
+                        <el-popover
+                            v-if="familyIssues.length"
+                            placement="bottom"
+                            trigger="hover"
+                            :title="$t('commons.msg.infoTitle')"
+                            :width="300"
+                            popper-class="firewall-family-issue-popper"
+                        >
+                            <template #reference>
+                                <el-icon class="firewall-family-hint-icon" :aria-label="$t('commons.msg.infoTitle')">
+                                    <WarningFilled />
+                                </el-icon>
+                            </template>
+                            <div class="firewall-family-issue-list">
+                                <div
+                                    v-for="issue in familyIssues"
+                                    :key="issue.family"
+                                    class="firewall-family-issue-item"
+                                >
+                                    {{ familyIssueText(issue) }}
+                                </div>
+                            </div>
+                            <div v-if="retryableFamilyIssues.length" class="firewall-family-issue-footer">
+                                <el-button
+                                    v-permission
+                                    v-node-admin
+                                    :loading="familyRetrying"
+                                    size="small"
+                                    type="primary"
+                                    @click.stop="onRetryFamilyIssues"
+                                >
+                                    {{ $t('commons.button.retry') }}
+                                </el-button>
+                            </div>
+                        </el-popover>
                     </div>
                     <div class="mt-0.5">
                         <template v-if="isServiceBackend">
@@ -39,10 +74,7 @@
                             </el-button>
                         </template>
                         <template v-if="isDirectManaged">
-                            <el-divider
-                                v-if="isDirectBase || !anyFamilyBound || familyIssues.length"
-                                direction="vertical"
-                            />
+                            <el-divider v-if="isDirectBase || !anyFamilyBound" direction="vertical" />
                             <template v-if="isDirectBase">
                                 <el-button
                                     v-if="anyFamilyBound"
@@ -79,52 +111,19 @@
                                     {{ $t('commons.button.init') }}
                                 </el-button>
                             </el-tooltip>
-                            <el-popover
-                                v-if="familyIssues.length"
-                                placement="bottom"
-                                trigger="hover"
-                                :width="300"
-                                :show-after="120"
-                                :hide-after="120"
-                                popper-class="firewall-family-issue-popper"
-                            >
-                                <template #reference>
-                                    <el-button
-                                        class="firewall-family-warning-trigger"
-                                        type="warning"
-                                        link
-                                        :aria-label="$t('commons.status.exceptional')"
-                                    >
-                                        <el-icon><WarningFilled /></el-icon>
-                                    </el-button>
-                                </template>
-                                <div class="firewall-family-issue-list">
-                                    <div
-                                        v-for="issue in familyIssues"
-                                        :key="issue.family"
-                                        class="firewall-family-issue-item"
-                                    >
-                                        <span class="firewall-family-name">{{ issue.family }}</span>
-                                        <span class="firewall-family-issue-text">{{ familyIssueLabel(issue) }}</span>
-                                    </div>
-                                </div>
-                                <div v-if="retryableFamilyIssues.length" class="firewall-family-issue-footer">
-                                    <el-button
-                                        v-permission
-                                        v-node-admin
-                                        :loading="familyRetrying"
-                                        size="small"
-                                        type="primary"
-                                        @click.stop="onRetryFamilyIssues"
-                                    >
-                                        {{ $t('commons.button.retry') }}
-                                    </el-button>
-                                </div>
-                            </el-popover>
                         </template>
+                        <slot name="actions" />
                     </div>
                 </div>
             </el-card>
+            <el-alert
+                v-if="props.currentTab === 'base' && baseInfo.conflictBackend"
+                class="mt-3"
+                type="warning"
+                show-icon
+                :closable="false"
+                :title="$t('firewall.directBackendConflictWarning', [backendName, baseInfo.conflictBackend])"
+            />
             <el-alert
                 v-if="props.currentTab === 'forward' && baseInfo.syncError"
                 class="mt-3"
@@ -185,6 +184,7 @@ const baseInfo = ref<Firewall.FirewallBase>({
     isBind: false,
     name: '',
     backend: '',
+    conflictBackend: '',
     version: '',
     pingStatus: '',
     syncError: '',
@@ -222,7 +222,9 @@ interface FamilyIssue {
     family: 'IPv4' | 'IPv6';
     available: boolean;
     initialized: boolean;
+    bound: boolean;
 }
+const managedChainName = computed(() => (props.currentTab === 'forward' ? '1PANEL_FORWARD' : '1PANEL_BASIC'));
 const familyIssues = computed<FamilyIssue[]>(() => {
     if (!isDirectManaged.value || !anyFamilyBound.value) return [];
     return familyStatuses.value
@@ -231,12 +233,16 @@ const familyIssues = computed<FamilyIssue[]>(() => {
             family: item.family,
             available: item.status.available,
             initialized: item.status.initialized,
+            bound: item.status.bound,
         }));
 });
 const retryableFamilyIssues = computed(() => familyIssues.value.filter((item) => item.available));
-const familyIssueLabel = (issue: FamilyIssue) => {
+const familyIssueText = (issue: FamilyIssue) => {
     if (!issue.available) return i18n.global.t('firewall.familyUnsupported', [issue.family]);
-    return i18n.global.t(issue.initialized ? 'commons.status.unbind' : 'firewall.notInitialized');
+    const status = i18n.global.t(
+        !issue.initialized ? 'firewall.notInitialized' : issue.bound ? 'commons.status.bound' : 'commons.status.unbind',
+    );
+    return i18n.global.t('firewall.familyChainIssue', [issue.family, managedChainName.value, status]);
 };
 const initActionHelper = computed(() => {
     if (props.currentTab === 'forward' && baseInfo.value.isInit && !baseInfo.value.isBind) {
@@ -300,7 +306,12 @@ const onInit = async () => {
     switch (props.currentTab) {
         case 'base':
             chainName = '1PANEL_BASIC';
-            msg = i18n.global.t('firewall.initMsg', [baseInfo.value.name || backendName.value]);
+            msg = baseInfo.value.conflictBackend
+                ? i18n.global.t('firewall.initDirectBackendConflictMsg', [
+                      baseInfo.value.name || backendName.value,
+                      baseInfo.value.conflictBackend,
+                  ])
+                : i18n.global.t('firewall.initMsg', [baseInfo.value.name || backendName.value]);
             break;
         case 'forward':
             chainName = '1PANEL_FORWARD';
@@ -403,18 +414,10 @@ defineExpose({
 </script>
 
 <style lang="scss">
-.firewall-family-warning-trigger {
-    width: 26px;
-    height: 26px;
-    margin-left: 4px;
-    border-radius: 50%;
-    background: var(--el-color-warning-light-9);
+.firewall-family-hint-icon {
+    align-self: center;
+    color: var(--el-color-warning);
     font-size: 16px;
-
-    &:hover,
-    &:focus-visible {
-        background: var(--el-color-warning-light-8);
-    }
 }
 
 .firewall-family-issue-popper.el-popover {
@@ -431,10 +434,6 @@ defineExpose({
 }
 
 .firewall-family-issue-item {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 8px;
     color: var(--el-text-color-regular);
     font-size: 13px;
     line-height: 20px;
@@ -446,15 +445,5 @@ defineExpose({
     margin-top: 12px;
     padding-top: 10px;
     border-top: 1px solid var(--el-border-color-lighter);
-}
-
-.firewall-family-name {
-    color: var(--el-text-color-primary);
-    font-weight: 600;
-}
-
-.firewall-family-issue-text {
-    color: var(--el-color-warning-dark-2);
-    white-space: nowrap;
 }
 </style>

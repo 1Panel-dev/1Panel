@@ -305,6 +305,14 @@ func TestCapabilitiesOnlyAdvertiseAtomicIncomingFamilies(t *testing.T) {
 	}
 }
 
+func TestPrepareRuleRejectsOptionsUFWCannotSynchronize(t *testing.T) {
+	rule := writableRule(filter.FamilyIPv4, "", "8080")
+	rule.SourcePort = "1024"
+	if _, err := NewAdapterWithReader(&fakeReader{}).PrepareRule(rule); !errors.Is(err, filter.ErrInvalidRule) {
+		t.Fatalf("unsupported source port passed UFW preview validation: %v", err)
+	}
+}
+
 func TestCompileCreateUsesFamilyExplicitFullSyntax(t *testing.T) {
 	tests := []struct {
 		name    string

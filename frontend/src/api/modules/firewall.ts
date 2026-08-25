@@ -27,6 +27,10 @@ export const searchFirewallRules = (request: Firewall.InventoryRequest) => {
     return http.post<Firewall.Inventory>('/hosts/firewall/rules/search', request, TimeoutEnum.T_40S);
 };
 
+export const resetFirewallRules = (request: Firewall.ResetRequest) => {
+    return http.post<Firewall.ResetResponse>('/hosts/firewall/rules/reset', request, TimeoutEnum.T_10M);
+};
+
 export const loadFirewallNativeDetail = (request: Firewall.NativeDetailRequest) => {
     return http.post<string>('/hosts/firewall/rules/native/detail', request, TimeoutEnum.T_40S);
 };
@@ -37,6 +41,18 @@ export const checkFirewallRules = (request: Firewall.CheckRequest) => {
 
 export const createFirewallRules = (request: Firewall.CreateRequest) => {
     return http.post<Firewall.CreateResponse>('/hosts/firewall/rules', request, TimeoutEnum.T_10M);
+};
+
+export const previewFirewallRuleSync = (request: Firewall.RuleSyncRequest) => {
+    return http.post<Firewall.RuleSyncPreview>('/hosts/firewall/rules/sync/preview', request, TimeoutEnum.T_3M);
+};
+
+export const loadFirewallRuleSyncTask = () => {
+    return http.get<Firewall.RuleSyncTask>('/hosts/firewall/rules/sync/task');
+};
+
+export const syncFirewallRules = (request: Firewall.RuleSyncRequest) => {
+    return http.post<Firewall.RuleSyncResult>('/hosts/firewall/rules/sync', request, TimeoutEnum.T_10M);
 };
 
 export const deleteFirewallRules = (request: Firewall.DeleteRequest) => {

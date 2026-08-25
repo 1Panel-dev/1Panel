@@ -32,6 +32,26 @@ func LoadFamilyInitStatus(family filter.Family, tab string) (bool, bool, error) 
 	return loadFamilyInitStatus(family)
 }
 
+func LoadFamilyBindStatus(family filter.Family) (bool, error) {
+	if family != filter.FamilyIPv4 && family != filter.FamilyIPv6 {
+		return false, nil
+	}
+	stdout, err := run("list", "chain", TableFamily(family), TableName, InputChain)
+	if err != nil {
+		return false, err
+	}
+	return hasBaseChainBinding(stdout), nil
+}
+
+func hasBaseChainBinding(output string) bool {
+	for _, chain := range BasicChains() {
+		if strings.Contains(output, "jump "+chain) {
+			return true
+		}
+	}
+	return false
+}
+
 func loadFamilyInitStatus(family filter.Family) (bool, bool, error) {
 	for _, chain := range BasicChains() {
 		if _, err := run("list", "chain", TableFamily(family), TableName, chain); err != nil {

@@ -4108,14 +4108,54 @@ const message = {
         addressFamily: 'IP バージョン',
         portOrRange: 'ポート / 範囲',
         exportAllRules: 'すべてのルールをエクスポート',
-        clearAllRules: 'すべてのルールを削除',
         importBackendHelper:
             'インポートしたルールは現在の {0} バックエンド向けに変換されます。移行元のルールは変更されません。',
-        clearAllRulesHelper:
-            '現在のバックエンドにある管理可能な {0} 件のルールを削除します。この操作は元に戻せません。続行しますか？',
+        resetDirectRulesHelper:
+            '{0} から 1Panel システムファイアウォールのすべてのチェーン、ルール、永続化ファイル、対応するデータベース記録を削除します',
+        resetWhitelistRulesHelper:
+            '{0} のすべてのカスタム設定とデータベース記録を削除し、インストール時の既定値に戻して {0} を無効化します。\nクリーンアップ後、ファイアウォール保護は提供されなくなります。この操作は元に戻せません。',
+        cleanupForwardingBackendHelper:
+            '{0} から 1Panel のポート転送ルールとチェーンをすべて削除し、データベースデータのみを保持します',
+        cleanupDockerBackendHelper:
+            '{0} から 1Panel Docker ポート保護ルールとチェーンをすべて削除し、データベースデータのみを保持します',
+        cleanupBeforeBackendSwitch:
+            '現在の {0} バックエンドには 1Panel の実行時ルールが残っています。{1} に切り替える前にクリーンアップしてください。',
+        cleanupAction: 'クリーンアップ',
         backendSwitchNotice:
-            '切り替えでは現在使用するファイアウォールバックエンドのみが変更され、既存のルールは移行も削除もされません。切り替え後、対象ファイアウォールにルールを同期して有効であることを確認してから、元のファイアウォールルールを削除してください。',
+            'システムファイアウォールの切り替えではルールを自動移行または削除しません。ポート転送と Docker 保護は現在のバックエンドを先にクリーンアップする必要があります。保存済みルールとポリシーは 1Panel に残り、切り替え後に再初期化または同期できます。',
         switchBackendHelper: '{0} に切り替えますか？',
+        ruleSyncTitle: 'ルールを同期',
+        ruleSyncAction: 'ルールを同期',
+        ruleSyncHelper:
+            '選択したファイアウォールの 1Panel 管理ルールを現在のファイアウォールへ同期します。元のルールは削除されず、外部ルールは同期されません。',
+        ruleSyncDatabase: '1Panel データベース',
+        ruleSyncDatabaseHelper:
+            '1Panel データベースのルールを基準に、現在のファイアウォールの管理対象ルールを同期・調整します。不足しているルールは追加され、余分なルールは削除されます。',
+        ruleSyncDatabaseTotal: 'データベースルール',
+        ruleSyncDatabaseConfirm:
+            'データベースの {0} 件のルールに完全一致するよう {1} を同期しますか？対象側の {2} 件のルールを削除し、不足ルールを追加します。',
+        ruleSyncSource: '元バックエンド',
+        ruleSyncTarget: '現在のバックエンド',
+        ruleSyncTotal: '変換後のルール',
+        ruleSyncReady: '同期可能',
+        ruleSyncExisting: '存在済み',
+        ruleSyncRemove: '削除予定',
+        ruleSyncBlocked: '同期不可',
+        ruleSyncReason: '確認結果',
+        ruleSyncConfirm: '{0} 件のルールを {1} から {2} へ同期しますか？元バックエンドは変更されません。',
+        ruleSyncResetSource: '同期成功後に移行元ファイアウォール {0} をリセットして無効化する',
+        ruleSyncResetSourceHelper: 'すべてのルールが正常に同期された場合にのみ移行元をリセットします。',
+        ruleSyncResetSourceBlocked: '同期できないルールがあります。解決してから移行元を自動リセットしてください。',
+        ruleSyncResetSourceConfirm:
+            '{0} 件のルールを {1} から {2} へ同期し、その後 {1} をリセットして無効化しますか？すべての設定が削除され、元に戻せません。',
+        ruleSyncPartial: '同期完了：成功 {0} 件、存在済み {1} 件、失敗 {2} 件。',
+        ruleSyncSuccess: '同期完了：成功 {0} 件、存在済み {1} 件、削除 {2} 件。',
+        ruleSyncStatus: {
+            ready: '同期可能',
+            existing: '存在済み',
+            remove: '削除予定',
+            blocked: '同期不可',
+        },
         uninstalledStatus: '未インストール',
         initializedStatus: '初期化済み',
         partiallyInitialized: '一部初期化済み',
@@ -4125,6 +4165,7 @@ const message = {
             'ホストの INPUT ルールでは、この Docker 公開ポートを直接保護できません。クリックしてコンテナポート保護を開きます。',
         notInitialized: '未初期化',
         familyUnsupported: 'システムは {0} をサポートしていません',
+        familyChainIssue: '{0} · {1} チェーン · {2}',
         dockerGuardUnbindConfirm:
             'バインドを解除すると、すべてのコンテナポートは一時的に Docker のデフォルト動作に戻ります。既存の保護設定は保持されます。続行しますか？',
         deleteDockerGuardPolicyConfirm: 'このエンドポイントは Docker のデフォルト動作に戻ります。続行しますか？',
@@ -4132,10 +4173,14 @@ const message = {
         protection: '保護',
         portDetails: 'ポート詳細',
         orphanEndpoints: '未関連付けエンドポイント',
+        orphanPolicies: '未関連付けルール',
+        orphanPoliciesHelper:
+            '以下の {0} 件のルールは Docker ポートにバインドされていません。一致するポートが検出されると自動的にバインドされます。',
         exposure: '公開状態',
         externallyExposed: '外部アクセスを許可（0.0.0.0 / ::）',
         restrictedBinding: '外部アクセスを拒否（127.0.0.1 / ::1）',
         composeOrApp: 'Compose / アプリ',
+        sources: '送信元',
         deniedSources: '拒否する送信元',
         allowedSources: '許可する送信元',
         dockerGuardPolicy: 'コンテナポート保護ポリシー',
@@ -4178,6 +4223,10 @@ const message = {
         baseIptables: 'iptables サービス',
         forwardIptables: 'iptables ポート転送サービス',
         initMsg: '{0} を初期化します。続行しますか？',
+        initDirectBackendConflictMsg:
+            '{1} はまだバインドされています。{0} を初期化すると両方のファイアウォールルールが有効になり、予期せずアクセスが遮断される可能性があります。続行しますか？',
+        directBackendConflictWarning:
+            '{0} と {1} が同時にバインドされているため、両方のルールが有効です。相互に遮断しないことを確認し、使用しないファイアウォールを手動でバインド解除してください。',
         initHelper:
             '{0} が初期化されていないことを検出しました。上部ステータスバーの初期化ボタンをクリックして設定してください！',
         bindHelper: 'バインド - ファイアウォールルールは状態がバインドされている場合のみ有効になります。確認しますか？',

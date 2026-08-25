@@ -21,6 +21,118 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+func TestFirewallResetCleansDirectBackendAndStoredRules(t *testing.T) {
+	db := newFirewallRuleTestDB(t)
+	ruleRepo := repo.NewFirewallRuleRepo(db)
+	stored, err := model.FirewallRuleFromDomain(executorTestAddressRule("172.16.10.111"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	stored.UUID = "reset-direct-rule"
+	stored.Origin = constant.FirewallRuleOriginCreated
+	stored.Owner = constant.FirewallRuleSourceUser
+	if err := ruleRepo.Create(context.Background(), &stored); err != nil {
+		t.Fatal(err)
+	}
+	cleaned := ""
+	service := &FirewallService{
+		rules: ruleRepo,
+		selectedProvider: func(context.Context) (filter.Provider, error) {
+			return filter.ProviderIptables, nil
+		},
+		cleanupBackend: func(provider string) error {
+			cleaned = provider
+			return nil
+		},
+	}
+	result, err := service.Reset(context.Background(), dto.FirewallRuleReset{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cleaned != string(filter.ProviderIptables) || result.Removed != 1 {
+		t.Fatalf("unexpected reset result: cleaned=%q result=%#v", cleaned, result)
+	}
+	remaining, err := ruleRepo.List(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(remaining) != 0 {
+		t.Fatalf("reset retained direct-backend metadata: %#v", remaining)
+	}
+}
+
+func TestFirewallResetCleansInactiveDirectBackendWithoutChangingSelectedBackendState(t *testing.T) {
+	service := &FirewallService{
+		rules: repo.NewFirewallRuleRepo(newFirewallRuleTestDB(t)),
+		selectedProvider: func(context.Context) (filter.Provider, error) {
+			return filter.ProviderNftables, nil
+		},
+		cleanupBackend: func(string) error {
+			t.Fatal("inactive source cleanup used the selected-backend cleanup path")
+			return nil
+		},
+		cleanupInactiveBackend: func(provider string) error {
+			if provider != string(filter.ProviderIptables) {
+				t.Fatalf("inactive cleanup provider = %q", provider)
+			}
+			return nil
+		},
+	}
+	result, err := service.Reset(context.Background(), dto.FirewallRuleReset{Provider: filter.ProviderIptables})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !result.Disabled {
+		t.Fatalf("inactive source cleanup result = %#v", result)
+	}
+}
+
+func TestFirewallResetRestoresUFWDefaultsAndDeletesStoredRules(t *testing.T) {
+	scope := filter.Scope{
+		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,
+		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
+	}
+	protectedRule := filter.FirewallRule{
+		Scope: scope, NativeKind: filter.NativeKindUFWRule, Protocol: "tcp",
+		DestinationPort: "22", Action: filter.ActionAccept,
+	}
+	db := newFirewallRuleTestDB(t)
+	ruleRepo := repo.NewFirewallRuleRepo(db)
+	stored, err := model.FirewallRuleFromDomain(protectedRule)
+	if err != nil {
+		t.Fatal(err)
+	}
+	stored.UUID = "protected-reset-rule"
+	stored.Origin = constant.FirewallRuleOriginCreated
+	stored.Owner = constant.FirewallRuleSourceUser
+	if err := ruleRepo.Create(context.Background(), &stored); err != nil {
+		t.Fatal(err)
+	}
+	resetProvider := ""
+	service := &FirewallService{
+		rules:            ruleRepo,
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderNftables, nil },
+		resetBackend: func(provider string) error {
+			if provider != string(filter.ProviderUFW) {
+				t.Fatalf("reset unexpected provider %q", provider)
+			}
+			resetProvider = provider
+			return nil
+		},
+	}
+	result, err := service.Reset(context.Background(), dto.FirewallRuleReset{Provider: filter.ProviderUFW})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resetProvider != string(filter.ProviderUFW) || result.Removed != 1 || !result.Disabled {
+		t.Fatalf("unexpected reset result: provider=%q result=%#v", resetProvider, result)
+	}
+	remaining, err := ruleRepo.List(context.Background())
+	if err != nil || len(remaining) != 0 {
+		t.Fatalf("reset retained UFW metadata: %#v err=%v", remaining, err)
+	}
+}
+
 func TestFirewallRuleServiceCheckCreateInventoryWorkflow(t *testing.T) {
 	rule := executorTestAddressRule("172.16.10.111")
 	external := executorObservedRule(rule, "", 1)

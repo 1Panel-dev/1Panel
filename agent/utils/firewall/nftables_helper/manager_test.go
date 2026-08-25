@@ -7,15 +7,12 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 )
 
-func TestActiveLegacyChainRequiresJump(t *testing.T) {
-	if got := activeLegacyChain(`chain 1PANEL_BASIC { type filter hook input priority filter; }`); got != "" {
-		t.Fatalf("unbound legacy chain was treated as active: %q", got)
+func TestHasBaseChainBinding(t *testing.T) {
+	if hasBaseChainBinding(`chain NFT_1PANEL_INPUT { policy accept; }`) {
+		t.Fatal("empty input chain was treated as bound")
 	}
-	if got := activeLegacyChain(`-A INPUT -j 1PANEL_BASIC`); got != "1PANEL_BASIC" {
-		t.Fatalf("iptables jump was not detected: %q", got)
-	}
-	if got := activeLegacyChain(`jump 1PANEL_BASIC_BEFORE`); got != "1PANEL_BASIC_BEFORE" {
-		t.Fatalf("nftables jump was not detected: %q", got)
+	if !hasBaseChainBinding(`jump NFT_1PANEL_BASIC`) {
+		t.Fatal("partial nftables binding was not detected")
 	}
 }
 

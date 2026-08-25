@@ -8,14 +8,15 @@ import (
 )
 
 type nftRecordingRunner struct {
-	objects    map[string]bool
-	baseRules  map[string]string
-	runCalls   [][]string
-	inputCalls []restoreCall
+	objects     map[string]bool
+	baseRules   map[string]string
+	policyRules map[string]string
+	runCalls    [][]string
+	inputCalls  []restoreCall
 }
 
 func newNftRecordingRunner() *nftRecordingRunner {
-	return &nftRecordingRunner{objects: map[string]bool{}, baseRules: map[string]string{}}
+	return &nftRecordingRunner{objects: map[string]bool{}, baseRules: map[string]string{}, policyRules: map[string]string{}}
 }
 
 func (r *nftRecordingRunner) Run(executable string, args ...string) (string, error) {
@@ -34,6 +35,9 @@ func (r *nftRecordingRunner) Run(executable string, args ...string) (string, err
 		}
 		if plain[1] == "chain" && len(plain) == 5 && plain[4] == NftBaseChain {
 			return r.baseRules[plain[2]], nil
+		}
+		if plain[1] == "chain" && len(plain) == 5 && plain[4] == NftChain {
+			return r.policyRules[plain[2]], nil
 		}
 		return "", nil
 	}
@@ -104,6 +108,23 @@ func TestCompileNftEmptyAllowSourcesDropsAll(t *testing.T) {
 	rules := compileNftPolicy(Policy{UUID: "id", Family: FamilyIPv4, HostIP: "0.0.0.0", HostPort: 5432, Protocol: "tcp", Mode: ModeAllow})
 	if len(rules) != 1 || !strings.HasSuffix(strings.Join(rules[0], " "), "drop") {
 		t.Fatalf("rules = %#v", rules)
+	}
+}
+
+func TestParseNftablesDockerGuardPolicies(t *testing.T) {
+	output := strings.Join([]string{
+		`meta l4proto udp ct original proto-dst 53 comment "1panel-docker:deny" drop # handle 3`,
+		`meta l4proto tcp ct original ip daddr 192.0.2.10 ct original proto-dst 5432 ip saddr 203.0.113.1/32 comment "1panel-docker:allow" return # handle 4`,
+		`meta l4proto tcp ct original ip daddr 192.0.2.10 ct original proto-dst 5432 comment "1panel-docker:allow" drop # handle 5`,
+	}, "\n")
+	policies, err := parseDockerGuardPolicies(output, FamilyIPv4)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(policies) != 2 || policies[0].UUID != "deny" || policies[0].Mode != ModeAll ||
+		policies[1].UUID != "allow" || policies[1].HostIP != "192.0.2.10" || policies[1].Mode != ModeAllow ||
+		!reflect.DeepEqual(policies[1].Sources, []string{"203.0.113.1/32"}) {
+		t.Fatalf("policies = %#v", policies)
 	}
 }
 

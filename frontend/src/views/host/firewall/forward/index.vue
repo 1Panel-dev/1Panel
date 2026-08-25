@@ -11,12 +11,27 @@
                 v-model:is-bind="isBind"
                 v-model:name="fireName"
                 current-tab="forward"
-            />
+            >
+                <template v-if="isInit" #actions>
+                    <el-divider direction="vertical" />
+                    <el-button v-permission v-node-admin type="primary" link @click="cleanupBackend">
+                        {{ $t('firewall.cleanupAction') }}
+                    </el-button>
+                </template>
+            </FireStatus>
             <div v-if="fireName !== '-'">
+                <div v-if="!isInit || !isBind" class="mb-4 flex justify-end">
+                    <el-button v-permission v-node-admin type="primary" plain @click="openRuleSync">
+                        {{ $t('firewall.ruleSyncAction') }}
+                    </el-button>
+                </div>
                 <LayoutContent :title="$t('firewall.forwardRule', 2)" :class="{ mask: !isInit || !isBind }">
                     <template #leftToolBar>
                         <el-button v-permission v-node-admin type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}
+                        </el-button>
+                        <el-button v-permission v-node-admin @click="openRuleSync">
+                            {{ $t('commons.button.sync') }}
                         </el-button>
                         <el-button
                             v-permission
@@ -26,15 +41,6 @@
                             :disabled="selects.length === 0"
                         >
                             {{ $t('commons.button.delete') }}
-                        </el-button>
-                        <el-button
-                            v-permission
-                            v-node-admin
-                            plain
-                            :disabled="paginationConfig.total === 0"
-                            @click="onClearAll"
-                        >
-                            {{ $t('commons.button.clean') }}
                         </el-button>
                         <el-button-group>
                             <el-button v-permission v-node-admin @click="onImport">
@@ -120,21 +126,26 @@
         </OpDialog>
         <OperateDialog @search="search" ref="dialogRef" />
         <ImportDialog @search="search" ref="dialogImportRef" />
+        <RuleSync ref="ruleSyncRef" @search="refreshAfterSync" />
+        <ConfirmDialog ref="cleanupConfirmRef" @confirm="submitCleanupBackend" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import OperateDialog from './operate/index.vue';
 import ImportDialog from './import/index.vue';
+import RuleSync from '@/views/host/firewall/sync/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
+import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
+import { operateFirewallBackend, operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
 import { Firewall } from '@/api/interface/firewall';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { downloadWithContent } from '@/utils/file';
 import { getCurrentDateFormatted } from '@/utils/date';
+import { ElMessageBox } from 'element-plus';
 const loading = ref();
 const selects = ref<any>([]);
 const searchName = ref();
@@ -144,6 +155,38 @@ const isInit = ref(false);
 const isBind = ref(false);
 const fireName = ref();
 const fireStatusRef = ref();
+const ruleSyncRef = ref<InstanceType<typeof RuleSync>>();
+const cleanupConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
+
+const openRuleSync = () => {
+    if (fireName.value !== 'iptables' && fireName.value !== 'nftables') return;
+    ruleSyncRef.value?.acceptParams(fireName.value, 'forwarding');
+};
+
+const refreshAfterSync = async () => {
+    await fireStatusRef.value?.acceptParams();
+};
+
+const cleanupBackend = () => {
+    if (fireName.value !== 'iptables' && fireName.value !== 'nftables') return;
+    cleanupConfirmRef.value?.acceptParams({
+        header: i18n.global.t('firewall.cleanupAction'),
+        operationInfo: i18n.global.t('firewall.cleanupForwardingBackendHelper', [fireName.value]),
+        submitInputInfo: fireName.value,
+    });
+};
+
+const submitCleanupBackend = async () => {
+    if (fireName.value !== 'iptables' && fireName.value !== 'nftables') return;
+    loading.value = true;
+    try {
+        await operateFirewallBackend({ subsystem: 'forwarding', backend: fireName.value, operation: 'cleanup' });
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        await fireStatusRef.value?.acceptParams();
+    } finally {
+        loading.value = false;
+    }
+};
 
 const syncStatusLabel = (status?: Firewall.RuleForward['syncStatus']) => {
     if (status === 'converged') return i18n.global.t('firewall.effective');
@@ -308,19 +351,6 @@ const exportRules = async (rules: Firewall.RuleForward[]) => {
 };
 
 const onExport = async () => exportRules(selects.value.length > 0 ? selects.value : await loadAllRules());
-
-const onClearAll = async () => {
-    const rules = await loadAllRules();
-    if (rules.length === 0) return;
-    operateRules.value = rules.map((rule) => ({ ...rule, operation: 'remove' }));
-    opRef.value.acceptParams({
-        title: i18n.global.t('commons.button.clean'),
-        names: [],
-        msg: i18n.global.t('firewall.clearAllRulesHelper', [rules.length]),
-        api: null,
-        params: null,
-    });
-};
 
 const buttons = [
     {

@@ -3,17 +3,18 @@ package dto
 import "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 
 type FirewallSubsystemStatus struct {
-	Name       string                      `json:"name"`
-	Backend    string                      `json:"backend"`
-	IsExist    bool                        `json:"isExist"`
-	IsActive   bool                        `json:"isActive"`
-	IsInit     bool                        `json:"isInit"`
-	IsBind     bool                        `json:"isBind"`
-	Version    string                      `json:"version"`
-	PingStatus string                      `json:"pingStatus"`
-	SyncError  string                      `json:"syncError,omitempty"`
-	IPv4       FirewallBackendFamilyStatus `json:"ipv4"`
-	IPv6       FirewallBackendFamilyStatus `json:"ipv6"`
+	Name            string                      `json:"name"`
+	Backend         string                      `json:"backend"`
+	ConflictBackend string                      `json:"conflictBackend,omitempty"`
+	IsExist         bool                        `json:"isExist"`
+	IsActive        bool                        `json:"isActive"`
+	IsInit          bool                        `json:"isInit"`
+	IsBind          bool                        `json:"isBind"`
+	Version         string                      `json:"version"`
+	PingStatus      string                      `json:"pingStatus"`
+	SyncError       string                      `json:"syncError,omitempty"`
+	IPv4            FirewallBackendFamilyStatus `json:"ipv4"`
+	IPv6            FirewallBackendFamilyStatus `json:"ipv6"`
 }
 
 type FirewallLifecycleOperation struct {
@@ -75,6 +76,15 @@ type FirewallSystemPort struct {
 type FirewallRuleInventoryResponse struct {
 	Items   []filter.InventoryItem `json:"items"`
 	Notices []filter.ScopeNotice   `json:"notices,omitempty"`
+}
+
+type FirewallRuleResetResponse struct {
+	Removed  int  `json:"removed"`
+	Disabled bool `json:"disabled"`
+}
+
+type FirewallRuleReset struct {
+	Provider filter.Provider `json:"provider,omitempty" validate:"omitempty,oneof=firewalld ufw iptables nftables"`
 }
 
 type FirewallRuleCheckResult struct {
@@ -153,8 +163,9 @@ type DockerPortGuardContainer struct {
 }
 
 type DockerPortGuardList struct {
-	Base       DockerPortGuardBase        `json:"base"`
-	Containers []DockerPortGuardContainer `json:"containers"`
+	Base           DockerPortGuardBase        `json:"base"`
+	Containers     []DockerPortGuardContainer `json:"containers"`
+	OrphanPolicies []DockerPortGuardEndpoint  `json:"orphanPolicies"`
 }
 
 type DockerPortGuardEndpointIdentity struct {
@@ -217,6 +228,62 @@ type FirewallRuleCreateFailure struct {
 	Status string              `json:"status"`
 	Rule   filter.FirewallRule `json:"rule"`
 	Error  string              `json:"error,omitempty"`
+}
+
+type FirewallRuleSyncRequest struct {
+	Subsystem      string          `json:"subsystem" validate:"omitempty,oneof=system forwarding docker"`
+	SourceProvider filter.Provider `json:"sourceProvider,omitempty" validate:"omitempty,oneof=firewalld ufw iptables nftables"`
+	TargetProvider filter.Provider `json:"targetProvider" validate:"required,oneof=firewalld ufw iptables nftables"`
+	ResetSource    bool            `json:"resetSource"`
+	TaskID         string          `json:"taskID,omitempty" validate:"omitempty,max=64"`
+}
+
+type FirewallRuleSyncItem struct {
+	SourceUUID  string                   `json:"sourceUUID"`
+	Rule        *filter.FirewallRule     `json:"rule,omitempty"`
+	ForwardRule *ForwardRule             `json:"forwardRule,omitempty"`
+	DockerRule  *DockerPortGuardEndpoint `json:"dockerRule,omitempty"`
+	Status      string                   `json:"status"`
+	Reason      string                   `json:"reason,omitempty"`
+}
+
+type FirewallRuleSyncPreview struct {
+	Subsystem      string                 `json:"subsystem"`
+	SourceProvider filter.Provider        `json:"sourceProvider,omitempty"`
+	TargetProvider filter.Provider        `json:"targetProvider"`
+	Total          int                    `json:"total"`
+	Ready          int                    `json:"ready"`
+	Existing       int                    `json:"existing"`
+	Removed        int                    `json:"removed"`
+	Blocked        int                    `json:"blocked"`
+	Items          []FirewallRuleSyncItem `json:"items"`
+}
+
+type FirewallRuleSyncResult struct {
+	Subsystem      string                    `json:"subsystem"`
+	SourceProvider filter.Provider           `json:"sourceProvider,omitempty"`
+	TargetProvider filter.Provider           `json:"targetProvider"`
+	Total          int                       `json:"total"`
+	Succeeded      int                       `json:"succeeded"`
+	Skipped        int                       `json:"skipped"`
+	Removed        int                       `json:"removed"`
+	Failed         int                       `json:"failed"`
+	Errors         []FirewallRuleSyncFailure `json:"errors,omitempty"`
+	TaskID         string                    `json:"taskID,omitempty"`
+	Queued         bool                      `json:"queued,omitempty"`
+}
+
+type FirewallRuleSyncTask struct {
+	TaskID    string `json:"taskID,omitempty"`
+	Executing bool   `json:"executing"`
+}
+
+type FirewallRuleSyncFailure struct {
+	SourceUUID  string                   `json:"sourceUUID"`
+	Rule        *filter.FirewallRule     `json:"rule,omitempty"`
+	ForwardRule *ForwardRule             `json:"forwardRule,omitempty"`
+	DockerRule  *DockerPortGuardEndpoint `json:"dockerRule,omitempty"`
+	Error       string                   `json:"error"`
 }
 
 type FirewallRuleDelete struct {

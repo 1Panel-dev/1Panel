@@ -1,18 +1,24 @@
 <template>
     <div>
         <FireRouter />
-        <DockerGuardStatus :base="data.base" @operate="operate" />
+        <DockerGuardStatus :base="data.base" @operate="operate" @cleanup="cleanupBackend" />
         <LayoutContent :title="$t('firewall.dockerGuard')" v-loading="loading">
             <template #prompt>
                 <el-alert v-if="data.base.message" type="warning" :closable="false" :title="data.base.message" />
                 <el-alert v-else type="info" :closable="false" :title="$t('firewall.dockerGuardHelper')" />
             </template>
             <template #leftToolBar>
-                <el-button v-if="data.base.initialized" v-permission v-node-admin type="primary" @click="sync">
+                <el-button
+                    v-if="data.base.backend === 'iptables' || data.base.backend === 'nftables'"
+                    v-permission
+                    type="primary"
+                    v-node-admin
+                    @click="openRuleSync"
+                >
                     {{ $t('commons.button.sync') }}
                 </el-button>
-                <el-button v-permission v-node-admin plain :disabled="policies.length === 0" @click="clearAll">
-                    {{ $t('commons.button.clean') }}
+                <el-button v-if="allOrphanPolicies.length" plain @click="orphanDrawerVisible = true">
+                    {{ $t('firewall.orphanPolicies') }} ({{ allOrphanPolicies.length }})
                 </el-button>
                 <el-button-group>
                     <el-button v-permission v-node-admin @click="openImport">
@@ -87,8 +93,49 @@
             </template>
         </LayoutContent>
 
+        <DrawerPro v-model="orphanDrawerVisible" :header="$t('firewall.orphanPolicies')" size="large">
+            <template #content>
+                <el-alert
+                    type="info"
+                    :closable="false"
+                    show-icon
+                    :title="$t('firewall.orphanPoliciesHelper', [allOrphanPolicies.length])"
+                />
+                <el-table :data="orphanRows" max-height="calc(100vh - 180px)" class="mt-3">
+                    <el-table-column :label="$t('commons.table.port')" min-width="190">
+                        <template #default="{ row }">
+                            <span>{{ endpointLabel(row) }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('firewall.protectionMode')" min-width="150">
+                        <template #default="{ row }">{{ protectionModeLabel(row) }}</template>
+                    </el-table-column>
+                    <el-table-column :label="$t('firewall.sources')" min-width="200" show-overflow-tooltip>
+                        <template #default="{ row }">{{ row.sources?.join(', ') || '-' }}</template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="description"
+                        :label="$t('commons.table.description')"
+                        min-width="160"
+                        show-overflow-tooltip
+                    >
+                        <template #default="{ row }">{{ row.description || '-' }}</template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.operate')" width="80" fixed="right">
+                        <template #default="{ row }">
+                            <el-button v-permission v-node-admin type="primary" link @click="removeOrphanPolicy(row)">
+                                {{ $t('commons.button.delete') }}
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </template>
+        </DrawerPro>
+
         <DockerGuardDetail ref="detailRef" :containers="containerRows" @search="search" />
         <DockerGuardImport ref="importRef" @search="search" />
+        <RuleSync ref="ruleSyncRef" @search="search" />
+        <ConfirmDialog ref="cleanupConfirmRef" @confirm="submitCleanupBackend" />
     </div>
 </template>
 
@@ -98,12 +145,14 @@ import FireRouter from '@/views/host/firewall/index.vue';
 import DockerGuardStatus from '@/views/host/firewall/docker/status/index.vue';
 import DockerGuardDetail from '@/views/host/firewall/docker/detail/index.vue';
 import DockerGuardImport from '@/views/host/firewall/docker/import/index.vue';
+import RuleSync from '@/views/host/firewall/sync/index.vue';
+import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { Firewall } from '@/api/interface/firewall';
 import {
     deleteDockerPortGuardPolicies,
     loadDockerPortGuard,
     operateDockerPortGuard,
-    syncDockerPortGuard,
+    operateFirewallBackend,
 } from '@/api/modules/firewall';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -115,6 +164,9 @@ import { dockerGuardEndpointKey } from '@/views/host/firewall/docker/model';
 const loading = ref(false);
 const detailRef = ref<InstanceType<typeof DockerGuardDetail>>();
 const importRef = ref<InstanceType<typeof DockerGuardImport>>();
+const ruleSyncRef = ref<InstanceType<typeof RuleSync>>();
+const cleanupConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
+const orphanDrawerVisible = ref(false);
 const searchName = ref('');
 const selectedFilters = ref<string[]>([]);
 const data = reactive<Firewall.DockerGuardList>({
@@ -128,6 +180,22 @@ const data = reactive<Firewall.DockerGuardList>({
         backend: '',
     },
     containers: [],
+    orphanPolicies: [],
+});
+
+const allOrphanPolicies = computed(() => {
+    const result = new Map<string, Firewall.DockerGuardEndpoint>();
+    for (const endpoint of data.orphanPolicies || []) {
+        result.set(dockerGuardEndpointKey(endpoint), endpoint);
+    }
+    for (const container of data.containers || []) {
+        if (container.key !== '__orphan__' && container.endpoints.some((endpoint) => endpoint.containerID)) continue;
+        for (const endpoint of container.endpoints) {
+            if (!endpoint.policyUUID) continue;
+            result.set(dockerGuardEndpointKey(endpoint), endpoint);
+        }
+    }
+    return [...result.values()];
 });
 
 const containerRows = computed(() => {
@@ -140,6 +208,7 @@ const containerRows = computed(() => {
         .map((item) => item.slice('exposure:'.length));
 
     return data.containers
+        .filter((container) => container.key !== '__orphan__')
         .map((container) => {
             const name = container.name || i18n.global.t('firewall.orphanEndpoints');
             const containerMatches = [name, container.application, container.compose]
@@ -175,6 +244,33 @@ const containerRows = computed(() => {
         .filter((container) => container.portGroups.length > 0);
 });
 
+const orphanRows = computed(() => {
+    const keyword = searchName.value.trim().toLowerCase();
+    const families = selectedFilters.value
+        .filter((item) => item.startsWith('family:'))
+        .map((item) => item.slice('family:'.length));
+    const exposures = selectedFilters.value
+        .filter((item) => item.startsWith('exposure:'))
+        .map((item) => item.slice('exposure:'.length));
+    return allOrphanPolicies.value.filter((endpoint) => {
+        if (families.length && !families.includes(endpoint.family)) return false;
+        const exposure = isExternallyExposed(endpoint) ? 'external' : 'restricted';
+        if (exposures.length && !exposures.includes(exposure)) return false;
+        if (!keyword) return true;
+        return [
+            endpoint.family,
+            endpoint.hostIP,
+            endpoint.hostPort,
+            endpoint.protocol,
+            endpoint.mode,
+            endpoint.description,
+            ...(endpoint.sources || []),
+        ]
+            .filter((item) => item !== undefined)
+            .some((item) => String(item).toLowerCase().includes(keyword));
+    });
+});
+
 const policies = computed<Firewall.DockerGuardPolicy[]>(() => {
     const result = new Map<string, Firewall.DockerGuardPolicy>();
     for (const container of data.containers) {
@@ -192,16 +288,20 @@ const policies = computed<Firewall.DockerGuardPolicy[]>(() => {
             });
         }
     }
+    for (const endpoint of allOrphanPolicies.value) {
+        if (!endpoint.policyUUID || !endpoint.mode) continue;
+        result.set(dockerGuardEndpointKey(endpoint), {
+            family: endpoint.family,
+            hostIP: endpoint.hostIP,
+            hostPort: endpoint.hostPort,
+            protocol: endpoint.protocol,
+            mode: endpoint.mode,
+            sources: endpoint.sources || [],
+            description: endpoint.description || '',
+        });
+    }
     return [...result.values()];
 });
-
-const policyUUIDs = computed(() => [
-    ...new Set(
-        data.containers.flatMap(
-            (container) => container.endpoints.map((endpoint) => endpoint.policyUUID).filter(Boolean) as string[],
-        ),
-    ),
-]);
 
 const isExternallyExposed = (endpoint: Firewall.DockerGuardEndpoint) =>
     (endpoint.family === 'ipv4' && (!endpoint.hostIP || endpoint.hostIP === '0.0.0.0')) ||
@@ -235,13 +335,29 @@ const operate = async (operation: 'initialize' | 'bind' | 'unbind') => {
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     await search();
 };
-const sync = async () => {
+const cleanupBackend = () => {
+    if (data.base.backend !== 'iptables' && data.base.backend !== 'nftables') return;
+    cleanupConfirmRef.value?.acceptParams({
+        header: i18n.global.t('firewall.cleanupAction'),
+        operationInfo: i18n.global.t('firewall.cleanupDockerBackendHelper', [data.base.backend]),
+        submitInputInfo: data.base.backend,
+    });
+};
+
+const submitCleanupBackend = async () => {
+    if (data.base.backend !== 'iptables' && data.base.backend !== 'nftables') return;
+    loading.value = true;
     try {
-        await syncDockerPortGuard();
+        await operateFirewallBackend({ subsystem: 'docker', backend: data.base.backend, operation: 'cleanup' });
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    } finally {
         await search();
+    } finally {
+        loading.value = false;
     }
+};
+const openRuleSync = () => {
+    if (data.base.backend !== 'iptables' && data.base.backend !== 'nftables') return;
+    ruleSyncRef.value?.acceptParams(data.base.backend, 'docker');
 };
 const openImport = () => {
     importRef.value?.acceptParams();
@@ -261,27 +377,28 @@ const exportAll = async () => {
         `1panel-docker-port-guard-${getCurrentDateFormatted()}.json`,
     );
 };
-const clearAll = async () => {
-    if (!policyUUIDs.value.length) return;
+const openPorts = (row: Firewall.DockerGuardContainer) => {
+    detailRef.value?.acceptParams(row);
+};
+const removeOrphanPolicy = async (row: Firewall.DockerGuardEndpoint) => {
+    if (!row.policyUUID) return;
     try {
         await ElMessageBox.confirm(
-            i18n.global.t('firewall.clearAllRulesHelper', [policyUUIDs.value.length]),
-            i18n.global.t('commons.button.clean'),
+            i18n.global.t('firewall.deleteDockerGuardPolicyConfirm'),
+            i18n.global.t('commons.button.delete'),
             { type: 'warning' },
         );
     } catch {
         return;
     }
-    loading.value = true;
-    try {
-        await deleteDockerPortGuardPolicies({ uuids: policyUUIDs.value });
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    } finally {
-        await search();
-    }
+    await deleteDockerPortGuardPolicies({ uuids: [row.policyUUID] });
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    await search();
 };
-const openPorts = (row: Firewall.DockerGuardContainer) => {
-    detailRef.value?.acceptParams(row);
+const protectionModeLabel = (row: Firewall.DockerGuardEndpoint) => {
+    if (row.mode === 'deny_sources') return i18n.global.t('firewall.denySources');
+    if (row.mode === 'allow_sources') return i18n.global.t('firewall.allowSources');
+    return i18n.global.t('firewall.denyAll');
 };
 const endpointStatusType = (row: Firewall.DockerGuardEndpoint) => {
     if (row.effective) return 'success';

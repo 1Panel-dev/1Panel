@@ -163,6 +163,33 @@ func (m *Manager) Reconcile(policies []Policy) error {
 	return m.rebuildLocked(policies)
 }
 
+func (m *Manager) ListPolicies() ([]Policy, error) {
+	policies := make([]Policy, 0)
+	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
+		executable := executableForFamily(family)
+		if executable == "" || !m.runner.Exists(executable) {
+			continue
+		}
+		exists, err := m.chainExists(executable, Chain)
+		if err != nil {
+			return nil, &FamilyError{Family: family, Err: fmt.Errorf("inspect %s chain: %w", Chain, err)}
+		}
+		if !exists {
+			continue
+		}
+		output, err := m.run(executable, "-S", Chain)
+		if err != nil {
+			return nil, &FamilyError{Family: family, Err: fmt.Errorf("list %s chain: %w", Chain, err)}
+		}
+		parsed, err := parseDockerGuardPolicies(output, family)
+		if err != nil {
+			return nil, &FamilyError{Family: family, Err: err}
+		}
+		policies = append(policies, parsed...)
+	}
+	return policies, nil
+}
+
 func (m *Manager) Unbind() error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()

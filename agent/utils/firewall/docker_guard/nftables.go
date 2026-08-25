@@ -58,6 +58,29 @@ func (m *NftablesManager) Reconcile(policies []Policy) error {
 	return m.rebuildLocked(policies)
 }
 
+func (m *NftablesManager) ListPolicies() ([]Policy, error) {
+	if !m.runner.Exists("nft") {
+		return nil, nil
+	}
+	policies := make([]Policy, 0)
+	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
+		tableFamily := nftTableFamily(family)
+		if !m.objectExists("chain", tableFamily, NftTable, NftChain) {
+			continue
+		}
+		output, err := m.run("-a", "list", "chain", tableFamily, NftTable, NftChain)
+		if err != nil {
+			return nil, &FamilyError{Family: family, Err: fmt.Errorf("list %s chain: %w", NftChain, err)}
+		}
+		parsed, err := parseDockerGuardPolicies(output, family)
+		if err != nil {
+			return nil, &FamilyError{Family: family, Err: err}
+		}
+		policies = append(policies, parsed...)
+	}
+	return policies, nil
+}
+
 func (m *NftablesManager) Unbind() error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
