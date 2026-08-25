@@ -44,6 +44,9 @@ var Upstream []byte
 //go:embed sse.conf
 var SSE []byte
 
+//go:embed gzip.conf
+var Gzip []byte
+
 //go:embed *.json *.conf
 var websitesFiles embed.FS
 
