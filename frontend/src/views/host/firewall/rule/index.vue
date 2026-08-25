@@ -13,7 +13,14 @@
                 v-model:version="firewallVersion"
                 current-tab="base"
                 @search="search"
-            />
+            >
+                <template v-if="canReset" #actions>
+                    <el-divider direction="vertical" />
+                    <el-button v-permission v-node-admin type="primary" link :loading="resetting" @click="resetRules">
+                        {{ $t('firewall.cleanupAction') }}
+                    </el-button>
+                </template>
+            </FireStatus>
 
             <div v-if="provider !== '-'">
                 <el-card v-if="isDirectBackend && (!isInit || !isBind)" class="mask-prompt">
@@ -39,21 +46,19 @@
                         <el-button
                             v-permission
                             v-node-admin
-                            type="primary"
-                            plain
-                            :disabled="selects.length === 0"
-                            @click="removeSelectedRules"
+                            :disabled="!canSyncRules"
+                            :loading="syncOpening"
+                            @click="openRuleSync"
                         >
-                            {{ $t('commons.button.delete') }}
+                            {{ $t('commons.button.sync') }}
                         </el-button>
                         <el-button
                             v-permission
                             v-node-admin
-                            plain
-                            :disabled="allManagedRules.length === 0"
-                            @click="clearAllRules"
+                            :disabled="selects.length === 0"
+                            @click="removeSelectedRules"
                         >
-                            {{ $t('commons.button.clean') }}
+                            {{ $t('commons.button.delete') }}
                         </el-button>
                         <el-button-group>
                             <el-button v-permission v-node-admin @click="openImport">
@@ -69,32 +74,6 @@
                         </el-button-group>
                     </template>
                     <template #rightToolBar>
-                        <el-popover
-                            v-if="provider === 'iptables' || provider === 'nftables'"
-                            placement="bottom"
-                            trigger="click"
-                            :width="230"
-                        >
-                            <template #reference>
-                                <el-button
-                                    :type="iptablesChainFilterActive ? 'primary' : 'default'"
-                                    :icon="Filter"
-                                    :title="$t('menu.filter')"
-                                    plain
-                                />
-                            </template>
-                            <div class="firewall-chain-filter-title">{{ $t('firewall.chain') }}</div>
-                            <el-checkbox-group
-                                v-model="visibleIptablesChains"
-                                class="firewall-chain-filter-options"
-                                :min="1"
-                                @change="changeIptablesChainFilter"
-                            >
-                                <el-checkbox v-for="chain in iptablesChains" :key="chain" :value="chain">
-                                    {{ chain }}
-                                </el-checkbox>
-                            </el-checkbox-group>
-                        </el-popover>
                         <div class="firewall-filter-bar">
                             <el-select
                                 v-model="selectedRuleFilters"
@@ -291,7 +270,6 @@
                                                 placement="right"
                                                 trigger="click"
                                                 :width="340"
-                                                popper-class="firewall-used-popper"
                                             >
                                                 <template #reference>
                                                     <el-tag
@@ -353,7 +331,9 @@
         </div>
         <RuleOperate ref="ruleOperateRef" @search="search" />
         <RuleImport ref="ruleImportRef" @search="search" />
+        <RuleSync ref="ruleSyncRef" @search="search" />
         <ProcessDetail ref="processDetailRef" />
+        <ConfirmDialog ref="resetConfirmRef" @confirm="submitResetRules" />
     </div>
 </template>
 
@@ -366,6 +346,8 @@ import {
     deleteFirewallRules,
     loadDockerPortGuard,
     loadFirewallNativeDetail,
+    loadFirewallRuleSyncTask,
+    resetFirewallRules,
     searchFirewallRules,
 } from '@/api/modules/firewall';
 import { getListeningProcess } from '@/api/modules/process';
@@ -375,12 +357,14 @@ import { downloadWithContent } from '@/utils/file';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import RuleImport from '@/views/host/firewall/rule/import/index.vue';
 import RuleOperate from '@/views/host/firewall/rule/operate/index.vue';
+import RuleSync from '@/views/host/firewall/sync/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import ProcessDetail from '@/views/host/process/process/detail/index.vue';
+import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { ElMessageBox } from 'element-plus';
-import { Expand, Filter, Lock, WarningFilled } from '@element-plus/icons-vue';
+import { Expand, Lock, WarningFilled } from '@element-plus/icons-vue';
 
 interface RuleRow extends Firewall.InventoryItem {
     rowKey: string;
@@ -409,18 +393,25 @@ type RuleFilter = 'family:ipv4' | 'family:ipv6' | 'action:accept' | 'action:deny
 const fireStatusRef = ref<InstanceType<typeof FireStatus>>();
 const ruleOperateRef = ref<InstanceType<typeof RuleOperate>>();
 const ruleImportRef = ref<InstanceType<typeof RuleImport>>();
+const ruleSyncRef = ref<InstanceType<typeof RuleSync>>();
 const processDetailRef = ref<InstanceType<typeof ProcessDetail>>();
+const resetConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
 const loading = ref(false);
+const resetting = ref(false);
+const syncOpening = ref(false);
 const isActive = ref(false);
 const isInit = ref(false);
 const isBind = ref(false);
 const provider = ref('');
 const isDirectBackend = computed(() => provider.value === 'iptables' || provider.value === 'nftables');
+const canReset = computed(
+    () =>
+        ['iptables', 'nftables', 'firewalld', 'ufw'].includes(provider.value) &&
+        (isDirectBackend.value ? isInit.value : true),
+);
 const isFirewallReady = computed(() => (isDirectBackend.value ? isInit.value && isBind.value : isActive.value));
 const firewallVersion = ref('');
 const selectedRuleFilters = ref<RuleFilter[]>([]);
-const iptablesChains = ['1PANEL_BASIC_BEFORE', '1PANEL_BASIC', '1PANEL_BASIC_AFTER'] as const;
-const visibleIptablesChains = ref<string[]>(['1PANEL_BASIC']);
 const searchName = ref('');
 const inventoryItems = ref<Firewall.InventoryItem[]>([]);
 const listeningProcesses = ref<Process.ListeningProcess[]>([]);
@@ -428,7 +419,6 @@ const dockerEndpoints = ref<Firewall.DockerGuardEndpoint[]>([]);
 const selects = ref<RuleRow[]>([]);
 const scopeNotices = ref<Firewall.ScopeNotice[]>([]);
 
-const iptablesChainFilterActive = computed(() => visibleIptablesChains.value.length < iptablesChains.length);
 const supportsFirewalldPriority = computed(() => {
     if (provider.value !== 'firewalld') return true;
     const match = firewallVersion.value.trim().match(/^(\d+)\.(\d+)/);
@@ -437,6 +427,12 @@ const supportsFirewalldPriority = computed(() => {
     const minor = Number(match[2]);
     return major > 0 || minor >= 7;
 });
+const canSyncRules = computed(
+    () =>
+        ['iptables', 'nftables', 'firewalld', 'ufw'].includes(provider.value) &&
+        isActive.value &&
+        ((provider.value !== 'iptables' && provider.value !== 'nftables') || isBind.value),
+);
 
 const paginationConfig = reactive({
     cacheSizeKey: 'firewall-rule-page-size',
@@ -778,7 +774,7 @@ const filteredItems = computed<RuleRow[]>(() => {
     return allRows.value.filter((item) => {
         if (
             (item.rule.scope.provider === 'iptables' || item.rule.scope.provider === 'nftables') &&
-            !visibleIptablesChains.value.includes(item.rule.scope.chain || '')
+            item.rule.scope.chain !== '1PANEL_BASIC'
         ) {
             return false;
         }
@@ -810,11 +806,6 @@ const pagedItems = computed(() => {
 
 const resetPagination = () => {
     paginationConfig.currentPage = 1;
-};
-
-const changeIptablesChainFilter = () => {
-    selects.value = [];
-    resetPagination();
 };
 
 const changeRuleFilter = () => {
@@ -934,6 +925,21 @@ const openImport = () => {
     ruleImportRef.value?.acceptParams(provider.value as Firewall.Provider);
 };
 
+const openRuleSync = async () => {
+    if (!canSyncRules.value) return;
+    syncOpening.value = true;
+    try {
+        const running = (await loadFirewallRuleSyncTask()).data;
+        if (running.executing && running.taskID) {
+            ruleSyncRef.value?.openTask(running.taskID);
+            return;
+        }
+        await ruleSyncRef.value?.acceptParams(provider.value as Firewall.Provider);
+    } finally {
+        syncOpening.value = false;
+    }
+};
+
 const exportRules = async (rows: RuleRow[]) => {
     if (rows.length === 0) return;
     try {
@@ -961,26 +967,20 @@ const exportRulesBySelection = () => {
     return exportRules(selected.length > 0 ? selected : allManagedRules.value);
 };
 
-const removeRules = async (selected: RuleRow[], clearAll = false) => {
+const removeRules = async (selected: RuleRow[]) => {
     if (selected.length === 0) return;
     const usedBy = selected.flatMap((row) =>
         row.rule.action === 'accept' ? ruleUsageEntries(row).map((entry) => entry.owner) : [],
     );
-    const baseMessage = clearAll
-        ? i18n.global.t('firewall.clearAllRulesHelper', [selected.length])
-        : i18n.global.t('firewall.deleteRuleConfirm', [selected.length]);
+    const baseMessage = i18n.global.t('firewall.deleteRuleConfirm', [selected.length]);
     const message = usedBy.length
         ? `${baseMessage}\n${i18n.global.t('firewall.deleteUsedRuleConfirm', [usedBy.join(', ')])}`
         : baseMessage;
     try {
-        await ElMessageBox.confirm(
-            message,
-            i18n.global.t(clearAll ? 'commons.button.clean' : 'commons.button.delete'),
-            {
-                confirmButtonText: i18n.global.t('commons.button.confirm'),
-                cancelButtonText: i18n.global.t('commons.button.cancel'),
-            },
-        );
+        await ElMessageBox.confirm(message, i18n.global.t('commons.button.delete'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        });
     } catch {
         return;
     }
@@ -1012,7 +1012,29 @@ const removeRules = async (selected: RuleRow[], clearAll = false) => {
 
 const removeSelectedRules = () => removeRules(selects.value.filter((row) => isEditableManagedRule(row)));
 
-const clearAllRules = () => removeRules(allManagedRules.value, true);
+const resetRules = () => {
+    const message = i18n.global.t(
+        isDirectBackend.value ? 'firewall.resetDirectRulesHelper' : 'firewall.resetWhitelistRulesHelper',
+        [provider.value],
+    );
+    resetConfirmRef.value?.acceptParams({
+        header: i18n.global.t('firewall.cleanupAction'),
+        operationInfo: message,
+        submitInputInfo: provider.value,
+    });
+};
+
+const submitResetRules = async () => {
+    resetting.value = true;
+    loading.value = true;
+    try {
+        await resetFirewallRules({ provider: provider.value as Firewall.Provider });
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    } finally {
+        resetting.value = false;
+        fireStatusRef.value?.acceptParams();
+    }
+};
 
 const viewRawRule = async (row: RuleRow) => {
     let raw = row.observed?.raw?.trim();
@@ -1164,18 +1186,7 @@ onMounted(() => {
 }
 
 .firewall-rule-filter {
-    width: 480px;
-}
-
-.firewall-chain-filter-title {
-    margin-bottom: 8px;
-    font-weight: 500;
-}
-
-.firewall-chain-filter-options {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    width: 400px;
 }
 
 .firewall-action {

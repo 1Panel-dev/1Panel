@@ -15,6 +15,12 @@ type Client interface {
 	Version() (string, error)
 }
 
+// Resetter restores a service-backed firewall to its installation defaults.
+// Implementations must leave the firewall disabled after a successful reset.
+type Resetter interface {
+	Reset() error
+}
+
 func NewClient() (Client, error) {
 	runtime, err := DetectRuntime()
 	if err != nil {

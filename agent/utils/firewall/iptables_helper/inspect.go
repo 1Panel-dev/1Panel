@@ -70,6 +70,37 @@ func LoadFamilyInitStatus(family, tab string) (bool, bool, error) {
 	}
 }
 
+func LoadFamilyBindStatus(family string) (bool, error) {
+	var (
+		output string
+		err    error
+	)
+	switch family {
+	case constant.FirewallFamilyIPv4:
+		output, err = RunWithStd(FilterTab, "-S", InputChain)
+	case constant.FirewallFamilyIPv6:
+		output, err = RunIPv6WithStd(FilterTab, "-S", InputChain)
+	default:
+		return false, fmt.Errorf("unsupported iptables family %q", family)
+	}
+	if err != nil {
+		return false, err
+	}
+	return hasBaseChainBinding(output), nil
+}
+
+func hasBaseChainBinding(output string) bool {
+	for _, line := range strings.Split(output, "\n") {
+		line = strings.TrimSpace(line)
+		for _, chain := range BasicChains() {
+			if line == fmt.Sprintf("-A %s -j %s", InputChain, chain) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func loadInitStatus(tab string, runner func(string, ...string) (string, error), requireTerminalRules bool) (bool, bool, error) {
 	switch tab {
 	case "base":

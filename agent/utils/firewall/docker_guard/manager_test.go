@@ -18,6 +18,7 @@ type recordingRunner struct {
 	exists       map[string]bool
 	chains       string
 	dockerRules  string
+	guardRules   string
 	runErr       error
 }
 
@@ -36,6 +37,9 @@ func (r *recordingRunner) Run(_ string, args ...string) (string, error) {
 			return r.dockerRules, nil
 		}
 		return "-A DOCKER-USER -j 1PANEL_DOCKER\n", nil
+	}
+	if reflect.DeepEqual(args, []string{"-w", "-t", "filter", "-S", Chain}) {
+		return r.guardRules, nil
 	}
 	return "", nil
 }
@@ -93,6 +97,23 @@ func TestCompileEmptyAllowSourcesDropsAll(t *testing.T) {
 	rules := compilePolicy(Policy{UUID: "id", Family: FamilyIPv4, HostIP: "0.0.0.0", HostPort: 5432, Protocol: "tcp", Mode: ModeAllow})
 	if len(rules) != 1 || !strings.HasSuffix(strings.Join(rules[0], " "), "-j DROP") {
 		t.Fatalf("rules = %#v", rules)
+	}
+}
+
+func TestParseIptablesDockerGuardPolicies(t *testing.T) {
+	output := strings.Join([]string{
+		`-A 1PANEL_DOCKER -p tcp -m conntrack --ctorigdstport 8080 -m comment --comment "1panel-docker:deny" -j DROP`,
+		`-A 1PANEL_DOCKER -p tcp -m conntrack --ctorigdst 192.0.2.10/32 --ctorigdstport 5432 -s 203.0.113.1/32 -m comment --comment "1panel-docker:allow" -j RETURN`,
+		`-A 1PANEL_DOCKER -p tcp -m conntrack --ctorigdst 192.0.2.10/32 --ctorigdstport 5432 -m comment --comment "1panel-docker:allow" -j DROP`,
+	}, "\n")
+	policies, err := parseDockerGuardPolicies(output, FamilyIPv4)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(policies) != 2 || policies[0].UUID != "deny" || policies[0].Mode != ModeAll ||
+		policies[1].UUID != "allow" || policies[1].HostIP != "192.0.2.10" || policies[1].Mode != ModeAllow ||
+		!reflect.DeepEqual(policies[1].Sources, []string{"203.0.113.1/32"}) {
+		t.Fatalf("policies = %#v", policies)
 	}
 }
 

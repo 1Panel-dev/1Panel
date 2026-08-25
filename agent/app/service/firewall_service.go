@@ -34,11 +34,14 @@ import (
 )
 
 type FirewallService struct {
-	rules            repo.IFirewallRuleRepo
-	adapters         firewallRuleRuntimeRegistry
-	selectedProvider func(context.Context) (filter.Provider, error)
-	protectedPorts   func() ([]firewall.PortWhitelist, error)
-	iptablesHelper   *iptables_helper.Manager
+	rules                  repo.IFirewallRuleRepo
+	adapters               firewallRuleRuntimeRegistry
+	selectedProvider       func(context.Context) (filter.Provider, error)
+	protectedPorts         func() ([]firewall.PortWhitelist, error)
+	iptablesHelper         *iptables_helper.Manager
+	cleanupBackend         func(string) error
+	cleanupInactiveBackend func(string) error
+	resetBackend           func(string) error
 }
 
 var firewallRuleMutationMu sync.Mutex
@@ -51,9 +54,13 @@ type IFirewallService interface {
 	LoadFirewallNativeDetail(context.Context, dto.FirewallNativeDetail) (string, error)
 	Check(context.Context, string, dto.FirewallRuleCheck) (dto.FirewallRuleCheckResponse, error)
 	Create(context.Context, dto.FirewallRuleCreate) (dto.FirewallRuleCreateResponse, error)
+	PreviewRuleSync(context.Context, string, dto.FirewallRuleSyncRequest) (dto.FirewallRuleSyncPreview, error)
+	SyncRules(context.Context, string, dto.FirewallRuleSyncRequest) (dto.FirewallRuleSyncResult, error)
+	CurrentRuleSyncTask() (dto.FirewallRuleSyncTask, error)
 	Delete(context.Context, dto.FirewallRuleDelete) (dto.FirewallRuleDeleteResponse, error)
 	Update(context.Context, string, dto.FirewallRuleUpdate) error
 	Reorder(context.Context, string, dto.FirewallRuleReorder) error
+	Reset(context.Context, dto.FirewallRuleReset) (dto.FirewallRuleResetResponse, error)
 }
 
 func NewIFirewallService() IFirewallService {
@@ -62,11 +69,14 @@ func NewIFirewallService() IFirewallService {
 
 func newFirewallService() *FirewallService {
 	return &FirewallService{
-		rules:            repo.NewIFirewallRuleRepo(),
-		adapters:         newFirewallRuleRuntimeRegistry(firewallRuleSnapshotPolicy),
-		selectedProvider: firewallRuleSelectedProvider,
-		protectedPorts:   loadFirewallPortWhiteList,
-		iptablesHelper:   newIptablesHelperManager(),
+		rules:                  repo.NewIFirewallRuleRepo(),
+		adapters:               newFirewallRuleRuntimeRegistry(firewallRuleSnapshotPolicy),
+		selectedProvider:       firewallRuleSelectedProvider,
+		protectedPorts:         loadFirewallPortWhiteList,
+		iptablesHelper:         newIptablesHelperManager(),
+		cleanupBackend:         cleanupSystemBackend,
+		cleanupInactiveBackend: cleanupInactiveSystemBackend,
+		resetBackend:           resetServiceFirewallBackend,
 	}
 }
 
@@ -93,8 +103,38 @@ func (s *FirewallService) LoadBaseInfo(chainGroup string) (dto.FirewallSubsystem
 		status.IsInit, status.IsBind = initialized, bound
 		status.IPv4 = loadSystemFirewallFamilyInfo(status.Name, constant.FirewallFamilyIPv4)
 		status.IPv6 = loadSystemFirewallFamilyInfo(status.Name, constant.FirewallFamilyIPv6)
+		if chainGroup == "base" {
+			status.ConflictBackend = conflictingDirectFirewallBackend(runtimeStatus.Name)
+		}
 	}
 	return status, nil
+}
+
+func conflictingDirectFirewallBackend(provider string) string {
+	other := ""
+	switch provider {
+	case constant.FirewallProviderIptables:
+		other = constant.FirewallProviderNftables
+	case constant.FirewallProviderNftables:
+		other = constant.FirewallProviderIptables
+	default:
+		return ""
+	}
+	for _, family := range []string{constant.FirewallFamilyIPv4, constant.FirewallFamilyIPv6} {
+		var (
+			bound bool
+			err   error
+		)
+		if other == constant.FirewallProviderIptables {
+			bound, err = iptables_helper.LoadFamilyBindStatus(family)
+		} else {
+			bound, err = nftables_helper.LoadFamilyBindStatus(filter.Family(family))
+		}
+		if err == nil && bound {
+			return other
+		}
+	}
+	return ""
 }
 
 func (s *FirewallService) OperateFirewall(request dto.FirewallLifecycleOperation) error {
@@ -151,6 +191,95 @@ func (s *FirewallService) OperateFilterChain(request dto.FilterChainOperation) e
 	}
 	ports := excludeFirewallPorts(configured, required)
 	return s.SyncSystemPorts(context.Background(), nil, systemPorts(ports))
+}
+
+func (s *FirewallService) Reset(ctx context.Context, request dto.FirewallRuleReset) (dto.FirewallRuleResetResponse, error) {
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
+
+	provider := request.Provider
+	selected := provider
+	if provider == "" {
+		var err error
+		selected, err = s.selectedProvider(ctx)
+		if err != nil {
+			return dto.FirewallRuleResetResponse{}, err
+		}
+		provider = selected
+	} else if isDirectFirewallProvider(provider) {
+		var err error
+		selected, err = s.selectedProvider(ctx)
+		if err != nil {
+			return dto.FirewallRuleResetResponse{}, err
+		}
+	}
+	stored, err := s.rules.List(ctx, repo.WithByProvider(string(provider)))
+	if err != nil {
+		return dto.FirewallRuleResetResponse{}, err
+	}
+	if provider == filter.ProviderIptables || provider == filter.ProviderNftables {
+		cleanup := s.cleanupBackend
+		if isDirectFirewallProvider(selected) && selected != provider {
+			cleanup = s.cleanupInactiveBackend
+			if cleanup == nil {
+				cleanup = cleanupInactiveSystemBackend
+			}
+		} else if cleanup == nil {
+			cleanup = cleanupSystemBackend
+		}
+		if err := cleanup(string(provider)); err != nil {
+			return dto.FirewallRuleResetResponse{}, err
+		}
+		deleted, err := s.deleteFirewallRuleRecords(ctx, stored)
+		return dto.FirewallRuleResetResponse{Removed: deleted, Disabled: err == nil}, err
+	}
+	if provider != filter.ProviderUFW && provider != filter.ProviderFirewalld {
+		return dto.FirewallRuleResetResponse{}, fmt.Errorf("%w: unsupported firewall provider %s", filter.ErrProviderUnavailable, provider)
+	}
+	reset := s.resetBackend
+	if reset == nil {
+		reset = resetServiceFirewallBackend
+	}
+	if err := reset(string(provider)); err != nil {
+		return dto.FirewallRuleResetResponse{}, err
+	}
+	deleted, err := s.deleteFirewallRuleRecords(ctx, stored)
+	return dto.FirewallRuleResetResponse{Removed: deleted, Disabled: err == nil}, err
+}
+
+func isDirectFirewallProvider(provider filter.Provider) bool {
+	return provider == filter.ProviderIptables || provider == filter.ProviderNftables
+}
+
+func resetServiceFirewallBackend(provider string) error {
+	client, err := lifecycle.NewClientFor(provider)
+	if err != nil {
+		return err
+	}
+	resetter, ok := client.(lifecycle.Resetter)
+	if !ok {
+		return fmt.Errorf("firewall provider %s does not support reset", provider)
+	}
+	if provider == constant.FirewallProviderFirewalld {
+		if err := lifecycle.NewOperator(client).Operate(lifecycle.OperationStop, false, nil); err != nil {
+			return err
+		}
+	}
+	return resetter.Reset()
+}
+
+func (s *FirewallService) deleteFirewallRuleRecords(
+	ctx context.Context,
+	stored []model.FirewallRule,
+) (int, error) {
+	deleted := 0
+	for _, record := range stored {
+		if err := s.rules.DeleteWithRevision(ctx, record.UUID, record.Revision); err != nil {
+			return deleted, fmt.Errorf("delete reset firewall rule %q: %w", record.UUID, err)
+		}
+		deleted++
+	}
+	return deleted, nil
 }
 
 func (s *FirewallService) loadProtectedPorts() ([]firewall.PortWhitelist, error) {

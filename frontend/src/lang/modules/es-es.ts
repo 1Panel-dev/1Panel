@@ -4171,14 +4171,56 @@ const message = {
         addressFamily: 'Versión de IP',
         portOrRange: 'Puerto / rango',
         exportAllRules: 'Exportar todas las reglas',
-        clearAllRules: 'Borrar todas las reglas',
         importBackendHelper:
             'Las reglas importadas se convierten para el backend actual {0}. Las reglas de origen no se modifican.',
-        clearAllRulesHelper:
-            '¿Eliminar las {0} reglas administrables del backend actual? Esta acción no se puede deshacer.',
+        resetDirectRulesHelper:
+            'Elimina de {0} todas las cadenas, reglas, archivos persistentes y registros de base de datos correspondientes del firewall del sistema de 1Panel',
+        resetWhitelistRulesHelper:
+            'Elimina de {0} toda la configuración personalizada y sus registros de base de datos, restaura los valores iniciales y desactiva {0}.\nDespués de la limpieza, dejará de proporcionarse protección. Esta acción no se puede deshacer.',
+        cleanupForwardingBackendHelper:
+            'Elimina de {0} todas las reglas y cadenas de reenvío de puertos de 1Panel, conservando solo los datos de la base de datos',
+        cleanupDockerBackendHelper:
+            'Elimina de {0} todas las reglas y cadenas de protección de puertos Docker de 1Panel, conservando solo los datos de la base de datos',
+        cleanupBeforeBackendSwitch:
+            'El backend actual {0} todavía contiene reglas de ejecución de 1Panel. Límpielo antes de cambiar a {1}.',
+        cleanupAction: 'Limpiar',
         backendSwitchNotice:
-            'El cambio solo modifica el backend de firewall utilizado actualmente; no migra ni elimina las reglas existentes. Después del cambio, sincronice las reglas con el firewall de destino y confirme que estén activas antes de eliminar las reglas del firewall original.',
+            'El cambio del firewall del sistema no migra ni limpia reglas automáticamente. Para el reenvío de puertos y la protección Docker debe limpiar primero el backend actual; las reglas y políticas guardadas permanecen en 1Panel y pueden inicializarse o sincronizarse después.',
         switchBackendHelper: '¿Cambiar a {0}?',
+        ruleSyncTitle: 'Sincronizar reglas',
+        ruleSyncAction: 'Sincronizar reglas',
+        ruleSyncHelper:
+            'Sincroniza las reglas gestionadas por 1Panel del firewall seleccionado al firewall actual. Las reglas de origen no se eliminan y las reglas externas no se incluyen.',
+        ruleSyncDatabase: 'Base de datos de 1Panel',
+        ruleSyncDatabaseHelper:
+            'Sincroniza y concilia las reglas administradas del firewall actual con las reglas de la base de datos de 1Panel. Se añadirán las reglas que falten y se eliminarán las sobrantes.',
+        ruleSyncDatabaseTotal: 'Reglas de la base de datos',
+        ruleSyncDatabaseConfirm:
+            '¿Sincronizar {1} para que coincida exactamente con las {0} reglas de la base de datos? Se eliminarán {2} reglas del destino y se añadirán las que falten.',
+        ruleSyncSource: 'Backend de origen',
+        ruleSyncTarget: 'Backend actual',
+        ruleSyncTotal: 'Reglas convertidas',
+        ruleSyncReady: 'Preparadas',
+        ruleSyncExisting: 'Existentes',
+        ruleSyncRemove: 'Para eliminar',
+        ruleSyncBlocked: 'No disponibles',
+        ruleSyncReason: 'Resultado de comprobación',
+        ruleSyncConfirm: '¿Sincronizar {0} reglas de {1} a {2}? El backend de origen no se modificará.',
+        ruleSyncResetSource: 'Restablecer y desactivar el firewall de origen {0} tras sincronizar',
+        ruleSyncResetSourceHelper:
+            'El firewall de origen solo se restablece si todas las reglas se sincronizan correctamente.',
+        ruleSyncResetSourceBlocked:
+            'Hay reglas que no se pueden sincronizar. Resuélvalas antes de restablecer el origen.',
+        ruleSyncResetSourceConfirm:
+            '¿Sincronizar {0} reglas de {1} a {2} y después restablecer y desactivar {1}? Se eliminará toda su configuración y no se puede deshacer.',
+        ruleSyncPartial: 'Sincronización completada: {0} correctas, {1} ya existían y {2} fallaron.',
+        ruleSyncSuccess: 'Sincronización completada: {0} correctas, {1} ya existían y {2} eliminadas.',
+        ruleSyncStatus: {
+            ready: 'Preparada',
+            existing: 'Existente',
+            remove: 'Para eliminar',
+            blocked: 'No disponible',
+        },
         uninstalledStatus: 'No instalado',
         initializedStatus: 'Inicializado',
         partiallyInitialized: 'Parcialmente inicializado',
@@ -4188,6 +4230,7 @@ const message = {
             'Las reglas INPUT del host no protegen directamente este puerto publicado por Docker. Haz clic para abrir la protección de puertos de contenedores.',
         notInitialized: 'No inicializado',
         familyUnsupported: 'El sistema no admite {0}',
+        familyChainIssue: '{0} · cadena {1} · {2}',
         dockerGuardUnbindConfirm:
             'Después de desvincular, todos los puertos de contenedores volverán temporalmente al acceso predeterminado de Docker. Se conservarán los ajustes de protección existentes. ¿Continuar?',
         deleteDockerGuardPolicyConfirm:
@@ -4197,10 +4240,14 @@ const message = {
         protection: 'Protección',
         portDetails: 'Detalles del puerto',
         orphanEndpoints: 'Puntos de conexión sin asociar',
+        orphanPolicies: 'Reglas sin asociar',
+        orphanPoliciesHelper:
+            'Las siguientes {0} regla(s) no están vinculadas a ningún puerto Docker. Se vincularán automáticamente cuando se detecte un puerto coincidente.',
         exposure: 'Exposición',
         externallyExposed: 'Permitir acceso externo (0.0.0.0 / ::)',
         restrictedBinding: 'Denegar acceso externo (127.0.0.1 / ::1)',
         composeOrApp: 'Compose / Aplicación',
+        sources: 'Orígenes',
         deniedSources: 'Orígenes denegados',
         allowedSources: 'Orígenes permitidos',
         dockerGuardPolicy: 'Política de protección de puertos de contenedores',
@@ -4245,6 +4292,10 @@ const message = {
         baseIptables: 'Servicio iptables',
         forwardIptables: 'Servicio de Reenvío de Puertos iptables',
         initMsg: 'A punto de inicializar {0}, ¿continuar?',
+        initDirectBackendConflictMsg:
+            '{1} sigue vinculado. Si se inicializa {0}, ambos conjuntos de reglas estarán activos y podrían bloquear el acceso de forma inesperada. ¿Desea continuar?',
+        directBackendConflictWarning:
+            '{0} y {1} están vinculados, por lo que ambos conjuntos de reglas están activos. Compruebe que no se bloqueen entre sí y desvincule manualmente el firewall que ya no utilice.',
         initHelper:
             'Se detectó que {0} no está inicializado. ¡Haga clic en el botón de inicialización en la barra de estado superior para configurar!',
         bindHelper:

@@ -83,7 +83,7 @@
         </template>
     </DrawerPro>
 
-    <el-dialog v-model="policyVisible" :title="$t('firewall.dockerGuardPolicy')" width="520">
+    <DialogPro v-model="policyVisible" :title="$t('firewall.dockerGuardPolicy')" size="large">
         <el-form label-position="top">
             <el-form-item :label="$t('firewall.protectionMode')">
                 <el-radio-group v-model="form.mode">
@@ -103,7 +103,7 @@
             <el-button @click="policyVisible = false">{{ $t('commons.button.cancel') }}</el-button>
             <el-button type="primary" @click="submitPolicy">{{ $t('commons.button.confirm') }}</el-button>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>
@@ -246,7 +246,7 @@ const protectionSummary = (row: Firewall.DockerGuardEndpoint) => {
     return row.effective ? summary : `${summary} · ${i18n.global.t('firewall.notEffective')}`;
 };
 
-defineExpose({ acceptParams });
+defineExpose({ acceptParams, openPolicy });
 </script>
 
 <style lang="scss" scoped>

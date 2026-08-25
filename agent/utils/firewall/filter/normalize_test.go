@@ -18,6 +18,7 @@ func TestNormalizeRule(t *testing.T) {
 		SourceAddress:      "172.16.10.111",
 		DestinationAddress: "0.0.0.0/0",
 		DestinationPort:    "080:080",
+		Interface:          " * ",
 		Action:             "ALLOW",
 		ConnectionStates:   []string{"NEW", "established", "new"},
 	})
@@ -39,6 +40,9 @@ func TestNormalizeRule(t *testing.T) {
 	}
 	if rule.DestinationPort != "80" {
 		t.Fatalf("unexpected destination port %q", rule.DestinationPort)
+	}
+	if rule.Interface != "" {
+		t.Fatalf("wildcard interface was not normalized: %q", rule.Interface)
 	}
 	if len(rule.ConnectionStates) != 2 || rule.ConnectionStates[0] != "established" || rule.ConnectionStates[1] != "new" {
 		t.Fatalf("unexpected states: %#v", rule.ConnectionStates)

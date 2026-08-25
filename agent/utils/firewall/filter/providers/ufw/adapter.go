@@ -42,6 +42,17 @@ func NewAdapterWithBackend(reader CommandReader, writer CommandWriter) *Adapter 
 
 func (a *Adapter) Provider() filter.Provider { return filter.ProviderUFW }
 
+func (a *Adapter) PrepareRule(rule filter.FirewallRule) (filter.FirewallRule, error) {
+	normalized, err := filter.NormalizeRule(rule)
+	if err != nil {
+		return filter.FirewallRule{}, err
+	}
+	if err := validateWritableRule(normalized); err != nil {
+		return filter.FirewallRule{}, err
+	}
+	return normalized, nil
+}
+
 func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 	return filter.Capabilities{
 		Scopes: []filter.ScopePattern{{

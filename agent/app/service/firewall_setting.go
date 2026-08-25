@@ -230,6 +230,19 @@ func (s *FirewallSettingService) operateDocker(ctx context.Context, request dto.
 		return settingRepo.UpdateOrCreate(constant.FirewallDockerPortGuardStatusKey, constant.StatusDisable)
 	}
 	previous, _ := settingRepo.GetValueByKey(constant.FirewallDockerBackendKey)
+	if request.Operation == "select" {
+		current := previous
+		if current == "" {
+			current = alternateDirectBackend(request.Backend)
+		}
+		initialized, err := dockerGuardBackendInitialized(current)
+		if err != nil {
+			return err
+		}
+		if current != request.Backend && initialized {
+			return fmt.Errorf("clean up the current Docker firewall backend %s before switching to %s", current, request.Backend)
+		}
+	}
 	if err := settingRepo.UpdateOrCreate(constant.FirewallDockerBackendKey, request.Backend); err != nil {
 		return err
 	}
@@ -240,6 +253,23 @@ func (s *FirewallSettingService) operateDocker(ctx context.Context, request dto.
 		}
 	}
 	return nil
+}
+
+func dockerGuardBackendInitialized(backend string) (bool, error) {
+	var guard dockerGuardRuntime = docker_guard.NewManager()
+	if backend == constant.FirewallProviderNftables {
+		guard = docker_guard.NewNftablesManager()
+	}
+	for _, family := range []string{docker_guard.FamilyIPv4, docker_guard.FamilyIPv6} {
+		initialized, err := guard.Initialized(family)
+		if err != nil {
+			return false, err
+		}
+		if initialized {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func (s *FirewallSettingService) operateSystem(request dto.FirewallBackendOperation) error {
@@ -288,6 +318,17 @@ func cleanupSystemBackend(backend string) error {
 	}
 }
 
+func cleanupInactiveSystemBackend(backend string) error {
+	switch backend {
+	case constant.FirewallProviderIptables:
+		return (&iptables_helper.Manager{}).Cleanup()
+	case constant.FirewallProviderNftables:
+		return (&nftables_helper.Manager{}).Cleanup()
+	default:
+		return fmt.Errorf("cleanup is only available for 1Panel-owned iptables and nftables resources")
+	}
+}
+
 func (s *FirewallSettingService) operateForwarding(request dto.FirewallBackendOperation) error {
 	manager, err := newForwardingManagerFor(request.Backend)
 	if err != nil {
@@ -303,6 +344,24 @@ func (s *FirewallSettingService) operateForwarding(request dto.FirewallBackendOp
 		recordForwardingSyncError(nil)
 		return nil
 	}
+	previous, _ := settingRepo.GetValueByKey(constant.FirewallForwardingBackendKey)
+	if request.Operation == "select" {
+		current := previous
+		if current == "" {
+			detected, err := newForwardingManager()
+			if err != nil {
+				return err
+			}
+			current = detected.Name()
+		}
+		initialized, err := forwardingBackendInitialized(current)
+		if err != nil {
+			return err
+		}
+		if current != request.Backend && initialized {
+			return fmt.Errorf("clean up the current forwarding backend %s before switching to %s", current, request.Backend)
+		}
+	}
 	if err := settingRepo.UpdateOrCreate(constant.FirewallForwardingBackendKey, request.Backend); err != nil {
 		return err
 	}
@@ -311,4 +370,31 @@ func (s *FirewallSettingService) operateForwarding(request dto.FirewallBackendOp
 	}
 	recordForwardingSyncError(nil)
 	return nil
+}
+
+func forwardingBackendInitialized(backend string) (bool, error) {
+	manager, err := newForwardingManagerFor(backend)
+	if err != nil {
+		if strings.Contains(err.Error(), "is not installed") {
+			return false, nil
+		}
+		return false, err
+	}
+	for _, family := range []string{constant.FirewallFamilyIPv4, constant.FirewallFamilyIPv6} {
+		initialized, _, err := manager.FamilyStatus(family)
+		if err != nil {
+			return false, err
+		}
+		if initialized {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func alternateDirectBackend(backend string) string {
+	if backend == constant.FirewallProviderNftables {
+		return constant.FirewallProviderIptables
+	}
+	return constant.FirewallProviderNftables
 }

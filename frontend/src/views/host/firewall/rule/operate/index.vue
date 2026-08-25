@@ -97,7 +97,7 @@
             </el-form-item>
         </el-form>
 
-        <div v-if="showingPreview" class="rule-preview">
+        <div v-if="showingPreview" v-loading="loading" class="rule-preview">
             <div class="rule-preview-title">
                 <span>{{ $t('firewall.ruleCheckResult') }}</span>
             </div>
@@ -171,8 +171,7 @@
             </el-button>
             <el-button
                 type="primary"
-                :loading="loading"
-                :disabled="showingPreview && hasBlockingRules"
+                :disabled="loading || (showingPreview && hasBlockingRules)"
                 @click="onCheckOrSubmit"
             >
                 {{ $t(showingPreview ? 'commons.button.submit' : 'commons.button.check') }}

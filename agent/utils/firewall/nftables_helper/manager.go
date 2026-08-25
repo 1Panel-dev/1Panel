@@ -8,11 +8,9 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 )
@@ -79,18 +77,6 @@ func (m *Manager) disableBase() error {
 }
 
 func (m *Manager) ensureBaseChains() error {
-	hasTable := false
-	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
-		if _, err := run("list", "table", TableFamily(family), TableName); err == nil {
-			hasTable = true
-			break
-		}
-	}
-	if !hasTable {
-		if err := rejectLegacyOnePanelChains(); err != nil {
-			return err
-		}
-	}
 	commands := make([][]string, 0, 10)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
@@ -131,51 +117,6 @@ func requiredPortCommand(tableFamily string, port firewall.PortWhitelist) []stri
 		"meta", "l4proto", port.Protocol, port.Protocol, "dport", port.Port,
 		"accept", "comment", `"` + requiredPortComment + `"`,
 	}
-}
-
-func rejectLegacyOnePanelChains() error {
-	for _, family := range []string{"ip", "ip6"} {
-		stdout, err := run("list", "chain", family, "filter", "INPUT")
-		if err == nil {
-			if chain := activeLegacyChain(stdout); chain != "" {
-				return fmt.Errorf("legacy 1Panel firewall chain %s is still bound to %s filter INPUT; unbind or migrate it before initializing native nftables", chain, family)
-			}
-		}
-	}
-	for _, executable := range []string{"iptables", "iptables-nft", "ip6tables", "ip6tables-nft"} {
-		if !cmd.Which(executable) {
-			continue
-		}
-		stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithOptionalSudoAndStdout(executable, "-t", "filter", "-S", "INPUT")
-		if err != nil {
-			continue
-		}
-		if chain := activeLegacyChain(stdout); chain != "" {
-			return fmt.Errorf("legacy 1Panel firewall chain %s is still bound through %s INPUT; unbind or migrate it before initializing native nftables", chain, executable)
-		}
-	}
-	return nil
-}
-
-func activeLegacyChain(output string) string {
-	legacy := map[string]struct{}{
-		constant.FirewallBasicBeforeChain: {},
-		constant.FirewallBasicChain:       {},
-		constant.FirewallBasicAfterChain:  {},
-	}
-	for _, line := range strings.Split(output, "\n") {
-		fields := strings.Fields(line)
-		for index := 0; index+1 < len(fields); index++ {
-			if fields[index] != "jump" && fields[index] != "-j" {
-				continue
-			}
-			chain := strings.Trim(fields[index+1], `"`)
-			if _, ok := legacy[chain]; ok {
-				return chain
-			}
-		}
-	}
-	return ""
 }
 
 func (m *Manager) initPreRules() error {

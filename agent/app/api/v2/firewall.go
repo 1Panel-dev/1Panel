@@ -179,6 +179,29 @@ func (b *BaseApi) SearchFirewallRules(c *gin.Context) {
 }
 
 // @Tags Firewall
+// @Summary Reset firewall rules
+// @Accept json
+// @Param request body dto.FirewallRuleReset true "request"
+// @Success 200 {object} dto.FirewallRuleResetResponse
+// @Failure 400 {object} dto.Response
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/rules/reset [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"重置防火墙规则","formatEN":"reset firewall rules"}
+func (b *BaseApi) ResetFirewallRules(c *gin.Context) {
+	var request dto.FirewallRuleReset
+	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
+	}
+	result, err := firewallService.Reset(c.Request.Context(), request)
+	if err != nil {
+		handleFirewallRuleError(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
+
+// @Tags Firewall
 // @Summary Load one provider-native firewall object definition
 // @Accept json
 // @Param request body dto.FirewallNativeDetail true "request"
@@ -244,6 +267,96 @@ func (b *BaseApi) CreateFirewallRules(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, result)
+}
+
+// @Tags Firewall
+// @Summary Preview firewall rule synchronization
+// @Accept json
+// @Param request body dto.FirewallRuleSyncRequest true "request"
+// @Success 200 {object} dto.FirewallRuleSyncPreview
+// @Failure 400 {object} dto.Response
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/rules/sync/preview [post]
+func (b *BaseApi) PreviewFirewallRuleSync(c *gin.Context) {
+	var request dto.FirewallRuleSyncRequest
+	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
+	}
+	var (
+		result dto.FirewallRuleSyncPreview
+		err    error
+	)
+	switch firewallRuleSyncSubsystem(request.Subsystem) {
+	case "forwarding":
+		result, err = forwardingService.PreviewRuleSync(c.Request.Context(), request)
+	case "docker":
+		result, err = dockerPortGuardService.PreviewRuleSync(c.Request.Context(), request)
+	default:
+		result, err = firewallService.PreviewRuleSync(c.Request.Context(), c.ClientIP(), request)
+	}
+	if err != nil {
+		handleFirewallRuleError(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
+
+// @Tags Firewall
+// @Summary Load the currently executing firewall rule synchronization task
+// @Success 200 {object} dto.FirewallRuleSyncTask
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/rules/sync/task [get]
+func (b *BaseApi) LoadFirewallRuleSyncTask(c *gin.Context) {
+	result, err := firewallService.CurrentRuleSyncTask()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
+
+// @Tags Firewall
+// @Summary Synchronize firewall rules to a target backend
+// @Accept json
+// @Param request body dto.FirewallRuleSyncRequest true "request"
+// @Success 200 {object} dto.FirewallRuleSyncResult
+// @Failure 400 {object} dto.Response
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/rules/sync [post]
+// @x-panel-log {"bodyKeys":["subsystem","sourceProvider","targetProvider"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步 [subsystem] 防火墙规则到 [targetProvider]","formatEN":"sync [subsystem] firewall rules to [targetProvider]"}
+func (b *BaseApi) SyncFirewallRules(c *gin.Context) {
+	var request dto.FirewallRuleSyncRequest
+	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
+	}
+	var (
+		result dto.FirewallRuleSyncResult
+		err    error
+	)
+	switch firewallRuleSyncSubsystem(request.Subsystem) {
+	case "forwarding":
+		result, err = forwardingService.SyncRules(c.Request.Context(), request)
+	case "docker":
+		result, err = dockerPortGuardService.SyncRules(c.Request.Context(), request)
+	default:
+		result, err = firewallService.SyncRules(c.Request.Context(), c.ClientIP(), request)
+	}
+	if err != nil {
+		handleFirewallRuleError(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
+
+func firewallRuleSyncSubsystem(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return "system"
+	}
+	return value
 }
 
 // @Tags Firewall

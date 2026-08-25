@@ -4192,14 +4192,55 @@ const message = {
         addressFamily: 'Versi IP',
         portOrRange: 'Port / julat',
         exportAllRules: 'Eksport semua peraturan',
-        clearAllRules: 'Kosongkan semua peraturan',
         importBackendHelper:
             'Peraturan yang diimport ditukar untuk bahagian belakang semasa {0}. Peraturan sumber tidak diubah.',
-        clearAllRulesHelper:
-            'Padam semua {0} peraturan yang boleh diurus daripada bahagian belakang semasa? Tindakan ini tidak boleh dibuat asal.',
+        resetDirectRulesHelper:
+            'Padam semua rantaian, peraturan, fail berterusan dan rekod pangkalan data berkaitan tembok api sistem 1Panel daripada {0}',
+        resetWhitelistRulesHelper:
+            'Padam semua konfigurasi tersuai dan rekod pangkalan data daripada {0}, pulihkan tetapan pemasangan asal dan nyahdayakan {0}.\nSelepas pembersihan, perlindungan tembok api tidak lagi diberikan. Tindakan ini tidak boleh dibuat asal.',
+        cleanupForwardingBackendHelper:
+            'Padam semua peraturan dan rantaian pemajuan port 1Panel daripada {0}, hanya mengekalkan data pangkalan data',
+        cleanupDockerBackendHelper:
+            'Padam semua peraturan dan rantaian perlindungan port Docker 1Panel daripada {0}, hanya mengekalkan data pangkalan data',
+        cleanupBeforeBackendSwitch:
+            'Bahagian belakang semasa {0} masih mengandungi peraturan masa jalan 1Panel. Bersihkannya sebelum bertukar kepada {1}.',
+        cleanupAction: 'Bersihkan',
         backendSwitchNotice:
-            'Penukaran hanya mengubah bahagian belakang tembok api yang sedang digunakan; peraturan sedia ada tidak dipindahkan atau dibersihkan. Selepas menukar, segerakkan peraturan ke tembok api sasaran dan sahkan ia berkuat kuasa sebelum membersihkan peraturan tembok api asal.',
+            'Penukaran tembok api sistem tidak memindahkan atau membersihkan peraturan secara automatik. Pemajuan port dan perlindungan Docker memerlukan bahagian belakang semasa dibersihkan dahulu; peraturan dan dasar tersimpan kekal dalam 1Panel dan boleh dimulakan atau disegerakkan semula selepas penukaran.',
         switchBackendHelper: 'Tukar kepada {0}?',
+        ruleSyncTitle: 'Segerakkan peraturan',
+        ruleSyncAction: 'Segerakkan peraturan',
+        ruleSyncHelper:
+            'Segerakkan peraturan yang diurus oleh 1Panel daripada tembok api terpilih ke tembok api semasa. Peraturan sumber tidak dipadam dan peraturan luaran tidak disertakan.',
+        ruleSyncDatabase: 'Pangkalan data 1Panel',
+        ruleSyncDatabaseHelper:
+            'Segerakkan dan selaraskan peraturan terurus dalam tembok api semasa berdasarkan peraturan pangkalan data 1Panel. Peraturan yang tiada akan ditambah dan peraturan berlebihan akan dipadam.',
+        ruleSyncDatabaseTotal: 'Peraturan pangkalan data',
+        ruleSyncDatabaseConfirm:
+            'Segerakkan {1} supaya sepadan tepat dengan {0} peraturan pangkalan data? {2} peraturan sasaran akan dipadam dan peraturan yang tiada akan ditambah.',
+        ruleSyncSource: 'Bahagian belakang sumber',
+        ruleSyncTarget: 'Bahagian belakang semasa',
+        ruleSyncTotal: 'Peraturan ditukar',
+        ruleSyncReady: 'Sedia',
+        ruleSyncExisting: 'Sedia ada',
+        ruleSyncRemove: 'Untuk dipadam',
+        ruleSyncBlocked: 'Tidak tersedia',
+        ruleSyncReason: 'Hasil semakan',
+        ruleSyncConfirm: 'Segerakkan {0} peraturan daripada {1} ke {2}? Bahagian belakang sumber tidak akan diubah.',
+        ruleSyncResetSource: 'Tetapkan semula dan nyahdayakan tembok api sumber {0} selepas penyegerakan berjaya',
+        ruleSyncResetSourceHelper: 'Sumber hanya ditetapkan semula selepas semua peraturan berjaya disegerakkan.',
+        ruleSyncResetSourceBlocked:
+            'Ada peraturan yang tidak dapat disegerakkan. Selesaikan dahulu sebelum menetapkan semula sumber.',
+        ruleSyncResetSourceConfirm:
+            'Segerakkan {0} peraturan daripada {1} ke {2}, kemudian tetapkan semula dan nyahdayakan {1}? Semua konfigurasinya akan dipadam dan tidak boleh dibuat asal.',
+        ruleSyncPartial: 'Penyegerakan selesai: {0} berjaya, {1} sudah wujud dan {2} gagal.',
+        ruleSyncSuccess: 'Penyegerakan selesai: {0} berjaya, {1} sudah wujud dan {2} dipadam.',
+        ruleSyncStatus: {
+            ready: 'Sedia',
+            existing: 'Sedia ada',
+            remove: 'Untuk dipadam',
+            blocked: 'Tidak tersedia',
+        },
         uninstalledStatus: 'Belum dipasang',
         initializedStatus: 'Dimulakan',
         partiallyInitialized: 'Dimulakan sebahagian',
@@ -4209,6 +4250,7 @@ const message = {
             'Peraturan INPUT hos tidak melindungi port terbitan Docker ini secara langsung. Klik untuk membuka perlindungan port bekas.',
         notInitialized: 'Belum dimulakan',
         familyUnsupported: 'Sistem tidak menyokong {0}',
+        familyChainIssue: '{0} · rantaian {1} · {2}',
         dockerGuardUnbindConfirm:
             'Selepas dinyahikat, semua port bekas akan kembali sementara kepada akses lalai Docker. Tetapan perlindungan sedia ada dikekalkan. Teruskan?',
         deleteDockerGuardPolicyConfirm: 'Titik akhir ini akan kembali kepada akses lalai Docker. Teruskan?',
@@ -4216,10 +4258,14 @@ const message = {
         protection: 'Perlindungan',
         portDetails: 'Butiran port',
         orphanEndpoints: 'Titik akhir tidak berkaitan',
+        orphanPolicies: 'Peraturan tidak berkaitan',
+        orphanPoliciesHelper:
+            '{0} peraturan berikut belum terikat pada port Docker. Peraturan akan diikat secara automatik apabila port sepadan dikesan.',
         exposure: 'Pendedahan',
         externallyExposed: 'Benarkan akses luaran (0.0.0.0 / ::)',
         restrictedBinding: 'Tolak akses luaran (127.0.0.1 / ::1)',
         composeOrApp: 'Compose / Aplikasi',
+        sources: 'Sumber',
         deniedSources: 'Sumber ditolak',
         allowedSources: 'Sumber dibenarkan',
         dockerGuardPolicy: 'Dasar perlindungan port bekas',
@@ -4261,6 +4307,10 @@ const message = {
         baseIptables: 'Perkhidmatan iptables',
         forwardIptables: 'Perkhidmatan Penerusan Port iptables',
         initMsg: 'Akan memulakan {0}, teruskan?',
+        initDirectBackendConflictMsg:
+            '{1} masih terikat. Jika {0} dimulakan, kedua-dua set peraturan firewall akan aktif dan mungkin menyekat akses tanpa dijangka. Teruskan?',
+        directBackendConflictWarning:
+            '{0} dan {1} kedua-duanya terikat, jadi kedua-dua set peraturan aktif. Pastikan ia tidak saling menyekat, kemudian nyahikat firewall yang tidak lagi digunakan secara manual.',
         initHelper: 'Mengesan {0} tidak dimulakan. Sila klik butang pemulaan di bar status atas untuk mengkonfigurasi!',
         bindHelper: 'Ikat - Peraturan firewall hanya akan berkuat kuasa apabila status terikat. Sahkan?',
         unbindHelper:

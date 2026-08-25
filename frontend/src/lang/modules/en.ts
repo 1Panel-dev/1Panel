@@ -4126,11 +4126,54 @@ const message = {
         addressFamily: 'IP version',
         portOrRange: 'Port / range',
         exportAllRules: 'Export all rules',
-        clearAllRules: 'Clear all rules',
         importBackendHelper: 'Imported rules are converted for the current {0} backend. Source rules are not changed.',
-        clearAllRulesHelper: 'Delete all {0} manageable rules from the current backend? This cannot be undone.',
+        ruleSyncTitle: 'Synchronize rules',
+        ruleSyncAction: 'Sync rules',
+        ruleSyncHelper:
+            'Sync 1Panel-managed rules from the selected firewall to the current firewall. Source rules stay unchanged, and external rules are not included.',
+        ruleSyncDatabase: '1Panel database',
+        ruleSyncDatabaseHelper:
+            'Synchronize and reconcile the managed rules in the current firewall based on the 1Panel database rules. Missing rules will be added and extra rules will be removed.',
+        ruleSyncDatabaseTotal: 'Database rules',
+        ruleSyncDatabaseConfirm:
+            'Synchronize {1} to exactly match the {0} database rules? {2} target rule(s) will be removed and missing rules will be added.',
+        ruleSyncSource: 'Source backend',
+        ruleSyncTarget: 'Current backend',
+        ruleSyncTotal: 'Converted rules',
+        ruleSyncReady: 'Ready',
+        ruleSyncExisting: 'Existing',
+        ruleSyncRemove: 'To remove',
+        ruleSyncBlocked: 'Unavailable',
+        ruleSyncReason: 'Check result',
+        ruleSyncConfirm: 'Synchronize {0} rules from {1} to {2}? The source backend will not be modified.',
+        ruleSyncResetSource: 'Reset and disable source firewall {0} after synchronization succeeds',
+        ruleSyncResetSourceHelper:
+            'The source firewall is reset only after every rule is synchronized successfully. This operation cannot be undone.',
+        ruleSyncResetSourceBlocked:
+            'Some rules cannot be synchronized. Resolve them before automatically resetting the source firewall.',
+        ruleSyncResetSourceConfirm:
+            'Synchronize {0} rules from {1} to {2}, then reset and disable {1}? This deletes all {1} firewall configuration and cannot be undone.',
+        ruleSyncPartial: 'Synchronization completed: {0} succeeded, {1} already existed, and {2} failed.',
+        ruleSyncSuccess: 'Synchronization completed: {0} succeeded, {1} already existed, and {2} were removed.',
+        ruleSyncStatus: {
+            ready: 'Ready',
+            existing: 'Existing',
+            remove: 'To remove',
+            blocked: 'Unavailable',
+        },
+        resetDirectRulesHelper:
+            'Delete all 1Panel system firewall chains, rules, persisted files, and corresponding database records from {0}',
+        resetWhitelistRulesHelper:
+            'Delete all custom firewall configuration and corresponding database records from {0}, restore installation defaults, and disable {0}.\nAfter cleanup, firewall protection will no longer be provided. This cannot be undone.',
+        cleanupForwardingBackendHelper:
+            'Delete all 1Panel port forwarding rules and chains from {0}, retaining only database data',
+        cleanupDockerBackendHelper:
+            'Delete all 1Panel Docker port protection rules and chains from {0}, retaining only database data',
+        cleanupBeforeBackendSwitch:
+            'The current {0} backend still contains 1Panel runtime rules. Clean it up before switching to {1}.',
+        cleanupAction: 'Clean up',
         backendSwitchNotice:
-            'Switching only changes the firewall backend currently in use. Existing rules are not migrated or cleaned up. After switching, synchronize the rules to the target firewall and verify that they are effective before cleaning up the original firewall rules.',
+            'System firewall switching does not migrate or clean rules automatically. Port forwarding and Docker protection require cleaning the current backend first; saved rules and policies remain in 1Panel and can be initialized or synchronized after switching.',
         switchBackendHelper: 'Switch to {0}?',
         uninstalledStatus: 'Not installed',
         initializedStatus: 'Initialized',
@@ -4141,6 +4184,7 @@ const message = {
             'Host INPUT rules do not directly protect this Docker published port. Click to open Container Port Guard.',
         notInitialized: 'Not initialized',
         familyUnsupported: 'The system does not support {0}',
+        familyChainIssue: '{0} · {1} chain · {2}',
         dockerGuardUnbindConfirm:
             'After unbinding, all container ports temporarily return to Docker default access behavior. Existing protection settings are retained. Continue?',
         deleteDockerGuardPolicyConfirm: 'This endpoint will return to Docker default access behavior. Continue?',
@@ -4149,10 +4193,14 @@ const message = {
         protection: 'Protection',
         portDetails: 'Port details',
         orphanEndpoints: 'Unassociated endpoints',
+        orphanPolicies: 'Unassociated rules',
+        orphanPoliciesHelper:
+            'The following {0} rule(s) are not bound to a Docker port. They will be bound automatically when a matching port is detected.',
         exposure: 'Exposure',
         externallyExposed: 'Allow external access (0.0.0.0 / ::)',
         restrictedBinding: 'Deny external access (127.0.0.1 / ::1)',
         composeOrApp: 'Compose / App',
+        sources: 'Sources',
         deniedSources: 'Denied sources',
         allowedSources: 'Allowed sources',
         dockerGuardPolicy: 'Container port guard policy',
@@ -4194,6 +4242,10 @@ const message = {
         baseIptables: 'iptables Service',
         forwardIptables: 'iptables Port Forwarding Service',
         initMsg: 'About to initialize {0}, continue?',
+        initDirectBackendConflictMsg:
+            '{1} is still bound. If {0} is initialized, both firewall rule sets will be active and may unexpectedly block access. Continue?',
+        directBackendConflictWarning:
+            '{0} and {1} are both bound, so both rule sets are active. Make sure they do not block each other, then manually unbind the firewall you no longer use.',
         initHelper:
             'Detected that {0} is not initialized. Click the initialization button in the top status bar to configure!',
         bindHelper: 'Bind - Firewall rules will only take effect when the status is bound. Confirm?',

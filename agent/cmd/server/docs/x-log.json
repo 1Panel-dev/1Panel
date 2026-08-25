@@ -3692,6 +3692,24 @@
 		"formatZH": "调整防火墙规则顺序 [uuid]",
 		"formatEN": "reorder firewall rule [uuid]"
 	},
+	"/hosts/firewall/rules/reset": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "重置防火墙规则",
+		"formatEN": "reset firewall rules"
+	},
+	"/hosts/firewall/rules/sync": {
+		"bodyKeys": [
+			"subsystem",
+			"sourceProvider",
+			"targetProvider"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步 [subsystem] 防火墙规则到 [targetProvider]",
+		"formatEN": "sync [subsystem] firewall rules to [targetProvider]"
+	},
 	"/hosts/firewall/rules/update": {
 		"bodyKeys": [
 			"uuid"

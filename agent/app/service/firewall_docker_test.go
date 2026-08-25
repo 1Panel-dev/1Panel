@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	agenti18n "github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/docker/docker/client"
 	"github.com/glebarez/sqlite"
 	"github.com/google/uuid"
@@ -23,6 +24,7 @@ import (
 type persistentDockerGuardRuntime struct {
 	initialized bool
 	initialize  int
+	reconcile   int
 	bind        int
 	unbind      int
 	policies    []docker_guard.Policy
@@ -33,18 +35,33 @@ func (r *persistentDockerGuardRuntime) Initialize(policies []docker_guard.Policy
 	r.initialize++
 	r.initialized = true
 	r.policies = append([]docker_guard.Policy(nil), policies...)
+	r.markFamiliesEffective(policies)
 	return nil
 }
 
 func (r *persistentDockerGuardRuntime) Bind() error {
 	r.bind++
 	r.initialized = true
+	for family, status := range r.statuses {
+		status.Initialized, status.Bound, status.Effective = true, true, true
+		r.statuses[family] = status
+	}
 	return nil
 }
 
 func (r *persistentDockerGuardRuntime) Reconcile(policies []docker_guard.Policy) error {
+	r.reconcile++
 	r.policies = append([]docker_guard.Policy(nil), policies...)
 	return nil
+}
+
+func (r *persistentDockerGuardRuntime) markFamiliesEffective(policies []docker_guard.Policy) {
+	if r.statuses == nil {
+		return
+	}
+	for _, policy := range policies {
+		r.statuses[policy.Family] = docker_guard.FamilyStatus{Initialized: true, Bound: true, Effective: true}
+	}
 }
 
 func (r *persistentDockerGuardRuntime) Unbind() error {
@@ -65,6 +82,10 @@ func (r *persistentDockerGuardRuntime) Status(family string) docker_guard.Family
 	return docker_guard.FamilyStatus{Initialized: r.initialized, Bound: r.initialized, Effective: r.initialized}
 }
 
+func (r *persistentDockerGuardRuntime) ListPolicies() ([]docker_guard.Policy, error) {
+	return append([]docker_guard.Policy(nil), r.policies...), nil
+}
+
 type persistentDockerGuardPolicies struct{ items []model.DockerPortGuardPolicy }
 
 func (r *persistentDockerGuardPolicies) List(context.Context) ([]model.DockerPortGuardPolicy, error) {
@@ -80,9 +101,12 @@ func (r *persistentDockerGuardPolicies) UpsertBatch(context.Context, []model.Doc
 func TestDockerGuardOverviewLocalizesUnavailableDocker(t *testing.T) {
 	agenti18n.Init()
 	service := &DockerPortGuardService{
-		policies: &persistentDockerGuardPolicies{},
-		runtime:  &persistentDockerGuardRuntime{},
-		version:  func(string) string { return "1.8.10" },
+		policies: &persistentDockerGuardPolicies{items: []model.DockerPortGuardPolicy{{
+			UUID: "orphan-policy", Family: docker_guard.FamilyIPv4, HostIP: "0.0.0.0", HostPort: 8080,
+			Protocol: "tcp", Mode: docker_guard.ModeAll, Sources: "[]",
+		}}},
+		runtime: &persistentDockerGuardRuntime{},
+		version: func(string) string { return "1.8.10" },
 		client: func() (*client.Client, error) {
 			return nil, errors.New("Cannot connect to the Docker daemon at unix:///var/run/docker.sock")
 		},
@@ -97,6 +121,12 @@ func TestDockerGuardOverviewLocalizesUnavailableDocker(t *testing.T) {
 	if overview.Base.Version != "1.8.10" {
 		t.Fatalf("version = %q, want 1.8.10", overview.Base.Version)
 	}
+	if len(overview.Containers) != 0 || len(overview.OrphanPolicies) != 1 {
+		t.Fatalf("overview = %#v, want persisted policy returned separately from Docker containers", overview)
+	}
+	if overview.OrphanPolicies[0].PolicyUUID != "orphan-policy" {
+		t.Fatalf("orphan policy = %#v", overview.OrphanPolicies[0])
+	}
 }
 
 func TestDockerGuardRuntimeStatusAggregatesAvailableFamilies(t *testing.T) {
@@ -106,6 +136,198 @@ func TestDockerGuardRuntimeStatusAggregatesAvailableFamilies(t *testing.T) {
 	base := (&DockerPortGuardService{}).runtimeStatus(runtime, constant.FirewallProviderNftables)
 	if !base.Initialized || !base.Bound || base.IPv4.Initialized || !base.IPv6.Initialized {
 		t.Fatalf("unexpected aggregate Docker guard status: %#v", base)
+	}
+}
+
+func TestMatchDockerGuardPoliciesReturnsUnmatchedDatabaseRules(t *testing.T) {
+	policies := []model.DockerPortGuardPolicy{
+		{UUID: "matched", Family: docker_guard.FamilyIPv4, HostIP: "0.0.0.0", HostPort: 8080, Protocol: "tcp", Mode: docker_guard.ModeAll, Sources: "[]"},
+		{UUID: "orphan", Family: docker_guard.FamilyIPv4, HostIP: "0.0.0.0", HostPort: 9090, Protocol: "tcp", Mode: docker_guard.ModeSources, Sources: `["203.0.113.0/24"]`},
+	}
+	endpoints := []dto.DockerPortGuardEndpoint{{
+		Family: docker_guard.FamilyIPv4, HostIP: "0.0.0.0", HostPort: 8080, Protocol: "tcp", ContainerID: "container-1",
+	}}
+	matched, orphanPolicies := matchDockerGuardPolicies(dto.DockerPortGuardBase{}, policies, endpoints)
+	if len(matched) != 1 || matched[0].PolicyUUID != "matched" {
+		t.Fatalf("matched endpoints = %#v", matched)
+	}
+	if len(orphanPolicies) != 1 || orphanPolicies[0].PolicyUUID != "orphan" || orphanPolicies[0].HostPort != 9090 {
+		t.Fatalf("orphan policies = %#v", orphanPolicies)
+	}
+}
+
+func TestDockerGuardRuleSyncInitializesTargetWithPersistedPolicies(t *testing.T) {
+	setupDockerGuardSettingsDB(t)
+	selectDockerGuardBackend(t, constant.FirewallProviderNftables)
+	target := &persistentDockerGuardRuntime{}
+	policies := &persistentDockerGuardPolicies{items: []model.DockerPortGuardPolicy{{
+		UUID: "policy-1", Family: docker_guard.FamilyIPv4, HostIP: "0.0.0.0", HostPort: 8080,
+		Protocol: "tcp", Mode: docker_guard.ModeSources, Sources: `["203.0.113.0/24"]`,
+	}}}
+	service := &DockerPortGuardService{
+		policies:          policies,
+		runtimeForBackend: func(string) dockerGuardRuntime { return target },
+	}
+	request := dto.FirewallRuleSyncRequest{Subsystem: "docker", TargetProvider: filter.ProviderNftables}
+	preview, err := service.PreviewRuleSync(context.Background(), request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preview.Total != 1 || preview.Ready != 1 || preview.TargetProvider != filter.ProviderNftables || preview.Items[0].DockerRule == nil {
+		t.Fatalf("unexpected preview: %#v", preview)
+	}
+	result, err := service.SyncRules(context.Background(), request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Succeeded != 1 || result.Failed != 0 || target.initialize != 1 || len(target.policies) != 1 {
+		t.Fatalf("unexpected sync result=%#v target=%#v", result, target)
+	}
+	retry, err := service.PreviewRuleSync(context.Background(), request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if retry.Ready != 0 || retry.Existing != 1 || retry.Removed != 0 {
+		t.Fatalf("synchronized Docker policy was not recognized: %#v", retry)
+	}
+	retryResult, err := service.SyncRules(context.Background(), request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if retryResult.Succeeded != 0 || retryResult.Skipped != 1 || retryResult.Removed != 0 {
+		t.Fatalf("existing Docker policy was not counted as skipped: %#v", retryResult)
+	}
+}
+
+func TestDockerGuardRuleSyncReconcilesInitializedEffectiveTarget(t *testing.T) {
+	setupDockerGuardSettingsDB(t)
+	selectDockerGuardBackend(t, constant.FirewallProviderNftables)
+	policy := model.DockerPortGuardPolicy{
+		UUID: "policy-1", Family: docker_guard.FamilyIPv4, HostIP: "0.0.0.0", HostPort: 8080,
+		Protocol: "tcp", Mode: docker_guard.ModeAll, Sources: "[]",
+	}
+	target := &persistentDockerGuardRuntime{initialized: true}
+	service := &DockerPortGuardService{
+		policies:          &persistentDockerGuardPolicies{items: []model.DockerPortGuardPolicy{policy}},
+		runtimeForBackend: func(string) dockerGuardRuntime { return target },
+	}
+	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+		Subsystem: "docker", TargetProvider: filter.ProviderNftables,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Succeeded != 1 || result.Skipped != 0 || target.reconcile != 1 || len(target.policies) != 1 {
+		t.Fatalf("initialized target skipped runtime reconciliation: result=%#v target=%#v", result, target)
+	}
+}
+
+func TestDockerGuardRuleSyncRebindsInitializedIneffectiveTarget(t *testing.T) {
+	setupDockerGuardSettingsDB(t)
+	selectDockerGuardBackend(t, constant.FirewallProviderNftables)
+	policy := model.DockerPortGuardPolicy{
+		UUID: "policy-1", Family: docker_guard.FamilyIPv4, HostIP: "0.0.0.0", HostPort: 8080,
+		Protocol: "tcp", Mode: docker_guard.ModeAll, Sources: "[]",
+	}
+	target := &persistentDockerGuardRuntime{
+		initialized: true,
+		statuses: map[string]docker_guard.FamilyStatus{
+			docker_guard.FamilyIPv4: {Initialized: true},
+		},
+	}
+	service := &DockerPortGuardService{
+		policies:          &persistentDockerGuardPolicies{items: []model.DockerPortGuardPolicy{policy}},
+		runtimeForBackend: func(string) dockerGuardRuntime { return target },
+	}
+	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+		Subsystem: "docker", TargetProvider: filter.ProviderNftables,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Succeeded != 1 || target.bind != 1 || target.reconcile != 1 ||
+		!target.Status(docker_guard.FamilyIPv4).Effective {
+		t.Fatalf("initialized target was not rebound and reconciled: result=%#v target=%#v", result, target)
+	}
+}
+
+func TestDockerGuardRuleSyncClearsInitializedTargetWhenDatabaseIsEmpty(t *testing.T) {
+	setupDockerGuardSettingsDB(t)
+	selectDockerGuardBackend(t, constant.FirewallProviderNftables)
+	target := &persistentDockerGuardRuntime{
+		initialized: true,
+		policies: []docker_guard.Policy{{
+			UUID: "stale-policy", Family: docker_guard.FamilyIPv4, HostIP: "0.0.0.0", HostPort: 8080,
+			Protocol: "tcp", Mode: docker_guard.ModeAll,
+		}},
+	}
+	service := &DockerPortGuardService{
+		policies:          &persistentDockerGuardPolicies{},
+		runtimeForBackend: func(string) dockerGuardRuntime { return target },
+	}
+	preview, err := service.PreviewRuleSync(context.Background(), dto.FirewallRuleSyncRequest{
+		Subsystem: "docker", TargetProvider: filter.ProviderNftables,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preview.Total != 0 || preview.Removed != 1 || len(preview.Items) != 1 || preview.Items[0].Status != "remove" {
+		t.Fatalf("stale runtime policy was not included in preview: %#v", preview)
+	}
+	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+		Subsystem: "docker", TargetProvider: filter.ProviderNftables,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Total != 0 || result.Removed != 1 || target.initialize != 0 || target.reconcile != 1 || len(target.policies) != 0 {
+		t.Fatalf("empty database did not clear initialized target: result=%#v target=%#v", result, target)
+	}
+}
+
+func TestDockerGuardRuleSyncLeavesUninitializedTargetEmpty(t *testing.T) {
+	setupDockerGuardSettingsDB(t)
+	selectDockerGuardBackend(t, constant.FirewallProviderNftables)
+	target := &persistentDockerGuardRuntime{}
+	service := &DockerPortGuardService{
+		policies:          &persistentDockerGuardPolicies{},
+		runtimeForBackend: func(string) dockerGuardRuntime { return target },
+	}
+	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+		Subsystem: "docker", TargetProvider: filter.ProviderNftables,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Total != 0 || target.initialize != 0 || target.reconcile != 0 {
+		t.Fatalf("empty database initialized an unused target: result=%#v target=%#v", result, target)
+	}
+}
+
+func TestDockerGuardRuleSyncRejectsUnselectedTarget(t *testing.T) {
+	setupDockerGuardSettingsDB(t)
+	selectDockerGuardBackend(t, constant.FirewallProviderIptables)
+	target := &persistentDockerGuardRuntime{}
+	service := &DockerPortGuardService{
+		policies:          &persistentDockerGuardPolicies{},
+		runtimeForBackend: func(string) dockerGuardRuntime { return target },
+	}
+	request := dto.FirewallRuleSyncRequest{Subsystem: "docker", TargetProvider: filter.ProviderNftables}
+	if _, err := service.PreviewRuleSync(context.Background(), request); !errors.Is(err, filter.ErrProviderUnavailable) {
+		t.Fatalf("preview error = %v, want provider unavailable", err)
+	}
+	if _, err := service.SyncRules(context.Background(), request); !errors.Is(err, filter.ErrProviderUnavailable) {
+		t.Fatalf("sync error = %v, want provider unavailable", err)
+	}
+	if target.initialize != 0 || target.bind != 0 || target.reconcile != 0 {
+		t.Fatalf("unselected target was modified: %#v", target)
+	}
+}
+
+func selectDockerGuardBackend(t *testing.T, backend string) {
+	t.Helper()
+	if err := settingRepo.UpdateOrCreate(constant.FirewallDockerBackendKey, backend); err != nil {
+		t.Fatal(err)
 	}
 }
 

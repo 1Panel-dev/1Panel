@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -55,6 +56,17 @@ func (f *Firewalld) Start() error {
 func (f *Firewalld) Stop() error {
 	if err := controller.HandleStop("firewalld"); err != nil {
 		return fmt.Errorf("stop the firewall failed, err: %v", err)
+	}
+	return nil
+}
+
+func (f *Firewalld) Reset() error {
+	_, resetErr := cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en")).RunWithOptionalSudoAndStdout(
+		"firewall-offline-cmd", "--reset-to-defaults",
+	)
+	disableErr := controller.Handle("disable", "firewalld")
+	if err := errors.Join(resetErr, disableErr); err != nil {
+		return fmt.Errorf("reset firewalld to defaults failed: %w", err)
 	}
 	return nil
 }

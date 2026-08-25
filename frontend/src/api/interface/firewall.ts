@@ -42,6 +42,7 @@ export namespace Firewall {
     export interface FirewallBase {
         name: string;
         backend: string;
+        conflictBackend?: string;
         isExist: boolean;
         isActive: boolean;
         isInit: boolean;
@@ -181,6 +182,15 @@ export namespace Firewall {
         notices?: ScopeNotice[];
     }
 
+    export interface ResetResponse {
+        removed: number;
+        disabled: boolean;
+    }
+
+    export interface ResetRequest {
+        provider?: Provider;
+    }
+
     export type CheckDecision = 'ready' | 'confirmation_required' | 'blocked' | 'no_change';
     export type CheckClassification =
         'none' | 'exact_managed' | 'exact_external' | 'covered' | 'conflict' | 'unsupported' | 'protected';
@@ -248,6 +258,64 @@ export namespace Firewall {
         status: 'failed' | 'skipped';
         rule: Rule;
         error?: string;
+    }
+
+    export interface RuleSyncRequest {
+        subsystem: BackendSubsystem;
+        sourceProvider?: Provider;
+        targetProvider: Provider;
+        resetSource?: boolean;
+        taskID?: string;
+    }
+
+    export type RuleSyncStatus = 'ready' | 'existing' | 'remove' | 'blocked';
+
+    export interface RuleSyncItem {
+        sourceUUID: string;
+        rule?: Rule;
+        forwardRule?: RuleForward;
+        dockerRule?: DockerGuardEndpoint;
+        status: RuleSyncStatus;
+        reason?: string;
+    }
+
+    export interface RuleSyncPreview {
+        subsystem: BackendSubsystem;
+        sourceProvider?: Provider;
+        targetProvider: Provider;
+        total: number;
+        ready: number;
+        existing: number;
+        removed: number;
+        blocked: number;
+        items: RuleSyncItem[];
+    }
+
+    export interface RuleSyncResult {
+        subsystem: BackendSubsystem;
+        sourceProvider?: Provider;
+        targetProvider: Provider;
+        total: number;
+        succeeded: number;
+        skipped: number;
+        removed: number;
+        failed: number;
+        errors?: RuleSyncFailure[];
+        taskID?: string;
+        queued?: boolean;
+    }
+
+    export interface RuleSyncTask {
+        taskID?: string;
+        executing: boolean;
+    }
+
+    export interface RuleSyncFailure {
+        sourceUUID: string;
+        rule?: Rule;
+        forwardRule?: RuleForward;
+        dockerRule?: DockerGuardEndpoint;
+        error: string;
     }
 
     export interface DeleteRequest {
@@ -332,6 +400,7 @@ export namespace Firewall {
     export interface DockerGuardList {
         base: DockerGuardBase;
         containers: DockerGuardContainer[];
+        orphanPolicies: DockerGuardEndpoint[];
     }
     export interface DockerGuardEndpointIdentity {
         family: 'ipv4' | 'ipv6';

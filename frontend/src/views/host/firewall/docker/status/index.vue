@@ -5,6 +5,40 @@
                 <div class="flex flex-wrap gap-4 ml-3">
                     <el-tag effect="dark" type="success">{{ base.name }}</el-tag>
                     <el-tag>{{ $t('app.version') }}: {{ base.version || '-' }}</el-tag>
+                    <el-popover
+                        v-if="familyIssues.length"
+                        placement="bottom"
+                        trigger="hover"
+                        :title="$t('commons.msg.infoTitle')"
+                        :width="300"
+                        popper-class="docker-firewall-family-issue-popper"
+                    >
+                        <template #reference>
+                            <el-icon class="docker-firewall-family-hint-icon" :aria-label="$t('commons.msg.infoTitle')">
+                                <WarningFilled />
+                            </el-icon>
+                        </template>
+                        <div class="docker-firewall-family-issue-list">
+                            <div
+                                v-for="issue in familyIssues"
+                                :key="issue.family"
+                                class="docker-firewall-family-issue-item"
+                            >
+                                {{ familyStatusText(issue.family, issue.status) }}
+                            </div>
+                        </div>
+                        <div v-if="retryableFamilyIssues.length" class="docker-firewall-family-issue-footer">
+                            <el-button
+                                v-permission
+                                v-node-admin
+                                size="small"
+                                type="primary"
+                                @click.stop="emit('operate', familyRetryOperation)"
+                            >
+                                {{ $t('commons.button.retry') }}
+                            </el-button>
+                        </div>
+                    </el-popover>
                 </div>
                 <div class="mt-0.5 flex items-center">
                     <el-divider v-if="anyFamilyBound" direction="vertical" />
@@ -31,49 +65,12 @@
                     <el-button v-else v-permission v-node-admin type="primary" link @click="emit('operate', 'unbind')">
                         {{ $t('commons.button.unbind') }}
                     </el-button>
-                    <el-popover
-                        v-if="familyIssues.length"
-                        placement="bottom"
-                        trigger="hover"
-                        :width="380"
-                        :show-after="120"
-                        :hide-after="120"
-                        popper-class="docker-firewall-family-issue-popper"
-                    >
-                        <template #reference>
-                            <el-button
-                                class="docker-firewall-family-warning-trigger"
-                                type="warning"
-                                link
-                                :aria-label="$t('commons.status.exceptional')"
-                            >
-                                <el-icon><WarningFilled /></el-icon>
-                            </el-button>
-                        </template>
-                        <div class="docker-firewall-family-issue-list">
-                            <div
-                                v-for="issue in familyIssues"
-                                :key="issue.family"
-                                class="docker-firewall-family-issue-item"
-                            >
-                                <span class="docker-firewall-family-name">{{ issue.family }}</span>
-                                <span class="docker-firewall-family-issue-text">
-                                    {{ familyStatusDescription(issue.family, issue.status) }}
-                                </span>
-                            </div>
-                        </div>
-                        <div v-if="retryableFamilyIssues.length" class="docker-firewall-family-issue-footer">
-                            <el-button
-                                v-permission
-                                v-node-admin
-                                size="small"
-                                type="primary"
-                                @click.stop="emit('operate', familyRetryOperation)"
-                            >
-                                {{ $t('commons.button.retry') }}
-                            </el-button>
-                        </div>
-                    </el-popover>
+                    <template v-if="anyFamilyInitialized">
+                        <el-divider direction="vertical" />
+                        <el-button v-permission v-node-admin type="primary" link @click="emit('cleanup')">
+                            {{ $t('firewall.cleanupAction') }}
+                        </el-button>
+                    </template>
                 </div>
             </div>
         </el-card>
@@ -87,7 +84,10 @@ import { WarningFilled } from '@element-plus/icons-vue';
 import { computed } from 'vue';
 
 const props = defineProps<{ base: Firewall.DockerGuardBase }>();
-const emit = defineEmits<{ operate: [operation: 'initialize' | 'bind' | 'unbind'] }>();
+const emit = defineEmits<{
+    operate: [operation: 'initialize' | 'bind' | 'unbind'];
+    cleanup: [];
+}>();
 
 const familyStatuses = computed(
     () =>
@@ -113,25 +113,31 @@ const retryableFamilyIssues = computed(() =>
 const familyRetryOperation = computed<'initialize' | 'bind'>(() =>
     retryableFamilyIssues.value.some((item) => !item.status.initialized) ? 'initialize' : 'bind',
 );
-const familyStatusDescription = (family: string, status: Firewall.DockerGuardFamilyStatus) => {
-    if (status.state === 'effective') return i18n.global.t('firewall.dockerGuardStatusEffective', [family]);
-    return i18n.global.t(`firewall.dockerGuardStatusReason.${status.reason || 'inspect_failed'}`, [family]);
+const dockerChainName = computed(() => (props.base.backend === 'nftables' ? 'NFT_1PANEL_DOCKER' : '1PANEL_DOCKER'));
+const familyStatusText = (family: string, status: Firewall.DockerGuardFamilyStatus) => {
+    if (
+        status.reason === 'command_missing' ||
+        status.reason === 'docker_chain_missing' ||
+        status.reason === 'inspect_failed'
+    ) {
+        return i18n.global.t(`firewall.dockerGuardStatusReason.${status.reason}`, [family]);
+    }
+    const state = i18n.global.t(
+        !status.initialized
+            ? 'firewall.notInitialized'
+            : !status.bound
+              ? 'commons.status.unbind'
+              : 'firewall.notEffective',
+    );
+    return i18n.global.t('firewall.familyChainIssue', [family, dockerChainName.value, state]);
 };
 </script>
 
 <style lang="scss">
-.docker-firewall-family-warning-trigger {
-    width: 26px;
-    height: 26px;
-    margin-left: 4px;
-    border-radius: 50%;
-    background: var(--el-color-warning-light-9);
+.docker-firewall-family-hint-icon {
+    align-self: center;
+    color: var(--el-color-warning);
     font-size: 16px;
-
-    &:hover,
-    &:focus-visible {
-        background: var(--el-color-warning-light-8);
-    }
 }
 
 .docker-firewall-family-issue-popper.el-popover {
@@ -148,10 +154,6 @@ const familyStatusDescription = (family: string, status: Firewall.DockerGuardFam
 }
 
 .docker-firewall-family-issue-item {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: start;
-    gap: 8px;
     color: var(--el-text-color-regular);
     font-size: 13px;
     line-height: 20px;
@@ -163,14 +165,5 @@ const familyStatusDescription = (family: string, status: Firewall.DockerGuardFam
     margin-top: 12px;
     padding-top: 10px;
     border-top: 1px solid var(--el-border-color-lighter);
-}
-
-.docker-firewall-family-name {
-    color: var(--el-text-color-primary);
-    font-weight: 600;
-}
-
-.docker-firewall-family-issue-text {
-    color: var(--el-color-warning-dark-2);
 }
 </style>

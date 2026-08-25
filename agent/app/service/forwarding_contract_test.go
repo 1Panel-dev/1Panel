@@ -9,6 +9,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	forwardClient "github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/go-playground/validator/v10"
@@ -19,10 +20,12 @@ type fakeForwardingAdapter struct {
 	rules      []forwardClient.Rule
 	listErr    error
 	operateErr error
+	enableErr  error
 	init       bool
 	initErr    error
 	familyInit map[string]bool
 	reconciled []forwardClient.Rule
+	reconciles int
 }
 
 func (f *fakeForwardingAdapter) Name() string { return f.name }
@@ -32,6 +35,7 @@ func (f *fakeForwardingAdapter) List() ([]forwardClient.Rule, error) {
 }
 
 func (f *fakeForwardingAdapter) Reconcile(rules []forwardClient.Rule) error {
+	f.reconciles++
 	f.reconciled = append([]forwardClient.Rule(nil), rules...)
 	if f.operateErr == nil {
 		f.rules = append([]forwardClient.Rule(nil), rules...)
@@ -39,7 +43,7 @@ func (f *fakeForwardingAdapter) Reconcile(rules []forwardClient.Rule) error {
 	return f.operateErr
 }
 
-func (f *fakeForwardingAdapter) Enable() error  { return nil }
+func (f *fakeForwardingAdapter) Enable() error  { return f.enableErr }
 func (f *fakeForwardingAdapter) Cleanup() error { return nil }
 func (f *fakeForwardingAdapter) FamilyStatus(family string) (bool, bool, error) {
 	if f.familyInit != nil {
@@ -167,6 +171,216 @@ func TestForwardingBackendSelectionReturnsStatusError(t *testing.T) {
 	_, err := selectForwardingManager([]forwardingCandidate{{adapter: &fakeForwardingAdapter{name: "nftables", initErr: wantErr}}})
 	if !errors.Is(err, wantErr) {
 		t.Fatalf("got %v want %v", err, wantErr)
+	}
+}
+
+func TestForwardingRuleSyncReplaysPersistedRulesIntoTarget(t *testing.T) {
+	sourceRule := forwardClient.Rule{
+		Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80",
+	}
+	target := &fakeForwardingAdapter{name: "nftables"}
+	service := &ForwardingService{
+		managerFactory: func() (*forwardClient.Manager, error) {
+			return forwardClient.NewManager(target, nil), nil
+		},
+		rules:          &fakeForwardingRuleRepo{rules: forwardingRuleModels([]forwardClient.Rule{sourceRule})},
+		enabled:        func() (bool, error) { return true, nil },
+		persistBackend: func(string) error { return nil },
+		markEnabled:    func() error { return nil },
+	}
+	request := dto.FirewallRuleSyncRequest{Subsystem: "forwarding", TargetProvider: "nftables"}
+	preview, err := service.PreviewRuleSync(context.Background(), request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preview.Total != 1 || preview.Ready != 1 || preview.TargetProvider != "nftables" || preview.Items[0].ForwardRule == nil {
+		t.Fatalf("unexpected preview: %#v", preview)
+	}
+	result, err := service.SyncRules(context.Background(), request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Succeeded != 1 || result.Failed != 0 || len(target.reconciled) != 1 || target.reconciled[0].Identity() != sourceRule.Identity() {
+		t.Fatalf("unexpected sync result=%#v target=%#v", result, target.reconciled)
+	}
+	target.init = true
+	retry, err := service.PreviewRuleSync(context.Background(), request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if retry.Ready != 0 || retry.Existing != 1 {
+		t.Fatalf("synchronized forwarding rule was not recognized: %#v", retry)
+	}
+}
+
+func TestForwardingRuleSyncReportsActivationFailure(t *testing.T) {
+	wantErr := errors.New("enable forwarding failed")
+	sourceRule := forwardClient.Rule{
+		Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80",
+	}
+	target := &fakeForwardingAdapter{name: "nftables", enableErr: wantErr}
+	service := &ForwardingService{
+		managerFactory: func() (*forwardClient.Manager, error) {
+			return forwardClient.NewManager(target, nil), nil
+		},
+		rules:          &fakeForwardingRuleRepo{rules: forwardingRuleModels([]forwardClient.Rule{sourceRule})},
+		persistBackend: func(string) error { return nil },
+		markEnabled:    func() error { return nil },
+	}
+	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+		Subsystem: "forwarding", TargetProvider: "nftables",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Succeeded != 0 || result.Failed != 1 || len(result.Errors) != 1 ||
+		result.Errors[0].Error != wantErr.Error() {
+		t.Fatalf("activation failure was not reported: %#v", result)
+	}
+	if target.reconciles != 0 {
+		t.Fatalf("failed activation reconciled target %d times", target.reconciles)
+	}
+}
+
+func TestForwardingRuleSyncTreatsWildcardInterfaceAsDatabaseDefault(t *testing.T) {
+	databaseRule := forwardClient.Rule{
+		Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80",
+	}
+	runtimeRule := databaseRule
+	runtimeRule.Interface = "*"
+	target := &fakeForwardingAdapter{name: "iptables", init: true, rules: []forwardClient.Rule{runtimeRule}}
+	service := &ForwardingService{
+		managerFactory: func() (*forwardClient.Manager, error) {
+			return forwardClient.NewManager(target, nil), nil
+		},
+		rules:          &fakeForwardingRuleRepo{rules: forwardingRuleModels([]forwardClient.Rule{databaseRule})},
+		enabled:        func() (bool, error) { return true, nil },
+		persistBackend: func(string) error { return nil },
+		markEnabled:    func() error { return nil },
+	}
+	preview, err := service.PreviewRuleSync(context.Background(), dto.FirewallRuleSyncRequest{
+		Subsystem: "forwarding", TargetProvider: "iptables",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preview.Total != 1 || preview.Existing != 1 || preview.Ready != 0 || preview.Removed != 0 || len(preview.Items) != 1 {
+		t.Fatalf("wildcard interface produced duplicate sync actions: %#v", preview)
+	}
+}
+
+func TestForwardingRuleSyncReconcilesTargetToDatabaseState(t *testing.T) {
+	existing := forwardClient.Rule{
+		Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80",
+	}
+	missing := forwardClient.Rule{
+		Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8443", TargetIP: "10.0.0.3", TargetPort: "443",
+	}
+	extra := forwardClient.Rule{
+		Family: forwardClient.FamilyIPv4, Protocol: "udp", Port: "5353", TargetIP: "10.0.0.4", TargetPort: "53",
+	}
+	target := &fakeForwardingAdapter{name: "nftables", init: true, rules: []forwardClient.Rule{existing, extra}}
+	service := &ForwardingService{
+		managerFactory: func() (*forwardClient.Manager, error) {
+			return forwardClient.NewManager(target, nil), nil
+		},
+		rules:          &fakeForwardingRuleRepo{rules: forwardingRuleModels([]forwardClient.Rule{existing, missing})},
+		enabled:        func() (bool, error) { return true, nil },
+		persistBackend: func(string) error { return nil },
+		markEnabled:    func() error { return nil },
+	}
+	preview, err := service.PreviewRuleSync(context.Background(), dto.FirewallRuleSyncRequest{
+		Subsystem: "forwarding", TargetProvider: "nftables",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preview.Total != 2 || preview.Removed != 1 || len(preview.Items) != 3 || preview.Items[2].Status != "remove" {
+		t.Fatalf("extra target rule was not included in preview: %#v", preview)
+	}
+	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+		Subsystem: "forwarding", TargetProvider: "nftables",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Succeeded != 1 || result.Skipped != 1 || result.Removed != 1 || result.Failed != 0 || target.reconciles != 1 {
+		t.Fatalf("unexpected sync result=%#v reconciles=%d", result, target.reconciles)
+	}
+	if len(target.rules) != 2 || forwardingRuleIndex(target.rules, existing) < 0 ||
+		forwardingRuleIndex(target.rules, missing) < 0 || forwardingRuleIndex(target.rules, extra) >= 0 {
+		t.Fatalf("target did not converge to database state: %#v", target.rules)
+	}
+}
+
+func TestForwardingRuleSyncRemovesExtraRulesWhenDatabaseRulesAlreadyExist(t *testing.T) {
+	existing := forwardClient.Rule{
+		Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80",
+	}
+	extra := forwardClient.Rule{
+		Family: forwardClient.FamilyIPv4, Protocol: "udp", Port: "5353", TargetIP: "10.0.0.4", TargetPort: "53",
+	}
+	target := &fakeForwardingAdapter{name: "nftables", init: true, rules: []forwardClient.Rule{existing, extra}}
+	service := &ForwardingService{
+		managerFactory: func() (*forwardClient.Manager, error) {
+			return forwardClient.NewManager(target, nil), nil
+		},
+		rules:          &fakeForwardingRuleRepo{rules: forwardingRuleModels([]forwardClient.Rule{existing})},
+		enabled:        func() (bool, error) { return true, nil },
+		persistBackend: func(string) error { return nil },
+		markEnabled:    func() error { return nil },
+	}
+	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+		Subsystem: "forwarding", TargetProvider: "nftables",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Succeeded != 0 || result.Skipped != 1 || result.Failed != 0 || target.reconciles != 1 ||
+		len(target.rules) != 1 || forwardingRuleIndex(target.rules, existing) < 0 {
+		t.Fatalf("extra target rule was not removed: result=%#v target=%#v", result, target)
+	}
+}
+
+func TestForwardingRuleSyncClearsInitializedTargetWhenDatabaseIsEmpty(t *testing.T) {
+	extra := forwardClient.Rule{
+		Family: forwardClient.FamilyIPv4, Protocol: "tcp", Port: "8080", TargetIP: "10.0.0.2", TargetPort: "80",
+	}
+	target := &fakeForwardingAdapter{name: "nftables", init: true, rules: []forwardClient.Rule{extra}}
+	service := &ForwardingService{
+		managerFactory: func() (*forwardClient.Manager, error) {
+			return forwardClient.NewManager(target, nil), nil
+		},
+		rules: &fakeForwardingRuleRepo{},
+	}
+	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+		Subsystem: "forwarding", TargetProvider: "nftables",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Total != 0 || result.Removed != 1 || target.reconciles != 1 || len(target.rules) != 0 {
+		t.Fatalf("empty database did not clear initialized target: result=%#v target=%#v", result, target)
+	}
+}
+
+func TestForwardingRuleSyncRejectsUnselectedTarget(t *testing.T) {
+	current := &fakeForwardingAdapter{name: "iptables"}
+	service := &ForwardingService{
+		managerFactory: func() (*forwardClient.Manager, error) {
+			return forwardClient.NewManager(current, nil), nil
+		},
+		rules: &fakeForwardingRuleRepo{},
+	}
+	request := dto.FirewallRuleSyncRequest{Subsystem: "forwarding", TargetProvider: filter.ProviderNftables}
+	if _, err := service.PreviewRuleSync(context.Background(), request); !errors.Is(err, filter.ErrProviderUnavailable) {
+		t.Fatalf("preview error = %v, want provider unavailable", err)
+	}
+	if _, err := service.SyncRules(context.Background(), request); !errors.Is(err, filter.ErrProviderUnavailable) {
+		t.Fatalf("sync error = %v, want provider unavailable", err)
+	}
+	if current.reconciles != 0 {
+		t.Fatalf("unselected target request modified the current backend: %#v", current)
 	}
 }
 

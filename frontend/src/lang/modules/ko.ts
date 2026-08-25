@@ -4031,13 +4031,53 @@ const message = {
         addressFamily: 'IP 버전',
         portOrRange: '포트 / 범위',
         exportAllRules: '모든 규칙 내보내기',
-        clearAllRules: '모든 규칙 지우기',
         importBackendHelper: '가져온 규칙은 현재 {0} 백엔드에 맞게 변환됩니다. 원본 백엔드의 규칙은 변경되지 않습니다.',
-        clearAllRulesHelper:
-            '현재 백엔드의 관리 가능한 규칙 {0}개를 삭제합니다. 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?',
+        resetDirectRulesHelper:
+            '{0}에서 모든 1Panel 시스템 방화벽 체인, 규칙, 영구 파일 및 관련 데이터베이스 기록을 삭제합니다',
+        resetWhitelistRulesHelper:
+            '{0}의 모든 사용자 설정과 데이터베이스 기록을 삭제하고 설치 기본값으로 복원한 후 {0}을(를) 비활성화합니다.\n정리 후 방화벽 보호가 더 이상 제공되지 않습니다. 이 작업은 되돌릴 수 없습니다.',
+        cleanupForwardingBackendHelper:
+            '{0}의 모든 1Panel 포트 전달 규칙과 체인을 삭제하고 데이터베이스 데이터만 유지합니다',
+        cleanupDockerBackendHelper:
+            '{0}의 모든 1Panel Docker 포트 보호 규칙과 체인을 삭제하고 데이터베이스 데이터만 유지합니다',
+        cleanupBeforeBackendSwitch:
+            '현재 {0} 백엔드에 1Panel 런타임 규칙이 남아 있습니다. {1}(으)로 전환하기 전에 먼저 정리하세요.',
+        cleanupAction: '정리',
         backendSwitchNotice:
-            '전환은 현재 사용하는 방화벽 백엔드만 변경하며 기존 규칙을 이전하거나 정리하지 않습니다. 전환 후 대상 방화벽에 규칙을 동기화하고 적용 여부를 확인한 다음 기존 방화벽 규칙을 정리하십시오.',
+            '시스템 방화벽 전환은 규칙을 자동으로 이전하거나 정리하지 않습니다. 포트 전달과 Docker 보호는 현재 백엔드를 먼저 정리해야 하며, 저장된 규칙과 정책은 1Panel에 유지되어 전환 후 다시 초기화하거나 동기화할 수 있습니다.',
         switchBackendHelper: '{0}(으)로 전환하시겠습니까?',
+        ruleSyncTitle: '규칙 동기화',
+        ruleSyncAction: '규칙 동기화',
+        ruleSyncHelper:
+            '선택한 방화벽의 1Panel 관리 규칙을 현재 방화벽에 동기화합니다. 원본 규칙은 삭제되지 않으며 외부 규칙은 동기화되지 않습니다.',
+        ruleSyncDatabase: '1Panel 데이터베이스',
+        ruleSyncDatabaseHelper:
+            '1Panel 데이터베이스 규칙을 기준으로 현재 방화벽의 관리 규칙을 동기화하고 조정합니다. 누락된 규칙은 추가되고 불필요한 규칙은 삭제됩니다.',
+        ruleSyncDatabaseTotal: '데이터베이스 규칙',
+        ruleSyncDatabaseConfirm:
+            '데이터베이스 규칙 {0}개와 정확히 일치하도록 {1}을 동기화하시겠습니까? 대상 규칙 {2}개가 삭제되고 누락된 규칙이 추가됩니다.',
+        ruleSyncSource: '원본 백엔드',
+        ruleSyncTarget: '현재 백엔드',
+        ruleSyncTotal: '변환된 규칙',
+        ruleSyncReady: '동기화 가능',
+        ruleSyncExisting: '이미 존재',
+        ruleSyncRemove: '삭제 예정',
+        ruleSyncBlocked: '동기화 불가',
+        ruleSyncReason: '검사 결과',
+        ruleSyncConfirm: '{0}개 규칙을 {1}에서 {2}(으)로 동기화하시겠습니까? 원본 백엔드는 변경되지 않습니다.',
+        ruleSyncResetSource: '동기화 성공 후 원본 방화벽 {0} 재설정 및 비활성화',
+        ruleSyncResetSourceHelper: '모든 규칙이 성공적으로 동기화된 경우에만 원본 방화벽을 재설정합니다.',
+        ruleSyncResetSourceBlocked: '동기화할 수 없는 규칙이 있습니다. 먼저 해결한 후 원본을 재설정하십시오.',
+        ruleSyncResetSourceConfirm:
+            '{0}개 규칙을 {1}에서 {2}(으)로 동기화한 후 {1}을(를) 재설정하고 비활성화하시겠습니까? 모든 설정이 삭제되며 되돌릴 수 없습니다.',
+        ruleSyncPartial: '동기화 완료: 성공 {0}개, 이미 존재 {1}개, 실패 {2}개.',
+        ruleSyncSuccess: '동기화 완료: 성공 {0}개, 이미 존재 {1}개, 삭제 {2}개.',
+        ruleSyncStatus: {
+            ready: '동기화 가능',
+            existing: '이미 존재',
+            remove: '삭제 예정',
+            blocked: '동기화 불가',
+        },
         uninstalledStatus: '설치되지 않음',
         initializedStatus: '초기화됨',
         partiallyInitialized: '일부 초기화됨',
@@ -4047,6 +4087,7 @@ const message = {
             '호스트 INPUT 규칙은 이 Docker 게시 포트를 직접 보호하지 않습니다. 클릭하여 컨테이너 포트 보호를 여세요.',
         notInitialized: '초기화되지 않음',
         familyUnsupported: '시스템에서 {0}을 지원하지 않습니다',
+        familyChainIssue: '{0} · {1} 체인 · {2}',
         dockerGuardUnbindConfirm:
             '바인딩을 해제하면 모든 컨테이너 포트가 일시적으로 Docker 기본 접근 방식으로 돌아갑니다. 기존 보호 설정은 유지됩니다. 계속하시겠습니까?',
         deleteDockerGuardPolicyConfirm: '이 엔드포인트가 Docker 기본 접근 방식으로 돌아갑니다. 계속하시겠습니까?',
@@ -4054,10 +4095,14 @@ const message = {
         protection: '보호',
         portDetails: '포트 상세 정보',
         orphanEndpoints: '연결되지 않은 엔드포인트',
+        orphanPolicies: '연결되지 않은 규칙',
+        orphanPoliciesHelper:
+            '다음 {0}개 규칙은 Docker 포트에 바인딩되지 않았습니다. 일치하는 포트가 감지되면 자동으로 바인딩됩니다.',
         exposure: '노출 상태',
         externallyExposed: '외부 접근 허용 (0.0.0.0 / ::)',
         restrictedBinding: '외부 접근 거부 (127.0.0.1 / ::1)',
         composeOrApp: 'Compose / 앱',
+        sources: '소스',
         deniedSources: '거부된 소스',
         allowedSources: '허용된 소스',
         dockerGuardPolicy: '컨테이너 포트 보호 정책',
@@ -4099,6 +4144,10 @@ const message = {
         baseIptables: 'iptables 서비스',
         forwardIptables: 'iptables 포트 포워딩 서비스',
         initMsg: '{0}을(를) 초기화하려고 합니다. 계속하시겠습니까?',
+        initDirectBackendConflictMsg:
+            '{1}이(가) 아직 바인딩되어 있습니다. {0}을(를) 초기화하면 두 방화벽 규칙 세트가 모두 적용되어 예기치 않게 접근이 차단될 수 있습니다. 계속하시겠습니까?',
+        directBackendConflictWarning:
+            '{0}과(와) {1}이(가) 모두 바인딩되어 두 규칙 세트가 함께 적용됩니다. 서로 차단하지 않는지 확인한 후 사용하지 않는 방화벽을 수동으로 바인딩 해제하세요.',
         initHelper: '{0}이(가) 초기화되지 않았습니다. 상단 상태 표시줄의 초기화 버튼을 클릭하여 구성하세요!',
         bindHelper: '바인딩 - 방화벽 규칙은 상태가 바인딩된 경우에만 효과가 있습니다. 확인하시겠습니까?',
         unbindHelper:

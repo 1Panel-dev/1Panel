@@ -4190,13 +4190,54 @@ const message = {
         addressFamily: 'IP sürümü',
         portOrRange: 'Port / aralık',
         exportAllRules: 'Tüm kuralları dışa aktar',
-        clearAllRules: 'Tüm kuralları temizle',
         importBackendHelper:
             'İçe aktarılan kurallar geçerli {0} arka ucu için dönüştürülür. Kaynak kurallar değiştirilmez.',
-        clearAllRulesHelper: 'Geçerli arka uçtaki yönetilebilir {0} kural silinsin mi? Bu işlem geri alınamaz.',
+        resetDirectRulesHelper:
+            '{0} içindeki tüm 1Panel sistem güvenlik duvarı zincirlerini, kurallarını, kalıcı dosyalarını ve ilgili veritabanı kayıtlarını silin',
+        resetWhitelistRulesHelper:
+            '{0} içindeki tüm özel yapılandırmayı ve veritabanı kayıtlarını silin, kurulum varsayılanlarını geri yükleyin ve {0} öğesini devre dışı bırakın.\nTemizlemeden sonra güvenlik duvarı koruması sağlanmaz. Bu işlem geri alınamaz.',
+        cleanupForwardingBackendHelper:
+            '{0} içindeki tüm 1Panel bağlantı noktası yönlendirme kurallarını ve zincirlerini silin, yalnızca veritabanı verilerini koruyun',
+        cleanupDockerBackendHelper:
+            '{0} içindeki tüm 1Panel Docker bağlantı noktası koruma kurallarını ve zincirlerini silin, yalnızca veritabanı verilerini koruyun',
+        cleanupBeforeBackendSwitch:
+            'Mevcut {0} arka ucu hâlâ 1Panel çalışma zamanı kuralları içeriyor. {1} arka ucuna geçmeden önce temizleyin.',
+        cleanupAction: 'Temizle',
         backendSwitchNotice:
-            'Geçiş yalnızca kullanılmakta olan güvenlik duvarı arka ucunu değiştirir; mevcut kurallar taşınmaz veya temizlenmez. Geçişten sonra kuralları hedef güvenlik duvarıyla eşitleyin ve eski güvenlik duvarı kurallarını temizlemeden önce etkin olduklarını doğrulayın.',
+            'Sistem güvenlik duvarı geçişi kuralları otomatik olarak taşımaz veya temizlemez. Bağlantı noktası yönlendirme ve Docker korumasında önce mevcut arka uç temizlenmelidir; kayıtlı kurallar ve ilkeler 1Panel içinde kalır ve geçişten sonra yeniden başlatılabilir veya eşitlenebilir.',
         switchBackendHelper: '{0} arka ucuna geçilsin mi?',
+        ruleSyncTitle: 'Kuralları eşitle',
+        ruleSyncAction: 'Kuralları eşitle',
+        ruleSyncHelper:
+            'Seçilen güvenlik duvarındaki 1Panel yönetimli kuralları mevcut güvenlik duvarıyla eşitler. Kaynak kurallar silinmez ve harici kurallar eşitlenmez.',
+        ruleSyncDatabase: '1Panel veritabanı',
+        ruleSyncDatabaseHelper:
+            'Mevcut güvenlik duvarındaki yönetilen kuralları 1Panel veritabanı kurallarına göre eşitler ve uyumlu hale getirir. Eksik kurallar eklenir, fazla kurallar silinir.',
+        ruleSyncDatabaseTotal: 'Veritabanı kuralları',
+        ruleSyncDatabaseConfirm:
+            '{1}, {0} veritabanı kuralıyla tam olarak eşleşecek şekilde eşitlensin mi? Hedefteki {2} kural silinecek ve eksik kurallar eklenecektir.',
+        ruleSyncSource: 'Kaynak arka uç',
+        ruleSyncTarget: 'Mevcut arka uç',
+        ruleSyncTotal: 'Dönüştürülen kurallar',
+        ruleSyncReady: 'Hazır',
+        ruleSyncExisting: 'Mevcut',
+        ruleSyncRemove: 'Silinecek',
+        ruleSyncBlocked: 'Kullanılamaz',
+        ruleSyncReason: 'Kontrol sonucu',
+        ruleSyncConfirm: '{0} kural {1} arka ucundan {2} arka ucuna eşitlensin mi? Kaynak arka uç değiştirilmez.',
+        ruleSyncResetSource: 'Eşitleme başarılı olunca kaynak güvenlik duvarı {0} sıfırlansın ve devre dışı bırakılsın',
+        ruleSyncResetSourceHelper: 'Kaynak yalnızca tüm kurallar başarıyla eşitlendikten sonra sıfırlanır.',
+        ruleSyncResetSourceBlocked: 'Bazı kurallar eşitlenemiyor. Kaynağı sıfırlamadan önce bunları çözün.',
+        ruleSyncResetSourceConfirm:
+            '{0} kural {1} üzerinden {2} üzerine eşitlenip ardından {1} sıfırlansın ve devre dışı bırakılsın mı? Tüm yapılandırma silinir ve geri alınamaz.',
+        ruleSyncPartial: 'Eşitleme tamamlandı: {0} başarılı, {1} zaten mevcut, {2} başarısız.',
+        ruleSyncSuccess: 'Eşitleme tamamlandı: {0} başarılı, {1} zaten mevcut, {2} silindi.',
+        ruleSyncStatus: {
+            ready: 'Hazır',
+            existing: 'Mevcut',
+            remove: 'Silinecek',
+            blocked: 'Kullanılamaz',
+        },
         uninstalledStatus: 'Yüklü değil',
         initializedStatus: 'Başlatıldı',
         partiallyInitialized: 'Kısmen başlatıldı',
@@ -4206,6 +4247,7 @@ const message = {
             'Ana makine INPUT kuralları bu Docker yayımlanmış portunu doğrudan korumaz. Konteyner portu korumasını açmak için tıklayın.',
         notInitialized: 'Başlatılmadı',
         familyUnsupported: 'Sistem {0} desteğini sunmuyor',
+        familyChainIssue: '{0} · {1} zinciri · {2}',
         dockerGuardUnbindConfirm:
             'Bağ kaldırıldıktan sonra tüm konteyner portları geçici olarak Docker varsayılan erişim davranışına döner. Mevcut koruma ayarları korunur. Devam edilsin mi?',
         deleteDockerGuardPolicyConfirm: 'Bu uç nokta Docker varsayılan erişim davranışına döner. Devam edilsin mi?',
@@ -4214,10 +4256,14 @@ const message = {
         protection: 'Koruma',
         portDetails: 'Port ayrıntıları',
         orphanEndpoints: 'İlişkilendirilmemiş uç noktalar',
+        orphanPolicies: 'İlişkilendirilmemiş kurallar',
+        orphanPoliciesHelper:
+            'Aşağıdaki {0} kural bir Docker portuna bağlı değil. Eşleşen bir port algılandığında otomatik olarak bağlanır.',
         exposure: 'Dışa açıklık',
         externallyExposed: 'Harici erişime izin ver (0.0.0.0 / ::)',
         restrictedBinding: 'Harici erişimi reddet (127.0.0.1 / ::1)',
         composeOrApp: 'Compose / Uygulama',
+        sources: 'Kaynaklar',
         deniedSources: 'Reddedilen kaynaklar',
         allowedSources: 'İzin verilen kaynaklar',
         dockerGuardPolicy: 'Konteyner portu koruma ilkesi',
@@ -4258,6 +4304,10 @@ const message = {
         baseIptables: 'iptables Servisi',
         forwardIptables: 'iptables Port Yönlendirme Servisi',
         initMsg: '{0} başlatılmak üzere, devam etmek istiyor musunuz?',
+        initDirectBackendConflictMsg:
+            '{1} hâlâ bağlı. {0} başlatılırsa iki güvenlik duvarı kural kümesi de etkin olur ve erişimi beklenmedik şekilde engelleyebilir. Devam edilsin mi?',
+        directBackendConflictWarning:
+            '{0} ve {1} aynı anda bağlı olduğundan iki kural kümesi de etkindir. Birbirlerini engellemediklerini doğrulayın ve artık kullanmadığınız güvenlik duvarının bağlantısını el ile kaldırın.',
         initHelper:
             '{0} başlatılmadığı tespit edildi. Lütfen üst durum çubuğundaki başlatma düğmesine tıklayarak yapılandırın!',
         bindHelper: 'Bağla - Güvenlik duvarı kuralları yalnızca durum bağlı olduğunda etkili olur. Onaylıyor musunuz?',
