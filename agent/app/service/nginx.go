@@ -63,6 +63,9 @@ func (n NginxService) GetNginxConfig() (*response.NginxFile, error) {
 }
 
 func (n NginxService) GetConfigByScope(req request.NginxScopeReq) ([]response.NginxParam, error) {
+	if req.Scope == dto.Brotli {
+		return getNginxBrotliParams()
+	}
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
 		return nil, nil
@@ -71,6 +74,9 @@ func (n NginxService) GetConfigByScope(req request.NginxScopeReq) ([]response.Ng
 }
 
 func (n NginxService) UpdateConfigByScope(req request.NginxConfigUpdate) error {
+	if req.Scope == dto.Brotli {
+		return updateNginxBrotliParams(getNginxParams(req.Params, dto.BrotliKeys))
+	}
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
 		return nil

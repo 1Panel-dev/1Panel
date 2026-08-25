@@ -3969,6 +3969,8 @@ const message = {
         gzipMinLengthHelper: 'Minimum Sıkıştırılmış Dosya',
         gzipCompLevelHelper: 'Sıkıştırma Oranı',
         gzipHelper: 'İletim için sıkıştırmayı etkinleştir',
+        brotliHelper: 'brotli sıkıştırmayı etkinleştir, genellikle gzip ile karşılaştırıldığında daha küçüktür',
+        brotliCompLevelHelper: 'Brotli sıkıştırma oranı, 0 ile 11 arası',
         connections: 'Aktif bağlantılar',
         accepts: 'Kabul edilenler',
         handled: 'İşlenenler',

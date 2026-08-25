@@ -3798,6 +3798,8 @@ const message = {
         gzipMinLengthHelper: 'ຂະໜາດໄຟລ໌ຕ່ຳສຸດທີ່ຈະບີບອັດ',
         gzipCompLevelHelper: 'ອັດຕາການບີບອັດ',
         gzipHelper: 'ເປີດໃຊ້ການບີບອັດໃນການຮັບສົ່ງຂໍ້ມູນ',
+        brotliHelper: 'ເປີດໃຊ້ການບີບອັດ brotli, ປົກກະຕິນ້ອຍກວ່າ gzip',
+        brotliCompLevelHelper: 'ອັດຕາການບີບອັດ brotli, 0 ຫາ 11',
         connections: 'ການເຊື່ອມຕໍ່ທີ່ກຳລັງເຮັດວຽກ',
         accepts: 'ຍອມຮັບແລ້ວ',
         handled: 'ຈັດການແລ້ວ',

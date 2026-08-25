@@ -3823,6 +3823,8 @@ const message = {
         gzipMinLengthHelper: '최소 압축 파일 크기',
         gzipCompLevelHelper: '압축률',
         gzipHelper: '전송을 위한 압축 활성화',
+        brotliHelper: 'brotli 압축 활성화, 일반적으로 gzip보다 작습니다',
+        brotliCompLevelHelper: 'brotli 압축률, 0에서 11까지',
         connections: '활성 연결',
         accepts: '수락',
         handled: '처리됨',

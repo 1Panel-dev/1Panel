@@ -3871,6 +3871,8 @@ const message = {
         gzipMinLengthHelper: 'حداقل فایل فشرده',
         gzipCompLevelHelper: 'نرخ فشرده‌سازی',
         gzipHelper: 'فعال‌سازی فشرده‌سازی برای انتقال',
+        brotliHelper: 'فعال‌سازی فشرده‌سازی brotli، معمولاً کوچک‌تر از gzip',
+        brotliCompLevelHelper: 'نرخ فشرده‌سازی brotli، از 0 تا 11',
         connections: 'اتصال‌های فعال',
         accepts: 'پذیرش‌ها',
         handled: 'مدیریت شده',

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -63,6 +64,27 @@ func renderNginxHTTPConfig(directives []nginxHTTPDirective) []byte {
 		content.WriteString("\n")
 	}
 	return []byte(content.String())
+}
+
+var nginxHTTPDirectiveRe = regexp.MustCompile(`^[ \t]*([a-z_][a-z0-9_]*)[ \t]+([^;]*);[ \t]*$`)
+
+// readNginxHTTPDirectives parses a managed file back into directive values.
+// A missing or unreadable file yields no directives, which makes callers fall
+// back to their defaults.
+func readNginxHTTPDirectives(filePath string) map[string][]string {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil
+	}
+	directives := make(map[string][]string)
+	for _, line := range strings.Split(string(content), "\n") {
+		match := nginxHTTPDirectiveRe.FindStringSubmatch(line)
+		if match == nil {
+			continue
+		}
+		directives[match[1]] = strings.Fields(match[2])
+	}
+	return directives
 }
 
 // snapshotManagedNginxHTTPConfigs captures every managed file so a failed

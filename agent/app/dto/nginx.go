@@ -51,13 +51,19 @@ const (
 	CACHE      NginxKey = "cache"
 	HttpPer    NginxKey = "http-per"
 	ProxyCache NginxKey = "proxy-cache"
+	Brotli     NginxKey = "brotli"
 )
+
+// BrotliKeys are served from the panel-managed http.d file rather than
+// nginx.conf, because the module is optional: its directives must disappear
+// together with the module, otherwise nginx refuses to start.
+var BrotliKeys = []string{"brotli", "brotli_comp_level", "brotli_min_length", "brotli_types"}
 
 var ScopeKeyMap = map[NginxKey][]string{
 	Index:     {"index"},
 	LimitConn: {"limit_conn", "limit_rate", "limit_conn_zone"},
 	SSL:       {"ssl_certificate", "ssl_certificate_key"},
-	HttpPer:   {"server_names_hash_bucket_size", "client_header_buffer_size", "client_max_body_size", "keepalive_timeout", "gzip", "gzip_min_length", "gzip_comp_level"},
+	HttpPer:   {"server_names_hash_bucket_size", "client_header_buffer_size", "client_max_body_size", "keepalive_timeout", "gzip", "gzip_min_length", "gzip_comp_level", "gzip_types", "gzip_vary", "gzip_proxied"},
 }
 
 var StaticFileKeyMap = map[NginxKey]struct {

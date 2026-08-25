@@ -1,8 +1,13 @@
 package service
 
 import (
+	"path"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 )
 
 // nginxCompressibleTypes is shared by gzip_types and brotli_types so both
@@ -62,6 +67,10 @@ func nginxModuleRuntimeOrder(name string) int {
 
 // desiredNginxModuleRuntimeConfigs renders the managed http.d files for every
 // enabled module that has a ready build and known runtime defaults.
+//
+// Values the user changed through the compression settings page are read back
+// from the current managed file, so reconciling after an unrelated module
+// change does not silently reset them to the defaults.
 func desiredNginxModuleRuntimeConfigs(install model.AppInstall, modules []dto.NginxModule, target dto.NginxModuleTarget) map[string][]byte {
 	desired := make(map[string][]byte)
 	for _, module := range modules {
@@ -74,9 +83,106 @@ func desiredNginxModuleRuntimeConfigs(install model.AppInstall, modules []dto.Ng
 			continue
 		}
 		fileName := nginxHTTPConfigFileName(nginxModuleRuntimeOrder(module.Name), module.Name)
-		desired[fileName] = renderNginxHTTPConfig(directives)
+		current := readNginxHTTPDirectives(path.Join(nginxHTTPConfigDir(install), fileName))
+		desired[fileName] = renderNginxHTTPConfig(mergeNginxRuntimeDirectives(directives, current))
 	}
 	return desired
+}
+
+// mergeNginxRuntimeDirectives keeps the declared directive set and ordering
+// while preferring values already present in the managed file.
+func mergeNginxRuntimeDirectives(defaults []nginxHTTPDirective, current map[string][]string) []nginxHTTPDirective {
+	if len(current) == 0 {
+		return defaults
+	}
+	merged := make([]nginxHTTPDirective, 0, len(defaults))
+	for _, directive := range defaults {
+		if params, ok := current[directive.Name]; ok && len(params) > 0 {
+			directive.Params = params
+		}
+		merged = append(merged, directive)
+	}
+	return merged
+}
+
+// nginxBrotliModuleName is the catalog name of the brotli module.
+const nginxBrotliModuleName = "ngx_brotli"
+
+// getNginxBrotliParams reports the brotli settings currently in effect.
+//
+// Brotli is served from the managed http.d file instead of nginx.conf, so the
+// directives can be removed together with the module. When the module is
+// disabled the declared defaults are returned, which lets the settings page
+// show what would be applied once it is enabled.
+func getNginxBrotliParams() ([]response.NginxParam, error) {
+	install, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return nil, err
+	}
+	fileName := nginxHTTPConfigFileName(nginxModuleRuntimeOrder(nginxBrotliModuleName), nginxBrotliModuleName)
+	current := readNginxHTTPDirectives(path.Join(nginxHTTPConfigDir(install), fileName))
+	res := make([]response.NginxParam, 0, len(dto.BrotliKeys))
+	for _, directive := range mergeNginxRuntimeDirectives(nginxModuleRuntimeDefaults[nginxBrotliModuleName], current) {
+		res = append(res, response.NginxParam{Name: directive.Name, Params: directive.Params})
+	}
+	return res, nil
+}
+
+// updateNginxBrotliParams persists brotli settings to the managed http.d file.
+//
+// Writing is refused unless the module is enabled and built: the directives
+// would reference a module that is not loaded and nginx would fail to start.
+func updateNginxBrotliParams(params []dto.NginxParam) error {
+	install, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	if !nginxHTTPConfigSupported(install) {
+		return buserr.New("ErrBrotliUnsupported")
+	}
+	modules, err := loadNginxModules(install)
+	if err != nil {
+		return err
+	}
+	values := make(map[string][]string, len(params))
+	for _, param := range params {
+		values[param.Name] = param.Params
+	}
+	for i := range modules {
+		if modules[i].Name != nginxBrotliModuleName {
+			continue
+		}
+		if !modules[i].Enable {
+			return buserr.New("ErrBrotliDisabled")
+		}
+		fileName := nginxHTTPConfigFileName(nginxModuleRuntimeOrder(nginxBrotliModuleName), nginxBrotliModuleName)
+		configDir := nginxHTTPConfigDir(install)
+		snapshot, snapErr := snapshotManagedNginxHTTPConfigs(configDir)
+		if snapErr != nil {
+			return snapErr
+		}
+		merged := mergeNginxRuntimeDirectives(nginxModuleRuntimeDefaults[nginxBrotliModuleName], values)
+		desired := map[string][]byte{fileName: renderNginxHTTPConfig(merged)}
+		for name, content := range snapshot {
+			if name != fileName {
+				desired[name] = content
+			}
+		}
+		if err = applyManagedNginxHTTPConfigs(configDir, desired); err != nil {
+			_ = applyManagedNginxHTTPConfigs(configDir, snapshot)
+			return err
+		}
+		if err = opNginx(install.ContainerName, constant.NginxCheck); err != nil {
+			_ = applyManagedNginxHTTPConfigs(configDir, snapshot)
+			return err
+		}
+		if err = opNginx(install.ContainerName, constant.NginxReload); err != nil {
+			_ = applyManagedNginxHTTPConfigs(configDir, snapshot)
+			return err
+		}
+		return nil
+	}
+	return buserr.New("ErrBrotliDisabled")
 }
 
 // nginxModuleRuntimeReady reports whether the module is actually usable.

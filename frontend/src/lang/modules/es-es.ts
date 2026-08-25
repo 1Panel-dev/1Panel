@@ -3951,6 +3951,8 @@ const message = {
         gzipMinLengthHelper: 'Tamaño mínimo para comprimir',
         gzipCompLevelHelper: 'Nivel de compresión',
         gzipHelper: 'Habilitar compresión para transmisión',
+        brotliHelper: 'Habilitar compresión brotli, normalmente menor que gzip',
+        brotliCompLevelHelper: 'Tasa de compresión brotli, de 0 a 11',
         connections: 'Conexiones activas',
         accepts: 'Aceptadas',
         handled: 'Gestionadas',

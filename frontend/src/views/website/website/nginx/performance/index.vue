@@ -48,6 +48,29 @@
                     </el-form-item>
                 </el-col>
             </el-row>
+            <el-row v-if="brotliAvailable" v-loading="loading" :gutter="20">
+                <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
+                    <el-form-item label="brotli" prop="brotli">
+                        <el-select v-model="brotliForm.brotli">
+                            <el-option :label="'on'" :value="'on'"></el-option>
+                            <el-option :label="'off'" :value="'off'"></el-option>
+                        </el-select>
+                        <span class="input-help">{{ $t('nginx.brotliHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="brotli_min_length" prop="brotli_min_length">
+                        <el-input clearable v-model.number="brotliForm.brotli_min_length">
+                            <template #append>{{ unitLabel('brotli_min_length', 'k') }}</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('nginx.gzipMinLengthHelper') }}</span>
+                    </el-form-item>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
+                    <el-form-item label="brotli_comp_level" prop="brotli_comp_level">
+                        <el-input clearable v-model.number="brotliForm.brotli_comp_level"></el-input>
+                        <span class="input-help">{{ $t('nginx.brotliCompLevelHelper') }}</span>
+                    </el-form-item>
+                </el-col>
+            </el-row>
             <el-form-item>
                 <el-button v-permission type="primary" @click="submit(nginxFormRef)">
                     {{ $t('commons.button.save') }}
@@ -58,7 +81,7 @@
 </template>
 <script lang="ts" setup>
 import { Nginx } from '@/api/interface/nginx';
-import { getNginxConfigByScope, updateNginxConfigByScope } from '@/api/modules/nginx';
+import { getNginxConfigByScope, getNginxModules, updateNginxConfigByScope } from '@/api/modules/nginx';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -86,6 +109,16 @@ let form = ref({
 let nginxFormRef = ref();
 let loading = ref(false);
 
+// Brotli is only offered once the module is enabled and built. Its directives
+// live in a panel-managed file rather than nginx.conf, because they have to
+// disappear together with the module.
+const brotliAvailable = ref(false);
+const brotliForm = ref({
+    brotli: 'on',
+    brotli_comp_level: 5,
+    brotli_min_length: 1,
+});
+
 const variablesRules = reactive({
     server_names_hash_bucket_size: [checkNumberRange(1, 9999)],
     client_header_buffer_size: [checkNumberRange(0, 999999999)],
@@ -94,12 +127,15 @@ const variablesRules = reactive({
     gzip: [Rules.requiredSelect],
     gzip_min_length: [Rules.requiredSelect],
     gzip_comp_level: [checkNumberRange(1, 9)],
+    brotli: [Rules.requiredSelect],
+    brotli_min_length: [Rules.requiredSelect],
+    brotli_comp_level: [checkNumberRange(0, 11)],
 });
 
 // nginx size directives may be written with or without a unit suffix, and
 // the suffix carries a factor of 1024. Remember the unit that was read so it
 // can be written back unchanged, instead of assuming a fixed one.
-const sizeKeys = ['client_header_buffer_size', 'client_max_body_size', 'gzip_min_length'];
+const sizeKeys = ['client_header_buffer_size', 'client_max_body_size', 'gzip_min_length', 'brotli_min_length'];
 const units = ref<Record<string, string>>({});
 
 const parseSizeParam = (name: string, value: string) => {
@@ -138,6 +174,29 @@ const getParams = async () => {
             form.value[param.name] = Number(param.params[0].match(/\d+/g)?.[0] ?? 0);
         }
     }
+    await getBrotliParams();
+};
+
+const getBrotliParams = async () => {
+    const modules = await getNginxModules();
+    const brotli = modules.data.modules?.find((item) => item.name === 'ngx_brotli');
+    brotliAvailable.value = !!brotli && brotli.enable && brotli.buildStatus === 'ready';
+    if (!brotliAvailable.value) {
+        return;
+    }
+    const res = await getNginxConfigByScope({ scope: 'brotli' });
+    for (const param of res.data) {
+        if (param.params.length === 0) {
+            continue;
+        }
+        if (param.name === 'brotli') {
+            brotliForm.value.brotli = param.params[0];
+        } else if (param.name === 'brotli_min_length') {
+            brotliForm.value.brotli_min_length = parseSizeParam(param.name, param.params[0]);
+        } else if (param.name === 'brotli_comp_level') {
+            brotliForm.value.brotli_comp_level = Number(param.params[0].match(/\d+/g)?.[0] ?? 0);
+        }
+    }
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
@@ -158,6 +217,22 @@ const submit = async (formEl: FormInstance | undefined) => {
         };
         updateReq.value.params = params;
         updateNginxConfigByScope(updateReq.value)
+            .then(() => {
+                if (!brotliAvailable.value) {
+                    return;
+                }
+                // brotli_types is managed by the panel and deliberately not
+                // exposed, so it stays aligned with gzip_types.
+                return updateNginxConfigByScope({
+                    scope: 'brotli',
+                    operate: 'update',
+                    params: {
+                        brotli: brotliForm.value.brotli,
+                        brotli_comp_level: String(brotliForm.value.brotli_comp_level),
+                        brotli_min_length: withUnit('brotli_min_length', brotliForm.value.brotli_min_length, 'k'),
+                    },
+                });
+            })
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 getParams();

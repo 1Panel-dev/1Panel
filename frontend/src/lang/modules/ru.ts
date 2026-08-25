@@ -3954,6 +3954,8 @@ const message = {
         gzipMinLengthHelper: 'Минимальный размер сжатого файла',
         gzipCompLevelHelper: 'Степень сжатия',
         gzipHelper: 'Включить сжатие для передачи',
+        brotliHelper: 'Включить сжатие brotli, обычно меньше, чем gzip',
+        brotliCompLevelHelper: 'Степень сжатия brotli, от 0 до 11',
         connections: 'Активные соединения',
         accepts: 'Принято',
         handled: 'Обработано',

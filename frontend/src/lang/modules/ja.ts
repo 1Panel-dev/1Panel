@@ -3894,6 +3894,8 @@ const message = {
         gzipMinLengthHelper: '最小圧縮ファイル',
         gzipCompLevelHelper: '圧縮率',
         gzipHelper: '伝送の圧縮を有効にします',
+        brotliHelper: 'brotli 圧縮を有効にします。通常 gzip より小さくなります',
+        brotliCompLevelHelper: 'brotli 圧縮率、0 から 11',
         connections: 'アクティブな接続',
         accepts: '受け入れます',
         handled: '処理',

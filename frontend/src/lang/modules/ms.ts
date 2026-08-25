@@ -3966,6 +3966,8 @@ const message = {
         gzipMinLengthHelper: 'Saiz minimum fail untuk pemampatan',
         gzipCompLevelHelper: 'Kadar mampatan',
         gzipHelper: 'Aktifkan pemampatan untuk penghantaran',
+        brotliHelper: 'Aktifkan pemampatan brotli, biasanya lebih kecil daripada gzip',
+        brotliCompLevelHelper: 'Kadar pemampatan brotli, 0 hingga 11',
         connections: 'Sambungan aktif',
         accepts: 'Diterima',
         handled: 'Diuruskan',

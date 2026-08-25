@@ -3693,6 +3693,8 @@ const message = {
         gzipMinLengthHelper: '最小压缩文件',
         gzipCompLevelHelper: '压缩率',
         gzipHelper: '是否开启压缩传输',
+        brotliHelper: '开启 brotli 压缩，通常比 gzip 体积更小',
+        brotliCompLevelHelper: 'brotli 压缩率，取值 0 到 11',
         connections: '活动连接(Active connections)',
         accepts: '总连接次数(accepts)',
         handled: '总握手次数(handled)',

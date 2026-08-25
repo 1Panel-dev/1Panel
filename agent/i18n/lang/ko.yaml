@@ -215,6 +215,8 @@ ErrDomainFormat: '{{ .name }} 도메인 이름 형식이 올바르지 않습니�
 ErrDefaultAlias: '기본값은 예약된 코드입니다. 다른 코드를 사용하세요'
 ErrParentWebsite: '먼저 하위 사이트 {{ .name }}을 삭제해야 합니다.'
 ErrBuildDirNotFound: '빌드 디렉토리가 존재하지 않습니다'
+ErrBrotliDisabled: 'brotli 모듈이 활성화되지 않았습니다. 먼저 활성화하고 빌드하세요'
+ErrBrotliUnsupported: '설치된 OpenResty 버전은 관리형 brotli 설정을 지원하지 않습니다'
 ErrImageNotExist: '운영 환경 {{ .name }} 이미지가 존재하지 않습니다. 운영 환경을 다시 편집하세요.'
 ErrProxyIsUsed: '로드 밸런싱이 역방향 프록시에 의해 사용되었으므로 삭제할 수 없습니다'
 ErrSSLValid: '인증서 파일에 문제가 있습니다. 인증서 상태를 확인하세요'
