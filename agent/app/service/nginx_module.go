@@ -654,9 +654,36 @@ func reconcileDynamicNginxModuleConfig(install model.AppInstall, modules []dto.N
 			return fmt.Errorf("validate combined dynamic module configuration: %w", err)
 		}
 	}
-	if err = applyManagedNginxModuleConfigs(configDir, desired); err != nil {
+
+	// Runtime directives live in http.d because load_module is main-context
+	// while directives such as "brotli on" are http-context. Both sets are
+	// written before nginx -t runs, so nginx only ever observes the final,
+	// consistent state; on failure both are rolled back together.
+	httpConfigDir := nginxHTTPConfigDir(install)
+	httpSupported := nginxHTTPConfigSupported(install)
+	var httpSnapshot nginxModuleConfigSnapshot
+	if httpSupported {
+		if httpSnapshot, err = snapshotManagedNginxHTTPConfigs(httpConfigDir); err != nil {
+			return err
+		}
+	}
+	restore := func() {
 		_ = applyManagedNginxModuleConfigs(configDir, snapshot)
+		if httpSupported {
+			_ = applyManagedNginxHTTPConfigs(httpConfigDir, httpSnapshot)
+		}
+	}
+
+	if err = applyManagedNginxModuleConfigs(configDir, desired); err != nil {
+		restore()
 		return err
+	}
+	if httpSupported {
+		desiredHTTP := desiredNginxModuleRuntimeConfigs(install, modules, target)
+		if err = applyManagedNginxHTTPConfigs(httpConfigDir, desiredHTTP); err != nil {
+			restore()
+			return err
+		}
 	}
 	if !reload {
 		return nil
@@ -666,11 +693,11 @@ func reconcileDynamicNginxModuleConfig(install model.AppInstall, modules []dto.N
 		return nil
 	}
 	if err = opNginx(install.ContainerName, constant.NginxCheck); err != nil {
-		_ = applyManagedNginxModuleConfigs(configDir, snapshot)
+		restore()
 		return err
 	}
 	if err = opNginx(install.ContainerName, constant.NginxReload); err != nil {
-		_ = applyManagedNginxModuleConfigs(configDir, snapshot)
+		restore()
 		return err
 	}
 	return nil
