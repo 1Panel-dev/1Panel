@@ -18,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -162,6 +163,51 @@ func nginxModuleDynamicSupported(install model.AppInstall) bool {
 	buildPath := path.Join(install.GetPath(), nginxModuleBuildDir)
 	return fileOp.Stat(path.Join(buildPath, nginxModuleBuilderFile)) &&
 		fileOp.Stat(path.Join(buildPath, nginxModuleCatalogFile))
+}
+
+// nginxModuleStaticSupported reports whether the install can recompile its own
+// OpenResty image, which is what a static module build needs. Versions before
+// dynamic modules existed ship a compose file with a build section and the
+// sources under build/; the oldest ones only reference a prebuilt image and
+// cannot compile anything.
+func nginxModuleStaticSupported(install model.AppInstall) bool {
+	if !files.NewFileOp().Stat(path.Join(install.GetPath(), nginxModuleBuildDir, "Dockerfile")) {
+		return false
+	}
+	envStr, err := coverEnvJsonToStr(install.Env)
+	if err != nil {
+		return false
+	}
+	project, err := dockerUtils.GetComposeProject(install.Name, install.GetPath(),
+		[]byte(install.DockerCompose), []byte(envStr), true)
+	if err != nil {
+		return false
+	}
+	for _, service := range project.AllServices() {
+		if service.Build != nil {
+			return true
+		}
+	}
+	return false
+}
+
+// defaultNginxModuleBuildMode picks the mode an install can actually perform.
+//
+// Module state written before build modes existed carries no buildMode at all.
+// Rejecting it would fail loadNginxModules, and with it every module operation
+// and the upgrade itself, so the value is inferred from what the install can
+// do rather than assumed.
+func defaultNginxModuleBuildMode(install model.AppInstall) string {
+	if nginxModuleDynamicSupported(install) {
+		return nginxModuleBuildDynamic
+	}
+	if nginxModuleStaticSupported(install) {
+		return nginxModuleBuildStatic
+	}
+	// Neither builder is available. Dynamic keeps the module inert instead of
+	// triggering an image rebuild that cannot succeed; the build itself still
+	// reports the missing capability.
+	return nginxModuleBuildDynamic
 }
 
 func syncNginxModuleBuilder(detailBuildDir, installBuildDir string) error {
@@ -835,10 +881,17 @@ func executeNginxModuleBuild(install model.AppInstall, reqModules []string, forc
 	// used to force the static path here, which meant a full image rebuild for
 	// an install that has no static module left to compile.
 	staticBuild := hasEnabledStaticNginxModules(modules)
-	if !staticBuild && hasDynamicNginxModuleBuildTask(modules, reqModules) {
-		if !nginxModuleDynamicSupported(install) {
-			return errors.New("the installed OpenResty version does not support dynamic module builds")
+	if !staticBuild && hasDynamicNginxModuleBuildTask(modules, reqModules) && !nginxModuleDynamicSupported(install) {
+		// The install predates dynamic modules. Compile the same modules into
+		// the image instead of refusing the build, which is how these versions
+		// have always produced modules.
+		if !nginxModuleStaticSupported(install) {
+			return buserr.New("ErrModuleBuildUnsupported")
 		}
+		if modules, err = convertNginxModulesToStatic(modules, reqModules); err != nil {
+			return err
+		}
+		staticBuild = true
 	}
 	if staticBuild {
 		return executeStaticNginxModuleBuild(install, modules, mirror, force, parentTask)
@@ -913,7 +966,17 @@ func loadNginxModulesWithCatalog(install model.AppInstall, catalogPath string) (
 			Builds: state.Builds, LastError: state.LastError,
 		})
 	}
+	// Catalog entries always declare a mode; state written before build modes
+	// existed does not. Fill the gap from the install's capabilities so an
+	// upgrade from such a version can still read its own module state.
+	fallbackMode := ""
 	for i := range modules {
+		if modules[i].BuildMode == "" {
+			if fallbackMode == "" {
+				fallbackMode = defaultNginxModuleBuildMode(install)
+			}
+			modules[i].BuildMode = fallbackMode
+		}
 		if err = validateNginxModuleBuildMode(modules[i]); err != nil {
 			return nil, err
 		}
@@ -1291,6 +1354,43 @@ func normalizeDynamicModuleParams(params string) (string, error) {
 		return "", err
 	}
 	return params, nil
+}
+
+// normalizeStaticModuleParams is the inverse of normalizeDynamicModuleParams:
+// a module compiled into the image uses --add-module and the plain form of
+// nginx's built-in switches.
+func normalizeStaticModuleParams(params string) string {
+	params = strings.TrimSpace(params)
+	params = strings.ReplaceAll(params, "--add-dynamic-module=", "--add-module=")
+	return strings.ReplaceAll(params, "=dynamic", "")
+}
+
+// convertNginxModulesToStatic retargets the modules a build was asked to
+// produce so they are compiled into the image. It is used when the install
+// has no dynamic builder, where this is the only way to produce a module.
+//
+// The change is confined to the returned slice: it drives one build and is
+// never persisted, so the catalog's declared mode stays authoritative and the
+// modules go back to dynamic once the install gains a builder.
+func convertNginxModulesToStatic(modules []dto.NginxModule, selected []string) ([]dto.NginxModule, error) {
+	selectedNames := make(map[string]struct{}, len(selected))
+	for _, name := range selected {
+		selectedNames[name] = struct{}{}
+	}
+	converted := cloneNginxModules(modules)
+	for i := range converted {
+		if !nginxModuleNeedsDynamicBuild(converted[i], selectedNames) {
+			continue
+		}
+		params := normalizeStaticModuleParams(converted[i].Params)
+		if params == "" {
+			return nil, fmt.Errorf("OpenResty module %s has no configure options to compile into the image", converted[i].Name)
+		}
+		converted[i].BuildMode = nginxModuleBuildStatic
+		converted[i].Params = params
+		converted[i].Enable = true
+	}
+	return converted, nil
 }
 
 func parseDynamicModuleParams(params string) ([]string, error) {

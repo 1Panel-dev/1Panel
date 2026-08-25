@@ -217,6 +217,7 @@ ErrParentWebsite: 'まずサブサイト {{ .name }} を削除する必要があ
 ErrBuildDirNotFound: 'ビルド ディレクトリが存在しません'
 ErrBrotliDisabled: 'brotli モジュールが有効になっていません。先に有効化してビルドしてください'
 ErrBrotliUnsupported: 'インストールされている OpenResty のバージョンは管理された brotli 設定をサポートしていません'
+ErrModuleBuildUnsupported: 'この OpenResty バージョンではモジュールをビルドできません。先にアップグレードしてください'
 ErrImageNotExist: 'オペレーティング環境 {{ .name }} イメージが存在しません。オペレーティング環境を再編集してください'
 ErrProxyIsUsed: 'ロードバランシングはリバースプロキシによって使用されているため、削除できません'
 ErrSSLValid: '証明書ファイルが異常です、証明書の状態を確認してください！'

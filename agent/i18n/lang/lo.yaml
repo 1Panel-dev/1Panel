@@ -207,6 +207,7 @@ ErrParentWebsite: 'ກະລຸນາລຶບເວັບໄຊຍ່ອຍ {{ 
 ErrBuildDirNotFound: 'ບໍ່ມີໂຟນເດີ Build ຢູ່'
 ErrBrotliDisabled: 'ໂມດູນ brotli ຍັງບໍ່ໄດ້ເປີດໃຊ້, ກະລຸນາເປີດໃຊ້ ແລະ ສ້າງກ່ອນ'
 ErrBrotliUnsupported: 'ລຸ້ນ OpenResty ທີ່ຕິດຕັ້ງບໍ່ຮອງຮັບການຕັ້ງຄ່າ brotli ແບບຈັດການ'
+ErrModuleBuildUnsupported: 'ລຸ້ນ OpenResty ນີ້ບໍ່ສາມາດສ້າງໂມດູນໄດ້, ກະລຸນາອັບເກຣດກ່ອນ'
 ErrImageNotExist: 'ບໍ່ພົບຮູບພາບ runtime: {{ .name }}'
 ErrProxyIsUsed: 'ຕົວຈັດການການໂຫຼດ (Load balancer) ຖືກໃຊ້ງານໂດຍ reverse proxy'
 ErrSSLValid: 'ໄຟລ໌ໃບຮັບຮອງບໍ່ຖືກຕ້ອງ'
