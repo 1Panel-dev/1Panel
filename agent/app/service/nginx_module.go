@@ -749,6 +749,14 @@ func applyManagedNginxModuleConfigs(configDir string, desired map[string][]byte)
 	return nil
 }
 
+// hasEnabledStaticNginxModules reports whether a full image rebuild is needed.
+//
+// Module state is the only input on purpose. RESTY_CONFIG_OPTIONS_MORE in .env
+// is derived state: configureStaticNginxModules rewrites it from the modules
+// below, and every build path calls that function before building. Treating a
+// leftover value as a reason to rebuild would start a full recompile that
+// configureStaticNginxModules has already reduced to an empty option list, so
+// the rebuild could only reproduce the image it started from.
 func hasEnabledStaticNginxModules(modules []dto.NginxModule) bool {
 	for _, module := range modules {
 		normalizeNginxModule(&module)
@@ -757,17 +765,6 @@ func hasEnabledStaticNginxModules(modules []dto.NginxModule) bool {
 		}
 	}
 	return false
-}
-
-func staticNginxBuildRequired(install model.AppInstall, modules []dto.NginxModule) bool {
-	if hasEnabledStaticNginxModules(modules) {
-		return true
-	}
-	envs, err := gotenv.Read(install.GetEnvPath())
-	if err != nil {
-		return false
-	}
-	return strings.TrimSpace(envs["RESTY_CONFIG_OPTIONS_MORE"]) != ""
 }
 
 func configureStaticNginxModules(install model.AppInstall, modules []dto.NginxModule, mirror string) error {
@@ -834,7 +831,10 @@ func executeNginxModuleBuild(install model.AppInstall, reqModules []string, forc
 	if err != nil {
 		return err
 	}
-	staticBuild := staticNginxBuildRequired(install, modules)
+	// Only the module list decides this. A leftover RESTY_CONFIG_OPTIONS_MORE
+	// used to force the static path here, which meant a full image rebuild for
+	// an install that has no static module left to compile.
+	staticBuild := hasEnabledStaticNginxModules(modules)
 	if !staticBuild && hasDynamicNginxModuleBuildTask(modules, reqModules) {
 		if !nginxModuleDynamicSupported(install) {
 			return errors.New("the installed OpenResty version does not support dynamic module builds")
