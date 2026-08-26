@@ -1278,9 +1278,8 @@ const message = {
             reject: '거부',
             publish: '게시',
             disable: '게시 해제',
-            customTarget: '사용자 지정 에이전트',
-            addCustomTarget: '에이전트 추가',
-            installToTarget: '사용자 지정 에이전트에 설치',
+            customTarget: '에이전트 Skill 디렉터리',
+            installToTarget: '에이전트 Skill 디렉터리에 설치',
             hostSkillDir: 'Skill 디렉터리',
             hostSkillDirHelper: '노드의 Skill 디렉터리 경로를 입력하세요.',
             installMethod: '설치 방식',
@@ -1310,8 +1309,8 @@ const message = {
             rejectConfirm: '이 Skill 검토를 거부하시겠습니까? 거부 후 Skill은 거부 상태가 됩니다.',
             downloadPublishedOnly: '게시된 Skill 패키지만 다운로드할 수 있습니다.',
             deleteTargetConfirm:
-                '이 사용자 지정 에이전트를 삭제하시겠습니까? 삭제 후 사용자는 이 설치 대상을 선택할 수 없습니다.',
-            noInstallTarget: '사용 가능한 사용자 지정 에이전트가 없습니다. 먼저 설치 대상을 구성하세요.',
+                '이 에이전트 Skill 디렉터리 설정을 삭제하시겠습니까? 삭제 후 사용자는 이 설치 디렉터리를 선택할 수 없습니다.',
+            noInstallTarget: '사용 가능한 에이전트 Skill 디렉터리가 없습니다. 먼저 추가하세요.',
             postInstallConfirm:
                 '이 대상에는 설치 후 명령이 구성되어 있습니다. 실행 전에 신뢰할 수 있는 명령인지 확인하세요.',
             status: {

@@ -1299,9 +1299,8 @@ const message = {
             reject: 'Reject',
             publish: 'Publish',
             disable: 'Unpublish',
-            customTarget: 'Custom Agent',
-            addCustomTarget: 'Add Agent',
-            installToTarget: 'Install to Custom Agent',
+            customTarget: 'Agent Skill Directory',
+            installToTarget: 'Install to Agent Skill Directory',
             hostSkillDir: 'Skill Directory',
             hostSkillDirHelper: 'Enter the Skill directory path on the node.',
             installMethod: 'Install Method',
@@ -1331,8 +1330,9 @@ const message = {
                 'Delete this skill? This cannot be undone. Skills already installed in agents will not be affected.',
             rejectConfirm: 'Reject this skill review? It will move to the rejected status.',
             downloadPublishedOnly: 'Only published skill packages can be downloaded.',
-            deleteTargetConfirm: 'Delete this custom agent? Users will no longer be able to select it.',
-            noInstallTarget: 'No custom agent is available. Configure an install target first.',
+            deleteTargetConfirm:
+                'Delete this agent Skill directory configuration? Users will no longer be able to select this installation directory.',
+            noInstallTarget: 'No agent Skill directory is available. Add one first.',
             postInstallConfirm:
                 'This target has a post-install command. Confirm the command is trusted before running.',
             status: {

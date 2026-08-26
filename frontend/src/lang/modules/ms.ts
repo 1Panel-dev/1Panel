@@ -1311,9 +1311,8 @@ const message = {
             reject: 'Tolak',
             publish: 'Terbitkan',
             disable: 'Nyahterbit',
-            customTarget: 'Agen tersuai',
-            addCustomTarget: 'Tambah agen',
-            installToTarget: 'Pasang ke agen tersuai',
+            customTarget: 'Direktori Skill ejen',
+            installToTarget: 'Pasang ke direktori Skill ejen',
             hostSkillDir: 'Direktori Skill',
             hostSkillDirHelper: 'Masukkan laluan direktori Skill pada nod.',
             installMethod: 'Kaedah pemasangan',
@@ -1342,8 +1341,9 @@ const message = {
                 'Padam Skill ini? Tindakan ini tidak boleh dipulihkan. Skill yang telah dipasang pada agen tidak akan terjejas.',
             rejectConfirm: 'Tolak semakan Skill ini? Skill akan masuk ke status ditolak.',
             downloadPublishedOnly: 'Hanya pakej Skill yang telah diterbitkan boleh dimuat turun.',
-            deleteTargetConfirm: 'Padam agen tersuai ini? Pengguna tidak lagi boleh memilih sasaran pemasangan ini.',
-            noInstallTarget: 'Tiada agen tersuai tersedia. Konfigurasikan sasaran pemasangan dahulu.',
+            deleteTargetConfirm:
+                'Padam konfigurasi direktori Skill ejen ini? Pengguna tidak lagi boleh memilih direktori pemasangan ini.',
+            noInstallTarget: 'Tiada direktori Skill ejen tersedia. Tambah satu dahulu.',
             postInstallConfirm:
                 'Sasaran ini mempunyai arahan selepas pemasangan. Sahkan arahan tersebut dipercayai sebelum dijalankan.',
             status: {

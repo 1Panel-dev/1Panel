@@ -1308,9 +1308,8 @@ const message = {
             reject: 'Rejeitar',
             publish: 'Publicar',
             disable: 'Despublicar',
-            customTarget: 'Agente personalizado',
-            addCustomTarget: 'Adicionar agente',
-            installToTarget: 'Instalar no agente personalizado',
+            customTarget: 'Diretório de Skills do agente',
+            installToTarget: 'Instalar no diretório de Skills do agente',
             hostSkillDir: 'Diretório de Skills',
             hostSkillDirHelper: 'Informe o caminho do diretório de Skills no nó.',
             installMethod: 'Método de instalação',
@@ -1341,8 +1340,8 @@ const message = {
             rejectConfirm: 'Rejeitar a revisão desta Skill? Ela passará para o status rejeitado.',
             downloadPublishedOnly: 'Somente pacotes Skill publicados podem ser baixados.',
             deleteTargetConfirm:
-                'Excluir este agente personalizado? Os usuários não poderão mais selecionar este destino de instalação.',
-            noInstallTarget: 'Nenhum agente personalizado disponível. Configure primeiro um destino de instalação.',
+                'Excluir esta configuração do diretório de Skills do agente? Os usuários não poderão mais selecionar este diretório de instalação.',
+            noInstallTarget: 'Nenhum diretório de Skills do agente disponível. Adicione um primeiro.',
             postInstallConfirm:
                 'Este destino tem um comando pós-instalação. Confirme que o comando é confiável antes de executá-lo.',
             status: {

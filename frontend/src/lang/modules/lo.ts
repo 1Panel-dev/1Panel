@@ -1275,9 +1275,8 @@ const message = {
             reject: 'ປະຕິເສດ',
             publish: 'ເຜີຍແຜ່',
             disable: 'ຍົກເລີກການເຜີຍແຜ່',
-            customTarget: 'Agent ທີ່ກຳນົດເອງ',
-            addCustomTarget: 'ເພີ່ມ Agent',
-            installToTarget: 'ຕິດຕັ້ງໃສ່ Agent ທີ່ກຳນົດເອງ',
+            customTarget: 'ໂຟນເດີ Skill ຂອງ Agent',
+            installToTarget: 'ຕິດຕັ້ງໃສ່ໂຟນເດີ Skill ຂອງ Agent',
             hostSkillDir: 'ໂຟນເດີ Skill',
             hostSkillDirHelper: 'ປ້ອນເສັ້ນທາງໂຟນເດີ Skill ໃນ Node.',
             installMethod: 'ວິທີການຕິດຕັ້ງ',
@@ -1307,8 +1306,9 @@ const message = {
                 'ລຶບ Skill ນີ້ຫຼືບໍ່? ການດຳເນີນການນີ້ບໍ່ສາມາດກັບຄືນໄດ້. Skill ທີ່ຕິດຕັ້ງໃນ Agent ແລ້ວຈະບໍ່ໄດ້ຮັບຜົນກະທົບ.',
             rejectConfirm: 'ປະຕິເສດການກວດສອບ Skill ນີ້ຫຼືບໍ່? ມັນຈະຖືກປ່ຽນສະຖານະເປັນ "ປະຕິເສດ".',
             downloadPublishedOnly: 'ສາມາດດາວໂຫຼດໄດ້ສະເພາະແພັກເກັດ Skill ທີ່ເຜີຍແຜ່ແລ້ວເທົ່ານັ້ນ.',
-            deleteTargetConfirm: 'ລຶບ Agent ທີ່ກຳນົດເອງນີ້ຫຼືບໍ່? ຜູ້ໃຊ້ຈະບໍ່ສາມາດເລືອກມັນໄດ້ອີກ.',
-            noInstallTarget: 'ບໍ່ມີ Agent ທີ່ກຳນົດເອງໃຫ້ໃຊ້ງານ. ກະລຸນາກຳນົດເປົ້າໝາຍການຕິດຕັ້ງກ່ອນ.',
+            deleteTargetConfirm:
+                'ລຶບການຕັ້ງຄ່າໂຟນເດີ Skill ຂອງ Agent ນີ້ຫຼືບໍ່? ຜູ້ໃຊ້ຈະບໍ່ສາມາດເລືອກໂຟນເດີຕິດຕັ້ງນີ້ໄດ້ອີກ.',
+            noInstallTarget: 'ບໍ່ມີໂຟນເດີ Skill ຂອງ Agent ໃຫ້ໃຊ້ງານ. ກະລຸນາເພີ່ມກ່ອນ.',
             postInstallConfirm: 'ເປົ້າໝາຍນີ້ມີຄຳສັ່ງຫຼັງການຕິດຕັ້ງ. ກະລຸນາຢືນຢັນວ່າຄຳສັ່ງນັ້ນເຊື່ອຖືໄດ້ກ່ອນທີ່ຈະລັນ.',
             status: {
                 pending: 'ລໍຖ້າການກວດສອບ',
