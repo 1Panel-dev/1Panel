@@ -1,53 +1,33 @@
 <template>
     <div>
-        <div class="flex w-full flex-col gap-2 md:flex-row items-center">
-            <div class="flex flex-wrap gap-y-2 items-center">
-                <span v-if="props.footer">
-                    <el-link type="primary" underline="never" @click="toEdition" v-if="!isFxplay">
-                        <span class="font-normal">{{ $t('license.knowMorePro') }}</span>
+        <div class="flex flex-wrap items-center">
+            <div class="flex flex-wrap items-center">
+                <el-link v-if="isEE" underline="never" type="primary" @click="toEdition">
+                    {{ $t('license.ee') }}
+                </el-link>
+                <el-link v-else-if="isMasterPro" underline="never" type="primary" @click="toLxware">
+                    {{ $t('license.pro') }}
+                </el-link>
+                <el-link v-else-if="isOffline" underline="never" type="primary" @click="to1Panel">
+                    {{ $t('license.offLine') }}
+                </el-link>
+                <el-link v-else underline="never" type="primary" @click="toEdition">
+                    {{ $t('license.community') }}
+                </el-link>
+                <el-link underline="never" class="version" type="primary" @click="getVersionLog()">
+                    {{ version }}
+                </el-link>
+                <el-badge
+                    is-dot
+                    v-if="isAdmin && !isOffline && !isEE"
+                    class="-mt-0.5"
+                    :hidden="version === 'Waiting' || !hasNewVersion"
+                >
+                    <el-link class="ml-2" underline="never" type="primary" @click="onLoadUpgradeInfo">
+                        {{ $t('commons.button.update') }}
                     </el-link>
-                    <el-divider direction="vertical" />
-                    <el-link type="primary" underline="never" @click="toForum" v-if="!isFxplay">
-                        <span class="font-normal">{{ $t('setting.forum') }}</span>
-                    </el-link>
-                    <el-divider direction="vertical" v-if="!isFxplay" />
-                    <el-link type="primary" underline="never" @click="toDoc">
-                        <span class="font-normal">{{ $t('setting.doc2') }}</span>
-                    </el-link>
-                    <el-divider direction="vertical" v-if="!isFxplay" />
-                    <el-link type="primary" underline="never" @click="toGithub" v-if="!isFxplay">
-                        <span class="font-normal">{{ $t('setting.project') }}</span>
-                    </el-link>
-                    <el-divider direction="vertical" />
-                </span>
-                <div class="flex flex-wrap items-center">
-                    <el-link v-if="isEE" underline="never" type="primary" @click="toEdition">
-                        {{ $t('license.ee') }}
-                    </el-link>
-                    <el-link v-else-if="isMasterPro" underline="never" type="primary" @click="toLxware">
-                        {{ $t('license.pro') }}
-                    </el-link>
-                    <el-link v-else-if="isOffline" underline="never" type="primary" @click="to1Panel">
-                        {{ $t('license.offLine') }}
-                    </el-link>
-                    <el-link v-else underline="never" type="primary" @click="toEdition">
-                        {{ $t('license.community') }}
-                    </el-link>
-                    <el-link underline="never" class="version" type="primary" @click="getVersionLog()">
-                        {{ version }}
-                    </el-link>
-                    <el-badge
-                        is-dot
-                        v-if="isAdmin && !isOffline && !isEE"
-                        class="-mt-0.5"
-                        :hidden="version === 'Waiting' || !hasNewVersion"
-                    >
-                        <el-link class="ml-2" underline="never" type="primary" @click="onLoadUpgradeInfo">
-                            {{ $t('commons.button.update') }}
-                        </el-link>
-                    </el-badge>
-                    <el-tag v-if="version === 'Waiting'" round class="ml-2.5">{{ $t('setting.upgrading') }}</el-tag>
-                </div>
+                </el-badge>
+                <el-tag v-if="version === 'Waiting'" round class="ml-2.5">{{ $t('setting.upgrading') }}</el-tag>
             </div>
         </div>
 
@@ -65,7 +45,7 @@ import { MsgSuccess } from '@/utils/message';
 import { onMounted, ref } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { docsUrl, isOffline, isFxplay, isMasterPro, isEE, isIntl, isAdmin, hasNewVersion } = useGlobalStore();
+const { isOffline, isMasterPro, isEE, isIntl, isAdmin, hasNewVersion } = useGlobalStore();
 const upgradeRef = ref();
 const releasesRef = ref();
 
@@ -73,12 +53,6 @@ const version = ref<string>('');
 const loading = ref(false);
 const upgradeInfo = ref();
 const upgradeVersion = ref();
-const props = defineProps({
-    footer: {
-        type: Boolean,
-        default: false,
-    },
-});
 
 const search = async () => {
     const res = await getSettingBaseInfo();
@@ -105,25 +79,12 @@ const to1Panel = () => {
     window.open(url, '_blank', 'noopener,noreferrer');
 };
 
-const toDoc = () => {
-    window.open(docsUrl.value.endsWith('/') ? docsUrl.value : `${docsUrl.value}/`, '_blank', 'noopener,noreferrer');
-};
-
 const toEdition = () => {
     if (!isIntl.value) {
         window.open('https://1panel.cn/versions.html' + '', '_blank', 'noopener,noreferrer');
     } else {
         window.open('https://1panel.pro/pricing' + '', '_blank', 'noopener,noreferrer');
     }
-};
-
-const toForum = () => {
-    let url = isIntl.value ? 'https://github.com/1Panel-dev/1Panel/discussions' : 'https://bbs.fit2cloud.com/c/1p/7';
-    window.open(url, '_blank', 'noopener,noreferrer');
-};
-
-const toGithub = () => {
-    window.open('https://github.com/1Panel-dev/1Panel', '_blank', 'noopener,noreferrer');
 };
 
 const onLoadUpgradeInfo = async () => {
