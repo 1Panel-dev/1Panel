@@ -1308,9 +1308,8 @@ const message = {
             reject: 'Reddet',
             publish: 'Yayınla',
             disable: 'Yayından kaldır',
-            customTarget: 'Özel ajan',
-            addCustomTarget: 'Ajan ekle',
-            installToTarget: 'Özel ajana kur',
+            customTarget: 'Ajan Skill dizini',
+            installToTarget: 'Ajan Skill dizinine kur',
             hostSkillDir: 'Skill dizini',
             hostSkillDirHelper: 'Düğümdeki Skill dizini yolunu girin.',
             installMethod: 'Kurulum yöntemi',
@@ -1340,8 +1339,9 @@ const message = {
                 'Bu Skilli silmek istiyor musunuz? Bu işlem geri alınamaz. Ajanlara kurulu Skilller etkilenmez.',
             rejectConfirm: 'Bu Skill incelemesini reddetmek istiyor musunuz? Skill reddedildi durumuna geçer.',
             downloadPublishedOnly: 'Yalnızca yayınlanmış Skill paketleri indirilebilir.',
-            deleteTargetConfirm: 'Bu özel ajan silinsin mi? Kullanıcılar artık bu kurulum hedefini seçemez.',
-            noInstallTarget: 'Kullanılabilir özel ajan yok. Önce bir kurulum hedefi yapılandırın.',
+            deleteTargetConfirm:
+                'Bu ajan Skill dizini yapılandırması silinsin mi? Kullanıcılar artık bu kurulum dizinini seçemez.',
+            noInstallTarget: 'Kullanılabilir ajan Skill dizini yok. Önce bir tane ekleyin.',
             postInstallConfirm:
                 'Bu hedefte kurulum sonrası komut yapılandırılmış. Çalıştırmadan önce komutun güvenilir olduğunu doğrulayın.',
             status: {

@@ -1289,9 +1289,8 @@ const message = {
             reject: '却下',
             publish: '公開',
             disable: '非公開',
-            customTarget: 'カスタムエージェント',
-            addCustomTarget: 'エージェントを追加',
-            installToTarget: 'カスタムエージェントにインストール',
+            customTarget: 'エージェント Skill ディレクトリ',
+            installToTarget: 'エージェント Skill ディレクトリにインストール',
             hostSkillDir: 'Skill ディレクトリ',
             hostSkillDirHelper: 'ノードの Skill ディレクトリパスを入力してください。',
             installMethod: 'インストール方法',
@@ -1323,8 +1322,8 @@ const message = {
             rejectConfirm: 'この Skill のレビューを却下しますか？却下後、Skill は「却下」状態になります。',
             downloadPublishedOnly: '公開済みの Skill パッケージのみダウンロードできます。',
             deleteTargetConfirm:
-                'このカスタムエージェントを削除しますか？削除後、ユーザーはこのインストール先を選択できなくなります。',
-            noInstallTarget: '利用可能なカスタムエージェントがありません。先にインストール先を設定してください。',
+                'このエージェント Skill ディレクトリ設定を削除しますか？削除後、ユーザーはこのインストールディレクトリを選択できなくなります。',
+            noInstallTarget: '利用可能なエージェント Skill ディレクトリがありません。先に追加してください。',
             postInstallConfirm:
                 'この対象にはインストール後コマンドが設定されています。実行前に信頼できるコマンドか確認してください。',
             status: {
