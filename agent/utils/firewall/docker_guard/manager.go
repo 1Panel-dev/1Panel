@@ -215,7 +215,7 @@ func (m *Manager) Cleanup() error {
 		if err != nil {
 			return err
 		}
-		rules := dockerGuardLifecycleRules(output, false, chainDeclared(output, Chain))
+		rules := dockerGuardLifecycleRules(output, false, false)
 		if len(rules) == 0 {
 			continue
 		}
