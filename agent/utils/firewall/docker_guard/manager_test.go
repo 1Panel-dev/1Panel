@@ -189,6 +189,26 @@ func TestDockerGuardLifecycleRulesBatchCreateAndRebind(t *testing.T) {
 	}
 }
 
+func TestCleanupRemovesExistingChainWithoutRecreatingIt(t *testing.T) {
+	runner := &recordingRunner{}
+	manager := NewManagerWithRunner(runner)
+	if err := manager.Cleanup(); err != nil {
+		t.Fatal(err)
+	}
+	if len(runner.restoreCalls) != 1 {
+		t.Fatalf("restore calls = %d, want 1", len(runner.restoreCalls))
+	}
+	script := runner.restoreCalls[0].input
+	if strings.Contains(script, "-N "+Chain+"\n") {
+		t.Fatalf("cleanup must not recreate the existing chain:\n%s", script)
+	}
+	for _, want := range []string{"-F " + Chain + "\n", "-X " + Chain + "\n"} {
+		if !strings.Contains(script, want) {
+			t.Fatalf("cleanup restore is missing %q:\n%s", want, script)
+		}
+	}
+}
+
 func TestReconcileReturnsChainInspectionError(t *testing.T) {
 	manager := NewManagerWithRunner(&recordingRunner{runErr: errors.New("inspect failed")})
 	err := manager.Reconcile(nil)
