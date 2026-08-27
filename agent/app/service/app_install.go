@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"math"
 	"net/http"
 	"os"
@@ -255,7 +256,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	}
 	dockerComposePath := install.GetComposePath()
 	if req.UseLifecycleScripts && (req.Operate == constant.Start || req.Operate == constant.Stop || req.Operate == constant.Restart) {
-		return operateAppWithLifecycleScripts(install, req)
+		return operateAppWithLifecycleScripts(install, req, nil)
 	}
 	switch req.Operate {
 	case constant.Rebuild:
@@ -318,7 +319,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	}
 }
 
-func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppInstalledOperate) error {
+func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppInstalledOperate, onFailure func(error)) error {
 	taskType := task.TaskUpdate
 	switch req.Operate {
 	case constant.Start:
@@ -364,16 +365,20 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 			install.Message = ""
 			return appInstallRepo.Save(context.Background(), &install)
 		},
-		func(t *task.Task) {
-			install.Status = constant.StatusUpErr
-			install.Message = t.Task.ErrorMsg
-			_ = appInstallRepo.Save(context.Background(), &install)
-		},
+		nil,
 		0,
 		time.Hour,
 	)
 	go func() {
-		_ = operationTask.Execute()
+		if taskErr := operationTask.Execute(); taskErr != nil {
+			if onFailure != nil {
+				onFailure(taskErr)
+				return
+			}
+			install.Status = constant.StatusUpErr
+			install.Message = taskErr.Error()
+			_ = appInstallRepo.Save(context.Background(), &install)
+		}
 	}()
 	return nil
 }
@@ -476,7 +481,7 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	if err != nil {
 		return err
 	}
-	backupEnvMaps := oldEnvMaps
+	backupEnvMaps := maps.Clone(oldEnvMaps)
 	handleMap(req.Params, oldEnvMaps)
 	paramByte, err := json.Marshal(oldEnvMaps)
 	if err != nil {
@@ -488,19 +493,26 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	}
 	fileOp := files.NewFileOp()
 	_ = fileOp.WriteFile(installed.GetComposePath(), strings.NewReader(installed.DockerCompose), constant.DirPerm)
+	restoreConfig := func(operationErr error) {
+		_ = env.Write(backupEnvMaps, envPath)
+		_ = fileOp.WriteFile(installed.GetComposePath(), strings.NewReader(backupDockerCompose), constant.DirPerm)
+		failed := oldInstalled
+		failed.Status = constant.StatusUpErr
+		failed.Message = operationErr.Error()
+		_ = appInstallRepo.Save(context.Background(), &failed)
+	}
 	if req.UseLifecycleScripts {
 		err = operateAppWithLifecycleScripts(installed, request.AppInstalledOperate{
 			InstallId:           installed.ID,
 			Operate:             constant.Restart,
 			TaskID:              req.TaskID,
 			UseLifecycleScripts: true,
-		})
+		}, restoreConfig)
 	} else {
 		err = rebuildApp(installed)
 	}
 	if err != nil {
-		_ = env.Write(backupEnvMaps, envPath)
-		_ = fileOp.WriteFile(installed.GetComposePath(), strings.NewReader(backupDockerCompose), constant.DirPerm)
+		restoreConfig(err)
 		return err
 	}
 	if !req.UseLifecycleScripts {
