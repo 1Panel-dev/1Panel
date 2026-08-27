@@ -4032,9 +4032,9 @@ const message = {
         exportAllRules: '모든 규칙 내보내기',
         importBackendHelper: '가져온 규칙은 현재 {0} 백엔드에 맞게 변환됩니다. 원본 백엔드의 규칙은 변경되지 않습니다.',
         resetDirectRulesHelper:
-            '{0}에서 모든 1Panel 시스템 방화벽 체인, 규칙, 영구 파일 및 관련 데이터베이스 기록을 삭제합니다',
+            '{0}에서 1Panel 시스템 방화벽 체인, 실행 규칙 및 영구 파일을 삭제하고 데이터베이스 정책은 유지합니다',
         resetWhitelistRulesHelper:
-            '{0}의 모든 사용자 설정과 데이터베이스 기록을 삭제하고 설치 기본값으로 복원한 후 {0}을(를) 비활성화합니다.\n정리 후 방화벽 보호가 더 이상 제공되지 않습니다. 이 작업은 되돌릴 수 없습니다.',
+            '{0}의 활성 사용자 설정을 정리하고 설치 기본값으로 복원한 후 비활성화합니다. 데이터베이스 정책은 유지되며 나중에 다시 동기화할 수 있습니다.',
         cleanupForwardingBackendHelper:
             '{0}의 모든 1Panel 포트 전달 규칙과 체인을 삭제하고 데이터베이스 데이터만 유지합니다',
         cleanupDockerBackendHelper:
@@ -4043,7 +4043,7 @@ const message = {
             '현재 {0} 백엔드에 1Panel 런타임 규칙이 남아 있습니다. {1}(으)로 전환하기 전에 먼저 정리하세요.',
         cleanupAction: '정리',
         backendSwitchNotice:
-            '시스템 방화벽 전환은 규칙을 자동으로 이전하거나 정리하지 않습니다. 포트 전달과 Docker 보호는 현재 백엔드를 먼저 정리해야 하며, 저장된 규칙과 정책은 1Panel에 유지되어 전환 후 다시 초기화하거나 동기화할 수 있습니다.',
+            '시스템 방화벽, 포트 전달 또는 Docker 보호를 전환하기 전에 현재 백엔드를 정리하세요. 데이터베이스 정책은 유지되며 전환 후 다시 초기화하거나 동기화할 수 있습니다.',
         switchBackendHelper: '{0}(으)로 전환하시겠습니까?',
         ruleSyncTitle: '규칙 동기화',
         ruleSyncAction: '규칙 동기화',
@@ -4055,7 +4055,7 @@ const message = {
         ruleSyncDatabaseTotal: '데이터베이스 규칙',
         ruleSyncDatabaseConfirm:
             '데이터베이스 규칙 {0}개와 정확히 일치하도록 {1}을 동기화하시겠습니까? 대상 규칙 {2}개가 삭제되고 누락된 규칙이 추가됩니다.',
-        ruleSyncSource: '원본 백엔드',
+        ruleSyncSource: '구성 소스',
         ruleSyncTarget: '현재 백엔드',
         ruleSyncTotal: '변환된 규칙',
         ruleSyncReady: '동기화 가능',
@@ -4063,6 +4063,22 @@ const message = {
         ruleSyncRemove: '삭제 예정',
         ruleSyncBlocked: '동기화 불가',
         ruleSyncReason: '검사 결과',
+        ruleSyncReasonDetail: {
+            matchesDatabasePolicy: '규칙이 이미 데이터베이스 정책과 일치합니다.',
+            managedOrderDiffers: '관리 규칙 순서가 데이터베이스 순서와 다릅니다.',
+            managedOnlyInTarget: '관리 규칙이 대상 방화벽에만 존재합니다.',
+            managedRuntimeCannotRemove: '관리 중인 런타임 규칙을 안전하게 삭제할 수 없습니다.',
+            managedOrderBlocked: '외부, 인식할 수 없거나 보호된 규칙을 넘어 관리 규칙의 순서를 변경할 수 없습니다.',
+            mayBlockManagement: '이 규칙은 현재 관리 연결을 차단할 수 있습니다.',
+            missingFromTarget: '대상 방화벽에 이 규칙이 없습니다.',
+            targetDiffers: '대상 규칙이 데이터베이스 정책과 다릅니다.',
+            alreadyExistsInTarget: '대상 방화벽에 이 규칙이 이미 존재합니다.',
+            onlyInTarget: '이 규칙은 대상 방화벽에만 존재합니다.',
+            stale: '방화벽 규칙 상태가 오래되었습니다. 새로 고친 후 다시 시도하세요.',
+            lockoutRisk: '이 방화벽 변경으로 관리 접근이 차단될 수 있습니다.',
+            protectedRule: '보호된 방화벽 규칙은 수정할 수 없습니다.',
+            cannotReconcile: '대상 규칙을 동기화할 수 없습니다: {0}',
+        },
         ruleSyncConfirm: '{0}개 규칙을 {1}에서 {2}(으)로 동기화하시겠습니까? 원본 백엔드는 변경되지 않습니다.',
         ruleSyncResetSource: '동기화 성공 후 원본 방화벽 {0} 재설정 및 비활성화',
         ruleSyncResetSourceHelper: '모든 규칙이 성공적으로 동기화된 경우에만 원본 방화벽을 재설정합니다.',

@@ -29,12 +29,6 @@ type FirewallRuleRepo struct {
 	db *gorm.DB
 }
 
-func WithFirewallRuleScope(scopeKey string) DBOption {
-	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("scope_key = ?", scopeKey)
-	}
-}
-
 func WithFirewallRuleSource(kind, id string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("owner = ?", model.FirewallRuleOwner(kind, id))
@@ -120,8 +114,7 @@ func prepareFirewallRule(rule *model.FirewallRule) error {
 	if rule == nil {
 		return fmt.Errorf("%w: rule is nil", ErrFirewallPersistenceInvalid)
 	}
-	if rule.ScopeKey == "" || rule.Provider == "" || rule.Family == "" || rule.Location == "" ||
-		rule.NativeKind == "" || rule.Protocol == "" || rule.Action == "" || rule.RuleKey == "" {
+	if rule.Family == "" || rule.Protocol == "" || rule.Action == "" {
 		return fmt.Errorf("%w: atomic rule identity fields are required", ErrFirewallPersistenceInvalid)
 	}
 	if rule.UUID == "" {

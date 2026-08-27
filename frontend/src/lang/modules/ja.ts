@@ -4110,9 +4110,9 @@ const message = {
         importBackendHelper:
             'インポートしたルールは現在の {0} バックエンド向けに変換されます。移行元のルールは変更されません。',
         resetDirectRulesHelper:
-            '{0} から 1Panel システムファイアウォールのすべてのチェーン、ルール、永続化ファイル、対応するデータベース記録を削除します',
+            '{0} から 1Panel システムファイアウォールのチェーン、実行ルール、永続化ファイルを削除し、データベースポリシーは保持します',
         resetWhitelistRulesHelper:
-            '{0} のすべてのカスタム設定とデータベース記録を削除し、インストール時の既定値に戻して {0} を無効化します。\nクリーンアップ後、ファイアウォール保護は提供されなくなります。この操作は元に戻せません。',
+            '{0} の有効なカスタム設定を消去し、インストール時の既定値に戻して無効化します。データベースポリシーは保持され、後で再同期できます。',
         cleanupForwardingBackendHelper:
             '{0} から 1Panel のポート転送ルールとチェーンをすべて削除し、データベースデータのみを保持します',
         cleanupDockerBackendHelper:
@@ -4121,7 +4121,7 @@ const message = {
             '現在の {0} バックエンドには 1Panel の実行時ルールが残っています。{1} に切り替える前にクリーンアップしてください。',
         cleanupAction: 'クリーンアップ',
         backendSwitchNotice:
-            'システムファイアウォールの切り替えではルールを自動移行または削除しません。ポート転送と Docker 保護は現在のバックエンドを先にクリーンアップする必要があります。保存済みルールとポリシーは 1Panel に残り、切り替え後に再初期化または同期できます。',
+            'システムファイアウォール、ポート転送、Docker 保護を切り替える前に現在のバックエンドをクリーンアップしてください。データベースポリシーは保持され、切り替え後に再初期化または同期できます。',
         switchBackendHelper: '{0} に切り替えますか？',
         ruleSyncTitle: 'ルールを同期',
         ruleSyncAction: 'ルールを同期',
@@ -4133,7 +4133,7 @@ const message = {
         ruleSyncDatabaseTotal: 'データベースルール',
         ruleSyncDatabaseConfirm:
             'データベースの {0} 件のルールに完全一致するよう {1} を同期しますか？対象側の {2} 件のルールを削除し、不足ルールを追加します。',
-        ruleSyncSource: '元バックエンド',
+        ruleSyncSource: '設定ソース',
         ruleSyncTarget: '現在のバックエンド',
         ruleSyncTotal: '変換後のルール',
         ruleSyncReady: '同期可能',
@@ -4141,6 +4141,23 @@ const message = {
         ruleSyncRemove: '削除予定',
         ruleSyncBlocked: '同期不可',
         ruleSyncReason: '確認結果',
+        ruleSyncReasonDetail: {
+            matchesDatabasePolicy: 'ルールは既にデータベースポリシーと一致しています。',
+            managedOrderDiffers: '管理対象ルールの順序がデータベースの順序と異なります。',
+            managedOnlyInTarget: '管理対象ルールは対象ファイアウォールにのみ存在します。',
+            managedRuntimeCannotRemove: '管理対象の実行中ルールを安全に削除できません。',
+            managedOrderBlocked:
+                '外部、認識不能、または保護されたルールを越えて管理対象ルールを並べ替えることはできません。',
+            mayBlockManagement: 'このルールにより現在の管理接続が遮断される可能性があります。',
+            missingFromTarget: '対象ファイアウォールにこのルールがありません。',
+            targetDiffers: '対象ルールがデータベースポリシーと異なります。',
+            alreadyExistsInTarget: '対象ファイアウォールにこのルールは既に存在します。',
+            onlyInTarget: 'このルールは対象ファイアウォールにのみ存在します。',
+            stale: 'ファイアウォールルールの状態が古くなっています。更新して再試行してください。',
+            lockoutRisk: 'この変更により管理アクセスが遮断される可能性があります。',
+            protectedRule: '保護されたファイアウォールルールは変更できません。',
+            cannotReconcile: '対象ルールを同期できません：{0}',
+        },
         ruleSyncConfirm: '{0} 件のルールを {1} から {2} へ同期しますか？元バックエンドは変更されません。',
         ruleSyncResetSource: '同期成功後に移行元ファイアウォール {0} をリセットして無効化する',
         ruleSyncResetSourceHelper: 'すべてのルールが正常に同期された場合にのみ移行元をリセットします。',

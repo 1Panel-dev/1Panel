@@ -139,6 +139,17 @@ func TestDockerGuardRuntimeStatusAggregatesAvailableFamilies(t *testing.T) {
 	}
 }
 
+func TestDockerGuardRuntimeStatusReportsMissingBackend(t *testing.T) {
+	runtime := &persistentDockerGuardRuntime{statuses: map[string]docker_guard.FamilyStatus{
+		docker_guard.FamilyIPv4: {Reason: docker_guard.ReasonCommandMissing},
+		docker_guard.FamilyIPv6: {Reason: docker_guard.ReasonCommandMissing},
+	}}
+	base := (&DockerPortGuardService{}).runtimeStatus(runtime, constant.FirewallProviderIptables)
+	if base.IsExist {
+		t.Fatalf("missing Docker firewall backend reported as installed: %#v", base)
+	}
+}
+
 func TestMatchDockerGuardPoliciesReturnsUnmatchedDatabaseRules(t *testing.T) {
 	policies := []model.DockerPortGuardPolicy{
 		{UUID: "matched", Family: docker_guard.FamilyIPv4, HostIP: "0.0.0.0", HostPort: 8080, Protocol: "tcp", Mode: docker_guard.ModeAll, Sources: "[]"},
@@ -169,28 +180,28 @@ func TestDockerGuardRuleSyncInitializesTargetWithPersistedPolicies(t *testing.T)
 		runtimeForBackend: func(string) dockerGuardRuntime { return target },
 	}
 	request := dto.FirewallRuleSyncRequest{Subsystem: "docker", TargetProvider: filter.ProviderNftables}
-	preview, err := service.PreviewRuleSync(context.Background(), request)
+	preview, err := service.previewRuleSync(context.Background(), request)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if preview.Total != 1 || preview.Ready != 1 || preview.TargetProvider != filter.ProviderNftables || preview.Items[0].DockerRule == nil {
 		t.Fatalf("unexpected preview: %#v", preview)
 	}
-	result, err := service.SyncRules(context.Background(), request)
+	result, err := service.syncRules(context.Background(), request)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if result.Succeeded != 1 || result.Failed != 0 || target.initialize != 1 || len(target.policies) != 1 {
 		t.Fatalf("unexpected sync result=%#v target=%#v", result, target)
 	}
-	retry, err := service.PreviewRuleSync(context.Background(), request)
+	retry, err := service.previewRuleSync(context.Background(), request)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if retry.Ready != 0 || retry.Existing != 1 || retry.Removed != 0 {
 		t.Fatalf("synchronized Docker policy was not recognized: %#v", retry)
 	}
-	retryResult, err := service.SyncRules(context.Background(), request)
+	retryResult, err := service.syncRules(context.Background(), request)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -211,7 +222,7 @@ func TestDockerGuardRuleSyncReconcilesInitializedEffectiveTarget(t *testing.T) {
 		policies:          &persistentDockerGuardPolicies{items: []model.DockerPortGuardPolicy{policy}},
 		runtimeForBackend: func(string) dockerGuardRuntime { return target },
 	}
-	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+	result, err := service.syncRules(context.Background(), dto.FirewallRuleSyncRequest{
 		Subsystem: "docker", TargetProvider: filter.ProviderNftables,
 	})
 	if err != nil {
@@ -239,7 +250,7 @@ func TestDockerGuardRuleSyncRebindsInitializedIneffectiveTarget(t *testing.T) {
 		policies:          &persistentDockerGuardPolicies{items: []model.DockerPortGuardPolicy{policy}},
 		runtimeForBackend: func(string) dockerGuardRuntime { return target },
 	}
-	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+	result, err := service.syncRules(context.Background(), dto.FirewallRuleSyncRequest{
 		Subsystem: "docker", TargetProvider: filter.ProviderNftables,
 	})
 	if err != nil {
@@ -265,7 +276,7 @@ func TestDockerGuardRuleSyncClearsInitializedTargetWhenDatabaseIsEmpty(t *testin
 		policies:          &persistentDockerGuardPolicies{},
 		runtimeForBackend: func(string) dockerGuardRuntime { return target },
 	}
-	preview, err := service.PreviewRuleSync(context.Background(), dto.FirewallRuleSyncRequest{
+	preview, err := service.previewRuleSync(context.Background(), dto.FirewallRuleSyncRequest{
 		Subsystem: "docker", TargetProvider: filter.ProviderNftables,
 	})
 	if err != nil {
@@ -274,7 +285,7 @@ func TestDockerGuardRuleSyncClearsInitializedTargetWhenDatabaseIsEmpty(t *testin
 	if preview.Total != 0 || preview.Removed != 1 || len(preview.Items) != 1 || preview.Items[0].Status != "remove" {
 		t.Fatalf("stale runtime policy was not included in preview: %#v", preview)
 	}
-	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+	result, err := service.syncRules(context.Background(), dto.FirewallRuleSyncRequest{
 		Subsystem: "docker", TargetProvider: filter.ProviderNftables,
 	})
 	if err != nil {
@@ -293,7 +304,7 @@ func TestDockerGuardRuleSyncLeavesUninitializedTargetEmpty(t *testing.T) {
 		policies:          &persistentDockerGuardPolicies{},
 		runtimeForBackend: func(string) dockerGuardRuntime { return target },
 	}
-	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+	result, err := service.syncRules(context.Background(), dto.FirewallRuleSyncRequest{
 		Subsystem: "docker", TargetProvider: filter.ProviderNftables,
 	})
 	if err != nil {
@@ -313,10 +324,10 @@ func TestDockerGuardRuleSyncRejectsUnselectedTarget(t *testing.T) {
 		runtimeForBackend: func(string) dockerGuardRuntime { return target },
 	}
 	request := dto.FirewallRuleSyncRequest{Subsystem: "docker", TargetProvider: filter.ProviderNftables}
-	if _, err := service.PreviewRuleSync(context.Background(), request); !errors.Is(err, filter.ErrProviderUnavailable) {
+	if _, err := service.previewRuleSync(context.Background(), request); !errors.Is(err, filter.ErrProviderUnavailable) {
 		t.Fatalf("preview error = %v, want provider unavailable", err)
 	}
-	if _, err := service.SyncRules(context.Background(), request); !errors.Is(err, filter.ErrProviderUnavailable) {
+	if _, err := service.syncRules(context.Background(), request); !errors.Is(err, filter.ErrProviderUnavailable) {
 		t.Fatalf("sync error = %v, want provider unavailable", err)
 	}
 	if target.initialize != 0 || target.bind != 0 || target.reconcile != 0 {

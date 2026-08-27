@@ -1,7 +1,6 @@
 package lifecycle
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
@@ -41,7 +40,7 @@ func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareS
 		}
 		if prepareStart != nil {
 			if err := prepareStart(o.client); err != nil {
-				return errors.Join(err, o.client.Stop())
+				return err
 			}
 		}
 	case OperationStop:

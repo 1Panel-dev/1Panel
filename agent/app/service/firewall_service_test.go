@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	filterfirewalld "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/providers/firewalld"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/glebarez/sqlite"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -21,7 +22,36 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func TestFirewallResetCleansDirectBackendAndStoredRules(t *testing.T) {
+func TestFirewallBaseInfoDistinguishesMissingAndConflictingProviders(t *testing.T) {
+	wantErr := errors.New("firewalld and ufw conflict")
+	for _, test := range []struct {
+		name      string
+		installed []string
+		exists    bool
+		message   string
+	}{
+		{name: "missing", installed: nil},
+		{name: "conflict", installed: []string{constant.FirewallProviderFirewalld, constant.FirewallProviderUFW}, exists: true, message: wantErr.Error()},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			service := &FirewallService{
+				baseClient: func() (lifecycle.Client, error) { return nil, wantErr },
+				installedProviders: func() []string {
+					return append([]string(nil), test.installed...)
+				},
+			}
+			base, err := service.LoadBaseInfo("base")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if base.IsExist != test.exists || base.Message != test.message {
+				t.Fatalf("unexpected firewall failure status: %#v", base)
+			}
+		})
+	}
+}
+
+func TestFirewallResetCleansDirectBackendAndKeepsStoredRules(t *testing.T) {
 	db := newFirewallRuleTestDB(t)
 	ruleRepo := repo.NewFirewallRuleRepo(db)
 	stored, err := model.FirewallRuleFromDomain(executorTestAddressRule("172.16.10.111"))
@@ -56,8 +86,8 @@ func TestFirewallResetCleansDirectBackendAndStoredRules(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(remaining) != 0 {
-		t.Fatalf("reset retained direct-backend metadata: %#v", remaining)
+	if len(remaining) != 1 || remaining[0].UUID != stored.UUID {
+		t.Fatalf("reset removed provider-neutral database policy: %#v", remaining)
 	}
 }
 
@@ -87,7 +117,7 @@ func TestFirewallResetCleansInactiveDirectBackendWithoutChangingSelectedBackendS
 	}
 }
 
-func TestFirewallResetRestoresUFWDefaultsAndDeletesStoredRules(t *testing.T) {
+func TestFirewallResetRestoresUFWDefaultsAndKeepsStoredRules(t *testing.T) {
 	scope := filter.Scope{
 		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,
 		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
@@ -128,8 +158,8 @@ func TestFirewallResetRestoresUFWDefaultsAndDeletesStoredRules(t *testing.T) {
 		t.Fatalf("unexpected reset result: provider=%q result=%#v", resetProvider, result)
 	}
 	remaining, err := ruleRepo.List(context.Background())
-	if err != nil || len(remaining) != 0 {
-		t.Fatalf("reset retained UFW metadata: %#v err=%v", remaining, err)
+	if err != nil || len(remaining) != 1 || remaining[0].UUID != stored.UUID {
+		t.Fatalf("reset removed provider-neutral UFW policy: %#v err=%v", remaining, err)
 	}
 }
 
@@ -305,7 +335,7 @@ func TestFirewallRuleServiceCreateRequiresCheck(t *testing.T) {
 	}
 }
 
-func TestFirewallRuleServiceAlwaysAppendsUFWCreateWithinFamily(t *testing.T) {
+func TestFirewallRuleServiceHonorsExplicitUFWCreatePosition(t *testing.T) {
 	scope := filter.Scope{
 		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,
 		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
@@ -317,7 +347,7 @@ func TestFirewallRuleServiceAlwaysAppendsUFWCreateWithinFamily(t *testing.T) {
 	existing := executorObservedRule(existingRule, "", 4)
 	adapter := newFakeFilterAdapter(t, scope, []filter.ObservedRule{existing})
 	service, _ := newTestFirewallExecutor(t, adapter)
-	order := int64(9)
+	order := int64(2)
 	rule := filter.FirewallRule{
 		Scope: scope, NativeKind: filter.NativeKindUFWRule,
 		Protocol: "tcp", DestinationPort: "8080", Action: filter.ActionAccept, OrderIndex: &order,
@@ -326,11 +356,38 @@ func TestFirewallRuleServiceAlwaysAppendsUFWCreateWithinFamily(t *testing.T) {
 	if err := createExecutorRule(service, adapter, dto.FirewallRuleCreateItem{
 		Rule: rule, Action: filter.CheckActionCreate, SourceKind: constant.FirewallRuleSourceUser,
 	}); err != nil {
-		t.Fatalf("create UFW rule at next position: %v", err)
+		t.Fatalf("create UFW rule at explicit position: %v", err)
+	}
+	if adapter.lastChange.Append || adapter.lastChange.After == nil || adapter.lastChange.After.OrderIndex == nil ||
+		*adapter.lastChange.After.OrderIndex != order {
+		t.Fatalf("UFW explicit create position was not preserved: %#v", adapter.lastChange)
+	}
+}
+
+func TestFirewallRuleServiceDefaultsMissingUFWCreatePositionToAppend(t *testing.T) {
+	scope := filter.Scope{
+		Provider: filter.ProviderUFW, Family: filter.FamilyIPv4,
+		Chain: filter.UFWInputChain, Direction: filter.DirectionInput,
+	}
+	existingRule := filter.FirewallRule{
+		Scope: scope, NativeKind: filter.NativeKindUFWRule,
+		Protocol: "tcp", DestinationPort: "80", Action: filter.ActionAccept,
+	}
+	adapter := newFakeFilterAdapter(t, scope, []filter.ObservedRule{executorObservedRule(existingRule, "", 4)})
+	service, _ := newTestFirewallExecutor(t, adapter)
+	rule := filter.FirewallRule{
+		Scope: scope, NativeKind: filter.NativeKindUFWRule,
+		Protocol: "tcp", DestinationPort: "8080", Action: filter.ActionAccept,
+	}
+
+	if err := createExecutorRule(service, adapter, dto.FirewallRuleCreateItem{
+		Rule: rule, Action: filter.CheckActionCreate, SourceKind: constant.FirewallRuleSourceUser,
+	}); err != nil {
+		t.Fatalf("append UFW rule: %v", err)
 	}
 	if !adapter.lastChange.Append || adapter.lastChange.After == nil || adapter.lastChange.After.OrderIndex == nil ||
 		*adapter.lastChange.After.OrderIndex != 5 {
-		t.Fatalf("UFW client position was not replaced with the IPv4 append position: %#v", adapter.lastChange)
+		t.Fatalf("missing UFW position did not default to append: %#v", adapter.lastChange)
 	}
 }
 
@@ -683,7 +740,7 @@ func TestFirewallRuleServiceBatchCreateRejectsDuplicateManagedRule(t *testing.T)
 	}
 }
 
-func TestFirewallRuleServiceIptablesBatchRollsBackOnMetadataFailure(t *testing.T) {
+func TestFirewallRuleServiceIptablesBatchDoesNotPersistRuntimeMetadata(t *testing.T) {
 	rules := []filter.FirewallRule{executorTestRule("8080"), executorTestRule("8081")}
 	adapter := newFakeFilterAdapter(t, rules[0].Scope, nil)
 	db := newFirewallRuleTestDB(t)
@@ -709,13 +766,13 @@ func TestFirewallRuleServiceIptablesBatchRollsBackOnMetadataFailure(t *testing.T
 		})
 	}
 	created, err := service.Create(ctx, request)
-	if err != nil || created.Succeeded != 0 || created.Failed != 1 || created.Skipped != 1 {
-		t.Fatalf("batch failure result: %#v err=%v", created, err)
+	if err != nil || created.Succeeded != 2 || created.Failed != 0 || created.Skipped != 0 {
+		t.Fatalf("batch result: %#v err=%v", created, err)
 	}
 	stored, listErr := ruleRepo.List(ctx)
-	if listErr != nil || len(stored) != 0 || len(adapter.snapshot.Rules) != 0 || adapter.applyCount != 1 || adapter.rollbackCount != 1 {
+	if listErr != nil || len(stored) != 2 || len(adapter.snapshot.Rules) != 2 || adapter.applyCount != 1 || adapter.rollbackCount != 0 {
 		t.Fatalf(
-			"failed batch was not rolled back: stored=%#v snapshot=%#v applies=%d rollbacks=%d err=%v",
+			"batch persisted runtime metadata: stored=%#v snapshot=%#v applies=%d rollbacks=%d err=%v",
 			stored, adapter.snapshot, adapter.applyCount, adapter.rollbackCount, listErr,
 		)
 	}
@@ -945,6 +1002,64 @@ func TestSyncSystemPortsBatchesNativeAcceptedPortsByScope(t *testing.T) {
 	}
 }
 
+func TestSyncSystemPortsCreatesAcceptedPortDespitePartialOppositeOverlap(t *testing.T) {
+	scope := filter.Scope{
+		Provider: filter.ProviderFirewalld, Family: filter.FamilyInet,
+		Zone: filter.FirewalldInputZone, Direction: filter.DirectionInput,
+	}
+	existing := filter.FirewallRule{
+		Scope: filter.Scope{
+			Provider: filter.ProviderFirewalld, Family: filter.FamilyIPv4,
+			Zone: filter.FirewalldInputZone, Direction: filter.DirectionInput,
+		},
+		NativeKind: filter.NativeKindRichRule, Protocol: "all",
+		SourceAddress: "1.1.1.1", Action: filter.ActionDrop,
+	}
+	adapter := newFakeFilterAdapter(t, scope, []filter.ObservedRule{executorObservedRule(existing, "", 1)})
+	engine := &FirewallService{
+		rules: repo.NewFirewallRuleRepo(newFirewallRuleTestDB(t)),
+		adapters: firewallRuleRuntimeRegistry{
+			filter.ProviderFirewalld: newFirewallRuleRuntime(adapter, nil),
+		},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderFirewalld, nil },
+	}
+
+	err := engine.SyncSystemPorts(context.Background(), nil, []dto.FirewallSystemPort{{Port: "443", Protocol: "tcp"}})
+	if err != nil {
+		t.Fatalf("create partially overlapping accepted port: %v", err)
+	}
+	if adapter.applyCount != 1 || len(adapter.snapshot.Rules) != 2 {
+		t.Fatalf("accepted port was not created: applyCount=%d rules=%#v", adapter.applyCount, adapter.snapshot.Rules)
+	}
+}
+
+func TestSyncSystemPortsRejectsFullyCoveredOppositeRule(t *testing.T) {
+	scope := filter.Scope{
+		Provider: filter.ProviderFirewalld, Family: filter.FamilyInet,
+		Zone: filter.FirewalldInputZone, Direction: filter.DirectionInput,
+	}
+	existing := filter.FirewallRule{
+		Scope: scope, NativeKind: filter.NativeKindRichRule, Protocol: "tcp",
+		DestinationPort: "443", Action: filter.ActionDrop,
+	}
+	adapter := newFakeFilterAdapter(t, scope, []filter.ObservedRule{executorObservedRule(existing, "", 1)})
+	engine := &FirewallService{
+		rules: repo.NewFirewallRuleRepo(newFirewallRuleTestDB(t)),
+		adapters: firewallRuleRuntimeRegistry{
+			filter.ProviderFirewalld: newFirewallRuleRuntime(adapter, nil),
+		},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderFirewalld, nil },
+	}
+
+	err := engine.SyncSystemPorts(context.Background(), nil, []dto.FirewallSystemPort{{Port: "443", Protocol: "tcp"}})
+	if err == nil || !strings.Contains(err.Error(), "overlapping_rule_with_different_action") {
+		t.Fatalf("fully covered opposite rule returned %v", err)
+	}
+	if adapter.applyCount != 0 {
+		t.Fatalf("fully conflicting accepted port was applied %d times", adapter.applyCount)
+	}
+}
+
 func TestSyncSystemPortsDoesNotTakeOverExistingManagedRule(t *testing.T) {
 	scope := filter.Scope{
 		Provider: filter.ProviderIptables, Family: filter.FamilyIPv4, Table: "filter",
@@ -955,21 +1070,11 @@ func TestSyncSystemPortsDoesNotTakeOverExistingManagedRule(t *testing.T) {
 	observed := executorObservedRule(rule, "1panel-rule:user-rule", 1)
 	adapter := newFakeFilterAdapter(t, scope, []filter.ObservedRule{observed})
 	ruleRepo := repo.NewFirewallRuleRepo(newFirewallRuleTestDB(t))
-	ruleKey, err := filter.RuleKey(rule)
-	if err != nil {
-		t.Fatal(err)
-	}
 	userRecord, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreateItem{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
 	if err != nil {
 		t.Fatal(err)
 	}
 	userRecord.UUID = "user-rule"
-	userRecord.RuleKey = ruleKey
-	instanceKey, err := filter.InstanceKey(observed)
-	if err != nil {
-		t.Fatal(err)
-	}
-	userRecord.MatchKey = firewallRuleMatchKey(observed.Marker, instanceKey)
 	if err := ruleRepo.Create(context.Background(), &userRecord); err != nil {
 		t.Fatal(err)
 	}
@@ -1033,8 +1138,7 @@ func TestFirewallExecutorCreatesAndVerifiesRule(t *testing.T) {
 		t.Fatalf("unexpected apply count: %d", adapter.applyCount)
 	}
 	rules, _ := ruleRepo.List(context.Background())
-	if len(rules) != 1 || rules[0].MatchKey != firewallRuleMarkerMatchPrefix+adapter.snapshot.Rules[0].Marker ||
-		rules[0].OrderIndex != nil {
+	if len(rules) != 1 || rules[0].DestinationPort != "8080" {
 		t.Fatalf("rule was not verified and bound: %#v", rules)
 	}
 }
@@ -1081,7 +1185,7 @@ func TestFirewallExecutorCleansUpVerificationFailure(t *testing.T) {
 	}
 }
 
-func TestFirewallExecutorRollsBackCreateWhenPersistenceCommitFails(t *testing.T) {
+func TestFirewallExecutorCreateDoesNotPersistRuntimeMetadata(t *testing.T) {
 	rule := executorTestRule("9091")
 	adapter := newFakeFilterAdapter(t, rule.Scope, nil)
 	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
@@ -1093,12 +1197,12 @@ func TestFirewallExecutorRollsBackCreateWhenPersistenceCommitFails(t *testing.T)
 	err := createExecutorRule(executor, adapter, dto.FirewallRuleCreateItem{
 		Rule: rule, SourceKind: constant.FirewallRuleSourceUser,
 	})
-	if err == nil || !strings.Contains(err.Error(), "commit failed") {
-		t.Fatalf("expected persistence commit failure, got %v", err)
+	if err != nil {
+		t.Fatalf("runtime metadata update affected create: %v", err)
 	}
 	stored, _ := ruleRepo.List(context.Background())
-	if len(stored) != 0 || len(adapter.snapshot.Rules) != 0 || adapter.rollbackCount != 1 {
-		t.Fatalf("failed create was not fully compensated: stored=%#v snapshot=%#v rollbacks=%d", stored, adapter.snapshot, adapter.rollbackCount)
+	if len(stored) != 1 || len(adapter.snapshot.Rules) != 1 || adapter.rollbackCount != 0 {
+		t.Fatalf("create persisted runtime metadata: stored=%#v snapshot=%#v rollbacks=%d", stored, adapter.snapshot, adapter.rollbackCount)
 	}
 }
 
@@ -1416,7 +1520,6 @@ func TestFirewallExecutorUpdatesManagedRuleAndPositionTogether(t *testing.T) {
 			t.Fatalf("build managed rule: %v", err)
 		}
 		record.UUID = rule.UUID
-		record.MatchKey = firewallRuleMatchKey("1panel-rule:"+rule.UUID, "")
 		if err := ruleRepo.Create(context.Background(), &record); err != nil {
 			t.Fatalf("create managed record: %v", err)
 		}
@@ -1432,7 +1535,7 @@ func TestFirewallExecutorUpdatesManagedRuleAndPositionTogether(t *testing.T) {
 		t.Fatalf("rule content and position were not updated together: %#v", adapter.snapshot.Rules)
 	}
 	stored, err := ruleRepo.GetByUUID(context.Background(), first.UUID)
-	if err != nil || stored.OrderIndex != nil {
+	if err != nil || stored.DestinationPort != "8443" {
 		t.Fatalf("request-only position was persisted: stored=%#v err=%v", stored, err)
 	}
 }
@@ -1455,27 +1558,65 @@ func TestFirewallExecutorReordersManagedRule(t *testing.T) {
 			t.Fatalf("build managed rule: %v", err)
 		}
 		record.UUID = rule.UUID
-		marker := "1panel-rule:" + rule.UUID
-		record.MatchKey = firewallRuleMatchKey(marker, "")
 		if err := ruleRepo.Create(context.Background(), &record); err != nil {
 			t.Fatalf("create managed record: %v", err)
 		}
 	}
 	target := int64(2)
 	err := executor.reorderRule(context.Background(), "", "first", &target, nil)
-	if err != nil {
+	if err != nil || adapter.applyCount != 1 || adapter.snapshot.Rules[1].Marker != "1panel-rule:first" {
+		t.Fatalf("managed reorder failed: applyCount=%d snapshot=%#v err=%v", adapter.applyCount, adapter.snapshot.Rules, err)
+	}
+	firstRecord, err := ruleRepo.GetByUUID(context.Background(), "first")
+	if err != nil || firstRecord.Sequence == nil || *firstRecord.Sequence != 2*model.FirewallRuleSequenceStep {
+		t.Fatalf("reordered rule sequence was not persisted: record=%#v err=%v", firstRecord, err)
+	}
+	secondRecord, err := ruleRepo.GetByUUID(context.Background(), "second")
+	if err != nil || secondRecord.Sequence == nil || *secondRecord.Sequence != model.FirewallRuleSequenceStep {
+		t.Fatalf("neighbor sequence was not rebalanced: record=%#v err=%v", secondRecord, err)
+	}
+}
+
+func TestFirewallExecutorReorderUsesSparseSequenceMidpoint(t *testing.T) {
+	first := executorTestRule("8080")
+	first.UUID = "first"
+	second := executorTestRule("8081")
+	second.UUID = "second"
+	third := executorTestRule("8082")
+	third.UUID = "third"
+	adapter := newFakeFilterAdapter(t, first.Scope, []filter.ObservedRule{
+		executorObservedRule(first, "1panel-rule:first", 1),
+		executorObservedRule(second, "1panel-rule:second", 2),
+		executorObservedRule(third, "1panel-rule:third", 3),
+	})
+	executor, ruleRepo := newTestFirewallExecutor(t, adapter)
+	for index, rule := range []filter.FirewallRule{first, second, third} {
+		record, err := firewallRuleModelForCreate(rule, dto.FirewallRuleCreateItem{SourceKind: constant.FirewallRuleSourceUser}, constant.FirewallRuleOriginCreated)
+		if err != nil {
+			t.Fatalf("build managed rule: %v", err)
+		}
+		record.UUID = rule.UUID
+		sequence := int64(index+1) * model.FirewallRuleSequenceStep
+		record.Sequence = &sequence
+		if err := ruleRepo.Create(context.Background(), &record); err != nil {
+			t.Fatalf("create managed record: %v", err)
+		}
+	}
+
+	target := int64(2)
+	if err := executor.reorderRule(context.Background(), "", third.UUID, &target, nil); err != nil {
 		t.Fatalf("reorder managed rule: %v", err)
 	}
-	if adapter.snapshot.Rules[1].Marker != "1panel-rule:first" {
-		t.Fatalf("rule was not reordered: snapshot=%#v", adapter.snapshot)
+	want := map[string]int64{
+		first.UUID:  model.FirewallRuleSequenceStep,
+		third.UUID:  model.FirewallRuleSequenceStep + model.FirewallRuleSequenceStep/2,
+		second.UUID: 2 * model.FirewallRuleSequenceStep,
 	}
-	applyCount := adapter.applyCount
-	outOfRange := int64(3)
-	if err := executor.reorderRule(context.Background(), "", first.UUID, &outOfRange, nil); !errors.Is(err, filter.ErrInvalidRule) {
-		t.Fatalf("expected out-of-range reorder rejection, got %v", err)
-	}
-	if adapter.applyCount != applyCount {
-		t.Fatalf("out-of-range reorder reached adapter: applyCount=%d", adapter.applyCount)
+	for uuid, wantSequence := range want {
+		record, err := ruleRepo.GetByUUID(context.Background(), uuid)
+		if err != nil || record.Sequence == nil || *record.Sequence != wantSequence {
+			t.Fatalf("sequence for %s = %#v, want %d (err=%v)", uuid, record.Sequence, wantSequence, err)
+		}
 	}
 }
 
@@ -1498,7 +1639,6 @@ func TestFirewallExecutorUsesExplicitPositionDuringUpdate(t *testing.T) {
 			t.Fatalf("build managed rule: %v", err)
 		}
 		record.UUID = rule.UUID
-		record.MatchKey = firewallRuleMatchKey("1panel-rule:"+rule.UUID, "")
 		if err := ruleRepo.Create(context.Background(), &record); err != nil {
 			t.Fatalf("create managed record: %v", err)
 		}
@@ -1528,8 +1668,6 @@ func TestFirewallExecutorRejectsPriorityReorderWithoutExplicitPriority(t *testin
 		t.Fatalf("build zone port record: %v", err)
 	}
 	record.UUID = rule.UUID
-	marker := "1panel-rule:" + rule.UUID
-	record.MatchKey = firewallRuleMatchKey(marker, "")
 	if err := ruleRepo.Create(context.Background(), &record); err != nil {
 		t.Fatalf("create zone port record: %v", err)
 	}
@@ -1550,21 +1688,15 @@ func TestMergeFirewallInventoryMapsPersistenceOwnershipAndUsage(t *testing.T) {
 		Action:           filter.ActionAccept,
 		Description:      "ssh",
 	}
-	ruleKey, err := filter.RuleKey(domainRule)
-	if err != nil {
-		t.Fatalf("rule key: %v", err)
-	}
 	position := 1
-	marker := "onepanel:created:ssh"
+	marker := "1panel-rule:managed"
 	stored, err := model.FirewallRuleFromDomain(domainRule)
 	if err != nil {
 		t.Fatalf("build stored rule: %v", err)
 	}
 	stored.UUID = "managed"
-	stored.RuleKey = ruleKey
 	stored.Origin = constant.FirewallRuleOriginCreated
 	stored.Owner = constant.FirewallRuleSourceUser
-	stored.MatchKey = firewallRuleMatchKey(marker, "")
 	observed := filter.ObservedRule{
 		Rule:    domainRule,
 		Locator: filter.Locator{Provider: filter.ProviderIptables, ScopeKey: domainRule.Scope.Key(), Position: &position},
@@ -1581,28 +1713,6 @@ func TestMergeFirewallInventoryMapsPersistenceOwnershipAndUsage(t *testing.T) {
 	}
 	if items[0].Desired.Rule.ConnectionStates[0] != "established" {
 		t.Fatalf("persistence metadata was not normalized: %#v", items[0].Desired.Rule)
-	}
-}
-
-func TestFirewallRuleMatchKeyRoundTrip(t *testing.T) {
-	tests := []struct {
-		marker      string
-		instanceKey string
-	}{
-		{marker: "1panel-rule:ssh", instanceKey: "instance-fallback"},
-		{instanceKey: "firewalld-instance"},
-	}
-	for _, test := range tests {
-		marker, instanceKey := firewallRuleMatchValues(firewallRuleMatchKey(test.marker, test.instanceKey))
-		if marker != test.marker {
-			t.Fatalf("unexpected marker: want=%q got=%q", test.marker, marker)
-		}
-		if test.marker == "" && instanceKey != test.instanceKey {
-			t.Fatalf("unexpected instance key: want=%q got=%q", test.instanceKey, instanceKey)
-		}
-		if test.marker != "" && instanceKey != "" {
-			t.Fatalf("marker match retained fallback instance key: %q", instanceKey)
-		}
 	}
 }
 

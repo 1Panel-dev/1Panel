@@ -283,18 +283,7 @@ func (b *BaseApi) PreviewFirewallRuleSync(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	var (
-		result dto.FirewallRuleSyncPreview
-		err    error
-	)
-	switch firewallRuleSyncSubsystem(request.Subsystem) {
-	case "forwarding":
-		result, err = forwardingService.PreviewRuleSync(c.Request.Context(), request)
-	case "docker":
-		result, err = dockerPortGuardService.PreviewRuleSync(c.Request.Context(), request)
-	default:
-		result, err = firewallService.PreviewRuleSync(c.Request.Context(), c.ClientIP(), request)
-	}
+	result, err := firewallService.PreviewRuleSync(c.Request.Context(), c.ClientIP(), request)
 	if err != nil {
 		handleFirewallRuleError(c, err)
 		return
@@ -332,31 +321,12 @@ func (b *BaseApi) SyncFirewallRules(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	var (
-		result dto.FirewallRuleSyncResult
-		err    error
-	)
-	switch firewallRuleSyncSubsystem(request.Subsystem) {
-	case "forwarding":
-		result, err = forwardingService.SyncRules(c.Request.Context(), request)
-	case "docker":
-		result, err = dockerPortGuardService.SyncRules(c.Request.Context(), request)
-	default:
-		result, err = firewallService.SyncRules(c.Request.Context(), c.ClientIP(), request)
-	}
+	result, err := firewallService.SyncRules(c.Request.Context(), c.ClientIP(), request)
 	if err != nil {
 		handleFirewallRuleError(c, err)
 		return
 	}
 	helper.SuccessWithData(c, result)
-}
-
-func firewallRuleSyncSubsystem(value string) string {
-	value = strings.TrimSpace(value)
-	if value == "" {
-		return "system"
-	}
-	return value
 }
 
 // @Tags Firewall

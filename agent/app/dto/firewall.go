@@ -12,6 +12,7 @@ type FirewallSubsystemStatus struct {
 	IsBind          bool                        `json:"isBind"`
 	Version         string                      `json:"version"`
 	PingStatus      string                      `json:"pingStatus"`
+	Message         string                      `json:"message,omitempty"`
 	SyncError       string                      `json:"syncError,omitempty"`
 	IPv4            FirewallBackendFamilyStatus `json:"ipv4"`
 	IPv6            FirewallBackendFamilyStatus `json:"ipv6"`
@@ -113,6 +114,7 @@ type FirewallNativeDetail struct {
 type DockerPortGuardBase struct {
 	Name        string                      `json:"name"`
 	Version     string                      `json:"version"`
+	IsExist     bool                        `json:"isExist"`
 	Initialized bool                        `json:"initialized"`
 	Bound       bool                        `json:"bound"`
 	IPv4        DockerPortGuardFamilyStatus `json:"ipv4"`

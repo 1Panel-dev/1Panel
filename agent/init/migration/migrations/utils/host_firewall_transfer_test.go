@@ -42,13 +42,13 @@ func TestTransferHostFirewallImportsIptablesRecords(t *testing.T) {
 		switch rule.Description {
 		case "web":
 			protocols = append(protocols, rule.Protocol)
-			if rule.Location != filter.IptablesInputChain || rule.Family != string(filter.FamilyIPv4) || rule.DestinationPort != "80" {
+			if rule.Family != string(filter.FamilyIPv4) || rule.DestinationPort != "80" {
 				t.Fatalf("unexpected port rule: %#v", rule)
 			}
 		case "blocked host":
 			foundAddress = rule.SourceAddress == "10.0.0.8/32" && rule.Action == string(filter.ActionDrop)
 		case "ssh first":
-			foundAdvanced = rule.Location == "1PANEL_BASIC_BEFORE" && rule.DestinationPort == "22"
+			foundAdvanced = rule.DestinationPort == "22"
 		case "unsupported chain":
 			t.Fatal("unsupported legacy chain was imported")
 		}
@@ -91,19 +91,13 @@ func TestTransferHostFirewallMapsFirewalldRepresentations(t *testing.T) {
 	}
 	zonePorts, denyFamilies := 0, make(map[string]bool)
 	for _, rule := range rules {
-		if rule.Location != filter.FirewalldInputZone {
-			t.Fatalf("unexpected firewalld location %q", rule.Location)
-		}
 		switch rule.Description {
 		case "zone ports":
 			zonePorts++
-			if rule.NativeKind != string(filter.NativeKindZonePort) || rule.Family != string(filter.FamilyInet) {
+			if rule.Family != string(filter.FamilyInet) {
 				t.Fatalf("unexpected zone port: %#v", rule)
 			}
 		case "dual family deny":
-			if rule.NativeKind != string(filter.NativeKindRichRule) {
-				t.Fatalf("unexpected deny native kind: %#v", rule)
-			}
 			denyFamilies[rule.Family] = true
 		case "v6 source":
 			if rule.Family != string(filter.FamilyIPv6) || rule.SourceAddress != "2001:db8::8/128" {
@@ -136,9 +130,6 @@ func TestTransferHostFirewallExpandsUFWFamilies(t *testing.T) {
 	portFamilies := make(map[string]bool)
 	foundFromTo := false
 	for _, rule := range rules {
-		if rule.NativeKind != string(filter.NativeKindUFWRule) || rule.Location != filter.UFWInputChain {
-			t.Fatalf("unexpected ufw representation: %#v", rule)
-		}
 		if rule.Description == "dual family port" {
 			portFamilies[rule.Family] = true
 		}
@@ -334,7 +325,7 @@ func newHostFirewallTransferTestDB(t *testing.T, withLegacyTable bool) *gorm.DB 
 func loadTransferredHostFirewallRules(t *testing.T, db *gorm.DB) []model.FirewallRule {
 	t.Helper()
 	var rules []model.FirewallRule
-	if err := db.Order("scope_key ASC, rule_key ASC").Find(&rules).Error; err != nil {
+	if err := db.Order("family ASC, protocol ASC, destination_port ASC, uuid ASC").Find(&rules).Error; err != nil {
 		t.Fatal(err)
 	}
 	return rules
@@ -343,8 +334,9 @@ func loadTransferredHostFirewallRules(t *testing.T, db *gorm.DB) []model.Firewal
 func assertTransferredRuleDefaults(t *testing.T, rules []model.FirewallRule) {
 	t.Helper()
 	for _, rule := range rules {
-		if rule.UUID == "" || rule.RuleKey == "" || rule.ScopeKey == "" || rule.Revision != 1 ||
-			rule.Origin != constant.FirewallRuleOriginAdopted || rule.Owner != constant.FirewallRuleSourceUser || rule.MatchKey != "" {
+		if rule.UUID == "" || rule.Revision != 1 || rule.CompatibilityError != "" ||
+			rule.Priority != nil || rule.Sequence != nil ||
+			rule.Origin != constant.FirewallRuleOriginAdopted || rule.Owner != constant.FirewallRuleSourceUser {
 			t.Fatalf("unexpected transferred defaults: %#v", rule)
 		}
 	}

@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	forwardClient "github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
@@ -94,10 +96,25 @@ func TestForwardingAndFilterInterfacesAreSeparated(t *testing.T) {
 	if _, ok := firewallServiceType.MethodByName("OperateForwardRule"); ok {
 		t.Fatal("firewall service still owns forwarding writes")
 	}
+	for _, method := range []string{"PreviewRuleSync", "SyncRules"} {
+		if _, ok := firewallServiceType.MethodByName(method); !ok {
+			t.Fatalf("firewall service missing centralized %s", method)
+		}
+	}
 	forwardingServiceType := reflect.TypeOf((*IForwardingService)(nil)).Elem()
 	for _, method := range []string{"LoadBaseInfo", "SearchRules", "OperateRules", "Enable", "Restore"} {
 		if _, ok := forwardingServiceType.MethodByName(method); !ok {
 			t.Fatalf("forwarding service missing %s", method)
+		}
+	}
+	for _, serviceType := range []reflect.Type{
+		forwardingServiceType,
+		reflect.TypeOf((*IDockerPortGuardService)(nil)).Elem(),
+	} {
+		for _, method := range []string{"PreviewRuleSync", "SyncRules"} {
+			if _, ok := serviceType.MethodByName(method); ok {
+				t.Fatalf("subsystem service still exposes centralized %s", method)
+			}
 		}
 	}
 }
@@ -189,14 +206,14 @@ func TestForwardingRuleSyncReplaysPersistedRulesIntoTarget(t *testing.T) {
 		markEnabled:    func() error { return nil },
 	}
 	request := dto.FirewallRuleSyncRequest{Subsystem: "forwarding", TargetProvider: "nftables"}
-	preview, err := service.PreviewRuleSync(context.Background(), request)
+	preview, err := service.previewRuleSync(context.Background(), request)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if preview.Total != 1 || preview.Ready != 1 || preview.TargetProvider != "nftables" || preview.Items[0].ForwardRule == nil {
 		t.Fatalf("unexpected preview: %#v", preview)
 	}
-	result, err := service.SyncRules(context.Background(), request)
+	result, err := service.syncRules(context.Background(), request)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -204,7 +221,7 @@ func TestForwardingRuleSyncReplaysPersistedRulesIntoTarget(t *testing.T) {
 		t.Fatalf("unexpected sync result=%#v target=%#v", result, target.reconciled)
 	}
 	target.init = true
-	retry, err := service.PreviewRuleSync(context.Background(), request)
+	retry, err := service.previewRuleSync(context.Background(), request)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -227,7 +244,7 @@ func TestForwardingRuleSyncReportsActivationFailure(t *testing.T) {
 		persistBackend: func(string) error { return nil },
 		markEnabled:    func() error { return nil },
 	}
-	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+	result, err := service.syncRules(context.Background(), dto.FirewallRuleSyncRequest{
 		Subsystem: "forwarding", TargetProvider: "nftables",
 	})
 	if err != nil {
@@ -258,7 +275,7 @@ func TestForwardingRuleSyncTreatsWildcardInterfaceAsDatabaseDefault(t *testing.T
 		persistBackend: func(string) error { return nil },
 		markEnabled:    func() error { return nil },
 	}
-	preview, err := service.PreviewRuleSync(context.Background(), dto.FirewallRuleSyncRequest{
+	preview, err := service.previewRuleSync(context.Background(), dto.FirewallRuleSyncRequest{
 		Subsystem: "forwarding", TargetProvider: "iptables",
 	})
 	if err != nil {
@@ -289,7 +306,7 @@ func TestForwardingRuleSyncReconcilesTargetToDatabaseState(t *testing.T) {
 		persistBackend: func(string) error { return nil },
 		markEnabled:    func() error { return nil },
 	}
-	preview, err := service.PreviewRuleSync(context.Background(), dto.FirewallRuleSyncRequest{
+	preview, err := service.previewRuleSync(context.Background(), dto.FirewallRuleSyncRequest{
 		Subsystem: "forwarding", TargetProvider: "nftables",
 	})
 	if err != nil {
@@ -298,7 +315,7 @@ func TestForwardingRuleSyncReconcilesTargetToDatabaseState(t *testing.T) {
 	if preview.Total != 2 || preview.Removed != 1 || len(preview.Items) != 3 || preview.Items[2].Status != "remove" {
 		t.Fatalf("extra target rule was not included in preview: %#v", preview)
 	}
-	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+	result, err := service.syncRules(context.Background(), dto.FirewallRuleSyncRequest{
 		Subsystem: "forwarding", TargetProvider: "nftables",
 	})
 	if err != nil {
@@ -330,7 +347,7 @@ func TestForwardingRuleSyncRemovesExtraRulesWhenDatabaseRulesAlreadyExist(t *tes
 		persistBackend: func(string) error { return nil },
 		markEnabled:    func() error { return nil },
 	}
-	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+	result, err := service.syncRules(context.Background(), dto.FirewallRuleSyncRequest{
 		Subsystem: "forwarding", TargetProvider: "nftables",
 	})
 	if err != nil {
@@ -353,7 +370,7 @@ func TestForwardingRuleSyncClearsInitializedTargetWhenDatabaseIsEmpty(t *testing
 		},
 		rules: &fakeForwardingRuleRepo{},
 	}
-	result, err := service.SyncRules(context.Background(), dto.FirewallRuleSyncRequest{
+	result, err := service.syncRules(context.Background(), dto.FirewallRuleSyncRequest{
 		Subsystem: "forwarding", TargetProvider: "nftables",
 	})
 	if err != nil {
@@ -373,10 +390,10 @@ func TestForwardingRuleSyncRejectsUnselectedTarget(t *testing.T) {
 		rules: &fakeForwardingRuleRepo{},
 	}
 	request := dto.FirewallRuleSyncRequest{Subsystem: "forwarding", TargetProvider: filter.ProviderNftables}
-	if _, err := service.PreviewRuleSync(context.Background(), request); !errors.Is(err, filter.ErrProviderUnavailable) {
+	if _, err := service.previewRuleSync(context.Background(), request); !errors.Is(err, filter.ErrProviderUnavailable) {
 		t.Fatalf("preview error = %v, want provider unavailable", err)
 	}
-	if _, err := service.SyncRules(context.Background(), request); !errors.Is(err, filter.ErrProviderUnavailable) {
+	if _, err := service.syncRules(context.Background(), request); !errors.Is(err, filter.ErrProviderUnavailable) {
 		t.Fatalf("sync error = %v, want provider unavailable", err)
 	}
 	if current.reconciles != 0 {
@@ -410,6 +427,39 @@ func TestForwardingBaseInfoIncludesFamilyStatus(t *testing.T) {
 	}
 	if !base.IPv6.Available || base.IPv6.Initialized || base.IPv6.Bound {
 		t.Fatalf("unexpected IPv6 status: %#v", base.IPv6)
+	}
+}
+
+func TestForwardingBaseInfoReportsMissingBackend(t *testing.T) {
+	service := &ForwardingService{
+		managerFactory: func() (*forwardClient.Manager, error) {
+			return nil, errForwardingBackendUnavailable
+		},
+		installedProviders: func() []string { return nil },
+	}
+	base, err := service.LoadBaseInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if base.IsExist || base.Name != "-" || base.Backend != "-" {
+		t.Fatalf("unexpected missing forwarding backend status: %#v", base)
+	}
+}
+
+func TestForwardingBaseInfoReportsUnavailableSelection(t *testing.T) {
+	wantErr := fmt.Errorf("%w: selected forwarding backend nftables is not installed", errForwardingBackendUnavailable)
+	service := &ForwardingService{
+		managerFactory: func() (*forwardClient.Manager, error) {
+			return nil, wantErr
+		},
+		installedProviders: func() []string { return []string{constant.FirewallProviderIptables} },
+	}
+	base, err := service.LoadBaseInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !base.IsExist || base.Message != wantErr.Error() || base.Name != "-" || base.Backend != "-" {
+		t.Fatalf("unexpected unavailable forwarding selection status: %#v", base)
 	}
 }
 

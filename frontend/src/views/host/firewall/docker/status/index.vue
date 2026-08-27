@@ -1,5 +1,5 @@
 <template>
-    <div class="app-status card-interval">
+    <div v-if="base.isExist" class="app-status card-interval">
         <el-card>
             <div class="flex w-full flex-col gap-4 md:flex-row">
                 <div class="flex flex-wrap gap-4 ml-3">
@@ -75,11 +75,13 @@
             </div>
         </el-card>
     </div>
+    <NoSuchService v-else name="iptables / iptables-nft / nftables" />
 </template>
 
 <script lang="ts" setup>
 import { Firewall } from '@/api/interface/firewall';
 import i18n from '@/lang';
+import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import { WarningFilled } from '@element-plus/icons-vue';
 import { computed } from 'vue';
 

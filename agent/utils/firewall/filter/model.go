@@ -27,6 +27,12 @@ const (
 	FamilyInet Family = constant.FirewallFamilyInet
 )
 
+type PortWhitelist struct {
+	Family   string `json:"family"`
+	Port     string `json:"port"`
+	Protocol string `json:"protocol"`
+}
+
 type Direction string
 
 const (

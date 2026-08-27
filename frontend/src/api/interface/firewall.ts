@@ -49,6 +49,7 @@ export namespace Firewall {
         isBind: boolean;
         version: string;
         pingStatus: string;
+        message?: string;
         syncError?: string;
         ipv4: BackendFamilyStatus;
         ipv6: BackendFamilyStatus;
@@ -346,6 +347,7 @@ export namespace Firewall {
     export interface DockerGuardBase {
         name: string;
         version: string;
+        isExist: boolean;
         initialized: boolean;
         bound: boolean;
         ipv4: DockerGuardFamilyStatus;

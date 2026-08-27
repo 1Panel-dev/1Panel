@@ -1,10 +1,16 @@
 package model
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 )
+
+const FirewallRuleSequenceStep int64 = 1 << 32
 
 type DockerPortGuardPolicy struct {
 	BaseModel
@@ -31,13 +37,9 @@ type ForwardingRule struct {
 }
 
 type FirewallRule struct {
-	UUID     string `gorm:"size:64;primaryKey" json:"uuid"`
-	ScopeKey string `gorm:"size:255;not null;index" json:"scopeKey"`
-	Provider string `gorm:"size:32;not null" json:"provider"`
-	Family   string `gorm:"size:16;not null" json:"family"`
-	Location string `gorm:"size:128;not null" json:"location"`
+	UUID   string `gorm:"size:64;primaryKey" json:"uuid"`
+	Family string `gorm:"size:16;not null" json:"family"`
 
-	NativeKind         string `gorm:"size:64;not null" json:"nativeKind"`
 	Protocol           string `gorm:"size:32;not null" json:"protocol"`
 	SourceAddress      string `gorm:"size:255" json:"sourceAddress"`
 	SourcePort         string `gorm:"size:64" json:"sourcePort"`
@@ -46,15 +48,13 @@ type FirewallRule struct {
 	Interface          string `gorm:"size:128" json:"interface"`
 	ConnectionStates   string `gorm:"type:text" json:"connectionStates"`
 	Action             string `gorm:"size:32;not null" json:"action"`
-	Priority           *int   `json:"priority"`
-	OrderIndex         *int64 `json:"orderIndex"`
-	OrderBucket        string `gorm:"size:64" json:"orderBucket"`
 	Description        string `gorm:"type:text" json:"description"`
+	CompatibilityError string `gorm:"type:text" json:"compatibilityError,omitempty"`
+	Priority           *int   `json:"priority,omitempty"`
+	Sequence           *int64 `gorm:"index" json:"sequence,omitempty"`
 
-	RuleKey  string `gorm:"size:80;not null" json:"ruleKey"`
 	Origin   string `gorm:"size:32;not null" json:"origin"`
 	Owner    string `gorm:"size:320;not null" json:"owner"`
-	MatchKey string `gorm:"size:320" json:"matchKey"`
 	Revision uint   `gorm:"not null;default:1" json:"revision"`
 }
 
@@ -72,16 +72,13 @@ func FirewallRuleFromDomain(rule filter.FirewallRule) (FirewallRule, error) {
 	if err != nil {
 		return FirewallRule{}, err
 	}
-	ruleKey, err := filter.RuleKey(normalized)
-	if err != nil {
-		return FirewallRule{}, err
+	switch normalized.NativeKind {
+	case "", filter.NativeKindRule, filter.NativeKindZonePort, filter.NativeKindRichRule, filter.NativeKindUFWRule:
+	default:
+		return FirewallRule{}, fmt.Errorf("%w: native rule %q cannot be stored as a provider-neutral policy", filter.ErrUnsupportedScope, normalized.NativeKind)
 	}
-	return FirewallRule{
-		ScopeKey:           normalized.Scope.Key(),
-		Provider:           string(normalized.Scope.Provider),
+	record := FirewallRule{
 		Family:             string(normalized.Scope.Family),
-		Location:           firewallRuleLocation(normalized.Scope),
-		NativeKind:         string(normalized.NativeKind),
 		Protocol:           normalized.Protocol,
 		SourceAddress:      normalized.SourceAddress,
 		SourcePort:         normalized.SourcePort,
@@ -90,30 +87,31 @@ func FirewallRuleFromDomain(rule filter.FirewallRule) (FirewallRule, error) {
 		Interface:          normalized.Interface,
 		ConnectionStates:   strings.Join(normalized.ConnectionStates, ","),
 		Action:             string(normalized.Action),
-		Priority:           normalized.Priority,
-		OrderIndex:         persistedFirewallOrderIndex(normalized),
-		OrderBucket:        normalized.OrderBucket,
 		Description:        normalized.Description,
-		RuleKey:            ruleKey,
-	}, nil
+	}
+	if normalized.Scope.Provider == filter.ProviderFirewalld {
+		record.Priority = normalized.Priority
+	}
+	return record, nil
 }
 
-func persistedFirewallOrderIndex(rule filter.FirewallRule) *int64 {
-	switch rule.Scope.Provider {
-	case filter.ProviderIptables, filter.ProviderNftables, filter.ProviderUFW:
-		return nil
-	default:
-		return rule.OrderIndex
-	}
-}
-
-func firewallRuleLocation(scope filter.Scope) string {
-	switch scope.Provider {
-	case filter.ProviderFirewalld:
-		return scope.Zone
-	case filter.ProviderIptables, filter.ProviderNftables, filter.ProviderUFW:
-		return scope.Chain
-	default:
-		return ""
-	}
+func (rule FirewallRule) PolicyKey() string {
+	payload, _ := json.Marshal(struct {
+		Family             string `json:"family"`
+		Protocol           string `json:"protocol"`
+		SourceAddress      string `json:"sourceAddress,omitempty"`
+		SourcePort         string `json:"sourcePort,omitempty"`
+		DestinationAddress string `json:"destinationAddress,omitempty"`
+		DestinationPort    string `json:"destinationPort,omitempty"`
+		Interface          string `json:"interface,omitempty"`
+		ConnectionStates   string `json:"connectionStates,omitempty"`
+		Action             string `json:"action"`
+	}{
+		Family: rule.Family, Protocol: rule.Protocol,
+		SourceAddress: rule.SourceAddress, SourcePort: rule.SourcePort,
+		DestinationAddress: rule.DestinationAddress, DestinationPort: rule.DestinationPort,
+		Interface: rule.Interface, ConnectionStates: rule.ConnectionStates, Action: rule.Action,
+	})
+	sum := sha256.Sum256(payload)
+	return hex.EncodeToString(sum[:])
 }

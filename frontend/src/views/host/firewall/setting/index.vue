@@ -31,6 +31,9 @@
                                                 <el-tag v-if="!option.installed" size="small" type="info">
                                                     {{ $t('firewall.uninstalledStatus') }}
                                                 </el-tag>
+                                                <el-tag v-else-if="!option.supported" size="small" type="warning">
+                                                    Docker: {{ $t('firewall.uninstalledStatus') }}
+                                                </el-tag>
                                                 <el-popover
                                                     v-else-if="option.message"
                                                     placement="right"
@@ -286,7 +289,7 @@ const changeBackend = async (subsystem: Firewall.BackendSubsystem, group: Firewa
     const previousOption = group.options.find((option) => option.name === previous);
     const previousInitialized =
         previousOption?.initialized || previousOption?.ipv4.initialized || previousOption?.ipv6.initialized;
-    if (subsystem !== 'system' && previous && previous !== backend && previousInitialized) {
+    if (previous && previous !== backend && previousInitialized) {
         group.selected = previous;
         await ElMessageBox.alert(
             i18n.global.t('firewall.cleanupBeforeBackendSwitch', [previous, backend]),
