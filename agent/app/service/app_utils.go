@@ -353,15 +353,21 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 			logStr := i18n.GetMsgByKey("Stop") + i18n.GetMsgByKey("App")
 			t.Log(logStr)
 
-			out, err := compose.Down(install.GetComposePath())
-			if err != nil && !deleteReq.ForceDelete {
-				return handleErr(install, err, out)
+			if deleteReq.UseLifecycleScripts {
+				if err = runScript(t, &install, "uninstall"); err != nil {
+					return err
+				}
+			} else {
+				out, err := compose.Down(install.GetComposePath())
+				if err != nil && !deleteReq.ForceDelete {
+					return handleErr(install, err, out)
+				}
+				if err = runScript(t, &install, "uninstall"); err != nil {
+					_, _ = compose.Up(install.GetComposePath())
+					return err
+				}
 			}
 			t.LogSuccess(logStr)
-			if err = runScript(t, &install, "uninstall"); err != nil {
-				_, _ = compose.Up(install.GetComposePath())
-				return err
-			}
 			if deleteReq.DeleteImage {
 				content, err := op.GetContent(install.GetEnvPath())
 				if err != nil {
@@ -999,6 +1005,12 @@ func runScript(task *task.Task, appInstall *model.AppInstall, operate string) er
 		scriptPath = path.Join(workDir, "scripts", "upgrade.sh")
 	case "uninstall":
 		scriptPath = path.Join(workDir, "scripts", "uninstall.sh")
+	case "start":
+		scriptPath = path.Join(workDir, "scripts", "start.sh")
+	case "stop":
+		scriptPath = path.Join(workDir, "scripts", "stop.sh")
+	case "restart":
+		scriptPath = path.Join(workDir, "scripts", "restart.sh")
 	}
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(scriptPath) {
@@ -1008,7 +1020,11 @@ func runScript(task *task.Task, appInstall *model.AppInstall, operate string) er
 	logStr := i18n.GetWithName("ExecShell", operate)
 	task.LogStart(logStr)
 
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute), cmd.WithWorkDir(workDir))
+	timeout := 10 * time.Minute
+	if operate == "start" || operate == "restart" {
+		timeout = time.Hour
+	}
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(timeout), cmd.WithWorkDir(workDir), cmd.WithTask(*task))
 	if err := cmdMgr.Run("bash", scriptPath); err != nil {
 		task.LogFailedWithErr(logStr, err)
 		return err
@@ -1043,12 +1059,15 @@ func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
 	return false, nil
 }
 
-func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error {
+func upApp(task *task.Task, appInstall *model.AppInstall, pullImages, useLifecycleScripts bool) error {
 	upProject := func(appInstall *model.AppInstall) (err error) {
 		var (
 			out    string
 			errMsg string
 		)
+		if useLifecycleScripts {
+			return runScript(task, appInstall, "start")
+		}
 		if pullImages && appInstall.App.Type != "php" {
 			envByte, err := files.NewFileOp().GetContent(appInstall.GetEnvPath())
 			if err != nil {

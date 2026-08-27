@@ -961,6 +961,7 @@ const message = {
             ascendVisibleDevices: 'Peranti Ascend yang kelihatan',
             vllmCommandPortHelper:
                 'Perintah permulaan mesti menggunakan port {0}; jika tidak, perkhidmatan tidak dapat diakses.',
+            ascendVisibleDevices: 'Peranti Ascend boleh dilihat (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Segerakkan ke akaun model',
             modelAccountAddressHelper:
                 'Alamat kontena sesuai untuk kontena agen; 127.0.0.1, IP sistem, atau alamat tersuai sesuai untuk AI Gateway atau perkhidmatan luaran.',
@@ -1066,9 +1067,13 @@ const message = {
             accountMaxConcurrency: 'Keserentakan maksimum akaun',
             groupMaxConcurrency: 'Keserentakan maksimum kumpulan pengguna',
             apiKeyMaxConcurrency: 'Keserentakan maksimum setiap API Key',
-            gatewayConcurrency: 'Keserentakan gateway',
-            waitingQueue: 'Baris gilir menunggu',
+            gatewayConcurrency: 'Keserentakan gateway semasa',
+            waitingQueue: 'Baris gilir menunggu semasa',
+            currentActiveUsers: 'Pengguna aktif semasa',
+            activeStreamingRequests: 'Permintaan penstriman aktif',
             modelAccountConcurrency: 'Keserentakan akaun model',
+            accountAvailability: 'Ketersediaan akaun model',
+            capacityFull: 'Kapasiti penuh',
             groupConcurrency: 'Keserentakan kumpulan pengguna',
             apiKeyConcurrency: 'Keserentakan API Key',
             currentLimit: 'Semasa / Had',

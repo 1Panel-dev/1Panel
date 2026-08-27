@@ -959,6 +959,7 @@ const message = {
             ascendVisibleDevices: 'Görünür Ascend cihazları',
             vllmCommandPortHelper:
                 'Başlatma komutu {0} numaralı bağlantı noktasını kullanmalıdır; aksi halde hizmete erişilemez.',
+            ascendVisibleDevices: 'Görünür Ascend cihazları (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Model hesabına senkronize et',
             modelAccountAddressHelper:
                 'Konteyner adresi ajan konteynerleri içindir; 127.0.0.1, sistem IP veya özel adres AI Gateway ya da harici servisler içindir.',
@@ -1063,9 +1064,13 @@ const message = {
             accountMaxConcurrency: 'Hesap maksimum eşzamanlılığı',
             groupMaxConcurrency: 'Kullanıcı grubu maksimum eşzamanlılığı',
             apiKeyMaxConcurrency: 'API Key başına maksimum eşzamanlılık',
-            gatewayConcurrency: 'Ağ geçidi eşzamanlılığı',
-            waitingQueue: 'Bekleme kuyruğu',
+            gatewayConcurrency: 'Mevcut ağ geçidi eşzamanlılığı',
+            waitingQueue: 'Mevcut bekleme kuyruğu',
+            currentActiveUsers: 'Şu anda aktif kullanıcılar',
+            activeStreamingRequests: 'Aktif akış istekleri',
             modelAccountConcurrency: 'Model hesabı eşzamanlılığı',
+            accountAvailability: 'Model hesabı kullanılabilirliği',
+            capacityFull: 'Kapasite dolu',
             groupConcurrency: 'Kullanıcı grubu eşzamanlılığı',
             apiKeyConcurrency: 'API Key eşzamanlılığı',
             currentLimit: 'Mevcut / Sınır',

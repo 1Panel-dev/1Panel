@@ -940,6 +940,7 @@ const message = {
             ascendVisibleDevices: 'Ascend 可視デバイス',
             vllmCommandPortHelper:
                 '起動コマンドではポート {0} を使用する必要があります。使用しない場合、サービスにアクセスできません。',
+            ascendVisibleDevices: 'Ascend 可視デバイス（ASCEND_RT_VISIBLE_DEVICES）',
             syncModelAccount: 'モデルアカウントに同期',
             modelAccountAddressHelper:
                 'コンテナアドレスはエージェントコンテナ向けです。127.0.0.1、システム IP、カスタムアドレスは AI Gateway または外部サービス向けです。',
@@ -1044,9 +1045,13 @@ const message = {
             accountMaxConcurrency: 'アカウント最大同時実行数',
             groupMaxConcurrency: 'ユーザーグループ最大同時実行数',
             apiKeyMaxConcurrency: 'API Key ごとの最大同時実行数',
-            gatewayConcurrency: 'ゲートウェイ同時実行数',
-            waitingQueue: '待機キュー',
+            gatewayConcurrency: '現在のゲートウェイ同時実行数',
+            waitingQueue: '現在の待機キュー',
+            currentActiveUsers: '現在のアクティブユーザー',
+            activeStreamingRequests: '実行中のストリーミングリクエスト',
             modelAccountConcurrency: 'モデルアカウント同時実行数',
+            accountAvailability: 'モデルアカウント可用性',
+            capacityFull: '上限到達',
             groupConcurrency: 'ユーザーグループ同時実行数',
             apiKeyConcurrency: 'API Key 同時実行数',
             currentLimit: '現在 / 上限',

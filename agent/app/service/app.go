@@ -483,15 +483,17 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 		index++
 	}
 	newServiceName := strings.ToLower(appInstall.Name)
-	if app.Limit == 0 && newServiceName != serviceName && len(servicesMap) == 1 {
+	if app.Limit == 0 && newServiceName != serviceName && len(servicesMap) == 1 && !req.KeepServiceName {
 		servicesMap[newServiceName] = servicesMap[serviceName]
 		delete(servicesMap, serviceName)
 		serviceName = newServiceName
 	}
 	appInstall.ServiceName = serviceName
 
-	if err = addDockerComposeCommonParam(composeMap, appInstall.ServiceName, req.AppContainerConfig, req.Params); err != nil {
-		return
+	if !req.SkipComposeCommonConfig {
+		if err = addDockerComposeCommonParam(composeMap, appInstall.ServiceName, req.AppContainerConfig, req.Params); err != nil {
+			return
+		}
 	}
 	var (
 		composeByte []byte
@@ -559,7 +561,7 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 				return err
 			}
 		}
-		if executeScript {
+		if executeScript || req.UseLifecycleScripts {
 			if err = runScript(t, appInstall, "init"); err != nil {
 				return err
 			}
@@ -572,7 +574,7 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 				return err
 			}
 		}
-		if err = upApp(t, appInstall, req.PullImage); err != nil {
+		if err = upApp(t, appInstall, req.PullImage, req.UseLifecycleScripts); err != nil {
 			return err
 		}
 		updateToolApp(appInstall)

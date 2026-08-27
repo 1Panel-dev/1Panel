@@ -50,6 +50,10 @@ type AppContainerConfig struct {
 	Type          string  `json:"type"`
 	SpecifyIP     string  `json:"specifyIP"`
 	RestartPolicy string  `json:"restartPolicy" validate:"omitempty,oneof=always unless-stopped no on-failure"`
+
+	KeepServiceName         bool `json:"-"`
+	SkipComposeCommonConfig bool `json:"-"`
+	UseLifecycleScripts     bool `json:"-"`
 }
 
 type AppInstalledSearch struct {
@@ -92,6 +96,8 @@ type AppInstalledOperate struct {
 	TaskID        string              `json:"taskID"`
 	DeleteImage   bool                `json:"deleteImage"`
 	Favorite      bool                `json:"favorite"`
+
+	UseLifecycleScripts bool `json:"-"`
 }
 
 type AppInstallUpgrade struct {
@@ -111,11 +117,14 @@ type AppInstallDelete struct {
 	DeleteDB     bool   `json:"deleteDB"`
 	DeleteImage  bool   `json:"deleteImage"`
 	TaskID       string `json:"taskID"`
+
+	UseLifecycleScripts bool `json:"-"`
 }
 
 type AppInstalledUpdate struct {
 	InstallId uint                   `json:"installId" validate:"required"`
 	Params    map[string]interface{} `json:"params" validate:"required"`
+	TaskID    string                 `json:"-"`
 	AppContainerConfig
 }
 
