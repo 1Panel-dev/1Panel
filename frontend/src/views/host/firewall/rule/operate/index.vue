@@ -149,7 +149,7 @@
                                     {{ previewRule(item).description }}
                                 </span>
                                 <span
-                                    v-if="['warning', 'error'].includes(ruleCheckStatus(item.plan))"
+                                    v-if="ruleCheckStatus(item.plan) === 'error'"
                                     class="rule-check-item-reason"
                                     :class="`is-${ruleCheckStatus(item.plan)}`"
                                 >
@@ -191,6 +191,7 @@ import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import ErrDialog from './err-message.vue';
 import {
+    formatHostAddress,
     inferAddressFamily,
     isValidIPOrCIDR,
     isValidPortRange,
@@ -298,6 +299,7 @@ const wildcardAddressLabel = (family: Firewall.Family) =>
 const isWildcardAddress = (_family: Firewall.Family, address?: string) => !address?.trim();
 const priorityFieldLabel = computed(() => i18n.global.t('firewall.priority'));
 const showPriorityField = computed(() => {
+    if (provider.value === 'ufw') return mode.value === 'edit';
     if (provider.value !== 'firewalld') return true;
     return (
         firewalldPrioritySupported.value && (mode.value === 'create' || editingRule.value?.nativeKind === 'rich_rule')
@@ -317,25 +319,21 @@ const showingPreview = computed(() => previewVisible.value && previewRules.value
 const supportedPlanReasons = new Set([
     'equivalent_external_rule',
     'multiple_equivalent_external_rules',
-    'requested_rule_is_covered',
     'equivalent_managed_rule',
     'managed_rule_drifted',
     'opaque_rule_in_target_scope',
     'runtime_permanent_mismatch',
     'protected_rule',
-    'overlapping_rule_with_different_action',
-    'partially_overlapping_rule_with_different_action',
 ]);
 
 const planReasonMessage = (reason: string) =>
     i18n.global.t(`firewall.plan_${supportedPlanReasons.has(reason) ? reason : 'blocked'}`);
 
-type RuleCheckDisplayStatus = 'creatable' | 'existing' | 'warning' | 'error';
+type RuleCheckDisplayStatus = 'creatable' | 'existing' | 'error';
 
 const ruleCheckStatus = (result: Firewall.RuleCheckResult): RuleCheckDisplayStatus => {
     if (result.decision === 'blocked') return 'error';
     if (result.decision === 'no_change' || result.classification === 'exact_external') return 'existing';
-    if (result.decision === 'confirmation_required') return 'warning';
     return 'creatable';
 };
 
@@ -347,7 +345,6 @@ const ruleCheckDescription = (result: Firewall.RuleCheckResult) => {
 
 const ruleCheckGroupDescription = (status: RuleCheckDisplayStatus) => {
     if (status === 'error') return i18n.global.t('firewall.ruleCheckBlockedHelper');
-    if (status === 'warning') return i18n.global.t('firewall.ruleCheckWarningHelper');
     if (status === 'existing') return i18n.global.t('firewall.ruleCheckExistingHelper');
     return i18n.global.t('firewall.ruleCheckReadyHelper');
 };
@@ -356,14 +353,13 @@ const ruleCheckCounts = computed(() => {
     const counts: Record<RuleCheckDisplayStatus, number> = {
         creatable: 0,
         existing: 0,
-        warning: 0,
         error: 0,
     };
     for (const item of batchPlans.value) counts[ruleCheckStatus(item.plan)]++;
     return counts;
 });
 
-const ruleCheckGroupOrder: RuleCheckDisplayStatus[] = ['error', 'warning', 'creatable', 'existing'];
+const ruleCheckGroupOrder: RuleCheckDisplayStatus[] = ['error', 'creatable', 'existing'];
 const ruleCheckGroups = computed(() =>
     ruleCheckGroupOrder
         .map((status) => ({
@@ -471,7 +467,8 @@ const resetForm = () => {
     form.destinationAddress = '';
     form.destinationPorts = [''];
     form.action = 'accept';
-    form.priority = provider.value === 'firewalld' ? undefined : positionalPriorityMax.value;
+    form.priority =
+        provider.value === 'firewalld' || provider.value === 'ufw' ? undefined : positionalPriorityMax.value;
     form.description = '';
     editingUUID.value = '';
     editingRule.value = undefined;
@@ -504,7 +501,7 @@ const acceptParams = (
         form.sourceAddresses = [
             {
                 family: rule.scope.family,
-                address: rule.sourceAddress || '',
+                address: formatHostAddress(rule.sourceAddress, rule.scope.family),
             },
         ];
         form.sourcePort = rule.sourcePort || '';
@@ -606,7 +603,10 @@ const buildRule = (
         destinationPort,
         action,
         priority: provider.value === 'firewalld' && firewalldPrioritySupported.value ? form.priority : undefined,
-        orderIndex: provider.value === 'firewalld' ? undefined : form.priority,
+        orderIndex:
+            provider.value === 'firewalld' || (provider.value === 'ufw' && mode.value === 'create')
+                ? undefined
+                : form.priority,
         description: form.description,
     };
 };
@@ -632,7 +632,9 @@ const availableResolutions = (result: Firewall.RuleCheckResult) =>
     (result.allowedActions || []).filter((item): item is Firewall.ApplicableCheckAction => item !== 'cancel');
 
 const previewAddress = (rule: Firewall.Rule) => {
-    if (rule.sourceAddress && !isWildcardAddress(rule.scope.family, rule.sourceAddress)) return rule.sourceAddress;
+    if (rule.sourceAddress && !isWildcardAddress(rule.scope.family, rule.sourceAddress)) {
+        return formatHostAddress(rule.sourceAddress, rule.scope.family);
+    }
     return wildcardAddressLabel(rule.scope.family);
 };
 const previewProtocol = (rule: Firewall.Rule) =>
@@ -693,7 +695,7 @@ const prepareBatchPlans = async () => {
             rule,
             plan: result,
             resolution:
-                ruleCheckStatus(result) === 'creatable' || ruleCheckStatus(result) === 'warning'
+                ruleCheckStatus(result) === 'creatable'
                     ? available.find((action) => action !== 'select_adopt')
                     : undefined,
         });
@@ -1010,10 +1012,6 @@ defineExpose({ acceptParams });
 }
 
 .rule-check-item-reason {
-    &.is-warning {
-        color: var(--el-color-warning);
-    }
-
     &.is-error {
         color: var(--el-color-danger);
     }

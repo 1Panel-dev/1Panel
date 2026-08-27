@@ -152,7 +152,7 @@
                                 :heightDiff="370"
                                 row-key="rowKey"
                             >
-                                <el-table-column type="selection" :selectable="isEditableManagedRule" width="48" fix />
+                                <el-table-column type="selection" :selectable="isDeletableManagedRule" width="48" fix />
                                 <el-table-column :label="$t('firewall.action')" width="76">
                                     <template #default="{ row }">
                                         <span
@@ -344,7 +344,7 @@ import {
     checkFirewallRules,
     createFirewallRules,
     deleteFirewallRules,
-    loadDockerPortGuard,
+    loadDockerPublishedPorts,
     loadFirewallNativeDetail,
     loadFirewallRuleSyncTask,
     resetFirewallRules,
@@ -355,6 +355,7 @@ import i18n from '@/lang';
 import { getCurrentDateFormatted } from '@/utils/date';
 import { downloadWithContent } from '@/utils/file';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { formatHostAddress } from '@/views/host/firewall/utils/validation';
 import RuleImport from '@/views/host/firewall/rule/import/index.vue';
 import RuleOperate from '@/views/host/firewall/rule/operate/index.vue';
 import RuleSync from '@/views/host/firewall/sync/index.vue';
@@ -568,7 +569,7 @@ const displayAddress = (row: Firewall.InventoryItem) => {
     if (isOpaqueRule(row) && !hasParsedUFWFields(row)) return '-';
     const wildcard = wildcardAddress(row.rule.scope.family);
     const address = row.rule.sourceAddress;
-    if (address && address !== wildcard) return address;
+    if (address && address !== wildcard) return formatHostAddress(address, row.rule.scope.family);
     return `${wildcard}（${i18n.global.t('firewall.anyWhere')}）`;
 };
 const displayPort = (row: Firewall.InventoryItem) => {
@@ -614,7 +615,7 @@ const loadListeningProcesses = async () => {
 };
 const loadDockerEndpoints = async () => {
     try {
-        dockerEndpoints.value = (await loadDockerPortGuard()).data.containers.flatMap(
+        dockerEndpoints.value = (await loadDockerPublishedPorts()).data.flatMap(
             (container) => container.endpoints || [],
         );
     } catch {
@@ -743,7 +744,7 @@ const allRows = computed<RuleRow[]>(() =>
     }),
 );
 
-const allManagedRules = computed(() => allRows.value.filter((row) => isEditableManagedRule(row)));
+const allManagedRules = computed(() => allRows.value.filter((row) => isDeletableManagedRule(row)));
 
 const matchesRuleFamily = (rule: Firewall.Rule, family: Firewall.Family) => {
     if (rule.scope.family !== 'inet') return rule.scope.family === family;
@@ -970,21 +971,50 @@ const exportRules = async (rows: RuleRow[]) => {
 };
 
 const exportRulesBySelection = () => {
-    const selected = selects.value.filter((row) => isEditableManagedRule(row));
+    const selected = selects.value.filter((row) => isDeletableManagedRule(row));
     return exportRules(selected.length > 0 ? selected : allManagedRules.value);
+};
+
+const isWildcardDestinationPort = (rule: Firewall.Rule) => {
+    const port = rule.destinationPort?.trim();
+    return !port || port === '*';
+};
+
+const ruleUsageOwners = (row: RuleRow) =>
+    [...new Set(ruleUsageEntries(row).map((entry) => entry.owner))].sort((left, right) => left.localeCompare(right));
+
+const usageOwnersSummary = (owners: string[]) => {
+    const visibleOwners = owners.slice(0, 5);
+    const remaining = owners.length - visibleOwners.length;
+    return remaining > 0 ? `${visibleOwners.join(', ')} (+${remaining})` : visibleOwners.join(', ');
+};
+
+const deleteRulesConfirmMessage = (selected: RuleRow[]) => {
+    const accepted = selected.filter((row) => row.rule.action === 'accept' && Boolean(row.observed));
+    const risky = accepted.filter((row) => isWildcardDestinationPort(row.rule) || ruleUsageEntries(row).length > 0);
+    if (selected.length > 1 && risky.length > 0) {
+        return i18n.global.t('firewall.deleteRiskRulesConfirm', [selected.length, risky.length]);
+    }
+    if (selected.length === 1 && accepted.length === 1) {
+        const [row] = accepted;
+        if (isWildcardDestinationPort(row.rule)) {
+            return i18n.global.t('firewall.deleteWildcardRuleConfirm', [
+                formatHostAddress(row.rule.sourceAddress, row.rule.scope.family) || i18n.global.t('firewall.anyWhere'),
+                `${row.rule.protocol.toUpperCase()}/*`,
+            ]);
+        }
+        const owners = ruleUsageOwners(row);
+        if (owners.length > 0) {
+            return i18n.global.t('firewall.deleteUsedRuleConfirm', [usageOwnersSummary(owners)]);
+        }
+    }
+    return i18n.global.t('firewall.deleteRuleConfirm', [selected.length]);
 };
 
 const removeRules = async (selected: RuleRow[]) => {
     if (selected.length === 0) return;
-    const usedBy = selected.flatMap((row) =>
-        row.rule.action === 'accept' ? ruleUsageEntries(row).map((entry) => entry.owner) : [],
-    );
-    const baseMessage = i18n.global.t('firewall.deleteRuleConfirm', [selected.length]);
-    const message = usedBy.length
-        ? `${baseMessage}\n${i18n.global.t('firewall.deleteUsedRuleConfirm', [usedBy.join(', ')])}`
-        : baseMessage;
     try {
-        await ElMessageBox.confirm(message, i18n.global.t('commons.button.delete'), {
+        await ElMessageBox.confirm(deleteRulesConfirmMessage(selected), i18n.global.t('commons.button.delete'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
         });
@@ -1017,7 +1047,7 @@ const removeRules = async (selected: RuleRow[]) => {
     }
 };
 
-const removeSelectedRules = () => removeRules(selects.value.filter((row) => isEditableManagedRule(row)));
+const removeSelectedRules = () => removeRules(selects.value.filter((row) => isDeletableManagedRule(row)));
 
 const resetRules = () => {
     const message = i18n.global.t(
@@ -1127,6 +1157,16 @@ const isEditableManagedRule = (row: Firewall.InventoryItem) =>
     row.state !== 'drifted' &&
     row.state !== 'protected';
 
+const isMissingManagedRule = (row: Firewall.InventoryItem) =>
+    row.state === 'drifted' && row.match === 'missing' && !row.observed;
+
+const isDeletableManagedRule = (row: Firewall.InventoryItem) =>
+    Boolean(row.desired?.uuid) &&
+    (row.desired?.origin === 'created' || row.desired?.origin === 'adopted') &&
+    !isIptablesSystemPresetScope(row.rule.scope) &&
+    row.state !== 'protected' &&
+    (row.state !== 'drifted' || isMissingManagedRule(row));
+
 const displayRulePriority = (row: Firewall.InventoryItem) => {
     if (row.rule.scope.provider === 'firewalld') return row.rule.priority ?? '-';
     if (
@@ -1173,7 +1213,7 @@ const operationButtons = [
         label: i18n.global.t('commons.button.delete'),
         permission: true,
         nodeAdmin: true,
-        show: (row: RuleRow) => isEditableManagedRule(row),
+        show: (row: RuleRow) => isDeletableManagedRule(row),
         click: removeRule,
     },
 ];

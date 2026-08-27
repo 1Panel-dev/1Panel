@@ -86,6 +86,10 @@ func MergeInventory(input InventoryMergeInput) ([]InventoryItem, error) {
 	byMarker := make(map[string][]int)
 	for index, observed := range input.Observed {
 		candidate := observedInventoryCandidate{rule: observed}
+		if marker := strings.TrimSpace(candidate.rule.Marker); marker != "" {
+			markerKey := candidate.rule.Rule.Scope.Key() + "\x00" + marker
+			byMarker[markerKey] = append(byMarker[markerKey], index)
+		}
 		if observed.ParseStatus == ParseStatusSupported {
 			normalized, err := NormalizeRule(observed.Rule)
 			if err != nil {
@@ -100,10 +104,6 @@ func MergeInventory(input InventoryMergeInput) ([]InventoryItem, error) {
 			if instanceKey, err := InstanceKey(candidate.rule); err == nil {
 				candidate.instanceKey = instanceKey
 				byInstanceKey[instanceKey] = append(byInstanceKey[instanceKey], index)
-			}
-			if marker := strings.TrimSpace(candidate.rule.Marker); marker != "" {
-				markerKey := candidate.rule.Rule.Scope.Key() + "\x00" + marker
-				byMarker[markerKey] = append(byMarker[markerKey], index)
 			}
 		}
 		candidates[index] = candidate
@@ -144,9 +144,16 @@ func MergeInventory(input InventoryMergeInput) ([]InventoryItem, error) {
 		if desiredIndex, exists := desiredMatches[index]; exists {
 			desired := normalizedDesired[desiredIndex]
 			observed := candidate.rule
+			match := desiredMatchStates[desiredIndex]
+			if match == InventoryMatchExact && observed.ParseStatus != ParseStatusSupported {
+				orderIndex := observed.Rule.OrderIndex
+				observed.Rule = desired.Rule
+				observed.Rule.OrderIndex = orderIndex
+				observed.ParseStatus = ParseStatusSupported
+				observed.UncertainFields = nil
+			}
 			displayRule := observed.Rule
 			displayRule.Description = desired.Rule.Description
-			match := desiredMatchStates[desiredIndex]
 			state := inventoryStateForDesired(desired, match)
 			if observed.Protected {
 				state = InventoryStateProtected
@@ -202,7 +209,8 @@ func findObservedInventoryMatch(
 	if marker := strings.TrimSpace(desired.Marker); marker != "" {
 		markerKey := desired.Rule.Scope.Key() + "\x00" + marker
 		match, status := uniqueUnclaimedCandidate(byMarker[markerKey], candidates)
-		if match >= 0 && candidates[match].ruleKey != desired.RuleKey {
+		if match >= 0 && candidates[match].rule.ParseStatus != ParseStatusOpaque &&
+			!ObservedRuleMatchesExpected(candidates[match].rule, desired.Rule) {
 			return match, InventoryMatchChanged
 		}
 		return match, status

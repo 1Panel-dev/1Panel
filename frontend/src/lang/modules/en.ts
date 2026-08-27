@@ -4067,20 +4067,16 @@ const message = {
         plan_equivalent_external_rule:
             'An identical external rule already exists. Take it over instead of creating a duplicate.',
         plan_multiple_equivalent_external_rules: 'Multiple identical external rules exist. Select one to take over.',
-        plan_requested_rule_is_covered:
-            'An existing rule already covers this configuration. Continuing will create an overlapping rule.',
         plan_equivalent_managed_rule: 'An identical rule is already managed by 1Panel. No duplicate is needed.',
         allRulesAlreadyExist: 'All {0} checked rules already exist. There are no new rules to create.',
         ruleCheckResult: 'Rule check results',
         ruleCheckStatus_creatable: 'Creatable',
         ruleCheckStatus_existing: 'Exists',
-        ruleCheckStatus_warning: 'Warning',
         ruleCheckStatus_error: 'Error',
         ruleCheckExistingHelper: 'An identical rule already exists and will be skipped.',
         ruleCheckReadyHelper: 'The check passed. This rule can be created.',
         ruleCheckExternalExists: 'An identical external rule already exists and will be skipped automatically.',
         ruleCheckBlockedHelper: 'Rules with errors cannot be submitted. Go back, edit them, and check again.',
-        ruleCheckWarningHelper: 'Check complete. Warnings do not block submission, so you can continue.',
         plan_managed_rule_drifted:
             'The 1Panel management record differs from the live firewall rule. Check the system rule.',
         plan_opaque_rule_in_target_scope:
@@ -4088,10 +4084,6 @@ const message = {
         plan_runtime_permanent_mismatch:
             'The runtime and permanent firewall configurations differ. Synchronize them first.',
         plan_protected_rule: 'This rule is protected and cannot be taken over, changed, or deleted.',
-        plan_overlapping_rule_with_different_action:
-            'An overlapping rule has the opposite action. The operation was stopped.',
-        plan_partially_overlapping_rule_with_different_action:
-            'This rule partially overlaps a rule with the opposite action. The effective result depends on rule order.',
         plan_blocked: 'This rule cannot be applied safely. Refresh the rules and try again.',
         scopeDefaultMismatch: 'The system default zone is {0}; this page manages only the public zone.',
         scopeInactive: 'The managed scope is inactive. New rules may not affect current traffic.',
@@ -4121,6 +4113,7 @@ const message = {
         systemFirewallHelper: 'Controls host port access and inbound firewall rules.',
         forwardingHelper: 'Manages port-forwarding rules.',
         dockerFirewallHelper: 'Selects how 1Panel manages container port protection.',
+        dockerNftablesRequirement: 'Docker ≥ 29.0.0, experimental',
         backendRecommendation: 'Using iptables or nftables is recommended.',
         configuredRules: '{0} rules configured',
         addressFamily: 'IP version',
@@ -4187,11 +4180,14 @@ const message = {
             'Delete all 1Panel Docker port protection rules and chains from {0}, retaining only database data',
         cleanupBeforeBackendSwitch:
             'The current {0} backend still contains 1Panel runtime rules. Clean it up before switching to {1}.',
-        cleanupAction: 'Clean up',
+        cleanupAction: 'Reset',
         backendSwitchNotice:
             'Clean the current backend before switching the system firewall, port forwarding, or Docker protection. Saved database policies are retained and can be initialized or synchronized after switching.',
         switchBackendHelper: 'Switch to {0}?',
+        switchDockerBackendHelper: 'Switch to {0}? This will update the Docker configuration and restart Docker.',
         uninstalledStatus: 'Not installed',
+        selectedBackendNotInstalled:
+            '{backend} was not detected. Install it manually from {library}, or switch the firewall backend in {settings}.',
         initializedStatus: 'Initialized',
         partiallyInitialized: 'Partially initialized',
         dockerGuardHelper:
@@ -4224,7 +4220,10 @@ const message = {
         denySources: 'Deny specified sources',
         allowSources: 'Allow specified sources only',
         denyAll: 'Deny all access',
-        sourcesHelper: 'Enter one IPv4/IPv6 address or CIDR per line; an empty allowlist denies all access',
+        dockerGuardMixedFamilyHelper:
+            'IPv4 and IPv6 are both selected. Configure source-based policies separately; deny all can be applied directly.',
+        dockerGuardInconsistentConfigHelper:
+            'The selected rules have different configurations. Configure them again to overwrite all selected rules; an empty description clears all descriptions.',
         effective: 'Effective',
         forwardUnsynced: 'Unsynced',
         notEnabled: 'Not enabled',
@@ -4284,7 +4283,10 @@ const message = {
         destinationPortPlaceholder: 'e.g. 80, 80,443, or 8080-8089',
         deleteRuleConfirm: 'Will delete {0} rules. Continue?',
         deleteUsedRuleConfirm:
-            'This port is used by {0}. Deleting its allow rule may make the service unreachable. Continue?',
+            'This rule covers listening services provided by {0}. Deleting it may make those services unreachable. Continue?',
+        deleteWildcardRuleConfirm:
+            'This rule allows {0} to access {1}. Deleting it may affect access to multiple services. Continue?',
+        deleteRiskRulesConfirm: 'Will delete {0} rules. {1} allow rules may affect service access. Continue?',
         editRuleConfirm:
             'The following fields will change: {0}. The rule will be applied and verified immediately. Continue?',
     },

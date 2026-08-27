@@ -4050,28 +4050,21 @@ const message = {
         plan_equivalent_external_rule: '同じ外部ルールが既にあります。重複作成せず管理対象にできます。',
         plan_multiple_equivalent_external_rules:
             '同じ外部ルールが複数あります。管理対象にするルールを選択してください。',
-        plan_requested_rule_is_covered:
-            '既存ルールがこの設定を既に包含しています。続行すると重複するルールが作成されます。',
         plan_equivalent_managed_rule: '同じルールは既に 1Panel の管理対象です。重複作成は不要です。',
         allRulesAlreadyExist: '確認した {0} 件のルールはすべて既に存在します。新しく作成するルールはありません。',
         ruleCheckResult: 'ルール確認結果',
         ruleCheckStatus_creatable: '作成可能',
         ruleCheckStatus_existing: '既存',
-        ruleCheckStatus_warning: '警告',
         ruleCheckStatus_error: 'エラー',
         ruleCheckExistingHelper: '同じルールが既に存在するため、今回はスキップします。',
         ruleCheckReadyHelper: '確認に合格しました。このルールは作成できます。',
         ruleCheckExternalExists: '同じ外部ルールが既に存在するため、自動的にスキップされます。',
         ruleCheckBlockedHelper: 'エラーのあるルールは送信できません。戻って修正し、もう一度確認してください。',
-        ruleCheckWarningHelper: '確認が完了しました。警告は送信を妨げないため、そのまま続行できます。',
         plan_managed_rule_drifted:
             '管理対象ルールが実際のファイアウォールと一致しません。先に不整合を解消してください。',
         plan_opaque_rule_in_target_scope: '対象範囲に安全に解析できないルールがあります。操作を停止しました。',
         plan_runtime_permanent_mismatch: '実行中と永続設定のファイアウォール構成が異なります。先に同期してください。',
         plan_protected_rule: 'このルールは保護されており、管理対象化、変更、削除はできません。',
-        plan_overlapping_rule_with_different_action: '反対の動作を持つ重複ルールがあります。操作を停止しました。',
-        plan_partially_overlapping_rule_with_different_action:
-            '反対の動作を持つルールと一部重複しています。実際の動作はルールの順序によって決まります。',
         plan_blocked: 'このルールは安全に適用できません。ルールを更新して再試行してください。',
         scopeDefaultMismatch: 'システムの既定 zone は {0} です。このページでは public zone のみ管理します。',
         scopeInactive: '管理対象の範囲が有効ではありません。新しいルールが現在の通信に適用されない場合があります。',
@@ -4102,6 +4095,7 @@ const message = {
         systemFirewallHelper: 'ホストのポートアクセスと受信ルールを管理します。',
         forwardingHelper: 'ポート転送ルールを管理します。',
         dockerFirewallHelper: '1Panel のコンテナポート保護の管理方法を選択します。',
+        dockerNftablesRequirement: 'Docker ≥ 29.0.0、実験的',
         backendRecommendation: 'iptables または nftables の使用を推奨します。',
         configuredRules: '{0} 件設定済み',
         addressFamily: 'IP バージョン',
@@ -4119,10 +4113,11 @@ const message = {
             '{0} から 1Panel Docker ポート保護ルールとチェーンをすべて削除し、データベースデータのみを保持します',
         cleanupBeforeBackendSwitch:
             '現在の {0} バックエンドには 1Panel の実行時ルールが残っています。{1} に切り替える前にクリーンアップしてください。',
-        cleanupAction: 'クリーンアップ',
+        cleanupAction: 'リセット',
         backendSwitchNotice:
             'システムファイアウォール、ポート転送、Docker 保護を切り替える前に現在のバックエンドをクリーンアップしてください。データベースポリシーは保持され、切り替え後に再初期化または同期できます。',
         switchBackendHelper: '{0} に切り替えますか？',
+        switchDockerBackendHelper: '{0} に切り替えますか？Docker の設定を更新し、Docker を再起動します。',
         ruleSyncTitle: 'ルールを同期',
         ruleSyncAction: 'ルールを同期',
         ruleSyncHelper:
@@ -4173,6 +4168,8 @@ const message = {
             blocked: '同期不可',
         },
         uninstalledStatus: '未インストール',
+        selectedBackendNotInstalled:
+            '{backend} サービスが検出されませんでした。{library} から手動でインストールするか、{settings} でファイアウォールバックエンドを切り替えてください。',
         initializedStatus: '初期化済み',
         partiallyInitialized: '一部初期化済み',
         dockerGuardHelper:
@@ -4204,8 +4201,10 @@ const message = {
         denySources: '指定した送信元を拒否',
         allowSources: '指定した送信元のみ許可',
         denyAll: 'すべてのアクセスを拒否',
-        sourcesHelper:
-            '1 行につき 1 つの IPv4/IPv6 アドレスまたは CIDR を入力してください。許可リストが空の場合はすべて拒否します',
+        dockerGuardMixedFamilyHelper:
+            'IPv4 と IPv6 の両方が選択されています。送信元指定は個別に設定してください。「すべて拒否」はそのまま適用できます。',
+        dockerGuardInconsistentConfigHelper:
+            '選択したルールの設定が異なります。再設定するとすべて統一して上書きされ、説明が空の場合はすべてクリアされます。',
         effective: '有効',
         forwardUnsynced: '未同期',
         notEnabled: '未有効化',
@@ -4264,7 +4263,11 @@ const message = {
         destinationPortPlaceholder: '例: 80、80,443、8080-8089',
         deleteRuleConfirm: '{0} 個のルールを削除します。続行しますか？',
         deleteUsedRuleConfirm:
-            'このポートは {0} が使用中です。許可ルールを削除するとサービスにアクセスできなくなる可能性があります。続行しますか？',
+            'このルールは {0} が提供する待ち受け中のサービスを対象としています。削除するとそれらのサービスにアクセスできなくなる可能性があります。続行しますか？',
+        deleteWildcardRuleConfirm:
+            'このルールは {0} に {1} へのアクセスを許可しています。削除すると複数のサービスへのアクセスに影響する可能性があります。続行しますか？',
+        deleteRiskRulesConfirm:
+            '{0} 個のルールを削除します。そのうち {1} 個の許可ルールがサービスへのアクセスに影響する可能性があります。続行しますか？',
         editRuleConfirm: '次の項目を変更します：{0}。ルールは直ちに適用され、再検証されます。続行しますか？',
     },
     runtime: {

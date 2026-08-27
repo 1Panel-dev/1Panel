@@ -2,6 +2,7 @@ package service
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -14,20 +15,128 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 )
+
+const dockerNftablesMinVersion = "29.0.0"
 
 type DockerService struct{}
 
 type IDockerService interface {
 	UpdateConf(req dto.SettingUpdate, withRestart bool) error
+	UpdateFirewallBackend(backend string) error
 	UpdateLogOption(req dto.LogOption) error
 	UpdateIpv6Option(req dto.Ipv6Option) error
 	UpdateConfByFile(info dto.DaemonJsonUpdateByFile) error
 	LoadDockerStatus() *dto.DockerStatus
 	LoadDockerConf() (*dto.DaemonJsonConf, error)
 	OperateDocker(req dto.DockerOperation) error
+}
+
+func loadDockerEngineVersion(ctx context.Context) string {
+	client, err := docker.NewDockerClient()
+	if err == nil {
+		defer client.Close()
+		if version, versionErr := client.ServerVersion(ctx); versionErr == nil && version.Version != "" {
+			return version.Version
+		}
+	}
+	if !cmd.Which("dockerd") {
+		return ""
+	}
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("dockerd", "--version")
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(stdout)
+}
+
+func dockerNftablesSupported(version string) bool {
+	return version != "" && common.CompareAppVersion(version, dockerNftablesMinVersion)
+}
+
+func applyDockerFirewallBackendConfig(daemonMap map[string]interface{}, backend, version string) error {
+	switch backend {
+	case constant.FirewallProviderNftables:
+		if !dockerNftablesSupported(version) {
+			return fmt.Errorf("Docker Engine %s or later is required for the nftables firewall backend", dockerNftablesMinVersion)
+		}
+		daemonMap["experimental"] = true
+		daemonMap["firewall-backend"] = constant.FirewallProviderNftables
+	case constant.FirewallProviderIptables:
+		if dockerNftablesSupported(version) {
+			daemonMap["firewall-backend"] = constant.FirewallProviderIptables
+		} else {
+			delete(daemonMap, "firewall-backend")
+		}
+	default:
+		return fmt.Errorf("unsupported Docker firewall backend %q", backend)
+	}
+	return nil
+}
+
+func (u *DockerService) UpdateFirewallBackend(backend string) error {
+	version := loadDockerEngineVersion(context.Background())
+	if backend == constant.FirewallProviderNftables && !dockerNftablesSupported(version) {
+		return fmt.Errorf("Docker Engine %s or later is required for the nftables firewall backend", dockerNftablesMinVersion)
+	}
+
+	original, readErr := os.ReadFile(constant.DaemonJsonPath)
+	existed := readErr == nil
+	if readErr != nil && !os.IsNotExist(readErr) {
+		return readErr
+	}
+	daemonMap := make(map[string]interface{})
+	if len(bytes.TrimSpace(original)) > 0 {
+		if err := json.Unmarshal(original, &daemonMap); err != nil {
+			return fmt.Errorf("failed to parse Docker configuration: %w", err)
+		}
+	}
+	if err := applyDockerFirewallBackendConfig(daemonMap, backend, version); err != nil {
+		return err
+	}
+	updated, err := json.MarshalIndent(daemonMap, "", "\t")
+	if err != nil {
+		return err
+	}
+	if existed && bytes.Equal(bytes.TrimSpace(original), bytes.TrimSpace(updated)) {
+		return nil
+	}
+	if err := os.MkdirAll(path.Dir(constant.DaemonJsonPath), 0755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(constant.DaemonJsonPath, updated, 0640); err != nil {
+		return err
+	}
+	restore := func() error {
+		if existed {
+			return os.WriteFile(constant.DaemonJsonPath, original, 0640)
+		}
+		err := os.Remove(constant.DaemonJsonPath)
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	if err := validateDockerConfig(); err != nil {
+		if restoreErr := restore(); restoreErr != nil {
+			return fmt.Errorf("%v; failed to restore Docker configuration: %w", err, restoreErr)
+		}
+		return err
+	}
+	if err := controller.HandleRestart("docker"); err != nil {
+		cause := fmt.Errorf("failed to restart Docker: %w", err)
+		if restoreErr := restore(); restoreErr != nil {
+			return fmt.Errorf("%v; failed to restore Docker configuration: %w", cause, restoreErr)
+		}
+		if restoreRestartErr := controller.HandleRestart("docker"); restoreRestartErr != nil {
+			return fmt.Errorf("%v; the previous configuration was restored but Docker could not be restarted: %w", cause, restoreRestartErr)
+		}
+		return cause
+	}
+	return nil
 }
 
 func NewIDockerService() IDockerService {
@@ -167,7 +276,9 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate, withRestart bool) erro
 			delete(daemonMap, "ipv6")
 			delete(daemonMap, "fixed-cidr-v6")
 			delete(daemonMap, "ip6tables")
-			delete(daemonMap, "experimental")
+			if configuredDockerFirewallBackend() != constant.FirewallProviderNftables {
+				delete(daemonMap, "experimental")
+			}
 		}
 	case "LogOption":
 		if req.Value == "disable" {

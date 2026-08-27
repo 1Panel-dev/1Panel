@@ -490,6 +490,21 @@ func (b *BaseApi) ListDockerPortGuard(c *gin.Context) {
 }
 
 // @Tags Firewall
+// @Summary List Docker published ports
+// @Success 200 {array} dto.DockerPortGuardContainer
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/docker/endpoints [get]
+func (b *BaseApi) ListDockerPublishedPorts(c *gin.Context) {
+	data, err := dockerPortGuardService.LoadPublishedPorts(c.Request.Context())
+	if err != nil {
+		handleDockerPortGuardError(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Firewall
 // @Summary Sync Docker port guard rules
 // @Success 200
 // @Security ApiKeyAuth

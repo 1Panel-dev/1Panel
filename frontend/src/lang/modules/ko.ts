@@ -3976,26 +3976,20 @@ const message = {
         plan_equivalent_external_rule:
             '동일한 외부 규칙이 이미 있습니다. 중복 생성 대신 관리 대상으로 전환할 수 있습니다.',
         plan_multiple_equivalent_external_rules: '동일한 외부 규칙이 여러 개 있습니다. 관리할 규칙을 선택하세요.',
-        plan_requested_rule_is_covered: '기존 규칙이 이미 이 설정을 포함합니다. 계속하면 겹치는 규칙이 생성됩니다.',
         plan_equivalent_managed_rule: '동일한 규칙을 1Panel이 이미 관리하고 있습니다. 중복 생성할 필요가 없습니다.',
         allRulesAlreadyExist: '확인한 규칙 {0}개가 모두 이미 존재합니다. 새로 생성할 규칙이 없습니다.',
         ruleCheckResult: '규칙 검사 결과',
         ruleCheckStatus_creatable: '생성 가능',
         ruleCheckStatus_existing: '이미 존재함',
-        ruleCheckStatus_warning: '경고',
         ruleCheckStatus_error: '오류',
         ruleCheckExistingHelper: '동일한 규칙이 이미 존재하므로 이번 작업에서는 건너뜁니다.',
         ruleCheckReadyHelper: '검사를 통과했습니다. 이 규칙을 생성할 수 있습니다.',
         ruleCheckExternalExists: '동일한 외부 규칙이 이미 존재하며 자동으로 건너뜁니다.',
         ruleCheckBlockedHelper: '오류가 있는 규칙은 제출할 수 없습니다. 돌아가서 수정한 후 다시 검사하세요.',
-        ruleCheckWarningHelper: '검사가 완료되었습니다. 경고는 제출을 막지 않으므로 계속할 수 있습니다.',
         plan_managed_rule_drifted: '관리 규칙이 실제 방화벽과 일치하지 않습니다. 먼저 불일치를 해결하세요.',
         plan_opaque_rule_in_target_scope: '대상 범위에 안전하게 분석할 수 없는 규칙이 있어 작업을 중지했습니다.',
         plan_runtime_permanent_mismatch: '실행 중 구성과 영구 방화벽 구성이 다릅니다. 먼저 동기화하세요.',
         plan_protected_rule: '이 규칙은 보호되어 관리 전환, 변경 또는 삭제할 수 없습니다.',
-        plan_overlapping_rule_with_different_action: '반대 동작을 가진 겹치는 규칙이 있어 작업을 중지했습니다.',
-        plan_partially_overlapping_rule_with_different_action:
-            '반대 동작을 가진 규칙과 일부 겹칩니다. 실제 동작은 규칙 순서에 따라 결정됩니다.',
         plan_blocked: '이 규칙을 안전하게 적용할 수 없습니다. 목록을 새로 고친 후 다시 시도하세요.',
         scopeDefaultMismatch: '시스템 기본 zone은 {0}이며 이 페이지는 public zone만 관리합니다.',
         scopeInactive: '관리 범위가 비활성 상태입니다. 새 규칙이 현재 트래픽에 적용되지 않을 수 있습니다.',
@@ -4025,6 +4019,7 @@ const message = {
         systemFirewallHelper: '호스트 포트 접근과 인바운드 규칙을 관리합니다.',
         forwardingHelper: '포트 포워딩 규칙을 관리합니다.',
         dockerFirewallHelper: '1Panel 컨테이너 포트 보호 관리 방식을 선택합니다.',
+        dockerNftablesRequirement: 'Docker ≥ 29.0.0, 실험적',
         backendRecommendation: 'iptables 또는 nftables 사용을 권장합니다.',
         configuredRules: '{0}개 규칙 설정됨',
         addressFamily: 'IP 버전',
@@ -4041,10 +4036,11 @@ const message = {
             '{0}의 모든 1Panel Docker 포트 보호 규칙과 체인을 삭제하고 데이터베이스 데이터만 유지합니다',
         cleanupBeforeBackendSwitch:
             '현재 {0} 백엔드에 1Panel 런타임 규칙이 남아 있습니다. {1}(으)로 전환하기 전에 먼저 정리하세요.',
-        cleanupAction: '정리',
+        cleanupAction: '재설정',
         backendSwitchNotice:
             '시스템 방화벽, 포트 전달 또는 Docker 보호를 전환하기 전에 현재 백엔드를 정리하세요. 데이터베이스 정책은 유지되며 전환 후 다시 초기화하거나 동기화할 수 있습니다.',
         switchBackendHelper: '{0}(으)로 전환하시겠습니까?',
+        switchDockerBackendHelper: '{0}(으)로 전환하시겠습니까? Docker 설정을 업데이트하고 Docker를 재시작합니다.',
         ruleSyncTitle: '규칙 동기화',
         ruleSyncAction: '규칙 동기화',
         ruleSyncHelper:
@@ -4094,6 +4090,8 @@ const message = {
             blocked: '동기화 불가',
         },
         uninstalledStatus: '설치되지 않음',
+        selectedBackendNotInstalled:
+            '{backend} 서비스를 감지하지 못했습니다. {library}에서 수동으로 설치하거나 {settings}에서 방화벽 백엔드를 전환하세요.',
         initializedStatus: '초기화됨',
         partiallyInitialized: '일부 초기화됨',
         dockerGuardHelper:
@@ -4125,8 +4123,10 @@ const message = {
         denySources: '지정한 소스 거부',
         allowSources: '지정한 소스만 허용',
         denyAll: '모든 접근 거부',
-        sourcesHelper:
-            '한 줄에 하나의 IPv4/IPv6 주소 또는 CIDR을 입력하세요. 허용 목록이 비어 있으면 모든 접근을 거부합니다',
+        dockerGuardMixedFamilyHelper:
+            'IPv4와 IPv6가 모두 선택되었습니다. 출발지 지정 정책은 각각 설정해야 하며, 모든 접근 거부는 바로 적용할 수 있습니다.',
+        dockerGuardInconsistentConfigHelper:
+            '선택한 규칙의 설정이 서로 다릅니다. 다시 설정하면 모두 동일하게 덮어쓰며, 설명이 비어 있으면 모든 설명을 지웁니다.',
         effective: '적용됨',
         forwardUnsynced: '미동기화',
         notEnabled: '활성화되지 않음',
@@ -4183,7 +4183,11 @@ const message = {
         destinationPortPlaceholder: '예: 80, 80,443 또는 8080-8089',
         deleteRuleConfirm: '{0}개의 규칙을 삭제합니다. 계속하시겠습니까?',
         deleteUsedRuleConfirm:
-            '이 포트는 {0}에서 사용 중입니다. 허용 규칙을 삭제하면 서비스에 접근하지 못할 수 있습니다. 계속하시겠습니까?',
+            '이 규칙은 {0}이(가) 제공하는 대기 중인 서비스에 적용됩니다. 삭제하면 해당 서비스에 접근하지 못할 수 있습니다. 계속하시겠습니까?',
+        deleteWildcardRuleConfirm:
+            '이 규칙은 {0}에서 {1}에 접근하도록 허용합니다. 삭제하면 여러 서비스에 대한 접근에 영향을 줄 수 있습니다. 계속하시겠습니까?',
+        deleteRiskRulesConfirm:
+            '{0}개의 규칙을 삭제합니다. 그중 {1}개의 허용 규칙이 서비스 접근에 영향을 줄 수 있습니다. 계속하시겠습니까?',
         editRuleConfirm: '다음 필드가 변경됩니다: {0}. 규칙이 즉시 적용되고 다시 검증됩니다. 계속하시겠습니까?',
         quickJump: '빠른 이동',
     },

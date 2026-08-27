@@ -285,6 +285,8 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		command := insertCommand(position, normalized, marker)
 		if change.Append {
 			command = commentCommand(normalized, marker)
+			plan.Expected.Locator.NativeID = ""
+			plan.Expected.Locator.Position = nil
 		}
 		plan.Commands = []filter.NativeCommand{command}
 		plan.RollbackCommands = []filter.NativeCommand{deleteRuleCommand(normalized, marker)}
@@ -311,14 +313,27 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 			}
 			targetPosition = int(*normalized.OrderIndex)
 		}
+		maximumPosition := maximumObservedPosition(snapshot)
+		if targetPosition > maximumPosition {
+			return filter.NativeRulePlan{}, fmt.Errorf(
+				"%w: update target position %d is out of range 1-%d",
+				filter.ErrInvalidRule, targetPosition, maximumPosition,
+			)
+		}
+		appendAtEnd := change.Append || targetPosition == maximumPosition
+		restoreAtEnd := change.RestoreAtEnd || position == maximumPosition
 		plan.Previous = &target
 		plan.Expected = observedForRule(normalized, marker, targetPosition)
+		if appendAtEnd {
+			plan.Expected.Locator.NativeID = ""
+			plan.Expected.Locator.Position = nil
+		}
 		plan.Commands = []filter.NativeCommand{
 			deletePositionCommand(position),
-			positionedCommand(targetPosition, normalized, marker, change.Append),
+			positionedCommand(targetPosition, normalized, marker, appendAtEnd),
 		}
 		plan.RollbackCommands = []filter.NativeCommand{
-			positionedCommand(position, target.Rule, observedComment(target), change.RestoreAtEnd),
+			positionedCommand(position, target.Rule, observedComment(target), restoreAtEnd),
 			deleteRuleCommand(normalized, marker),
 		}
 	case filter.ChangeDelete:
@@ -330,8 +345,9 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		plan.Previous = &target
 		plan.Expected = target
 		plan.Commands = []filter.NativeCommand{deletePositionCommand(position)}
+		restoreAtEnd := change.RestoreAtEnd || position == maximumObservedPosition(snapshot)
 		plan.RollbackCommands = []filter.NativeCommand{
-			positionedCommand(position, target.Rule, observedComment(target), change.RestoreAtEnd),
+			positionedCommand(position, target.Rule, observedComment(target), restoreAtEnd),
 		}
 	case filter.ChangeReorder:
 		return filter.NativeRulePlan{}, fmt.Errorf("%w: ufw reorder is not supported", filter.ErrUnsupportedScope)
@@ -390,15 +406,23 @@ func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChang
 	if target.Protected {
 		return filter.ObservedRule{}, filter.ErrProtectedRule
 	}
-	if target.ParseStatus != filter.ParseStatusSupported {
-		return filter.ObservedRule{}, fmt.Errorf("%w: opaque ufw rules cannot be modified", filter.ErrInvalidRule)
-	}
 	if requireOwned {
 		if target.Marker != marker {
 			return filter.ObservedRule{}, fmt.Errorf("%w: ufw rule is not owned by this rule UUID", filter.ErrInvalidRule)
 		}
 	} else if target.Marker != "" {
 		return filter.ObservedRule{}, fmt.Errorf("%w: ufw adoption target is already marked", filter.ErrInvalidRule)
+	}
+	if target.Marker == marker && target.ParseStatus != filter.ParseStatusSupported &&
+		(target.ParseStatus == filter.ParseStatusOpaque || filter.ObservedRuleMatchesExpected(target, desired)) {
+		orderIndex := target.Rule.OrderIndex
+		target.Rule = desired
+		target.Rule.OrderIndex = orderIndex
+		target.ParseStatus = filter.ParseStatusSupported
+		target.UncertainFields = nil
+	}
+	if target.ParseStatus != filter.ParseStatusSupported {
+		return filter.ObservedRule{}, fmt.Errorf("%w: opaque ufw rules cannot be modified", filter.ErrInvalidRule)
 	}
 	wantKey, err := filter.RuleKey(desired)
 	if err != nil {
@@ -418,14 +442,18 @@ func insertionPosition(snapshot filter.Snapshot, rule filter.FirewallRule) int {
 	if rule.OrderIndex != nil && *rule.OrderIndex > 0 {
 		return int(*rule.OrderIndex)
 	}
-	maxPosition := 0
+	position := maximumObservedPosition(snapshot) + 1
+	return position
+}
+
+func maximumObservedPosition(snapshot filter.Snapshot) int {
+	maximum := 0
 	for _, observed := range snapshot.Rules {
-		if observed.Locator.Position != nil && *observed.Locator.Position > maxPosition {
-			maxPosition = *observed.Locator.Position
+		if observed.Locator.Position != nil && *observed.Locator.Position > maximum {
+			maximum = *observed.Locator.Position
 		}
 	}
-	position := maxPosition + 1
-	return position
+	return maximum
 }
 
 func observedForRule(rule filter.FirewallRule, marker string, position int) filter.ObservedRule {
@@ -536,17 +564,21 @@ func (a *Adapter) verify(ctx context.Context, plan filter.BackendPlan) (filter.V
 	if count != 1 {
 		return filter.VerifyResult{Snapshot: snapshot, Matched: false}, nil
 	}
-	wantKey, err := filter.RuleKey(rulePlan.Expected.Rule)
-	if err != nil {
-		return filter.VerifyResult{}, err
-	}
 	for _, observed := range snapshot.Rules {
-		if observed.Marker != marker || observed.ParseStatus != filter.ParseStatusSupported {
+		if observed.Marker != marker {
 			continue
 		}
-		gotKey, keyErr := filter.RuleKey(observed.Rule)
-		if keyErr != nil || gotKey != wantKey || observed.Locator.Position == nil || rulePlan.Expected.Locator.Position == nil ||
-			*observed.Locator.Position != *rulePlan.Expected.Locator.Position {
+		positionMatches := rulePlan.Expected.Locator.Position == nil ||
+			(observed.Locator.Position != nil && *observed.Locator.Position == *rulePlan.Expected.Locator.Position)
+		semanticMatches := filter.ObservedRuleMatchesExpected(observed, rulePlan.Expected.Rule)
+		// A unique generated marker proves that UFW committed this command. Some
+		// UFW versions render otherwise valid rules in a form the numbered-status
+		// parser cannot fully recover. Do not turn that read-side limitation into
+		// a failed write, but keep rejecting fully parsed semantic mismatches.
+		if observed.ParseStatus == filter.ParseStatusOpaque {
+			semanticMatches = true
+		}
+		if !semanticMatches || !positionMatches {
 			return filter.VerifyResult{Snapshot: snapshot, Matched: false}, nil
 		}
 		return filter.VerifyResult{Snapshot: snapshot, Matched: true}, nil
@@ -657,6 +689,7 @@ func parseNumberedRules(scope filter.Scope, output string) []filter.ObservedRule
 
 func parseNumberedRule(scope filter.Scope, position int, destination, action, direction, source, raw string) filter.ObservedRule {
 	comment, source := splitComment(source)
+	marker := ownedMarker(comment)
 	positionCopy := position
 	locator := filter.Locator{
 		Provider: filter.ProviderUFW, ScopeKey: scope.Key(), NativeID: strconv.Itoa(position),
@@ -674,12 +707,13 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 	opaque := func() filter.ObservedRule {
 		return filter.ObservedRule{
 			Rule:    partialRule,
+			Marker:  marker,
 			Locator: locator, ParseStatus: filter.ParseStatusOpaque, Raw: raw, Persistence: filter.PersistenceStatusConverged,
 		}
 	}
 	partial := func() filter.ObservedRule {
 		return filter.ObservedRule{
-			Rule: partialRule, Locator: locator, ParseStatus: filter.ParseStatusPartial, Raw: raw,
+			Rule: partialRule, Locator: locator, Marker: marker, ParseStatus: filter.ParseStatusPartial, Raw: raw,
 			Persistence: filter.PersistenceStatusConverged,
 		}
 	}
@@ -717,7 +751,7 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 				SourceAddress: sourceAddress, Interface: profileInterface, Action: ruleAction,
 				OrderIndex: &order, Description: profile,
 			},
-			Locator: locator, ParseStatus: filter.ParseStatusOpaque, Raw: raw,
+			Locator: locator, Marker: marker, ParseStatus: filter.ParseStatusOpaque, Raw: raw,
 			Persistence: filter.PersistenceStatusConverged,
 		}
 	}
@@ -725,8 +759,10 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 	partialRule.DestinationAddress = destinationAddress
 	partialRule.DestinationPort = destinationPort
 	partialRule.Interface = iface
-	partialRule.Description = comment
-	if partialRule.Description == "" {
+	if marker == "" {
+		partialRule.Description = comment
+	}
+	if partialRule.Description == "" && marker == "" {
 		partialRule.Description = destinationAnnotation
 	}
 	if destinationAnnotation != "" && validApplicationProfileName(destinationAnnotation) {
@@ -742,10 +778,7 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 		SourceAddress: sourceAddress, DestinationAddress: destinationAddress, DestinationPort: destinationPort,
 		Interface: iface, Action: ruleAction, OrderIndex: &order,
 	}
-	marker := ""
-	if strings.HasPrefix(comment, "1panel-rule:") && strings.TrimSpace(strings.TrimPrefix(comment, "1panel-rule:")) != "" {
-		marker = comment
-	} else {
+	if marker == "" {
 		rule.Description = comment
 		if rule.Description == "" {
 			rule.Description = destinationAnnotation
@@ -756,9 +789,15 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 		return opaque()
 	}
 	locator.Canonical = canonicalRule(normalized)
+	parseStatus := filter.ParseStatusSupported
+	var uncertainFields []string
+	if normalized.Protocol == "all" && normalized.DestinationPort == "" {
+		parseStatus = filter.ParseStatusPartial
+		uncertainFields = []string{filter.ObservedFieldProtocol}
+	}
 	return filter.ObservedRule{
-		Rule: normalized, Locator: locator, Marker: marker, ParseStatus: filter.ParseStatusSupported,
-		Raw: raw, Persistence: filter.PersistenceStatusConverged,
+		Rule: normalized, Locator: locator, Marker: marker, ParseStatus: parseStatus,
+		UncertainFields: uncertainFields, Raw: raw, Persistence: filter.PersistenceStatusConverged,
 	}
 }
 
@@ -834,7 +873,8 @@ func parseUnrecognizedNumberedRule(scope filter.Scope, raw string) (filter.Obser
 		return filter.ObservedRule{}, "", false, false
 	}
 	positionCopy := position
-	_, familyInput := splitComment(matches[2])
+	comment, familyInput := splitComment(matches[2])
+	marker := ownedMarker(comment)
 	family := filter.FamilyIPv4
 	if strings.Contains(familyInput, "(v6)") || containsIPv6Address(familyInput) {
 		family = filter.FamilyIPv6
@@ -850,8 +890,16 @@ func parseUnrecognizedNumberedRule(scope filter.Scope, raw string) (filter.Obser
 			Provider: filter.ProviderUFW, ScopeKey: scope.Key(), NativeID: strconv.Itoa(position),
 			Canonical: normalizedDisplay(raw), Position: &positionCopy,
 		},
-		ParseStatus: filter.ParseStatusOpaque, Raw: raw, Persistence: filter.PersistenceStatusConverged,
+		Marker: marker, ParseStatus: filter.ParseStatusOpaque, Raw: raw, Persistence: filter.PersistenceStatusConverged,
 	}, family, inbound, true
+}
+
+func ownedMarker(comment string) string {
+	comment = strings.TrimSpace(comment)
+	if strings.HasPrefix(comment, "1panel-rule:") && strings.TrimSpace(strings.TrimPrefix(comment, "1panel-rule:")) != "" {
+		return comment
+	}
+	return ""
 }
 
 func splitComment(source string) (string, string) {
@@ -887,6 +935,9 @@ func parseDestination(value string) (address, port, protocol, iface, annotation 
 		if isAnywhere(tokens[0]) {
 			return "", "", "all", iface, annotation, true
 		}
+		if parsedAddress, parsedProtocol, endpointOK := parseAddressProtocol(tokens[0]); endpointOK {
+			return parsedAddress, "", parsedProtocol, iface, annotation, true
+		}
 		if parsedPort, parsedProtocol, portOK := parsePortProtocol(tokens[0]); portOK {
 			return "", parsedPort, parsedProtocol, iface, annotation, true
 		}
@@ -901,6 +952,23 @@ func parseDestination(value string) (address, port, protocol, iface, annotation 
 		}
 	}
 	return "", "", "", "", "", false
+}
+
+func parseAddressProtocol(value string) (string, string, bool) {
+	separator := strings.LastIndex(value, "/")
+	if separator <= 0 || separator == len(value)-1 {
+		return "", "", false
+	}
+	protocol := strings.ToLower(strings.TrimSpace(value[separator+1:]))
+	if protocol != "tcp" && protocol != "udp" {
+		return "", "", false
+	}
+	endpoint := strings.TrimSpace(value[:separator])
+	if isAnywhere(endpoint) {
+		return "", protocol, true
+	}
+	address, ok := parseAddress(endpoint)
+	return address, protocol, ok
 }
 
 func splitDestinationAnnotation(value string) (string, string) {

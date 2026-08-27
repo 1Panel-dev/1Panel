@@ -2,7 +2,15 @@
     <div>
         <FireRouter />
         <DockerGuardStatus :base="data.base" @operate="operate" @cleanup="cleanupBackend" />
-        <LayoutContent v-if="data.base.isExist" :title="$t('firewall.dockerGuard')" v-loading="loading">
+        <el-card v-if="data.base.isExist && !data.base.message && !data.base.initialized" class="mask-prompt">
+            <span>{{ $t('firewall.initHelper', [data.base.name]) }}</span>
+        </el-card>
+        <LayoutContent
+            v-if="data.base.isExist"
+            :title="$t('firewall.dockerGuard')"
+            :class="{ mask: !data.base.message && !data.base.initialized }"
+            v-loading="loading"
+        >
             <template #prompt>
                 <el-alert v-if="data.base.message" type="warning" :closable="false" :title="data.base.message" />
                 <el-alert v-else type="info" :closable="false" :title="$t('firewall.dockerGuardHelper')" />
@@ -20,11 +28,24 @@
                 <el-button v-if="allOrphanPolicies.length" plain @click="orphanDrawerVisible = true">
                     {{ $t('firewall.orphanPolicies') }} ({{ allOrphanPolicies.length }})
                 </el-button>
+                <el-button
+                    v-permission
+                    v-node-admin
+                    :disabled="selectedPolicyUUIDs.length === 0"
+                    @click="removeSelectedPolicies"
+                >
+                    {{ $t('commons.button.delete') }}
+                </el-button>
                 <el-button-group>
                     <el-button v-permission v-node-admin @click="openImport">
                         {{ $t('commons.button.import') }}
                     </el-button>
-                    <el-button v-permission v-node-admin :disabled="policies.length === 0" @click="exportAll">
+                    <el-button
+                        v-permission
+                        v-node-admin
+                        :disabled="policies.length === 0"
+                        @click="exportPoliciesBySelection"
+                    >
                         {{ $t('commons.button.export') }}
                     </el-button>
                 </el-button-group>
@@ -56,7 +77,8 @@
                 <TableRefresh @search="search" />
             </template>
             <template #main>
-                <ComplexTable :data="containerRows" :heightDiff="370">
+                <ComplexTable v-model:selects="selects" :data="containerRows" :heightDiff="370" row-key="key">
+                    <el-table-column type="selection" :selectable="hasProtectedEndpoint" width="48" fix />
                     <el-table-column :label="$t('commons.table.name')" min-width="180">
                         <template #default="{ row }">{{ row.name }}</template>
                     </el-table-column>
@@ -101,7 +123,24 @@
                     show-icon
                     :title="$t('firewall.orphanPoliciesHelper', [allOrphanPolicies.length])"
                 />
-                <el-table :data="orphanRows" max-height="calc(100vh - 180px)" class="mt-3">
+                <div class="mt-3">
+                    <el-button
+                        v-permission
+                        v-node-admin
+                        :disabled="orphanSelects.length === 0"
+                        @click="removePolicies(orphanSelects, true)"
+                    >
+                        {{ $t('commons.button.delete') }}
+                    </el-button>
+                </div>
+                <el-table
+                    :data="orphanRows"
+                    row-key="policyUUID"
+                    max-height="calc(100vh - 220px)"
+                    class="mt-3"
+                    @selection-change="changeOrphanSelection"
+                >
+                    <el-table-column type="selection" width="48" />
                     <el-table-column :label="$t('commons.table.port')" min-width="190">
                         <template #default="{ row }">
                             <span>{{ endpointLabel(row) }}</span>
@@ -123,7 +162,13 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.operate')" width="80" fixed="right">
                         <template #default="{ row }">
-                            <el-button v-permission v-node-admin type="primary" link @click="removeOrphanPolicy(row)">
+                            <el-button
+                                v-permission
+                                v-node-admin
+                                type="primary"
+                                link
+                                @click="removePolicies([row], false)"
+                            >
                                 {{ $t('commons.button.delete') }}
                             </el-button>
                         </template>
@@ -169,6 +214,8 @@ const cleanupConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
 const orphanDrawerVisible = ref(false);
 const searchName = ref('');
 const selectedFilters = ref<string[]>([]);
+const selects = ref<Firewall.DockerGuardContainer[]>([]);
+const orphanSelects = ref<Firewall.DockerGuardEndpoint[]>([]);
 const data = reactive<Firewall.DockerGuardList>({
     base: {
         name: 'iptables-docker',
@@ -304,6 +351,30 @@ const policies = computed<Firewall.DockerGuardPolicy[]>(() => {
     return [...result.values()];
 });
 
+const policyUUIDs = (endpoints: Firewall.DockerGuardEndpoint[]) => [
+    ...new Set(endpoints.map((endpoint) => endpoint.policyUUID).filter(Boolean) as string[]),
+];
+const selectedEndpoints = computed(() => selects.value.flatMap((container) => container.endpoints));
+const selectedPolicyUUIDs = computed(() => policyUUIDs(selectedEndpoints.value));
+const hasProtectedEndpoint = (container: Firewall.DockerGuardContainer) =>
+    container.endpoints.some((endpoint) => Boolean(endpoint.policyUUID));
+const policiesFromEndpoints = (endpoints: Firewall.DockerGuardEndpoint[]) => {
+    const result = new Map<string, Firewall.DockerGuardPolicy>();
+    for (const endpoint of endpoints) {
+        if (!endpoint.policyUUID || !endpoint.mode) continue;
+        result.set(dockerGuardEndpointKey(endpoint), {
+            family: endpoint.family,
+            hostIP: endpoint.hostIP,
+            hostPort: endpoint.hostPort,
+            protocol: endpoint.protocol,
+            mode: endpoint.mode,
+            sources: endpoint.sources || [],
+            description: endpoint.description || '',
+        });
+    }
+    return [...result.values()];
+};
+
 const isExternallyExposed = (endpoint: Firewall.DockerGuardEndpoint) =>
     (endpoint.family === 'ipv4' && (!endpoint.hostIP || endpoint.hostIP === '0.0.0.0')) ||
     (endpoint.family === 'ipv6' && (!endpoint.hostIP || endpoint.hostIP === '::'));
@@ -316,6 +387,8 @@ const search = async () => {
     loading.value = true;
     try {
         Object.assign(data, (await loadDockerPortGuard()).data);
+        selects.value = [];
+        orphanSelects.value = [];
     } finally {
         loading.value = false;
     }
@@ -363,39 +436,54 @@ const openRuleSync = () => {
 const openImport = () => {
     importRef.value?.acceptParams();
 };
-const exportAll = async () => {
-    if (!policies.value.length) return;
+const exportPolicies = async (items: Firewall.DockerGuardPolicy[]) => {
+    if (!items.length) return;
     try {
         await ElMessageBox.confirm(
-            i18n.global.t('firewall.exportHelper', [policies.value.length]),
+            i18n.global.t('firewall.exportHelper', [items.length]),
             i18n.global.t('commons.button.export'),
         );
     } catch {
         return;
     }
-    downloadWithContent(
-        JSON.stringify(policies.value, null, 2),
-        `1panel-docker-port-guard-${getCurrentDateFormatted()}.json`,
-    );
+    downloadWithContent(JSON.stringify(items, null, 2), `1panel-docker-port-guard-${getCurrentDateFormatted()}.json`);
+};
+const exportPoliciesBySelection = () => {
+    const selected = policiesFromEndpoints(selectedEndpoints.value);
+    return exportPolicies(selected.length > 0 ? selected : policies.value);
 };
 const openPorts = (row: Firewall.DockerGuardContainer) => {
     detailRef.value?.acceptParams(row);
 };
-const removeOrphanPolicy = async (row: Firewall.DockerGuardEndpoint) => {
-    if (!row.policyUUID) return;
+const changeOrphanSelection = (rows: Firewall.DockerGuardEndpoint[]) => {
+    orphanSelects.value = rows;
+};
+const removePolicies = async (endpoints: Firewall.DockerGuardEndpoint[], batch: boolean) => {
+    const uuids = policyUUIDs(endpoints);
+    if (!uuids.length) return;
     try {
         await ElMessageBox.confirm(
-            i18n.global.t('firewall.deleteDockerGuardPolicyConfirm'),
+            i18n.global.t(
+                batch ? 'firewall.clearDockerGuardPoliciesConfirm' : 'firewall.deleteDockerGuardPolicyConfirm',
+            ),
             i18n.global.t('commons.button.delete'),
             { type: 'warning' },
         );
     } catch {
         return;
     }
-    await deleteDockerPortGuardPolicies({ uuids: [row.policyUUID] });
-    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    await search();
+    loading.value = true;
+    try {
+        for (let offset = 0; offset < uuids.length; offset += 256) {
+            await deleteDockerPortGuardPolicies({ uuids: uuids.slice(offset, offset + 256) });
+        }
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        await search();
+    } finally {
+        loading.value = false;
+    }
 };
+const removeSelectedPolicies = () => removePolicies(selectedEndpoints.value, true);
 const protectionModeLabel = (row: Firewall.DockerGuardEndpoint) => {
     if (row.mode === 'deny_sources') return i18n.global.t('firewall.denySources');
     if (row.mode === 'allow_sources') return i18n.global.t('firewall.allowSources');

@@ -4132,30 +4132,22 @@ const message = {
         plan_equivalent_external_rule: 'Peraturan luaran yang sama sudah wujud. Ambil alih tanpa mencipta pendua.',
         plan_multiple_equivalent_external_rules:
             'Terdapat beberapa peraturan luaran yang sama. Pilih satu untuk diurus.',
-        plan_requested_rule_is_covered:
-            'Peraturan sedia ada sudah meliputi konfigurasi ini. Meneruskan akan mencipta peraturan bertindih.',
         plan_equivalent_managed_rule: 'Peraturan yang sama sudah diurus oleh 1Panel. Pendua tidak diperlukan.',
         allRulesAlreadyExist: 'Kesemua {0} peraturan yang diperiksa sudah wujud. Tiada peraturan baharu untuk dicipta.',
         ruleCheckResult: 'Keputusan semakan peraturan',
         ruleCheckStatus_creatable: 'Boleh dicipta',
         ruleCheckStatus_existing: 'Sudah wujud',
-        ruleCheckStatus_warning: 'Amaran',
         ruleCheckStatus_error: 'Ralat',
         ruleCheckExistingHelper: 'Peraturan yang sama sudah wujud dan akan dilangkau.',
         ruleCheckReadyHelper: 'Semakan lulus. Peraturan ini boleh dicipta.',
         ruleCheckExternalExists: 'Peraturan luaran yang sama sudah wujud dan akan dilangkau secara automatik.',
         ruleCheckBlockedHelper: 'Peraturan yang mempunyai ralat tidak boleh dihantar. Kembali, edit dan semak semula.',
-        ruleCheckWarningHelper: 'Semakan selesai. Amaran tidak menghalang penghantaran; anda boleh meneruskan.',
         plan_managed_rule_drifted:
             'Peraturan terurus tidak sepadan dengan tembok api aktif. Selesaikan perbezaan dahulu.',
         plan_opaque_rule_in_target_scope:
             'Skop sasaran mengandungi peraturan yang tidak dapat dihuraikan dengan selamat. Operasi dihentikan.',
         plan_runtime_permanent_mismatch: 'Konfigurasi tembok api aktif dan kekal berbeza. Segerakkan dahulu.',
         plan_protected_rule: 'Peraturan ini dilindungi dan tidak boleh diambil alih, diubah atau dipadam.',
-        plan_overlapping_rule_with_different_action:
-            'Terdapat peraturan bertindih dengan tindakan bertentangan. Operasi dihentikan.',
-        plan_partially_overlapping_rule_with_different_action:
-            'Peraturan ini bertindih sebahagian dengan peraturan bertentangan. Hasil bergantung pada susunan peraturan.',
         plan_blocked: 'Peraturan ini tidak dapat digunakan dengan selamat. Muat semula senarai dan cuba lagi.',
         scopeDefaultMismatch: 'Zon lalai sistem ialah {0}; halaman ini hanya mengurus zon public.',
         scopeInactive: 'Skop terurus tidak aktif. Peraturan baharu mungkin tidak mempengaruhi trafik semasa.',
@@ -4187,6 +4179,7 @@ const message = {
         systemFirewallHelper: 'Mengawal akses port hos dan peraturan masuk.',
         forwardingHelper: 'Mengurus peraturan pemajuan port.',
         dockerFirewallHelper: 'Memilih cara 1Panel mengurus perlindungan port bekas.',
+        dockerNftablesRequirement: 'Docker ≥ 29.0.0, percubaan',
         backendRecommendation: 'Disyorkan untuk menggunakan iptables atau nftables.',
         configuredRules: '{0} peraturan dikonfigurasi',
         addressFamily: 'Versi IP',
@@ -4204,10 +4197,11 @@ const message = {
             'Padam semua peraturan dan rantaian perlindungan port Docker 1Panel daripada {0}, hanya mengekalkan data pangkalan data',
         cleanupBeforeBackendSwitch:
             'Bahagian belakang semasa {0} masih mengandungi peraturan masa jalan 1Panel. Bersihkannya sebelum bertukar kepada {1}.',
-        cleanupAction: 'Bersihkan',
+        cleanupAction: 'Tetapkan semula',
         backendSwitchNotice:
             'Bersihkan bahagian belakang semasa sebelum menukar tembok api sistem, pemajuan port atau perlindungan Docker. Dasar pangkalan data dikekalkan dan boleh dimulakan atau disegerakkan selepas penukaran.',
         switchBackendHelper: 'Tukar kepada {0}?',
+        switchDockerBackendHelper: 'Tukar kepada {0}? Ini akan mengemas kini konfigurasi dan memulakan semula Docker.',
         ruleSyncTitle: 'Segerakkan peraturan',
         ruleSyncAction: 'Segerakkan peraturan',
         ruleSyncHelper:
@@ -4259,6 +4253,8 @@ const message = {
             blocked: 'Tidak tersedia',
         },
         uninstalledStatus: 'Belum dipasang',
+        selectedBackendNotInstalled:
+            'Perkhidmatan {backend} tidak dikesan. Pasang secara manual daripada {library}, atau tukar backend firewall dalam {settings}.',
         initializedStatus: 'Dimulakan',
         partiallyInitialized: 'Dimulakan sebahagian',
         dockerGuardHelper:
@@ -4290,7 +4286,10 @@ const message = {
         denySources: 'Tolak sumber tertentu',
         allowSources: 'Benarkan sumber tertentu sahaja',
         denyAll: 'Tolak semua akses',
-        sourcesHelper: 'Masukkan satu alamat IPv4/IPv6 atau CIDR setiap baris; senarai izin kosong menolak semua akses',
+        dockerGuardMixedFamilyHelper:
+            'IPv4 dan IPv6 dipilih. Konfigurasikan dasar berasaskan sumber secara berasingan; tolak semua boleh digunakan terus.',
+        dockerGuardInconsistentConfigHelper:
+            'Peraturan yang dipilih mempunyai konfigurasi berbeza. Tetapkan semula untuk menulis ganti semuanya; keterangan kosong akan mengosongkan semua keterangan.',
         effective: 'Berkuat kuasa',
         forwardUnsynced: 'Belum disegerak',
         notEnabled: 'Tidak didayakan',
@@ -4349,7 +4348,11 @@ const message = {
         destinationPortPlaceholder: 'contoh: 80, 80,443 atau 8080-8089',
         deleteRuleConfirm: 'Akan memadam {0} peraturan. Teruskan?',
         deleteUsedRuleConfirm:
-            'Port ini sedang digunakan oleh {0}. Memadam peraturan benarkan mungkin menyebabkan perkhidmatan tidak dapat dicapai. Teruskan?',
+            'Peraturan ini meliputi perkhidmatan mendengar yang disediakan oleh {0}. Memadamnya mungkin menyebabkan perkhidmatan tersebut tidak dapat dicapai. Teruskan?',
+        deleteWildcardRuleConfirm:
+            'Peraturan ini membenarkan {0} mengakses {1}. Memadamnya mungkin menjejaskan akses kepada beberapa perkhidmatan. Teruskan?',
+        deleteRiskRulesConfirm:
+            'Akan memadam {0} peraturan. {1} peraturan benarkan mungkin menjejaskan akses perkhidmatan. Teruskan?',
         editRuleConfirm: 'Medan berikut akan diubah: {0}. Peraturan akan digunakan dan disahkan serta-merta. Teruskan?',
     },
     runtime: {

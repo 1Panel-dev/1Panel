@@ -4134,27 +4134,20 @@ const message = {
         adoptRuleConfirm: 'Devraldıktan sonra 1Panel bu mevcut kuralı yönetebilir ve silebilir. Devam edilsin mi?',
         plan_equivalent_external_rule: 'Aynı harici kural zaten var. Kopya oluşturmak yerine yönetimi devralın.',
         plan_multiple_equivalent_external_rules: 'Birden fazla aynı harici kural var. Yönetilecek kuralı seçin.',
-        plan_requested_rule_is_covered:
-            'Mevcut bir kural bu yapılandırmayı zaten kapsıyor. Devam etmek örtüşen bir kural oluşturur.',
         plan_equivalent_managed_rule: 'Aynı kural zaten 1Panel tarafından yönetiliyor. Kopya gerekmez.',
         allRulesAlreadyExist: 'Kontrol edilen {0} kuralın tümü zaten mevcut. Oluşturulacak yeni kural yok.',
         ruleCheckResult: 'Kural kontrol sonuçları',
         ruleCheckStatus_creatable: 'Oluşturulabilir',
         ruleCheckStatus_existing: 'Zaten mevcut',
-        ruleCheckStatus_warning: 'Uyarı',
         ruleCheckStatus_error: 'Hata',
         ruleCheckExistingHelper: 'Aynı kural zaten mevcut ve atlanacak.',
         ruleCheckReadyHelper: 'Kontrol başarılı. Bu kural oluşturulabilir.',
         ruleCheckExternalExists: 'Aynı harici kural zaten mevcut ve otomatik olarak atlanacak.',
         ruleCheckBlockedHelper: 'Hatalı kurallar gönderilemez. Geri dönüp düzenleyin ve yeniden kontrol edin.',
-        ruleCheckWarningHelper: 'Kontrol tamamlandı. Uyarılar gönderimi engellemez; devam edebilirsiniz.',
         plan_managed_rule_drifted: 'Yönetilen kural etkin güvenlik duvarıyla eşleşmiyor. Önce farkı giderin.',
         plan_opaque_rule_in_target_scope: 'Hedef kapsamda güvenle ayrıştırılamayan bir kural var. İşlem durduruldu.',
         plan_runtime_permanent_mismatch: 'Etkin ve kalıcı güvenlik duvarı yapılandırmaları farklı. Önce eşitleyin.',
         plan_protected_rule: 'Bu kural korumalıdır; yönetimi devralınamaz, değiştirilemez veya silinemez.',
-        plan_overlapping_rule_with_different_action: 'Karşıt eylemli örtüşen bir kural var. İşlem durduruldu.',
-        plan_partially_overlapping_rule_with_different_action:
-            'Kural, karşıt eylemli bir kuralla kısmen örtüşüyor. Sonuç kural sırasına bağlıdır.',
         plan_blocked: 'Bu kural güvenle uygulanamıyor. Listeyi yenileyip tekrar deneyin.',
         scopeDefaultMismatch: 'Sistemin varsayılan zone değeri {0}; bu sayfa yalnızca public zone alanını yönetir.',
         scopeInactive: 'Yönetilen kapsam etkin değil. Yeni kurallar mevcut trafiği etkilemeyebilir.',
@@ -4185,6 +4178,7 @@ const message = {
         systemFirewallHelper: 'Ana makine port erişimini ve gelen kuralları yönetir.',
         forwardingHelper: 'Port yönlendirme kurallarını yönetir.',
         dockerFirewallHelper: '1Panel konteyner portu korumasının nasıl yönetileceğini seçer.',
+        dockerNftablesRequirement: 'Docker ≥ 29.0.0, deneysel',
         backendRecommendation: 'iptables veya nftables kullanılması önerilir.',
         configuredRules: '{0} kural yapılandırıldı',
         addressFamily: 'IP sürümü',
@@ -4202,10 +4196,12 @@ const message = {
             '{0} içindeki tüm 1Panel Docker bağlantı noktası koruma kurallarını ve zincirlerini silin, yalnızca veritabanı verilerini koruyun',
         cleanupBeforeBackendSwitch:
             'Mevcut {0} arka ucu hâlâ 1Panel çalışma zamanı kuralları içeriyor. {1} arka ucuna geçmeden önce temizleyin.',
-        cleanupAction: 'Temizle',
+        cleanupAction: 'Sıfırla',
         backendSwitchNotice:
             'Sistem güvenlik duvarı, bağlantı noktası yönlendirme veya Docker korumasını değiştirmeden önce mevcut arka ucu temizleyin. Veritabanı ilkeleri korunur ve geçişten sonra yeniden başlatılabilir veya eşitlenebilir.',
         switchBackendHelper: '{0} arka ucuna geçilsin mi?',
+        switchDockerBackendHelper:
+            '{0} arka ucuna geçilsin mi? Docker yapılandırması güncellenecek ve Docker yeniden başlatılacak.',
         ruleSyncTitle: 'Kuralları eşitle',
         ruleSyncAction: 'Kuralları eşitle',
         ruleSyncHelper:
@@ -4256,6 +4252,8 @@ const message = {
             blocked: 'Kullanılamaz',
         },
         uninstalledStatus: 'Yüklü değil',
+        selectedBackendNotInstalled:
+            '{backend} hizmeti algılanmadı. {library} üzerinden manuel olarak yükleyin veya {settings} bölümünden güvenlik duvarı arka ucunu değiştirin.',
         initializedStatus: 'Başlatıldı',
         partiallyInitialized: 'Kısmen başlatıldı',
         dockerGuardHelper:
@@ -4288,7 +4286,10 @@ const message = {
         denySources: 'Belirtilen kaynakları reddet',
         allowSources: 'Yalnızca belirtilen kaynaklara izin ver',
         denyAll: 'Tüm erişimi reddet',
-        sourcesHelper: 'Her satıra bir IPv4/IPv6 adresi veya CIDR girin; boş izin listesi tüm erişimi reddeder',
+        dockerGuardMixedFamilyHelper:
+            'IPv4 ve IPv6 birlikte seçildi. Kaynak tabanlı ilkeleri ayrı ayrı yapılandırın; tüm erişimi reddet doğrudan uygulanabilir.',
+        dockerGuardInconsistentConfigHelper:
+            'Seçili kuralların yapılandırmaları farklı. Tümünün üzerine yazmak için yeniden ayarlayın; açıklamanın boş bırakılması tüm açıklamaları temizler.',
         effective: 'Etkin',
         forwardUnsynced: 'Senkronize değil',
         notEnabled: 'Etkin değil',
@@ -4347,7 +4348,11 @@ const message = {
         destinationPortPlaceholder: 'örn. 80, 80,443 veya 8080-8089',
         deleteRuleConfirm: '{0} kural silinecek. Devam etmek istiyor musunuz?',
         deleteUsedRuleConfirm:
-            'Bu port {0} tarafından kullanılıyor. İzin kuralını silmek hizmeti erişilemez hale getirebilir. Devam edilsin mi?',
+            'Bu kural, {0} tarafından sağlanan dinleme hizmetlerini kapsıyor. Silinmesi bu hizmetleri erişilemez hale getirebilir. Devam edilsin mi?',
+        deleteWildcardRuleConfirm:
+            'Bu kural {0} için {1} erişimine izin veriyor. Silinmesi birden fazla hizmete erişimi etkileyebilir. Devam edilsin mi?',
+        deleteRiskRulesConfirm:
+            '{0} kural silinecek. {1} izin kuralı hizmet erişimini etkileyebilir. Devam edilsin mi?',
         editRuleConfirm: 'Şu alanlar değiştirilecek: {0}. Kural hemen uygulanıp doğrulanacak. Devam edilsin mi?',
     },
     runtime: {

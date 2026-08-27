@@ -29,7 +29,6 @@ const (
 	CheckClassificationNone          CheckClassification = "none"
 	CheckClassificationExactManaged  CheckClassification = "exact_managed"
 	CheckClassificationExactExternal CheckClassification = "exact_external"
-	CheckClassificationCovered       CheckClassification = "covered"
 	CheckClassificationConflict      CheckClassification = "conflict"
 	CheckClassificationUnsupported   CheckClassification = "unsupported"
 	CheckClassificationProtected     CheckClassification = "protected"
@@ -38,11 +37,10 @@ const (
 type CheckAction string
 
 const (
-	CheckActionCreate       CheckAction = "create"
-	CheckActionCreateAnyway CheckAction = "create_anyway"
-	CheckActionAdopt        CheckAction = "adopt"
-	CheckActionSelectAdopt  CheckAction = "select_adopt"
-	CheckActionCancel       CheckAction = "cancel"
+	CheckActionCreate      CheckAction = "create"
+	CheckActionAdopt       CheckAction = "adopt"
+	CheckActionSelectAdopt CheckAction = "select_adopt"
+	CheckActionCancel      CheckAction = "cancel"
 )
 
 type RuleCheckResult struct {
@@ -111,9 +109,6 @@ func CheckCreate(
 	}
 
 	exact := make([]ObservedRule, 0)
-	covered := make([]ObservedRule, 0)
-	conflicts := make([]ObservedRule, 0)
-	partialConflicts := make([]ObservedRule, 0)
 	for _, observed := range snapshot.Rules {
 		if observed.ParseStatus != ParseStatusSupported {
 			if observed.Rule.Scope.Provider == ProviderFirewalld && observed.Rule.NativeKind == NativeKindZoneService {
@@ -136,21 +131,6 @@ func CheckCreate(
 		}
 		if observedKey == ruleKey {
 			exact = append(exact, observed)
-			continue
-		}
-		if RuleCovers(observedRule, normalized) && observedRule.Action == normalized.Action {
-			covered = append(covered, observed)
-			continue
-		}
-		if RulesOverlap(observedRule, normalized) && observedRule.Action != normalized.Action {
-			if allowsOrderedFirewalldException(observed, normalized) {
-				continue
-			}
-			if RuleCovers(observedRule, normalized) {
-				conflicts = append(conflicts, observed)
-			} else {
-				partialConflicts = append(partialConflicts, observed)
-			}
 		}
 	}
 
@@ -177,24 +157,7 @@ func CheckCreate(
 		result.Reason = "multiple_equivalent_external_rules"
 		result.Candidates = exact
 		result.AllowedActions = []CheckAction{CheckActionSelectAdopt, CheckActionCancel}
-	case len(conflicts) > 0:
-		result.Decision = CheckDecisionBlocked
-		result.Classification = CheckClassificationConflict
-		result.Reason = "overlapping_rule_with_different_action"
-		result.Candidates = conflicts
 	case result.Classification == CheckClassificationUnsupported:
-	case len(partialConflicts) > 0:
-		result.Decision = CheckDecisionConfirmationRequired
-		result.Classification = CheckClassificationConflict
-		result.Reason = "partially_overlapping_rule_with_different_action"
-		result.Candidates = partialConflicts
-		result.AllowedActions = []CheckAction{CheckActionCreateAnyway, CheckActionCancel}
-	case len(covered) > 0:
-		result.Decision = CheckDecisionConfirmationRequired
-		result.Classification = CheckClassificationCovered
-		result.Reason = "requested_rule_is_covered"
-		result.Candidates = covered
-		result.AllowedActions = []CheckAction{CheckActionCreateAnyway, CheckActionCancel}
 	default:
 		result.AllowedActions = []CheckAction{CheckActionCreate}
 	}
@@ -213,13 +176,6 @@ func finishCheck(result RuleCheckResult) (RuleCheckResult, error) {
 		result.Candidates[index].InstanceKey = identity
 	}
 	return result, nil
-}
-
-func allowsOrderedFirewalldException(existing ObservedRule, requested FirewallRule) bool {
-	return !existing.Protected && requested.Scope.Provider == ProviderFirewalld &&
-		requested.NativeKind == NativeKindRichRule && requested.Priority != nil && *requested.Priority < 0 &&
-		(requested.Action == ActionDrop || requested.Action == ActionReject) &&
-		existing.Rule.NativeKind == NativeKindZonePort && existing.Rule.Action == ActionAccept
 }
 
 func containsPersistenceDrift(rules []ObservedRule) bool {

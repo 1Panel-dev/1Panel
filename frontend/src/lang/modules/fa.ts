@@ -4025,27 +4025,20 @@ const message = {
         adoptRuleConfirm: 'پس از واگذاری، 1Panel می‌تواند این قانون موجود را نگهداری و حذف کند. ادامه می‌دهید؟',
         plan_equivalent_external_rule: 'یک قانون خارجی یکسان وجود دارد. به‌جای ایجاد تکراری، مدیریت آن را واگذار کنید.',
         plan_multiple_equivalent_external_rules: 'چند قانون خارجی یکسان وجود دارد. یکی را برای مدیریت انتخاب کنید.',
-        plan_requested_rule_is_covered:
-            'یک قانون موجود این تنظیم را پوشش می‌دهد. ادامه باعث ایجاد قانون هم‌پوشان می‌شود.',
         plan_equivalent_managed_rule: 'یک قانون یکسان از قبل توسط 1Panel مدیریت می‌شود و نیازی به تکرار نیست.',
         allRulesAlreadyExist: 'هر {0} قانون بررسی‌شده از قبل وجود دارند. قانون جدیدی برای ایجاد وجود ندارد.',
         ruleCheckResult: 'نتایج بررسی قوانین',
         ruleCheckStatus_creatable: 'قابل ایجاد',
         ruleCheckStatus_existing: 'موجود',
-        ruleCheckStatus_warning: 'هشدار',
         ruleCheckStatus_error: 'خطا',
         ruleCheckExistingHelper: 'یک قانون یکسان از قبل وجود دارد و نادیده گرفته خواهد شد.',
         ruleCheckReadyHelper: 'بررسی با موفقیت انجام شد. این قانون قابل ایجاد است.',
         ruleCheckExternalExists: 'یک قانون خارجی یکسان از قبل وجود دارد و به‌صورت خودکار نادیده گرفته می‌شود.',
         ruleCheckBlockedHelper: 'قوانین دارای خطا قابل ارسال نیستند. بازگردید، آن‌ها را ویرایش و دوباره بررسی کنید.',
-        ruleCheckWarningHelper: 'بررسی کامل شد. هشدارها مانع ارسال نمی‌شوند و می‌توانید ادامه دهید.',
         plan_managed_rule_drifted: 'قانون مدیریت‌شده با دیوارهٔ آتش فعال یکسان نیست. ابتدا ناهمگامی را رفع کنید.',
         plan_opaque_rule_in_target_scope: 'در محدودهٔ هدف قانونی وجود دارد که تحلیل امن آن ممکن نیست. عملیات متوقف شد.',
         plan_runtime_permanent_mismatch: 'پیکربندی فعال و دائمی دیوارهٔ آتش متفاوت است. ابتدا آن‌ها را همگام کنید.',
         plan_protected_rule: 'این قانون محافظت‌شده است و نمی‌توان آن را مدیریت، تغییر یا حذف کرد.',
-        plan_overlapping_rule_with_different_action: 'قانونی هم‌پوشان با عملکرد مخالف وجود دارد. عملیات متوقف شد.',
-        plan_partially_overlapping_rule_with_different_action:
-            'این قانون تا حدی با قانونی با عملکرد مخالف هم‌پوشانی دارد. نتیجه به ترتیب قوانین بستگی دارد.',
         plan_blocked: 'این قانون با ایمنی قابل اعمال نیست. فهرست را تازه‌سازی و دوباره تلاش کنید.',
         scopeDefaultMismatch: 'ناحیهٔ پیش‌فرض سامانه {0} است؛ این صفحه فقط ناحیهٔ public را مدیریت می‌کند.',
         scopeInactive: 'محدودهٔ مدیریت‌شده فعال نیست. قوانین جدید ممکن است بر ترافیک فعلی اثر نگذارند.',
@@ -4075,6 +4068,7 @@ const message = {
         systemFirewallHelper: 'دسترسی پورت‌های میزبان و قوانین ورودی را کنترل می‌کند.',
         forwardingHelper: 'قوانین انتقال پورت را مدیریت می‌کند.',
         dockerFirewallHelper: 'روش مدیریت محافظت از پورت کانتینر در 1Panel را انتخاب می‌کند.',
+        dockerNftablesRequirement: 'Docker ≥ 29.0.0، آزمایشی',
         backendRecommendation: 'استفاده از iptables یا nftables توصیه می‌شود.',
         configuredRules: '{0} قانون پیکربندی شده',
         addressFamily: 'نسخه IP',
@@ -4091,10 +4085,12 @@ const message = {
             'همه قوانین و زنجیره‌های محافظت پورت Docker مربوط به 1Panel از {0} حذف می‌شوند و فقط داده‌های پایگاه داده حفظ می‌شوند',
         cleanupBeforeBackendSwitch:
             'بک‌اند فعلی {0} هنوز شامل قوانین زمان اجرای 1Panel است. پیش از تغییر به {1} آن را پاک‌سازی کنید.',
-        cleanupAction: 'پاک‌سازی',
+        cleanupAction: 'بازنشانی',
         backendSwitchNotice:
             'پیش از تغییر فایروال سیستم، انتقال پورت یا محافظت Docker، بک‌اند فعلی را پاک‌سازی کنید. سیاست‌های پایگاه داده حفظ می‌شوند و پس از تغییر قابل راه‌اندازی یا همگام‌سازی هستند.',
         switchBackendHelper: 'به {0} تغییر داده شود؟',
+        switchDockerBackendHelper:
+            'به {0} تغییر داده شود؟ پیکربندی Docker به‌روزرسانی و Docker راه‌اندازی مجدد می‌شود.',
         ruleSyncTitle: 'همگام‌سازی قوانین',
         ruleSyncAction: 'همگام‌سازی قوانین',
         ruleSyncHelper:
@@ -4145,6 +4141,8 @@ const message = {
             blocked: 'غیرقابل همگام‌سازی',
         },
         uninstalledStatus: 'نصب‌نشده',
+        selectedBackendNotInstalled:
+            'سرویس {backend} شناسایی نشد. آن را به‌صورت دستی از {library} نصب کنید یا بک‌اند فایروال را در {settings} تغییر دهید.',
         initializedStatus: 'راه‌اندازی شده',
         partiallyInitialized: 'تا حدی راه‌اندازی شده',
         dockerGuardHelper:
@@ -4177,7 +4175,10 @@ const message = {
         denySources: 'رد منابع مشخص‌شده',
         allowSources: 'فقط اجازه به منابع مشخص‌شده',
         denyAll: 'رد همه دسترسی‌ها',
-        sourcesHelper: 'در هر خط یک آدرس IPv4/IPv6 یا CIDR وارد کنید؛ فهرست مجاز خالی همه دسترسی‌ها را رد می‌کند',
+        dockerGuardMixedFamilyHelper:
+            'هر دو IPv4 و IPv6 انتخاب شده‌اند. سیاست‌های مبتنی بر مبدأ را جداگانه تنظیم کنید؛ رد همه دسترسی‌ها را می‌توان مستقیماً اعمال کرد.',
+        dockerGuardInconsistentConfigHelper:
+            'پیکربندی قوانین انتخاب‌شده متفاوت است. برای بازنویسی همه، دوباره تنظیم کنید؛ توضیح خالی، توضیحات همه قوانین را پاک می‌کند.',
         effective: 'فعال',
         forwardUnsynced: 'همگام‌نشده',
         notEnabled: 'فعال نشده',
@@ -4236,7 +4237,11 @@ const message = {
         destinationPortPlaceholder: 'مثلاً: 80، 80,443 یا 8080-8089',
         deleteRuleConfirm: '{0} قانون حذف خواهند شد. ادامه می‌دهید؟',
         deleteUsedRuleConfirm:
-            'این پورت توسط {0} استفاده می‌شود. حذف قانون مجاز ممکن است سرویس را غیرقابل دسترس کند. ادامه می‌دهید؟',
+            'این قانون سرویس‌های در حال گوش‌دادن ارائه‌شده توسط {0} را پوشش می‌دهد. حذف آن ممکن است این سرویس‌ها را غیرقابل دسترس کند. ادامه می‌دهید؟',
+        deleteWildcardRuleConfirm:
+            'این قانون به {0} اجازه دسترسی به {1} را می‌دهد. حذف آن ممکن است دسترسی به چندین سرویس را تحت تأثیر قرار دهد. ادامه می‌دهید؟',
+        deleteRiskRulesConfirm:
+            '{0} قانون حذف خواهند شد. {1} قانون مجاز ممکن است دسترسی به سرویس‌ها را تحت تأثیر قرار دهد. ادامه می‌دهید؟',
         editRuleConfirm: 'فیلدهای زیر تغییر می‌کنند: {0}. قانون بلافاصله اعمال و بررسی می‌شود. ادامه می‌دهید؟',
     },
     runtime: {

@@ -20,6 +20,10 @@
                 </template>
             </FireStatus>
             <div v-if="fireName !== '-'">
+                <el-card v-if="!isInit || !isBind" class="mask-prompt">
+                    <span v-if="!isInit">{{ $t('firewall.initHelper', [`${fireName}-forward`]) }}</span>
+                    <span v-else>{{ $t('firewall.basicStatus') }}</span>
+                </el-card>
                 <div v-if="!isInit || !isBind" class="mb-4 flex justify-end">
                     <el-button v-permission v-node-admin type="primary" plain @click="openRuleSync">
                         {{ $t('firewall.ruleSyncAction') }}

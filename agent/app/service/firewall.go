@@ -37,7 +37,6 @@ type FirewallService struct {
 	cleanupInactiveBackend func(string) error
 	resetBackend           func(string) error
 	baseClient             func() (lifecycle.Client, error)
-	installedProviders     func() []string
 }
 
 type firewallRuleRuntimeResolver interface {
@@ -81,12 +80,14 @@ func newFirewallService() *FirewallService {
 		cleanupInactiveBackend: cleanupInactiveSystemBackend,
 		resetBackend:           resetServiceFirewallBackend,
 		baseClient:             selectedSystemFirewallClient,
-		installedProviders:     lifecycle.InstalledProviders,
 	}
 }
 
 func (s *FirewallService) LoadBaseInfo(chainGroup string) (dto.FirewallSubsystemStatus, error) {
 	status := dto.FirewallSubsystemStatus{Version: "-", Name: "-", Backend: "-"}
+	if selected := configuredSystemFirewallBackend(); selected != "" {
+		status.Name, status.Backend = selected, selected
+	}
 	loadClient := s.baseClient
 	if loadClient == nil {
 		loadClient = selectedSystemFirewallClient
@@ -96,14 +97,12 @@ func (s *FirewallService) LoadBaseInfo(chainGroup string) (dto.FirewallSubsystem
 		if global.LOG != nil {
 			global.LOG.Errorf("load firewall failed, err: %v", err)
 		}
-		loadInstalled := s.installedProviders
-		if loadInstalled == nil {
-			loadInstalled = lifecycle.InstalledProviders
+		if errors.Is(err, lifecycle.ErrNotInstalled) {
+			status.Reason = constant.FirewallBackendNotInstalled
+			return status, nil
 		}
-		if len(loadInstalled()) > 0 {
-			status.IsExist = true
-			status.Message = err.Error()
-		}
+		status.IsExist = true
+		status.Message = err.Error()
 		return status, nil
 	}
 	status.IsExist = true
@@ -122,38 +121,8 @@ func (s *FirewallService) LoadBaseInfo(chainGroup string) (dto.FirewallSubsystem
 		status.IsInit, status.IsBind = initialized, bound
 		status.IPv4 = loadSystemFirewallFamilyInfo(status.Name, constant.FirewallFamilyIPv4)
 		status.IPv6 = loadSystemFirewallFamilyInfo(status.Name, constant.FirewallFamilyIPv6)
-		if chainGroup == "base" {
-			status.ConflictBackend = conflictingDirectFirewallBackend(runtimeStatus.Name)
-		}
 	}
 	return status, nil
-}
-
-func conflictingDirectFirewallBackend(provider string) string {
-	other := ""
-	switch provider {
-	case constant.FirewallProviderIptables:
-		other = constant.FirewallProviderNftables
-	case constant.FirewallProviderNftables:
-		other = constant.FirewallProviderIptables
-	default:
-		return ""
-	}
-	for _, family := range []string{constant.FirewallFamilyIPv4, constant.FirewallFamilyIPv6} {
-		var (
-			bound bool
-			err   error
-		)
-		if other == constant.FirewallProviderIptables {
-			bound, err = iptables_helper.LoadFamilyBindStatus(family)
-		} else {
-			bound, err = nftables_helper.LoadFamilyBindStatus(filter.Family(family))
-		}
-		if err == nil && bound {
-			return other
-		}
-	}
-	return ""
 }
 
 func (s *FirewallService) OperateFirewall(request dto.FirewallLifecycleOperation) error {
@@ -1058,6 +1027,15 @@ func (s *FirewallService) deleteNativeRuleBatch(ctx context.Context, prepared []
 	for _, item := range prepared {
 		observed, observeErr := filter.ManagedObserved(snapshot, item.desired)
 		if observeErr != nil {
+			if errors.Is(observeErr, filter.ErrRuleStale) {
+				missing, mergeErr := managedFirewallRuleMissing(snapshot, item.desired)
+				if mergeErr != nil {
+					return mergeErr
+				}
+				if missing {
+					continue
+				}
+			}
 			return observeErr
 		}
 		if observed.Locator.Position == nil {
@@ -1077,18 +1055,24 @@ func (s *FirewallService) deleteNativeRuleBatch(ctx context.Context, prepared []
 	for _, item := range positioned {
 		changes = append(changes, item.change)
 	}
-	backendPlan, verification, err := runtime.Execute(ctx, snapshot, changes)
-	if err != nil {
-		return err
-	}
-	if !verification.Matched {
-		return filter.ErrVerificationFailed
+	var backendPlan filter.BackendPlan
+	if len(changes) > 0 {
+		var verification filter.VerifyResult
+		backendPlan, verification, err = runtime.Execute(ctx, snapshot, changes)
+		if err != nil {
+			return err
+		}
+		if !verification.Matched {
+			return filter.ErrVerificationFailed
+		}
 	}
 
 	deleted := make([]model.FirewallRule, 0, len(prepared))
 	for _, item := range prepared {
 		if err = s.rules.DeleteWithRevision(ctx, item.stored.UUID, item.stored.Revision); err != nil {
-			err = rollbackFirewallPlan(ctx, runtime, backendPlan, err)
+			if len(changes) > 0 {
+				err = rollbackFirewallPlan(ctx, runtime, backendPlan, err)
+			}
 			return s.restoreDeletedFirewallRecords(ctx, deleted, err)
 		}
 		deleted = append(deleted, item.stored)
@@ -1257,19 +1241,9 @@ func (s *FirewallService) deleteRule(ctx context.Context, ruleUUID string) error
 		observed, managedErr := filter.ManagedObserved(snapshot, desired)
 		if managedErr != nil {
 			if errors.Is(managedErr, filter.ErrRuleStale) {
-				items, mergeErr := filter.MergeInventory(filter.InventoryMergeInput{
-					Observed: snapshot.Rules,
-					Desired:  []filter.DesiredRule{desired},
-				})
+				missing, mergeErr := managedFirewallRuleMissing(snapshot, desired)
 				if mergeErr != nil {
 					return rollback(mergeErr)
-				}
-				missing := false
-				for _, item := range items {
-					if item.Desired != nil && item.Desired.UUID == desired.UUID {
-						missing = item.Match == filter.InventoryMatchMissing && item.Observed == nil
-						break
-					}
 				}
 				if missing {
 					continue
@@ -1279,10 +1253,7 @@ func (s *FirewallService) deleteRule(ctx context.Context, ruleUUID string) error
 		}
 		restoreAtEnd := false
 		if desired.Rule.Scope.Provider == filter.ProviderUFW && observed.Locator.Position != nil {
-			maxPosition, maxErr := runtime.MaxPosition(ctx, snapshot, desired.Rule)
-			if maxErr != nil {
-				return rollback(maxErr)
-			}
+			maxPosition := maxObservedFirewallPosition(snapshot)
 			restoreAtEnd = int64(*observed.Locator.Position) == maxPosition
 		}
 		locator := observed.Locator
@@ -1302,6 +1273,22 @@ func (s *FirewallService) deleteRule(ctx context.Context, ruleUUID string) error
 		return rollback(err)
 	}
 	return nil
+}
+
+func managedFirewallRuleMissing(snapshot filter.Snapshot, desired filter.DesiredRule) (bool, error) {
+	items, err := filter.MergeInventory(filter.InventoryMergeInput{
+		Observed: snapshot.Rules,
+		Desired:  []filter.DesiredRule{desired},
+	})
+	if err != nil {
+		return false, err
+	}
+	for _, item := range items {
+		if item.Desired != nil && item.Desired.UUID == desired.UUID {
+			return item.Match == filter.InventoryMatchMissing && item.Observed == nil, nil
+		}
+	}
+	return false, nil
 }
 
 func (s *FirewallService) updateRule(ctx context.Context, clientIP, ruleUUID string, requestedRule filter.FirewallRule) error {
@@ -1548,10 +1535,7 @@ func (s *FirewallService) executeManagedMutation(ctx context.Context, request ma
 	}
 	appendRule, restoreAtEnd := false, false
 	if after.Scope.Provider == filter.ProviderUFW && request.AdapterOperation == filter.ChangeUpdate {
-		maxPosition, maxErr := request.Runtime.MaxPosition(ctx, request.Snapshot, after)
-		if maxErr != nil {
-			return maxErr
-		}
+		maxPosition := maxObservedFirewallPosition(request.Snapshot)
 		appendRule = after.OrderIndex != nil && *after.OrderIndex == maxPosition
 		restoreAtEnd = request.Locator.Position != nil && int64(*request.Locator.Position) == maxPosition
 	}
@@ -1596,6 +1580,16 @@ func (s *FirewallService) executeManagedMutation(ctx context.Context, request ma
 		return rollbackFirewallPlan(ctx, request.Runtime, backendPlan, err)
 	}
 	return nil
+}
+
+func maxObservedFirewallPosition(snapshot filter.Snapshot) int64 {
+	var maximum int64
+	for _, observed := range snapshot.Rules {
+		if observed.Locator.Position != nil && int64(*observed.Locator.Position) > maximum {
+			maximum = int64(*observed.Locator.Position)
+		}
+	}
+	return maximum
 }
 
 func (s *FirewallService) ensureFirewallRuleIdentityAvailable(
@@ -1705,13 +1699,8 @@ func (s *FirewallService) prepareSystemPortCreate(ctx context.Context, port dto.
 			create.Action = filter.CheckActionSelectAdopt
 		}
 		create.AdoptInstanceKey = check.Candidates[0].InstanceKey
-	case filter.CheckClassificationCovered:
-		create.Action = filter.CheckActionCreateAnyway
 	case filter.CheckClassificationConflict:
-		if !containsFirewallCheckAction(check.AllowedActions, filter.CheckActionCreateAnyway) {
-			return nil, fmt.Errorf("cannot manage accepted port %s/%s: %s", port.Port, port.Protocol, check.Reason)
-		}
-		create.Action = filter.CheckActionCreateAnyway
+		return nil, fmt.Errorf("cannot manage accepted port %s/%s: %s", port.Port, port.Protocol, check.Reason)
 	case filter.CheckClassificationExactManaged:
 		return nil, nil
 	case filter.CheckClassificationProtected:
@@ -2195,15 +2184,6 @@ func authorizeFirewallRuleCreate(
 func firewallCheckFlagCodec() *filter.CheckFlagCodec {
 	secret := []byte(global.CONF.Base.EncryptKey + "\x00firewall-rule-check-v1")
 	return filter.NewCheckFlagCodec(secret, constant.FirewallRuleCheckVersion)
-}
-
-func containsFirewallCheckAction(actions []filter.CheckAction, expected filter.CheckAction) bool {
-	for _, action := range actions {
-		if action == expected {
-			return true
-		}
-	}
-	return false
 }
 
 func OperateFirewallPort(oldPorts, newPorts []int) error {

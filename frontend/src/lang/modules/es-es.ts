@@ -4110,31 +4110,23 @@ const message = {
         plan_equivalent_external_rule: 'Ya existe una regla externa idéntica. Puedes asumir su gestión sin duplicarla.',
         plan_multiple_equivalent_external_rules:
             'Existen varias reglas externas idénticas. Selecciona una para gestionarla.',
-        plan_requested_rule_is_covered:
-            'Una regla existente ya cubre esta configuración. Continuar creará una regla superpuesta.',
         plan_equivalent_managed_rule: '1Panel ya gestiona una regla idéntica. No es necesario duplicarla.',
         allRulesAlreadyExist: 'Las {0} reglas comprobadas ya existen. No hay reglas nuevas que crear.',
         ruleCheckResult: 'Resultados de la comprobación de reglas',
         ruleCheckStatus_creatable: 'Se puede crear',
         ruleCheckStatus_existing: 'Ya existe',
-        ruleCheckStatus_warning: 'Advertencia',
         ruleCheckStatus_error: 'Error',
         ruleCheckExistingHelper: 'Ya existe una regla idéntica y se omitirá.',
         ruleCheckReadyHelper: 'La comprobación se superó. Esta regla se puede crear.',
         ruleCheckExternalExists: 'Ya existe una regla externa idéntica y se omitirá automáticamente.',
         ruleCheckBlockedHelper:
             'Las reglas con errores no se pueden enviar. Vuelve, modifícalas y compruébalas de nuevo.',
-        ruleCheckWarningHelper: 'Comprobación finalizada. Las advertencias no impiden el envío; puedes continuar.',
         plan_managed_rule_drifted:
             'La regla gestionada no coincide con el firewall activo. Resuelve primero la diferencia.',
         plan_opaque_rule_in_target_scope:
             'El ámbito contiene una regla que no puede analizarse con seguridad. La operación se detuvo.',
         plan_runtime_permanent_mismatch: 'Las configuraciones activa y permanente difieren. Sincronízalas primero.',
         plan_protected_rule: 'Esta regla está protegida y no se puede asumir, modificar ni eliminar.',
-        plan_overlapping_rule_with_different_action:
-            'Existe una regla superpuesta con la acción opuesta. La operación se detuvo.',
-        plan_partially_overlapping_rule_with_different_action:
-            'La regla se superpone parcialmente con otra de acción opuesta. El resultado depende del orden de las reglas.',
         plan_blocked: 'La regla no puede aplicarse de forma segura. Actualiza la lista e inténtalo de nuevo.',
         scopeDefaultMismatch: 'La zona predeterminada es {0}; esta página solo gestiona la zona public.',
         scopeInactive: 'El ámbito gestionado está inactivo. Las reglas nuevas podrían no afectar al tráfico actual.',
@@ -4165,6 +4157,7 @@ const message = {
         systemFirewallHelper: 'Controla el acceso a los puertos del host y las reglas de entrada.',
         forwardingHelper: 'Gestiona las reglas de reenvío de puertos.',
         dockerFirewallHelper: 'Selecciona cómo gestiona 1Panel la protección de puertos de contenedores.',
+        dockerNftablesRequirement: 'Docker ≥ 29.0.0, experimental',
         backendRecommendation: 'Se recomienda usar iptables o nftables.',
         configuredRules: '{0} reglas configuradas',
         addressFamily: 'Versión de IP',
@@ -4182,10 +4175,11 @@ const message = {
             'Elimina de {0} todas las reglas y cadenas de protección de puertos Docker de 1Panel, conservando solo los datos de la base de datos',
         cleanupBeforeBackendSwitch:
             'El backend actual {0} todavía contiene reglas de ejecución de 1Panel. Límpielo antes de cambiar a {1}.',
-        cleanupAction: 'Limpiar',
+        cleanupAction: 'Restablecer',
         backendSwitchNotice:
             'Limpia el backend actual antes de cambiar el firewall del sistema, el reenvío de puertos o la protección Docker. Las políticas de la base de datos se conservan y pueden inicializarse o sincronizarse después.',
         switchBackendHelper: '¿Cambiar a {0}?',
+        switchDockerBackendHelper: '¿Cambiar a {0}? Esto actualizará la configuración y reiniciará Docker.',
         ruleSyncTitle: 'Sincronizar reglas',
         ruleSyncAction: 'Sincronizar reglas',
         ruleSyncHelper:
@@ -4238,6 +4232,8 @@ const message = {
             blocked: 'No disponible',
         },
         uninstalledStatus: 'No instalado',
+        selectedBackendNotInstalled:
+            'No se detectó el servicio {backend}. Instálelo manualmente desde {library} o cambie el backend del firewall en {settings}.',
         initializedStatus: 'Inicializado',
         partiallyInitialized: 'Parcialmente inicializado',
         dockerGuardHelper:
@@ -4271,8 +4267,10 @@ const message = {
         denySources: 'Denegar orígenes especificados',
         allowSources: 'Permitir solo los orígenes especificados',
         denyAll: 'Denegar todo acceso',
-        sourcesHelper:
-            'Introduce una dirección IPv4/IPv6 o CIDR por línea; una lista de permitidos vacía deniega todo acceso',
+        dockerGuardMixedFamilyHelper:
+            'Se han seleccionado IPv4 e IPv6. Configura por separado las políticas basadas en el origen; denegar todo puede aplicarse directamente.',
+        dockerGuardInconsistentConfigHelper:
+            'Las reglas seleccionadas tienen configuraciones diferentes. Configúralas de nuevo para sobrescribirlas todas; una descripción vacía borrará todas las descripciones.',
         effective: 'En vigor',
         forwardUnsynced: 'Sin sincronizar',
         notEnabled: 'No habilitado',
@@ -4335,7 +4333,11 @@ const message = {
         destinationPortPlaceholder: 'p. ej. 80, 80,443 o 8080-8089',
         deleteRuleConfirm: 'Se eliminarán {0} reglas. ¿Continuar?',
         deleteUsedRuleConfirm:
-            'Este puerto está siendo utilizado por {0}. Eliminar la regla de acceso puede dejar el servicio inaccesible. ¿Continuar?',
+            'Esta regla abarca servicios en escucha proporcionados por {0}. Eliminarla puede hacer que esos servicios sean inaccesibles. ¿Continuar?',
+        deleteWildcardRuleConfirm:
+            'Esta regla permite que {0} acceda a {1}. Eliminarla puede afectar al acceso a varios servicios. ¿Continuar?',
+        deleteRiskRulesConfirm:
+            'Se eliminarán {0} reglas. {1} reglas de acceso pueden afectar al acceso a servicios. ¿Continuar?',
         editRuleConfirm:
             'Se modificarán los siguientes campos: {0}. La regla se aplicará y verificará inmediatamente. ¿Continuar?',
     },

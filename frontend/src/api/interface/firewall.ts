@@ -11,6 +11,7 @@ export namespace Firewall {
         initialized: boolean;
         bound: boolean;
         supported: boolean;
+        supportReason?: string;
         implementation?: string;
         message?: string;
         ipv4: BackendFamilyStatus;
@@ -50,6 +51,7 @@ export namespace Firewall {
         version: string;
         pingStatus: string;
         message?: string;
+        reason?: string;
         syncError?: string;
         ipv4: BackendFamilyStatus;
         ipv6: BackendFamilyStatus;
@@ -132,6 +134,7 @@ export namespace Firewall {
         instanceKey?: string;
         marker?: string;
         parseStatus: ParseStatus;
+        uncertainFields?: string[];
         raw?: string;
         protected: boolean;
         persistence?: PersistenceStatus;
@@ -194,8 +197,8 @@ export namespace Firewall {
 
     export type CheckDecision = 'ready' | 'confirmation_required' | 'blocked' | 'no_change';
     export type CheckClassification =
-        'none' | 'exact_managed' | 'exact_external' | 'covered' | 'conflict' | 'unsupported' | 'protected';
-    export type CheckAction = 'create' | 'create_anyway' | 'adopt' | 'select_adopt' | 'cancel';
+        'none' | 'exact_managed' | 'exact_external' | 'conflict' | 'unsupported' | 'protected';
+    export type CheckAction = 'create' | 'adopt' | 'select_adopt' | 'cancel';
     export type ApplicableCheckAction = Exclude<CheckAction, 'cancel'>;
 
     export interface RuleCheckResult {

@@ -16,6 +16,7 @@ type FirewallSubsystemStatus struct {
 	Version         string                      `json:"version"`
 	PingStatus      string                      `json:"pingStatus"`
 	Message         string                      `json:"message,omitempty"`
+	Reason          string                      `json:"reason,omitempty"`
 	SyncError       string                      `json:"syncError,omitempty"`
 	IPv4            FirewallBackendFamilyStatus `json:"ipv4"`
 	IPv6            FirewallBackendFamilyStatus `json:"ipv6"`
@@ -33,6 +34,7 @@ type FirewallBackendOption struct {
 	Initialized    bool                        `json:"initialized"`
 	Bound          bool                        `json:"bound"`
 	Supported      bool                        `json:"supported"`
+	SupportReason  string                      `json:"supportReason,omitempty"`
 	Implementation string                      `json:"implementation,omitempty"`
 	Message        string                      `json:"message,omitempty"`
 	IPv4           FirewallBackendFamilyStatus `json:"ipv4"`

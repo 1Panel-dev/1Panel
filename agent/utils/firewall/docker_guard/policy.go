@@ -55,8 +55,8 @@ func NormalizePolicy(policy Policy) (Policy, error) {
 			normalizedSources = append(normalizedSources, canonical)
 		}
 	}
-	if policy.Mode == ModeSources && len(normalizedSources) == 0 {
-		return Policy{}, fmt.Errorf("%w: deny_sources requires at least one source", ErrInvalidPolicy)
+	if policy.Mode != ModeAll && len(normalizedSources) == 0 {
+		return Policy{}, fmt.Errorf("%w: source-based modes require at least one source", ErrInvalidPolicy)
 	}
 	if policy.Mode == ModeAll {
 		normalizedSources = []string{}
