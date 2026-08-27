@@ -319,7 +319,7 @@ func (s *ForwardingService) loadRuleSyncCandidates(
 			Family: record.Family, Protocol: record.Protocol, Port: record.Port, TargetIP: record.TargetIP,
 			TargetPort: record.TargetPort, Interface: record.Interface,
 		}
-		normalized, normalizeErr := forwardingproviders.NormalizeRule(rule)
+		normalized, normalizeErr := forwarding.NormalizeRule(rule)
 		candidates = append(candidates, forwardingRuleSyncCandidate{rule: normalized, err: normalizeErr})
 	}
 	targetStatus, err := target.Status()
@@ -358,7 +358,7 @@ func verifyForwardingRuleSync(target *forwarding.Manager, desired []forwarding.R
 func normalizeForwardingRuntimeRules(rules []forwarding.Rule) ([]forwarding.Rule, error) {
 	normalized := make([]forwarding.Rule, 0, len(rules))
 	for _, rule := range rules {
-		item, err := forwardingproviders.NormalizeRule(rule)
+		item, err := forwarding.NormalizeRule(rule)
 		if err != nil {
 			return nil, fmt.Errorf("normalize target forwarding rule %s: %w", rule.Identity(), err)
 		}
@@ -473,7 +473,7 @@ func mergeForwardingInventory(
 	items := make([]forwardingInventoryItem, 0, len(stored)+len(runtime))
 	byIdentity := make(map[string]int, len(stored)+len(runtime))
 	for _, record := range stored {
-		rule, err := forwardingproviders.NormalizeRule(forwarding.Rule{
+		rule, err := forwarding.NormalizeRule(forwarding.Rule{
 			Family: record.Family, Protocol: record.Protocol, Port: record.Port, TargetIP: record.TargetIP,
 			TargetPort: record.TargetPort, Interface: record.Interface,
 		})
@@ -485,7 +485,7 @@ func mergeForwardingInventory(
 		items = append(items, forwardingInventoryItem{ID: record.ID, Rule: rule, IsDesired: true})
 	}
 	for _, observed := range runtime {
-		rule, err := forwardingproviders.NormalizeRule(observed)
+		rule, err := forwarding.NormalizeRule(observed)
 		if err != nil {
 			return nil, fmt.Errorf("normalize runtime forwarding rule: %w", err)
 		}
@@ -518,7 +518,7 @@ func lastForwardingSyncError() string {
 func applyForwardingOperations(current []forwarding.Rule, requested []dto.ForwardRuleOperation) ([]forwarding.Rule, error) {
 	desired := make([]forwarding.Rule, 0, len(current)+len(requested))
 	for _, rule := range current {
-		normalized, err := forwardingproviders.NormalizeRule(rule)
+		normalized, err := forwarding.NormalizeRule(rule)
 		if err != nil {
 			return nil, fmt.Errorf("normalize persisted forwarding rule: %w", err)
 		}
@@ -526,7 +526,7 @@ func applyForwardingOperations(current []forwarding.Rule, requested []dto.Forwar
 	}
 	for _, operation := range requested {
 		for _, protocol := range strings.Split(operation.Protocol, "/") {
-			rule, err := forwardingproviders.NormalizeRule(forwarding.Rule{
+			rule, err := forwarding.NormalizeRule(forwarding.Rule{
 				Family: operation.Family, Protocol: protocol, Port: operation.Port, TargetIP: operation.TargetIP,
 				TargetPort: operation.TargetPort, Interface: operation.Interface,
 			})
@@ -605,7 +605,10 @@ func newForwardingManagerFor(backend string) (*forwarding.Manager, error) {
 				return forwarding.NewManager(candidate.adapter, candidate.runtime), nil
 			}
 		}
-		return nil, fmt.Errorf("%w: selected forwarding backend %s is not installed", errForwardingBackendUnavailable, backend)
+		return nil, fmt.Errorf(
+			"%w: selected forwarding backend %s %w",
+			errForwardingBackendUnavailable, backend, lifecycle.ErrNotInstalled,
+		)
 	}
 	return selectForwardingManager(candidates)
 }

@@ -125,6 +125,35 @@ type Scope struct {
 	Direction Direction `json:"direction"`
 }
 
+func ManagedInputScopes(provider Provider) []Scope {
+	base := Scope{Provider: provider, Direction: DirectionInput}
+	switch provider {
+	case ProviderIptables, ProviderNftables:
+		result := make([]Scope, 0, 6)
+		for _, family := range []Family{FamilyIPv4, FamilyIPv6} {
+			for _, chain := range []string{BasicBeforeChain, IptablesInputChain, BasicAfterChain} {
+				scope := base
+				scope.Family, scope.Table, scope.Chain = family, "filter", chain
+				result = append(result, scope)
+			}
+		}
+		return result
+	case ProviderFirewalld:
+		base.Family, base.Zone = FamilyInet, FirewalldInputZone
+		return []Scope{base}
+	case ProviderUFW:
+		result := make([]Scope, 0, 2)
+		for _, family := range []Family{FamilyIPv4, FamilyIPv6} {
+			scope := base
+			scope.Family, scope.Chain = family, UFWInputChain
+			result = append(result, scope)
+		}
+		return result
+	default:
+		return nil
+	}
+}
+
 func (s Scope) Normalize() Scope {
 	s.Provider = Provider(strings.ToLower(strings.TrimSpace(string(s.Provider))))
 	s.Family = Family(strings.ToLower(strings.TrimSpace(string(s.Family))))

@@ -3,6 +3,7 @@ package firewall
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -192,4 +193,94 @@ func PortWhitelistKey(item PortWhitelist) string {
 		return family + "/" + key
 	}
 	return key
+}
+
+type SystemPort struct {
+	Family   string
+	Port     string
+	Protocol string
+}
+
+func RuleForSystemPort(provider filter.Provider, port SystemPort) filter.FirewallRule {
+	scope := filter.Scope{Provider: provider, Direction: filter.DirectionInput}
+	family := filter.Family(strings.ToLower(strings.TrimSpace(port.Family)))
+	switch provider {
+	case filter.ProviderIptables, filter.ProviderNftables:
+		if family != filter.FamilyIPv6 {
+			family = filter.FamilyIPv4
+		}
+		scope.Family, scope.Table = family, "filter"
+	case filter.ProviderFirewalld:
+		if family != filter.FamilyIPv4 && family != filter.FamilyIPv6 {
+			family = filter.FamilyInet
+		}
+		scope.Family, scope.Zone = family, filter.FirewalldInputZone
+	case filter.ProviderUFW:
+		if family != filter.FamilyIPv6 {
+			family = filter.FamilyIPv4
+		}
+		scope.Family = family
+	}
+	return filter.FirewallRule{
+		Scope: scope, Protocol: port.Protocol, DestinationPort: port.Port,
+		Action: filter.ActionAccept, Description: "1Panel managed accepted port",
+	}
+}
+
+func NormalizeSystemPorts(ports []SystemPort) (map[string]SystemPort, error) {
+	result := make(map[string]SystemPort, len(ports))
+	for _, port := range ports {
+		normalized, err := filter.NormalizeRule(RuleForSystemPort(filter.ProviderIptables, port))
+		if err != nil {
+			return nil, err
+		}
+		family := strings.ToLower(strings.TrimSpace(port.Family))
+		if family != "" {
+			family = string(normalized.Scope.Family)
+		}
+		item := SystemPort{Family: family, Port: normalized.DestinationPort, Protocol: normalized.Protocol}
+		result[SystemPortKey(item)] = item
+	}
+	return result, nil
+}
+
+func SystemPortKey(port SystemPort) string {
+	key := LegacySystemPortKey(port)
+	if family := strings.ToLower(strings.TrimSpace(port.Family)); family != "" {
+		return family + "/" + key
+	}
+	return key
+}
+
+func LegacySystemPortKey(port SystemPort) string {
+	return strings.ToLower(strings.TrimSpace(port.Protocol)) + "/" + strings.TrimSpace(port.Port)
+}
+
+func SortedSystemPortKeys(ports map[string]SystemPort) []string {
+	keys := make([]string, 0, len(ports))
+	for key := range ports {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
+func ContainsPort(ports []PortWhitelist, target PortWhitelist) bool {
+	for _, port := range ports {
+		familyMatches := port.Family == "" || target.Family == "" || port.Family == target.Family
+		if familyMatches && port.Port == target.Port && port.Protocol == target.Protocol {
+			return true
+		}
+	}
+	return false
+}
+
+func ExcludePorts(ports, excluded []PortWhitelist) []PortWhitelist {
+	result := make([]PortWhitelist, 0, len(ports))
+	for _, port := range ports {
+		if !ContainsPort(excluded, port) {
+			result = append(result, port)
+		}
+	}
+	return result
 }
