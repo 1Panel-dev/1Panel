@@ -949,6 +949,7 @@ const message = {
             ascendVisibleDevices: 'Ascend Visible Devices',
             vllmCommandPortHelper:
                 'The startup command must use port {0}; otherwise, the service will be inaccessible.',
+            ascendVisibleDevices: 'Ascend visible devices (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Sync to model account',
             modelAccountAddressHelper:
                 'Container address is for agent containers; 127.0.0.1, system IP, or custom address is for AI Gateway or external services.',
@@ -1054,9 +1055,13 @@ const message = {
             accountMaxConcurrency: 'Account Max Concurrency',
             groupMaxConcurrency: 'User Group Max Concurrency',
             apiKeyMaxConcurrency: 'Per-API-Key Max Concurrency',
-            gatewayConcurrency: 'Gateway Concurrency',
-            waitingQueue: 'Waiting Queue',
+            gatewayConcurrency: 'Current Gateway Concurrency',
+            waitingQueue: 'Current Waiting Queue',
+            currentActiveUsers: 'Current Active Users',
+            activeStreamingRequests: 'Active Streaming Requests',
             modelAccountConcurrency: 'Model Account Concurrency',
+            accountAvailability: 'Model Account Availability',
+            capacityFull: 'At Capacity',
             groupConcurrency: 'User Group Concurrency',
             apiKeyConcurrency: 'API Key Concurrency',
             currentLimit: 'Current / Limit',

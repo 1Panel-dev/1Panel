@@ -957,6 +957,7 @@ const message = {
             ascendVisibleDevices: 'Dispositivos Ascend visíveis',
             vllmCommandPortHelper:
                 'O comando de inicialização deve usar a porta {0}; caso contrário, o serviço ficará inacessível.',
+            ascendVisibleDevices: 'Dispositivos Ascend visíveis (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Sincronizar com conta de modelo',
             modelAccountAddressHelper:
                 'Use o endereço do contêiner para agentes; 127.0.0.1, IP do sistema ou endereço personalizado para AI Gateway ou serviços externos.',
@@ -1062,9 +1063,13 @@ const message = {
             accountMaxConcurrency: 'Concorrência máxima da conta',
             groupMaxConcurrency: 'Concorrência máxima do grupo de usuários',
             apiKeyMaxConcurrency: 'Concorrência máxima por API Key',
-            gatewayConcurrency: 'Concorrência do gateway',
-            waitingQueue: 'Fila de espera',
+            gatewayConcurrency: 'Concorrência atual do gateway',
+            waitingQueue: 'Fila de espera atual',
+            currentActiveUsers: 'Usuários ativos agora',
+            activeStreamingRequests: 'Solicitações de streaming ativas',
             modelAccountConcurrency: 'Concorrência das contas de modelo',
+            accountAvailability: 'Disponibilidade das contas de modelo',
+            capacityFull: 'Capacidade esgotada',
             groupConcurrency: 'Concorrência dos grupos de usuários',
             apiKeyConcurrency: 'Concorrência das API Keys',
             currentLimit: 'Atual / Limite',
