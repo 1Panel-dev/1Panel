@@ -277,6 +277,7 @@ export namespace Firewall {
         forwardRule?: RuleForward;
         dockerRule?: DockerGuardEndpoint;
         status: RuleSyncStatus;
+        reasonCode?: string;
         reason?: string;
     }
 

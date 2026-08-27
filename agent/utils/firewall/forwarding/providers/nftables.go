@@ -185,7 +185,7 @@ func rebuildNftForwardCommands(rules []forwarding.Rule) ([][]string, error) {
 		}
 	}
 	for _, rule := range rules {
-		normalized, err := NormalizeRule(rule)
+		normalized, err := forwarding.NormalizeRule(rule)
 		if err != nil {
 			return nil, err
 		}

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/netip"
 	"sort"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -33,16 +32,7 @@ const (
 	dockerGuardComposeCreatedBy    = "createdBy"
 )
 
-type dockerGuardRuntime interface {
-	Initialize([]docker_guard.Policy) error
-	Bind() error
-	Reconcile([]docker_guard.Policy) error
-	Unbind() error
-	Cleanup() error
-	Initialized(string) (bool, error)
-	Status(string) docker_guard.FamilyStatus
-	ListPolicies() ([]docker_guard.Policy, error)
-}
+type dockerGuardRuntime = docker_guard.Runtime
 
 type DockerPortGuardService struct {
 	policies          repo.IDockerPortGuardRepo
@@ -52,20 +42,12 @@ type DockerPortGuardService struct {
 	version           func(string) string
 }
 
-type normalizedDockerGuardPolicy struct {
-	Family   string
-	HostIP   string
-	HostPort uint16
-	Protocol string
-	Mode     string
-}
-
 var (
 	dockerPortGuardServiceMu sync.Mutex
 	dockerPortGuardSyncMu    sync.RWMutex
 	dockerPortGuardSyncErr   error
-	ErrDockerGuardInvalid    = errors.New("invalid Docker port guard request")
-	ErrDockerUnavailable     = errors.New("Docker is unavailable")
+	ErrDockerGuardInvalid    = docker_guard.ErrInvalidPolicy
+	ErrDockerUnavailable     = docker.ErrUnavailable
 )
 
 type IDockerPortGuardService interface {
@@ -156,7 +138,7 @@ func matchDockerGuardPolicies(
 		if !ok {
 			continue
 		}
-		endpoints[i].PolicyUUID, endpoints[i].Mode, endpoints[i].Sources = policy.UUID, policy.Mode, decodeGuardSources(policy.Sources)
+		endpoints[i].PolicyUUID, endpoints[i].Mode, endpoints[i].Sources = policy.UUID, policy.Mode, docker_guard.DecodeSources(policy.Sources)
 		endpoints[i].Description = policy.Description
 		endpoints[i].Effective = (policy.Family == docker_guard.FamilyIPv4 && base.IPv4.Effective) || (policy.Family == docker_guard.FamilyIPv6 && base.IPv6.Effective)
 		delete(byEndpoint, key)
@@ -165,7 +147,7 @@ func matchDockerGuardPolicies(
 	for _, policy := range byEndpoint {
 		orphanPolicies = append(orphanPolicies, dto.DockerPortGuardEndpoint{
 			Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol,
-			PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: decodeGuardSources(policy.Sources), Description: policy.Description,
+			PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: docker_guard.DecodeSources(policy.Sources), Description: policy.Description,
 		})
 	}
 	return endpoints, orphanPolicies
@@ -224,7 +206,7 @@ func (s *DockerPortGuardService) Operate(ctx context.Context, request dto.Docker
 func (s *DockerPortGuardService) DeletePolicies(ctx context.Context, request dto.DockerPortGuardPolicyBatchDelete) error {
 	dockerPortGuardServiceMu.Lock()
 	defer dockerPortGuardServiceMu.Unlock()
-	uuids, err := normalizeDockerGuardPolicyUUIDs(request.UUIDs)
+	uuids, err := docker_guard.NormalizePolicyUUIDs(request.UUIDs)
 	if err != nil {
 		return err
 	}
@@ -234,33 +216,16 @@ func (s *DockerPortGuardService) DeletePolicies(ctx context.Context, request dto
 	return s.reconcileLocked(ctx)
 }
 
-func normalizeDockerGuardPolicyUUIDs(values []string) ([]string, error) {
-	uuids := make([]string, 0, len(values))
-	seen := make(map[string]struct{}, len(values))
-	for _, policyUUID := range values {
-		policyUUID = strings.TrimSpace(policyUUID)
-		if policyUUID == "" {
-			return nil, fmt.Errorf("%w: policy UUID cannot be empty", ErrDockerGuardInvalid)
-		}
-		if _, exists := seen[policyUUID]; exists {
-			continue
-		}
-		seen[policyUUID] = struct{}{}
-		uuids = append(uuids, policyUUID)
-	}
-	if len(uuids) == 0 {
-		return nil, fmt.Errorf("%w: policy UUIDs cannot be empty", ErrDockerGuardInvalid)
-	}
-	return uuids, nil
-}
-
 func (s *DockerPortGuardService) UpsertPolicies(ctx context.Context, request dto.DockerPortGuardPolicyBatch) error {
 	dockerPortGuardServiceMu.Lock()
 	defer dockerPortGuardServiceMu.Unlock()
 	policies := make([]model.DockerPortGuardPolicy, 0, len(request.Endpoints))
 	seen := make(map[string]struct{}, len(request.Endpoints))
 	for _, endpoint := range request.Endpoints {
-		normalized, sources, err := normalizeGuardPolicy(endpoint.Family, endpoint.HostIP, endpoint.HostPort, endpoint.Protocol, request.Mode, request.Sources)
+		normalized, err := docker_guard.NormalizePolicy(docker_guard.Policy{
+			Family: endpoint.Family, HostIP: endpoint.HostIP, HostPort: endpoint.HostPort,
+			Protocol: endpoint.Protocol, Mode: request.Mode, Sources: request.Sources,
+		})
 		if err != nil {
 			return err
 		}
@@ -269,7 +234,7 @@ func (s *DockerPortGuardService) UpsertPolicies(ctx context.Context, request dto
 			continue
 		}
 		seen[key] = struct{}{}
-		encoded, _ := json.Marshal(sources)
+		encoded, _ := json.Marshal(normalized.Sources)
 		policies = append(policies, model.DockerPortGuardPolicy{
 			UUID: uuid.NewString(), Family: normalized.Family, HostIP: normalized.HostIP,
 			HostPort: normalized.HostPort, Protocol: normalized.Protocol, Mode: normalized.Mode,
@@ -348,92 +313,14 @@ func dockerGuardPoliciesFromModels(policies []model.DockerPortGuardPolicy) []doc
 func dockerGuardPolicyFromModel(policy model.DockerPortGuardPolicy) docker_guard.Policy {
 	return docker_guard.Policy{
 		UUID: policy.UUID, Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort,
-		Protocol: policy.Protocol, Mode: policy.Mode, Sources: decodeGuardSources(policy.Sources),
+		Protocol: policy.Protocol, Mode: policy.Mode, Sources: docker_guard.DecodeSources(policy.Sources),
 	}
-}
-
-func dockerGuardPolicySyncKey(policy docker_guard.Policy) string {
-	mode := policy.Mode
-	if mode == docker_guard.ModeAllow && len(policy.Sources) == 0 {
-		mode = docker_guard.ModeAll
-	}
-	sources := append([]string(nil), policy.Sources...)
-	sort.Strings(sources)
-	return strings.Join([]string{
-		policy.UUID, policy.Family, canonicalGuardHost(policy.HostIP), strconv.Itoa(int(policy.HostPort)),
-		policy.Protocol, mode, strings.Join(sources, ","),
-	}, "\x00")
-}
-
-func canonicalGuardHost(value string) string {
-	if address, err := netip.ParseAddr(value); err == nil {
-		return address.String()
-	}
-	return value
-}
-
-func verifyDockerGuardRuleSync(runtime dockerGuardRuntime, desired []docker_guard.Policy) error {
-	actual, err := runtime.ListPolicies()
-	if err != nil {
-		return fmt.Errorf("verify synchronized Docker firewall policies: %w", err)
-	}
-	if !databaseSyncStatesEqual(actual, desired, dockerGuardPolicySyncKey) {
-		return fmt.Errorf("verify synchronized Docker firewall policies: target policies do not match the database")
-	}
-	return nil
-}
-
-func reconcileDockerGuardSyncTarget(backend string, policies []docker_guard.Policy, runtime dockerGuardRuntime) error {
-	families := make(map[string]struct{}, len(policies))
-	needsInitialize, needsBind := false, false
-	for _, policy := range policies {
-		families[policy.Family] = struct{}{}
-	}
-	if len(families) == 0 {
-		initialized := false
-		for _, family := range []string{docker_guard.FamilyIPv4, docker_guard.FamilyIPv6} {
-			status := runtime.Status(family)
-			if status.Reason == docker_guard.ReasonInspectFailed {
-				return fmt.Errorf("inspect Docker firewall target %s for %s failed", backend, family)
-			}
-			initialized = initialized || status.Initialized
-		}
-		if initialized {
-			return runtime.Reconcile(nil)
-		}
-		return nil
-	}
-	for family := range families {
-		status := runtime.Status(family)
-		needsInitialize = needsInitialize || !status.Initialized
-		needsBind = needsBind || !status.Bound || !status.Effective
-	}
-	var err error
-	if needsInitialize {
-		err = runtime.Initialize(policies)
-	} else {
-		if needsBind {
-			err = runtime.Bind()
-		}
-		if err == nil {
-			err = runtime.Reconcile(policies)
-		}
-	}
-	if err != nil {
-		return err
-	}
-	for family := range families {
-		if !runtime.Status(family).Effective {
-			return fmt.Errorf("Docker firewall target %s is not effective for %s", backend, family)
-		}
-	}
-	return nil
 }
 
 func dockerGuardRuleSyncDTO(policy model.DockerPortGuardPolicy) *dto.DockerPortGuardEndpoint {
 	return &dto.DockerPortGuardEndpoint{
 		Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol,
-		PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: decodeGuardSources(policy.Sources), Description: policy.Description,
+		PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: docker_guard.DecodeSources(policy.Sources), Description: policy.Description,
 	}
 }
 
@@ -551,7 +438,7 @@ func (s *DockerPortGuardService) runtimePolicies(ctx context.Context) ([]docker_
 	}
 	policies := make([]docker_guard.Policy, 0, len(stored))
 	for _, policy := range stored {
-		policies = append(policies, docker_guard.Policy{UUID: policy.UUID, Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol, Mode: policy.Mode, Sources: decodeGuardSources(policy.Sources)})
+		policies = append(policies, docker_guard.Policy{UUID: policy.UUID, Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol, Mode: policy.Mode, Sources: docker_guard.DecodeSources(policy.Sources)})
 	}
 	return policies, nil
 }
@@ -577,10 +464,7 @@ func (s *DockerPortGuardService) guardRuntime(backend string) dockerGuardRuntime
 	if s.runtime != nil {
 		return s.runtime
 	}
-	if backend == constant.FirewallProviderNftables {
-		return docker_guard.NewNftablesManager()
-	}
-	return docker_guard.NewManager()
+	return docker_guard.NewRuntime(backend)
 }
 
 func (s *DockerPortGuardService) runtimeForDocker(ctx context.Context) (dockerGuardRuntime, string, error) {
@@ -668,65 +552,12 @@ func discoverDockerEndpoints(ctx context.Context, cli *client.Client) ([]dto.Doc
 	return endpoints, nil
 }
 
-func normalizeGuardPolicy(family, hostIP string, hostPort uint16, protocol, mode string, sources []string) (normalizedDockerGuardPolicy, []string, error) {
-	family, hostIP, protocol, mode = strings.ToLower(strings.TrimSpace(family)), strings.TrimSpace(hostIP), strings.ToLower(strings.TrimSpace(protocol)), strings.ToLower(strings.TrimSpace(mode))
-	if hostPort == 0 || (protocol != "tcp" && protocol != "udp") || (family != docker_guard.FamilyIPv4 && family != docker_guard.FamilyIPv6) || (mode != docker_guard.ModeAll && mode != docker_guard.ModeSources && mode != docker_guard.ModeAllow) {
-		return normalizedDockerGuardPolicy{}, nil, fmt.Errorf("%w: invalid policy fields", ErrDockerGuardInvalid)
-	}
-	addr, err := netip.ParseAddr(hostIP)
-	if err != nil || (family == docker_guard.FamilyIPv4) != addr.Is4() {
-		return normalizedDockerGuardPolicy{}, nil, fmt.Errorf("%w: host IP does not match address family", ErrDockerGuardInvalid)
-	}
-	normalizedSources := make([]string, 0, len(sources))
-	seen := map[string]struct{}{}
-	for _, source := range sources {
-		source = strings.TrimSpace(source)
-		if source == "" {
-			continue
-		}
-		prefix, err := netip.ParsePrefix(source)
-		if err != nil {
-			if sourceAddr, addrErr := netip.ParseAddr(source); addrErr == nil {
-				bits := 128
-				if sourceAddr.Is4() {
-					bits = 32
-				}
-				prefix = netip.PrefixFrom(sourceAddr, bits)
-			} else {
-				return normalizedDockerGuardPolicy{}, nil, fmt.Errorf("%w: invalid source address %q", ErrDockerGuardInvalid, source)
-			}
-		}
-		if (family == docker_guard.FamilyIPv4) != prefix.Addr().Is4() {
-			return normalizedDockerGuardPolicy{}, nil, fmt.Errorf("%w: source %q does not match address family", ErrDockerGuardInvalid, source)
-		}
-		canonical := prefix.Masked().String()
-		if _, ok := seen[canonical]; !ok {
-			seen[canonical] = struct{}{}
-			normalizedSources = append(normalizedSources, canonical)
-		}
-	}
-	if mode == docker_guard.ModeSources && len(normalizedSources) == 0 {
-		return normalizedDockerGuardPolicy{}, nil, fmt.Errorf("%w: deny_sources requires at least one source", ErrDockerGuardInvalid)
-	}
-	if mode == docker_guard.ModeAll {
-		normalizedSources = []string{}
-	}
-	sort.Strings(normalizedSources)
-	return normalizedDockerGuardPolicy{Family: family, HostIP: hostIP, HostPort: hostPort, Protocol: protocol, Mode: mode}, normalizedSources, nil
-}
-
-func decodeGuardSources(value string) []string {
-	result := []string{}
-	_ = json.Unmarshal([]byte(value), &result)
-	return result
-}
-
 func dockerGuardPolicyEndpoints(policies []model.DockerPortGuardPolicy) []dto.DockerPortGuardEndpoint {
 	endpoints := make([]dto.DockerPortGuardEndpoint, 0, len(policies))
 	for _, policy := range policies {
 		endpoints = append(endpoints, dto.DockerPortGuardEndpoint{
 			Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol,
-			PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: decodeGuardSources(policy.Sources),
+			PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: docker_guard.DecodeSources(policy.Sources),
 			Description: policy.Description,
 		})
 	}

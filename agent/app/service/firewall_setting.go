@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -24,7 +25,9 @@ type IFirewallSettingService interface {
 
 type FirewallSettingService struct{}
 
-func NewIFirewallSettingService() IFirewallSettingService { return &FirewallSettingService{} }
+func NewIFirewallSettingService() IFirewallSettingService {
+	return &FirewallSettingService{}
+}
 
 func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings, error) {
 	result := dto.FirewallSettings{PingStatus: ping.LoadStatus()}
@@ -132,10 +135,7 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 			Name: name, Installed: installed[name], Supported: dockerInstalled,
 			Active: dockerInstalled && installed[name] && result.Docker.Selected == name,
 		}
-		var guard dockerGuardRuntime = docker_guard.NewManager()
-		if name == constant.FirewallProviderNftables {
-			guard = docker_guard.NewNftablesManager()
-		}
+		guard := docker_guard.NewRuntime(name)
 		ipv4, ipv6 := guard.Status(docker_guard.FamilyIPv4), guard.Status(docker_guard.FamilyIPv6)
 		option.Initialized = ipv4.Initialized || ipv6.Initialized
 		option.Bound = ipv4.Bound || ipv6.Bound
@@ -196,10 +196,7 @@ func (s *FirewallSettingService) Operate(ctx context.Context, request dto.Firewa
 }
 
 func (s *FirewallSettingService) operateDocker(ctx context.Context, request dto.FirewallBackendOperation) error {
-	var guard dockerGuardRuntime = docker_guard.NewManager()
-	if request.Backend == constant.FirewallProviderNftables {
-		guard = docker_guard.NewNftablesManager()
-	}
+	guard := docker_guard.NewRuntime(request.Backend)
 	if request.Operation == "cleanup" {
 		if err := guard.Cleanup(); err != nil {
 			return err
@@ -224,7 +221,7 @@ func (s *FirewallSettingService) operateDocker(ctx context.Context, request dto.
 		return err
 	}
 	if request.Operation == "initialize" {
-		if err := NewIDockerPortGuardService().Operate(ctx, dto.DockerPortGuardOperation{Operation: "initialize"}); err != nil {
+		if err := newDockerPortGuardService().Operate(ctx, dto.DockerPortGuardOperation{Operation: "initialize"}); err != nil {
 			_ = settingRepo.UpdateOrCreate(constant.FirewallDockerBackendKey, previous)
 			return err
 		}
@@ -233,10 +230,7 @@ func (s *FirewallSettingService) operateDocker(ctx context.Context, request dto.
 }
 
 func dockerGuardBackendInitialized(backend string) (bool, error) {
-	var guard dockerGuardRuntime = docker_guard.NewManager()
-	if backend == constant.FirewallProviderNftables {
-		guard = docker_guard.NewNftablesManager()
-	}
+	guard := docker_guard.NewRuntime(backend)
 	for _, family := range []string{docker_guard.FamilyIPv4, docker_guard.FamilyIPv6} {
 		initialized, err := guard.Initialized(family)
 		if err != nil {
@@ -372,7 +366,7 @@ func (s *FirewallSettingService) operateForwarding(request dto.FirewallBackendOp
 		return err
 	}
 	if request.Operation == "initialize" {
-		return NewIForwardingService().Enable()
+		return newForwardingService().Enable()
 	}
 	recordForwardingSyncError(nil)
 	return nil
@@ -381,7 +375,7 @@ func (s *FirewallSettingService) operateForwarding(request dto.FirewallBackendOp
 func forwardingBackendInitialized(backend string) (bool, error) {
 	manager, err := newForwardingManagerFor(backend)
 	if err != nil {
-		if strings.Contains(err.Error(), "is not installed") {
+		if errors.Is(err, lifecycle.ErrNotInstalled) {
 			return false, nil
 		}
 		return false, err

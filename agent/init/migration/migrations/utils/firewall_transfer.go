@@ -11,7 +11,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
-	forwardingproviders "github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding/providers"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"gorm.io/gorm"
@@ -109,7 +108,7 @@ func importLegacyForwardingRules(ctx context.Context, db *gorm.DB, rules []forwa
 	models := make([]model.ForwardingRule, 0, len(rules))
 	seen := make(map[string]struct{}, len(rules))
 	for _, rule := range rules {
-		normalized, err := forwardingproviders.NormalizeRule(rule)
+		normalized, err := forwarding.NormalizeRule(rule)
 		if err != nil {
 			return fmt.Errorf("normalize legacy forwarding rule: %w", err)
 		}
@@ -160,7 +159,7 @@ func loadLegacyFirewallForwarding() (firewallTransferSource, error) {
 			return firewallTransferSource{}, err
 		}
 		for _, item := range firewalldRules {
-			if _, err := forwardingproviders.NormalizeRule(item.rule); err != nil {
+			if _, err := forwarding.NormalizeRule(item.rule); err != nil {
 				if global.LOG != nil {
 					global.LOG.Warnf("skip unsupported legacy firewalld forwarding rule %q: %v", item.spec, err)
 				}

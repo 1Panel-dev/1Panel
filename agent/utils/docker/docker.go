@@ -3,6 +3,7 @@ package docker
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -21,6 +22,8 @@ import (
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
 )
+
+var ErrUnavailable = errors.New("Docker is unavailable")
 
 func NewDockerClient() (*client.Client, error) {
 	var settingItem model.Setting

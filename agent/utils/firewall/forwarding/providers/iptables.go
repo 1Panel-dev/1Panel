@@ -134,7 +134,7 @@ func (l *iptablesNATAdapter) Reconcile(rules []forwarding.Rule) error {
 		forwarding.FamilyIPv6: nil,
 	}
 	for _, rule := range rules {
-		normalized, err := NormalizeRule(rule)
+		normalized, err := forwarding.NormalizeRule(rule)
 		if err != nil {
 			return err
 		}

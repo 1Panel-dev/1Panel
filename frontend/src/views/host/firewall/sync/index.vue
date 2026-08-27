@@ -147,7 +147,7 @@
                 </template>
                 <el-table-column :label="$t('firewall.ruleSyncReason')" min-width="220" show-overflow-tooltip>
                     <template #default="{ row }">
-                        {{ reasonText(row.reason) }}
+                        {{ reasonText(row.reasonCode, row.reason) }}
                     </template>
                 </el-table-column>
             </ComplexTable>
@@ -296,7 +296,16 @@ const syncReasonKeys: Record<string, string> = {
     'protected firewall rule cannot be modified': 'protectedRule',
 };
 
-const reasonText = (reason?: string) => {
+const syncReasonCodeKeys: Record<string, string> = {
+    already_exists_in_target: 'alreadyExistsInTarget',
+    only_exists_in_target: 'onlyInTarget',
+    managed_only_exists_in_target: 'managedOnlyInTarget',
+    unsafe_managed_rule_removal: 'managedRuntimeCannotRemove',
+};
+
+const reasonText = (reasonCode?: string, reason?: string) => {
+    const codedReasonKey = reasonCode ? syncReasonCodeKeys[reasonCode] : undefined;
+    if (codedReasonKey) return i18n.global.t(`firewall.ruleSyncReasonDetail.${codedReasonKey}`);
     if (!reason) return '-';
     const reasonKey = syncReasonKeys[reason];
     if (reasonKey) return i18n.global.t(`firewall.ruleSyncReasonDetail.${reasonKey}`);

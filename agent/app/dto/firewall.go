@@ -1,6 +1,9 @@
 package dto
 
-import "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
+import (
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
+	firewallsync "github.com/1Panel-dev/1Panel/agent/utils/firewall/sync"
+)
 
 type FirewallSubsystemStatus struct {
 	Name            string                      `json:"name"`
@@ -245,7 +248,8 @@ type FirewallRuleSyncItem struct {
 	Rule        *filter.FirewallRule     `json:"rule,omitempty"`
 	ForwardRule *ForwardRule             `json:"forwardRule,omitempty"`
 	DockerRule  *DockerPortGuardEndpoint `json:"dockerRule,omitempty"`
-	Status      string                   `json:"status"`
+	Status      firewallsync.Status      `json:"status"`
+	ReasonCode  firewallsync.ReasonCode  `json:"reasonCode,omitempty"`
 	Reason      string                   `json:"reason,omitempty"`
 }
 
