@@ -7,13 +7,10 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 )
 
-type PortWhitelist struct {
-	Family   string `json:"family"`
-	Port     string `json:"port"`
-	Protocol string `json:"protocol"`
-}
+type PortWhitelist = filter.PortWhitelist
 
 func ParsePortWhitelist(value string) ([]PortWhitelist, error) {
 	value = strings.TrimSpace(value)

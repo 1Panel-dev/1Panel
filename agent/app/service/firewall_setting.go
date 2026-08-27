@@ -8,7 +8,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
@@ -69,9 +68,6 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 		result.System.Options = append(result.System.Options, option)
 	}
 	result.System.Selected, _ = settingRepo.GetValueByKey(constant.FirewallSystemBackendKey)
-	if !installed[result.System.Selected] {
-		result.System.Selected = ""
-	}
 	if result.System.Selected == "" {
 		if client, err := lifecycle.NewClient(); err == nil {
 			result.System.Selected = client.Name()
@@ -124,36 +120,17 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 		result.Forwarding.Current = strings.Join(initializedForwarding, " + ")
 	}
 	result.Forwarding.Selected, _ = settingRepo.GetValueByKey(constant.FirewallForwardingBackendKey)
-	if !installed[result.Forwarding.Selected] {
-		result.Forwarding.Selected = ""
-	}
 	if result.Forwarding.Selected == "" {
-		for _, option := range result.Forwarding.Options {
-			if option.Initialized && result.Forwarding.Selected == "" {
-				result.Forwarding.Selected = option.Name
-			} else if option.Initialized {
-				result.Forwarding.Selected = ""
-				break
-			}
-		}
+		result.Forwarding.Selected = constant.FirewallProviderIptables
 	}
 
 	dockerInstalled := cmd.Which("docker")
-	detectedDockerBackend := ""
-	if dockerInstalled {
-		if client, err := docker.NewDockerClient(); err == nil {
-			defer client.Close()
-			if info, err := client.Info(ctx); err == nil {
-				detectedDockerBackend = dockerFirewallBackend(info)
-			}
-		}
-	}
-	result.Docker.Selected = selectedDockerFirewallBackend(detectedDockerBackend)
+	result.Docker.Selected = configuredDockerFirewallBackend()
 	result.Docker.Current = result.Docker.Selected
 	for _, name := range []string{constant.FirewallProviderIptables, constant.FirewallProviderNftables} {
 		option := dto.FirewallBackendOption{
-			Name: name, Installed: dockerInstalled && installed[name], Supported: true,
-			Active: dockerInstalled && result.Docker.Selected == name,
+			Name: name, Installed: installed[name], Supported: dockerInstalled,
+			Active: dockerInstalled && installed[name] && result.Docker.Selected == name,
 		}
 		var guard dockerGuardRuntime = docker_guard.NewManager()
 		if name == constant.FirewallProviderNftables {
@@ -285,6 +262,15 @@ func (s *FirewallSettingService) operateSystem(request dto.FirewallBackendOperat
 			previous = client.Name()
 		}
 	}
+	if request.Operation == "select" && previous != "" && previous != request.Backend {
+		initialized, err := systemFirewallBackendInitialized(previous)
+		if err != nil {
+			return err
+		}
+		if initialized {
+			return fmt.Errorf("clean up the current system firewall backend %s before switching to %s", previous, request.Backend)
+		}
+	}
 	if err := settingRepo.UpdateOrCreate(constant.FirewallSystemBackendKey, request.Backend); err != nil {
 		return err
 	}
@@ -305,6 +291,26 @@ func (s *FirewallSettingService) operateSystem(request dto.FirewallBackendOperat
 		return rollback(initErr)
 	}
 	return settingRepo.UpdateOrCreate(constant.FirewallFilterInitializedKey, constant.StatusEnable)
+}
+
+func systemFirewallBackendInitialized(backend string) (bool, error) {
+	if supportsManagedFilterChains(backend) {
+		for _, family := range []string{constant.FirewallFamilyIPv4, constant.FirewallFamilyIPv6} {
+			initialized, _, err := loadSystemFirewallFamilyStatus(backend, family)
+			if err != nil {
+				return false, err
+			}
+			if initialized {
+				return true, nil
+			}
+		}
+		return false, nil
+	}
+	client, err := lifecycle.NewClientFor(backend)
+	if err != nil {
+		return false, err
+	}
+	return client.Status()
 }
 
 func cleanupSystemBackend(backend string) error {

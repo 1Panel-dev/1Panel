@@ -4215,9 +4215,9 @@ const message = {
         importBackendHelper:
             'As regras importadas são convertidas para o backend atual {0}. As regras de origem não são alteradas.',
         resetDirectRulesHelper:
-            'Exclua de {0} todas as cadeias, regras, arquivos persistentes e registros correspondentes do banco de dados do firewall de sistema do 1Panel',
+            'Exclua de {0} as cadeias, regras em execução e arquivos persistentes do firewall do 1Panel; as políticas salvas no banco são mantidas',
         resetWhitelistRulesHelper:
-            'Exclua de {0} toda a configuração personalizada e seus registros de banco, restaure os padrões de instalação e desative {0}.\nApós a limpeza, a proteção não será mais fornecida. Esta ação não pode ser desfeita.',
+            'Limpe de {0} a configuração personalizada ativa, restaure os padrões de instalação e desative {0}; as políticas do banco são mantidas e podem ser sincronizadas novamente.',
         cleanupForwardingBackendHelper:
             'Exclua de {0} todas as regras e cadeias de encaminhamento de portas do 1Panel, mantendo apenas os dados do banco de dados',
         cleanupDockerBackendHelper:
@@ -4226,7 +4226,7 @@ const message = {
             'O backend atual {0} ainda contém regras de execução do 1Panel. Limpe-o antes de mudar para {1}.',
         cleanupAction: 'Limpar',
         backendSwitchNotice:
-            'A troca do firewall do sistema não migra nem limpa regras automaticamente. O encaminhamento de portas e a proteção Docker exigem a limpeza prévia do backend atual; regras e políticas salvas permanecem no 1Panel e podem ser inicializadas ou sincronizadas após a troca.',
+            'Limpe o backend atual antes de trocar o firewall do sistema, o encaminhamento de portas ou a proteção Docker. As políticas do banco são mantidas e podem ser inicializadas ou sincronizadas após a troca.',
         switchBackendHelper: 'Mudar para {0}?',
         ruleSyncTitle: 'Sincronizar regras',
         ruleSyncAction: 'Sincronizar regras',
@@ -4238,7 +4238,7 @@ const message = {
         ruleSyncDatabaseTotal: 'Regras do banco de dados',
         ruleSyncDatabaseConfirm:
             'Sincronizar {1} para corresponder exatamente às {0} regras do banco de dados? {2} regras do destino serão removidas e as ausentes serão adicionadas.',
-        ruleSyncSource: 'Backend de origem',
+        ruleSyncSource: 'Fonte da configuração',
         ruleSyncTarget: 'Backend atual',
         ruleSyncTotal: 'Regras convertidas',
         ruleSyncReady: 'Prontas',
@@ -4246,6 +4246,23 @@ const message = {
         ruleSyncRemove: 'A remover',
         ruleSyncBlocked: 'Indisponíveis',
         ruleSyncReason: 'Resultado da verificação',
+        ruleSyncReasonDetail: {
+            matchesDatabasePolicy: 'A regra já corresponde à política do banco de dados.',
+            managedOrderDiffers: 'A ordem das regras gerenciadas difere da sequência do banco de dados.',
+            managedOnlyInTarget: 'A regra gerenciada existe apenas no firewall de destino.',
+            managedRuntimeCannotRemove: 'A regra ativa gerenciada não pode ser removida com segurança.',
+            managedOrderBlocked:
+                'As regras gerenciadas não podem ser reordenadas através de regras externas, não reconhecidas ou protegidas.',
+            mayBlockManagement: 'A regra pode bloquear a conexão de gerenciamento atual.',
+            missingFromTarget: 'A regra não existe no firewall de destino.',
+            targetDiffers: 'A regra de destino difere da política do banco de dados.',
+            alreadyExistsInTarget: 'A regra já existe no firewall de destino.',
+            onlyInTarget: 'A regra existe apenas no firewall de destino.',
+            stale: 'O estado da regra está desatualizado. Atualize e tente novamente.',
+            lockoutRisk: 'Esta alteração pode bloquear o acesso de gerenciamento.',
+            protectedRule: 'Esta regra protegida do firewall não pode ser modificada.',
+            cannotReconcile: 'Não foi possível sincronizar a regra de destino: {0}',
+        },
         ruleSyncConfirm: 'Sincronizar {0} regras de {1} para {2}? O backend de origem não será alterado.',
         ruleSyncResetSource: 'Redefinir e desativar o firewall de origem {0} após a sincronização',
         ruleSyncResetSourceHelper:

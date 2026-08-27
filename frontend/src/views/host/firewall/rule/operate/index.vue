@@ -298,7 +298,7 @@ const wildcardAddressLabel = (family: Firewall.Family) =>
 const isWildcardAddress = (_family: Firewall.Family, address?: string) => !address?.trim();
 const priorityFieldLabel = computed(() => i18n.global.t('firewall.priority'));
 const showPriorityField = computed(() => {
-    if (provider.value !== 'firewalld') return mode.value === 'edit';
+    if (provider.value !== 'firewalld') return true;
     return (
         firewalldPrioritySupported.value && (mode.value === 'create' || editingRule.value?.nativeKind === 'rich_rule')
     );
@@ -471,7 +471,7 @@ const resetForm = () => {
     form.destinationAddress = '';
     form.destinationPorts = [''];
     form.action = 'accept';
-    form.priority = provider.value === 'firewalld' || mode.value === 'create' ? undefined : positionalPriorityMax.value;
+    form.priority = provider.value === 'firewalld' ? undefined : positionalPriorityMax.value;
     form.description = '';
     editingUUID.value = '';
     editingRule.value = undefined;
@@ -606,7 +606,7 @@ const buildRule = (
         destinationPort,
         action,
         priority: provider.value === 'firewalld' && firewalldPrioritySupported.value ? form.priority : undefined,
-        orderIndex: provider.value === 'firewalld' || mode.value === 'create' ? undefined : form.priority,
+        orderIndex: provider.value === 'firewalld' ? undefined : form.priority,
         description: form.description,
     };
 };

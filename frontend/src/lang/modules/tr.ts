@@ -4193,9 +4193,9 @@ const message = {
         importBackendHelper:
             'İçe aktarılan kurallar geçerli {0} arka ucu için dönüştürülür. Kaynak kurallar değiştirilmez.',
         resetDirectRulesHelper:
-            '{0} içindeki tüm 1Panel sistem güvenlik duvarı zincirlerini, kurallarını, kalıcı dosyalarını ve ilgili veritabanı kayıtlarını silin',
+            '{0} içindeki 1Panel sistem güvenlik duvarı zincirlerini, çalışma zamanı kurallarını ve kalıcı dosyaları silin; veritabanı ilkelerini koruyun',
         resetWhitelistRulesHelper:
-            '{0} içindeki tüm özel yapılandırmayı ve veritabanı kayıtlarını silin, kurulum varsayılanlarını geri yükleyin ve {0} öğesini devre dışı bırakın.\nTemizlemeden sonra güvenlik duvarı koruması sağlanmaz. Bu işlem geri alınamaz.',
+            '{0} içindeki etkin özel yapılandırmayı temizleyin, kurulum varsayılanlarını geri yükleyin ve {0} öğesini devre dışı bırakın; veritabanı ilkeleri korunur ve yeniden eşitlenebilir.',
         cleanupForwardingBackendHelper:
             '{0} içindeki tüm 1Panel bağlantı noktası yönlendirme kurallarını ve zincirlerini silin, yalnızca veritabanı verilerini koruyun',
         cleanupDockerBackendHelper:
@@ -4204,7 +4204,7 @@ const message = {
             'Mevcut {0} arka ucu hâlâ 1Panel çalışma zamanı kuralları içeriyor. {1} arka ucuna geçmeden önce temizleyin.',
         cleanupAction: 'Temizle',
         backendSwitchNotice:
-            'Sistem güvenlik duvarı geçişi kuralları otomatik olarak taşımaz veya temizlemez. Bağlantı noktası yönlendirme ve Docker korumasında önce mevcut arka uç temizlenmelidir; kayıtlı kurallar ve ilkeler 1Panel içinde kalır ve geçişten sonra yeniden başlatılabilir veya eşitlenebilir.',
+            'Sistem güvenlik duvarı, bağlantı noktası yönlendirme veya Docker korumasını değiştirmeden önce mevcut arka ucu temizleyin. Veritabanı ilkeleri korunur ve geçişten sonra yeniden başlatılabilir veya eşitlenebilir.',
         switchBackendHelper: '{0} arka ucuna geçilsin mi?',
         ruleSyncTitle: 'Kuralları eşitle',
         ruleSyncAction: 'Kuralları eşitle',
@@ -4216,7 +4216,7 @@ const message = {
         ruleSyncDatabaseTotal: 'Veritabanı kuralları',
         ruleSyncDatabaseConfirm:
             '{1}, {0} veritabanı kuralıyla tam olarak eşleşecek şekilde eşitlensin mi? Hedefteki {2} kural silinecek ve eksik kurallar eklenecektir.',
-        ruleSyncSource: 'Kaynak arka uç',
+        ruleSyncSource: 'Yapılandırma kaynağı',
         ruleSyncTarget: 'Mevcut arka uç',
         ruleSyncTotal: 'Dönüştürülen kurallar',
         ruleSyncReady: 'Hazır',
@@ -4224,6 +4224,23 @@ const message = {
         ruleSyncRemove: 'Silinecek',
         ruleSyncBlocked: 'Kullanılamaz',
         ruleSyncReason: 'Kontrol sonucu',
+        ruleSyncReasonDetail: {
+            matchesDatabasePolicy: 'Kural zaten veritabanı ilkesiyle eşleşiyor.',
+            managedOrderDiffers: 'Yönetilen kuralların sırası veritabanı sırasından farklı.',
+            managedOnlyInTarget: 'Yönetilen kural yalnızca hedef güvenlik duvarında mevcut.',
+            managedRuntimeCannotRemove: 'Yönetilen etkin kural güvenli bir şekilde kaldırılamıyor.',
+            managedOrderBlocked:
+                'Yönetilen kurallar harici, tanınmayan veya korunan kuralların üzerinden yeniden sıralanamaz.',
+            mayBlockManagement: 'Kural mevcut yönetim bağlantısını engelleyebilir.',
+            missingFromTarget: 'Kural hedef güvenlik duvarında bulunmuyor.',
+            targetDiffers: 'Hedef kural veritabanı ilkesinden farklı.',
+            alreadyExistsInTarget: 'Kural hedef güvenlik duvarında zaten mevcut.',
+            onlyInTarget: 'Kural yalnızca hedef güvenlik duvarında mevcut.',
+            stale: 'Güvenlik duvarı kuralının durumu güncel değil. Yenileyip tekrar deneyin.',
+            lockoutRisk: 'Bu değişiklik yönetim erişimini engelleyebilir.',
+            protectedRule: 'Bu korumalı güvenlik duvarı kuralı değiştirilemez.',
+            cannotReconcile: 'Hedef kural eşitlenemiyor: {0}',
+        },
         ruleSyncConfirm: '{0} kural {1} arka ucundan {2} arka ucuna eşitlensin mi? Kaynak arka uç değiştirilmez.',
         ruleSyncResetSource: 'Eşitleme başarılı olunca kaynak güvenlik duvarı {0} sıfırlansın ve devre dışı bırakılsın',
         ruleSyncResetSourceHelper: 'Kaynak yalnızca tüm kurallar başarıyla eşitlendikten sonra sıfırlanır.',

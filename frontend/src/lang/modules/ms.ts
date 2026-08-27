@@ -4195,9 +4195,9 @@ const message = {
         importBackendHelper:
             'Peraturan yang diimport ditukar untuk bahagian belakang semasa {0}. Peraturan sumber tidak diubah.',
         resetDirectRulesHelper:
-            'Padam semua rantaian, peraturan, fail berterusan dan rekod pangkalan data berkaitan tembok api sistem 1Panel daripada {0}',
+            'Padam rantaian, peraturan masa jalan dan fail berterusan tembok api sistem 1Panel daripada {0}; dasar pangkalan data yang disimpan dikekalkan',
         resetWhitelistRulesHelper:
-            'Padam semua konfigurasi tersuai dan rekod pangkalan data daripada {0}, pulihkan tetapan pemasangan asal dan nyahdayakan {0}.\nSelepas pembersihan, perlindungan tembok api tidak lagi diberikan. Tindakan ini tidak boleh dibuat asal.',
+            'Bersihkan konfigurasi tersuai aktif daripada {0}, pulihkan tetapan pemasangan asal dan nyahdayakan {0}; dasar pangkalan data dikekalkan dan boleh disegerakkan semula.',
         cleanupForwardingBackendHelper:
             'Padam semua peraturan dan rantaian pemajuan port 1Panel daripada {0}, hanya mengekalkan data pangkalan data',
         cleanupDockerBackendHelper:
@@ -4206,7 +4206,7 @@ const message = {
             'Bahagian belakang semasa {0} masih mengandungi peraturan masa jalan 1Panel. Bersihkannya sebelum bertukar kepada {1}.',
         cleanupAction: 'Bersihkan',
         backendSwitchNotice:
-            'Penukaran tembok api sistem tidak memindahkan atau membersihkan peraturan secara automatik. Pemajuan port dan perlindungan Docker memerlukan bahagian belakang semasa dibersihkan dahulu; peraturan dan dasar tersimpan kekal dalam 1Panel dan boleh dimulakan atau disegerakkan semula selepas penukaran.',
+            'Bersihkan bahagian belakang semasa sebelum menukar tembok api sistem, pemajuan port atau perlindungan Docker. Dasar pangkalan data dikekalkan dan boleh dimulakan atau disegerakkan selepas penukaran.',
         switchBackendHelper: 'Tukar kepada {0}?',
         ruleSyncTitle: 'Segerakkan peraturan',
         ruleSyncAction: 'Segerakkan peraturan',
@@ -4218,7 +4218,7 @@ const message = {
         ruleSyncDatabaseTotal: 'Peraturan pangkalan data',
         ruleSyncDatabaseConfirm:
             'Segerakkan {1} supaya sepadan tepat dengan {0} peraturan pangkalan data? {2} peraturan sasaran akan dipadam dan peraturan yang tiada akan ditambah.',
-        ruleSyncSource: 'Bahagian belakang sumber',
+        ruleSyncSource: 'Sumber konfigurasi',
         ruleSyncTarget: 'Bahagian belakang semasa',
         ruleSyncTotal: 'Peraturan ditukar',
         ruleSyncReady: 'Sedia',
@@ -4226,6 +4226,23 @@ const message = {
         ruleSyncRemove: 'Untuk dipadam',
         ruleSyncBlocked: 'Tidak tersedia',
         ruleSyncReason: 'Hasil semakan',
+        ruleSyncReasonDetail: {
+            matchesDatabasePolicy: 'Peraturan sudah sepadan dengan dasar pangkalan data.',
+            managedOrderDiffers: 'Susunan peraturan terurus berbeza daripada turutan pangkalan data.',
+            managedOnlyInTarget: 'Peraturan terurus hanya wujud dalam tembok api sasaran.',
+            managedRuntimeCannotRemove: 'Peraturan aktif terurus tidak dapat dipadam dengan selamat.',
+            managedOrderBlocked:
+                'Peraturan terurus tidak boleh disusun semula merentasi peraturan luaran, tidak dikenali atau dilindungi.',
+            mayBlockManagement: 'Peraturan mungkin menyekat sambungan pengurusan semasa.',
+            missingFromTarget: 'Peraturan tiada dalam tembok api sasaran.',
+            targetDiffers: 'Peraturan sasaran berbeza daripada dasar pangkalan data.',
+            alreadyExistsInTarget: 'Peraturan sudah wujud dalam tembok api sasaran.',
+            onlyInTarget: 'Peraturan hanya wujud dalam tembok api sasaran.',
+            stale: 'Keadaan peraturan tembok api sudah lapuk. Muat semula dan cuba lagi.',
+            lockoutRisk: 'Perubahan ini mungkin menyekat akses pengurusan.',
+            protectedRule: 'Peraturan tembok api yang dilindungi ini tidak boleh diubah.',
+            cannotReconcile: 'Peraturan sasaran tidak dapat disegerakkan: {0}',
+        },
         ruleSyncConfirm: 'Segerakkan {0} peraturan daripada {1} ke {2}? Bahagian belakang sumber tidak akan diubah.',
         ruleSyncResetSource: 'Tetapkan semula dan nyahdayakan tembok api sumber {0} selepas penyegerakan berjaya',
         ruleSyncResetSourceHelper: 'Sumber hanya ditetapkan semula selepas semua peraturan berjaya disegerakkan.',

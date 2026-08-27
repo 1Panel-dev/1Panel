@@ -27,16 +27,15 @@ type IForwardingService interface {
 	OperateRules(request dto.ForwardRuleOperate) error
 	Enable() error
 	Restore(context.Context) error
-	PreviewRuleSync(context.Context, dto.FirewallRuleSyncRequest) (dto.FirewallRuleSyncPreview, error)
-	SyncRules(context.Context, dto.FirewallRuleSyncRequest) (dto.FirewallRuleSyncResult, error)
 }
 
 type ForwardingService struct {
-	managerFactory func() (*forwarding.Manager, error)
-	rules          repo.IForwardingRuleRepo
-	enabled        func() (bool, error)
-	persistBackend func(string) error
-	markEnabled    func() error
+	managerFactory     func() (*forwarding.Manager, error)
+	rules              repo.IForwardingRuleRepo
+	enabled            func() (bool, error)
+	persistBackend     func(string) error
+	markEnabled        func() error
+	installedProviders func() []string
 }
 
 type forwardingCandidate struct {
@@ -45,6 +44,7 @@ type forwardingCandidate struct {
 }
 
 var errForwardingBackendConflict = errors.New("iptables and nftables forwarding backends are both initialized; remove one before continuing")
+var errForwardingBackendUnavailable = errors.New("no supported forwarding backend detected")
 var forwardingMutationMu sync.Mutex
 
 const (
@@ -59,6 +59,10 @@ var (
 )
 
 func NewIForwardingService() IForwardingService {
+	return newForwardingService()
+}
+
+func newForwardingService() *ForwardingService {
 	return &ForwardingService{
 		managerFactory: newForwardingManager,
 		rules:          repo.NewIForwardingRuleRepo(),
@@ -69,6 +73,7 @@ func NewIForwardingService() IForwardingService {
 		persistBackend: func(backend string) error {
 			return settingRepo.UpdateOrCreate(constant.FirewallForwardingBackendKey, backend)
 		},
+		installedProviders: lifecycle.InstalledProviders,
 	}
 }
 
@@ -83,6 +88,20 @@ func (s *ForwardingService) LoadBaseInfo() (dto.FirewallSubsystemStatus, error) 
 	}
 	manager, err := s.manager()
 	if err != nil {
+		if errors.Is(err, errForwardingBackendUnavailable) {
+			loadInstalled := s.installedProviders
+			if loadInstalled == nil {
+				loadInstalled = lifecycle.InstalledProviders
+			}
+			for _, provider := range loadInstalled() {
+				if provider == constant.FirewallProviderIptables || provider == constant.FirewallProviderNftables {
+					baseInfo.IsExist = true
+					baseInfo.Message = err.Error()
+					break
+				}
+			}
+			return baseInfo, nil
+		}
 		return baseInfo, err
 	}
 	status, err := manager.Status()
@@ -276,141 +295,6 @@ func (s *ForwardingService) Restore(ctx context.Context) error {
 	return err
 }
 
-func (s *ForwardingService) PreviewRuleSync(
-	ctx context.Context,
-	request dto.FirewallRuleSyncRequest,
-) (dto.FirewallRuleSyncPreview, error) {
-	targetProvider, err := databaseRuleSyncTarget(request, "forwarding")
-	if err != nil {
-		return dto.FirewallRuleSyncPreview{}, err
-	}
-	target, candidates, targetRules, _, err := s.loadRuleSyncCandidates(ctx, targetProvider)
-	if err != nil {
-		return dto.FirewallRuleSyncPreview{}, err
-	}
-	result := dto.FirewallRuleSyncPreview{
-		Subsystem:      "forwarding",
-		TargetProvider: filter.Provider(target.Name()),
-		Items:          make([]dto.FirewallRuleSyncItem, 0, len(candidates)),
-	}
-	matchedTargetRules := make([]bool, len(targetRules))
-	for _, candidate := range candidates {
-		item := dto.FirewallRuleSyncItem{
-			SourceUUID:  candidate.rule.Identity(),
-			ForwardRule: forwardingRuleSyncDTO(candidate.rule),
-		}
-		matchedIndex := -1
-		if candidate.err == nil {
-			matchedIndex = forwardingRuleUnmatchedIndex(targetRules, matchedTargetRules, candidate.rule)
-		}
-		switch {
-		case candidate.err != nil:
-			item.Status, item.Reason = firewallRuleSyncBlocked, candidate.err.Error()
-			result.Blocked++
-		case matchedIndex >= 0:
-			matchedTargetRules[matchedIndex] = true
-			item.Status, item.Reason = firewallRuleSyncExisting, "rule already exists in target backend"
-			result.Existing++
-		default:
-			item.Status = firewallRuleSyncReady
-			result.Ready++
-		}
-		result.Items = append(result.Items, item)
-	}
-	for index, rule := range targetRules {
-		if matchedTargetRules[index] {
-			continue
-		}
-		result.Items = append(result.Items, dto.FirewallRuleSyncItem{
-			SourceUUID: rule.Identity(), ForwardRule: forwardingRuleSyncDTO(rule),
-			Status: "remove", Reason: "rule exists only in target backend",
-		})
-		result.Removed++
-	}
-	result.Total = len(candidates)
-	return result, nil
-}
-
-func (s *ForwardingService) SyncRules(
-	ctx context.Context,
-	request dto.FirewallRuleSyncRequest,
-) (dto.FirewallRuleSyncResult, error) {
-	forwardingMutationMu.Lock()
-	defer forwardingMutationMu.Unlock()
-
-	targetProvider, err := databaseRuleSyncTarget(request, "forwarding")
-	if err != nil {
-		return dto.FirewallRuleSyncResult{}, err
-	}
-	target, candidates, targetRules, targetInitialized, err := s.loadRuleSyncCandidates(ctx, targetProvider)
-	if err != nil {
-		return dto.FirewallRuleSyncResult{}, err
-	}
-	result := dto.FirewallRuleSyncResult{
-		Subsystem:      "forwarding",
-		TargetProvider: filter.Provider(target.Name()),
-		Total:          len(candidates),
-	}
-	desired := make([]forwarding.Rule, 0, len(candidates))
-	ready := make([]forwardingRuleSyncCandidate, 0, len(candidates))
-	matchedTargetRules := make([]bool, len(targetRules))
-	for _, candidate := range candidates {
-		if candidate.err != nil {
-			appendForwardingRuleSyncFailure(&result, candidate, candidate.err)
-			continue
-		}
-		desired = append(desired, candidate.rule)
-		matchedIndex := forwardingRuleUnmatchedIndex(targetRules, matchedTargetRules, candidate.rule)
-		if matchedIndex >= 0 {
-			matchedTargetRules[matchedIndex] = true
-			result.Skipped++
-			continue
-		}
-		ready = append(ready, candidate)
-	}
-	if result.Failed > 0 {
-		return result, nil
-	}
-	removed := forwardingExtraRuleCount(targetRules, desired)
-	if len(desired) == 0 && !targetInitialized {
-		return result, nil
-	}
-	if len(desired) == 0 {
-		err = target.Reconcile(desired)
-		if err == nil {
-			err = verifyForwardingRuleSync(target, desired)
-		}
-		recordForwardingSyncError(err)
-		if err == nil {
-			result.Removed = removed
-		}
-		return result, err
-	}
-	if err := s.persistForwardingEnabled(); err != nil {
-		return dto.FirewallRuleSyncResult{}, err
-	}
-	err = s.activateManager(target)
-	if err == nil {
-		err = target.Reconcile(desired)
-		if err == nil {
-			err = verifyForwardingRuleSync(target, desired)
-		}
-	}
-	recordForwardingSyncError(err)
-	if err != nil {
-		if len(ready) == 0 {
-			return result, err
-		}
-		for _, candidate := range ready {
-			appendForwardingRuleSyncFailure(&result, candidate, err)
-		}
-		return result, nil
-	}
-	result.Succeeded = len(ready)
-	result.Removed = removed
-	return result, nil
-}
-
 func (s *ForwardingService) loadRuleSyncCandidates(
 	ctx context.Context,
 	targetProvider filter.Provider,
@@ -465,13 +349,8 @@ func verifyForwardingRuleSync(target *forwarding.Manager, desired []forwarding.R
 	if err != nil {
 		return fmt.Errorf("verify synchronized forwarding rules: %w", err)
 	}
-	if len(actual) != len(desired) {
-		return fmt.Errorf("verify synchronized forwarding rules: target has %d rules, want %d", len(actual), len(desired))
-	}
-	for _, rule := range desired {
-		if forwardingRuleIndex(actual, rule) < 0 {
-			return fmt.Errorf("verify synchronized forwarding rules: target is missing %s", rule.Identity())
-		}
+	if !databaseSyncStatesEqual(actual, desired, func(rule forwarding.Rule) string { return rule.Identity() }) {
+		return fmt.Errorf("verify synchronized forwarding rules: target rules do not match the database")
 	}
 	return nil
 }
@@ -488,45 +367,11 @@ func normalizeForwardingRuntimeRules(rules []forwarding.Rule) ([]forwarding.Rule
 	return normalized, nil
 }
 
-func forwardingRuleUnmatchedIndex(rules []forwarding.Rule, matched []bool, rule forwarding.Rule) int {
-	for index := range rules {
-		if !matched[index] && rules[index].Identity() == rule.Identity() {
-			return index
-		}
-	}
-	return -1
-}
-
-func forwardingExtraRuleCount(actual, desired []forwarding.Rule) int {
-	matched := make([]bool, len(desired))
-	extra := 0
-	for _, rule := range actual {
-		matchedIndex := forwardingRuleUnmatchedIndex(desired, matched, rule)
-		if matchedIndex < 0 {
-			extra++
-			continue
-		}
-		matched[matchedIndex] = true
-	}
-	return extra
-}
-
 func forwardingRuleSyncDTO(rule forwarding.Rule) *dto.ForwardRule {
 	return &dto.ForwardRule{
 		Family: rule.Family, Protocol: rule.Protocol, Port: rule.Port, TargetIP: rule.TargetIP,
 		TargetPort: rule.TargetPort, Interface: rule.Interface,
 	}
-}
-
-func appendForwardingRuleSyncFailure(
-	result *dto.FirewallRuleSyncResult,
-	candidate forwardingRuleSyncCandidate,
-	err error,
-) {
-	result.Failed++
-	result.Errors = append(result.Errors, dto.FirewallRuleSyncFailure{
-		SourceUUID: candidate.rule.Identity(), ForwardRule: forwardingRuleSyncDTO(candidate.rule), Error: err.Error(),
-	})
 }
 
 func (s *ForwardingService) reconcile(rules []forwarding.Rule) error {
@@ -735,13 +580,16 @@ func (s *ForwardingService) manager() (*forwarding.Manager, error) {
 
 func newForwardingManager() (*forwarding.Manager, error) {
 	selected, _ := settingRepo.GetValueByKey(constant.FirewallForwardingBackendKey)
+	if strings.TrimSpace(selected) == "" {
+		selected = constant.FirewallProviderIptables
+	}
 	return newForwardingManagerFor(strings.TrimSpace(selected))
 }
 
 func newForwardingManagerFor(backend string) (*forwarding.Manager, error) {
 	clients, err := lifecycle.NewNetfilterClients()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", errForwardingBackendUnavailable, err)
 	}
 	candidates := make([]forwardingCandidate, 0, len(clients))
 	for _, client := range clients {
@@ -757,7 +605,7 @@ func newForwardingManagerFor(backend string) (*forwarding.Manager, error) {
 				return forwarding.NewManager(candidate.adapter, candidate.runtime), nil
 			}
 		}
-		return nil, fmt.Errorf("selected forwarding backend %s is not installed", backend)
+		return nil, fmt.Errorf("%w: selected forwarding backend %s is not installed", errForwardingBackendUnavailable, backend)
 	}
 	return selectForwardingManager(candidates)
 }

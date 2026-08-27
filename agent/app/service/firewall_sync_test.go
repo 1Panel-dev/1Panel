@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
+	"errors"
 	"path/filepath"
-	"sync"
 	"testing"
 	"time"
 
@@ -19,6 +19,55 @@ import (
 	"gorm.io/gorm"
 )
 
+type fakeFirewallDatabaseSyncAdapter struct {
+	previewResult dto.FirewallRuleSyncPreview
+	syncResult    dto.FirewallRuleSyncResult
+	previewErr    error
+	syncErr       error
+	previewCalls  int
+	syncCalls     int
+}
+
+func (f *fakeFirewallDatabaseSyncAdapter) previewRuleSync(
+	context.Context,
+	dto.FirewallRuleSyncRequest,
+) (dto.FirewallRuleSyncPreview, error) {
+	f.previewCalls++
+	return f.previewResult, f.previewErr
+}
+
+func (f *fakeFirewallDatabaseSyncAdapter) syncRules(
+	context.Context,
+	dto.FirewallRuleSyncRequest,
+) (dto.FirewallRuleSyncResult, error) {
+	f.syncCalls++
+	return f.syncResult, f.syncErr
+}
+
+func TestFirewallRuleSyncCoordinatorDispatchesSubsystemAdapters(t *testing.T) {
+	forwardingErr := errors.New("forwarding preview")
+	dockerErr := errors.New("docker sync")
+	forwarding := &fakeFirewallDatabaseSyncAdapter{previewErr: forwardingErr}
+	docker := &fakeFirewallDatabaseSyncAdapter{syncErr: dockerErr}
+	service := &FirewallService{forwardingSync: forwarding, dockerSync: docker}
+
+	_, err := service.PreviewRuleSync(context.Background(), "client-ip", dto.FirewallRuleSyncRequest{
+		Subsystem: "forwarding", TargetProvider: filter.ProviderNftables,
+	})
+	if !errors.Is(err, forwardingErr) {
+		t.Fatalf("forwarding preview was not dispatched to its adapter: %v", err)
+	}
+	_, err = service.SyncRules(context.Background(), "client-ip", dto.FirewallRuleSyncRequest{
+		Subsystem: "docker", TargetProvider: filter.ProviderNftables,
+	})
+	if !errors.Is(err, dockerErr) {
+		t.Fatalf("Docker synchronization was not dispatched to its adapter: %v", err)
+	}
+	if forwarding.previewCalls != 1 || forwarding.syncCalls != 0 || docker.previewCalls != 0 || docker.syncCalls != 1 {
+		t.Fatalf("unexpected adapter calls: forwarding=%#v docker=%#v", forwarding, docker)
+	}
+}
+
 func TestFirewallRuleSyncRequestValidationAllowsDatabaseSource(t *testing.T) {
 	validate := validator.New()
 	for _, subsystem := range []string{"forwarding", "docker"} {
@@ -29,6 +78,26 @@ func TestFirewallRuleSyncRequestValidationAllowsDatabaseSource(t *testing.T) {
 	}
 	if err := validate.Struct(dto.FirewallRuleSyncRequest{Subsystem: "system", SourceProvider: filter.ProviderIptables}); err == nil {
 		t.Fatal("synchronization request without target provider was accepted")
+	}
+}
+
+func TestFirewallRuleSyncFailureMessagesIncludeDetailsAndGroupDuplicates(t *testing.T) {
+	messages := firewallRuleSyncFailureMessages([]dto.FirewallRuleSyncFailure{
+		{SourceUUID: "rule-1", Error: "iptables-restore failed: invalid port"},
+		{SourceUUID: "rule-2", Error: "iptables-restore failed: invalid port"},
+		{SourceUUID: "rule-3", Error: "permission denied"},
+	})
+	want := []string{
+		"UUID [rule-1, rule-2]: iptables-restore failed: invalid port",
+		"UUID [rule-3]: permission denied",
+	}
+	if len(messages) != len(want) {
+		t.Fatalf("failure messages = %#v, want %#v", messages, want)
+	}
+	for index := range want {
+		if messages[index] != want[index] {
+			t.Fatalf("failure message %d = %q, want %q", index, messages[index], want[index])
+		}
 	}
 }
 
@@ -65,7 +134,7 @@ func TestFirewallRuleSyncPreviewApplyAndRetry(t *testing.T) {
 		},
 		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderNftables, nil },
 	}
-	request := dto.FirewallRuleSyncRequest{SourceProvider: filter.ProviderIptables, TargetProvider: filter.ProviderNftables}
+	request := dto.FirewallRuleSyncRequest{TargetProvider: filter.ProviderNftables}
 
 	preview, err := service.PreviewRuleSync(ctx, "", request)
 	if err != nil {
@@ -82,7 +151,7 @@ func TestFirewallRuleSyncPreviewApplyAndRetry(t *testing.T) {
 	if result.Total != 1 || result.Succeeded != 1 || result.Skipped != 0 || result.Failed != 0 {
 		t.Fatalf("unexpected sync result: %#v", result)
 	}
-	targetRecords, err := ruleRepo.List(ctx, repo.WithByProvider(string(filter.ProviderNftables)))
+	targetRecords, err := ruleRepo.List(ctx)
 	if err != nil {
 		t.Fatalf("list target records: %v", err)
 	}
@@ -100,7 +169,7 @@ func TestFirewallRuleSyncPreviewApplyAndRetry(t *testing.T) {
 
 	setupFirewallTaskTestDB(t)
 	taskResult, err := service.SyncRules(ctx, "", dto.FirewallRuleSyncRequest{
-		Subsystem: "system", SourceProvider: filter.ProviderIptables, TargetProvider: filter.ProviderNftables,
+		Subsystem: "system", TargetProvider: filter.ProviderNftables,
 		TaskID: "firewall-sync-task",
 	})
 	if err != nil {
@@ -110,15 +179,237 @@ func TestFirewallRuleSyncPreviewApplyAndRetry(t *testing.T) {
 		t.Fatalf("plain synchronization was not queued as a task: %#v", taskResult)
 	}
 	waitFirewallSyncTask(t, taskResult.TaskID)
-	sourceRecords, err := ruleRepo.List(ctx, repo.WithByProvider(string(filter.ProviderIptables)))
+	sourceRecords, err := ruleRepo.List(ctx)
 	if err != nil || len(sourceRecords) != 1 {
 		t.Fatalf("plain synchronization reset the source backend: %#v err=%v", sourceRecords, err)
 	}
 }
 
-func TestFirewallRuleSyncTaskResetsSourceAfterSuccessfulMigration(t *testing.T) {
+func TestFirewallRuleSyncKeepsExpandedRulesInTheSameScope(t *testing.T) {
 	ctx := context.Background()
-	setupFirewallTaskTestDB(t)
+	ruleRepo := repo.NewFirewallRuleRepo(newFirewallRuleTestDB(t))
+	sourceRule := filter.FirewallRule{
+		Scope: filter.Scope{
+			Provider: filter.ProviderIptables, Family: filter.FamilyIPv4,
+			Table: "filter", Chain: filter.IptablesInputChain, Direction: filter.DirectionInput,
+		},
+		Protocol: "tcp", DestinationPort: "80,443", Action: filter.ActionAccept,
+	}
+	sourceRecord, err := model.FirewallRuleFromDomain(sourceRule)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sourceRecord.Origin = constant.FirewallRuleOriginCreated
+	sourceRecord.Owner = constant.FirewallRuleSourceUser
+	if err := ruleRepo.Create(ctx, &sourceRecord); err != nil {
+		t.Fatal(err)
+	}
+
+	targetScope := filter.Scope{
+		Provider: filter.ProviderNftables, Family: filter.FamilyIPv4,
+		Table: "filter", Chain: filter.IptablesInputChain, Direction: filter.DirectionInput,
+	}
+	adapter := newFakeFilterAdapter(t, targetScope, nil)
+	service := &FirewallService{
+		rules: ruleRepo,
+		adapters: firewallRuleRuntimeRegistry{
+			filter.ProviderNftables: newFirewallRuleRuntime(adapter, nil),
+		},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderNftables, nil },
+	}
+	request := dto.FirewallRuleSyncRequest{TargetProvider: filter.ProviderNftables}
+
+	result, err := service.syncRules(ctx, "", request)
+	if err != nil || result.Succeeded != 2 || result.Failed != 0 {
+		t.Fatalf("expanded rule synchronization failed: result=%#v err=%v", result, err)
+	}
+	if len(adapter.snapshot.Rules) != 2 {
+		t.Fatalf("expanded rules overwrote each other: %#v", adapter.snapshot.Rules)
+	}
+	if adapter.applyCount != 1 {
+		t.Fatalf("same-scope rules were applied in %d calls, want one batch", adapter.applyCount)
+	}
+	if adapter.observeCount != len(firewallRuleSyncScopes(filter.ProviderNftables)) {
+		t.Fatalf("synchronization observed scopes %d times, want one read per scope", adapter.observeCount)
+	}
+	ports := make(map[string]struct{}, len(adapter.snapshot.Rules))
+	markers := make(map[string]struct{}, len(adapter.snapshot.Rules))
+	for _, observed := range adapter.snapshot.Rules {
+		ports[observed.Rule.DestinationPort] = struct{}{}
+		markers[observed.Marker] = struct{}{}
+	}
+	if _, exists := ports["80"]; !exists {
+		t.Fatalf("expanded port 80 is missing: %#v", adapter.snapshot.Rules)
+	}
+	if _, exists := ports["443"]; !exists {
+		t.Fatalf("expanded port 443 is missing: %#v", adapter.snapshot.Rules)
+	}
+	if len(markers) != 2 {
+		t.Fatalf("expanded rules reused one runtime marker: %#v", adapter.snapshot.Rules)
+	}
+
+	retry, err := service.syncRules(ctx, "", request)
+	if err != nil || retry.Succeeded != 0 || retry.Skipped != 2 || retry.Failed != 0 {
+		t.Fatalf("expanded rule synchronization is not idempotent: result=%#v err=%v", retry, err)
+	}
+}
+
+func TestFirewallRuleSyncRestoresManagedOrderFromDatabase(t *testing.T) {
+	ctx := context.Background()
+	ruleRepo := repo.NewFirewallRuleRepo(newFirewallRuleTestDB(t))
+	targetScope := filter.Scope{
+		Provider: filter.ProviderNftables, Family: filter.FamilyIPv4,
+		Table: "filter", Chain: filter.IptablesInputChain, Direction: filter.DirectionInput,
+	}
+	adapter := newFakeFilterAdapter(t, targetScope, nil)
+	service := &FirewallService{
+		rules: ruleRepo,
+		adapters: firewallRuleRuntimeRegistry{
+			filter.ProviderNftables: newFirewallRuleRuntime(adapter, nil),
+		},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderNftables, nil },
+	}
+
+	records := make([]model.FirewallRule, 0, 2)
+	for index, port := range []string{"8080", "8081"} {
+		rule := filter.FirewallRule{
+			Scope: filter.Scope{
+				Provider: filter.ProviderIptables, Family: filter.FamilyIPv4,
+				Table: "filter", Chain: filter.IptablesInputChain, Direction: filter.DirectionInput,
+			},
+			Protocol: "tcp", DestinationPort: port, Action: filter.ActionAccept,
+		}
+		record, err := model.FirewallRuleFromDomain(rule)
+		if err != nil {
+			t.Fatal(err)
+		}
+		record.UUID = []string{"first", "second"}[index]
+		record.Origin = constant.FirewallRuleOriginCreated
+		record.Owner = constant.FirewallRuleSourceUser
+		sequence := int64(index+1) * model.FirewallRuleSequenceStep
+		record.Sequence = &sequence
+		if err := ruleRepo.Create(ctx, &record); err != nil {
+			t.Fatal(err)
+		}
+		records = append(records, record)
+	}
+	compiledFirst, err := service.compileStoredFirewallRules(ctx, records[0], filter.ProviderNftables)
+	if err != nil {
+		t.Fatal(err)
+	}
+	compiledSecond, err := service.compileStoredFirewallRules(ctx, records[1], filter.ProviderNftables)
+	if err != nil {
+		t.Fatal(err)
+	}
+	observedSecond := executorObservedRule(compiledSecond[0].Rule, compiledSecond[0].Marker, 1)
+	observedFirst := executorObservedRule(compiledFirst[0].Rule, compiledFirst[0].Marker, 2)
+	// Native inventory identifies managed rules through their marker and does
+	// not populate the domain rule UUID.
+	observedSecond.Rule.UUID = ""
+	observedFirst.Rule.UUID = ""
+	adapter.snapshot, err = filter.NewSnapshot(targetScope, []filter.ObservedRule{observedSecond, observedFirst})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	request := dto.FirewallRuleSyncRequest{TargetProvider: filter.ProviderNftables}
+	preview, err := service.PreviewRuleSync(ctx, "", request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preview.Ready != 2 || preview.Existing != 0 || preview.Blocked != 0 {
+		t.Fatalf("order drift was not included in preview: %#v", preview)
+	}
+	result, err := service.syncRules(ctx, "", request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Succeeded != 2 || result.Failed != 0 || adapter.applyCount != 1 {
+		t.Fatalf("managed order was not synchronized: result=%#v applies=%d", result, adapter.applyCount)
+	}
+	if adapter.snapshot.Rules[0].Marker != compiledFirst[0].Marker || adapter.snapshot.Rules[1].Marker != compiledSecond[0].Marker {
+		t.Fatalf("runtime order does not match database order: %#v", adapter.snapshot.Rules)
+	}
+	for index, uuid := range []string{"first", "second"} {
+		stored, loadErr := ruleRepo.GetByUUID(ctx, uuid)
+		want := int64(index+1) * model.FirewallRuleSequenceStep
+		if loadErr != nil || stored.Sequence == nil || *stored.Sequence != want {
+			t.Fatalf("synchronization rewrote database sequence for %s: record=%#v err=%v", uuid, stored, loadErr)
+		}
+	}
+}
+
+func TestFirewallRuleSyncBlocksManagedOrderAcrossExternalRule(t *testing.T) {
+	ctx := context.Background()
+	ruleRepo := repo.NewFirewallRuleRepo(newFirewallRuleTestDB(t))
+	targetScope := filter.Scope{
+		Provider: filter.ProviderNftables, Family: filter.FamilyIPv4,
+		Table: "filter", Chain: filter.IptablesInputChain, Direction: filter.DirectionInput,
+	}
+	adapter := newFakeFilterAdapter(t, targetScope, nil)
+	service := &FirewallService{
+		rules: ruleRepo,
+		adapters: firewallRuleRuntimeRegistry{
+			filter.ProviderNftables: newFirewallRuleRuntime(adapter, nil),
+		},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderNftables, nil },
+	}
+
+	compiled := make([]filter.DesiredRule, 0, 2)
+	for index, port := range []string{"8080", "8081"} {
+		rule := filter.FirewallRule{
+			Scope: filter.Scope{
+				Provider: filter.ProviderIptables, Family: filter.FamilyIPv4,
+				Table: "filter", Chain: filter.IptablesInputChain, Direction: filter.DirectionInput,
+			},
+			Protocol: "tcp", DestinationPort: port, Action: filter.ActionAccept,
+		}
+		record, err := model.FirewallRuleFromDomain(rule)
+		if err != nil {
+			t.Fatal(err)
+		}
+		record.UUID = []string{"first", "second"}[index]
+		record.Origin = constant.FirewallRuleOriginCreated
+		record.Owner = constant.FirewallRuleSourceUser
+		sequence := int64(index+1) * model.FirewallRuleSequenceStep
+		record.Sequence = &sequence
+		if err := ruleRepo.Create(ctx, &record); err != nil {
+			t.Fatal(err)
+		}
+		rules, compileErr := service.compileStoredFirewallRules(ctx, record, filter.ProviderNftables)
+		if compileErr != nil {
+			t.Fatal(compileErr)
+		}
+		compiled = append(compiled, rules[0])
+	}
+	external := compiled[0].Rule
+	external.UUID = ""
+	external.DestinationPort = "9090"
+	adapter.snapshot, _ = filter.NewSnapshot(targetScope, []filter.ObservedRule{
+		executorObservedRule(compiled[1].Rule, compiled[1].Marker, 1),
+		executorObservedRule(external, "", 2),
+		executorObservedRule(compiled[0].Rule, compiled[0].Marker, 3),
+	})
+
+	request := dto.FirewallRuleSyncRequest{TargetProvider: filter.ProviderNftables}
+	preview, err := service.PreviewRuleSync(ctx, "", request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preview.Blocked != 2 || preview.Ready != 0 {
+		t.Fatalf("unsafe order change was not blocked: %#v", preview)
+	}
+	result, err := service.syncRules(ctx, "", request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Failed != 2 || adapter.applyCount != 0 || adapter.snapshot.Rules[1].Marker != "" {
+		t.Fatalf("blocked order change mutated runtime rules: result=%#v applies=%d rules=%#v", result, adapter.applyCount, adapter.snapshot.Rules)
+	}
+}
+
+func TestFirewallRuleSyncRejectsProviderSourceAndKeepsDatabasePolicy(t *testing.T) {
+	ctx := context.Background()
 	db := newFirewallRuleTestDB(t)
 	ruleRepo := repo.NewFirewallRuleRepo(db)
 	sourceRule := filter.FirewallRule{
@@ -142,76 +433,153 @@ func TestFirewallRuleSyncTaskResetsSourceAfterSuccessfulMigration(t *testing.T) 
 		Table: "filter", Chain: filter.IptablesInputChain, Direction: filter.DirectionInput,
 	}
 	target := newFakeFilterAdapter(t, targetScope, nil)
-	cleaned := ""
-	cleanupStarted := make(chan struct{})
-	continueCleanup := make(chan struct{})
-	var releaseCleanup sync.Once
-	release := func() { releaseCleanup.Do(func() { close(continueCleanup) }) }
-	defer release()
 	service := &FirewallService{
 		rules: ruleRepo,
 		adapters: firewallRuleRuntimeRegistry{
 			filter.ProviderNftables: newFirewallRuleRuntime(target, nil),
 		},
 		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderNftables, nil },
-		cleanupInactiveBackend: func(provider string) error {
-			cleaned = provider
-			close(cleanupStarted)
-			<-continueCleanup
-			return nil
-		},
 	}
-	result, err := service.SyncRules(ctx, "", dto.FirewallRuleSyncRequest{
-		Subsystem: "system", SourceProvider: filter.ProviderIptables, TargetProvider: filter.ProviderNftables,
-		ResetSource: true, TaskID: "firewall-migration-task",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !result.Queued || result.TaskID != "firewall-migration-task" {
-		t.Fatalf("unexpected queued result: %#v", result)
-	}
-	select {
-	case <-cleanupStarted:
-	case <-time.After(5 * time.Second):
-		t.Fatal("timed out waiting for source cleanup")
-	}
-	running, err := service.CurrentRuleSyncTask()
-	if err != nil || !running.Executing || running.TaskID != result.TaskID {
-		t.Fatalf("unexpected running task: %#v err=%v", running, err)
-	}
-	duplicate, err := service.SyncRules(ctx, "", dto.FirewallRuleSyncRequest{
-		Subsystem: "system", SourceProvider: filter.ProviderIptables, TargetProvider: filter.ProviderNftables,
-		ResetSource: true, TaskID: "duplicate-firewall-migration-task",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !duplicate.Queued || duplicate.TaskID != result.TaskID {
-		t.Fatalf("duplicate synchronization did not reuse the running task: %#v", duplicate)
-	}
-	plainSync, err := service.SyncRules(ctx, "", dto.FirewallRuleSyncRequest{
+	_, err = service.PreviewRuleSync(ctx, "", dto.FirewallRuleSyncRequest{
 		Subsystem: "system", SourceProvider: filter.ProviderIptables, TargetProvider: filter.ProviderNftables,
 	})
-	if err != nil {
-		t.Fatal(err)
+	if err == nil {
+		t.Fatal("system database synchronization accepted a source provider")
 	}
-	if !plainSync.Queued || plainSync.TaskID != result.TaskID {
-		t.Fatalf("plain synchronization did not reuse the running task: %#v", plainSync)
+	result, err := service.syncRules(ctx, "", dto.FirewallRuleSyncRequest{TargetProvider: filter.ProviderNftables})
+	if err != nil || result.Succeeded != 1 {
+		t.Fatalf("database synchronization failed: result=%#v err=%v", result, err)
 	}
-	release()
+	records, err := ruleRepo.List(ctx)
+	if err != nil || len(records) != 1 || records[0].UUID != sourceRecord.UUID {
+		t.Fatalf("database policy was duplicated or removed: %#v err=%v", records, err)
+	}
+}
 
-	waitFirewallSyncTask(t, result.TaskID)
-	if cleaned != string(filter.ProviderIptables) {
-		t.Fatalf("source backend was not reset: %q", cleaned)
+func TestFirewallRuleSyncRemovesManagedRuntimeRuleMissingFromDatabase(t *testing.T) {
+	ctx := context.Background()
+	ruleRepo := repo.NewFirewallRuleRepo(newFirewallRuleTestDB(t))
+	scope := filter.Scope{
+		Provider: filter.ProviderFirewalld, Family: filter.FamilyInet,
+		Zone: filter.FirewalldInputZone, Direction: filter.DirectionInput,
 	}
-	sourceRecords, err := ruleRepo.List(ctx, repo.WithByProvider(string(filter.ProviderIptables)))
-	if err != nil || len(sourceRecords) != 0 {
-		t.Fatalf("source records were retained: %#v err=%v", sourceRecords, err)
+	rule := filter.FirewallRule{
+		UUID: "orphan", Scope: scope, NativeKind: filter.NativeKindRichRule,
+		Protocol: "tcp", DestinationPort: "9443", Action: filter.ActionAccept,
 	}
-	targetRecords, err := ruleRepo.List(ctx, repo.WithByProvider(string(filter.ProviderNftables)))
-	if err != nil || len(targetRecords) != 1 {
-		t.Fatalf("target records were not retained: %#v err=%v", targetRecords, err)
+	observed := executorObservedRule(rule, "1panel-rule:orphan", 1)
+	observed.Rule.UUID = ""
+	adapter := newFakeFilterAdapter(t, scope, []filter.ObservedRule{observed})
+	service := &FirewallService{
+		rules: ruleRepo,
+		adapters: firewallRuleRuntimeRegistry{
+			filter.ProviderFirewalld: newFirewallRuleRuntime(adapter, nil),
+		},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderFirewalld, nil },
+	}
+	request := dto.FirewallRuleSyncRequest{TargetProvider: filter.ProviderFirewalld}
+
+	preview, err := service.PreviewRuleSync(ctx, "", request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preview.Total != 0 || preview.Removed != 1 || len(preview.Items) != 1 || preview.Items[0].Status != "remove" {
+		t.Fatalf("unexpected orphan preview: %#v", preview)
+	}
+	result, err := service.syncRules(ctx, "", request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Total != 0 || result.Removed != 1 || result.Failed != 0 || len(adapter.snapshot.Rules) != 0 {
+		t.Fatalf("orphan runtime rule was not removed: result=%#v rules=%#v", result, adapter.snapshot.Rules)
+	}
+	stored, err := ruleRepo.List(ctx)
+	if err != nil || len(stored) != 0 {
+		t.Fatalf("runtime cleanup changed database policies: %#v err=%v", stored, err)
+	}
+}
+
+func TestFirewallRuleSyncCompileFailureDoesNotCreateOrphanRemoval(t *testing.T) {
+	ctx := context.Background()
+	ruleRepo := repo.NewFirewallRuleRepo(newFirewallRuleTestDB(t))
+	scope := filter.Scope{
+		Provider: filter.ProviderFirewalld, Family: filter.FamilyInet,
+		Zone: filter.FirewalldInputZone, Direction: filter.DirectionInput,
+	}
+	rule := filter.FirewallRule{
+		UUID: "incompatible", Scope: scope, NativeKind: filter.NativeKindRichRule,
+		Protocol: "tcp", DestinationPort: "9443", Action: filter.ActionAccept,
+	}
+	record, err := model.FirewallRuleFromDomain(rule)
+	if err != nil {
+		t.Fatal(err)
+	}
+	record.UUID = rule.UUID
+	record.Origin = constant.FirewallRuleOriginCreated
+	record.Owner = constant.FirewallRuleSourceUser
+	record.CompatibilityError = "manual recreation required"
+	if err := ruleRepo.Create(ctx, &record); err != nil {
+		t.Fatal(err)
+	}
+	adapter := newFakeFilterAdapter(t, scope, []filter.ObservedRule{
+		executorObservedRule(rule, "1panel-rule:"+rule.UUID, 1),
+	})
+	service := &FirewallService{
+		rules: ruleRepo,
+		adapters: firewallRuleRuntimeRegistry{
+			filter.ProviderFirewalld: newFirewallRuleRuntime(adapter, nil),
+		},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderFirewalld, nil },
+	}
+
+	preview, err := service.PreviewRuleSync(ctx, "", dto.FirewallRuleSyncRequest{TargetProvider: filter.ProviderFirewalld})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preview.Blocked != 1 || preview.Removed != 0 || len(preview.Items) != 1 {
+		t.Fatalf("compile failure classified its runtime rule as an orphan: %#v", preview)
+	}
+}
+
+func TestFirewallRuleSyncBlockedPlanDoesNotRemoveOrphans(t *testing.T) {
+	ctx := context.Background()
+	ruleRepo := repo.NewFirewallRuleRepo(newFirewallRuleTestDB(t))
+	scope := filter.Scope{
+		Provider: filter.ProviderNftables, Family: filter.FamilyIPv4,
+		Table: "filter", Chain: filter.IptablesInputChain, Direction: filter.DirectionInput,
+	}
+	blockedRule := filter.FirewallRule{
+		Scope: scope, Protocol: "all", Action: filter.ActionDrop,
+	}
+	record, err := model.FirewallRuleFromDomain(blockedRule)
+	if err != nil {
+		t.Fatal(err)
+	}
+	record.Origin = constant.FirewallRuleOriginCreated
+	record.Owner = constant.FirewallRuleSourceUser
+	if err := ruleRepo.Create(ctx, &record); err != nil {
+		t.Fatal(err)
+	}
+	orphanRule := filter.FirewallRule{
+		UUID: "orphan", Scope: scope, Protocol: "tcp", DestinationPort: "9443", Action: filter.ActionAccept,
+	}
+	adapter := newFakeFilterAdapter(t, scope, []filter.ObservedRule{
+		executorObservedRule(orphanRule, "1panel-rule:orphan", 1),
+	})
+	service := &FirewallService{
+		rules: ruleRepo,
+		adapters: firewallRuleRuntimeRegistry{
+			filter.ProviderNftables: newFirewallRuleRuntime(adapter, nil),
+		},
+		selectedProvider: func(context.Context) (filter.Provider, error) { return filter.ProviderNftables, nil },
+	}
+
+	result, err := service.syncRules(ctx, "203.0.113.10", dto.FirewallRuleSyncRequest{TargetProvider: filter.ProviderNftables})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Failed != 1 || result.Removed != 0 || adapter.applyCount != 0 || len(adapter.snapshot.Rules) != 1 {
+		t.Fatalf("blocked synchronization mutated target rules: result=%#v rules=%#v applies=%d", result, adapter.snapshot.Rules, adapter.applyCount)
 	}
 }
 
@@ -262,52 +630,25 @@ func setupFirewallTaskTestDB(t *testing.T) {
 	})
 }
 
-func TestFirewallRulesForSyncProviderSplitsAddresslessInetRule(t *testing.T) {
-	source := filter.FirewallRule{
-		Scope: filter.Scope{
-			Provider: filter.ProviderFirewalld, Family: filter.FamilyInet,
-			Zone: filter.FirewalldInputZone, Direction: filter.DirectionInput,
-		},
-		NativeKind: filter.NativeKindRichRule,
-		Protocol:   "tcp", DestinationPort: "443", Action: filter.ActionAccept,
+func TestSortFirewallPoliciesUsesProviderPlacement(t *testing.T) {
+	sequenceOne, sequenceTwo := model.FirewallRuleSequenceStep, 2*model.FirewallRuleSequenceStep
+	priorityLow, priorityHigh := -100, 100
+	policies := []model.FirewallRule{
+		{UUID: "high", Priority: &priorityHigh, Sequence: &sequenceOne},
+		{UUID: "none"},
+		{UUID: "low", Priority: &priorityLow, Sequence: &sequenceTwo},
 	}
-	rules, err := firewallRulesForSyncProvider(source, filter.ProviderUFW)
-	if err != nil {
-		t.Fatalf("convert inet rule: %v", err)
-	}
-	if len(rules) != 2 {
-		t.Fatalf("converted rule count = %d, want 2", len(rules))
-	}
-	for index, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
-		if rules[index].Scope.Provider != filter.ProviderUFW || rules[index].Scope.Family != family ||
-			rules[index].Scope.Chain != filter.UFWInputChain {
-			t.Fatalf("converted rule %d = %#v", index, rules[index])
-		}
-		if rules[index].UUID != "" || rules[index].Priority != nil || rules[index].OrderIndex != nil {
-			t.Fatalf("provider-native identity leaked into converted rule %d: %#v", index, rules[index])
-		}
-	}
-}
 
-func TestFirewallRulesForSyncProviderSplitsUnsupportedPortSet(t *testing.T) {
-	source := filter.FirewallRule{
-		Scope: filter.Scope{
-			Provider: filter.ProviderIptables, Family: filter.FamilyIPv4,
-			Table: "filter", Chain: filter.IptablesInputChain, Direction: filter.DirectionInput,
-		},
-		Protocol: "tcp", DestinationPort: "80,443", Interface: "*", Action: filter.ActionAccept,
+	positional := append([]model.FirewallRule(nil), policies...)
+	sortFirewallPolicies(positional, filter.ProviderUFW)
+	if positional[0].UUID != "high" || positional[1].UUID != "low" || positional[2].UUID != "none" {
+		t.Fatalf("positional policies were not sorted by sequence: %#v", positional)
 	}
-	rules, err := firewallRulesForSyncProvider(source, filter.ProviderNftables)
-	if err != nil {
-		t.Fatalf("convert iptables port set: %v", err)
-	}
-	if len(rules) != 2 || rules[0].DestinationPort != "80" || rules[1].DestinationPort != "443" {
-		t.Fatalf("nftables port set was not split: %#v", rules)
-	}
-	for _, rule := range rules {
-		if rule.Interface != "" {
-			t.Fatalf("wildcard interface leaked into target rule: %#v", rule)
-		}
+
+	weighted := append([]model.FirewallRule(nil), policies...)
+	sortFirewallPolicies(weighted, filter.ProviderFirewalld)
+	if weighted[0].UUID != "low" || weighted[1].UUID != "high" || weighted[2].UUID != "none" {
+		t.Fatalf("firewalld policies were not sorted by priority: %#v", weighted)
 	}
 }
 

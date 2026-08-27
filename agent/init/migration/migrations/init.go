@@ -1700,3 +1700,86 @@ var InitDockerPortGuardStatus = &gormigrate.Migration{
 		}).Error
 	},
 }
+
+var NormalizeFirewallBackendSelections = &gormigrate.Migration{
+	ID: "20260826-normalize-firewall-backend-selections",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.Transaction(func(tx *gorm.DB) error {
+			if err := tx.Where("key = ?", constant.FirewallDockerBackendKey).FirstOrCreate(&model.Setting{
+				Key: constant.FirewallDockerBackendKey, Value: "",
+			}).Error; err != nil {
+				return err
+			}
+			result := tx.Model(&model.Setting{}).
+				Where(
+					"key = ? AND value NOT IN ?",
+					constant.FirewallForwardingBackendKey,
+					[]string{constant.FirewallProviderIptables, constant.FirewallProviderNftables},
+				).
+				Update("value", constant.FirewallProviderIptables)
+			if result.Error != nil {
+				return result.Error
+			}
+			if err := tx.Where("key = ?", constant.FirewallForwardingBackendKey).FirstOrCreate(&model.Setting{
+				Key: constant.FirewallForwardingBackendKey, Value: constant.FirewallProviderIptables,
+			}).Error; err != nil {
+				return err
+			}
+			return nil
+		})
+	},
+}
+
+var SimplifyFirewallRulePolicy = &gormigrate.Migration{
+	ID: "20260826-simplify-firewall-rule-policy",
+	Migrate: func(tx *gorm.DB) error {
+		if !tx.Migrator().HasTable(&model.FirewallRule{}) {
+			return nil
+		}
+		return tx.Transaction(func(tx *gorm.DB) error {
+			if !tx.Migrator().HasColumn("firewall_rules", "compatibility_error") {
+				if err := tx.Exec("ALTER TABLE firewall_rules ADD COLUMN compatibility_error text NOT NULL DEFAULT ''").Error; err != nil {
+					return err
+				}
+			}
+			if !tx.Migrator().HasColumn("firewall_rules", "sequence") {
+				if err := tx.Exec("ALTER TABLE firewall_rules ADD COLUMN sequence integer").Error; err != nil {
+					return err
+				}
+			}
+			if tx.Migrator().HasColumn("firewall_rules", "native_kind") {
+				if err := tx.Exec(`UPDATE firewall_rules
+					SET compatibility_error = 'legacy native firewall rule requires manual recreation: ' || native_kind
+					WHERE native_kind IN ('zone_service', 'ufw_application', 'opaque')`).Error; err != nil {
+					return err
+				}
+			}
+			if tx.Migrator().HasColumn("firewall_rules", "provider") {
+				if err := tx.Exec(`UPDATE firewall_rules
+					SET priority = NULL, sequence = NULL`).Error; err != nil {
+					return err
+				}
+			}
+			if err := tx.Exec("CREATE INDEX IF NOT EXISTS idx_firewall_rules_sequence ON firewall_rules(sequence)").Error; err != nil {
+				return err
+			}
+			for _, index := range []string{
+				"idx_firewall_rules_scope_key",
+				"uk_firewall_rules_scope_rule",
+				"uk_firewall_rules_scope_match",
+			} {
+				if err := tx.Exec("DROP INDEX IF EXISTS " + index).Error; err != nil {
+					return err
+				}
+			}
+			for _, column := range []string{
+				"provider", "scope_key", "location", "native_kind", "order_index", "order_bucket", "rule_key", "match_key",
+			} {
+				if tx.Migrator().HasColumn("firewall_rules", column) {
+					_ = tx.Exec("ALTER TABLE firewall_rules DROP COLUMN " + column).Error
+				}
+			}
+			return nil
+		})
+	},
+}

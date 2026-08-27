@@ -1,10 +1,6 @@
 package filter
 
-import (
-	"testing"
-
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
-)
+import "testing"
 
 func TestCheckCreateRequestsAdoptionForEquivalentExternalRule(t *testing.T) {
 	rule := checkAddressRule("172.16.10.111", ActionDrop)
@@ -299,7 +295,7 @@ func TestCheckCreateBlocksProtectedManagementPortWithoutObservedAllowRule(t *tes
 	if err != nil {
 		t.Fatalf("snapshot: %v", err)
 	}
-	plan, err := CheckCreate(snapshot, rule, nil, "203.0.113.9", firewall.PortWhitelist{
+	plan, err := CheckCreate(snapshot, rule, nil, "203.0.113.9", PortWhitelist{
 		Family: "ipv4", Port: "22", Protocol: "tcp",
 	})
 	if err != nil {
@@ -317,7 +313,7 @@ func TestCheckCreateAllowsProtectedPortDenyForUnrelatedSource(t *testing.T) {
 	if err != nil {
 		t.Fatalf("snapshot: %v", err)
 	}
-	plan, err := CheckCreate(snapshot, rule, nil, "203.0.113.9", firewall.PortWhitelist{
+	plan, err := CheckCreate(snapshot, rule, nil, "203.0.113.9", PortWhitelist{
 		Family: "ipv4", Port: "22", Protocol: "tcp",
 	})
 	if err != nil {

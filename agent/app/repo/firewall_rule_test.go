@@ -18,7 +18,7 @@ func TestFirewallRuleRepoRevision(t *testing.T) {
 	db := newFirewallRepoTestDB(t)
 	repository := NewFirewallRuleRepo(db)
 	ctx := context.Background()
-	rule := newFirewallRuleModel("sha256:rule-one")
+	rule := newFirewallRuleModel()
 
 	if err := repository.Create(ctx, &rule); err != nil {
 		t.Fatalf("create rule: %v", err)
@@ -72,7 +72,7 @@ func TestFirewallRepositoriesUseContextTransaction(t *testing.T) {
 
 	err := db.Transaction(func(tx *gorm.DB) error {
 		ctx := context.WithValue(context.Background(), constant.DB, tx)
-		rule := newFirewallRuleModel("sha256:transaction")
+		rule := newFirewallRuleModel()
 		if err := ruleRepo.Create(ctx, &rule); err != nil {
 			return err
 		}
@@ -110,16 +110,11 @@ func newFirewallRepoTestDB(t *testing.T) *gorm.DB {
 	return db
 }
 
-func newFirewallRuleModel(ruleKey string) model.FirewallRule {
+func newFirewallRuleModel() model.FirewallRule {
 	return model.FirewallRule{
-		ScopeKey:        "iptables:ipv4:filter:1PANEL_BASIC:input",
-		Provider:        "iptables",
 		Family:          "ipv4",
-		Location:        "1PANEL_BASIC",
-		NativeKind:      "rule",
 		Protocol:        "tcp",
 		DestinationPort: "22",
 		Action:          "accept",
-		RuleKey:         ruleKey,
 	}
 }

@@ -4137,7 +4137,7 @@ const message = {
         ruleSyncDatabaseTotal: 'Database rules',
         ruleSyncDatabaseConfirm:
             'Synchronize {1} to exactly match the {0} database rules? {2} target rule(s) will be removed and missing rules will be added.',
-        ruleSyncSource: 'Source backend',
+        ruleSyncSource: 'Configuration source',
         ruleSyncTarget: 'Current backend',
         ruleSyncTotal: 'Converted rules',
         ruleSyncReady: 'Ready',
@@ -4145,6 +4145,22 @@ const message = {
         ruleSyncRemove: 'To remove',
         ruleSyncBlocked: 'Unavailable',
         ruleSyncReason: 'Check result',
+        ruleSyncReasonDetail: {
+            matchesDatabasePolicy: 'The rule already matches the database policy.',
+            managedOrderDiffers: 'The managed rule order differs from the database sequence.',
+            managedOnlyInTarget: 'The managed rule exists only in the target firewall.',
+            managedRuntimeCannotRemove: 'The managed runtime rule cannot be removed safely.',
+            managedOrderBlocked: 'Managed rules cannot be reordered across external, unrecognized, or protected rules.',
+            mayBlockManagement: 'The rule may block the current management connection.',
+            missingFromTarget: 'The rule is missing from the target firewall.',
+            targetDiffers: 'The target rule differs from the database policy.',
+            alreadyExistsInTarget: 'The rule already exists in the target firewall.',
+            onlyInTarget: 'The rule exists only in the target firewall.',
+            stale: 'The firewall rule state is outdated. Refresh and try again.',
+            lockoutRisk: 'This firewall change may block management access.',
+            protectedRule: 'This protected firewall rule cannot be modified.',
+            cannotReconcile: 'The target rule cannot be reconciled: {0}',
+        },
         ruleSyncConfirm: 'Synchronize {0} rules from {1} to {2}? The source backend will not be modified.',
         ruleSyncResetSource: 'Reset and disable source firewall {0} after synchronization succeeds',
         ruleSyncResetSourceHelper:
@@ -4162,9 +4178,9 @@ const message = {
             blocked: 'Unavailable',
         },
         resetDirectRulesHelper:
-            'Delete all 1Panel system firewall chains, rules, persisted files, and corresponding database records from {0}',
+            'Delete all 1Panel system firewall chains, runtime rules, and persisted files from {0}; saved database policies are retained',
         resetWhitelistRulesHelper:
-            'Delete all custom firewall configuration and corresponding database records from {0}, restore installation defaults, and disable {0}.\nAfter cleanup, firewall protection will no longer be provided. This cannot be undone.',
+            'Clear the active custom firewall configuration from {0}, restore installation defaults, and disable {0}; saved database policies are retained and can be synchronized again.',
         cleanupForwardingBackendHelper:
             'Delete all 1Panel port forwarding rules and chains from {0}, retaining only database data',
         cleanupDockerBackendHelper:
@@ -4173,7 +4189,7 @@ const message = {
             'The current {0} backend still contains 1Panel runtime rules. Clean it up before switching to {1}.',
         cleanupAction: 'Clean up',
         backendSwitchNotice:
-            'System firewall switching does not migrate or clean rules automatically. Port forwarding and Docker protection require cleaning the current backend first; saved rules and policies remain in 1Panel and can be initialized or synchronized after switching.',
+            'Clean the current backend before switching the system firewall, port forwarding, or Docker protection. Saved database policies are retained and can be initialized or synchronized after switching.',
         switchBackendHelper: 'Switch to {0}?',
         uninstalledStatus: 'Not installed',
         initializedStatus: 'Initialized',

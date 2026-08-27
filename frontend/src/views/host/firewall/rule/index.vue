@@ -676,7 +676,14 @@ const priorityPositionRanges = (
     if (provider.value === 'firewalld') return {};
     const extraPosition = item ? 0 : 1;
     if (provider.value === 'ufw') {
-        if (!item) return {};
+        if (!item) {
+            const maxPosition = inventoryItems.value.reduce(
+                (max, row) => Math.max(max, row.observed?.locator.position || 0),
+                0,
+            );
+            const range = { min: 1, max: Math.max(1, maxPosition + 1) };
+            return { ipv4: range, ipv6: range };
+        }
         const family = item.rule.scope.family;
         const positions = inventoryItems.value
             .filter((row) => row.rule.scope.family === family && row.observed?.locator.position)

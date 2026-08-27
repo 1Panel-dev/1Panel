@@ -6,8 +6,6 @@ import (
 	"net/netip"
 	"strconv"
 	"strings"
-
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 )
 
 var (
@@ -63,7 +61,7 @@ func CheckCreate(
 	requested FirewallRule,
 	desired []DesiredRule,
 	clientIP string,
-	protectedPorts ...firewall.PortWhitelist,
+	protectedPorts ...PortWhitelist,
 ) (RuleCheckResult, error) {
 	normalized, err := NormalizeRule(requested)
 	if err != nil {
@@ -245,7 +243,7 @@ func containsProtectedRule(rules []ObservedRule) bool {
 func RuleBlocksManagementConnection(
 	rule FirewallRule,
 	clientIP string,
-	protectedPorts ...firewall.PortWhitelist,
+	protectedPorts ...PortWhitelist,
 ) bool {
 	if rule.Action == ActionAccept {
 		return false

@@ -101,7 +101,7 @@ func convertLegacyHostFirewallRecords(records []legacyHostFirewallRecord, provid
 				}
 				continue
 			}
-			identity := item.ScopeKey + "\x00" + item.RuleKey
+			identity := item.PolicyKey()
 			if index, exists := byIdentity[identity]; exists {
 				if item.Description != "" {
 					converted[index].Description = item.Description
@@ -289,10 +289,10 @@ func importLegacyHostFirewallRules(tx *gorm.DB, rules []model.FirewallRule) erro
 	}
 	byIdentity := make(map[string]model.FirewallRule, len(existing))
 	for _, item := range existing {
-		byIdentity[item.ScopeKey+"\x00"+item.RuleKey] = item
+		byIdentity[item.PolicyKey()] = item
 	}
 	for _, item := range rules {
-		identity := item.ScopeKey + "\x00" + item.RuleKey
+		identity := item.PolicyKey()
 		if current, exists := byIdentity[identity]; exists {
 			if current.Description == "" && item.Description != "" {
 				if err := tx.Model(&model.FirewallRule{}).Where("uuid = ?", current.UUID).

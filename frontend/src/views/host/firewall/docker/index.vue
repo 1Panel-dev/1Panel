@@ -2,7 +2,7 @@
     <div>
         <FireRouter />
         <DockerGuardStatus :base="data.base" @operate="operate" @cleanup="cleanupBackend" />
-        <LayoutContent :title="$t('firewall.dockerGuard')" v-loading="loading">
+        <LayoutContent v-if="data.base.isExist" :title="$t('firewall.dockerGuard')" v-loading="loading">
             <template #prompt>
                 <el-alert v-if="data.base.message" type="warning" :closable="false" :title="data.base.message" />
                 <el-alert v-else type="info" :closable="false" :title="$t('firewall.dockerGuardHelper')" />
@@ -173,6 +173,7 @@ const data = reactive<Firewall.DockerGuardList>({
     base: {
         name: 'iptables-docker',
         version: '-',
+        isExist: true,
         initialized: false,
         bound: false,
         ipv4: { state: 'disabled', initialized: false, bound: false, effective: false },

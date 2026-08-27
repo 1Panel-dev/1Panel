@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="app-status card-interval" v-if="baseInfo.isExist">
+        <div class="app-status card-interval" v-if="baseInfo.isExist && !baseInfo.message">
             <el-card>
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4 ml-3">
@@ -133,6 +133,16 @@
                 :title="baseInfo.syncError"
             />
         </div>
+        <el-alert v-else-if="baseInfo.isExist" class="card-interval" type="error" show-icon :closable="false">
+            <template #title>
+                <div class="flex items-center gap-2">
+                    <span>{{ baseInfo.message }}</span>
+                    <el-button v-permission v-node-admin type="primary" link @click="goToFirewallSetting">
+                        {{ $t('commons.button.set') }}
+                    </el-button>
+                </div>
+            </template>
+        </el-alert>
         <NoSuchService
             v-else
             :name="
@@ -172,10 +182,13 @@ import { ElMessageBox } from 'element-plus';
 import { computed, nextTick, ref } from 'vue';
 import { loadDockerStatus } from '@/api/modules/container';
 import { WarningFilled } from '@element-plus/icons-vue';
+import { routerToName } from '@/utils/router';
 
 const props = defineProps({
     currentTab: String,
 });
+
+const goToFirewallSetting = () => routerToName('FirewallSetting');
 
 const baseInfo = ref<Firewall.FirewallBase>({
     isActive: false,
@@ -187,6 +200,7 @@ const baseInfo = ref<Firewall.FirewallBase>({
     conflictBackend: '',
     version: '',
     pingStatus: '',
+    message: '',
     syncError: '',
     ipv4: { available: false, initialized: false, bound: false },
     ipv6: { available: false, initialized: false, bound: false },

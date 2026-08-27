@@ -9,11 +9,7 @@ import (
 )
 
 func selectedDockerFirewallBackend(fallback string) string {
-	selected := ""
-	if global.DB != nil {
-		selected, _ = settingRepo.GetValueByKey(constant.FirewallDockerBackendKey)
-	}
-	selected = strings.ToLower(strings.TrimSpace(selected))
+	selected := configuredDockerFirewallBackend()
 	if selected == constant.FirewallProviderIptables || selected == constant.FirewallProviderNftables {
 		return selected
 	}
@@ -22,6 +18,18 @@ func selectedDockerFirewallBackend(fallback string) string {
 		return fallback
 	}
 	return constant.FirewallProviderIptables
+}
+
+func configuredDockerFirewallBackend() string {
+	if global.DB == nil {
+		return ""
+	}
+	selected, _ := settingRepo.GetValueByKey(constant.FirewallDockerBackendKey)
+	selected = strings.ToLower(strings.TrimSpace(selected))
+	if selected == constant.FirewallProviderIptables || selected == constant.FirewallProviderNftables {
+		return selected
+	}
+	return ""
 }
 
 func selectedSystemFirewallClient() (lifecycle.Client, error) {

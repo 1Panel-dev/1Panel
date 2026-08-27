@@ -4,13 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 )
 
 var ErrVerificationFailed = errors.New("firewall rule verification failed")
 
-func ProtectSnapshot(snapshot Snapshot, ports []firewall.PortWhitelist) (Snapshot, error) {
+func ProtectSnapshot(snapshot Snapshot, ports []PortWhitelist) (Snapshot, error) {
 	rules := append([]ObservedRule(nil), snapshot.Rules...)
 	for index := range rules {
 		rule := rules[index].Rule
@@ -49,7 +47,7 @@ func GuardMutation(
 	target ObservedRule,
 	after FirewallRule,
 	clientIP string,
-	protectedPorts ...firewall.PortWhitelist,
+	protectedPorts ...PortWhitelist,
 ) error {
 	if RuleBlocksManagementConnection(after, clientIP, protectedPorts...) {
 		return ErrLockoutRisk

@@ -6,15 +6,7 @@
             <div class="sync-route">
                 <div class="sync-provider">
                     <span class="sync-provider-label">{{ $t('firewall.ruleSyncSource') }}</span>
-                    <el-select
-                        v-if="subsystem === 'system'"
-                        v-model="sourceProvider"
-                        class="sync-provider-select"
-                        @change="changeSource"
-                    >
-                        <el-option v-for="item in sourceOptions" :key="item" :label="item" :value="item" />
-                    </el-select>
-                    <div v-else class="sync-database-source">
+                    <div class="sync-database-source">
                         <el-icon><Coin /></el-icon>
                         <span>{{ $t('firewall.ruleSyncDatabase') }}</span>
                     </div>
@@ -32,19 +24,6 @@
                         <el-icon><Lock /></el-icon>
                         <span>{{ targetProvider }}</span>
                     </div>
-                </div>
-            </div>
-
-            <div v-if="subsystem === 'system'" class="sync-reset-source">
-                <el-checkbox v-model="resetSource" :disabled="Boolean(preview?.blocked)">
-                    {{ $t('firewall.ruleSyncResetSource', [sourceProvider]) }}
-                </el-checkbox>
-                <div class="input-help">
-                    {{
-                        preview?.blocked
-                            ? $t('firewall.ruleSyncResetSourceBlocked')
-                            : $t('firewall.ruleSyncResetSourceHelper')
-                    }}
                 </div>
             </div>
 
@@ -126,7 +105,11 @@
                             {{ row.rule?.destinationPort || $t('firewall.allPorts') }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('firewall.action')" prop="rule.action" width="90" />
+                    <el-table-column :label="$t('firewall.action')" width="90">
+                        <template #default="{ row }">
+                            {{ actionText(row.rule?.action) }}
+                        </template>
+                    </el-table-column>
                 </template>
                 <template v-else-if="subsystem === 'forwarding'">
                     <el-table-column label="IP" prop="forwardRule.family" width="80" />
@@ -197,30 +180,20 @@ import { computed, ref } from 'vue';
 
 const emit = defineEmits<{ (event: 'search'): void }>();
 const { currentNode } = useGlobalStore();
-const providers: Firewall.Provider[] = ['iptables', 'nftables', 'firewalld', 'ufw'];
 const visible = ref(false);
 const loading = ref(false);
 const subsystem = ref<Firewall.BackendSubsystem>('system');
 const targetProvider = ref<Firewall.Provider>('iptables');
-const sourceProvider = ref<Firewall.Provider>();
 const preview = ref<Firewall.RuleSyncPreview>();
-const resetSource = ref(false);
 const taskLogRef = ref<InstanceType<typeof TaskLog>>();
 type RuleDetailFilter = Firewall.RuleSyncStatus | 'total';
 const detailFilter = ref<RuleDetailFilter>();
 
-const sourceOptions = computed(() => providers.filter((item) => item !== targetProvider.value));
-const isDatabaseSync = computed(() => subsystem.value !== 'system');
-const syncHelper = computed(() =>
-    i18n.global.t(isDatabaseSync.value ? 'firewall.ruleSyncDatabaseHelper' : 'firewall.ruleSyncHelper'),
-);
-const totalLabel = computed(() =>
-    i18n.global.t(isDatabaseSync.value ? 'firewall.ruleSyncDatabaseTotal' : 'firewall.ruleSyncTotal'),
-);
+const syncHelper = computed(() => i18n.global.t('firewall.ruleSyncDatabaseHelper'));
+const totalLabel = computed(() => i18n.global.t('firewall.ruleSyncDatabaseTotal'));
 const syncDisabled = computed(() => {
     if (!preview.value) return true;
-    if (isDatabaseSync.value) return preview.value.blocked > 0;
-    return Boolean(preview.value.blocked && resetSource.value) || (!resetSource.value && preview.value.ready === 0);
+    return preview.value.blocked > 0;
 });
 const detailItems = computed(() => {
     if (!preview.value || !detailFilter.value) return [];
@@ -236,20 +209,15 @@ const toggleDetail = (filter: RuleDetailFilter, count: number) => {
 const syncRequest = (taskID?: string): Firewall.RuleSyncRequest => ({
     subsystem: subsystem.value,
     targetProvider: targetProvider.value,
-    ...(subsystem.value === 'system' && sourceProvider.value ? { sourceProvider: sourceProvider.value } : {}),
-    ...(subsystem.value === 'system'
-        ? { resetSource: resetSource.value, ...(taskID ? { taskID } : {}) }
-        : { resetSource: false }),
+    resetSource: false,
+    ...(taskID ? { taskID } : {}),
 });
 
 const loadPreview = async () => {
-    if (subsystem.value === 'system' && (!sourceProvider.value || sourceProvider.value === targetProvider.value))
-        return;
     detailFilter.value = undefined;
     loading.value = true;
     try {
         preview.value = (await previewFirewallRuleSync(syncRequest())).data;
-        if (preview.value.blocked > 0) resetSource.value = false;
     } finally {
         loading.value = false;
     }
@@ -258,23 +226,11 @@ const loadPreview = async () => {
 const onSync = async () => {
     if (syncDisabled.value || !preview.value) return;
     try {
-        const message = resetSource.value
-            ? i18n.global.t('firewall.ruleSyncResetSourceConfirm', [
-                  preview.value.ready,
-                  sourceProvider.value,
-                  targetProvider.value,
-              ])
-            : isDatabaseSync.value
-              ? i18n.global.t('firewall.ruleSyncDatabaseConfirm', [
-                    preview.value.total,
-                    targetProvider.value,
-                    preview.value.removed,
-                ])
-              : i18n.global.t('firewall.ruleSyncConfirm', [
-                    preview.value.ready,
-                    sourceProvider.value,
-                    targetProvider.value,
-                ]);
+        const message = i18n.global.t('firewall.ruleSyncDatabaseConfirm', [
+            preview.value.total,
+            targetProvider.value,
+            preview.value.removed,
+        ]);
         await ElMessageBox.confirm(message, i18n.global.t('firewall.ruleSyncTitle'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -306,11 +262,6 @@ const onSync = async () => {
     }
 };
 
-const changeSource = async () => {
-    resetSource.value = false;
-    await loadPreview();
-};
-
 const handleTaskClose = () => {
     emit('search');
 };
@@ -329,11 +280,37 @@ const statusType = (status: Firewall.RuleSyncStatus) => {
 
 const statusText = (status: Firewall.RuleSyncStatus) => i18n.global.t(`firewall.ruleSyncStatus.${status}`);
 
+const syncReasonKeys: Record<string, string> = {
+    'rule already matches database policy': 'matchesDatabasePolicy',
+    'managed rule order differs from database sequence': 'managedOrderDiffers',
+    'managed rule exists only in target backend': 'managedOnlyInTarget',
+    'managed runtime rule cannot be safely removed': 'managedRuntimeCannotRemove',
+    'managed rule order cannot cross external, opaque, or protected rules': 'managedOrderBlocked',
+    'rule may block the current management connection': 'mayBlockManagement',
+    'rule is missing from target backend': 'missingFromTarget',
+    'target rule differs from database policy': 'targetDiffers',
+    'rule already exists in target backend': 'alreadyExistsInTarget',
+    'rule exists only in target backend': 'onlyInTarget',
+    'firewall rule state is stale': 'stale',
+    'firewall change may lock out management access': 'lockoutRisk',
+    'protected firewall rule cannot be modified': 'protectedRule',
+};
+
 const reasonText = (reason?: string) => {
     if (!reason) return '-';
-    const key = `firewall.plan_${reason}`;
-    return i18n.global.te(key) ? i18n.global.t(key) : reason;
+    const reasonKey = syncReasonKeys[reason];
+    if (reasonKey) return i18n.global.t(`firewall.ruleSyncReasonDetail.${reasonKey}`);
+    const cannotReconcilePrefix = 'target rule cannot be reconciled: ';
+    if (reason.startsWith(cannotReconcilePrefix)) {
+        return i18n.global.t('firewall.ruleSyncReasonDetail.cannotReconcile', [
+            reason.slice(cannotReconcilePrefix.length),
+        ]);
+    }
+    const planKey = `firewall.plan_${reason}`;
+    return i18n.global.te(planKey) ? i18n.global.t(planKey) : reason;
 };
+
+const actionText = (action?: Firewall.Action) => (action ? i18n.global.t(`firewall.${action}`) : '-');
 
 const displayAddress = (rule: Firewall.Rule) => {
     const values = [rule.sourceAddress, rule.destinationAddress].filter(Boolean);
@@ -352,22 +329,11 @@ const dockerMode = (mode?: Firewall.DockerGuardPolicy['mode']) => {
     return i18n.global.t(mode === 'allow_sources' ? 'firewall.allowSources' : 'firewall.denySources');
 };
 
-const acceptParams = async (
-    target: Firewall.Provider,
-    syncSubsystem: Firewall.BackendSubsystem = 'system',
-    source?: Firewall.Provider,
-) => {
+const acceptParams = async (target: Firewall.Provider, syncSubsystem: Firewall.BackendSubsystem = 'system') => {
     subsystem.value = syncSubsystem;
     targetProvider.value = target;
-    sourceProvider.value =
-        syncSubsystem === 'system'
-            ? source && sourceOptions.value.includes(source)
-                ? source
-                : sourceOptions.value[0]
-            : undefined;
     preview.value = undefined;
     detailFilter.value = undefined;
-    resetSource.value = false;
     visible.value = true;
     await loadPreview();
 };

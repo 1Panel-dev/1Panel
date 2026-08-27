@@ -1,10 +1,6 @@
 package filter
 
-import (
-	"testing"
-
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
-)
+import "testing"
 
 func TestProtectSnapshotTreatsAllProtocolAsCoveringProtectedTransport(t *testing.T) {
 	scope := Scope{Provider: ProviderUFW, Family: FamilyIPv4, Chain: UFWInputChain, Direction: DirectionInput}
@@ -18,7 +14,7 @@ func TestProtectSnapshotTreatsAllProtocolAsCoveringProtectedTransport(t *testing
 		t.Fatalf("create snapshot: %v", err)
 	}
 
-	protected, err := ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Port: "22", Protocol: "tcp"}})
+	protected, err := ProtectSnapshot(snapshot, []PortWhitelist{{Port: "22", Protocol: "tcp"}})
 	if err != nil {
 		t.Fatalf("protect snapshot: %v", err)
 	}
@@ -40,7 +36,7 @@ func TestProtectSnapshotMarksBareUFWPortForBothFamilies(t *testing.T) {
 		if err != nil {
 			t.Fatalf("create %s snapshot: %v", family, err)
 		}
-		protected, err := ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Port: "22", Protocol: "tcp"}})
+		protected, err := ProtectSnapshot(snapshot, []PortWhitelist{{Port: "22", Protocol: "tcp"}})
 		if err != nil {
 			t.Fatalf("protect %s snapshot: %v", family, err)
 		}
@@ -61,7 +57,7 @@ func TestProtectSnapshotMatchesPortSetsAndRanges(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create snapshot: %v", err)
 	}
-	protected, err := ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Port: "22", Protocol: "tcp"}, {Port: "8080", Protocol: "tcp"}})
+	protected, err := ProtectSnapshot(snapshot, []PortWhitelist{{Port: "22", Protocol: "tcp"}, {Port: "8080", Protocol: "tcp"}})
 	if err != nil {
 		t.Fatalf("protect snapshot: %v", err)
 	}
@@ -77,7 +73,7 @@ func TestProtectSnapshotRespectsConfiguredFamily(t *testing.T) {
 		if err != nil {
 			t.Fatalf("create %s snapshot: %v", family, err)
 		}
-		protected, err := ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Family: "ipv6", Port: "443", Protocol: "tcp"}})
+		protected, err := ProtectSnapshot(snapshot, []PortWhitelist{{Family: "ipv6", Port: "443", Protocol: "tcp"}})
 		if err != nil {
 			t.Fatalf("protect %s snapshot: %v", family, err)
 		}
@@ -96,7 +92,7 @@ func TestProtectSnapshotDoesNotReclassifyManagedRule(t *testing.T) {
 		t.Fatalf("create snapshot: %v", err)
 	}
 
-	protected, err := ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Port: "9999", Protocol: "tcp"}})
+	protected, err := ProtectSnapshot(snapshot, []PortWhitelist{{Port: "9999", Protocol: "tcp"}})
 	if err != nil {
 		t.Fatalf("protect snapshot: %v", err)
 	}
@@ -115,7 +111,7 @@ func TestManagedBroadAllowDoesNotBlockManagedRuleEdit(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create snapshot: %v", err)
 	}
-	snapshot, err = ProtectSnapshot(snapshot, []firewall.PortWhitelist{{Port: "9999", Protocol: "tcp"}})
+	snapshot, err = ProtectSnapshot(snapshot, []PortWhitelist{{Port: "9999", Protocol: "tcp"}})
 	if err != nil {
 		t.Fatalf("protect snapshot: %v", err)
 	}
@@ -124,7 +120,7 @@ func TestManagedBroadAllowDoesNotBlockManagedRuleEdit(t *testing.T) {
 	after.SourceAddress = "198.51.100.21/32"
 	after.DestinationPort = "55113"
 	after.Action = ActionDrop
-	if err := GuardMutation(snapshot, target, after, "", firewall.PortWhitelist{Port: "9999", Protocol: "tcp"}); err != nil {
+	if err := GuardMutation(snapshot, target, after, "", PortWhitelist{Port: "9999", Protocol: "tcp"}); err != nil {
 		t.Fatalf("managed rule edit was blocked by another managed allow rule: %v", err)
 	}
 }

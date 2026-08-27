@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"net/netip"
-	"slices"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -74,11 +74,13 @@ type IDockerPortGuardService interface {
 	DeletePolicies(context.Context, dto.DockerPortGuardPolicyBatchDelete) error
 	UpsertPolicies(context.Context, dto.DockerPortGuardPolicyBatch) error
 	Reconcile(context.Context) error
-	PreviewRuleSync(context.Context, dto.FirewallRuleSyncRequest) (dto.FirewallRuleSyncPreview, error)
-	SyncRules(context.Context, dto.FirewallRuleSyncRequest) (dto.FirewallRuleSyncResult, error)
 }
 
 func NewIDockerPortGuardService() IDockerPortGuardService {
+	return newDockerPortGuardService()
+}
+
+func newDockerPortGuardService() *DockerPortGuardService {
 	return &DockerPortGuardService{
 		policies: repo.NewIDockerPortGuardRepo(),
 		client:   docker.NewDockerClient,
@@ -286,115 +288,6 @@ func (s *DockerPortGuardService) Reconcile(ctx context.Context) error {
 	return s.reconcileLocked(ctx)
 }
 
-func (s *DockerPortGuardService) PreviewRuleSync(
-	ctx context.Context,
-	request dto.FirewallRuleSyncRequest,
-) (dto.FirewallRuleSyncPreview, error) {
-	target, policies, runtime, err := s.loadRuleSyncCandidates(ctx, request)
-	if err != nil {
-		return dto.FirewallRuleSyncPreview{}, err
-	}
-	result := dto.FirewallRuleSyncPreview{
-		Subsystem:      "docker",
-		TargetProvider: filter.Provider(target),
-		Items:          make([]dto.FirewallRuleSyncItem, 0, len(policies)),
-	}
-	targetPolicies, err := runtime.ListPolicies()
-	if err != nil {
-		return dto.FirewallRuleSyncPreview{}, err
-	}
-	matchedTargetPolicies := make([]bool, len(targetPolicies))
-	for _, policy := range policies {
-		runtimePolicy := dockerGuardPolicyFromModel(policy)
-		item := dto.FirewallRuleSyncItem{
-			SourceUUID: policy.UUID,
-			DockerRule: dockerGuardRuleSyncDTO(policy),
-		}
-		matchedIndex := dockerGuardPolicyUnmatchedIndex(targetPolicies, matchedTargetPolicies, runtimePolicy)
-		if matchedIndex >= 0 {
-			matchedTargetPolicies[matchedIndex] = true
-			item.Status, item.Reason = firewallRuleSyncExisting, "policy already exists in target backend"
-			result.Existing++
-		} else {
-			item.Status = firewallRuleSyncReady
-			result.Ready++
-		}
-		result.Items = append(result.Items, item)
-	}
-	for index, policy := range targetPolicies {
-		if matchedTargetPolicies[index] {
-			continue
-		}
-		result.Items = append(result.Items, dto.FirewallRuleSyncItem{
-			SourceUUID: policy.UUID, DockerRule: dockerGuardRuntimeRuleSyncDTO(policy),
-			Status: "remove", Reason: "policy exists only in target backend",
-		})
-		result.Removed++
-	}
-	result.Total = len(policies)
-	return result, nil
-}
-
-func (s *DockerPortGuardService) SyncRules(
-	ctx context.Context,
-	request dto.FirewallRuleSyncRequest,
-) (dto.FirewallRuleSyncResult, error) {
-	dockerPortGuardServiceMu.Lock()
-	defer dockerPortGuardServiceMu.Unlock()
-
-	target, policies, targetRuntime, err := s.loadRuleSyncCandidates(ctx, request)
-	if err != nil {
-		return dto.FirewallRuleSyncResult{}, err
-	}
-	result := dto.FirewallRuleSyncResult{
-		Subsystem:      "docker",
-		TargetProvider: filter.Provider(target),
-		Total:          len(policies),
-	}
-	runtimePolicies := dockerGuardPoliciesFromModels(policies)
-	targetPolicies, err := targetRuntime.ListPolicies()
-	if err != nil {
-		return dto.FirewallRuleSyncResult{}, err
-	}
-	missing := dockerGuardExtraPolicyCount(runtimePolicies, targetPolicies)
-	existing := len(runtimePolicies) - missing
-	removed := dockerGuardExtraPolicyCount(targetPolicies, runtimePolicies)
-	err = reconcileDockerGuardSyncTarget(target, runtimePolicies, targetRuntime)
-	if err == nil {
-		err = verifyDockerGuardRuleSync(targetRuntime, runtimePolicies)
-	}
-	recordDockerPortGuardReconcileError(err)
-	if err != nil {
-		if len(policies) == 0 {
-			return result, err
-		}
-		for _, policy := range policies {
-			appendDockerRuleSyncFailure(&result, policy, err)
-		}
-		return result, nil
-	}
-	if len(policies) == 0 {
-		result.Removed = removed
-		return result, nil
-	}
-	if err := settingRepo.UpdateOrCreate(constant.FirewallDockerBackendKey, target); err != nil {
-		for _, policy := range policies {
-			appendDockerRuleSyncFailure(&result, policy, err)
-		}
-		return result, nil
-	}
-	if err := settingRepo.UpdateOrCreate(constant.FirewallDockerPortGuardStatusKey, constant.StatusEnable); err != nil {
-		for _, policy := range policies {
-			appendDockerRuleSyncFailure(&result, policy, err)
-		}
-		return result, nil
-	}
-	result.Succeeded = missing
-	result.Skipped = existing
-	result.Removed = removed
-	return result, nil
-}
-
 func (s *DockerPortGuardService) loadRuleSyncCandidates(
 	ctx context.Context,
 	request dto.FirewallRuleSyncRequest,
@@ -459,38 +352,17 @@ func dockerGuardPolicyFromModel(policy model.DockerPortGuardPolicy) docker_guard
 	}
 }
 
-func dockerGuardPolicyUnmatchedIndex(
-	policies []docker_guard.Policy,
-	matched []bool,
-	want docker_guard.Policy,
-) int {
-	for index := range policies {
-		if !matched[index] && dockerGuardPoliciesEqual(policies[index], want) {
-			return index
-		}
+func dockerGuardPolicySyncKey(policy docker_guard.Policy) string {
+	mode := policy.Mode
+	if mode == docker_guard.ModeAllow && len(policy.Sources) == 0 {
+		mode = docker_guard.ModeAll
 	}
-	return -1
-}
-
-func dockerGuardPoliciesEqual(left, right docker_guard.Policy) bool {
-	if left.UUID != right.UUID || left.Family != right.Family || canonicalGuardHost(left.HostIP) != canonicalGuardHost(right.HostIP) ||
-		left.HostPort != right.HostPort || left.Protocol != right.Protocol {
-		return false
-	}
-	leftMode, rightMode := left.Mode, right.Mode
-	if leftMode == docker_guard.ModeAllow && len(left.Sources) == 0 {
-		leftMode = docker_guard.ModeAll
-	}
-	if rightMode == docker_guard.ModeAllow && len(right.Sources) == 0 {
-		rightMode = docker_guard.ModeAll
-	}
-	if leftMode != rightMode {
-		return false
-	}
-	leftSources, rightSources := append([]string(nil), left.Sources...), append([]string(nil), right.Sources...)
-	sort.Strings(leftSources)
-	sort.Strings(rightSources)
-	return slices.Equal(leftSources, rightSources)
+	sources := append([]string(nil), policy.Sources...)
+	sort.Strings(sources)
+	return strings.Join([]string{
+		policy.UUID, policy.Family, canonicalGuardHost(policy.HostIP), strconv.Itoa(int(policy.HostPort)),
+		policy.Protocol, mode, strings.Join(sources, ","),
+	}, "\x00")
 }
 
 func canonicalGuardHost(value string) string {
@@ -500,27 +372,12 @@ func canonicalGuardHost(value string) string {
 	return value
 }
 
-func dockerGuardExtraPolicyCount(actual, desired []docker_guard.Policy) int {
-	matched := make([]bool, len(desired))
-	extra := 0
-	for _, policy := range actual {
-		matchedIndex := dockerGuardPolicyUnmatchedIndex(desired, matched, policy)
-		if matchedIndex < 0 {
-			extra++
-			continue
-		}
-		matched[matchedIndex] = true
-	}
-	return extra
-}
-
 func verifyDockerGuardRuleSync(runtime dockerGuardRuntime, desired []docker_guard.Policy) error {
 	actual, err := runtime.ListPolicies()
 	if err != nil {
 		return fmt.Errorf("verify synchronized Docker firewall policies: %w", err)
 	}
-	if len(actual) != len(desired) || dockerGuardExtraPolicyCount(actual, desired) != 0 ||
-		dockerGuardExtraPolicyCount(desired, actual) != 0 {
+	if !databaseSyncStatesEqual(actual, desired, dockerGuardPolicySyncKey) {
 		return fmt.Errorf("verify synchronized Docker firewall policies: target policies do not match the database")
 	}
 	return nil
@@ -585,17 +442,6 @@ func dockerGuardRuntimeRuleSyncDTO(policy docker_guard.Policy) *dto.DockerPortGu
 		Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol,
 		PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: append([]string(nil), policy.Sources...),
 	}
-}
-
-func appendDockerRuleSyncFailure(
-	result *dto.FirewallRuleSyncResult,
-	policy model.DockerPortGuardPolicy,
-	err error,
-) {
-	result.Failed++
-	result.Errors = append(result.Errors, dto.FirewallRuleSyncFailure{
-		SourceUUID: policy.UUID, DockerRule: dockerGuardRuleSyncDTO(policy), Error: err.Error(),
-	})
 }
 
 func (s *DockerPortGuardService) reconcileLocked(ctx context.Context) (err error) {
@@ -716,6 +562,7 @@ func (s *DockerPortGuardService) runtimeStatus(runtime dockerGuardRuntime, backe
 	return dto.DockerPortGuardBase{
 		Name:        dockerFirewallDisplayName(backend),
 		Backend:     backend,
+		IsExist:     ipv4.Reason != docker_guard.ReasonCommandMissing || ipv6.Reason != docker_guard.ReasonCommandMissing,
 		Initialized: ipv4.Initialized || ipv6.Initialized,
 		Bound:       ipv4.Bound || ipv6.Bound,
 		IPv4:        dto.DockerPortGuardFamilyStatus{State: ipv4.State, Reason: ipv4.Reason, Initialized: ipv4.Initialized, Bound: ipv4.Bound, Effective: ipv4.Effective},
