@@ -107,7 +107,7 @@ func (c *CheckFlagCodec) Authorize(
 	}
 
 	switch action {
-	case CheckActionCreate, CheckActionCreateAnyway:
+	case CheckActionCreate:
 		if strings.TrimSpace(adoptInstanceKey) != "" {
 			return CreateAuthorization{}, ErrRuleOperation
 		}

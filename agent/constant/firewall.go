@@ -1,10 +1,11 @@
 package constant
 
 const (
-	FirewallProviderFirewalld = "firewalld"
-	FirewallProviderUFW       = "ufw"
-	FirewallProviderIptables  = "iptables"
-	FirewallProviderNftables  = "nftables"
+	FirewallProviderFirewalld   = "firewalld"
+	FirewallProviderUFW         = "ufw"
+	FirewallProviderIptables    = "iptables"
+	FirewallProviderNftables    = "nftables"
+	FirewallBackendNotInstalled = "backend_not_installed"
 
 	FirewallFamilyIPv4 = "ipv4"
 	FirewallFamilyIPv6 = "ipv6"

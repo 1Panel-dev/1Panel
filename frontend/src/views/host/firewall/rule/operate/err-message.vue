@@ -31,6 +31,7 @@
 
 <script lang="ts" setup>
 import { Firewall } from '@/api/interface/firewall';
+import { formatHostAddress } from '@/views/host/firewall/utils/validation';
 import { reactive, ref } from 'vue';
 
 const emit = defineEmits<{ (event: 'close'): void }>();
@@ -53,7 +54,7 @@ const familyLabel = (family: Firewall.Family) => (family === 'inet' ? 'IPv4/IPv6
 
 const ruleSummary = (failure: Firewall.CreateFailure) => {
     const rule = failure.rule;
-    const address = rule.sourceAddress || wildcardAddress(rule.scope.family);
+    const address = formatHostAddress(rule.sourceAddress, rule.scope.family) || wildcardAddress(rule.scope.family);
     return `#${failure.index + 1} · ${familyLabel(rule.scope.family)} · ${rule.protocol.toUpperCase()} · ${address} → ${rule.destinationPort || '*'}`;
 };
 

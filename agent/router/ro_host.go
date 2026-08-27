@@ -43,6 +43,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 
 		hostRouter.POST("/firewall/filter/operate", baseApi.OperateFilterChain)
 		hostRouter.GET("/firewall/docker/ports", baseApi.ListDockerPortGuard)
+		hostRouter.GET("/firewall/docker/endpoints", baseApi.ListDockerPublishedPorts)
 		hostRouter.POST("/firewall/docker/sync", baseApi.SyncDockerPortGuard)
 		hostRouter.POST("/firewall/docker/operate", baseApi.OperateDockerPortGuard)
 		hostRouter.POST("/firewall/docker/policies/batch", baseApi.UpsertDockerPortGuardPolicies)

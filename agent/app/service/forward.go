@@ -30,20 +30,13 @@ type IForwardingService interface {
 }
 
 type ForwardingService struct {
-	managerFactory     func() (*forwarding.Manager, error)
-	rules              repo.IForwardingRuleRepo
-	enabled            func() (bool, error)
-	persistBackend     func(string) error
-	markEnabled        func() error
-	installedProviders func() []string
+	managerFactory func() (*forwarding.Manager, error)
+	rules          repo.IForwardingRuleRepo
+	enabled        func() (bool, error)
+	persistBackend func(string) error
+	markEnabled    func() error
 }
 
-type forwardingCandidate struct {
-	adapter forwarding.Adapter
-	runtime forwarding.RuntimeClient
-}
-
-var errForwardingBackendConflict = errors.New("iptables and nftables forwarding backends are both initialized; remove one before continuing")
 var errForwardingBackendUnavailable = errors.New("no supported forwarding backend detected")
 var forwardingMutationMu sync.Mutex
 
@@ -73,7 +66,6 @@ func newForwardingService() *ForwardingService {
 		persistBackend: func(backend string) error {
 			return settingRepo.UpdateOrCreate(constant.FirewallForwardingBackendKey, backend)
 		},
-		installedProviders: lifecycle.InstalledProviders,
 	}
 }
 
@@ -83,23 +75,14 @@ type forwardingRuleSyncCandidate struct {
 }
 
 func (s *ForwardingService) LoadBaseInfo() (dto.FirewallSubsystemStatus, error) {
+	selected := configuredForwardingBackend()
 	baseInfo := dto.FirewallSubsystemStatus{
-		Version: "-", Name: "-", Backend: "-", SyncError: lastForwardingSyncError(),
+		Version: "-", Name: forwardingDisplayName(selected), Backend: selected, SyncError: lastForwardingSyncError(),
 	}
 	manager, err := s.manager()
 	if err != nil {
 		if errors.Is(err, errForwardingBackendUnavailable) {
-			loadInstalled := s.installedProviders
-			if loadInstalled == nil {
-				loadInstalled = lifecycle.InstalledProviders
-			}
-			for _, provider := range loadInstalled() {
-				if provider == constant.FirewallProviderIptables || provider == constant.FirewallProviderNftables {
-					baseInfo.IsExist = true
-					baseInfo.Message = err.Error()
-					break
-				}
-			}
+			baseInfo.Reason = constant.FirewallBackendNotInstalled
 			return baseInfo, nil
 		}
 		return baseInfo, err
@@ -579,66 +562,29 @@ func (s *ForwardingService) manager() (*forwarding.Manager, error) {
 }
 
 func newForwardingManager() (*forwarding.Manager, error) {
+	return newForwardingManagerFor(configuredForwardingBackend())
+}
+
+func configuredForwardingBackend() string {
 	selected, _ := settingRepo.GetValueByKey(constant.FirewallForwardingBackendKey)
-	if strings.TrimSpace(selected) == "" {
-		selected = constant.FirewallProviderIptables
+	selected = strings.TrimSpace(selected)
+	if selected == "" {
+		return constant.FirewallProviderIptables
 	}
-	return newForwardingManagerFor(strings.TrimSpace(selected))
+	return selected
 }
 
 func newForwardingManagerFor(backend string) (*forwarding.Manager, error) {
-	clients, err := lifecycle.NewNetfilterClients()
+	client, err := lifecycle.NewClientFor(backend)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", errForwardingBackendUnavailable, err)
-	}
-	candidates := make([]forwardingCandidate, 0, len(clients))
-	for _, client := range clients {
-		adapter, err := forwardingproviders.New(client.Name())
-		if err != nil {
-			return nil, err
-		}
-		candidates = append(candidates, forwardingCandidate{adapter: adapter, runtime: client})
-	}
-	if backend != "" {
-		for _, candidate := range candidates {
-			if candidate.adapter.Name() == backend {
-				return forwarding.NewManager(candidate.adapter, candidate.runtime), nil
-			}
-		}
 		return nil, fmt.Errorf(
-			"%w: selected forwarding backend %s %w",
-			errForwardingBackendUnavailable, backend, lifecycle.ErrNotInstalled,
+			"%w: selected forwarding backend %s: %w",
+			errForwardingBackendUnavailable, backend, err,
 		)
 	}
-	return selectForwardingManager(candidates)
-}
-
-func selectForwardingManager(candidates []forwardingCandidate) (*forwarding.Manager, error) {
-	if len(candidates) == 0 {
-		return nil, errors.New("no supported forwarding backend detected")
+	adapter, err := forwardingproviders.New(client.Name())
+	if err != nil {
+		return nil, err
 	}
-	selected := -1
-	for index, candidate := range candidates {
-		ipv4Initialized, _, err := candidate.adapter.FamilyStatus(forwarding.FamilyIPv4)
-		if err != nil {
-			return nil, err
-		}
-		ipv6Initialized, _, err := candidate.adapter.FamilyStatus(forwarding.FamilyIPv6)
-		if err != nil {
-			return nil, err
-		}
-		initialized := ipv4Initialized || ipv6Initialized
-		if !initialized {
-			continue
-		}
-		if selected >= 0 {
-			return nil, errForwardingBackendConflict
-		}
-		selected = index
-	}
-	if selected < 0 {
-		selected = 0
-	}
-	candidate := candidates[selected]
-	return forwarding.NewManager(candidate.adapter, candidate.runtime), nil
+	return forwarding.NewManager(adapter, client), nil
 }

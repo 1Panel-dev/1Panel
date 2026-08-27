@@ -3952,26 +3952,20 @@ const message = {
         adoptRuleConfirm: 'ຫຼັງຈາກຮັບເຂົ້າແລ້ວ 1Panel ຈະສາມາດຮັກສາແລະລຶບກົດນີ້ໄດ້. ສືບຕໍ່ບໍ?',
         plan_equivalent_external_rule: 'ມີກົດພາຍນອກທີ່ຄືກັນແລ້ວ. ສາມາດຮັບເຂົ້າຈັດການແທນການສ້າງຊ້ຳ.',
         plan_multiple_equivalent_external_rules: 'ມີກົດພາຍນອກທີ່ຄືກັນຫຼາຍກົດ. ກະລຸນາເລືອກໜຶ່ງກົດ.',
-        plan_requested_rule_is_covered: 'ກົດທີ່ມີຢູ່ຄອບຄຸມຄ່ານີ້ແລ້ວ. ການສືບຕໍ່ຈະສ້າງກົດທີ່ຊ້ອນກັນ.',
         plan_equivalent_managed_rule: 'ກົດທີ່ຄືກັນຖືກ 1Panel ຈັດການແລ້ວ ບໍ່ຕ້ອງສ້າງຊ້ຳ.',
         allRulesAlreadyExist: 'ກົດທັງໝົດ {0} ລາຍການທີ່ກວດສອບມີຢູ່ແລ້ວ. ບໍ່ມີກົດໃໝ່ທີ່ຕ້ອງສ້າງ.',
         ruleCheckResult: 'ຜົນການກວດສອບກົດ',
         ruleCheckStatus_creatable: 'ສາມາດສ້າງໄດ້',
         ruleCheckStatus_existing: 'ມີຢູ່ແລ້ວ',
-        ruleCheckStatus_warning: 'ຄຳເຕືອນ',
         ruleCheckStatus_error: 'ຂໍ້ຜິດພາດ',
         ruleCheckExistingHelper: 'ມີກົດທີ່ຄືກັນຢູ່ແລ້ວ ແລະ ຈະຖືກຂ້າມ.',
         ruleCheckReadyHelper: 'ການກວດສອບຜ່ານ. ສາມາດສ້າງກົດນີ້ໄດ້.',
         ruleCheckExternalExists: 'ມີກົດພາຍນອກທີ່ຄືກັນຢູ່ແລ້ວ ແລະຈະຖືກຂ້າມອັດຕະໂນມັດ.',
         ruleCheckBlockedHelper: 'ບໍ່ສາມາດສົ່ງກົດທີ່ມີຂໍ້ຜິດພາດໄດ້. ກັບໄປແກ້ໄຂ ແລະກວດສອບໃໝ່.',
-        ruleCheckWarningHelper: 'ກວດສອບສຳເລັດ. ຄຳເຕືອນບໍ່ຂັດຂວາງການສົ່ງ ແລະສາມາດດຳເນີນຕໍ່ໄດ້.',
         plan_managed_rule_drifted: 'ກົດທີ່ຈັດການບໍ່ກົງກັບໄຟວໍທີ່ໃຊ້ງານ. ກະລຸນາແກ້ໄຂກ່ອນ.',
         plan_opaque_rule_in_target_scope: 'ມີກົດໃນຂອບເຂດທີ່ບໍ່ສາມາດວິເຄາະໄດ້ຢ່າງປອດໄພ. ການດຳເນີນງານຖືກຢຸດ.',
         plan_runtime_permanent_mismatch: 'ຄ່າໄຟວໍທີ່ໃຊ້ງານແລະຄ່າຖາວອນບໍ່ກົງກັນ. ກະລຸນາຊິງກ່ອນ.',
         plan_protected_rule: 'ກົດນີ້ຖືກປົກປ້ອງ ແລະບໍ່ສາມາດຮັບເຂົ້າ, ແກ້ໄຂ ຫຼືລຶບໄດ້.',
-        plan_overlapping_rule_with_different_action: 'ມີກົດທີ່ຊ້ອນກັນແລະມີການກະທຳກົງກັນຂ້າມ. ການດຳເນີນງານຖືກຢຸດ.',
-        plan_partially_overlapping_rule_with_different_action:
-            'ກົດນີ້ຊ້ອນກັນບາງສ່ວນກັບກົດທີ່ມີການກະທຳກົງກັນຂ້າມ. ຜົນຂຶ້ນກັບລຳດັບກົດ.',
         plan_blocked: 'ບໍ່ສາມາດນຳໃຊ້ກົດນີ້ໄດ້ຢ່າງປອດໄພ. ກະລຸນາໂຫຼດໃໝ່ແລ້ວລອງອີກຄັ້ງ.',
         scopeDefaultMismatch: 'zone ຄ່າເລີ່ມຕົ້ນແມ່ນ {0}; ໜ້ານີ້ຈັດການສະເພາະ public zone.',
         scopeInactive: 'ຂອບເຂດທີ່ຈັດການບໍ່ໄດ້ເປີດໃຊ້. ກົດໃໝ່ອາດບໍ່ມີຜົນຕໍ່ການຈະລາຈອນປັດຈຸບັນ.',
@@ -4001,6 +3995,7 @@ const message = {
         systemFirewallHelper: 'ຄວບຄຸມການເຂົ້າເຖິງພອດໂຮສ ແລະ ກົດຂາເຂົ້າ.',
         forwardingHelper: 'ຈັດການກົດການສົ່ງຕໍ່ພອດ.',
         dockerFirewallHelper: 'ເລືອກວິທີທີ່ 1Panel ຈັດການການປ້ອງກັນພອດຄອນເທນເນີ.',
+        dockerNftablesRequirement: 'Docker ≥ 29.0.0, ທົດລອງ',
         backendRecommendation: 'ແນະນຳໃຫ້ໃຊ້ iptables ຫຼື nftables ໃນການຈັດການ.',
         configuredRules: 'ຕັ້ງຄ່າແລ້ວ {0} ກົດ',
         addressFamily: 'ລຸ້ນ IP',
@@ -4016,10 +4011,11 @@ const message = {
         cleanupDockerBackendHelper:
             'ລຶບກົດ ແລະ chain ປ້ອງກັນພອດ Docker ຂອງ 1Panel ທັງໝົດຈາກ {0}, ເກັບໄວ້ສະເພາະຂໍ້ມູນໃນຖານຂໍ້ມູນ',
         cleanupBeforeBackendSwitch: 'ແບັກເອັນປັດຈຸບັນ {0} ຍັງມີກົດ runtime ຂອງ 1Panel. ກະລຸນາລ້າງກ່ອນສະຫຼັບໄປ {1}.',
-        cleanupAction: 'ລ້າງ',
+        cleanupAction: 'ຣີເຊັດ',
         backendSwitchNotice:
             'ລ້າງແບັກເອັນປັດຈຸບັນກ່ອນສະຫຼັບໄຟວໍລະບົບ, ການສົ່ງຕໍ່ພອດ ຫຼື ການປ້ອງກັນ Docker. ນະໂຍບາຍໃນຖານຂໍ້ມູນຈະຖືກເກັບໄວ້ ແລະສາມາດເລີ່ມ ຫຼືຊິງຫຼັງສະຫຼັບ.',
         switchBackendHelper: 'ຢືນຢັນການສະຫຼັບເປັນ {0} ບໍ?',
+        switchDockerBackendHelper: 'ປ່ຽນເປັນ {0} ບໍ? ການຕັ້ງຄ່າ Docker ຈະຖືກອັບເດດ ແລະ Docker ຈະເລີ່ມໃໝ່.',
         ruleSyncTitle: 'ຊິງກົດ',
         ruleSyncAction: 'ຊິງກົດ',
         ruleSyncHelper:
@@ -4068,6 +4064,8 @@ const message = {
             blocked: 'ຊິງບໍ່ໄດ້',
         },
         uninstalledStatus: 'ຍັງບໍ່ໄດ້ຕິດຕັ້ງ',
+        selectedBackendNotInstalled:
+            'ບໍ່ພົບບໍລິການ {backend}. ກະລຸນາຕິດຕັ້ງແບບກຳນົດເອງຈາກ {library} ຫຼືປ່ຽນແບັກເອັນໄຟວໍໃນ {settings}.',
         initializedStatus: 'ເລີ່ມຕົ້ນແລ້ວ',
         partiallyInitialized: 'ເລີ່ມຕົ້ນບາງສ່ວນ',
         dockerGuardHelper:
@@ -4099,7 +4097,10 @@ const message = {
         denySources: 'ປະຕິເສດແຫຼ່ງທີ່ລະບຸ',
         allowSources: 'ອະນຸຍາດສະເພາະແຫຼ່ງທີ່ລະບຸ',
         denyAll: 'ປະຕິເສດການເຂົ້າເຖິງທັງໝົດ',
-        sourcesHelper: 'ໃສ່ທີ່ຢູ່ IPv4/IPv6 ຫຼື CIDR ໜຶ່ງລາຍການຕໍ່ແຖວ; ລາຍການອະນຸຍາດຫວ່າງຈະປະຕິເສດທຸກການເຂົ້າເຖິງ',
+        dockerGuardMixedFamilyHelper:
+            'ເລືອກທັງ IPv4 ແລະ IPv6 ແລ້ວ. ນະໂຍບາຍທີ່ລະບຸແຫຼ່ງທີ່ມາຕ້ອງຕັ້ງຄ່າແຍກກັນ; ການປະຕິເສດທັງໝົດສາມາດນຳໃຊ້ໄດ້ໂດຍກົງ.',
+        dockerGuardInconsistentConfigHelper:
+            'ກົດທີ່ເລືອກມີການຕັ້ງຄ່າແຕກຕ່າງກັນ. ກຳນົດໃໝ່ເພື່ອຂຽນທັບທັງໝົດ; ຄຳອະທິບາຍຫວ່າງຈະລຶບຄຳອະທິບາຍທັງໝົດ.',
         effective: 'ມີຜົນແລ້ວ',
         forwardUnsynced: 'ຍັງບໍ່ຊິງຄ໌',
         notEnabled: 'ບໍ່ໄດ້ເປີດໃຊ້',
@@ -4153,7 +4154,11 @@ const message = {
         sourceAddressPlaceholder: 'ຕົວຢ່າງ: 172.16.10.11, 172.16.0.0/24, 2001:db8::1 ຫຼື 2001:db8::/64',
         destinationPortPlaceholder: 'ຕົວຢ່າງ: 80, 80,443 ຫຼື 8080-8089',
         deleteRuleConfirm: 'ຈະລຶບ {0} ກົດລະບຽບ. ຕ້ອງການຕໍ່ຫຼືບໍ່?',
-        deleteUsedRuleConfirm: 'ພອດນີ້ກຳລັງຖືກໃຊ້ໂດຍ {0}. ການລຶບກົດອະນຸຍາດອາດເຮັດໃຫ້ບໍລິການເຂົ້າເຖິງບໍ່ໄດ້. ສືບຕໍ່ບໍ?',
+        deleteUsedRuleConfirm:
+            'ກົດນີ້ຄອບຄຸມບໍລິການທີ່ກຳລັງຟັງຊຶ່ງສະໜອງໂດຍ {0}. ການລຶບອາດເຮັດໃຫ້ບໍລິການເຫຼົ່ານັ້ນເຂົ້າເຖິງບໍ່ໄດ້. ສືບຕໍ່ບໍ?',
+        deleteWildcardRuleConfirm:
+            'ກົດນີ້ອະນຸຍາດໃຫ້ {0} ເຂົ້າເຖິງ {1}. ການລຶບອາດສົ່ງຜົນຕໍ່ການເຂົ້າເຖິງຫຼາຍບໍລິການ. ສືບຕໍ່ບໍ?',
+        deleteRiskRulesConfirm: 'ຈະລຶບ {0} ກົດລະບຽບ. {1} ກົດອະນຸຍາດອາດສົ່ງຜົນຕໍ່ການເຂົ້າເຖິງບໍລິການ. ສືບຕໍ່ບໍ?',
         editRuleConfirm: 'ຈະປ່ຽນຟິວຕໍ່ໄປນີ້: {0}. ກົດຈະຖືກນຳໃຊ້ແລະກວດສອບທັນທີ. ສືບຕໍ່ບໍ?',
     },
     runtime: {

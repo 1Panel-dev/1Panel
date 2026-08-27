@@ -20,7 +20,7 @@ export const normalizeDockerGuardPolicy = (value: unknown): Firewall.DockerGuard
     if (!isValidAddressForFamily(policy.family!, policy.hostIP, false)) return;
     if (!Array.isArray(policy.sources) || !policy.sources.every((source) => typeof source === 'string')) return;
     const sources = policy.sources.map((source) => source.trim()).filter(Boolean);
-    if (policy.mode === 'deny_sources' && sources.length === 0) return;
+    if (policy.mode !== 'deny_all' && sources.length === 0) return;
     if (policy.mode !== 'deny_all' && !sources.every((source) => isValidDockerGuardSource(policy.family!, source))) {
         return;
     }

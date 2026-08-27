@@ -70,6 +70,9 @@ export const reorderFirewallRule = (uuid: string, request: Firewall.ReorderReque
 export const loadDockerPortGuard = () =>
     http.get<Firewall.DockerGuardList>('/hosts/firewall/docker/ports', {}, { timeout: TimeoutEnum.T_40S });
 
+export const loadDockerPublishedPorts = () =>
+    http.get<Firewall.DockerGuardContainer[]>('/hosts/firewall/docker/endpoints', {}, { timeout: TimeoutEnum.T_40S });
+
 export const syncDockerPortGuard = () => http.post('/hosts/firewall/docker/sync', {}, TimeoutEnum.T_60S);
 
 export const operateDockerPortGuard = (operation: 'initialize' | 'bind' | 'unbind') =>

@@ -52,6 +52,7 @@ var (
 
 type IDockerPortGuardService interface {
 	LoadOverview(context.Context) (dto.DockerPortGuardList, error)
+	LoadPublishedPorts(context.Context) ([]dto.DockerPortGuardContainer, error)
 	Operate(context.Context, dto.DockerPortGuardOperation) error
 	DeletePolicies(context.Context, dto.DockerPortGuardPolicyBatchDelete) error
 	UpsertPolicies(context.Context, dto.DockerPortGuardPolicyBatch) error
@@ -81,6 +82,20 @@ func ReconcileDockerPortGuardBestEffort(ctx context.Context) {
 	if err := ReconcileDockerPortGuard(ctx); err != nil {
 		global.LOG.Warnf("reconcile Docker port guard failed, err: %v", err)
 	}
+}
+
+func (s *DockerPortGuardService) LoadPublishedPorts(ctx context.Context) ([]dto.DockerPortGuardContainer, error) {
+	cli, err := s.client()
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrDockerUnavailable, err)
+	}
+	defer cli.Close()
+
+	endpoints, err := discoverDockerEndpoints(ctx, cli)
+	if err != nil {
+		return nil, err
+	}
+	return groupDockerGuardContainers(endpoints), nil
 }
 
 func (s *DockerPortGuardService) LoadOverview(ctx context.Context) (dto.DockerPortGuardList, error) {

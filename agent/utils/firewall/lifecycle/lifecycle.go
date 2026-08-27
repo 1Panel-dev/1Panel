@@ -125,7 +125,7 @@ func NewClientFor(provider string) (Client, error) {
 	case "iptables":
 		commands, err := ResolveIptablesCommands()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("iptables %w: %v", ErrNotInstalled, err)
 		}
 		return providers.NewIptables(commands.IPv4)
 	case "nftables":

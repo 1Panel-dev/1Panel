@@ -48,6 +48,7 @@ import { Firewall } from '@/api/interface/firewall';
 import { checkFirewallRules, createFirewallRules } from '@/api/modules/firewall';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { formatHostAddress } from '@/views/host/firewall/utils/validation';
 import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
 import { ref } from 'vue';
 
@@ -63,7 +64,7 @@ const uploaderFiles = ref<UploadFile[]>([]);
 const displayAddress = (rule: Firewall.Rule, address?: string) => {
     const wildcard =
         rule.scope.family === 'ipv6' ? '::/0' : rule.scope.family === 'inet' ? '0.0.0.0/0, ::/0' : '0.0.0.0/0';
-    if (address && address !== wildcard) return address;
+    if (address && address !== wildcard) return formatHostAddress(address, rule.scope.family);
     return `${wildcard}（${i18n.global.t('firewall.anyWhere')}）`;
 };
 
@@ -149,8 +150,6 @@ const importedCreateRequest = (plan: Firewall.RuleCheckResult): Firewall.CreateI
     if (plan.classification === 'exact_external') {
         if (plan.candidates?.length !== 1 || !allowed.includes('adopt')) throw new Error(plan.reason);
         resolution = 'adopt';
-    } else if (plan.classification === 'covered' && allowed.includes('create_anyway')) {
-        resolution = 'create_anyway';
     }
     if (!resolution || resolution === 'select_adopt') throw new Error(plan.reason);
     return {

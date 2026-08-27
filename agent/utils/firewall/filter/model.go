@@ -334,14 +334,15 @@ type Locator struct {
 }
 
 type ObservedRule struct {
-	Rule        FirewallRule      `json:"rule"`
-	Locator     Locator           `json:"locator"`
-	InstanceKey string            `json:"instanceKey,omitempty"`
-	Marker      string            `json:"marker,omitempty"`
-	ParseStatus ParseStatus       `json:"parseStatus"`
-	Raw         string            `json:"raw,omitempty"`
-	Protected   bool              `json:"protected"`
-	Persistence PersistenceStatus `json:"persistence,omitempty"`
+	Rule            FirewallRule      `json:"rule"`
+	Locator         Locator           `json:"locator"`
+	InstanceKey     string            `json:"instanceKey,omitempty"`
+	Marker          string            `json:"marker,omitempty"`
+	ParseStatus     ParseStatus       `json:"parseStatus"`
+	UncertainFields []string          `json:"uncertainFields,omitempty"`
+	Raw             string            `json:"raw,omitempty"`
+	Protected       bool              `json:"protected"`
+	Persistence     PersistenceStatus `json:"persistence,omitempty"`
 }
 
 type Snapshot struct {

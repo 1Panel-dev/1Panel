@@ -1,6 +1,23 @@
 <template>
     <div>
-        <div class="app-status card-interval" v-if="baseInfo.isExist && !baseInfo.message">
+        <el-alert v-if="backendMissing" class="card-interval" type="warning" show-icon :closable="false">
+            <template #title>
+                <i18n-t keypath="firewall.selectedBackendNotInstalled" tag="span">
+                    <template #backend>{{ backendName }}</template>
+                    <template #library>
+                        <el-link type="primary" @click="goToScriptLibrary">
+                            {{ $t('cronjob.library.library') }}
+                        </el-link>
+                    </template>
+                    <template #settings>
+                        <el-link type="primary" @click="goToFirewallSetting">
+                            {{ $t('commons.button.set') }}
+                        </el-link>
+                    </template>
+                </i18n-t>
+            </template>
+        </el-alert>
+        <div class="app-status card-interval" v-else-if="baseInfo.isExist && !baseInfo.message">
             <el-card>
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4 ml-3">
@@ -182,13 +199,14 @@ import { ElMessageBox } from 'element-plus';
 import { computed, nextTick, ref } from 'vue';
 import { loadDockerStatus } from '@/api/modules/container';
 import { WarningFilled } from '@element-plus/icons-vue';
-import { routerToName } from '@/utils/router';
+import { routerToName, routerToNameWithQuery } from '@/utils/router';
 
 const props = defineProps({
     currentTab: String,
 });
 
 const goToFirewallSetting = () => routerToName('FirewallSetting');
+const goToScriptLibrary = () => routerToNameWithQuery('Library', { uncached: 'true' });
 
 const baseInfo = ref<Firewall.FirewallBase>({
     isActive: false,
@@ -201,6 +219,7 @@ const baseInfo = ref<Firewall.FirewallBase>({
     version: '',
     pingStatus: '',
     message: '',
+    reason: '',
     syncError: '',
     ipv4: { available: false, initialized: false, bound: false },
     ipv6: { available: false, initialized: false, bound: false },
@@ -211,6 +230,7 @@ const dockerStatus = ref();
 const withDockerRestart = ref(false);
 const familyRetrying = ref(false);
 const backendName = computed(() => baseInfo.value.backend || baseInfo.value.name);
+const backendMissing = computed(() => baseInfo.value.reason === 'backend_not_installed');
 const isServiceBackend = computed(() => backendName.value === 'firewalld' || backendName.value === 'ufw');
 const isDirectBase = computed(
     () => props.currentTab === 'base' && (backendName.value === 'iptables' || backendName.value === 'nftables'),
@@ -288,6 +308,15 @@ const loadBaseInfo = async (search: boolean) => {
                 ipv4: res.data.ipv4 || { available: true, initialized: res.data.isInit, bound: res.data.isBind },
                 ipv6: res.data.ipv6 || { available: false, initialized: false, bound: false },
             };
+            if (backendMissing.value) {
+                emit('update:name', '-');
+                emit('update:is-active', false);
+                emit('update:is-init', false);
+                emit('update:is-bind', false);
+                emit('update:version', '');
+                emit('update:loading', false);
+                return;
+            }
             emit('update:name', backendName.value);
             emit('update:is-active', baseInfo.value.isActive);
             emit('update:is-init', isDirectManaged.value ? anyFamilyInitialized.value : baseInfo.value.isInit);

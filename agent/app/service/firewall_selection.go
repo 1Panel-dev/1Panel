@@ -33,8 +33,8 @@ func configuredDockerFirewallBackend() string {
 }
 
 func selectedSystemFirewallClient() (lifecycle.Client, error) {
-	if provider, _ := settingRepo.GetValueByKey(constant.FirewallSystemBackendKey); strings.TrimSpace(provider) != "" {
-		return lifecycle.NewClientFor(strings.TrimSpace(provider))
+	if provider := configuredSystemFirewallBackend(); provider != "" {
+		return lifecycle.NewClientFor(provider)
 	}
 	client, err := lifecycle.NewClient()
 	if err != nil {
@@ -42,6 +42,14 @@ func selectedSystemFirewallClient() (lifecycle.Client, error) {
 	}
 	_ = settingRepo.UpdateOrCreate(constant.FirewallSystemBackendKey, client.Name())
 	return client, nil
+}
+
+func configuredSystemFirewallBackend() string {
+	if global.DB == nil {
+		return ""
+	}
+	provider, _ := settingRepo.GetValueByKey(constant.FirewallSystemBackendKey)
+	return strings.TrimSpace(provider)
 }
 
 func NewSelectedSystemFirewallClient() (lifecycle.Client, error) {

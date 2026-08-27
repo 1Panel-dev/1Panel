@@ -15,93 +15,58 @@
                                     v-model="item.group.selected"
                                     v-permission
                                     v-node-admin
-                                    class="sm:!w-1/2 !w-full"
+                                    class="sm:!w-2/3 !w-full"
                                     @change="changeBackend(item.subsystem, item.group)"
                                 >
                                     <el-option
                                         v-for="option in sortedOptions(item.group)"
                                         :key="option.name"
-                                        :label="option.name"
+                                        :label="backendOptionLabel(item.subsystem, option)"
                                         :value="option.name"
                                         :disabled="!option.installed || !option.supported"
                                     >
                                         <div class="option-row">
-                                            <span>{{ option.name }}</span>
+                                            <span class="option-name">
+                                                {{ backendOptionLabel(item.subsystem, option) }}
+                                                <el-icon
+                                                    v-if="option.name === item.group.selected"
+                                                    class="selected-icon"
+                                                >
+                                                    <Check />
+                                                </el-icon>
+                                            </span>
                                             <div class="option-status">
                                                 <el-tag v-if="!option.installed" size="small" type="info">
                                                     {{ $t('firewall.uninstalledStatus') }}
                                                 </el-tag>
-                                                <el-tag v-else-if="!option.supported" size="small" type="warning">
+                                                <el-tag
+                                                    v-else-if="
+                                                        !option.supported &&
+                                                        option.supportReason !== 'docker_version_unsupported'
+                                                    "
+                                                    size="small"
+                                                    type="warning"
+                                                >
                                                     Docker: {{ $t('firewall.uninstalledStatus') }}
                                                 </el-tag>
-                                                <el-popover
-                                                    v-else-if="option.message"
-                                                    placement="right"
-                                                    trigger="hover"
-                                                    :width="220"
+                                                <el-tag
+                                                    v-else-if="
+                                                        option.supported &&
+                                                        (option.name !== item.group.selected ||
+                                                            isServiceBackend(option.name))
+                                                    "
+                                                    size="small"
+                                                    type="success"
                                                 >
-                                                    <template #reference>
-                                                        <el-tag size="small" type="warning">
-                                                            <el-icon><WarningFilled /></el-icon>
-                                                            {{ $t('commons.status.exceptional') }}
-                                                        </el-tag>
-                                                    </template>
-                                                    <div class="backend-issue-list">
-                                                        <div class="backend-issue-item">{{ option.message }}</div>
-                                                    </div>
-                                                </el-popover>
-                                                <template v-else-if="isServiceBackend(option.name)">
-                                                    <el-tag size="small" :type="option.active ? 'success' : 'info'">
-                                                        {{
-                                                            $t(
-                                                                option.active
-                                                                    ? 'commons.status.running'
-                                                                    : 'commons.status.stopped',
-                                                            )
-                                                        }}
-                                                    </el-tag>
-                                                </template>
-                                                <template v-else>
-                                                    <el-popover
-                                                        v-if="showBackendFamilyDetails(option)"
-                                                        placement="right"
-                                                        trigger="hover"
-                                                        :width="360"
-                                                    >
-                                                        <template #reference>
-                                                            <el-tag
-                                                                size="small"
-                                                                :type="backendDisplayState(option).type"
-                                                            >
-                                                                <el-icon v-if="backendDisplayState(option).exceptional">
-                                                                    <WarningFilled />
-                                                                </el-icon>
-                                                                {{ $t(backendDisplayState(option).label) }}
-                                                            </el-tag>
-                                                        </template>
-                                                        <div class="backend-issue-list">
-                                                            <div
-                                                                v-for="familyState in backendFamilyStates(option)"
-                                                                :key="familyState.family"
-                                                                class="backend-issue-item"
-                                                            >
-                                                                {{
-                                                                    backendFamilyStatusLabel(
-                                                                        familyState.family,
-                                                                        familyState.status,
-                                                                    )
-                                                                }}
-                                                            </div>
-                                                        </div>
-                                                    </el-popover>
-                                                    <el-tag
-                                                        v-else
-                                                        size="small"
-                                                        :type="backendDisplayState(option).type"
-                                                    >
-                                                        {{ $t(backendDisplayState(option).label) }}
-                                                    </el-tag>
-                                                </template>
+                                                    {{ $t('app.installed') }}
+                                                </el-tag>
+                                                <el-tag
+                                                    v-else-if="option.supported"
+                                                    size="small"
+                                                    :type="backendInitializationState(option).type"
+                                                >
+                                                    {{ $t(backendInitializationState(option).label) }}
+                                                </el-tag>
                                             </div>
                                         </div>
                                     </el-option>
@@ -154,7 +119,7 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
-import { WarningFilled } from '@element-plus/icons-vue';
+import { Check } from '@element-plus/icons-vue';
 
 const { isMobile } = useGlobalStore();
 const loading = ref(false);
@@ -168,11 +133,6 @@ const pingStatus = ref('Disable');
 const oldPingStatus = ref('Disable');
 const whiteListRef = ref();
 
-const backendFamilies = [
-    { key: 'ipv4', label: 'IPv4' },
-    { key: 'ipv6', label: 'IPv6' },
-] as const;
-
 const providerOrder: Record<Firewall.Provider, number> = {
     iptables: 0,
     nftables: 1,
@@ -184,54 +144,36 @@ const isServiceBackend = (provider: Firewall.Provider) => {
     return provider === 'firewalld' || provider === 'ufw';
 };
 
-type BackendTagType = 'success' | 'info' | 'warning';
-interface BackendDisplayState {
-    label: string;
-    type: BackendTagType;
-    exceptional: boolean;
-}
+const isDockerNftablesOption = (subsystem: Firewall.BackendSubsystem, option: Firewall.BackendOption) =>
+    subsystem === 'docker' && option.name === 'nftables';
 
-const backendFamilyStates = (option: Firewall.BackendOption) =>
-    backendFamilies.map((family) => ({ family: family.label, status: option[family.key] }));
-
-const backendDisplayState = (option: Firewall.BackendOption): BackendDisplayState => {
-    if (option.message) {
-        return { label: 'commons.status.exceptional', type: 'warning', exceptional: true };
+const backendOptionLabel = (subsystem: Firewall.BackendSubsystem, option: Firewall.BackendOption) => {
+    if (!isDockerNftablesOption(subsystem, option)) {
+        return option.name;
     }
-    const families = backendFamilyStates(option);
-    if (families.every(({ status }) => !status.initialized && !status.bound)) {
-        return { label: 'firewall.notInitialized', type: 'info', exceptional: false };
-    }
-    if (families.every(({ status }) => status.available && status.initialized && status.bound && !status.reason)) {
-        return { label: 'commons.status.bound', type: 'success', exceptional: false };
-    }
-    if (families.every(({ status }) => status.available && status.initialized && !status.bound && !status.reason)) {
-        return { label: 'commons.status.unbind', type: 'info', exceptional: false };
-    }
-    return { label: 'commons.status.exceptional', type: 'warning', exceptional: true };
+    return `${option.name}（${i18n.global.t('firewall.dockerNftablesRequirement')}）`;
 };
 
-const showBackendFamilyDetails = (option: Firewall.BackendOption) =>
-    backendDisplayState(option).label !== 'commons.status.bound' ||
-    backendFamilyStates(option).some(({ status }) => !status.available || Boolean(status.reason));
+interface BackendInitializationState {
+    label: string;
+    type: 'success' | 'info';
+}
 
-const dockerGuardReasons = new Set([
-    'docker_chain_missing',
-    'guard_chain_missing',
-    'jump_missing',
-    'jump_not_first',
-    'jump_duplicate',
-    'inspect_failed',
-]);
-
-const backendFamilyStatusLabel = (family: 'IPv4' | 'IPv6', status: Firewall.BackendFamilyStatus) => {
-    if (!status.available || status.reason === 'command_missing') {
-        return i18n.global.t('firewall.familyUnsupported', [family]);
+const backendInitializationState = (option: Firewall.BackendOption): BackendInitializationState => {
+    const availableFamilies = [option.ipv4, option.ipv6].filter((status) => status.available);
+    if (availableFamilies.length === 0) {
+        return option.initialized
+            ? { label: 'firewall.initializedStatus', type: 'success' }
+            : { label: 'firewall.notInitialized', type: 'info' };
     }
-    if (status.reason && dockerGuardReasons.has(status.reason)) {
-        return i18n.global.t(`firewall.dockerGuardStatusReason.${status.reason}`, [family]);
+    const initializedFamilies = availableFamilies.filter((status) => status.initialized).length;
+    if (initializedFamilies === 0) {
+        return { label: 'firewall.notInitialized', type: 'info' };
     }
-    return `${family} ${i18n.global.t(status.initialized ? (status.bound ? 'commons.status.bound' : 'commons.status.unbind') : 'firewall.notInitialized')}`;
+    if (initializedFamilies === availableFamilies.length) {
+        return { label: 'firewall.initializedStatus', type: 'success' };
+    }
+    return { label: 'firewall.partiallyInitialized', type: 'info' };
 };
 
 const groups = computed(() => {
@@ -300,7 +242,10 @@ const changeBackend = async (subsystem: Firewall.BackendSubsystem, group: Firewa
     }
     try {
         await ElMessageBox.confirm(
-            i18n.global.t('firewall.switchBackendHelper', [backend]),
+            i18n.global.t(
+                subsystem === 'docker' ? 'firewall.switchDockerBackendHelper' : 'firewall.switchBackendHelper',
+                [backend],
+            ),
             i18n.global.t('commons.button.confirm'),
             {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -354,17 +299,16 @@ load();
     gap: 5px;
     white-space: nowrap;
     font-size: 12px;
+    flex-shrink: 0;
 }
 
-.backend-issue-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+.option-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
-.backend-issue-item {
-    color: var(--el-text-color-regular);
-    font-size: 13px;
-    line-height: 20px;
+.selected-icon {
+    color: var(--el-color-primary);
 }
 </style>

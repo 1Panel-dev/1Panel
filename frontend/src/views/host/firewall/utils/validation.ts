@@ -59,6 +59,17 @@ export const isValidAddressForFamily = (
     return isValidIPOrCIDR(value) && inferAddressFamily(value.split('/')[0]) === family;
 };
 
+export const formatHostAddress = (value?: string, family?: FirewallAddressFamily): string => {
+    const address = value?.trim() || '';
+    if (!address) return '';
+    const addressFamily = family === 'inet' || !family ? inferAddressFamily(address.split('/')[0]) : family;
+    const hostPrefix = addressFamily === 'ipv6' ? '/128' : '/32';
+    if (!address.endsWith(hostPrefix)) return address;
+    const host = address.slice(0, -hostPrefix.length);
+    const validHost = addressFamily === 'ipv6' ? isValidIPv6Address(host) : isValidIPv4Address(host);
+    return validHost ? host : address;
+};
+
 export const normalizePortRange = (value: string): string => {
     const matched = value.trim().match(/^(\d+)(?:[:-](\d+))?$/);
     if (!matched) throw new Error('invalid port range');
