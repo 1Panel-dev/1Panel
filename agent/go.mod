@@ -31,7 +31,7 @@ require (
 	github.com/klauspost/compress v1.19.2
 	github.com/mattn/go-shellwords v1.0.14
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
-	github.com/miekg/dns v1.1.72
+	github.com/miekg/dns v1.1.73
 	github.com/minio/minio-go/v7 v7.2.1
 	github.com/nicksnyder/go-i18n/v2 v2.6.1
 	github.com/opencontainers/image-spec v1.1.1
@@ -217,9 +217,7 @@ require (
 	go.yaml.in/yaml/v4 v4.0.0-rc.4 // indirect
 	go4.org v0.0.0-20260112195520-a5071408f32f // indirect
 	golang.org/x/arch v0.26.0 // indirect
-	golang.org/x/mod v0.38.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
-	golang.org/x/tools v0.48.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	modernc.org/fileutil v1.4.0 // indirect
 	modernc.org/libc v1.72.0 // indirect
