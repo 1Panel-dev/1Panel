@@ -4111,16 +4111,16 @@ const message = {
         resetDirectRulesHelper:
             '{0} から 1Panel システムファイアウォールのチェーン、実行ルール、永続化ファイルを削除し、データベースポリシーは保持します',
         resetWhitelistRulesHelper:
-            '{0} の有効なカスタム設定を消去し、インストール時の既定値に戻して無効化します。データベースポリシーは保持され、後で再同期できます。',
+            '{0} の有効なカスタム設定をリセットし、インストール時の既定値に戻して無効化します。データベースポリシーは保持され、後で再同期できます。',
         cleanupForwardingBackendHelper:
-            '{0} から 1Panel のポート転送ルールとチェーンをすべて削除し、データベースデータのみを保持します',
+            '{0} の 1Panel ポート転送ランタイムルールをリセットします。関連するルールとチェーンをすべて削除し、データベースデータを保持します',
         cleanupDockerBackendHelper:
-            '{0} から 1Panel Docker ポート保護ルールとチェーンをすべて削除し、データベースデータのみを保持します',
+            '{0} の 1Panel Docker ポート保護ランタイムルールをリセットします。関連するルールとチェーンをすべて削除し、データベースデータを保持します',
         cleanupBeforeBackendSwitch:
-            '現在の {0} バックエンドには 1Panel の実行時ルールが残っています。{1} に切り替える前にクリーンアップしてください。',
+            '現在の {0} バックエンドには 1Panel の実行時ルールが残っています。{1} に切り替える前にリセットしてください。',
         cleanupAction: 'リセット',
         backendSwitchNotice:
-            'システムファイアウォール、ポート転送、Docker 保護を切り替える前に現在のバックエンドをクリーンアップしてください。データベースポリシーは保持され、切り替え後に再初期化または同期できます。',
+            'システムファイアウォール、ポート転送、Docker 保護を切り替える前に現在のバックエンドをリセットしてください。データベースポリシーは保持され、切り替え後に再初期化または同期できます。',
         switchBackendHelper: '{0} に切り替えますか？',
         switchDockerBackendHelper: '{0} に切り替えますか？Docker の設定を更新し、Docker を再起動します。',
         ruleSyncTitle: 'ルールを同期',
@@ -4194,9 +4194,6 @@ const message = {
         orphanPolicies: '未関連付けルール',
         orphanPoliciesHelper:
             '以下の {0} 件のルールは Docker ポートにバインドされていません。一致するポートが検出されると自動的にバインドされます。',
-        exposure: '公開状態',
-        externallyExposed: '外部アクセスを許可（0.0.0.0 / ::）',
-        restrictedBinding: '外部アクセスを拒否（127.0.0.1 / ::1）',
         composeOrApp: 'Compose / アプリ',
         sources: '送信元',
         deniedSources: '拒否する送信元',

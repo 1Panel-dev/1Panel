@@ -160,7 +160,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import { isValidDockerGuardSource } from '@/views/host/firewall/docker/model';
-import { splitTagValues } from '@/views/host/firewall/utils/validation';
+import { formatHostAddress, formatHostAddressList, splitTagValues } from '@/views/host/firewall/utils/validation';
 
 const props = defineProps<{ containers: Firewall.DockerGuardContainer[] }>();
 const emit = defineEmits<{ search: [] }>();
@@ -273,7 +273,10 @@ const openPolicy = (endpoints: Firewall.DockerGuardEndpoint[]) => {
     const first = endpoints[0];
     form.mode = hasMixedFamilies.value ? 'deny_all' : policyConfigConsistent.value ? first.mode || 'deny_sources' : '';
     form.description = descriptionConfigConsistent.value ? (first.description || '').trim() : '';
-    form.sources = policyConfigConsistent.value && first.sources?.length ? [...first.sources] : [''];
+    form.sources =
+        policyConfigConsistent.value && first.sources?.length
+            ? first.sources.map((source) => formatHostAddress(source, first.family))
+            : [''];
     policyVisible.value = true;
     nextTick(() => formRef.value?.clearValidate());
 };
@@ -345,9 +348,9 @@ const protectionSummary = (row: Firewall.DockerGuardEndpoint) => {
     if (!row.policyUUID) return i18n.global.t('firewall.dockerGuardUnprotected');
     let summary = i18n.global.t('firewall.denyAll');
     if (row.mode === 'deny_sources') {
-        summary = `${i18n.global.t('firewall.deny')}: ${row.sources.join(', ')}`;
+        summary = `${i18n.global.t('firewall.deny')}: ${formatHostAddressList(row.sources, row.family)}`;
     } else if (row.mode === 'allow_sources' && row.sources.length) {
-        summary = `${i18n.global.t('firewall.allow')}: ${row.sources.join(', ')}`;
+        summary = `${i18n.global.t('firewall.allow')}: ${formatHostAddressList(row.sources, row.family)}`;
     }
     return row.effective ? summary : `${summary} · ${i18n.global.t('firewall.notEffective')}`;
 };

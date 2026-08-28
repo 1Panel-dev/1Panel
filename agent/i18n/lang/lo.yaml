@@ -148,6 +148,8 @@ ErrCustomApps: 'ກວດພົບແອັບທີ່ຕິດຕັ້ງແ�
 ErrCustomRuntimes: 'ກວດພົບ runtime ທີ່ຕິດຕັ້ງແລ້ວ; ກະລຸນາລຶບອອກກ່ອນ'
 ErrAppVersionDeprecated: "ແອັບພລິເຄຊັນ {{ .name }} ບໍ່ຮອງຮັບກັບເວີຊັນ 1Panel ປັດຈຸບັນ, ຈຶ່ງຖືກຂ້າມໄປ"
 ErrDockerFailed: 'Docker ຜິດປົກກະຕິ; ກະລຸນາກວດສອບສະຖານະການບໍລິການ'
+ErrDockerIptablesChainUnavailable: 'ບໍ່ພົບ chain DOCKER-USER ຂອງ Docker. ກະລຸນາເລີ່ມ Docker ໃໝ່ແລ້ວລອງອີກຄັ້ງ'
+ErrDockerNftablesChainUnavailable: 'ບໍ່ພົບ chain ໄຟວໍ nftables IPv4 ຂອງ Docker. ກະລຸນາກວດສອບວ່າ Docker ລຸ້ນປັດຈຸບັນຮອງຮັບ backend ໄຟວໍ nftables, ເລີ່ມ Docker ໃໝ່ແລ້ວລອງອີກຄັ້ງ'
 ErrDockerComposeCmdNotFound: 'ບໍ່ພົບຄຳສັ່ງ Docker Compose ໃນເຄື່ອງ'
 UseExistImage: 'ມີຮູບພາບຢູ່ແລ້ວ; ກຳລັງໃຊ້ຮູບພາບທີ່ມີຢູ່'
 UpgradePrepare: 'ກະກຽມອັບເກຣດແອັບ'

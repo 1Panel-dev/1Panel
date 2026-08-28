@@ -223,7 +223,7 @@ func RuleForSystemPort(provider filter.Provider, port SystemPort) filter.Firewal
 	}
 	return filter.FirewallRule{
 		Scope: scope, Protocol: port.Protocol, DestinationPort: port.Port,
-		Action: filter.ActionAccept, Description: "1Panel managed accepted port",
+		Action: filter.ActionAccept,
 	}
 }
 

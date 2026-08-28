@@ -158,6 +158,8 @@ ErrCustomApps: 'برنامه‌های نصب شده شناسایی شدند؛ ا
 ErrCustomRuntimes: 'محیط‌های اجرایی نصب شده شناسایی شدند؛ ابتدا حذف کنید'
 ErrAppVersionDeprecated: "برنامه {{ .name }} با نسخه فعلی 1Panel سازگار نیست، رد شد"
 ErrDockerFailed: 'Docker غیرعادی است؛ وضعیت سرویس را بررسی کنید'
+ErrDockerIptablesChainUnavailable: 'زنجیره DOCKER-USER داکر یافت نشد. داکر را راه‌اندازی مجدد کنید و دوباره تلاش کنید'
+ErrDockerNftablesChainUnavailable: 'زنجیره فایروال IPv4 مربوط به nftables داکر یافت نشد. بررسی کنید نسخه فعلی داکر از بک‌اند فایروال nftables پشتیبانی کند، سپس داکر را راه‌اندازی مجدد کرده و دوباره تلاش کنید'
 ErrDockerComposeCmdNotFound: 'Docker Compose روی میزبان یافت نشد'
 UseExistImage: 'تصویر وجود دارد؛ استفاده از تصویر موجود'
 UpgradePrepare: 'آماده‌سازی ارتقاء برنامه'

@@ -1,22 +1,20 @@
 <template>
     <div>
-        <el-alert v-if="backendMissing" class="card-interval" type="warning" show-icon :closable="false">
-            <template #title>
-                <i18n-t keypath="firewall.selectedBackendNotInstalled" tag="span">
-                    <template #backend>{{ backendName }}</template>
-                    <template #library>
-                        <el-link type="primary" @click="goToScriptLibrary">
-                            {{ $t('cronjob.library.library') }}
-                        </el-link>
-                    </template>
-                    <template #settings>
-                        <el-link type="primary" @click="goToFirewallSetting">
-                            {{ $t('commons.button.set') }}
-                        </el-link>
-                    </template>
-                </i18n-t>
-            </template>
-        </el-alert>
+        <NoSuchService v-if="backendUnavailable" :name="backendName">
+            <i18n-t keypath="firewall.selectedBackendNotInstalled" tag="span">
+                <template #backend>{{ backendName }}</template>
+                <template #library>
+                    <button type="button" class="firewall-backend-link" @click="goToScriptLibrary">
+                        {{ $t('cronjob.library.library') }}
+                    </button>
+                </template>
+                <template #settings>
+                    <button type="button" class="firewall-backend-link" @click="goToFirewallSetting">
+                        {{ $t('commons.button.set') }}
+                    </button>
+                </template>
+            </i18n-t>
+        </NoSuchService>
         <div class="app-status card-interval" v-else-if="baseInfo.isExist && !baseInfo.message">
             <el-card>
                 <div class="flex w-full flex-col gap-4 md:flex-row">
@@ -160,15 +158,6 @@
                 </div>
             </template>
         </el-alert>
-        <NoSuchService
-            v-else
-            :name="
-                props.currentTab === 'forward'
-                    ? 'iptables / iptables-nft / nftables'
-                    : 'Firewalld / Ufw / iptables / iptables-nft / nftables'
-            "
-        />
-
         <DockerRestart
             ref="dockerRef"
             v-model:withDockerRestart="withDockerRestart"
@@ -230,7 +219,7 @@ const dockerStatus = ref();
 const withDockerRestart = ref(false);
 const familyRetrying = ref(false);
 const backendName = computed(() => baseInfo.value.backend || baseInfo.value.name);
-const backendMissing = computed(() => baseInfo.value.reason === 'backend_not_installed');
+const backendUnavailable = computed(() => baseInfo.value.reason === 'backend_not_installed' || !baseInfo.value.isExist);
 const isServiceBackend = computed(() => backendName.value === 'firewalld' || backendName.value === 'ufw');
 const isDirectBase = computed(
     () => props.currentTab === 'base' && (backendName.value === 'iptables' || backendName.value === 'nftables'),
@@ -308,7 +297,7 @@ const loadBaseInfo = async (search: boolean) => {
                 ipv4: res.data.ipv4 || { available: true, initialized: res.data.isInit, bound: res.data.isBind },
                 ipv6: res.data.ipv6 || { available: false, initialized: false, bound: false },
             };
-            if (backendMissing.value) {
+            if (backendUnavailable.value) {
                 emit('update:name', '-');
                 emit('update:is-active', false);
                 emit('update:is-init', false);

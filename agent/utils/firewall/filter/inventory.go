@@ -42,6 +42,7 @@ type DesiredRule struct {
 	Rule                FirewallRule `json:"rule"`
 	RuleKey             string       `json:"ruleKey"`
 	Origin              RuleOrigin   `json:"origin"`
+	Protected           bool         `json:"protected,omitempty"`
 	Marker              string       `json:"marker,omitempty"`
 	ObservedInstanceKey string       `json:"observedInstanceKey,omitempty"`
 }
@@ -244,6 +245,9 @@ func uniqueUnclaimedCandidate(indices []int, candidates []observedInventoryCandi
 func inventoryStateForDesired(desired DesiredRule, match InventoryMatch) InventoryState {
 	if match != InventoryMatchExact {
 		return InventoryStateDrifted
+	}
+	if desired.Protected {
+		return InventoryStateProtected
 	}
 	switch desired.Origin {
 	case RuleOriginAdopted:

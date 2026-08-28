@@ -505,7 +505,7 @@ const acceptParams = (
             },
         ];
         form.sourcePort = rule.sourcePort || '';
-        form.destinationAddress = rule.destinationAddress || '';
+        form.destinationAddress = formatHostAddress(rule.destinationAddress, rule.scope.family);
         form.destinationPorts = [rule.destinationPort || ''];
         if (form.destinationPorts.length === 0) form.destinationPorts = [''];
         form.action = rule.action === 'reject' ? 'drop' : rule.action;

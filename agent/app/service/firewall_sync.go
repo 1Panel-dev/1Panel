@@ -119,6 +119,27 @@ func (s *FirewallService) syncRules(
 	return s.executeFirewallSystemSyncPlan(ctx, clientIP, plan), nil
 }
 
+func (s *FirewallService) restoreStoredFirewallRules(ctx context.Context, provider filter.Provider) error {
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
+
+	result, err := s.syncRules(ctx, "", dto.FirewallRuleSyncRequest{
+		Subsystem:      "system",
+		TargetProvider: provider,
+	})
+	if err != nil {
+		return fmt.Errorf("restore database firewall rules: %w", err)
+	}
+	if result.Failed == 0 {
+		return nil
+	}
+	messages := firewallRuleSyncFailureMessages(result.Errors)
+	if len(messages) == 0 {
+		return fmt.Errorf("restore database firewall rules: %d rules failed", result.Failed)
+	}
+	return fmt.Errorf("restore database firewall rules: %s", strings.Join(messages, "; "))
+}
+
 func (s *FirewallService) loadFirewallRuleSyncPlan(
 	ctx context.Context,
 	clientIP string,
@@ -164,10 +185,17 @@ func (s *FirewallService) loadFirewallRuleSyncPlan(
 		seenSnapshots[scopeKey] = struct{}{}
 		scopeEntries := append([]*firewallRuleSyncEntry(nil), entriesByScope[scopeKey]...)
 		desired := make([]filter.DesiredRule, 0, len(scopeEntries))
-		byMarker := make(map[string]*firewallRuleSyncEntry, len(scopeEntries))
+		byRuleUUID := make(map[string]*firewallRuleSyncEntry, len(scopeEntries))
 		for _, entry := range scopeEntries {
 			desired = append(desired, entry.desired)
-			byMarker[entry.desired.Marker] = entry
+			ruleUUID := strings.TrimSpace(entry.desired.Rule.UUID)
+			if ruleUUID == "" {
+				return firewallSystemSyncPlan{}, fmt.Errorf("%w: compiled database rule has no runtime UUID", filter.ErrInvalidRule)
+			}
+			if _, exists := byRuleUUID[ruleUUID]; exists {
+				return firewallSystemSyncPlan{}, fmt.Errorf("%w: duplicate compiled runtime rule UUID %q", filter.ErrInvalidRule, ruleUUID)
+			}
+			byRuleUUID[ruleUUID] = entry
 		}
 		inventory, mergeErr := filter.MergeInventory(filter.InventoryMergeInput{
 			Observed: snapshot.Rules, Desired: desired,
@@ -180,7 +208,7 @@ func (s *FirewallService) loadFirewallRuleSyncPlan(
 			if inventoryItem.Desired == nil {
 				continue
 			}
-			entry, exists := byMarker[inventoryItem.Desired.Marker]
+			entry, exists := byRuleUUID[strings.TrimSpace(inventoryItem.Desired.Rule.UUID)]
 			if !exists {
 				continue
 			}
@@ -1170,8 +1198,12 @@ func firewallRuleSyncChange(
 		}
 		change.Operation = filter.ChangeCreate
 		if position := firewallRuleSyncInsertionPosition(snapshot, entries, entry); position != nil {
-			after.OrderIndex = position
-			change.After = &after
+			if entry.rule.Scope.Provider == filter.ProviderUFW && *position > maxObservedFirewallPosition(snapshot) {
+				change.Append = true
+			} else {
+				after.OrderIndex = position
+				change.After = &after
+			}
 		} else {
 			change.Append = entry.rule.Scope.Provider == filter.ProviderUFW
 		}

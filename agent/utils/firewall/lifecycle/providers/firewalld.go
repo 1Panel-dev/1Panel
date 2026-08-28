@@ -184,10 +184,8 @@ func restoreFirewalldConfigContext(configDir string) error {
 }
 
 func validateFirewalldConfig() error {
-	// Keep the service disabled while validating. Legacy versions support this
-	// flag even though they do not provide --reset-to-defaults.
 	_, err := cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en")).RunWithOptionalSudoAndStdout(
-		"firewall-offline-cmd", "--disabled", "--get-zones",
+		"firewall-offline-cmd", "--get-zones",
 	)
 	return err
 }

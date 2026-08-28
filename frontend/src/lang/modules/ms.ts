@@ -4195,16 +4195,16 @@ const message = {
         resetDirectRulesHelper:
             'Padam rantaian, peraturan masa jalan dan fail berterusan tembok api sistem 1Panel daripada {0}; dasar pangkalan data yang disimpan dikekalkan',
         resetWhitelistRulesHelper:
-            'Bersihkan konfigurasi tersuai aktif daripada {0}, pulihkan tetapan pemasangan asal dan nyahdayakan {0}; dasar pangkalan data dikekalkan dan boleh disegerakkan semula.',
+            'Tetapkan semula konfigurasi tersuai aktif dalam {0}, pulihkan tetapan pemasangan asal dan nyahdayakan {0}; dasar pangkalan data dikekalkan dan boleh disegerakkan semula.',
         cleanupForwardingBackendHelper:
-            'Padam semua peraturan dan rantaian pemajuan port 1Panel daripada {0}, hanya mengekalkan data pangkalan data',
+            'Tetapkan semula peraturan masa jalan pemajuan port 1Panel dalam {0}: padam semua peraturan dan rantaian berkaitan sambil mengekalkan data pangkalan data',
         cleanupDockerBackendHelper:
-            'Padam semua peraturan dan rantaian perlindungan port Docker 1Panel daripada {0}, hanya mengekalkan data pangkalan data',
+            'Tetapkan semula peraturan masa jalan perlindungan port Docker 1Panel dalam {0}: padam semua peraturan dan rantaian berkaitan sambil mengekalkan data pangkalan data',
         cleanupBeforeBackendSwitch:
-            'Bahagian belakang semasa {0} masih mengandungi peraturan masa jalan 1Panel. Bersihkannya sebelum bertukar kepada {1}.',
+            'Bahagian belakang semasa {0} masih mengandungi peraturan masa jalan 1Panel. Tetapkan semula sebelum bertukar kepada {1}.',
         cleanupAction: 'Tetapkan semula',
         backendSwitchNotice:
-            'Bersihkan bahagian belakang semasa sebelum menukar tembok api sistem, pemajuan port atau perlindungan Docker. Dasar pangkalan data dikekalkan dan boleh dimulakan atau disegerakkan selepas penukaran.',
+            'Tetapkan semula bahagian belakang semasa sebelum menukar tembok api sistem, pemajuan port atau perlindungan Docker. Dasar pangkalan data dikekalkan dan boleh dimulakan atau disegerakkan selepas penukaran.',
         switchBackendHelper: 'Tukar kepada {0}?',
         switchDockerBackendHelper: 'Tukar kepada {0}? Ini akan mengemas kini konfigurasi dan memulakan semula Docker.',
         ruleSyncTitle: 'Segerakkan peraturan',
@@ -4279,9 +4279,6 @@ const message = {
         orphanPolicies: 'Peraturan tidak berkaitan',
         orphanPoliciesHelper:
             '{0} peraturan berikut belum terikat pada port Docker. Peraturan akan diikat secara automatik apabila port sepadan dikesan.',
-        exposure: 'Pendedahan',
-        externallyExposed: 'Benarkan akses luaran (0.0.0.0 / ::)',
-        restrictedBinding: 'Tolak akses luaran (127.0.0.1 / ::1)',
         composeOrApp: 'Compose / Aplikasi',
         sources: 'Sumber',
         deniedSources: 'Sumber ditolak',

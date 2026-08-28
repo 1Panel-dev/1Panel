@@ -3947,13 +3947,15 @@ const message = {
         },
         resetDirectRulesHelper: '删除 {0} 中全部 1Panel 系统防火墙链、运行规则及持久化文件，保留数据库策略',
         resetWhitelistRulesHelper:
-            '清理 {0} 中当前生效的自定义防火墙配置，恢复安装默认状态并停用 {0}；数据库策略会保留，之后可以重新同步。',
-        cleanupForwardingBackendHelper: '删除 {0} 中全部 1Panel 端口转发规则及规则链，仅保留数据库数据',
-        cleanupDockerBackendHelper: '删除 {0} 中全部 1Panel Docker 端口防护规则及规则链，仅保留数据库数据',
-        cleanupBeforeBackendSwitch: '当前后端 {0} 仍存在 1Panel 运行时规则，请先清理该后端，再切换到 {1}。',
+            '重置 {0} 中当前生效的自定义防火墙配置，恢复安装默认状态并停用 {0}；数据库策略会保留，之后可以重新同步。',
+        cleanupForwardingBackendHelper:
+            '重置 {0} 中的 1Panel 端口转发运行时规则：删除全部相关规则及规则链，仅保留数据库数据',
+        cleanupDockerBackendHelper:
+            '重置 {0} 中的 1Panel Docker 端口防护运行时规则：删除全部相关规则及规则链，仅保留数据库数据',
+        cleanupBeforeBackendSwitch: '当前后端 {0} 仍存在 1Panel 运行时规则，请先重置该后端，再切换到 {1}。',
         cleanupAction: '重置',
         backendSwitchNotice:
-            '主机防火墙、端口转发和 Docker 防护切换前都需要先清理当前后端；数据库策略会保留，切换后可以重新初始化或同步。',
+            '主机防火墙、端口转发和 Docker 防护切换前都需要先重置当前后端；数据库策略会保留，切换后可以重新初始化或同步。',
         switchBackendHelper: '确认切换为 {0}？',
         switchDockerBackendHelper: '确认切换为 {0}？该操作会更新 Docker 配置并重启 Docker 服务。',
         uninstalledStatus: '未安装',
@@ -3974,9 +3976,6 @@ const message = {
         orphanEndpoints: '未关联端点',
         orphanPolicies: '未关联规则',
         orphanPoliciesHelper: '以下 {0} 条规则尚未绑定 Docker 端口，检测到匹配端口后将自动绑定。',
-        exposure: '暴露状态',
-        externallyExposed: '允许外部访问（0.0.0.0 / ::）',
-        restrictedBinding: '拒绝外部访问（127.0.0.1 / ::1）',
         composeOrApp: 'Compose / 应用',
         sources: '来源',
         deniedSources: '禁止来源',

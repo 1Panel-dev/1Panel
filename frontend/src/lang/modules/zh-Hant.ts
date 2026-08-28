@@ -3854,13 +3854,15 @@ const message = {
         importBackendHelper: '匯入規則會轉換並寫入目前後端 {0}，來源後端規則不會被修改。',
         resetDirectRulesHelper: '刪除 {0} 中全部 1Panel 系統防火牆鏈、執行規則及持久化檔案，保留資料庫策略',
         resetWhitelistRulesHelper:
-            '清理 {0} 中目前生效的自訂防火牆設定，恢復安裝預設狀態並停用 {0}；資料庫策略會保留，之後可重新同步。',
-        cleanupForwardingBackendHelper: '刪除 {0} 中全部 1Panel 連接埠轉送規則及規則鏈，僅保留資料庫資料',
-        cleanupDockerBackendHelper: '刪除 {0} 中全部 1Panel Docker 連接埠防護規則及規則鏈，僅保留資料庫資料',
-        cleanupBeforeBackendSwitch: '目前後端 {0} 仍存在 1Panel 執行時規則，請先清理該後端，再切換到 {1}。',
+            '重設 {0} 中目前生效的自訂防火牆設定，恢復安裝預設狀態並停用 {0}；資料庫策略會保留，之後可重新同步。',
+        cleanupForwardingBackendHelper:
+            '重設 {0} 中的 1Panel 連接埠轉送執行時規則：刪除全部相關規則及規則鏈，僅保留資料庫資料',
+        cleanupDockerBackendHelper:
+            '重設 {0} 中的 1Panel Docker 連接埠防護執行時規則：刪除全部相關規則及規則鏈，僅保留資料庫資料',
+        cleanupBeforeBackendSwitch: '目前後端 {0} 仍存在 1Panel 執行時規則，請先重設該後端，再切換到 {1}。',
         cleanupAction: '重設',
         backendSwitchNotice:
-            '主機防火牆、連接埠轉送和 Docker 防護切換前都必須先清理目前後端；資料庫策略會保留，切換後可重新初始化或同步。',
+            '主機防火牆、連接埠轉送和 Docker 防護切換前都必須先重設目前後端；資料庫策略會保留，切換後可重新初始化或同步。',
         switchBackendHelper: '確認切換為 {0}？',
         switchDockerBackendHelper: '確認切換為 {0}？此操作會更新 Docker 設定並重新啟動 Docker 服務。',
         ruleSyncTitle: '同步規則',
@@ -3929,9 +3931,6 @@ const message = {
         orphanEndpoints: '未關聯端點',
         orphanPolicies: '未關聯規則',
         orphanPoliciesHelper: '以下 {0} 條規則尚未綁定 Docker 連接埠，偵測到匹配連接埠後將自動綁定。',
-        exposure: '暴露狀態',
-        externallyExposed: '允許外部存取（0.0.0.0 / ::）',
-        restrictedBinding: '拒絕外部存取（127.0.0.1 / ::1）',
         composeOrApp: 'Compose / 應用程式',
         sources: '來源',
         deniedSources: '禁止來源',

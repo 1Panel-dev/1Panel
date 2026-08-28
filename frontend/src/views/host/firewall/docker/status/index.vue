@@ -75,7 +75,21 @@
             </div>
         </el-card>
     </div>
-    <NoSuchService v-else name="iptables / iptables-nft / nftables" />
+    <NoSuchService v-else :name="backendName">
+        <i18n-t keypath="firewall.selectedBackendNotInstalled" tag="span">
+            <template #backend>{{ backendName }}</template>
+            <template #library>
+                <button type="button" class="firewall-backend-link" @click="goToScriptLibrary">
+                    {{ $t('cronjob.library.library') }}
+                </button>
+            </template>
+            <template #settings>
+                <button type="button" class="firewall-backend-link" @click="goToFirewallSetting">
+                    {{ $t('commons.button.set') }}
+                </button>
+            </template>
+        </i18n-t>
+    </NoSuchService>
 </template>
 
 <script lang="ts" setup>
@@ -84,12 +98,16 @@ import i18n from '@/lang';
 import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import { WarningFilled } from '@element-plus/icons-vue';
 import { computed } from 'vue';
+import { routerToName, routerToNameWithQuery } from '@/utils/router';
 
 const props = defineProps<{ base: Firewall.DockerGuardBase }>();
 const emit = defineEmits<{
     operate: [operation: 'initialize' | 'bind' | 'unbind'];
     cleanup: [];
 }>();
+const backendName = computed(() => props.base.backend || props.base.name);
+const goToFirewallSetting = () => routerToName('FirewallSetting');
+const goToScriptLibrary = () => routerToNameWithQuery('Library', { uncached: 'true' });
 
 const familyStatuses = computed(
     () =>

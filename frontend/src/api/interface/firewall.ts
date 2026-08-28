@@ -149,6 +149,7 @@ export namespace Firewall {
         rule: Rule;
         ruleKey: string;
         origin: RuleOrigin;
+        protected?: boolean;
         marker?: string;
         observedInstanceKey?: string;
     }

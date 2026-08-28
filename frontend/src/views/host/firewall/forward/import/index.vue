@@ -84,7 +84,12 @@ import i18n from '@/lang';
 import { getNetworkOptions } from '@/api/modules/host';
 import { operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
 import { Firewall } from '@/api/interface/firewall';
-import { isValidAddressForFamily, isValidPortRange, normalizePortRange } from '@/views/host/firewall/utils/validation';
+import {
+    inferAddressFamily,
+    isValidAddressForFamily,
+    isValidPortRange,
+    normalizePortRange,
+} from '@/views/host/firewall/utils/validation';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -151,6 +156,9 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
             }
 
             for (const item of parsed) {
+                if (!item.family && typeof item.targetIP === 'string') {
+                    item.family = inferAddressFamily(item.targetIP);
+                }
                 if (!checkDataFormat(item)) {
                     MsgError(i18n.global.t('commons.msg.errImportFormat'));
                     loading.value = false;

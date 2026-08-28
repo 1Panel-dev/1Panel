@@ -169,6 +169,10 @@ func (s *FirewallService) OperateFilterChain(request dto.FilterChainOperation) e
 	if request.Operate != string(firewall.BaseOperationInit) && request.Operate != string(firewall.BaseOperationBind) {
 		return nil
 	}
+	ctx := context.Background()
+	if err := s.restoreStoredFirewallRules(ctx, filter.Provider(provider)); err != nil {
+		return err
+	}
 	configured, err := loadConfiguredFirewallPortWhiteList()
 	if err != nil {
 		return err
@@ -178,7 +182,7 @@ func (s *FirewallService) OperateFilterChain(request dto.FilterChainOperation) e
 		return err
 	}
 	ports := excludeFirewallPorts(configured, required)
-	return s.SyncSystemPorts(context.Background(), nil, systemPorts(ports))
+	return s.SyncSystemPorts(ctx, nil, systemPorts(ports))
 }
 
 func (s *FirewallService) Reset(ctx context.Context, request dto.FirewallRuleReset) (dto.FirewallRuleResetResponse, error) {
@@ -963,7 +967,7 @@ func (s *FirewallService) Delete(
 			continue
 		}
 		for _, item := range group.items {
-			if err := s.deleteRule(ctx, item.stored.UUID); err != nil {
+			if err := s.deleteRule(ctx, item.stored.UUID, false); err != nil {
 				result.Failed++
 				result.Errors = append(result.Errors, dto.FirewallRuleDeleteFailure{
 					Index: item.index, UUID: item.stored.UUID, Error: err.Error(),
@@ -992,6 +996,9 @@ func (s *FirewallService) prepareDelete(
 			return preparedFirewallRuleDelete{}, fmt.Errorf("%w: managed rule %q was not found", filter.ErrInvalidRule, ruleUUID)
 		}
 		return preparedFirewallRuleDelete{}, err
+	}
+	if isProtectedSystemFirewallRule(stored) {
+		return preparedFirewallRuleDelete{}, filter.ErrProtectedRule
 	}
 	if stored.Origin != constant.FirewallRuleOriginCreated && stored.Origin != constant.FirewallRuleOriginAdopted {
 		return preparedFirewallRuleDelete{}, fmt.Errorf("%w: only created or adopted rules can be deleted", filter.ErrInvalidRule)
@@ -1196,7 +1203,7 @@ func (s *FirewallService) createRule(
 	return nil
 }
 
-func (s *FirewallService) deleteRule(ctx context.Context, ruleUUID string) error {
+func (s *FirewallService) deleteRule(ctx context.Context, ruleUUID string, allowProtected bool) error {
 	if ruleUUID == "" {
 		return fmt.Errorf("%w: rule UUID is required", repo.ErrFirewallPersistenceInvalid)
 	}
@@ -1230,6 +1237,9 @@ func (s *FirewallService) deleteRule(ctx context.Context, ruleUUID string) error
 		return cause
 	}
 	for _, desired := range desiredRules {
+		if allowProtected {
+			desired.Protected = false
+		}
 		runtime, runtimeErr := s.resolveRuntime(ctx, desired.Rule.Scope.Provider)
 		if runtimeErr != nil {
 			return rollback(runtimeErr)
@@ -1237,6 +1247,11 @@ func (s *FirewallService) deleteRule(ctx context.Context, ruleUUID string) error
 		snapshot, observeErr := runtime.ObserveMutation(ctx, desired.Rule.Scope)
 		if observeErr != nil {
 			return rollback(observeErr)
+		}
+		if allowProtected {
+			for index := range snapshot.Rules {
+				snapshot.Rules[index].Protected = false
+			}
 		}
 		observed, managedErr := filter.ManagedObserved(snapshot, desired)
 		if managedErr != nil {
@@ -1475,6 +1490,10 @@ func (s *FirewallService) loadManagedMutation(
 	stored, err := s.rules.GetByUUID(ctx, ruleUUID)
 	if err != nil {
 		return model.FirewallRule{}, filter.DesiredRule{}, filter.Snapshot{}, filter.ObservedRule{}, nil, err
+	}
+	if isProtectedSystemFirewallRule(stored) {
+		return model.FirewallRule{}, filter.DesiredRule{}, filter.Snapshot{}, filter.ObservedRule{}, nil,
+			filter.ErrProtectedRule
 	}
 	if stored.Origin != constant.FirewallRuleOriginCreated && stored.Origin != constant.FirewallRuleOriginAdopted {
 		return model.FirewallRule{}, filter.DesiredRule{}, filter.Snapshot{}, filter.ObservedRule{}, nil,
@@ -1728,18 +1747,17 @@ func (s *FirewallService) deleteSystemPort(ctx context.Context, port dto.Firewal
 			continue
 		}
 		for _, rule := range stored {
-			result, err := s.Delete(ctx, dto.FirewallRuleDelete{UUIDs: []string{rule.UUID}})
-			if err != nil {
+			if err := s.deleteProtectedSystemPortRule(ctx, rule.UUID); err != nil {
 				return err
-			}
-			if result.Failed > 0 {
-				if len(result.Errors) > 0 {
-					return errors.New(result.Errors[0].Error)
-				}
-				return errors.New("delete firewall rule failed")
 			}
 		}
 	}
+}
+
+func (s *FirewallService) deleteProtectedSystemPortRule(ctx context.Context, ruleUUID string) error {
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
+	return s.deleteRule(ctx, ruleUUID, true)
 }
 
 func (s *FirewallService) systemPortRecords(ctx context.Context, port dto.FirewallSystemPort) ([]model.FirewallRule, error) {
@@ -1765,6 +1783,14 @@ func (s *FirewallService) systemPortRecords(ctx context.Context, port dto.Firewa
 		}
 	}
 	return records, nil
+}
+
+func isProtectedSystemFirewallRule(rule model.FirewallRule) bool {
+	ownerPrefix := model.FirewallRuleOwner(
+		constant.FirewallRuleSourceSecurity,
+		constant.FirewallSystemAcceptedPortSourcePrefix,
+	)
+	return strings.HasPrefix(rule.Owner, ownerPrefix)
 }
 
 func (s *FirewallService) adoptExternalSystemPort(ctx context.Context, port dto.FirewallSystemPort) (bool, error) {
@@ -2069,6 +2095,7 @@ func (s *FirewallService) desiredFirewallRulesForScope(
 		}
 		for _, rule := range compiled {
 			if rule.Rule.Scope.Key() == scope.Key() {
+				rule.Protected = isProtectedSystemFirewallRule(record)
 				desired = append(desired, rule)
 			}
 		}
@@ -2458,15 +2485,22 @@ func supportsManagedFilterChains(provider string) bool {
 }
 
 func (s *FirewallService) addPortsBeforeStart(client lifecycle.Client) error {
-	if client.Name() == constant.FirewallProviderIptables || client.Name() == constant.FirewallProviderNftables {
-		isInit, _, err := loadDirectFirewallInitStatus(client.Name())
+	ctx := context.Background()
+	provider := filter.Provider(client.Name())
+	if provider == filter.ProviderIptables || provider == filter.ProviderNftables {
+		isInit, _, err := loadDirectFirewallInitStatus(string(provider))
 		if err != nil {
 			return err
 		}
 		if !isInit {
 			return nil
 		}
-		if client.Name() == constant.FirewallProviderIptables {
+	}
+	if err := s.restoreStoredFirewallRules(ctx, provider); err != nil {
+		return err
+	}
+	if provider == filter.ProviderIptables || provider == filter.ProviderNftables {
+		if provider == filter.ProviderIptables {
 			if err := newIptablesHelperManager().SyncRequiredPorts(true); err != nil {
 				return err
 			}
@@ -2481,13 +2515,13 @@ func (s *FirewallService) addPortsBeforeStart(client lifecycle.Client) error {
 		if err != nil {
 			return err
 		}
-		return s.SyncSystemPorts(context.Background(), nil, systemPorts(excludeFirewallPorts(configured, required)))
+		return s.SyncSystemPorts(ctx, nil, systemPorts(excludeFirewallPorts(configured, required)))
 	}
 	portWhitelist, err := loadFirewallPortWhiteList()
 	if err != nil {
 		return err
 	}
-	return s.SyncSystemPorts(context.Background(), nil, systemPorts(portWhitelist))
+	return s.SyncSystemPorts(ctx, nil, systemPorts(portWhitelist))
 }
 
 func syncManagedAcceptedPorts(previous, current []firewall.PortWhitelist) error {

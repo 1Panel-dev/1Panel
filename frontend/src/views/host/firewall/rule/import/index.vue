@@ -48,7 +48,7 @@ import { Firewall } from '@/api/interface/firewall';
 import { checkFirewallRules, createFirewallRules } from '@/api/modules/firewall';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { formatHostAddress } from '@/views/host/firewall/utils/validation';
+import { formatHostAddress, inferAddressFamily } from '@/views/host/firewall/utils/validation';
 import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
 import { ref } from 'vue';
 
@@ -89,6 +89,35 @@ const targetScope = (family: Firewall.Family): Firewall.Scope => {
     return { provider: 'ufw', family, chain: 'incoming', direction: 'input' };
 };
 
+const normalizeLegacyImportedRule = (value: unknown): Firewall.Rule[] | undefined => {
+    if (!value || typeof value !== 'object') return;
+    const rule = value as Record<string, unknown>;
+    if (!['accept', 'drop'].includes(String(rule.strategy))) return;
+    if (typeof rule.address !== 'string') return;
+    if (rule.description !== undefined && typeof rule.description !== 'string') return;
+
+    const family = ['ipv4', 'ipv6'].includes(String(rule.family))
+        ? (rule.family as Firewall.Family)
+        : rule.address.trim()
+          ? inferAddressFamily(rule.address.split('/')[0])
+          : 'ipv4';
+
+    const port = typeof rule.port === 'string' ? rule.port.trim() : '';
+    const protocol = typeof rule.protocol === 'string' ? rule.protocol.trim().toLowerCase() : '';
+    if (port && !['tcp', 'udp', 'tcp/udp'].includes(protocol)) return;
+    if (!port && protocol && !['all', 'any'].includes(protocol)) return;
+
+    const protocols = port ? (protocol === 'tcp/udp' ? ['tcp', 'udp'] : [protocol]) : ['all'];
+    return protocols.map((item) => ({
+        scope: targetScope(family),
+        protocol: item,
+        sourceAddress: rule.address as string,
+        destinationPort: port || undefined,
+        action: rule.strategy as Firewall.Action,
+        description: (rule.description as string | undefined) || '',
+    }));
+};
+
 const normalizeImportedRule = (rule: Firewall.Rule): Firewall.Rule[] => {
     const splitInet = rule.scope.family === 'inet' && provider.value !== 'firewalld';
     const addresses = [rule.sourceAddress, rule.destinationAddress].filter((value): value is string => Boolean(value));
@@ -118,11 +147,24 @@ const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     reader.onload = (event) => {
         try {
             const parsed: unknown = JSON.parse(String(event.target?.result || ''));
-            if (!Array.isArray(parsed) || !parsed.every(isRule)) {
+            if (!Array.isArray(parsed)) {
                 MsgError(i18n.global.t('commons.msg.errImportFormat'));
                 return;
             }
-            rules.value = parsed.flatMap(normalizeImportedRule);
+            const normalizedGroups = parsed.map((rule) => {
+                if (isRule(rule)) return normalizeImportedRule(rule);
+                return normalizeLegacyImportedRule(rule);
+            });
+            if (normalizedGroups.some((group) => !group)) {
+                MsgError(i18n.global.t('commons.msg.errImportFormat'));
+                return;
+            }
+            const normalized = normalizedGroups.flatMap((group) => group || []);
+            if (normalized.length === 0 || normalized.some((rule) => !isRule(rule))) {
+                MsgError(i18n.global.t('commons.msg.errImportFormat'));
+                return;
+            }
+            rules.value = normalized;
             selects.value = [...rules.value];
         } catch (error) {
             MsgError(i18n.global.t('commons.msg.errImport') + String(error));

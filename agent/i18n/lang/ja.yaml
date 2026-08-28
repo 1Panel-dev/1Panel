@@ -158,6 +158,8 @@ ErrCustomApps: 'インストールされているアプリケーションがあ�
 ErrCustomRuntimes: 'ランタイム環境がインストールされています。まずそれを削除してください'
 ErrAppVersionDeprecated: '{{ .name }} アプリケーションは現在の 1Panel バージョンと互換性がありません、スキップしました'
 ErrDockerFailed: 'Docker の状態が異常です。サービス状態を確認してください'
+ErrDockerIptablesChainUnavailable: 'Docker の DOCKER-USER チェーンが見つかりません。Docker を再起動してから再試行してください'
+ErrDockerNftablesChainUnavailable: 'Docker の nftables IPv4 ファイアウォールチェーンが見つかりません。現在の Docker バージョンが nftables ファイアウォールバックエンドをサポートしていることを確認し、Docker を再起動してから再試行してください'
 ErrDockerComposeCmdNotFound: 'Docker Compose コマンドは存在しません。ホストマシンにこのコマンドを先にインストールしてください'
 UseExistImage: 'イメージは既に存在します。既存のイメージを使用します'
 UpgradePrepare: 'アプリケーションのアップグレードを準備'

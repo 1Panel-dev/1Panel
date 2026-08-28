@@ -141,7 +141,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('firewall.sourceIP')" min-width="170" show-overflow-tooltip>
                         <template #default="{ row }">
-                            {{ row.dockerRule?.sources?.join(', ') || '-' }}
+                            {{ dockerSources(row.dockerRule) || '-' }}
                         </template>
                     </el-table-column>
                 </template>
@@ -174,6 +174,7 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 import { newUUID } from '@/utils/id';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { formatHostAddress, formatHostAddressList } from '@/views/host/firewall/utils/validation';
 import { Coin, Lock, Right } from '@element-plus/icons-vue';
 import { ElMessageBox } from 'element-plus';
 import { computed, ref } from 'vue';
@@ -322,7 +323,9 @@ const reasonText = (reasonCode?: string, reason?: string) => {
 const actionText = (action?: Firewall.Action) => (action ? i18n.global.t(`firewall.${action}`) : '-');
 
 const displayAddress = (rule: Firewall.Rule) => {
-    const values = [rule.sourceAddress, rule.destinationAddress].filter(Boolean);
+    const values = [rule.sourceAddress, rule.destinationAddress]
+        .filter((value): value is string => Boolean(value))
+        .map((value) => formatHostAddress(value, rule.scope.family));
     return values.length > 0 ? values.join(' → ') : i18n.global.t('firewall.anyWhere');
 };
 
@@ -331,6 +334,9 @@ const dockerAddress = (rule?: Firewall.DockerGuardEndpoint) => {
     const address = rule.hostIP.includes(':') ? `[${rule.hostIP}]` : rule.hostIP;
     return `${address}:${rule.hostPort}`;
 };
+
+const dockerSources = (rule?: Firewall.DockerGuardEndpoint) =>
+    rule ? formatHostAddressList(rule.sources, rule.family) : '';
 
 const dockerMode = (mode?: Firewall.DockerGuardPolicy['mode']) => {
     if (!mode) return '-';

@@ -117,7 +117,7 @@ import WhiteList from '@/views/host/firewall/setting/white-list/index.vue';
 import { whiteListRuleCount } from '@/views/host/firewall/setting/white-list/model';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { Check } from '@element-plus/icons-vue';
 
@@ -254,14 +254,27 @@ const changeBackend = async (subsystem: Firewall.BackendSubsystem, group: Firewa
             },
         );
         loading.value = true;
-        await operateFirewallBackend({
-            subsystem,
-            backend: backend as Firewall.Provider,
-            operation: 'select',
-        });
+        await operateFirewallBackend(
+            {
+                subsystem,
+                backend: backend as Firewall.Provider,
+                operation: 'select',
+            },
+            true,
+        );
         await load();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    } catch {
+    } catch (error) {
+        const result = error as { errorCode?: string; message?: string };
+        if (result?.errorCode === 'FW_BACKEND_CLEANUP_REQUIRED') {
+            await ElMessageBox.alert(
+                i18n.global.t('firewall.cleanupBeforeBackendSwitch', [previous, backend]),
+                i18n.global.t('firewall.cleanupAction'),
+                { type: 'warning' },
+            );
+        } else if (result?.message) {
+            MsgError(result.message);
+        }
         if (savedBackends.value[subsystem] !== backend) {
             group.selected = savedBackends.value[subsystem];
         }

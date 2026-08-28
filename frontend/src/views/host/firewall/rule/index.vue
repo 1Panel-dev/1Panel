@@ -2,7 +2,7 @@
     <div>
         <FireRouter />
 
-        <div v-loading="loading">
+        <div>
             <FireStatus
                 ref="fireStatusRef"
                 v-model:loading="loading"
@@ -16,15 +16,24 @@
             >
                 <template v-if="canReset" #actions>
                     <el-divider direction="vertical" />
-                    <el-button v-permission v-node-admin type="primary" link :loading="resetting" @click="resetRules">
+                    <el-button
+                        v-permission
+                        v-node-admin
+                        type="primary"
+                        link
+                        :disabled="loading"
+                        :loading="resetting"
+                        @click="resetRules"
+                    >
                         {{ $t('firewall.cleanupAction') }}
                     </el-button>
                 </template>
             </FireStatus>
 
             <div v-if="provider !== '-'">
-                <el-card v-if="isDirectBackend && (!isInit || !isBind)" class="mask-prompt">
-                    <span v-if="!isInit">{{ $t('firewall.initHelper', [provider]) }}</span>
+                <el-card v-if="showFirewallUnavailablePrompt" class="mask-prompt">
+                    <span v-if="isServiceBackend">{{ $t('firewall.firewallNotStart') }}</span>
+                    <span v-else-if="!isInit">{{ $t('firewall.initHelper', [provider]) }}</span>
                     <span v-else>{{ $t('firewall.basicStatus') }}</span>
                 </el-card>
 
@@ -40,13 +49,13 @@
                         />
                     </template>
                     <template #leftToolBar>
-                        <el-button v-permission v-node-admin type="primary" @click="openCreate">
+                        <el-button v-permission v-node-admin type="primary" :disabled="loading" @click="openCreate">
                             {{ $t('commons.button.create') }}
                         </el-button>
                         <el-button
                             v-permission
                             v-node-admin
-                            :disabled="!canSyncRules"
+                            :disabled="loading || !canSyncRules"
                             :loading="syncOpening"
                             @click="openRuleSync"
                         >
@@ -55,18 +64,18 @@
                         <el-button
                             v-permission
                             v-node-admin
-                            :disabled="selects.length === 0"
+                            :disabled="loading || selects.length === 0"
                             @click="removeSelectedRules"
                         >
                             {{ $t('commons.button.delete') }}
                         </el-button>
                         <el-button-group>
-                            <el-button v-permission v-node-admin @click="openImport">
+                            <el-button v-permission v-node-admin :disabled="loading" @click="openImport">
                                 {{ $t('commons.button.import') }}
                             </el-button>
                             <el-button
                                 v-permission
-                                :disabled="allManagedRules.length === 0"
+                                :disabled="loading || allManagedRules.length === 0"
                                 @click="exportRulesBySelection"
                             >
                                 {{ $t('commons.button.export') }}
@@ -74,6 +83,31 @@
                         </el-button-group>
                     </template>
                     <template #rightToolBar>
+                        <el-popover
+                            v-if="provider === 'iptables' || provider === 'nftables'"
+                            placement="bottom"
+                            trigger="click"
+                            :width="230"
+                        >
+                            <template #reference>
+                                <el-button
+                                    :type="iptablesChainFilterActive ? 'primary' : 'default'"
+                                    :icon="Filter"
+                                    :title="$t('menu.filter')"
+                                    plain
+                                />
+                            </template>
+                            <div class="firewall-chain-filter-title">{{ $t('firewall.chain') }}</div>
+                            <el-checkbox-group
+                                v-model="visibleIptablesChains"
+                                class="firewall-chain-filter-options"
+                                @change="changeIptablesChainFilter"
+                            >
+                                <el-checkbox v-for="chain in iptablesChains" :key="chain" :value="chain">
+                                    {{ chain }}
+                                </el-checkbox>
+                            </el-checkbox-group>
+                        </el-popover>
                         <div class="firewall-filter-bar">
                             <el-select
                                 v-model="selectedRuleFilters"
@@ -144,7 +178,7 @@
                         <TableSetting title="firewall-rule-refresh" @search="search" />
                     </template>
                     <template #main>
-                        <div>
+                        <div v-loading="loading">
                             <ComplexTable
                                 v-model:selects="selects"
                                 :pagination-config="paginationConfig"
@@ -365,7 +399,7 @@ import ProcessDetail from '@/views/host/process/process/detail/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { ElMessageBox } from 'element-plus';
-import { Expand, Lock, WarningFilled } from '@element-plus/icons-vue';
+import { Expand, Filter, Lock, WarningFilled } from '@element-plus/icons-vue';
 
 interface RuleRow extends Firewall.InventoryItem {
     rowKey: string;
@@ -405,14 +439,20 @@ const isInit = ref(false);
 const isBind = ref(false);
 const provider = ref('');
 const isDirectBackend = computed(() => provider.value === 'iptables' || provider.value === 'nftables');
+const isServiceBackend = computed(() => provider.value === 'firewalld' || provider.value === 'ufw');
 const canReset = computed(
     () =>
         ['iptables', 'nftables', 'firewalld', 'ufw'].includes(provider.value) &&
         (isDirectBackend.value ? isInit.value : true),
 );
 const isFirewallReady = computed(() => (isDirectBackend.value ? isInit.value && isBind.value : isActive.value));
+const showFirewallUnavailablePrompt = computed(
+    () => (isDirectBackend.value && (!isInit.value || !isBind.value)) || (isServiceBackend.value && !isActive.value),
+);
 const firewallVersion = ref('');
 const selectedRuleFilters = ref<RuleFilter[]>([]);
+const iptablesChains = ['1PANEL_BASIC_BEFORE', '1PANEL_BASIC', '1PANEL_BASIC_AFTER'] as const;
+const visibleIptablesChains = ref<string[]>([...iptablesChains]);
 const searchName = ref('');
 const inventoryItems = ref<Firewall.InventoryItem[]>([]);
 const listeningProcesses = ref<Process.ListeningProcess[]>([]);
@@ -420,6 +460,7 @@ const dockerEndpoints = ref<Firewall.DockerGuardEndpoint[]>([]);
 const selects = ref<RuleRow[]>([]);
 const scopeNotices = ref<Firewall.ScopeNotice[]>([]);
 
+const iptablesChainFilterActive = computed(() => visibleIptablesChains.value.length < iptablesChains.length);
 const supportsFirewalldPriority = computed(() => {
     if (provider.value !== 'firewalld') return true;
     const match = firewallVersion.value.trim().match(/^(\d+)\.(\d+)/);
@@ -782,7 +823,7 @@ const filteredItems = computed<RuleRow[]>(() => {
     return allRows.value.filter((item) => {
         if (
             (item.rule.scope.provider === 'iptables' || item.rule.scope.provider === 'nftables') &&
-            item.rule.scope.chain !== '1PANEL_BASIC'
+            !visibleIptablesChains.value.includes(item.rule.scope.chain || '')
         ) {
             return false;
         }
@@ -814,6 +855,11 @@ const pagedItems = computed(() => {
 
 const resetPagination = () => {
     paginationConfig.currentPage = 1;
+};
+
+const changeIptablesChainFilter = () => {
+    selects.value = [];
+    resetPagination();
 };
 
 const changeRuleFilter = () => {
@@ -1153,6 +1199,7 @@ const removeRule = (row: RuleRow) => removeRules([row]);
 const isEditableManagedRule = (row: Firewall.InventoryItem) =>
     Boolean(row.desired?.uuid) &&
     (row.desired?.origin === 'created' || row.desired?.origin === 'adopted') &&
+    !row.desired?.protected &&
     !isIptablesSystemPresetScope(row.rule.scope) &&
     row.state !== 'drifted' &&
     row.state !== 'protected';
@@ -1163,6 +1210,7 @@ const isMissingManagedRule = (row: Firewall.InventoryItem) =>
 const isDeletableManagedRule = (row: Firewall.InventoryItem) =>
     Boolean(row.desired?.uuid) &&
     (row.desired?.origin === 'created' || row.desired?.origin === 'adopted') &&
+    !row.desired?.protected &&
     !isIptablesSystemPresetScope(row.rule.scope) &&
     row.state !== 'protected' &&
     (row.state !== 'drifted' || isMissingManagedRule(row));
@@ -1234,6 +1282,17 @@ onMounted(() => {
 
 .firewall-rule-filter {
     width: 400px;
+}
+
+.firewall-chain-filter-title {
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.firewall-chain-filter-options {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .firewall-action {

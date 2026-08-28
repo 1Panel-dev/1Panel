@@ -4178,16 +4178,16 @@ const message = {
         resetDirectRulesHelper:
             'Delete all 1Panel system firewall chains, runtime rules, and persisted files from {0}; saved database policies are retained',
         resetWhitelistRulesHelper:
-            'Clear the active custom firewall configuration from {0}, restore installation defaults, and disable {0}; saved database policies are retained and can be synchronized again.',
+            'Reset the active custom firewall configuration in {0}, restore installation defaults, and disable {0}; saved database policies are retained and can be synchronized again.',
         cleanupForwardingBackendHelper:
-            'Delete all 1Panel port forwarding rules and chains from {0}, retaining only database data',
+            'Reset the 1Panel port forwarding runtime rules in {0}: delete all related rules and chains while retaining database data',
         cleanupDockerBackendHelper:
-            'Delete all 1Panel Docker port protection rules and chains from {0}, retaining only database data',
+            'Reset the 1Panel Docker port protection runtime rules in {0}: delete all related rules and chains while retaining database data',
         cleanupBeforeBackendSwitch:
-            'The current {0} backend still contains 1Panel runtime rules. Clean it up before switching to {1}.',
+            'The current {0} backend still contains 1Panel runtime rules. Reset it before switching to {1}.',
         cleanupAction: 'Reset',
         backendSwitchNotice:
-            'Clean the current backend before switching the system firewall, port forwarding, or Docker protection. Saved database policies are retained and can be initialized or synchronized after switching.',
+            'Reset the current backend before switching the system firewall, port forwarding, or Docker protection. Saved database policies are retained and can be initialized or synchronized after switching.',
         switchBackendHelper: 'Switch to {0}?',
         switchDockerBackendHelper: 'Switch to {0}? This will update the Docker configuration and restart Docker.',
         uninstalledStatus: 'Not installed',
@@ -4213,9 +4213,6 @@ const message = {
         orphanPolicies: 'Unassociated rules',
         orphanPoliciesHelper:
             'The following {0} rule(s) are not bound to a Docker port. They will be bound automatically when a matching port is detected.',
-        exposure: 'Exposure',
-        externallyExposed: 'Allow external access (0.0.0.0 / ::)',
-        restrictedBinding: 'Deny external access (127.0.0.1 / ::1)',
         composeOrApp: 'Compose / App',
         sources: 'Sources',
         deniedSources: 'Denied sources',
