@@ -24,6 +24,17 @@ type IFirewallSettingService interface {
 
 type FirewallSettingService struct{}
 
+var ErrFirewallBackendCleanupRequired = errors.New("firewall backend cleanup required")
+
+func firewallBackendCleanupRequired(current, target string) error {
+	return fmt.Errorf(
+		"%w: current backend %s still contains 1Panel runtime rules; clean it up before switching to %s",
+		ErrFirewallBackendCleanupRequired,
+		current,
+		target,
+	)
+}
+
 func NewIFirewallSettingService() IFirewallSettingService {
 	return &FirewallSettingService{}
 }
@@ -213,7 +224,7 @@ func (s *FirewallSettingService) operateDocker(ctx context.Context, request dto.
 			return err
 		}
 		if current != request.Backend && initialized {
-			return fmt.Errorf("clean up the current Docker firewall backend %s before switching to %s", current, request.Backend)
+			return firewallBackendCleanupRequired(current, request.Backend)
 		}
 	}
 	if err := settingRepo.UpdateOrCreate(constant.FirewallDockerBackendKey, request.Backend); err != nil {
@@ -267,7 +278,7 @@ func (s *FirewallSettingService) operateSystem(request dto.FirewallBackendOperat
 			return err
 		}
 		if initialized {
-			return fmt.Errorf("clean up the current system firewall backend %s before switching to %s", previous, request.Backend)
+			return firewallBackendCleanupRequired(previous, request.Backend)
 		}
 	}
 	if err := settingRepo.UpdateOrCreate(constant.FirewallSystemBackendKey, request.Backend); err != nil {
@@ -374,7 +385,7 @@ func (s *FirewallSettingService) operateForwarding(request dto.FirewallBackendOp
 			return err
 		}
 		if current != request.Backend && initialized {
-			return fmt.Errorf("clean up the current forwarding backend %s before switching to %s", current, request.Backend)
+			return firewallBackendCleanupRequired(current, request.Backend)
 		}
 	}
 	if err := settingRepo.UpdateOrCreate(constant.FirewallForwardingBackendKey, request.Backend); err != nil {

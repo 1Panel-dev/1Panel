@@ -158,6 +158,8 @@ ErrCustomApps: 'Установлено приложение. Сначала уд
 ErrCustomRuntimes: 'Установлена среда выполнения. Сначала удалите ее'
 ErrAppVersionDeprecated: 'Приложение {{ .name }} несовместимо с текущей версией 1Panel, пропущено'
 ErrDockerFailed: 'Состояние Docker аномально, проверьте состояние сервиса'
+ErrDockerIptablesChainUnavailable: 'Цепочка Docker DOCKER-USER не найдена. Перезапустите Docker и повторите попытку'
+ErrDockerNftablesChainUnavailable: 'Цепочка IPv4 брандмауэра nftables Docker не найдена. Убедитесь, что текущая версия Docker поддерживает бэкенд брандмауэра nftables, перезапустите Docker и повторите попытку'
 ErrDockerComposeCmdNotFound: 'Команда Docker Compose отсутствует, пожалуйста, установите эту команду на хост-машине сначала'
 UseExistImage: 'Образ уже существует, используется существующий образ'
 UpgradePrepare: 'Подготовка обновления приложения'

@@ -4194,16 +4194,16 @@ const message = {
         resetDirectRulesHelper:
             '{0} içindeki 1Panel sistem güvenlik duvarı zincirlerini, çalışma zamanı kurallarını ve kalıcı dosyaları silin; veritabanı ilkelerini koruyun',
         resetWhitelistRulesHelper:
-            '{0} içindeki etkin özel yapılandırmayı temizleyin, kurulum varsayılanlarını geri yükleyin ve {0} öğesini devre dışı bırakın; veritabanı ilkeleri korunur ve yeniden eşitlenebilir.',
+            '{0} içindeki etkin özel yapılandırmayı sıfırlayın, kurulum varsayılanlarını geri yükleyin ve {0} öğesini devre dışı bırakın; veritabanı ilkeleri korunur ve yeniden eşitlenebilir.',
         cleanupForwardingBackendHelper:
-            '{0} içindeki tüm 1Panel bağlantı noktası yönlendirme kurallarını ve zincirlerini silin, yalnızca veritabanı verilerini koruyun',
+            '{0} içindeki 1Panel bağlantı noktası yönlendirme çalışma zamanı kurallarını sıfırlayın: ilgili tüm kuralları ve zincirleri silip veritabanı verilerini koruyun',
         cleanupDockerBackendHelper:
-            '{0} içindeki tüm 1Panel Docker bağlantı noktası koruma kurallarını ve zincirlerini silin, yalnızca veritabanı verilerini koruyun',
+            '{0} içindeki 1Panel Docker bağlantı noktası koruma çalışma zamanı kurallarını sıfırlayın: ilgili tüm kuralları ve zincirleri silip veritabanı verilerini koruyun',
         cleanupBeforeBackendSwitch:
-            'Mevcut {0} arka ucu hâlâ 1Panel çalışma zamanı kuralları içeriyor. {1} arka ucuna geçmeden önce temizleyin.',
+            'Mevcut {0} arka ucu hâlâ 1Panel çalışma zamanı kuralları içeriyor. {1} arka ucuna geçmeden önce sıfırlayın.',
         cleanupAction: 'Sıfırla',
         backendSwitchNotice:
-            'Sistem güvenlik duvarı, bağlantı noktası yönlendirme veya Docker korumasını değiştirmeden önce mevcut arka ucu temizleyin. Veritabanı ilkeleri korunur ve geçişten sonra yeniden başlatılabilir veya eşitlenebilir.',
+            'Sistem güvenlik duvarı, bağlantı noktası yönlendirme veya Docker korumasını değiştirmeden önce mevcut arka ucu sıfırlayın. Veritabanı ilkeleri korunur ve geçişten sonra yeniden başlatılabilir veya eşitlenebilir.',
         switchBackendHelper: '{0} arka ucuna geçilsin mi?',
         switchDockerBackendHelper:
             '{0} arka ucuna geçilsin mi? Docker yapılandırması güncellenecek ve Docker yeniden başlatılacak.',
@@ -4279,9 +4279,6 @@ const message = {
         orphanPolicies: 'İlişkilendirilmemiş kurallar',
         orphanPoliciesHelper:
             'Aşağıdaki {0} kural bir Docker portuna bağlı değil. Eşleşen bir port algılandığında otomatik olarak bağlanır.',
-        exposure: 'Dışa açıklık',
-        externallyExposed: 'Harici erişime izin ver (0.0.0.0 / ::)',
-        restrictedBinding: 'Harici erişimi reddet (127.0.0.1 / ::1)',
         composeOrApp: 'Compose / Uygulama',
         sources: 'Kaynaklar',
         deniedSources: 'Reddedilen kaynaklar',

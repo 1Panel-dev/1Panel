@@ -51,28 +51,6 @@
                 </el-button-group>
             </template>
             <template #rightToolBar>
-                <div class="firewall-filter-bar">
-                    <el-select
-                        v-model="selectedFilters"
-                        class="firewall-rule-filter"
-                        :placeholder="$t('menu.filter')"
-                        multiple
-                        clearable
-                        collapse-tags
-                        collapse-tags-tooltip
-                        :max-collapse-tags="4"
-                        popper-class="firewall-rule-filter-popper"
-                    >
-                        <el-option-group label="IP">
-                            <el-option label="IPv4" value="family:ipv4" />
-                            <el-option label="IPv6" value="family:ipv6" />
-                        </el-option-group>
-                        <el-option-group :label="$t('firewall.exposure')">
-                            <el-option :label="$t('firewall.externallyExposed')" value="exposure:external" />
-                            <el-option :label="$t('firewall.restrictedBinding')" value="exposure:restricted" />
-                        </el-option-group>
-                    </el-select>
-                </div>
                 <TableSearch v-model:searchName="searchName" />
                 <TableRefresh @search="search" />
             </template>
@@ -88,16 +66,61 @@
                     <el-table-column :label="$t('commons.table.port')" min-width="400">
                         <template #default="{ row }">
                             <div class="flex flex-wrap items-center gap-2">
-                                <el-tooltip
+                                <el-popover
                                     v-for="group in row.portGroups.slice(0, 5)"
                                     :key="group.key"
-                                    :content="protectionDetail(group.endpoint)"
                                     placement="top"
+                                    trigger="hover"
+                                    :width="360"
+                                    :show-after="200"
                                 >
-                                    <el-tag :type="endpointStatusType(group.endpoint)" effect="plain">
-                                        {{ group.label }}
-                                    </el-tag>
-                                </el-tooltip>
+                                    <template #reference>
+                                        <el-tag :type="endpointStatusType(group.endpoint)" effect="plain">
+                                            <span v-if="group.endpoint.policyUUID" class="docker-guard-protected-label">
+                                                <el-icon><Lock /></el-icon>
+                                                <span>{{ group.label }}</span>
+                                            </span>
+                                            <span v-else>{{ group.label }}</span>
+                                        </el-tag>
+                                    </template>
+                                    <el-descriptions class="docker-guard-descriptions" :column="1" border size="small">
+                                        <el-descriptions-item :label="$t('firewall.protectionMode')">
+                                            {{
+                                                group.endpoint.policyUUID
+                                                    ? protectionModeLabel(group.endpoint)
+                                                    : $t('firewall.dockerGuardUnprotected')
+                                            }}
+                                        </el-descriptions-item>
+                                        <el-descriptions-item
+                                            v-if="
+                                                group.endpoint.policyUUID &&
+                                                group.endpoint.mode !== 'deny_all' &&
+                                                group.endpoint.sources.length
+                                            "
+                                            :label="$t('firewall.sources')"
+                                        >
+                                            {{ displaySources(group.endpoint) }}
+                                        </el-descriptions-item>
+                                        <el-descriptions-item
+                                            v-if="group.endpoint.policyUUID"
+                                            :label="$t('commons.table.status')"
+                                        >
+                                            {{
+                                                $t(
+                                                    group.endpoint.effective
+                                                        ? 'firewall.effective'
+                                                        : 'firewall.notEffective',
+                                                )
+                                            }}
+                                        </el-descriptions-item>
+                                        <el-descriptions-item
+                                            v-if="group.endpoint.description"
+                                            :label="$t('commons.table.description')"
+                                        >
+                                            {{ group.endpoint.description }}
+                                        </el-descriptions-item>
+                                    </el-descriptions>
+                                </el-popover>
                                 <el-button v-if="row.portGroups.length > 5" plain size="small" @click="openPorts(row)">
                                     +{{ row.portGroups.length - 5 }}
                                 </el-button>
@@ -133,7 +156,7 @@
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </div>
-                <el-table
+                <ComplexTable
                     :data="orphanRows"
                     row-key="policyUUID"
                     max-height="calc(100vh - 220px)"
@@ -150,7 +173,7 @@
                         <template #default="{ row }">{{ protectionModeLabel(row) }}</template>
                     </el-table-column>
                     <el-table-column :label="$t('firewall.sources')" min-width="200" show-overflow-tooltip>
-                        <template #default="{ row }">{{ row.sources?.join(', ') || '-' }}</template>
+                        <template #default="{ row }">{{ displaySources(row) || '-' }}</template>
                     </el-table-column>
                     <el-table-column
                         prop="description"
@@ -173,7 +196,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                </el-table>
+                </ComplexTable>
             </template>
         </DrawerPro>
 
@@ -202,9 +225,11 @@ import {
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
+import { Lock } from '@element-plus/icons-vue';
 import { downloadWithContent } from '@/utils/file';
 import { getCurrentDateFormatted } from '@/utils/date';
 import { dockerGuardEndpointKey } from '@/views/host/firewall/docker/model';
+import { formatHostAddressList } from '@/views/host/firewall/utils/validation';
 
 const loading = ref(false);
 const detailRef = ref<InstanceType<typeof DockerGuardDetail>>();
@@ -213,7 +238,6 @@ const ruleSyncRef = ref<InstanceType<typeof RuleSync>>();
 const cleanupConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
 const orphanDrawerVisible = ref(false);
 const searchName = ref('');
-const selectedFilters = ref<string[]>([]);
 const selects = ref<Firewall.DockerGuardContainer[]>([]);
 const orphanSelects = ref<Firewall.DockerGuardEndpoint[]>([]);
 const data = reactive<Firewall.DockerGuardList>({
@@ -248,12 +272,6 @@ const allOrphanPolicies = computed(() => {
 
 const containerRows = computed(() => {
     const keyword = searchName.value.trim().toLowerCase();
-    const families = selectedFilters.value
-        .filter((item) => item.startsWith('family:'))
-        .map((item) => item.slice('family:'.length));
-    const exposures = selectedFilters.value
-        .filter((item) => item.startsWith('exposure:'))
-        .map((item) => item.slice('exposure:'.length));
 
     return data.containers
         .filter((container) => container.key !== '__orphan__')
@@ -263,9 +281,6 @@ const containerRows = computed(() => {
                 .filter(Boolean)
                 .some((item) => item!.toLowerCase().includes(keyword));
             const endpointMatches = (endpoint: Firewall.DockerGuardEndpoint) => {
-                if (families.length && !families.includes(endpoint.family)) return false;
-                const exposure = isExternallyExposed(endpoint) ? 'external' : 'restricted';
-                if (exposures.length && !exposures.includes(exposure)) return false;
                 if (!keyword || containerMatches) return true;
                 return [endpoint.family, endpoint.hostIP, endpoint.hostPort, endpoint.containerPort, endpoint.protocol]
                     .filter((item) => item !== undefined)
@@ -294,16 +309,7 @@ const containerRows = computed(() => {
 
 const orphanRows = computed(() => {
     const keyword = searchName.value.trim().toLowerCase();
-    const families = selectedFilters.value
-        .filter((item) => item.startsWith('family:'))
-        .map((item) => item.slice('family:'.length));
-    const exposures = selectedFilters.value
-        .filter((item) => item.startsWith('exposure:'))
-        .map((item) => item.slice('exposure:'.length));
     return allOrphanPolicies.value.filter((endpoint) => {
-        if (families.length && !families.includes(endpoint.family)) return false;
-        const exposure = isExternallyExposed(endpoint) ? 'external' : 'restricted';
-        if (exposures.length && !exposures.includes(exposure)) return false;
         if (!keyword) return true;
         return [
             endpoint.family,
@@ -375,13 +381,12 @@ const policiesFromEndpoints = (endpoints: Firewall.DockerGuardEndpoint[]) => {
     return [...result.values()];
 };
 
-const isExternallyExposed = (endpoint: Firewall.DockerGuardEndpoint) =>
-    (endpoint.family === 'ipv4' && (!endpoint.hostIP || endpoint.hostIP === '0.0.0.0')) ||
-    (endpoint.family === 'ipv6' && (!endpoint.hostIP || endpoint.hostIP === '::'));
 const endpointLabel = (endpoint: Firewall.DockerGuardEndpoint) => {
     const address = endpoint.hostIP.includes(':') ? `[${endpoint.hostIP}]` : endpoint.hostIP;
     return `${address}:${endpoint.hostPort}/${endpoint.protocol}`;
 };
+const displaySources = (endpoint: Firewall.DockerGuardEndpoint) =>
+    formatHostAddressList(endpoint.sources, endpoint.family);
 
 const search = async () => {
     loading.value = true;
@@ -493,57 +498,22 @@ const endpointStatusType = (row: Firewall.DockerGuardEndpoint) => {
     if (row.effective) return 'success';
     return row.policyUUID ? 'warning' : 'info';
 };
-const protectionDetail = (row: Firewall.DockerGuardEndpoint) => {
-    if (!row.policyUUID) return i18n.global.t('firewall.dockerGuardUnprotected');
-    let detail = i18n.global.t('firewall.denyAll');
-    if (row.mode === 'deny_sources') {
-        detail = `${i18n.global.t('firewall.deniedSources')}: ${row.sources.join(', ')}`;
-    }
-    if (row.mode === 'allow_sources' && row.sources.length) {
-        detail = `${i18n.global.t('firewall.allowedSources')}: ${row.sources.join(', ')}`;
-    }
-    if (!row.effective) {
-        detail = `${detail} · ${i18n.global.t('firewall.notEffective')}`;
-    }
-    return row.description ? `${detail}\n${row.description}` : detail;
-};
 search();
 </script>
 
 <style lang="scss" scoped>
-.firewall-filter-bar {
+.docker-guard-protected-label {
     display: inline-flex;
-    flex: none;
-    flex-wrap: nowrap;
-    gap: 8px;
+    align-items: flex-end;
+    gap: 1px;
 }
 
-.firewall-rule-filter {
-    width: 480px;
-}
-
-:global(.firewall-rule-filter-popper .el-select-group__wrap) {
-    padding: 6px 8px 8px;
-}
-
-:global(.firewall-rule-filter-popper .el-select-group__wrap:not(:last-of-type)) {
-    padding-bottom: 10px;
-}
-
-:global(.firewall-rule-filter-popper .el-select-group__wrap:not(:last-of-type)::after) {
-    display: none;
-}
-
-:global(.firewall-rule-filter-popper .el-select-group__title) {
-    height: 30px;
-    margin-bottom: 4px;
-    padding: 0 10px;
-    border-left: 3px solid var(--el-color-primary);
-    border-radius: 4px;
-    background: var(--el-fill-color-light);
-    color: var(--el-text-color-primary);
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 30px;
+.docker-guard-descriptions :deep(.el-descriptions__label) {
+    width: 96px;
+    min-width: 96px;
+    max-width: 96px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>

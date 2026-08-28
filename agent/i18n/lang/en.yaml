@@ -158,6 +158,8 @@ ErrCustomApps: 'Installed apps detected; uninstall first'
 ErrCustomRuntimes: 'Installed runtimes detected; delete first'
 ErrAppVersionDeprecated: "The {{ .name }} application is not compatible with the current 1Panel version, skipped"
 ErrDockerFailed: 'Docker is abnormal; check service status'
+ErrDockerIptablesChainUnavailable: 'The Docker DOCKER-USER chain was not found. Restart Docker and try again'
+ErrDockerNftablesChainUnavailable: 'The Docker nftables IPv4 firewall chain was not found. Verify that the current Docker version supports the nftables firewall backend, restart Docker, and try again'
 ErrDockerComposeCmdNotFound: 'Docker Compose not found on host'
 UseExistImage: 'Image exists; using existing image'
 UpgradePrepare: 'Prepare application upgrade'

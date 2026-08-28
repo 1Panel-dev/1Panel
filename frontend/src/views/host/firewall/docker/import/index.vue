@@ -27,7 +27,7 @@
                     <template #default="{ row }">{{ modeLabel(row.mode) }}</template>
                 </el-table-column>
                 <el-table-column :label="$t('firewall.protection')" min-width="180">
-                    <template #default="{ row }">{{ row.sources.join(', ') || '-' }}</template>
+                    <template #default="{ row }">{{ displaySources(row) || '-' }}</template>
                 </el-table-column>
                 <el-table-column :label="$t('commons.table.description')" prop="description" min-width="150" />
             </ComplexTable>
@@ -49,6 +49,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
 import { ref } from 'vue';
 import { dockerGuardEndpointKey, normalizeDockerGuardPolicy } from '@/views/host/firewall/docker/model';
+import { formatHostAddressList } from '@/views/host/firewall/utils/validation';
 
 const emit = defineEmits<{ (event: 'search'): void }>();
 const visible = ref(false);
@@ -57,6 +58,7 @@ const policies = ref<Firewall.DockerGuardPolicy[]>([]);
 const selects = ref<Firewall.DockerGuardPolicy[]>([]);
 const uploadRef = ref();
 const uploaderFiles = ref<UploadFile[]>([]);
+const displaySources = (policy: Firewall.DockerGuardPolicy) => formatHostAddressList(policy.sources, policy.family);
 
 const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     if (!uploadFile.raw) return;

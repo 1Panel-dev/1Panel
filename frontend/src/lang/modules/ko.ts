@@ -4034,16 +4034,16 @@ const message = {
         resetDirectRulesHelper:
             '{0}에서 1Panel 시스템 방화벽 체인, 실행 규칙 및 영구 파일을 삭제하고 데이터베이스 정책은 유지합니다',
         resetWhitelistRulesHelper:
-            '{0}의 활성 사용자 설정을 정리하고 설치 기본값으로 복원한 후 비활성화합니다. 데이터베이스 정책은 유지되며 나중에 다시 동기화할 수 있습니다.',
+            '{0}의 활성 사용자 설정을 재설정하고 설치 기본값으로 복원한 후 비활성화합니다. 데이터베이스 정책은 유지되며 나중에 다시 동기화할 수 있습니다.',
         cleanupForwardingBackendHelper:
-            '{0}의 모든 1Panel 포트 전달 규칙과 체인을 삭제하고 데이터베이스 데이터만 유지합니다',
+            '{0}의 1Panel 포트 전달 런타임 규칙을 재설정합니다. 관련 규칙과 체인을 모두 삭제하고 데이터베이스 데이터는 유지합니다',
         cleanupDockerBackendHelper:
-            '{0}의 모든 1Panel Docker 포트 보호 규칙과 체인을 삭제하고 데이터베이스 데이터만 유지합니다',
+            '{0}의 1Panel Docker 포트 보호 런타임 규칙을 재설정합니다. 관련 규칙과 체인을 모두 삭제하고 데이터베이스 데이터는 유지합니다',
         cleanupBeforeBackendSwitch:
-            '현재 {0} 백엔드에 1Panel 런타임 규칙이 남아 있습니다. {1}(으)로 전환하기 전에 먼저 정리하세요.',
+            '현재 {0} 백엔드에 1Panel 런타임 규칙이 남아 있습니다. {1}(으)로 전환하기 전에 먼저 재설정하세요.',
         cleanupAction: '재설정',
         backendSwitchNotice:
-            '시스템 방화벽, 포트 전달 또는 Docker 보호를 전환하기 전에 현재 백엔드를 정리하세요. 데이터베이스 정책은 유지되며 전환 후 다시 초기화하거나 동기화할 수 있습니다.',
+            '시스템 방화벽, 포트 전달 또는 Docker 보호를 전환하기 전에 현재 백엔드를 재설정하세요. 데이터베이스 정책은 유지되며 전환 후 다시 초기화하거나 동기화할 수 있습니다.',
         switchBackendHelper: '{0}(으)로 전환하시겠습니까?',
         switchDockerBackendHelper: '{0}(으)로 전환하시겠습니까? Docker 설정을 업데이트하고 Docker를 재시작합니다.',
         ruleSyncTitle: '규칙 동기화',
@@ -4116,9 +4116,6 @@ const message = {
         orphanPolicies: '연결되지 않은 규칙',
         orphanPoliciesHelper:
             '다음 {0}개 규칙은 Docker 포트에 바인딩되지 않았습니다. 일치하는 포트가 감지되면 자동으로 바인딩됩니다.',
-        exposure: '노출 상태',
-        externallyExposed: '외부 접근 허용 (0.0.0.0 / ::)',
-        restrictedBinding: '외부 접근 거부 (127.0.0.1 / ::1)',
         composeOrApp: 'Compose / 앱',
         sources: '소스',
         deniedSources: '거부된 소스',

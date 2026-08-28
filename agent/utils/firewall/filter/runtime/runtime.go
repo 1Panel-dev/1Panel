@@ -124,6 +124,10 @@ func (e *Engine) CompileDesired(
 	origin filter.RuleOrigin,
 	rules []filter.FirewallRule,
 ) ([]filter.DesiredRule, error) {
+	capabilities, err := e.Capabilities(ctx)
+	if err != nil {
+		return nil, err
+	}
 	result := make([]filter.DesiredRule, 0, len(rules))
 	scopeOrdinals := make(map[string]int)
 	for _, rule := range rules {
@@ -142,10 +146,11 @@ func (e *Engine) CompileDesired(
 		ordinal := scopeOrdinals[scopeKey]
 		scopeOrdinals[scopeKey] = ordinal + 1
 		prepared.UUID = compiledRuleUUID(policyUUID, ruleKey, ordinal)
-		result = append(result, filter.DesiredRule{
-			UUID: policyUUID, Rule: prepared, RuleKey: ruleKey, Origin: origin,
-			Marker: "1panel-rule:" + prepared.UUID,
-		})
+		desired := filter.DesiredRule{UUID: policyUUID, Rule: prepared, RuleKey: ruleKey, Origin: origin}
+		if capabilities.Marker {
+			desired.Marker = "1panel-rule:" + prepared.UUID
+		}
+		result = append(result, desired)
 	}
 	return result, nil
 }

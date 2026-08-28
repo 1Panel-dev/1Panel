@@ -43,11 +43,13 @@ type DockerPortGuardService struct {
 }
 
 var (
-	dockerPortGuardServiceMu sync.Mutex
-	dockerPortGuardSyncMu    sync.RWMutex
-	dockerPortGuardSyncErr   error
-	ErrDockerGuardInvalid    = docker_guard.ErrInvalidPolicy
-	ErrDockerUnavailable     = docker.ErrUnavailable
+	dockerPortGuardServiceMu          sync.Mutex
+	dockerPortGuardSyncMu             sync.RWMutex
+	dockerPortGuardSyncErr            error
+	ErrDockerGuardInvalid             = docker_guard.ErrInvalidPolicy
+	ErrDockerUnavailable              = docker.ErrUnavailable
+	ErrDockerIptablesChainUnavailable = docker_guard.ErrDockerIptablesChainUnavailable
+	ErrDockerNftablesChainUnavailable = docker_guard.ErrDockerNftablesChainUnavailable
 )
 
 type IDockerPortGuardService interface {

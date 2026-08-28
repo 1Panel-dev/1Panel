@@ -70,6 +70,12 @@ export const formatHostAddress = (value?: string, family?: FirewallAddressFamily
     return validHost ? host : address;
 };
 
+export const formatHostAddressList = (values: string[] = [], family?: FirewallAddressFamily): string =>
+    values
+        .map((value) => formatHostAddress(value, family))
+        .filter(Boolean)
+        .join(', ');
+
 export const normalizePortRange = (value: string): string => {
     const matched = value.trim().match(/^(\d+)(?:[:-](\d+))?$/);
     if (!matched) throw new Error('invalid port range');

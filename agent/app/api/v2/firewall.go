@@ -468,6 +468,16 @@ func (b *BaseApi) OperateFirewallBackend(c *gin.Context) {
 		return
 	}
 	if err := firewallSettingService.Operate(c.Request.Context(), request); err != nil {
+		if errors.Is(err, service.ErrFirewallBackendCleanupRequired) {
+			helper.ErrorWithBusinessCode(
+				c,
+				http.StatusConflict,
+				"FW_BACKEND_CLEANUP_REQUIRED",
+				"ErrInvalidParams",
+				err,
+			)
+			return
+		}
 		helper.InternalServer(c, err)
 		return
 	}
@@ -583,6 +593,14 @@ func (b *BaseApi) UpsertDockerPortGuardPolicies(c *gin.Context) {
 }
 
 func handleDockerPortGuardError(c *gin.Context, err error) {
+	if errors.Is(err, service.ErrDockerIptablesChainUnavailable) {
+		helper.ErrorWithBusinessCode(c, http.StatusServiceUnavailable, "FW_DOCKER_IPTABLES_CHAIN_UNAVAILABLE", "ErrDockerIptablesChainUnavailable", err)
+		return
+	}
+	if errors.Is(err, service.ErrDockerNftablesChainUnavailable) {
+		helper.ErrorWithBusinessCode(c, http.StatusServiceUnavailable, "FW_DOCKER_NFTABLES_CHAIN_UNAVAILABLE", "ErrDockerNftablesChainUnavailable", err)
+		return
+	}
 	if errors.Is(err, service.ErrDockerGuardInvalid) {
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_DOCKER_GUARD_INVALID", "ErrInvalidParams", err)
 		return

@@ -35,7 +35,11 @@ const (
 	ReasonInspectFailed      = "inspect_failed"
 )
 
-var ErrDockerChainUnavailable = errors.New("Docker DOCKER-USER chain is unavailable")
+var (
+	ErrDockerChainUnavailable         = errors.New("Docker DOCKER-USER chain is unavailable")
+	ErrDockerIptablesChainUnavailable = fmt.Errorf("%w for iptables", ErrDockerChainUnavailable)
+	ErrDockerNftablesChainUnavailable = fmt.Errorf("%w for nftables", ErrDockerChainUnavailable)
+)
 
 type FamilyError struct {
 	Family string
@@ -287,7 +291,7 @@ func (m *Manager) bindExistingFamily(executable string, required bool) error {
 	}
 	if !chainDeclared(output, DockerChain) {
 		if required {
-			return fmt.Errorf("%w for %s", ErrDockerChainUnavailable, executable)
+			return ErrDockerIptablesChainUnavailable
 		}
 		return nil
 	}
@@ -313,7 +317,7 @@ func (m *Manager) ensureFamily(executable string, required bool) error {
 	}
 	if !chainDeclared(output, DockerChain) {
 		if required {
-			return fmt.Errorf("%w for %s", ErrDockerChainUnavailable, executable)
+			return ErrDockerIptablesChainUnavailable
 		}
 		return nil
 	}

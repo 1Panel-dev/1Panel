@@ -158,6 +158,8 @@ ErrCustomApps: '설치된 애플리케이션이 있습니다. 먼저 제거해 �
 ErrCustomRuntimes: '설치된 런타임 환경이 있습니다. 먼저 삭제해 주세요'
 ErrAppVersionDeprecated: '{{ .name }} 응용 프로그램은 현재 1Panel 버전과 호환되지 않아 건너뛰었습니다'
 ErrDockerFailed: 'Docker의 상태가 비정상입니다. 서비스 상태를 확인하세요'
+ErrDockerIptablesChainUnavailable: 'Docker DOCKER-USER 체인을 찾을 수 없습니다. Docker를 다시 시작한 후 재시도하세요'
+ErrDockerNftablesChainUnavailable: 'Docker nftables IPv4 방화벽 체인을 찾을 수 없습니다. 현재 Docker 버전이 nftables 방화벽 백엔드를 지원하는지 확인하고 Docker를 다시 시작한 후 재시도하세요'
 ErrDockerComposeCmdNotFound: 'Docker Compose 명령이 없습니다. 호스트 머신에 먼저 이 명령을 설치하세요'
 UseExistImage: '이미지가 이미 존재하여 기존 이미지를 사용합니다'
 UpgradePrepare: '애플리케이션 업그레이드 준비'

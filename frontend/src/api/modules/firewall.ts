@@ -86,5 +86,8 @@ export const deleteDockerPortGuardPolicies = (request: Firewall.DockerGuardPolic
 
 export const loadFirewallSettings = () => http.get<Firewall.Settings>('/hosts/firewall/settings');
 
-export const operateFirewallBackend = (request: Firewall.BackendOperateRequest) =>
-    http.post('/hosts/firewall/settings/operate', request, TimeoutEnum.T_10M);
+export const operateFirewallBackend = (request: Firewall.BackendOperateRequest, skipErrorMessage = false) =>
+    http.postWithConfig('/hosts/firewall/settings/operate', request, {
+        timeout: TimeoutEnum.T_10M,
+        skipErrorMessage,
+    });

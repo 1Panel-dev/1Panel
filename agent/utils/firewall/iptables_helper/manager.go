@@ -427,12 +427,16 @@ func buildRequiredPortsRestoreScript(
 	}
 
 	if includeDefaults {
-		for _, rule := range []struct{ raw, line string }{
-			{"-A " + BasicBeforeChain + " " + IoRuleIn, "-A " + BasicBeforeChain + " " + IoRuleIn},
-			{"-A " + BasicBeforeChain + " " + EstablishedRule, "-A " + BasicBeforeChain + " " + EstablishedRule},
+		for _, rule := range []string{
+			"-A " + BasicBeforeChain + " " + IoRuleIn,
+			"-A " + BasicBeforeChain + " " + EstablishedRule,
 		} {
-			if !containsIptablesRule(beforeRaw, rule.raw) {
-				commands = append(commands, rule.line)
+			count := countIptablesRule(beforeRaw, rule)
+			for duplicate := 1; duplicate < count; duplicate++ {
+				commands = append(commands, strings.Replace(rule, "-A ", "-D ", 1))
+			}
+			if count == 0 {
+				commands = append(commands, rule)
 			}
 		}
 	}
@@ -466,12 +470,17 @@ func iptablesPortRuleLine(operation, chain, protocol, port string) string {
 }
 
 func containsIptablesRule(output, rule string) bool {
+	return countIptablesRule(output, rule) > 0
+}
+
+func countIptablesRule(output, rule string) int {
+	count := 0
 	for _, line := range strings.Split(output, "\n") {
 		if strings.TrimSpace(line) == rule {
-			return true
+			count++
 		}
 	}
-	return false
+	return count
 }
 
 func (m *Manager) updateSetting(key, value string) error {

@@ -4173,16 +4173,16 @@ const message = {
         resetDirectRulesHelper:
             'Elimina de {0} las cadenas, reglas activas y archivos persistentes del firewall de 1Panel; se conservan las políticas de la base de datos',
         resetWhitelistRulesHelper:
-            'Limpia de {0} la configuración personalizada activa, restaura los valores iniciales y desactiva {0}; las políticas de la base de datos se conservan y pueden volver a sincronizarse.',
+            'Restablece la configuración personalizada activa en {0}, restaura los valores iniciales y desactiva {0}; las políticas de la base de datos se conservan y pueden volver a sincronizarse.',
         cleanupForwardingBackendHelper:
-            'Elimina de {0} todas las reglas y cadenas de reenvío de puertos de 1Panel, conservando solo los datos de la base de datos',
+            'Restablece las reglas de ejecución del reenvío de puertos de 1Panel en {0}: elimina todas las reglas y cadenas relacionadas y conserva los datos de la base de datos',
         cleanupDockerBackendHelper:
-            'Elimina de {0} todas las reglas y cadenas de protección de puertos Docker de 1Panel, conservando solo los datos de la base de datos',
+            'Restablece las reglas de ejecución de protección de puertos Docker de 1Panel en {0}: elimina todas las reglas y cadenas relacionadas y conserva los datos de la base de datos',
         cleanupBeforeBackendSwitch:
-            'El backend actual {0} todavía contiene reglas de ejecución de 1Panel. Límpielo antes de cambiar a {1}.',
+            'El backend actual {0} todavía contiene reglas de ejecución de 1Panel. Restablézcalo antes de cambiar a {1}.',
         cleanupAction: 'Restablecer',
         backendSwitchNotice:
-            'Limpia el backend actual antes de cambiar el firewall del sistema, el reenvío de puertos o la protección Docker. Las políticas de la base de datos se conservan y pueden inicializarse o sincronizarse después.',
+            'Restablece el backend actual antes de cambiar el firewall del sistema, el reenvío de puertos o la protección Docker. Las políticas de la base de datos se conservan y pueden inicializarse o sincronizarse después.',
         switchBackendHelper: '¿Cambiar a {0}?',
         switchDockerBackendHelper: '¿Cambiar a {0}? Esto actualizará la configuración y reiniciará Docker.',
         ruleSyncTitle: 'Sincronizar reglas',
@@ -4260,9 +4260,6 @@ const message = {
         orphanPolicies: 'Reglas sin asociar',
         orphanPoliciesHelper:
             'Las siguientes {0} regla(s) no están vinculadas a ningún puerto Docker. Se vincularán automáticamente cuando se detecte un puerto coincidente.',
-        exposure: 'Exposición',
-        externallyExposed: 'Permitir acceso externo (0.0.0.0 / ::)',
-        restrictedBinding: 'Denegar acceso externo (127.0.0.1 / ::1)',
         composeOrApp: 'Compose / Aplicación',
         sources: 'Orígenes',
         deniedSources: 'Orígenes denegados',

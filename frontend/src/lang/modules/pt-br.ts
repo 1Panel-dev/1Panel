@@ -4214,16 +4214,16 @@ const message = {
         resetDirectRulesHelper:
             'Exclua de {0} as cadeias, regras em execução e arquivos persistentes do firewall do 1Panel; as políticas salvas no banco são mantidas',
         resetWhitelistRulesHelper:
-            'Limpe de {0} a configuração personalizada ativa, restaure os padrões de instalação e desative {0}; as políticas do banco são mantidas e podem ser sincronizadas novamente.',
+            'Redefina a configuração personalizada ativa em {0}, restaure os padrões de instalação e desative {0}; as políticas do banco são mantidas e podem ser sincronizadas novamente.',
         cleanupForwardingBackendHelper:
-            'Exclua de {0} todas as regras e cadeias de encaminhamento de portas do 1Panel, mantendo apenas os dados do banco de dados',
+            'Redefina as regras de execução de encaminhamento de portas do 1Panel em {0}: exclua todas as regras e cadeias relacionadas e mantenha os dados do banco de dados',
         cleanupDockerBackendHelper:
-            'Exclua de {0} todas as regras e cadeias de proteção de portas Docker do 1Panel, mantendo apenas os dados do banco de dados',
+            'Redefina as regras de execução de proteção de portas Docker do 1Panel em {0}: exclua todas as regras e cadeias relacionadas e mantenha os dados do banco de dados',
         cleanupBeforeBackendSwitch:
-            'O backend atual {0} ainda contém regras de execução do 1Panel. Limpe-o antes de mudar para {1}.',
+            'O backend atual {0} ainda contém regras de execução do 1Panel. Redefina-o antes de mudar para {1}.',
         cleanupAction: 'Redefinir',
         backendSwitchNotice:
-            'Limpe o backend atual antes de trocar o firewall do sistema, o encaminhamento de portas ou a proteção Docker. As políticas do banco são mantidas e podem ser inicializadas ou sincronizadas após a troca.',
+            'Redefina o backend atual antes de trocar o firewall do sistema, o encaminhamento de portas ou a proteção Docker. As políticas do banco são mantidas e podem ser inicializadas ou sincronizadas após a troca.',
         switchBackendHelper: 'Mudar para {0}?',
         switchDockerBackendHelper: 'Mudar para {0}? Isso atualizará a configuração e reiniciará o Docker.',
         ruleSyncTitle: 'Sincronizar regras',
@@ -4299,9 +4299,6 @@ const message = {
         orphanPolicies: 'Regras não associadas',
         orphanPoliciesHelper:
             'As {0} regra(s) a seguir não estão vinculadas a uma porta Docker. Elas serão vinculadas automaticamente quando uma porta correspondente for detectada.',
-        exposure: 'Exposição',
-        externallyExposed: 'Permitir acesso externo (0.0.0.0 / ::)',
-        restrictedBinding: 'Negar acesso externo (127.0.0.1 / ::1)',
         composeOrApp: 'Compose / Aplicativo',
         sources: 'Origens',
         deniedSources: 'Origens negadas',

@@ -164,7 +164,7 @@ func (m *NftablesManager) ensureFamily(family string, required bool) error {
 	}
 	if !m.objectExists("table", tableFamily, dockerNftTable) {
 		if required {
-			return fmt.Errorf("%w for nftables %s", ErrDockerChainUnavailable, family)
+			return fmt.Errorf("%w %s", ErrDockerNftablesChainUnavailable, family)
 		}
 		return nil
 	}
@@ -206,7 +206,7 @@ func (m *NftablesManager) bindExistingFamily(family string, required bool) error
 	}
 	if !m.objectExists("table", tableFamily, dockerNftTable) {
 		if required {
-			return fmt.Errorf("%w for nftables %s", ErrDockerChainUnavailable, family)
+			return fmt.Errorf("%w %s", ErrDockerNftablesChainUnavailable, family)
 		}
 		return nil
 	}

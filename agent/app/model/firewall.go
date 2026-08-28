@@ -144,6 +144,10 @@ func (rule FirewallRule) RulesForProvider(provider filter.Provider) ([]filter.Fi
 		Interface: rule.Interface, ConnectionStates: connectionStates,
 		Action: filter.Action(rule.Action), Description: rule.Description,
 	}
+	if provider != filter.ProviderUFW && strings.EqualFold(strings.TrimSpace(base.Protocol), "all") &&
+		strings.TrimSpace(base.SourcePort) == "" && strings.TrimSpace(base.DestinationPort) != "" {
+		base.Protocol = "tcp/udp"
+	}
 	if provider == filter.ProviderFirewalld {
 		base.Priority = rule.Priority
 	}
