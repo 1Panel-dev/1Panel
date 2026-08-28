@@ -16,6 +16,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -1758,7 +1759,10 @@ func checkPortStats(ports []dto.PortHelper, checkInUse bool) (nat.PortMap, error
 			}
 			for i := 0; i <= hostEnd-hostStart; i++ {
 				bindItem := nat.PortBinding{HostPort: strconv.Itoa(hostStart + i), HostIP: port.HostIP}
-				portMap[nat.Port(fmt.Sprintf("%d/%s", containerStart+i, port.Protocol))] = []nat.PortBinding{bindItem}
+				portKey := nat.Port(fmt.Sprintf("%d/%s", containerStart+i, port.Protocol))
+				if !slices.Contains(portMap[portKey], bindItem) {
+					portMap[portKey] = append(portMap[portKey], bindItem)
+				}
 			}
 			for i := hostStart; i <= hostEnd; i++ {
 				if checkInUse && common.ScanPortWithIP(port.HostIP, i) {
@@ -1776,7 +1780,10 @@ func checkPortStats(ports []dto.PortHelper, checkInUse bool) (nat.PortMap, error
 				return portMap, buserr.WithDetail("ErrPortInUsed", portItem, nil)
 			}
 			bindItem := nat.PortBinding{HostPort: strconv.Itoa(portItem), HostIP: port.HostIP}
-			portMap[nat.Port(fmt.Sprintf("%s/%s", port.ContainerPort, port.Protocol))] = []nat.PortBinding{bindItem}
+			portKey := nat.Port(fmt.Sprintf("%s/%s", port.ContainerPort, port.Protocol))
+			if !slices.Contains(portMap[portKey], bindItem) {
+				portMap[portKey] = append(portMap[portKey], bindItem)
+			}
 		}
 	}
 	return portMap, nil
@@ -1955,7 +1962,7 @@ func loadComposeCount(client *client.Client) int {
 }
 func loadContainerPortForInfo(itemPorts []container.Port) []dto.PortHelper {
 	var exposedPorts []dto.PortHelper
-	samePortMap := make(map[string]dto.PortHelper)
+	seenPorts := make(map[dto.PortHelper]struct{})
 	ports := transPortToStr(itemPorts)
 	for _, item := range ports {
 		itemStr := strings.Split(item, "->")
@@ -1976,16 +1983,11 @@ func loadContainerPortForInfo(itemPorts []container.Port) []dto.PortHelper {
 		}
 		itemPort.ContainerPort = itemContainer[0]
 		itemPort.Protocol = itemContainer[1]
-		keyItem := fmt.Sprintf("%s->%s/%s", itemPort.HostPort, itemPort.ContainerPort, itemPort.Protocol)
-		if val, ok := samePortMap[keyItem]; ok {
-			val.HostIP = ""
-			samePortMap[keyItem] = val
-		} else {
-			samePortMap[keyItem] = itemPort
+		if _, exists := seenPorts[itemPort]; exists {
+			continue
 		}
-	}
-	for _, val := range samePortMap {
-		exposedPorts = append(exposedPorts, val)
+		seenPorts[itemPort] = struct{}{}
+		exposedPorts = append(exposedPorts, itemPort)
 	}
 	return exposedPorts
 }
