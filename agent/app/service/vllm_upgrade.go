@@ -13,10 +13,14 @@ const (
 	vllmImageTypeNvidia  = "nvidia"
 	vllmImageTypeIntel   = "intel"
 	vllmImageTypeAscend  = "ascend"
+	vllmImageTypeGB10    = "nvidia-gb10-dspark"
 )
 
 func resolveVllmVersionFamily(version, image string) string {
 	normalizedVersion := strings.ToLower(strings.TrimSpace(version))
+	if strings.HasPrefix(normalizedVersion, vllmImageTypeGB10+"-") {
+		return vllmImageTypeGB10
+	}
 	if strings.HasPrefix(normalizedVersion, vllmImageTypeIntel+"-") {
 		return vllmImageTypeIntel
 	}
@@ -27,6 +31,9 @@ func resolveVllmVersionFamily(version, image string) string {
 		return vllmImageTypeNvidia
 	}
 	normalizedImage := strings.ToLower(strings.TrimSpace(image))
+	if strings.Contains(normalizedImage, "vllm-gb10-dspark") {
+		return vllmImageTypeGB10
+	}
 	if strings.Contains(normalizedImage, "intel/") || strings.Contains(normalizedImage, "llm-scaler-vllm") {
 		return vllmImageTypeIntel
 	}
@@ -39,7 +46,7 @@ func resolveVllmVersionFamily(version, image string) string {
 func trimVllmVersionFamily(version string) string {
 	trimmed := strings.TrimSpace(version)
 	normalized := strings.ToLower(trimmed)
-	for _, family := range []string{vllmImageTypeNvidia, vllmImageTypeIntel, vllmImageTypeAscend} {
+	for _, family := range []string{vllmImageTypeGB10, vllmImageTypeNvidia, vllmImageTypeIntel, vllmImageTypeAscend} {
 		prefix := family + "-"
 		if strings.HasPrefix(normalized, prefix) {
 			return strings.TrimSpace(trimmed[len(prefix):])
@@ -51,6 +58,9 @@ func trimVllmVersionFamily(version string) string {
 func buildDefaultVllmImageByVersion(version string) string {
 	tag := trimVllmVersionFamily(version)
 	family := resolveVllmVersionFamily(version, "")
+	if family == vllmImageTypeGB10 {
+		return "1panel/vllm-gb10-dspark:" + tag
+	}
 	if family == vllmImageTypeIntel {
 		return "intel/llm-scaler-vllm:" + tag
 	}
@@ -71,7 +81,8 @@ func isVllmUpgradeVersionAllowed(currentVersion, targetVersion, currentImage str
 
 func hasVllmVersionFamilyPrefix(version string) bool {
 	normalized := strings.ToLower(strings.TrimSpace(version))
-	return strings.HasPrefix(normalized, vllmImageTypeNvidia+"-") ||
+	return strings.HasPrefix(normalized, vllmImageTypeGB10+"-") ||
+		strings.HasPrefix(normalized, vllmImageTypeNvidia+"-") ||
 		strings.HasPrefix(normalized, vllmImageTypeIntel+"-") ||
 		strings.HasPrefix(normalized, vllmImageTypeAscend+"-")
 }
