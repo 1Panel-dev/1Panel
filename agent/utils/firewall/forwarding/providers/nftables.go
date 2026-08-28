@@ -14,12 +14,14 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 )
 
 const (
 	nftForwardFamily = "ip"
 	nftForwardTable  = "nft_1panel_forward"
 	nftForwardFile   = "1panel_forward.nft"
+	nftForwardMarker = "1panel-forward:"
 )
 
 type nftablesAdapter struct{ system forwardingSystem }
@@ -155,9 +157,9 @@ func ensureNftForwardTables() error {
 		chains := []struct {
 			name, chainType, hook, priority string
 		}{
-			{nftForwardChain(forwarding.ChainPreRouting), "nat", "prerouting", "dstnat"},
-			{nftForwardChain(forwarding.ChainPostRouting), "nat", "postrouting", "srcnat"},
-			{nftForwardChain(forwarding.ChainForward), "filter", "forward", "filter"},
+			{nftForwardChain(forwarding.ChainPreRouting), "nat", "prerouting", "-100"},
+			{nftForwardChain(forwarding.ChainPostRouting), "nat", "postrouting", "100"},
+			{nftForwardChain(forwarding.ChainForward), "filter", "forward", "0"},
 		}
 		for _, chain := range chains {
 			if tableExists {
@@ -232,15 +234,58 @@ func nftAddressKeyword(family string) string {
 }
 
 func encodeNftForwardRule(rule forwarding.Rule) string {
-	fields := []string{rule.Family, rule.Protocol, rule.Port, rule.TargetIP, rule.TargetPort, rule.Interface}
-	for index := range fields {
-		fields[index] = base64.RawURLEncoding.EncodeToString([]byte(fields[index]))
+	family, protocol := "4", "t"
+	if rule.Family == forwarding.FamilyIPv6 {
+		family = "6"
 	}
-	return "1panel-forward:" + strings.Join(fields, ".")
+	if rule.Protocol == "udp" {
+		protocol = "u"
+	}
+	return nftForwardMarker + "v2|" + strings.Join(
+		[]string{family, protocol, rule.Port, rule.TargetIP, rule.TargetPort, rule.Interface},
+		"|",
+	)
 }
 
 func decodeNftForwardRule(value string) (forwarding.Rule, bool) {
-	value = strings.TrimPrefix(value, "1panel-forward:")
+	if !strings.HasPrefix(value, nftForwardMarker) {
+		return forwarding.Rule{}, false
+	}
+	value = strings.TrimPrefix(value, nftForwardMarker)
+	if strings.HasPrefix(value, "v2|") {
+		return decodeCompactNftForwardRule(value)
+	}
+	return decodeLegacyNftForwardRule(value)
+}
+
+func decodeCompactNftForwardRule(value string) (forwarding.Rule, bool) {
+	parts := strings.Split(value, "|")
+	if len(parts) != 7 || parts[0] != "v2" {
+		return forwarding.Rule{}, false
+	}
+	family, protocol := "", ""
+	switch parts[1] {
+	case "4":
+		family = forwarding.FamilyIPv4
+	case "6":
+		family = forwarding.FamilyIPv6
+	default:
+		return forwarding.Rule{}, false
+	}
+	switch parts[2] {
+	case "t":
+		protocol = "tcp"
+	case "u":
+		protocol = "udp"
+	default:
+		return forwarding.Rule{}, false
+	}
+	return forwarding.Rule{
+		Family: family, Protocol: protocol, Port: parts[3], TargetIP: parts[4], TargetPort: parts[5], Interface: parts[6],
+	}, true
+}
+
+func decodeLegacyNftForwardRule(value string) (forwarding.Rule, bool) {
 	parts := strings.Split(value, ".")
 	if len(parts) != 6 {
 		return forwarding.Rule{}, false
@@ -259,7 +304,7 @@ func decodeNftForwardRule(value string) (forwarding.Rule, bool) {
 func parseNftForwardRules(stdout string) []forwarding.Rule {
 	result := make([]forwarding.Rule, 0)
 	for _, line := range strings.Split(stdout, "\n") {
-		commentStart := strings.Index(line, `comment "1panel-forward:`)
+		commentStart := strings.Index(line, `comment "`+nftForwardMarker)
 		handleStart := strings.LastIndex(line, "# handle ")
 		if commentStart < 0 || handleStart < 0 {
 			continue
@@ -296,8 +341,7 @@ func nftRunCommands(commands [][]string) error {
 	if err != nil {
 		return err
 	}
-	manager := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second), cmd.WithStdin(strings.NewReader(script)))
-	return manager.RunWithOptionalSudo("nft", "-f", "-")
+	return nftables_helper.RunScript(script)
 }
 
 func nftCommandsScript(commands [][]string) (string, error) {

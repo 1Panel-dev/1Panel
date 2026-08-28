@@ -177,6 +177,15 @@ func (a *Adapter) PrepareRule(rule filter.FirewallRule) (filter.FirewallRule, er
 		if err != nil {
 			return filter.FirewallRule{}, err
 		}
+	} else if normalized.NativeKind == filter.NativeKindZonePort && !isNativeZonePort(normalized) {
+		// Edit requests inherit the current native kind. Once a native zone port
+		// gains an address, loses its port, or changes to a deny action, it must
+		// be represented as a rich rule instead.
+		normalized.NativeKind = filter.NativeKindRichRule
+		normalized, err = filter.NormalizeRule(normalized)
+		if err != nil {
+			return filter.FirewallRule{}, err
+		}
 	}
 	if err := validateWritableRule(normalized); err != nil {
 		return filter.FirewallRule{}, err

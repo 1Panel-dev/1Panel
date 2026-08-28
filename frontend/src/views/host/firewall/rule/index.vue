@@ -1216,7 +1216,10 @@ const isDeletableManagedRule = (row: Firewall.InventoryItem) =>
     (row.state !== 'drifted' || isMissingManagedRule(row));
 
 const displayRulePriority = (row: Firewall.InventoryItem) => {
-    if (row.rule.scope.provider === 'firewalld') return row.rule.priority ?? '-';
+    if (row.rule.scope.provider === 'firewalld') {
+        if (!supportsFirewalldPriority.value || row.rule.nativeKind !== 'rich_rule') return '-';
+        return row.rule.priority ?? '-';
+    }
     if (
         (row.rule.scope.provider === 'iptables' || row.rule.scope.provider === 'nftables') &&
         row.rule.scope.chain !== '1PANEL_BASIC'

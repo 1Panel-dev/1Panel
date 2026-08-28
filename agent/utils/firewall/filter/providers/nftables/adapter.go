@@ -219,7 +219,7 @@ func validatePlan(plan filter.BackendPlan) error {
 }
 
 func validateNativeCommand(command filter.NativeCommand) error {
-	if command.Executable != "nft" || len(command.Args) != 2 || command.Args[0] != "-f" || command.Args[1] != "-" || command.Stdin == "" {
+	if command.Executable != "nft" || len(command.Args) != 0 || command.Stdin == "" {
 		return fmt.Errorf("%w: invalid nftables native command", filter.ErrInvalidRule)
 	}
 	return nil
@@ -354,7 +354,7 @@ func rebuildCommand(scope filter.Scope, rules []filter.ObservedRule) (filter.Nat
 			script.WriteByte('\n')
 		}
 	}
-	return filter.NativeCommand{Executable: "nft", Args: []string{"-f", "-"}, Stdin: script.String()}, nil
+	return filter.NativeCommand{Executable: "nft", Stdin: script.String()}, nil
 }
 
 func compileExpressionArgs(rule filter.FirewallRule, marker string) []string {
@@ -550,11 +550,11 @@ func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) erro
 	if command.Executable != "nft" {
 		return fmt.Errorf("unexpected nftables executable %q", command.Executable)
 	}
-	options := []cmd.Option{cmd.WithContext(ctx), cmd.WithTimeout(60 * time.Second)}
 	if command.Stdin != "" {
-		options = append(options, cmd.WithStdin(strings.NewReader(command.Stdin)))
+		return nftables_helper.RunScriptContext(ctx, command.Stdin)
 	}
-	return cmd.NewCommandMgr(options...).RunWithOptionalSudo(command.Executable, command.Args...)
+	return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second)).
+		RunWithOptionalSudo(command.Executable, command.Args...)
 }
 
 func (systemBackend) Save(ctx context.Context) error {
