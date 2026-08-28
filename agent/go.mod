@@ -42,7 +42,7 @@ require (
 	github.com/qiniu/go-sdk/v7 v7.27.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil/v4 v4.26.7
-	github.com/sirupsen/logrus v1.9.4
+	github.com/sirupsen/logrus v1.10.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/cobra v1.10.2
@@ -53,11 +53,11 @@ require (
 	github.com/tomasen/fcgi_client v0.0.0-20180423082037-2bb3d819fd19
 	github.com/upyun/go-sdk v2.1.0+incompatible
 	go.mongodb.org/mongo-driver/v2 v2.8.0
-	golang.org/x/crypto v0.54.0
-	golang.org/x/net v0.57.0
+	golang.org/x/crypto v0.55.0
+	golang.org/x/net v0.58.0
 	golang.org/x/sync v0.22.0
 	golang.org/x/sys v0.47.0
-	golang.org/x/text v0.40.0
+	golang.org/x/text v0.41.0
 	golang.org/x/time v0.15.0
 	google.golang.org/genproto v0.0.0-20260414002931-afd174a4e478
 	gopkg.in/ini.v1 v1.67.3
@@ -217,9 +217,9 @@ require (
 	go.yaml.in/yaml/v4 v4.0.0-rc.4 // indirect
 	go4.org v0.0.0-20260112195520-a5071408f32f // indirect
 	golang.org/x/arch v0.26.0 // indirect
-	golang.org/x/mod v0.37.0 // indirect
+	golang.org/x/mod v0.38.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
-	golang.org/x/tools v0.47.0 // indirect
+	golang.org/x/tools v0.48.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	modernc.org/fileutil v1.4.0 // indirect
 	modernc.org/libc v1.72.0 // indirect
