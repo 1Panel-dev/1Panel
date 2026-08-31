@@ -329,11 +329,19 @@ func nftForwardChain(logical string) string {
 }
 
 func nftRun(args ...string) (string, error) {
-	return cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout("nft", args...)
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout("nft", args...)
+	if err != nil {
+		return stdout, fmt.Errorf("command=nft %s failed: %w", strings.Join(args, " "), err)
+	}
+	return stdout, nil
 }
 
 func nftRunCommand(args ...string) error {
-	return cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudo("nft", args...)
+	err := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudo("nft", args...)
+	if err != nil {
+		return fmt.Errorf("command=nft %s failed: %w", strings.Join(args, " "), err)
+	}
+	return nil
 }
 
 func nftRunCommands(commands [][]string) error {

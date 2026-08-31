@@ -11,6 +11,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	firewallutil "github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
@@ -190,5 +191,6 @@ func loadRulesFromFile(executable, restoreExecutable, tab, chain, fileName strin
 
 func restoreRules(executable, input string) error {
 	manager := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second), cmd.WithStdin(strings.NewReader(input)))
-	return manager.RunWithOptionalSudo(executable, "--noflush", "--wait")
+	err := manager.RunWithOptionalSudo(executable, "--noflush", "--wait")
+	return firewallutil.WrapBatchCommandError(executable+" --noflush --wait", input, err)
 }

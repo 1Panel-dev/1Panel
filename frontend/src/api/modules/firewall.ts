@@ -18,10 +18,19 @@ export const operateFire = (operation: string, withDockerRestart: boolean) =>
 export const operateForwardRule = (request: { rules: Firewall.RuleForward[]; forceDelete?: boolean }) =>
     http.post('/hosts/firewall/forward/operate', request, TimeoutEnum.T_40S);
 
-export const enableForwarding = () => http.post('/hosts/firewall/forward/enable', {}, TimeoutEnum.T_60S);
+export const enableForwarding = (taskID?: string) =>
+    http.post<Firewall.FilterChainOperationResult>(
+        '/hosts/firewall/forward/enable',
+        taskID ? { taskID } : {},
+        TimeoutEnum.T_60S,
+    );
 
-export const operateFilterChain = (name: string, operate: string) =>
-    http.post('/hosts/firewall/filter/operate', { name, operate }, TimeoutEnum.T_60S);
+export const operateFilterChain = (name: string, operate: string, taskID?: string) =>
+    http.post<Firewall.FilterChainOperationResult>(
+        '/hosts/firewall/filter/operate',
+        { name, operate, ...(taskID ? { taskID } : {}) },
+        TimeoutEnum.T_60S,
+    );
 
 export const searchFirewallRules = (request: Firewall.InventoryRequest) => {
     return http.post<Firewall.Inventory>('/hosts/firewall/rules/search', request, TimeoutEnum.T_40S);
@@ -83,10 +92,10 @@ export const syncDockerPortGuard = () =>
         },
     );
 
-export const operateDockerPortGuard = (operation: 'initialize' | 'bind' | 'unbind') =>
-    http.postWithConfig(
+export const operateDockerPortGuard = (operation: 'initialize' | 'bind' | 'unbind', taskID?: string) =>
+    http.postWithConfig<Firewall.FilterChainOperationResult>(
         '/hosts/firewall/docker/operate',
-        { operation },
+        { operation, ...(taskID ? { taskID } : {}) },
         {
             timeout: TimeoutEnum.T_60S,
             skipErrorMessage: true,

@@ -401,6 +401,9 @@ func nftHasFirstUniqueJump(output string) bool {
 			continue
 		}
 		fields := strings.Fields(line)
+		if len(fields) == 0 || fields[0] == "table" || fields[0] == "chain" {
+			continue
+		}
 		return len(fields) >= 2 && fields[0] == "jump" && fields[1] == NftChain
 	}
 	return false

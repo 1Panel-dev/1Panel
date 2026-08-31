@@ -426,6 +426,35 @@ interface PriorityPositionRange {
 
 type RuleFilter = 'family:ipv4' | 'family:ipv6' | 'action:accept' | 'action:deny' | `state:${Firewall.InventoryState}`;
 
+const ruleFilterStorageKey = 'firewall-rule-filters';
+const chainFilterStorageKey = 'firewall-rule-visible-chains';
+const ruleFilterOptions: RuleFilter[] = [
+    'family:ipv4',
+    'family:ipv6',
+    'action:accept',
+    'action:deny',
+    'state:managed',
+    'state:adopted',
+    'state:external',
+    'state:protected',
+    'state:drifted',
+];
+const iptablesChains = ['1PANEL_BASIC_BEFORE', '1PANEL_BASIC', '1PANEL_BASIC_AFTER'] as const;
+
+const loadCachedFilterValues = <T extends string>(key: string, allowed: readonly T[], defaults: readonly T[]): T[] => {
+    try {
+        const cached = JSON.parse(localStorage.getItem(key) || 'null');
+        if (!Array.isArray(cached)) return [...defaults];
+        return cached.filter((item): item is T => typeof item === 'string' && allowed.includes(item as T));
+    } catch {
+        return [...defaults];
+    }
+};
+
+const cacheFilterValues = (key: string, values: readonly string[]) => {
+    localStorage.setItem(key, JSON.stringify(values));
+};
+
 const fireStatusRef = ref<InstanceType<typeof FireStatus>>();
 const ruleOperateRef = ref<InstanceType<typeof RuleOperate>>();
 const ruleImportRef = ref<InstanceType<typeof RuleImport>>();
@@ -451,9 +480,10 @@ const showFirewallUnavailablePrompt = computed(
     () => (isDirectBackend.value && (!isInit.value || !isBind.value)) || (isServiceBackend.value && !isActive.value),
 );
 const firewallVersion = ref('');
-const selectedRuleFilters = ref<RuleFilter[]>([]);
-const iptablesChains = ['1PANEL_BASIC_BEFORE', '1PANEL_BASIC', '1PANEL_BASIC_AFTER'] as const;
-const visibleIptablesChains = ref<string[]>([...iptablesChains]);
+const selectedRuleFilters = ref<RuleFilter[]>(loadCachedFilterValues(ruleFilterStorageKey, ruleFilterOptions, []));
+const visibleIptablesChains = ref<string[]>(
+    loadCachedFilterValues(chainFilterStorageKey, iptablesChains, iptablesChains),
+);
 const searchName = ref('');
 const inventoryItems = ref<Firewall.InventoryItem[]>([]);
 const inventoryTotal = ref(0);
@@ -850,11 +880,13 @@ const searchWithReset = () => {
 };
 
 const changeIptablesChainFilter = () => {
+    cacheFilterValues(chainFilterStorageKey, visibleIptablesChains.value);
     selects.value = [];
     return searchWithReset();
 };
 
 const changeRuleFilter = () => {
+    cacheFilterValues(ruleFilterStorageKey, selectedRuleFilters.value);
     selects.value = [];
     return searchWithReset();
 };

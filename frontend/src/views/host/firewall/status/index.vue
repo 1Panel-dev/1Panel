@@ -168,6 +168,7 @@
                 <span>{{ $t('firewall.' + operation + 'FirewallHelper') }}</span>
             </template>
         </DockerRestart>
+        <TaskLog ref="taskLogRef" @close="handleInitializationTaskClose" />
     </div>
 </template>
 
@@ -189,6 +190,8 @@ import { computed, nextTick, ref } from 'vue';
 import { loadDockerStatus } from '@/api/modules/container';
 import { WarningFilled } from '@element-plus/icons-vue';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
+import TaskLog from '@/components/log/task/index.vue';
+import { newUUID } from '@/utils/id';
 
 const props = defineProps({
     currentTab: String,
@@ -218,6 +221,7 @@ const operation = ref('restart');
 const dockerStatus = ref();
 const withDockerRestart = ref(false);
 const familyRetrying = ref(false);
+const taskLogRef = ref();
 const backendName = computed(() => baseInfo.value.backend || baseInfo.value.name);
 const backendUnavailable = computed(() => baseInfo.value.reason === 'backend_not_installed' || !baseInfo.value.isExist);
 const isServiceBackend = computed(() => backendName.value === 'firewalld' || backendName.value === 'ufw');
@@ -360,11 +364,25 @@ const onInit = async () => {
     } catch {
         return;
     }
-    const initializer =
-        props.currentTab === 'forward' ? enableForwarding() : operateFilterChain(chainName, 'init-' + props.currentTab);
-    await initializer;
+    if (props.currentTab === 'base') {
+        const result = (await operateFilterChain(chainName, 'init-' + props.currentTab, newUUID())).data;
+        if (result.queued && result.taskID) {
+            taskLogRef.value?.openWithTaskID(result.taskID, true);
+            return;
+        }
+    } else {
+        const result = (await enableForwarding(newUUID())).data;
+        if (result.queued && result.taskID) {
+            taskLogRef.value?.openWithTaskID(result.taskID, true);
+            return;
+        }
+    }
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     await loadBaseInfo(true);
+};
+
+const handleInitializationTaskClose = () => {
+    loadBaseInfo(true);
 };
 
 const onBind = async () => {
@@ -386,7 +404,11 @@ const onRetryFamilyIssues = async () => {
     familyRetrying.value = true;
     try {
         if (isDirectForward.value) {
-            await enableForwarding();
+            const result = (await enableForwarding(newUUID())).data;
+            if (result.queued && result.taskID) {
+                taskLogRef.value?.openWithTaskID(result.taskID, true);
+                return;
+            }
         } else {
             await operateFilterChain('1PANEL_BASIC', 'bind-base');
         }

@@ -11,9 +11,11 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
 	forwardingproviders "github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding/providers"
@@ -26,6 +28,7 @@ type IForwardingService interface {
 	SearchRules(request dto.ForwardRuleSearch) (int64, interface{}, error)
 	OperateRules(request dto.ForwardRuleOperate) error
 	Enable() error
+	QueueInitialization(dto.FirewallInitializationTask) (dto.FilterChainOperationResponse, error)
 	Restore(context.Context) error
 }
 
@@ -247,6 +250,58 @@ func (s *ForwardingService) Enable() error {
 	err = manager.Reconcile(forwardingRulesFromModels(rules))
 	recordForwardingSyncError(err)
 	return err
+}
+
+func (s *ForwardingService) QueueInitialization(
+	request dto.FirewallInitializationTask,
+) (dto.FilterChainOperationResponse, error) {
+	if err := task.CheckScopeTaskIsExecuting(task.TaskScopeFirewall, 0); err != nil {
+		return dto.FilterChainOperationResponse{}, err
+	}
+	taskItem, err := task.NewTaskWithOps("port forwarding", task.TaskExec, task.TaskScopeFirewall, request.TaskID, 0)
+	if err != nil {
+		return dto.FilterChainOperationResponse{}, fmt.Errorf("create forwarding initialization task: %w", err)
+	}
+	var manager *forwarding.Manager
+	var backend string
+	taskItem.AddSubTask(i18n.GetMsgByKey("FirewallEnableForwardingStep"), func(t *task.Task) error {
+		forwardingMutationMu.Lock()
+		defer forwardingMutationMu.Unlock()
+		var err error
+		manager, err = s.manager()
+		if err != nil {
+			recordForwardingSyncError(err)
+			return err
+		}
+		backend = manager.Name()
+		t.Logf("backend=%s", backend)
+		if err := s.persistForwardingEnabled(); err != nil {
+			recordForwardingSyncError(err)
+			return err
+		}
+		if err := s.activateManager(manager); err != nil {
+			recordForwardingSyncError(err)
+			return err
+		}
+		return nil
+	}, nil)
+	taskItem.AddSubTask(i18n.GetMsgByKey("FirewallRestoreForwardingRulesStep"), func(t *task.Task) error {
+		forwardingMutationMu.Lock()
+		defer forwardingMutationMu.Unlock()
+		rules, err := s.rules.List(t.TaskCtx)
+		if err != nil {
+			recordForwardingSyncError(err)
+			return err
+		}
+		err = manager.Reconcile(forwardingRulesFromModels(rules))
+		recordForwardingSyncError(err)
+		return err
+	}, nil)
+	if err := repo.NewITaskRepo().Save(context.Background(), taskItem.Task); err != nil {
+		return dto.FilterChainOperationResponse{}, fmt.Errorf("save forwarding initialization task: %w", err)
+	}
+	go func() { _ = taskItem.Execute() }()
+	return dto.FilterChainOperationResponse{TaskID: taskItem.TaskID, Queued: true}, nil
 }
 
 func (s *ForwardingService) Restore(ctx context.Context) error {

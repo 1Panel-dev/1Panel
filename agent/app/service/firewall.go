@@ -13,8 +13,10 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	filterruntime "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/runtime"
@@ -50,6 +52,7 @@ type IFirewallService interface {
 	LoadBaseInfo(chainGroup string) (dto.FirewallSubsystemStatus, error)
 	OperateFirewall(request dto.FirewallLifecycleOperation) error
 	OperateFilterChain(request dto.FilterChainOperation) error
+	QueueFilterChainInitialization(request dto.FilterChainOperation) (dto.FilterChainOperationResponse, error)
 	Reset(context.Context, dto.FirewallRuleReset) (dto.FirewallRuleResetResponse, error)
 	Inventory(context.Context, dto.FirewallRuleInventory) (dto.FirewallRuleInventoryResponse, error)
 	LoadFirewallNativeDetail(context.Context, dto.FirewallNativeDetail) (string, error)
@@ -156,6 +159,61 @@ func (s *FirewallService) OperateFilterChain(request dto.FilterChainOperation) e
 	if err != nil {
 		return err
 	}
+	if err := s.operateFilterChainBase(provider, request); err != nil {
+		return err
+	}
+	if request.Operate != string(firewall.BaseOperationInit) && request.Operate != string(firewall.BaseOperationBind) {
+		return nil
+	}
+	ctx := context.Background()
+	if err := s.restoreStoredFirewallRules(ctx, filter.Provider(provider)); err != nil {
+		return err
+	}
+	return s.syncConfiguredFirewallPorts(ctx)
+}
+
+func (s *FirewallService) QueueFilterChainInitialization(
+	request dto.FilterChainOperation,
+) (dto.FilterChainOperationResponse, error) {
+	if request.Operate != string(firewall.BaseOperationInit) {
+		return dto.FilterChainOperationResponse{}, fmt.Errorf("only filter chain initialization can be queued")
+	}
+	provider, err := selectedSystemFirewallProvider()
+	if err != nil {
+		return dto.FilterChainOperationResponse{}, err
+	}
+	if !supportsManagedFilterChains(provider) {
+		return dto.FilterChainOperationResponse{}, fmt.Errorf("filter chain operations are not supported for %s", provider)
+	}
+	if err := task.CheckScopeTaskIsExecuting(task.TaskScopeFirewall, 0); err != nil {
+		return dto.FilterChainOperationResponse{}, err
+	}
+
+	resourceName := fmt.Sprintf("%s filter", provider)
+	taskItem, err := task.NewTaskWithOps(resourceName, task.TaskExec, task.TaskScopeFirewall, request.TaskID, 0)
+	if err != nil {
+		return dto.FilterChainOperationResponse{}, fmt.Errorf("create firewall initialization task: %w", err)
+	}
+	taskItem.AddSubTask(i18n.GetWithName("FirewallInitializeChainsStep", provider), func(t *task.Task) error {
+		t.Logf("backend=%s", provider)
+		return s.operateFilterChainBase(provider, request)
+	}, nil)
+	taskItem.AddSubTask(i18n.GetWithName("FirewallRestoreRulesStep", provider), func(t *task.Task) error {
+		return s.restoreStoredFirewallRules(t.TaskCtx, filter.Provider(provider))
+	}, nil)
+	taskItem.AddSubTask(i18n.GetMsgByKey("FirewallSyncWhitelistStep"), func(t *task.Task) error {
+		return s.syncConfiguredFirewallPorts(t.TaskCtx)
+	}, nil)
+	if err := repo.NewITaskRepo().Save(context.Background(), taskItem.Task); err != nil {
+		return dto.FilterChainOperationResponse{}, fmt.Errorf("save firewall initialization task: %w", err)
+	}
+	go func() {
+		_ = taskItem.Execute()
+	}()
+	return dto.FilterChainOperationResponse{TaskID: taskItem.TaskID, Queued: true}, nil
+}
+
+func (s *FirewallService) operateFilterChainBase(provider string, request dto.FilterChainOperation) error {
 	if !supportsManagedFilterChains(provider) {
 		return fmt.Errorf("filter chain operations are not supported for %s", provider)
 	}
@@ -166,13 +224,10 @@ func (s *FirewallService) OperateFilterChain(request dto.FilterChainOperation) e
 	} else if err := s.iptablesHelper.Operate(firewall.BaseOperation(request.Operate)); err != nil {
 		return err
 	}
-	if request.Operate != string(firewall.BaseOperationInit) && request.Operate != string(firewall.BaseOperationBind) {
-		return nil
-	}
-	ctx := context.Background()
-	if err := s.restoreStoredFirewallRules(ctx, filter.Provider(provider)); err != nil {
-		return err
-	}
+	return nil
+}
+
+func (s *FirewallService) syncConfiguredFirewallPorts(ctx context.Context) error {
 	configured, err := loadConfiguredFirewallPortWhiteList()
 	if err != nil {
 		return err

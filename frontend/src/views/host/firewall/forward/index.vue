@@ -77,9 +77,15 @@
                             <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
                             <el-table-column :label="$t('commons.table.status')" :min-width="90" prop="syncStatus">
                                 <template #default="{ row }">
-                                    <el-tag :type="syncStatusType(row.syncStatus)">
-                                        {{ syncStatusLabel(row.syncStatus) }}
-                                    </el-tag>
+                                    <el-tooltip
+                                        :disabled="!syncStatusMessage(row.syncStatus)"
+                                        :content="syncStatusMessage(row.syncStatus)"
+                                        placement="top"
+                                    >
+                                        <el-tag :type="syncStatusType(row.syncStatus)">
+                                            {{ syncStatusLabel(row.syncStatus) }}
+                                        </el-tag>
+                                    </el-tooltip>
                                 </template>
                             </el-table-column>
                             <el-table-column :label="$t('firewall.sourcePort')" :min-width="70" prop="port" />
@@ -195,6 +201,11 @@ const syncStatusLabel = (status?: Firewall.RuleForward['syncStatus']) => {
 const syncStatusType = (status?: Firewall.RuleForward['syncStatus']) => {
     if (status === 'converged') return 'success';
     return status === 'runtime_only' ? 'warning' : 'danger';
+};
+const syncStatusMessage = (status?: Firewall.RuleForward['syncStatus']) => {
+    if (status === 'missing') return i18n.global.t('firewall.ruleSyncReasonDetail.missingFromTarget');
+    if (status === 'runtime_only') return i18n.global.t('firewall.ruleSyncReasonDetail.onlyInTarget');
+    return '';
 };
 
 const opRef = ref();

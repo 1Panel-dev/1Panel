@@ -18579,7 +18579,10 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.FilterChainOperationResponse"
+						}
 					}
 				},
 				"security": [
@@ -18763,7 +18766,10 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.FilterChainOperationResponse"
+						}
 					}
 				},
 				"security": [
@@ -18818,9 +18824,26 @@ const docTemplate = `{
 		},
 		"/hosts/firewall/forward/enable": {
 			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.FirewallInitializationTask"
+						}
+					}
+				],
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.FilterChainOperationResponse"
+						}
 					}
 				},
 				"security": [
@@ -35619,6 +35642,10 @@ const docTemplate = `{
 						"unbind"
 					],
 					"type": "string"
+				},
+				"taskID": {
+					"maxLength": 64,
+					"type": "string"
 				}
 			},
 			"required": [
@@ -35882,12 +35909,27 @@ const docTemplate = `{
 						"unbind-base"
 					],
 					"type": "string"
+				},
+				"taskID": {
+					"maxLength": 64,
+					"type": "string"
 				}
 			},
 			"required": [
 				"name",
 				"operate"
 			],
+			"type": "object"
+		},
+		"dto.FilterChainOperationResponse": {
+			"properties": {
+				"queued": {
+					"type": "boolean"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.FirewallBackendFamilyStatus": {
@@ -35984,6 +36026,15 @@ const docTemplate = `{
 				},
 				"supported": {
 					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.FirewallInitializationTask": {
+			"properties": {
+				"taskID": {
+					"maxLength": 64,
+					"type": "string"
 				}
 			},
 			"type": "object"

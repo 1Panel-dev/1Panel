@@ -71,6 +71,16 @@ type FirewallBackendOperation struct {
 type FilterChainOperation struct {
 	Name    string `json:"name" validate:"required,eq=1PANEL_BASIC"`
 	Operate string `json:"operate" validate:"required,oneof=init-base bind-base unbind-base"`
+	TaskID  string `json:"taskID,omitempty" validate:"omitempty,max=64"`
+}
+
+type FilterChainOperationResponse struct {
+	TaskID string `json:"taskID"`
+	Queued bool   `json:"queued"`
+}
+
+type FirewallInitializationTask struct {
+	TaskID string `json:"taskID,omitempty" validate:"omitempty,max=64"`
 }
 
 type FirewallSystemPort struct {
@@ -206,6 +216,7 @@ type DockerPortGuardPolicyBatchDelete struct {
 
 type DockerPortGuardOperation struct {
 	Operation string `json:"operation" validate:"required,oneof=initialize bind unbind"`
+	TaskID    string `json:"taskID,omitempty" validate:"omitempty,max=64"`
 }
 
 type FirewallRuleCheckItem struct {

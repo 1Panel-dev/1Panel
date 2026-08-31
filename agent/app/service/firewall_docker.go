@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	agenti18n "github.com/1Panel-dev/1Panel/agent/i18n"
@@ -56,6 +57,7 @@ type IDockerPortGuardService interface {
 	LoadOverview(context.Context) (dto.DockerPortGuardList, error)
 	LoadPublishedPorts(context.Context) ([]dto.DockerPortGuardContainer, error)
 	Operate(context.Context, dto.DockerPortGuardOperation) error
+	QueueInitialization(dto.DockerPortGuardOperation) (dto.FilterChainOperationResponse, error)
 	DeletePolicies(context.Context, dto.DockerPortGuardPolicyBatchDelete) error
 	UpsertPolicies(context.Context, dto.DockerPortGuardPolicyBatch) error
 	Reconcile(context.Context) error
@@ -217,6 +219,60 @@ func (s *DockerPortGuardService) Operate(ctx context.Context, request dto.Docker
 	default:
 		return fmt.Errorf("unsupported Docker port guard operation: %s", request.Operation)
 	}
+}
+
+func (s *DockerPortGuardService) QueueInitialization(
+	request dto.DockerPortGuardOperation,
+) (dto.FilterChainOperationResponse, error) {
+	if request.Operation != "initialize" {
+		return dto.FilterChainOperationResponse{}, fmt.Errorf("only Docker port guard initialization can be queued")
+	}
+	if err := task.CheckScopeTaskIsExecuting(task.TaskScopeFirewall, 0); err != nil {
+		return dto.FilterChainOperationResponse{}, err
+	}
+	taskItem, err := task.NewTaskWithOps("Docker port guard", task.TaskExec, task.TaskScopeFirewall, request.TaskID, 0)
+	if err != nil {
+		return dto.FilterChainOperationResponse{}, fmt.Errorf("create Docker port guard initialization task: %w", err)
+	}
+	var runtime dockerGuardRuntime
+	var backend string
+	var policies []docker_guard.Policy
+	taskItem.AddSubTask(agenti18n.GetMsgByKey("FirewallInspectDockerGuardStep"), func(t *task.Task) error {
+		var err error
+		runtime, backend, err = s.runtimeForDocker(t.TaskCtx)
+		if err != nil {
+			return err
+		}
+		policies, err = s.runtimePolicies(t.TaskCtx)
+		if err != nil {
+			return err
+		}
+		t.Logf("backend=%s", backend)
+		return nil
+	}, nil)
+	taskItem.AddSubTask(agenti18n.GetWithName("FirewallInitializeDockerGuardStep", "Docker"), func(t *task.Task) error {
+		dockerPortGuardServiceMu.Lock()
+		defer dockerPortGuardServiceMu.Unlock()
+		t.Logf("backend=%s", backend)
+		err := runtime.Initialize(policies)
+		recordDockerPortGuardReconcileError(err)
+		return err
+	}, nil)
+	taskItem.AddSubTask(agenti18n.GetMsgByKey("FirewallPersistDockerGuardStep"), func(t *task.Task) error {
+		if err := settingRepo.UpdateOrCreate(constant.FirewallDockerBackendKey, backend); err != nil {
+			return err
+		}
+		if err := settingRepo.UpdateOrCreate(constant.FirewallDockerPortGuardStatusKey, constant.StatusEnable); err != nil {
+			return err
+		}
+		recordDockerPortGuardReconcileError(nil)
+		return nil
+	}, nil)
+	if err := repo.NewITaskRepo().Save(context.Background(), taskItem.Task); err != nil {
+		return dto.FilterChainOperationResponse{}, fmt.Errorf("save Docker port guard initialization task: %w", err)
+	}
+	go func() { _ = taskItem.Execute() }()
+	return dto.FilterChainOperationResponse{TaskID: taskItem.TaskID, Queued: true}, nil
 }
 
 func (s *DockerPortGuardService) DeletePolicies(ctx context.Context, request dto.DockerPortGuardPolicyBatchDelete) error {

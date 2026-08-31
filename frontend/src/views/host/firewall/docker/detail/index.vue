@@ -88,6 +88,12 @@
                             <span class="port-card-value">{{ group.endpoint.description || '-' }}</span>
                         </el-tooltip>
                     </div>
+                    <div v-if="group.endpoint.policyUUID && !group.endpoint.effective" class="port-card-field">
+                        <span class="port-card-label">{{ $t('commons.table.message') }}</span>
+                        <el-tooltip :content="statusMessage(group.endpoint)" placement="top" :show-after="400">
+                            <span class="port-card-value is-warning">{{ statusMessage(group.endpoint) }}</span>
+                        </el-tooltip>
+                    </div>
                 </el-card>
             </div>
         </template>
@@ -159,10 +165,10 @@ import { deleteDockerPortGuardPolicies, upsertDockerPortGuardPolicies } from '@/
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
-import { isValidDockerGuardSource } from '@/views/host/firewall/docker/model';
+import { dockerGuardEndpointStatusMessage, isValidDockerGuardSource } from '@/views/host/firewall/docker/model';
 import { formatHostAddress, formatHostAddressList, splitTagValues } from '@/views/host/firewall/utils/validation';
 
-const props = defineProps<{ containers: Firewall.DockerGuardContainer[] }>();
+const props = defineProps<{ base: Firewall.DockerGuardBase; containers: Firewall.DockerGuardContainer[] }>();
 const emit = defineEmits<{ search: [] }>();
 
 const drawerVisible = ref(false);
@@ -225,6 +231,8 @@ const selectedPolicyUUIDs = computed(() => policyUUIDs(selectedEndpoints.value))
 const sourcesLabel = computed(() =>
     form.mode === 'allow_sources' ? i18n.global.t('firewall.allowedSources') : i18n.global.t('firewall.deniedSources'),
 );
+const statusMessage = (endpoint: Firewall.DockerGuardEndpoint) =>
+    dockerGuardEndpointStatusMessage(props.base, endpoint);
 type ValidationCallback = (error?: Error) => void;
 const validateSources = (_rule: unknown, value: string[], callback: ValidationCallback) => {
     const sources = splitTagValues(value || []);
@@ -469,6 +477,10 @@ defineExpose({ acceptParams, openPolicy });
     color: var(--el-text-color-regular);
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.port-card-value.is-warning {
+    color: var(--el-color-warning);
 }
 
 .port-card-actions {
