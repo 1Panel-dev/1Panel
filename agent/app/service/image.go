@@ -29,7 +29,6 @@ import (
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/pkg/archive"
-	"github.com/docker/docker/pkg/homedir"
 )
 
 type ImageService struct{}
@@ -278,38 +277,37 @@ func (u *ImageService) ImagePull(req dto.ImagePull) error {
 		itemName := strings.ReplaceAll(path.Base(item), ":", "_")
 		taskItem.AddSubTask(i18n.GetWithName("ImagePull", itemName), func(t *task.Task) error {
 			taskItem.Logf("----------------- %s -----------------", itemName)
+			if req.RepoID == 0 {
+				pullErr := pullImages(taskItem, client, item)
+				taskItem.LogWithStatus(i18n.GetMsgByKey("TaskPull"), pullErr)
+				return pullErr
+			}
+
 			options := image.PullOptions{}
 			imageName := item
-			if req.RepoID == 0 {
-				hasAuth, authStr := loadAuthInfo(item)
-				if hasAuth {
-					options.RegistryAuth = authStr
+			repo, repoErr := imageRepoRepo.Get(repo.WithByID(req.RepoID))
+			taskItem.LogWithStatus(i18n.GetMsgByKey("ImageRepoAuthFromDB"), repoErr)
+			if repoErr != nil {
+				return repoErr
+			}
+			if repo.Auth {
+				authConfig := registry.AuthConfig{
+					Username: repo.Username,
+					Password: repo.Password,
 				}
-			} else {
-				repo, err := imageRepoRepo.Get(repo.WithByID(req.RepoID))
-				taskItem.LogWithStatus(i18n.GetMsgByKey("ImageRepoAuthFromDB"), err)
+				encodedJSON, err := json.Marshal(authConfig)
 				if err != nil {
 					return err
 				}
-				if repo.Auth {
-					authConfig := registry.AuthConfig{
-						Username: repo.Username,
-						Password: repo.Password,
-					}
-					encodedJSON, err := json.Marshal(authConfig)
-					if err != nil {
-						return err
-					}
-					authStr := base64.URLEncoding.EncodeToString(encodedJSON)
-					options.RegistryAuth = authStr
-				}
-				imageName = repo.DownloadUrl + "/" + item
+				authStr := base64.URLEncoding.EncodeToString(encodedJSON)
+				options.RegistryAuth = authStr
 			}
+			imageName = repo.DownloadUrl + "/" + item
 			dockerCli := docker.NewClientWithExist(client)
-			err = dockerCli.PullImageWithProcessAndOptions(taskItem, imageName, options)
-			taskItem.LogWithStatus(i18n.GetMsgByKey("TaskPull"), err)
-			if err != nil {
-				return err
+			pullErr := dockerCli.PullImageWithProcessAndOptions(taskItem, imageName, options)
+			taskItem.LogWithStatus(i18n.GetMsgByKey("TaskPull"), pullErr)
+			if pullErr != nil {
+				return pullErr
 			}
 			return nil
 		}, nil)
@@ -546,50 +544,4 @@ func checkUsed(imageID string, containers []container.Summary) bool {
 		}
 	}
 	return false
-}
-
-func loadAuthInfo(image string) (bool, string) {
-	if !strings.Contains(image, "/") {
-		return false, ""
-	}
-	homeDir := homedir.Get()
-	confPath := path.Join(homeDir, ".docker/config.json")
-	configFileBytes, err := os.ReadFile(confPath)
-	if err != nil {
-		return false, ""
-	}
-	var config dockerConfig
-	if err = json.Unmarshal(configFileBytes, &config); err != nil {
-		return false, ""
-	}
-	var (
-		user   string
-		passwd string
-	)
-	imagePrefix := strings.Split(image, "/")[0]
-	if val, ok := config.Auths[imagePrefix]; ok {
-		itemByte, _ := base64.StdEncoding.DecodeString(val.Auth)
-		itemStr := string(itemByte)
-		if strings.Contains(itemStr, ":") {
-			user = strings.Split(itemStr, ":")[0]
-			passwd = strings.Split(itemStr, ":")[1]
-		}
-	}
-	authConfig := registry.AuthConfig{
-		Username: user,
-		Password: passwd,
-	}
-	encodedJSON, err := json.Marshal(authConfig)
-	if err != nil {
-		return false, ""
-	}
-	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
-	return true, authStr
-}
-
-type dockerConfig struct {
-	Auths map[string]authConfig `json:"auths"`
-}
-type authConfig struct {
-	Auth string `json:"auth"`
 }

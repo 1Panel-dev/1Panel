@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -1678,30 +1679,42 @@ func checkImageLike(client *client.Client, imageName string) bool {
 
 func pullImages(task *task.Task, client *client.Client, imageName string) error {
 	dockerCli := docker.NewClientWithExist(client)
+	repos, err := imageRepoRepo.List()
+	if err != nil {
+		return err
+	}
+	imageRepo := selectImageRepo(imageName, repos)
+	if imageRepo == nil || !imageRepo.Auth {
+		return dockerCli.PullImageWithProcess(task, imageName)
+	}
+
 	options := image.PullOptions{}
-	repos, _ := imageRepoRepo.List()
-	if len(repos) != 0 {
-		for _, repo := range repos {
-			if strings.HasPrefix(imageName, repo.DownloadUrl) && repo.Auth {
-				authConfig := registry.AuthConfig{
-					Username: repo.Username,
-					Password: repo.Password,
-				}
-				encodedJSON, err := json.Marshal(authConfig)
-				if err != nil {
-					return err
-				}
-				authStr := base64.URLEncoding.EncodeToString(encodedJSON)
-				options.RegistryAuth = authStr
-			}
+	authConfig := registry.AuthConfig{
+		Username: imageRepo.Username,
+		Password: imageRepo.Password,
+	}
+	encodedJSON, err := json.Marshal(authConfig)
+	if err != nil {
+		return err
+	}
+	options.RegistryAuth = base64.URLEncoding.EncodeToString(encodedJSON)
+	return dockerCli.PullImageWithProcessAndOptions(task, imageName, options)
+}
+
+func selectImageRepo(imageName string, repos []model.ImageRepo) *model.ImageRepo {
+	var selected *model.ImageRepo
+	selectedURLLength := 0
+	for i := range repos {
+		downloadURL := strings.TrimRight(strings.TrimSpace(repos[i].DownloadUrl), "/")
+		if downloadURL == "" || !strings.HasPrefix(imageName, downloadURL+"/") {
+			continue
 		}
-	} else {
-		hasAuth, authStr := loadAuthInfo(imageName)
-		if hasAuth {
-			options.RegistryAuth = authStr
+		if len(downloadURL) > selectedURLLength {
+			selected = &repos[i]
+			selectedURLLength = len(downloadURL)
 		}
 	}
-	return dockerCli.PullImageWithProcessAndOptions(task, imageName, options)
+	return selected
 }
 
 func loadCpuAndMem(client *client.Client, containerItem string) dto.ContainerListStats {
