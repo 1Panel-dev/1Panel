@@ -21,7 +21,7 @@
                 <TableSetting title="login-log-refresh" @search="search()" />
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="370">
+                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="330">
                     <el-table-column :label="$t('logs.loginIP')" prop="ip" />
                     <el-table-column v-if="isEnterprise" :label="$t('commons.login.username')" prop="user" />
                     <el-table-column :label="$t('logs.loginAddress')" prop="address" />

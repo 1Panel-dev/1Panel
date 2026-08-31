@@ -183,6 +183,9 @@ export namespace Firewall {
     }
 
     export interface Inventory {
+        total: number;
+        allTotal: number;
+        managedTotal: number;
         items: InventoryItem[];
         notices?: ScopeNotice[];
     }
@@ -214,8 +217,14 @@ export namespace Firewall {
         checkFlag: string;
     }
 
-    export interface InventoryRequest {
-        scope: Scope;
+    export interface InventoryRequest extends ReqPage {
+        scopes: Scope[];
+        all?: boolean;
+        info: string;
+        families?: Array<'ipv4' | 'ipv6'>;
+        actions?: Array<'accept' | 'deny'>;
+        states?: InventoryState[];
+        excludeChains?: string[];
     }
 
     export interface NativeDetailRequest {

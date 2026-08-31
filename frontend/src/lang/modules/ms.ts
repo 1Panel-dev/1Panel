@@ -4335,7 +4335,7 @@ const message = {
             'Nyahikat - Apabila tidak terikat, semua peraturan firewall yang ditambah akan menjadi tidak sah. Teruskan dengan berhati-hati. Sahkan?',
         portWhiteList: 'Senarai putih port',
         portWhiteListAlter:
-            'Port dalam senarai putih akan dibuka secara automatik apabila firewall dimulakan atau dihidupkan.',
+            'Menyimpan tidak mengubah peraturan firewall semasa dengan serta-merta. Port baharu akan dibuka pada pemulaan atau pengaktifan seterusnya. Untuk menutup port yang dialih keluar, padam peraturan sedia ada secara manual daripada senarai peraturan.',
         portWhiteListHelper: 'Menyokong IPv4/IPv6, TCP/UDP, port tunggal dan julat seperti 8000-8100.',
         chain: 'Rantai',
         sourceIP: 'IP Sumber',

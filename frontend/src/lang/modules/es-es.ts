@@ -4320,7 +4320,7 @@ const message = {
             'Desvincular: al desvincular, todas las reglas de firewall agregadas se volverán inválidas. Proceda con precaución. ¿Confirmar?',
         portWhiteList: 'Lista blanca de puertos',
         portWhiteListAlter:
-            'Los puertos de la lista blanca se abrirán automáticamente al inicializar o iniciar el firewall.',
+            'Guardar no cambia inmediatamente las reglas actuales del firewall. Los puertos nuevos se abrirán la próxima vez que se inicialice o inicie el firewall. Para cerrar un puerto eliminado, borre manualmente su regla existente en la lista de reglas.',
         portWhiteListHelper: 'Admite IPv4/IPv6, TCP/UDP, puertos individuales y rangos como 8000-8100.',
         chain: 'Cadena',
         sourceIP: 'IP de Origen',

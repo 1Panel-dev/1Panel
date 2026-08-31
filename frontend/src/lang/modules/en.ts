@@ -4270,7 +4270,7 @@ const message = {
             'Unbind - When unbound, all added firewall rules will become invalid. Proceed with caution. Confirm?',
         portWhiteList: 'Port allowlist',
         portWhiteListAlter:
-            'Ports in the allowlist are opened automatically when the firewall is initialized or started.',
+            'Saving does not change the current firewall rules immediately. New ports are opened the next time the firewall is initialized or started. To close a removed port, delete its existing rule manually from the rule list.',
         portWhiteListHelper: 'Supports IPv4/IPv6, TCP/UDP, single ports, and port ranges such as 8000-8100.',
         chain: 'Chain',
         sourceIP: 'Source IP',

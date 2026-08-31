@@ -4358,7 +4358,7 @@ const message = {
             'Desvincular - Quando desvinculado, todas as regras de firewall adicionadas se tornarão inválidas. Prossiga com cautela. Confirmar?',
         portWhiteList: 'Lista branca de portas',
         portWhiteListAlter:
-            'As portas na lista branca serão abertas automaticamente ao inicializar ou iniciar o firewall.',
+            'Salvar não altera imediatamente as regras atuais do firewall. Novas portas serão abertas na próxima inicialização ou ativação. Para fechar uma porta removida, exclua manualmente a regra existente na lista de regras.',
         portWhiteListHelper: 'Suporta IPv4/IPv6, TCP/UDP, portas únicas e intervalos como 8000-8100.',
         chain: 'Cadeia',
         sourceIP: 'IP de Origem',

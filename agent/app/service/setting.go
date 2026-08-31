@@ -138,7 +138,7 @@ func (u *SettingService) Update(key, value string) error {
 		return err
 	}
 	if key == constant.FirewallPortWhiteList {
-		return SyncFirewallPortWhitelistAfterUpdate(oldValue)
+		return ReleaseFirewallPortWhitelistAfterUpdate(oldValue)
 	}
 	return nil
 }

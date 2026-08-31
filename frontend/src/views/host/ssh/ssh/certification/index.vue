@@ -18,7 +18,7 @@
                 v-model:selects="selects"
                 :data="data"
                 @search="search"
-                :heightDiff="370"
+                :heightDiff="320"
             >
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name" />

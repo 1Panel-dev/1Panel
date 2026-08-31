@@ -4335,7 +4335,7 @@ const message = {
             'Bağlantıyı Kaldır - Bağlantı kaldırıldığında, eklenen tüm güvenlik duvarı kuralları geçersiz olacaktır. Dikkatli ilerleyin. Onaylıyor musunuz?',
         portWhiteList: 'Port beyaz listesi',
         portWhiteListAlter:
-            'Beyaz listedeki portlar, güvenlik duvarı başlatılırken veya çalıştırılırken otomatik olarak açılır.',
+            'Kaydetmek mevcut güvenlik duvarı kurallarını hemen değiştirmez. Yeni portlar bir sonraki başlatma veya etkinleştirmede açılır. Listeden kaldırılan bir portu kapatmak için mevcut kuralı kurallar listesinden elle silin.',
         portWhiteListHelper: 'IPv4/IPv6, TCP/UDP, tek portlar ve 8000-8100 gibi port aralıklarını destekler.',
         chain: 'Zincir',
         sourceIP: 'Kaynak IP',

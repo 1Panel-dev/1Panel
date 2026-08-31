@@ -3980,7 +3980,8 @@ const message = {
         bindHelper: '綁定 僅當狀態為綁定時，防火牆規則才能生效，是否確認？',
         unbindHelper: '解除綁定 解除綁定時，已新增的所有防火牆規則將失效，請謹慎操作，是否確認？',
         portWhiteList: '埠白名單',
-        portWhiteListAlter: '防火牆初始化或啟動時，將自動放行白名單埠',
+        portWhiteListAlter:
+            '儲存後不會立即變更目前的防火牆規則。新增的埠將在下次初始化或啟動防火牆時自動放行；若要關閉已移出的埠，請前往規則清單手動刪除現有規則。',
         portWhiteListHelper: '支援 IPv4/IPv6、TCP/UDP、單一連接埠以及 8000-8100 格式的連接埠範圍。',
         chain: '鏈',
         sourceIP: '來源 IP',

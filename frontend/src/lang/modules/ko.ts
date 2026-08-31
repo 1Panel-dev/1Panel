@@ -4170,7 +4170,8 @@ const message = {
         unbindHelper:
             '바인딩 해제 - 바인딩 해제 시 추가된 모든 방화벽 규칙이 무효화됩니다. 주의하여 진행하세요. 확인하시겠습니까?',
         portWhiteList: '포트 화이트리스트',
-        portWhiteListAlter: '방화벽을 초기화하거나 시작할 때 화이트리스트의 포트가 자동으로 허용됩니다.',
+        portWhiteListAlter:
+            '저장해도 현재 방화벽 규칙은 즉시 변경되지 않습니다. 새 포트는 다음 초기화 또는 시작 시 허용됩니다. 제거한 포트를 닫으려면 규칙 목록에서 기존 규칙을 수동으로 삭제하세요.',
         portWhiteListHelper: 'IPv4/IPv6, TCP/UDP, 단일 포트 및 8000-8100과 같은 포트 범위를 지원합니다.',
         chain: '체인',
         sourceIP: '소스 IP',

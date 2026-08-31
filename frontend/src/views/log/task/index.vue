@@ -16,7 +16,7 @@
                 <TableSetting title="task-log-refresh" @search="search()" />
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="370">
+                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="330">
                     <el-table-column :label="$t('logs.taskName')" prop="name" min-width="180px">
                         <template #default="{ row }">
                             {{ translateTaskText(row.name) }}

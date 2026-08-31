@@ -75,7 +75,7 @@
                             </el-button>
                             <el-button
                                 v-permission
-                                :disabled="loading || allManagedRules.length === 0"
+                                :disabled="loading || managedTotal === 0"
                                 @click="exportRulesBySelection"
                             >
                                 {{ $t('commons.button.export') }}
@@ -173,7 +173,7 @@
                                 </el-option-group>
                             </el-select>
                         </div>
-                        <TableSearch v-model:searchName="searchName" @search="resetPagination" />
+                        <TableSearch v-model:searchName="searchName" @search="searchWithReset" />
                         <TableRefresh @search="search" />
                         <TableSetting title="firewall-rule-refresh" @search="search" />
                     </template>
@@ -182,9 +182,10 @@
                             <ComplexTable
                                 v-model:selects="selects"
                                 :pagination-config="paginationConfig"
-                                :data="pagedItems"
-                                :heightDiff="370"
+                                :data="allRows"
+                                :heightDiff="320"
                                 row-key="rowKey"
+                                @search="search"
                             >
                                 <el-table-column type="selection" :selectable="isDeletableManagedRule" width="48" fix />
                                 <el-table-column :label="$t('firewall.action')" width="76">
@@ -397,7 +398,7 @@ import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import ProcessDetail from '@/views/host/process/process/detail/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { Expand, Filter, Lock, WarningFilled } from '@element-plus/icons-vue';
 
@@ -455,6 +456,8 @@ const iptablesChains = ['1PANEL_BASIC_BEFORE', '1PANEL_BASIC', '1PANEL_BASIC_AFT
 const visibleIptablesChains = ref<string[]>([...iptablesChains]);
 const searchName = ref('');
 const inventoryItems = ref<Firewall.InventoryItem[]>([]);
+const inventoryTotal = ref(0);
+const managedTotal = ref(0);
 const listeningProcesses = ref<Process.ListeningProcess[]>([]);
 const dockerEndpoints = ref<Firewall.DockerGuardEndpoint[]>([]);
 const selects = ref<RuleRow[]>([]);
@@ -511,11 +514,37 @@ const providerScopes = (): Firewall.Scope[] => {
     return [];
 };
 
+const inventoryFilters = () => ({
+    families: selectedRuleFilters.value
+        .filter((filter) => filter.startsWith('family:'))
+        .map((filter) => filter.slice('family:'.length) as 'ipv4' | 'ipv6'),
+    actions: selectedRuleFilters.value
+        .filter((filter) => filter.startsWith('action:'))
+        .map((filter) => filter.slice('action:'.length) as 'accept' | 'deny'),
+    states: selectedRuleFilters.value
+        .filter((filter) => filter.startsWith('state:'))
+        .map((filter) => filter.slice('state:'.length) as Firewall.InventoryState),
+    excludeChains: isDirectBackend.value
+        ? iptablesChains.filter((chain) => !visibleIptablesChains.value.includes(chain))
+        : [],
+});
+
+const inventoryRequest = (page = paginationConfig.currentPage, pageSize = paginationConfig.pageSize) => ({
+    scopes: providerScopes(),
+    info: searchName.value,
+    page,
+    pageSize,
+    ...inventoryFilters(),
+});
+
 const search = async () => {
     if (!isFirewallReady.value) {
         loading.value = false;
         inventoryItems.value = [];
         scopeNotices.value = [];
+        paginationConfig.total = 0;
+        inventoryTotal.value = 0;
+        managedTotal.value = 0;
         return;
     }
 
@@ -524,18 +553,31 @@ const search = async () => {
         loading.value = false;
         inventoryItems.value = [];
         scopeNotices.value = [];
+        paginationConfig.total = 0;
+        inventoryTotal.value = 0;
+        managedTotal.value = 0;
         return;
     }
 
     loading.value = true;
     try {
-        const [responses] = await Promise.all([
-            Promise.all(scopes.map((scope) => searchFirewallRules({ scope }))),
+        const [response] = await Promise.all([
+            searchFirewallRules(inventoryRequest()),
             loadListeningProcesses(),
             loadDockerEndpoints(),
         ]);
-        inventoryItems.value = responses.flatMap((response) => response.data.items || []);
-        scopeNotices.value = responses.flatMap((response) => response.data.notices || []);
+        const total = response.data.total || 0;
+        const lastPage = Math.max(1, Math.ceil(total / paginationConfig.pageSize));
+        if (paginationConfig.currentPage > lastPage) {
+            paginationConfig.currentPage = lastPage;
+            await search();
+            return;
+        }
+        inventoryItems.value = response.data.items || [];
+        scopeNotices.value = response.data.notices || [];
+        paginationConfig.total = total;
+        inventoryTotal.value = response.data.allTotal || 0;
+        managedTotal.value = response.data.managedTotal || 0;
         selects.value = [];
     } finally {
         loading.value = false;
@@ -714,20 +756,18 @@ const sameIptablesPositionScope = (rule: Firewall.Rule, family: Firewall.Family,
 
 const priorityPositionRanges = (
     item?: Firewall.InventoryItem,
+    sourceItems: Firewall.InventoryItem[] = inventoryItems.value,
 ): Partial<Record<Firewall.Family, PriorityPositionRange>> => {
     if (provider.value === 'firewalld') return {};
     const extraPosition = item ? 0 : 1;
     if (provider.value === 'ufw') {
         if (!item) {
-            const maxPosition = inventoryItems.value.reduce(
-                (max, row) => Math.max(max, row.observed?.locator.position || 0),
-                0,
-            );
+            const maxPosition = sourceItems.reduce((max, row) => Math.max(max, row.observed?.locator.position || 0), 0);
             const range = { min: 1, max: Math.max(1, maxPosition + 1) };
             return { ipv4: range, ipv6: range };
         }
         const family = item.rule.scope.family;
-        const positions = inventoryItems.value
+        const positions = sourceItems
             .filter((row) => row.rule.scope.family === family && row.observed?.locator.position)
             .map((row) => row.observed!.locator.position!);
         const currentPosition = item.observed?.locator.position || 1;
@@ -741,7 +781,7 @@ const priorityPositionRanges = (
     const chain = item?.rule.scope.chain || '1PANEL_BASIC';
     return Object.fromEntries(
         (['ipv4', 'ipv6'] as Firewall.Family[]).map((family) => {
-            const scopeRows = inventoryItems.value
+            const scopeRows = sourceItems
                 .filter((row) => sameIptablesPositionScope(row.rule, family, chain))
                 .sort(
                     (left, right) => (left.observed?.locator.position || 0) - (right.observed?.locator.position || 0),
@@ -771,8 +811,8 @@ const priorityPositionRanges = (
     );
 };
 
-const allRows = computed<RuleRow[]>(() =>
-    inventoryItems.value.map((item, index) => {
+const toRuleRows = (items: Firewall.InventoryItem[]): RuleRow[] =>
+    items.map((item, index) => {
         const nativeGroup = item.rule.orderBucket || item.rule.nativeKind || 'default';
         return {
             ...item,
@@ -782,102 +822,42 @@ const allRows = computed<RuleRow[]>(() =>
                 item.observed?.marker ||
                 `${scopeIdentity(item.rule)}:${nativeGroup}:${item.observed?.locator.position ?? index}`,
         };
-    }),
-);
-
-const allManagedRules = computed(() => allRows.value.filter((row) => isDeletableManagedRule(row)));
-
-const matchesRuleFamily = (rule: Firewall.Rule, family: Firewall.Family) => {
-    if (rule.scope.family !== 'inet') return rule.scope.family === family;
-
-    const address = rule.sourceAddress;
-    if (!address) return true;
-    return family === 'ipv6' ? address.includes(':') : !address.includes(':');
-};
-
-const matchesRuleFilters = (item: Firewall.InventoryItem) => {
-    const familyFilters = selectedRuleFilters.value.filter((filter) => filter.startsWith('family:'));
-    if (
-        familyFilters.length > 0 &&
-        !familyFilters.some((filter) => matchesRuleFamily(item.rule, filter.slice('family:'.length) as Firewall.Family))
-    ) {
-        return false;
-    }
-
-    const actionFilters = selectedRuleFilters.value.filter((filter) => filter.startsWith('action:'));
-    if (
-        actionFilters.length > 0 &&
-        !actionFilters.some((filter) =>
-            filter === 'action:accept' ? item.rule.action === 'accept' : item.rule.action !== 'accept',
-        )
-    ) {
-        return false;
-    }
-
-    const stateFilters = selectedRuleFilters.value.filter((filter) => filter.startsWith('state:'));
-    return stateFilters.length === 0 || stateFilters.some((filter) => item.state === filter.slice('state:'.length));
-};
-
-const filteredItems = computed<RuleRow[]>(() => {
-    const keyword = searchName.value.trim().toLowerCase();
-    return allRows.value.filter((item) => {
-        if (
-            (item.rule.scope.provider === 'iptables' || item.rule.scope.provider === 'nftables') &&
-            !visibleIptablesChains.value.includes(item.rule.scope.chain || '')
-        ) {
-            return false;
-        }
-        if (!matchesRuleFilters(item)) {
-            return false;
-        }
-        if (!keyword) return true;
-        return [
-            displayProtocol(item),
-            displayAddress(item),
-            displayPort(item),
-            item.rule.sourceAddress,
-            item.rule.sourcePort,
-            item.rule.destinationAddress,
-            item.rule.description,
-            item.observed?.rule.description,
-            item.desired?.rule.description,
-            item.observed?.raw,
-            item.rule.action,
-            item.state,
-        ].some((value) => value?.toLowerCase().includes(keyword));
     });
-});
 
-const pagedItems = computed(() => {
-    const start = (paginationConfig.currentPage - 1) * paginationConfig.pageSize;
-    return filteredItems.value.slice(start, start + paginationConfig.pageSize);
-});
+const allRows = computed<RuleRow[]>(() => toRuleRows(inventoryItems.value));
+
+const loadAllInventoryItems = async () => {
+    if (inventoryTotal.value === 0) return [];
+    const response = await searchFirewallRules({
+        ...inventoryRequest(1, paginationConfig.pageSize),
+        all: true,
+        info: '',
+        families: [],
+        actions: [],
+        states: [],
+        excludeChains: [],
+    });
+    return response.data.items || [];
+};
 
 const resetPagination = () => {
     paginationConfig.currentPage = 1;
 };
 
+const searchWithReset = () => {
+    resetPagination();
+    return search();
+};
+
 const changeIptablesChainFilter = () => {
     selects.value = [];
-    resetPagination();
+    return searchWithReset();
 };
 
 const changeRuleFilter = () => {
     selects.value = [];
-    resetPagination();
+    return searchWithReset();
 };
-
-watch(
-    filteredItems,
-    (items) => {
-        paginationConfig.total = items.length;
-        const lastPage = Math.max(1, Math.ceil(items.length / paginationConfig.pageSize));
-        if (paginationConfig.currentPage > lastPage) {
-            paginationConfig.currentPage = lastPage;
-        }
-    },
-    { immediate: true },
-);
 
 const notices = computed<DisplayNotice[]>(() => {
     const unique = new Map<string, DisplayNotice>();
@@ -967,10 +947,11 @@ const openCreate = async () => {
             return;
         }
     }
+    const sourceItems = await loadAllInventoryItems();
     ruleOperateRef.value?.acceptParams(
         provider.value as Firewall.Provider,
         undefined,
-        priorityPositionRanges(),
+        priorityPositionRanges(undefined, sourceItems),
         supportsFirewalldPriority.value,
     );
 };
@@ -1016,9 +997,11 @@ const exportRules = async (rows: RuleRow[]) => {
     downloadWithContent(JSON.stringify(exported, null, 2), `1panel-firewall-rules-${getCurrentDateFormatted()}.json`);
 };
 
-const exportRulesBySelection = () => {
+const exportRulesBySelection = async () => {
     const selected = selects.value.filter((row) => isDeletableManagedRule(row));
-    return exportRules(selected.length > 0 ? selected : allManagedRules.value);
+    if (selected.length > 0) return exportRules(selected);
+    const allManagedRules = toRuleRows(await loadAllInventoryItems()).filter((row) => isDeletableManagedRule(row));
+    return exportRules(allManagedRules);
 };
 
 const isWildcardDestinationPort = (rule: Firewall.Rule) => {
@@ -1228,12 +1211,13 @@ const displayRulePriority = (row: Firewall.InventoryItem) => {
     return row.observed?.locator.position ?? '-';
 };
 
-const openEdit = (row: RuleRow) => {
+const openEdit = async (row: RuleRow) => {
     if (!isEditableManagedRule(row)) return;
+    const sourceItems = await loadAllInventoryItems();
     ruleOperateRef.value?.acceptParams(
         provider.value as Firewall.Provider,
         row,
-        priorityPositionRanges(row),
+        priorityPositionRanges(row, sourceItems),
         supportsFirewalldPriority.value,
     );
 };

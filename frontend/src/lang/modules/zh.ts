@@ -4026,7 +4026,8 @@ const message = {
         bindHelper: '绑定 仅当状态为绑定时，防火墙规则才能生效，是否确认？',
         unbindHelper: '解绑 解除绑定时，已添加的所有防火墙规则将失效，请谨慎操作，是否确认？',
         portWhiteList: '端口白名单',
-        portWhiteListAlter: '防火墙初始化或启动时，将自动放行白名单端口',
+        portWhiteListAlter:
+            '保存后不会立即更改当前防火墙规则。新增端口将在下次初始化或启动防火墙时自动放行；如需关闭已移出的端口，请前往规则列表手动删除现有规则。',
         portWhiteListHelper: '支持 IPv4/IPv6、TCP/UDP、单端口以及 8000-8100 格式的端口范围。',
         chain: '链',
         sourceIP: '源 IP',
