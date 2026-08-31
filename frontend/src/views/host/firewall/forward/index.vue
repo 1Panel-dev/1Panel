@@ -66,7 +66,7 @@
                             v-model:selects="selects"
                             @search="search"
                             :data="data"
-                            :heightDiff="370"
+                            :heightDiff="320"
                         >
                             <el-table-column type="selection" fix />
                             <el-table-column label="IP" :min-width="60" prop="family">

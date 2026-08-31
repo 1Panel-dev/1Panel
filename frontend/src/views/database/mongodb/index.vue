@@ -110,7 +110,7 @@
                     @sort-change="search"
                     @search="search"
                     :data="tableRows"
-                    :heightDiff="370"
+                    :heightDiff="320"
                 >
                     <el-table-column :label="$t('commons.table.name')" prop="name" min-width="180" sortable>
                         <template #default="{ row }">

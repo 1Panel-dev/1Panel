@@ -280,8 +280,19 @@ func (s *FirewallService) loadProtectedPorts() ([]firewall.PortWhitelist, error)
 }
 
 func (s *FirewallService) Inventory(ctx context.Context, request dto.FirewallRuleInventory) (dto.FirewallRuleInventoryResponse, error) {
-	scope := request.Scope.Normalize()
-	if isCombinedUFWInventoryScope(scope) {
+	requestedScopes := request.Scopes
+	if len(requestedScopes) == 0 && request.Scope.Provider != "" {
+		requestedScopes = []filter.Scope{request.Scope}
+	}
+	if len(requestedScopes) == 0 {
+		return dto.FirewallRuleInventoryResponse{}, filter.ErrInvalidScope
+	}
+	scopes := make([]filter.Scope, len(requestedScopes))
+	for index, requested := range requestedScopes {
+		scopes[index] = requested.Normalize()
+	}
+	if len(scopes) == 1 && isCombinedUFWInventoryScope(scopes[0]) {
+		scope := scopes[0]
 		if err := s.checkSelectedProvider(ctx, scope.Provider); err != nil {
 			return dto.FirewallRuleInventoryResponse{}, err
 		}
@@ -289,19 +300,27 @@ func (s *FirewallService) Inventory(ctx context.Context, request dto.FirewallRul
 		if err != nil {
 			return dto.FirewallRuleInventoryResponse{}, err
 		}
-		return s.combinedUFWInventory(ctx, runtime, scope)
+		response, err := s.combinedUFWInventory(ctx, runtime, scope)
+		if err != nil {
+			return dto.FirewallRuleInventoryResponse{}, err
+		}
+		return finalizeFirewallInventory(response, request), nil
 	}
-	if err := scope.ValidateMVP(); err != nil {
+	provider := scopes[0].Provider
+	for _, scope := range scopes {
+		if err := scope.ValidateMVP(); err != nil {
+			return dto.FirewallRuleInventoryResponse{}, err
+		}
+		if scope.Provider != provider {
+			return dto.FirewallRuleInventoryResponse{}, fmt.Errorf(
+				"%w: inventory scopes must use the same provider", filter.ErrInvalidScope,
+			)
+		}
+	}
+	if err := s.checkSelectedProvider(ctx, provider); err != nil {
 		return dto.FirewallRuleInventoryResponse{}, err
 	}
-	if err := s.checkSelectedProvider(ctx, scope.Provider); err != nil {
-		return dto.FirewallRuleInventoryResponse{}, err
-	}
-	runtime, err := s.adapters.Resolve(scope.Provider)
-	if err != nil {
-		return dto.FirewallRuleInventoryResponse{}, err
-	}
-	snapshot, err := runtime.Observe(ctx, scope)
+	runtime, err := s.adapters.Resolve(provider)
 	if err != nil {
 		return dto.FirewallRuleInventoryResponse{}, err
 	}
@@ -309,15 +328,158 @@ func (s *FirewallService) Inventory(ctx context.Context, request dto.FirewallRul
 	if err != nil {
 		return dto.FirewallRuleInventoryResponse{}, err
 	}
-	desired, err := s.desiredFirewallRulesForScope(ctx, stored, scope)
-	if err != nil {
-		return dto.FirewallRuleInventoryResponse{}, err
+	response := dto.FirewallRuleInventoryResponse{}
+	for _, scope := range scopes {
+		snapshot, err := runtime.Observe(ctx, scope)
+		if err != nil {
+			return dto.FirewallRuleInventoryResponse{}, err
+		}
+		desired, err := s.desiredFirewallRulesForScope(ctx, stored, scope)
+		if err != nil {
+			return dto.FirewallRuleInventoryResponse{}, err
+		}
+		items, err := filter.MergeInventory(filter.InventoryMergeInput{Observed: snapshot.Rules, Desired: desired})
+		if err != nil {
+			return dto.FirewallRuleInventoryResponse{}, err
+		}
+		response.Items = append(response.Items, items...)
+		response.Notices = append(response.Notices, snapshot.Notices...)
 	}
-	items, err := filter.MergeInventory(filter.InventoryMergeInput{Observed: snapshot.Rules, Desired: desired})
-	if err != nil {
-		return dto.FirewallRuleInventoryResponse{}, err
+	return finalizeFirewallInventory(response, request), nil
+}
+
+func finalizeFirewallInventory(
+	response dto.FirewallRuleInventoryResponse,
+	request dto.FirewallRuleInventory,
+) dto.FirewallRuleInventoryResponse {
+	response.AllTotal = int64(len(response.Items))
+	for _, item := range response.Items {
+		if isDeletableManagedInventoryItem(item) {
+			response.ManagedTotal++
+		}
 	}
-	return dto.FirewallRuleInventoryResponse{Items: items, Notices: snapshot.Notices}, nil
+	filtered := make([]filter.InventoryItem, 0, len(response.Items))
+	for _, item := range response.Items {
+		if matchesFirewallInventoryRequest(item, request) {
+			filtered = append(filtered, item)
+		}
+	}
+	response.Total = int64(len(filtered))
+	if request.All {
+		response.Items = filtered
+		return response
+	}
+	page, pageSize := max(1, request.Page), max(1, request.PageSize)
+	start := (page - 1) * pageSize
+	if start >= len(filtered) {
+		response.Items = make([]filter.InventoryItem, 0)
+		return response
+	}
+	end := min(start+pageSize, len(filtered))
+	response.Items = filtered[start:end]
+	return response
+}
+
+func matchesFirewallInventoryRequest(item filter.InventoryItem, request dto.FirewallRuleInventory) bool {
+	if slicesContains(request.ExcludeChains, item.Rule.Scope.Chain) {
+		return false
+	}
+	if len(request.Families) > 0 && !matchesFirewallInventoryFamily(item.Rule, request.Families) {
+		return false
+	}
+	if len(request.Actions) > 0 && !matchesFirewallInventoryAction(item.Rule.Action, request.Actions) {
+		return false
+	}
+	if len(request.States) > 0 && !slicesContains(request.States, item.State) {
+		return false
+	}
+	keyword := strings.ToLower(strings.TrimSpace(request.Info))
+	if keyword == "" {
+		return true
+	}
+	rule := item.Rule
+	values := []string{
+		firewallInventoryProtocol(rule), rule.SourceAddress, rule.SourcePort, rule.DestinationAddress,
+		rule.DestinationPort, rule.Description, string(rule.Action), string(item.State),
+	}
+	if item.Observed != nil {
+		values = append(values, item.Observed.Rule.Description)
+	}
+	if item.Desired != nil {
+		values = append(values, item.Desired.Rule.Description)
+	}
+	for _, value := range values {
+		if strings.Contains(strings.ToLower(value), keyword) {
+			return true
+		}
+	}
+	return false
+}
+
+func matchesFirewallInventoryFamily(rule filter.FirewallRule, families []filter.Family) bool {
+	for _, family := range families {
+		if rule.Scope.Family != filter.FamilyInet && rule.Scope.Family == family {
+			return true
+		}
+		if rule.Scope.Family == filter.FamilyInet &&
+			(rule.SourceAddress == "" || (family == filter.FamilyIPv6) == strings.Contains(rule.SourceAddress, ":")) {
+			return true
+		}
+	}
+	return false
+}
+
+func matchesFirewallInventoryAction(action filter.Action, actions []string) bool {
+	for _, requested := range actions {
+		if requested == "accept" && action == filter.ActionAccept {
+			return true
+		}
+		if requested == "deny" && action != filter.ActionAccept {
+			return true
+		}
+	}
+	return false
+}
+
+func firewallInventoryProtocol(rule filter.FirewallRule) string {
+	if rule.NativeKind == filter.NativeKindZoneService {
+		return "service"
+	}
+	if rule.NativeKind == filter.NativeKindUFWApplication && rule.Protocol == "" {
+		return "app"
+	}
+	if rule.Scope.Provider == filter.ProviderUFW && rule.Protocol == "all" && rule.DestinationPort != "" {
+		return "tcp/udp"
+	}
+	return rule.Protocol
+}
+
+func slicesContains[T comparable](values []T, target T) bool {
+	for _, value := range values {
+		if value == target {
+			return true
+		}
+	}
+	return false
+}
+
+func isDeletableManagedInventoryItem(item filter.InventoryItem) bool {
+	if item.Desired == nil || item.Desired.Protected || item.State == filter.InventoryStateProtected {
+		return false
+	}
+	if item.Desired.Origin != filter.RuleOriginCreated && item.Desired.Origin != filter.RuleOriginAdopted {
+		return false
+	}
+	if isIptablesSystemPresetInventoryScope(item.Rule.Scope) {
+		return false
+	}
+	return item.State != filter.InventoryStateDrifted ||
+		(item.Match == filter.InventoryMatchMissing && item.Observed == nil)
+}
+
+func isIptablesSystemPresetInventoryScope(scope filter.Scope) bool {
+	return (scope.Provider == filter.ProviderIptables || scope.Provider == filter.ProviderNftables) &&
+		(scope.Chain == filter.BasicBeforeChain || scope.Chain == filter.BasicAfterChain)
 }
 
 func isCombinedUFWInventoryScope(scope filter.Scope) bool {
@@ -2419,26 +2581,7 @@ func loadRequiredFirewallPortWhiteList() ([]firewall.PortWhitelist, error) {
 	}), nil
 }
 
-func SyncFirewallPortWhitelistAfterUpdate(oldValue string) error {
-	client, err := selectedSystemFirewallClient()
-	if err != nil {
-		return err
-	}
-	state, err := lifecycle.LoadState(client)
-	if err != nil {
-		return err
-	}
-	if state.Name == constant.FirewallProviderIptables || state.Name == constant.FirewallProviderNftables {
-		isInit, _, err := loadDirectFirewallInitStatus(state.Name)
-		if err != nil {
-			return err
-		}
-		if !isInit {
-			return nil
-		}
-	} else if !state.IsActive {
-		return nil
-	}
+func ReleaseFirewallPortWhitelistAfterUpdate(oldValue string) error {
 	ports, err := loadConfiguredFirewallPortWhiteList()
 	if err != nil {
 		return err
@@ -2451,14 +2594,50 @@ func SyncFirewallPortWhitelistAfterUpdate(oldValue string) error {
 	if err != nil {
 		return err
 	}
-	if state.Name == constant.FirewallProviderIptables || state.Name == constant.FirewallProviderNftables {
-		ports = excludeFirewallPorts(ports, required)
-		oldPorts = excludeFirewallPorts(oldPorts, required)
-	} else {
-		ports = firewall.NormalizePortWhitelist(append(ports, required...))
-		oldPorts = firewall.NormalizePortWhitelist(append(oldPorts, required...))
+	removed := excludeFirewallPorts(oldPorts, ports)
+	removed = excludeFirewallPorts(removed, required)
+	return newFirewallService().releaseSystemPorts(context.Background(), systemPorts(removed))
+}
+
+// releaseSystemPorts only removes whitelist ownership from persisted rules. It
+// deliberately leaves the active native rules unchanged so users can delete
+// them explicitly from the firewall rule list.
+func (s *FirewallService) releaseSystemPorts(ctx context.Context, ports []dto.FirewallSystemPort) error {
+	portSet, err := normalizeSystemPorts(ports)
+	if err != nil || len(portSet) == 0 {
+		return err
 	}
-	return syncManagedAcceptedPorts(oldPorts, ports)
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
+
+	owners := make(map[string]struct{}, len(portSet)*2)
+	for _, port := range portSet {
+		owners[model.FirewallRuleOwner(
+			constant.FirewallRuleSourceSecurity,
+			constant.FirewallSystemAcceptedPortSourcePrefix+systemPortKey(port),
+		)] = struct{}{}
+		if port.Family == constant.FirewallFamilyIPv4 {
+			owners[model.FirewallRuleOwner(
+				constant.FirewallRuleSourceSecurity,
+				constant.FirewallSystemAcceptedPortSourcePrefix+legacySystemPortKey(port),
+			)] = struct{}{}
+		}
+	}
+	records, err := s.rules.List(ctx)
+	if err != nil {
+		return err
+	}
+	for _, record := range records {
+		if _, exists := owners[record.Owner]; !exists {
+			continue
+		}
+		if err := s.rules.UpdateWithRevision(ctx, record.UUID, record.Revision, map[string]interface{}{
+			"owner": constant.FirewallRuleSourceUser,
+		}); err != nil {
+			return fmt.Errorf("release accepted firewall port rule %q: %w", record.UUID, err)
+		}
+	}
+	return nil
 }
 
 func newIptablesHelperManager() *iptables_helper.Manager {

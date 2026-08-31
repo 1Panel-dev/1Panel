@@ -42,7 +42,7 @@
                 </el-button>
             </template>
             <template #main>
-                <MainDiv :heightDiff="370">
+                <MainDiv :heightDiff="330">
                     <LogFile
                         ref="logRef"
                         :config="logConfig"

@@ -55,7 +55,7 @@
                 <TableRefresh @search="search" />
             </template>
             <template #main>
-                <ComplexTable v-model:selects="selects" :data="containerRows" :heightDiff="370" row-key="key">
+                <ComplexTable v-model:selects="selects" :data="containerRows" :heightDiff="320" row-key="key">
                     <el-table-column type="selection" :selectable="hasProtectedEndpoint" width="48" fix />
                     <el-table-column :label="$t('commons.table.name')" min-width="180">
                         <template #default="{ row }">{{ row.name }}</template>

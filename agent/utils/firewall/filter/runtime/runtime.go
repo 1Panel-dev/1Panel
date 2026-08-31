@@ -129,8 +129,7 @@ func (e *Engine) CompileDesired(
 		return nil, err
 	}
 	result := make([]filter.DesiredRule, 0, len(rules))
-	scopeOrdinals := make(map[string]int)
-	for _, rule := range rules {
+	for ordinal, rule := range rules {
 		prepared, err := e.Prepare(rule)
 		if err != nil {
 			return nil, err
@@ -142,9 +141,6 @@ func (e *Engine) CompileDesired(
 		if err != nil {
 			return nil, err
 		}
-		scopeKey := prepared.Scope.Key()
-		ordinal := scopeOrdinals[scopeKey]
-		scopeOrdinals[scopeKey] = ordinal + 1
 		prepared.UUID = compiledRuleUUID(policyUUID, ruleKey, ordinal)
 		desired := filter.DesiredRule{UUID: policyUUID, Rule: prepared, RuleKey: ruleKey, Origin: origin}
 		if capabilities.Marker {

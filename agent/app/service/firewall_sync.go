@@ -981,6 +981,16 @@ type firewallScopeReconciler struct {
 }
 
 func (r *firewallScopeReconciler) reconcile() {
+	if r.runtime.Provider() == filter.ProviderUFW {
+		snapshot, err := r.runtime.ObserveMutation(r.ctx, r.snapshot.Scope)
+		if err != nil {
+			for _, entry := range r.entries {
+				entry.fail(err)
+			}
+			return
+		}
+		r.snapshot = snapshot
+	}
 	removes := make([]*firewallRuleSyncEntry, 0)
 	updates := make([]*firewallRuleSyncEntry, 0)
 	creates := make([]*firewallRuleSyncEntry, 0)
@@ -1217,12 +1227,27 @@ func firewallRuleSyncChange(
 		before := firewallsync.ObservedRule(*item.Observed)
 		locator := item.Observed.Locator
 		change.Operation = filter.ChangeUpdate
+		if requiresUFWMarkerAdoption(entry.desired, *item.Observed) {
+			change.Operation = filter.ChangeAdopt
+			change.PreviousMarker = item.Observed.Marker
+		}
 		change.Before = &before
 		change.Locator = &locator
 	default:
 		return filter.DesiredChange{}, false, fmt.Errorf("%w: target rule match is %s", filter.ErrRuleOperation, item.Match)
 	}
 	return change, true, nil
+}
+
+func requiresUFWMarkerAdoption(desired filter.DesiredRule, observed filter.ObservedRule) bool {
+	if desired.Rule.Scope.Provider != filter.ProviderUFW || observed.Marker == desired.Marker {
+		return false
+	}
+	marker := strings.TrimSpace(observed.Marker)
+	if marker == "" {
+		return desired.Origin == filter.RuleOriginAdopted
+	}
+	return marker == "1panel-rule:"+strings.TrimSpace(desired.UUID)
 }
 
 func firewallRuleSyncInsertionPosition(

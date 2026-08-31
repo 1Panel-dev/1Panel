@@ -80,8 +80,11 @@ type FirewallSystemPort struct {
 }
 
 type FirewallRuleInventoryResponse struct {
-	Items   []filter.InventoryItem `json:"items"`
-	Notices []filter.ScopeNotice   `json:"notices,omitempty"`
+	Total        int64                  `json:"total"`
+	AllTotal     int64                  `json:"allTotal"`
+	ManagedTotal int64                  `json:"managedTotal"`
+	Items        []filter.InventoryItem `json:"items"`
+	Notices      []filter.ScopeNotice   `json:"notices,omitempty"`
 }
 
 type FirewallRuleResetResponse struct {
@@ -106,7 +109,15 @@ type FirewallRuleCheckResult struct {
 }
 
 type FirewallRuleInventory struct {
-	Scope filter.Scope `json:"scope" validate:"required"`
+	PageInfo
+	Scope         filter.Scope            `json:"scope,omitempty"`
+	Scopes        []filter.Scope          `json:"scopes,omitempty" validate:"max=16"`
+	All           bool                    `json:"all,omitempty"`
+	Info          string                  `json:"info"`
+	Families      []filter.Family         `json:"families,omitempty" validate:"omitempty,dive,oneof=ipv4 ipv6"`
+	Actions       []string                `json:"actions,omitempty" validate:"omitempty,dive,oneof=accept deny"`
+	States        []filter.InventoryState `json:"states,omitempty" validate:"omitempty,dive,oneof=managed adopted external drifted protected"`
+	ExcludeChains []string                `json:"excludeChains,omitempty" validate:"omitempty,dive,oneof=1PANEL_BASIC_BEFORE 1PANEL_BASIC 1PANEL_BASIC_AFTER"`
 }
 
 type FirewallNativeDetail struct {

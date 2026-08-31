@@ -173,7 +173,16 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 		return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, fmt.Errorf("verify UFW rule: %w", err))
 	}
 	if !verification.Matched {
-		return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, errors.New("ufw write verification failed"))
+		return filter.ApplyResult{}, a.compensate(
+			ctx,
+			plan.Rules[0],
+			executed,
+			fmt.Errorf(
+				"ufw write verification failed for marker %q in scope %s",
+				plan.Rules[0].Expected.Marker,
+				plan.Scope.Key(),
+			),
+		)
 	}
 	return filter.ApplyResult{
 		Applied:      []filter.ObservedRule{plan.Rules[0].Expected},
@@ -298,8 +307,14 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		position = *target.Locator.Position
 		plan.Previous = &target
 		plan.Expected = observedForRule(normalized, marker, position)
-		plan.Commands = []filter.NativeCommand{commentCommand(normalized, marker)}
-		plan.RollbackCommands = []filter.NativeCommand{commentCommand(target.Rule, observedComment(target))}
+		plan.Commands = []filter.NativeCommand{
+			deletePositionCommand(position),
+			insertCommand(position, normalized, marker),
+		}
+		plan.RollbackCommands = []filter.NativeCommand{
+			insertCommand(position, target.Rule, observedComment(target)),
+			deleteRuleCommand(normalized, marker),
+		}
 	case filter.ChangeUpdate:
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, marker, true)
 		if targetErr != nil {
@@ -406,15 +421,23 @@ func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChang
 	if target.Protected {
 		return filter.ObservedRule{}, filter.ErrProtectedRule
 	}
+	previousMarker := strings.TrimSpace(change.PreviousMarker)
 	if requireOwned {
 		if target.Marker != marker {
 			return filter.ObservedRule{}, fmt.Errorf("%w: ufw rule is not owned by this rule UUID", filter.ErrInvalidRule)
 		}
-	} else if target.Marker != "" {
-		return filter.ObservedRule{}, fmt.Errorf("%w: ufw adoption target is already marked", filter.ErrInvalidRule)
+	} else if target.Marker != previousMarker {
+		if target.Marker != "" {
+			return filter.ObservedRule{}, fmt.Errorf("%w: ufw adoption target marker changed", filter.ErrRuleStale)
+		}
+		return filter.ObservedRule{}, filter.ErrRuleStale
 	}
-	if target.Marker == marker && target.ParseStatus != filter.ParseStatusSupported &&
-		(target.ParseStatus == filter.ParseStatusOpaque || filter.ObservedRuleMatchesExpected(target, desired)) {
+	semanticMatch := filter.ObservedRuleMatchesExpected(target, desired)
+	canHydrateOwned := target.Marker == marker &&
+		(target.ParseStatus == filter.ParseStatusOpaque || semanticMatch)
+	canHydrateAdopted := !requireOwned && target.Marker == previousMarker &&
+		target.ParseStatus != filter.ParseStatusOpaque && semanticMatch
+	if target.ParseStatus != filter.ParseStatusSupported && (canHydrateOwned || canHydrateAdopted) {
 		orderIndex := target.Rule.OrderIndex
 		target.Rule = desired
 		target.Rule.OrderIndex = orderIndex
@@ -544,19 +567,20 @@ func observedComment(observed filter.ObservedRule) string {
 }
 
 func (a *Adapter) verify(ctx context.Context, plan filter.BackendPlan) (filter.VerifyResult, error) {
-	snapshot, err := a.Observe(ctx, plan.Scope)
+	scopes := append([]filter.Scope{plan.Scope}, relatedScopes(plan.Scope)...)
+	snapshots, err := a.ObserveScopes(ctx, scopes)
 	if err != nil {
 		return filter.VerifyResult{}, err
 	}
+	if len(snapshots) != len(scopes) {
+		return filter.VerifyResult{}, errors.New("ufw observation returned an incomplete scope set")
+	}
+	snapshot := snapshots[0]
 	rulePlan := plan.Rules[0]
 	marker := rulePlan.Expected.Marker
-	count := countMarker(snapshot, marker)
-	for _, scope := range relatedScopes(plan.Scope) {
-		other, err := a.Observe(ctx, scope)
-		if err != nil {
-			return filter.VerifyResult{}, err
-		}
-		count += countMarker(other, marker)
+	count := 0
+	for _, observedSnapshot := range snapshots {
+		count += countMarker(observedSnapshot, marker)
 	}
 	if rulePlan.Operation == filter.ChangeDelete {
 		return filter.VerifyResult{Snapshot: snapshot, Matched: count == 0}, nil
@@ -819,10 +843,22 @@ func stripRuleAnnotations(value string) (string, bool) {
 func applicationProfile(value string) (string, string, bool) {
 	profile, iface, ok := splitInterface(value)
 	profile = strings.TrimSpace(profile)
-	if !ok || !validApplicationProfileName(profile) {
+	if !ok || looksLikeAddressedService(profile) || !validApplicationProfileName(profile) {
 		return "", "", false
 	}
 	return profile, iface, true
+}
+
+func looksLikeAddressedService(value string) bool {
+	tokens := strings.Fields(value)
+	if len(tokens) < 2 {
+		return false
+	}
+	if isAnywhere(tokens[0]) {
+		return true
+	}
+	_, ok := parseAddress(tokens[0])
+	return ok
 }
 
 func validApplicationProfileName(profile string) bool {

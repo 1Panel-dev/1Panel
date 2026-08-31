@@ -35,8 +35,6 @@
                             <span class="protocol-option-description">{{ $t('firewall.allProtocolHelper') }}</span>
                         </div>
                     </el-option>
-                    <el-option v-if="provider !== 'ufw'" label="ICMP" value="icmp" />
-                    <el-option v-if="provider !== 'ufw'" label="ICMPV6" value="icmpv6" />
                 </el-select>
             </el-form-item>
             <el-form-item label="IP" prop="sourceAddresses">

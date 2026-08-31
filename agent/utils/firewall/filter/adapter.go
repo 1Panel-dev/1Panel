@@ -18,12 +18,13 @@ const (
 )
 
 type DesiredChange struct {
-	Operation    ChangeOperation `json:"operation"`
-	Before       *FirewallRule   `json:"before,omitempty"`
-	After        *FirewallRule   `json:"after,omitempty"`
-	Locator      *Locator        `json:"locator,omitempty"`
-	Append       bool            `json:"append,omitempty"`
-	RestoreAtEnd bool            `json:"restoreAtEnd,omitempty"`
+	Operation      ChangeOperation `json:"operation"`
+	Before         *FirewallRule   `json:"before,omitempty"`
+	After          *FirewallRule   `json:"after,omitempty"`
+	Locator        *Locator        `json:"locator,omitempty"`
+	PreviousMarker string          `json:"previousMarker,omitempty"`
+	Append         bool            `json:"append,omitempty"`
+	RestoreAtEnd   bool            `json:"restoreAtEnd,omitempty"`
 }
 
 type NativeCommand struct {

@@ -214,12 +214,60 @@ func findObservedInventoryMatch(
 			!ObservedRuleMatchesExpected(candidates[match].rule, desired.Rule) {
 			return match, InventoryMatchChanged
 		}
+		if status != InventoryMatchMissing {
+			return match, status
+		}
+		if desired.Origin == RuleOriginAdopted {
+			match, status = uniqueUnclaimedSemanticCandidate(desired.Rule, "", candidates)
+			if status != InventoryMatchMissing {
+				if match >= 0 {
+					return match, InventoryMatchChanged
+				}
+				return match, status
+			}
+		}
+		legacyMarker := "1panel-rule:" + strings.TrimSpace(desired.UUID)
+		if legacyMarker != "1panel-rule:" && legacyMarker != marker {
+			match, status = uniqueUnclaimedSemanticCandidate(desired.Rule, legacyMarker, candidates)
+			if status != InventoryMatchMissing {
+				if match >= 0 {
+					return match, InventoryMatchChanged
+				}
+				return match, status
+			}
+		}
 		return match, status
 	}
 	if desired.ObservedInstanceKey != "" {
 		return uniqueUnclaimedCandidate(byInstanceKey[desired.ObservedInstanceKey], candidates)
 	}
 	return uniqueUnclaimedCandidate(byRuleKey[desired.RuleKey], candidates)
+}
+
+func uniqueUnclaimedSemanticCandidate(
+	expected FirewallRule,
+	marker string,
+	candidates []observedInventoryCandidate,
+) (int, InventoryMatch) {
+	match := -1
+	count := 0
+	for index := range candidates {
+		candidate := candidates[index]
+		if candidate.claimed || strings.TrimSpace(candidate.rule.Marker) != marker ||
+			!ObservedRuleMatchesExpected(candidate.rule, expected) {
+			continue
+		}
+		match = index
+		count++
+	}
+	switch count {
+	case 0:
+		return -1, InventoryMatchMissing
+	case 1:
+		return match, InventoryMatchExact
+	default:
+		return -1, InventoryMatchAmbiguous
+	}
 }
 
 func uniqueUnclaimedCandidate(indices []int, candidates []observedInventoryCandidate) (int, InventoryMatch) {

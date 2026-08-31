@@ -36254,28 +36254,101 @@ const docTemplate = `{
 		},
 		"dto.FirewallRuleInventory": {
 			"properties": {
+				"actions": {
+					"items": {
+						"enum": [
+							"accept",
+							"deny"
+						],
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"all": {
+					"type": "boolean"
+				},
+				"excludeChains": {
+					"items": {
+						"enum": [
+							"1PANEL_BASIC_BEFORE",
+							"1PANEL_BASIC",
+							"1PANEL_BASIC_AFTER"
+						],
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"families": {
+					"items": {
+						"enum": [
+							"ipv4",
+							"ipv6"
+						],
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"info": {
+					"type": "string"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				},
 				"scope": {
 					"$ref": "#/definitions/filter.Scope"
+				},
+				"scopes": {
+					"items": {
+						"$ref": "#/definitions/filter.Scope"
+					},
+					"maxItems": 16,
+					"type": "array"
+				},
+				"states": {
+					"items": {
+						"enum": [
+							"managed",
+							"adopted",
+							"external",
+							"drifted",
+							"protected"
+						],
+						"type": "string"
+					},
+					"type": "array"
 				}
 			},
 			"required": [
-				"scope"
+				"page",
+				"pageSize"
 			],
 			"type": "object"
 		},
 		"dto.FirewallRuleInventoryResponse": {
 			"properties": {
+				"allTotal": {
+					"type": "integer"
+				},
 				"items": {
 					"items": {
 						"$ref": "#/definitions/filter.InventoryItem"
 					},
 					"type": "array"
 				},
+				"managedTotal": {
+					"type": "integer"
+				},
 				"notices": {
 					"items": {
 						"$ref": "#/definitions/filter.ScopeNotice"
 					},
 					"type": "array"
+				},
+				"total": {
+					"type": "integer"
 				}
 			},
 			"type": "object"
