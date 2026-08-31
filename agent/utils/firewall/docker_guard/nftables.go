@@ -177,7 +177,7 @@ func (m *NftablesManager) ensureFamily(family string, required bool) error {
 	if !baseExists {
 		commands = append(commands, []string{
 			"add", "chain", tableFamily, NftTable, NftBaseChain,
-			"{", "type", "filter", "hook", "forward", "priority", "filter", "-", "1", ";", "policy", "accept", ";", "}",
+			"{", "type", "filter", "hook", "forward", "priority", "-1", ";", "policy", "accept", ";", "}",
 		})
 	}
 	if !tableExists || !m.objectExists("chain", tableFamily, NftTable, NftChain) {
@@ -255,7 +255,7 @@ func (m *NftablesManager) rebuildLocked(policies []Policy) error {
 		if err != nil {
 			return &FamilyError{Family: family, Err: err}
 		}
-		if _, err := m.runner.RunInput("nft", script, "-f", "-"); err != nil {
+		if _, err := m.runner.RunInput("nft", script); err != nil {
 			return &FamilyError{Family: family, Err: fmt.Errorf("restore rules: %w", err)}
 		}
 	}
@@ -272,7 +272,7 @@ func compileNftPolicy(policy Policy) [][]string {
 	base = append(base, "ct", "original", "proto-dst", strconv.Itoa(int(policy.HostPort)))
 	comment := strconv.Quote("1panel-docker:" + policy.UUID)
 	if policy.Mode == ModeAll {
-		return [][]string{append(append([]string{}, base...), "comment", comment, "drop")}
+		return [][]string{append(append([]string{}, base...), "drop", "comment", comment)}
 	}
 	target := "drop"
 	capacity := len(policy.Sources)
@@ -283,11 +283,11 @@ func compileNftPolicy(policy Policy) [][]string {
 	rules := make([][]string, 0, capacity)
 	for _, source := range policy.Sources {
 		args := append([]string{}, base...)
-		args = append(args, addressKeyword, "saddr", source, "comment", comment, target)
+		args = append(args, addressKeyword, "saddr", source, target, "comment", comment)
 		rules = append(rules, args)
 	}
 	if policy.Mode == ModeAllow {
-		rules = append(rules, append(append([]string{}, base...), "comment", comment, "drop"))
+		rules = append(rules, append(append([]string{}, base...), "drop", "comment", comment))
 	}
 	return rules
 }
@@ -347,7 +347,7 @@ func (m *NftablesManager) runBatch(commands [][]string) error {
 	if err != nil {
 		return err
 	}
-	if _, err := m.runner.RunInput("nft", script, "-f", "-"); err != nil {
+	if _, err := m.runner.RunInput("nft", script); err != nil {
 		return fmt.Errorf("batch update Docker guard lifecycle: %w", err)
 	}
 	return nil

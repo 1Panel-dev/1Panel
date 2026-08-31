@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 )
 
 const (
@@ -83,6 +84,9 @@ func (commandRunner) Run(executable string, args ...string) (string, error) {
 
 func (commandRunner) RunInput(executable, input string, args ...string) (string, error) {
 	executable = dockerGuardExecutable(executable)
+	if executable == "nft" {
+		return "", nftables_helper.RunScript(input)
+	}
 	manager := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second), cmd.WithStdin(strings.NewReader(input)))
 	return manager.RunWithOptionalSudoAndStdout(executable, args...)
 }

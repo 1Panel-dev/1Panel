@@ -123,7 +123,6 @@ func (s *DockerPortGuardService) LoadOverview(ctx context.Context) (dto.DockerPo
 	base = s.runtimeStatus(s.guardRuntime(base.Backend), base.Backend)
 	base.Version = s.loadFirewallVersion(base.Backend)
 	if reconcileErr := lastDockerPortGuardReconcileError(); reconcileErr != nil {
-		base.Message = reconcileErr.Error()
 		markDockerGuardReconcileFailure(&base, reconcileErr)
 	}
 	endpoints, err := discoverDockerEndpoints(ctx, cli)

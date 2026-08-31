@@ -88,12 +88,12 @@ func (m *Manager) ensureBaseChains() error {
 		if !tableExists {
 			commands = append(commands, []string{
 				"add", "chain", tableFamily, TableName, InputChain,
-				"{", "type", "filter", "hook", "input", "priority", "filter", ";", "policy", "accept", ";", "}",
+				"{", "type", "filter", "hook", "input", "priority", "0", ";", "policy", "accept", ";", "}",
 			})
 		} else if _, err := run("list", "chain", tableFamily, TableName, InputChain); err != nil {
 			commands = append(commands, []string{
 				"add", "chain", tableFamily, TableName, InputChain,
-				"{", "type", "filter", "hook", "input", "priority", "filter", ";", "policy", "accept", ";", "}",
+				"{", "type", "filter", "hook", "input", "priority", "0", ";", "policy", "accept", ";", "}",
 			})
 		}
 		for _, nativeChain := range BasicChains() {

@@ -300,17 +300,22 @@ const submitPolicy = async () => {
     const valid = await formRef.value?.validate().catch(() => false);
     if (!valid || !form.mode) return;
     const sources = splitTagValues(form.sources);
-    await upsertDockerPortGuardPolicies({
-        endpoints: policyEndpoints.value.map(({ family, hostIP, hostPort, protocol }) => ({
-            family,
-            hostIP,
-            hostPort,
-            protocol,
-        })),
-        mode: form.mode,
-        sources: form.mode === 'deny_all' ? [] : sources,
-        description: form.description,
-    });
+    try {
+        await upsertDockerPortGuardPolicies({
+            endpoints: policyEndpoints.value.map(({ family, hostIP, hostPort, protocol }) => ({
+                family,
+                hostIP,
+                hostPort,
+                protocol,
+            })),
+            mode: form.mode,
+            sources: form.mode === 'deny_all' ? [] : sources,
+            description: form.description,
+        });
+    } catch {
+        emit('search');
+        return;
+    }
     policyVisible.value = false;
     selectedGroupKeys.value = [];
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -330,8 +335,13 @@ const remove = async (endpoints: Firewall.DockerGuardEndpoint[], batch: boolean)
     } catch {
         return;
     }
-    for (let offset = 0; offset < uuids.length; offset += 256) {
-        await deleteDockerPortGuardPolicies({ uuids: uuids.slice(offset, offset + 256) });
+    try {
+        for (let offset = 0; offset < uuids.length; offset += 256) {
+            await deleteDockerPortGuardPolicies({ uuids: uuids.slice(offset, offset + 256) });
+        }
+    } catch {
+        emit('search');
+        return;
     }
     selectedGroupKeys.value = [];
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

@@ -410,7 +410,12 @@ const operate = async (operation: 'initialize' | 'bind' | 'unbind') => {
             return;
         }
     }
-    await operateDockerPortGuard(operation);
+    try {
+        await operateDockerPortGuard(operation);
+    } catch {
+        await search();
+        return;
+    }
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     await search();
 };
@@ -483,6 +488,8 @@ const removePolicies = async (endpoints: Firewall.DockerGuardEndpoint[], batch: 
             await deleteDockerPortGuardPolicies({ uuids: uuids.slice(offset, offset + 256) });
         }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        await search();
+    } catch {
         await search();
     } finally {
         loading.value = false;

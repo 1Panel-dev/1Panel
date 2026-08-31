@@ -73,16 +73,37 @@ export const loadDockerPortGuard = () =>
 export const loadDockerPublishedPorts = () =>
     http.get<Firewall.DockerGuardContainer[]>('/hosts/firewall/docker/endpoints', {}, { timeout: TimeoutEnum.T_40S });
 
-export const syncDockerPortGuard = () => http.post('/hosts/firewall/docker/sync', {}, TimeoutEnum.T_60S);
+export const syncDockerPortGuard = () =>
+    http.postWithConfig(
+        '/hosts/firewall/docker/sync',
+        {},
+        {
+            timeout: TimeoutEnum.T_60S,
+            skipErrorMessage: true,
+        },
+    );
 
 export const operateDockerPortGuard = (operation: 'initialize' | 'bind' | 'unbind') =>
-    http.post('/hosts/firewall/docker/operate', { operation }, TimeoutEnum.T_60S);
+    http.postWithConfig(
+        '/hosts/firewall/docker/operate',
+        { operation },
+        {
+            timeout: TimeoutEnum.T_60S,
+            skipErrorMessage: true,
+        },
+    );
 
 export const upsertDockerPortGuardPolicies = (request: Firewall.DockerGuardPolicyBatch) =>
-    http.post('/hosts/firewall/docker/policies/batch', request, TimeoutEnum.T_60S);
+    http.postWithConfig('/hosts/firewall/docker/policies/batch', request, {
+        timeout: TimeoutEnum.T_60S,
+        skipErrorMessage: true,
+    });
 
 export const deleteDockerPortGuardPolicies = (request: Firewall.DockerGuardPolicyBatchDelete) =>
-    http.post('/hosts/firewall/docker/policies/delete/batch', request, TimeoutEnum.T_60S);
+    http.postWithConfig('/hosts/firewall/docker/policies/delete/batch', request, {
+        timeout: TimeoutEnum.T_60S,
+        skipErrorMessage: true,
+    });
 
 export const loadFirewallSettings = () => http.get<Firewall.Settings>('/hosts/firewall/settings');
 

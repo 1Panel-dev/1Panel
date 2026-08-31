@@ -1451,7 +1451,7 @@ func (s *FirewallService) prepareManagedUpdate(
 	if after.Scope.Key() != before.Rule.Scope.Key() {
 		return preparedManagedUpdate{}, fmt.Errorf("%w: managed rule scope cannot be changed", filter.ErrUnsupportedScope)
 	}
-	if after.NativeKind != before.Rule.NativeKind {
+	if !supportsManagedNativeKindTransition(before.Rule, after) {
 		return preparedManagedUpdate{}, fmt.Errorf("%w: native rule conversion requires an explicit workflow", filter.ErrUnsupportedScope)
 	}
 	capabilities, err := runtime.Capabilities(ctx)
@@ -1481,6 +1481,17 @@ func (s *FirewallService) prepareManagedUpdate(
 	return preparedManagedUpdate{
 		Stored: stored, Before: before, After: after, Snapshot: snapshot, Observed: observed, Runtime: runtime,
 	}, nil
+}
+
+func supportsManagedNativeKindTransition(before, after filter.FirewallRule) bool {
+	if before.NativeKind == after.NativeKind {
+		return true
+	}
+	if before.Scope.Key() != after.Scope.Key() || before.Scope.Provider != filter.ProviderFirewalld {
+		return false
+	}
+	return before.NativeKind == filter.NativeKindZonePort && after.NativeKind == filter.NativeKindRichRule ||
+		before.NativeKind == filter.NativeKindRichRule && after.NativeKind == filter.NativeKindZonePort
 }
 
 func (s *FirewallService) loadManagedMutation(

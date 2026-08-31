@@ -1,7 +1,9 @@
 package nftables_helper
 
 import (
+	"context"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -41,11 +43,39 @@ func runBatch(commands ...[]string) error {
 	if err != nil || script == "" {
 		return err
 	}
-	manager := cmd.NewCommandMgr(
-		cmd.WithTimeout(60*time.Second),
-		cmd.WithStdin(strings.NewReader(script)),
-	)
-	return manager.RunWithOptionalSudo("nft", "-f", "-")
+	return RunScript(script)
+}
+
+func RunScript(script string) error {
+	return RunScriptContext(context.Background(), script)
+}
+
+func RunScriptContext(ctx context.Context, script string) error {
+	return runScriptFile(script, func(file string) error {
+		return cmd.NewCommandMgr(
+			cmd.WithContext(ctx),
+			cmd.WithTimeout(60*time.Second),
+		).RunWithOptionalSudo("nft", "-f", file)
+	})
+}
+
+func runScriptFile(script string, run func(string) error) error {
+	file, err := os.CreateTemp("", "1panel-nft-*.nft")
+	if err != nil {
+		return err
+	}
+	name := file.Name()
+	defer func() {
+		_ = file.Close()
+		_ = os.Remove(name)
+	}()
+	if _, err := file.WriteString(script); err != nil {
+		return err
+	}
+	if err := file.Close(); err != nil {
+		return err
+	}
+	return run(name)
 }
 
 func buildBatchScript(commands ...[]string) (string, error) {
