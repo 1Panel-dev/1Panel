@@ -3961,6 +3961,8 @@ const message = {
     firewall: {
         create: '규칙 만들기',
         edit: '규칙 수정',
+        quickJump: '빠른 이동',
+
         used: '사용됨',
         unUsed: '사용 안 함',
         managed: '패널 생성',
@@ -4029,27 +4031,9 @@ const message = {
         configuredRules: '{0}개 규칙 설정됨',
         addressFamily: 'IP 버전',
         portOrRange: '포트 / 범위',
-        exportAllRules: '모든 규칙 내보내기',
         importBackendHelper: '가져온 규칙은 현재 {0} 백엔드에 맞게 변환됩니다. 원본 백엔드의 규칙은 변경되지 않습니다.',
-        resetDirectRulesHelper:
-            '{0}에서 1Panel 시스템 방화벽 체인, 실행 규칙 및 영구 파일을 삭제하고 데이터베이스 정책은 유지합니다',
-        resetWhitelistRulesHelper:
-            '{0}의 활성 사용자 설정을 재설정하고 설치 기본값으로 복원한 후 비활성화합니다. 데이터베이스 정책은 유지되며 나중에 다시 동기화할 수 있습니다.',
-        cleanupForwardingBackendHelper:
-            '{0}의 1Panel 포트 전달 런타임 규칙을 재설정합니다. 관련 규칙과 체인을 모두 삭제하고 데이터베이스 데이터는 유지합니다',
-        cleanupDockerBackendHelper:
-            '{0}의 1Panel Docker 포트 보호 런타임 규칙을 재설정합니다. 관련 규칙과 체인을 모두 삭제하고 데이터베이스 데이터는 유지합니다',
-        cleanupBeforeBackendSwitch:
-            '현재 {0} 백엔드에 1Panel 런타임 규칙이 남아 있습니다. {1}(으)로 전환하기 전에 먼저 재설정하세요.',
-        cleanupAction: '재설정',
-        backendSwitchNotice:
-            '시스템 방화벽, 포트 전달 또는 Docker 보호를 전환하기 전에 현재 백엔드를 재설정하세요. 데이터베이스 정책은 유지되며 전환 후 다시 초기화하거나 동기화할 수 있습니다.',
-        switchBackendHelper: '{0}(으)로 전환하시겠습니까?',
-        switchDockerBackendHelper: '{0}(으)로 전환하시겠습니까? Docker 설정을 업데이트하고 Docker를 재시작합니다.',
         ruleSyncTitle: '규칙 동기화',
         ruleSyncAction: '규칙 동기화',
-        ruleSyncHelper:
-            '선택한 방화벽의 1Panel 관리 규칙을 현재 방화벽에 동기화합니다. 원본 규칙은 삭제되지 않으며 외부 규칙은 동기화되지 않습니다.',
         ruleSyncDatabase: '1Panel 데이터베이스',
         ruleSyncDatabaseHelper:
             '1Panel 데이터베이스 규칙을 기준으로 현재 방화벽의 관리 규칙을 동기화하고 조정합니다. 누락된 규칙은 추가되고 불필요한 규칙은 삭제됩니다.',
@@ -4058,7 +4042,6 @@ const message = {
             '데이터베이스 규칙 {0}개와 정확히 일치하도록 {1}을 동기화하시겠습니까? 대상 규칙 {2}개가 삭제되고 누락된 규칙이 추가됩니다.',
         ruleSyncSource: '구성 소스',
         ruleSyncTarget: '현재 백엔드',
-        ruleSyncTotal: '변환된 규칙',
         ruleSyncReady: '동기화 가능',
         ruleSyncExisting: '이미 존재',
         ruleSyncRemove: '삭제 예정',
@@ -4080,12 +4063,6 @@ const message = {
             protectedRule: '보호된 방화벽 규칙은 수정할 수 없습니다.',
             cannotReconcile: '대상 규칙을 동기화할 수 없습니다: {0}',
         },
-        ruleSyncConfirm: '{0}개 규칙을 {1}에서 {2}(으)로 동기화하시겠습니까? 원본 백엔드는 변경되지 않습니다.',
-        ruleSyncResetSource: '동기화 성공 후 원본 방화벽 {0} 재설정 및 비활성화',
-        ruleSyncResetSourceHelper: '모든 규칙이 성공적으로 동기화된 경우에만 원본 방화벽을 재설정합니다.',
-        ruleSyncResetSourceBlocked: '동기화할 수 없는 규칙이 있습니다. 먼저 해결한 후 원본을 재설정하십시오.',
-        ruleSyncResetSourceConfirm:
-            '{0}개 규칙을 {1}에서 {2}(으)로 동기화한 후 {1}을(를) 재설정하고 비활성화하시겠습니까? 모든 설정이 삭제되며 되돌릴 수 없습니다.',
         ruleSyncPartial: '동기화 완료: 성공 {0}개, 이미 존재 {1}개, 실패 {2}개.',
         ruleSyncSuccess: '동기화 완료: 성공 {0}개, 이미 존재 {1}개, 삭제 {2}개.',
         ruleSyncStatus: {
@@ -4094,6 +4071,21 @@ const message = {
             remove: '삭제 예정',
             blocked: '동기화 불가',
         },
+        resetDirectRulesHelper:
+            '{0}에서 1Panel 시스템 방화벽 체인, 실행 규칙 및 영구 파일을 삭제하고 데이터베이스 정책은 유지합니다',
+        resetWhitelistRulesHelper:
+            '{0}의 활성 사용자 설정을 재설정하고 설치 기본값으로 복원한 후 비활성화합니다. 데이터베이스 정책은 유지되며 나중에 다시 동기화할 수 있습니다.',
+        cleanupForwardingBackendHelper:
+            '{0}의 1Panel 포트 전달 런타임 규칙을 재설정합니다. 관련 규칙과 체인을 모두 삭제하고 데이터베이스 데이터는 유지합니다',
+        cleanupDockerBackendHelper:
+            '{0}의 1Panel Docker 포트 보호 런타임 규칙을 재설정합니다. 관련 규칙과 체인을 모두 삭제하고 데이터베이스 데이터는 유지합니다',
+        cleanupBeforeBackendSwitch:
+            '현재 {0} 백엔드에 1Panel 런타임 규칙이 남아 있습니다. {1}(으)로 전환하기 전에 먼저 재설정하세요.',
+        cleanupAction: '재설정',
+        backendSwitchNotice:
+            '시스템 방화벽, 포트 전달 또는 Docker 보호를 전환하기 전에 현재 백엔드를 재설정하세요. 데이터베이스 정책은 유지되며 전환 후 다시 초기화하거나 동기화할 수 있습니다.',
+        switchBackendHelper: '{0}(으)로 전환하시겠습니까?',
+        switchDockerBackendHelper: '{0}(으)로 전환하시겠습니까? Docker 설정을 업데이트하고 Docker를 재시작합니다.',
         uninstalledStatus: '설치되지 않음',
         selectedBackendNotInstalled:
             '{backend} 서비스를 감지하지 못했습니다. {library}에서 수동으로 설치하거나 {settings}에서 방화벽 백엔드를 전환하세요.',
@@ -4101,6 +4093,13 @@ const message = {
         partiallyInitialized: '일부 초기화됨',
         dockerGuardHelper:
             'Docker 컨테이너가 호스트에 게시한 포트의 접근 제한을 설정합니다. 보호되지 않은 포트는 Docker 기본 접근 방식을 유지합니다.',
+        dockerTrafficPathMixed: '선택한 포트가 서로 다른 접근 경로를 사용합니다. 각각 설정하세요.',
+        dockerTrafficPathUnknown:
+            '이 포트의 접근 경로를 확인할 수 없습니다. Docker 네트워크 설정을 확인한 후 다시 시도하세요.',
+        dockerTrafficPathPending: '접근 경로 확인 대기',
+        dockerInputPolicyNotEffective:
+            '이 포트는 호스트가 직접 수신하므로 기존 컨테이너 포트 보호 규칙이 적용되지 않습니다. 호스트 방화벽에서 설정하세요.',
+        dockerInputUseHostFirewall: '이 포트의 접근 규칙은 호스트 방화벽에서 설정하세요.',
         dockerInputNotProtected:
             '호스트 INPUT 규칙은 이 Docker 게시 포트를 직접 보호하지 않습니다. 클릭하여 컨테이너 포트 보호를 여세요.',
         notInitialized: '초기화되지 않음',
@@ -4131,9 +4130,7 @@ const message = {
             '선택한 규칙의 설정이 서로 다릅니다. 다시 설정하면 모두 동일하게 덮어쓰며, 설명이 비어 있으면 모든 설명을 지웁니다.',
         effective: '적용됨',
         forwardUnsynced: '미동기화',
-        notEnabled: '활성화되지 않음',
         notEffective: '적용되지 않음',
-        dockerGuardStatusEffective: '{0} 컨테이너 포트 보호가 정상적으로 작동 중입니다',
         dockerGuardStatusReason: {
             command_missing:
                 '{0} 방화벽 구성 요소를 사용할 수 없어 해당 보호를 활성화할 수 없습니다. 시스템 방화벽 환경을 확인하세요',
@@ -4158,8 +4155,6 @@ const message = {
         importSuccess: '{0}개의 규칙을 성공적으로 가져왔습니다',
         importPartialSuccess: '가져오기 완료: 성공 {0}건, 실패 {1}건',
         basicStatus: '현재 방화벽이 바인딩되지 않았습니다. 먼저 바인딩하세요!',
-        baseIptables: 'iptables 서비스',
-        forwardIptables: 'iptables 포트 포워딩 서비스',
         initMsg: '{0}을(를) 초기화하려고 합니다. 계속하시겠습니까?',
         initDirectBackendConflictMsg:
             '{1}이(가) 아직 바인딩되어 있습니다. {0}을(를) 초기화하면 두 방화벽 규칙 세트가 모두 적용되어 예기치 않게 접근이 차단될 수 있습니다. 계속하시겠습니까?',
@@ -4192,7 +4187,6 @@ const message = {
         deleteRiskRulesConfirm:
             '{0}개의 규칙을 삭제합니다. 그중 {1}개의 허용 규칙이 서비스 접근에 영향을 줄 수 있습니다. 계속하시겠습니까?',
         editRuleConfirm: '다음 필드가 변경됩니다: {0}. 규칙이 즉시 적용되고 다시 검증됩니다. 계속하시겠습니까?',
-        quickJump: '빠른 이동',
     },
     runtime: {
         runtime: '실행 환경',

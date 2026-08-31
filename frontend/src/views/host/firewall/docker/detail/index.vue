@@ -79,13 +79,15 @@
                     <div class="port-card-field">
                         <span class="port-card-label">{{ $t('firewall.protection') }}</span>
                         <el-tooltip :content="protectionSummary(group.endpoint)" placement="top" :show-after="400">
-                            <span class="port-card-value">{{ protectionSummary(group.endpoint) }}</span>
+                            <span class="port-card-value" :class="{ 'is-warning': !group.endpoint.effective }">
+                                {{ protectionSummary(group.endpoint) }}
+                            </span>
                         </el-tooltip>
                     </div>
-                    <div class="port-card-field">
+                    <div v-if="group.endpoint.description" class="port-card-field">
                         <span class="port-card-label">{{ $t('commons.table.description') }}</span>
-                        <el-tooltip :content="group.endpoint.description || '-'" placement="top" :show-after="400">
-                            <span class="port-card-value">{{ group.endpoint.description || '-' }}</span>
+                        <el-tooltip :content="group.endpoint.description" placement="top" :show-after="400">
+                            <span class="port-card-value">{{ group.endpoint.description }}</span>
                         </el-tooltip>
                     </div>
                     <div v-if="group.endpoint.policyUUID && !group.endpoint.effective" class="port-card-field">
@@ -163,7 +165,7 @@ import { computed, nextTick, reactive, ref } from 'vue';
 import { Firewall } from '@/api/interface/firewall';
 import { deleteDockerPortGuardPolicies, upsertDockerPortGuardPolicies } from '@/api/modules/firewall';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import { dockerGuardEndpointStatusMessage, isValidDockerGuardSource } from '@/views/host/firewall/docker/model';
 import { formatHostAddress, formatHostAddressList, splitTagValues } from '@/views/host/firewall/utils/validation';
@@ -277,6 +279,20 @@ const toggleSelection = (key: string) => {
 };
 const openPolicy = (endpoints: Firewall.DockerGuardEndpoint[]) => {
     if (!endpoints.length) return;
+    const paths = new Set(endpoints.map((endpoint) => endpoint.trafficPath || 'unknown'));
+    if (paths.size !== 1) {
+        MsgWarning(i18n.global.t('firewall.dockerTrafficPathMixed'));
+        return;
+    }
+    const path = [...paths][0];
+    if (path === 'input') {
+        MsgWarning(i18n.global.t('firewall.dockerInputUseHostFirewall'));
+        return;
+    }
+    if (path !== 'forward') {
+        MsgWarning(i18n.global.t('firewall.dockerTrafficPathUnknown'));
+        return;
+    }
     policyEndpoints.value = endpoints;
     const first = endpoints[0];
     form.mode = hasMixedFamilies.value ? 'deny_all' : policyConfigConsistent.value ? first.mode || 'deny_sources' : '';
@@ -363,6 +379,8 @@ const portMappingLabel = (row: Firewall.DockerGuardPortGroup) => {
     return `${publishedEndpoint} → ${value}/${row.endpoint.protocol}`;
 };
 const protectionSummary = (row: Firewall.DockerGuardEndpoint) => {
+    if (row.trafficPath === 'input') return i18n.global.t('firewall.dockerInputUseHostFirewall');
+    if (row.trafficPath === 'unknown') return i18n.global.t('firewall.dockerTrafficPathPending');
     if (!row.policyUUID) return i18n.global.t('firewall.dockerGuardUnprotected');
     let summary = i18n.global.t('firewall.denyAll');
     if (row.mode === 'deny_sources') {

@@ -4105,28 +4105,10 @@ const message = {
         configuredRules: '{0} 件設定済み',
         addressFamily: 'IP バージョン',
         portOrRange: 'ポート / 範囲',
-        exportAllRules: 'すべてのルールをエクスポート',
         importBackendHelper:
             'インポートしたルールは現在の {0} バックエンド向けに変換されます。移行元のルールは変更されません。',
-        resetDirectRulesHelper:
-            '{0} から 1Panel システムファイアウォールのチェーン、実行ルール、永続化ファイルを削除し、データベースポリシーは保持します',
-        resetWhitelistRulesHelper:
-            '{0} の有効なカスタム設定をリセットし、インストール時の既定値に戻して無効化します。データベースポリシーは保持され、後で再同期できます。',
-        cleanupForwardingBackendHelper:
-            '{0} の 1Panel ポート転送ランタイムルールをリセットします。関連するルールとチェーンをすべて削除し、データベースデータを保持します',
-        cleanupDockerBackendHelper:
-            '{0} の 1Panel Docker ポート保護ランタイムルールをリセットします。関連するルールとチェーンをすべて削除し、データベースデータを保持します',
-        cleanupBeforeBackendSwitch:
-            '現在の {0} バックエンドには 1Panel の実行時ルールが残っています。{1} に切り替える前にリセットしてください。',
-        cleanupAction: 'リセット',
-        backendSwitchNotice:
-            'システムファイアウォール、ポート転送、Docker 保護を切り替える前に現在のバックエンドをリセットしてください。データベースポリシーは保持され、切り替え後に再初期化または同期できます。',
-        switchBackendHelper: '{0} に切り替えますか？',
-        switchDockerBackendHelper: '{0} に切り替えますか？Docker の設定を更新し、Docker を再起動します。',
         ruleSyncTitle: 'ルールを同期',
         ruleSyncAction: 'ルールを同期',
-        ruleSyncHelper:
-            '選択したファイアウォールの 1Panel 管理ルールを現在のファイアウォールへ同期します。元のルールは削除されず、外部ルールは同期されません。',
         ruleSyncDatabase: '1Panel データベース',
         ruleSyncDatabaseHelper:
             '1Panel データベースのルールを基準に、現在のファイアウォールの管理対象ルールを同期・調整します。不足しているルールは追加され、余分なルールは削除されます。',
@@ -4135,7 +4117,6 @@ const message = {
             'データベースの {0} 件のルールに完全一致するよう {1} を同期しますか？対象側の {2} 件のルールを削除し、不足ルールを追加します。',
         ruleSyncSource: '設定ソース',
         ruleSyncTarget: '現在のバックエンド',
-        ruleSyncTotal: '変換後のルール',
         ruleSyncReady: '同期可能',
         ruleSyncExisting: '存在済み',
         ruleSyncRemove: '削除予定',
@@ -4158,12 +4139,6 @@ const message = {
             protectedRule: '保護されたファイアウォールルールは変更できません。',
             cannotReconcile: '対象ルールを同期できません：{0}',
         },
-        ruleSyncConfirm: '{0} 件のルールを {1} から {2} へ同期しますか？元バックエンドは変更されません。',
-        ruleSyncResetSource: '同期成功後に移行元ファイアウォール {0} をリセットして無効化する',
-        ruleSyncResetSourceHelper: 'すべてのルールが正常に同期された場合にのみ移行元をリセットします。',
-        ruleSyncResetSourceBlocked: '同期できないルールがあります。解決してから移行元を自動リセットしてください。',
-        ruleSyncResetSourceConfirm:
-            '{0} 件のルールを {1} から {2} へ同期し、その後 {1} をリセットして無効化しますか？すべての設定が削除され、元に戻せません。',
         ruleSyncPartial: '同期完了：成功 {0} 件、存在済み {1} 件、失敗 {2} 件。',
         ruleSyncSuccess: '同期完了：成功 {0} 件、存在済み {1} 件、削除 {2} 件。',
         ruleSyncStatus: {
@@ -4172,6 +4147,21 @@ const message = {
             remove: '削除予定',
             blocked: '同期不可',
         },
+        resetDirectRulesHelper:
+            '{0} から 1Panel システムファイアウォールのチェーン、実行ルール、永続化ファイルを削除し、データベースポリシーは保持します',
+        resetWhitelistRulesHelper:
+            '{0} の有効なカスタム設定をリセットし、インストール時の既定値に戻して無効化します。データベースポリシーは保持され、後で再同期できます。',
+        cleanupForwardingBackendHelper:
+            '{0} の 1Panel ポート転送ランタイムルールをリセットします。関連するルールとチェーンをすべて削除し、データベースデータを保持します',
+        cleanupDockerBackendHelper:
+            '{0} の 1Panel Docker ポート保護ランタイムルールをリセットします。関連するルールとチェーンをすべて削除し、データベースデータを保持します',
+        cleanupBeforeBackendSwitch:
+            '現在の {0} バックエンドには 1Panel の実行時ルールが残っています。{1} に切り替える前にリセットしてください。',
+        cleanupAction: 'リセット',
+        backendSwitchNotice:
+            'システムファイアウォール、ポート転送、Docker 保護を切り替える前に現在のバックエンドをリセットしてください。データベースポリシーは保持され、切り替え後に再初期化または同期できます。',
+        switchBackendHelper: '{0} に切り替えますか？',
+        switchDockerBackendHelper: '{0} に切り替えますか？Docker の設定を更新し、Docker を再起動します。',
         uninstalledStatus: '未インストール',
         selectedBackendNotInstalled:
             '{backend} サービスが検出されませんでした。{library} から手動でインストールするか、{settings} でファイアウォールバックエンドを切り替えてください。',
@@ -4179,6 +4169,13 @@ const message = {
         partiallyInitialized: '一部初期化済み',
         dockerGuardHelper:
             'Docker コンテナがホストに公開するポートのアクセス制限を設定します。未保護のポートは Docker のデフォルトのアクセス動作を維持します。',
+        dockerTrafficPathMixed: '選択したポートは異なるアクセス経路を使用しています。個別に設定してください。',
+        dockerTrafficPathUnknown:
+            'このポートのアクセス経路を確認できません。Docker ネットワーク設定を確認して再試行してください。',
+        dockerTrafficPathPending: 'アクセス経路を確認中',
+        dockerInputPolicyNotEffective:
+            'このポートはホストが直接受信するため、既存のコンテナポート保護ルールは適用されません。ホストファイアウォールで設定してください。',
+        dockerInputUseHostFirewall: 'このポートのアクセスはホストファイアウォールで設定してください。',
         dockerInputNotProtected:
             'ホストの INPUT ルールでは、この Docker 公開ポートを直接保護できません。クリックしてコンテナポート保護を開きます。',
         notInitialized: '未初期化',
@@ -4209,9 +4206,7 @@ const message = {
             '選択したルールの設定が異なります。再設定するとすべて統一して上書きされ、説明が空の場合はすべてクリアされます。',
         effective: '有効',
         forwardUnsynced: '未同期',
-        notEnabled: '未有効化',
         notEffective: '未反映',
-        dockerGuardStatusEffective: '{0} コンテナポート保護は正常に動作しています',
         dockerGuardStatusReason: {
             command_missing:
                 '{0} ファイアウォールコンポーネントが利用できないため、対応する保護を有効にできません。システムファイアウォールを確認してください',
@@ -4237,8 +4232,6 @@ const message = {
         importSuccess: '{0} 件のルールを正常にインポートしました',
         importPartialSuccess: 'インポート完了: {0} 件成功、{1} 件失敗',
         basicStatus: '現在のファイアウォールはバインドされていません。先にバインドしてください。',
-        baseIptables: 'iptables サービス',
-        forwardIptables: 'iptables ポート転送サービス',
         initMsg: '{0} を初期化します。続行しますか？',
         initDirectBackendConflictMsg:
             '{1} はまだバインドされています。{0} を初期化すると両方のファイアウォールルールが有効になり、予期せずアクセスが遮断される可能性があります。続行しますか？',

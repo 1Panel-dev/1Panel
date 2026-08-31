@@ -4189,28 +4189,10 @@ const message = {
         configuredRules: '{0} peraturan dikonfigurasi',
         addressFamily: 'Versi IP',
         portOrRange: 'Port / julat',
-        exportAllRules: 'Eksport semua peraturan',
         importBackendHelper:
             'Peraturan yang diimport ditukar untuk bahagian belakang semasa {0}. Peraturan sumber tidak diubah.',
-        resetDirectRulesHelper:
-            'Padam rantaian, peraturan masa jalan dan fail berterusan tembok api sistem 1Panel daripada {0}; dasar pangkalan data yang disimpan dikekalkan',
-        resetWhitelistRulesHelper:
-            'Tetapkan semula konfigurasi tersuai aktif dalam {0}, pulihkan tetapan pemasangan asal dan nyahdayakan {0}; dasar pangkalan data dikekalkan dan boleh disegerakkan semula.',
-        cleanupForwardingBackendHelper:
-            'Tetapkan semula peraturan masa jalan pemajuan port 1Panel dalam {0}: padam semua peraturan dan rantaian berkaitan sambil mengekalkan data pangkalan data',
-        cleanupDockerBackendHelper:
-            'Tetapkan semula peraturan masa jalan perlindungan port Docker 1Panel dalam {0}: padam semua peraturan dan rantaian berkaitan sambil mengekalkan data pangkalan data',
-        cleanupBeforeBackendSwitch:
-            'Bahagian belakang semasa {0} masih mengandungi peraturan masa jalan 1Panel. Tetapkan semula sebelum bertukar kepada {1}.',
-        cleanupAction: 'Tetapkan semula',
-        backendSwitchNotice:
-            'Tetapkan semula bahagian belakang semasa sebelum menukar tembok api sistem, pemajuan port atau perlindungan Docker. Dasar pangkalan data dikekalkan dan boleh dimulakan atau disegerakkan selepas penukaran.',
-        switchBackendHelper: 'Tukar kepada {0}?',
-        switchDockerBackendHelper: 'Tukar kepada {0}? Ini akan mengemas kini konfigurasi dan memulakan semula Docker.',
         ruleSyncTitle: 'Segerakkan peraturan',
         ruleSyncAction: 'Segerakkan peraturan',
-        ruleSyncHelper:
-            'Segerakkan peraturan yang diurus oleh 1Panel daripada tembok api terpilih ke tembok api semasa. Peraturan sumber tidak dipadam dan peraturan luaran tidak disertakan.',
         ruleSyncDatabase: 'Pangkalan data 1Panel',
         ruleSyncDatabaseHelper:
             'Segerakkan dan selaraskan peraturan terurus dalam tembok api semasa berdasarkan peraturan pangkalan data 1Panel. Peraturan yang tiada akan ditambah dan peraturan berlebihan akan dipadam.',
@@ -4219,7 +4201,6 @@ const message = {
             'Segerakkan {1} supaya sepadan tepat dengan {0} peraturan pangkalan data? {2} peraturan sasaran akan dipadam dan peraturan yang tiada akan ditambah.',
         ruleSyncSource: 'Sumber konfigurasi',
         ruleSyncTarget: 'Bahagian belakang semasa',
-        ruleSyncTotal: 'Peraturan ditukar',
         ruleSyncReady: 'Sedia',
         ruleSyncExisting: 'Sedia ada',
         ruleSyncRemove: 'Untuk dipadam',
@@ -4242,13 +4223,6 @@ const message = {
             protectedRule: 'Peraturan tembok api yang dilindungi ini tidak boleh diubah.',
             cannotReconcile: 'Peraturan sasaran tidak dapat disegerakkan: {0}',
         },
-        ruleSyncConfirm: 'Segerakkan {0} peraturan daripada {1} ke {2}? Bahagian belakang sumber tidak akan diubah.',
-        ruleSyncResetSource: 'Tetapkan semula dan nyahdayakan tembok api sumber {0} selepas penyegerakan berjaya',
-        ruleSyncResetSourceHelper: 'Sumber hanya ditetapkan semula selepas semua peraturan berjaya disegerakkan.',
-        ruleSyncResetSourceBlocked:
-            'Ada peraturan yang tidak dapat disegerakkan. Selesaikan dahulu sebelum menetapkan semula sumber.',
-        ruleSyncResetSourceConfirm:
-            'Segerakkan {0} peraturan daripada {1} ke {2}, kemudian tetapkan semula dan nyahdayakan {1}? Semua konfigurasinya akan dipadam dan tidak boleh dibuat asal.',
         ruleSyncPartial: 'Penyegerakan selesai: {0} berjaya, {1} sudah wujud dan {2} gagal.',
         ruleSyncSuccess: 'Penyegerakan selesai: {0} berjaya, {1} sudah wujud dan {2} dipadam.',
         ruleSyncStatus: {
@@ -4257,6 +4231,21 @@ const message = {
             remove: 'Untuk dipadam',
             blocked: 'Tidak tersedia',
         },
+        resetDirectRulesHelper:
+            'Padam rantaian, peraturan masa jalan dan fail berterusan tembok api sistem 1Panel daripada {0}; dasar pangkalan data yang disimpan dikekalkan',
+        resetWhitelistRulesHelper:
+            'Tetapkan semula konfigurasi tersuai aktif dalam {0}, pulihkan tetapan pemasangan asal dan nyahdayakan {0}; dasar pangkalan data dikekalkan dan boleh disegerakkan semula.',
+        cleanupForwardingBackendHelper:
+            'Tetapkan semula peraturan masa jalan pemajuan port 1Panel dalam {0}: padam semua peraturan dan rantaian berkaitan sambil mengekalkan data pangkalan data',
+        cleanupDockerBackendHelper:
+            'Tetapkan semula peraturan masa jalan perlindungan port Docker 1Panel dalam {0}: padam semua peraturan dan rantaian berkaitan sambil mengekalkan data pangkalan data',
+        cleanupBeforeBackendSwitch:
+            'Bahagian belakang semasa {0} masih mengandungi peraturan masa jalan 1Panel. Tetapkan semula sebelum bertukar kepada {1}.',
+        cleanupAction: 'Tetapkan semula',
+        backendSwitchNotice:
+            'Tetapkan semula bahagian belakang semasa sebelum menukar tembok api sistem, pemajuan port atau perlindungan Docker. Dasar pangkalan data dikekalkan dan boleh dimulakan atau disegerakkan selepas penukaran.',
+        switchBackendHelper: 'Tukar kepada {0}?',
+        switchDockerBackendHelper: 'Tukar kepada {0}? Ini akan mengemas kini konfigurasi dan memulakan semula Docker.',
         uninstalledStatus: 'Belum dipasang',
         selectedBackendNotInstalled:
             'Perkhidmatan {backend} tidak dikesan. Pasang secara manual daripada {library}, atau tukar backend firewall dalam {settings}.',
@@ -4264,6 +4253,12 @@ const message = {
         partiallyInitialized: 'Dimulakan sebahagian',
         dockerGuardHelper:
             'Tetapkan sekatan akses untuk port yang diterbitkan oleh bekas Docker pada hos. Port tanpa perlindungan mengekalkan tingkah laku akses lalai Docker.',
+        dockerTrafficPathMixed: 'Port yang dipilih menggunakan laluan akses berbeza. Tetapkannya secara berasingan.',
+        dockerTrafficPathUnknown: 'Laluan akses port ini tidak dapat ditentukan. Semak rangkaian Docker dan cuba lagi.',
+        dockerTrafficPathPending: 'Laluan akses belum ditentukan',
+        dockerInputPolicyNotEffective:
+            'Port ini diterima terus oleh hos, jadi peraturan perlindungan port bekas sedia ada tidak digunakan. Tetapkannya dalam firewall hos.',
+        dockerInputUseHostFirewall: 'Konfigurasikan akses port ini dalam tembok api hos.',
         dockerInputNotProtected:
             'Peraturan INPUT hos tidak melindungi port terbitan Docker ini secara langsung. Klik untuk membuka perlindungan port bekas.',
         notInitialized: 'Belum dimulakan',
@@ -4294,9 +4289,7 @@ const message = {
             'Peraturan yang dipilih mempunyai konfigurasi berbeza. Tetapkan semula untuk menulis ganti semuanya; keterangan kosong akan mengosongkan semua keterangan.',
         effective: 'Berkuat kuasa',
         forwardUnsynced: 'Belum disegerak',
-        notEnabled: 'Tidak didayakan',
         notEffective: 'Tidak berkuat kuasa',
-        dockerGuardStatusEffective: 'Perlindungan port bekas {0} berfungsi seperti biasa',
         dockerGuardStatusReason: {
             command_missing:
                 'Komponen firewall {0} tidak tersedia, jadi perlindungan berkaitan tidak boleh didayakan. Semak firewall sistem',
@@ -4322,8 +4315,6 @@ const message = {
         importSuccess: '{0} peraturan berjaya diimport',
         importPartialSuccess: 'Import selesai: {0} berjaya, {1} gagal',
         basicStatus: 'Firewall semasa tidak terikat. Sila ikat dahulu.',
-        baseIptables: 'Perkhidmatan iptables',
-        forwardIptables: 'Perkhidmatan Penerusan Port iptables',
         initMsg: 'Akan memulakan {0}, teruskan?',
         initDirectBackendConflictMsg:
             '{1} masih terikat. Jika {0} dimulakan, kedua-dua set peraturan firewall akan aktif dan mungkin menyekat akses tanpa dijangka. Teruskan?',

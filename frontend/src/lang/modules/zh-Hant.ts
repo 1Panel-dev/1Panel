@@ -3850,24 +3850,9 @@ const message = {
         configuredRules: '已設定 {0} 條規則',
         addressFamily: 'IP 版本',
         portOrRange: '連接埠 / 範圍',
-        exportAllRules: '匯出全部規則',
         importBackendHelper: '匯入規則會轉換並寫入目前後端 {0}，來源後端規則不會被修改。',
-        resetDirectRulesHelper: '刪除 {0} 中全部 1Panel 系統防火牆鏈、執行規則及持久化檔案，保留資料庫策略',
-        resetWhitelistRulesHelper:
-            '重設 {0} 中目前生效的自訂防火牆設定，恢復安裝預設狀態並停用 {0}；資料庫策略會保留，之後可重新同步。',
-        cleanupForwardingBackendHelper:
-            '重設 {0} 中的 1Panel 連接埠轉送執行時規則：刪除全部相關規則及規則鏈，僅保留資料庫資料',
-        cleanupDockerBackendHelper:
-            '重設 {0} 中的 1Panel Docker 連接埠防護執行時規則：刪除全部相關規則及規則鏈，僅保留資料庫資料',
-        cleanupBeforeBackendSwitch: '目前後端 {0} 仍存在 1Panel 執行時規則，請先重設該後端，再切換到 {1}。',
-        cleanupAction: '重設',
-        backendSwitchNotice:
-            '主機防火牆、連接埠轉送和 Docker 防護切換前都必須先重設目前後端；資料庫策略會保留，切換後可重新初始化或同步。',
-        switchBackendHelper: '確認切換為 {0}？',
-        switchDockerBackendHelper: '確認切換為 {0}？此操作會更新 Docker 設定並重新啟動 Docker 服務。',
         ruleSyncTitle: '同步規則',
         ruleSyncAction: '同步規則',
-        ruleSyncHelper: '將所選防火牆中由 1Panel 管理的規則同步至目前防火牆。原規則不會刪除，外部規則不會同步。',
         ruleSyncDatabase: '1Panel 資料庫',
         ruleSyncDatabaseHelper:
             '以 1Panel 資料庫規則為準，同步並校準目前防火牆中的管理規則。缺少的規則會被新增，多餘的規則會被刪除。',
@@ -3876,7 +3861,6 @@ const message = {
             '即將以資料庫中的 {0} 條規則覆蓋同步 {1}；將刪除 {2} 條目標規則，並補上缺少的規則。是否繼續？',
         ruleSyncSource: '設定來源',
         ruleSyncTarget: '目前後端',
-        ruleSyncTotal: '轉換後規則',
         ruleSyncReady: '可同步',
         ruleSyncExisting: '已存在',
         ruleSyncRemove: '待刪除',
@@ -3898,12 +3882,6 @@ const message = {
             protectedRule: '此防火牆規則受保護，無法修改。',
             cannotReconcile: '無法同步目標規則：{0}',
         },
-        ruleSyncConfirm: '即將把 {0} 條規則從 {1} 同步至 {2}，來源後端不會被修改。是否繼續？',
-        ruleSyncResetSource: '同步成功後重設並停用來源防火牆 {0}',
-        ruleSyncResetSourceHelper: '僅在全部規則同步成功後重設來源防火牆，此操作無法復原。',
-        ruleSyncResetSourceBlocked: '存在無法同步的規則，請先處理後再自動重設來源防火牆。',
-        ruleSyncResetSourceConfirm:
-            '即將把 {0} 條規則從 {1} 同步至 {2}，成功後重設並停用 {1}。這會刪除 {1} 的全部防火牆設定且無法復原，是否繼續？',
         ruleSyncPartial: '同步完成：成功 {0} 條，已存在 {1} 條，失敗 {2} 條。',
         ruleSyncSuccess: '同步完成：成功 {0} 條，已存在 {1} 條，刪除 {2} 條。',
         ruleSyncStatus: {
@@ -3912,12 +3890,30 @@ const message = {
             remove: '待刪除',
             blocked: '不可同步',
         },
+        resetDirectRulesHelper: '刪除 {0} 中全部 1Panel 系統防火牆鏈、執行規則及持久化檔案，保留資料庫策略',
+        resetWhitelistRulesHelper:
+            '重設 {0} 中目前生效的自訂防火牆設定，恢復安裝預設狀態並停用 {0}；資料庫策略會保留，之後可重新同步。',
+        cleanupForwardingBackendHelper:
+            '重設 {0} 中的 1Panel 連接埠轉送執行時規則：刪除全部相關規則及規則鏈，僅保留資料庫資料',
+        cleanupDockerBackendHelper:
+            '重設 {0} 中的 1Panel Docker 連接埠防護執行時規則：刪除全部相關規則及規則鏈，僅保留資料庫資料',
+        cleanupBeforeBackendSwitch: '目前後端 {0} 仍存在 1Panel 執行時規則，請先重設該後端，再切換到 {1}。',
+        cleanupAction: '重設',
+        backendSwitchNotice:
+            '主機防火牆、連接埠轉送和 Docker 防護切換前都必須先重設目前後端；資料庫策略會保留，切換後可重新初始化或同步。',
+        switchBackendHelper: '確認切換為 {0}？',
+        switchDockerBackendHelper: '確認切換為 {0}？此操作會更新 Docker 設定並重新啟動 Docker 服務。',
         uninstalledStatus: '未安裝',
         selectedBackendNotInstalled:
             '未偵測到 {backend} 服務，請前往{library}頁面手動安裝，或在{settings}中切換防火牆後端。',
         initializedStatus: '已初始化',
         partiallyInitialized: '部分初始化',
         dockerGuardHelper: '為 Docker 容器發佈到主機的連接埠設定存取限制；未設定防護的連接埠維持 Docker 預設存取方式。',
+        dockerTrafficPathMixed: '所選連接埠使用不同的存取方式，請分別設定。',
+        dockerTrafficPathUnknown: '暫時無法確認此連接埠的存取方式，請檢查 Docker 網路設定後重試。',
+        dockerTrafficPathPending: '存取方式待確認',
+        dockerInputPolicyNotEffective: '此連接埠由主機直接接收，現有容器連接埠防護規則不會生效，請改用主機防火牆設定。',
+        dockerInputUseHostFirewall: '此連接埠需要透過主機防火牆設定存取規則，請前往主機防火牆進行設定。',
         dockerInputNotProtected: '主機 INPUT 規則無法直接保護此 Docker 發佈連接埠，點擊前往容器連接埠防護。',
         notInitialized: '未初始化',
         familyUnsupported: '系統不支援 {0}',
@@ -3944,9 +3940,7 @@ const message = {
         dockerGuardInconsistentConfigHelper: '所選規則設定不一致，請重新設定；提交後將統一覆寫，空白描述將統一清除。',
         effective: '已生效',
         forwardUnsynced: '未同步',
-        notEnabled: '未啟用',
         notEffective: '未生效',
-        dockerGuardStatusEffective: '{0} 容器連接埠防護運作正常',
         dockerGuardStatusReason: {
             command_missing: '系統缺少 {0} 防火牆元件，對應的容器連接埠防護暫時無法使用，請檢查系統防火牆環境',
             docker_chain_missing:
@@ -3969,8 +3963,6 @@ const message = {
         importSuccess: '成功匯入 {0} 條規則',
         importPartialSuccess: '匯入完成：成功 {0} 條，失敗 {1} 條',
         basicStatus: '目前防火牆尚未綁定，請先綁定',
-        baseIptables: 'iptables 服務',
-        forwardIptables: 'iptables 埠轉發服務',
         initMsg: '即將初始化 {0}, 是否繼續？',
         initDirectBackendConflictMsg:
             '偵測到 {1} 仍處於綁定狀態。繼續初始化 {0} 後，兩套防火牆規則將同時生效，可能導致存取被意外阻擋。是否繼續？',

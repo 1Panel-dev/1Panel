@@ -4208,28 +4208,10 @@ const message = {
         configuredRules: '{0} regras configuradas',
         addressFamily: 'Versão do IP',
         portOrRange: 'Porta / intervalo',
-        exportAllRules: 'Exportar todas as regras',
         importBackendHelper:
             'As regras importadas são convertidas para o backend atual {0}. As regras de origem não são alteradas.',
-        resetDirectRulesHelper:
-            'Exclua de {0} as cadeias, regras em execução e arquivos persistentes do firewall do 1Panel; as políticas salvas no banco são mantidas',
-        resetWhitelistRulesHelper:
-            'Redefina a configuração personalizada ativa em {0}, restaure os padrões de instalação e desative {0}; as políticas do banco são mantidas e podem ser sincronizadas novamente.',
-        cleanupForwardingBackendHelper:
-            'Redefina as regras de execução de encaminhamento de portas do 1Panel em {0}: exclua todas as regras e cadeias relacionadas e mantenha os dados do banco de dados',
-        cleanupDockerBackendHelper:
-            'Redefina as regras de execução de proteção de portas Docker do 1Panel em {0}: exclua todas as regras e cadeias relacionadas e mantenha os dados do banco de dados',
-        cleanupBeforeBackendSwitch:
-            'O backend atual {0} ainda contém regras de execução do 1Panel. Redefina-o antes de mudar para {1}.',
-        cleanupAction: 'Redefinir',
-        backendSwitchNotice:
-            'Redefina o backend atual antes de trocar o firewall do sistema, o encaminhamento de portas ou a proteção Docker. As políticas do banco são mantidas e podem ser inicializadas ou sincronizadas após a troca.',
-        switchBackendHelper: 'Mudar para {0}?',
-        switchDockerBackendHelper: 'Mudar para {0}? Isso atualizará a configuração e reiniciará o Docker.',
         ruleSyncTitle: 'Sincronizar regras',
         ruleSyncAction: 'Sincronizar regras',
-        ruleSyncHelper:
-            'Sincroniza as regras gerenciadas pelo 1Panel do firewall selecionado para o firewall atual. As regras de origem não são excluídas e regras externas não são incluídas.',
         ruleSyncDatabase: 'Banco de dados do 1Panel',
         ruleSyncDatabaseHelper:
             'Sincroniza e ajusta as regras gerenciadas no firewall atual com base nas regras do banco de dados do 1Panel. As regras ausentes serão adicionadas e as excedentes serão removidas.',
@@ -4238,7 +4220,6 @@ const message = {
             'Sincronizar {1} para corresponder exatamente às {0} regras do banco de dados? {2} regras do destino serão removidas e as ausentes serão adicionadas.',
         ruleSyncSource: 'Fonte da configuração',
         ruleSyncTarget: 'Backend atual',
-        ruleSyncTotal: 'Regras convertidas',
         ruleSyncReady: 'Prontas',
         ruleSyncExisting: 'Existentes',
         ruleSyncRemove: 'A remover',
@@ -4261,14 +4242,6 @@ const message = {
             protectedRule: 'Esta regra protegida do firewall não pode ser modificada.',
             cannotReconcile: 'Não foi possível sincronizar a regra de destino: {0}',
         },
-        ruleSyncConfirm: 'Sincronizar {0} regras de {1} para {2}? O backend de origem não será alterado.',
-        ruleSyncResetSource: 'Redefinir e desativar o firewall de origem {0} após a sincronização',
-        ruleSyncResetSourceHelper:
-            'A origem só será redefinida depois que todas as regras forem sincronizadas com sucesso.',
-        ruleSyncResetSourceBlocked:
-            'Algumas regras não podem ser sincronizadas. Resolva-as antes de redefinir a origem.',
-        ruleSyncResetSourceConfirm:
-            'Sincronizar {0} regras de {1} para {2} e depois redefinir e desativar {1}? Toda a configuração será removida e não poderá ser recuperada.',
         ruleSyncPartial: 'Sincronização concluída: {0} com sucesso, {1} já existiam e {2} falharam.',
         ruleSyncSuccess: 'Sincronização concluída: {0} com sucesso, {1} já existiam e {2} removidas.',
         ruleSyncStatus: {
@@ -4277,6 +4250,21 @@ const message = {
             remove: 'A remover',
             blocked: 'Indisponível',
         },
+        resetDirectRulesHelper:
+            'Exclua de {0} as cadeias, regras em execução e arquivos persistentes do firewall do 1Panel; as políticas salvas no banco são mantidas',
+        resetWhitelistRulesHelper:
+            'Redefina a configuração personalizada ativa em {0}, restaure os padrões de instalação e desative {0}; as políticas do banco são mantidas e podem ser sincronizadas novamente.',
+        cleanupForwardingBackendHelper:
+            'Redefina as regras de execução de encaminhamento de portas do 1Panel em {0}: exclua todas as regras e cadeias relacionadas e mantenha os dados do banco de dados',
+        cleanupDockerBackendHelper:
+            'Redefina as regras de execução de proteção de portas Docker do 1Panel em {0}: exclua todas as regras e cadeias relacionadas e mantenha os dados do banco de dados',
+        cleanupBeforeBackendSwitch:
+            'O backend atual {0} ainda contém regras de execução do 1Panel. Redefina-o antes de mudar para {1}.',
+        cleanupAction: 'Redefinir',
+        backendSwitchNotice:
+            'Redefina o backend atual antes de trocar o firewall do sistema, o encaminhamento de portas ou a proteção Docker. As políticas do banco são mantidas e podem ser inicializadas ou sincronizadas após a troca.',
+        switchBackendHelper: 'Mudar para {0}?',
+        switchDockerBackendHelper: 'Mudar para {0}? Isso atualizará a configuração e reiniciará o Docker.',
         uninstalledStatus: 'Não instalado',
         selectedBackendNotInstalled:
             'O serviço {backend} não foi detectado. Instale-o manualmente pela {library} ou altere o backend do firewall em {settings}.',
@@ -4284,6 +4272,14 @@ const message = {
         partiallyInitialized: 'Parcialmente inicializado',
         dockerGuardHelper:
             'Configure restrições de acesso para as portas publicadas pelos contêineres Docker no host. Portas sem proteção mantêm o acesso padrão do Docker.',
+        dockerTrafficPathMixed:
+            'As portas selecionadas usam caminhos de acesso diferentes. Configure-as separadamente.',
+        dockerTrafficPathUnknown:
+            'Não foi possível determinar o caminho de acesso desta porta. Verifique a rede do Docker e tente novamente.',
+        dockerTrafficPathPending: 'Caminho de acesso pendente',
+        dockerInputPolicyNotEffective:
+            'O host recebe esta porta diretamente, portanto a regra de proteção da porta do contêiner não se aplica. Configure-a no firewall do host.',
+        dockerInputUseHostFirewall: 'Configure o acesso a esta porta no firewall do host.',
         dockerInputNotProtected:
             'As regras INPUT do host não protegem diretamente esta porta publicada pelo Docker. Clique para abrir a proteção de portas de contêineres.',
         notInitialized: 'Não inicializado',
@@ -4314,9 +4310,7 @@ const message = {
             'As regras selecionadas têm configurações diferentes. Configure-as novamente para substituir todas; uma descrição vazia limpará todas as descrições.',
         effective: 'Em vigor',
         forwardUnsynced: 'Não sincronizado',
-        notEnabled: 'Não habilitado',
         notEffective: 'Sem efeito',
-        dockerGuardStatusEffective: 'A proteção de portas de contêineres {0} está funcionando normalmente',
         dockerGuardStatusReason: {
             command_missing:
                 'O componente de firewall {0} não está disponível e a proteção correspondente não pode ser habilitada. Verifique o firewall do sistema',
@@ -4343,8 +4337,6 @@ const message = {
         importSuccess: '{0} regras importadas com sucesso',
         importPartialSuccess: 'Importação concluída: {0} sucesso, {1} falha',
         basicStatus: 'O firewall atual não está vinculado. Vincule-o primeiro.',
-        baseIptables: 'Serviço iptables',
-        forwardIptables: 'Serviço de Encaminhamento de Porta iptables',
         initMsg: 'Prestes a inicializar {0}, continuar?',
         initDirectBackendConflictMsg:
             '{1} ainda está vinculado. Se {0} for inicializado, os dois conjuntos de regras ficarão ativos e poderão bloquear o acesso inesperadamente. Continuar?',

@@ -34,6 +34,8 @@ export const dockerGuardEndpointStatusMessage = (
     endpoint: Firewall.DockerGuardEndpoint,
 ): string => {
     if (!endpoint.policyUUID || endpoint.effective) return '';
+    if (endpoint.trafficPath === 'input') return i18n.global.t('firewall.dockerInputPolicyNotEffective');
+    if (endpoint.trafficPath === 'unknown') return i18n.global.t('firewall.dockerTrafficPathUnknown');
     const ipv6 = endpoint.family === 'ipv6';
     return dockerGuardFamilyStatusMessage(base, ipv6 ? 'IPv6' : 'IPv4', ipv6 ? base.ipv6 : base.ipv4);
 };

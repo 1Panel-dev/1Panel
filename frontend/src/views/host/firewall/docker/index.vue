@@ -76,35 +76,36 @@
                                 >
                                     <template #reference>
                                         <el-tag :type="endpointStatusType(group.endpoint)" effect="plain">
-                                            <span v-if="group.endpoint.policyUUID" class="docker-guard-protected-label">
+                                            <span
+                                                v-if="isDockerPolicyEndpoint(group.endpoint)"
+                                                class="docker-guard-protected-label"
+                                            >
                                                 <el-icon><Lock /></el-icon>
                                                 <span>{{ group.label }}</span>
                                             </span>
                                             <span v-else>{{ group.label }}</span>
                                         </el-tag>
                                     </template>
-                                    <el-descriptions class="docker-guard-descriptions" :column="1" border size="small">
+                                    <span v-if="!isDockerPolicyEndpoint(group.endpoint)">
+                                        {{ endpointPrompt(group.endpoint) }}
+                                    </span>
+                                    <el-descriptions
+                                        v-else
+                                        class="docker-guard-descriptions"
+                                        :column="1"
+                                        border
+                                        size="small"
+                                    >
                                         <el-descriptions-item :label="$t('firewall.protectionMode')">
-                                            {{
-                                                group.endpoint.policyUUID
-                                                    ? protectionModeLabel(group.endpoint)
-                                                    : $t('firewall.dockerGuardUnprotected')
-                                            }}
+                                            {{ protectionModeLabel(group.endpoint) }}
                                         </el-descriptions-item>
                                         <el-descriptions-item
-                                            v-if="
-                                                group.endpoint.policyUUID &&
-                                                group.endpoint.mode !== 'deny_all' &&
-                                                group.endpoint.sources.length
-                                            "
+                                            v-if="group.endpoint.mode !== 'deny_all' && group.endpoint.sources.length"
                                             :label="$t('firewall.sources')"
                                         >
                                             {{ displaySources(group.endpoint) }}
                                         </el-descriptions-item>
-                                        <el-descriptions-item
-                                            v-if="group.endpoint.policyUUID"
-                                            :label="$t('commons.table.status')"
-                                        >
+                                        <el-descriptions-item :label="$t('commons.table.status')">
                                             <div>
                                                 {{
                                                     $t(
@@ -401,6 +402,13 @@ const displaySources = (endpoint: Firewall.DockerGuardEndpoint) =>
     formatHostAddressList(endpoint.sources, endpoint.family);
 const endpointStatusMessage = (endpoint: Firewall.DockerGuardEndpoint) =>
     dockerGuardEndpointStatusMessage(data.base, endpoint);
+const isDockerPolicyEndpoint = (endpoint: Firewall.DockerGuardEndpoint) =>
+    endpoint.trafficPath === 'forward' && Boolean(endpoint.policyUUID);
+const endpointPrompt = (endpoint: Firewall.DockerGuardEndpoint) => {
+    if (endpoint.trafficPath === 'input') return i18n.global.t('firewall.dockerInputUseHostFirewall');
+    if (endpoint.trafficPath === 'unknown') return i18n.global.t('firewall.dockerTrafficPathPending');
+    return i18n.global.t('firewall.dockerGuardUnprotected');
+};
 
 const search = async () => {
     loading.value = true;
