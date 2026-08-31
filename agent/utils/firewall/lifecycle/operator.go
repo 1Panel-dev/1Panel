@@ -22,17 +22,25 @@ type Operator struct {
 	client Client
 }
 
+// DockerRestartError reports that the requested firewall operation completed,
+// but rebuilding Docker's firewall rules failed.
+type DockerRestartError struct {
+	Err error
+}
+
+func (e *DockerRestartError) Error() string {
+	return fmt.Sprintf("failed to restart Docker: %v", e.Err)
+}
+
+func (e *DockerRestartError) Unwrap() error {
+	return e.Err
+}
+
 func NewOperator(client Client) *Operator {
 	return &Operator{client: client}
 }
 
 func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareStart func(Client) error) error {
-	if o.client.Name() == ProviderFirewalld && operation == OperationStop {
-		if err := rememberFail2BanBeforeFirewallStop(); err != nil {
-			return err
-		}
-	}
-
 	switch operation {
 	case OperationStart:
 		if err := o.client.Start(); err != nil {
@@ -44,9 +52,7 @@ func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareS
 			}
 		}
 	case OperationStop:
-		if err := o.client.Stop(); err != nil {
-			return err
-		}
+		return o.StopWithPrepare(withDockerRestart, nil)
 	case OperationRestart:
 		if err := o.client.Restart(); err != nil {
 			return err
@@ -62,11 +68,35 @@ func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareS
 
 	if withDockerRestart {
 		if err := controller.HandleRestart("docker"); err != nil {
-			return fmt.Errorf("failed to restart Docker: %v", err)
+			return &DockerRestartError{Err: err}
 		}
 	}
 	if o.client.Name() == ProviderFirewalld && operation == OperationStart {
 		return restoreFail2BanAfterFirewallStart()
+	}
+	return nil
+}
+
+// StopWithPrepare records dependent service state, runs preparation, stops the
+// firewall, and optionally restarts Docker in that order.
+func (o *Operator) StopWithPrepare(withDockerRestart bool, prepareStop func() error) error {
+	if o.client.Name() == ProviderFirewalld {
+		if err := rememberFail2BanBeforeFirewallStop(); err != nil {
+			return err
+		}
+	}
+	if prepareStop != nil {
+		if err := prepareStop(); err != nil {
+			return err
+		}
+	}
+	if err := o.client.Stop(); err != nil {
+		return err
+	}
+	if withDockerRestart {
+		if err := controller.HandleRestart("docker"); err != nil {
+			return &DockerRestartError{Err: err}
+		}
 	}
 	return nil
 }

@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	filterruntime "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/runtime"
@@ -37,7 +38,10 @@ type FirewallService struct {
 	iptablesHelper         *iptables_helper.Manager
 	cleanupBackend         func(string) error
 	cleanupInactiveBackend func(string) error
-	resetBackend           func(string) error
+	resetBackend           func(string, bool) error
+	dockerActive           func() (bool, error)
+	restoreForwarding      func(context.Context) error
+	restoreDockerGuard     func(context.Context) error
 	baseClient             func() (lifecycle.Client, error)
 }
 
@@ -82,7 +86,14 @@ func newFirewallService() *FirewallService {
 		cleanupBackend:         cleanupSystemBackend,
 		cleanupInactiveBackend: cleanupInactiveSystemBackend,
 		resetBackend:           resetServiceFirewallBackend,
-		baseClient:             selectedSystemFirewallClient,
+		dockerActive: func() (bool, error) {
+			return controller.CheckActive("docker")
+		},
+		restoreForwarding: func(ctx context.Context) error {
+			return newForwardingService().Restore(ctx)
+		},
+		restoreDockerGuard: ReconcileDockerPortGuard,
+		baseClient:         selectedSystemFirewallClient,
 	}
 }
 
@@ -286,8 +297,38 @@ func (s *FirewallService) Reset(ctx context.Context, request dto.FirewallRuleRes
 	if reset == nil {
 		reset = resetServiceFirewallBackend
 	}
-	if err := reset(string(provider)); err != nil {
-		return dto.FirewallRuleResetResponse{}, err
+	restartDocker := false
+	if provider == filter.ProviderFirewalld && request.WithDockerRestart {
+		dockerActive := s.dockerActive
+		if dockerActive == nil {
+			dockerActive = func() (bool, error) { return controller.CheckActive("docker") }
+		}
+		active, err := dockerActive()
+		if err != nil {
+			return dto.FirewallRuleResetResponse{}, fmt.Errorf("check Docker status before resetting firewalld: %w", err)
+		}
+		restartDocker = active
+	}
+	resetErr := reset(string(provider), restartDocker)
+	if resetErr != nil {
+		var dockerRestartErr *lifecycle.DockerRestartError
+		if provider != filter.ProviderFirewalld || !errors.As(resetErr, &dockerRestartErr) {
+			return dto.FirewallRuleResetResponse{}, resetErr
+		}
+	}
+	if provider == filter.ProviderFirewalld {
+		restoreForwarding := s.restoreForwarding
+		if restoreForwarding == nil {
+			restoreForwarding = func(ctx context.Context) error { return newForwardingService().Restore(ctx) }
+		}
+		restoreDockerGuard := s.restoreDockerGuard
+		if restoreDockerGuard == nil {
+			restoreDockerGuard = ReconcileDockerPortGuard
+		}
+		restoreErr := restoreFirewalldDependents(ctx, restartDocker, restoreForwarding, restoreDockerGuard)
+		if err := errors.Join(resetErr, restoreErr); err != nil {
+			return dto.FirewallRuleResetResponse{}, err
+		}
 	}
 	return dto.FirewallRuleResetResponse{Removed: len(stored), Disabled: true}, nil
 }
@@ -296,21 +337,54 @@ func isDirectFirewallProvider(provider filter.Provider) bool {
 	return provider == filter.ProviderIptables || provider == filter.ProviderNftables
 }
 
-func resetServiceFirewallBackend(provider string) error {
+func resetServiceFirewallBackend(provider string, withDockerRestart bool) error {
 	client, err := lifecycle.NewClientFor(provider)
 	if err != nil {
 		return err
 	}
+	return resetServiceFirewallClient(client, withDockerRestart, func(
+		client lifecycle.Client,
+		restartDocker bool,
+		prepareStop func() error,
+	) error {
+		return lifecycle.NewOperator(client).StopWithPrepare(restartDocker, prepareStop)
+	})
+}
+
+func resetServiceFirewallClient(
+	client lifecycle.Client,
+	withDockerRestart bool,
+	stop func(lifecycle.Client, bool, func() error) error,
+) error {
 	resetter, ok := client.(lifecycle.Resetter)
 	if !ok {
-		return fmt.Errorf("firewall provider %s does not support reset", provider)
+		return fmt.Errorf("firewall provider %s does not support reset", client.Name())
 	}
-	if provider == constant.FirewallProviderFirewalld {
-		if err := lifecycle.NewOperator(client).Operate(lifecycle.OperationStop, false, nil); err != nil {
+	if resetBeforeStop, ok := client.(lifecycle.PreStopResetter); ok {
+		if err := stop(client, withDockerRestart, resetBeforeStop.ResetBeforeStop); err != nil {
 			return err
 		}
+		return nil
 	}
 	return resetter.Reset()
+}
+
+func restoreFirewalldDependents(
+	ctx context.Context,
+	restartDocker bool,
+	restoreForwarding func(context.Context) error,
+	restoreDockerGuard func(context.Context) error,
+) error {
+	var errs []error
+	if err := restoreForwarding(ctx); err != nil {
+		errs = append(errs, fmt.Errorf("restore port forwarding after resetting firewalld: %w", err))
+	}
+	if restartDocker {
+		if err := restoreDockerGuard(ctx); err != nil {
+			errs = append(errs, fmt.Errorf("restore Docker port guard after resetting firewalld: %w", err))
+		}
+	}
+	return errors.Join(errs...)
 }
 
 func (s *FirewallService) deleteFirewallRuleRecords(

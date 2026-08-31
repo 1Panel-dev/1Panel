@@ -102,6 +102,13 @@ type Resetter interface {
 	Reset() error
 }
 
+// PreStopResetter prepares a service-backed firewall reset without stopping
+// the service. The lifecycle operator can then stop the service and perform
+// dependent recovery, such as rebuilding Docker firewall rules, in order.
+type PreStopResetter interface {
+	ResetBeforeStop() error
+}
+
 func NewClient() (Client, error) {
 	runtime, err := DetectRuntime()
 	if err != nil {

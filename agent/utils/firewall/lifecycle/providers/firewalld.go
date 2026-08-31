@@ -76,16 +76,16 @@ func (f *Firewalld) Stop() error {
 }
 
 func (f *Firewalld) Reset() error {
-	running, err := f.Status()
-	if err != nil {
-		return fmt.Errorf("reset firewalld to defaults failed: %w", err)
+	if err := f.ResetBeforeStop(); err != nil {
+		return err
 	}
-	if running {
-		if err := f.Stop(); err != nil {
-			return fmt.Errorf("reset firewalld to defaults failed: %w", err)
-		}
+	if err := f.Stop(); err != nil {
+		return fmt.Errorf("stop firewalld after reset failed: %w", err)
 	}
+	return nil
+}
 
+func (f *Firewalld) ResetBeforeStop() error {
 	backupDir := fmt.Sprintf("%s.1panel-backup-%d", firewalldConfigDir, time.Now().UnixNano())
 	rollback, err := replaceFirewalldConfig(
 		firewalldConfigDir,

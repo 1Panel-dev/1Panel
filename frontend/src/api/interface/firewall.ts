@@ -201,6 +201,7 @@ export namespace Firewall {
 
     export interface ResetRequest {
         provider?: Provider;
+        withDockerRestart?: boolean;
     }
 
     export type CheckDecision = 'ready' | 'confirmation_required' | 'blocked' | 'no_change';
