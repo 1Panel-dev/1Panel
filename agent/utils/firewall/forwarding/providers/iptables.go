@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	firewallutil "github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
@@ -63,7 +64,8 @@ func (systemIptablesBackend) Restore(family, input string) error {
 		}
 	}
 	manager := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second), cmd.WithStdin(strings.NewReader(input)))
-	return manager.RunWithOptionalSudo(executable, "--noflush", "--wait")
+	err = manager.RunWithOptionalSudo(executable, "--noflush", "--wait")
+	return firewallutil.WrapBatchCommandError(executable+" --noflush --wait", input, err)
 }
 
 func (systemIptablesBackend) LoadRulesFromFile(table, chain, fileName string) error {

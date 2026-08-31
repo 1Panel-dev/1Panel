@@ -121,24 +121,31 @@ func (b *BaseApi) OperateForwardingRules(c *gin.Context) {
 
 // @Tags Firewall
 // @Summary Enable forwarding
-// @Success 200
+// @Accept json
+// @Param request body dto.FirewallInitializationTask true "request"
+// @Success 200 {object} dto.FilterChainOperationResponse
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/forward/enable [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"初始化并启用端口转发","formatEN":"initialize and enable port forwarding"}
 func (b *BaseApi) EnableForwarding(c *gin.Context) {
-	if err := forwardingService.Enable(); err != nil {
+	var request dto.FirewallInitializationTask
+	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
+	}
+	result, err := forwardingService.QueueInitialization(request)
+	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.Success(c)
+	helper.SuccessWithData(c, result)
 }
 
 // @Tags Firewall
 // @Summary Apply/Unload/Init firewall filter chain
 // @Accept json
 // @Param request body dto.FilterChainOperation true "request"
-// @Success 200
+// @Success 200 {object} dto.FilterChainOperationResponse
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/filter/operate [post]
@@ -148,12 +155,20 @@ func (b *BaseApi) OperateFilterChain(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
+	if request.Operate == "init-base" {
+		result, err := firewallService.QueueFilterChainInitialization(request)
+		if err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+		helper.SuccessWithData(c, result)
+		return
+	}
 	if err := firewallService.OperateFilterChain(request); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-
-	helper.Success(c)
+	helper.SuccessWithData(c, dto.FilterChainOperationResponse{})
 }
 
 // @Tags Firewall
@@ -533,7 +548,7 @@ func (b *BaseApi) SyncDockerPortGuard(c *gin.Context) {
 // @Summary Operate Docker port guard
 // @Accept json
 // @Param request body dto.DockerPortGuardOperation true "request"
-// @Success 200
+// @Success 200 {object} dto.FilterChainOperationResponse
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/docker/operate [post]
@@ -541,6 +556,15 @@ func (b *BaseApi) SyncDockerPortGuard(c *gin.Context) {
 func (b *BaseApi) OperateDockerPortGuard(c *gin.Context) {
 	var request dto.DockerPortGuardOperation
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
+	}
+	if request.Operation == "initialize" {
+		result, err := dockerPortGuardService.QueueInitialization(request)
+		if err != nil {
+			handleDockerPortGuardError(c, err)
+			return
+		}
+		helper.SuccessWithData(c, result)
 		return
 	}
 	if err := dockerPortGuardService.Operate(c.Request.Context(), request); err != nil {

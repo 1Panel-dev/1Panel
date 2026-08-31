@@ -94,11 +94,11 @@
 
 <script lang="ts" setup>
 import { Firewall } from '@/api/interface/firewall';
-import i18n from '@/lang';
 import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import { WarningFilled } from '@element-plus/icons-vue';
 import { computed } from 'vue';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
+import { dockerGuardFamilyStatusMessage } from '@/views/host/firewall/docker/model';
 
 const props = defineProps<{ base: Firewall.DockerGuardBase }>();
 const emit = defineEmits<{
@@ -133,24 +133,8 @@ const retryableFamilyIssues = computed(() =>
 const familyRetryOperation = computed<'initialize' | 'bind'>(() =>
     retryableFamilyIssues.value.some((item) => !item.status.initialized) ? 'initialize' : 'bind',
 );
-const dockerChainName = computed(() => (props.base.backend === 'nftables' ? 'NFT_1PANEL_DOCKER' : '1PANEL_DOCKER'));
-const familyStatusText = (family: string, status: Firewall.DockerGuardFamilyStatus) => {
-    if (
-        status.reason === 'command_missing' ||
-        status.reason === 'docker_chain_missing' ||
-        status.reason === 'inspect_failed'
-    ) {
-        return i18n.global.t(`firewall.dockerGuardStatusReason.${status.reason}`, [family]);
-    }
-    const state = i18n.global.t(
-        !status.initialized
-            ? 'firewall.notInitialized'
-            : !status.bound
-              ? 'commons.status.unbind'
-              : 'firewall.notEffective',
-    );
-    return i18n.global.t('firewall.familyChainIssue', [family, dockerChainName.value, state]);
-};
+const familyStatusText = (family: 'IPv4' | 'IPv6', status: Firewall.DockerGuardFamilyStatus) =>
+    dockerGuardFamilyStatusMessage(props.base, family, status);
 </script>
 
 <style lang="scss">

@@ -10,6 +10,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	firewallutil "github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 )
@@ -79,7 +80,11 @@ type commandRunner struct{}
 func (commandRunner) Run(executable string, args ...string) (string, error) {
 	executable = dockerGuardExecutable(executable)
 	manager := cmd.NewCommandMgr(cmd.WithTimeout(60 * time.Second))
-	return manager.RunWithOptionalSudoAndStdout(executable, args...)
+	stdout, err := manager.RunWithOptionalSudoAndStdout(executable, args...)
+	if err != nil {
+		return stdout, fmt.Errorf("command=%s %s failed: %w", executable, strings.Join(args, " "), err)
+	}
+	return stdout, nil
 }
 
 func (commandRunner) RunInput(executable, input string, args ...string) (string, error) {
@@ -88,7 +93,8 @@ func (commandRunner) RunInput(executable, input string, args ...string) (string,
 		return "", nftables_helper.RunScript(input)
 	}
 	manager := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second), cmd.WithStdin(strings.NewReader(input)))
-	return manager.RunWithOptionalSudoAndStdout(executable, args...)
+	stdout, err := manager.RunWithOptionalSudoAndStdout(executable, args...)
+	return stdout, firewallutil.WrapBatchCommandError(executable+" "+strings.Join(args, " "), input, err)
 }
 
 func (commandRunner) Exists(executable string) bool {

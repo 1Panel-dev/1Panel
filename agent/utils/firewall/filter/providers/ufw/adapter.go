@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
@@ -164,30 +165,40 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 			if a.failedCommandApplied(ctx, plan.Rules[0], index) {
 				executed = index + 1
 			}
-			return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, fmt.Errorf("execute UFW rule: %w", err))
+			cause := ufwApplyError(plan.Rules[0], fmt.Errorf("execute UFW rule: %w", err))
+			return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, cause)
 		}
 		executed = index + 1
 	}
 	verification, err := a.verify(ctx, plan)
 	if err != nil {
-		return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, fmt.Errorf("verify UFW rule: %w", err))
+		cause := ufwApplyError(plan.Rules[0], fmt.Errorf("verify UFW rule: %w", err))
+		return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, cause)
 	}
 	if !verification.Matched {
+		cause := ufwApplyError(plan.Rules[0], fmt.Errorf(
+			"ufw write verification failed for marker %q in scope %s",
+			plan.Rules[0].Expected.Marker,
+			plan.Scope.Key(),
+		))
 		return filter.ApplyResult{}, a.compensate(
 			ctx,
 			plan.Rules[0],
 			executed,
-			fmt.Errorf(
-				"ufw write verification failed for marker %q in scope %s",
-				plan.Rules[0].Expected.Marker,
-				plan.Scope.Key(),
-			),
+			cause,
 		)
 	}
 	return filter.ApplyResult{
 		Applied:      []filter.ObservedRule{plan.Rules[0].Expected},
 		Verification: &verification,
 	}, nil
+}
+
+func ufwApplyError(plan filter.NativeRulePlan, cause error) error {
+	if plan.Operation == filter.ChangeAdopt {
+		return buserr.WithDetail("ErrUFWRuleAdopt", cause.Error(), cause)
+	}
+	return cause
 }
 
 func (a *Adapter) failedCommandApplied(ctx context.Context, plan filter.NativeRulePlan, commandIndex int) bool {
@@ -197,8 +208,10 @@ func (a *Adapter) failedCommandApplied(ctx context.Context, plan filter.NativeRu
 	}
 	markerCount := countMarker(snapshot, plan.Expected.Marker)
 	switch plan.Operation {
-	case filter.ChangeCreate, filter.ChangeAdopt:
+	case filter.ChangeCreate:
 		return markerCount > 0
+	case filter.ChangeAdopt:
+		return plan.Previous == nil || !containsObservedRule(snapshot, *plan.Previous)
 	case filter.ChangeUpdate:
 		if commandIndex == 0 {
 			return markerCount == 0
@@ -307,14 +320,11 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		position = *target.Locator.Position
 		plan.Previous = &target
 		plan.Expected = observedForRule(normalized, marker, position)
-		plan.Commands = []filter.NativeCommand{
-			deletePositionCommand(position),
-			insertCommand(position, normalized, marker),
-		}
-		plan.RollbackCommands = []filter.NativeCommand{
-			insertCommand(position, target.Rule, observedComment(target)),
-			deleteRuleCommand(normalized, marker),
-		}
+		// UFW updates the comment of an existing rule when the same rule is added
+		// without insert/prepend. This keeps the rule active and in its original
+		// position throughout adoption.
+		plan.Commands = []filter.NativeCommand{commentCommand(normalized, marker)}
+		plan.RollbackCommands = []filter.NativeCommand{commentCommand(target.Rule, observedComment(target))}
 	case filter.ChangeUpdate:
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, marker, true)
 		if targetErr != nil {
@@ -653,6 +663,19 @@ func countMarker(snapshot filter.Snapshot, marker string) int {
 		}
 	}
 	return count
+}
+
+func containsObservedRule(snapshot filter.Snapshot, expected filter.ObservedRule) bool {
+	for _, observed := range snapshot.Rules {
+		if expected.Locator.Position != nil &&
+			(observed.Locator.Position == nil || *observed.Locator.Position != *expected.Locator.Position) {
+			continue
+		}
+		if observed.Marker == expected.Marker && filter.ObservedRuleMatchesExpected(observed, expected.Rule) {
+			return true
+		}
+	}
+	return false
 }
 
 func hasScopeNotice(notices []filter.ScopeNotice, code filter.ScopeNoticeCode) bool {

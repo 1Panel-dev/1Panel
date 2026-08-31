@@ -40,6 +40,10 @@ export namespace Firewall {
         backend: Provider;
         operation: BackendOperation;
     }
+    export interface FilterChainOperationResult {
+        taskID?: string;
+        queued?: boolean;
+    }
     export interface FirewallBase {
         name: string;
         backend: string;

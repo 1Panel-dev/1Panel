@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	firewallutil "github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 )
 
@@ -31,11 +32,19 @@ func BasicChains() []string {
 }
 
 func run(args ...string) (string, error) {
-	return cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout("nft", args...)
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout("nft", args...)
+	if err != nil {
+		return stdout, fmt.Errorf("command=nft %s failed: %w", strings.Join(args, " "), err)
+	}
+	return stdout, nil
 }
 
 func runCommand(args ...string) error {
-	return cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudo("nft", args...)
+	err := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudo("nft", args...)
+	if err != nil {
+		return fmt.Errorf("command=nft %s failed: %w", strings.Join(args, " "), err)
+	}
+	return nil
 }
 
 func runBatch(commands ...[]string) error {
@@ -75,7 +84,7 @@ func runScriptFile(script string, run func(string) error) error {
 	if err := file.Close(); err != nil {
 		return err
 	}
-	return run(name)
+	return firewallutil.WrapBatchCommandError("nft -f <generated-batch>", script, run(name))
 }
 
 func buildBatchScript(commands ...[]string) (string, error) {

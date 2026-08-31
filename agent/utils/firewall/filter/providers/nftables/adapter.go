@@ -542,7 +542,7 @@ type systemBackend struct{}
 
 func (systemBackend) ListChain(ctx context.Context, scope filter.Scope) (string, error) {
 	return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout(
-		"nft", "-n", "-a", "list", "chain", nftables_helper.TableFamily(scope.Family), nftables_helper.TableName, nativeChainName(scope),
+		"nft", "-n", "-n", "-a", "list", "chain", nftables_helper.TableFamily(scope.Family), nftables_helper.TableName, nativeChainName(scope),
 	)
 }
 

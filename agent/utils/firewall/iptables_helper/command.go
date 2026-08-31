@@ -54,7 +54,11 @@ func runTables(ctx context.Context, executable, tab string, ignoreExist1, withWa
 		args = append(args, "-w")
 	}
 	args = append(args, ruleArgs...)
-	return cmdMgr.RunWithOptionalSudoAndStdout(executable, args...)
+	stdout, err := cmdMgr.RunWithOptionalSudoAndStdout(executable, args...)
+	if err != nil {
+		return stdout, fmt.Errorf("command=%s %s failed: %w", executable, strings.Join(args, " "), err)
+	}
+	return stdout, nil
 }
 
 func runIptables(ctx context.Context, tab string, ignoreExist1, withWait bool, ruleArgs ...string) (string, error) {

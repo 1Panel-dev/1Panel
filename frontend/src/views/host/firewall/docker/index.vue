@@ -105,13 +105,21 @@
                                             v-if="group.endpoint.policyUUID"
                                             :label="$t('commons.table.status')"
                                         >
-                                            {{
-                                                $t(
-                                                    group.endpoint.effective
-                                                        ? 'firewall.effective'
-                                                        : 'firewall.notEffective',
-                                                )
-                                            }}
+                                            <div>
+                                                {{
+                                                    $t(
+                                                        group.endpoint.effective
+                                                            ? 'firewall.effective'
+                                                            : 'firewall.notEffective',
+                                                    )
+                                                }}
+                                                <div
+                                                    v-if="!group.endpoint.effective"
+                                                    class="docker-guard-status-message"
+                                                >
+                                                    {{ endpointStatusMessage(group.endpoint) }}
+                                                </div>
+                                            </div>
                                         </el-descriptions-item>
                                         <el-descriptions-item
                                             v-if="group.endpoint.description"
@@ -200,10 +208,11 @@
             </template>
         </DrawerPro>
 
-        <DockerGuardDetail ref="detailRef" :containers="containerRows" @search="search" />
+        <DockerGuardDetail ref="detailRef" :base="data.base" :containers="containerRows" @search="search" />
         <DockerGuardImport ref="importRef" @search="search" />
         <RuleSync ref="ruleSyncRef" @search="search" />
         <ConfirmDialog ref="cleanupConfirmRef" @confirm="submitCleanupBackend" />
+        <TaskLog ref="taskLogRef" @close="search" />
     </div>
 </template>
 
@@ -215,6 +224,7 @@ import DockerGuardDetail from '@/views/host/firewall/docker/detail/index.vue';
 import DockerGuardImport from '@/views/host/firewall/docker/import/index.vue';
 import RuleSync from '@/views/host/firewall/sync/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { Firewall } from '@/api/interface/firewall';
 import {
     deleteDockerPortGuardPolicies,
@@ -228,14 +238,16 @@ import { ElMessageBox } from 'element-plus';
 import { Lock } from '@element-plus/icons-vue';
 import { downloadWithContent } from '@/utils/file';
 import { getCurrentDateFormatted } from '@/utils/date';
-import { dockerGuardEndpointKey } from '@/views/host/firewall/docker/model';
+import { dockerGuardEndpointKey, dockerGuardEndpointStatusMessage } from '@/views/host/firewall/docker/model';
 import { formatHostAddressList } from '@/views/host/firewall/utils/validation';
+import { newUUID } from '@/utils/id';
 
 const loading = ref(false);
 const detailRef = ref<InstanceType<typeof DockerGuardDetail>>();
 const importRef = ref<InstanceType<typeof DockerGuardImport>>();
 const ruleSyncRef = ref<InstanceType<typeof RuleSync>>();
 const cleanupConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
+const taskLogRef = ref<InstanceType<typeof TaskLog>>();
 const orphanDrawerVisible = ref(false);
 const searchName = ref('');
 const selects = ref<Firewall.DockerGuardContainer[]>([]);
@@ -387,6 +399,8 @@ const endpointLabel = (endpoint: Firewall.DockerGuardEndpoint) => {
 };
 const displaySources = (endpoint: Firewall.DockerGuardEndpoint) =>
     formatHostAddressList(endpoint.sources, endpoint.family);
+const endpointStatusMessage = (endpoint: Firewall.DockerGuardEndpoint) =>
+    dockerGuardEndpointStatusMessage(data.base, endpoint);
 
 const search = async () => {
     loading.value = true;
@@ -411,7 +425,12 @@ const operate = async (operation: 'initialize' | 'bind' | 'unbind') => {
         }
     }
     try {
-        await operateDockerPortGuard(operation);
+        const result = (await operateDockerPortGuard(operation, operation === 'initialize' ? newUUID() : undefined))
+            .data;
+        if (operation === 'initialize' && result.queued && result.taskID) {
+            taskLogRef.value?.openWithTaskID(result.taskID, true);
+            return;
+        }
     } catch {
         await search();
         return;
@@ -522,5 +541,11 @@ search();
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.docker-guard-status-message {
+    margin-top: 4px;
+    color: var(--el-color-warning);
+    line-height: 18px;
 }
 </style>

@@ -1,4 +1,5 @@
 import { Firewall } from '@/api/interface/firewall';
+import i18n from '@/lang';
 import { isValidAddressForFamily } from '@/views/host/firewall/utils/validation';
 
 type DockerGuardEndpointIdentity = Pick<Firewall.DockerGuardEndpoint, 'family' | 'hostIP' | 'hostPort' | 'protocol'>;
@@ -8,6 +9,34 @@ export const dockerGuardEndpointKey = (endpoint: DockerGuardEndpointIdentity): s
 
 export const isValidDockerGuardSource = (family: Firewall.DockerGuardEndpoint['family'], value: string): boolean =>
     isValidAddressForFamily(family, value);
+
+export const dockerGuardFamilyStatusMessage = (
+    base: Firewall.DockerGuardBase,
+    family: 'IPv4' | 'IPv6',
+    status: Firewall.DockerGuardFamilyStatus,
+): string => {
+    if (status.reason) {
+        return i18n.global.t(`firewall.dockerGuardStatusReason.${status.reason}`, [family]);
+    }
+    const state = i18n.global.t(
+        !status.initialized
+            ? 'firewall.notInitialized'
+            : !status.bound
+              ? 'commons.status.unbind'
+              : 'firewall.notEffective',
+    );
+    const chainName = base.backend === 'nftables' ? 'NFT_1PANEL_DOCKER' : '1PANEL_DOCKER';
+    return i18n.global.t('firewall.familyChainIssue', [family, chainName, state]);
+};
+
+export const dockerGuardEndpointStatusMessage = (
+    base: Firewall.DockerGuardBase,
+    endpoint: Firewall.DockerGuardEndpoint,
+): string => {
+    if (!endpoint.policyUUID || endpoint.effective) return '';
+    const ipv6 = endpoint.family === 'ipv6';
+    return dockerGuardFamilyStatusMessage(base, ipv6 ? 'IPv6' : 'IPv4', ipv6 ? base.ipv6 : base.ipv4);
+};
 
 export const normalizeDockerGuardPolicy = (value: unknown): Firewall.DockerGuardPolicy | undefined => {
     if (!value || typeof value !== 'object') return;
