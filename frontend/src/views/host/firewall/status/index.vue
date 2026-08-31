@@ -333,7 +333,7 @@ const loadBaseInfo = async (search: boolean) => {
 
 const loadDocker = async () => {
     const res = await loadDockerStatus();
-    dockerStatus.value = res.data.isExist;
+    dockerStatus.value = res.data.isActive;
 };
 
 const onInit = async () => {

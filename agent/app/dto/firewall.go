@@ -103,7 +103,8 @@ type FirewallRuleResetResponse struct {
 }
 
 type FirewallRuleReset struct {
-	Provider filter.Provider `json:"provider,omitempty" validate:"omitempty,oneof=firewalld ufw iptables nftables"`
+	Provider          filter.Provider `json:"provider,omitempty" validate:"omitempty,oneof=firewalld ufw iptables nftables"`
+	WithDockerRestart bool            `json:"withDockerRestart"`
 }
 
 type FirewallRuleCheckResult struct {

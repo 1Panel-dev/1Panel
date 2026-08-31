@@ -368,7 +368,12 @@
         <RuleImport ref="ruleImportRef" @search="search" />
         <RuleSync ref="ruleSyncRef" @search="search" />
         <ProcessDetail ref="processDetailRef" />
-        <ConfirmDialog ref="resetConfirmRef" @confirm="submitResetRules" />
+        <ConfirmDialog ref="resetConfirmRef" @confirm="prepareResetRules" />
+        <DockerRestart
+            ref="dockerRestartRef"
+            v-model:withDockerRestart="withDockerRestart"
+            @submit="submitResetRules"
+        />
     </div>
 </template>
 
@@ -398,6 +403,8 @@ import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import ProcessDetail from '@/views/host/process/process/detail/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
+import { loadDockerStatus } from '@/api/modules/container';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { Expand, Filter, Lock, WarningFilled } from '@element-plus/icons-vue';
@@ -461,6 +468,8 @@ const ruleImportRef = ref<InstanceType<typeof RuleImport>>();
 const ruleSyncRef = ref<InstanceType<typeof RuleSync>>();
 const processDetailRef = ref<InstanceType<typeof ProcessDetail>>();
 const resetConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
+const dockerRestartRef = ref<InstanceType<typeof DockerRestart>>();
+const withDockerRestart = ref(false);
 const loading = ref(false);
 const resetting = ref(false);
 const syncOpening = ref(false);
@@ -1111,6 +1120,7 @@ const removeRules = async (selected: RuleRow[]) => {
 const removeSelectedRules = () => removeRules(selects.value.filter((row) => isDeletableManagedRule(row)));
 
 const resetRules = () => {
+    withDockerRestart.value = false;
     const message = i18n.global.t(
         isDirectBackend.value ? 'firewall.resetDirectRulesHelper' : 'firewall.resetWhitelistRulesHelper',
         [provider.value],
@@ -1122,11 +1132,25 @@ const resetRules = () => {
     });
 };
 
+const prepareResetRules = async () => {
+    if (provider.value === 'firewalld') {
+        const status = await loadDockerStatus();
+        if (status.data.isActive) {
+            dockerRestartRef.value?.acceptParams({ title: i18n.global.t('firewall.dockerRestart') });
+            return;
+        }
+    }
+    await submitResetRules();
+};
+
 const submitResetRules = async () => {
     resetting.value = true;
     loading.value = true;
     try {
-        await resetFirewallRules({ provider: provider.value as Firewall.Provider });
+        await resetFirewallRules({
+            provider: provider.value as Firewall.Provider,
+            withDockerRestart: provider.value === 'firewalld' && withDockerRestart.value,
+        });
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     } finally {
         resetting.value = false;
