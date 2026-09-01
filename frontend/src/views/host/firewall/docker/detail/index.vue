@@ -16,6 +16,8 @@
                     {{ $t('commons.button.selectAll') }}
                 </el-checkbox>
                 <el-button
+                    v-permission
+                    v-node-admin
                     type="primary"
                     :disabled="selectedEndpoints.length === 0"
                     @click="openPolicy(selectedEndpoints)"
@@ -62,11 +64,20 @@
                             </el-tooltip>
                         </div>
                         <div class="port-card-actions">
-                            <el-button type="primary" link size="small" @click.stop="openPolicy(group.endpoints)">
+                            <el-button
+                                v-permission
+                                v-node-admin
+                                type="primary"
+                                link
+                                size="small"
+                                @click.stop="openPolicy(group.endpoints)"
+                            >
                                 {{ $t('commons.button.set') }}
                             </el-button>
                             <el-button
                                 v-if="group.endpoint.policyUUID"
+                                v-permission
+                                v-node-admin
                                 type="primary"
                                 link
                                 size="small"
@@ -167,7 +178,11 @@ import { deleteDockerPortGuardPolicies, upsertDockerPortGuardPolicies } from '@/
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
-import { dockerGuardEndpointStatusMessage, isValidDockerGuardSource } from '@/views/host/firewall/docker/model';
+import {
+    dockerGuardEndpointStatusMessage,
+    dockerGuardManagementTarget,
+    isValidDockerGuardSource,
+} from '@/views/host/firewall/docker/model';
 import { formatHostAddress, formatHostAddressList, splitTagValues } from '@/views/host/firewall/utils/validation';
 
 const props = defineProps<{ base: Firewall.DockerGuardBase; containers: Firewall.DockerGuardContainer[] }>();
@@ -279,17 +294,17 @@ const toggleSelection = (key: string) => {
 };
 const openPolicy = (endpoints: Firewall.DockerGuardEndpoint[]) => {
     if (!endpoints.length) return;
-    const paths = new Set(endpoints.map((endpoint) => endpoint.trafficPath || 'unknown'));
-    if (paths.size !== 1) {
+    const targets = new Set(endpoints.map(dockerGuardManagementTarget));
+    if (targets.size !== 1) {
         MsgWarning(i18n.global.t('firewall.dockerTrafficPathMixed'));
         return;
     }
-    const path = [...paths][0];
-    if (path === 'input') {
+    const target = [...targets][0];
+    if (target === 'host_firewall') {
         MsgWarning(i18n.global.t('firewall.dockerInputUseHostFirewall'));
         return;
     }
-    if (path !== 'forward') {
+    if (target !== 'container_guard') {
         MsgWarning(i18n.global.t('firewall.dockerTrafficPathUnknown'));
         return;
     }
@@ -379,8 +394,9 @@ const portMappingLabel = (row: Firewall.DockerGuardPortGroup) => {
     return `${publishedEndpoint} → ${value}/${row.endpoint.protocol}`;
 };
 const protectionSummary = (row: Firewall.DockerGuardEndpoint) => {
-    if (row.trafficPath === 'input') return i18n.global.t('firewall.dockerInputUseHostFirewall');
-    if (row.trafficPath === 'unknown') return i18n.global.t('firewall.dockerTrafficPathPending');
+    const target = dockerGuardManagementTarget(row);
+    if (target === 'host_firewall') return i18n.global.t('firewall.dockerInputUseHostFirewall');
+    if (target === 'needs_diagnosis') return i18n.global.t('firewall.dockerTrafficPathUnknown');
     if (!row.policyUUID) return i18n.global.t('firewall.dockerGuardUnprotected');
     let summary = i18n.global.t('firewall.denyAll');
     if (row.mode === 'deny_sources') {

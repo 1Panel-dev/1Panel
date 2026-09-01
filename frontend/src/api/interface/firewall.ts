@@ -404,6 +404,8 @@ export namespace Firewall {
         effective: boolean;
         description?: string;
         trafficPath: 'forward' | 'input' | 'unknown';
+        managementTarget?: 'container_guard' | 'host_firewall' | 'needs_diagnosis';
+        managementReason?: 'nat_inspect_failed' | 'nat_chain_unreachable' | 'proxy_inspect_failed' | 'no_matching_path';
     }
     export interface DockerGuardPortGroup {
         key: string;

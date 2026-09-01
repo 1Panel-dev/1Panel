@@ -3821,7 +3821,7 @@ const message = {
         scopeInactive: '目前託管範圍未啟用，新增規則可能不會作用於現有流量。',
         scopeMissing: '託管範圍 {0} 尚未建立，套用第一條規則時將以安全方式建立。',
         scopeUnmanagedActive: '偵測到其他使用中範圍：{0}，1Panel 不會修改其中的規則。',
-        scopeRuntimeMismatch: '執行設定與永久設定在下列項目不一致：{0}。',
+        scopeRuntimeMismatch: 'firewalld 執行中設定與永久設定不一致，請重新啟動防火牆。',
         dockerRestart: '防火牆操作需要重新啟動 Docker 服務',
         firewallHelper: '{0}系統防火牆',
         firewallNotStart: '尚未啟用系統防火牆，請先啟用',

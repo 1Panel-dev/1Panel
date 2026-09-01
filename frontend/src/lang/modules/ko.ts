@@ -4002,7 +4002,7 @@ const message = {
         scopeInactive: '관리 범위가 비활성 상태입니다. 새 규칙이 현재 트래픽에 적용되지 않을 수 있습니다.',
         scopeMissing: '관리 범위 {0}이(가) 없으며 첫 규칙을 적용할 때 안전하게 생성됩니다.',
         scopeUnmanagedActive: '다른 활성 범위가 감지되었습니다: {0}. 1Panel은 해당 규칙을 변경하지 않습니다.',
-        scopeRuntimeMismatch: '실행 중 구성과 영구 구성의 다음 항목이 다릅니다: {0}.',
+        scopeRuntimeMismatch: 'firewalld의 실행 중 구성과 영구 구성이 다릅니다. 방화벽을 재시작하세요.',
         dockerRestart: '방화벽 작업에는 Docker 서비스 재시작이 필요합니다',
         firewallHelper: '{0} 시스템 방화벽',
         firewallNotStart: '현재 시스템 방화벽이 활성화되지 않았습니다. 먼저 활성화하세요.',

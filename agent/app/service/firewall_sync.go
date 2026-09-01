@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	firewallsync "github.com/1Panel-dev/1Panel/agent/utils/firewall/sync"
 	"gorm.io/gorm"
 )
@@ -138,6 +139,91 @@ func (s *FirewallService) restoreStoredFirewallRules(ctx context.Context, provid
 		return fmt.Errorf("restore database firewall rules: %d rules failed", result.Failed)
 	}
 	return fmt.Errorf("restore database firewall rules: %s", strings.Join(messages, "; "))
+}
+
+func AdoptLegacyHostFirewallRuleOwnership(ctx context.Context) error {
+	return newFirewallService().adoptLegacyHostFirewallRuleOwnership(ctx)
+}
+
+func (s *FirewallService) adoptLegacyHostFirewallRuleOwnership(ctx context.Context) error {
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
+
+	selected, err := s.selectedProvider(ctx)
+	if err != nil {
+		return err
+	}
+	if selected != filter.ProviderIptables && selected != filter.ProviderUFW {
+		return fmt.Errorf("%w: selected provider %s does not require legacy ownership transfer", filter.ErrProviderUnavailable, selected)
+	}
+	runtime, err := s.adapters.Resolve(selected)
+	if err != nil {
+		return err
+	}
+	stored, err := s.rules.List(ctx)
+	if err != nil {
+		return err
+	}
+	for _, scope := range filter.ManagedInputScopes(selected) {
+		desired, err := s.desiredFirewallRulesForScope(ctx, stored, scope)
+		if err != nil {
+			return err
+		}
+		if len(desired) == 0 {
+			continue
+		}
+		snapshot, err := runtime.ObserveMutation(ctx, scope)
+		if err != nil {
+			return err
+		}
+		for {
+			items, err := filter.MergeInventory(filter.InventoryMergeInput{
+				Observed: snapshot.Rules,
+				Desired:  desired,
+			})
+			if err != nil {
+				return err
+			}
+			var candidate *filter.InventoryItem
+			for index := range items {
+				item := &items[index]
+				if item.Match != filter.InventoryMatchChanged || item.Desired == nil || item.Observed == nil ||
+					item.Desired.Origin != filter.RuleOriginAdopted || strings.TrimSpace(item.Desired.Marker) == "" ||
+					strings.TrimSpace(item.Observed.Marker) != "" || item.Observed.Protected ||
+					!filter.ObservedRuleMatchesExpected(*item.Observed, item.Desired.Rule) {
+					continue
+				}
+				candidate = item
+				break
+			}
+			if candidate == nil {
+				break
+			}
+			after := candidate.Desired.Rule
+			before := firewallsync.ObservedRule(*candidate.Observed)
+			locator := candidate.Observed.Locator
+			_, verification, err := runtime.Execute(ctx, snapshot, []filter.DesiredChange{{
+				Operation:      filter.ChangeAdopt,
+				Before:         &before,
+				After:          &after,
+				Locator:        &locator,
+				PreviousMarker: candidate.Observed.Marker,
+			}})
+			if err != nil {
+				return err
+			}
+			if !verification.Matched {
+				return filter.ErrVerificationFailed
+			}
+			snapshot = verification.Snapshot
+		}
+	}
+	if selected == filter.ProviderIptables {
+		if err := iptables_helper.CleanupLegacyAdvancedChains(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *FirewallService) loadFirewallRuleSyncPlan(

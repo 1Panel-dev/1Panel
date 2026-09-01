@@ -4178,7 +4178,7 @@ const message = {
         scopeInactive: 'O escopo gerenciado está inativo. Novas regras podem não afetar o tráfego atual.',
         scopeMissing: 'O escopo gerenciado {0} não existe e será criado com segurança ao aplicar a primeira regra.',
         scopeUnmanagedActive: 'Outros escopos ativos foram detectados: {0}. O 1Panel não modificará suas regras.',
-        scopeRuntimeMismatch: 'As configurações ativa e permanente diferem em: {0}.',
+        scopeRuntimeMismatch: 'As configurações ativa e permanente do firewalld não coincidem. Reinicie o firewall.',
         dockerRestart: 'Operações de firewall exigem reinicialização do serviço Docker',
         firewallHelper: 'Firewall do sistema {0}',
         firewallNotStart: 'O firewall do sistema não está habilitado atualmente. Habilite-o primeiro.',

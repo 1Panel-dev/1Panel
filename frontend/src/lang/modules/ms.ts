@@ -4158,7 +4158,7 @@ const message = {
         scopeInactive: 'Skop terurus tidak aktif. Peraturan baharu mungkin tidak mempengaruhi trafik semasa.',
         scopeMissing: 'Skop terurus {0} tiada dan akan dicipta dengan selamat apabila peraturan pertama digunakan.',
         scopeUnmanagedActive: 'Skop aktif lain dikesan: {0}. 1Panel tidak akan mengubah peraturannya.',
-        scopeRuntimeMismatch: 'Konfigurasi aktif dan kekal berbeza bagi: {0}.',
+        scopeRuntimeMismatch: 'Konfigurasi firewalld aktif dan kekal tidak sepadan. Mulakan semula firewall.',
         dockerRestart: 'Operasi firewall memerlukan memulakan semula perkhidmatan Docker',
         firewallHelper: '{0} firewall sistem',
         firewallNotStart: 'Firewall sistem belum diaktifkan. Aktifkannya dahulu.',

@@ -372,6 +372,7 @@
         <DockerRestart
             ref="dockerRestartRef"
             v-model:withDockerRestart="withDockerRestart"
+            :title="$t('firewall.cleanupAction')"
             @submit="submitResetRules"
         />
     </div>
@@ -395,6 +396,7 @@ import i18n from '@/lang';
 import { getCurrentDateFormatted } from '@/utils/date';
 import { downloadWithContent } from '@/utils/file';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { dockerGuardManagementTarget } from '@/views/host/firewall/docker/model';
 import { formatHostAddress } from '@/views/host/firewall/utils/validation';
 import RuleImport from '@/views/host/firewall/rule/import/index.vue';
 import RuleOperate from '@/views/host/firewall/rule/operate/index.vue';
@@ -419,7 +421,7 @@ interface UsageEntry {
     owner: string;
     pid?: number;
     docker?: boolean;
-    dockerTrafficPath?: Firewall.DockerGuardEndpoint['trafficPath'];
+    dockerManagementTarget?: Firewall.DockerGuardEndpoint['managementTarget'];
 }
 
 interface DisplayNotice {
@@ -772,7 +774,7 @@ const ruleUsageEntries = (row: RuleRow): UsageEntry[] => {
             ports: [endpoint.hostPort],
             owner: `Docker: ${endpoint.containerName || endpoint.containerID?.slice(0, 12) || '-'}`,
             docker: true,
-            dockerTrafficPath: endpoint.trafficPath,
+            dockerManagementTarget: dockerGuardManagementTarget(endpoint),
         }));
     return [...processes, ...docker];
 };
@@ -780,9 +782,11 @@ const usageEntryPortText = (entry: UsageEntry) => entry.ports.join(', ') || '-';
 const usageEntryLabel = (entry: UsageEntry) =>
     entry.docker
         ? `${entry.owner} (${usageEntryPortText(entry)}) — ${i18n.global.t(
-              entry.dockerTrafficPath === 'input'
+              entry.dockerManagementTarget === 'host_firewall'
                   ? 'firewall.dockerInputUseHostFirewall'
-                  : 'firewall.dockerInputNotProtected',
+                  : entry.dockerManagementTarget === 'container_guard'
+                    ? 'firewall.dockerInputNotProtected'
+                    : 'firewall.dockerTrafficPathUnknown',
           )}`
         : `${entry.owner} (${usageEntryPortText(entry)})`;
 const openUsageDetail = (entry: UsageEntry) => {
@@ -931,7 +935,7 @@ const scopeNoticeText = (notice: Firewall.ScopeNotice) => {
         case 'unmanaged_active_scopes':
             return i18n.global.t('firewall.scopeUnmanagedActive', [value]);
         case 'runtime_permanent_mismatch':
-            return i18n.global.t('firewall.scopeRuntimeMismatch', [value]);
+            return i18n.global.t('firewall.scopeRuntimeMismatch');
     }
 };
 

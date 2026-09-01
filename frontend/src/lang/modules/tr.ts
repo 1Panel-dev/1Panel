@@ -4158,7 +4158,8 @@ const message = {
         scopeInactive: 'Yönetilen kapsam etkin değil. Yeni kurallar mevcut trafiği etkilemeyebilir.',
         scopeMissing: 'Yönetilen {0} kapsamı eksik ve ilk kural uygulanırken güvenli şekilde oluşturulacak.',
         scopeUnmanagedActive: 'Başka etkin kapsamlar algılandı: {0}. 1Panel bunların kurallarını değiştirmez.',
-        scopeRuntimeMismatch: 'Etkin ve kalıcı yapılandırmalar şu öğelerde farklı: {0}.',
+        scopeRuntimeMismatch:
+            'Etkin ve kalıcı firewalld yapılandırmaları eşleşmiyor. Güvenlik duvarını yeniden başlatın.',
         dockerRestart: 'Güvenlik duvarı işlemleri Docker hizmetinin yeniden başlatılmasını gerektirir',
         firewallHelper: '{0} sistem güvenlik duvarı',
         firewallNotStart: 'Sistem güvenlik duvarı şu anda etkin değil. Önce etkinleştirin.',
