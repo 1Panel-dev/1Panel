@@ -25,11 +25,9 @@
                 <div class="menu-setting-card__label mb-3">{{ $t('setting.menuHide') }}</div>
                 <el-alert :closable="false" :title="$t('setting.menuSettingHelper')" type="warning" />
                 <el-tree
-                    ref="menuTreeRef"
                     :data="treeData.hideMenu"
                     :allow-drag="allowDrag"
                     :allow-drop="allowDrop"
-                    :filter-node-method="filterMenu"
                     draggable
                     node-key="id"
                     class="mt-3 menu-hide-tree"
@@ -77,19 +75,18 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, reactive, ref } from 'vue';
-import { AllowDropType, ElMessageBox, ElTree, RenderContentContext } from 'element-plus';
+import { reactive, ref } from 'vue';
+import { AllowDropType, ElMessageBox, RenderContentContext } from 'element-plus';
 import i18n from '@/lang';
 import { defaultMenu, updateMenu, updateSetting } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { ArrowRight } from '@element-plus/icons-vue';
 import { sortMenu } from '@/utils/misc';
-const { isEE, isIntl, isAdmin, menuAccordion } = useGlobalStore();
+const { menuAccordion } = useGlobalStore();
 
 const drawerVisible = ref();
 const loading = ref();
-const menuTreeRef = ref<InstanceType<typeof ElTree>>();
 const em = defineEmits(['search']);
 interface DialogProps {
     hideMenu: string;
@@ -106,7 +103,6 @@ const acceptParams = (params: DialogProps): void => {
     let hideMenu = JSON.parse(params.hideMenu);
     sortMenu(hideMenu);
     treeData.hideMenu = hideMenu;
-    nextTick(() => menuTreeRef.value?.filter(true));
 };
 type Node = RenderContentContext['node'];
 
@@ -150,16 +146,8 @@ const allowDrop = (draggingNode: Node, dropNode: Node, type: AllowDropType) => {
 const handleDrop = (draggingNode: Node, dropNode: Node) => {
     const siblingNodes = dropNode.level == 2 ? dropNode.parent.parent.data : dropNode.parent.data;
     const updateSort = (nodes) => {
-        const reservedSorts = new Set(nodes.filter((node) => !isMenuVisible(node)).map((node) => node.sort));
-        let nextSort = 100;
-        nodes.forEach((node) => {
-            if (isMenuVisible(node)) {
-                while (reservedSorts.has(nextSort)) {
-                    nextSort += 100;
-                }
-                node.sort = nextSort;
-                nextSort += 100;
-            }
+        nodes.forEach((node, index) => {
+            node.sort = (index + 1) * 100;
             if (node.children && node.children.length) {
                 updateSort(node.children);
             }
@@ -176,23 +164,10 @@ const treeData = reactive({
     checkedData: [],
 });
 
-const isMenuVisible = (data: { label: string }) => {
-    if (data.label === 'Upage') {
-        return !(isIntl.value || (isEE.value && !isAdmin.value));
-    }
-    if (data.label === 'XApp') {
-        return !isIntl.value;
-    }
-    return true;
-};
-const filterMenu = (_value: boolean, data: { label: string }) => isMenuVisible(data);
-
 const onChangeShow = async (row: any) => {
     if (row.children) {
         for (const item of row.children) {
-            if (isMenuVisible(item)) {
-                item.isShow = row.isShow;
-            }
+            item.isShow = row.isShow;
         }
         return;
     }
@@ -202,9 +177,6 @@ const onChangeShow = async (row: any) => {
         }
         let allHide = true;
         for (const item2 of item.children) {
-            if (!isMenuVisible(item2)) {
-                continue;
-            }
             if (item2.isShow) {
                 allHide = false;
             }
