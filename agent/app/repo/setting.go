@@ -14,6 +14,7 @@ type ISettingRepo interface {
 	GetList(opts ...DBOption) ([]model.Setting, error)
 	Get(opts ...DBOption) (model.Setting, error)
 	GetValueByKey(key string) (string, error)
+	GetValuesByKeys(keys []string) (map[string]string, error)
 	Create(key, value string) error
 	Update(key, value string) error
 	WithByKey(key string) DBOption
@@ -66,6 +67,20 @@ func (s *SettingRepo) GetValueByKey(key string) (string, error) {
 		return "", err
 	}
 	return setting.Value, nil
+}
+
+// GetValuesByKeys fetches several settings in one query. Missing keys are
+// simply absent from the result.
+func (s *SettingRepo) GetValuesByKeys(keys []string) (map[string]string, error) {
+	var settings []model.Setting
+	if err := global.DB.Where("key in (?)", keys).Find(&settings).Error; err != nil {
+		return nil, err
+	}
+	values := make(map[string]string, len(settings))
+	for _, setting := range settings {
+		values[setting.Key] = setting.Value
+	}
+	return values, nil
 }
 
 func (s *SettingRepo) WithByKey(key string) DBOption {

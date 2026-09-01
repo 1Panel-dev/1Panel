@@ -2122,6 +2122,20 @@ const message = {
         aiSummary: '行が {0} プレフィックスで始まり Enter を押すと、AI コマンド生成がトリガーされます。',
         aiPrefixAsciiVisible: 'ASCII の表示可能文字のみ対応しています。スペース、CJK 文字、全角記号は使用できません。',
         saveHelper: '現在のターミナル設定を保存してもよろしいですか？',
+        pinSession: 'セッションをピン留め',
+        unpinSession: 'ピン留めを解除',
+        pinSessionHelper:
+            'ピン留めすると、ページを離れたりブラウザーを閉じたりした後もセッションはサーバー上で {0} 分間保持されます。',
+        sessionRestored: '{0} 件のセッションを復元しました',
+        sessionExpired: 'セッションが期限切れか存在しません。再接続してください。',
+        sessionKicked: 'このセッションは別のウィンドウで開かれています。',
+        closePinnedConfirm:
+            'このターミナルはピン留めされています。閉じるとサーバー上のセッションも終了します。続行しますか？',
+        sessionKeepAlive: 'セッション保持時間（分）',
+        sessionKeepAliveHelper:
+            'ページを離れた後にピン留めされたセッションを保持する時間です。0 を指定すると機能を無効にします。',
+        sessionMaxPinned: 'ピン留めセッションの最大数',
+        sessionBuffer: '再生バッファー（KB）',
     },
     toolbox: {
         common: {

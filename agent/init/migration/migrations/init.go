@@ -1783,3 +1783,16 @@ var SimplifyFirewallRulePolicy = &gormigrate.Migration{
 		})
 	},
 }
+
+var AddTerminalSessionSettings = &gormigrate.Migration{
+	ID: "20260827-add-terminal-session-settings",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "TerminalSessionKeepAlive", Value: "30"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "TerminalSessionMaxPinned", Value: "10"}).Error; err != nil {
+			return err
+		}
+		return tx.Create(&model.Setting{Key: "TerminalSessionBuffer", Value: "256"}).Error
+	},
+}

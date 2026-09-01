@@ -2161,6 +2161,19 @@ const message = {
         aiPrefixAsciiVisible:
             'Hanya aksara ASCII yang kelihatan disokong. Ruang, aksara CJK dan simbol lebar penuh tidak dibenarkan.',
         saveHelper: 'Adakah anda pasti mahu menyimpan konfigurasi terminal semasa?',
+        pinSession: 'Sematkan sesi',
+        unpinSession: 'Nyahsemat sesi',
+        pinSessionHelper:
+            'Setelah disemat, sesi akan terus berjalan pada pelayan selama {0} minit selepas anda meninggalkan halaman atau menutup pelayar.',
+        sessionRestored: '{0} sesi telah dipulihkan',
+        sessionExpired: 'Sesi telah tamat tempoh atau tidak wujud lagi, sila sambung semula.',
+        sessionKicked: 'Sesi ini telah dibuka dalam tetingkap lain.',
+        closePinnedConfirm: 'Terminal ini disemat. Menutupnya juga akan menamatkan sesi pada pelayan. Teruskan?',
+        sessionKeepAlive: 'Tempoh sesi dikekalkan (minit)',
+        sessionKeepAliveHelper:
+            'Berapa lama sesi terminal yang disemat dikekalkan selepas anda meninggalkan halaman. 0 mematikan ciri ini.',
+        sessionMaxPinned: 'Sesi disemat maksimum',
+        sessionBuffer: 'Penimbal main semula (KB)',
     },
     toolbox: {
         common: {

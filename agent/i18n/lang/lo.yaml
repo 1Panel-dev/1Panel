@@ -56,6 +56,9 @@ Decrypt: "ຖອດລະຫັດ"
 #agent
 ErrAgentAccountBound: 'ບັນຊີຖືກຜູກມັດກັບຕົວແທນ (Agent) ແລະບໍ່ສາມາດລຶບໄດ້'
 ErrTerminalAIAccountInUse: 'ບັນຊີໂມເດລນີ້ກຳລັງຖືກໃຊ້ໂດຍ Terminal AI. ກະລຸນາປ່ຽນບັນຊີໃນການຕັ້ງຄ່າ Terminal AI ຫຼື ປິດໃຊ້ງານ Terminal AI ແລ້ວລອງໃໝ່.'
+ErrTerminalSessionNotFound: 'ບໍ່ພົບເຊດຊັນເທີມິນອລ ຫຼື ໝົດອາຍຸແລ້ວ'
+ErrTerminalSessionLimit: 'ຈຳນວນເຊດຊັນເທີມິນອລທີ່ປັກໝຸດໄດ້ຮອດຂີດຈຳກັດແລ້ວ ({{ .detail }})'
+ErrTerminalSessionDisabled: 'ຟັງຊັນຮັກສາເຊດຊັນເທີມິນອລຖືກປິດໄວ້'
 ErrFileAIAccountInUse: 'ບັນຊີໂມເດລນີ້ກຳລັງຖືກໃຊ້ໂດຍ AI ຈັດການໄຟລ໌. ກະລຸນາປ່ຽນບັນຊີໃນການຕັ້ງຄ່າ AI ຈັດການໄຟລ໌ ຫຼື ປິດໃຊ້ງານແລ້ວລອງໃໝ່.'
 ErrAgentAccountUnavailable: 'ການເຊື່ອມຕໍ່ບັນຊີບໍ່ສາມາດໃຊ້ງານໄດ້: {{ .err }}'
 ErrAgentProviderNotSupported: 'ບໍ່ຮອງຮັບຜູ້ໃຫ້ບໍລິການຕົວແທນນີ້'

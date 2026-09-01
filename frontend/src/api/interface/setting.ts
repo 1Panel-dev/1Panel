@@ -27,6 +27,10 @@ export namespace Setting {
         fileRecycleBin: string;
         localSSHConnShow: string;
         firewallPortWhiteList: string;
+
+        terminalSessionKeepAlive: string;
+        terminalSessionMaxPinned: string;
+        terminalSessionBuffer: string;
     }
     export interface SettingInfo {
         systemVersion: string;

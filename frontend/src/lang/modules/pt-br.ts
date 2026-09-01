@@ -2168,6 +2168,19 @@ const message = {
         aiPrefixAsciiVisible:
             'Apenas caracteres ASCII visíveis são suportados. Espaços, caracteres CJK e símbolos de largura total não são permitidos.',
         saveHelper: 'Tem certeza de que deseja salvar a configuração atual do terminal?',
+        pinSession: 'Fixar sessão',
+        unpinSession: 'Desafixar sessão',
+        pinSessionHelper:
+            'Depois de fixada, a sessão continua em execução no servidor por {0} minutos após você sair da página ou fechar o navegador.',
+        sessionRestored: '{0} sessões restauradas',
+        sessionExpired: 'A sessão expirou ou não existe mais, conecte-se novamente.',
+        sessionKicked: 'Esta sessão foi aberta em outra janela.',
+        closePinnedConfirm: 'Este terminal está fixado. Fechá-lo também encerrará a sessão no servidor. Continuar?',
+        sessionKeepAlive: 'Duração da sessão (minutos)',
+        sessionKeepAliveHelper:
+            'Por quanto tempo uma sessão de terminal fixada é mantida depois que você sai da página. 0 desativa o recurso.',
+        sessionMaxPinned: 'Máximo de sessões fixadas',
+        sessionBuffer: 'Buffer de reprodução (KB)',
     },
     toolbox: {
         common: {

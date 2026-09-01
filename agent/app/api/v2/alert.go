@@ -300,15 +300,24 @@ func (b *BaseApi) UpdateAlertConfig(c *gin.Context) {
 	helper.Success(c)
 }
 
-func loadAuditUser(c *gin.Context) string {
+// panelUser is the panel user the core proxy identified via the X-Panel-User
+// header, or "" when the caller is unknown.
+func panelUser(c *gin.Context) string {
 	userName := strings.TrimSpace(c.GetHeader("X-Panel-User"))
 	if userName == "" {
-		return defaultAuditUser
+		return ""
 	}
 	if decoded, err := url.QueryUnescape(userName); err == nil {
 		return decoded
 	}
 	return userName
+}
+
+func loadAuditUser(c *gin.Context) string {
+	if user := panelUser(c); user != "" {
+		return user
+	}
+	return defaultAuditUser
 }
 
 // @Tags Alert

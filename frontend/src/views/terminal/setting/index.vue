@@ -126,6 +126,42 @@
                                     </template>
                                 </el-input>
                             </el-form-item>
+
+                            <el-divider border-style="dashed" />
+
+                            <el-form-item :label="$t('terminal.sessionKeepAlive')">
+                                <el-input-number
+                                    class="formInput"
+                                    :step="5"
+                                    :min="0"
+                                    :max="1440"
+                                    v-model="form.sessionKeepAlive"
+                                />
+                                <span class="input-help">{{ $t('terminal.sessionKeepAliveHelper') }}</span>
+                            </el-form-item>
+                            <el-form-item :label="$t('terminal.sessionMaxPinned')">
+                                <el-input-number
+                                    class="formInput"
+                                    :step="1"
+                                    :min="1"
+                                    :max="50"
+                                    v-model="form.sessionMaxPinned"
+                                />
+                            </el-form-item>
+                            <el-form-item :label="$t('terminal.sessionBuffer')">
+                                <el-input-number
+                                    class="formInput"
+                                    :step="64"
+                                    :min="64"
+                                    :max="4096"
+                                    v-model="form.sessionBuffer"
+                                />
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button @click="onSaveSession" type="primary">
+                                    {{ $t('commons.button.save') }}
+                                </el-button>
+                            </el-form-item>
                         </el-col>
                     </el-row>
                 </el-form>
@@ -147,7 +183,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue';
-import { getTerminalInfo, UpdateTerminalInfo } from '@/api/modules/setting';
+import { getAgentSettingInfo, getTerminalInfo, updateAgentSetting, UpdateTerminalInfo } from '@/api/modules/setting';
 import { Terminal } from '@xterm/xterm';
 import OperateDialog from '@/views/terminal/setting/default-conn/index.vue';
 import '@xterm/xterm/css/xterm.css';
@@ -194,7 +230,15 @@ const form = reactive({
     scrollSensitivity: 6,
     showDefaultConn: false,
     defaultConn: '',
+    sessionKeepAlive: 30,
+    sessionMaxPinned: 10,
+    sessionBuffer: 256,
 });
+let savedSession = {
+    sessionKeepAlive: 30,
+    sessionMaxPinned: 10,
+    sessionBuffer: 256,
+};
 const resetConn = ref(false);
 const opRef = ref();
 
@@ -232,7 +276,49 @@ watch(
 const acceptParams = () => {
     search(true);
     loadConnShow();
+    loadSessionSetting();
     iniTerm();
+};
+
+const toNumber = (value: string | undefined, defaultValue: number): number => {
+    if (value === undefined || value === null || value === '') {
+        return defaultValue;
+    }
+    const num = Number(value);
+    return isNaN(num) ? defaultValue : num;
+};
+
+const loadSessionSetting = async () => {
+    await getAgentSettingInfo()
+        .then((res) => {
+            savedSession = {
+                sessionKeepAlive: toNumber(res.data?.terminalSessionKeepAlive, 30),
+                sessionMaxPinned: toNumber(res.data?.terminalSessionMaxPinned, 10),
+                sessionBuffer: toNumber(res.data?.terminalSessionBuffer, 256),
+            };
+            Object.assign(form, savedSession);
+        })
+        .catch(() => {});
+};
+
+const onSaveSession = async () => {
+    const items = [
+        { key: 'TerminalSessionKeepAlive', value: form.sessionKeepAlive, old: savedSession.sessionKeepAlive },
+        { key: 'TerminalSessionMaxPinned', value: form.sessionMaxPinned, old: savedSession.sessionMaxPinned },
+        { key: 'TerminalSessionBuffer', value: form.sessionBuffer, old: savedSession.sessionBuffer },
+    ].filter((item) => item.value !== item.old);
+    if (items.length === 0) {
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        return;
+    }
+    loading.value = true;
+    try {
+        await Promise.all(items.map((item) => updateAgentSetting({ key: item.key, value: String(item.value) })));
+        await loadSessionSetting();
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    } finally {
+        loading.value = false;
+    }
 };
 
 onMounted(() => {

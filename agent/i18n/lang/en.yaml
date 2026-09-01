@@ -71,6 +71,9 @@ Decrypt: "Decrypt"
 # agent
 ErrAgentAccountBound: 'Account is bound to an agent and cannot be deleted'
 ErrTerminalAIAccountInUse: 'This model account is currently used by Terminal AI. Switch the account in Terminal AI settings or disable Terminal AI and try again.'
+ErrTerminalSessionNotFound: 'Terminal session does not exist or has expired'
+ErrTerminalSessionLimit: 'The number of pinned terminal sessions has reached the limit ({{ .detail }})'
+ErrTerminalSessionDisabled: 'Terminal session keep alive is disabled'
 ErrFileAIAccountInUse: 'This model account is currently used by File Management AI. Switch the account in File Management AI settings or disable File Management AI and try again.'
 ErrAgentAccountUnavailable: 'Account connection unavailable: {{ .err }}'
 ErrAgentProviderNotSupported: 'Unsupported agent provider'

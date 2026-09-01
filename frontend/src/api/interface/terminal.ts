@@ -7,3 +7,16 @@ export interface ReqTerminal {
     password: string;
     key: string;
 }
+
+export interface TerminalSession {
+    id: string;
+    kind: 'local' | 'ssh';
+    hostId: number;
+    title: string;
+    pinned: boolean;
+    attached: boolean;
+    createdAt: string;
+    lastActiveAt: string;
+    detachedAt?: string;
+    expiresAt?: string;
+}

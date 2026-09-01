@@ -25,8 +25,11 @@ import { decodeBase64, encodeBase64 } from '@/utils/base64';
 import { TerminalStore } from '@/store';
 import { MsgError } from '@/utils/message';
 import { checkStreamAuth } from '@/utils/stream-auth';
+import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { currentNode } = useGlobalStore();
+
+const emit = defineEmits(['session', 'session-expired', 'session-kicked']);
 
 const terminalElement = ref<HTMLDivElement | null>(null);
 const fitAddon = new FitAddon();
@@ -42,6 +45,9 @@ const hideInitCmdEcho = ref(false);
 const initCmdEchoBuffer = ref('');
 const waitForPrompt = ref('');
 const waitForPromptBuffer = ref('');
+const sessionID = ref('');
+const sessionTitle = ref('');
+const isAttachMode = ref(false);
 const aiNotice = ref({
     visible: false,
     loading: false,
@@ -114,6 +120,8 @@ interface WsProps {
     error: string;
     initCmd: string;
     waitForPrompt?: string;
+    sessionId?: string;
+    title?: string;
 }
 
 interface TerminalBufferLine {
@@ -128,6 +136,9 @@ const acceptParams = (props: WsProps) => {
             initCmd.value = props.initCmd || '';
             waitForPrompt.value = props.waitForPrompt || '';
             waitForPromptBuffer.value = '';
+            sessionID.value = props.sessionId || '';
+            sessionTitle.value = props.title || '';
+            isAttachMode.value = !!props.sessionId;
             init(props.endpoint, props.args);
         }
     });
@@ -258,6 +269,12 @@ const initWebSocket = async (endpoint_: string, args: string = '') => {
     if (args.indexOf('operateNode=') !== -1) {
         conn = `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}`;
     }
+    if (sessionID.value) {
+        conn += `&session=${encodeURIComponent(sessionID.value)}`;
+    }
+    if (sessionTitle.value) {
+        conn += `&title=${encodeURIComponent(sessionTitle.value)}`;
+    }
     const authError = await checkStreamAuth(conn);
     if (token !== initWebSocketToken || !termReady.value) {
         return;
@@ -295,7 +312,7 @@ const showWebSocketAuthError = (message: string) => {
 const runRealTerminal = () => {
     webSocketReady.value = true;
     term.value?.focus();
-    if (initCmd.value !== '') {
+    if (!isAttachMode.value && initCmd.value !== '') {
         hideInitCmdEcho.value = true;
         initCmdEchoBuffer.value = '';
         sendMsg(initCmd.value);
@@ -355,6 +372,11 @@ const onWSReceive = (message: MessageEvent) => {
             }
             break;
         }
+        case 'session': {
+            sessionID.value = wsMsg.id || '';
+            emit('session', { id: sessionID.value, pinned: !!wsMsg.pinned });
+            break;
+        }
         case 'heartbeat': {
             latency.value = new Date().getTime() - wsMsg.timestamp;
             break;
@@ -385,8 +407,24 @@ const closeRealTerminal = (ev: CloseEvent) => {
         heartbeatTimer.value = undefined;
     }
     terminalSocket.value = undefined;
+    switch (ev.code) {
+        case 4404:
+            sessionID.value = '';
+            isAttachMode.value = false;
+            writeSessionNotice(i18n.global.t('terminal.sessionExpired'));
+            emit('session-expired');
+            return;
+        case 4409:
+            writeSessionNotice(i18n.global.t('terminal.sessionKicked'));
+            emit('session-kicked');
+            return;
+    }
     term.value?.write('The connection has been disconnected.');
     term.value?.write(ev.reason);
+};
+
+const writeSessionNotice = (message: string) => {
+    term.value?.write(`\r\n\x1b[31m${message}\x1b[m\r\n`);
 };
 
 const isWsOpen = () => {
@@ -510,6 +548,7 @@ defineExpose({
     isWsOpen,
     sendMsg,
     getLatency: () => latency.value,
+    getSessionId: () => sessionID.value,
 });
 
 onBeforeUnmount(() => {

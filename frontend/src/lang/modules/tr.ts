@@ -2153,6 +2153,19 @@ const message = {
         aiPrefixAsciiVisible:
             'Yalnızca görünür ASCII karakterleri desteklenir. Boşluklara, CJK karakterlerine ve tam genişlikli sembollere izin verilmez.',
         saveHelper: 'Mevcut terminal yapılandırmasını kaydetmek istediğinizden emin misiniz?',
+        pinSession: 'Oturumu sabitle',
+        unpinSession: 'Sabitlemeyi kaldır',
+        pinSessionHelper:
+            'Sabitlendikten sonra, sayfadan ayrılsanız veya tarayıcıyı kapatsanız bile oturum sunucuda {0} dakika boyunca çalışmaya devam eder.',
+        sessionRestored: '{0} oturum geri yüklendi',
+        sessionExpired: 'Oturum süresi doldu veya artık mevcut değil, lütfen yeniden bağlanın.',
+        sessionKicked: 'Bu oturum başka bir pencerede açıldı.',
+        closePinnedConfirm: 'Bu terminal sabitlenmiş. Kapatmak sunucudaki oturumu da sonlandırır. Devam edilsin mi?',
+        sessionKeepAlive: 'Oturum saklama süresi (dakika)',
+        sessionKeepAliveHelper:
+            'Sabitlenmiş bir terminal oturumunun sayfadan ayrıldıktan sonra ne kadar süre saklanacağı. 0 bu özelliği kapatır.',
+        sessionMaxPinned: 'En fazla sabitlenmiş oturum',
+        sessionBuffer: 'Yeniden oynatma arabelleği (KB)',
     },
     toolbox: {
         common: {

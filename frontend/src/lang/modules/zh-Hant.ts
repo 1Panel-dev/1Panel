@@ -2011,6 +2011,17 @@ const message = {
         aiSummary: '以 {0} 前綴開頭並按下 Enter 時，會觸發 AI 命令生成',
         aiPrefixAsciiVisible: '僅支援 ASCII 可見字元，不支援空格、中文或全形符號',
         saveHelper: '是否確認儲存目前終端設定？',
+        pinSession: '釘選工作階段',
+        unpinSession: '取消釘選',
+        pinSessionHelper: '釘選後離開頁面或關閉瀏覽器，工作階段仍會在伺服器保持 {0} 分鐘',
+        sessionRestored: '已復原 {0} 個工作階段',
+        sessionExpired: '工作階段已過期或不存在，請重新連線',
+        sessionKicked: '此工作階段已在其他視窗開啟',
+        closePinnedConfirm: '此終端已釘選，關閉後伺服器端工作階段也會一併結束，是否繼續？',
+        sessionKeepAlive: '工作階段保持時長（分鐘）',
+        sessionKeepAliveHelper: '釘選的終端工作階段在離開頁面後可保持的時長，0 表示關閉此功能',
+        sessionMaxPinned: '最大釘選工作階段數',
+        sessionBuffer: '回放緩衝大小（KB）',
     },
     toolbox: {
         common: {

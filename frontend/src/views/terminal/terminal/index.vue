@@ -37,6 +37,23 @@
                             link
                             @click="onReconnect(item)"
                         />
+                        <el-tooltip v-if="showPinButton(item)" placement="top">
+                            <template #content>
+                                <div>
+                                    {{ item.pinned ? $t('terminal.unpinSession') : $t('terminal.pinSession') }}
+                                </div>
+                                <div>{{ $t('terminal.pinSessionHelper', [keepAliveFor(item.node)]) }}</div>
+                            </template>
+                            <el-button
+                                link
+                                class="terminal-pin-button"
+                                :class="{ 'is-pinned': item.pinned }"
+                                :type="item.pinned ? 'warning' : 'info'"
+                                @click.stop="onTogglePin(item)"
+                            >
+                                <svg-icon iconName="p-pushpin" className="terminal-pin-icon" />
+                            </el-button>
+                        </el-tooltip>
                         <span v-if="item.title.length <= 20">&nbsp;{{ item.title }}&nbsp;</span>
                         <el-tooltip v-else :content="item.title" placement="top-start">
                             <span>&nbsp;{{ item.title.substring(0, 17) }}...&nbsp;</span>
@@ -50,6 +67,9 @@
                     }"
                     :ref="'t-' + item.index"
                     :key="item.Refresh"
+                    @session="(e: any) => onSessionReady(item, e)"
+                    @session-expired="onSessionExpired(item)"
+                    @session-kicked="onSessionKicked(item)"
                 ></Terminal>
 
                 <div class="flex items-center gap-2 w-full py-2 flex-wrap">
@@ -238,19 +258,28 @@ import { ref, getCurrentInstance, watch, nextTick, onMounted, onBeforeUnmount } 
 import Terminal from '@/components/terminal/index.vue';
 import HostDialog from '@/views/terminal/terminal/host-create.vue';
 import type Node from 'element-plus/es/components/tree/src/model/node';
-import { ElTree } from 'element-plus';
+import { ElMessageBox, ElTree } from 'element-plus';
 import screenfull from 'screenfull';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';
-import { getHostTree, testByID, testLocalConn } from '@/api/modules/terminal';
+import {
+    closeTerminalSession,
+    getHostTree,
+    pinTerminalSession,
+    searchTerminalSessions,
+    testByID,
+    testLocalConn,
+} from '@/api/modules/terminal';
+import { TerminalSession } from '@/api/interface/terminal';
+import { Setting } from '@/api/interface/setting';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import router from '@/routers';
 import { getCommandTree } from '@/api/modules/command';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import AiSetting from '@/views/terminal/setting/ai/index.vue';
-import { MsgWarning } from '@/utils/message';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
 
-const { isFullScreen, isMobile, isNodeAdmin, openMenuTabs } = useGlobalStore();
+const { currentNode, isFullScreen, isMobile, isNodeAdmin, openMenuTabs } = useGlobalStore();
 
 const dialogRef = ref();
 const ctx = getCurrentInstance() as any;
@@ -292,6 +321,11 @@ interface Tree {
     children?: Tree[];
 }
 const initCmd = ref('');
+const agentSetting = ref<Setting.AgentSettingInfo>();
+const sessionKeepAlive = ref('0');
+// ssh pinning uses the local agent's keep-alive, not the selected node's.
+const localSessionKeepAlive = ref('0');
+const keepAliveFor = (node: string) => (node === 'local' ? localSessionKeepAlive.value : sessionKeepAlive.value);
 
 const acceptParams = async () => {
     isFullScreen.value = false;
@@ -301,8 +335,12 @@ const acceptParams = async () => {
     } else {
         hostTree.value = [];
     }
+    await loadAgentSetting();
     if (terminalTabs.value.length === 0) {
-        await openDefaultLocalConn();
+        const restored = await restoreSessions();
+        if (restored === 0) {
+            await openDefaultLocalConn();
+        }
     }
     timer = setInterval(() => {
         syncTerminal();
@@ -314,16 +352,135 @@ const acceptParams = async () => {
     }
 };
 
+const loadAgentSetting = async () => {
+    await getAgentSettingInfo()
+        .then((res) => {
+            agentSetting.value = res.data;
+            sessionKeepAlive.value = res.data?.terminalSessionKeepAlive || '0';
+        })
+        .catch(() => {});
+    if ((currentNode.value || 'local') === 'local') {
+        localSessionKeepAlive.value = sessionKeepAlive.value;
+        return;
+    }
+    await getAgentSettingInfo('local')
+        .then((res) => {
+            localSessionKeepAlive.value = res.data?.terminalSessionKeepAlive || '0';
+        })
+        .catch(() => {});
+};
+
 const openDefaultLocalConn = async () => {
     if (isNodeAdmin.value) {
         onNewLocal();
         return;
     }
-    await getAgentSettingInfo().then((res) => {
-        if (res.data?.localSSHConnShow === 'Enable') {
-            onNewLocal();
-        }
+    if (agentSetting.value?.localSSHConnShow === 'Enable') {
+        onNewLocal();
+    }
+};
+
+const loadSessions = async (node: string): Promise<Array<TerminalSession>> => {
+    try {
+        const res = await searchTerminalSessions(node);
+        return res.data || [];
+    } catch {
+        return [];
+    }
+};
+
+const pushTerminalTab = (tab: {
+    title: string;
+    wsID: number;
+    node: string;
+    status?: string;
+    sessionId?: string;
+    pinned?: boolean;
+}): number => {
+    terminalTabs.value.push({
+        index: tabIndex,
+        latency: 0,
+        status: 'online',
+        sessionId: '',
+        pinned: false,
+        ...tab,
     });
+    return tabIndex++;
+};
+
+const restoreSessions = async (): Promise<number> => {
+    const node = currentNode.value || 'local';
+    // ssh sessions live on the local agent; local shells live on their node's agent.
+    // Restore only pinned sessions from agents that have pinning enabled.
+    const collect = async (fromNode: string, keep: (s: TerminalSession) => boolean) =>
+        keepAliveFor(fromNode) === '0'
+            ? []
+            : (await loadSessions(fromNode))
+                  .filter((s) => s.pinned && keep(s))
+                  .map((session) => ({ session, node: fromNode }));
+    const [localItems, nodeItems] = await Promise.all([
+        collect('local', (s) => node === 'local' || s.kind !== 'local'),
+        node === 'local' ? Promise.resolve([]) : collect(node, (s) => s.kind === 'local'),
+    ]);
+    const items = [...localItems, ...nodeItems];
+    if (items.length === 0) {
+        return 0;
+    }
+    for (const item of items) {
+        const session = item.session;
+        pushTerminalTab({
+            title: session.title || i18n.global.t('terminal.localhost'),
+            wsID: session.kind === 'local' ? 0 : session.hostId,
+            sessionId: session.id,
+            pinned: session.pinned,
+            node: item.node,
+        });
+    }
+    terminalValue.value = terminalTabs.value[0].index;
+    await nextTick();
+    for (const tab of terminalTabs.value) {
+        ctx.refs[`t-${tab.index}`] &&
+            ctx.refs[`t-${tab.index}`][0].acceptParams({
+                endpoint: tab.wsID === 0 ? '/api/v2/hosts/terminal/local' : '/api/v2/hosts/terminal/ssh',
+                args: tab.wsID === 0 ? '' : `id=${tab.wsID}`,
+                sessionId: tab.sessionId,
+                title: tab.title,
+                initCmd: '',
+                error: '',
+            });
+    }
+    MsgSuccess(i18n.global.t('terminal.sessionRestored', [items.length]));
+    return items.length;
+};
+
+const showPinButton = (item: any) => {
+    return keepAliveFor(item.node) !== '0' && !!item.sessionId;
+};
+
+const onTogglePin = async (item: any) => {
+    if (!item.sessionId) {
+        return;
+    }
+    const pinned = !item.pinned;
+    await pinTerminalSession({ id: item.sessionId, pinned: pinned }, item.node).then(() => {
+        item.pinned = pinned;
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    });
+};
+
+const onSessionReady = (item: any, session: { id: string; pinned: boolean }) => {
+    item.sessionId = session.id;
+    item.pinned = session.pinned;
+};
+
+const onSessionExpired = (item: any) => {
+    item.sessionId = '';
+    item.pinned = false;
+    item.status = 'closed';
+};
+
+const onSessionKicked = (item: any) => {
+    item.status = 'closed';
 };
 
 const cleanTimer = () => {
@@ -346,9 +503,34 @@ const loadFullScreenHeight = () => {
     return openMenuTabs.value ? '105px' : '60px';
 };
 
-const handleTabsRemove = (targetName: string, action: 'remove' | 'add') => {
+const handleTabsRemove = async (targetName: string, action: 'remove' | 'add') => {
     if (action !== 'remove') {
         return;
+    }
+    const target = terminalTabs.value.find((tab: any) => tab.index === targetName);
+    if (target && target.sessionId) {
+        if (target.pinned) {
+            try {
+                await ElMessageBox.confirm(
+                    i18n.global.t('terminal.closePinnedConfirm'),
+                    i18n.global.t('commons.msg.infoTitle'),
+                    {
+                        confirmButtonText: i18n.global.t('commons.button.confirm'),
+                        cancelButtonText: i18n.global.t('commons.button.cancel'),
+                        type: 'warning',
+                    },
+                );
+            } catch {
+                return;
+            }
+            try {
+                await closeTerminalSession(target.sessionId, target.node);
+            } catch {
+                return;
+            }
+        } else {
+            closeTerminalSession(target.sessionId, target.node).catch(() => {});
+        }
     }
     if (ctx) {
         ctx.refs[`t-${targetName}`] && ctx.refs[`t-${targetName}`][0].onClose();
@@ -449,24 +631,18 @@ const onNewLocal = async () => {
         dialogRef.value!.acceptParams({ isLocal: true });
         return;
     }
-    terminalTabs.value.push({
-        index: tabIndex,
-        title: i18n.global.t('terminal.localhost'),
-        wsID: 0,
-        status: 'online',
-        latency: 0,
-    });
-    terminalValue.value = tabIndex;
+    const title = i18n.global.t('terminal.localhost');
+    terminalValue.value = pushTerminalTab({ title: title, wsID: 0, node: currentNode.value || 'local' });
     nextTick(() => {
         ctx.refs[`t-${terminalValue.value}`] &&
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
                 endpoint: '/api/v2/hosts/terminal/local',
+                title: title,
                 initCmd: initCmd.value,
                 error: '',
             });
         initCmd.value = '';
     });
-    tabIndex++;
 };
 
 const onClickConn = (node: Node, data: Tree) => {
@@ -487,6 +663,8 @@ const onReconnect = async (item: any) => {
             ctx.refs[`t-${item.index}`] &&
                 ctx.refs[`t-${item.index}`][0].acceptParams({
                     endpoint: '/api/v2/hosts/terminal/local',
+                    sessionId: item.sessionId || '',
+                    title: item.title,
                     initCmd: initCmd.value,
                     error: res.data ? '' : 'Failed to set up the connection. Please check the host information',
                 });
@@ -502,6 +680,8 @@ const onReconnect = async (item: any) => {
             ctx.refs[`t-${item.index}`][0].acceptParams({
                 endpoint: '/api/v2/hosts/terminal/ssh',
                 args: `id=${item.wsID}`,
+                sessionId: item.sessionId || '',
+                title: item.title,
                 initCmd: initCmd.value,
                 error: res.data ? '' : 'Failed to set up the connection. Please check the host information',
             });
@@ -516,25 +696,23 @@ const onConnTerminal = async (title: string, wsID: number) => {
         return;
     }
     const res = await testByID(wsID);
-    terminalTabs.value.push({
-        index: tabIndex,
+    terminalValue.value = pushTerminalTab({
         title: title,
         wsID: wsID,
         status: res.data ? 'online' : 'closed',
-        latency: 0,
+        node: 'local',
     });
-    terminalValue.value = tabIndex;
     nextTick(() => {
         ctx.refs[`t-${terminalValue.value}`] &&
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
                 endpoint: '/api/v2/hosts/terminal/ssh',
                 args: `id=${wsID}`,
+                title: title,
                 initCmd: initCmd.value,
                 error: res.data ? '' : 'Authentication failed. Please check the host information!',
             });
         initCmd.value = '';
     });
-    tabIndex++;
 };
 
 function syncTerminal() {
@@ -594,6 +772,28 @@ onMounted(() => {
     }
     :deep(.el-tabs__item.is-active:hover) {
         color: var(--panel-terminal-tag-active-text-color);
+    }
+}
+
+.terminal-pin-button {
+    opacity: 0.5;
+    padding: 0 2px;
+    vertical-align: middle;
+
+    &:hover,
+    &:focus-visible {
+        opacity: 1;
+    }
+
+    &.is-pinned {
+        opacity: 1;
+    }
+
+    :deep(.terminal-pin-icon) {
+        width: 1em;
+        height: 1em;
+        padding: 0;
+        vertical-align: middle;
     }
 }
 

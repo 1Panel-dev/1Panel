@@ -27,6 +27,10 @@ type SettingInfo struct {
 	LocalSSHConnShow string `json:"localSSHConnShow"`
 
 	FirewallPortWhiteList string `json:"firewallPortWhiteList"`
+
+	TerminalSessionKeepAlive string `json:"terminalSessionKeepAlive"`
+	TerminalSessionMaxPinned string `json:"terminalSessionMaxPinned"`
+	TerminalSessionBuffer    string `json:"terminalSessionBuffer"`
 }
 
 type SettingUpdate struct {
@@ -35,7 +39,7 @@ type SettingUpdate struct {
 }
 
 type AgentSettingUpdate struct {
-	Key   string `json:"key" validate:"required,oneof=SystemIP DockerSockPath FileRecycleBin FirewallPortWhiteList"`
+	Key   string `json:"key" validate:"required,oneof=SystemIP DockerSockPath FileRecycleBin FirewallPortWhiteList TerminalSessionKeepAlive TerminalSessionMaxPinned TerminalSessionBuffer"`
 	Value string `json:"value"`
 }
 

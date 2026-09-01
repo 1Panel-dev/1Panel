@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
+	"unicode"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -21,6 +23,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+// closeCodeSessionNotFound is sent when the session is gone or not owned by the caller.
+const closeCodeSessionNotFound = 4404
+
+// maxTerminalTitleRunes caps the client supplied tab name.
+const maxTerminalTitleRunes = 64
+
 // @Tags Terminal
 // @Summary Ws local terminal
 // @Param command query string false "command"
@@ -29,7 +37,11 @@ import (
 // @Security Timestamp
 // @Router /hosts/terminal/local [get]
 func (b *BaseApi) WsLocalTerminal(c *gin.Context) {
-	b.runSSHSession(c, loadLocalConn, c.DefaultQuery("command", ""))
+	b.runSSHSession(c, sshSessionOption{
+		kind:    terminal.SessionKindLocal,
+		connect: loadLocalConn,
+		command: c.DefaultQuery("command", ""),
+	})
 }
 
 // @Tags Terminal
@@ -41,14 +53,19 @@ func (b *BaseApi) WsLocalTerminal(c *gin.Context) {
 // @Security Timestamp
 // @Router /hosts/terminal/ssh [get]
 func (b *BaseApi) WsHostSSH(c *gin.Context) {
-	b.runSSHSession(c, func() (*ssh.SSHClient, error) {
-		hostID, _ := strconv.Atoi(c.DefaultQuery("id", "0"))
-		if hostID <= 0 {
-			return nil, errors.New("missing host id")
-		}
-		host, err := service.GetHostInfo(uint(hostID))
-		return newHostSSHClient(host, err)
-	}, c.DefaultQuery("command", ""))
+	hostID, _ := strconv.Atoi(c.DefaultQuery("id", "0"))
+	b.runSSHSession(c, sshSessionOption{
+		kind:   terminal.SessionKindSSH,
+		hostID: uint(max(hostID, 0)),
+		connect: func() (*ssh.SSHClient, error) {
+			if hostID <= 0 {
+				return nil, errors.New("missing host id")
+			}
+			host, err := service.GetHostInfo(uint(hostID))
+			return newHostSSHClient(host, err)
+		},
+		command: c.DefaultQuery("command", ""),
+	})
 }
 
 // @Tags Terminal
@@ -115,37 +132,158 @@ func prepareTerminalSession(c *gin.Context) (*websocket.Conn, int, int, bool) {
 	return wsConn, cols, rows, true
 }
 
-func (b *BaseApi) runSSHSession(c *gin.Context, connect func() (*ssh.SSHClient, error), command string) {
+type sshSessionOption struct {
+	kind    string
+	hostID  uint
+	connect func() (*ssh.SSHClient, error)
+	command string
+}
+
+func (b *BaseApi) runSSHSession(c *gin.Context, opt sshSessionOption) {
 	wsConn, cols, rows, ok := prepareTerminalSession(c)
 	if !ok {
 		return
 	}
 	defer wsConn.Close()
 
-	client, clientErr := connect()
+	owner := panelUser(c)
+	if sessionID := strings.TrimSpace(c.Query("session")); len(sessionID) != 0 {
+		attachTerminalSession(wsConn, sessionID, owner, cols, rows)
+		return
+	}
+
+	client, clientErr := opt.connect()
 	if wshandleError(wsConn, errors.WithMessage(clientErr, "failed to set up the connection. Please check the host information")) {
 		return
 	}
-	defer client.Close()
 
-	sws, err := terminal.NewLogicSshWsSession(cols, rows, client.Client, wsConn, command)
-	if wshandleError(wsConn, err) {
+	sess, err := terminal.DefaultManager.OpenSession(client.Client, terminal.SessionOptions{
+		Kind:    opt.kind,
+		HostID:  opt.hostID,
+		Title:   sanitizeTerminalTitle(c.Query("title")),
+		Owner:   owner,
+		Cols:    cols,
+		Rows:    rows,
+		InitCmd: opt.command,
+	})
+	if err != nil {
+		// session does not exist yet, so we still own the ssh client
+		client.Close()
+		_ = wshandleError(wsConn, err)
 		return
 	}
-	defer sws.Close()
-
-	quitChan := make(chan bool, 3)
-	sws.Start(quitChan)
-	go sws.Wait(quitChan)
-
-	<-quitChan
+	// no defer sess.Close(): pinned sessions outlive this websocket
+	att, err := sess.Attach(wsConn, cols, rows)
+	if err != nil {
+		sess.Close()
+		_ = wshandleError(wsConn, err)
+		return
+	}
+	att.Run()
 
 	closeTerminalConn(wsConn)
+}
+
+// attachTerminalSession binds the websocket to an existing session.
+func attachTerminalSession(wsConn *websocket.Conn, sessionID, owner string, cols, rows int) {
+	sess, err := terminal.DefaultManager.Lookup(sessionID, owner)
+	if err != nil {
+		closeTerminalConnWithCode(wsConn, closeCodeSessionNotFound, "session not found")
+		return
+	}
+	att, err := sess.Attach(wsConn, cols, rows)
+	if err != nil {
+		global.LOG.Errorf("attach terminal session %s failed, err: %v", sessionID, err)
+		closeTerminalConnWithCode(wsConn, closeCodeSessionNotFound, "session not found")
+		return
+	}
+	att.Run()
+
+	closeTerminalConn(wsConn)
+}
+
+// sanitizeTerminalTitle keeps a client supplied tab name printable and short.
+func sanitizeTerminalTitle(title string) string {
+	var builder strings.Builder
+	count := 0
+	for _, r := range strings.TrimSpace(title) {
+		if unicode.IsControl(r) {
+			continue
+		}
+		if count == maxTerminalTitleRunes {
+			break
+		}
+		builder.WriteRune(r)
+		count++
+	}
+	return strings.TrimSpace(builder.String())
+}
+
+// @Tags Terminal
+// @Summary Search terminal sessions
+// @Accept json
+// @Success 200 {array} dto.TerminalSessionInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/terminal/sessions/search [post]
+func (b *BaseApi) SearchTerminalSessions(c *gin.Context) {
+	list, err := terminalSessionService.List(panelUser(c))
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags Terminal
+// @Summary Pin or unpin a terminal session
+// @Accept json
+// @Param request body dto.TerminalSessionPin true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/terminal/sessions/pin [post]
+func (b *BaseApi) PinTerminalSession(c *gin.Context) {
+	var req dto.TerminalSessionPin
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := terminalSessionService.Pin(panelUser(c), req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Terminal
+// @Summary Close a terminal session
+// @Accept json
+// @Param request body dto.TerminalSessionClose true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/terminal/sessions/close [post]
+func (b *BaseApi) CloseTerminalSession(c *gin.Context) {
+	var req dto.TerminalSessionClose
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := terminalSessionService.Close(panelUser(c), req.ID); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
 }
 
 func closeTerminalConn(wsConn *websocket.Conn) {
 	dt := time.Now().Add(time.Second)
 	_ = wsConn.WriteControl(websocket.CloseMessage, nil, dt)
+}
+
+// closeTerminalConnWithCode reports a terminal specific failure to the client.
+func closeTerminalConnWithCode(wsConn *websocket.Conn, code int, reason string) {
+	dt := time.Now().Add(time.Second)
+	_ = wsConn.WriteControl(websocket.CloseMessage, websocket.FormatCloseMessage(code, reason), dt)
 }
 
 func newHostSSHClient(host *model.Host, err error) (*ssh.SSHClient, error) {

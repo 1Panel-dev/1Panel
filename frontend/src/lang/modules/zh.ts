@@ -2041,6 +2041,17 @@ const message = {
         aiSummary: '以 {0} 前缀开头并回车时，会触发 AI 命令生成',
         aiPrefixAsciiVisible: '仅支持 ASCII 可见字符，不支持空格、中文或全角符号',
         saveHelper: '是否确认保存当前终端配置？',
+        pinSession: '固定会话',
+        unpinSession: '取消固定',
+        pinSessionHelper: '固定后离开页面或关闭浏览器，会话仍会在服务器保持 {0} 分钟',
+        sessionRestored: '已恢复 {0} 个会话',
+        sessionExpired: '会话已过期或不存在，请重新连接',
+        sessionKicked: '该会话已在其他窗口打开',
+        closePinnedConfirm: '该终端已固定，关闭后服务端会话也将一并结束，是否继续？',
+        sessionKeepAlive: '会话保持时长（分钟）',
+        sessionKeepAliveHelper: '固定的终端会话在离开页面后可保持的时长，0 表示关闭会话保持功能',
+        sessionMaxPinned: '最大固定会话数',
+        sessionBuffer: '回放缓冲大小（KB）',
     },
     toolbox: {
         common: {

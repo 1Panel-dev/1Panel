@@ -2133,6 +2133,19 @@ const message = {
         aiPrefixAsciiVisible:
             'Only ASCII visible characters are supported. Spaces, CJK characters, and full-width symbols are not allowed.',
         saveHelper: 'Are you sure you want to save the current terminal configuration?',
+        pinSession: 'Pin session',
+        unpinSession: 'Unpin session',
+        pinSessionHelper:
+            'Once pinned, the session keeps running on the server for {0} minutes after you leave the page or close the browser.',
+        sessionRestored: '{0} session(s) restored',
+        sessionExpired: 'The session has expired or no longer exists, please reconnect.',
+        sessionKicked: 'This session has been opened in another window.',
+        closePinnedConfirm: 'This terminal is pinned. Closing it will also end the session on the server. Continue?',
+        sessionKeepAlive: 'Session keep-alive (minutes)',
+        sessionKeepAliveHelper:
+            'How long a pinned terminal session is kept after you leave the page. 0 disables session keep-alive.',
+        sessionMaxPinned: 'Max pinned sessions',
+        sessionBuffer: 'Replay buffer (KB)',
     },
     toolbox: {
         common: {

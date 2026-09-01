@@ -1,6 +1,7 @@
 import http from '@/api';
 import { ResPage } from '../interface';
 import { Host } from '../interface/host';
+import { TerminalSession } from '../interface/terminal';
 import { encodeBase64Fields } from '@/utils/base64';
 import { deepCopy } from '@/utils/misc';
 export const searchHosts = (params: Host.SearchWithPage) => {
@@ -52,4 +53,13 @@ export const loadLocalConn = () => {
 };
 export const testLocalConn = () => {
     return http.post<boolean>(`/settings/ssh/check`);
+};
+export const searchTerminalSessions = (node: string) => {
+    return http.post<Array<TerminalSession>>(`/hosts/terminal/sessions/search`, {}, undefined, { CurrentNode: node });
+};
+export const pinTerminalSession = (params: { id: string; pinned: boolean }, node: string) => {
+    return http.post(`/hosts/terminal/sessions/pin`, params, undefined, { CurrentNode: node });
+};
+export const closeTerminalSession = (id: string, node: string) => {
+    return http.post(`/hosts/terminal/sessions/close`, { id: id }, undefined, { CurrentNode: node });
 };

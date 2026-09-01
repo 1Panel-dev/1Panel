@@ -191,6 +191,9 @@ func loadAgentAccount(accountID uint) (*model.AgentAccount, error) {
 }
 
 func loadAgentSettingValue(key string) (string, error) {
+	if global.DB == nil {
+		return "", os.ErrNotExist
+	}
 	var setting model.Setting
 	if err := global.DB.Where("key = ?", key).First(&setting).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

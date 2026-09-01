@@ -2091,6 +2091,18 @@ const message = {
         aiSummary: '{0} 접두사로 시작하는 줄에서 Enter를 누르면 AI 명령 생성이 트리거됩니다.',
         aiPrefixAsciiVisible: 'ASCII 표시 가능 문자만 지원합니다. 공백, CJK 문자 및 전각 기호는 사용할 수 없습니다.',
         saveHelper: '현재 터미널 설정을 저장하시겠습니까?',
+        pinSession: '세션 고정',
+        unpinSession: '고정 해제',
+        pinSessionHelper: '고정하면 페이지를 벗어나거나 브라우저를 닫아도 세션이 서버에서 {0}분 동안 유지됩니다.',
+        sessionRestored: '{0}개의 세션을 복원했습니다',
+        sessionExpired: '세션이 만료되었거나 존재하지 않습니다. 다시 연결하세요.',
+        sessionKicked: '이 세션은 다른 창에서 열렸습니다.',
+        closePinnedConfirm: '이 터미널은 고정되어 있습니다. 닫으면 서버의 세션도 종료됩니다. 계속하시겠습니까?',
+        sessionKeepAlive: '세션 유지 시간(분)',
+        sessionKeepAliveHelper:
+            '페이지를 벗어난 후 고정된 터미널 세션을 유지하는 시간입니다. 0이면 기능이 비활성화됩니다.',
+        sessionMaxPinned: '최대 고정 세션 수',
+        sessionBuffer: '재생 버퍼(KB)',
     },
     toolbox: {
         common: {

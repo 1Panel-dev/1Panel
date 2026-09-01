@@ -108,6 +108,7 @@ func agentDBMigrations() []*gormigrate.Migration {
 		migrations.InitDockerPortGuardStatus,
 		migrations.NormalizeFirewallBackendSelections,
 		migrations.SimplifyFirewallRulePolicy,
+		migrations.AddTerminalSessionSettings,
 	}
 }
 

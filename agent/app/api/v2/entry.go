@@ -85,4 +85,6 @@ var (
 	alertService     = service.NewIAlertService()
 
 	diskService = service.NewIDiskService()
+
+	terminalSessionService = service.NewITerminalSessionService()
 )
