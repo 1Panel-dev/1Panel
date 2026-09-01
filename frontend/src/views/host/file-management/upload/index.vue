@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="open"
         :header="$t('commons.button.upload')"
-        @before-close="handleClose"
+        @before-close="requestClose"
         size="normal"
         :confirmBeforeClose="true"
     >
@@ -16,19 +16,20 @@
             />
             <div class="upload-button flex flex-wrap justify-between items-center gap-4 pb-4 md:flex-nowrap">
                 <div class="flex flex-wrap gap-4">
-                    <el-button type="primary" @click="upload('file')">
+                    <el-button type="primary" :disabled="uploadLocked" @click="upload('file')">
                         {{ $t('commons.button.upload') }}{{ $t('menu.files') }}
                     </el-button>
-                    <el-button type="primary" @click="upload('dir')">
+                    <el-button type="primary" :disabled="uploadLocked" @click="upload('dir')">
                         {{ $t('commons.button.upload') }}{{ $t('file.dir') }}
                     </el-button>
                 </div>
-                <el-button @click="clearFiles">{{ $t('file.clearList') }}</el-button>
+                <el-button :disabled="uploadLocked" @click="clearFiles">{{ $t('file.clearList') }}</el-button>
             </div>
 
             <div>
                 <div
                     class="el-upload-dragger"
+                    :class="{ 'upload-dragger-disabled': uploadLocked }"
                     @dragover="handleDragover"
                     @drop="handleDrop"
                     @dragleave="handleDragleave"
@@ -53,6 +54,7 @@
                 :on-success="handleSuccess"
                 :show-file-list="false"
                 multiple
+                :disabled="uploadLocked"
                 v-model:file-list="uploaderFiles"
                 :limit="1000"
             >
@@ -94,7 +96,7 @@
                             type="primary"
                             link
                             @click="removeFile(index)"
-                            :disabled="loading"
+                            :disabled="uploadLocked"
                             :icon="Close"
                         ></el-button>
                     </span>
@@ -104,8 +106,10 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="handleClose" :disabled="upLoading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit()" :disabled="upLoading || uploaderFiles.length == 0">
+                <el-button :type="upLoading ? 'danger' : 'default'" :loading="canceling" @click="requestClose()">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button type="primary" @click="submit()" :disabled="uploadLocked || uploaderFiles.length == 0">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -138,8 +142,9 @@ interface UploadFileProps {
 }
 
 const uploadRef = ref<UploadInstance>();
-const loading = ref(false);
 const upLoading = ref(false);
+const canceling = ref(false);
+const uploadLocked = computed(() => upLoading.value || canceling.value);
 let uploadPercent = ref(0);
 const uploadTotalCount = ref(0);
 const uploadCurrentIndex = ref(0);
@@ -161,27 +166,48 @@ const activeChunkUpload = ref<{ uploadID: string; node: string } | null>(null);
 const { currentNode } = useGlobalStore();
 
 const em = defineEmits(['close']);
-const handleClose = (done) => {
-    if (upLoading.value) {
-        ElMessageBox.confirm(i18n.global.t('file.cancelUploadHelper'), i18n.global.t('file.cancelUpload'), {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-            type: 'info',
-        })
-            .then(async () => {
-                const controller = abortController.value;
-                controller?.abort();
-                await cleanupActiveChunkUpload();
-                if (abortController.value === controller) {
-                    abortController.value = null;
-                }
-                closePage();
-                done();
-            })
-            .catch(() => {});
-    } else {
-        closePage();
-        done();
+type DrawerCloseDone = () => void;
+
+const finishClose = (done?: DrawerCloseDone) => {
+    closePage();
+    done?.();
+};
+
+const requestClose = async (done?: DrawerCloseDone) => {
+    if (canceling.value) {
+        return;
+    }
+    if (!upLoading.value) {
+        finishClose(done);
+        return;
+    }
+
+    canceling.value = true;
+    try {
+        try {
+            await ElMessageBox.confirm(i18n.global.t('file.cancelUploadHelper'), i18n.global.t('file.cancelUpload'), {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'info',
+            });
+        } catch {
+            return;
+        }
+
+        if (!upLoading.value) {
+            finishClose(done);
+            return;
+        }
+
+        const controller = abortController.value;
+        controller?.abort();
+        await cleanupActiveChunkUpload();
+        if (abortController.value === controller) {
+            abortController.value = null;
+        }
+        finishClose(done);
+    } finally {
+        canceling.value = false;
     }
 };
 const closePage = () => {
@@ -203,12 +229,18 @@ const CHUNK_SIZE = 1024 * 1024 * 5;
 const MAX_CHUNK_RETRIES = 3;
 
 const upload = (command: string) => {
+    if (uploadLocked.value) {
+        return;
+    }
     state.uploadEle.webkitdirectory = command == 'dir';
     uploadRef.value.$el.querySelector('input').value = '';
     uploadRef.value.$el.querySelector('input').click();
 };
 
 const removeFile = (index: number) => {
+    if (uploadLocked.value) {
+        return;
+    }
     uploaderFiles.value.splice(index, 1);
 };
 
@@ -222,8 +254,11 @@ const initTempFiles = () => {
 };
 
 const handleDrop = async (event: DragEvent) => {
-    initTempFiles();
     event.preventDefault();
+    if (uploadLocked.value) {
+        return;
+    }
+    initTempFiles();
     const items = event.dataTransfer?.items;
 
     if (items) {
@@ -323,7 +358,7 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
 };
 
 const clearFiles = () => {
-    uploadRef.value!.clearFiles();
+    uploadRef.value?.clearFiles();
     uploaderFiles.value = [];
 };
 
@@ -379,7 +414,6 @@ const uploadFile = async (files: any[], overwrite: boolean) => {
         return;
     }
 
-    loading.value = true;
     upLoading.value = true;
     uploadTotalCount.value = files.length;
     const controller = new AbortController();
@@ -422,7 +456,6 @@ const uploadFile = async (files: any[], overwrite: boolean) => {
             MsgSuccess(i18n.global.t('file.uploadSuccess'));
         }
     } finally {
-        loading.value = false;
         upLoading.value = false;
         uploadTotalCount.value = 0;
         uploadCurrentIndex.value = 0;
@@ -602,6 +635,7 @@ const acceptParams = (props: UploadFileProps) => {
     uploadTotalCount.value = 0;
     uploadCurrentIndex.value = 0;
     uploadHelper.value = '';
+    canceling.value = false;
 
     nextTick(() => {
         state.uploadEle = document.querySelector('.el-upload__input');
@@ -628,6 +662,11 @@ defineExpose({ acceptParams, handleDrop, open });
     .el-button + .el-button {
         margin-left: 0;
     }
+}
+
+.upload-dragger-disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .file-item {
