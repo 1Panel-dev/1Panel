@@ -159,21 +159,23 @@ type DockerPortGuardFamilyStatus struct {
 }
 
 type DockerPortGuardEndpoint struct {
-	Family        string   `json:"family"`
-	HostIP        string   `json:"hostIP"`
-	HostPort      uint16   `json:"hostPort"`
-	Protocol      string   `json:"protocol"`
-	ContainerID   string   `json:"containerID"`
-	ContainerName string   `json:"containerName"`
-	ContainerPort uint16   `json:"containerPort"`
-	Compose       string   `json:"compose,omitempty"`
-	Application   string   `json:"application,omitempty"`
-	PolicyUUID    string   `json:"policyUUID,omitempty"`
-	Mode          string   `json:"mode,omitempty"`
-	Sources       []string `json:"sources"`
-	Effective     bool     `json:"effective"`
-	Description   string   `json:"description,omitempty"`
-	TrafficPath   string   `json:"trafficPath"`
+	Family           string   `json:"family"`
+	HostIP           string   `json:"hostIP"`
+	HostPort         uint16   `json:"hostPort"`
+	Protocol         string   `json:"protocol"`
+	ContainerID      string   `json:"containerID"`
+	ContainerName    string   `json:"containerName"`
+	ContainerPort    uint16   `json:"containerPort"`
+	Compose          string   `json:"compose,omitempty"`
+	Application      string   `json:"application,omitempty"`
+	PolicyUUID       string   `json:"policyUUID,omitempty"`
+	Mode             string   `json:"mode,omitempty"`
+	Sources          []string `json:"sources"`
+	Effective        bool     `json:"effective"`
+	Description      string   `json:"description,omitempty"`
+	TrafficPath      string   `json:"trafficPath"`
+	ManagementTarget string   `json:"managementTarget"`
+	ManagementReason string   `json:"managementReason,omitempty"`
 }
 
 type DockerPortGuardPortGroup struct {

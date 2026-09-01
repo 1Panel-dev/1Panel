@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
@@ -310,6 +311,28 @@ func cleanupLegacyFirewalldForwarding(rules []legacyFirewalldForward) error {
 	}
 	if err := manager.Run("firewall-cmd", "--reload"); err != nil {
 		return fmt.Errorf("reload firewalld after forwarding transfer: %w", err)
+	}
+	return restartDockerAfterFirewalldReload(cmd.Which, controller.CheckActive, controller.HandleRestart)
+}
+
+func restartDockerAfterFirewalldReload(
+	which func(string) bool,
+	checkActive func(string) (bool, error),
+	restart func(string) error,
+) error {
+	const service = "docker"
+	if !which(service) {
+		return nil
+	}
+	active, err := checkActive(service)
+	if err != nil {
+		return fmt.Errorf("check Docker status after reloading firewalld: %w", err)
+	}
+	if !active {
+		return nil
+	}
+	if err := restart(service); err != nil {
+		return fmt.Errorf("restart Docker after reloading firewalld: %w", err)
 	}
 	return nil
 }

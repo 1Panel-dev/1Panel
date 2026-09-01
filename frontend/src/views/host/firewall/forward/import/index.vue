@@ -1,33 +1,47 @@
 <template>
-    <DialogPro v-model="visible" :title="$t('commons.button.import')" size="large">
+    <DialogPro v-model="visible" :title="$t('commons.button.import')" size="w-70">
         <div>
             <el-alert :closable="false" show-icon type="info">
                 <template #default>
                     <div>{{ $t('commons.msg.importHelper') }}</div>
                 </template>
             </el-alert>
-            <el-upload
-                action="#"
-                :auto-upload="false"
-                ref="uploadRef"
-                class="float-left mt-2"
-                :show-file-list="false"
-                :limit="1"
-                accept=".json"
-                :on-change="fileOnChange"
-                :on-exceed="handleExceed"
-                v-model:file-list="uploaderFiles"
-            >
-                <el-button class="float-left" type="primary">{{ $t('commons.button.upload') }}</el-button>
-            </el-upload>
+            <div class="import-file-bar mt-3">
+                <el-upload
+                    ref="uploadRef"
+                    v-model:file-list="uploaderFiles"
+                    action="#"
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    :limit="1"
+                    accept=".json"
+                    :on-change="fileOnChange"
+                    :on-exceed="handleExceed"
+                >
+                    <el-button type="primary" icon="Upload">{{ $t('commons.button.upload') }}</el-button>
+                </el-upload>
+                <div v-if="uploaderFiles.length" class="import-file-info">
+                    <el-icon><Document /></el-icon>
+                    <span class="import-file-name">{{ uploaderFiles[0].name }}</span>
+                </div>
+                <el-text v-else type="info">.json</el-text>
+            </div>
 
-            <el-card class="mt-2 w-full" v-loading="loading">
+            <el-card class="mt-3 w-full" shadow="never" v-loading="loading">
+                <template #header>
+                    <div class="import-preview-header">
+                        <span>{{ $t('commons.button.preview') }}</span>
+                        <el-tag v-if="displayData.length" type="info" effect="plain">
+                            {{ $t('commons.table.total', [displayData.length]) }}
+                        </el-tag>
+                    </div>
+                </template>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     @search="search"
                     v-model:selects="selects"
                     :data="pageData"
-                    :height="440"
+                    :height="300"
                 >
                     <el-table-column type="selection" fix />
                     <el-table-column label="IP" :min-width="60" prop="family">
@@ -77,8 +91,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { genFileId, UploadFile, UploadFiles, UploadProps, UploadRawFile } from 'element-plus';
+import { reactive, ref } from 'vue';
+import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { getNetworkOptions } from '@/api/modules/host';
@@ -90,6 +104,7 @@ import {
     isValidPortRange,
     normalizePortRange,
 } from '@/views/host/firewall/utils/validation';
+import { Document } from '@element-plus/icons-vue';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -102,8 +117,8 @@ const currentFireName = ref('');
 const availableInterfaces = ref<string[]>([]);
 
 const uploadRef = ref();
-const uploaderFiles = ref();
-const pageData = ref([]);
+const uploaderFiles = ref<UploadFile[]>([]);
+const pageData = ref<any[]>([]);
 const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,
@@ -111,10 +126,18 @@ const paginationConfig = reactive({
 });
 
 const acceptParams = async (fireName: string): Promise<void> => {
-    visible.value = true;
+    loading.value = false;
     displayData.value = [];
     selects.value = [];
+    currentRules.value = [];
+    availableInterfaces.value = [];
+    uploaderFiles.value = [];
+    pageData.value = [];
+    paginationConfig.currentPage = 1;
+    paginationConfig.total = 0;
+    uploadRef.value?.clearFiles();
     currentFireName.value = fireName;
+    visible.value = true;
     loadCurrentData(fireName);
 };
 
@@ -139,8 +162,13 @@ const search = () => {
 };
 
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
+    if (!_uploadFile.raw) return;
     loading.value = true;
     displayData.value = [];
+    pageData.value = [];
+    selects.value = [];
+    paginationConfig.currentPage = 1;
+    paginationConfig.total = 0;
     uploaderFiles.value = uploadFiles;
 
     const reader = new FileReader();
@@ -268,3 +296,33 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped lang="scss">
+.import-file-bar {
+    display: flex;
+    min-height: 32px;
+    align-items: center;
+    gap: 12px;
+}
+
+.import-file-info {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 6px;
+    color: var(--el-text-color-regular);
+}
+
+.import-file-name {
+    overflow: hidden;
+    max-width: 420px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.import-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+</style>

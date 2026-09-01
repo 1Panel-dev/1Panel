@@ -7,6 +7,15 @@ type DockerGuardEndpointIdentity = Pick<Firewall.DockerGuardEndpoint, 'family' |
 export const dockerGuardEndpointKey = (endpoint: DockerGuardEndpointIdentity): string =>
     `${endpoint.family}|${endpoint.hostIP}|${endpoint.hostPort}|${endpoint.protocol}`;
 
+export const dockerGuardManagementTarget = (
+    endpoint: Firewall.DockerGuardEndpoint,
+): NonNullable<Firewall.DockerGuardEndpoint['managementTarget']> => {
+    if (endpoint.managementTarget) return endpoint.managementTarget;
+    if (endpoint.trafficPath === 'forward') return 'container_guard';
+    if (endpoint.trafficPath === 'input') return 'host_firewall';
+    return 'needs_diagnosis';
+};
+
 export const isValidDockerGuardSource = (family: Firewall.DockerGuardEndpoint['family'], value: string): boolean =>
     isValidAddressForFamily(family, value);
 
@@ -34,8 +43,9 @@ export const dockerGuardEndpointStatusMessage = (
     endpoint: Firewall.DockerGuardEndpoint,
 ): string => {
     if (!endpoint.policyUUID || endpoint.effective) return '';
-    if (endpoint.trafficPath === 'input') return i18n.global.t('firewall.dockerInputPolicyNotEffective');
-    if (endpoint.trafficPath === 'unknown') return i18n.global.t('firewall.dockerTrafficPathUnknown');
+    const target = dockerGuardManagementTarget(endpoint);
+    if (target === 'host_firewall') return i18n.global.t('firewall.dockerInputPolicyNotEffective');
+    if (target === 'needs_diagnosis') return i18n.global.t('firewall.dockerTrafficPathUnknown');
     const ipv6 = endpoint.family === 'ipv6';
     return dockerGuardFamilyStatusMessage(base, ipv6 ? 'IPv6' : 'IPv4', ipv6 ? base.ipv6 : base.ipv4);
 };

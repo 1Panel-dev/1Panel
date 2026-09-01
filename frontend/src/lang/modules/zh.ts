@@ -3869,7 +3869,7 @@ const message = {
         scopeInactive: '当前托管范围未激活，新增规则可能不会作用于现有流量。',
         scopeMissing: '托管范围 {0} 尚未创建，应用首条规则时将以安全方式创建。',
         scopeUnmanagedActive: '检测到其他活动范围：{0}，1Panel 不会修改其中的规则。',
-        scopeRuntimeMismatch: '运行配置与永久配置在以下项目中不一致：{0}。',
+        scopeRuntimeMismatch: 'firewalld 运行配置与永久配置不一致，请重启防火墙。',
         dockerRestart: '防火墙操作需要重启 Docker 服务',
         firewallHelper: '{0}系统防火墙',
         firewallNotStart: '当前未开启系统防火墙，请先开启！',

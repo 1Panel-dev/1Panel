@@ -4094,7 +4094,7 @@ const message = {
         scopeInactive: 'The managed scope is inactive. New rules may not affect current traffic.',
         scopeMissing: 'Managed scope {0} is missing and will be created safely when the first rule is applied.',
         scopeUnmanagedActive: 'Other active scopes were detected: {0}. 1Panel will not modify their rules.',
-        scopeRuntimeMismatch: 'The runtime and permanent configurations differ for: {0}.',
+        scopeRuntimeMismatch: 'The active and permanent firewalld configurations differ. Restart the firewall.',
         dockerRestart: 'Firewall operations require restarting the Docker service',
         firewallHelper: '{0} system firewall',
         firewallNotStart: 'The system firewall is not enabled at present. Enable it first.',

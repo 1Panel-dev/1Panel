@@ -239,7 +239,11 @@ import { ElMessageBox } from 'element-plus';
 import { Lock } from '@element-plus/icons-vue';
 import { downloadWithContent } from '@/utils/file';
 import { getCurrentDateFormatted } from '@/utils/date';
-import { dockerGuardEndpointKey, dockerGuardEndpointStatusMessage } from '@/views/host/firewall/docker/model';
+import {
+    dockerGuardEndpointKey,
+    dockerGuardEndpointStatusMessage,
+    dockerGuardManagementTarget,
+} from '@/views/host/firewall/docker/model';
 import { formatHostAddressList } from '@/views/host/firewall/utils/validation';
 import { newUUID } from '@/utils/id';
 
@@ -403,10 +407,11 @@ const displaySources = (endpoint: Firewall.DockerGuardEndpoint) =>
 const endpointStatusMessage = (endpoint: Firewall.DockerGuardEndpoint) =>
     dockerGuardEndpointStatusMessage(data.base, endpoint);
 const isDockerPolicyEndpoint = (endpoint: Firewall.DockerGuardEndpoint) =>
-    endpoint.trafficPath === 'forward' && Boolean(endpoint.policyUUID);
+    dockerGuardManagementTarget(endpoint) === 'container_guard' && Boolean(endpoint.policyUUID);
 const endpointPrompt = (endpoint: Firewall.DockerGuardEndpoint) => {
-    if (endpoint.trafficPath === 'input') return i18n.global.t('firewall.dockerInputUseHostFirewall');
-    if (endpoint.trafficPath === 'unknown') return i18n.global.t('firewall.dockerTrafficPathPending');
+    const target = dockerGuardManagementTarget(endpoint);
+    if (target === 'host_firewall') return i18n.global.t('firewall.dockerInputUseHostFirewall');
+    if (target === 'needs_diagnosis') return i18n.global.t('firewall.dockerTrafficPathUnknown');
     return i18n.global.t('firewall.dockerGuardUnprotected');
 };
 

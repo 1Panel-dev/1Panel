@@ -1705,12 +1705,22 @@ var NormalizeFirewallBackendSelections = &gormigrate.Migration{
 	ID: "20260826-normalize-firewall-backend-selections",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.Transaction(func(tx *gorm.DB) error {
+			result := tx.Model(&model.Setting{}).
+				Where(
+					"key = ? AND value NOT IN ?",
+					constant.FirewallDockerBackendKey,
+					[]string{constant.FirewallProviderIptables, constant.FirewallProviderNftables},
+				).
+				Update("value", constant.FirewallProviderIptables)
+			if result.Error != nil {
+				return result.Error
+			}
 			if err := tx.Where("key = ?", constant.FirewallDockerBackendKey).FirstOrCreate(&model.Setting{
-				Key: constant.FirewallDockerBackendKey, Value: "",
+				Key: constant.FirewallDockerBackendKey, Value: constant.FirewallProviderIptables,
 			}).Error; err != nil {
 				return err
 			}
-			result := tx.Model(&model.Setting{}).
+			result = tx.Model(&model.Setting{}).
 				Where(
 					"key = ? AND value NOT IN ?",
 					constant.FirewallForwardingBackendKey,

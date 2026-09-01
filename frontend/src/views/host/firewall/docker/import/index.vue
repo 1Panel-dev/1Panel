@@ -1,21 +1,36 @@
 <template>
-    <DialogPro v-model="visible" :title="$t('commons.button.import')" size="large">
+    <DialogPro v-model="visible" :title="$t('commons.button.import')" size="w-70">
         <el-alert class="mb-3" type="info" :closable="false" :title="$t('commons.msg.importHelper')" />
-        <el-upload
-            ref="uploadRef"
-            v-model:file-list="uploaderFiles"
-            action="#"
-            :auto-upload="false"
-            :show-file-list="false"
-            :limit="1"
-            accept=".json"
-            :on-change="fileOnChange"
-            :on-exceed="handleExceed"
-        >
-            <el-button type="primary">{{ $t('commons.button.upload') }}</el-button>
-        </el-upload>
-        <el-card class="mt-3 w-full" v-loading="loading">
-            <ComplexTable v-model:selects="selects" :data="policies" :height="420">
+        <div class="import-file-bar mt-3">
+            <el-upload
+                ref="uploadRef"
+                v-model:file-list="uploaderFiles"
+                action="#"
+                :auto-upload="false"
+                :show-file-list="false"
+                :limit="1"
+                accept=".json"
+                :on-change="fileOnChange"
+                :on-exceed="handleExceed"
+            >
+                <el-button type="primary" icon="Upload">{{ $t('commons.button.upload') }}</el-button>
+            </el-upload>
+            <div v-if="uploaderFiles.length" class="import-file-info">
+                <el-icon><Document /></el-icon>
+                <span class="import-file-name">{{ uploaderFiles[0].name }}</span>
+            </div>
+            <el-text v-else type="info">.json</el-text>
+        </div>
+        <el-card class="mt-3 w-full" shadow="never" v-loading="loading">
+            <template #header>
+                <div class="import-preview-header">
+                    <span>{{ $t('commons.button.preview') }}</span>
+                    <el-tag v-if="policies.length" type="info" effect="plain">
+                        {{ $t('commons.table.total', [policies.length]) }}
+                    </el-tag>
+                </div>
+            </template>
+            <ComplexTable v-model:selects="selects" :data="policies" :height="300">
                 <el-table-column type="selection" fix />
                 <el-table-column label="IP" prop="family" min-width="65">
                     <template #default="{ row }">{{ row.family === 'ipv6' ? 'IPv6' : 'IPv4' }}</template>
@@ -50,6 +65,7 @@ import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type Up
 import { ref } from 'vue';
 import { dockerGuardEndpointKey, normalizeDockerGuardPolicy } from '@/views/host/firewall/docker/model';
 import { formatHostAddressList } from '@/views/host/firewall/utils/validation';
+import { Document } from '@element-plus/icons-vue';
 
 const emit = defineEmits<{ (event: 'search'): void }>();
 const visible = ref(false);
@@ -63,6 +79,8 @@ const displaySources = (policy: Firewall.DockerGuardPolicy) => formatHostAddress
 const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     if (!uploadFile.raw) return;
     loading.value = true;
+    policies.value = [];
+    selects.value = [];
     uploaderFiles.value = uploadFiles;
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -140,11 +158,43 @@ const modeLabel = (mode: Firewall.DockerGuardPolicy['mode']) => {
 };
 
 const acceptParams = () => {
+    loading.value = false;
     policies.value = [];
     selects.value = [];
     uploaderFiles.value = [];
+    uploadRef.value?.clearFiles();
     visible.value = true;
 };
 
 defineExpose({ acceptParams });
 </script>
+
+<style scoped lang="scss">
+.import-file-bar {
+    display: flex;
+    min-height: 32px;
+    align-items: center;
+    gap: 12px;
+}
+
+.import-file-info {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 6px;
+    color: var(--el-text-color-regular);
+}
+
+.import-file-name {
+    overflow: hidden;
+    max-width: 420px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.import-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+</style>

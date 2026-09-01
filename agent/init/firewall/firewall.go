@@ -30,6 +30,9 @@ func Init() {
 		global.LOG.Errorf("transfer legacy host firewall records failed, err: %v", err)
 		return
 	}
+	if err := migrationutils.TransferLegacyHostFirewallRuleOwnership(ctx, clientName, service.AdoptLegacyHostFirewallRuleOwnership); err != nil {
+		global.LOG.Warnf("transfer legacy host firewall rule ownership failed, err: %v", err)
+	}
 	if err := migrationutils.TransferFirewallForwarding(ctx); err != nil {
 		global.LOG.Errorf("transfer legacy forwarding rules failed, err: %v", err)
 		return

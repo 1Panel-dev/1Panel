@@ -34,14 +34,52 @@ type legacyHostFirewallRecord struct {
 	Description string
 }
 
-// TransferHostFirewall imports the legacy firewalls table into firewall_rules.
-// It intentionally does not inspect or mutate the system firewall: the normal
-// inventory merge associates imported rows with observed rules by RuleKey.
 func TransferHostFirewall(ctx context.Context, provider string) error {
 	if global.DB == nil {
 		return errors.New("host firewall transfer database is required")
 	}
 	return transferHostFirewall(ctx, global.DB, filter.Provider(strings.ToLower(strings.TrimSpace(provider))))
+}
+
+func TransferLegacyHostFirewallRuleOwnership(ctx context.Context, provider string, transfer func(context.Context) error) error {
+	if global.DB == nil {
+		return errors.New("host firewall transfer database is required")
+	}
+	return transferLegacyHostFirewallRuleOwnership(
+		ctx,
+		global.DB,
+		filter.Provider(strings.ToLower(strings.TrimSpace(provider))),
+		transfer,
+	)
+}
+
+func transferLegacyHostFirewallRuleOwnership(
+	ctx context.Context,
+	db *gorm.DB,
+	provider filter.Provider,
+	transfer func(context.Context) error,
+) error {
+	if !legacyHostFirewallOwnershipProvider(provider) {
+		return nil
+	}
+	if db == nil {
+		return errors.New("host firewall transfer database is required")
+	}
+	completed, err := migrationRecordExists(db, hostFirewallTransferMigrationID)
+	if err != nil || completed {
+		return err
+	}
+	if transfer == nil {
+		return errors.New("legacy host firewall ownership transfer is required")
+	}
+	if err := transfer(ctx); err != nil {
+		return fmt.Errorf("transfer legacy host firewall rule ownership: %w", err)
+	}
+	return markMigrationRecord(db, hostFirewallTransferMigrationID)
+}
+
+func legacyHostFirewallOwnershipProvider(provider filter.Provider) bool {
+	return provider == filter.ProviderIptables || provider == filter.ProviderUFW
 }
 
 func transferHostFirewall(ctx context.Context, db *gorm.DB, provider filter.Provider) error {
@@ -68,6 +106,9 @@ func transferHostFirewall(ctx context.Context, db *gorm.DB, provider filter.Prov
 	return db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := importLegacyHostFirewallRules(tx, models); err != nil {
 			return err
+		}
+		if legacyHostFirewallOwnershipProvider(provider) {
+			return nil
 		}
 		return markMigrationRecord(tx, hostFirewallTransferMigrationID)
 	})
@@ -144,7 +185,7 @@ func legacyHostFirewallRules(record legacyHostFirewallRecord, provider filter.Pr
 		rule.SourcePort = ""
 		rule.DestinationPort = ""
 	default:
-		if provider != filter.ProviderIptables {
+		if provider != filter.ProviderIptables || legacyIptablesAdvancedChain(record.Chain) {
 			return nil, fmt.Errorf("%w: advanced rule for provider %q", errUnsupportedLegacyHostFirewallRule, provider)
 		}
 	}
@@ -164,6 +205,15 @@ func legacyHostFirewallRules(record legacyHostFirewallRecord, provider filter.Pr
 		return nil, fmt.Errorf("%w: provider %q", errUnsupportedLegacyHostFirewallRule, provider)
 	}
 	return filter.ExpandAtomicRules(rule)
+}
+
+func legacyIptablesAdvancedChain(chain string) bool {
+	switch strings.ToUpper(strings.TrimSpace(chain)) {
+	case "1PANEL_INPUT", "1PANEL_OUTPUT":
+		return true
+	default:
+		return false
+	}
 }
 
 func legacyIptablesChain(record legacyHostFirewallRecord) string {
@@ -201,12 +251,27 @@ func legacyUFWHostRules(record legacyHostFirewallRecord, rule filter.FirewallRul
 	if strings.EqualFold(strings.TrimSpace(record.Type), "address") || strings.EqualFold(strings.TrimSpace(record.Type), "ip") {
 		rule.SourceAddress, rule.DestinationAddress = splitLegacyUFWAddress(rule.SourceAddress)
 	}
+	if legacyUFWSinglePortAllProtocols(record, rule.DestinationPort) {
+		rule.Protocol = "all"
+	}
 	if legacyAddressIsEmpty(rule.SourceAddress) && legacyAddressIsEmpty(rule.DestinationAddress) {
 		rule.Scope.Family = filter.FamilyInet
 	} else {
 		rule.Scope.Family = legacyRuleFamily(rule.SourceAddress, rule.DestinationAddress)
 	}
 	return filter.ExpandAtomicRules(rule)
+}
+
+func legacyUFWSinglePortAllProtocols(record legacyHostFirewallRecord, port string) bool {
+	if !strings.EqualFold(strings.TrimSpace(record.Type), "port") {
+		return false
+	}
+	protocol := strings.ToLower(strings.TrimSpace(record.Protocol))
+	if protocol != "tcp/udp" && protocol != "udp/tcp" {
+		return false
+	}
+	port = strings.TrimSpace(port)
+	return port != "" && !strings.Contains(port, ",") && !strings.Contains(port, "-")
 }
 
 func expandLegacyFamilies(rule filter.FirewallRule, families ...filter.Family) ([]filter.FirewallRule, error) {

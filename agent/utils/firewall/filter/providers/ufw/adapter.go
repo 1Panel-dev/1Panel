@@ -320,11 +320,14 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		position = *target.Locator.Position
 		plan.Previous = &target
 		plan.Expected = observedForRule(normalized, marker, position)
-		// UFW updates the comment of an existing rule when the same rule is added
-		// without insert/prepend. This keeps the rule active and in its original
-		// position throughout adoption.
-		plan.Commands = []filter.NativeCommand{commentCommand(normalized, marker)}
-		plan.RollbackCommands = []filter.NativeCommand{commentCommand(target.Rule, observedComment(target))}
+		plan.Commands = []filter.NativeCommand{
+			deletePositionCommand(position),
+			insertCommand(position, normalized, marker),
+		}
+		plan.RollbackCommands = []filter.NativeCommand{
+			insertCommand(position, target.Rule, observedComment(target)),
+			deleteRuleCommand(normalized, marker),
+		}
 	case filter.ChangeUpdate:
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, marker, true)
 		if targetErr != nil {

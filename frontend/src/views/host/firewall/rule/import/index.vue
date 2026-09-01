@@ -1,21 +1,36 @@
 <template>
-    <DialogPro v-model="visible" :title="$t('commons.button.import')" size="large">
+    <DialogPro v-model="visible" :title="$t('commons.button.import')" size="w-70">
         <el-alert class="mb-3" type="info" :closable="false" :title="$t('firewall.importBackendHelper', [provider])" />
-        <el-upload
-            ref="uploadRef"
-            v-model:file-list="uploaderFiles"
-            action="#"
-            :auto-upload="false"
-            :show-file-list="false"
-            :limit="1"
-            accept=".json"
-            :on-change="fileOnChange"
-            :on-exceed="handleExceed"
-        >
-            <el-button type="primary">{{ $t('commons.button.upload') }}</el-button>
-        </el-upload>
-        <el-card class="mt-3 w-full" v-loading="loading">
-            <ComplexTable v-model:selects="selects" :data="rules" :height="420">
+        <div class="import-file-bar mt-3">
+            <el-upload
+                ref="uploadRef"
+                v-model:file-list="uploaderFiles"
+                action="#"
+                :auto-upload="false"
+                :show-file-list="false"
+                :limit="1"
+                accept=".json"
+                :on-change="fileOnChange"
+                :on-exceed="handleExceed"
+            >
+                <el-button type="primary" icon="Upload">{{ $t('commons.button.upload') }}</el-button>
+            </el-upload>
+            <div v-if="uploaderFiles.length" class="import-file-info">
+                <el-icon><Document /></el-icon>
+                <span class="import-file-name">{{ uploaderFiles[0].name }}</span>
+            </div>
+            <el-text v-else type="info">.json</el-text>
+        </div>
+        <el-card class="mt-3 w-full" shadow="never" v-loading="loading">
+            <template #header>
+                <div class="import-preview-header">
+                    <span>{{ $t('commons.button.preview') }}</span>
+                    <el-tag v-if="rules.length" type="info" effect="plain">
+                        {{ $t('commons.table.total', [rules.length]) }}
+                    </el-tag>
+                </div>
+            </template>
+            <ComplexTable v-model:selects="selects" :data="rules" :height="300">
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.protocol')" prop="protocol" min-width="90" />
                 <el-table-column :label="$t('firewall.sourceIP')" min-width="150">
@@ -30,7 +45,9 @@
                 <el-table-column :label="$t('firewall.destPort')" min-width="110">
                     <template #default="{ row }">{{ row.destinationPort || $t('firewall.allPorts') }}</template>
                 </el-table-column>
-                <el-table-column :label="$t('firewall.action')" prop="action" min-width="90" />
+                <el-table-column :label="$t('firewall.action')" prop="action" min-width="90">
+                    <template #default="{ row }">{{ actionLabel(row.action) }}</template>
+                </el-table-column>
                 <el-table-column :label="$t('commons.table.description')" prop="description" min-width="150" />
             </ComplexTable>
         </el-card>
@@ -49,6 +66,7 @@ import { checkFirewallRules, createFirewallRules } from '@/api/modules/firewall'
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { formatHostAddress, inferAddressFamily } from '@/views/host/firewall/utils/validation';
+import { Document } from '@element-plus/icons-vue';
 import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
 import { ref } from 'vue';
 
@@ -66,6 +84,12 @@ const displayAddress = (rule: Firewall.Rule, address?: string) => {
         rule.scope.family === 'ipv6' ? '::/0' : rule.scope.family === 'inet' ? '0.0.0.0/0, ::/0' : '0.0.0.0/0';
     if (address && address !== wildcard) return formatHostAddress(address, rule.scope.family);
     return `${wildcard}（${i18n.global.t('firewall.anyWhere')}）`;
+};
+
+const actionLabel = (action: Firewall.Action) => {
+    if (action === 'accept') return i18n.global.t('firewall.accept');
+    if (action === 'reject') return i18n.global.t('firewall.reject');
+    return i18n.global.t('firewall.drop');
 };
 
 const isRule = (value: unknown): value is Firewall.Rule => {
@@ -142,6 +166,8 @@ const normalizeImportedRule = (rule: Firewall.Rule): Firewall.Rule[] => {
 const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     if (!uploadFile.raw) return;
     loading.value = true;
+    rules.value = [];
+    selects.value = [];
     uploaderFiles.value = uploadFiles;
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -248,12 +274,44 @@ const onImport = async () => {
 };
 
 const acceptParams = (value: Firewall.Provider) => {
+    loading.value = false;
     provider.value = value;
     rules.value = [];
     selects.value = [];
     uploaderFiles.value = [];
+    uploadRef.value?.clearFiles();
     visible.value = true;
 };
 
 defineExpose({ acceptParams });
 </script>
+
+<style scoped lang="scss">
+.import-file-bar {
+    display: flex;
+    min-height: 32px;
+    align-items: center;
+    gap: 12px;
+}
+
+.import-file-info {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 6px;
+    color: var(--el-text-color-regular);
+}
+
+.import-file-name {
+    overflow: hidden;
+    max-width: 420px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.import-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+</style>

@@ -4137,7 +4137,8 @@ const message = {
         scopeInactive: 'El ámbito gestionado está inactivo. Las reglas nuevas podrían no afectar al tráfico actual.',
         scopeMissing: 'Falta el ámbito gestionado {0}; se creará de forma segura al aplicar la primera regla.',
         scopeUnmanagedActive: 'Se detectaron otros ámbitos activos: {0}. 1Panel no modificará sus reglas.',
-        scopeRuntimeMismatch: 'Las configuraciones activa y permanente difieren en: {0}.',
+        scopeRuntimeMismatch:
+            'Las configuraciones activa y permanente de firewalld no coinciden. Reinicie el firewall.',
         dockerRestart: 'Las operaciones del firewall requieren reiniciar el servicio de Docker',
         firewallHelper: 'Firewall del sistema {0}',
         firewallNotStart: 'El firewall del sistema no está habilitado actualmente. Actívalo primero.',

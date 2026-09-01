@@ -4075,7 +4075,8 @@ const message = {
         scopeInactive: '管理対象の範囲が有効ではありません。新しいルールが現在の通信に適用されない場合があります。',
         scopeMissing: '管理対象スコープ {0} がありません。最初のルール適用時に安全に作成されます。',
         scopeUnmanagedActive: '他の有効な範囲が見つかりました：{0}。1Panel はそのルールを変更しません。',
-        scopeRuntimeMismatch: '実行中と永続設定で次の項目が一致しません：{0}。',
+        scopeRuntimeMismatch:
+            'firewalld の実行中の設定と永続設定が一致しません。ファイアウォールを再起動してください。',
         dockerRestart: 'ファイアウォール操作にはDockerサービスの再起動が必要です',
         firewallHelper: '{0}システムファイアウォール',
         firewallNotStart: '現在、システムファイアウォールは有効になっていません。最初に有効にします。',
