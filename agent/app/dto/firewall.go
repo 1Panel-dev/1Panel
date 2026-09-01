@@ -173,6 +173,7 @@ type DockerPortGuardEndpoint struct {
 	Sources       []string `json:"sources"`
 	Effective     bool     `json:"effective"`
 	Description   string   `json:"description,omitempty"`
+	TrafficPath   string   `json:"trafficPath"`
 }
 
 type DockerPortGuardPortGroup struct {

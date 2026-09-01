@@ -419,6 +419,7 @@ interface UsageEntry {
     owner: string;
     pid?: number;
     docker?: boolean;
+    dockerTrafficPath?: Firewall.DockerGuardEndpoint['trafficPath'];
 }
 
 interface DisplayNotice {
@@ -763,6 +764,7 @@ const ruleUsageEntries = (row: RuleRow): UsageEntry[] => {
         ];
     });
     const docker = dockerEndpoints.value
+        .filter((endpoint) => row.rule.scope.family === 'inet' || endpoint.family === row.rule.scope.family)
         .filter((endpoint) => protocols.includes(endpoint.protocol === 'tcp' ? 1 : 2))
         .filter((endpoint) => isPortInRule(row.rule.destinationPort, endpoint.hostPort))
         .map((endpoint) => ({
@@ -770,13 +772,18 @@ const ruleUsageEntries = (row: RuleRow): UsageEntry[] => {
             ports: [endpoint.hostPort],
             owner: `Docker: ${endpoint.containerName || endpoint.containerID?.slice(0, 12) || '-'}`,
             docker: true,
+            dockerTrafficPath: endpoint.trafficPath,
         }));
     return [...processes, ...docker];
 };
 const usageEntryPortText = (entry: UsageEntry) => entry.ports.join(', ') || '-';
 const usageEntryLabel = (entry: UsageEntry) =>
     entry.docker
-        ? `${entry.owner} (${usageEntryPortText(entry)}) — ${i18n.global.t('firewall.dockerInputNotProtected')}`
+        ? `${entry.owner} (${usageEntryPortText(entry)}) — ${i18n.global.t(
+              entry.dockerTrafficPath === 'input'
+                  ? 'firewall.dockerInputUseHostFirewall'
+                  : 'firewall.dockerInputNotProtected',
+          )}`
         : `${entry.owner} (${usageEntryPortText(entry)})`;
 const openUsageDetail = (entry: UsageEntry) => {
     if (entry.docker) {

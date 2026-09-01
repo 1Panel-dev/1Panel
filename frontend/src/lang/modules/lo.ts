@@ -4000,26 +4000,9 @@ const message = {
         configuredRules: 'ຕັ້ງຄ່າແລ້ວ {0} ກົດ',
         addressFamily: 'ລຸ້ນ IP',
         portOrRange: 'ພອດ / ຊ່ວງ',
-        exportAllRules: 'ສົ່ງອອກກົດທັງໝົດ',
         importBackendHelper: 'ກົດທີ່ນຳເຂົ້າຈະຖືກປ່ຽນໃຫ້ເໝາະກັບແບັກເອນ {0} ປັດຈຸບັນ. ກົດຕົ້ນທາງຈະບໍ່ຖືກປ່ຽນ.',
-        resetDirectRulesHelper:
-            'ລຶບ chain, ກົດທີ່ກຳລັງໃຊ້ ແລະ ໄຟລ໌ຖາວອນຂອງໄຟວໍລະບົບ 1Panel ຈາກ {0}; ນະໂຍບາຍໃນຖານຂໍ້ມູນຈະຖືກເກັບໄວ້',
-        resetWhitelistRulesHelper:
-            'ຣີເຊັດການຕັ້ງຄ່າກຳນົດເອງທີ່ກຳລັງໃຊ້ໃນ {0}, ຄືນຄ່າເລີ່ມຕົ້ນ ແລະປິດ {0}; ນະໂຍບາຍໃນຖານຂໍ້ມູນຈະຖືກເກັບໄວ້ ແລະຊິງຄືນໄດ້.',
-        cleanupForwardingBackendHelper:
-            'ຣີເຊັດກົດ runtime ສຳລັບການສົ່ງຕໍ່ພອດ 1Panel ໃນ {0}: ລຶບກົດ ແລະ chain ທີ່ກ່ຽວຂ້ອງທັງໝົດ ແລະເກັບຂໍ້ມູນໃນຖານຂໍ້ມູນ',
-        cleanupDockerBackendHelper:
-            'ຣີເຊັດກົດ runtime ປ້ອງກັນພອດ Docker ຂອງ 1Panel ໃນ {0}: ລຶບກົດ ແລະ chain ທີ່ກ່ຽວຂ້ອງທັງໝົດ ແລະເກັບຂໍ້ມູນໃນຖານຂໍ້ມູນ',
-        cleanupBeforeBackendSwitch: 'ແບັກເອັນປັດຈຸບັນ {0} ຍັງມີກົດ runtime ຂອງ 1Panel. ກະລຸນາຣີເຊັດກ່ອນສະຫຼັບໄປ {1}.',
-        cleanupAction: 'ຣີເຊັດ',
-        backendSwitchNotice:
-            'ຣີເຊັດແບັກເອັນປັດຈຸບັນກ່ອນສະຫຼັບໄຟວໍລະບົບ, ການສົ່ງຕໍ່ພອດ ຫຼື ການປ້ອງກັນ Docker. ນະໂຍບາຍໃນຖານຂໍ້ມູນຈະຖືກເກັບໄວ້ ແລະສາມາດເລີ່ມ ຫຼືຊິງຫຼັງສະຫຼັບ.',
-        switchBackendHelper: 'ຢືນຢັນການສະຫຼັບເປັນ {0} ບໍ?',
-        switchDockerBackendHelper: 'ປ່ຽນເປັນ {0} ບໍ? ການຕັ້ງຄ່າ Docker ຈະຖືກອັບເດດ ແລະ Docker ຈະເລີ່ມໃໝ່.',
         ruleSyncTitle: 'ຊິງກົດ',
         ruleSyncAction: 'ຊິງກົດ',
-        ruleSyncHelper:
-            'ຊິງກົດທີ່ 1Panel ຈັດການຈາກໄຟຣ໌ວໍທີ່ເລືອກໄປຫາໄຟຣ໌ວໍປັດຈຸບັນ. ກົດຕົ້ນທາງຈະບໍ່ຖືກລຶບ ແລະ ກົດພາຍນອກຈະບໍ່ຖືກຊິງ.',
         ruleSyncDatabase: 'ຖານຂໍ້ມູນ 1Panel',
         ruleSyncDatabaseHelper:
             'ໃຊ້ກົດໃນຖານຂໍ້ມູນ 1Panel ເປັນຫຼັກເພື່ອຊິງຄ໌ ແລະປັບກົດທີ່ຈັດການໂດຍ 1Panel ໃນໄຟຣ໌ວໍປັດຈຸບັນ. ກົດທີ່ຂາດຈະຖືກເພີ່ມ ແລະກົດທີ່ເກີນຈະຖືກລຶບ.',
@@ -4027,7 +4010,6 @@ const message = {
         ruleSyncDatabaseConfirm: 'ຊິງ {1} ໃຫ້ກົງກັບ {0} ກົດໃນຖານຂໍ້ມູນບໍ? ຈະລຶບ {2} ກົດຂອງເປົ້າໝາຍ ແລະເພີ່ມກົດທີ່ຂາດ.',
         ruleSyncSource: 'ແຫຼ່ງການຕັ້ງຄ່າ',
         ruleSyncTarget: 'ແບັກເອນປັດຈຸບັນ',
-        ruleSyncTotal: 'ກົດທີ່ແປງແລ້ວ',
         ruleSyncReady: 'ພ້ອມຊິງ',
         ruleSyncExisting: 'ມີແລ້ວ',
         ruleSyncRemove: 'ຈະລຶບ',
@@ -4049,12 +4031,6 @@ const message = {
             protectedRule: 'ກົດໄຟວໍທີ່ຖືກປົກປ້ອງນີ້ບໍ່ສາມາດແກ້ໄຂໄດ້.',
             cannotReconcile: 'ບໍ່ສາມາດຊິງກົດເປົ້າໝາຍ: {0}',
         },
-        ruleSyncConfirm: 'ຊິງ {0} ກົດຈາກ {1} ໄປ {2} ບໍ? ແບັກເອນຕົ້ນທາງຈະບໍ່ຖືກປ່ຽນ.',
-        ruleSyncResetSource: 'ຫຼັງຈາກຊິງສຳເລັດ ໃຫ້ຣີເຊັດ ແລະ ປິດໄຟວໍຕົ້ນທາງ {0}',
-        ruleSyncResetSourceHelper: 'ໄຟວໍຕົ້ນທາງຈະຖືກຣີເຊັດສະເພາະເມື່ອກົດທັງໝົດຊິງສຳເລັດ.',
-        ruleSyncResetSourceBlocked: 'ມີກົດທີ່ຊິງບໍ່ໄດ້; ກະລຸນາແກ້ໄຂກ່ອນຣີເຊັດຕົ້ນທາງ.',
-        ruleSyncResetSourceConfirm:
-            'ຊິງ {0} ກົດຈາກ {1} ໄປ {2} ແລ້ວຣີເຊັດແລະປິດ {1} ບໍ? ການຕັ້ງຄ່າທັງໝົດຈະຖືກລຶບ ແລະ ຍ້ອນກັບບໍ່ໄດ້.',
         ruleSyncPartial: 'ຊິງສຳເລັດ: ສຳເລັດ {0}, ມີແລ້ວ {1}, ລົ້ມເຫຼວ {2}.',
         ruleSyncSuccess: 'ຊິງສຳເລັດ: ສຳເລັດ {0}, ມີແລ້ວ {1}, ລຶບ {2}.',
         ruleSyncStatus: {
@@ -4063,6 +4039,20 @@ const message = {
             remove: 'ຈະລຶບ',
             blocked: 'ຊິງບໍ່ໄດ້',
         },
+        resetDirectRulesHelper:
+            'ລຶບ chain, ກົດທີ່ກຳລັງໃຊ້ ແລະ ໄຟລ໌ຖາວອນຂອງໄຟວໍລະບົບ 1Panel ຈາກ {0}; ນະໂຍບາຍໃນຖານຂໍ້ມູນຈະຖືກເກັບໄວ້',
+        resetWhitelistRulesHelper:
+            'ຣີເຊັດການຕັ້ງຄ່າກຳນົດເອງທີ່ກຳລັງໃຊ້ໃນ {0}, ຄືນຄ່າເລີ່ມຕົ້ນ ແລະປິດ {0}; ນະໂຍບາຍໃນຖານຂໍ້ມູນຈະຖືກເກັບໄວ້ ແລະຊິງຄືນໄດ້.',
+        cleanupForwardingBackendHelper:
+            'ຣີເຊັດກົດ runtime ສຳລັບການສົ່ງຕໍ່ພອດ 1Panel ໃນ {0}: ລຶບກົດ ແລະ chain ທີ່ກ່ຽວຂ້ອງທັງໝົດ ແລະເກັບຂໍ້ມູນໃນຖານຂໍ້ມູນ',
+        cleanupDockerBackendHelper:
+            'ຣີເຊັດກົດ runtime ປ້ອງກັນພອດ Docker ຂອງ 1Panel ໃນ {0}: ລຶບກົດ ແລະ chain ທີ່ກ່ຽວຂ້ອງທັງໝົດ ແລະເກັບຂໍ້ມູນໃນຖານຂໍ້ມູນ',
+        cleanupBeforeBackendSwitch: 'ແບັກເອັນປັດຈຸບັນ {0} ຍັງມີກົດ runtime ຂອງ 1Panel. ກະລຸນາຣີເຊັດກ່ອນສະຫຼັບໄປ {1}.',
+        cleanupAction: 'ຣີເຊັດ',
+        backendSwitchNotice:
+            'ຣີເຊັດແບັກເອັນປັດຈຸບັນກ່ອນສະຫຼັບໄຟວໍລະບົບ, ການສົ່ງຕໍ່ພອດ ຫຼື ການປ້ອງກັນ Docker. ນະໂຍບາຍໃນຖານຂໍ້ມູນຈະຖືກເກັບໄວ້ ແລະສາມາດເລີ່ມ ຫຼືຊິງຫຼັງສະຫຼັບ.',
+        switchBackendHelper: 'ຢືນຢັນການສະຫຼັບເປັນ {0} ບໍ?',
+        switchDockerBackendHelper: 'ປ່ຽນເປັນ {0} ບໍ? ການຕັ້ງຄ່າ Docker ຈະຖືກອັບເດດ ແລະ Docker ຈະເລີ່ມໃໝ່.',
         uninstalledStatus: 'ຍັງບໍ່ໄດ້ຕິດຕັ້ງ',
         selectedBackendNotInstalled:
             'ບໍ່ພົບບໍລິການ {backend}. ກະລຸນາຕິດຕັ້ງແບບກຳນົດເອງຈາກ {library} ຫຼືປ່ຽນແບັກເອັນໄຟວໍໃນ {settings}.',
@@ -4070,6 +4060,12 @@ const message = {
         partiallyInitialized: 'ເລີ່ມຕົ້ນບາງສ່ວນ',
         dockerGuardHelper:
             'ຕັ້ງຄ່າຂໍ້ຈຳກັດການເຂົ້າເຖິງສຳລັບພອດທີ່ Docker ເຜີຍແຜ່ໃນໂຮສ. ພອດທີ່ບໍ່ໄດ້ປ້ອງກັນຈະໃຊ້ຮູບແບບເຂົ້າເຖິງເລີ່ມຕົ້ນຂອງ Docker.',
+        dockerTrafficPathMixed: 'ພອດທີ່ເລືອກໃຊ້ເສັ້ນທາງເຂົ້າເຖິງຕ່າງກັນ. ກະລຸນາຕັ້ງຄ່າແຍກກັນ.',
+        dockerTrafficPathUnknown: 'ບໍ່ສາມາດກຳນົດເສັ້ນທາງເຂົ້າເຖິງຂອງພອດນີ້ໄດ້. ກວດສອບເຄືອຂ່າຍ Docker ແລ້ວລອງໃໝ່.',
+        dockerTrafficPathPending: 'ລໍຖ້າກວດສອບເສັ້ນທາງ',
+        dockerInputPolicyNotEffective:
+            'ພອດນີ້ຖືກຮັບໂດຍໂຮສໂດຍກົງ ດັ່ງນັ້ນກົດປ້ອງກັນພອດຄອນເທນເນີຈຶ່ງບໍ່ມີຜົນ. ກະລຸນາຕັ້ງຄ່າໃນໄຟວໍຂອງໂຮສ.',
+        dockerInputUseHostFirewall: 'ກະລຸນາຕັ້ງຄ່າການເຂົ້າເຖິງພອດນີ້ໃນໄຟວໍຂອງໂຮສ.',
         dockerInputNotProtected:
             'ກົດ INPUT ຂອງໂຮສບໍ່ໄດ້ປ້ອງກັນພອດ Docker ນີ້ໂດຍກົງ. ຄລິກເພື່ອເປີດການປ້ອງກັນພອດຄອນເທນເນີ.',
         notInitialized: 'ຍັງບໍ່ໄດ້ເລີ່ມຕົ້ນ',
@@ -4100,9 +4096,7 @@ const message = {
             'ກົດທີ່ເລືອກມີການຕັ້ງຄ່າແຕກຕ່າງກັນ. ກຳນົດໃໝ່ເພື່ອຂຽນທັບທັງໝົດ; ຄຳອະທິບາຍຫວ່າງຈະລຶບຄຳອະທິບາຍທັງໝົດ.',
         effective: 'ມີຜົນແລ້ວ',
         forwardUnsynced: 'ຍັງບໍ່ຊິງຄ໌',
-        notEnabled: 'ບໍ່ໄດ້ເປີດໃຊ້',
         notEffective: 'ບໍ່ມີຜົນ',
-        dockerGuardStatusEffective: 'ການປ້ອງກັນພອດຄອນເທນເນີ {0} ເຮັດວຽກປົກກະຕິ',
         dockerGuardStatusReason: {
             command_missing: 'ບໍ່ມີອົງປະກອບໄຟວໍ {0}, ຈຶ່ງບໍ່ສາມາດເປີດການປ້ອງກັນທີ່ກ່ຽວຂ້ອງໄດ້. ກວດສອບໄຟວໍລະບົບ',
             docker_chain_missing:
@@ -4125,8 +4119,6 @@ const message = {
         importSuccess: 'ນຳເຂົ້າ {0} ກົດລະບຽບສຳເລັດແລ້ວ',
         importPartialSuccess: 'ນຳເຂົ້າສຳເລັດ: ສຳເລັດ {0}, ລົ້ມເຫຼວ {1}',
         basicStatus: 'ໄຟວໍປັດຈຸບັນຍັງບໍ່ໄດ້ຜູກມັດ. ກະລຸນາຜູກມັດກ່ອນ!',
-        baseIptables: 'ບໍລິການ iptables',
-        forwardIptables: 'ບໍລິການສົ່ງຕໍ່ພອດ iptables',
         initMsg: 'ກຳລັງຈະເລີ່ມຕົ້ນ {0}, ຕ້ອງການຕໍ່ຫຼືບໍ່?',
         initDirectBackendConflictMsg:
             '{1} ຍັງຖືກຜູກຢູ່. ຖ້າເລີ່ມຕົ້ນ {0}, ກົດໄຟວອລທັງສອງຊຸດຈະເຮັດວຽກ ແລະອາດປິດກັ້ນການເຂົ້າເຖິງໂດຍບໍ່ຄາດຄິດ. ສືບຕໍ່ບໍ?',

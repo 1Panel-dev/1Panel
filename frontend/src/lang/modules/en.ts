@@ -4123,12 +4123,9 @@ const message = {
         configuredRules: '{0} rules configured',
         addressFamily: 'IP version',
         portOrRange: 'Port / range',
-        exportAllRules: 'Export all rules',
         importBackendHelper: 'Imported rules are converted for the current {0} backend. Source rules are not changed.',
         ruleSyncTitle: 'Synchronize rules',
         ruleSyncAction: 'Sync rules',
-        ruleSyncHelper:
-            'Sync 1Panel-managed rules from the selected firewall to the current firewall. Source rules stay unchanged, and external rules are not included.',
         ruleSyncDatabase: '1Panel database',
         ruleSyncDatabaseHelper:
             'Synchronize and reconcile the managed rules in the current firewall based on the 1Panel database rules. Missing rules will be added and extra rules will be removed.',
@@ -4137,7 +4134,6 @@ const message = {
             'Synchronize {1} to exactly match the {0} database rules? {2} target rule(s) will be removed and missing rules will be added.',
         ruleSyncSource: 'Configuration source',
         ruleSyncTarget: 'Current backend',
-        ruleSyncTotal: 'Converted rules',
         ruleSyncReady: 'Ready',
         ruleSyncExisting: 'Existing',
         ruleSyncRemove: 'To remove',
@@ -4159,14 +4155,6 @@ const message = {
             protectedRule: 'This protected firewall rule cannot be modified.',
             cannotReconcile: 'The target rule cannot be reconciled: {0}',
         },
-        ruleSyncConfirm: 'Synchronize {0} rules from {1} to {2}? The source backend will not be modified.',
-        ruleSyncResetSource: 'Reset and disable source firewall {0} after synchronization succeeds',
-        ruleSyncResetSourceHelper:
-            'The source firewall is reset only after every rule is synchronized successfully. This operation cannot be undone.',
-        ruleSyncResetSourceBlocked:
-            'Some rules cannot be synchronized. Resolve them before automatically resetting the source firewall.',
-        ruleSyncResetSourceConfirm:
-            'Synchronize {0} rules from {1} to {2}, then reset and disable {1}? This deletes all {1} firewall configuration and cannot be undone.',
         ruleSyncPartial: 'Synchronization completed: {0} succeeded, {1} already existed, and {2} failed.',
         ruleSyncSuccess: 'Synchronization completed: {0} succeeded, {1} already existed, and {2} were removed.',
         ruleSyncStatus: {
@@ -4197,6 +4185,13 @@ const message = {
         partiallyInitialized: 'Partially initialized',
         dockerGuardHelper:
             'Set access restrictions for ports published from Docker containers to the host. Unprotected ports retain Docker default access behavior.',
+        dockerTrafficPathMixed: 'The selected ports use different access paths. Configure them separately.',
+        dockerTrafficPathUnknown:
+            'The access path for this port could not be determined. Check the Docker network configuration and try again.',
+        dockerTrafficPathPending: 'Access path pending',
+        dockerInputPolicyNotEffective:
+            'The host receives this port directly, so the existing container port protection rule does not apply. Configure it in the host firewall instead.',
+        dockerInputUseHostFirewall: 'Configure access for this port in the host firewall.',
         dockerInputNotProtected:
             'Host INPUT rules do not directly protect this Docker published port. Click to open Container Port Guard.',
         notInitialized: 'Not initialized',
@@ -4228,9 +4223,7 @@ const message = {
             'The selected rules have different configurations. Configure them again to overwrite all selected rules; an empty description clears all descriptions.',
         effective: 'Effective',
         forwardUnsynced: 'Unsynced',
-        notEnabled: 'Not enabled',
         notEffective: 'Not effective',
-        dockerGuardStatusEffective: '{0} container port protection is working normally',
         dockerGuardStatusReason: {
             command_missing:
                 'The {0} firewall component is unavailable, so the corresponding container port protection cannot be enabled. Check the system firewall environment',
@@ -4256,8 +4249,6 @@ const message = {
         importSuccess: 'Successfully imported {0} rules',
         importPartialSuccess: 'Import completed: {0} succeeded, {1} failed',
         basicStatus: 'The current firewall is unbound. Bind it first.',
-        baseIptables: 'iptables Service',
-        forwardIptables: 'iptables Port Forwarding Service',
         initMsg: 'About to initialize {0}, continue?',
         initDirectBackendConflictMsg:
             '{1} is still bound. If {0} is initialized, both firewall rule sets will be active and may unexpectedly block access. Continue?',

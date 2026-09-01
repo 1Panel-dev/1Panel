@@ -403,6 +403,7 @@ export namespace Firewall {
         sources: string[];
         effective: boolean;
         description?: string;
+        trafficPath: 'forward' | 'input' | 'unknown';
     }
     export interface DockerGuardPortGroup {
         key: string;
