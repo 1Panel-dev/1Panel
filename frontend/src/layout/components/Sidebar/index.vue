@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { RouteRecordRaw, useRoute } from 'vue-router';
+import { RouteRecordRaw, useRoute, useRouter } from 'vue-router';
 import { loadingSvg } from '@/utils/svg';
 import Logo from './components/Logo.vue';
 import Collapse from './components/Collapse.vue';
@@ -42,8 +42,9 @@ import { hasPermissionMetaAccess, hasRouteRoleAccess } from '@/utils/rbac';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const route = useRoute();
+const router = useRouter();
 const menuStore = MenuStore();
-const { currentNode, isAdmin, isEE, isIntl, menuAccordion, permissions } = useGlobalStore();
+const { currentNode, isAdmin, menuAccordion, permissions } = useGlobalStore();
 const version = ref();
 
 const activeMenu = computed(() => {
@@ -53,8 +54,28 @@ const activeMenu = computed(() => {
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 
 let routerMenus = computed((): RouteRecordRaw[] => {
-    return menuStore.menuList.filter((route) => route.meta && !route.meta.hideInSidebar) as RouteRecordRaw[];
+    return buildRegisteredMenuList(menuStore.menuList as RouteRecordRaw[]).filter(
+        (route) => route.meta && !route.meta.hideInSidebar,
+    );
 });
+
+function buildRegisteredMenuList(source: RouteRecordRaw[]): RouteRecordRaw[] {
+    return source.reduce<RouteRecordRaw[]>((result, item) => {
+        if (!item.name || !router.hasRoute(item.name)) {
+            return result;
+        }
+
+        const menuItem = { ...item };
+        if (Array.isArray(item.children)) {
+            menuItem.children = buildRegisteredMenuList(item.children);
+            if (item.children.length > 0 && menuItem.children.length === 0) {
+                return result;
+            }
+        }
+        result.push(menuItem);
+        return result;
+    }, []);
+}
 
 const screenWidth = ref(0);
 const listeningWindow = () => {
@@ -192,17 +213,7 @@ function buildVisibleMenu(menu: RouteRecordRaw, showSet: Set<string>): RouteReco
         return menuItem;
     }
 
-    const visibleChildren = children
-        .map((item) => {
-            if (item.name === 'Upage' && (isIntl.value || (isEE.value && !isAdmin.value))) {
-                return null;
-            }
-            if (item.name === 'XApp' && isIntl.value) {
-                return null;
-            }
-            return buildVisibleMenu(item, showSet);
-        })
-        .filter(Boolean) as RouteRecordRaw[];
+    const visibleChildren = children.map((item) => buildVisibleMenu(item, showSet)).filter(Boolean) as RouteRecordRaw[];
 
     menuItem.children = visibleChildren;
     if (menuItem.children.length === 0) {

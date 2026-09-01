@@ -147,7 +147,7 @@ func repairAndSortHideMenu(settingMap map[string]string) {
 		return
 	}
 
-	menus, changed := menutree.EnsureXpackAppMenus(menus, nil)
+	menus, changed := menutree.ReconcileHideMenuIntegrity(menus, nil)
 	if changed {
 		repairedBytes, err := json.Marshal(menus)
 		if err != nil {
@@ -213,7 +213,7 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 		if len(menus) == 0 {
 			return fmt.Errorf("hide menu cannot be empty")
 		}
-		menus, _ = menutree.EnsureXpackAppMenus(menus, previousMenus)
+		menus, _ = menutree.ReconcileHideMenuIntegrity(menus, previousMenus)
 		for i := 0; i < len(menus); i++ {
 			if menus[i].Label == "Home-Menu" || menus[i].Label == "App-Menu" || menus[i].Label == "Setting-Menu" {
 				menus[i].IsShow = true

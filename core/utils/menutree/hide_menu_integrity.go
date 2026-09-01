@@ -32,34 +32,46 @@ func preserveMissingMenus(root, current *[]dto.ShowMenu, fallback []dto.ShowMenu
 	return changed
 }
 
-func EnsureXpackAppMenus(menus, fallback []dto.ShowMenu) ([]dto.ShowMenu, bool) {
+func ReconcileHideMenuIntegrity(menus, fallback []dto.ShowMenu) ([]dto.ShowMenu, bool) {
 	updated := cloneMenus(menus)
-	parentIndex := findXpackMenu(updated)
-	fallbackParentIndex := findXpackMenu(fallback)
-
 	changed := false
+	if preferredXApp := findSystemMenu(updated, defaultXAppMenu()); preferredXApp != nil {
+		changed = normalizeSystemFields(preferredXApp, defaultXAppMenu())
+	}
+
+	var removed bool
+	updated, removed = removeSystemMenus(updated, retiredUpageMenuIdentity())
+	sanitizedFallback := cloneMenus(fallback)
+	if preferredFallbackXApp := findSystemMenu(sanitizedFallback, defaultXAppMenu()); preferredFallbackXApp != nil {
+		normalizeSystemFields(preferredFallbackXApp, defaultXAppMenu())
+	}
+	sanitizedFallback, _ = removeSystemMenus(sanitizedFallback, retiredUpageMenuIdentity())
+	changed = changed || removed
+	if existingXApp := findSystemMenu(updated, defaultXAppMenu()); existingXApp != nil {
+		normalized := normalizeSystemFields(existingXApp, defaultXAppMenu())
+		deduplicated, deduplicatedChanged := deduplicateSystemMenu(updated, existingXApp, defaultXAppMenu())
+		return deduplicated, changed || normalized || deduplicatedChanged
+	}
+
+	parentIndex := findXpackMenu(updated)
 	if parentIndex < 0 {
 		parent := defaultXpackMenu()
+		fallbackParentIndex := findXpackMenu(sanitizedFallback)
 		if fallbackParentIndex >= 0 {
-			parent = cloneMenu(fallback[fallbackParentIndex])
+			parent = cloneMenu(sanitizedFallback[fallbackParentIndex])
 		}
 		updated = append(updated, parent)
 		parentIndex = len(updated) - 1
 		changed = true
 	}
 
-	required := []dto.ShowMenu{defaultXAppMenu(), defaultUpageMenu()}
-	for _, canonical := range required {
-		parentIndex = findXpackMenu(updated)
-		var childChanged bool
-		updated, childChanged = ensureSystemMenu(
-			updated,
-			parentIndex,
-			fallback,
-			canonical,
-		)
-		changed = changed || childChanged
-	}
+	updated, xAppChanged := ensureSystemMenu(
+		updated,
+		parentIndex,
+		sanitizedFallback,
+		defaultXAppMenu(),
+	)
+	changed = changed || xAppChanged
 
 	return updated, changed
 }
@@ -87,15 +99,11 @@ func defaultXAppMenu() dto.ShowMenu {
 	}
 }
 
-func defaultUpageMenu() dto.ShowMenu {
+func retiredUpageMenuIdentity() dto.ShowMenu {
 	return dto.ShowMenu{
-		ID:       "119",
-		Disabled: false,
-		Title:    "xpack.upage",
-		IsShow:   true,
-		Label:    "Upage",
-		Path:     "/xpack/upage",
-		Sort:     800,
+		ID:    "119",
+		Label: "Upage",
+		Path:  "/xpack/upage",
 	}
 }
 
@@ -229,6 +237,29 @@ func deduplicateSystemMenu(menus []dto.ShowMenu, selected *dto.ShowMenu, canonic
 		deduplicated = append(deduplicated, *menu)
 	}
 	return deduplicated, changed
+}
+
+func removeSystemMenus(menus []dto.ShowMenu, identity dto.ShowMenu) ([]dto.ShowMenu, bool) {
+	if menus == nil {
+		return nil, false
+	}
+	filtered := make([]dto.ShowMenu, 0, len(menus))
+	changed := false
+	for i := range menus {
+		menu := &menus[i]
+		children, childChanged := removeSystemMenus(menu.Children, identity)
+		if matchesSystemIdentity(*menu, identity) {
+			filtered = append(filtered, children...)
+			changed = true
+			continue
+		}
+		if childChanged {
+			menu.Children = children
+			changed = true
+		}
+		filtered = append(filtered, *menu)
+	}
+	return filtered, changed
 }
 
 func matchesSystemIdentity(menu, canonical dto.ShowMenu) bool {
