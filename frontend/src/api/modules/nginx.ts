@@ -6,8 +6,8 @@ export const getNginx = () => {
     return http.get<File.File>(`/openresty`);
 };
 
-export const getNginxConfigByScope = (req: Nginx.NginxScopeReq) => {
-    return http.post<Nginx.NginxParam[]>(`/openresty/scope`, req);
+export const getNginxConfigByScope = <T = Nginx.NginxParam[]>(req: Nginx.NginxScopeReq) => {
+    return http.post<T>(`/openresty/scope`, req);
 };
 
 export const updateNginxConfigByScope = (req: Nginx.NginxConfigReq) => {

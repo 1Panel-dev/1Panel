@@ -49,6 +49,11 @@
                 </el-col>
             </el-row>
             <el-row v-if="brotliAvailable" v-loading="loading" :gutter="20">
+                <el-col :span="24" v-if="brotliManagedExternally">
+                    <el-alert type="info" :closable="false" class="mb-2">
+                        {{ $t('nginx.brotliManagedExternallyHelper') }}
+                    </el-alert>
+                </el-col>
                 <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
                     <el-form-item label="brotli" prop="brotli">
                         <el-select v-model="brotliForm.brotli">
@@ -113,6 +118,7 @@ let loading = ref(false);
 // live in a panel-managed file rather than nginx.conf, because they have to
 // disappear together with the module.
 const brotliAvailable = ref(false);
+const brotliManagedExternally = ref(false);
 const brotliForm = ref({
     brotli: 'on',
     brotli_comp_level: 5,
@@ -184,8 +190,9 @@ const getBrotliParams = async () => {
     if (!brotliAvailable.value) {
         return;
     }
-    const res = await getNginxConfigByScope({ scope: 'brotli' });
-    for (const param of res.data) {
+    const res = await getNginxConfigByScope<Nginx.NginxBrotliRes>({ scope: 'brotli' });
+    brotliManagedExternally.value = !!res.data?.managedExternally;
+    for (const param of res.data?.params ?? []) {
         if (param.params.length === 0) {
             continue;
         }

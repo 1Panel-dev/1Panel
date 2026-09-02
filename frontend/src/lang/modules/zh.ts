@@ -3695,6 +3695,7 @@ const message = {
         gzipHelper: '是否开启压缩传输',
         brotliHelper: '开启 brotli 压缩，通常比 gzip 体积更小',
         brotliCompLevelHelper: 'brotli 压缩率，取值 0 到 11',
+        brotliManagedExternallyHelper: 'brotli 已在 nginx.conf 中手动配置，面板仅显示当前生效值，不会覆盖。',
         connections: '活动连接(Active connections)',
         accepts: '总连接次数(accepts)',
         handled: '总握手次数(handled)',

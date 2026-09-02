@@ -3873,6 +3873,7 @@ const message = {
         gzipHelper: 'فعال‌سازی فشرده‌سازی برای انتقال',
         brotliHelper: 'فعال‌سازی فشرده‌سازی brotli، معمولاً کوچک‌تر از gzip',
         brotliCompLevelHelper: 'نرخ فشرده‌سازی brotli، از 0 تا 11',
+        brotliManagedExternallyHelper: 'brotli به‌صورت دستی در nginx.conf پیکربندی شده است؛ پنل فقط مقادیر در حال اجرا را نشان می‌دهد و آن‌ها را بازنویسی نمی‌کند.',
         connections: 'اتصال‌های فعال',
         accepts: 'پذیرش‌ها',
         handled: 'مدیریت شده',

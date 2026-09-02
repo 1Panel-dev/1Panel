@@ -3953,6 +3953,7 @@ const message = {
         gzipHelper: 'Habilitar compresión para transmisión',
         brotliHelper: 'Habilitar compresión brotli, normalmente menor que gzip',
         brotliCompLevelHelper: 'Tasa de compresión brotli, de 0 a 11',
+        brotliManagedExternallyHelper: 'Brotli está configurado manualmente en nginx.conf; el panel muestra los valores en vigor y no los sobrescribe.',
         connections: 'Conexiones activas',
         accepts: 'Aceptadas',
         handled: 'Gestionadas',

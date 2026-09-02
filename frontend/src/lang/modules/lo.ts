@@ -3800,6 +3800,7 @@ const message = {
         gzipHelper: 'ເປີດໃຊ້ການບີບອັດໃນການຮັບສົ່ງຂໍ້ມູນ',
         brotliHelper: 'ເປີດໃຊ້ການບີບອັດ brotli, ປົກກະຕິນ້ອຍກວ່າ gzip',
         brotliCompLevelHelper: 'ອັດຕາການບີບອັດ brotli, 0 ຫາ 11',
+        brotliManagedExternallyHelper: 'brotli ຖືກຕັ້ງຄ່າດ້ວຍມືໃນ nginx.conf; ແຜງຄວບຄຸມຈະສະແດງຄ່າທີ່ກຳລັງໃຊ້ຢູ່ ແລະ ຈະບໍ່ຂຽບທັບ.',
         connections: 'ການເຊື່ອມຕໍ່ທີ່ກຳລັງເຮັດວຽກ',
         accepts: 'ຍອມຮັບແລ້ວ',
         handled: 'ຈັດການແລ້ວ',

@@ -32,7 +32,7 @@ type NginxService struct {
 
 type INginxService interface {
 	GetNginxConfig() (*response.NginxFile, error)
-	GetConfigByScope(req request.NginxScopeReq) ([]response.NginxParam, error)
+	GetConfigByScope(req request.NginxScopeReq) (interface{}, error)
 	UpdateConfigByScope(req request.NginxConfigUpdate) error
 	GetStatus() (response.NginxStatus, error)
 	UpdateConfigFile(req request.NginxConfigFileUpdate) error
@@ -62,7 +62,7 @@ func (n NginxService) GetNginxConfig() (*response.NginxFile, error) {
 	return &response.NginxFile{Content: string(byteContent)}, nil
 }
 
-func (n NginxService) GetConfigByScope(req request.NginxScopeReq) ([]response.NginxParam, error) {
+func (n NginxService) GetConfigByScope(req request.NginxScopeReq) (interface{}, error) {
 	if req.Scope == dto.Brotli {
 		return getNginxBrotliParams()
 	}
