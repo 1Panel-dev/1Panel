@@ -582,13 +582,13 @@ func disconnectOriginalContainerNetworks(ctx context.Context, cli containerSwitc
 	endpoints := make(map[string]*network.EndpointSettings, len(extras)+1)
 	if primary != nil {
 		for name, endpoint := range primary.EndpointsConfig {
-			if name != "bridge" && endpoint != nil && endpoint.IPAMConfig != nil {
+			if name != "bridge" && endpoint != nil {
 				endpoints[name] = endpoint
 			}
 		}
 	}
 	for name, endpoint := range extras {
-		if name != "bridge" && endpoint != nil && endpoint.IPAMConfig != nil {
+		if name != "bridge" && endpoint != nil {
 			endpoints[name] = endpoint
 		}
 	}
