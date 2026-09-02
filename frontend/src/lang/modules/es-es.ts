@@ -4200,6 +4200,8 @@ const message = {
             stale: 'El estado de la regla está desactualizado. Actualiza e inténtalo de nuevo.',
             lockoutRisk: 'Este cambio puede bloquear el acceso de administración.',
             protectedRule: 'Esta regla protegida del firewall no se puede modificar.',
+            dockerAcceptReadOnly:
+                'Esta regla ACCEPT es de solo lectura y se conservará al sincronizar las demás reglas. Para eliminarla, bórrela manualmente en el host.',
             cannotReconcile: 'No se puede sincronizar la regla de destino: {0}',
         },
         ruleSyncPartial: 'Sincronización completada: {0} correctas, {1} ya existían y {2} fallaron.',
@@ -4219,10 +4221,10 @@ const message = {
         cleanupDockerBackendHelper:
             'Restablece las reglas de ejecución de protección de puertos Docker de 1Panel en {0}: elimina todas las reglas y cadenas relacionadas y conserva los datos de la base de datos',
         cleanupBeforeBackendSwitch:
-            'El backend actual {0} todavía contiene reglas de ejecución de 1Panel. Restablézcalo antes de cambiar a {1}.',
+            'El backend actual {0} todavía contiene reglas de ejecución de 1Panel. Restablézcalo antes de cambiar a {1}. El restablecimiento solo elimina las reglas de ejecución; las políticas de la base de datos se conservan y pueden inicializarse o sincronizarse después del cambio.',
         cleanupAction: 'Restablecer',
         backendSwitchNotice:
-            'Restablece el backend actual antes de cambiar el firewall del sistema, el reenvío de puertos o la protección Docker. Las políticas de la base de datos se conservan y pueden inicializarse o sincronizarse después.',
+            'Se recomienda utilizar un único método de gestión de firewall. Ejecutar varios firewalls al mismo tiempo puede causar conflictos de reglas, estados inconsistentes o problemas de acceso a los puertos de los contenedores.',
         switchBackendHelper: '¿Cambiar a {0}?',
         switchDockerBackendHelper: '¿Cambiar a {0}? Esto actualizará la configuración y reiniciará Docker.',
         uninstalledStatus: 'No instalado',

@@ -170,6 +170,8 @@ type DockerPortGuardEndpoint struct {
 	Application      string   `json:"application,omitempty"`
 	PolicyUUID       string   `json:"policyUUID,omitempty"`
 	Mode             string   `json:"mode,omitempty"`
+	NativeAction     string   `json:"nativeAction,omitempty"`
+	ReadOnly         bool     `json:"readOnly,omitempty"`
 	Sources          []string `json:"sources"`
 	Effective        bool     `json:"effective"`
 	Description      string   `json:"description,omitempty"`

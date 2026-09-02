@@ -400,6 +400,8 @@ export namespace Firewall {
         application?: string;
         policyUUID?: string;
         mode?: 'deny_sources' | 'allow_sources' | 'deny_all';
+        nativeAction?: string;
+        readOnly?: boolean;
         sources: string[];
         effective: boolean;
         description?: string;

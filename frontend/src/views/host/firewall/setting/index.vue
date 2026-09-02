@@ -3,7 +3,7 @@
         <FireRouter />
         <LayoutContent :title="$t('commons.button.set')">
             <template #prompt>
-                <el-alert type="warning" show-icon :closable="false" :title="$t('firewall.backendSwitchNotice')" />
+                <el-alert type="info" show-icon :closable="false" :title="$t('firewall.backendSwitchNotice')" />
             </template>
             <template #main>
                 <el-form :label-position="isMobile ? 'top' : 'left'" label-width="150px">

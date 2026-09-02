@@ -4153,6 +4153,8 @@ const message = {
             stale: 'The firewall rule state is outdated. Refresh and try again.',
             lockoutRisk: 'This firewall change may block management access.',
             protectedRule: 'This protected firewall rule cannot be modified.',
+            dockerAcceptReadOnly:
+                'This ACCEPT rule is read-only and will be preserved while other rules are synchronized. To remove it, delete it manually on the host.',
             cannotReconcile: 'The target rule cannot be reconciled: {0}',
         },
         ruleSyncPartial: 'Synchronization completed: {0} succeeded, {1} already existed, and {2} failed.',
@@ -4172,10 +4174,10 @@ const message = {
         cleanupDockerBackendHelper:
             'Reset the 1Panel Docker port protection runtime rules in {0}: delete all related rules and chains while retaining database data',
         cleanupBeforeBackendSwitch:
-            'The current {0} backend still contains 1Panel runtime rules. Reset it before switching to {1}.',
+            'The current {0} backend still contains 1Panel runtime rules. Reset it before switching to {1}. Resetting only removes runtime rules; saved database policies are retained and can be initialized or synchronized after switching.',
         cleanupAction: 'Reset',
         backendSwitchNotice:
-            'Reset the current backend before switching the system firewall, port forwarding, or Docker protection. Saved database policies are retained and can be initialized or synchronized after switching.',
+            'Use only one firewall management method at a time. Running multiple firewalls simultaneously may cause rule conflicts, inconsistent status, or container port access failures.',
         switchBackendHelper: 'Switch to {0}?',
         switchDockerBackendHelper: 'Switch to {0}? This will update the Docker configuration and restart Docker.',
         uninstalledStatus: 'Not installed',

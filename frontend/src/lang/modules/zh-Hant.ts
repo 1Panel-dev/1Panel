@@ -3880,6 +3880,8 @@ const message = {
             stale: '防火牆規則狀態已過期，請重新整理後再試。',
             lockoutRisk: '此次防火牆變更可能會阻斷管理存取。',
             protectedRule: '此防火牆規則受保護，無法修改。',
+            dockerAcceptReadOnly:
+                '此 ACCEPT 規則為唯讀、不可同步；同步其他規則時將保留此規則。如需移除，請在主機上手動刪除。',
             cannotReconcile: '無法同步目標規則：{0}',
         },
         ruleSyncPartial: '同步完成：成功 {0} 條，已存在 {1} 條，失敗 {2} 條。',
@@ -3897,10 +3899,11 @@ const message = {
             '重設 {0} 中的 1Panel 連接埠轉送執行時規則：刪除全部相關規則及規則鏈，僅保留資料庫資料',
         cleanupDockerBackendHelper:
             '重設 {0} 中的 1Panel Docker 連接埠防護執行時規則：刪除全部相關規則及規則鏈，僅保留資料庫資料',
-        cleanupBeforeBackendSwitch: '目前後端 {0} 仍存在 1Panel 執行時規則，請先重設該後端，再切換到 {1}。',
+        cleanupBeforeBackendSwitch:
+            '目前後端 {0} 仍存在 1Panel 執行時規則，請先重設該後端，再切換到 {1}。重設僅清理執行時規則，資料庫策略會保留，切換後可重新初始化或同步。',
         cleanupAction: '重設',
         backendSwitchNotice:
-            '主機防火牆、連接埠轉送和 Docker 防護切換前都必須先重設目前後端；資料庫策略會保留，切換後可重新初始化或同步。',
+            '建議僅啟用一種防火牆管理方式。同時執行多個防火牆可能導致規則衝突、狀態不一致或容器連接埠存取異常。',
         switchBackendHelper: '確認切換為 {0}？',
         switchDockerBackendHelper: '確認切換為 {0}？此操作會更新 Docker 設定並重新啟動 Docker 服務。',
         uninstalledStatus: '未安裝',

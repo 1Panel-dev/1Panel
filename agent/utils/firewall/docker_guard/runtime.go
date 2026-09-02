@@ -2,9 +2,29 @@ package docker_guard
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
 )
+
+type NativeRule struct {
+	Family string   `json:"family"`
+	Order  int64    `json:"order"`
+	Tokens []string `json:"tokens"`
+}
+
+type ReadOnlyPolicy struct {
+	Policy      Policy
+	Action      string
+	Sequence    int64
+	NativeRules []NativeRule
+}
+
+type PolicyInventory struct {
+	Policies          []Policy
+	ReadOnly          []ReadOnlyPolicy
+	ManagedRuleOrders map[string][]int64
+}
 
 type Runtime interface {
 	Initialize([]Policy) error
@@ -14,7 +34,7 @@ type Runtime interface {
 	Cleanup() error
 	Initialized(string) (bool, error)
 	Status(string) FamilyStatus
-	ListPolicies() ([]Policy, error)
+	ListPolicies() (PolicyInventory, error)
 }
 
 func NewRuntime(provider string) Runtime {
@@ -24,15 +44,58 @@ func NewRuntime(provider string) Runtime {
 	return NewManager()
 }
 
-func Verify(runtime Runtime, desired []Policy) error {
-	actual, err := runtime.ListPolicies()
+func Verify(runtime Runtime, desired []Policy, preserved []ReadOnlyPolicy) error {
+	inventory, err := runtime.ListPolicies()
 	if err != nil {
 		return fmt.Errorf("verify synchronized Docker firewall policies: %w", err)
 	}
-	if !PolicyStatesEqual(actual, desired) {
+	if !PolicyStatesEqual(inventory.Policies, desired) {
 		return fmt.Errorf("verify synchronized Docker firewall policies: target policies do not match the database")
 	}
+	if !readOnlyStatesEqual(inventory.ReadOnly, preserved) {
+		return fmt.Errorf("verify synchronized Docker firewall policies: read-only runtime rules changed")
+	}
 	return nil
+}
+
+func readOnlyStatesEqual(left, right []ReadOnlyPolicy) bool {
+	if len(left) != len(right) {
+		return false
+	}
+	leftRules := flattenNativeRules(left)
+	rightRules := flattenNativeRules(right)
+	if len(leftRules) != len(rightRules) {
+		return false
+	}
+	for index := range leftRules {
+		if leftRules[index].Family != rightRules[index].Family || !slices.Equal(leftRules[index].Tokens, rightRules[index].Tokens) {
+			return false
+		}
+	}
+	return true
+}
+
+func flattenNativeRules(policies []ReadOnlyPolicy) []NativeRule {
+	rules := make([]NativeRule, 0)
+	for _, policy := range policies {
+		rules = append(rules, policy.NativeRules...)
+	}
+	slices.SortStableFunc(rules, func(left, right NativeRule) int {
+		if left.Family < right.Family {
+			return -1
+		}
+		if left.Family > right.Family {
+			return 1
+		}
+		if left.Order < right.Order {
+			return -1
+		}
+		if left.Order > right.Order {
+			return 1
+		}
+		return 0
+	})
+	return rules
 }
 
 func ReconcileTarget(backend string, policies []Policy, runtime Runtime) error {

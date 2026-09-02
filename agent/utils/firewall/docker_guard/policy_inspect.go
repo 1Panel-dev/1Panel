@@ -11,35 +11,57 @@ import (
 )
 
 type observedPolicy struct {
-	policy        Policy
-	dropAll       bool
-	droppedSource []string
-	allowedSource []string
+	policy         Policy
+	sequence       int64
+	nativeRules    []NativeRule
+	managedOrders  []int64
+	dropAll        bool
+	droppedSource  []string
+	allowedSource  []string
+	acceptedSource []string
+	acceptAll      bool
 }
 
-func parseDockerGuardPolicies(output, family string) ([]Policy, error) {
+func parseDockerGuardPolicies(output, family string) (PolicyInventory, error) {
 	groups := make(map[string]*observedPolicy)
 	order := make([]string, 0)
+	sequence := int64(0)
 	for _, line := range strings.Split(output, "\n") {
-		if !strings.Contains(line, "1panel-docker:") {
+		line = strings.TrimSpace(line)
+		if line == "" {
 			continue
 		}
-		tokens, err := shellwords.Parse(strings.TrimSpace(line))
+		tokens, err := shellwords.Parse(line)
 		if err != nil {
-			return nil, fmt.Errorf("parse Docker guard rule: %w", err)
+			return PolicyInventory{}, fmt.Errorf("parse Docker guard rule: %w", err)
 		}
+		managed := strings.Contains(line, "1panel-docker:")
+		if !managed && !hasAcceptAction(tokens) {
+			continue
+		}
+		sequence++
 		fragment, source, action, err := parseDockerGuardRuleTokens(tokens, family)
 		if err != nil {
-			return nil, err
+			return PolicyInventory{}, err
 		}
-		key := strings.Join([]string{fragment.UUID, fragment.Family, fragment.HostIP, strconv.Itoa(int(fragment.HostPort)), fragment.Protocol}, "|")
+		identity := fragment.UUID
+		if action == "accept" {
+			identity = action
+		}
+		key := strings.Join([]string{identity, fragment.Family, fragment.HostIP, strconv.Itoa(int(fragment.HostPort)), fragment.Protocol}, "|")
 		group, exists := groups[key]
 		if !exists {
-			group = &observedPolicy{policy: fragment}
+			group = &observedPolicy{policy: fragment, sequence: sequence}
 			groups[key] = group
 			order = append(order, key)
 		}
 		switch {
+		case action == "accept" && source != "":
+			group.acceptedSource = append(group.acceptedSource, source)
+			group.nativeRules = append(group.nativeRules, NativeRule{Family: family, Order: sequence, Tokens: nativeRuleTokens(tokens)})
+		case action == "accept":
+			group.acceptAll = true
+			group.nativeRules = append(group.nativeRules, NativeRule{Family: family, Order: sequence, Tokens: nativeRuleTokens(tokens)})
 		case action == "return" && source != "":
 			group.allowedSource = append(group.allowedSource, source)
 		case action == "drop" && source != "":
@@ -47,12 +69,22 @@ func parseDockerGuardPolicies(output, family string) ([]Policy, error) {
 		case action == "drop":
 			group.dropAll = true
 		default:
-			return nil, fmt.Errorf("unsupported Docker guard rule action %q", action)
+			return PolicyInventory{}, fmt.Errorf("unsupported Docker guard rule action %q", action)
+		}
+		if action != "accept" {
+			group.managedOrders = append(group.managedOrders, sequence)
 		}
 	}
-	policies := make([]Policy, 0, len(order))
+	inventory := PolicyInventory{Policies: make([]Policy, 0, len(order)), ManagedRuleOrders: make(map[string][]int64)}
 	for _, key := range order {
 		group := groups[key]
+		if group.acceptAll || len(group.acceptedSource) > 0 {
+			group.policy.Sources = uniqueSortedStrings(group.acceptedSource)
+			inventory.ReadOnly = append(inventory.ReadOnly, ReadOnlyPolicy{
+				Policy: group.policy, Action: "accept", Sequence: group.sequence, NativeRules: group.nativeRules,
+			})
+			continue
+		}
 		switch {
 		case len(group.allowedSource) > 0:
 			group.policy.Mode = ModeAllow
@@ -63,11 +95,36 @@ func parseDockerGuardPolicies(output, family string) ([]Policy, error) {
 		case group.dropAll:
 			group.policy.Mode = ModeAll
 		default:
-			return nil, fmt.Errorf("Docker guard policy %s has no effective rules", group.policy.UUID)
+			return PolicyInventory{}, fmt.Errorf("Docker guard policy %s has no effective rules", group.policy.UUID)
 		}
-		policies = append(policies, group.policy)
+		inventory.Policies = append(inventory.Policies, group.policy)
+		inventory.ManagedRuleOrders[managedOrderKey(group.policy.Family, group.policy.UUID)] = append([]int64(nil), group.managedOrders...)
 	}
-	return policies, nil
+	return inventory, nil
+}
+
+func nativeRuleTokens(tokens []string) []string {
+	result := make([]string, 0, len(tokens))
+	for index, token := range tokens {
+		if token == "#" {
+			tokens = tokens[:index]
+			break
+		}
+	}
+	if len(tokens) >= 2 && tokens[len(tokens)-2] == "handle" {
+		tokens = tokens[:len(tokens)-2]
+	}
+	for index := 0; index < len(tokens); index++ {
+		result = append(result, tokens[index])
+		if tokens[index] == "counter" && index+4 < len(tokens) && tokens[index+1] == "packets" && tokens[index+3] == "bytes" {
+			index += 4
+		}
+	}
+	return result
+}
+
+func managedOrderKey(family, policyUUID string) string {
+	return family + "\x00" + policyUUID
 }
 
 func parseDockerGuardRuleTokens(tokens []string, family string) (Policy, string, string, error) {
@@ -79,7 +136,11 @@ func parseDockerGuardRuleTokens(tokens []string, family string) (Policy, string,
 			policy.Protocol = nextPolicyToken(tokens, index)
 		case "--ctorigdst":
 			policy.HostIP = normalizeObservedHost(nextPolicyToken(tokens, index))
+		case "-d":
+			policy.HostIP = normalizeObservedHost(nextPolicyToken(tokens, index))
 		case "--ctorigdstport":
+			policy.HostPort = parsePolicyPort(nextPolicyToken(tokens, index))
+		case "--dport":
 			policy.HostPort = parsePolicyPort(nextPolicyToken(tokens, index))
 		case "-s":
 			source = nextPolicyToken(tokens, index)
@@ -107,17 +168,50 @@ func parseDockerGuardRuleTokens(tokens []string, family string) (Policy, string,
 				}
 			}
 		case "ip", "ip6":
-			if nextPolicyToken(tokens, index) == "saddr" {
+			switch nextPolicyToken(tokens, index) {
+			case "saddr":
 				source = nextPolicyToken(tokens, index+1)
+			case "daddr":
+				policy.HostIP = normalizeObservedHost(nextPolicyToken(tokens, index+1))
 			}
-		case "drop", "return":
+		case "tcp", "udp":
+			if nextPolicyToken(tokens, index) == "dport" {
+				policy.Protocol = tokens[index]
+				policy.HostPort = parsePolicyPort(nextPolicyToken(tokens, index+1))
+			}
+		case "accept", "drop", "return":
+			if isCommentValue(tokens, index) {
+				continue
+			}
 			action = tokens[index]
 		}
 	}
-	if policy.UUID == "" || policy.Protocol == "" || policy.HostPort == 0 || action == "" {
+	if action == "" || (action != "accept" && (policy.UUID == "" || policy.Protocol == "" || policy.HostPort == 0)) {
 		return Policy{}, "", "", fmt.Errorf("incomplete 1Panel Docker guard rule")
 	}
+	if action == "accept" && policy.Protocol == "" {
+		policy.Protocol = "all"
+	}
 	return policy, source, action, nil
+}
+
+func hasAcceptAction(tokens []string) bool {
+	for index, token := range tokens {
+		if token == "-j" && strings.EqualFold(nextPolicyToken(tokens, index), "accept") {
+			return true
+		}
+		if strings.EqualFold(token, "accept") && !isCommentValue(tokens, index) {
+			return true
+		}
+	}
+	return false
+}
+
+func isCommentValue(tokens []string, index int) bool {
+	if index == 0 {
+		return false
+	}
+	return tokens[index-1] == "comment" || tokens[index-1] == "--comment"
 }
 
 func normalizeObservedHost(value string) string {

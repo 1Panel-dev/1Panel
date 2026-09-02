@@ -778,7 +778,7 @@ func databaseSyncStatesEqual[T any](left, right []T, key func(T) string) bool {
 func (p databaseSyncPlan) preview() dto.FirewallRuleSyncPreview {
 	result := dto.FirewallRuleSyncPreview{
 		Subsystem: p.subsystem, TargetProvider: p.target,
-		Items: append([]dto.FirewallRuleSyncItem(nil), p.items...),
+		Items: append(make([]dto.FirewallRuleSyncItem, 0, len(p.items)), p.items...),
 	}
 	for _, item := range p.items {
 		switch item.Status {
@@ -855,6 +855,22 @@ func (p databaseSyncPlan) failedResult(cause error) dto.FirewallRuleSyncResult {
 
 func (p databaseSyncPlan) reconcile(run func() error) (dto.FirewallRuleSyncResult, error) {
 	if p.preview().Blocked > 0 {
+		return p.validationResult(), nil
+	}
+	if err := run(); err != nil {
+		return p.failedResult(err), err
+	}
+	return p.completedResult(), nil
+}
+
+func (p databaseSyncPlan) reconcileReadOnlyPartial(run func() error) (dto.FirewallRuleSyncResult, error) {
+	preview := p.preview()
+	for _, item := range p.items {
+		if item.Status == firewallRuleSyncBlocked && item.ReasonCode != firewallsync.ReasonReadOnlyRule {
+			return p.validationResult(), nil
+		}
+	}
+	if preview.Ready == 0 && preview.Removed == 0 {
 		return p.validationResult(), nil
 	}
 	if err := run(); err != nil {
@@ -988,11 +1004,11 @@ func (s *DockerPortGuardService) previewRuleSync(
 	if err != nil {
 		return dto.FirewallRuleSyncPreview{}, err
 	}
-	targetPolicies, err := runtime.ListPolicies()
+	targetInventory, err := runtime.ListPolicies()
 	if err != nil {
 		return dto.FirewallRuleSyncPreview{}, err
 	}
-	return buildDockerDatabaseSyncPlan(filter.Provider(target), policies, targetPolicies).preview(), nil
+	return buildDockerDatabaseSyncPlan(filter.Provider(target), policies, targetInventory).preview(), nil
 }
 
 func (s *DockerPortGuardService) syncRules(
@@ -1007,16 +1023,19 @@ func (s *DockerPortGuardService) syncRules(
 		return dto.FirewallRuleSyncResult{}, err
 	}
 	runtimePolicies := dockerGuardPoliciesFromModels(policies)
-	targetPolicies, err := targetRuntime.ListPolicies()
+	targetInventory, err := targetRuntime.ListPolicies()
 	if err != nil {
 		return dto.FirewallRuleSyncResult{}, err
 	}
-	plan := buildDockerDatabaseSyncPlan(filter.Provider(target), policies, targetPolicies)
-	result, reconcileErr := plan.reconcile(func() error {
+	plan := buildDockerDatabaseSyncPlan(filter.Provider(target), policies, targetInventory)
+	result, reconcileErr := plan.reconcileReadOnlyPartial(func() error {
+		if err := s.replaceRuntimeReadOnlyPolicies(ctx, targetInventory.ReadOnly); err != nil {
+			return err
+		}
 		if err := docker_guard.ReconcileTarget(target, runtimePolicies, targetRuntime); err != nil {
 			return err
 		}
-		if err := docker_guard.Verify(targetRuntime, runtimePolicies); err != nil {
+		if err := docker_guard.Verify(targetRuntime, runtimePolicies, targetInventory.ReadOnly); err != nil {
 			return err
 		}
 		if len(policies) == 0 {
@@ -1029,10 +1048,7 @@ func (s *DockerPortGuardService) syncRules(
 	})
 	recordDockerPortGuardReconcileError(reconcileErr)
 	if reconcileErr != nil {
-		if len(policies) == 0 {
-			return result, reconcileErr
-		}
-		return result, nil
+		return result, reconcileErr
 	}
 	return result, nil
 }
@@ -1040,7 +1056,7 @@ func (s *DockerPortGuardService) syncRules(
 func buildDockerDatabaseSyncPlan(
 	target filter.Provider,
 	policies []model.DockerPortGuardPolicy,
-	actual []docker_guard.Policy,
+	inventory docker_guard.PolicyInventory,
 ) databaseSyncPlan {
 	desired := make([]databaseSyncDesired[docker_guard.Policy], 0, len(policies))
 	for _, policy := range policies {
@@ -1049,12 +1065,22 @@ func buildDockerDatabaseSyncPlan(
 			item:  dto.FirewallRuleSyncItem{SourceUUID: policy.UUID, DockerRule: dockerGuardRuleSyncDTO(policy)},
 		})
 	}
-	return buildDatabaseSyncPlan(
-		"docker", target, desired, actual, docker_guard.PolicySyncKey,
+	plan := buildDatabaseSyncPlan(
+		"docker", target, desired, inventory.Policies, docker_guard.PolicySyncKey,
 		func(policy docker_guard.Policy) dto.FirewallRuleSyncItem {
 			return dto.FirewallRuleSyncItem{SourceUUID: policy.UUID, DockerRule: dockerGuardRuntimeRuleSyncDTO(policy)}
 		},
 	)
+	for _, policy := range inventory.ReadOnly {
+		plan.items = append(plan.items, dto.FirewallRuleSyncItem{
+			SourceUUID: dockerGuardReadOnlyPolicyUUID(policy),
+			DockerRule: dockerGuardReadOnlyRuleSyncDTO(policy),
+			Status:     firewallsync.StatusBlocked,
+			ReasonCode: firewallsync.ReasonReadOnlyRule,
+			Reason:     firewallsync.ReasonMessage(firewallsync.ReasonReadOnlyRule),
+		})
+	}
+	return plan
 }
 
 type firewallScopeReconciler struct {

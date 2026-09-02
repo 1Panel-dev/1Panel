@@ -54,6 +54,30 @@ func (a *Adapter) PrepareRule(rule filter.FirewallRule) (filter.FirewallRule, er
 	return normalized, nil
 }
 
+func (a *Adapter) AppendUnverified(ctx context.Context, rule filter.FirewallRule, comment string) error {
+	normalized, err := a.PrepareRule(rule)
+	if err != nil {
+		return err
+	}
+	if normalized.Action != filter.ActionAccept || normalized.DestinationPort == "" ||
+		normalized.SourceAddress != "" || normalized.SourcePort != "" ||
+		normalized.DestinationAddress != "" || normalized.Interface != "" {
+		return fmt.Errorf("%w: unverified UFW appends only support accepted ports", filter.ErrInvalidRule)
+	}
+	if a.writer == nil {
+		return errors.New("ufw writer is required")
+	}
+	comment = strings.TrimSpace(comment)
+	if comment == "" || strings.ContainsAny(comment, "\r\n\x00") {
+		return fmt.Errorf("%w: invalid UFW fallback comment", filter.ErrInvalidRule)
+	}
+	command := commentCommand(normalized, comment)
+	if err := validateCommand(command); err != nil {
+		return err
+	}
+	return a.writer.Run(ctx, command)
+}
+
 func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 	return filter.Capabilities{
 		Scopes: []filter.ScopePattern{{
@@ -89,7 +113,7 @@ func (a *Adapter) ObserveScopes(ctx context.Context, scopes []filter.Scope) ([]f
 	}
 	numbered, err := a.reader.Read(ctx, "status", "numbered")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: read UFW numbered status: %w", filter.ErrInventoryUnavailable, err)
 	}
 
 	notices := statusNotices(numbered)
