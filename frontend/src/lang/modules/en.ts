@@ -3167,6 +3167,8 @@ const message = {
         upgradeNow: 'Upgrade now',
         source: 'Download source',
         versionNotSame: 'Node version mismatch with the main node. Please upgrade in Node Management before retrying.',
+        currentNodeVersionNotSame:
+            'The current node version does not match the main node. Contact the administrator to upgrade the current node.',
         versionCompare:
             'Detected that node {0} is already at the latest upgradable version. Please check the primary node version and try again!',
         about: 'About',

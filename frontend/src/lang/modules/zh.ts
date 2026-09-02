@@ -2894,6 +2894,7 @@ const message = {
         upgradeNow: '立即更新',
         source: '下载源',
         versionNotSame: '节点版本与主节点不一致，暂不支持切换，请在节点管理中升级后重试！',
+        currentNodeVersionNotSame: '当前节点版本与主节点不一致，请联系管理员升级当前节点。',
         versionCompare: '检测到节点 {0} 版本已是当前可升级最新版本，请检查主节点版本后重试！',
 
         safe: '安全',

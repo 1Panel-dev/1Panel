@@ -2860,6 +2860,7 @@ const message = {
         upgradeNow: '立即更新',
         source: '下載源',
         versionNotSame: '節點版本與主節點不一致，請在節點管理中升級後重試。',
+        currentNodeVersionNotSame: '目前節點版本與主節點不一致，請聯絡管理員升級目前節點。',
         versionCompare: '偵測到節點 {0} 版本已是目前可升級最新版本，請檢查主節點版本後重試',
         safe: '安全',
         passkey: '通行金鑰',

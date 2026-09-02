@@ -3198,6 +3198,8 @@ const message = {
         source: 'Fonte para download',
         versionNotSame:
             'A versão do nó não corresponde à do nó principal. Atualize na Gestão de Nós antes de tentar novamente.',
+        currentNodeVersionNotSame:
+            'A versão do nó atual não corresponde à do nó principal. Entre em contato com o administrador para atualizar o nó atual.',
         versionCompare:
             'Detectado que o nó {0} já está na última versão atualizável. Por favor, verifique a versão do nó principal e tente novamente!',
         about: 'Sobre',
