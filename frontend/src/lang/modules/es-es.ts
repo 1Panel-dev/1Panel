@@ -3225,6 +3225,8 @@ const message = {
         source: 'Fuente de descarga',
         versionNotSame:
             'La versión del nodo no coincide con la del nodo principal. Actualiza en la gestión de nodos antes de reintentar.',
+        currentNodeVersionNotSame:
+            'La versión del nodo actual no coincide con la del nodo principal. Contacta con el administrador para actualizar el nodo actual.',
         versionCompare:
             'Se detectó que el nodo {0} ya está en la última versión actualizable. Verifica la versión del nodo principal e inténtalo de nuevo.',
         about: 'Acerca de',

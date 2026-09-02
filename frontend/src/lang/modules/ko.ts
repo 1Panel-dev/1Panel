@@ -3070,6 +3070,8 @@ const message = {
         upgradeNow: '지금 업그레이드',
         source: '다운로드 소스',
         versionNotSame: '노드 버전이 메인 노드와 일치하지 않습니다. 노드 관리에서 업그레이드한 후 다시 시도해 주세요.',
+        currentNodeVersionNotSame:
+            '현재 노드 버전이 메인 노드와 일치하지 않습니다. 관리자에게 문의하여 현재 노드를 업그레이드하세요.',
         versionCompare:
             '노드 {0}이(가) 이미 업그레이드 가능한 최신 버전입니다. 마스터 노드 버전을 확인 후 다시 시도하세요!',
         about: '정보',

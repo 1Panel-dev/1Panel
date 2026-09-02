@@ -21,6 +21,9 @@
                 </div>
             </div>
         </el-card>
+        <div v-if="currentNodeVersionMismatch" class="mt-3">
+            <el-alert type="warning" :closable="false" show-icon :title="$t('setting.currentNodeVersionNotSame')" />
+        </div>
         <div class="mt-3" v-if="showExpiresAt && expiresAlertVisible && productProExpires && productProExpires !== 0">
             <el-alert type="warning" @close="handleExpiresAlertClose">
                 <template #title>
@@ -52,6 +55,8 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { hasPermissionMetaAccess, hasRouteAccess } from '@/utils/rbac';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { getSettingBaseInfo } from '@/api/modules/setting';
+import { listNodes } from '@/utils/node';
 
 defineOptions({ name: 'RouterButton' });
 
@@ -67,7 +72,7 @@ const props = defineProps({
 });
 
 const router = useRouter();
-const { isEnterprise, isIntl, productProExpires } = useGlobalStore();
+const { currentNode, isEnterprise, isIntl, isXpackOrEE, productProExpires } = useGlobalStore();
 const buttonArray = computed(() => {
     return props.buttons.filter((button) => {
         if (!hasPermissionMetaAccess(button.permission)) {
@@ -82,6 +87,7 @@ const buttonArray = computed(() => {
 });
 
 const activeName = ref('');
+const currentNodeVersionMismatch = ref(false);
 const expiresInfo = ref(0);
 const expiresAlertVisible = ref(false);
 const expiresAlertKey = computed(() => (isEnterprise.value ? 'xpack.expiresEnterpriseAlert' : 'xpack.expiresProAlert'));
@@ -112,6 +118,33 @@ watch(
         loadExpiresAlert();
     },
 );
+
+watch([currentNode, isXpackOrEE], checkCurrentNodeVersion, { immediate: true });
+
+async function checkCurrentNodeVersion() {
+    const checkedNode = currentNode.value;
+    if (checkedNode === 'local' || !isXpackOrEE.value) {
+        currentNodeVersionMismatch.value = false;
+        return;
+    }
+
+    try {
+        const [settingRes, nodes] = await Promise.all([getSettingBaseInfo(), listNodes('all')]);
+        if (currentNode.value !== checkedNode) {
+            return;
+        }
+        const currentNodeInfo = nodes.find((item) => item.name === checkedNode);
+        currentNodeVersionMismatch.value = Boolean(
+            currentNodeInfo?.version &&
+            settingRes.data.systemVersion &&
+            currentNodeInfo.version !== settingRes.data.systemVersion,
+        );
+    } catch {
+        if (currentNode.value === checkedNode) {
+            currentNodeVersionMismatch.value = false;
+        }
+    }
+}
 
 function syncActiveName() {
     if (!buttonArray.value.length) {

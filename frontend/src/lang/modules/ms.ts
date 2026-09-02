@@ -3198,6 +3198,8 @@ const message = {
         source: 'Sumber muat turun',
         versionNotSame:
             'Versi nod tidak sepadan dengan nod utama. Sila naik taraf di Pengurusan Nod sebelum mencuba semula.',
+        currentNodeVersionNotSame:
+            'Versi nod semasa tidak sepadan dengan nod utama. Hubungi pentadbir untuk menaik taraf nod semasa.',
         versionCompare:
             'Nod {0} telah berada pada versi terkini yang boleh dinaik taraf. Sila periksa versi nod utama dan cuba lagi!',
         about: 'Mengenai',

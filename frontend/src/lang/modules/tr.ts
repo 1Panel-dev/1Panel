@@ -3207,6 +3207,8 @@ const message = {
         upgradeNow: 'Şimdi yükselt',
         source: 'İndirme kaynağı',
         versionNotSame: 'Düğüm sürümü ana düğümle uyuşmuyor. Lütfen Düğüm Yönetiminde yükseltin ve tekrar deneyin.',
+        currentNodeVersionNotSame:
+            'Geçerli düğüm sürümü ana düğümle uyuşmuyor. Geçerli düğümü yükseltmek için yöneticiyle iletişime geçin.',
         versionCompare:
             '{0} düğümünün zaten en son yükseltilebilir sürümde olduğu tespit edildi. Lütfen birincil düğüm sürümünü kontrol edin ve tekrar deneyin!',
         about: 'Hakkında',
