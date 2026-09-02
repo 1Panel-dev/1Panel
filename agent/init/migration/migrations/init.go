@@ -1793,3 +1793,21 @@ var SimplifyFirewallRulePolicy = &gormigrate.Migration{
 		})
 	},
 }
+
+var AddDockerPortGuardReadOnly = &gormigrate.Migration{
+	ID: "20260902-add-docker-port-guard-read-only",
+	Migrate: func(tx *gorm.DB) error {
+		if !tx.Migrator().HasTable(&model.DockerPortGuardPolicy{}) {
+			return nil
+		}
+		if err := tx.AutoMigrate(&model.DockerPortGuardPolicy{}); err != nil {
+			return err
+		}
+		if tx.Migrator().HasIndex(&model.DockerPortGuardPolicy{}, "idx_docker_port_guard_endpoint") {
+			if err := tx.Migrator().DropIndex(&model.DockerPortGuardPolicy{}, "idx_docker_port_guard_endpoint"); err != nil {
+				return err
+			}
+		}
+		return tx.Migrator().CreateIndex(&model.DockerPortGuardPolicy{}, "idx_docker_port_guard_endpoint")
+	},
+}

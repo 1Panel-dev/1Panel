@@ -111,14 +111,18 @@ func CheckCreate(
 	exact := make([]ObservedRule, 0)
 	for _, observed := range snapshot.Rules {
 		if observed.ParseStatus != ParseStatusSupported {
-			if observed.Rule.Scope.Provider == ProviderFirewalld && observed.Rule.NativeKind == NativeKindZoneService {
+			if hydrated, ok := hydrateOwnedPartialRule(observed, desired); ok {
+				observed = hydrated
+			} else {
+				if observed.Rule.Scope.Provider == ProviderFirewalld && observed.Rule.NativeKind == NativeKindZoneService {
+					continue
+				}
+				result.Decision = CheckDecisionBlocked
+				result.Classification = CheckClassificationUnsupported
+				result.Reason = "opaque_rule_in_target_scope"
+				result.Candidates = append(result.Candidates, observed)
 				continue
 			}
-			result.Decision = CheckDecisionBlocked
-			result.Classification = CheckClassificationUnsupported
-			result.Reason = "opaque_rule_in_target_scope"
-			result.Candidates = append(result.Candidates, observed)
-			continue
 		}
 		observedRule, err := NormalizeRule(observed.Rule)
 		if err != nil {
@@ -162,6 +166,47 @@ func CheckCreate(
 		result.AllowedActions = []CheckAction{CheckActionCreate}
 	}
 	return finishCheck(result)
+}
+
+func hydrateOwnedPartialRule(observed ObservedRule, desired []DesiredRule) (ObservedRule, bool) {
+	if observed.ParseStatus != ParseStatusPartial || strings.TrimSpace(observed.Marker) == "" ||
+		len(observed.UncertainFields) != 1 || observed.UncertainFields[0] != ObservedFieldProtocol {
+		return observed, false
+	}
+	var matched *DesiredRule
+	for index := range desired {
+		candidate := &desired[index]
+		if candidate.Origin != RuleOriginCreated && candidate.Origin != RuleOriginAdopted {
+			continue
+		}
+		if candidate.Rule.Scope.Normalize().Key() != observed.Rule.Scope.Normalize().Key() ||
+			!desiredMarkerMatchesObserved(*candidate, observed.Marker) ||
+			!ObservedRuleMatchesExpected(observed, candidate.Rule) {
+			continue
+		}
+		if matched != nil {
+			return observed, false
+		}
+		matched = candidate
+	}
+	if matched == nil {
+		return observed, false
+	}
+	orderIndex := observed.Rule.OrderIndex
+	observed.Rule = matched.Rule
+	observed.Rule.OrderIndex = orderIndex
+	observed.ParseStatus = ParseStatusSupported
+	observed.UncertainFields = nil
+	return observed, true
+}
+
+func desiredMarkerMatchesObserved(desired DesiredRule, observedMarker string) bool {
+	observedMarker = strings.TrimSpace(observedMarker)
+	if observedMarker == strings.TrimSpace(desired.Marker) {
+		return observedMarker != ""
+	}
+	return desired.Origin == RuleOriginAdopted && strings.TrimSpace(desired.UUID) != "" &&
+		observedMarker == "1panel-rule:"+strings.TrimSpace(desired.UUID)
 }
 
 func finishCheck(result RuleCheckResult) (RuleCheckResult, error) {

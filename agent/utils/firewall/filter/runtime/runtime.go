@@ -118,6 +118,14 @@ func (e *Engine) CheckRule(ctx context.Context, rule filter.FirewallRule) error 
 	return checker.CheckRule(ctx, rule)
 }
 
+func (e *Engine) AppendUnverified(ctx context.Context, rule filter.FirewallRule, comment string) error {
+	appender, ok := e.adapter.(filter.UnverifiedRuleAppender)
+	if !ok {
+		return fmt.Errorf("%w: %s does not support unverified rule appends", filter.ErrAdapterUnavailable, e.Provider())
+	}
+	return appender.AppendUnverified(ctx, rule, comment)
+}
+
 func (e *Engine) CompileDesired(
 	ctx context.Context,
 	policyUUID string,

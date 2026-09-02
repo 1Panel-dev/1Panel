@@ -141,7 +141,7 @@ func (s *DockerPortGuardService) LoadOverview(ctx context.Context) (dto.DockerPo
 	selectedBackend := selectedDockerFirewallBackend("")
 	base := s.runtimeStatus(s.guardRuntime(selectedBackend), selectedBackend)
 	base.Version = s.loadFirewallVersion(selectedBackend)
-	policies, err := s.policies.List(ctx)
+	policies, err := s.policies.ListManaged(ctx)
 	if err != nil {
 		return dto.DockerPortGuardList{}, err
 	}
@@ -424,7 +424,7 @@ func (s *DockerPortGuardService) loadRuleSyncCandidates(
 			filter.ErrProviderUnavailable, selected, target,
 		)
 	}
-	policies, err := s.policies.List(ctx)
+	policies, err := s.policies.ListManaged(ctx)
 	if err != nil {
 		return "", nil, nil, err
 	}
@@ -487,6 +487,57 @@ func dockerGuardRuntimeRuleSyncDTO(policy docker_guard.Policy) *dto.DockerPortGu
 	}
 }
 
+func dockerGuardReadOnlyRuleSyncDTO(policy docker_guard.ReadOnlyPolicy) *dto.DockerPortGuardEndpoint {
+	return &dto.DockerPortGuardEndpoint{
+		Family: policy.Policy.Family, HostIP: policy.Policy.HostIP, HostPort: policy.Policy.HostPort,
+		Protocol: policy.Policy.Protocol, PolicyUUID: dockerGuardReadOnlyPolicyUUID(policy), Sources: append([]string(nil), policy.Policy.Sources...),
+		NativeAction: policy.Action, ReadOnly: true, TrafficPath: dockerTrafficPathUnknown,
+		ManagementTarget: dockerManagementNeedsDiagnosis, ManagementReason: dockerReasonNoMatchingPath,
+	}
+}
+
+func dockerGuardReadOnlyPolicyUUID(policy docker_guard.ReadOnlyPolicy) string {
+	nativeRules, _ := json.Marshal(policy.NativeRules)
+	fingerprint := strings.Join([]string{
+		policy.Policy.Family, policy.Policy.HostIP, strconv.Itoa(int(policy.Policy.HostPort)),
+		policy.Policy.Protocol, policy.Action, string(nativeRules),
+	}, "\x00")
+	return uuid.NewSHA1(uuid.NameSpaceOID, []byte(fingerprint)).String()
+}
+
+func dockerGuardRuntimeReadOnlyModels(policies []docker_guard.ReadOnlyPolicy) ([]model.DockerPortGuardPolicy, error) {
+	result := make([]model.DockerPortGuardPolicy, 0, len(policies))
+	for _, policy := range policies {
+		sources, err := json.Marshal(policy.Policy.Sources)
+		if err != nil {
+			return nil, err
+		}
+		nativeRules, err := json.Marshal(policy.NativeRules)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, model.DockerPortGuardPolicy{
+			UUID:     dockerGuardReadOnlyPolicyUUID(policy),
+			ReadOnly: true,
+			Family:   policy.Policy.Family, HostIP: policy.Policy.HostIP, HostPort: policy.Policy.HostPort,
+			Protocol: policy.Policy.Protocol, Sources: string(sources), NativeAction: policy.Action,
+			NativeRules: string(nativeRules), Sequence: policy.Sequence,
+		})
+	}
+	return result, nil
+}
+
+func (s *DockerPortGuardService) replaceRuntimeReadOnlyPolicies(
+	ctx context.Context,
+	policies []docker_guard.ReadOnlyPolicy,
+) error {
+	stored, err := dockerGuardRuntimeReadOnlyModels(policies)
+	if err != nil {
+		return err
+	}
+	return s.policies.ReplaceRuntimeReadOnly(ctx, stored)
+}
+
 func (s *DockerPortGuardService) reconcileLocked(ctx context.Context) (err error) {
 	defer func() { recordDockerPortGuardReconcileError(err) }()
 	persistedEnabled, err := dockerPortGuardPersistedEnabled()
@@ -515,12 +566,22 @@ func (s *DockerPortGuardService) reconcileLocked(ctx context.Context) (err error
 	if err != nil {
 		return err
 	}
+	inventory, err := runtime.ListPolicies()
+	if err != nil {
+		return err
+	}
+	if err := s.replaceRuntimeReadOnlyPolicies(ctx, inventory.ReadOnly); err != nil {
+		return err
+	}
 	if !initialized {
 		err = runtime.Initialize(policies)
 	} else {
 		err = runtime.Reconcile(policies)
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	return docker_guard.Verify(runtime, policies, inventory.ReadOnly)
 }
 
 func dockerPortGuardPersistedEnabled() (bool, error) {
@@ -588,7 +649,7 @@ func markDockerGuardFamilyNotEffective(base *dto.DockerPortGuardBase, family str
 }
 
 func (s *DockerPortGuardService) runtimePolicies(ctx context.Context) ([]docker_guard.Policy, error) {
-	stored, err := s.policies.List(ctx)
+	stored, err := s.policies.ListManaged(ctx)
 	if err != nil {
 		return nil, err
 	}

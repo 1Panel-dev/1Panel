@@ -3,6 +3,7 @@ package docker_guard
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -28,6 +29,10 @@ func NewNftablesManagerWithRunner(runner Runner) *NftablesManager {
 func (m *NftablesManager) Initialize(policies []Policy) error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
+	inventory, err := m.ListPolicies()
+	if err != nil {
+		return err
+	}
 	if !m.runner.Exists("nft") {
 		return errors.New("nft is not installed")
 	}
@@ -37,7 +42,7 @@ func (m *NftablesManager) Initialize(policies []Policy) error {
 	if err := m.ensureFamily(FamilyIPv6, false); err != nil {
 		return &FamilyError{Family: FamilyIPv6, Err: err}
 	}
-	return m.rebuildLocked(policies)
+	return m.rebuildLocked(policies, inventory)
 }
 
 func (m *NftablesManager) Bind() error {
@@ -55,14 +60,18 @@ func (m *NftablesManager) Bind() error {
 func (m *NftablesManager) Reconcile(policies []Policy) error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
-	return m.rebuildLocked(policies)
+	inventory, err := m.ListPolicies()
+	if err != nil {
+		return err
+	}
+	return m.rebuildLocked(policies, inventory)
 }
 
-func (m *NftablesManager) ListPolicies() ([]Policy, error) {
+func (m *NftablesManager) ListPolicies() (PolicyInventory, error) {
 	if !m.runner.Exists("nft") {
-		return nil, nil
+		return PolicyInventory{}, nil
 	}
-	policies := make([]Policy, 0)
+	inventory := PolicyInventory{Policies: make([]Policy, 0), ManagedRuleOrders: make(map[string][]int64)}
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		tableFamily := nftTableFamily(family)
 		if !m.objectExists("chain", tableFamily, NftTable, NftChain) {
@@ -70,15 +79,19 @@ func (m *NftablesManager) ListPolicies() ([]Policy, error) {
 		}
 		output, err := m.run("-a", "list", "chain", tableFamily, NftTable, NftChain)
 		if err != nil {
-			return nil, &FamilyError{Family: family, Err: fmt.Errorf("list %s chain: %w", NftChain, err)}
+			return PolicyInventory{}, &FamilyError{Family: family, Err: fmt.Errorf("list %s chain: %w", NftChain, err)}
 		}
 		parsed, err := parseDockerGuardPolicies(output, family)
 		if err != nil {
-			return nil, &FamilyError{Family: family, Err: err}
+			return PolicyInventory{}, &FamilyError{Family: family, Err: err}
 		}
-		policies = append(policies, parsed...)
+		inventory.Policies = append(inventory.Policies, parsed.Policies...)
+		inventory.ReadOnly = append(inventory.ReadOnly, parsed.ReadOnly...)
+		for key, orders := range parsed.ManagedRuleOrders {
+			inventory.ManagedRuleOrders[key] = append([]int64(nil), orders...)
+		}
 	}
-	return policies, nil
+	return inventory, nil
 }
 
 func (m *NftablesManager) Unbind() error {
@@ -234,7 +247,7 @@ func (m *NftablesManager) ensureJump(family string) error {
 	return m.runBatch(commands)
 }
 
-func (m *NftablesManager) rebuildLocked(policies []Policy) error {
+func (m *NftablesManager) rebuildLocked(policies []Policy, inventory PolicyInventory) error {
 	if !m.runner.Exists("nft") {
 		return nil
 	}
@@ -245,11 +258,7 @@ func (m *NftablesManager) rebuildLocked(policies []Policy) error {
 		}
 		commands := [][]string{{"flush", "chain", tableFamily, NftTable, NftChain}}
 		commands = append(commands, []string{"add", "rule", tableFamily, NftTable, NftChain, "ct", "state", "{", "established,related", "}", "return"})
-		for _, policy := range policies {
-			if policy.Family == family {
-				commands = append(commands, compileNftPolicy(policy)...)
-			}
-		}
+		commands = append(commands, orderedNftRules(family, policies, inventory)...)
 		commands = append(commands, []string{"add", "rule", tableFamily, NftTable, NftChain, "return"})
 		script, err := buildNftScript(commands)
 		if err != nil {
@@ -260,6 +269,81 @@ func (m *NftablesManager) rebuildLocked(policies []Policy) error {
 		}
 	}
 	return nil
+}
+
+type orderedNftRule struct {
+	order int64
+	index int
+	rules [][]string
+}
+
+func orderedNftRules(family string, policies []Policy, inventory PolicyInventory) [][]string {
+	tableFamily := nftTableFamily(family)
+	segments := make([]orderedNftRule, 0, len(policies)+len(inventory.ReadOnly))
+	maxOrder := int64(0)
+	index := 0
+	for _, orders := range inventory.ManagedRuleOrders {
+		for _, order := range orders {
+			if order > maxOrder {
+				maxOrder = order
+			}
+		}
+	}
+	for _, item := range inventory.ReadOnly {
+		for _, native := range item.NativeRules {
+			if native.Family != family || len(native.Tokens) == 0 || native.Tokens[0] == "-A" {
+				continue
+			}
+			command := []string{"add", "rule", tableFamily, NftTable, NftChain}
+			command = append(command, quoteNftTokens(native.Tokens)...)
+			segments = append(segments, orderedNftRule{order: native.Order, index: index, rules: [][]string{command}})
+			index++
+			if native.Order > maxOrder {
+				maxOrder = native.Order
+			}
+		}
+	}
+	for _, policy := range policies {
+		if policy.Family != family {
+			continue
+		}
+		compiled := compileNftPolicy(policy)
+		orders := inventory.ManagedRuleOrders[managedOrderKey(policy.Family, policy.UUID)]
+		for ruleIndex, rule := range compiled {
+			order := int64(0)
+			if ruleIndex < len(orders) {
+				order = orders[ruleIndex]
+			} else {
+				maxOrder++
+				order = maxOrder
+			}
+			segments = append(segments, orderedNftRule{order: order, index: index, rules: [][]string{rule}})
+			index++
+		}
+	}
+	sort.SliceStable(segments, func(left, right int) bool {
+		if segments[left].order == segments[right].order {
+			return segments[left].index < segments[right].index
+		}
+		return segments[left].order < segments[right].order
+	})
+	rules := make([][]string, 0)
+	for _, segment := range segments {
+		rules = append(rules, segment.rules...)
+	}
+	return rules
+}
+
+func quoteNftTokens(tokens []string) []string {
+	quoted := make([]string, 0, len(tokens))
+	for _, token := range tokens {
+		if strings.ContainsAny(token, " \t\\\"'") && !strings.HasPrefix(token, `"`) {
+			quoted = append(quoted, strconv.Quote(token))
+			continue
+		}
+		quoted = append(quoted, token)
+	}
+	return quoted
 }
 
 func compileNftPolicy(policy Policy) [][]string {

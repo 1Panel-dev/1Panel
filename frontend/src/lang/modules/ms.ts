@@ -4221,6 +4221,8 @@ const message = {
             stale: 'Keadaan peraturan tembok api sudah lapuk. Muat semula dan cuba lagi.',
             lockoutRisk: 'Perubahan ini mungkin menyekat akses pengurusan.',
             protectedRule: 'Peraturan tembok api yang dilindungi ini tidak boleh diubah.',
+            dockerAcceptReadOnly:
+                'Peraturan ACCEPT ini adalah baca sahaja dan akan dikekalkan semasa peraturan lain disegerakkan. Untuk membuangnya, padam secara manual pada hos.',
             cannotReconcile: 'Peraturan sasaran tidak dapat disegerakkan: {0}',
         },
         ruleSyncPartial: 'Penyegerakan selesai: {0} berjaya, {1} sudah wujud dan {2} gagal.',
@@ -4240,10 +4242,10 @@ const message = {
         cleanupDockerBackendHelper:
             'Tetapkan semula peraturan masa jalan perlindungan port Docker 1Panel dalam {0}: padam semua peraturan dan rantaian berkaitan sambil mengekalkan data pangkalan data',
         cleanupBeforeBackendSwitch:
-            'Bahagian belakang semasa {0} masih mengandungi peraturan masa jalan 1Panel. Tetapkan semula sebelum bertukar kepada {1}.',
+            'Bahagian belakang semasa {0} masih mengandungi peraturan masa jalan 1Panel. Tetapkan semula sebelum bertukar kepada {1}. Penetapan semula hanya membersihkan peraturan masa jalan; dasar pangkalan data dikekalkan dan boleh dimulakan atau disegerakkan selepas penukaran.',
         cleanupAction: 'Tetapkan semula',
         backendSwitchNotice:
-            'Tetapkan semula bahagian belakang semasa sebelum menukar tembok api sistem, pemajuan port atau perlindungan Docker. Dasar pangkalan data dikekalkan dan boleh dimulakan atau disegerakkan selepas penukaran.',
+            'Disyorkan untuk mengaktifkan hanya satu kaedah pengurusan tembok api. Menjalankan berbilang tembok api serentak boleh menyebabkan konflik peraturan, status tidak konsisten atau masalah akses port kontena.',
         switchBackendHelper: 'Tukar kepada {0}?',
         switchDockerBackendHelper: 'Tukar kepada {0}? Ini akan mengemas kini konfigurasi dan memulakan semula Docker.',
         uninstalledStatus: 'Belum dipasang',

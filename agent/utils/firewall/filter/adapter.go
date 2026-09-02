@@ -5,7 +5,10 @@ import (
 	"errors"
 )
 
-var ErrAdapterUnavailable = errors.New("firewall rule adapter is unavailable")
+var (
+	ErrAdapterUnavailable   = errors.New("firewall rule adapter is unavailable")
+	ErrInventoryUnavailable = errors.New("firewall rule inventory is unavailable")
+)
 
 type ChangeOperation string
 
@@ -78,6 +81,10 @@ type RulePreparer interface {
 
 type RuleChecker interface {
 	CheckRule(context.Context, FirewallRule) error
+}
+
+type UnverifiedRuleAppender interface {
+	AppendUnverified(context.Context, FirewallRule, string) error
 }
 
 type NativeDetailReader interface {

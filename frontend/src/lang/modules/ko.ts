@@ -4061,6 +4061,8 @@ const message = {
             stale: '방화벽 규칙 상태가 오래되었습니다. 새로 고친 후 다시 시도하세요.',
             lockoutRisk: '이 방화벽 변경으로 관리 접근이 차단될 수 있습니다.',
             protectedRule: '보호된 방화벽 규칙은 수정할 수 없습니다.',
+            dockerAcceptReadOnly:
+                '이 ACCEPT 규칙은 읽기 전용이며 다른 규칙을 동기화할 때 그대로 유지됩니다. 제거하려면 호스트에서 수동으로 삭제하세요.',
             cannotReconcile: '대상 규칙을 동기화할 수 없습니다: {0}',
         },
         ruleSyncPartial: '동기화 완료: 성공 {0}개, 이미 존재 {1}개, 실패 {2}개.',
@@ -4080,10 +4082,10 @@ const message = {
         cleanupDockerBackendHelper:
             '{0}의 1Panel Docker 포트 보호 런타임 규칙을 재설정합니다. 관련 규칙과 체인을 모두 삭제하고 데이터베이스 데이터는 유지합니다',
         cleanupBeforeBackendSwitch:
-            '현재 {0} 백엔드에 1Panel 런타임 규칙이 남아 있습니다. {1}(으)로 전환하기 전에 먼저 재설정하세요.',
+            '현재 {0} 백엔드에 1Panel 런타임 규칙이 남아 있습니다. {1}(으)로 전환하기 전에 먼저 재설정하세요. 재설정은 런타임 규칙만 정리하며 데이터베이스 정책은 유지됩니다. 전환 후 다시 초기화하거나 동기화할 수 있습니다.',
         cleanupAction: '재설정',
         backendSwitchNotice:
-            '시스템 방화벽, 포트 전달 또는 Docker 보호를 전환하기 전에 현재 백엔드를 재설정하세요. 데이터베이스 정책은 유지되며 전환 후 다시 초기화하거나 동기화할 수 있습니다.',
+            '하나의 방화벽 관리 방식만 활성화하는 것이 좋습니다. 여러 방화벽을 동시에 실행하면 규칙 충돌, 상태 불일치 또는 컨테이너 포트 접근 오류가 발생할 수 있습니다.',
         switchBackendHelper: '{0}(으)로 전환하시겠습니까?',
         switchDockerBackendHelper: '{0}(으)로 전환하시겠습니까? Docker 설정을 업데이트하고 Docker를 재시작합니다.',
         uninstalledStatus: '설치되지 않음',

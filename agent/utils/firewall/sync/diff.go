@@ -26,6 +26,7 @@ const (
 	ReasonOnlyExistsInTarget  ReasonCode = "only_exists_in_target"
 	ReasonManagedOnlyInTarget ReasonCode = "managed_only_exists_in_target"
 	ReasonUnsafeRemoval       ReasonCode = "unsafe_managed_rule_removal"
+	ReasonReadOnlyRule        ReasonCode = "read_only_rule"
 )
 
 func ReasonMessage(code ReasonCode) string {
@@ -38,6 +39,8 @@ func ReasonMessage(code ReasonCode) string {
 		return "managed rule exists only in target backend"
 	case ReasonUnsafeRemoval:
 		return "managed runtime rule cannot be safely removed"
+	case ReasonReadOnlyRule:
+		return "read-only runtime rule is preserved but cannot be synchronized"
 	default:
 		return ""
 	}

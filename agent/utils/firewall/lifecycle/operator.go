@@ -1,6 +1,7 @@
 package lifecycle
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -36,11 +37,25 @@ func (e *DockerRestartError) Unwrap() error {
 	return e.Err
 }
 
+type CompletedOperationError struct {
+	Operation Operation
+	Err       error
+}
+
+func (e *CompletedOperationError) Error() string {
+	return fmt.Sprintf("firewall %s completed with recovery errors: %v", e.Operation, e.Err)
+}
+
+func (e *CompletedOperationError) Unwrap() error {
+	return e.Err
+}
+
 func NewOperator(client Client) *Operator {
 	return &Operator{client: client}
 }
 
 func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareStart func(Client) error) error {
+	var recoveryErrors []error
 	switch operation {
 	case OperationStart:
 		if err := o.client.Start(); err != nil {
@@ -48,7 +63,7 @@ func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareS
 		}
 		if prepareStart != nil {
 			if err := prepareStart(o.client); err != nil {
-				return err
+				recoveryErrors = append(recoveryErrors, fmt.Errorf("prepare firewall after start: %w", err))
 			}
 		}
 	case OperationStop:
@@ -59,7 +74,7 @@ func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareS
 		}
 		if prepareStart != nil {
 			if err := prepareStart(o.client); err != nil {
-				return err
+				recoveryErrors = append(recoveryErrors, fmt.Errorf("prepare firewall after restart: %w", err))
 			}
 		}
 	default:
@@ -68,11 +83,16 @@ func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareS
 
 	if withDockerRestart {
 		if err := controller.HandleRestart("docker"); err != nil {
-			return &DockerRestartError{Err: err}
+			recoveryErrors = append(recoveryErrors, &DockerRestartError{Err: err})
 		}
 	}
 	if o.client.Name() == ProviderFirewalld && operation == OperationStart {
-		return restoreFail2BanAfterFirewallStart()
+		if err := restoreFail2BanAfterFirewallStart(); err != nil {
+			recoveryErrors = append(recoveryErrors, err)
+		}
+	}
+	if err := errors.Join(recoveryErrors...); err != nil {
+		return &CompletedOperationError{Operation: operation, Err: err}
 	}
 	return nil
 }

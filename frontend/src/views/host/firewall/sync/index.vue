@@ -136,7 +136,7 @@
                     <el-table-column :label="$t('commons.table.protocol')" prop="dockerRule.protocol" width="90" />
                     <el-table-column :label="$t('firewall.protectionMode')" min-width="145">
                         <template #default="{ row }">
-                            {{ dockerMode(row.dockerRule?.mode) }}
+                            {{ dockerMode(row.dockerRule) }}
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('firewall.sourceIP')" min-width="170" show-overflow-tooltip>
@@ -194,12 +194,19 @@ const syncHelper = computed(() => i18n.global.t('firewall.ruleSyncDatabaseHelper
 const totalLabel = computed(() => i18n.global.t('firewall.ruleSyncDatabaseTotal'));
 const syncDisabled = computed(() => {
     if (!preview.value) return true;
+    if (subsystem.value === 'docker') {
+        const hasUnsupportedBlocker = (preview.value.items || []).some(
+            (item) => item.status === 'blocked' && item.reasonCode !== 'read_only_rule',
+        );
+        return hasUnsupportedBlocker || (preview.value.ready === 0 && preview.value.removed === 0);
+    }
     return preview.value.blocked > 0;
 });
 const detailItems = computed(() => {
     if (!preview.value || !detailFilter.value) return [];
-    if (detailFilter.value === 'total') return preview.value.items.filter((item) => item.status !== 'remove');
-    return preview.value.items.filter((item) => item.status === detailFilter.value);
+    const items = preview.value.items || [];
+    if (detailFilter.value === 'total') return items.filter((item) => item.status !== 'remove');
+    return items.filter((item) => item.status === detailFilter.value);
 });
 
 const toggleDetail = (filter: RuleDetailFilter, count: number) => {
@@ -302,6 +309,7 @@ const syncReasonCodeKeys: Record<string, string> = {
     only_exists_in_target: 'onlyInTarget',
     managed_only_exists_in_target: 'managedOnlyInTarget',
     unsafe_managed_rule_removal: 'managedRuntimeCannotRemove',
+    read_only_rule: 'dockerAcceptReadOnly',
 };
 
 const reasonText = (reasonCode?: string, reason?: string) => {
@@ -338,7 +346,9 @@ const dockerAddress = (rule?: Firewall.DockerGuardEndpoint) => {
 const dockerSources = (rule?: Firewall.DockerGuardEndpoint) =>
     rule ? formatHostAddressList(rule.sources, rule.family) : '';
 
-const dockerMode = (mode?: Firewall.DockerGuardPolicy['mode']) => {
+const dockerMode = (rule?: Firewall.DockerGuardEndpoint) => {
+    if (rule?.readOnly && rule.nativeAction) return rule.nativeAction.toUpperCase();
+    const mode = rule?.mode;
     if (!mode) return '-';
     if (mode === 'deny_all') return i18n.global.t('firewall.denyAll');
     return i18n.global.t(mode === 'allow_sources' ? 'firewall.allowSources' : 'firewall.denySources');

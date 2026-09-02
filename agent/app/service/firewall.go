@@ -156,13 +156,56 @@ func (s *FirewallService) OperateFirewall(request dto.FirewallLifecycleOperation
 	if err != nil {
 		return err
 	}
-	if err := lifecycle.NewOperator(client).Operate(lifecycle.Operation(request.Operation), request.WithDockerRestart, s.addPortsBeforeStart); err != nil {
-		return err
+	operation := lifecycle.Operation(request.Operation)
+	operationErr := lifecycle.NewOperator(client).Operate(operation, request.WithDockerRestart, s.addPortsBeforeStart)
+	restoreFirewalld := client.Name() == lifecycle.ProviderFirewalld &&
+		(operation == lifecycle.OperationStart || operation == lifecycle.OperationRestart)
+	if operation != lifecycle.OperationStart && operation != lifecycle.OperationRestart {
+		return operationErr
 	}
-	if request.Operation == "start" || request.Operation == "restart" {
-		ReconcileDockerPortGuardBestEffort(context.Background())
+	if operationErr != nil {
+		var completedErr *lifecycle.CompletedOperationError
+		var dockerRestartErr *lifecycle.DockerRestartError
+		if !errors.As(operationErr, &completedErr) && !errors.As(operationErr, &dockerRestartErr) {
+			return operationErr
+		}
+		if global.LOG != nil {
+			global.LOG.Warnf("firewall %s completed with post-start recovery errors: %v", operation, operationErr)
+		}
 	}
+	if restoreFirewalld {
+		restoreErr := s.restoreFirewalldRuntimeDependents(context.Background(), operation)
+		if restoreErr != nil && global.LOG != nil {
+			global.LOG.Errorf("restore firewalld runtime dependents after %s failed: %v", operation, restoreErr)
+		}
+		return nil
+	}
+	ReconcileDockerPortGuardBestEffort(context.Background())
 	return nil
+}
+
+func (s *FirewallService) restoreFirewalldRuntimeDependents(ctx context.Context, operation lifecycle.Operation) error {
+	restoreForwarding := s.restoreForwarding
+	if restoreForwarding == nil {
+		restoreForwarding = func(ctx context.Context) error { return newForwardingService().Restore(ctx) }
+	}
+	restoreDockerGuard := s.restoreDockerGuard
+	if restoreDockerGuard == nil {
+		restoreDockerGuard = ReconcileDockerPortGuard
+	}
+	dockerActive := s.dockerActive
+	if dockerActive == nil {
+		dockerActive = func() (bool, error) { return controller.CheckActive("docker") }
+	}
+
+	active, err := dockerActive()
+	restoreErr := restoreFirewalldDependents(
+		ctx, fmt.Sprintf("after firewalld %s", operation), err == nil && active, restoreForwarding, restoreDockerGuard,
+	)
+	if err != nil {
+		return errors.Join(fmt.Errorf("check Docker status after firewalld %s: %w", operation, err), restoreErr)
+	}
+	return restoreErr
 }
 
 func (s *FirewallService) OperateFilterChain(request dto.FilterChainOperation) error {
@@ -325,7 +368,9 @@ func (s *FirewallService) Reset(ctx context.Context, request dto.FirewallRuleRes
 		if restoreDockerGuard == nil {
 			restoreDockerGuard = ReconcileDockerPortGuard
 		}
-		restoreErr := restoreFirewalldDependents(ctx, restartDocker, restoreForwarding, restoreDockerGuard)
+		restoreErr := restoreFirewalldDependents(
+			ctx, "after resetting firewalld", restartDocker, restoreForwarding, restoreDockerGuard,
+		)
 		if err := errors.Join(resetErr, restoreErr); err != nil {
 			return dto.FirewallRuleResetResponse{}, err
 		}
@@ -371,17 +416,18 @@ func resetServiceFirewallClient(
 
 func restoreFirewalldDependents(
 	ctx context.Context,
-	restartDocker bool,
+	reason string,
+	restoreDocker bool,
 	restoreForwarding func(context.Context) error,
 	restoreDockerGuard func(context.Context) error,
 ) error {
 	var errs []error
 	if err := restoreForwarding(ctx); err != nil {
-		errs = append(errs, fmt.Errorf("restore port forwarding after resetting firewalld: %w", err))
+		errs = append(errs, fmt.Errorf("restore port forwarding %s: %w", reason, err))
 	}
-	if restartDocker {
+	if restoreDocker {
 		if err := restoreDockerGuard(ctx); err != nil {
-			errs = append(errs, fmt.Errorf("restore Docker port guard after resetting firewalld: %w", err))
+			errs = append(errs, fmt.Errorf("restore Docker port guard %s: %w", reason, err))
 		}
 	}
 	return errors.Join(errs...)
@@ -1970,10 +2016,63 @@ func (s *FirewallService) cleanupAppliedCreate(
 
 func (s *FirewallService) ensureSystemPort(ctx context.Context, port dto.FirewallSystemPort) error {
 	create, err := s.prepareSystemPortCreate(ctx, port)
-	if err != nil || create == nil {
+	if err == nil && create == nil {
+		return nil
+	}
+	if err == nil {
+		err = s.createFirewallRuleItem(ctx, *create)
+	}
+	if err == nil {
+		return nil
+	}
+	if !errors.Is(err, filter.ErrInventoryUnavailable) {
 		return err
 	}
-	return s.createFirewallRuleItem(ctx, *create)
+	return s.appendUFWSystemPortUnverified(ctx, port, err)
+}
+
+func (s *FirewallService) appendUFWSystemPortUnverified(
+	ctx context.Context,
+	port dto.FirewallSystemPort,
+	cause error,
+) error {
+	if s.selectedProvider == nil || s.adapters == nil {
+		return cause
+	}
+	provider, providerErr := s.selectedProvider(ctx)
+	if providerErr != nil {
+		return errors.Join(cause, providerErr)
+	}
+	if provider != filter.ProviderUFW {
+		return cause
+	}
+	if global.LOG != nil {
+		global.LOG.Warnf(
+			"UFW inventory is unavailable while restoring accepted port %s/%s; attempting a restricted direct allow: %v",
+			port.Port, port.Protocol, cause,
+		)
+	}
+	runtime, resolveErr := s.adapters.Resolve(provider)
+	if resolveErr != nil {
+		return errors.Join(cause, resolveErr)
+	}
+	comment := "1panel-system-port:" + systemPortKey(port)
+	if appendErr := runtime.AppendUnverified(ctx, systemPortRule(provider, port), comment); appendErr != nil {
+		if global.LOG != nil {
+			global.LOG.Errorf(
+				"restore accepted UFW port %s/%s without rule inventory failed: %v; original error: %v",
+				port.Port, port.Protocol, appendErr, cause,
+			)
+		}
+		return errors.Join(cause, fmt.Errorf("append accepted UFW port without rule inventory: %w", appendErr))
+	}
+	if global.LOG != nil {
+		global.LOG.Warnf(
+			"restored accepted UFW port %s/%s without rule inventory; normal rule management failed: %v",
+			port.Port, port.Protocol, cause,
+		)
+	}
+	return nil
 }
 
 func (s *FirewallService) createFirewallRuleItem(ctx context.Context, item dto.FirewallRuleCreateItem) error {
@@ -2595,12 +2694,17 @@ func (s *FirewallService) SyncSystemPorts(ctx context.Context, previous, current
 		return err
 	}
 	if !supportsNativeRuleBatch(provider) {
+		var syncErrors []error
 		for _, key := range sortedSystemPortKeys(currentSet) {
 			if _, exists := previousSet[key]; exists {
 				continue
 			}
 			if err := s.ensureSystemPort(ctx, currentSet[key]); err != nil {
-				return err
+				wrapped := fmt.Errorf("restore accepted firewall port %s: %w", key, err)
+				syncErrors = append(syncErrors, wrapped)
+				if global.LOG != nil {
+					global.LOG.Errorf("%v", wrapped)
+				}
 			}
 		}
 		for _, key := range sortedSystemPortKeys(previousSet) {
@@ -2608,10 +2712,14 @@ func (s *FirewallService) SyncSystemPorts(ctx context.Context, previous, current
 				continue
 			}
 			if err := s.deleteSystemPort(ctx, previousSet[key]); err != nil {
-				return err
+				wrapped := fmt.Errorf("release accepted firewall port %s: %w", key, err)
+				syncErrors = append(syncErrors, wrapped)
+				if global.LOG != nil {
+					global.LOG.Errorf("%v", wrapped)
+				}
 			}
 		}
-		return nil
+		return errors.Join(syncErrors...)
 	}
 
 	creates := make([]dto.FirewallRuleCreateItem, 0)
@@ -2806,41 +2914,61 @@ func supportsManagedFilterChains(provider string) bool {
 func (s *FirewallService) addPortsBeforeStart(client lifecycle.Client) error {
 	ctx := context.Background()
 	provider := filter.Provider(client.Name())
+	var recoveryErrors []error
+	recordFailure := func(stage string, err error) {
+		if err == nil {
+			return
+		}
+		wrapped := fmt.Errorf("%s for %s: %w", stage, provider, err)
+		recoveryErrors = append(recoveryErrors, wrapped)
+		if global.LOG != nil {
+			global.LOG.Errorf("firewall post-start recovery failed: %v", wrapped)
+		}
+	}
 	if provider == filter.ProviderIptables || provider == filter.ProviderNftables {
 		isInit, _, err := loadDirectFirewallInitStatus(string(provider))
 		if err != nil {
-			return err
+			recordFailure("load managed chain status", err)
+			return errors.Join(recoveryErrors...)
 		}
 		if !isInit {
 			return nil
 		}
 	}
 	if err := s.restoreStoredFirewallRules(ctx, provider); err != nil {
-		return err
+		recordFailure("restore stored firewall rules", err)
 	}
 	if provider == filter.ProviderIptables || provider == filter.ProviderNftables {
 		if provider == filter.ProviderIptables {
 			if err := newIptablesHelperManager().SyncRequiredPorts(true); err != nil {
-				return err
+				recordFailure("synchronize required ports", err)
 			}
 		} else if err := newNftablesHelperManager().SyncRequiredPorts(); err != nil {
-			return err
+			recordFailure("synchronize required ports", err)
 		}
 		configured, err := loadConfiguredFirewallPortWhiteList()
 		if err != nil {
-			return err
+			recordFailure("load configured accepted ports", err)
+			return errors.Join(recoveryErrors...)
 		}
 		required, err := loadRequiredFirewallPortWhiteList()
 		if err != nil {
-			return err
+			recordFailure("load required accepted ports", err)
+			return errors.Join(recoveryErrors...)
 		}
-		return s.SyncSystemPorts(ctx, nil, systemPorts(excludeFirewallPorts(configured, required)))
+		recordFailure(
+			"restore configured accepted ports",
+			s.SyncSystemPorts(ctx, nil, systemPorts(excludeFirewallPorts(configured, required))),
+		)
+		return errors.Join(recoveryErrors...)
 	}
 	portWhitelist, err := loadFirewallPortWhiteList()
 	if err != nil {
-		return err
+		recordFailure("load accepted ports", err)
+		return errors.Join(recoveryErrors...)
 	}
-	return s.SyncSystemPorts(ctx, nil, systemPorts(portWhitelist))
+	recordFailure("restore accepted ports", s.SyncSystemPorts(ctx, nil, systemPorts(portWhitelist)))
+	return errors.Join(recoveryErrors...)
 }
 
 func syncManagedAcceptedPorts(previous, current []firewall.PortWhitelist) error {

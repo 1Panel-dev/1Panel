@@ -3,6 +3,7 @@ package docker_guard
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -134,6 +135,10 @@ func NewManagerWithRunner(runner Runner) *Manager { return &Manager{runner: runn
 func (m *Manager) Initialize(policies []Policy) error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
+	inventory, err := m.ListPolicies()
+	if err != nil {
+		return err
+	}
 	if !m.runner.Exists("iptables-restore") {
 		return errors.New("iptables-restore is not installed")
 	}
@@ -154,7 +159,7 @@ func (m *Manager) Initialize(policies []Policy) error {
 			}
 		}
 	}
-	return m.rebuildLocked(policies)
+	return m.rebuildLocked(policies, inventory)
 }
 
 func (m *Manager) Bind() error {
@@ -174,11 +179,15 @@ func (m *Manager) Bind() error {
 func (m *Manager) Reconcile(policies []Policy) error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
-	return m.rebuildLocked(policies)
+	inventory, err := m.ListPolicies()
+	if err != nil {
+		return err
+	}
+	return m.rebuildLocked(policies, inventory)
 }
 
-func (m *Manager) ListPolicies() ([]Policy, error) {
-	policies := make([]Policy, 0)
+func (m *Manager) ListPolicies() (PolicyInventory, error) {
+	inventory := PolicyInventory{Policies: make([]Policy, 0), ManagedRuleOrders: make(map[string][]int64)}
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		executable := executableForFamily(family)
 		if executable == "" || !m.runner.Exists(executable) {
@@ -186,22 +195,26 @@ func (m *Manager) ListPolicies() ([]Policy, error) {
 		}
 		exists, err := m.chainExists(executable, Chain)
 		if err != nil {
-			return nil, &FamilyError{Family: family, Err: fmt.Errorf("inspect %s chain: %w", Chain, err)}
+			return PolicyInventory{}, &FamilyError{Family: family, Err: fmt.Errorf("inspect %s chain: %w", Chain, err)}
 		}
 		if !exists {
 			continue
 		}
 		output, err := m.run(executable, "-S", Chain)
 		if err != nil {
-			return nil, &FamilyError{Family: family, Err: fmt.Errorf("list %s chain: %w", Chain, err)}
+			return PolicyInventory{}, &FamilyError{Family: family, Err: fmt.Errorf("list %s chain: %w", Chain, err)}
 		}
 		parsed, err := parseDockerGuardPolicies(output, family)
 		if err != nil {
-			return nil, &FamilyError{Family: family, Err: err}
+			return PolicyInventory{}, &FamilyError{Family: family, Err: err}
 		}
-		policies = append(policies, parsed...)
+		inventory.Policies = append(inventory.Policies, parsed.Policies...)
+		inventory.ReadOnly = append(inventory.ReadOnly, parsed.ReadOnly...)
+		for key, orders := range parsed.ManagedRuleOrders {
+			inventory.ManagedRuleOrders[key] = append([]int64(nil), orders...)
+		}
 	}
-	return policies, nil
+	return inventory, nil
 }
 
 func (m *Manager) Unbind() error {
@@ -368,7 +381,7 @@ func (m *Manager) restoreLifecycle(executable string, rules [][]string) error {
 	return nil
 }
 
-func (m *Manager) rebuildLocked(policies []Policy) error {
+func (m *Manager) rebuildLocked(policies []Policy, inventory PolicyInventory) error {
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		executable := executableForFamily(family)
 		if executable == "" || !m.runner.Exists(executable) {
@@ -382,12 +395,7 @@ func (m *Manager) rebuildLocked(policies []Policy) error {
 			continue
 		}
 		rules := [][]string{{"-F", Chain}, {"-A", Chain, "-m", "conntrack", "--ctstate", "RELATED,ESTABLISHED", "-j", "RETURN"}}
-		for _, policy := range policies {
-			if policy.Family != family {
-				continue
-			}
-			rules = append(rules, compilePolicy(policy)...)
-		}
+		rules = append(rules, orderedIPTablesRules(family, policies, inventory)...)
 		rules = append(rules, []string{"-A", Chain, "-j", "RETURN"})
 		script, err := buildRestoreScript(rules)
 		if err != nil {
@@ -404,18 +412,82 @@ func (m *Manager) rebuildLocked(policies []Policy) error {
 	return nil
 }
 
+type orderedIPTablesRule struct {
+	order int64
+	index int
+	rules [][]string
+}
+
+func orderedIPTablesRules(family string, policies []Policy, inventory PolicyInventory) [][]string {
+	segments := make([]orderedIPTablesRule, 0, len(policies)+len(inventory.ReadOnly))
+	maxOrder := int64(0)
+	index := 0
+	for _, orders := range inventory.ManagedRuleOrders {
+		for _, order := range orders {
+			if order > maxOrder {
+				maxOrder = order
+			}
+		}
+	}
+	for _, item := range inventory.ReadOnly {
+		for _, native := range item.NativeRules {
+			if native.Family != family || len(native.Tokens) < 2 || native.Tokens[0] != "-A" || native.Tokens[1] != Chain {
+				continue
+			}
+			segments = append(segments, orderedIPTablesRule{order: native.Order, index: index, rules: [][]string{append([]string(nil), native.Tokens...)}})
+			index++
+			if native.Order > maxOrder {
+				maxOrder = native.Order
+			}
+		}
+	}
+	for _, policy := range policies {
+		if policy.Family != family {
+			continue
+		}
+		compiled := compilePolicy(policy)
+		orders := inventory.ManagedRuleOrders[managedOrderKey(policy.Family, policy.UUID)]
+		for ruleIndex, rule := range compiled {
+			order := int64(0)
+			if ruleIndex < len(orders) {
+				order = orders[ruleIndex]
+			} else {
+				maxOrder++
+				order = maxOrder
+			}
+			segments = append(segments, orderedIPTablesRule{order: order, index: index, rules: [][]string{rule}})
+			index++
+		}
+	}
+	sort.SliceStable(segments, func(left, right int) bool {
+		if segments[left].order == segments[right].order {
+			return segments[left].index < segments[right].index
+		}
+		return segments[left].order < segments[right].order
+	})
+	rules := make([][]string, 0)
+	for _, segment := range segments {
+		rules = append(rules, segment.rules...)
+	}
+	return rules
+}
+
 func buildRestoreScript(rules [][]string) (string, error) {
 	var script strings.Builder
 	script.WriteString("*filter\n")
 	for _, rule := range rules {
 		for i, token := range rule {
-			if token == "" || strings.ContainsAny(token, " \t\r\n\\\"'") {
+			if token == "" || strings.ContainsAny(token, "\r\n\x00") {
 				return "", fmt.Errorf("invalid iptables-restore token %q", token)
 			}
 			if i > 0 {
 				script.WriteByte(' ')
 			}
-			script.WriteString(token)
+			if strings.ContainsAny(token, " \t\\\"'") {
+				script.WriteString(strconv.Quote(token))
+			} else {
+				script.WriteString(token)
+			}
 		}
 		script.WriteByte('\n')
 	}

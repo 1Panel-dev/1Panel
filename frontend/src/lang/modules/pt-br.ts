@@ -4240,6 +4240,8 @@ const message = {
             stale: 'O estado da regra está desatualizado. Atualize e tente novamente.',
             lockoutRisk: 'Esta alteração pode bloquear o acesso de gerenciamento.',
             protectedRule: 'Esta regra protegida do firewall não pode ser modificada.',
+            dockerAcceptReadOnly:
+                'Esta regra ACCEPT é somente leitura e será preservada durante a sincronização das outras regras. Para removê-la, exclua-a manualmente no host.',
             cannotReconcile: 'Não foi possível sincronizar a regra de destino: {0}',
         },
         ruleSyncPartial: 'Sincronização concluída: {0} com sucesso, {1} já existiam e {2} falharam.',
@@ -4259,10 +4261,10 @@ const message = {
         cleanupDockerBackendHelper:
             'Redefina as regras de execução de proteção de portas Docker do 1Panel em {0}: exclua todas as regras e cadeias relacionadas e mantenha os dados do banco de dados',
         cleanupBeforeBackendSwitch:
-            'O backend atual {0} ainda contém regras de execução do 1Panel. Redefina-o antes de mudar para {1}.',
+            'O backend atual {0} ainda contém regras de execução do 1Panel. Redefina-o antes de mudar para {1}. A redefinição remove apenas as regras de execução; as políticas do banco são mantidas e podem ser inicializadas ou sincronizadas após a troca.',
         cleanupAction: 'Redefinir',
         backendSwitchNotice:
-            'Redefina o backend atual antes de trocar o firewall do sistema, o encaminhamento de portas ou a proteção Docker. As políticas do banco são mantidas e podem ser inicializadas ou sincronizadas após a troca.',
+            'Recomenda-se habilitar apenas uma forma de gerenciamento de firewall. Executar vários firewalls ao mesmo tempo pode causar conflitos de regras, estados inconsistentes ou falhas de acesso às portas dos contêineres.',
         switchBackendHelper: 'Mudar para {0}?',
         switchDockerBackendHelper: 'Mudar para {0}? Isso atualizará a configuração e reiniciará o Docker.',
         uninstalledStatus: 'Não instalado',

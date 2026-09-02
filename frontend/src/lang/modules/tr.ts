@@ -4221,6 +4221,8 @@ const message = {
             stale: 'Güvenlik duvarı kuralının durumu güncel değil. Yenileyip tekrar deneyin.',
             lockoutRisk: 'Bu değişiklik yönetim erişimini engelleyebilir.',
             protectedRule: 'Bu korumalı güvenlik duvarı kuralı değiştirilemez.',
+            dockerAcceptReadOnly:
+                'Bu ACCEPT kuralı salt okunurdur ve diğer kurallar eşitlenirken korunur. Kaldırmak için ana makinede manuel olarak silin.',
             cannotReconcile: 'Hedef kural eşitlenemiyor: {0}',
         },
         ruleSyncPartial: 'Eşitleme tamamlandı: {0} başarılı, {1} zaten mevcut, {2} başarısız.',
@@ -4240,10 +4242,10 @@ const message = {
         cleanupDockerBackendHelper:
             '{0} içindeki 1Panel Docker bağlantı noktası koruma çalışma zamanı kurallarını sıfırlayın: ilgili tüm kuralları ve zincirleri silip veritabanı verilerini koruyun',
         cleanupBeforeBackendSwitch:
-            'Mevcut {0} arka ucu hâlâ 1Panel çalışma zamanı kuralları içeriyor. {1} arka ucuna geçmeden önce sıfırlayın.',
+            'Mevcut {0} arka ucu hâlâ 1Panel çalışma zamanı kuralları içeriyor. {1} arka ucuna geçmeden önce sıfırlayın. Sıfırlama yalnızca çalışma zamanı kurallarını temizler; veritabanı ilkeleri korunur ve geçişten sonra yeniden başlatılabilir veya eşitlenebilir.',
         cleanupAction: 'Sıfırla',
         backendSwitchNotice:
-            'Sistem güvenlik duvarı, bağlantı noktası yönlendirme veya Docker korumasını değiştirmeden önce mevcut arka ucu sıfırlayın. Veritabanı ilkeleri korunur ve geçişten sonra yeniden başlatılabilir veya eşitlenebilir.',
+            'Yalnızca bir güvenlik duvarı yönetim yönteminin etkinleştirilmesi önerilir. Birden fazla güvenlik duvarının aynı anda çalışması kural çakışmalarına, tutarsız durumlara veya konteyner bağlantı noktası erişim sorunlarına yol açabilir.',
         switchBackendHelper: '{0} arka ucuna geçilsin mi?',
         switchDockerBackendHelper:
             '{0} arka ucuna geçilsin mi? Docker yapılandırması güncellenecek ve Docker yeniden başlatılacak.',

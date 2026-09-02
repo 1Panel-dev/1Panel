@@ -3929,6 +3929,8 @@ const message = {
             stale: '检查后防火墙状态已发生变化，请刷新后重试。',
             lockoutRisk: '执行后可能导致当前 1Panel 管理页面无法访问，本次操作已停止。',
             protectedRule: '这是保证系统正常运行的必要规则，不能修改。',
+            dockerAcceptReadOnly:
+                '该 ACCEPT 规则为只读、不可同步；同步其他规则时会保留该规则。如需移除，请在主机上手动删除。',
             cannotReconcile: '该规则无法自动同步：{0}',
         },
         ruleSyncPartial: '同步完成：成功 {0} 条，已存在 {1} 条，失败 {2} 条。',
@@ -3946,10 +3948,11 @@ const message = {
             '重置 {0} 中的 1Panel 端口转发运行时规则：删除全部相关规则及规则链，仅保留数据库数据',
         cleanupDockerBackendHelper:
             '重置 {0} 中的 1Panel Docker 端口防护运行时规则：删除全部相关规则及规则链，仅保留数据库数据',
-        cleanupBeforeBackendSwitch: '当前后端 {0} 仍存在 1Panel 运行时规则，请先重置该后端，再切换到 {1}。',
+        cleanupBeforeBackendSwitch:
+            '当前后端 {0} 仍存在 1Panel 运行时规则，请先重置该后端，再切换到 {1}。重置仅清理运行时规则，数据库策略会保留，切换后可以重新初始化或同步。',
         cleanupAction: '重置',
         backendSwitchNotice:
-            '主机防火墙、端口转发和 Docker 防护切换前都需要先重置当前后端；数据库策略会保留，切换后可以重新初始化或同步。',
+            '建议仅启用一种防火墙管理方式。多个防火墙同时运行可能导致规则冲突、状态不一致或容器端口访问异常。',
         switchBackendHelper: '确认切换为 {0}？',
         switchDockerBackendHelper: '确认切换为 {0}？该操作会更新 Docker 配置并重启 Docker 服务。',
         uninstalledStatus: '未安装',
