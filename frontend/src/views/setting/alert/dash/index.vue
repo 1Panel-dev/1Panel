@@ -160,6 +160,7 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { getAlertConfigDisplayName } from '@/views/setting/alert/setting/drawer/secret-field';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
@@ -293,8 +294,8 @@ const formatMethod = (row: Alert.AlertInfo) => {
         if (config) {
             const typeLabel = i18n.global.t(`xpack.alert.${config.type === 'email' ? 'mail' : config.type}`);
             try {
-                const cfg = JSON.parse(config.config || '{}');
-                const name = cfg.displayName || cfg.sender || cfg.phone || '';
+                const cfg = JSON.parse(config.config || '{}') as Record<string, unknown>;
+                const name = getAlertConfigDisplayName(config.type, cfg);
                 return name ? `${name}(${typeLabel})` : typeLabel;
             } catch {
                 return typeLabel;

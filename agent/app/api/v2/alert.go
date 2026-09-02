@@ -2,11 +2,14 @@ package v2
 
 import (
 	"errors"
+	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -294,6 +297,34 @@ func (b *BaseApi) UpdateAlertConfig(c *gin.Context) {
 		return
 	}
 	if err := alertService.UpdateAlertConfig(req, loadAuditUser(c)); err != nil {
+		switch {
+		case errors.Is(err, repo.ErrAlertConfigRevisionConflict):
+			helper.ErrorWithBusinessCode(c, http.StatusConflict, "ALERT_CONFIG_REVISION_CONFLICT", "ErrInvalidParams", err)
+		case errors.Is(err, repo.ErrAlertConfigRevisionRequired):
+			helper.ErrorWithBusinessCode(c, http.StatusConflict, "ALERT_CONFIG_REVISION_REQUIRED", "ErrInvalidParams", err)
+		default:
+			helper.InternalServer(c, err)
+		}
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Alert
+// @Summary Update alert config status
+// @Accept json
+// @Param request body dto.AlertConfigStatusUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /alert/config/status [post]
+// @x-panel-log {"bodyKeys":["id","status"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新告警配置状态 [id][status]","formatEN":"update alert config status [id][status]"}
+func (b *BaseApi) UpdateAlertConfigStatus(c *gin.Context) {
+	var req dto.AlertConfigStatusUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := alertService.UpdateAlertConfigStatus(req, loadAuditUser(c)); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -344,6 +375,15 @@ func (b *BaseApi) DeleteAlertConfig(c *gin.Context) {
 func (b *BaseApi) TestAlertConfig(c *gin.Context) {
 	var req dto.AlertConfigTest
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if req.Type == constant.Custom {
+		result, err := alertService.TestCustomAlertConfig(req)
+		if err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+		helper.SuccessWithData(c, result)
 		return
 	}
 	flag, err := alertService.TestAlertConfig(req)

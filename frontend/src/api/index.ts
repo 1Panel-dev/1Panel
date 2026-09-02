@@ -206,7 +206,7 @@ class RequestHttp {
         return this.service.delete(url, { params, ..._object });
     }
     download<BlobPart>(url: string, params?: object, _object = {}): Promise<BlobPart> {
-        return this.service.post(url, params, _object);
+        return this.service.post(url, params, _object) as unknown as Promise<BlobPart>;
     }
     upload<T>(url: string, params: object = {}, config?: RequestConfig): Promise<ResultData<T>> {
         return this.service.post(url, params, config);

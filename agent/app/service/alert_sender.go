@@ -75,7 +75,7 @@ func (s *AlertSender) sendByConfig(config model.AlertConfig, quota string, param
 		} else {
 			s.sendBarkWithConfig(config, quota, params)
 		}
-	case constant.WeCom, constant.DingTalk, constant.FeiShu:
+	case constant.WeCom, constant.DingTalk, constant.FeiShu, constant.Custom:
 		if isResource {
 			s.sendResourceWebhookWithConfig(config, quota, params)
 		} else {
@@ -86,7 +86,7 @@ func (s *AlertSender) sendByConfig(config model.AlertConfig, quota string, param
 
 func (s *AlertSender) sendByLegacyMethod(method string, quota string, params []dto.Param, isResource bool) {
 	alertRepo := repo.NewIAlertRepo()
-	typeMap := map[string]string{"mail": constant.Email, constant.Bark: constant.Bark, constant.SMS: constant.SMS}
+	typeMap := map[string]string{"mail": constant.Email, constant.Bark: constant.Bark, constant.SMS: constant.SMS, constant.Custom: constant.Custom}
 	configType := method
 	if mapped, ok := typeMap[method]; ok {
 		configType = mapped
@@ -308,12 +308,31 @@ func (s *AlertSender) sendWebhookWithConfig(config model.AlertConfig, quota stri
 	}
 	transport := xpack.MultiNodeProvider.LoadRequestTransport()
 	agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
-	err := xpack.AlertProvider.CreateWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, config, transport, agentInfo)
+	queued := false
+	var err error
+	if config.Type == constant.Custom {
+		task := dto.AlertTaskMetadata{
+			AlertID:   s.alert.ID,
+			Type:      s.alert.Type,
+			Quota:     quota,
+			QuotaType: s.quotaType,
+			Method:    strconv.Itoa(int(config.ID)),
+		}
+		result, deliveryErr := xpack.DeliverCustomWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, config, transport, agentInfo, task)
+		queued, err = result.Queued, deliveryErr
+		if err == nil && result.Queued {
+			_, err = alertUtil.RecordQueuedAlertTask(result.LogID, task)
+		}
+	} else {
+		err = xpack.AlertProvider.CreateWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, config, transport, agentInfo)
+	}
 	if err != nil {
 		global.LOG.Errorf("%s alert %s webhook push failed: %v", s.alert.Type, config.Type, err)
 		return
 	}
-	alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, strconv.Itoa(int(config.ID)))
+	if !queued {
+		alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, strconv.Itoa(int(config.ID)))
+	}
 }
 
 func (s *AlertSender) sendResourceWebhookWithConfig(config model.AlertConfig, quota string, params []dto.Param) {
@@ -334,11 +353,31 @@ func (s *AlertSender) sendResourceWebhookWithConfig(config model.AlertConfig, qu
 	}
 	transport := xpack.MultiNodeProvider.LoadRequestTransport()
 	agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
-	if err := xpack.AlertProvider.CreateWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, config, transport, agentInfo); err != nil {
+	queued := false
+	var err error
+	if config.Type == constant.Custom {
+		task := dto.AlertTaskMetadata{
+			AlertID:   s.alert.ID,
+			Type:      s.alert.Type,
+			Quota:     quota,
+			QuotaType: s.quotaType,
+			Method:    strconv.Itoa(int(config.ID)),
+		}
+		result, deliveryErr := xpack.DeliverCustomWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, config, transport, agentInfo, task)
+		queued, err = result.Queued, deliveryErr
+		if err == nil && result.Queued {
+			_, err = alertUtil.RecordQueuedAlertTask(result.LogID, task)
+		}
+	} else {
+		err = xpack.AlertProvider.CreateWebhookAlertLog(s.alert.Type, s.alert, create, quota, params, config, transport, agentInfo)
+	}
+	if err != nil {
 		global.LOG.Errorf("%s alert %s webhook push failed: %v", s.alert.Type, config.Type, err)
 		return
 	}
-	alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, strconv.Itoa(int(config.ID)))
+	if !queued {
+		alertUtil.CreateNewAlertTask(quota, s.alert.Type, s.quotaType, strconv.Itoa(int(config.ID)))
+	}
 }
 
 func (s *AlertSender) sendWebhook(quota string, params []dto.Param, method string) {

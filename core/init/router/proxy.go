@@ -1,8 +1,10 @@
 package router
 
 import (
+	"errors"
 	"net/http"
 	"net/url"
+	"path"
 	"strconv"
 	"strings"
 
@@ -17,6 +19,8 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
+
+var errInternalOnlyAgentEndpoint = errors.New("internal agent endpoint cannot be proxied")
 
 func Proxy() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -51,6 +55,11 @@ func Proxy() gin.HandlerFunc {
 			c.Request.Header.Set("X-Panel-User", url.QueryEscape(userName))
 		}
 
+		if isInternalOnlyAgentEndpoint(reqPath) {
+			helper.ErrorWithDetail(c, http.StatusForbidden, "ErrProxy", errInternalOnlyAgentEndpoint)
+			return
+		}
+
 		if reqPath == "/api/v2/hosts/terminal/local" && (currentNode == "local" || len(currentNode) == 0) {
 			proxyLocalAgent(c)
 			return
@@ -63,6 +72,12 @@ func Proxy() gin.HandlerFunc {
 		xpack.MultiNodeProvider.Proxy(c, currentNode)
 		c.Abort()
 	}
+}
+
+func isInternalOnlyAgentEndpoint(reqPath string) bool {
+	normalizedPath := path.Clean(reqPath)
+	return normalizedPath == "/api/v2/xpack/alert/offline/email" ||
+		normalizedPath == "/api/v2/xpack/alert/offline/webhook"
 }
 
 func proxyLocalAgent(c *gin.Context) {

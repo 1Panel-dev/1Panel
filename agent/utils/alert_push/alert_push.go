@@ -50,9 +50,10 @@ func pushByConfigId(alertRepo repo.IAlertRepo, alert dto.AlertDTO, pushAlert dto
 
 func pushByLegacyMethod(alertRepo repo.IAlertRepo, alert dto.AlertDTO, pushAlert dto.PushAlert, method string) {
 	typeMap := map[string]string{
-		"mail":        constant.Email,
-		constant.Bark: constant.Bark,
-		constant.SMS:  constant.SMS,
+		"mail":          constant.Email,
+		constant.Bark:   constant.Bark,
+		constant.SMS:    constant.SMS,
+		constant.Custom: constant.Custom,
 	}
 	configType := method
 	if mapped, ok := typeMap[method]; ok {
@@ -137,7 +138,7 @@ func sendAlert(alertRepo repo.IAlertRepo, alert dto.AlertDTO, pushAlert dto.Push
 		}
 		alertUtil.CreateNewAlertTask(strconv.Itoa(int(pushAlert.EntryID)), alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)), methodStr)
 
-	case constant.WeCom, constant.DingTalk, constant.FeiShu:
+	case constant.WeCom, constant.DingTalk, constant.FeiShu, constant.Custom:
 		todayCount, _, err := alertRepo.LoadTaskCount(alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)), methodStr)
 		if err != nil || alert.SendCount <= todayCount {
 			return
@@ -150,11 +151,29 @@ func sendAlert(alertRepo repo.IAlertRepo, alert dto.AlertDTO, pushAlert dto.Push
 		}
 		transport := xpack.MultiNodeProvider.LoadRequestTransport()
 		agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
-		err = xpack.AlertProvider.CreateTaskScanWebhookAlertLog(alert, alert.Type, create, pushAlert, config, transport, agentInfo)
+		queued := false
+		if config.Type == constant.Custom {
+			task := dto.AlertTaskMetadata{
+				AlertID:   alert.ID,
+				Type:      alertUtil.GetCronJobType(alert.Type),
+				Quota:     strconv.Itoa(int(pushAlert.EntryID)),
+				QuotaType: strconv.Itoa(int(pushAlert.EntryID)),
+				Method:    methodStr,
+			}
+			result, deliveryErr := xpack.DeliverTaskScanCustomWebhookAlertLog(alert, alert.Type, create, pushAlert, config, transport, agentInfo, task)
+			queued, err = result.Queued, deliveryErr
+			if err == nil && result.Queued {
+				_, err = alertUtil.RecordQueuedAlertTask(result.LogID, task)
+			}
+		} else {
+			err = xpack.AlertProvider.CreateTaskScanWebhookAlertLog(alert, alert.Type, create, pushAlert, config, transport, agentInfo)
+		}
 		if err != nil {
 			global.LOG.Errorf("%s alert %s webhook push failed: %v", alert.Type, methodStr, err)
 			return
 		}
-		alertUtil.CreateNewAlertTask(strconv.Itoa(int(pushAlert.EntryID)), alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)), methodStr)
+		if !queued {
+			alertUtil.CreateNewAlertTask(strconv.Itoa(int(pushAlert.EntryID)), alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)), methodStr)
+		}
 	}
 }

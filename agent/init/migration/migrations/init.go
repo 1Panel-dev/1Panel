@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	migrationutils "github.com/1Panel-dev/1Panel/agent/init/migration/migrations/utils"
+	alertwebhook "github.com/1Panel-dev/1Panel/agent/utils/alert_webhook"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
@@ -27,6 +28,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
 	"github.com/go-gormigrate/gormigrate/v2"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -489,7 +491,7 @@ var AddColumnToAlert = &gormigrate.Migration{
 var MigrateAlertMethodConfigIDs = &gormigrate.Migration{
 	ID: "20251001-migrate-alert-method-config-ids",
 	Migrate: func(tx *gorm.DB) error {
-		if err := global.AlertDB.AutoMigrate(&model.Alert{}, &model.AlertLog{}, &model.AlertTask{}, &model.AlertConfig{}); err != nil {
+		if err := tx.AutoMigrate(&model.Alert{}, &model.AlertLog{}, &model.AlertTask{}, &model.AlertConfig{}); err != nil {
 			return err
 		}
 		if err := migrateAlertMethodConfigIDs(tx); err != nil {
@@ -502,7 +504,7 @@ var MigrateAlertMethodConfigIDs = &gormigrate.Migration{
 var MigrateAlertLogTaskMethodConfigIDs = &gormigrate.Migration{
 	ID: "20260608-migrate-alert-log-task-method-config-ids",
 	Migrate: func(tx *gorm.DB) error {
-		if err := global.AlertDB.AutoMigrate(&model.AlertLog{}, &model.AlertTask{}, &model.AlertConfig{}); err != nil {
+		if err := tx.AutoMigrate(&model.AlertLog{}, &model.AlertTask{}, &model.AlertConfig{}); err != nil {
 			return err
 		}
 		if err := migrateAlertMethodRecords(tx, &model.AlertLog{}); err != nil {
@@ -518,8 +520,102 @@ var MigrateAlertLogTaskMethodConfigIDs = &gormigrate.Migration{
 var AddAlertAuditUser = &gormigrate.Migration{
 	ID: "20260602-add-alert-audit-user",
 	Migrate: func(tx *gorm.DB) error {
-		return global.AlertDB.AutoMigrate(&model.Alert{}, &model.AlertConfig{})
+		return tx.AutoMigrate(&model.Alert{}, &model.AlertConfig{})
 	},
+}
+
+var AddAlertConfigUIDAndSecret = &gormigrate.Migration{
+	ID: "20260826-add-alert-config-uid-secret",
+	Migrate: func(tx *gorm.DB) error {
+		return migrateAlertConfigUIDAndSecret(tx)
+	},
+}
+
+var AddAlertTaskDeliveryLogID = &gormigrate.Migration{
+	ID: "20260826-add-alert-task-delivery-log-id",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.AlertTask{})
+	},
+}
+
+func migrateAlertConfigUIDAndSecret(tx *gorm.DB) error {
+	if !tx.Migrator().HasTable(&model.AlertConfig{}) {
+		return tx.AutoMigrate(&model.AlertConfig{})
+	}
+
+	if !tx.Migrator().HasColumn(&model.AlertConfig{}, "UID") {
+		if err := tx.Exec("ALTER TABLE alert_configs ADD COLUMN uid varchar(64)").Error; err != nil {
+			return err
+		}
+	}
+	if !tx.Migrator().HasColumn(&model.AlertConfig{}, "SecretConfig") {
+		if err := tx.Exec("ALTER TABLE alert_configs ADD COLUMN secret_config text NOT NULL DEFAULT ''").Error; err != nil {
+			return err
+		}
+	}
+
+	var configs []struct {
+		ID  uint
+		UID string
+	}
+	if err := tx.Table("alert_configs").Select("id", "uid").Find(&configs).Error; err != nil {
+		return err
+	}
+	for _, config := range configs {
+		if strings.TrimSpace(config.UID) != "" {
+			continue
+		}
+		if err := tx.Table("alert_configs").Where("id = ?", config.ID).Update("uid", uuid.NewString()).Error; err != nil {
+			return err
+		}
+	}
+
+	if err := tx.AutoMigrate(&model.AlertConfig{}); err != nil {
+		return err
+	}
+
+	var customConfigs []model.AlertConfig
+	if err := tx.Where("type = ?", constant.Custom).Find(&customConfigs).Error; err != nil {
+		return err
+	}
+	for _, config := range customConfigs {
+		prepared, status, legacy, err := alertwebhook.NormalizeLegacy(config.Config, config.Status, config.Title)
+		if err != nil {
+			return fmt.Errorf("normalize legacy custom webhook %d: %w", config.ID, err)
+		}
+		if !legacy {
+			if err := alertwebhook.ValidateStored(config); err != nil && config.Status != constant.AlertDisable {
+				if updateErr := tx.Model(&model.AlertConfig{}).Where("id = ?", config.ID).Update("status", constant.AlertDisable).Error; updateErr != nil {
+					return updateErr
+				}
+			}
+			continue
+		}
+		if err := tx.Model(&model.AlertConfig{}).Where("id = ?", config.ID).Updates(map[string]interface{}{
+			"config":        prepared.Config,
+			"secret_config": prepared.SecretConfig,
+			"status":        status,
+		}).Error; err != nil {
+			return err
+		}
+	}
+
+	if tx.Migrator().HasTable(&model.Alert{}) {
+		if err := migrateAlertMethodConfigIDs(tx); err != nil {
+			return err
+		}
+	}
+	if tx.Migrator().HasTable(&model.AlertLog{}) {
+		if err := migrateAlertMethodRecords(tx, &model.AlertLog{}); err != nil {
+			return err
+		}
+	}
+	if tx.Migrator().HasTable(&model.AlertTask{}) {
+		if err := migrateAlertMethodRecords(tx, &model.AlertTask{}); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func migrateAlertMethodConfigIDs(tx *gorm.DB) error {
@@ -615,6 +711,7 @@ func alertLegacyMethodTypeMap() map[string]string {
 		constant.WeCom:    constant.WeCom,
 		constant.DingTalk: constant.DingTalk,
 		constant.FeiShu:   constant.FeiShu,
+		constant.Custom:   constant.Custom,
 	}
 }
 

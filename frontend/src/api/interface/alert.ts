@@ -156,6 +156,7 @@ export namespace Alert {
 
     export interface AlertConfigUpdateReq {
         id: number;
+        revision?: string;
         type: string;
         title: string;
         config: string;
@@ -163,15 +164,37 @@ export namespace Alert {
         displayName: string;
     }
 
+    export interface AlertConfigStatusReq {
+        id: number;
+        status: string;
+    }
+
     export interface AlertConfigTest {
-        port: number;
+        id?: number;
+        type: 'email';
+        config: string;
         host: string;
+        port: number;
         sender: string;
         userName: string;
         password: string;
         displayName: string;
         encryption: string;
         recipient: string;
+    }
+
+    export interface AlertConfigCustomTest {
+        id?: number;
+        type: 'custom';
+        config: string;
+    }
+
+    export interface AlertConfigCustomTestResult {
+        success: boolean;
+        statusCode?: number;
+        duration?: number;
+        message?: string;
+        response?: string;
     }
 
     export interface CommonAlertConfig {

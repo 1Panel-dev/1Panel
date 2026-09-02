@@ -151,16 +151,25 @@ type AlertLog struct {
 }
 
 type AlertDetail struct {
-	LicenseId   string  `json:"licenseId"`
-	Type        string  `json:"type"`
-	SubType     string  `json:"subType"`
-	Title       string  `json:"title"`
-	Method      string  `json:"method"`
-	LicenseCode string  `json:"licenseCode"`
-	DeviceId    string  `json:"deviceId"`
-	Project     string  `json:"project"`
-	Params      []Param `json:"params"`
-	Phone       string  `json:"phone"`
+	LicenseId   string             `json:"licenseId"`
+	Type        string             `json:"type"`
+	SubType     string             `json:"subType"`
+	Title       string             `json:"title"`
+	Method      string             `json:"method"`
+	LicenseCode string             `json:"licenseCode"`
+	DeviceId    string             `json:"deviceId"`
+	Project     string             `json:"project"`
+	Params      []Param            `json:"params"`
+	Phone       string             `json:"phone"`
+	Task        *AlertTaskMetadata `json:"task,omitempty"`
+}
+
+type AlertTaskMetadata struct {
+	AlertID   uint   `json:"alertId"`
+	Type      string `json:"type"`
+	Quota     string `json:"quota"`
+	QuotaType string `json:"quotaType"`
+	Method    string `json:"method"`
 }
 
 type AlertRule struct {
@@ -295,15 +304,19 @@ type OfflineQueryRequest struct {
 }
 
 type AlertConfigUpdate struct {
-	ID          uint   `json:"id"`
-	Type        string `json:"type"`
-	Title       string `json:"title"`
-	Status      string `json:"status"`
-	Config      string `json:"config"`
-	DisplayName string `json:"displayName"`
+	ID          uint       `json:"id"`
+	Type        string     `json:"type"`
+	Title       string     `json:"title"`
+	Status      string     `json:"status"`
+	Config      string     `json:"config"`
+	DisplayName string     `json:"displayName"`
+	Revision    *time.Time `json:"revision"`
 }
 
 type AlertConfigTest struct {
+	ID          uint   `json:"id"`
+	Type        string `json:"type"`
+	Config      string `json:"config"`
 	Host        string `json:"host"`
 	Port        int    `json:"port"`
 	Sender      string `json:"sender"`

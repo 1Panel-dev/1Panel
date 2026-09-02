@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -24,6 +25,12 @@ func NewLocalClient(reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) 
 	return client.Request(reqUrl, reqMethod, body, ctx)
 }
 
+func NewLocalClientWithContext(requestContext context.Context, reqURL, reqMethod string, body io.Reader, ctx *gin.Context, timeout time.Duration) (interface{}, error) {
+	client := newReusableClientWithTimeout("/etc/1panel/agent.sock", timeout)
+	defer client.CloseIdleConnections()
+	return client.RequestWithContext(requestContext, reqURL, reqMethod, body, ctx)
+}
+
 type ReusableClient struct {
 	client   *http.Client
 	sockPath string
@@ -34,17 +41,19 @@ func NewReusableClient() *ReusableClient {
 }
 
 func newReusableClient(sockPath string) *ReusableClient {
-	dialUnix := func() (conn net.Conn, err error) {
-		return net.Dial("unix", sockPath)
-	}
+	return newReusableClientWithTimeout(sockPath, 0)
+}
+
+func newReusableClientWithTimeout(sockPath string, timeout time.Duration) *ReusableClient {
+	dialer := &net.Dialer{Timeout: timeout}
 	transport := &http.Transport{
 		MaxIdleConns:        12,
 		MaxIdleConnsPerHost: 6,
 		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-			return dialUnix()
+			return dialer.DialContext(ctx, "unix", sockPath)
 		},
 	}
-	return &ReusableClient{client: &http.Client{Transport: transport}, sockPath: sockPath}
+	return &ReusableClient{client: &http.Client{Transport: transport, Timeout: timeout}, sockPath: sockPath}
 }
 
 func (c *ReusableClient) CloseIdleConnections() {
@@ -55,6 +64,10 @@ func (c *ReusableClient) CloseIdleConnections() {
 }
 
 func (c *ReusableClient) Request(reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (interface{}, error) {
+	return c.RequestWithContext(context.Background(), reqUrl, reqMethod, body, ctx)
+}
+
+func (c *ReusableClient) RequestWithContext(requestContext context.Context, reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (interface{}, error) {
 	if c == nil || c.client == nil {
 		return nil, errors.New("local agent client is not initialized")
 	}
@@ -71,7 +84,7 @@ func (c *ReusableClient) Request(reqUrl, reqMethod string, body io.Reader, ctx *
 		Host:   parsedURL.Host,
 	}
 
-	req, err := http.NewRequest(reqMethod, rURL.String(), body)
+	req, err := http.NewRequestWithContext(requestContext, reqMethod, rURL.String(), body)
 	if err != nil {
 		return nil, fmt.Errorf("creating request failed, err: %v", err)
 	}

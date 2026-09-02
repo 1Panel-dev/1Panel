@@ -14,6 +14,7 @@ const resolveAlertConfigExcludeTypes = (excludeTypes: string[] = []) => {
     }
     return Array.from(types);
 };
+
 export const SearchAlerts = (req: Alert.AlertSearch, currentNode?: string) => {
     return http.post<ResPage<Alert.AlertInfo>>(
         `/alert/search`,
@@ -99,8 +100,16 @@ export const UpdateAlertConfig = (req: Alert.AlertConfigUpdateReq) => {
     return http.post<any>(`/alert/config/update`, req);
 };
 
+export const UpdateAlertConfigStatus = (req: Alert.AlertConfigStatusReq) => {
+    return http.post<any>(`/alert/config/status`, req);
+};
+
 export const TestAlertConfig = (req: Alert.AlertConfigTest) => {
     return http.post<any>(`/alert/config/test`, req);
+};
+
+export const TestCustomAlertConfig = (req: Alert.AlertConfigCustomTest) => {
+    return http.post<Alert.AlertConfigCustomTestResult>(`/alert/config/test`, req);
 };
 
 export const SyncAlertInfo = (req: Alert.AlertLogId) => {

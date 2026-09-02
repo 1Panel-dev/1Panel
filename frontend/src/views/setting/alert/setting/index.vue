@@ -49,7 +49,7 @@
                     <template #title>
                         <div class="flex items-center justify-start">
                             {{ $t('xpack.alert.alertConfigHelper') }}
-                            <span v-if="!isProductPro">
+                            <span v-if="!isProductPro && !isEE">
                                 {{ $t('commons.units.semicolon') }}{{ $t('xpack.alert.alertConfigProHelper') }}
                             </span>
                             <el-link
@@ -89,15 +89,24 @@
                     </el-table-column>
                     <el-table-column :label="$t('xpack.alert.configDetail')" min-width="240" prop="details">
                         <template #default="{ row }">
-                            <div class="text-sm cursor-pointer select-none" @click="toggleDetail(row.id!)">
-                                <template v-if="expandedIds.has(row.id!)">
-                                    {{ getConfigDetails(row) }}
-                                    <el-icon class="ml-1 align-middle text-gray-400"><View /></el-icon>
-                                </template>
-                                <template v-else>
-                                    {{ getConfigSummary(row) }}
-                                    <el-icon class="ml-1 align-middle text-gray-400"><Hide /></el-icon>
-                                </template>
+                            <div class="config-detail text-sm">
+                                <span class="config-detail__value">
+                                    {{ expandedIds.has(row.id!) ? getConfigDetails(row) : getConfigSummary(row) }}
+                                </span>
+                                <el-button
+                                    link
+                                    class="config-detail__toggle"
+                                    :title="
+                                        $t(expandedIds.has(row.id!) ? 'commons.button.hide' : 'commons.button.view')
+                                    "
+                                    :aria-label="
+                                        $t(expandedIds.has(row.id!) ? 'commons.button.hide' : 'commons.button.view')
+                                    "
+                                    @click="toggleDetail(row.id!)"
+                                >
+                                    <el-icon v-if="expandedIds.has(row.id!)"><View /></el-icon>
+                                    <el-icon v-else><Hide /></el-icon>
+                                </el-button>
                             </div>
                         </template>
                     </el-table-column>
@@ -107,7 +116,7 @@
                                 v-model="row.status"
                                 active-value="Enable"
                                 inactive-value="Disable"
-                                :disabled="!isProductPro && ['weCom', 'dingTalk', 'feiShu', 'sms'].includes(row.type)"
+                                :disabled="isStatusChangeDisabled(row)"
                                 @change="onStatusChange(row)"
                             />
                         </template>
@@ -142,14 +151,22 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { ListAlertConfigs, PageAlertConfigs, DeleteAlertConfig, UpdateAlertConfig } from '@/api/modules/alert';
+import {
+    ListAlertConfigs,
+    PageAlertConfigs,
+    DeleteAlertConfig,
+    UpdateAlertConfig,
+    UpdateAlertConfigStatus,
+} from '@/api/modules/alert';
 import { ElMessageBox } from 'element-plus';
-import { Message, ChatDotRound, Bell, View, Hide } from '@element-plus/icons-vue';
+import { Message, ChatDotRound, Bell, View, Hide, Link } from '@element-plus/icons-vue';
 import SendTimeRange from '@/views/setting/alert/setting/time-range/index.vue';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import AlertDrawer from '@/views/setting/alert/setting/drawer/index.vue';
 import { Alert } from '@/api/interface/alert';
+import { formatCustomWebhookDetails, formatCustomWebhookSafeSummary } from './drawer/custom-webhook';
+import { getAlertConfigDisplayName, rawSecretValue } from './drawer/secret-field';
 
 const { docsUrl, isMaster, isMobile, isProductPro, isEE, isIntl } = useGlobalStore();
 
@@ -162,7 +179,6 @@ const alertFormRef = ref();
 
 const allConfigs = ref<Alert.AlertConfigInfo[]>([]);
 const expandedIds = ref<Set<number>>(new Set());
-
 const toggleDetail = (id: number) => {
     const next = new Set(expandedIds.value);
     if (next.has(id)) {
@@ -220,14 +236,8 @@ const parseConfig = <T extends object>(raw: Alert.AlertConfigInfo, fallback: T):
 
 function getDisplayName(row: Alert.AlertConfigInfo): string {
     try {
-        const cfg = JSON.parse(row.config || '{}');
-        if (row.type === 'email') {
-            return cfg.displayName || '';
-        }
-        if (cfg.webhooks && cfg.webhooks.length > 0) {
-            return cfg.webhooks.map((w: { displayName: string }) => w.displayName).join(', ');
-        }
-        return cfg.displayName || '';
+        const cfg = JSON.parse(row.config || '{}') as Record<string, unknown>;
+        return getAlertConfigDisplayName(row.type, cfg);
     } catch {
         return '';
     }
@@ -242,18 +252,24 @@ function getConfigDetails(row: Alert.AlertConfigInfo): string {
             return `${cfg.sender || ''} → ${cfg.host || ''}:${cfg.port || ''} | ${i18n.global.t('xpack.alert.recipient')}: ${recipients}`;
         }
         if (row.type === 'sms') {
-            return `${i18n.global.t('xpack.alert.phone')}: ${cfg.phone || ''}`;
+            return `${i18n.global.t('xpack.alert.phone')}: ${rawSecretValue(cfg.phone)}`;
+        }
+        if (row.type === 'custom') {
+            return formatCustomWebhookDetails(cfg, i18n.global.t('commons.msg.noneData'));
         }
         if (cfg.webhooks && cfg.webhooks.length > 0) {
             return cfg.webhooks
-                .map((w: { displayName: string; url: string }) => `${w.displayName}: ${w.url}`)
+                .map(
+                    (webhook: { displayName: string; url: unknown }) =>
+                        `${webhook.displayName}: ${rawSecretValue(webhook.url)}`,
+                )
                 .join(' | ');
         }
         if (cfg.displayName && cfg.url) {
-            return `${cfg.displayName}: ${cfg.url}`;
+            return `${cfg.displayName}: ${rawSecretValue(cfg.url)}`;
         }
         if (cfg.url) {
-            return cfg.url;
+            return rawSecretValue(cfg.url);
         }
         return '';
     } catch {
@@ -275,15 +291,12 @@ function getConfigSummary(row: Alert.AlertConfigInfo): string {
             return `${maskString(cfg.sender || '')} → ${cfg.host || ''}:${cfg.port || ''} | ${i18n.global.t('xpack.alert.recipient')}: ${recipientCount}`;
         }
         if (row.type === 'sms') {
-            return `${i18n.global.t('xpack.alert.phone')}: ${maskString(cfg.phone || '', 4)}`;
+            return `${i18n.global.t('xpack.alert.phone')}: ${maskString(rawSecretValue(cfg.phone), 4)}`;
         }
-        if (cfg.webhooks && cfg.webhooks.length > 0) {
-            return cfg.webhooks.map((w: { displayName: string }) => w.displayName).join(', ');
+        if (row.type === 'custom') {
+            return formatCustomWebhookSafeSummary(cfg, { includeUrl: false });
         }
-        if (cfg.displayName) {
-            return cfg.displayName;
-        }
-        return '***';
+        return getAlertConfigDisplayName(row.type, cfg) || '***';
     } catch {
         return '***';
     }
@@ -297,6 +310,7 @@ const getTypeIcon = (type: string) => {
         dingTalk: ChatDotRound,
         feiShu: ChatDotRound,
         bark: Bell,
+        custom: Link,
     };
     return map[type] || Message;
 };
@@ -309,6 +323,7 @@ const getTypeColor = (type: string) => {
         dingTalk: '#409eff',
         feiShu: '#7c3aed',
         bark: '#e6a23c',
+        custom: '#6366f1',
     };
     return map[type] || '#909399';
 };
@@ -321,11 +336,13 @@ const getTypeTagType = (type: string) => {
         dingTalk: '',
         feiShu: 'danger',
         bark: 'warning',
+        custom: 'primary',
     };
     return map[type] || 'info';
 };
 
 const searchConfigs = async () => {
+    expandedIds.value = new Set();
     loading.value = true;
     try {
         const [configRes, pageRes] = await Promise.all([
@@ -335,7 +352,6 @@ const searchConfigs = async () => {
                 pageSize: paginationConfig.pageSize,
             }),
         ]);
-
         const commonFound = configRes.data?.find((s: Alert.AlertConfigInfo) => s.type === 'common');
         if (commonFound) {
             const parsedConfig = parseConfig(commonFound, defaultCommonConfig.config);
@@ -429,21 +445,21 @@ const onChangeOffline = async () => {
     }
 };
 
-const onStatusChange = (row: Alert.AlertConfigInfo) => {
-    UpdateAlertConfig({
-        id: row.id!,
-        type: row.type,
-        title: row.title,
-        status: row.status,
-        config: row.config,
-        displayName: i18n.global.t(row.title),
-    })
-        .then(() => {
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        })
-        .catch(() => {
-            row.status = row.status === 'Enable' ? 'Disable' : 'Enable';
+const onStatusChange = async (row: Alert.AlertConfigInfo) => {
+    try {
+        await UpdateAlertConfigStatus({
+            id: row.id!,
+            status: row.status,
         });
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        await searchConfigs();
+    } catch {
+        row.status = row.status === 'Enable' ? 'Disable' : 'Enable';
+    }
+};
+
+const isStatusChangeDisabled = (row: Alert.AlertConfigInfo): boolean => {
+    return !isProductPro.value && ['weCom', 'dingTalk', 'feiShu', 'sms'].includes(row.type);
 };
 
 const onDelete = (id: number) => {
@@ -462,12 +478,17 @@ const onCreate = () => {
 };
 
 const openEditDrawer = (row: Alert.AlertConfigInfo) => {
+    if (!row.updatedAt) {
+        MsgError(i18n.global.t('xpack.alert.alertConfigChanged'));
+        return;
+    }
     let configData: Record<string, any> = {};
     try {
         configData = JSON.parse(row.config || '{}');
     } catch {}
     alertDrawerRef.value.acceptParams({
         id: row.id,
+        revision: row.updatedAt,
         type: row.type,
         config: configData,
         status: row.status,
@@ -483,7 +504,8 @@ const buttons = computed(() => [
             openEditDrawer(row);
         },
         disabled: (row: Alert.AlertConfigInfo) =>
-            (isIntl.value || !isProductPro.value) && ['weCom', 'dingTalk', 'feiShu', 'sms'].includes(row.type),
+            !row.updatedAt ||
+            ((isIntl.value || !isProductPro.value) && ['weCom', 'dingTalk', 'feiShu', 'sms'].includes(row.type)),
     },
     {
         label: i18n.global.t('commons.button.delete'),
@@ -502,5 +524,22 @@ onMounted(async () => {
 <style scoped lang="scss">
 .label {
     color: var(--el-text-color-placeholder);
+}
+
+.config-detail {
+    align-items: flex-start;
+    display: flex;
+    gap: 4px;
+}
+
+.config-detail__value {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.config-detail__toggle {
+    flex: none;
+    padding: 2px;
 }
 </style>
