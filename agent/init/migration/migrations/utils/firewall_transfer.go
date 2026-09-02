@@ -25,6 +25,11 @@ type legacyFirewalldForward struct {
 	spec string
 }
 
+type legacyFirewalldForwardFailure struct {
+	spec string
+	err  error
+}
+
 type firewallTransferSource struct {
 	rules      []forwarding.Rule
 	firewalld  []legacyFirewalldForward
@@ -159,16 +164,14 @@ func loadLegacyFirewallForwarding() (firewallTransferSource, error) {
 		if err != nil {
 			return firewallTransferSource{}, err
 		}
-		for _, item := range firewalldRules {
-			if _, err := forwarding.NormalizeRule(item.rule); err != nil {
-				if global.LOG != nil {
-					global.LOG.Warnf("skip unsupported legacy firewalld forwarding rule %q: %v", item.spec, err)
-				}
-				continue
+		supportedRules, cleanupRules, failures := selectSupportedLegacyFirewalldForwarding(firewalldRules)
+		for _, failure := range failures {
+			if global.LOG != nil {
+				global.LOG.Warnf("skip unsupported legacy firewalld forwarding rule %q: %v", failure.spec, failure.err)
 			}
-			source.rules = append(source.rules, item.rule)
-			source.firewalld = append(source.firewalld, item)
 		}
+		source.rules = append(source.rules, supportedRules...)
+		source.firewalld = append(source.firewalld, cleanupRules...)
 		if len(source.rules) > 0 {
 			source.provider = "iptables"
 		}
@@ -183,6 +186,23 @@ func loadLegacyFirewallForwarding() (firewallTransferSource, error) {
 	}
 	source.rules = append(source.rules, rules...)
 	return source, nil
+}
+
+func selectSupportedLegacyFirewalldForwarding(items []legacyFirewalldForward) (
+	[]forwarding.Rule, []legacyFirewalldForward, []legacyFirewalldForwardFailure,
+) {
+	rules := make([]forwarding.Rule, 0, len(items))
+	cleanup := make([]legacyFirewalldForward, 0, len(items))
+	failures := make([]legacyFirewalldForwardFailure, 0)
+	for _, item := range items {
+		if _, err := forwarding.NormalizeRule(item.rule); err != nil {
+			failures = append(failures, legacyFirewalldForwardFailure{spec: item.spec, err: err})
+			continue
+		}
+		rules = append(rules, item.rule)
+		cleanup = append(cleanup, item)
+	}
+	return rules, cleanup, failures
 }
 
 func listLegacyIptablesForwarding() ([]forwarding.Rule, error) {
@@ -261,40 +281,55 @@ func listLegacyFirewalldForwarding() ([]legacyFirewalldForward, error) {
 	if err != nil {
 		return nil, fmt.Errorf("list legacy firewalld forwarding rules: %w", err)
 	}
-	return parseLegacyFirewalldForwarding(stdout), nil
+	rules, failures := parseLegacyFirewalldForwarding(stdout)
+	for _, failure := range failures {
+		if global.LOG != nil {
+			global.LOG.Warnf("skip unsupported legacy firewalld forwarding rule %q: %v", failure.spec, failure.err)
+		}
+	}
+	return rules, nil
 }
 
-func parseLegacyFirewalldForwarding(stdout string) []legacyFirewalldForward {
+func parseLegacyFirewalldForwarding(stdout string) ([]legacyFirewalldForward, []legacyFirewalldForwardFailure) {
 	result := make([]legacyFirewalldForward, 0)
-	for _, line := range strings.Split(stdout, "\n") {
-		spec := strings.TrimSpace(line)
-		if !strings.HasPrefix(spec, "port=") {
+	failures := make([]legacyFirewalldForwardFailure, 0)
+	for _, spec := range strings.Fields(stdout) {
+		item, err := parseLegacyFirewalldForward(spec)
+		if err != nil {
+			failures = append(failures, legacyFirewalldForwardFailure{spec: spec, err: err})
 			continue
 		}
-		port, rest, ok := strings.Cut(strings.TrimPrefix(spec, "port="), ":proto=")
-		if !ok {
-			continue
-		}
-		protocol, rest, ok := strings.Cut(rest, ":toport=")
-		if !ok {
-			continue
-		}
-		targetPort, targetIP, ok := strings.Cut(rest, ":toaddr=")
-		if !ok {
-			continue
-		}
-		if targetIP == "" {
-			targetIP = "127.0.0.1"
-		}
-		result = append(result, legacyFirewalldForward{
-			rule: forwarding.Rule{
-				Family: forwarding.FamilyIPv4, Protocol: protocol, Port: port,
-				TargetIP: targetIP, TargetPort: targetPort,
-			},
-			spec: spec,
-		})
+		result = append(result, item)
 	}
-	return result
+	return result, failures
+}
+
+func parseLegacyFirewalldForward(spec string) (legacyFirewalldForward, error) {
+	if !strings.HasPrefix(spec, "port=") {
+		return legacyFirewalldForward{}, errors.New("missing port field")
+	}
+	port, rest, ok := strings.Cut(strings.TrimPrefix(spec, "port="), ":proto=")
+	if !ok {
+		return legacyFirewalldForward{}, errors.New("missing protocol field")
+	}
+	protocol, rest, ok := strings.Cut(rest, ":toport=")
+	if !ok {
+		return legacyFirewalldForward{}, errors.New("missing target port field")
+	}
+	targetPort, targetIP, ok := strings.Cut(rest, ":toaddr=")
+	if !ok {
+		return legacyFirewalldForward{}, errors.New("missing target address field")
+	}
+	if targetIP == "" {
+		targetIP = "127.0.0.1"
+	}
+	return legacyFirewalldForward{
+		rule: forwarding.Rule{
+			Family: forwarding.FamilyIPv4, Protocol: protocol, Port: port,
+			TargetIP: targetIP, TargetPort: targetPort,
+		},
+		spec: spec,
+	}, nil
 }
 
 func cleanupLegacyFirewalldForwarding(rules []legacyFirewalldForward) error {

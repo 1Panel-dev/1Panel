@@ -149,6 +149,9 @@ func (l *iptablesNATAdapter) Reconcile(rules []forwarding.Rule) error {
 		if family == forwarding.FamilyIPv6 && !l.backend.IPv6Available() {
 			continue
 		}
+		if err := l.batchEnsureChains(family); err != nil {
+			return err
+		}
 		script, err := buildIptablesForwardRestoreScript(byFamily[family])
 		if err != nil {
 			return err
@@ -315,27 +318,50 @@ func buildIptablesForwardLifecycleScript(outputs map[string]string, create bool)
 	items := []struct{ table, parent, chain string }{
 		{iptables_helper.NatTab, "PREROUTING", forwarding.ChainPreRouting},
 		{iptables_helper.NatTab, "POSTROUTING", forwarding.ChainPostRouting},
-		{iptables_helper.FilterTab, "FORWARD", forwarding.ChainForward},
 	}
 	byTable := make(map[string][]string, 2)
 	for _, item := range items {
 		output := outputs[item.table]
 		chainExists := containsExactLine(output, "-N "+item.chain)
-		bindingExists := containsExactLine(output, "-A "+item.parent+" -j "+item.chain)
+		binding := "-A " + item.parent + " -j " + item.chain
+		bindingCount := countExactLines(output, binding)
 		if create {
 			if !chainExists {
 				byTable[item.table] = append(byTable[item.table], "-N "+item.chain)
 			}
-			if !bindingExists {
+			if bindingCount == 0 {
 				byTable[item.table] = append(byTable[item.table], "-A "+item.parent+" -j "+item.chain)
 			}
 			continue
 		}
-		if bindingExists {
+		for range bindingCount {
 			byTable[item.table] = append(byTable[item.table], "-D "+item.parent+" -j "+item.chain)
 		}
 		if chainExists {
 			byTable[item.table] = append(byTable[item.table], "-F "+item.chain, "-X "+item.chain)
+		}
+	}
+
+	filterOutput := outputs[iptables_helper.FilterTab]
+	filterChainExists := containsExactLine(filterOutput, "-N "+forwarding.ChainForward)
+	filterBinding := "-A FORWARD -j " + forwarding.ChainForward
+	filterBindingCount := countExactLines(filterOutput, filterBinding)
+	if create {
+		if !filterChainExists {
+			byTable[iptables_helper.FilterTab] = append(byTable[iptables_helper.FilterTab], "-N "+forwarding.ChainForward)
+		}
+		if !forwardBindingEffective(filterOutput) {
+			for range filterBindingCount {
+				byTable[iptables_helper.FilterTab] = append(byTable[iptables_helper.FilterTab], "-D FORWARD -j "+forwarding.ChainForward)
+			}
+			byTable[iptables_helper.FilterTab] = append(byTable[iptables_helper.FilterTab], canonicalForwardBindingRule(filterOutput))
+		}
+	} else {
+		for range filterBindingCount {
+			byTable[iptables_helper.FilterTab] = append(byTable[iptables_helper.FilterTab], "-D FORWARD -j "+forwarding.ChainForward)
+		}
+		if filterChainExists {
+			byTable[iptables_helper.FilterTab] = append(byTable[iptables_helper.FilterTab], "-F "+forwarding.ChainForward, "-X "+forwarding.ChainForward)
 		}
 	}
 	var script strings.Builder
@@ -351,6 +377,68 @@ func buildIptablesForwardLifecycleScript(outputs map[string]string, create bool)
 		script.WriteString("\nCOMMIT\n")
 	}
 	return script.String()
+}
+
+func countExactLines(output, want string) int {
+	count := 0
+	for _, line := range strings.Split(output, "\n") {
+		if strings.TrimSpace(line) == want {
+			count++
+		}
+	}
+	return count
+}
+
+func forwardBindingEffective(output string) bool {
+	binding := "-A FORWARD -j " + forwarding.ChainForward
+	bindingPosition := 0
+	terminalPosition := 0
+	position := 0
+	bindings := 0
+	for _, line := range strings.Split(output, "\n") {
+		line = strings.TrimSpace(line)
+		if !strings.HasPrefix(line, "-A FORWARD ") {
+			continue
+		}
+		position++
+		if line == binding {
+			bindings++
+			bindingPosition = position
+		}
+		if terminalPosition == 0 && isUnconditionalForwardTerminal(line) {
+			terminalPosition = position
+		}
+	}
+	return bindings == 1 && (terminalPosition == 0 || bindingPosition < terminalPosition)
+}
+
+func canonicalForwardBindingRule(output string) string {
+	binding := "-A FORWARD -j " + forwarding.ChainForward
+	position := 1
+	for _, line := range strings.Split(output, "\n") {
+		line = strings.TrimSpace(line)
+		if !strings.HasPrefix(line, "-A FORWARD ") || line == binding {
+			continue
+		}
+		if isUnconditionalForwardTerminal(line) {
+			return fmt.Sprintf("-I FORWARD %d -j %s", position, forwarding.ChainForward)
+		}
+		position++
+	}
+	return "-A FORWARD -j " + forwarding.ChainForward
+}
+
+func isUnconditionalForwardTerminal(line string) bool {
+	fields := strings.Fields(line)
+	if len(fields) < 4 || fields[0] != "-A" || fields[1] != "FORWARD" || fields[2] != "-j" {
+		return false
+	}
+	switch fields[3] {
+	case "ACCEPT", "DROP", "REJECT", "RETURN":
+		return true
+	default:
+		return false
+	}
 }
 
 func containsExactLine(output, want string) bool {
@@ -444,12 +532,13 @@ func (l *iptablesNATAdapter) familyInitStatus(family string) (bool, bool, error)
 	if err != nil {
 		return false, false, fmt.Errorf("list %s filter initialization rules: %w", label, err)
 	}
-	filterInit, filterBind := checkInitAndBind(
+	filterInit, _ := checkInitAndBind(
 		[]string{"-N " + forwarding.ChainForward},
-		[]string{"-A FORWARD -j " + forwarding.ChainForward},
+		nil,
 		strings.Split(filterRules, "\n"),
 	)
-	return natInit && filterInit, forwardingEnabled && natBind && filterBind, nil
+	filterBind := forwardBindingEffective(filterRules)
+	return natInit && filterInit, forwardingEnabled && natBind && filterInit && filterBind, nil
 }
 
 func (l *iptablesNATAdapter) FamilyStatus(family string) (bool, bool, error) {
@@ -483,6 +572,14 @@ func containsExactRule(lines []string, rule string) bool {
 }
 
 func (l *iptablesNATAdapter) Replay() error {
+	for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
+		if family == forwarding.FamilyIPv6 && !l.backend.IPv6Available() {
+			continue
+		}
+		if err := l.batchEnsureChains(family); err != nil {
+			return err
+		}
+	}
 	for _, item := range []struct {
 		table string
 		chain string
