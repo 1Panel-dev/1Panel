@@ -695,9 +695,10 @@ func sendAlertsByConfigId(alert dto.AlertDTO, alertType, quota, quotaType string
 
 func sendAlertsByLegacyMethod(alert dto.AlertDTO, alertType, quota, quotaType string, params []dto.Param, method string) {
 	typeMap := map[string]string{
-		"mail":        constant.Email,
-		constant.Bark: constant.Bark,
-		constant.SMS:  constant.SMS,
+		"mail":          constant.Email,
+		constant.Bark:   constant.Bark,
+		constant.SMS:    constant.SMS,
+		constant.Custom: constant.Custom,
 	}
 	configType, ok := typeMap[method]
 	if !ok {
@@ -785,7 +786,7 @@ func doSendAlert(alert dto.AlertDTO, alertType, quota, quotaType string, params 
 		}
 		alertUtil.CreateNewAlertTask(quota, alertType, quotaType, methodStr)
 
-	case constant.WeCom, constant.DingTalk, constant.FeiShu:
+	case constant.WeCom, constant.DingTalk, constant.FeiShu, constant.Custom:
 		todayCount, isValid := canSendAlertToday(alertType, quotaType, alert.SendCount, methodStr)
 		if !isValid {
 			return
@@ -798,12 +799,31 @@ func doSendAlert(alert dto.AlertDTO, alertType, quota, quotaType string, params 
 		}
 		transport := xpack.MultiNodeProvider.LoadRequestTransport()
 		agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
-		alertErr := xpack.AlertProvider.CreateWebhookAlertLog(alertType, alert, create, quotaType, params, config, transport, agentInfo)
+		queued := false
+		var alertErr error
+		if config.Type == constant.Custom {
+			task := dto.AlertTaskMetadata{
+				AlertID:   alert.ID,
+				Type:      alertType,
+				Quota:     quota,
+				QuotaType: quotaType,
+				Method:    methodStr,
+			}
+			result, deliveryErr := xpack.DeliverCustomWebhookAlertLog(alertType, alert, create, quotaType, params, config, transport, agentInfo, task)
+			queued, alertErr = result.Queued, deliveryErr
+			if alertErr == nil && result.Queued {
+				_, alertErr = alertUtil.RecordQueuedAlertTask(result.LogID, task)
+			}
+		} else {
+			alertErr = xpack.AlertProvider.CreateWebhookAlertLog(alertType, alert, create, quotaType, params, config, transport, agentInfo)
+		}
 		if alertErr != nil {
 			global.LOG.Infof("%s alert webhook %s push faild, err: %v", alertType, methodStr, alertErr)
 			return
 		}
-		alertUtil.CreateNewAlertTask(quota, alertType, quotaType, methodStr)
+		if !queued {
+			alertUtil.CreateNewAlertTask(quota, alertType, quotaType, methodStr)
+		}
 	}
 }
 

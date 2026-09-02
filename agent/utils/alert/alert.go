@@ -157,6 +157,117 @@ func CreateNewAlertTask(quota, alertType, quotaType, method string) {
 	global.LOG.Infof("%s alert %s push completed", alertType, method)
 }
 
+func AttachQueuedAlertTaskMetadata(rawDetail string, task dto.AlertTaskMetadata) (string, error) {
+	if err := validateQueuedAlertTaskMetadata(task); err != nil {
+		return "", err
+	}
+	var detail dto.AlertDetail
+	if err := json.Unmarshal([]byte(rawDetail), &detail); err != nil {
+		return "", fmt.Errorf("decode queued alert detail: %w", err)
+	}
+	detail.Task = &task
+	data, err := json.Marshal(detail)
+	if err != nil {
+		return "", fmt.Errorf("encode queued alert detail: %w", err)
+	}
+	return string(data), nil
+}
+
+func RecordQueuedAlertTask(logID uint, task dto.AlertTaskMetadata) (bool, error) {
+	if logID == 0 {
+		return false, fmt.Errorf("queued alert log ID is required")
+	}
+	if global.AlertDB == nil {
+		return false, fmt.Errorf("alert database is unavailable")
+	}
+	if err := validateQueuedAlertTaskMetadata(task); err != nil {
+		return false, err
+	}
+	alertRepo := repo.NewIAlertRepo()
+	log, err := alertRepo.GetLog(repo.WithByID(logID))
+	if err != nil {
+		return false, err
+	}
+	if log.Status != constant.AlertPushing {
+		if log.Status == constant.AlertSuccess {
+			if existing, taskErr := alertRepo.GetAlertTask(alertRepo.WithByDeliveryLogID(logID)); taskErr == nil && existing.DeliveryLogID != nil {
+				return false, nil
+			}
+		}
+		return false, fmt.Errorf("alert delivery log %d is not pending", logID)
+	}
+	storedTask, alertTask, err := queuedAlertTaskFromLog(log)
+	if err != nil {
+		return false, err
+	}
+	if storedTask != task {
+		return false, fmt.Errorf("queued alert task metadata changed before reservation")
+	}
+	return alertRepo.CreatePendingAlertTask(logID, task.AlertID, &alertTask)
+}
+
+func FinalizeQueuedAlertDelivery(logID uint, succeeded bool, message string) (bool, error) {
+	if logID == 0 {
+		return false, fmt.Errorf("queued alert log ID is required")
+	}
+	if global.AlertDB == nil {
+		return false, fmt.Errorf("alert database is unavailable")
+	}
+	var fallback *model.AlertTask
+	if succeeded {
+		alertRepo := repo.NewIAlertRepo()
+		log, err := alertRepo.GetLog(repo.WithByID(logID))
+		if err != nil {
+			return false, err
+		}
+		if log.Status != constant.AlertPushing {
+			return false, nil
+		}
+		_, task, err := queuedAlertTaskFromLog(log)
+		if err != nil {
+			return false, err
+		}
+		fallback = &task
+	}
+	return repo.NewIAlertRepo().FinalizePendingAlertTask(logID, succeeded, message, fallback)
+}
+
+func queuedAlertTaskFromLog(log model.AlertLog) (dto.AlertTaskMetadata, model.AlertTask, error) {
+	var detail dto.AlertDetail
+	if err := json.Unmarshal([]byte(log.AlertDetail), &detail); err != nil {
+		return dto.AlertTaskMetadata{}, model.AlertTask{}, fmt.Errorf("decode queued alert task metadata: %w", err)
+	}
+	if detail.Task == nil {
+		return dto.AlertTaskMetadata{}, model.AlertTask{}, fmt.Errorf("queued alert task metadata is missing")
+	}
+	if err := validateQueuedAlertTaskMetadata(*detail.Task); err != nil {
+		return dto.AlertTaskMetadata{}, model.AlertTask{}, err
+	}
+	if detail.Task.AlertID != log.AlertId || detail.Task.Type != log.Type || detail.Task.Method != log.Method {
+		return dto.AlertTaskMetadata{}, model.AlertTask{}, fmt.Errorf("queued alert task metadata does not match its log")
+	}
+	task := model.AlertTask{
+		Type:      detail.Task.Type,
+		Quota:     detail.Task.Quota,
+		QuotaType: detail.Task.QuotaType,
+		Method:    detail.Task.Method,
+	}
+	return *detail.Task, task, nil
+}
+
+func validateQueuedAlertTaskMetadata(task dto.AlertTaskMetadata) error {
+	if task.AlertID == 0 {
+		return fmt.Errorf("queued alert task alert ID is required")
+	}
+	if strings.TrimSpace(task.Type) == "" {
+		return fmt.Errorf("queued alert task type is required")
+	}
+	if strings.TrimSpace(task.Method) == "" {
+		return fmt.Errorf("queued alert task method is required")
+	}
+	return nil
+}
+
 func ProcessAlertDetail(alert dto.AlertDTO, project string, params []dto.Param, method string) string {
 	alertDetail := dto.AlertDetail{
 		Type:    GetCronJobType(alert.Type),

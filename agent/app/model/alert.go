@@ -1,5 +1,12 @@
 package model
 
+import (
+	"strings"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
 type Alert struct {
 	BaseModel
 
@@ -18,10 +25,11 @@ type Alert struct {
 
 type AlertTask struct {
 	BaseModel
-	Type      string `gorm:"type:varchar(64);not null" json:"type"`
-	Quota     string `gorm:"type:varchar(64)" json:"quota"`
-	QuotaType string `gorm:"type:varchar(64)" json:"quotaType"`
-	Method    string `gorm:"type:varchar(128);not null;default:'sms'" json:"method"`
+	Type          string `gorm:"type:varchar(64);not null" json:"type"`
+	Quota         string `gorm:"type:varchar(64)" json:"quota"`
+	QuotaType     string `gorm:"type:varchar(64)" json:"quotaType"`
+	Method        string `gorm:"type:varchar(128);not null;default:'sms'" json:"method"`
+	DeliveryLogID *uint  `gorm:"uniqueIndex" json:"-"`
 }
 
 type AlertLog struct {
@@ -41,12 +49,21 @@ type AlertLog struct {
 
 type AlertConfig struct {
 	BaseModel
-	Type       string `gorm:"type:varchar(64);not null" json:"type"`
-	Title      string `gorm:"type:varchar(64);not null" json:"title"`
-	Status     string `gorm:"type:varchar(64);not null" json:"status"`
-	Config     string `gorm:"type:varchar(256);not null" json:"config"`
-	CreateUser string `gorm:"type:varchar(256)" json:"createUser"`
-	UpdateUser string `gorm:"type:varchar(256)" json:"updateUser"`
+	UID          string `gorm:"type:varchar(64);not null;uniqueIndex" json:"uid"`
+	Type         string `gorm:"type:varchar(64);not null" json:"type"`
+	Title        string `gorm:"type:varchar(64);not null" json:"title"`
+	Status       string `gorm:"type:varchar(64);not null" json:"status"`
+	Config       string `gorm:"type:text;not null" json:"config"`
+	SecretConfig string `gorm:"type:text;not null;default:''" json:"-"`
+	CreateUser   string `gorm:"type:varchar(256)" json:"createUser"`
+	UpdateUser   string `gorm:"type:varchar(256)" json:"updateUser"`
+}
+
+func (a *AlertConfig) BeforeCreate(_ *gorm.DB) error {
+	if strings.TrimSpace(a.UID) == "" {
+		a.UID = uuid.NewString()
+	}
+	return nil
 }
 
 type LoginLog struct {

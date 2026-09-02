@@ -397,6 +397,7 @@ import i18n from '@/lang';
 import { routerToName } from '@/utils/router';
 import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { getAlertConfigDisplayName } from '@/views/setting/alert/setting/drawer/secret-field';
 
 const { isMaster, isProductPro, isEE, isIntl } = useGlobalStore();
 
@@ -442,6 +443,8 @@ const legacyMethodTypeMap: Record<string, string> = {
     weCom: 'weCom',
     dingTalk: 'dingTalk',
     feiShu: 'feiShu',
+    webhook: 'custom',
+    custom: 'custom',
 };
 
 const normalizeMethodValues = (methods: string[]) => {
@@ -467,23 +470,8 @@ const getConfigTypeLabel = (type: string): string => {
 
 const getConfigOptionLabel = (c: Alert.AlertConfigInfo): string => {
     try {
-        const cfg = JSON.parse(c.config || '{}');
-        const name = cfg.displayName || cfg.sender || cfg.phone || '';
-        if (c.type === 'email') {
-            return name ? `${name}` : cfg.sender || getConfigTypeLabel(c.type);
-        }
-        if (cfg.webhooks && cfg.webhooks.length > 0) {
-            return cfg.webhooks
-                .map((w: { displayName: string }) => w.displayName || '')
-                .filter(Boolean)
-                .join(', ');
-        }
-        if (cfg.displayName) {
-            return cfg.displayName;
-        }
-        if (c.type === 'sms') {
-            return cfg.phone || getConfigTypeLabel(c.type);
-        }
+        const cfg = JSON.parse(c.config || '{}') as Record<string, unknown>;
+        return getAlertConfigDisplayName(c.type, cfg) || getConfigTypeLabel(c.type);
     } catch {}
     return getConfigTypeLabel(c.type);
 };

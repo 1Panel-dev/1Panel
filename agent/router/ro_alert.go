@@ -24,6 +24,7 @@ func (a *AlertRouter) InitRouter(Router *gin.RouterGroup) {
 		alertRouter.POST("/cronjob/list", baseApi.GetCronJobs)
 
 		alertRouter.POST("/config/update", baseApi.UpdateAlertConfig)
+		alertRouter.POST("/config/status", baseApi.UpdateAlertConfigStatus)
 		alertRouter.POST("/config/info", baseApi.GetAlertConfig)
 		alertRouter.POST("/config/search", baseApi.PageAlertConfig)
 		alertRouter.POST("/config/del", baseApi.DeleteAlertConfig)

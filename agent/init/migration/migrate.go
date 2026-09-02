@@ -5,6 +5,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/init/migration/migrations"
 
 	"github.com/go-gormigrate/gormigrate/v2"
+	"gorm.io/gorm"
 )
 
 func Init() {
@@ -122,13 +123,21 @@ func InitTaskDB() {
 }
 
 func InitAlertDB() {
-	m := gormigrate.New(global.AlertDB, gormigrate.DefaultOptions, []*gormigrate.Migration{
-		migrations.MigrateAlertMethodConfigIDs,
-		migrations.MigrateAlertLogTaskMethodConfigIDs,
-		migrations.AddAlertAuditUser,
-	})
-	if err := m.Migrate(); err != nil {
+	if err := migrateAlertDB(global.AlertDB); err != nil {
 		global.LOG.Error(err)
 		panic(err)
 	}
+}
+
+func migrateAlertDB(db *gorm.DB) error {
+	options := *gormigrate.DefaultOptions
+	options.UseTransaction = true
+	m := gormigrate.New(db, &options, []*gormigrate.Migration{
+		migrations.AddAlertConfigUIDAndSecret,
+		migrations.MigrateAlertMethodConfigIDs,
+		migrations.MigrateAlertLogTaskMethodConfigIDs,
+		migrations.AddAlertAuditUser,
+		migrations.AddAlertTaskDeliveryLogID,
+	})
+	return m.Migrate()
 }

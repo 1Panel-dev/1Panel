@@ -870,6 +870,7 @@ import { splitTimeFromSecond, transferTimeToSecond } from '@/utils/validate';
 import { getGroupList } from '@/api/modules/group';
 import { routerToName, routerToPath } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
+import { getAlertConfigDisplayName } from '@/views/setting/alert/setting/drawer/secret-field';
 const router = useRouter();
 
 const { docsUrl, isFxplay, isProductPro } = useGlobalStore();
@@ -914,6 +915,8 @@ const legacyAlertMethodTypeMap: Record<string, string> = {
     weCom: 'weCom',
     dingTalk: 'dingTalk',
     feiShu: 'feiShu',
+    webhook: 'custom',
+    custom: 'custom',
 };
 
 const normalizeAlertMethodItems = (methods: string[]) => {
@@ -935,7 +938,7 @@ const groupedAlertConfigOptions = computed(() => {
         type: string;
         options: { value: string; label: string; typeLabel: string }[];
     }[] = [];
-    const typeOrder = ['email', 'sms', 'weCom', 'dingTalk', 'feiShu', 'bark'];
+    const typeOrder = ['email', 'sms', 'weCom', 'dingTalk', 'feiShu', 'bark', 'custom'];
     for (const t of typeOrder) {
         if (typeMap.has(t)) {
             const typeLabel = getConfigTypeLabel(t);
@@ -948,6 +951,14 @@ const groupedAlertConfigOptions = computed(() => {
             });
         }
     }
+    for (const [type, options] of typeMap) {
+        if (typeOrder.includes(type)) continue;
+        const typeLabel = getConfigTypeLabel(type);
+        groups.push({
+            type,
+            options: options.map((item) => ({ ...item, typeLabel })),
+        });
+    }
     return groups;
 });
 
@@ -957,8 +968,11 @@ const getConfigTypeLabel = (type: string): string => {
 
 const getAlertConfigOptionLabel = (c: Alert.AlertConfigInfo): string => {
     try {
-        const cfg = JSON.parse(c.config || '{}');
-        return cfg.displayName || i18n.global.t(`xpack.alert.${c.type === 'email' ? 'mail' : c.type}`);
+        const cfg = JSON.parse(c.config || '{}') as Record<string, unknown>;
+        return (
+            getAlertConfigDisplayName(c.type, cfg) ||
+            i18n.global.t(`xpack.alert.${c.type === 'email' ? 'mail' : c.type}`)
+        );
     } catch {
         return i18n.global.t(`xpack.alert.${c.type === 'email' ? 'mail' : c.type}`);
     }

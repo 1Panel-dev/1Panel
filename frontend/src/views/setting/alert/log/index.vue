@@ -98,6 +98,7 @@ import {
 } from '@/api/modules/alert';
 import { ElMessageBox } from 'element-plus';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { getAlertConfigDisplayName } from '@/views/setting/alert/setting/drawer/secret-field';
 
 const { isMobile, isProductPro, isIntl, isMaster } = useGlobalStore();
 const { t } = i18n.global;
@@ -242,8 +243,8 @@ const formatMethod = (row: Alert.AlertLog) => {
             const typeKey = config.type === 'email' ? 'mail' : config.type;
             const typeLabel = i18n.global.t('xpack.alert.' + typeKey);
             try {
-                const cfg = JSON.parse(config.config || '{}');
-                const name = cfg.displayName || cfg.sender || cfg.phone || '';
+                const cfg = JSON.parse(config.config || '{}') as Record<string, unknown>;
+                const name = getAlertConfigDisplayName(config.type, cfg);
                 return name ? `${name}(${typeLabel})` : typeLabel;
             } catch {
                 return typeLabel;
@@ -268,7 +269,8 @@ const formatMethod = (row: Alert.AlertLog) => {
             case 'sms':
                 return t('xpack.alert.sms');
             case 'webhook':
-                return t('xpack.alert.webhookItem');
+            case 'custom':
+                return t('xpack.alert.custom');
             case 'bark':
                 return t('xpack.alert.bark');
             default:
