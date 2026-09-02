@@ -37,6 +37,9 @@ func Init() {
 		global.LOG.Errorf("transfer legacy forwarding rules failed, err: %v", err)
 		return
 	}
+	if err := initForwardingRules(ctx); err != nil {
+		global.LOG.Warnf("restore forwarding rules failed, manual synchronization is available, err: %v", err)
+	}
 	if !needInit() {
 		repairIptablesIPv6BaseChains(clientName)
 		return
@@ -44,10 +47,6 @@ func Init() {
 	defer initDockerPortGuard(ctx)
 	InitPingStatus()
 	global.LOG.Info("initializing firewall settings...")
-	if err := initForwardingRules(ctx); err != nil {
-		global.LOG.Errorf("restore forwarding rules failed, err: %v", err)
-		return
-	}
 	if clientName == "nftables" {
 		if err := nftables_helper.Restore(); err != nil {
 			global.LOG.Errorf("restore nftables rules failed, err: %v", err)
