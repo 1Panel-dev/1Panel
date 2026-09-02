@@ -3308,14 +3308,15 @@ const message = {
         restoreCommunity: 'Restaurar Community Edition',
         restoreCommunityOnline: 'Restauración en línea',
         restoreCommunityOffline: 'Restauración sin conexión',
-        restoreCommunityPackageFound:
-            'Se detectó un paquete sin conexión de Community Edition válido. La restauración sin conexión está disponible.',
-        restoreCommunityPackageMissing:
-            'No se detectó ningún paquete sin conexión de Community Edition válido. La restauración sin conexión no está disponible actualmente.',
+        restoreCommunityPackageFound: 'El paquete está listo',
+        restoreCommunityPackageMissing: 'Esperando el paquete',
+        restoreCommunityPackageChecking: 'Comprobando el paquete',
+        restoreCommunityPackageReadyHelper: 'Puede continuar con la restauración sin conexión.',
         restoreCommunityOnlineHelper:
             'Se descargará automáticamente el paquete Community Edition de la versión actual y se limpiarán los datos exclusivos de Enterprise.',
         restoreCommunityOfflineHelper:
             'Coloque en {path} un paquete oficial cuya versión no sea anterior a la versión Enterprise actual. El cambio se habilitará al detectar un paquete utilizable.',
+        restoreCommunityCopyDownloadLink: 'Copiar enlace de descarga',
         restoreCommunityConfirm:
             'Después de cambiar de versión, podrá iniciar sesión en Community Edition con la cuenta actual de superadministrador de Enterprise. Los datos exclusivos de Enterprise se eliminarán durante el cambio. Proceda con precaución.',
         restoreCommunityStarting:

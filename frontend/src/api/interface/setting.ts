@@ -308,6 +308,8 @@ export namespace Setting {
         message: string;
         packageExist: boolean;
         packageDirectory: string;
+        packageName: string;
+        packageURL: string;
     }
     export type CommunityRestoreMode = 'online' | 'offline';
     export interface NodeItem {

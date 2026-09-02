@@ -3034,11 +3034,14 @@ const message = {
         restoreCommunity: '恢復社群版',
         restoreCommunityOnline: '線上恢復',
         restoreCommunityOffline: '離線恢復',
-        restoreCommunityPackageFound: '已偵測到可用的社群版離線安裝包，可以執行離線恢復。',
-        restoreCommunityPackageMissing: '未偵測到可用的社群版離線安裝包，暫時無法執行離線恢復。',
+        restoreCommunityPackageFound: '安裝包已就緒',
+        restoreCommunityPackageMissing: '等待放置安裝包',
+        restoreCommunityPackageChecking: '正在檢查安裝包',
+        restoreCommunityPackageReadyHelper: '可直接執行離線恢復。',
         restoreCommunityOnlineHelper: '切換後將自動下載目前版本的社群版安裝包，並清理企業版專屬資料。',
         restoreCommunityOfflineHelper:
             '請先將版本不低於目前企業版的官方安裝包放入 {path}，偵測到可用安裝包後即可執行切換。',
+        restoreCommunityCopyDownloadLink: '複製下載連結',
         restoreCommunityConfirm:
             '版本切換後，可以使用目前企業版超級管理員帳號登入社群版。切換過程中將清除企業版專屬資料，請謹慎操作。',
         restoreCommunityStarting: '正在準備社群版，完成後面板將自動重新啟動。',

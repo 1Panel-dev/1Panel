@@ -3171,14 +3171,15 @@ const message = {
         restoreCommunity: '커뮤니티 버전 복원',
         restoreCommunityOnline: '온라인 복원',
         restoreCommunityOffline: '오프라인 복원',
-        restoreCommunityPackageFound:
-            '사용 가능한 Community Edition 오프라인 설치 패키지가 감지되었습니다. 오프라인 복원을 실행할 수 있습니다.',
-        restoreCommunityPackageMissing:
-            '사용 가능한 Community Edition 오프라인 설치 패키지가 감지되지 않아 현재 오프라인 복원을 실행할 수 없습니다.',
+        restoreCommunityPackageFound: '설치 패키지 준비 완료',
+        restoreCommunityPackageMissing: '설치 패키지 배치 대기 중',
+        restoreCommunityPackageChecking: '설치 패키지 확인 중',
+        restoreCommunityPackageReadyHelper: '오프라인 복원을 바로 실행할 수 있습니다.',
         restoreCommunityOnlineHelper:
             '현재 버전의 커뮤니티 버전 패키지를 자동으로 다운로드하고 Enterprise 전용 데이터를 정리합니다.',
         restoreCommunityOfflineHelper:
             '현재 Enterprise 버전 이상인 공식 패키지를 {path}에 저장하세요. 사용 가능한 패키지가 감지되면 전환이 활성화됩니다.',
+        restoreCommunityCopyDownloadLink: '다운로드 링크 복사',
         restoreCommunityConfirm:
             '버전 전환 후 현재 Enterprise 슈퍼 관리자 계정으로 커뮤니티 버전에 로그인할 수 있습니다. 전환 과정에서 Enterprise 전용 데이터가 삭제되므로 신중하게 진행하세요.',
         restoreCommunityStarting: '커뮤니티 버전을 준비 중입니다. 완료되면 패널이 자동으로 다시 시작됩니다.',
