@@ -52,7 +52,7 @@ require (
 	github.com/tklauser/go-sysconf v0.4.0
 	github.com/tomasen/fcgi_client v0.0.0-20180423082037-2bb3d819fd19
 	github.com/upyun/go-sdk v2.1.0+incompatible
-	go.mongodb.org/mongo-driver/v2 v2.8.1
+	go.mongodb.org/mongo-driver/v2 v2.8.2
 	golang.org/x/crypto v0.55.0
 	golang.org/x/net v0.58.0
 	golang.org/x/sync v0.22.0
