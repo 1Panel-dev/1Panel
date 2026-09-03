@@ -205,7 +205,9 @@ const syncDisabled = computed(() => {
 const detailItems = computed(() => {
     if (!preview.value || !detailFilter.value) return [];
     const items = preview.value.items || [];
-    if (detailFilter.value === 'total') return items.filter((item) => item.status !== 'remove');
+    if (detailFilter.value === 'total') {
+        return items.filter((item) => item.status !== 'remove' && item.reasonCode !== 'read_only_rule');
+    }
     return items.filter((item) => item.status === detailFilter.value);
 });
 
