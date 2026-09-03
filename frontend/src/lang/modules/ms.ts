@@ -513,6 +513,8 @@ const message = {
         closeCurrent: 'Tutup semasa',
         closeOther: 'Tutup lain',
         closeAll: 'Tutup Semua',
+        keepAlive: 'Kekalkan sesi halaman',
+        cancelKeepAlive: 'Hentikan pengekalan sesi halaman',
     },
     header: {
         logout: 'Log keluar',
@@ -2804,6 +2806,7 @@ const message = {
         portChangeHelper: 'Ubah port perkhidmatan dan mulakan semula perkhidmatan. Adakah anda mahu meneruskan?',
         theme: 'Tema',
         menuTabs: 'Tab menu',
+        menuTabsHelper: 'Selepas didayakan, klik butang kunci pada tab untuk mengekalkan sesi halaman.',
         menuAccordion: 'Pengembangan berbilang menu',
         menuAccordionHelper:
             'Selepas diaktifkan, beberapa kumpulan menu bar sisi boleh kekal dikembangkan pada masa yang sama.',

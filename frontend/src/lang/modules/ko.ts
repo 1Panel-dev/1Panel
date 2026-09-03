@@ -502,6 +502,8 @@ const message = {
         closeCurrent: '현재 탭 닫기',
         closeOther: '다른 탭 닫기',
         closeAll: '모두 닫기',
+        keepAlive: '페이지 세션 유지',
+        cancelKeepAlive: '페이지 세션 유지 해제',
     },
     header: {
         logout: '로그아웃',
@@ -2705,6 +2707,7 @@ const message = {
         portChangeHelper: '서비스 포트를 수정하고 서비스를 다시 시작합니다. 계속하시겠습니까?',
         theme: '테마',
         menuTabs: '메뉴 탭',
+        menuTabsHelper: '활성화한 후 탭의 잠금 버튼을 클릭하면 페이지 세션을 유지할 수 있습니다.',
         menuAccordion: '메뉴 다중 펼침',
         menuAccordionHelper: '활성화하면 사이드바의 여러 메뉴 그룹을 동시에 펼쳐 둘 수 있습니다.',
         dark: '다크',

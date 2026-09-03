@@ -493,6 +493,8 @@ const message = {
         closeCurrent: '關閉目前',
         closeOther: '關閉其它',
         closeAll: '關閉所有',
+        keepAlive: '保持頁面工作階段',
+        cancelKeepAlive: '取消保持頁面工作階段',
     },
     header: {
         logout: '登出',
@@ -2600,6 +2602,7 @@ const message = {
         portChangeHelper: '服務埠修改需要重新啟動服務，是否繼續？',
         theme: '主題顏色',
         menuTabs: '選單分頁',
+        menuTabsHelper: '開啟後，可點擊分頁上的鎖定按鈕以保持頁面工作階段。',
         menuAccordion: '選單多項展開',
         menuAccordionHelper: '啟用後，側邊欄可同時展開多個選單分組。',
         componentSize: '元件大小',

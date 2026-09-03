@@ -506,6 +506,8 @@ const message = {
         closeCurrent: 'ປິດໜ້ານີ້',
         closeOther: 'ປິດໜ້າອື່ນ',
         closeAll: 'ປິດທັງໝົດ',
+        keepAlive: 'ຮັກສາເຊັດຊັນໜ້າ',
+        cancelKeepAlive: 'ຍົກເລີກການຮັກສາເຊັດຊັນໜ້າ',
     },
     header: {
         logout: 'ອອກຈາກລະບົບ',
@@ -2689,6 +2691,7 @@ const message = {
         portChangeHelper: 'ແກ້ໄຂພອດບໍລິການ ແລະ ເລີ່ມບໍລິການໃໝ່. ຕ້ອງການເຮັດຕໍ່ບໍ?',
         theme: 'ຮູບແບບ',
         menuTabs: 'ແທັບເມນູ',
+        menuTabsHelper: 'ຫຼັງຈາກເປີດໃຊ້ງານແລ້ວ, ຄລິກປຸ່ມລັອກໃນແທັບເພື່ອຮັກສາເຊັດຊັນໜ້າ.',
         menuAccordion: 'ຂະຫຍາຍຫຼາຍເມນູ',
         menuAccordionHelper: 'ຫຼັງຈາກເປີດໃຊ້ ສາມາດຂະຫຍາຍຫຼາຍກຸ່ມເມນູດ້ານຂ້າງພ້ອມກັນໄດ້.',
         componentSize: 'ຂະໜາດຄອມໂພເນນ',

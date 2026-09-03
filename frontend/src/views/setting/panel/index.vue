@@ -56,6 +56,7 @@
                                         <span>{{ $t('commons.button.disable') }}</span>
                                     </el-radio-button>
                                 </el-radio-group>
+                                <span class="input-help">{{ $t('setting.menuTabsHelper') }}</span>
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.watermark')" v-if="isXpackOrEE" prop="watermark">

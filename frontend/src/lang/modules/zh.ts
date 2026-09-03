@@ -497,6 +497,8 @@ const message = {
         closeCurrent: '关闭当前',
         closeOther: '关闭其它',
         closeAll: '关闭所有',
+        keepAlive: '保持页面会话',
+        cancelKeepAlive: '取消保持页面会话',
     },
     header: {
         logout: '退出登录',
@@ -2631,6 +2633,7 @@ const message = {
         portChangeHelper: '服务端口修改需要重启服务，是否继续？',
         theme: '主题颜色',
         menuTabs: '菜单标签页',
+        menuTabsHelper: '开启后，可点击标签页上的锁按钮保持页面会话。',
         menuAccordion: '菜单多项展开',
         menuAccordionHelper: '开启后，侧边栏可同时展开多个菜单分组。',
         componentSize: '组件大小',

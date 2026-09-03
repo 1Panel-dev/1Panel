@@ -1,27 +1,11 @@
 <template>
-    <router-view v-slot="{ Component, route }" :key="key">
-        <transition appear name="fade-transform" mode="out-in">
-            <keep-alive :include="include">
-                <component :is="Component" :key="route.path"></component>
-            </keep-alive>
-        </transition>
-    </router-view>
+    <RouterViewCache :keep-alive="keepAlive" with-transition />
 </template>
 
 <script setup lang="ts">
-import cacheRouter from '@/routers/cache-router';
-import { computed } from 'vue';
+import type { KeepAlivePattern } from '@/utils/tab-cache';
 
-const key = computed(() => {
-    return Math.random();
-});
-const include = computed(() => {
-    return props.keepAlive || cacheRouter;
-});
-const props = defineProps({
-    keepAlive: {
-        type: Object,
-        required: false,
-    },
-});
+defineProps<{
+    keepAlive?: KeepAlivePattern | null;
+}>();
 </script>

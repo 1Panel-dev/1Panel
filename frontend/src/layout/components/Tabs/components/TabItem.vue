@@ -10,9 +10,33 @@
             >
                 <span class="custom-tabs-label">
                     <span>{{ menuName }}</span>
+                    <el-tooltip
+                        :content="tabItem.keepAlive ? $t('tabs.cancelKeepAlive') : $t('tabs.keepAlive')"
+                        placement="top"
+                    >
+                        <el-button
+                            class="tab-keep-alive-button"
+                            :class="{ 'is-active': tabItem.keepAlive }"
+                            link
+                            :type="tabItem.keepAlive ? 'primary' : 'info'"
+                            @click.stop="tabsStore.toggleKeepAlive(tabItem.path)"
+                        >
+                            <el-icon>
+                                <Lock v-if="tabItem.keepAlive" />
+                                <Unlock v-else />
+                            </el-icon>
+                        </el-button>
+                    </el-tooltip>
                 </span>
                 <template #dropdown>
                     <el-dropdown-menu>
+                        <el-dropdown-item @click="tabsStore.toggleKeepAlive(tabItem.path)">
+                            <el-icon>
+                                <Lock v-if="tabItem.keepAlive" />
+                                <Unlock v-else />
+                            </el-icon>
+                            {{ tabItem.keepAlive ? $t('tabs.cancelKeepAlive') : $t('tabs.keepAlive') }}
+                        </el-dropdown-item>
                         <el-dropdown-item
                             v-if="tabsStore.hasCloseDropdown(tabItem.path, 'close')"
                             @click="$emit('closeTab', tabItem.path)"
@@ -52,7 +76,7 @@
 import { computed, ref } from 'vue';
 import { TabsStore } from '@/store';
 import i18n from '@/lang';
-import { Close, DArrowLeft, DArrowRight, More } from '@element-plus/icons-vue';
+import { Close, DArrowLeft, DArrowRight, Lock, More, Unlock } from '@element-plus/icons-vue';
 
 const tabsStore = TabsStore();
 
@@ -85,9 +109,24 @@ defineExpose({
 });
 </script>
 
-<style scoped>
-.common-tabs .custom-tabs-label span {
-    vertical-align: middle;
-    margin-left: 4px;
+<style scoped lang="scss">
+.custom-tabs-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tab-keep-alive-button {
+    width: 18px;
+    height: 18px;
+    min-height: 18px;
+    padding: 0;
+    opacity: 0.65;
+    transition: opacity 0.15s ease;
+}
+
+.tab-keep-alive-button.is-active,
+.tab-keep-alive-button:hover {
+    opacity: 1;
 }
 </style>

@@ -507,6 +507,8 @@ const message = {
         closeCurrent: 'Fechar atual',
         closeOther: 'Fechar outros',
         closeAll: 'Fechar todos',
+        keepAlive: 'Manter sessão da página',
+        cancelKeepAlive: 'Parar de manter a sessão da página',
     },
     header: {
         logout: 'Logout',
@@ -2803,6 +2805,7 @@ const message = {
         portChangeHelper: 'Modificar a porta do serviço e reiniciar o serviço. Deseja continuar?',
         theme: 'Tema',
         menuTabs: 'Guias do menu',
+        menuTabsHelper: 'Após habilitar, clique no botão de cadeado da guia para manter a sessão da página.',
         menuAccordion: 'Expansão múltipla de menus',
         menuAccordionHelper:
             'Após ativar, vários grupos de menus da barra lateral podem permanecer expandidos ao mesmo tempo.',

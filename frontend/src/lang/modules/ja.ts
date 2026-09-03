@@ -508,6 +508,8 @@ const message = {
         closeCurrent: '電流を閉じます',
         closeOther: '他を閉じます',
         closeAll: 'すべてを閉じます',
+        keepAlive: 'ページセッションを保持',
+        cancelKeepAlive: 'ページセッションの保持を解除',
     },
     header: {
         logout: 'ログアウト',
@@ -2740,6 +2742,7 @@ const message = {
         portChangeHelper: 'サービスポートを変更し、サービスを再起動します。続けたいですか？',
         theme: 'テーマ',
         menuTabs: 'タブメニュー',
+        menuTabsHelper: '有効にすると、タブのロックボタンをクリックしてページセッションを保持できます。',
         menuAccordion: 'メニューの複数展開',
         menuAccordionHelper: '有効にすると、サイドバーの複数のメニューグループを同時に展開したままにできます。',
         dark: '暗い',
