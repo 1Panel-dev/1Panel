@@ -3973,6 +3973,8 @@ const message = {
         brotliCompLevelHelper: 'Brotli sıkıştırma oranı, 0 ile 11 arası',
         brotliManagedExternallyHelper:
             'Brotli, nginx.conf dosyasında elle yapılandırıldı; panel yalnızca geçerli değerleri gösterir ve üzerine yazmaz.',
+        brotliManagedUnavailableHelper:
+            'Panel, yönetilen brotli yapılandırmasını nginx.conf dosyasına otomatik olarak ekleyemedi; aşağıdaki değerler etkin olmayacak.',
         connections: 'Aktif bağlantılar',
         accepts: 'Kabul edilenler',
         handled: 'İşlenenler',

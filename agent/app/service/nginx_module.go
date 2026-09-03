@@ -705,18 +705,38 @@ func reconcileDynamicNginxModuleConfig(install model.AppInstall, modules []dto.N
 	// while directives such as "brotli on" are http-context. Both sets are
 	// written before nginx -t runs, so nginx only ever observes the final,
 	// consistent state; on failure both are rolled back together.
+	//
+	// The include that loads http.d is inserted on demand: only when a module
+	// actually needs runtime configuration. An install whose nginx.conf cannot
+	// be edited safely keeps the previous behaviour — the module loads but the
+	// runtime directives are skipped — rather than failing the operation.
 	httpConfigDir := nginxHTTPConfigDir(install)
-	httpSupported := nginxHTTPConfigSupported(install)
+	desiredHTTP := desiredNginxModuleRuntimeConfigs(install, modules, target)
+	httpActive := nginxHTTPIncludePresent(install)
+	var nginxConfSnapshot []byte
+	if len(desiredHTTP) > 0 && !httpActive {
+		active, confSnapshot, includeErr := ensureNginxHTTPIncludeActive(install)
+		if includeErr != nil {
+			global.LOG.Warnf("cannot insert the http.d include into nginx.conf, skipping runtime directives: %v", includeErr)
+			desiredHTTP = nil
+		} else {
+			httpActive = active
+			nginxConfSnapshot = confSnapshot
+		}
+	}
 	var httpSnapshot nginxModuleConfigSnapshot
-	if httpSupported {
+	if httpActive {
 		if httpSnapshot, err = snapshotManagedNginxHTTPConfigs(httpConfigDir); err != nil {
 			return err
 		}
 	}
 	restore := func() {
 		_ = applyManagedNginxModuleConfigs(configDir, snapshot)
-		if httpSupported {
+		if httpActive {
 			_ = applyManagedNginxHTTPConfigs(httpConfigDir, httpSnapshot)
+		}
+		if nginxConfSnapshot != nil {
+			_ = os.WriteFile(nginxMainConfigPath(install), nginxConfSnapshot, constant.FilePerm)
 		}
 	}
 
@@ -724,8 +744,7 @@ func reconcileDynamicNginxModuleConfig(install model.AppInstall, modules []dto.N
 		restore()
 		return err
 	}
-	if httpSupported {
-		desiredHTTP := desiredNginxModuleRuntimeConfigs(install, modules, target)
+	if httpActive {
 		if err = applyManagedNginxHTTPConfigs(httpConfigDir, desiredHTTP); err != nil {
 			restore()
 			return err

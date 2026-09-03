@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -22,7 +23,87 @@ const (
 
 	nginxHTTPConfigPrefix = "1panel-http-"
 	nginxHTTPConfigHeader = "# Managed by 1Panel. Manual changes will be overwritten.\n"
+
+	// nginxHTTPIncludeDirective is the include line that loads the managed
+	// directory. Fresh installs carry it in the shipped nginx.conf; existing
+	// ones get it inserted by the panel the first time a module needs
+	// http-context configuration.
+	nginxHTTPIncludeDirective = "include /usr/local/openresty/nginx/conf/http.d/*.conf;"
 )
+
+var (
+	// nginxHTTPIncludeRe matches the include line wherever it appears. A
+	// commented-out copy does not count.
+	nginxHTTPIncludeRe = regexp.MustCompile(`(?m)^[ \t]*include[ \t]+/usr/local/openresty/nginx/conf/http\.d/\*\.conf;[ \t]*\r?$`)
+
+	// nginxConfDIncludeRe locates the site-config include, the preferred
+	// insertion point, and captures its indentation.
+	nginxConfDIncludeRe = regexp.MustCompile(`(?m)^([ \t]*)include[ \t]+/usr/local/openresty/nginx/conf/conf\.d/\*\.conf;[ \t]*\r?$`)
+
+	// nginxHTTPBlockStartRe locates the http block opening, the fallback
+	// insertion point, and captures its indentation.
+	nginxHTTPBlockStartRe = regexp.MustCompile(`(?m)^([ \t]*)http[ \t]*\{[ \t]*\r?$`)
+)
+
+// nginxHTTPIncludePresent reports whether nginx.conf already loads http.d.
+func nginxHTTPIncludePresent(install model.AppInstall) bool {
+	content, err := os.ReadFile(nginxMainConfigPath(install))
+	if err != nil {
+		return false
+	}
+	return nginxHTTPIncludeRe.MatchString(string(content))
+}
+
+// insertNginxHTTPInclude returns the config with the http.d include added.
+//
+// The include goes right before the conf.d include so panel-managed defaults
+// are evaluated before per-site configuration; without one, it goes at the
+// top of the http block. Everything else stays byte-identical. A config
+// without a locatable http block is rejected, and callers degrade instead of
+// failing their operation over it.
+func insertNginxHTTPInclude(content string) (string, error) {
+	if nginxHTTPIncludeRe.MatchString(content) {
+		return content, nil
+	}
+	if m := nginxConfDIncludeRe.FindStringSubmatchIndex(content); m != nil {
+		indent := content[m[2]:m[3]]
+		return content[:m[0]] + indent + nginxHTTPIncludeDirective + "\n" + content[m[0]:], nil
+	}
+	if m := nginxHTTPBlockStartRe.FindStringSubmatchIndex(content); m != nil {
+		indent := content[m[2]:m[3]] + "    "
+		return content[:m[1]] + "\n" + indent + nginxHTTPIncludeDirective + content[m[1]:], nil
+	}
+	return "", errors.New("no insertion point for the http.d include in nginx.conf")
+}
+
+// ensureNginxHTTPIncludeActive makes nginx.conf load http.d, inserting the
+// include when missing. It returns whether the directory is loaded after the
+// call, plus the original config content so the caller can roll back the edit
+// together with the rest of its changes.
+func ensureNginxHTTPIncludeActive(install model.AppInstall) (active bool, snapshot []byte, err error) {
+	configPath := nginxMainConfigPath(install)
+	content, readErr := os.ReadFile(configPath)
+	if readErr != nil {
+		return false, nil, readErr
+	}
+	if nginxHTTPIncludeRe.MatchString(string(content)) {
+		if err = os.MkdirAll(nginxHTTPConfigDir(install), constant.DirPerm); err != nil {
+			return false, nil, err
+		}
+		return true, nil, nil
+	}
+	updated, insErr := insertNginxHTTPInclude(string(content))
+	if insErr != nil {
+		return false, nil, insErr
+	}
+	if err = os.WriteFile(configPath, []byte(updated), constant.FilePerm); err != nil {
+		return false, nil, err
+	}
+	if err = os.MkdirAll(nginxHTTPConfigDir(install), constant.DirPerm); err != nil {
+		return false, nil, err
+	}
+	return true, content, nil
+}
 
 // nginxHTTPDirective is a single http-context directive rendered into a
 // managed file.
@@ -36,15 +117,6 @@ func (d nginxHTTPDirective) render() string {
 		return d.Name + ";"
 	}
 	return d.Name + " " + strings.Join(d.Params, " ") + ";"
-}
-
-// nginxHTTPConfigSupported reports whether the installed OpenResty exposes the
-// managed http.d directory. Installations created before http.d was introduced
-// have no such directory and no include for it, so writing files there would
-// silently have no effect.
-func nginxHTTPConfigSupported(install model.AppInstall) bool {
-	info, err := os.Stat(nginxHTTPConfigDir(install))
-	return err == nil && info.IsDir()
 }
 
 func nginxHTTPConfigDir(install model.AppInstall) string {

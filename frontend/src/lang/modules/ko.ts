@@ -3825,7 +3825,10 @@ const message = {
         gzipHelper: '전송을 위한 압축 활성화',
         brotliHelper: 'brotli 압축 활성화, 일반적으로 gzip보다 작습니다',
         brotliCompLevelHelper: 'brotli 압축률, 0에서 11까지',
-        brotliManagedExternallyHelper: 'brotli가 nginx.conf에 수동으로 구성되어 있습니다. 패널은 적용 중인 값만 표시하며 덮어쓰지 않습니다.',
+        brotliManagedExternallyHelper:
+            'brotli가 nginx.conf에 수동으로 구성되어 있습니다. 패널은 적용 중인 값만 표시하며 덮어쓰지 않습니다.',
+        brotliManagedUnavailableHelper:
+            '패널이 관리되는 brotli 구성을 nginx.conf에 자동으로 추가할 수 없습니다. 아래 설정은 적용되지 않습니다.',
         connections: '활성 연결',
         accepts: '수락',
         handled: '처리됨',

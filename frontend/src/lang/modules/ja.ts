@@ -3896,7 +3896,10 @@ const message = {
         gzipHelper: '伝送の圧縮を有効にします',
         brotliHelper: 'brotli 圧縮を有効にします。通常 gzip より小さくなります',
         brotliCompLevelHelper: 'brotli 圧縮率、0 から 11',
-        brotliManagedExternallyHelper: 'brotli は nginx.conf で手動設定されています。パネルは現在の有効な値を表示するだけで、上書きしません。',
+        brotliManagedExternallyHelper:
+            'brotli は nginx.conf で手動設定されています。パネルは現在の有効な値を表示するだけで、上書きしません。',
+        brotliManagedUnavailableHelper:
+            'パネルは管理対象の brotli 設定を nginx.conf に自動で追加できませんでした。以下の設定は有効になりません。',
         connections: 'アクティブな接続',
         accepts: '受け入れます',
         handled: '処理',

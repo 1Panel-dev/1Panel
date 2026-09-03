@@ -3873,7 +3873,10 @@ const message = {
         gzipHelper: 'فعال‌سازی فشرده‌سازی برای انتقال',
         brotliHelper: 'فعال‌سازی فشرده‌سازی brotli، معمولاً کوچک‌تر از gzip',
         brotliCompLevelHelper: 'نرخ فشرده‌سازی brotli، از 0 تا 11',
-        brotliManagedExternallyHelper: 'brotli به‌صورت دستی در nginx.conf پیکربندی شده است؛ پنل فقط مقادیر در حال اجرا را نشان می‌دهد و آن‌ها را بازنویسی نمی‌کند.',
+        brotliManagedExternallyHelper:
+            'brotli به‌صورت دستی در nginx.conf پیکربندی شده است؛ پنل فقط مقادیر در حال اجرا را نشان می‌دهد و آن‌ها را بازنویسی نمی‌کند.',
+        brotliManagedUnavailableHelper:
+            'پنل نتوانست پیکربندی مدیریت‌شده brotli را به‌صورت خودکار به nginx.conf اضافه کند؛ مقادیر زیر اعمال نخواهند شد.',
         connections: 'اتصال‌های فعال',
         accepts: 'پذیرش‌ها',
         handled: 'مدیریت شده',

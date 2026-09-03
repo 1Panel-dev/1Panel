@@ -3968,7 +3968,10 @@ const message = {
         gzipHelper: 'Aktifkan pemampatan untuk penghantaran',
         brotliHelper: 'Aktifkan pemampatan brotli, biasanya lebih kecil daripada gzip',
         brotliCompLevelHelper: 'Kadar pemampatan brotli, 0 hingga 11',
-        brotliManagedExternallyHelper: 'Brotli dikonfigurasikan secara manual dalam nginx.conf; panel memaparkan nilai yang berkuat kuasa dan tidak akan menimpanya.',
+        brotliManagedExternallyHelper:
+            'Brotli dikonfigurasikan secara manual dalam nginx.conf; panel memaparkan nilai yang berkuat kuasa dan tidak akan menimpanya.',
+        brotliManagedUnavailableHelper:
+            'Panel tidak dapat menambahkan konfigurasi brotli terurus ke nginx.conf secara automatik; nilai di bawah tidak akan berkuat kuasa.',
         connections: 'Sambungan aktif',
         accepts: 'Diterima',
         handled: 'Diuruskan',

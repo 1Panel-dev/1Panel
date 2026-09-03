@@ -3956,7 +3956,10 @@ const message = {
         gzipHelper: 'Включить сжатие для передачи',
         brotliHelper: 'Включить сжатие brotli, обычно меньше, чем gzip',
         brotliCompLevelHelper: 'Степень сжатия brotli, от 0 до 11',
-        brotliManagedExternallyHelper: 'Brotli настроен вручную в nginx.conf; панель показывает действующие значения и не перезаписывает их.',
+        brotliManagedExternallyHelper:
+            'Brotli настроен вручную в nginx.conf; панель показывает действующие значения и не перезаписывает их.',
+        brotliManagedUnavailableHelper:
+            'Панель не смогла автоматически добавить управляемую конфигурацию brotli в nginx.conf; значения ниже не вступят в силу.',
         connections: 'Активные соединения',
         accepts: 'Принято',
         handled: 'Обработано',

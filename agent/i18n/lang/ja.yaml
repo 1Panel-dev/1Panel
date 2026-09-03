@@ -216,7 +216,7 @@ ErrDefaultAlias: 'デフォルトは予約済みのコードです。別のコ�
 ErrParentWebsite: 'まずサブサイト {{ .name }} を削除する必要があります'
 ErrBuildDirNotFound: 'ビルド ディレクトリが存在しません'
 ErrBrotliDisabled: 'brotli モジュールが有効になっていません。先に有効化してビルドしてください'
-ErrBrotliUnsupported: 'インストールされている OpenResty のバージョンは管理された brotli 設定をサポートしていません'
+ErrBrotliUnsupported: 'パネルは brotli 設定を nginx.conf に自動で組み込めませんでした。ファイルを確認するか OpenResty をアップグレードしてください'
 ErrModuleBuildUnsupported: 'この OpenResty バージョンではモジュールをビルドできません。先にアップグレードしてください'
 ErrImageNotExist: 'オペレーティング環境 {{ .name }} イメージが存在しません。オペレーティング環境を再編集してください'
 ErrProxyIsUsed: 'ロードバランシングはリバースプロキシによって使用されているため、削除できません'

@@ -216,7 +216,7 @@ ErrDefaultAlias: 'по умолчанию зарезервирован код, �
 ErrParentWebsite: 'Сначала вам необходимо удалить дочерний сайт {{ .name }}'
 ErrBuildDirNotFound: 'Каталог сборки не существует'
 ErrBrotliDisabled: 'Модуль brotli не включён, сначала включите и соберите его'
-ErrBrotliUnsupported: 'Установленная версия OpenResty не поддерживает управляемые настройки brotli'
+ErrBrotliUnsupported: 'Панель не смогла автоматически подключить настройки brotli к nginx.conf; проверьте файл или обновите OpenResty'
 ErrModuleBuildUnsupported: 'Эта версия OpenResty не может собирать модули, сначала обновите её'
 ErrImageNotExist: 'Образ операционной среды {{ .name }} не существует, пожалуйста, отредактируйте операционную среду заново'
 ErrProxyIsUsed: 'Балансировка нагрузки используется обратным прокси, невозможно удалить'

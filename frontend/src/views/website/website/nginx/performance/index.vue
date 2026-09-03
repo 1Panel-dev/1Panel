@@ -54,6 +54,11 @@
                         {{ $t('nginx.brotliManagedExternallyHelper') }}
                     </el-alert>
                 </el-col>
+                <el-col :span="24" v-if="brotliManagedUnavailable">
+                    <el-alert type="warning" :closable="false" class="mb-2">
+                        {{ $t('nginx.brotliManagedUnavailableHelper') }}
+                    </el-alert>
+                </el-col>
                 <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
                     <el-form-item label="brotli" prop="brotli">
                         <el-select v-model="brotliForm.brotli">
@@ -119,6 +124,7 @@ let loading = ref(false);
 // disappear together with the module.
 const brotliAvailable = ref(false);
 const brotliManagedExternally = ref(false);
+const brotliManagedUnavailable = ref(false);
 const brotliForm = ref({
     brotli: 'on',
     brotli_comp_level: 5,
@@ -192,6 +198,7 @@ const getBrotliParams = async () => {
     }
     const res = await getNginxConfigByScope<Nginx.NginxBrotliRes>({ scope: 'brotli' });
     brotliManagedExternally.value = !!res.data?.managedExternally;
+    brotliManagedUnavailable.value = !!res.data?.managedUnavailable;
     for (const param of res.data?.params ?? []) {
         if (param.params.length === 0) {
             continue;
@@ -225,7 +232,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         updateReq.value.params = params;
         updateNginxConfigByScope(updateReq.value)
             .then(() => {
-                if (!brotliAvailable.value) {
+                if (!brotliAvailable.value || brotliManagedUnavailable.value) {
                     return;
                 }
                 // brotli_types is managed by the panel and deliberately not

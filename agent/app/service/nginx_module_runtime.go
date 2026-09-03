@@ -210,7 +210,13 @@ func getNginxBrotliParams() (*response.NginxBrotliRes, error) {
 		fileName := nginxHTTPConfigFileName(nginxModuleRuntimeOrder(nginxBrotliModuleName), nginxBrotliModuleName)
 		current = readNginxHTTPDirectives(path.Join(nginxHTTPConfigDir(install), fileName))
 	}
-	res := &response.NginxBrotliRes{ManagedExternally: managedExternally}
+	res := &response.NginxBrotliRes{
+		ManagedExternally: managedExternally,
+		// Without the include, values the panel would write would never reach
+		// nginx, so they are reported as unavailable rather than shown as if
+		// they were in effect.
+		ManagedUnavailable: !managedExternally && !nginxHTTPIncludePresent(install),
+	}
 	for _, directive := range mergeNginxRuntimeDirectives(nginxModuleRuntimeDefaults[nginxBrotliModuleName], current) {
 		res.Params = append(res.Params, response.NginxParam{Name: directive.Name, Params: directive.Params})
 	}
@@ -247,9 +253,6 @@ func updateNginxBrotliParams(params []dto.NginxParam) error {
 	if err != nil {
 		return err
 	}
-	if !nginxHTTPConfigSupported(install) {
-		return buserr.New("ErrBrotliUnsupported")
-	}
 	modules, err := loadNginxModules(install)
 	if err != nil {
 		return err
@@ -270,6 +273,30 @@ func updateNginxBrotliParams(params []dto.NginxParam) error {
 		// would define every directive twice and nginx would refuse to start.
 		if nginxModuleConfiguredByUser(install, nginxBrotliModuleName) {
 			return updateUserNginxBrotliParams(install, values)
+		}
+		// A managed write needs the include. Installations missing it are
+		// upgraded in place here; when nginx.conf cannot be edited safely the
+		// write is refused with an actionable error instead of writing values
+		// nginx would never load.
+		if !nginxHTTPIncludePresent(install) {
+			configPath := nginxMainConfigPath(install)
+			content, readErr := os.ReadFile(configPath)
+			if readErr != nil {
+				return readErr
+			}
+			updated, insErr := insertNginxHTTPInclude(string(content))
+			if insErr != nil {
+				return buserr.New("ErrBrotliUnsupported")
+			}
+			if err = os.WriteFile(configPath, []byte(updated), constant.FilePerm); err != nil {
+				return err
+			}
+			if err = os.MkdirAll(nginxHTTPConfigDir(install), constant.DirPerm); err != nil {
+				return err
+			}
+			if err = nginxCheckAndReload(string(content), configPath, install.ContainerName); err != nil {
+				return err
+			}
 		}
 		fileName := nginxHTTPConfigFileName(nginxModuleRuntimeOrder(nginxBrotliModuleName), nginxBrotliModuleName)
 		configDir := nginxHTTPConfigDir(install)
