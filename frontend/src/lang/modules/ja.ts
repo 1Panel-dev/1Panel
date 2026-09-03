@@ -3229,14 +3229,15 @@ const message = {
         restoreCommunity: 'コミュニティ版に戻す',
         restoreCommunityOnline: 'オンライン復元',
         restoreCommunityOffline: 'オフライン復元',
-        restoreCommunityPackageFound:
-            '使用可能なコミュニティ版オフラインパッケージが検出されました。オフライン復元を実行できます。',
-        restoreCommunityPackageMissing:
-            '使用可能なコミュニティ版オフラインパッケージが検出されていないため、現在オフライン復元を実行できません。',
+        restoreCommunityPackageFound: 'パッケージの準備ができました',
+        restoreCommunityPackageMissing: 'パッケージの配置待ち',
+        restoreCommunityPackageChecking: 'パッケージを確認しています',
+        restoreCommunityPackageReadyHelper: 'オフライン復元を実行できます。',
         restoreCommunityOnlineHelper:
             '現在のバージョンのコミュニティ版パッケージを自動的にダウンロードし、Enterprise 専用データを削除します。',
         restoreCommunityOfflineHelper:
             '現在の Enterprise バージョン以上の公式パッケージを {path} に配置してください。使用可能なパッケージが検出されると切り替えが有効になります。',
+        restoreCommunityCopyDownloadLink: 'ダウンロードリンクをコピー',
         restoreCommunityConfirm:
             'バージョン切り替え後は、現在の Enterprise スーパー管理者アカウントでコミュニティ版にログインできます。切り替え中に Enterprise 専用データが消去されるため、慎重に操作してください。',
         restoreCommunityStarting: 'コミュニティ版を準備しています。完了後、パネルは自動的に再起動します。',

@@ -3279,14 +3279,15 @@ const message = {
         restoreCommunity: 'Восстановить Community Edition',
         restoreCommunityOnline: 'Онлайн-восстановление',
         restoreCommunityOffline: 'Офлайн-восстановление',
-        restoreCommunityPackageFound:
-            'Обнаружен подходящий офлайн-пакет Community Edition. Офлайн-восстановление доступно.',
-        restoreCommunityPackageMissing:
-            'Подходящий офлайн-пакет Community Edition не обнаружен. Офлайн-восстановление сейчас недоступно.',
+        restoreCommunityPackageFound: 'Пакет готов',
+        restoreCommunityPackageMissing: 'Ожидание пакета',
+        restoreCommunityPackageChecking: 'Проверка пакета',
+        restoreCommunityPackageReadyHelper: 'Можно выполнить офлайн-восстановление.',
         restoreCommunityOnlineHelper:
             'Пакет Community Edition текущей версии будет загружен автоматически, а данные, предназначенные только для Enterprise, будут очищены.',
         restoreCommunityOfflineHelper:
             'Поместите официальный пакет версии не ниже текущей Enterprise в {path}. Переключение станет доступно после обнаружения подходящего пакета.',
+        restoreCommunityCopyDownloadLink: 'Копировать ссылку для скачивания',
         restoreCommunityConfirm:
             'После смены версии можно войти в Community Edition с текущей учётной записью суперадминистратора Enterprise. Во время переключения данные, доступные только в Enterprise, будут удалены. Будьте осторожны.',
         restoreCommunityStarting:

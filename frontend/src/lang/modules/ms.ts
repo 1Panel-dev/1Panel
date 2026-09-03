@@ -3302,14 +3302,15 @@ const message = {
         restoreCommunity: 'Pulihkan Community Edition',
         restoreCommunityOnline: 'Pemulihan dalam talian',
         restoreCommunityOffline: 'Pemulihan luar talian',
-        restoreCommunityPackageFound:
-            'Pakej luar talian Community Edition yang boleh digunakan telah dikesan. Pemulihan luar talian tersedia.',
-        restoreCommunityPackageMissing:
-            'Tiada pakej luar talian Community Edition yang boleh digunakan dikesan. Pemulihan luar talian tidak tersedia pada masa ini.',
+        restoreCommunityPackageFound: 'Pakej sudah sedia',
+        restoreCommunityPackageMissing: 'Menunggu pakej',
+        restoreCommunityPackageChecking: 'Memeriksa pakej',
+        restoreCommunityPackageReadyHelper: 'Anda boleh meneruskan pemulihan luar talian.',
         restoreCommunityOnlineHelper:
             'Pakej Community Edition untuk versi semasa akan dimuat turun secara automatik dan data khusus Enterprise akan dibersihkan.',
         restoreCommunityOfflineHelper:
             'Letakkan pakej rasmi yang tidak lebih lama daripada versi Enterprise semasa dalam {path}. Pertukaran akan didayakan selepas pakej yang boleh digunakan dikesan.',
+        restoreCommunityCopyDownloadLink: 'Salin pautan muat turun',
         restoreCommunityConfirm:
             'Selepas menukar versi, anda boleh log masuk ke Community Edition menggunakan akaun pentadbir super Enterprise semasa. Data khusus Enterprise akan dipadamkan semasa pertukaran. Sila teruskan dengan berhati-hati.',
         restoreCommunityStarting:

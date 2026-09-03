@@ -3214,14 +3214,15 @@ const message = {
         restoreCommunity: 'بازیابی نسخه Community',
         restoreCommunityOnline: 'بازیابی آنلاین',
         restoreCommunityOffline: 'بازیابی آفلاین',
-        restoreCommunityPackageFound:
-            'یک بسته آفلاین قابل استفاده Community Edition شناسایی شد. بازیابی آفلاین در دسترس است.',
-        restoreCommunityPackageMissing:
-            'هیچ بسته آفلاین قابل استفاده Community Edition شناسایی نشد. بازیابی آفلاین در حال حاضر در دسترس نیست.',
+        restoreCommunityPackageFound: 'بسته آماده است',
+        restoreCommunityPackageMissing: 'در انتظار قرار دادن بسته',
+        restoreCommunityPackageChecking: 'در حال بررسی بسته',
+        restoreCommunityPackageReadyHelper: 'می‌توانید بازیابی آفلاین را انجام دهید.',
         restoreCommunityOnlineHelper:
             'بسته نسخه Community برای نسخه فعلی به‌طور خودکار دانلود و داده‌های ویژه Enterprise پاک‌سازی می‌شوند.',
         restoreCommunityOfflineHelper:
             'یک بسته رسمی با نسخه‌ای قدیمی‌تر نبودن از نسخه فعلی Enterprise را در {path} قرار دهید. پس از شناسایی بسته قابل استفاده، تغییر نسخه فعال می‌شود.',
+        restoreCommunityCopyDownloadLink: 'کپی لینک دانلود',
         restoreCommunityConfirm:
             'پس از تغییر نسخه، می‌توانید با حساب ابرمدیر فعلی Enterprise وارد نسخه Community شوید. داده‌های مختص Enterprise در طول تغییر حذف می‌شوند. لطفاً با احتیاط ادامه دهید.',
         restoreCommunityStarting:

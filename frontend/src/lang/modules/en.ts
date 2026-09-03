@@ -3246,14 +3246,15 @@ const message = {
         restoreCommunity: 'Restore Community Edition',
         restoreCommunityOnline: 'Online restore',
         restoreCommunityOffline: 'Offline restore',
-        restoreCommunityPackageFound:
-            'A usable offline Community Edition package was detected. Offline restore is available.',
-        restoreCommunityPackageMissing:
-            'No usable offline Community Edition package was detected. Offline restore is currently unavailable.',
+        restoreCommunityPackageFound: 'Package is ready',
+        restoreCommunityPackageMissing: 'Waiting for package',
+        restoreCommunityPackageChecking: 'Checking package',
+        restoreCommunityPackageReadyHelper: 'You can proceed with the offline restore.',
         restoreCommunityOnlineHelper:
             'The Community Edition package for the current version will be downloaded automatically, and Enterprise-only data will be cleaned up.',
         restoreCommunityOfflineHelper:
             'Place an official package no older than the current Enterprise version in {path}. Switching is enabled after a usable package is detected.',
+        restoreCommunityCopyDownloadLink: 'Copy download link',
         restoreCommunityConfirm:
             'After switching versions, you can sign in to Community Edition with the current Enterprise super administrator account. Enterprise-only data will be removed during the switch. Proceed with caution.',
         restoreCommunityStarting: 'Preparing Community Edition. The panel will restart automatically when ready.',

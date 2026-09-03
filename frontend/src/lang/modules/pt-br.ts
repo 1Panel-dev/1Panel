@@ -3309,14 +3309,15 @@ const message = {
         restoreCommunity: 'Restaurar Community Edition',
         restoreCommunityOnline: 'Restauração online',
         restoreCommunityOffline: 'Restauração offline',
-        restoreCommunityPackageFound:
-            'Um pacote offline utilizável da Community Edition foi detectado. A restauração offline está disponível.',
-        restoreCommunityPackageMissing:
-            'Nenhum pacote offline utilizável da Community Edition foi detectado. A restauração offline não está disponível no momento.',
+        restoreCommunityPackageFound: 'O pacote está pronto',
+        restoreCommunityPackageMissing: 'Aguardando o pacote',
+        restoreCommunityPackageChecking: 'Verificando o pacote',
+        restoreCommunityPackageReadyHelper: 'Você pode prosseguir com a restauração offline.',
         restoreCommunityOnlineHelper:
             'O pacote Community Edition da versão atual será baixado automaticamente e os dados exclusivos da Enterprise serão limpos.',
         restoreCommunityOfflineHelper:
             'Coloque em {path} um pacote oficial cuja versão não seja anterior à versão Enterprise atual. A troca será habilitada quando um pacote utilizável for detectado.',
+        restoreCommunityCopyDownloadLink: 'Copiar link de download',
         restoreCommunityConfirm:
             'Após trocar de versão, você poderá entrar na Community Edition com a conta atual de superadministrador da Enterprise. Os dados exclusivos da Enterprise serão removidos durante a troca. Prossiga com cuidado.',
         restoreCommunityStarting:

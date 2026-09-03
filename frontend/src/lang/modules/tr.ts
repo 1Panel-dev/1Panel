@@ -3294,14 +3294,15 @@ const message = {
         restoreCommunity: 'Community Edition sürümünü geri yükle',
         restoreCommunityOnline: 'Çevrimiçi geri yükleme',
         restoreCommunityOffline: 'Çevrimdışı geri yükleme',
-        restoreCommunityPackageFound:
-            'Kullanılabilir bir çevrimdışı Community Edition paketi algılandı. Çevrimdışı geri yükleme kullanılabilir.',
-        restoreCommunityPackageMissing:
-            'Kullanılabilir bir çevrimdışı Community Edition paketi algılanmadı. Çevrimdışı geri yükleme şu anda kullanılamıyor.',
+        restoreCommunityPackageFound: 'Paket hazır',
+        restoreCommunityPackageMissing: 'Paket bekleniyor',
+        restoreCommunityPackageChecking: 'Paket kontrol ediliyor',
+        restoreCommunityPackageReadyHelper: 'Çevrimdışı geri yüklemeye devam edebilirsiniz.',
         restoreCommunityOnlineHelper:
             'Geçerli sürümün Community Edition paketi otomatik olarak indirilecek ve Enterprise sürümüne özel veriler temizlenecektir.',
         restoreCommunityOfflineHelper:
             'Geçerli Enterprise sürümünden eski olmayan resmi bir paketi {path} dizinine yerleştirin. Kullanılabilir bir paket algılandığında geçiş etkinleştirilir.',
+        restoreCommunityCopyDownloadLink: 'İndirme bağlantısını kopyala',
         restoreCommunityConfirm:
             'Sürüm değişikliğinden sonra mevcut Enterprise süper yönetici hesabıyla Community Edition sürümüne giriş yapabilirsiniz. Enterprise sürümüne özel veriler geçiş sırasında silinecektir. Lütfen dikkatli ilerleyin.',
         restoreCommunityStarting:

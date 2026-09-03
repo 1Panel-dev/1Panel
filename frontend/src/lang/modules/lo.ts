@@ -3157,14 +3157,15 @@ const message = {
         restoreCommunity: 'ກູ້ຄືນ Community Edition',
         restoreCommunityOnline: 'ກູ້ຄືນອອນລາຍ',
         restoreCommunityOffline: 'ກູ້ຄືນອອບລາຍ',
-        restoreCommunityPackageFound:
-            'ກວດພົບແພັກເກດ Community Edition ອອບລາຍທີ່ໃຊ້ໄດ້ ແລະສາມາດດຳເນີນການກູ້ຄືນອອບລາຍໄດ້.',
-        restoreCommunityPackageMissing:
-            'ບໍ່ພົບແພັກເກດ Community Edition ອອບລາຍທີ່ໃຊ້ໄດ້ ຈຶ່ງຍັງບໍ່ສາມາດກູ້ຄືນອອບລາຍໄດ້.',
+        restoreCommunityPackageFound: 'ແພັກເກດພ້ອມໃຊ້ງານ',
+        restoreCommunityPackageMissing: 'ກຳລັງລໍຖ້າແພັກເກດ',
+        restoreCommunityPackageChecking: 'ກຳລັງກວດສອບແພັກເກດ',
+        restoreCommunityPackageReadyHelper: 'ສາມາດດຳເນີນການກູ້ຄືນອອບລາຍໄດ້ທັນທີ.',
         restoreCommunityOnlineHelper:
             'ລະບົບຈະດາວໂຫຼດແພັກເກດ Community Edition ສຳລັບເວີຊັນປັດຈຸບັນອັດຕະໂນມັດ ແລະ ລ້າງຂໍ້ມູນສະເພາະ Enterprise.',
         restoreCommunityOfflineHelper:
             'ວາງແພັກເກດທາງການທີ່ມີເວີຊັນບໍ່ຕ່ຳກວ່າ Enterprise ປັດຈຸບັນໄວ້ໃນ {path}. ການສະຫຼັບຈະເປີດໃຊ້ເມື່ອກວດພົບແພັກເກດທີ່ໃຊ້ໄດ້.',
+        restoreCommunityCopyDownloadLink: 'ຄັດລອກລິ້ງດາວໂຫຼດ',
         restoreCommunityConfirm:
             'ຫຼັງຈາກສະຫຼັບເວີຊັນ ສາມາດໃຊ້ບັນຊີຜູ້ດູແລສູງສຸດ Enterprise ປັດຈຸບັນເຂົ້າ Community Edition. ຂໍ້ມູນສະເພາະ Enterprise ຈະຖືກລຶບໃນລະຫວ່າງການສະຫຼັບ. ກະລຸນາດຳເນີນການດ້ວຍຄວາມລະມັດລະວັງ.',
         restoreCommunityStarting: 'ກຳລັງກະກຽມ Community Edition. ແຜງຄວບຄຸມຈະເລີ່ມໃໝ່ອັດຕະໂນມັດເມື່ອສຳເລັດ.',

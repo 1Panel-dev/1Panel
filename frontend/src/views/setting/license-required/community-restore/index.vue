@@ -23,26 +23,50 @@
                 <el-radio value="offline" border>{{ $t('license.restoreCommunityOffline') }}</el-radio>
             </el-radio-group>
 
-            <span class="input-help">
-                {{
-                    restoreMode === 'offline'
-                        ? $t('license.restoreCommunityOfflineHelper', { path: restoreInfo.packageDirectory })
-                        : $t('license.restoreCommunityOnlineHelper')
-                }}
+            <span v-if="restoreMode === 'online'" class="input-help">
+                {{ $t('license.restoreCommunityOnlineHelper') }}
             </span>
 
-            <el-alert
-                v-if="restoreMode === 'offline'"
-                v-loading="packageChecking"
-                :title="
-                    restoreInfo.packageExist
-                        ? $t('license.restoreCommunityPackageFound')
-                        : $t('license.restoreCommunityPackageMissing')
-                "
-                :type="restoreInfo.packageExist ? 'success' : 'warning'"
-                :closable="false"
-                show-icon
-            />
+            <div v-else class="package-status">
+                <div class="package-status-header">
+                    <el-icon v-if="packageChecking" class="is-loading"><Loading /></el-icon>
+                    <el-icon v-else-if="restoreInfo.packageExist"><CircleCheckFilled /></el-icon>
+                    <el-icon v-else><Clock /></el-icon>
+                    <span>
+                        {{
+                            packageChecking
+                                ? $t('license.restoreCommunityPackageChecking')
+                                : restoreInfo.packageExist
+                                  ? $t('license.restoreCommunityPackageFound')
+                                  : $t('license.restoreCommunityPackageMissing')
+                        }}
+                    </span>
+                </div>
+
+                <div v-if="!packageChecking" class="package-status-content">
+                    <span v-if="restoreInfo.packageExist && restoreInfo.packageName" class="package-name">
+                        {{ restoreInfo.packageName }}
+                    </span>
+                    <span class="package-status-description">
+                        {{
+                            restoreInfo.packageExist
+                                ? $t('license.restoreCommunityPackageReadyHelper')
+                                : $t('license.restoreCommunityOfflineHelper', {
+                                      path: restoreInfo.packageDirectory,
+                                  })
+                        }}
+                    </span>
+                    <el-button
+                        v-if="!restoreInfo.packageExist && restoreInfo.packageURL"
+                        class="copy-download-link"
+                        type="primary"
+                        link
+                        @click="copyText(restoreInfo.packageURL)"
+                    >
+                        {{ $t('license.restoreCommunityCopyDownloadLink') }}
+                    </el-button>
+                </div>
+            </div>
         </div>
 
         <template #footer>
@@ -62,6 +86,8 @@
 <script setup lang="ts">
 import { onUnmounted, reactive, ref } from 'vue';
 import { getCommunityRestoreStatus, restoreCommunity } from '@/api/modules/setting';
+import { copyText } from '@/utils/clipboard';
+import { CircleCheckFilled, Clock, Loading } from '@element-plus/icons-vue';
 
 const emit = defineEmits<{
     started: [];
@@ -76,6 +102,8 @@ const restoreInfo = reactive({
     message: '',
     packageExist: false,
     packageDirectory: '',
+    packageName: '',
+    packageURL: '',
 });
 let packageTimer: number | undefined;
 
@@ -158,5 +186,50 @@ defineExpose({
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.package-status {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 16px;
+    background-color: var(--el-bg-color);
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 4px;
+}
+
+.package-status-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: var(--el-text-color-primary);
+}
+
+.package-status-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding-left: 22px;
+}
+
+.package-status-description {
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--el-text-color-secondary);
+}
+
+.package-name {
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--el-text-color-primary);
+    word-break: break-all;
+}
+
+.copy-download-link {
+    margin: 4px 0 0;
+    padding: 0;
+    font-size: 12px;
 }
 </style>
