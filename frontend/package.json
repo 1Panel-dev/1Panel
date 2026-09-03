@@ -52,7 +52,7 @@
         "screenfull": "^6.0.2",
         "sortablejs": "^1.15.7",
         "uuid": "^14.0.1",
-        "vue": "^3.5.40",
+        "vue": "^3.5.42",
         "vue-clipboard3": "^2.0.0",
         "vue-codemirror": "^6.1.1",
         "vue-demi": "^0.14.6",
