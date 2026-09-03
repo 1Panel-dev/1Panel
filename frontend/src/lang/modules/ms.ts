@@ -3972,6 +3972,8 @@ const message = {
             'Brotli dikonfigurasikan secara manual dalam nginx.conf; panel memaparkan nilai yang berkuat kuasa dan tidak akan menimpanya.',
         brotliManagedUnavailableHelper:
             'Panel tidak dapat menambahkan konfigurasi brotli terurus ke nginx.conf secara automatik; nilai di bawah tidak akan berkuat kuasa.',
+        brotliMinLengthHelper: 'Saiz respons minimum untuk dimampatkan dengan brotli',
+        brotliSaveFailed: 'Tetapan brotli gagal disimpan; tetapan gzip di atas telah digunakan',
         connections: 'Sambungan aktif',
         accepts: 'Diterima',
         handled: 'Diuruskan',

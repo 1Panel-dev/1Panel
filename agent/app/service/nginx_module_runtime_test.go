@@ -1,8 +1,14 @@
 package service
 
 import (
+	"os"
+	"path"
 	"strings"
 	"testing"
+
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
 const userBrotliConf = `user  root;
@@ -161,5 +167,40 @@ func TestRewriteUserBrotliPreservesIndentation(t *testing.T) {
 	got := pattern.ReplaceAllString(content, "${1}brotli off;")
 	if !strings.Contains(got, "\t\tbrotli off;") {
 		t.Errorf("original indentation was not preserved: %q", got)
+	}
+}
+
+// Detection must cover the default/ directory, which is included at http
+// scope like conf.d but lives under the install directory, not the site root.
+func TestNginxModuleUserConfigPathsCoversDefaultDir(t *testing.T) {
+	siteDir := t.TempDir()
+	installRoot := t.TempDir()
+	installDir := path.Join(installRoot, "openresty", "openresty")
+	defaultDir := path.Join(installDir, "conf", "default")
+	if err := os.MkdirAll(defaultDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path.Join(defaultDir, "00.default.conf"), []byte("server {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	global.Dir.AppInstallDir = installRoot
+	install := model.AppInstall{Name: "openresty"}
+	install.App.Key = constant.AppOpenresty
+
+	paths := nginxModuleUserConfigPathsWithSiteDir(install, siteDir)
+	foundMain, foundDefault := false, false
+	for _, p := range paths {
+		if strings.HasSuffix(p, path.Join("conf", "nginx.conf")) {
+			foundMain = true
+		}
+		if strings.HasSuffix(p, path.Join("conf", "default", "00.default.conf")) {
+			foundDefault = true
+		}
+	}
+	if !foundMain {
+		t.Error("nginx.conf must be scanned")
+	}
+	if !foundDefault {
+		t.Error("conf/default must be scanned: it is included at http scope")
 	}
 }

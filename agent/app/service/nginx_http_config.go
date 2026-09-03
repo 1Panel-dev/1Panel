@@ -32,13 +32,15 @@ const (
 )
 
 var (
-	// nginxHTTPIncludeRe matches the include line wherever it appears. A
-	// commented-out copy does not count.
-	nginxHTTPIncludeRe = regexp.MustCompile(`(?m)^[ \t]*include[ \t]+/usr/local/openresty/nginx/conf/http\.d/\*\.conf;[ \t]*\r?$`)
+	// nginxHTTPIncludeRe matches the include line wherever it appears. The
+	// absolute path prefix and whitespace are optional in the match so a
+	// variant written by an older installer or by hand still counts; a
+	// commented-out copy does not.
+	nginxHTTPIncludeRe = regexp.MustCompile(`(?m)^[ \t]*include\s+(/usr/local/openresty/nginx/conf/)?http\.d/\*\.conf\s*;[ \t]*\r?$`)
 
 	// nginxConfDIncludeRe locates the site-config include, the preferred
 	// insertion point, and captures its indentation.
-	nginxConfDIncludeRe = regexp.MustCompile(`(?m)^([ \t]*)include[ \t]+/usr/local/openresty/nginx/conf/conf\.d/\*\.conf;[ \t]*\r?$`)
+	nginxConfDIncludeRe = regexp.MustCompile(`(?m)^([ \t]*)include\s+(/usr/local/openresty/nginx/conf/)?conf\.d/\*\.conf\s*;[ \t]*\r?$`)
 
 	// nginxHTTPBlockStartRe locates the http block opening, the fallback
 	// insertion point, and captures its indentation.
@@ -54,24 +56,45 @@ func nginxHTTPIncludePresent(install model.AppInstall) bool {
 	return nginxHTTPIncludeRe.MatchString(string(content))
 }
 
+// writeNginxFileAtomic writes through a temp file plus rename so a crash or a
+// concurrent reader never observes a half-written config.
+func writeNginxFileAtomic(filePath string, content []byte) error {
+	tmpPath := filePath + ".tmp"
+	if err := os.WriteFile(tmpPath, content, constant.FilePerm); err != nil {
+		return err
+	}
+	return os.Rename(tmpPath, filePath)
+}
+
+// nginxFileLineEnding picks the file's own style so an inserted or rewritten
+// line does not mix LF into a CRLF file.
+func nginxFileLineEnding(content string) string {
+	if strings.Contains(content, "\r\n") {
+		return "\r\n"
+	}
+	return "\n"
+}
+
 // insertNginxHTTPInclude returns the config with the http.d include added.
 //
 // The include goes right before the conf.d include so panel-managed defaults
 // are evaluated before per-site configuration; without one, it goes at the
-// top of the http block. Everything else stays byte-identical. A config
-// without a locatable http block is rejected, and callers degrade instead of
-// failing their operation over it.
+// top of the http block. The inserted line follows the file's own line-ending
+// style, and everything else stays byte-identical. A config without a
+// locatable http block is rejected, and callers degrade instead of failing
+// their operation over it.
 func insertNginxHTTPInclude(content string) (string, error) {
 	if nginxHTTPIncludeRe.MatchString(content) {
 		return content, nil
 	}
+	eol := nginxFileLineEnding(content)
 	if m := nginxConfDIncludeRe.FindStringSubmatchIndex(content); m != nil {
 		indent := content[m[2]:m[3]]
-		return content[:m[0]] + indent + nginxHTTPIncludeDirective + "\n" + content[m[0]:], nil
+		return content[:m[0]] + indent + nginxHTTPIncludeDirective + eol + content[m[0]:], nil
 	}
 	if m := nginxHTTPBlockStartRe.FindStringSubmatchIndex(content); m != nil {
 		indent := content[m[2]:m[3]] + "    "
-		return content[:m[1]] + "\n" + indent + nginxHTTPIncludeDirective + content[m[1]:], nil
+		return content[:m[1]] + eol + indent + nginxHTTPIncludeDirective + content[m[1]:], nil
 	}
 	return "", errors.New("no insertion point for the http.d include in nginx.conf")
 }
@@ -96,7 +119,7 @@ func ensureNginxHTTPIncludeActive(install model.AppInstall) (active bool, snapsh
 	if insErr != nil {
 		return false, nil, insErr
 	}
-	if err = os.WriteFile(configPath, []byte(updated), constant.FilePerm); err != nil {
+	if err = writeNginxFileAtomic(configPath, []byte(updated)); err != nil {
 		return false, nil, err
 	}
 	if err = os.MkdirAll(nginxHTTPConfigDir(install), constant.DirPerm); err != nil {

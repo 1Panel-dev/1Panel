@@ -71,7 +71,7 @@
                         <el-input clearable v-model.number="brotliForm.brotli_min_length">
                             <template #append>{{ unitLabel('brotli_min_length', 'k') }}</template>
                         </el-input>
-                        <span class="input-help">{{ $t('nginx.gzipMinLengthHelper') }}</span>
+                        <span class="input-help">{{ $t('nginx.brotliMinLengthHelper') }}</span>
                     </el-form-item>
                 </el-col>
                 <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
@@ -94,7 +94,7 @@ import { Nginx } from '@/api/interface/nginx';
 import { getNginxConfigByScope, getNginxModules, updateNginxConfigByScope } from '@/api/modules/nginx';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 
@@ -172,6 +172,9 @@ const unitLabel = (name: string, defaultUnit: string) => {
 };
 
 const getParams = async () => {
+    // Reset the unit cache: a directive removed since the last load must not
+    // hand its remembered unit to a value that no longer carries one.
+    units.value = {};
     const res = await getNginxConfigByScope(req.value);
     data.value = res.data;
     for (const param of res.data) {
@@ -182,9 +185,11 @@ const getParams = async () => {
             form.value.gzip = param.params[0];
         } else if (sizeKeys.includes(param.name)) {
             form.value[param.name] = parseSizeParam(param.name, param.params[0]);
-        } else {
+        } else if (param.name in form.value) {
             form.value[param.name] = Number(param.params[0].match(/\d+/g)?.[0] ?? 0);
         }
+        // Keys the page does not render (gzip_types, gzip_vary, gzip_proxied)
+        // are deliberately not stuffed into the form.
     }
     await getBrotliParams();
 };
@@ -245,12 +250,19 @@ const submit = async (formEl: FormInstance | undefined) => {
                         brotli_comp_level: String(brotliForm.value.brotli_comp_level),
                         brotli_min_length: withUnit('brotli_min_length', brotliForm.value.brotli_min_length, 'k'),
                     },
+                }).catch(() => {
+                    // gzip was already saved by the time brotli failed; say so
+                    // instead of leaving the user guessing which half applied.
+                    MsgError(i18n.global.t('nginx.brotliSaveFailed'));
+                    getParams();
+                    throw new Error('brotli save failed');
                 });
             })
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 getParams();
             })
+            .catch(() => {})
             .finally(() => {
                 loading.value = false;
             });

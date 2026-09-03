@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
@@ -77,7 +76,7 @@ func upgradeStockNginxGzipConfig(install model.AppInstall) error {
 	if updated == string(content) {
 		return nil
 	}
-	if err = os.WriteFile(configPath, []byte(updated), constant.FilePerm); err != nil {
+	if err = writeNginxFileAtomic(configPath, []byte(updated)); err != nil {
 		return err
 	}
 	if err = nginxCheckAndReload(string(content), configPath, install.ContainerName); err != nil {
@@ -120,7 +119,7 @@ func rewriteNginxGzipDirectives(content string) string {
 	result := make([]string, 0, len(lines))
 	seen := make(map[string]struct{})
 	lastGzipIndex := -1
-	indent := "    "
+	lastGzipIndent := "    "
 
 	for _, line := range lines {
 		match := nginxGzipDirectiveRe.FindStringSubmatch(line)
@@ -129,15 +128,19 @@ func rewriteNginxGzipDirectives(content string) string {
 			continue
 		}
 		name := match[1]
-		if leading := line[:len(line)-len(strings.TrimLeft(line, " \t"))]; leading != "" {
-			indent = leading
+		// The indentation belongs to the line itself; a top-level directive
+		// must not inherit the indent a previous, nested directive used.
+		lineIndent := line[:len(line)-len(strings.TrimLeft(line, " \t"))]
+		if lineIndent == "" {
+			lineIndent = "    "
 		}
+		lastGzipIndent = lineIndent
 		if _, obsolete := obsoleteNginxGzipDirectives[name]; obsolete {
 			continue
 		}
 		seen[name] = struct{}{}
 		if replacement, ok := correctedNginxGzipDirectives[name]; ok {
-			result = append(result, indent+name+" "+replacement+";")
+			result = append(result, lineIndent+name+" "+replacement+";")
 		} else {
 			result = append(result, line)
 		}
@@ -158,7 +161,7 @@ func rewriteNginxGzipDirectives(content string) string {
 	sort.Strings(missing)
 	added := make([]string, 0, len(missing))
 	for _, name := range missing {
-		added = append(added, indent+name+" "+correctedNginxGzipDirectives[name]+";")
+		added = append(added, lastGzipIndent+name+" "+correctedNginxGzipDirectives[name]+";")
 	}
 	tail := append(added, result[lastGzipIndex+1:]...)
 	return strings.Join(append(result[:lastGzipIndex+1], tail...), "\n")

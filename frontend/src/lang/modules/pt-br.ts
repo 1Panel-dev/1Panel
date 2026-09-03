@@ -3992,6 +3992,8 @@ const message = {
             'O brotli está configurado manualmente no nginx.conf; o painel mostra os valores em vigor e não os sobrescreve.',
         brotliManagedUnavailableHelper:
             'O painel não conseguiu adicionar automaticamente a configuração brotli gerenciada ao nginx.conf; os valores abaixo não terão efeito.',
+        brotliMinLengthHelper: 'Tamanho mínimo da resposta para compressão brotli',
+        brotliSaveFailed: 'Falha ao salvar as configurações brotli; as configurações gzip acima foram aplicadas',
         connections: 'Conexões ativas',
         accepts: 'Accepts',
         handled: 'Handled',

@@ -3,6 +3,8 @@ package service
 import (
 	"strings"
 	"testing"
+
+	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
 )
 
 const stockNginxConf = `user  root;
@@ -143,5 +145,38 @@ func TestRewriteNginxGzipDirectivesKeepsGzipLikeNames(t *testing.T) {
 	}
 	if !strings.Contains(result, "    gzip on;") {
 		t.Error("gzip directive should be kept in place")
+	}
+}
+
+// The gzip.conf template, the upgrade maps and the appstore defaults are three
+// copies of one intent. Pin the first two so they cannot drift apart silently.
+func TestGzipTemplateMatchesCorrectedDefaults(t *testing.T) {
+	template := nginx_conf.GetWebsiteFile("gzip.conf")
+	if len(template) == 0 {
+		t.Fatal("gzip.conf template is missing from the embedded files")
+	}
+	expected := make(map[string]string, len(stockNginxGzipDirectives))
+	for name, value := range stockNginxGzipDirectives {
+		expected[name] = value
+	}
+	for name := range obsoleteNginxGzipDirectives {
+		delete(expected, name)
+	}
+	for name, value := range correctedNginxGzipDirectives {
+		expected[name] = value
+	}
+	found := make(map[string]string)
+	for _, match := range nginxGzipDirectiveRe.FindAllStringSubmatch(string(template), -1) {
+		found[match[1]] = strings.Join(strings.Fields(match[2]), " ")
+	}
+	if len(found) != len(expected) {
+		t.Fatalf("template has %d directives, corrected defaults have %d", len(found), len(expected))
+	}
+	for name, want := range expected {
+		if got, ok := found[name]; !ok {
+			t.Errorf("template is missing %s", name)
+		} else if got != want {
+			t.Errorf("%s: template has %q, corrected defaults have %q", name, got, want)
+		}
 	}
 }

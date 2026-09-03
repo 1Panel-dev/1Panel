@@ -3975,6 +3975,8 @@ const message = {
             'Brotli, nginx.conf dosyasında elle yapılandırıldı; panel yalnızca geçerli değerleri gösterir ve üzerine yazmaz.',
         brotliManagedUnavailableHelper:
             'Panel, yönetilen brotli yapılandırmasını nginx.conf dosyasına otomatik olarak ekleyemedi; aşağıdaki değerler etkin olmayacak.',
+        brotliMinLengthHelper: 'brotli ile sıkıştırılacak minimum yanıt boyutu',
+        brotliSaveFailed: 'Brotli ayarları kaydedilemedi; yukarıdaki gzip ayarları uygulandı',
         connections: 'Aktif bağlantılar',
         accepts: 'Kabul edilenler',
         handled: 'İşlenenler',

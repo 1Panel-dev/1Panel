@@ -3804,6 +3804,8 @@ const message = {
             'brotli ຖືກຕັ້ງຄ່າດ້ວຍມືໃນ nginx.conf; ແຜງຄວບຄຸມຈະສະແດງຄ່າທີ່ກຳລັງໃຊ້ຢູ່ ແລະ ຈະບໍ່ຂຽບທັບ.',
         brotliManagedUnavailableHelper:
             'ແຜງຄວບຄຸມບໍ່ສາມາດເພີ່ມການຕັ້ງຄ່າ brotli ທີ່ຈັດການໄປຍັງ nginx.conf ໂດຍອັດຕະໂນມັດໄດ້; ຄ່າຂ້າງລຸ່ມນີ້ຈະບໍ່ມີຜົນ.',
+        brotliMinLengthHelper: 'ຂະໜາດຕອບສະໜອງຂັ້ນຕ່ຳທີ່ຈະບີບອັດດ້ວຍ brotli',
+        brotliSaveFailed: 'ບັນທຶກການຕັ້ງຄ່າ brotli ບໍ່ສຳເລັດ; ການຕັ້ງຄ່າ gzip ຂ້າງເທິງໄດ້ຖືກນຳໃຊ້ແລ້ວ',
         connections: 'ການເຊື່ອມຕໍ່ທີ່ກຳລັງເຮັດວຽກ',
         accepts: 'ຍອມຮັບແລ້ວ',
         handled: 'ຈັດການແລ້ວ',

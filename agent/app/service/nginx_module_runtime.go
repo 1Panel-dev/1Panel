@@ -84,6 +84,11 @@ func desiredNginxModuleRuntimeConfigs(install model.AppInstall, modules []dto.Ng
 	desired := make(map[string][]byte)
 	for _, module := range modules {
 		normalizeNginxModule(&module)
+		// A custom module that happens to share a built-in name must not pick
+		// up the built-in's runtime defaults; the table is for catalog modules.
+		if module.Custom {
+			continue
+		}
 		directives, ok := nginxModuleRuntimeDefaults[module.Name]
 		if !ok || !module.Enable {
 			continue
@@ -138,11 +143,16 @@ var nginxModuleUserDirectiveRe = regexp.MustCompile(`(?m)^[ \t]*brotli[a-z_]*[ \
 // stream include is skipped on purpose — brotli is an http module and has no
 // business there.
 func nginxModuleUserConfigPaths(install model.AppInstall) []string {
-	websiteDir := GetWebSiteRootDir()
-	return append(
-		[]string{nginxMainConfigPath(install)},
-		globConfFiles(path.Join(websiteDir, "conf.d"))...,
-	)
+	return nginxModuleUserConfigPathsWithSiteDir(install, GetWebSiteRootDir())
+}
+
+// nginxModuleUserConfigPathsWithSiteDir is the testable core: the site conf
+// directory is injected so unit tests do not need the settings database.
+func nginxModuleUserConfigPathsWithSiteDir(install model.AppInstall, siteDir string) []string {
+	paths := []string{nginxMainConfigPath(install)}
+	paths = append(paths, globConfFiles(path.Join(siteDir, "conf.d"))...)
+	paths = append(paths, globConfFiles(path.Join(install.GetPath(), nginxModuleConfDir, "default"))...)
+	return paths
 }
 
 func globConfFiles(dir string) []string {
@@ -288,7 +298,7 @@ func updateNginxBrotliParams(params []dto.NginxParam) error {
 			if insErr != nil {
 				return buserr.New("ErrBrotliUnsupported")
 			}
-			if err = os.WriteFile(configPath, []byte(updated), constant.FilePerm); err != nil {
+			if err = writeNginxFileAtomic(configPath, []byte(updated)); err != nil {
 				return err
 			}
 			if err = os.MkdirAll(nginxHTTPConfigDir(install), constant.DirPerm); err != nil {
@@ -335,12 +345,39 @@ func updateNginxBrotliParams(params []dto.NginxParam) error {
 // indentation, and every other line is untouched, so a hand-maintained config
 // survives an edit from the settings page. Directives the user did not write
 // are not introduced, since the panel cannot know where they intended them.
+//
+// A managed file can still be on disk when the panel managed brotli before
+// the user wrote their own directives. Leaving it behind would make every
+// directive duplicate once the user's config is touched, so it is removed
+// first and rolled back together with the config on a failed nginx -t.
 func updateUserNginxBrotliParams(install model.AppInstall, values map[string][]string) error {
 	configPath := nginxMainConfigPath(install)
 	content, err := os.ReadFile(configPath)
 	if err != nil {
 		return err
 	}
+	configDir := nginxHTTPConfigDir(install)
+	httpSnapshot, snapErr := snapshotManagedNginxHTTPConfigs(configDir)
+	if snapErr != nil {
+		return snapErr
+	}
+	managedFile := nginxHTTPConfigFileName(nginxModuleRuntimeOrder(nginxBrotliModuleName), nginxBrotliModuleName)
+	if _, stale := httpSnapshot[managedFile]; stale {
+		remaining := make(map[string][]byte, len(httpSnapshot))
+		for name, fileContent := range httpSnapshot {
+			if name != managedFile {
+				remaining[name] = fileContent
+			}
+		}
+		if err = applyManagedNginxHTTPConfigs(configDir, remaining); err != nil {
+			return err
+		}
+	}
+	restore := func() {
+		_ = writeNginxFileAtomic(configPath, content)
+		_ = applyManagedNginxHTTPConfigs(configDir, httpSnapshot)
+	}
+
 	updated := string(content)
 	for _, name := range dto.BrotliKeys {
 		params, ok := values[name]
@@ -357,10 +394,19 @@ func updateUserNginxBrotliParams(install model.AppInstall, values map[string][]s
 	if updated == string(content) {
 		return nil
 	}
-	if err = os.WriteFile(configPath, []byte(updated), constant.FilePerm); err != nil {
+	if err = writeNginxFileAtomic(configPath, []byte(updated)); err != nil {
+		restore()
 		return err
 	}
-	return nginxCheckAndReload(string(content), configPath, install.ContainerName)
+	if err = opNginx(install.ContainerName, constant.NginxCheck); err != nil {
+		restore()
+		return err
+	}
+	if err = opNginx(install.ContainerName, constant.NginxReload); err != nil {
+		restore()
+		return err
+	}
+	return nil
 }
 
 // nginxModuleRuntimeReady reports whether the module is actually usable.

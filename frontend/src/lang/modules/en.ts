@@ -3910,6 +3910,8 @@ const message = {
             'Brotli is configured manually in nginx.conf; the panel shows the values in effect and will not overwrite them.',
         brotliManagedUnavailableHelper:
             'The panel could not add the managed brotli configuration to nginx.conf automatically; the values below will not take effect.',
+        brotliMinLengthHelper: 'Minimum response size to brotli-compress',
+        brotliSaveFailed: 'Brotli settings failed to save; the gzip settings above were applied',
         connections: 'Active connections',
         accepts: 'Accepts',
         handled: 'Handled',

@@ -3697,6 +3697,8 @@ const message = {
         brotliCompLevelHelper: 'brotli 压缩率，取值 0 到 11',
         brotliManagedExternallyHelper: 'brotli 已在 nginx.conf 中手动配置，面板仅显示当前生效值，不会覆盖。',
         brotliManagedUnavailableHelper: '面板无法自动向 nginx.conf 写入托管的 brotli 配置，以下设置不会生效。',
+        brotliMinLengthHelper: 'brotli 压缩的最小响应大小',
+        brotliSaveFailed: 'brotli 设置保存失败，上方的 gzip 设置已应用',
         connections: '活动连接(Active connections)',
         accepts: '总连接次数(accepts)',
         handled: '总握手次数(handled)',

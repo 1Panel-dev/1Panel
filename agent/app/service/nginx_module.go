@@ -901,16 +901,12 @@ func executeNginxModuleBuild(install model.AppInstall, reqModules []string, forc
 	// an install that has no static module left to compile.
 	staticBuild := hasEnabledStaticNginxModules(modules)
 	if !staticBuild && hasDynamicNginxModuleBuildTask(modules, reqModules) && !nginxModuleDynamicSupported(install) {
-		// The install predates dynamic modules. Compile the same modules into
-		// the image instead of refusing the build, which is how these versions
-		// have always produced modules.
-		if !nginxModuleStaticSupported(install) {
-			return buserr.New("ErrModuleBuildUnsupported")
-		}
-		if modules, err = convertNginxModulesToStatic(modules, reqModules); err != nil {
-			return err
-		}
-		staticBuild = true
+		// The catalog and the builder have always shipped together, and an
+		// install missing the catalog fails to load its module state before
+		// this point, so this branch is a guard rather than a real path. Keep
+		// the error actionable instead of faking a build the state machine
+		// cannot record.
+		return buserr.New("ErrModuleBuildUnsupported")
 	}
 	if staticBuild {
 		return executeStaticNginxModuleBuild(install, modules, mirror, force, parentTask)
@@ -1373,43 +1369,6 @@ func normalizeDynamicModuleParams(params string) (string, error) {
 		return "", err
 	}
 	return params, nil
-}
-
-// normalizeStaticModuleParams is the inverse of normalizeDynamicModuleParams:
-// a module compiled into the image uses --add-module and the plain form of
-// nginx's built-in switches.
-func normalizeStaticModuleParams(params string) string {
-	params = strings.TrimSpace(params)
-	params = strings.ReplaceAll(params, "--add-dynamic-module=", "--add-module=")
-	return strings.ReplaceAll(params, "=dynamic", "")
-}
-
-// convertNginxModulesToStatic retargets the modules a build was asked to
-// produce so they are compiled into the image. It is used when the install
-// has no dynamic builder, where this is the only way to produce a module.
-//
-// The change is confined to the returned slice: it drives one build and is
-// never persisted, so the catalog's declared mode stays authoritative and the
-// modules go back to dynamic once the install gains a builder.
-func convertNginxModulesToStatic(modules []dto.NginxModule, selected []string) ([]dto.NginxModule, error) {
-	selectedNames := make(map[string]struct{}, len(selected))
-	for _, name := range selected {
-		selectedNames[name] = struct{}{}
-	}
-	converted := cloneNginxModules(modules)
-	for i := range converted {
-		if !nginxModuleNeedsDynamicBuild(converted[i], selectedNames) {
-			continue
-		}
-		params := normalizeStaticModuleParams(converted[i].Params)
-		if params == "" {
-			return nil, fmt.Errorf("OpenResty module %s has no configure options to compile into the image", converted[i].Name)
-		}
-		converted[i].BuildMode = nginxModuleBuildStatic
-		converted[i].Params = params
-		converted[i].Enable = true
-	}
-	return converted, nil
 }
 
 func parseDynamicModuleParams(params string) ([]string, error) {

@@ -3960,6 +3960,8 @@ const message = {
             'Brotli настроен вручную в nginx.conf; панель показывает действующие значения и не перезаписывает их.',
         brotliManagedUnavailableHelper:
             'Панель не смогла автоматически добавить управляемую конфигурацию brotli в nginx.conf; значения ниже не вступят в силу.',
+        brotliMinLengthHelper: 'Минимальный размер ответа для сжатия brotli',
+        brotliSaveFailed: 'Не удалось сохранить настройки brotli; настройки gzip выше были применены',
         connections: 'Активные соединения',
         accepts: 'Принято',
         handled: 'Обработано',
