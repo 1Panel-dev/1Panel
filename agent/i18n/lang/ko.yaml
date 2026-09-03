@@ -678,6 +678,7 @@ XfsNotFound: 'xfs 파일 시스템이 감지되지 않았습니다, 먼저 xfspr
 # 터미널
 TerminalAIBlockedRiskyCommand: '위험한 명령이 차단되었습니다: {{ .command }}'
 TerminalAIThinking: 'AI가 생각 중입니다...'
+TerminalOutputTruncated: '[출력이 잘렸습니다. 최근 출력만 표시합니다]'
 TerminalAIReadyToExecute: '생각이 완료되었습니다. Enter를 눌러 실행하세요 (소요 시간 {{ .duration }}, token: {{ .tokens }})'
 TerminalAIRequestFailed: 'AI 요청 실패: {{ .err }}'
 

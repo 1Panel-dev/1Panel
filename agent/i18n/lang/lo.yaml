@@ -668,6 +668,7 @@ XfsNotFound: 'ບໍ່ພົບ xfs; ກະລຸນາຕິດຕັ້ງ xf
 # terminal
 TerminalAIBlockedRiskyCommand: 'ບລັອກຄຳສັ່ງທີ່ມີຄວາມສ່ຽງ: {{ .command }}'
 TerminalAIThinking: 'AI ກຳລັງຄິດ...'
+TerminalOutputTruncated: '[ຜົນລັບຖືກຕັດ, ສະແດງສະເພາະຜົນລັບຫຼ້າສຸດ]'
 TerminalAIReadyToExecute: 'ຄິດສຳເລັດແລ້ວ, ກົດ Enter ເພື່ອປະຕິບັດ (ໃຊ້ເວລາ: {{ .duration }}, ໂທເຄັນ: {{ .tokens }})'
 TerminalAIRequestFailed: 'ຄຳຮ້ອງຂໍ AI ລົ້ມເຫຼວ: {{ .err }}'
 FileAISearchEmptyDir: 'ບໍ່ພົບໄຟລ໌ ຫຼື ໂຟນເດີພາຍໃຕ້ເສັ້ນທາງນີ້ (ຫຼື ລາຍການທັງໝົດຖືກກັ່ນກອງອອກ).'

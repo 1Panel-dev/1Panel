@@ -678,6 +678,7 @@ XfsNotFound: 'xfs یافت نشد؛ ابتدا xfsprogs را نصب کنید'
 # ترمینال
 TerminalAIBlockedRiskyCommand: 'دستور پرخطر مسدود شد: {{ .command }}'
 TerminalAIThinking: 'هوش مصنوعی در حال فکر کردن است...'
+TerminalOutputTruncated: '[خروجی کوتاه شد، فقط خروجی اخیر نمایش داده می‌شود]'
 TerminalAIReadyToExecute: 'تفکر کامل شد، برای اجرا Enter را فشار دهید (مدت زمان: {{ .duration }}، توکن‌ها: {{ .tokens }})'
 TerminalAIRequestFailed: 'درخواست هوش مصنوعی ناموفق بود: {{ .err }}'
 

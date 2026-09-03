@@ -678,6 +678,7 @@ XfsNotFound: "未检测到 xfs 文件系统，请先安装 xfsprogs"
 # 终端
 TerminalAIBlockedRiskyCommand: "已拦截风险命令：{{ .command }}"
 TerminalAIThinking: "AI 正在思考..."
+TerminalOutputTruncated: "[输出已截断，仅显示最近输出]"
 TerminalAIReadyToExecute: "思考完成，请回车执行（耗时 {{ .duration }}，token：{{ .tokens }}）"
 TerminalAIRequestFailed: "AI 请求失败：{{ .err }}"
 
