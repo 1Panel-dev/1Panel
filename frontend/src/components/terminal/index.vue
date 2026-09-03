@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, shallowRef, watch, onBeforeUnmount, nextTick, computed, onMounted } from 'vue';
+import { ref, shallowRef, watch, onActivated, onBeforeUnmount, nextTick, computed, onMounted } from 'vue';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
@@ -515,6 +515,10 @@ defineExpose({
 onBeforeUnmount(() => {
     onClose();
     resizeObserver.value?.disconnect();
+});
+
+onActivated(() => {
+    nextTick(changeTerminalSize);
 });
 </script>
 

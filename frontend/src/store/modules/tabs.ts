@@ -1,14 +1,16 @@
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
+import { getTabCacheName } from '@/utils/tab-cache';
 
 const TabsStore = defineStore(
     'TabsStore',
     () => {
         const isShowTabIcon = ref(true);
-        // 缓存的KEY，直接给keepalive使用
-        const cachedTabs = ref([]);
         const openedTabs = ref([]);
         const activeTabPath = ref('');
+        const keepAliveTabs = computed(() => {
+            return openedTabs.value.filter((tab) => tab.keepAlive).map((tab) => getTabCacheName(tab.path));
+        });
 
         const getActivePath = (path) => {
             let firstSlashIndex = path.indexOf('/');
@@ -25,7 +27,6 @@ const TabsStore = defineStore(
 
         const removeAllTabs = () => {
             openedTabs.value = [];
-            cachedTabs.value = [];
         };
 
         const removeUnActiveTabs = () => {
@@ -33,7 +34,7 @@ const TabsStore = defineStore(
                 let idx = getTabIdxByPath(activeTabPath.value);
                 idx = idx > -1 ? idx : 0;
                 const tab = openedTabs.value[idx];
-                removeOtherTabs(tab);
+                removeOtherTabs(tab.path);
             }
         };
 
@@ -47,8 +48,14 @@ const TabsStore = defineStore(
         const addTab = (tab) => {
             const idx = getTabIdxByPath(tab.path);
             if (idx < 0) {
-                openedTabs.value.push(Object.assign({}, tab));
-                addCachedTab(tab.name);
+                openedTabs.value.push(Object.assign({}, tab, { keepAlive: false }));
+            }
+        };
+
+        const toggleKeepAlive = (path) => {
+            const tab = findTab(path);
+            if (tab) {
+                tab.keepAlive = !tab.keepAlive;
             }
         };
 
@@ -56,7 +63,6 @@ const TabsStore = defineStore(
             if (openedTabs.value.length > 1) {
                 const idx = getTabIdxByPath(path);
                 if (idx > -1) {
-                    removeCachedTab(openedTabs.value[idx].name);
                     openedTabs.value.splice(idx, 1);
                 }
                 return openedTabs.value[openedTabs.value.length - 1].path;
@@ -68,37 +74,16 @@ const TabsStore = defineStore(
             if (idx > -1) {
                 const tab = openedTabs.value[idx];
                 openedTabs.value = [tab];
-                cachedTabs.value = [];
-                cachedTabs.value = [tab.name];
             }
         };
 
         const removeTabs = (path, type) => {
             if (path) {
                 const idx = getTabIdxByPath(path);
-                let removeTabs = [];
                 if (type === 'right') {
-                    removeTabs = openedTabs.value.splice(idx + 1);
+                    openedTabs.value.splice(idx + 1);
                 } else if (type === 'left') {
-                    removeTabs = openedTabs.value.splice(0, idx);
-                }
-                if (removeTabs.length) {
-                    removeTabs.forEach((e) => removeCachedTab(e.name));
-                }
-            }
-        };
-
-        const addCachedTab = (name) => {
-            if (name && !cachedTabs.value.includes(name)) {
-                cachedTabs.value.push(name);
-            }
-        };
-
-        const removeCachedTab = (name) => {
-            if (name) {
-                const idx = cachedTabs.value.findIndex((v) => v === name);
-                if (idx > -1) {
-                    cachedTabs.value.splice(idx, 1);
+                    openedTabs.value.splice(0, idx);
                 }
             }
         };
@@ -120,11 +105,10 @@ const TabsStore = defineStore(
             isShowTabIcon,
             activeTabPath,
             openedTabs,
-            cachedTabs,
+            keepAliveTabs,
             addTab,
             findTab,
-            addCachedTab,
-            removeCachedTab,
+            toggleKeepAlive,
             removeTab,
             removeTabs,
             removeOtherTabs,

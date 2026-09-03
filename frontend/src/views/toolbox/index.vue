@@ -14,7 +14,7 @@
             </template>
         </RouterButton>
         <LayoutContent>
-            <router-view></router-view>
+            <RouterViewCache />
         </LayoutContent>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>

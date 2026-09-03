@@ -37,14 +37,14 @@
             <div class="main-container">
                 <mobile-header v-if="classObj.mobile" />
                 <Tabs v-if="classObj.openMenuTabs" />
-                <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" class="app-main" />
+                <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.keepAliveTabs : null" class="app-main" />
                 <Footer class="app-footer" v-if="!isFullScreen" />
             </div>
         </el-watermark>
         <div class="main-container" v-else>
             <mobile-header v-if="classObj.mobile" />
             <Tabs v-if="classObj.openMenuTabs" />
-            <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" class="app-main" />
+            <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.keepAliveTabs : null" class="app-main" />
             <Footer class="app-footer" v-if="!isFullScreen" />
         </div>
         <TaskList ref="taskListRef" />

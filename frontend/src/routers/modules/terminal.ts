@@ -18,7 +18,6 @@ const terminalRouter = {
             props: true,
             component: () => import('@/views/terminal/index.vue'),
             meta: {
-                keepAlive: true,
                 protectedRoleOnly: true,
             },
         },

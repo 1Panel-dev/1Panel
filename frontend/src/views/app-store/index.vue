@@ -4,7 +4,7 @@
             <RouterButton :buttons="buttons"></RouterButton>
         </div>
         <LayoutContent>
-            <router-view></router-view>
+            <RouterViewCache />
         </LayoutContent>
     </div>
 </template>

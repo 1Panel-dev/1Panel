@@ -504,6 +504,8 @@ const message = {
         closeCurrent: 'بستن جاری',
         closeOther: 'بستن سایر',
         closeAll: 'بستن همه',
+        keepAlive: 'حفظ نشست صفحه',
+        cancelKeepAlive: 'لغو حفظ نشست صفحه',
     },
     header: {
         logout: 'خروج',
@@ -2734,6 +2736,7 @@ const message = {
         portChangeHelper: 'پورت سرویس را تغییر داده و سرویس را مجدداً راه‌اندازی کنید. ادامه می‌دهید؟',
         theme: 'پوسته',
         menuTabs: 'زبانه‌های منو',
+        menuTabsHelper: 'پس از فعال‌سازی، برای حفظ نشست صفحه روی دکمه قفل زبانه کلیک کنید.',
         menuAccordion: 'باز شدن چند منو',
         menuAccordionHelper: 'پس از فعال‌سازی، چند گروه منوی نوار کناری می‌توانند هم‌زمان باز بمانند.',
         componentSize: 'اندازه کامپوننت',
