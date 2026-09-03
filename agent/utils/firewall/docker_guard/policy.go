@@ -91,12 +91,27 @@ func PolicySyncKey(policy Policy) string {
 	if mode == ModeAllow && len(policy.Sources) == 0 {
 		mode = ModeAll
 	}
-	sources := append([]string(nil), policy.Sources...)
+	sources := make([]string, 0, len(policy.Sources))
+	for _, source := range policy.Sources {
+		sources = append(sources, canonicalPolicySource(source))
+	}
 	sort.Strings(sources)
 	return strings.Join([]string{
 		policy.UUID, policy.Family, CanonicalHost(policy.HostIP), strconv.Itoa(int(policy.HostPort)),
 		policy.Protocol, mode, strings.Join(sources, ","),
 	}, "\x00")
+}
+
+func canonicalPolicySource(value string) string {
+	value = strings.TrimSpace(value)
+	if prefix, err := netip.ParsePrefix(value); err == nil {
+		return prefix.Masked().String()
+	}
+	if address, err := netip.ParseAddr(value); err == nil {
+		address = address.Unmap()
+		return netip.PrefixFrom(address, address.BitLen()).String()
+	}
+	return value
 }
 
 func PolicyStatesEqual(left, right []Policy) bool {

@@ -790,7 +790,9 @@ func (p databaseSyncPlan) preview() dto.FirewallRuleSyncPreview {
 			result.Total++
 		case firewallRuleSyncBlocked:
 			result.Blocked++
-			result.Total++
+			if item.ReasonCode != firewallsync.ReasonReadOnlyRule {
+				result.Total++
+			}
 		case firewallsync.StatusRemove:
 			result.Removed++
 		}
