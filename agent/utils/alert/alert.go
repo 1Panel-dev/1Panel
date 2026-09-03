@@ -2,13 +2,10 @@ package alert
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"mime"
 	network "net"
 	"net/http"
-	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 	"sync"
@@ -24,7 +21,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/bark"
 	"github.com/1Panel-dev/1Panel/agent/utils/email"
 	"github.com/1Panel-dev/1Panel/agent/utils/psutil"
-	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/jinzhu/copier"
 )
 
@@ -534,133 +530,6 @@ func FindRecentSuccessLoginsNotInWhitelist(minutes int, whitelist []string) ([]m
 		}
 	}
 	return abnormalLogs, nil
-}
-
-func CountRecentFailedSSHLog(minutes uint, maxAllowed uint) (int, bool, error) {
-	lines, err := grepSSHLog([]string{"Failed password", "Invalid user", "authentication failure"})
-	if err != nil {
-		return 0, false, err
-	}
-
-	thresholdTime := time.Now().Add(-time.Duration(minutes) * time.Minute)
-	count := 0
-
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
-		}
-		t, err := parseLogTime(line)
-		if err != nil {
-			continue
-		}
-		if t.After(thresholdTime) {
-			count++
-		}
-	}
-	return count, count >= int(maxAllowed), nil
-}
-
-func FindRecentSuccessLoginNotInWhitelist(minutes int, whitelist []string) ([]string, error) {
-	lines, err := grepSSHLog([]string{"Accepted password", "Accepted publickey"})
-	if err != nil {
-		return nil, err
-	}
-
-	thresholdTime := time.Now().Add(-time.Duration(minutes) * time.Minute)
-	var abnormalLogins []string
-
-	whitelistMap := make(map[string]struct{}, len(whitelist))
-	for _, ip := range whitelist {
-		whitelistMap[ip] = struct{}{}
-	}
-
-	ipRegex := re.GetRegex(re.AlertIPPattern)
-
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
-		}
-
-		t, err := parseLogTime(line)
-		if err != nil || t.Before(thresholdTime) {
-			continue
-		}
-
-		match := ipRegex.FindStringSubmatch(line)
-		if len(match) >= 2 {
-			ip := match[1]
-			if _, ok := whitelistMap[ip]; !ok {
-				abnormalLogins = append(abnormalLogins, fmt.Sprintf("%s-%s", ip, t.Format("2006-01-02 15:04:05")))
-			}
-		}
-	}
-
-	return abnormalLogins, nil
-}
-
-func findGrepPath() (string, error) {
-	path, err := exec.LookPath("grep")
-	if err != nil {
-		return "", fmt.Errorf("grep not found in PATH: %w", err)
-	}
-	return path, nil
-}
-
-func grepSSHLog(keywords []string) ([]string, error) {
-	logFiles := []string{"/var/log/secure", "/var/log/auth.log"}
-	var results []string
-	seen := make(map[string]struct{})
-
-	grepPath, err := findGrepPath()
-	if err != nil {
-		return nil, fmt.Errorf("find grep failed: %w", err)
-	}
-
-	for _, logFile := range logFiles {
-		if _, err := os.Stat(logFile); err != nil {
-			continue
-		}
-		for _, keyword := range keywords {
-			cmd := exec.Command(grepPath, "-a", keyword, logFile)
-			output, err := cmd.Output()
-			if err != nil {
-				var exitErr *exec.ExitError
-				if errors.As(err, &exitErr) {
-					if exitErr.ExitCode() == 1 {
-						continue
-					}
-				}
-				return nil, fmt.Errorf("read log file fail [%s]: %w", logFile, err)
-			}
-
-			lines := strings.Split(string(output), "\n")
-			for _, line := range lines {
-				line = strings.TrimSpace(line)
-				if line != "" {
-					if _, exists := seen[line]; !exists {
-						results = append(results, line)
-						seen[line] = struct{}{}
-					}
-				}
-			}
-		}
-	}
-
-	return results, nil
-}
-
-func parseLogTime(line string) (time.Time, error) {
-	if len(line) < 15 {
-		return time.Time{}, nil
-	}
-	timeStr := line[:15]
-	parsedTime, err := time.ParseInLocation("Jan 2 15:04:05", timeStr, time.Local)
-	if err != nil {
-		return time.Time{}, nil
-	}
-	return parsedTime.AddDate(time.Now().Year(), 0, 0), nil
 }
 
 func getNodeName(agentInfo *dto.AgentInfo) string {

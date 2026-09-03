@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"net"
@@ -32,6 +33,7 @@ const (
 	ResourceAlertInterval = 30
 	CheckIntervalSec      = 3
 	LoadCheckIntervalMin  = 5
+	sshIPLoginWindow      = 30 * time.Minute
 )
 
 type AlertTaskHelper struct {
@@ -512,10 +514,28 @@ func loadPanelLogin(alert dto.AlertDTO) {
 }
 
 func loadSSHLogin(alert dto.AlertDTO) {
-	count, isAlert, err := alertUtil.CountRecentFailedSSHLog(alert.Cycle, alert.Count)
-	if err != nil {
-		global.LOG.Errorf("Failed to count recent failed ssh login logs: %v", err)
+	now := time.Now()
+	failedWindow := time.Duration(alert.Cycle) * time.Minute
+	loadWindow := failedWindow
+	if loadWindow < sshIPLoginWindow {
+		loadWindow = sshIPLoginWindow
 	}
+	location, err := time.LoadLocation(common.LoadTimeZoneByCmd())
+	if err != nil {
+		global.LOG.Errorf("Failed to load timezone for ssh login logs: %v", err)
+		location = time.Local
+	}
+	histories, err := loadSSHAlertHistories(defaultSSHLogDir, now.Add(-loadWindow), now, location)
+	if err != nil {
+		global.LOG.Errorf("Failed to load ssh login logs: %v", err)
+	}
+	count, records := summarizeSSHLoginHistories(
+		histories,
+		now,
+		failedWindow,
+		strings.Split(strings.TrimSpace(alert.AdvancedParams), "\n"),
+	)
+	isAlert := count >= int(alert.Count)
 	if isAlert {
 		params := []dto.Param{
 			{
@@ -531,12 +551,6 @@ func loadSSHLogin(alert dto.AlertDTO) {
 		}
 		sendAlerts(alert, "sshLogin", strconv.Itoa(count), "sshLogin", params)
 	}
-	whitelist := strings.Split(strings.TrimSpace(alert.AdvancedParams), "\n")
-	records, err := alertUtil.FindRecentSuccessLoginNotInWhitelist(30, whitelist)
-	if err != nil {
-		global.LOG.Errorf("Failed to check recent failed ip ssh login logs: %v", err)
-	}
-	records = filterSSHLoginEntriesNotInWhitelist(records, whitelist)
 	if len(records) > 0 {
 		quota := strings.Join(records, "\n")
 		params := []dto.Param{
@@ -559,20 +573,6 @@ func filterLoginLogsNotInWhitelist(records []model.LoginLog, whitelist []string)
 	filtered := make([]model.LoginLog, 0, len(records))
 	for _, record := range records {
 		if !isIPInWhitelist(record.IP, whitelist) {
-			filtered = append(filtered, record)
-		}
-	}
-	return filtered
-}
-
-func filterSSHLoginEntriesNotInWhitelist(records []string, whitelist []string) []string {
-	filtered := make([]string, 0, len(records))
-	for _, record := range records {
-		ip := record
-		if idx := strings.Index(record, "-"); idx >= 0 {
-			ip = record[:idx]
-		}
-		if !isIPInWhitelist(ip, whitelist) {
 			filtered = append(filtered, record)
 		}
 	}
@@ -1116,4 +1116,56 @@ func calculateMinutesDifference(newDate time.Time) int {
 	}
 	minutesDifference := int(now.Sub(newDate).Minutes())
 	return minutesDifference
+}
+
+func loadSSHAlertHistories(
+	baseDir string,
+	startTime, endTime time.Time,
+	location *time.Location,
+) ([]dto.SSHHistory, error) {
+	fileList, err := listSSHLogFiles(baseDir)
+	if err != nil {
+		return nil, err
+	}
+
+	var (
+		histories []dto.SSHHistory
+		loadErr   error
+	)
+	for _, file := range fileList {
+		items, err := loadSSHHistoriesFromFile(file.Name, "", "", startTime, endTime, file.Year, location)
+		if err != nil {
+			loadErr = errors.Join(loadErr, fmt.Errorf("load SSH log file %s: %w", file.Name, err))
+			continue
+		}
+		histories = append(histories, items...)
+	}
+	return histories, loadErr
+}
+
+func summarizeSSHLoginHistories(
+	histories []dto.SSHHistory,
+	now time.Time,
+	failedWindow time.Duration,
+	whitelist []string,
+) (int, []string) {
+	failedStartTime := now.Add(-failedWindow)
+	successStartTime := now.Add(-sshIPLoginWindow)
+	failedCount := 0
+	var abnormalLogins []string
+
+	for _, item := range histories {
+		switch item.Status {
+		case constant.StatusFailed:
+			if isSSHLogWithinTimeRange(item.Date, failedStartTime, now) {
+				failedCount++
+			}
+		case constant.StatusSuccess:
+			if !isSSHLogWithinTimeRange(item.Date, successStartTime, now) || isIPInWhitelist(item.Address, whitelist) {
+				continue
+			}
+			abnormalLogins = append(abnormalLogins, fmt.Sprintf("%s-%s", item.Address, item.Date.Format(constant.DateTimeLayout)))
+		}
+	}
+	return failedCount, abnormalLogins
 }
