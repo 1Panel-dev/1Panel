@@ -40,6 +40,7 @@ import (
 const sshPath = "/etc/ssh/sshd_config"
 const defaultSSHPort = "22"
 const sshManagedMarker = "# config by 1panel"
+const defaultSSHLogDir = "/var/log"
 
 type SSHService struct{}
 
@@ -668,13 +669,11 @@ func isSSHLogFileName(name string) bool {
 	return false
 }
 
-func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []dto.SSHHistory, error) {
+func listSSHLogFiles(baseDir string) ([]sshFileItem, error) {
 	var fileList []sshFileItem
-	var data []dto.SSHHistory
-	baseDir := "/var/log"
 	fileItems, err := os.ReadDir(baseDir)
 	if err != nil {
-		return 0, data, err
+		return nil, err
 	}
 	for _, item := range fileItems {
 		if item.IsDir() || !isSSHLogFileName(item.Name()) {
@@ -682,7 +681,7 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []d
 		}
 		info, err := item.Info()
 		if err != nil {
-			return 0, data, err
+			return nil, err
 		}
 		if !info.Mode().IsRegular() {
 			continue
@@ -695,7 +694,15 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []d
 		}
 		fileList = append(fileList, sshFileItem{Name: itemPath, Year: info.ModTime().Year()})
 	}
-	fileList = sortFileList(fileList)
+	return sortFileList(fileList), nil
+}
+
+func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []dto.SSHHistory, error) {
+	var data []dto.SSHHistory
+	fileList, err := listSSHLogFiles(defaultSSHLogDir)
+	if err != nil {
+		return 0, data, err
+	}
 
 	filter := ""
 	if len(req.Info) != 0 {
@@ -742,7 +749,7 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (int64, []d
 }
 
 func (u *SSHService) CleanLog() error {
-	return cleanSSHLogFiles("/var/log")
+	return cleanSSHLogFiles(defaultSSHLogDir)
 }
 
 func cleanSSHLogFiles(baseDir string) error {
@@ -1290,20 +1297,11 @@ func loadSSHData(
 	if err != nil {
 		return datas, 0, 0
 	}
-	lines, err := loadSSHLogLines(filePath)
+	histories, err := loadSSHHistoriesFromFile(filePath, status, filter, startTime, endTime, currentYear, nyc)
 	if err != nil {
 		return datas, 0, 0
 	}
-	items := collectSSHLogItems(lines, filter, status)
-	for i := len(items) - 1; i >= 0; i-- {
-		itemData := items[i].History
-		if !matchSSHLogStatus(status, itemData.Status) || !checkIsStandard(itemData) {
-			continue
-		}
-		itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
-		if !isSSHLogWithinTimeRange(itemData.Date, startTime, endTime) {
-			continue
-		}
+	for _, itemData := range histories {
 		if successCount+failedCount >= showCountFrom && (showCountTo == -1 || successCount+failedCount < showCountTo) {
 			itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
 			datas = append(datas, itemData)
@@ -1315,6 +1313,32 @@ func loadSSHData(
 		}
 	}
 	return datas, successCount, failedCount
+}
+
+func loadSSHHistoriesFromFile(
+	filePath, status, filter string,
+	startTime, endTime time.Time,
+	currentYear int,
+	location *time.Location,
+) ([]dto.SSHHistory, error) {
+	lines, err := loadSSHLogLines(filePath)
+	if err != nil {
+		return nil, err
+	}
+	items := collectSSHLogItems(lines, filter, status)
+	histories := make([]dto.SSHHistory, 0, len(items))
+	for i := len(items) - 1; i >= 0; i-- {
+		itemData := items[i].History
+		if !matchSSHLogStatus(status, itemData.Status) || !checkIsStandard(itemData) {
+			continue
+		}
+		itemData.Date = loadDate(currentYear, itemData.DateStr, location)
+		if !isSSHLogWithinTimeRange(itemData.Date, startTime, endTime) {
+			continue
+		}
+		histories = append(histories, itemData)
+	}
+	return histories, nil
 }
 
 func isSSHLogWithinTimeRange(itemTime, startTime, endTime time.Time) bool {
