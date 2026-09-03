@@ -1347,7 +1347,7 @@ const rules = reactive({
     downloadAccountID: [Rules.requiredSelect],
     retainCopies: [Rules.number],
     retryTimes: [Rules.number],
-    timeoutItem: [Rules.number],
+    timeoutItem: [Rules.integerNumber],
     timeoutUnit: [Rules.requiredSelect],
     alertCount: [Rules.integerNumber, { validator: checkSendCount, trigger: 'blur' }],
     alertMethodItems: [Rules.requiredSelect],
