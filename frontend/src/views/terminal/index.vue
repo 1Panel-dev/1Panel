@@ -37,7 +37,7 @@ import HostTab from '@/views/terminal/host/index.vue';
 import CommandTab from '@/views/terminal/command/index.vue';
 import TerminalTab from '@/views/terminal/terminal/index.vue';
 import SettingTab from '@/views/terminal/setting/index.vue';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { getTerminalInfo } from '@/api/modules/setting';
 import { TerminalStore } from '@/store';
 import { useGlobalStore } from '@/composables/useGlobalStore';
@@ -85,9 +85,6 @@ const loadTerminalSetting = async () => {
 onMounted(() => {
     loadTerminalSetting();
     handleChange('terminal');
-});
-onUnmounted(() => {
-    terminalTabRef.value?.cleanTimer();
 });
 </script>
 
