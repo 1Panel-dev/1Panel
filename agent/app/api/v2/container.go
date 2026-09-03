@@ -439,7 +439,7 @@ func (b *BaseApi) ContainerItemStats(c *gin.Context) {
 		return
 	}
 
-	data, err := containerService.ContainerItemStats(req)
+	data, err := containerService.ContainerItemStats(c.Request.Context(), req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

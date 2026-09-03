@@ -82,10 +82,11 @@ export const cleanContainerLog = (containerName: string, operateNode?: string) =
     return http.post(`/containers/clean/log${params}`, { name: containerName }, TimeoutEnum.T_60S);
 };
 export const containerItemStats = (containerID: string, currentNode?: string) => {
+    const timeout = containerID === 'system' ? TimeoutEnum.T_5M : TimeoutEnum.T_60S;
     return http.post<Container.ContainerItemStats>(
         `/containers/item/stats`,
         { name: containerID },
-        TimeoutEnum.T_60S,
+        timeout,
         currentNode ? { CurrentNode: currentNode } : undefined,
     );
 };

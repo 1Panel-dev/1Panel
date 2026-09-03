@@ -81,7 +81,7 @@ type IContainerService interface {
 	ContainerUpgrade(req dto.ContainerUpgrade) error
 	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
 	ContainerListStats() ([]dto.ContainerListStats, error)
-	ContainerItemStats(req dto.OperationWithName) (dto.ContainerItemStats, error)
+	ContainerItemStats(ctx context.Context, req dto.OperationWithName) (dto.ContainerItemStats, error)
 	LoadResourceLimit() (*dto.ResourceLimit, error)
 	ContainerRename(req dto.ContainerRename) error
 	ContainerCommit(req dto.ContainerCommit) error
@@ -248,15 +248,15 @@ func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
 	}
 	return data, nil
 }
-func (u *ContainerService) ContainerItemStats(req dto.OperationWithName) (dto.ContainerItemStats, error) {
+func (u *ContainerService) ContainerItemStats(ctx context.Context, req dto.OperationWithName) (dto.ContainerItemStats, error) {
 	var data dto.ContainerItemStats
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return data, err
 	}
+	defer client.Close()
 	if req.Name != "system" {
-		defer client.Close()
-		containerInfo, _, err := client.ContainerInspectWithRaw(context.Background(), req.Name, true)
+		containerInfo, _, err := client.ContainerInspectWithRaw(ctx, req.Name, true)
 		if err != nil {
 			return data, err
 		}
@@ -265,7 +265,7 @@ func (u *ContainerService) ContainerItemStats(req dto.OperationWithName) (dto.Co
 		return data, nil
 	}
 
-	usage, err := client.DiskUsage(context.Background(), types.DiskUsageOptions{})
+	usage, err := client.DiskUsage(ctx, types.DiskUsageOptions{})
 	if err != nil {
 		return data, err
 	}
